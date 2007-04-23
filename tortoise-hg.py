@@ -10,15 +10,15 @@ import _winreg
 def DllRegisterServer(cls):
     import _winreg
 
-    # Add bzrlib to the library path
+    # Add mercurial to the library path
     try:
-        import bzrlib
+        import mercurial
     except ImportError:
         import sys
         from win32com.server import register
         register.UnregisterClasses(cls)
-        sys.exit("Error: Failed to find bzrlib module! Include the path to bzrlib in PYTHONPATH environment variable while registering component.")
-    bzr_path = os.path.dirname(os.path.dirname(bzrlib.__file__))
+        sys.exit("Error: Failed to find mercurial module! Include the path to mercurial in PYTHONPATH environment variable while registering component.")
+    bzr_path = os.path.dirname(os.path.dirname(mercurial.__file__))
     key = "CLSID\\%s\\PythonCOMPath" % cls._reg_clsid_
     path = _winreg.QueryValue(_winreg.HKEY_CLASSES_ROOT, key)
     _winreg.SetValue(_winreg.HKEY_CLASSES_ROOT, key, _winreg.REG_SZ, "%s;%s" % (path, bzr_path))

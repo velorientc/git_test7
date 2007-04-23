@@ -38,55 +38,43 @@ class IconOverlayExtension(object):
         """
         Get the state of a given path in source control.
         """
-        import bzrlib.workingtree
-        import bzrlib.errors
+        
+        print "called: __get_state__(%s)" % path
+        
+        if os.path.isdir(path):
+            print "%s: skip directory" % path
+            return NOT_IN_TREE      # ignore directories (for efficiency)
+            
+        from mercurial import hg, repo, ui, cmdutil
+
+        # open repo
+        u = ui.ui()
+        dir, filename = os.path.split(path)
+        os.chdir(dir)
         try:
-            tree, relpath = bzrlib.workingtree.WorkingTree.open_containing(path)
-        except bzrlib.errors.NotBranchError:
+            repo = hg.repository(u, path='')
+        except repo.RepoError:
             # We aren't in a working tree
+            print "%s: not in repo" % dir
             return NOT_IN_TREE
 
-        # Ideally, we'd use tree.changes_from, but unfortunately this is
-        # recusive for directories, so we calculate changes ourselves.
-        if tree.is_control_filename(relpath):
-            return CONTROL_FILE
+        # get file status
+        files, matchfn, anypats = cmdutil.matchpats(repo, [filename])
+        modified, added, removed, deleted, unknown, ignored, clean = [
+                n for n in repo.status(files=files, list_clean=True)]
 
-        file_id = tree.path2id(relpath)
-        if file_id is None:
-            # This is an unknown file...
-            return UNKNOWN
-
-        # Get information about the path from the old tree
-        old = tree.basis_tree()
-        old.lock_read()
-        try:
-            try:
-                entry = old.inventory[file_id]
-            except bzrlib.errors.NoSuchId:
-                # This is an added entry...
-                return ADDED
-
-            if entry.kind != "file":
-                # TODO: For directories, we want to find out if
-                # the contents of the directories have changed...
-                return UNCHANGED
-
-            old_size = entry.text_size
-            old_sha1 = entry.text_sha1
-        finally:
-            old.unlock()
-
-        # Look in the new tree to see if has changed...
-        tree.lock_read()
-        try:
-            if tree.get_file_size(file_id) != old_size or tree.get_file_sha1(file_id) != old_sha1:
-                # This file has been modified
-                return MODIFIED
-        finally:
-            tree.unlock()
-
-        # This file has unchanged.
-        return UNCHANGED
+        if added:
+            print "%s: ADDED" % path
+            return ADDED
+        if modified:
+            print "%s: MODIFIED" % path
+            return MODIFIED
+        if clean:
+            print "%s: UNCHANGED" % path
+            return UNCHANGED
+        
+        print "%s: UNKNOWN" % path
+        return UNKNOWN
 
     def IsMemberOf(self, path, attrib):
         S_OK = 0
