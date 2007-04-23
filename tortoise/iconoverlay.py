@@ -22,6 +22,11 @@ class IconOverlayExtension(object):
         icon overlays; we (will) use 6, tortoisecvs uses 7... not a good
         recipe for a happy system.
     """
+    
+    counter = 0
+    last_path = ""
+    last_status = UNKNOWN
+    
     _com_interfaces_ = [shell.IID_IShellIconOverlayIdentifier]
     _public_methods_ = [
         "GetOverlayInfo", "GetPriority", "IsMemberOf"
@@ -41,6 +46,17 @@ class IconOverlayExtension(object):
         
         print "called: __get_state__(%s)" % path
         
+        # debugging
+        if IconOverlayExtension.counter > 10000:
+            IconOverlayExtension.counter = 0
+        else:
+            IconOverlayExtension.counter += 1
+        print "counter = %d" % IconOverlayExtension.counter
+        
+        # check if path is cached
+        if IconOverlayExtension.last_path == path:
+            return IconOverlayExtension.last_status
+            
         if os.path.isdir(path):
             print "%s: skip directory" % path
             return NOT_IN_TREE      # ignore directories (for efficiency)
@@ -56,6 +72,9 @@ class IconOverlayExtension(object):
         except repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
+            # cached path and status
+            IconOverlayExtension.last_status = NOT_IN_TREE
+            IconOverlayExtension.last_path = path
             return NOT_IN_TREE
 
         # get file status
@@ -64,17 +83,20 @@ class IconOverlayExtension(object):
                 n for n in repo.status(files=files, list_clean=True)]
 
         if added:
-            print "%s: ADDED" % path
-            return ADDED
-        if modified:
-            print "%s: MODIFIED" % path
-            return MODIFIED
-        if clean:
-            print "%s: UNCHANGED" % path
-            return UNCHANGED
-        
-        print "%s: UNKNOWN" % path
-        return UNKNOWN
+            status = ADDED
+        elif modified:
+            status = MODIFIED
+        elif clean:
+            status = UNCHANGED
+        else:
+            status = UNKNOWN
+
+        # cached path and status
+        IconOverlayExtension.last_status = status
+        IconOverlayExtension.last_path = path
+
+        print "%s: %s" % (path, status)
+        return status
 
     def IsMemberOf(self, path, attrib):
         S_OK = 0
