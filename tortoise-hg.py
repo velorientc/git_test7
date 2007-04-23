@@ -43,12 +43,13 @@ def DllUnregisterServer(cls):
 if __name__ == '__main__':
     from win32com.server import register
     from tortoise.contextmenu import ContextMenuExtension
+    import tortoise.iconoverlay
+    
     register.UseCommandLine(ContextMenuExtension,
                    finalize_register = lambda: DllRegisterServer(ContextMenuExtension),
                    finalize_unregister = lambda: DllUnregisterServer(ContextMenuExtension))
 
     # Register all of the icon overlay extensions
-    import tortoise.iconoverlay
     for icon_class in tortoise.iconoverlay.get_overlay_classes():
         register.UseCommandLine(icon_class,
                        finalize_register = lambda: DllRegisterServer(icon_class),
