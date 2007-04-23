@@ -2,6 +2,7 @@
 # Copyright (C) 2007 Henry Ludemann <misc@hl.id.au>
 
 import os.path
+import win32api
 from win32com.shell import shell, shellcon
 import _winreg
 
@@ -11,6 +12,8 @@ MODIFIED = "modified"
 UNKNOWN = "unknown"
 NOT_IN_TREE = "not in tree"
 CONTROL_FILE = "control file"
+
+CACHE_TIMEOUT = 1000
 
 class IconOverlayExtension(object):
     """
@@ -26,6 +29,7 @@ class IconOverlayExtension(object):
     counter = 0
     last_path = ""
     last_status = UNKNOWN
+    last_tick = 0
     
     _com_interfaces_ = [shell.IID_IShellIconOverlayIdentifier]
     _public_methods_ = [
@@ -53,14 +57,16 @@ class IconOverlayExtension(object):
             IconOverlayExtension.counter += 1
         print "counter = %d" % IconOverlayExtension.counter
         
-        # check if path is cached
-        if IconOverlayExtension.last_path == path:
-            return IconOverlayExtension.last_status
-            
         if os.path.isdir(path):
             print "%s: skip directory" % path
             return NOT_IN_TREE      # ignore directories (for efficiency)
-            
+
+        # check if path is cached
+        tc = win32api.GetTickCount()
+        elapsed = tc - IconOverlayExtension.last_tick
+        if IconOverlayExtension.last_path == path and elapsed < CACHE_TIMEOUT:
+            return IconOverlayExtension.last_status
+
         from mercurial import hg, repo, ui, cmdutil
 
         # open repo
@@ -75,6 +81,7 @@ class IconOverlayExtension(object):
             # cached path and status
             IconOverlayExtension.last_status = NOT_IN_TREE
             IconOverlayExtension.last_path = path
+            IconOverlayExtension.last_tick = tc
             return NOT_IN_TREE
 
         # get file status
@@ -91,9 +98,10 @@ class IconOverlayExtension(object):
         else:
             status = UNKNOWN
 
-        # cached path and status
+        # cached file info
         IconOverlayExtension.last_status = status
         IconOverlayExtension.last_path = path
+        IconOverlayExtension.last_tick = tc
 
         print "%s: %s" % (path, status)
         return status
