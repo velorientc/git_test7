@@ -57,7 +57,7 @@ class IconOverlayExtension(object):
             IconOverlayExtension.counter += 1
         print "counter = %d" % IconOverlayExtension.counter
         
-        if os.path.isdir(path):
+        if 0 and os.path.isdir(path):
             print "%s: skip directory" % path
             return NOT_IN_TREE      # ignore directories (for efficiency)
 
@@ -71,7 +71,11 @@ class IconOverlayExtension(object):
 
         # open repo
         u = ui.ui()
-        dir, filename = os.path.split(path)
+        if os.path.isdir(path):
+            dir, filename = path, ''
+        else:
+            dir, filename = os.path.split(path)
+
         os.chdir(dir)
         try:
             repo = hg.repository(u, path='')
