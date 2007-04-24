@@ -149,9 +149,9 @@ def make_icon_overlay(name, icon, state, clsid):
     globals()[classname] = cls
 
 _overlay_classes = []
+make_icon_overlay("Changed", "changed.ico", MODIFIED, "{102C6A24-5F38-4186-B64A-237011809FAB}")
 make_icon_overlay("Unchanged", "unchanged.ico", UNCHANGED, "{00FEE959-5773-424B-88AC-A01BFC8E4555}")
 make_icon_overlay("Added", "added.ico", ADDED, "{8447DB75-5875-4BA8-9F38-A727DAA484A0}")
-make_icon_overlay("Changed", "changed.ico", MODIFIED, "{102C6A24-5F38-4186-B64A-237011809FAB}")
 make_icon_overlay("Unknown", "unknown.ico", UNKNOWN, "{A8AFEA16-5F0C-4BE2-A64B-80C41C50D911}")
 
 def get_overlay_classes():
