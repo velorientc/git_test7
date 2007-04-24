@@ -88,6 +88,14 @@ class IconOverlayExtension(object):
             IconOverlayExtension.last_tick = tc
             return NOT_IN_TREE
 
+        # skip root direcory to improve speed
+        if repo.root == path:
+            print "%s: skip repo root" % dir
+            IconOverlayExtension.last_status = NOT_IN_TREE
+            IconOverlayExtension.last_path = path
+            IconOverlayExtension.last_tick = tc
+            return NOT_IN_TREE
+            
         # get file status
         files, matchfn, anypats = cmdutil.matchpats(repo, [filename])
         modified, added, removed, deleted, unknown, ignored, clean = [
