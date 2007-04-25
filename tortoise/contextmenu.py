@@ -137,6 +137,23 @@ class ContextMenuExtension:
             # string into the correct encoding depending on the flags.
             return self._handlers[cmd][0]
         return S_FALSE
+
+    def _find_path(self, pgmname):
+        ospath = os.environ['PATH']
+        plist = []
+        for path in ospath.split(';'):
+            for ext in ['exe', 'bat', 'cmd']:
+                ppath = os.path.join(path, "%s.%s" % (pgmname, ext))
+                #print "checking path: %s" % ppath
+                if os.path.exists(ppath):
+                    plist.append(ppath)
+
+        if plist:
+            #print "path found: %s" % ", ".join(plist)
+            return plist[0]
+        else:
+            return None
+
         
     def _checkout(self, parent_window):
         import checkout
@@ -155,9 +172,11 @@ class ContextMenuExtension:
         else:
             dir = os.path.dirname(path)
         os.chdir(dir)
-
-        subprocess.Popen(['hg', 'qct'])
-        print "popened 'hg qct'"
+        
+        hgpath = self._find_path('hg')
+        if hgpath:
+            subprocess.Popen(['hg', 'qct'])
+            print "popened 'hg qct'"
 
     def _diff(self, parent_window):
         import os, subprocess
@@ -169,11 +188,15 @@ class ContextMenuExtension:
             dir = path
         else:
             dir = os.path.dirname(path)
+
         print "chdir to %s" % dir
         os.chdir(dir)
         print "cwd = %s" % os.getcwd()
-        subprocess.Popen(['hg', 'extdiff'])
-        print "popened 'hg extdiff'"
+        
+        hgpath = self._find_path('hg')
+        if hgpath:
+            subprocess.Popen([hgpath, 'extdiff', '.'])
+            print "popened 'hg extdiff'"
 
     def _view(self, parent_window):
         import os, subprocess
@@ -187,6 +210,8 @@ class ContextMenuExtension:
             dir = os.path.dirname(path)
         os.chdir(dir)
         
-        subprocess.Popen(['hg', 'view'])
-        print "popened 'hg view'"
+        hgpath = self._find_path('hg')
+        if hgpath:
+            subprocess.Popen([hgpath, 'view'])
+            print "popened 'hg view'"
 
