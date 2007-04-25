@@ -165,13 +165,6 @@ class ContextMenuExtension:
         import os, subprocess
 
         print "_commit() on %s" % ", ".join(self._filenames)
-
-        path = self._filenames[0]
-        if os.path.isdir(path):
-            dir = path
-        else:
-            dir = os.path.dirname(path)
-        os.chdir(dir)
         
         hgpath = self._find_path('hg')
         if hgpath:
@@ -182,16 +175,6 @@ class ContextMenuExtension:
         import os, subprocess
 
         print "_commit() on %s" % ", ".join(self._filenames)
-
-        path = self._filenames[0]
-        if os.path.isdir(path):
-            dir = path
-        else:
-            dir = os.path.dirname(path)
-
-        print "chdir to %s" % dir
-        os.chdir(dir)
-        print "cwd = %s" % os.getcwd()
         
         hgpath = self._find_path('hg')
         if hgpath:
@@ -202,13 +185,6 @@ class ContextMenuExtension:
         import os, subprocess
         
         print "_view() on %s" % ", ".join(self._filenames)
-        
-        path = self._filenames[0]
-        if os.path.isdir(path):
-            dir = path
-        else:
-            dir = os.path.dirname(path)
-        os.chdir(dir)
         
         hgpath = self._find_path('hg')
         if hgpath:
