@@ -10,8 +10,6 @@ import win32gui
 import win32gui_struct
 import _winreg
 
-from dialog import info_dialog
-
 S_OK = 0
 S_FALSE = 1
 
@@ -78,25 +76,44 @@ class ContextMenuExtension:
 
         Each command is a tuple containing (display text, handler).
         """
-        import bzrlib.builtins
-        import bzrlib.errors
+        
+        print "_get_commands() on %s" ", ".join(self._filenames)
 
+        from mercurial import hg, ui, repo
+        
         tree = None
+
+        # open repo
+        path = self._filenames[0]
+        if os.path.isdir(path):
+            dir, filename = path, ''
+        else:
+            dir, filename = os.path.split(path)
+
+        os.chdir(dir)
+        u = ui.ui()
         try:
-            tree, relative_files = bzrlib.builtins.internal_tree_files(self._filenames)
-        except bzrlib.errors.NotBranchError:
-            pass
-        except bzrlib.errors.FileInWrongBranch:
-            # We have no commands that are valid for multiple branches.
+            tree = hg.repository(u, path='')
+        except repo.RepoError:
+            print "%s: not in repo" % dir
             return []
 
+        print "_get_commands(): adding hg commands"
+        
         result = []
-        if len(self._filenames) == 1 and tree is None and os.path.isdir(self._filenames[0]):
-            result.append((_("Bzr Checkout"), _("Checkout a bazaar branch"), self._checkout))
         if tree is not None:
-            result.append((_("Commit"), _("Commit changes to the branch"), self._commit))
-        if tree is not None and len(self._filenames) == 1:
-            result.append((_("Diff"), _("View changes made in the local tree"), self._diff))
+            result.append((_("Commit"), 
+                           _("Commit changes to the branch"),
+                           self._commit))
+        if tree is not None:
+            result.append((_("Diff"),
+                           _("View changes made in the local tree"),
+                           self._diff))
+        if tree is not None:
+            result.append((_("View"),
+                           _("View history"),
+                           self._view))
+
         return result
 
     def InvokeCommand(self, ci):
@@ -120,7 +137,7 @@ class ContextMenuExtension:
             # string into the correct encoding depending on the flags.
             return self._handlers[cmd][0]
         return S_FALSE
-
+        
     def _checkout(self, parent_window):
         import checkout
         dialog = checkout.CheckoutDialog(self._filenames[0])
@@ -128,41 +145,48 @@ class ContextMenuExtension:
         dialog.destroy()
 
     def _commit(self, parent_window):
-        import bzrlib.builtins
+        import os, subprocess
 
-        # Note that we don't catch the exceptions; we shouldn't be in here
-        # if we aren't in a tree.
-        tree, relative_files = bzrlib.builtins.internal_tree_files(self._filenames)
+        print "_commit() on %s" % ", ".join(self._filenames)
 
-        import commit
-        import gtk
-        # Note that the commit dialog only handles a single item to
-        # commit at the moment...
-        dialog = commit.CommitDialog(tree, tree.basedir, False, relative_files)
-        if not dialog.delta.has_changed():
-            info_dialog(_("Commit"), _("No changes found!"))
+        path = self._filenames[0]
+        if os.path.isdir(path):
+            dir = path
         else:
-            dialog.run()
-            dialog.destroy()
+            dir = os.path.dirname(path)
+        os.chdir(dir)
+
+        subprocess.Popen(['hg', 'qct'])
+        print "popened 'hg qct'"
 
     def _diff(self, parent_window):
-        import bzrlib.builtins
+        import os, subprocess
 
-        # Note that we don't catch the exceptions; we shouldn't be in here
-        # if we aren't in a tree.
-        tree, relative_files = bzrlib.builtins.internal_tree_files(self._filenames)
-        assert len(relative_files) == 1
+        print "_commit() on %s" % ", ".join(self._filenames)
 
-        import diff
-        import gtk
+        path = self._filenames[0]
+        if os.path.isdir(path):
+            dir = path
+        else:
+            dir = os.path.dirname(path)
+        print "chdir to %s" % dir
+        os.chdir(dir)
+        print "cwd = %s" % os.getcwd()
+        subprocess.Popen(['hg', 'extdiff'])
+        print "popened 'hg extdiff'"
 
-        # Note that the commit dialog only handles a single item to
-        # commit at the moment...
-        window = diff.DiffWindow()
-        window.set_diff("changes", tree, tree.basis_tree())
-        if relative_files[0] != "":
-            window.set_file(relative_files[0])
-        window.connect("destroy", lambda widgit: gtk.main_quit())
-        window.show()
-        gtk.main()
+    def _view(self, parent_window):
+        import os, subprocess
+        
+        print "_view() on %s" % ", ".join(self._filenames)
+        
+        path = self._filenames[0]
+        if os.path.isdir(path):
+            dir = path
+        else:
+            dir = os.path.dirname(path)
+        os.chdir(dir)
+        
+        subprocess.Popen(['hg', 'view'])
+        print "popened 'hg view'"
 
