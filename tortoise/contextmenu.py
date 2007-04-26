@@ -51,17 +51,27 @@ class ContextMenuExtension:
         self._handlers = {}
         commands = self._get_commands()
         if len(commands) > 0:
+            # menu separator
             win32gui.InsertMenu(hMenu, indexMenu,
                                 win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
                                 0, None)
-            indexMenu += 1
+            
+            # create submenu with Hg commands
+            submenu = win32gui.CreatePopupMenu()
             for id, (text, help_text, command) in enumerate(commands):
                 item, extras = win32gui_struct.PackMENUITEMINFO(text=text,
                             wID=idCmdFirst + id)
-                win32gui.InsertMenuItem(hMenu, indexMenu + id, 1, item)
+                win32gui.InsertMenuItem(submenu, id, 1, item)
                 self._handlers[id] = (help_text, command)
 
-            indexMenu += len(commands)
+            # add Hg submenu to context menu
+            indexMenu += 1
+            item, extras = win32gui_struct.PackMENUITEMINFO(text="TortoiseHg",
+                                                            hSubMenu=submenu)
+            win32gui.InsertMenuItem(hMenu, indexMenu, 1, item)
+
+            # menu separator
+            indexMenu += 1
             win32gui.InsertMenu(hMenu, indexMenu,
                                 win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
                                 0, None)
