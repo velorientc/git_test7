@@ -184,7 +184,7 @@ class ContextMenuExtension:
     def _diff(self, parent_window):
         import os, subprocess
 
-        print "_commit() on %s" % ", ".join(self._filenames)
+        print "_diff() on %s" % ", ".join(self._filenames)
         
         hgpath = self._find_path('hg')
         if hgpath:
