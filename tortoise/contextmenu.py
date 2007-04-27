@@ -164,6 +164,25 @@ class ContextMenuExtension:
         else:
             return None
 
+    def _runProgram(self, appName, cmdline):
+        # subprocess.Popen() would create a terminal (cmd.exe) window when 
+        # making calls to hg, we use CreateProcess() coupled with 
+        # CREATE_NO_WINDOW flag to suppress the terminal window
+        
+        import win32process, win32con, os
+        
+        flags = win32con.CREATE_NO_WINDOW
+        startupInfo = win32process.STARTUPINFO()
+        
+        h1, h2, i1, i2 = win32process.CreateProcess(appName, 
+                                                    cmdline,
+                                                    None,
+                                                    None,
+                                                    1,
+                                                    flags,
+                                                    os.environ,
+                                                    os.getcwd(),
+                                                    startupInfo)
         
     def _checkout(self, parent_window):
         import checkout
@@ -178,8 +197,9 @@ class ContextMenuExtension:
         
         hgpath = self._find_path('hg')
         if hgpath:
-            subprocess.Popen(['hg', 'qct'])
-            print "popened 'hg qct'"
+            cmd = "%s qct" % hgpath
+            self._runProgram(hgpath, cmd)
+            print "started 'hg qct'"
 
     def _diff(self, parent_window):
         import os, subprocess
@@ -188,8 +208,9 @@ class ContextMenuExtension:
         
         hgpath = self._find_path('hg')
         if hgpath:
-            subprocess.Popen([hgpath, 'extdiff', '.'])
-            print "popened 'hg extdiff'"
+            cmd = "%s extdiff" % hgpath
+            self._runProgram(hgpath, cmd)
+            print "started 'hg extdiff'"
 
     def _view(self, parent_window):
         import os, subprocess
@@ -198,6 +219,7 @@ class ContextMenuExtension:
         
         hgpath = self._find_path('hg')
         if hgpath:
-            subprocess.Popen([hgpath, 'view'])
-            print "popened 'hg view'"
+            cmd = "%s view" % hgpath
+            self._runProgram(hgpath, cmd)
+            print "started 'hg view'"
 
