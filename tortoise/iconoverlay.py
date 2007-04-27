@@ -3,6 +3,7 @@
 
 import os.path
 import win32api
+import win32con
 from win32com.shell import shell, shellcon
 import _winreg
 
@@ -54,6 +55,21 @@ class IconOverlayExtension(object):
     def GetPriority(self):
         return 0
 
+    def _get_installed_overlays():
+        key = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE,
+                                    "Software\\Microsoft\\Windows\\" +
+                                        "CurrentVersion\\Explorer\\" +
+                                        "ShellIconOverlayIdentifiers",
+                                    0,
+                                    win32con.KEY_READ)
+        keys = win32api.RegEnumKeyEx(key)
+        handlercount = len(keys)
+        print "number of overlay handlers installed = %d" % handlercount
+        for i, k in enumerate(keys):
+            print i, k
+        win32api.RegCloseKey(key)
+        return handlercount
+        
     def _get_state(self, path):
         """
         Get the state of a given path in source control.
