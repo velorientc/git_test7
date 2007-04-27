@@ -37,7 +37,18 @@ class IconOverlayExtension(object):
         ]
 
     def GetOverlayInfo(self):
-        icon = os.path.join(os.path.dirname(__file__), "..", "icons", "status", self.icon)
+        import win32api
+
+        # only support Overlays In Explorer
+        print "GetOverlayInfo: checking if in explorer"
+        modname = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
+        print "modname = %s" % modname
+        if not modname.endswith("\\explorer.exe"):
+            print "GetOverlayInfo: not in explorer"
+            return ("", 0, 0) 
+ 
+        icon = os.path.join(os.path.dirname(__file__), "..", "icons",
+                            "status", self.icon)
         return (icon, 0, shellcon.ISIOI_ICONFILE)
 
     def GetPriority(self):

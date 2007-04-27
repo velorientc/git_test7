@@ -8,6 +8,7 @@ from win32com.shell import shell, shellcon
 import win32con
 import win32gui
 import win32gui_struct
+import win32api
 import _winreg
 
 S_OK = 0
@@ -46,6 +47,14 @@ class ContextMenuExtension:
     def QueryContextMenu(self, hMenu, indexMenu, idCmdFirst, idCmdLast, uFlags):
         if uFlags & shellcon.CMF_DEFAULTONLY:
             return 0
+
+        # only support Overlays In Explorer
+        print "QueryContextMenu: checking if in explorer"
+        modname = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
+        print "modname = %s" % modname
+        if not modname.endswith("\\explorer.exe"):
+            print "QueryContextMenu: not in explorer"
+            return 0 
 
         # As we are a context menu handler, we can ignore verbs.
         self._handlers = {}
