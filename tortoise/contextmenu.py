@@ -25,8 +25,8 @@ def _shellquote(s):
 
 """Windows shell extension that adds context menu items to Bazaar branches."""
 class ContextMenuExtension:
-    _reg_progid_ = "Bazaar.ShellExtension.ContextMenu"
-    _reg_desc_ = "Bazaar Shell Extension"
+    _reg_progid_ = "Mercurial.ShellExtension.ContextMenu"
+    _reg_desc_ = "Mercurial Shell Extension"
     _reg_clsid_ = "{EEE9936B-73ED-4D45-80C9-AF918354F885}"
     _com_interfaces_ = [shell.IID_IShellExtInit, shell.IID_IContextMenu]
     _public_methods_ = [
