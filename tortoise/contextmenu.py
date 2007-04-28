@@ -10,9 +10,18 @@ import win32gui
 import win32gui_struct
 import win32api
 import _winreg
+import re
 
 S_OK = 0
 S_FALSE = 1
+
+_quotere = None
+def _shellquote(s):
+    global _quotere
+    if _quotere is None:
+        _quotere = re.compile(r'(\\*)("|\\$)')
+    return '"%s"' % _quotere.sub(r'\1\1\\\2', s)
+    return "'%s'" % s.replace("'", "'\\''")
 
 """Windows shell extension that adds context menu items to Bazaar branches."""
 class ContextMenuExtension:
@@ -215,9 +224,10 @@ class ContextMenuExtension:
         
         hgpath = self._find_path('hg')
         if hgpath:
-            cmd = "%s extdiff" % hgpath
+            quoted_files = [_shellquote(s) for s in self._filenames]
+            cmd = "%s extdiff %s" % (hgpath, " ".join(quoted_files))
             self._run_program(hgpath, cmd)
-            print "started 'hg extdiff'"
+            print "started %s" % cmd
 
     def _view(self, parent_window):
         import os, subprocess
