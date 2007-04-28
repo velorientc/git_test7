@@ -173,7 +173,7 @@ class ContextMenuExtension:
         else:
             return None
 
-    def _runProgram(self, appName, cmdline):
+    def _run_program(self, appName, cmdline):
         # subprocess.Popen() would create a terminal (cmd.exe) window when 
         # making calls to hg, we use CreateProcess() coupled with 
         # CREATE_NO_WINDOW flag to suppress the terminal window
@@ -207,7 +207,7 @@ class ContextMenuExtension:
         hgpath = self._find_path('hg')
         if hgpath:
             cmd = "%s qct" % hgpath
-            self._runProgram(hgpath, cmd)
+            self._run_program(hgpath, cmd)
             print "started 'hg qct'"
 
     def _diff(self, parent_window):
@@ -218,7 +218,7 @@ class ContextMenuExtension:
         hgpath = self._find_path('hg')
         if hgpath:
             cmd = "%s extdiff" % hgpath
-            self._runProgram(hgpath, cmd)
+            self._run_program(hgpath, cmd)
             print "started 'hg extdiff'"
 
     def _view(self, parent_window):
@@ -229,6 +229,6 @@ class ContextMenuExtension:
         hgpath = self._find_path('hg')
         if hgpath:
             cmd = "%s view" % hgpath
-            self._runProgram(hgpath, cmd)
+            self._run_program(hgpath, cmd)
             print "started 'hg view'"
 
