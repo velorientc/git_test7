@@ -158,20 +158,18 @@ class ContextMenuExtension:
         return S_FALSE
 
     def _find_path(self, pgmname):
-        ospath = os.environ['PATH']
-        plist = []
-        for path in ospath.split(';'):
-            for ext in ['exe', 'bat', 'cmd']:
-                ppath = os.path.join(path, "%s.%s" % (pgmname, ext))
-                #print "checking path: %s" % ppath
-                if os.path.exists(ppath):
-                    plist.append(ppath)
+        """ return first executable found in search path """
+        ospath = os.environ['PATH'].split(os.pathsep)
+        pathext = os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD')
+        pathext = pathext.lower().split(os.pathsep)
 
-        if plist:
-            #print "path found: %s" % ", ".join(plist)
-            return plist[0]
-        else:
-            return None
+        for path in ospath:
+            for ext in pathext:
+                ppath = os.path.join(path, pgmname + ext)
+                if os.path.exists(ppath):
+                    return ppath
+
+        return None
 
     def _run_program(self, appName, cmdline):
         # subprocess.Popen() would create a terminal (cmd.exe) window when 
