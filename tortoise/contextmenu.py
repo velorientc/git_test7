@@ -2,10 +2,11 @@
 # Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
 # Copyright (C) 2007 Henry Ludemann <misc@hl.id.au>
 
-import os.path
+import os
 import pythoncom
 from win32com.shell import shell, shellcon
 import win32con
+import win32process
 import win32gui
 import win32gui_struct
 import win32api
@@ -16,12 +17,45 @@ S_OK = 0
 S_FALSE = 1
 
 _quotere = None
-def _shellquote(s):
+def shellquote(s):
     global _quotere
     if _quotere is None:
         _quotere = re.compile(r'(\\*)("|\\$)')
     return '"%s"' % _quotere.sub(r'\1\1\\\2', s)
     return "'%s'" % s.replace("'", "'\\''")
+
+def find_path(pgmname):
+    """ return first executable found in search path """
+    ospath = os.environ['PATH'].split(os.pathsep)
+    pathext = os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD')
+    pathext = pathext.lower().split(os.pathsep)
+
+    for path in ospath:
+        for ext in pathext:
+            ppath = os.path.join(path, pgmname + ext)
+            if os.path.exists(ppath):
+                return ppath
+
+    return None
+
+def run_program(appName, cmdline):
+    # subprocess.Popen() would create a terminal (cmd.exe) window when 
+    # making calls to hg, we use CreateProcess() coupled with 
+    # CREATE_NO_WINDOW flag to suppress the terminal window
+
+    print "run_program: %s, %s" % (appName, cmdline)
+    flags = win32con.CREATE_NO_WINDOW
+    startupInfo = win32process.STARTUPINFO()
+    
+    h1, h2, i1, i2 = win32process.CreateProcess(appName, 
+                                                cmdline,
+                                                None,
+                                                None,
+                                                1,
+                                                flags,
+                                                os.environ,
+                                                os.getcwd(),
+                                                startupInfo)
 
 """Windows shell extension that adds context menu items to Mercurial repository"""
 class ContextMenuExtension:
@@ -166,40 +200,6 @@ class ContextMenuExtension:
             return self._handlers[cmd][0]
         return S_FALSE
 
-    def _find_path(self, pgmname):
-        """ return first executable found in search path """
-        ospath = os.environ['PATH'].split(os.pathsep)
-        pathext = os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD')
-        pathext = pathext.lower().split(os.pathsep)
-
-        for path in ospath:
-            for ext in pathext:
-                ppath = os.path.join(path, pgmname + ext)
-                if os.path.exists(ppath):
-                    return ppath
-
-        return None
-
-    def _run_program(self, appName, cmdline):
-        # subprocess.Popen() would create a terminal (cmd.exe) window when 
-        # making calls to hg, we use CreateProcess() coupled with 
-        # CREATE_NO_WINDOW flag to suppress the terminal window
-        
-        import win32process, win32con, os
-        
-        flags = win32con.CREATE_NO_WINDOW
-        startupInfo = win32process.STARTUPINFO()
-        
-        h1, h2, i1, i2 = win32process.CreateProcess(appName, 
-                                                    cmdline,
-                                                    None,
-                                                    None,
-                                                    1,
-                                                    flags,
-                                                    os.environ,
-                                                    os.getcwd(),
-                                                    startupInfo)
-        
     def _checkout(self, parent_window):
         import checkout
         dialog = checkout.CheckoutDialog(self._filenames[0])
@@ -211,32 +211,30 @@ class ContextMenuExtension:
 
         print "_commit() on %s" % ", ".join(self._filenames)
         
-        hgpath = self._find_path('hg')
+        hgpath = find_path('hg')
         if hgpath:
             cmd = "%s qct" % hgpath
-            self._run_program(hgpath, cmd)
-            print "started 'hg qct'"
+            run_program(hgpath, cmd)
 
     def _diff(self, parent_window):
         import os, subprocess
 
         print "_diff() on %s" % ", ".join(self._filenames)
         
-        hgpath = self._find_path('hg')
+        hgpath = find_path('hg')
         if hgpath:
-            quoted_files = [_shellquote(s) for s in self._filenames]
+            quoted_files = [shellquote(s) for s in self._filenames]
             cmd = "%s extdiff %s" % (hgpath, " ".join(quoted_files))
-            self._run_program(hgpath, cmd)
-            print "started %s" % cmd
+            run_program(hgpath, cmd)
 
     def _view(self, parent_window):
         import os, subprocess
         
         print "_view() on %s" % ", ".join(self._filenames)
         
-        hgpath = self._find_path('hg')
+        hgpath = find_path('hg')
         if hgpath:
             cmd = "%s view" % hgpath
-            self._run_program(hgpath, cmd)
-            print "started 'hg view'"
+            run_program(hgpath, cmd)
+
 
