@@ -82,6 +82,9 @@ class ContextMenuExtension:
         self._handlers = {}
 
     def Initialize(self, folder, dataobj, hkey):
+        if dataobj is None:
+            return
+
         format_etc = win32con.CF_HDROP, None, 1, -1, pythoncom.TYMED_HGLOBAL
         sm = dataobj.GetData(format_etc)
         num_files = shell.DragQueryFile(sm.data_handle, -1)
@@ -148,13 +151,6 @@ class ContextMenuExtension:
         tree = None
 
         # open repo
-        path = self._filenames[0]
-        if os.path.isdir(path):
-            dir, filename = path, ''
-        else:
-            dir, filename = os.path.split(path)
-
-        os.chdir(dir)
         u = ui.ui()
         try:
             tree = hg.repository(u, path='')
