@@ -18,10 +18,10 @@ def DllRegisterServer(cls):
         from win32com.server import register
         register.UnregisterClasses(cls)
         sys.exit("Error: Failed to find mercurial module! Include the path to mercurial in PYTHONPATH environment variable while registering component.")
-    bzr_path = os.path.dirname(os.path.dirname(mercurial.__file__))
+    hg_path = os.path.dirname(os.path.dirname(mercurial.__file__))
     key = "CLSID\\%s\\PythonCOMPath" % cls._reg_clsid_
     path = _winreg.QueryValue(_winreg.HKEY_CLASSES_ROOT, key)
-    _winreg.SetValue(_winreg.HKEY_CLASSES_ROOT, key, _winreg.REG_SZ, "%s;%s" % (path, bzr_path))
+    _winreg.SetValue(_winreg.HKEY_CLASSES_ROOT, key, _winreg.REG_SZ, "%s;%s" % (path, hg_path))
 
     # Add the appropriate shell extension registry keys
     for category, keyname in cls.registry_keys: 

@@ -23,7 +23,7 @@ def _shellquote(s):
     return '"%s"' % _quotere.sub(r'\1\1\\\2', s)
     return "'%s'" % s.replace("'", "'\\''")
 
-"""Windows shell extension that adds context menu items to Bazaar branches."""
+"""Windows shell extension that adds context menu items to Mercurial repository"""
 class ContextMenuExtension:
     _reg_progid_ = "Mercurial.ShellExtension.ContextMenu"
     _reg_desc_ = "Mercurial Shell Extension"
