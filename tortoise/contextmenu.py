@@ -13,6 +13,8 @@ import win32api
 import _winreg
 import re
 
+GUI_SHELL = 'guishell'
+
 S_OK = 0
 S_FALSE = 1
 
@@ -167,15 +169,36 @@ class ContextMenuExtension:
             result.append((_("Commit"), 
                            _("Commit changes to the branch"),
                            self._commit))
-        if tree is not None:
+            result.append((_("Visual diff"),
+                           _("View changes using GUI diff tool"),
+                           self._vdiff))
             result.append((_("Diff"),
-                           _("View changes made in the local tree"),
+                           _("View changes"),
                            self._diff))
-        if tree is not None:
             result.append((_("View"),
                            _("View history"),
                            self._view))
-
+            result.append((_("Status"),
+                           _("Repository status"),
+                           self._status))
+            result.append((_("Add"),
+                           _("Add files to Hg repository"),
+                           self._add))
+            result.append((_("Revert"),
+                           _("Revert file status"),
+                           self._revert))
+            result.append((_("Pull"),
+                           _("Pull from parent repository"),
+                           self._pull))
+            result.append((_("Tip"),
+                           _("Show latest (tip) revision info"),
+                           self._tip))
+            result.append((_("Heads"),
+                           _("Show all repository head changesets"),
+                           self._heads))
+            result.append((_("Parent"),
+                           _("Show working directory's parent revisions"),
+                           self._parents))
         return result
 
     def InvokeCommand(self, ci):
@@ -206,7 +229,7 @@ class ContextMenuExtension:
             cmd = "%s qct" % hgpath
             run_program(hgpath, cmd)
 
-    def _diff(self, parent_window):
+    def _vdiff(self, parent_window):
         hgpath = find_path('hg')
         if hgpath:
             quoted_files = [shellquote(s) for s in self._filenames]
@@ -219,4 +242,54 @@ class ContextMenuExtension:
             cmd = "%s view" % hgpath
             run_program(hgpath, cmd)
 
+    def _status(self, parent_window):
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            quoted_files = [shellquote(s) for s in self._filenames]
+            cmd = "%s hg status %s" % (exepath, " ".join(quoted_files))
+            run_program(exepath, cmd)
 
+    def _pull(self, parent_window):
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            cmd = "%s hg -v pull" % exepath
+            run_program(exepath, cmd)
+
+    def _add(self, parent_window):
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            quoted_files = [shellquote(s) for s in self._filenames]
+            cmd = "%s hg -v add %s" % (exepath, " ".join(quoted_files))
+            run_program(exepath, cmd)
+            
+    def _revert(self, parent_window):
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            quoted_files = [shellquote(s) for s in self._filenames]
+            cmd = "%s hg -v revert %s" % (exepath, " ".join(quoted_files))
+            run_program(exepath, cmd)
+
+    def _tip(self, parent_window):
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            cmd = "%s hg -v tip" % exepath
+            run_program(exepath, cmd)
+
+    def _parents(self, parent_window):
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            cmd = "%s hg -v parents" % exepath
+            run_program(exepath, cmd)
+
+    def _heads(self, parent_window):
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            cmd = "%s hg -v heads" % exepath
+            run_program(exepath, cmd)
+
+    def _diff(self, parent_window):
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            quoted_files = [shellquote(s) for s in self._filenames]
+            cmd = "%s hg -v diff %s" % (exepath, " ".join(quoted_files))
+            run_program(exepath, cmd)
