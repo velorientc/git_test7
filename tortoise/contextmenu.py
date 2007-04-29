@@ -207,20 +207,12 @@ class ContextMenuExtension:
         dialog.destroy()
 
     def _commit(self, parent_window):
-        import os, subprocess
-
-        print "_commit() on %s" % ", ".join(self._filenames)
-        
         hgpath = find_path('hg')
         if hgpath:
             cmd = "%s qct" % hgpath
             run_program(hgpath, cmd)
 
     def _diff(self, parent_window):
-        import os, subprocess
-
-        print "_diff() on %s" % ", ".join(self._filenames)
-        
         hgpath = find_path('hg')
         if hgpath:
             quoted_files = [shellquote(s) for s in self._filenames]
@@ -228,10 +220,6 @@ class ContextMenuExtension:
             run_program(hgpath, cmd)
 
     def _view(self, parent_window):
-        import os, subprocess
-        
-        print "_view() on %s" % ", ".join(self._filenames)
-        
         hgpath = find_path('hg')
         if hgpath:
             cmd = "%s view" % hgpath
