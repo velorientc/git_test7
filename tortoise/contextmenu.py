@@ -200,12 +200,6 @@ class ContextMenuExtension:
             return self._handlers[cmd][0]
         return S_FALSE
 
-    def _checkout(self, parent_window):
-        import checkout
-        dialog = checkout.CheckoutDialog(self._filenames[0])
-        dialog.run()
-        dialog.destroy()
-
     def _commit(self, parent_window):
         hgpath = find_path('hg')
         if hgpath:
