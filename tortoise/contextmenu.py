@@ -11,6 +11,7 @@ import win32gui
 import win32gui_struct
 import win32api
 import _winreg
+from mercurial import hg, ui, repo
 import re
 
 GUI_SHELL = 'guishell'
@@ -144,13 +145,10 @@ class ContextMenuExtension:
         Each command is a tuple containing (display text, handler).
         """
         
-        print "_get_commands() on %s" ", ".join(self._filenames)
-
-        from mercurial import hg, ui, repo
-        
-        tree = None
+        print "_get_commands() on %s" ", ".join(self._filenames)        
 
         # open repo
+        tree = None
         u = ui.ui()
         try:
             tree = hg.repository(u, path='')
