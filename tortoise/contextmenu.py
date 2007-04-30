@@ -203,7 +203,10 @@ class ContextMenuExtension:
                            _("Revert file status"),
                            self._revert))
             result.append((_("Pull"),
-                           _("Pull from parent repository"),
+                           _("Pull from default repository"),
+                           self._pull))
+            result.append((_("Push"),
+                           _("Push to default repository"),
                            self._pull))
             result.append((_("Tip"),
                            _("Show latest (tip) revision info"),
@@ -214,6 +217,9 @@ class ContextMenuExtension:
             result.append((_("Parent"),
                            _("Show working directory's parent revisions"),
                            self._parents))
+            result.append((_("Rollback"),
+                           _("Rollback the last transaction"),
+                           self._rollback))
         return result
 
     def InvokeCommand(self, ci):
@@ -270,6 +276,9 @@ class ContextMenuExtension:
     def _pull(self, parent_window):
         self._run_program_with_guishell('pull', True)
 
+    def _push(self, parent_window):
+        self._run_program_with_guishell('push', True)
+
     def _add(self, parent_window):
         self._run_program_with_guishell('add')
             
@@ -287,6 +296,9 @@ class ContextMenuExtension:
 
     def _diff(self, parent_window):
         self._run_program_with_guishell('diff')
+
+    def _rollback(self, parent_window):
+        self._run_program_with_guishell('rollback')
 
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
