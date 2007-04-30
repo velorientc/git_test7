@@ -41,6 +41,15 @@ def find_path(pgmname):
 
     return None
 
+def find_root(path):
+    p = os.path.isdir(path) and path or os.path.dirname(path)
+    while not os.path.isdir(os.path.join(p, ".hg")):
+        oldp = p
+        p = os.path.dirname(p)
+        if p == oldp:
+            return None
+    return p
+
 def run_program(appName, cmdline):
     # subprocess.Popen() would create a terminal (cmd.exe) window when 
     # making calls to hg, we use CreateProcess() coupled with 
@@ -79,19 +88,23 @@ class ContextMenuExtension:
         ]
 
     def __init__(self):
+        print "ContextMenuExtension: __init__ called"
+        self._folder = None
         self._filenames = []
         self._handlers = {}
 
     def Initialize(self, folder, dataobj, hkey):
-        if dataobj is None:
-            return
+        print "Initialize: cwd = ", os.getcwd()
+        if folder:
+            self._folder = shell.SHGetPathFromIDList(folder)
+            print "folder = ", self._folder
 
-        format_etc = win32con.CF_HDROP, None, 1, -1, pythoncom.TYMED_HGLOBAL
-        sm = dataobj.GetData(format_etc)
-        num_files = shell.DragQueryFile(sm.data_handle, -1)
-        self._filenames = []
-        for i in range(num_files):
-            self._filenames.append(shell.DragQueryFile(sm.data_handle, i))
+        if dataobj:
+            format_etc = win32con.CF_HDROP, None, 1, -1, pythoncom.TYMED_HGLOBAL
+            sm = dataobj.GetData(format_etc)
+            num_files = shell.DragQueryFile(sm.data_handle, -1)
+            for i in range(num_files):
+                self._filenames.append(shell.DragQueryFile(sm.data_handle, i))
 
     def QueryContextMenu(self, hMenu, indexMenu, idCmdFirst, idCmdLast, uFlags):
         if uFlags & shellcon.CMF_DEFAULTONLY:
@@ -150,10 +163,18 @@ class ContextMenuExtension:
         # open repo
         tree = None
         u = ui.ui()
+        rpath = self._folder or self._filenames[0]
+        root = find_root(rpath)
+        if root is None:
+            print "%s: not in repo" % rpath
+            return []
+
+        print "file = %s\nroot = %s" % (rpath, root)
+        
         try:
-            tree = hg.repository(u, path='')
+            tree = hg.repository(u, path=root)
         except repo.RepoError:
-            print "%s: not in repo" % dir
+            print "%s: can't repo" % dir
             return []
 
         print "_get_commands(): adding hg commands"
@@ -220,70 +241,64 @@ class ContextMenuExtension:
     def _commit(self, parent_window):
         hgpath = find_path('hg')
         if hgpath:
-            cmd = "%s qct" % hgpath
+            targets = self._filenames or [self._folder]
+            root = find_root(targets[0])
+            cmd = "%s --repository %s qct" % (hgpath, shellquote(root))
             run_program(hgpath, cmd)
 
     def _vdiff(self, parent_window):
         hgpath = find_path('hg')
         if hgpath:
-            quoted_files = [shellquote(s) for s in self._filenames]
-            cmd = "%s extdiff %s" % (hgpath, " ".join(quoted_files))
+            targets = self._filenames or [self._folder]
+            root = find_root(targets[0])
+            quoted_files = [shellquote(s) for s in targets]
+            cmd = "%s --repository %s extdiff %s" % (hgpath, 
+                    shellquote(root), " ".join(quoted_files))
             run_program(hgpath, cmd)
 
     def _view(self, parent_window):
         hgpath = find_path('hg')
         if hgpath:
-            cmd = "%s view" % hgpath
+            targets = self._filenames or [self._folder]
+            root = find_root(targets[0])
+            cmd = "%s --repository %s view" % (hgpath, shellquote(root))
             run_program(hgpath, cmd)
 
     def _status(self, parent_window):
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            quoted_files = [shellquote(s) for s in self._filenames]
-            cmd = "%s hg status %s" % (exepath, " ".join(quoted_files))
-            run_program(exepath, cmd)
+        self._run_program_with_guishell('status')
 
     def _pull(self, parent_window):
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            cmd = "%s hg -v pull" % exepath
-            run_program(exepath, cmd)
+        self._run_program_with_guishell('pull', True)
 
     def _add(self, parent_window):
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            quoted_files = [shellquote(s) for s in self._filenames]
-            cmd = "%s hg -v add %s" % (exepath, " ".join(quoted_files))
-            run_program(exepath, cmd)
+        self._run_program_with_guishell('add')
             
     def _revert(self, parent_window):
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            quoted_files = [shellquote(s) for s in self._filenames]
-            cmd = "%s hg -v revert %s" % (exepath, " ".join(quoted_files))
-            run_program(exepath, cmd)
-
+        self._run_program_with_guishell('revert')
+ 
     def _tip(self, parent_window):
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            cmd = "%s hg -v tip" % exepath
-            run_program(exepath, cmd)
+        self._run_program_with_guishell('tip', True)
 
     def _parents(self, parent_window):
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            cmd = "%s hg -v parents" % exepath
-            run_program(exepath, cmd)
+        self._run_program_with_guishell('parent', True)
 
     def _heads(self, parent_window):
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            cmd = "%s hg -v heads" % exepath
-            run_program(exepath, cmd)
+        self._run_program_with_guishell('heads', True)
 
     def _diff(self, parent_window):
+        self._run_program_with_guishell('diff')
+
+    def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
         if exepath:
-            quoted_files = [shellquote(s) for s in self._filenames]
-            cmd = "%s hg -v diff %s" % (exepath, " ".join(quoted_files))
-            run_program(exepath, cmd)
+            targets = self._filenames or [self._folder]
+            root = find_root(targets[0])
+            quoted_files = []
+            if noargs == False:
+                quoted_files = [shellquote(s) for s in targets]
+            cmdline = "%s hg --repository %s --verbose %s %s" % (
+                            exepath, 
+                            shellquote(root),
+                            hgcmd,
+                            " ".join(quoted_files))
+            run_program(exepath, cmdline)

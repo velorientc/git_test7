@@ -6,6 +6,7 @@ import win32api
 import win32con
 from win32com.shell import shell, shellcon
 import _winreg
+from mercurial import hg, repo, ui, cmdutil, util
 
 UNCHANGED = "unchanged"
 ADDED = "added"
@@ -15,6 +16,15 @@ NOT_IN_TREE = "not in tree"
 CONTROL_FILE = "control file"
 
 CACHE_TIMEOUT = 1000
+
+def find_root(path):
+    p = os.path.isdir(path) and path or os.path.dirname(path)
+    while not os.path.isdir(os.path.join(p, ".hg")):
+        oldp = p
+        p = os.path.dirname(p)
+        if p == oldp:
+            return None
+    return p
 
 class IconOverlayExtension(object):
     """
@@ -75,7 +85,7 @@ class IconOverlayExtension(object):
         Get the state of a given path in source control.
         """
         
-        print "called: __get_state__(%s)" % path
+        print "called: _get_state(%s)" % path
         
         # debugging
         if IconOverlayExtension.counter > 10000:
@@ -94,18 +104,32 @@ class IconOverlayExtension(object):
         if IconOverlayExtension.last_path == path and elapsed < CACHE_TIMEOUT:
             return IconOverlayExtension.last_status
 
-        from mercurial import hg, repo, ui, cmdutil
-
         # open repo
-        u = ui.ui()
-        if os.path.isdir(path):
-            dir, filename = path, ''
-        else:
-            dir, filename = os.path.split(path)
+        root = find_root(path)
+        print "_get_state: root = ", root
+        if root is None:
+            print "_get_state: not in repo"
+            # cached path and status
+            IconOverlayExtension.last_status = NOT_IN_TREE
+            IconOverlayExtension.last_path = path
+            IconOverlayExtension.last_tick = tc
+            return NOT_IN_TREE
 
-        os.chdir(dir)
+        # skip root direcory to improve speed
+        if root == path:
+            print "_get_state: skip repo root"
+            IconOverlayExtension.last_status = NOT_IN_TREE
+            IconOverlayExtension.last_path = path
+            IconOverlayExtension.last_tick = tc
+            return NOT_IN_TREE
+            
+        print "_get_state: cwd (before) = ", os.getcwd()
+        #os.chdir(dir)
+        #print "_get_state: cwd (after) = ", os.getcwd()
+
+        u = ui.ui()
         try:
-            repo = hg.repository(u, path='')
+            repo = hg.repository(u, path=root)
         except repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
@@ -115,18 +139,15 @@ class IconOverlayExtension(object):
             IconOverlayExtension.last_tick = tc
             return NOT_IN_TREE
 
-        # skip root direcory to improve speed
-        if repo.root == path:
-            print "%s: skip repo root" % dir
-            IconOverlayExtension.last_status = NOT_IN_TREE
-            IconOverlayExtension.last_path = path
-            IconOverlayExtension.last_tick = tc
-            return NOT_IN_TREE
-            
         # get file status
-        files, matchfn, anypats = cmdutil.matchpats(repo, [filename])
-        modified, added, removed, deleted, unknown, ignored, clean = [
-                n for n in repo.status(files=files, list_clean=True)]
+        try:
+            files, matchfn, anypats = cmdutil.matchpats(repo, [path])
+            modified, added, removed, deleted, unknown, ignored, clean = [
+                    n for n in repo.status(files=files, list_clean=True)]
+        except util.Abort, inst:
+            print "abort: %s" % inst
+            print "treat as unknown : %s" % path
+            return UNKNOWN
 
         if added:
             status = ADDED
