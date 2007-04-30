@@ -159,7 +159,7 @@ class ContextMenuExtension:
         Each command is a tuple containing (display text, handler).
         """
         
-        print "_get_commands() on %s" ", ".join(self._filenames)        
+        print "_get_commands() on %s" % ", ".join(self._filenames)        
 
         # open repo
         tree = None
