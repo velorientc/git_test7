@@ -7,6 +7,7 @@ import pythoncom
 from win32com.shell import shell, shellcon
 import win32con
 import win32process
+import win32ui
 import win32gui
 import win32gui_struct
 import win32api
@@ -283,7 +284,12 @@ class ContextMenuExtension:
         self._run_program_with_guishell('add')
             
     def _revert(self, parent_window):
-        self._run_program_with_guishell('revert')
+        targets = self._filenames or [self._folder]
+        msg = "Confirm reverting: %s" % ", ".join(targets)
+        title = "Mercurial: revert"
+        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
+        if rv == 1:
+            self._run_program_with_guishell('revert')
  
     def _tip(self, parent_window):
         self._run_program_with_guishell('tip', True)
@@ -298,7 +304,13 @@ class ContextMenuExtension:
         self._run_program_with_guishell('diff')
 
     def _rollback(self, parent_window):
-        self._run_program_with_guishell('rollback')
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        msg = "Confirm rollback: %s" % root
+        title = "Mercurial: rollback"
+        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
+        if rv == 1:
+            self._run_program_with_guishell('rollback')
 
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
