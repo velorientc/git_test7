@@ -310,7 +310,7 @@ class ContextMenuExtension:
         title = "Mercurial: rollback"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
-            self._run_program_with_guishell('rollback')
+            self._run_program_with_guishell('rollback', True)
 
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
