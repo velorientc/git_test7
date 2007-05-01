@@ -210,9 +210,6 @@ class ContextMenuExtension:
             result.append((_("Push to"), 
                            _("Push source into the repo here"),
                            self._push_here))
-            result.append((_("Pull from"), 
-                           _("Pull source from repo"),
-                           self._push_here))
         return result
         
     def _get_commands(self):
@@ -370,9 +367,6 @@ class ContextMenuExtension:
                             shellquote(src),
                             shellquote(dest))
             run_program(exepath, cmdline)
-
-    def _pull_here(self, parent_window):
-        win32ui.MessageBox("_pull_here", "Hg", win32con.MB_OK)
 
     def _status(self, parent_window):
         self._run_program_with_guishell('status')
