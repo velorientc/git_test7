@@ -121,7 +121,10 @@ class ContextMenuExtension:
 
         # As we are a context menu handler, we can ignore verbs.
         self._handlers = {}
-        commands = self._get_commands()
+        if self._folder and self._filenames:
+            commands = self._get_commands_dragdrop()
+        else:
+            commands = self._get_commands()
         if len(commands) > 0:
             # menu separator
             win32gui.InsertMenu(hMenu, indexMenu,
@@ -152,6 +155,66 @@ class ContextMenuExtension:
         # Return the number of commands we added
         return len(commands)
 
+    def _get_commands_dragdrop(self):
+        """
+        Get a list of commands valid for the current selection.
+
+        Each command is a tuple containing (display text, handler).
+        """
+        
+        print "_get_commands_dragdrop() on %s" % ", ".join(self._filenames)        
+
+        # we can only accept dropping one item
+        if len(self._filenames) > 1:
+            return []
+
+        def _open_repo(path):
+            u = ui.ui()
+            root = find_root(path)
+            if root:
+                try:
+                    repo = hg.repository(u, path=root)
+                    return repo
+                except repo.RepoError:
+                    pass
+
+            return None
+
+        # open repo
+        drag_repo = None
+        drop_repo = None
+        
+        print "drag = %s" % self._filenames[0]
+        print "drop = %s" % self._folder
+        
+        drag_path = self._filenames[0]
+        drag_repo = _open_repo(drag_path)
+        if not drag_repo:
+            return []
+        if drag_repo and drag_repo.root != drag_path:
+            return []   # dragged item must be a hg repo root directory
+        print "drag root = %s" % drag_repo.root
+
+        drop_repo = _open_repo(self._folder)
+
+        print "_get_commands_dragdrop(): adding hg commands"
+        
+        result = []
+        result.append((_("Create Clone"), 
+                       _("Create clone here from source"),
+                       self._clone_here))
+
+        if drop_repo:
+            print "_get_commands_dragdrop(): drop zone is a hg repo too"
+            print "drop root = %s" % drag_repo.root
+            result.append((_("Push to"), 
+                           _("Push source into the repo here"),
+                           self._push_here))
+            result.append((_("Pull from"), 
+                           _("Pull source from repo"),
+                           self._push_here))
+        return result
+        
     def _get_commands(self):
         """
         Get a list of commands valid for the current selection.
@@ -270,6 +333,15 @@ class ContextMenuExtension:
             root = find_root(targets[0])
             cmd = "%s --repository %s view" % (hgpath, shellquote(root))
             run_program(hgpath, cmd)
+
+    def _clone_here(self, parent_window):
+        win32ui.MessageBox("_clone_here", "Hg", win32con.MB_OK)
+
+    def _push_here(self, parent_window):
+        win32ui.MessageBox("_push_here", "Hg", win32con.MB_OK)
+
+    def _pull_here(self, parent_window):
+        win32ui.MessageBox("_pull_here", "Hg", win32con.MB_OK)
 
     def _status(self, parent_window):
         self._run_program_with_guishell('status')
