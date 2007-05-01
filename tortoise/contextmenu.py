@@ -356,7 +356,21 @@ class ContextMenuExtension:
             
 
     def _push_here(self, parent_window):
-        win32ui.MessageBox("_push_here", "Hg", win32con.MB_OK)
+        src = self._filenames[0]
+        dest = self._folder
+        msg = "Push changes from %s into %s?" % (src, dest)
+        title = "Mercurial: push"
+        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
+        if rv == 2:
+            return
+
+        exepath = find_path(GUI_SHELL)
+        if exepath:
+            cmdline = "%s hg --verbose --repository %s push %s" % (
+                            exepath, 
+                            shellquote(src),
+                            shellquote(dest))
+            run_program(exepath, cmdline)
 
     def _pull_here(self, parent_window):
         win32ui.MessageBox("_pull_here", "Hg", win32con.MB_OK)
