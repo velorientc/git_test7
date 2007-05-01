@@ -335,8 +335,9 @@ class ContextMenuExtension:
             run_program(hgpath, cmd)
 
     def _clone_here(self, parent_window):
-        targets = self._filenames or [self._folder]
-        msg = "Create clone for %s in %s?" % (self._filenames[0], self._folder)
+        src = self._filenames[0]
+        dest = self._folder
+        msg = "Create clone for %s in %s?" % (src, dest)
         title = "Mercurial: clone"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 2:
@@ -344,14 +345,12 @@ class ContextMenuExtension:
 
         exepath = find_path(GUI_SHELL)
         if exepath:
-            src = self._filenames[0]
             repo_name = os.path.basename(src)
-            dest = os.path.join(self._folder, repo_name)
-            cmdline = "%s hg --verbose %s %s %s" % (
+            dest_clone = os.path.join(dest, repo_name)
+            cmdline = "%s hg --verbose clone %s %s" % (
                             exepath, 
-                            'clone',
-                            shellquote(self._filenames[0]),
-                            shellquote(dest))
+                            shellquote(src),
+                            shellquote(dest_clone))
             run_program(exepath, cmdline)
             
 
