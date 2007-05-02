@@ -14,6 +14,7 @@ import win32api
 import _winreg
 from mercurial import hg, ui, repo
 import re
+import gpopen
 
 GUI_SHELL = 'guishell'
 
@@ -281,6 +282,9 @@ class ContextMenuExtension:
             result.append((_("Rollback"),
                            _("Rollback the last transaction"),
                            self._rollback))
+            result.append((_("Help"),
+                           _("Basic Mercurial help text"),
+                           self._help))
         return result
 
     def InvokeCommand(self, ci):
@@ -423,3 +427,6 @@ class ContextMenuExtension:
                             hgcmd,
                             " ".join(quoted_files))
             run_program(exepath, cmdline)
+
+    def _help(self, parent_window):
+        gpopen.PopenThread(['hg', 'help', '--verbose'])
