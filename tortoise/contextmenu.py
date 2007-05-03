@@ -52,6 +52,17 @@ def find_root(path):
             return None
     return p
 
+def get_clone_repo_name(dir, repo_name):
+    dest_clone = os.path.join(dir, repo_name)
+    if os.path.exists(dest_clone):
+        dest_clone = os.path.join(dir, "Clone of " + repo_name)
+
+    i = 2
+    while os.path.exists(dest_clone):
+        dest_clone = os.path.join(dir, "Clone of (%s) %s" % (i, repo_name))
+        i += 1
+    return dest_clone
+
 def run_program(appName, cmdline):
     # subprocess.Popen() would create a terminal (cmd.exe) window when 
     # making calls to hg, we use CreateProcess() coupled with 
@@ -347,7 +358,7 @@ class ContextMenuExtension:
         exepath = find_path(GUI_SHELL)
         if exepath:
             repo_name = os.path.basename(src)
-            dest_clone = os.path.join(dest, repo_name)
+            dest_clone = get_clone_repo_name(dest, repo_name)
             cmdline = "%s hg --verbose clone %s %s" % (
                             exepath, 
                             shellquote(src),
