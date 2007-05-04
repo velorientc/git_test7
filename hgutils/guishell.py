@@ -75,6 +75,7 @@ class ThreadedClient:
         the GUI. We spawn a new thread for the worker.
         """
         self.master = master
+        self.pop = None
 
         # Create the queue
         self.queue = Queue.Queue()
@@ -102,13 +103,24 @@ class ThreadedClient:
         if not self.running:
             # This is the brutal stop of the system. You may want to do
             # some cleanup before actually shutting it down.
+            if self.pop and self.pop.poll():
+                import os
+                pid = self.pop.pid
+                if os.name == 'nt':
+                    import win32api
+                    handle = win32api.OpenProcess(1, 0, pid)
+                    win32api.TerminateProcess(handle, 0)
+                else:
+                    import signal
+                    os.kill(pid, signal.SIGINT)
+                print "killed pid: ", pid
             import sys
             sys.exit(1)
         self.master.after(100, self.periodicCall)
 
     def runProgram(self):
         #print "runProgram:", self.cmdline
-        pop = subprocess.Popen(self.cmdline, 
+        self.pop = subprocess.Popen(self.cmdline, 
                                shell=True,
                                stderr=subprocess.STDOUT,
                                stdout=subprocess.PIPE,
@@ -116,17 +128,18 @@ class ThreadedClient:
 
         try:
             #print "checking popen"
-            while pop.poll() == None:
+            while self.pop.poll() == None:
                 #print "reading pop"
-                out = pop.stdout.readline()
+                out = self.pop.stdout.readline()
                 if out: self.queue.put(out)
                 #time.sleep(0.001)
             #print "popen closed"
-            out = pop.stdout.read()
+            out = self.pop.stdout.read()
             if out: self.queue.put(out)
         except IOError:
             pass
         
+        self.pop = None
         #print "done runProgram"
 
     def endApplication(self):
