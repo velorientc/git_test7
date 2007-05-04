@@ -138,10 +138,15 @@ class ContextMenuExtension:
         else:
             commands = self._get_commands()
         if len(commands) > 0:
-            # menu separator
-            win32gui.InsertMenu(hMenu, indexMenu,
-                                win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
-                                0, None)
+            # a brutal hack to detect if we are the first menu to go on to the 
+            # context menu. If we are not the first, then add a menu separator
+            # The number '30000' is just a guess based on my observation
+            print "idCmdFirst = ", idCmdFirst
+            if idCmdFirst >= 30000:
+                win32gui.InsertMenu(hMenu, indexMenu,
+                                    win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
+                                    0, None)
+                indexMenu += 1
             
             # create submenu with Hg commands
             submenu = win32gui.CreatePopupMenu()
@@ -152,13 +157,12 @@ class ContextMenuExtension:
                 self._handlers[id] = (help_text, command)
 
             # add Hg submenu to context menu
-            indexMenu += 1
             item, extras = win32gui_struct.PackMENUITEMINFO(text="TortoiseHg",
                                                             hSubMenu=submenu)
             win32gui.InsertMenuItem(hMenu, indexMenu, 1, item)
+            indexMenu += 1
 
             # menu separator
-            indexMenu += 1
             win32gui.InsertMenu(hMenu, indexMenu,
                                 win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
                                 0, None)
