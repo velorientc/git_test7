@@ -330,6 +330,9 @@ class ContextMenuExtension:
             result.append((_("Parents"),
                            _("Show working directory's parent revisions"),
                            self._parents))
+            result.append((_("Log"),
+                           _("Show revision history"),
+                           self._log))
 
             result.append([])   # separator
 
@@ -460,6 +463,9 @@ class ContextMenuExtension:
 
     def _heads(self, parent_window):
         self._run_program_with_guishell('heads', True)
+
+    def _log(self, parent_window):
+        self._run_program_with_guishell('log', True)
 
     def _diff(self, parent_window):
         self._run_program_with_guishell('diff')
