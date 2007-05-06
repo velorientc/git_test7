@@ -150,8 +150,20 @@ class ContextMenuExtension:
             
             # create submenu with Hg commands
             submenu = win32gui.CreatePopupMenu()
-            for id, (text, help_text, command) in enumerate(commands):
-                item, extras = win32gui_struct.PackMENUITEMINFO(text=text,
+            for id, menu_info in enumerate(commands):
+                fstate = win32con.MF_BYCOMMAND
+                enabled = True
+                if len(menu_info) == 4:
+                    text, help_text, command, enabled = menu_info
+                else:
+                    text, help_text, command = menu_info
+
+                if not enabled:
+                    fstate |= win32con.MF_GRAYED
+                
+                item, extras = win32gui_struct.PackMENUITEMINFO(
+                            text=text,
+                            fState=fstate,
                             wID=idCmdFirst + id)
                 win32gui.InsertMenuItem(submenu, id, 1, item)
                 self._handlers[id] = (help_text, command)
@@ -258,18 +270,32 @@ class ContextMenuExtension:
         
         result = []
         if tree is not None:
-            result.append((_("Commit"), 
-                           _("Commit changes to the branch"),
-                           self._commit))
+            # hgk - enabled by extensions.hgk
+            status = not u.config("extensions", "hgk") is None
+            result.append((_("View"),
+                           _("View history with GUI tool"),
+                           self._view,
+                           status))
+
+            # commit tool - enabled by extensions.qct
+            status = not u.config("extensions", "qct") is None
+            result.append((_("Commit tool"), 
+                           _("commit changes with GUI tool"),
+                           self._commit,
+                           status))
+
+            # diff tool - enabled by extensions.extdiff +  extdiff.cmd.vdiff
+            status = not u.config("extensions", "extdiff") is None and \
+                     u.config("extdiff", "cmd.vdiff")
             result.append((_("Visual diff"),
                            _("View changes using GUI diff tool"),
-                           self._vdiff))
+                           self._vdiff,
+                           status))
+
+            # Mercurial standard commands
             result.append((_("Diff"),
                            _("View changes"),
                            self._diff))
-            result.append((_("View"),
-                           _("View history"),
-                           self._view))
             result.append((_("Status"),
                            _("Repository status"),
                            self._status))
@@ -338,7 +364,7 @@ class ContextMenuExtension:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
             quoted_files = [shellquote(s) for s in targets]
-            cmd = "%s --repository %s extdiff %s" % (hgpath, 
+            cmd = "%s --repository %s vdiff %s" % (hgpath, 
                     shellquote(root), " ".join(quoted_files))
             run_program(hgpath, cmd)
 
