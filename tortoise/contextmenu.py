@@ -153,7 +153,12 @@ class ContextMenuExtension:
             for id, menu_info in enumerate(commands):
                 fstate = win32con.MF_BYCOMMAND
                 enabled = True
-                if len(menu_info) == 4:
+                if len(menu_info) == 0:
+                    win32gui.InsertMenu(submenu, id, 
+                                        win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
+                                        0, None)
+                    continue
+                elif len(menu_info) == 4:
                     text, help_text, command, enabled = menu_info
                 else:
                     text, help_text, command = menu_info
@@ -270,18 +275,18 @@ class ContextMenuExtension:
         
         result = []
         if tree is not None:
-            # hgk - enabled by extensions.hgk
-            status = not u.config("extensions", "hgk") is None
-            result.append((_("View"),
-                           _("View history with GUI tool"),
-                           self._view,
-                           status))
-
             # commit tool - enabled by extensions.qct
             status = not u.config("extensions", "qct") is None
             result.append((_("Commit tool"), 
                            _("commit changes with GUI tool"),
                            self._commit,
+                           status))
+
+            # hgk - enabled by extensions.hgk
+            status = not u.config("extensions", "hgk") is None
+            result.append((_("View"),
+                           _("View history with GUI tool"),
+                           self._view,
                            status))
 
             # diff tool - enabled by extensions.extdiff +  extdiff.cmd.vdiff
@@ -291,38 +296,52 @@ class ContextMenuExtension:
                            _("View changes using GUI diff tool"),
                            self._vdiff,
                            status))
-
+                           
+            result.append([])   # separator
+            
             # Mercurial standard commands
-            result.append((_("Diff"),
-                           _("View changes"),
-                           self._diff))
             result.append((_("Status"),
                            _("Repository status"),
                            self._status))
+            result.append((_("Diff"),
+                           _("View changes"),
+                           self._diff))
             result.append((_("Add"),
                            _("Add files to Hg repository"),
                            self._add))
+
+            result.append([])   # separator
+
             result.append((_("Revert"),
                            _("Revert file status"),
                            self._revert))
-            result.append((_("Pull"),
-                           _("Pull from default repository"),
-                           self._pull))
-            result.append((_("Push"),
-                           _("Push to default repository"),
-                           self._pull))
+            result.append((_("Rollback"),
+                           _("Rollback the last transaction"),
+                           self._rollback))
+
+            result.append([])   # separator
+
             result.append((_("Tip"),
                            _("Show latest (tip) revision info"),
                            self._tip))
             result.append((_("Heads"),
                            _("Show all repository head changesets"),
                            self._heads))
-            result.append((_("Parent"),
+            result.append((_("Parents"),
                            _("Show working directory's parent revisions"),
                            self._parents))
-            result.append((_("Rollback"),
-                           _("Rollback the last transaction"),
-                           self._rollback))
+
+            result.append([])   # separator
+
+            result.append((_("Pull"),
+                           _("Pull from default repository"),
+                           self._pull))
+            result.append((_("Push"),
+                           _("Push to default repository"),
+                           self._pull))
+
+            result.append([])   # separator
+
             result.append((_("Help"),
                            _("Basic Mercurial help text"),
                            self._help))
