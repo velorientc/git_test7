@@ -7,6 +7,7 @@ import pythoncom
 from win32com.shell import shell, shellcon
 import win32con
 import win32process
+import win32event
 import win32ui
 import win32gui
 import win32gui_struct
@@ -72,15 +73,23 @@ def run_program(appName, cmdline):
     flags = win32con.CREATE_NO_WINDOW
     startupInfo = win32process.STARTUPINFO()
     
-    h1, h2, i1, i2 = win32process.CreateProcess(appName, 
-                                                cmdline,
-                                                None,
-                                                None,
-                                                1,
-                                                flags,
-                                                os.environ,
-                                                os.getcwd(),
-                                                startupInfo)
+    handlers = win32process.CreateProcess(appName, 
+                                            cmdline,
+                                            None,
+                                            None,
+                                            1,
+                                            flags,
+                                            os.environ,
+                                            os.getcwd(),
+                                            startupInfo)
+    hProcess, hThread, PId, TId = handlers
+    win32event.WaitForSingleObject(hProcess, 500)
+    exitcode = win32process.GetExitCodeProcess(hProcess)
+    if exitcode < 0:
+        msg = "Error when starting external command: \n%s " % cmdline
+        title = "Mercurial"
+        win32ui.MessageBox(msg, title, 
+                           win32con.MB_OK|win32con.MB_ICONERROR)   
 
 """Windows shell extension that adds context menu items to Mercurial repository"""
 class ContextMenuExtension:
