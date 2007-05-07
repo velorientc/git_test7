@@ -149,10 +149,13 @@ class PopenThread:
         if msg:
             self.gui.write(msg)
 
-if __name__ == "__main__":
-    dlg_template = dlg_template(400, 300)
-    gui = ResizableEditDialog(dlg_template)
+def run(cmd):
+    tmpl = dlg_template(300, 250)
+    gui = ResizableEditDialog(tmpl)
     gui.CreateWindow()
+
+    PopenThread(cmd, gui=gui)
     
+if __name__ == "__main__":
     #gui = OutputDialog("Hg help")
-    PopenThread(['C:\Python24\Scripts\hg.bat', 'help'], gui=gui)
+    run(['C:\Python24\Scripts\hg.bat', 'help'])
