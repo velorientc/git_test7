@@ -504,4 +504,4 @@ class ContextMenuExtension:
             run_program(exepath, cmdline)
 
     def _help(self, parent_window):
-        gpopen.PopenThread(['hg', 'help', '--verbose'])
+        gpopen.run(['hg', 'help', '--verbose'])
