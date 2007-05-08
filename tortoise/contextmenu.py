@@ -445,16 +445,16 @@ class ContextMenuExtension:
             run_program(exepath, cmdline)
 
     def _status(self, parent_window):
-        self._run_program_with_guishell('status')
+        self._run_dialog('status')
 
     def _pull(self, parent_window):
-        self._run_program_with_guishell('pull', True)
+        self._run_dialog('pull', True)
 
     def _push(self, parent_window):
-        self._run_program_with_guishell('push', True)
+        self._run_dialog('push', True)
 
     def _add(self, parent_window):
-        self._run_program_with_guishell('add')
+        self._run_dialog('add')
             
     def _revert(self, parent_window):
         targets = self._filenames or [self._folder]
@@ -462,22 +462,22 @@ class ContextMenuExtension:
         title = "Mercurial: revert"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
-            self._run_program_with_guishell('revert')
+            self._run_dialog('revert')
  
     def _tip(self, parent_window):
-        self._run_program_with_guishell('tip', True)
+        self._run_dialog('tip', True)
 
     def _parents(self, parent_window):
-        self._run_program_with_guishell('parent', True)
+        self._run_dialog('parent', True)
 
     def _heads(self, parent_window):
-        self._run_program_with_guishell('heads', True)
+        self._run_dialog('heads', True)
 
     def _log(self, parent_window):
-        self._run_program_with_guishell('log', True)
+        self._run_dialog('log', True)
 
     def _diff(self, parent_window):
-        self._run_program_with_guishell('diff')
+        self._run_dialog('diff')
 
     def _rollback(self, parent_window):
         targets = self._filenames or [self._folder]
@@ -486,7 +486,7 @@ class ContextMenuExtension:
         title = "Mercurial: rollback"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
-            self._run_program_with_guishell('rollback', True)
+            self._run_dialog('rollback', True)
 
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
@@ -502,6 +502,19 @@ class ContextMenuExtension:
                             hgcmd,
                             " ".join(quoted_files))
             run_program(exepath, cmdline)
+
+    def _run_dialog(self, hgcmd, noargs=False):
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        quoted_files = []
+        if noargs == False:
+            quoted_files = [shellquote(s) for s in targets]
+        cmdline = "hg --repository %s --verbose %s %s" % (
+                        shellquote(root),
+                        hgcmd,
+                        " ".join(quoted_files))
+        print "_run_program_dialog: cmdline = ", cmdline
+        gpopen.run(cmdline)
 
     def _help(self, parent_window):
         gpopen.run(['hg', 'help', '--verbose'])
