@@ -131,19 +131,21 @@ class PopenThread:
                                stdout=subprocess.PIPE,
                                stdin=subprocess.PIPE)
 
+        bytes = 0
         try:
-            print "checking popen"
+            print "run_program: popened"
             while pop.poll() == None:
-                print "reading pop"
                 out = pop.stdout.readline()
+                bytes += len(out)
                 self.out_text(out)
-            print "popen closed"
             out = pop.stdout.read()
+            bytes += len(out)
             self.out_text(out)
+            print "run_program: popen closed"
         except IOError:
             pass
         
-        print "done runProgram"
+        print "end runProgram: bytes = ", bytes
 
     def out_text(self, msg):
         if msg:
