@@ -1,6 +1,7 @@
 # Published under the GNU GPL, v2 or later.
 # Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
 # Copyright (C) 2007 Henry Ludemann <misc@hl.id.au>
+# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 
 import os
 import pythoncom
