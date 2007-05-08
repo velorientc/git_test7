@@ -350,7 +350,7 @@ class ContextMenuExtension:
                            self._pull))
             result.append((_("Push"),
                            _("Push to default repository"),
-                           self._pull))
+                           self._push))
 
             result.append([])   # separator
 
