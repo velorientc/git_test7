@@ -416,15 +416,12 @@ class ContextMenuExtension:
         if rv == 2:
             return
 
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            repo_name = os.path.basename(src)
-            dest_clone = get_clone_repo_name(dest, repo_name)
-            cmdline = "%s hg --verbose clone %s %s" % (
-                            exepath, 
-                            shellquote(src),
-                            shellquote(dest_clone))
-            run_program(exepath, cmdline)
+        repo_name = os.path.basename(src)
+        dest_clone = get_clone_repo_name(dest, repo_name)
+        cmdline = "hg --verbose clone %s %s" % (
+                        shellquote(src),
+                        shellquote(dest_clone))
+        gpopen.run(cmdline)
             
 
     def _push_here(self, parent_window):
@@ -436,13 +433,10 @@ class ContextMenuExtension:
         if rv == 2:
             return
 
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            cmdline = "%s hg --verbose --repository %s push %s" % (
-                            exepath, 
-                            shellquote(src),
-                            shellquote(dest))
-            run_program(exepath, cmdline)
+        cmdline = "hg --verbose --repository %s push %s" % (
+                        shellquote(src),
+                        shellquote(dest))
+        gpopen.run(cmdline)
 
     def _status(self, parent_window):
         self._run_dialog('status')
