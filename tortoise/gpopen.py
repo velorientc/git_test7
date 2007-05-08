@@ -26,6 +26,7 @@ class ResizableEditDialog(Dialog):
         self.SetWindowText(title)
         self.outtext = self.GetDlgItem(dlg_EDIT1)
         self.outtext.SetReadOnly()
+        self.outtext.LimitText(10000000)    # enough to hald the log output?
         ctrl = self.GetDlgItem(dlg_EDIT1)
         l, t, r, b = ctrl.GetWindowRect()
         l, t, r, b = self.ScreenToClient( (l, t, r, b ) )
