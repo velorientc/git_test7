@@ -54,7 +54,7 @@ class IconOverlayExtension(object):
         print "GetOverlayInfo: checking if in explorer"
         modname = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
         print "modname = %s" % modname
-        if not modname.endswith("\\explorer.exe"):
+        if not modname.lower().endswith("\\explorer.exe"):
             print "GetOverlayInfo: not in explorer"
             return ("", 0, 0) 
  
