@@ -469,7 +469,7 @@ class ContextMenuExtension:
         self._run_dialog('heads', True)
 
     def _log(self, parent_window):
-        self._run_dialog('log', True)
+        self._run_dialog('log', True, verbose=False)
 
     def _diff(self, parent_window):
         self._run_dialog('diff')
@@ -498,15 +498,16 @@ class ContextMenuExtension:
                             " ".join(quoted_files))
             run_program(exepath, cmdline)
 
-    def _run_dialog(self, hgcmd, noargs=False):
+    def _run_dialog(self, hgcmd, noargs=False, verbose=True):
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
         quoted_files = []
         if noargs == False:
             quoted_files = [shellquote(s) for s in targets]
-        cmdline = "hg --repository %s --verbose %s %s" % (
+        cmdline = "hg --repository %s %s %s %s" % (
                         shellquote(root),
                         hgcmd,
+                        verbose and "--verbose" or "",
                         " ".join(quoted_files))
         print "_run_program_dialog: cmdline = ", cmdline
         gpopen.run(cmdline)
