@@ -135,9 +135,16 @@ class PopenThread:
         bytes = 0
         try:
             print "run_program: popened"
+            line = 0
+            blocksize = 1024
             while pop.poll() == None:
-                out = pop.stdout.readline()
-                bytes += len(out)
+                if line < 100:
+                    out = pop.stdout.readline()
+                    line += 1
+                else:
+                    out = pop.stdout.read(blocksize)
+                    if blocksize < 1024 * 50:
+                        blocksize *= 2
                 out = out.replace('\n', '\r\n') # fileter LF for binary output
                 self.out_text(out)
             out = pop.stdout.read()
@@ -163,4 +170,5 @@ def run(cmd):
     
 if __name__ == "__main__":
     #gui = OutputDialog("Hg help")
-    run(['C:\Python24\Scripts\hg.bat', 'help'])
+    run(['python -u C:\Python24\Scripts\hg -R C:\hg\h1 log -v'])
+    #run(['C:\Python24\Scripts\hg.bat', 'help'])
