@@ -138,9 +138,11 @@ class PopenThread:
             while pop.poll() == None:
                 out = pop.stdout.readline()
                 bytes += len(out)
+                out = out.replace('\n', '\r\n') # fileter LF for binary output
                 self.out_text(out)
             out = pop.stdout.read()
             bytes += len(out)
+            out = out.replace('\n', '\r\n')     # fileter LF for binary output
             self.out_text(out)
             print "run_program: popen closed"
         except IOError:
