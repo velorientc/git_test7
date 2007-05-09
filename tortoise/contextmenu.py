@@ -253,6 +253,12 @@ class ContextMenuExtension:
             result.append((_("Push to"), 
                            _("Push source into the repo here"),
                            self._push_here))
+            result.append((_("Incoming"), 
+                           _("show new changesets found in source"),
+                           self._incoming_here))
+            result.append((_("Outgoing"), 
+                           _("show changesets not found in destination"),
+                           self._outgoing_here))
         return result
         
     def _get_commands(self):
@@ -429,7 +435,6 @@ class ContextMenuExtension:
                         shellquote(src),
                         shellquote(dest_clone))
         gpopen.run(cmdline)
-            
 
     def _push_here(self, parent_window):
         src = self._filenames[0]
@@ -441,6 +446,22 @@ class ContextMenuExtension:
             return
 
         cmdline = "hg --verbose --repository %s push %s" % (
+                        shellquote(src),
+                        shellquote(dest))
+        gpopen.run(cmdline)
+
+    def _incoming_here(self, parent_window):
+        src = self._filenames[0]
+        dest = self._folder
+        cmdline = "hg --verbose --repository %s incoming %s" % (
+                        shellquote(src),
+                        shellquote(dest))
+        gpopen.run(cmdline)
+
+    def _outgoing_here(self, parent_window):
+        src = self._filenames[0]
+        dest = self._folder
+        cmdline = "hg --verbose --repository %s outgoing %s" % (
                         shellquote(src),
                         shellquote(dest))
         gpopen.run(cmdline)
