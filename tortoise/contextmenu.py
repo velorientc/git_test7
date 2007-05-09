@@ -352,6 +352,12 @@ class ContextMenuExtension:
             result.append((_("Push"),
                            _("Push to default repository"),
                            self._push))
+            result.append((_("Incoming"),
+                           _("show new changesets found in source"),
+                           self._incoming))
+            result.append((_("Outgoing"),
+                           _("show changesets not found in destination"),
+                           self._outgoing))
 
             result.append([])   # separator
 
@@ -447,6 +453,12 @@ class ContextMenuExtension:
 
     def _push(self, parent_window):
         self._run_dialog('push', True)
+
+    def _incoming(self, parent_window):
+        self._run_dialog('incoming', True)
+
+    def _outgoing(self, parent_window):
+        self._run_dialog('outgoing', True)
 
     def _add(self, parent_window):
         self._run_dialog('add')
