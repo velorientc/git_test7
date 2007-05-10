@@ -19,11 +19,17 @@ dlgButton = 128
 dlg_EDIT1 = 1001
 
 class ResizableEditDialog(Dialog): 
-    def OnInitDialog(self, title='Mercurial'): 
+    def __init__(self, title=None, tmpl=None):
+        self.title = title
+        if tmpl is None:
+            tmpl = dlg_template()
+        Dialog.__init__(self, tmpl)
+
+    def OnInitDialog(self): 
         rc = Dialog.OnInitDialog(self)
         self.HookMessage(self.OnSize, win32con.WM_SIZE)
 
-        self.SetWindowText(title)
+        self.SetWindowText(self.title)
         self.outtext = self.GetDlgItem(dlg_EDIT1)
         self.outtext.SetReadOnly()
         self.outtext.LimitText(10000000)    # enough to hald the log output?
@@ -161,9 +167,9 @@ class PopenThread:
         if msg:
             self.gui.write(msg)
 
-def run(cmd):
+def run(cmd, title='Mercurial'):
     tmpl = dlg_template(300, 250)
-    gui = ResizableEditDialog(tmpl)
+    gui = ResizableEditDialog(title, tmpl)
     gui.CreateWindow()
 
     PopenThread(cmd, gui=gui)
