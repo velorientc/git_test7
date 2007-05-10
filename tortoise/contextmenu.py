@@ -283,7 +283,7 @@ class ContextMenuExtension:
                            status))
                            
             result.append([])   # separator
-            
+
             # Mercurial standard commands
             result.append((_("Status"),
                            _("Repository status"),
@@ -291,6 +291,9 @@ class ContextMenuExtension:
             result.append((_("Diff"),
                            _("View changes"),
                            self._diff))
+            result.append((_("Commit"),
+                           _("Commit changes"),
+                           self._commit_simple))
             result.append((_("Add"),
                            _("Add files to Hg repository"),
                            self._add))
@@ -485,6 +488,12 @@ class ContextMenuExtension:
         if rv == 1:
             self._run_dialog('rollback', True)
 
+    def _commit_simple(self, parent_window):
+        import commitdialog
+        targets = self._filenames or [self._folder]
+        #quoted_files = [shellquote(s) for s in targets]
+        commitdialog.do_commit(targets)
+        
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
         if exepath:
