@@ -306,6 +306,9 @@ class ContextMenuExtension:
             result.append((_("Rollback"),
                            _("Rollback the last transaction"),
                            self._rollback))
+            result.append((_("Update"),
+                           _("update working directory"),
+                           self._update))
 
             result.append([])   # separator
 
@@ -493,6 +496,11 @@ class ContextMenuExtension:
         targets = self._filenames or [self._folder]
         #quoted_files = [shellquote(s) for s in targets]
         commitdialog.do_commit(targets)
+        
+    def _update(self, parent_window):
+        import updatedialog
+        targets = self._filenames or [self._folder]
+        updatedialog.do_update(targets[0])
         
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
