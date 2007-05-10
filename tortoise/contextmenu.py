@@ -15,44 +15,13 @@ import win32gui_struct
 import win32api
 import _winreg
 from mercurial import hg, ui, repo
-import re
 import gpopen
+from thgutil import *
 
 GUI_SHELL = 'guishell'
 
 S_OK = 0
 S_FALSE = 1
-
-_quotere = None
-def shellquote(s):
-    global _quotere
-    if _quotere is None:
-        _quotere = re.compile(r'(\\*)("|\\$)')
-    return '"%s"' % _quotere.sub(r'\1\1\\\2', s)
-    return "'%s'" % s.replace("'", "'\\''")
-
-def find_path(pgmname):
-    """ return first executable found in search path """
-    ospath = os.environ['PATH'].split(os.pathsep)
-    pathext = os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD')
-    pathext = pathext.lower().split(os.pathsep)
-
-    for path in ospath:
-        for ext in pathext:
-            ppath = os.path.join(path, pgmname + ext)
-            if os.path.exists(ppath):
-                return ppath
-
-    return None
-
-def find_root(path):
-    p = os.path.isdir(path) and path or os.path.dirname(path)
-    while not os.path.isdir(os.path.join(p, ".hg")):
-        oldp = p
-        p = os.path.dirname(p)
-        if p == oldp:
-            return None
-    return p
 
 def get_clone_repo_name(dir, repo_name):
     dest_clone = os.path.join(dir, repo_name)

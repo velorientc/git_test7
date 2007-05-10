@@ -8,6 +8,7 @@ import win32con
 from win32com.shell import shell, shellcon
 import _winreg
 from mercurial import hg, repo, ui, cmdutil, util
+import thgutil
 
 UNCHANGED = "unchanged"
 ADDED = "added"
@@ -17,15 +18,6 @@ NOT_IN_TREE = "not in tree"
 CONTROL_FILE = "control file"
 
 CACHE_TIMEOUT = 1000
-
-def find_root(path):
-    p = os.path.isdir(path) and path or os.path.dirname(path)
-    while not os.path.isdir(os.path.join(p, ".hg")):
-        oldp = p
-        p = os.path.dirname(p)
-        if p == oldp:
-            return None
-    return p
 
 class IconOverlayExtension(object):
     """
@@ -106,7 +98,7 @@ class IconOverlayExtension(object):
             return IconOverlayExtension.last_status
 
         # open repo
-        root = find_root(path)
+        root = thgutil.find_root(path)
         print "_get_state: root = ", root
         if root is None:
             print "_get_state: not in repo"
