@@ -240,25 +240,28 @@ class ContextMenuExtension:
         print "_get_commands() on %s" % ", ".join(self._filenames)        
 
         # open repo
+        result = []
         tree = None
         u = ui.ui()
         rpath = self._folder or self._filenames[0]
         root = find_root(rpath)
         if root is None:
             print "%s: not in repo" % rpath
-            return []
+            result.append((_("Create repo here"),
+                           _("create a new repository in this directory"),
+                           self._init))
+            return result
 
         print "file = %s\nroot = %s" % (rpath, root)
         
         try:
             tree = hg.repository(u, path=root)
         except repo.RepoError:
-            print "%s: can't repo" % dir
+            print "%s: can't open repo" % dir
             return []
 
         print "_get_commands(): adding hg commands"
         
-        result = []
         if tree is not None:
             # commit tool - enabled by extensions.qct
             status = not u.config("extensions", "qct") is None
@@ -440,6 +443,9 @@ class ContextMenuExtension:
                         shellquote(src),
                         shellquote(dest))
         gpopen.run(cmdline)
+
+    def _init(self, parent_window):
+        self._run_dialog('init', True)
 
     def _status(self, parent_window):
         self._run_dialog('status')
