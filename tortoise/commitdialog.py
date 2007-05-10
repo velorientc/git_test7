@@ -13,10 +13,10 @@ import win32con
 from pywin.mfc import dialog
 from mercurial import hg, repo, ui, cmdutil, util
 import gpopen
-import util
+import thgutil
 
 def get_changes_text(filenames):
-    root = util.find_root(filenames[0])
+    root = thgutil.find_root(filenames[0])
     u = ui.ui()
     try:
         repo = hg.repository(u, path=root)
@@ -99,7 +99,7 @@ def do_commit(files):
         os.close(logfd)
 
         # commit file with log message        
-        root = util.find_root(files[0])
+        root = thgutil.find_root(files[0])
         quoted_files = [util.shellquote(s) for s in files]
         cmdline = "hg --repository %s commit --verbose --logfile %s %s" % (
                         util.shellquote(root),
