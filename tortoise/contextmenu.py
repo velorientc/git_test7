@@ -462,7 +462,16 @@ class ContextMenuExtension:
         gpopen.run(cmdline)
 
     def _init(self, parent_window):
-        self._run_dialog('init', True)
+        dir = self._folder or self._filenames[0]
+        msg = "Create Hg repository in %s?" % (dir)
+        title = "Mercurial: init"
+        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
+        if rv == 2:
+            return
+
+        cmdline = "hg --verbose init %s" % (
+                        shellquote(dir))
+        gpopen.run(cmdline)
 
     def _status(self, parent_window):
         self._run_dialog('status')
