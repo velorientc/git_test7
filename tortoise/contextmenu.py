@@ -222,6 +222,9 @@ class ContextMenuExtension:
             result.append((_("Push to"), 
                            _("Push source into the repo here"),
                            self._push_here))
+            result.append((_("Pull from"), 
+                           _("Pull new change from dragged repo"),
+                           self._pull_here))
             result.append((_("Incoming"), 
                            _("show new changesets found in source"),
                            self._incoming_here))
@@ -426,6 +429,20 @@ class ContextMenuExtension:
         cmdline = "hg --verbose --repository %s push %s" % (
                         shellquote(src),
                         shellquote(dest))
+        gpopen.run(cmdline)
+
+    def _pull_here(self, parent_window):
+        src = self._filenames[0]
+        dest = self._folder
+        msg = "Pull changes from %s?" % (src)
+        title = "Mercurial: pull"
+        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
+        if rv == 2:
+            return
+
+        cmdline = "hg --verbose --repository %s pull %s" % (
+                        shellquote(dest),
+                        shellquote(src))
         gpopen.run(cmdline)
 
     def _incoming_here(self, parent_window):
