@@ -24,6 +24,8 @@ def update_dlg_template():
              win32con.WS_VISIBLE | 
              win32con.WS_CAPTION | 
              win32con.WS_SYSMENU |
+             win32con.DS_CENTER |
+             # win32con.DS_CENTERMOUSE |
              # win32con.WS_THICKFRAME |  # we can resize the dialog window
              win32con.DS_SETFONT)
 
