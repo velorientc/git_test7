@@ -167,12 +167,26 @@ class PopenThread:
         if msg:
             self.gui.write(msg)
 
-def run(cmd, title='Mercurial'):
-    tmpl = dlg_template(300, 250)
-    gui = ResizableEditDialog(title, tmpl)
-    gui.CreateWindow()
+class PopenDialog(ResizableEditDialog):
+    def __init__(self, cmd, title=None, tmpl=None):
+        self.cmd = cmd
+        ResizableEditDialog.__init__(self, title, tmpl)
+        
+    def OnInitDialog(self):
+        rc = ResizableEditDialog.OnInitDialog(self)
+        self.HookMessage(self.OnShow, win32con.WM_SHOWWINDOW)
 
-    PopenThread(cmd, gui=gui)
+    def OnShow(self, msg):
+        PopenThread(self.cmd, gui=self)
+            
+def run(cmd, modal=False, title='Mercurial'):
+    tmpl = dlg_template(300, 250)
+    gui = PopenDialog(cmd, title, tmpl)
+    if modal:
+        gui.DoModal()
+    else:
+        gui.CreateWindow()
+    print "run done"
     
 if __name__ == "__main__":
     #gui = OutputDialog("Hg help")
