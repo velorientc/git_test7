@@ -563,7 +563,8 @@ class ContextMenuExtension:
                         verbose and "--verbose" or "",
                         " ".join(quoted_files))
         print "_run_program_dialog: cmdline = ", cmdline
-        gpopen.run(cmdline)
+        title = "Hg %s" % hgcmd
+        gpopen.run(cmdline, title=title)
 
     def _help(self, parent_window):
         gpopen.run(['hg', 'help', '--verbose'])
