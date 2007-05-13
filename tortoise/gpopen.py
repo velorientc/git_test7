@@ -174,9 +174,6 @@ class PopenDialog(ResizableEditDialog):
         
     def OnInitDialog(self):
         rc = ResizableEditDialog.OnInitDialog(self)
-        self.HookMessage(self.OnShow, win32con.WM_SHOWWINDOW)
-
-    def OnShow(self, msg):
         PopenThread(self.cmd, gui=self)
             
 def run(cmd, modal=False, title='Mercurial'):
