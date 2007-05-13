@@ -2,7 +2,7 @@
 # Copyright (C) 2007 Henry Ludemann <misc@hl.id.au>
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 
-import os.path
+import os
 import win32api
 import win32con
 from win32com.shell import shell, shellcon
@@ -18,6 +18,17 @@ NOT_IN_TREE = "not in tree"
 CONTROL_FILE = "control file"
 
 CACHE_TIMEOUT = 1000
+CACHE_SIZE = 10
+overlay_cache = {}
+
+def get_cache_list(path):
+    pathdir = os.path.dirname(path)
+    dlist = [x for x in os.listdir(pathdir) if x <> ".hg"]
+    #dlist.sort()
+    #idx = dlist.index(os.path.basename(path))
+    cache_list = dlist #[idx : idx + CACHE_SIZE]
+    cache_list = [os.path.join(pathdir, x) for x in cache_list]
+    return cache_list
 
 class IconOverlayExtension(object):
     """
@@ -77,7 +88,7 @@ class IconOverlayExtension(object):
         """
         Get the state of a given path in source control.
         """
-        
+        global overlay_cache
         print "called: _get_state(%s)" % path
         
         # debugging
@@ -93,32 +104,22 @@ class IconOverlayExtension(object):
 
         # check if path is cached
         tc = win32api.GetTickCount()
-        elapsed = tc - IconOverlayExtension.last_tick
-        if IconOverlayExtension.last_path == path and elapsed < CACHE_TIMEOUT:
-            return IconOverlayExtension.last_status
+        if overlay_cache.has_key(path):
+            if tc - overlay_cache[path]['ticks'] < CACHE_TIMEOUT:
+                print "%s: %s (cached)" % (path, overlay_cache[path]['status'])
+                return overlay_cache[path]['status']
 
         # open repo
         root = thgutil.find_root(path)
         print "_get_state: root = ", root
         if root is None:
             print "_get_state: not in repo"
-            # cached path and status
-            IconOverlayExtension.last_status = NOT_IN_TREE
-            IconOverlayExtension.last_path = path
-            IconOverlayExtension.last_tick = tc
             return NOT_IN_TREE
 
         # skip root direcory to improve speed
         if root == path:
             print "_get_state: skip repo root"
-            IconOverlayExtension.last_status = NOT_IN_TREE
-            IconOverlayExtension.last_path = path
-            IconOverlayExtension.last_tick = tc
             return NOT_IN_TREE
-            
-        print "_get_state: cwd (before) = ", os.getcwd()
-        #os.chdir(dir)
-        #print "_get_state: cwd (after) = ", os.getcwd()
 
         u = ui.ui()
         try:
@@ -126,36 +127,49 @@ class IconOverlayExtension(object):
         except repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
-            # cached path and status
-            IconOverlayExtension.last_status = NOT_IN_TREE
-            IconOverlayExtension.last_path = path
-            IconOverlayExtension.last_tick = tc
             return NOT_IN_TREE
 
         # get file status
+        tc1 = win32api.GetTickCount()
+        cache_list = get_cache_list(path)
+        #print "cache_list: ", "\n".join(cache_list)
         try:
-            files, matchfn, anypats = cmdutil.matchpats(repo, [path])
+            files, matchfn, anypats = cmdutil.matchpats(repo, cache_list)
             modified, added, removed, deleted, unknown, ignored, clean = [
                     n for n in repo.status(files=files, list_clean=True)]
         except util.Abort, inst:
             print "abort: %s" % inst
             print "treat as unknown : %s" % path
             return UNKNOWN
-
-        if added:
-            status = ADDED
-        elif modified:
-            status = MODIFIED
-        elif clean:
-            status = UNCHANGED
-        else:
-            status = UNKNOWN
+        print "status() took %d ticks" % (win32api.GetTickCount() - tc1)
+        
+        # add directory status to list
+        clean.extend(set([os.path.dirname(x) for x in clean]))
+        modified.extend(set([os.path.dirname(x) for x in modified]))
+        added.extend(set([os.path.dirname(x) for x in added]))
+        removed.extend(set([os.path.dirname(x) for x in removed]))
+        deleted.extend(set([os.path.dirname(x) for x in deleted]))
 
         # cached file info
-        IconOverlayExtension.last_status = status
-        IconOverlayExtension.last_path = path
-        IconOverlayExtension.last_tick = tc
+        tc = win32api.GetTickCount()
+        overlay_cache = {}
+        for f in files:
+            if f in added:
+                status = ADDED
+            elif f in modified:
+                status = MODIFIED
+            elif f in clean:
+                status = UNCHANGED
+            else:
+                status = UNKNOWN
+            fpath = os.path.join(repo.root, os.path.normpath(f))
+            overlay_cache[fpath] = {'ticks': tc, 'status': status}
+        #print "overlay cache:", "\n".join(overlay_cache)
 
+        if overlay_cache.has_key(path):
+            status = overlay_cache[path]['status']
+        else:
+            status = UNKNOWN
         print "%s: %s" % (path, status)
         return status
 
