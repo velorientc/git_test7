@@ -17,7 +17,7 @@ UNKNOWN = "unknown"
 NOT_IN_TREE = "not in tree"
 CONTROL_FILE = "control file"
 
-CACHE_TIMEOUT = 1000
+CACHE_TIMEOUT = 3000
 CACHE_SIZE = 400
 overlay_cache = {}
 
