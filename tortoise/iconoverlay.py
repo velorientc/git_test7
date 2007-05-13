@@ -18,15 +18,25 @@ NOT_IN_TREE = "not in tree"
 CONTROL_FILE = "control file"
 
 CACHE_TIMEOUT = 1000
-CACHE_SIZE = 10
+CACHE_SIZE = 400
 overlay_cache = {}
 
-def get_cache_list(path):
+def get_cache_list(path, size):
+    """"
+    get a sorted list (of size 'size') of file/folders which reside in  
+    the same directory as 'path' and windowed around 'path' on the list. 
+    The .hg directory will be ignore. Other directories will also be 
+    ignored unless path is a directory itself.
+    """
     pathdir = os.path.dirname(path)
     dlist = [x for x in os.listdir(pathdir) if x <> ".hg"]
-    #dlist.sort()
-    #idx = dlist.index(os.path.basename(path))
-    cache_list = dlist #[idx : idx + CACHE_SIZE]
+    if not os.path.isdir(path):
+        dlist = [x for x in dlist if not os.path.isdir(x)]
+    dlist.sort()
+    idx = dlist.index(os.path.basename(path))
+    begin = max(0, idx - size/2)
+    end = idx + size/2
+    cache_list = dlist[begin : end]
     cache_list = [os.path.join(pathdir, x) for x in cache_list]
     return cache_list
 
@@ -131,7 +141,7 @@ class IconOverlayExtension(object):
 
         # get file status
         tc1 = win32api.GetTickCount()
-        cache_list = get_cache_list(path)
+        cache_list = get_cache_list(path, CACHE_SIZE)
         #print "cache_list: ", "\n".join(cache_list)
         try:
             files, matchfn, anypats = cmdutil.matchpats(repo, cache_list)
