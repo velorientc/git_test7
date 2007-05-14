@@ -19,6 +19,9 @@ import gpopen
 from thgutil import *
 
 GUI_SHELL = 'guishell'
+SIMPLE_MERGE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'hgutils',
+                            'simplemerge')
+os.environ['HGMERGE'] = ('python %s -L my -L other' % shellquote(SIMPLE_MERGE))
 
 S_OK = 0
 S_FALSE = 1
@@ -315,6 +318,9 @@ class ContextMenuExtension:
             result.append((_("Update"),
                            _("update working directory"),
                            self._update))
+            result.append((_("Merge"),
+                           _("merge working directory with another revision"),
+                           self._merge_simple))
 
             result.append([])   # separator
 
@@ -516,6 +522,10 @@ class ContextMenuExtension:
     def _diff(self, parent_window):
         self._run_dialog('diff')
 
+    def _merge_simple(self, parent_window):
+        print "HGMERGE = %s" % os.environ['HGMERGE']
+        self._run_dialog('merge', True)
+
     def _rollback(self, parent_window):
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -535,7 +545,7 @@ class ContextMenuExtension:
         import updatedialog
         targets = self._filenames or [self._folder]
         updatedialog.do_update(targets[0])
-        
+
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
         if exepath:
