@@ -52,10 +52,7 @@ class IconOverlayExtension(object):
     """
     
     counter = 0
-    last_path = ""
-    last_status = UNKNOWN
-    last_tick = 0
-    
+
     _com_interfaces_ = [shell.IID_IShellIconOverlayIdentifier]
     _public_methods_ = [
         "GetOverlayInfo", "GetPriority", "IsMemberOf"
