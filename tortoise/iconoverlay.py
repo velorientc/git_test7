@@ -33,7 +33,10 @@ def get_cache_list(path, size):
     if not os.path.isdir(path):
         dlist = [x for x in dlist if not os.path.isdir(x)]
     dlist.sort()
-    idx = dlist.index(os.path.basename(path))
+    try:
+        idx = dlist.index(os.path.basename(path))
+    except:
+        idx = 0
     begin = max(0, idx - size/2)
     end = idx + size/2
     cache_list = dlist[begin : end]
