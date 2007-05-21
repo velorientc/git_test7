@@ -150,13 +150,24 @@ class IconOverlayExtension(object):
             return UNKNOWN
         print "status() took %d ticks" % (win32api.GetTickCount() - tc1)
         
-        # add directory status to list
-        clean.extend(set([os.path.dirname(x) for x in clean]))
-        modified.extend(set([os.path.dirname(x) for x in modified]))
-        added.extend(set([os.path.dirname(x) for x in added]))
-        removed.extend(set([os.path.dirname(x) for x in removed]))
-        deleted.extend(set([os.path.dirname(x) for x in deleted]))
+        def add_dirs(list):
+            dirs = set()
+            for f in list:
+                dir = os.path.dirname(f)
+                if dir in dirs:
+                   continue
+                while dir:
+                    dirs.add(dir)
+                    dir = os.path.dirname(dir)
+            list.extend(dirs)
 
+        # add directory status to list
+        add_dirs(clean)
+        add_dirs(modified)
+        add_dirs(added)
+        add_dirs(removed)
+        add_dirs(deleted)
+        
         # cached file info
         tc = win32api.GetTickCount()
         overlay_cache = {}
@@ -171,7 +182,7 @@ class IconOverlayExtension(object):
                 status = UNKNOWN
             fpath = os.path.join(repo.root, os.path.normpath(f))
             overlay_cache[fpath] = {'ticks': tc, 'status': status}
-        #print "overlay cache:", "\n".join(overlay_cache)
+            #print "cache:", fpath, status
 
         if overlay_cache.has_key(path):
             status = overlay_cache[path]['status']
