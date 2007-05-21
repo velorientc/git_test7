@@ -17,6 +17,8 @@ import _winreg
 from mercurial import hg, ui, repo
 import gpopen
 from thgutil import *
+import commitdialog
+import updatedialog
 
 GUI_SHELL = 'guishell'
 SIMPLE_MERGE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'hgutils',
@@ -536,13 +538,11 @@ class ContextMenuExtension:
             self._run_dialog('rollback', True)
 
     def _commit_simple(self, parent_window):
-        import commitdialog
         targets = self._filenames or [self._folder]
         #quoted_files = [shellquote(s) for s in targets]
         commitdialog.do_commit(targets)
         
     def _update(self, parent_window):
-        import updatedialog
         targets = self._filenames or [self._folder]
         updatedialog.do_update(targets[0])
 
