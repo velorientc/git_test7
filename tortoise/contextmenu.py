@@ -507,7 +507,11 @@ class ContextMenuExtension:
         title = "Mercurial: revert"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
-            self._run_dialog('revert')
+            self._run_dialog('revert', modal=True)
+
+            # refresh overlay icons
+            dir = self._folder or os.path.dirname(self._filenames[0])
+            shell_notify(dir)
  
     def _tip(self, parent_window):
         self._run_dialog('tip', True)
