@@ -499,8 +499,12 @@ class ContextMenuExtension:
         self._run_dialog('outgoing', True)
 
     def _add(self, parent_window):
-        self._run_dialog('add')
-            
+        self._run_dialog('add', modal=True)
+
+        # refresh overlay icons
+        dir = self._folder or os.path.dirname(self._filenames[0])
+        shell_notify(dir)
+
     def _revert(self, parent_window):
         targets = self._filenames or [self._folder]
         msg = "Confirm reverting: %s" % ", ".join(targets)
