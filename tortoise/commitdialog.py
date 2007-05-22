@@ -107,6 +107,14 @@ def do_commit(files):
                         " ".join(quoted_files))
         gpopen.run(cmdline, modal=True)
         os.unlink(logpath)
+        
+        # refresh overlay icons in commit directories
+        # FIXME: other explorer windows opened on the same repo
+        #        may not get refreshed
+        for f in files:
+            dir = os.path.isdir(f) and f or os.path.dirname(f)
+            thgutil.shell_notify(dir)
+
 
 if __name__ == "__main__":
     files = ["D:\\Profiles\\r28629\\My Documents\\Mercurial\\repos\\c1\\"]

@@ -8,6 +8,7 @@ of the GNU General Public License, incorporated herein by reference.
 """
 
 import os.path, re
+from win32com.shell import shell, shellcon
 
 _quotere = None
 def shellquote(s):
@@ -39,3 +40,11 @@ def find_root(path):
         if p == oldp:
             return None
     return p
+
+def shell_notify(path):
+    pidl, ignore = shell.SHILCreateFromPath(path, 0)
+    print "notify: ", shell.SHGetPathFromIDList(pidl)
+    shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
+                         shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSHNOWAIT,
+                         pidl,
+                         None)
