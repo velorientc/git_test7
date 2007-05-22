@@ -108,6 +108,10 @@ class IconOverlayExtension(object):
             IconOverlayExtension.counter += 1
         print "counter = %d" % IconOverlayExtension.counter
         
+        if os.path.basename(path) == ".hg":
+            print "%s: skip directory" % path
+            return NOT_IN_TREE      # ignore .hg directories (for efficiency)
+
         if 0 and os.path.isdir(path):
             print "%s: skip directory" % path
             return NOT_IN_TREE      # ignore directories (for efficiency)
