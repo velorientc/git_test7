@@ -535,7 +535,13 @@ class ContextMenuExtension:
         title = "Mercurial: rollback"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
-            self._run_dialog('rollback', True)
+            self._run_dialog('rollback', noargs=True, modal=True)
+
+            # refresh overlay icons
+            dir = self._folder or os.path.dirname(self._filenames[0])
+            shell_notify(dir)
+
+
 
     def _commit_simple(self, parent_window):
         targets = self._filenames or [self._folder]
@@ -561,7 +567,7 @@ class ContextMenuExtension:
                             " ".join(quoted_files))
             run_program(exepath, cmdline)
 
-    def _run_dialog(self, hgcmd, noargs=False, verbose=True):
+    def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
         quoted_files = []
@@ -574,7 +580,7 @@ class ContextMenuExtension:
                         " ".join(quoted_files))
         print "_run_program_dialog: cmdline = ", cmdline
         title = "Hg %s" % hgcmd
-        gpopen.run(cmdline, title=title)
+        gpopen.run(cmdline, title=title, modal=modal)
 
     def _help(self, parent_window):
         gpopen.run(['hg', 'help', '--verbose'])
