@@ -534,7 +534,11 @@ class ContextMenuExtension:
 
     def _merge_simple(self, parent_window):
         print "HGMERGE = %s" % os.environ['HGMERGE']
-        self._run_dialog('merge', True)
+        self._run_dialog('merge', noargs=True, modal=True)
+
+        # refresh overlay icons
+        dir = self._folder or os.path.dirname(self._filenames[0])
+        shell_notify(dir)
 
     def _rollback(self, parent_window):
         targets = self._filenames or [self._folder]
