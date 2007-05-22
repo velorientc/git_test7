@@ -85,7 +85,9 @@ def do_update(path, title="Hg update"):
                         util.shellquote(root),
                         clean and "--clean" or "",
                         rev)
-        gpopen.run(cmdline, title=title)
+        gpopen.run(cmdline, title=title, modal=True)
+        return True
+    return False
 
 if __name__ == "__main__":
     do_update("D:\\Profiles\\r28629\\My Documents\\Mercurial\\repos\\c1")

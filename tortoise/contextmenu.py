@@ -554,7 +554,10 @@ class ContextMenuExtension:
         
     def _update(self, parent_window):
         targets = self._filenames or [self._folder]
-        updatedialog.do_update(targets[0])
+        if updatedialog.do_update(targets[0]) == True:
+            # refresh overlay icons
+            dir = self._folder or os.path.dirname(self._filenames[0])
+            shell_notify(dir)        
 
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)
