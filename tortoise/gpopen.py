@@ -104,6 +104,7 @@ class PopenDialog(ResizableEditDialog):
         
     def OnInitDialog(self):
         rc = ResizableEditDialog.OnInitDialog(self)
+        self.ok_btn = self.GetDlgItem(win32con.IDOK)
         self.thread1 = threading.Thread(target=self.run_program)
         self.thread1.start()
             
@@ -116,6 +117,7 @@ class PopenDialog(ResizableEditDialog):
 
         bytes = 0
         print "popen begin"
+        self.ok_btn.EnableWindow(False) # disable OK button
         try:
             line = 0
             blocksize = 1024
@@ -135,7 +137,8 @@ class PopenDialog(ResizableEditDialog):
             self.write(out)
         except IOError:
             pass
-        
+
+        self.ok_btn.EnableWindow(True) # enable OK button
         print "popen end: bytes = ", bytes
 
 def run(cmd, modal=False, title='Mercurial'):
