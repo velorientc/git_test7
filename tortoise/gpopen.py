@@ -33,10 +33,6 @@ class ResizableEditDialog(Dialog):
         self.outtext = self.GetDlgItem(dlg_EDIT1)
         self.outtext.SetReadOnly()
         self.outtext.LimitText(10000000)    # enough to hald the log output?
-        ctrl = self.GetDlgItem(dlg_EDIT1)
-        l, t, r, b = ctrl.GetWindowRect()
-        l, t, r, b = self.ScreenToClient( (l, t, r, b ) )
-        print "create: edit rect =", l, t, r, b 
  
         # set output window to use fixed font
         self.font = win32ui.CreateFont({'name': "Courier New", 'height': 14})
@@ -50,15 +46,12 @@ class ResizableEditDialog(Dialog):
         rect = self.GetClientRect()
         print "dlg client rect = ", rect
  
-    def _do_size(self, cx, cy, repaint = 1):
-        print "cx = %d, cy = %d" % (cx, cy)
-        
+    def _do_size(self, cx, cy, repaint=1):
         # resize the textbox.
         ctrl = self.GetDlgItem(dlg_EDIT1)
         l, t, r, b = ctrl.GetWindowRect()
         l, t = self.ScreenToClient( (l,t) )
         r, b = self.ScreenToClient( (r,b) )
-        print "resize: edit rect =", l, t, r, b 
         ctrl.MoveWindow((l, t, cx-6, cy-40), repaint)
         
         # relocate the button.
@@ -99,38 +92,21 @@ def dlg_template(w=300, h=300):
                       | win32con.ES_WANTRETURN
                ])
     bw, bh = 50, 15
-    dlg.append([dlgButton,"OK", win32con.IDOK, (3, h -bh -2, bw, bh),
+    dlg.append([dlgButton, "OK", win32con.IDOK, (3, h -bh -2, bw, bh),
                     s | win32con.BS_PUSHBUTTON]) 
 
     return dlg
-      
-class OutputDialog:
-    def __init__(self, title='Mercurial'):
-        # create and dialog to show out from hg commands
-        self.dlg = Dialog(win32ui.IDD_LARGE_EDIT)
-        self.dlg.CreateWindow()
-        self.dlg.SetWindowText(title)
-        
-        self.outtext = self.dlg.GetDlgItem(win32ui.IDC_EDIT1)
-        self.outtext.SetReadOnly()
 
-        # set output window to use fixed font
-        self.font = win32ui.CreateFont({'name': "Courier New", 'height': 14})
-        self.outtext.SetFont(self.font);
-
-    def write(self, msg):
-        self.outtext.ReplaceSel(msg)
-    
-class PopenThread:
-    def __init__(self, cmd, gui=None):
-        self.gui = gui or OutputDialog()
-
-        # Set up the thread to do execute hg command
-        self.running = 1
+class PopenDialog(ResizableEditDialog):
+    def __init__(self, cmd, title=None, tmpl=None):
         self.cmdline = cmd
+        ResizableEditDialog.__init__(self, title, tmpl)
+        
+    def OnInitDialog(self):
+        rc = ResizableEditDialog.OnInitDialog(self)
         self.thread1 = threading.Thread(target=self.run_program)
         self.thread1.start()
-
+            
     def run_program(self):
         pop = subprocess.Popen(self.cmdline, 
                                shell=True,
@@ -139,8 +115,8 @@ class PopenThread:
                                stdin=subprocess.PIPE)
 
         bytes = 0
+        print "popen begin"
         try:
-            print "run_program: popened"
             line = 0
             blocksize = 1024
             while pop.poll() == None:
@@ -152,30 +128,16 @@ class PopenThread:
                     if blocksize < 1024 * 50:
                         blocksize *= 2
                 out = out.replace('\n', '\r\n') # fileter LF for binary output
-                self.out_text(out)
+                self.write(out)
             out = pop.stdout.read()
             bytes += len(out)
             out = out.replace('\n', '\r\n')     # fileter LF for binary output
-            self.out_text(out)
-            print "run_program: popen closed"
+            self.write(out)
         except IOError:
             pass
         
-        print "end runProgram: bytes = ", bytes
+        print "popen end: bytes = ", bytes
 
-    def out_text(self, msg):
-        if msg:
-            self.gui.write(msg)
-
-class PopenDialog(ResizableEditDialog):
-    def __init__(self, cmd, title=None, tmpl=None):
-        self.cmd = cmd
-        ResizableEditDialog.__init__(self, title, tmpl)
-        
-    def OnInitDialog(self):
-        rc = ResizableEditDialog.OnInitDialog(self)
-        PopenThread(self.cmd, gui=self)
-            
 def run(cmd, modal=False, title='Mercurial'):
     tmpl = dlg_template(300, 250)
     gui = PopenDialog(cmd, title, tmpl)
@@ -183,9 +145,8 @@ def run(cmd, modal=False, title='Mercurial'):
         gui.DoModal()
     else:
         gui.CreateWindow()
-    print "run done"
     
 if __name__ == "__main__":
     #gui = OutputDialog("Hg help")
-    run(['python -u C:\Python24\Scripts\hg -R C:\hg\h1 log -v'])
+    run(['python -u C:\Python24\Scripts\hg -R C:\hg\h1 log -l100'])
     #run(['C:\Python24\Scripts\hg.bat', 'help'])
