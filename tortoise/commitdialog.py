@@ -12,7 +12,7 @@ import win32ui
 import win32con
 from pywin.mfc import dialog
 from mercurial import hg, repo, ui, cmdutil, util
-import gpopen
+import gpopen2 as gpopen
 import thgutil
 
 def get_changes_text(filenames):

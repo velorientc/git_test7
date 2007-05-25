@@ -15,10 +15,10 @@ import win32gui_struct
 import win32api
 import _winreg
 from mercurial import hg, ui, repo
-import gpopen
 from thgutil import *
 import commitdialog
 import updatedialog
+import gpopen2 as gpopen
 
 GUI_SHELL = 'guishell'
 SIMPLE_MERGE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'hgutils',
@@ -599,3 +599,4 @@ class ContextMenuExtension:
 
     def _help(self, parent_window):
         gpopen.run(['hg', 'help', '--verbose'])
+        

@@ -11,7 +11,7 @@ import win32ui
 import win32con
 from pywin.mfc.dialog import Dialog
 from mercurial import util
-import gpopen
+import gpopen2 as gpopen
 import thgutil
 
 dlgStatic = 130
