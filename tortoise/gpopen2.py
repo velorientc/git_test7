@@ -18,13 +18,12 @@ IDC_BUTTON_CLOSE = 1026
 IDC_OUTPUT_EDIT = 1027
 
 g_registeredClass = 0
-g_iconPathName = os.path.abspath(os.path.join( os.path.split(sys.executable)[0], "pyc.ico" ))
-if not os.path.isfile(g_iconPathName):
-    # Look in the source tree.
-    g_iconPathName = os.path.abspath(os.path.join( os.path.split(sys.executable)[0], "..\\PC\\pyc.ico" ))
-    if not os.path.isfile(g_iconPathName):
-        print "Can't find the icon file"
-        g_iconPathName = None
+
+def getIconPath(*args):
+    icon = os.path.join(os.path.dirname(__file__), "..", "icons", *args)
+    if not os.path.isfile(icon):
+        return None
+    return icon
 
 def setEditFont(hwnd, fontname, height):
     lf = win32gui.LOGFONT()
@@ -81,7 +80,13 @@ class PopenWindowBase:
             # C code: wc.cbWndExtra = DLGWINDOWEXTRA + sizeof(HBRUSH) + (sizeof(COLORREF));
             wc.cbWndExtra = win32con.DLGWINDOWEXTRA + struct.calcsize("Pi")
             icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
-            #wc.hIcon = win32gui.LoadImage(self.hinst, g_iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
+            icon_path = getIconPath("tortoise", "hg.ico")
+            if icon_path:
+                wc.hIcon = win32gui.LoadImage(self.hinst, icon_path,
+                                              win32con.IMAGE_ICON,
+                                              0,
+                                              0,
+                                              icon_flags)
             classAtom = win32gui.RegisterClass(wc)
             g_registeredClass = 1
         return className
