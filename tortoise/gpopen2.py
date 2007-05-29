@@ -10,6 +10,8 @@ import win32con
 import struct
 import commctrl
 import subprocess
+import getopt
+import thgutil
 
 # control ID
 IDC_COMMANDTEXT = 1024
@@ -298,7 +300,7 @@ class PopenDialog(PopenWindowBase):
 
         win32gui.EnableWindow(refresh_btn, True)
 
-def run(cmdline='', title='Hg', modal=False):
+def run(cmdline, title='Hg', modal=False):
     dlg = PopenDialog(cmdline=cmdline, title=title)
     if modal:
         dlg.DoModal()
@@ -306,8 +308,74 @@ def run(cmdline='', title='Hg', modal=False):
         dlg.CreateWindow()
         win32gui.PumpMessages()
     
+def get_option(args):
+    long_opt_list =  ['command=', 'exepath=', 'listfile=', 'title=',
+                      'root=', 'notify', 'deletelistfile']
+    opts, args = getopt.getopt(args, "c:e:l:ndt:R:", long_opt_list)
+    options = dict({'hgcmd': 'help', 'hgpath': 'hg'} )
+    
+    for o, a in opts:
+        if o in ("-c", "--command"):
+            options['hgcmd'] = a
+        elif o in ("-l", "--listfile"):
+            options['listfile'] = a
+        elif o in ("-e", "--exepath"):
+            options['hgpath'] = a
+        elif o in ("-n", "--notify"):
+            options['notify'] = True
+        elif o in ("-t", "--title"):
+            options['title'] = a
+        elif o in ("-d", "--deletelistfile"):
+            options['rmlistfile'] = True
+        elif o in ("-R", "--root"):
+            options['root'] = a
+
+    return (options, args)
+
+def get_list_from_file(filename):
+    fd = open(filename, "r")
+    lines = [ x.replace("\n", "") for x in fd.readlines() ]
+    fd.close()
+    return lines
+    
 if __name__=='__main__':
+    if len(sys.argv) > 1:
+        try:
+            option, args = get_option(sys.argv[1:])
+        except getopt.GetoptError, inst:
+            print inst
+            sys.exit(1)
+        
+        filelist = []
+        if option.has_key('listfile'):
+            filelist = get_list_from_file(option['listfile'])
+            
+        #cmdline = option['hgpath']
+        cmdline = "hg %s" % option['hgcmd']
+        if option.has_key('root'):
+            cmdline += " --repository %s" % thgutil.shellquote(option['root'])
+        if args:
+            cmdline += " %s" % " ".join([(x) for x in args])
+        if filelist:
+            cmdline += " %s" % " ".join([(x) for x in filelist])
+                    
+        opt = {}
+        if option.has_key('title'):
+            opt['title'] = option['title']
+        else:
+            opt['title'] = "hg %s" % option['hgcmd']
+        run(cmdline, **opt)
+                             
+        if option.has_key('notify'):
+            for f in filelist:
+                dir = os.path.isdir(f) and f or os.path.dirname(f)
+                thgutil.shell_notify(os.path.abspath(dir))
+
+        if option.has_key('rmlistfile'):
+            os.unlink(option['listfile'])
+            
+    # ========== test cases ==========
     #run(['hg log -v', modal=True])
-    run(['hg', 'log', '-v'], modal=False)
+    #run(['hg', 'log', '-v'], modal=False)
     #run(['hg -R C:\hg\h1 log -v'])
     #run(['hg version'])
