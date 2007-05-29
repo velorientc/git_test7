@@ -67,7 +67,7 @@ class PopenWindowBase:
         return self._DoCreate(win32gui.DialogBoxIndirect)
 
     def _RegisterWndClass(self):
-        className = "PythonDocSearch"
+        className = "TortoiseHgDialog"
         global g_registeredClass
         if not g_registeredClass:
             message_map = {}
