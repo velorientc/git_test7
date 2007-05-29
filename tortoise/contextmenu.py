@@ -4,6 +4,7 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 
 import os
+import tempfile
 import pythoncom
 from win32com.shell import shell, shellcon
 import win32con
@@ -27,6 +28,34 @@ os.environ['HGMERGE'] = ('python %s -L my -L other' % shellquote(SIMPLE_MERGE))
 
 S_OK = 0
 S_FALSE = 1
+
+def gpopen_exec(cmd, cmdopts='', root=None, filelist=[], title=None, notify=False):
+    # put filenames in a temp file to pass to gpopen
+    if filelist:
+        fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
+        os.write(fd, "\n".join(filelist))
+        os.close(fd)
+
+    # find the executable paths
+    gpath, ext = os.path.splitext(gpopen.__file__)
+    gpath = gpath + ".py"
+    print "using ", gpath
+    if not os.path.isfile(gpath):
+        raise "file '%s' not found" % gpath
+    pypath = find_path('python')
+    
+    # start gpopen
+    gpopts = "--command %s" % cmd
+    if root:
+        gpopts += " --root %s" % shellquote(root)
+    if filelist:
+        gpopts += " --listfile %s --deletelistfile" % (shellquote(tmpfile))
+    if notify:
+        gpopts += " --notify"
+    if title:
+        gpopts += " --title %s" % shellquote(title)
+
+    run_program(pypath, 'python %s %s -- %s' % (shellquote(gpath), gpopts, cmdopts))
 
 def get_clone_repo_name(dir, repo_name):
     dest_clone = os.path.join(dir, repo_name)
@@ -420,10 +449,9 @@ class ContextMenuExtension:
 
         repo_name = os.path.basename(src)
         dest_clone = get_clone_repo_name(dest, repo_name)
-        cmdline = "hg --verbose clone %s %s" % (
-                        shellquote(src),
-                        shellquote(dest_clone))
-        gpopen.run(cmdline)
+        cmdopts = "--verbose"
+        repos = [src, dest_clone]
+        gpopen_exec('clone', cmdopts, filelist=repos)
 
     def _push_here(self, parent_window):
         src = self._filenames[0]
@@ -434,10 +462,8 @@ class ContextMenuExtension:
         if rv == 2:
             return
 
-        cmdline = "hg --verbose --repository %s push %s" % (
-                        shellquote(src),
-                        shellquote(dest))
-        gpopen.run(cmdline)
+        cmdopts = "--verbose"
+        gpopen_exec('push', cmdopts, root=src, filelist=[dest])
 
     def _pull_here(self, parent_window):
         src = self._filenames[0]
@@ -448,26 +474,20 @@ class ContextMenuExtension:
         if rv == 2:
             return
 
-        cmdline = "hg --verbose --repository %s pull %s" % (
-                        shellquote(dest),
-                        shellquote(src))
-        gpopen.run(cmdline)
+        cmdopts = "--verbose"
+        gpopen_exec('pull', cmdopts, root=src, filelist=[dest])
 
     def _incoming_here(self, parent_window):
         src = self._filenames[0]
         dest = self._folder
-        cmdline = "hg --verbose --repository %s incoming %s" % (
-                        shellquote(src),
-                        shellquote(dest))
-        gpopen.run(cmdline)
+        cmdopts = "--verbose"
+        gpopen_exec('incoming', cmdopts, root=src, filelist=[dest])
 
     def _outgoing_here(self, parent_window):
         src = self._filenames[0]
         dest = self._folder
-        cmdline = "hg --verbose --repository %s outgoing %s" % (
-                        shellquote(src),
-                        shellquote(dest))
-        gpopen.run(cmdline)
+        cmdopts = "--verbose"
+        gpopen_exec('outgoing', cmdopts, root=src, filelist=[dest])
 
     def _init(self, parent_window):
         dest = self._folder or self._filenames[0]
@@ -585,18 +605,11 @@ class ContextMenuExtension:
     def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
-        quoted_files = []
-        if noargs == False:
-            quoted_files = [shellquote(s) for s in targets]
-        cmdline = "hg --repository %s %s %s %s" % (
-                        shellquote(root),
-                        hgcmd,
-                        verbose and "--verbose" or "",
-                        " ".join(quoted_files))
-        print "_run_program_dialog: cmdline = ", cmdline
+        cmdopts = "%s" % (verbose and "--verbose" or "")
+        print "_run_program_dialog: cmdopts = ", cmdopts
         title = "Hg %s" % hgcmd
-        gpopen.run(cmdline, title=title, modal=modal)
+        gpopen_exec(hgcmd, cmdopts, root=root, filelist=targets)
 
     def _help(self, parent_window):
-        gpopen.run(['hg', 'help', '--verbose'])
+        gpopen_exec('help', '--verbose')
         
