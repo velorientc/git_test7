@@ -96,12 +96,19 @@ class PopenWindowBase:
     def _GetDialogTemplate(self, dlgClassName):
         w = 300
         h = 250
-        style = win32con.WS_THICKFRAME | win32con.WS_POPUP | win32con.WS_VISIBLE | win32con.WS_CAPTION | win32con.WS_SYSMENU | win32con.DS_SETFONT | win32con.WS_MINIMIZEBOX
+        style = (  win32con.WS_THICKFRAME 
+                 | win32con.WS_POPUP 
+                 | win32con.WS_VISIBLE 
+                 | win32con.WS_CAPTION 
+                 | win32con.WS_SYSMENU 
+                 | win32con.DS_SETFONT 
+                 | win32con.WS_MINIMIZEBOX )
         cs = win32con.WS_CHILD | win32con.WS_VISIBLE
         title = "Mercurial"
 
         # Window frame and title
-        dlg = [ [title, (0, 0, w, h), style, None, (8, "MS Sans Serif"), None, dlgClassName], ]
+        dlg = [ [title, (0, 0, w, h), style, None, (8, "MS Sans Serif"),
+                 None, dlgClassName], ]
 
         # ID label and text box
         dlg.append([130, "Command:", -1, (5, 5, w - 10, 9), cs | win32con.SS_LEFT])
@@ -112,16 +119,16 @@ class PopenWindowBase:
         # (x positions don't matter here)
         s = cs | win32con.WS_TABSTOP
         dlg.append([128, "Refresh", IDC_BUTTON_REFRESH, (5, 35, 50, 14), s])
-        s = win32con.BS_PUSHBUTTON | s
-        dlg.append([128, "Close", IDC_BUTTON_CLOSE, (100, 35, 50, 14), s | win32con.BS_DEFPUSHBUTTON])
+        dlg.append([128, "Close", IDC_BUTTON_CLOSE, (100, 35, 50, 14), 
+                    s | win32con.BS_DEFPUSHBUTTON])
 
         dlg.append(['EDIT', "", IDC_OUTPUT_EDIT, (5, 55, w - 10, h - 60),
-                        cs | win32con.SS_LEFT
-                          | win32con.WS_BORDER
-                          | win32con.ES_MULTILINE
-                          | win32con.WS_VSCROLL
-                          | win32con.WS_HSCROLL
-                          | win32con.ES_WANTRETURN
+                    cs | win32con.SS_LEFT
+                       | win32con.WS_BORDER
+                       | win32con.ES_MULTILINE
+                       | win32con.WS_VSCROLL
+                       | win32con.WS_HSCROLL
+                       | win32con.ES_WANTRETURN
                    ])
         return dlg
 
