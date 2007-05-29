@@ -123,6 +123,8 @@ class ResizableEditDialog(Dialog):
         self.outtext.SetFont(self.font);
 
     def write(self, msg):
+        # convert LF to CRLF for binary output
+        msg = re.sub(r'(?<!\r)\n', r'\r\n', msg)
         self.outtext.ReplaceSel(msg)
 
     def PreDoModal(self):
@@ -217,11 +219,10 @@ class PopenDialog(ResizableEditDialog):
                     out = pop.stdout.read(blocksize)
                     if blocksize < 1024 * 50:
                         blocksize *= 2
-                out = out.replace('\n', '\r\n') # fileter LF for binary output
+                bytes += len(out)
                 self.write(out)
             out = pop.stdout.read()
             bytes += len(out)
-            out = out.replace('\n', '\r\n')     # fileter LF for binary output
             self.write(out)
         except IOError:
             pass
