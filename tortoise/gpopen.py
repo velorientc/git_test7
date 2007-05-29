@@ -91,7 +91,7 @@ def parse(args):
     if option.has_key('rmlistfile'):
         os.unlink(option['listfile'])
             
-class TestDialogApp(dlgappcore.DialogApp):
+class TortoiseHgDialogApp(dlgappcore.DialogApp):
     def __init__(self):
         dlgappcore.DialogApp.__init__(self)
         
@@ -99,7 +99,7 @@ class TestDialogApp(dlgappcore.DialogApp):
         return parse(sys.argv)
         #return PopenDialog(['hg'] + sys.argv, 'Mercurial')
 
-app.AppBuilder = TestDialogApp()
+app.AppBuilder = TortoiseHgDialogApp()
 
 class ResizableEditDialog(Dialog): 
     def __init__(self, title="hg", tmpl=None):
