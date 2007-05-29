@@ -7,10 +7,12 @@
 import subprocess
 import threading
 import win32ui
+from pywin.framework import dlgappcore, app
 from pywin.mfc.dialog import Dialog
 import win32con
 import win32api
 import win32gui
+import re, sys
 
 dlgStatic = 130
 dlgEdit = 129
@@ -18,8 +20,18 @@ dlgButton = 128
 
 dlg_EDIT1 = 1001
 
+class TestDialogApp(dlgappcore.DialogApp):
+    def __init__(self):
+        dlgappcore.DialogApp.__init__(self)
+        
+    def CreateDialog(self):
+        import sys
+        return PopenDialog(['hg'] + sys.argv, 'Mercurial')
+
+app.AppBuilder = TestDialogApp()
+
 class ResizableEditDialog(Dialog): 
-    def __init__(self, title=None, tmpl=None):
+    def __init__(self, title="hg", tmpl=None):
         self.title = title
         if tmpl is None:
             tmpl = dlg_template()
@@ -29,7 +41,8 @@ class ResizableEditDialog(Dialog):
         rc = Dialog.OnInitDialog(self)
         self.HookMessage(self.OnSize, win32con.WM_SIZE)
 
-        self.SetWindowText(self.title)
+        if self.title:
+            self.SetWindowText(self.title)
         self.outtext = self.GetDlgItem(dlg_EDIT1)
         self.outtext.SetReadOnly()
         self.outtext.LimitText(10000000)    # enough to hald the log output?
@@ -37,9 +50,14 @@ class ResizableEditDialog(Dialog):
         # set output window to use fixed font
         self.font = win32ui.CreateFont({'name': "Courier New", 'height': 14})
         self.outtext.SetFont(self.font);
+        self.write("hello!")
 
     def write(self, msg):
         self.outtext.ReplaceSel(msg)
+
+    def PreDoModal(self):
+        #sys.stdout = sys.stderr = self
+        pass
 
     def OnCreate(self, msg):
         print "Oncreate: ", msg
@@ -107,7 +125,7 @@ class PopenDialog(ResizableEditDialog):
         self.ok_btn = self.GetDlgItem(win32con.IDOK)
         self.thread1 = threading.Thread(target=self.run_program)
         self.thread1.start()
-            
+
     def run_program(self):
         pop = subprocess.Popen(self.cmdline, 
                                shell=True,
@@ -148,8 +166,21 @@ def run(cmd, modal=False, title='Mercurial'):
         gui.DoModal()
     else:
         gui.CreateWindow()
+
+_quotere = None
+def shellquote(s):
+    global _quotere
+    if _quotere is None:
+        _quotere = re.compile(r'(\\*)("|\\$)')
+    return '"%s"' % _quotere.sub(r'\1\1\\\2', s)
+    return "'%s'" % s.replace("'", "'\\''")
     
-if __name__ == "__main__":
-    #gui = OutputDialog("Hg help")
-    run(['python -u C:\Python24\Scripts\hg -R C:\hg\h1 log -l100'])
-    #run(['C:\Python24\Scripts\hg.bat', 'help'])
+if __name__=='__main__':
+    import sys
+    try:
+        parent = win32ui.GetMainFrame().GetSafeHwnd()
+        arg = " ".join([shellquote(x) for x in sys.argv])
+        win32api.ShellExecute(parent, None, 'pythonwin.exe', '/app %s' % arg, None, 1)
+    except win32api.error, details:
+        win32ui.MessageBox("Error executing command - %s" % (details), "Demos")
+    print "done"
