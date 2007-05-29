@@ -19,7 +19,6 @@ from mercurial import hg, ui, repo
 from thgutil import *
 import commitdialog
 import updatedialog
-import gpopen2 as gpopen
 
 GUI_SHELL = 'guishell'
 SIMPLE_MERGE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'hgutils',
@@ -30,6 +29,39 @@ S_OK = 0
 S_FALSE = 1
 
 def gpopen_exec(cmd, cmdopts='', root=None, filelist=[], title=None, notify=False):
+    app = os.path.join(os.path.dirname(__file__), "gpopen.py")
+    print "app = ", app
+
+    if filelist:
+        fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
+        os.write(fd, "\n".join(filelist))
+        os.close(fd)
+
+    # start gpopen
+    gpopts = "--command %s" % cmd
+    if root:
+        gpopts += " --root %s" % shellquote(root)
+    if filelist:
+        gpopts += " --listfile %s --deletelistfile" % (shellquote(tmpfile))
+    if notify:
+        gpopts += " --notify"
+    if title:
+        gpopts += " --title %s" % shellquote(title)
+
+    cmdline = '/app %s %s -- %s' % (shellquote(app), gpopts, cmdopts)
+
+    try:
+        win32api.ShellExecute(0,
+                              None,
+                              'pythonwin.exe',
+                              cmdline,
+                              None, 
+                              1)
+    except win32api.error, details:
+        win32ui.MessageBox("Error executing command - %s" % (details), "gpopen")
+    print "gpopen_exec: done"
+
+def gpopen_exec2(cmd, cmdopts='', root=None, filelist=[], title=None, notify=False):
     # put filenames in a temp file to pass to gpopen
     if filelist:
         fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
@@ -37,8 +69,7 @@ def gpopen_exec(cmd, cmdopts='', root=None, filelist=[], title=None, notify=Fals
         os.close(fd)
 
     # find the executable paths
-    gpath, ext = os.path.splitext(gpopen.__file__)
-    gpath = gpath + ".py"
+    gpath = os.path.join(os.path.dirname(__file__), "gpopen2.py")
     print "using ", gpath
     if not os.path.isfile(gpath):
         raise "file '%s' not found" % gpath
@@ -613,4 +644,3 @@ class ContextMenuExtension:
 
     def _help(self, parent_window):
         gpopen_exec('help', '--verbose')
-        
