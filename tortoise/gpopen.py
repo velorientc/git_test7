@@ -96,7 +96,6 @@ class TestDialogApp(dlgappcore.DialogApp):
         dlgappcore.DialogApp.__init__(self)
         
     def CreateDialog(self):
-        import sys
         return parse(sys.argv)
         #return PopenDialog(['hg'] + sys.argv, 'Mercurial')
 
@@ -237,14 +236,6 @@ def run(cmd, modal=False, title='Mercurial'):
         gui.DoModal()
     else:
         gui.CreateWindow()
-
-_quotere = None
-def shellquote(s):
-    global _quotere
-    if _quotere is None:
-        _quotere = re.compile(r'(\\*)("|\\$)')
-    return '"%s"' % _quotere.sub(r'\1\1\\\2', s)
-    return "'%s'" % s.replace("'", "'\\''")
     
 if __name__=='__main__':
     #dlg = parse(['-c', 'help', '--', '-v'])
