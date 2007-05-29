@@ -13,6 +13,8 @@ import win32con
 import win32api
 import win32gui
 import re, sys
+import getopt
+import thgutil
 
 dlgStatic = 130
 dlgEdit = 129
@@ -20,13 +22,83 @@ dlgButton = 128
 
 dlg_EDIT1 = 1001
 
+def get_option(args):
+    long_opt_list =  ['command=', 'exepath=', 'listfile=', 'title=',
+                      'root=', 'notify', 'deletelistfile']
+    opts, args = getopt.getopt(args, "c:e:l:ndt:R:", long_opt_list)
+    options = dict({'hgcmd': 'help', 'hgpath': 'hg'} )
+    
+    for o, a in opts:
+        if o in ("-c", "--command"):
+            options['hgcmd'] = a
+        elif o in ("-l", "--listfile"):
+            options['listfile'] = a
+        elif o in ("-e", "--exepath"):
+            options['hgpath'] = a
+        elif o in ("-n", "--notify"):
+            options['notify'] = True
+        elif o in ("-t", "--title"):
+            options['title'] = a
+        elif o in ("-d", "--deletelistfile"):
+            options['rmlistfile'] = True
+        elif o in ("-R", "--root"):
+            options['root'] = a
+
+    return (options, args)
+
+def get_list_from_file(filename):
+    fd = open(filename, "r")
+    lines = [ x.replace("\n", "") for x in fd.readlines() ]
+    fd.close()
+    return lines
+    
+def parse(args):
+    try:
+        option, args = get_option(args)
+    except getopt.GetoptError, inst:
+        print inst
+        sys.exit(1)
+    
+    filelist = []
+    if option.has_key('listfile'):
+        filelist = get_list_from_file(option['listfile'])
+        
+    #cmdline = option['hgpath']
+    cmdline = "hg %s" % option['hgcmd']
+    if option.has_key('root'):
+        cmdline += " --repository %s" % thgutil.shellquote(option['root'])
+    if args:
+        cmdline += " %s" % " ".join([(x) for x in args])
+    if filelist:
+        cmdline += " %s" % " ".join([thgutil.shellquote(x) for x in filelist])
+                
+    opt = {}
+    if option.has_key('title'):
+        opt['title'] = option['title']
+    elif option.has_key('root'):
+        opt['title'] = "hg %s - %s" % (option['hgcmd'], option['root'])
+    else:
+        opt['title'] = "hg %s" % option['hgcmd']
+
+    #run(cmdline, **opt)
+    return PopenDialog(cmdline, **opt)
+                         
+    if option.has_key('notify'):
+        for f in filelist:
+            dir = os.path.isdir(f) and f or os.path.dirname(f)
+            thgutil.shell_notify(os.path.abspath(dir))
+
+    if option.has_key('rmlistfile'):
+        os.unlink(option['listfile'])
+            
 class TestDialogApp(dlgappcore.DialogApp):
     def __init__(self):
         dlgappcore.DialogApp.__init__(self)
         
     def CreateDialog(self):
         import sys
-        return PopenDialog(['hg'] + sys.argv, 'Mercurial')
+        return parse(sys.argv)
+        #return PopenDialog(['hg'] + sys.argv, 'Mercurial')
 
 app.AppBuilder = TestDialogApp()
 
@@ -50,7 +122,6 @@ class ResizableEditDialog(Dialog):
         # set output window to use fixed font
         self.font = win32ui.CreateFont({'name': "Courier New", 'height': 14})
         self.outtext.SetFont(self.font);
-        self.write("hello!")
 
     def write(self, msg):
         self.outtext.ReplaceSel(msg)
@@ -176,11 +247,6 @@ def shellquote(s):
     return "'%s'" % s.replace("'", "'\\''")
     
 if __name__=='__main__':
-    import sys
-    try:
-        parent = win32ui.GetMainFrame().GetSafeHwnd()
-        arg = " ".join([shellquote(x) for x in sys.argv])
-        win32api.ShellExecute(parent, None, 'pythonwin.exe', '/app %s' % arg, None, 1)
-    except win32api.error, details:
-        win32ui.MessageBox("Error executing command - %s" % (details), "Demos")
-    print "done"
+    #dlg = parse(['-c', 'help', '--', '-v'])
+    dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
+    dlg.CreateWindow()
