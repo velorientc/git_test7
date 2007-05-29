@@ -362,8 +362,11 @@ if __name__=='__main__':
         opt = {}
         if option.has_key('title'):
             opt['title'] = option['title']
+        elif option.has_key('root'):
+            opt['title'] = "hg %s - %s" % (option['hgcmd'], option['root'])
         else:
             opt['title'] = "hg %s" % option['hgcmd']
+
         run(cmdline, **opt)
                              
         if option.has_key('notify'):
