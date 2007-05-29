@@ -605,10 +605,13 @@ class ContextMenuExtension:
     def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
+        filelist = []
+        if noargs == False:
+            filelist = targets
         cmdopts = "%s" % (verbose and "--verbose" or "")
         print "_run_program_dialog: cmdopts = ", cmdopts
         title = "Hg %s" % hgcmd
-        gpopen_exec(hgcmd, cmdopts, root=root, filelist=targets)
+        gpopen_exec(hgcmd, cmdopts, root=root, filelist=filelist)
 
     def _help(self, parent_window):
         gpopen_exec('help', '--verbose')
