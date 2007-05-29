@@ -357,7 +357,7 @@ if __name__=='__main__':
         if args:
             cmdline += " %s" % " ".join([(x) for x in args])
         if filelist:
-            cmdline += " %s" % " ".join([(x) for x in filelist])
+            cmdline += " %s" % " ".join([thgutil.shellquote(x) for x in filelist])
                     
         opt = {}
         if option.has_key('title'):
