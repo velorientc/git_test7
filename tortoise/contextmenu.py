@@ -573,8 +573,6 @@ class ContextMenuExtension:
             dir = self._folder or os.path.dirname(self._filenames[0])
             shell_notify(dir)
 
-
-
     def _commit_simple(self, parent_window):
         targets = self._filenames or [self._folder]
         #quoted_files = [shellquote(s) for s in targets]
