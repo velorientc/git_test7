@@ -48,3 +48,48 @@ def shell_notify(path):
                          shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSHNOWAIT,
                          pidl,
                          None)
+
+def get_icon_path(*args):
+    icon = os.path.join(os.path.dirname(__file__), "..", "icons", *args)
+    if not os.path.isfile(icon):
+        return None
+    return icon
+    
+def icon_to_bitmap(iconPathName):
+    """
+    create a bitmap based converted from an icon.
+
+    adapted from pywin32's demo program win32gui_menu.py
+    """
+    from win32gui import *
+    from win32api import *
+    import win32con
+
+    # Create one with an icon - this is a fair bit more work, as we need
+    # to convert the icon to a bitmap.
+    # First load the icon.
+    ico_x = GetSystemMetrics(win32con.SM_CXSMICON)
+    ico_y = GetSystemMetrics(win32con.SM_CYSMICON)
+    if iconPathName:
+        hicon = LoadImage(0, iconPathName, win32con.IMAGE_ICON, ico_x, ico_y, win32con.LR_LOADFROMFILE)
+    else:
+        shell_dll = os.path.join(GetSystemDirectory(), "shell32.dll")
+        large, small = win32gui.ExtractIconEx(shell_dll, 4, 1)
+        hicon = small[0]
+        DestroyIcon(large[0])
+
+    hdcBitmap = CreateCompatibleDC(0)
+    hdcScreen = GetDC(0)
+    hbm = CreateCompatibleBitmap(hdcScreen, ico_x, ico_y)
+    hbmOld = SelectObject(hdcBitmap, hbm)
+    # Fill the background.
+    brush = GetSysColorBrush(win32con.COLOR_MENU)
+    FillRect(hdcBitmap, (0, 0, 16, 16), brush)
+    # unclear if brush needs to be feed.  Best clue I can find is:
+    # "GetSysColorBrush returns a cached brush instead of allocating a new
+    # one." - implies no DeleteObject
+    # draw the icon
+    DrawIconEx(hdcBitmap, 0, 0, hicon, ico_x, ico_y, 0, 0, win32con.DI_NORMAL)
+    SelectObject(hdcBitmap, hbmOld)
+    DeleteDC(hdcBitmap)
+    return hbm

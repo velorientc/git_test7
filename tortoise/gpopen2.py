@@ -21,12 +21,6 @@ IDC_OUTPUT_EDIT = 1027
 
 g_registeredClass = 0
 
-def getIconPath(*args):
-    icon = os.path.join(os.path.dirname(__file__), "..", "icons", *args)
-    if not os.path.isfile(icon):
-        return None
-    return icon
-
 def setEditFont(hwnd, fontname, height):
     lf = win32gui.LOGFONT()
     lf.lfFaceName = fontname
@@ -82,7 +76,7 @@ class PopenWindowBase:
             # C code: wc.cbWndExtra = DLGWINDOWEXTRA + sizeof(HBRUSH) + (sizeof(COLORREF));
             wc.cbWndExtra = win32con.DLGWINDOWEXTRA + struct.calcsize("Pi")
             icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
-            icon_path = getIconPath("tortoise", "hg.ico")
+            icon_path = thgutil.get_icon_path("tortoise", "hg.ico")
             if icon_path:
                 wc.hIcon = win32gui.LoadImage(self.hinst, icon_path,
                                               win32con.IMAGE_ICON,

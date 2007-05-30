@@ -189,8 +189,14 @@ class ContextMenuExtension:
                 self._handlers[id] = (help_text, command)
 
             # add Hg submenu to context menu
-            item, extras = win32gui_struct.PackMENUITEMINFO(text="TortoiseHg",
-                                                            hSubMenu=submenu)
+            opt = {'text': "TortoiseHg", 'hSubMenu': submenu}
+            icon_path = get_icon_path("tortoise", "hg.ico")
+            print "icon path =", icon_path
+            hg_icon = None
+            if icon_path:
+                opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
+                                     icon_to_bitmap(icon_path)
+            item, extras = win32gui_struct.PackMENUITEMINFO(**opt)
             win32gui.InsertMenuItem(hMenu, indexMenu, 1, item)
             indexMenu += 1
 
