@@ -10,7 +10,7 @@ of the GNU General Public License, incorporated herein by reference.
 import os, tempfile, re
 import win32ui
 import win32con
-from pywin.mfc import dialog
+from pywin.framework.dlgappcore import AppDialog
 from mercurial import hg, repo, ui, cmdutil, util
 import gpopen
 import thgutil
@@ -44,11 +44,11 @@ def get_changes_text(filenames):
 
     return "\n".join(edittext)
 
-class SimpleCommitDialog(dialog.Dialog):
+class SimpleCommitDialog(AppDialog):
     def __init__(self, files=[], title="Mercurial: commit"):
         self.title = title
         self.commitfiles = files
-        dialog.Dialog.__init__(self, win32ui.IDD_LARGE_EDIT)
+        AppDialog.__init__(self, win32ui.IDD_LARGE_EDIT)
 
     def OnInitDialog(self):
         self.SetWindowText(self.title)
@@ -75,7 +75,7 @@ class SimpleCommitDialog(dialog.Dialog):
 
     def OnOK(self):
         if self._do_commit() == True:
-            dialog.Dialog.OnOK(self)
+            AppDialog.OnOK(self)
         
     def _do_commit(self):
         # strip log message of lines with HG: prefix
