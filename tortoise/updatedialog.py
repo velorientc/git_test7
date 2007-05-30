@@ -9,9 +9,9 @@ of the GNU General Public License, incorporated herein by reference.
 
 import win32ui
 import win32con
-from pywin.mfc.dialog import Dialog
+from pywin.framework.dlgappcore import AppDialog
 from mercurial import util
-import gpopen2 as gpopen
+import gpopen
 import thgutil
 
 dlgStatic = 130
@@ -51,43 +51,46 @@ def update_dlg_template():
                ]) 
     return dlg
 
-class UpdateDialog(Dialog): 
-    def __init__(self, revision="tip", title=None, tmpl=None):
+class UpdateDialog(AppDialog): 
+    def __init__(self, path, revision="tip", title=None, tmpl=None):
         self.title = title
+        self.path = path
+        self.root = thgutil.find_root(path)
         if tmpl is None:
             tmpl = update_dlg_template()
-        Dialog.__init__(self, tmpl)
+        AppDialog.__init__(self, tmpl)
         self.AddDDX(win32ui.IDC_EDIT1, 'revision')
         self.data['revision']=revision
                 
     def OnInitDialog(self): 
-        rc = Dialog.OnInitDialog(self)
-        self.SetWindowText(self.title)
+        rc = AppDialog.OnInitDialog(self)
+        title = "hg update - %s" % self.root
+        self.SetWindowText(title)
 
         # uncheck overwrite button        
         self.GetDlgItem(win32ui.IDC_CHECK1).SetCheck(0)
         self.data['overwrite']=0
 
     def OnOK(self):
-        chbox = self.GetDlgItem(win32ui.IDC_CHECK1)
-        self.data['overwrite'] = chbox.GetCheck()
-        Dialog.OnOK(self)
+        self._do_update()
+        AppDialog.OnOK(self)
 
-def do_update(path, title="Hg update"):
-    dlg = UpdateDialog(title=title)
-    if dlg.DoModal() == win32con.IDOK:
-        rev = dlg['revision']
+    def _do_update(self):
+        rev = self.GetDlgItem(win32ui.IDC_EDIT1).GetWindowText()
         if rev.startswith("-"):
             rev = "-- " + rev
-        clean = dlg['overwrite']
-        root = thgutil.find_root(path)
+        clean = self.GetDlgItem(win32ui.IDC_CHECK1).GetCheck()
+
         cmdline = "hg --repository %s update --verbose %s %s" % (
-                        util.shellquote(root),
+                        util.shellquote(self.root),
                         clean and "--clean" or "",
                         rev)
-        gpopen.run(cmdline, title=title, modal=True)
-        return True
-    return False
+        gpopen.run(cmdline, modal=True)
+
+def do_update(path, title="Hg update"):
+    dlg = UpdateDialog(path=path)
+    dlg.CreateWindow()
+    return dlg
 
 if __name__ == "__main__":
     do_update("D:\\Profiles\\r28629\\My Documents\\Mercurial\\repos\\c1")
