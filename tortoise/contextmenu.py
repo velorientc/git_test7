@@ -576,9 +576,6 @@ class ContextMenuExtension:
             shell_notify(dir)
 
     def _commit_simple(self, parent_window):
-        #targets = self._filenames or [self._folder]
-        #quoted_files = [shellquote(s) for s in targets]
-        #commitdialog.do_commit(targets)
         self._run_dialog('commit')
 
     def _update(self, parent_window):
