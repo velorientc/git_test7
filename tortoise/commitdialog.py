@@ -45,8 +45,8 @@ def get_changes_text(filenames):
     return "\n".join(edittext)
 
 class SimpleCommitDialog(AppDialog):
-    def __init__(self, files=[], title="Mercurial: commit"):
-        self.title = title
+    def __init__(self, files=[]):
+        self.title = "hg commit - %s" % thgutil.find_root(files[0])
         self.commitfiles = files
         AppDialog.__init__(self, win32ui.IDD_LARGE_EDIT)
 
