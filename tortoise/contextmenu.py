@@ -29,7 +29,7 @@ S_OK = 0
 S_FALSE = 1
 
 def gpopen_exec(cmd, cmdopts='', root=None, filelist=[], title=None, notify=False):
-    app = os.path.join(os.path.dirname(__file__), "gpopen.py")
+    app = os.path.join(os.path.dirname(__file__), "tortoisedialog.py")
     print "app = ", app
 
     if filelist:

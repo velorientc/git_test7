@@ -7,13 +7,11 @@
 import subprocess
 import threading
 import win32ui
-from pywin.framework import dlgappcore, app
-from pywin.mfc.dialog import Dialog
+from pywin.framework.dlgappcore import AppDialog
 import win32con
 import win32api
 import win32gui
-import os, re, sys
-import getopt
+import re
 import thgutil
 
 dlgStatic = 130
@@ -22,105 +20,15 @@ dlgButton = 128
 
 dlg_EDIT1 = 1001
 
-def get_option(args):
-    long_opt_list =  ['command=', 'exepath=', 'listfile=', 'title=',
-                      'root=', 'notify', 'deletelistfile']
-    opts, args = getopt.getopt(args, "c:e:l:ndt:R:", long_opt_list)
-    options = dict({'hgcmd': 'help', 'hgpath': 'hg'} )
-    
-    for o, a in opts:
-        if o in ("-c", "--command"):
-            options['hgcmd'] = a
-        elif o in ("-l", "--listfile"):
-            options['listfile'] = a
-        elif o in ("-e", "--exepath"):
-            options['hgpath'] = a
-        elif o in ("-n", "--notify"):
-            options['notify'] = True
-        elif o in ("-t", "--title"):
-            options['title'] = a
-        elif o in ("-d", "--deletelistfile"):
-            options['rmlistfile'] = True
-        elif o in ("-R", "--root"):
-            options['root'] = a
-
-    return (options, args)
-
-def get_list_from_file(filename):
-    fd = open(filename, "r")
-    lines = [ x.replace("\n", "") for x in fd.readlines() ]
-    fd.close()
-    return lines
-    
-def parse(args):
-    try:
-        option, args = get_option(args)
-    except getopt.GetoptError, inst:
-        print inst
-        sys.exit(1)
-    
-    filelist = []
-    if option.has_key('listfile'):
-        filelist = get_list_from_file(option['listfile'])
-    if option.has_key('rmlistfile'):
-        os.unlink(option['listfile'])
-        
-    #cmdline = option['hgpath']
-    cmdline = "hg %s" % option['hgcmd']
-    if option.has_key('root'):
-        cmdline += " --repository %s" % thgutil.shellquote(option['root'])
-    if args:
-        cmdline += " %s" % " ".join([(x) for x in args])
-    if filelist:
-        cmdline += " %s" % " ".join([thgutil.shellquote(x) for x in filelist])
-                
-    opt = {}
-    if option.has_key('title'):
-        opt['title'] = option['title']
-    elif option.has_key('root'):
-        opt['title'] = "hg %s - %s" % (option['hgcmd'], option['root'])
-    else:
-        opt['title'] = "hg %s" % option['hgcmd']
-
-    #run(cmdline, **opt)
-    if option['hgcmd'] == 'commit':
-        import commitdialog
-        if not filelist:
-            filelist = [option['root']]
-        return commitdialog.SimpleCommitDialog(files=filelist)
-    elif option['hgcmd'] == 'update':
-        import updatedialog
-        if not filelist:
-            filelist = [option['root']]
-        return updatedialog.UpdateDialog(path=filelist[0])
-    else:
-        return PopenDialog(cmdline, **opt)
-                         
-    if option.has_key('notify'):
-        for f in filelist:
-            dir = os.path.isdir(f) and f or os.path.dirname(f)
-            thgutil.shell_notify(os.path.abspath(dir))
-
-            
-class TortoiseHgDialogApp(dlgappcore.DialogApp):
-    def __init__(self):
-        dlgappcore.DialogApp.__init__(self)
-        
-    def CreateDialog(self):
-        return parse(sys.argv)
-        #return PopenDialog(['hg'] + sys.argv, 'Mercurial')
-
-app.AppBuilder = TortoiseHgDialogApp()
-
-class ResizableEditDialog(Dialog): 
+class ResizableEditDialog(AppDialog): 
     def __init__(self, title="hg", tmpl=None):
         self.title = title
         if tmpl is None:
             tmpl = dlg_template()
-        Dialog.__init__(self, tmpl)
+        AppDialog.__init__(self, tmpl)
 
     def OnInitDialog(self): 
-        rc = Dialog.OnInitDialog(self)
+        rc = AppDialog.OnInitDialog(self)
         self.HookMessage(self.OnSize, win32con.WM_SIZE)
 
         if self.title:
@@ -137,10 +45,6 @@ class ResizableEditDialog(Dialog):
         # convert LF to CRLF for binary output
         msg = re.sub(r'(?<!\r)\n', r'\r\n', msg)
         self.outtext.ReplaceSel(msg)
-
-    def PreDoModal(self):
-        #sys.stdout = sys.stderr = self
-        pass
 
     def OnCreate(self, msg):
         print "Oncreate: ", msg
@@ -250,7 +154,4 @@ def run(cmd, modal=False, title='Mercurial'):
         gui.CreateWindow()
     
 if __name__=='__main__':
-    #dlg = parse(['-c', 'help', '--', '-v'])
-    #dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
-    dlg = parse(['-c', 'commit', '--root', 'c:\hg\h1', '--', '-l1'])
-    dlg.CreateWindow()
+    run('hg help -v')
