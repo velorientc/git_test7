@@ -12,7 +12,7 @@ from pywin.mfc.dialog import Dialog
 import win32con
 import win32api
 import win32gui
-import re, sys
+import os, re, sys
 import getopt
 import thgutil
 
@@ -62,6 +62,8 @@ def parse(args):
     filelist = []
     if option.has_key('listfile'):
         filelist = get_list_from_file(option['listfile'])
+    if option.has_key('rmlistfile'):
+        os.unlink(option['listfile'])
         
     #cmdline = option['hgpath']
     cmdline = "hg %s" % option['hgcmd']
@@ -81,15 +83,19 @@ def parse(args):
         opt['title'] = "hg %s" % option['hgcmd']
 
     #run(cmdline, **opt)
-    return PopenDialog(cmdline, **opt)
+    if option['hgcmd'] == 'commit':
+        import commitdialog
+        if not filelist:
+            filelist = [option['root']]
+        return commitdialog.SimpleCommitDialog(files=filelist)
+    else:
+        return PopenDialog(cmdline, **opt)
                          
     if option.has_key('notify'):
         for f in filelist:
             dir = os.path.isdir(f) and f or os.path.dirname(f)
             thgutil.shell_notify(os.path.abspath(dir))
 
-    if option.has_key('rmlistfile'):
-        os.unlink(option['listfile'])
             
 class TortoiseHgDialogApp(dlgappcore.DialogApp):
     def __init__(self):
@@ -240,5 +246,6 @@ def run(cmd, modal=False, title='Mercurial'):
     
 if __name__=='__main__':
     #dlg = parse(['-c', 'help', '--', '-v'])
-    dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
+    #dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
+    dlg = parse(['-c', 'commit', '--root', 'c:\hg\h1', '--', '-l1'])
     dlg.CreateWindow()
