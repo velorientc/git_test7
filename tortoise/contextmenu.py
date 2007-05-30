@@ -610,13 +610,8 @@ class ContextMenuExtension:
         #commitdialog.do_commit(targets)
         self._run_dialog('commit')
 
-        
     def _update(self, parent_window):
-        targets = self._filenames or [self._folder]
-        if updatedialog.do_update(targets[0]) == True:
-            # refresh overlay icons
-            dir = self._folder or os.path.dirname(self._filenames[0])
-            shell_notify(dir)        
+        self._run_dialog('update')
 
     def _run_program_with_guishell(self, hgcmd, noargs=False):
         exepath = find_path(GUI_SHELL)

@@ -88,6 +88,11 @@ def parse(args):
         if not filelist:
             filelist = [option['root']]
         return commitdialog.SimpleCommitDialog(files=filelist)
+    elif option['hgcmd'] == 'update':
+        import updatedialog
+        if not filelist:
+            filelist = [option['root']]
+        return updatedialog.UpdateDialog(path=filelist[0])
     else:
         return PopenDialog(cmdline, **opt)
                          
