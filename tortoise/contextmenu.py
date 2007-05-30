@@ -17,8 +17,6 @@ import win32api
 import _winreg
 from mercurial import hg, ui, repo
 from thgutil import *
-import commitdialog
-import updatedialog
 
 GUI_SHELL = 'guishell'
 SIMPLE_MERGE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'hgutils',
