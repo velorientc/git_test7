@@ -12,7 +12,7 @@ import win32ui
 import win32con
 from pywin.mfc import dialog
 from mercurial import hg, repo, ui, cmdutil, util
-import gpopen2 as gpopen
+import gpopen
 import thgutil
 
 def get_changes_text(filenames):
@@ -45,11 +45,10 @@ def get_changes_text(filenames):
     return "\n".join(edittext)
 
 class SimpleCommitDialog(dialog.Dialog):
-    def __init__(self, defmsg="", title="Mercurial: commit"):
+    def __init__(self, files=[], title="Mercurial: commit"):
         self.title = title
+        self.commitfiles = files
         dialog.Dialog.__init__(self, win32ui.IDD_LARGE_EDIT)
-        self.AddDDX(win32ui.IDC_EDIT1, 'msg')
-        self.data['msg']=defmsg
 
     def OnInitDialog(self):
         self.SetWindowText(self.title)
@@ -64,25 +63,23 @@ class SimpleCommitDialog(dialog.Dialog):
         edit = self.GetDlgItem(win32ui.IDC_EDIT1)
         edit.SetFont(self.font)
 
-        edit.SetWindowText(self.data['msg'])
-                        
-def do_commit(files):
-    """
-    show a simple editor dialog for enter log message,
-    and commit the list of files.
-    """
-    # get the list of changes to present at the editor
-    text = get_changes_text(files)
-    if text is None:
-        return
+        # get the list of changes to present at the editor
+        text = get_changes_text(self.commitfiles)
+        if text:
+            text = text.replace("\n", "\r\n")
+            edit.SetWindowText(text)
+        else:
+            edit.SetWindowText("<<No changes to commit>>")
+            edit.EnableWindow(False)
+            okBtn.EnableWindow(False)
 
-    # show commit dialog
-    text = text.replace("\n", "\r\n")
-    dlg = SimpleCommitDialog(defmsg=text)
-
-    if dlg.DoModal() == win32con.IDOK:
+    def OnOK(self):
+        if self._do_commit() == True:
+            dialog.Dialog.OnOK(self)
+        
+    def _do_commit(self):
         # strip log message of lines with HG: prefix
-        text = dlg['msg']
+        text = self.GetDlgItem(win32ui.IDC_EDIT1).GetWindowText()
         text = re.sub("(?m)^HG:.*\r\n", "", text)
         lines = [line.rstrip() for line in text.rstrip().splitlines()]
         while lines and not lines[0]:
@@ -94,13 +91,13 @@ def do_commit(files):
         
         # save log message to a temp file        
         text = '\n'.join(lines)
-        logfd, logpath = tempfile.mkstemp(prefix="tortoisehg_")
+        logfd, logpath = tempfile.mkstemp(prefix="tortoisehg_ci_log_")
         os.write(logfd, text)
         os.close(logfd)
 
         # commit file with log message        
-        root = thgutil.find_root(files[0])
-        quoted_files = [util.shellquote(s) for s in files]
+        root = thgutil.find_root(self.commitfiles[0])
+        quoted_files = [util.shellquote(s) for s in self.commitfiles]
         cmdline = "hg --repository %s commit --verbose --logfile %s %s" % (
                         util.shellquote(root),
                         util.shellquote(logpath),
@@ -111,10 +108,22 @@ def do_commit(files):
         # refresh overlay icons in commit directories
         # FIXME: other explorer windows opened on the same repo
         #        may not get refreshed
-        for f in files:
+        for f in self.commitfiles:
             dir = os.path.isdir(f) and f or os.path.dirname(f)
             thgutil.shell_notify(dir)
 
+        return True
+
+def do_commit(files):
+    """
+    show a simple editor dialog for enter log message,
+    and commit the list of files.
+    """
+
+    # show commit dialog
+    dlg = SimpleCommitDialog(files=files)
+    dlg.CreateWindow()
+    return dlg
 
 if __name__ == "__main__":
     files = ["D:\\Profiles\\r28629\\My Documents\\Mercurial\\repos\\c1\\"]
