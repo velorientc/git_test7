@@ -9,6 +9,9 @@ of the GNU General Public License, incorporated herein by reference.
 
 import os.path, re
 from win32com.shell import shell, shellcon
+from win32gui import *
+from win32api import *
+import win32con
 
 _quotere = None
 def shellquote(s):
@@ -55,16 +58,17 @@ def get_icon_path(*args):
         return None
     return icon
     
+bitmap_cache = {}
 def icon_to_bitmap(iconPathName, type="SMICON"):
     """
     create a bitmap based converted from an icon.
 
     adapted from pywin32's demo program win32gui_menu.py
     """
-    from win32gui import *
-    from win32api import *
-    import win32con
-
+    global bitmap_cache
+    if bitmap_cache.has_key(iconPathName):
+        return bitmap_cache[iconPathName]
+        
     # Create one with an icon - this is a fair bit more work, as we need
     # to convert the icon to a bitmap.
     # First load the icon.
@@ -89,6 +93,7 @@ def icon_to_bitmap(iconPathName, type="SMICON"):
     # one." - implies no DeleteObject
     # draw the icon
     DrawIconEx(hdcBitmap, 0, 0, hicon, ico_x, ico_y, 0, 0, win32con.DI_NORMAL)
+    bitmap_cache[iconPathName] = hbm    # store bitmap to cache
     
     # restore settings
     SelectObject(hdcBitmap, hbmOld)
