@@ -89,6 +89,10 @@ def icon_to_bitmap(iconPathName, type="SMICON"):
     # one." - implies no DeleteObject
     # draw the icon
     DrawIconEx(hdcBitmap, 0, 0, hicon, ico_x, ico_y, 0, 0, win32con.DI_NORMAL)
+    
+    # restore settings
     SelectObject(hdcBitmap, hbmOld)
     DeleteDC(hdcBitmap)
+    DestroyIcon(hicon)
+    
     return hbm
