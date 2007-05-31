@@ -88,6 +88,9 @@ def parse(args):
         if not filelist:
             filelist = [option['root']]
         return updatedialog.UpdateDialog(path=filelist[0])
+    if option['hgcmd'] == 'status':
+        import statusdialog
+        return statusdialog.status_dialog(option['root'], files=filelist)
     else:
         import gpopen
         return gpopen.PopenDialog(cmdline, **opt)
@@ -95,5 +98,5 @@ def parse(args):
 if __name__=='__main__':
     dlg = parse(['-c', 'help', '--', '-v'])
     #dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
-    #dlg = parse(['-c', 'commit', '--root', 'c:\hg\h1', '--', '-l1'])
+    dlg = parse(['-c', 'status', '--root', 'c:\hg\h1'])
     dlg.CreateWindow()
