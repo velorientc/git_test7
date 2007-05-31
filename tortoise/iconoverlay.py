@@ -179,10 +179,10 @@ class IconOverlayExtension(object):
         tc = win32api.GetTickCount()
         overlay_cache = {}
         for f in files:
-            if f in added:
-                status = ADDED
-            elif f in modified:
+            if f in modified:
                 status = MODIFIED
+            elif f in added:
+                status = ADDED
             elif f in clean:
                 status = UNCHANGED
             else:
