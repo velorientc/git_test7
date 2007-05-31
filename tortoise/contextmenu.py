@@ -195,7 +195,7 @@ class ContextMenuExtension:
             hg_icon = None
             if icon_path:
                 opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
-                                     icon_to_bitmap(icon_path)
+                                     icon_to_bitmap(icon_path, type="MENUCHECK")
             item, extras = win32gui_struct.PackMENUITEMINFO(**opt)
             win32gui.InsertMenuItem(hMenu, indexMenu, 1, item)
             indexMenu += 1

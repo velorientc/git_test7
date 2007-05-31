@@ -55,7 +55,7 @@ def get_icon_path(*args):
         return None
     return icon
     
-def icon_to_bitmap(iconPathName):
+def icon_to_bitmap(iconPathName, type="SMICON"):
     """
     create a bitmap based converted from an icon.
 
@@ -68,8 +68,13 @@ def icon_to_bitmap(iconPathName):
     # Create one with an icon - this is a fair bit more work, as we need
     # to convert the icon to a bitmap.
     # First load the icon.
-    ico_x = GetSystemMetrics(win32con.SM_CXSMICON)
-    ico_y = GetSystemMetrics(win32con.SM_CYSMICON)
+    if "MENUCHECK":
+        ico_x = GetSystemMetrics(win32con.SM_CXMENUCHECK)
+        ico_y = GetSystemMetrics(win32con.SM_CYMENUCHECK)
+    else:
+        ico_x = GetSystemMetrics(win32con.SM_CXSMICON)
+        ico_y = GetSystemMetrics(win32con.SM_CYSMICON)
+        
     if iconPathName:
         hicon = LoadImage(0, iconPathName, win32con.IMAGE_ICON, ico_x, ico_y, win32con.LR_LOADFROMFILE)
     else:
