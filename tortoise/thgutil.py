@@ -75,13 +75,7 @@ def icon_to_bitmap(iconPathName, type="SMICON"):
         ico_x = GetSystemMetrics(win32con.SM_CXSMICON)
         ico_y = GetSystemMetrics(win32con.SM_CYSMICON)
         
-    if iconPathName:
-        hicon = LoadImage(0, iconPathName, win32con.IMAGE_ICON, ico_x, ico_y, win32con.LR_LOADFROMFILE)
-    else:
-        shell_dll = os.path.join(GetSystemDirectory(), "shell32.dll")
-        large, small = win32gui.ExtractIconEx(shell_dll, 4, 1)
-        hicon = small[0]
-        DestroyIcon(large[0])
+    hicon = LoadImage(0, iconPathName, win32con.IMAGE_ICON, ico_x, ico_y, win32con.LR_LOADFROMFILE)
 
     hdcBitmap = CreateCompatibleDC(0)
     hdcScreen = GetDC(0)
