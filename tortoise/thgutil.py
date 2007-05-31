@@ -84,7 +84,7 @@ def icon_to_bitmap(iconPathName):
     hbmOld = SelectObject(hdcBitmap, hbm)
     # Fill the background.
     brush = GetSysColorBrush(win32con.COLOR_MENU)
-    FillRect(hdcBitmap, (0, 0, 16, 16), brush)
+    FillRect(hdcBitmap, (0, 0, ico_x, ico_y), brush)
     # unclear if brush needs to be feed.  Best clue I can find is:
     # "GetSysColorBrush returns a cached brush instead of allocating a new
     # one." - implies no DeleteObject
