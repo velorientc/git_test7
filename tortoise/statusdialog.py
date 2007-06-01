@@ -57,7 +57,8 @@ class HgStatusList(hierlist.HierList):
         return self.status.has_key(item)
 
     def GetSelectedBitmapColumn(self, item):
-        return self.GetBitmapColumn(item)+6 # Use different color for selection
+        #return self.GetBitmapColumn(item)+6 # Use different color for selection
+        pass
 
     def OnTreeItemDoubleClick(self,(hwndFrom, idFrom, code), extra):
         pass
