@@ -53,19 +53,26 @@ class HgStatusList(hierlist.HierList):
         self.Refresh()
 
     def GetText(self, item):
-        return os.path.normpath(item)
+        if type(item) == type([]):
+            return item[0]
+        else:
+            return os.path.normpath(item)
 
     def GetSubList(self, item):
         if item == self.root:
-            ret = [x for x in self.status.keys() if self.status[x]]
-        elif self.status.has_key(item):
-            ret = self.status[item]
+            # return group as list of [<groupname>, <list of file>] to
+            # differentiate status group from file in list
+            ret = [[x, self.status[x]] for x in self.status.keys()
+                                       if self.status[x]]
+        elif type(item) == type([]):
+            ret = item[1]   # file list of status
         else:
-            ret = None
+            ret = item
+
         return ret
 
     def IsExpandable(self, item):
-        return self.status.has_key(item)
+        return type(item) == type([])
 
     def GetSelectedBitmapColumn(self, item):
         #return self.GetBitmapColumn(item)+6 # Use different color for selection
