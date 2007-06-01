@@ -88,7 +88,12 @@ class StatusDialog(hierlist.HierDialog):
         #                    TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
         #                    WS_BORDER | WS_TABSTOP,3,3,160,88
         # END
-        
+
+        w, h = 250, 150        
+        padx, pady = 3, 3
+        bw, bh = 50, 14
+        lw, lh = w-bw-padx*4, h-pady*2
+        bx = lw + padx*2
         style = (win32con.DS_MODALFRAME | 
                  win32con.WS_POPUP | 
                  win32con.WS_VISIBLE | 
@@ -102,9 +107,8 @@ class StatusDialog(hierlist.HierDialog):
         cs = win32con.WS_CHILD | win32con.WS_VISIBLE 
         s = win32con.WS_TABSTOP | cs 
 
-        dlg = [["TortoiseHg", (0, 0, 226, 93), style, None, (8, "MS Sans Serif")],]
-        
-        dlg.append(['SysTreeView32', "Tree1", win32ui.IDC_LIST1, (3,3,160,88),
+        dlg = [["TortoiseHg", (0, 0, w, h), style, None, (8, "MS Sans Serif")],]
+        dlg.append(['SysTreeView32', "Tree1", win32ui.IDC_LIST1, (3,3,lw,lh),
                         s | win32con.WS_BORDER
                           | win32con.WS_CHILD
                           | win32con.WS_VISIBLE
@@ -113,10 +117,11 @@ class StatusDialog(hierlist.HierDialog):
                           | commctrl.TVS_LINESATROOT
                           | commctrl.TVS_SHOWSELALWAYS
                    ])
-        dlg.append([128 ,"OK", win32con.IDOK, (170,5,50,14),
+
+        dlg.append([128 ,"OK", win32con.IDOK, (bx,5,bw,bh),
                         s | win32con.BS_PUSHBUTTON
                    ]) 
-        dlg.append([128,"Cancel", win32con.IDCANCEL, (170,25,50,14),
+        dlg.append([128,"Cancel", win32con.IDCANCEL, (bx,25,bw,bh),
                         s | win32con.BS_PUSHBUTTON
                    ]) 
         return dlg
