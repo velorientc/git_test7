@@ -14,6 +14,16 @@ from pywin.tools import hierlist
 from mercurial import hg, repo, ui, cmdutil, util
 import thgutil
 
+status_type = [
+        'Modified',
+        'Added',
+        'Removed',
+        'Deleted',
+        'Unknown',
+        'Clean',
+        'Ignored',
+    ]
+
 def get_repo_status(root, files=[], list_ignored=False, list_clean=False):
     u = ui.ui()
     try:
@@ -30,13 +40,13 @@ def get_repo_status(root, files=[], list_ignored=False, list_clean=False):
     except util.Abort, inst:
         return None
 
-    return {'modified': modified,
-            'added': added,
-            'removed': removed,
-            'deleted': deleted,
-            'unknown': unknown,
-            'ignored': ignored,
-            'clean': clean}
+    return {'Modified': modified,
+            'Added': added,
+            'Removed': removed,
+            'Deleted': deleted,
+            'Unknown': unknown,
+            'Ignored': ignored,
+            'Clean': clean}
 
 class HgStatusList(hierlist.HierList):
     def __init__(self, root, files=[], listBoxID = win32ui.IDC_LIST1):
@@ -62,8 +72,8 @@ class HgStatusList(hierlist.HierList):
         if item == self.root:
             # return group as list of [<groupname>, <list of file>] to
             # differentiate status group from file in list
-            ret = [[x, self.status[x]] for x in self.status.keys()
-                                       if self.status[x]]
+            ret = [[x, self.status[x]] for x in status_type
+                        if self.status.has_key(x) and self.status[x]]
         elif type(item) == type([]):
             ret = item[1]   # file list of status
         else:
