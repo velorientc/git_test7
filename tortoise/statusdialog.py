@@ -63,10 +63,64 @@ class HgStatusList(hierlist.HierList):
         pass
 
 class StatusDialog(hierlist.HierDialog):
+    def __init__(self, title, hierList, bitmapID = win32ui.IDB_HIERFOLDERS,
+                 dlgID = win32ui.IDD_TREE, dll = None, 
+                 childListBoxID = win32ui.IDC_LIST1):
+        hierlist.HierDialog.__init__(self, title, hierList, bitmapID,
+                                     self._dialog_template(), dll,
+                                     childListBoxID)
+
     # support dialog app
     def PreDoModal(self):
         pass
+    
+    def _dialog_template(self):
+        # dialog resource reference:
+        #
+        # IDD_TREE DIALOG DISCARDABLE  0, 0, 226, 93
+        # STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+        # CAPTION "title"
+        # FONT 8, "MS Sans Serif"
+        # BEGIN
+        #     DEFPUSHBUTTON   "OK",IDOK,170,5,50,14
+        #     PUSHBUTTON      "Cancel",IDCANCEL,170,25,50,14
+        #     CONTROL         "Tree1",IDC_LIST1,"SysTreeView32",TVS_HASBUTTONS | 
+        #                    TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
+        #                    WS_BORDER | WS_TABSTOP,3,3,160,88
+        # END
         
+        style = (win32con.DS_MODALFRAME | 
+                 win32con.WS_POPUP | 
+                 win32con.WS_VISIBLE | 
+                 win32con.WS_CAPTION | 
+                 win32con.WS_SYSMENU |
+                 win32con.DS_CENTER |
+                 win32con.DS_CENTERMOUSE |
+                 #win32con.WS_THICKFRAME |  # we can resize the dialog window
+                 win32con.DS_SETFONT)
+
+        cs = win32con.WS_CHILD | win32con.WS_VISIBLE 
+        s = win32con.WS_TABSTOP | cs 
+
+        dlg = [["TortoiseHg", (0, 0, 226, 93), style, None, (8, "MS Sans Serif")],]
+        
+        dlg.append(['SysTreeView32', "Tree1", win32ui.IDC_LIST1, (3,3,160,88),
+                        s | win32con.WS_BORDER
+                          | win32con.WS_CHILD
+                          | win32con.WS_VISIBLE
+                          | commctrl.TVS_HASBUTTONS
+                          | commctrl.TVS_HASLINES
+                          | commctrl.TVS_LINESATROOT
+                          | commctrl.TVS_SHOWSELALWAYS
+                   ])
+        dlg.append([128 ,"OK", win32con.IDOK, (170,5,50,14),
+                        s | win32con.BS_PUSHBUTTON
+                   ]) 
+        dlg.append([128,"Cancel", win32con.IDCANCEL, (170,25,50,14),
+                        s | win32con.BS_PUSHBUTTON
+                   ]) 
+        return dlg
+
 def status_dialog(root, files=[]):
     stlist = HgStatusList(root, files)
     dlg = StatusDialog('hg status - %s' % root, stlist)
@@ -78,4 +132,4 @@ def test(root, files=[]):
 
 if __name__=='__main__':
     test("c:\hg\h1")
-    test("c:\hg\h1", ["c:\hg\h1\mercurial"])
+    #test("c:\hg\h1", ["c:\hg\h1\mercurial"])
