@@ -13,6 +13,7 @@ import win32api
 import win32gui
 import re
 import thgutil
+import os
 
 dlgStatic = 130
 dlgEdit = 129
@@ -103,10 +104,11 @@ def dlg_template(w=300, h=300):
     return dlg
 
 class PopenDialog(ResizableEditDialog):
-    def __init__(self, cmd, title=None, tmpl=None):
+    def __init__(self, cmd, title=None, tmpl=None, notify_list=[]):
         self.cmdline = cmd
         ResizableEditDialog.__init__(self, title, tmpl)
-        
+        self.notify_list = notify_list
+
     def OnInitDialog(self):
         rc = ResizableEditDialog.OnInitDialog(self)
         self.ok_btn = self.GetDlgItem(win32con.IDOK)
@@ -142,12 +144,21 @@ class PopenDialog(ResizableEditDialog):
         except IOError:
             pass
 
+        self._do_notify()
         self.ok_btn.EnableWindow(True) # enable OK button
         print "popen end: bytes = ", bytes
 
+    def _do_notify(self):
+        if not self.notify_list:
+            return
+        
+        for f in self.notify_list:
+            dir = os.path.isdir(f) and f or os.path.dirname(f)
+            thgutil.shell_notify(dir)
+        
 def run(cmd, modal=False, title='Mercurial'):
     tmpl = dlg_template(300, 250)
-    gui = PopenDialog(cmd, title, tmpl)
+    gui = PopenDialog(cmd, title, tmpl, notify_list=["c:\\hg\\h1\\f1"])
     if modal:
         gui.DoModal()
     else:

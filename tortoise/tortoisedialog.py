@@ -78,6 +78,13 @@ def parse(args):
     else:
         opt['title'] = "hg %s" % option['hgcmd']
 
+    cmd_notify = ('add', 'revert', 'merge', 'rollback')
+    if option.has_key('notify') or option['hgcmd'] in cmd_notify:
+        if filelist:
+            opt['notify_list'] = filelist
+        elif option.has_key('root'):
+            opt['notify_list'] = [ option['root'] ]
+    
     if option['hgcmd'] == 'commit':
         import commitdialog
         if not filelist:
@@ -96,7 +103,9 @@ def parse(args):
         return gpopen.PopenDialog(cmdline, **opt)
     
 if __name__=='__main__':
-    dlg = parse(['-c', 'help', '--', '-v'])
+    #dlg = parse(['-c', 'help', '--', '-v'])
     #dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
-    dlg = parse(['-c', 'status', '--root', 'c:\hg\h1'])
+    #dlg = parse(['-c', 'status', '--root', 'c:\hg\h1', ])
+    #dlg = parse(['-c', 'add', '--root', 'c:\hg\h1', '--listfile', 'c:\\hg\\h1\\f1', '--notify'])
+    dlg = parse(['-c', 'rollback', '--root', 'c:\\hg\\h1'])
     dlg.CreateWindow()

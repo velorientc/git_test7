@@ -529,10 +529,6 @@ class ContextMenuExtension:
     def _add(self, parent_window):
         self._run_dialog('add', modal=True)
 
-        # refresh overlay icons
-        dir = self._folder or os.path.dirname(self._filenames[0])
-        shell_notify(dir)
-
     def _revert(self, parent_window):
         targets = self._filenames or [self._folder]
         msg = "Confirm reverting: %s" % ", ".join(targets)
@@ -541,10 +537,6 @@ class ContextMenuExtension:
         if rv == 1:
             self._run_dialog('revert', modal=True)
 
-            # refresh overlay icons
-            dir = self._folder or os.path.dirname(self._filenames[0])
-            shell_notify(dir)
- 
     def _tip(self, parent_window):
         self._run_dialog('tip', True)
 
@@ -564,10 +556,6 @@ class ContextMenuExtension:
         print "HGMERGE = %s" % os.environ['HGMERGE']
         self._run_dialog('merge', noargs=True, modal=True)
 
-        # refresh overlay icons
-        dir = self._folder or os.path.dirname(self._filenames[0])
-        shell_notify(dir)
-
     def _rollback(self, parent_window):
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -576,10 +564,6 @@ class ContextMenuExtension:
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
             self._run_dialog('rollback', noargs=True, modal=True)
-
-            # refresh overlay icons
-            dir = self._folder or os.path.dirname(self._filenames[0])
-            shell_notify(dir)
 
     def _commit_simple(self, parent_window):
         self._run_dialog('commit')
