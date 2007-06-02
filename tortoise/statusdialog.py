@@ -24,7 +24,8 @@ status_type = [
         'Ignored',
     ]
 
-def get_repo_status(root, files=[], list_ignored=False, list_clean=False):
+def get_repo_status(cwd, files=[], list_ignored=False, list_clean=False):
+    root = thgutil.find_root(cwd)
     u = ui.ui()
     try:
         repo = hg.repository(u, path=root)
@@ -49,15 +50,16 @@ def get_repo_status(root, files=[], list_ignored=False, list_clean=False):
             'Clean': clean}
 
 class HgStatusList(hierlist.HierList):
-    def __init__(self, root, files=[], listBoxID = win32ui.IDC_LIST1):
-        hierlist.HierList.__init__(self, root, win32ui.IDB_HIERFOLDERS, listBoxID)
+    def __init__(self, cwd, files=[], listBoxID = win32ui.IDC_LIST1):
+        hierlist.HierList.__init__(self, cwd, win32ui.IDB_HIERFOLDERS, listBoxID)
         self._files = files
+        self.cwd = cwd
         self.list_clean = False
         self.list_ignored = False
         self.status = {}
 
     def _get_status(self):
-        self.status = get_repo_status(self.root, files=self._files,
+        self.status = get_repo_status(self.cwd, files=self._files,
                                       list_ignored=self.list_ignored,
                                       list_clean=self.list_clean)
         self.Refresh()

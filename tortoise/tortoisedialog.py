@@ -21,7 +21,7 @@ app.AppBuilder = TortoiseHgDialogApp()
 
 def get_option(args):
     long_opt_list =  ['command=', 'exepath=', 'listfile=', 'title=',
-                      'root=', 'notify', 'deletelistfile']
+                      'root=', 'cwd=', 'notify', 'deletelistfile']
     opts, args = getopt.getopt(args, "c:e:l:ndt:R:", long_opt_list)
     options = {'hgcmd': 'help', 'hgpath': 'hg'}
     
@@ -40,6 +40,8 @@ def get_option(args):
             options['rmlistfile'] = True
         elif o in ("-R", "--root"):
             options['root'] = a
+        elif o in ("--cwd"):
+            options['cwd'] = a
 
     return (options, args)
 
@@ -50,11 +52,7 @@ def get_list_from_file(filename):
     return lines
     
 def parse(args):
-    try:
-        option, args = get_option(args)
-    except getopt.GetoptError, inst:
-        print inst
-        sys.exit(1)
+    option, args = get_option(args)
     
     filelist = []
     if option.has_key('listfile'):
@@ -74,7 +72,7 @@ def parse(args):
     if option.has_key('title'):
         opt['title'] = option['title']
     elif option.has_key('root'):
-        opt['title'] = "hg %s - %s" % (option['hgcmd'], option['root'])
+        opt['title'] = "hg %s - %s" % (option['hgcmd'], option['cwd'])
     else:
         opt['title'] = "hg %s" % option['hgcmd']
 
@@ -88,8 +86,8 @@ def parse(args):
     if option['hgcmd'] == 'commit':
         import commitdialog
         if not filelist:
-            filelist = [option['root']]
-        return commitdialog.SimpleCommitDialog(files=filelist)
+            filelist = [option['cwd']]
+        return commitdialog.SimpleCommitDialog(cwd=option['cwd'], files=filelist)
     elif option['hgcmd'] == 'update':
         import updatedialog
         if not filelist:
@@ -97,7 +95,7 @@ def parse(args):
         return updatedialog.UpdateDialog(path=filelist[0])
     if option['hgcmd'] == 'status':
         import statusdialog
-        return statusdialog.status_dialog(option['root'], files=filelist)
+        return statusdialog.status_dialog(option['cwd'], files=filelist)
     else:
         import gpopen
         return gpopen.PopenDialog(cmdline, **opt)

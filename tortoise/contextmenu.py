@@ -25,7 +25,7 @@ os.environ['HGMERGE'] = ('python %s -L my -L other' % shellquote(SIMPLE_MERGE))
 S_OK = 0
 S_FALSE = 1
 
-def open_dialog(cmd, cmdopts='', root=None, filelist=[], title=None, notify=False):
+def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, notify=False):
     app = os.path.join(os.path.dirname(__file__), "tortoisedialog.py")
     print "app = ", app
 
@@ -44,6 +44,9 @@ def open_dialog(cmd, cmdopts='', root=None, filelist=[], title=None, notify=Fals
         gpopts += " --notify"
     if title:
         gpopts += " --title %s" % shellquote(title)
+    if cwd:
+        gpopts += " --cwd %s" % shellquote(cwd)
+
 
     cmdline = '/app %s %s -- %s' % (shellquote(app), gpopts, cmdopts)
 
@@ -571,6 +574,16 @@ class ContextMenuExtension:
         self._run_dialog('update')
 
     def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
+        if self._folder:
+            cwd = self._folder
+        elif self._filenames:
+            f = self._filenames[0]
+            cwd = os.path.isdir(f) and f or os.path.dirname(f)
+        else:
+            win32ui.MessageBox("Can't get cwd!", 'Hg ERROR', 
+                   win32con.MB_OK|win32con.MB_ICONERROR)
+            return
+
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
         filelist = []
@@ -579,7 +592,7 @@ class ContextMenuExtension:
         cmdopts = "%s" % (verbose and "--verbose" or "")
         print "_run_program_dialog: cmdopts = ", cmdopts
         title = "Hg %s" % hgcmd
-        open_dialog(hgcmd, cmdopts, root=root, filelist=filelist)
+        open_dialog(hgcmd, cmdopts, cwd=cwd, root=root, filelist=filelist)
 
     def _help(self, parent_window):
         open_dialog('help', '--verbose')
