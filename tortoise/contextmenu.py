@@ -18,7 +18,6 @@ import _winreg
 from mercurial import hg, ui, repo
 from thgutil import *
 
-GUI_SHELL = 'guishell'
 SIMPLE_MERGE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'hgutils',
                             'simplemerge')
 os.environ['HGMERGE'] = ('python %s -L my -L other' % shellquote(SIMPLE_MERGE))
@@ -563,28 +562,13 @@ class ContextMenuExtension:
         title = "Mercurial: rollback"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
-            self._run_dialog('rollback', noargs=True, modal=True)
+            self._run_dialog('rollback')
 
     def _commit_simple(self, parent_window):
         self._run_dialog('commit')
 
     def _update(self, parent_window):
         self._run_dialog('update')
-
-    def _run_program_with_guishell(self, hgcmd, noargs=False):
-        exepath = find_path(GUI_SHELL)
-        if exepath:
-            targets = self._filenames or [self._folder]
-            root = find_root(targets[0])
-            quoted_files = []
-            if noargs == False:
-                quoted_files = [shellquote(s) for s in targets]
-            cmdline = "%s hg --repository %s --verbose %s %s" % (
-                            exepath, 
-                            shellquote(root),
-                            hgcmd,
-                            " ".join(quoted_files))
-            run_program(exepath, cmdline)
 
     def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
         targets = self._filenames or [self._folder]
