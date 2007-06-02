@@ -80,8 +80,8 @@ def parse(args):
     if option.has_key('notify') or option['hgcmd'] in cmd_notify:
         if filelist:
             opt['notify_list'] = filelist
-        elif option.has_key('root'):
-            opt['notify_list'] = [ option['root'] ]
+        elif option.has_key('cwd'):
+            opt['notify_list'] = [ option['cwd'] ]
     
     if option['hgcmd'] == 'commit':
         import commitdialog
