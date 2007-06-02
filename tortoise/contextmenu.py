@@ -565,7 +565,7 @@ class ContextMenuExtension:
         title = "Mercurial: rollback"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
-            self._run_dialog('rollback')
+            self._run_dialog('rollback', noargs=True)
 
     def _commit_simple(self, parent_window):
         self._run_dialog('commit')
