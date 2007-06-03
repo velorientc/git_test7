@@ -11,6 +11,8 @@ import win32ui
 import win32con
 from pywin.framework.dlgappcore import AppDialog
 from mercurial import util
+from mercurial.i18n import _
+from mercurial.node import *
 import gpopen
 import thgutil
 
@@ -20,6 +22,9 @@ dlgButton = 128
 
 def error_dialog(msg):
     win32ui.MessageBox(msg, "hg tag", win32con.MB_OK | win32con.MB_ICONERROR)
+
+def msg_dialog(msg):
+    win32ui.MessageBox(msg, "hg tag", win32con.MB_OK)
 
 def _dlg_template():
     w, h = 250, 100
@@ -109,34 +114,54 @@ class AddTagDialog(AppDialog):
             AppDialog.OnOK(self)
 
     def _add_tag(self):
-        tag = self.GetDlgItem(win32ui.IDC_EDIT1).GetWindowText()
+        # read input
+        name = self.GetDlgItem(win32ui.IDC_EDIT1).GetWindowText()
         rev = self.GetDlgItem(win32ui.IDC_EDIT2).GetWindowText()
-        is_local_tag = self.GetDlgItem(win32ui.IDC_CHECK1).GetCheck()
-        user_msg = self.GetDlgItem(win32ui.IDC_CHECK2).GetCheck()
-        msg = self.GetDlgItem(win32ui.IDC_EDIT3).GetWindowText()
+        local = self.GetDlgItem(win32ui.IDC_CHECK1).GetCheck()
+
+        message = None        
+        if self.GetDlgItem(win32ui.IDC_CHECK2).GetCheck():
+            message = self.GetDlgItem(win32ui.IDC_EDIT3).GetWindowText()
 
         # verify input
-        if tag == "":
+        if name == "":
             error_dialog("Please enter tag name")
             return False
         if rev == "":
             error_dialog("Pleas enter revision to tag")
             return False
-        if rev.startswith("-"):
-            rev = "-- " + rev
 
-        cmdline = "hg --repository %s tag --verbose --rev %s" % (
-                        util.shellquote(self.root), rev)
+        # add tag to repo        
+        try:
+            self._add_hg_tag(name, rev, message, local)
+        except util.Abort, inst:
+            error_dialog("Error: %s" % inst)
+            return False
+        except:
+            error_dialog("Unknown wrror when adding tag")
+            raise
+            return False
 
-        if is_local_tag:
-            cmdline += ' --local'
-        if user_msg and not is_local_tag: 
-            cmdline += " --message %s" % util.shellquote(msg.splitlines()[0])
-        cmdline += " %s" % util.shellquote(tag)
-
-        print "cmdline =", cmdline
-        gpopen.run(cmdline, modal=True)
         return True
+    
+    def _add_hg_tag(self, name, revision, message, local, user=None,
+                    date=None, force=False):
+        root = thgutil.find_root(self.path)
+        u = ui.ui()
+        try:
+            repo = hg.repository(u, path=root)
+        except repo.RepoError:
+            return None
+
+        if name in repo.tags() and not force:
+            raise util.Abort(_('a tag named "%s" already exists')
+                             % name)
+        r = repo.changectx(revision).node()
+
+        if not message:
+            message = _('Added tag %s for changeset %s') % (name, short(r))
+
+        repo.tag(name, r, message, local, user, date)
 
     def OnNotify(self, id, code):
         if id == win32ui.IDC_CHECK2:
