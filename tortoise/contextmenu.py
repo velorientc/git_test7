@@ -380,6 +380,15 @@ class ContextMenuExtension:
 
             result.append([])   # separator
 
+            result.append((_("View Tags"),
+                           _("list repository tags"),
+                           self._show_tags))
+            result.append((_("Add Tags"),
+                           _("add a tag for the current or given revision"),
+                           self._add_tag))
+
+            result.append([])   # separator
+
             result.append((_("Pull"),
                            _("Pull from default repository"),
                            self._pull))
@@ -550,6 +559,12 @@ class ContextMenuExtension:
 
     def _log(self, parent_window):
         self._run_dialog('log', True, verbose=False)
+
+    def _show_tags(self, parent_window):
+        self._run_dialog('tags', True, verbose=False)
+
+    def _add_tag(self, parent_window):
+        self._run_dialog('tag', True, verbose=False)
 
     def _diff(self, parent_window):
         self._run_dialog('diff')

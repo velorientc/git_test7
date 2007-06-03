@@ -93,9 +93,15 @@ def parse(args):
         if not filelist:
             filelist = [option['root']]
         return updatedialog.UpdateDialog(path=filelist[0])
-    if option['hgcmd'] == 'status':
+    elif option['hgcmd'] == 'status':
         import statusdialog
         return statusdialog.status_dialog(option['cwd'], files=filelist)
+    elif option['hgcmd'] == 'tags':
+        import taglistdialog
+        return taglistdialog.TagsDialog(option['root'])
+    elif option['hgcmd'] == 'tag':
+        import tagadddialog
+        return tagadddialog.AddTagDialog(option['root'])
     else:
         import gpopen
         return gpopen.PopenDialog(cmdline, **opt)
