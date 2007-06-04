@@ -7,7 +7,7 @@ This software may be used and distributed according to the terms
 of the GNU General Public License, incorporated herein by reference.
 """
 
-from pywin.dialogs.list import ListsDialog
+from listdialog import ListsDialog
 from mercurial import hg, repo, ui, cmdutil, util, node
 import thgutil
 
@@ -40,7 +40,7 @@ class TagsDialog(ListsDialog):
     def __init__(self, path):
         taglist = get_tag_list(path)
         title = 'Hg tags - %s' % thgutil.find_root(path)
-        ListsDialog.__init__(self, title, taglist, headings)
+        ListsDialog.__init__(self, title, taglist, headings, resizable=True)
 
     # support dialog app
     def PreDoModal(self):
