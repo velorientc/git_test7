@@ -9,6 +9,7 @@ from win32com.shell import shell, shellcon
 import _winreg
 from mercurial import hg, repo, ui, cmdutil, util
 import thgutil
+import sys
 
 UNCHANGED = "unchanged"
 ADDED = "added"
@@ -72,9 +73,17 @@ class IconOverlayExtension(object):
             print "GetOverlayInfo: not in explorer"
             return ("", 0, 0) 
  
-        icon = os.path.join(os.path.dirname(__file__), "..", "icons",
-                            "status", self.icon)
-        return (icon, 0, shellcon.ISIOI_ICONFILE)
+        if hasattr(sys, "frozen"):
+            # for dll/exe built with py2exe
+            dir = os.path.dirname(__file__)
+            dir = os.path.dirname(dir)
+            dir = os.path.dirname(dir)
+            path = os.path.join(dir, "icons", "status", self.icon)
+        else:
+            dir = os.path.dirname(__file__)
+            path = os.path.join(dir, "..", "icons", "status", self.icon)
+
+        return (path, 0, shellcon.ISIOI_ICONFILE)
 
     def GetPriority(self):
         return 0
