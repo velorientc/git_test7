@@ -53,7 +53,17 @@ def shell_notify(path):
                          None)
 
 def get_icon_path(*args):
-    icon = os.path.join(os.path.dirname(__file__), "..", "icons", *args)
+    import sys
+    if hasattr(sys, "frozen"):
+        # for dll/exe built with py2exe
+        dir = os.path.dirname(__file__)
+        dir = os.path.dirname(dir)
+        dir = os.path.dirname(dir)
+        icon = os.path.join(dir, "icons", *args)
+    else:
+        dir = os.path.dirname(__file__)
+        icon = os.path.join(dir, "..", "icons", *args)
+        
     if not os.path.isfile(icon):
         return None
     return icon

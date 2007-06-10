@@ -73,17 +73,13 @@ class IconOverlayExtension(object):
             print "GetOverlayInfo: not in explorer"
             return ("", 0, 0) 
  
-        if hasattr(sys, "frozen"):
-            # for dll/exe built with py2exe
-            dir = os.path.dirname(__file__)
-            dir = os.path.dirname(dir)
-            dir = os.path.dirname(dir)
-            path = os.path.join(dir, "icons", "status", self.icon)
-        else:
-            dir = os.path.dirname(__file__)
-            path = os.path.join(dir, "..", "icons", "status", self.icon)
+        icon = thgutil.get_icon_path("status", self.icon)
+        print "icon = ", icon
 
-        return (path, 0, shellcon.ISIOI_ICONFILE)
+        if icon:
+            return (icon, 0, shellcon.ISIOI_ICONFILE)
+        else:
+            return ("", 0, 0) 
 
     def GetPriority(self):
         return 0
