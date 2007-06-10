@@ -6,6 +6,10 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
+import sys
+if hasattr(sys, "frozen") and sys.frozen == 'dll':
+    import win32traceutil
+
 # shell extension classes
 from tortoise.contextmenu import ContextMenuExtension
 from tortoise.iconoverlay import ChangedOverlay, AddedOverlay, UnchangedOverlay
