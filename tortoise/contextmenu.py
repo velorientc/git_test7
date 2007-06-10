@@ -115,6 +115,8 @@ class ContextMenuExtension:
         (_winreg.HKEY_CLASSES_ROOT, r"Directory\Background\shellex\ContextMenuHandlers\TortoiseHg"),
         (_winreg.HKEY_CLASSES_ROOT, r"Directory\shellex\ContextMenuHandlers\TortoiseHg"),
         (_winreg.HKEY_CLASSES_ROOT, r"Folder\shellex\ContextMenuHandlers\TortoiseHg"),
+        (_winreg.HKEY_CLASSES_ROOT, r"Directory\shellex\DragDropHandlers\TortoiseHg"),
+        (_winreg.HKEY_CLASSES_ROOT, r"Folder\shellex\DragDropHandlers\TortoiseHg"),
         ]
 
     def __init__(self):
