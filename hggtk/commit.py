@@ -23,66 +23,21 @@ except:
 import gtk
 import gobject
 import pango
-
-import os.path
-
-import bzrlib.errors as errors
-from bzrlib import osutils
-
+from mercurial import hg, repo, ui, cmdutil, util
+from mercurial.i18n import _
 from dialog import error_dialog, question_dialog
-from errors import show_bzr_error
-
-try:
-    import dbus
-    import dbus.glib
-    have_dbus = True
-except ImportError:
-    have_dbus = False
 
 class CommitDialog(gtk.Dialog):
     """ New implementation of the Commit dialog. """
-    def __init__(self, wt, wtpath, notbranch, selected=None, parent=None):
+    def __init__(self, root='', files=[], parent=None):
         """ Initialize the Commit Dialog. """
-        gtk.Dialog.__init__(self, title="Commit - Olive",
+        gtk.Dialog.__init__(self, title="TortoiseHg commit - %s" % root,
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-        
-        # Get arguments
-        self.wt = wt
-        self.wtpath = wtpath
-        self.notbranch = notbranch
-        self.selected = selected
-        
-        # Set the delta
-        self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-        self.delta = self.wt.changes_from(self.old_tree)
-        
-        # Get pending merges
-        self.pending = self._pending_merges(self.wt)
-        
-        # Do some preliminary checks
-        self._is_checkout = False
-        self._is_pending = False
-        if self.wt is None and not self.notbranch:
-            error_dialog(_('Directory does not have a working tree'),
-                         _('Operation aborted.'))
-            self.close()
-            return
-
-        if self.notbranch:
-            error_dialog(_('Directory is not a branch'),
-                         _('You can perform this action only in a branch.'))
-            self.close()
-            return
-        else:
-            if self.wt.branch.get_bound_location() is not None:
-                # we have a checkout, so the local commit checkbox must appear
-                self._is_checkout = True
-            
-            if self.pending:
-                # There are pending merges, file selection not supported
-                self._is_pending = True
+              
+        self.root = root
+        self.files = files
         
         # Create the widgets
         self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
@@ -94,12 +49,6 @@ class CommitDialog(gtk.Dialog):
         self._vbox_message = gtk.VBox()
         self._label_message = gtk.Label(_("Commit message:"))
         self._textview_message = gtk.TextView()
-        
-        if self._is_pending:
-            self._expander_merges = gtk.Expander(_("Pending merges"))
-            self._vpaned_list = gtk.VPaned()
-            self._scrolledwindow_merges = gtk.ScrolledWindow()
-            self._treeview_merges = gtk.TreeView()
 
         # Set callbacks
         self._button_commit.connect('clicked', self._on_commit_clicked)
@@ -115,11 +64,6 @@ class CommitDialog(gtk.Dialog):
         self._vpaned_main.set_position(200)
         self._button_commit.set_flags(gtk.CAN_DEFAULT)
 
-        if self._is_pending:
-            self._scrolledwindow_merges.set_policy(gtk.POLICY_AUTOMATIC,
-                                                   gtk.POLICY_AUTOMATIC)
-            self._treeview_files.set_sensitive(False)
-        
         # Construct the dialog
         self.action_area.pack_end(self._button_commit)
         
@@ -131,41 +75,16 @@ class CommitDialog(gtk.Dialog):
         self._vbox_message.pack_start(self._label_message, False, False)
         self._vbox_message.pack_start(self._scrolledwindow_message, True, True)
         
-        if self._is_pending:        
-            self._expander_merges.add(self._scrolledwindow_merges)
-            self._scrolledwindow_merges.add(self._treeview_merges)
-            self._vpaned_list.add1(self._expander_files)
-            self._vpaned_list.add2(self._expander_merges)
-            self._vpaned_main.add1(self._vpaned_list)
-        else:
-            self._vpaned_main.add1(self._expander_files)
-
+        self._vpaned_main.add1(self._expander_files)
         self._vpaned_main.add2(self._vbox_message)
         
         self.vbox.pack_start(self._vpaned_main, True, True)
-        if self._is_checkout: 
-            self._check_local = gtk.CheckButton(_("_Only commit locally"),
-                                                use_underline=True)
-            self.vbox.pack_start(self._check_local, False, False)
-            if have_dbus:
-                bus = dbus.SystemBus()
-                proxy_obj = bus.get_object('org.freedesktop.NetworkManager', 
-                              '/org/freedesktop/NetworkManager')
-                dbus_iface = dbus.Interface(
-                        proxy_obj, 'org.freedesktop.NetworkManager')
-                # 3 is the enum value for STATE_CONNECTED
-                self._check_local.set_active(dbus_iface.state() != 3)
-        
+
         # Create the file list
         self._create_file_view()
-        # Create the pending merges
-        self._create_pending_merges()
         
         # Expand the corresponding expander
-        if self._is_pending:
-            self._expander_merges.set_expanded(True)
-        else:
-            self._expander_files.set_expanded(True)
+        self._expander_files.set_expanded(True)
         
         # Display dialog
         self.vbox.show_all()
@@ -194,117 +113,33 @@ class CommitDialog(gtk.Dialog):
                 pass
             diff.show()
     
-    @show_bzr_error
     def _on_commit_clicked(self, button):
         """ Commit button clicked handler. """
         textbuffer = self._textview_message.get_buffer()
         start, end = textbuffer.get_bounds()
         message = textbuffer.get_text(start, end).decode('utf-8')
         
-        if not self.pending:
-            specific_files = self._get_specific_files()
-        else:
-            specific_files = None
+        specific_files = self._get_specific_files()
+        if not specific_files:
+            error_dialog(_('No file selected?'),
+                         _('You can select files to commit.'))
+            return
 
         if message == '':
-            response = question_dialog(_('Commit with an empty message?'),
-                                       _('You can describe your commit intent in the message.'))
-            if response == gtk.RESPONSE_NO:
-                # Kindly give focus to message area
-                self._textview_message.grab_focus()
-                return
+            error_dialog(_('Commit message is empty'),
+                         _('Please enter the commit message.'))
+            # Kindly give focus to message area
+            self._textview_message.grab_focus()
+            return
 
-        if self._is_checkout:
-            local = self._check_local.get_active()
-        else:
-            local = False
-
-        if list(self.wt.unknowns()) != []:
-            response = question_dialog(_("Commit with unknowns?"),
-               _("Unknown files exist in the working tree. Commit anyway?"))
-            if response == gtk.RESPONSE_NO:
-                return
-        
         try:
-            self.wt.commit(message,
-                       allow_pointless=False,
-                       strict=False,
-                       local=local,
-                       specific_files=specific_files)
-        except errors.PointlessCommit:
-            response = question_dialog(_('Commit with no changes?'),
-                                       _('There are no changes in the working tree.'))
-            if response == gtk.RESPONSE_YES:
-                self.wt.commit(message,
-                               allow_pointless=True,
-                               strict=False,
-                               local=local,
-                               specific_files=specific_files)
-        self.response(gtk.RESPONSE_OK)
+            self.repo.commit(specific_files, message)
+        except ValueError, inst:
+            error_dialog(_('Error during commit'),
+                         _(str(inst)))
+            return
 
-    def _pending_merges(self, wt):
-        """ Return a list of pending merges or None if there are none of them. """
-        parents = wt.get_parent_ids()
-        if len(parents) < 2:
-            return None
-        
-        import re
-        from bzrlib.osutils import format_date
-        
-        pending = parents[1:]
-        branch = wt.branch
-        last_revision = parents[0]
-        
-        if last_revision is not None:
-            try:
-                ignore = set(branch.repository.get_ancestry(last_revision))
-            except errors.NoSuchRevision:
-                # the last revision is a ghost : assume everything is new 
-                # except for it
-                ignore = set([None, last_revision])
-        else:
-            ignore = set([None])
-        
-        pm = []
-        for merge in pending:
-            ignore.add(merge)
-            try:
-                m_revision = branch.repository.get_revision(merge)
-                
-                rev = {}
-                rev['committer'] = re.sub('<.*@.*>', '', m_revision.committer).strip(' ')
-                rev['summary'] = m_revision.get_summary()
-                rev['date'] = format_date(m_revision.timestamp,
-                                          m_revision.timezone or 0, 
-                                          'original', date_fmt="%Y-%m-%d",
-                                          show_offset=False)
-                
-                pm.append(rev)
-                
-                inner_merges = branch.repository.get_ancestry(merge)
-                assert inner_merges[0] is None
-                inner_merges.pop(0)
-                inner_merges.reverse()
-                for mmerge in inner_merges:
-                    if mmerge in ignore:
-                        continue
-                    mm_revision = branch.repository.get_revision(mmerge)
-                    
-                    rev = {}
-                    rev['committer'] = re.sub('<.*@.*>', '', mm_revision.committer).strip(' ')
-                    rev['summary'] = mm_revision.get_summary()
-                    rev['date'] = format_date(mm_revision.timestamp,
-                                              mm_revision.timezone or 0, 
-                                              'original', date_fmt="%Y-%m-%d",
-                                              show_offset=False)
-                
-                    pm.append(rev)
-                    
-                    ignore.add(mmerge)
-            except errors.NoSuchRevision:
-                print "DEBUG: NoSuchRevision:", merge
-        
-        return pm
+        self.response(gtk.RESPONSE_OK)
 
     def _create_file_view(self):
         self._file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,   # [0] checkbox
@@ -322,82 +157,29 @@ class CommitDialog(gtk.Dialog):
         self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
                                      gtk.CellRendererText(), text=2))
 
-        for path, id, kind in self.delta.added:
-            marker = osutils.kind_marker(kind)
-            if self.selected is not None:
-                if path == os.path.join(self.wtpath, self.selected):
-                    self._file_store.append([ True, path+marker, _('added'), path ])
-                else:
-                    self._file_store.append([ False, path+marker, _('added'), path ])
-            else:
-                self._file_store.append([ True, path+marker, _('added'), path ])
-
-        for path, id, kind in self.delta.removed:
-            marker = osutils.kind_marker(kind)
-            if self.selected is not None:
-                if path == os.path.join(self.wtpath, self.selected):
-                    self._file_store.append([ True, path+marker, _('removed'), path ])
-                else:
-                    self._file_store.append([ False, path+marker, _('removed'), path ])
-            else:
-                self._file_store.append([ True, path+marker, _('removed'), path ])
-
-        for oldpath, newpath, id, kind, text_modified, meta_modified in self.delta.renamed:
-            marker = osutils.kind_marker(kind)
-            if text_modified or meta_modified:
-                changes = _('renamed and modified')
-            else:
-                changes = _('renamed')
-            if self.selected is not None:
-                if newpath == os.path.join(self.wtpath, self.selected):
-                    self._file_store.append([ True,
-                                              oldpath+marker + '  =>  ' + newpath+marker,
-                                              changes,
-                                              newpath
-                                            ])
-                else:
-                    self._file_store.append([ False,
-                                              oldpath+marker + '  =>  ' + newpath+marker,
-                                              changes,
-                                              newpath
-                                            ])
-            else:
-                self._file_store.append([ True,
-                                          oldpath+marker + '  =>  ' + newpath+marker,
-                                          changes,
-                                          newpath
-                                        ])
-
-        for path, id, kind, text_modified, meta_modified in self.delta.modified:
-            marker = osutils.kind_marker(kind)
-            if self.selected is not None:
-                if path == os.path.join(self.wtpath, self.selected):
-                    self._file_store.append([ True, path+marker, _('modified'), path ])
-                else:
-                    self._file_store.append([ False, path+marker, _('modified'), path ])
-            else:
-                self._file_store.append([ True, path+marker, _('modified'), path ])
-    
-    def _create_pending_merges(self):
-        if not self.pending:
-            return
+        # open Hg repo
+        u = ui.ui()
+        try:
+            repo = hg.repository(u, path=self.root)
+        except repo.RepoError:
+            return None
+        self.repo = repo
         
-        liststore = gtk.ListStore(gobject.TYPE_STRING,
-                                  gobject.TYPE_STRING,
-                                  gobject.TYPE_STRING)
-        self._treeview_merges.set_model(liststore)
-        
-        self._treeview_merges.append_column(gtk.TreeViewColumn(_('Date'),
-                                            gtk.CellRendererText(), text=0))
-        self._treeview_merges.append_column(gtk.TreeViewColumn(_('Committer'),
-                                            gtk.CellRendererText(), text=1))
-        self._treeview_merges.append_column(gtk.TreeViewColumn(_('Summary'),
-                                            gtk.CellRendererText(), text=2))
-        
-        for item in self.pending:
-            liststore.append([ item['date'],
-                               item['committer'],
-                               item['summary'] ])
+        # get file status
+        try:
+            files, matchfn, anypats = cmdutil.matchpats(repo, self.files)
+            modified, added, removed, deleted, unknown, ignored, clean = [
+                    n for n in repo.status(files=files, list_clean=False)]
+        except util.Abort, inst:
+            return None
+
+        # add change files to list window
+        for path in modified:
+            self._file_store.append([ True, path, _('added'), path ])
+        for path in added:
+            self._file_store.append([ True, path, _('added'), path ])
+        for path in removed:
+            self._file_store.append([ True, path, _('added'), path ])
     
     def _get_specific_files(self):
         ret = []
@@ -413,3 +195,10 @@ class CommitDialog(gtk.Dialog):
     def _toggle_commit(self, cell, path, model):
         model[path][0] = not model[path][0]
         return
+
+def run(root='', files=[]):
+    dialog = CommitDialog(root=root, files=files)
+    dialog.run()
+
+if __name__ == "__main__":
+    run()
