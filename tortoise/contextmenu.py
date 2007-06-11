@@ -26,8 +26,8 @@ S_OK = 0
 S_FALSE = 1
 
 def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, notify=False):
-    app = os.path.join(os.path.dirname(__file__), "tortoisedialog.py")
-    print "app = ", app
+    app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
+    print "proc app = ", app_path
 
     if filelist:
         fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
@@ -47,16 +47,10 @@ def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, n
     if cwd:
         gpopts += " --cwd %s" % shellquote(cwd)
 
-
-    cmdline = '/app %s %s -- %s' % (shellquote(app), gpopts, cmdopts)
+    cmdline = '%s %s -- %s' % (shellquote(app_path), gpopts, cmdopts)
 
     try:
-        win32api.ShellExecute(0,
-                              None,
-                              'pythonwin.exe',
-                              cmdline,
-                              None, 
-                              1)
+        run_program(None, cmdline)
     except win32api.error, details:
         win32ui.MessageBox("Error executing command - %s" % (details), "gpopen")
     print "open_dialog: done"
