@@ -20,19 +20,22 @@ try:
 except:
     pass
 
+import sys
 import gtk
+from mercurial import hg, repo, ui, cmdutil, util
+from mercurial.i18n import _
 
 class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
-    def __init__(self, wt, wtpath):
+    def __init__(self, root='', files=[], list_clean=False):
         """ Initialize the Status window. """
         super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         self.set_title("Working tree changes")
         self._create()
-        self.wt = wt
-        self.wtpath = wtpath
-        # Set the old working tree
-        self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
+        self.root = root
+        self.files = files
+        self.list_clean = list_clean
+        
         # Generate status output
         self._generate_status()
 
@@ -56,11 +59,11 @@ class StatusDialog(gtk.Dialog):
         window.show()
 
     def _generate_status(self):
-        """ Generate 'bzr status' output. """
+        """ Generate 'hg status' output. """
         self.model = gtk.TreeStore(str, str)
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
-        self.treeview.connect("row-activated", self.row_diff)
+        #self.treeview.connect("row-activated", self.row_diff)
         
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
@@ -69,46 +72,40 @@ class StatusDialog(gtk.Dialog):
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
         
-        delta = self.wt.changes_from(self.old_tree)
+        u = ui.ui()
+        try:
+            repo = hg.repository(u, path=self.root)
+        except repo.RepoError:
+            return None
+        
+        # get file status
+        try:
+            files, matchfn, anypats = cmdutil.matchpats(repo, self.files)
+            modified, added, removed, deleted, unknown, ignored, clean = [
+                    n for n in repo.status(files=files, list_clean=self.list_clean)]
+        except util.Abort, inst:
+            return None
 
         changes = False
         
-        if len(delta.added):
+        if len(added):
             changes = True
             titer = self.model.append(None, [ _('Added'), None ])
-            for path, id, kind in delta.added:
+            for path in added:
                 self.model.append(titer, [ path, path ])
 
-        if len(delta.removed):
+        if len(removed):
             changes = True
             titer = self.model.append(None, [ _('Removed'), None ])
-            for path, id, kind in delta.removed:
+            for path in removed:
                 self.model.append(titer, [ path, path ])
 
-        if len(delta.renamed):
-            changes = True
-            titer = self.model.append(None, [ _('Renamed'), None ])
-            for oldpath, newpath, id, kind, text_modified, meta_modified \
-                    in delta.renamed:
-                self.model.append(titer, [ oldpath, newpath ])
-
-        if len(delta.modified):
+        if len(modified):
             changes = True
             titer = self.model.append(None, [ _('Modified'), None ])
-            for path, id, kind, text_modified, meta_modified in delta.modified:
+            for path in modified:
                 self.model.append(titer, [ path, path ])
         
-        done_unknown = False
-        for path in self.wt.unknowns():
-            changes = True
-            if not done_unknown:
-                titer = self.model.append(None, [ _('Unknown'), None ])
-                done_unknown = True
-            self.model.append(titer, [ path, path ])
-
-        if not changes:
-            self.model.append(None, [ _('No changes.'), None ])
-
         self.treeview.expand_all()
     
     def display(self):
@@ -117,3 +114,14 @@ class StatusDialog(gtk.Dialog):
 
     def close(self, widget=None):
         self.window.destroy()
+
+def run(root='', files=[]):
+    dialog = StatusDialog(root=root, files=files)
+    dialog.run()
+    
+if __name__ == "__main__":
+    import sys
+    root = "D:\\Profiles\\r28629\\My Documents\\Mercurial\\repos\\c1\\"
+    #dialog = StatusDialog(root=root)
+    dialog = StatusDialog(files=sys.argv[1:])
+    dialog.run()
