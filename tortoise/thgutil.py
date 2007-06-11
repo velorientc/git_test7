@@ -21,10 +21,12 @@ def shellquote(s):
     return '"%s"' % _quotere.sub(r'\1\1\\\2', s)
     return "'%s'" % s.replace("'", "'\\''")
 
-def find_path(pgmname):
+def find_path(pgmname, path=None, ext=None):
     """ return first executable found in search path """
-    ospath = os.environ['PATH'].split(os.pathsep)
-    pathext = os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD')
+    print "find_path: ", pgmname, path, ext
+    ospath = path and path or os.environ['PATH']
+    ospath = ospath.split(os.pathsep)
+    pathext = ext and ext or os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD')
     pathext = pathext.lower().split(os.pathsep)
 
     for path in ospath:
