@@ -6,7 +6,10 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
+import os
 import sys
+import _winreg
+
 if hasattr(sys, "frozen") and sys.frozen == 'dll':
     import win32traceutil
 
@@ -14,12 +17,24 @@ if hasattr(sys, "frozen") and sys.frozen == 'dll':
 from tortoise.contextmenu import ContextMenuExtension
 from tortoise.iconoverlay import ChangedOverlay, AddedOverlay, UnchangedOverlay
 
+# TortoiseHg registry setup
+def register_tortoise_path(unregister=False):
+    key = r"Software\TortoiseHg"
+    cat = _winreg.HKEY_CURRENT_USER     # HKEY_LOCAL_MACHINE
+    if (unregister):
+        _winreg.DeleteKey(cat, key)
+        print "TortoiseHg unregistered"
+    else:
+        _winreg.SetValue(cat, key, _winreg.REG_SZ, os.getcwd())
+        print "TortoiseHg registered"
+
 # for COM registration via py2exe
 def DllRegisterServer():
     RegisterServer(ContextMenuExtension)
     RegisterServer(ChangedOverlay)
     RegisterServer(AddedOverlay)
     RegisterServer(UnchangedOverlay)
+    register_tortoise_path()
 
 # for COM registration via py2exe
 def DllUnregisterServer():
@@ -27,11 +42,9 @@ def DllUnregisterServer():
     UnregisterServer(ChangedOverlay)
     UnregisterServer(AddedOverlay)
     UnregisterServer(UnchangedOverlay)
+    register_tortoise_path(unregister=True)
 
 def RegisterServer(cls):
-    import _winreg
-    import os.path
-
     # Add mercurial to the library path
     try:
         import mercurial
@@ -55,7 +68,6 @@ def RegisterServer(cls):
     print cls._reg_desc_, "registration complete."
 
 def UnregisterServer(cls):
-    import _winreg
     for category, keyname in cls.registry_keys:
         try:
             _winreg.DeleteKey(category, keyname)
@@ -75,3 +87,10 @@ if __name__=='__main__':
         register.UseCommandLine(cls,
                 finalize_register = lambda: RegisterServer(cls),
                 finalize_unregister = lambda: UnregisterServer(cls))
+
+    if "--unregister" in sys.argv[1:]:
+        register_tortoise_path(unregister=True)
+    else:
+        register_tortoise_path()
+
+    
