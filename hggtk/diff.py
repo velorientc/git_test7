@@ -9,24 +9,17 @@ the changes made between two revisions on a branch.
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
-
-from cStringIO import StringIO
-
 import gtk
 import pango
 import sys
+from mercurial import hg, repo, ui, cmdutil, util, patch
+from mercurial.i18n import _
 
 try:
     import gtksourceview
     have_gtksourceview = True
 except ImportError:
     have_gtksourceview = False
-
-import bzrlib
-
-from bzrlib.diff import show_diff_trees
-from bzrlib.errors import NoSuchFile
-
 
 class DiffWindow(gtk.Window):
     """Diff window.
@@ -48,6 +41,7 @@ class DiffWindow(gtk.Window):
         self.set_default_size(width, height)
 
         self.construct()
+        self.connect("delete_event", self._close_window)
 
     def construct(self):
         """Construct the window contents."""
@@ -105,43 +99,43 @@ class DiffWindow(gtk.Window):
         scrollwin.add(sourceview)
         sourceview.show()
 
-    def set_diff(self, description, rev_tree, parent_tree):
+    def set_diff(self, root='', files=[], description=''):
         """Set the differences showed by this window.
 
         Compares the two trees and populates the window with the
         differences.
         """
-        self.rev_tree = rev_tree
-        self.parent_tree = parent_tree
+        self.root = root
+        self.files = files
+        
+        # open Hg repo
+        self.ui = ui.ui()
+        try:
+            self.repo = hg.repository(self.ui, path=self.root)
+        except repo.RepoError:
+            return None
 
         self.model.clear()
-        delta = self.rev_tree.changes_from(self.parent_tree)
-
+        modified, added, removed = self.repo.status()[0:3]
         self.model.append(None, [ "Complete Diff", "" ])
 
-        if len(delta.added):
+        if len(added):
             titer = self.model.append(None, [ "Added", None ])
-            for path, id, kind in delta.added:
+            for path in added:
                 self.model.append(titer, [ path, path ])
 
-        if len(delta.removed):
+        if len(removed):
             titer = self.model.append(None, [ "Removed", None ])
-            for path, id, kind in delta.removed:
+            for path in removed:
                 self.model.append(titer, [ path, path ])
 
-        if len(delta.renamed):
-            titer = self.model.append(None, [ "Renamed", None ])
-            for oldpath, newpath, id, kind, text_modified, meta_modified \
-                    in delta.renamed:
-                self.model.append(titer, [ oldpath, newpath ])
-
-        if len(delta.modified):
+        if len(modified):
             titer = self.model.append(None, [ "Modified", None ])
-            for path, id, kind, text_modified, meta_modified in delta.modified:
+            for path in modified:
                 self.model.append(titer, [ path, path ])
 
         self.treeview.expand_all()
-        self.set_title(description + " - bzrk diff")
+        self.set_title("TortoseHg diff - " + description)
 
     def set_file(self, file_path):
         tv_path = None
@@ -164,6 +158,26 @@ class DiffWindow(gtk.Window):
         elif specific_files == [ "" ]:
             specific_files = []
 
-        s = StringIO()
-        show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files)
-        self.buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
+        diff = self._get_hg_diff()
+        self.buffer.set_text(diff.decode(sys.getdefaultencoding(), 'replace'))
+
+    def _get_hg_diff(self):
+        self.repo.ui.pushbuffer()
+        patch.diff(self.repo, files=self.files)
+        difflines = self.repo.ui.popbuffer()
+        return difflines
+
+    def _close_window(self, widget, event, data=None):
+        gtk.main_quit()
+        return False
+
+def run(root='', files=[], modal=False):
+    diff = DiffWindow()
+    diff.set_diff()
+    diff.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+    diff.set_modal(modal)
+    diff.show()
+    gtk.main()
+    
+if __name__ == "__main__":
+    run()
