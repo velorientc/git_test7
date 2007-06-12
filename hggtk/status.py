@@ -50,20 +50,23 @@ class StatusDialog(gtk.Dialog):
 
     def row_diff(self, tv, path, tvc):
         file = self.model[path][1]
-        if file is None:
-            return
-        from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow()
-        window.set_diff("Working tree changes", self.old_tree, self.wt)
-        window.set_file(file)
-        window.show()
+        if file is not None:
+            import os.path
+            from diff import DiffWindow
+            
+            diff = DiffWindow()
+            diff._set_as_dialog(modal=True)
+            
+            selpath = os.path.join(self.repo.root, file)
+            diff.set_diff(self.root, [ selpath ])
+            diff.show()
 
     def _generate_status(self):
         """ Generate 'hg status' output. """
         self.model = gtk.TreeStore(str, str)
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
-        #self.treeview.connect("row-activated", self.row_diff)
+        self.treeview.connect("row-activated", self.row_diff)
         
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
@@ -77,6 +80,7 @@ class StatusDialog(gtk.Dialog):
             repo = hg.repository(u, path=self.root)
         except repo.RepoError:
             return None
+        self.repo = repo
         
         # get file status
         try:
