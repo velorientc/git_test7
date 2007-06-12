@@ -79,26 +79,15 @@ def parse(args):
         if not filelist:
             filelist = [option['cwd']]
         return hggtk.commit.run(root=option['root'], files=filelist)
-    elif option['hgcmd'] == 'update':
-        import updatedialog
-        if not filelist:
-            filelist = [option['root']]
-        return updatedialog.UpdateDialog(path=filelist[0])
     elif option['hgcmd'] == 'status':
         import hggtk.status
         return hggtk.status.run(root=option['root'], files=filelist)
     elif option['hgcmd'] == 'diff':
         import hggtk.diff
         return hggtk.diff.run(root=option['root'], files=filelist)
-    elif option['hgcmd'] == 'tags':
-        import taglistdialog
-        return taglistdialog.TagsDialog(option['root'])
-    elif option['hgcmd'] == 'tag':
-        import tagadddialog
-        return tagadddialog.AddTagDialog(option['root'])
     else:
-        import gpopen
-        return gpopen.PopenDialog(cmdline, **opt)
+        import hggtk.cmd
+        return hggtk.cmd.run(cmdline)
     
 if __name__=='__main__':
     #dlg = parse(['-c', 'help', '--', '-v'])
