@@ -582,7 +582,7 @@ class ContextMenuExtension:
         self._run_dialog('commit')
 
     def _update(self, parent_window):
-        self._run_dialog('update')
+        self._run_dialog('update', noargs=True)
 
     def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
         if self._folder:
