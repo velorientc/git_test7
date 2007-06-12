@@ -77,7 +77,11 @@ class RevisionDialog(gtk.Dialog):
     
     def select_page(self, name):
         try:
-            page_num = self.pages.index(name)
+            # do case-insentive search on page name
+            lpages = [x.lower() for x in self.pages]
+            page_num = lpages.index(name.lower())
+            
+            # show select page
             self.notebook.set_current_page(page_num)
         except:
             pass

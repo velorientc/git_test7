@@ -87,8 +87,7 @@ def parse(args):
         return hggtk.diff.run(root=option['root'], files=filelist)
     elif option['hgcmd'] in ('tip', 'parents', 'heads'):
         import hggtk.revisions
-        return hggtk.revisions.run(root=option['root'],
-                                   page=option['hgcmd'].capitalize())
+        return hggtk.revisions.run(root=option['root'], page=option['hgcmd'])
     else:
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)
