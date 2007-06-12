@@ -29,8 +29,14 @@ class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
     def __init__(self, root='', files=[], list_clean=False):
         """ Initialize the Status window. """
-        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-        self.set_title("Working tree changes")
+        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
+                                           buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+
+        # set dialog title
+        title = "hg status "
+        if root: title += " - %s" % root
+        self.set_title(title)
+
         self._create()
         self.root = root
         self.files = files
