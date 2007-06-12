@@ -87,6 +87,9 @@ def parse(args):
     elif option['hgcmd'] == 'status':
         import hggtk.status
         return hggtk.status.run(root=option['root'], files=filelist)
+    elif option['hgcmd'] == 'diff':
+        import hggtk.diff
+        return hggtk.diff.run(root=option['root'], files=filelist)
     elif option['hgcmd'] == 'tags':
         import taglistdialog
         return taglistdialog.TagsDialog(option['root'])
