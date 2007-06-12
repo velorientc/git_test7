@@ -172,11 +172,11 @@ class CommitDialog(gtk.Dialog):
 
         # add change files to list window
         for path in modified:
-            self._file_store.append([ True, path, _('added'), path ])
+            self._file_store.append([ True, path, _('modified'), path ])
         for path in added:
             self._file_store.append([ True, path, _('added'), path ])
         for path in removed:
-            self._file_store.append([ True, path, _('added'), path ])
+            self._file_store.append([ True, path, _('removed'), path ])
     
     def _get_specific_files(self):
         ret = []
