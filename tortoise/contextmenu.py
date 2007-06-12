@@ -548,7 +548,7 @@ class ContextMenuExtension:
         self._run_dialog('tip', True)
 
     def _parents(self, parent_window):
-        self._run_dialog('parent', True)
+        self._run_dialog('parents', True)
 
     def _heads(self, parent_window):
         self._run_dialog('heads', True)
