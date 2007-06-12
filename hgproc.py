@@ -75,10 +75,10 @@ def parse(args):
             opt['notify_list'] = [ option['cwd'] ]
     
     if option['hgcmd'] == 'commit':
-        import commitdialog
+        import hggtk.commit
         if not filelist:
             filelist = [option['cwd']]
-        return commitdialog.SimpleCommitDialog(cwd=option['cwd'], files=filelist)
+        return hggtk.commit.run(root=option['root'], files=filelist)
     elif option['hgcmd'] == 'update':
         import updatedialog
         if not filelist:
