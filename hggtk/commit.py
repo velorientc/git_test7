@@ -100,17 +100,11 @@ class CommitDialog(gtk.Dialog):
         if iter is not None:
             from diff import DiffWindow
             
-            _selected = model.get_value(iter, 1)
-            
             diff = DiffWindow()
-            diff.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
-            diff.set_modal(True)
-            parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-            diff.set_diff(self.wt.branch.nick, self.wt, parent_tree)
-            try:
-                diff.set_file(_selected)
-            except errors.NoSuchFile:
-                pass
+            diff._set_as_dialog(modal=True)
+            
+            _selected = model.get_value(iter, 1)            
+            diff.set_diff(self.root, [_selected])
             diff.show()
     
     def _on_commit_clicked(self, button):
