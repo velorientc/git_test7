@@ -98,13 +98,16 @@ class CommitDialog(gtk.Dialog):
         (model, iter) = treeselection.get_selected()
         
         if iter is not None:
+            import os.path
             from diff import DiffWindow
             
             diff = DiffWindow()
             diff._set_as_dialog(modal=True)
             
-            _selected = model.get_value(iter, 1)            
-            diff.set_diff(self.root, [_selected])
+            _selected = model.get_value(iter, 1)          
+            selpath = os.path.join(self.repo.root, _selected)
+            print "commit: selected = ", selpath
+            diff.set_diff(self.root, [ selpath ])
             diff.show()
     
     def _on_commit_clicked(self, button):

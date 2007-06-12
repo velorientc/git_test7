@@ -114,8 +114,10 @@ class DiffWindow(gtk.Window):
         except repo.RepoError:
             return None
 
+        self.files, matchfn, anypats = cmdutil.matchpats(self.repo, self.files)
+        modified, added, removed = self.repo.status(files=self.files)[0:3]
+
         self.model.clear()
-        modified, added, removed = self.repo.status()[0:3]
         self.model.append(None, [ "Complete Diff", "" ])
 
         if len(added):
@@ -155,14 +157,15 @@ class DiffWindow(gtk.Window):
         if specific_files == [ None ]:
             return
         elif specific_files == [ "" ]:
-            specific_files = []
+            specific_files = self.files
 
-        diff = self._get_hg_diff()
+        print "spec: ", specific_files
+        diff = self._get_hg_diff(specific_files)
         self.buffer.set_text(diff.decode(sys.getdefaultencoding(), 'replace'))
 
-    def _get_hg_diff(self):
+    def _get_hg_diff(self, files):
         self.repo.ui.pushbuffer()
-        patch.diff(self.repo, files=self.files)
+        patch.diff(self.repo, files=files)
         difflines = self.repo.ui.popbuffer()
         return difflines
 
@@ -175,10 +178,11 @@ class DiffWindow(gtk.Window):
 
 def run(root='', files=[]):
     diff = DiffWindow()
-    diff.set_diff()
+    diff.set_diff(root, files)
     diff._set_as_window()
     diff.show()
     gtk.main()
 
 if __name__ == "__main__":
+    #run(r'c:\hg\h1', [r'c:\hg\h1\f1'])
     run()
