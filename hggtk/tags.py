@@ -1,0 +1,106 @@
+#
+# tags dialog for TortoiseHg
+#
+# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+#
+
+try:
+    import pygtk
+    pygtk.require("2.0")
+except:
+    pass
+
+import sys
+import gtk
+import gobject
+from mercurial import hg, repo, ui, cmdutil, util, node
+from mercurial.i18n import _
+
+def get_tag_list(path):
+    root = path
+    u = ui.ui()
+    try:
+        repo = hg.repository(u, path=root)
+    except repo.RepoError:
+        return None
+
+    l = repo.tagslist()
+    l.reverse()
+    hexfunc = node.hex
+    taglist = []
+    for t, n in l:
+        try:
+            hn = hexfunc(n)
+            r, c = repo.changelog.rev(n), hexfunc(n)
+        except revlog.LookupError:
+            r, c = "?", hn
+
+        taglist.append((t, r, c))
+
+    return taglist
+
+class TagsDialog(gtk.Dialog):
+    """ TortoiseHg dialog to add/remove files """
+    def __init__(self, root=''):
+        """ Initialize the Status window. """
+        super(TagsDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
+                                           buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+
+        self.root = root
+
+        # set dialog title
+        title = "hg tags "
+        if root: title += " - %s" % root
+        self.set_title(title)
+
+        # build dialog
+        self.set_default_size(500, 300)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self._treeview = gtk.TreeView()
+        scrolledwindow.add(self._treeview)
+        self._create_file_view()
+        self.vbox.pack_start(scrolledwindow, True, True)
+        self.vbox.show_all()
+        
+        # Generate status output
+        self._get_tags()
+
+    def _create_file_view(self):
+        self._file_store = gtk.ListStore(
+                gobject.TYPE_BOOLEAN,   # checkbox
+                gobject.TYPE_STRING,    # tag name
+                gobject.TYPE_STRING,    # revision
+                gobject.TYPE_STRING,    # cset id
+            )
+        self._treeview.set_model(self._file_store)
+        crt = gtk.CellRendererToggle()
+        crt.set_property("activatable", True)
+        crt.connect("toggled", self._toggle_commit, self._file_store)
+        self._treeview.append_column(gtk.TreeViewColumn(_(''),
+                                     crt, active=0))
+        self._treeview.append_column(gtk.TreeViewColumn(_('Tag'),
+                                     gtk.CellRendererText(), text=1))
+        self._treeview.append_column(gtk.TreeViewColumn(_('Revision'),
+                                     gtk.CellRendererText(), text=2))
+        self._treeview.append_column(gtk.TreeViewColumn(_('ID'),
+                                     gtk.CellRendererText(), text=3))
+
+    def _get_tags(self):
+        """ Generate 'hg status' output. """        
+        tags = get_tag_list(self.root)
+
+        for t, r, c in tags:
+            self._file_store.append([ False, t, r, c ])
+        self._treeview.expand_all()
+
+    def _toggle_commit(self, cell, path, model):
+        model[path][0] = not model[path][0]
+        return
+
+def run(root=''):
+    dialog = TagsDialog(root=root)
+    dialog.run()
+    
+if __name__ == "__main__":
+    run()
