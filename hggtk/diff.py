@@ -41,7 +41,6 @@ class DiffWindow(gtk.Window):
         self.set_default_size(width, height)
 
         self.construct()
-        self.connect("delete_event", self._close_window)
 
     def construct(self):
         """Construct the window contents."""
@@ -167,17 +166,19 @@ class DiffWindow(gtk.Window):
         difflines = self.repo.ui.popbuffer()
         return difflines
 
-    def _close_window(self, widget, event, data=None):
-        gtk.main_quit()
-        return False
+    def _set_as_window(self):
+        self.connect("destroy", gtk.main_quit)
 
-def run(root='', files=[], modal=False):
+    def _set_as_dialog(self, modal=False):
+        self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+        self.set_modal(modal)
+
+def run(root='', files=[]):
     diff = DiffWindow()
     diff.set_diff()
-    diff.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
-    diff.set_modal(modal)
+    diff._set_as_window()
     diff.show()
     gtk.main()
-    
+
 if __name__ == "__main__":
     run()
