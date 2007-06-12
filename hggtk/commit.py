@@ -170,6 +170,10 @@ class CommitDialog(gtk.Dialog):
         except util.Abort, inst:
             return None
 
+        # disable commit button if no changes found
+        if not modified + added + removed:
+            self._button_commit.set_sensitive(False)
+            
         # add change files to list window
         for path in modified:
             self._file_store.append([ True, path, _('modified'), path ])
