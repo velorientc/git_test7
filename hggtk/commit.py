@@ -91,7 +91,10 @@ class CommitDialog(gtk.Dialog):
         
         # Default to Commit button
         self._button_commit.grab_default()
-    
+
+        # show changed file list
+        self._generate_status()
+        
     def _on_treeview_files_row_activated(self, treeview, path, view_column):
         # FIXME: the diff window freezes for some reason
         treeselection = treeview.get_selection()
@@ -134,9 +137,10 @@ class CommitDialog(gtk.Dialog):
         except ValueError, inst:
             error_dialog(_('Error during commit'),
                          _(str(inst)))
-            return
-
-        self.response(gtk.RESPONSE_OK)
+        
+        self._generate_status()     # refresh file list
+        self._clear_commit_message()
+        return
 
     def _create_file_view(self):
         self._file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,   # [0] checkbox
@@ -153,6 +157,10 @@ class CommitDialog(gtk.Dialog):
                                      gtk.CellRendererText(), text=1))
         self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
                                      gtk.CellRendererText(), text=2))
+
+    def _generate_status(self):
+        # clear changed files display
+        self._file_store.clear()
 
         # open Hg repo
         u = ui.ui()
@@ -197,6 +205,10 @@ class CommitDialog(gtk.Dialog):
         model[path][0] = not model[path][0]
         return
 
+    def _clear_commit_message(self):
+        textbuffer = self._textview_message.get_buffer()
+        textbuffer.set_text("")
+        
 def run(root='', files=[]):
     dialog = CommitDialog(root=root, files=files)
     dialog.run()
