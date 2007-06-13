@@ -76,7 +76,7 @@ class TagsDialog(gtk.Dialog):
         self._treeview.set_model(self._file_store)
         crt = gtk.CellRendererToggle()
         crt.set_property("activatable", True)
-        crt.connect("toggled", self._toggle_commit, self._file_store)
+        crt.connect("toggled", self._toggled_handler, self._file_store)
         self._treeview.append_column(gtk.TreeViewColumn(_(''),
                                      crt, active=0))
         self._treeview.append_column(gtk.TreeViewColumn(_('Tag'),
@@ -94,7 +94,7 @@ class TagsDialog(gtk.Dialog):
             self._file_store.append([ False, t, r, c ])
         self._treeview.expand_all()
 
-    def _toggle_commit(self, cell, path, model):
+    def _toggled_handler(self, cell, path, model):
         model[path][0] = not model[path][0]
         return
 
