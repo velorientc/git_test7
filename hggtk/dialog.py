@@ -25,21 +25,8 @@ import gtk.glade
 
 
 def about():
-    """ Display the AboutDialog. """
-    from bzrlib.plugins.gtk import __version__
-    from bzrlib.plugins.gtk.olive.guifiles import GLADEFILENAME
-
-    # Load AboutDialog description
-    dglade = gtk.glade.XML(GLADEFILENAME, 'aboutdialog')
-    dialog = dglade.get_widget('aboutdialog')
-
-    # Set version
-    dialog.set_version(__version__)
-
-    dialog.run()
-    # Destroy the dialog
-    dialog.destroy()
-
+    raise "About dialog currently under construction"
+    
 def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK):
     """ Display a given type of MessageDialog with the given message.
     
