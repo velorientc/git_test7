@@ -122,6 +122,12 @@ class StatusDialog(gtk.Dialog):
             for path in modified:
                 self.model.append(titer, [ path, path ])
         
+        if len(deleted):
+            changes = True
+            titer = self.model.append(None, [ _('Deleted'), None ])
+            for path in deleted:
+                self.model.append(titer, [ path, path ])
+
         self.treeview.expand_all()
         
     def row_diff(self, tv, path, tvc):
