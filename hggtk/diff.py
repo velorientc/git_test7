@@ -31,7 +31,7 @@ class DiffWindow(gtk.Window):
     def __init__(self):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_border_width(0)
-        self.set_title("bzrk diff")
+        self.set_title("diff")
 
         # Use two thirds of the screen by default
         screen = self.get_screen()
