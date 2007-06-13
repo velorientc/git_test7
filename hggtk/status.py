@@ -22,6 +22,7 @@ except:
 
 import sys
 import gtk
+from dialog import question_dialog, error_dialog
 from mercurial import hg, repo, ui, cmdutil, util
 from mercurial.i18n import _
 
@@ -37,39 +38,40 @@ class StatusDialog(gtk.Dialog):
         if root: title += " - %s" % root
         self.set_title(title)
 
-        self._create()
         self.root = root
         self.files = files
         self.list_clean = list_clean
         
+        # build dialog
+        self._create()
+
         # Generate status output
         self._generate_status()
 
     def _create(self):
         self.set_default_size(400, 300)
+        
+        # add treeview to list change files
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.treeview = gtk.TreeView()
+        self._create_treestore()
         scrolledwindow.add(self.treeview)
         self.vbox.pack_start(scrolledwindow, True, True)
+        
+        # add revert button
+        self._button_revert = gtk.Button("Revert")
+        self._button_revert.connect('clicked', self._on_revert_clicked)
+        self._button_revert.set_flags(gtk.CAN_DEFAULT)
+        self.action_area.pack_end(self._button_revert)
+        
+        # show them all
         self.vbox.show_all()
 
-    def row_diff(self, tv, path, tvc):
-        file = self.model[path][1]
-        if file is not None:
-            import os.path
-            from diff import DiffWindow
-            
-            diff = DiffWindow()
-            diff._set_as_dialog(modal=True)
-            
-            selpath = os.path.join(self.repo.root, file)
-            diff.set_diff(self.root, [ selpath ])
-            diff.show()
-
-    def _generate_status(self):
+    def _create_treestore(self):
         """ Generate 'hg status' output. """
         self.model = gtk.TreeStore(str, str)
+        self.treeview.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
         self.treeview.connect("row-activated", self.row_diff)
@@ -81,18 +83,22 @@ class StatusDialog(gtk.Dialog):
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
         
+    def _generate_status(self):
+        # clear changed files display
+        self.model.clear()
+        
+        # open hg repo
         u = ui.ui()
         try:
-            repo = hg.repository(u, path=self.root)
+            self.repo = hg.repository(u, path=self.root)
         except repo.RepoError:
             return None
-        self.repo = repo
         
         # get file status
         try:
-            files, matchfn, anypats = cmdutil.matchpats(repo, self.files)
+            files, matchfn, anypats = cmdutil.matchpats(self.repo, self.files)
             modified, added, removed, deleted, unknown, ignored, clean = [
-                    n for n in repo.status(files=files, list_clean=self.list_clean)]
+                    n for n in self.repo.status(files=files, list_clean=self.list_clean)]
         except util.Abort, inst:
             return None
 
@@ -117,13 +123,64 @@ class StatusDialog(gtk.Dialog):
                 self.model.append(titer, [ path, path ])
         
         self.treeview.expand_all()
-    
-    def display(self):
-        """ Display the Diff window. """
-        self.window.show_all()
+        
+    def row_diff(self, tv, path, tvc):
+        file = self.model[path][1]
+        if file is not None:
+            import os.path
+            from diff import DiffWindow
+            
+            diff = DiffWindow()
+            diff._set_as_dialog(modal=True)
+            
+            selpath = os.path.join(self.repo.root, file)
+            diff.set_diff(self.root, [ selpath ])
+            diff.show()
 
-    def close(self, widget=None):
-        self.window.destroy()
+    def _on_revert_clicked(self, button):
+        files = self._get_tree_selections(self.treeview, 1)
+        files = [x for x in files if not x is None]
+        if not files:
+            return
+        
+        response = question_dialog("Do you really want to revert", "\n".join(files))
+        if response == gtk.RESPONSE_YES:
+            import os.path
+            if self._do_revert(files) == True:
+                # refresh changed file display
+                self._generate_status()
+   
+    def _get_tree_selections(self, treeview, index=0):
+        treeselection = treeview.get_selection()
+        mode = treeselection.get_mode()
+        list = []
+        if mode == gtk.SELECTION_MULTIPLE:
+            (model, pathlist) = treeselection.get_selected_rows()
+            for p in pathlist:
+                iter = model.get_iter(p)
+                list.append(model.get_value(iter, index))
+        else:
+            (model, iter) = treeselection.get_selected()
+            list.append(model.get_value(iter, index))
+        
+        return list
+        
+    def _do_revert(self, files):
+        import os.path
+        from mercurial import commands
+        
+        absfiles = [os.path.join(self.root, x) for x in files]
+        try:
+            cmdoptions = commands.parse(self.repo.ui, ['revert'])[4]
+            commands.revert(self.repo.ui, self.repo, *absfiles, **cmdoptions)
+        except util.Abort, inst:
+            error_dialog("Error in revert", "abort: %s" % inst)
+            return False
+        except:
+            import traceback
+            error_dialog("Error in revert", "Traceback:\n%s" % traceback.format_exc())
+            return False
+        return True
 
 def run(root='', files=[]):
     dialog = StatusDialog(root=root, files=files)
@@ -131,7 +188,6 @@ def run(root='', files=[]):
     
 if __name__ == "__main__":
     import sys
-    root = "D:\\Profiles\\r28629\\My Documents\\Mercurial\\repos\\c1\\"
-    #dialog = StatusDialog(root=root)
-    dialog = StatusDialog(files=sys.argv[1:])
+    root = len(sys.argv) > 1 and sys.argv[1:] or []
+    dialog = StatusDialog(*root)
     dialog.run()
