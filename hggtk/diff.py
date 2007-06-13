@@ -159,7 +159,6 @@ class DiffWindow(gtk.Window):
         elif specific_files == [ "" ]:
             specific_files = self.files
 
-        print "spec: ", specific_files
         diff = self._get_hg_diff(specific_files)
         self.buffer.set_text(diff.decode(sys.getdefaultencoding(), 'replace'))
 
