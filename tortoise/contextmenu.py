@@ -537,12 +537,7 @@ class ContextMenuExtension:
         self._run_dialog('add', modal=True)
 
     def _revert(self, parent_window):
-        targets = self._filenames or [self._folder]
-        msg = "Confirm reverting: %s" % ", ".join(targets)
-        title = "Mercurial: revert"
-        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
-        if rv == 1:
-            self._run_dialog('revert', modal=True)
+        self._run_dialog('status')
 
     def _tip(self, parent_window):
         self._run_dialog('tip', True)

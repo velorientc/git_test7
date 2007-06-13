@@ -79,7 +79,7 @@ def parse(args):
         if not filelist:
             filelist = [option['cwd']]
         return hggtk.commit.run(root=option['root'], files=filelist)
-    elif option['hgcmd'] == 'status':
+    elif option['hgcmd'] in ('status', 'revert'):
         import hggtk.status
         return hggtk.status.run(root=option['root'], files=filelist)
     elif option['hgcmd'] == 'tags':
