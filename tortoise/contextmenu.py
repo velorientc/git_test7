@@ -343,6 +343,9 @@ class ContextMenuExtension:
             result.append((_("Add"),
                            _("Add files to Hg repository"),
                            self._add))
+            result.append((_("Remove"),
+                           _("remove selected files on the next commit"),
+                           self._remove))
 
             result.append([])   # separator
 
@@ -535,6 +538,9 @@ class ContextMenuExtension:
 
     def _add(self, parent_window):
         self._run_dialog('add', modal=True)
+
+    def _remove(self, parent_window):
+        self._run_dialog('remove')
 
     def _revert(self, parent_window):
         self._run_dialog('status')
