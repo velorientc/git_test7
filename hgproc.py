@@ -82,6 +82,11 @@ def parse(args):
     elif option['hgcmd'] in ('status', 'revert'):
         import hggtk.status
         return hggtk.status.run(root=option['root'], files=filelist)
+    elif option['hgcmd'] in ('add', 'remove'):
+        import hggtk.addremove
+        return hggtk.addremove.run(option['hgcmd'],
+                                   root=option['root'],
+                                   files=filelist)
     elif option['hgcmd'] == 'tags':
         import hggtk.tags
         return hggtk.tags.run(root=option['root'])
