@@ -30,11 +30,21 @@ import py2exe
 
 # Don't pull in all this MFC stuff used by the makepy UI.
 py2exe_options = dict(
-        excludes="pywin,pywin.dialogs,pywin.dialogs.list",
+        excludes = "pywin,pywin.dialogs,pywin.dialogs.list",
+        includes = "pango,atk,pangocairo,cairo,gobject",
+        dll_excludes = [
+            "iconv.dll","intl.dll","libatk-1.0-0.dll",
+            "libgdk_pixbuf-2.0-0.dll","libgdk-win32-2.0-0.dll",
+            "libglib-2.0-0.dll","libgmodule-2.0-0.dll",
+            "libgobject-2.0-0.dll","libgthread-2.0-0.dll",
+            "libgtk-win32-2.0-0.dll","libpango-1.0-0.dll",
+            "libpangowin32-1.0-0.dll"
+        ],
     )
 
 setup(name="TortoiseHg COM server",
         com_server=["tortoisehg"],
+        console=["hgproc.py"],
         options = dict(py2exe=py2exe_options),
         modules="win32com.shell",
         data_files=[(os.path.join('', root),
