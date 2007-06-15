@@ -17,7 +17,7 @@ from mercurial import hg, repo, ui, cmdutil, util
 from mercurial.i18n import _
 
 class HistoryDialog(gtk.Dialog):
-    """ Display Status window and perform the needed actions. """
+    """ Dialog to display Mercurial history """
     def __init__(self, root='', files=[], list_clean=False, page=100):
         """ Initialize the Dialog """
         super(HistoryDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -39,7 +39,7 @@ class HistoryDialog(gtk.Dialog):
         # build dialog
         self._create()
 
-        # Generate status output
+        # display history 
         self._generate_history()
 
     def _create(self):
