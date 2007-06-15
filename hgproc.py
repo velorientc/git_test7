@@ -87,6 +87,9 @@ def parse(args):
         return hggtk.addremove.run(option['hgcmd'],
                                    root=option['root'],
                                    files=filelist)
+    elif option['hgcmd'] == 'tag':
+        import hggtk.tagadd
+        return hggtk.tagadd.run(root=option['root'])
     elif option['hgcmd'] == 'tags':
         import hggtk.tags
         return hggtk.tags.run(root=option['root'])
