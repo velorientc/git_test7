@@ -107,7 +107,11 @@ class TagAddDialog(gtk.Dialog):
         if rev == "":
             error_dialog("Revision input is empty", "Please enter revision to tag")
             return False
-
+        if use_msg and not message:
+            error_dialog("Custom commit message is empty", "Please enter commit message")
+            self._commit_message.grab_focus()
+            return False
+            
         # add tag to repo        
         try:
             self._add_hg_tag(name, rev, message, is_local, force=force)
