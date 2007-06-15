@@ -373,8 +373,8 @@ class ContextMenuExtension:
             result.append((_("Parents"),
                            _("Show working directory's parent revisions"),
                            self._parents))
-            result.append((_("Log"),
-                           _("Show revision history"),
+            result.append((_("Revision history"),
+                           _("Browse revision history"),
                            self._log))
 
             result.append([])   # separator
