@@ -68,35 +68,25 @@ class TagsDialog(gtk.Dialog):
 
     def _create_file_view(self):
         self._file_store = gtk.ListStore(
-                gobject.TYPE_BOOLEAN,   # checkbox
                 gobject.TYPE_STRING,    # tag name
                 gobject.TYPE_STRING,    # revision
                 gobject.TYPE_STRING,    # cset id
             )
         self._treeview.set_model(self._file_store)
-        crt = gtk.CellRendererToggle()
-        crt.set_property("activatable", True)
-        crt.connect("toggled", self._toggled_handler, self._file_store)
-        self._treeview.append_column(gtk.TreeViewColumn(_(''),
-                                     crt, active=0))
         self._treeview.append_column(gtk.TreeViewColumn(_('Tag'),
-                                     gtk.CellRendererText(), text=1))
+                                     gtk.CellRendererText(), text=0))
         self._treeview.append_column(gtk.TreeViewColumn(_('Revision'),
-                                     gtk.CellRendererText(), text=2))
+                                     gtk.CellRendererText(), text=1))
         self._treeview.append_column(gtk.TreeViewColumn(_('ID'),
-                                     gtk.CellRendererText(), text=3))
+                                     gtk.CellRendererText(), text=2))
 
     def _get_tags(self):
         """ Generate 'hg status' output. """        
         tags = get_tag_list(self.root)
 
         for t, r, c in tags:
-            self._file_store.append([ False, t, r, c ])
+            self._file_store.append([ t, r, c ])
         self._treeview.expand_all()
-
-    def _toggled_handler(self, cell, path, model):
-        model[path][0] = not model[path][0]
-        return
 
 def run(root=''):
     dialog = TagsDialog(root=root)
