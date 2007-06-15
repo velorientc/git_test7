@@ -90,6 +90,9 @@ def parse(args):
     elif option['hgcmd'] == 'tags':
         import hggtk.tags
         return hggtk.tags.run(root=option['root'])
+    elif option['hgcmd'] in ('log', 'history'):
+        import hggtk.history
+        return hggtk.history.run(root=option['root'])
     elif option['hgcmd'] == 'diff':
         import hggtk.diff
         return hggtk.diff.run(root=option['root'], files=filelist)
