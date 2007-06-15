@@ -103,9 +103,11 @@ class TagAddDialog(gtk.Dialog):
         # verify input
         if name == "":
             error_dialog("Tag input is empty", "Please enter tag name")
+            self._tag_input.grab_focus()
             return False
         if rev == "":
             error_dialog("Revision input is empty", "Please enter revision to tag")
+            self._rev_input.grab_focus()
             return False
         if use_msg and not message:
             error_dialog("Custom commit message is empty", "Please enter commit message")
