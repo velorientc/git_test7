@@ -364,15 +364,9 @@ class ContextMenuExtension:
 
             result.append([])   # separator
 
-            result.append((_("Tip"),
-                           _("Show latest (tip) revision info"),
+            result.append((_("Revision status..."),
+                           _("Show various revision info"),
                            self._tip))
-            result.append((_("Heads"),
-                           _("Show all repository head changesets"),
-                           self._heads))
-            result.append((_("Parents"),
-                           _("Show working directory's parent revisions"),
-                           self._parents))
             result.append((_("Revision history"),
                            _("Browse revision history"),
                            self._log))
