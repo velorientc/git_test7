@@ -46,6 +46,7 @@ class TagAddDialog(gtk.Dialog):
         lbl.set_justify(gtk.JUSTIFY_LEFT)
         self._tag_input = gtk.Entry()
         self._btn_tag_browse = gtk.Button("Browse...")
+        self._btn_tag_browse.connect('clicked', self._btn_tag_clicked)
         tagbox.pack_start(lbl, False, False)
         tagbox.pack_start(self._tag_input, False, False)
         tagbox.pack_start(self._btn_tag_browse, False, False, 5)
@@ -95,6 +96,13 @@ class TagAddDialog(gtk.Dialog):
         rev = history.select(self.root)
         if rev is not None:
             self._rev_input.set_text(rev)
+        
+    def _btn_tag_clicked(self, button):
+        """ select tag from tags dialog """
+        import tags
+        tag = tags.select(self.root)
+        if tag is not None:
+            self._tag_input.set_text(tag)
         
     def _btn_addtag_clicked(self, button):
         self._do_add_tag()
