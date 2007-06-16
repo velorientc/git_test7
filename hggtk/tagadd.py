@@ -59,6 +59,7 @@ class TagAddDialog(gtk.Dialog):
         self._rev_input = gtk.Entry()
         self._rev_input.set_text("tip")
         self._btn_rev_browse = gtk.Button("Browse...")
+        self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._rev_input, False, False)
         revbox.pack_start(self._btn_rev_browse, False, False, 5)
@@ -87,6 +88,13 @@ class TagAddDialog(gtk.Dialog):
         
         # show them all
         self.vbox.show_all()
+
+    def _btn_rev_clicked(self, button):
+        """ select revision from history dialog """
+        import history
+        rev = history.select(self.root)
+        if rev is not None:
+            self._rev_input.set_text(rev)
         
     def _btn_addtag_clicked(self, button):
         self._do_add_tag()
