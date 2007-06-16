@@ -18,10 +18,6 @@ import _winreg
 from mercurial import hg, ui, repo
 from thgutil import *
 
-SIMPLE_MERGE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'hgutils',
-                            'simplemerge')
-os.environ['HGMERGE'] = ('python %s -L my -L other' % shellquote(SIMPLE_MERGE))
-
 S_OK = 0
 S_FALSE = 1
 
@@ -561,8 +557,11 @@ class ContextMenuExtension:
         self._run_dialog('diff')
 
     def _merge_simple(self, parent_window):
+        app_path = find_path("simplemerge", get_prog_root(), '.EXE;.BAT')
+        os.environ['HGMERGE'] = ('%s -L my -L other' % shellquote(app_path))
+
         print "HGMERGE = %s" % os.environ['HGMERGE']
-        self._run_dialog('merge', noargs=True, modal=True)
+        self._run_dialog('merge', noargs=True)
 
     def _rollback(self, parent_window):
         targets = self._filenames or [self._folder]

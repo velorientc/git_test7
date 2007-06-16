@@ -44,7 +44,7 @@ py2exe_options = dict(
 
 setup(name="TortoiseHg COM server",
         com_server=["tortoisehg"],
-        console=["hgproc.py"],
+        console=["hgproc.py", "hgutils\simplemerge"],
         options = dict(py2exe=py2exe_options),
         modules="win32com.shell",
         data_files=[(os.path.join('', root),
