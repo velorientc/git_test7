@@ -18,10 +18,15 @@ from mercurial.i18n import _
 
 class HistoryDialog(gtk.Dialog):
     """ Dialog to display Mercurial history """
-    def __init__(self, root='', files=[], list_clean=False, page=100):
+    def __init__(self, root='', files=[], list_clean=False, select=False, page=100):
         """ Initialize the Dialog """
+        if select:
+            buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                      gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+        else:
+            buttons = (gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
         super(HistoryDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                           buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                           buttons=buttons)
 
         # set dialog title
         title = "hg log "
@@ -35,6 +40,7 @@ class HistoryDialog(gtk.Dialog):
         self.page_size = page
         self.start_rev = 'tip'
         self.tip_rev = None
+        self.selected = (None, None)
         
         # build dialog
         self._create()
@@ -88,7 +94,8 @@ class HistoryDialog(gtk.Dialog):
     def _create_treestore(self):
         """ create history display """
         self.model = gtk.TreeStore(str, str)
-        self.treeview.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.treeview.connect("cursor-changed", self._cursor_changed)
+        #self.treeview.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
         
@@ -103,6 +110,13 @@ class HistoryDialog(gtk.Dialog):
         column.pack_start(cell, expand=True)
         column.add_attribute(cell, "text", 1)
         self.treeview.append_column(column)
+
+    def _cursor_changed(self, tv):
+        (model, iter) = tv.get_selection().get_selected()
+        path = self.model.get_path(iter)
+        cs = self.history[path[0]]['changeset'][0]
+        rev, id = cs.split(':')
+        self.selected = (rev, id)
         
     def _get_hg_history(self, rev=None, limit=10):
         # open hg repo
@@ -222,7 +236,7 @@ class HistoryDialog(gtk.Dialog):
             return True
         return False
 
-    def _get_tree_selections(self, treeview, index=0):
+    def _get_selected_revision(self):
         treeselection = treeview.get_selection()
         mode = treeselection.get_mode()
         list = []
@@ -240,9 +254,18 @@ class HistoryDialog(gtk.Dialog):
 def run(root='', files=[]):
     dialog = HistoryDialog(root=root, files=files)
     dialog.run()
+    return 
     
+def select(root='', files=[]):
+    dialog = HistoryDialog(root=root, files=files, select=True)
+    resp = dialog.run()
+    rev = None
+    if resp == gtk.RESPONSE_ACCEPT:
+        rev = dialog.selected[1]
+    dialog.hide()
+    return rev
+
 if __name__ == "__main__":
     import sys
     root = len(sys.argv) > 1 and sys.argv[1:] or []
-    dialog = HistoryDialog(*root)
-    dialog.run()
+    run(*root)
