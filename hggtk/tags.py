@@ -41,10 +41,14 @@ def get_tag_list(path):
 
 class TagsDialog(gtk.Dialog):
     """ TortoiseHg dialog to add/remove files """
-    def __init__(self, root=''):
-        """ Initialize the Status window. """
+    def __init__(self, root='', select=False):
+        if select:
+            buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                      gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+        else:
+            buttons = (gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
         super(TagsDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                           buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                         buttons=buttons)
 
         self.root = root
 
@@ -58,6 +62,7 @@ class TagsDialog(gtk.Dialog):
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self._treeview = gtk.TreeView()
+        self._treeview.connect("cursor-changed", self._get_selected_tag)
         scrolledwindow.add(self._treeview)
         self._create_file_view()
         self.vbox.pack_start(scrolledwindow, True, True)
@@ -87,10 +92,25 @@ class TagsDialog(gtk.Dialog):
         for t, r, c in tags:
             self._file_store.append([ t, r, c ])
         self._treeview.expand_all()
+        
+    def _get_selected_tag(self, tv):
+        treeselection = tv.get_selection()
+        mode = treeselection.get_mode()
+        (model, iter) = treeselection.get_selected()
+        self.selected = model.get_value(iter, 0)
 
 def run(root=''):
     dialog = TagsDialog(root=root)
     dialog.run()
+
+def select(root=''):
+    dialog = TagsDialog(root=root, select=True)
+    resp = dialog.run()
+    rev = None
+    if resp == gtk.RESPONSE_ACCEPT:
+        rev = dialog.selected
+    dialog.hide()
+    return rev
     
 if __name__ == "__main__":
     run()
