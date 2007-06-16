@@ -17,6 +17,9 @@ if hasattr(sys, "frozen") and sys.frozen == 'dll':
 from tortoise.contextmenu import ContextMenuExtension
 from tortoise.iconoverlay import ChangedOverlay, AddedOverlay, UnchangedOverlay
 
+bin_path = os.path.dirname(os.path.join(os.getcwd(), sys.argv[0]))
+print "bin path = ", bin_path
+
 # TortoiseHg registry setup
 def register_tortoise_path(unregister=False):
     key = r"Software\TortoiseHg"
@@ -25,7 +28,7 @@ def register_tortoise_path(unregister=False):
         _winreg.DeleteKey(cat, key)
         print "TortoiseHg unregistered"
     else:
-        _winreg.SetValue(cat, key, _winreg.REG_SZ, os.getcwd())
+        _winreg.SetValue(cat, key, _winreg.REG_SZ, bin_path)
         print "TortoiseHg registered"
 
 # for COM registration via py2exe
