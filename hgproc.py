@@ -58,14 +58,6 @@ def parse(args):
         cmdline += " %s" % " ".join([(x) for x in args])
     if filelist:
         cmdline += " %s" % " ".join([thgutil.shellquote(x) for x in filelist])
-                
-    opt = {}
-    if option.has_key('title'):
-        opt['title'] = option['title']
-    elif option.has_key('root'):
-        opt['title'] = "hg %s - %s" % (option['hgcmd'], option['cwd'])
-    else:
-        opt['title'] = "hg %s" % option['hgcmd']
 
     cmd_notify = ('add', 'revert', 'merge', 'rollback')
     if option.has_key('notify') or option['hgcmd'] in cmd_notify:
