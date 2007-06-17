@@ -17,6 +17,7 @@ from mercurial import hg, repo, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
 from dialog import error_dialog, question_dialog
+from revtree import RevisionTree
 
 class RevisionDialog(gtk.Dialog):
     def __init__(self, root=''):
@@ -43,9 +44,9 @@ class RevisionDialog(gtk.Dialog):
 
         # create pages for each type of revision info
         self.pages = []
-        self.tip_text = self.add_page(notebook, 'Tip')
-        self.parents_text = self.add_page(notebook, 'Parents')
-        self.heads_text = self.add_page(notebook, 'Heads')
+        self.tip_tree = self.add_page(notebook, 'Tip')
+        self.parents_tree = self.add_page(notebook, 'Parents')
+        self.heads_tree = self.add_page(notebook, 'Heads')
 
         self.vbox.show_all()
         
@@ -60,20 +61,13 @@ class RevisionDialog(gtk.Dialog):
         frame.set_size_request(500, 250)
         frame.show()
 
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        textview = gtk.TextView(buffer=None)
-        textview.set_editable(False)
-        textview.modify_font(pango.FontDescription("Monospace"))
-        scrolledwindow.add(textview)
-        textview.set_editable(False)
-        textbuffer = textview.get_buffer()
-        frame.add(scrolledwindow)
+        tree = RevisionTree()
+        frame.add(tree)
 
         label = gtk.Label(tab)
         notebook.append_page(frame, label)
 
-        return textbuffer
+        return tree
     
     def select_page(self, name):
         try:
@@ -101,11 +95,11 @@ class RevisionDialog(gtk.Dialog):
         self.repo = repo
         
         text = self.tip(repo)
-        self.tip_text.set_text(_(text))
+        self.tip_tree.set_history(_(text))
         text = self.parents(repo)
-        self.parents_text.set_text(_(text))
+        self.parents_tree.set_history(_(text))
         text = self.heads(repo)
-        self.heads_text.set_text(_(text))
+        self.heads_tree.set_history(_(text))
         
     def tip(self, repo):
         """ Show the tip revision """
