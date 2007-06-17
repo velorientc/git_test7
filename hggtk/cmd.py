@@ -8,26 +8,28 @@ import pygtk
 pygtk.require("2.0")
 
 import gtk
+import gobject
 import pango
 import subprocess
 import threading
+import Queue
 from mercurial import hg, commands, util
 
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, width=520, height=400):
-        self.cmdline = cmdline
-        
         if type(cmdline) == type([]):
             title = " ".join(cmdline)
         else:
             title = cmdline
-            
         gtk.Dialog.__init__(self,
                             title=title,
                             flags=gtk.DIALOG_MODAL, 
                             #buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
                             )
         
+        self.cmdline = cmdline
+        self.queue = Queue.Queue()
+
         # construct dialog
         self.set_default_size(width, height)
         
@@ -51,7 +53,7 @@ class CmdDialog(gtk.Dialog):
 
     def _on_commit_clicked(self, button):
         """ Commit button clicked handler. """
-        self.response(gtk.RESPONSE_OK)
+        self.response(gtk.RESPONSE_ACCEPT)
         
     def _on_window_map_event(self, event, param):
         self._exec_cmd()
@@ -71,16 +73,28 @@ class CmdDialog(gtk.Dialog):
         self._start_thread()
 
     def write(self, msg, append=True):
-        gtk.gdk.threads_enter()
         msg = unicode(msg, 'iso-8859-1')
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)
         else:
             self.textbuffer.set_text(msg)
-        gtk.gdk.threads_leave()
 
+    def process_queue(self):
+        """
+        Handle all the messages currently in the queue (if any).
+        """
+        while self.queue.qsize():
+            try:
+                msg = self.queue.get(0)
+                self.write(msg)
+            except Queue.Empty:
+                pass
+                
+        return True
+        
     def _start_thread(self):
+        gobject.timeout_add(10, self.process_queue)
         self.thread1 = threading.Thread(target=self._do_popen)
         self.thread1.start()
         
@@ -88,7 +102,6 @@ class CmdDialog(gtk.Dialog):
         if not self.cmdline:
             return
 
-        #print("start popen: %s\n" % self.cmdline)
         pop = subprocess.Popen(self.cmdline, 
                                shell=True,
                                stderr=subprocess.STDOUT,
@@ -107,20 +120,18 @@ class CmdDialog(gtk.Dialog):
                     out = pop.stdout.read(blocksize)
                     if blocksize < 1024 * 50:
                         blocksize *= 2
-                self.write(out)
+                self.queue.put(out)
             out = pop.stdout.read()
-            self.write(out)
+            self.queue.put(out)
         except IOError:
             pass
 
         self._button_ok.set_sensitive(True)
 
 def run(cmd=''):
-    gtk.gdk.threads_init()
     dlg = CmdDialog(cmd)
-    gtk.gdk.threads_enter()
     dlg.run()
-    gtk.gdk.threads_leave()
+    dlg.hide()
     
 if __name__ == "__main__":
     import sys
