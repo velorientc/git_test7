@@ -102,6 +102,9 @@ def parse(args):
     elif option['hgcmd'] in ('tip', 'parents', 'heads'):
         import hggtk.revisions
         return hggtk.revisions.run(root=option['root'], page=option['hgcmd'])
+    elif option['hgcmd'] == 'update':
+        import hggtk.update
+        return hggtk.update.run(root=option['root'])
     else:
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)
