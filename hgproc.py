@@ -99,6 +99,9 @@ def parse(args):
     elif option['hgcmd'] == 'diff':
         import hggtk.diff
         return hggtk.diff.run(root=option['root'], files=filelist)
+    elif option['hgcmd'] == 'merge':
+        import hggtk.merge
+        return hggtk.merge.run(root=option['root'])
     elif option['hgcmd'] in ('tip', 'parents', 'heads'):
         import hggtk.revisions
         return hggtk.revisions.run(root=option['root'], page=option['hgcmd'])
