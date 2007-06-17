@@ -79,7 +79,7 @@ class UpdateDialog(gtk.Dialog):
         import cmd
         cmdline = 'hg update --repository %s --rev %s' % \
                         (util.shellquote(self.root), rev)
-        if overwrite: cmdline += "--clean"
+        if overwrite: cmdline += " --clean"
         cmd.run(cmdline)
 
 def run(root=''):
