@@ -545,7 +545,7 @@ class ContextMenuExtension:
         self._run_dialog('heads', True)
 
     def _log(self, parent_window):
-        self._run_dialog('log', True, verbose=False)
+        self._run_dialog('log', verbose=False)
 
     def _show_tags(self, parent_window):
         self._run_dialog('tags', True, verbose=False)

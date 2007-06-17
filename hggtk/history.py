@@ -176,11 +176,11 @@ class HistoryDialog(gtk.Dialog):
         if self.start_rev == 'tip':
             self.tip_rev = self._get_revision_on_page(0)
         
-    def _do_hg_cmd(self, cmd, options, files=[]):
+    def _do_hg_cmd(self, cmd, options):
         import os.path
         from mercurial.commands import parse
                   
-        absfiles = [os.path.join(self.root, x) for x in files]
+        absfiles = [os.path.join(self.root, x) for x in self.files]
         try:
             self.repo.ui.pushbuffer()
             c, func, args, opts, cmdoptions = parse(self.repo.ui, cmd)
