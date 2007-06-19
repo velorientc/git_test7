@@ -15,12 +15,6 @@ import sys
 from mercurial import hg, repo, ui, cmdutil, util, patch
 from mercurial.i18n import _
 
-try:
-    import gtksourceview
-    have_gtksourceview = True
-except ImportError:
-    have_gtksourceview = False
-
 class DiffWindow(gtk.Window):
     """Diff window.
 
@@ -81,7 +75,8 @@ class DiffWindow(gtk.Window):
         pane.pack2(scrollwin)
         scrollwin.show()
 
-        if have_gtksourceview:
+        try:
+            import gtksourceview
             self.buffer = gtksourceview.SourceBuffer()
             slm = gtksourceview.SourceLanguagesManager()
             gsl = slm.get_language_from_mime_type("text/x-patch")
@@ -89,7 +84,7 @@ class DiffWindow(gtk.Window):
             self.buffer.set_highlight(True)
 
             sourceview = gtksourceview.SourceView(self.buffer)
-        else:
+        except ImportError:
             self.buffer = gtk.TextBuffer()
             sourceview = gtk.TextView(self.buffer)
 
