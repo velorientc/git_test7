@@ -59,13 +59,6 @@ def parse(args):
     if filelist:
         cmdline += " %s" % " ".join([thgutil.shellquote(x) for x in filelist])
 
-    cmd_notify = ('add', 'revert', 'merge', 'rollback')
-    if option.has_key('notify') or option['hgcmd'] in cmd_notify:
-        if filelist:
-            opt['notify_list'] = filelist
-        elif option.has_key('cwd'):
-            opt['notify_list'] = [ option['cwd'] ]
-    
     if option['hgcmd'] == 'commit':
         import hggtk.commit
         if not filelist:
