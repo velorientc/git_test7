@@ -13,9 +13,10 @@ except:
 import sys
 import gtk
 import gobject
-from mercurial import hg, repo, ui, cmdutil, util, node
+from mercurial import util
 from mercurial.i18n import _
 from dialog import question_dialog, error_dialog
+import hglib
 
 DIALOG_TYPE_ADD = 1
 DIALOG_TYPE_REMOVE = 2
@@ -53,7 +54,8 @@ class AddRemoveDialog(gtk.Dialog):
         self.cmd = cmd
         self.root = root
         self.files = files
-
+        self.hg = hglib.Hg(root)
+        
         # set dialog title
         title = "hg %s" % cmd
         if root: title += " - %s" % root
@@ -118,19 +120,10 @@ class AddRemoveDialog(gtk.Dialog):
         # clear changed files display
         self._file_store.clear()
 
-        # open Hg repo
-        u = ui.ui()
-        try:
-            repo = hg.repository(u, path=self.root)
-        except repo.RepoError:
-            return None
-        self.repo = repo
-        
         # get file status
         try:
-            files, matchfn, anypats = cmdutil.matchpats(repo, self.files)
-            modified, added, removed, deleted, unknown, ignored, clean = [
-                    n for n in repo.status(files=files, list_clean=self.list_clean)]
+            modified, added, removed, deleted, unknown, ignored, clean = \
+                    self.hg.status(files=self.files, list_clean=self.list_clean)
         except util.Abort, inst:
             return None
             
@@ -186,14 +179,9 @@ class AddRemoveDialog(gtk.Dialog):
                 # refresh changed file display
                 self._generate_status()
          
-    def _do_hg_cmd(self, cmd, files):
-        import os.path
-        from mercurial.commands import parse
-        
-        absfiles = [os.path.join(self.root, x) for x in files]
+    def _do_hg_cmd(self, cmd, files):        
         try:
-            c, func, args, opts, cmdoptions = parse(self.repo.ui, [cmd])
-            func(self.repo.ui, self.repo, *absfiles, **cmdoptions)
+            self.hg.command(cmd, files=files)
         except util.Abort, inst:
             error_dialog("Error in revert", "abort: %s" % inst)
             return False

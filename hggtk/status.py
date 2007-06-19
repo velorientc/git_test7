@@ -23,12 +23,13 @@ except:
 import sys
 import gtk
 from dialog import question_dialog, error_dialog
-from mercurial import hg, repo, ui, cmdutil, util
+from mercurial import util
 from mercurial.i18n import _
+import hglib
 
 class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
-    def __init__(self, root='', files=[], list_clean=False):
+    def __init__(self, path='', files=[], list_clean=False):
         """ Initialize the Status window. """
         super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -38,7 +39,9 @@ class StatusDialog(gtk.Dialog):
         if root: title += " - %s" % root
         self.set_title(title)
 
-        self.root = root
+        self.path = path
+        self.hg = hglib.Hg(path)
+        self.root = self.hg.root
         self.files = files
         self.list_clean = list_clean
         
@@ -86,19 +89,11 @@ class StatusDialog(gtk.Dialog):
     def _generate_status(self):
         # clear changed files display
         self.model.clear()
-        
-        # open hg repo
-        u = ui.ui()
-        try:
-            self.repo = hg.repository(u, path=self.root)
-        except repo.RepoError:
-            return None
-        
+
         # get file status
         try:
-            files, matchfn, anypats = cmdutil.matchpats(self.repo, self.files)
-            modified, added, removed, deleted, unknown, ignored, clean = [
-                    n for n in self.repo.status(files=files, list_clean=self.list_clean)]
+            status = self.hg.status(self.files, list_clean=self.list_clean)
+            modified, added, removed, deleted, unknown, ignored, clean = status
         except util.Abort, inst:
             return None
 
@@ -139,7 +134,7 @@ class StatusDialog(gtk.Dialog):
             diff = DiffWindow()
             diff._set_as_dialog(modal=True)
             
-            selpath = os.path.join(self.repo.root, file)
+            selpath = os.path.join(self.root, file)
             diff.set_diff(self.root, [ selpath ])
             diff.show()
 
@@ -172,13 +167,8 @@ class StatusDialog(gtk.Dialog):
         return list
         
     def _do_revert(self, files):
-        import os.path
-        from mercurial import commands
-        
-        absfiles = [os.path.join(self.root, x) for x in files]
         try:
-            cmdoptions = commands.parse(self.repo.ui, ['revert'])[4]
-            commands.revert(self.repo.ui, self.repo, *absfiles, **cmdoptions)
+            self.hg.command('revert', files=files)
         except util.Abort, inst:
             error_dialog("Error in revert", "abort: %s" % inst)
             return False

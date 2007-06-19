@@ -13,8 +13,9 @@ except:
 import sys
 import gtk
 from dialog import question_dialog, error_dialog
-from mercurial import hg, repo, ui, cmdutil, util
+from mercurial import util
 from mercurial.i18n import _
+import hglib
 
 class HistoryDialog(gtk.Dialog):
     """ Dialog to display Mercurial history """
@@ -41,6 +42,8 @@ class HistoryDialog(gtk.Dialog):
         self.start_rev = 'tip'
         self.tip_rev = None
         self.selected = (None, None)
+
+        self.hg = hglib.Hg(root)
         
         # build dialog
         self._create()
@@ -118,21 +121,12 @@ class HistoryDialog(gtk.Dialog):
         rev, id = cs.split(':')
         self.selected = (rev, id)
         
-    def _get_hg_history(self, rev=None, limit=10):
-        # open hg repo
-        if 1 or not self.repo:
-            u = ui.ui()
-            try:
-                self.repo = hg.repository(u, path=self.root)
-            except repo.RepoError:
-                return None
-        
+    def _get_hg_history(self, rev=None, limit=10):    
         # get history
-        logcmd = ['log']
         options = {}
         if rev: options['rev'] = [rev]
         if limit: options['limit'] = limit
-        self._do_hg_cmd(logcmd, options)
+        self._do_hg_cmd('log', options)
         
         # parse log output
         import re
@@ -178,15 +172,9 @@ class HistoryDialog(gtk.Dialog):
         
     def _do_hg_cmd(self, cmd, options):
         import os.path
-        from mercurial.commands import parse
                   
-        absfiles = [os.path.join(self.root, x) for x in self.files]
         try:
-            self.repo.ui.pushbuffer()
-            c, func, args, opts, cmdoptions = parse(self.repo.ui, cmd)
-            cmdoptions.update(options)
-            func(self.repo.ui, self.repo, *absfiles, **cmdoptions)
-            self.hgout = self.repo.ui.popbuffer()
+            self.hgout = self.hg.command(cmd, options=options, files=self.files)
         except util.Abort, inst:
             error_dialog("Error in revert", "abort: %s" % inst)
             return False
