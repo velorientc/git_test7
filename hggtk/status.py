@@ -36,7 +36,7 @@ class StatusDialog(gtk.Dialog):
 
         # set dialog title
         title = "hg status "
-        if root: title += " - %s" % root
+        if path: title += " - %s" % path
         self.set_title(title)
 
         self.path = path
@@ -179,7 +179,7 @@ class StatusDialog(gtk.Dialog):
         return True
 
 def run(root='', files=[]):
-    dialog = StatusDialog(root=root, files=files)
+    dialog = StatusDialog(path=root, files=files)
     dialog.run()
     
 if __name__ == "__main__":
