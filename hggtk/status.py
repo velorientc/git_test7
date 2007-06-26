@@ -26,6 +26,7 @@ from dialog import question_dialog, error_dialog
 from mercurial import util
 from mercurial.i18n import _
 import hglib
+from shlib import shell_notify
 
 class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
@@ -150,6 +151,8 @@ class StatusDialog(gtk.Dialog):
             if self._do_revert(files) == True:
                 # refresh changed file display
                 self._generate_status()
+                paths = [os.path.join(self.root, x) for x in files]
+                shell_notify(paths)
    
     def _get_tree_selections(self, treeview, index=0):
         treeselection = treeview.get_selection()
