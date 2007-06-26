@@ -6,17 +6,17 @@ try:
     commands.demandimport.disable()
     try:
         # Mercurail 0.9.4
-        from mercurial.cmdutil import parse, findrepo
+        from mercurial.cmdutil import parse
     except:
         # Mercurail <= 0.9.3
         from mercurial.commands import parse
-        def findrepo():
-            return
 finally:
     commands.demandimport.enable()
 
-def rootpath(path):
+def rootpath(path=None):
     """ find Mercurial's repo root of path """
+    if not path:
+        path = os.getcwd()
     p = os.path.isdir(path) and path or os.path.dirname(path)
     while not os.path.isdir(os.path.join(p, ".hg")):
         oldp = p
@@ -28,13 +28,9 @@ def rootpath(path):
 class Hg:
     def __init__(self, path=''):
         self.u = ui.ui()
-        if path:
-            self.path = rootpath(path)
-        else:
-            self.path = findrepo() or ""
-
-        self.repo = hg.repository(self.u, path=self.path)
-        self.root = self.repo.root
+        self.path = path
+        self.root = rootpath(path)
+        self.repo = hg.repository(self.u, path=self.root)
        
     def command(self, cmd, files=[], options={}):
         absfiles = [os.path.join(self.root, x) for x in files]
