@@ -92,7 +92,7 @@ def parse(args):
         return hggtk.revisions.run(root=option['root'], page=option['hgcmd'])
     elif option['hgcmd'] == 'update':
         import hggtk.update
-        return hggtk.update.run(root=option['root'])
+        return hggtk.update.run(cwd=option['cwd'])
     else:
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)

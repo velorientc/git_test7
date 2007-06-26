@@ -7,24 +7,26 @@
 import pygtk
 pygtk.require("2.0")
 
+import os
 import sys
 import gtk
 from dialog import *
 from mercurial import util
+from shlib import shell_notify
+from hglib import rootpath
 
 class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
-    def __init__(self, root=''):
+    def __init__(self, cwd=''):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
         super(UpdateDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
-
-        self.root = root
+        self.cwd = cwd or os.getcwd()
+        self.root = rootpath(self.cwd)
 
         # set dialog title
-        title = "hg update"
-        if root: title += " - %s" % root
+        title = "hg update - %s" % self.cwd
         self.set_title(title)
 
         self._create()
@@ -81,16 +83,18 @@ class UpdateDialog(gtk.Dialog):
                         (util.shellquote(self.root), rev)
         if overwrite: cmdline += " --clean"
         cmd.run(cmdline)
+        print "running cmd..."
+        shell_notify([self.cwd])
 
-def run(root=''):
-    dialog = UpdateDialog(root=root)
+def run(cwd=''):
+    dialog = UpdateDialog(cwd=cwd)
     dialog.run()
     return 
 
 if __name__ == "__main__":
     import sys
-    root = len(sys.argv) > 1 and sys.argv[1:] or []
-    run(*root)
+    path = len(sys.argv) > 1 and sys.argv[1] or ''
+    run(path)
 
                                            
                                            
