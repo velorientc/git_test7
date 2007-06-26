@@ -2,6 +2,19 @@ import os.path
 from mercurial import hg, ui, cmdutil, commands
 from mercurial.node import *
 
+try:
+    commands.demandimport.disable()
+    try:
+        # Mercurail 0.9.4
+        from mercurial.cmdutil import parse, findrepo
+    except:
+        # Mercurail <= 0.9.3
+        from mercurial.commands import parse
+        def findrepo():
+            return
+finally:
+    commands.demandimport.enable()
+
 def rootpath(path):
     """ find Mercurial's repo root of path """
     p = os.path.isdir(path) and path or os.path.dirname(path)
@@ -14,15 +27,19 @@ def rootpath(path):
 
 class Hg:
     def __init__(self, path=''):
-        self.path = path
         self.u = ui.ui()
-        self.repo = hg.repository(self.u, path=rootpath(path))
+        if path:
+            self.path = rootpath(path)
+        else:
+            self.path = findrepo() or ""
+
+        self.repo = hg.repository(self.u, path=self.path)
         self.root = self.repo.root
        
     def command(self, cmd, files=[], options={}):
         absfiles = [os.path.join(self.root, x) for x in files]
         self.repo.ui.pushbuffer()
-        c, func, args, opts, cmdoptions = commands.parse(self.repo.ui, [cmd])
+        c, func, args, opts, cmdoptions = parse(self.repo.ui, [cmd])
         cmdoptions.update(options)
         func(self.repo.ui, self.repo, *absfiles, **cmdoptions)
         outtext = self.repo.ui.popbuffer()
