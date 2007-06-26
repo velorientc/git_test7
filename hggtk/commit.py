@@ -27,6 +27,7 @@ from mercurial import hg, repo, ui, cmdutil, util
 from mercurial.i18n import _
 from dialog import error_dialog, question_dialog
 from shlib import shell_notify
+import hglib
 
 class CommitDialog(gtk.Dialog):
     """ New implementation of the Commit dialog. """
@@ -39,6 +40,7 @@ class CommitDialog(gtk.Dialog):
               
         self.root = root
         self.files = files
+        self.hg = hglib.Hg(self.root)
         
         # Create the widgets
         self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
@@ -134,7 +136,7 @@ class CommitDialog(gtk.Dialog):
             return
 
         try:
-            self.repo.commit(specific_files, message)
+            self.hg.repo.commit(specific_files, message)
         except ValueError, inst:
             error_dialog(_('Error during commit'),
                          _(str(inst)))
@@ -163,20 +165,11 @@ class CommitDialog(gtk.Dialog):
     def _generate_status(self):
         # clear changed files display
         self._file_store.clear()
-
-        # open Hg repo
-        u = ui.ui()
-        try:
-            repo = hg.repository(u, path=self.root)
-        except repo.RepoError:
-            return None
-        self.repo = repo
         
         # get file status
         try:
-            files, matchfn, anypats = cmdutil.matchpats(repo, self.files)
-            modified, added, removed, deleted, unknown, ignored, clean = [
-                    n for n in repo.status(files=files, list_clean=False)]
+            status = self.hg.status(self.files)
+            modified, added, removed, deleted, unknown, ignored, clean = status
         except util.Abort, inst:
             return None
 
