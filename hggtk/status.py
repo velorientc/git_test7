@@ -151,8 +151,7 @@ class StatusDialog(gtk.Dialog):
             if self._do_revert(files) == True:
                 # refresh changed file display
                 self._generate_status()
-                paths = [os.path.join(self.root, x) for x in files]
-                shell_notify(paths)
+                shell_notify(self.hg.abspath(files))
    
     def _get_tree_selections(self, treeview, index=0):
         treeselection = treeview.get_selection()

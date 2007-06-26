@@ -46,3 +46,6 @@ class Hg:
         status = [n for n in self.repo.status(files=files, list_clean=list_clean)]    
         return status
         
+    def abspath(self, files):
+        return [os.path.join(self.root, x) for x in files]
+
