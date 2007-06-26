@@ -26,6 +26,7 @@ import pango
 from mercurial import hg, repo, ui, cmdutil, util
 from mercurial.i18n import _
 from dialog import error_dialog, question_dialog
+from shlib import shell_notify
 
 class CommitDialog(gtk.Dialog):
     """ New implementation of the Commit dialog. """
@@ -140,6 +141,7 @@ class CommitDialog(gtk.Dialog):
         
         self._generate_status()     # refresh file list
         self._clear_commit_message()
+        shell_notify(specific_files)
         return
 
     def _create_file_view(self):
