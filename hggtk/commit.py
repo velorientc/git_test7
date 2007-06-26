@@ -20,6 +20,7 @@ try:
 except:
     pass
 
+import os
 import gtk
 import gobject
 import pango
@@ -143,7 +144,8 @@ class CommitDialog(gtk.Dialog):
         
         self._generate_status()     # refresh file list
         self._clear_commit_message()
-        shell_notify(specific_files)
+        paths = [os.path.join(self.root, x) for x in specific_files]
+        shell_notify(paths)
         return
 
     def _create_file_view(self):
