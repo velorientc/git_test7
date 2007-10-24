@@ -112,7 +112,7 @@ class CommitDialog(gtk.Dialog):
             diff._set_as_dialog(modal=True)
             
             _selected = model.get_value(iter, 1)          
-            selpath = os.path.join(self.repo.root, _selected)
+            selpath = os.path.join(self.hg.repo.root, _selected)
             print "commit: selected = ", selpath
             diff.set_diff(self.root, [ selpath ])
             diff.show()
