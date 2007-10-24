@@ -3,15 +3,26 @@ from mercurial import hg, ui, cmdutil, commands
 from mercurial.node import *
 
 try:
-    commands.demandimport.disable()
+    try:
+        commands.demandimport.disable()
+    except:
+        pass    # 0.9.5 has demandimport removed
     try:
         # Mercurail 0.9.4
         from mercurial.cmdutil import parse
     except:
-        # Mercurail <= 0.9.3
-        from mercurial.commands import parse
+        try:
+            # Mercurail <= 0.9.3
+            from mercurial.commands import parse
+        except:
+            # Mercurail 0.9.5
+            from mercurial.dispatch import _parse as parse
+
 finally:
-    commands.demandimport.enable()
+    try:
+        commands.demandimport.enable()
+    except:
+        pass     # 0.9.5 has demandimport removed
 
 def rootpath(path=None):
     """ find Mercurial's repo root of path """
