@@ -11,7 +11,8 @@ import os
 import sys
 import gtk
 from dialog import *
-from mercurial import util
+from mercurial.node import *
+from mercurial import util, hg, repo, ui
 from shlib import shell_notify
 from hglib import rootpath
 
@@ -24,6 +25,12 @@ class UpdateDialog(gtk.Dialog):
                                            buttons=buttons)
         self.cwd = cwd or os.getcwd()
         self.root = rootpath(self.cwd)
+        
+        u = ui.ui()
+        try:
+            self.repo = hg.repository(u, path=self.root)
+        except repo.RepoError:
+            return None
 
         # set dialog title
         title = "hg update - %s" % self.cwd
@@ -39,12 +46,30 @@ class UpdateDialog(gtk.Dialog):
         lbl = gtk.Label("Update to revision:")
         lbl.set_property("width-chars", 20)
         lbl.set_justify(gtk.JUSTIFY_LEFT)
-        self._rev_input = gtk.Entry()
-        self._rev_input.set_text("tip")
+        
+        # revisions  combo box
+        revlist = gtk.ListStore(str, str)
+        self._revbox = gtk.ComboBoxEntry(revlist, 0)
+        
+        # add extra column to droplist for type of changeset
+        cell = gtk.CellRendererText()
+        self._revbox.pack_start(cell)
+        self._revbox.add_attribute(cell, 'text', 1)
+    
+        # populate revision data
+        self._rev_input = self._revbox.get_child()
+        heads = self.repo.heads()
+        if heads:
+            revlist.append([short(heads[0]), "(tip)"])
+            self._rev_input.set_text(short(heads[0]))
+        for i, node in enumerate(heads):
+            revlist.append([short(node), "(head %d)" % (i+1)])
+        
+        # setup buttons
         self._btn_rev_browse = gtk.Button("Browse...")
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(lbl, False, False)
-        revbox.pack_start(self._rev_input, False, False)
+        revbox.pack_start(self._revbox, False, False)
         revbox.pack_start(self._btn_rev_browse, False, False, 5)
         self.vbox.pack_start(revbox, False, False, 2)
 
