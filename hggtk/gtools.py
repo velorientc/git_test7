@@ -41,7 +41,7 @@ respectively:
 diffcmd diffopts file_rev1 file_rev2
 """
 
-import mercurial.demandimport; mercurial.demandimport.enable()
+import mercurial.demandimport; mercurial.demandimport.disable()
 
 import os
 import threading
