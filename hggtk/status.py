@@ -14,7 +14,7 @@ def run(root='', files=[]):
 
     cmdoptions = {
         'all':False, 'clean':False, 'ignored':False, 'modified':True,
-        'added':True, 'removed':True, 'deleted':True, 'unknown':True, 'rev':[],
+        'added':True, 'removed':True, 'deleted':True, 'unknown':False, 'rev':[],
         'exclude':[], 'include':[], 'debug':True,'verbose':True
     }
     
