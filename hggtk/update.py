@@ -59,9 +59,9 @@ class UpdateDialog(gtk.Dialog):
         # populate revision data
         self._rev_input = self._revbox.get_child()
         heads = self.repo.heads()
-        if heads:
-            revlist.append([short(heads[0]), "(tip)"])
-            self._rev_input.set_text(short(heads[0]))
+        tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
+        revlist.append([short(tip), "(tip)"])
+        self._rev_input.set_text(short(tip))
         for i, node in enumerate(heads):
             revlist.append([short(node), "(head %d)" % (i+1)])
         
