@@ -60,8 +60,9 @@ class MergeDialog(gtk.Dialog):
         tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
         revlist.append([short(tip), "(tip)"])
         self._rev_input.set_text(short(tip))
-        for i, node in enumerate(heads):
-            revlist.append([short(node), "(head %d)" % (i+1)])
+        if len(heads) > 1:
+            for i, node in enumerate(heads):
+                revlist.append([short(node), "(head %d)" % (i+1)])
 
         self._btn_rev_browse = gtk.Button("Browse...")
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
