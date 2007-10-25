@@ -436,7 +436,7 @@ class GDialog(gtk.Window):
             file = None
             settings = self.save_settings()
             versioned = (GDialog.settings_version, settings)
-            dirname = os.path.join(os.path.expanduser('~'), '.hg/gtools')
+            dirname = os.path.join(os.path.expanduser('~'), '.gtools')
             filename = os.path.join(dirname, self.__class__.__name__)
             try:
                 if not os.path.exists(dirname):
@@ -456,7 +456,7 @@ class GDialog(gtk.Window):
         try:
             file = None
             settings = None
-            dirname = os.path.join(os.path.expanduser('~'), '.hg/gtools')
+            dirname = os.path.join(os.path.expanduser('~'), '.gtools')
             filename = os.path.join(dirname, self.__class__.__name__)
             try:
                 file = open(filename, 'rb')
