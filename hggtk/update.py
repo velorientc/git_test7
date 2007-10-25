@@ -62,8 +62,9 @@ class UpdateDialog(gtk.Dialog):
         tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
         revlist.append([short(tip), "(tip)"])
         self._rev_input.set_text(short(tip))
-        for i, node in enumerate(heads):
-            revlist.append([short(node), "(head %d)" % (i+1)])
+        if len(heads) > 1:
+            for i, node in enumerate(heads):
+                revlist.append([short(node), "(head %d)" % (i+1)])
         
         # setup buttons
         self._btn_rev_browse = gtk.Button("Browse...")
