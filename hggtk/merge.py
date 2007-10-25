@@ -23,7 +23,7 @@ class MergeDialog(gtk.Dialog):
         self.root = root
 
         # set dialog title
-        title = "hg update"
+        title = "hg merge"
         if root: title += " - %s" % root
         self.set_title(title)
 
