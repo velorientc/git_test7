@@ -16,6 +16,7 @@ import gobject
 from mercurial import util
 from mercurial.i18n import _
 from dialog import question_dialog, error_dialog
+from shlib import shell_notify
 import hglib
 
 DIALOG_TYPE_ADD = 1
@@ -170,6 +171,7 @@ class AddRemoveDialog(gtk.Dialog):
             if self._do_hg_cmd('add', files) == True:
                 # refresh changed file display
                 self._generate_status()
+                shell_notify(self.hg.abspath(files))
        
     def _do_remove(self, files):
         response = question_dialog("Remove selected files?", "")
