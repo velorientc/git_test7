@@ -63,8 +63,6 @@ from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
 
-gtk.gdk.threads_init()
-
 def gcommit(ui, repo, *pats, **opts):
     """graphical display for committing outstanding changes
 
@@ -136,6 +134,7 @@ def glog(ui, repo, *pats, **opts):
 
 
 def run(dialog):
+    gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     dialog.display()
     gtk.main()
