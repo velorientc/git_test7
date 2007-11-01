@@ -32,9 +32,6 @@ import py2exe
 py2exe_options = dict(
         excludes = "pywin,pywin.dialogs,pywin.dialogs.list",
         includes = "pango,atk,pangocairo,cairo,gobject",
-        dll_excludes = [
-            "libgdk_pixbuf-2.0-0.dll","libpango-1.0-0.dll",
-        ],
     )
 
 setup(name="TortoiseHg COM server",
