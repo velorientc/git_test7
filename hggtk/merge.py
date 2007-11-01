@@ -26,7 +26,7 @@ class MergeDialog(gtk.Dialog):
         u = ui.ui()
         try:
             self.repo = hg.repository(u, path=self.root)
-        except repo.RepoError:
+        except hg.RepoError:
             return None
 
         # set dialog title

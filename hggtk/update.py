@@ -12,7 +12,7 @@ import sys
 import gtk
 from dialog import *
 from mercurial.node import *
-from mercurial import util, hg, repo, ui
+from mercurial import util, hg, ui
 from shlib import shell_notify
 from hglib import rootpath
 
@@ -29,7 +29,7 @@ class UpdateDialog(gtk.Dialog):
         u = ui.ui()
         try:
             self.repo = hg.repository(u, path=self.root)
-        except repo.RepoError:
+        except hg.RepoError:
             return None
 
         # set dialog title

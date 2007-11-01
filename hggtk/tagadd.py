@@ -14,7 +14,7 @@ import os
 import sys
 import gtk
 from dialog import question_dialog, error_dialog, info_dialog
-from mercurial import hg, repo, ui, cmdutil, util
+from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
 
@@ -147,7 +147,7 @@ class TagAddDialog(gtk.Dialog):
         u = ui.ui()
         try:
             repo = hg.repository(u, path=self.root)
-        except repo.RepoError:
+        except hg.RepoError:
             return None
 
         if name in repo.tags() and not force:

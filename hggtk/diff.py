@@ -12,7 +12,7 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 import gtk
 import pango
 import sys
-from mercurial import hg, repo, ui, cmdutil, util, patch
+from mercurial import hg, ui, cmdutil, util, patch
 from mercurial.i18n import _
 
 class DiffWindow(gtk.Window):
@@ -106,7 +106,7 @@ class DiffWindow(gtk.Window):
         self.ui = ui.ui()
         try:
             self.repo = hg.repository(self.ui, path=self.root)
-        except repo.RepoError:
+        except hg.RepoError:
             return None
 
         self.files, matchfn, anypats = cmdutil.matchpats(self.repo, self.files)

@@ -13,7 +13,7 @@ except:
 import gtk
 import gobject
 import pango
-from mercurial import hg, repo, ui, cmdutil, util
+from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
 from dialog import error_dialog, question_dialog
@@ -90,7 +90,7 @@ class RevisionDialog(gtk.Dialog):
         u = ui.ui()
         try:
             repo = hg.repository(u, path=self.root)
-        except repo.RepoError:
+        except hg.RepoError:
             return None
         self.repo = repo
         
