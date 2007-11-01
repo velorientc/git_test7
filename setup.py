@@ -28,9 +28,15 @@ except ImportError:
 from distutils.core import setup
 import py2exe
 
-# Don't pull in all this MFC stuff used by the makepy UI.
+
 py2exe_options = dict(
+        # Don't pull in all this MFC stuff used by the makepy UI.
         excludes = "pywin,pywin.dialogs,pywin.dialogs.list",
+        
+        # add library files to support PyGtk-based dialogs/windows
+        # Note:
+        #    after py2exe build, copy GTK's etc and lib directories into
+        #    the dist directory created by py2exe
         includes = "pango,atk,pangocairo,cairo,gobject",
     )
 
