@@ -9,6 +9,7 @@ import os
 import sys
 import getopt
 from tortoise import thgutil
+#from hgext import *
 
 def get_option(args):
     long_opt_list =  ['command=', 'exepath=', 'listfile=', 'title=',
@@ -97,6 +98,14 @@ def parse(args):
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)
     
+def run_trapped(args):
+    try:
+        dlg = parse(sys.argv[1:])
+    except:
+        import traceback
+        from hggtk.dialog import error_dialog
+        error_dialog("Error executing hgproc", traceback.format_exc())
+
 if __name__=='__main__':
     #dlg = parse(['-c', 'help', '--', '-v'])
     #dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
@@ -104,4 +113,4 @@ if __name__=='__main__':
     #dlg = parse(['-c', 'add', '--root', 'c:\hg\h1', '--listfile', 'c:\\hg\\h1\\f1', '--notify'])
     #dlg = parse(['-c', 'rollback', '--root', 'c:\\hg\\h1'])
     print "args=", sys.argv
-    dlg = parse(sys.argv[1:])
+    dlg = run_trapped(sys.argv[1:])
