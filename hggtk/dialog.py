@@ -27,7 +27,8 @@ import gtk.glade
 def about():
     raise "About dialog currently under construction"
     
-def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK):
+def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK,
+                    title="TortoiseHg"):
     """ Display a given type of MessageDialog with the given message.
     
     :param type: message dialog type
@@ -36,6 +37,7 @@ def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK):
     """
     dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL, type=type,
                                buttons=buttons)
+    dialog.set_title(title)
     dialog.set_markup('<big><b>' + primary + '</b></big>')
     dialog.format_secondary_markup(secondary)
     response = dialog.run()
