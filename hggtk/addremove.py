@@ -22,29 +22,6 @@ import hglib
 DIALOG_TYPE_ADD = 1
 DIALOG_TYPE_REMOVE = 2
 
-def get_tag_list(path):
-    root = path
-    u = ui.ui()
-    try:
-        repo = hg.repository(u, path=root)
-    except repo.RepoError:
-        return None
-
-    l = repo.tagslist()
-    l.reverse()
-    hexfunc = node.hex
-    taglist = []
-    for t, n in l:
-        try:
-            hn = hexfunc(n)
-            r, c = repo.changelog.rev(n), hexfunc(n)
-        except revlog.LookupError:
-            r, c = "?", hn
-
-        taglist.append((t, r, c))
-
-    return taglist
-
 class AddRemoveDialog(gtk.Dialog):
     """ TortoiseHg dialog to add/remove files """
     def __init__(self, cmd, root='', files=[]):
