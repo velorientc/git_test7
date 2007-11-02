@@ -28,6 +28,11 @@ except ImportError:
 from distutils.core import setup
 import py2exe
 
+# FIXME: quick hack to include installed hg extensions in py2exe binary
+import hgext
+hgextdir = os.path.dirname(hgext.__file__)
+hgextmods = set(["hgext." + os.path.splitext(f)[0]
+                  for f in os.listdir(hgextdir)])
 
 py2exe_options = dict(
         # Don't pull in all this MFC stuff used by the makepy UI.
@@ -37,7 +42,7 @@ py2exe_options = dict(
         # Note:
         #    after py2exe build, copy GTK's etc and lib directories into
         #    the dist directory created by py2exe
-        includes = "pango,atk,pangocairo,cairo,gobject",
+        includes = "pango,atk,pangocairo,cairo,gobject," + ",".join(hgextmods),
     )
 
 setup(name="TortoiseHg COM server",
