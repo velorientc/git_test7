@@ -17,6 +17,7 @@ def run(root='', files=[]):
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
         'unknown':False, 'ignored':False, 
         'exclude':[], 'include':[],
+        'check': False, 'git':False, 'logfile':'', 'addremove':False,
     }
     
     gtools.gcommit(u, repo, *files, **cmdoptions)
