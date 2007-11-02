@@ -9,7 +9,10 @@ import os
 import sys
 import getopt
 from tortoise import thgutil
-#from hgext import *
+
+os.environ['PATH'] = "%s;%s" % (thgutil.get_prog_root(), os.environ['PATH'])
+hg_executable = thgutil.find_path("hg")
+print "hgproc: hg_executable = %s" % hg_executable
 
 def get_option(args):
     long_opt_list =  ['command=', 'exepath=', 'listfile=', 'title=',
