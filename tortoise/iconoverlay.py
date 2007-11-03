@@ -105,6 +105,7 @@ class IconOverlayExtension(object):
         """
         global overlay_cache
         print "called: _get_state(%s)" % path
+        tc = win32api.GetTickCount()
         
         # debugging
         if IconOverlayExtension.counter > 10000:
@@ -115,6 +116,7 @@ class IconOverlayExtension(object):
         
         if os.path.basename(path) == ".hg":
             print "%s: skip directory" % path
+            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
             return NOT_IN_TREE      # ignore .hg directories (for efficiency)
 
         if 0 and os.path.isdir(path):
@@ -122,7 +124,6 @@ class IconOverlayExtension(object):
             return NOT_IN_TREE      # ignore directories (for efficiency)
 
         # check if path is cached
-        tc = win32api.GetTickCount()
         if overlay_cache.has_key(path):
             if tc - overlay_cache[path]['ticks'] < CACHE_TIMEOUT:
                 print "%s: %s (cached)" % (path, overlay_cache[path]['status'])
@@ -133,11 +134,13 @@ class IconOverlayExtension(object):
         print "_get_state: root = ", root
         if root is None:
             print "_get_state: not in repo"
+            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
             return NOT_IN_TREE
 
         # skip root direcory to improve speed
         if root == path:
             print "_get_state: skip repo root"
+            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
             return NOT_IN_TREE
 
         u = ui.ui()
@@ -146,6 +149,7 @@ class IconOverlayExtension(object):
         except repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
+            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
             return NOT_IN_TREE
 
         # get file status
