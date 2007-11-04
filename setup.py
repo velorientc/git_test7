@@ -41,7 +41,9 @@ py2exe_options = dict(
         # add library files to support PyGtk-based dialogs/windows
         # Note:
         #    after py2exe build, copy GTK's etc and lib directories into
-        #    the dist directory created by py2exe
+        #    the dist directory created by py2exe.
+        #    also needed is the GTK's share/themes (as dist/share/themes), 
+        #    for dialogs to display in MS-Windows XP theme.
         includes = "pango,atk,pangocairo,cairo,gobject," + ",".join(hgextmods),
     )
 
