@@ -43,11 +43,11 @@ class TraceDialog(gtk.Dialog):
         self.connect('delete_event', self._on_window_close_clicked)
 
     def _on_ok_clicked(self, button):
-        self._read_trace = False
+        self._stop_read_thread()
         self.response(gtk.RESPONSE_ACCEPT)
         
     def _on_window_close_clicked(self, event, param):
-        self._read_trace = False
+        self._stop_read_thread()
         
     def _on_window_map_event(self, event, param):
         self._begin_trace()
@@ -63,6 +63,12 @@ class TraceDialog(gtk.Dialog):
         self._read_trace = True
         self.thread1 = threading.Thread(target=self._do_read_trace)
         self.thread1.start()
+
+    def _stop_read_thread(self):
+        self._read_trace = False
+
+        # wait for worker thread to to fix Unhandled exception in thread
+        self.thread1.join() 
         
     def _process_queue(self):
         """
