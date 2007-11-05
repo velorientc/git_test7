@@ -23,10 +23,14 @@ class TraceDialog(gtk.Dialog):
         # construct dialog
         self.set_default_size(width, height)
         
+        self._button_clear = gtk.Button("Clear")
+        self._button_clear.connect('clicked', self._on_clear_clicked)
+        self.action_area.pack_end(self._button_clear)
+
         self._button_ok = gtk.Button("OK")
         self._button_ok.connect('clicked', self._on_ok_clicked)
-        self.action_area.pack_end(self._button_ok)
-        
+        self.action_area.pack_end(self._button_ok)        
+
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
@@ -45,6 +49,9 @@ class TraceDialog(gtk.Dialog):
     def _on_ok_clicked(self, button):
         self._stop_read_thread()
         self.response(gtk.RESPONSE_ACCEPT)
+        
+    def _on_clear_clicked(self, button):
+        self.write("", False)
         
     def _on_window_close_clicked(self, event, param):
         self._stop_read_thread()
