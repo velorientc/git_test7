@@ -33,6 +33,9 @@ working copy. To enable gtools:
    fontcomment = courier 10
    fontdiff = courier 10
    fontlist = courier 9
+
+   # make the integrated diff window appear at the bottom or side
+   diffbottom = False
  
 The external diff tool is run as shown below. Unless specified otherwise,
 file_rev1 and file_rev2 are the parent revision and the working copy 
@@ -325,6 +328,7 @@ class GDialog(gtk.Window):
         self.fontlist = 'courier 9'
         self.diffopts = ''
         self.diffcmd = ''
+        self.diffbottom = ''
 
         for attr, setting in self.ui.configitems('gtools'):
             if setting : setattr(self, attr, setting)
@@ -332,6 +336,11 @@ class GDialog(gtk.Window):
         if not self.diffcmd :
             if not self.diffopts : self.diffopts = '-Npru'
             self.diffcmd = 'diff'
+
+        if not self.diffbottom or self.diffbottom.lower() == 'false' or self.diffbottom == '0':
+            self.diffbottom = False
+        else:
+            self.diffbottom = True
 
 
     def _parse_opts(self):
@@ -437,7 +446,7 @@ class GDialog(gtk.Window):
             file = None
             settings = self.save_settings()
             versioned = (GDialog.settings_version, settings)
-            dirname = os.path.join(os.path.expanduser('~'), '.hg/gtools')
+            dirname = os.path.join(os.path.expanduser('~'), '.hgext/gtools')
             filename = os.path.join(dirname, self.__class__.__name__)
             try:
                 if not os.path.exists(dirname):
@@ -457,7 +466,7 @@ class GDialog(gtk.Window):
         try:
             file = None
             settings = None
-            dirname = os.path.join(os.path.expanduser('~'), '.hg/gtools')
+            dirname = os.path.join(os.path.expanduser('~'), '.hgext/gtools')
             filename = os.path.join(dirname, self.__class__.__name__)
             try:
                 file = open(filename, 'rb')
@@ -617,6 +626,7 @@ class GLog(GDialog):
                     lines = block.split('\n')
                     parents = []
                     for line in lines:
+                        line = util.fromlocal(line)
                         sep = line.index(':')
                         info = line[0:sep]
                         value = line[sep+1:].strip()
@@ -629,7 +639,7 @@ class GLog(GDialog):
                             log[info] = value
     
                     self.model.append((log['rev'], log['user'], log['summary'], log['date'], 
-                                       util.strdate(log['date'], '%a %b %d %H:%M:%S %Y', {})[0],
+                                       util.strdate(util.tolocal(log['date']), '%a %b %d %H:%M:%S %Y', {})[0],
                                        parents))
                 yield logtext is not None
 
@@ -684,6 +694,7 @@ class GLog(GDialog):
         lines_iter = iter(lines)
 
         for line in lines_iter:
+            line = util.fromlocal(line)
             if line.startswith('changeset:'):
                 buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'changeset')
             if line.startswith('date:'):
@@ -697,9 +708,27 @@ class GLog(GDialog):
                 break;
 
         for line in lines_iter:
+            line = util.fromlocal(line)
             buffer.insert(buff_iter, line + '\n')
 
         self.details_text.set_buffer(buffer)
+        return True
+
+
+    def _search_in_tree(self, model, column, key, iter, data):
+        """Searches all fields shown in the tree when the user hits crtr+f,
+        not just the ones that are set via tree.set_search_column.
+        Case insensitive
+        """
+        key = key.lower()
+        searchable = [x.lower() for x in (
+                        model.get_value(iter,0), #rev id (local)
+                        model.get_value(iter,1), #author
+                        model.get_value(iter,2), #summary
+                        )]
+        for field in searchable:
+            if field.find(key) != -1:
+                return False
         return True
 
 
@@ -708,6 +737,10 @@ class GLog(GDialog):
         self._menu.set_size_request(90, -1)
         menuitem = gtk.MenuItem('_status', True)
         menuitem.connect('activate', self._show_status)
+        menuitem.set_border_width(1)
+        self._menu.append(menuitem)
+        menuitem = gtk.MenuItem("_export patch",True)
+        menuitem.connect('activate',self._export_patch)
         menuitem.set_border_width(1)
         self._menu.append(menuitem)
         self._menu.show_all()
@@ -721,7 +754,7 @@ class GLog(GDialog):
         self.tree.connect('row-activated', self._tree_row_act)
         self.tree.set_reorderable(False)
         self.tree.set_enable_search(True)
-        self.tree.set_search_column(0)
+        self.tree.set_search_equal_func(self._search_in_tree,None)
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
         self.tree.get_selection().connect('changed', self._tree_selection_changed)
         self.tree.set_rubber_banding(False)
@@ -827,6 +860,21 @@ class GLog(GDialog):
             dialog = GStatus(self.ui, self.repo, [], statopts, False)
             dialog.display()
         return True
+
+
+    def _export_patch(self, menuitem):
+        row = self.model[self.tree.get_selection().get_selected()[1]]
+        rev = long(row[0])
+        fd = NativeSaveFileDialogWrapper(Title = "Save patch to")
+        result = fd.run()
+
+        if result:
+            # In case new export args are added in the future, merge the hg defaults
+            exportOpts= self.merge_opts(commands.table['^export'][1], ())
+            exportOpts['output'] = result
+            def dohgexport():
+                commands.export(self.ui,self.repo,str(rev),**exportOpts)
+            success, outtext = self._hg_call_wrapper("Export",dohgexport,False)
 
 
     def _tree_selection_changed(self, selection):
@@ -957,7 +1005,7 @@ class GStatus(GDialog):
 
     def save_settings(self):
         settings = GDialog.save_settings(self)
-        settings['gstatus'] = (self._hpaned.get_position(), self._setting_lasthpos)
+        settings['gstatus'] = (self._diffpane.get_position(), self._setting_lastpos)
         return settings
 
 
@@ -965,11 +1013,11 @@ class GStatus(GDialog):
         GDialog.load_settings(self, settings)
         if settings:
             mysettings = settings['gstatus']
-            self._setting_hpos = mysettings[0]
-            self._setting_lasthpos = mysettings[1]
+            self._setting_pos = mysettings[0]
+            self._setting_lastpos = mysettings[1]
         else:
-            self._setting_hpos = 64000
-            self._setting_lasthpos = 270
+            self._setting_pos = 64000
+            self._setting_lastpos = 270
 
 
     def get_body(self):
@@ -1062,13 +1110,16 @@ class GStatus(GDialog):
         self.diff_text.modify_font(pango.FontDescription(self.fontdiff))
         scroller.add(self.diff_text)
 
-        self._hpaned = gtk.HPaned()
-        self._hpaned.pack1(tree_frame, True, False)
-        self._hpaned.pack2(diff_frame, True, True)
-        self._hpaned.set_position(self._setting_hpos)
-        self._hpaned_moved_id = self._hpaned.connect('notify::position', self._hpaned_moved)
+        if self.diffbottom:
+            self._diffpane = gtk.VPaned()
+        else:
+            self._diffpane = gtk.HPaned()
 
-        return self._hpaned
+        self._diffpane.pack1(tree_frame, True, False)
+        self._diffpane.pack2(diff_frame, True, True)
+        self._diffpane.set_position(self._setting_pos)
+        self._diffpane_moved_id = self._diffpane.connect('notify::position', self._diffpane_moved)
+        return self._diffpane
 
 
     def get_extras(self):
@@ -1101,7 +1152,7 @@ class GStatus(GDialog):
 
 
     def _displayed(self, widget, event):
-        self._hpaned_moved(self._hpaned)
+        self._diffpane_moved(self._diffpane)
         return False
 
 
@@ -1325,6 +1376,7 @@ class GStatus(GDialog):
                 difftext.seek(0)
                 iter = buffer.get_start_iter()
                 for line in difftext:
+                    line = util.fromlocal(line)
                     if line.startswith('---') or line.startswith('+++'):
                         buffer.insert_with_tags_by_name(iter, line, 'header')
                     elif line.startswith('-'):
@@ -1350,29 +1402,33 @@ class GStatus(GDialog):
 
     def _showdiff_toggled(self, togglebutton, data=None):
         # prevent movement events while setting position
-        self._hpaned.handler_block(self._hpaned_moved_id)
+        self._diffpane.handler_block(self._diffpane_moved_id)
 
         if togglebutton.get_active():
             self._tree_selection_changed(self.tree.get_selection(), True)
-            self._hpaned.set_position(self._setting_lasthpos)
+            self._diffpane.set_position(self._setting_lastpos)
         else:
-            self._setting_lasthpos = self._hpaned.get_position()
-            self._hpaned.set_position(64000)
+            self._setting_lastpos = self._diffpane.get_position()
+            self._diffpane.set_position(64000)
             self.diff_text.set_buffer(gtk.TextBuffer())
 
-        self._hpaned.handler_unblock(self._hpaned_moved_id)
+        self._diffpane.handler_unblock(self._diffpane_moved_id)
         return True
 
 
-    def _hpaned_moved(self, paned, data=None):
+    def _diffpane_moved(self, paned, data=None):
         # prevent toggle events while setting toolbar state
         self.showdiff_toggle.handler_block(self._showdiff_toggled_id)
+        if self.diffbottom:
+            sizemax = self._diffpane.get_allocation().height
+        else:
+            sizemax = self._diffpane.get_allocation().width
 
         if self.showdiff_toggle.get_active():
-            if paned.get_position() >=  paned.get_allocation().width - 55:
+            if paned.get_position() >=  sizemax - 55:
                 self.showdiff_toggle.set_active(False)
                 self.diff_text.set_buffer(gtk.TextBuffer())
-        elif paned.get_position() < paned.get_allocation().width - 55:
+        elif paned.get_position() < sizemax - 55:
             self.showdiff_toggle.set_active(True)
             self._tree_selection_changed(self.tree.get_selection(), True)
 
@@ -1742,6 +1798,81 @@ class GCommit(GStatus):
         if success:
             self.text.set_buffer(gtk.TextBuffer())
             self.reload_status()
+
+
+class NativeSaveFileDialogWrapper:
+    """Wrap the windows file dialog, or display default gtk dialog if that isn't available"""
+    def __init__(self, InitialDir = None, Title = "Save File", Filter = {"All files": "*.*"}, FilterIndex = 1):
+        import os.path
+        if InitialDir == None:
+            InitialDir = os.path.expanduser("~")
+        self.InitialDir = InitialDir
+        self.Title = Title
+        self.Filter = Filter
+        self.FilterIndex = FilterIndex
+
+    def run(self):
+        """run the file dialog, either return a file name, or False if the user aborted the dialog"""
+        try:
+            import win32gui
+            if self.tortoiseHgIsInstalled(): #as of 20071021, the file dialog will hang if the tortoiseHg shell extension is installed. I have no clue why, yet - Tyberius Prime
+                   return self.runCompatible()
+            else:
+                    return self.runWindows()
+        except ImportError:
+            return self.runCompatible()
+
+    def tortoiseHgIsInstalled(self):
+        import _winreg
+        try:
+            hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,r"Software\Microsoft\Windows\CurrentVersion\Explorer\ShellIconOverlayIdentifiers\Changed")
+            if hkey:
+                cls = _winreg.QueryValue(hkey,"")
+                return cls == "{102C6A24-5F38-4186-B64A-237011809FAB}"
+        except WindowsError: #reg key not found
+            pass
+        return False
+
+    def runWindows(self):
+        import win32gui, win32con, os
+        filter = ""
+        for name, pattern in self.Filter.items():
+            filter += name + "\0" + pattern + "\0"
+        customfilter = "\0"
+
+        fname, customfilter, flags=win32gui.GetSaveFileNameW(
+            InitialDir=self.InitialDir,
+            Flags=win32con.OFN_EXPLORER,
+            File='', DefExt='py',
+            Title=self.Title,
+            Filter="",
+            CustomFilter="",
+            FilterIndex=1)
+        if fname:
+            return fname
+        else:
+           return False
+
+    def runCompatible(self):
+        file_save =gtk.FileChooserDialog(self.Title,None,
+                gtk.FILE_CHOOSER_ACTION_SAVE
+                , (gtk.STOCK_CANCEL
+                    , gtk.RESPONSE_CANCEL
+                    , gtk.STOCK_SAVE
+                    , gtk.RESPONSE_OK))
+        file_save.set_default_response(gtk.RESPONSE_OK)
+        file_save.set_current_folder(self.InitialDir)
+        for name, pattern in self.Filter.items():
+            fi = gtk.FileFilter()
+            fi.set_name(name)
+            fi.add_pattern(pattern)
+            file_save.add_filter(fi)
+        if file_save.run() == gtk.RESPONSE_OK:
+            result = file_save.get_filename();
+        else:
+            result = False
+        file_save.destroy()
+        return result
 
 
 
