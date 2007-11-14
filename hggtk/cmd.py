@@ -11,6 +11,7 @@ import gtk
 import gobject
 import pango
 import subprocess
+import os
 import threading
 import Queue
 from mercurial import hg, commands, util
@@ -102,6 +103,10 @@ class CmdDialog(gtk.Dialog):
         if not self.cmdline:
             return
 
+        # run hg in unbuffered mode, so the output can be captured and display a.s.a.p.
+        os.environ['PYTHONUNBUFFERED'] = "1"
+
+        # start hg operation on a subprocess and capture the output
         pop = subprocess.Popen(self.cmdline, 
                                shell=True,
                                stderr=subprocess.STDOUT,
