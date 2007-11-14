@@ -24,12 +24,7 @@ Building TortoiseHg installer:
    
       http://www.selenic.com/mercurial/wiki/index.cgi/WindowsInstall
 	  
-2. Clone a copy of the TortoiseHg repository to C:\hg\tortoisehg-release\
-   
-   Note: 
-   The path "C:\hg\tortoisehg-release\" is hardcoded in the Inno Setup script,
-   tortoisehg.iss. You can change the SourceDir directive in the setup script
-   if you wish to build the installer in the different directory.
+2. Clone a copy of the TortoiseHg repository, and chdir into the clone.
 
 3. Build TortoiseHg binary with py2exe:
    
