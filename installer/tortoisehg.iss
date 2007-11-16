@@ -49,8 +49,8 @@ Name: {group}\Debugging Log; Filename: {app}\tracelog.exe
 Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
-Filename: "{app}\add_path.exe"; Parameters: "{app}"; Description: "Add the installation path to the search path"
-Filename: "regsvr32.exe"; Parameters: "/s ""{app}\tortoisehg.dll"""; Description: "Install shell extension";
+Filename: "{app}\add_path.exe"; Parameters: "{app}"; StatusMsg: "Adding installation path to search path..."
+Filename: "regsvr32.exe"; Parameters: "/s ""{app}\tortoisehg.dll"""; StatusMsg: "Registering shell extension...";
 
 [UninstallDelete]
 Type: files; Name: {app}\TortoiseHg.url
