@@ -50,12 +50,12 @@ Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
 Filename: "{app}\add_path.exe"; Parameters: "{app}"; Description: "Add the installation path to the search path"
-Filename: "regsvr32.exe"; Parameters: "/s {app}\tortoisehg.dll"; Description: "Install shell extension";
+Filename: "regsvr32.exe"; Parameters: "/s ""{app}\tortoisehg.dll"""; Description: "Install shell extension";
 
 [UninstallDelete]
 Type: files; Name: {app}\TortoiseHg.url
 
 [UninstallRun]
 Filename: "{app}\add_path.exe"; Parameters: "/del {app}"
-Filename: "regsvr32.exe"; Parameters: "/s /u {app}\tortoisehg.dll"
+Filename: "regsvr32.exe"; Parameters: "/s /u ""{app}\tortoisehg.dll"""
 
