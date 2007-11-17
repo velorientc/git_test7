@@ -31,7 +31,7 @@ SetupLogging=yes
 
 [Files]
 Source: COPYING; DestDir: {app}; DestName: Copying.txt
-Source: dist\*.exe; DestDir: {app} ; Flags: ignoreversion  
+Source: dist\*.exe; DestDir: {app} ; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.zip; DestDir: {app} ; Flags: ignoreversion restartreplace uninsrestartdelete 
 Source: dist\*.dll; DestDir: {app} ; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.pyd; DestDir: {app} ; Flags: ignoreversion restartreplace uninsrestartdelete
