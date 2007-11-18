@@ -1,5 +1,5 @@
 #
-# A PyGtk-based Python Trace Collector dialog
+# A PyGtk-based Python Trace Collector window
 #
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
@@ -13,24 +13,25 @@ import threading
 import Queue
 import win32trace
 
-class TraceDialog(gtk.Dialog):
-    def __init__(self, width=700, height=400):
-        gtk.Dialog.__init__(self,
-                            title="Python Trace Collector",
-                            flags=gtk.DIALOG_MODAL,
-                           )
-
-        # construct dialog
-        self.set_default_size(width, height)
+class TraceLog():
+    def __init__(self):
+        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        self.window.set_title("Python Trace Collector")
         
-        self._button_clear = gtk.Button("Clear")
-        self._button_clear.connect('clicked', self._on_clear_clicked)
-        self.action_area.pack_end(self._button_clear)
-
-        self._button_ok = gtk.Button("OK")
-        self._button_ok.connect('clicked', self._on_ok_clicked)
-        self.action_area.pack_end(self._button_ok)        
-
+        # construct window
+        self.window.set_default_size(700, 400)
+        self.main_area = gtk.VBox()
+        self.window.add(self.main_area)
+        
+        # mimic standard dialog widgets
+        self.action_area = gtk.HBox()
+        self.main_area.pack_end(self.action_area, False, False, 5)
+        sep = gtk.HSeparator()
+        self.main_area.pack_end(sep, False, False, 0)
+        self.vbox = gtk.VBox()
+        self.main_area.pack_end(self.vbox)        
+        
+        # add python trace ouput window
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
@@ -39,22 +40,32 @@ class TraceDialog(gtk.Dialog):
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
-        
         self.vbox.pack_start(scrolledwindow, True, True)
         self.vbox.show_all()
 
-        self.connect('map_event', self._on_window_map_event)
-        self.connect('delete_event', self._on_window_close_clicked)
+        # add buttons
+        self._button_quit = gtk.Button("Quit")
+        self._button_quit.connect('clicked', self._on_ok_clicked)
+        self.action_area.pack_end(self._button_quit, False, False, 5)        
+
+        self._button_clear = gtk.Button("Clear")
+        self._button_clear.connect('clicked', self._on_clear_clicked)
+        self.action_area.pack_end(self._button_clear, False, False, 5)
+
+        # add assorted window event handlers
+        self.window.connect('map_event', self._on_window_map_event)
+        self.window.connect('delete_event', self._on_window_close_clicked)
 
     def _on_ok_clicked(self, button):
         self._stop_read_thread()
-        self.response(gtk.RESPONSE_ACCEPT)
+        gtk.main_quit()
         
     def _on_clear_clicked(self, button):
         self.write("", False)
         
     def _on_window_close_clicked(self, event, param):
         self._stop_read_thread()
+        gtk.main_quit()
         
     def _on_window_map_event(self, event, param):
         self._begin_trace()
@@ -107,9 +118,13 @@ class TraceDialog(gtk.Dialog):
         else:
             self.textbuffer.set_text(msg)
 
+    def main(self):
+        self.window.show_all()
+        gtk.main()
+        
 def run():
-    dlg = TraceDialog()
-    dlg.run()
+    dlg = TraceLog()
+    dlg.main()
     
 if __name__ == "__main__":
     run()
