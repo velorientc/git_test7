@@ -45,7 +45,7 @@ Filename: {app}\TortoiseHg.url; Section: InternetShortcut; Key: URL; String: htt
 
 [Icons]
 Name: {group}\TortoiseHg Web Site; Filename: {app}\TortoiseHg.url
-Name: {group}\Debugging Log; Filename: {app}\tracelog.exe
+Name: {group}\Python Trace Collector; Filename: {app}\tracelog.exe
 Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
