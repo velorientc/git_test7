@@ -4,7 +4,12 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import win32traceutil
+try:
+    import win32traceutil
+    trace = True
+except pywintypes.error:
+    trace = False
+
 import os
 import sys
 import getopt
@@ -12,7 +17,7 @@ from tortoise import thgutil
 
 os.environ['PATH'] = "%s;%s" % (thgutil.get_prog_root(), os.environ['PATH'])
 hg_executable = thgutil.find_path("hg")
-print "hgproc: hg_executable = %s" % hg_executable
+if trace: print "hgproc: hg_executable = %s" % hg_executable
 
 def get_option(args):
     long_opt_list =  ['command=', 'exepath=', 'listfile=', 'title=',
@@ -115,5 +120,5 @@ if __name__=='__main__':
     #dlg = parse(['-c', 'status', '--root', 'c:\hg\h1', ])
     #dlg = parse(['-c', 'add', '--root', 'c:\hg\h1', '--listfile', 'c:\\hg\\h1\\f1', '--notify'])
     #dlg = parse(['-c', 'rollback', '--root', 'c:\\hg\\h1'])
-    print "args=", sys.argv
+    if trace: print "args=", sys.argv
     dlg = run_trapped(sys.argv[1:])
