@@ -302,22 +302,15 @@ class ContextMenuExtension:
         print "_get_commands(): adding hg commands"
         
         if tree is not None:
-            # Commit Tool (qct, gcommit, or internal)
-            result.append((_("Commit"), 
-                           _("commit changes with GUI tool"),
-                           self._commit))
-
-            # Visual history (hgk, hgview, glog, or internal)
-            result.append((_("View history"),
-                           _("View history with GUI tool"),
-                           self._view))
-
             # Visual Diff (any extdiff command)
             result.append((_("Visual diff"),
                            _("View changes using GUI diff tool"),
                            self._vdiff))
                            
-            result.append([])   # separator
+            # Commit (qct, gcommit, or internal)
+            result.append((_("Commit"), 
+                           _("Commit changes with GUI tool"),
+                           self._commit))
 
             # Working directory status (gstatus, internal)
             result.append((_("Status"),
@@ -328,21 +321,18 @@ class ContextMenuExtension:
             result.append((_("Diff"),
                            _("View changes"),
                            self._diff))
-            result.append((_("Commit"),
-                           _("Commit changes"),
-                           self._commit_simple))
             result.append((_("Add"),
                            _("Add files to Hg repository"),
                            self._add))
             result.append((_("Remove"),
-                           _("remove selected files on the next commit"),
+                           _("Remove selected files on the next commit"),
                            self._remove))
+            result.append((_("Revert"),
+                           _("Revert selected files"),
+                           self._revert))
 
             result.append([])   # separator
 
-            result.append((_("Revert"),
-                           _("Revert file status"),
-                           self._revert))
             result.append((_("Rollback"),
                            _("Rollback the last transaction"),
                            self._rollback))
@@ -355,12 +345,14 @@ class ContextMenuExtension:
 
             result.append([])   # separator
 
-            result.append((_("Revision status..."),
+            # Visual history (hgk, hgview, glog, or internal)
+            result.append((_("View history"),
+                           _("View history with GUI tool"),
+                           self._view))
+
+            result.append((_("Current revision status..."),
                            _("Show various revision info"),
                            self._tip))
-            result.append((_("Revision history"),
-                           _("Browse revision history"),
-                           self._log))
 
             result.append([])   # separator
 
