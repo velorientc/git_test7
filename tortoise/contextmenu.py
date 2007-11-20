@@ -416,6 +416,7 @@ class ContextMenuExtension:
         return S_FALSE
 
     def _commit(self, parent_window):
+        '''[tortoisehg] commit = [qct | gcommit | internal]'''
         ct = ui.ui().config('tortoisehg', 'commit', 'internal')
         if ct == 'internal':
             self._commit_simple(parent_window)
@@ -429,6 +430,7 @@ class ContextMenuExtension:
             run_program(hgpath, cmd)
 
     def _vdiff(self, parent_window):
+        '''[tortoisehg] diff = <any extdiff command>'''
         diff = ui.ui().config('tortoisehg', 'vdiff', None)
         if not diff:
             msg = "You must configure tortoisehg.vdiff in your Mercurial.ini"
@@ -446,6 +448,7 @@ class ContextMenuExtension:
             run_program(hgpath, cmd)
 
     def _view(self, parent_window):
+        '''[tortoisehg] view = [hgk | hgvew | glog | internal]'''
         view = ui.ui().config('tortoisehg', 'view', 'internal')
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -542,6 +545,7 @@ class ContextMenuExtension:
                                win32con.MB_OK|win32con.MB_ICONERROR)
             
     def _status(self, parent_window):
+        '''[tortoisehg] status = [gstatus | internal]'''
         stat = ui.ui().config('tortoisehg', 'status', 'internal')
         if stat == 'internal':
             self._run_dialog('status')
