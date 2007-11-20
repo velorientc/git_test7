@@ -302,34 +302,29 @@ class ContextMenuExtension:
         print "_get_commands(): adding hg commands"
         
         if tree is not None:
-            # commit tool - enabled by extensions.qct
-            status = not u.config("extensions", "qct") is None
-            result.append((_("Commit tool"), 
+            # Commit Tool (qct, gcommit, or internal)
+            result.append((_("Commit"), 
                            _("commit changes with GUI tool"),
-                           self._commit,
-                           status))
+                           self._commit))
 
-            # hgk - enabled by extensions.hgk
-            status = not u.config("extensions", "hgk") is None
-            result.append((_("View"),
+            # Visual history (hgk, hgview, glog, or internal)
+            result.append((_("View history"),
                            _("View history with GUI tool"),
-                           self._view,
-                           status))
+                           self._view))
 
-            # diff tool - enabled by extensions.extdiff +  extdiff.cmd.vdiff
-            status = not u.config("extensions", "extdiff") is None and \
-                     u.config("extdiff", "cmd.vdiff")
+            # Visual Diff (any extdiff command)
             result.append((_("Visual diff"),
                            _("View changes using GUI diff tool"),
-                           self._vdiff,
-                           status))
+                           self._vdiff))
                            
             result.append([])   # separator
 
-            # Mercurial standard commands
+            # Working directory status (gstatus, internal)
             result.append((_("Status"),
                            _("Repository status"),
                            self._status))
+
+            # Mercurial standard commands
             result.append((_("Diff"),
                            _("View changes"),
                            self._diff))
@@ -421,30 +416,65 @@ class ContextMenuExtension:
         return S_FALSE
 
     def _commit(self, parent_window):
+        ct = ui.ui().config('tortoisehg', 'commit', 'internal')
+        if ct == 'internal':
+            self._commit_simple(parent_window)
+            return
         hgpath = find_path('hg')
         if hgpath:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
-            cmd = "%s --repository %s qct" % (hgpath, shellquote(root))
+            cmd = "%s --repository %s %s" % \
+                    (shellquote(hgpath), shellquote(root), ct)
             run_program(hgpath, cmd)
 
     def _vdiff(self, parent_window):
+        diff = ui.ui().config('tortoisehg', 'vdiff', None)
+        if not diff:
+            msg = "You must configure tortoisehg.vdiff in your Mercurial.ini"
+            title = "Visual Diff Not Configured"
+            win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+            return
         hgpath = find_path('hg')
         if hgpath:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
             quoted_files = [shellquote(s) for s in targets]
-            cmd = "%s --repository %s vdiff %s" % (hgpath, 
-                    shellquote(root), " ".join(quoted_files))
+            cmd = "%s --repository %s %s %s" %  \
+                (shellquote(hgpath), shellquote(root),
+                   diff, " ".join(quoted_files))
             run_program(hgpath, cmd)
 
     def _view(self, parent_window):
-        hgpath = find_path('hg')
-        if hgpath:
-            targets = self._filenames or [self._folder]
-            root = find_root(targets[0])
-            cmd = "%s --repository %s view" % (hgpath, shellquote(root))
-            run_program(hgpath, cmd)
+        view = ui.ui().config('tortoisehg', 'view', 'internal')
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        if view == 'internal':
+            self._log(parent_window)
+        elif view == 'hgview':
+            hgviewpath = find_path('hgview')
+            cmd = "%s --repository=%s" % \
+                    (shellquote(hgviewpath), shellquote(root))
+            if len(self._filenames) == 1:
+                cmd += " --file=%s" % shellquote(self._filenames[0])
+            run_program(hgviewpath, cmd)
+        else:
+            hgpath = find_path('hg')
+            if not hgpath: return
+            if view == 'hgk':
+                cmd = "%s --repository %s view" % \
+                        (shellquote(hgpath), shellquote(root))
+                run_program(hgpath, cmd)
+            elif view == 'glog':
+                quoted_files = [shellquote(s) for s in targets]
+                cmd = "%s --repository %s glog %s" % \
+                        (shellquote(hgpath), shellquote(root),
+                         " ".join(quoted_files))
+                run_program(hgpath, cmd)
+            else:
+                msg = "History viewer %s not recognized" % view
+                title = "Unknown history tool"
+                win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
 
     def _clone_here(self, parent_window):
         src = self._filenames[0]
@@ -512,7 +542,21 @@ class ContextMenuExtension:
                                win32con.MB_OK|win32con.MB_ICONERROR)
             
     def _status(self, parent_window):
-        self._run_dialog('status')
+        stat = ui.ui().config('tortoisehg', 'status', 'internal')
+        if stat == 'internal':
+            self._run_dialog('status')
+        elif stat == 'gstatus':
+            targets = self._filenames or [self._folder]
+            root = find_root(targets[0])
+            quoted_files = [shellquote(s) for s in targets]
+            cmd = "%s --repository %s gstatus %s" % \
+                    (shellquote(hgpath), shellquote(root),
+                     " ".join(quoted_files))
+            run_program(hgpath, cmd)
+        else:
+            msg = "Status viewer %s not recognized" % stat
+            title = "Unknown status tool"
+            win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
 
     def _pull(self, parent_window):
         self._run_dialog('pull', True)
