@@ -367,7 +367,7 @@ class ContextMenuExtension:
             result.append((_("View Tags"),
                            _("list repository tags"),
                            self._show_tags))
-            result.append((_("Add Tags"),
+            result.append((_("Add Tag"),
                            _("add a tag for the current or given revision"),
                            self._add_tag))
 
