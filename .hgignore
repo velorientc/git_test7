@@ -3,3 +3,6 @@ syntax: glob
 *.orig
 *.rej
 *.pyc
+build/
+dist/
+Output/
