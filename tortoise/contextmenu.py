@@ -530,6 +530,7 @@ class ContextMenuExtension:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
             quoted_files = [shellquote(s) for s in targets]
+            hgpath = find_path('hg')
             cmd = "%s --repository %s gstatus %s" % \
                     (shellquote(hgpath), shellquote(root),
                      " ".join(quoted_files))
