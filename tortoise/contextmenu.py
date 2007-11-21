@@ -407,7 +407,7 @@ class ContextMenuExtension:
             run_program(cmd)
 
     def _vdiff(self, parent_window):
-        '''[tortoisehg] diff = <any extdiff command>'''
+        '''[tortoisehg] vdiff = <any extdiff command>'''
         diff = ui.ui().config('tortoisehg', 'vdiff', None)
         if not diff:
             msg = "You must configure tortoisehg.vdiff in your Mercurial.ini"
