@@ -326,7 +326,7 @@ class ContextMenuExtension:
                            self._update))
             result.append((_("Merge"),
                            _("merge working directory with another revision"),
-                           self._merge_simple))
+                           self._merge))
 
             result.append([])   # separator
 
@@ -582,11 +582,18 @@ class ContextMenuExtension:
     def _diff(self, parent_window):
         self._run_dialog('diff')
 
-    def _merge_simple(self, parent_window):
-        app_path = find_path("simplemerge", get_prog_root(), '.EXE;.BAT')
-        os.environ['HGMERGE'] = ('%s -L my -L other' % shellquote(app_path))
+    def _merge(self, parent_window):
+        uimerge = ui.ui().config('ui', 'merge', None)
+        hgmerge = os.environ.get('HGMERGE', None)
+        if uimerge:
+            print "ui.merge = %s" % uimerge
+        elif hgmerge:
+            print "HGMERGE = %s" % os.environ['HGMERGE']
+        else:
+            app_path = find_path("simplemerge", get_prog_root(), '.EXE;.BAT')
+            os.environ['HGMERGE'] = ('%s -L my -L other' % shellquote(app_path))
+            print "HGMERGE = %s" % os.environ['HGMERGE']
 
-        print "HGMERGE = %s" % os.environ['HGMERGE']
         self._run_dialog('merge', noargs=True)
 
     def _rollback(self, parent_window):
