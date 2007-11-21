@@ -46,7 +46,7 @@ def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, n
     cmdline = '%s %s -- %s' % (shellquote(app_path), gpopts, cmdopts)
 
     try:
-        run_program(None, cmdline)
+        run_program(cmdline)
     except win32api.error, details:
         win32ui.MessageBox("Error executing command - %s" % (details), "gpopen")
     print "open_dialog: done"
@@ -62,33 +62,18 @@ def get_clone_repo_name(dir, repo_name):
         i += 1
     return dest_clone
 
-def run_program(appName, cmdline):
-    # subprocess.Popen() would create a terminal (cmd.exe) window when 
-    # making calls to hg, we use CreateProcess() coupled with 
-    # CREATE_NO_WINDOW flag to suppress the terminal window
+def run_program(cmdline):
+    print "run_program: %s" % (cmdline)
 
-    print "run_program: %s, %s" % (appName, cmdline)
-    flags = win32con.CREATE_NO_WINDOW
-    startupInfo = win32process.STARTUPINFO()
+    import subprocess
+    pop = subprocess.Popen(cmdline, 
+                           shell=False,
+                           creationflags=win32con.CREATE_NO_WINDOW,
+                           stderr=subprocess.STDOUT,
+                           stdout=subprocess.PIPE,
+                           stdin=subprocess.PIPE)
+    print "run_program: done"
     
-    handlers = win32process.CreateProcess(appName, 
-                                            cmdline,
-                                            None,
-                                            None,
-                                            1,
-                                            flags,
-                                            os.environ,
-                                            os.getcwd(),
-                                            startupInfo)
-    hProcess, hThread, PId, TId = handlers
-    win32event.WaitForSingleObject(hProcess, 500)
-    exitcode = win32process.GetExitCodeProcess(hProcess)
-    if exitcode < 0:
-        msg = "Error when starting external command: \n%s " % cmdline
-        title = "Mercurial"
-        win32ui.MessageBox(msg, title, 
-                           win32con.MB_OK|win32con.MB_ICONERROR)   
-
 """Windows shell extension that adds context menu items to Mercurial repository"""
 class ContextMenuExtension:
     _reg_progid_ = "Mercurial.ShellExtension.ContextMenu"
@@ -419,7 +404,7 @@ class ContextMenuExtension:
             root = find_root(targets[0])
             cmd = "%s --repository %s %s" % \
                     (shellquote(hgpath), shellquote(root), ct)
-            run_program(hgpath, cmd)
+            run_program(cmd)
 
     def _vdiff(self, parent_window):
         '''[tortoisehg] diff = <any extdiff command>'''
@@ -437,7 +422,7 @@ class ContextMenuExtension:
             cmd = "%s --repository %s %s %s" %  \
                 (shellquote(hgpath), shellquote(root),
                    diff, " ".join(quoted_files))
-            run_program(hgpath, cmd)
+            run_program(cmd)
 
     def _view(self, parent_window):
         '''[tortoisehg] view = [hgk | hgvew | glog | internal]'''
@@ -452,20 +437,20 @@ class ContextMenuExtension:
                     (shellquote(hgviewpath), shellquote(root))
             if len(self._filenames) == 1:
                 cmd += " --file=%s" % shellquote(self._filenames[0])
-            run_program(hgviewpath, cmd)
+            run_program(cmd)
         else:
             hgpath = find_path('hg')
             if not hgpath: return
             if view == 'hgk':
                 cmd = "%s --repository %s view" % \
                         (shellquote(hgpath), shellquote(root))
-                run_program(hgpath, cmd)
+                run_program(cmd)
             elif view == 'glog':
                 quoted_files = [shellquote(s) for s in targets]
                 cmd = "%s --repository %s glog %s" % \
                         (shellquote(hgpath), shellquote(root),
                          " ".join(quoted_files))
-                run_program(hgpath, cmd)
+                run_program(cmd)
             else:
                 msg = "History viewer %s not recognized" % view
                 title = "Unknown history tool"
@@ -548,7 +533,7 @@ class ContextMenuExtension:
             cmd = "%s --repository %s gstatus %s" % \
                     (shellquote(hgpath), shellquote(root),
                      " ".join(quoted_files))
-            run_program(hgpath, cmd)
+            run_program(cmd)
         else:
             msg = "Status viewer %s not recognized" % stat
             title = "Unknown status tool"
