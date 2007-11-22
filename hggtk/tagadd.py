@@ -43,7 +43,7 @@ class TagAddDialog(gtk.Dialog):
         tagbox = gtk.HBox()
         lbl = gtk.Label("Tag:")
         lbl.set_property("width-chars", 10)
-        lbl.set_justify(gtk.JUSTIFY_LEFT)
+        lbl.set_alignment(0, 0.5)
         self._tag_input = gtk.Entry()
         self._btn_tag_browse = gtk.Button("Browse...")
         self._btn_tag_browse.connect('clicked', self._btn_tag_clicked)
@@ -56,7 +56,7 @@ class TagAddDialog(gtk.Dialog):
         revbox = gtk.HBox()
         lbl = gtk.Label("Revision:")
         lbl.set_property("width-chars", 10)
-        lbl.set_justify(gtk.JUSTIFY_LEFT)
+        lbl.set_alignment(0, 0.5)
         self._rev_input = gtk.Entry()
         self._rev_input.set_text("tip")
         self._btn_rev_browse = gtk.Button("Browse...")
@@ -78,6 +78,7 @@ class TagAddDialog(gtk.Dialog):
 
         # commit message
         lbl = gtk.Label("Commit message:")
+        lbl.set_alignment(0, 0.5)
         self._commit_message = gtk.Entry()
         self.vbox.pack_end(self._commit_message, False, False, 1)
         self.vbox.pack_end(lbl, False, False, 1)
