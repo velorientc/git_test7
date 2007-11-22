@@ -37,7 +37,7 @@ class CommitDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, title="TortoiseHg commit - %s" % root,
                                   parent=parent,
                                   flags=0,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+                                  buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
               
         self.root = root
         self.files = files
