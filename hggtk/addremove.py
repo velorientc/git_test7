@@ -27,7 +27,7 @@ class AddRemoveDialog(gtk.Dialog):
     def __init__(self, cmd, root='', files=[]):
         """ Initialize the Status window. """
         super(AddRemoveDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                              buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                              buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
         self.cmd = cmd
         self.root = root

@@ -46,7 +46,7 @@ class TagsDialog(gtk.Dialog):
             buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                       gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
         else:
-            buttons = (gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+            buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(TagsDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                          buttons=buttons)
 

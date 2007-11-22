@@ -33,7 +33,7 @@ class StatusDialog(gtk.Dialog):
     def __init__(self, path='', files=[], list_clean=False):
         """ Initialize the Status window. """
         super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                           buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
         # set dialog title
         title = "hg status "

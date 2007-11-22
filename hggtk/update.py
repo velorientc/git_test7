@@ -20,7 +20,7 @@ class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
     def __init__(self, cwd=''):
         """ Initialize the Dialog """
-        buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(UpdateDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
         self.cwd = cwd or os.getcwd()

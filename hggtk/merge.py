@@ -17,7 +17,7 @@ class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
     def __init__(self, root=''):
         """ Initialize the Dialog """
-        buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(MergeDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                           buttons=buttons)
 

@@ -23,7 +23,7 @@ class TagAddDialog(gtk.Dialog):
     def __init__(self, root=''):
         """ Initialize the Dialog """
         super(TagAddDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                           buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+                                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
         # set dialog title
         title = "hg tag "

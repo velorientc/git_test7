@@ -25,7 +25,7 @@ class RevisionDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, title="TortoiseHg Revisions - %s" % root,
                                   parent=None,
                                   flags=0,
-                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK))
+                                  buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
         self.root = root
 
