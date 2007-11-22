@@ -102,6 +102,9 @@ def parse(args):
     elif option['hgcmd'] == 'update':
         import hggtk.update
         return hggtk.update.run(cwd=option['cwd'])
+    elif option['hgcmd'] == 'clone':
+        import hggtk.clone
+        return hggtk.clone.run(cwd=option['cwd'])
     else:
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)

@@ -274,6 +274,9 @@ class ContextMenuExtension:
             result.append((_("Create repo here"),
                            _("create a new repository in this directory"),
                            self._init))
+            result.append((_("Clone a repository"),
+                           _("clone a repository"),
+                           self._clone))
             return result
 
         print "file = %s\nroot = %s" % (rpath, root)
@@ -350,6 +353,9 @@ class ContextMenuExtension:
 
             result.append([])   # separator
 
+            result.append((_("Clone a repository"),
+                           _("Clone a repository"),
+                           self._clone))
             result.append((_("Pull"),
                            _("Pull from default repository"),
                            self._pull))
@@ -539,6 +545,9 @@ class ContextMenuExtension:
             msg = "Status viewer %s not recognized" % stat
             title = "Unknown status tool"
             win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+
+    def _clone(self, parent_window):
+        self._run_dialog('clone', True)
 
     def _pull(self, parent_window):
         self._run_dialog('pull', True)
