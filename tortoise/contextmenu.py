@@ -155,6 +155,7 @@ class ContextMenuExtension:
                     win32gui.InsertMenu(submenu, idCmd, 
                                         win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
                                         idCmdFirst+idCmd, None)
+                    text = "<sep>"
                 else:
                     if len(menu_info) == 4:
                         text, help_text, command, enabled = menu_info
