@@ -20,7 +20,7 @@ from mercurial.node import *
 
 class CloneDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, cwd=''):
+    def __init__(self, cwd='', repos=[]):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(CloneDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -33,6 +33,15 @@ class CloneDialog(gtk.Dialog):
         title += " - %s" % (os.getcwd())
         self.set_title(title)
 
+        self._src_path = ''
+        self._dest_path = ''
+        
+        try:
+            self._src_path = repos[0]
+            self._dest_path = repos[1]
+        except:
+            pass
+            
         # build dialog
         self._create()
 
@@ -46,12 +55,14 @@ class CloneDialog(gtk.Dialog):
         lbl.set_property("width-chars", ewidth)
         lbl.set_alignment(0, 0.5)
         self._src_input = gtk.Entry()
+        self._src_input.set_text(self._src_path)
         self._btn_src_browse = gtk.Button("Browse...")
         self._btn_src_browse.connect('clicked', self._btn_src_clicked)
         srcbox.pack_start(lbl, False, False)
         srcbox.pack_start(self._src_input, True, True)
         srcbox.pack_end(self._btn_src_browse, False, False, 5)
         self.vbox.pack_start(srcbox, False, False, 2)
+        
 
         # clone destination
         destbox = gtk.HBox()
@@ -59,7 +70,7 @@ class CloneDialog(gtk.Dialog):
         lbl.set_property("width-chars", ewidth)
         lbl.set_alignment(0, 0.5)
         self._dest_input = gtk.Entry()
-        self._dest_input.set_text("")
+        self._dest_input.set_text(self._dest_path)
         self._btn_dest_browse = gtk.Button("Browse...")
         self._btn_dest_browse.connect('clicked', self._btn_dest_clicked)
         destbox.pack_start(lbl, False, False)
@@ -179,10 +190,10 @@ class CloneDialog(gtk.Dialog):
             error_dialog("Clone error", traceback.format_exc())
             return False
 
-def run(cwd=''):
-    dialog = CloneDialog(cwd)
+def run(cwd='', repos=[]):
+    dialog = CloneDialog(cwd, repos)
     dialog.run()
     
 if __name__ == "__main__":
     import sys
-    run()
+    run(os.getcwd(), sys.argv[1:])
