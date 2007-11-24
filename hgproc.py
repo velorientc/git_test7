@@ -104,7 +104,7 @@ def parse(args):
         return hggtk.update.run(cwd=option['cwd'])
     elif option['hgcmd'] == 'clone':
         import hggtk.clone
-        return hggtk.clone.run(cwd=option['cwd'])
+        return hggtk.clone.run(cwd=option['cwd'], repos=filelist)
     else:
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)

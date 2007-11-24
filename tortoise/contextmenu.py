@@ -476,17 +476,11 @@ class ContextMenuExtension:
     def _clone_here(self, parent_window):
         src = self._filenames[0]
         dest = self._folder
-        msg = "Create clone for %s in %s?" % (src, dest)
-        title = "Mercurial: clone"
-        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
-        if rv == 2:
-            return
-
         repo_name = os.path.basename(src)
         dest_clone = get_clone_repo_name(dest, repo_name)
         cmdopts = "--verbose"
         repos = [src, dest_clone]
-        open_dialog('clone', cmdopts, filelist=repos)
+        open_dialog('clone', cmdopts, cwd=dest, filelist=repos)
 
     def _push_here(self, parent_window):
         src = self._filenames[0]
