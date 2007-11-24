@@ -131,16 +131,20 @@ class ContextMenuExtension:
             commands = self._get_commands_dragdrop()
         else:
             commands = self._get_commands()
+        idCmd = idCmdFirst
         if len(commands) > 0:
             # a brutal hack to detect if we are the first menu to go on to the 
             # context menu. If we are not the first, then add a menu separator
             # The number '30000' is just a guess based on my observation
             print "idCmdFirst = ", idCmdFirst
+            sep = 0
             if idCmdFirst >= 30000:
                 win32gui.InsertMenu(hMenu, indexMenu,
                                     win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
                                     0, None)
                 indexMenu += 1
+                idCmd += 1
+                sep = 1
             
             # create submenu with Hg commands
             submenu = win32gui.CreatePopupMenu()
@@ -148,27 +152,30 @@ class ContextMenuExtension:
                 fstate = win32con.MF_BYCOMMAND
                 enabled = True
                 if len(menu_info) == 0:
-                    win32gui.InsertMenu(submenu, id, 
+                    win32gui.InsertMenu(submenu, idCmd, 
                                         win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
-                                        0, None)
-                    continue
-                elif len(menu_info) == 4:
-                    text, help_text, command, enabled = menu_info
+                                        idCmd, None)
                 else:
-                    text, help_text, command = menu_info
+                    if len(menu_info) == 4:
+                        text, help_text, command, enabled = menu_info
+                    else:
+                        text, help_text, command = menu_info
 
-                if not enabled:
-                    fstate |= win32con.MF_GRAYED
+                    if not enabled:
+                        fstate |= win32con.MF_GRAYED
+                    
+                    item, extras = win32gui_struct.PackMENUITEMINFO(
+                                text=text,
+                                fState=fstate,
+                                wID=idCmd)
+                    win32gui.InsertMenuItem(submenu, idCmd, True, item)
+                    self._handlers[id + sep] = (help_text, command)
                 
-                item, extras = win32gui_struct.PackMENUITEMINFO(
-                            text=text,
-                            fState=fstate,
-                            wID=idCmdFirst + id)
-                win32gui.InsertMenuItem(submenu, id, 1, item)
-                self._handlers[id] = (help_text, command)
+                print "idCmd: %d, id: %d, menu: %s" % (idCmd, id, text)
+                idCmd += 1
 
             # add Hg submenu to context menu
-            opt = {'text': "TortoiseHg", 'hSubMenu': submenu}
+            opt = {'text': "TortoiseHg", 'hSubMenu': submenu, 'wID': idCmd}
             icon_path = get_icon_path("tortoise", "hg.ico")
             print "icon path =", icon_path
             hg_icon = None
@@ -176,17 +183,26 @@ class ContextMenuExtension:
                 opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
                                      icon_to_bitmap(icon_path, type="MENUCHECK")
             item, extras = win32gui_struct.PackMENUITEMINFO(**opt)
-            win32gui.InsertMenuItem(hMenu, indexMenu, 1, item)
+            win32gui.InsertMenuItem(hMenu, indexMenu, True, item)
+            
+            # a submenu item need a (dummay) handler too 
+            self._handlers[id + sep + 1] = ("", lambda x,y: 0)
+            
             indexMenu += 1
+            idCmd += 1
 
             # menu separator
             win32gui.InsertMenu(hMenu, indexMenu,
                                 win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
                                 0, None)
             indexMenu += 1
+            idCmd += 1
 
-        # Return the number of commands we added
-        return len(commands)
+        # Return total number of menus & submenus we've added
+        menu_added = idCmd - idCmdFirst
+        print "commands count = ", len(commands)
+        print "menu_added = ", menu_added
+        return menu_added
 
     def _get_commands_dragdrop(self):
         """
@@ -378,6 +394,7 @@ class ContextMenuExtension:
 
     def InvokeCommand(self, ci):
         mask, hwnd, verb, params, dir, nShow, hotkey, hicon = ci
+        print "InvokeCommand: verb = ", verb
         if verb >> 16:
             # This is a textual verb invocation... not supported.
             return S_FALSE
@@ -386,6 +403,7 @@ class ContextMenuExtension:
         self._handlers[verb][1](hwnd)
 
     def GetCommandString(self, cmd, uFlags):
+        print "GetCommandString: cmd = ", cmd
         if uFlags & shellcon.GCS_VALIDATEA or uFlags & shellcon.GCS_VALIDATEW:
             if cmd in self._handlers:
                 return S_OK
