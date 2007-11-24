@@ -169,8 +169,7 @@ class ContextMenuExtension:
                                 wID=idCmdFirst+idCmd)
                     win32gui.InsertMenuItem(submenu, idCmdFirst+idCmd, True, item)
                     self._handlers[idCmd] = (help_text, command)
-                
-                print "idCmd: %d, id: %d, menu: %s" % (idCmd, id, text)
+
                 idCmd += 1
 
             # add Hg submenu to context menu
@@ -198,8 +197,6 @@ class ContextMenuExtension:
             idCmd += 1
 
         # Return total number of menus & submenus we've added
-        print "commands count = ", len(commands)
-        print "menu_added = ", idCmd
         return idCmd
 
     def _get_commands_dragdrop(self):
@@ -392,7 +389,6 @@ class ContextMenuExtension:
 
     def InvokeCommand(self, ci):
         mask, hwnd, verb, params, dir, nShow, hotkey, hicon = ci
-        print "InvokeCommand: verb = ", verb
         if verb >> 16:
             # This is a textual verb invocation... not supported.
             return S_FALSE
@@ -401,7 +397,6 @@ class ContextMenuExtension:
         self._handlers[verb][1](hwnd)
 
     def GetCommandString(self, cmd, uFlags):
-        print "GetCommandString: cmd = ", cmd
         if uFlags & shellcon.GCS_VALIDATEA or uFlags & shellcon.GCS_VALIDATEW:
             if cmd in self._handlers:
                 return S_OK
