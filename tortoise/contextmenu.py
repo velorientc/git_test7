@@ -137,14 +137,12 @@ class ContextMenuExtension:
             # context menu. If we are not the first, then add a menu separator
             # The number '30000' is just a guess based on my observation
             print "idCmdFirst = ", idCmdFirst
-            sep = 0
             if idCmdFirst >= 30000:
                 win32gui.InsertMenu(hMenu, indexMenu,
                                     win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
                                     idCmdFirst+idCmd, None)
                 indexMenu += 1
                 idCmd += 1
-                sep = 1
             
             # create submenu with Hg commands
             submenu = win32gui.CreatePopupMenu()
