@@ -80,11 +80,11 @@ class CloneDialog(gtk.Dialog):
 
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label("Checkout Revision:")
+        lbl = gtk.Label("Clone To Revision:")
         lbl.set_property("width-chars", ewidth)
         lbl.set_alignment(0, 0.5)
         self._rev_input = gtk.Entry()
-        self._rev_input.set_text("tip")
+        self._rev_input.set_text("")
         self._btn_rev_browse = gtk.Button("Select...")
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(lbl, False, False)
