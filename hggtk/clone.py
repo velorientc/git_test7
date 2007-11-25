@@ -85,11 +85,14 @@ class CloneDialog(gtk.Dialog):
         lbl.set_alignment(0, 0.5)
         self._rev_input = gtk.Entry()
         self._rev_input.set_text("")
+        self._opt_allrev = gtk.CheckButton("Clone all revisions")
+        self._opt_allrev.set_active(True)
         self._btn_rev_browse = gtk.Button("Select...")
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._rev_input, False, False)
         #revbox.pack_start(self._btn_rev_browse, False, False, 5)
+        revbox.pack_start(self._opt_allrev, False, False)
         self.vbox.pack_start(revbox, False, False, 2)
 
         # options
@@ -154,7 +157,7 @@ class CloneDialog(gtk.Dialog):
         dest = self._dest_input.get_text()
         remotecmd = self._remote_cmd.get_text()
         rev = self._rev_input.get_text()
-
+        
         # verify input
         if src == "":
             error_dialog("Source path is empty", "Please enter")
@@ -172,7 +175,7 @@ class CloneDialog(gtk.Dialog):
                 cmdline += ' --pull'
             if remotecmd:   
                 cmdline += ' --remotecmd %s' % util.shellquote(remotecmd)
-            if rev:   
+            if not self._opt_allrev.get_active() and rev:   
                 cmdline += ' --rev %s' % rev
 
             cmdline += ' --verbose'
