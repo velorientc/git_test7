@@ -7,6 +7,14 @@
 try:
     import win32traceutil
     trace = True
+    
+    # FIXME: quick workaround traceback caused by missing "closed" 
+    # attribute in win32trace.
+    from mercurial import ui
+    def write_err(self, *args):
+        for a in args:
+            sys.stderr.write(str(a))
+    ui.ui.write_err = write_err
 except pywintypes.error:
     trace = False
 
