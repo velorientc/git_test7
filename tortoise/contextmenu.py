@@ -113,6 +113,38 @@ class ContextMenuExtension:
             for i in range(num_files):
                 self._filenames.append(shell.DragQueryFile(sm.data_handle, i))
 
+    def create_submenu(self, commands, idCmd, idCmdFirst):
+        menu = win32gui.CreatePopupMenu()
+        for menu_info in commands:
+            fstate = win32con.MF_BYCOMMAND
+            if len(menu_info) == 0:
+                win32gui.InsertMenu(menu, idCmd, 
+                        win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
+                        idCmdFirst + idCmd, None)
+                idCmd += 1
+                continue
+            elif len(menu_info) == 2:
+                text, subcommands = menu_info
+                submenu, idCmd = self.create_submenu(subcommands, idCmd, idCmdFirst)
+                item, _ = win32gui_struct.PackMENUITEMINFO(
+                        text=text, hSubMenu=submenu, wID=idCmdFirst + idCmd)
+                win32gui.InsertMenuItem(menu, idCmdFirst + idCmd, True, item)
+                self._handlers[idCmd] = ("", lambda x,y: 0)
+                idCmd += 1
+                continue
+            elif len(menu_info) == 4:
+                text, help_text, command, enabled = menu_info
+                if not enabled: fstate |= win32con.MF_GRAYED
+            elif len(menu_info) == 3:
+                text, help_text, command = menu_info
+                
+            item, _ = win32gui_struct.PackMENUITEMINFO(
+                        text=text, fState=fstate, wID=idCmdFirst + idCmd)
+            win32gui.InsertMenuItem(menu, idCmdFirst+idCmd, True, item)
+            self._handlers[idCmd] = (help_text, command)
+            idCmd += 1
+        return (menu, idCmd)
+
     def QueryContextMenu(self, hMenu, indexMenu, idCmdFirst, idCmdLast, uFlags):
         if uFlags & shellcon.CMF_DEFAULTONLY:
             return 0
@@ -144,39 +176,13 @@ class ContextMenuExtension:
                 indexMenu += 1
                 idCmd += 1
             
-            # create submenu with Hg commands
-            submenu = win32gui.CreatePopupMenu()
-            for id, menu_info in enumerate(commands):
-                fstate = win32con.MF_BYCOMMAND
-                enabled = True
-                if len(menu_info) == 0:
-                    win32gui.InsertMenu(submenu, idCmd, 
-                                        win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
-                                        idCmdFirst+idCmd, None)
-                    text = "<sep>"
-                else:
-                    if len(menu_info) == 4:
-                        text, help_text, command, enabled = menu_info
-                    else:
-                        text, help_text, command = menu_info
+            # create submenus with Hg commands
+            submenu, idCmd = self.create_submenu(commands, idCmd, idCmdFirst)
 
-                    if not enabled:
-                        fstate |= win32con.MF_GRAYED
-                    
-                    item, extras = win32gui_struct.PackMENUITEMINFO(
-                                text=text,
-                                fState=fstate,
-                                wID=idCmdFirst+idCmd)
-                    win32gui.InsertMenuItem(submenu, idCmdFirst+idCmd, True, item)
-                    self._handlers[idCmd] = (help_text, command)
-
-                idCmd += 1
-
-            # add Hg submenu to context menu
+            # add Hg submenus to context menu
             opt = {'text': "TortoiseHg", 'hSubMenu': submenu, 'wID': idCmdFirst+idCmd}
             icon_path = get_icon_path("tortoise", "hg.ico")
             print "icon path =", icon_path
-            hg_icon = None
             if icon_path:
                 opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
                                      icon_to_bitmap(icon_path, type="MENUCHECK")
