@@ -94,7 +94,18 @@ def parse(args):
         import hggtk.diff
         return hggtk.diff.run(root=option['root'], files=filelist)
     elif option['hgcmd'] == 'merge':
+        from mercurial import ui
         import hggtk.merge
+        uimerge = ui.ui().config('ui', 'merge', None)
+        hgmerge = os.environ.get('HGMERGE', None)
+        if uimerge:
+            print "ui.merge = %s" % uimerge
+        elif hgmerge:
+            print "HGMERGE = %s" % os.environ['HGMERGE']
+        else:
+            app_path = thgutil.find_path("simplemerge", thgutil.get_prog_root(), '.EXE;.BAT')
+            os.environ['HGMERGE'] = ('%s -L my -L other' % thgutil.shellquote(app_path))
+            print "HGMERGE = %s" % os.environ['HGMERGE']
         return hggtk.merge.run(root=option['root'])
     elif option['hgcmd'] in ('tip', 'parents', 'heads'):
         import hggtk.revisions
