@@ -388,9 +388,26 @@ class ContextMenuExtension:
 
             result.append([])   # separator
 
+            # Optionally add an Options submenu
+            c = ui.ui().config('tortoisehg', 'hgconfig', None)
+            if c in ['1', 'yes', 'True']:
+                config = []
+                config.append((_("Username"),
+                    _("Configure username"),
+                    self._uname))
+                config.append((_("Paths"),
+                    _("Configure remote paths"),
+                    self._paths))
+                config.append((_("Web"),
+                    _("Configure repository web data"),
+                    self._web))
+                result.append((_("Options"), config))
+                result.append([])   # separator
+
             result.append((_("Help"),
                            _("Basic Mercurial help text"),
                            self._help))
+
         return result
 
     def InvokeCommand(self, ci):
@@ -428,6 +445,33 @@ class ContextMenuExtension:
             cmd = "%s --repository %s %s" % \
                     (shellquote(hgpath), shellquote(root), ct)
             run_program(cmd)
+
+    def _uname(self, parent_window):
+        hgpath = find_path('hg')
+        if not hgpath: return
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        cmd = "%s --repository %s config username" % (shellquote(hgpath), 
+                shellquote(root))
+        run_program(cmd)
+
+    def _paths(self, parent_window):
+        hgpath = find_path('hg')
+        if not hgpath: return
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        cmd = "%s --repository %s config paths" % (shellquote(hgpath), 
+                shellquote(root))
+        run_program(cmd)
+
+    def _web(self, parent_window):
+        hgpath = find_path('hg')
+        if not hgpath: return
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        cmd = "%s --repository %s config web" % (shellquote(hgpath), 
+                shellquote(root))
+        run_program(cmd)
 
     def _vdiff(self, parent_window):
         '''[tortoisehg] vdiff = <any extdiff command>'''
