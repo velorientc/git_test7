@@ -344,6 +344,9 @@ class ContextMenuExtension:
             result.append((_("Recover"),
                            _("Recover from an interrupted commit or pull"),
                            self._recover))
+            result.append((_("Verify"),
+                           _("Verify repository consistency"),
+                           self._verify))
             result.append((_("Update"),
                            _("update working directory"),
                            self._update))
@@ -669,6 +672,9 @@ class ContextMenuExtension:
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
             self._run_dialog('recover', noargs=True)
+
+    def _verify(self, parent_window):
+        self._run_dialog('verify', noargs=True)
 
     def _commit_simple(self, parent_window):
         self._run_dialog('commit')
