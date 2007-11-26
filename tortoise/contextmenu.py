@@ -341,6 +341,9 @@ class ContextMenuExtension:
             result.append((_("Rollback"),
                            _("Rollback the last transaction"),
                            self._rollback))
+            result.append((_("Recover"),
+                           _("Recover from an interrupted commit or pull"),
+                           self._recover))
             result.append((_("Update"),
                            _("update working directory"),
                            self._update))
@@ -657,6 +660,15 @@ class ContextMenuExtension:
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 1:
             self._run_dialog('rollback', noargs=True)
+
+    def _recover(self, parent_window):
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        msg = "Confirm recovering %s?" % root
+        title = "Mercurial: recover"
+        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
+        if rv == 1:
+            self._run_dialog('recover', noargs=True)
 
     def _commit_simple(self, parent_window):
         self._run_dialog('commit')
