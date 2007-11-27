@@ -124,6 +124,9 @@ def parse(args):
     elif option['hgcmd'] == 'clone':
         import hggtk.clone
         return hggtk.clone.run(cwd=option['cwd'], repos=filelist)
+    elif option['hgcmd'] == 'serve':
+        import hggtk.serve
+        return hggtk.serve.run(cwd=option['cwd'], root=option['root'])
     else:
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)

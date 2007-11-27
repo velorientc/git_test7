@@ -391,6 +391,9 @@ class ContextMenuExtension:
             result.append((_("Outgoing"),
                            _("show changesets not found in destination"),
                            self._outgoing))
+            result.append((_("Web server"),
+                           _("start web server for this repository"),
+                           self._serve))
 
             result.append([])   # separator
 
@@ -621,6 +624,9 @@ class ContextMenuExtension:
 
     def _outgoing(self, parent_window):
         self._run_dialog('outgoing', True)
+
+    def _serve(self, parent_window):
+        self._run_dialog('serve', noargs=True)
 
     def _add(self, parent_window):
         self._run_dialog('add', modal=True)
