@@ -17,6 +17,7 @@ import os
 import pango
 import Queue
 import signal
+import socket
 import subprocess
 import sys
 from tempfile import mkstemp
@@ -40,7 +41,7 @@ class ServeDialog(gtk.Dialog):
         self._button_stop.connect('clicked', self._on_stop_clicked)
         self.action_area.pack_end(self._button_stop)
         self._button_stop.set_sensitive(False)
-        
+
         self._repo = repo
         if cwd: os.chdir(cwd)
         
@@ -93,9 +94,12 @@ class ServeDialog(gtk.Dialog):
         if port:
             self.cmdline += ' --port %d' % port
 
-        # run hg in unbuffered mode, so the output can be captured and display a.s.a.p.
+        # run hg in unbuffered mode, so the output can be captured and
+        # display a.s.a.p.
         os.environ['PYTHONUNBUFFERED'] = "1"
-        self.queue.put(self.cmdline + '\n')
+        #self.write(self.cmdline + '\n')
+        self.write('Web server started, now available at ')
+        self.write('http://%s:%d/\n' % (socket.getfqdn(), port))
 
         self._button_start.set_sensitive(False)
         self._button_stop.set_sensitive(True)
@@ -114,8 +118,7 @@ class ServeDialog(gtk.Dialog):
         gobject.timeout_add(10, self.process_queue)
 
     def _on_stop_clicked(self, button):
-        if self.proc.poll() == None:
-            self.write('Killing server process\n')
+        if self.proc and self.proc.poll() == None:
             file = os.fdopen(self.tmp_fd, "r")
             pid = int(file.read())
             file.close()
@@ -126,6 +129,7 @@ class ServeDialog(gtk.Dialog):
                 win32api.TerminateProcess(handle, 0)
             else:
                 os.kill(pid, signal.SIGHUP)
+            self.write('Web server stopped.\n')
 
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
