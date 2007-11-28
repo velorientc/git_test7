@@ -28,7 +28,7 @@ from mercurial.node import *
 
 class ServeDialog(gtk.Dialog):
     """ Dialog to run web server"""
-    def __init__(self, cwd='', repo='.'):
+    def __init__(self, cwd='', repo = None):
         """ Initialize the Dialog """
         super(ServeDialog, self).__init__(flags=gtk.DIALOG_MODAL)
 
@@ -170,7 +170,7 @@ class PollThread(threading.Thread):
         except IOError:
             pass
 
-def run(cwd='', repo='.'):
+def run(cwd='', repo=None):
     dialog = ServeDialog(cwd, repo)
     dialog.run()
     dialog.hide()
