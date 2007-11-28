@@ -2,7 +2,12 @@
 # A distutils setup script to register TortoiseHg COM server
 #
 
-# By default, the installer will be created as dist\Output\setup.exe.
+# To build stand-alone package, use 'python setup.py py2exe' then use
+# InnoSetup to build the installer.  By default, the installer will be
+# created as dist\Output\setup.exe.
+
+# To build a source MSI package (for the NSI Mercurial installer), use
+# 'python setup.py bdist_msi'
 
 import time
 import sys
@@ -28,36 +33,53 @@ except ImportError:
 from distutils.core import setup
 import py2exe
 
-# FIXME: quick hack to include installed hg extensions in py2exe binary
-import hgext
-hgextdir = os.path.dirname(hgext.__file__)
-hgextmods = set(["hgext." + os.path.splitext(f)[0]
+_data_files = []
+extra = {}
+hgextmods = []
+
+if 'py2exe' in sys.argv:
+    # FIXME: quick hack to include installed hg extensions in py2exe binary
+    import hgext
+    hgextdir = os.path.dirname(hgext.__file__)
+    hgextmods = set(["hgext." + os.path.splitext(f)[0]
                   for f in os.listdir(hgextdir)])
-
-py2exe_options = dict(
-        # Don't pull in all this MFC stuff used by the makepy UI.
-        excludes = "pywin,pywin.dialogs,pywin.dialogs.list",
-        
-        # add library files to support PyGtk-based dialogs/windows
-        # Note:
-        #    after py2exe build, copy GTK's etc and lib directories into
-        #    the dist directory created by py2exe.
-        #    also needed is the GTK's share/themes (as dist/share/themes), 
-        #    for dialogs to display in MS-Windows XP theme.
-        includes = "pango,atk,pangocairo,cairo,gobject," + ",".join(hgextmods),
-    )
-
-setup(name="TortoiseHg COM server",
-        com_server=["tortoisehg"],
-        console=[
-                 "hg",
-                 "hgproc.py",
-                 "hgutils/simplemerge",         
-                ],
-        windows=[{"script":"hggtk/tracelog.py",
-                  "icon_resources":[(1, "icons/tortoise/python.ico")]}],
-        options = dict(py2exe=py2exe_options),
-        data_files=[(os.path.join('', root),
+    _data_files = [(root, [os.path.join(root, file_) for file_ in files])
+                        for root, dirs, files in os.walk('icons')]
+    extra['windows'] = [{"script":"hggtk/tracelog.py",
+                        "icon_resources": [(1, "icons/tortoise/python.ico")]}]
+    extra['com_server'] = ["tortoisehg"]
+    extra['console'] = ["hg", "hgproc.py", "hgutils/simplemerge"]
+elif 'bdist_msi' in sys.argv:
+    _data_files = [(os.path.join('share/tortoisehg', root),
                 [os.path.join(root, file_) for file_ in files])
-                for root, dirs, files in os.walk('icons')],
+                for root, dirs, files in os.walk('icons')]
+    _data_files.append(('mercurial/hgrc.d', ['tortoisehg.rc']))
+    extra['scripts'] = ['tortoisehg.py', 'hgproc.py', 'hggtk/tracelog.py']
+
+opts = {
+   "py2exe" : {
+       # Don't pull in all this MFC stuff used by the makepy UI.
+       "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list",
+
+       # add library files to support PyGtk-based dialogs/windows
+       # Note:
+       #    after py2exe build, copy GTK's etc and lib directories into
+       #    the dist directory created by py2exe.
+       #    also needed is the GTK's share/themes (as dist/share/themes), 
+       #    for dialogs to display in MS-Windows XP theme.
+       "includes" : "pango,atk,pangocairo,cairo,gobject," + ",".join(hgextmods),
+   }
+}
+
+setup(name="TortoiseHg",
+        version='0.1',
+        author='TK Soh',
+        author_email='teekaysoh@gmail.com',
+        url='http://tortoisehg.sourceforge.net',
+        description='Windows shell extension for Mercurial VCS',
+        license='GNU GPL2',
+        packages=['tortoise', 'hggtk', 'hgwin'],
+        data_files = _data_files,
+        options=opts,
+        **extra
     )

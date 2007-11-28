@@ -1,0 +1,21 @@
+; Configuration file for TortoiseHg Windows COM Server
+; This is intended to be copied into your system wide configuration
+; directory (C:\Python25\Mercurial\hgrc.d) or to be appended to your
+; system wide configuration file (C:\Program Files\Mercurial\Mercurial.ini)
+
+[tortoisehg]
+;
+; Favorite commit tool.  Options 'qct', 'gcommit', 'internal'
+commit = qct
+;
+; Favorite history browser.  Options 'hgk', 'hgview', 'glog', 'internal'
+view = hgk
+;
+; Visual diff command.  Requires extdiff extension to be configured
+vdiff = vdiff
+;
+; Working directory status tool.  Options 'gstatus', 'internal'
+status = gstatus
+;
+; Flag which declares you have hg-config installed, enables options menu
+hgconfig = 1
