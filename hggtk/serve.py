@@ -177,6 +177,7 @@ class PollThread(threading.Thread):
 def run(cwd='', repo=None):
     dialog = ServeDialog(cwd, repo)
     dialog.run()
+    dialog._on_stop_clicked(None)
     dialog.hide()
     
 if __name__ == "__main__":
