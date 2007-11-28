@@ -57,7 +57,6 @@ setup(name="TortoiseHg COM server",
         windows=[{"script":"hggtk/tracelog.py",
                   "icon_resources":[(1, "icons/tortoise/python.ico")]}],
         options = dict(py2exe=py2exe_options),
-        modules="win32com.shell",
         data_files=[(os.path.join('', root),
                 [os.path.join(root, file_) for file_ in files])
                 for root, dirs, files in os.walk('icons')],
