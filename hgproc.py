@@ -127,6 +127,18 @@ def parse(args):
     elif option['hgcmd'] == 'serve':
         import hggtk.serve
         return hggtk.serve.run(cwd=option['cwd'])
+    elif option['hgcmd'] in ['incoming', 'pull']:
+        import hggtk.paths
+        path = hggtk.paths.run(pull = True)
+        if path:
+            import hggtk.cmd
+            return hggtk.cmd.run(cmdline + ' ' + path)
+    elif option['hgcmd'] in ['outgoing', 'push']:
+        import hggtk.paths
+        path = hggtk.paths.run(pull = False)
+        if path:
+            import hggtk.cmd
+            return hggtk.cmd.run(cmdline + ' ' + path)
     else:
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)
