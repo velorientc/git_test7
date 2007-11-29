@@ -44,6 +44,7 @@ class ServeDialog(gtk.Dialog):
         self.action_area.pack_end(self._button_stop)
         self._button_stop.set_sensitive(False)
 
+        self.proc = None
         self._repo = repo
         if cwd: os.chdir(cwd)
         
