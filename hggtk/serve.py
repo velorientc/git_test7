@@ -33,6 +33,8 @@ class ServeDialog(gtk.Dialog):
         """ Initialize the Dialog """
         super(ServeDialog, self).__init__(flags=gtk.DIALOG_MODAL)
 
+        self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+
         self._button_start = gtk.Button("Start")
         self._button_start.connect('clicked', self._on_start_clicked)
         self.action_area.pack_end(self._button_start)
