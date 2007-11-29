@@ -55,12 +55,11 @@ class ServeDialog(gtk.Dialog):
         self.queue = Queue.Queue()
         
         self.set_default_size(730, 300)
-        ewidth = 16
         
         # revision input
         revbox = gtk.HBox()
         lbl = gtk.Label("HTTP Port:")
-        lbl.set_property("width-chars", ewidth)
+        lbl.set_property("width-chars", 16)
         lbl.set_alignment(0, 0.5)
         self._port_input = gtk.Entry()
         self._port_input.set_text("8000")
