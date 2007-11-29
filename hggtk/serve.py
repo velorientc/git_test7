@@ -39,6 +39,9 @@ class ServeDialog(gtk.Dialog):
         self._button_start.connect('clicked', self._on_start_clicked)
         self.action_area.pack_end(self._button_start)
 
+        self.connect('delete-event', self._delete)
+        self.connect('response', self._response)
+
         self._button_stop = gtk.Button("Stop")
         self._button_stop.connect('clicked', self._on_stop_clicked)
         self.action_area.pack_end(self._button_stop)
@@ -79,6 +82,15 @@ class ServeDialog(gtk.Dialog):
 
         # show them all
         self.vbox.show_all()
+
+    def _delete(self, widget, event):
+        return True
+
+    def _response(self, widget, response_id):
+        if self.proc and self.proc.poll() == None:
+            if question_dialog("Really Exit?", "Server process is still running\n" +
+                    "Exiting will stop the server.") != gtk.RESPONSE_YES:
+                widget.emit_stop_by_name('response')
 
     def _on_start_clicked(self, button):
         # gather input data
