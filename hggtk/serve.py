@@ -29,7 +29,7 @@ from mercurial.node import *
 
 class ServeDialog(gtk.Dialog):
     """ Dialog to run web server"""
-    def __init__(self, cwd='', repo = None):
+    def __init__(self, cwd='', root=''):
         """ Initialize the Dialog """
         super(ServeDialog, self).__init__(flags=gtk.DIALOG_MODAL)
 
@@ -48,11 +48,11 @@ class ServeDialog(gtk.Dialog):
         self._button_stop.set_sensitive(False)
 
         self.proc = None
-        self._repo = repo
+        self._root = root
         if cwd: os.chdir(cwd)
         
         # set dialog title
-        title = "hg serve --pid-file pid.tmp"
+        title = "hg serve"
         title += " - %s" % (os.getcwd())
         self.set_title(title)
         self.queue = Queue.Queue()
@@ -103,10 +103,18 @@ class ServeDialog(gtk.Dialog):
         # start server
         (fd, filename) = mkstemp()
         self.cmdline = 'hg serve --pid-file ' + filename
-        if self._repo:
-            self.cmdline += ' --repository ' + self._repo
+        if self._root:
+            self.cmdline += ' --repository "%s"' % self._root
         if port:
             self.cmdline += ' --port %d' % port
+
+        try:
+            repo = hg.repository(ui.ui(), path=self._root)
+            if not repo.ui.config('web', 'name'):
+                self.cmdline += ' --name "%s"' % \
+                    os.path.basename(self._root)
+        except hg.RepoError:
+            pass
 
         # run hg in unbuffered mode, so the output can be captured and
         # display a.s.a.p.
@@ -188,8 +196,8 @@ class PollThread(threading.Thread):
         except IOError:
             pass
 
-def run(cwd='', repo=None):
-    dialog = ServeDialog(cwd, repo)
+def run(cwd='', root=''):
+    dialog = ServeDialog(cwd, root)
     dialog.run()
     dialog._on_stop_clicked(None)
     dialog.hide()
