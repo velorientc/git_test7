@@ -57,7 +57,7 @@ class ServeDialog(gtk.Dialog):
         self.set_title(title)
         self.queue = Queue.Queue()
         
-        self.set_default_size(730, 300)
+        self.set_default_size(500, 300)
         
         # revision input
         revbox = gtk.HBox()
