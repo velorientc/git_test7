@@ -307,11 +307,6 @@ class ContextMenuExtension:
         print "_get_commands(): adding hg commands"
         
         if tree is not None:
-            # Visual Diff (any extdiff command)
-            result.append((_("Visual diff"),
-                           _("View changes using GUI diff tool"),
-                           self._vdiff))
-                           
             # Commit (qct, gcommit, or internal)
             result.append((_("Commit"), 
                            _("Commit changes with GUI tool"),
@@ -326,6 +321,12 @@ class ContextMenuExtension:
             result.append((_("Diff"),
                            _("View changes"),
                            self._diff))
+
+            # Visual Diff (any extdiff command)
+            result.append((_("Visual diff"),
+                           _("View changes using GUI diff tool"),
+                           self._vdiff))
+                           
             result.append((_("Add"),
                            _("Add files to Hg repository"),
                            self._add))
