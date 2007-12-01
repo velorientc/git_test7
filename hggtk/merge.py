@@ -107,6 +107,7 @@ class MergeDialog(gtk.Dialog):
         # populate revision data        
         heads = self.repo.heads()
         tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
+        self._revlist.clear()
         for i, node in enumerate(heads):
             if node in self._parents:
                 continue
