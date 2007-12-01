@@ -132,6 +132,10 @@ class MergeDialog(gtk.Dialog):
         rev = self._rev_input.get_text()
         force = self._chbox_force.get_active()
         
+        if not rev:
+            error_dialog("Can't merge", "please enter revision to merge")
+            return
+        
         response = question_dialog("Really want to merge?",
                                    "with revision %s" % rev)
         if response != gtk.RESPONSE_YES:
