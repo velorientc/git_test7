@@ -377,7 +377,7 @@ class ContextMenuExtension:
 
             result.append([])   # separator
 
-            result.append((_("Clone a repository"),
+            result.append((_("Clone"),
                            _("Clone a repository"),
                            self._clone))
             result.append((_("Pull"),
