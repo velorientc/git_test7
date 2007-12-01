@@ -132,13 +132,13 @@ def parse(args):
         path = hggtk.paths.run(root=option['root'], pull=True)
         if path:
             import hggtk.cmd
-            return hggtk.cmd.run(cmdline + ' ' + path)
+            return hggtk.cmd.run(cmdline + ' ' + thgutil.shellquote(path))
     elif option['hgcmd'] in ['outgoing', 'push']:
         import hggtk.paths
         path = hggtk.paths.run(root=option['root'], pull=False)
         if path:
             import hggtk.cmd
-            return hggtk.cmd.run(cmdline + ' ' + path)
+            return hggtk.cmd.run(cmdline + ' ' + thgutil.shellquote(path))
     else:
         import hggtk.cmd
         return hggtk.cmd.run(cmdline)
