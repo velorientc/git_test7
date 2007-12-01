@@ -33,8 +33,8 @@ class PathsDialog(gtk.Dialog):
 
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label("Select %s:" % \
-                (pull and "incoming" or "outgoing"))
+        lbl = gtk.Label("%s path:" % \
+                (pull and "Incoming" or "Outgoing"))
         lbl.set_justify(gtk.JUSTIFY_LEFT)
         
         # revisions  combo box
