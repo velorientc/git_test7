@@ -359,9 +359,11 @@ class ContextMenuExtension:
 
             # Visual history (hgk, hgview, glog, or internal)
             result.append((_("View history"),
-                           _("View history with GUI tool"),
+                           _("View revision history"),
+                           self._history))
+            result.append((_("Revision graph"),
+                           _("View history with DAG graph"),
                            self._view))
-
             result.append((_("Current revision status..."),
                            _("Show various revision info"),
                            self._tip))
@@ -502,13 +504,17 @@ class ContextMenuExtension:
             run_program(cmd)
 
     def _view(self, parent_window):
-        '''[tortoisehg] view = [hgk | hgvew | glog | internal]'''
-        view = ui.ui().config('tortoisehg', 'view', 'internal')
+        '''[tortoisehg] view = [hgk | hgview]'''
+        view = ui.ui().config('tortoisehg', 'view', '')
+        if not view:
+            msg = "You must configure tortoisehg.view in your Mercurial.ini"
+            title = "Revision Graph Tool Not Configured"
+            win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+            return
+
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
-        if view == 'internal':
-            self._log(parent_window)
-        elif view == 'hgview':
+        if view == 'hgview':
             hgviewpath = find_path('hgview')
             cmd = "%s --repository=%s" % \
                     (shellquote(hgviewpath), shellquote(root))
@@ -522,14 +528,29 @@ class ContextMenuExtension:
                 cmd = "%s --repository %s view" % \
                         (shellquote(hgpath), shellquote(root))
                 run_program(cmd)
-            elif view == 'glog':
+            else:
+                msg = "Revision graph viewer %s not recognized" % view
+                title = "Unknown history tool"
+                win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+
+    def _history(self, parent_window):
+        '''[tortoisehg] log = [glog | internal]'''
+        log = ui.ui().config('tortoisehg', 'log', 'internal')
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        if log == 'internal':
+            self._log(parent_window)
+        else:
+            hgpath = find_path('hg')
+            if not hgpath: return
+            if log == 'glog':
                 quoted_files = [shellquote(s) for s in targets]
                 cmd = "%s --repository %s glog %s" % \
                         (shellquote(hgpath), shellquote(root),
                          " ".join(quoted_files))
                 run_program(cmd)
             else:
-                msg = "History viewer %s not recognized" % view
+                msg = "History viewer %s not recognized" % log
                 title = "Unknown history tool"
                 win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
 
