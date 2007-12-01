@@ -21,7 +21,7 @@ class PathsDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, title="TortoiseHg Select Remote Repository",
                                   parent=None,
                                   flags=0,
-                                  buttons=None)
+                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         self.root = root
         self.selected_path = None
 
