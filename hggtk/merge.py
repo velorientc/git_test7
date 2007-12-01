@@ -23,8 +23,8 @@ class MergeDialog(gtk.Dialog):
 
         self.root = root
 
-        u = ui.ui()
         try:
+            u = ui.ui()
             self.repo = hg.repository(u, path=self.root)
         except hg.RepoError:
             return None
@@ -38,31 +38,32 @@ class MergeDialog(gtk.Dialog):
         
     def _create(self):
         self.set_default_size(350, 120)
+        
+        # repo parent revisions
+        parentbox = gtk.HBox()
+        lbl = gtk.Label("Parent revisions:")
+        lbl.set_property("width-chars", 18)
+        lbl.set_alignment(0, 0.5)
+        self._parent_revs = gtk.Entry()
+        parentbox.pack_start(lbl, False, False)
+        parentbox.pack_start(self._parent_revs, False, False)
+        self.vbox.pack_start(parentbox, False, False, 2)
 
         # revision input
         revbox = gtk.HBox()
         lbl = gtk.Label("Merge with revision:")
-        lbl.set_property("width-chars", 20)
-        lbl.set_justify(gtk.JUSTIFY_LEFT)
+        lbl.set_property("width-chars", 18)
+        lbl.set_alignment(0, 0.5)
         
         # revisions  combo box
-        revlist = gtk.ListStore(str, str)
-        self._revbox = gtk.ComboBoxEntry(revlist, 0)
+        self._revlist = gtk.ListStore(str, str)
+        self._revbox = gtk.ComboBoxEntry(self._revlist, 0)
         
         # add extra column to droplist for type of changeset
         cell = gtk.CellRendererText()
         self._revbox.pack_start(cell)
         self._revbox.add_attribute(cell, 'text', 1)
-    
-        # populate revision data
         self._rev_input = self._revbox.get_child()
-        heads = self.repo.heads()
-        tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
-        revlist.append([short(tip), "(tip)"])
-        self._rev_input.set_text(short(tip))
-        if len(heads) > 1:
-            for i, node in enumerate(heads):
-                revlist.append([short(node), "(head %d)" % (i+1)])
 
         self._btn_rev_browse = gtk.Button("Browse...")
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
@@ -80,8 +81,43 @@ class MergeDialog(gtk.Dialog):
         self.action_area.pack_end(self._btn_merge)
         
         # show them all
+        self._refresh()
         self.vbox.show_all()
 
+    def _refresh(self):
+        """ update display on dialog with recent repo data """
+        try:
+            # FIXME: force hg to refresh parents info
+            del self.repo
+            self.repo = hg.repository(ui.ui(), path=self.root)
+        except hg.RepoError:
+            return None
+
+        # populate parent rev data
+        self._parents = [x.node() for x in self.repo.workingctx().parents()]
+        print "merge: parents = ", self._parents 
+        self._parent_revs.set_sensitive(True)
+        self._parent_revs.set_text(", ".join([short(x) for x in self._parents]))
+        self._parent_revs.set_sensitive(False)
+        
+        # disable merge if repo already have uncommited merge
+        if len(self._parents) > 1:
+            self._btn_merge.set_sensitive(False)
+            
+        # populate revision data        
+        heads = self.repo.heads()
+        tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
+        for i, node in enumerate(heads):
+            if node in self._parents:
+                continue
+            
+            status = "head %d" % (i+1)
+            if node == tip:
+                status += ", tip"
+            
+            self._revlist.append([short(node), "(%s)" %status])
+            self._rev_input.set_text(short(node))
+        
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
         import history
@@ -106,6 +142,7 @@ class MergeDialog(gtk.Dialog):
                         (util.shellquote(self.root), rev)
         if force: cmdline += " --force"
         cmd.run(cmdline)
+        self._refresh()
 
 def run(root=''):
     dialog = MergeDialog(root=root)
