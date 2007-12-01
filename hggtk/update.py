@@ -41,30 +41,32 @@ class UpdateDialog(gtk.Dialog):
     def _create(self):
         self.set_default_size(350, 120)
 
+        # repo parent revisions
+        parentbox = gtk.HBox()
+        lbl = gtk.Label("Parent revisions:")
+        lbl.set_property("width-chars", 18)
+        lbl.set_alignment(0, 0.5)
+        self._parent_revs = gtk.Entry()
+        self._parent_revs.set_sensitive(False)
+        parentbox.pack_start(lbl, False, False)
+        parentbox.pack_start(self._parent_revs, False, False)
+        self.vbox.pack_start(parentbox, False, False, 2)
+
         # revision input
         revbox = gtk.HBox()
         lbl = gtk.Label("Update to revision:")
-        lbl.set_property("width-chars", 20)
-        lbl.set_justify(gtk.JUSTIFY_LEFT)
+        lbl.set_property("width-chars", 18)
+        lbl.set_alignment(0, 0.5)
         
         # revisions  combo box
-        revlist = gtk.ListStore(str, str)
-        self._revbox = gtk.ComboBoxEntry(revlist, 0)
+        self._revlist = gtk.ListStore(str, str)
+        self._revbox = gtk.ComboBoxEntry(self._revlist, 0)
         
         # add extra column to droplist for type of changeset
         cell = gtk.CellRendererText()
         self._revbox.pack_start(cell)
         self._revbox.add_attribute(cell, 'text', 1)
-    
-        # populate revision data
         self._rev_input = self._revbox.get_child()
-        heads = self.repo.heads()
-        tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
-        revlist.append([short(tip), "(tip)"])
-        self._rev_input.set_text(short(tip))
-        if len(heads) > 1:
-            for i, node in enumerate(heads):
-                revlist.append([short(node), "(head %d)" % (i+1)])
         
         # setup buttons
         self._btn_rev_browse = gtk.Button("Browse...")
@@ -84,7 +86,36 @@ class UpdateDialog(gtk.Dialog):
         
         # show them all
         self.vbox.show_all()
+        self._refresh()
 
+    def _refresh(self):
+        """ update display on dialog with recent repo data """
+        try:
+            # FIXME: force hg to refresh parents info
+            del self.repo
+            self.repo = hg.repository(ui.ui(), path=self.root)
+        except hg.RepoError:
+            return None
+
+        # populate parent rev data
+        self._parents = [x.node() for x in self.repo.workingctx().parents()]
+        self._parent_revs.set_text(", ".join([short(x) for x in self._parents]))
+
+        # populate revision data        
+        heads = self.repo.heads()
+        tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
+        self._revlist.clear()
+        for i, node in enumerate(heads):
+            if node in self._parents:
+                continue
+            
+            status = "head %d" % (i+1)
+            if node == tip:
+                status += ", tip"
+            
+            self._revlist.append([short(node), "(%s)" %status])
+            self._rev_input.set_text(short(node))
+            
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
         import history
@@ -99,6 +130,10 @@ class UpdateDialog(gtk.Dialog):
         rev = self._rev_input.get_text()
         overwrite = self._overwrite.get_active()
         
+        if not rev:
+            error_dialog("Can't update", "please enter revision to update to")
+            return
+        
         response = question_dialog("Really want to update?",
                                    "to revision %s" % rev)
         if response != gtk.RESPONSE_YES:
@@ -109,7 +144,7 @@ class UpdateDialog(gtk.Dialog):
                         (util.shellquote(self.root), rev)
         if overwrite: cmdline += " --clean"
         cmd.run(cmdline)
-        print "running cmd..."
+        self._refresh()
         shell_notify([self.cwd])
 
 def run(cwd=''):
