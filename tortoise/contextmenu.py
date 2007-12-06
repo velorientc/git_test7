@@ -30,9 +30,10 @@ class TortoiseMenu(object):
         self.icon = icon
 
 class TortoiseSubmenu(object):
-    def __init__(self, menutext, menulist):
+    def __init__(self, menutext, menulist, icon=None):
         self.menutext = menutext
         self.menulist = menulist
+        self.icon = icon
         
 class TortoiseMenuSep(object):
     def __init__(self):
@@ -141,10 +142,19 @@ class ContextMenuExtension:
                 subcommands = menu_info.menulist
                 submenu, idCmd = self.create_submenu(subcommands,
                         idCmd, idCmdFirst)
-                item, _ = win32gui_struct.PackMENUITEMINFO(
-                        text=menu_info.menutext,
-                        hSubMenu=submenu, 
-                        wID=idCmdFirst + idCmd)
+                opt = {
+                    'text' : menu_info.menutext,
+                    'wID' : idCmdFirst + idCmd,
+                    'hSubMenu' : submenu, 
+                }
+
+                if menu_info.icon:
+                    icon_path = get_icon_path("tortoise", menu_info.icon)
+                    if icon_path:
+                        opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
+                                icon_to_bitmap(icon_path, type="MENUCHECK")
+                
+                item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(menu, idCmdFirst + idCmd, True, item)
                 self._handlers[idCmd] = ("", lambda x,y: 0)
             elif type(menu_info) == TortoiseMenu:
