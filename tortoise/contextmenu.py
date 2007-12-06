@@ -285,7 +285,7 @@ class ContextMenuExtension:
         result = []
         result.append(TortoiseMenu(_("Create Clone"), 
                        _("Create clone here from source"),
-                       self._clone_here))
+                       self._clone_here, icon="menurelocate.ico"))
 
         if drop_repo:
             print "_get_commands_dragdrop(): drop zone is a hg repo too"
@@ -323,10 +323,10 @@ class ContextMenuExtension:
             print "%s: not in repo" % rpath
             result.append(TortoiseMenu(_("Create repo here"),
                            _("create a new repository in this directory"),
-                           self._init))
+                           self._init, icon="menucreaterepos.ico"))
             result.append(TortoiseMenu(_("Clone a repository"),
                            _("clone a repository"),
-                           self._clone))
+                           self._clone, icon="menurelocate.ico"))
             return result
 
         print "file = %s\nroot = %s" % (rpath, root)
@@ -343,32 +343,32 @@ class ContextMenuExtension:
             # Commit (qct, gcommit, or internal)
             result.append(TortoiseMenu(_("Commit"), 
                            _("Commit changes with GUI tool"),
-                           self._commit))
+                           self._commit, icon="menucommit.ico"))
 
             # Working directory status (gstatus, internal)
             result.append(TortoiseMenu(_("Status"),
                            _("Repository status"),
-                           self._status))
+                           self._status, icon="menushowchanged.ico"))
 
             # Mercurial standard commands
             result.append(TortoiseMenu(_("Diff"),
                            _("View changes"),
-                           self._diff))
+                           self._diff, icon="menudiff.ico"))
 
             # Visual Diff (any extdiff command)
             result.append(TortoiseMenu(_("Visual diff"),
                            _("View changes using GUI diff tool"),
-                           self._vdiff))
+                           self._vdiff, icon="TortoiseMerge.ico"))
                            
             result.append(TortoiseMenu(_("Add"),
                            _("Add files to Hg repository"),
-                           self._add))
+                           self._add, icon="menuadd.ico"))
             result.append(TortoiseMenu(_("Remove"),
                            _("Remove selected files on the next commit"),
-                           self._remove))
+                           self._remove, icon="menudelete.ico"))
             result.append(TortoiseMenu(_("Revert"),
                            _("Revert selected files"),
-                           self._revert))
+                           self._revert, icon="menurevert.ico"))
 
             result.append(TortoiseMenuSep())
 
@@ -383,20 +383,20 @@ class ContextMenuExtension:
                            self._verify))
             result.append(TortoiseMenu(_("Update"),
                            _("update working directory"),
-                           self._update))
+                           self._update, icon="menucheckout.ico"))
             result.append(TortoiseMenu(_("Merge"),
                            _("merge working directory with another revision"),
-                           self._merge))
+                           self._merge, icon="menumerge.ico"))
 
             result.append(TortoiseMenuSep())
 
             # Visual history (hgk, hgview, glog, or internal)
             result.append(TortoiseMenu(_("View history"),
                            _("View revision history"),
-                           self._history))
+                           self._history, icon="menulog.ico"))
             result.append(TortoiseMenu(_("Revision graph"),
                            _("View history with DAG graph"),
-                           self._view))
+                           self._view, icon="menurevisiongraph.ico"))
             result.append(TortoiseMenu(_("Current revision status..."),
                            _("Show various revision info"),
                            self._tip))
@@ -414,7 +414,7 @@ class ContextMenuExtension:
 
             result.append(TortoiseMenu(_("Clone"),
                            _("Clone a repository"),
-                           self._clone))
+                           self._clone, icon="menurelocate.ico"))
             result.append(TortoiseMenu(_("Pull"),
                            _("Pull from default repository"),
                            self._pull))
@@ -446,12 +446,13 @@ class ContextMenuExtension:
                 config.append(TortoiseMenu(_("Web"),
                     _("Configure repository web data"),
                     self._web))
-                result.append(TortoiseSubmenu(_("Options"), config))
+                result.append(TortoiseSubmenu(_("Options"), config,
+                        icon="menusettings.ico"))
                 result.append(TortoiseMenuSep())
 
             result.append(TortoiseMenu(_("Help"),
                            _("Basic Mercurial help text"),
-                           self._help))
+                           self._help, icon="menuhelp.ico"))
 
         return result
 
