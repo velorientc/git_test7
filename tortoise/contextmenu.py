@@ -150,9 +150,8 @@ class ContextMenuExtension:
 
                 if menu_info.icon:
                     icon_path = get_icon_path("tortoise", menu_info.icon)
-                    if icon_path:
-                        opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
-                                icon_to_bitmap(icon_path, type="MENUCHECK")
+                    opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
+                            icon_to_bitmap(icon_path, type="MENUCHECK")
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(menu, idCmdFirst + idCmd, True, item)
@@ -170,9 +169,8 @@ class ContextMenuExtension:
 
                 if menu_info.icon:
                     icon_path = get_icon_path("tortoise", menu_info.icon)
-                    if icon_path:
-                        opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
-                                icon_to_bitmap(icon_path, type="MENUCHECK")
+                    opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
+                            icon_to_bitmap(icon_path, type="MENUCHECK")
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(menu, idCmdFirst+idCmd, True, item)
