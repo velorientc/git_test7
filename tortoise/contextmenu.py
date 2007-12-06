@@ -152,10 +152,19 @@ class ContextMenuExtension:
                 if menu_info.state is False:
                     fstate |= win32con.MF_GRAYED
                 
-                item, _ = win32gui_struct.PackMENUITEMINFO(
-                        text=menu_info.menutext,
-                        fState=fstate,
-                        wID=idCmdFirst + idCmd)
+                opt = {
+                    'text' : menu_info.menutext,
+                    'fState' : fstate,
+                    'wID' : idCmdFirst + idCmd,
+                }
+
+                if menu_info.icon:
+                    icon_path = get_icon_path("tortoise", menu_info.icon)
+                    if icon_path:
+                        opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
+                                icon_to_bitmap(icon_path, type="MENUCHECK")
+                
+                item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(menu, idCmdFirst+idCmd, True, item)
                 self._handlers[idCmd] = (menu_info.helptext, menu_info.handler)
             idCmd += 1
