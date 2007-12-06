@@ -483,7 +483,7 @@ class ContextMenuExtension:
         if ct == 'internal':
             self._commit_simple(parent_window)
             return
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if hgpath:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
@@ -492,7 +492,7 @@ class ContextMenuExtension:
             run_program(cmd)
 
     def _uname(self, parent_window):
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if not hgpath: return
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -501,7 +501,7 @@ class ContextMenuExtension:
         run_program(cmd)
 
     def _paths(self, parent_window):
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if not hgpath: return
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -510,7 +510,7 @@ class ContextMenuExtension:
         run_program(cmd)
 
     def _web(self, parent_window):
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if not hgpath: return
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -526,7 +526,7 @@ class ContextMenuExtension:
             title = "Visual Diff Not Configured"
             win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
             return
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if hgpath:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
@@ -555,7 +555,7 @@ class ContextMenuExtension:
                 cmd += " --file=%s" % shellquote(self._filenames[0])
             run_program(cmd)
         else:
-            hgpath = find_path('hg')
+            hgpath = find_path('hg', get_prog_root())
             if not hgpath: return
             if view == 'hgk':
                 cmd = "%s --repository %s view" % \
@@ -574,7 +574,7 @@ class ContextMenuExtension:
         if log == 'internal':
             self._log(parent_window)
         else:
-            hgpath = find_path('hg')
+            hgpath = find_path('hg', get_prog_root())
             if not hgpath: return
             if log == 'glog':
                 quoted_files = [shellquote(s) for s in targets]
@@ -655,7 +655,7 @@ class ContextMenuExtension:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
             quoted_files = [shellquote(s) for s in targets]
-            hgpath = find_path('hg')
+            hgpath = find_path('hg', get_prog_root())
             cmd = "%s --repository %s gstatus %s" % \
                     (shellquote(hgpath), shellquote(root),
                      " ".join(quoted_files))
