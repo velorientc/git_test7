@@ -21,6 +21,23 @@ from thgutil import *
 S_OK = 0
 S_FALSE = 1
 
+class TortoiseMenu(object):
+    def __init__(self, menutext, helptext, handler, icon=None, state=True):
+        self.menutext = menutext
+        self.helptext = helptext
+        self.handler = handler
+        self.state = state
+        self.icon = icon
+
+class TortoiseSubmenu(object):
+    def __init__(self, menutext, menulist):
+        self.menutext = menutext
+        self.menulist = menulist
+        
+class TortoiseMenuSep(object):
+    def __init__(self):
+        pass
+    
 def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, notify=False):
     app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
     print "proc app = ", app_path
@@ -116,32 +133,31 @@ class ContextMenuExtension:
     def create_submenu(self, commands, idCmd, idCmdFirst):
         menu = win32gui.CreatePopupMenu()
         for menu_info in commands:
-            fstate = win32con.MF_BYCOMMAND
-            if len(menu_info) == 0:
+            if type(menu_info) == TortoiseMenuSep:
                 win32gui.InsertMenu(menu, idCmd, 
                         win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
                         idCmdFirst + idCmd, None)
-                idCmd += 1
-                continue
-            elif len(menu_info) == 2:
-                text, subcommands = menu_info
-                submenu, idCmd = self.create_submenu(subcommands, idCmd, idCmdFirst)
+            elif type(menu_info) == TortoiseSubmenu:
+                subcommands = menu_info.menulist
+                submenu, idCmd = self.create_submenu(subcommands,
+                        idCmd, idCmdFirst)
                 item, _ = win32gui_struct.PackMENUITEMINFO(
-                        text=text, hSubMenu=submenu, wID=idCmdFirst + idCmd)
+                        text=menu_info.menutext,
+                        hSubMenu=submenu, 
+                        wID=idCmdFirst + idCmd)
                 win32gui.InsertMenuItem(menu, idCmdFirst + idCmd, True, item)
                 self._handlers[idCmd] = ("", lambda x,y: 0)
-                idCmd += 1
-                continue
-            elif len(menu_info) == 4:
-                text, help_text, command, enabled = menu_info
-                if not enabled: fstate |= win32con.MF_GRAYED
-            elif len(menu_info) == 3:
-                text, help_text, command = menu_info
+            elif type(menu_info) == TortoiseMenu:
+                fstate = win32con.MF_BYCOMMAND
+                if menu_info.state is False:
+                    fstate |= win32con.MF_GRAYED
                 
-            item, _ = win32gui_struct.PackMENUITEMINFO(
-                        text=text, fState=fstate, wID=idCmdFirst + idCmd)
-            win32gui.InsertMenuItem(menu, idCmdFirst+idCmd, True, item)
-            self._handlers[idCmd] = (help_text, command)
+                item, _ = win32gui_struct.PackMENUITEMINFO(
+                        text=menu_info.menutext,
+                        fState=fstate,
+                        wID=idCmdFirst + idCmd)
+                win32gui.InsertMenuItem(menu, idCmdFirst+idCmd, True, item)
+                self._handlers[idCmd] = (menu_info.helptext, menu_info.handler)
             idCmd += 1
         return (menu, idCmd)
 
@@ -250,23 +266,23 @@ class ContextMenuExtension:
         print "_get_commands_dragdrop(): adding hg commands"
         
         result = []
-        result.append((_("Create Clone"), 
+        result.append(TortoiseMenu(_("Create Clone"), 
                        _("Create clone here from source"),
                        self._clone_here))
 
         if drop_repo:
             print "_get_commands_dragdrop(): drop zone is a hg repo too"
             print "drop root = %s" % drag_repo.root
-            result.append((_("Push to"), 
+            result.append(TortoiseMenu(_("Push to"), 
                            _("Push source into the repo here"),
                            self._push_here))
-            result.append((_("Pull from"), 
+            result.append(TortoiseMenu(_("Pull from"), 
                            _("Pull new change from dragged repo"),
                            self._pull_here))
-            result.append((_("Incoming"), 
+            result.append(TortoiseMenu(_("Incoming"), 
                            _("show new changesets found in source"),
                            self._incoming_here))
-            result.append((_("Outgoing"), 
+            result.append(TortoiseMenu(_("Outgoing"), 
                            _("show changesets not found in destination"),
                            self._outgoing_here))
         return result
@@ -288,10 +304,10 @@ class ContextMenuExtension:
         root = find_root(rpath)
         if root is None:
             print "%s: not in repo" % rpath
-            result.append((_("Create repo here"),
+            result.append(TortoiseMenu(_("Create repo here"),
                            _("create a new repository in this directory"),
                            self._init))
-            result.append((_("Clone a repository"),
+            result.append(TortoiseMenu(_("Clone a repository"),
                            _("clone a repository"),
                            self._clone))
             return result
@@ -308,115 +324,115 @@ class ContextMenuExtension:
         
         if tree is not None:
             # Commit (qct, gcommit, or internal)
-            result.append((_("Commit"), 
+            result.append(TortoiseMenu(_("Commit"), 
                            _("Commit changes with GUI tool"),
                            self._commit))
 
             # Working directory status (gstatus, internal)
-            result.append((_("Status"),
+            result.append(TortoiseMenu(_("Status"),
                            _("Repository status"),
                            self._status))
 
             # Mercurial standard commands
-            result.append((_("Diff"),
+            result.append(TortoiseMenu(_("Diff"),
                            _("View changes"),
                            self._diff))
 
             # Visual Diff (any extdiff command)
-            result.append((_("Visual diff"),
+            result.append(TortoiseMenu(_("Visual diff"),
                            _("View changes using GUI diff tool"),
                            self._vdiff))
                            
-            result.append((_("Add"),
+            result.append(TortoiseMenu(_("Add"),
                            _("Add files to Hg repository"),
                            self._add))
-            result.append((_("Remove"),
+            result.append(TortoiseMenu(_("Remove"),
                            _("Remove selected files on the next commit"),
                            self._remove))
-            result.append((_("Revert"),
+            result.append(TortoiseMenu(_("Revert"),
                            _("Revert selected files"),
                            self._revert))
 
-            result.append([])   # separator
+            result.append(TortoiseMenuSep())
 
-            result.append((_("Rollback"),
+            result.append(TortoiseMenu(_("Rollback"),
                            _("Rollback the last transaction"),
                            self._rollback))
-            result.append((_("Recover"),
+            result.append(TortoiseMenu(_("Recover"),
                            _("Recover from an interrupted commit or pull"),
                            self._recover))
-            result.append((_("Verify"),
+            result.append(TortoiseMenu(_("Verify"),
                            _("Verify repository consistency"),
                            self._verify))
-            result.append((_("Update"),
+            result.append(TortoiseMenu(_("Update"),
                            _("update working directory"),
                            self._update))
-            result.append((_("Merge"),
+            result.append(TortoiseMenu(_("Merge"),
                            _("merge working directory with another revision"),
                            self._merge))
 
-            result.append([])   # separator
+            result.append(TortoiseMenuSep())
 
             # Visual history (hgk, hgview, glog, or internal)
-            result.append((_("View history"),
+            result.append(TortoiseMenu(_("View history"),
                            _("View revision history"),
                            self._history))
-            result.append((_("Revision graph"),
+            result.append(TortoiseMenu(_("Revision graph"),
                            _("View history with DAG graph"),
                            self._view))
-            result.append((_("Current revision status..."),
+            result.append(TortoiseMenu(_("Current revision status..."),
                            _("Show various revision info"),
                            self._tip))
 
-            result.append([])   # separator
+            result.append(TortoiseMenuSep())
 
-            result.append((_("View Tags"),
+            result.append(TortoiseMenu(_("View Tags"),
                            _("list repository tags"),
                            self._show_tags))
-            result.append((_("Add Tag"),
+            result.append(TortoiseMenu(_("Add Tag"),
                            _("add a tag for the current or given revision"),
                            self._add_tag))
 
-            result.append([])   # separator
+            result.append(TortoiseMenuSep())
 
-            result.append((_("Clone"),
+            result.append(TortoiseMenu(_("Clone"),
                            _("Clone a repository"),
                            self._clone))
-            result.append((_("Pull"),
+            result.append(TortoiseMenu(_("Pull"),
                            _("Pull from default repository"),
                            self._pull))
-            result.append((_("Push"),
+            result.append(TortoiseMenu(_("Push"),
                            _("Push to default repository"),
                            self._push))
-            result.append((_("Incoming"),
+            result.append(TortoiseMenu(_("Incoming"),
                            _("show new changesets found in source"),
                            self._incoming))
-            result.append((_("Outgoing"),
+            result.append(TortoiseMenu(_("Outgoing"),
                            _("show changesets not found in destination"),
                            self._outgoing))
-            result.append((_("Web server"),
+            result.append(TortoiseMenu(_("Web server"),
                            _("start web server for this repository"),
                            self._serve))
 
-            result.append([])   # separator
+            result.append(TortoiseMenuSep())
 
             # Optionally add an Options submenu
             c = ui.ui().config('tortoisehg', 'hgconfig', None)
             if c in ['1', 'yes', 'True']:
                 config = []
-                config.append((_("Username"),
+                config.append(TortoiseMenu(_("Username"),
                     _("Configure username"),
                     self._uname))
-                config.append((_("Paths"),
+                config.append(TortoiseMenu(_("Paths"),
                     _("Configure remote paths"),
                     self._paths))
-                config.append((_("Web"),
+                config.append(TortoiseMenu(_("Web"),
                     _("Configure repository web data"),
                     self._web))
-                result.append((_("Options"), config))
-                result.append([])   # separator
+                result.append(TortoiseSubmenu(_("Options"), config))
+                result.append(TortoiseMenuSep())
 
-            result.append((_("Help"),
+            result.append(TortoiseMenu(_("Help"),
                            _("Basic Mercurial help text"),
                            self._help))
 
