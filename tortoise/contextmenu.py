@@ -30,10 +30,16 @@ class TortoiseMenu(object):
         self.icon = icon
 
 class TortoiseSubmenu(object):
-    def __init__(self, menutext, menulist, icon=None):
+    def __init__(self, menutext, icon=None):
         self.menutext = menutext
-        self.menulist = menulist
+        self.menus = []
         self.icon = icon
+        
+    def add_menu(self, menutext, helptext, handler, icon=None, state=True):
+        self.menus.append(TortoiseMenu(menutext, helptext, handler, icon, state))
+        
+    def get_menus(self):
+        return self.menus
         
 class TortoiseMenuSep(object):
     def __init__(self):
@@ -131,16 +137,15 @@ class ContextMenuExtension:
             for i in range(num_files):
                 self._filenames.append(shell.DragQueryFile(sm.data_handle, i))
 
-    def create_submenu(self, commands, idCmd, idCmdFirst):
+    def create_submenu(self, menus, idCmd, idCmdFirst):
         menu = win32gui.CreatePopupMenu()
-        for menu_info in commands:
+        for menu_info in menus:
             if type(menu_info) == TortoiseMenuSep:
                 win32gui.InsertMenu(menu, idCmd, 
                         win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
                         idCmdFirst + idCmd, None)
             elif type(menu_info) == TortoiseSubmenu:
-                subcommands = menu_info.menulist
-                submenu, idCmd = self.create_submenu(subcommands,
+                submenu, idCmd = self.create_submenu(menu_info.get_menus(),
                         idCmd, idCmdFirst)
                 opt = {
                     'text' : menu_info.menutext,
@@ -413,24 +418,25 @@ class ContextMenuExtension:
                            _("start web server for this repository"),
                            self._serve))
 
-            result.append(TortoiseMenuSep())
-
             # Optionally add an Options submenu
             c = ui.ui().config('tortoisehg', 'hgconfig', None)
             if c in ['1', 'yes', 'True']:
-                config = []
-                config.append(TortoiseMenu(_("Username"),
-                    _("Configure username"),
-                    self._uname))
-                config.append(TortoiseMenu(_("Paths"),
-                    _("Configure remote paths"),
-                    self._paths))
-                config.append(TortoiseMenu(_("Web"),
-                    _("Configure repository web data"),
-                    self._web))
-                result.append(TortoiseSubmenu(_("Options"), config))
                 result.append(TortoiseMenuSep())
+                optmenu = TortoiseSubmenu(_("Options"))
+                
+                optmenu.add_menu(_("Username"),
+                                 _("Configure username"),
+                                 self._uname)
+                optmenu.add_menu(_("Paths"),
+                                 _("Configure remote paths"),
+                                 self._paths)
+                optmenu.add_menu(_("Web"),
+                                 _("Configure repository web data"),
+                                 self._web)
+                        
+                result.append(optmenu)
 
+            result.append(TortoiseMenuSep())
             result.append(TortoiseMenu(_("Help"),
                            _("Basic Mercurial help text"),
                            self._help))
