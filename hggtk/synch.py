@@ -46,7 +46,7 @@ class SynchDialog(gtk.Dialog):
         self.connect('delete-event', self._delete)
         self.connect('response', self._response)
 
-        self._btn_close = gtk.Button("Ok")
+        self._btn_close = gtk.Button("Close")
         self._btn_close.connect('clicked', self._close_clicked)
         self.action_area.pack_end(self._btn_close)
 
