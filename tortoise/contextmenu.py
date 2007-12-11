@@ -290,18 +290,9 @@ class ContextMenuExtension:
         if drop_repo:
             print "_get_commands_dragdrop(): drop zone is a hg repo too"
             print "drop root = %s" % drag_repo.root
-            result.append(TortoiseMenu(_("Push to"), 
-                           _("Push source into the repo here"),
-                           self._push_here))
-            result.append(TortoiseMenu(_("Pull from"), 
-                           _("Pull new change from dragged repo"),
-                           self._pull_here))
-            result.append(TortoiseMenu(_("Incoming"), 
-                           _("show new changesets found in source"),
-                           self._incoming_here))
-            result.append(TortoiseMenu(_("Outgoing"), 
-                           _("show changesets not found in destination"),
-                           self._outgoing_here))
+            result.append(TortoiseMenu(_("Synchronize"),
+                           _("Synchronize with dragged repository"),
+                           self._synch_here))
         return result
         
     def _get_commands(self):
@@ -662,6 +653,9 @@ class ContextMenuExtension:
     def _synch(self, parent_window):
         self._run_dialog('synch', True)
 
+    def _synch_here(self, parent_window):
+        self._run_dialog('synch', False)
+        
     def _pull(self, parent_window):
         self._run_dialog('pull', True)
 
