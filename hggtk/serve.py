@@ -35,17 +35,12 @@ class ServeDialog(gtk.Dialog):
 
         self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
-        self._button_start = gtk.Button("Start")
-        self._button_start.connect('clicked', self._on_start_clicked)
-        self.action_area.pack_end(self._button_start)
-
         self.connect('delete-event', self._delete)
         self.connect('response', self._response)
 
-        self._button_stop = gtk.Button("Stop")
-        self._button_stop.connect('clicked', self._on_stop_clicked)
-        self.action_area.pack_end(self._button_stop)
-        self._button_stop.set_sensitive(False)
+        self._btn_close = gtk.Button("Close")
+        self._btn_close.connect('clicked', self._close_clicked)
+        self.action_area.pack_end(self._btn_close)
 
         self.proc = None
         self._root = root
@@ -59,6 +54,26 @@ class ServeDialog(gtk.Dialog):
         
         self.set_default_size(500, 300)
         
+        # toolbar
+        self.tbar = gtk.Toolbar()
+        self._button_start = self._toolbutton(gtk.STOCK_MEDIA_PLAY,
+                                              'Start', 
+                                              self._on_start_clicked,
+                                              None)
+        self._button_stop  = self._toolbutton(gtk.STOCK_MEDIA_STOP,
+                                              'Stop',
+                                              self._on_stop_clicked,
+                                              None)
+        tbuttons = [
+                self._button_start,
+                gtk.SeparatorToolItem(),
+                self._button_stop,
+                gtk.SeparatorToolItem(),
+            ]
+        for btn in tbuttons:
+            self.tbar.insert(btn, -1)
+        self.vbox.pack_start(self.tbar, False, False, 2)
+        
         # revision input
         revbox = gtk.HBox()
         lbl = gtk.Label("HTTP Port:")
@@ -71,6 +86,7 @@ class ServeDialog(gtk.Dialog):
         self.vbox.pack_start(revbox, False, False, 2)
 
         scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
@@ -83,16 +99,51 @@ class ServeDialog(gtk.Dialog):
         # show them all
         self.vbox.show_all()
 
+    def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
+        if menu:
+            tbutton = gtk.MenuToolButton(stock)
+            tbutton.set_menu(menu)
+        else:
+            tbutton = gtk.ToolButton(stock)
+            
+        tbutton.set_label(label)
+        tbutton.connect('clicked', handler, userdata)
+        return tbutton
+            
+    def _close_clicked(self, *args):
+        #if self._server_stopped() == True:
+        self.response(gtk.RESPONSE_CLOSE)
+        
     def _delete(self, widget, event):
         return True
 
     def _response(self, widget, response_id):
+        if self._server_stopped() == False:
+            widget.emit_stop_by_name('response')
+    
+    def _server_stopped(self):
+        '''
+        check if server is running, or to terminate if running
+        '''
         if self.proc and self.proc.poll() == None:
             if question_dialog("Really Exit?", "Server process is still running\n" +
                     "Exiting will stop the server.") != gtk.RESPONSE_YES:
-                widget.emit_stop_by_name('response')
+                return False
+            else:
+                self._stop_server()
+                return True
+        else:
+            return True
 
-    def _on_start_clicked(self, button):
+    def _on_start_clicked(self, *args):
+        self._start_server()
+        self._button_start.set_sensitive(False)
+        self._button_stop.set_sensitive(True)
+
+    def _on_stop_clicked(self, *args):
+        self._stop_server()
+
+    def _start_server(self):
         # gather input data
         try:
             port = int(self._port_input.get_text())
@@ -123,9 +174,6 @@ class ServeDialog(gtk.Dialog):
         self.write('Web server started, now available at ')
         self.write('http://%s:%d/\n' % (socket.getfqdn(), port))
 
-        self._button_start.set_sensitive(False)
-        self._button_stop.set_sensitive(True)
-
         # start hg operation on a subprocess and capture the output
         self.tmp_file = filename
         self.tmp_fd = fd
@@ -138,8 +186,8 @@ class ServeDialog(gtk.Dialog):
 
         PollThread(self.proc, self.queue).start()
         gobject.timeout_add(10, self.process_queue)
-
-    def _on_stop_clicked(self, button):
+        
+    def _stop_server(self):
         if self.proc and self.proc.poll() == None:
             file = os.fdopen(self.tmp_fd, "r")
             pid = int(file.read())
@@ -199,7 +247,6 @@ class PollThread(threading.Thread):
 def run(cwd='', root=''):
     dialog = ServeDialog(cwd, root)
     dialog.run()
-    dialog._on_stop_clicked(None)
     dialog.hide()
     
 if __name__ == "__main__":
