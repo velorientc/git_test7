@@ -127,6 +127,9 @@ def parse(args):
     elif option['hgcmd'] == 'serve':
         import hggtk.serve
         return hggtk.serve.run(cwd=option['cwd'], root=option['root'])
+    elif option['hgcmd'] == 'synch':
+        import hggtk.synch
+        return hggtk.synch.run(root=option['root'])
     elif option['hgcmd'] in ['incoming', 'pull']:
         import hggtk.paths
         path = hggtk.paths.run(root=option['root'], pull=True)

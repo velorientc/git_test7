@@ -415,18 +415,9 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Clone"),
                            _("Clone a repository"),
                            self._clone))
-            result.append(TortoiseMenu(_("Pull"),
-                           _("Pull from default repository"),
-                           self._pull))
-            result.append(TortoiseMenu(_("Push"),
-                           _("Push to default repository"),
-                           self._push))
-            result.append(TortoiseMenu(_("Incoming"),
-                           _("show new changesets found in source"),
-                           self._incoming))
-            result.append(TortoiseMenu(_("Outgoing"),
-                           _("show changesets not found in destination"),
-                           self._outgoing))
+            result.append(TortoiseMenu(_("Synchronize"),
+                           _("Synchronize with remote repository"),
+                           self._synch))
             result.append(TortoiseMenu(_("Web server"),
                            _("start web server for this repository"),
                            self._serve))
@@ -667,6 +658,9 @@ class ContextMenuExtension:
 
     def _clone(self, parent_window):
         self._run_dialog('clone', True)
+
+    def _synch(self, parent_window):
+        self._run_dialog('synch', True)
 
     def _pull(self, parent_window):
         self._run_dialog('pull', True)
