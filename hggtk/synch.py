@@ -23,7 +23,7 @@ from mercurial.node import *
 from dialog import error_dialog
 
 class SynchDialog(gtk.Dialog):
-    def __init__(self, root=''):
+    def __init__(self, root='', repos=[]):
         """ Initialize the Dialog. """
         rootbase = os.path.basename(root)
         gtk.Dialog.__init__(self, title="TortoiseHg Synchronize - %s" % rootbase,
@@ -96,7 +96,9 @@ class SynchDialog(gtk.Dialog):
                 defpushrow = row
             revlist.append([path])
 
-        if defrow:
+        if repos:
+            self._pathbox.get_child().set_text(repos[0])            
+        elif defrow:
             self._pathbox.set_active(defrow)
         elif defpushrow:
             self._pathbox.set_active(defpushrow)
@@ -324,8 +326,9 @@ class SynchDialog(gtk.Dialog):
         except IOError:
             pass
 
-def run(root=''):
-    dlg = SynchDialog(root=root)
+def run(root='', repos=[]):
+    print "synch: repos=",repos
+    dlg = SynchDialog(root=root, repos=repos)
     dlg.run()
     dlg.hide()
     
