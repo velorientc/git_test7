@@ -45,6 +45,17 @@ class TortoiseMenuSep(object):
     def __init__(self):
         pass
     
+def open_repo(path):
+    root = find_root(path)
+    if root:
+        try:
+            repo = hg.repository(ui.ui(), path=root)
+            return repo
+        except repo.RepoError:
+            pass
+
+    return None
+
 def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, notify=False):
     app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
     print "proc app = ", app_path
@@ -238,18 +249,6 @@ class ContextMenuExtension:
         if len(self._filenames) > 1:
             return []
 
-        def _open_repo(path):
-            u = ui.ui()
-            root = find_root(path)
-            if root:
-                try:
-                    repo = hg.repository(u, path=root)
-                    return repo
-                except repo.RepoError:
-                    pass
-
-            return None
-
         # open repo
         drag_repo = None
         drop_repo = None
@@ -258,14 +257,14 @@ class ContextMenuExtension:
         print "drop = %s" % self._folder
         
         drag_path = self._filenames[0]
-        drag_repo = _open_repo(drag_path)
+        drag_repo = open_repo(drag_path)
         if not drag_repo:
             return []
         if drag_repo and drag_repo.root != drag_path:
             return []   # dragged item must be a hg repo root directory
         print "drag root = %s" % drag_repo.root
 
-        drop_repo = _open_repo(self._folder)
+        drop_repo = open_repo(self._folder)
 
         print "_get_commands_dragdrop(): adding hg commands"
         
@@ -293,31 +292,20 @@ class ContextMenuExtension:
 
         # open repo
         result = []
-        tree = None
-        u = ui.ui()
         rpath = self._folder or self._filenames[0]
-        root = find_root(rpath)
-        if root is None:
+        repo = open_repo(rpath)
+        if repo is None:
             print "%s: not in repo" % rpath
+            
             result.append(TortoiseMenu(_("Create repo here"),
                            _("create a new repository in this directory"),
                            self._init))
             result.append(TortoiseMenu(_("Clone a repository"),
                            _("clone a repository"),
                            self._clone))
-            return result
-
-        print "file = %s\nroot = %s" % (rpath, root)
-        
-        try:
-            tree = hg.repository(u, path=root)
-        except repo.RepoError:
-            print "%s: can't open repo" % dir
-            return []
-
-        print "_get_commands(): adding hg commands"
-        
-        if tree is not None:
+        else:
+            print "_get_commands(): adding hg commands"
+            
             # Commit (qct, gcommit, or internal)
             result.append(TortoiseMenu(_("Commit"), 
                            _("Commit changes with GUI tool"),
