@@ -349,16 +349,6 @@ class ContextMenuExtension:
                            self._revert))
 
             result.append(TortoiseMenuSep())
-
-            result.append(TortoiseMenu(_("Rollback"),
-                           _("Rollback the last transaction"),
-                           self._rollback))
-            result.append(TortoiseMenu(_("Recover"),
-                           _("Recover from an interrupted commit or pull"),
-                           self._recover))
-            result.append(TortoiseMenu(_("Verify"),
-                           _("Verify repository consistency"),
-                           self._verify))
             result.append(TortoiseMenu(_("Update"),
                            _("update working directory"),
                            self._update))
@@ -399,6 +389,20 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Web server"),
                            _("start web server for this repository"),
                            self._serve))
+
+            # repo recovery functions
+            rcmenu = TortoiseSubmenu(_("Repo recovery"))
+            result.append(rcmenu)
+            
+            rcmenu.add_menu(_("Rollback"),
+                            _("Rollback the last transaction"),
+                            self._rollback)
+            rcmenu.add_menu(_("Recover"),
+                            _("Recover from an interrupted commit or pull"),
+                            self._recover)
+            rcmenu.add_menu(_("Verify"),
+                            _("Verify repository consistency"),
+                            self._verify)
 
             # Optionally add an Options submenu
             c = ui.ui().config('tortoisehg', 'hgconfig', None)
