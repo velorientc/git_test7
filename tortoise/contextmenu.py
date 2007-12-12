@@ -225,7 +225,7 @@ class ContextMenuExtension:
             # add regularly used commit menu to main context menu
             rpath = self._folder or self._filenames[0]
             if open_repo(rpath):
-                thgmenu.append(TortoiseMenu(_("Commit"), 
+                thgmenu.append(TortoiseMenu(_("HG Commit..."), 
                                _("Commit changes in repository"),
                                self._commit))
                                
@@ -233,7 +233,7 @@ class ContextMenuExtension:
             commands = self._get_commands()
 
         # create submenus with Hg commands
-        thgmenu.append(TortoiseSubmenu("TortoiseHg", commands, icon="hg.ico"))
+        thgmenu.append(TortoiseSubmenu("TortoiseHG", commands, icon="hg.ico"))
         thgmenu.append(TortoiseMenuSep())
         
         idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
@@ -302,58 +302,58 @@ class ContextMenuExtension:
         if repo is None:
             print "%s: not in repo" % rpath
             
-            result.append(TortoiseMenu(_("Create repo here"),
+            result.append(TortoiseMenu(_("Create Repository Here"),
                            _("create a new repository in this directory"),
                            self._init))
-            result.append(TortoiseMenu(_("Clone a repository"),
+            result.append(TortoiseMenu(_("Clone a Repository"),
                            _("clone a repository"),
                            self._clone))
         else:
             print "_get_commands(): adding hg commands"
             
             # Working directory status (gstatus, internal)
-            result.append(TortoiseMenu(_("Status"),
+            result.append(TortoiseMenu(_("View File Status"),
                            _("Repository status"),
                            self._status))
 
             # Mercurial standard commands
-            result.append(TortoiseMenu(_("Diff"),
+            result.append(TortoiseMenu(_("Show Diff"),
                            _("View changes"),
                            self._diff))
 
             # Visual Diff (any extdiff command)
-            result.append(TortoiseMenu(_("Visual diff"),
+            result.append(TortoiseMenu(_("Visual Diff"),
                            _("View changes using GUI diff tool"),
                            self._vdiff))
                            
-            result.append(TortoiseMenu(_("Add"),
+            result.append(TortoiseMenu(_("Add Files"),
                            _("Add files to Hg repository"),
                            self._add))
-            result.append(TortoiseMenu(_("Remove"),
+            result.append(TortoiseMenu(_("Remove Files"),
                            _("Remove selected files on the next commit"),
                            self._remove))
-            result.append(TortoiseMenu(_("Revert"),
+            result.append(TortoiseMenu(_("Undo Changes"),
                            _("Revert selected files"),
                            self._revert))
 
             result.append(TortoiseMenuSep())
-            result.append(TortoiseMenu(_("Update"),
+            result.append(TortoiseMenu(_("Checkout Revision"),
                            _("update working directory"),
                            self._update))
-            result.append(TortoiseMenu(_("Merge"),
+            result.append(TortoiseMenu(_("Merge Revisions"),
                            _("merge working directory with another revision"),
                            self._merge))
 
             result.append(TortoiseMenuSep())
 
             # Visual history (hgk, hgview, glog, or internal)
-            result.append(TortoiseMenu(_("View history"),
+            result.append(TortoiseMenu(_("View Changelog"),
                            _("View revision history"),
                            self._history))
-            result.append(TortoiseMenu(_("Revision graph"),
+            result.append(TortoiseMenu(_("Revision Graph"),
                            _("View history with DAG graph"),
                            self._view))
-            result.append(TortoiseMenu(_("Current revision status..."),
+            result.append(TortoiseMenu(_("Current Revision Status..."),
                            _("Show various revision info"),
                            self._tip))
 
@@ -368,18 +368,18 @@ class ContextMenuExtension:
 
             result.append(TortoiseMenuSep())
 
-            result.append(TortoiseMenu(_("Clone"),
-                           _("Clone a repository"),
+            result.append(TortoiseMenu(_("Create Clone"),
+                           _("Clone a repository here"),
                            self._clone))
-            result.append(TortoiseMenu(_("Synchronize"),
+            result.append(TortoiseMenu(_("Synchronize..."),
                            _("Synchronize with remote repository"),
                            self._synch))
-            result.append(TortoiseMenu(_("Web server"),
+            result.append(TortoiseMenu(_("Web Server"),
                            _("start web server for this repository"),
                            self._serve))
 
             # repo recovery functions
-            rcmenu = TortoiseSubmenu(_("Repo recovery"))
+            rcmenu = TortoiseSubmenu(_("Repo Recovery"))
             result.append(rcmenu)
             
             rcmenu.add_menu(_("Rollback"),
