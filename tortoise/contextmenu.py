@@ -30,9 +30,9 @@ class TortoiseMenu(object):
         self.icon = icon
 
 class TortoiseSubmenu(object):
-    def __init__(self, menutext, icon=None):
+    def __init__(self, menutext, menus=[], icon=None):
         self.menutext = menutext
-        self.menus = []
+        self.menus = menus[:]
         self.icon = icon
         
     def add_menu(self, menutext, helptext, handler, icon=None, state=True):
@@ -137,15 +137,18 @@ class ContextMenuExtension:
             for i in range(num_files):
                 self._filenames.append(shell.DragQueryFile(sm.data_handle, i))
 
-    def create_submenu(self, menus, idCmd, idCmdFirst):
-        menu = win32gui.CreatePopupMenu()
+    def _create_menu(self, parent, menus, pos, idCmd, idCmdFirst):
+        print "_create_menu: entry: ", menus, pos, idCmd, idCmdFirst
         for menu_info in menus:
             if type(menu_info) == TortoiseMenuSep:
-                win32gui.InsertMenu(menu, idCmd, 
+                print "TortoiseMenuSep:", pos, idCmd, idCmdFirst 
+                win32gui.InsertMenu(parent, pos, 
                         win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
                         idCmdFirst + idCmd, None)
             elif type(menu_info) == TortoiseSubmenu:
-                submenu, idCmd = self.create_submenu(menu_info.get_menus(),
+                print "TortoiseSubmenu:", pos, idCmd, idCmdFirst 
+                submenu = win32gui.CreatePopupMenu()
+                idCmd = self._create_menu(submenu, menu_info.get_menus(), 0,
                         idCmd, idCmdFirst)
                 opt = {
                     'text' : menu_info.menutext,
@@ -159,9 +162,10 @@ class ContextMenuExtension:
                             icon_to_bitmap(icon_path, type="MENUCHECK")
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
-                win32gui.InsertMenuItem(menu, idCmdFirst + idCmd, True, item)
+                win32gui.InsertMenuItem(parent, pos, True, item)
                 self._handlers[idCmd] = ("", lambda x,y: 0)
             elif type(menu_info) == TortoiseMenu:
+                print "TortoiseMenu: %s" % menu_info.menutext, pos, idCmd, idCmdFirst 
                 fstate = win32con.MF_BYCOMMAND
                 if menu_info.state is False:
                     fstate |= win32con.MF_GRAYED
@@ -178,10 +182,11 @@ class ContextMenuExtension:
                             icon_to_bitmap(icon_path, type="MENUCHECK")
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
-                win32gui.InsertMenuItem(menu, idCmdFirst+idCmd, True, item)
+                win32gui.InsertMenuItem(parent, pos, True, item)
                 self._handlers[idCmd] = (menu_info.helptext, menu_info.handler)
             idCmd += 1
-        return (menu, idCmd)
+            pos += 1
+        return idCmd
 
     def QueryContextMenu(self, hMenu, indexMenu, idCmdFirst, idCmdLast, uFlags):
         if uFlags & shellcon.CMF_DEFAULTONLY:
@@ -207,38 +212,15 @@ class ContextMenuExtension:
             # context menu. If we are not the first, then add a menu separator
             # The number '30000' is just a guess based on my observation
             print "idCmdFirst = ", idCmdFirst
+            thgmenu = []
             if idCmdFirst >= 30000:
-                win32gui.InsertMenu(hMenu, indexMenu,
-                                    win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
-                                    idCmdFirst+idCmd, None)
-                indexMenu += 1
-                idCmd += 1
+                thgmenu.append(TortoiseMenuSep())
             
             # create submenus with Hg commands
-            submenu, idCmd = self.create_submenu(commands, idCmd, idCmdFirst)
-
-            # add Hg submenus to context menu
-            opt = {'text': "TortoiseHg", 'hSubMenu': submenu, 'wID': idCmdFirst+idCmd}
-            icon_path = get_icon_path("tortoise", "hg.ico")
-            print "icon path =", icon_path
-            if icon_path:
-                opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
-                                     icon_to_bitmap(icon_path, type="MENUCHECK")
-            item, extras = win32gui_struct.PackMENUITEMINFO(**opt)
-            win32gui.InsertMenuItem(hMenu, indexMenu, True, item)
+            thgmenu.append(TortoiseSubmenu("TortoiseHg", commands, icon="hg.ico"))
+            thgmenu.append(TortoiseMenuSep())
             
-            # a submenu item need a (dummay) handler too 
-            self._handlers[idCmd] = ("", lambda x,y: 0)
-            
-            indexMenu += 1
-            idCmd += 1
-
-            # menu separator
-            win32gui.InsertMenu(hMenu, indexMenu,
-                                win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
-                                idCmdFirst+idCmd, None)
-            indexMenu += 1
-            idCmd += 1
+            idCmd = self._create_menu(hMenu, thgmenu, indexMenu, idCmd, idCmdFirst)
 
         # Return total number of menus & submenus we've added
         return idCmd
