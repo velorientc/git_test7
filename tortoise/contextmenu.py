@@ -149,15 +149,12 @@ class ContextMenuExtension:
                 self._filenames.append(shell.DragQueryFile(sm.data_handle, i))
 
     def _create_menu(self, parent, menus, pos, idCmd, idCmdFirst):
-        print "_create_menu: entry: ", menus, pos, idCmd, idCmdFirst
         for menu_info in menus:
             if type(menu_info) == TortoiseMenuSep:
-                print "TortoiseMenuSep:", pos, idCmd, idCmdFirst 
                 win32gui.InsertMenu(parent, pos, 
                         win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
                         idCmdFirst + idCmd, None)
             elif type(menu_info) == TortoiseSubmenu:
-                print "TortoiseSubmenu:", pos, idCmd, idCmdFirst 
                 submenu = win32gui.CreatePopupMenu()
                 idCmd = self._create_menu(submenu, menu_info.get_menus(), 0,
                         idCmd, idCmdFirst)
@@ -176,7 +173,6 @@ class ContextMenuExtension:
                 win32gui.InsertMenuItem(parent, pos, True, item)
                 self._handlers[idCmd] = ("", lambda x,y: 0)
             elif type(menu_info) == TortoiseMenu:
-                print "TortoiseMenu: %s" % menu_info.menutext, pos, idCmd, idCmdFirst 
                 fstate = win32con.MF_BYCOMMAND
                 if menu_info.state is False:
                     fstate |= win32con.MF_GRAYED
