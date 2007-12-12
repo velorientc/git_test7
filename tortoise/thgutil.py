@@ -67,7 +67,7 @@ def get_prog_root():
     import _winreg
     
     key = r"Software\TortoiseHg"
-    cat = _winreg.HKEY_CURRENT_USER     # HKEY_LOCAL_MACHINE
+    cat = _winreg.HKEY_LOCAL_MACHINE
     dir = _winreg.QueryValue(cat, key)
     return dir
 
