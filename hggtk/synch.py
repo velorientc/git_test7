@@ -78,11 +78,14 @@ class SynchDialog(gtk.Dialog):
         
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label("Remote path:")
+        lbl = gtk.Button("Remote Path:")
+        lbl.unset_flags(gtk.CAN_FOCUS)
+        lbl.connect('clicked', self._btn_remotepath_clicked)
         
         # revisions  combo box
         revlist = gtk.ListStore(str)
         self._pathbox = gtk.ComboBoxEntry(revlist, 0)
+        self._pathtext = self._pathbox.get_child()
         
         self.paths = self._get_paths()
         defrow = None
@@ -97,7 +100,7 @@ class SynchDialog(gtk.Dialog):
             revlist.append([path])
 
         if repos:
-            self._pathbox.get_child().set_text(repos[0])            
+            self._pathtext.set_text(repos[0])            
         elif defrow:
             self._pathbox.set_active(defrow)
         elif defpushrow:
@@ -186,6 +189,19 @@ class SynchDialog(gtk.Dialog):
         except hg.RepoError:
             return None
 
+    def _btn_remotepath_clicked(self, button):
+        """ select source folder to clone """
+        dialog = gtk.FileChooserDialog(title="Select Repository",
+                action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
+                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        dialog.set_default_response(gtk.RESPONSE_OK)
+        dialog.set_current_folder(self.root)
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            self._pathtext.set_text(dialog.get_filename())
+        dialog.destroy()
+        
     def _close_clicked(self, *args):
         if self.thread1 and self.thread1.isAlive():
             error_dialog("Can't close now", "command is running")
