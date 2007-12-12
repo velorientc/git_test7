@@ -106,15 +106,11 @@ class UpdateDialog(gtk.Dialog):
         tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
         self._revlist.clear()
         for i, node in enumerate(heads):
-            if node in self._parents:
-                continue
-            
             status = "head %d" % (i+1)
             if node == tip:
                 status += ", tip"
-            
             self._revlist.append([short(node), "(%s)" %status])
-            self._rev_input.set_text(short(node))
+        self._revbox.set_active(0)
             
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
