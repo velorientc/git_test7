@@ -211,27 +211,36 @@ class ContextMenuExtension:
             print "QueryContextMenu: not in explorer"
             return 0 
 
+        thgmenu = []    # hg menus
+
+        # a brutal hack to detect if we are the first menu to go on to the 
+        # context menu. If we are not the first, then add a menu separator
+        # The number '30000' is just a guess based on my observation
+        print "idCmdFirst = ", idCmdFirst
+        if idCmdFirst >= 30000:
+            thgmenu.append(TortoiseMenuSep())
+            
         # As we are a context menu handler, we can ignore verbs.
         self._handlers = {}
         if self._folder and self._filenames:
+            # get menus with drag-n-drop support
             commands = self._get_commands_dragdrop()
         else:
+            # add regularly used commit menu to main context menu
+            rpath = self._folder or self._filenames[0]
+            if open_repo(rpath):
+                thgmenu.append(TortoiseMenu(_("Commit"), 
+                               _("Commit changes in repository"),
+                               self._commit))
+                               
+            # get other menus for hg submenu
             commands = self._get_commands()
-        idCmd = 0
-        if len(commands) > 0:
-            # a brutal hack to detect if we are the first menu to go on to the 
-            # context menu. If we are not the first, then add a menu separator
-            # The number '30000' is just a guess based on my observation
-            print "idCmdFirst = ", idCmdFirst
-            thgmenu = []
-            if idCmdFirst >= 30000:
-                thgmenu.append(TortoiseMenuSep())
-            
-            # create submenus with Hg commands
-            thgmenu.append(TortoiseSubmenu("TortoiseHg", commands, icon="hg.ico"))
-            thgmenu.append(TortoiseMenuSep())
-            
-            idCmd = self._create_menu(hMenu, thgmenu, indexMenu, idCmd, idCmdFirst)
+
+        # create submenus with Hg commands
+        thgmenu.append(TortoiseSubmenu("TortoiseHg", commands, icon="hg.ico"))
+        thgmenu.append(TortoiseMenuSep())
+        
+        idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
 
         # Return total number of menus & submenus we've added
         return idCmd
@@ -306,11 +315,6 @@ class ContextMenuExtension:
         else:
             print "_get_commands(): adding hg commands"
             
-            # Commit (qct, gcommit, or internal)
-            result.append(TortoiseMenu(_("Commit"), 
-                           _("Commit changes with GUI tool"),
-                           self._commit))
-
             # Working directory status (gstatus, internal)
             result.append(TortoiseMenu(_("Status"),
                            _("Repository status"),
