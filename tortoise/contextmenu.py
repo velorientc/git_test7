@@ -344,6 +344,12 @@ class ContextMenuExtension:
                            _("merge working directory with another revision"),
                            self._merge))
 
+            # if repo is in merging state, add menu to signal that
+            if len(repo.workingctx().parents()) > 1:
+                result.append(TortoiseMenu(_("Undo Merge"),
+                               _("Undo merge by updating to revision"),
+                               self._update))
+                
             result.append(TortoiseMenuSep())
 
             # Visual history (hgk, hgview, glog, or internal)
