@@ -23,7 +23,7 @@ print "bin path = ", bin_path
 # TortoiseHg registry setup
 def register_tortoise_path(unregister=False):
     key = r"Software\TortoiseHg"
-    cat = _winreg.HKEY_CURRENT_USER     # HKEY_LOCAL_MACHINE
+    cat = _winreg.HKEY_LOCAL_MACHINE
     if (unregister):
         _winreg.DeleteKey(cat, key)
         print "TortoiseHg unregistered"

@@ -22,11 +22,24 @@ import os
 import sys
 import getopt
 from tortoise import thgutil
+from mercurial import ui
 
 os.environ['PATH'] = "%s;%s" % (thgutil.get_prog_root(), os.environ['PATH'])
 hg_executable = thgutil.find_path("hg")
 if trace: print "hgproc: hg_executable = %s" % hg_executable
 
+# setup merge tool for any dialogs that do merging
+uimerge = ui.ui().config('ui', 'merge', None)
+hgmerge = os.environ.get('HGMERGE', None)
+if uimerge:
+    print "ui.merge = %s" % uimerge
+elif hgmerge:
+    print "HGMERGE = %s" % os.environ['HGMERGE']
+else:
+    app_path = thgutil.find_path("simplemerge", thgutil.get_prog_root(), '.EXE;.BAT')
+    os.environ['HGMERGE'] = ('%s -L my -L other' % thgutil.shellquote(app_path))
+    print "HGMERGE = %s" % os.environ['HGMERGE']
+        
 def get_option(args):
     long_opt_list =  ['command=', 'exepath=', 'listfile=', 'title=',
                       'root=', 'cwd=', 'notify', 'deletelistfile']
@@ -102,18 +115,7 @@ def parse(args):
         import hggtk.diff
         return hggtk.diff.run(root=option['root'], files=filelist)
     elif option['hgcmd'] == 'merge':
-        from mercurial import ui
         import hggtk.merge
-        uimerge = ui.ui().config('ui', 'merge', None)
-        hgmerge = os.environ.get('HGMERGE', None)
-        if uimerge:
-            print "ui.merge = %s" % uimerge
-        elif hgmerge:
-            print "HGMERGE = %s" % os.environ['HGMERGE']
-        else:
-            app_path = thgutil.find_path("simplemerge", thgutil.get_prog_root(), '.EXE;.BAT')
-            os.environ['HGMERGE'] = ('%s -L my -L other' % thgutil.shellquote(app_path))
-            print "HGMERGE = %s" % os.environ['HGMERGE']
         return hggtk.merge.run(root=option['root'])
     elif option['hgcmd'] in ('tip', 'parents', 'heads'):
         import hggtk.revisions
@@ -127,6 +129,9 @@ def parse(args):
     elif option['hgcmd'] == 'serve':
         import hggtk.serve
         return hggtk.serve.run(cwd=option['cwd'], root=option['root'])
+    elif option['hgcmd'] == 'synch':
+        import hggtk.synch
+        return hggtk.synch.run(root=option['cwd'], repos=filelist)
     elif option['hgcmd'] in ['incoming', 'pull']:
         import hggtk.paths
         path = hggtk.paths.run(root=option['root'], pull=True)

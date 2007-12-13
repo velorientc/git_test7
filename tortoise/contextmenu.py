@@ -30,15 +30,32 @@ class TortoiseMenu(object):
         self.icon = icon
 
 class TortoiseSubmenu(object):
-    def __init__(self, menutext, menulist, icon=None):
+    def __init__(self, menutext, menus=[], icon=None):
         self.menutext = menutext
-        self.menulist = menulist
+        self.menus = menus[:]
         self.icon = icon
+        
+    def add_menu(self, menutext, helptext, handler, icon=None, state=True):
+        self.menus.append(TortoiseMenu(menutext, helptext, handler, icon, state))
+        
+    def get_menus(self):
+        return self.menus
         
 class TortoiseMenuSep(object):
     def __init__(self):
         pass
     
+def open_repo(path):
+    root = find_root(path)
+    if root:
+        try:
+            repo = hg.repository(ui.ui(), path=root)
+            return repo
+        except repo.RepoError:
+            pass
+
+    return None
+
 def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, notify=False):
     app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
     print "proc app = ", app_path
@@ -131,16 +148,15 @@ class ContextMenuExtension:
             for i in range(num_files):
                 self._filenames.append(shell.DragQueryFile(sm.data_handle, i))
 
-    def create_submenu(self, commands, idCmd, idCmdFirst):
-        menu = win32gui.CreatePopupMenu()
-        for menu_info in commands:
+    def _create_menu(self, parent, menus, pos, idCmd, idCmdFirst):
+        for menu_info in menus:
             if type(menu_info) == TortoiseMenuSep:
-                win32gui.InsertMenu(menu, idCmd, 
+                win32gui.InsertMenu(parent, pos, 
                         win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
                         idCmdFirst + idCmd, None)
             elif type(menu_info) == TortoiseSubmenu:
-                subcommands = menu_info.menulist
-                submenu, idCmd = self.create_submenu(subcommands,
+                submenu = win32gui.CreatePopupMenu()
+                idCmd = self._create_menu(submenu, menu_info.get_menus(), 0,
                         idCmd, idCmdFirst)
                 opt = {
                     'text' : menu_info.menutext,
@@ -154,7 +170,7 @@ class ContextMenuExtension:
                             icon_to_bitmap(icon_path)
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
-                win32gui.InsertMenuItem(menu, idCmdFirst + idCmd, True, item)
+                win32gui.InsertMenuItem(parent, pos, True, item)
                 self._handlers[idCmd] = ("", lambda x,y: 0)
             elif type(menu_info) == TortoiseMenu:
                 fstate = win32con.MF_BYCOMMAND
@@ -173,10 +189,11 @@ class ContextMenuExtension:
                             icon_to_bitmap(icon_path)
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
-                win32gui.InsertMenuItem(menu, idCmdFirst+idCmd, True, item)
+                win32gui.InsertMenuItem(parent, pos, True, item)
                 self._handlers[idCmd] = (menu_info.helptext, menu_info.handler)
             idCmd += 1
-        return (menu, idCmd)
+            pos += 1
+        return idCmd
 
     def QueryContextMenu(self, hMenu, indexMenu, idCmdFirst, idCmdLast, uFlags):
         if uFlags & shellcon.CMF_DEFAULTONLY:
@@ -190,50 +207,36 @@ class ContextMenuExtension:
             print "QueryContextMenu: not in explorer"
             return 0 
 
+        thgmenu = []    # hg menus
+
+        # a brutal hack to detect if we are the first menu to go on to the 
+        # context menu. If we are not the first, then add a menu separator
+        # The number '30000' is just a guess based on my observation
+        print "idCmdFirst = ", idCmdFirst
+        if idCmdFirst >= 30000:
+            thgmenu.append(TortoiseMenuSep())
+            
         # As we are a context menu handler, we can ignore verbs.
         self._handlers = {}
         if self._folder and self._filenames:
+            # get menus with drag-n-drop support
             commands = self._get_commands_dragdrop()
         else:
+            # add regularly used commit menu to main context menu
+            rpath = self._folder or self._filenames[0]
+            if open_repo(rpath):
+                thgmenu.append(TortoiseMenu(_("HG Commit..."), 
+                               _("Commit changes in repository"),
+                               self._commit, icon="menucommit.ico"))
+                               
+            # get other menus for hg submenu
             commands = self._get_commands()
-        idCmd = 0
-        if len(commands) > 0:
-            # a brutal hack to detect if we are the first menu to go on to the 
-            # context menu. If we are not the first, then add a menu separator
-            # The number '30000' is just a guess based on my observation
-            print "idCmdFirst = ", idCmdFirst
-            if idCmdFirst >= 30000:
-                win32gui.InsertMenu(hMenu, indexMenu,
-                                    win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
-                                    idCmdFirst+idCmd, None)
-                indexMenu += 1
-                idCmd += 1
-            
-            # create submenus with Hg commands
-            submenu, idCmd = self.create_submenu(commands, idCmd, idCmdFirst)
 
-            # add Hg submenus to context menu
-            opt = {'text': "TortoiseHg", 'hSubMenu': submenu, 'wID': idCmdFirst+idCmd}
-            icon_path = get_icon_path("tortoise", "hg.ico")
-            print "icon path =", icon_path
-            if icon_path:
-                opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
-                                     icon_to_bitmap(icon_path)
-            item, extras = win32gui_struct.PackMENUITEMINFO(**opt)
-            win32gui.InsertMenuItem(hMenu, indexMenu, True, item)
-            
-            # a submenu item need a (dummay) handler too 
-            self._handlers[idCmd] = ("", lambda x,y: 0)
-            
-            indexMenu += 1
-            idCmd += 1
-
-            # menu separator
-            win32gui.InsertMenu(hMenu, indexMenu,
-                                win32con.MF_SEPARATOR|win32con.MF_BYPOSITION,
-                                idCmdFirst+idCmd, None)
-            indexMenu += 1
-            idCmd += 1
+        # create submenus with Hg commands
+        thgmenu.append(TortoiseSubmenu("TortoiseHG", commands, icon="hg.ico"))
+        thgmenu.append(TortoiseMenuSep())
+        
+        idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
 
         # Return total number of menus & submenus we've added
         return idCmd
@@ -251,18 +254,6 @@ class ContextMenuExtension:
         if len(self._filenames) > 1:
             return []
 
-        def _open_repo(path):
-            u = ui.ui()
-            root = find_root(path)
-            if root:
-                try:
-                    repo = hg.repository(u, path=root)
-                    return repo
-                except repo.RepoError:
-                    pass
-
-            return None
-
         # open repo
         drag_repo = None
         drop_repo = None
@@ -271,14 +262,14 @@ class ContextMenuExtension:
         print "drop = %s" % self._folder
         
         drag_path = self._filenames[0]
-        drag_repo = _open_repo(drag_path)
+        drag_repo = open_repo(drag_path)
         if not drag_repo:
             return []
         if drag_repo and drag_repo.root != drag_path:
             return []   # dragged item must be a hg repo root directory
         print "drag root = %s" % drag_repo.root
 
-        drop_repo = _open_repo(self._folder)
+        drop_repo = open_repo(self._folder)
 
         print "_get_commands_dragdrop(): adding hg commands"
         
@@ -290,18 +281,9 @@ class ContextMenuExtension:
         if drop_repo:
             print "_get_commands_dragdrop(): drop zone is a hg repo too"
             print "drop root = %s" % drag_repo.root
-            result.append(TortoiseMenu(_("Push to"), 
-                           _("Push source into the repo here"),
-                           self._push_here))
-            result.append(TortoiseMenu(_("Pull from"), 
-                           _("Pull new change from dragged repo"),
-                           self._pull_here))
-            result.append(TortoiseMenu(_("Incoming"), 
-                           _("show new changesets found in source"),
-                           self._incoming_here))
-            result.append(TortoiseMenu(_("Outgoing"), 
-                           _("show changesets not found in destination"),
-                           self._outgoing_here))
+            result.append(TortoiseMenu(_("Synchronize"),
+                           _("Synchronize with dragged repository"),
+                           self._synch_here))
         return result
         
     def _get_commands(self):
@@ -315,89 +297,69 @@ class ContextMenuExtension:
 
         # open repo
         result = []
-        tree = None
-        u = ui.ui()
         rpath = self._folder or self._filenames[0]
-        root = find_root(rpath)
-        if root is None:
+        repo = open_repo(rpath)
+        if repo is None:
             print "%s: not in repo" % rpath
-            result.append(TortoiseMenu(_("Create repo here"),
+            
+            result.append(TortoiseMenu(_("Create Repository Here"),
                            _("create a new repository in this directory"),
                            self._init, icon="menucreaterepos.ico"))
-            result.append(TortoiseMenu(_("Clone a repository"),
+            result.append(TortoiseMenu(_("Clone a Repository"),
                            _("clone a repository"),
                            self._clone, icon="menurelocate.ico"))
-            return result
-
-        print "file = %s\nroot = %s" % (rpath, root)
-        
-        try:
-            tree = hg.repository(u, path=root)
-        except repo.RepoError:
-            print "%s: can't open repo" % dir
-            return []
-
-        print "_get_commands(): adding hg commands"
-        
-        if tree is not None:
-            # Commit (qct, gcommit, or internal)
-            result.append(TortoiseMenu(_("Commit"), 
-                           _("Commit changes with GUI tool"),
-                           self._commit, icon="menucommit.ico"))
-
+        else:
+            print "_get_commands(): adding hg commands"
+            
             # Working directory status (gstatus, internal)
-            result.append(TortoiseMenu(_("Status"),
+            result.append(TortoiseMenu(_("View File Status"),
                            _("Repository status"),
                            self._status, icon="menushowchanged.ico"))
 
             # Mercurial standard commands
-            result.append(TortoiseMenu(_("Diff"),
+            result.append(TortoiseMenu(_("Show Diff"),
                            _("View changes"),
                            self._diff, icon="menudiff.ico"))
 
             # Visual Diff (any extdiff command)
-            result.append(TortoiseMenu(_("Visual diff"),
+            result.append(TortoiseMenu(_("Visual Diff"),
                            _("View changes using GUI diff tool"),
                            self._vdiff, icon="TortoiseMerge.ico"))
                            
-            result.append(TortoiseMenu(_("Add"),
+            result.append(TortoiseMenu(_("Add Files"),
                            _("Add files to Hg repository"),
                            self._add, icon="menuadd.ico"))
-            result.append(TortoiseMenu(_("Remove"),
+            result.append(TortoiseMenu(_("Remove Files"),
                            _("Remove selected files on the next commit"),
                            self._remove, icon="menudelete.ico"))
-            result.append(TortoiseMenu(_("Revert"),
+            result.append(TortoiseMenu(_("Undo Changes"),
                            _("Revert selected files"),
                            self._revert, icon="menurevert.ico"))
 
             result.append(TortoiseMenuSep())
-
-            result.append(TortoiseMenu(_("Rollback"),
-                           _("Rollback the last transaction"),
-                           self._rollback))
-            result.append(TortoiseMenu(_("Recover"),
-                           _("Recover from an interrupted commit or pull"),
-                           self._recover))
-            result.append(TortoiseMenu(_("Verify"),
-                           _("Verify repository consistency"),
-                           self._verify))
-            result.append(TortoiseMenu(_("Update"),
+            result.append(TortoiseMenu(_("Checkout Revision"),
                            _("update working directory"),
                            self._update, icon="menucheckout.ico"))
-            result.append(TortoiseMenu(_("Merge"),
+            result.append(TortoiseMenu(_("Merge Revisions"),
                            _("merge working directory with another revision"),
                            self._merge, icon="menumerge.ico"))
 
+            # if repo is in merging state, add menu to signal that
+            if len(repo.workingctx().parents()) > 1:
+                result.append(TortoiseMenu(_("Undo Merge"),
+                               _("Undo merge by updating to revision"),
+                               self._update))
+                
             result.append(TortoiseMenuSep())
 
             # Visual history (hgk, hgview, glog, or internal)
-            result.append(TortoiseMenu(_("View history"),
+            result.append(TortoiseMenu(_("View Changelog"),
                            _("View revision history"),
                            self._history, icon="menulog.ico"))
-            result.append(TortoiseMenu(_("Revision graph"),
+            result.append(TortoiseMenu(_("Revision Graph"),
                            _("View history with DAG graph"),
                            self._view, icon="menurevisiongraph.ico"))
-            result.append(TortoiseMenu(_("Current revision status..."),
+            result.append(TortoiseMenu(_("Current Revision Status..."),
                            _("Show various revision info"),
                            self._tip))
 
@@ -412,44 +374,48 @@ class ContextMenuExtension:
 
             result.append(TortoiseMenuSep())
 
-            result.append(TortoiseMenu(_("Clone"),
-                           _("Clone a repository"),
+            result.append(TortoiseMenu(_("Create Clone"),
+                           _("Clone a repository here"),
                            self._clone, icon="menurelocate.ico"))
-            result.append(TortoiseMenu(_("Pull"),
-                           _("Pull from default repository"),
-                           self._pull))
-            result.append(TortoiseMenu(_("Push"),
-                           _("Push to default repository"),
-                           self._push))
-            result.append(TortoiseMenu(_("Incoming"),
-                           _("show new changesets found in source"),
-                           self._incoming))
-            result.append(TortoiseMenu(_("Outgoing"),
-                           _("show changesets not found in destination"),
-                           self._outgoing))
-            result.append(TortoiseMenu(_("Web server"),
+            result.append(TortoiseMenu(_("Synchronize..."),
+                           _("Synchronize with remote repository"),
+                           self._synch))
+            result.append(TortoiseMenu(_("Web Server"),
                            _("start web server for this repository"),
                            self._serve))
 
-            result.append(TortoiseMenuSep())
+            # repo recovery functions
+            rcmenu = TortoiseSubmenu(_("Repo Recovery"))
+            result.append(rcmenu)
+            
+            rcmenu.add_menu(_("Rollback"),
+                            _("Rollback the last transaction"),
+                            self._rollback)
+            rcmenu.add_menu(_("Recover"),
+                            _("Recover from an interrupted commit or pull"),
+                            self._recover)
+            rcmenu.add_menu(_("Verify"),
+                            _("Verify repository consistency"),
+                            self._verify)
 
             # Optionally add an Options submenu
             c = ui.ui().config('tortoisehg', 'hgconfig', None)
             if c in ['1', 'yes', 'True']:
-                config = []
-                config.append(TortoiseMenu(_("Username"),
-                    _("Configure username"),
-                    self._uname))
-                config.append(TortoiseMenu(_("Paths"),
-                    _("Configure remote paths"),
-                    self._paths))
-                config.append(TortoiseMenu(_("Web"),
-                    _("Configure repository web data"),
-                    self._web))
-                result.append(TortoiseSubmenu(_("Options"), config,
-                        icon="menusettings.ico"))
                 result.append(TortoiseMenuSep())
+                optmenu = TortoiseSubmenu(_("Options"),icon="menusettings.ico")
+                
+                optmenu.add_menu(_("Username"),
+                                 _("Configure username"),
+                                 self._uname)
+                optmenu.add_menu(_("Paths"),
+                                 _("Configure remote paths"),
+                                 self._paths)
+                optmenu.add_menu(_("Web"),
+                                 _("Configure repository web data"),
+                                 self._web)
+                result.append(optmenu)
 
+            result.append(TortoiseMenuSep())
             result.append(TortoiseMenu(_("Help"),
                            _("Basic Mercurial help text"),
                            self._help, icon="menuhelp.ico"))
@@ -484,7 +450,7 @@ class ContextMenuExtension:
         if ct == 'internal':
             self._commit_simple(parent_window)
             return
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if hgpath:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
@@ -493,7 +459,7 @@ class ContextMenuExtension:
             run_program(cmd)
 
     def _uname(self, parent_window):
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if not hgpath: return
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -502,7 +468,7 @@ class ContextMenuExtension:
         run_program(cmd)
 
     def _paths(self, parent_window):
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if not hgpath: return
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -511,7 +477,7 @@ class ContextMenuExtension:
         run_program(cmd)
 
     def _web(self, parent_window):
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if not hgpath: return
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
@@ -527,7 +493,7 @@ class ContextMenuExtension:
             title = "Visual Diff Not Configured"
             win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
             return
-        hgpath = find_path('hg')
+        hgpath = find_path('hg', get_prog_root())
         if hgpath:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
@@ -556,7 +522,7 @@ class ContextMenuExtension:
                 cmd += " --file=%s" % shellquote(self._filenames[0])
             run_program(cmd)
         else:
-            hgpath = find_path('hg')
+            hgpath = find_path('hg', get_prog_root())
             if not hgpath: return
             if view == 'hgk':
                 cmd = "%s --repository %s view" % \
@@ -575,7 +541,7 @@ class ContextMenuExtension:
         if log == 'internal':
             self._log(parent_window)
         else:
-            hgpath = find_path('hg')
+            hgpath = find_path('hg', get_prog_root())
             if not hgpath: return
             if log == 'glog':
                 quoted_files = [shellquote(s) for s in targets]
@@ -656,7 +622,7 @@ class ContextMenuExtension:
             targets = self._filenames or [self._folder]
             root = find_root(targets[0])
             quoted_files = [shellquote(s) for s in targets]
-            hgpath = find_path('hg')
+            hgpath = find_path('hg', get_prog_root())
             cmd = "%s --repository %s gstatus %s" % \
                     (shellquote(hgpath), shellquote(root),
                      " ".join(quoted_files))
@@ -669,6 +635,12 @@ class ContextMenuExtension:
     def _clone(self, parent_window):
         self._run_dialog('clone', True)
 
+    def _synch(self, parent_window):
+        self._run_dialog('synch', True)
+
+    def _synch_here(self, parent_window):
+        self._run_dialog('synch', False)
+        
     def _pull(self, parent_window):
         self._run_dialog('pull', True)
 
