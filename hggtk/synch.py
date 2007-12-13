@@ -101,12 +101,12 @@ class SynchDialog(gtk.Dialog):
             revlist.append([path])
 
         if repos:
-            self._pathtext.set_text(repos[0])            
-        elif defrow:
+            self._pathtext.set_text(repos[0])
+        elif defrow is not None:
             self._pathbox.set_active(defrow)
-        elif defpushrow:
+        elif defpushrow is not None:
             self._pathbox.set_active(defpushrow)
-    
+
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._pathbox, True, True)
         self.vbox.pack_start(revbox, False, False, 2)
