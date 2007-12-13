@@ -311,7 +311,6 @@ class ContextMenuExtension:
         else:
             print "_get_commands(): adding hg commands"
             
-            # Working directory status (gstatus, internal)
             result.append(TortoiseMenu(_("View File Status"),
                            _("Repository status"),
                            self._status, icon="menushowchanged.ico"))
@@ -352,7 +351,6 @@ class ContextMenuExtension:
                 
             result.append(TortoiseMenuSep())
 
-            # Visual history (hgk, hgview, glog, or internal)
             result.append(TortoiseMenu(_("View Changelog"),
                            _("View revision history"),
                            self._history, icon="menulog.ico"))
@@ -445,7 +443,7 @@ class ContextMenuExtension:
         return S_FALSE
 
     def _commit(self, parent_window):
-        '''[tortoisehg] commit = [qct | gcommit | internal]'''
+        '''[tortoisehg] commit = [qct | internal]'''
         ct = ui.ui().config('tortoisehg', 'commit', 'internal')
         if ct == 'internal':
             self._commit_simple(parent_window)
@@ -534,25 +532,7 @@ class ContextMenuExtension:
                 win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
 
     def _history(self, parent_window):
-        '''[tortoisehg] log = [glog | internal]'''
-        log = ui.ui().config('tortoisehg', 'log', 'internal')
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        if log == 'internal':
-            self._log(parent_window)
-        else:
-            hgpath = find_path('hg', get_prog_root())
-            if not hgpath: return
-            if log == 'glog':
-                quoted_files = [shellquote(s) for s in targets]
-                cmd = "%s --repository %s glog %s" % \
-                        (shellquote(hgpath), shellquote(root),
-                         " ".join(quoted_files))
-                run_program(cmd)
-            else:
-                msg = "History viewer %s not recognized" % log
-                title = "Unknown history tool"
-                win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+        self._log(parent_window)
 
     def _clone_here(self, parent_window):
         src = self._filenames[0]
@@ -614,23 +594,7 @@ class ContextMenuExtension:
                                win32con.MB_OK|win32con.MB_ICONERROR)
             
     def _status(self, parent_window):
-        '''[tortoisehg] status = [gstatus | internal]'''
-        stat = ui.ui().config('tortoisehg', 'status', 'internal')
-        if stat == 'internal':
-            self._run_dialog('status')
-        elif stat == 'gstatus':
-            targets = self._filenames or [self._folder]
-            root = find_root(targets[0])
-            quoted_files = [shellquote(s) for s in targets]
-            hgpath = find_path('hg', get_prog_root())
-            cmd = "%s --repository %s gstatus %s" % \
-                    (shellquote(hgpath), shellquote(root),
-                     " ".join(quoted_files))
-            run_program(cmd)
-        else:
-            msg = "Status viewer %s not recognized" % stat
-            title = "Unknown status tool"
-            win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+        self._run_dialog('status')
 
     def _clone(self, parent_window):
         self._run_dialog('clone', True)
