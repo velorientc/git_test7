@@ -65,6 +65,7 @@ from mercurial.i18n import _
 from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
+from shlib import shell_notify
 
 def gcommit(ui, repo, *pats, **opts):
     """graphical display for committing outstanding changes
@@ -1352,6 +1353,7 @@ class GStatus(GDialog):
             commands.remove(self.ui, self.repo, *files, **removeopts)
         success, outtext = self._hg_call_wrapper('Remove', dohgremove)
         if success:
+            shell_notify(files)
             self.reload_status()
 
 
@@ -1483,6 +1485,7 @@ class GStatus(GDialog):
         if dialog.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
+                shell_notify(files)
                 self.reload_status()
 
     def _add_clicked(self, toolbutton, data=None):
@@ -1506,6 +1509,7 @@ class GStatus(GDialog):
             commands.add(self.ui, self.repo, *files, **addopts)
         success, outtext = self._hg_call_wrapper('Add', dohgadd)
         if success:
+            shell_notify(files)
             self.reload_status()
 
 
@@ -1796,6 +1800,7 @@ class GCommit(GStatus):
         success, outtext = self._hg_call_wrapper('Commit', dohgcommit)
         if success:
             self.text.set_buffer(gtk.TextBuffer())
+            shell_notify(files)
             self.reload_status()
 
 
