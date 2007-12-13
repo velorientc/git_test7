@@ -72,41 +72,57 @@ def get_prog_root():
     return dir
 
 bitmap_cache = {}
-def icon_to_bitmap(iconPathName, type="SMICON"):
+def icon_to_bitmap(iconPathName):
     """
     create a bitmap based converted from an icon.
 
     adapted from pywin32's demo program win32gui_menu.py
     """
     global bitmap_cache
-    if bitmap_cache.has_key(iconPathName):
-        return bitmap_cache[iconPathName]
         
-    # Create one with an icon - this is a fair bit more work, as we need
-    # to convert the icon to a bitmap.
-    # First load the icon.
-    if "MENUCHECK":
-        ico_x = GetSystemMetrics(win32con.SM_CXMENUCHECK)
-        ico_y = GetSystemMetrics(win32con.SM_CYMENUCHECK)
+    cx = GetSystemMetrics(win32con.SM_CXMENUCHECK)
+    cy = GetSystemMetrics(win32con.SM_CYMENUCHECK)
+    
+    # use icon image with size smaller but closer to menu size
+    if cx >= 16:
+        ico_x = ico_y = 16
     else:
-        ico_x = GetSystemMetrics(win32con.SM_CXSMICON)
-        ico_y = GetSystemMetrics(win32con.SM_CYSMICON)
-        
-    hicon = LoadImage(0, iconPathName, win32con.IMAGE_ICON, ico_x, ico_y, win32con.LR_LOADFROMFILE)
+        ico_x = ico_y = 12
+    ico_idx = "%d:%d", (cx, cy)
+    
+    print "menucheck c_xy = ", cx, cy
+    print "menucheck ico_xy = ", ico_x, ico_y
+    
+    # see if icon has been cached
+    try:
+        return bitmap_cache[iconPathName][ico_idx]
+    except:
+        pass
+
+    hicon = LoadImage(0, iconPathName, win32con.IMAGE_ICON, ico_x, ico_y, 
+            win32con.LR_LOADFROMFILE)
 
     hdcBitmap = CreateCompatibleDC(0)
     hdcScreen = GetDC(0)
-    hbm = CreateCompatibleBitmap(hdcScreen, ico_x, ico_y)
+    hbm = CreateCompatibleBitmap(hdcScreen, cx, cy)
     hbmOld = SelectObject(hdcBitmap, hbm)
+
     # Fill the background.
     brush = GetSysColorBrush(win32con.COLOR_MENU)
-    FillRect(hdcBitmap, (0, 0, ico_x, ico_y), brush)
-    # unclear if brush needs to be feed.  Best clue I can find is:
-    # "GetSysColorBrush returns a cached brush instead of allocating a new
-    # one." - implies no DeleteObject
-    # draw the icon
-    DrawIconEx(hdcBitmap, 0, 0, hicon, ico_x, ico_y, 0, 0, win32con.DI_NORMAL)
-    bitmap_cache[iconPathName] = hbm    # store bitmap to cache
+    FillRect(hdcBitmap, (0, 0, cx, cy), brush)
+    
+    # we try to center the icon image within the bitmap without resizing
+    # the icon, so that the icon will be display as closely level to the
+    # menu text as possible.
+    startx = int((cx-ico_x)/2)
+    starty = int((cx-ico_y)/2)    
+    DrawIconEx(hdcBitmap, startx, starty, hicon, ico_x, ico_y, 0, 0,
+            win32con.DI_NORMAL)
+            
+    # store bitmap to cache
+    if not bitmap_cache.has_key(iconPathName):
+        bitmap_cache[iconPathName] = {}
+    bitmap_cache[iconPathName][ico_idx] = hbm
     
     # restore settings
     SelectObject(hdcBitmap, hbmOld)
