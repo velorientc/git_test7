@@ -20,17 +20,18 @@ import os
 import threading
 from mercurial import hg, ui, util 
 from mercurial.node import *
+from hglib import rootpath
 from dialog import error_dialog
 
 class SynchDialog(gtk.Dialog):
-    def __init__(self, root='', repos=[]):
+    def __init__(self, cwd='', repos=[]):
         """ Initialize the Dialog. """
-        rootbase = os.path.basename(root)
+        rootbase = os.path.basename(cwd)
         gtk.Dialog.__init__(self, title="TortoiseHg Synchronize - %s" % rootbase,
                                   parent=None,
                                   flags=0,
                                   buttons=())
-        self.root = root
+        self.root = rootpath(cwd)
         self.selected_path = None
         self.thread1 = None
         self.queue = Queue.Queue()
@@ -342,9 +343,9 @@ class SynchDialog(gtk.Dialog):
         except IOError:
             pass
 
-def run(root='', repos=[]):
+def run(cwd='', repos=[]):
     print "synch: repos=",repos
-    dlg = SynchDialog(root=root, repos=repos)
+    dlg = SynchDialog(cwd=cwd, repos=repos)
     dlg.run()
     dlg.hide()
     
