@@ -162,9 +162,11 @@ class ServeDialog(gtk.Dialog):
     def _on_browse_clicked(self, *args):
         ''' launch default browser to view repo '''
         if self._url:
-            import win32api, win32con
-            win32api.ShellExecute(0, "open", self._url, None, "", 
-                    win32con.SW_SHOW)
+            def start_browser():
+                import win32api, win32con
+                win32api.ShellExecute(0, "open", self._url, None, "", 
+                        win32con.SW_SHOW)
+            threading.Thread(target=start_browser).start()
     
     def _start_server(self):
         # gather input data
