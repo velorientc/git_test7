@@ -43,6 +43,7 @@ class ServeDialog(gtk.Dialog):
         self.action_area.pack_end(self._btn_close)
 
         self.proc = None
+        self._url = None
         self._root = root
         if cwd: os.chdir(cwd)
         
@@ -64,11 +65,16 @@ class ServeDialog(gtk.Dialog):
                                               'Stop',
                                               self._on_stop_clicked,
                                               None)
+        self._button_browse = self._toolbutton(gtk.STOCK_HOME,
+                                              'Browse',
+                                              self._on_browse_clicked,
+                                              None)
         tbuttons = [
                 self._button_start,
                 gtk.SeparatorToolItem(),
                 self._button_stop,
                 gtk.SeparatorToolItem(),
+                self._button_browse,
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -97,6 +103,7 @@ class ServeDialog(gtk.Dialog):
         self.vbox.pack_start(scrolledwindow, True, True)
 
         # show them all
+        self._set_button_states()
         self.vbox.show_all()
 
     def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
@@ -135,14 +142,30 @@ class ServeDialog(gtk.Dialog):
         else:
             return True
 
+    def _set_button_states(self):
+        if self.proc and self.proc.poll() == None:
+            self._button_start.set_sensitive(False)
+            self._button_stop.set_sensitive(True)
+            self._button_browse.set_sensitive(True)
+        else:
+            self._button_start.set_sensitive(True)
+            self._button_stop.set_sensitive(False)
+            self._button_browse.set_sensitive(False)
+            
     def _on_start_clicked(self, *args):
         self._start_server()
-        self._button_start.set_sensitive(False)
-        self._button_stop.set_sensitive(True)
-
+        self._set_button_states()
+        
     def _on_stop_clicked(self, *args):
         self._stop_server()
 
+    def _on_browse_clicked(self, *args):
+        ''' launch default browser to view repo '''
+        if self._url:
+            import win32api, win32con
+            win32api.ShellExecute(0, "open", self._url, None, "", 
+                    win32con.SW_SHOW)
+    
     def _start_server(self):
         # gather input data
         try:
@@ -171,8 +194,8 @@ class ServeDialog(gtk.Dialog):
         # display a.s.a.p.
         os.environ['PYTHONUNBUFFERED'] = "1"
         #self.write(self.cmdline + '\n')
-        self.write('Web server started, now available at ')
-        self.write('http://%s:%d/\n' % (socket.getfqdn(), port))
+        self._url = 'http://%s:%d/' % (socket.getfqdn(), port)
+        self.write('Web server started, now available at %s\n' % self._url)
 
         # start hg operation on a subprocess and capture the output
         self.tmp_file = filename
@@ -199,6 +222,7 @@ class ServeDialog(gtk.Dialog):
                 win32api.TerminateProcess(handle, 0)
             else:
                 os.kill(pid, signal.SIGHUP)
+            self._url = None
             self.write('Web server stopped.\n')
 
     def write(self, msg, append=True):
@@ -221,8 +245,7 @@ class ServeDialog(gtk.Dialog):
                 pass
 
         if threading.activeCount() == 1:
-            self._button_start.set_sensitive(True)
-            self._button_stop.set_sensitive(False)
+            self._set_button_states()
             return False # Stop polling this function
         else:
             return True
