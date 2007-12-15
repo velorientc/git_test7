@@ -276,7 +276,7 @@ class ContextMenuExtension:
         result = []
         result.append(TortoiseMenu(_("Create Clone"), 
                        _("Create clone here from source"),
-                       self._clone_here, icon="menurelocate.ico"))
+                       self._clone_here, icon="menuclone.ico"))
 
         if drop_repo:
             print "_get_commands_dragdrop(): drop zone is a hg repo too"
@@ -307,7 +307,7 @@ class ContextMenuExtension:
                            self._init, icon="menucreaterepos.ico"))
             result.append(TortoiseMenu(_("Clone a Repository"),
                            _("clone a repository"),
-                           self._clone, icon="menurelocate.ico"))
+                           self._clone, icon="menuclone.ico"))
         else:
             print "_get_commands(): adding hg commands"
             
@@ -376,7 +376,7 @@ class ContextMenuExtension:
 
             result.append(TortoiseMenu(_("Create Clone"),
                            _("Clone a repository here"),
-                           self._clone, icon="menurelocate.ico"))
+                           self._clone, icon="menuclone.ico"))
             result.append(TortoiseMenu(_("Synchronize..."),
                            _("Synchronize with remote repository"),
                            self._synch, icon="menusynch.ico"))
