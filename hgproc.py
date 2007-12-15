@@ -131,7 +131,7 @@ def parse(args):
         return hggtk.serve.run(cwd=option['cwd'], root=option['root'])
     elif option['hgcmd'] == 'synch':
         import hggtk.synch
-        return hggtk.synch.run(root=option['cwd'], repos=filelist)
+        return hggtk.synch.run(cwd=option['cwd'], repos=filelist)
     elif option['hgcmd'] in ['incoming', 'pull']:
         import hggtk.paths
         path = hggtk.paths.run(root=option['root'], pull=True)
