@@ -283,7 +283,7 @@ class ContextMenuExtension:
             print "drop root = %s" % drag_repo.root
             result.append(TortoiseMenu(_("Synchronize"),
                            _("Synchronize with dragged repository"),
-                           self._synch_here))
+                           self._synch_here, icon="menusynch.ico"))
         return result
         
     def _get_commands(self):
@@ -361,7 +361,7 @@ class ContextMenuExtension:
                            self._view, icon="menurevisiongraph.ico"))
             result.append(TortoiseMenu(_("Current Revision Status..."),
                            _("Show various revision info"),
-                           self._tip))
+                           self._tip, icon="menurepobrowse.ico"))
 
             result.append(TortoiseMenuSep())
 
@@ -379,13 +379,13 @@ class ContextMenuExtension:
                            self._clone, icon="menurelocate.ico"))
             result.append(TortoiseMenu(_("Synchronize..."),
                            _("Synchronize with remote repository"),
-                           self._synch))
+                           self._synch, icon="menusynch.ico"))
             result.append(TortoiseMenu(_("Web Server"),
                            _("start web server for this repository"),
-                           self._serve))
+                           self._serve, icon="proxy.ico"))
 
             # repo recovery functions
-            rcmenu = TortoiseSubmenu(_("Repo Recovery"))
+            rcmenu = TortoiseSubmenu(_("Repo Recovery"), icon="general.ico")
             result.append(rcmenu)
             
             rcmenu.add_menu(_("Rollback"),
