@@ -684,6 +684,7 @@ class GLog(GDialog):
         buff_iter = buffer.get_start_iter()
         buffer.create_tag('changeset', foreground='#000090', paragraph_background='#F0F0F0')
         buffer.create_tag('date', foreground='#000090', paragraph_background='#F0F0F0')
+        buffer.create_tag('tag', foreground='#000090', paragraph_background='#F0F0F0')
         buffer.create_tag('files', foreground='#5C5C5C', paragraph_background='#F0F0F0')
         if parents == 1:
             buffer.create_tag('parent', foreground='#900000', paragraph_background='#F0F0F0')
@@ -703,6 +704,8 @@ class GLog(GDialog):
                 buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'parent')
             elif line.startswith('files:'):
                 buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'files')
+            elif line.startswith('tag:'):
+                buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'tag')
             elif line.startswith('description:'):
                 buffer.insert(buff_iter, '\n')
                 break;
