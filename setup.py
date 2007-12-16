@@ -6,8 +6,9 @@
 # InnoSetup to build the installer.  By default, the installer will be
 # created as dist\Output\setup.exe.
 
-# To build a source MSI package (for the NSI Mercurial installer), use
-# 'python setup.py bdist_msi'
+# To build a source installer for use with the Mercurial NSI
+# installer, use 
+# 'python setup.py bdist_wininst --install-script=thg_postinstall.py'
 
 import time
 import sys
@@ -49,12 +50,22 @@ if 'py2exe' in sys.argv:
                         "icon_resources": [(1, "icons/tortoise/python.ico")]}]
     extra['com_server'] = ["tortoisehg"]
     extra['console'] = ["hg", "hgproc.py", "hgutils/simplemerge"]
-elif 'bdist_msi' in sys.argv:
+
+elif 'bdist_msi' in sys.argv or 'bdist_wininst' in sys.argv:
+    # C:\Python25\share\tortoisehg\icons\...
     _data_files = [(os.path.join('share/tortoisehg', root),
                 [os.path.join(root, file_) for file_ in files])
                 for root, dirs, files in os.walk('icons')]
-    _data_files.append(('mercurial/hgrc.d', ['tortoisehg.rc']))
-    extra['scripts'] = ['tortoisehg.py', 'hgproc.py', 'hggtk/tracelog.py']
+
+    # C:\Python25\share\tortoisehg\*.bat, *.py
+    _data_files.append(('share/tortoisehg',
+        ['hgproc.py', 'hgproc.bat', 'tortoisehg.py']))
+
+    # C:\Python25\mercurial\hgrc.d\tortoisehg.rc
+    _data_files.append(('mercurial/hgrc.d', ['installer/tortoisehg.rc']))
+
+    # C:\Python25\Scripts\tracelog.bat, thg_postinstall.py
+    extra['scripts'] = ['installer/tracelog.bat', 'installer/thg_postinstall.py']
 
 opts = {
    "py2exe" : {
