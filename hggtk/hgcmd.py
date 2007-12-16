@@ -10,18 +10,14 @@ pygtk.require("2.0")
 import gtk
 import gobject
 import pango
-import subprocess
 import os
 import threading
 import Queue
-from mercurial import hg, commands, util
+from hglib import HgThread
 
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, width=520, height=400, mainapp=False):
-        if type(cmdline) == type([]):
-            title = " ".join(cmdline)
-        else:
-            title = cmdline
+        title = 'hg ' + ' '.join(cmdline[1:])
         gtk.Dialog.__init__(self,
                             title=title,
                             flags=gtk.DIALOG_MODAL, 
@@ -60,22 +56,11 @@ class CmdDialog(gtk.Dialog):
         self.response(gtk.RESPONSE_ACCEPT)
         
     def _on_window_map_event(self, event, param):
-        self._exec_cmd()
+        self.hgthread = HgThread(self.cmdline[1:])
+        self.hgthread.start()
+        self._button_ok.set_sensitive(False)
+        gobject.timeout_add(10, self.process_queue)
     
-    def _exec_cmd(self):
-        self.write("", False)
-        
-        # show command to be executed
-        if type(self.cmdline) == type([]):
-            cmd = " ".join(self.cmdline)
-        else:
-            cmd = self.cmdline
-        self.write("%s\n" % cmd)
-        self.write("=" * 60 + "\n")
-        
-        # execute comnand and show output on text widget
-        self._start_thread()
-
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
         if append:
@@ -88,55 +73,21 @@ class CmdDialog(gtk.Dialog):
         """
         Handle all the messages currently in the queue (if any).
         """
-        while self.queue.qsize():
+        enditer = self.textbuffer.get_end_iter()
+        while self.hgthread.getqueue().qsize():
             try:
-                msg = self.queue.get(0)
-                self.write(msg)
+                msg = self.hgthread.getqueue().get(0)
+                msg = unicode(msg, 'iso-8859-1')
+                self.textbuffer.insert(enditer, msg)
             except Queue.Empty:
                 pass
-                
-        return True
-        
-    def _start_thread(self):
-        gobject.timeout_add(10, self.process_queue)
-        self.thread1 = threading.Thread(target=self._do_popen)
-        self.thread1.start()
-        
-    def _do_popen(self):        
-        if not self.cmdline:
-            return
+        if threading.activeCount() == 1:
+            self._button_ok.set_sensitive(True)
+            return False # Stop polling this function
+        else:
+            return True
 
-        # run hg in unbuffered mode, so the output can be captured and display a.s.a.p.
-        os.environ['PYTHONUNBUFFERED'] = "1"
-
-        # start hg operation on a subprocess and capture the output
-        pop = subprocess.Popen(self.cmdline, 
-                               shell=False,
-                               stderr=subprocess.STDOUT,
-                               stdout=subprocess.PIPE,
-                               stdin=subprocess.PIPE)
-
-        self._button_ok.set_sensitive(False)
-        try:
-            line = 0
-            blocksize = 1024
-            while pop.poll() == None:
-                if line < 100:
-                    out = pop.stdout.readline()
-                    line += 1
-                else:
-                    out = pop.stdout.read(blocksize)
-                    if blocksize < 1024 * 50:
-                        blocksize *= 2
-                self.queue.put(out)
-            out = pop.stdout.read()
-            self.queue.put(out)
-        except IOError:
-            pass
-
-        self._button_ok.set_sensitive(True)
-
-def run(cmdline='', **opts):
+def run(cmdline=[], **opts):
     dlg = CmdDialog(cmdline, mainapp=True)
     dlg.show_all()
     gtk.gdk.threads_init()
@@ -147,6 +98,6 @@ def run(cmdline='', **opts):
 if __name__ == "__main__":
     import sys
     opts = {}
-    opts['cmdline'] = sys.argv[1:]
+    opts['cmdline'] = sys.argv
     run(**opts)
 
