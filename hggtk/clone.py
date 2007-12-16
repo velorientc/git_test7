@@ -1,5 +1,5 @@
 #
-# TortoiseHg dialog to add tag
+# TortoiseHg dialog to clone a repo
 #
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
