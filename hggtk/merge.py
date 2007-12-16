@@ -122,8 +122,8 @@ class MergeDialog(gtk.Dialog):
         
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
-        import history
-        rev = history.select(self.root)
+        import histselect
+        rev = histselect.select(self.root)
         if rev is not None:
             self._rev_input.set_text(rev)
 
