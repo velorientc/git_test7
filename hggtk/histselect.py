@@ -176,11 +176,12 @@ class HistoryDialog(gtk.Dialog):
         try:
             self.hgout = self.hg.command(cmd, options=options, files=self.files)
         except util.Abort, inst:
-            error_dialog("Error in revert", "abort: %s" % inst)
+            error_dialog("Error in %s command" % cmd, "abort: %s" % inst)
             return False
         except:
             import traceback
-            error_dialog("Error in revert", "Traceback:\n%s" % traceback.format_exc())
+            error_dialog("Error in %s command" % cmd,
+                    "Traceback:\n%s" % traceback.format_exc())
             return False
         return True
 
