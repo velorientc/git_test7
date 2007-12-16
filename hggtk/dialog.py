@@ -44,6 +44,35 @@ def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK,
     dialog.destroy()
     return response
 
+def entry_dialog(msg, visible=True, default='', title="TortoiseHg Prompt"):
+    """ Allow a user to enter a text string (username/password)
+    
+    :param type: message dialog type
+    
+    :param message: the message you want to display.
+    """
+    dialog = gtk.Dialog(flags=gtk.DIALOG_MODAL,
+            buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK))
+    dialog.set_title(title)
+    hbox = gtk.HBox(spacing=6)
+    entry = gtk.Entry()
+    entry.set_text(default or '')
+    entry.set_visibility(visible)
+    entry.set_activates_default(True)
+    hbox.pack_start(gtk.Label(msg))
+    hbox.pack_start(entry)
+    dialog.vbox.pack_start(hbox)
+    dialog.vbox.set_spacing(6)
+    dialog.set_default_response(gtk.RESPONSE_OK)
+    dialog.show_all()
+    response = dialog.run()
+    if response == gtk.RESPONSE_OK:
+        text = entry.get_text()
+    else:
+        text = None
+    dialog.destroy()
+    return text
+
 def error_dialog(primary, secondary):
     """ Display an error dialog with the given message. """
     return _message_dialog(gtk.MESSAGE_ERROR, primary, secondary)
