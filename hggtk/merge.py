@@ -143,11 +143,11 @@ class MergeDialog(gtk.Dialog):
         if response != gtk.RESPONSE_YES:
             return
             
-        import cmd
+        import hgcmd
         cmdline = 'hg merge --repository %s --rev %s' % \
                         (util.shellquote(self.root), rev)
         if force: cmdline += " --force"
-        cmd.run(cmdline)
+        hgcmd.run(cmdline)
         self._refresh()
 
 def run(root=''):

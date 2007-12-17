@@ -135,11 +135,11 @@ class UpdateDialog(gtk.Dialog):
         if response != gtk.RESPONSE_YES:
             return
             
-        import cmd
+        import hgcmd
         cmdline = 'hg update --repository %s --rev %s' % \
                         (util.shellquote(self.root), rev)
         if overwrite: cmdline += " --clean"
-        cmd.run(cmdline)
+        hgcmd.run(cmdline)
         self._refresh()
         shell_notify([self.cwd])
 

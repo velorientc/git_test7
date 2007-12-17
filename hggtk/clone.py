@@ -183,8 +183,8 @@ class CloneDialog(gtk.Dialog):
             if dest:
                 cmdline += ' %s' % util.shellquote(dest)
             print "cmdline: ", cmdline
-            import cmd
-            cmd.run(cmdline)
+            import hgcmd
+            hgcmd.run(cmdline)
         except util.Abort, inst:
             error_dialog("Clone aborted", str(inst))
             return False
