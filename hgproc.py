@@ -50,15 +50,16 @@ def get_option(args):
     options['hgpath'] = find_path('hg', '.EXE;.BAT') or 'hg'
     options['cwd'] = os.getcwd()
     options['files'] = []
+    listfile = None
+    delfile = False
     
     for o, a in opts:
         if o in ("-c", "--command"):
             options['hgcmd'] = a
         elif o in ("-l", "--listfile"):
             listfile = a
-            options['files'] = get_list_from_file(listfile)
         elif o in ("-d", "--deletelistfile"):
-            os.unlink(listfile)
+            delfile = True
         elif o in ("-e", "--exepath"):
             options['hgpath'] = a
         elif o in ("-n", "--notify"):
@@ -69,6 +70,11 @@ def get_option(args):
             options['root'] = a
         elif o in ("--cwd"):
             options['cwd'] = a
+
+    if listfile:
+        options['files'] = get_list_from_file(listfile)
+        if delfile:
+            os.unlink(listfile)
 
     return (options, args)
 
