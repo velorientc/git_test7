@@ -141,7 +141,7 @@ class MergeDialog(gtk.Dialog):
         if force:
             cmdline.append("--force")
 
-        from command import CmdDialog
+        from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()

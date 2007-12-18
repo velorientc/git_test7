@@ -139,7 +139,7 @@ class UpdateDialog(gtk.Dialog):
         if overwrite: 
             cmdline.append('--clean')
 
-        from command import CmdDialog
+        from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
