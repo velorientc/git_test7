@@ -15,7 +15,7 @@ from mercurial import util, hg, ui
 
 class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
-    def __init__(self, root='', hgpath='hg'):
+    def __init__(self, root=''):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(MergeDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -29,7 +29,6 @@ class MergeDialog(gtk.Dialog):
 
         self.root = root
         self.repo = None
-        self._hgpath = hgpath
         self._create()
 
     def _create(self):
@@ -138,7 +137,7 @@ class MergeDialog(gtk.Dialog):
         if response != gtk.RESPONSE_YES:
             return
 
-        cmdline = [self._hgpath, 'merge', '-R', self.root, '--rev', rev]
+        cmdline = ['hg', 'merge', '-R', self.root, '--rev', rev]
         if force:
             cmdline.append("--force")
 
@@ -148,8 +147,8 @@ class MergeDialog(gtk.Dialog):
         dlg.hide()
         self._refresh()
 
-def run(root='', hgpath='hg', **opts):
-    dialog = MergeDialog(root, hgpath)
+def run(root='', **opts):
+    dialog = MergeDialog(root)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

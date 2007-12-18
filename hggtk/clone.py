@@ -20,7 +20,7 @@ from mercurial.node import *
 
 class CloneDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, cwd='', repos=[], hgpath='hg'):
+    def __init__(self, cwd='', repos=[]):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(CloneDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -35,7 +35,6 @@ class CloneDialog(gtk.Dialog):
 
         self._src_path = ''
         self._dest_path = ''
-        self._hgpath = hgpath
         
         try:
             self._src_path = repos[0]
@@ -165,7 +164,7 @@ class CloneDialog(gtk.Dialog):
         
         # start cloning        
         try:            
-            cmdline = [self._hgpath, 'clone']
+            cmdline = ['hg', 'clone']
             if self._opt_update.get_active():
                 cmdline.append('--noupdate')
             if self._opt_uncomp.get_active():
@@ -184,7 +183,7 @@ class CloneDialog(gtk.Dialog):
             if dest:
                 cmdline.append(dest)
 
-            print "cmdline: ", cmdline
+            print "cmdline: ", ' '.join(cmdline)
             from hgcmd import CmdDialog
             dlg = CmdDialog(cmdline)
             dlg.run()
@@ -197,8 +196,8 @@ class CloneDialog(gtk.Dialog):
             error_dialog("Clone error", traceback.format_exc())
             return False
 
-def run(cwd='', files=[], hgpath='hg', **opts):
-    dialog = CloneDialog(cwd, repos=files, hgpath=hgpath)
+def run(cwd='', files=[], **opts):
+    dialog = CloneDialog(cwd, repos=files)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
