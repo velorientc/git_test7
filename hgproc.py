@@ -9,21 +9,23 @@ import sys
 from mercurial import ui
 from tortoise.thgutil import find_path, get_prog_root, shellquote
 
-try:
-    import win32traceutil
-    
-    # FIXME: quick workaround traceback caused by missing "closed" 
-    # attribute in win32trace.
-    def write_err(self, *args):
-        for a in args:
-            sys.stderr.write(str(a))
-    ui.ui.write_err = write_err
+if not sys.stdin.isatty():
+    try:
+        import win32traceutil
+        
+        # FIXME: quick workaround traceback caused by missing "closed" 
+        # attribute in win32trace.
+        from mercurial import ui
+        def write_err(self, *args):
+            for a in args:
+                sys.stderr.write(str(a))
+        ui.ui.write_err = write_err
 
-    os.environ['PATH'] = "%s;%s" % (get_prog_root(), os.environ['PATH'])
-except ImportError:
-    pass
-except pywintypes.error:
-    pass
+        os.environ['PATH'] = "%s;%s" % (get_prog_root(), os.environ['PATH'])
+    except ImportError:
+        pass
+    except pywintypes.error:
+        pass
 
 # Map hgproc commands to dialog modules in hggtk/
 from hggtk import commit, status, addremove, tagadd, tags, history, merge
