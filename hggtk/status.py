@@ -7,7 +7,7 @@
 from mercurial import ui, hg
 import gtools
 
-def run(root='', files=[]):
+def run(root='', files=[], **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -22,5 +22,6 @@ def run(root='', files=[]):
 
 if __name__ == "__main__":
     import sys
-    path = len(sys.argv) > 1 and sys.argv[1] or ''
-    run(path)
+    opts = {}
+    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    run(**opts)

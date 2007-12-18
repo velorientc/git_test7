@@ -56,6 +56,7 @@ class TagsDialog(gtk.Dialog):
         title = "hg tags "
         if root: title += " - %s" % root
         self.set_title(title)
+        self.connect('response', gtk.main_quit)
 
         # build dialog
         self.set_default_size(500, 300)
@@ -99,10 +100,14 @@ class TagsDialog(gtk.Dialog):
         (model, iter) = treeselection.get_selected()
         self.selected = model.get_value(iter, 0)
 
-def run(root=''):
+def run(root='', **opts):
     dialog = TagsDialog(root=root)
-    dialog.run()
-
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
+    
 def select(root=''):
     dialog = TagsDialog(root=root, select=True)
     resp = dialog.run()
@@ -113,4 +118,4 @@ def select(root=''):
     return rev
     
 if __name__ == "__main__":
-    run()
+    run(**{})

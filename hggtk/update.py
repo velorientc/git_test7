@@ -40,6 +40,7 @@ class UpdateDialog(gtk.Dialog):
         
     def _create(self):
         self.set_default_size(350, 120)
+        self.connect('response', gtk.main_quit)
 
         # repo parent revisions
         parentbox = gtk.HBox()
@@ -85,7 +86,6 @@ class UpdateDialog(gtk.Dialog):
         self.action_area.pack_end(self._btn_update)
         
         # show them all
-        self.vbox.show_all()
         self._refresh()
 
     def _refresh(self):
@@ -135,24 +135,26 @@ class UpdateDialog(gtk.Dialog):
         if response != gtk.RESPONSE_YES:
             return
             
-        import hgcmd
         cmdline = 'hg update --repository %s --rev %s' % \
                         (util.shellquote(self.root), rev)
         if overwrite: cmdline += " --clean"
-        hgcmd.run(cmdline)
+        from command import CmdDialog
+        dlg = CmdDialog(cmdline)
+        dlg.run()
+        dlg.hide()
         self._refresh()
         shell_notify([self.cwd])
 
-def run(cwd=''):
-    dialog = UpdateDialog(cwd=cwd)
-    dialog.run()
-    return 
+def run(cwd='', **opts):
+    dialog = UpdateDialog(cwd)
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
     import sys
-    path = len(sys.argv) > 1 and sys.argv[1] or ''
-    run(path)
-
-                                           
-                                           
-                       
+    opts = {}
+    opts['cwd'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    run(**opts)

@@ -28,6 +28,7 @@ class RevisionDialog(gtk.Dialog):
                                   buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
         self.root = root
+        self.connect('response', gtk.main_quit)
 
         self._button_refresh = gtk.Button(_("Refresh"))
         self._button_refresh.connect('clicked', self._button_refresh_clicked)
@@ -129,12 +130,19 @@ class RevisionDialog(gtk.Dialog):
         text = repo.ui.popbuffer()
         return text
         
-def run(root='', page=None):
-    dlg = RevisionDialog(root=root)
-    if page:
-        dlg.select_page(page)
-    dlg.run()
+def run(root='', hgcmd='', **opts):
+    dialog = RevisionDialog(root)
+    if hgcmd:
+        dialog.select_page(hgcmd)
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
     import sys
-    run()
+    opts = {}
+    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    opts['hgcmd'] = 'tip'
+    run(**opts)

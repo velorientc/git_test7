@@ -19,7 +19,8 @@ import hglib
 
 class HistoryDialog(gtk.Dialog):
     """ Dialog to display Mercurial history """
-    def __init__(self, root='', files=[], list_clean=False, select=False, page=100):
+    def __init__(self, root='', files=[], list_clean=False,
+            select=False, page=100, mainapp=False):
         """ Initialize the Dialog """
         if select:
             buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -33,6 +34,8 @@ class HistoryDialog(gtk.Dialog):
         title = "hg log "
         if root: title += " - %s" % root
         self.set_title(title)
+        if mainapp:
+            self.connect('response', gtk.main_quit)
 
         self.root = root
         self.files = files
@@ -240,10 +243,13 @@ class HistoryDialog(gtk.Dialog):
         
         return list
         
-def run(root='', files=[]):
-    dialog = HistoryDialog(root=root, files=files)
-    dialog.run()
-    return 
+def run(root='', files=[], **opts):
+    dialog = HistoryDialog(root=root, files=files, mainapp=True)
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
     
 def select(root='', files=[]):
     dialog = HistoryDialog(root=root, files=files, select=True)
@@ -256,5 +262,6 @@ def select(root='', files=[]):
 
 if __name__ == "__main__":
     import sys
-    root = len(sys.argv) > 1 and sys.argv[1:] or []
-    run(*root)
+    opts = {}
+    opts['root'] = len(sys.argv) > 1 and sys.argv[1:] or []
+    run(**opts)

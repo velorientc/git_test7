@@ -38,6 +38,7 @@ class TagAddDialog(gtk.Dialog):
 
     def _create(self):
         self.set_default_size(350, 180)
+        self.connect('response', gtk.main_quit)
         
         # tag name input
         tagbox = gtk.HBox()
@@ -164,12 +165,16 @@ class TagAddDialog(gtk.Dialog):
             
         repo.tag(name, r, message, local, user, date)
 
-def run(root=''):
-    dialog = TagAddDialog(root=root)
-    dialog.run()
+def run(root='', **opts):
+    dialog = TagAddDialog(root)
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
     
 if __name__ == "__main__":
     import sys
-    root = len(sys.argv) > 1 and sys.argv[1:] or []
-    dialog = TagAddDialog(*root)
-    dialog.run()
+    opts = {}
+    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    run(**opts)

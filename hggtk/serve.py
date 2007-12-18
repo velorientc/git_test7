@@ -102,9 +102,7 @@ class ServeDialog(gtk.Dialog):
         self.textbuffer = self.textview.get_buffer()
         self.vbox.pack_start(scrolledwindow, True, True)
 
-        # show them all
         self._set_button_states()
-        self.vbox.show_all()
 
     def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
         if menu:
@@ -127,6 +125,8 @@ class ServeDialog(gtk.Dialog):
     def _response(self, widget, response_id):
         if self._server_stopped() == False:
             widget.emit_stop_by_name('response')
+        else:
+            gtk.main_quit()
     
     def _server_stopped(self):
         '''
@@ -276,14 +276,17 @@ class PollThread(threading.Thread):
         except IOError:
             pass
 
-def run(cwd='', root=''):
+def run(cwd='', root='', **opts):
     dialog = ServeDialog(cwd, root)
-    dialog.run()
-    dialog.hide()
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
     
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) == 2:
-        run(os.getcwd(), sys.argv[1])
-    else:
-        run(os.getcwd())
+    opts = {}
+    opts['cwd'] = os.getcwd()
+    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    run(**opts)

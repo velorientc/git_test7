@@ -170,13 +170,15 @@ class DiffWindow(gtk.Window):
         self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
         self.set_modal(modal)
 
-def run(root='', files=[]):
+def run(root='', files=[], **opts):
     diff = DiffWindow()
     diff.set_diff(root, files)
     diff._set_as_window()
     diff.show()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
     gtk.main()
+    gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
-    #run(r'c:\hg\h1', [r'c:\hg\h1\f1'])
-    run()
+    run(**{})

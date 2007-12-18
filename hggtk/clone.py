@@ -47,6 +47,7 @@ class CloneDialog(gtk.Dialog):
 
     def _create(self):
         self.set_default_size(400, 180)
+        self.connect('response', gtk.main_quit)
         ewidth = 16
         
         # clone source
@@ -116,9 +117,6 @@ class CloneDialog(gtk.Dialog):
         self._btn_clone = gtk.Button("Clone")
         self._btn_clone.connect('clicked', self._btn_clone_clicked)
         self.action_area.pack_end(self._btn_clone)
-        
-        # show them all
-        self.vbox.show_all()
 
     def _btn_dest_clicked(self, button):
         """ select folder as clone destination """
@@ -183,8 +181,10 @@ class CloneDialog(gtk.Dialog):
             if dest:
                 cmdline += ' %s' % util.shellquote(dest)
             print "cmdline: ", cmdline
-            import hgcmd
-            hgcmd.run(cmdline)
+            from hgcmd import CmdDialog
+            dlg = CmdDialog(cmdline)
+            dlg.run()
+            dlg.hide()
         except util.Abort, inst:
             error_dialog("Clone aborted", str(inst))
             return False
@@ -193,10 +193,17 @@ class CloneDialog(gtk.Dialog):
             error_dialog("Clone error", traceback.format_exc())
             return False
 
-def run(cwd='', repos=[]):
+def run(cwd='', repos=[], **opts):
     dialog = CloneDialog(cwd, repos)
-    dialog.run()
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
     
 if __name__ == "__main__":
     import sys
-    run(os.getcwd(), sys.argv[1:])
+    opts = {}
+    opts['cwd'] = os.getcwd()
+    opts['repos'] = sys.argv[1:]
+    run(**opts)

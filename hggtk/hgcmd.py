@@ -17,7 +17,7 @@ import Queue
 from mercurial import hg, commands, util
 
 class CmdDialog(gtk.Dialog):
-    def __init__(self, cmdline, width=520, height=400):
+    def __init__(self, cmdline, width=520, height=400, mainapp=False):
         if type(cmdline) == type([]):
             title = " ".join(cmdline)
         else:
@@ -35,7 +35,6 @@ class CmdDialog(gtk.Dialog):
         self.set_default_size(width, height)
         
         self._button_ok = gtk.Button("OK")
-        self._button_ok.connect('clicked', self._on_commit_clicked)
         self.action_area.pack_end(self._button_ok)
         
         scrolledwindow = gtk.ScrolledWindow()
@@ -48,9 +47,13 @@ class CmdDialog(gtk.Dialog):
         self.textbuffer = self.textview.get_buffer()
         
         self.vbox.pack_start(scrolledwindow, True, True)
-        self.vbox.show_all()
-
         self.connect('map_event', self._on_window_map_event)
+
+        if mainapp:
+            self._button_ok.connect('clicked', gtk.main_quit)
+        else:
+            self._button_ok.connect('clicked', self._on_commit_clicked)
+            self.show_all()
 
     def _on_commit_clicked(self, button):
         """ Commit button clicked handler. """
@@ -133,12 +136,17 @@ class CmdDialog(gtk.Dialog):
 
         self._button_ok.set_sensitive(True)
 
-def run(cmd=''):
-    dlg = CmdDialog(cmd)
-    dlg.run()
-    dlg.hide()
+def run(cmdline='', **opts):
+    dlg = CmdDialog(cmdline, mainapp=True)
+    dlg.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
     
 if __name__ == "__main__":
     import sys
-    run(sys.argv[1:])
+    opts = {}
+    opts['cmdline'] = sys.argv[1:]
+    run(**opts)
 

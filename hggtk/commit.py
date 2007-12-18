@@ -7,7 +7,12 @@
 from mercurial import ui, hg
 import gtools
 
-def run(root='', files=[]):
+def run(root='', files=[], cwd='', **opts):
+    # If no files or directories were selected, take current dir
+    # TODO: Not clear if this is best; user may expect repo wide
+    if not files and cwd:
+        files = [cwd]
+
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -24,5 +29,6 @@ def run(root='', files=[]):
 
 if __name__ == "__main__":
     import sys
-    path = len(sys.argv) > 1 and sys.argv[1] or ''
-    run(path)
+    opts = {}
+    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    run(**opts)

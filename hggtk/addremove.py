@@ -38,6 +38,7 @@ class AddRemoveDialog(gtk.Dialog):
         title = "hg %s" % cmd
         if root: title += " - %s" % root
         self.set_title(title)
+        self.connect('response', gtk.main_quit)
 
         # build dialog
         self.set_default_size(550, 400)
@@ -170,10 +171,17 @@ class AddRemoveDialog(gtk.Dialog):
             return False
         return True
 
-def run(cmd, root='', files=[]):
-    dialog = AddRemoveDialog(cmd, root=root, files=files)
-    dialog.run()
+def run(hgcmd='add', root='', files=[], **opts):
+    dialog = AddRemoveDialog(hgcmd, root, files)
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
     
 if __name__ == "__main__":
-    #run('add', r'c:\hg\h1', [r'c:\hg\h1\mercurial'])
-    run('remove',r'c:\hg\h1', [r'c:\hg\h1\mercurial\hgweb'])
+    opts = {}
+    opts['cmd'] = 'add'
+    opts['root'] = os.getcwd()
+    opts['files'] = os.listdir(os.listdir)
+    run(**opts)

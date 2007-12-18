@@ -21,21 +21,16 @@ class MergeDialog(gtk.Dialog):
         super(MergeDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                           buttons=buttons)
 
-        self.root = root
-
-        try:
-            u = ui.ui()
-            self.repo = hg.repository(u, path=self.root)
-        except hg.RepoError:
-            return None
-
         # set dialog title
         title = "hg merge"
         if root: title += " - %s" % root
         self.set_title(title)
+        self.connect('response', gtk.main_quit)
 
+        self.root = root
+        self.repo = None
         self._create()
-        
+
     def _create(self):
         self.set_default_size(350, 120)
         
@@ -82,7 +77,6 @@ class MergeDialog(gtk.Dialog):
         
         # show them all
         self._refresh()
-        self.vbox.show_all()
 
     def _refresh(self):
         """ update display on dialog with recent repo data """
@@ -142,24 +136,27 @@ class MergeDialog(gtk.Dialog):
                                    "with revision %s" % rev)
         if response != gtk.RESPONSE_YES:
             return
-            
-        import hgcmd
+
         cmdline = 'hg merge --repository %s --rev %s' % \
                         (util.shellquote(self.root), rev)
         if force: cmdline += " --force"
-        hgcmd.run(cmdline)
+
+        from command import CmdDialog
+        dlg = CmdDialog(cmdline)
+        dlg.run()
+        dlg.hide()
         self._refresh()
 
-def run(root=''):
-    dialog = MergeDialog(root=root)
-    dialog.run()
-    return 
+def run(root='', **opts):
+    dialog = MergeDialog(root)
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
     import sys
-    root = len(sys.argv) > 1 and sys.argv[1:] or []
-    run(*root)
-
-                                           
-                                           
-                       
+    opts = {}
+    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    run(**opts)

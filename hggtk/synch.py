@@ -122,8 +122,6 @@ class SynchDialog(gtk.Dialog):
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
         self.vbox.pack_start(scrolledwindow, True, True)
-
-        self.vbox.show_all()
         
     def _pull_menu(self):
         menu = gtk.Menu()
@@ -216,6 +214,8 @@ class SynchDialog(gtk.Dialog):
         if self.thread1 and self.thread1.isAlive():
             error_dialog("Can't close now", "command is running")
             widget.emit_stop_by_name('response')
+        else:
+            gtk.main_quit()
     
     def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
         if menu:
@@ -343,12 +343,13 @@ class SynchDialog(gtk.Dialog):
         except IOError:
             pass
 
-def run(cwd='', repos=[]):
-    print "synch: repos=",repos
-    dlg = SynchDialog(cwd=cwd, repos=repos)
-    dlg.run()
-    dlg.hide()
+def run(cwd='', files=[], **opts):
+    dialog = SynchDialog(cwd, repos=files)
+    dialog.show_all()
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
     
 if __name__ == "__main__":
-    import sys
-    run()
+    run(**{})
