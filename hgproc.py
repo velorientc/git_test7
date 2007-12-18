@@ -9,6 +9,9 @@ import sys
 from mercurial import ui
 from tortoise.thgutil import find_path, get_prog_root, shellquote
 
+# always use hg exe installed with TortoiseHg
+os.environ['PATH'] = "%s;%s" % (get_prog_root(), os.environ['PATH'])
+
 if not sys.stdin.isatty():
     try:
         import win32traceutil
@@ -20,8 +23,6 @@ if not sys.stdin.isatty():
             for a in args:
                 sys.stderr.write(str(a))
         ui.ui.write_err = write_err
-
-        os.environ['PATH'] = "%s;%s" % (get_prog_root(), os.environ['PATH'])
     except ImportError:
         pass
     except pywintypes.error:
