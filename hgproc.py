@@ -47,7 +47,7 @@ def get_option(args):
     # Set default options
     options = {}
     options['hgcmd'] = 'help'
-    options['hgpath'] = find_path('hg', '.EXE;.BAT') or 'hg'
+    options['hgpath'] = find_path('hg', ext='.EXE;.BAT') or 'hg'
     options['cwd'] = os.getcwd()
     options['files'] = []
     listfile = None
@@ -95,7 +95,7 @@ def parse(args):
     elif ui.ui().config('ui', 'merge', None):
         pass
     else:
-        path = find_path("simplemerge", '.EXE;.BAT') or 'simplemerge'
+        path = find_path("simplemerge", ext='.EXE;.BAT') or 'simplemerge'
         os.environ['HGMERGE'] = '%s -L my -L other' % shellquote(path)
         print "override HGMERGE =", os.environ['HGMERGE']
 
