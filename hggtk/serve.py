@@ -163,9 +163,16 @@ class ServeDialog(gtk.Dialog):
         ''' launch default browser to view repo '''
         if self._url:
             def start_browser():
-                import win32api, win32con
-                win32api.ShellExecute(0, "open", self._url, None, "", 
+                if os.name == 'nt':
+                    import win32api, win32con
+                    win32api.ShellExecute(0, "open", self._url, None, "", 
                         win32con.SW_SHOW)
+                else:
+                    import gconf
+                    client = gconf.client_get_default()
+                    browser = client.get_string(
+                            '/desktop/gnome/url-handlers/http/command') + '&'
+                    os.system(browser % self._url)
             threading.Thread(target=start_browser).start()
     
     def _start_server(self):
