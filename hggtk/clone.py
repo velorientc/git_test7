@@ -20,7 +20,7 @@ from mercurial.node import *
 
 class CloneDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, cwd='', repos=[]):
+    def __init__(self, cwd='', repos=[], hgpath='hg'):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(CloneDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -35,6 +35,7 @@ class CloneDialog(gtk.Dialog):
 
         self._src_path = ''
         self._dest_path = ''
+        self._hgpath = hgpath
         
         try:
             self._src_path = repos[0]
@@ -164,22 +165,25 @@ class CloneDialog(gtk.Dialog):
         
         # start cloning        
         try:            
-            cmdline = 'hg clone'
+            cmdline = [self._hgpath, 'clone']
             if self._opt_update.get_active():
-                cmdline += ' --noupdate'
+                cmdline.append('--noupdate')
             if self._opt_uncomp.get_active():
-                cmdline += ' --uncompressed'
+                cmdline.append('--uncompressed')
             if self._opt_pull.get_active():
-                cmdline += ' --pull'
+                cmdline.append('--pull')
             if remotecmd:   
-                cmdline += ' --remotecmd %s' % util.shellquote(remotecmd)
+                cmdline.append('--remotecmd')
+                cmdline.append(remotecmd)
             if not self._opt_allrev.get_active() and rev:   
-                cmdline += ' --rev %s' % rev
+                cmdline.append('--rev')
+                cmdline.append(rev)
 
-            cmdline += ' --verbose'
-            cmdline += ' %s' % util.shellquote(src)
+            cmdline.append('--verbose')
+            cmdline.append(src)
             if dest:
-                cmdline += ' %s' % util.shellquote(dest)
+                cmdline.append(dest)
+
             print "cmdline: ", cmdline
             from hgcmd import CmdDialog
             dlg = CmdDialog(cmdline)
@@ -193,8 +197,8 @@ class CloneDialog(gtk.Dialog):
             error_dialog("Clone error", traceback.format_exc())
             return False
 
-def run(cwd='', repos=[], **opts):
-    dialog = CloneDialog(cwd, repos)
+def run(cwd='', files=[], hgpath='hg', **opts):
+    dialog = CloneDialog(cwd, repos=files, hgpath=hgpath)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
@@ -205,5 +209,5 @@ if __name__ == "__main__":
     import sys
     opts = {}
     opts['cwd'] = os.getcwd()
-    opts['repos'] = sys.argv[1:]
+    opts['files'] = sys.argv[1:]
     run(**opts)

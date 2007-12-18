@@ -18,13 +18,14 @@ from hglib import rootpath
 
 class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
-    def __init__(self, cwd=''):
+    def __init__(self, cwd='', hgpath='hg'):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(UpdateDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
         self.cwd = cwd or os.getcwd()
         self.root = rootpath(self.cwd)
+        self._hgpath = hgpath
         
         u = ui.ui()
         try:
@@ -135,9 +136,10 @@ class UpdateDialog(gtk.Dialog):
         if response != gtk.RESPONSE_YES:
             return
             
-        cmdline = 'hg update --repository %s --rev %s' % \
-                        (util.shellquote(self.root), rev)
-        if overwrite: cmdline += " --clean"
+        cmdline = [self._hgpath, 'update', '-R', self.root, '--rev', rev]
+        if overwrite: 
+            cmdline.append('--clean')
+
         from command import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
@@ -145,8 +147,8 @@ class UpdateDialog(gtk.Dialog):
         self._refresh()
         shell_notify([self.cwd])
 
-def run(cwd='', **opts):
-    dialog = UpdateDialog(cwd)
+def run(cwd='', hgpath='hg', **opts):
+    dialog = UpdateDialog(cwd, hgpath)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

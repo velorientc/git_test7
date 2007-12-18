@@ -29,7 +29,7 @@ from mercurial.node import *
 
 class ServeDialog(gtk.Dialog):
     """ Dialog to run web server"""
-    def __init__(self, cwd='', root=''):
+    def __init__(self, cwd='', root='', hgpath='hg'):
         """ Initialize the Dialog """
         super(ServeDialog, self).__init__(flags=gtk.DIALOG_MODAL)
 
@@ -45,6 +45,7 @@ class ServeDialog(gtk.Dialog):
         self.proc = None
         self._url = None
         self._root = root
+        self._hgpath = hgpath
         if cwd: os.chdir(cwd)
         
         # set dialog title
@@ -185,19 +186,13 @@ class ServeDialog(gtk.Dialog):
         
         # start server
         (fd, filename) = mkstemp()
-        self.cmdline = 'hg serve --pid-file ' + filename
+        self.cmdline = [self._hgpath, 'serve', '--pid-file', filename]
         if self._root:
-            self.cmdline += ' --repository "%s"' % self._root
+            self.cmdline.append('--repository')
+            self.cmdline.append(self._root)
         if port:
-            self.cmdline += ' --port %d' % port
-
-        try:
-            repo = hg.repository(ui.ui(), path=self._root)
-            if not repo.ui.config('web', 'name'):
-                self.cmdline += ' --name "%s"' % \
-                    os.path.basename(self._root)
-        except hg.RepoError:
-            pass
+            self.cmdline.append('--port')
+            self.cmdline.append(str(port))
 
         # run hg in unbuffered mode, so the output can be captured and
         # display a.s.a.p.
@@ -210,7 +205,7 @@ class ServeDialog(gtk.Dialog):
         self.tmp_file = filename
         self.tmp_fd = fd
         self.proc = subprocess.Popen(self.cmdline, 
-                               shell=True,
+                               shell=False,
                                stderr=subprocess.STDOUT,
                                stdout=subprocess.PIPE,
                                stdin=subprocess.PIPE,
@@ -276,8 +271,8 @@ class PollThread(threading.Thread):
         except IOError:
             pass
 
-def run(cwd='', root='', **opts):
-    dialog = ServeDialog(cwd, root)
+def run(cwd='', root='', hgpath='hg', **opts):
+    dialog = ServeDialog(cwd, root, hgpath)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

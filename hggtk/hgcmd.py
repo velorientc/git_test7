@@ -111,7 +111,7 @@ class CmdDialog(gtk.Dialog):
 
         # start hg operation on a subprocess and capture the output
         pop = subprocess.Popen(self.cmdline, 
-                               shell=True,
+                               shell=False,
                                stderr=subprocess.STDOUT,
                                stdout=subprocess.PIPE,
                                stdin=subprocess.PIPE)

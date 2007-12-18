@@ -24,7 +24,7 @@ from hglib import rootpath
 from dialog import error_dialog
 
 class SynchDialog(gtk.Dialog):
-    def __init__(self, cwd='', repos=[]):
+    def __init__(self, cwd='', repos=[], hgpath='hg'):
         """ Initialize the Dialog. """
         rootbase = os.path.basename(cwd)
         gtk.Dialog.__init__(self, title="TortoiseHg Synchronize - %s" % rootbase,
@@ -33,6 +33,7 @@ class SynchDialog(gtk.Dialog):
                                   buttons=())
         self.root = rootpath(cwd)
         self.selected_path = None
+        self._hgpath = hgpath
         self.thread1 = None
         self.queue = Queue.Queue()
 
@@ -229,55 +230,56 @@ class SynchDialog(gtk.Dialog):
         return tbutton
         
     def _pull_clicked(self, toolbutton, data=None):
-        cmd = 'pull'
+        cmd = ['pull']
         if self._pull_update.get_active():
-            cmd += " --update"
+            cmd.append('--update')
         if self._pull_force.get_active():
-            cmd += " --force"
+            cmd.append('--force')
         self._exec_cmd(cmd)
     
     def _push_clicked(self, toolbutton, data=None):
-        cmd = 'push'
+        cmd = ['push']
         if self._push_force.get_active():
-            cmd += " --force"
+            cmd.append('--force')
         self._exec_cmd(cmd)
         
     def _incoming_clicked(self, toolbutton, data=None):
-        cmd = 'incoming'
+        cmd = ['incoming']
         if self._incoming_show_patch.get_active():
-            cmd += " --patch"
+            cmd.append('--patch')
         if self._incoming_no_merges.get_active():
-            cmd += " --no-merges"
+            cmd.append('--no-merges')
         if self._incoming_force.get_active():
-            cmd += " --force"
+            cmd.append('--force')
         if self._incoming_newest.get_active():
-            cmd += " --newest-first"
+            cmd.append('--newest-first')
         self._exec_cmd(cmd)
         
     def _outgoing_clicked(self, toolbutton, data=None):
-        cmd = 'outgoing'
+        cmd = ['outgoing']
         if self._outgoing_show_patch.get_active():
-            cmd += " --patch"
+            cmd.append('--patch')
         if self._outgoing_no_merges.get_active():
-            cmd += " --no-merges"
+            cmd.append('--no-merges')
         if self._outgoing_force.get_active():
-            cmd += " --force"
+            cmd.append('--force')
         if self._outgoing_newest.get_active():
-            cmd += " --newest-first"
+            cmd.append('--newest-first')
         self._exec_cmd(cmd)
         
     def _exec_cmd(self, cmd):
         text_entry = self._pathbox.get_child()
         remote_path = str(text_entry.get_text())
         
-        self.cmdline = "hg %s --verbose --repository %s %s" % (cmd,
-                                                     util.shellquote(self.repo.root),
-                                                     util.shellquote(remote_path),
-                                                     )
+        self.cmdline = [self._hgpath] + cmd
+        self.cmdline.append('--verbose')
+        self.cmdline.append('--repository')
+        self.cmdline.append(self.repo.root)
+        self.cmdline.append(remote_path)
         
         # show command to be executed
         if type(self.cmdline) == type([]):
-            cmd = " ".join(self.cmdline)
+            cmd = ' '.join(self.cmdline)
         else:
             cmd = self.cmdline
         
@@ -321,7 +323,7 @@ class SynchDialog(gtk.Dialog):
 
         # start hg operation on a subprocess and capture the output
         pop = subprocess.Popen(self.cmdline, 
-                               shell=True,
+                               shell=False,
                                stderr=subprocess.STDOUT,
                                stdout=subprocess.PIPE,
                                stdin=subprocess.PIPE)
@@ -343,8 +345,8 @@ class SynchDialog(gtk.Dialog):
         except IOError:
             pass
 
-def run(cwd='', files=[], **opts):
-    dialog = SynchDialog(cwd, repos=files)
+def run(cwd='', files=[], hgpath='hg', **opts):
+    dialog = SynchDialog(cwd, repos=files, hgpath=hgpath)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
