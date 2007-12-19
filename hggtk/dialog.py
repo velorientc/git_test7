@@ -39,7 +39,7 @@ def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK,
                                buttons=buttons)
     dialog.set_title(title)
     dialog.set_markup('<big><b>' + primary + '</b></big>')
-    dialog.format_secondary_markup(secondary)
+    dialog.format_secondary_text(secondary)
     response = dialog.run()
     dialog.destroy()
     return response
