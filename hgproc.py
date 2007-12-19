@@ -26,12 +26,14 @@ except pywintypes.error:
     pass
 
 # Map hgproc commands to dialog modules in hggtk/
-_dialogs = { 'commit' : 'commit',    'status' : 'status',    'revert' : 'status',
-             'add'    : 'addremove', 'remove' : 'addremove', 'tag'    : 'tagadd',
-             'tags'   : 'tags',      'log'    : 'history',   'history': 'history',
-             'diff'   : 'diff',      'merge'  : 'merge',     'tip'    : 'revisions',
-             'parents': 'revisions', 'heads'  : 'revisions', 'update' : 'update',
-             'clone'  : 'clone',     'serve'  : 'serve',     'synch'  : 'synch'}
+from hggtk import commit, status, addremove, tagadd, tags, history, merge
+from hggtk import diff, revisions, update, serve, clone, synch, hgcmd
+_dialogs = { 'commit' : commit,    'status' : status,    'revert' : status,
+             'add'    : addremove, 'remove' : addremove, 'tag'    : tagadd,
+             'tags'   : tags,      'log'    : history,   'history': history,
+             'diff'   : diff,      'merge'  : merge,     'tip'    : revisions,
+             'parents': revisions, 'heads'  : revisions, 'update' : update,
+             'clone'  : clone,     'serve'  : serve,     'synch'  : synch}
 
 def get_list_from_file(filename):
     fd = open(filename, "r")
@@ -100,9 +102,8 @@ def parse(args):
         print "override HGMERGE =", os.environ['HGMERGE']
 
     global _dialogs
-    module = _dialogs.get(option['hgcmd'], 'hgcmd')
-    exec('from hggtk.%s import run' % module)
-    run(**option)
+    dialog = _dialogs.get(option['hgcmd'], hgcmd)
+    dialog.run(**option)
 
 
 def run_trapped(args):
