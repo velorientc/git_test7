@@ -10,7 +10,10 @@
 # Published under the GNU GPL
 
 import gconf
+import gtk
+import gobject
 from mercurial import hg, ui, util, repo
+from mercurial.node import short
 import nautilus
 import os
 import subprocess
@@ -23,7 +26,8 @@ TERMINAL_KEY = '/desktop/gnome/applications/terminal/exec'
 
 class HgExtension(nautilus.MenuProvider,
                   nautilus.ColumnProvider,
-                  nautilus.InfoProvider):
+                  nautilus.InfoProvider,
+                  nautilus.PropertyPageProvider):
 
     def __init__(self):
         self.cacherepo = None
@@ -407,21 +411,12 @@ class HgExtension(nautilus.MenuProvider,
                                "HG Status",
                                "Version control status"),
 
-    def update_file_info(self, file):
-        '''Return emblem and hg status for this file'''
-        path = self.get_path_for_vfs_file(file)
-        if path is None or file.is_directory():
-            return
-        repo = self.get_repo_for_path(path)
-        if repo is None:
-            return
-
+    def _get_file_status(self, repo, localpath):
         emblem = None
         status = '?'
 
         # This is not what the API is optimized for, but this appears
         # to work efficiently enough
-        localpath = path[len(repo.root)+1:]
         changes = repo.dirstate.status([localpath], util.always, True, True)
         (lookup, modified, added, removed, deleted, unknown,
                 ignored, clean) = changes
@@ -433,7 +428,7 @@ class HgExtension(nautilus.MenuProvider,
             emblem = 'cvs-modified'
             status = 'modified'
         elif localpath in added:
-            emblem = 'cvs-added'
+            emblem = 'cvs-aded'
             status = 'added'
         elif localpath in unknown:
             emblem = 'new'
@@ -444,7 +439,79 @@ class HgExtension(nautilus.MenuProvider,
             # Should be hard to reach this state
             emblem = 'stockmail-priority-high'
             status = 'deleted'
+        return emblem, status
 
+
+    def update_file_info(self, file):
+        '''Return emblem and hg status for this file'''
+        path = self.get_path_for_vfs_file(file)
+        if path is None or file.is_directory():
+            return
+        repo = self.get_repo_for_path(path)
+        if repo is None:
+            return
+        localpath = path[len(repo.root)+1:]
+        emblem, status = self._get_file_status(repo, localpath)
         if emblem is not None:
             file.add_emblem(emblem)
         file.add_string_attribute('hg_status', status)
+
+    # property page borrowed from http://www.gnome.org/~gpoo/hg/nautilus-hg/
+    def __add_row(self, table, row, label_item, label_value):
+        label = gtk.Label(label_item)
+        label.set_use_markup(True)
+        label.set_alignment(1, 0)
+        table.attach(label, 0, 1, row, row + 1, gtk.FILL, gtk.FILL, 0, 0)
+        label.show()
+
+        label = gtk.Label(label_value)
+        label.set_use_markup(True)
+        label.set_alignment(0, 1)
+        label.show()
+        table.attach(label, 1, 2, row, row + 1, gtk.FILL, 0, 0, 0)
+
+    def get_property_pages(self, vfs_files):
+        if len(vfs_files) != 1:
+            return
+        file = vfs_files[0]
+        path = self.get_path_for_vfs_file(file)
+        if path is None or file.is_directory():
+            return
+        repo = self.get_repo_for_path(path)
+        if repo is None:
+            return
+
+        localpath = path[len(repo.root)+1:]
+        emblem, status = self._get_file_status(repo, localpath)
+
+        # Get the information from Mercurial
+        ctx = repo.changectx()
+        rev = ctx.rev()
+        node = short(ctx.node())
+        parents = '\n'.join([short(p.node()) for p in ctx.parents()])
+        description = ctx.description()
+        user = ctx.user()
+        user = gobject.markup_escape_text(user)
+        tags = ', '.join(ctx.tags())
+        branch = ctx.branch()
+
+        self.property_label = gtk.Label('Mercurial')
+
+        table = gtk.Table(5, 2, False)
+        table.set_border_width(5)
+        table.set_row_spacings(5)
+        table.set_col_spacings(5)
+
+        self.__add_row(table, 0, '<b>Status</b>:', status)
+        self.__add_row(table, 1, '<b>Revision</b>:', str(rev))
+        self.__add_row(table, 2, '<b>Description</b>:', description)
+        self.__add_row(table, 3, '<b>Tags</b>:', tags)
+        self.__add_row(table, 4, '<b>Node</b>:', node)
+        self.__add_row(table, 5, '<b>Parents</b>:', parents)
+        self.__add_row(table, 6, '<b>User</b>:', user)
+        self.__add_row(table, 7, '<b>Branch</b>:', branch)
+
+        table.show()
+
+        return nautilus.PropertyPage("MercurialPropertyPage::status",
+                                     self.property_label, table),
