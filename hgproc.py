@@ -10,7 +10,11 @@ from mercurial import ui
 from tortoise.thgutil import find_path, get_prog_root, shellquote
 
 # always use hg exe installed with TortoiseHg
-os.environ['PATH'] = "%s;%s" % (get_prog_root(), os.environ['PATH'])
+thgdir = get_prog_root()
+try:
+    os.environ['PATH'] = os.path.pathsep.join([thgdir, os.environ['PATH']])
+except KeyError:
+    os.environ['PATH'] = thgdir
 
 if not sys.stdin.isatty():
     try:
