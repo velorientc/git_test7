@@ -145,7 +145,7 @@ else: # Not Windows
         return None
         
     def get_prog_root():
-        path = os.environ.get('HGPROC_PATH', '.')
+        path = os.environ.get('TORTOISEHG_PATH', os.path.dirname(__file__))
         return os.path.isdir(path) and path or os.path.dirname(path)
 
     def icon_to_bitmap(iconPathName):
