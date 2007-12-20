@@ -74,17 +74,7 @@ class IconOverlayExtension(object):
         "GetOverlayInfo", "GetPriority", "IsMemberOf"
         ]
 
-    def GetOverlayInfo(self):
-        import win32api
-
-        # only support Overlays In Explorer
-        print "GetOverlayInfo: checking if in explorer"
-        modname = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
-        print "modname = %s" % modname
-        if not modname.lower().endswith("\\explorer.exe"):
-            print "GetOverlayInfo: not in explorer"
-            return ("", 0, 0) 
- 
+    def GetOverlayInfo(self): 
         icon = thgutil.get_icon_path("status", self.icon)
         print "icon = ", icon
 

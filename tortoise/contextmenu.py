@@ -199,14 +199,6 @@ class ContextMenuExtension:
         if uFlags & shellcon.CMF_DEFAULTONLY:
             return 0
 
-        # only support Overlays In Explorer
-        print "QueryContextMenu: checking if in explorer"
-        modname = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
-        print "modname = %s" % modname
-        if not modname.lower().endswith("\\explorer.exe"):
-            print "QueryContextMenu: not in explorer"
-            return 0 
-
         thgmenu = []    # hg menus
 
         # a brutal hack to detect if we are the first menu to go on to the 
