@@ -58,7 +58,6 @@ def open_repo(path):
 
 def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, notify=False):
     app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
-    print "proc app = ", app_path
 
     if filelist:
         fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
@@ -84,7 +83,6 @@ def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, n
         run_program(cmdline)
     except win32api.error, details:
         win32ui.MessageBox("Error executing command - %s" % (details), "gpopen")
-    print "open_dialog: done"
 
 def get_clone_repo_name(dir, repo_name):
     dest_clone = os.path.join(dir, repo_name)
@@ -107,7 +105,6 @@ def run_program(cmdline):
                            stderr=subprocess.STDOUT,
                            stdout=subprocess.PIPE,
                            stdin=subprocess.PIPE)
-    print "run_program: done"
     
 """Windows shell extension that adds context menu items to Mercurial repository"""
 class ContextMenuExtension:
@@ -130,16 +127,13 @@ class ContextMenuExtension:
         ]
 
     def __init__(self):
-        print "ContextMenuExtension: __init__ called"
         self._folder = None
         self._filenames = []
         self._handlers = {}
 
     def Initialize(self, folder, dataobj, hkey):
-        print "Initialize: cwd = ", os.getcwd()
         if folder:
             self._folder = shell.SHGetPathFromIDList(folder)
-            print "folder = ", self._folder
 
         if dataobj:
             format_etc = win32con.CF_HDROP, None, 1, -1, pythoncom.TYMED_HGLOBAL
@@ -259,11 +253,8 @@ class ContextMenuExtension:
             return []
         if drag_repo and drag_repo.root != drag_path:
             return []   # dragged item must be a hg repo root directory
-        print "drag root = %s" % drag_repo.root
 
         drop_repo = open_repo(self._folder)
-
-        print "_get_commands_dragdrop(): adding hg commands"
         
         result = []
         result.append(TortoiseMenu(_("Create Clone"), 
@@ -271,8 +262,6 @@ class ContextMenuExtension:
                        self._clone_here, icon="menuclone.ico"))
 
         if drop_repo:
-            print "_get_commands_dragdrop(): drop zone is a hg repo too"
-            print "drop root = %s" % drag_repo.root
             result.append(TortoiseMenu(_("Synchronize"),
                            _("Synchronize with dragged repository"),
                            self._synch_here, icon="menusynch.ico"))
@@ -292,8 +281,6 @@ class ContextMenuExtension:
         rpath = self._folder or self._filenames[0]
         repo = open_repo(rpath)
         if repo is None:
-            print "%s: not in repo" % rpath
-            
             result.append(TortoiseMenu(_("Create Repository Here"),
                            _("create a new repository in this directory"),
                            self._init, icon="menucreaterepos.ico"))
@@ -301,8 +288,6 @@ class ContextMenuExtension:
                            _("clone a repository"),
                            self._clone, icon="menuclone.ico"))
         else:
-            print "_get_commands(): adding hg commands"
-            
             result.append(TortoiseMenu(_("View File Status"),
                            _("Repository status"),
                            self._status, icon="menushowchanged.ico"))
@@ -693,7 +678,6 @@ class ContextMenuExtension:
         if noargs == False:
             filelist = targets
         cmdopts = "%s" % (verbose and "--verbose" or "")
-        print "_run_program_dialog: cmdopts = ", cmdopts
         title = "Hg %s" % hgcmd
         open_dialog(hgcmd, cmdopts, cwd=cwd, root=root, filelist=filelist)
 

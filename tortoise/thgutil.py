@@ -88,9 +88,6 @@ if os.name == 'nt':
             ico_x = ico_y = 12
         ico_idx = "%d:%d", (cx, cy)
         
-        print "menucheck c_xy = ", cx, cy
-        print "menucheck ico_xy = ", ico_x, ico_y
-        
         # see if icon has been cached
         try:
             return bitmap_cache[iconPathName][ico_idx]
