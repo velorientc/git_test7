@@ -18,7 +18,7 @@ import sys
 import tempfile
 import urllib
 
-THG_PATH = '~/tools/tortoisehg-dev'
+TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
 TERMINAL_KEY = '/desktop/gnome/applications/terminal/exec'
 
 class HgExtension(nautilus.MenuProvider,
@@ -29,7 +29,9 @@ class HgExtension(nautilus.MenuProvider,
         self.cacherepo = None
         self.cacheroot = None
         self.client = gconf.client_get_default()
-        thgpath = os.environ.get('THG_PATH', os.path.expanduser(THG_PATH))
+        thgpath = os.environ.get('TORTOISEHG_PATH',
+                os.path.expanduser(TORTOISEHG_PATH))
+        os.environ['TORTOISEHG_PATH'] = thgpath
         self.hgproc = os.path.join(thgpath, 'hgproc.py')
         self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
 
