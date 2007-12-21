@@ -89,7 +89,7 @@ setup(name="TortoiseHg",
         url='http://tortoisehg.sourceforge.net',
         description='Windows shell extension for Mercurial VCS',
         license='GNU GPL2',
-        packages=['tortoise', 'hggtk', 'hgwin'],
+        packages=['tortoise', 'hggtk'],
         data_files = _data_files,
         options=opts,
         **extra
