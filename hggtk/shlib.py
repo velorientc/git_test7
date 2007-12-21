@@ -14,11 +14,15 @@ def set_tortoise_icon(window, icon):
     # The context menu should set this variable
     var = os.environ.get('THG_ICON_PATH', None)
     paths = var and [ var ] or []
-    # Else try relative paths from hggtk, the repository layout
-    dir = os.path.dirname(__file__)
-    paths.append(os.path.join(dir, '..', 'icons'))
-    # ... or the source installer layout
-    paths.append(os.path.join(dir, '..', '..', '..', 'share', 'tortoisehg', 'icons'))
+    try:
+        # Else try relative paths from hggtk, the repository layout
+        dir = os.path.dirname(__file__)
+        paths.append(os.path.join(dir, '..', 'icons'))
+        # ... or the source installer layout
+        paths.append(os.path.join(dir, '..', '..', '..',
+            'share', 'tortoisehg', 'icons'))
+    except NameError: # __file__ is not always available
+        pass
     for p in paths:
         path = os.path.join(p, 'tortoise', icon)
         if os.path.isfile(path):
