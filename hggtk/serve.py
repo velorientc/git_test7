@@ -26,6 +26,7 @@ from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
+from shlib import set_tortoise_icon
 
 class ServeDialog(gtk.Dialog):
     """ Dialog to run web server"""
@@ -33,6 +34,7 @@ class ServeDialog(gtk.Dialog):
         """ Initialize the Dialog """
         super(ServeDialog, self).__init__(flags=gtk.DIALOG_MODAL)
 
+        set_tortoise_icon(self, 'proxy.ico')
         self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
         self.connect('delete-event', self._delete)

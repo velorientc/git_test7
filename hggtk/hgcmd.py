@@ -14,6 +14,7 @@ import os
 import threading
 import Queue
 from hglib import HgThread
+from shlib import set_tortoise_icon
 
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, width=520, height=400, mainapp=False):
@@ -23,7 +24,8 @@ class CmdDialog(gtk.Dialog):
                             flags=gtk.DIALOG_MODAL, 
                             #buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
                             )
-        
+
+        set_tortoise_icon(self, 'hg.ico')
         self.cmdline = cmdline
 
         # construct dialog

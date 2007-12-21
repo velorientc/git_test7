@@ -65,7 +65,7 @@ from mercurial.i18n import _
 from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
-from shlib import shell_notify
+from shlib import shell_notify, set_tortoise_icon
 
 def gcommit(ui, repo, *pats, **opts):
     """graphical display for committing outstanding changes
@@ -266,6 +266,8 @@ class GDialog(gtk.Window):
     def get_title(self):
         return ''
 
+    def get_icon(self):
+        return ''
 
     def get_minsize(self):
         return (395, 200)
@@ -390,6 +392,7 @@ class GDialog(gtk.Window):
 
     def _setup_gtk(self):
         self.set_title(self.get_title())
+        set_tortoise_icon(self, self.get_icon())
         
         # Minimum size
         minx, miny = self.get_minsize()
@@ -530,6 +533,8 @@ class GLog(GDialog):
     def get_title(self):
         return os.path.basename(self.repo.root) + ' log ' + ':'.join(self.opts['rev']) + ' ' + ' '.join(self.pats)
 
+    def get_icon(self):
+        return 'menulog.ico'
 
     def parse_opts(self):
         # Disable quiet to get full log info
@@ -979,6 +984,8 @@ class GStatus(GDialog):
     def get_title(self):
         return os.path.basename(self.repo.root) + ' status ' + ':'.join(self.opts['rev'])  + ' ' + ' '.join(self.pats)
 
+    def get_icon(self):
+        return 'menushowchanged.ico'
 
     def get_defsize(self):
         return self._setting_defsize
@@ -1672,6 +1679,8 @@ class GCommit(GStatus):
     def get_title(self):
         return os.path.basename(self.repo.root) + ' commit ' + ' '.join(self.pats) + ' ' + self.opts['user'] + ' ' + self.opts['date']
 
+    def get_icon(self):
+        return 'menucommit.ico'
 
     def auto_check(self):
         if self.test_opt('check'):
