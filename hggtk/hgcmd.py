@@ -25,7 +25,6 @@ class CmdDialog(gtk.Dialog):
                             )
         
         self.cmdline = cmdline
-        self.queue = Queue.Queue()
 
         # construct dialog
         self.set_default_size(width, height)
