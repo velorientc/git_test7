@@ -121,7 +121,7 @@ class HgExtension(nautilus.MenuProvider,
         self._run_dialog('init', [vfs_file])
 
     def _merge_cb(self, window, vfs_file):
-        self._run_dialog('merge', [vfs_file])
+        self._run_dialog('merge', [vfs_file], filelist=False)
 
     def _paths_cb(self, window, vfs_file):
         path = self.get_path_for_vfs_file(vfs_file)
@@ -134,13 +134,13 @@ class HgExtension(nautilus.MenuProvider,
         self._run_dialog('revert', vfs_files)
 
     def _serve_cb(self, window, vfs_file):
-        self._run_dialog('serve', [vfs_file])
+        self._run_dialog('serve', [vfs_file], filelist=False)
 
     def _status_cb(self, window, vfs_file):
         self._run_dialog('status', [vfs_file])
 
     def _sync_cb(self, window, vfs_file):
-        self._run_dialog('synch', [vfs_file])
+        self._run_dialog('synch', [vfs_file], filelist=False)
 
     def _uname_cb(self, window, vfs_file):
         path = self.get_path_for_vfs_file(vfs_file)
@@ -150,7 +150,7 @@ class HgExtension(nautilus.MenuProvider,
         subprocess.Popen(['hg', 'config', 'uname'], cwd=cwd, shell=False)
 
     def _update_cb(self, window, vfs_file):
-        self._run_dialog('update', [vfs_file])
+        self._run_dialog('update', [vfs_file], filelist=False)
 
     def _view_cb(self, window, vfs_file):
         path = self.get_path_for_vfs_file(vfs_file)
@@ -173,7 +173,7 @@ class HgExtension(nautilus.MenuProvider,
         cwd = os.path.isdir(path) and path or os.path.dirname(path)
         subprocess.Popen(['hg', 'config', 'web'], cwd=cwd, shell=False)
 
-    def _run_dialog(self, hgcmd, vfs_files):
+    def _run_dialog(self, hgcmd, vfs_files, filelist=True):
         '''
         hgcmd - hgproc subcommand
         vfs_files - directory, or list of selected files
@@ -186,17 +186,19 @@ class HgExtension(nautilus.MenuProvider,
         repo = self.get_repo_for_path(path)
         cwd = os.path.isdir(path) and path or os.path.dirname(path)
 
-        # Use temporary file to store file list (avoid shell command
-        # line limitations)
-        fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
-        os.write(fd, "\n".join(paths))
-        os.close(fd)
-
         cmdopts  = [sys.executable, self.hgproc]
         cmdopts += ['--root', repo.root]
         cmdopts += ['--cwd', cwd]
-        cmdopts += ['--listfile', tmpfile, '--deletelistfile']
         cmdopts += ['--command', hgcmd]
+
+        if filelist:
+            # Use temporary file to store file list (avoid shell command
+            # line limitations)
+            fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
+            os.write(fd, "\n".join(paths))
+            os.close(fd)
+            cmdopts += ['--listfile', tmpfile, '--deletelistfile']
+
         subprocess.Popen(cmdopts, cwd=cwd, shell=False)
 
         # Remove cached repo object, dirstate may change
