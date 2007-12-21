@@ -36,6 +36,7 @@ class HgExtension(nautilus.MenuProvider,
         thgpath = os.environ.get('TORTOISEHG_PATH',
                 os.path.expanduser(TORTOISEHG_PATH))
         os.environ['TORTOISEHG_PATH'] = thgpath
+        os.environ['THG_ICON_PATH'] = os.path.join(thgpath, 'icons')
         self.hgproc = os.path.join(thgpath, 'hgproc.py')
         self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
 

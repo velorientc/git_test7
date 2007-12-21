@@ -9,6 +9,25 @@ of the GNU General Public License, incorporated herein by reference.
 
 import os
 
+def set_tortoise_icon(window, icon):
+    '''Find a tortoise icon, apply to PyGtk window'''
+    # The context menu should set this variable
+    var = os.environ.get('THG_ICON_PATH', None)
+    paths = var and [ var ] or []
+    # Else try relative paths from hggtk, the repository layout
+    dir = os.path.dirname(__file__)
+    paths.append(os.path.join(dir, '..', 'icons'))
+    # ... or the source installer layout
+    paths.append(os.path.join(dir, '..', '..', '..', 'share', 'tortoisehg', 'icons'))
+    for p in paths:
+        path = os.path.join(p, 'tortoise', icon)
+        if os.path.isfile(path):
+            window.set_icon_from_file(path)
+            return
+    else:
+        print 'icon not found', icon
+        return None
+
 if os.name == 'nt':
     from win32com.shell import shell, shellcon
     def shell_notify(paths):
