@@ -70,13 +70,104 @@ class ConfigDialog(gtk.Dialog):
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
         self.fill_frame(self.tortoise_frame, self._tortoise_info)
 
+        self._user_info = (
+                ('Username', 'ui.username', [], 
+                    'Name associated with commits'),
+                ('Editor', 'ui.editor', [],
+                    'The editor to use during a commit'),
+                ('Verbose', 'ui.verbose', ['False', 'True'],
+                    'Increase the amount of output printed'),
+                ('Debug', 'ui.debug', ['False', 'True'],
+                    'Print debugging information'),
+                )
         self.user_frame = self.add_page(notebook, 'User')
-        self.paths_frame = self.add_page(notebook, 'Paths')
-        self.web_frame = self.add_page(notebook, 'Web')
-        self.email_frame = self.add_page(notebook, 'Email')
-        self.hgmerge_frame = self.add_page(notebook, 'Merge')
+        self.fill_frame(self.user_frame, self._user_info)
 
-        self.vbox.show_all()
+        # paths page is special TODO borrow from hg-config
+        self.paths_frame = self.add_page(notebook, 'Paths')
+
+        self._web_info = (
+                ('Description', 'web.description', ['unknown'],
+                    'Textual description of the repository''s purpose or' +
+                    'contents.'),
+                ('Contact', 'web.contact', ['unknown'],
+                    'Name or email address of the person in charge of the' +
+                    'repository.'),
+                ('Style', 'web.style', ['default', 'gitweb', 'old'],
+                    'Which template map style to use'),
+                ('Archive Formats', 'web.allow_archive', ['bz2', 'gz', 'zip'],
+                    'List of archive formats allowed for downloading'),
+                ('Port', 'web.port', ['8000'], 'Port to listen on'),
+                ('Push Requires SSL', 'web.push_ssl', ['True', 'False'],
+                    'Whether to require that inbound pushes be transported' +
+                    'over SSL to prevent password sniffing.'),
+                ('Stripes', 'web.stripes', ['1', '0'],
+                    'How many lines a "zebra stripe" should span in multiline' +
+                    'output. Default is 1; set to 0 to disable.'),
+                ('Max Files', 'web.maxfiles', ['10'],
+                    'Maximum number of files to list per changeset.'),
+                ('Max Changes', 'web.maxfiles', ['10'],
+                    'Maximum number of changes to list on the changelog.'),
+                ('Allow Push', 'ui.allow_push', ['*'],
+'''Whether to allow pushing to the repository. If empty or not
+set, push is not allowed. If the special value "*", any remote
+user can push, including unauthenticated users. Otherwise, the
+remote user must have been authenticated, and the authenticated
+user name must be present in this list (separated by whitespace
+or ","). The contents of the allow_push list are examined after
+the deny_push list.'''),
+                ('Deny Push', 'ui.deny_push', ['*'],
+'''Whether to deny pushing to the repository. If empty or not set,
+push is not denied. If the special value "*", all remote users
+are denied push. Otherwise, unauthenticated users are all
+denied, and any authenticated user name present in this list
+(separated by whitespace or ",") is also denied. The contents
+of the deny_push list are examined before the allow_push list.'''),
+                ('Encoding', 'web.encoding', ['UTF-8'],
+                    'Character encoding name'),
+                )
+        self.web_frame = self.add_page(notebook, 'Web')
+        self.fill_frame(self.web_frame, self._web_info)
+
+        self._email_info = (
+                ('From:', 'email.from', [],
+                    'Email address to use in "From" header and SMTP envelope'),
+                ('To:', 'email.to', [],
+                    'Comma-separated list of recipients'' email addresses'),
+                ('Cc:', 'email.cc', [],
+                    'Comma-separated list of carbon copy recipients'' email ' +
+                    'addresses'),
+                ('Bcc:', 'email.bcc', [],
+                    'Comma-separated list of blind carbon copy recipients'' ' +
+                    'email addresses'),
+                ('method:', 'email.method', ['smtp'],
+'''Optional. Method to use to send email messages. If value is "smtp" (default),
+use SMTP (configured below).  Otherwise, use as name of program to run that
+acts like sendmail (takes "-f" option for sender, list of recipients on command
+line, message on stdin). Normally, setting this to "sendmail" or
+"/usr/sbin/sendmail" is enough to use sendmail to send messages.'''),
+                ('SMTP Host:', 'smtp.host', [], 'Host name of mail server'),
+                ('SMTP Port:', 'smtp.port', ['25'],
+                    'Port to connect to on mail server. Default: 25'),
+                ('SMTP TLS:', 'smtp.tls', ['False', 'True'],
+                    'Connect to mail server using TLS.  Default: False'),
+                ('SMTP Username:', 'smtp.username', [],
+                    'Username to authenticate to SMTP server with'),
+                ('SMTP Password:', 'smtp.password', [],
+                    'Password to authenticate to SMTP server with'),
+                ('SMTP Local Hostname:', 'smtp.local_hostname', [],
+                    'Hostname the sender can use to identify itself to MTA'))
+        self.email_frame = self.add_page(notebook, 'Email')
+        self.fill_frame(self.email_frame, self._email_info)
+
+        self._hgmerge_info = (
+                ('Default 3-way Merge', 'hgmerge.interactive',
+                    ['gpyfm', 'kdiff3', 'tortoisemerge', 'p4merge',
+                        'meld', 'tkdiff', 'filemerge', 'ecmerge',
+                        'xxdiff', 'guiffy', 'diffmerge'],
+                    'Textual merge program for resolving merge conflicts'),)
+        self.hgmerge_frame = self.add_page(notebook, 'Merge')
+        self.fill_frame(self.hgmerge_frame, self._hgmerge_info)
 
     def fill_frame(self, frame, info):
         #tooltips = gtk.GtkTooltips()
@@ -85,12 +176,6 @@ class ConfigDialog(gtk.Dialog):
         frame.add(vbox)
 
         for label, cpath, values, tooltip in info:
-            # Special case, add extdiff.cmd.* to values
-            if cpath == 'tortoisehg.vdiff':
-                for name, value in self.ui.configitems('extdiff'):
-                    if name.startswith('cmd.'):
-                        values.append(name[4:])
-
             vlist = gtk.ListStore(str)
             combo = gtk.ComboBoxEntry(vlist, 0)
             #tooltips.set_tip(combo, tooltip)
@@ -102,19 +187,28 @@ class ConfigDialog(gtk.Dialog):
             section, key = cpath.split('.')
             curvalue = self.ui.config(section, key, None)
 
+            # Special case, add extdiff.cmd.* to values
+            if cpath == 'tortoisehg.vdiff':
+                for name, value in self.ui.configitems('extdiff'):
+                    if name.startswith('cmd.'):
+                        values.append(name[4:])
+
+            currow = None
             vlist.append(['<unspecified>'])
             for v in values:
                 vlist.append([v])
+                if v == curvalue: currow = len(vlist) - 1
             if cpath in self.history:
                 for v in self.history[cpath]:
                     vlist.append([v])
+                if v == curvalue: currow = len(vlist) - 1
 
             if curvalue is None:
                 combo.set_active(0)
-            elif curvalue not in values:
-                combo.set_active(values.index(curvalue))
-            else:
+            elif currow is None:
                 combo.get_child().set_text(curvalue)
+            else:
+                combo.set_active(currow)
 
             lbl = gtk.Label(label)
             hbox = gtk.HBox()
@@ -139,7 +233,7 @@ class ConfigDialog(gtk.Dialog):
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
         frame.set_border_width(10)
-        frame.set_size_request(500, 250)
+        frame.set_size_request(508, 500)
         frame.show()
 
         label = gtk.Label(tab)
