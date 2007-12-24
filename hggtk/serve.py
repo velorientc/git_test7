@@ -50,6 +50,12 @@ class ServeDialog(gtk.Dialog):
         self._hgpath = hgpath
         if cwd: os.chdir(cwd)
         
+        try:
+            repo = hg.repository(ui.ui(), path=root)
+            self.defport = repo.ui.config('web', 'port') or '8000'
+        except hg.RepoError:
+            self.defport = '8000'
+
         # set dialog title
         title = "hg serve"
         title += " - %s" % (os.getcwd())
@@ -89,7 +95,7 @@ class ServeDialog(gtk.Dialog):
         lbl.set_property("width-chars", 16)
         lbl.set_alignment(0, 0.5)
         self._port_input = gtk.Entry()
-        self._port_input.set_text("8000")
+        self._port_input.set_text(self.defport)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._port_input, False, False)
         self.vbox.pack_start(revbox, False, False, 2)
@@ -183,8 +189,10 @@ class ServeDialog(gtk.Dialog):
         try:
             port = int(self._port_input.get_text())
         except:
-            error_dialog("Invalid port 2048..65535", "Defaulting to 8000")
-            port = None
+            try: port = int(self.defport)
+            except: port = '8000'
+            error_dialog("Invalid port 2048..65535", "Defaulting to " +
+                    self.defport)
         
         # start server
         (fd, filename) = mkstemp()
@@ -192,9 +200,8 @@ class ServeDialog(gtk.Dialog):
         if self._root:
             self.cmdline.append('--repository')
             self.cmdline.append(self._root)
-        if port:
-            self.cmdline.append('--port')
-            self.cmdline.append(str(port))
+        self.cmdline.append('--port')
+        self.cmdline.append(str(port))
 
         # run hg in unbuffered mode, so the output can be captured and
         # display a.s.a.p.
