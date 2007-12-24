@@ -218,6 +218,15 @@ class ContextMenuExtension:
             # get other menus for hg submenu
             commands = self._get_commands()
 
+        # add common menu items
+        commands.append(TortoiseMenuSep())
+        commands.append(TortoiseMenu(_("Help"),
+                       _("Basic Mercurial help text"),
+                       self._help, icon="menuhelp.ico"))
+        commands.append(TortoiseMenu(_("About"),
+                       _("About TortoiseHg"),
+                       self._about, icon="menuabout.ico"))
+       
         # create submenus with Hg commands
         thgmenu.append(TortoiseSubmenu("TortoiseHG", commands, icon="hg.ico"))
         thgmenu.append(TortoiseMenuSep())
@@ -393,11 +402,6 @@ class ContextMenuExtension:
                                  _("Configure repository web data"),
                                  self._web)
                 result.append(optmenu)
-
-            result.append(TortoiseMenuSep())
-            result.append(TortoiseMenu(_("Help"),
-                           _("Basic Mercurial help text"),
-                           self._help, icon="menuhelp.ico"))
 
         return result
 
@@ -683,3 +687,6 @@ class ContextMenuExtension:
 
     def _help(self, parent_window):
         open_dialog('help', '--verbose')
+
+    def _about(self, parent_window):
+        open_dialog('about')
