@@ -15,7 +15,7 @@ from shlib import set_tortoise_icon
 import iniparse
 
 class ConfigDialog(gtk.Dialog):
-    def __init__(self, root='', configrepo=False):
+    def __init__(self, root='', configrepo=False, focusfield=None):
         """ Initialize the Dialog. """        
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
@@ -27,7 +27,7 @@ class ConfigDialog(gtk.Dialog):
             repo = None
             if configrepo:
                 error_dialog('No repository found', 'Unable to configure')
-                gtk.main_quit()
+                return
 
         if configrepo:
             self.ui = repo.ui
@@ -78,13 +78,20 @@ class ConfigDialog(gtk.Dialog):
                 ('Verbose', 'ui.verbose', ['False', 'True'],
                     'Increase the amount of output printed'),
                 ('Debug', 'ui.debug', ['False', 'True'],
-                    'Print debugging information'),
-                )
+                    'Print debugging information'))
         self.user_frame = self.add_page(notebook, 'User')
         self.fill_frame(self.user_frame, self._user_info)
 
-        # paths page is special TODO borrow from hg-config
+        self._paths_info = (
+                ('default', 'paths.default', [],
+'''Directory or URL to use when pulling if no source is specified.
+Default is set to repository from which the current repository was cloned.'''),
+                ('default-push', 'paths.default-push', [],
+'''Optional. Directory or URL to use when pushing if no
+destination is specified.'''))
         self.paths_frame = self.add_page(notebook, 'Paths')
+        self.fill_frame(self.paths_frame, self._paths_info)
+        # paths page is special TODO borrow from hg-config
 
         self._web_info = (
                 ('Description', 'web.description', ['unknown'],
@@ -124,8 +131,7 @@ denied, and any authenticated user name present in this list
 (separated by whitespace or ",") is also denied. The contents
 of the deny_push list are examined before the allow_push list.'''),
                 ('Encoding', 'web.encoding', ['UTF-8'],
-                    'Character encoding name'),
-                )
+                    'Character encoding name'))
         self.web_frame = self.add_page(notebook, 'Web')
         self.fill_frame(self.web_frame, self._web_info)
 
@@ -168,9 +174,18 @@ line, message on stdin). Normally, setting this to "sendmail" or
                     'Textual merge program for resolving merge conflicts'),)
         self.hgmerge_frame = self.add_page(notebook, 'Merge')
         self.fill_frame(self.hgmerge_frame, self._hgmerge_info)
+        # TODO add ability to specify file extension based merge tools
+
+        if focusfield:
+            # Set page and focus to requested datum
+            for page_num, (frame, info, widgets) in enumerate(self.pages):
+                for w, (label, cpath, values, tip) in enumerate(info):
+                    if cpath == focusfield:
+                        self.notebook.set_current_page(page_num)
+                        widgets[w].grab_focus()
 
     def fill_frame(self, frame, info):
-        #tooltips = gtk.GtkTooltips()
+        #tooltips = gtk.GtkTooltips()  TODO, why is this not working?
         widgets = []
         vbox = gtk.VBox()
         frame.add(vbox)
@@ -181,14 +196,11 @@ line, message on stdin). Normally, setting this to "sendmail" or
             #tooltips.set_tip(combo, tooltip)
             widgets.append(combo)
 
-            # Get currently configured value for this config level
-            # using a ui.ui() will parse system wide and user configs.
-            # using the repo.ui will _also_ parse the $root/.hg/hgrc
-            section, key = cpath.split('.')
-            curvalue = self.ui.config(section, key, None)
+            # Get currently configured value from this config file
+            curvalue = self.get_ini_config(cpath)
 
-            # Special case, add extdiff.cmd.* to values
             if cpath == 'tortoisehg.vdiff':
+                # Special case, add extdiff.cmd.* to possible values
                 for name, value in self.ui.configitems('extdiff'):
                     if name.startswith('cmd.'):
                         values.append(name[4:])
@@ -218,6 +230,24 @@ line, message on stdin). Normally, setting this to "sendmail" or
 
         self.pages.append((frame, info, widgets))
         
+    def add_page(self, notebook, tab):
+        frame = gtk.Frame()
+        frame.set_border_width(10)
+        frame.set_size_request(508, 500)
+        frame.show()
+
+        label = gtk.Label(tab)
+        notebook.append_page(frame, label)
+        return frame
+
+    def get_ini_config(self, cpath):
+        '''Retrieve a value from the parsed config file'''
+        try:
+            # Presumes single section/key level depth
+            section, key = cpath.split('.', 1)
+            return self.ini[section][key]
+        except KeyError:
+            return None
         
     def load_config(self, rcpath):
         for fn in rcpath:
@@ -230,21 +260,15 @@ line, message on stdin). Normally, setting this to "sendmail" or
             f.close()
         return iniparse.INIConfig(file(fn))
 
-    def add_page(self, notebook, tab):
-        frame = gtk.Frame()
-        frame.set_border_width(10)
-        frame.set_size_request(508, 500)
-        frame.show()
-
-        label = gtk.Label(tab)
-        notebook.append_page(frame, label)
-        return frame
-
     def _apply_clicked(self, *args):
         pass
     
 def run(root='', cmdline=[], **opts):
-    dialog = ConfigDialog(root, configrepo='--configrepo' in cmdline)
+    if '--focusfield' in cmdline:
+        field = cmdline[cmdline.index('--focusfield')+1]
+    else:
+        field = None
+    dialog = ConfigDialog(root, '--configrepo' in cmdline, field)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
@@ -252,6 +276,8 @@ def run(root='', cmdline=[], **opts):
     gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
+    # example command line
+    # python hggtk/thgconfig.py --focusfield ui.editor
     import sys
     opts = {}
     opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
