@@ -16,7 +16,7 @@ import gobject
 from mercurial import util
 from mercurial.i18n import _
 from dialog import question_dialog, error_dialog
-from shlib import shell_notify
+from shlib import shell_notify, set_tortoise_icon
 import hglib
 
 DIALOG_TYPE_ADD = 1
@@ -29,6 +29,7 @@ class AddRemoveDialog(gtk.Dialog):
         super(AddRemoveDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                               buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
+        set_tortoise_icon(self, 'menuadd.ico')
         self.cmd = cmd
         self.root = root
         self.files = files

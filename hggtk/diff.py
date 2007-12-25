@@ -14,6 +14,7 @@ import pango
 import sys
 from mercurial import hg, ui, cmdutil, util, patch
 from mercurial.i18n import _
+from shlib import set_tortoise_icon
 
 class DiffWindow(gtk.Window):
     """Diff window.
@@ -24,6 +25,7 @@ class DiffWindow(gtk.Window):
 
     def __init__(self):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        set_tortoise_icon(self, 'menudiff.ico')
         self.set_border_width(0)
         self.set_title("diff")
 

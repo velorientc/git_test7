@@ -13,7 +13,7 @@ import gtk
 from dialog import *
 from mercurial.node import *
 from mercurial import util, hg, ui
-from shlib import shell_notify
+from shlib import shell_notify, set_tortoise_icon
 from hglib import rootpath
 
 class UpdateDialog(gtk.Dialog):
@@ -23,6 +23,7 @@ class UpdateDialog(gtk.Dialog):
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(UpdateDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
+        set_tortoise_icon(self, 'menucheckout.ico')
         self.cwd = cwd or os.getcwd()
         self.root = rootpath(self.cwd)
         
