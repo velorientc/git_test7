@@ -1,11 +1,199 @@
 #
 # commit.py - commit dialog for TortoiseHg
 #
+# Copyright 2007 Brad Schick, brad at gmail . com
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-from mercurial import ui, hg
-import gtools
+import os
+import threading
+import StringIO
+import sys
+import shutil
+import tempfile
+import datetime
+import cPickle
+
+import pygtk
+pygtk.require('2.0')
+import gtk
+import gobject
+import pango
+
+from mercurial.i18n import _
+from mercurial.node import *
+from mercurial import cmdutil, util, ui, hg, commands, patch
+from hgext import extdiff
+from shlib import shell_notify
+from gdialog import *
+from status import GStatus
+
+class GCommit(GStatus):
+    """GTK+ based dialog for displaying repository status and committing changes.
+
+    Also provides related operations like add, delete, remove, revert, refresh,
+    ignore, diff, and edit.
+    """
+
+    ### Overrides of base class methods ###
+
+    def parse_opts(self):
+        GStatus.parse_opts(self)
+
+        # Need an entry, because extdiff code expects it
+        if not self.test_opt('rev'):
+            self.opts['rev'] = ''
+
+        if self.test_opt('message'):
+            buffer = gtk.TextBuffer()
+            buffer.set_text(self.opts['message'])
+            self.text.set_buffer(buffer)
+
+        if self.test_opt('logfile'):
+            buffer = gtk.TextBuffer()
+            buffer.set_text('Comment will be read from file ' + self.opts['logfile'])
+            self.text.set_buffer(buffer)
+            self.text.set_sensitive(False)
+
+
+    def get_title(self):
+        return os.path.basename(self.repo.root) + ' commit ' + ' '.join(self.pats) + ' ' + self.opts['user'] + ' ' + self.opts['date']
+
+
+    def auto_check(self):
+        if self.test_opt('check'):
+            for entry in self.model : 
+                if entry[1] in 'MAR':
+                    entry[0] = True
+
+
+    def save_settings(self):
+        settings = GStatus.save_settings(self)
+        settings['gcommit'] = self._vpaned.get_position()
+        return settings
+
+
+    def load_settings(self, settings):
+        GStatus.load_settings(self, settings)
+        if settings:
+            self._setting_vpos = settings['gcommit']
+        else:
+            self._setting_vpos = -1
+
+
+    def get_tbbuttons(self):
+        tbbuttons = GStatus.get_tbbuttons(self)
+        tbbuttons.insert(2, self.make_toolbutton(gtk.STOCK_OK, '_commit', self._commit_clicked))
+        return tbbuttons
+
+
+    def get_body(self):
+        status_body = GStatus.get_body(self)
+
+        frame = gtk.Frame()
+        frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        frame.add(scroller)
+        
+        self.text = gtk.TextView()
+        self.text.set_wrap_mode(gtk.WRAP_WORD)
+        self.text.modify_font(pango.FontDescription(self.fontcomment))
+        scroller.add(self.text)
+        
+        self._vpaned = gtk.VPaned()
+        self._vpaned.add1(frame)
+        self._vpaned.add2(status_body)
+        self._vpaned.set_position(self._setting_vpos)
+        return self._vpaned
+
+
+    def get_menu_info(self):
+        """Returns menu info in this order: merge, addrem, unknown, clean, ignored, deleted
+        """
+        merge, addrem, unknown, clean, ignored, deleted  = GStatus.get_menu_info(self)
+        return (merge + (('_commit', self._commit_file),),
+                addrem + (('_commit', self._commit_file),),
+                unknown + (('_commit', self._commit_file),),
+                clean,
+                ignored,
+                deleted + (('_commit', self._commit_file),))
+
+
+    def should_live(self, widget=None, event=None):
+        # If there are more than a few character typed into the commit
+        # message, ask if the exit should continue.
+        live = False
+        if self.text.get_buffer().get_char_count() > 10:
+            dialog = Confirm('Exit', [], self, 'Discard commit message and exit?')
+            if dialog.run() == gtk.RESPONSE_NO:
+                live = True
+        return live
+
+    ### End of overridable methods ###
+
+
+    def _commit_clicked(self, toolbutton, data=None):
+        if not self._ready_message():
+            return True
+
+        commitable = 'MAR'
+        addremove_list = self._relevant_files('?!')
+        if len(addremove_list) and self._should_addremove(addremove_list):
+            commitable += '?!'
+
+        commit_list = self._relevant_files(commitable)
+        if len(commit_list) > 0:
+            self._hg_commit(commit_list)
+        else:
+            Prompt('Nothing Commited', 'No committable files selected', self).run()
+        return True
+
+
+    def _commit_file(self, stat, file):
+        if self._ready_message():
+            if stat not in '?!' or self._should_addremove([file]):
+                self._hg_commit([file])
+        return True
+
+
+    def _should_addremove(self, files):
+        if self.test_opt('addremove'):
+            return True
+        else:
+            response = Confirm('Add/Remove', files, self).run() 
+            if response == gtk.RESPONSE_YES:
+                # This will stay set for further commits (meaning no more prompts). Problem?
+                self.opts['addremove'] = True
+                return True
+        return False
+
+
+    def _ready_message(self):
+        begin, end = self.text.get_buffer().get_bounds()
+        message = self.text.get_buffer().get_text(begin, end) 
+        if not self.test_opt('logfile') and not message:
+            Prompt('Nothing Commited', 'Please enter commit message', self).run()
+            self.text.grab_focus()
+            return False
+        else:
+            if not self.test_opt('logfile'):
+                self.opts['message'] = message
+            return True
+
+
+    def _hg_commit(self, files):
+        from gtools import cmdtable
+
+        # In case new commit args are added in the future, merge the hg defaults
+        commitopts = self.merge_opts(commands.table['^commit|ci'][1], [name[1] for name in cmdtable['gcommit|gci'][1]])
+        def dohgcommit():
+            commands.commit(self.ui, self.repo, *files, **commitopts)
+        success, outtext = self._hg_call_wrapper('Commit', dohgcommit)
+        if success:
+            self.text.set_buffer(gtk.TextBuffer())
+            shell_notify(files)
+            self.reload_status()
 
 def run(root='', files=[], cwd='', **opts):
     # If no files or directories were selected, take current dir
@@ -25,7 +213,13 @@ def run(root='', files=[], cwd='', **opts):
         'check': False, 'git':False, 'logfile':'', 'addremove':False,
     }
     
-    gtools.gcommit(u, repo, *files, **cmdoptions)
+    dialog = GCommit(u, repo, files, cmdoptions, True)
+    
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    dialog.display()
+    gtk.main()
+    gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
     import sys
