@@ -118,6 +118,10 @@ class GLog(GDialog):
         self.tree.hide()
         self.model.clear()
 
+        # Retrieve repo revision info
+        repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
+        heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
+        
         # Generator that parses and inserts log entries
         def inserter(logtext):
             while logtext:
@@ -130,7 +134,7 @@ class GLog(GDialog):
     
                 for block in blocks:
                     # defaults
-                    log = { 'user' : 'missing', 'summary' : '' }
+                    log = { 'user' : 'missing', 'summary' : '', 'tag' : '' }
                     lines = block.split('\n')
                     parents = []
                     for line in lines:
@@ -146,8 +150,16 @@ class GLog(GDialog):
                         else:
                             log[info] = value
     
-                    self.model.append((log['rev'], log['user'], log['summary'], log['date'], 
-                                       util.strdate(util.tolocal(log['date']), '%a %b %d %H:%M:%S %Y', {})[0],
+                    rev = int(log['rev'])
+                    is_parent = rev in repo_parents and gtk.STOCK_HOME or ''
+                    is_head = rev in heads and gtk.STOCK_EXECUTE or ''
+                    show_date = util.strdate(util.tolocal(log['date']),
+                            '%a %b %d %H:%M:%S %Y', {})[0]
+                    self.model.append((is_parent, is_head, 
+                                       log['rev'],
+                                       log['tag'], log['user'],
+                                       log['summary'], log['date'],
+                                       show_date,
                                        parents))
                 yield logtext is not None
 
@@ -242,7 +254,18 @@ class GLog(GDialog):
                 return False
         return True
 
+    def make_parent(self, tvcolumn, cell, model, iter):
+        stock = model.get_value(iter, 0)
+        pb = self.tree.render_icon(stock, gtk.ICON_SIZE_MENU, None)
+        cell.set_property('pixbuf', pb)
+        return
 
+    def make_head(self, tvcolumn, cell, model, iter):
+        stock = model.get_value(iter, 1)
+        pb = self.tree.render_icon(stock, gtk.ICON_SIZE_MENU, None)
+        cell.set_property('pixbuf', pb)
+        return
+        
     def get_body(self):
         self._menu = gtk.Menu()
         self._menu.set_size_request(90, -1)
@@ -256,7 +279,7 @@ class GLog(GDialog):
         self._menu.append(menuitem)
         self._menu.show_all()
 
-        self.model = gtk.ListStore(str, str, str, str, long, object)
+        self.model = gtk.ListStore(str, str, str, str, str, str, str, long, object)
         self.model.set_default_sort_func(self._sort_by_rev)
 
         self.tree = gtk.TreeView(self.model)
@@ -272,39 +295,63 @@ class GLog(GDialog):
         self.tree.modify_font(pango.FontDescription(self.fontlist))
         self.tree.set_rules_hint(True) 
         
+        parent_cell = gtk.CellRendererPixbuf()
+        head_cell = gtk.CellRendererPixbuf()
+        tags_cell = gtk.CellRendererText()
         changeset_cell = gtk.CellRendererText()
         user_cell = gtk.CellRendererText()
         summary_cell = gtk.CellRendererText()
         date_cell = gtk.CellRendererText()
         
-        col0 = gtk.TreeViewColumn('rev', changeset_cell)
-        col0.add_attribute(changeset_cell, 'text', 0)
-        col0.set_cell_data_func(changeset_cell, self._text_color)
-        col0.set_sort_column_id(0)
-        col0.set_resizable(False)
+        col = 1
         
-        col1 = gtk.TreeViewColumn('user', user_cell)
-        col1.add_attribute(user_cell, 'text', 1)
-        col1.set_cell_data_func(user_cell, self._text_color)
-        col1.set_sort_column_id(1)
-        col1.set_resizable(True)
+        col_status = gtk.TreeViewColumn('status')
+        col_status.pack_start(parent_cell, False)
+        col_status.pack_start(head_cell, False)
+        col_status.set_cell_data_func(parent_cell, self.make_parent)
+        col_status.set_cell_data_func(head_cell, self.make_head)
         
-        col2 = gtk.TreeViewColumn('summary', summary_cell)
-        col2.add_attribute(summary_cell, 'text', 2)
-        col2.set_cell_data_func(summary_cell, self._text_color)
-        col2.set_sort_column_id(2)
-        col2.set_resizable(True)
+        col += 1
+        col_rev = gtk.TreeViewColumn('rev', changeset_cell)
+        col_rev.add_attribute(changeset_cell, 'text', col)
+        col_rev.set_cell_data_func(changeset_cell, self._text_color)
+        col_rev.set_sort_column_id(col)
+        col_rev.set_resizable(False)
+        
+        col += 1
+        col_tag = gtk.TreeViewColumn('tag', tags_cell)
+        col_tag.add_attribute(tags_cell, 'text', col)
+        col_tag.set_cell_data_func(tags_cell, self._text_color)
+        col_tag.set_sort_column_id(col)
+        col_tag.set_resizable(False)
+        
+        col += 1
+        col_user = gtk.TreeViewColumn('user', user_cell)
+        col_user.add_attribute(user_cell, 'text', col)
+        col_user.set_cell_data_func(user_cell, self._text_color)
+        col_user.set_sort_column_id(col)
+        col_user.set_resizable(True)
+        
+        col += 1
+        col_sum = gtk.TreeViewColumn('summary', summary_cell)
+        col_sum.add_attribute(summary_cell, 'text', col)
+        col_sum.set_cell_data_func(summary_cell, self._text_color)
+        col_sum.set_sort_column_id(col)
+        col_sum.set_resizable(True)
 
-        col3 = gtk.TreeViewColumn('date', date_cell)
-        col3.add_attribute(date_cell, 'text', 3)
-        col3.set_cell_data_func(date_cell, self._text_color)
-        col3.set_sort_column_id(4)
-        col3.set_resizable(True)
+        col += 1
+        col_date = gtk.TreeViewColumn('date', date_cell)
+        col_date.add_attribute(date_cell, 'text', col)
+        col_date.set_cell_data_func(date_cell, self._text_color)
+        col_date.set_sort_column_id(col)
+        col_date.set_resizable(True)
 
-        self.tree.append_column(col0)
-        self.tree.append_column(col1)
-        self.tree.append_column(col2)
-        self.tree.append_column(col3)
+        self.tree.append_column(col_status)
+        self.tree.append_column(col_rev)
+        self.tree.append_column(col_tag)
+        self.tree.append_column(col_user)
+        self.tree.append_column(col_sum)
+        self.tree.append_column(col_date)
         self.tree.set_headers_clickable(True)
         
         scroller = gtk.ScrolledWindow()
@@ -335,7 +382,7 @@ class GLog(GDialog):
 
 
     def _sort_by_rev(self, model, iter1, iter2):
-        lhs, rhs = (model.get_value(iter1, 0), model.get_value(iter2, 0))
+        lhs, rhs = (model.get_value(iter1, 2), model.get_value(iter2, 2))
 
         # GTK+ bug that calls sort before a full row is inserted causing values to be None.
         if None in (lhs, rhs) :
@@ -346,7 +393,7 @@ class GLog(GDialog):
 
 
     def _text_color(self, column, text_renderer, list, row_iter):
-        parents = list[row_iter][5]
+        parents = list[row_iter][8]
         if len(parents) == 2:
             text_renderer.set_property('foreground', '#006400')
         elif len(parents) == 1:
@@ -360,8 +407,8 @@ class GLog(GDialog):
         from gtools import cmdtable
         
         row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[0])
-        parents = row[5]
+        rev = long(row[2])
+        parents = row[8]
         if len(parents) == 0:
             parents = [rev-1]
 
@@ -378,7 +425,7 @@ class GLog(GDialog):
 
     def _export_patch(self, menuitem):
         row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[0])
+        rev = long(row[2])
         fd = NativeSaveFileDialogWrapper(Title = "Save patch to")
         result = fd.run()
 
@@ -395,10 +442,10 @@ class GLog(GDialog):
         ''' Update the details text '''
         if selection.count_selected_rows() == 0:
             return False
-        rev = [self.model[selection.get_selected()[1]][0]]
+        rev = [self.model[selection.get_selected()[1]][2]]
         if rev != self._last_rev:
             self._last_rev = rev
-            parents = self.model[selection.get_selected()[1]][5]
+            parents = self.model[selection.get_selected()[1]][8]
             self.load_details(rev, len(parents))
 
         return False
