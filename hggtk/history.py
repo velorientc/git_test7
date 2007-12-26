@@ -45,8 +45,40 @@ class GLog(GDialog):
 
 
     def get_tbbuttons(self):
-        return [self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh', self._refresh_clicked),
-                     gtk.SeparatorToolItem()]
+        return [
+                self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh', self._refresh_clicked),
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_INDEX, '_filter', self._refresh_clicked,
+                        menu=self._filter_menu()),
+                gtk.SeparatorToolItem()
+             ]
+
+    def _filter_all(self, widget, data=None):
+        if widget.get_active():
+            self._filter = "all"
+            self.reload_log()
+            
+    def _filter_tagged(self, widget, data=None):
+        if widget.get_active():
+            self._filter = "tagged"
+            self.reload_log()
+        
+    def _filter_menu(self):
+        menu = gtk.Menu()
+        
+        self._filter = "all"    # FIXME: not the best place to init variable
+
+        button = gtk.RadioMenuItem(None, "Show All Revisions")
+        button.set_active(True)
+        button.connect("toggled", self._filter_all)
+        menu.append(button)
+        
+        button = gtk.RadioMenuItem(button, "Show Tagged Revisions")
+        button.connect("toggled", self._filter_tagged)
+        menu.append(button)
+       
+        menu.show_all()
+        return menu
 
 
     def prepare_display(self):
@@ -92,6 +124,11 @@ class GLog(GDialog):
         return success, logtext
 
 
+    def _get_tagged_rev(self):
+        l = [hex(r) for t, r in self.repo.tagslist()]
+        l.reverse()
+        return l
+        
     def reload_log(self):
         """Clear out the existing ListStore model and reload it from the repository. 
         """
@@ -99,9 +136,15 @@ class GLog(GDialog):
         if self.refreshing:
             return False
 
+        revs = []
+        if self._filter == "all":
+            revs = self.opts['rev']
+        elif self._filter == "tagged":
+            revs = self._get_tagged_rev()
+            
         # For long logs this is the slowest part, but given the current
         # Hg API doesn't allow it to be easily processed in chuncks
-        success, logtext = self._hg_log(self.opts['rev'], self.pats, False)
+        success, logtext = self._hg_log(revs, self.pats, False)
         if not success:
             return False
 
