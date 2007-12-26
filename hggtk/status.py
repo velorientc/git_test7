@@ -102,6 +102,7 @@ class GStatus(GDialog):
         if self.count_revs() < 2:
             tbuttons += [self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 're_vert', self._revert_clicked),
                          self.make_toolbutton(gtk.STOCK_ADD, '_add', self._add_clicked),
+                         self.make_toolbutton(gtk.STOCK_CANCEL, '_remove', self._remove_clicked),
                          self.make_toolbutton(gtk.STOCK_DELETE, '_delete', self._delete_clicked),
                          gtk.SeparatorToolItem(),
                          self.make_toolbutton(gtk.STOCK_YES, '_select', self._sel_desel_clicked, True),
@@ -467,7 +468,6 @@ class GStatus(GDialog):
             commands.remove(self.ui, self.repo, *files, **removeopts)
         success, outtext = self._hg_call_wrapper('Remove', dohgremove)
         if success:
-            shell_notify(files)
             self.reload_status()
 
 
@@ -630,6 +630,15 @@ class GStatus(GDialog):
             self.reload_status()
 
 
+    def _remove_clicked(self, toolbutton, data=None):
+        remove_list = self._relevant_files('C')
+        if len(remove_list) > 0:
+            self._hg_remove(remove_list)
+        else:
+            Prompt('Nothing Removed', 'No removable files selected', self).run()
+        return True
+        
+        
     def _delete_clicked(self, toolbutton, data=None):
         delete_list = self._relevant_files('?I')
         if len(delete_list) > 0:
