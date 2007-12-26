@@ -125,7 +125,6 @@ class GLog(GDialog):
         def dohglog():
             self.restore_cwd()
             self.repo.dirstate.invalidate()
-            self.repo.invalidate()
             commands.log(self.ui, self.repo, *pats, **self.opts)
 
         logtext = ''
@@ -155,6 +154,7 @@ class GLog(GDialog):
             return False
 
         # Retrieve repo revision info
+        self.repo.invalidate()
         repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
         heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
         
