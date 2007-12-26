@@ -142,6 +142,9 @@ destination is specified.'''))
         self.refresh_path_list()
 
         self._web_info = (
+                ('Name', 'web.name', ['unknown'],
+                    'Repository name to use in the web interface.  Default ' +
+                    'is the working directory.'),
                 ('Description', 'web.description', ['unknown'],
                     'Textual description of the repository''s purpose or ' +
                     'contents.'),
@@ -151,7 +154,8 @@ destination is specified.'''))
                 ('Style', 'web.style', ['default', 'gitweb', 'old'],
                     'Which template map style to use'),
                 ('Archive Formats', 'web.allow_archive', ['bz2', 'gz', 'zip'],
-                    'List of archive formats allowed for downloading'),
+                    'Comma separated list of archive formats allowed for ' +
+                    'downloading'),
                 ('Port', 'web.port', ['8000'], 'Port to listen on'),
                 ('Push Requires SSL', 'web.push_ssl', ['True', 'False'],
                     'Whether to require that inbound pushes be transported ' +
