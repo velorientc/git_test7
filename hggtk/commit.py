@@ -59,6 +59,8 @@ class GCommit(GStatus):
     def get_title(self):
         return os.path.basename(self.repo.root) + ' commit ' + ' '.join(self.pats) + ' ' + self.opts['user'] + ' ' + self.opts['date']
 
+    def get_icon(self):
+        return 'menucommit.ico'
 
     def auto_check(self):
         if self.test_opt('check'):

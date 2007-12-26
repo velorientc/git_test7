@@ -38,6 +38,8 @@ class GLog(GDialog):
     def get_title(self):
         return os.path.basename(self.repo.root) + ' log ' + ':'.join(self.opts['rev']) + ' ' + ' '.join(self.pats)
 
+    def get_icon(self):
+        return 'menulog.ico'
 
     def parse_opts(self):
         # Disable quiet to get full log info

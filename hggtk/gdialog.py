@@ -65,7 +65,7 @@ from mercurial.i18n import _
 from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
-from shlib import shell_notify
+from shlib import shell_notify, set_tortoise_icon
 
 class SimpleMessage(gtk.MessageDialog):
     def run(self):
@@ -143,6 +143,8 @@ class GDialog(gtk.Window):
     def get_title(self):
         return ''
 
+    def get_icon(self):
+        return ''
 
     def get_minsize(self):
         return (395, 200)
@@ -272,6 +274,7 @@ class GDialog(gtk.Window):
 
     def _setup_gtk(self):
         self.set_title(self.get_title())
+        set_tortoise_icon(self, self.get_icon())
         
         # Minimum size
         minx, miny = self.get_minsize()

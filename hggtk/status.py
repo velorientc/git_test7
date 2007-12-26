@@ -90,6 +90,8 @@ class GStatus(GDialog):
     def get_title(self):
         return os.path.basename(self.repo.root) + ' status ' + ':'.join(self.opts['rev'])  + ' ' + ' '.join(self.pats)
 
+    def get_icon(self):
+        return 'menushowchanged.ico'
 
     def get_defsize(self):
         return self._setting_defsize
