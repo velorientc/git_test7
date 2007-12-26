@@ -571,7 +571,7 @@ def run(root='', files=[], **opts):
         'include':[], 'exclude':[]
     }
 
-    dialog = GLog(u, repo, files, cmdoptions, True)
+    dialog = GLog(u, repo, files, cmdoptions, False)
     
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
