@@ -62,10 +62,10 @@ class ConfigDialog(gtk.Dialog):
         # create pages for each section of configuration file
         self._tortoise_info = (
                 ('Commit Tool', 'tortoisehg.commit', ['qct', 'internal'],
-                    'Select commit tool launched by TortoiseHg. Qct is' +
+                    'Select commit tool launched by TortoiseHg. Qct is ' +
                     'not included, must be installed separately'),
                 ('Revision Graph Viewer', 'tortoisehg.view', ['hgk', 'hgview'],
-                    'Select revision graph (DAG) viewer launched by' +
+                    'Select revision graph (DAG) viewer launched by ' +
                     'TortoiseHg'),
                 ('Visual Diff Tool', 'tortoisehg.vdiff', [],
                     'Specify the visual diff tool; must be extdiff command'))
@@ -144,10 +144,10 @@ destination is specified.'''))
 
         self._web_info = (
                 ('Description', 'web.description', ['unknown'],
-                    'Textual description of the repository''s purpose or' +
+                    'Textual description of the repository''s purpose or ' +
                     'contents.'),
                 ('Contact', 'web.contact', ['unknown'],
-                    'Name or email address of the person in charge of the' +
+                    'Name or email address of the person in charge of the ' +
                     'repository.'),
                 ('Style', 'web.style', ['default', 'gitweb', 'old'],
                     'Which template map style to use'),
@@ -155,10 +155,10 @@ destination is specified.'''))
                     'List of archive formats allowed for downloading'),
                 ('Port', 'web.port', ['8000'], 'Port to listen on'),
                 ('Push Requires SSL', 'web.push_ssl', ['True', 'False'],
-                    'Whether to require that inbound pushes be transported' +
+                    'Whether to require that inbound pushes be transported ' +
                     'over SSL to prevent password sniffing.'),
                 ('Stripes', 'web.stripes', ['1', '0'],
-                    'How many lines a "zebra stripe" should span in multiline' +
+                    'How many lines a "zebra stripe" should span in multiline '+
                     'output. Default is 1; set to 0 to disable.'),
                 ('Max Files', 'web.maxfiles', ['10'],
                     'Maximum number of files to list per changeset.'),
@@ -216,11 +216,13 @@ line, message on stdin). Normally, setting this to "sendmail" or
         self.fill_frame(self.email_frame, self._email_info)
 
         self._hgmerge_info = (
-                ('Default 3-way Merge', 'hgmerge.interactive',
+                ('Default 3-way Merge Tool', 'hgmerge.interactive',
                     ['gpyfm', 'kdiff3', 'tortoisemerge', 'p4merge',
                         'meld', 'tkdiff', 'filemerge', 'ecmerge',
                         'xxdiff', 'guiffy', 'diffmerge'],
-                    'Textual merge program for resolving merge conflicts'),)
+'''Textual merge program for resolving merge conflicts.  If left
+unspecified, the hgmerge wrapper will use the first applicable
+tool it finds on your system'''),)
         self.hgmerge_frame = self.add_page(notebook, 'Merge')
         self.fill_frame(self.hgmerge_frame, self._hgmerge_info)
         # TODO add ability to specify file extension based merge tools
@@ -468,8 +470,9 @@ def run(root='', cmdline=[], **opts):
     gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
-    # example command line
+    # example command lines
     # python hggtk/thgconfig.py --focusfield ui.editor
+    # python hggtk/thgconfig.py . --focusfield paths.default --configrepo
     import sys
     opts = {}
     opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
