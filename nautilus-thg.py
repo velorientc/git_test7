@@ -124,13 +124,6 @@ class HgExtension(nautilus.MenuProvider,
     def _merge_cb(self, window, vfs_file):
         self._run_dialog('merge', [vfs_file], filelist=False)
 
-    def _paths_cb(self, window, vfs_file):
-        path = self.get_path_for_vfs_file(vfs_file)
-        if path is None:
-            return
-        cwd = os.path.isdir(path) and path or os.path.dirname(path)
-        subprocess.Popen(['hg', 'config', 'paths'], cwd=cwd, shell=False)
-
     def _revert_cb(self, window, vfs_files):
         self._run_dialog('revert', vfs_files)
 
@@ -143,12 +136,11 @@ class HgExtension(nautilus.MenuProvider,
     def _sync_cb(self, window, vfs_file):
         self._run_dialog('synch', [vfs_file], filelist=False)
 
-    def _uname_cb(self, window, vfs_file):
-        path = self.get_path_for_vfs_file(vfs_file)
-        if path is None:
-            return
-        cwd = os.path.isdir(path) and path or os.path.dirname(path)
-        subprocess.Popen(['hg', 'config', 'uname'], cwd=cwd, shell=False)
+    def _thgconfig_repo_cb(self, window, vfs_file):
+        self._run_dialog('config', [vfs_file], args=['--configrepo'])
+
+    def _thgconfig_user_cb(self, window, vfs_file):
+        self._run_dialog('config', [vfs_file], filelist=False)
 
     def _update_cb(self, window, vfs_file):
         self._run_dialog('update', [vfs_file], filelist=False)
@@ -167,14 +159,7 @@ class HgExtension(nautilus.MenuProvider,
         else:
             subprocess.Popen(['hg', 'view'], shell=False, cwd=cwd)
 
-    def _web_cb(self, window, vfs_file):
-        path = self.get_path_for_vfs_file(vfs_file)
-        if path is None:
-            return
-        cwd = os.path.isdir(path) and path or os.path.dirname(path)
-        subprocess.Popen(['hg', 'config', 'web'], cwd=cwd, shell=False)
-
-    def _run_dialog(self, hgcmd, vfs_files, filelist=True):
+    def _run_dialog(self, hgcmd, vfs_files, filelist=True, args=[]):
         '''
         hgcmd - hgproc subcommand
         vfs_files - directory, or list of selected files
@@ -191,6 +176,7 @@ class HgExtension(nautilus.MenuProvider,
         cmdopts += ['--root', repo.root]
         cmdopts += ['--cwd', cwd]
         cmdopts += ['--command', hgcmd]
+        cmdopts.extend(args)
 
         if filelist:
             # Use temporary file to store file list (avoid shell command
@@ -296,23 +282,16 @@ class HgExtension(nautilus.MenuProvider,
         item.connect('activate', self._serve_cb, vfs_file)
         items.append(item)
 
-        # add hg-config dialogs
-        if repo.ui.config('tortoisehg', 'hgconfig') in ('1', 'True', 'yes'):
-            item = nautilus.MenuItem('HgNautilus::uname',
-                                 'Config Username',
-                                 'Configure Mercurial username')
-            item.connect('activate', self._uname_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::web',
-                                 'Config Web Server',
-                                 'Configure web server')
-            item.connect('activate', self._web_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::paths',
-                                 'Config Paths',
-                                 'Configure peer repository paths')
-            item.connect('activate', self._paths_cb, vfs_file)
-            items.append(item)
+        item = nautilus.MenuItem('HgNautilus::repoconfig',
+                             'Repository Settings',
+                             'Configure Mercurial settings for this repo')
+        item.connect('activate', self._thgconfig_repo_cb, vfs_file)
+        items.append(item)
+        item = nautilus.MenuItem('HgNautilus::userconfig',
+                             'User-Global Settings',
+                             'Configure global Mercurial settings')
+        item.connect('activate', self._thgconfig_user_cb, vfs_file)
+        items.append(item)
 
         item = nautilus.MenuItem('HgNautilus::terminal',
                              'Open Terminal Here',
