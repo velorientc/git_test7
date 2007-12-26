@@ -63,6 +63,16 @@ class GLog(GDialog):
             self._filter = "tagged"
             self.reload_log()
         
+    def _filter_parents(self, widget, data=None):
+        if widget.get_active():
+            self._filter = "parents"
+            self.reload_log()
+            
+    def _filter_heads(self, widget, data=None):
+        if widget.get_active():
+            self._filter = "heads"
+            self.reload_log()
+
     def _filter_menu(self):
         menu = gtk.Menu()
         
@@ -75,6 +85,14 @@ class GLog(GDialog):
         
         button = gtk.RadioMenuItem(button, "Show Tagged Revisions")
         button.connect("toggled", self._filter_tagged)
+        menu.append(button)
+       
+        button = gtk.RadioMenuItem(button, "Show Parent Revisions")
+        button.connect("toggled", self._filter_parents)
+        menu.append(button)
+       
+        button = gtk.RadioMenuItem(button, "Show Head Revisions")
+        button.connect("toggled", self._filter_heads)
         menu.append(button)
        
         menu.show_all()
@@ -136,11 +154,19 @@ class GLog(GDialog):
         if self.refreshing:
             return False
 
+        # Retrieve repo revision info
+        repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
+        heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
+        
         revs = []
         if self._filter == "all":
             revs = self.opts['rev']
         elif self._filter == "tagged":
             revs = self._get_tagged_rev()
+        elif self._filter == "parents":
+            revs = [str(x) for x in repo_parents]
+        elif self._filter == "heads":
+            revs = [str(x) for x in heads]
             
         # For long logs this is the slowest part, but given the current
         # Hg API doesn't allow it to be easily processed in chuncks
@@ -161,10 +187,6 @@ class GLog(GDialog):
         # Load the new data into the tree's model
         self.tree.hide()
         self.model.clear()
-
-        # Retrieve repo revision info
-        repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
-        heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
         
         # Generator that parses and inserts log entries
         def inserter(logtext):
