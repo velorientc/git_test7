@@ -75,6 +75,7 @@ class GLog(GDialog):
         def dohglog():
             self.restore_cwd()
             self.repo.dirstate.invalidate()
+            self.repo.invalidate()
             commands.log(self.ui, self.repo, *pats, **self.opts)
 
         logtext = ''
