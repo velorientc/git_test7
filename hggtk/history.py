@@ -327,7 +327,7 @@ class GLog(GDialog):
         col_tag.add_attribute(tags_cell, 'text', col)
         col_tag.set_cell_data_func(tags_cell, self._text_color)
         col_tag.set_sort_column_id(col)
-        col_tag.set_resizable(False)
+        col_tag.set_resizable(True)
         
         col += 1
         col_user = gtk.TreeViewColumn('user', user_cell)
