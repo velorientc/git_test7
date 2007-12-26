@@ -765,7 +765,7 @@ def run(root='', files=[], **opts):
         'exclude':[], 'include':[], 'debug':True,'verbose':True
     }
     
-    dialog = GStatus(u, repo, files, cmdoptions, False)
+    dialog = GStatus(u, repo, files, cmdoptions, True)
 
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
