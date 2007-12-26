@@ -333,7 +333,7 @@ class ContextMenuExtension:
             if len(repo.workingctx().parents()) > 1:
                 result.append(TortoiseMenu(_("Undo Merge"),
                                _("Undo merge by updating to revision"),
-                               self._update))
+                               self._update, icon="menuunmerge.ico"))
                 
             result.append(TortoiseMenuSep())
 
