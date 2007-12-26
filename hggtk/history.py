@@ -138,6 +138,7 @@ class GLog(GDialog):
                     log = { 'user' : 'missing', 'summary' : '', 'tag' : '' }
                     lines = block.split('\n')
                     parents = []
+                    tags = []
                     for line in lines:
                         line = util.fromlocal(line)
                         sep = line.index(':')
@@ -148,9 +149,13 @@ class GLog(GDialog):
                             log['rev'] = value.split(':')[0]
                         elif info == 'parent':
                             parents.append(long(value.split(':')[0]))
+                        elif info == 'tag':
+                            tags.append(value)
                         else:
                             log[info] = value
     
+                    if tags: log['tag'] = ','.join(tags)
+
                     rev = int(log['rev'])
                     is_parent = rev in repo_parents and gtk.STOCK_HOME or ''
                     is_head = rev in heads and gtk.STOCK_EXECUTE or ''
