@@ -43,7 +43,6 @@ class ConfigDialog(gtk.Dialog):
         #set_tortoise_icon(self, 'menurepobrowse.ico')
         self.ini = self.load_config(self.rcpath)
 
-        self.connect('response', gtk.main_quit)
         # Create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
@@ -464,6 +463,7 @@ def run(root='', cmdline=[], **opts):
         field = None
     dialog = ConfigDialog(root, '--configrepo' in cmdline, field)
     dialog.show_all()
+    dialog.connect('response', gtk.main_quit)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
