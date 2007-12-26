@@ -302,11 +302,7 @@ class GDialog(gtk.Window):
         bbox.set_layout(gtk.BUTTONBOX_EDGE)
         hbox.pack_end(bbox, False, False)
 
-        if self.main:
-            button = gtk.Button(stock=gtk.STOCK_QUIT)
-        else:
-            button = gtk.Button(stock=gtk.STOCK_CLOSE)
-
+        button = gtk.Button(stock=gtk.STOCK_CLOSE)
         button.connect('clicked', self._quit_clicked)
         bbox.pack_end(button, False, False)
         self.connect('destroy', self._destroying)
