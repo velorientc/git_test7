@@ -257,8 +257,13 @@ class GDialog(gtk.Window):
         return cnt
 
 
-    def make_toolbutton(self, stock, label, handler, userdata=None):
-        tbutton = gtk.ToolButton(stock)
+    def make_toolbutton(self, stock, label, handler, userdata=None, menu=None):
+        if menu:
+            tbutton = gtk.MenuToolButton(stock)
+            tbutton.set_menu(menu)
+        else:
+            tbutton = gtk.ToolButton(stock)
+
         tbutton.set_use_underline(True)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
