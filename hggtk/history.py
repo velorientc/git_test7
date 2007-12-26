@@ -484,9 +484,19 @@ class GLog(GDialog):
         rev = long(row[2])
         parents = row[8]
         
+        # save tag info for detecting new tags added
+        oldtags = self.repo.tagslist()
+        
         dialog = TagAddDialog(self.repo.root, rev=str(rev))
         dialog.run()
         dialog.hide()
+        
+        # refresh if new tags added
+        self.repo.invalidate()
+        newtags = self.repo.tagslist()
+        if newtags != oldtags:
+            self.reload_log()
+
                 
     def _show_status(self, menuitem):
         from status import GStatus
