@@ -277,6 +277,10 @@ class GLog(GDialog):
         menuitem.connect('activate',self._export_patch)
         menuitem.set_border_width(1)
         self._menu.append(menuitem)
+        menuitem = gtk.MenuItem('add _tag', True)
+        menuitem.connect('activate', self._add_tag)
+        menuitem.set_border_width(1)
+        self._menu.append(menuitem)
         self._menu.show_all()
 
         self.model = gtk.ListStore(str, str, str, str, str, str, str, long, object)
@@ -402,6 +406,17 @@ class GLog(GDialog):
             text_renderer.set_property('foreground', 'black')
 
 
+    def _add_tag(self, menuitem):
+        from tagadd import TagAddDialog
+
+        row = self.model[self.tree.get_selection().get_selected()[1]]
+        rev = long(row[2])
+        parents = row[8]
+        
+        dialog = TagAddDialog(self.repo.root, rev=str(rev))
+        dialog.run()
+        dialog.hide()
+                
     def _show_status(self, menuitem):
         from status import GStatus
         from gtools import cmdtable
