@@ -51,9 +51,10 @@ class ServeDialog(gtk.Dialog):
         if cwd: os.chdir(cwd)
         
         try:
-            repo = hg.repository(ui.ui(), path=root)
-            self.defport = repo.ui.config('web', 'port') or '8000'
+            self.repo = hg.repository(ui.ui(), path=root)
+            self.defport = self.repo.ui.config('web', 'port') or '8000'
         except hg.RepoError:
+            self.repo = None
             self.defport = '8000'
 
         # set dialog title
@@ -78,12 +79,17 @@ class ServeDialog(gtk.Dialog):
                                               'Browse',
                                               self._on_browse_clicked,
                                               None)
+        self._button_conf = self._toolbutton(gtk.STOCK_PREFERENCES,
+                                              'Configure',
+                                              self._on_conf_clicked,
+                                              None)
         tbuttons = [
                 self._button_start,
                 gtk.SeparatorToolItem(),
                 self._button_stop,
                 gtk.SeparatorToolItem(),
                 self._button_browse,
+                self._button_conf,
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -156,10 +162,12 @@ class ServeDialog(gtk.Dialog):
             self._button_start.set_sensitive(False)
             self._button_stop.set_sensitive(True)
             self._button_browse.set_sensitive(True)
+            self._button_conf.set_sensitive(False)
         else:
             self._button_start.set_sensitive(True)
             self._button_stop.set_sensitive(False)
             self._button_browse.set_sensitive(False)
+            self._button_conf.set_sensitive(True)
             
     def _on_start_clicked(self, *args):
         self._start_server()
@@ -184,6 +192,14 @@ class ServeDialog(gtk.Dialog):
                     os.system(browser % self._url)
             threading.Thread(target=start_browser).start()
     
+    def _on_conf_clicked(self, *args):
+        if self.repo is None: return
+        from thgconfig import ConfigDialog
+        dlg = ConfigDialog(self.repo.root, True, 'web.name')
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+
     def _start_server(self):
         # gather input data
         try:
