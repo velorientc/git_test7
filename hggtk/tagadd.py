@@ -20,7 +20,7 @@ from mercurial.node import *
 
 class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, root='', tag='', rev=None):
+    def __init__(self, root='', tag='', rev=''):
         """ Initialize the Dialog """
         super(TagAddDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
@@ -33,6 +33,11 @@ class TagAddDialog(gtk.Dialog):
         self.root = root
         self.repo = None
 
+        try:
+            self.repo = hg.repository(ui.ui(), path=self.root)
+        except hg.RepoError:
+            pass
+
         # build dialog
         self._create(tag, rev)
 
@@ -44,14 +49,13 @@ class TagAddDialog(gtk.Dialog):
         lbl = gtk.Label("Tag:")
         lbl.set_property("width-chars", 10)
         lbl.set_alignment(0, 0.5)
-        self._tag_input = gtk.Entry()
-        self._btn_tag_browse = gtk.Button("Browse...")
-        self._btn_tag_browse.connect('clicked', self._btn_tag_clicked)
+        self._tagslist = gtk.ListStore(str)
+        self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
+        self._tag_input = self._taglistbox.get_child()
         self._tag_input.set_text(tag)
         tagbox.pack_start(lbl, False, False)
-        tagbox.pack_start(self._tag_input, False, False)
-        tagbox.pack_start(self._btn_tag_browse, False, False, 5)
-        self.vbox.pack_start(tagbox, False, False, 2)
+        tagbox.pack_start(self._taglistbox, True, True)
+        self.vbox.pack_start(tagbox, True, True, 2)
 
         # revision input
         revbox = gtk.HBox()
@@ -59,7 +63,7 @@ class TagAddDialog(gtk.Dialog):
         lbl.set_property("width-chars", 10)
         lbl.set_alignment(0, 0.5)
         self._rev_input = gtk.Entry()
-        self._rev_input.set_text(rev and rev or "tip")
+        self._rev_input.set_text(rev)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._rev_input, False, False)
         self.vbox.pack_start(revbox, False, False, 2)
@@ -85,10 +89,25 @@ class TagAddDialog(gtk.Dialog):
         self._btn_addtag = gtk.Button("Add")
         self._btn_addtag.connect('clicked', self._btn_addtag_clicked)
         self.action_area.pack_end(self._btn_addtag)
-        
+                
         # show them all
+        self._refresh()
         self.vbox.show_all()
 
+    def _refresh(self):
+        """ update display on dialog with recent repo data """
+        self.repo.invalidate()
+        self._tagslist.clear()
+        self._tag_input.set_text("")
+
+        # add tags to drop-down list
+        tags = [x[0] for x in self.repo.tagslist()]
+        tags.sort()
+        for tagname in tags:
+            if tagname == "tip":
+                continue
+            self._tagslist.append([tagname])
+            
     def _btn_tag_clicked(self, button):
         """ select tag from tags dialog """
         import tags
@@ -113,10 +132,6 @@ class TagAddDialog(gtk.Dialog):
             error_dialog("Tag input is empty", "Please enter tag name")
             self._tag_input.grab_focus()
             return False
-        if rev == "":
-            error_dialog("Revision input is empty", "Please enter revision to tag")
-            self._rev_input.grab_focus()
-            return False
         if use_msg and not message:
             error_dialog("Custom commit message is empty", "Please enter commit message")
             self._commit_message.grab_focus()
@@ -126,6 +141,7 @@ class TagAddDialog(gtk.Dialog):
         try:
             self._add_hg_tag(name, rev, message, is_local, force=force)
             info_dialog("Tagging completed", "Tag '%s' has been added" % name)
+            self._refresh()
         except util.Abort, inst:
             error_dialog("Error in tagging", str(inst))
             return False
@@ -136,26 +152,20 @@ class TagAddDialog(gtk.Dialog):
             
     def _add_hg_tag(self, name, revision, message, local, user=None,
                     date=None, force=False):
-        u = ui.ui()
-        try:
-            repo = hg.repository(u, path=self.root)
-        except hg.RepoError:
-            return None
-
-        if name in repo.tags() and not force:
+        if name in self.repo.tags() and not force:
             raise util.Abort(_('a tag named "%s" already exists')
                              % name)
-        r = repo.changectx(revision).node()
+        r = self.repo.changectx(revision).node()
 
         if not message:
             message = _('Added tag %s for changeset %s') % (name, short(r))
 
-        if name in repo.tags() and not force:
+        if name in self.repo.tags() and not force:
             util.Abort("Tag '%s' already exist" % name)
             
-        repo.tag(name, r, message, local, user, date)
+        self.repo.tag(name, r, message, local, user, date)
 
-def run(root='', tag='', rev=None, **opts):
+def run(root='', tag='', rev='', **opts):
     dialog = TagAddDialog(root, tag, rev)
 
     # the dialog maybe called by another window/dialog, so we only
