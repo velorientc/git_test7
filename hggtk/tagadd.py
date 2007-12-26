@@ -20,7 +20,7 @@ from mercurial.node import *
 
 class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, root=''):
+    def __init__(self, root='', tag='', rev=None):
         """ Initialize the Dialog """
         super(TagAddDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
@@ -34,11 +34,10 @@ class TagAddDialog(gtk.Dialog):
         self.repo = None
 
         # build dialog
-        self._create()
+        self._create(tag, rev)
 
-    def _create(self):
+    def _create(self, tag, rev):
         self.set_default_size(350, 180)
-        self.connect('response', gtk.main_quit)
         
         # tag name input
         tagbox = gtk.HBox()
@@ -48,6 +47,7 @@ class TagAddDialog(gtk.Dialog):
         self._tag_input = gtk.Entry()
         self._btn_tag_browse = gtk.Button("Browse...")
         self._btn_tag_browse.connect('clicked', self._btn_tag_clicked)
+        self._tag_input.set_text(tag)
         tagbox.pack_start(lbl, False, False)
         tagbox.pack_start(self._tag_input, False, False)
         tagbox.pack_start(self._btn_tag_browse, False, False, 5)
@@ -59,7 +59,7 @@ class TagAddDialog(gtk.Dialog):
         lbl.set_property("width-chars", 10)
         lbl.set_alignment(0, 0.5)
         self._rev_input = gtk.Entry()
-        self._rev_input.set_text("tip")
+        self._rev_input.set_text(rev and rev or "tip")
         self._btn_rev_browse = gtk.Button("Browse...")
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(lbl, False, False)
@@ -165,16 +165,23 @@ class TagAddDialog(gtk.Dialog):
             
         repo.tag(name, r, message, local, user, date)
 
-def run(root='', **opts):
-    dialog = TagAddDialog(root)
+def run(root='', tag='', rev=None, **opts):
+    dialog = TagAddDialog(root, tag, rev)
+
+    # the dialog maybe called by another window/dialog, so we only
+    # enable the close dialog handler if dialog is run as mainapp
+    dialog.connect('response', gtk.main_quit)
+    
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-    
+
 if __name__ == "__main__":
     import sys
     opts = {}
     opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    #opts['tag'] = 'mytag'
+    #opts['rev'] = '-1'
     run(**opts)
