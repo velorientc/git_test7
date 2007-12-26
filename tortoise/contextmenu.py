@@ -343,18 +343,6 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Revision Graph"),
                            _("View history with DAG graph"),
                            self._view, icon="menurevisiongraph.ico"))
-            result.append(TortoiseMenu(_("Current Revision Status..."),
-                           _("Show various revision info"),
-                           self._tip, icon="menurepobrowse.ico"))
-
-            result.append(TortoiseMenuSep())
-
-            result.append(TortoiseMenu(_("View Tags"),
-                           _("list repository tags"),
-                           self._show_tags))
-            result.append(TortoiseMenu(_("Add Tag"),
-                           _("add a tag for the current or given revision"),
-                           self._add_tag))
 
             result.append(TortoiseMenuSep())
 
