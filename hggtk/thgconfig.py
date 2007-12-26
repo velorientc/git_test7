@@ -29,8 +29,8 @@ class ConfigDialog(gtk.Dialog):
         except hg.RepoError:
             repo = None
             if configrepo:
-                error_dialog('No repository found', 'Unable to configure')
-                return
+                error_dialog('No repository found', 'no repo at ' + root)
+                gtk.main_quit()
 
         if configrepo:
             self.ui = repo.ui
@@ -92,8 +92,55 @@ Default is set to repository from which the current repository was cloned.'''),
 '''Optional. Directory or URL to use when pushing if no
 destination is specified.'''))
         self.paths_frame = self.add_page(notebook, 'Paths')
-        self.fill_frame(self.paths_frame, self._paths_info)
-        # paths page is special TODO borrow from hg-config
+        vbox = self.fill_frame(self.paths_frame, self._paths_info)
+
+        self.pathtree = gtk.TreeView()
+        self.pathsel = self.pathtree.get_selection()
+        self.pathsel.connect("changed", self._pathlist_rowchanged)
+        column = gtk.TreeViewColumn('Peer Repository Paths',
+                gtk.CellRendererText(), text=2)
+        self.pathtree.append_column(column) 
+
+        self.pathlist = []
+        if 'paths' in list(self.ini):
+            for name in self.ini['paths']:
+                if name in ('default', 'default-push'): continue
+                self.pathlist.append((name, self.ini['paths'][name]))
+        vbox.add(self.pathtree)
+        self.curpathrow = 0
+
+        # TODO add scrollable window to tree view
+        buttonbox = gtk.HBox()
+        self.addButton = gtk.Button("Add")
+        self.addButton.connect('clicked', self._add_path)
+        buttonbox.pack_start(self.addButton)
+
+        self._delpathbutton = gtk.Button("Remove")
+        self._delpathbutton.connect('clicked', self._remove_path)
+        buttonbox.pack_start(self._delpathbutton)
+
+        self._testpathbutton = gtk.Button("Test")
+        self._testpathbutton.connect('clicked', self._test_path)
+        buttonbox.pack_start(self._testpathbutton)
+
+        self._refreshpathbutton = gtk.Button("Refresh")
+        self._refreshpathbutton.connect('clicked', self._refresh_path)
+        buttonbox.pack_start(self._refreshpathbutton)
+
+        hbox = gtk.HBox()
+        self._pathnameedit = gtk.Entry()
+        hbox.pack_start(gtk.Label('Name:'), False, False, 4)
+        hbox.pack_start(self._pathnameedit, True, True, 4)
+        vbox.pack_start(hbox, False, False, 4)
+
+        hbox = gtk.HBox()
+        self._pathpathedit = gtk.Entry()
+        hbox.pack_start(gtk.Label('Path:'), False, False, 4)
+        hbox.pack_start(self._pathpathedit, True, True, 4)
+        vbox.pack_start(hbox, False, False, 4)
+        vbox.pack_start(buttonbox, False, False, 4)
+
+        self.refresh_path_list()
 
         self._web_info = (
                 ('Description', 'web.description', ['unknown'],
@@ -180,14 +227,83 @@ line, message on stdin). Normally, setting this to "sendmail" or
 
         if focusfield:
             # Set page and focus to requested datum
-            for page_num, (frame, info, widgets) in enumerate(self.pages):
+            for page_num, (vbox, info, widgets) in enumerate(self.pages):
                 for w, (label, cpath, values, tip) in enumerate(info):
                     if cpath == focusfield:
                         self.notebook.set_current_page(page_num)
                         widgets[w].grab_focus()
 
+    def _add_path(self, *args):
+        if len(self.pathlist):
+            self.pathlist.append(self.pathlist[self.curpathrow])
+        else:
+            self.pathlist.append(('default', 'http://'))
+        self.curpathrow = len(self.pathlist)-1
+        self.refresh_path_list()
+        self._pathnameedit.grab_focus()
+
+    def _remove_path(self, *args):
+        del self.pathlist[self.curpathrow]
+        if self.curpathrow > len(self.pathlist)-1:
+            self.curpathrow = len(self.pathlist)-1
+        self.refresh_path_list()
+
+    def _test_path(self, *args):
+        testpath = self._pathpathedit.get_text()
+        if not testpath:
+            return
+        if testpath[0] == '~':
+            testpath = os.path.expanduser(testpath)
+        cmdline = ['hg', 'incoming', '--verbose', testpath]
+        from hgcmd import CmdDialog
+        dlg = CmdDialog(cmdline)
+        dlg.run()
+        dlg.hide()
+
+    def _refresh_path(self, *args):
+        self.pathlist[self.curpathrow] = (self._pathnameedit.get_text(),
+                self._pathpathedit.get_text())
+        self.refresh_path_list()
+
+    def _pathlist_rowchanged(self, sel):
+        model, iter = sel.get_selected()
+        if not iter:
+            return
+        self._pathnameedit.set_text(model.get(iter, 0)[0])
+        self._pathpathedit.set_text(model.get(iter, 1)[0])
+        self.curpathrow = model.get(iter, 3)[0]
+
+    def refresh_path_list(self):
+        model = gtk.ListStore(gobject.TYPE_PYOBJECT,
+                gobject.TYPE_PYOBJECT,
+                gobject.TYPE_STRING,
+                gobject.TYPE_PYOBJECT)
+        row = 0
+        for (name, path) in self.pathlist:
+            iter = model.insert_before(None, None)
+            model.set_value(iter, 0, name)
+            model.set_value(iter, 1, path)
+            model.set_value(iter, 2, "%s = %s" % (name, path))
+            model.set_value(iter, 3, row)
+            row += 1
+        self.pathtree.set_model(model)
+        if len(self.pathlist):
+            self._delpathbutton.set_sensitive(True)
+            self._testpathbutton.set_sensitive(True)
+            self._refreshpathbutton.set_sensitive(True)
+            self._pathnameedit.set_sensitive(True)
+            self._pathpathedit.set_sensitive(True)
+        else:
+            self._delpathbutton.set_sensitive(False)
+            self._testpathbutton.set_sensitive(False)
+            self._refreshpathbutton.set_sensitive(False)
+            self._pathnameedit.set_sensitive(False)
+            self._pathpathedit.set_sensitive(False)
+        if self.curpathrow < len(self.pathlist):
+             self.pathsel.select_path(self.curpathrow)
+
     def fill_frame(self, frame, info):
-        #tooltips = gtk.GtkTooltips()  TODO, why is this not working?
+        tooltips = gtk.Tooltips()
         widgets = []
         vbox = gtk.VBox()
         frame.add(vbox)
@@ -195,7 +311,6 @@ line, message on stdin). Normally, setting this to "sendmail" or
         for label, cpath, values, tooltip in info:
             vlist = gtk.ListStore(str)
             combo = gtk.ComboBoxEntry(vlist, 0)
-            #tooltips.set_tip(combo, tooltip)
             widgets.append(combo)
 
             # Get currently configured value from this config file
@@ -229,11 +344,14 @@ line, message on stdin). Normally, setting this to "sendmail" or
 
             lbl = gtk.Label(label)
             hbox = gtk.HBox()
+            tooltips.set_tip(combo, tooltip)
+            tooltips.set_tip(lbl, tooltip)
             hbox.pack_start(lbl, False, False, 4)
             hbox.pack_start(combo, True, True, 4)
             vbox.pack_start(hbox, False, False, 4)
 
-        self.pages.append((frame, info, widgets))
+        self.pages.append((vbox, info, widgets))
+        return vbox
         
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
@@ -266,28 +384,51 @@ line, message on stdin). Normally, setting this to "sendmail" or
         self.fn = fn
         return iniparse.INIConfig(file(fn))
 
+    def record_new_value(self, cpath, newvalue, keephistory=True):
+        section, key = cpath.split('.', 1)
+        if newvalue == _unspecstr:
+            try:
+                del self.ini[section][key]
+            except KeyError:
+                pass
+            return
+        if section not in list(self.ini):
+            self.ini.new_namespace(section)
+        self.ini[section][key] = newvalue
+        if not keephistory:
+            return
+        if cpath not in self.history:
+            self.history[cpath] = []
+        elif newvalue in self.history[cpath]:
+            self.history[cpath].remove(newvalue)
+        self.history[cpath].insert(0, newvalue)
+
     def _apply_clicked(self, *args):
         # Reload history, since it may have been modified externally
         self.history = self.load_history()
-        for frame, info, widgets in self.pages:
+
+        # flush changes on paths page
+        if len(self.pathlist):
+            self._refresh_path(None)
+            refreshlist = []
+            for (name, path) in self.pathlist:
+                cpath = '.'.join(['paths', name])
+                self.record_new_value(cpath, path, False)
+                refreshlist.append(name)
+            if 'paths' not in list(self.ini):
+                self.ini.new_namespace('paths')
+            for name in list(self.ini.paths):
+                if name not in refreshlist:
+                    del self.ini['paths'][name]
+
+        # TODO: Add special code for flushing hgmerge extensions
+
+        # Flush changes on all pages
+        for vbox, info, widgets in self.pages:
             for w, (label, cpath, values, tip) in enumerate(info):
                 newvalue = widgets[w].get_child().get_text()
-                section, key = cpath.split('.', 1)
-                if newvalue == _unspecstr:
-                    try:
-                        del self.ini[section][key]
-                    except KeyError:
-                        pass
-                else:
-                    if section not in list(self.ini):
-                        self.ini.new_namespace(section)
-                    self.ini[section][key] = newvalue
-                    if cpath not in self.history:
-                        self.history[cpath] = []
-                    elif newvalue in self.history[cpath]:
-                        self.history[cpath].remove(newvalue)
-                    self.history[cpath].insert(0, newvalue)
-        # TODO: Add special code for paths, hgmerge extensions
+                self.record_new_value(cpath, newvalue)
+
         self.save_history(self.history)
         try:
             f = open(self.fn, "w")
