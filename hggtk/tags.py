@@ -56,7 +56,6 @@ class TagsDialog(gtk.Dialog):
         title = "hg tags "
         if root: title += " - %s" % root
         self.set_title(title)
-        self.connect('response', gtk.main_quit)
 
         # build dialog
         self.set_default_size(500, 300)
@@ -102,6 +101,11 @@ class TagsDialog(gtk.Dialog):
 
 def run(root='', **opts):
     dialog = TagsDialog(root=root)
+    
+    # the dialog maybe called by another window/dialog, so we only
+    # enable the close dialog handler if dialog is run as mainapp
+    dialog.connect('response', gtk.main_quit)
+
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
