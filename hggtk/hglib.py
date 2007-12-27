@@ -136,7 +136,11 @@ class HgThread(threading.Thread):
         savedui = ui.ui
         ui.ui = GtkUi
         try:
-            dispatch._dispatch(self.ui, self.args)
+            ret = dispatch._dispatch(self.ui, self.args)
+            if ret:
+                self.ui.write('command returned error code %d.\n' % int(ret))
+            else:
+                self.ui.write('command completed successfully.\n')
         except hg.RepoError, e:
             self.ui.write(e)
         except util.Abort, e:
