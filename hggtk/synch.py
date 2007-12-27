@@ -66,6 +66,15 @@ class SynchDialog(gtk.Dialog):
                                  'push',
                                  self._push_clicked,
                                  self._push_menu()),
+                self._toolbutton(gtk.STOCK_GOTO_LAST,
+                                 'email',
+                                 self._email_clicked,
+                                 self._email_menu()),
+                gtk.SeparatorToolItem(),
+                self._toolbutton(gtk.STOCK_PREFERENCES,
+                                 'configure',
+                                 self._conf_clicked,
+                                 self._conf_menu()),
                 gtk.SeparatorToolItem(),
             ]
         for btn in tbuttons:
@@ -79,8 +88,8 @@ class SynchDialog(gtk.Dialog):
         lbl.connect('clicked', self._btn_remotepath_clicked)
         
         # revisions  combo box
-        revlist = gtk.ListStore(str)
-        self._pathbox = gtk.ComboBoxEntry(revlist, 0)
+        self.revlist = gtk.ListStore(str)
+        self._pathbox = gtk.ComboBoxEntry(self.revlist, 0)
         self._pathtext = self._pathbox.get_child()
         
         self.paths = self._get_paths()
@@ -93,7 +102,7 @@ class SynchDialog(gtk.Dialog):
                     defpushrow = row
             elif name == 'default-push':
                 defpushrow = row
-            revlist.append([path])
+            self.revlist.append([path])
 
         if repos:
             self._pathtext.set_text(repos[0])
@@ -175,6 +184,12 @@ class SynchDialog(gtk.Dialog):
         menu.show_all()
         return menu
         
+    def _email_menu(self):
+        return None
+
+    def _conf_menu(self):
+        return None
+
     def _get_paths(self):
         """ retrieve repo revisions """
         try:
@@ -237,6 +252,30 @@ class SynchDialog(gtk.Dialog):
             cmd.append('--force')
         self._exec_cmd(cmd)
         
+    def _conf_clicked(self, toolbutton, data=None):
+        from thgconfig import ConfigDialog
+        dlg = ConfigDialog(self.root, True, 'paths.default')
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.paths = self._get_paths()
+        self.revlist.clear()
+        for row, (name, path) in enumerate(self.paths):
+            self.revlist.append([path])
+
+    def _email_clicked(self, toolbutton, data=None):
+        path = self._pathtext.get_text()
+        if not path:
+            info_dialog('No repository selected',
+                    'Select a peer repository to compare with')
+            self._pathbox.grab_focus()
+            return
+        from hgemail import EmailDialog
+        dlg = EmailDialog(self.root, ['--outgoing', path])
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+
     def _incoming_clicked(self, toolbutton, data=None):
         cmd = ['incoming']
         if self._incoming_show_patch.get_active():
