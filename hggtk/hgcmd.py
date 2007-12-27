@@ -40,7 +40,6 @@ class CmdDialog(gtk.Dialog):
         self.textview.set_editable(False)
         self.textview.modify_font(pango.FontDescription("Monospace"))
         scrolledwindow.add(self.textview)
-        self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
         
         self.vbox.pack_start(scrolledwindow, True, True)
