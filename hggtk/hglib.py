@@ -97,7 +97,10 @@ class GtkUi(ui.ui):
         '''generic PyGtk prompt dialog'''
         try:
             # Show text entry dialog with msg prompt
+            gtk.gdk.threads_enter()
             r = entry_dialog(msg, default=default)
+            gtk.gdk.flush()
+            gtk.gdk.threads_leave()
             if not pat or re.match(pat, r, matchflags):
                 return r
             else:
@@ -107,8 +110,12 @@ class GtkUi(ui.ui):
 
     def getpass(self, prompt=None, default=None):
         '''generic PyGtk password prompt dialog'''
-        return entry_dialog(prompt or _('password: '),
-                visible=False, default=default)
+        gtk.gdk.threads_enter()
+        p = entry_dialog(prompt or _('password: '), visible=False,
+                default=default)
+        gtk.gdk.flush()
+        gtk.gdk.threads_leave()
+        return p
 
     def print_exc(self):
         traceback.print_exc()
