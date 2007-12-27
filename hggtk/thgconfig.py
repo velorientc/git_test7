@@ -30,7 +30,7 @@ class ConfigDialog(gtk.Dialog):
             repo = None
             if configrepo:
                 error_dialog('No repository found', 'no repo at ' + root)
-                gtk.main_quit()
+                self.response(gtk.RESPONSE_CANCEL)
 
         if configrepo:
             self.ui = repo.ui
