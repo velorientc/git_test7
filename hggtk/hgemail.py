@@ -11,6 +11,7 @@ import gtk
 import pango
 import shelve
 import shlib
+from tempfile import mkstemp
 from dialog import *
 from mercurial import hg, ui
 from thgconfig import ConfigDialog
@@ -87,7 +88,7 @@ class EmailDialog(gtk.Dialog):
         vbox.pack_start(self._bundle, True, True, 4)
 
         self.descview = gtk.TextView(buffer=None)
-        self.descview.set_editable(False)
+        self.descview.set_editable(True)
         self.descview.modify_font(pango.FontDescription("Monospace"))
         self.descbuffer = self.descview.get_buffer()
         scrolledwindow = gtk.ScrolledWindow()
@@ -186,17 +187,28 @@ class EmailDialog(gtk.Dialog):
         record_new_value('email.from', history, fromtext)
         shlib.save_history(history)
 
-        cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
+        cmdline = ['hg', 'email', '--noninteractive',
+                '-f', fromtext, '-t', totext, '-c', cctext]
         if self._bundle.get_active():   cmdline += ['--bundle']
         elif self._plain.get_active():  cmdline += ['--plain']
         elif self._git.get_active():    cmdline += ['--git']
+        start = self.descbuffer.get_start_iter()
+        end = self.descbuffer.get_end_iter()
+        desc = self.descbuffer.get_text(start, end)
+        if desc:
+            fd, tmpfile = mkstemp(prefix="thg_emaildesc_")
+            os.write(fd, desc)
+            os.close(fd)
+            cmdline += ['--desc', tmpfile]
+        else:
+            tmpfile = None
         cmdline.extend(self.revargs)
-        print 'cmdline =', cmdline
-        # TODO: --subject and --desc
+
         dlg = CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
         dlg.hide()
+        if tmpfile: os.unlink(tmpfile)
 
 def run(root='', **opts):
     # In most use cases, this dialog will be launched by other
