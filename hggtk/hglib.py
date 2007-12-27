@@ -76,7 +76,6 @@ class GtkUi(ui.ui):
         super(GtkUi, self).__init__(verbose, debug, quiet, interactive,
                 traceback, report_untrusted, parentui)
         # Override a few settings
-        self.interactive = True
         self.verbose = True
 
     def isatty(self):
@@ -119,6 +118,7 @@ class HgThread(threading.Thread):
     def __init__(self, args = []):
         self.ui = GtkUi()
         self.args = args
+        self.ret = None
         threading.Thread.__init__(self)
 
     def command(self, cmd, files=[], options={}):
@@ -131,16 +131,28 @@ class HgThread(threading.Thread):
     def getqueue(self):
         return GtkUi.queue
 
+    def return_code(self):
+        '''
+        None - command is incomplete, possibly exited with exception
+        0    - command returned successfully
+               else an error was returned
+        '''
+        return self.ret
+
     def run(self):
         # Monkey patch our GUI ui subclass into place
-        savedui = ui.ui
-        ui.ui = GtkUi
+        if not hasattr(ui.ui, 'queue'):
+            savedui = ui.ui
+            ui.ui = GtkUi
+        else:
+            savedui = None
         try:
             ret = dispatch._dispatch(self.ui, self.args)
             if ret:
                 self.ui.write('command returned error code %d.\n' % int(ret))
             else:
                 self.ui.write('command completed successfully.\n')
+            self.ret = ret or 0
         except hg.RepoError, e:
             self.ui.write(e)
         except util.Abort, e:
@@ -152,4 +164,5 @@ class HgThread(threading.Thread):
             self.ui.print_exc()
         finally:
             # Undo monkey patch
-            ui.ui = savedui
+            if savedui:
+                ui.ui = savedui
