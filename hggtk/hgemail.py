@@ -39,7 +39,7 @@ class EmailDialog(gtk.Dialog):
         # set dialog title
         title = "Email Mercurial Patches"
         self.set_title(title)
-        self.set_default_size(620, 400)
+        self.set_default_size(630, 190)
 
         hbox = gtk.HBox()
         envframe = gtk.Frame('Envelope')
@@ -94,7 +94,7 @@ class EmailDialog(gtk.Dialog):
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.descview)
-        frame = gtk.Frame('Patch (list) Description')
+        frame = gtk.Frame('Patch Series Description')
         frame.set_border_width(4)
         frame.add(scrolledwindow)
         self.vbox.pack_start(frame, True, True, 4)
@@ -181,6 +181,18 @@ class EmailDialog(gtk.Dialog):
                 self._refresh()
                 return
 
+        '''
+        editor = self.repo.ui.geteditor()
+        if editor in ('vi', 'vim'):
+            info_dialog('Info required', 'Please configure a visual editor')
+            dlg = ConfigDialog(self.root, False, 'ui.editor')
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
+            self._refresh()
+            return
+        '''
+
         history = shlib.read_history()
         record_new_value('email.to', history, totext)
         record_new_value('email.cc', history, cctext)
@@ -194,20 +206,19 @@ class EmailDialog(gtk.Dialog):
         start = self.descbuffer.get_start_iter()
         end = self.descbuffer.get_end_iter()
         desc = self.descbuffer.get_text(start, end)
-        if desc:
+        try:
             fd, tmpfile = mkstemp(prefix="thg_emaildesc_")
             os.write(fd, desc)
             os.close(fd)
             cmdline += ['--desc', tmpfile]
-        else:
-            tmpfile = None
-        cmdline.extend(self.revargs)
+            cmdline.extend(self.revargs)
 
-        dlg = CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        if tmpfile: os.unlink(tmpfile)
+            dlg = CmdDialog(cmdline)
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
+        finally:
+            os.unlink(tmpfile)
 
 def run(root='', **opts):
     # In most use cases, this dialog will be launched by other
