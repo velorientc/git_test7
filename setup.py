@@ -82,8 +82,14 @@ opts = {
    }
 }
 
+# specify version string, otherwise 'hg identify' will be used:
+version = ''
+
+import tortoise.version
+tortoise.version.remember_version(version)
+
 setup(name="TortoiseHg",
-        version='0.1',
+        version=tortoise.version.get_version(),
         author='TK Soh',
         author_email='teekaysoh@gmail.com',
         url='http://tortoisehg.sourceforge.net',
