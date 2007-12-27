@@ -11,7 +11,7 @@ import os
 import pango
 from mercurial import hg, ui, cmdutil, util
 from dialog import error_dialog, question_dialog
-from shlib import set_tortoise_icon
+import shlib
 import shelve
 import iniparse
 
@@ -40,7 +40,7 @@ class ConfigDialog(gtk.Dialog):
             self.rcpath = util.user_rcpath()
             self.set_title('TortoiseHg Configure User-Global Settings')
 
-        #set_tortoise_icon(self, 'menurepobrowse.ico')
+        #shlib.set_tortoise_icon(self, 'menurepobrowse.ico')
         self.ini = self.load_config(self.rcpath)
 
         # Create a new notebook, place the position of the tabs
@@ -56,7 +56,7 @@ class ConfigDialog(gtk.Dialog):
         self.action_area.pack_end(self._btn_apply)
 
         self.pages = []
-        self.history = self.load_history()
+        self.history = shlib.read_history()
 
         # create pages for each section of configuration file
         self._tortoise_info = (
@@ -410,7 +410,7 @@ tool it finds on your system'''),)
 
     def _apply_clicked(self, *args):
         # Reload history, since it may have been modified externally
-        self.history = self.load_history()
+        self.history = shlib.read_history()
 
         # flush changes on paths page
         if len(self.pathlist):
@@ -434,7 +434,7 @@ tool it finds on your system'''),)
                 newvalue = widgets[w].get_child().get_text()
                 self.record_new_value(cpath, newvalue)
 
-        self.save_history(self.history)
+        shlib.save_history(self.history)
         try:
             f = open(self.fn, "w")
             f.write(str(self.ini))
@@ -443,23 +443,6 @@ tool it finds on your system'''),)
             error_dialog('Unable to write back configuration file', str(e))
         return 0
 
-    def load_history(self):
-        path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
-        if not os.path.exists(os.path.dirname(path)):
-            os.makedirs(os.path.dirname(path))
-        dbase = shelve.open(path)
-        history = dbase.get('config_history', {})
-        dbase.close()
-        return history
-
-    def save_history(self, history):
-        path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
-        if not os.path.exists(os.path.dirname(path)):
-            os.makedirs(os.path.dirname(path))
-        dbase = shelve.open(path)
-        dbase['config_history'] = history
-        dbase.close()
-    
 def run(root='', cmdline=[], **opts):
     if '--focusfield' in cmdline:
         field = cmdline[cmdline.index('--focusfield')+1]

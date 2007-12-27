@@ -8,6 +8,24 @@ of the GNU General Public License, incorporated herein by reference.
 """
 
 import os
+import shelve
+
+def read_history(key='config_history'):
+    path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
+    dbase = shelve.open(path)
+    dict = dbase.get(key, {})
+    dbase.close()
+    return dict
+
+def save_history(dict, key='config_history'):
+    path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
+    dbase = shelve.open(path)
+    dbase[key] = dict
+    dbase.close()
 
 def set_tortoise_icon(window, icon):
     '''Find a tortoise icon, apply to PyGtk window'''
