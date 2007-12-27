@@ -227,7 +227,7 @@ class GLog(GDialog):
                     show_date = util.strdate(util.tolocal(log['date']),
                             '%a %b %d %H:%M:%S %Y', {})[0]
                     self.model.append((is_parent, is_head, 
-                                       log['rev'],
+                                       long(log['rev']),
                                        log['tag'], log['user'],
                                        log['summary'], log['date'],
                                        show_date,
@@ -354,7 +354,7 @@ class GLog(GDialog):
         self._menu.append(menuitem)
         self._menu.show_all()
 
-        self.model = gtk.ListStore(str, str, str, str, str, str, str, long, object)
+        self.model = gtk.ListStore(str, str, long, str, str, str, str, long, object)
         self.model.set_default_sort_func(self._sort_by_rev)
 
         self.tree = gtk.TreeView(self.model)
@@ -539,7 +539,7 @@ class GLog(GDialog):
         ''' Update the details text '''
         if selection.count_selected_rows() == 0:
             return False
-        rev = [self.model[selection.get_selected()[1]][2]]
+        rev = [str(x) for x in [self.model[selection.get_selected()[1]][2]]]
         if rev != self._last_rev:
             self._last_rev = rev
             parents = self.model[selection.get_selected()[1]][8]
