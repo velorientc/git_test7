@@ -17,6 +17,7 @@ from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
+from shlib import set_tortoise_icon
 
 class CloneDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
@@ -26,6 +27,7 @@ class CloneDialog(gtk.Dialog):
         super(CloneDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
 
+        set_tortoise_icon(self, 'menuclone.ico')
         if cwd: os.chdir(cwd)
         
         # set dialog title

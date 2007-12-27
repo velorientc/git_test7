@@ -90,6 +90,8 @@ class GStatus(GDialog):
     def get_title(self):
         return os.path.basename(self.repo.root) + ' status ' + ':'.join(self.opts['rev'])  + ' ' + ' '.join(self.pats)
 
+    def get_icon(self):
+        return 'menushowchanged.ico'
 
     def get_defsize(self):
         return self._setting_defsize
@@ -587,7 +589,7 @@ class GStatus(GDialog):
             return
 
         # Create new opts,  so nothing unintented gets through.
-        revertopts = self.merge_opts(commands.table['^revert'][1], ('include', 'exclude', 'rev'))
+        revertopts = self.merge_opts(commands.table['revert'][1], ('include', 'exclude', 'rev'))
         def dohgrevert():
             commands.revert(self.ui, self.repo, *files, **revertopts)
 

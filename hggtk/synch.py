@@ -21,6 +21,7 @@ from mercurial import hg, ui, util
 from mercurial.node import *
 from dialog import error_dialog
 from hglib import HgThread
+from shlib import set_tortoise_icon
 
 class SynchDialog(gtk.Dialog):
     def __init__(self, cwd='', root = '', repos=[]):
@@ -30,6 +31,8 @@ class SynchDialog(gtk.Dialog):
                                   parent=None,
                                   flags=0,
                                   buttons=())
+
+        set_tortoise_icon(self, 'menusynch.ico')
         self.root = root
         self.selected_path = None
 

@@ -12,6 +12,7 @@ import gtk
 from dialog import *
 from mercurial.node import *
 from mercurial import util, hg, ui
+from shlib import set_tortoise_icon
 
 class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
@@ -21,6 +22,7 @@ class MergeDialog(gtk.Dialog):
         super(MergeDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                           buttons=buttons)
 
+        set_tortoise_icon(self, 'menumerge.ico')
         # set dialog title
         title = "hg merge"
         if root: title += " - %s" % root

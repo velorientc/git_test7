@@ -18,6 +18,7 @@ from mercurial.i18n import _
 from mercurial.node import *
 from dialog import error_dialog, question_dialog
 from revtree import RevisionTree
+from shlib import set_tortoise_icon
 
 class RevisionDialog(gtk.Dialog):
     def __init__(self, root=''):
@@ -27,6 +28,7 @@ class RevisionDialog(gtk.Dialog):
                                   flags=0,
                                   buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
+        set_tortoise_icon(self, 'menurepobrowse.ico')
         self.root = root
         self.connect('response', gtk.main_quit)
 

@@ -26,6 +26,7 @@ from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
+from shlib import set_tortoise_icon
 
 class ServeDialog(gtk.Dialog):
     """ Dialog to run web server"""
@@ -33,6 +34,7 @@ class ServeDialog(gtk.Dialog):
         """ Initialize the Dialog """
         super(ServeDialog, self).__init__(flags=gtk.DIALOG_MODAL)
 
+        set_tortoise_icon(self, 'proxy.ico')
         self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
         self.connect('delete-event', self._delete)
@@ -48,6 +50,13 @@ class ServeDialog(gtk.Dialog):
         self._hgpath = hgpath
         if cwd: os.chdir(cwd)
         
+        try:
+            self.repo = hg.repository(ui.ui(), path=root)
+            self.defport = self.repo.ui.config('web', 'port') or '8000'
+        except hg.RepoError:
+            self.repo = None
+            self.defport = '8000'
+
         # set dialog title
         title = "hg serve"
         title += " - %s" % (os.getcwd())
@@ -70,12 +79,17 @@ class ServeDialog(gtk.Dialog):
                                               'Browse',
                                               self._on_browse_clicked,
                                               None)
+        self._button_conf = self._toolbutton(gtk.STOCK_PREFERENCES,
+                                              'Configure',
+                                              self._on_conf_clicked,
+                                              None)
         tbuttons = [
                 self._button_start,
                 gtk.SeparatorToolItem(),
                 self._button_stop,
                 gtk.SeparatorToolItem(),
                 self._button_browse,
+                self._button_conf,
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -87,7 +101,7 @@ class ServeDialog(gtk.Dialog):
         lbl.set_property("width-chars", 16)
         lbl.set_alignment(0, 0.5)
         self._port_input = gtk.Entry()
-        self._port_input.set_text("8000")
+        self._port_input.set_text(self.defport)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._port_input, False, False)
         self.vbox.pack_start(revbox, False, False, 2)
@@ -148,10 +162,12 @@ class ServeDialog(gtk.Dialog):
             self._button_start.set_sensitive(False)
             self._button_stop.set_sensitive(True)
             self._button_browse.set_sensitive(True)
+            self._button_conf.set_sensitive(False)
         else:
             self._button_start.set_sensitive(True)
             self._button_stop.set_sensitive(False)
             self._button_browse.set_sensitive(False)
+            self._button_conf.set_sensitive(True)
             
     def _on_start_clicked(self, *args):
         self._start_server()
@@ -176,13 +192,23 @@ class ServeDialog(gtk.Dialog):
                     os.system(browser % self._url)
             threading.Thread(target=start_browser).start()
     
+    def _on_conf_clicked(self, *args):
+        if self.repo is None: return
+        from thgconfig import ConfigDialog
+        dlg = ConfigDialog(self.repo.root, True, 'web.name')
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+
     def _start_server(self):
         # gather input data
         try:
             port = int(self._port_input.get_text())
         except:
-            error_dialog("Invalid port 2048..65535", "Defaulting to 8000")
-            port = None
+            try: port = int(self.defport)
+            except: port = '8000'
+            error_dialog("Invalid port 2048..65535", "Defaulting to " +
+                    self.defport)
         
         # start server
         (fd, filename) = mkstemp()
@@ -190,9 +216,8 @@ class ServeDialog(gtk.Dialog):
         if self._root:
             self.cmdline.append('--repository')
             self.cmdline.append(self._root)
-        if port:
-            self.cmdline.append('--port')
-            self.cmdline.append(str(port))
+        self.cmdline.append('--port')
+        self.cmdline.append(str(port))
 
         # run hg in unbuffered mode, so the output can be captured and
         # display a.s.a.p.
