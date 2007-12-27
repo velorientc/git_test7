@@ -397,11 +397,13 @@ class GDialog(gtk.Window):
 
 class NativeSaveFileDialogWrapper:
     """Wrap the windows file dialog, or display default gtk dialog if that isn't available"""
-    def __init__(self, InitialDir = None, Title = "Save File", Filter = {"All files": "*.*"}, FilterIndex = 1):
+    def __init__(self, InitialDir = None, Title = "Save File", 
+                 Filter = {"All files": "*.*"}, FilterIndex = 1, FileName = ''):
         import os.path
         if InitialDir == None:
             InitialDir = os.path.expanduser("~")
         self.InitialDir = InitialDir
+        self.FileName = FileName
         self.Title = Title
         self.Filter = Filter
         self.FilterIndex = FilterIndex
@@ -438,7 +440,8 @@ class NativeSaveFileDialogWrapper:
         fname, customfilter, flags=win32gui.GetSaveFileNameW(
             InitialDir=self.InitialDir,
             Flags=win32con.OFN_EXPLORER,
-            File='', DefExt='py',
+            File=self.FileName, 
+            DefExt='py',
             Title=self.Title,
             Filter="",
             CustomFilter="",
@@ -457,6 +460,7 @@ class NativeSaveFileDialogWrapper:
                     , gtk.RESPONSE_OK))
         file_save.set_default_response(gtk.RESPONSE_OK)
         file_save.set_current_folder(self.InitialDir)
+        file_save.set_current_name(self.FileName)
         for name, pattern in self.Filter.items():
             fi = gtk.FileFilter()
             fi.set_name(name)
