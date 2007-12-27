@@ -187,8 +187,7 @@ class EmailDialog(gtk.Dialog):
         record_new_value('email.from', history, fromtext)
         shlib.save_history(history)
 
-        cmdline = ['hg', 'email', '--noninteractive',
-                '-f', fromtext, '-t', totext, '-c', cctext]
+        cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
         if self._bundle.get_active():   cmdline += ['--bundle']
         elif self._plain.get_active():  cmdline += ['--plain']
         elif self._git.get_active():    cmdline += ['--git']
