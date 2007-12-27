@@ -1,5 +1,5 @@
 #
-# email.py - TortoiseHg's dialog for sending patches via email
+# hgemail.py - TortoiseHg's dialog for sending patches via email
 #
 # Copyright (C) 2007 Steve Borho <steve@borho.org>
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
@@ -9,9 +9,12 @@ import os
 import sys
 import gtk
 import pango
+import shelve
+import shlib
 from dialog import *
-from shlib import set_tortoise_icon
-from hglib import HgThread
+from mercurial import hg, ui
+from thgconfig import ConfigDialog
+from hgcmd import CmdDialog
 
 class EmailDialog(gtk.Dialog):
     """ Send patches or bundles via email """
@@ -20,7 +23,7 @@ class EmailDialog(gtk.Dialog):
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(EmailDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
-        #set_tortoise_icon(self, 'menucheckout.ico')
+        #shlib.set_tortoise_icon(self, 'menucheckout.ico')
         self.root = root
         self.revargs = revargs
         
@@ -49,7 +52,7 @@ class EmailDialog(gtk.Dialog):
 
         # To: combo box
         hbox = gtk.HBox()
-        self._tolist = gtk.ListStore(str, str)
+        self._tolist = gtk.ListStore(str)
         self._tobox = gtk.ComboBoxEntry(self._tolist, 0)
         hbox.pack_start(gtk.Label('To:'), False, False, 4)
         hbox.pack_start(self._tobox, True, True, 4)
@@ -57,7 +60,7 @@ class EmailDialog(gtk.Dialog):
 
         # Cc: combo box
         hbox = gtk.HBox()
-        self._cclist = gtk.ListStore(str, str)
+        self._cclist = gtk.ListStore(str)
         self._ccbox = gtk.ComboBoxEntry(self._cclist, 0)
         hbox.pack_start(gtk.Label('Cc:'), False, False, 4)
         hbox.pack_start(self._ccbox, True, True, 4)
@@ -65,7 +68,7 @@ class EmailDialog(gtk.Dialog):
 
         # From: combo box
         hbox = gtk.HBox()
-        self._fromlist = gtk.ListStore(str, str)
+        self._fromlist = gtk.ListStore(str)
         self._frombox = gtk.ComboBoxEntry(self._fromlist, 0)
         hbox.pack_start(gtk.Label('From:'), False, False, 4)
         hbox.pack_start(self._frombox, True, True, 4)
@@ -94,26 +97,107 @@ class EmailDialog(gtk.Dialog):
         frame.set_border_width(4)
         frame.add(scrolledwindow)
         self.vbox.pack_start(frame, True, True, 4)
+        self.connect('map_event', self._on_window_map_event)
+
+    def _on_window_map_event(self, event, param):
         self._refresh()
 
     def _refresh(self):
-        # TODO: Allocate a repo object, load dialog from current
-        # configuration.  Check for -b, -p, -g in defaults.email
-        pass
+        def fill_history(history, vlist, cpath):
+            vlist.clear()
+            if cpath not in history:
+                return
+            for v in history[cpath]:
+                vlist.append([v])
+
+        history = shlib.read_history()
+        try:
+            repo = hg.repository(ui.ui(), path=self.root)
+            self.repo = repo
+        except hg.RepoError:
+            self.repo = None
+            return
+
+        if repo.ui.config('extensions', 'patchbomb') is not None:
+            pass
+        elif repo.ui.config('extensions', 'hgext.patchbomb') is not None:
+            pass
+        else:
+            error_dialog('Email not enabled',
+                    'You must enable the patchbomb extension to use this tool')
+            self.response(gtk.RESPONSE_CANCEL)
+
+        self._tobox.get_child().set_text(repo.ui.config('email', 'to', ''))
+        self._ccbox.get_child().set_text(repo.ui.config('email', 'cc', ''))
+        self._frombox.get_child().set_text(repo.ui.config('email', 'from', ''))
+        fill_history(history, self._tolist, 'email.to')
+        fill_history(history, self._cclist, 'email.cc')
+        fill_history(history, self._fromlist, 'email.from')
+
+        # See if user has set flags in defaults.email
+        defaults = repo.ui.config('defaults', 'email', '').split()
+        if '-g' in defaults:      self._git.set_active(True)
+        if '-b' in defaults:      self._bundle.set_active(True)
+        if '--plain' in defaults: self._plain.set_active(True)
 
     def _on_conf_clicked(self, button):
-        from thgconfig import ConfigDialog
         dlg = ConfigDialog(self.root, False, 'email.from')
         dlg.show_all()
         dlg.run()
         dlg.hide()
+        self._refresh()
 
     def _on_send_clicked(self, button):
-        # TODO: check for prerequisites, launch config dialog if no
-        # method or SMTP host is configured
-        # run hgcmd or return command line to caller?
-        pass
-        
+        def record_new_value(cpath, history, newvalue):
+            if cpath not in history:
+                history[cpath] = []
+            elif newvalue in history[cpath]:
+                history[cpath].remove(newvalue)
+            history[cpath].insert(0, newvalue)
+
+        totext = self._tobox.get_child().get_text()
+        cctext = self._ccbox.get_child().get_text()
+        fromtext = self._frombox.get_child().get_text()
+
+        if not totext:
+            info_dialog('Info required', 'You must specify a recipient')
+            self._tobox.grab_focus()
+            return
+        if not fromtext:
+            info_dialog('Info required', 'You must specify a sender address')
+            self._frombox.grab_focus()
+            return
+        if not self.repo:
+            return
+
+        if self.repo.ui.config('email', 'method', 'smtp') == 'smtp':
+            if not self.repo.ui.config('smtp', 'host'):
+                info_dialog('Info required', 'You must configure SMTP')
+                dlg = ConfigDialog(self.root, False, 'smtp.host')
+                dlg.show_all()
+                dlg.run()
+                dlg.hide()
+                self._refresh()
+                return
+
+        history = shlib.read_history()
+        record_new_value('email.to', history, totext)
+        record_new_value('email.cc', history, cctext)
+        record_new_value('email.from', history, fromtext)
+        shlib.save_history(history)
+
+        cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
+        if self._bundle.get_active():   cmdline += ['--bundle']
+        elif self._plain.get_active():  cmdline += ['--plain']
+        elif self._git.get_active():    cmdline += ['--git']
+        cmdline.extend(self.revargs)
+        print 'cmdline =', cmdline
+        # TODO: --subject and --desc
+        dlg = CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+
 def run(root='', **opts):
     # In most use cases, this dialog will be launched by other
     # hggtk tools like glog and synch.  It's not expected to be
