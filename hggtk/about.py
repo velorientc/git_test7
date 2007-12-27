@@ -56,7 +56,7 @@ class AboutDialog(gtk.AboutDialog):
                 "GTK-%s" % make_version(gtk.gtk_version),
             ])
         
-        comment = "Sevaral icons are courtesy of the TortoiseSVN project"
+        comment = "Several icons are courtesy of the TortoiseSVN project"
 
         self.set_website("http://tortoisehg.sourceforge.net/")
         self.set_name("TortoiseHg")
