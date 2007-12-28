@@ -80,6 +80,9 @@ class HgExtension(nautilus.MenuProvider,
         terminal = self.client.get_string(TERMINAL_KEY)
         os.system('%s &' % terminal)
 
+    def _about_cb(self, window, vfs_file):
+        self._run_dialog('about', [vfs_file])
+
     def _add_cb(self, window, vfs_files):
         self._run_dialog('add', vfs_files)
 
@@ -212,6 +215,12 @@ class HgExtension(nautilus.MenuProvider,
                                  self.icon('menuclone.ico'))
             item.connect('activate', self._clone_cb, vfs_file)
             items.append(item)
+            item = nautilus.MenuItem('HgNautilus::about',
+                                 'About TortoiseHg',
+                                 'Information about TortoiseHg installation',
+                                 self.icon('menuabout.ico'))
+            item.connect('activate', self._about_cb, vfs_file)
+            items.append(item)
             item = nautilus.MenuItem('HgNautilus::terminal',
                                  'Open Terminal Here',
                                  'Open terminal in current directory')
@@ -287,10 +296,18 @@ class HgExtension(nautilus.MenuProvider,
                              'Configure Mercurial settings for this repo')
         item.connect('activate', self._thgconfig_repo_cb, vfs_file)
         items.append(item)
+
         item = nautilus.MenuItem('HgNautilus::userconfig',
                              'User-Global Settings',
                              'Configure global Mercurial settings')
         item.connect('activate', self._thgconfig_user_cb, vfs_file)
+        items.append(item)
+
+        item = nautilus.MenuItem('HgNautilus::about',
+                             'About TortoiseHg',
+                             'Information about TortoiseHg installation',
+                             self.icon('menuabout.ico'))
+        item.connect('activate', self._about_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('HgNautilus::terminal',
@@ -326,6 +343,12 @@ class HgExtension(nautilus.MenuProvider,
                                  'Create Clone in %s' % name,
                                  self.icon('menuclone.ico'))
             item.connect('activate', self._clone_cb, vfs_file)
+            items.append(item)
+            item = nautilus.MenuItem('HgNautilus::about',
+                                 'About TortoiseHg',
+                                 'Information about TortoiseHg installation',
+                                 self.icon('menuabout.ico'))
+            item.connect('activate', self._about_cb, vfs_file)
             items.append(item)
             item = nautilus.MenuItem('HgNautilus::terminal',
                                  'Open Terminal Here',
