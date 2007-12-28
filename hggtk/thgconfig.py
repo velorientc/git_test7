@@ -32,6 +32,10 @@ class ConfigDialog(gtk.Dialog):
                 error_dialog('No repository found', 'no repo at ' + root)
                 self.response(gtk.RESPONSE_CANCEL)
 
+        # Catch close events
+        self.connect('delete-event', self._delete)
+        self.connect('response', self._response)
+
         if configrepo:
             self.ui = repo.ui
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
@@ -55,6 +59,7 @@ class ConfigDialog(gtk.Dialog):
         self._btn_apply.connect('clicked', self._apply_clicked)
         self.action_area.pack_end(self._btn_apply)
 
+        self.dirty = False
         self.pages = []
         self.tooltips = gtk.Tooltips()
         self.history = shlib.read_history()
@@ -121,13 +126,13 @@ class ConfigDialog(gtk.Dialog):
         self._delpathbutton.connect('clicked', self._remove_path)
         buttonbox.pack_start(self._delpathbutton)
 
-        self._testpathbutton = gtk.Button("Test")
-        self._testpathbutton.connect('clicked', self._test_path)
-        buttonbox.pack_start(self._testpathbutton)
-
         self._refreshpathbutton = gtk.Button("Refresh")
         self._refreshpathbutton.connect('clicked', self._refresh_path)
         buttonbox.pack_start(self._refreshpathbutton)
+
+        self._testpathbutton = gtk.Button("Test")
+        self._testpathbutton.connect('clicked', self._test_path)
+        buttonbox.pack_start(self._testpathbutton)
 
         hbox = gtk.HBox()
         self._pathnameedit = gtk.Entry()
@@ -241,6 +246,24 @@ class ConfigDialog(gtk.Dialog):
                         self.notebook.set_current_page(page_num)
                         widgets[w].grab_focus()
 
+        # Force dialog into clean state in the beginning
+        self._btn_apply.set_sensitive(False)
+        self.dirty = False
+
+    def _delete(self, widget, event):
+        return True
+
+    def _response(self, widget, response_id):
+        if self.dirty:
+            if question_dialog('Quit without saving?',
+                'Yes to lose changes, No to continue') != gtk.RESPONSE_YES:
+                widget.emit_stop_by_name('response')
+
+    def dirty_event(self, *args):
+        if not self.dirty:
+            self._btn_apply.set_sensitive(True)
+            self.dirty = True
+
     def _add_path(self, *args):
         if len(self.pathlist):
             self.pathlist.append(self.pathlist[self.curpathrow])
@@ -249,12 +272,14 @@ class ConfigDialog(gtk.Dialog):
         self.curpathrow = len(self.pathlist)-1
         self.refresh_path_list()
         self._pathnameedit.grab_focus()
+        self.dirty_event()
 
     def _remove_path(self, *args):
         del self.pathlist[self.curpathrow]
         if self.curpathrow > len(self.pathlist)-1:
             self.curpathrow = len(self.pathlist)-1
         self.refresh_path_list()
+        self.dirty_event()
 
     def _test_path(self, *args):
         testpath = self._pathpathedit.get_text()
@@ -272,6 +297,7 @@ class ConfigDialog(gtk.Dialog):
         self.pathlist[self.curpathrow] = (self._pathnameedit.get_text(),
                 self._pathpathedit.get_text())
         self.refresh_path_list()
+        self.dirty_event()
 
     def _pathlist_rowchanged(self, sel):
         model, iter = sel.get_selected()
@@ -318,6 +344,7 @@ class ConfigDialog(gtk.Dialog):
         for label, cpath, values, tooltip in info:
             vlist = gtk.ListStore(str)
             combo = gtk.ComboBoxEntry(vlist, 0)
+            combo.connect("changed", self.dirty_event)
             widgets.append(combo)
 
             # Get currently configured value from this config file
@@ -345,7 +372,7 @@ class ConfigDialog(gtk.Dialog):
             if curvalue is None:
                 combo.set_active(0)
             elif currow is None:
-                combo.get_child().set_text(curvalue)
+                combo.child.set_text(curvalue)
             else:
                 combo.set_active(currow)
 
@@ -433,7 +460,7 @@ class ConfigDialog(gtk.Dialog):
         # Flush changes on all pages
         for vbox, info, widgets in self.pages:
             for w, (label, cpath, values, tip) in enumerate(info):
-                newvalue = widgets[w].get_child().get_text()
+                newvalue = widgets[w].child.get_text()
                 self.record_new_value(cpath, newvalue)
 
         shlib.save_history(self.history)
@@ -443,6 +470,9 @@ class ConfigDialog(gtk.Dialog):
             f.close()
         except IOError, e:
             error_dialog('Unable to write back configuration file', str(e))
+
+        self._btn_apply.set_sensitive(False)
+        self.dirty = False
         return 0
 
 def run(root='', cmdline=[], **opts):
