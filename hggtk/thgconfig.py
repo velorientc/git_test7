@@ -99,16 +99,18 @@ destination is specified.'''))
         column = gtk.TreeViewColumn('Peer Repository Paths',
                 gtk.CellRendererText(), text=2)
         self.pathtree.append_column(column) 
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add(self.pathtree)
+        vbox.add(scrolledwindow)
 
         self.pathlist = []
         if 'paths' in list(self.ini):
             for name in self.ini['paths']:
                 if name in ('default', 'default-push'): continue
                 self.pathlist.append((name, self.ini['paths'][name]))
-        vbox.add(self.pathtree)
         self.curpathrow = 0
 
-        # TODO add scrollable window to tree view
         buttonbox = gtk.HBox()
         self.addButton = gtk.Button("Add")
         self.addButton.connect('clicked', self._add_path)
