@@ -200,7 +200,11 @@ class EmailDialog(gtk.Dialog):
         shlib.save_history(history)
 
         cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
-        if self._bundle.get_active():   cmdline += ['--bundle']
+        cmdline += ['--repository', self.repo.root]
+        if self._bundle.get_active():
+            cmdline += ['--bundle']
+            if '--outgoing' in self.revargs:
+                self.revargs.remove('--outgoing')
         elif self._plain.get_active():  cmdline += ['--plain']
         elif self._git.get_active():    cmdline += ['--git']
         start = self.descbuffer.get_start_iter()
