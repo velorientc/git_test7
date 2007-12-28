@@ -174,10 +174,20 @@ class EmailDialog(gtk.Dialog):
         fill_history(history, self._fromlist, 'email.from')
 
         # See if user has set flags in defaults.email
+        self._git.set_sensitive(True)
+        self._bundle.set_sensitive(True)
+        self._plain.set_sensitive(True)
         defaults = repo.ui.config('defaults', 'email', '').split()
-        if '-g' in defaults:      self._git.set_active(True)
-        if '-b' in defaults:      self._bundle.set_active(True)
-        if '--plain' in defaults: self._plain.set_active(True)
+        for flag in defaults:
+            if flag in ('-g', '--git'):
+                self._git.set_active(True)
+                self._git.set_sensitive(False)
+            if flag in ('-b', '--bundle'):
+                self._bundle.set_active(True)
+                self._bundle.set_sensitive(False)
+            if flag in ('--plain'):
+                self._plain.set_active(True)
+                self._plain.set_sensitive(False)
 
     def _on_conf_clicked(self, button, userdata):
         dlg = ConfigDialog(self.root, False, 'email.from')
@@ -218,18 +228,6 @@ class EmailDialog(gtk.Dialog):
                 dlg.hide()
                 self._refresh()
                 return
-
-        '''
-        editor = self.repo.ui.geteditor()
-        if editor in ('vi', 'vim'):
-            info_dialog('Info required', 'Please configure a visual editor')
-            dlg = ConfigDialog(self.root, False, 'ui.editor')
-            dlg.show_all()
-            dlg.run()
-            dlg.hide()
-            self._refresh()
-            return
-        '''
 
         history = shlib.read_history()
         record_new_value('email.to', history, totext)
