@@ -24,7 +24,7 @@ class EmailDialog(gtk.Dialog):
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(EmailDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
-        #shlib.set_tortoise_icon(self, 'menucheckout.ico')
+        shlib.set_tortoise_icon(self, 'hg.ico')
         self.root = root
         self.revargs = revargs
         

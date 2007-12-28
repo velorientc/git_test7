@@ -12,11 +12,13 @@ import pango
 import threading
 import Queue
 import win32trace
+import shlib
 
 class TraceLog():
     def __init__(self):
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.set_title("Python Trace Collector")
+        shlib.set_tortoise_icon(self.window, 'hg.ico')
         
         # construct window
         self.window.set_default_size(700, 400)
