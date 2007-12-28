@@ -28,13 +28,18 @@ class EmailDialog(gtk.Dialog):
         self.root = root
         self.revargs = revargs
         
-        self._button_conf = gtk.Button('Preferences', gtk.STOCK_PREFERENCES)
-        self._button_conf.connect('clicked', self._on_conf_clicked)
-        self.action_area.pack_end(self._button_conf)
-
-        self._button_send = gtk.Button('Send', gtk.STOCK_OK)
-        self._button_send.connect('clicked', self._on_send_clicked)
-        self.action_area.pack_end(self._button_send)
+        self.tbar = gtk.Toolbar()
+        tbuttons = [
+                self._toolbutton(gtk.STOCK_GOTO_LAST, 'Send',
+                                 self._on_send_clicked),
+                gtk.SeparatorToolItem(),
+                self._toolbutton(gtk.STOCK_PREFERENCES, 'configure',
+                                 self._on_conf_clicked),
+                gtk.SeparatorToolItem(),
+            ]
+        for btn in tbuttons:
+            self.tbar.insert(btn, -1)
+        self.vbox.pack_start(self.tbar, False, False, 2)
 
         # set dialog title
         title = "Email Mercurial Patches"
@@ -100,6 +105,17 @@ class EmailDialog(gtk.Dialog):
         self.vbox.pack_start(frame, True, True, 4)
         self.connect('map_event', self._on_window_map_event)
 
+    def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
+        if menu:
+            tbutton = gtk.MenuToolButton(stock)
+            tbutton.set_menu(menu)
+        else:
+            tbutton = gtk.ToolButton(stock)
+            
+        tbutton.set_label(label)
+        tbutton.connect('clicked', handler, userdata)
+        return tbutton
+        
     def _on_window_map_event(self, event, param):
         self._refresh()
 
@@ -141,14 +157,14 @@ class EmailDialog(gtk.Dialog):
         if '-b' in defaults:      self._bundle.set_active(True)
         if '--plain' in defaults: self._plain.set_active(True)
 
-    def _on_conf_clicked(self, button):
+    def _on_conf_clicked(self, button, userdata):
         dlg = ConfigDialog(self.root, False, 'email.from')
         dlg.show_all()
         dlg.run()
         dlg.hide()
         self._refresh()
 
-    def _on_send_clicked(self, button):
+    def _on_send_clicked(self, button, userdata):
         def record_new_value(cpath, history, newvalue):
             if cpath not in history:
                 history[cpath] = []
