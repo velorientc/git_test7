@@ -68,13 +68,11 @@ class SynchDialog(gtk.Dialog):
                                  self._push_menu()),
                 self._toolbutton(gtk.STOCK_GOTO_LAST,
                                  'email',
-                                 self._email_clicked,
-                                 self._email_menu()),
+                                 self._email_clicked),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_PREFERENCES,
                                  'configure',
-                                 self._conf_clicked,
-                                 self._conf_menu()),
+                                 self._conf_clicked),
                 gtk.SeparatorToolItem(),
             ]
         for btn in tbuttons:
@@ -184,12 +182,6 @@ class SynchDialog(gtk.Dialog):
         menu.show_all()
         return menu
         
-    def _email_menu(self):
-        return None
-
-    def _conf_menu(self):
-        return None
-
     def _get_paths(self):
         """ retrieve repo revisions """
         try:
