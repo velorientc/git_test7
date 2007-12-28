@@ -86,11 +86,11 @@ class ConfigDialog(gtk.Dialog):
 
         self._paths_info = (
                 ('default', 'paths.default', [],
-'''Directory or URL to use when pulling if no source is specified.
-Default is set to repository from which the current repository was cloned.'''),
+'Directory or URL to use when pulling if no source is specified.'
+' Default is set to repository from which the current repository was cloned.'),
                 ('default-push', 'paths.default-push', [],
-'''Optional. Directory or URL to use when pushing if no
-destination is specified.'''))
+'Optional. Directory or URL to use when pushing if no'
+' destination is specified.'''))
         self.paths_frame = self.add_page(notebook, 'Paths')
         vbox = self.fill_frame(self.paths_frame, self._paths_info)
 
@@ -171,20 +171,20 @@ destination is specified.'''))
                 ('Max Changes', 'web.maxfiles', ['10'],
                     'Maximum number of changes to list on the changelog.'),
                 ('Allow Push', 'ui.allow_push', ['*'],
-'''Whether to allow pushing to the repository. If empty or not
-set, push is not allowed. If the special value "*", any remote
-user can push, including unauthenticated users. Otherwise, the
-remote user must have been authenticated, and the authenticated
-user name must be present in this list (separated by whitespace
-or ","). The contents of the allow_push list are examined after
-the deny_push list.'''),
+'Whether to allow pushing to the repository. If empty or not'
+' set, push is not allowed. If the special value "*", any remote'
+' user can push, including unauthenticated users. Otherwise, the'
+' remote user must have been authenticated, and the authenticated'
+' user name must be present in this list (separated by whitespace'
+' or ","). The contents of the allow_push list are examined after'
+' the deny_push list.'),
                 ('Deny Push', 'ui.deny_push', ['*'],
-'''Whether to deny pushing to the repository. If empty or not set,
-push is not denied. If the special value "*", all remote users
-are denied push. Otherwise, unauthenticated users are all
-denied, and any authenticated user name present in this list
-(separated by whitespace or ",") is also denied. The contents
-of the deny_push list are examined before the allow_push list.'''),
+'Whether to deny pushing to the repository. If empty or not set,'
+' push is not denied. If the special value "*", all remote users'
+' are denied push. Otherwise, unauthenticated users are all'
+' denied, and any authenticated user name present in this list'
+' (separated by whitespace or ",") is also denied. The contents'
+' of the deny_push list are examined before the allow_push list.'),
                 ('Encoding', 'web.encoding', ['UTF-8'],
                     'Character encoding name'))
         self.web_frame = self.add_page(notebook, 'Web')
@@ -202,11 +202,11 @@ of the deny_push list are examined before the allow_push list.'''),
                     'Comma-separated list of blind carbon copy recipients'' ' +
                     'email addresses'),
                 ('method:', 'email.method', ['smtp'],
-'''Optional. Method to use to send email messages. If value is "smtp" (default),
-use SMTP (configured below).  Otherwise, use as name of program to run that
-acts like sendmail (takes "-f" option for sender, list of recipients on command
-line, message on stdin). Normally, setting this to "sendmail" or
-"/usr/sbin/sendmail" is enough to use sendmail to send messages.'''),
+'Optional. Method to use to send email messages. If value is "smtp" (default),'
+' use SMTP (configured below).  Otherwise, use as name of program to run that'
+' acts like sendmail (takes "-f" option for sender, list of recipients on'
+' command line, message on stdin). Normally, setting this to "sendmail" or'
+' "/usr/sbin/sendmail" is enough to use sendmail to send messages.'),
                 ('SMTP Host:', 'smtp.host', [], 'Host name of mail server'),
                 ('SMTP Port:', 'smtp.port', ['25'],
                     'Port to connect to on mail server. Default: 25'),
@@ -226,9 +226,9 @@ line, message on stdin). Normally, setting this to "sendmail" or
                     ['gpyfm', 'kdiff3', 'tortoisemerge', 'p4merge',
                         'meld', 'tkdiff', 'filemerge', 'ecmerge',
                         'xxdiff', 'guiffy', 'diffmerge'],
-'''Textual merge program for resolving merge conflicts.  If left
-unspecified, the hgmerge wrapper will use the first applicable
-tool it finds on your system'''),)
+'Textual merge program for resolving merge conflicts.  If left'
+' unspecified, the hgmerge wrapper will use the first applicable'
+' tool it finds on your system'),)
         self.hgmerge_frame = self.add_page(notebook, 'Merge')
         self.fill_frame(self.hgmerge_frame, self._hgmerge_info)
         # TODO add ability to specify file extension based merge tools
