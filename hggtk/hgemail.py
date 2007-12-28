@@ -101,7 +101,9 @@ class EmailDialog(gtk.Dialog):
         scrolledwindow.add(self.descview)
         frame = gtk.Frame('Patch Series (bundle) Description')
         frame.set_border_width(4)
-        frame.add(scrolledwindow)
+        hbox = gtk.HBox()
+        hbox.pack_start(scrolledwindow, True, True, 4)
+        frame.add(hbox)
         self.vbox.pack_start(frame, True, True, 4)
         self.connect('map_event', self._on_window_map_event)
 
