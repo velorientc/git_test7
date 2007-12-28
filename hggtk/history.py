@@ -318,9 +318,9 @@ class GLog(GDialog):
         """
         key = key.lower()
         searchable = [x.lower() for x in (
-                        model.get_value(iter,0), #rev id (local)
-                        model.get_value(iter,1), #author
-                        model.get_value(iter,2), #summary
+                        str(model.get_value(iter,2)), #rev id (local)
+                        model.get_value(iter,4), #author
+                        model.get_value(iter,5), #summary
                         )]
         for field in searchable:
             if field.find(key) != -1:
