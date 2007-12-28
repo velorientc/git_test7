@@ -83,14 +83,27 @@ class EmailDialog(gtk.Dialog):
         vbox = gtk.VBox()
         flagframe.add(vbox)
 
+        self.tooltips = gtk.Tooltips()
         self._git = gtk.CheckButton("Use extended (git) patch format")
         vbox.pack_start(self._git, True, True, 4)
+        self.tooltips.set_tip(self._git, 
+                'Git patches can describe binary files, copies, and'
+                ' permission changes, but recipients may not be able to'
+                ' use them if they are not using git or Mercurial.')
 
         self._plain = gtk.CheckButton("Plain, do not prepend HG header")
         vbox.pack_start(self._plain, True, True, 4)
+        self.tooltips.set_tip(self._plain, 
+                'Stripping Mercurial header removes username and parent'
+                ' information.  Only useful if recipient is not using'
+                ' Mercurial (and does not like to see the headers).')
 
         self._bundle = gtk.CheckButton("Send single binary bundle, not patches")
         vbox.pack_start(self._bundle, True, True, 4)
+        self.tooltips.set_tip(self._bundle, 
+                'Bundles store complete changesets in binary form.'
+                ' Upstream users can pull from them. This is the safest'
+                ' way to send changes to recipient Mercurial users.')
 
         self.descview = gtk.TextView(buffer=None)
         self.descview.set_editable(True)
@@ -99,12 +112,19 @@ class EmailDialog(gtk.Dialog):
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.descview)
-        frame = gtk.Frame('Patch Series (bundle) Description')
+        frame = gtk.Frame('Patch Series (Bundle) Description')
         frame.set_border_width(4)
         hbox = gtk.HBox()
         hbox.pack_start(scrolledwindow, True, True, 4)
         frame.add(hbox)
         self.vbox.pack_start(frame, True, True, 4)
+        self.tooltips.set_tip(frame, 
+                'Patch series description is sent in initial summary'
+                ' email with [PATCH 0 of N] header.  It should describe'
+                ' the effects of the entire patch series.  When emailing'
+                ' a bundle, this description makes up the message body.'
+                ' This field is _unused_ when sending a single patch')
+
         self.connect('map_event', self._on_window_map_event)
 
     def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
