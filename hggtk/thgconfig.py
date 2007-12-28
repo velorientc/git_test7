@@ -56,6 +56,7 @@ class ConfigDialog(gtk.Dialog):
         self.action_area.pack_end(self._btn_apply)
 
         self.pages = []
+        self.tooltips = gtk.Tooltips()
         self.history = shlib.read_history()
 
         # create pages for each section of configuration file
@@ -310,7 +311,6 @@ tool it finds on your system'''),)
              self.pathsel.select_path(self.curpathrow)
 
     def fill_frame(self, frame, info):
-        tooltips = gtk.Tooltips()
         widgets = []
         vbox = gtk.VBox()
         frame.add(vbox)
@@ -351,8 +351,8 @@ tool it finds on your system'''),)
 
             lbl = gtk.Label(label)
             hbox = gtk.HBox()
-            tooltips.set_tip(combo, tooltip)
-            tooltips.set_tip(lbl, tooltip)
+            self.tooltips.set_tip(combo, tooltip)
+            self.tooltips.set_tip(lbl, tooltip)
             hbox.pack_start(lbl, False, False, 4)
             hbox.pack_start(combo, True, True, 4)
             vbox.pack_start(hbox, False, False, 4)
