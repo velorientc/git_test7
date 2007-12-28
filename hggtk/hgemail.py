@@ -99,7 +99,7 @@ class EmailDialog(gtk.Dialog):
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.descview)
-        frame = gtk.Frame('Patch Series Description')
+        frame = gtk.Frame('Patch Series (bundle) Description')
         frame.set_border_width(4)
         frame.add(scrolledwindow)
         self.vbox.pack_start(frame, True, True, 4)
