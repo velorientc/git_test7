@@ -44,7 +44,7 @@ class EmailDialog(gtk.Dialog):
         # set dialog title
         title = "Email Mercurial Patches"
         self.set_title(title)
-        self.set_default_size(630, 190)
+        self.set_default_size(630, 400)
 
         hbox = gtk.HBox()
         envframe = gtk.Frame('Envelope')
@@ -115,6 +115,14 @@ class EmailDialog(gtk.Dialog):
                 ' Upstream users can pull from them. This is the safest'
                 ' way to send changes to recipient Mercurial users.')
 
+        vbox = gtk.VBox()
+        hbox = gtk.HBox()
+        self._subjlist = gtk.ListStore(str)
+        self._subjbox = gtk.ComboBoxEntry(self._subjlist, 0)
+        hbox.pack_start(gtk.Label('Subject:'), False, False, 4)
+        hbox.pack_start(self._subjbox, True, True, 4)
+        vbox.pack_start(hbox, False, False, 4)
+
         self.descview = gtk.TextView(buffer=None)
         self.descview.set_editable(True)
         self.descview.modify_font(pango.FontDescription("Monospace"))
@@ -124,16 +132,16 @@ class EmailDialog(gtk.Dialog):
         scrolledwindow.add(self.descview)
         frame = gtk.Frame('Patch Series (Bundle) Description')
         frame.set_border_width(4)
-        hbox = gtk.HBox()
-        hbox.pack_start(scrolledwindow, True, True, 4)
-        frame.add(hbox)
-        self.vbox.pack_start(frame, True, True, 4)
+        vbox.pack_start(scrolledwindow, True, True, 4)
+        vbox.set_border_width(4)
+        frame.add(vbox)
         self.tooltips.set_tip(frame, 
                 'Patch series description is sent in initial summary'
-                ' email with [PATCH 0 of N] header.  It should describe'
+                ' email with [PATCH 0 of N] subject.  It should describe'
                 ' the effects of the entire patch series.  When emailing'
-                ' a bundle, this description makes up the message body.'
-                ' This field is _unused_ when sending a single patch')
+                ' a bundle, these fields make up the message subject and body.'
+                ' The description field is unused when sending a single patch')
+        self.vbox.pack_start(frame, True, True, 4)
 
         self.connect('map_event', self._on_window_map_event)
 
@@ -176,12 +184,14 @@ class EmailDialog(gtk.Dialog):
                     'You must enable the patchbomb extension to use this tool')
             self.response(gtk.RESPONSE_CANCEL)
 
-        self._tobox.get_child().set_text(repo.ui.config('email', 'to', ''))
-        self._ccbox.get_child().set_text(repo.ui.config('email', 'cc', ''))
-        self._frombox.get_child().set_text(repo.ui.config('email', 'from', ''))
+        self._tobox.child.set_text(repo.ui.config('email', 'to', ''))
+        self._ccbox.child.set_text(repo.ui.config('email', 'cc', ''))
+        self._frombox.child.set_text(repo.ui.config('email', 'from', ''))
+        self._subjbox.child.set_text(repo.ui.config('email', 'subject', ''))
         fill_history(history, self._tolist, 'email.to')
         fill_history(history, self._cclist, 'email.cc')
         fill_history(history, self._fromlist, 'email.from')
+        fill_history(history, self._subjlist, 'email.subject')
 
         # See if user has set flags in defaults.email
         self._git.set_sensitive(True)
@@ -209,15 +219,17 @@ class EmailDialog(gtk.Dialog):
 
     def _on_send_clicked(self, button, userdata):
         def record_new_value(cpath, history, newvalue):
+            if not newvalue: return
             if cpath not in history:
                 history[cpath] = []
             elif newvalue in history[cpath]:
                 history[cpath].remove(newvalue)
             history[cpath].insert(0, newvalue)
 
-        totext = self._tobox.get_child().get_text()
-        cctext = self._ccbox.get_child().get_text()
-        fromtext = self._frombox.get_child().get_text()
+        totext = self._tobox.child.get_text()
+        cctext = self._ccbox.child.get_text()
+        fromtext = self._frombox.child.get_text()
+        subjtext = self._subjbox.child.get_text()
 
         if not totext:
             info_dialog('Info required', 'You must specify a recipient')
@@ -245,10 +257,13 @@ class EmailDialog(gtk.Dialog):
         record_new_value('email.to', history, totext)
         record_new_value('email.cc', history, cctext)
         record_new_value('email.from', history, fromtext)
+        record_new_value('email.subject', history, subjtext)
         shlib.save_history(history)
 
         cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
         cmdline += ['--repository', self.repo.root]
+        if subjtext:
+            cmdline += ['--subject', subjtext]
         if self._bundle.get_active():
             cmdline += ['--bundle']
             if '--outgoing' in self.revargs:
