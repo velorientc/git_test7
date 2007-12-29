@@ -58,9 +58,8 @@ class ServeDialog(gtk.Dialog):
             self.defport = '8000'
 
         # set dialog title
-        title = "hg serve"
-        title += " - %s" % (os.getcwd())
-        self.set_title(title)
+        name = self.repo.ui.config('web', 'name') or os.path.basename(root)
+        self.set_title("hg serve - " + name)
         self.queue = Queue.Queue()
         
         self.set_default_size(500, 300)

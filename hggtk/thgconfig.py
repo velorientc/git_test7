@@ -38,8 +38,9 @@ class ConfigDialog(gtk.Dialog):
 
         if configrepo:
             self.ui = repo.ui
+            name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.set_title('TortoiseHg Configure Repository - ' + repo.root)
+            self.set_title('TortoiseHg Configure Repository - ' + name)
         else:
             self.rcpath = util.user_rcpath()
             self.set_title('TortoiseHg Configure User-Global Settings')

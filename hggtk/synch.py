@@ -26,9 +26,7 @@ from shlib import set_tortoise_icon
 class SynchDialog(gtk.Dialog):
     def __init__(self, cwd='', root = '', repos=[]):
         """ Initialize the Dialog. """
-        rootbase = os.path.basename(cwd)
-        gtk.Dialog.__init__(self, title="TortoiseHg Synchronize - %s" % rootbase,
-                                  parent=None,
+        gtk.Dialog.__init__(self, parent=None,
                                   flags=0,
                                   buttons=())
 
@@ -37,6 +35,10 @@ class SynchDialog(gtk.Dialog):
         self.selected_path = None
 
         self.set_default_size(600, 400)
+
+        self.paths = self._get_paths()
+        name = self.repo.ui.config('web', 'name') or os.path.basename(root)
+        self.set_title("TortoiseHg Synchronize - " + name)
 
         #self.connect('delete-event', lambda x, y: True)
         self.connect('delete-event', self._delete)
@@ -90,7 +92,6 @@ class SynchDialog(gtk.Dialog):
         self._pathbox = gtk.ComboBoxEntry(self.revlist, 0)
         self._pathtext = self._pathbox.get_child()
         
-        self.paths = self._get_paths()
         defrow = None
         defpushrow = None
         for row, (name, path) in enumerate(self.paths):
@@ -185,8 +186,8 @@ class SynchDialog(gtk.Dialog):
     def _get_paths(self):
         """ retrieve repo revisions """
         try:
-            repo = hg.repository(ui.ui(), path=self.root)
-            return repo.ui.configitems('paths')
+            self.repo = hg.repository(ui.ui(), path=self.root)
+            return self.repo.ui.configitems('paths')
         except hg.RepoError:
             return None
 
