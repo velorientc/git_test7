@@ -28,6 +28,9 @@ def save_history(dict, key='config_history'):
     dbase.close()
 
 def set_tortoise_icon(window, icon):
+    window.set_icon_from_file(get_tortoise_icon(icon))
+
+def get_tortoise_icon(icon):
     '''Find a tortoise icon, apply to PyGtk window'''
     # The context menu should set this variable
     var = os.environ.get('THG_ICON_PATH', None)
@@ -44,8 +47,7 @@ def set_tortoise_icon(window, icon):
     for p in paths:
         path = os.path.join(p, 'tortoise', icon)
         if os.path.isfile(path):
-            window.set_icon_from_file(path)
-            return
+            return path
     else:
         print 'icon not found', icon
         return None
