@@ -589,7 +589,9 @@ class GStatus(GDialog):
             return
 
         # Create new opts,  so nothing unintented gets through.
-        revertopts = self.merge_opts(commands.table['revert'][1], ('include', 'exclude', 'rev'))
+        # commands.table revert key changed after 0.9.5, in change d4ec6d61b3ee
+        key = '^revert' in commands.table and '^revert' or 'revert'
+        revertopts = self.merge_opts(commands.table[key][1], ('include', 'exclude', 'rev'))
         def dohgrevert():
             commands.revert(self.ui, self.repo, *files, **revertopts)
 
