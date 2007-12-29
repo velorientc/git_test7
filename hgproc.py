@@ -53,8 +53,7 @@ def get_list_from_file(filename):
 def get_option(args):
     import getopt
     long_opt_list = ('command=', 'exepath=', 'listfile=', 'title=',
-                      'root=', 'cwd=', 'notify', 'deletelistfile',
-                      'configrepo')
+                      'root=', 'cwd=', 'notify', 'deletelistfile')
     opts, args = getopt.getopt(args, "c:e:l:ndt:R:", long_opt_list)
     # Set default options
     options = {}
@@ -82,8 +81,6 @@ def get_option(args):
             options['root'] = a
         elif o in ("--cwd"):
             options['cwd'] = a
-        elif o in ("--configrepo"):
-            args.append(o)
 
     if listfile:
         options['files'] = get_list_from_file(listfile)

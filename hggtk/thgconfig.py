@@ -475,12 +475,12 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
         return 0
 
-def run(root='', cmdline=[], **opts):
+def run(root='', cmdline=[], files=[], **opts):
     if '--focusfield' in cmdline:
         field = cmdline[cmdline.index('--focusfield')+1]
     else:
         field = None
-    dialog = ConfigDialog(root, '--configrepo' in cmdline, field)
+    dialog = ConfigDialog(root, bool(files), field)
     dialog.show_all()
     dialog.connect('response', gtk.main_quit)
     gtk.gdk.threads_init()
@@ -491,9 +491,10 @@ def run(root='', cmdline=[], **opts):
 if __name__ == "__main__":
     # example command lines
     # python hggtk/thgconfig.py --focusfield ui.editor
-    # python hggtk/thgconfig.py . --focusfield paths.default --configrepo
+    # python hggtk/thgconfig.py --focusfield paths.default --configrepo
     import sys
     opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    opts['root'] = os.getcwd()
     opts['cmdline'] = sys.argv
+    opts['files'] = '--configrepo' in sys.argv and ['.'] or []
     run(**opts)

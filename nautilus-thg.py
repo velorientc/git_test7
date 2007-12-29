@@ -140,7 +140,7 @@ class HgExtension(nautilus.MenuProvider,
         self._run_dialog('synch', [vfs_file], filelist=False)
 
     def _thgconfig_repo_cb(self, window, vfs_file):
-        self._run_dialog('config', [vfs_file], args=['--configrepo'])
+        self._run_dialog('config', [vfs_file])
 
     def _thgconfig_user_cb(self, window, vfs_file):
         self._run_dialog('config', [vfs_file], filelist=False)
@@ -162,10 +162,11 @@ class HgExtension(nautilus.MenuProvider,
         else:
             subprocess.Popen(['hg', 'view'], shell=False, cwd=cwd)
 
-    def _run_dialog(self, hgcmd, vfs_files, filelist=True, args=[]):
+    def _run_dialog(self, hgcmd, vfs_files, filelist=True):
         '''
         hgcmd - hgproc subcommand
         vfs_files - directory, or list of selected files
+        filelist  - bool for whether to generate file list for hgproc
         '''
         paths = [self.get_path_for_vfs_file(f) for f in vfs_files]
         if paths[0] is None:
@@ -179,7 +180,6 @@ class HgExtension(nautilus.MenuProvider,
         cmdopts += ['--root', repo.root]
         cmdopts += ['--cwd', cwd]
         cmdopts += ['--command', hgcmd]
-        cmdopts.extend(args)
 
         if filelist:
             # Use temporary file to store file list (avoid shell command
