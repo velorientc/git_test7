@@ -156,7 +156,7 @@ class HgThread(threading.Thread):
         try:
             ret = dispatch._dispatch(self.ui, self.args)
             if ret:
-                self.ui.write('command returned error code %d.\n' % int(ret))
+                self.ui.write('command returned code %d.\n' % int(ret))
             else:
                 self.ui.write('command completed successfully.\n')
             self.ret = ret or 0
