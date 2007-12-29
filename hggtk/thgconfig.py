@@ -257,7 +257,7 @@ class ConfigDialog(gtk.Dialog):
     def _response(self, widget, response_id):
         if self.dirty:
             if question_dialog('Quit without saving?',
-                'Yes to lose changes, No to continue') != gtk.RESPONSE_YES:
+                'Yes to abandon changes, No to continue') != gtk.RESPONSE_YES:
                 widget.emit_stop_by_name('response')
 
     def dirty_event(self, *args):
