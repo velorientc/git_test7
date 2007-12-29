@@ -374,22 +374,15 @@ class ContextMenuExtension:
                             _("Verify repository consistency"),
                             self._verify)
 
-            # Optionally add an Options submenu
-            c = ui.ui().config('tortoisehg', 'hgconfig', None)
-            if c in ['1', 'yes', 'True']:
-                result.append(TortoiseMenuSep())
-                optmenu = TortoiseSubmenu(_("Options"),icon="menusettings.ico")
-                
-                optmenu.add_menu(_("Username"),
-                                 _("Configure username"),
-                                 self._uname)
-                optmenu.add_menu(_("Paths"),
-                                 _("Configure remote paths"),
-                                 self._paths)
-                optmenu.add_menu(_("Web"),
-                                 _("Configure repository web data"),
-                                 self._web)
-                result.append(optmenu)
+            result.append(TortoiseMenuSep())
+            optmenu = TortoiseSubmenu(_("Settings"),icon="menusettings.ico")
+            optmenu.add_menu(_("Global"),
+                             _("Configure user wide settings"),
+                             self._config_user)
+            optmenu.add_menu(_("Repository"),
+                             _("Configure settings local to this repository"),
+                             self._config_repo)
+            result.append(optmenu)
 
         return result
 
@@ -429,32 +422,11 @@ class ContextMenuExtension:
                     (shellquote(hgpath), shellquote(root), ct)
             run_program(cmd)
 
-    def _uname(self, parent_window):
-        hgpath = find_path('hg', get_prog_root())
-        if not hgpath: return
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        cmd = "%s --repository %s config username" % (shellquote(hgpath), 
-                shellquote(root))
-        run_program(cmd)
+    def _config_user(self, parent_window):
+        self._run_dialog('config', noargs=True)
 
-    def _paths(self, parent_window):
-        hgpath = find_path('hg', get_prog_root())
-        if not hgpath: return
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        cmd = "%s --repository %s config paths" % (shellquote(hgpath), 
-                shellquote(root))
-        run_program(cmd)
-
-    def _web(self, parent_window):
-        hgpath = find_path('hg', get_prog_root())
-        if not hgpath: return
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        cmd = "%s --repository %s config web" % (shellquote(hgpath), 
-                shellquote(root))
-        run_program(cmd)
+    def _config_repo(self, parent_window):
+        self._run_dialog('config')
 
     def _vdiff(self, parent_window):
         '''[tortoisehg] vdiff = <any extdiff command>'''
