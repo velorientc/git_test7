@@ -246,8 +246,13 @@ class SynchDialog(gtk.Dialog):
         self._exec_cmd(cmd)
         
     def _conf_clicked(self, toolbutton, data=None):
+        newpath = self._pathtext.get_text()
+        for name, path in self.paths:
+            if path == newpath:
+                newpath = None
+                break
         from thgconfig import ConfigDialog
-        dlg = ConfigDialog(self.root, True, 'paths.default')
+        dlg = ConfigDialog(self.root, True, 'paths.default', newpath)
         dlg.show_all()
         dlg.run()
         dlg.hide()

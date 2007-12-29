@@ -18,7 +18,10 @@ import iniparse
 _unspecstr = '<unspecified>'
 
 class ConfigDialog(gtk.Dialog):
-    def __init__(self, root='', configrepo=False, focusfield=None):
+    def __init__(self, root='',
+            configrepo=False,
+            focusfield=None,
+            newpath=None):
         """ Initialize the Dialog. """        
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
@@ -68,11 +71,11 @@ class ConfigDialog(gtk.Dialog):
         # create pages for each section of configuration file
         self._tortoise_info = (
                 ('Commit Tool', 'tortoisehg.commit', ['qct', 'internal'],
-                    'Select commit tool launched by TortoiseHg. Qct is ' +
-                    'not included, must be installed separately'),
+                    'Select commit tool launched by TortoiseHg. Qct is'
+                    ' not included, must be installed separately'),
                 ('Revision Graph Viewer', 'tortoisehg.view', ['hgk', 'hgview'],
-                    'Select revision graph (DAG) viewer launched by ' +
-                    'TortoiseHg'),
+                    'Select revision graph (DAG) viewer launched by'
+                    ' TortoiseHg'),
                 ('Visual Diff Tool', 'tortoisehg.vdiff', [],
                     'Specify the visual diff tool; must be extdiff command'))
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
@@ -82,7 +85,9 @@ class ConfigDialog(gtk.Dialog):
                 ('Username', 'ui.username', [], 
                     'Name associated with commits'),
                 ('Editor', 'ui.editor', [],
-                    'The editor to use during a commit'),
+                    'The editor to use during a commit and other'
+                    ' instances where Mercurial needs multiline input from'
+                    ' the user.  Only required by CLI commands.'),
                 ('Verbose', 'ui.verbose', ['False', 'True'],
                     'Increase the amount of output printed'),
                 ('Debug', 'ui.debug', ['False', 'True'],
@@ -148,30 +153,28 @@ class ConfigDialog(gtk.Dialog):
         vbox.pack_start(hbox, False, False, 4)
         vbox.pack_start(buttonbox, False, False, 4)
 
-        self.refresh_path_list()
-
         self._web_info = (
                 ('Name', 'web.name', ['unknown'],
-                    'Repository name to use in the web interface.  Default ' +
-                    'is the working directory.'),
+                    'Repository name to use in the web interface.  Default'
+                    ' is the working directory.'),
                 ('Description', 'web.description', ['unknown'],
-                    'Textual description of the repository''s purpose or ' +
-                    'contents.'),
+                    'Textual description of the repository''s purpose or'
+                    ' contents.'),
                 ('Contact', 'web.contact', ['unknown'],
-                    'Name or email address of the person in charge of the ' +
-                    'repository.'),
+                    'Name or email address of the person in charge of the'
+                    ' repository.'),
                 ('Style', 'web.style', ['default', 'gitweb', 'old'],
                     'Which template map style to use'),
                 ('Archive Formats', 'web.allow_archive', ['bz2', 'gz', 'zip'],
-                    'Comma separated list of archive formats allowed for ' +
-                    'downloading'),
+                    'Comma separated list of archive formats allowed for'
+                    ' downloading'),
                 ('Port', 'web.port', ['8000'], 'Port to listen on'),
                 ('Push Requires SSL', 'web.push_ssl', ['True', 'False'],
-                    'Whether to require that inbound pushes be transported ' +
-                    'over SSL to prevent password sniffing.'),
+                    'Whether to require that inbound pushes be transported'
+                    ' over SSL to prevent password sniffing.'),
                 ('Stripes', 'web.stripes', ['1', '0'],
-                    'How many lines a "zebra stripe" should span in multiline '+
-                    'output. Default is 1; set to 0 to disable.'),
+                    'How many lines a "zebra stripe" should span in multiline'
+                    ' output. Default is 1; set to 0 to disable.'),
                 ('Max Files', 'web.maxfiles', ['10'],
                     'Maximum number of files to list per changeset.'),
                 ('Max Changes', 'web.maxfiles', ['10'],
@@ -202,10 +205,10 @@ class ConfigDialog(gtk.Dialog):
                 ('To:', 'email.to', [],
                     'Comma-separated list of recipients'' email addresses'),
                 ('Cc:', 'email.cc', [],
-                    'Comma-separated list of carbon copy recipients'' email ' +
-                    'addresses'),
+                    'Comma-separated list of carbon copy recipients'' email'
+                    ' addresses'),
                 ('Bcc:', 'email.bcc', [],
-                    'Comma-separated list of blind carbon copy recipients'' ' +
+                    'Comma-separated list of blind carbon copy recipients'' '
                     'email addresses'),
                 ('method:', 'email.method', ['smtp'],
 'Optional. Method to use to send email messages. If value is "smtp" (default),'
@@ -246,6 +249,14 @@ class ConfigDialog(gtk.Dialog):
                     if cpath == focusfield:
                         self.notebook.set_current_page(page_num)
                         widgets[w].grab_focus()
+
+        if newpath:
+            self.pathlist.append(('new', newpath))
+            self.curpathrow = len(self.pathlist)-1
+            self.refresh_path_list()
+            self._pathnameedit.grab_focus()
+        else:
+            self.refresh_path_list()
 
         # Force dialog into clean state in the beginning
         self._btn_apply.set_sensitive(False)
