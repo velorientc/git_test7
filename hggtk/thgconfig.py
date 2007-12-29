@@ -152,6 +152,7 @@ class ConfigDialog(gtk.Dialog):
         hbox.pack_start(self._pathpathedit, True, True, 4)
         vbox.pack_start(hbox, False, False, 4)
         vbox.pack_start(buttonbox, False, False, 4)
+        self.refresh_path_list()
 
         self._web_info = (
                 ('Name', 'web.name', ['unknown'],
@@ -242,22 +243,6 @@ class ConfigDialog(gtk.Dialog):
         self.fill_frame(self.hgmerge_frame, self._hgmerge_info)
         # TODO add ability to specify file extension based merge tools
 
-        if focusfield:
-            # Set page and focus to requested datum
-            for page_num, (vbox, info, widgets) in enumerate(self.pages):
-                for w, (label, cpath, values, tip) in enumerate(info):
-                    if cpath == focusfield:
-                        self.notebook.set_current_page(page_num)
-                        widgets[w].grab_focus()
-
-        if newpath:
-            self.pathlist.append(('new', newpath))
-            self.curpathrow = len(self.pathlist)-1
-            self.refresh_path_list()
-            self._pathnameedit.grab_focus()
-        else:
-            self.refresh_path_list()
-
         # Force dialog into clean state in the beginning
         self._btn_apply.set_sensitive(False)
         self.dirty = False
@@ -270,6 +255,23 @@ class ConfigDialog(gtk.Dialog):
             if question_dialog('Quit without saving?',
                 'Yes to abandon changes, No to continue') != gtk.RESPONSE_YES:
                 widget.emit_stop_by_name('response')
+
+    def focus_field(self, focusfield):
+        '''Set page and focus to requested datum'''
+        for page_num, (vbox, info, widgets) in enumerate(self.pages):
+            for w, (label, cpath, values, tip) in enumerate(info):
+                if cpath == focusfield:
+                    self.notebook.set_current_page(page_num)
+                    widgets[w].grab_focus()
+                    return
+
+    def new_path(self, newpath):
+        '''Add a new path to [paths], give default name, focus'''
+        self.pathlist.append(('new', newpath))
+        self.curpathrow = len(self.pathlist)-1
+        self.refresh_path_list()
+        self.notebook.set_current_page(2)
+        self._pathnameedit.grab_focus()
 
     def dirty_event(self, *args):
         if not self.dirty:
@@ -488,13 +490,12 @@ class ConfigDialog(gtk.Dialog):
         return 0
 
 def run(root='', cmdline=[], files=[], **opts):
-    if '--focusfield' in cmdline:
-        field = cmdline[cmdline.index('--focusfield')+1]
-    else:
-        field = None
-    dialog = ConfigDialog(root, bool(files), field)
+    dialog = ConfigDialog(root, bool(files))
     dialog.show_all()
     dialog.connect('response', gtk.main_quit)
+    if '--focusfield' in cmdline:
+        field = cmdline[cmdline.index('--focusfield')+1]
+        dialog.focus_field(field)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()

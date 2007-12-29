@@ -194,8 +194,9 @@ class ServeDialog(gtk.Dialog):
     def _on_conf_clicked(self, *args):
         if self.repo is None: return
         from thgconfig import ConfigDialog
-        dlg = ConfigDialog(self.repo.root, True, 'web.name')
+        dlg = ConfigDialog(self.repo.root, True)
         dlg.show_all()
+        dlg.focus_field('web.name')
         dlg.run()
         dlg.hide()
 

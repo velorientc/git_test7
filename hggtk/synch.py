@@ -252,8 +252,12 @@ class SynchDialog(gtk.Dialog):
                 newpath = None
                 break
         from thgconfig import ConfigDialog
-        dlg = ConfigDialog(self.root, True, 'paths.default', newpath)
+        dlg = ConfigDialog(self.root, True)
         dlg.show_all()
+        if newpath:
+            dlg.new_path(newpath)
+        else:
+            dlg.focus_field('paths.default')
         dlg.run()
         dlg.hide()
         self.paths = self._get_paths()

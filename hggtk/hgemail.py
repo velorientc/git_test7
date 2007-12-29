@@ -190,8 +190,9 @@ class EmailDialog(gtk.Dialog):
                 self._plain.set_sensitive(False)
 
     def _on_conf_clicked(self, button, userdata):
-        dlg = ConfigDialog(self.root, False, 'email.from')
+        dlg = ConfigDialog(self.root, False)
         dlg.show_all()
+        dlg.focus_field('email.from')
         dlg.run()
         dlg.hide()
         self._refresh()
@@ -222,8 +223,9 @@ class EmailDialog(gtk.Dialog):
         if self.repo.ui.config('email', 'method', 'smtp') == 'smtp':
             if not self.repo.ui.config('smtp', 'host'):
                 info_dialog('Info required', 'You must configure SMTP')
-                dlg = ConfigDialog(self.root, False, 'smtp.host')
+                dlg = ConfigDialog(self.root, False)
                 dlg.show_all()
+                dlg.focus_field('smtp.host')
                 dlg.run()
                 dlg.hide()
                 self._refresh()
