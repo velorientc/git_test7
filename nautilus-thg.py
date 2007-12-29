@@ -293,13 +293,15 @@ class HgExtension(nautilus.MenuProvider,
 
         item = nautilus.MenuItem('HgNautilus::repoconfig',
                              'Repository Settings',
-                             'Configure Mercurial settings for this repo')
+                             'Configure Mercurial settings for this repo',
+                             self.icon('menusettings.ico'))
         item.connect('activate', self._thgconfig_repo_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('HgNautilus::userconfig',
                              'User-Global Settings',
-                             'Configure global Mercurial settings')
+                             'Configure global Mercurial settings',
+                             self.icon('menusettings.ico'))
         item.connect('activate', self._thgconfig_user_cb, vfs_file)
         items.append(item)
 

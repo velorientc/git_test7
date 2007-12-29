@@ -44,7 +44,7 @@ class ConfigDialog(gtk.Dialog):
             self.rcpath = util.user_rcpath()
             self.set_title('TortoiseHg Configure User-Global Settings')
 
-        shlib.set_tortoise_icon(self, 'hg.ico')
+        shlib.set_tortoise_icon(self, 'menusettings.ico')
         self.ini = self.load_config(self.rcpath)
 
         # Create a new notebook, place the position of the tabs
