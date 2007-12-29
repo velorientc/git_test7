@@ -244,7 +244,7 @@ class HgExtension(nautilus.MenuProvider,
 
         item = nautilus.MenuItem('HgNautilus::diff',
                              'Visual Diff',
-                             'Show Changes',
+                             'Show Changes to Repository',
                              self.icon('menudiff.ico'))
         item.connect('activate', self._diff_cb, [vfs_file])
         items.append(item)
