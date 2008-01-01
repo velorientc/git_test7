@@ -21,7 +21,7 @@ from shlib import set_tortoise_icon
 class HistoryDialog(gtk.Dialog):
     """ Dialog to display Mercurial history """
     def __init__(self, root='', files=[], list_clean=False,
-            select=False, page=100, mainapp=False):
+            select=False, page=100):
         """ Initialize the Dialog """
         if select:
             buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -36,8 +36,6 @@ class HistoryDialog(gtk.Dialog):
         title = "hg log "
         if root: title += " - %s" % root
         self.set_title(title)
-        if mainapp:
-            self.connect('response', gtk.main_quit)
 
         self.root = root
         self.files = files
@@ -246,8 +244,9 @@ class HistoryDialog(gtk.Dialog):
         return list
         
 def run(root='', files=[], **opts):
-    dialog = HistoryDialog(root=root, files=files, mainapp=True)
+    dialog = HistoryDialog(root=root, files=files)
     dialog.show_all()
+    dialog.connect('response', gtk.main_quit)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
