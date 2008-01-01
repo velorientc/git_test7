@@ -156,7 +156,7 @@ class GStatus(GDialog):
         self._menus['A'] = addrem_menu
         self._menus['R'] = addrem_menu
         self._menus['?'] = unknown_menu
-        self._menus['='] = clean_menu
+        self._menus['C'] = clean_menu
         self._menus['I'] = ignored_menu
         self._menus['!'] = deleted_menu
 
@@ -306,7 +306,7 @@ class GStatus(GDialog):
                        ('unknown', '?', unknown),
                        ('ignored', 'I', ignored))
     
-        explicit_changetypes = changetypes + (('clean', '=', clean),)
+        explicit_changetypes = changetypes + (('clean', 'C', clean),)
 
         # List of the currently checked and selected files to pass on to the new data
         recheck = [entry[2] for entry in self.model if entry[0]]
@@ -371,7 +371,7 @@ class GStatus(GDialog):
 
 
     def _sort_by_stat(self, model, iter1, iter2):
-        order = 'MAR!?I='
+        order = 'MAR!?IC'
         lhs, rhs = (model.get_value(iter1, 1), model.get_value(iter2, 1))
 
         # GTK+ bug that calls sort before a full row is inserted causing values to be None.
@@ -392,7 +392,7 @@ class GStatus(GDialog):
             text_renderer.set_property('foreground', '#006400')
         elif stat == 'R':
             text_renderer.set_property('foreground', '#900000')
-        elif stat == '=':
+        elif stat == 'C':
             text_renderer.set_property('foreground', 'black')
         elif stat == '!':
             text_renderer.set_property('foreground', 'red')
@@ -635,7 +635,7 @@ class GStatus(GDialog):
 
 
     def _remove_clicked(self, toolbutton, data=None):
-        remove_list = self._relevant_files('=')
+        remove_list = self._relevant_files('C')
         if len(remove_list) > 0:
             self._hg_remove(remove_list)
         else:
