@@ -350,6 +350,10 @@ class GLog(GDialog):
         menuitem.connect('activate',self._export_patch)
         menuitem.set_border_width(1)
         self._menu.append(menuitem)
+        menuitem = gtk.MenuItem("e_mail patch",True)
+        menuitem.connect('activate',self._email_patch)
+        menuitem.set_border_width(1)
+        self._menu.append(menuitem)
         menuitem = gtk.MenuItem('add _tag', True)
         menuitem.connect('activate', self._add_tag)
         menuitem.set_border_width(1)
@@ -536,6 +540,14 @@ class GLog(GDialog):
                 commands.export(self.ui,self.repo,str(rev),**exportOpts)
             success, outtext = self._hg_call_wrapper("Export",dohgexport,False)
 
+    def _email_patch(self, menuitem):
+        from hgemail import EmailDialog
+        row = self.model[self.tree.get_selection().get_selected()[1]]
+        rev = long(row[2])
+        dlg = EmailDialog(self.repo.root, ['--rev', str(rev)])
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
 
     def _tree_selection_changed(self, selection):
         ''' Update the details text '''
