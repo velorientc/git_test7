@@ -67,8 +67,8 @@ class Hg:
         return [os.path.join(self.root, x) for x in files]
 
 class GtkUi(ui.ui):
-    queue = Queue.Queue()
-    lock = threading.Lock()
+    outputq = Queue.Queue()
+    dialoglock = threading.Lock()
     dialogq = Queue.Queue()
     responseq = Queue.Queue()
 
@@ -87,11 +87,11 @@ class GtkUi(ui.ui):
 
     def write(self, *args):
         for a in args:
-            self.queue.put(str(a))
+            self.outputq.put(str(a))
 
     def write_err(self, *args):
         for a in args:
-            self.queue.put('*** ' + str(a))
+            self.outputq.put('*** ' + str(a))
 
     def flush(self):
         pass
@@ -102,11 +102,11 @@ class GtkUi(ui.ui):
         if not self.interactive: return default
         while True:
             try:
-                # Show text entry dialog with msg prompt
-                self.lock.acquire()
+                # send request to main thread, await response
+                self.dialoglock.acquire()
                 self.dialogq.put( (msg, True, default) )
                 r = self.responseq.get(True)
-                self.lock.release()
+                self.dialoglock.release()
                 if not r:
                     return default
                 if not pat or re.match(pat, r):
@@ -118,10 +118,11 @@ class GtkUi(ui.ui):
 
     def getpass(self, prompt=None, default=None):
         '''generic PyGtk password prompt dialog'''
-        self.lock.acquire()
+        # send request to main thread, await response
+        self.dialoglock.acquire()
         self.dialogq.put( (prompt or _('password: '), False, default) )
         r = self.responseq.get(True)
-        self.lock.release()
+        self.dialoglock.release()
         return p
 
     def print_exc(self):
@@ -129,6 +130,9 @@ class GtkUi(ui.ui):
         return True
 
 class HgThread(threading.Thread):
+    savedui = None
+    instances = 0
+
     def __init__(self, args = []):
         self.ui = GtkUi()
         self.args = args
@@ -143,7 +147,7 @@ class HgThread(threading.Thread):
         self.args = args + files
 
     def getqueue(self):
-        return GtkUi.queue
+        return GtkUi.outputq
 
     def return_code(self):
         '''
@@ -171,12 +175,11 @@ class HgThread(threading.Thread):
         GtkUi.responseq.put(text)
 
     def run(self):
-        # Monkey patch our GUI ui subclass into place
-        if not hasattr(ui.ui, 'queue'):
-            savedui = ui.ui
+        if HgThread.instances == 0 and not hasattr(ui.ui, 'outputq'):
+            # Monkey patch our GUI ui subclass into place
+            HgThread.savedui = ui.ui
             ui.ui = GtkUi
-        else:
-            savedui = None
+        HgThread.instances += 1
         try:
             ret = dispatch._dispatch(self.ui, self.args)
             if ret:
@@ -185,7 +188,7 @@ class HgThread(threading.Thread):
                 self.ui.write('command completed successfully.\n')
             self.ret = ret or 0
         except hg.RepoError, e:
-            self.ui.write(e)
+            self.ui.write_err(e)
         except util.Abort, e:
             self.ui.write_err(e)
             if self.ui.traceback:
@@ -194,6 +197,8 @@ class HgThread(threading.Thread):
             self.ui.write_err(e)
             self.ui.print_exc()
         finally:
-            # Undo monkey patch
-            if savedui:
-                ui.ui = savedui
+            HgThread.instances += -1
+            if HgThread.instances == 0 and HgThread.savedui:
+                # Undo monkey patch
+                ui.ui = HgThread.savedui
+                HgThread.savedui = None
