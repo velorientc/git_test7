@@ -91,7 +91,7 @@ class GtkUi(ui.ui):
 
     def write_err(self, *args):
         for a in args:
-            self.queue.put('Error: ' + str(a))
+            self.queue.put('*** ' + str(a))
 
     def flush(self):
         pass
