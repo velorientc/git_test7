@@ -93,20 +93,25 @@ class GtkUi(ui.ui):
     def flush(self):
         pass
 
-    def prompt(self, msg, pat=None, default="y", matchflags=0):
+    def prompt(self, msg, pat=None, default="y"):
         '''generic PyGtk prompt dialog'''
-        try:
-            # Show text entry dialog with msg prompt
-            gtk.gdk.threads_enter()
-            r = entry_dialog(msg, default=default)
-            gtk.gdk.flush()
-            gtk.gdk.threads_leave()
-            if not pat or re.match(pat, r, matchflags):
-                return r
-            else:
-                self.write(_("unrecognized response\n"))
-        except:
-            raise util.Abort(_('response expected'))
+        import re
+        if not self.interactive: return default
+        while True:
+            try:
+                # Show text entry dialog with msg prompt
+                gtk.gdk.threads_enter()
+                r = entry_dialog(msg, default=default)
+                gtk.gdk.flush()
+                gtk.gdk.threads_leave()
+                if not r:
+                    return default
+                if not pat or re.match(pat, r):
+                    return r
+                else:
+                    self.write(_("unrecognized response\n"))
+            except EOFError:
+                raise util.Abort(_('response expected'))
 
     def getpass(self, prompt=None, default=None):
         '''generic PyGtk password prompt dialog'''
