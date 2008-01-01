@@ -134,8 +134,10 @@ class EmailDialog(gtk.Dialog):
         frame.set_border_width(4)
         vbox.pack_start(scrolledwindow, True, True, 4)
         vbox.set_border_width(4)
-        frame.add(vbox)
-        self.tooltips.set_tip(frame, 
+        eventbox = gtk.EventBox()
+        eventbox.add(vbox)
+        frame.add(eventbox)
+        self.tooltips.set_tip(eventbox, 
                 'Patch series description is sent in initial summary'
                 ' email with [PATCH 0 of N] subject.  It should describe'
                 ' the effects of the entire patch series.  When emailing'

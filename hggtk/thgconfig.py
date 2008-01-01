@@ -204,13 +204,13 @@ class ConfigDialog(gtk.Dialog):
                 ('From:', 'email.from', [],
                     'Email address to use in "From" header and SMTP envelope'),
                 ('To:', 'email.to', [],
-                    'Comma-separated list of recipients'' email addresses'),
+                    'Comma-separated list of recipient email addresses'),
                 ('Cc:', 'email.cc', [],
-                    'Comma-separated list of carbon copy recipients'' email'
+                    'Comma-separated list of carbon copy recipient email'
                     ' addresses'),
                 ('Bcc:', 'email.bcc', [],
-                    'Comma-separated list of blind carbon copy recipients'' '
-                    'email addresses'),
+                    'Comma-separated list of blind carbon copy recipient'
+                    ' email addresses'),
                 ('method:', 'email.method', ['smtp'],
 'Optional. Method to use to send email messages. If value is "smtp" (default),'
 ' use SMTP (configured below).  Otherwise, use as name of program to run that'
@@ -392,9 +392,10 @@ class ConfigDialog(gtk.Dialog):
 
             lbl = gtk.Label(label)
             hbox = gtk.HBox()
-            self.tooltips.set_tip(combo, tooltip)
-            self.tooltips.set_tip(lbl, tooltip)
-            hbox.pack_start(lbl, False, False, 4)
+            eventbox = gtk.EventBox()
+            self.tooltips.set_tip(eventbox, tooltip)
+            eventbox.add(lbl)
+            hbox.pack_start(eventbox, False, False, 4)
             hbox.pack_start(combo, True, True, 4)
             vbox.pack_start(hbox, False, False, 4)
 
