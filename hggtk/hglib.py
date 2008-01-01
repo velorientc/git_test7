@@ -68,6 +68,9 @@ class Hg:
 
 class GtkUi(ui.ui):
     queue = Queue.Queue()
+    lock = threading.Lock()
+    dialogq = Queue.Queue()
+    responseq = Queue.Queue()
 
     '''PyGtk enabled mercurial.ui subclass'''
     def __init__(self, verbose=False, debug=False, quiet=False,
@@ -100,10 +103,10 @@ class GtkUi(ui.ui):
         while True:
             try:
                 # Show text entry dialog with msg prompt
-                gtk.gdk.threads_enter()
-                r = entry_dialog(msg, default=default)
-                gtk.gdk.flush()
-                gtk.gdk.threads_leave()
+                self.lock.acquire()
+                self.dialogq.put( (msg, True, default) )
+                r = self.responseq.get(True)
+                self.lock.release()
                 if not r:
                     return default
                 if not pat or re.match(pat, r):
@@ -115,11 +118,10 @@ class GtkUi(ui.ui):
 
     def getpass(self, prompt=None, default=None):
         '''generic PyGtk password prompt dialog'''
-        gtk.gdk.threads_enter()
-        p = entry_dialog(prompt or _('password: '), visible=False,
-                default=default)
-        gtk.gdk.flush()
-        gtk.gdk.threads_leave()
+        self.lock.acquire()
+        self.dialogq.put( (prompt or _('password: '), False, default) )
+        r = self.responseq.get(True)
+        self.lock.release()
         return p
 
     def print_exc(self):
@@ -150,6 +152,23 @@ class HgThread(threading.Thread):
                else an error was returned
         '''
         return self.ret
+
+    def process_dialogs(self):
+        '''Polled every 10ms to serve dialogs for the background thread'''
+        try:
+            (prompt, visible, default) = GtkUi.dialogq.get_nowait()
+            self.dlg = entry_dialog(prompt, visible, default,
+                    self.dialog_response)
+        except Queue.Empty:
+            pass
+
+    def dialog_response(self, widget, response_id):
+        if response_id == gtk.RESPONSE_OK:
+            text = self.dlg.entry.get_text()
+        else:
+            text = None
+        self.dlg.destroy()
+        GtkUi.responseq.put(text)
 
     def run(self):
         # Monkey patch our GUI ui subclass into place

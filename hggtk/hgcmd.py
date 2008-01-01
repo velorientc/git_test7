@@ -73,6 +73,7 @@ class CmdDialog(gtk.Dialog):
         """
         Handle all the messages currently in the queue (if any).
         """
+        self.hgthread.process_dialogs()
         enditer = self.textbuffer.get_end_iter()
         while self.hgthread.getqueue().qsize():
             try:

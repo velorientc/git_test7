@@ -333,6 +333,7 @@ class SynchDialog(gtk.Dialog):
         """
         Handle all the messages currently in the queue (if any).
         """
+        self.hgthread.process_dialogs()
         while self.hgthread.getqueue().qsize():
             try:
                 msg = self.hgthread.getqueue().get(0)

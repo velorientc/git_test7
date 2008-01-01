@@ -44,16 +44,17 @@ def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK,
     dialog.destroy()
     return response
 
-def entry_dialog(msg, visible=True, default='', title="TortoiseHg Prompt"):
+def entry_dialog(msg, visible=True, default='', respfunc=None):
     """ Allow a user to enter a text string (username/password)
-    
-    :param type: message dialog type
-    
     :param message: the message you want to display.
+    :param visible: should reponse be visible to user
+    :param default: default response text
+    :param respfunc: callback function for when dialog exits
+    :returns if respfunc returns dialog, else return response text
     """
     dialog = gtk.Dialog(flags=gtk.DIALOG_MODAL,
             buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK))
-    dialog.set_title(title)
+    dialog.set_title('TortoiseHg Prompt')
     entry = gtk.Entry()
     entry.set_text(default or '')
     entry.set_visibility(visible)
@@ -63,13 +64,18 @@ def entry_dialog(msg, visible=True, default='', title="TortoiseHg Prompt"):
     dialog.vbox.set_spacing(6)
     dialog.set_default_response(gtk.RESPONSE_OK)
     dialog.show_all()
-    response = dialog.run()
-    if response == gtk.RESPONSE_OK:
-        text = entry.get_text()
+    if respfunc:
+        dialog.connect('response', respfunc)
+        dialog.entry = entry
+        return dialog
     else:
-        text = None
-    dialog.destroy()
-    return text
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            text = entry.get_text()
+        else:
+            text = None
+        dialog.destroy()
+        return text
 
 def error_dialog(primary, secondary):
     """ Display an error dialog with the given message. """
