@@ -201,32 +201,32 @@ class ConfigDialog(gtk.Dialog):
         self.fill_frame(self.web_frame, self._web_info)
 
         self._email_info = (
-                ('From:', 'email.from', [],
+                ('From', 'email.from', [],
                     'Email address to use in "From" header and SMTP envelope'),
-                ('To:', 'email.to', [],
+                ('To', 'email.to', [],
                     'Comma-separated list of recipient email addresses'),
-                ('Cc:', 'email.cc', [],
+                ('Cc', 'email.cc', [],
                     'Comma-separated list of carbon copy recipient email'
                     ' addresses'),
-                ('Bcc:', 'email.bcc', [],
+                ('Bcc', 'email.bcc', [],
                     'Comma-separated list of blind carbon copy recipient'
                     ' email addresses'),
-                ('method:', 'email.method', ['smtp'],
+                ('method', 'email.method', ['smtp'],
 'Optional. Method to use to send email messages. If value is "smtp" (default),'
 ' use SMTP (configured below).  Otherwise, use as name of program to run that'
 ' acts like sendmail (takes "-f" option for sender, list of recipients on'
 ' command line, message on stdin). Normally, setting this to "sendmail" or'
 ' "/usr/sbin/sendmail" is enough to use sendmail to send messages.'),
-                ('SMTP Host:', 'smtp.host', [], 'Host name of mail server'),
-                ('SMTP Port:', 'smtp.port', ['25'],
+                ('SMTP Host', 'smtp.host', [], 'Host name of mail server'),
+                ('SMTP Port', 'smtp.port', ['25'],
                     'Port to connect to on mail server. Default: 25'),
-                ('SMTP TLS:', 'smtp.tls', ['False', 'True'],
+                ('SMTP TLS', 'smtp.tls', ['False', 'True'],
                     'Connect to mail server using TLS.  Default: False'),
-                ('SMTP Username:', 'smtp.username', [],
+                ('SMTP Username', 'smtp.username', [],
                     'Username to authenticate to SMTP server with'),
-                ('SMTP Password:', 'smtp.password', [],
+                ('SMTP Password', 'smtp.password', [],
                     'Password to authenticate to SMTP server with'),
-                ('SMTP Local Hostname:', 'smtp.local_hostname', [],
+                ('Local Hostname', 'smtp.local_hostname', [],
                     'Hostname the sender can use to identify itself to MTA'))
         self.email_frame = self.add_page(notebook, 'Email')
         self.fill_frame(self.email_frame, self._email_info)
@@ -352,10 +352,12 @@ class ConfigDialog(gtk.Dialog):
 
     def fill_frame(self, frame, info):
         widgets = []
+        table = gtk.Table(len(info), 2, False)
         vbox = gtk.VBox()
         frame.add(vbox)
+        vbox.pack_start(table, False, False, 2)
 
-        for label, cpath, values, tooltip in info:
+        for row, (label, cpath, values, tooltip) in enumerate(info):
             vlist = gtk.ListStore(str)
             combo = gtk.ComboBoxEntry(vlist, 0)
             combo.connect("changed", self.dirty_event)
@@ -390,14 +392,13 @@ class ConfigDialog(gtk.Dialog):
             else:
                 combo.set_active(currow)
 
-            lbl = gtk.Label(label)
-            hbox = gtk.HBox()
+            lbl = gtk.Label(label + ':')
+            lbl.set_alignment(1.0, 0.0)
             eventbox = gtk.EventBox()
-            self.tooltips.set_tip(eventbox, tooltip)
             eventbox.add(lbl)
-            hbox.pack_start(eventbox, False, False, 4)
-            hbox.pack_start(combo, True, True, 4)
-            vbox.pack_start(hbox, False, False, 4)
+            table.attach(eventbox, 0, 1, row, row+1, gtk.FILL, 0, 4, 3)
+            table.attach(combo, 1, 2, row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+            self.tooltips.set_tip(eventbox, tooltip)
 
         self.pages.append((vbox, info, widgets))
         return vbox
