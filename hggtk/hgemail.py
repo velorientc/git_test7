@@ -42,8 +42,12 @@ class EmailDialog(gtk.Dialog):
         self.vbox.pack_start(self.tbar, False, False, 2)
 
         # set dialog title
-        title = "Email Mercurial Patches"
-        self.set_title(title)
+        if revargs[0] in ('--outgoing', '-o'):
+            self.set_title('Email outgoing changes')
+        elif revargs[0] in ('--rev', '-r'):
+            self.set_title('Email revision(s) ' + ' '.join(revargs[1:]))
+        else:
+            self.set_title('Email Mercurial Patches')
         self.set_default_size(630, 400)
 
         hbox = gtk.HBox()
