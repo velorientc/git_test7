@@ -17,7 +17,7 @@ from hglib import HgThread
 from shlib import set_tortoise_icon
 
 class CmdDialog(gtk.Dialog):
-    def __init__(self, cmdline, width=520, height=400, mainapp=False):
+    def __init__(self, cmdline, width=520, height=400):
         title = 'hg ' + ' '.join(cmdline[1:])
         gtk.Dialog.__init__(self,
                             title=title,
@@ -45,14 +45,11 @@ class CmdDialog(gtk.Dialog):
         self.vbox.pack_start(scrolledwindow, True, True)
         self.connect('map_event', self._on_window_map_event)
 
-        if mainapp:
-            self._button_ok.connect('clicked', gtk.main_quit)
-        else:
-            self._button_ok.connect('clicked', self._on_commit_clicked)
-            self.show_all()
+        self._button_ok.connect('clicked', self._on_ok_clicked)
+        self.show_all()
 
-    def _on_commit_clicked(self, button):
-        """ Commit button clicked handler. """
+    def _on_ok_clicked(self, button):
+        """ Ok button clicked handler. """
         self.response(gtk.RESPONSE_ACCEPT)
         
     def _on_window_map_event(self, event, param):
@@ -89,7 +86,8 @@ class CmdDialog(gtk.Dialog):
             return True
 
 def run(cmdline=[], **opts):
-    dlg = CmdDialog(cmdline, mainapp=True)
+    dlg = CmdDialog(cmdline)
+    dlg.connect('response', gtk.main_quit)
     dlg.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
