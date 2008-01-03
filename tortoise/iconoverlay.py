@@ -11,6 +11,7 @@ from mercurial import hg, repo, ui, cmdutil, util
 import thgutil
 import sys
 
+# file/directory status
 UNCHANGED = "unchanged"
 ADDED = "added"
 MODIFIED = "modified"
@@ -19,9 +20,14 @@ NOT_IN_TREE = "not in tree"
 NO_DIRSTATE = "dirstate not found"
 CONTROL_FILE = "control file"
 
+# file status cache
 CACHE_TIMEOUT = 3000
 CACHE_SIZE = 400
 overlay_cache = {}
+
+# some misc constants
+S_OK = 0
+S_FALSE = 1
 
 def subdirs(p):
     oldp = ""
@@ -55,6 +61,20 @@ def get_cache_list(path, size):
     cache_list = dlist[begin : end]
     cache_list = [os.path.join(pathdir, x) for x in cache_list]
     return cache_list
+
+def get_dirs(list):
+    return set([os.path.dirname(p) for p in list])
+    
+def add_dirs(list):
+    dirs = set()
+    for f in list:
+        dir = os.path.dirname(f)
+        if dir in dirs:
+           continue
+        while dir:
+            dirs.add(dir)
+            dir = os.path.dirname(dir)
+    list.extend(dirs)
 
 class IconOverlayExtension(object):
     """
@@ -106,72 +126,46 @@ class IconOverlayExtension(object):
         Get the state of a given path in source control.
         """
         global overlay_cache
-        print "called: _get_state(%s)" % path
+        #print "called: _get_state(%s)" % path
         tc = win32api.GetTickCount()
         
-        # debugging
-        if IconOverlayExtension.counter > 10000:
-            IconOverlayExtension.counter = 0
-        else:
-            IconOverlayExtension.counter += 1
-        print "counter = %d" % IconOverlayExtension.counter
-        
-        if os.path.basename(path) == ".hg":
-            print "%s: skip directory" % path
-            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
-            return NOT_IN_TREE      # ignore .hg directories (for efficiency)
-
-        if 0 and os.path.isdir(path):
-            print "%s: skip directory" % path
-            return NOT_IN_TREE      # ignore directories (for efficiency)
-
         # check if path is cached
         if overlay_cache.has_key(path):
             if tc - overlay_cache[path]['ticks'] < CACHE_TIMEOUT:
                 print "%s: %s (cached)" % (path, overlay_cache[path]['status'])
                 return overlay_cache[path]['status']
 
+        if os.path.basename(path) == ".hg":
+            print "%s: skip directory" % path
+            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
+            return NOT_IN_TREE      # ignore .hg directories (for efficiency)
+
         # open repo
         root = thgutil.find_root(path)
-        print "_get_state: root = ", root
+        #print "_get_state: root = ", root
         if root is None:
-            print "_get_state: not in repo"
+            #print "_get_state: not in repo"
             overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
             return NOT_IN_TREE
 
-        # can't get correct status without dirstate
-        if not os.path.exists(os.path.join(root, ".hg", "dirstate")):
-            print "_get_state: dirstate not found"
-            return NO_DIRSTATE
-            
         # skip root direcory to improve speed
         if root == path:
-            print "_get_state: skip repo root"
+            #print "_get_state: skip repo root"
             overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
             return NOT_IN_TREE
-
-        u = ui.ui()
+            
+        # can't get correct status without dirstate
+        if not os.path.exists(os.path.join(root, ".hg", "dirstate")):
+            #print "_get_state: dirstate not found"
+            return NO_DIRSTATE
+            
         try:
-            repo = hg.repository(u, path=root)
+            repo = hg.repository(ui.ui(), path=root)
         except repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
             overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
             return NOT_IN_TREE
-
-        def get_dirs(list):
-            return set([os.path.dirname(p) for p in list])
-            
-        def add_dirs(list):
-            dirs = set()
-            for f in list:
-                dir = os.path.dirname(f)
-                if dir in dirs:
-                   continue
-                while dir:
-                    dirs.add(dir)
-                    dir = os.path.dirname(dir)
-            list.extend(dirs)
 
         # get file status
         tc1 = win32api.GetTickCount()
@@ -239,8 +233,6 @@ class IconOverlayExtension(object):
         return status
 
     def IsMemberOf(self, path, attrib):
-        S_OK = 0
-        S_FALSE = 1
         if self._get_state(path) == self.state:
             return S_OK
         return S_FALSE
