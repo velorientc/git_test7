@@ -131,13 +131,14 @@ class IconOverlayExtension(object):
         
         # check if path is cached
         if overlay_cache.has_key(path):
-            if tc - overlay_cache[path]['ticks'] < CACHE_TIMEOUT:
-                print "%s: %s (cached)" % (path, overlay_cache[path]['status'])
-                return overlay_cache[path]['status']
+            if tc - overlay_cache[path][1] < CACHE_TIMEOUT:
+                status = overlay_cache[path][0]
+                print "%s: %s (cached)" % (path, status)
+                return status
 
         if os.path.basename(path) == ".hg":
             print "%s: skip directory" % path
-            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
+            overlay_cache[path] = (UNKNOWN, tc)
             return NOT_IN_TREE      # ignore .hg directories (for efficiency)
 
         # open repo
@@ -145,13 +146,13 @@ class IconOverlayExtension(object):
         #print "_get_state: root = ", root
         if root is None:
             #print "_get_state: not in repo"
-            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
+            overlay_cache[path] = (UNKNOWN, tc)
             return NOT_IN_TREE
 
         # skip root direcory to improve speed
         if root == path:
             #print "_get_state: skip repo root"
-            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
+            overlay_cache[path] = (UNKNOWN, tc)
             return NOT_IN_TREE
             
         # can't get correct status without dirstate
@@ -164,7 +165,7 @@ class IconOverlayExtension(object):
         except repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
-            overlay_cache[path] = {'ticks': tc, 'status': UNKNOWN}
+            overlay_cache[path] = (UNKNOWN, tc)
             return NOT_IN_TREE
 
         # get file status
@@ -218,15 +219,15 @@ class IconOverlayExtension(object):
             else:
                 status = UNKNOWN
             fpath = os.path.join(repo.root, os.path.normpath(f))
-            overlay_cache[fpath] = {'ticks': tc, 'status': status}
+            overlay_cache[fpath] = (status, tc)
             #print "cache:", fpath, status
         
         for f in cache_list:
             if not f in overlay_cache:
-                overlay_cache[f] = {'ticks': tc, 'status': UNKNOWN}
+                overlay_cache[f] = (UNKNOWN, tc)
 
         if overlay_cache.has_key(path):
-            status = overlay_cache[path]['status']
+            status = overlay_cache[path][0]
         else:
             status = UNKNOWN
         print "%s: %s" % (path, status)
