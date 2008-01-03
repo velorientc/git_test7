@@ -130,7 +130,9 @@ class IconOverlayExtension(object):
         #print "_get_state: root = ", root
         if root is None:
             #print "_get_state: not in repo"
-            overlay_cache[path] = (UNKNOWN, tc)
+            overlay_cache = {}
+            for f in get_cache_list(path):
+                overlay_cache[f] = (UNKNOWN, tc)
             return NOT_IN_TREE
 
         # skip root direcory to improve speed
