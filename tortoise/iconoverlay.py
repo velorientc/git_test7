@@ -22,7 +22,6 @@ CONTROL_FILE = "control file"
 
 # file status cache
 CACHE_TIMEOUT = 3000
-CACHE_SIZE = 400
 overlay_cache = {}
 
 # some misc constants
@@ -40,27 +39,12 @@ def subdirs(p):
             return
         yield p
 
-def get_cache_list(path, size):
-    """"
-    get a sorted list (of size 'size') of file/folders which reside in  
-    the same directory as 'path' and windowed around 'path' on the list. 
-    The .hg directory will be ignore. Other directories will also be 
-    ignored unless path is a directory itself.
+def get_cache_list(path):
+    """
+    get a list of file/folders which reside in the same directory as 'path' 
     """
     pathdir = os.path.dirname(path)
-    dlist = [x for x in os.listdir(pathdir) if x <> ".hg"]
-    if not os.path.isdir(path):
-        dlist = [x for x in dlist if not os.path.isdir(x)]
-    dlist.sort()
-    try:
-        idx = dlist.index(os.path.basename(path))
-    except:
-        idx = 0
-    begin = max(0, idx - size/2)
-    end = idx + size/2
-    cache_list = dlist[begin : end]
-    cache_list = [os.path.join(pathdir, x) for x in cache_list]
-    return cache_list
+    return [os.path.join(pathdir, x) for x in os.listdir(pathdir) if x <> ".hg"]
 
 def get_dirs(list):
     return set([os.path.dirname(p) for p in list])
@@ -170,7 +154,7 @@ class IconOverlayExtension(object):
 
         # get file status
         tc1 = win32api.GetTickCount()
-        cache_list = get_cache_list(path, CACHE_SIZE)
+        cache_list = get_cache_list(path)
         #print "cache_list: ", "\n".join(cache_list)
         
         dirstate_list = [ os.path.normpath(os.path.join(root, x[0])) 
