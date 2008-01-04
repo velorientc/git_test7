@@ -520,7 +520,7 @@ class GLog(GDialog):
             statopts['modified'] = True
             statopts['added'] = True
             statopts['removed'] = True
-            dialog = GStatus(self.ui, self.repo, [], statopts, False)
+            dialog = GStatus(self.ui, self.repo, self.cwd, [], statopts, False)
             dialog.display()
         return True
 
