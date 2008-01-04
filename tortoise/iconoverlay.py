@@ -120,6 +120,14 @@ class IconOverlayExtension(object):
                 print "%s: %s (cached)" % (path, status)
                 return status
 
+        # path is a drive
+        if path.endswith(":\\"):
+            st = thgutil.netdrive_status(path)
+            if st == False:
+                print "%s: skip invalid network drive" % path
+                overlay_cache[path] = (UNKNOWN, tc)
+                return NOT_IN_TREE
+                
         if os.path.basename(path) == ".hg":
             print "%s: skip directory" % path
             overlay_cache[path] = (UNKNOWN, tc)

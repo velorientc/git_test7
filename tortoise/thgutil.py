@@ -29,9 +29,12 @@ def find_root(path):
 if os.name == 'nt':
     from win32com.shell import shell, shellcon
     import win32con
+    import win32net
     from win32gui import *
     from win32api import *
     import _winreg
+
+    USE_OK  = 0     # network drive status
 
     def find_path(pgmname, path=None, ext=None):
         """ return first executable found in search path """
@@ -71,6 +74,19 @@ if os.name == 'nt':
         dir = _winreg.QueryValue(cat, key)
         return dir
 
+    def netdrive_status(drive):
+        """
+        return True if a network drive is accessible (connected, ...),
+        or None if <drive> is not a network drive
+        """
+        letter = os.path.splitdrive(drive)[0]
+        _drives, total, _ = win32net.NetUseEnum(None, 1, 0)
+        for drv in _drives:
+            if drv['local'] == letter:
+                info = win32net.NetUseGetInfo(None, letter, 1)
+                return info['status'] == USE_OK
+        return None
+    
     bitmap_cache = {}
     def icon_to_bitmap(iconPathName):
         """
