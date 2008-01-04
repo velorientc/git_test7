@@ -193,7 +193,7 @@ class GCommit(GStatus):
         success, outtext = self._hg_call_wrapper('Commit', dohgcommit)
         if success:
             self.text.set_buffer(gtk.TextBuffer())
-            shell_notify(files)
+            shell_notify([self.cwd] + files)
             self.reload_status()
 
 def run(root='', files=[], cwd='', **opts):
