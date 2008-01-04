@@ -133,10 +133,11 @@ class HgThread(threading.Thread):
     savedui = None
     instances = 0
 
-    def __init__(self, args = []):
+    def __init__(self, args = [], postfunc = None):
         self.ui = GtkUi()
         self.args = args
         self.ret = None
+        self.postfunc = postfunc
         threading.Thread.__init__(self)
 
     def command(self, cmd, files=[], options={}):
@@ -187,6 +188,8 @@ class HgThread(threading.Thread):
             else:
                 self.ui.write('command completed successfully.\n')
             self.ret = ret or 0
+            if self.postfunc:
+                self.postfunc(ret)
         except hg.RepoError, e:
             self.ui.write_err(e)
         except util.Abort, e:

@@ -116,7 +116,7 @@ class RecoveryDialog(gtk.Dialog):
         return tbutton
         
     def _rollback_clicked(self, toolbutton, data=None):
-        def notify():
+        def notify(ret):
             import time
             time.sleep(0.5)     # give fs some time to pick up changes
             shell_notify([self.cwd])
@@ -143,18 +143,8 @@ class RecoveryDialog(gtk.Dialog):
 
         # execute command and show output on text widget
         gobject.timeout_add(10, self.process_queue)
-        self.hgthread = HgThread(cmdline)
+        self.hgthread = HgThread(cmdline, postfunc)
         self.hgthread.start()
-
-        if not postfunc is None:
-            # start another thread to execute postfunc
-            # when self.hgthread is done
-            def do_postfunc():
-                print "do_postfunc: started"
-                self.hgthread.join()
-                postfunc()
-                print "do_postfunc: done"
-            threading.Thread(target=do_postfunc).start()
         
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
