@@ -584,7 +584,7 @@ class GLog(GDialog):
         self._menu.get_children()[0].activate()
         return True
 
-def run(root='', files=[], **opts):
+def run(root='', cwd='', files=[], **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -596,7 +596,7 @@ def run(root='', files=[], **opts):
         'include':[], 'exclude':[]
     }
 
-    dialog = GLog(u, repo, files, cmdoptions, True)
+    dialog = GLog(u, repo, cwd, files, cmdoptions, True)
     
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

@@ -214,7 +214,7 @@ def run(root='', files=[], cwd='', **opts):
         'check': False, 'git':False, 'logfile':'', 'addremove':False,
     }
     
-    dialog = GCommit(u, repo, files, cmdoptions, True)
+    dialog = GCommit(u, repo, cwd, files, cmdoptions, True)
     
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
