@@ -21,7 +21,7 @@ from mercurial import hg, ui, util
 from mercurial.node import *
 from dialog import error_dialog
 from hglib import HgThread
-from shlib import set_tortoise_icon
+from shlib import set_tortoise_icon, shell_notify
 
 class RecoveryDialog(gtk.Dialog):
     def __init__(self, cwd='', root=''):
@@ -32,6 +32,7 @@ class RecoveryDialog(gtk.Dialog):
 
         set_tortoise_icon(self, 'general.ico')
         self.root = root
+        self.cwd = cwd
         self.selected_path = None
 
         self.set_default_size(600, 400)
@@ -115,8 +116,12 @@ class RecoveryDialog(gtk.Dialog):
         return tbutton
         
     def _rollback_clicked(self, toolbutton, data=None):
+        def notify():
+            import time
+            time.sleep(0.5)     # give fs some time to pick up changes
+            shell_notify([self.cwd])
         cmd = ['rollback']
-        self._exec_cmd(cmd)
+        self._exec_cmd(cmd, postfunc=notify)
         
     def _recover_clicked(self, toolbutton, data=None):
         cmd = ['recover']
@@ -126,7 +131,7 @@ class RecoveryDialog(gtk.Dialog):
         cmd = ['verify']
         self._exec_cmd(cmd)
     
-    def _exec_cmd(self, cmd):
+    def _exec_cmd(self, cmd, postfunc=None):            
         cmdline = cmd
         cmdline.append('--verbose')
         cmdline.append('--repository')
@@ -140,6 +145,16 @@ class RecoveryDialog(gtk.Dialog):
         gobject.timeout_add(10, self.process_queue)
         self.hgthread = HgThread(cmdline)
         self.hgthread.start()
+
+        if not postfunc is None:
+            # start another thread to execute postfunc
+            # when self.hgthread is done
+            def do_postfunc():
+                print "do_postfunc: started"
+                self.hgthread.join()
+                postfunc()
+                print "do_postfunc: done"
+            threading.Thread(target=do_postfunc).start()
         
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
