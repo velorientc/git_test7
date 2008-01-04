@@ -26,6 +26,7 @@ from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
+from gtools import cmdtable
 from status import GStatus
 
 class GCommit(GStatus):
@@ -185,8 +186,6 @@ class GCommit(GStatus):
 
 
     def _hg_commit(self, files):
-        from gtools import cmdtable
-
         # In case new commit args are added in the future, merge the hg defaults
         commitopts = self.merge_opts(commands.table['^commit|ci'][1], [name[1] for name in cmdtable['gcommit|gci'][1]])
         def dohgcommit():
