@@ -125,7 +125,7 @@ class RecoveryDialog(gtk.Dialog):
         return tbutton
         
     def _rollback_clicked(self, toolbutton, data=None):
-        def notify(ret):
+        def notify(ret, *args):
             import time
             time.sleep(0.5)     # give fs some time to pick up changes
             shell_notify([self.cwd])
