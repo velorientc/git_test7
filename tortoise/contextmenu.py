@@ -356,25 +356,15 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Synchronize..."),
                            _("Synchronize with remote repository"),
                            self._synch, icon="menusynch.ico"))
+            result.append(TortoiseMenu(_("Recovery..."),
+                           _("General repair and recovery of repository"),
+                           self._recovery, icon="general.ico"))
             result.append(TortoiseMenu(_("Web Server"),
                            _("start web server for this repository"),
                            self._serve, icon="proxy.ico"))
 
-            # repo recovery functions
-            rcmenu = TortoiseSubmenu(_("Repo Recovery"), icon="general.ico")
-            result.append(rcmenu)
-            
-            rcmenu.add_menu(_("Rollback"),
-                            _("Rollback the last transaction"),
-                            self._rollback)
-            rcmenu.add_menu(_("Recover"),
-                            _("Recover from an interrupted commit or pull"),
-                            self._recover)
-            rcmenu.add_menu(_("Verify"),
-                            _("Verify repository consistency"),
-                            self._verify)
-
             result.append(TortoiseMenuSep())
+            
             optmenu = TortoiseSubmenu(_("Settings"),icon="menusettings.ico")
             optmenu.add_menu(_("Global"),
                              _("Configure user wide settings"),
@@ -598,26 +588,8 @@ class ContextMenuExtension:
     def _merge(self, parent_window):
         self._run_dialog('merge', noargs=True)
 
-    def _rollback(self, parent_window):
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        msg = "Confirm rollback: %s" % root
-        title = "Mercurial: rollback"
-        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
-        if rv == 1:
-            self._run_dialog('rollback', noargs=True)
-
-    def _recover(self, parent_window):
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        msg = "Confirm recovering %s?" % root
-        title = "Mercurial: recover"
-        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
-        if rv == 1:
-            self._run_dialog('recover', noargs=True)
-
-    def _verify(self, parent_window):
-        self._run_dialog('verify', noargs=True)
+    def _recovery(self, parent_window):
+        self._run_dialog('recovery')
 
     def _commit_simple(self, parent_window):
         self._run_dialog('commit')

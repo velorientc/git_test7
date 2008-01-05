@@ -136,7 +136,7 @@ class UpdateDialog(gtk.Dialog):
         if response != gtk.RESPONSE_YES:
             return
             
-        cmdline = ['hg', 'update', '-R', self.root, '--rev', rev]
+        cmdline = ['hg', 'update', '-R', self.root, '--rev', rev, '--verbose']
         if overwrite: 
             cmdline.append('--clean')
 

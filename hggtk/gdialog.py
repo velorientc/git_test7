@@ -124,9 +124,9 @@ class GDialog(gtk.Window):
     # "Constants"
     settings_version = 1
 
-    def __init__(self, ui, repo, pats, opts, main):
+    def __init__(self, ui, repo, cwd, pats, opts, main):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        self._cwd = repo.root
+        self.cwd = cwd
         self.ui = ui
         self.ui.interactive=False
         self.repo = repo
@@ -366,7 +366,7 @@ class GDialog(gtk.Window):
         # extdiff works on relative directories to avoid showing temp paths. Since another thread
         # could be running that changed cwd, we always need to set it back. This is a race condition
         # but not likely to be a problem.
-        os.chdir(self._cwd)
+        os.chdir(self.repo.root)
 
 
     def _hg_call_wrapper(self, title, command, showoutput=True):

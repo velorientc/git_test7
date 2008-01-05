@@ -16,7 +16,7 @@ from mercurial import ui, util, hg
 from mercurial.i18n import _
 from status import GStatus
 
-def run(hgcmd='add', root='', files=[], **opts):
+def run(hgcmd='add', root='', cwd='', files=[], **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -34,7 +34,7 @@ def run(hgcmd='add', root='', files=[], **opts):
     else:
         raise "Invalid command '%s'" % hgcmd
         
-    dialog = GStatus(u, repo, files, cmdoptions, True)
+    dialog = GStatus(u, repo, cwd, files, cmdoptions, True)
 
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

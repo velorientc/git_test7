@@ -6,7 +6,7 @@ AppCopyright=Copyright 2007 TK Soh and others
 AppName=TortoiseHg
 AppVerName=TortoiseHg snapshot
 ;InfoAfterFile=iss/postinstall.txt
-LicenseFile=COPYING
+LicenseFile=COPYING.txt
 ShowLanguageDialog=yes
 AppPublisher=TK Soh and others
 AppPublisherURL=http://tortoisehg.sourceforge.net/
@@ -30,7 +30,7 @@ AlwaysRestart=yes
 SetupLogging=yes
 
 [Files]
-Source: COPYING; DestDir: {app}; DestName: Copying.txt
+Source: COPYING.txt; DestDir: {app}; DestName: COPYING.txt
 Source: dist\*.exe; DestDir: {app} ; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.zip; DestDir: {app} ; Flags: ignoreversion restartreplace uninsrestartdelete 
 Source: dist\*.dll; DestDir: {app} ; Flags: ignoreversion restartreplace uninsrestartdelete

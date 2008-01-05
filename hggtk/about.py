@@ -19,7 +19,7 @@ from tortoise.thgutil import get_prog_root
 
 prog_root = get_prog_root()
 hg_icon = os.path.join(prog_root, "icons/tortoise/hg.ico")
-license_file = os.path.join(prog_root, "COPYING")
+license_file = os.path.join(prog_root, "COPYING.txt")
 
 def browse_url(url):
     import threading

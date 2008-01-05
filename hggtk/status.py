@@ -767,7 +767,7 @@ class GStatus(GDialog):
         menu.get_children()[0].activate()
         return True
 
-def run(root='', files=[], **opts):
+def run(root='', cwd='', files=[], **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -778,7 +778,7 @@ def run(root='', files=[], **opts):
         'exclude':[], 'include':[], 'debug':True,'verbose':True
     }
     
-    dialog = GStatus(u, repo, files, cmdoptions, True)
+    dialog = GStatus(u, repo, cwd, files, cmdoptions, True)
 
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

@@ -127,6 +127,9 @@ class HgExtension(nautilus.MenuProvider,
     def _merge_cb(self, window, vfs_file):
         self._run_dialog('merge', [vfs_file], filelist=False)
 
+    def _recovery_cb(self, window, vfs_file):
+        self._run_dialog('recovery', [vfs_file])
+
     def _revert_cb(self, window, vfs_files):
         self._run_dialog('revert', vfs_files)
 
@@ -289,6 +292,13 @@ class HgExtension(nautilus.MenuProvider,
                              'Start internal web server',
                              self.icon('proxy.ico'))
         item.connect('activate', self._serve_cb, vfs_file)
+        items.append(item)
+
+        item = nautilus.MenuItem('HgNautilus::recover',
+                             'Recovery',
+                             'General repair and recovery of repository',
+                             self.icon('general.ico'))
+        item.connect('activate', self._recovery_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('HgNautilus::repoconfig',
