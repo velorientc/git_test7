@@ -58,7 +58,8 @@ if os.name == 'nt':
         for path in paths:
             abspath = os.path.abspath(path)
             pidl, ignore = shell.SHILCreateFromPath(abspath, 0)
-            #print "notify: ", shell.SHGetPathFromIDList(pidl)
+            if pidl is None:
+                continue
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
                                  shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSHNOWAIT,
                                  pidl,
