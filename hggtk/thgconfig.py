@@ -140,19 +140,25 @@ class ConfigDialog(gtk.Dialog):
         self._testpathbutton.connect('clicked', self._test_path)
         buttonbox.pack_start(self._testpathbutton)
 
-        hbox = gtk.HBox()
+        table = gtk.Table(2, 2, False)
+        lbl = gtk.Label('Name:')
+        lbl.set_alignment(1.0, 0.0)
         self._pathnameedit = gtk.Entry()
-        hbox.pack_start(gtk.Label('Name:'), False, False, 4)
-        hbox.pack_start(self._pathnameedit, True, True, 4)
-        vbox.pack_start(hbox, False, False, 4)
+        table.attach(lbl, 0, 1, 0, 1, gtk.FILL, 0, 4, 3)
+        table.attach(self._pathnameedit, 1, 2, 0, 1,
+                gtk.FILL|gtk.EXPAND, 0, 4, 3)
 
-        hbox = gtk.HBox()
+        lbl = gtk.Label('Path:')
+        lbl.set_alignment(1.0, 0.0)
         self._pathpathedit = gtk.Entry()
-        hbox.pack_start(gtk.Label('Path:'), False, False, 4)
-        hbox.pack_start(self._pathpathedit, True, True, 4)
-        vbox.pack_start(hbox, False, False, 4)
+        table.attach(lbl, 0, 1, 1, 2, gtk.FILL, 0, 4, 3)
+        table.attach(self._pathpathedit, 1, 2, 1, 2,
+                gtk.FILL|gtk.EXPAND, 0, 4, 3)
+
+        vbox.pack_start(table, False, False, 4)
         vbox.pack_start(buttonbox, False, False, 4)
         self.refresh_path_list()
+
 
         self._web_info = (
                 ('Name', 'web.name', ['unknown'],
