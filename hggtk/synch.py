@@ -50,31 +50,43 @@ class SynchDialog(gtk.Dialog):
 
         # toolbar
         self.tbar = gtk.Toolbar()
+        self.tips = gtk.Tooltips()
         tbuttons = [
                 self._toolbutton(gtk.STOCK_GO_DOWN,
                                  'incoming', 
                                  self._incoming_clicked,
-                                 self._incoming_menu()),
+                                 self._incoming_menu(),
+                                 tip='Display changes that can be pulled'
+                                 ' from selected repository'),
                 self._toolbutton(gtk.STOCK_GOTO_BOTTOM,
                                  'pull',
                                  self._pull_clicked,
-                                 self._pull_menu()),
+                                 self._pull_menu(),
+                                 tip='Pull changes from selected'
+                                 ' repository'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_GO_UP,
                                  'outgoing',
                                  self._outgoing_clicked,
-                                 self._outgoing_menu()),
+                                 self._outgoing_menu(),
+                                 tip='Display local changes that will be pushed'
+                                 ' to selected repository'),
                 self._toolbutton(gtk.STOCK_GOTO_TOP,
                                  'push',
                                  self._push_clicked,
-                                 self._push_menu()),
+                                 self._push_menu(),
+                                 tip='Push local changes to selected'
+                                 ' repository'),
                 self._toolbutton(gtk.STOCK_GOTO_LAST,
                                  'email',
-                                 self._email_clicked),
+                                 self._email_clicked,
+                                 tip='Email local outgoing changes to'
+                                 ' one or more recipients'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_PREFERENCES,
                                  'configure',
-                                 self._conf_clicked),
+                                 self._conf_clicked,
+                                 tip='Configure peer repository paths'),
                 gtk.SeparatorToolItem(),
             ]
         for btn in tbuttons:
@@ -220,7 +232,8 @@ class SynchDialog(gtk.Dialog):
         else:
             gtk.main_quit()
     
-    def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
+    def _toolbutton(self, stock, label, handler,
+                    menu=None, userdata=None, tip=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
@@ -228,6 +241,8 @@ class SynchDialog(gtk.Dialog):
             tbutton = gtk.ToolButton(stock)
             
         tbutton.set_label(label)
+        if tip:
+            self.tips.set_tip(tbutton, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
         
