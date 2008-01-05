@@ -118,9 +118,9 @@ class RecoveryDialog(gtk.Dialog):
         else:
             tbutton = gtk.ToolButton(stock)
             
-        if tip:
-            self.tips.set_tip(tbutton, tip)
         tbutton.set_label(label)
+        if tip:
+            tbutton.set_tooltip(self.tips, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
         

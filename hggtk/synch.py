@@ -242,7 +242,7 @@ class SynchDialog(gtk.Dialog):
             
         tbutton.set_label(label)
         if tip:
-            self.tips.set_tip(tbutton, tip)
+            tbutton.set_tooltip(self.tips, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
         
