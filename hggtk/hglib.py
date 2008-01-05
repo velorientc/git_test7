@@ -133,7 +133,7 @@ class HgThread(threading.Thread):
     savedui = None
     instances = 0
 
-    def __init__(self, args = [], postfunc = None):
+    def __init__(self, args=[], postfunc=None):
         self.ui = GtkUi()
         self.args = args
         self.ret = None
