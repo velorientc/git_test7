@@ -19,7 +19,7 @@ import os
 import threading
 from mercurial import hg, ui, util 
 from mercurial.node import *
-from dialog import error_dialog
+from dialog import error_dialog, question_dialog
 from hglib import HgThread
 from shlib import set_tortoise_icon, shell_notify
 
@@ -124,6 +124,11 @@ class RecoveryDialog(gtk.Dialog):
         return tbutton
         
     def _rollback_clicked(self, toolbutton, data=None):
+        response = question_dialog("Rollback repository",
+                "%s ?" % os.path.basename(self.repo.root))
+        if not response == gtk.RESPONSE_YES:
+            return
+
         def notify(ret, *args):
             import time
             time.sleep(0.5)     # give fs some time to pick up changes
