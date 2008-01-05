@@ -50,18 +50,24 @@ class RecoveryDialog(gtk.Dialog):
 
         # toolbar
         self.tbar = gtk.Toolbar()
+        self.tips = gtk.Tooltips()
         tbuttons = [
                 self._toolbutton(gtk.STOCK_UNDO,
                                  'rollback', 
-                                 self._rollback_clicked),
+                                 self._rollback_clicked,
+                                 tip='Rollback (undo) last transaction to local'
+                                 ' repository (pull, commit, etc)'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_CLEAR,
                                  'recover',
-                                 self._recover_clicked),
+                                 self._recover_clicked,
+                                 tip='Recover from interrupted operation.'
+                                 ' Only required if specifically requested'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_APPLY,
                                  'verify',
-                                 self._verify_clicked),
+                                 self._verify_clicked,
+                                 tip='Validate repository consistency'),
                 gtk.SeparatorToolItem(),
             ]
         for btn in tbuttons:
@@ -104,13 +110,16 @@ class RecoveryDialog(gtk.Dialog):
         else:
             gtk.main_quit()
     
-    def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
+    def _toolbutton(self, stock, label, handler,
+                    menu=None, userdata=None, tip=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
             
+        if tip:
+            self.tips.set_tip(tbutton, tip)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
