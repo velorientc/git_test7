@@ -84,10 +84,10 @@ class ServeDialog(gtk.Dialog):
                                               None)
         tbuttons = [
                 self._button_start,
-                gtk.SeparatorToolItem(),
                 self._button_stop,
                 gtk.SeparatorToolItem(),
                 self._button_browse,
+                gtk.SeparatorToolItem(),
                 self._button_conf,
             ]
         for btn in tbuttons:
