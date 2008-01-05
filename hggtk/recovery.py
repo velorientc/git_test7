@@ -55,14 +55,13 @@ class RecoveryDialog(gtk.Dialog):
                 self._toolbutton(gtk.STOCK_UNDO,
                                  'rollback', 
                                  self._rollback_clicked,
-                                 tip='Rollback (undo) last transaction to local'
-                                 ' repository (pull, commit, etc)'),
+                                 tip='Rollback (undo) last transaction to'
+                                     ' repository (pull, commit, etc)'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_CLEAR,
                                  'recover',
                                  self._recover_clicked,
-                                 tip='Recover from interrupted operation.'
-                                 ' Only required if specifically requested'),
+                                 tip='Recover from interrupted operation'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_APPLY,
                                  'verify',
