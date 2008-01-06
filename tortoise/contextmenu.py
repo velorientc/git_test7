@@ -220,9 +220,6 @@ class ContextMenuExtension:
 
         # add common menu items
         commands.append(TortoiseMenuSep())
-        commands.append(TortoiseMenu(_("Help"),
-                       _("Basic Mercurial help text"),
-                       self._help, icon="menuhelp.ico"))
         commands.append(TortoiseMenu(_("About"),
                        _("About TortoiseHg"),
                        self._about, icon="menuabout.ico"))
