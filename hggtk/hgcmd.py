@@ -27,6 +27,7 @@ class CmdDialog(gtk.Dialog):
 
         set_tortoise_icon(self, 'hg.ico')
         self.cmdline = cmdline
+        self.returncode = None
 
         # construct dialog
         self.set_default_size(width, height)
@@ -98,6 +99,7 @@ class CmdDialog(gtk.Dialog):
         self.update_progress()
         if threading.activeCount() == 1:
             self._button_ok.set_sensitive(True)
+            self.returncode = self.hgthread.return_code()
             return False # Stop polling this function
         else:
             return True
