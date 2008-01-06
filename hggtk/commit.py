@@ -203,12 +203,7 @@ class GCommit(GStatus):
         shell_notify([self.cwd] + files)
         self.reload_status()
 
-def run(root='', files=[], cwd='', **opts):
-    # If no files or directories were selected, take current dir
-    # TODO: Not clear if this is best; user may expect repo wide
-    if not files and cwd:
-        files = [cwd]
-
+def launch(root='', files=[], cwd=''):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -217,7 +212,7 @@ def run(root='', files=[], cwd='', **opts):
     if ct != 'internal':
         args = ['--repository', root, ct]
         ret = dispatch._dispatch(repo.ui, args)
-        return
+        return None
 
     cmdoptions = {
         'user':'', 'date':'',
@@ -228,12 +223,19 @@ def run(root='', files=[], cwd='', **opts):
     }
     
     dialog = GCommit(u, repo, cwd, files, cmdoptions, True)
-    
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
     dialog.display()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return dialog
+    
+def run(root='', files=[], cwd='', **opts):
+    # If no files or directories were selected, take current dir
+    # TODO: Not clear if this is best; user may expect repo wide
+    if not files and cwd:
+        files = [cwd]
+    if launch(root, files, cwd):
+        gtk.gdk.threads_init()
+        gtk.gdk.threads_enter()
+        gtk.main()
+        gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
     import sys

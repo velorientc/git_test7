@@ -6,13 +6,8 @@
 #
 
 import os
-import threading
-import StringIO
+import subprocess
 import sys
-import shutil
-import tempfile
-import datetime
-import cPickle
 
 import pygtk
 pygtk.require('2.0')
@@ -26,6 +21,7 @@ from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
+from hgcmd import CmdDialog
 
 class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -341,13 +337,16 @@ class GLog(GDialog):
         
     def get_body(self):
         self._menu = gtk.Menu()
-        self._menu.set_size_request(95, -1)
         menuitem = gtk.MenuItem('_status', True)
         menuitem.connect('activate', self._show_status)
         menuitem.set_border_width(1)
         self._menu.append(menuitem)
         menuitem = gtk.MenuItem('_checkout', True)
         menuitem.connect('activate', self._checkout)
+        menuitem.set_border_width(1)
+        self._menu.append(menuitem)
+        menuitem = gtk.MenuItem('_merge with', True)
+        menuitem.connect('activate', self._merge)
         menuitem.set_border_width(1)
         self._menu.append(menuitem)
         menuitem = gtk.MenuItem("_export patch",True)
@@ -566,21 +565,58 @@ class GLog(GDialog):
         if len(pl) > 1:
             warning = "Outstanding uncommitted merges"
         elif pa != p1 and pa != p2:
-            warning = "Update spans branches"
+            warning = "Checkout spans branches"
         elif wc.files():
             warning = "Outstanding uncommitted changes"
         if warning:
-            from dialog import question_dialog
             flags = ['--clean']
-            msg = 'Yes to lose changes and perform clean checkout, No to abort'
-            if question_dialog(warning, msg) != gtk.RESPONSE_YES:
+            msg = 'lose changes'
+            warning += ', requires clean checkout'
+            if Confirm(msg, [], self, warning).run() != gtk.RESPONSE_YES:
                 return
-        from hgcmd import CmdDialog
         cmdline = ['hg', 'update', '-R', self.repo.root] + flags + [str(rev)]
         dialog = CmdDialog(cmdline)
         dialog.set_transient_for(self)
         dialog.run()
         dialog.hide()
+        shell_notify([self.repo.root])
+        self.repo.dirstate.invalidate()
+        self.reload_log()
+
+    def _merge(self, menuitem):
+        row = self.model[self.tree.get_selection().get_selected()[1]]
+        rev = long(row[2])
+        self.repo.invalidate()
+        wc = self.repo.workingctx()
+        pl = wc.parents()
+        if len(pl) > 1:
+            Prompt("Unable to merge",
+                    "Outstanding uncommitted merge", self).run()
+            return
+        elif wc.files():
+            Prompt("Unable to merge",
+                    "Outstanding uncommitted changes", self).run()
+            return
+        elif pl[0] == self.repo.changectx(rev):
+            Prompt("Unable to merge",
+                    "Cannot merge a revision with itself", self).run()
+            return
+
+        cmdline = ['hg', 'merge', '-R', self.repo.root, str(rev)]
+        dialog = CmdDialog(cmdline)
+        dialog.set_transient_for(self)
+        dialog.run()
+        dialog.hide()
+        if dialog.returncode == 0:
+            # Spawn commit tool if merge was successful
+            ct = self.repo.ui.config('tortoisehg', 'commit', 'internal')
+            if ct == 'internal':
+                from commit import launch as commit_launch
+                commit_launch(self.repo.root, [], self.repo.root)
+            else:
+                args = [self.hgpath, '--repository', self.repo.root, ct]
+                subprocess.Popen(args, shell=False)
+
         shell_notify([self.repo.root])
         self.repo.dirstate.invalidate()
         self.reload_log()
@@ -620,7 +656,7 @@ class GLog(GDialog):
         self._menu.get_children()[0].activate()
         return True
 
-def run(root='', cwd='', files=[], **opts):
+def run(root='', cwd='', files=[], hgpath='hg', **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -633,6 +669,7 @@ def run(root='', cwd='', files=[], **opts):
     }
 
     dialog = GLog(u, repo, cwd, files, cmdoptions, True)
+    dialog.hgpath = hgpath
     
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
