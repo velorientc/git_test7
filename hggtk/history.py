@@ -341,7 +341,7 @@ class GLog(GDialog):
         
     def get_body(self):
         self._menu = gtk.Menu()
-        self._menu.set_size_request(90, -1)
+        self._menu.set_size_request(95, -1)
         menuitem = gtk.MenuItem('_status', True)
         menuitem.connect('activate', self._show_status)
         menuitem.set_border_width(1)
