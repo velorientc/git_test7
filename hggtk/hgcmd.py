@@ -14,10 +14,10 @@ import os
 import threading
 import Queue
 from hglib import HgThread
-from shlib import set_tortoise_icon
+from shlib import set_tortoise_icon, get_system_times
 
 class CmdDialog(gtk.Dialog):
-    def __init__(self, cmdline, width=520, height=400):
+    def __init__(self, cmdline, progressbar=False, width=520, height=400):
         title = 'hg ' + ' '.join(cmdline[1:])
         gtk.Dialog.__init__(self,
                             title=title,
@@ -34,7 +34,23 @@ class CmdDialog(gtk.Dialog):
         self._button_ok = gtk.Button("OK")
         self.action_area.pack_end(self._button_ok)
         
+        self.pbar = None
+        if progressbar:
+            self.last_pbar_update = 0
+            
+            # Create a centering alignment object
+            align = gtk.Alignment(0.0, 0.0, 1, 0)
+            self.vbox.pack_start(align, False, False, 3)
+            align.show()
+            
+            # create the progress bar
+            self.pbar = gtk.ProgressBar()
+            align.add(self.pbar)
+            self.pbar.pulse()
+            self.pbar.show()
+        
         scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
@@ -79,14 +95,29 @@ class CmdDialog(gtk.Dialog):
                 self.textbuffer.insert(enditer, msg)
             except Queue.Empty:
                 pass
+        self.update_progress()
         if threading.activeCount() == 1:
             self._button_ok.set_sensitive(True)
             return False # Stop polling this function
         else:
             return True
 
-def run(cmdline=[], **opts):
-    dlg = CmdDialog(cmdline)
+    def update_progress(self):
+        if not self.pbar:
+            return          # progress bar not enabled
+            
+        if threading.activeCount() == 1:
+            self.pbar.set_fraction(1.0)
+        else:
+            # pulse the progress bar every ~100ms
+            tm = get_system_times()[4]
+            if tm - self.last_pbar_update < 0.100:
+                return
+            self.last_pbar_update = tm
+            self.pbar.pulse()
+
+def run(cmdline=[], progressbar=False, **opts):
+    dlg = CmdDialog(cmdline, progressbar)
     dlg.connect('response', gtk.main_quit)
     dlg.show_all()
     gtk.gdk.threads_init()
@@ -96,7 +127,6 @@ def run(cmdline=[], **opts):
     
 if __name__ == "__main__":
     import sys
-    opts = {}
-    opts['cmdline'] = sys.argv
-    run(**opts)
+    #run(sys.argv)
+    run(sys.argv, True)
 
