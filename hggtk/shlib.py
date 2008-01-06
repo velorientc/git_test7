@@ -9,7 +9,14 @@ of the GNU General Public License, incorporated herein by reference.
 
 import os
 import shelve
+import time
 
+def get_system_times():
+    t = os.times()
+    if t[4] == 0.0: # Windows leaves this as zero, so use time.clock()
+        t = (t[0], t[1], t[2], t[3], time.clock())
+    return t
+    
 def read_history(key='config_history'):
     path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
     if not os.path.exists(os.path.dirname(path)):
