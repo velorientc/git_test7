@@ -86,8 +86,11 @@ class GtkUi(ui.ui):
         return True
 
     def write(self, *args):
-        for a in args:
-            self.outputq.put(str(a))
+        if self.buffers:
+            self.buffers[-1].extend([str(a) for a in args])
+        else:
+            for a in args:
+                self.outputq.put(str(a))
 
     def write_err(self, *args):
         for a in args:
