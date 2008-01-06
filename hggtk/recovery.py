@@ -37,7 +37,6 @@ class RecoveryDialog(gtk.Dialog):
 
         self.set_default_size(600, 400)
 
-        self.paths = self._get_paths()
         name = os.path.basename(os.path.abspath(root))
         self.set_title("TortoiseHg Recovery - " + name)
 
@@ -52,6 +51,11 @@ class RecoveryDialog(gtk.Dialog):
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
         tbuttons = [
+                self._toolbutton(gtk.STOCK_NEW,
+                                 'clean', 
+                                 self._clean_clicked,
+                                 tip='Clean checkout, undo all changes'),
+                gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_UNDO,
                                  'rollback', 
                                  self._rollback_clicked,
@@ -85,14 +89,6 @@ class RecoveryDialog(gtk.Dialog):
         self.textbuffer = self.textview.get_buffer()
         self.vbox.pack_start(scrolledwindow, True, True)
 
-    def _get_paths(self):
-        """ retrieve repo revisions """
-        try:
-            self.repo = hg.repository(ui.ui(), path=self.root)
-            return self.repo.ui.configitems('paths')
-        except hg.RepoError:
-            return None
-        
     def _close_clicked(self, *args):
         if threading.activeCount() != 1:
             error_dialog("Can't close now", "command is running")
@@ -123,18 +119,32 @@ class RecoveryDialog(gtk.Dialog):
         tbutton.connect('clicked', handler, userdata)
         return tbutton
         
-    def _rollback_clicked(self, toolbutton, data=None):
-        response = question_dialog("Rollback repository",
-                "%s ?" % os.path.basename(self.repo.root))
+    def _clean_clicked(self, toolbutton, data=None):
+        response = question_dialog("Clean repository",
+                "%s ?" % os.path.basename(self.root))
         if not response == gtk.RESPONSE_YES:
             return
+        try:
+            repo = hg.repository(ui.ui(), path=self.root)
+        except hg.RepoError:
+            self.write("Unable to find repo at %s\n" % (self.root), False)
+            return
+        pl = repo.workingctx().parents()
+        cmd = ['update', '--clean', '--rev', str(pl[0].rev())]
+        self._exec_cmd(cmd, postfunc=self._notify)
 
-        def notify(ret, *args):
-            import time
-            time.sleep(0.5)     # give fs some time to pick up changes
-            shell_notify([self.cwd])
+    def _notify(self, ret, *args):
+        import time
+        time.sleep(0.5)     # give fs some time to pick up changes
+        shell_notify([self.cwd])
+
+    def _rollback_clicked(self, toolbutton, data=None):
+        response = question_dialog("Rollback repository",
+                "%s ?" % os.path.basename(self.root))
+        if not response == gtk.RESPONSE_YES:
+            return
         cmd = ['rollback']
-        self._exec_cmd(cmd, postfunc=notify)
+        self._exec_cmd(cmd, postfunc=self._notify)
         
     def _recover_clicked(self, toolbutton, data=None):
         cmd = ['recover']
