@@ -28,6 +28,7 @@ from shlib import shell_notify
 from gdialog import *
 from gtools import cmdtable
 from status import GStatus
+from hgcmd import CmdDialog
 
 class GCommit(GStatus):
     """GTK+ based dialog for displaying repository status and committing changes.
@@ -186,15 +187,21 @@ class GCommit(GStatus):
 
 
     def _hg_commit(self, files):
-        # In case new commit args are added in the future, merge the hg defaults
-        commitopts = self.merge_opts(commands.table['^commit|ci'][1], [name[1] for name in cmdtable['gcommit|gci'][1]])
-        def dohgcommit():
-            commands.commit(self.ui, self.repo, *files, **commitopts)
-        success, outtext = self._hg_call_wrapper('Commit', dohgcommit)
-        if success:
-            self.text.set_buffer(gtk.TextBuffer())
-            shell_notify([self.cwd] + files)
-            self.reload_status()
+        # call the threaded CmdDialog to do the commit, so the the large commit
+        # won't get locked up by potential large commit. CmdDialog will also
+        # display the progress of the commit operation.
+        cmdline  = ["hg", "commit", "--verbose", "--repository", self.repo.root]
+        cmdline += ['--message', self.opts['message']]
+        cmdline += files
+        dialog = CmdDialog(cmdline, True)
+        dialog.set_transient_for(self)
+        dialog.run()
+        dialog.hide()
+
+        # refresh overlay icons and commit dialog
+        self.text.set_buffer(gtk.TextBuffer())
+        shell_notify([self.cwd] + files)
+        self.reload_status()
 
 def run(root='', files=[], cwd='', **opts):
     # If no files or directories were selected, take current dir
