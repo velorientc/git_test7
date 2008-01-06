@@ -284,6 +284,7 @@ class GStatus(GDialog):
         """
         self.restore_cwd()
         self.repo.dirstate.invalidate()
+        self.repo.invalidate()
 
         # The following code was copied from the status function in mercurial\commands.py
         # and modified slightly to work here
