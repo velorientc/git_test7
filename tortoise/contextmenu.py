@@ -397,18 +397,7 @@ class ContextMenuExtension:
         return S_FALSE
 
     def _commit(self, parent_window):
-        '''[tortoisehg] commit = [qct | internal]'''
-        ct = ui.ui().config('tortoisehg', 'commit', 'internal')
-        if ct == 'internal':
-            self._commit_simple(parent_window)
-            return
-        hgpath = find_path('hg', get_prog_root())
-        if hgpath:
-            targets = self._filenames or [self._folder]
-            root = find_root(targets[0])
-            cmd = "%s --repository %s %s" % \
-                    (shellquote(hgpath), shellquote(root), ct)
-            run_program(cmd)
+        self._run_dialog('commit')
 
     def _config_user(self, parent_window):
         self._run_dialog('config', noargs=True)
@@ -597,9 +586,6 @@ class ContextMenuExtension:
 
     def _recovery(self, parent_window):
         self._run_dialog('recovery')
-
-    def _commit_simple(self, parent_window):
-        self._run_dialog('commit')
 
     def _update(self, parent_window):
         self._run_dialog('update', noargs=True)

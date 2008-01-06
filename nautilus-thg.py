@@ -95,17 +95,7 @@ class HgExtension(nautilus.MenuProvider,
         self._run_dialog('clone', [vfs_file])
 
     def _commit_cb(self, window, vfs_files):
-        path = self.get_path_for_vfs_file(vfs_files[0])
-        if path is None:
-            return
-        repo = self.get_repo_for_path(path)
-        if repo is None:
-            return
-        if repo.ui.config('tortoisehg', 'commit') == 'qct':
-            cwd = os.path.isdir(path) and path or os.path.dirname(path)
-            subprocess.Popen(['hg', 'qct'], cwd=cwd, shell=False)
-        else:
-            self._run_dialog('commit', vfs_files)
+        self._run_dialog('commit', vfs_files)
         self.clear_cached_repo()
 
     def _diff_cb(self, window, vfs_files):

@@ -22,7 +22,7 @@ import pango
 
 from mercurial.i18n import _
 from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands, patch
+from mercurial import cmdutil, util, ui, hg, commands, patch, dispatch
 from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
@@ -212,6 +212,12 @@ def run(root='', files=[], cwd='', **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
+
+    ct = repo.ui.config('tortoisehg', 'commit', 'internal')
+    if ct != 'internal':
+        args = ['--repository', root, ct]
+        ret = dispatch._dispatch(repo.ui, args)
+        return
 
     cmdoptions = {
         'user':'', 'date':'',
