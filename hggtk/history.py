@@ -346,6 +346,10 @@ class GLog(GDialog):
         menuitem.connect('activate', self._show_status)
         menuitem.set_border_width(1)
         self._menu.append(menuitem)
+        menuitem = gtk.MenuItem('_checkout', True)
+        menuitem.connect('activate', self._checkout)
+        menuitem.set_border_width(1)
+        self._menu.append(menuitem)
         menuitem = gtk.MenuItem("_export patch",True)
         menuitem.connect('activate',self._export_patch)
         menuitem.set_border_width(1)
@@ -548,6 +552,38 @@ class GLog(GDialog):
         dlg.show_all()
         dlg.run()
         dlg.hide()
+
+    def _checkout(self, menuitem):
+        row = self.model[self.tree.get_selection().get_selected()[1]]
+        rev = long(row[2])
+        self.repo.invalidate()
+        wc = self.repo.workingctx()
+        pl = wc.parents()
+        p1, p2 = pl[0], self.repo.changectx(rev)
+        pa = p1.ancestor(p2)
+        warning = ''
+        flags = []
+        if len(pl) > 1:
+            warning = "Outstanding uncommitted merges"
+        elif pa != p1 and pa != p2:
+            warning = "Update spans branches"
+        elif wc.files():
+            warning = "Outstanding uncommitted changes"
+        if warning:
+            from dialog import question_dialog
+            flags = ['--clean']
+            msg = 'Yes to lose changes and perform clean checkout, No to abort'
+            if question_dialog(warning, msg) != gtk.RESPONSE_YES:
+                return
+        from hgcmd import CmdDialog
+        cmdline = ['hg', 'update', '-R', self.repo.root] + flags + [str(rev)]
+        dialog = CmdDialog(cmdline)
+        dialog.set_transient_for(self)
+        dialog.run()
+        dialog.hide()
+        shell_notify([self.repo.root])
+        self.repo.dirstate.invalidate()
+        self.reload_log()
 
     def _tree_selection_changed(self, selection):
         ''' Update the details text '''
