@@ -126,6 +126,7 @@ class HgExtension(nautilus.MenuProvider,
 
     def _history_cb(self, window, vfs_files):
         self._run_dialog('history', vfs_files)
+        self.clear_cached_repo()
 
     def _init_cb(self, window, vfs_file):
         self._run_dialog('init', [vfs_file])
