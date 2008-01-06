@@ -48,6 +48,10 @@ class HgExtension(nautilus.MenuProvider,
             return None
         return urllib.unquote(vfs_file.get_uri()[7:])
 
+    def clear_cached_repo(self):
+        self.cacheroot = None
+        self.cacherepo = None
+
     def get_repo_for_path(self, path):
         '''
         Find mercurial repository for vfs_file
@@ -85,6 +89,7 @@ class HgExtension(nautilus.MenuProvider,
 
     def _add_cb(self, window, vfs_files):
         self._run_dialog('add', vfs_files)
+        self.clear_cached_repo()
 
     def _clone_cb(self, window, vfs_file):
         self._run_dialog('clone', [vfs_file])
@@ -101,6 +106,7 @@ class HgExtension(nautilus.MenuProvider,
             subprocess.Popen(['hg', 'qct'], cwd=cwd, shell=False)
         else:
             self._run_dialog('commit', vfs_files)
+        self.clear_cached_repo()
 
     def _diff_cb(self, window, vfs_files):
         path = self.get_path_for_vfs_file(vfs_files[0])
@@ -126,12 +132,15 @@ class HgExtension(nautilus.MenuProvider,
 
     def _merge_cb(self, window, vfs_file):
         self._run_dialog('merge', [vfs_file], filelist=False)
+        self.clear_cached_repo()
 
     def _recovery_cb(self, window, vfs_file):
         self._run_dialog('recovery', [vfs_file])
+        self.clear_cached_repo()
 
     def _revert_cb(self, window, vfs_files):
         self._run_dialog('revert', vfs_files)
+        self.clear_cached_repo()
 
     def _serve_cb(self, window, vfs_file):
         self._run_dialog('serve', [vfs_file], filelist=False)
@@ -141,6 +150,7 @@ class HgExtension(nautilus.MenuProvider,
 
     def _sync_cb(self, window, vfs_file):
         self._run_dialog('synch', [vfs_file], filelist=False)
+        self.clear_cached_repo()
 
     def _thgconfig_repo_cb(self, window, vfs_file):
         self._run_dialog('config', [vfs_file])
@@ -150,6 +160,12 @@ class HgExtension(nautilus.MenuProvider,
 
     def _update_cb(self, window, vfs_file):
         self._run_dialog('update', [vfs_file], filelist=False)
+        self.clear_cached_repo()
+
+    def _unmerge_cb(self, window, vfs_file):
+        self._run_dialog('checkout', [vfs_file], filelist=False,
+                extras=['--', '--clean', str(self.rev0)])
+        self.clear_cached_repo()
 
     def _view_cb(self, window, vfs_file):
         path = self.get_path_for_vfs_file(vfs_file)
@@ -165,7 +181,7 @@ class HgExtension(nautilus.MenuProvider,
         else:
             subprocess.Popen(['hg', 'view'], shell=False, cwd=cwd)
 
-    def _run_dialog(self, hgcmd, vfs_files, filelist=True):
+    def _run_dialog(self, hgcmd, vfs_files, filelist=True, extras=[]):
         '''
         hgcmd - hgproc subcommand
         vfs_files - directory, or list of selected files
@@ -191,6 +207,7 @@ class HgExtension(nautilus.MenuProvider,
             os.write(fd, "\n".join(paths))
             os.close(fd)
             cmdopts += ['--listfile', tmpfile, '--deletelistfile']
+        cmdopts.extend(extras)
 
         subprocess.Popen(cmdopts, cwd=cwd, shell=False)
 
@@ -230,6 +247,15 @@ class HgExtension(nautilus.MenuProvider,
             item.connect('activate', self._open_terminal_cb, vfs_file)
             items.append(item)
             return items
+
+        if len(repo.workingctx().parents()) > 1:
+            self.rev0 = repo.workingctx().parents()[0].rev()
+            item = nautilus.MenuItem('HgNautilus::undomerge',
+                                 'Undo Merge',
+                                 'Clean checkout of original parent revision',
+                                 self.icon('menuunmerge.ico'))
+            item.connect('activate', self._unmerge_cb, vfs_file)
+            items.append(item)
 
         item = nautilus.MenuItem('HgNautilus::commit',
                              'Commit',
