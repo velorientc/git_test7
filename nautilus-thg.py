@@ -121,10 +121,6 @@ class HgExtension(nautilus.MenuProvider,
     def _init_cb(self, window, vfs_file):
         self._run_dialog('init', [vfs_file])
 
-    def _merge_cb(self, window, vfs_file):
-        self._run_dialog('merge', [vfs_file], filelist=False)
-        self.clear_cached_repo()
-
     def _recovery_cb(self, window, vfs_file):
         self._run_dialog('recovery', [vfs_file])
         self.clear_cached_repo()
@@ -148,10 +144,6 @@ class HgExtension(nautilus.MenuProvider,
 
     def _thgconfig_user_cb(self, window, vfs_file):
         self._run_dialog('config', [vfs_file], filelist=False)
-
-    def _update_cb(self, window, vfs_file):
-        self._run_dialog('update', [vfs_file], filelist=False)
-        self.clear_cached_repo()
 
     def _unmerge_cb(self, window, vfs_file):
         self._run_dialog('checkout', [vfs_file], filelist=False,
@@ -281,20 +273,6 @@ class HgExtension(nautilus.MenuProvider,
                              'Show revision DAG',
                              self.icon('menurevisiongraph.ico'))
         item.connect('activate', self._view_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::update',
-                             'Checkout Revision',
-                             'Checkout revision',
-                             self.icon('menucheckout.ico'))
-        item.connect('activate', self._update_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::merge',
-                             'Merge Revisions',
-                             'Merge with another revision',
-                             self.icon('menumerge.ico'))
-        item.connect('activate', self._merge_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('HgNautilus::sync',
