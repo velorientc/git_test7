@@ -602,20 +602,34 @@ class GLog(GDialog):
                     "Cannot merge a revision with itself", self).run()
             return
 
+        desc = []
+        log = self.repo.changelog
+        for crev in (pl[0].rev(), rev):
+            changenode = log.node(crev)
+            change = log.read(changenode)
+            description = change[4].strip()
+            summary = description.splitlines()[0]
+            desc.append('%d : %s' % (crev, summary))
+        msg = desc[0] + '\n  and\n' + desc[1]
+        if Confirm('Merge', [], self, msg).run() != gtk.RESPONSE_YES:
+            return
+
         cmdline = ['hg', 'merge', '-R', self.repo.root, str(rev)]
         dialog = CmdDialog(cmdline)
         dialog.set_transient_for(self)
         dialog.run()
         dialog.hide()
         if dialog.returncode == 0:
-            # Spawn commit tool if merge was successful
-            ct = self.repo.ui.config('tortoisehg', 'commit', 'internal')
-            if ct == 'internal':
-                from commit import launch as commit_launch
-                commit_launch(self.repo.root, [], self.repo.root, False)
-            else:
-                args = [self.hgpath, '--repository', self.repo.root, ct]
-                subprocess.Popen(args, shell=False)
+            msg = 'Launch commit tool for merge results?'
+            if Confirm('Commit', [], self, msg).run() == gtk.RESPONSE_YES:
+                # Spawn commit tool if merge was successful
+                ct = self.repo.ui.config('tortoisehg', 'commit', 'internal')
+                if ct == 'internal':
+                    from commit import launch as commit_launch
+                    commit_launch(self.repo.root, [], self.repo.root, False)
+                else:
+                    args = [self.hgpath, '--repository', self.repo.root, ct]
+                    subprocess.Popen(args, shell=False)
 
         shell_notify([self.repo.root])
         self.repo.dirstate.invalidate()
