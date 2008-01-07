@@ -206,6 +206,22 @@ class ConfigDialog(gtk.Dialog):
         self.web_frame = self.add_page(notebook, 'Web')
         self.fill_frame(self.web_frame, self._web_info)
 
+        self._proxy_info = (
+                ('host', 'http_proxy.host', [],
+                    'Host name and (optional) port of proxy server, for'
+                    ' example "myproxy:8000"'),
+                ('no', 'http_proxy.no', [],
+                    'Optional. Comma-separated list of host names that'
+                    ' should bypass the proxy'),
+                ('passwd', 'http_proxy.passwd', [],
+                    'Optional. Password to authenticate with at the'
+                    ' proxy server'),
+                ('user', 'http_proxy.user', [],
+                    'Optional. User name to authenticate with at the'
+                    ' proxy server'))
+        self.proxy_frame = self.add_page(notebook, 'Proxy')
+        self.fill_frame(self.proxy_frame, self._proxy_info)
+
         self._email_info = (
                 ('From', 'email.from', [],
                     'Email address to use in "From" header and SMTP envelope'),
