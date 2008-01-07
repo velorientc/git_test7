@@ -186,7 +186,7 @@ class ConfigDialog(gtk.Dialog):
                     'Maximum number of files to list per changeset.'),
                 ('Max Changes', 'web.maxfiles', ['10'],
                     'Maximum number of changes to list on the changelog.'),
-                ('Allow Push', 'ui.allow_push', ['*'],
+                ('Allow Push', 'web.allow_push', ['*'],
 'Whether to allow pushing to the repository. If empty or not'
 ' set, push is not allowed. If the special value "*", any remote'
 ' user can push, including unauthenticated users. Otherwise, the'
@@ -194,7 +194,7 @@ class ConfigDialog(gtk.Dialog):
 ' user name must be present in this list (separated by whitespace'
 ' or ","). The contents of the allow_push list are examined after'
 ' the deny_push list.'),
-                ('Deny Push', 'ui.deny_push', ['*'],
+                ('Deny Push', 'web.deny_push', ['*'],
 'Whether to deny pushing to the repository. If empty or not set,'
 ' push is not denied. If the special value "*", all remote users'
 ' are denied push. Otherwise, unauthenticated users are all'
