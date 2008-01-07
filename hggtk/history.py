@@ -612,7 +612,7 @@ class GLog(GDialog):
             ct = self.repo.ui.config('tortoisehg', 'commit', 'internal')
             if ct == 'internal':
                 from commit import launch as commit_launch
-                commit_launch(self.repo.root, [], self.repo.root)
+                commit_launch(self.repo.root, [], self.repo.root, False)
             else:
                 args = [self.hgpath, '--repository', self.repo.root, ct]
                 subprocess.Popen(args, shell=False)

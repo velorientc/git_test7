@@ -203,7 +203,7 @@ class GCommit(GStatus):
         shell_notify([self.cwd] + files)
         self.reload_status()
 
-def launch(root='', files=[], cwd=''):
+def launch(root='', files=[], cwd='', main=True):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -222,7 +222,7 @@ def launch(root='', files=[], cwd=''):
         'check': False, 'git':False, 'logfile':'', 'addremove':False,
     }
     
-    dialog = GCommit(u, repo, cwd, files, cmdoptions, True)
+    dialog = GCommit(u, repo, cwd, files, cmdoptions, main)
     dialog.display()
     return dialog
     
@@ -231,7 +231,7 @@ def run(root='', files=[], cwd='', **opts):
     # TODO: Not clear if this is best; user may expect repo wide
     if not files and cwd:
         files = [cwd]
-    if launch(root, files, cwd):
+    if launch(root, files, cwd, True):
         gtk.gdk.threads_init()
         gtk.gdk.threads_enter()
         gtk.main()
