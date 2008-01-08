@@ -181,6 +181,16 @@ class MergeDialog(gtk.Dialog):
         
     def _do_unmerge(self):
         rev = self._rev_input.get_text()
+        
+        if not rev:
+            error_dialog("Can't unmerge", "please select revision to unmerge")
+            return
+        
+        response = question_dialog("Undo merge",
+                                   "and checkout revision %s?" % rev)
+        if response != gtk.RESPONSE_YES:
+            return
+
         cmdline = ['hg', 'update', '-R', self.root, '--rev', rev, '--clean', '--verbose']
         dlg = CmdDialog(cmdline)
         dlg.run()
