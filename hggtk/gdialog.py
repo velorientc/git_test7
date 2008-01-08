@@ -1,48 +1,10 @@
-# gtools.py - Graphical diff and status extension for Mercurial
+# gdialog.py - base dialog for gtools
 #
 # Copyright 2007 Brad Schick, brad at gmail . com
 #
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 # 
-"""gtools extension provides graphical status and commit dialogs
-
-The gtools extension provides gtk+ based graphical status, log,
-and commit dialogs. Each dialogs provides a convenient way to see what 
-has changed in a repository. Data is displayed in a list that can be
-sorted, selected, and double-clicked to launch diff and editor tools.
-Right-click context menus and toolbars provide operations like commit, 
-add, view, delete, ignore, remove, revert, and refresh.
-
-Files are diff'ed and edited in place whenever possible, so you can
-make changes within external tools and save them directly back to the
-working copy. To enable gtools:
-
-   [extensions]
-   hgext.gtools =
-
-   [gtools]
-   # external diff tool and options
-   diffcmd = gdiff
-   diffopts = -Nprc5
- 
-   # editor, if not specified [ui] editor is used
-   editor = scite
- 
-   # set the fonts for the comments, diffs, and lists
-   fontcomment = courier 10
-   fontdiff = courier 10
-   fontlist = courier 9
-
-   # make the integrated diff window appear at the bottom or side
-   diffbottom = False
- 
-The external diff tool is run as shown below. Unless specified otherwise,
-file_rev1 and file_rev2 are the parent revision and the working copy 
-respectively:
-
-diffcmd diffopts file_rev1 file_rev2
-"""
 
 import mercurial.demandimport; mercurial.demandimport.disable()
 
