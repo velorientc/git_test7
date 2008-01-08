@@ -13,12 +13,12 @@ from dialog import *
 from mercurial.node import *
 from mercurial import util, hg, ui
 from hgcmd import CmdDialog
-from shlib import set_tortoise_icon
+from shlib import set_tortoise_icon, shell_notify
 import histselect
 
 class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
-    def __init__(self, root=''):
+    def __init__(self, root='', cwd=''):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(MergeDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -32,6 +32,7 @@ class MergeDialog(gtk.Dialog):
         self.connect('response', gtk.main_quit)
 
         self.root = root
+        self.cwd = cwd or root
         self.repo = None
         self._create()
 
@@ -184,6 +185,7 @@ class MergeDialog(gtk.Dialog):
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
+        shell_notify([self.cwd])
         self._refresh()
         
     def _do_merge(self):
@@ -206,10 +208,11 @@ class MergeDialog(gtk.Dialog):
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
+        shell_notify([self.cwd])
         self._refresh()
 
-def run(root='', **opts):
-    dialog = MergeDialog(root)
+def run(root='', cwd='', **opts):
+    dialog = MergeDialog(root, cwd)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
