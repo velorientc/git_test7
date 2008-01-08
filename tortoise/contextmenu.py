@@ -322,16 +322,16 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Checkout Revision"),
                            _("update working directory"),
                            self._update, icon="menucheckout.ico"))
-            result.append(TortoiseMenu(_("Merge Revisions"),
-                           _("merge working directory with another revision"),
-                           self._merge, icon="menumerge.ico"))
 
-            # if repo is in merging state, add menu to signal that
-            if len(repo.workingctx().parents()) > 1:
-                self.rev0 = repo.workingctx().parents()[0].rev()
+            # if change merge menu per merge status of working directory
+            if len(repo.workingctx().parents()) == 1:
+                result.append(TortoiseMenu(_("Merge Revisions"),
+                               _("merge working directory with another revision"),
+                               self._merge, icon="menumerge.ico"))
+            else:
                 result.append(TortoiseMenu(_("Undo Merge"),
                                _("Undo merge by updating to revision"),
-                               self._unmerge, icon="menuunmerge.ico"))
+                               self._merge, icon="menuunmerge.ico"))
                 
             result.append(TortoiseMenuSep())
 
@@ -574,15 +574,6 @@ class ContextMenuExtension:
 
     def _merge(self, parent_window):
         self._run_dialog('merge', noargs=True)
-
-    def _unmerge(self, parent_window):
-        title = 'Undo merge attempt?'
-        msg = 'Ok to perform clean checkout of revision %d?' % self.rev0
-        if win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL) == 2:
-            return
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        open_dialog('checkout', '--clean ' + str(self.rev0), root=root)
 
     def _recovery(self, parent_window):
         self._run_dialog('recovery')
