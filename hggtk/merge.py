@@ -122,7 +122,6 @@ class MergeDialog(gtk.Dialog):
 
         # populate parent rev data
         self._parents = [x.node() for x in self.repo.workingctx().parents()]
-        print "merge: parents = ", self._parents 
         self._parent_revs.set_sensitive(True)
         self._parent_revs.set_text(", ".join([short(x) for x in self._parents]))
         self._parent_revs.set_sensitive(False)
