@@ -12,7 +12,9 @@ import gtk
 from dialog import *
 from mercurial.node import *
 from mercurial import util, hg, ui
+from hgcmd import CmdDialog
 from shlib import set_tortoise_icon
+import histselect
 
 class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
@@ -166,7 +168,6 @@ class MergeDialog(gtk.Dialog):
         
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
-        import histselect
         rev = histselect.select(self.root)
         if rev is not None:
             self._rev_input.set_text(rev)
@@ -180,7 +181,6 @@ class MergeDialog(gtk.Dialog):
     def _do_unmerge(self):
         rev = self._rev_input.get_text()
         cmdline = ['hg', 'update', '-R', self.root, '--rev', rev, '--clean', '--verbose']
-        from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
@@ -203,7 +203,6 @@ class MergeDialog(gtk.Dialog):
         if force:
             cmdline.append("--force")
 
-        from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
