@@ -532,7 +532,9 @@ class GLog(GDialog):
         row = self.model[self.tree.get_selection().get_selected()[1]]
         rev = long(row[2])
         filename = "%s_rev%s.patch" % (os.path.basename(self.repo.root), rev)
-        fd = NativeSaveFileDialogWrapper(Title = "Save patch to", FileName=filename)
+        fd = NativeSaveFileDialogWrapper(Title = "Save patch to",
+                                         InitialDir=self.repo.root,
+                                         FileName=filename)
         result = fd.run()
 
         if result:
