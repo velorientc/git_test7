@@ -338,7 +338,7 @@ class GLog(GDialog):
         sel = self.tree.get_selection()
         sel.select_iter(iter)
         path = self.model.get_path(iter)
-        self.tree.scroll_to_cell(path)
+        self.tree.scroll_to_cell(path, use_align=True, row_align=0.5)
 
     def get_link_text(self, tag, widget, event, iter):
         """handle clicking on a link in a textview"""
