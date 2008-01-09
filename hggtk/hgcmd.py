@@ -32,7 +32,7 @@ class CmdDialog(gtk.Dialog):
         # construct dialog
         self.set_default_size(width, height)
         
-        self._button_ok = gtk.Button("OK")
+        self._button_ok = gtk.Button("Close")
         self.action_area.pack_end(self._button_ok)
         
         self.pbar = None
