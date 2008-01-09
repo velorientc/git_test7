@@ -410,6 +410,8 @@ class GLog(GDialog):
         col_tag.set_resizable(True)
         
         col += 1
+        user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
+        user_cell.set_property('width_chars', 25)
         col_user = gtk.TreeViewColumn('user', user_cell)
         col_user.add_attribute(user_cell, 'text', col)
         col_user.set_cell_data_func(user_cell, self._text_color)
@@ -417,6 +419,8 @@ class GLog(GDialog):
         col_user.set_resizable(True)
         
         col += 1
+        summary_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
+        summary_cell.set_property('width_chars', 65)
         col_sum = gtk.TreeViewColumn('summary', summary_cell)
         col_sum.add_attribute(summary_cell, 'text', col)
         col_sum.set_cell_data_func(summary_cell, self._text_color)
