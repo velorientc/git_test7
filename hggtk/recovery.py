@@ -51,7 +51,7 @@ class RecoveryDialog(gtk.Dialog):
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
         tbuttons = [
-                self._toolbutton(gtk.STOCK_NEW,
+                self._toolbutton(gtk.STOCK_CLEAR,
                                  'clean', 
                                  self._clean_clicked,
                                  tip='Clean checkout, undo all changes'),
