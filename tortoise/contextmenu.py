@@ -287,12 +287,12 @@ class ContextMenuExtension:
         rpath = self._folder or self._filenames[0]
         repo = open_repo(rpath)
         if repo is None:
-            result.append(TortoiseMenu(_("Create Repository Here"),
-                           _("create a new repository in this directory"),
-                           self._init, icon="menucreaterepos.ico"))
             result.append(TortoiseMenu(_("Clone a Repository"),
                            _("clone a repository"),
                            self._clone, icon="menuclone.ico"))
+            result.append(TortoiseMenu(_("Create Repository Here"),
+                           _("create a new repository in this directory"),
+                           self._init, icon="menucreaterepos.ico"))
         else:
             result.append(TortoiseMenu(_("View File Status"),
                            _("Repository status"),
@@ -347,13 +347,6 @@ class ContextMenuExtension:
 
             result.append(TortoiseMenuSep())
 
-            if repo.root != rpath:
-                result.append(TortoiseMenu(_("Create Repository"),
-                               _("create a new repository in this directory"),
-                               self._init, icon="menucreaterepos.ico"))
-            result.append(TortoiseMenu(_("Create Clone"),
-                           _("Clone a repository here"),
-                           self._clone, icon="menuclone.ico"))
             result.append(TortoiseMenu(_("Synchronize..."),
                            _("Synchronize with remote repository"),
                            self._synch, icon="menusynch.ico"))
@@ -363,6 +356,13 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Web Server"),
                            _("start web server for this repository"),
                            self._serve, icon="proxy.ico"))
+            result.append(TortoiseMenu(_("Create Clone"),
+                           _("Clone a repository here"),
+                           self._clone, icon="menuclone.ico"))
+            if repo.root != rpath:
+                result.append(TortoiseMenu(_("Create Repository Here"),
+                               _("create a new repository in this directory"),
+                               self._init, icon="menucreaterepos.ico"))
 
             result.append(TortoiseMenuSep())
             
