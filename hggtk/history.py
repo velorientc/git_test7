@@ -281,11 +281,12 @@ class GLog(GDialog):
         buffer.create_tag('date', foreground='#000090', paragraph_background='#F0F0F0')
         buffer.create_tag('tag', foreground='#000090', paragraph_background='#F0F0F0')
         buffer.create_tag('files', foreground='#5C5C5C', paragraph_background='#F0F0F0')
-        if parents == 1:
-            buffer.create_tag('parent', foreground='#900000', paragraph_background='#F0F0F0')
-        elif parents == 2:
-            buffer.create_tag('parent', foreground='#006400', paragraph_background='#F0F0F0')
-
+        buffer.create_tag('parent', foreground='#000090', paragraph_background='#F0F0F0')
+        
+        parent_link = buffer.create_tag('parlink', foreground='#0000FF', 
+                underline=pango.UNDERLINE_SINGLE, paragraph_background='#F0F0F0')
+        parent_link.connect("event", self.parent_link_handler)
+        
         lines = logtext.split('\n')
         lines_iter = iter(lines)
 
@@ -298,7 +299,8 @@ class GLog(GDialog):
             if line.startswith('date:'):
                 buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'date')
             elif line.startswith('parent:'):
-                buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'parent')
+                buffer.insert_with_tags_by_name(buff_iter, line[0:13], 'parent')
+                buffer.insert_with_tags_by_name(buff_iter, line[13:] + '\n', 'parlink')
             elif line.startswith('files:'):
                 buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'files')
             elif line.startswith('tag:'):
@@ -314,7 +316,44 @@ class GLog(GDialog):
         self.details_text.set_buffer(buffer)
         return True
 
+    def parent_link_handler(self, tag, widget, event, iter):
+        text = self.get_link_text(tag, widget, event, iter)
+        if not text:
+            return
+        
+        # get linked revision
+        linkrev = long(text.split(':')[0])
+        
+        # find the row for the linked rev in the tree
+        iter = self.model.get_iter_first()
+        while iter:
+            rev = self.model.get_value(iter, 2)
+            if rev == linkrev:
+                break
+            iter = self.model.iter_next(iter)
+        if not iter:
+            return
+            
+        # jump to the linked revision
+        sel = self.tree.get_selection()
+        sel.select_iter(iter)
+        path = self.model.get_path(iter)
+        self.tree.scroll_to_cell(path)
 
+    def get_link_text(self, tag, widget, event, iter):
+        """handle clicking on a link in a textview"""
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return
+        text_buffer = widget.get_buffer()
+        beg = iter.copy()
+        while not beg.begins_tag(tag):
+            beg.backward_char()
+        end = iter.copy()
+        while not end.ends_tag(tag):
+            end.forward_char()
+        text = text_buffer.get_text(beg, end)
+        return text
+        
     def _search_in_tree(self, model, column, key, iter, data):
         """Searches all fields shown in the tree when the user hits crtr+f,
         not just the ones that are set via tree.set_search_column.
