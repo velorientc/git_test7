@@ -17,7 +17,7 @@ from hglib import HgThread
 from shlib import set_tortoise_icon, get_system_times
 
 class CmdDialog(gtk.Dialog):
-    def __init__(self, cmdline, progressbar=False, width=520, height=400):
+    def __init__(self, cmdline, progressbar=True, width=520, height=400):
         title = 'hg ' + ' '.join(cmdline[1:])
         gtk.Dialog.__init__(self,
                             title=title,
@@ -128,8 +128,8 @@ class CmdDialog(gtk.Dialog):
             self.last_pbar_update = tm
             self.pbar.pulse()
 
-def run(cmdline=[], progressbar=False, **opts):
-    dlg = CmdDialog(cmdline, progressbar)
+def run(cmdline=[], **opts):
+    dlg = CmdDialog(cmdline)
     dlg.connect('response', gtk.main_quit)
     dlg.show_all()
     gtk.gdk.threads_init()
@@ -140,5 +140,5 @@ def run(cmdline=[], progressbar=False, **opts):
 if __name__ == "__main__":
     import sys
     #run(sys.argv)
-    run(sys.argv, True)
+    run(sys.argv)
 
