@@ -38,10 +38,18 @@ class CmdDialog(gtk.Dialog):
         self.pbar = None
         if progressbar:
             self.last_pbar_update = 0
+
+            hbox = gtk.HBox()
             
+            self.status_text = gtk.Label()
+            self.status_text.set_text(" ".join(cmdline).replace("\n", " "))
+            self.status_text.set_alignment(0, 0.5)
+            self.status_text.set_ellipsize(pango.ELLIPSIZE_END)
+            hbox.pack_start(self.status_text, True, True, 3)
+
             # Create a centering alignment object
             align = gtk.Alignment(0.0, 0.0, 1, 0)
-            self.vbox.pack_start(align, False, False, 3)
+            hbox.pack_end(align, False, False, 3)
             align.show()
             
             # create the progress bar
@@ -49,7 +57,9 @@ class CmdDialog(gtk.Dialog):
             align.add(self.pbar)
             self.pbar.pulse()
             self.pbar.show()
-        
+
+            self.vbox.pack_start(hbox, False, False, 3)
+
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
