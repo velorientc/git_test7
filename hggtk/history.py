@@ -188,6 +188,12 @@ class GLog(GDialog):
         
         # Generator that parses and inserts log entries
         def inserter(logtext):
+            def person(author):
+                '''get name of author, or else username.'''
+                f = author.find('<')
+                if f == -1: return util.shortuser(author)
+                return author[:f].rstrip()
+
             while logtext:
                 blocks = logtext.strip('\n').split('\n\n', GLog.block_count)
                 if len(blocks) > GLog.block_count:
@@ -226,7 +232,7 @@ class GLog(GDialog):
                             '%a %b %d %H:%M:%S %Y', {})[0]
                     self.model.append((is_parent, is_head, 
                                        long(log['rev']),
-                                       log['tag'], log['user'],
+                                       log['tag'], person(log['user']),
                                        log['summary'], log['date'],
                                        show_date,
                                        parents))
@@ -286,6 +292,8 @@ class GLog(GDialog):
         for line in lines_iter:
             line = util.fromlocal(line)
             if line.startswith('changeset:'):
+                buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'changeset')
+            if line.startswith('user:'):
                 buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'changeset')
             if line.startswith('date:'):
                 buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'date')
@@ -411,7 +419,7 @@ class GLog(GDialog):
         
         col += 1
         user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        user_cell.set_property('width_chars', 25)
+        user_cell.set_property('width_chars', 20)
         col_user = gtk.TreeViewColumn('user', user_cell)
         col_user.add_attribute(user_cell, 'text', col)
         col_user.set_cell_data_func(user_cell, self._text_color)
