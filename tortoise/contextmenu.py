@@ -304,9 +304,11 @@ class ContextMenuExtension:
                            self._diff, icon="menudiff.ico"))
 
             # Visual Diff (any extdiff command)
+            has_vdiff = repo.ui.config('tortoisehg', 'vdiff', '') != ''
             result.append(TortoiseMenu(_("Visual Diff"),
                            _("View changes using GUI diff tool"),
-                           self._vdiff, icon="TortoiseMerge.ico"))
+                           self._vdiff, icon="TortoiseMerge.ico",
+                           state=has_vdiff))
                            
             result.append(TortoiseMenu(_("Add Files"),
                            _("Add files to Hg repository"),
