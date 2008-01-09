@@ -43,6 +43,22 @@ class UpdateDialog(gtk.Dialog):
         self.set_default_size(350, 120)
         self.connect('response', gtk.main_quit)
 
+        # add toolbar with tooltips
+        self.tbar = gtk.Toolbar()
+        self.tips = gtk.Tooltips()
+        
+        self._btn_update = self._toolbutton(
+                gtk.STOCK_GO_DOWN,
+                'update', 
+                self._btn_update_clicked,
+                tip='Update working directory to selected revision')
+        tbuttons = [
+                self._btn_update,
+            ]
+        for btn in tbuttons:
+            self.tbar.insert(btn, -1)
+        self.vbox.pack_start(self.tbar, False, False, 2)
+        
         # repo parent revisions
         parentbox = gtk.HBox()
         lbl = gtk.Label("Parent revisions:")
@@ -80,15 +96,24 @@ class UpdateDialog(gtk.Dialog):
 
         self._overwrite = gtk.CheckButton("Overwrite local changes")
         self.vbox.pack_end(self._overwrite, False, False, 10)
-
-        # add action buttn
-        self._btn_update = gtk.Button("Update")
-        self._btn_update.connect('clicked', self._btn_update_clicked)
-        self.action_area.pack_end(self._btn_update)
         
         # show them all
         self._refresh()
 
+    def _toolbutton(self, stock, label, handler,
+                    menu=None, userdata=None, tip=None):
+        if menu:
+            tbutton = gtk.MenuToolButton(stock)
+            tbutton.set_menu(menu)
+        else:
+            tbutton = gtk.ToolButton(stock)
+            
+        tbutton.set_label(label)
+        if tip:
+            tbutton.set_tooltip(self.tips, tip)
+        tbutton.connect('clicked', handler, userdata)
+        return tbutton
+        
     def _refresh(self):
         """ update display on dialog with recent repo data """
         try:
@@ -112,7 +137,7 @@ class UpdateDialog(gtk.Dialog):
                 status += ", tip"
             self._revlist.append([short(node), "(%s)" %status])
         self._revbox.set_active(0)
-            
+
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
         import histselect
@@ -120,7 +145,7 @@ class UpdateDialog(gtk.Dialog):
         if rev is not None:
             self._rev_input.set_text(rev)
 
-    def _btn_update_clicked(self, button):
+    def _btn_update_clicked(self, button, data=None):
         self._do_update()
         
     def _do_update(self):
