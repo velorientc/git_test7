@@ -298,11 +298,6 @@ class ContextMenuExtension:
                            _("Repository status"),
                            self._status, icon="menushowchanged.ico"))
 
-            # Mercurial standard commands
-            result.append(TortoiseMenu(_("Show Diff"),
-                           _("View changes"),
-                           self._diff, icon="menudiff.ico"))
-
             # Visual Diff (any extdiff command)
             has_vdiff = repo.ui.config('tortoisehg', 'vdiff', '') != ''
             result.append(TortoiseMenu(_("Visual Diff"),
