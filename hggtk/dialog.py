@@ -40,6 +40,7 @@ def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK,
     dialog.set_title(title)
     dialog.set_markup('<big><b>' + primary + '</b></big>')
     dialog.format_secondary_text(secondary)
+    dialog.set_position(gtk.WIN_POS_MOUSE)
     response = dialog.run()
     dialog.destroy()
     return response
