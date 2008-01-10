@@ -8,6 +8,7 @@
 import os
 import subprocess
 import sys
+import time
 
 import pygtk
 pygtk.require('2.0')
@@ -22,6 +23,7 @@ from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
 from hgcmd import CmdDialog
+
 
 class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -228,13 +230,15 @@ class GLog(GDialog):
                     rev = int(log['rev'])
                     is_parent = rev in repo_parents and gtk.STOCK_HOME or ''
                     is_head = rev in heads and gtk.STOCK_EXECUTE or ''
-                    show_date = util.strdate(util.tolocal(log['date']),
+                    date_secs = util.strdate(util.tolocal(log['date']),
                             '%a %b %d %H:%M:%S %Y', {})[0]
+                    show_date = time.strftime("%Y-%m-%d %H:%M:%S",
+                            time.gmtime(date_secs))
                     self.model.append((is_parent, is_head, 
                                        long(log['rev']),
                                        log['tag'], person(log['user']),
-                                       log['summary'], log['date'],
-                                       show_date,
+                                       log['summary'], show_date,
+                                       date_secs,
                                        parents))
                 yield logtext is not None
 
