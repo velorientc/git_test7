@@ -400,7 +400,7 @@ class GLog(GDialog):
         _menu.append(self._cmenu_merge)
         _menu.append(create_menu('_export patch', self._export_patch))
         _menu.append(create_menu('e_mail patch', self._email_patch))
-        _menu.append(create_menu('add/remove _tag', self._show_status))
+        _menu.append(create_menu('add/remove _tag', self._add_tag))
         _menu.show_all()
         return _menu
         
