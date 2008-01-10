@@ -408,7 +408,7 @@ class GLog(GDialog):
         menuitem.connect('activate',self._email_patch)
         menuitem.set_border_width(1)
         self._menu.append(menuitem)
-        menuitem = gtk.MenuItem('add _tag', True)
+        menuitem = gtk.MenuItem('add/remove _tag', True)
         menuitem.connect('activate', self._add_tag)
         menuitem.set_border_width(1)
         self._menu.append(menuitem)
