@@ -8,6 +8,7 @@
 import os
 import subprocess
 import sys
+import time
 
 import pygtk
 pygtk.require('2.0')
@@ -22,6 +23,7 @@ from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
 from hgcmd import CmdDialog
+
 
 class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -228,13 +230,15 @@ class GLog(GDialog):
                     rev = int(log['rev'])
                     is_parent = rev in repo_parents and gtk.STOCK_HOME or ''
                     is_head = rev in heads and gtk.STOCK_EXECUTE or ''
-                    show_date = util.strdate(util.tolocal(log['date']),
+                    date_secs = util.strdate(util.tolocal(log['date']),
                             '%a %b %d %H:%M:%S %Y', {})[0]
+                    show_date = time.strftime("%Y-%m-%d %H:%M:%S",
+                            time.gmtime(date_secs))
                     self.model.append((is_parent, is_head, 
                                        long(log['rev']),
                                        log['tag'], person(log['user']),
-                                       log['summary'], log['date'],
-                                       show_date,
+                                       log['summary'], show_date,
+                                       date_secs,
                                        parents))
                 yield logtext is not None
 
@@ -381,35 +385,28 @@ class GLog(GDialog):
         pb = self.tree.render_icon(stock, gtk.ICON_SIZE_MENU, None)
         cell.set_property('pixbuf', pb)
         return
+
+    def tree_context_menu(self):
+        def create_menu(label, callback):
+            menuitem = gtk.MenuItem(label, True)
+            menuitem.connect('activate', callback)
+            menuitem.set_border_width(1)
+            return menuitem
+            
+        _menu = gtk.Menu()
+        _menu.append(create_menu('_status', self._show_status))
+        _menu.append(create_menu('_checkout', self._checkout))
+        self._cmenu_merge = create_menu('_merge with', self._merge)
+        _menu.append(self._cmenu_merge)
+        _menu.append(create_menu('_export patch', self._export_patch))
+        _menu.append(create_menu('e_mail patch', self._email_patch))
+        _menu.append(create_menu('add/remove _tag', self._add_tag))
+        _menu.show_all()
+        return _menu
         
     def get_body(self):
-        self._menu = gtk.Menu()
-        menuitem = gtk.MenuItem('_status', True)
-        menuitem.connect('activate', self._show_status)
-        menuitem.set_border_width(1)
-        self._menu.append(menuitem)
-        menuitem = gtk.MenuItem('_checkout', True)
-        menuitem.connect('activate', self._checkout)
-        menuitem.set_border_width(1)
-        self._menu.append(menuitem)
-        menuitem = gtk.MenuItem('_merge with', True)
-        menuitem.connect('activate', self._merge)
-        menuitem.set_border_width(1)
-        self._menu.append(menuitem)
-        menuitem = gtk.MenuItem("_export patch",True)
-        menuitem.connect('activate',self._export_patch)
-        menuitem.set_border_width(1)
-        self._menu.append(menuitem)
-        menuitem = gtk.MenuItem("e_mail patch",True)
-        menuitem.connect('activate',self._email_patch)
-        menuitem.set_border_width(1)
-        self._menu.append(menuitem)
-        menuitem = gtk.MenuItem('add _tag', True)
-        menuitem.connect('activate', self._add_tag)
-        menuitem.set_border_width(1)
-        self._menu.append(menuitem)
-        self._menu.show_all()
-
+        self._menu = self.tree_context_menu()
+        
         self.model = gtk.ListStore(str, str, long, str, str, str, str, long, object)
         self.model.set_default_sort_func(self._sort_by_rev)
 
@@ -712,7 +709,19 @@ class GLog(GDialog):
         return False
 
 
-    def _tree_popup_menu(self, widget, button=0, time=0) :
+    def _tree_popup_menu(self, treeview, button=0, time=0) :
+        row = self.model[self.tree.get_selection().get_selected()[1]]
+        selrev = long(row[2])
+        
+        # disable/enable menus as required
+        parents = [self.repo.changelog.rev(x.node()) for x in
+                   self.repo.workingctx().parents()]
+        can_merge = selrev not in parents and \
+                    len(self.repo.heads()) > 1 and \
+                    len(parents) < 2
+        self._cmenu_merge.set_sensitive(can_merge)
+
+        # display the context menu
         self._menu.popup(None, None, None, button, time)
         return True
 
