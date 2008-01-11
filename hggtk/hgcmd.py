@@ -33,8 +33,12 @@ class CmdDialog(gtk.Dialog):
         self.set_default_size(width, height)
         
         self._button_ok = gtk.Button("Close")
+        self._button_ok.connect('clicked', self._on_ok_clicked)
         self.action_area.pack_end(self._button_ok)
         
+        self.connect('delete-event', self._delete)
+        self.connect('response', self._response)
+
         self.pbar = None
         if progressbar:
             self.last_pbar_update = 0
@@ -72,13 +76,19 @@ class CmdDialog(gtk.Dialog):
         self.vbox.pack_start(scrolledwindow, True, True)
         self.connect('map_event', self._on_window_map_event)
 
-        self._button_ok.connect('clicked', self._on_ok_clicked)
         self.show_all()
 
     def _on_ok_clicked(self, button):
         """ Ok button clicked handler. """
         self.response(gtk.RESPONSE_ACCEPT)
         
+    def _delete(self, widget, event):
+        return True
+
+    def _response(self, widget, response_id):
+        if threading.activeCount() > 1:
+            widget.emit_stop_by_name('response')
+    
     def _on_window_map_event(self, event, param):
         self.hgthread = HgThread(self.cmdline[1:])
         self.hgthread.start()
