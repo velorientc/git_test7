@@ -24,6 +24,8 @@ from shlib import shell_notify
 from gdialog import *
 from hgcmd import CmdDialog
 
+from vis.treeview import TreeView
+
 
 class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -152,6 +154,9 @@ class GLog(GDialog):
         # If the last refresh is still being processed, then do nothing
         if self.refreshing:
             return False
+
+        if self.grapher:
+            return True
 
         # Retrieve repo revision info
         self.repo.invalidate()
@@ -406,89 +411,97 @@ class GLog(GDialog):
         
     def get_body(self):
         self._menu = self.tree_context_menu()
-        
-        self.model = gtk.ListStore(str, str, long, str, str, str, str, long, object)
-        self.model.set_default_sort_func(self._sort_by_rev)
+        self.grapher = True
+        if self.grapher:
+            scroller = TreeView(self.repo)
+            self.tree = scroller.treeview
+            self.model = scroller.model
+        else:
+            self.model = gtk.ListStore(str, str, long, str, str, str, str, 
+                    long, object)
+            self.model.set_default_sort_func(self._sort_by_rev)
 
-        self.tree = gtk.TreeView(self.model)
+            self.tree = gtk.TreeView(self.model)
+            self.tree.set_reorderable(False)
+            self.tree.set_enable_search(True)
+            self.tree.set_search_equal_func(self._search_in_tree,None)
+            self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
+            self.tree.get_selection().connect('changed',
+                    self._tree_selection_changed)
+            self.tree.set_rubber_banding(False)
+            self.tree.modify_font(pango.FontDescription(self.fontlist))
+            self.tree.set_rules_hint(True) 
+            
+            parent_cell = gtk.CellRendererPixbuf()
+            head_cell = gtk.CellRendererPixbuf()
+            tags_cell = gtk.CellRendererText()
+            changeset_cell = gtk.CellRendererText()
+            user_cell = gtk.CellRendererText()
+            summary_cell = gtk.CellRendererText()
+            date_cell = gtk.CellRendererText()
+            
+            col = 1
+            
+            col_status = gtk.TreeViewColumn('status')
+            col_status.pack_start(parent_cell, False)
+            col_status.pack_start(head_cell, False)
+            col_status.set_cell_data_func(parent_cell, self.make_parent)
+            col_status.set_cell_data_func(head_cell, self.make_head)
+            
+            col += 1
+            col_rev = gtk.TreeViewColumn('rev', changeset_cell)
+            col_rev.add_attribute(changeset_cell, 'text', col)
+            col_rev.set_cell_data_func(changeset_cell, self._text_color)
+            col_rev.set_sort_column_id(col)
+            col_rev.set_resizable(False)
+            
+            col += 1
+            col_tag = gtk.TreeViewColumn('tag', tags_cell)
+            col_tag.add_attribute(tags_cell, 'text', col)
+            col_tag.set_cell_data_func(tags_cell, self._text_color)
+            col_tag.set_sort_column_id(col)
+            col_tag.set_resizable(True)
+            
+            col += 1
+            user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
+            user_cell.set_property('width_chars', 20)
+            col_user = gtk.TreeViewColumn('user', user_cell)
+            col_user.add_attribute(user_cell, 'text', col)
+            col_user.set_cell_data_func(user_cell, self._text_color)
+            col_user.set_sort_column_id(col)
+            col_user.set_resizable(True)
+            
+            col += 1
+            summary_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
+            summary_cell.set_property('width_chars', 65)
+            col_sum = gtk.TreeViewColumn('summary', summary_cell)
+            col_sum.add_attribute(summary_cell, 'text', col)
+            col_sum.set_cell_data_func(summary_cell, self._text_color)
+            col_sum.set_sort_column_id(col)
+            col_sum.set_resizable(True)
+
+            col += 1
+            col_date = gtk.TreeViewColumn('date', date_cell)
+            col_date.add_attribute(date_cell, 'text', col)
+            col_date.set_cell_data_func(date_cell, self._text_color)
+            col_date.set_sort_column_id(col)
+            col_date.set_resizable(True)
+
+            self.tree.append_column(col_status)
+            self.tree.append_column(col_rev)
+            self.tree.append_column(col_tag)
+            self.tree.append_column(col_user)
+            self.tree.append_column(col_sum)
+            self.tree.append_column(col_date)
+            self.tree.set_headers_clickable(True)
+            
+            scroller = gtk.ScrolledWindow()
+            scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            scroller.add(self.tree)
+
         self.tree.connect('button-release-event', self._tree_button_release)
         self.tree.connect('popup-menu', self._tree_popup_menu)
         self.tree.connect('row-activated', self._tree_row_act)
-        self.tree.set_reorderable(False)
-        self.tree.set_enable_search(True)
-        self.tree.set_search_equal_func(self._search_in_tree,None)
-        self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-        self.tree.get_selection().connect('changed', self._tree_selection_changed)
-        self.tree.set_rubber_banding(False)
-        self.tree.modify_font(pango.FontDescription(self.fontlist))
-        self.tree.set_rules_hint(True) 
-        
-        parent_cell = gtk.CellRendererPixbuf()
-        head_cell = gtk.CellRendererPixbuf()
-        tags_cell = gtk.CellRendererText()
-        changeset_cell = gtk.CellRendererText()
-        user_cell = gtk.CellRendererText()
-        summary_cell = gtk.CellRendererText()
-        date_cell = gtk.CellRendererText()
-        
-        col = 1
-        
-        col_status = gtk.TreeViewColumn('status')
-        col_status.pack_start(parent_cell, False)
-        col_status.pack_start(head_cell, False)
-        col_status.set_cell_data_func(parent_cell, self.make_parent)
-        col_status.set_cell_data_func(head_cell, self.make_head)
-        
-        col += 1
-        col_rev = gtk.TreeViewColumn('rev', changeset_cell)
-        col_rev.add_attribute(changeset_cell, 'text', col)
-        col_rev.set_cell_data_func(changeset_cell, self._text_color)
-        col_rev.set_sort_column_id(col)
-        col_rev.set_resizable(False)
-        
-        col += 1
-        col_tag = gtk.TreeViewColumn('tag', tags_cell)
-        col_tag.add_attribute(tags_cell, 'text', col)
-        col_tag.set_cell_data_func(tags_cell, self._text_color)
-        col_tag.set_sort_column_id(col)
-        col_tag.set_resizable(True)
-        
-        col += 1
-        user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        user_cell.set_property('width_chars', 20)
-        col_user = gtk.TreeViewColumn('user', user_cell)
-        col_user.add_attribute(user_cell, 'text', col)
-        col_user.set_cell_data_func(user_cell, self._text_color)
-        col_user.set_sort_column_id(col)
-        col_user.set_resizable(True)
-        
-        col += 1
-        summary_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        summary_cell.set_property('width_chars', 65)
-        col_sum = gtk.TreeViewColumn('summary', summary_cell)
-        col_sum.add_attribute(summary_cell, 'text', col)
-        col_sum.set_cell_data_func(summary_cell, self._text_color)
-        col_sum.set_sort_column_id(col)
-        col_sum.set_resizable(True)
-
-        col += 1
-        col_date = gtk.TreeViewColumn('date', date_cell)
-        col_date.add_attribute(date_cell, 'text', col)
-        col_date.set_cell_data_func(date_cell, self._text_color)
-        col_date.set_sort_column_id(col)
-        col_date.set_resizable(True)
-
-        self.tree.append_column(col_status)
-        self.tree.append_column(col_rev)
-        self.tree.append_column(col_tag)
-        self.tree.append_column(col_user)
-        self.tree.append_column(col_sum)
-        self.tree.append_column(col_date)
-        self.tree.set_headers_clickable(True)
-        
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.add(self.tree)
         
         tree_frame = gtk.Frame()
         tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)

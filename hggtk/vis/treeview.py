@@ -10,8 +10,8 @@ dialog.  Other portions stolen from graphlog extension.
 import gtk
 import gobject
 import pango
-from hggtk.vis import treemodel
-from hggtk.vis import graphcell
+import treemodel
+import graphcell
 
 class TreeView(gtk.ScrolledWindow):
 
@@ -47,13 +47,6 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show date column',
                                  False,
                                  gobject.PARAM_READWRITE),
-
-        'compact': (gobject.TYPE_BOOLEAN,
-                    'Compact view',
-                    'Break ancestry lines to save space',
-                    True,
-                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE)
-
     }
 
     __gsignals__ = {
@@ -65,7 +58,7 @@ class TreeView(gtk.ScrolledWindow):
                               ())
     }
 
-    def __init__(self, repo, start, maxnum, compact=True):
+    def __init__(self, repo):
         """Create a new TreeView.
 
         :param repo:  Repository object to show.
@@ -80,20 +73,24 @@ class TreeView(gtk.ScrolledWindow):
 
         self.construct_treeview()
 
-        self.iter   = None
+        self.iter = None
         self.repo = repo
-
-        self.start = start
-        self.maxnum = maxnum
-        self.compact = compact
-
+        self.model = self.create_model()
+        self.treeview.set_model(self.model)
         gobject.idle_add(self.populate)
+
+    def create_model(self):
+        opts = { 'rev' : [] }
+        limit = self.repo.ui.config('tortoisehg', 'graphlimit', None)
+        (start_rev, stop_rev) = (self.repo.changelog.count() - 1, 0)
+        if limit:
+            stop_rev = max(stop_rev, start_rev - limit + 1)
+        grapher = treemodel.revision_grapher(self.repo, start_rev, stop_rev)
+        return treemodel.TreeModel(self.repo, grapher)
 
     def do_get_property(self, property):
         if property.name == 'date-column-visible':
             return self.date_column.get_visible()
-        elif property.name == 'compact':
-            return self.compact
         elif property.name == 'repo':
             return self.repo
         elif property.name == 'revision':
@@ -108,8 +105,6 @@ class TreeView(gtk.ScrolledWindow):
     def do_set_property(self, property, value):
         if property.name == 'date-column-visible':
             self.date_column.set_visible(value)
-        elif property.name == 'compact':
-            self.compact = value
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'revision':
@@ -147,6 +142,8 @@ class TreeView(gtk.ScrolledWindow):
         return self.get_property('parents')
         
     def refresh(self):
+        self.model = self.create_model()
+        self.treeview.set_model(self.model)
         gobject.idle_add(self.populate, self.get_revision())
 
     def update(self):
@@ -185,21 +182,13 @@ class TreeView(gtk.ScrolledWindow):
     def populate(self, revision=None):
         """Fill the treeview with contents.
         """
-        opts = { 'rev' : [] }
-        limit = self.repo.ui.config('tortoisehg', 'graphlimit')
-        (start_rev, stop_rev) = (self.repo.changelog.count() - 1, 0)
-        stop_rev = max(stop_rev, start_rev - limit + 1)
-        grapher = treemodel.revision_grapher(self.repo, start_rev, stop_rev)
-
-        self.model = treemodel.TreeModel(self.repo, grapher)
         self.graph_cell.columns_len = 4 # TODO not known up-front
         width = self.graph_cell.get_size(self.treeview)[2]
         if width > 500:
             width = 500
         self.graph_column.set_fixed_width(width)
         self.graph_column.set_max_width(width)
-        self.index = index
-        self.treeview.set_model(self.model)
+        self.index = [] # TODO
 
         if revision is None:
             self.treeview.set_cursor(0)
@@ -223,14 +212,6 @@ class TreeView(gtk.ScrolledWindow):
 
         self.treeview.connect("cursor-changed",
                 self._on_selection_changed)
-
-        # TODO: Parent should connect menu events
-        #self.treeview.connect("row-activated", 
-        #        self._on_revision_activated)
-        #self.treeview.connect("button-release-event", 
-        #        self._on_revision_selected)
-        #self.treeview.connect('popup-menu',
-        #        self._popup_menu)
 
         self.treeview.set_property('fixed-height-mode', True)
 
@@ -276,7 +257,7 @@ class TreeView(gtk.ScrolledWindow):
         cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.date_column = gtk.TreeViewColumn("Date")
-        self.date_column.set_visible(False)
+        self.date_column.set_visible(True)
         self.date_column.set_resizable(True)
         self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.date_column.set_fixed_width(cell.get_size(self.treeview)[2])

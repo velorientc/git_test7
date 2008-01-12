@@ -130,27 +130,26 @@ class TreeModel(gtk.GenericTreeModel):
             revision = self.revisions[revid]
 
         if column == REVISION: return revision
-        if column == MESSAGE: return revision[2]
+        if column == MESSAGE: return revision[2].split('\n')[0]
         if column == COMMITER: return re.sub('<.*@.*>', '',
                                              revision[0]).strip(' ')
-        if column == TIMESTAMP: # TODO: not sure if this is correct
-            return strftime("%Y-%m-%d %H:%M", localtime(revision[1]))
+        if column == TIMESTAMP:
+            return strftime("%Y-%m-%d %H:%M", localtime(revision[1][0]))
 
     def on_iter_next(self, rowref):
-        if rowref < len(self.line_graph_data) - 1:
-            return rowref+1
         # Dynamically generate graph rows on demand
-        while rowref >= len(self.line_graph_data):
-            # TODO: not sure about this either
+        while rowref >= len(self.line_graph_data)-1:
             try:
                 (rev, node, node_index, edges,
-                    n_columns, parents, children) = self.grapher()
+                    n_columns, parents, children) = self.grapher.next()
             except StopIteration:
                 break
             # TODO: add color later on
-            lines = [(r, 0) for (r, n) in edges]
+            lines = [(s, e, 0) for (s, e) in edges]
             self.line_graph_data.append( (rev, (node_index, 0),
                 lines, parents, children) )
+        if rowref < len(self.line_graph_data) - 1:
+            return rowref+1
         return None
 
     def on_iter_children(self, parent):
