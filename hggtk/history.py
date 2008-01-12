@@ -415,6 +415,7 @@ class GLog(GDialog):
     def get_body(self):
         self._menu = self.tree_context_menu()
 
+        # TODO: move self.grapher, self.limit elsewheres
         if self.grapher:
             limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '100')
             if limit_opt:
@@ -426,6 +427,7 @@ class GLog(GDialog):
                     limit = None
             else:
                 limit = None
+            self.limit = limit
             scroller = TreeView(self.repo, limit)
             self.graphview = scroller
             self.tree = scroller.treeview
@@ -732,7 +734,7 @@ class GLog(GDialog):
     def _next_clicked(self, toolbutton, data=None):
         if self.grapher:
             limit = self.graphview.get_property('limit')
-            self.graphview.set_property('limit', limit + 100)
+            self.graphview.set_property('limit', limit + self.limit)
         return True
 
 

@@ -84,21 +84,41 @@ class TreeView(gtk.ScrolledWindow):
 
     def create_grapher(self):
         self.grapher = revision_grapher(self.repo,
-                self.repo.changelog.count(), 0)
+                self.repo.changelog.count() - 1, 0)
         self.graphdata = []
         self.create_model()
 
     def create_model(self):
+        def fix_long_right_edges(edges):
+            for (i, (start, end)) in enumerate(edges):
+                if end > start:
+                    edges[i] = (start, end + 1)
+
         self.max_cols = 1
         self.index = {}
+        # TODO: add color later on.  Color parents, at least
         while not self.limit or len(self.graphdata) < self.limit:
             try:
-                (rev, node, index, edges, ncols,
+                (rev, node, index, edges, ncols, n_columns_diff,
                         parents, children) = self.grapher.next()
             except StopIteration:
                 return
-            # TODO: add color later on
-            lines = [(s, e, 0) for (s, e) in edges]
+            if n_columns_diff == -1:
+                fix_long_right_edges(edges)
+            lines = []
+            for n in xrange(index):
+                lines.append( (n, n, 0) )
+            for s, e in edges:
+                lines.append( (s, e, 0) )
+            if n_columns_diff == 0:
+                for n in xrange(index+1, ncols):
+                    lines.append( (n, n, 0) )
+            if n_columns_diff == -1:
+                for n in xrange(index+1, ncols-1):
+                    lines.append( (n, n, 0) )
+                lines.append( (ncols-1, ncols-2, 0) )
+            elif n_columns_diff == 1:
+                lines.append( (ncols-1, ncols, 0) )
             self.max_cols = max(self.max_cols, ncols)
             self.index[rev] = len(self.graphdata)
             self.graphdata.append( (rev, (index, 0), lines,
