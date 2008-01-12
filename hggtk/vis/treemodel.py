@@ -13,9 +13,9 @@ import re
 from time import (strftime, localtime)
 
 # treemodel row enumerated attributes
-REVID = 0
+LINES = 0
 NODE = 1
-LINES = 2
+REVID = 2
 LAST_LINES = 3
 MESSAGE = 4
 COMMITER = 5
@@ -70,19 +70,20 @@ class TreeModel(gtk.GenericTreeModel):
             return []
 
         if revid not in self.revisions:
-            # TODO: not sure about this
             ctx = self.repo.changectx(revid)
-            revision = (ctx.user(), ctx.date(), ctx.description())
+            revision = (None, node, revid, None, ctx.description(),
+                    ctx.user(), ctx.date(), None, parents)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
 
         if column == REVISION: return revision
-        if column == MESSAGE: return revision[2].split('\n')[0]
+        if column == MESSAGE: return revision[MESSAGE].split('\n')[0]
         if column == COMMITER: return re.sub('<.*@.*>', '',
-                                             revision[0]).strip(' ')
+                                             revision[COMMITER]).strip(' ')
         if column == TIMESTAMP:
-            return strftime("%Y-%m-%d %H:%M", localtime(revision[1][0]))
+            return strftime("%Y-%m-%d %H:%M",
+                    localtime(revision[TIMESTAMP][0]))
 
     def on_iter_next(self, rowref):
         if rowref < len(self.line_graph_data) - 1:

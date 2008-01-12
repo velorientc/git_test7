@@ -24,6 +24,7 @@ from shlib import shell_notify
 from gdialog import *
 from hgcmd import CmdDialog
 
+from vis import treemodel
 from vis.treeview import TreeView
 
 
@@ -432,6 +433,8 @@ class GLog(GDialog):
             self.graphview = scroller
             self.tree = scroller.treeview
             self.model = scroller.model
+            self.graphview.connect('revision-selected',
+                    self._graphtree_selection_changed)
         else:
             self.model = gtk.ListStore(str, str, long, str, str, str, str, 
                     long, object)
@@ -441,10 +444,10 @@ class GLog(GDialog):
             self.tree.set_reorderable(False)
             self.tree.set_enable_search(True)
             self.tree.set_search_equal_func(self._search_in_tree,None)
+            self.tree.set_rubber_banding(False)
             self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
             self.tree.get_selection().connect('changed',
                     self._tree_selection_changed)
-            self.tree.set_rubber_banding(False)
             self.tree.modify_font(pango.FontDescription(self.fontlist))
             self.tree.set_rules_hint(True) 
             
@@ -566,9 +569,8 @@ class GLog(GDialog):
     def _add_tag(self, menuitem):
         from tagadd import TagAddDialog
 
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
-        parents = row[8]
+        rev = self.currow[treemodel.REVID]
+        parents = self.currow[treemodel.PARENTS]
         
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
@@ -588,9 +590,8 @@ class GLog(GDialog):
         from status import GStatus
         from gtools import cmdtable
         
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
-        parents = row[8]
+        rev = self.currow[treemodel.REVID]
+        parents = self.currow[treemodel.PARENTS]
         if len(parents) == 0:
             parents = [rev-1]
 
@@ -606,8 +607,7 @@ class GLog(GDialog):
 
 
     def _export_patch(self, menuitem):
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
+        rev = self.currow[treemodel.REVID]
         filename = "%s_rev%s.patch" % (os.path.basename(self.repo.root), rev)
         fd = NativeSaveFileDialogWrapper(Title = "Save patch to",
                                          InitialDir=self.repo.root,
@@ -624,16 +624,14 @@ class GLog(GDialog):
 
     def _email_patch(self, menuitem):
         from hgemail import EmailDialog
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
+        rev = self.currow[treemodel.REVID]
         dlg = EmailDialog(self.repo.root, ['--rev', str(rev)])
         dlg.show_all()
         dlg.run()
         dlg.hide()
 
     def _checkout(self, menuitem):
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
+        rev = self.currow[treemodel.REVID]
         self.repo.invalidate()
         wc = self.repo.workingctx()
         pl = wc.parents()
@@ -663,8 +661,7 @@ class GLog(GDialog):
         self.reload_log()
 
     def _merge(self, menuitem):
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
+        rev = self.currow[treemodel.REVID]
         self.repo.invalidate()
         wc = self.repo.workingctx()
         pl = wc.parents()
@@ -714,18 +711,26 @@ class GLog(GDialog):
         self.repo.dirstate.invalidate()
         self.reload_log()
 
-    def _tree_selection_changed(self, selection):
-        ''' Update the details text '''
-        if selection.count_selected_rows() == 0:
-            return False
-        rev = [str(x) for x in [self.model[selection.get_selected()[1]][2]]]
+    def _graphtree_selection_changed(self, treeview):
+        self.currow = self.graphview.get_revision()
+        rev = [ str(self.currow[treemodel.REVID]) ]
         if rev != self._last_rev:
             self._last_rev = rev
-            parents = self.model[selection.get_selected()[1]][8]
+            parents = self.currow[treemodel.PARENTS]
             self.load_details(rev, len(parents))
-
         return False
 
+    def _tree_selection_changed(self, selection):
+        ''' Update the details text'''
+        if selection.count_selected_rows() == 0:
+            return False
+        self.currow = self.model[selection.get_selected()[1]]
+        rev = [ str(self.currow[treemodel.REVID]) ]
+        if rev != self._last_rev:
+            self._last_rev = rev
+            parents = self.currow[treemodel.PARENTS]
+            self.load_details(rev, len(parents))
+        return False
 
     def _refresh_clicked(self, toolbutton, data=None):
         self.reload_log()
@@ -745,8 +750,7 @@ class GLog(GDialog):
 
 
     def _tree_popup_menu(self, treeview, button=0, time=0) :
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        selrev = long(row[2])
+        selrev = self.currow[treemodel.REVID]
         
         # disable/enable menus as required
         parents = [self.repo.changelog.rev(x.node()) for x in
