@@ -38,11 +38,6 @@ class TreeView(gtk.ScrolledWindow):
                             '',
                             gobject.PARAM_READABLE),
 
-        'children': (gobject.TYPE_PYOBJECT,
-                     'Child revisions',
-                     'Children of the currently selected revision',
-                     gobject.PARAM_READABLE),
-
         'parents': (gobject.TYPE_PYOBJECT,
                     'Parent revisions',
                     'Parents to the currently selected revision',
@@ -99,8 +94,8 @@ class TreeView(gtk.ScrolledWindow):
         # TODO: add color later on.  Color parents, at least
         while not self.limit or len(self.graphdata) < self.limit:
             try:
-                (rev, node, index, edges, ncols, n_columns_diff,
-                        parents, children) = self.grapher.next()
+                (rev, node, index, edges, ncols,
+                        n_columns_diff, parents) = self.grapher.next()
             except StopIteration:
                 return
             if n_columns_diff == -1:
@@ -122,7 +117,7 @@ class TreeView(gtk.ScrolledWindow):
             self.max_cols = max(self.max_cols, ncols)
             self.index[rev] = len(self.graphdata)
             self.graphdata.append( (rev, (index, 0), lines,
-                parents, children) )
+                parents) )
         self.model = treemodel.TreeModel(self.repo, self.graphdata)
         self.treeview.set_model(self.model)
 
@@ -152,8 +147,6 @@ class TreeView(gtk.ScrolledWindow):
             return self.limit
         elif property.name == 'revision':
             return self.model.get_value(self.iter, treemodel.REVISION)
-        elif property.name == 'children':
-            return self.model.get_value(self.iter, treemodel.CHILDREN)
         elif property.name == 'parents':
             return self.model.get_value(self.iter, treemodel.PARENTS)
         else:
@@ -187,13 +180,6 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.set_cursor(self.index[revid])
         self.treeview.grab_focus()
 
-    def get_children(self):
-        """Return the children of the currently selected revision.
-
-        :return: list of revision ids.
-        """
-        return self.get_property('children')
-
     def get_parents(self):
         """Return the parents of the currently selected revision.
 
@@ -204,39 +190,6 @@ class TreeView(gtk.ScrolledWindow):
     def refresh(self):
         self.create_grapher()
         gobject.idle_add(self.populate, self.get_revision())
-
-    def update(self):
-        print 'TreeView.update() unimplemented'
-
-    def back(self):
-        """Signal handler for the Back button."""
-        parents = self.get_parents()
-        if not len(parents):
-            return
-
-        for parent_id in parents:
-            parent_index = self.index[parent_id]
-            parent = self.model[parent_index][treemodel.REVISION]
-            if same_branch(self.get_revision(), parent):
-                self.set_revision(parent)
-                break
-        else:
-            self.set_revision_id(parents[0])
-
-    def forward(self):
-        """Signal handler for the Forward button."""
-        children = self.get_children()
-        if not len(children):
-            return
-
-        for child_id in children:
-            child_index = self.index[child_id]
-            child = self.model[child_index][treemodel.REVISION]
-            if same_branch(child, self.get_revision()):
-                self.set_revision(child)
-                break
-        else:
-            self.set_revision_id(children[0])
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()

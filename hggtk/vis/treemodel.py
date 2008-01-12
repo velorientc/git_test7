@@ -22,7 +22,6 @@ COMMITER = 5
 TIMESTAMP = 6
 REVISION = 7
 PARENTS = 8
-CHILDREN = 9
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -48,7 +47,6 @@ class TreeModel(gtk.GenericTreeModel):
         if index == TIMESTAMP: return gobject.TYPE_STRING
         if index == REVISION: return gobject.TYPE_PYOBJECT
         if index == PARENTS: return gobject.TYPE_PYOBJECT
-        if index == CHILDREN: return gobject.TYPE_PYOBJECT
 
     def on_get_iter(self, path):
         return path[0]
@@ -57,13 +55,12 @@ class TreeModel(gtk.GenericTreeModel):
         return rowref
 
     def on_get_value(self, rowref, column):
-        (revid, node, lines, parents, children) = self.line_graph_data[rowref]
+        (revid, node, lines, parents) = self.line_graph_data[rowref]
 
         if column == REVID: return revid
         if column == NODE: return node
         if column == LINES: return lines
         if column == PARENTS: return parents
-        if column == CHILDREN: return children
         if column == LAST_LINES:
             if rowref>0:
                 return self.line_graph_data[rowref-1][2]

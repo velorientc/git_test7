@@ -55,12 +55,9 @@ def revision_grapher(repo, start_rev, stop_rev):
         for parent in parents:
             edges.append((rev_index, next_revs.index(parent)))
 
-        # Get rid of this, it sucks
-        children = [changelog.rev(x) for x in changelog.children(node)]
-
         n_columns_diff = len(next_revs) - len(revs)
-        yield (curr_rev, node, rev_index, edges, len(revs), n_columns_diff,
-            parents, children)
+        yield (curr_rev, node, rev_index, edges, len(revs),
+                n_columns_diff, parents)
 
         revs = next_revs
         curr_rev -= 1
