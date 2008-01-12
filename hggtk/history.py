@@ -24,6 +24,9 @@ from shlib import shell_notify
 from gdialog import *
 from hgcmd import CmdDialog
 
+from vis import treemodel
+from vis.treeview import TreeView
+
 
 class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -31,7 +34,7 @@ class GLog(GDialog):
 
     # "Constants"
     block_count = 150
-
+    grapher = True
 
     def get_title(self):
         return os.path.basename(self.repo.root) + ' log ' + ':'.join(self.opts['rev']) + ' ' + ' '.join(self.pats)
@@ -46,11 +49,14 @@ class GLog(GDialog):
 
     def get_tbbuttons(self):
         return [
-                self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh', self._refresh_clicked),
+                self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
+                    self._refresh_clicked),
                 gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_INDEX, '_filter', self._refresh_clicked,
-                        menu=self._filter_menu()),
-                gtk.SeparatorToolItem()
+                self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
+                    self._refresh_clicked, menu=self._filter_menu()),
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_GO_DOWN, '_next',
+                    self._next_clicked)
              ]
 
     def _filter_all(self, widget, data=None):
@@ -152,6 +158,9 @@ class GLog(GDialog):
         # If the last refresh is still being processed, then do nothing
         if self.refreshing:
             return False
+
+        if self.grapher:
+            return True
 
         # Retrieve repo revision info
         self.repo.invalidate()
@@ -406,89 +415,112 @@ class GLog(GDialog):
         
     def get_body(self):
         self._menu = self.tree_context_menu()
-        
-        self.model = gtk.ListStore(str, str, long, str, str, str, str, long, object)
-        self.model.set_default_sort_func(self._sort_by_rev)
 
-        self.tree = gtk.TreeView(self.model)
+        # TODO: move self.grapher, self.limit elsewheres
+        if self.grapher:
+            limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '100')
+            if limit_opt:
+                try:
+                    limit = int(limit_opt)
+                except ValueError:
+                    limit = 0
+                if limit <= 0:
+                    limit = None
+            else:
+                limit = None
+            self.limit = limit
+            scroller = TreeView(self.repo, limit)
+            self.graphview = scroller
+            self.tree = scroller.treeview
+            self.model = scroller.model
+            self.graphview.connect('revision-selected',
+                    self._graphtree_selection_changed)
+        else:
+            self.model = gtk.ListStore(str, str, long, str, str, str, str, 
+                    long, object)
+            self.model.set_default_sort_func(self._sort_by_rev)
+
+            self.tree = gtk.TreeView(self.model)
+            self.tree.set_reorderable(False)
+            self.tree.set_enable_search(True)
+            self.tree.set_search_equal_func(self._search_in_tree,None)
+            self.tree.set_rubber_banding(False)
+            self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
+            self.tree.get_selection().connect('changed',
+                    self._tree_selection_changed)
+            self.tree.modify_font(pango.FontDescription(self.fontlist))
+            self.tree.set_rules_hint(True) 
+            
+            parent_cell = gtk.CellRendererPixbuf()
+            head_cell = gtk.CellRendererPixbuf()
+            tags_cell = gtk.CellRendererText()
+            changeset_cell = gtk.CellRendererText()
+            user_cell = gtk.CellRendererText()
+            summary_cell = gtk.CellRendererText()
+            date_cell = gtk.CellRendererText()
+            
+            col = 1
+            
+            col_status = gtk.TreeViewColumn('status')
+            col_status.pack_start(parent_cell, False)
+            col_status.pack_start(head_cell, False)
+            col_status.set_cell_data_func(parent_cell, self.make_parent)
+            col_status.set_cell_data_func(head_cell, self.make_head)
+            
+            col += 1
+            col_rev = gtk.TreeViewColumn('rev', changeset_cell)
+            col_rev.add_attribute(changeset_cell, 'text', col)
+            col_rev.set_cell_data_func(changeset_cell, self._text_color)
+            col_rev.set_sort_column_id(col)
+            col_rev.set_resizable(False)
+            
+            col += 1
+            col_tag = gtk.TreeViewColumn('tag', tags_cell)
+            col_tag.add_attribute(tags_cell, 'text', col)
+            col_tag.set_cell_data_func(tags_cell, self._text_color)
+            col_tag.set_sort_column_id(col)
+            col_tag.set_resizable(True)
+            
+            col += 1
+            user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
+            user_cell.set_property('width_chars', 20)
+            col_user = gtk.TreeViewColumn('user', user_cell)
+            col_user.add_attribute(user_cell, 'text', col)
+            col_user.set_cell_data_func(user_cell, self._text_color)
+            col_user.set_sort_column_id(col)
+            col_user.set_resizable(True)
+            
+            col += 1
+            summary_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
+            summary_cell.set_property('width_chars', 65)
+            col_sum = gtk.TreeViewColumn('summary', summary_cell)
+            col_sum.add_attribute(summary_cell, 'text', col)
+            col_sum.set_cell_data_func(summary_cell, self._text_color)
+            col_sum.set_sort_column_id(col)
+            col_sum.set_resizable(True)
+
+            col += 1
+            col_date = gtk.TreeViewColumn('date', date_cell)
+            col_date.add_attribute(date_cell, 'text', col)
+            col_date.set_cell_data_func(date_cell, self._text_color)
+            col_date.set_sort_column_id(col)
+            col_date.set_resizable(True)
+
+            self.tree.append_column(col_status)
+            self.tree.append_column(col_rev)
+            self.tree.append_column(col_tag)
+            self.tree.append_column(col_user)
+            self.tree.append_column(col_sum)
+            self.tree.append_column(col_date)
+            self.tree.set_headers_clickable(True)
+            
+            scroller = gtk.ScrolledWindow()
+            scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            scroller.add(self.tree)
+
         self.tree.connect('button-release-event', self._tree_button_release)
         self.tree.connect('popup-menu', self._tree_popup_menu)
         self.tree.connect('row-activated', self._tree_row_act)
-        self.tree.set_reorderable(False)
-        self.tree.set_enable_search(True)
-        self.tree.set_search_equal_func(self._search_in_tree,None)
-        self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-        self.tree.get_selection().connect('changed', self._tree_selection_changed)
-        self.tree.set_rubber_banding(False)
-        self.tree.modify_font(pango.FontDescription(self.fontlist))
-        self.tree.set_rules_hint(True) 
-        
-        parent_cell = gtk.CellRendererPixbuf()
-        head_cell = gtk.CellRendererPixbuf()
-        tags_cell = gtk.CellRendererText()
-        changeset_cell = gtk.CellRendererText()
-        user_cell = gtk.CellRendererText()
-        summary_cell = gtk.CellRendererText()
-        date_cell = gtk.CellRendererText()
-        
-        col = 1
-        
-        col_status = gtk.TreeViewColumn('status')
-        col_status.pack_start(parent_cell, False)
-        col_status.pack_start(head_cell, False)
-        col_status.set_cell_data_func(parent_cell, self.make_parent)
-        col_status.set_cell_data_func(head_cell, self.make_head)
-        
-        col += 1
-        col_rev = gtk.TreeViewColumn('rev', changeset_cell)
-        col_rev.add_attribute(changeset_cell, 'text', col)
-        col_rev.set_cell_data_func(changeset_cell, self._text_color)
-        col_rev.set_sort_column_id(col)
-        col_rev.set_resizable(False)
-        
-        col += 1
-        col_tag = gtk.TreeViewColumn('tag', tags_cell)
-        col_tag.add_attribute(tags_cell, 'text', col)
-        col_tag.set_cell_data_func(tags_cell, self._text_color)
-        col_tag.set_sort_column_id(col)
-        col_tag.set_resizable(True)
-        
-        col += 1
-        user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        user_cell.set_property('width_chars', 20)
-        col_user = gtk.TreeViewColumn('user', user_cell)
-        col_user.add_attribute(user_cell, 'text', col)
-        col_user.set_cell_data_func(user_cell, self._text_color)
-        col_user.set_sort_column_id(col)
-        col_user.set_resizable(True)
-        
-        col += 1
-        summary_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        summary_cell.set_property('width_chars', 65)
-        col_sum = gtk.TreeViewColumn('summary', summary_cell)
-        col_sum.add_attribute(summary_cell, 'text', col)
-        col_sum.set_cell_data_func(summary_cell, self._text_color)
-        col_sum.set_sort_column_id(col)
-        col_sum.set_resizable(True)
-
-        col += 1
-        col_date = gtk.TreeViewColumn('date', date_cell)
-        col_date.add_attribute(date_cell, 'text', col)
-        col_date.set_cell_data_func(date_cell, self._text_color)
-        col_date.set_sort_column_id(col)
-        col_date.set_resizable(True)
-
-        self.tree.append_column(col_status)
-        self.tree.append_column(col_rev)
-        self.tree.append_column(col_tag)
-        self.tree.append_column(col_user)
-        self.tree.append_column(col_sum)
-        self.tree.append_column(col_date)
-        self.tree.set_headers_clickable(True)
-        
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.add(self.tree)
         
         tree_frame = gtk.Frame()
         tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -537,9 +569,8 @@ class GLog(GDialog):
     def _add_tag(self, menuitem):
         from tagadd import TagAddDialog
 
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
-        parents = row[8]
+        rev = self.currow[treemodel.REVID]
+        parents = self.currow[treemodel.PARENTS]
         
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
@@ -559,9 +590,8 @@ class GLog(GDialog):
         from status import GStatus
         from gtools import cmdtable
         
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
-        parents = row[8]
+        rev = self.currow[treemodel.REVID]
+        parents = self.currow[treemodel.PARENTS]
         if len(parents) == 0:
             parents = [rev-1]
 
@@ -577,8 +607,7 @@ class GLog(GDialog):
 
 
     def _export_patch(self, menuitem):
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
+        rev = self.currow[treemodel.REVID]
         filename = "%s_rev%s.patch" % (os.path.basename(self.repo.root), rev)
         fd = NativeSaveFileDialogWrapper(Title = "Save patch to",
                                          InitialDir=self.repo.root,
@@ -595,16 +624,14 @@ class GLog(GDialog):
 
     def _email_patch(self, menuitem):
         from hgemail import EmailDialog
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
+        rev = self.currow[treemodel.REVID]
         dlg = EmailDialog(self.repo.root, ['--rev', str(rev)])
         dlg.show_all()
         dlg.run()
         dlg.hide()
 
     def _checkout(self, menuitem):
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
+        rev = self.currow[treemodel.REVID]
         self.repo.invalidate()
         wc = self.repo.workingctx()
         pl = wc.parents()
@@ -634,8 +661,7 @@ class GLog(GDialog):
         self.reload_log()
 
     def _merge(self, menuitem):
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        rev = long(row[2])
+        rev = self.currow[treemodel.REVID]
         self.repo.invalidate()
         wc = self.repo.workingctx()
         pl = wc.parents()
@@ -685,21 +711,35 @@ class GLog(GDialog):
         self.repo.dirstate.invalidate()
         self.reload_log()
 
-    def _tree_selection_changed(self, selection):
-        ''' Update the details text '''
-        if selection.count_selected_rows() == 0:
-            return False
-        rev = [str(x) for x in [self.model[selection.get_selected()[1]][2]]]
+    def _graphtree_selection_changed(self, treeview):
+        self.currow = self.graphview.get_revision()
+        rev = [ str(self.currow[treemodel.REVID]) ]
         if rev != self._last_rev:
             self._last_rev = rev
-            parents = self.model[selection.get_selected()[1]][8]
+            parents = self.currow[treemodel.PARENTS]
             self.load_details(rev, len(parents))
-
         return False
 
+    def _tree_selection_changed(self, selection):
+        ''' Update the details text'''
+        if selection.count_selected_rows() == 0:
+            return False
+        self.currow = self.model[selection.get_selected()[1]]
+        rev = [ str(self.currow[treemodel.REVID]) ]
+        if rev != self._last_rev:
+            self._last_rev = rev
+            parents = self.currow[treemodel.PARENTS]
+            self.load_details(rev, len(parents))
+        return False
 
     def _refresh_clicked(self, toolbutton, data=None):
         self.reload_log()
+        return True
+
+    def _next_clicked(self, toolbutton, data=None):
+        if self.grapher:
+            limit = self.graphview.get_property('limit')
+            self.graphview.set_property('limit', limit + self.limit)
         return True
 
 
@@ -710,8 +750,7 @@ class GLog(GDialog):
 
 
     def _tree_popup_menu(self, treeview, button=0, time=0) :
-        row = self.model[self.tree.get_selection().get_selected()[1]]
-        selrev = long(row[2])
+        selrev = self.currow[treemodel.REVID]
         
         # disable/enable menus as required
         parents = [self.repo.changelog.rev(x.node()) for x in
