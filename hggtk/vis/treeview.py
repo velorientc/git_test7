@@ -11,7 +11,8 @@ import gtk
 import gobject
 import pango
 import treemodel
-import graphcell
+from graphcell import CellRendererGraph
+from revgraph import revision_grapher
 
 class TreeView(gtk.ScrolledWindow):
 
@@ -20,6 +21,11 @@ class TreeView(gtk.ScrolledWindow):
                    'Repository',
                    'The Mercurial repository being visualized',
                    gobject.PARAM_CONSTRUCT_ONLY | gobject.PARAM_WRITABLE),
+
+        'limit': (gobject.TYPE_PYOBJECT,
+                   'Revision Display Limit',
+                   'The maximum number of revisions to display',
+                   gobject.PARAM_READWRITE),
 
         'revision': (gobject.TYPE_PYOBJECT,
                      'Revision',
@@ -58,13 +64,10 @@ class TreeView(gtk.ScrolledWindow):
                               ())
     }
 
-    def __init__(self, repo):
+    def __init__(self, repo, limit = None):
         """Create a new TreeView.
 
-        :param repo:  Repository object to show.
-        :param start: Revision id of top revision.
-        :param maxnum: Maximum number of revisions to display, 
-                       None for no limit.
+        :param repo:  Repository object to show
         """
         gtk.ScrolledWindow.__init__(self)
 
@@ -73,26 +76,60 @@ class TreeView(gtk.ScrolledWindow):
 
         self.construct_treeview()
 
+        self.limit = limit
         self.iter = None
         self.repo = repo
-        self.model = self.create_model()
-        self.treeview.set_model(self.model)
+        self.create_grapher()
         gobject.idle_add(self.populate)
 
+    def create_grapher(self):
+        self.grapher = revision_grapher(self.repo,
+                self.repo.changelog.count(), 0)
+        self.graphdata = []
+        self.create_model()
+
     def create_model(self):
-        opts = { 'rev' : [] }
-        limit = self.repo.ui.config('tortoisehg', 'graphlimit', None)
-        (start_rev, stop_rev) = (self.repo.changelog.count() - 1, 0)
-        if limit:
-            stop_rev = max(stop_rev, start_rev - limit + 1)
-        grapher = treemodel.revision_grapher(self.repo, start_rev, stop_rev)
-        return treemodel.TreeModel(self.repo, grapher)
+        self.max_cols = 1
+        self.index = {}
+        while not self.limit or len(self.graphdata) < self.limit:
+            try:
+                (rev, node, index, edges, ncols,
+                        parents, children) = self.grapher.next()
+            except StopIteration:
+                return
+            # TODO: add color later on
+            lines = [(s, e, 0) for (s, e) in edges]
+            self.max_cols = max(self.max_cols, ncols)
+            self.index[rev] = len(self.graphdata)
+            self.graphdata.append( (rev, (index, 0), lines,
+                parents, children) )
+        self.model = treemodel.TreeModel(self.repo, self.graphdata)
+        self.treeview.set_model(self.model)
+
+    def populate(self, revision=None):
+        """Fill the treeview with contents.
+        """
+        self.graph_cell.columns_len = self.max_cols
+        width = self.graph_cell.get_size(self.treeview)[2]
+        if width > 500:
+            width = 500
+        self.graph_column.set_fixed_width(width)
+        self.graph_column.set_max_width(width)
+
+        if revision is None:
+            self.treeview.set_cursor(0)
+        else:
+            self.set_revision(revision)
+        self.emit('revisions-loaded')
+        return False
 
     def do_get_property(self, property):
         if property.name == 'date-column-visible':
             return self.date_column.get_visible()
         elif property.name == 'repo':
             return self.repo
+        elif property.name == 'limit':
+            return self.limit
         elif property.name == 'revision':
             return self.model.get_value(self.iter, treemodel.REVISION)
         elif property.name == 'children':
@@ -107,6 +144,9 @@ class TreeView(gtk.ScrolledWindow):
             self.date_column.set_visible(value)
         elif property.name == 'repo':
             self.repo = value
+        elif property.name == 'limit':
+            self.limit = value
+            self.create_model()
         elif property.name == 'revision':
             self.set_revision_id(value.revision_id)
         else:
@@ -142,8 +182,7 @@ class TreeView(gtk.ScrolledWindow):
         return self.get_property('parents')
         
     def refresh(self):
-        self.model = self.create_model()
-        self.treeview.set_model(self.model)
+        self.create_grapher()
         gobject.idle_add(self.populate, self.get_revision())
 
     def update(self):
@@ -179,26 +218,6 @@ class TreeView(gtk.ScrolledWindow):
         else:
             self.set_revision_id(children[0])
 
-    def populate(self, revision=None):
-        """Fill the treeview with contents.
-        """
-        self.graph_cell.columns_len = 4 # TODO not known up-front
-        width = self.graph_cell.get_size(self.treeview)[2]
-        if width > 500:
-            width = 500
-        self.graph_column.set_fixed_width(width)
-        self.graph_column.set_max_width(width)
-        self.index = [] # TODO
-
-        if revision is None:
-            self.treeview.set_cursor(0)
-        else:
-            self.set_revision(revision)
-
-        # TODO: this looks broken
-        self.emit('revisions-loaded')
-        return False
-
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
 
@@ -218,7 +237,7 @@ class TreeView(gtk.ScrolledWindow):
         self.add(self.treeview)
         self.treeview.show()
 
-        self.graph_cell = graphcell.CellRendererGraph()
+        self.graph_cell = CellRendererGraph()
         self.graph_column = gtk.TreeViewColumn()
         self.graph_column.set_resizable(True)
         self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)

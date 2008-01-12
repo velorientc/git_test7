@@ -33,7 +33,7 @@ class GLog(GDialog):
 
     # "Constants"
     block_count = 150
-
+    grapher = True
 
     def get_title(self):
         return os.path.basename(self.repo.root) + ' log ' + ':'.join(self.opts['rev']) + ' ' + ' '.join(self.pats)
@@ -48,11 +48,14 @@ class GLog(GDialog):
 
     def get_tbbuttons(self):
         return [
-                self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh', self._refresh_clicked),
+                self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
+                    self._refresh_clicked),
                 gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_INDEX, '_filter', self._refresh_clicked,
-                        menu=self._filter_menu()),
-                gtk.SeparatorToolItem()
+                self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
+                    self._refresh_clicked, menu=self._filter_menu()),
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_GO_DOWN, '_next',
+                    self._next_clicked)
              ]
 
     def _filter_all(self, widget, data=None):
@@ -411,9 +414,20 @@ class GLog(GDialog):
         
     def get_body(self):
         self._menu = self.tree_context_menu()
-        self.grapher = True
+
         if self.grapher:
-            scroller = TreeView(self.repo)
+            limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '100')
+            if limit_opt:
+                try:
+                    limit = int(limit_opt)
+                except ValueError:
+                    limit = 0
+                if limit <= 0:
+                    limit = None
+            else:
+                limit = None
+            scroller = TreeView(self.repo, limit)
+            self.graphview = scroller
             self.tree = scroller.treeview
             self.model = scroller.model
         else:
@@ -713,6 +727,12 @@ class GLog(GDialog):
 
     def _refresh_clicked(self, toolbutton, data=None):
         self.reload_log()
+        return True
+
+    def _next_clicked(self, toolbutton, data=None):
+        if self.grapher:
+            limit = self.graphview.get_property('limit')
+            self.graphview.set_property('limit', limit + 100)
         return True
 
 

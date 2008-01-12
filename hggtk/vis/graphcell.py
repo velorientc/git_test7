@@ -1,17 +1,25 @@
-''' Mercurial revision DAG visualization library
+# -*- coding: UTF-8 -*-
+"""Cell renderer for directed graph.
 
-  Implements a gtk.TreeModel which visualizes a Mercurial repository
-  revision history.
+This module contains the implementation of a custom GtkCellRenderer that
+draws part of the directed graph based on the lines suggested by the code
+in graph.py.
 
-Portions of this code stolen mercilessly from bzr-gtk visualization
-dialog.  Other portions stolen from graphlog extension.
-'''
+Because we're shiny, we use Cairo to do this, and because we're naughty
+we cheat and draw over the bits of the TreeViewColumn that are supposed to
+just be for the background.
+"""
 
-import cairo
+__copyright__ = "Copyright © 2005 Canonical Ltd."
+__author__    = "Scott James Remnant <scott@ubuntu.com>"
+
+import math
+
 import gtk
 import gobject
-import math
 import pango
+import cairo
+
 
 class CellRendererGraph(gtk.GenericCellRenderer):
     """Cell renderer for directed graph.

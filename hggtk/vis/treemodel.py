@@ -11,7 +11,6 @@ import gtk
 import gobject
 import re
 from time import (strftime, localtime)
-from mercurial.node import nullrev
 
 # treemodel row enumerated attributes
 REVID = 0
@@ -25,64 +24,13 @@ REVISION = 7
 PARENTS = 8
 CHILDREN = 9
 
-def revision_grapher(repo, start_rev, stop_rev):
-    """incremental revision grapher
-
-    This generator function walks through the revision history from
-    revision start_rev to revision stop_rev (which must be less than
-    or equal to start_rev) and for each revision emits tuples with the
-    following elements:
-
-      - Current revision.
-      - Current node.
-      - Column of the current node in the set of ongoing edges.
-      - Edges; a list of (col, next_col) indicating the edges between
-        the current node and its parents.
-      - Number of columns (ongoing edges) in the current revision.
-      - current revision parents
-      - current revision children
-    """
-
-    assert start_rev >= stop_rev
-    curr_rev = start_rev
-    revs = []
-    while curr_rev >= stop_rev:
-        node = repo.changelog.node(curr_rev)
-
-        # Compute revs and next_revs.
-        if curr_rev not in revs:
-            # New head.
-            revs.append(curr_rev)
-        rev_index = revs.index(curr_rev)
-        next_revs = revs[:]
-
-        # Add parents to next_revs.
-        parents = [x for x in repo.changelog.parentrevs(curr_rev) if x != nullrev]
-        parents_to_add = []
-        for parent in parents:
-            if parent not in next_revs:
-                parents_to_add.append(parent)
-        parents_to_add.sort()
-        next_revs[rev_index:rev_index + 1] = parents_to_add
-
-        edges = []
-        for parent in parents:
-            edges.append((rev_index, next_revs.index(parent)))
-
-        children = repo.changelog.children(node)
-        yield (curr_rev, node, rev_index, edges, len(revs), parents, children)
-
-        revs = next_revs
-        curr_rev -= 1
-
 class TreeModel(gtk.GenericTreeModel):
 
-    def __init__ (self, repo, graph_generator):
+    def __init__ (self, repo, graphdata):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
         self.repo = repo
-        self.grapher = graph_generator
-        self.line_graph_data = []
+        self.line_graph_data = graphdata
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
@@ -137,17 +85,6 @@ class TreeModel(gtk.GenericTreeModel):
             return strftime("%Y-%m-%d %H:%M", localtime(revision[1][0]))
 
     def on_iter_next(self, rowref):
-        # Dynamically generate graph rows on demand
-        while rowref >= len(self.line_graph_data)-1:
-            try:
-                (rev, node, node_index, edges,
-                    n_columns, parents, children) = self.grapher.next()
-            except StopIteration:
-                break
-            # TODO: add color later on
-            lines = [(s, e, 0) for (s, e) in edges]
-            self.line_graph_data.append( (rev, (node_index, 0),
-                lines, parents, children) )
         if rowref < len(self.line_graph_data) - 1:
             return rowref+1
         return None
