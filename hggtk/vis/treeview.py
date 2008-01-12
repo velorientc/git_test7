@@ -91,9 +91,9 @@ class TreeView(gtk.ScrolledWindow):
                 (rev, node, index, edges, ncols,
                         n_columns_diff, parents) = self.grapher.next()
             except StopIteration:
-                return
-            if n_columns_diff == -1:
-                fix_long_right_edges(edges)
+                break
+            #if n_columns_diff == -1:
+            #    fix_long_right_edges(edges)
             lines = []
             for n in xrange(index):
                 lines.append( (n, n, 0) )
