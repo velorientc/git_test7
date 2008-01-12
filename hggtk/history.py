@@ -557,7 +557,7 @@ class GLog(GDialog):
 
 
     def _text_color(self, column, text_renderer, list, row_iter):
-        parents = list[row_iter][8]
+        parents = list[row_iter][treemodel.PARENTS]
         if len(parents) == 2:
             text_renderer.set_property('foreground', '#006400')
         elif len(parents) == 1:
@@ -596,7 +596,8 @@ class GLog(GDialog):
             parents = [rev-1]
 
         for parent in parents:
-            statopts = self.merge_opts(cmdtable['gstatus|gst'][1], ('include', 'exclude', 'git'))
+            statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
+                    ('include', 'exclude', 'git'))
             statopts['rev'] = ['%u:%u' % (parent, rev)]
             statopts['modified'] = True
             statopts['added'] = True
