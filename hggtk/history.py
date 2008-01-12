@@ -435,6 +435,7 @@ class GLog(GDialog):
             self.model = scroller.model
             self.graphview.connect('revision-selected',
                     self._graphtree_selection_changed)
+            self.graphview.set_property('date-column-visible', True)
         else:
             self.model = gtk.ListStore(str, str, long, str, str, str, str, 
                     long, object)

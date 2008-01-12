@@ -38,11 +38,6 @@ class TreeView(gtk.ScrolledWindow):
                             '',
                             gobject.PARAM_READABLE),
 
-        'parents': (gobject.TYPE_PYOBJECT,
-                    'Parent revisions',
-                    'Parents to the currently selected revision',
-                    gobject.PARAM_READABLE),
-
         'date-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Date',
                                  'Show date column',
@@ -72,7 +67,6 @@ class TreeView(gtk.ScrolledWindow):
         self.construct_treeview()
 
         self.limit = limit
-        self.iter = None
         self.repo = repo
         self.create_grapher()
         gobject.idle_add(self.populate)
@@ -81,6 +75,8 @@ class TreeView(gtk.ScrolledWindow):
         self.grapher = revision_grapher(self.repo,
                 self.repo.changelog.count() - 1, 0)
         self.graphdata = []
+        self.index = {}
+        self.max_cols = 1
         self.create_model()
 
     def create_model(self):
@@ -89,8 +85,6 @@ class TreeView(gtk.ScrolledWindow):
                 if end > start:
                     edges[i] = (start, end + 1)
 
-        self.max_cols = 1
-        self.index = {}
         # TODO: add color later on.  Color parents, at least
         while not self.limit or len(self.graphdata) < self.limit:
             try:
@@ -134,7 +128,7 @@ class TreeView(gtk.ScrolledWindow):
         if revision is None:
             self.treeview.set_cursor(0)
         else:
-            self.set_revision(revision)
+            self.set_revision_id(revision[treemodel.REVID])
         self.emit('revisions-loaded')
         return False
 
@@ -146,9 +140,7 @@ class TreeView(gtk.ScrolledWindow):
         elif property.name == 'limit':
             return self.limit
         elif property.name == 'revision':
-            return self.model.get_value(self.iter, treemodel.REVISION)
-        elif property.name == 'parents':
-            return self.model.get_value(self.iter, treemodel.PARENTS)
+            return self.currev
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -160,17 +152,15 @@ class TreeView(gtk.ScrolledWindow):
         elif property.name == 'limit':
             self.limit = value
             self.create_model()
+            gobject.idle_add(self.populate, self.get_revision())
         elif property.name == 'revision':
-            self.set_revision_id(value.revision_id)
+            self.set_revision_id(value)
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
     def get_revision(self):
         """Return revision id of currently selected revision, or None."""
         return self.get_property('revision')
-
-    def set_revision(self, revision):
-        self.set_property('revision', revision)
 
     def set_revision_id(self, revid):
         """Change the currently selected revision.
@@ -249,7 +239,7 @@ class TreeView(gtk.ScrolledWindow):
         cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.date_column = gtk.TreeViewColumn("Date")
-        self.date_column.set_visible(True)
+        self.date_column.set_visible(False)
         self.date_column.set_resizable(True)
         self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.date_column.set_fixed_width(cell.get_size(self.treeview)[2])
@@ -261,6 +251,7 @@ class TreeView(gtk.ScrolledWindow):
         """callback for when the treeview changes."""
         (path, focus) = treeview.get_cursor()
         if path is not None:
-            self.iter = self.model.get_iter(path)
+            iter = self.model.get_iter(path)
+            self.currev = self.model.get_value(iter, treemodel.REVISION)
             self.emit('revision-selected')
 
