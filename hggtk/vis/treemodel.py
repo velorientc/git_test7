@@ -75,14 +75,19 @@ class TreeModel(gtk.GenericTreeModel):
         else:
             revision = self.revisions[revid]
 
-        if column == REVISION: return revision
-        if column == MESSAGE: return revision[MESSAGE].split('\n')[0]
+        if column == REVISION:
+            return revision
+        if column == MESSAGE:
+            summary = revision[MESSAGE].split('\n')[0]
+            return gobject.markup_escape_text(summary)
         if column == COMMITER: 
             author = revision[COMMITER]
             if '<' in author:
-                return re.sub('<.*@.*>', '', author).strip(' ')
+                author = re.sub('<.*@.*>', '', author).strip(' ')
             else:
-                return util.shortuser(author)
+                author = util.shortuser(author)
+            #return object.markup_escape_text(author)
+            return author
         if column == TIMESTAMP:
             return strftime("%Y-%m-%d %H:%M",
                     localtime(revision[TIMESTAMP][0]))
