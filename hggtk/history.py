@@ -483,7 +483,8 @@ class GLog(GDialog):
         self.tree.set_reorderable(False)
         self.tree.set_enable_search(True)
         self.tree.set_search_equal_func(self._search_in_tree,None)
-        self.tree.set_rubber_banding(False)
+        # Not compatible with <PyGtk 2.10, and is redundant with next line
+        # self.tree.set_rubber_banding(False)
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
         self.tree.get_selection().connect('changed',
                 self._tree_selection_changed)
