@@ -89,13 +89,13 @@ class TreeView(gtk.ScrolledWindow):
         savedlen = len(self.graphdata)
         while not self.limit or len(self.graphdata) < self.limit:
             try:
-                (rev, lines, index, parents) = self.grapher.next()
+                (rev, node, lines, parents) = self.grapher.next()
             except StopIteration:
                 self.nextbutton.hide()
                 break
             self.max_cols = max(self.max_cols, len(lines))
             self.index[rev] = len(self.graphdata)
-            self.graphdata.append( (rev, (index, 0), lines, parents) )
+            self.graphdata.append( (rev, node, lines, parents) )
         if self.model:
             for x in xrange(savedlen, len(self.graphdata)):
                 rowref = self.model.get_iter(x)

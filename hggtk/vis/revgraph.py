@@ -29,6 +29,8 @@ def revision_grapher(repo, start_rev, stop_rev):
     curr_rev = start_rev
     changelog = repo.changelog
     revs = []
+    rev_color = {}
+    nextcolor = 0
     while curr_rev >= stop_rev:
         node = changelog.node(curr_rev)
 
@@ -36,6 +38,8 @@ def revision_grapher(repo, start_rev, stop_rev):
         if curr_rev not in revs:
             # New head.
             revs.append(curr_rev)
+            rev_color[curr_rev] = nextcolor ; nextcolor += 1
+        curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
 
@@ -45,18 +49,24 @@ def revision_grapher(repo, start_rev, stop_rev):
         for parent in parents:
             if parent not in next_revs:
                 parents_to_add.append(parent)
+                if len(parents) > 1:
+                    rev_color[parent] = nextcolor ; nextcolor += 1
+                else:
+                    rev_color[parent] = curcolor
         parents_to_add.sort()
         next_revs[rev_index:rev_index + 1] = parents_to_add
 
         lines = []
         for i, rev in enumerate(revs):
             if rev in next_revs:
-                lines.append( (i, next_revs.index(rev), 0) )
+                color = rev_color[rev]
+                lines.append( (i, next_revs.index(rev), color) )
             elif rev == curr_rev:
                 for parent in parents:
-                    lines.append( (i, next_revs.index(parent), 0) )
+                    color = rev_color[parent]
+                    lines.append( (i, next_revs.index(parent), color) )
 
-        yield (curr_rev, lines, rev_index, parents)
+        yield (curr_rev, (rev_index, curcolor), lines, parents)
 
         revs = next_revs
         curr_rev -= 1
