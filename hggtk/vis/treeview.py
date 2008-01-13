@@ -64,11 +64,12 @@ class TreeView(gtk.ScrolledWindow):
         self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_IN)
 
-        self.construct_treeview()
-
+        self.batchsize = limit
         self.limit = limit
         self.repo = repo
         self.currev = None
+
+        self.construct_treeview()
         self.create_grapher()
         gobject.idle_add(self.populate)
 
@@ -86,6 +87,7 @@ class TreeView(gtk.ScrolledWindow):
             try:
                 (rev, lines, index, parents) = self.grapher.next()
             except StopIteration:
+                self.nextbutton.hide()
                 break
             self.max_cols = max(self.max_cols, len(lines))
             self.index[rev] = len(self.graphdata)
@@ -136,6 +138,11 @@ class TreeView(gtk.ScrolledWindow):
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
+    def _next_clicked(self, button):
+        self.limit += self.batchsize
+        self.create_model()
+        gobject.idle_add(self.populate, self.get_revision())
+
     def get_revision(self):
         """Return revision id of currently selected revision, or None."""
         return self.get_property('revision')
@@ -170,13 +177,21 @@ class TreeView(gtk.ScrolledWindow):
         if set_tooltip is not None:
             set_tooltip(treemodel.MESSAGE)
 
-        self.treeview.connect("cursor-changed",
-                self._on_selection_changed)
-
+        self.treeview.connect("cursor-changed", self._on_selection_changed)
         self.treeview.set_property('fixed-height-mode', True)
-
-        self.add(self.treeview)
         self.treeview.show()
+
+        if self.batchsize:
+            vbox = gtk.VBox()
+            vbox.pack_start(self.treeview, expand = True)
+            self.nextbutton = gtk.Button("next %d revisions" % self.batchsize)
+            self.nextbutton.connect('clicked', self._next_clicked)
+            hbox = gtk.HBox()
+            hbox.pack_start(self.nextbutton, expand = False)
+            vbox.pack_start(hbox, expand = False)
+            self.add_with_viewport(vbox)
+        else:
+            self.add(self.treeview)
 
         self.graph_cell = CellRendererGraph()
         self.graph_column = gtk.TreeViewColumn()

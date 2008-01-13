@@ -55,8 +55,6 @@ class GLog(GDialog):
                 self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
                     self._refresh_clicked, menu=self._filter_menu()),
                 gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_GO_DOWN, '_next',
-                    self._next_clicked)
              ]
 
     def _filter_graph(self, widget, data=None):
@@ -779,13 +777,6 @@ class GLog(GDialog):
     def _refresh_clicked(self, toolbutton, data=None):
         self.reload_log()
         return True
-
-    def _next_clicked(self, toolbutton, data=None):
-        if self.grapher:
-            limit = self.graphview.get_property('limit')
-            self.graphview.set_property('limit', limit + self.limit)
-        return True
-
 
     def _tree_button_release(self, widget, event) :
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK)):
