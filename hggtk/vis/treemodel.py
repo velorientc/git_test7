@@ -70,16 +70,8 @@ class TreeModel(gtk.GenericTreeModel):
 
         if revid not in self.revisions:
             ctx = self.repo.changectx(revid)
-            revision = (None, node, revid, None, ctx.description(),
-                    ctx.user(), ctx.date(), None, parents)
-            self.revisions[revid] = revision
-        else:
-            revision = self.revisions[revid]
 
-        if column == REVISION:
-            return revision
-        if column == MESSAGE:
-            summary = revision[MESSAGE].replace('\0', '')
+            summary = ctx.description().replace('\0', '')
             summary = summary.split('\n')[0]
             summary = gobject.markup_escape_text(summary)
             node = self.repo.lookup(revid)
@@ -90,18 +82,29 @@ class TreeModel(gtk.GenericTreeModel):
                     t + '</small></span> '
             if revid in self.parents:
                 summary = '<i><b>' + summary + '</b></i>'
-            return tagstring + summary
-        if column == COMMITER: 
-            author = revision[COMMITER]
-            if '<' in author:
-                author = re.sub('<.*@.*>', '', author).strip(' ')
+            summary = tagstring + summary
+
+            if '<' in ctx.user():
+                author = re.sub('<.*@.*>', '', ctx.user()).strip(' ')
             else:
-                author = util.shortuser(author)
-            #return object.markup_escape_text(author)
-            return author
+                author = util.shortuser(ctx.user())
+
+            date = strftime("%Y-%m-%d %H:%M", localtime(ctx.date()[0]))
+
+            revision = (None, node, revid, None, summary,
+                    author, date, None, parents)
+            self.revisions[revid] = revision
+        else:
+            revision = self.revisions[revid]
+
+        if column == REVISION:
+            return revision
+        if column == MESSAGE:
+            return revision[MESSAGE]
+        if column == COMMITER: 
+            return revision[COMMITER]
         if column == TIMESTAMP:
-            return strftime("%Y-%m-%d %H:%M",
-                    localtime(revision[TIMESTAMP][0]))
+            return revision[TIMESTAMP]
 
     def on_iter_next(self, rowref):
         if rowref < len(self.line_graph_data) - 1:
