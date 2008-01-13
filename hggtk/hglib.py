@@ -185,23 +185,24 @@ class HgThread(threading.Thread):
             ui.ui = GtkUi
         HgThread.instances += 1
         try:
-            ret = dispatch._dispatch(self.ui, self.args)
-            if ret:
-                self.ui.write('[command returned code %d]\n' % int(ret))
-            else:
-                self.ui.write('[command completed successfully]\n')
-            self.ret = ret or 0
-            if self.postfunc:
-                self.postfunc(ret)
-        except hg.RepoError, e:
-            self.ui.write_err(e)
-        except util.Abort, e:
-            self.ui.write_err(e)
-            if self.ui.traceback:
+            try:
+                ret = dispatch._dispatch(self.ui, self.args)
+                if ret:
+                    self.ui.write('[command returned code %d]\n' % int(ret))
+                else:
+                    self.ui.write('[command completed successfully]\n')
+                self.ret = ret or 0
+                if self.postfunc:
+                    self.postfunc(ret)
+            except hg.RepoError, e:
+                self.ui.write_err(e)
+            except util.Abort, e:
+                self.ui.write_err(e)
+                if self.ui.traceback:
+                    self.ui.print_exc()
+            except Exception, e:
+                self.ui.write_err(e)
                 self.ui.print_exc()
-        except Exception, e:
-            self.ui.write_err(e)
-            self.ui.print_exc()
         finally:
             HgThread.instances += -1
             if HgThread.instances == 0 and HgThread.savedui:
