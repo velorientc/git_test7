@@ -79,7 +79,8 @@ class TreeModel(gtk.GenericTreeModel):
         if column == REVISION:
             return revision
         if column == MESSAGE:
-            summary = revision[MESSAGE].split('\n')[0]
+            summary = revision[MESSAGE].replace('\0', '')
+            summary = summary.split('\n')[0]
             summary = gobject.markup_escape_text(summary)
             node = self.repo.lookup(revid)
             tags = self.repo.nodetags(node)
