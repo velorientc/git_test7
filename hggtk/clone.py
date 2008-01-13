@@ -52,6 +52,22 @@ class CloneDialog(gtk.Dialog):
         self.connect('response', gtk.main_quit)
         ewidth = 16
         
+        # add toolbar with tooltips
+        self.tbar = gtk.Toolbar()
+        self.tips = gtk.Tooltips()
+        
+        self._btn_clone = self._toolbutton(
+                gtk.STOCK_COPY,
+                'clone', 
+                self._btn_clone_clicked,
+                tip='Clone a repository')
+        tbuttons = [
+                self._btn_clone,
+            ]
+        for btn in tbuttons:
+            self.tbar.insert(btn, -1)
+        self.vbox.pack_start(self.tbar, False, False, 2)
+
         # clone source
         srcbox = gtk.HBox()
         lbl = gtk.Label("Source Path:")
@@ -114,11 +130,20 @@ class CloneDialog(gtk.Dialog):
         self._remote_cmd = gtk.Entry()
         self.vbox.pack_end(self._remote_cmd, False, False, 1)
         self.vbox.pack_end(lbl, False, False, 1)
-        
-        # add action buttn
-        self._btn_clone = gtk.Button("Clone")
-        self._btn_clone.connect('clicked', self._btn_clone_clicked)
-        self.action_area.pack_end(self._btn_clone)
+
+    def _toolbutton(self, stock, label, handler,
+                    menu=None, userdata=None, tip=None):
+        if menu:
+            tbutton = gtk.MenuToolButton(stock)
+            tbutton.set_menu(menu)
+        else:
+            tbutton = gtk.ToolButton(stock)
+            
+        tbutton.set_label(label)
+        if tip:
+            tbutton.set_tooltip(self.tips, tip)
+        tbutton.connect('clicked', handler, userdata)
+        return tbutton
 
     def _btn_dest_clicked(self, button):
         """ select folder as clone destination """
@@ -151,7 +176,7 @@ class CloneDialog(gtk.Dialog):
         if rev is not None:
             self._rev_input.set_text(rev)
             
-    def _btn_clone_clicked(self, button):
+    def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
         src = self._src_input.get_text()
         dest = self._dest_input.get_text()
