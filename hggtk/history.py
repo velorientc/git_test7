@@ -46,7 +46,6 @@ class GLog(GDialog):
         # Disable quiet to get full log info
         self.ui.quiet = False
 
-
     def get_tbbuttons(self):
         return [
                 self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
