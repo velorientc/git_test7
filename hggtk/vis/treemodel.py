@@ -11,6 +11,7 @@ import gtk
 import gobject
 import re
 from time import (strftime, localtime)
+from mercurial import util
 
 # treemodel row enumerated attributes
 LINES = 0
@@ -76,8 +77,12 @@ class TreeModel(gtk.GenericTreeModel):
 
         if column == REVISION: return revision
         if column == MESSAGE: return revision[MESSAGE].split('\n')[0]
-        if column == COMMITER: return re.sub('<.*@.*>', '',
-                                             revision[COMMITER]).strip(' ')
+        if column == COMMITER: 
+            author = revision[COMMITER]
+            if '<' in author:
+                return re.sub('<.*@.*>', '', author).strip(' ')
+            else:
+                return util.shortuser(author)
         if column == TIMESTAMP:
             return strftime("%Y-%m-%d %H:%M",
                     localtime(revision[TIMESTAMP][0]))
