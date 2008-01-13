@@ -30,6 +30,7 @@ class TreeModel(gtk.GenericTreeModel):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
         self.repo = repo
+        self.parents = [x.rev() for x in repo.workingctx().parents()]
         self.line_graph_data = graphdata
 
     def on_get_flags(self):
@@ -79,7 +80,11 @@ class TreeModel(gtk.GenericTreeModel):
             return revision
         if column == MESSAGE:
             summary = revision[MESSAGE].split('\n')[0]
-            return gobject.markup_escape_text(summary)
+            summary = gobject.markup_escape_text(summary)
+            if revid in self.parents:
+                return '<i><b>' + summary + '</b></i>'
+            else:
+                return summary
         if column == COMMITER: 
             author = revision[COMMITER]
             if '<' in author:
