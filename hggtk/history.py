@@ -370,6 +370,10 @@ class GLog(GDialog):
         # get linked revision
         linkrev = long(text.split(':')[0])
         
+        if self.grapher:
+            self.graphview.set_revision_id(long(linkrev))
+            return
+
         # find the row for the linked rev in the tree
         iter = self.model.get_iter_first()
         while iter:
