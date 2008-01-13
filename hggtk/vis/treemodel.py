@@ -23,6 +23,7 @@ COMMITER = 5
 TIMESTAMP = 6
 REVISION = 7
 PARENTS = 8
+WCPARENT = 9
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -37,7 +38,7 @@ class TreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
 
     def on_get_n_columns(self):
-        return 11
+        return 10
 
     def on_get_column_type(self, index):
         if index == REVID: return gobject.TYPE_STRING
@@ -49,6 +50,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == TIMESTAMP: return gobject.TYPE_STRING
         if index == REVISION: return gobject.TYPE_PYOBJECT
         if index == PARENTS: return gobject.TYPE_PYOBJECT
+        if index == WCPARENT: return gobject.TYPE_STRING
 
     def on_get_iter(self, path):
         return path[0]
@@ -91,8 +93,10 @@ class TreeModel(gtk.GenericTreeModel):
 
             date = strftime("%Y-%m-%d %H:%M", localtime(ctx.date()[0]))
 
+            wc_parent = revid in self.parents and gtk.STOCK_HOME or ''
+
             revision = (None, node, revid, None, summary,
-                    author, date, None, parents)
+                    author, date, None, parents, wc_parent)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
@@ -105,6 +109,8 @@ class TreeModel(gtk.GenericTreeModel):
             return revision[COMMITER]
         if column == TIMESTAMP:
             return revision[TIMESTAMP]
+        if column == WCPARENT:
+            return revision[WCPARENT]
 
     def on_iter_next(self, rowref):
         if rowref < len(self.line_graph_data) - 1:

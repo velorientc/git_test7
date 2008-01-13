@@ -215,6 +215,15 @@ class TreeView(gtk.ScrolledWindow):
                 "out-lines", treemodel.LINES)
         self.treeview.append_column(self.graph_column)
 
+        cell = gtk.CellRendererPixbuf()
+        self.status_column = gtk.TreeViewColumn('status')
+        self.status_column.pack_start(cell, expand=True)
+        self.status_column.set_resizable(True)
+        self.status_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.status_column.set_fixed_width(32)
+        self.status_column.set_cell_data_func(cell, self.make_parent)
+        self.treeview.append_column(self.status_column)
+        
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
@@ -248,6 +257,11 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.pack_start(cell, expand=True)
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(self.date_column)
+
+    def make_parent(self, tvcolumn, cell, model, iter):
+        stock = model.get_value(iter, treemodel.WCPARENT)
+        pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
+        cell.set_property('pixbuf', pb)
 
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
