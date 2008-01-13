@@ -464,6 +464,10 @@ class GLog(GDialog):
         self.graphview.connect('revision-selected',
                 self._graphtree_selection_changed)
         self.graphview.set_property('date-column-visible', True)
+
+        self.tree.connect('button-release-event', self._tree_button_release)
+        self.tree.connect('popup-menu', self._tree_popup_menu)
+        self.tree.connect('row-activated', self._tree_row_act)
         return self.graphview
 
     def get_treeview(self):
@@ -546,6 +550,10 @@ class GLog(GDialog):
         self.tree.set_headers_clickable(True)
         self.tree.show_all()
         
+        self.tree.connect('button-release-event', self._tree_button_release)
+        self.tree.connect('popup-menu', self._tree_popup_menu)
+        self.tree.connect('row-activated', self._tree_row_act)
+        
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(self.tree)
@@ -559,10 +567,6 @@ class GLog(GDialog):
         else:
             scroller = self.get_treeview()
 
-        self.tree.connect('button-release-event', self._tree_button_release)
-        self.tree.connect('popup-menu', self._tree_popup_menu)
-        self.tree.connect('row-activated', self._tree_row_act)
-        
         self.tree_frame = gtk.Frame()
         self.tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         self.tree_frame.add(scroller)
