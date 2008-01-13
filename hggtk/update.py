@@ -42,7 +42,6 @@ class UpdateDialog(gtk.Dialog):
         
     def _create(self):
         self.set_default_size(350, 120)
-        self.connect('response', gtk.main_quit)
 
         # add toolbar with tooltips
         self.tbar = gtk.Toolbar()
@@ -178,6 +177,7 @@ class UpdateDialog(gtk.Dialog):
 
 def run(cwd='', rev='', **opts):
     dialog = UpdateDialog(cwd, rev)
+    dialog.connect('response', gtk.main_quit)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

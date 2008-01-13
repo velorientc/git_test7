@@ -23,6 +23,7 @@ from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
 from hgcmd import CmdDialog
+from update import UpdateDialog
 
 
 class GLog(GDialog):
@@ -605,28 +606,10 @@ class GLog(GDialog):
     def _checkout(self, menuitem):
         row = self.model[self.tree.get_selection().get_selected()[1]]
         rev = long(row[2])
-        self.repo.invalidate()
-        wc = self.repo.workingctx()
-        pl = wc.parents()
-        p1, p2 = pl[0], self.repo.changectx(rev)
-        pa = p1.ancestor(p2)
-        warning = ''
-        flags = []
-        if len(pl) > 1:
-            warning = "Outstanding uncommitted merges"
-        elif pa != p1 and pa != p2:
-            warning = "Checkout spans branches"
-        elif wc.files():
-            warning = "Outstanding uncommitted changes"
-        if warning:
-            flags = ['--clean']
-            msg = 'lose changes'
-            warning += ', requires clean checkout'
-            if Confirm(msg, [], self, warning).run() != gtk.RESPONSE_YES:
-                return
-        cmdline = ['hg', 'update', '-R', self.repo.root] + flags + [str(rev)]
-        dialog = CmdDialog(cmdline)
+        
+        dialog = UpdateDialog(self.cwd, rev)
         dialog.set_transient_for(self)
+        dialog.show_all()
         dialog.run()
         dialog.hide()
         shell_notify([self.repo.root])
