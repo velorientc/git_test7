@@ -18,7 +18,7 @@ import histselect
 
 class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
-    def __init__(self, root='', cwd=''):
+    def __init__(self, root='', cwd='', rev=''):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(MergeDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -29,10 +29,10 @@ class MergeDialog(gtk.Dialog):
         title = "hg merge"
         if root: title += " - %s" % root
         self.set_title(title)
-        self.connect('response', gtk.main_quit)
 
         self.root = root
         self.cwd = cwd or root
+        self.rev = rev
         self.repo = None
         self._create()
 
@@ -157,6 +157,9 @@ class MergeDialog(gtk.Dialog):
             
             self._revlist.append([short(node), "(%s)" %status])
             self._rev_input.set_text(short(node))
+
+        if self.rev:
+            self._rev_input.set_text(str(self.rev))
         
     def _merge_menu(self):
         menu = gtk.Menu()
@@ -221,8 +224,9 @@ class MergeDialog(gtk.Dialog):
         shell_notify([self.cwd])
         self._refresh()
 
-def run(root='', cwd='', **opts):
-    dialog = MergeDialog(root, cwd)
+def run(root='', cwd='', rev='', **opts):
+    dialog = MergeDialog(root, cwd, rev)
+    dialog.connect('response', gtk.main_quit)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
