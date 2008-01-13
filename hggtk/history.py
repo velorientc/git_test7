@@ -606,6 +606,7 @@ class GLog(GDialog):
     def _checkout(self, menuitem):
         row = self.model[self.tree.get_selection().get_selected()[1]]
         rev = long(row[2])
+        parents0 = [x.node() for x in self.repo.workingctx().parents()]
         
         dialog = UpdateDialog(self.cwd, rev)
         dialog.set_transient_for(self)
@@ -617,9 +618,14 @@ class GLog(GDialog):
         dialog.set_transient_for(None)        
         dialog.hide()
         
-        shell_notify([self.repo.root])
-        self.repo.dirstate.invalidate()
-        self.reload_log()
+        # FIXME: re-open repo to retrieve the new parent data
+        root = self.repo.root
+        del self.repo
+        self.repo = hg.repository(ui.ui(), path=root)
+
+        parents1 = [x.node() for x in self.repo.workingctx().parents()]
+        if not parents0 == parents1:
+            self.reload_log()
 
     def _merge(self, menuitem):
         row = self.model[self.tree.get_selection().get_selected()[1]]
