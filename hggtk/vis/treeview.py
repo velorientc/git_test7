@@ -216,7 +216,7 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.graph_column)
 
         cell = gtk.CellRendererPixbuf()
-        self.status_column = gtk.TreeViewColumn('status')
+        self.status_column = gtk.TreeViewColumn('Status')
         self.status_column.pack_start(cell, expand=True)
         self.status_column.set_resizable(True)
         self.status_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
@@ -224,6 +224,17 @@ class TreeView(gtk.ScrolledWindow):
         self.status_column.set_cell_data_func(cell, self.make_parent)
         self.treeview.append_column(self.status_column)
         
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 7)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        self.rev_column = gtk.TreeViewColumn("RevID")
+        self.rev_column.set_resizable(True)
+        self.rev_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.rev_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.rev_column.pack_start(cell, expand=True)
+        self.rev_column.add_attribute(cell, "text", treemodel.REVID)
+        self.treeview.append_column(self.rev_column)
+
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
