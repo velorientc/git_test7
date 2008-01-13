@@ -187,13 +187,13 @@ class GLog(GDialog):
     def reload_log(self):
         """Clear out the existing ListStore model and reload it from the repository. 
         """
-        # If the last refresh is still being processed, then do nothing
-        if self.refreshing:
-            return False
-
         if self.grapher:
             self.graphview.refresh()
             return True
+
+        # If the last refresh is still being processed, then do nothing
+        if self.refreshing:
+            return False
 
         # Retrieve repo revision info
         self.repo.invalidate()
@@ -828,6 +828,9 @@ def run(root='', cwd='', files=[], hgpath='hg', **opts):
 
     dialog = GLog(u, repo, cwd, files, cmdoptions, True)
     dialog.hgpath = hgpath
+
+    if len(files):
+        dialog.grapher = False
     
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
@@ -839,4 +842,5 @@ if __name__ == "__main__":
     import sys
     opts = {}
     opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    #opts['files'] = sys.argv[1:]
     run(**opts)
