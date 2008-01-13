@@ -48,7 +48,7 @@ class UpdateDialog(gtk.Dialog):
         self.tips = gtk.Tooltips()
         
         self._btn_update = self._toolbutton(
-                gtk.STOCK_GO_DOWN,
+                gtk.STOCK_REVERT_TO_SAVED,
                 'update', 
                 self._btn_update_clicked,
                 tip='Update working directory to selected revision')
