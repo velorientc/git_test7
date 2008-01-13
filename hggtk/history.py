@@ -23,7 +23,7 @@ from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
 from hgcmd import CmdDialog
-
+from merge import MergeDialog
 
 class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -636,40 +636,23 @@ class GLog(GDialog):
     def _merge(self, menuitem):
         row = self.model[self.tree.get_selection().get_selected()[1]]
         rev = long(row[2])
-        self.repo.invalidate()
-        wc = self.repo.workingctx()
-        pl = wc.parents()
-        if len(pl) > 1:
-            Prompt("Unable to merge",
-                    "Outstanding uncommitted merge", self).run()
-            return
-        elif wc.files():
-            Prompt("Unable to merge",
-                    "Outstanding uncommitted changes", self).run()
-            return
-        elif pl[0] == self.repo.changectx(rev):
-            Prompt("Unable to merge",
-                    "Cannot merge a revision with itself", self).run()
-            return
-
-        desc = []
-        log = self.repo.changelog
-        for crev in (pl[0].rev(), rev):
-            changenode = log.node(crev)
-            change = log.read(changenode)
-            description = change[4].strip()
-            summary = description.splitlines()[0]
-            desc.append('%d : %s' % (crev, summary))
-        msg = desc[0] + '\n  and\n' + desc[1]
-        if Confirm('Merge', [], self, msg).run() != gtk.RESPONSE_YES:
-            return
-
-        cmdline = ['hg', 'merge', '-R', self.repo.root, str(rev)]
-        dialog = CmdDialog(cmdline)
+        parents0 = [x.node() for x in self.repo.workingctx().parents()]
+        node = short(self.repo.changelog.node(rev))
+        dialog = MergeDialog(self.repo.root, self.cwd, node)
         dialog.set_transient_for(self)
+        dialog.show_all()
         dialog.run()
         dialog.hide()
-        if dialog.returncode == 0:
+        del dialog
+        
+        # FIXME: re-open repo to retrieve the new parent data
+        root = self.repo.root
+        del self.repo
+        self.repo = hg.repository(ui.ui(), path=root)
+        
+        # if parents data has changed...
+        parents1 = [x.node() for x in self.repo.workingctx().parents()]
+        if not parents0 == parents1:
             msg = 'Launch commit tool for merge results?'
             if Confirm('Commit', [], self, msg).run() == gtk.RESPONSE_YES:
                 # Spawn commit tool if merge was successful
@@ -680,10 +663,7 @@ class GLog(GDialog):
                 else:
                     args = [self.hgpath, '--repository', self.repo.root, ct]
                     subprocess.Popen(args, shell=False)
-
-        shell_notify([self.repo.root])
-        self.repo.dirstate.invalidate()
-        self.reload_log()
+            self.reload_log()
 
     def _tree_selection_changed(self, selection):
         ''' Update the details text '''
