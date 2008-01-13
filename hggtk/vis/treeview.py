@@ -79,10 +79,14 @@ class TreeView(gtk.ScrolledWindow):
         self.graphdata = []
         self.index = {}
         self.max_cols = 1
-        self.create_model()
+        self.model = None
+        self.fill_model()
+        self.model = treemodel.TreeModel(self.repo, self.graphdata)
+        self.treeview.set_model(self.model)
 
-    def create_model(self):
+    def fill_model(self):
         # TODO: add color later on.  Color parents, at least
+        savedlen = len(self.graphdata)
         while not self.limit or len(self.graphdata) < self.limit:
             try:
                 (rev, lines, index, parents) = self.grapher.next()
@@ -92,8 +96,11 @@ class TreeView(gtk.ScrolledWindow):
             self.max_cols = max(self.max_cols, len(lines))
             self.index[rev] = len(self.graphdata)
             self.graphdata.append( (rev, (index, 0), lines, parents) )
-        self.model = treemodel.TreeModel(self.repo, self.graphdata)
-        self.treeview.set_model(self.model)
+        if self.model:
+            for x in xrange(savedlen, len(self.graphdata)):
+                rowref = self.model.get_iter(x)
+                path = self.model.get_path(rowref) 
+                self.model.row_inserted(path, rowref) 
 
     def populate(self, revision=None):
         """Fill the treeview with contents.
@@ -109,6 +116,7 @@ class TreeView(gtk.ScrolledWindow):
             self.treeview.set_cursor(0)
         else:
             self.set_revision_id(revision[treemodel.REVID])
+        self.treeview.show_all()
         self.emit('revisions-loaded')
         return False
 
@@ -131,7 +139,7 @@ class TreeView(gtk.ScrolledWindow):
             self.repo = value
         elif property.name == 'limit':
             self.limit = value
-            self.create_model()
+            self.fill_model()
             gobject.idle_add(self.populate, self.get_revision())
         elif property.name == 'revision':
             self.set_revision_id(value)
@@ -140,7 +148,7 @@ class TreeView(gtk.ScrolledWindow):
 
     def _next_clicked(self, button):
         self.limit += self.batchsize
-        self.create_model()
+        self.fill_model()
         gobject.idle_add(self.populate, self.get_revision())
 
     def get_revision(self):
