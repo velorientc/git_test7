@@ -81,10 +81,15 @@ class TreeModel(gtk.GenericTreeModel):
         if column == MESSAGE:
             summary = revision[MESSAGE].split('\n')[0]
             summary = gobject.markup_escape_text(summary)
+            node = self.repo.lookup(revid)
+            tags = self.repo.nodetags(node)
+            tagstring = ''
+            for t in tags:
+                tagstring += '<span background="yellow"><small>' + \
+                    t + '</small></span> '
             if revid in self.parents:
-                return '<i><b>' + summary + '</b></i>'
-            else:
-                return summary
+                summary = '<i><b>' + summary + '</b></i>'
+            return tagstring + summary
         if column == COMMITER: 
             author = revision[COMMITER]
             if '<' in author:
