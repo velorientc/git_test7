@@ -18,7 +18,7 @@ from hglib import rootpath
 
 class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
-    def __init__(self, cwd=''):
+    def __init__(self, cwd='', rev=''):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(UpdateDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -26,6 +26,7 @@ class UpdateDialog(gtk.Dialog):
         set_tortoise_icon(self, 'menucheckout.ico')
         self.cwd = cwd or os.getcwd()
         self.root = rootpath(self.cwd)
+        self.rev = rev
         
         u = ui.ui()
         try:
@@ -136,7 +137,10 @@ class UpdateDialog(gtk.Dialog):
             if node == tip:
                 status += ", tip"
             self._revlist.append([short(node), "(%s)" %status])
-        self._revbox.set_active(0)
+        if self.rev:
+            self._revbox.get_child().set_text(str(self.rev))
+        else:
+            self._revbox.set_active(0)
 
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
@@ -172,8 +176,8 @@ class UpdateDialog(gtk.Dialog):
         self._refresh()
         shell_notify([self.cwd])
 
-def run(cwd='', **opts):
-    dialog = UpdateDialog(cwd)
+def run(cwd='', rev='', **opts):
+    dialog = UpdateDialog(cwd, rev)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
@@ -184,4 +188,5 @@ if __name__ == "__main__":
     import sys
     opts = {}
     opts['cwd'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    #opts['rev'] = 123
     run(**opts)
