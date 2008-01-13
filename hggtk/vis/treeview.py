@@ -85,13 +85,14 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.set_model(self.model)
 
     def fill_model(self):
-        # TODO: add color later on.  Color parents, at least
         savedlen = len(self.graphdata)
         while not self.limit or len(self.graphdata) < self.limit:
             try:
                 (rev, node, lines, parents) = self.grapher.next()
             except StopIteration:
-                self.nextbutton.hide()
+                if self.nextbutton:
+                    self.nextbutton.destroy()
+                    self.nextbutton = None
                 break
             self.max_cols = max(self.max_cols, len(lines))
             self.index[rev] = len(self.graphdata)
@@ -116,7 +117,6 @@ class TreeView(gtk.ScrolledWindow):
             self.treeview.set_cursor(0)
         else:
             self.set_revision_id(revision[treemodel.REVID])
-        self.treeview.show_all()
         self.emit('revisions-loaded')
         return False
 
@@ -199,6 +199,7 @@ class TreeView(gtk.ScrolledWindow):
             vbox.pack_start(hbox, expand = False)
             self.add_with_viewport(vbox)
         else:
+            self.nextbutton = None
             self.add(self.treeview)
 
         self.graph_cell = CellRendererGraph()
