@@ -436,7 +436,7 @@ class GLog(GDialog):
             return menuitem
             
         _menu = gtk.Menu()
-        _menu.append(create_menu('_status', self._show_status))
+        _menu.append(create_menu('di_splay', self._show_status))
         _menu.append(create_menu('_checkout', self._checkout))
         self._cmenu_merge = create_menu('_merge with', self._merge)
         _menu.append(self._cmenu_merge)
