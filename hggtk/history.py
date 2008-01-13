@@ -188,6 +188,7 @@ class GLog(GDialog):
         """Clear out the existing ListStore model and reload it from the repository. 
         """
         if self.grapher:
+            self.repo.invalidate()
             self.graphview.refresh()
             return True
 
