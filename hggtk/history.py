@@ -611,7 +611,12 @@ class GLog(GDialog):
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.run()
+
+        # FIXME: must remove transient explicitly to prevent history
+        #        dialog from getting pushed behind other app windows
+        dialog.set_transient_for(None)        
         dialog.hide()
+        
         shell_notify([self.repo.root])
         self.repo.dirstate.invalidate()
         self.reload_log()
@@ -625,8 +630,11 @@ class GLog(GDialog):
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.run()
+
+        # FIXME: must remove transient explicitly to prevent history
+        #        dialog sfrom getting pushed behind other app windows
+        dialog.set_transient_for(None)
         dialog.hide()
-        del dialog
         
         # FIXME: re-open repo to retrieve the new parent data
         root = self.repo.root
