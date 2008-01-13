@@ -23,7 +23,8 @@ from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
 from hgcmd import CmdDialog
-
+from update import UpdateDialog
+from merge import MergeDialog
 from vis import treemodel
 from vis.treeview import TreeView
 
@@ -682,70 +683,49 @@ class GLog(GDialog):
 
     def _checkout(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        self.repo.invalidate()
-        wc = self.repo.workingctx()
-        pl = wc.parents()
-        p1, p2 = pl[0], self.repo.changectx(rev)
-        pa = p1.ancestor(p2)
-        warning = ''
-        flags = []
-        if len(pl) > 1:
-            warning = "Outstanding uncommitted merges"
-        elif pa != p1 and pa != p2:
-            warning = "Checkout spans branches"
-        elif wc.files():
-            warning = "Outstanding uncommitted changes"
-        if warning:
-            flags = ['--clean']
-            msg = 'lose changes'
-            warning += ', requires clean checkout'
-            if Confirm(msg, [], self, warning).run() != gtk.RESPONSE_YES:
-                return
-        cmdline = ['hg', 'update', '-R', self.repo.root] + flags + [str(rev)]
-        dialog = CmdDialog(cmdline)
+        parents0 = [x.node() for x in self.repo.workingctx().parents()]
+        
+        dialog = UpdateDialog(self.cwd, rev)
         dialog.set_transient_for(self)
+        dialog.show_all()
         dialog.run()
+
+        # FIXME: must remove transient explicitly to prevent history
+        #        dialog from getting pushed behind other app windows
+        dialog.set_transient_for(None)        
         dialog.hide()
-        shell_notify([self.repo.root])
-        self.repo.dirstate.invalidate()
-        self.reload_log()
+        
+        # FIXME: re-open repo to retrieve the new parent data
+        root = self.repo.root
+        del self.repo
+        self.repo = hg.repository(ui.ui(), path=root)
+
+        parents1 = [x.node() for x in self.repo.workingctx().parents()]
+        if not parents0 == parents1:
+            self.reload_log()
 
     def _merge(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        self.repo.invalidate()
-        wc = self.repo.workingctx()
-        pl = wc.parents()
-        if len(pl) > 1:
-            Prompt("Unable to merge",
-                    "Outstanding uncommitted merge", self).run()
-            return
-        elif wc.files():
-            Prompt("Unable to merge",
-                    "Outstanding uncommitted changes", self).run()
-            return
-        elif pl[0] == self.repo.changectx(rev):
-            Prompt("Unable to merge",
-                    "Cannot merge a revision with itself", self).run()
-            return
-
-        desc = []
-        log = self.repo.changelog
-        for crev in (pl[0].rev(), rev):
-            changenode = log.node(crev)
-            change = log.read(changenode)
-            description = change[4].strip()
-            summary = description.splitlines()[0]
-            desc.append('%d : %s' % (crev, summary))
-        msg = desc[0] + '\n  and\n' + desc[1]
-        if Confirm('Merge', [], self, msg).run() != gtk.RESPONSE_YES:
-            return
-
-        cmdline = ['hg', 'merge', '-R', self.repo.root, str(rev)]
-        dialog = CmdDialog(cmdline)
+        parents0 = [x.node() for x in self.repo.workingctx().parents()]
+        node = short(self.repo.changelog.node(rev))
+        dialog = MergeDialog(self.repo.root, self.cwd, node)
         dialog.set_transient_for(self)
+        dialog.show_all()
         dialog.run()
+
+        # FIXME: must remove transient explicitly to prevent history
+        #        dialog sfrom getting pushed behind other app windows
+        dialog.set_transient_for(None)
         dialog.hide()
-        if dialog.returncode == 0:
+        
+        # FIXME: re-open repo to retrieve the new parent data
+        root = self.repo.root
+        del self.repo
+        self.repo = hg.repository(ui.ui(), path=root)
+        
+        # if parents data has changed...
+        parents1 = [x.node() for x in self.repo.workingctx().parents()]
+        if not parents0 == parents1:
             msg = 'Launch commit tool for merge results?'
             if Confirm('Commit', [], self, msg).run() == gtk.RESPONSE_YES:
                 # Spawn commit tool if merge was successful
@@ -756,10 +736,7 @@ class GLog(GDialog):
                 else:
                     args = [self.hgpath, '--repository', self.repo.root, ct]
                     subprocess.Popen(args, shell=False)
-
-        shell_notify([self.repo.root])
-        self.repo.dirstate.invalidate()
-        self.reload_log()
+            self.reload_log()
 
     def _graphtree_selection_changed(self, treeview):
         self.currow = self.graphview.get_revision()
