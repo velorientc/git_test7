@@ -68,6 +68,7 @@ class TreeView(gtk.ScrolledWindow):
 
         self.limit = limit
         self.repo = repo
+        self.currev = None
         self.create_grapher()
         gobject.idle_add(self.populate)
 
