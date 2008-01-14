@@ -300,7 +300,7 @@ class GLog(GDialog):
                 try:
                     self.refreshing = gen.next()
                 except StopIteration:
-                    return False
+                    self.refreshing = False
                 return self.refreshing
             gobject.idle_add(doidle)
 
