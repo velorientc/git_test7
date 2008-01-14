@@ -110,14 +110,15 @@ class GLog(GDialog):
     def _filter_menu(self):
         menu = gtk.Menu()
         
-        self._filter = "graph"    # FIXME: not the best place to init variable
-
         button = gtk.RadioMenuItem(None, "Show Revisions Graph")
-        button.set_active(True)
+        if self._filter == 'graph':
+            button.set_active(True)
         button.connect("toggled", self._filter_graph)
         menu.append(button)
         
         button = gtk.RadioMenuItem(button, "Show All Revisions")
+        if self._filter == 'all':
+            button.set_active(True)
         button.connect("toggled", self._filter_all)
         menu.append(button)
         
@@ -820,8 +821,12 @@ def run(root='', cwd='', files=[], hgpath='hg', **opts):
     dialog = GLog(u, repo, cwd, files, cmdoptions, True)
     dialog.hgpath = hgpath
 
-    if len(files):
+    if not files or files == [root]:
         dialog.grapher = False
+        dialog._filter = "all"
+    else:
+        dialog.grapher = True
+        dialog._filter = "graph"
     
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
