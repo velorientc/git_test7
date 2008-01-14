@@ -181,6 +181,8 @@ class TreeView(gtk.ScrolledWindow):
         return self.get_property('parents')
         
     def refresh(self):
+        self.repo.invalidate()
+        self.repo.dirstate.invalidate()
         self.create_grapher()
         gobject.idle_add(self.populate, self.get_revision())
 
