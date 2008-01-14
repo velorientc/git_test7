@@ -163,9 +163,9 @@ class EmailDialog(gtk.Dialog):
         return tbutton
         
     def _on_window_map_event(self, event, param):
-        self._refresh()
+        self._refresh(True)
 
-    def _refresh(self):
+    def _refresh(self, initial):
         def fill_history(history, vlist, cpath):
             vlist.clear()
             if cpath not in history:
@@ -190,10 +190,12 @@ class EmailDialog(gtk.Dialog):
                     'You must enable the patchbomb extension to use this tool')
             self.response(gtk.RESPONSE_CANCEL)
 
-        self._tobox.child.set_text(repo.ui.config('email', 'to', ''))
-        self._ccbox.child.set_text(repo.ui.config('email', 'cc', ''))
-        self._frombox.child.set_text(repo.ui.config('email', 'from', ''))
-        self._subjbox.child.set_text(repo.ui.config('email', 'subject', ''))
+        if initial:
+            # Only zap these fields at startup
+            self._tobox.child.set_text(repo.ui.config('email', 'to', ''))
+            self._ccbox.child.set_text(repo.ui.config('email', 'cc', ''))
+            self._frombox.child.set_text(repo.ui.config('email', 'from', ''))
+            self._subjbox.child.set_text(repo.ui.config('email', 'subject', ''))
         fill_history(history, self._tolist, 'email.to')
         fill_history(history, self._cclist, 'email.cc')
         fill_history(history, self._fromlist, 'email.from')
@@ -221,7 +223,7 @@ class EmailDialog(gtk.Dialog):
         dlg.focus_field('email.from')
         dlg.run()
         dlg.hide()
-        self._refresh()
+        self._refresh(False)
 
     def _on_send_clicked(self, button, userdata):
         def record_new_value(cpath, history, newvalue):
@@ -256,7 +258,7 @@ class EmailDialog(gtk.Dialog):
                 dlg.focus_field('smtp.host')
                 dlg.run()
                 dlg.hide()
-                self._refresh()
+                self._refresh(False)
                 return
 
         history = shlib.read_history()
