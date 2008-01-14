@@ -387,6 +387,7 @@ class GLog(GDialog):
         
         if self.grapher:
             self.graphview.set_revision_id(long(linkrev))
+            self.graphview.scroll_to_revision(long(linkrev))
             return
 
         # find the row for the linked rev in the tree

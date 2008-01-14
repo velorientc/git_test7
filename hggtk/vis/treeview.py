@@ -155,11 +155,7 @@ class TreeView(gtk.ScrolledWindow):
         """Return revision id of currently selected revision, or None."""
         return self.get_property('revision')
 
-    def set_revision_id(self, revid):
-        """Change the currently selected revision.
-
-        :param revid: Revision id of revision to display.
-        """
+    def scroll_to_revision(self, revid):
         row = self.index[revid]
         adj = self.get_vadjustment()
         if adj and self.batchsize:
@@ -167,6 +163,13 @@ class TreeView(gtk.ScrolledWindow):
             count = len(self.graphdata)
             ratio = float(row) / float(count)
             adj.set_value(ratio * (adj.upper - adj.lower))
+
+    def set_revision_id(self, revid):
+        """Change the currently selected revision.
+
+        :param revid: Revision id of revision to display.
+        """
+        row = self.index[revid]
         self.treeview.set_cursor(row)
         self.treeview.grab_focus()
 
