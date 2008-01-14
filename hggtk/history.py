@@ -324,14 +324,20 @@ class GLog(GDialog):
 
         buffer = gtk.TextBuffer()
         buff_iter = buffer.get_start_iter()
-        buffer.create_tag('changeset', foreground='#000090', paragraph_background='#F0F0F0')
-        buffer.create_tag('date', foreground='#000090', paragraph_background='#F0F0F0')
-        buffer.create_tag('tag', foreground='#000090', paragraph_background='#F0F0F0')
-        buffer.create_tag('files', foreground='#5C5C5C', paragraph_background='#F0F0F0')
-        buffer.create_tag('parent', foreground='#000090', paragraph_background='#F0F0F0')
+        buffer.create_tag('changeset', foreground='#000090',
+                paragraph_background='#F0F0F0')
+        buffer.create_tag('date', foreground='#000090',
+                paragraph_background='#F0F0F0')
+        buffer.create_tag('tag', foreground='#000090',
+                paragraph_background='#F0F0F0')
+        buffer.create_tag('files', foreground='#5C5C5C',
+                paragraph_background='#F0F0F0')
+        buffer.create_tag('parent', foreground='#000090',
+                paragraph_background='#F0F0F0')
         
         parent_link = buffer.create_tag('parlink', foreground='#0000FF', 
-                underline=pango.UNDERLINE_SINGLE, paragraph_background='#F0F0F0')
+                underline=pango.UNDERLINE_SINGLE,
+                paragraph_background='#F0F0F0')
         parent_link.connect("event", self.parent_link_handler)
         
         lines = logtext.split('\n')
@@ -340,18 +346,25 @@ class GLog(GDialog):
         for line in lines_iter:
             line = util.fromlocal(line)
             if line.startswith('changeset:'):
-                buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'changeset')
+                buffer.insert_with_tags_by_name(buff_iter,
+                        line + '\n', 'changeset')
             if line.startswith('user:'):
-                buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'changeset')
+                buffer.insert_with_tags_by_name(buff_iter,
+                        line + '\n', 'changeset')
             if line.startswith('date:'):
-                buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'date')
+                buffer.insert_with_tags_by_name(buff_iter,
+                        line + '\n', 'date')
             elif line.startswith('parent:'):
-                buffer.insert_with_tags_by_name(buff_iter, line[0:13], 'parent')
-                buffer.insert_with_tags_by_name(buff_iter, line[13:] + '\n', 'parlink')
+                buffer.insert_with_tags_by_name(buff_iter,
+                        line[0:13], 'parent')
+                buffer.insert_with_tags_by_name(buff_iter,
+                        line[13:] + '\n', 'parlink')
             elif line.startswith('files:'):
-                buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'files')
+                buffer.insert_with_tags_by_name(buff_iter,
+                        line + '\n', 'files')
             elif line.startswith('tag:'):
-                buffer.insert_with_tags_by_name(buff_iter, line + '\n', 'tag')
+                buffer.insert_with_tags_by_name(buff_iter,
+                        line + '\n', 'tag')
             elif line.startswith('description:'):
                 buffer.insert(buff_iter, '\n')
                 break;
