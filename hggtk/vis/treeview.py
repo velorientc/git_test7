@@ -160,7 +160,14 @@ class TreeView(gtk.ScrolledWindow):
 
         :param revid: Revision id of revision to display.
         """
-        self.treeview.set_cursor(self.index[revid])
+        row = self.index[revid]
+        adj = self.get_vadjustment()
+        if adj and self.batchsize:
+            # manual scrolling, since tree is in a viewport
+            count = len(self.graphdata)
+            ratio = float(row) / float(count)
+            adj.set_value(ratio * (adj.upper - adj.lower))
+        self.treeview.set_cursor(row)
         self.treeview.grab_focus()
 
     def get_parents(self):
