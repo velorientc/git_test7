@@ -93,6 +93,9 @@ class TreeView(gtk.ScrolledWindow):
                 if self.nextbutton:
                     self.nextbutton.destroy()
                     self.nextbutton = None
+                if self.allbutton:
+                    self.allbutton.destroy()
+                    self.allbutton = None
                 break
             self.max_cols = max(self.max_cols, len(lines))
             self.index[rev] = len(self.graphdata)
@@ -151,6 +154,11 @@ class TreeView(gtk.ScrolledWindow):
         self.fill_model()
         gobject.idle_add(self.populate, self.get_revision())
 
+    def _all_clicked(self, button):
+        self.limit = None
+        self.fill_model()
+        gobject.idle_add(self.populate, self.get_revision())
+
     def get_revision(self):
         """Return revision id of currently selected revision, or None."""
         return self.get_property('revision')
@@ -206,8 +214,11 @@ class TreeView(gtk.ScrolledWindow):
             vbox.pack_start(self.treeview, expand = True)
             self.nextbutton = gtk.Button("next %d revisions" % self.batchsize)
             self.nextbutton.connect('clicked', self._next_clicked)
+            self.allbutton = gtk.Button("show all revisions")
+            self.allbutton.connect('clicked', self._all_clicked)
             hbox = gtk.HBox()
-            hbox.pack_start(self.nextbutton, expand = False)
+            hbox.pack_start(self.nextbutton, False, True, 4)
+            hbox.pack_start(self.allbutton, False, True, 4)
             vbox.pack_start(hbox, expand = False)
             self.add_with_viewport(vbox)
         else:
