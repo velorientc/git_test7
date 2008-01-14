@@ -827,7 +827,7 @@ def run(root='', cwd='', files=[], hgpath='hg', **opts):
     dialog = GLog(u, repo, cwd, files, cmdoptions, True)
     dialog.hgpath = hgpath
 
-    if not files or files == [root]:
+    if files and files != [root]:
         dialog.grapher = False
         dialog._filter = "all"
     else:
@@ -844,5 +844,5 @@ if __name__ == "__main__":
     import sys
     opts = {}
     opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
-    #opts['files'] = sys.argv[1:]
+    opts['files'] = [opts['root']]
     run(**opts)
