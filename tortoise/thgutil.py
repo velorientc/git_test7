@@ -61,8 +61,6 @@ if os.name == 'nt':
 
     def get_icon_path(*args):
         dir = get_prog_root()
-        if not os.environ.has_key('THG_ICON_PATH'):
-            os.environ['THG_ICON_PATH'] = os.path.join(dir, 'icons')
         icon = os.path.join(dir, "icons", *args)
         if not os.path.isfile(icon):
             return None
@@ -143,6 +141,10 @@ if os.name == 'nt':
         DestroyIcon(hicon)
         
         return hbm
+
+    if not os.environ.has_key('THG_ICON_PATH'):
+        dir = get_prog_root()
+        os.environ['THG_ICON_PATH'] = os.path.join(dir, 'icons')
 
 else: # Not Windows
 
