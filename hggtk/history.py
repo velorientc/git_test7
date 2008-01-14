@@ -285,6 +285,8 @@ class GLog(GDialog):
                                        date_secs,
                                        parents))
                 yield logtext is not None
+                # Abort if the graph view has been swapped in
+                if self.grapher: return
 
 
         # Insert entries during idle to improve response time, but run
@@ -295,7 +297,10 @@ class GLog(GDialog):
         # If insert didn't finish, setup idle processing for the remainder
         if self.refreshing:
             def doidle():
-                self.refreshing = gen.next()
+                try:
+                    self.refreshing = gen.next()
+                except StopIteration:
+                    return False
                 return self.refreshing
             gobject.idle_add(doidle)
 
