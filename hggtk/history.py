@@ -479,6 +479,8 @@ class GLog(GDialog):
         self.tree.connect('button-release-event', self._tree_button_release)
         self.tree.connect('popup-menu', self._tree_popup_menu)
         self.tree.connect('row-activated', self._tree_row_act)
+        self.tree.modify_font(pango.FontDescription(self.fontlist))
+        #self.tree.modify_font(pango.FontDescription('Ariel 10'))
         return self.graphview
 
     def get_treeview(self):
@@ -496,6 +498,7 @@ class GLog(GDialog):
         self.tree.get_selection().connect('changed',
                 self._tree_selection_changed)
         self.tree.modify_font(pango.FontDescription(self.fontlist))
+        #self.tree.modify_font(pango.FontDescription('Ariel 10'))
         self.tree.set_rules_hint(True) 
         
         parent_cell = gtk.CellRendererPixbuf()
