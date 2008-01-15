@@ -324,6 +324,13 @@ class TreeView(gtk.ScrolledWindow):
         parents = list[row_iter][treemodel.PARENTS]
         if len(parents) == 2: # mark merge changesets green
             text_renderer.set_property('foreground', '#006400')
+        elif len(parents) == 1:
+            # detect non-trivial parent
+            rev = list[row_iter][treemodel.REVID]
+            if long(rev) != parents[0]+1:
+                text_renderer.set_property('foreground', '#900000')
+            else:
+                text_renderer.set_property('foreground', 'black')
         else:
             text_renderer.set_property('foreground', 'black')
 
