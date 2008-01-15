@@ -32,13 +32,13 @@ from vis.treeview import TreeView
 class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
     """
-
-    # "Constants"
-    block_count = 150
-    grapher = True
-
     def get_title(self):
-        return os.path.basename(self.repo.root) + ' log ' + ':'.join(self.opts['rev']) + ' ' + ' '.join(self.pats)
+        title = os.path.basename(self.repo.root) + ' log ' 
+        if self.opts['rev']:
+            title += '--rev ' + ':'.join(self.opts['rev'])
+        if self.pats != ['']:
+            title += '{search} ' + ' '.join(self.pats)
+        return title
 
     def get_icon(self):
         return 'menulog.ico'
@@ -71,41 +71,30 @@ class GLog(GDialog):
         tbuttons.append(self.nextbutton)
 
         self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
-                '_load all', self._load_all)
+                '_load all', self._load_all_clicked)
         tbuttons.append(self.allbutton)
 
         tbuttons.append(gtk.SeparatorToolItem())
         return tbuttons
 
     def _more_clicked(self, button, data):
-        if self.grapher and self.graphview.next_revision_batch():
+        if self.graphview.next_revision_batch():
             self.nextbutton.set_sensitive(False)
             self.allbutton.set_sensitive(False)
 
-    def _load_all(self, button, data):
-        if self.grapher:
-            self.graphview.load_all_revisions()
+    def _load_all_clicked(self, button, data):
+        self.graphview.load_all_revisions()
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
     def _graph_toggled(self, togglebutton, data=None):
         if togglebutton.get_active():
-            self.grapher = True
-            self.tree_frame.remove(self.tree_frame.child)
-            self.tree_frame.add(self.get_graph_treeview())
-            self.tree_frame.show_all()
+            self.graph_col_enabled = True
             self.filterbutton.set_sensitive(False)
-            self.nextbutton.set_sensitive(True)
-            self.allbutton.set_sensitive(True)
         else:
-            self.grapher = False
-            self.tree_frame.remove(self.tree_frame.child)
-            self.tree_frame.add(self.get_treeview())
-            self.tree_frame.show_all()
+            self.graph_col_enabled = False
             self.filterbutton.set_sensitive(True)
-            self.nextbutton.set_sensitive(False)
-            self.allbutton.set_sensitive(False)
-            self.reload_log()
+        self.reload_log()
 
     def _filter_all(self, widget, data=None):
         if widget.get_active():
@@ -152,11 +141,8 @@ class GLog(GDialog):
 
 
     def prepare_display(self):
-        self.refreshing = False
-        self._last_rev = -999
-        # If the log load failed, no reason to continue
-        if not self.reload_log():
-            raise util.Abort('could not load log')
+        self._last_rev = None
+        self._filter = "all"
 
 
     def save_settings(self):
@@ -192,151 +178,35 @@ class GLog(GDialog):
             self.ui.verbose = saved_verbose
         return success, logtext
 
-
     def _get_tagged_rev(self):
         l = [hex(r) for t, r in self.repo.tagslist()]
         l.reverse()
         return l
-        
+
     def reload_log(self):
-        """Clear out the existing ListStore model and reload it from the
-           repository.
-        """
-        if self.grapher:
-            self.repo.invalidate()
-            self.graphview.refresh()
-            return True
-
-        # If the last refresh is still being processed, then do nothing
-        if self.refreshing:
-            return False
-
-        # Retrieve repo revision info
-        self.repo.invalidate()
-        repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
-        heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
-        
-        revs = []
-        if self._filter == "all":
-            revs = self.opts['rev']
-        elif self._filter == "tagged":
-            revs = self._get_tagged_rev()
-        elif self._filter == "parents":
-            revs = [str(x) for x in repo_parents]
-        elif self._filter == "heads":
-            revs = [str(x) for x in heads]
-            
-        # For long logs this is the slowest part, but given the current
-        # Hg API doesn't allow it to be easily processed in chuncks
-        success, logtext = self._hg_log(revs, self.pats, False)
-        if not success:
-            return False
-
-        if not logtext:
-            return True
-
-        # Currently selected file
-        iter = self.tree.get_selection().get_selected()[1]
-        if iter:
-            reselect = self.model[iter][0]
+        """Send refresh event to treeview object"""
+        self.nextbutton.set_sensitive(True)
+        self.allbutton.set_sensitive(True)
+        if self.graph_col_enabled:
+            self.graphview.refresh(None, None, self.opts)
         else:
-            reselect = None
+            revs = []
+            if self._filter == "all":
+                revs = self.opts['rev']
+            elif self._filter == "tagged":
+                revs = self._get_tagged_rev()
+            elif self._filter == "parents":
+                repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
+                revs = [str(x) for x in repo_parents]
+            elif self._filter == "heads":
+                heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
+                revs = [str(x) for x in heads]
+            self.graphview.refresh(revs, self.pats, self.opts)
 
-        # Load the new data into the tree's model
-        self.tree.hide()
-        self.model.clear()
-        
-        # Generator that parses and inserts log entries
-        def inserter(logtext):
-            def person(author):
-                '''get name of author, or else username.'''
-                f = author.find('<')
-                if f == -1: return util.shortuser(author)
-                return author[:f].rstrip()
-
-            while logtext:
-                blocks = logtext.strip('\n').split('\n\n', GLog.block_count)
-                if len(blocks) > GLog.block_count:
-                    logtext = blocks[GLog.block_count]
-                    del blocks[GLog.block_count]
-                else:
-                    logtext = None
-    
-                for block in blocks:
-                    # defaults
-                    log = { 'user' : 'missing', 'summary' : '', 'tag' : '' }
-                    lines = block.split('\n')
-                    parents = []
-                    tags = []
-                    for line in lines:
-                        line = util.fromlocal(line)
-                        sep = line.index(':')
-                        info = line[0:sep]
-                        value = line[sep+1:].strip()
-    
-                        if info == 'changeset':
-                            log['rev'] = value.split(':')[0]
-                        elif info == 'parent':
-                            parents.append(long(value.split(':')[0]))
-                        elif info == 'tag':
-                            tags.append(value)
-                        else:
-                            log[info] = value
-    
-                    if tags: log['tag'] = ','.join(tags)
-
-                    rev = int(log['rev'])
-                    is_parent = rev in repo_parents and gtk.STOCK_HOME or ''
-                    is_head = rev in heads and gtk.STOCK_EXECUTE or ''
-                    date_secs = util.strdate(util.tolocal(log['date']),
-                            '%a %b %d %H:%M:%S %Y', {})[0]
-                    show_date = time.strftime("%Y-%m-%d %H:%M:%S",
-                            time.gmtime(date_secs))
-                    self.model.append((is_parent, is_head, 
-                                       long(log['rev']), log['tag'],
-                                       log['summary'], person(log['user']),
-                                       show_date, date_secs, parents))
-                yield logtext is not None
-                # Abort if the graph view has been swapped in
-                if self.grapher: return
-
-
-        # Insert entries during idle to improve response time, but run
-        # the first batch synchronously to attempt the reselect below
-        gen = inserter(logtext)
-        self.refreshing = gen.next()
-
-        # If insert didn't finish, setup idle processing for the remainder
-        if self.refreshing:
-            def doidle():
-                try:
-                    self.refreshing = gen.next()
-                except StopIteration:
-                    self.refreshing = False
-                return self.refreshing
-            gobject.idle_add(doidle)
-
-        selection = self.tree.get_selection()
-        for row in self.model:
-            if row[0] == reselect:
-                selection.select_iter(row.iter)
-                break
-        else:
-            self.tree.scroll_to_cell((0,))
-            selection.select_path((0,))
-
-        self.tree.show()
-        self.tree.grab_focus()
-        return True
-
-
-    def load_details(self, rev, parents):
-        save_removed = self.opts['removed'] 
-        self.opts['removed'] = False
-        success, logtext = self._hg_log(rev, [], True)
-        self.opts['removed'] = save_removed
-
-        if not success:
+    def load_details(self, rev):
+        parents = self.currow[treemodel.PARENTS]
+        ctx = self.repo.changectx(rev)
+        if not ctx:
             self.details_text.set_buffer(gtk.TextBuffer())
             return False
 
@@ -358,39 +228,33 @@ class GLog(GDialog):
                 paragraph_background='#F0F0F0')
         parent_link.connect("event", self.parent_link_handler)
         
-        lines = logtext.split('\n')
-        lines_iter = iter(lines)
+        date = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(ctx.date()[0]))
+        
+        change = str(rev) + ':' + short(ctx.node())
+        buffer.insert_with_tags_by_name(buff_iter,
+                'changeset: ' + change + '\n', 'changeset')
+        buffer.insert_with_tags_by_name(buff_iter,
+                'user:      ' + ctx.user() + '\n', 'changeset')
+        buffer.insert_with_tags_by_name(buff_iter,
+                'date:      ' + date + '\n', 'date')
 
-        for line in lines_iter:
-            line = util.fromlocal(line)
-            if line.startswith('changeset:'):
-                buffer.insert_with_tags_by_name(buff_iter,
-                        line + '\n', 'changeset')
-            if line.startswith('user:'):
-                buffer.insert_with_tags_by_name(buff_iter,
-                        line + '\n', 'changeset')
-            if line.startswith('date:'):
-                buffer.insert_with_tags_by_name(buff_iter,
-                        line + '\n', 'date')
-            elif line.startswith('parent:'):
-                buffer.insert_with_tags_by_name(buff_iter,
-                        line[0:13], 'parent')
-                buffer.insert_with_tags_by_name(buff_iter,
-                        line[13:] + '\n', 'parlink')
-            elif line.startswith('files:'):
-                buffer.insert_with_tags_by_name(buff_iter,
-                        line + '\n', 'files')
-            elif line.startswith('tag:'):
-                buffer.insert_with_tags_by_name(buff_iter,
-                        line + '\n', 'tag')
-            elif line.startswith('description:'):
-                buffer.insert(buff_iter, '\n')
-                break;
+        for p in parents:
+            change = str(p) + ':' + short(self.repo.changelog.node(p))
+            buffer.insert_with_tags_by_name(buff_iter,
+                    'parent:    ', 'parent')
+            buffer.insert_with_tags_by_name(buff_iter,
+                    change + '\n', 'parlink')
 
-        for line in lines_iter:
-            line = util.fromlocal(line)
-            buffer.insert(buff_iter, line + '\n')
+        buffer.insert_with_tags_by_name(buff_iter,
+                'files:     ' + ' '.join(ctx.files()) + '\n', 'files')
 
+        tags = ' '.join(ctx.tags())
+        if tags:
+            buffer.insert_with_tags_by_name(buff_iter,
+                    'tags:      ' + tags + '\n', 'tag')
+
+        log = util.fromlocal(ctx.description())
+        buffer.insert(buff_iter, '\n' + log + '\n')
         self.details_text.set_buffer(buffer)
         return True
 
@@ -398,30 +262,9 @@ class GLog(GDialog):
         text = self.get_link_text(tag, widget, event, iter)
         if not text:
             return
-        
-        # get linked revision
         linkrev = long(text.split(':')[0])
-        
-        if self.grapher:
-            self.graphview.set_revision_id(long(linkrev))
-            self.graphview.scroll_to_revision(long(linkrev))
-            return
-
-        # find the row for the linked rev in the tree
-        iter = self.model.get_iter_first()
-        while iter:
-            rev = self.model.get_value(iter, 2)
-            if rev == linkrev:
-                break
-            iter = self.model.iter_next(iter)
-        if not iter:
-            return
-            
-        # jump to the linked revision
-        sel = self.tree.get_selection()
-        sel.select_iter(iter)
-        path = self.model.get_path(iter)
-        self.tree.scroll_to_cell(path, use_align=True, row_align=0.5)
+        self.graphview.set_revision_id(linkrev)
+        self.graphview.scroll_to_revision(linkrev)
 
     def get_link_text(self, tag, widget, event, iter):
         """handle clicking on a link in a textview"""
@@ -437,18 +280,6 @@ class GLog(GDialog):
         text = text_buffer.get_text(beg, end)
         return text
         
-    def make_parent(self, tvcolumn, cell, model, iter):
-        stock = model.get_value(iter, 0)
-        pb = self.tree.render_icon(stock, gtk.ICON_SIZE_MENU, None)
-        cell.set_property('pixbuf', pb)
-        return
-
-    def make_head(self, tvcolumn, cell, model, iter):
-        stock = model.get_value(iter, 1)
-        pb = self.tree.render_icon(stock, gtk.ICON_SIZE_MENU, None)
-        cell.set_property('pixbuf', pb)
-        return
-
     def tree_context_menu(self):
         def create_menu(label, callback):
             menuitem = gtk.MenuItem(label, True)
@@ -467,8 +298,14 @@ class GLog(GDialog):
         _menu.show_all()
         return _menu
         
-    def get_graph_treeview(self):
-        limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '100')
+
+    def get_body(self):
+        self._menu = self.tree_context_menu()
+
+        self.tree_frame = gtk.Frame()
+        self.tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+
+        limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
         if limit_opt:
             try:
                 limit = int(limit_opt)
@@ -481,125 +318,16 @@ class GLog(GDialog):
         self.limit = limit
         self.graphview = TreeView(self.repo, limit)
         self.tree = self.graphview.treeview
-        self.model = self.graphview.model
-        self.graphview.connect('revision-selected',
-                self._graphtree_selection_changed)
+        self.graphview.connect('revision-selected', self.selection_changed)
         self.graphview.set_property('date-column-visible', True)
 
         self.tree.connect('button-release-event', self._tree_button_release)
         self.tree.connect('popup-menu', self._tree_popup_menu)
         self.tree.connect('row-activated', self._tree_row_act)
-        self.tree.modify_font(pango.FontDescription(self.fontlist))
-        #self.tree.modify_font(pango.FontDescription('Ariel 10'))
-        return self.graphview
-
-    def get_treeview(self):
-        self.model = gtk.ListStore(str, str, long, str, str, str, str, 
-                long, object)
-        self.model.set_default_sort_func(self._sort_by_rev)
-
-        self.tree = gtk.TreeView(self.model)
-        self.tree.set_reorderable(False)
-        self.tree.set_enable_search(True)
-        # Not compatible with <PyGtk 2.10, and is redundant with next line
-        # self.tree.set_rubber_banding(False)
-        self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-        self.tree.get_selection().connect('changed',
-                self._tree_selection_changed)
-        self.tree.modify_font(pango.FontDescription(self.fontlist))
-        #self.tree.modify_font(pango.FontDescription('Ariel 10'))
-        self.tree.set_rules_hint(True) 
-
-        parent_cell = gtk.CellRendererPixbuf()
-        head_cell = gtk.CellRendererPixbuf()
-        tags_cell = gtk.CellRendererText()
-        changeset_cell = gtk.CellRendererText()
-        user_cell = gtk.CellRendererText()
-        summary_cell = gtk.CellRendererText()
-        date_cell = gtk.CellRendererText()
+        #self.tree.modify_font(pango.FontDescription(self.fontlist))
         
-        col = 1
-        
-        col_status = gtk.TreeViewColumn('Status')
-        col_status.pack_start(parent_cell, False)
-        col_status.pack_start(head_cell, False)
-        col_status.set_cell_data_func(parent_cell, self.make_parent)
-        col_status.set_cell_data_func(head_cell, self.make_head)
-        
-        col += 1
-        col_rev = gtk.TreeViewColumn('Rev', changeset_cell)
-        col_rev.add_attribute(changeset_cell, 'text', col)
-        col_rev.set_cell_data_func(changeset_cell, self._text_color)
-        col_rev.set_sort_column_id(col)
-        col_rev.set_resizable(False)
-        
-        col += 1
-        tags_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        tags_cell.set_property('width_chars', 8)
-        col_tag = gtk.TreeViewColumn('Tag', tags_cell)
-        col_tag.add_attribute(tags_cell, 'text', col)
-        col_tag.set_cell_data_func(tags_cell, self._text_color)
-        col_tag.set_sort_column_id(col)
-        col_tag.set_resizable(True)
-        
-        col += 1
-        summary_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        summary_cell.set_property('width_chars', 65)
-        col_sum = gtk.TreeViewColumn('Summary', summary_cell)
-        col_sum.add_attribute(summary_cell, 'text', col)
-        col_sum.set_cell_data_func(summary_cell, self._text_color)
-        col_sum.set_sort_column_id(col)
-        col_sum.set_resizable(True)
-
-        col += 1
-        user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        user_cell.set_property('width_chars', 20)
-        col_user = gtk.TreeViewColumn('User', user_cell)
-        col_user.add_attribute(user_cell, 'text', col)
-        col_user.set_cell_data_func(user_cell, self._text_color)
-        col_user.set_sort_column_id(col)
-        col_user.set_resizable(True)
-        
-        col += 1
-        col_date = gtk.TreeViewColumn('Date', date_cell)
-        col_date.add_attribute(date_cell, 'text', col)
-        col_date.set_cell_data_func(date_cell, self._text_color)
-        col_date.set_sort_column_id(col)
-        col_date.set_resizable(True)
-
-        self.tree.append_column(col_status)
-        self.tree.append_column(col_rev)
-        self.tree.append_column(col_tag)
-        self.tree.append_column(col_sum)
-        self.tree.append_column(col_user)
-        self.tree.append_column(col_date)
-        self.tree.set_headers_clickable(True)
-        self.tree.show_all()
-        
-        self.tree.connect('button-release-event', self._tree_button_release)
-        self.tree.connect('popup-menu', self._tree_popup_menu)
-        self.tree.connect('row-activated', self._tree_row_act)
-        
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.set_shadow_type(gtk.SHADOW_IN)
-        scroller.add(self.tree)
-        return scroller
-
-    def get_body(self):
-        self._menu = self.tree_context_menu()
-
-        self.tree_frame = gtk.Frame()
-        self.tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        self.tree_frame.add(gtk.ScrolledWindow())
-
-        # Toggle graph selection button, triggers treeview allocation
-        if self.grapher:
-            self.graph_toggle.set_active(True)
-            self.filterbutton.set_sensitive(False)
-        else:
-            self.graph_toggle.set_active(False)
-            self.filterbutton.set_sensitive(True)
+        self.tree_frame.add(self.graphview)
+        self.tree_frame.show_all()
 
         details_frame = gtk.Frame()
         details_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -617,28 +345,15 @@ class GLog(GDialog):
         self._vpaned.pack1(self.tree_frame, True, False)
         self._vpaned.pack2(details_frame, True, True)
         self._vpaned.set_position(self._setting_vpos)
-        return self._vpaned
 
-
-    def _sort_by_rev(self, model, iter1, iter2):
-        lhs, rhs = (model.get_value(iter1, 2), model.get_value(iter2, 2))
-
-        # GTK+ bug that calls sort before a full row is inserted causing values to be None.
-        if None in (lhs, rhs) :
-            return 0
-
-        result = long(rhs) - long(lhs)
-        return min(max(result, -1), 1)
-
-
-    def _text_color(self, column, text_renderer, list, row_iter):
-        parents = list[row_iter][treemodel.PARENTS]
-        if len(parents) == 2:
-            text_renderer.set_property('foreground', '#006400')
-        elif len(parents) == 1:
-            text_renderer.set_property('foreground', '#900000')
+        # Initialize graph selection toggle
+        if self.graph_col_enabled:
+            self.graph_toggle.set_active(True)
+            self.filterbutton.set_sensitive(False)
         else:
-            text_renderer.set_property('foreground', 'black')
+            self.graph_toggle.set_active(False)
+            self.filterbutton.set_sensitive(True)
+        return self._vpaned
 
 
     def _add_tag(self, menuitem):
@@ -691,7 +406,8 @@ class GLog(GDialog):
         result = fd.run()
 
         if result:
-            # In case new export args are added in the future, merge the hg defaults
+            # In case new export args are added in the future, merge the
+            # hg defaults
             exportOpts= self.merge_opts(commands.table['^export'][1], ())
             exportOpts['output'] = result
             def dohgexport():
@@ -763,25 +479,12 @@ class GLog(GDialog):
                     subprocess.Popen(args, shell=False)
             self.reload_log()
 
-    def _graphtree_selection_changed(self, treeview):
+    def selection_changed(self, treeview):
         self.currow = self.graphview.get_revision()
-        rev = [ str(self.currow[treemodel.REVID]) ]
+        rev = self.currow[treemodel.REVID]
         if rev != self._last_rev:
             self._last_rev = rev
-            parents = self.currow[treemodel.PARENTS]
-            self.load_details(rev, len(parents))
-        return False
-
-    def _tree_selection_changed(self, selection):
-        ''' Update the details text'''
-        if selection.count_selected_rows() == 0:
-            return False
-        self.currow = self.model[selection.get_selected()[1]]
-        rev = [ str(self.currow[treemodel.REVID]) ]
-        if rev != self._last_rev:
-            self._last_rev = rev
-            parents = self.currow[treemodel.PARENTS]
-            self.load_details(rev, len(parents))
+            self.load_details(rev)
         return False
 
     def _refresh_clicked(self, toolbutton, data=None):
@@ -789,7 +492,8 @@ class GLog(GDialog):
         return True
 
     def _tree_button_release(self, widget, event) :
-        if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK)):
+        if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
+            gtk.gdk.CONTROL_MASK)):
             self._tree_popup_menu(widget, event.button, event.time)
         return False
 
@@ -832,11 +536,9 @@ def run(root='', cwd='', files=[], hgpath='hg', **opts):
     dialog.hgpath = hgpath
 
     if files and files != [root]:
-        dialog.grapher = False
-        dialog._filter = "all"
+        dialog.graph_col_enabled = False
     else:
-        dialog.grapher = True
-        dialog._filter = "graph"
+        dialog.graph_col_enabled = True
     
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

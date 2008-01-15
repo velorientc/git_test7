@@ -9,6 +9,7 @@ __copyright__ = "Copyright 2007 Joel Rosdahl"
 __author__    = "Joel Rosdahl <joel@rosdahl.net>"
 
 from mercurial.node import nullrev
+from mercurial import cmdutil, util, ui
 
 def revision_grapher(repo, start_rev, stop_rev):
     """incremental revision grapher
@@ -71,3 +72,71 @@ def revision_grapher(repo, start_rev, stop_rev):
         revs = next_revs
         curr_rev -= 1
 
+def filtered_log_generator(repo, revs, pats, opts):
+    '''Fill view model iteratively
+       repo - Mercurial repository object
+       revs - list of revision specifiers (revno, hash, tags, etc)
+       pats - list of file names or patterns
+    '''
+    def get_parents(rev):
+        return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
+
+    # User specified list of revisions, pretty easy
+    for revname in revs:
+        node = repo.lookup(revname)
+        rev = repo.changelog.rev(node)
+        yield (rev, (0,0), [], get_parents(rev))
+    if revs: return
+
+    # 'All revisions' filter, even easier
+    if pats == [''] and not opts['keyword'] and not opts['date']:
+        rev = repo.changelog.count()-1
+        while rev >= 0:
+            yield (rev, (0,0), [], get_parents(rev))
+            rev = rev-1
+        return
+
+    # pattern, keyword, or date search.  respects merge, no_merge options
+    # TODO: add copies/renames later
+    df = False
+    if opts['date']:
+        df = util.matchdate(opts['date'])
+
+    if not opts.has_key('merges'):
+        opts['merges'] = None
+    if not opts.has_key('no_merges'):
+        opts['no_merges'] = None
+
+    stack = []
+    get = util.cachefunc(lambda r: repo.changectx(r).changeset())
+    changeiter, matchfn = cmdutil.walkchangerevs(repo.ui, repo, pats, get, opts)
+    for st, rev, fns in changeiter:
+        if st == 'iter':
+            if stack:
+                yield stack.pop()
+            continue
+        if st != 'add':
+            continue
+        parents = get_parents(rev)
+        if opts['no_merges'] and len(parents) == 2:
+            continue
+        if opts['merges'] and len(parents) != 2:
+            continue
+
+        if df:
+            changes = get(rev)
+            if not df(changes[2][0]):
+                continue
+
+        if opts['keyword']:
+            changes = get(rev)
+            miss = 0
+            for k in [kw.lower() for kw in opts['keyword']]:
+                if not (k in changes[1].lower() or
+                        k in changes[4].lower() or
+                        k in " ".join(changes[3]).lower()):
+                    miss = 1
+                    break
+            if miss:
+                continue
+        stack.append((rev, (0,0), [], parents))
