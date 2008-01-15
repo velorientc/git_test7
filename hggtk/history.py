@@ -51,7 +51,7 @@ class GLog(GDialog):
         self.refreshbutton = self.make_toolbutton(gtk.STOCK_REFRESH,
             'Re_fresh', self._refresh_clicked)
         self.filterbutton = self.make_toolbutton(gtk.STOCK_INDEX,
-            '_Filter', self._refresh_clicked, menu=self._filter_menu())
+            '_Filter', self._filter_clicked, menu=self._filter_menu())
         return [
                 self.refreshbutton,
                 gtk.SeparatorToolItem(),
@@ -71,6 +71,24 @@ class GLog(GDialog):
         '''Treeview reports log generator has exited'''
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
+
+    def _filter_clicked(self, toolbutton, data=None):
+        '''Launch filter configuration dialog'''
+        # TODO: :-)
+        return
+        # This dialog should include...
+        #
+        # branch drop-down list, sets _filter='branch:name'
+        self._filter = 'branch:0.9.2compat'
+        self.reload_log()
+        #
+        # date selector, sets _filter='date:pattern'
+        #   allow user to launch 'hg help dates'
+        #
+        # keyword entry, sets _filter='keyword:word0,word1'
+        #
+        # revision range entry, calls cmdutil.revrange(), sets
+        # opts['rev'], sets _filter to 'all'
 
     def _filter_selected(self, widget, data=None):
         if widget.get_active():
@@ -165,6 +183,9 @@ class GLog(GDialog):
                 self.graphview.refresh(None, None, self.opts)
                 return
             revs = self.opts['rev']
+        elif self._filter.startswith("branch:"):
+            self.graphview.refresh(None, self._filter[7:], self.opts)
+            return
         elif self._filter == "only_merges":
             self.opts['only_merges'] = True
             self.graphview.refresh([], [''], self.opts)

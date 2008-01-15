@@ -83,8 +83,17 @@ class TreeView(gtk.ScrolledWindow):
 
     def create_log_generator(self, revs, pats, opts):
         if revs is None:
-            start = self.repo.changelog.count() - 1
-            self.grapher = revision_grapher(self.repo, start, 0)
+            if pats is not None:  # branch name
+                b = self.repo.branchtags()
+                if b.has_key(pats):
+                    node = b[pats]
+                    start = self.repo.changelog.rev(node)
+                    print 'branch', pats, 'starts at rev', start
+                else:
+                    start = self.repo.changelog.count() - 1
+            else:
+                start = self.repo.changelog.count() - 1
+            self.grapher = revision_grapher(self.repo, start, 0, pats)
             self.show_graph = True
         else:
             self.grapher = filtered_log_generator(self.repo, revs, pats, opts)
