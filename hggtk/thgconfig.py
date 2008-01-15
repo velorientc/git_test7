@@ -77,7 +77,10 @@ class ConfigDialog(gtk.Dialog):
                     'Select revision graph (DAG) viewer launched by'
                     ' TortoiseHg'),
                 ('Visual Diff Tool', 'tortoisehg.vdiff', [],
-                    'Specify the visual diff tool; must be extdiff command'))
+                    'Specify the visual diff tool; must be extdiff command'),
+                ('Log Batch Size', 'tortoisehg.graphlimit', [],
+                    'The number of revisions to read and display in the'
+                    ' changelog viewer in a single batch. Default: 500'))
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
         self.fill_frame(self.tortoise_frame, self._tortoise_info)
 
