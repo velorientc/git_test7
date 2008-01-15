@@ -48,12 +48,14 @@ class GLog(GDialog):
         self.ui.quiet = False
 
     def get_tbbuttons(self):
+        self.refreshbutton = self.make_toolbutton(gtk.STOCK_REFRESH,
+            'Re_fresh', self._refresh_clicked)
+        self.filterbutton = self.make_toolbutton(gtk.STOCK_INDEX,
+            '_Filter', self._refresh_clicked, menu=self._filter_menu())
         return [
-                self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
-                    self._refresh_clicked),
+                self.refreshbutton,
                 gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
-                    self._refresh_clicked, menu=self._filter_menu()),
+                self.filterbutton,
                 gtk.SeparatorToolItem()
              ]
 
@@ -314,15 +316,20 @@ class GLog(GDialog):
         vbox = gtk.VBox()
         self.nextbutton = gtk.ToolButton(gtk.STOCK_GO_DOWN)
         self.nextbutton.connect('clicked', self._more_clicked)
-        self.nextbutton.set_tooltip(self.tips,
-                'show next %d revisions' % limit)
         self.allbutton = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
         self.allbutton.connect('clicked', self._load_all_clicked)
-        self.allbutton.set_tooltip(self.tips,
-                'show all remaining revisions')
-        vbox.pack_start(gtk.Label(''), True, True)
+        vbox.pack_start(gtk.Label(''), True, True) # expanding blank label
         vbox.pack_start(self.nextbutton, False, False)
         vbox.pack_start(self.allbutton, False, False)
+
+        self.nextbutton.set_tooltip(self.tips,
+                'show next %d revisions' % limit)
+        self.allbutton.set_tooltip(self.tips,
+                'show all remaining revisions')
+        self.refreshbutton.set_tooltip(self.tips,
+                'Reload revision history')
+        self.filterbutton.set_tooltip(self.tips,
+                'Filter revisions for display')
 
         hbox.pack_start(vbox, False, False, 0)
         self.tree_frame.add(hbox)
