@@ -44,9 +44,9 @@ class TreeModel(gtk.GenericTreeModel):
         return 12
 
     def on_get_column_type(self, index):
-        if index == REVID: return gobject.TYPE_STRING
         if index == NODE: return gobject.TYPE_PYOBJECT
         if index == LINES: return gobject.TYPE_PYOBJECT
+        if index == REVID: return gobject.TYPE_STRING
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
         if index == MESSAGE: return gobject.TYPE_STRING
         if index == COMMITER: return gobject.TYPE_STRING
