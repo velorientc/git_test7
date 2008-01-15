@@ -75,7 +75,12 @@ class GLog(GDialog):
 
     def _filter_clicked(self, toolbutton, data=None):
         '''Launch filter configuration dialog'''
-        dlg = FilterDialog(self.repo.root, [], self.pats)
+        rev0 = self.graphview.get_mark_rev()
+        if rev0 is not None and self.currow is not None:
+            revs = [rev0, self.currow[treemodel.REVID]]
+        else:
+            revs = []
+        dlg = FilterDialog(self.repo.root, revs, self.pats)
         dlg.show_all()
         dlg.run()
         dlg.hide()
@@ -122,6 +127,7 @@ class GLog(GDialog):
     def prepare_display(self):
         self._last_rev = None
         self._filter = "all"
+        self.currow = None
         self.reload_log()
 
 
@@ -299,6 +305,9 @@ class GLog(GDialog):
         _menu.append(create_menu('_export patch', self._export_patch))
         _menu.append(create_menu('e_mail patch', self._email_patch))
         _menu.append(create_menu('add/remove _tag', self._add_tag))
+        _menu.append(create_menu('mark rev for diff', self._mark_rev))
+        self._cmenu_diff = create_menu('_diff with mark', self._diff_revs)
+        _menu.append(self._cmenu_diff)
         _menu.show_all()
         return _menu
         
@@ -375,6 +384,25 @@ class GLog(GDialog):
         self._vpaned.set_position(self._setting_vpos)
         return self._vpaned
 
+
+    def _diff_revs(self, menuitem):
+        from status import GStatus
+        from gtools import cmdtable
+        rev0 = self.graphview.get_mark_rev()
+        rev1 = self.currow[treemodel.REVID]
+        statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
+                ('include', 'exclude', 'git'))
+        statopts['rev'] = ['%u:%u' % (rev0, rev1)]
+        statopts['modified'] = True
+        statopts['added'] = True
+        statopts['removed'] = True
+        dialog = GStatus(self.ui, self.repo, self.cwd, [], statopts, False)
+        dialog.display()
+        return True
+
+    def _mark_rev(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        self.graphview.set_mark_rev(rev)
 
     def _add_tag(self, menuitem):
         from tagadd import TagAddDialog
@@ -527,7 +555,9 @@ class GLog(GDialog):
         can_merge = selrev not in parents and \
                     len(self.repo.heads()) > 1 and \
                     len(parents) < 2
+        can_diff = self.graphview.get_mark_rev() is not None
         self._cmenu_merge.set_sensitive(can_merge)
+        self._cmenu_diff.set_sensitive(can_diff)
 
         # display the context menu
         self._menu.popup(None, None, None, button, time)

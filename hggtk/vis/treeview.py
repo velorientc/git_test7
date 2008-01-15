@@ -67,6 +67,7 @@ class TreeView(gtk.ScrolledWindow):
         self.batchsize = limit
         self.repo = repo
         self.currev = None
+        self.marked_rev = None
         self.construct_treeview()
 
     def search_in_tree(self, model, column, key, iter, data):
@@ -106,6 +107,7 @@ class TreeView(gtk.ScrolledWindow):
         self.max_cols = 1
         self.model = None
         self.limit = self.batchsize
+        self.marked_rev = None
 
     def populate(self, revision=None):
         """Fill the treeview with contents.
@@ -323,13 +325,24 @@ class TreeView(gtk.ScrolledWindow):
         cell.set_property('pixbuf', pb)
 
     def make_head(self, tvcolumn, cell, model, iter):
-        stock = model.get_value(iter, treemodel.HEAD)
+        if self.marked_rev == long(model.get_value(iter, treemodel.REVID)):
+            stock = gtk.STOCK_GO_FORWARD
+        else:
+            stock = model.get_value(iter, treemodel.HEAD)
         pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
         cell.set_property('pixbuf', pb)
 
+    def set_mark_rev(self, rev):
+        '''User has marked a revision for diff'''
+        self.marked_rev = long(rev)
+
+    def get_mark_rev(self):
+        return self.marked_rev
+
     def text_color(self, column, text_renderer, list, row_iter):
         parents = list[row_iter][treemodel.PARENTS]
-        if len(parents) == 2: # mark merge changesets green
+        if len(parents) == 2:
+            # mark merge changesets green
             text_renderer.set_property('foreground', '#006400')
         elif len(parents) == 1:
             # detect non-trivial parent
