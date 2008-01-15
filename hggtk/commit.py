@@ -187,6 +187,15 @@ class GCommit(GStatus):
 
 
     def _hg_commit(self, files):
+        if not self.repo.ui.config('ui', 'username'):
+            Prompt('Username not configured', 'Please enter a username', self).run()
+            from thgconfig import ConfigDialog
+            dlg = ConfigDialog(self.repo.root, False)
+            dlg.show_all()
+            dlg.focus_field('ui.username')
+            dlg.run()
+            dlg.hide()
+
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
