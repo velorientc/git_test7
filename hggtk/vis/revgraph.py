@@ -11,7 +11,7 @@ __author__    = "Joel Rosdahl <joel@rosdahl.net>"
 from mercurial.node import nullrev
 from mercurial import cmdutil, util, ui
 
-def revision_grapher(repo, start_rev, stop_rev):
+def revision_grapher(repo, start_rev, stop_rev, branch=None):
     """incremental revision grapher
 
     This generator function walks through the revision history from
@@ -37,6 +37,11 @@ def revision_grapher(repo, start_rev, stop_rev):
 
         # Compute revs and next_revs.
         if curr_rev not in revs:
+            if branch:
+                ctx = repo.changectx(curr_rev)
+                if ctx.branch() != branch:
+                    curr_rev -= 1
+                    continue
             # New head.
             revs.append(curr_rev)
             rev_color[curr_rev] = nextcolor ; nextcolor += 1
