@@ -65,7 +65,28 @@ class GLog(GDialog):
                     self._refresh_clicked, menu=self._filter_menu())
         tbuttons.append(self.filterbutton)
         tbuttons.append(gtk.SeparatorToolItem())
+
+        self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN, '_more',
+                    self._more_clicked)
+        tbuttons.append(self.nextbutton)
+
+        self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
+                '_load all', self._load_all)
+        tbuttons.append(self.allbutton)
+
+        tbuttons.append(gtk.SeparatorToolItem())
         return tbuttons
+
+    def _more_clicked(self, button, data):
+        if self.grapher and self.graphview.next_revision_batch():
+            self.nextbutton.set_sensitive(False)
+            self.allbutton.set_sensitive(False)
+
+    def _load_all(self, button, data):
+        if self.grapher:
+            self.graphview.load_all_revisions()
+        self.nextbutton.set_sensitive(False)
+        self.allbutton.set_sensitive(False)
 
     def _graph_toggled(self, togglebutton, data=None):
         if togglebutton.get_active():
@@ -74,12 +95,16 @@ class GLog(GDialog):
             self.tree_frame.add(self.get_graph_treeview())
             self.tree_frame.show_all()
             self.filterbutton.set_sensitive(False)
+            self.nextbutton.set_sensitive(True)
+            self.allbutton.set_sensitive(True)
         else:
             self.grapher = False
             self.tree_frame.remove(self.tree_frame.child)
             self.tree_frame.add(self.get_treeview())
             self.tree_frame.show_all()
             self.filterbutton.set_sensitive(True)
+            self.nextbutton.set_sensitive(False)
+            self.allbutton.set_sensitive(False)
             self.reload_log()
 
     def _filter_all(self, widget, data=None):
@@ -174,7 +199,8 @@ class GLog(GDialog):
         return l
         
     def reload_log(self):
-        """Clear out the existing ListStore model and reload it from the repository. 
+        """Clear out the existing ListStore model and reload it from the
+           repository.
         """
         if self.grapher:
             self.repo.invalidate()
@@ -500,7 +526,7 @@ class GLog(GDialog):
         self.tree.modify_font(pango.FontDescription(self.fontlist))
         #self.tree.modify_font(pango.FontDescription('Ariel 10'))
         self.tree.set_rules_hint(True) 
-        
+
         parent_cell = gtk.CellRendererPixbuf()
         head_cell = gtk.CellRendererPixbuf()
         tags_cell = gtk.CellRendererText()

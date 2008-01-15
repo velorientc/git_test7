@@ -90,12 +90,6 @@ class TreeView(gtk.ScrolledWindow):
             try:
                 (rev, node, lines, parents) = self.grapher.next()
             except StopIteration:
-                if self.nextbutton:
-                    self.nextbutton.destroy()
-                    self.nextbutton = None
-                if self.allbutton:
-                    self.allbutton.destroy()
-                    self.allbutton = None
                 break
             self.max_cols = max(self.max_cols, len(lines))
             self.index[rev] = len(self.graphdata)
@@ -149,12 +143,13 @@ class TreeView(gtk.ScrolledWindow):
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
-    def _next_clicked(self, button):
+    def next_revision_batch(self):
         self.limit += self.batchsize
         self.fill_model()
         gobject.idle_add(self.populate, self.get_revision())
+        return self.limit >= self.repo.changelog.count()
 
-    def _all_clicked(self, button):
+    def load_all_revisions(self):
         self.limit = None
         self.fill_model()
         gobject.idle_add(self.populate, self.get_revision())
@@ -165,12 +160,7 @@ class TreeView(gtk.ScrolledWindow):
 
     def scroll_to_revision(self, revid):
         row = self.index[revid]
-        adj = self.get_vadjustment()
-        if adj and self.batchsize:
-            # manual scrolling, since tree is in a viewport
-            count = len(self.graphdata)
-            ratio = float(row) / float(count)
-            adj.set_value(ratio * (adj.upper - adj.lower))
+        self.treeview.scroll_to_cell(row, use_align=True, row_align=0.5)
 
     def set_revision_id(self, revid):
         """Change the currently selected revision.
@@ -208,22 +198,7 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.connect("cursor-changed", self._on_selection_changed)
         self.treeview.set_property('fixed-height-mode', True)
         self.treeview.show()
-
-        if self.batchsize:
-            vbox = gtk.VBox()
-            vbox.pack_start(self.treeview, expand = True)
-            self.nextbutton = gtk.Button("next %d revisions" % self.batchsize)
-            self.nextbutton.connect('clicked', self._next_clicked)
-            self.allbutton = gtk.Button("show all revisions")
-            self.allbutton.connect('clicked', self._all_clicked)
-            hbox = gtk.HBox()
-            hbox.pack_start(self.nextbutton, False, True, 4)
-            hbox.pack_start(self.allbutton, False, True, 4)
-            vbox.pack_start(hbox, expand = False)
-            self.add_with_viewport(vbox)
-        else:
-            self.nextbutton = None
-            self.add(self.treeview)
+        self.add(self.treeview)
 
         self.graph_cell = CellRendererGraph()
         self.graph_column = gtk.TreeViewColumn()
