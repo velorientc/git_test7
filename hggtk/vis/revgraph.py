@@ -11,6 +11,9 @@ __author__    = "Joel Rosdahl <joel@rosdahl.net>"
 from mercurial.node import nullrev
 from mercurial import cmdutil, util, ui
 
+def __get_parents(repo, rev):
+    return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
+
 def revision_grapher(repo, start_rev, stop_rev, branch=None):
     """incremental revision grapher
 
@@ -77,22 +80,18 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None):
         revs = next_revs
         curr_rev -= 1
 
-def filtered_log_generator(repo, revs, pats, opts):
-    '''Fill view model iteratively
-       repo - Mercurial repository object
-       revs - list of revision specifiers (revno, hash, tags, etc)
-       pats - list of file names or patterns
-    '''
-    def get_parents(rev):
-        return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
-
-    # User specified list of revisions, pretty easy
+def dumb_log_generator(repo, revs):
     for revname in revs:
         node = repo.lookup(revname)
         rev = repo.changelog.rev(node)
-        yield (rev, (0,0), [], get_parents(rev))
-    if revs: return
+        yield (rev, (0,0), [], __get_parents(repo, rev))
 
+def filtered_log_generator(repo, pats, opts):
+    '''Fill view model iteratively
+       repo - Mercurial repository object
+       pats - list of file names or patterns
+       opts - command line options for log command
+    '''
     # Log searches: pattern, keyword, date, etc
     df = False
     if opts['date']:
@@ -108,7 +107,7 @@ def filtered_log_generator(repo, revs, pats, opts):
             continue
         if st != 'add':
             continue
-        parents = get_parents(rev)
+        parents = __get_parents(repo, rev)
         if opts['no_merges'] and len(parents) == 2:
             continue
         if opts['only_merges'] and len(parents) != 2:

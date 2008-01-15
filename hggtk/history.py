@@ -22,6 +22,7 @@ from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
+from logfilter import FilterDialog
 from hgcmd import CmdDialog
 from update import UpdateDialog
 from merge import MergeDialog
@@ -36,7 +37,7 @@ class GLog(GDialog):
         title = os.path.basename(self.repo.root) + ' log ' 
         if self.opts['rev']:
             title += '--rev ' + ':'.join(self.opts['rev'])
-        if self.pats != ['']:
+        if len(self.pats) > 1 or not os.path.isdir(self.pats[0]):
             title += '{search} ' + ' '.join(self.pats)
         return title
 
@@ -74,21 +75,12 @@ class GLog(GDialog):
 
     def _filter_clicked(self, toolbutton, data=None):
         '''Launch filter configuration dialog'''
-        # TODO: :-)
-        return
-        # This dialog should include...
-        #
-        # branch drop-down list, sets _filter='branch:name'
-        self._filter = 'branch:0.9.2compat'
-        self.reload_log()
-        #
-        # date selector, sets _filter='date:pattern'
-        #   allow user to launch 'hg help dates'
-        #
-        # keyword entry, sets _filter='keyword:word0,word1'
-        #
-        # revision range entry, calls cmdutil.revrange(), sets
-        # opts['rev'], sets _filter to 'all'
+        dlg = FilterDialog(self.repo.root, [], self.pats)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        if hasattr(dlg, 'opts'):
+            self.reload_log(dlg.opts)
 
     def _filter_selected(self, widget, data=None):
         if widget.get_active():
@@ -171,38 +163,47 @@ class GLog(GDialog):
         l.reverse()
         return l
 
-    def reload_log(self):
+    def reload_log(self, filteropts = {}):
         """Send refresh event to treeview object"""
+        self.details_text.set_buffer(gtk.TextBuffer())
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
+        self.opts['revs'] = None
         self.opts['no_merges'] = False
         self.opts['only_merges'] = False
+        self.opts['revrange'] = filteropts.get('revrange', None)
+        self.opts['date'] = filteropts.get('date', None)
+        self.opts['keyword'] = filteropts.get('keyword', [])
         revs = []
-        if self._filter == "all":
-            if not self.opts['rev']:
-                self.graphview.refresh(None, None, self.opts)
-                return
-            revs = self.opts['rev']
-        elif self._filter.startswith("branch:"):
-            self.graphview.refresh(None, self._filter[7:], self.opts)
-            return
+        if filteropts:
+            branch = filteropts.get('branch', None)
+            if filteropts.has_key('revrange') or filteropts.has_key('branch'):
+                self.graphview.refresh(True, branch, self.opts)
+            else:
+                filter = filteropts.get('pats', [])
+                self.graphview.refresh(False, filter, self.opts)
+        elif self._filter == "all":
+            if len(self.pats) > 1 or not os.path.isdir(self.pats[0]):
+                self.graphview.refresh(False, self.pats, self.opts)
+            else:
+                self.graphview.refresh(True, None, self.opts)
         elif self._filter == "only_merges":
             self.opts['only_merges'] = True
-            self.graphview.refresh([], [], self.opts)
-            return
+            self.graphview.refresh(False, [], self.opts)
         elif self._filter == "no_merges":
             self.opts['no_merges'] = True
-            self.graphview.refresh([], [], self.opts)
-            return
+            self.graphview.refresh(False, [], self.opts)
         elif self._filter == "tagged":
-            revs = self._get_tagged_rev()
+            self.opts['revs'] = self._get_tagged_rev()
+            self.graphview.refresh(False, [], self.opts)
         elif self._filter == "parents":
             repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
-            revs = [str(x) for x in repo_parents]
+            self.opts['revs'] = [str(x) for x in repo_parents]
+            self.graphview.refresh(False, [], self.opts)
         elif self._filter == "heads":
             heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
-            revs = [str(x) for x in heads]
-        self.graphview.refresh(revs, self.pats, self.opts)
+            self.opts['revs'] = [str(x) for x in heads]
+            self.graphview.refresh(False, [], self.opts)
 
     def load_details(self, rev):
         parents = self.currow[treemodel.PARENTS]
@@ -563,6 +564,6 @@ def run(root='', cwd='', files=[], hgpath='hg', **opts):
 if __name__ == "__main__":
     import sys
     opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
     opts['files'] = [opts['root']]
     run(**opts)

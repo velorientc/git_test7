@@ -12,7 +12,7 @@ import sys
 import gtk
 from dialog import *
 from mercurial.node import *
-from mercurial import util, hg, ui
+from mercurial import cmdutil, util, hg, ui
 from shlib import shell_notify, set_tortoise_icon
 
 class FilterDialog(gtk.Dialog):
@@ -56,6 +56,7 @@ class FilterDialog(gtk.Dialog):
         self.branchbox = gtk.ComboBoxEntry(self.branchlist, 0)
         hbox.pack_start(self.branchradio, False, False, 4)
         hbox.pack_start(self.branchbox, True, True, 4)
+        self.tips.set_tip(hbox, 'View revision graph of named branch')
         self.vbox.pack_start(hbox, False, False, 4)
         for name in self.repo.branchtags().keys():
             self.branchlist.append([name])
@@ -68,6 +69,7 @@ class FilterDialog(gtk.Dialog):
         hbox.pack_start(self.revradio, False, False, 4)
         hbox.pack_start(self.rev0Entry, True, False, 4)
         hbox.pack_start(self.rev1Entry, True, False, 4)
+        self.tips.set_tip(hbox, 'View range of revisions')
         self.vbox.pack_start(hbox, False, False, 4)
         if revs:
             self.rev0Entry.set_text(str(revs[0]))
@@ -77,6 +79,7 @@ class FilterDialog(gtk.Dialog):
         hbox = gtk.HBox()
         self.searchradio = gtk.RadioButton(self.branchradio, 'Search Filter')
         hbox.pack_start(self.searchradio, False, False, 4)
+        self.tips.set_tip(hbox, 'Search repository changelog with criteria')
         self.vbox.pack_start(hbox, False, False, 4)
 
         self.searchframe = gtk.Frame()
@@ -85,27 +88,32 @@ class FilterDialog(gtk.Dialog):
         self.searchframe.add(vbox)
 
         hbox = gtk.HBox()
-        self.filescheck = gtk.CheckButton("File(s)")
         self.filesentry = gtk.Entry()
-        hbox.pack_start(self.filescheck, False, False, 4)
+        hbox.pack_start(gtk.Label('File(s):'), False, False, 4)
         hbox.pack_start(self.filesentry, True, True, 4)
+        self.tips.set_tip(hbox, 'Display only changesets affecting these'
+                ' comma separated file paths')
         vbox.pack_start(hbox, False, False, 4)
+        if files:
+            self.filesentry.set_text(', '.join(files))
         
         hbox = gtk.HBox()
-        self.kwcheck = gtk.CheckButton("Keyword(s)")
         self.kwentry = gtk.Entry()
-        hbox.pack_start(self.kwcheck, False, False, 4)
+        hbox.pack_start(gtk.Label('Keyword(s):'), False, False, 4)
         hbox.pack_start(self.kwentry, True, True, 4)
+        self.tips.set_tip(hbox, 'Display only changesets matching these'
+                ' comma separated case insensitive keywords')
         vbox.pack_start(hbox, False, False, 4)
 
         hbox = gtk.HBox()
-        self.datecheck = gtk.CheckButton("Date")
         self.dateentry = gtk.Entry()
         self.helpbutton = gtk.Button("Help...")
         self.helpbutton.connect('clicked', self._date_help)
-        hbox.pack_start(self.datecheck, False, False, 4)
+        hbox.pack_start(gtk.Label('Date:'), False, False, 4)
         hbox.pack_start(self.dateentry, True, True, 4)
         hbox.pack_start(self.helpbutton, False, False, 4)
+        self.tips.set_tip(hbox, 'Display only changesets matching this'
+                ' date specification')
         vbox.pack_start(hbox, False, False, 4)
 
         self.searchradio.connect('toggled', self.searchtoggle)
@@ -145,15 +153,48 @@ class FilterDialog(gtk.Dialog):
         return tbutton
         
     def _btn_execute_clicked(self, button, data=None):
-        # validate inputs
-        # set _filter, _revs
-        # signal response
-        pass
+        opts = {}
+        if self.searchradio.get_active():
+            pats = self.filesentry.get_text()
+            kw = self.kwentry.get_text()
+            date = self.dateentry.get_text()
+            if pats:
+                opts['pats'] = [p.strip() for p in pats.split(',')]
+            if kw:
+                opts['keyword'] = [w.strip() for w in kw.split(',')]
+            if date:
+                try:
+                    df = util.matchdate(date)
+                    opts['date'] = date
+                except:
+                    # TODO: make message box
+                    print 'invalid date', date
+                    return
+        elif self.revradio.get_active():
+            rev0 = self.rev0Entry.get_text()
+            rev1 = self.rev1Entry.get_text()
+            try:
+                range = cmdutil.revrange(self.repo, [rev0, rev1])
+                range.sort()
+                range.reverse()
+                opts['revrange'] = range
+            except Exception, e:
+                # TODO: make message box
+                print e, rev0, rev1
+                return
+        elif self.branchradio.get_active():
+            branch = self.branchbox.child.get_text()
+            if branch:
+                opts['branch'] = branch
+            else:
+                return
+
+        self.opts = opts
+        self.emit('response', gtk.RESPONSE_OK)
         
     def _date_help(self, button):
-        cmdline = ['hg', 'help', 'dates']
         from hgcmd import CmdDialog
-        dlg = CmdDialog(cmdline)
+        dlg = CmdDialog(['hg', 'help', 'dates'], False)
         dlg.run()
         dlg.hide()
 

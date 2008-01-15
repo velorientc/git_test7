@@ -1,4 +1,4 @@
-#
+#_
 # Configuration dialog for TortoiseHg and Mercurial
 #
 # Copyright (C) 2007 Steve Borho <steve@borho.org>

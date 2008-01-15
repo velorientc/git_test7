@@ -12,7 +12,7 @@ import gobject
 import pango
 import treemodel
 from graphcell import CellRendererGraph
-from revgraph import revision_grapher, filtered_log_generator
+from revgraph import *
 
 class TreeView(gtk.ScrolledWindow):
 
@@ -81,23 +81,26 @@ class TreeView(gtk.ScrolledWindow):
                 return False
         return True
 
-    def create_log_generator(self, revs, pats, opts):
-        if revs is None:
+    def create_log_generator(self, graphcol, pats, opts):
+        if graphcol:
+            end = 0
             if pats is not None:  # branch name
                 b = self.repo.branchtags()
                 if b.has_key(pats):
                     node = b[pats]
                     start = self.repo.changelog.rev(node)
-                    print 'branch', pats, 'starts at rev', start
                 else:
                     start = self.repo.changelog.count() - 1
+            elif opts['revrange']:
+                start, end = opts['revrange']
             else:
                 start = self.repo.changelog.count() - 1
-            self.grapher = revision_grapher(self.repo, start, 0, pats)
-            self.show_graph = True
+            self.grapher = revision_grapher(self.repo, start, end, pats)
+        elif opts['revs']:
+            self.grapher = dumb_log_generator(self.repo, opts['revs'])
         else:
-            self.grapher = filtered_log_generator(self.repo, revs, pats, opts)
-            self.show_graph = False
+            self.grapher = filtered_log_generator(self.repo, pats, opts)
+        self.show_graph = graphcol
         self.graphdata = []
         self.index = {}
         self.max_cols = 1
@@ -120,8 +123,12 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
             self.limit = len(self.graphdata)
 
-        if not self.limit or len(self.graphdata) < self.limit:
+        if self.limit is None or len(self.graphdata) < self.limit:
             return True
+
+        if not len(self.graphdata):
+            self.treeview.set_model(None)
+            return False
 
         if not self.model:
             self.model = treemodel.TreeModel(self.repo, self.graphdata)
@@ -200,10 +207,10 @@ class TreeView(gtk.ScrolledWindow):
         """
         return self.get_property('parents')
         
-    def refresh(self, revs, pats, opts):
+    def refresh(self, graphcol, pats, opts):
         self.repo.invalidate()
         self.repo.dirstate.invalidate()
-        self.create_log_generator(revs, pats, opts)
+        self.create_log_generator(graphcol, pats, opts)
         gobject.idle_add(self.populate, self.get_revision())
 
     def construct_treeview(self):
