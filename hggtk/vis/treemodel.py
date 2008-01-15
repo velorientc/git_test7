@@ -24,6 +24,7 @@ TIMESTAMP = 6
 REVISION = 7
 PARENTS = 8
 WCPARENT = 9
+TAGS = 10
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -38,7 +39,7 @@ class TreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
 
     def on_get_n_columns(self):
-        return 10
+        return 11
 
     def on_get_column_type(self, index):
         if index == REVID: return gobject.TYPE_STRING
@@ -51,6 +52,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == REVISION: return gobject.TYPE_PYOBJECT
         if index == PARENTS: return gobject.TYPE_PYOBJECT
         if index == WCPARENT: return gobject.TYPE_STRING
+        if index == TAGS: return gobject.TYPE_STRING
 
     def on_get_iter(self, path):
         return path[0]
@@ -77,26 +79,19 @@ class TreeModel(gtk.GenericTreeModel):
             summary = summary.split('\n')[0]
             summary = gobject.markup_escape_text(summary)
             node = self.repo.lookup(revid)
-            tags = self.repo.nodetags(node)
-            tagstring = ''
-            for t in tags:
-                tagstring += '<span background="yellow"><small>' + \
-                    t + '</small></span> '
-            if revid in self.parents:
-                summary = '<i><b>' + summary + '</b></i>'
-            summary = tagstring + summary
+            tags = ', '.join(self.repo.nodetags(node))
 
             if '<' in ctx.user():
                 author = re.sub('<.*@.*>', '', ctx.user()).strip(' ')
             else:
                 author = util.shortuser(ctx.user())
 
-            date = strftime("%Y-%m-%d %H:%M", localtime(ctx.date()[0]))
+            date = strftime("%Y-%m-%d %H:%M:%S", localtime(ctx.date()[0]))
 
             wc_parent = revid in self.parents and gtk.STOCK_HOME or ''
 
             revision = (None, node, revid, None, summary,
-                    author, date, None, parents, wc_parent)
+                    author, date, None, parents, wc_parent, tags)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
@@ -111,6 +106,8 @@ class TreeModel(gtk.GenericTreeModel):
             return revision[TIMESTAMP]
         if column == WCPARENT:
             return revision[WCPARENT]
+        if column == TAGS:
+            return revision[TAGS]
 
     def on_iter_next(self, rowref):
         if rowref < len(self.line_graph_data) - 1:

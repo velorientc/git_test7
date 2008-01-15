@@ -267,11 +267,9 @@ class GLog(GDialog):
                     show_date = time.strftime("%Y-%m-%d %H:%M:%S",
                             time.gmtime(date_secs))
                     self.model.append((is_parent, is_head, 
-                                       long(log['rev']),
-                                       log['tag'], person(log['user']),
-                                       log['summary'], show_date,
-                                       date_secs,
-                                       parents))
+                                       long(log['rev']), log['tag'],
+                                       log['summary'], person(log['user']),
+                                       show_date, date_secs, parents))
                 yield logtext is not None
                 # Abort if the graph view has been swapped in
                 if self.grapher: return
@@ -510,46 +508,48 @@ class GLog(GDialog):
         
         col = 1
         
-        col_status = gtk.TreeViewColumn('status')
+        col_status = gtk.TreeViewColumn('Status')
         col_status.pack_start(parent_cell, False)
         col_status.pack_start(head_cell, False)
         col_status.set_cell_data_func(parent_cell, self.make_parent)
         col_status.set_cell_data_func(head_cell, self.make_head)
         
         col += 1
-        col_rev = gtk.TreeViewColumn('rev', changeset_cell)
+        col_rev = gtk.TreeViewColumn('Rev', changeset_cell)
         col_rev.add_attribute(changeset_cell, 'text', col)
         col_rev.set_cell_data_func(changeset_cell, self._text_color)
         col_rev.set_sort_column_id(col)
         col_rev.set_resizable(False)
         
         col += 1
-        col_tag = gtk.TreeViewColumn('tag', tags_cell)
+        tags_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
+        tags_cell.set_property('width_chars', 8)
+        col_tag = gtk.TreeViewColumn('Tag', tags_cell)
         col_tag.add_attribute(tags_cell, 'text', col)
         col_tag.set_cell_data_func(tags_cell, self._text_color)
         col_tag.set_sort_column_id(col)
         col_tag.set_resizable(True)
         
         col += 1
-        user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
-        user_cell.set_property('width_chars', 20)
-        col_user = gtk.TreeViewColumn('user', user_cell)
-        col_user.add_attribute(user_cell, 'text', col)
-        col_user.set_cell_data_func(user_cell, self._text_color)
-        col_user.set_sort_column_id(col)
-        col_user.set_resizable(True)
-        
-        col += 1
         summary_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
         summary_cell.set_property('width_chars', 65)
-        col_sum = gtk.TreeViewColumn('summary', summary_cell)
+        col_sum = gtk.TreeViewColumn('Summary', summary_cell)
         col_sum.add_attribute(summary_cell, 'text', col)
         col_sum.set_cell_data_func(summary_cell, self._text_color)
         col_sum.set_sort_column_id(col)
         col_sum.set_resizable(True)
 
         col += 1
-        col_date = gtk.TreeViewColumn('date', date_cell)
+        user_cell.set_property('ellipsize', pango.ELLIPSIZE_END)
+        user_cell.set_property('width_chars', 20)
+        col_user = gtk.TreeViewColumn('User', user_cell)
+        col_user.add_attribute(user_cell, 'text', col)
+        col_user.set_cell_data_func(user_cell, self._text_color)
+        col_user.set_sort_column_id(col)
+        col_user.set_resizable(True)
+        
+        col += 1
+        col_date = gtk.TreeViewColumn('Date', date_cell)
         col_date.add_attribute(date_cell, 'text', col)
         col_date.set_cell_data_func(date_cell, self._text_color)
         col_date.set_sort_column_id(col)
@@ -558,8 +558,8 @@ class GLog(GDialog):
         self.tree.append_column(col_status)
         self.tree.append_column(col_rev)
         self.tree.append_column(col_tag)
-        self.tree.append_column(col_user)
         self.tree.append_column(col_sum)
+        self.tree.append_column(col_user)
         self.tree.append_column(col_date)
         self.tree.set_headers_clickable(True)
         self.tree.show_all()
