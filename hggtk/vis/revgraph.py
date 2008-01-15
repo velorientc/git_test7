@@ -93,24 +93,24 @@ def filtered_log_generator(repo, revs, pats, opts):
         yield (rev, (0,0), [], get_parents(rev))
     if revs: return
 
+    simple = True
+    for k in ('keyword', 'date', 'only_merges', 'no_merges'):
+        if opts[k]:
+            simple = False
+            break
+
     # 'All revisions' filter, even easier
-    if pats == [''] and not opts['keyword'] and not opts['date']:
+    if pats == [''] and simple:
         rev = repo.changelog.count()-1
         while rev >= 0:
             yield (rev, (0,0), [], get_parents(rev))
             rev = rev-1
         return
 
-    # pattern, keyword, or date search.  respects merge, no_merge options
-    # TODO: add copies/renames later
+    # Log searches: pattern, keyword, date, etc
     df = False
     if opts['date']:
         df = util.matchdate(opts['date'])
-
-    if not opts.has_key('merges'):
-        opts['merges'] = None
-    if not opts.has_key('no_merges'):
-        opts['no_merges'] = None
 
     stack = []
     get = util.cachefunc(lambda r: repo.changectx(r).changeset())
@@ -125,7 +125,7 @@ def filtered_log_generator(repo, revs, pats, opts):
         parents = get_parents(rev)
         if opts['no_merges'] and len(parents) == 2:
             continue
-        if opts['merges'] and len(parents) != 2:
+        if opts['only_merges'] and len(parents) != 2:
             continue
 
         if df:
@@ -133,6 +133,7 @@ def filtered_log_generator(repo, revs, pats, opts):
             if not df(changes[2][0]):
                 continue
 
+        # TODO: add copies/renames later
         if opts['keyword']:
             changes = get(rev)
             miss = 0

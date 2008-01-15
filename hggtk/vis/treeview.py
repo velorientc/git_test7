@@ -170,8 +170,9 @@ class TreeView(gtk.ScrolledWindow):
         return self.get_property('revision')
 
     def scroll_to_revision(self, revid):
-        row = self.index[revid]
-        self.treeview.scroll_to_cell(row, use_align=True, row_align=0.5)
+        if self.index.has_key(revid):
+            row = self.index[revid]
+            self.treeview.scroll_to_cell(row, use_align=True, row_align=0.5)
 
     def set_revision_id(self, revid):
         """Change the currently selected revision.

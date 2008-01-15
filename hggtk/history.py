@@ -70,24 +70,9 @@ class GLog(GDialog):
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
-    def _filter_all(self, widget, data=None):
+    def _filter_selected(self, widget, data=None):
         if widget.get_active():
-            self._filter = "all"
-            self.reload_log()
-            
-    def _filter_tagged(self, widget, data=None):
-        if widget.get_active():
-            self._filter = "tagged"
-            self.reload_log()
-        
-    def _filter_parents(self, widget, data=None):
-        if widget.get_active():
-            self._filter = "parents"
-            self.reload_log()
-            
-    def _filter_heads(self, widget, data=None):
-        if widget.get_active():
-            self._filter = "heads"
+            self._filter = data
             self.reload_log()
 
     def _filter_menu(self):
@@ -95,19 +80,27 @@ class GLog(GDialog):
         
         button = gtk.RadioMenuItem(None, "Show All Revisions")
         button.set_active(True)
-        button.connect("toggled", self._filter_all)
+        button.connect("toggled", self._filter_selected, 'all')
         menu.append(button)
         
         button = gtk.RadioMenuItem(button, "Show Tagged Revisions")
-        button.connect("toggled", self._filter_tagged)
+        button.connect("toggled", self._filter_selected, 'tagged')
         menu.append(button)
        
         button = gtk.RadioMenuItem(button, "Show Parent Revisions")
-        button.connect("toggled", self._filter_parents)
+        button.connect("toggled", self._filter_selected, 'parents')
         menu.append(button)
        
         button = gtk.RadioMenuItem(button, "Show Head Revisions")
-        button.connect("toggled", self._filter_heads)
+        button.connect("toggled", self._filter_selected, 'heads')
+        menu.append(button)
+       
+        button = gtk.RadioMenuItem(button, "Show Only Merge Revisions")
+        button.connect("toggled", self._filter_selected, 'only_merges')
+        menu.append(button)
+       
+        button = gtk.RadioMenuItem(button, "Show Non-Merge Revisions")
+        button.connect("toggled", self._filter_selected, 'no_merges')
         menu.append(button)
        
         menu.show_all()
@@ -162,12 +155,22 @@ class GLog(GDialog):
         """Send refresh event to treeview object"""
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
+        self.opts['no_merges'] = False
+        self.opts['only_merges'] = False
         revs = []
         if self._filter == "all":
             if not self.opts['rev']:
                 self.graphview.refresh(None, None, self.opts)
                 return
             revs = self.opts['rev']
+        elif self._filter == "only_merges":
+            self.opts['only_merges'] = True
+            self.graphview.refresh([], [''], self.opts)
+            return
+        elif self._filter == "no_merges":
+            self.opts['no_merges'] = True
+            self.graphview.refresh([], [''], self.opts)
+            return
         elif self._filter == "tagged":
             revs = self._get_tagged_rev()
         elif self._filter == "parents":
