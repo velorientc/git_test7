@@ -227,6 +227,8 @@ class GLog(GDialog):
         buffer.insert_with_tags_by_name(buff_iter,
                 'changeset: ' + change + '\n', 'changeset')
         buffer.insert_with_tags_by_name(buff_iter,
+                'branch:    ' + ctx.branch() + '\n', 'changeset')
+        buffer.insert_with_tags_by_name(buff_iter,
                 'user:      ' + ctx.user() + '\n', 'changeset')
         buffer.insert_with_tags_by_name(buff_iter,
                 'date:      ' + date + '\n', 'date')
