@@ -437,22 +437,6 @@ class GLog(GDialog):
         text = text_buffer.get_text(beg, end)
         return text
         
-    def _search_in_tree(self, model, column, key, iter, data):
-        """Searches all fields shown in the tree when the user hits crtr+f,
-        not just the ones that are set via tree.set_search_column.
-        Case insensitive
-        """
-        key = key.lower()
-        searchable = [x.lower() for x in (
-                        str(model.get_value(iter,2)), #rev id (local)
-                        model.get_value(iter,4), #author
-                        model.get_value(iter,5), #summary
-                        )]
-        for field in searchable:
-            if field.find(key) != -1:
-                return False
-        return True
-
     def make_parent(self, tvcolumn, cell, model, iter):
         stock = model.get_value(iter, 0)
         pb = self.tree.render_icon(stock, gtk.ICON_SIZE_MENU, None)
@@ -517,7 +501,6 @@ class GLog(GDialog):
         self.tree = gtk.TreeView(self.model)
         self.tree.set_reorderable(False)
         self.tree.set_enable_search(True)
-        self.tree.set_search_equal_func(self._search_in_tree,None)
         # Not compatible with <PyGtk 2.10, and is redundant with next line
         # self.tree.set_rubber_banding(False)
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)

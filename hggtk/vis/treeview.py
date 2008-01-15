@@ -73,6 +73,18 @@ class TreeView(gtk.ScrolledWindow):
         self.create_grapher()
         gobject.idle_add(self.populate)
 
+    def search_in_tree(self, model, column, key, iter, data):
+        """Searches all fields shown in the tree when the user hits crtr+f,
+        not just the ones that are set via tree.set_search_column.
+        Case insensitive
+        """
+        key = key.lower()
+        for col in (treemodel.REVID, treemodel.TAGS, treemodel.COMMITER,
+                treemodel.MESSAGE):
+            if key in model.get_value(iter, col).lower():
+                return False
+        return True
+
     def create_grapher(self):
         self.grapher = revision_grapher(self.repo,
                 self.repo.changelog.count() - 1, 0)
@@ -188,7 +200,8 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview = gtk.TreeView()
 
         self.treeview.set_rules_hint(True)
-        self.treeview.set_search_column(treemodel.REVID)
+        self.treeview.set_enable_search(True)
+        self.treeview.set_search_equal_func(self.search_in_tree, None)
         
         # Fix old PyGTK bug - by JAM
         set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
