@@ -599,6 +599,7 @@ class GLog(GDialog):
         
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.set_shadow_type(gtk.SHADOW_IN)
         scroller.add(self.tree)
         return scroller
 
