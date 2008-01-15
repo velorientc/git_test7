@@ -65,22 +65,12 @@ class GLog(GDialog):
                     self._refresh_clicked, menu=self._filter_menu())
         tbuttons.append(self.filterbutton)
         tbuttons.append(gtk.SeparatorToolItem())
-
-        self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN, '_more',
-                    self._more_clicked)
-        tbuttons.append(self.nextbutton)
-
-        self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
-                '_load all', self._load_all_clicked)
-        tbuttons.append(self.allbutton)
-
-        tbuttons.append(gtk.SeparatorToolItem())
         return tbuttons
 
-    def _more_clicked(self, button, data):
+    def _more_clicked(self, button):
         self.graphview.next_revision_batch()
 
-    def _load_all_clicked(self, button, data):
+    def _load_all_clicked(self, button):
         self.graphview.load_all_revisions()
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
@@ -318,7 +308,7 @@ class GLog(GDialog):
                 limit = None
         else:
             limit = None
-        self.limit = limit
+
         self.graphview = TreeView(self.repo, limit)
         self.tree = self.graphview.treeview
         self.graphview.connect('revision-selected', self.selection_changed)
@@ -330,7 +320,25 @@ class GLog(GDialog):
         self.tree.connect('row-activated', self._tree_row_act)
         #self.tree.modify_font(pango.FontDescription(self.fontlist))
         
-        self.tree_frame.add(self.graphview)
+        self.tips = gtk.Tooltips()
+
+        hbox = gtk.HBox()
+        hbox.pack_start(self.graphview, True, True, 0)
+        vbox = gtk.VBox()
+        self.nextbutton = gtk.ToolButton(gtk.STOCK_GO_DOWN)
+        self.nextbutton.connect('clicked', self._more_clicked)
+        self.nextbutton.set_tooltip(self.tips,
+                'show next %d revisions' % limit)
+        self.allbutton = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
+        self.allbutton.connect('clicked', self._load_all_clicked)
+        self.allbutton.set_tooltip(self.tips,
+                'show all remaining revisions')
+        vbox.pack_start(gtk.Label(''), True, True)
+        vbox.pack_start(self.nextbutton, False, False)
+        vbox.pack_start(self.allbutton, False, False)
+
+        hbox.pack_start(vbox, False, False, 0)
+        self.tree_frame.add(hbox)
         self.tree_frame.show_all()
 
         details_frame = gtk.Frame()
