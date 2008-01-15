@@ -10,7 +10,7 @@ dialog.  Other portions stolen from graphlog extension.
 import gtk
 import gobject
 import re
-from time import (strftime, localtime)
+from time import (strftime, gmtime)
 from mercurial import util
 
 # treemodel row enumerated attributes
@@ -89,7 +89,7 @@ class TreeModel(gtk.GenericTreeModel):
             else:
                 author = util.shortuser(ctx.user())
 
-            date = strftime("%Y-%m-%d %H:%M:%S", localtime(ctx.date()[0]))
+            date = strftime("%Y-%m-%d %H:%M:%S", gmtime(ctx.date()[0]))
 
             wc_parent = revid in self.parents and gtk.STOCK_HOME or ''
             head = revid in self.heads and gtk.STOCK_EXECUTE or ''
