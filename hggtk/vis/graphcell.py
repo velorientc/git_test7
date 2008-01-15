@@ -160,7 +160,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         (column, colour) = self.node
         ctx.arc(cell_area.x + box_size * column + box_size / 2,
                 cell_area.y + cell_area.height / 2,
-                box_size / 4, 0, 2 * math.pi)
+                box_size / 5, 0, 2 * math.pi)
 
         self.set_colour(ctx, colour, 0.0, 0.5)
         ctx.stroke_preserve()
