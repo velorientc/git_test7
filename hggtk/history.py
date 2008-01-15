@@ -78,12 +78,15 @@ class GLog(GDialog):
         return tbuttons
 
     def _more_clicked(self, button, data):
-        if self.graphview.next_revision_batch():
-            self.nextbutton.set_sensitive(False)
-            self.allbutton.set_sensitive(False)
+        self.graphview.next_revision_batch()
 
     def _load_all_clicked(self, button, data):
         self.graphview.load_all_revisions()
+        self.nextbutton.set_sensitive(False)
+        self.allbutton.set_sensitive(False)
+
+    def revisions_loaded(self, graphview):
+        '''Treeview reports log generator has exited'''
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
@@ -319,6 +322,7 @@ class GLog(GDialog):
         self.graphview = TreeView(self.repo, limit)
         self.tree = self.graphview.treeview
         self.graphview.connect('revision-selected', self.selection_changed)
+        self.graphview.connect('revisions-loaded', self.revisions_loaded)
         self.graphview.set_property('date-column-visible', True)
 
         self.tree.connect('button-release-event', self._tree_button_release)

@@ -98,22 +98,23 @@ class TreeView(gtk.ScrolledWindow):
     def populate(self, revision=None):
         """Fill the treeview with contents.
         """
-        savedlen = len(self.graphdata)
-        while not self.limit or len(self.graphdata) < self.limit:
-            try:
-                (rev, node, lines, parents) = self.grapher.next()
-            except StopIteration:
-                break
+        try:
+            (rev, node, lines, parents) = self.grapher.next()
             self.max_cols = max(self.max_cols, len(lines))
             self.index[rev] = len(self.graphdata)
             self.graphdata.append( (rev, node, lines, parents) )
-
-        if self.model:
-            for x in xrange(savedlen, len(self.graphdata)):
-                rowref = self.model.get_iter(x)
+            if self.model:
+                rowref = self.model.get_iter(len(self.graphdata)-1)
                 path = self.model.get_path(rowref) 
                 self.model.row_inserted(path, rowref) 
-        else:
+        except StopIteration:
+            self.emit('revisions-loaded')
+            self.limit = len(self.graphdata)
+
+        if not self.limit or len(self.graphdata) < self.limit:
+            return True
+
+        if not self.model:
             self.model = treemodel.TreeModel(self.repo, self.graphdata)
             self.treeview.set_model(self.model)
 
@@ -129,7 +130,6 @@ class TreeView(gtk.ScrolledWindow):
             self.treeview.set_cursor(0)
         else:
             self.set_revision_id(revision[treemodel.REVID])
-        self.emit('revisions-loaded')
         return False
 
     def do_get_property(self, property):
@@ -160,7 +160,6 @@ class TreeView(gtk.ScrolledWindow):
     def next_revision_batch(self):
         self.limit += self.batchsize
         gobject.idle_add(self.populate, self.get_revision())
-        return self.limit >= self.repo.changelog.count()
 
     def load_all_revisions(self):
         self.limit = None
