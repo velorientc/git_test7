@@ -54,17 +54,17 @@ class GLog(GDialog):
                 gtk.SeparatorToolItem(),
              ]
 
-        self.filterbutton = self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
-                    self._refresh_clicked, menu=self._filter_menu())
-        tbuttons.append(self.filterbutton)
-        tbuttons.append(gtk.SeparatorToolItem())
-
         self.graph_toggle = gtk.ToggleToolButton(gtk.STOCK_CONVERT)
         self.graph_toggle.set_use_underline(True)
         self.graph_toggle.set_label('_show graph')
         self.graph_toggle.set_active(False)
         self.graph_toggle.connect('toggled', self._graph_toggled)
         tbuttons.append(self.graph_toggle)
+
+        self.filterbutton = self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
+                    self._refresh_clicked, menu=self._filter_menu())
+        tbuttons.append(self.filterbutton)
+        tbuttons.append(gtk.SeparatorToolItem())
         return tbuttons
 
     def _graph_toggled(self, togglebutton, data=None):
