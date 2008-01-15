@@ -48,24 +48,14 @@ class GLog(GDialog):
         self.ui.quiet = False
 
     def get_tbbuttons(self):
-        tbuttons = [
+        return [
                 self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
                     self._refresh_clicked),
                 gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
+                    self._refresh_clicked, menu=self._filter_menu()),
+                gtk.SeparatorToolItem()
              ]
-
-        self.graph_toggle = gtk.ToggleToolButton(gtk.STOCK_CONVERT)
-        self.graph_toggle.set_use_underline(True)
-        self.graph_toggle.set_label('_show graph')
-        self.graph_toggle.set_active(False)
-        self.graph_toggle.connect('toggled', self._graph_toggled)
-        tbuttons.append(self.graph_toggle)
-
-        self.filterbutton = self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
-                    self._refresh_clicked, menu=self._filter_menu())
-        tbuttons.append(self.filterbutton)
-        tbuttons.append(gtk.SeparatorToolItem())
-        return tbuttons
 
     def _more_clicked(self, button):
         self.graphview.next_revision_batch()
@@ -79,15 +69,6 @@ class GLog(GDialog):
         '''Treeview reports log generator has exited'''
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
-
-    def _graph_toggled(self, togglebutton, data=None):
-        if togglebutton.get_active():
-            self.graph_col_enabled = True
-            self.filterbutton.set_sensitive(False)
-        else:
-            self.graph_col_enabled = False
-            self.filterbutton.set_sensitive(True)
-        self.reload_log()
 
     def _filter_all(self, widget, data=None):
         if widget.get_active():
@@ -136,6 +117,7 @@ class GLog(GDialog):
     def prepare_display(self):
         self._last_rev = None
         self._filter = "all"
+        self.reload_log()
 
 
     def save_settings(self):
@@ -180,21 +162,21 @@ class GLog(GDialog):
         """Send refresh event to treeview object"""
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
-        if self.graph_col_enabled:
-            self.graphview.refresh(None, None, self.opts)
-        else:
-            revs = []
-            if self._filter == "all":
-                revs = self.opts['rev']
-            elif self._filter == "tagged":
-                revs = self._get_tagged_rev()
-            elif self._filter == "parents":
-                repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
-                revs = [str(x) for x in repo_parents]
-            elif self._filter == "heads":
-                heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
-                revs = [str(x) for x in heads]
-            self.graphview.refresh(revs, self.pats, self.opts)
+        revs = []
+        if self._filter == "all":
+            if not self.opts['rev']:
+                self.graphview.refresh(None, None, self.opts)
+                return
+            revs = self.opts['rev']
+        elif self._filter == "tagged":
+            revs = self._get_tagged_rev()
+        elif self._filter == "parents":
+            repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
+            revs = [str(x) for x in repo_parents]
+        elif self._filter == "heads":
+            heads = [self.repo.changelog.rev(x) for x in self.repo.heads()]
+            revs = [str(x) for x in heads]
+        self.graphview.refresh(revs, self.pats, self.opts)
 
     def load_details(self, rev):
         parents = self.currow[treemodel.PARENTS]
@@ -359,14 +341,6 @@ class GLog(GDialog):
         self._vpaned.pack1(self.tree_frame, True, False)
         self._vpaned.pack2(details_frame, True, True)
         self._vpaned.set_position(self._setting_vpos)
-
-        # Initialize graph selection toggle
-        if self.graph_col_enabled:
-            self.graph_toggle.set_active(True)
-            self.filterbutton.set_sensitive(False)
-        else:
-            self.graph_toggle.set_active(False)
-            self.filterbutton.set_sensitive(True)
         return self._vpaned
 
 
@@ -549,11 +523,6 @@ def run(root='', cwd='', files=[], hgpath='hg', **opts):
     dialog = GLog(u, repo, cwd, files, cmdoptions, True)
     dialog.hgpath = hgpath
 
-    if files and files != [root]:
-        dialog.graph_col_enabled = False
-    else:
-        dialog.graph_col_enabled = True
-    
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     dialog.display()
