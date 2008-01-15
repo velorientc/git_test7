@@ -213,13 +213,16 @@ class TreeView(gtk.ScrolledWindow):
                 "out-lines", treemodel.LINES)
         self.treeview.append_column(self.graph_column)
 
-        cell = gtk.CellRendererPixbuf()
+        pcell = gtk.CellRendererPixbuf()
+        hcell = gtk.CellRendererPixbuf()
         self.status_column = gtk.TreeViewColumn('Status')
-        self.status_column.pack_start(cell, expand=True)
+        self.status_column.pack_start(pcell, expand=True)
+        self.status_column.pack_start(hcell, expand=True)
         self.status_column.set_resizable(True)
         self.status_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.status_column.set_fixed_width(48)
-        self.status_column.set_cell_data_func(cell, self.make_parent)
+        self.status_column.set_cell_data_func(pcell, self.make_parent)
+        self.status_column.set_cell_data_func(hcell, self.make_head)
         self.treeview.append_column(self.status_column)
         
         cell = gtk.CellRendererText()
@@ -280,6 +283,11 @@ class TreeView(gtk.ScrolledWindow):
 
     def make_parent(self, tvcolumn, cell, model, iter):
         stock = model.get_value(iter, treemodel.WCPARENT)
+        pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
+        cell.set_property('pixbuf', pb)
+
+    def make_head(self, tvcolumn, cell, model, iter):
+        stock = model.get_value(iter, treemodel.HEAD)
         pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
         cell.set_property('pixbuf', pb)
 

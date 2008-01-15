@@ -24,7 +24,8 @@ TIMESTAMP = 6
 REVISION = 7
 PARENTS = 8
 WCPARENT = 9
-TAGS = 10
+HEAD = 10
+TAGS = 11
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -33,13 +34,14 @@ class TreeModel(gtk.GenericTreeModel):
         self.revisions = {}
         self.repo = repo
         self.parents = [x.rev() for x in repo.workingctx().parents()]
+        self.heads = [repo.changelog.rev(x) for x in repo.heads()]
         self.line_graph_data = graphdata
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
 
     def on_get_n_columns(self):
-        return 11
+        return 12
 
     def on_get_column_type(self, index):
         if index == REVID: return gobject.TYPE_STRING
@@ -52,6 +54,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == REVISION: return gobject.TYPE_PYOBJECT
         if index == PARENTS: return gobject.TYPE_PYOBJECT
         if index == WCPARENT: return gobject.TYPE_STRING
+        if index == HEAD: return gobject.TYPE_STRING
         if index == TAGS: return gobject.TYPE_STRING
 
     def on_get_iter(self, path):
@@ -89,9 +92,10 @@ class TreeModel(gtk.GenericTreeModel):
             date = strftime("%Y-%m-%d %H:%M:%S", localtime(ctx.date()[0]))
 
             wc_parent = revid in self.parents and gtk.STOCK_HOME or ''
+            head = revid in self.heads and gtk.STOCK_EXECUTE or ''
 
             revision = (None, node, revid, None, summary,
-                    author, date, None, parents, wc_parent, tags)
+                    author, date, None, parents, wc_parent, head, tags)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
@@ -106,6 +110,8 @@ class TreeModel(gtk.GenericTreeModel):
             return revision[TIMESTAMP]
         if column == WCPARENT:
             return revision[WCPARENT]
+        if column == HEAD:
+            return revision[HEAD]
         if column == TAGS:
             return revision[TAGS]
 
