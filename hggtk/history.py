@@ -48,77 +48,65 @@ class GLog(GDialog):
         self.ui.quiet = False
 
     def get_tbbuttons(self):
-        return [
+        tbuttons = [
                 self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
                     self._refresh_clicked),
                 gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
-                    self._refresh_clicked, menu=self._filter_menu()),
-                gtk.SeparatorToolItem(),
              ]
 
-    def _filter_graph(self, widget, data=None):
-        if widget.get_active():
-            self._filter = "graph"
-            if not self.grapher:
-                self.grapher = True
-                self.tree_frame.remove(self.tree_frame.child)
-                self.tree_frame.add(self.get_graph_treeview())
-                self.tree_frame.show_all()
+        self.filterbutton = self.make_toolbutton(gtk.STOCK_INDEX, '_filter',
+                    self._refresh_clicked, menu=self._filter_menu())
+        tbuttons.append(self.filterbutton)
+        tbuttons.append(gtk.SeparatorToolItem())
+
+        self.graph_toggle = gtk.ToggleToolButton(gtk.STOCK_CONVERT)
+        self.graph_toggle.set_use_underline(True)
+        self.graph_toggle.set_label('_show graph')
+        self.graph_toggle.set_active(False)
+        self.graph_toggle.connect('toggled', self._graph_toggled)
+        tbuttons.append(self.graph_toggle)
+        return tbuttons
+
+    def _graph_toggled(self, togglebutton, data=None):
+        if togglebutton.get_active():
+            self.grapher = True
+            self.tree_frame.remove(self.tree_frame.child)
+            self.tree_frame.add(self.get_graph_treeview())
+            self.tree_frame.show_all()
+            self.filterbutton.set_sensitive(False)
+        else:
+            self.grapher = False
+            self.tree_frame.remove(self.tree_frame.child)
+            self.tree_frame.add(self.get_treeview())
+            self.tree_frame.show_all()
+            self.filterbutton.set_sensitive(True)
             self.reload_log()
-            
+
     def _filter_all(self, widget, data=None):
         if widget.get_active():
             self._filter = "all"
-            if self.grapher:
-                self.grapher = False
-                self.tree_frame.remove(self.tree_frame.child)
-                self.tree_frame.add(self.get_treeview())
-                self.tree_frame.show_all()
             self.reload_log()
             
     def _filter_tagged(self, widget, data=None):
         if widget.get_active():
             self._filter = "tagged"
-            if self.grapher:
-                self.grapher = False
-                self.tree_frame.remove(self.tree_frame.child)
-                self.tree_frame.add(self.get_treeview())
-                self.tree_frame.show_all()
             self.reload_log()
         
     def _filter_parents(self, widget, data=None):
         if widget.get_active():
             self._filter = "parents"
-            if self.grapher:
-                self.grapher = False
-                self.tree_frame.remove(self.tree_frame.child)
-                self.tree_frame.add(self.get_treeview())
-                self.tree_frame.show_all()
             self.reload_log()
             
     def _filter_heads(self, widget, data=None):
         if widget.get_active():
             self._filter = "heads"
-            if self.grapher:
-                self.grapher = False
-                self.tree_frame.remove(self.tree_frame.child)
-                self.tree_frame.add(self.get_treeview())
-                self.tree_frame.show_all()
             self.reload_log()
 
     def _filter_menu(self):
         menu = gtk.Menu()
         
-        button = gtk.RadioMenuItem(None, "Show Revisions Graph")
-        if self._filter == 'graph':
-            button.set_active(True)
-        button.connect("toggled", self._filter_graph)
-        menu.append(button)
-        
-        button = gtk.RadioMenuItem(button, "Show All Revisions")
-        if self._filter == 'all':
-            button.set_active(True)
+        button = gtk.RadioMenuItem(None, "Show All Revisions")
+        button.set_active(True)
         button.connect("toggled", self._filter_all)
         menu.append(button)
         
@@ -588,14 +576,17 @@ class GLog(GDialog):
     def get_body(self):
         self._menu = self.tree_context_menu()
 
-        if self.grapher:
-            scroller = self.get_graph_treeview()
-        else:
-            scroller = self.get_treeview()
-
         self.tree_frame = gtk.Frame()
         self.tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        self.tree_frame.add(scroller)
+        self.tree_frame.add(gtk.ScrolledWindow())
+
+        # Toggle graph selection button, triggers treeview allocation
+        if self.grapher:
+            self.graph_toggle.set_active(True)
+            self.filterbutton.set_sensitive(False)
+        else:
+            self.graph_toggle.set_active(False)
+            self.filterbutton.set_sensitive(True)
 
         details_frame = gtk.Frame()
         details_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
