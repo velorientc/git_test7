@@ -93,20 +93,6 @@ def filtered_log_generator(repo, revs, pats, opts):
         yield (rev, (0,0), [], get_parents(rev))
     if revs: return
 
-    simple = True
-    for k in ('keyword', 'date', 'only_merges', 'no_merges'):
-        if opts[k]:
-            simple = False
-            break
-
-    # 'All revisions' filter, even easier
-    if pats == [''] and simple:
-        rev = repo.changelog.count()-1
-        while rev >= 0:
-            yield (rev, (0,0), [], get_parents(rev))
-            rev = rev-1
-        return
-
     # Log searches: pattern, keyword, date, etc
     df = False
     if opts['date']:

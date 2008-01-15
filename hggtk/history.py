@@ -188,11 +188,11 @@ class GLog(GDialog):
             return
         elif self._filter == "only_merges":
             self.opts['only_merges'] = True
-            self.graphview.refresh([], [''], self.opts)
+            self.graphview.refresh([], [], self.opts)
             return
         elif self._filter == "no_merges":
             self.opts['no_merges'] = True
-            self.graphview.refresh([], [''], self.opts)
+            self.graphview.refresh([], [], self.opts)
             return
         elif self._filter == "tagged":
             revs = self._get_tagged_rev()
