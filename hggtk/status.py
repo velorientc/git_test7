@@ -24,6 +24,7 @@ import pango
 from mercurial.i18n import _
 from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
+from thgconfig import ConfigDialog
 from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
@@ -49,18 +50,33 @@ class GStatus(GDialog):
 
 
     def get_menu_info(self):
-        """Returns menu info in this order: merge, addrem, unknown, clean, ignored, deleted 
+        """Returns menu info in this order:
+            merge, addrem, unknown, clean, ignored, deleted 
         """
-        return ((('_difference', self._diff_file), ('_view right', self._view_file), 
-                    ('view _left', self._view_left_file), ('_revert', self._revert_file), ('l_og', self._log_file)),
-                (('_difference', self._diff_file), ('_view', self._view_file), 
-                    ('_revert', self._revert_file), ('l_og', self._log_file)),
-                (('_view', self._view_file), ('_delete', self._delete_file), 
-                    ('_add', self._add_file), ('_ignore', self._ignore_file)),
-                (('_view', self._view_file), ('re_move', self._remove_file), ('l_og', self._log_file)),
-                (('_view', self._view_file), ('_delete', self._delete_file)),
-                (('_view', self._view_file), ('_revert', self._revert_file), 
-                    ('re_move', self._remove_file), ('l_og', self._log_file)))
+        return (
+                (('_difference', self._diff_file),
+                    ('_view right', self._view_file), 
+                    ('view _left', self._view_left_file),
+                    ('_revert', self._revert_file),
+                    ('l_og', self._log_file)),
+                (('_difference', self._diff_file),
+                    ('_view', self._view_file), 
+                    ('_revert', self._revert_file), 
+                    ('l_og', self._log_file)),
+                (('_view', self._view_file),
+                    ('_delete', self._delete_file), 
+                    ('_add', self._add_file),
+                    ('_ignore', self._ignore_file)),
+                (('_view', self._view_file),
+                    ('re_move', self._remove_file),
+                    ('l_og', self._log_file)),
+                (('_view', self._view_file),
+                    ('_delete', self._delete_file)),
+                (('_view', self._view_file),
+                    ('_revert', self._revert_file), 
+                    ('re_move', self._remove_file),
+                    ('l_og', self._log_file))
+                )
 
     ### End of overridable methods ###
 
@@ -420,6 +436,17 @@ class GStatus(GDialog):
             extdiff.dodiff(self.ui, self.repo, self.diffcmd, [self.diffopts],
                             [file], self.opts)
 
+        if self.diffcmd == 'diff':
+            Prompt('No visual diff configured',
+                    'Please select a visual diff application.', self).run()
+            dlg = ConfigDialog(self.repo.root, False)
+            dlg.show_all()
+            dlg.focus_field('tortoisehg.vdiff')
+            dlg.run()
+            dlg.hide()
+            self.ui = ui.ui()
+            self._parse_config()
+            return
         thread = threading.Thread(target=dodiff, name='diff:'+file)
         thread.setDaemon(True)
         thread.start()
@@ -439,15 +466,11 @@ class GStatus(GDialog):
 
                 if copynode:
                     tmproot = tempfile.mkdtemp(prefix='gtools.')
-                    copydir = extdiff.snapshot_node(self.ui, self.repo, [util.pconvert(file)],
-                                                     copynode, tmproot)
+                    copydir = extdiff.snapshot_node(self.ui, self.repo,
+                            [util.pconvert(file)], copynode, tmproot)
                     pathroot = os.path.join(tmproot, copydir)
 
                 file_path = os.path.join(pathroot, file)
-                editor = (os.environ.get('HGEDITOR') or
-                        self.ui.config('gtools', 'editor') or
-                        self.ui.config('ui', 'editor') or
-                        os.environ.get('EDITOR', 'vi'))
                 util.system("%s \"%s\"" % (editor, file_path),
                             environ={'HGUSER': self.ui.username()},
                             onerr=util.Abort, errprefix=_('edit failed'))
@@ -455,6 +478,21 @@ class GStatus(GDialog):
                 if tmproot:
                     shutil.rmtree(tmproot)
 
+        editor = (os.environ.get('HGEDITOR') or
+                self.ui.config('gtools', 'editor') or
+                self.ui.config('ui', 'editor') or
+                os.environ.get('EDITOR', 'vi'))
+        if editor in ('vi', 'vim'):
+            Prompt('No visual editor configured',
+                    'Please configure a visual editor.', self).run()
+            dlg = ConfigDialog(self.repo.root, False)
+            dlg.show_all()
+            dlg.focus_field('ui.editor')
+            dlg.run()
+            dlg.hide()
+            self.ui = ui.ui()
+            self._parse_config()
+            return
         thread = threading.Thread(target=doedit, name='edit:'+file)
         thread.setDaemon(True)
         thread.start()

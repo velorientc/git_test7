@@ -175,8 +175,14 @@ class GDialog(gtk.Window):
             if setting : setattr(self, attr, setting)
 
         if not self.diffcmd :
-            if not self.diffopts : self.diffopts = '-Npru'
-            self.diffcmd = 'diff'
+            # default to tortoisehg's configuration
+            vdiff = self.ui.config('tortoisehg', 'vdiff')
+            if vdiff:
+                self.diffcmd = self.ui.config('extdiff', 'cmd.'+vdiff)
+            else:
+                self.diffcmd = 'diff'
+                if not self.diffopts :
+                    self.diffopts = '-Npru'
 
         if not self.diffbottom or self.diffbottom.lower() == 'false' or self.diffbottom == '0':
             self.diffbottom = False
