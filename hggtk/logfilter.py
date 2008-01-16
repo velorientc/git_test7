@@ -17,7 +17,7 @@ from shlib import shell_notify, set_tortoise_icon
 
 class FilterDialog(gtk.Dialog):
     """ Dialog for creating log filters """
-    def __init__(self, root='', revs=[], files=[]):
+    def __init__(self, root='', revs=[], files=[], filterfunc=None):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(FilterDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
@@ -25,6 +25,8 @@ class FilterDialog(gtk.Dialog):
 
         set_tortoise_icon(self, 'menucheckout.ico')
         self.set_title("hg log filter - %s" % os.path.basename(root))
+
+        self.filterfunc = filterfunc
 
         try:
             self.repo = hg.repository(ui.ui(), path=root)
@@ -198,8 +200,8 @@ class FilterDialog(gtk.Dialog):
             else:
                 return
 
-        self.opts = opts
-        self.emit('response', gtk.RESPONSE_OK)
+        if self.filterfunc:
+            self.filterfunc(opts)
         
     def _date_help(self, button):
         from hgcmd import CmdDialog
