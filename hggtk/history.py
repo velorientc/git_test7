@@ -70,6 +70,8 @@ class GLog(GDialog):
 
     def revisions_loaded(self, graphview):
         '''Treeview reports log generator has exited'''
+        if not self.graphview.graphdata:
+            self.details_text.set_buffer(gtk.TextBuffer())
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
@@ -186,7 +188,6 @@ class GLog(GDialog):
 
     def reload_log(self, filteropts = {}):
         """Send refresh event to treeview object"""
-        self.details_text.set_buffer(gtk.TextBuffer())
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
         self.opts['revs'] = None
