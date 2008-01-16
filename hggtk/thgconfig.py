@@ -147,6 +147,7 @@ class ConfigDialog(gtk.Dialog):
         lbl = gtk.Label('Name:')
         lbl.set_alignment(1.0, 0.0)
         self._pathnameedit = gtk.Entry()
+        self._pathnameedit.set_sensitive(False)
         table.attach(lbl, 0, 1, 0, 1, gtk.FILL, 0, 4, 3)
         table.attach(self._pathnameedit, 1, 2, 0, 1,
                 gtk.FILL|gtk.EXPAND, 0, 4, 3)
@@ -154,6 +155,7 @@ class ConfigDialog(gtk.Dialog):
         lbl = gtk.Label('Path:')
         lbl.set_alignment(1.0, 0.0)
         self._pathpathedit = gtk.Entry()
+        self._pathpathedit.set_sensitive(False)
         table.attach(lbl, 0, 1, 1, 2, gtk.FILL, 0, 4, 3)
         table.attach(self._pathpathedit, 1, 2, 1, 2,
                 gtk.FILL|gtk.EXPAND, 0, 4, 3)
@@ -307,7 +309,7 @@ class ConfigDialog(gtk.Dialog):
         if len(self.pathlist):
             self.pathlist.append(self.pathlist[self.curpathrow])
         else:
-            self.pathlist.append(('default', 'http://'))
+            self.pathlist.append(('new', 'http://'))
         self.curpathrow = len(self.pathlist)-1
         self.refresh_path_list()
         self._pathnameedit.grab_focus()
@@ -333,8 +335,18 @@ class ConfigDialog(gtk.Dialog):
         dlg.hide()
 
     def _refresh_path(self, *args):
-        self.pathlist[self.curpathrow] = (self._pathnameedit.get_text(),
+        name, path = (self._pathnameedit.get_text(),
                 self._pathpathedit.get_text())
+        if name == 'default':
+            vbox, info, widgets = self.pages[2]
+            widgets[0].child.set_text(path)
+            del self.pathlist[self.curpathrow]
+        elif name == 'default-push':
+            vbox, info, widgets = self.pages[2]
+            widgets[1].child.set_text(path)
+            del self.pathlist[self.curpathrow]
+        else:
+            self.pathlist[self.curpathrow] = (name, path)
         self.refresh_path_list()
         self.dirty_event()
 
@@ -344,6 +356,8 @@ class ConfigDialog(gtk.Dialog):
             return
         self._pathnameedit.set_text(model.get(iter, 0)[0])
         self._pathpathedit.set_text(model.get(iter, 1)[0])
+        self._pathnameedit.set_sensitive(True)
+        self._pathpathedit.set_sensitive(True)
         self.curpathrow = model.get(iter, 3)[0]
 
     def refresh_path_list(self):
@@ -364,16 +378,16 @@ class ConfigDialog(gtk.Dialog):
             self._delpathbutton.set_sensitive(True)
             self._testpathbutton.set_sensitive(True)
             self._refreshpathbutton.set_sensitive(True)
-            self._pathnameedit.set_sensitive(True)
-            self._pathpathedit.set_sensitive(True)
         else:
             self._delpathbutton.set_sensitive(False)
             self._testpathbutton.set_sensitive(False)
             self._refreshpathbutton.set_sensitive(False)
+            self._pathnameedit.set_text('')
+            self._pathpathedit.set_text('')
             self._pathnameedit.set_sensitive(False)
             self._pathpathedit.set_sensitive(False)
-        if self.curpathrow < len(self.pathlist):
-             self.pathsel.select_path(self.curpathrow)
+        if self.curpathrow >= 0 and self.curpathrow < len(self.pathlist):
+            self.pathsel.select_path(self.curpathrow)
 
     def fill_frame(self, frame, info):
         widgets = []
@@ -495,6 +509,9 @@ class ConfigDialog(gtk.Dialog):
             for name in list(self.ini.paths):
                 if name not in refreshlist:
                     del self.ini['paths'][name]
+        else:
+            for name in list(self.ini.paths):
+                del self.ini['paths'][name]
 
         # TODO: Add special code for flushing hgmerge extensions
 
