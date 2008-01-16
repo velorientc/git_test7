@@ -74,18 +74,23 @@ class GLog(GDialog):
         self.allbutton.set_sensitive(False)
 
     def _filter_clicked(self, toolbutton, data=None):
-        '''Launch filter configuration dialog'''
+        '''Launch a modeless filter dialog'''
+        def do_reload(opts):
+            self.reload_log(opts)
+
+        def close_filter_dialog(dialog, response_id):
+            dialog.destroy()
+
         rev0 = self.graphview.get_mark_rev()
         if rev0 is not None and self.currow is not None:
             revs = [rev0, self.currow[treemodel.REVID]]
         else:
             revs = []
-        dlg = FilterDialog(self.repo.root, revs, self.pats)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        if hasattr(dlg, 'opts'):
-            self.reload_log(dlg.opts)
+            
+        dlg = FilterDialog(self.repo.root, revs, self.pats, filterfunc=do_reload)
+        dlg.connect('response', close_filter_dialog)
+        dlg.set_modal(False)
+        dlg.show()
 
     def _filter_selected(self, widget, data=None):
         if widget.get_active():
