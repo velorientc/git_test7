@@ -94,13 +94,14 @@ class GLog(GDialog):
             dialog.hide()
             #self._filter_dialog = None
 
-        rev0 = self.graphview.get_mark_rev()
-        if rev0 is not None and self.currow is not None:
-            revs = [rev0, self.currow[treemodel.REVID]]
-        else:
-            revs = []
+        revs = []
+        if self.currow is not None:
+            revs.append(self.currow[treemodel.REVID])
+        if self.graphview.get_mark_rev() is not None:
+            revs.append(self.graphview.get_mark_rev())
             
-        dlg = FilterDialog(self.repo.root, revs, self.pats, filterfunc=do_reload)
+        dlg = FilterDialog(self.repo.root, revs, self.pats,
+                filterfunc=do_reload)
         dlg.connect('response', close_filter_dialog)
         dlg.set_modal(False)
         dlg.show()
