@@ -88,6 +88,7 @@ class GLog(GDialog):
     def _show_filter_dialog(self):
         '''Launch a modeless filter dialog'''
         def do_reload(opts):
+            self.custombutton.set_active(True)
             self.reload_log(opts)
 
         def close_filter_dialog(dialog, response_id):
@@ -140,6 +141,10 @@ class GLog(GDialog):
         button = gtk.RadioMenuItem(button, "Show Non-Merge Revisions")
         button.connect("toggled", self._filter_selected, 'no_merges')
         menu.append(button)
+       
+        self.custombutton = gtk.RadioMenuItem(button, "Custom Filter")
+        self.custombutton.set_sensitive(False)
+        menu.append(self.custombutton)
        
         menu.show_all()
         return menu
