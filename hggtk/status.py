@@ -98,22 +98,31 @@ class GStatus(GDialog):
 
 
     def get_tbbuttons(self):
-        tbuttons = [self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh', self._refresh_clicked),
+        tbuttons = [self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
+            self._refresh_clicked, tip='refresh'),
                      gtk.SeparatorToolItem()]
 
         if self.count_revs() < 2:
-            tbuttons += [self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 're_vert', self._revert_clicked),
-                         self.make_toolbutton(gtk.STOCK_ADD, '_add', self._add_clicked),
-                         self.make_toolbutton(gtk.STOCK_CANCEL, '_remove', self._remove_clicked),
-                         self.make_toolbutton(gtk.STOCK_DELETE, '_delete', self._delete_clicked),
-                         gtk.SeparatorToolItem(),
-                         self.make_toolbutton(gtk.STOCK_YES, '_select', self._sel_desel_clicked, True),
-                         self.make_toolbutton(gtk.STOCK_NO, '_deselect', self._sel_desel_clicked, False),
-                         gtk.SeparatorToolItem()]
+            tbuttons += [
+                    self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 're_vert',
+                        self._revert_clicked, tip='revert'),
+                    self.make_toolbutton(gtk.STOCK_ADD, '_add',
+                        self._add_clicked, tip='add'),
+                    self.make_toolbutton(gtk.STOCK_CANCEL, '_remove',
+                        self._remove_clicked, tip='remove'),
+                    self.make_toolbutton(gtk.STOCK_DELETE, '_delete',
+                        self._delete_clicked, tip='delete'),
+                    gtk.SeparatorToolItem(),
+                    self.make_toolbutton(gtk.STOCK_YES, '_select',
+                        self._sel_desel_clicked, True, tip='select'),
+                    self.make_toolbutton(gtk.STOCK_NO, '_deselect',
+                        self._sel_desel_clicked, False, tip='deselect'),
+                    gtk.SeparatorToolItem()]
 
         self.showdiff_toggle = gtk.ToggleToolButton(gtk.STOCK_JUSTIFY_FILL)
         self.showdiff_toggle.set_use_underline(True)
         self.showdiff_toggle.set_label('_show diff')
+        self.showdiff_toggle.set_tooltip(self.tooltips, 'show diff pane')
         self.showdiff_toggle.set_active(False)
         self._showdiff_toggled_id = self.showdiff_toggle.connect('toggled', self._showdiff_toggled )
         tbuttons.append(self.showdiff_toggle)
