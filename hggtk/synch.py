@@ -195,11 +195,20 @@ class SynchDialog(gtk.Dialog):
         menu.show_all()
         return menu
         
-    def _get_paths(self):
+    def _get_paths(self, sort="value"):
         """ retrieve symbolic paths """
         try:
             self.repo = hg.repository(ui.ui(), path=self.root)
-            return self.repo.ui.configitems('paths')
+            paths = self.repo.ui.configitems('paths')
+            if sort:
+                if sort == "value":
+                    sortfunc = lambda a,b: cmp(a[1], b[1])
+                elif sort == "name":
+                    sortfunc = lambda a,b: cmp(a[0], b[0])
+                else:
+                    raise "unknown sort key '%s'" % sort
+                paths.sort(sortfunc)
+            return paths
         except hg.RepoError:
             return None
 
