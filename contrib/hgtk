@@ -1,0 +1,91 @@
+#!/usr/bin/python
+#
+# front-end script for TortoiseHg dialogs
+# Copyright (C) 2008 Steve Borho <steve@borho.org>
+#
+# Modify this line to the location of your tortoisehg repository
+#
+tortoisehg_dir = '~/tools/tortoisehg-dev'
+
+import os
+import sys
+
+dialogs = '''log synch status clone merge update userconfig repoconfig
+serve recovery commit'''
+
+nonrepo_commands = 'clone'
+
+def help():
+    print 'TortoiseHg Dialog Wrapper\n'
+    print 'hgk [DIALOG]'
+    print '    dialogs:', dialogs
+
+def main(command):
+    dlist = dialogs.split()
+    l = []
+    for d in dlist:
+        if d.startswith(command):
+            l.append(d)
+    if not l:
+        print 'dialog', command, 'not recognized'
+        help()
+        sys.exit(1)
+    if len(l) > 1:
+        print 'dialog', command, 'is ambiguous'
+        print '\tcould be one of', ' '.join(l)
+        sys.exit(1)
+    command = l[0]
+
+    # Add TortoiseHg to python path
+    norm = os.path.normpath(os.path.expanduser(tortoisehg_dir))
+    if norm not in sys.path:
+        sys.path.append(norm)
+
+    try:
+        from tortoise import thgutil
+    except ImportError:
+        print 'Please fix "tortoisehg_dir" at the top of this script'
+        sys.exit(1)
+
+    cwd = os.getcwd()
+    root = thgutil.find_root(cwd)
+    opts = { 'root' : root, 'cwd' : cwd }
+
+    if root is None and command not in nonrepo_commands:
+        print 'No repository found, and', command, 'requires one.'
+        sys.exit(1)
+
+    # add aliases to taste (and to commands at top of file)
+    if command in ('log'):
+        from hggtk.history import run
+        opts['files'] = [root]
+    elif command in ('synch'):
+        from hggtk.synch import run
+    elif command in ('status'):
+        from hggtk.status import run
+    elif command in ('clone'):
+        from hggtk.clone import run
+    elif command in ('merge'):
+        from hggtk.merge import run
+    elif command in ('update'):
+        from hggtk.update import run
+    elif command in ('serve'):
+        from hggtk.serve import run
+    elif command in ('recovery'):
+        from hggtk.recovery import run
+    elif command in ('commit'):
+        from hggtk.commit import run
+    elif command in ('repoconfig'):
+        from hggtk.thgconfig import run
+        opts['files'] = [root]
+    elif command in ('userconfig'):
+        from hggtk.thgconfig import run
+    run(**opts)
+
+
+if __name__=='__main__':
+    if len(sys.argv) != 2:
+        help()
+    else:
+        main(sys.argv[1])
+    sys.exit(0)
