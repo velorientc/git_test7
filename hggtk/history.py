@@ -74,12 +74,19 @@ class GLog(GDialog):
         self.allbutton.set_sensitive(False)
 
     def _filter_clicked(self, toolbutton, data=None):
+        if self._filter_dialog:
+            self._filter_dialog.present()
+        else:
+            self._show_filter_dialog()
+
+    def _show_filter_dialog(self):
         '''Launch a modeless filter dialog'''
         def do_reload(opts):
             self.reload_log(opts)
 
         def close_filter_dialog(dialog, response_id):
             dialog.destroy()
+            self._filter_dialog = None
 
         rev0 = self.graphview.get_mark_rev()
         if rev0 is not None and self.currow is not None:
@@ -92,6 +99,8 @@ class GLog(GDialog):
         dlg.set_modal(False)
         dlg.set_keep_above(True)
         dlg.show()
+        
+        self._filter_dialog = dlg
 
     def _filter_selected(self, widget, data=None):
         if widget.get_active():
@@ -319,6 +328,7 @@ class GLog(GDialog):
         
 
     def get_body(self):
+        self._filter_dialog = None
         self._menu = self.tree_context_menu()
 
         self.tree_frame = gtk.Frame()
