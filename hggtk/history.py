@@ -97,7 +97,6 @@ class GLog(GDialog):
         dlg = FilterDialog(self.repo.root, revs, self.pats, filterfunc=do_reload)
         dlg.connect('response', close_filter_dialog)
         dlg.set_modal(False)
-        dlg.set_keep_above(True)
         dlg.show()
         
         self._filter_dialog = dlg
