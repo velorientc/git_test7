@@ -221,13 +221,16 @@ class GDialog(gtk.Window):
         return cnt
 
 
-    def make_toolbutton(self, stock, label, handler, userdata=None, menu=None):
+    def make_toolbutton(self, stock, label, handler,
+            userdata=None, menu=None, tip=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
 
+        if tip:
+            tbutton.set_tooltip(self.tooltips, tip)
         tbutton.set_use_underline(True)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
@@ -248,6 +251,7 @@ class GDialog(gtk.Window):
         vbox = gtk.VBox(False, 0)
         self.add(vbox)
         
+        self.tooltips = gtk.Tooltips()
         toolbar = gtk.Toolbar()
         tbuttons =  self.get_tbbuttons()
         for tbutton in tbuttons:

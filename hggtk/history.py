@@ -49,14 +49,17 @@ class GLog(GDialog):
         self.ui.quiet = False
 
     def get_tbbuttons(self):
-        self.refreshbutton = self.make_toolbutton(gtk.STOCK_REFRESH,
-            'Re_fresh', self._refresh_clicked)
-        self.filterbutton = self.make_toolbutton(gtk.STOCK_INDEX,
-            '_Filter', self._filter_clicked, menu=self._filter_menu())
         return [
-                self.refreshbutton,
+                self.make_toolbutton(gtk.STOCK_REFRESH,
+                    'Re_fresh',
+                    self._refresh_clicked,
+                    tip='Reload revision history'),
                 gtk.SeparatorToolItem(),
-                self.filterbutton,
+                self.make_toolbutton(gtk.STOCK_INDEX,
+                    '_Filter',
+                    self._filter_clicked,
+                    menu=self._filter_menu(),
+                    tip='Filter revisions for display'),
                 gtk.SeparatorToolItem()
              ]
 
@@ -357,8 +360,6 @@ class GLog(GDialog):
         self.tree.connect('row-activated', self._tree_row_act)
         #self.tree.modify_font(pango.FontDescription(self.fontlist))
         
-        self.tips = gtk.Tooltips()
-
         hbox = gtk.HBox()
         hbox.pack_start(self.graphview, True, True, 0)
         vbox = gtk.VBox()
@@ -370,14 +371,10 @@ class GLog(GDialog):
         vbox.pack_start(self.nextbutton, False, False)
         vbox.pack_start(self.allbutton, False, False)
 
-        self.nextbutton.set_tooltip(self.tips,
+        self.nextbutton.set_tooltip(self.tooltips,
                 'show next %d revisions' % limit)
-        self.allbutton.set_tooltip(self.tips,
+        self.allbutton.set_tooltip(self.tooltips,
                 'show all remaining revisions')
-        self.refreshbutton.set_tooltip(self.tips,
-                'Reload revision history')
-        self.filterbutton.set_tooltip(self.tips,
-                'Filter revisions for display')
 
         hbox.pack_start(vbox, False, False, 0)
         self.tree_frame.add(hbox)
