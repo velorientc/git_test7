@@ -196,7 +196,7 @@ class SynchDialog(gtk.Dialog):
         return menu
         
     def _get_paths(self):
-        """ retrieve repo revisions """
+        """ retrieve symbolic paths """
         try:
             self.repo = hg.repository(ui.ui(), path=self.root)
             return self.repo.ui.configitems('paths')
