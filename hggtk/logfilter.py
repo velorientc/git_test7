@@ -38,14 +38,13 @@ class FilterDialog(gtk.Dialog):
         # add toolbar with tooltips
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
-        
-        self._btn_execute = self._toolbutton(
-                gtk.STOCK_FIND,
-                'Execute', 
-                self._btn_execute_clicked,
-                tip='Execute filtered search of revision history')
+
         tbuttons = [
-                self._btn_execute,
+                self._toolbutton(
+                    gtk.STOCK_FIND,
+                    'Apply', 
+                    self._btn_apply_clicked,
+                    tip='Apply filter to revision history'),
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -163,7 +162,7 @@ class FilterDialog(gtk.Dialog):
         tbutton.connect('clicked', handler, userdata)
         return tbutton
         
-    def _btn_execute_clicked(self, button, data=None):
+    def _btn_apply_clicked(self, button, data=None):
         opts = {}
         if self.searchradio.get_active():
             pats = self.filesentry.get_text()
