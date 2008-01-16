@@ -89,7 +89,10 @@ class FilterDialog(gtk.Dialog):
 
         hbox = gtk.HBox()
         self.filesentry = gtk.Entry()
-        hbox.pack_start(gtk.Label('File(s):'), False, False, 4)
+        lbl = gtk.Label('File(s):')
+        lbl.set_property("width-chars", 10)
+        lbl.set_alignment(0, 0.5)
+        hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.filesentry, True, True, 4)
         self.tips.set_tip(hbox, 'Display only changesets affecting these'
                 ' comma separated file paths')
@@ -99,7 +102,10 @@ class FilterDialog(gtk.Dialog):
         
         hbox = gtk.HBox()
         self.kwentry = gtk.Entry()
-        hbox.pack_start(gtk.Label('Keyword(s):'), False, False, 4)
+        lbl = gtk.Label('Keyword(s):')
+        lbl.set_property("width-chars", 10)
+        lbl.set_alignment(0, 0.5)
+        hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.kwentry, True, True, 4)
         self.tips.set_tip(hbox, 'Display only changesets matching these'
                 ' comma separated case insensitive keywords')
@@ -109,7 +115,10 @@ class FilterDialog(gtk.Dialog):
         self.dateentry = gtk.Entry()
         self.helpbutton = gtk.Button("Help...")
         self.helpbutton.connect('clicked', self._date_help)
-        hbox.pack_start(gtk.Label('Date:'), False, False, 4)
+        lbl = gtk.Label('Date:')
+        lbl.set_property("width-chars", 10)
+        lbl.set_alignment(0, 0.5)
+        hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.dateentry, True, True, 4)
         hbox.pack_start(self.helpbutton, False, False, 4)
         self.tips.set_tip(hbox, 'Display only changesets matching this'
