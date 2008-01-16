@@ -70,6 +70,8 @@ if os.name == 'nt':
         key = r"Software\TortoiseHg"
         cat = _winreg.HKEY_LOCAL_MACHINE
         dir = _winreg.QueryValue(cat, key)
+        if not os.environ.has_key('THG_ICON_PATH'):
+            os.environ['THG_ICON_PATH'] = os.path.join(dir, 'icons')
         return dir
 
     def netdrive_status(drive):
@@ -141,10 +143,6 @@ if os.name == 'nt':
         DestroyIcon(hicon)
         
         return hbm
-
-    if not os.environ.has_key('THG_ICON_PATH'):
-        dir = get_prog_root()
-        os.environ['THG_ICON_PATH'] = os.path.join(dir, 'icons')
 
 else: # Not Windows
 
