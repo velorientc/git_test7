@@ -3,16 +3,18 @@ import os.path
 import traceback
 import threading
 import Queue
-from mercurial import hg, ui, util, commands, dispatch, cmdutil
+from mercurial import hg, ui, util, dispatch, cmdutil
 from mercurial.node import *
 from mercurial.i18n import _
 from dialog import entry_dialog
 
 try:
     try:
-        commands.demandimport.disable()
+        from mercurial import demandimport
     except:
-        pass    # 0.9.5 has demandimport removed
+        from mercurial.commands import demandimport # pre 0.9.5
+    demandimport.disable()
+
     try:
         # Mercurail 0.9.4
         from mercurial.cmdutil import parse
@@ -23,12 +25,8 @@ try:
         except:
             # Mercurail 0.9.5
             from mercurial.dispatch import _parse as parse
-
 finally:
-    try:
-        commands.demandimport.enable()
-    except:
-        pass     # 0.9.5 has demandimport removed
+    demandimport.enable()
 
 def rootpath(path=None):
     """ find Mercurial's repo root of path """
