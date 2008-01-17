@@ -10,7 +10,7 @@ pygtk.require("2.0")
 import os
 import sys
 import gtk
-from dialog import *
+from gdialog import *
 from mercurial.node import *
 from mercurial import cmdutil, util, hg, ui
 from shlib import shell_notify, set_tortoise_icon
@@ -176,21 +176,23 @@ class FilterDialog(gtk.Dialog):
                 try:
                     df = util.matchdate(date)
                     opts['date'] = date
-                except:
-                    # TODO: make message box
-                    print 'invalid date', date
+                except Exception, e:
+                    Prompt('Invalid date specification', str(e), self).run()
+                    self.dateentry.grab_focus()
                     return
         elif self.revradio.get_active():
             rev0 = self.rev0Entry.get_text()
             rev1 = self.rev1Entry.get_text()
+            if not rev1:
+                rev1 = rev0
             try:
                 range = cmdutil.revrange(self.repo, [rev0, rev1])
                 range.sort()
                 range.reverse()
                 opts['revrange'] = range
             except Exception, e:
-                # TODO: make message box
-                print e, rev0, rev1
+                Prompt('Invalid revision range', str(e), self).run()
+                self.rev0Entry.grab_focus()
                 return
         elif self.branchradio.get_active():
             branch = self.branchbox.child.get_text()

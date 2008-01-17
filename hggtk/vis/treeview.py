@@ -93,7 +93,11 @@ class TreeView(gtk.ScrolledWindow):
                 else:
                     start = self.repo.changelog.count() - 1
             elif opts['revrange']:
-                start, end = opts['revrange']
+                if len(opts['revrange']) >= 2:
+                    start, end = opts['revrange']
+                else:
+                    start = opts['revrange'][0]
+                    end = start
             else:
                 start = self.repo.changelog.count() - 1
             self.grapher = revision_grapher(self.repo, start, end, pats)
