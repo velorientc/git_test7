@@ -3,7 +3,7 @@ import os.path
 import traceback
 import threading
 import Queue
-from mercurial import hg, ui, util, dispatch, cmdutil
+from mercurial import hg, ui, util, cmdutil, commands
 from mercurial.node import *
 from mercurial.i18n import _
 from dialog import entry_dialog
@@ -25,6 +25,11 @@ try:
         except:
             # Mercurail 0.9.5
             from mercurial.dispatch import _parse as parse
+
+    if hasattr(commands, 'dispatch'):
+        from mercurial.cmdutil import dispatch
+    else:
+        from mercurial.dispatch import _dispatch as dispatch
 finally:
     demandimport.enable()
 
@@ -184,7 +189,7 @@ class HgThread(threading.Thread):
         HgThread.instances += 1
         try:
             try:
-                ret = dispatch._dispatch(self.ui, self.args)
+                ret = dispatch(self.ui, self.args)
                 if ret:
                     self.ui.write('[command returned code %d]\n' % int(ret))
                 else:
