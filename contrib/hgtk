@@ -17,7 +17,7 @@ nonrepo_commands = 'clone'
 
 def help():
     print 'TortoiseHg Dialog Wrapper\n'
-    print 'hgk [DIALOG]'
+    print 'hgtk [DIALOG]'
     print '    dialogs:', dialogs
 
 def main(command):
