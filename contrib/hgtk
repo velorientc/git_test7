@@ -13,7 +13,7 @@ import sys
 dialogs = '''log synch status clone merge update userconfig repoconfig
 serve recovery commit about'''
 
-nonrepo_commands = 'clone'
+nonrepo_commands = 'clone about'
 
 def help():
     print 'TortoiseHg Dialog Wrapper\n'
