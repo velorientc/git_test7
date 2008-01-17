@@ -199,8 +199,10 @@ class GStatus(GDialog):
         self.tree.set_enable_search(True)
         self.tree.set_search_column(2)
         self.tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        self.tree.get_selection().connect('changed', self._tree_selection_changed, False)
-        self.tree.set_rubber_banding(True)
+        self.tree.get_selection().connect('changed',
+                self._tree_selection_changed, False)
+        if hasattr(self.tree, 'set_rubber_banding'):
+            self.tree.set_rubber_banding(True)
         self.tree.modify_font(pango.FontDescription(self.fontlist))
         self.tree.set_headers_clickable(True)
         
