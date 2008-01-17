@@ -93,7 +93,6 @@ class GLog(GDialog):
 
         def close_filter_dialog(dialog, response_id):
             dialog.hide()
-            #self._filter_dialog = None
 
         revs = []
         if self.currow is not None:
@@ -149,19 +148,16 @@ class GLog(GDialog):
         menu.show_all()
         return menu
 
-
     def prepare_display(self):
         self._last_rev = None
         self._filter = "all"
         self.currow = None
         self.reload_log()
 
-
     def save_settings(self):
         settings = GDialog.save_settings(self)
         settings['glog'] = self._vpaned.get_position()
         return settings
-
 
     def load_settings(self, settings):
         GDialog.load_settings(self, settings)
@@ -169,7 +165,6 @@ class GLog(GDialog):
             self._setting_vpos = settings['glog']
         else:
             self._setting_vpos = -1
-
 
     def _hg_log(self, rev, pats, verbose):
         def dohglog():
@@ -195,7 +190,7 @@ class GLog(GDialog):
         l.reverse()
         return l
 
-    def reload_log(self, filteropts = {}):
+    def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
@@ -335,7 +330,6 @@ class GLog(GDialog):
         _menu.append(self._cmenu_diff)
         _menu.show_all()
         return _menu
-        
 
     def get_body(self):
         self._filter_dialog = None
@@ -404,7 +398,6 @@ class GLog(GDialog):
         self._vpaned.set_position(self._setting_vpos)
         return self._vpaned
 
-
     def _diff_revs(self, menuitem):
         from status import GStatus
         from gtools import cmdtable
@@ -443,7 +436,6 @@ class GLog(GDialog):
         if newtags != oldtags:
             self.reload_log()
 
-                
     def _show_status(self, menuitem):
         from status import GStatus
         from gtools import cmdtable
@@ -463,7 +455,6 @@ class GLog(GDialog):
             dialog = GStatus(self.ui, self.repo, self.cwd, [], statopts, False)
             dialog.display()
         return True
-
 
     def _export_patch(self, menuitem):
         rev = self.currow[treemodel.REVID]
@@ -565,7 +556,6 @@ class GLog(GDialog):
             self._tree_popup_menu(widget, event.button, event.time)
         return False
 
-
     def _tree_popup_menu(self, treeview, button=0, time=0) :
         selrev = self.currow[treemodel.REVID]
         
@@ -582,7 +572,6 @@ class GLog(GDialog):
         # display the context menu
         self._menu.popup(None, None, None, button, time)
         return True
-
 
     def _tree_row_act(self, tree, path, column) :
         """Default action is the first entry in the context menu
