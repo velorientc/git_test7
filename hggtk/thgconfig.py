@@ -509,9 +509,10 @@ class ConfigDialog(gtk.Dialog):
             for name in list(self.ini.paths):
                 if name not in refreshlist:
                     del self.ini['paths'][name]
-        else:
+        elif 'paths' in list(self.ini):
             for name in list(self.ini.paths):
-                del self.ini['paths'][name]
+                if name not in ('default', 'default-push'):
+                    del self.ini['paths'][name]
 
         # TODO: Add special code for flushing hgmerge extensions
 
