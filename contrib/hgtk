@@ -11,7 +11,7 @@ import os
 import sys
 
 dialogs = '''log synch status clone merge update userconfig repoconfig
-serve recovery commit'''
+serve recovery commit about'''
 
 nonrepo_commands = 'clone'
 
@@ -81,6 +81,8 @@ def main(command):
         opts['files'] = [root]
     elif command in ('userconfig'):
         from hggtk.thgconfig import run
+    elif command in ('about'):
+        from hggtk.about import run
     run(**opts)
 
 

@@ -61,7 +61,8 @@ class AboutDialog(gtk.AboutDialog):
         self.set_website("http://tortoisehg.sourceforge.net/")
         self.set_name("TortoiseHg")
         self.set_version("(version %s)" % tortoise.version.get_version())
-        self.set_wrap_license(True)
+        if hasattr(self, 'set_wrap_license'):
+            self.set_wrap_license(True)
         self.set_copyright("Copyright 2007 TK Soh and others")
         self.set_license(file(license_file).read())
         self.set_comments("with " + lib_versions + "\n\n" + comment)
