@@ -349,6 +349,10 @@ class GLog(GDialog):
         else:
             limit = None
 
+        # PyGtk 2.6 and below did not automatically register types
+        if gobject.pygtk_version < (2, 8, 0): 
+            gobject.type_register(TreeView)
+
         self.graphview = TreeView(self.repo, limit)
         self.tree = self.graphview.treeview
         self.graphview.connect('revision-selected', self.selection_changed)
