@@ -626,7 +626,7 @@ class GStatus(GDialog):
         
         # Might want to include 'rev' here... trying without
         statopts = self.merge_opts(cmdtable['glog|ghistory'][1], ('include', 'exclude', 'git'))
-        dialog = GLog(self.ui, self.repo, [file], statopts, False)
+        dialog = GLog(self.ui, self.repo, self.cwd, [file], statopts, False)
         dialog.display()
         return True
 
