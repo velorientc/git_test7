@@ -4,7 +4,7 @@
 # Copyright (C) 2008 Steve Borho <steve@borho.org>
 #
 # Modify this line to the location of your tortoisehg repository
-#
+# or set TORTOISEHG_PATH in your environment
 tortoisehg_dir = '~/tools/tortoisehg-dev'
 
 import os
@@ -37,7 +37,8 @@ def main(command):
     command = l[0]
 
     # Add TortoiseHg to python path
-    norm = os.path.normpath(os.path.expanduser(tortoisehg_dir))
+    path = os.environ.get('TORTOISEHG_PATH') or tortoisehg_dir
+    norm = os.path.normpath(os.path.expanduser(path))
     if norm not in sys.path:
         sys.path.append(norm)
 
