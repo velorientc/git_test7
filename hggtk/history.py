@@ -717,6 +717,10 @@ class GLog(GDialog):
 
     def _revert_file(self, menuitem):
         rev = self.currow[treemodel.REVID]
+        dialog = Confirm('revert file to old revision', [], self,
+                'Revert %s to contents at revision %d?' % (self.curfile, rev))
+        if dialog.run() == gtk.RESPONSE_NO:
+            return
         cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), self.curfile]
         self.restore_cwd()
         dlg = CmdDialog(cmdline)
