@@ -399,6 +399,12 @@ class GLog(GDialog):
         _menu.append(create_menu('_view at revision', self._view_file_rev))
         _menu.append(create_menu('_file history', self._file_history))
         _menu.append(create_menu('_revert file contents', self._revert_file))
+        self._file_diff_to_mark_menu = create_menu('_diff file to mark',
+                self._diff_file_to_mark)
+        self._file_diff_from_mark_menu = create_menu('diff file _from mark',
+                self._diff_file_from_mark)
+        _menu.append(self._file_diff_to_mark_menu)
+        _menu.append(self._file_diff_from_mark_menu)
         _menu.show_all()
         return _menu
 
@@ -690,6 +696,9 @@ class GLog(GDialog):
         return False
 
     def _file_popup_menu(self, treeview, button=0, time=0) :
+        is_mark = self.graphview.get_mark_rev() is not None
+        self._file_diff_to_mark_menu.set_sensitive(is_mark)
+        self._file_diff_from_mark_menu.set_sensitive(is_mark)
         self._filemenu.popup(None, None, None, button, time)
         return True
 
@@ -700,6 +709,7 @@ class GLog(GDialog):
         return True
 
     def _view_file_rev(self, menuitem):
+        '''User selected view file revision from the file list context menu'''
         rev = self.currow[treemodel.REVID]
         parents = self.currow[treemodel.PARENTS]
         if len(parents) == 0:
@@ -710,12 +720,45 @@ class GLog(GDialog):
         self._node1, self._node2 = cmdutil.revpair(self.repo, [pair])
         self._view_file('M', self.curfile, force_left=False)
 
+    def _diff_file_to_mark(self, menuitem):
+        '''User selected diff to mark from the file list context menu'''
+        from status import GStatus
+        from gtools import cmdtable
+        rev0 = self.graphview.get_mark_rev()
+        rev1 = self.currow[treemodel.REVID]
+        statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
+                ('include', 'exclude', 'git'))
+        statopts['rev'] = ['%u:%u' % (rev1, rev0)]
+        statopts['modified'] = True
+        statopts['added'] = True
+        statopts['removed'] = True
+        dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile], statopts, False)
+        dialog.display()
+        return True
+
+    def _diff_file_from_mark(self, menuitem):
+        '''User selected diff from mark from the file list context menu'''
+        from status import GStatus
+        from gtools import cmdtable
+        rev0 = self.graphview.get_mark_rev()
+        rev1 = self.currow[treemodel.REVID]
+        statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
+                ('include', 'exclude', 'git'))
+        statopts['rev'] = ['%u:%u' % (rev0, rev1)]
+        statopts['modified'] = True
+        statopts['added'] = True
+        statopts['removed'] = True
+        dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile], statopts, False)
+        dialog.display()
+        return True
+
     def _file_history(self, menuitem):
         '''User selected file history from file list context menu'''
         self.custombutton.set_active(True)
         self.reload_log({'pats' : [self.curfile]})
 
     def _revert_file(self, menuitem):
+        '''User selected file revert from the file list context menu'''
         rev = self.currow[treemodel.REVID]
         dialog = Confirm('revert file to old revision', [], self,
                 'Revert %s to contents at revision %d?' % (self.curfile, rev))
