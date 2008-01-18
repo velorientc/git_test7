@@ -261,7 +261,12 @@ class GLog(GDialog):
                 paragraph_background='#F0F0F0')
         buffer.create_tag('parent', foreground='#000090',
                 paragraph_background='#F0F0F0')
-        
+
+        buffer.create_tag('removed', foreground='#900000')
+        buffer.create_tag('added', foreground='#006400')
+        buffer.create_tag('position', foreground='#FF8000')
+        buffer.create_tag('header', foreground='#000090')
+
         parent_link = buffer.create_tag('parlink', foreground='#0000FF', 
                 underline=pango.UNDERLINE_SINGLE,
                 paragraph_background='#F0F0F0')
@@ -308,7 +313,21 @@ class GLog(GDialog):
                 self.repo.ui.pushbuffer()
                 patch.diff(self.repo, pnodes[i], node, match=lambda x:x==path)
                 delta = self.repo.ui.popbuffer()
-                buffer.insert(buff_iter, delta)
+                for line in delta.splitlines():
+                    if line.startswith('---') or line.startswith('+++'):
+                        buffer.insert_with_tags_by_name(buff_iter,
+                                line+'\n', 'header')
+                    elif line[0] == '-':
+                        buffer.insert_with_tags_by_name(buff_iter,
+                                line+'\n', 'removed')
+                    elif line[0] == '+':
+                        buffer.insert_with_tags_by_name(buff_iter,
+                                line+'\n', 'added')
+                    elif line.startswith('@@'):
+                        buffer.insert_with_tags_by_name(buff_iter,
+                                line+'\n', 'position')
+                    else:
+                        buffer.insert(buff_iter, line+'\n')
                 if len(parents) > 1:
                     stretch = '=' * 20
                     buffer.insert_with_tags_by_name(buff_iter,
