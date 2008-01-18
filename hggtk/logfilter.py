@@ -132,8 +132,8 @@ class FilterDialog(gtk.Dialog):
 
         # toggle them all once
         self.searchradio.set_active(True)
-        self.revradio.set_active(True)
         self.branchradio.set_active(True)
+        self.revradio.set_active(True)
 
         # show them all
         self.show_all()
