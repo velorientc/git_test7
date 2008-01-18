@@ -13,7 +13,7 @@ import shelve
 import shlib
 from tempfile import mkstemp
 from dialog import *
-from mercurial import hg, ui
+from mercurial import hg, ui, extensions
 from thgconfig import ConfigDialog
 from hgcmd import CmdDialog
 
@@ -181,10 +181,9 @@ class EmailDialog(gtk.Dialog):
             self.repo = None
             return
 
-        if repo.ui.config('extensions', 'patchbomb') is not None:
-            pass
-        elif repo.ui.config('extensions', 'hgext.patchbomb') is not None:
-            pass
+        for name, module in extensions.extensions():
+            if name == 'patchbomb':
+                break
         else:
             error_dialog('Email not enabled',
                     'You must enable the patchbomb extension to use this tool')
