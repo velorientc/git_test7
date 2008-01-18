@@ -176,30 +176,6 @@ class GLog(GDialog):
             self._setting_vpos = -1
             self._setting_hpos = -1
 
-    def _hg_log(self, rev, pats, verbose):
-        def dohglog():
-            self.restore_cwd()
-            self.repo.dirstate.invalidate()
-            commands.log(self.ui, self.repo, *pats, **self.opts)
-
-        logtext = ''
-        success = False
-        saved_revs = self.opts['rev']
-        saved_verbose = self.ui.verbose
-        try:
-            self.opts['rev'] = rev
-            self.ui.verbose = verbose
-            success, logtext = self._hg_call_wrapper('Log', dohglog, False)
-        finally:
-            self.opts['rev'] = saved_revs
-            self.ui.verbose = saved_verbose
-        return success, logtext
-
-    def _get_tagged_rev(self):
-        l = [hex(r) for t, r in self.repo.tagslist()]
-        l.reverse()
-        return l
-
     def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""
         self.restore_cwd()  # paths relative to repo root do not work otherwise
@@ -231,7 +207,9 @@ class GLog(GDialog):
             self.opts['no_merges'] = True
             self.graphview.refresh(False, [], self.opts)
         elif self._filter == "tagged":
-            self.opts['revs'] = self._get_tagged_rev()
+            tagged = [hex(r) for t, r in self.repo.tagslist()]
+            tagged.reverse()
+            self.opts['revs'] = tagged
             self.graphview.refresh(False, [], self.opts)
         elif self._filter == "parents":
             repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
