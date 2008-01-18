@@ -454,7 +454,7 @@ class GLog(GDialog):
         details_frame.add(scroller)
         
         self.details_text = gtk.TextView()
-        self.details_text.set_wrap_mode(gtk.WRAP_WORD)
+        self.details_text.set_wrap_mode(gtk.WRAP_NONE)
         self.details_text.set_editable(False)
         self.details_text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.details_text)
