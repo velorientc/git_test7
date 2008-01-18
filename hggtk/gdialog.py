@@ -269,27 +269,38 @@ class GDialog(gtk.Window):
         body = self.get_body()
         vbox.pack_start(body, True, True, 0)
         
-        hbox = gtk.HBox(False, 0)
-        hbox.set_border_width(6)
-        vbox.pack_end(hbox, False, False, 0)
-        
-        bbox = gtk.HButtonBox()
-        bbox.set_layout(gtk.BUTTONBOX_EDGE)
-        hbox.pack_end(bbox, False, False)
+        # Subclass provides extra stuff to left of Close button
+        extras = self.get_extras()
+        if extras:
+            hbox = gtk.HBox(False, 0)
+            hbox.set_border_width(6)
+            vbox.pack_end(hbox, False, False, 0)
+            
+            bbox = gtk.HButtonBox()
+            bbox.set_layout(gtk.BUTTONBOX_EDGE)
+            hbox.pack_end(bbox, False, False)
 
-        button = gtk.Button(stock=gtk.STOCK_CLOSE)
-        button.connect('clicked', self._quit_clicked)
-        bbox.pack_end(button, False, False)
+            button = gtk.Button(stock=gtk.STOCK_CLOSE)
+            button.connect('clicked', self._quit_clicked)
+            bbox.pack_end(button, False, False)
+            hbox.pack_start(extras, False, False)
+        else:
+            # Else conserve vertical space and place close button
+            # on right edge of toolbar
+            sep = gtk.SeparatorToolItem()
+            sep.set_expand(True)
+            sep.set_draw(False)
+            toolbar.insert(sep, -1)
+            button = self.make_toolbutton(gtk.STOCK_CLOSE, 'Close',
+                    self._quit_clicked, tip='Close Application')
+            toolbar.insert(button, -1)
+
         self.connect('destroy', self._destroying)
         self.connect('delete_event', self.should_live)
 
-        # Subclass provides extra stuff to left of Quit button
-        extras = self.get_extras()
-        if extras:
-            hbox.pack_start(extras, False, False)
 
 
-    def _quit_clicked(self, button):
+    def _quit_clicked(self, button, data=None):
         if not self.should_live():
             self.destroy()
 
