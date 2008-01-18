@@ -154,6 +154,7 @@ class GLog(GDialog):
         self._last_rev = None
         self._filter = "all"
         self.currow = None
+        self.curfile = None
         self.reload_log()
 
     def save_settings(self):
@@ -201,6 +202,7 @@ class GLog(GDialog):
 
     def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""
+        self.restore_cwd()  # paths relative to repo root do not work otherwise
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
         self.opts['revs'] = None
@@ -343,14 +345,6 @@ class GLog(GDialog):
         self.details_text.set_buffer(buffer)
         return True
 
-    def _filelist_rowchanged(self, sel):
-        model, iter = sel.get_selected()
-        if not iter:
-            return
-        # scroll to file in details window
-        mark = model[iter][1]
-        self.details_text.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
-
     def parent_link_handler(self, tag, widget, event, iter):
         text = self.get_link_text(tag, widget, event, iter)
         if not text:
@@ -393,10 +387,25 @@ class GLog(GDialog):
         _menu.append(self._cmenu_diff)
         _menu.show_all()
         return _menu
+ 
+    def file_context_menu(self):
+        def create_menu(label, callback):
+            menuitem = gtk.MenuItem(label, True)
+            menuitem.connect('activate', callback)
+            menuitem.set_border_width(1)
+            return menuitem
+            
+        _menu = gtk.Menu()
+        _menu.append(create_menu('_view at revision', self._view_file_rev))
+        _menu.append(create_menu('_file history', self._file_history))
+        _menu.append(create_menu('_revert file contents', self._revert_file))
+        _menu.show_all()
+        return _menu
 
     def get_body(self):
         self._filter_dialog = None
         self._menu = self.tree_context_menu()
+        self._filemenu = self.file_context_menu()
 
         self.tree_frame = gtk.Frame()
         self.tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -462,6 +471,10 @@ class GLog(GDialog):
         self._filelist_tree = gtk.TreeView()
         filesel = self._filelist_tree.get_selection()
         filesel.connect("changed", self._filelist_rowchanged)
+        self._filelist_tree.connect('button-release-event', self._file_button_release)
+        self._filelist_tree.connect('popup-menu', self._file_popup_menu)
+        self._filelist_tree.connect('row-activated', self._file_row_act)
+
         column = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=0)
         self._filelist_tree.append_column(column)
         scrolledwindow = gtk.ScrolledWindow()
@@ -659,6 +672,57 @@ class GLog(GDialog):
         """
         self._menu.get_children()[0].activate()
         return True
+
+    ### File List Context Menu ###
+    def _filelist_rowchanged(self, sel):
+        model, iter = sel.get_selected()
+        if not iter:
+            return
+        self.curfile = model[iter][0]
+        # scroll to file in details window
+        mark = model[iter][1]
+        self.details_text.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
+
+    def _file_button_release(self, widget, event) :
+        if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
+            gtk.gdk.CONTROL_MASK)):
+            self._file_popup_menu(widget, event.button, event.time)
+        return False
+
+    def _file_popup_menu(self, treeview, button=0, time=0) :
+        self._filemenu.popup(None, None, None, button, time)
+        return True
+
+    def _file_row_act(self, tree, path, column) :
+        """Default action is the first entry in the context menu
+        """
+        self._filemenu.get_children()[0].activate()
+        return True
+
+    def _view_file_rev(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        parents = self.currow[treemodel.PARENTS]
+        if len(parents) == 0:
+            parent = rev-1
+        else:
+            parent = parents[0]
+        pair = '%u:%u' % (parent, rev)
+        self._node1, self._node2 = cmdutil.revpair(self.repo, [pair])
+        self._view_file('M', self.curfile, force_left=False)
+
+    def _file_history(self, menuitem):
+        '''User selected file history from file list context menu'''
+        self.custombutton.set_active(True)
+        self.reload_log({'pats' : [self.curfile]})
+
+    def _revert_file(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), self.curfile]
+        self.restore_cwd()
+        dlg = CmdDialog(cmdline)
+        dlg.run()
+        dlg.hide()
+        shell_notify([self.curfile])
 
 def run(root='', cwd='', files=[], hgpath='hg', **opts):
     u = ui.ui()
