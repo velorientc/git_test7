@@ -28,6 +28,7 @@ from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
 from shlib import shell_notify, set_tortoise_icon
+from thgconfig import ConfigDialog
 
 class SimpleMessage(gtk.MessageDialog):
     def run(self):
@@ -380,6 +381,74 @@ class GDialog(gtk.Window):
                 Prompt(title + ' Messages and Errors', prompttext, self).run()
 
         return True, textout
+
+    def _diff_file(self, stat, file):
+        def dodiff():
+            self.restore_cwd()
+            extdiff.dodiff(self.ui, self.repo, self.diffcmd, [self.diffopts],
+                            [file], self.opts)
+
+        if self.diffcmd == 'diff':
+            Prompt('No visual diff configured',
+                    'Please select a visual diff application.', self).run()
+            dlg = ConfigDialog(self.repo.root, False)
+            dlg.show_all()
+            dlg.focus_field('tortoisehg.vdiff')
+            dlg.run()
+            dlg.hide()
+            self.ui = ui.ui()
+            self._parse_config()
+            return
+        thread = threading.Thread(target=dodiff, name='diff:'+file)
+        thread.setDaemon(True)
+        thread.start()
+
+
+    def _view_file(self, stat, file, force_left=False):
+        def doedit():
+            pathroot = self.repo.root
+            tmproot = None
+            copynode = None
+            try:
+                # if we aren't looking at the wc, copy the node...
+                if stat in 'R!' or force_left:
+                    copynode = self._node1
+                elif self._node2:
+                    copynode = self._node2
+
+                if copynode:
+                    tmproot = tempfile.mkdtemp(prefix='gtools.')
+                    copydir = extdiff.snapshot_node(self.ui, self.repo,
+                            [util.pconvert(file)], copynode, tmproot)
+                    pathroot = os.path.join(tmproot, copydir)
+
+                file_path = os.path.join(pathroot, file)
+                util.system("%s \"%s\"" % (editor, file_path),
+                            environ={'HGUSER': self.ui.username()},
+                            onerr=util.Abort, errprefix=_('edit failed'))
+            finally:
+                if tmproot:
+                    shutil.rmtree(tmproot)
+
+        editor = (self.ui.config('tortoisehg', 'editor') or
+                self.ui.config('gtools', 'editor') or
+                os.environ.get('HGEDITOR') or
+                self.ui.config('ui', 'editor') or
+                os.environ.get('EDITOR', 'vi'))
+        if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+            Prompt('No visual editor configured',
+                    'Please configure a visual editor.', self).run()
+            dlg = ConfigDialog(self.repo.root, False)
+            dlg.show_all()
+            dlg.focus_field('tortoisehg.editor')
+            dlg.run()
+            dlg.hide()
+            self.ui = ui.ui()
+            self._parse_config()
+            return
+        thread = threading.Thread(target=doedit, name='edit:'+file)
+        thread.setDaemon(True)
+        thread.start()
 
 class NativeSaveFileDialogWrapper:
     """Wrap the windows file dialog, or display default gtk dialog if that isn't available"""

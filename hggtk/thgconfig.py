@@ -78,6 +78,8 @@ class ConfigDialog(gtk.Dialog):
                     ' TortoiseHg'),
                 ('Visual Diff Tool', 'tortoisehg.vdiff', [],
                     'Specify the visual diff tool; must be extdiff command'),
+                ('Visual Editor', 'tortoisehg.editor', [],
+                    'Specify the visual editor used to view files, etc'),
                 ('Log Batch Size', 'tortoisehg.graphlimit', [],
                     'The number of revisions to read and display in the'
                     ' changelog viewer in a single batch. Default: 500'))

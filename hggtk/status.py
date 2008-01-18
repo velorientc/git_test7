@@ -24,7 +24,6 @@ import pango
 from mercurial.i18n import _
 from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
-from thgconfig import ConfigDialog
 from hgext import extdiff
 from shlib import shell_notify
 from gdialog import *
@@ -430,74 +429,6 @@ class GStatus(GDialog):
             text_renderer.set_property('foreground', 'black')
         else:
             text_renderer.set_property('foreground', 'black')
-
-
-    def _diff_file(self, stat, file):
-        def dodiff():
-            self.restore_cwd()
-            extdiff.dodiff(self.ui, self.repo, self.diffcmd, [self.diffopts],
-                            [file], self.opts)
-
-        if self.diffcmd == 'diff':
-            Prompt('No visual diff configured',
-                    'Please select a visual diff application.', self).run()
-            dlg = ConfigDialog(self.repo.root, False)
-            dlg.show_all()
-            dlg.focus_field('tortoisehg.vdiff')
-            dlg.run()
-            dlg.hide()
-            self.ui = ui.ui()
-            self._parse_config()
-            return
-        thread = threading.Thread(target=dodiff, name='diff:'+file)
-        thread.setDaemon(True)
-        thread.start()
-
-
-    def _view_file(self, stat, file, force_left=False):
-        def doedit():
-            pathroot = self.repo.root
-            tmproot = None
-            copynode = None
-            try:
-                # if we aren't looking at the wc, copy the node...
-                if stat in 'R!' or force_left:
-                    copynode = self._node1
-                elif self._node2:
-                    copynode = self._node2
-
-                if copynode:
-                    tmproot = tempfile.mkdtemp(prefix='gtools.')
-                    copydir = extdiff.snapshot_node(self.ui, self.repo,
-                            [util.pconvert(file)], copynode, tmproot)
-                    pathroot = os.path.join(tmproot, copydir)
-
-                file_path = os.path.join(pathroot, file)
-                util.system("%s \"%s\"" % (editor, file_path),
-                            environ={'HGUSER': self.ui.username()},
-                            onerr=util.Abort, errprefix=_('edit failed'))
-            finally:
-                if tmproot:
-                    shutil.rmtree(tmproot)
-
-        editor = (os.environ.get('HGEDITOR') or
-                self.ui.config('gtools', 'editor') or
-                self.ui.config('ui', 'editor') or
-                os.environ.get('EDITOR', 'vi'))
-        if editor in ('vi', 'vim'):
-            Prompt('No visual editor configured',
-                    'Please configure a visual editor.', self).run()
-            dlg = ConfigDialog(self.repo.root, False)
-            dlg.show_all()
-            dlg.focus_field('ui.editor')
-            dlg.run()
-            dlg.hide()
-            self.ui = ui.ui()
-            self._parse_config()
-            return
-        thread = threading.Thread(target=doedit, name='edit:'+file)
-        thread.setDaemon(True)
-        thread.start()
 
 
     def _view_left_file(self, stat, file):
