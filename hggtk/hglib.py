@@ -198,13 +198,13 @@ class HgThread(threading.Thread):
                 if self.postfunc:
                     self.postfunc(ret)
             except hg.RepoError, e:
-                self.ui.write_err(e)
+                self.ui.write_err(str(e))
             except util.Abort, e:
-                self.ui.write_err(e)
+                self.ui.write_err(str(e))
                 if self.ui.traceback:
                     self.ui.print_exc()
             except Exception, e:
-                self.ui.write_err(e)
+                self.ui.write_err(str(e))
                 self.ui.print_exc()
         finally:
             HgThread.instances += -1
