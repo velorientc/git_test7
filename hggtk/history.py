@@ -75,6 +75,8 @@ class GLog(GDialog):
         '''Treeview reports log generator has exited'''
         if not self.graphview.graphdata:
             self.details_text.set_buffer(gtk.TextBuffer())
+            self._filelist_tree.set_model(None)
+            self._last_rev = None
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
@@ -156,15 +158,22 @@ class GLog(GDialog):
 
     def save_settings(self):
         settings = GDialog.save_settings(self)
-        settings['glog'] = self._vpaned.get_position()
+        settings['glog'] = (self._vpaned.get_position(),
+                self._hpaned.get_position())
         return settings
 
     def load_settings(self, settings):
         GDialog.load_settings(self, settings)
         if settings:
-            self._setting_vpos = settings['glog']
+            set = settings['glog']
+            if type(set) == int:
+                self._setting_vpos = set
+                self._setting_hpos = -1
+            else:
+                (self._setting_vpos, self._setting_hpos) = set
         else:
             self._setting_vpos = -1
+            self._setting_hpos = -1
 
     def _hg_log(self, rev, pats, verbose):
         def dohglog():
@@ -236,6 +245,8 @@ class GLog(GDialog):
         ctx = self.repo.changectx(rev)
         if not ctx:
             self.details_text.set_buffer(gtk.TextBuffer())
+            self._filelist_tree.set_model(None)
+            self._last_rev = None
             return False
 
         buffer = gtk.TextBuffer()
@@ -261,8 +272,9 @@ class GLog(GDialog):
         change = str(rev) + ':' + short(ctx.node())
         buffer.insert_with_tags_by_name(buff_iter,
                 'changeset: ' + change + '\n', 'changeset')
-        buffer.insert_with_tags_by_name(buff_iter,
-                'branch:    ' + ctx.branch() + '\n', 'changeset')
+        if ctx.branch() != 'default':
+            buffer.insert_with_tags_by_name(buff_iter,
+                    'branch:    ' + ctx.branch() + '\n', 'changeset')
         buffer.insert_with_tags_by_name(buff_iter,
                 'user:      ' + ctx.user() + '\n', 'changeset')
         buffer.insert_with_tags_by_name(buff_iter,
@@ -275,18 +287,50 @@ class GLog(GDialog):
             buffer.insert_with_tags_by_name(buff_iter,
                     change + '\n', 'parlink')
 
-        buffer.insert_with_tags_by_name(buff_iter,
-                'files:     ' + ' '.join(ctx.files()) + '\n', 'files')
-
         tags = ' '.join(ctx.tags())
         if tags:
             buffer.insert_with_tags_by_name(buff_iter,
                     'tags:      ' + tags + '\n', 'tag')
 
         log = util.fromlocal(ctx.description())
-        buffer.insert(buff_iter, '\n' + log + '\n')
+        buffer.insert(buff_iter, '\n' + log + '\n\n')
+
+        # add file deltas to buffer
+        lines = []
+        node = self.repo.changelog.node(rev)
+        pnodes = [self.repo.changelog.node(p) for p in parents]
+        for path in ctx.files():
+            stretch = '=' * ((76 - len(path))/2)
+            lines.append(buffer.get_line_count())
+            buffer.insert_with_tags_by_name(buff_iter,
+                    '%s: %s :%s\n' % (stretch, path, stretch), 'files')
+            for i, p in enumerate(parents):
+                self.repo.ui.pushbuffer()
+                patch.diff(self.repo, pnodes[i], node, match=lambda x:x==path)
+                delta = self.repo.ui.popbuffer()
+                buffer.insert(buff_iter, delta)
+                if len(parents) > 1:
+                    stretch = '=' * 20
+                    buffer.insert_with_tags_by_name(buff_iter,
+                        '%s: other parent :%s\n' % (stretch, stretch), 'files')
+
+        model = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
+        for path in ctx.files():
+            mark = buffer.create_mark(path,
+                    buffer.get_iter_at_line(lines.pop(0)-1))
+            model.append((path, mark))
+
+        self._filelist_tree.set_model(model)
         self.details_text.set_buffer(buffer)
         return True
+
+    def _filelist_rowchanged(self, sel):
+        model, iter = sel.get_selected()
+        if not iter:
+            return
+        # scroll to file in details window
+        mark = model[iter][1]
+        self.details_text.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
 
     def parent_link_handler(self, tag, widget, event, iter):
         text = self.get_link_text(tag, widget, event, iter)
@@ -396,9 +440,23 @@ class GLog(GDialog):
         self.details_text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.details_text)
 
+        self._filelist_tree = gtk.TreeView()
+        filesel = self._filelist_tree.get_selection()
+        filesel.connect("changed", self._filelist_rowchanged)
+        column = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=0)
+        self._filelist_tree.append_column(column)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add(self._filelist_tree)
+
+        self._hpaned = gtk.HPaned()
+        self._hpaned.pack1(details_frame, True, True)
+        self._hpaned.pack2(scrolledwindow, True, True)
+        self._hpaned.set_position(self._setting_hpos)
+
         self._vpaned = gtk.VPaned()
         self._vpaned.pack1(self.tree_frame, True, False)
-        self._vpaned.pack2(details_frame, True, True)
+        self._vpaned.pack2(self._hpaned, True, True)
         self._vpaned.set_position(self._setting_vpos)
         return self._vpaned
 
