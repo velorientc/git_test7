@@ -277,6 +277,8 @@ class GLog(GDialog):
             buffer.insert_with_tags_by_name(buff_iter,
                     'tags:      ' + tags + '\n', 'tag')
 
+        self.details_text.set_buffer(buffer)
+
         log = util.fromlocal(ctx.description())
         buffer.insert(buff_iter, '\n' + log + '\n\n')
 
@@ -313,14 +315,16 @@ class GLog(GDialog):
                     buffer.insert_with_tags_by_name(buff_iter,
                         '%s: other parent :%s\n' % (stretch, stretch), 'files')
 
-        model = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
+        model = gtk.ListStore(gobject.TYPE_STRING,
+                gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)
+        mark = buffer.create_mark(None, buffer.get_iter_at_line(0))
+        model.append(('Contents', mark, False))
         for path in ctx.files():
             mark = buffer.create_mark(path,
                     buffer.get_iter_at_line(lines.pop(0)-1))
-            model.append((path, mark))
+            model.append((path, mark, True))
 
         self._filelist_tree.set_model(model)
-        self.details_text.set_buffer(buffer)
         return True
 
     def parent_link_handler(self, tag, widget, event, iter):
@@ -662,10 +666,13 @@ class GLog(GDialog):
         model, iter = sel.get_selected()
         if not iter:
             return
-        self.curfile = model[iter][0]
         # scroll to file in details window
         mark = model[iter][1]
         self.details_text.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
+        if model[iter][2]:
+            self.curfile = model[iter][0]
+        else:
+            self.curfile = None
 
     def _file_button_release(self, widget, event) :
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
@@ -674,6 +681,8 @@ class GLog(GDialog):
         return False
 
     def _file_popup_menu(self, treeview, button=0, time=0) :
+        if self.curfile is None:
+            return
         is_mark = self.graphview.get_mark_rev() is not None
         self._file_diff_to_mark_menu.set_sensitive(is_mark)
         self._file_diff_from_mark_menu.set_sensitive(is_mark)
@@ -710,7 +719,8 @@ class GLog(GDialog):
         statopts['modified'] = True
         statopts['added'] = True
         statopts['removed'] = True
-        dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile], statopts, False)
+        dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile],
+                statopts, False)
         dialog.display()
         return True
 
@@ -726,7 +736,8 @@ class GLog(GDialog):
         statopts['modified'] = True
         statopts['added'] = True
         statopts['removed'] = True
-        dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile], statopts, False)
+        dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile],
+                statopts, False)
         dialog.display()
         return True
 
