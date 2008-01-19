@@ -15,6 +15,7 @@ pygtk.require('2.0')
 import gtk
 import gobject
 import pango
+import StringIO
 
 from mercurial.i18n import _
 from mercurial.node import *
@@ -74,8 +75,8 @@ class GLog(GDialog):
     def revisions_loaded(self, graphview):
         '''Treeview reports log generator has exited'''
         if not self.graphview.graphdata:
-            self.details_text.set_buffer(gtk.TextBuffer())
-            self._filelist_tree.set_model(None)
+            self._buffer.set_text('')
+            self._filelist.clear()
             self._last_rev = None
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
@@ -221,124 +222,142 @@ class GLog(GDialog):
             self.graphview.refresh(False, [], self.opts)
 
     def load_details(self, rev):
-        parents = self.currow[treemodel.PARENTS]
+        '''Load selected changeset details into buffer and filelist'''
+        self._buffer.set_text('')
+        self._filelist.clear()
         ctx = self.repo.changectx(rev)
         if not ctx:
-            self.details_text.set_buffer(gtk.TextBuffer())
-            self._filelist_tree.set_model(None)
             self._last_rev = None
             return False
+        self.textview.freeze_child_notify()
+        try:
+            self._fill_buffer(self._buffer, rev, ctx, self._filelist)
+        finally:
+            self.textview.thaw_child_notify()
 
-        buffer = gtk.TextBuffer()
-        buff_iter = buffer.get_start_iter()
-        buffer.create_tag('changeset', foreground='#000090',
-                paragraph_background='#F0F0F0')
-        buffer.create_tag('date', foreground='#000090',
-                paragraph_background='#F0F0F0')
-        buffer.create_tag('tag', foreground='#000090',
-                paragraph_background='#F0F0F0')
-        buffer.create_tag('files', foreground='#5C5C5C',
-                paragraph_background='#F0F0F0')
-        buffer.create_tag('parent', foreground='#000090',
-                paragraph_background='#F0F0F0')
+    def _fill_buffer(self, buf, rev, ctx, filelist):
+        def title_line(title, text, tag):
+            pad = ' ' * (20 - len(title))
+            buf.insert_with_tags_by_name(eob, title + pad + text, tag)
+            buf.insert(eob, "\n")
 
-        buffer.create_tag('removed', foreground='#900000')
-        buffer.create_tag('added', foreground='#006400')
-        buffer.create_tag('position', foreground='#FF8000')
-        buffer.create_tag('header', foreground='#000090')
-
-        parent_link = buffer.create_tag('parlink', foreground='#0000FF', 
-                underline=pango.UNDERLINE_SINGLE,
-                paragraph_background='#F0F0F0')
-        parent_link.connect("event", self.parent_link_handler)
-        
+        eob = buf.get_end_iter()
+        # TODO: Add toggle for gmtime/localtime
         date = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(ctx.date()[0]))
-        
         change = str(rev) + ':' + short(ctx.node())
-        buffer.insert_with_tags_by_name(buff_iter,
-                'changeset: ' + change + '\n', 'changeset')
-        if ctx.branch() != 'default':
-            buffer.insert_with_tags_by_name(buff_iter,
-                    'branch:    ' + ctx.branch() + '\n', 'changeset')
-        buffer.insert_with_tags_by_name(buff_iter,
-                'user:      ' + ctx.user() + '\n', 'changeset')
-        buffer.insert_with_tags_by_name(buff_iter,
-                'date:      ' + date + '\n', 'date')
+        tags = ' '.join(ctx.tags())
+        parents = self.currow[treemodel.PARENTS]
 
+        title_line('changeset:', change, 'changeset')
+        if ctx.branch() != 'default':
+            title_line('branch:', ctx.branch(), 'greybg')
+        title_line('user:', ctx.user(), 'changeset')
+        title_line('date:', date, 'date')
         for p in parents:
             change = str(p) + ':' + short(self.repo.changelog.node(p))
-            buffer.insert_with_tags_by_name(buff_iter,
-                    'parent:    ', 'parent')
-            buffer.insert_with_tags_by_name(buff_iter,
-                    change + '\n', 'parlink')
-
-        tags = ' '.join(ctx.tags())
-        if tags:
-            buffer.insert_with_tags_by_name(buff_iter,
-                    'tags:      ' + tags + '\n', 'tag')
-
-        self.details_text.set_buffer(buffer)
+            title = 'parent:'
+            title += ' ' * (20 - len(title))
+            buf.insert_with_tags_by_name(eob, title, 'parent')
+            buf.insert_with_tags_by_name(eob, change, 'link')
+            buf.insert(eob, "\n")
+        if tags: title_line('tags:', tags, 'tag')
 
         log = util.fromlocal(ctx.description())
-        buffer.insert(buff_iter, '\n' + log + '\n\n')
+        buf.insert(eob, '\n' + log + '\n\n')
 
-        # add file deltas to buffer
-        lines = []
-        node = self.repo.changelog.node(rev)
-        pnodes = [self.repo.changelog.node(p) for p in parents]
-        for path in ctx.files():
-            stretch = '=' * ((76 - len(path))/2)
-            lines.append(buffer.get_line_count())
-            buffer.insert_with_tags_by_name(buff_iter,
-                    '%s: %s :%s\n' % (stretch, path, stretch), 'files')
-            for i, p in enumerate(parents):
-                self.repo.ui.pushbuffer()
-                patch.diff(self.repo, pnodes[i], node, match=lambda x:x==path)
-                delta = self.repo.ui.popbuffer()
-                for line in delta.splitlines():
-                    if line.startswith('---') or line.startswith('+++'):
-                        buffer.insert_with_tags_by_name(buff_iter,
-                                line+'\n', 'header')
-                    elif line[0] == '-':
-                        buffer.insert_with_tags_by_name(buff_iter,
-                                line+'\n', 'removed')
-                    elif line[0] == '+':
-                        buffer.insert_with_tags_by_name(buff_iter,
-                                line+'\n', 'added')
-                    elif line.startswith('@@'):
-                        buffer.insert_with_tags_by_name(buff_iter,
-                                line+'\n', 'position')
-                    else:
-                        buffer.insert(buff_iter, line+'\n')
-                if len(parents) > 1:
-                    stretch = '=' * 20
-                    buffer.insert_with_tags_by_name(buff_iter,
-                        '%s: other parent :%s\n' % (stretch, stretch), 'files')
+        # TODO: Add toolbar toggle for second parent
+        parent = self.repo.changelog.node(parents[0])
+        out = StringIO.StringIO()
+        patch.diff(self.repo, node1=parent, node2=ctx.node(),
+                files=ctx.files(), fp=out)
 
-        model = gtk.ListStore(gobject.TYPE_STRING,
-                gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)
-        mark = buffer.create_mark(None, buffer.get_iter_at_line(0))
-        model.append(('Contents', mark, False))
-        for path in ctx.files():
-            mark = buffer.create_mark(path,
-                    buffer.get_iter_at_line(lines.pop(0)-1))
-            model.append((path, mark, True))
+        offset = eob.get_offset()
+        difflines = util.tolocal(out.getvalue()).splitlines()
+        fileoffs, tags, lines, statmax = self.prepare_diff(difflines, offset)
 
-        self._filelist_tree.set_model(model)
-        return True
+        # XXX debug : sometime gtk complains it's not valid utf-8 !!!
+        buf.insert(eob, u''.join(lines).encode('utf-8'))
 
-    def parent_link_handler(self, tag, widget, event, iter):
-        text = self.get_link_text(tag, widget, event, iter)
+        # inserts the tags
+        for name, p0, p1 in tags:
+            i0 = buf.get_iter_at_offset(p0)
+            i1 = buf.get_iter_at_offset(p1)
+            txt = buf.get_text(i0, i1)
+            buf.apply_tag_by_name(name, i0, i1)
+            
+        buf.create_mark('begmark', buf.get_start_iter())
+        filelist.append(('Contents', 'begmark', False, ()))
+
+        # inserts the marks
+        for f, mark, offset, stats in fileoffs:
+            pos = buf.get_iter_at_offset(offset)
+            buf.create_mark(mark, pos)
+            filelist.append((f, mark, False, (stats[0],stats[1],statmax)))
+
+        sob, eob = buf.get_bounds()
+        buf.apply_tag_by_name("mono", sob, eob)
+
+    def prepare_diff(self, difflines, offset):
+        '''Borrowed from hgview; parses changeset diffs'''
+        DIFFHDR = "=== %s ===\n"
+        idx = 0
+        outlines = []
+        tags = []
+        filespos = []
+        def addtag( name, offset, length ):
+            if tags and tags[-1][0] == name and tags[-1][2]==offset:
+                tags[-1][2] += length
+            else:
+                tags.append( [name, offset, offset+length] )
+        stats = [0,0]
+        statmax = 0
+        for i,l in enumerate(difflines):
+            if l.startswith("diff"):
+                f = l.split()[-1]
+                txt = DIFFHDR % f
+                addtag( "greybg", offset, len(txt) )
+                outlines.append(txt)
+                markname = "file%d" % idx
+                idx += 1
+                statmax = max( statmax, stats[0]+stats[1] )
+                stats = [0,0]
+                filespos.append(( f, markname, offset, stats ))
+                offset += len(txt)
+                continue
+            elif l.startswith("+++"):
+                continue
+            elif l.startswith("---"):
+                continue
+            elif l.startswith("+"):
+                tag = "green"
+                stats[0] += 1
+            elif l.startswith("-"):
+                stats[1] += 1
+                tag = "red"
+            elif l.startswith("@@"):
+                tag = "blue"
+            else:
+                tag = "black"
+            l = l+"\n"
+            length = len(l)
+            addtag( tag, offset, length )
+            outlines.append( l )
+            offset += length
+        statmax = max( statmax, stats[0]+stats[1] )
+        return filespos, tags, outlines, statmax
+
+    def link_event(self, tag, widget, event, iter):
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return
+        text = self.get_link_text(tag, widget, iter)
         if not text:
             return
         linkrev = long(text.split(':')[0])
         self.graphview.set_revision_id(linkrev)
         self.graphview.scroll_to_revision(linkrev)
 
-    def get_link_text(self, tag, widget, event, iter):
+    def get_link_text(self, tag, widget, iter):
         """handle clicking on a link in a textview"""
-        if event.type != gtk.gdk.BUTTON_RELEASE:
-            return
         text_buffer = widget.get_buffer()
         beg = iter.copy()
         while not beg.begins_tag(tag):
@@ -450,24 +469,37 @@ class GLog(GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         details_frame.add(scroller)
         
-        self.details_text = gtk.TextView()
-        self.details_text.set_wrap_mode(gtk.WRAP_NONE)
-        self.details_text.set_editable(False)
-        self.details_text.modify_font(pango.FontDescription(self.fontcomment))
-        scroller.add(self.details_text)
+        details_text = gtk.TextView()
+        details_text.set_wrap_mode(gtk.WRAP_NONE)
+        details_text.set_editable(False)
+        details_text.modify_font(pango.FontDescription(self.fontcomment))
+        scroller.add(details_text)
 
-        self._filelist_tree = gtk.TreeView()
-        filesel = self._filelist_tree.get_selection()
+        self._buffer = gtk.TextBuffer()
+        self.setup_tags()
+        details_text.set_buffer(self._buffer)
+        self.textview = details_text
+
+        filelist_tree = gtk.TreeView()
+        filesel = filelist_tree.get_selection()
         filesel.connect("changed", self._filelist_rowchanged)
-        self._filelist_tree.connect('button-release-event', self._file_button_release)
-        self._filelist_tree.connect('popup-menu', self._file_popup_menu)
-        self._filelist_tree.connect('row-activated', self._file_row_act)
+        filelist_tree.connect('button-release-event',
+                self._file_button_release)
+        filelist_tree.connect('popup-menu', self._file_popup_menu)
+        filelist_tree.connect('row-activated', self._file_row_act)
+
+        self._filelist = gtk.ListStore(gobject.TYPE_STRING, # filename
+                gobject.TYPE_PYOBJECT, # mark
+                gobject.TYPE_PYOBJECT, # give cmenu
+                gobject.TYPE_PYOBJECT  # diffstats
+                )
+        filelist_tree.set_model(self._filelist)
 
         column = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=0)
-        self._filelist_tree.append_column(column)
+        filelist_tree.append_column(column)
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(self._filelist_tree)
+        scrolledwindow.add(filelist_tree)
 
         self._hpaned = gtk.HPaned()
         self._hpaned.pack1(details_frame, True, True)
@@ -479,6 +511,47 @@ class GLog(GDialog):
         self._vpaned.pack2(self._hpaned, True, True)
         self._vpaned.set_position(self._setting_vpos)
         return self._vpaned
+
+    def setup_tags(self):
+        """Creates the tags to be used inside the TextView"""
+        def make_texttag( name, **kwargs ):
+            """Helper function generating a TextTag"""
+            tag = gtk.TextTag(name)
+            for key, value in kwargs.items():
+                key = key.replace("_","-")
+                try:
+                    tag.set_property( key, value )
+                except TypeError:
+                    print "Warning the property %s is unsupported in" % key
+                    print "this version of pygtk"
+            return tag
+
+        tag_table = self._buffer.get_tag_table()
+
+        tag_table.add( make_texttag('changeset', foreground='#000090',
+                paragraph_background='#F0F0F0'))
+        tag_table.add(make_texttag('date', foreground='#000090',
+                paragraph_background='#F0F0F0'))
+        tag_table.add(make_texttag('tag', foreground='#000090',
+                paragraph_background='#F0F0F0'))
+        tag_table.add(make_texttag('files', foreground='#5C5C5C',
+                paragraph_background='#F0F0F0'))
+        tag_table.add(make_texttag('parent', foreground='#000090',
+                paragraph_background='#F0F0F0'))
+
+        tag_table.add( make_texttag( "mono", family="Monospace" ))
+        tag_table.add( make_texttag( "blue", foreground='blue' ))
+        tag_table.add( make_texttag( "red", foreground='red' ))
+        tag_table.add( make_texttag( "green", foreground='darkgreen' ))
+        tag_table.add( make_texttag( "black", foreground='black' ))
+        tag_table.add( make_texttag( "greybg",
+                                     paragraph_background='grey',
+                                     weight=pango.WEIGHT_BOLD ))
+        tag_table.add( make_texttag( "yellowbg", background='yellow' ))
+        link_tag = make_texttag( "link", foreground="blue",
+                                 underline=pango.UNDERLINE_SINGLE )
+        link_tag.connect("event", self.link_event )
+        tag_table.add( link_tag )
 
     def _diff_revs(self, menuitem):
         from status import GStatus
@@ -667,8 +740,8 @@ class GLog(GDialog):
         if not iter:
             return
         # scroll to file in details window
-        mark = model[iter][1]
-        self.details_text.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
+        mark = self._buffer.get_mark(model[iter][1])
+        self.textview.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
         if model[iter][2]:
             self.curfile = model[iter][0]
         else:
