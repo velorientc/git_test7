@@ -12,7 +12,7 @@ import re
 import threading
 import time
 from mercurial import hg, ui, util
-from hglib import Hg
+from hglib import hgcmd_toq
 from gdialog import *
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
 
@@ -199,12 +199,6 @@ class DataMineDialog(GDialog):
         self.notebook.set_current_page(num)
 
     def trigger_search(self, button, objs):
-        def thread_func(q, *args):
-            hg = Hg(self.repo.root)
-            out = hg.command(*args)
-            for line in out.splitlines():
-                q.put(line)
-
         (treeview, frame, regexp, follow, ignorecase, 
                 linenum, showall, search) = objs
         re = regexp.get_text()
@@ -215,21 +209,20 @@ class DataMineDialog(GDialog):
             return
         
         q = Queue.Queue()
-        args = [q, 'grep']
+        args = [self.repo.root, q, 'grep']
         if follow.get_active():     args.append('--follow')
         if ignorecase.get_active(): args.append('--ignore-case')
         if linenum.get_active():    args.append('--line-number')
         if showall.get_active():    args.append('--all')
         args.append(re)
-        model = treeview.get_model()
-        model.clear()
-
-        self.pbar.set_fraction(0.0)
-        thread = threading.Thread(target=thread_func, args=args)
+        thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
-        gobject.timeout_add(50, self.grep_wait, thread, q, treeview, search)
-        self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
+
+        treeview.get_model().clear()
+        self.pbar.set_fraction(0.0)
         search.set_sensitive(False)
+        self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
+        gobject.timeout_add(50, self.grep_wait, thread, q, treeview, search)
 
     def grep_wait(self, thread, q, treeview, search):
         """
@@ -369,26 +362,19 @@ class DataMineDialog(GDialog):
         self.ann_cmenu.get_children()[0].activate()
 
     def select_rev(self, button, objs):
-        def thread_func(q, *args):
-            hg = Hg(self.repo.root)
-            out = hg.command(*args)
-            for line in out.splitlines():
-                q.put(line)
-
         (treeview, path, revselect, select, follow) = objs
         q = Queue.Queue()
-        hgcmd = [q, 'annotate']
-        if follow.get_active():     hgcmd.append('--follow')
-        # TODO
-        hgcmd.append('--rev')
-        hgcmd.append(revselect)
-        hgcmd.append(path)
-        model = treeview.get_model()
-        model.clear()
-
-        self.pbar.set_fraction(0.0)
-        thread = threading.Thread(target=thread_func, args=hgcmd)
+        args = [self.repo.root, q, 'annotate']
+        if follow.get_active():
+            args.append('--follow')
+        args.append('--rev') # TODO
+        args.append(revselect)
+        args.append(path)
+        thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
+
+        treeview.get_model().clear()
+        self.pbar.set_fraction(0.0)
         gobject.timeout_add(50, self.annotate_wait, thread, q, treeview, select)
         select.set_sensitive(False)
 

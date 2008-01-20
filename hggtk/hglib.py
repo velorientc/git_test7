@@ -210,3 +210,20 @@ class HgThread(threading.Thread):
                 # Undo monkey patch
                 ui.ui = HgThread.savedui
                 HgThread.savedui = None
+
+def hgcmd_toq(path, q, *cmdargs, **options):
+    class Qui(ui.ui):
+        def __init__(self):
+            super(Qui, self).__init__()
+
+        def write(self, *args):
+            if self.buffers:
+                self.buffers[-1].extend([str(a) for a in args])
+            else:
+                for a in args:
+                    q.put(str(a))
+    u = Qui()
+    repo = hg.repository(u, path=path)
+    c, func, args, opts, cmdoptions = parse(repo.ui, cmdargs)
+    cmdoptions.update(options)
+    func(u, repo, *args, **cmdoptions)
