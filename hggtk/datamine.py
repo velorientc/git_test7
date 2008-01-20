@@ -342,7 +342,7 @@ class DataMineDialog(GDialog):
 
     def ann_text_color(self, column, text_renderer, model, row_iter):
         row_rev = model[row_iter][self.COL_REVID]
-        ctx = self.repo.changectx(row_rev)
+        ctx = self.repo.changectx(long(row_rev))
         basedate = self.repo.changectx(long(model.rev)).date()[0]
         text_renderer.set_property('foreground', 
                 self.annotate_colormap.get_color(ctx, basedate))
