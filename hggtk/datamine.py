@@ -62,8 +62,13 @@ class DataMineDialog(GDialog):
         notebook.show()
         self.notebook = notebook
         vbox.pack_start(self.notebook, True, True, 2)
+        hbox = gtk.HBox()
+        self.revisiondesc = gtk.Label('')
+        self.revisiondesc.set_alignment(0.0, 0.0)
         self.pbar = gtk.ProgressBar()
-        vbox.pack_start(self.pbar, False, False, 2)
+        hbox.pack_start(self.revisiondesc, True, True, 2)
+        hbox.pack_start(self.pbar, False, False, 2)
+        vbox.pack_start(hbox, False, False, 2)
         return vbox
 
     def grep_context_menu(self):
@@ -259,6 +264,7 @@ class DataMineDialog(GDialog):
             iter = model.get_iter(path)
             self.currev = model[iter][self.COL_REVID]
             self.curpath = model[iter][self.COL_PATH]
+            self.revisiondesc.set_text(model[iter][self.COL_TOOLTIP])
 
     def close_page(self, button):
         num = self.notebook.get_current_page()
@@ -339,6 +345,7 @@ class DataMineDialog(GDialog):
             iter = model.get_iter(path)
             self.currev = model[iter][self.COL_REVID]
             self.path = model.path
+            self.revisiondesc.set_text(model[iter][self.COL_TOOLTIP])
 
     def ann_text_color(self, column, text_renderer, model, row_iter):
         row_rev = model[row_iter][self.COL_REVID]
