@@ -11,7 +11,7 @@ import os
 import sys
 
 dialogs = '''log synch status clone merge update userconfig repoconfig
-serve recovery commit about'''
+serve recovery commit datamine about'''
 
 nonrepo_commands = 'clone about'
 
@@ -60,6 +60,8 @@ def main(command):
     if command in ('log'):
         from hggtk.history import run
         opts['files'] = [root]
+    elif command in ('datamine'):
+        from hggtk.datamine import run
     elif command in ('synch'):
         from hggtk.synch import run
     elif command in ('status'):

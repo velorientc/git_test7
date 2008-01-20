@@ -155,8 +155,13 @@ class GLog(GDialog):
         self._last_rev = None
         self._filter = "all"
         self.currow = None
-        self.curfile = None
-        self.reload_log()
+        # Hack - to force log to show file history at startup, set 
+        # curfile on dialog before calling dialog.display()
+        if hasattr(self, 'curfile'):
+            self._file_history(None)
+        else:
+            self.curfile = None
+            self.reload_log()
 
     def save_settings(self):
         settings = GDialog.save_settings(self)
@@ -292,7 +297,7 @@ class GLog(GDialog):
         for f, mark, offset, stats in fileoffs:
             pos = buf.get_iter_at_offset(offset)
             buf.create_mark(mark, pos)
-            filelist.append((f, mark, False, (stats[0],stats[1],statmax)))
+            filelist.append((f, mark, True, (stats[0],stats[1],statmax)))
 
         sob, eob = buf.get_bounds()
         buf.apply_tag_by_name("mono", sob, eob)
@@ -399,6 +404,7 @@ class GLog(GDialog):
         _menu = gtk.Menu()
         _menu.append(create_menu('_view at revision', self._view_file_rev))
         _menu.append(create_menu('_file history', self._file_history))
+        _menu.append(create_menu('_annotate file', self._ann_file))
         _menu.append(create_menu('_revert file contents', self._revert_file))
         self._file_diff_to_mark_menu = create_menu('_diff file to mark',
                 self._diff_file_to_mark)
@@ -747,13 +753,13 @@ class GLog(GDialog):
         else:
             self.curfile = None
 
-    def _file_button_release(self, widget, event) :
+    def _file_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
             gtk.gdk.CONTROL_MASK)):
             self._file_popup_menu(widget, event.button, event.time)
         return False
 
-    def _file_popup_menu(self, treeview, button=0, time=0) :
+    def _file_popup_menu(self, treeview, button=0, time=0):
         if self.curfile is None:
             return
         is_mark = self.graphview.get_mark_rev() is not None
@@ -812,7 +818,18 @@ class GLog(GDialog):
         dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile],
                 statopts, False)
         dialog.display()
-        return True
+
+    def _ann_file(self, menuitem):
+        '''User selected diff from mark from the file list context menu'''
+        from datamine import DataMineDialog
+        from gtools import cmdtable
+        rev = self.currow[treemodel.REVID]
+        statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
+                ('include', 'exclude', 'git'))
+        dialog = DataMineDialog(self.ui, self.repo, self.cwd, [],
+                statopts, False)
+        dialog.display()
+        dialog.add_annotate_page(self.curfile, str(rev))
 
     def _file_history(self, menuitem):
         '''User selected file history from file list context menu'''
