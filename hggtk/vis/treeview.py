@@ -11,6 +11,7 @@ import gtk
 import gobject
 import pango
 import treemodel
+import re
 from graphcell import CellRendererGraph
 from revgraph import *
 
@@ -226,7 +227,19 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.set_enable_search(True)
         self.treeview.set_search_equal_func(self.search_in_tree, None)
         
-        # Fix old PyGTK bug - by JAM
+        # If user has configured authorcolor in [tortoisehg], color
+        # rows by author matches
+        self.author_pats = []
+        for k, v in self.repo.ui.configitems('tortoisehg'):
+            if not k.startswith('authorcolor.'): continue
+            pat = k[12:]
+            self.author_pats.append((re.compile(pat, re.I), v))
+        if self.author_pats:
+            color_func = self.text_color_author
+        else:
+            color_func = self.text_color_orig
+
+        # Fix old PyGTK (<1.12) bug - by JAM
         set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
         if set_tooltip is not None:
             set_tooltip(treemodel.MESSAGE)
@@ -271,7 +284,7 @@ class TreeView(gtk.ScrolledWindow):
         self.rev_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.rev_column.pack_start(cell, expand=True)
         self.rev_column.add_attribute(cell, "text", treemodel.REVID)
-        self.rev_column.set_cell_data_func(cell, self.text_color)
+        self.rev_column.set_cell_data_func(cell, color_func)
         self.treeview.append_column(self.rev_column)
 
         cell = gtk.CellRendererText()
@@ -283,7 +296,7 @@ class TreeView(gtk.ScrolledWindow):
         self.tag_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.tag_column.pack_start(cell, expand=True)
         self.tag_column.add_attribute(cell, "text", treemodel.TAGS)
-        self.tag_column.set_cell_data_func(cell, self.text_color)
+        self.tag_column.set_cell_data_func(cell, color_func)
         self.treeview.append_column(self.tag_column)
 
         cell = gtk.CellRendererText()
@@ -295,7 +308,7 @@ class TreeView(gtk.ScrolledWindow):
         self.msg_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.msg_column.pack_start(cell, expand=True)
         self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
-        self.msg_column.set_cell_data_func(cell, self.text_color)
+        self.msg_column.set_cell_data_func(cell, color_func)
         self.treeview.append_column(self.msg_column)
 
         cell = gtk.CellRendererText()
@@ -307,7 +320,7 @@ class TreeView(gtk.ScrolledWindow):
         self.committer_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.committer_column.pack_start(cell, expand=True)
         self.committer_column.add_attribute(cell, "text", treemodel.COMMITER)
-        self.committer_column.set_cell_data_func(cell, self.text_color)
+        self.committer_column.set_cell_data_func(cell, color_func)
         self.treeview.append_column(self.committer_column)
 
         cell = gtk.CellRendererText()
@@ -320,7 +333,7 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.date_column.pack_start(cell, expand=True)
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
-        self.date_column.set_cell_data_func(cell, self.text_color)
+        self.date_column.set_cell_data_func(cell, color_func)
         self.treeview.append_column(self.date_column)
 
     def make_parent(self, tvcolumn, cell, model, iter):
@@ -343,7 +356,7 @@ class TreeView(gtk.ScrolledWindow):
     def get_mark_rev(self):
         return self.marked_rev
 
-    def text_color(self, column, text_renderer, list, row_iter):
+    def text_color_orig(self, column, text_renderer, list, row_iter):
         parents = list[row_iter][treemodel.PARENTS]
         if len(parents) == 2:
             # mark merge changesets green
@@ -357,6 +370,16 @@ class TreeView(gtk.ScrolledWindow):
                 text_renderer.set_property('foreground', 'black')
         else:
             text_renderer.set_property('foreground', 'black')
+
+    def text_color_author(self, column, text_renderer, list, row_iter):
+        commiter = list[row_iter][treemodel.COMMITER]
+        for re, v in self.author_pats:
+            if (re.search(commiter)):
+                color = v
+                break
+        else:
+            color = 'black'
+        text_renderer.set_property('foreground', color)
 
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
