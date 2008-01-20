@@ -187,14 +187,15 @@ class DataMineDialog(GDialog):
         frame.add(vbox)
         frame.show_all()
         num = self.notebook.append_page(frame, None)
-        objs = (treeview, regexp, follow, ignorecase, linenum, showall)
+        objs = (treeview, frame, regexp, follow, ignorecase, linenum, showall)
         search.connect('clicked', self.trigger_search, objs)
         close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
+        self.notebook.set_current_page(num)
 
     def trigger_search(self, button, objs):
-        (treeview, regexp, follow, ignorecase, linenum, showall) = objs
+        (treeview, frame, regexp, follow, ignorecase, linenum, showall) = objs
         re = regexp.get_text()
         if not re:
             Prompt('No regular expression given',
@@ -215,6 +216,7 @@ class DataMineDialog(GDialog):
         # TODO: get rid of this global lock
         self.set_sensitive(False)
         gobject.timeout_add(10, self.grep_out, thread, treeview)
+        self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
 
     def grep_out(self, thread, treeview):
         """
@@ -326,6 +328,7 @@ class DataMineDialog(GDialog):
         close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
+        self.notebook.set_current_page(num)
         self.select_rev(select, objs)
 
     def _ann_selection_changed(self, treeview):
