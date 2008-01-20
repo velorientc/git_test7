@@ -86,17 +86,9 @@ class DataMineDialog(GDialog):
         return _menu
 
     def _cmenu_display(self, menuitem):
-        from status import GStatus
-        from gtools import cmdtable
-        rev1 = long(self.currev)
-        rev0 = self.repo.changelog.parentrevs(rev1)[0]
-        statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
-                ('include', 'exclude', 'git'))
-        statopts['rev'] = ['%u:%u' % (rev0, rev1)]
-        statopts['modified'] = True
-        statopts['added'] = True
-        statopts['removed'] = True
-        dialog = GStatus(self.ui, self.repo, self.cwd, [], statopts, False)
+        from changeset import GChange
+        statopts = {'rev' : [self.currev] }
+        dialog = GChange(self.ui, self.repo, self.cwd, [], statopts, False)
         dialog.display()
 
     def _cmenu_annotate(self, menuitem):
