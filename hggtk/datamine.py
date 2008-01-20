@@ -7,13 +7,14 @@ import gtk
 import gobject
 import os
 import pango
-import threading
 import Queue
 import re
+import threading
+import time
 from mercurial import hg, ui, util
 from hglib import HgThread
-import shlib
 from gdialog import *
+from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
 
 class DataMineDialog(GDialog):
     COL_REVID = 0
@@ -22,7 +23,7 @@ class DataMineDialog(GDialog):
     COL_PATH = 3
 
     def get_title(self):
-        return 'DataMining' + os.path.basename(self.repo.root)
+        return 'DataMining - ' + os.path.basename(self.repo.root)
 
     def get_icon(self):
         return 'menulog.ico'
@@ -57,10 +58,9 @@ class DataMineDialog(GDialog):
         notebook.popup_enable()
         notebook.show()
         self.notebook = notebook
-        #self.add_search_page()
-        #self.add_annotate_page('hggtk/history.py', '762')
         self.grep_cmenu = self.grep_context_menu()
         self.ann_cmenu = self.annotate_context_menu()
+        self.annotate_colormap = AnnotateColorSaturation()
         return notebook
 
     def grep_context_menu(self):
@@ -177,7 +177,6 @@ class DataMineDialog(GDialog):
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
             column.add_attribute(cell, "text", col)
-            #column.set_cell_data_func(cell, self.grep_text_color)
             treeview.append_column(column)
         treeview.set_tooltip_column(self.COL_TOOLTIP)
         scroller = gtk.ScrolledWindow()
@@ -237,7 +236,9 @@ class DataMineDialog(GDialog):
                     author = util.shortuser(ctx.user())
                     summary = ctx.description().replace('\0', '')
                     summary = summary.split('\n')[0]
-                    tip = author+'@'+revid+' "'+summary+'"'
+                    date = time.strftime("%y-%m-%d %H:%M",
+                            time.gmtime(ctx.date()[0]))
+                    tip = author+'@'+revid+' '+date+' "'+summary+'"'
                     model.append((revid, text, tip, path))
             except Queue.Empty:
                 pass
@@ -274,6 +275,8 @@ class DataMineDialog(GDialog):
         hbox.pack_start(close, False, False)
         vbox.pack_start(hbox, False, False)
 
+        # TODO
+        select.set_sensitive(False)
         revselect = revid
 
         follow = gtk.CheckButton('Follow copies and renames')
@@ -282,6 +285,7 @@ class DataMineDialog(GDialog):
         treeview = gtk.TreeView()
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
         treeview.set_property('fixed-height-mode', True)
+        treeview.set_border_width(0)
         treeview.connect("cursor-changed", self._ann_selection_changed)
         treeview.connect('button-release-event', self._ann_button_release)
         treeview.connect('popup-menu', self._ann_popup_menu)
@@ -301,10 +305,11 @@ class DataMineDialog(GDialog):
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
             column.add_attribute(cell, "text", col)
-            #column.set_cell_data_func(cell, self.grep_text_color)
+            column.set_cell_data_func(cell, self.ann_text_color)
             treeview.append_column(column)
         treeview.set_tooltip_column(self.COL_TOOLTIP)
-        treeview.path = path
+        results.path = path
+        results.rev = revid
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(treeview)
@@ -319,6 +324,7 @@ class DataMineDialog(GDialog):
         close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
+        self.select_rev(select, objs)
 
     def _ann_selection_changed(self, treeview):
         """callback for when the user selects grep output."""
@@ -327,7 +333,15 @@ class DataMineDialog(GDialog):
         if path is not None and model is not None:
             iter = model.get_iter(path)
             self.currev = model[iter][self.COL_REVID]
-            self.path = treeview.path
+            self.path = model.path
+
+    def ann_text_color(self, column, text_renderer, model, row_iter):
+        row_rev = model[row_iter][self.COL_REVID]
+        ctx = self.repo.changectx(row_rev)
+        basedate = self.repo.changectx(long(model.rev)).date()[0]
+        text_renderer.set_property('foreground', 
+                self.annotate_colormap.get_color(ctx, basedate))
+        text_renderer.set_property('background', 'black')
 
     def _ann_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
@@ -380,7 +394,9 @@ class DataMineDialog(GDialog):
                     author = util.shortuser(ctx.user())
                     summary = ctx.description().replace('\0', '')
                     summary = summary.split('\n')[0]
-                    tip = author+'@'+revid+' "'+summary+'"'
+                    date = time.strftime("%y-%m-%d %H:%M",
+                            time.gmtime(ctx.date()[0]))
+                    tip = author+'@'+revid+' '+date+' "'+summary+'"'
                     model.append((revid, text, tip))
             except Queue.Empty:
                 pass
