@@ -12,7 +12,7 @@ import re
 import threading
 import time
 from mercurial import hg, ui, util
-from hglib import HgThread
+from hglib import Hg
 from gdialog import *
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
 
@@ -51,17 +51,20 @@ class DataMineDialog(GDialog):
 
     def get_body(self):
         """ Initialize the Dialog. """        
-        # Create a new notebook, place the position of the tabs
+        self.grep_cmenu = self.grep_context_menu()
+        self.ann_cmenu = self.annotate_context_menu()
+        self.annotate_colormap = AnnotateColorSaturation()
+        vbox = gtk.VBox()
         notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_LEFT)
         notebook.set_scrollable(True)
         notebook.popup_enable()
         notebook.show()
         self.notebook = notebook
-        self.grep_cmenu = self.grep_context_menu()
-        self.ann_cmenu = self.annotate_context_menu()
-        self.annotate_colormap = AnnotateColorSaturation()
-        return notebook
+        vbox.pack_start(self.notebook, True, True, 2)
+        self.pbar = gtk.ProgressBar()
+        vbox.pack_start(self.pbar, False, False, 2)
+        return vbox
 
     def grep_context_menu(self):
         _menu = gtk.Menu()
@@ -187,7 +190,8 @@ class DataMineDialog(GDialog):
         frame.add(vbox)
         frame.show_all()
         num = self.notebook.append_page(frame, None)
-        objs = (treeview, frame, regexp, follow, ignorecase, linenum, showall)
+        objs = (treeview, frame, regexp, follow, ignorecase,
+                linenum, showall, search)
         search.connect('clicked', self.trigger_search, objs)
         close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
@@ -195,61 +199,64 @@ class DataMineDialog(GDialog):
         self.notebook.set_current_page(num)
 
     def trigger_search(self, button, objs):
-        (treeview, frame, regexp, follow, ignorecase, linenum, showall) = objs
+        def thread_func(q, *args):
+            hg = Hg(self.repo.root)
+            out = hg.command(*args)
+            for line in out.splitlines():
+                q.put(line)
+
+        (treeview, frame, regexp, follow, ignorecase, 
+                linenum, showall, search) = objs
         re = regexp.get_text()
         if not re:
             Prompt('No regular expression given',
-                    'You must provide a search expression').run()
+                    'You must provide a search expression', self).run()
             regexp.grab_focus()
             return
-        hgcmd = ['grep']
-        if follow.get_active():     hgcmd.append('--follow')
-        if ignorecase.get_active(): hgcmd.append('--ignore-case')
-        if linenum.get_active():    hgcmd.append('--line-number')
-        if showall.get_active():    hgcmd.append('--all')
-        hgcmd.append(re)
+        
+        q = Queue.Queue()
+        args = [q, 'grep']
+        if follow.get_active():     args.append('--follow')
+        if ignorecase.get_active(): args.append('--ignore-case')
+        if linenum.get_active():    args.append('--line-number')
+        if showall.get_active():    args.append('--all')
+        args.append(re)
         model = treeview.get_model()
         model.clear()
 
-        thread = HgThread(hgcmd)
+        self.pbar.set_fraction(0.0)
+        thread = threading.Thread(target=thread_func, args=args)
         thread.start()
-        # TODO: get rid of this global lock
-        self.set_sensitive(False)
-        gobject.timeout_add(10, self.grep_out, thread, treeview)
+        gobject.timeout_add(50, self.grep_wait, thread, q, treeview, search)
         self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
+        search.set_sensitive(False)
 
-    def grep_out(self, thread, treeview):
+    def grep_wait(self, thread, q, treeview, search):
         """
         Handle all the messages currently in the queue (if any).
         """
-        thread.process_dialogs()
-        model = treeview.get_model()
-        while thread.getqueue().qsize():
+        while q.qsize():
+            line = q.get(0).rstrip('\r\n')
             try:
-                msg = thread.getqueue().get(0)
-                lines = msg.splitlines()
-                for line in lines:
-                    if not line: continue
-                    try:
-                        (path, revid, text) = line.split(':', 2)
-                    except ValueError:
-                        continue
-                    rev = long(revid)
-                    ctx = self.repo.changectx(rev)
-                    author = util.shortuser(ctx.user())
-                    summary = ctx.description().replace('\0', '')
-                    summary = summary.split('\n')[0]
-                    date = time.strftime("%y-%m-%d %H:%M",
-                            time.gmtime(ctx.date()[0]))
-                    tip = author+'@'+revid+' '+date+' "'+summary+'"'
-                    model.append((revid, text, tip, path))
-            except Queue.Empty:
-                pass
-        if threading.activeCount() == 1:
-            self.set_sensitive(True)
-            return False
-        else:
+                (path, revid, text) = line.split(':', 2)
+            except ValueError:
+                continue
+            rev = long(revid)
+            ctx = self.repo.changectx(rev)
+            author = util.shortuser(ctx.user())
+            summary = ctx.description().replace('\0', '')
+            summary = summary.split('\n')[0]
+            date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
+            tip = author+'@'+revid+' '+date+' "'+summary+'"'
+            model = treeview.get_model()
+            model.append((revid, text, tip, path))
+        if thread.isAlive():
+            self.pbar.pulse()
             return True
+        else:
+            search.set_sensitive(True)
+            self.pbar.set_fraction(1.0)
+            return False
 
     def _grep_selection_changed(self, treeview):
         """callback for when the user selects grep output."""
@@ -323,7 +330,7 @@ class DataMineDialog(GDialog):
         num = self.notebook.append_page_menu(frame, 
                 gtk.Label(os.path.basename(path) + '@' + revid),
                 gtk.Label(path + '@' + revid))
-        objs = (treeview, path, revselect, follow)
+        objs = (treeview, path, revselect, select, follow)
         select.connect('clicked', self.select_rev, objs)
         close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
@@ -362,8 +369,15 @@ class DataMineDialog(GDialog):
         self.ann_cmenu.get_children()[0].activate()
 
     def select_rev(self, button, objs):
-        (treeview, path, revselect, follow) = objs
-        hgcmd = ['annotate']
+        def thread_func(q, *args):
+            hg = Hg(self.repo.root)
+            out = hg.command(*args)
+            for line in out.splitlines():
+                q.put(line)
+
+        (treeview, path, revselect, select, follow) = objs
+        q = Queue.Queue()
+        hgcmd = [q, 'annotate']
         if follow.get_active():     hgcmd.append('--follow')
         # TODO
         hgcmd.append('--rev')
@@ -372,45 +386,38 @@ class DataMineDialog(GDialog):
         model = treeview.get_model()
         model.clear()
 
-        thread = HgThread(hgcmd)
+        self.pbar.set_fraction(0.0)
+        thread = threading.Thread(target=thread_func, args=hgcmd)
         thread.start()
-        # TODO: get rid of this global lock
-        self.set_sensitive(False)
-        gobject.timeout_add(10, self.annotate_out, thread, treeview)
+        gobject.timeout_add(50, self.annotate_wait, thread, q, treeview, select)
+        select.set_sensitive(False)
 
-    def annotate_out(self, thread, treeview):
+    def annotate_wait(self, thread, q, treeview, select):
         """
         Handle all the messages currently in the queue (if any).
         """
-        thread.process_dialogs()
-        model = treeview.get_model()
-        while thread.getqueue().qsize():
+        while q.qsize():
+            line = q.get(0).rstrip('\r\n')
             try:
-                msg = thread.getqueue().get(0)
-                lines = msg.splitlines()
-                for line in lines:
-                    if not line: continue
-                    try:
-                        (revid, text) = line.split(':', 1)
-                    except ValueError:
-                        continue
-                    rev = long(revid)
-                    ctx = self.repo.changectx(rev)
-                    author = util.shortuser(ctx.user())
-                    summary = ctx.description().replace('\0', '')
-                    summary = summary.split('\n')[0]
-                    date = time.strftime("%y-%m-%d %H:%M",
-                            time.gmtime(ctx.date()[0]))
-                    tip = author+'@'+revid+' '+date+' "'+summary+'"'
-                    model.append((revid, text, tip))
-            except Queue.Empty:
-                pass
-        if threading.activeCount() == 1:
-            self.set_sensitive(True)
-            return False
-        else:
+                (revid, text) = line.split(':', 1)
+            except ValueError:
+                continue
+            rev = long(revid)
+            ctx = self.repo.changectx(rev)
+            author = util.shortuser(ctx.user())
+            summary = ctx.description().replace('\0', '')
+            summary = summary.split('\n')[0]
+            date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
+            tip = author+'@'+revid+' '+date+' "'+summary+'"'
+            model = treeview.get_model()
+            model.append((revid, text, tip))
+        if thread.isAlive():
+            self.pbar.pulse()
             return True
-        print objs
+        else:
+            select.set_sensitive(True)
+            self.pbar.set_fraction(1.0)
+            return False
 
     def make_toolbutton(self, stock, label, handler,
             userdata=None, menu=None, tip=None):
