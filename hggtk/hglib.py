@@ -52,14 +52,12 @@ class Hg:
         self.root = rootpath(path)
         self.repo = hg.repository(self.u, path=self.root)
        
-    def command(self, cmd, files=[], options={}):
-        absfiles = [os.path.join(self.root, x) for x in files]
-        self.repo.ui.pushbuffer()
-        c, func, args, opts, cmdoptions = parse(self.repo.ui, [cmd])
+    def command(self, *cmdargs, **options):
+        c, func, args, opts, cmdoptions = parse(self.repo.ui, cmdargs)
         cmdoptions.update(options)
-        func(self.repo.ui, self.repo, *absfiles, **cmdoptions)
-        outtext = self.repo.ui.popbuffer()
-        return outtext
+        self.repo.ui.pushbuffer()
+        func(self.repo.ui, self.repo, *args, **cmdoptions)
+        return self.repo.ui.popbuffer()
         
     def status(self, files=[], list_clean=False):
         files, matchfn, anypats = cmdutil.matchpats(self.repo, files)

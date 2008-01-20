@@ -177,7 +177,8 @@ class HistoryDialog(gtk.Dialog):
         import os.path
                   
         try:
-            self.hgout = self.hg.command(cmd, options=options, files=self.files)
+            args = [cmd] + self.hg.abspath(self.files)
+            self.hgout = self.hg.command(*args, **options)
         except util.Abort, inst:
             error_dialog("Error in %s command" % cmd, "abort: %s" % inst)
             return False
