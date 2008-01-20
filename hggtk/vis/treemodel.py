@@ -36,6 +36,7 @@ class TreeModel(gtk.GenericTreeModel):
         self.parents = [x.rev() for x in repo.workingctx().parents()]
         self.heads = [repo.changelog.rev(x) for x in repo.heads()]
         self.line_graph_data = graphdata
+        self.author_re = re.compile('<.*@.*>', 0)
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
@@ -85,7 +86,7 @@ class TreeModel(gtk.GenericTreeModel):
             tags = ', '.join(self.repo.nodetags(node))
 
             if '<' in ctx.user():
-                author = re.sub('<.*@.*>', '', ctx.user()).strip(' ')
+                author = self.author_re.sub('', ctx.user()).strip(' ')
             else:
                 author = util.shortuser(ctx.user())
 
