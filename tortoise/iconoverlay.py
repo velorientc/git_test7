@@ -114,7 +114,7 @@ class IconOverlayExtension(object):
         tc = win32api.GetTickCount()
         
         # check if path is cached
-        if overlay_cache.has_key(path):
+        if path in overlay_cache:
             if tc - overlay_cache[path][1] < CACHE_TIMEOUT:
                 status = overlay_cache[path][0]
                 print "%s: %s (cached)" % (path, status)
@@ -217,7 +217,7 @@ class IconOverlayExtension(object):
             if not f in overlay_cache:
                 overlay_cache[f] = (UNKNOWN, tc)
 
-        if overlay_cache.has_key(path):
+        if path in overlay_cache:
             status = overlay_cache[path][0]
         else:
             status = UNKNOWN

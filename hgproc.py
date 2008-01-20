@@ -93,7 +93,7 @@ def parse(args):
     option, args = get_option(args)
     
     cmdline = [option['hgpath'], option['hgcmd']] 
-    if option.has_key('root'):
+    if 'root' in option:
         cmdline.append('--repository')
         cmdline.append(option['root'])
     cmdline.extend(args)

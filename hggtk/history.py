@@ -196,7 +196,7 @@ class GLog(GDialog):
         revs = []
         if filteropts:
             branch = filteropts.get('branch', None)
-            if filteropts.has_key('revrange') or filteropts.has_key('branch'):
+            if 'revrange' in filteropts or 'branch' in filteropts:
                 self.graphview.refresh(True, branch, self.opts)
             else:
                 filter = filteropts.get('pats', [])

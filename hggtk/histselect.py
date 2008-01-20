@@ -142,7 +142,7 @@ class HistoryDialog(gtk.Dialog):
                     cs = {}
             else:
                 name, value = re.split(':\s+', x, 1)
-                if not cs.has_key(name):    
+                if name not in cs:
                     cs[name] = []
                 cs[name].append(value)
         if cs:
@@ -162,7 +162,7 @@ class HistoryDialog(gtk.Dialog):
         for cs in self.history:
             titer = self.model.append(None, [ _('changeset:'), cs['changeset'][0] ])
             for fld in ('parent', 'tag', 'branch', 'user', 'date', 'summary'):
-                if not cs.has_key(fld):
+                if fld not in cs:
                     continue
                 vlist = type(cs[fld])==type([]) and cs[fld] or [cs[fld]]
                 for v in vlist:

@@ -87,7 +87,7 @@ class TreeView(gtk.ScrolledWindow):
             end = 0
             if pats is not None:  # branch name
                 b = self.repo.branchtags()
-                if b.has_key(pats):
+                if pats in b:
                     node = b[pats]
                     start = self.repo.changelog.rev(node)
                 else:
@@ -192,7 +192,7 @@ class TreeView(gtk.ScrolledWindow):
         return self.get_property('revision')
 
     def scroll_to_revision(self, revid):
-        if self.index.has_key(revid):
+        if revid in self.index:
             row = self.index[revid]
             self.treeview.scroll_to_cell(row, use_align=True, row_align=0.5)
 
@@ -201,7 +201,7 @@ class TreeView(gtk.ScrolledWindow):
 
         :param revid: Revision id of revision to display.
         """
-        if self.index.has_key(revid):
+        if revid in self.index:
             row = self.index[revid]
             self.treeview.set_cursor(row)
             self.treeview.grab_focus()

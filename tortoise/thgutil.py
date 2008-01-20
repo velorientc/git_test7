@@ -70,7 +70,7 @@ if os.name == 'nt':
         key = r"Software\TortoiseHg"
         cat = _winreg.HKEY_LOCAL_MACHINE
         dir = _winreg.QueryValue(cat, key)
-        if not os.environ.has_key('THG_ICON_PATH'):
+        if 'THG_ICON_PATH' not in os.environ:
             os.environ['THG_ICON_PATH'] = os.path.join(dir, 'icons')
         return dir
 
@@ -133,7 +133,7 @@ if os.name == 'nt':
                 win32con.DI_NORMAL)
                 
         # store bitmap to cache
-        if not bitmap_cache.has_key(iconPathName):
+        if iconPathName not in bitmap_cache:
             bitmap_cache[iconPathName] = {}
         bitmap_cache[iconPathName][ico_idx] = hbm
         
