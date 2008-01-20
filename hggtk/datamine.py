@@ -178,7 +178,8 @@ class DataMineDialog(GDialog):
             column.pack_start(cell, expand=True)
             column.add_attribute(cell, "text", col)
             treeview.append_column(column)
-        treeview.set_tooltip_column(self.COL_TOOLTIP)
+        if hasattr(treeview, 'set_tooltip_column'):
+            treeview.set_tooltip_column(self.COL_TOOLTIP)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(treeview)
@@ -307,7 +308,8 @@ class DataMineDialog(GDialog):
             column.add_attribute(cell, "text", col)
             column.set_cell_data_func(cell, self.ann_text_color)
             treeview.append_column(column)
-        treeview.set_tooltip_column(self.COL_TOOLTIP)
+        if hasattr(treeview, 'set_tooltip_column'):
+            treeview.set_tooltip_column(self.COL_TOOLTIP)
         results.path = path
         results.rev = revid
         scroller = gtk.ScrolledWindow()
