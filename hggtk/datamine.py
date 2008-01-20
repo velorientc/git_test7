@@ -226,6 +226,7 @@ class DataMineDialog(GDialog):
         treeview.get_model().clear()
         self.pbar.set_fraction(0.0)
         search.set_sensitive(False)
+        self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
         self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
         gobject.timeout_add(50, self.grep_wait, thread, q, treeview, search)
 
@@ -382,6 +383,7 @@ class DataMineDialog(GDialog):
 
         treeview.get_model().clear()
         self.pbar.set_fraction(0.0)
+        self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
         gobject.timeout_add(50, self.annotate_wait, thread, q, treeview, select)
         select.set_sensitive(False)
 
