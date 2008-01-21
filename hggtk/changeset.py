@@ -44,7 +44,7 @@ class GChange(GDialog):
         return [self.parent_toggle]
 
     def _parent_toggled(self, button):
-        pass
+        self.load_details(self.currev)
 
     def prepare_display(self):
         self.currow = None
@@ -73,10 +73,18 @@ class GChange(GDialog):
         parents = [x for x in self.repo.changelog.parentrevs(rev) \
                 if x != nullrev]
         self.parents = parents
+        title = self.get_title()
         if len(parents) == 2:
             self.parent_toggle.set_sensitive(True)
+            if self.parent_toggle.get_active():
+                title += ':' + str(self.parents[1])
+            else:
+                title += ':' + str(self.parents[0])
+            self.set_title(title)
         else:
             self.parent_toggle.set_sensitive(False)
+            self.parent_toggle.set_active(False)
+        self.set_title(title)
 
         ctx = self.repo.changectx(rev)
         if not ctx:
@@ -113,12 +121,25 @@ class GChange(GDialog):
             buf.insert_with_tags_by_name(eob, title, 'parent')
             buf.insert_with_tags_by_name(eob, change, 'link')
             buf.insert(eob, "\n")
+        for n in self.repo.changelog.children(ctx.node()):
+            childrev = self.repo.changelog.rev(n)
+            change = str(childrev) + ':' + short(n)
+            title = 'child:'
+            title += ' ' * (20 - len(title))
+            buf.insert_with_tags_by_name(eob, title, 'parent')
+            buf.insert_with_tags_by_name(eob, change, 'link')
+            buf.insert(eob, "\n")
+        for n in self.repo.changelog.children(ctx.node()):
+            childrev = self.repo.changelog.rev(n)
         if tags: title_line('tags:', tags, 'tag')
 
         log = util.fromlocal(ctx.description())
         buf.insert(eob, '\n' + log + '\n\n')
 
-        parent = self.repo.changelog.node(parents[0])
+        if self.parent_toggle.get_active():
+            parent = self.repo.changelog.node(parents[1])
+        else:
+            parent = self.repo.changelog.node(parents[0])
         out = StringIO.StringIO()
         patch.diff(self.repo, node1=parent, node2=ctx.node(),
                 files=ctx.files(), fp=out)
@@ -206,6 +227,8 @@ class GChange(GDialog):
         if self.graphview:
             self.graphview.set_revision_id(linkrev)
             self.graphview.scroll_to_revision(linkrev)
+        else:
+            self.load_details(linkrev)
 
     def get_link_text(self, tag, widget, iter):
         """handle clicking on a link in a textview"""
@@ -455,5 +478,5 @@ if __name__ == "__main__":
     import sys
     opts = {}
     opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    opts['rev'] = ['tip']
+    opts['rev'] = ['750']
     run(**opts)
