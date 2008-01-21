@@ -151,12 +151,15 @@ class GLog(GDialog):
         menu.show_all()
         return menu
 
+    def open_with_file(self, file):
+        '''Call this before display() to open with file history'''
+        self.curfile = file
+
     def prepare_display(self):
+        '''Called at end of display() method'''
         self._last_rev = None
         self._filter = "all"
         self.currow = None
-        # Hack - to force log to show file history at startup, set 
-        # curfile on dialog before calling dialog.display()
         if hasattr(self, 'curfile'):
             self.custombutton.set_active(True)
             self.reload_log({'pats' : [self.curfile]})

@@ -441,7 +441,6 @@ class ChangeSet(GDialog):
     def _ann_file(self, menuitem):
         '''User selected diff from mark from the file list context menu'''
         from datamine import DataMineDialog
-        from gtools import cmdtable
         rev = self.currev
         dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {}, False)
         dialog.display()
@@ -458,10 +457,9 @@ class ChangeSet(GDialog):
         else:
             # Else launch our own GLog instance
             from history import GLog
-            from gtools import cmdtable
             dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root],
                     {}, False)
-            dialog.curfile = self.curfile
+            dialog.open_with_file(self.curfile)
             dialog.display()
 
     def _revert_file(self, menuitem):
