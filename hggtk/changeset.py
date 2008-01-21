@@ -85,7 +85,12 @@ class GChange(GDialog):
             self.set_title(title)
         else:
             self.parent_toggle.set_sensitive(False)
-            self.parent_toggle.set_active(False)
+            if self.parent_toggle.get_active():
+                # Parent button must be pushed out, but this
+                # will cause load_details to be called again
+                # so we exit out to prevent recursion.
+                self.parent_toggle.set_active(False)
+                return
         self.set_title(title)
 
         ctx = self.repo.changectx(rev)
@@ -145,7 +150,6 @@ class GChange(GDialog):
         out = StringIO.StringIO()
         patch.diff(self.repo, node1=parent, node2=ctx.node(),
                 files=ctx.files(), fp=out)
-
         offset = eob.get_offset()
         difflines = util.tolocal(out.getvalue()).splitlines()
         fileoffs, tags, lines, statmax = self.prepare_diff(difflines, offset)
