@@ -86,9 +86,9 @@ class DataMineDialog(GDialog):
         return _menu
 
     def _cmenu_display(self, menuitem):
-        from changeset import GChange
+        from changeset import ChangeSet
         statopts = {'rev' : [self.currev] }
-        dialog = GChange(self.ui, self.repo, self.cwd, [], statopts, False)
+        dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts, False)
         dialog.display()
 
     def _cmenu_annotate(self, menuitem):

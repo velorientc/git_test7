@@ -22,7 +22,7 @@ from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
 from shlib import shell_notify
 from gdialog import *
-from changeset import GChange
+from changeset import ChangeSet
 from logfilter import FilterDialog
 from hgcmd import CmdDialog
 from update import UpdateDialog
@@ -171,7 +171,9 @@ class GLog(GDialog):
         return settings
 
     def load_settings(self, settings):
-        self.changeview = GChange(self.ui, self.repo, self.cwd, [],
+        '''Called at beginning of display() method'''
+        # Allocate ChangeSet instance to use internally
+        self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
                 self.opts, False)
         self.changeview.display(False)
         self.changeview.glog_parent = self
@@ -307,7 +309,7 @@ class GLog(GDialog):
         self.tree_frame.add(hbox)
         self.tree_frame.show_all()
 
-        # Add GChange instance to bottom half of vpane
+        # Add ChangeSet instance to bottom half of vpane
         self.changeview.graphview = self.graphview
         self._hpaned = self.changeview.get_body()
 
@@ -391,10 +393,9 @@ class GLog(GDialog):
             self.reload_log()
 
     def _show_status(self, menuitem):
-        from changeset import GChange
         rev = self.currow[treemodel.REVID]
         statopts = {'rev' : [str(rev)] }
-        dialog = GChange(self.ui, self.repo, self.cwd, [], statopts, False)
+        dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts, False)
         dialog.display()
 
     def _export_patch(self, menuitem):

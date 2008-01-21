@@ -23,7 +23,7 @@ from gdialog import *
 from hgcmd import CmdDialog
 
 
-class GChange(GDialog):
+class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
     """
     def get_title(self):
@@ -56,13 +56,13 @@ class GChange(GDialog):
 
     def save_settings(self):
         settings = GDialog.save_settings(self)
-        settings['gchange'] = self._hpaned.get_position()
+        settings['changeset'] = self._hpaned.get_position()
         return settings
 
     def load_settings(self, settings):
         GDialog.load_settings(self, settings)
-        if settings and 'gchange' in settings:
-            self._setting_hpos = settings['gchange']
+        if settings and 'changeset' in settings:
+            self._setting_hpos = settings['changeset']
         else:
             self._setting_hpos = -1
 
@@ -483,7 +483,7 @@ def run(root='', cwd='', files=[], **opts):
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
 
-    dialog = GChange(u, repo, cwd, files, opts, True)
+    dialog = ChangeSet(u, repo, cwd, files, opts, True)
     dialog.display()
 
     gtk.gdk.threads_init()
