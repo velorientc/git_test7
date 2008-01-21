@@ -280,7 +280,6 @@ class GLog(GDialog):
         self.tree = self.graphview.treeview
         self.graphview.connect('revision-selected', self.selection_changed)
         self.graphview.connect('revisions-loaded', self.revisions_loaded)
-        self.graphview.set_property('date-column-visible', True)
 
         self.tree.connect('button-release-event', self._tree_button_release)
         self.tree.connect('popup-menu', self._tree_popup_menu)
@@ -316,7 +315,40 @@ class GLog(GDialog):
         self._vpaned.pack2(self._hpaned)
         self._vpaned.set_position(self._setting_vpos)
         self._hpaned.set_position(self._setting_hpos)
-        return self._vpaned
+
+        # Append status bar
+        vbox = gtk.VBox()
+        vbox.pack_start(self._vpaned, True, True)
+
+        hbox = gtk.HBox()
+        showrev = gtk.CheckButton('Show ids')
+        showtags = gtk.CheckButton('Show tags')
+        showdate = gtk.CheckButton('Show date')
+        showrev.connect('toggled', self.toggle_rev_column)
+        showtags.connect('toggled', self.toggle_tags_column)
+        showdate.connect('toggled', self.toggle_date_column)
+        showrev.set_active(True)
+        showtags.set_active(True)
+        showdate.set_active(True)
+        hbox.pack_start(showrev, False, False)
+        hbox.pack_start(showtags, False, False)
+        hbox.pack_start(showdate, False, False)
+        hbox.pack_start(gtk.Label(''), True, True) # Padding
+
+        vbox.pack_start(hbox, False, False)
+        return vbox
+
+    def toggle_rev_column(self, button):
+        bool = button.get_active()
+        self.graphview.set_property('rev-column-visible', bool)
+
+    def toggle_tags_column(self, button):
+        bool = button.get_active()
+        self.graphview.set_property('tags-column-visible', bool)
+
+    def toggle_date_column(self, button):
+        bool = button.get_active()
+        self.graphview.set_property('date-column-visible', bool)
 
     def _diff_revs(self, menuitem):
         from status import GStatus

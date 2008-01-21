@@ -44,6 +44,16 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show date column',
                                  False,
                                  gobject.PARAM_READWRITE),
+        'rev-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Rev',
+                                 'Show revision id column',
+                                 False,
+                                 gobject.PARAM_READWRITE),
+        'tags-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Tags',
+                                 'Show tags column',
+                                 False,
+                                 gobject.PARAM_READWRITE),
     }
 
     __gsignals__ = {
@@ -156,6 +166,10 @@ class TreeView(gtk.ScrolledWindow):
     def do_get_property(self, property):
         if property.name == 'date-column-visible':
             return self.date_column.get_visible()
+        elif property.name == 'tags-column-visible':
+            return self.tag_column.get_visible()
+        elif property.name == 'rev-column-visible':
+            return self.rev_column.get_visible()
         elif property.name == 'repo':
             return self.repo
         elif property.name == 'limit':
@@ -168,6 +182,10 @@ class TreeView(gtk.ScrolledWindow):
     def do_set_property(self, property, value):
         if property.name == 'date-column-visible':
             self.date_column.set_visible(value)
+        elif property.name == 'tags-column-visible':
+            self.tag_column.set_visible(value)
+        elif property.name == 'rev-column-visible':
+            self.rev_column.set_visible(value)
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'limit':
@@ -265,6 +283,7 @@ class TreeView(gtk.ScrolledWindow):
         cell.set_property("width-chars", 8)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.rev_column = gtk.TreeViewColumn("Rev")
+        self.rev_column.set_visible(False)
         self.rev_column.set_resizable(True)
         self.rev_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.rev_column.set_fixed_width(cell.get_size(self.treeview)[2])
@@ -277,6 +296,7 @@ class TreeView(gtk.ScrolledWindow):
         cell.set_property("width-chars", 10)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.tag_column = gtk.TreeViewColumn("Tag")
+        self.tag_column.set_visible(False)
         self.tag_column.set_resizable(True)
         self.tag_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.tag_column.set_fixed_width(cell.get_size(self.treeview)[2])
