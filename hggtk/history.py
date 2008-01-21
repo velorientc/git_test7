@@ -320,7 +320,7 @@ class GLog(GDialog):
         self._vpaned.pack1(self.tree_frame, True, False)
         self._vpaned.pack2(self._hpaned)
         self._vpaned.set_position(self._setting_vpos)
-        self.changeview.set_position(self._setting_hpos)
+        self._hpaned.set_position(self._setting_hpos)
         return self._vpaned
 
     def _diff_revs(self, menuitem):
