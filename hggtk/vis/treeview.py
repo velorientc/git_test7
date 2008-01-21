@@ -65,7 +65,7 @@ class TreeView(gtk.ScrolledWindow):
                               ())
     }
 
-    def __init__(self, repo, limit = None):
+    def __init__(self, repo, limit=None, pbar=None):
         """Create a new TreeView.
 
         :param repo:  Repository object to show
@@ -80,6 +80,7 @@ class TreeView(gtk.ScrolledWindow):
         self.currev = None
         self.marked_rev = None
         self.construct_treeview()
+        self.pbar = pbar
 
     def search_in_tree(self, model, column, key, iter, data):
         """Searches all fields shown in the tree when the user hits crtr+f,
@@ -94,6 +95,7 @@ class TreeView(gtk.ScrolledWindow):
         return True
 
     def create_log_generator(self, graphcol, pats, opts):
+        self.pbar.set_fraction(0.0)
         if graphcol:
             end = 0
             if pats is not None:  # branch name
@@ -139,11 +141,13 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
             self.limit = len(self.graphdata)
 
+        self.pbar.pulse()
         if self.limit is None or len(self.graphdata) < self.limit:
             return True
 
         if not len(self.graphdata):
             self.treeview.set_model(None)
+            self.pbar.set_fraction(1.0)
             return False
 
         if not self.model:
@@ -161,6 +165,7 @@ class TreeView(gtk.ScrolledWindow):
 
         if revision is not None:
             self.set_revision_id(revision[treemodel.REVID])
+        self.pbar.set_fraction(1.0)
         return False
 
     def do_get_property(self, property):

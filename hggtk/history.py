@@ -276,7 +276,8 @@ class GLog(GDialog):
         if gobject.pygtk_version < (2, 8, 0): 
             gobject.type_register(TreeView)
 
-        self.graphview = TreeView(self.repo, limit)
+        self.pbar = gtk.ProgressBar()
+        self.graphview = TreeView(self.repo, limit, self.pbar)
         self.tree = self.graphview.treeview
         self.graphview.connect('revision-selected', self.selection_changed)
         self.graphview.connect('revisions-loaded', self.revisions_loaded)
@@ -334,6 +335,7 @@ class GLog(GDialog):
         hbox.pack_start(showtags, False, False)
         hbox.pack_start(showdate, False, False)
         hbox.pack_start(gtk.Label(''), True, True) # Padding
+        hbox.pack_start(self.pbar, False, False)
 
         vbox.pack_start(hbox, False, False)
         return vbox
