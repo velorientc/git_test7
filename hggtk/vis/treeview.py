@@ -263,18 +263,6 @@ class TreeView(gtk.ScrolledWindow):
                 "out-lines", treemodel.LINES)
         self.treeview.append_column(self.graph_column)
 
-        pcell = gtk.CellRendererPixbuf()
-        hcell = gtk.CellRendererPixbuf()
-        self.status_column = gtk.TreeViewColumn('Status')
-        self.status_column.pack_start(pcell, expand=True)
-        self.status_column.pack_start(hcell, expand=True)
-        self.status_column.set_resizable(True)
-        self.status_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.status_column.set_fixed_width(48)
-        self.status_column.set_cell_data_func(pcell, self.make_parent)
-        self.status_column.set_cell_data_func(hcell, self.make_head)
-        self.treeview.append_column(self.status_column)
-        
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 8)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
@@ -300,15 +288,24 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.tag_column)
 
         cell = gtk.CellRendererText()
+        mcell = gtk.CellRendererPixbuf()
+        pcell = gtk.CellRendererPixbuf()
+        hcell = gtk.CellRendererPixbuf()
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.msg_column = gtk.TreeViewColumn("Summary")
         self.msg_column.set_resizable(True)
         self.msg_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.msg_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.msg_column.pack_start(mcell, expand=False)
+        self.msg_column.pack_start(pcell, expand=False)
+        self.msg_column.pack_start(hcell, expand=False)
         self.msg_column.pack_start(cell, expand=True)
-        self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
+        self.msg_column.set_cell_data_func(mcell, self.make_mark)
+        self.msg_column.set_cell_data_func(pcell, self.make_parent)
+        self.msg_column.set_cell_data_func(hcell, self.make_head)
         self.msg_column.set_cell_data_func(cell, color_func)
+        self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
         self.treeview.append_column(self.msg_column)
 
         cell = gtk.CellRendererText()
@@ -338,16 +335,31 @@ class TreeView(gtk.ScrolledWindow):
 
     def make_parent(self, tvcolumn, cell, model, iter):
         stock = model.get_value(iter, treemodel.WCPARENT)
-        pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
-        cell.set_property('pixbuf', pb)
+        if stock:
+            pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
+            cell.set_property('pixbuf', pb)
+            cell.set_property('visible', 1)
+        else:
+            cell.set_property('visible', 0)
 
     def make_head(self, tvcolumn, cell, model, iter):
-        if self.marked_rev == long(model.get_value(iter, treemodel.REVID)):
-            stock = gtk.STOCK_GO_FORWARD
+        stock = model.get_value(iter, treemodel.HEAD)
+        if stock:
+            pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
+            cell.set_property('pixbuf', pb)
+            cell.set_property('visible', 1)
         else:
-            stock = model.get_value(iter, treemodel.HEAD)
-        pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
-        cell.set_property('pixbuf', pb)
+            cell.set_property('visible', 0)
+
+    def make_mark(self, tvcolumn, cell, model, iter):
+        rev = model.get_value(iter, treemodel.REVID)
+        if self.marked_rev == long(rev):
+            stock = gtk.STOCK_GO_FORWARD
+            pb = self.treeview.render_icon(stock, gtk.ICON_SIZE_MENU, None)
+            cell.set_property('pixbuf', pb)
+            cell.set_property('visible', 1)
+        else:
+            cell.set_property('visible', 0)
 
     def set_mark_rev(self, rev):
         '''User has marked a revision for diff'''
