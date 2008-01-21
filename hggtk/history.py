@@ -313,8 +313,14 @@ class GLog(GDialog):
         self.changeview.tooltips = gtk.Tooltips()
         self._hpaned = self.changeview.get_body()
         self.changeview._parse_opts()
-        # Force it to allocate a button, but to not show it
-        self.changeview.get_tbbuttons()
+
+        # Integrate changeset toolbar buttons into the main toolbar
+        self.toolbar.insert(gtk.SeparatorToolItem(), 3)
+        buttons = self.changeview.get_tbbuttons()
+        for b in buttons:
+            self.toolbar.insert(b, 4)
+            if b.get_label() == '_other parent':
+                b.set_sensitive(False)
 
         self._vpaned = gtk.VPaned()
         self._vpaned.pack1(self.tree_frame, True, False)

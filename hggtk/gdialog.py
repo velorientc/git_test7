@@ -270,6 +270,7 @@ class GDialog(gtk.Window):
         button = self.make_toolbutton(gtk.STOCK_CLOSE, 'Close',
                 self._quit_clicked, tip='Close Application')
         toolbar.insert(button, -1)
+        self.toolbar = toolbar
         vbox.pack_start(toolbar, False, False, 0)
 
         # Subclass returns the main body
