@@ -39,6 +39,7 @@ class GChange(GDialog):
         self.parent_toggle.set_use_underline(True)
         self.parent_toggle.set_label('_other parent')
         self.parent_toggle.set_tooltip(self.tooltips, 'diff other parent')
+        self.parent_toggle.set_sensitive(False)
         self.parent_toggle.set_active(False)
         self.parent_toggle.connect('toggled', self._parent_toggled)
         return [self.parent_toggle]

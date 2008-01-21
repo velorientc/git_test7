@@ -150,12 +150,15 @@ class GDialog(gtk.Window):
 
     ### End of overridable methods ###
 
-    def display(self):
+    def display(self, opengui=True):
         self._parse_config()
         self._load_settings()
-        self._setup_gtk()
+        if opengui:
+            self._setup_gtk()
+            self.prepare_display()
+        else:
+            self.tooltips = gtk.Tooltips()
         self._parse_opts()
-        self.prepare_display()
         self.show_all()
 
 

@@ -62,7 +62,7 @@ class GLog(GDialog):
                     menu=self._filter_menu(),
                     tip='Filter revisions for display'),
                 gtk.SeparatorToolItem()
-             ]
+             ] + self.changeview.get_tbbuttons()
 
     def _more_clicked(self, button):
         self.graphview.next_revision_batch()
@@ -171,6 +171,11 @@ class GLog(GDialog):
         return settings
 
     def load_settings(self, settings):
+        self.changeview = GChange(self.ui, self.repo, self.cwd, [],
+                self.opts, False)
+        self.changeview.display(False)
+        self.changeview.glog_parent = self
+
         GDialog.load_settings(self, settings)
         if settings:
             set = settings['glog']
@@ -303,23 +308,8 @@ class GLog(GDialog):
         self.tree_frame.show_all()
 
         # Add GChange instance to bottom half of vpane
-        self.changeview = GChange(self.ui, self.repo, self.cwd, [],
-                self.opts, False)
-        self.changeview._parse_config()
-        self.changeview._load_settings()
-        self.changeview.glog_parent = self
         self.changeview.graphview = self.graphview
-        self.changeview.tooltips = gtk.Tooltips()
         self._hpaned = self.changeview.get_body()
-        self.changeview._parse_opts()
-
-        # Integrate changeset toolbar buttons into the main toolbar
-        self.toolbar.insert(gtk.SeparatorToolItem(), 3)
-        buttons = self.changeview.get_tbbuttons()
-        for b in buttons:
-            self.toolbar.insert(b, 4)
-            if b.get_label() == '_other parent':
-                b.set_sensitive(False)
 
         self._vpaned = gtk.VPaned()
         self._vpaned.pack1(self.tree_frame, True, False)
