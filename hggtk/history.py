@@ -188,8 +188,7 @@ class GLog(GDialog):
         self.restore_cwd()  # paths relative to repo root do not work otherwise
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
-        if 'rev' not in self.opts:
-            self.opts['rev'] = []
+        self.opts['rev'] = [] # This option is dangerous - used directly by hg
         self.opts['revs'] = None
         self.opts['no_merges'] = False
         self.opts['only_merges'] = False
