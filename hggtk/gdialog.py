@@ -156,10 +156,10 @@ class GDialog(gtk.Window):
         if opengui:
             self._setup_gtk()
             self.prepare_display()
+            self.show_all()
         else:
             self.tooltips = gtk.Tooltips()
         self._parse_opts()
-        self.show_all()
 
 
     def test_opt(self, opt):
