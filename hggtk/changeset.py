@@ -157,7 +157,7 @@ class GChange(GDialog):
             buf.apply_tag_by_name(name, i0, i1)
             
         buf.create_mark('begmark', buf.get_start_iter())
-        filelist.append(('Contents', 'begmark', False, ()))
+        filelist.append(('[Description]', 'begmark', False, ()))
 
         # inserts the marks
         for f, mark, offset, stats in fileoffs:
