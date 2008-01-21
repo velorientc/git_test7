@@ -39,8 +39,8 @@ class SimpleMessage(gtk.MessageDialog):
 
 class Prompt(SimpleMessage):
     def __init__(self, title, message, parent):
-        gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO,
-                                    gtk.BUTTONS_CLOSE)
+        gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
+                gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE)
         self.set_title(title)
         self.set_markup('<b>' + message + '</b>')
 
@@ -49,8 +49,8 @@ class Confirm(SimpleMessage):
     """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO 
     """
     def __init__(self, title, files, parent, primary=None):
-        gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION,
-                                    gtk.BUTTONS_YES_NO)
+        gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
+                gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
         self.set_title('Confirm ' + title)
         if primary is None:
             primary = title + ' file' + ((len(files) > 1 and 's') or '') + '?'
@@ -150,12 +150,15 @@ class GDialog(gtk.Window):
 
     ### End of overridable methods ###
 
-    def display(self):
+    def display(self, opengui=True):
         self._parse_config()
         self._load_settings()
-        self._setup_gtk()
+        if opengui:
+            self._setup_gtk()
+            self.prepare_display()
+        else:
+            self.tooltips = gtk.Tooltips()
         self._parse_opts()
-        self.prepare_display()
         self.show_all()
 
 
@@ -185,7 +188,9 @@ class GDialog(gtk.Window):
                 if not self.diffopts :
                     self.diffopts = '-Npru'
 
-        if not self.diffbottom or self.diffbottom.lower() == 'false' or self.diffbottom == '0':
+        if not self.diffbottom:
+            self.diffbottom = False
+        elif self.diffbottom.lower() == 'false' or self.diffbottom == '0':
             self.diffbottom = False
         else:
             self.diffbottom = True

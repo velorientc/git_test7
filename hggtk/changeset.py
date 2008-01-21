@@ -39,6 +39,7 @@ class GChange(GDialog):
         self.parent_toggle.set_use_underline(True)
         self.parent_toggle.set_label('_other parent')
         self.parent_toggle.set_tooltip(self.tooltips, 'diff other parent')
+        self.parent_toggle.set_sensitive(False)
         self.parent_toggle.set_active(False)
         self.parent_toggle.connect('toggled', self._parent_toggled)
         return [self.parent_toggle]
@@ -81,16 +82,20 @@ class GChange(GDialog):
                 title += ':' + str(self.parents[1])
             else:
                 title += ':' + str(self.parents[0])
-            self.set_title(title)
         else:
             self.parent_toggle.set_sensitive(False)
-            self.parent_toggle.set_active(False)
-        self.set_title(title)
+            if self.parent_toggle.get_active():
+                # Parent button must be pushed out, but this
+                # will cause load_details to be called again
+                # so we exit out to prevent recursion.
+                self.parent_toggle.set_active(False)
+                return
 
         ctx = self.repo.changectx(rev)
         if not ctx:
             self._last_rev = None
             return False
+        self.set_title(title)
         self.textview.freeze_child_notify()
         try:
             self._fill_buffer(self._buffer, rev, ctx, self._filelist)
@@ -144,9 +149,8 @@ class GChange(GDialog):
         out = StringIO.StringIO()
         patch.diff(self.repo, node1=parent, node2=ctx.node(),
                 files=ctx.files(), fp=out)
-
-        offset = eob.get_offset()
         difflines = util.tolocal(out.getvalue()).splitlines()
+        offset = eob.get_offset()
         fileoffs, tags, lines, statmax = self.prepare_diff(difflines, offset)
         buf.insert(eob, u''.join(lines).encode('utf-8'))
 
