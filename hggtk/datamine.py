@@ -96,11 +96,7 @@ class DataMineDialog(GDialog):
 
     def _cmenu_file_log(self, menuitem):
         from history import GLog
-        from gtools import cmdtable
-        statopts = self.merge_opts(cmdtable['glog|ghistory'][1],
-                ('include', 'exclude', 'git'))
-        dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root],
-                statopts, False)
+        dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root], {}, False)
         dialog.curfile = self.curpath
         dialog.display()
 

@@ -49,6 +49,7 @@ class GChange(GDialog):
     def prepare_display(self):
         self.currow = None
         self.graphview = None
+        self.glog_parent = None
         node0, node1 = cmdutil.revpair(self.repo, self.opts.get('rev'))
         self.load_details(self.repo.changelog.rev(node0))
 
@@ -444,8 +445,20 @@ class GChange(GDialog):
 
     def _file_history(self, menuitem):
         '''User selected file history from file list context menu'''
-        self.custombutton.set_active(True)
-        self.reload_log({'pats' : [self.curfile]})
+        if self.glog_parent:
+            # If this changeset browser is embedded in glog, send
+            # send this event to the main app
+            self.glog_parent.custombutton.set_active(True)
+            self.glog_parent.opts['rev'] = None
+            self.glog_parent.reload_log({'pats' : [self.curfile]})
+        else:
+            # Else launch our own GLog instance
+            from history import GLog
+            from gtools import cmdtable
+            dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root],
+                    {}, False)
+            dialog.curfile = self.curfile
+            dialog.display()
 
     def _revert_file(self, menuitem):
         '''User selected file revert from the file list context menu'''
