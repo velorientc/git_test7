@@ -148,9 +148,7 @@ class TreeView(gtk.ScrolledWindow):
         self.graph_column.set_max_width(width)
         self.graph_column.set_visible(self.show_graph)
 
-        if revision is None:
-            self.treeview.set_cursor(0)
-        else:
+        if revision is not None:
             self.set_revision_id(revision[treemodel.REVID])
         return False
 
@@ -181,11 +179,11 @@ class TreeView(gtk.ScrolledWindow):
 
     def next_revision_batch(self):
         self.limit += self.batchsize
-        gobject.idle_add(self.populate, self.get_revision())
+        gobject.idle_add(self.populate)
 
     def load_all_revisions(self):
         self.limit = None
-        gobject.idle_add(self.populate, self.get_revision())
+        gobject.idle_add(self.populate)
 
     def get_revision(self):
         """Return revision id of currently selected revision, or None."""
