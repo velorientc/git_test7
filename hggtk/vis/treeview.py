@@ -112,7 +112,6 @@ class TreeView(gtk.ScrolledWindow):
         self.max_cols = 1
         self.model = None
         self.limit = self.batchsize
-        self.marked_rev = None
 
     def populate(self, revision=None):
         """Fill the treeview with contents.
