@@ -61,8 +61,18 @@ class GLog(GDialog):
                     self._filter_clicked,
                     menu=self._filter_menu(),
                     tip='Filter revisions for display'),
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_FIND,
+                    '_View',
+                    self._filter_clicked, # TODO What should this button do?
+                    menu=self._view_menu(),
+                    tip='Select columns to display'),
                 gtk.SeparatorToolItem()
              ] + self.changeview.get_tbbuttons()
+
+    def toggle_view_column(self, button, property):
+        bool = button.get_active()
+        self.graphview.set_property(property, bool)
 
     def _more_clicked(self, button):
         self.graphview.next_revision_batch()
@@ -115,6 +125,30 @@ class GLog(GDialog):
         if widget.get_active():
             self._filter = data
             self.reload_log()
+
+    def _view_menu(self):
+        menu = gtk.Menu()
+
+        button = gtk.CheckMenuItem("Show Ids")
+        button.connect("toggled", self.toggle_view_column,
+                'rev-column-visible')
+        button.set_active(True)
+        button.set_draw_as_radio(True)
+        menu.append(button)
+        button = gtk.CheckMenuItem("Show Tags")
+        button.connect("toggled", self.toggle_view_column,
+                'tags-column-visible')
+        button.set_active(True)
+        button.set_draw_as_radio(True)
+        menu.append(button)
+        button = gtk.CheckMenuItem("Show Date")
+        button.connect("toggled", self.toggle_view_column,
+                'date-column-visible')
+        button.set_active(True)
+        button.set_draw_as_radio(True)
+        menu.append(button)
+        menu.show_all()
+        return menu
 
     def _filter_menu(self):
         menu = gtk.Menu()
@@ -175,6 +209,22 @@ class GLog(GDialog):
 
     def load_settings(self, settings):
         '''Called at beginning of display() method'''
+        limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
+        if limit_opt:
+            try:
+                limit = int(limit_opt)
+            except ValueError:
+                limit = 0
+            if limit <= 0:
+                limit = None
+        else:
+            limit = None
+
+        # Allocate TreeView instance to use internally
+        self.limit = limit
+        self.pbar = gtk.ProgressBar()
+        self.graphview = TreeView(self.repo, limit, self.pbar)
+
         # Allocate ChangeSet instance to use internally
         self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
                 self.opts, False)
@@ -266,23 +316,10 @@ class GLog(GDialog):
         self.tree_frame = gtk.Frame()
         self.tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 
-        limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
-        if limit_opt:
-            try:
-                limit = int(limit_opt)
-            except ValueError:
-                limit = 0
-            if limit <= 0:
-                limit = None
-        else:
-            limit = None
-
         # PyGtk 2.6 and below did not automatically register types
         if gobject.pygtk_version < (2, 8, 0): 
             gobject.type_register(TreeView)
 
-        self.pbar = gtk.ProgressBar()
-        self.graphview = TreeView(self.repo, limit, self.pbar)
         self.tree = self.graphview.treeview
         self.graphview.connect('revision-selected', self.selection_changed)
         self.graphview.connect('revisions-loaded', self.revisions_loaded)
@@ -304,7 +341,7 @@ class GLog(GDialog):
         vbox.pack_start(self.allbutton, False, False)
 
         self.nextbutton.set_tooltip(self.tooltips,
-                'show next %d revisions' % limit)
+                'show next %d revisions' % self.limit)
         self.allbutton.set_tooltip(self.tooltips,
                 'show all remaining revisions')
 
@@ -327,35 +364,11 @@ class GLog(GDialog):
         vbox.pack_start(self._vpaned, True, True)
 
         hbox = gtk.HBox()
-        showrev = gtk.CheckButton('Show ids')
-        showtags = gtk.CheckButton('Show tags')
-        showdate = gtk.CheckButton('Show date')
-        showrev.connect('toggled', self.toggle_rev_column)
-        showtags.connect('toggled', self.toggle_tags_column)
-        showdate.connect('toggled', self.toggle_date_column)
-        showrev.set_active(True)
-        showtags.set_active(True)
-        showdate.set_active(True)
-        hbox.pack_start(showrev, False, False)
-        hbox.pack_start(showtags, False, False)
-        hbox.pack_start(showdate, False, False)
-        hbox.pack_start(gtk.Label(''), True, True) # Padding
         hbox.pack_start(self.pbar, False, False)
+        hbox.pack_start(gtk.Label(''), True, True) # Padding
 
         vbox.pack_start(hbox, False, False)
         return vbox
-
-    def toggle_rev_column(self, button):
-        bool = button.get_active()
-        self.graphview.set_property('rev-column-visible', bool)
-
-    def toggle_tags_column(self, button):
-        bool = button.get_active()
-        self.graphview.set_property('tags-column-visible', bool)
-
-    def toggle_date_column(self, button):
-        bool = button.get_active()
-        self.graphview.set_property('date-column-visible', bool)
 
     def _diff_revs(self, menuitem):
         from status import GStatus
