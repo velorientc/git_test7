@@ -379,7 +379,7 @@ class DataMineDialog(GDialog):
         scan is completed.
         '''
         q = Queue.Queue()
-        args = [self.repo.root, q, 'log', '--quiet', '--follow', path]
+        args = [self.repo.root, q, 'log', '--quiet', path]
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
 
