@@ -29,8 +29,7 @@ class DataMineDialog(GDialog):
         return 'menulog.ico'
 
     def parse_opts(self):
-        # Disable quiet to get full log info
-        self.ui.quiet = False
+        pass
 
     def get_tbbuttons(self):
         return [ self.make_toolbutton(gtk.STOCK_FIND, 'New Search', 
@@ -38,7 +37,7 @@ class DataMineDialog(GDialog):
             ]
 
     def prepare_display(self):
-        pass
+        os.chdir(self.repo.root)
 
     def save_settings(self):
         settings = GDialog.save_settings(self)
@@ -54,6 +53,9 @@ class DataMineDialog(GDialog):
         self.grep_cmenu = self.grep_context_menu()
         self.ann_cmenu = self.annotate_context_menu()
         self.annotate_colormap = AnnotateColorSaturation()
+        self.changedesc = {}
+        self.revisions = {}
+        self.filecurrev = {}
         vbox = gtk.VBox()
         notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_LEFT)
@@ -211,14 +213,27 @@ class DataMineDialog(GDialog):
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
 
-        treeview.get_model().clear()
+        model = treeview.get_model()
+        model.clear()
         self.pbar.set_fraction(0.0)
         search.set_sensitive(False)
         self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
         self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
-        gobject.timeout_add(50, self.grep_wait, thread, q, treeview, search)
+        gobject.timeout_add(50, self.grep_wait, thread, q, model, search)
 
-    def grep_wait(self, thread, q, treeview, search):
+    def get_rev_desc(self, rev):
+        if rev in self.changedesc:
+            return self.changedesc[rev]
+        ctx = self.repo.changectx(rev)
+        author = util.shortuser(ctx.user())
+        summary = ctx.description().replace('\0', '')
+        summary = summary.split('\n')[0]
+        date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
+        desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
+        self.changedesc[rev] = desc
+        return desc
+
+    def grep_wait(self, thread, q, model, search):
         """
         Handle all the messages currently in the queue (if any).
         """
@@ -228,14 +243,7 @@ class DataMineDialog(GDialog):
                 (path, revid, text) = line.split(':', 2)
             except ValueError:
                 continue
-            rev = long(revid)
-            ctx = self.repo.changectx(rev)
-            author = util.shortuser(ctx.user())
-            summary = ctx.description().replace('\0', '')
-            summary = summary.split('\n')[0]
-            date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
-            tip = author+'@'+revid+' '+date+' "'+summary+'"'
-            model = treeview.get_model()
+            tip = self.get_rev_desc(long(revid))
             model.append((revid, text, tip, path))
         if thread.isAlive():
             self.pbar.pulse()
@@ -246,7 +254,9 @@ class DataMineDialog(GDialog):
             return False
 
     def _grep_selection_changed(self, treeview):
-        """callback for when the user selects grep output."""
+        """
+        Callback for when the user selects grep output.
+        """
         (path, focus) = treeview.get_cursor()
         model = treeview.get_model()
         if path is not None and model is not None:
@@ -256,29 +266,52 @@ class DataMineDialog(GDialog):
             self.revisiondesc.set_text(model[iter][self.COL_TOOLTIP])
 
     def close_page(self, button):
+        '''Close page button has been pressed'''
         num = self.notebook.get_current_page()
         if num != -1:
             self.notebook.remove_page(num)
 
     def add_annotate_page(self, path, revid):
+        '''
+        Add new annotation page to notebook.  Start scan of
+        file 'path' revision history, start annotate of supplied
+        revision 'revid'.
+        '''
         frame = gtk.Frame()
         frame.set_border_width(10)
         vbox = gtk.VBox()
 
         hbox = gtk.HBox()
-        hbox.pack_start(gtk.Label('File History Annotation'))
+        lbl = gtk.Label()
+        lbl.set_alignment(0.0, 0.0)
+        hbox.pack_start(lbl)
         select = gtk.Button('Select')
         close = gtk.Button('Close')
         hbox.pack_start(select, False, False)
         hbox.pack_start(close, False, False)
         vbox.pack_start(hbox, False, False)
 
-        # TODO
-        select.set_sensitive(False)
-        revselect = revid
+        rev = long(revid)
+        hbox = gtk.HBox()
+        revselect = gtk.HScale()
+        revselect.set_digits(0)
+        revselect.set_range(0, self.repo.changelog.count()-1)
+        revselect.set_value(rev)
+        revselect.connect('value-changed', self.rev_select_changed, path, lbl)
+        hbox.pack_start(revselect, True, True)
+        if path not in self.revisions:
+            self.revisions[path] = []
+            self.load_file_history(path, hbox)
+        self.filecurrev[path] = rev
+        lbl.set_text(path + ': ' + self.get_rev_desc(rev))
 
-        follow = gtk.CheckButton('Follow copies and renames')
-        vbox.pack_start(follow, False, False)
+        next = gtk.ToolButton(gtk.STOCK_MEDIA_FORWARD)
+        next.connect('clicked', self.next_rev, revselect, path)
+        prev = gtk.ToolButton(gtk.STOCK_MEDIA_REWIND)
+        prev.connect('clicked', self.prev_rev, revselect, path)
+        hbox.pack_start(prev, False, False)
+        hbox.pack_start(next, False, False)
+        vbox.pack_start(hbox, False, False)
 
         treeview = gtk.TreeView()
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
@@ -318,13 +351,85 @@ class DataMineDialog(GDialog):
         num = self.notebook.append_page_menu(frame, 
                 gtk.Label(os.path.basename(path) + '@' + revid),
                 gtk.Label(path + '@' + revid))
-        objs = (treeview, path, revselect, select, follow)
-        select.connect('clicked', self.select_rev, objs)
+        objs = (frame, treeview.get_model(), path)
+        select.connect('clicked', self.trigger_annotate, objs)
         close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
-        self.select_rev(select, objs)
+        self.trigger_annotate(select, objs)
+
+    def rev_select_changed(self, range, path, label):
+        '''
+        User has moved the revision timeline slider.  If it
+        has hit apon a revision that modifies this file, remember
+        this revision as the 'current' for this file, and update
+        the label at the top of the page.
+        '''
+        rev = long(range.get_value())
+        if rev in self.revisions[path]:
+            self.filecurrev[path] = rev
+            label.set_text(path + ': ' + self.get_rev_desc(rev))
+
+    def load_file_history(self, path, hbox):
+        '''
+        When a new annotation page is opened, this function is
+        to retrieve the revision history of the specified file.
+        The revision slider on this page is frozen until this
+        scan is completed.
+        '''
+        q = Queue.Queue()
+        args = [self.repo.root, q, 'log', '--quiet', '--follow', path]
+        thread = threading.Thread(target=hgcmd_toq, args=args)
+        thread.start()
+
+        self.pbar.set_fraction(0.0)
+        self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
+        gobject.timeout_add(50, self.hist_wait, thread, q, path, hbox)
+        hbox.set_sensitive(False)
+
+    def hist_wait(self, thread, q, path, hbox):
+        """
+        Handle output from 'hg log -qf path'
+        """
+        while q.qsize():
+            line = q.get(0).rstrip('\r\n')
+            try:
+                (revid, node) = line.split(':', 1)
+            except ValueError:
+                continue
+            self.revisions[path].append(long(revid))
+        if thread.isAlive():
+            self.pbar.pulse()
+            return True
+        else:
+            hbox.set_sensitive(True)
+            self.pbar.set_fraction(1.0)
+            return False
+
+    def next_rev(self, button, revselect, path):
+        '''
+        User has pressed the 'next version' button on an annotate page.
+        Move the slider to the next highest revision that is applicable
+        for this file.
+        '''
+        cur = self.filecurrev[path]
+        revs = self.revisions[path]
+        i = revs.index(cur)
+        if i > 0:
+            revselect.set_value(revs[i-1])
+
+    def prev_rev(self, button, revselect, path):
+        '''
+        User has pressed the 'prev version' button on an annotate page.
+        Move the slider to the next lowest revision that is applicable
+        for this file.
+        '''
+        cur = self.filecurrev[path]
+        revs = self.revisions[path]
+        i = revs.index(cur)
+        if i < len(revs) - 1:
+            revselect.set_value(revs[i+1])
 
     def _ann_selection_changed(self, treeview):
         """callback for when the user selects grep output."""
@@ -337,6 +442,12 @@ class DataMineDialog(GDialog):
             self.revisiondesc.set_text(model[iter][self.COL_TOOLTIP])
 
     def ann_text_color(self, column, text_renderer, model, row_iter):
+        '''
+        Color selection routine for annotate treeview.  This uses the
+        color scheme borrowed from bzr-annotate.  The hue is set by
+        author and the intensity is by age.  The older the line the more
+        it tends towards white/gray.
+        '''
         row_rev = model[row_iter][self.COL_REVID]
         ctx = self.repo.changectx(long(row_rev))
         basedate = self.repo.changectx(long(model.rev)).date()[0]
@@ -357,25 +468,30 @@ class DataMineDialog(GDialog):
     def _ann_row_act(self, tree, path, column):
         self.ann_cmenu.get_children()[0].activate()
 
-    def select_rev(self, button, objs):
-        (treeview, path, revselect, select, follow) = objs
+    def trigger_annotate(self, button, objs):
+        '''
+        User has selected a file revision to annotate.  Trigger a
+        background thread to perform the annotation.  Disable the select
+        button until this operation is complete.
+        '''
+        (frame, model, path) = objs
         q = Queue.Queue()
-        args = [self.repo.root, q, 'annotate']
-        if follow.get_active():
-            args.append('--follow')
-        args.append('--rev') # TODO
-        args.append(revselect)
+        revid = str(self.filecurrev[path])
+        args = [self.repo.root, q, 'annotate', '--rev']
+        args.append(revid)
         args.append(path)
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
 
-        treeview.get_model().clear()
+        model.clear()
         self.pbar.set_fraction(0.0)
+        path = os.path.basename(path)
+        self.notebook.set_tab_label_text(frame, path+'@'+revid)
         self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
-        gobject.timeout_add(50, self.annotate_wait, thread, q, treeview, select)
-        select.set_sensitive(False)
+        gobject.timeout_add(50, self.annotate_wait, thread, q, model, button)
+        button.set_sensitive(False)
 
-    def annotate_wait(self, thread, q, treeview, select):
+    def annotate_wait(self, thread, q, model, button):
         """
         Handle all the messages currently in the queue (if any).
         """
@@ -385,20 +501,13 @@ class DataMineDialog(GDialog):
                 (revid, text) = line.split(':', 1)
             except ValueError:
                 continue
-            rev = long(revid)
-            ctx = self.repo.changectx(rev)
-            author = util.shortuser(ctx.user())
-            summary = ctx.description().replace('\0', '')
-            summary = summary.split('\n')[0]
-            date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
-            tip = author+'@'+revid+' '+date+' "'+summary+'"'
-            model = treeview.get_model()
+            tip = self.get_rev_desc(long(revid))
             model.append((revid, text, tip))
         if thread.isAlive():
             self.pbar.pulse()
             return True
         else:
-            select.set_sensitive(True)
+            button.set_sensitive(True)
             self.pbar.set_fraction(1.0)
             return False
 
@@ -438,6 +547,7 @@ def run(root='', cwd='', files=[], **opts):
     dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
     dialog.display()
     dialog.add_search_page()
+    #dialog.add_annotate_page('hggtk/history.py', '719')
 
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
