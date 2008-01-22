@@ -272,8 +272,9 @@ class GDialog(gtk.Window):
         sep.set_expand(True)
         sep.set_draw(False)
         toolbar.insert(sep, -1)
+        tip = self.main and 'Close Application' or 'Close Window'
         button = self.make_toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._quit_clicked, tip='Close Application')
+                self._quit_clicked, tip=tip)
         toolbar.insert(button, -1)
         self.toolbar = toolbar
         vbox.pack_start(toolbar, False, False, 0)
