@@ -485,7 +485,7 @@ class NativeSaveFileDialogWrapper:
     def runWindows(self):
         import win32gui, win32con, os
         filter = ""
-        for name, pattern in self.Filter.items():
+        for name, pattern in self.Filter.iteritems():
             filter += name + "\0" + pattern + "\0"
         customfilter = "\0"
 
@@ -513,7 +513,7 @@ class NativeSaveFileDialogWrapper:
         file_save.set_default_response(gtk.RESPONSE_OK)
         file_save.set_current_folder(self.InitialDir)
         file_save.set_current_name(self.FileName)
-        for name, pattern in self.Filter.items():
+        for name, pattern in self.Filter.iteritems():
             fi = gtk.FileFilter()
             fi.set_name(name)
             fi.add_pattern(pattern)

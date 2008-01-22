@@ -323,7 +323,7 @@ class ChangeSet(GDialog):
         def make_texttag( name, **kwargs ):
             """Helper function generating a TextTag"""
             tag = gtk.TextTag(name)
-            for key, value in kwargs.items():
+            for key, value in kwargs.iteritems():
                 key = key.replace("_","-")
                 try:
                     tag.set_property( key, value )
