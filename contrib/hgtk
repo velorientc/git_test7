@@ -36,11 +36,16 @@ def main(command):
         sys.exit(1)
     command = l[0]
 
-    # Add TortoiseHg to python path
-    path = os.environ.get('TORTOISEHG_PATH') or tortoisehg_dir
-    norm = os.path.normpath(os.path.expanduser(path))
-    if norm not in sys.path:
-        sys.path.append(norm)
+    if hasattr(sys, "frozen"):
+        # Py2exe environment
+        thgdir = os.path.dirname(sys.executable)
+        os.environ['THG_ICON_PATH'] = os.path.join(thgdir, 'icons')
+    else:
+        # Add TortoiseHg to python path
+        path = os.environ.get('TORTOISEHG_PATH') or tortoisehg_dir
+        norm = os.path.normpath(os.path.expanduser(path))
+        if norm not in sys.path:
+            sys.path.append(norm)
 
     try:
         from tortoise import thgutil
