@@ -302,16 +302,19 @@ class ChangeSet(GDialog):
                 gobject.TYPE_PYOBJECT  # diffstats
                 )
         filelist_tree.set_model(self._filelist)
-
         column = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=0)
         filelist_tree.append_column(column)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(filelist_tree)
+
+        list_frame = gtk.Frame()
+        list_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.add(filelist_tree)
+        list_frame.add(scroller)
 
         self._hpaned = gtk.HPaned()
         self._hpaned.pack1(details_frame, True, True)
-        self._hpaned.pack2(scrolledwindow, True, True)
+        self._hpaned.pack2(list_frame, True, True)
         self._hpaned.set_position(self._setting_hpos)
         return self._hpaned
 
