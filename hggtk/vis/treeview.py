@@ -15,6 +15,8 @@ import re
 from graphcell import CellRendererGraph
 from revgraph import *
 
+PBAR_PULSES = 10
+
 class TreeView(gtk.ScrolledWindow):
 
     __gproperties__ = {
@@ -65,7 +67,7 @@ class TreeView(gtk.ScrolledWindow):
                               ())
     }
 
-    def __init__(self, repo, limit=None, pbar=None):
+    def __init__(self, repo, limit=500, pbar=None):
         """Create a new TreeView.
 
         :param repo:  Repository object to show
@@ -81,6 +83,7 @@ class TreeView(gtk.ScrolledWindow):
         self.marked_rev = None
         self.construct_treeview()
         self.pbar = pbar
+        self.pbar.set_pulse_step(float(PBAR_PULSES / 100))
 
     def search_in_tree(self, model, column, key, iter, data):
         """Searches all fields shown in the tree when the user hits crtr+f,
@@ -124,6 +127,8 @@ class TreeView(gtk.ScrolledWindow):
         self.max_cols = 1
         self.model = None
         self.limit = self.batchsize
+        self._progresscur = 0
+        self._progressfrac = self.batchsize / PBAR_PULSES
 
     def populate(self, revision=None):
         """Fill the treeview with contents.
@@ -141,7 +146,11 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
             self.limit = len(self.graphdata)
 
-        self.pbar.pulse()
+        self._progresscur += 1
+        if self._progresscur >= self._progressfrac:
+            self.pbar.pulse()
+            self._progresscur = 0
+
         if self.limit is None or len(self.graphdata) < self.limit:
             return True
 
@@ -194,8 +203,7 @@ class TreeView(gtk.ScrolledWindow):
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'limit':
-            self.limit = value
-            gobject.idle_add(self.populate, self.get_revision())
+            self.batchsize = value
         elif property.name == 'revision':
             self.set_revision_id(value)
         else:
@@ -203,10 +211,16 @@ class TreeView(gtk.ScrolledWindow):
 
     def next_revision_batch(self):
         self.limit += self.batchsize
+        self._progresscur = 0
+        self._progressfrac = self.batchsize / PBAR_PULSES
+        self.pbar.set_fraction(0.0)
         gobject.idle_add(self.populate)
 
     def load_all_revisions(self):
         self.limit = None
+        self._progresscur = 0
+        self._progressfrac = (self.repo.changelog.count() - len(self.graphdata) - 1) / PBAR_PULSES
+        self.pbar.set_fraction(0.0)
         gobject.idle_add(self.populate)
 
     def get_revision(self):
