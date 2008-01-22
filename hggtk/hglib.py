@@ -3,7 +3,7 @@ import os.path
 import traceback
 import threading
 import Queue
-from mercurial import hg, ui, util, cmdutil, commands
+from mercurial import hg, ui, util, cmdutil, commands, extensions
 from mercurial.node import *
 from mercurial.i18n import _
 from dialog import entry_dialog
@@ -33,6 +33,27 @@ try:
 finally:
     demandimport.enable()
 
+keyword_module = None
+def detect_keyword():
+    '''
+    The keyword extension has difficulty predicting when it needs to
+    intercept data output from various commands when the mercurial
+    libraries are used by python applications.  Recent versions offer a
+    hook that applications can call to register commands about to be
+    executed (as a replacement for sys.argv[]).
+    '''
+    global keyword_module
+    if keyword_module is not None:
+        return keyword_module
+    for name, module in extensions.extensions():
+        if name == 'keyword':
+            if hasattr(module, '_externalcmdhook'):
+                keyword_module = module
+            break
+    else:
+        keyword_module = False
+    return keyword_module
+
 def rootpath(path=None):
     """ find Mercurial's repo root of path """
     if not path:
@@ -55,6 +76,8 @@ class Hg:
     def command(self, *cmdargs, **options):
         c, func, args, opts, cmdoptions = parse(self.repo.ui, cmdargs)
         cmdoptions.update(options)
+        kw = detect_keyword()
+        if kw: kw._externalcmdhook(c, *args, **cmdoptions)
         self.repo.ui.pushbuffer()
         func(self.repo.ui, self.repo, *args, **cmdoptions)
         return self.repo.ui.popbuffer()
@@ -187,6 +210,8 @@ class HgThread(threading.Thread):
         HgThread.instances += 1
         try:
             try:
+                kw = detect_keyword()
+                if kw: kw._externalcmdhook(self.args[0], *self.args[1:], **{})
                 ret = dispatch(self.ui, self.args)
                 if ret:
                     self.ui.write('[command returned code %d]\n' % int(ret))
@@ -228,4 +253,6 @@ def hgcmd_toq(path, q, *cmdargs, **options):
     cmdoptions.update(options)
     u.updateopts(opts["verbose"], opts["debug"], opts["quiet"],
                  not opts["noninteractive"], opts["traceback"])
+    kw = detect_keyword()
+    if kw: kw._externalcmdhook(c, *args, **cmdoptions)
     func(u, repo, *args, **cmdoptions)
