@@ -226,4 +226,6 @@ def hgcmd_toq(path, q, *cmdargs, **options):
     repo = hg.repository(u, path=path)
     c, func, args, opts, cmdoptions = parse(repo.ui, cmdargs)
     cmdoptions.update(options)
+    u.updateopts(opts["verbose"], opts["debug"], opts["quiet"],
+                 not opts["noninteractive"], opts["traceback"])
     func(u, repo, *args, **cmdoptions)
