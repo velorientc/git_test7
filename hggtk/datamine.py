@@ -20,7 +20,8 @@ class DataMineDialog(GDialog):
     COL_REVID = 0
     COL_TEXT = 1
     COL_TOOLTIP = 2
-    COL_PATH = 3
+    COL_PATH = 3  # for grep models
+    COL_COLOR = 3 # for annotate models
 
     def get_title(self):
         return 'DataMining - ' + os.path.basename(self.repo.root)
@@ -322,7 +323,7 @@ class DataMineDialog(GDialog):
         treeview.connect('popup-menu', self._ann_popup_menu)
         treeview.connect('row-activated', self._ann_row_act)
 
-        results = gtk.ListStore(str, str, str)
+        results = gtk.ListStore(str, str, str, str)
         treeview.set_model(results)
         for title, width, col in (('Rev', 10, self.COL_REVID),
                 ('Matches', 80, self.COL_TEXT)):
@@ -336,7 +337,7 @@ class DataMineDialog(GDialog):
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
             column.add_attribute(cell, "text", col)
-            column.set_cell_data_func(cell, self.ann_text_color)
+            column.add_attribute(cell, "background", self.COL_COLOR)
             treeview.append_column(column)
         if hasattr(treeview, 'set_tooltip_column'):
             treeview.set_tooltip_column(self.COL_TOOLTIP)
@@ -362,14 +363,30 @@ class DataMineDialog(GDialog):
     def rev_select_changed(self, range, path, label):
         '''
         User has moved the revision timeline slider.  If it
-        has hit apon a revision that modifies this file, remember
-        this revision as the 'current' for this file, and update
-        the label at the top of the page.
+        has hit apon (or passed) a revision that modifies this file,
+        remember this revision as the 'current' for this file, and
+        update the label at the top of the page.
         '''
         rev = long(range.get_value())
         if rev in self.revisions[path]:
             self.filecurrev[path] = rev
             label.set_text(path + ': ' + self.get_rev_desc(rev))
+            return
+        # Detect whether the user has passed one or more spots
+        cur = self.filecurrev[path]
+        revs = self.revisions[path]
+        i = revs.index(cur)
+        try:
+            while i and rev >= revs[i-1]:
+                i += -1
+            while rev <= revs[i+1]:
+                i += 1
+        except IndexError:
+            pass
+        if revs[i] != cur:
+            newrev = revs[i]
+            self.filecurrev[path] = newrev
+            label.set_text(path + ': ' + self.get_rev_desc(newrev))
 
     def load_file_history(self, path, hbox):
         '''
@@ -441,20 +458,6 @@ class DataMineDialog(GDialog):
             self.path = model.path
             self.revisiondesc.set_text(model[iter][self.COL_TOOLTIP])
 
-    def ann_text_color(self, column, text_renderer, model, row_iter):
-        '''
-        Color selection routine for annotate treeview.  This uses the
-        color scheme borrowed from bzr-annotate.  The hue is set by
-        author and the intensity is by age.  The older the line the more
-        it tends towards white/gray.
-        '''
-        row_rev = model[row_iter][self.COL_REVID]
-        ctx = self.repo.changectx(long(row_rev))
-        basedate = self.repo.changectx(long(model.rev)).date()[0]
-        text_renderer.set_property('foreground', 
-                self.annotate_colormap.get_color(ctx, basedate))
-        text_renderer.set_property('background', 'black')
-
     def _ann_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
             gtk.gdk.CONTROL_MASK)):
@@ -495,14 +498,18 @@ class DataMineDialog(GDialog):
         """
         Handle all the messages currently in the queue (if any).
         """
+        basedate = self.repo.changectx(long(model.rev)).date()[0]
         while q.qsize():
             line = q.get(0).rstrip('\r\n')
             try:
                 (revid, text) = line.split(':', 1)
             except ValueError:
                 continue
-            tip = self.get_rev_desc(long(revid))
-            model.append((revid, text, tip))
+            rowrev = long(revid)
+            tip = self.get_rev_desc(rowrev)
+            ctx = self.repo.changectx(rowrev)
+            color = self.annotate_colormap.get_color(ctx, basedate)
+            model.append((revid, text, tip, color))
         if thread.isAlive():
             self.pbar.pulse()
             return True

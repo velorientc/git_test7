@@ -27,10 +27,11 @@ WCPARENT = 9
 HEAD = 10
 TAGS = 11
 MARKED = 12
+FGCOLOR = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
-    def __init__ (self, repo, graphdata):
+    def __init__ (self, repo, graphdata, color_func):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
         self.repo = repo
@@ -38,12 +39,13 @@ class TreeModel(gtk.GenericTreeModel):
         self.heads = [repo.changelog.rev(x) for x in repo.heads()]
         self.line_graph_data = graphdata
         self.author_re = re.compile('<.*@.*>', 0)
+        self.color_func = color_func
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
 
     def on_get_n_columns(self):
-        return 13
+        return 14
 
     def on_get_column_type(self, index):
         if index == NODE: return gobject.TYPE_PYOBJECT
@@ -59,6 +61,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == HEAD: return gobject.TYPE_BOOLEAN
         if index == TAGS: return gobject.TYPE_STRING
         if index == MARKED: return gobject.TYPE_BOOLEAN
+        if index == FGCOLOR: return gobject.TYPE_STRING
 
     def on_get_iter(self, path):
         return path[0]
@@ -96,29 +99,20 @@ class TreeModel(gtk.GenericTreeModel):
 
             wc_parent = revid in self.parents
             head = revid in self.heads
+            color = self.color_func(parents, revid, author)
 
             revision = (None, node, revid, None, summary,
-                    author, date, None, parents, wc_parent, head, tags)
+                    author, date, None, parents, wc_parent, head, tags,
+                    None, color)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
 
         if column == REVISION:
             return revision
-        if column == MESSAGE:
-            return revision[MESSAGE]
-        if column == COMMITER: 
-            return revision[COMMITER]
-        if column == TIMESTAMP:
-            return revision[TIMESTAMP]
-        if column == WCPARENT:
-            return revision[WCPARENT]
-        if column == HEAD:
-            return revision[HEAD]
-        if column == TAGS:
-            return revision[TAGS]
         if column == MARKED:
             return revid == self.marked_rev
+        return revision[column]
 
     def on_iter_next(self, rowref):
         if rowref < len(self.line_graph_data) - 1:
