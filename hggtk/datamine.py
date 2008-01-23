@@ -59,7 +59,7 @@ class DataMineDialog(GDialog):
         self.filecurrev = {}
         vbox = gtk.VBox()
         notebook = gtk.Notebook()
-        notebook.set_tab_pos(gtk.POS_LEFT)
+        notebook.set_tab_pos(gtk.POS_TOP)
         notebook.set_scrollable(True)
         notebook.popup_enable()
         notebook.show()
