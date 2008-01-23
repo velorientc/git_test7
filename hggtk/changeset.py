@@ -141,6 +141,7 @@ class ChangeSet(GDialog):
 
         log = util.fromlocal(ctx.description())
         buf.insert(eob, '\n' + log + '\n\n')
+        offset = eob.get_offset()
 
         if self.parent_toggle.get_active():
             parent = self.repo.changelog.node(parents[1])
@@ -149,10 +150,11 @@ class ChangeSet(GDialog):
         out = StringIO.StringIO()
         patch.diff(self.repo, node1=parent, node2=ctx.node(),
                 files=ctx.files(), fp=out)
-        difflines = util.tolocal(out.getvalue()).splitlines()
-        offset = eob.get_offset()
-        fileoffs, tags, lines, statmax = self.prepare_diff(difflines, offset)
-        buf.insert(eob, u''.join(lines).encode('utf-8'))
+        txt = out.getvalue()
+        lines = unicode(txt, 'latin-1', 'replace').splitlines()
+        fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset)
+        for l in lines:
+            buf.insert(eob, l)
 
         # inserts the tags
         for name, p0, p1 in tags:
