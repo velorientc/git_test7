@@ -69,8 +69,8 @@ class DataMineDialog(GDialog):
         self.revisiondesc = gtk.Label('')
         self.revisiondesc.set_alignment(0.0, 0.0)
         self.pbar = gtk.ProgressBar()
-        hbox.pack_start(self.revisiondesc, True, True, 2)
         hbox.pack_start(self.pbar, False, False, 2)
+        hbox.pack_start(self.revisiondesc, True, True, 2)
         vbox.pack_start(hbox, False, False, 2)
         return vbox
 
