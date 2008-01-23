@@ -83,7 +83,7 @@ class TreeView(gtk.ScrolledWindow):
         self.marked_rev = None
         self.construct_treeview()
         self.pbar = pbar
-        self.pbar.set_pulse_step(float(PBAR_PULSES / 100))
+        self.pbar.set_pulse_step(PBAR_PULSES / 100.0)
 
     def search_in_tree(self, model, column, key, iter, data):
         """Searches all fields shown in the tree when the user hits crtr+f,
