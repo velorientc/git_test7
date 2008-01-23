@@ -363,14 +363,30 @@ class DataMineDialog(GDialog):
     def rev_select_changed(self, range, path, label):
         '''
         User has moved the revision timeline slider.  If it
-        has hit apon a revision that modifies this file, remember
-        this revision as the 'current' for this file, and update
-        the label at the top of the page.
+        has hit apon (or passed) a revision that modifies this file,
+        remember this revision as the 'current' for this file, and
+        update the label at the top of the page.
         '''
         rev = long(range.get_value())
         if rev in self.revisions[path]:
             self.filecurrev[path] = rev
             label.set_text(path + ': ' + self.get_rev_desc(rev))
+            return
+        # Detect whether the user has passed one or more spots
+        cur = self.filecurrev[path]
+        revs = self.revisions[path]
+        i = revs.index(cur)
+        try:
+            while i and rev >= revs[i-1]:
+                i += -1
+            while rev <= revs[i+1]:
+                i += 1
+        except IndexError:
+            pass
+        if revs[i] != cur:
+            newrev = revs[i]
+            self.filecurrev[path] = newrev
+            label.set_text(path + ': ' + self.get_rev_desc(newrev))
 
     def load_file_history(self, path, hbox):
         '''
