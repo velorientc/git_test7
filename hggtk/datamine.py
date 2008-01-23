@@ -445,15 +445,14 @@ class DataMineDialog(GDialog):
         '''
         Color selection routine for annotate treeview.  This uses the
         color scheme borrowed from bzr-annotate.  The hue is set by
-        author and the intensity is by age.  The older the line the more
+        author and the saturation is by age.  The older the line the more
         it tends towards white/gray.
         '''
         row_rev = model[row_iter][self.COL_REVID]
         ctx = self.repo.changectx(long(row_rev))
         basedate = self.repo.changectx(long(model.rev)).date()[0]
-        text_renderer.set_property('foreground', 
+        text_renderer.set_property('background', 
                 self.annotate_colormap.get_color(ctx, basedate))
-        text_renderer.set_property('background', 'black')
 
     def _ann_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
