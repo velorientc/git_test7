@@ -359,9 +359,11 @@ class GLog(GDialog):
         self._vpaned.set_position(self._setting_vpos)
         self._hpaned.set_position(self._setting_hpos)
 
-        # Append status bar
         vbox = gtk.VBox()
         vbox.pack_start(self._vpaned, True, True)
+
+        # Append status bar
+        vbox.pack_start(gtk.HSeparator(), False, False)
 
         hbox = gtk.HBox()
         hbox.pack_start(self.pbar, False, False)
