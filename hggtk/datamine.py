@@ -299,6 +299,7 @@ class DataMineDialog(GDialog):
         revselect.set_range(0, self.repo.changelog.count()-1)
         revselect.set_value(rev)
         revselect.connect('value-changed', self.rev_select_changed, path, lbl)
+        revselect.connect('button-release-event', self.rev_release_event, path)
         hbox.pack_start(revselect, True, True)
         if path not in self.revisions:
             self.revisions[path] = []
@@ -359,6 +360,19 @@ class DataMineDialog(GDialog):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
         self.trigger_annotate(select, objs)
+
+    def rev_release_event(self, widget, event, path):
+        '''
+        User released the mouse button after dragging the revision
+        selector.  Snap the selector to the last file revision
+        passed or hovered over.  We can't just set the value in this
+        fucntion, gtk ignores it, so we register a 0 delay timeout.
+        '''
+        def set_rev_value(widget, value):
+            widget.set_value(value)
+            return False
+        cur = self.filecurrev[path]
+        gobject.timeout_add(0, set_rev_value, widget, cur)
 
     def rev_select_changed(self, range, path, label):
         '''
