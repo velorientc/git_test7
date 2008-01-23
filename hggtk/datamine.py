@@ -136,22 +136,34 @@ class DataMineDialog(GDialog):
         vbox.pack_start(hbox, False, False)
 
         hbox = gtk.HBox()
-        hbox.pack_start(gtk.Label('Regexp:'), False, False, 4)
         regexp = gtk.Entry()
+        includes = gtk.Entry()
+        excludes = gtk.Entry()
+        hbox.pack_start(gtk.Label('Regexp:'), False, False, 4)
         hbox.pack_start(regexp, True, True, 4)
-        self.tooltips.set_tip(hbox, 'Regular expression')
-        vbox.pack_start(hbox, False, False)
+        hbox.pack_start(gtk.Label('Includes:'), False, False, 4)
+        hbox.pack_start(includes, True, True, 4)
+        hbox.pack_start(gtk.Label('Excludes:'), False, False, 4)
+        hbox.pack_start(excludes, True, True, 4)
+        self.tooltips.set_tip(regexp, 'Regular expression search pattern')
+        self.tooltips.set_tip(includes, 'Comma separated list of'
+                ' inclusion patterns.  By default, the entire repository'
+                ' is searched.')
+        self.tooltips.set_tip(excludes, 'Comma separated list of'
+                ' exclusion patterns.  Exclusion patterns are applied'
+                ' after inclusion patterns.')
+        vbox.pack_start(hbox, False, False, 4)
 
-        table = gtk.Table(2, 2, False)
+        hbox = gtk.HBox()
         follow = gtk.CheckButton('Follow copies and renames')
         ignorecase = gtk.CheckButton('Ignore case')
         linenum = gtk.CheckButton('Show line numbers')
         showall = gtk.CheckButton('Show all matching revisions')
-        table.attach(follow, 0, 1, 0, 1, gtk.FILL, 0, 4, 3)
-        table.attach(ignorecase, 0, 1, 1, 2, gtk.FILL, 0, 4, 3)
-        table.attach(linenum, 1, 2, 0, 1, gtk.FILL, 0, 4, 3)
-        table.attach(showall, 1, 2, 1, 2, gtk.FILL, 0, 4, 3)
-        vbox.pack_start(table, False, False)
+        hbox.pack_start(follow, False, False, 4)
+        hbox.pack_start(ignorecase, False, False, 4)
+        hbox.pack_start(linenum, False, False, 4)
+        hbox.pack_start(showall, False, False, 4)
+        vbox.pack_start(hbox, False, False, 4)
 
         treeview = gtk.TreeView()
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
@@ -186,8 +198,8 @@ class DataMineDialog(GDialog):
         frame.add(vbox)
         frame.show_all()
         num = self.notebook.append_page(frame, None)
-        objs = (treeview, frame, regexp, follow, ignorecase,
-                linenum, showall, search)
+        objs = (treeview.get_model(), frame, regexp, follow, ignorecase,
+                excludes, includes, linenum, showall, search)
         search.connect('clicked', self.trigger_search, objs)
         close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
@@ -195,8 +207,8 @@ class DataMineDialog(GDialog):
         self.notebook.set_current_page(num)
 
     def trigger_search(self, button, objs):
-        (treeview, frame, regexp, follow, ignorecase, 
-                linenum, showall, search) = objs
+        (model, frame, regexp, follow, ignorecase, 
+                excludes, includes, linenum, showall, search) = objs
         re = regexp.get_text()
         if not re:
             Prompt('No regular expression given',
@@ -210,11 +222,16 @@ class DataMineDialog(GDialog):
         if ignorecase.get_active(): args.append('--ignore-case')
         if linenum.get_active():    args.append('--line-number')
         if showall.get_active():    args.append('--all')
+        incs = [x.strip() for x in includes.get_text().split(',')]
+        excs = [x.strip() for x in excludes.get_text().split(',')]
+        for i in incs:
+            if i: args.extend(['-I', i])
+        for x in excs:
+            if x: args.extend(['-X', x])
         args.append(re)
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
 
-        model = treeview.get_model()
         model.clear()
         self.pbar.set_fraction(0.0)
         search.set_sensitive(False)
