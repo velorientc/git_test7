@@ -31,13 +31,10 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None):
 
     assert start_rev >= stop_rev
     curr_rev = start_rev
-    changelog = repo.changelog
     revs = []
     rev_color = {}
     nextcolor = 0
     while curr_rev >= stop_rev:
-        node = changelog.node(curr_rev)
-
         # Compute revs and next_revs.
         if curr_rev not in revs:
             if branch:
@@ -53,7 +50,7 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None):
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = [x for x in changelog.parentrevs(curr_rev) if x != nullrev]
+        parents = __get_parents(repo, curr_rev)
         parents_to_add = []
         for parent in parents:
             if parent not in next_revs:
