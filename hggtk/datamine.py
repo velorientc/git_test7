@@ -312,7 +312,13 @@ class DataMineDialog(GDialog):
         hbox.pack_start(close, False, False)
         vbox.pack_start(hbox, False, False)
 
-        rev = long(revid)
+        if revid == '.':
+            parentctx = self.repo.workingctx().parents()
+            rev = parentctx[0].rev()
+            revid = str(rev)
+        else:
+            rev = long(revid)
+
         hbox = gtk.HBox()
         revselect = gtk.HScale()
         revselect.set_digits(0)
@@ -587,8 +593,13 @@ def run(root='', cwd='', files=[], **opts):
 
     dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
     dialog.display()
-    dialog.add_search_page()
-    #dialog.add_annotate_page('hggtk/history.py', '719')
+    if len(files) > 1:
+        for f in files:
+            dialog.add_annotate_page(f, '.')
+    elif files and not os.path.isdir(files[0]):
+        dialog.add_annotate_page(files[0], '.')
+    else:
+        dialog.add_search_page()
 
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
