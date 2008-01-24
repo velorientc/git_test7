@@ -5,8 +5,8 @@ Mercurial repository, such as we display in the tree view at the top of the
 history window.  Original code was from graphlog extension.
 """
 
-__copyright__ = "Copyright 2007 Joel Rosdahl"
-__author__    = "Joel Rosdahl <joel@rosdahl.net>"
+__copyright__ = "Copyright 2007 Joel Rosdahl, 2008 Steve Borho"
+__author__    = "Joel Rosdahl <joel@rosdahl.net>, Steve Borho <steve@borho.org>"
 
 from mercurial.node import nullrev
 from mercurial import cmdutil, util, ui
