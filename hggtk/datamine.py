@@ -119,6 +119,18 @@ class DataMineDialog(GDialog):
         self.grep_cmenu.get_children()[0].activate()
         return True
 
+    def get_rev_desc(self, rev):
+        if rev in self.changedesc:
+            return self.changedesc[rev]
+        ctx = self.repo.changectx(rev)
+        author = util.shortuser(ctx.user())
+        summary = ctx.description().replace('\0', '')
+        summary = summary.split('\n')[0]
+        date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
+        desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
+        self.changedesc[rev] = desc
+        return desc
+
     def _search_clicked(self, button, data):
         self.add_search_page()
 
@@ -238,18 +250,6 @@ class DataMineDialog(GDialog):
         self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
         self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
         gobject.timeout_add(50, self.grep_wait, thread, q, model, search)
-
-    def get_rev_desc(self, rev):
-        if rev in self.changedesc:
-            return self.changedesc[rev]
-        ctx = self.repo.changectx(rev)
-        author = util.shortuser(ctx.user())
-        summary = ctx.description().replace('\0', '')
-        summary = summary.split('\n')[0]
-        date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
-        desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
-        self.changedesc[rev] = desc
-        return desc
 
     def grep_wait(self, thread, q, model, search):
         """
