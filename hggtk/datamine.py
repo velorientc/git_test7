@@ -57,6 +57,7 @@ class DataMineDialog(GDialog):
         self.changedesc = {}
         self.revisions = {}
         self.filecurrev = {}
+        self.newpagecount = 1
         vbox = gtk.VBox()
         notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
@@ -209,7 +210,9 @@ class DataMineDialog(GDialog):
         vbox.pack_start(scroller, True, True)
         frame.add(vbox)
         frame.show_all()
-        num = self.notebook.append_page(frame, None)
+        lbl = gtk.Label('Search %d' % self.newpagecount)
+        self.newpagecount += 1
+        num = self.notebook.append_page(frame, lbl)
         objs = (treeview.get_model(), frame, regexp, follow, ignorecase,
                 excludes, includes, linenum, showall, search)
         search.connect('clicked', self.trigger_search, objs)
