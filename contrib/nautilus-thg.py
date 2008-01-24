@@ -98,6 +98,9 @@ class HgExtension(nautilus.MenuProvider,
         self._run_dialog('commit', vfs_files)
         self.clear_cached_repo()
 
+    def _datamine_cb(self, window, vfs_files):
+        self._run_dialog('datamine', vfs_files)
+
     def _diff_cb(self, window, vfs_files):
         path = self.get_path_for_vfs_file(vfs_files[0])
         if path is None:
@@ -149,20 +152,6 @@ class HgExtension(nautilus.MenuProvider,
         self._run_dialog('checkout', [vfs_file], filelist=False,
                 extras=['--', '--clean', str(self.rev0)])
         self.clear_cached_repo()
-
-    def _view_cb(self, window, vfs_file):
-        path = self.get_path_for_vfs_file(vfs_file)
-        if path is None:
-            return
-        repo = self.get_repo_for_path(path)
-        if repo is None:
-            return
-        cwd = os.path.isdir(path) and path or os.path.dirname(path)
-        viewcmd = repo.ui.config('tortoisehg', 'view', 'hgk')
-        if viewcmd == 'hgview':
-            subprocess.Popen(['hgview'], shell=False, cwd=cwd)
-        else:
-            subprocess.Popen(['hg', 'view'], shell=False, cwd=cwd)
 
     def _run_dialog(self, hgcmd, vfs_files, filelist=True, extras=[]):
         '''
@@ -261,18 +250,18 @@ class HgExtension(nautilus.MenuProvider,
         item.connect('activate', self._diff_cb, [vfs_file])
         items.append(item)
 
-        item = nautilus.MenuItem('HgNautilus::log',
-                             'View Changelog',
-                             'Show revision history',
-                             self.icon('menulog.ico'))
+        item = nautilus.MenuItem('HgNautilus::dag',
+                             'Revision History',
+                             'Show revision DAG',
+                             self.icon('menurevisiongraph.ico'))
         item.connect('activate', self._history_cb, [vfs_file])
         items.append(item)
 
-        item = nautilus.MenuItem('HgNautilus::dag',
-                             'Revision Graph',
-                             'Show revision DAG',
-                             self.icon('menurevisiongraph.ico'))
-        item.connect('activate', self._view_cb, vfs_file)
+        item = nautilus.MenuItem('HgNautilus::datamine',
+                             'Data Mining',
+                             'Search revision history',
+                             self.icon('menulog.ico'))
+        item.connect('activate', self._datamine_cb, [vfs_file])
         items.append(item)
 
         item = nautilus.MenuItem('HgNautilus::sync',
@@ -406,6 +395,13 @@ class HgExtension(nautilus.MenuProvider,
                                  self.icon('menulog.ico'))
             item.connect('activate', self._history_cb, vfs_files)
             items.append(item)
+            item = nautilus.MenuItem('HgNautilus::annotate',
+                                 'Annotate File',
+                                 'Annotate file at current revision',
+                                 self.icon('menulog.ico'))
+            item.connect('activate', self._datamine_cb, vfs_files)
+            items.append(item)
+
 
         if modified:
             item = nautilus.MenuItem('HgNautilus::diff',
