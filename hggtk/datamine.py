@@ -114,7 +114,7 @@ class DataMineDialog(GDialog):
         self.grep_cmenu.popup(None, None, None, button, time)
         return True
 
-    def _grep_row_act(self, tree, path, column) :
+    def _grep_row_act(self, tree, path, column):
         """Default action is the first entry in the context menu
         """
         self.grep_cmenu.get_children()[0].activate()
@@ -289,7 +289,7 @@ class DataMineDialog(GDialog):
     def close_page(self, button):
         '''Close page button has been pressed'''
         num = self.notebook.get_current_page()
-        if num != -1:
+        if num != -1 and self.notebook.get_n_pages() > 1:
             self.notebook.remove_page(num)
 
     def add_annotate_page(self, path, revid):
