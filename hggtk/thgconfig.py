@@ -301,6 +301,7 @@ class ConfigDialog(gtk.Dialog):
         self.refresh_path_list()
         self.notebook.set_current_page(2)
         self._pathnameedit.grab_focus()
+        self.dirty_event()
 
     def dirty_event(self, *args):
         if not self.dirty:
