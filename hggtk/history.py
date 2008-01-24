@@ -38,6 +38,8 @@ class GLog(GDialog):
         title = os.path.basename(self.repo.root) + ' log ' 
         if 'rev' in self.opts and self.opts['rev']:
             title += '--rev ' + ':'.join(self.opts['rev'])
+        if not self.pats:
+            return title
         if len(self.pats) > 1 or not os.path.isdir(self.pats[0]):
             title += '{search} ' + ' '.join(self.pats)
         return title
@@ -194,6 +196,8 @@ class GLog(GDialog):
         self._last_rev = None
         self._filter = "all"
         self.currow = None
+        if self.pats == [self.repo.root]:
+            self.pats = []
         if hasattr(self, 'curfile'):
             self.custombutton.set_active(True)
             self.reload_log({'pats' : [self.curfile]})
@@ -264,7 +268,9 @@ class GLog(GDialog):
                 filter = filteropts.get('pats', [])
                 self.graphview.refresh(False, filter, self.opts)
         elif self._filter == "all":
-            if len(self.pats) > 1 or not os.path.isdir(self.pats[0]):
+            if not self.pats:
+                self.graphview.refresh(True, None, self.opts)
+            elif len(self.pats) > 1 or not os.path.isdir(self.pats[0]):
                 self.graphview.refresh(False, self.pats, self.opts)
             else:
                 self.graphview.refresh(True, None, self.opts)
