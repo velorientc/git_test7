@@ -29,6 +29,7 @@ from update import UpdateDialog
 from merge import MergeDialog
 from vis import treemodel
 from vis.treeview import TreeView
+import gtklib
 
 
 class GLog(GDialog):
@@ -226,8 +227,8 @@ class GLog(GDialog):
 
         # Allocate TreeView instance to use internally
         self.limit = limit
-        self.pbar = gtk.ProgressBar()
-        self.graphview = TreeView(self.repo, limit, self.pbar)
+        self.stbar = gtklib.StatusBar()
+        self.graphview = TreeView(self.repo, limit, self.stbar)
 
         # Allocate ChangeSet instance to use internally
         self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
@@ -370,12 +371,8 @@ class GLog(GDialog):
 
         # Append status bar
         vbox.pack_start(gtk.HSeparator(), False, False)
+        vbox.pack_start(self.stbar, False, False)
 
-        hbox = gtk.HBox()
-        hbox.pack_start(self.pbar, False, False)
-        hbox.pack_start(gtk.Label(''), True, True) # Padding
-
-        vbox.pack_start(hbox, False, False)
         return vbox
 
     def _diff_revs(self, menuitem):

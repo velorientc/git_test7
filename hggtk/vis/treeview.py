@@ -15,7 +15,6 @@ import re
 from graphcell import CellRendererGraph
 from revgraph import *
 
-PBAR_PULSES = 10
 
 class TreeView(gtk.ScrolledWindow):
 
@@ -83,7 +82,6 @@ class TreeView(gtk.ScrolledWindow):
         self.marked_rev = None
         self.construct_treeview()
         self.pbar = pbar
-        self.pbar.set_pulse_step(PBAR_PULSES / 100.0)
 
     def search_in_tree(self, model, column, key, iter, data):
         """Searches all fields shown in the tree when the user hits crtr+f,
@@ -98,7 +96,6 @@ class TreeView(gtk.ScrolledWindow):
         return True
 
     def create_log_generator(self, graphcol, pats, opts):
-        self.pbar.set_fraction(0.0)
         if graphcol:
             end = 0
             if pats is not None:  # branch name
@@ -127,8 +124,6 @@ class TreeView(gtk.ScrolledWindow):
         self.max_cols = 1
         self.model = None
         self.limit = self.batchsize
-        self._progresscur = 0
-        self._progressfrac = self.batchsize / PBAR_PULSES
 
     def populate(self, revision=None):
         """Fill the treeview with contents.
@@ -146,17 +141,12 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
             self.limit = len(self.graphdata)
 
-        self._progresscur += 1
-        if self._progresscur >= self._progressfrac:
-            self.pbar.pulse()
-            self._progresscur = 0
-
         if self.limit is None or len(self.graphdata) < self.limit:
             return True
 
         if not len(self.graphdata):
             self.treeview.set_model(None)
-            self.pbar.set_fraction(1.0)
+            self.pbar.end()
             return False
 
         if not self.model:
@@ -175,7 +165,7 @@ class TreeView(gtk.ScrolledWindow):
 
         if revision is not None:
             self.set_revision_id(revision[treemodel.REVID])
-        self.pbar.set_fraction(1.0)
+        self.pbar.end()
         return False
 
     def do_get_property(self, property):
@@ -212,16 +202,12 @@ class TreeView(gtk.ScrolledWindow):
 
     def next_revision_batch(self):
         self.limit += self.batchsize
-        self._progresscur = 0
-        self._progressfrac = self.batchsize / PBAR_PULSES
-        self.pbar.set_fraction(0.0)
+        self.pbar.begin()
         gobject.idle_add(self.populate)
 
     def load_all_revisions(self):
         self.limit = None
-        self._progresscur = 0
-        self._progressfrac = (self.repo.changelog.count() - len(self.graphdata) - 1) / PBAR_PULSES
-        self.pbar.set_fraction(0.0)
+        self.pbar.begin()
         gobject.idle_add(self.populate)
 
     def get_revision(self):
@@ -254,6 +240,7 @@ class TreeView(gtk.ScrolledWindow):
         self.repo.invalidate()
         self.repo.dirstate.invalidate()
         self.create_log_generator(graphcol, pats, opts)
+        self.pbar.begin()
         gobject.idle_add(self.populate, self.get_revision())
 
     def construct_treeview(self):
