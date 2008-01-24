@@ -73,9 +73,74 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None):
                     lines.append( (i, next_revs.index(parent), color) )
 
         yield (curr_rev, (rev_index, curcolor), lines, parents)
-
         revs = next_revs
         curr_rev -= 1
+
+
+def filelog_grapher(repo, path, rev):
+    '''
+    Graph the ancestry of a single file instance, specified by a
+    particular changeset (stop at file deletions and creations).
+
+    repo     - input repository
+    path     - name of file being graphed
+    rev      - revision id specifying file instance being graphed.
+    '''
+    # discover tipmost file rev
+    def tipmost(fctx):
+        # TODO: stop if change deletes file
+        if not fctx.children():
+            return fctx.filerev()
+        else:
+            revs = [tipmost(f) for f in fctx.children()]
+            return max(revs)
+
+    ctx = repo.changectx(rev)
+    filerev = tipmost(ctx.filectx(path))
+
+    revs = []
+    rev_color = {}
+    nextcolor = 0
+    while filerev >= 0:
+        fctx = repo.filectx(fileid=filerev)
+
+        # Compute revs and next_revs.
+        if filerev not in revs:
+            revs.append(filerev)
+            rev_color[filerev] = nextcolor ; nextcolor += 1
+        curcolor = rev_color[filerev]
+        index = revs.index(filerev)
+        next_revs = revs[:]
+
+        # TODO: stop if change deletes file
+
+        # Add parents to next_revs.
+        parents = [f.filerev() for f in fctx.parents()]
+        parents_to_add = []
+        for parent in parents:
+            if parent not in next_revs:
+                parents_to_add.append(parent)
+                if len(parents) > 1:
+                    rev_color[parent] = nextcolor ; nextcolor += 1
+                else:
+                    rev_color[parent] = curcolor
+        parents_to_add.sort()
+        next_revs[index:index + 1] = parents_to_add
+
+        lines = []
+        for i, rev in enumerate(revs):
+            if rev in next_revs:
+                color = rev_color[rev]
+                lines.append( (i, next_revs.index(rev), color) )
+            elif rev == filerev:
+                for parent in parents:
+                    color = rev_color[parent]
+                    lines.append( (i, next_revs.index(parent), color) )
+
+        yield (fctx.linkrev(), (index, curcolor), lines, parents)
+        revs = next_revs
+        filerev -= 1
+
 
 def dumb_log_generator(repo, revs):
     for revname in revs:
