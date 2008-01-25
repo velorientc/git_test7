@@ -217,7 +217,7 @@ def hgcmd_toq(path, q, *cmdargs, **options):
                     q.put(str(a))
     u = Qui()
     u.readconfig(os.path.join(path, ".hg", "hgrc"))
-    c, func, args, opts, cmdoptions = parse(ui, list(cmdargs))
+    c, func, args, opts, cmdoptions = parse(u, list(cmdargs))
     cmdoptions.update(options)
     u.updateopts(opts["verbose"], opts["debug"], opts["quiet"],
                  not opts["noninteractive"], opts["traceback"])
