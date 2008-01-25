@@ -14,7 +14,10 @@ import time
 from mercurial import hg, ui, util
 from hglib import hgcmd_toq
 from gdialog import *
+from vis import treemodel
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
+from vis.treeview import TreeView
+import gtklib
 
 class DataMineDialog(GDialog):
     COL_REVID = 0
@@ -66,13 +69,9 @@ class DataMineDialog(GDialog):
         notebook.show()
         self.notebook = notebook
         vbox.pack_start(self.notebook, True, True, 2)
-        hbox = gtk.HBox()
-        self.revisiondesc = gtk.Label('')
-        self.revisiondesc.set_alignment(0.0, 0.0)
-        self.pbar = gtk.ProgressBar()
-        hbox.pack_start(self.pbar, False, False, 2)
-        hbox.pack_start(self.revisiondesc, True, True, 2)
-        vbox.pack_start(hbox, False, False, 2)
+
+        self.stbar = gtklib.StatusBar()
+        vbox.pack_start(self.stbar, False, False, 2)
         return vbox
 
     def grep_context_menu(self):
@@ -248,9 +247,9 @@ class DataMineDialog(GDialog):
         thread.start()
 
         model.clear()
-        self.pbar.set_fraction(0.0)
         search.set_sensitive(False)
-        self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
+        self.stbar.begin()
+        self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
         self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
         gobject.timeout_add(50, self.grep_wait, thread, q, model, search)
 
@@ -267,11 +266,10 @@ class DataMineDialog(GDialog):
             tip = self.get_rev_desc(long(revid))
             model.append((revid, text, tip, path))
         if thread.isAlive():
-            self.pbar.pulse()
             return True
         else:
             search.set_sensitive(True)
-            self.pbar.set_fraction(1.0)
+            self.stbar.end()
             return False
 
     def _grep_selection_changed(self, treeview):
@@ -284,7 +282,7 @@ class DataMineDialog(GDialog):
             iter = model.get_iter(path)
             self.currev = model[iter][self.COL_REVID]
             self.curpath = model[iter][self.COL_PATH]
-            self.revisiondesc.set_text(model[iter][self.COL_TOOLTIP])
+            self.stbar.set_status_text(model[iter][self.COL_TOOLTIP])
 
     def close_page(self, button):
         '''Close page button has been pressed'''
@@ -301,6 +299,8 @@ class DataMineDialog(GDialog):
         frame = gtk.Frame()
         frame.set_border_width(10)
         vbox = gtk.VBox()
+
+        # graphview = TreeView(self.repo, limit, self.stbar)
 
         hbox = gtk.HBox()
         lbl = gtk.Label()
@@ -440,8 +440,8 @@ class DataMineDialog(GDialog):
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
 
-        self.pbar.set_fraction(0.0)
-        self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
+        self.stbar.begin()
+        self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
         gobject.timeout_add(50, self.hist_wait, thread, q, path, hbox)
         hbox.set_sensitive(False)
 
@@ -457,11 +457,10 @@ class DataMineDialog(GDialog):
                 continue
             self.revisions[path].append(long(revid))
         if thread.isAlive():
-            self.pbar.pulse()
             return True
         else:
             hbox.set_sensitive(True)
-            self.pbar.set_fraction(1.0)
+            self.stbar.end()
             return False
 
     def next_rev(self, button, revselect, path):
@@ -496,7 +495,7 @@ class DataMineDialog(GDialog):
             iter = model.get_iter(path)
             self.currev = model[iter][self.COL_REVID]
             self.path = model.path
-            self.revisiondesc.set_text(model[iter][self.COL_TOOLTIP])
+            self.stbar.set_status_text(model[iter][self.COL_TOOLTIP])
 
     def _ann_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
@@ -527,10 +526,10 @@ class DataMineDialog(GDialog):
         thread.start()
 
         model.clear()
-        self.pbar.set_fraction(0.0)
+        self.stbar.begin()
+        self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
         path = os.path.basename(path)
         self.notebook.set_tab_label_text(frame, path+'@'+revid)
-        self.revisiondesc.set_text('hg ' + ' '.join(args[2:]))
         gobject.timeout_add(50, self.annotate_wait, thread, q, model, button)
         button.set_sensitive(False)
 
@@ -551,11 +550,10 @@ class DataMineDialog(GDialog):
             color = self.annotate_colormap.get_color(ctx, basedate)
             model.append((revid, text, tip, color))
         if thread.isAlive():
-            self.pbar.pulse()
             return True
         else:
             button.set_sensitive(True)
-            self.pbar.set_fraction(1.0)
+            self.stbar.end()
             return False
 
     def make_toolbutton(self, stock, label, handler,
