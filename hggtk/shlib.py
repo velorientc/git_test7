@@ -60,8 +60,11 @@ def get_tortoise_icon(icon):
         return None
 
 if os.name == 'nt':
-    from win32com.shell import shell, shellcon
     def shell_notify(paths):
+        try:
+            from win32com.shell import shell, shellcon
+        except ImportError:
+            return
         for path in paths:
             abspath = os.path.abspath(path)
             pidl, ignore = shell.SHILCreateFromPath(abspath, 0)
