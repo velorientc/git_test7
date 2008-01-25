@@ -22,30 +22,23 @@ from mercurial.node import *
 from dialog import error_dialog, question_dialog
 from hglib import HgThread
 from shlib import set_tortoise_icon, shell_notify
+import gtklib
 
-class RecoveryDialog(gtk.Dialog):
+class RecoveryDialog(gtk.Window):
     def __init__(self, cwd='', root=''):
         """ Initialize the Dialog. """
-        gtk.Dialog.__init__(self, parent=None,
-                                  flags=0,
-                                  buttons=())
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         set_tortoise_icon(self, 'general.ico')
         self.root = root
         self.cwd = cwd
         self.selected_path = None
+        self.connect('delete-event', self._delete)
 
         self.set_default_size(600, 400)
 
         name = os.path.basename(os.path.abspath(root))
         self.set_title("TortoiseHg Recovery - " + name)
-
-        self.connect('delete-event', self._delete)
-        self.connect('response', self._response)
-
-        self._btn_close = gtk.Button("Close")
-        self._btn_close.connect('clicked', self._close_clicked)
-        self.action_area.pack_end(self._btn_close)
 
         # toolbar
         self.tbar = gtk.Toolbar()
@@ -75,7 +68,16 @@ class RecoveryDialog(gtk.Dialog):
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self.tbar.insert(sep, -1)
+        button = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+                self._close_clicked, tip='Close Application')
+        self.tbar.insert(button, -1)
+        vbox = gtk.VBox()
+        self.add(vbox)
+        vbox.pack_start(self.tbar, False, False, 2)
         
         # hg output window
         scrolledwindow = gtk.ScrolledWindow()
@@ -87,24 +89,23 @@ class RecoveryDialog(gtk.Dialog):
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
-        self.vbox.pack_start(scrolledwindow, True, True)
+        vbox.pack_start(scrolledwindow, True, True)
+
+        self.stbar = gtklib.StatusBar()
+        vbox.pack_start(self.stbar, False, False, 2)
 
     def _close_clicked(self, *args):
         if threading.activeCount() != 1:
             error_dialog("Can't close now", "command is running")
         else:
-            self.response(gtk.RESPONSE_CLOSE)
+            gtk.main_quit()
         
     def _delete(self, widget, event):
-        return True
-        
-    def _response(self, widget, response_id):
         if threading.activeCount() != 1:
-            error_dialog("Can't close now", "command is running")
-            widget.emit_stop_by_name('response')
+            return True
         else:
             gtk.main_quit()
-    
+        
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
         if menu:
@@ -162,12 +163,13 @@ class RecoveryDialog(gtk.Dialog):
         
         # show command to be executed
         self.write("", False)
-        #self.write("$ %s\n" % ' '.join(cmdline))
 
         # execute command and show output on text widget
         gobject.timeout_add(10, self.process_queue)
         self.hgthread = HgThread(cmdline, postfunc)
         self.hgthread.start()
+        self.stbar.begin()
+        self.stbar.set_status_text('hg ' + ' '.join(cmdline))
         
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
@@ -189,6 +191,7 @@ class RecoveryDialog(gtk.Dialog):
             except Queue.Empty:
                 pass
         if threading.activeCount() == 1:
+            self.stbar.end()
             return False # Stop polling this function
         else:
             return True
