@@ -48,13 +48,13 @@ def main(command):
             sys.path.append(norm)
 
     try:
-        from tortoise import thgutil
+        from hggtk import hglib
     except ImportError:
         print 'Please fix "tortoisehg_dir" at the top of this script'
         sys.exit(1)
 
     cwd = os.getcwd()
-    root = thgutil.find_root(cwd)
+    root = hglib.rootpath(cwd)
     opts = { 'root' : root, 'cwd' : cwd }
 
     if root is None and command not in nonrepo_commands:
