@@ -66,29 +66,6 @@ def rootpath(path=None):
             return ''
     return p
 
-class Hg:
-    def __init__(self, path=''):
-        self.u = ui.ui()
-        self.path = path
-        self.root = rootpath(path)
-        self.repo = hg.repository(self.u, path=self.root)
-       
-    def command(self, *cmdargs, **options):
-        c, func, args, opts, cmdoptions = parse(self.repo.ui, cmdargs)
-        cmdoptions.update(options)
-        kw = detect_keyword()
-        if kw: kw._externalcmdhook(c, *args, **cmdoptions)
-        self.repo.ui.pushbuffer()
-        func(self.repo.ui, self.repo, *args, **cmdoptions)
-        return self.repo.ui.popbuffer()
-        
-    def status(self, files=[], list_clean=False):
-        files, matchfn, anypats = cmdutil.matchpats(self.repo, files)
-        status = [n for n in self.repo.status(files=files, list_clean=list_clean)]    
-        return status
-        
-    def abspath(self, files):
-        return [os.path.join(self.root, x) for x in files]
 
 class GtkUi(ui.ui):
     outputq = Queue.Queue()
