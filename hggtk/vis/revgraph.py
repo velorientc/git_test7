@@ -120,8 +120,8 @@ def filelog_grapher(repo, path):
                     color = rev_color[parent]
                     lines.append( (i, next_revs.index(parent), color) )
 
-        pcrevs = [f.linkrev() for f in fctx.parents()]
-        yield (fctx.linkrev(), (index, curcolor), lines, pcrevs)
+        pcrevs = [pfc.rev() for pfc in fctx.parents()]
+        yield (fctx.rev(), (index, curcolor), lines, pcrevs)
         revs = next_revs
         filerev -= 1
 
