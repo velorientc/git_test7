@@ -153,6 +153,7 @@ class TreeView(gtk.ScrolledWindow):
         if not len(self.graphdata):
             self.treeview.set_model(None)
             self.pbar.end()
+            self.emit('revisions-loaded')
             return False
 
         if not self.model:
