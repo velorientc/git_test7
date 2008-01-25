@@ -16,13 +16,11 @@ from hgcmd import CmdDialog
 from shlib import set_tortoise_icon, shell_notify
 import histselect
 
-class MergeDialog(gtk.Dialog):
+class MergeDialog(gtk.Window):
     """ Dialog to merge revisions of a Mercurial repo """
     def __init__(self, root='', cwd='', rev=''):
         """ Initialize the Dialog """
-        buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-        super(MergeDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                          buttons=buttons)
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         set_tortoise_icon(self, 'menumerge.ico')
         # set dialog title
@@ -34,7 +32,12 @@ class MergeDialog(gtk.Dialog):
         self.cwd = cwd or root
         self.rev = rev
         self.repo = None
+        self.notify_func = None
         self._create()
+
+    def set_notify_func(self, func, *args):
+        self.notify_func = func
+        self.notify_args = args
 
     def _create(self):
         self.set_default_size(350, 120)
@@ -55,14 +58,23 @@ class MergeDialog(gtk.Dialog):
                 self._btn_unmerge_clicked,
                 tip='Undo merging and return working directory to'
                     ' one of it parent revision')
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+                self._close_clicked, tip='Close Application')
         tbuttons = [
                 self._btn_merge,
                 gtk.SeparatorToolItem(),
                 self._btn_unmerge,
+                sep,
+                self._btn_close
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
+        vbox = gtk.VBox()
+        self.add(vbox)
+        vbox.pack_start(self.tbar, False, False, 2)
         
         # repo parent revisions
         parentbox = gtk.HBox()
@@ -72,7 +84,7 @@ class MergeDialog(gtk.Dialog):
         self._parent_revs = gtk.Entry()
         parentbox.pack_start(lbl, False, False)
         parentbox.pack_start(self._parent_revs, True, True)
-        self.vbox.pack_start(parentbox, False, False, 2)
+        vbox.pack_start(parentbox, False, False, 2)
 
         # revision input
         revbox = gtk.HBox()
@@ -95,10 +107,13 @@ class MergeDialog(gtk.Dialog):
         revbox.pack_start(self._rev_lbl, False, False)
         revbox.pack_start(self._revbox, False, False)
         revbox.pack_start(self._btn_rev_browse, False, False, 5)
-        self.vbox.pack_start(revbox, False, False, 2)
+        vbox.pack_start(revbox, False, False, 2)
         
         # show them all
         self._refresh()
+
+    def _close_clicked(self, toolbutton, data=None):
+        self.destroy()
 
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
@@ -198,6 +213,8 @@ class MergeDialog(gtk.Dialog):
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
+        if self.notify_func:
+            self.notify_func(self.notify_args)
         shell_notify([self.cwd])
         self._refresh()
         
@@ -222,11 +239,13 @@ class MergeDialog(gtk.Dialog):
         dlg.run()
         dlg.hide()
         shell_notify([self.cwd])
+        if self.notify_func:
+            self.notify_func(self.notify_args)
         self._refresh()
 
 def run(root='', cwd='', rev='', **opts):
     dialog = MergeDialog(root, cwd, rev)
-    dialog.connect('response', gtk.main_quit)
+    dialog.connect('destroy', gtk.main_quit)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

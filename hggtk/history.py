@@ -475,21 +475,16 @@ class GLog(GDialog):
         dialog = MergeDialog(self.repo.root, self.cwd, node)
         dialog.set_transient_for(self)
         dialog.show_all()
-        dialog.run()
+        dialog.set_notify_func(self.merge_completed, parents0)
+        dialog.present()
 
-        # FIXME: must remove transient explicitly to prevent history
-        #        dialog sfrom getting pushed behind other app windows
-        dialog.set_transient_for(None)
-        dialog.hide()
-        
-        # FIXME: re-open repo to retrieve the new parent data
-        root = self.repo.root
-        del self.repo
-        self.repo = hg.repository(ui.ui(), path=root)
-        
+    def merge_completed(self, oldparents):
+        self.repo.invalidate()
+        self.repo.dirstate.invalidate()
+
         # if parents data has changed...
         parents1 = [x.node() for x in self.repo.workingctx().parents()]
-        if not parents0 == parents1:
+        if not oldparents == parents1:
             msg = 'Launch commit tool for merge results?'
             if Confirm('Commit', [], self, msg).run() == gtk.RESPONSE_YES:
                 # Spawn commit tool if merge was successful
