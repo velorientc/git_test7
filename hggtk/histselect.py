@@ -12,11 +12,12 @@ except:
 
 import sys
 import gtk
+import Queue
 from dialog import question_dialog, error_dialog
 from mercurial import util
 from mercurial.i18n import _
-import hglib
 from shlib import set_tortoise_icon
+import hglib
 
 class HistoryDialog(gtk.Dialog):
     """ Dialog to display Mercurial history """
@@ -40,14 +41,11 @@ class HistoryDialog(gtk.Dialog):
         self.root = root
         self.files = files
         self.list_clean = list_clean
-        self.repo = None
         self.page_size = page
         self.start_rev = 'tip'
         self.tip_rev = None
         self.selected = (None, None)
 
-        self.hg = hglib.Hg(root)
-        
         # build dialog
         self._create()
 
@@ -177,8 +175,12 @@ class HistoryDialog(gtk.Dialog):
         import os.path
                   
         try:
-            args = [cmd] + self.hg.abspath(self.files)
-            self.hgout = self.hg.command(*args, **options)
+            q = Queue.Queue()
+            args = [cmd] + [os.path.join(self.root, x) for x in self.files]
+            hglib.hgcmd_toq(self.root, q, *args, **{})
+            out = ''
+            while q.qsize(): out += q.get(0)
+            self.hgout = out
         except util.Abort, inst:
             error_dialog("Error in %s command" % cmd, "abort: %s" % inst)
             return False
