@@ -124,7 +124,12 @@ class HgThread(threading.Thread):
     windows.
     '''
     def __init__(self, args=[], postfunc=None):
-        self.path = rootpath()
+        for i, arg in enumerate(args):
+            if arg in ('-R', '--repo', '--repository'):
+                self.path = args[i+1]
+                break
+        else:
+            self.path = rootpath()
         self.outputq = Queue.Queue()
         self.dialogq = Queue.Queue()
         self.responseq = Queue.Queue()
