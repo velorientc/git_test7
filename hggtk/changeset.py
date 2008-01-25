@@ -456,15 +456,15 @@ class ChangeSet(GDialog):
         if self.glog_parent:
             # If this changeset browser is embedded in glog, send
             # send this event to the main app
+            opts = {'filehist' : self.curfile, 'filerev' : self.currev }
             self.glog_parent.custombutton.set_active(True)
-            self.glog_parent.opts['rev'] = None
-            self.glog_parent.reload_log({'pats' : [self.curfile]})
+            self.glog_parent.graphview.refresh(True, None, opts)
         else:
             # Else launch our own GLog instance
             from history import GLog
             dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root],
                     {}, False)
-            dialog.open_with_file(self.curfile)
+            dialog.open_with_file(self.curfile, self.currev)
             dialog.display()
 
     def _revert_file(self, menuitem):

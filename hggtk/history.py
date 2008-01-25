@@ -188,9 +188,10 @@ class GLog(GDialog):
         menu.show_all()
         return menu
 
-    def open_with_file(self, file):
+    def open_with_file(self, file, rev):
         '''Call this before display() to open with file history'''
         self.curfile = file
+        self.currev = rev
 
     def prepare_display(self):
         '''Called at end of display() method'''
@@ -200,8 +201,9 @@ class GLog(GDialog):
         if self.pats == [self.repo.root]:
             self.pats = []
         if hasattr(self, 'curfile'):
+            opts = {'filehist' : self.curfile, 'filerev' : self.currev }
             self.custombutton.set_active(True)
-            self.reload_log({'pats' : [self.curfile]})
+            self.graphview.refresh(True, None, opts)
         else:
             self.curfile = None
             self.reload_log()
