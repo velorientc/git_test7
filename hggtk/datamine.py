@@ -56,7 +56,6 @@ class DataMineDialog(GDialog):
         """ Initialize the Dialog. """        
         self.grep_cmenu = self.grep_context_menu()
         self.ann_cmenu = self.annotate_context_menu()
-        self.annotate_colormap = AnnotateColorSaturation()
         self.changedesc = {}
         self.revisions = {}
         self.filecurrev = {}
@@ -397,18 +396,27 @@ class DataMineDialog(GDialog):
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
 
+        # date of selected revision
+        ctx = self.repo.changectx(long(model.rev))
+        curdate = ctx.date()[0]
+        # date of initial revision
+        fctx = self.repo.filectx(path, fileid=0)
+        basedate = fctx.date()[0]
+        agedays = (curdate - basedate) / (24 * 60 * 60)
+        colormap = AnnotateColorSaturation(agedays)
+
         model.clear()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
         path = os.path.basename(path)
         self.notebook.set_tab_label_text(frame, path+'@'+str(rev))
-        gobject.timeout_add(50, self.annotate_wait, thread, q, model)
+        gobject.timeout_add(50, self.annotate_wait, thread, q, model,
+                curdate, colormap)
 
-    def annotate_wait(self, thread, q, model):
+    def annotate_wait(self, thread, q, model, curdate, colormap):
         """
         Handle all the messages currently in the queue (if any).
         """
-        basedate = self.repo.changectx(long(model.rev)).date()[0]
         while q.qsize():
             line = q.get(0).rstrip('\r\n')
             try:
@@ -418,7 +426,7 @@ class DataMineDialog(GDialog):
             rowrev = long(revid)
             tip = self.get_rev_desc(rowrev)
             ctx = self.repo.changectx(rowrev)
-            color = self.annotate_colormap.get_color(ctx, basedate)
+            color = colormap.get_color(ctx, curdate)
             model.append((revid, text, tip, color))
         if thread.isAlive():
             return True
