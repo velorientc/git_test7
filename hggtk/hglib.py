@@ -47,7 +47,7 @@ def detect_keyword():
         return keyword_module
     for name, module in extensions.extensions():
         if name == 'keyword':
-            if hasattr(module, '_externalcmdhook'):
+            if hasattr(module, 'externalcmdhook'):
                 keyword_module = module
             break
     else:
@@ -188,7 +188,7 @@ class HgThread(threading.Thread):
         try:
             try:
                 kw = detect_keyword()
-                if kw: kw._externalcmdhook(self.args[0], *self.args[1:], **{})
+                if kw: kw.externalcmdhook(self.args[0], *self.args[1:], **{})
                 ret = dispatch(self.ui, self.args)
                 if ret:
                     self.ui.write('[command returned code %d]\n' % int(ret))
@@ -231,5 +231,5 @@ def hgcmd_toq(path, q, *cmdargs, **options):
     u.updateopts(opts["verbose"], opts["debug"], opts["quiet"],
                  not opts["noninteractive"], opts["traceback"])
     kw = detect_keyword()
-    if kw: kw._externalcmdhook(c, *args, **cmdoptions)
-    func(u, repo, *args, **cmdoptions)
+    if kw: kw.externalcmdhook(c, *args, **cmdoptions)
+    return func(u, repo, *args, **cmdoptions)
