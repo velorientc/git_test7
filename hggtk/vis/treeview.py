@@ -131,6 +131,7 @@ class TreeView(gtk.ScrolledWindow):
     def populate(self, revision=None):
         """Fill the treeview with contents.
         """
+        stopped = False
         try:
             (rev, node, lines, parents) = self.grapher.next()
             self.max_cols = max(self.max_cols, len(lines))
@@ -141,10 +142,13 @@ class TreeView(gtk.ScrolledWindow):
                 path = self.model.get_path(rowref) 
                 self.model.row_inserted(path, rowref) 
         except StopIteration:
-            self.emit('revisions-loaded')
-            self.limit = len(self.graphdata)
+            stopped = True
 
-        if self.limit is None or len(self.graphdata) < self.limit:
+        if stopped:
+            pass
+        elif self.limit is None:
+            return True
+        elif len(self.graphdata) < self.limit:
             return True
 
         if not len(self.graphdata):
@@ -166,6 +170,8 @@ class TreeView(gtk.ScrolledWindow):
         self.graph_column.set_max_width(width)
         self.graph_column.set_visible(self.show_graph)
 
+        if stopped:
+            self.emit('revisions-loaded')
         if revision is not None:
             self.set_revision_id(revision[treemodel.REVID])
         self.pbar.end()
