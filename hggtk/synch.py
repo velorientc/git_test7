@@ -22,13 +22,12 @@ from mercurial.node import *
 from dialog import error_dialog
 from hglib import HgThread
 from shlib import set_tortoise_icon
+import gtklib
 
-class SynchDialog(gtk.Dialog):
+class SynchDialog(gtk.Window):
     def __init__(self, cwd='', root = '', repos=[]):
         """ Initialize the Dialog. """
-        gtk.Dialog.__init__(self, parent=None,
-                                  flags=0,
-                                  buttons=())
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         set_tortoise_icon(self, 'menusynch.ico')
         self.root = root
@@ -40,13 +39,7 @@ class SynchDialog(gtk.Dialog):
         name = self.repo.ui.config('web', 'name') or os.path.basename(root)
         self.set_title("TortoiseHg Synchronize - " + name)
 
-        #self.connect('delete-event', lambda x, y: True)
         self.connect('delete-event', self._delete)
-        self.connect('response', self._response)
-
-        self._btn_close = gtk.Button("Close")
-        self._btn_close.connect('clicked', self._close_clicked)
-        self.action_area.pack_end(self._btn_close)
 
         # toolbar
         self.tbar = gtk.Toolbar()
@@ -91,7 +84,16 @@ class SynchDialog(gtk.Dialog):
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self.tbar.insert(sep, -1)
+        button = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+                self._close_clicked, tip='Close Application')
+        self.tbar.insert(button, -1)
+        vbox = gtk.VBox()
+        self.add(vbox)
+        vbox.pack_start(self.tbar, False, False, 2)
         
         # revision input
         revbox = gtk.HBox()
@@ -124,7 +126,7 @@ class SynchDialog(gtk.Dialog):
 
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._pathbox, True, True)
-        self.vbox.pack_start(revbox, False, False, 2)
+        vbox.pack_start(revbox, False, False, 2)
 
         # hg output window
         scrolledwindow = gtk.ScrolledWindow()
@@ -136,7 +138,10 @@ class SynchDialog(gtk.Dialog):
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
-        self.vbox.pack_start(scrolledwindow, True, True)
+        vbox.pack_start(scrolledwindow, True, True)
+
+        self.stbar = gtklib.StatusBar()
+        vbox.pack_start(self.stbar, False, False, 2)
         
     def _pull_menu(self):
         menu = gtk.Menu()
@@ -225,19 +230,16 @@ class SynchDialog(gtk.Dialog):
             self._pathtext.set_text(dialog.get_filename())
         dialog.destroy()
         
-    def _close_clicked(self, *args):
+    def _close_clicked(self, toolbutton, data=None):
         if threading.activeCount() != 1:
             error_dialog("Can't close now", "command is running")
         else:
-            self.response(gtk.RESPONSE_CLOSE)
+            gtk.main_quit()
         
     def _delete(self, widget, event):
-        return True
-        
-    def _response(self, widget, response_id):
         if threading.activeCount() != 1:
             error_dialog("Can't close now", "command is running")
-            widget.emit_stop_by_name('response')
+            return True
         else:
             gtk.main_quit()
     
@@ -338,12 +340,13 @@ class SynchDialog(gtk.Dialog):
         
         # show command to be executed
         self.write("", False)
-        self.write("$ %s\n" % ' '.join(cmdline))
 
         # execute command and show output on text widget
         gobject.timeout_add(10, self.process_queue)
         self.hgthread = HgThread(cmdline)
         self.hgthread.start()
+        self.stbar.begin()
+        self.stbar.set_status_text('hg ' + ' '.join(cmdline))
         
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
@@ -365,6 +368,7 @@ class SynchDialog(gtk.Dialog):
             except Queue.Empty:
                 pass
         if threading.activeCount() == 1:
+            self.stbar.end()
             return False # Stop polling this function
         else:
             return True
