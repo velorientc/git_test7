@@ -447,44 +447,31 @@ class GLog(GDialog):
 
     def _checkout(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        parents0 = [x.node() for x in self.repo.workingctx().parents()]
-        
+        parents = [x.node() for x in self.repo.workingctx().parents()]
         dialog = UpdateDialog(self.cwd, rev)
         dialog.set_transient_for(self)
         dialog.show_all()
-        dialog.run()
+        dialog.set_notify_func(self.checkout_completed, parents)
+        dialog.present()
 
-        # FIXME: must remove transient explicitly to prevent history
-        #        dialog from getting pushed behind other app windows
-        dialog.set_transient_for(None)        
-        dialog.hide()
-        
-        # FIXME: re-open repo to retrieve the new parent data
-        root = self.repo.root
-        del self.repo
-        self.repo = hg.repository(ui.ui(), path=root)
-
-        parents1 = [x.node() for x in self.repo.workingctx().parents()]
-        if not parents0 == parents1:
+    def checkout_completed(self, oldparents):
+        newparents = [x.node() for x in self.repo.workingctx().parents()]
+        if not oldparents == newparents:
             self.reload_log()
 
     def _merge(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        parents0 = [x.node() for x in self.repo.workingctx().parents()]
+        parents = [x.node() for x in self.repo.workingctx().parents()]
         node = short(self.repo.changelog.node(rev))
         dialog = MergeDialog(self.repo.root, self.cwd, node)
         dialog.set_transient_for(self)
         dialog.show_all()
-        dialog.set_notify_func(self.merge_completed, parents0)
+        dialog.set_notify_func(self.merge_completed, parents)
         dialog.present()
 
     def merge_completed(self, oldparents):
-        self.repo.invalidate()
-        self.repo.dirstate.invalidate()
-
-        # if parents data has changed...
-        parents1 = [x.node() for x in self.repo.workingctx().parents()]
-        if not oldparents == parents1:
+        newparents = [x.node() for x in self.repo.workingctx().parents()]
+        if not oldparents == newparents:
             msg = 'Launch commit tool for merge results?'
             if Confirm('Commit', [], self, msg).run() == gtk.RESPONSE_YES:
                 # Spawn commit tool if merge was successful

@@ -16,17 +16,16 @@ from mercurial import util, hg, ui
 from shlib import shell_notify, set_tortoise_icon
 from hglib import rootpath
 
-class UpdateDialog(gtk.Dialog):
+class UpdateDialog(gtk.Window):
     """ Dialog to update Mercurial repo """
     def __init__(self, cwd='', rev=''):
         """ Initialize the Dialog """
-        buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-        super(UpdateDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                           buttons=buttons)
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         set_tortoise_icon(self, 'menucheckout.ico')
         self.cwd = cwd or os.getcwd()
         self.root = rootpath(self.cwd)
         self.rev = rev
+        self.notify_func = None
         
         u = ui.ui()
         try:
@@ -40,6 +39,10 @@ class UpdateDialog(gtk.Dialog):
 
         self._create()
         
+    def set_notify_func(self, func, *args):
+        self.notify_func = func
+        self.notify_args = args
+
     def _create(self):
         self.set_default_size(350, 120)
 
@@ -52,12 +55,21 @@ class UpdateDialog(gtk.Dialog):
                 'update', 
                 self._btn_update_clicked,
                 tip='Update working directory to selected revision')
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+                self._close_clicked, tip='Close Application')
         tbuttons = [
                 self._btn_update,
+                sep,
+                self._btn_close,
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
+        vbox = gtk.VBox()
+        self.add(vbox)
+        vbox.pack_start(self.tbar, False, False, 2)
         
         # repo parent revisions
         parentbox = gtk.HBox()
@@ -68,7 +80,7 @@ class UpdateDialog(gtk.Dialog):
         self._parent_revs.set_sensitive(False)
         parentbox.pack_start(lbl, False, False)
         parentbox.pack_start(self._parent_revs, False, False)
-        self.vbox.pack_start(parentbox, False, False, 2)
+        vbox.pack_start(parentbox, False, False, 2)
 
         # revision input
         revbox = gtk.HBox()
@@ -92,13 +104,16 @@ class UpdateDialog(gtk.Dialog):
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._revbox, False, False)
         revbox.pack_start(self._btn_rev_browse, False, False, 5)
-        self.vbox.pack_start(revbox, False, False, 2)
+        vbox.pack_start(revbox, False, False, 2)
 
         self._overwrite = gtk.CheckButton("Overwrite local changes")
-        self.vbox.pack_end(self._overwrite, False, False, 10)
+        vbox.pack_end(self._overwrite, False, False, 10)
         
         # show them all
         self._refresh()
+
+    def _close_clicked(self, toolbutton, data=None):
+        self.destroy()
 
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
@@ -172,12 +187,14 @@ class UpdateDialog(gtk.Dialog):
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
+        if self.notify_func:
+            self.notify_func(self.notify_args)
         self._refresh()
         shell_notify([self.cwd])
 
 def run(cwd='', rev='', **opts):
     dialog = UpdateDialog(cwd, rev)
-    dialog.connect('response', gtk.main_quit)
+    dialog.connect('destroy', gtk.main_quit)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
