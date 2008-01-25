@@ -3,7 +3,7 @@ import os.path
 import traceback
 import threading
 import Queue
-from mercurial import hg, ui, util, cmdutil, commands, extensions
+from mercurial import hg, ui, util, extensions
 from mercurial.node import *
 from mercurial.i18n import _
 from dialog import entry_dialog
@@ -25,11 +25,6 @@ try:
         except:
             # Mercurail 0.9.5
             from mercurial.dispatch import _parse as parse
-
-    if hasattr(commands, 'dispatch'):
-        from mercurial.cmdutil import dispatch
-    else:
-        from mercurial.dispatch import _dispatch as dispatch
 finally:
     demandimport.enable()
 
@@ -68,23 +63,17 @@ def rootpath(path=None):
 
 
 class GtkUi(ui.ui):
-    outputq = Queue.Queue()
-    dialoglock = threading.Lock()
-    dialogq = Queue.Queue()
-    responseq = Queue.Queue()
-
-    '''PyGtk enabled mercurial.ui subclass'''
-    def __init__(self, verbose=False, debug=False, quiet=False,
-                 interactive=True, traceback=False, report_untrusted=True,
-                 parentui=None):
-        super(GtkUi, self).__init__(verbose, debug, quiet, interactive,
-                traceback, report_untrusted, parentui)
-        # Override a few settings
-        self.verbose = True
-
-    def isatty(self):
-        # lies, damn lies, and marketing
-        return True
+    '''
+    PyGtk enabled mercurial.ui subclass.  All this code will be running
+    in a background thread, so it cannot directly call into Gtk.
+    Instead, it places output and dialog requests onto queues for the
+    main thread to pickup.
+    '''
+    def __init__(self, outputq, dialogq, responseq):
+        ui.ui.__init__(self)
+        self.outputq = outputq
+        self.dialogq = dialogq
+        self.responseq = responseq
 
     def write(self, *args):
         if self.buffers:
@@ -101,16 +90,13 @@ class GtkUi(ui.ui):
         pass
 
     def prompt(self, msg, pat=None, default="y"):
-        '''generic PyGtk prompt dialog'''
         import re
         if not self.interactive: return default
         while True:
             try:
                 # send request to main thread, await response
-                self.dialoglock.acquire()
                 self.dialogq.put( (msg, True, default) )
                 r = self.responseq.get(True)
-                self.dialoglock.release()
                 if not r:
                     return default
                 if not pat or re.match(pat, r):
@@ -121,12 +107,9 @@ class GtkUi(ui.ui):
                 raise util.Abort(_('response expected'))
 
     def getpass(self, prompt=None, default=None):
-        '''generic PyGtk password prompt dialog'''
         # send request to main thread, await response
-        self.dialoglock.acquire()
         self.dialogq.put( (prompt or _('password: '), False, default) )
         r = self.responseq.get(True)
-        self.dialoglock.release()
         return p
 
     def print_exc(self):
@@ -134,25 +117,25 @@ class GtkUi(ui.ui):
         return True
 
 class HgThread(threading.Thread):
-    savedui = None
-    instances = 0
-
+    '''
+    Run an hg command in a background thread, implies output is being
+    sent to a rendered text buffer interactively and requests for
+    feedback from Mercurial can be handled by the user via dialog
+    windows.
+    '''
     def __init__(self, args=[], postfunc=None):
-        self.ui = GtkUi()
+        self.path = rootpath()
+        self.outputq = Queue.Queue()
+        self.dialogq = Queue.Queue()
+        self.responseq = Queue.Queue()
+        self.ui = GtkUi(self.outputq, self.dialogq, self.responseq)
         self.args = args
         self.ret = None
         self.postfunc = postfunc
         threading.Thread.__init__(self)
 
-    def command(self, cmd, files=[], options={}):
-        '''Convenience function for setting command line arguments'''
-        args = [cmd]
-        for k in options.keys():
-            args += [k, options[k]]
-        self.args = args + files
-
     def getqueue(self):
-        return GtkUi.outputq
+        return self.outputq
 
     def return_code(self):
         '''
@@ -165,7 +148,7 @@ class HgThread(threading.Thread):
     def process_dialogs(self):
         '''Polled every 10ms to serve dialogs for the background thread'''
         try:
-            (prompt, visible, default) = GtkUi.dialogq.get_nowait()
+            (prompt, visible, default) = self.dialogq.get_nowait()
             self.dlg = entry_dialog(prompt, visible, default,
                     self.dialog_response)
         except Queue.Empty:
@@ -177,46 +160,49 @@ class HgThread(threading.Thread):
         else:
             text = None
         self.dlg.destroy()
-        GtkUi.responseq.put(text)
+        self.responseq.put(text)
 
     def run(self):
-        if HgThread.instances == 0 and not hasattr(ui.ui, 'outputq'):
-            # Monkey patch our GUI ui subclass into place
-            HgThread.savedui = ui.ui
-            ui.ui = GtkUi
-        HgThread.instances += 1
         try:
-            try:
-                kw = detect_keyword()
-                if kw: kw.externalcmdhook(self.args[0], *self.args[1:], **{})
-                ret = dispatch(self.ui, self.args)
-                if ret:
-                    self.ui.write('[command returned code %d]\n' % int(ret))
-                else:
-                    self.ui.write('[command completed successfully]\n')
-                self.ret = ret or 0
-                if self.postfunc:
-                    self.postfunc(ret)
-            except hg.RepoError, e:
-                self.ui.write_err(str(e))
-            except util.Abort, e:
-                self.ui.write_err(str(e))
-                if self.ui.traceback:
-                    self.ui.print_exc()
-            except Exception, e:
-                self.ui.write_err(str(e))
+            self.ui.readconfig(os.path.join(self.path, ".hg", "hgrc"))
+            c, func, args, opts, cmdoptions = parse(self.ui, self.args)
+            self.ui.updateopts(opts["verbose"], opts["debug"], opts["quiet"],
+                    not opts["noninteractive"], opts["traceback"])
+
+            kw = detect_keyword()
+            if kw: kw.externalcmdhook(c, *args, **cmdoptions)
+
+            repo = hg.repository(self.ui, path=self.path)
+            repo.ui = self.ui
+            ret = func(self.ui, repo, *args, **cmdoptions)
+
+            if ret:
+                self.ui.write('[command returned code %d]\n' % int(ret))
+            else:
+                self.ui.write('[command completed successfully]\n')
+
+            self.ret = ret or 0
+            if self.postfunc:
+                self.postfunc(ret)
+        except hg.RepoError, e:
+            self.ui.write_err(str(e))
+        except util.Abort, e:
+            self.ui.write_err(str(e))
+            if self.ui.traceback:
                 self.ui.print_exc()
-        finally:
-            HgThread.instances += -1
-            if HgThread.instances == 0 and HgThread.savedui:
-                # Undo monkey patch
-                ui.ui = HgThread.savedui
-                HgThread.savedui = None
+        except Exception, e:
+            self.ui.write_err(str(e))
+            self.ui.print_exc()
+
 
 def hgcmd_toq(path, q, *cmdargs, **options):
+    '''
+    Run an hg command in a background thread, pipe all output to a Queue
+    object.  Assumes command is completely noninteractive.
+    '''
     class Qui(ui.ui):
         def __init__(self):
-            super(Qui, self).__init__()
+            ui.ui.__init__(self)
 
         def write(self, *args):
             if self.buffers:
@@ -225,11 +211,14 @@ def hgcmd_toq(path, q, *cmdargs, **options):
                 for a in args:
                     q.put(str(a))
     u = Qui()
-    repo = hg.repository(u, path=path)
-    c, func, args, opts, cmdoptions = parse(repo.ui, list(cmdargs))
+    u.readconfig(os.path.join(path, ".hg", "hgrc"))
+    c, func, args, opts, cmdoptions = parse(ui, list(cmdargs))
     cmdoptions.update(options)
     u.updateopts(opts["verbose"], opts["debug"], opts["quiet"],
                  not opts["noninteractive"], opts["traceback"])
+
     kw = detect_keyword()
     if kw: kw.externalcmdhook(c, *args, **cmdoptions)
+
+    repo = hg.repository(u, path=path)
     return func(u, repo, *args, **cmdoptions)
