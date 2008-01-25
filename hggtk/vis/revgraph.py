@@ -89,6 +89,9 @@ def filelog_grapher(repo, path, rev):
     # discover tipmost file rev
     def tipmost(fctx):
         while True:
+            if fctx.filerev() in visited:
+                return fctx.filerev()
+            visited.append(fctx.filerev())
             cftxs = fctx.children()
             if len(cftxs) == 1: # fast-forward, without recursion
                 fctx = cftxs[0]
@@ -99,6 +102,7 @@ def filelog_grapher(repo, path, rev):
                 return max(revs)
 
     ctx = repo.changectx(rev)
+    visited = []
     filerev = tipmost(ctx.filectx(path))
 
     revs = []
