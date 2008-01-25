@@ -28,21 +28,14 @@ from mercurial.i18n import _
 from mercurial.node import *
 from shlib import set_tortoise_icon
 
-class ServeDialog(gtk.Dialog):
+class ServeDialog(gtk.Window):
     """ Dialog to run web server"""
     def __init__(self, cwd='', root='', hgpath='hg'):
         """ Initialize the Dialog """
-        super(ServeDialog, self).__init__(flags=gtk.DIALOG_MODAL)
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         set_tortoise_icon(self, 'proxy.ico')
-        self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
-
         self.connect('delete-event', self._delete)
-        self.connect('response', self._response)
-
-        self._btn_close = gtk.Button("Close")
-        self._btn_close.connect('clicked', self._close_clicked)
-        self.action_area.pack_end(self._btn_close)
 
         self.proc = None
         self._url = None
@@ -82,6 +75,12 @@ class ServeDialog(gtk.Dialog):
                                               'Configure',
                                               self._on_conf_clicked,
                                               None)
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self._button_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+                self._close_clicked)
+
         tbuttons = [
                 self._button_start,
                 self._button_stop,
@@ -89,10 +88,15 @@ class ServeDialog(gtk.Dialog):
                 self._button_browse,
                 gtk.SeparatorToolItem(),
                 self._button_conf,
+                sep,
+                self._button_close,
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
+
+        vbox = gtk.VBox()
+        self.add(vbox)
+        vbox.pack_start(self.tbar, False, False, 2)
         
         # revision input
         revbox = gtk.HBox()
@@ -103,7 +107,7 @@ class ServeDialog(gtk.Dialog):
         self._port_input.set_text(self.defport)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._port_input, False, False)
-        self.vbox.pack_start(revbox, False, False, 2)
+        vbox.pack_start(revbox, False, False, 2)
 
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -114,7 +118,7 @@ class ServeDialog(gtk.Dialog):
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
-        self.vbox.pack_start(scrolledwindow, True, True)
+        vbox.pack_start(scrolledwindow, True, True)
 
         self._set_button_states()
 
@@ -130,18 +134,15 @@ class ServeDialog(gtk.Dialog):
         return tbutton
             
     def _close_clicked(self, *args):
-        #if self._server_stopped() == True:
-        self.response(gtk.RESPONSE_CLOSE)
+        if self._server_stopped() == True:
+            gtk.main_quit()
         
     def _delete(self, widget, event):
-        return True
-
-    def _response(self, widget, response_id):
-        if self._server_stopped() == False:
-            widget.emit_stop_by_name('response')
-        else:
+        if self._server_stopped() == True:
             gtk.main_quit()
-    
+        else:
+            return True
+
     def _server_stopped(self):
         '''
         check if server is running, or to terminate if running
