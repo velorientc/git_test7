@@ -296,22 +296,6 @@ class DataMineDialog(GDialog):
         file 'path' revision history, start annotate of supplied
         revision 'revid'.
         '''
-        frame = gtk.Frame()
-        frame.set_border_width(10)
-        vbox = gtk.VBox()
-
-        # graphview = TreeView(self.repo, limit, self.stbar)
-
-        hbox = gtk.HBox()
-        lbl = gtk.Label()
-        lbl.set_alignment(0.0, 0.0)
-        hbox.pack_start(lbl)
-        select = gtk.Button('Select')
-        close = gtk.Button('Close')
-        hbox.pack_start(select, False, False)
-        hbox.pack_start(close, False, False)
-        vbox.pack_start(hbox, False, False)
-
         if revid == '.':
             parentctx = self.repo.workingctx().parents()
             rev = parentctx[0].rev()
@@ -319,28 +303,25 @@ class DataMineDialog(GDialog):
         else:
             rev = long(revid)
 
-        hbox = gtk.HBox()
-        revselect = gtk.HScale()
-        revselect.set_digits(0)
-        revselect.set_range(0, self.repo.changelog.count()-1)
-        revselect.set_value(rev)
-        revselect.connect('value-changed', self.rev_select_changed, path, lbl)
-        revselect.connect('button-release-event', self.rev_release_event, path)
-        hbox.pack_start(revselect, True, True)
-        if path not in self.revisions:
-            self.revisions[path] = []
-            self.load_file_history(path, hbox)
-        self.filecurrev[path] = rev
-        lbl.set_text(path + ': ' + self.get_rev_desc(rev))
+        frame = gtk.Frame()
+        frame.set_border_width(10)
+        vbox = gtk.VBox()
 
-        next = gtk.ToolButton(gtk.STOCK_MEDIA_FORWARD)
-        next.connect('clicked', self.next_rev, revselect, path)
-        prev = gtk.ToolButton(gtk.STOCK_MEDIA_REWIND)
-        prev.connect('clicked', self.prev_rev, revselect, path)
-        hbox.pack_start(prev, False, False)
-        hbox.pack_start(next, False, False)
+        hbox = gtk.HBox()
+        lbl = gtk.Label()
+        hbox.pack_start(lbl, True, True)
+        close = gtk.Button('Close')
+        close.connect('clicked', self.close_page)
+        hbox.pack_start(close, False, False)
         vbox.pack_start(hbox, False, False)
 
+        # File log revision graph
+        graphview = TreeView(self.repo, 5000, self.stbar)
+        graphview.connect('revisions-loaded', self.revisions_loaded, rev)
+        graphview.refresh(True, None, {'filehist':path, 'filerev':rev})
+        graphview.set_property('rev-column-visible', True)
+
+        # Annotation text tree view
         treeview = gtk.TreeView()
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
         treeview.set_property('fixed-height-mode', True)
@@ -373,122 +354,83 @@ class DataMineDialog(GDialog):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(treeview)
-        vbox.pack_start(scroller, True, True)
+
+        vpaned = gtk.VPaned()
+        vpaned.pack1(graphview, True, True)
+        vpaned.pack2(scroller, True, True)
+        vbox.pack_start(vpaned, True, True)
+
         frame.add(vbox)
         frame.show_all()
         num = self.notebook.append_page_menu(frame, 
                 gtk.Label(os.path.basename(path) + '@' + revid),
                 gtk.Label(path + '@' + revid))
-        objs = (frame, treeview.get_model(), path)
-        select.connect('clicked', self.trigger_annotate, objs)
-        close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
-        self.trigger_annotate(select, objs)
 
-    def rev_release_event(self, widget, event, path):
-        '''
-        User released the mouse button after dragging the revision
-        selector.  Snap the selector to the last file revision
-        passed or hovered over.  We can't just set the value in this
-        fucntion, gtk ignores it, so we register a 0 delay timeout.
-        '''
-        def set_rev_value(widget, value):
-            widget.set_value(value)
-            return False
-        cur = self.filecurrev[path]
-        gobject.timeout_add(0, set_rev_value, widget, cur)
+        objs = (frame, treeview.get_model(), path)
+        graphview.treeview.connect('row-activated', self.log_activate, objs)
 
-    def rev_select_changed(self, range, path, label):
-        '''
-        User has moved the revision timeline slider.  If it
-        has hit apon (or passed) a revision that modifies this file,
-        remember this revision as the 'current' for this file, and
-        update the label at the top of the page.
-        '''
-        rev = long(range.get_value())
-        if rev in self.revisions[path]:
-            self.filecurrev[path] = rev
-            label.set_text(path + ': ' + self.get_rev_desc(rev))
-            return
-        # Detect whether the user has passed one or more spots
-        cur = self.filecurrev[path]
-        revs = self.revisions[path]
-        i = revs.index(cur)
-        try:
-            while i and rev >= revs[i-1]:
-                i += -1
-            while rev <= revs[i+1]:
-                i += 1
-        except IndexError:
-            pass
-        if revs[i] != cur:
-            newrev = revs[i]
-            self.filecurrev[path] = newrev
-            label.set_text(path + ': ' + self.get_rev_desc(newrev))
+    def log_activate(self, treeview, path, column, objs):
+        model = treeview.get_model()
+        iter = model.get_iter(path)
+        rev = model.get_value(iter, treemodel.REVID)
+        self.trigger_annotate(rev, objs)
 
-    def load_file_history(self, path, hbox):
+    def revisions_loaded(self, graphview, rev):
+        graphview.set_revision_id(rev)
+        treeview = graphview.treeview
+        path, column = treeview.get_cursor()
+        treeview.row_activated(path, column)
+
+    def trigger_annotate(self, rev, objs):
         '''
-        When a new annotation page is opened, this function is
-        to retrieve the revision history of the specified file.
-        The revision slider on this page is frozen until this
-        scan is completed.
+        User has selected a file revision to annotate.  Trigger a
+        background thread to perform the annotation.  Disable the select
+        button until this operation is complete.
         '''
+        (frame, model, path) = objs
         q = Queue.Queue()
-        args = [self.repo.root, q, 'log', '--quiet', path]
+        args = [self.repo.root, q, 'annotate', '--rev', str(rev)]
+        args.append(path)
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
 
+        model.clear()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
-        gobject.timeout_add(50, self.hist_wait, thread, q, path, hbox)
-        hbox.set_sensitive(False)
+        path = os.path.basename(path)
+        self.notebook.set_tab_label_text(frame, path+'@'+str(rev))
+        gobject.timeout_add(50, self.annotate_wait, thread, q, model)
 
-    def hist_wait(self, thread, q, path, hbox):
+    def annotate_wait(self, thread, q, model):
         """
-        Handle output from 'hg log -qf path'
+        Handle all the messages currently in the queue (if any).
         """
+        basedate = self.repo.changectx(long(model.rev)).date()[0]
         while q.qsize():
             line = q.get(0).rstrip('\r\n')
             try:
-                (revid, node) = line.split(':', 1)
+                (revid, text) = line.split(':', 1)
             except ValueError:
                 continue
-            self.revisions[path].append(long(revid))
+            rowrev = long(revid)
+            tip = self.get_rev_desc(rowrev)
+            ctx = self.repo.changectx(rowrev)
+            color = self.annotate_colormap.get_color(ctx, basedate)
+            model.append((revid, text, tip, color))
         if thread.isAlive():
             return True
         else:
-            hbox.set_sensitive(True)
             self.stbar.end()
             return False
 
-    def next_rev(self, button, revselect, path):
-        '''
-        User has pressed the 'next version' button on an annotate page.
-        Move the slider to the next highest revision that is applicable
-        for this file.
-        '''
-        cur = self.filecurrev[path]
-        revs = self.revisions[path]
-        i = revs.index(cur)
-        if i > 0:
-            revselect.set_value(revs[i-1])
-
-    def prev_rev(self, button, revselect, path):
-        '''
-        User has pressed the 'prev version' button on an annotate page.
-        Move the slider to the next lowest revision that is applicable
-        for this file.
-        '''
-        cur = self.filecurrev[path]
-        revs = self.revisions[path]
-        i = revs.index(cur)
-        if i < len(revs) - 1:
-            revselect.set_value(revs[i+1])
-
     def _ann_selection_changed(self, treeview):
-        """callback for when the user selects grep output."""
+        """
+        User selected line of annotate output, describe revision
+        responsible for this line in the status bar
+        """
         (path, focus) = treeview.get_cursor()
         model = treeview.get_model()
         if path is not None and model is not None:
@@ -509,52 +451,6 @@ class DataMineDialog(GDialog):
 
     def _ann_row_act(self, tree, path, column):
         self.ann_cmenu.get_children()[0].activate()
-
-    def trigger_annotate(self, button, objs):
-        '''
-        User has selected a file revision to annotate.  Trigger a
-        background thread to perform the annotation.  Disable the select
-        button until this operation is complete.
-        '''
-        (frame, model, path) = objs
-        q = Queue.Queue()
-        revid = str(self.filecurrev[path])
-        args = [self.repo.root, q, 'annotate', '--rev']
-        args.append(revid)
-        args.append(path)
-        thread = threading.Thread(target=hgcmd_toq, args=args)
-        thread.start()
-
-        model.clear()
-        self.stbar.begin()
-        self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
-        path = os.path.basename(path)
-        self.notebook.set_tab_label_text(frame, path+'@'+revid)
-        gobject.timeout_add(50, self.annotate_wait, thread, q, model, button)
-        button.set_sensitive(False)
-
-    def annotate_wait(self, thread, q, model, button):
-        """
-        Handle all the messages currently in the queue (if any).
-        """
-        basedate = self.repo.changectx(long(model.rev)).date()[0]
-        while q.qsize():
-            line = q.get(0).rstrip('\r\n')
-            try:
-                (revid, text) = line.split(':', 1)
-            except ValueError:
-                continue
-            rowrev = long(revid)
-            tip = self.get_rev_desc(rowrev)
-            ctx = self.repo.changectx(rowrev)
-            color = self.annotate_colormap.get_color(ctx, basedate)
-            model.append((revid, text, tip, color))
-        if thread.isAlive():
-            return True
-        else:
-            button.set_sensitive(True)
-            self.stbar.end()
-            return False
 
     def make_toolbutton(self, stock, label, handler,
             userdata=None, menu=None, tip=None):
