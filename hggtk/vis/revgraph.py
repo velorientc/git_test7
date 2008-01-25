@@ -88,12 +88,15 @@ def filelog_grapher(repo, path, rev):
     '''
     # discover tipmost file rev
     def tipmost(fctx):
-        # TODO: stop if change deletes file
-        if not fctx.children():
-            return fctx.filerev()
-        else:
-            revs = [tipmost(f) for f in fctx.children()]
-            return max(revs)
+        while True:
+            cftxs = fctx.children()
+            if len(cftxs) == 1: # fast-forward, without recursion
+                fctx = cftxs[0]
+            elif not cftxs:
+                return fctx.filerev()
+            else:
+                revs = [tipmost(f) for f in cftxs]
+                return max(revs)
 
     ctx = repo.changectx(rev)
     filerev = tipmost(ctx.filectx(path))
@@ -102,7 +105,7 @@ def filelog_grapher(repo, path, rev):
     rev_color = {}
     nextcolor = 0
     while filerev >= 0:
-        fctx = repo.filectx(fileid=filerev)
+        fctx = repo.filectx(path, fileid=filerev)
 
         # Compute revs and next_revs.
         if filerev not in revs:
@@ -111,8 +114,6 @@ def filelog_grapher(repo, path, rev):
         curcolor = rev_color[filerev]
         index = revs.index(filerev)
         next_revs = revs[:]
-
-        # TODO: stop if change deletes file
 
         # Add parents to next_revs.
         parents = [f.filerev() for f in fctx.parents()]
@@ -137,7 +138,8 @@ def filelog_grapher(repo, path, rev):
                     color = rev_color[parent]
                     lines.append( (i, next_revs.index(parent), color) )
 
-        yield (fctx.linkrev(), (index, curcolor), lines, parents)
+        pcrevs = [f.linkrev() for f in fctx.parents()]
+        yield (fctx.linkrev(), (index, curcolor), lines, pcrevs)
         revs = next_revs
         filerev -= 1
 
