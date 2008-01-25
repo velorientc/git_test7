@@ -99,7 +99,7 @@ class DataMineDialog(GDialog):
     def _cmenu_file_log(self, menuitem):
         from history import GLog
         dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root], {}, False)
-        dialog.open_with_file(self.curpath, self.currev)
+        dialog.open_with_file(self.curpath)
         dialog.display()
 
     def _grep_button_release(self, widget, event):

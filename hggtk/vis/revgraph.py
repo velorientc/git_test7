@@ -77,34 +77,12 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None):
         curr_rev -= 1
 
 
-def filelog_grapher(repo, path, rev):
+def filelog_grapher(repo, path):
     '''
-    Graph the ancestry of a single file instance, specified by a
-    particular changeset (stop at file deletions and creations).
-
-    repo     - input repository
-    path     - name of file being graphed
-    rev      - revision id specifying file instance being graphed.
+    Graph the ancestry of a single file (log).  Deletions show
+    up as breaks in the graph.
     '''
-    # discover tipmost file rev
-    def tipmost(fctx):
-        while True:
-            if fctx.filerev() in visited:
-                return fctx.filerev()
-            visited.append(fctx.filerev())
-            cftxs = fctx.children()
-            if len(cftxs) == 1: # fast-forward, without recursion
-                fctx = cftxs[0]
-            elif not cftxs:
-                return fctx.filerev()
-            else:
-                revs = [tipmost(f) for f in cftxs]
-                return max(revs)
-
-    ctx = repo.changectx(rev)
-    visited = []
-    filerev = tipmost(ctx.filectx(path))
-
+    filerev = repo.file(path).count() - 1
     revs = []
     rev_color = {}
     nextcolor = 0

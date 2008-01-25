@@ -97,8 +97,7 @@ class TreeView(gtk.ScrolledWindow):
 
     def create_log_generator(self, graphcol, pats, opts):
         if 'filehist' in opts:
-            self.grapher = filelog_grapher(self.repo, opts['filehist'],
-                    opts['filerev'])
+            self.grapher = filelog_grapher(self.repo, opts['filehist'])
         elif graphcol:
             end = 0
             if pats is not None:  # branch name
