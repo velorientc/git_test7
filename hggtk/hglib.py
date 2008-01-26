@@ -242,14 +242,13 @@ def thgdispatch(ui, path=None, args=[]):
         path = ui.expandpath(rpath[-1])
 
     extensions.loadall(ui)
+    if not hasattr(extensions, 'extensions'):
+        extensions.extensions = lambda: () # pre-0.9.5, loadall did below
     for name, module in extensions.extensions():
         if name in _loaded:
             continue
 
         # setup extensions
-        # TODO this should be generalized to scheme, where extensions can
-        #      redepend on other extensions.  then we should toposort them, and
-        #      do initialization in correct order
         extsetup = getattr(module, 'extsetup', None)
         if extsetup:
             extsetup()
