@@ -12,14 +12,10 @@ pygtk.require('2.0')
 import gtk
 import gobject
 import pango
+import shlib
 
 import tortoise.version
 import mercurial.version
-from tortoise.thgutil import get_prog_root
-
-prog_root = get_prog_root()
-hg_icon = os.path.join(prog_root, "icons/tortoise/hg.ico")
-license_file = os.path.join(prog_root, "COPYING.txt")
 
 def browse_url(url):
     import threading
@@ -64,6 +60,11 @@ class AboutDialog(gtk.AboutDialog):
         if hasattr(self, 'set_wrap_license'):
             self.set_wrap_license(True)
         self.set_copyright("Copyright 2007 TK Soh and others")
+
+        hg_icon = os.path.normpath(shlib.get_tortoise_icon('hg.ico'))
+        prog_root = os.path.dirname(os.path.dirname(os.path.dirname(hg_icon)))
+        license_file = os.path.join(prog_root, "COPYING.txt")
+
         self.set_license(file(license_file).read())
         self.set_comments("with " + lib_versions + "\n\n" + comment)
         self.set_logo(gtk.gdk.pixbuf_new_from_file(hg_icon))      
