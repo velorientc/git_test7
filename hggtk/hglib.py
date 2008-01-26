@@ -1,9 +1,10 @@
 import gtk
 import os.path
+import sys
 import traceback
 import threading
 import Queue
-from mercurial import hg, ui, util, extensions
+from mercurial import hg, ui, util, extensions, commands, hook
 from mercurial.node import *
 from mercurial.i18n import _
 from dialog import entry_dialog
@@ -28,26 +29,6 @@ try:
 finally:
     demandimport.enable()
 
-keyword_module = None
-def detect_keyword():
-    '''
-    The keyword extension has difficulty predicting when it needs to
-    intercept data output from various commands when the mercurial
-    libraries are used by python applications.  Recent versions offer a
-    hook that applications can call to register commands about to be
-    executed (as a replacement for sys.argv[]).
-    '''
-    global keyword_module
-    if keyword_module is not None:
-        return keyword_module
-    for name, module in extensions.extensions():
-        if name == 'keyword':
-            if hasattr(module, 'externalcmdhook'):
-                keyword_module = module
-            break
-    else:
-        keyword_module = False
-    return keyword_module
 
 def rootpath(path=None):
     """ find Mercurial's repo root of path """
@@ -69,11 +50,20 @@ class GtkUi(ui.ui):
     Instead, it places output and dialog requests onto queues for the
     main thread to pickup.
     '''
-    def __init__(self, outputq, dialogq, responseq):
-        ui.ui.__init__(self)
-        self.outputq = outputq
-        self.dialogq = dialogq
-        self.responseq = responseq
+    def __init__(self, outputq=None, dialogq=None, responseq=None,
+            parentui=None):
+        super(GtkUi, self).__init__()
+        if parentui:
+            self.parentui = parentui.parentui or parentui
+            self.cdata = ui.dupconfig(self.parentui.cdata)
+            self.verbose = parentui.verbose
+            self.outputq = parentui.outputq
+            self.dialogq = parentui.dialogq
+            self.responseq = parentui.responseq
+        else:
+            self.outputq = outputq
+            self.dialogq = dialogq
+            self.responseq = responseq
 
     def write(self, *args):
         if self.buffers:
@@ -124,12 +114,6 @@ class HgThread(threading.Thread):
     windows.
     '''
     def __init__(self, args=[], postfunc=None):
-        for i, arg in enumerate(args):
-            if arg in ('-R', '--repo', '--repository'):
-                self.path = args[i+1]
-                break
-        else:
-            self.path = rootpath()
         self.outputq = Queue.Queue()
         self.dialogq = Queue.Queue()
         self.responseq = Queue.Queue()
@@ -169,23 +153,22 @@ class HgThread(threading.Thread):
 
     def run(self):
         try:
-            self.ui.readconfig(os.path.join(self.path, ".hg", "hgrc"))
-            c, func, args, opts, cmdoptions = parse(self.ui, self.args)
-            self.ui.updateopts(opts["verbose"], opts["debug"], opts["quiet"],
-                    not opts["noninteractive"], opts["traceback"])
-
-            kw = detect_keyword()
-            if kw: kw.externalcmdhook(c, *args, **cmdoptions)
-
-            repo = hg.repository(self.ui, path=self.path)
-            repo.ui = self.ui
-            ret = func(self.ui, repo, *args, **cmdoptions)
-
+            # Some commands create repositories, and thus must create
+            # new ui() instances.  For those, we monkey-patch ui.ui()
+            # as briefly as possible
+            origui = None
+            if self.args[0] in ('clone', 'init'):
+                origui = ui.ui
+                ui.ui = GtkUi
+            try:
+                ret = thgdispatch(self.ui, None, self.args)
+            finally:
+                if origui:
+                    ui.ui = origui
             if ret:
                 self.ui.write('[command returned code %d]\n' % int(ret))
             else:
                 self.ui.write('[command completed successfully]\n')
-
             self.ret = ret or 0
             if self.postfunc:
                 self.postfunc(ret)
@@ -199,8 +182,148 @@ class HgThread(threading.Thread):
             self.ui.write_err(str(e))
             self.ui.print_exc()
 
+def _earlygetopt(aliases, args):
+    """Return list of values for an option (or aliases).
 
-def hgcmd_toq(path, q, *cmdargs, **options):
+    The values are listed in the order they appear in args.
+    The options and values are removed from args.
+    """
+    try:
+        argcount = args.index("--")
+    except ValueError:
+        argcount = len(args)
+    shortopts = [opt for opt in aliases if len(opt) == 2]
+    values = []
+    pos = 0
+    while pos < argcount:
+        if args[pos] in aliases:
+            if pos + 1 >= argcount:
+                # ignore and let getopt report an error if there is no value
+                break
+            del args[pos]
+            values.append(args.pop(pos))
+            argcount -= 2
+        elif args[pos][:2] in shortopts:
+            # short option can have no following space, e.g. hg log -Rfoo
+            values.append(args.pop(pos)[2:])
+            argcount -= 1
+        else:
+            pos += 1
+    return values
+
+_loaded = {}
+def thgdispatch(ui, path=None, args=[]):
+    '''
+    Replicate functionality of mercurial dispatch but force the use
+    of the passed in ui for all purposes
+    '''
+    # read --config before doing anything else
+    # (e.g. to change trust settings for reading .hg/hgrc)
+    config = _earlygetopt(['--config'], args)
+    if config:
+        ui.updateopts(config=_parseconfig(config))
+
+    # check for cwd
+    cwd = _earlygetopt(['--cwd'], args)
+    if cwd:
+        os.chdir(cwd[-1])
+
+    # read the local repository .hgrc into a local ui object
+    path = rootpath(path) or ""
+    if path:
+        try:
+            ui.readconfig(os.path.join(path, ".hg", "hgrc"))
+        except IOError:
+            pass
+
+    # now we can expand paths, even ones in .hg/hgrc
+    rpath = _earlygetopt(["-R", "--repository", "--repo"], args)
+    if rpath:
+        path = ui.expandpath(rpath[-1])
+
+    extensions.loadall(ui)
+    for name, module in extensions.extensions():
+        if name in _loaded:
+            continue
+
+        # setup extensions
+        # TODO this should be generalized to scheme, where extensions can
+        #      redepend on other extensions.  then we should toposort them, and
+        #      do initialization in correct order
+        extsetup = getattr(module, 'extsetup', None)
+        if extsetup:
+            extsetup()
+
+        cmdtable = getattr(module, 'cmdtable', {})
+        overrides = [cmd for cmd in cmdtable if cmd in commands.table]
+        if overrides:
+            ui.warn(_("extension '%s' overrides commands: %s\n")
+                    % (name, " ".join(overrides)))
+        commands.table.update(cmdtable)
+        _loaded[name] = 1
+
+    # check for fallback encoding
+    fallback = ui.config('ui', 'fallbackencoding')
+    if fallback:
+        util._fallbackencoding = fallback
+
+    fullargs = args
+    cmd, func, args, options, cmdoptions = parse(ui, args)
+
+    if options["encoding"]:
+        util._encoding = options["encoding"]
+    if options["encodingmode"]:
+        util._encodingmode = options["encodingmode"]
+    ui.updateopts(options["verbose"], options["debug"], options["quiet"],
+                 not options["noninteractive"], options["traceback"])
+
+    if options['help']:
+        return commands.help_(ui, cmd, options['version'])
+    elif options['version']:
+        return commands.version_(ui)
+    elif not cmd:
+        return commands.help_(ui, 'shortlist')
+
+    repo = None
+    if cmd not in commands.norepo.split():
+        try:
+            repo = hg.repository(ui, path=path)
+            repo.ui = ui
+            ui.setconfig("bundle", "mainreporoot", repo.root)
+            if not repo.local():
+                raise util.Abort(_("repository '%s' is not local") % path)
+        except hg.RepoError:
+            if cmd not in commands.optionalrepo.split():
+                if not path:
+                    raise hg.RepoError(_("There is no Mercurial repository here"
+                                         " (.hg not found)"))
+                raise
+        d = lambda: func(ui, repo, *args, **cmdoptions)
+    else:
+        d = lambda: func(ui, *args, **cmdoptions)
+
+    # run pre-hook, and abort if it fails
+    ret = hook.hook(ui, repo, "pre-%s" % cmd, False, args=" ".join(fullargs))
+    if ret:
+        return ret
+
+    # Run actual command
+    try:
+        ret = d()
+    except TypeError, inst:
+        # was this an argument error?
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        if len(tb) != 2: # no
+            raise
+        raise ParseError(cmd, _("invalid arguments"))
+
+    # run post-hook, passing command result
+    hook.hook(ui, repo, "post-%s" % cmd, False, args=" ".join(fullargs),
+            result = ret)
+    return ret
+
+
+def hgcmd_toq(path, q, *args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue
     object.  Assumes command is completely noninteractive.
@@ -216,14 +339,4 @@ def hgcmd_toq(path, q, *cmdargs, **options):
                 for a in args:
                     q.put(str(a))
     u = Qui()
-    u.readconfig(os.path.join(path, ".hg", "hgrc"))
-    c, func, args, opts, cmdoptions = parse(u, list(cmdargs))
-    cmdoptions.update(options)
-    u.updateopts(opts["verbose"], opts["debug"], opts["quiet"],
-                 not opts["noninteractive"], opts["traceback"])
-
-    kw = detect_keyword()
-    if kw: kw.externalcmdhook(c, *args, **cmdoptions)
-
-    repo = hg.repository(u, path=path)
-    return func(u, repo, *args, **cmdoptions)
+    return thgdispatch(u, path, list(args))
