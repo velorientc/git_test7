@@ -26,6 +26,7 @@ class StatusBar(gtk.HBox):
         if extra:
             self.pack_end(extra, False, False)
         self.pack_end(self.pbox, False, False, padding=1)
+        self.pbox.set_child_visible(False)
         self.show_all()
         
     def _pulse_timer(self, now=False):
@@ -33,6 +34,7 @@ class StatusBar(gtk.HBox):
         return True
 
     def begin(self, msg="Running", timeout=100):
+        self.pbox.set_child_visible(True)
         self.pbox.map()
         self.set_status_text(msg)
         self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
