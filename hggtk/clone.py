@@ -19,13 +19,11 @@ from mercurial.i18n import _
 from mercurial.node import *
 from shlib import set_tortoise_icon
 
-class CloneDialog(gtk.Dialog):
+class CloneDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, cwd='', repos=[]):
         """ Initialize the Dialog """
-        buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-        super(CloneDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                           buttons=buttons)
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         set_tortoise_icon(self, 'menuclone.ico')
         if cwd: os.chdir(cwd)
@@ -49,7 +47,7 @@ class CloneDialog(gtk.Dialog):
 
     def _create(self):
         self.set_default_size(400, 180)
-        self.connect('response', gtk.main_quit)
+        self.connect('destroy', gtk.main_quit)
         ewidth = 16
         
         # add toolbar with tooltips
@@ -66,7 +64,16 @@ class CloneDialog(gtk.Dialog):
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self.tbar.insert(sep, -1)
+        button = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+                self._close_clicked, tip='Close Application')
+        self.tbar.insert(button, -1)
+        vbox = gtk.VBox()
+        self.add(vbox)
+        vbox.pack_start(self.tbar, False, False, 2)
 
         # clone source
         srcbox = gtk.HBox()
@@ -80,7 +87,7 @@ class CloneDialog(gtk.Dialog):
         srcbox.pack_start(lbl, False, False)
         srcbox.pack_start(self._src_input, True, True)
         srcbox.pack_end(self._btn_src_browse, False, False, 5)
-        self.vbox.pack_start(srcbox, False, False, 2)
+        vbox.pack_start(srcbox, False, False, 2)
         
 
         # clone destination
@@ -95,7 +102,7 @@ class CloneDialog(gtk.Dialog):
         destbox.pack_start(lbl, False, False)
         destbox.pack_start(self._dest_input, True, True)
         destbox.pack_end(self._btn_dest_browse, False, False, 5)
-        self.vbox.pack_start(destbox, False, False, 2)
+        vbox.pack_start(destbox, False, False, 2)
 
         # revision input
         revbox = gtk.HBox()
@@ -112,7 +119,7 @@ class CloneDialog(gtk.Dialog):
         revbox.pack_start(self._rev_input, False, False)
         #revbox.pack_start(self._btn_rev_browse, False, False, 5)
         revbox.pack_start(self._opt_allrev, False, False)
-        self.vbox.pack_start(revbox, False, False, 2)
+        vbox.pack_start(revbox, False, False, 2)
 
         # options
         option_box = gtk.VBox()
@@ -122,14 +129,17 @@ class CloneDialog(gtk.Dialog):
         option_box.pack_start(self._opt_update, False, False)
         option_box.pack_start(self._opt_pull, False, False)
         option_box.pack_start(self._opt_uncomp, False, False)
-        self.vbox.pack_start(option_box, False, False, 15)
+        vbox.pack_start(option_box, False, False, 15)
 
         # remote cmd
         lbl = gtk.Label("Remote Cmd:")
         lbl.set_alignment(0, 0.5)
         self._remote_cmd = gtk.Entry()
-        self.vbox.pack_end(self._remote_cmd, False, False, 1)
-        self.vbox.pack_end(lbl, False, False, 1)
+        vbox.pack_end(self._remote_cmd, False, False, 1)
+        vbox.pack_end(lbl, False, False, 1)
+
+    def _close_clicked(self, toolbutton, data=None):
+        gtk.main_quit()
 
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
