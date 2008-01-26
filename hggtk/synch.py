@@ -33,7 +33,7 @@ class SynchDialog(gtk.Window):
         self.root = root
         self.selected_path = None
 
-        self.set_default_size(600, 400)
+        self.set_default_size(610, 400)
 
         self.paths = self._get_paths()
         name = self.repo.ui.config('web', 'name') or os.path.basename(root)
