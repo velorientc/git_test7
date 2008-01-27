@@ -13,47 +13,52 @@ except:
 
 import gtk
 import gobject
+import httplib
 import os
 import pango
 import Queue
-import signal
 import socket
-import subprocess
 import sys
-from tempfile import mkstemp
 import threading
-from dialog import question_dialog, error_dialog, info_dialog
-from mercurial import hg, ui, cmdutil, util
+import time
+import hglib
+from dialog import question_dialog, error_dialog
+from mercurial import hg, ui, commands, cmdutil, util
+from mercurial.hgweb import server
 from mercurial.i18n import _
-from mercurial.node import *
 from shlib import set_tortoise_icon
 
+gservice = None
 class ServeDialog(gtk.Window):
     """ Dialog to run web server"""
-    def __init__(self, cwd='', root='', hgpath='hg'):
+    def __init__(self, cwd='', root=''):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         set_tortoise_icon(self, 'proxy.ico')
         self.connect('delete-event', self._delete)
 
-        self.proc = None
+        # Pipe stderr, stdout to self.write
+        sys.stdout = self
+        sys.stderr = self
+
+        # Override mercurial.commands.serve() with our own version
+        # that supports being stopped
+        commands.table.update(thg_serve_cmd)
+
         self._url = None
         self._root = root
-        self._hgpath = hgpath
         if cwd: os.chdir(cwd)
         
         try:
-            self.repo = hg.repository(ui.ui(), path=root)
-            self.defport = self.repo.ui.config('web', 'port') or '8000'
+            repo = hg.repository(ui.ui(), path=root)
+            self.defport = repo.ui.config('web', 'port') or '8000'
         except hg.RepoError:
-            self.repo = None
             self.defport = '8000'
 
         # set dialog title
-        name = self.repo.ui.config('web', 'name') or os.path.basename(root)
+        name = repo.ui.config('web', 'name') or os.path.basename(root)
         self.set_title("hg serve - " + name)
-        self.queue = Queue.Queue()
         
         self.set_default_size(500, 300)
         
@@ -147,8 +152,9 @@ class ServeDialog(gtk.Window):
         '''
         check if server is running, or to terminate if running
         '''
-        if self.proc and self.proc.poll() == None:
-            if question_dialog("Really Exit?", "Server process is still running\n" +
+        if gservice and not gservice.stopped:
+            if question_dialog("Really Exit?",
+                    "Server process is still running\n" +
                     "Exiting will stop the server.") != gtk.RESPONSE_YES:
                 return False
             else:
@@ -158,7 +164,7 @@ class ServeDialog(gtk.Window):
             return True
 
     def _set_button_states(self):
-        if self.proc and self.proc.poll() == None:
+        if gservice and not gservice.stopped:
             self._button_start.set_sensitive(False)
             self._button_stop.set_sensitive(True)
             self._button_browse.set_sensitive(True)
@@ -193,9 +199,8 @@ class ServeDialog(gtk.Window):
             threading.Thread(target=start_browser).start()
     
     def _on_conf_clicked(self, *args):
-        if self.repo is None: return
         from thgconfig import ConfigDialog
-        dlg = ConfigDialog(self.repo.root, True)
+        dlg = ConfigDialog(self._root, True)
         dlg.show_all()
         dlg.focus_field('web.name')
         dlg.run()
@@ -207,53 +212,27 @@ class ServeDialog(gtk.Window):
             port = int(self._port_input.get_text())
         except:
             try: port = int(self.defport)
-            except: port = '8000'
+            except: port = 8000
             error_dialog("Invalid port 2048..65535", "Defaulting to " +
                     self.defport)
         
-        # start server
-        (fd, filename) = mkstemp()
-        self.cmdline = [self._hgpath, 'serve', '--pid-file', filename]
-        if self._root:
-            self.cmdline.append('--repository')
-            self.cmdline.append(self._root)
-        self.cmdline.append('--port')
-        self.cmdline.append(str(port))
+        global gservice
+        gservice = None
 
-        # run hg in unbuffered mode, so the output can be captured and
-        # display a.s.a.p.
-        os.environ['PYTHONUNBUFFERED'] = "1"
-        #self.write(self.cmdline + '\n')
-        self._url = 'http://%s:%d/' % (socket.getfqdn(), port)
+        q = Queue.Queue()
+        args = [self._root, q, 'serve', '--port', str(port)]
+        thread = threading.Thread(target=hglib.hgcmd_toq, args=args)
+        thread.start()
+
+        while not gservice:
+            time.sleep(0.1)
+        self._url = 'http://%s:%d/' % (gservice.httpd.addr, port)
         self.write('Web server started, now available at %s\n' % self._url)
-
-        # start hg operation on a subprocess and capture the output
-        self.tmp_file = filename
-        self.tmp_fd = fd
-        self.proc = subprocess.Popen(self.cmdline, 
-                               shell=False,
-                               stderr=subprocess.STDOUT,
-                               stdout=subprocess.PIPE,
-                               stdin=subprocess.PIPE,
-                               bufsize=1) # line buffered
-
-        PollThread(self.proc, self.queue).start()
-        gobject.timeout_add(10, self.process_queue)
+        gobject.timeout_add(10, self.process_queue, q)
         
     def _stop_server(self):
-        if self.proc and self.proc.poll() == None:
-            file = os.fdopen(self.tmp_fd, "r")
-            pid = int(file.read())
-            file.close()
-            os.unlink(self.tmp_file)
-            if os.name == 'nt':
-                import win32api
-                handle = win32api.OpenProcess(1, 0, pid)
-                win32api.TerminateProcess(handle, 0)
-            else:
-                os.kill(pid, signal.SIGHUP)
-            self._url = None
-            self.write('Web server stopped.\n')
+        if gservice and not gservice.stopped:
+            gservice.stop()
 
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
@@ -263,42 +242,82 @@ class ServeDialog(gtk.Window):
         else:
             self.textbuffer.set_text(msg)
 
-    def process_queue(self):
+    def process_queue(self, q):
         """
         Handle all the messages currently in the queue (if any).
         """
-        while self.queue.qsize():
+        while q.qsize():
             try:
-                msg = self.queue.get(0)
+                msg = q.get(0)
                 self.write(msg)
             except Queue.Empty:
                 pass
 
-        if threading.activeCount() == 1:
+        if gservice and gservice.stopped:
             self._set_button_states()
             return False # Stop polling this function
         else:
             return True
         
-class PollThread(threading.Thread):
-    def __init__(self, proc, queue):
-        self.proc = proc
-        self.queue = queue
-        threading.Thread.__init__(self)
+def thg_serve(ui, repo, **opts):
+    class service:
+        def init(self):
+            self.stopped = True
+            util.set_signal_handler()
+            try:
+                self.httpd = server.create_server(ui, repo)
+            except socket.error, inst:
+                raise util.Abort(_('cannot start server: ') + inst.args[1])
 
-    def run(self):
-        try:
-            while self.proc.poll() == None:
-                out = self.proc.stdout.readline()
-                if not out: break
-                self.queue.put(out)
-            out = self.proc.stdout.read()
-            self.queue.put(out)
-        except IOError:
-            pass
+            if not ui.verbose: return
 
-def run(cwd='', root='', hgpath='hg', **opts):
-    dialog = ServeDialog(cwd, root, hgpath)
+            if self.httpd.port != 80:
+                ui.status(_('listening at http://%s:%d/\n') %
+                          (self.httpd.addr, self.httpd.port))
+            else:
+                ui.status(_('listening at http://%s/\n') % self.httpd.addr)
+
+        def stop(self):
+            self.stopped = True
+            # issue request to trigger handle_request() and quit
+            addr = '%s:%d' % (self.httpd.addr, self.httpd.port)
+            conn = httplib.HTTPConnection(addr)
+            conn.request("GET", "/")
+            conn.getresponse()
+
+        def run(self):
+            self.stopped = False
+            while not self.stopped:
+                self.httpd.handle_request()
+            self.httpd.server_close() # release port
+
+    global gservice
+    gservice = service()
+    cmdutil.service(opts, initfn=gservice.init, runfn=gservice.run)
+
+thg_serve_cmd =  {"^serve":
+        (thg_serve,
+         [('A', 'accesslog', '', _('name of access log file to write to')),
+          ('d', 'daemon', None, _('run server in background')),
+          ('', 'daemon-pipefds', '', _('used internally by daemon mode')),
+          ('E', 'errorlog', '', _('name of error log file to write to')),
+          ('p', 'port', 0, _('port to use (default: 8000)')),
+          ('a', 'address', '', _('address to use')),
+          ('n', 'name', '',
+           _('name to show in web pages (default: working dir)')),
+          ('', 'webdir-conf', '', _('name of the webdir config file'
+                                    ' (serve more than one repo)')),
+          ('', 'pid-file', '', _('name of file to write process ID to')),
+          ('', 'stdio', None, _('for remote clients')),
+          ('t', 'templates', '', _('web templates to use')),
+          ('', 'style', '', _('template style to use')),
+          ('6', 'ipv6', None, _('use IPv6 in addition to IPv4')),
+          ('', 'certificate', '', _('SSL certificate file'))],
+         _('hg serve [OPTION]...'))}
+
+
+def run(cwd='', root='', **opts):
+    dialog = ServeDialog(cwd, root)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
