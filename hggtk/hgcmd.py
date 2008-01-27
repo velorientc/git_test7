@@ -13,7 +13,7 @@ import pango
 import os
 import threading
 import Queue
-from hglib import HgThread
+from hglib import HgThread, hgcmd_toq
 from shlib import set_tortoise_icon, get_system_times
 
 class CmdDialog(gtk.Dialog):
@@ -138,7 +138,12 @@ class CmdDialog(gtk.Dialog):
             self.last_pbar_update = tm
             self.pbar.pulse()
 
-def run(cmdline=[], **opts):
+def run(cmdline=[], gui=True, **opts):
+    if not gui:
+        q = Queue.Queue()
+        hgcmd_toq(None, q, *cmdline[1:])
+        return
+
     dlg = CmdDialog(cmdline)
     dlg.connect('response', gtk.main_quit)
     dlg.show_all()
@@ -149,6 +154,5 @@ def run(cmdline=[], **opts):
     
 if __name__ == "__main__":
     import sys
-    #run(sys.argv)
     run(sys.argv)
 
