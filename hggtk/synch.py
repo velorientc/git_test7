@@ -332,7 +332,7 @@ class SynchDialog(gtk.Window):
         text_entry = self._pathbox.get_child()
         remote_path = str(text_entry.get_text())
         
-        cmdline = cmd
+        cmdline = cmd[:]
         cmdline.append('--verbose')
         cmdline.append('--repository')
         cmdline.append(self.root)
@@ -346,7 +346,7 @@ class SynchDialog(gtk.Window):
         self.hgthread = HgThread(cmdline)
         self.hgthread.start()
         self.stbar.begin()
-        self.stbar.set_status_text('hg ' + ' '.join(cmdline))
+        self.stbar.set_status_text('hg ' + ' '.join(cmd + [remote_path]))
         
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
