@@ -52,13 +52,14 @@ class ServeDialog(gtk.Window):
         
         try:
             repo = hg.repository(ui.ui(), path=root)
-            self.defport = repo.ui.config('web', 'port') or '8000'
         except hg.RepoError:
-            self.defport = '8000'
+            print 'no repository found'
+            gtk.main_quit()
 
         # set dialog title
-        name = repo.ui.config('web', 'name') or os.path.basename(root)
-        self.set_title("hg serve - " + name)
+        self.defport = repo.ui.config('web', 'port') or '8000'
+        self.webname = repo.ui.config('web', 'name') or os.path.basename(root)
+        self.set_title("hg serve - " + self.webname)
         
         self.set_default_size(500, 300)
         
@@ -225,7 +226,8 @@ class ServeDialog(gtk.Window):
         gservice = None
 
         q = Queue.Queue()
-        args = [self._root, q, 'serve', '--port', str(port)]
+        args = [self._root, q, 'serve', '--name', self.webname,
+                '--port', str(port)]
         thread = threading.Thread(target=hglib.hgcmd_toq, args=args)
         thread.start()
 
