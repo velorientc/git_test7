@@ -416,7 +416,7 @@ class ContextMenuExtension:
             return
         targets = self._filenames or [self._folder]
         root = find_root(targets[0])
-        open_dialog(diff, root=root, files=targets, gui=False)
+        open_dialog(diff, root=root, filelist=targets, gui=False)
 
     def _view(self, parent_window):
         '''[tortoisehg] view = [hgk | hgview]'''
