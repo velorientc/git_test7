@@ -6,10 +6,6 @@
 #
 
 import os
-import subprocess
-import sys
-import time
-
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -17,10 +13,8 @@ import gobject
 import pango
 import StringIO
 
-from mercurial.i18n import _
 from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands, patch
-from shlib import shell_notify
+from mercurial import ui, hg, commands
 from gdialog import *
 from changeset import ChangeSet
 from logfilter import FilterDialog
@@ -472,16 +466,6 @@ class GLog(GDialog):
     def merge_completed(self, oldparents):
         newparents = [x.node() for x in self.repo.workingctx().parents()]
         if not oldparents == newparents:
-            msg = 'Launch commit tool for merge results?'
-            if Confirm('Commit', [], self, msg).run() == gtk.RESPONSE_YES:
-                # Spawn commit tool if merge was successful
-                ct = self.repo.ui.config('tortoisehg', 'commit', 'internal')
-                if ct == 'internal':
-                    from commit import launch as commit_launch
-                    commit_launch(self.repo.root, [], self.repo.root, False)
-                else:
-                    args = [self.hgpath, '--repository', self.repo.root, ct]
-                    subprocess.Popen(args, shell=False)
             self.reload_log()
 
     def selection_changed(self, treeview):
@@ -526,7 +510,7 @@ class GLog(GDialog):
         self._menu.get_children()[0].activate()
         return True
 
-def run(root='', cwd='', files=[], hgpath='hg', **opts):
+def run(root='', cwd='', files=[], **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -539,7 +523,6 @@ def run(root='', cwd='', files=[], hgpath='hg', **opts):
     }
 
     dialog = GLog(u, repo, cwd, files, cmdoptions, True)
-    dialog.hgpath = hgpath
 
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
