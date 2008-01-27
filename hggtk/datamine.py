@@ -23,8 +23,8 @@ class DataMineDialog(GDialog):
     COL_REVID = 0
     COL_TEXT = 1
     COL_TOOLTIP = 2
-    COL_PATH = 3  # for grep models
-    COL_COLOR = 3 # for annotate models
+    COL_PATH = 3
+    COL_COLOR = 4
 
     def get_title(self):
         return 'DataMining - ' + os.path.basename(self.repo.root)
@@ -187,7 +187,7 @@ class DataMineDialog(GDialog):
         results = gtk.ListStore(str, str, str, str)
         treeview.set_model(results)
         for title, width, col in (('Rev', 10, self.COL_REVID),
-                ('File', 30, self.COL_PATH),
+                ('File', 40, self.COL_PATH),
                 ('Matches', 80, self.COL_TEXT)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
@@ -330,9 +330,10 @@ class DataMineDialog(GDialog):
         treeview.connect('popup-menu', self._ann_popup_menu)
         treeview.connect('row-activated', self._ann_row_act)
 
-        results = gtk.ListStore(str, str, str, str)
+        results = gtk.ListStore(str, str, str, str, str)
         treeview.set_model(results)
         for title, width, col in (('Rev', 10, self.COL_REVID),
+                ('File', 15, self.COL_PATH),
                 ('Matches', 80, self.COL_TEXT)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
@@ -391,8 +392,8 @@ class DataMineDialog(GDialog):
         '''
         (frame, model, path) = objs
         q = Queue.Queue()
-        args = [self.repo.root, q, 'annotate', '--rev', str(rev)]
-        args.append(path)
+        args = [self.repo.root, q, 'annotate', '--follow', '--number',
+                '--rev', str(rev), path]
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
 
@@ -420,14 +421,15 @@ class DataMineDialog(GDialog):
         while q.qsize():
             line = q.get(0).rstrip('\r\n')
             try:
-                (revid, text) = line.split(':', 1)
+                (revpath, text) = line.split(':', 1)
+                revid, path = revpath.split(' ', 1)
             except ValueError:
                 continue
             rowrev = long(revid)
             tip = self.get_rev_desc(rowrev)
             ctx = self.repo.changectx(rowrev)
             color = colormap.get_color(ctx, curdate)
-            model.append((revid, text, tip, color))
+            model.append((revid, text, tip, path.strip(), color))
         if thread.isAlive():
             return True
         else:
