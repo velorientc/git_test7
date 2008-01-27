@@ -56,7 +56,7 @@ def open_repo(path):
 
     return None
 
-def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, notify=False):
+def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], gui=True):
     app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
 
     if filelist:
@@ -70,12 +70,10 @@ def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], title=None, n
         gpopts += " --root %s" % shellquote(root)
     if filelist:
         gpopts += " --listfile %s --deletelistfile" % (shellquote(tmpfile))
-    if notify:
-        gpopts += " --notify"
-    if title:
-        gpopts += " --title %s" % shellquote(title)
     if cwd:
         gpopts += " --cwd %s" % shellquote(cwd)
+    if not gui:
+        gpopts += " --nogui"
 
     cmdline = '%s %s -- %s' % (shellquote(app_path), gpopts, cmdopts)
 
@@ -416,15 +414,9 @@ class ContextMenuExtension:
             title = "Visual Diff Not Configured"
             win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
             return
-        hgpath = find_path('hg', get_prog_root())
-        if hgpath:
-            targets = self._filenames or [self._folder]
-            root = find_root(targets[0])
-            quoted_files = [shellquote(s) for s in targets]
-            cmd = "%s --repository %s %s %s" %  \
-                (shellquote(hgpath), shellquote(root),
-                   diff, " ".join(quoted_files))
-            run_program(cmd)
+        targets = self._filenames or [self._folder]
+        root = find_root(targets[0])
+        open_dialog(diff, root=root, files=targets, gui=False)
 
     def _view(self, parent_window):
         '''[tortoisehg] view = [hgk | hgview]'''
@@ -445,12 +437,8 @@ class ContextMenuExtension:
                 cmd += " --file=%s" % shellquote(self._filenames[0])
             run_program(cmd)
         else:
-            hgpath = find_path('hg', get_prog_root())
-            if not hgpath: return
             if view == 'hgk':
-                cmd = "%s --repository %s view" % \
-                        (shellquote(hgpath), shellquote(root))
-                run_program(cmd)
+                open_dialog('view', root=root, gui=False)
             else:
                 msg = "Revision graph viewer %s not recognized" % view
                 title = "Unknown history tool"
@@ -601,7 +589,6 @@ class ContextMenuExtension:
         if noargs == False:
             filelist = targets
         cmdopts = "%s" % (verbose and "--verbose" or "")
-        title = "Hg %s" % hgcmd
         open_dialog(hgcmd, cmdopts, cwd=cwd, root=root, filelist=filelist)
 
     def _help(self, parent_window):
