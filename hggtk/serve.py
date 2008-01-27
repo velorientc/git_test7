@@ -187,9 +187,14 @@ class ServeDialog(gtk.Window):
         if self._url:
             def start_browser():
                 if os.name == 'nt':
-                    import win32api, win32con
-                    win32api.ShellExecute(0, "open", self._url, None, "", 
-                        win32con.SW_SHOW)
+                    try:
+                        import win32api, win32con
+                        win32api.ShellExecute(0, "open", self._url, None, "", 
+                            win32con.SW_SHOW)
+                    except:
+                        # Firefox likes to create exceptions at launch,
+                        # the user doesn't need to be bothered by them
+                        pass
                 else:
                     import gconf
                     client = gconf.client_get_default()
@@ -224,7 +229,7 @@ class ServeDialog(gtk.Window):
         thread = threading.Thread(target=hglib.hgcmd_toq, args=args)
         thread.start()
 
-        while not gservice:
+        while not gservice or not hasattr(gservice, 'httpd'):
             time.sleep(0.1)
         self._url = 'http://%s:%d/' % (gservice.httpd.addr, port)
         self.write('Web server started, now available at %s\n' % self._url)
@@ -233,6 +238,9 @@ class ServeDialog(gtk.Window):
     def _stop_server(self):
         if gservice and not gservice.stopped:
             gservice.stop()
+
+    def flush(self, *args):
+        pass
 
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
@@ -283,7 +291,9 @@ def thg_serve(ui, repo, **opts):
             addr = '%s:%d' % (self.httpd.addr, self.httpd.port)
             conn = httplib.HTTPConnection(addr)
             conn.request("GET", "/")
-            conn.getresponse()
+            res = conn.getresponse()
+            res.read()
+            conn.close()
 
         def run(self):
             self.stopped = False
