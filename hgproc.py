@@ -53,15 +53,15 @@ def get_list_from_file(filename):
 
 def get_option(args):
     import getopt
-    long_opt_list = ('command=', 'exepath=', 'listfile=', 'title=',
-                      'root=', 'cwd=', 'notify', 'deletelistfile')
-    opts, args = getopt.getopt(args, "c:e:l:ndt:R:", long_opt_list)
+    long_opt_list = ('command=', 'exepath=', 'listfile=', 'root=', 'cwd=',
+            'deletelistfile', 'nogui')
+    opts, args = getopt.getopt(args, "c:e:l:dR:", long_opt_list)
     # Set default options
     options = {}
     options['hgcmd'] = 'help'
-    options['hgpath'] = find_path('hg') or 'hg'
     options['cwd'] = os.getcwd()
     options['files'] = []
+    options['gui'] = True
     listfile = None
     delfile = False
     
@@ -72,12 +72,8 @@ def get_option(args):
             listfile = a
         elif o in ("-d", "--deletelistfile"):
             delfile = True
-        elif o in ("-e", "--exepath"):
-            options['hgpath'] = a
-        elif o in ("-n", "--notify"):
-            options['notify'] = True
-        elif o in ("-t", "--title"):
-            options['title'] = a
+        elif o in ("--nogui"):
+            options['gui'] = False
         elif o in ("-R", "--root"):
             options['root'] = a
         elif o in ("--cwd"):
@@ -93,7 +89,7 @@ def get_option(args):
 def parse(args):
     option, args = get_option(args)
     
-    cmdline = [option['hgpath'], option['hgcmd']] 
+    cmdline = ['hg', option['hgcmd']] 
     if 'root' in option:
         cmdline.append('--repository')
         cmdline.append(option['root'])
