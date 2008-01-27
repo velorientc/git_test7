@@ -129,7 +129,7 @@ class CmdDialog(gtk.Dialog):
             return          # progress bar not enabled
             
         if threading.activeCount() == 1:
-            self.pbar.set_fraction(1.0)
+            self.pbar.unmap()
         else:
             # pulse the progress bar every ~100ms
             tm = get_system_times()[4]
