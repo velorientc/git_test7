@@ -96,6 +96,7 @@ class GDialog(gtk.Window):
         self.pats = pats
         self.opts = opts
         self.main = main
+        self.tmproot = None
 
     ### Following methods are meant to be overridden by subclasses ###
 
@@ -403,31 +404,34 @@ class GDialog(gtk.Window):
 
 
     def _view_file(self, stat, file, force_left=False):
+        import atexit
+        
+        def cleanup():
+            shutil.rmtree(self.tmproot)
+
+        if not self.tmproot:
+            self.tmproot = tempfile.mkdtemp(prefix='gtools.')
+            atexit.register(cleanup)
+
         def doedit():
             pathroot = self.repo.root
-            tmproot = None
             copynode = None
-            try:
-                # if we aren't looking at the wc, copy the node...
-                if stat in 'R!' or force_left:
-                    copynode = self._node1
-                elif self._node2:
-                    copynode = self._node2
+            # if we aren't looking at the wc, copy the node...
+            if stat in 'R!' or force_left:
+                copynode = self._node1
+            elif self._node2:
+                copynode = self._node2
 
-                if copynode:
-                    tmproot = tempfile.mkdtemp(prefix='gtools.')
-                    copydir = extdiff.snapshot_node(self.ui, self.repo,
-                            [util.pconvert(file)], copynode, tmproot)
-                    pathroot = os.path.join(tmproot, copydir)
+            if copynode:
+                copydir = extdiff.snapshot_node(self.ui, self.repo,
+                        [util.pconvert(file)], copynode, self.tmproot)
+                pathroot = os.path.join(self.tmproot, copydir)
 
-                file_path = os.path.join(pathroot, file)
-                util.system("%s \"%s\"" % (editor, file_path),
-                            environ={'HGUSER': self.ui.username()},
-                            onerr=util.Abort, errprefix=_('edit failed'))
-            finally:
-                if tmproot:
-                    shutil.rmtree(tmproot)
-
+            file_path = os.path.join(pathroot, file)
+            util.system("%s \"%s\"" % (editor, file_path),
+                        environ={'HGUSER': self.ui.username()},
+                        onerr=util.Abort, errprefix=_('edit failed'))
+                
         editor = (self.ui.config('tortoisehg', 'editor') or
                 self.ui.config('gtools', 'editor') or
                 os.environ.get('HGEDITOR') or
@@ -444,6 +448,7 @@ class GDialog(gtk.Window):
             self.ui = ui.ui()
             self._parse_config()
             return
+            
         thread = threading.Thread(target=doedit, name='edit:'+file)
         thread.setDaemon(True)
         thread.start()
