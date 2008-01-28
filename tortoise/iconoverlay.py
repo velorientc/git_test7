@@ -105,7 +105,7 @@ class IconOverlayExtension(object):
         win32api.RegCloseKey(key)
         return handlercount
         
-    def _get_state(self, path):
+    def _get_state(self, upath):
         """
         Get the state of a given path in source control.
         """
@@ -113,6 +113,12 @@ class IconOverlayExtension(object):
         #print "called: _get_state(%s)" % path
         tc = win32api.GetTickCount()
         
+        try:
+            # handle some Asian charsets
+            path = upath.encode('mbcs')
+        except:
+            path = upath
+
         # check if path is cached
         if path in overlay_cache:
             if tc - overlay_cache[path][1] < CACHE_TIMEOUT:
