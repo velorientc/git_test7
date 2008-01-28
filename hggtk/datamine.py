@@ -410,7 +410,11 @@ class DataMineDialog(GDialog):
         graphview.set_revision_id(rev)
         treeview = graphview.treeview
         path, column = treeview.get_cursor()
-        treeview.row_activated(path, column)
+        # It's possible that the requested change was not found in the
+        # file's filelog history.  In that case, no row will be
+        # selected.
+        if path != None:
+            treeview.row_activated(path, column)
 
     def trigger_annotate(self, rev, objs):
         '''
