@@ -413,6 +413,37 @@ class GDialog(gtk.Window):
             self.tmproot = tempfile.mkdtemp(prefix='gtools.')
             atexit.register(cleanup)
 
+        def snapshot_node(ui, repo, files, node, tmproot):
+            '''
+            snapshot files as of some revision
+            (adapted from Extdiff extension)
+            '''
+            mf = repo.changectx(node).manifest()
+            dirname = os.path.basename(repo.root)
+            if dirname == "":
+                dirname = "root"
+            dirname = '%s.%s' % (dirname, short(node))
+            base = os.path.join(tmproot, dirname)
+            try:
+                os.mkdir(base)
+            except:
+                pass
+            ui.note(_('making snapshot of %d files from rev %s\n') %
+                    (len(files), short(node)))
+            for fn in files:
+                if not fn in mf:
+                    # skipping new file after a merge ?
+                    continue
+                wfn = util.pconvert(fn)
+                ui.note('  %s\n' % wfn)
+                dest = os.path.join(base, wfn)
+                destdir = os.path.dirname(dest)
+                if not os.path.isdir(destdir):
+                    os.makedirs(destdir)
+                data = repo.wwritedata(wfn, repo.file(wfn).read(mf[wfn]))
+                open(dest, 'wb').write(data)
+            return dirname
+
         def doedit():
             pathroot = self.repo.root
             copynode = None
@@ -423,7 +454,7 @@ class GDialog(gtk.Window):
                 copynode = self._node2
 
             if copynode:
-                copydir = extdiff.snapshot_node(self.ui, self.repo,
+                copydir = snapshot_node(self.ui, self.repo,
                         [util.pconvert(file)], copynode, self.tmproot)
                 pathroot = os.path.join(self.tmproot, copydir)
 
