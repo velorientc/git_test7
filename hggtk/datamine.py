@@ -57,8 +57,6 @@ class DataMineDialog(GDialog):
         self.grep_cmenu = self.grep_context_menu()
         self.ann_cmenu = self.annotate_context_menu()
         self.changedesc = {}
-        self.revisions = {}
-        self.filecurrev = {}
         self.newpagecount = 1
         vbox = gtk.VBox()
         notebook = gtk.Notebook()
