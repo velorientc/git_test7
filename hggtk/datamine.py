@@ -305,10 +305,16 @@ class DataMineDialog(GDialog):
         vbox = gtk.VBox()
 
         hbox = gtk.HBox()
+        followlabel = gtk.Label('')
+        follow = gtk.Button('Follow')
+        follow.connect('clicked', self.follow_rename)
+        follow.unmap()
+        hbox.pack_start(followlabel, False, False)
+        hbox.pack_start(follow, False, False)
         lbl = gtk.Label()
-        hbox.pack_start(lbl, True, True)
         close = gtk.Button('Close')
         close.connect('clicked', self.close_page)
+        hbox.pack_start(lbl, True, True)
         hbox.pack_start(close, False, False)
         vbox.pack_start(hbox, False, False)
 
@@ -317,6 +323,8 @@ class DataMineDialog(GDialog):
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
         graphview.refresh(True, None, {'filehist':path, 'filerev':rev})
         graphview.set_property('rev-column-visible', True)
+        graphview.connect('revision-selected', self.log_selection_changed,
+                path, followlabel, follow)
 
         # Annotation text tree view
         treeview = gtk.TreeView()
@@ -369,6 +377,28 @@ class DataMineDialog(GDialog):
 
         objs = (frame, treeview.get_model(), path)
         graphview.treeview.connect('row-activated', self.log_activate, objs)
+
+    def log_selection_changed(self, graphview, path, label, button):
+        row = graphview.get_revision()
+        rev = row[treemodel.REVID]
+        ctx = self.repo.changectx(rev)
+        #for key, data in ctx.extra().iteritems():
+        #    print 'extra:', key, data
+        filectx = ctx.filectx(path)
+        info = filectx.renamed()
+        if info:
+            (rpath, node) = info
+            frev = self.repo.file(rpath).linkrev(node)
+            button.set_label('%s@%s' % (rpath, frev))
+            button.map()
+            label.set_text('Follow Rename:')
+        else:
+            button.unmap()
+            label.set_text('')
+
+    def follow_rename(self, button):
+        path, rev = button.get_label().rsplit('@', 1)
+        self.add_annotate_page(path, rev)
 
     def log_activate(self, treeview, path, column, objs):
         model = treeview.get_model()
