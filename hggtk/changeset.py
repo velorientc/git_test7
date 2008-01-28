@@ -145,8 +145,10 @@ class ChangeSet(GDialog):
 
         if self.parent_toggle.get_active():
             parent = self.repo.changelog.node(parents[1])
-        else:
+        elif parents:
             parent = self.repo.changelog.node(parents[0])
+        else:
+            parent = nullid
         out = StringIO.StringIO()
         patch.diff(self.repo, node1=parent, node2=ctx.node(),
                 files=ctx.files(), fp=out)
