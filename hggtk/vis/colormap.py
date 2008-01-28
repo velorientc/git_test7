@@ -94,8 +94,8 @@ class AnnotateColorSaturation(AnnotateColorMap):
 
     def get_color(self, ctx, now):
         days = self._days(ctx, now)
-        #saturation = 255/((days/50) + 1)
-        saturation = 255/((days/self._scale) + 1)
+        saturation = 255/((days/50) + 1)
+        #saturation = 255/((days/self._scale) + 1)
         hue = self.hue(self.committer_angle(ctx.user()))
         color = tuple([self.saturate_v(saturation, h) for h in hue])
         return "#%x%x%x" % color

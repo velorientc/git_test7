@@ -48,19 +48,10 @@ class ServeDialog(gtk.Window):
 
         self._url = None
         self._root = root
-        if cwd: os.chdir(cwd)
+        if cwd:
+            os.chdir(cwd)
         
-        try:
-            repo = hg.repository(ui.ui(), path=root)
-        except hg.RepoError:
-            print 'no repository found'
-            gtk.main_quit()
-
-        # set dialog title
-        self.defport = repo.ui.config('web', 'port') or '8000'
-        self.webname = repo.ui.config('web', 'name') or os.path.basename(root)
-        self.set_title("hg serve - " + self.webname)
-        
+        self._get_config()
         self.set_default_size(500, 300)
         
         # toolbar
@@ -125,8 +116,18 @@ class ServeDialog(gtk.Window):
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
         vbox.pack_start(scrolledwindow, True, True)
-
         self._set_button_states()
+
+    def _get_config(self):
+        try:
+            repo = hg.repository(ui.ui(), path=self._root)
+        except hg.RepoError:
+            print 'no repository found'
+            gtk.main_quit()
+        self.defport = repo.ui.config('web', 'port') or '8000'
+        self.webname = repo.ui.config('web', 'name') or \
+                os.path.basename(self._root)
+        self.set_title("hg serve - " + self.webname)
 
     def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
         if menu:
@@ -211,6 +212,7 @@ class ServeDialog(gtk.Window):
         dlg.focus_field('web.name')
         dlg.run()
         dlg.hide()
+        self._get_config()
 
     def _start_server(self):
         # gather input data
@@ -226,7 +228,7 @@ class ServeDialog(gtk.Window):
         gservice = None
 
         q = Queue.Queue()
-        args = [self._root, q, 'serve', '--name', self.webname,
+        args = [self._root, q, 'serve', '--verbose', '--name', self.webname,
                 '--port', str(port)]
         thread = threading.Thread(target=hglib.hgcmd_toq, args=args)
         thread.start()
@@ -234,7 +236,6 @@ class ServeDialog(gtk.Window):
         while not gservice or not hasattr(gservice, 'httpd'):
             time.sleep(0.1)
         self._url = 'http://%s:%d/' % (gservice.httpd.addr, port)
-        self.write('Web server started, now available at %s\n' % self._url)
         gobject.timeout_add(10, self.process_queue, q)
         
     def _stop_server(self):
@@ -275,6 +276,8 @@ def thg_serve(ui, repo, **opts):
             self.stopped = True
             util.set_signal_handler()
             try:
+                if 'name' in opts:
+                    ui.setconfig('web', 'name', opts['name'])
                 self.httpd = server.create_server(ui, repo)
             except socket.error, inst:
                 raise util.Abort(_('cannot start server: ') + inst.args[1])

@@ -57,8 +57,6 @@ class DataMineDialog(GDialog):
         self.grep_cmenu = self.grep_context_menu()
         self.ann_cmenu = self.annotate_context_menu()
         self.changedesc = {}
-        self.revisions = {}
-        self.filecurrev = {}
         self.newpagecount = 1
         vbox = gtk.VBox()
         notebook = gtk.Notebook()
@@ -462,20 +460,6 @@ class DataMineDialog(GDialog):
     def _ann_row_act(self, tree, path, column):
         self.ann_cmenu.get_children()[0].activate()
 
-    def make_toolbutton(self, stock, label, handler,
-            userdata=None, menu=None, tip=None):
-        if menu:
-            tbutton = gtk.MenuToolButton(stock)
-            tbutton.set_menu(menu)
-        else:
-            tbutton = gtk.ToolButton(stock)
-
-        if tip:
-            tbutton.set_tooltip(self.tooltips, tip)
-        tbutton.set_use_underline(True)
-        tbutton.set_label(label)
-        tbutton.connect('clicked', handler, userdata)
-        return tbutton
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
