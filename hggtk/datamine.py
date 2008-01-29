@@ -419,21 +419,25 @@ class DataMineDialog(GDialog):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
 
-        showfilename.connect('toggled', self.toggle_filename, treeview)
+        showfilename.connect('toggled', self.toggle_filename_col, treeview)
         treeview.get_column(1).set_visible(False)
         graphview.connect('revision-selected', self.log_selection_changed,
                 path, followlabel, follow)
 
         objs = (frame, treeview.get_model(), path)
         graphview.treeview.connect('row-activated', self.log_activate, objs)
+        graphview.treeview.connect('button-release-event',
+                self._ann_button_release)
+        graphview.treeview.connect('popup-menu', self._ann_popup_menu)
 
-    def toggle_filename(self, button, treeview):
+    def toggle_filename_col(self, button, treeview):
         b = button.get_active()
         treeview.get_column(1).set_visible(b)
 
     def log_selection_changed(self, graphview, path, label, button):
         row = graphview.get_revision()
         rev = row[treemodel.REVID]
+        self.currev = str(rev)
         ctx = self.repo.changectx(rev)
         filectx = ctx.filectx(path)
         info = filectx.renamed()
