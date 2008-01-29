@@ -240,6 +240,7 @@ class DataMineDialog(GDialog):
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
+        regexp.grab_focus()
 
     def trigger_search(self, button, objs):
         (model, frame, regexp, follow, ignorecase, 
