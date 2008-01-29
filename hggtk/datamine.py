@@ -139,9 +139,7 @@ class DataMineDialog(GDialog):
         hbox = gtk.HBox()
         hbox.pack_start(gtk.Label('Revision History Search'))
         search = gtk.Button('Search')
-        close = gtk.Button('Close')
         hbox.pack_start(search, False, False)
-        hbox.pack_start(close, False, False)
         vbox.pack_start(hbox, False, False)
 
         hbox = gtk.HBox()
@@ -206,13 +204,20 @@ class DataMineDialog(GDialog):
         vbox.pack_start(scroller, True, True)
         frame.add(vbox)
         frame.show_all()
+
+        hbox = gtk.HBox()
         lbl = gtk.Label('Search %d' % self.newpagecount)
+        close = gtk.Button('x')
+        close.connect('clicked', self.close_page, frame)
+        hbox.pack_start(lbl, True, True, 2)
+        hbox.pack_start(close, False, False)
+        hbox.show_all()
+        num = self.notebook.append_page(frame, hbox)
+
         self.newpagecount += 1
-        num = self.notebook.append_page(frame, lbl)
         objs = (treeview.get_model(), frame, regexp, follow, ignorecase,
                 excludes, includes, linenum, showall, search)
         search.connect('clicked', self.trigger_search, objs)
-        close.connect('clicked', self.close_page)
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
@@ -247,7 +252,16 @@ class DataMineDialog(GDialog):
         search.set_sensitive(False)
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
-        self.notebook.set_tab_label_text(frame, 'search "%s"' % re.split()[0])
+
+        hbox = gtk.HBox()
+        lbl = gtk.Label('Search "%s"' % re.split()[0])
+        close = gtk.Button('x')
+        close.connect('clicked', self.close_page, frame)
+        hbox.pack_start(lbl, True, True, 2)
+        hbox.pack_start(close, False, False)
+        hbox.show_all()
+        self.notebook.set_tab_label(frame, hbox)
+
         gobject.timeout_add(50, self.grep_wait, thread, q, model, search)
 
     def grep_wait(self, thread, q, model, search):
@@ -281,9 +295,9 @@ class DataMineDialog(GDialog):
             self.curpath = model[iter][self.COL_PATH]
             self.stbar.set_status_text(model[iter][self.COL_TOOLTIP])
 
-    def close_page(self, button):
+    def close_page(self, button, widget):
         '''Close page button has been pressed'''
-        num = self.notebook.get_current_page()
+        num = self.notebook.page_num(widget)
         if num != -1 and self.notebook.get_n_pages() > 1:
             self.notebook.remove_page(num)
 
@@ -304,27 +318,21 @@ class DataMineDialog(GDialog):
         frame.set_border_width(10)
         vbox = gtk.VBox()
 
-        hbox = gtk.HBox()
-        followlabel = gtk.Label('')
-        follow = gtk.Button('Follow')
-        follow.connect('clicked', self.follow_rename)
-        follow.unmap()
-        hbox.pack_start(followlabel, False, False)
-        hbox.pack_start(follow, False, False)
-        lbl = gtk.Label()
-        close = gtk.Button('Close')
-        close.connect('clicked', self.close_page)
-        hbox.pack_start(lbl, True, True)
-        hbox.pack_start(close, False, False)
-        vbox.pack_start(hbox, False, False)
-
         # File log revision graph
         graphview = TreeView(self.repo, 5000, self.stbar)
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
         graphview.refresh(True, None, {'filehist':path, 'filerev':rev})
         graphview.set_property('rev-column-visible', True)
-        graphview.connect('revision-selected', self.log_selection_changed,
-                path, followlabel, follow)
+
+        hbox = gtk.HBox()
+        showfilename = gtk.CheckButton('Show Filename')
+        followlabel = gtk.Label('')
+        follow = gtk.Button('Follow')
+        follow.connect('clicked', self.follow_rename)
+        follow.unmap()
+        hbox.pack_start(showfilename, False, False, 4)
+        hbox.pack_start(followlabel, False, False)
+        hbox.pack_start(follow, False, False)
 
         # Annotation text tree view
         treeview = gtk.TreeView()
@@ -365,18 +373,36 @@ class DataMineDialog(GDialog):
         vpaned.pack1(graphview, True, True)
         vpaned.pack2(scroller, True, True)
         vbox.pack_start(vpaned, True, True)
-
+        vbox.pack_start(hbox, False, False)
         frame.add(vbox)
         frame.show_all()
+
+        hbox = gtk.HBox()
+        lbl = gtk.Label(os.path.basename(path) + '@' + revid)
+        close = gtk.Button('x')
+        close.connect('clicked', self.close_page, frame)
+        hbox.pack_start(lbl, True, True, 2)
+        hbox.pack_start(close, False, False)
+        hbox.show_all()
         num = self.notebook.append_page_menu(frame, 
-                gtk.Label(os.path.basename(path) + '@' + revid),
-                gtk.Label(path + '@' + revid))
+                hbox, gtk.Label(path + '@' + revid))
+
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
 
+        showfilename.connect('toggled', self.toggle_filename, treeview)
+        showfilename.set_active(True)
+        graphview.connect('revision-selected', self.log_selection_changed,
+                path, followlabel, follow)
+
         objs = (frame, treeview.get_model(), path)
         graphview.treeview.connect('row-activated', self.log_activate, objs)
+
+    def toggle_filename(self, button, treeview):
+        b = button.get_active()
+        col = treeview.get_column(1)
+        col.set_visible(b)
 
     def log_selection_changed(self, graphview, path, label, button):
         row = graphview.get_revision()
@@ -430,7 +456,7 @@ class DataMineDialog(GDialog):
         thread.start()
 
         # date of selected revision
-        ctx = self.repo.changectx(long(model.rev))
+        ctx = self.repo.changectx(long(rev))
         curdate = ctx.date()[0]
         # date of initial revision
         fctx = self.repo.filectx(path, fileid=0)
@@ -441,8 +467,16 @@ class DataMineDialog(GDialog):
         model.clear()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
-        path = os.path.basename(path)
-        self.notebook.set_tab_label_text(frame, path+'@'+str(rev))
+
+        hbox = gtk.HBox()
+        lbl = gtk.Label(os.path.basename(path) + '@' + str(rev))
+        close = gtk.Button('x')
+        close.connect('clicked', self.close_page, frame)
+        hbox.pack_start(lbl, True, True, 2)
+        hbox.pack_start(close, False, False)
+        hbox.show_all()
+        self.notebook.set_tab_label(frame, hbox)
+
         gobject.timeout_add(50, self.annotate_wait, thread, q, model,
                 curdate, colormap)
 
