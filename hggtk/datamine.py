@@ -305,6 +305,7 @@ class DataMineDialog(GDialog):
         else:
             search.set_sensitive(True)
             regexp.set_sensitive(True)
+            regexp.grab_focus()
             self.stbar.end()
             return False
 
