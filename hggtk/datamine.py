@@ -152,21 +152,18 @@ class DataMineDialog(GDialog):
         vbox = gtk.VBox()
 
         hbox = gtk.HBox()
-        hbox.pack_start(gtk.Label('Revision History Search'))
-        search = gtk.Button('Search')
-        hbox.pack_start(search, False, False)
-        vbox.pack_start(hbox, False, False)
-
-        hbox = gtk.HBox()
         regexp = gtk.Entry()
         includes = gtk.Entry()
         excludes = gtk.Entry()
+        search = gtk.Button('Search')
         hbox.pack_start(gtk.Label('Regexp:'), False, False, 4)
         hbox.pack_start(regexp, True, True, 4)
         hbox.pack_start(gtk.Label('Includes:'), False, False, 4)
         hbox.pack_start(includes, True, True, 4)
         hbox.pack_start(gtk.Label('Excludes:'), False, False, 4)
         hbox.pack_start(excludes, True, True, 4)
+        hbox.pack_start(search, False, False)
+        self.tooltips.set_tip(search, 'Start this search')
         self.tooltips.set_tip(regexp, 'Regular expression search pattern')
         self.tooltips.set_tip(includes, 'Comma separated list of'
                 ' inclusion patterns.  By default, the entire repository'
@@ -235,10 +232,15 @@ class DataMineDialog(GDialog):
         self.newpagecount += 1
         objs = (treeview.get_model(), frame, regexp, follow, ignorecase,
                 excludes, includes, linenum, showall, search)
+        # Clicking 'search' or hitting Enter in any text entry triggers search
         search.connect('clicked', self.trigger_search, objs)
+        regexp.connect('activate', self.trigger_search, objs)
+        includes.connect('activate', self.trigger_search, objs)
+        excludes.connect('activate', self.trigger_search, objs)
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
+        regexp.grab_focus()
 
     def trigger_search(self, button, objs):
         (model, frame, regexp, follow, ignorecase, 
