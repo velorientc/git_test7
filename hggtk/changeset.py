@@ -261,7 +261,8 @@ class ChangeSet(GDialog):
         _menu = gtk.Menu()
         _menu.append(create_menu('_view at revision', self._view_file_rev))
         _menu.append(create_menu('_file history', self._file_history))
-        _menu.append(create_menu('_annotate file', self._ann_file))
+        self._ann_menu = create_menu('_annotate file', self._ann_file)
+        _menu.append(self._ann_menu)
         _menu.append(create_menu('_revert file contents', self._revert_file))
         self._file_diff_to_mark_menu = create_menu('_diff file to mark',
                 self._diff_file_to_mark)
@@ -391,6 +392,16 @@ class ChangeSet(GDialog):
         self._file_diff_to_mark_menu.set_sensitive(is_mark)
         self._file_diff_from_mark_menu.set_sensitive(is_mark)
         self._filemenu.popup(None, None, None, button, time)
+
+        # If the filelog entry this changeset references does not link
+        # back to this changeset, it means this changeset did not
+        # actually change the contents of this file, and thus the file
+        # cannot be annotated at this revision (since this changeset
+        # does not appear in the filelog)
+        ctx = self.repo.changectx(self.currev)
+        fctx = ctx.filectx(self.curfile)
+        can_annotate = fctx.filelog().linkrev(fctx.filenode()) == ctx.rev()
+        self._ann_menu.set_sensitive(can_annotate)
         return True
 
     def _file_row_act(self, tree, path, column) :
