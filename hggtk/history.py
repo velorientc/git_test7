@@ -59,11 +59,15 @@ class GLog(GDialog):
                     menu=self._filter_menu(),
                     tip='Filter revisions for display'),
                 gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_FIND,
+                self.make_toolbutton(gtk.STOCK_ZOOM_IN,
                     '_View',
                     self._filter_clicked, # TODO What should this button do?
                     menu=self._view_menu(),
                     tip='Select columns to display'),
+                self.make_toolbutton(gtk.STOCK_FIND,
+                    '_DataMine',
+                    self._datamine_clicked,
+                    tip='Search Repository History'),
                 gtk.SeparatorToolItem()
              ] + self.changeview.get_tbbuttons()
 
@@ -87,6 +91,12 @@ class GLog(GDialog):
             self._last_rev = None
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
+
+    def _datamine_clicked(self, toolbutton, data=None):
+        from datamine import DataMineDialog
+        dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {}, False)
+        dialog.display()
+        dialog.add_search_page()
 
     def _filter_clicked(self, toolbutton, data=None):
         if self._filter_dialog:
