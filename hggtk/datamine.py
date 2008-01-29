@@ -187,7 +187,7 @@ class DataMineDialog(GDialog):
                 ('Matches', 80, self.COL_TEXT)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
-            cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+            cell.set_property("ellipsize", pango.ELLIPSIZE_START)
             cell.set_property("family", "Monospace")
             column = gtk.TreeViewColumn(title)
             column.set_resizable(True)
@@ -351,7 +351,7 @@ class DataMineDialog(GDialog):
                 ('Matches', 80, self.COL_TEXT)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
-            cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+            cell.set_property("ellipsize", pango.ELLIPSIZE_START)
             cell.set_property("family", "Monospace")
             column = gtk.TreeViewColumn(title)
             column.set_resizable(True)
