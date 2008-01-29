@@ -183,7 +183,7 @@ class DataMineDialog(GDialog):
         results = gtk.ListStore(str, str, str, str)
         treeview.set_model(results)
         for title, width, col in (('Rev', 10, self.COL_REVID),
-                ('File', 40, self.COL_PATH),
+                ('File', 25, self.COL_PATH),
                 ('Matches', 80, self.COL_TEXT)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
