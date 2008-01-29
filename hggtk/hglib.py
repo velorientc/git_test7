@@ -99,8 +99,7 @@ class GtkUi(ui.ui):
     def getpass(self, prompt=None, default=None):
         # send request to main thread, await response
         self.dialogq.put( (prompt or _('password: '), False, default) )
-        r = self.responseq.get(True)
-        return p
+        return self.responseq.get(True)
 
     def print_exc(self):
         traceback.print_exc()
