@@ -352,7 +352,8 @@ class DataMineDialog(GDialog):
         follow.connect('clicked', self.follow_rename)
         follow.hide()
         follow.set_sensitive(False)
-        hbox.pack_start(showfilename, False, False, 4)
+        hbox.pack_start(showfilename, False, False)
+        hbox.pack_start(gtk.Label(''), True, True)
         hbox.pack_start(followlabel, False, False)
         hbox.pack_start(follow, False, False)
 
