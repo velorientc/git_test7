@@ -515,10 +515,10 @@ class DataMineDialog(GDialog):
             line = q.get(0).rstrip('\r\n')
             try:
                 (revpath, text) = line.split(':', 1)
-                revid, path = revpath.split(' ', 1)
+                revid, path = revpath.lstrip().split(' ', 1)
+                rowrev = long(revid)
             except ValueError:
                 continue
-            rowrev = long(revid)
             tip = self.get_rev_desc(rowrev)
             ctx = self.repo.changectx(rowrev)
             color = colormap.get_color(ctx, curdate)
