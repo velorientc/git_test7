@@ -236,6 +236,7 @@ class DataMineDialog(GDialog):
         objs = (treeview.get_model(), frame, regexp, follow, ignorecase,
                 excludes, includes, linenum, showall, search)
         search.connect('clicked', self.trigger_search, objs)
+        regexp.connect('activate', lambda x: search.emit('clicked'))
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
@@ -268,6 +269,7 @@ class DataMineDialog(GDialog):
 
         model.clear()
         search.set_sensitive(False)
+        regexp.set_sensitive(False)
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
 
@@ -283,9 +285,10 @@ class DataMineDialog(GDialog):
         hbox.show_all()
         self.notebook.set_tab_label(frame, hbox)
 
-        gobject.timeout_add(50, self.grep_wait, thread, q, model, search)
+        gobject.timeout_add(50, self.grep_wait, thread, q, model,
+                search, regexp)
 
-    def grep_wait(self, thread, q, model, search):
+    def grep_wait(self, thread, q, model, search, regexp):
         """
         Handle all the messages currently in the queue (if any).
         """
@@ -301,6 +304,7 @@ class DataMineDialog(GDialog):
             return True
         else:
             search.set_sensitive(True)
+            regexp.set_sensitive(True)
             self.stbar.end()
             return False
 
