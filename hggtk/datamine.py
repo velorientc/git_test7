@@ -416,7 +416,7 @@ class DataMineDialog(GDialog):
         self.notebook.set_current_page(num)
 
         showfilename.connect('toggled', self.toggle_filename, treeview)
-        showfilename.set_active(True)
+        treeview.get_column(1).set_visible(False)
         graphview.connect('revision-selected', self.log_selection_changed,
                 path, followlabel, follow)
 
