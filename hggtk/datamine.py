@@ -350,7 +350,8 @@ class DataMineDialog(GDialog):
         followlabel = gtk.Label('')
         follow = gtk.Button('Follow')
         follow.connect('clicked', self.follow_rename)
-        follow.unmap()
+        follow.hide()
+        follow.set_sensitive(False)
         hbox.pack_start(showfilename, False, False, 4)
         hbox.pack_start(followlabel, False, False)
         hbox.pack_start(follow, False, False)
@@ -425,25 +426,24 @@ class DataMineDialog(GDialog):
 
     def toggle_filename(self, button, treeview):
         b = button.get_active()
-        col = treeview.get_column(1)
-        col.set_visible(b)
+        treeview.get_column(1).set_visible(b)
 
     def log_selection_changed(self, graphview, path, label, button):
         row = graphview.get_revision()
         rev = row[treemodel.REVID]
         ctx = self.repo.changectx(rev)
-        #for key, data in ctx.extra().iteritems():
-        #    print 'extra:', key, data
         filectx = ctx.filectx(path)
         info = filectx.renamed()
         if info:
             (rpath, node) = info
             frev = self.repo.file(rpath).linkrev(node)
             button.set_label('%s@%s' % (rpath, frev))
-            button.map()
+            button.show()
+            button.set_sensitive(True)
             label.set_text('Follow Rename:')
         else:
-            button.unmap()
+            button.hide()
+            button.set_sensitive(False)
             label.set_text('')
 
     def follow_rename(self, button):
