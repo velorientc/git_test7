@@ -337,6 +337,10 @@ class ContextMenuExtension:
                            _("View revision history"),
                            self._history, icon="menulog.ico"))
 
+            result.append(TortoiseMenu(_("Search Repository"),
+                           _("Search revisions of files for a text pattern"),
+                           self._grep, icon="menurepobrowse.ico"))
+                           
             has_view = ui.ui().config('tortoisehg', 'view', '') != ''
             result.append(TortoiseMenu(_("Revision Graph"),
                            _("View history with DAG graph"),
@@ -571,6 +575,9 @@ class ContextMenuExtension:
 
     def _update(self, parent_window):
         self._run_dialog('update', noargs=True)
+
+    def _grep(self, parent_window):
+        self._run_dialog('grep', noargs=True)
 
     def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
         if self._folder:
