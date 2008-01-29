@@ -45,7 +45,7 @@ class DataMineDialog(GDialog):
         return 'DataMining - ' + os.path.basename(self.repo.root)
 
     def get_icon(self):
-        return 'menulog.ico'
+        return 'menurepobrowse.ico'
 
     def parse_opts(self):
         pass
