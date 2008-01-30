@@ -123,10 +123,8 @@ class GStatus(GDialog):
                         self._revert_clicked, tip='revert'),
                     self.make_toolbutton(gtk.STOCK_ADD, '_add',
                         self._add_clicked, tip='add'),
-                    self.make_toolbutton(gtk.STOCK_CANCEL, '_remove',
+                    self.make_toolbutton(gtk.STOCK_DELETE, '_remove',
                         self._remove_clicked, tip='remove'),
-                    self.make_toolbutton(gtk.STOCK_DELETE, '_delete',
-                        self._delete_clicked, tip='delete'),
                     gtk.SeparatorToolItem(),
                     self.make_toolbutton(gtk.STOCK_YES, '_select',
                         self._sel_desel_clicked, True, tip='select'),
@@ -617,28 +615,20 @@ class GStatus(GDialog):
 
     def _remove_clicked(self, toolbutton, data=None):
         remove_list = self._relevant_files('C')
+        delete_list = self._relevant_files('?I')
         if len(remove_list) > 0:
             self._hg_remove(remove_list)
-        else:
-            Prompt('Nothing Removed', 'No removable files selected', self).run()
-        return True
-        
-        
-    def _delete_clicked(self, toolbutton, data=None):
-        delete_list = self._relevant_files('?I')
         if len(delete_list) > 0:
             self._delete_files(delete_list)
-        else:
-            Prompt('Nothing Deleted', 'No deletable files selected', self).run()
+        if not remove_list and not delete_list:
+            Prompt('Nothing Removed', 'No removable files selected', self).run()
         return True
-
 
     def _delete_file(self, stat, file):
         self._delete_files([file])
 
-
     def _delete_files(self, files):
-        dialog = Confirm('Delete', files, self)
+        dialog = Confirm('Delete unrevisioned', files, self)
         if dialog.run() == gtk.RESPONSE_YES :
             errors = ''
             for file in files:
