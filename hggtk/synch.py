@@ -51,7 +51,7 @@ class SynchDialog(gtk.Window):
                                  tip='Display changes that can be pulled'
                                  ' from selected repository'),
                 self._toolbutton(gtk.STOCK_GOTO_BOTTOM,
-                                 'Pull',
+                                 '   Pull   ',
                                  self._pull_clicked,
                                  self._pull_menu(),
                                  tip='Pull changes from selected'
