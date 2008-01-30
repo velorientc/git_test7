@@ -5,17 +5,24 @@
 
 [tortoisehg]
 ;
-; Favorite commit tool.  Options 'qct', 'gcommit', 'internal'
+; Favorite commit tool.  Options 'qct', 'internal'
 commit = qct
 ;
-; Favorite history browser.  Options 'hgk', 'hgview', 'glog', 'internal'
+; Favorite history browser.  Options 'hgk', 'hgview'
 view = hgk
 ;
 ; Visual diff command.  Requires extdiff extension to be configured
 vdiff = vdiff
 ;
-; Working directory status tool.  Options 'gstatus', 'internal'
-status = gstatus
+; Visual editor launched by TortoiseHg to view files
+;editor = notepad++
 ;
-; Flag which declares you have hg-config installed, enables options menu
-hgconfig = 1
+; Color changeset rows in history viewer by author name
+authorcolor = False
+;
+; Specify color for particular person (can be regexp)
+; authorcolor.person = color
+;
+; Number of revisions to parse in a batch.  The graphing algorithms in
+; the history viewer operate on batches of changesets at a time.
+graphlimit = 500
