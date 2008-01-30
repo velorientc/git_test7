@@ -66,7 +66,9 @@ class FilterDialog(gtk.Dialog):
         hbox = gtk.HBox()
         self.revradio = gtk.RadioButton(self.branchradio, 'Rev Range')
         self.rev0Entry = gtk.Entry()
+        self.rev0Entry.connect('activate', self._btn_apply_clicked)
         self.rev1Entry = gtk.Entry()
+        self.rev1Entry.connect('activate', self._btn_apply_clicked)
         hbox.pack_start(self.revradio, False, False, 4)
         hbox.pack_start(self.rev0Entry, True, False, 4)
         hbox.pack_start(self.rev1Entry, True, False, 4)
@@ -90,6 +92,7 @@ class FilterDialog(gtk.Dialog):
 
         hbox = gtk.HBox()
         self.filesentry = gtk.Entry()
+        self.filesentry.connect('activate', self._btn_apply_clicked)
         lbl = gtk.Label('File(s):')
         lbl.set_property("width-chars", 10)
         lbl.set_alignment(0, 0.5)
@@ -103,6 +106,7 @@ class FilterDialog(gtk.Dialog):
         
         hbox = gtk.HBox()
         self.kwentry = gtk.Entry()
+        self.kwentry.connect('activate', self._btn_apply_clicked)
         lbl = gtk.Label('Keyword(s):')
         lbl.set_property("width-chars", 10)
         lbl.set_alignment(0, 0.5)
@@ -114,6 +118,7 @@ class FilterDialog(gtk.Dialog):
 
         hbox = gtk.HBox()
         self.dateentry = gtk.Entry()
+        self.dateentry.connect('activate', self._btn_apply_clicked)
         self.helpbutton = gtk.Button("Help...")
         self.helpbutton.connect('clicked', self._date_help)
         lbl = gtk.Label('Date:')
