@@ -52,7 +52,7 @@ class UpdateDialog(gtk.Window):
         
         self._btn_update = self._toolbutton(
                 gtk.STOCK_REVERT_TO_SAVED,
-                'update', 
+                'Update', 
                 self._btn_update_clicked,
                 tip='Update working directory to selected revision')
         sep = gtk.SeparatorToolItem()
