@@ -104,7 +104,7 @@ class ChangeSet(GDialog):
 
     def _fill_buffer(self, buf, rev, ctx, filelist):
         def title_line(title, text, tag):
-            pad = ' ' * (20 - len(title))
+            pad = ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title + pad + text, tag)
             buf.insert(eob, "\n")
 
@@ -118,22 +118,27 @@ class ChangeSet(GDialog):
         title_line('changeset:', change, 'changeset')
         if ctx.branch() != 'default':
             title_line('branch:', ctx.branch(), 'greybg')
-        title_line('user:', ctx.user(), 'changeset')
-        title_line('date:', date, 'date')
+        title_line('user/date:', ctx.user() + '\t' + date, 'changeset')
         for p in parents:
+            pctx = self.repo.changectx(p)
+            summary = pctx.description().splitlines()[0]
             change = str(p) + ':' + short(self.repo.changelog.node(p))
             title = 'parent:'
-            title += ' ' * (20 - len(title))
+            title += ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title, 'parent')
             buf.insert_with_tags_by_name(eob, change, 'link')
+            buf.insert_with_tags_by_name(eob, ' ' + summary, 'parent')
             buf.insert(eob, "\n")
         for n in self.repo.changelog.children(ctx.node()):
+            cctx = self.repo.changectx(n)
+            summary = cctx.description().splitlines()[0]
             childrev = self.repo.changelog.rev(n)
             change = str(childrev) + ':' + short(n)
             title = 'child:'
-            title += ' ' * (20 - len(title))
+            title += ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title, 'parent')
             buf.insert_with_tags_by_name(eob, change, 'link')
+            buf.insert_with_tags_by_name(eob, ' ' + summary, 'parent')
             buf.insert(eob, "\n")
         for n in self.repo.changelog.children(ctx.node()):
             childrev = self.repo.changelog.rev(n)
