@@ -266,7 +266,8 @@ class TreeView(gtk.ScrolledWindow):
             if not k.startswith('authorcolor.'): continue
             pat = k[12:]
             self.author_pats.append((re.compile(pat, re.I), v))
-        if self.author_pats:
+        if self.author_pats or self.repo.ui.configbool('tortoisehg',
+                'authorcolor'):
             self.color_func = self.text_color_author
         else:
             self.color_func = self.text_color_orig
@@ -394,11 +395,18 @@ class TreeView(gtk.ScrolledWindow):
         else:
             return 'black'
 
+    colors = '''black blue deeppink mediumorchid blue burlywood4 goldenrod
+     slateblue red2 navy dimgrey'''.split()
+    color_cache = {}
+
     def text_color_author(self, parents, rev, author):
         for re, v in self.author_pats:
             if (re.search(author)):
                 return v
-        return 'black'
+        if author not in self.color_cache:
+            color = self.colors[len(self.color_cache.keys()) % len(self.colors)]
+            self.color_cache[author] = color
+        return self.color_cache[author]
 
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
