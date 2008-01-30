@@ -412,6 +412,7 @@ class GLog(GDialog):
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.present()
+        dialog.set_transient_for(None)
         
         # refresh if new tags added
         self.repo.invalidate()
@@ -458,6 +459,7 @@ class GLog(GDialog):
         dialog.show_all()
         dialog.set_notify_func(self.checkout_completed, parents)
         dialog.present()
+        dialog.set_transient_for(None)
 
     def checkout_completed(self, oldparents):
         newparents = [x.node() for x in self.repo.workingctx().parents()]
@@ -473,6 +475,7 @@ class GLog(GDialog):
         dialog.show_all()
         dialog.set_notify_func(self.merge_completed, parents)
         dialog.present()
+        dialog.set_transient_for(None)
 
     def merge_completed(self, oldparents):
         newparents = [x.node() for x in self.repo.workingctx().parents()]
