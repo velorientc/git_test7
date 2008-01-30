@@ -18,12 +18,11 @@ from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
 
-class TagAddDialog(gtk.Dialog):
+class TagAddDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, root='', tag='', rev=''):
         """ Initialize the Dialog """
-        super(TagAddDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         # set dialog title
         title = "hg tag "
@@ -48,23 +47,33 @@ class TagAddDialog(gtk.Dialog):
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
         
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+                self._close_clicked, tip='Close Application')
+
         self._btn_addtag = self._toolbutton(
                 gtk.STOCK_ADD,
-                'add', 
+                'Add', 
                 self._btn_addtag_clicked,
                 tip='Add tag to selected version')
         self._btn_rmtag = self._toolbutton(
                 gtk.STOCK_DELETE,
-                'remove', 
+                'Remove', 
                 self._btn_rmtag_clicked,
                 tip='Remove tag from repository')
         tbuttons = [
                 self._btn_addtag,
                 self._btn_rmtag,
+                sep,
+                self._btn_close,
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
+        vbox = gtk.VBox()
+        self.add(vbox)
+        vbox.pack_start(self.tbar, False, False, 2)
 
         # tag name input
         tagbox = gtk.HBox()
@@ -77,7 +86,7 @@ class TagAddDialog(gtk.Dialog):
         self._tag_input.set_text(tag)
         tagbox.pack_start(lbl, False, False)
         tagbox.pack_start(self._taglistbox, True, True)
-        self.vbox.pack_start(tagbox, True, True, 2)
+        vbox.pack_start(tagbox, True, True, 2)
 
         # revision input
         revbox = gtk.HBox()
@@ -88,7 +97,7 @@ class TagAddDialog(gtk.Dialog):
         self._rev_input.set_text(rev)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._rev_input, False, False)
-        self.vbox.pack_start(revbox, False, False, 2)
+        vbox.pack_start(revbox, False, False, 2)
 
         # tag options
         option_box = gtk.VBox()
@@ -98,18 +107,18 @@ class TagAddDialog(gtk.Dialog):
         option_box.pack_start(self._local_tag, False, False)
         option_box.pack_start(self._replace_tag, False, False)
         option_box.pack_start(self._use_msg, False, False)
-        self.vbox.pack_start(option_box, False, False, 15)
+        vbox.pack_start(option_box, False, False, 15)
 
         # commit message
         lbl = gtk.Label("Commit message:")
         lbl.set_alignment(0, 0.5)
         self._commit_message = gtk.Entry()
-        self.vbox.pack_end(self._commit_message, False, False, 1)
-        self.vbox.pack_end(lbl, False, False, 1)
+        vbox.pack_end(self._commit_message, False, False, 1)
+        vbox.pack_end(lbl, False, False, 1)
 
         # show them all
         self._refresh()
-        self.vbox.show_all()
+        vbox.show_all()
 
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
@@ -139,6 +148,9 @@ class TagAddDialog(gtk.Dialog):
                 continue
             self._tagslist.append([tagname])
             
+    def _close_clicked(self, toolbutton, data=None):
+        self.destroy()
+
     def _btn_tag_clicked(self, button):
         """ select tag from tags dialog """
         import tags
@@ -244,7 +256,7 @@ def run(root='', tag='', rev='', **opts):
 
     # the dialog maybe called by another window/dialog, so we only
     # enable the close dialog handler if dialog is run as mainapp
-    dialog.connect('response', gtk.main_quit)
+    dialog.connect('destroy', gtk.main_quit)
     
     dialog.show_all()
     gtk.gdk.threads_init()

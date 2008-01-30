@@ -409,8 +409,9 @@ class GLog(GDialog):
         oldtags = self.repo.tagslist()
         
         dialog = TagAddDialog(self.repo.root, rev=str(rev))
-        dialog.run()
-        dialog.hide()
+        dialog.set_transient_for(self)
+        dialog.show_all()
+        dialog.present()
         
         # refresh if new tags added
         self.repo.invalidate()
