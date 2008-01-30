@@ -46,35 +46,35 @@ class SynchDialog(gtk.Window):
         self.tips = gtk.Tooltips()
         tbuttons = [
                 self._toolbutton(gtk.STOCK_GO_DOWN,
-                                 'incoming', 
+                                 'Incoming', 
                                  self._incoming_clicked,
                                  tip='Display changes that can be pulled'
                                  ' from selected repository'),
                 self._toolbutton(gtk.STOCK_GOTO_BOTTOM,
-                                 'pull',
+                                 'Pull',
                                  self._pull_clicked,
                                  self._pull_menu(),
                                  tip='Pull changes from selected'
                                  ' repository'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_GO_UP,
-                                 'outgoing',
+                                 'Outgoing',
                                  self._outgoing_clicked,
                                  tip='Display local changes that will be pushed'
                                  ' to selected repository'),
                 self._toolbutton(gtk.STOCK_GOTO_TOP,
-                                 'push',
+                                 'Push',
                                  self._push_clicked,
                                  tip='Push local changes to selected'
                                  ' repository'),
                 self._toolbutton(gtk.STOCK_GOTO_LAST,
-                                 'email',
+                                 'Email',
                                  self._email_clicked,
                                  tip='Email local outgoing changes to'
                                  ' one or more recipients'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_PREFERENCES,
-                                 'configure',
+                                 'Configure',
                                  self._conf_clicked,
                                  tip='Configure peer repository paths'),
                 gtk.SeparatorToolItem(),
