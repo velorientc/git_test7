@@ -48,7 +48,6 @@ class SynchDialog(gtk.Window):
                 self._toolbutton(gtk.STOCK_GO_DOWN,
                                  'incoming', 
                                  self._incoming_clicked,
-                                 self._incoming_menu(),
                                  tip='Display changes that can be pulled'
                                  ' from selected repository'),
                 self._toolbutton(gtk.STOCK_GOTO_BOTTOM,
@@ -61,13 +60,11 @@ class SynchDialog(gtk.Window):
                 self._toolbutton(gtk.STOCK_GO_UP,
                                  'outgoing',
                                  self._outgoing_clicked,
-                                 self._outgoing_menu(),
                                  tip='Display local changes that will be pushed'
                                  ' to selected repository'),
                 self._toolbutton(gtk.STOCK_GOTO_TOP,
                                  'push',
                                  self._push_clicked,
-                                 self._push_menu(),
                                  tip='Push local changes to selected'
                                  ' repository'),
                 self._toolbutton(gtk.STOCK_GOTO_LAST,
@@ -128,6 +125,24 @@ class SynchDialog(gtk.Window):
         revbox.pack_start(self._pathbox, True, True)
         vbox.pack_start(revbox, False, False, 2)
 
+        expander = gtk.Expander('Advanced Options')
+        expander.set_expanded(False)
+        hbox = gtk.HBox()
+        self._reventry = gtk.Entry()
+        self._force = gtk.CheckButton('Force')
+        self._showpatch = gtk.CheckButton('Show Patches')
+        self._newestfirst = gtk.CheckButton('Show Newest First')
+        self._nomerge = gtk.CheckButton('Show No Merges')
+
+        hbox.pack_start(gtk.Label('Rev:'))
+        hbox.pack_start(self._reventry)
+        hbox.pack_start(self._force)
+        hbox.pack_start(self._showpatch)
+        hbox.pack_start(self._newestfirst)
+        hbox.pack_start(self._nomerge)
+        expander.add(hbox)
+        vbox.pack_start(expander, False, False, 2)
+
         # hg output window
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -148,54 +163,6 @@ class SynchDialog(gtk.Window):
            
         self._pull_update = gtk.CheckMenuItem("Update to new tip")
         menu.append(self._pull_update)
-
-        self._pull_force = gtk.CheckMenuItem("Force pull")
-        menu.append(self._pull_force)
-        
-        menu.show_all()
-        return menu
-        
-    def _push_menu(self):
-        menu = gtk.Menu()
-        
-        self._push_force = gtk.CheckMenuItem("Force push")
-        menu.append(self._push_force)
-        
-        menu.show_all()
-        return menu
-        
-    def _incoming_menu(self):
-        menu = gtk.Menu()
-
-        self._incoming_show_patch = gtk.CheckMenuItem("Show patch")
-        menu.append(self._incoming_show_patch)
-        
-        self._incoming_no_merges = gtk.CheckMenuItem("Do not show merges")
-        menu.append(self._incoming_no_merges)
-
-        self._incoming_newest = gtk.CheckMenuItem("Show newest record first")
-        menu.append(self._incoming_newest)
-
-        self._incoming_force = gtk.CheckMenuItem("Force incoming")
-        menu.append(self._incoming_force)
-        
-        menu.show_all()
-        return menu
-        
-    def _outgoing_menu(self):
-        menu = gtk.Menu()
-
-        self._outgoing_show_patch = gtk.CheckMenuItem("Show patch")
-        menu.append(self._outgoing_show_patch)
-        
-        self._outgoing_no_merges = gtk.CheckMenuItem("Do not show merges")
-        menu.append(self._outgoing_no_merges)
-
-        self._outgoing_newest = gtk.CheckMenuItem("Show newest record first")
-        menu.append(self._outgoing_newest)
-        
-        self._outgoing_force = gtk.CheckMenuItem("Force incoming")
-        menu.append(self._outgoing_force)
         
         menu.show_all()
         return menu
@@ -261,13 +228,13 @@ class SynchDialog(gtk.Window):
         cmd = ['pull']
         if self._pull_update.get_active():
             cmd.append('--update')
-        if self._pull_force.get_active():
+        if self._force.get_active():
             cmd.append('--force')
         self._exec_cmd(cmd)
     
     def _push_clicked(self, toolbutton, data=None):
         cmd = ['push']
-        if self._push_force.get_active():
+        if self._force.get_active():
             cmd.append('--force')
         self._exec_cmd(cmd)
         
@@ -306,25 +273,25 @@ class SynchDialog(gtk.Window):
 
     def _incoming_clicked(self, toolbutton, data=None):
         cmd = ['incoming']
-        if self._incoming_show_patch.get_active():
+        if self._showpatch.get_active():
             cmd.append('--patch')
-        if self._incoming_no_merges.get_active():
+        if self._nomerge.get_active():
             cmd.append('--no-merges')
-        if self._incoming_force.get_active():
+        if self._force.get_active():
             cmd.append('--force')
-        if self._incoming_newest.get_active():
+        if self._newestfirst.get_active():
             cmd.append('--newest-first')
         self._exec_cmd(cmd)
         
     def _outgoing_clicked(self, toolbutton, data=None):
         cmd = ['outgoing']
-        if self._outgoing_show_patch.get_active():
+        if self._showpatch.get_active():
             cmd.append('--patch')
-        if self._outgoing_no_merges.get_active():
+        if self._nomerge.get_active():
             cmd.append('--no-merges')
-        if self._outgoing_force.get_active():
+        if self._force.get_active():
             cmd.append('--force')
-        if self._outgoing_newest.get_active():
+        if self._newestfirst.get_active():
             cmd.append('--newest-first')
         self._exec_cmd(cmd)
         
