@@ -49,7 +49,7 @@ if 'py2exe' in sys.argv:
     extra['windows'] = [{"script":"hggtk/tracelog.py",
                         "icon_resources": [(1, "icons/tortoise/python.ico")]}]
     extra['com_server'] = ["tortoisehg"]
-    extra['console'] = ["hg", "hgproc.py", "hgutils/simplemerge"]
+    extra['console'] = ["contrib/hg", "hgproc.py", "hgutils/simplemerge"]
 
 elif 'bdist_msi' in sys.argv or 'bdist_wininst' in sys.argv:
     # C:\Python25\share\tortoisehg\icons\...
