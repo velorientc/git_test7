@@ -124,8 +124,16 @@ class SynchDialog(gtk.Window):
         elif defpushrow is not None:
             self._pathbox.set_active(defpushrow)
 
+        # create checkbox to disable proxy
+        self._use_proxy = gtk.CheckButton("use proxy server")        
+        if ui.ui().config('http_proxy', 'host', ''):   
+            self._use_proxy.set_active(True)
+        else:
+            self._use_proxy.set_sensitive(False)
+
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._pathbox, True, True)
+        revbox.pack_end(self._use_proxy, False, False)
         vbox.pack_start(revbox, False, False, 2)
 
         # hg output window
@@ -329,14 +337,16 @@ class SynchDialog(gtk.Window):
         self._exec_cmd(cmd)
         
     def _exec_cmd(self, cmd):
+        proxy_host = ui.ui().config('http_proxy', 'host', '')
+        use_proxy = self._use_proxy.get_active()
         text_entry = self._pathbox.get_child()
         remote_path = str(text_entry.get_text())
         
         cmdline = cmd[:]
-        cmdline.append('--verbose')
-        cmdline.append('--repository')
-        cmdline.append(self.root)
-        cmdline.append(remote_path)
+        cmdline += ['--verbose', '--repository', self.root]
+        if proxy_host and not use_proxy:
+            cmdline += ["--config", "http_proxy.host="]
+        cmdline += [remote_path]
         
         # show command to be executed
         self.write("", False)
