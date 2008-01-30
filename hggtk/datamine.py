@@ -348,6 +348,7 @@ class DataMineDialog(GDialog):
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
         graphview.refresh(True, None, {'filehist':path, 'filerev':rev})
         graphview.set_property('rev-column-visible', True)
+        graphview.set_property('date-column-visible', True)
 
         hbox = gtk.HBox()
         showfilename = gtk.CheckButton('Show Filename')
