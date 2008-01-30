@@ -113,28 +113,28 @@ class GStatus(GDialog):
 
 
     def get_tbbuttons(self):
-        tbuttons = [self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
+        tbuttons = [self.make_toolbutton(gtk.STOCK_REFRESH, 'Re_fresh',
             self._refresh_clicked, tip='refresh'),
                      gtk.SeparatorToolItem()]
 
         if self.count_revs() < 2:
             tbuttons += [
-                    self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 're_vert',
+                    self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 'Re_vert',
                         self._revert_clicked, tip='revert'),
-                    self.make_toolbutton(gtk.STOCK_ADD, '_add',
+                    self.make_toolbutton(gtk.STOCK_ADD, '_Add',
                         self._add_clicked, tip='add'),
-                    self.make_toolbutton(gtk.STOCK_DELETE, '_remove',
+                    self.make_toolbutton(gtk.STOCK_DELETE, '_Remove',
                         self._remove_clicked, tip='remove'),
                     gtk.SeparatorToolItem(),
-                    self.make_toolbutton(gtk.STOCK_YES, '_select',
+                    self.make_toolbutton(gtk.STOCK_YES, '_Select',
                         self._sel_desel_clicked, True, tip='select'),
-                    self.make_toolbutton(gtk.STOCK_NO, '_deselect',
+                    self.make_toolbutton(gtk.STOCK_NO, '_Deselect',
                         self._sel_desel_clicked, False, tip='deselect'),
                     gtk.SeparatorToolItem()]
 
         self.showdiff_toggle = gtk.ToggleToolButton(gtk.STOCK_JUSTIFY_FILL)
         self.showdiff_toggle.set_use_underline(True)
-        self.showdiff_toggle.set_label('_show diff')
+        self.showdiff_toggle.set_label('_Show Diff')
         self.showdiff_toggle.set_tooltip(self.tooltips, 'show diff pane')
         self.showdiff_toggle.set_active(False)
         self._showdiff_toggled_id = self.showdiff_toggle.connect('toggled', self._showdiff_toggled )
