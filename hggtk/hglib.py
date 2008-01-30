@@ -19,13 +19,16 @@ try:
     try:
         # Mercurail 0.9.4
         from mercurial.cmdutil import parse
+        from mercurial.cmdutil import parseconfig as _parseconfig
     except:
         try:
             # Mercurail <= 0.9.3
             from mercurial.commands import parse
+            from mercurial.commands import parseconfig as _parseconfig
         except:
             # Mercurail 0.9.5
             from mercurial.dispatch import _parse as parse
+            from mercurial.dispatch import _parseconfig
 finally:
     demandimport.enable()
 
