@@ -151,18 +151,18 @@ class DataMineDialog(GDialog):
         frame.set_border_width(10)
         vbox = gtk.VBox()
 
-        hbox = gtk.HBox()
+        search_hbox = gtk.HBox()
         regexp = gtk.Entry()
         includes = gtk.Entry()
         excludes = gtk.Entry()
         search = gtk.Button('Search')
-        hbox.pack_start(gtk.Label('Regexp:'), False, False, 4)
-        hbox.pack_start(regexp, True, True, 4)
-        hbox.pack_start(gtk.Label('Includes:'), False, False, 4)
-        hbox.pack_start(includes, True, True, 4)
-        hbox.pack_start(gtk.Label('Excludes:'), False, False, 4)
-        hbox.pack_start(excludes, True, True, 4)
-        hbox.pack_start(search, False, False)
+        search_hbox.pack_start(gtk.Label('Regexp:'), False, False, 4)
+        search_hbox.pack_start(regexp, True, True, 4)
+        search_hbox.pack_start(gtk.Label('Includes:'), False, False, 4)
+        search_hbox.pack_start(includes, True, True, 4)
+        search_hbox.pack_start(gtk.Label('Excludes:'), False, False, 4)
+        search_hbox.pack_start(excludes, True, True, 4)
+        search_hbox.pack_start(search, False, False)
         self.tooltips.set_tip(search, 'Start this search')
         self.tooltips.set_tip(regexp, 'Regular expression search pattern')
         self.tooltips.set_tip(includes, 'Comma separated list of'
@@ -171,7 +171,7 @@ class DataMineDialog(GDialog):
         self.tooltips.set_tip(excludes, 'Comma separated list of'
                 ' exclusion patterns.  Exclusion patterns are applied'
                 ' after inclusion patterns.')
-        vbox.pack_start(hbox, False, False, 4)
+        vbox.pack_start(search_hbox, False, False, 4)
 
         hbox = gtk.HBox()
         follow = gtk.CheckButton('Follow copies and renames')
@@ -231,7 +231,7 @@ class DataMineDialog(GDialog):
 
         self.newpagecount += 1
         objs = (treeview.get_model(), frame, regexp, follow, ignorecase,
-                excludes, includes, linenum, showall, search)
+                excludes, includes, linenum, showall, search_hbox)
         # Clicking 'search' or hitting Enter in any text entry triggers search
         search.connect('clicked', self.trigger_search, objs)
         regexp.connect('activate', self.trigger_search, objs)
@@ -244,7 +244,7 @@ class DataMineDialog(GDialog):
 
     def trigger_search(self, button, objs):
         (model, frame, regexp, follow, ignorecase, 
-                excludes, includes, linenum, showall, search) = objs
+                excludes, includes, linenum, showall, search_hbox) = objs
         re = regexp.get_text()
         if not re:
             Prompt('No regular expression given',
@@ -269,8 +269,7 @@ class DataMineDialog(GDialog):
         thread.start()
 
         model.clear()
-        search.set_sensitive(False)
-        regexp.set_sensitive(False)
+        search_hbox.set_sensitive(False)
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
 
@@ -287,9 +286,9 @@ class DataMineDialog(GDialog):
         self.notebook.set_tab_label(frame, hbox)
 
         gobject.timeout_add(50, self.grep_wait, thread, q, model,
-                search, regexp)
+                search_hbox, regexp)
 
-    def grep_wait(self, thread, q, model, search, regexp):
+    def grep_wait(self, thread, q, model, search_hbox, regexp):
         """
         Handle all the messages currently in the queue (if any).
         """
@@ -304,8 +303,7 @@ class DataMineDialog(GDialog):
         if thread.isAlive():
             return True
         else:
-            search.set_sensitive(True)
-            regexp.set_sensitive(True)
+            search_hbox.set_sensitive(True)
             regexp.grab_focus()
             self.stbar.end()
             return False

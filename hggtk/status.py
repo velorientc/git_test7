@@ -113,30 +113,28 @@ class GStatus(GDialog):
 
 
     def get_tbbuttons(self):
-        tbuttons = [self.make_toolbutton(gtk.STOCK_REFRESH, 're_fresh',
+        tbuttons = [self.make_toolbutton(gtk.STOCK_REFRESH, 'Re_fresh',
             self._refresh_clicked, tip='refresh'),
                      gtk.SeparatorToolItem()]
 
         if self.count_revs() < 2:
             tbuttons += [
-                    self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 're_vert',
+                    self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 'Re_vert',
                         self._revert_clicked, tip='revert'),
-                    self.make_toolbutton(gtk.STOCK_ADD, '_add',
+                    self.make_toolbutton(gtk.STOCK_ADD, '_Add',
                         self._add_clicked, tip='add'),
-                    self.make_toolbutton(gtk.STOCK_CANCEL, '_remove',
+                    self.make_toolbutton(gtk.STOCK_DELETE, '_Remove',
                         self._remove_clicked, tip='remove'),
-                    self.make_toolbutton(gtk.STOCK_DELETE, '_delete',
-                        self._delete_clicked, tip='delete'),
                     gtk.SeparatorToolItem(),
-                    self.make_toolbutton(gtk.STOCK_YES, '_select',
+                    self.make_toolbutton(gtk.STOCK_YES, '_Select',
                         self._sel_desel_clicked, True, tip='select'),
-                    self.make_toolbutton(gtk.STOCK_NO, '_deselect',
+                    self.make_toolbutton(gtk.STOCK_NO, '_Deselect',
                         self._sel_desel_clicked, False, tip='deselect'),
                     gtk.SeparatorToolItem()]
 
         self.showdiff_toggle = gtk.ToggleToolButton(gtk.STOCK_JUSTIFY_FILL)
         self.showdiff_toggle.set_use_underline(True)
-        self.showdiff_toggle.set_label('_show diff')
+        self.showdiff_toggle.set_label('_Show Diff')
         self.showdiff_toggle.set_tooltip(self.tooltips, 'show diff pane')
         self.showdiff_toggle.set_active(False)
         self._showdiff_toggled_id = self.showdiff_toggle.connect('toggled', self._showdiff_toggled )
@@ -617,28 +615,20 @@ class GStatus(GDialog):
 
     def _remove_clicked(self, toolbutton, data=None):
         remove_list = self._relevant_files('C')
+        delete_list = self._relevant_files('?I')
         if len(remove_list) > 0:
             self._hg_remove(remove_list)
-        else:
-            Prompt('Nothing Removed', 'No removable files selected', self).run()
-        return True
-        
-        
-    def _delete_clicked(self, toolbutton, data=None):
-        delete_list = self._relevant_files('?I')
         if len(delete_list) > 0:
             self._delete_files(delete_list)
-        else:
-            Prompt('Nothing Deleted', 'No deletable files selected', self).run()
+        if not remove_list and not delete_list:
+            Prompt('Nothing Removed', 'No removable files selected', self).run()
         return True
-
 
     def _delete_file(self, stat, file):
         self._delete_files([file])
 
-
     def _delete_files(self, files):
-        dialog = Confirm('Delete', files, self)
+        dialog = Confirm('Delete unrevisioned', files, self)
         if dialog.run() == gtk.RESPONSE_YES :
             errors = ''
             for file in files:

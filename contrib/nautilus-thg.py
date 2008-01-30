@@ -99,7 +99,7 @@ class HgExtension(nautilus.MenuProvider,
         self.clear_cached_repo()
 
     def _datamine_cb(self, window, vfs_files):
-        self._run_dialog('datamine', vfs_files)
+        self._run_dialog('grep', vfs_files)
 
     def _diff_cb(self, window, vfs_files):
         path = self.get_path_for_vfs_file(vfs_files[0])

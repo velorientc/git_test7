@@ -87,7 +87,7 @@ class GCommit(GStatus):
 
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
-        tbbuttons.insert(2, self.make_toolbutton(gtk.STOCK_OK, '_commit',
+        tbbuttons.insert(2, self.make_toolbutton(gtk.STOCK_OK, '_Commit',
             self._commit_clicked, tip='commit'))
         return tbbuttons
 
