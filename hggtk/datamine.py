@@ -154,6 +154,8 @@ class DataMineDialog(GDialog):
         search_hbox = gtk.HBox()
         regexp = gtk.Entry()
         includes = gtk.Entry()
+        if self.cwd.startswith(self.repo.root):
+            includes.set_text(util.canonpath(self.repo.root, self.cwd, '.'))
         excludes = gtk.Entry()
         search = gtk.Button('Search')
         search_hbox.pack_start(gtk.Label('Regexp:'), False, False, 4)
