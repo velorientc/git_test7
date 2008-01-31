@@ -312,7 +312,7 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Undo Changes"),
                            _("Revert selected files"),
                            self._revert, icon="menurevert.ico"))
-            result.append(TortoiseMenu(_("Annotate File"),
+            result.append(TortoiseMenu(_("Annotate Files"),
                            _("show changeset information per file line"),
                            self._annotate, icon="menublame.ico"))
 
