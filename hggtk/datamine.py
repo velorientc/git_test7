@@ -334,7 +334,7 @@ class DataMineDialog(GDialog):
         '''
         if revid == '.':
             parentctx = self.repo.workingctx().parents()
-            rev = parentctx[0].rev()
+            rev = parentctx[0].filectx(path).rev()
             revid = str(rev)
         else:
             rev = long(revid)
@@ -586,12 +586,10 @@ def run(root='', cwd='', files=[], **opts):
 
     dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
     dialog.display()
-    if len(files) > 1:
-        for f in files:
-            dialog.add_annotate_page(f, '.')
-    elif files and not os.path.isdir(files[0]):
-        dialog.add_annotate_page(files[0], '.')
-    else:
+    cfiles = [util.canonpath(root, cwd, f) for f in files if os.path.isfile(f)]
+    for f in cfiles:
+        dialog.add_annotate_page(f, '.')
+    if not cfiles:
         dialog.add_search_page()
 
     gtk.gdk.threads_init()
