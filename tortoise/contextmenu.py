@@ -577,7 +577,7 @@ class ContextMenuExtension:
         self._run_dialog('update', noargs=True)
 
     def _grep(self, parent_window):
-        self._run_dialog('grep', noargs=True)
+        self._run_dialog('grep')
 
     def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
         if self._folder:
