@@ -137,21 +137,30 @@ class SynchDialog(gtk.Window):
         expander.set_expanded(False)
         hbox = gtk.HBox()
         expander.add(hbox)
-        self._reventry = gtk.Entry()
-        self._force = gtk.CheckButton('Force pull or push')
-        frame = gtk.Frame('Incoming/Outgoing')
-        self._showpatch = gtk.CheckButton('Show Patches')
-        self._newestfirst = gtk.CheckButton('Show Newest First')
-        self._nomerge = gtk.CheckButton('Show No Merges')
 
         revvbox = gtk.VBox()
         revhbox = gtk.HBox()
+        self._reventry = gtk.Entry()
+        self._force = gtk.CheckButton('Force pull or push')
+        self.tips.set_tip(self._force, 'Run even when remote repository'
+                ' is unrelated.')
+
         revhbox.pack_start(gtk.Label('Target Revision:'), False, False, 2)
         revhbox.pack_start(self._reventry, True, True, 2)
-        revvbox.pack_start(revhbox, True, True, 8)
+        eventbox = gtk.EventBox()
+        eventbox.add(revhbox)
+        self.tips.set_tip(eventbox, 'A specific revision up to which you'
+                ' would like to push or pull.')
+        revvbox.pack_start(eventbox, True, True, 8)
         revvbox.pack_start(self._force, False, False, 2)
         hbox.pack_start(revvbox, True, True, 4)
+
+        frame = gtk.Frame('Incoming/Outgoing')
         hbox.pack_start(frame, False, False, 2)
+
+        self._showpatch = gtk.CheckButton('Show Patches')
+        self._newestfirst = gtk.CheckButton('Show Newest First')
+        self._nomerge = gtk.CheckButton('Show No Merges')
 
         hbox = gtk.HBox()
         hbox.pack_start(self._showpatch, False, False, 2)
