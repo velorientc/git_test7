@@ -196,7 +196,7 @@ class GLog(GDialog):
         self._last_rev = None
         self._filter = "all"
         self.currow = None
-        if self.pats == [self.repo.root]:
+        if self.pats == [self.repo.root] or self.pats == ['']:
             self.pats = []
         if hasattr(self, 'curfile'):
             opts = {'filehist' : self.curfile}
