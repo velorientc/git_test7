@@ -222,7 +222,10 @@ def launch(root='', files=[], cwd='', main=True):
     if ct != 'internal':
         from hglib import thgdispatch
         args = ['--repository', root, ct]
-        ret = thgdispatch(repo.ui, args=args)
+        try:
+            ret = thgdispatch(repo.ui, args=args)
+        except SystemExit:
+            pass
         return None
 
     cmdoptions = {
