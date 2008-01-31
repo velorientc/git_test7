@@ -532,6 +532,8 @@ def run(root='', cwd='', files=[], **opts):
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
 
+    files = [util.canonpath(root, cwd, f) for f in files]
+
     cmdoptions = {
         'follow':False, 'follow-first':False, 'copies':False, 'keyword':[],
         'limit':0, 'rev':[], 'removed':False, 'no_merges':False, 'date':None,
