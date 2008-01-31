@@ -404,9 +404,10 @@ class ConfigDialog(gtk.Dialog):
         vbox.pack_start(table, False, False, 2)
 
         for row, (label, cpath, values, tooltip) in enumerate(info):
-            vlist = gtk.ListStore(str)
+            vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
             combo.connect("changed", self.dirty_event)
+            combo.set_row_separator_func(lambda model, iter: model[iter][1])
             widgets.append(combo)
 
             # Get currently configured value from this config file
@@ -419,15 +420,21 @@ class ConfigDialog(gtk.Dialog):
                         values.append(name[4:])
 
             currow = None
-            vlist.append([_unspecstr])
-            for v in values:
-                vlist.append([v])
-                if v == curvalue:
-                    currow = len(vlist) - 1
+            vlist.append([_unspecstr, False])
+            if values:
+                vlist.append(['Suggested', True])
+                for v in values:
+                    vlist.append([v, False])
+                    if v == curvalue:
+                        currow = len(vlist) - 1
             if cpath in self.history:
+                separator = False
                 for v in self.history[cpath]:
                     if v in values: continue
-                    vlist.append([v])
+                    if not separator:
+                        vlist.append(['History', True])
+                        separator = True
+                    vlist.append([v, False])
                     if v == curvalue:
                         currow = len(vlist) - 1
 
@@ -437,6 +444,7 @@ class ConfigDialog(gtk.Dialog):
                 combo.child.set_text(curvalue)
             else:
                 combo.set_active(currow)
+
 
             lbl = gtk.Label(label + ':')
             lbl.set_alignment(1.0, 0.0)
