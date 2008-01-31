@@ -19,6 +19,15 @@ from mercurial import hg
 from mercurial import repo as _repo
 from thgutil import *
 
+# FIXME: quick workaround traceback caused by missing "closed" 
+# attribute in win32trace.
+import sys
+from mercurial import ui
+def write_err(self, *args):
+    for a in args:
+        sys.stderr.write(str(a))
+ui.ui.write_err = write_err
+
 S_OK = 0
 S_FALSE = 1
 

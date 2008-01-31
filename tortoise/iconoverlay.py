@@ -12,6 +12,14 @@ from mercurial import repo as _repo
 import thgutil
 import sys
 
+# FIXME: quick workaround traceback caused by missing "closed" 
+# attribute in win32trace.
+from mercurial import ui
+def write_err(self, *args):
+    for a in args:
+        sys.stderr.write(str(a))
+ui.ui.write_err = write_err
+
 # file/directory status
 UNCHANGED = "unchanged"
 ADDED = "added"
