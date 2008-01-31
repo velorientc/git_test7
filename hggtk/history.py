@@ -59,11 +59,6 @@ class GLog(GDialog):
                     menu=self._filter_menu(),
                     tip='Filter revisions for display'),
                 gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_ZOOM_IN,
-                    '_View',
-                    self._filter_clicked, # TODO What should this button do?
-                    menu=self._view_menu(),
-                    tip='Select columns to display'),
                 self.make_toolbutton(gtk.STOCK_FIND,
                     '_DataMine',
                     self._datamine_clicked,
@@ -344,10 +339,18 @@ class GLog(GDialog):
         hbox = gtk.HBox()
         hbox.pack_start(self.graphview, True, True, 0)
         vbox = gtk.VBox()
+        self.colmenu = gtk.MenuToolButton('')
+        self.colmenu.set_menu(self._view_menu())
+        # A MenuToolButton has two parts; a Button and a ToggleButton
+        # we want to see the togglebutton, but not the button
+        b = self.colmenu.child.get_children()[0]
+        b.unmap()
+        b.set_sensitive(False)
         self.nextbutton = gtk.ToolButton(gtk.STOCK_GO_DOWN)
         self.nextbutton.connect('clicked', self._more_clicked)
         self.allbutton = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
         self.allbutton.connect('clicked', self._load_all_clicked)
+        vbox.pack_start(self.colmenu, False, False)
         vbox.pack_start(gtk.Label(''), True, True) # expanding blank label
         vbox.pack_start(self.nextbutton, False, False)
         vbox.pack_start(self.allbutton, False, False)
