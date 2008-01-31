@@ -11,7 +11,7 @@ import Queue
 import re
 import threading
 import time
-from mercurial import hg, ui, util
+from mercurial import hg, ui, util, revlog
 from hglib import hgcmd_toq
 from gdialog import *
 from vis import treemodel
@@ -334,7 +334,12 @@ class DataMineDialog(GDialog):
         '''
         if revid == '.':
             ctx = self.repo.workingctx().parents()[0]
-            fctx = ctx.filectx(path)
+            try:
+                fctx = ctx.filectx(path)
+            except revlog.LookupError:
+                Prompt('File is unrevisioned',
+                        'Unable to annotate ' + path, self).run()
+                return
             rev = fctx.filelog().linkrev(fctx.filenode())
             revid = str(rev)
         else:
@@ -591,7 +596,7 @@ def run(root='', cwd='', files=[], **opts):
     dialog.display()
     for f in cfiles:
         dialog.add_annotate_page(f, '.')
-    if not cfiles:
+    if not dialog.notebook.get_n_pages():
         dialog.add_search_page()
 
     gtk.gdk.threads_init()
