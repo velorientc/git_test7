@@ -43,7 +43,7 @@ _dialogs = { 'commit' : commit,    'status' : status,    'revert' : status,
              'parents': revisions, 'heads'  : revisions, 'update' : update,
              'clone'  : clone,     'serve'  : serve,     'synch'  : synch,
              'about'  : about,     'config' : thgconfig, 'recovery': recovery,
-             'grep'   : datamine}
+             'datamine': datamine }
 
 def get_list_from_file(filename):
     fd = open(filename, "r")

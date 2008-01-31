@@ -312,6 +312,9 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Undo Changes"),
                            _("Revert selected files"),
                            self._revert, icon="menurevert.ico"))
+            result.append(TortoiseMenu(_("Annotate File"),
+                           _("show changeset information per file line"),
+                           self._annotate, icon="menublame.ico"))
 
             result.append(TortoiseMenuSep())
             result.append(TortoiseMenu(_("Checkout Revision"),
@@ -577,7 +580,13 @@ class ContextMenuExtension:
         self._run_dialog('update', noargs=True)
 
     def _grep(self, parent_window):
-        self._run_dialog('grep')
+        # open datamine dialog with no file brings up a search tab
+        self._run_dialog('datamine', noargs=True)
+
+    def _annotate(self, parent_window):
+        # open datamine dialog with files brings up the annotate
+        # tabs for each file
+        self._run_dialog('datamine')
 
     def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
         if self._folder:
