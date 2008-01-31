@@ -333,8 +333,9 @@ class DataMineDialog(GDialog):
         revision 'revid'.
         '''
         if revid == '.':
-            parentctx = self.repo.workingctx().parents()
-            rev = parentctx[0].filectx(path).rev()
+            ctx = self.repo.workingctx().parents()[0]
+            fctx = ctx.filectx(path)
+            rev = fctx.filelog().linkrev(fctx.filenode())
             revid = str(rev)
         else:
             rev = long(revid)
@@ -584,9 +585,10 @@ def run(root='', cwd='', files=[], **opts):
         'include':[], 'exclude':[]
     }
 
+    cfiles = [util.canonpath(root, cwd, f) for f in files if os.path.isfile(f)]
+
     dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
     dialog.display()
-    cfiles = [util.canonpath(root, cwd, f) for f in files if os.path.isfile(f)]
     for f in cfiles:
         dialog.add_annotate_page(f, '.')
     if not cfiles:
@@ -599,6 +601,9 @@ def run(root='', cwd='', files=[], **opts):
 
 if __name__ == "__main__":
     import sys
+    import hglib
     opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
+    opts['cwd'] = os.getcwd()
+    opts['root'] = hglib.rootpath()
+    opts['files'] = sys.argv[1:] or []
     run(**opts)
