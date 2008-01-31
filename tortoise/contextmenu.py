@@ -15,7 +15,8 @@ import win32gui
 import win32gui_struct
 import win32api
 import _winreg
-from mercurial import hg, ui, repo
+from mercurial import hg
+from mercurial import repo as _repo
 from thgutil import *
 
 S_OK = 0
@@ -51,7 +52,7 @@ def open_repo(path):
         try:
             repo = hg.repository(ui.ui(), path=root)
             return repo
-        except repo.RepoError:
+        except _repo.RepoError:
             pass
 
     return None

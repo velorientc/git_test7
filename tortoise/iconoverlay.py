@@ -7,7 +7,8 @@ import win32api
 import win32con
 from win32com.shell import shell, shellcon
 import _winreg
-from mercurial import hg, repo, ui, cmdutil, util
+from mercurial import hg, cmdutil, util
+from mercurial import repo as _repo
 import thgutil
 import sys
 
@@ -159,7 +160,7 @@ class IconOverlayExtension(object):
             
         try:
             repo = hg.repository(ui.ui(), path=root)
-        except repo.RepoError:
+        except _repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
             overlay_cache[path] = (UNKNOWN, tc)
