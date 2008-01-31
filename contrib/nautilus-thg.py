@@ -19,6 +19,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import time
 import urllib
 
 TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
@@ -493,9 +494,15 @@ class HgExtension(nautilus.MenuProvider,
         emblem, status = self._get_file_status(repo, localpath)
 
         # Get the information from Mercurial
-        ctx = repo.changectx()
-        rev = ctx.rev()
+        ctx = repo.workingctx().parents()[0]
+        try:
+            fctx = ctx.filectx(localpath)
+            rev = fctx.filelog().linkrev(fctx.filenode())
+        except:
+            rev = ctx.rev()
+        ctx = repo.changectx(rev)
         node = short(ctx.node())
+        date = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(ctx.date()[0]))
         parents = '\n'.join([short(p.node()) for p in ctx.parents()])
         description = ctx.description()
         user = ctx.user()
@@ -505,19 +512,20 @@ class HgExtension(nautilus.MenuProvider,
 
         self.property_label = gtk.Label('Mercurial')
 
-        table = gtk.Table(5, 2, False)
+        table = gtk.Table(7, 2, False)
         table.set_border_width(5)
         table.set_row_spacings(5)
         table.set_col_spacings(5)
 
         self.__add_row(table, 0, '<b>Status</b>:', status)
-        self.__add_row(table, 1, '<b>Revision</b>:', str(rev))
-        self.__add_row(table, 2, '<b>Description</b>:', description)
-        self.__add_row(table, 3, '<b>Tags</b>:', tags)
-        self.__add_row(table, 4, '<b>Node</b>:', node)
-        self.__add_row(table, 5, '<b>Parents</b>:', parents)
-        self.__add_row(table, 6, '<b>User</b>:', user)
-        self.__add_row(table, 7, '<b>Branch</b>:', branch)
+        self.__add_row(table, 1, '<b>Last-Commit-Revision</b>:', str(rev))
+        self.__add_row(table, 2, '<b>Last-Commit-Description</b>:', description)
+        self.__add_row(table, 3, '<b>Last-Commit-Date</b>:', date)
+        self.__add_row(table, 4, '<b>Last-Commit-User</b>:', user)
+        if tags:
+            self.__add_row(table, 5, '<b>Tags</b>:', tags)
+        if branch != 'default':
+            self.__add_row(table, 6, '<b>Branch</b>:', branch)
 
         table.show()
 
