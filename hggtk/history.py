@@ -33,7 +33,7 @@ class GLog(GDialog):
         title = os.path.basename(self.repo.root) + ' log ' 
         if 'rev' in self.opts and self.opts['rev']:
             title += '--rev ' + ':'.join(self.opts['rev'])
-        if not self.pats:
+        if not self.pats or self.pats == ['']:
             return title
         if len(self.pats) > 1 or not os.path.isdir(self.pats[0]):
             title += '{search} ' + ' '.join(self.pats)
