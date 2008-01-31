@@ -57,8 +57,10 @@ class FilterDialog(gtk.Dialog):
         self.branchbox = gtk.ComboBoxEntry(self.branchlist, 0)
         hbox.pack_start(self.branchradio, False, False, 4)
         hbox.pack_start(self.branchbox, True, True, 4)
-        self.tips.set_tip(hbox, 'View revision graph of named branch')
-        self.vbox.pack_start(hbox, False, False, 4)
+        eventbox = gtk.EventBox()
+        eventbox.add(hbox)
+        self.tips.set_tip(eventbox, 'View revision graph of named branch')
+        self.vbox.pack_start(eventbox, False, False, 4)
         for name in self.repo.branchtags().keys():
             self.branchlist.append([name])
 
@@ -72,8 +74,10 @@ class FilterDialog(gtk.Dialog):
         hbox.pack_start(self.revradio, False, False, 4)
         hbox.pack_start(self.rev0Entry, True, False, 4)
         hbox.pack_start(self.rev1Entry, True, False, 4)
-        self.tips.set_tip(hbox, 'View range of revisions')
-        self.vbox.pack_start(hbox, False, False, 4)
+        eventbox = gtk.EventBox()
+        eventbox.add(hbox)
+        self.tips.set_tip(eventbox, 'View range of revisions')
+        self.vbox.pack_start(eventbox, False, False, 4)
         if revs:
             self.rev0Entry.set_text(str(revs[0]))
         if len(revs) > 1:
@@ -82,8 +86,10 @@ class FilterDialog(gtk.Dialog):
         hbox = gtk.HBox()
         self.searchradio = gtk.RadioButton(self.branchradio, 'Search Filter')
         hbox.pack_start(self.searchradio, False, False, 4)
-        self.tips.set_tip(hbox, 'Search repository changelog with criteria')
-        self.vbox.pack_start(hbox, False, False, 4)
+        eventbox = gtk.EventBox()
+        eventbox.add(hbox)
+        self.tips.set_tip(eventbox, 'Search repository changelog with criteria')
+        self.vbox.pack_start(eventbox, False, False, 4)
 
         self.searchframe = gtk.Frame()
         self.vbox.pack_start(self.searchframe, True, False, 4)
@@ -98,9 +104,11 @@ class FilterDialog(gtk.Dialog):
         lbl.set_alignment(0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.filesentry, True, True, 4)
-        self.tips.set_tip(hbox, 'Display only changesets affecting these'
+        eventbox = gtk.EventBox()
+        eventbox.add(hbox)
+        self.tips.set_tip(eventbox, 'Display only changesets affecting these'
                 ' comma separated file paths')
-        vbox.pack_start(hbox, False, False, 4)
+        vbox.pack_start(eventbox, False, False, 4)
         if files:
             self.filesentry.set_text(', '.join(files))
         
@@ -112,9 +120,11 @@ class FilterDialog(gtk.Dialog):
         lbl.set_alignment(0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.kwentry, True, True, 4)
-        self.tips.set_tip(hbox, 'Display only changesets matching these'
+        eventbox = gtk.EventBox()
+        eventbox.add(hbox)
+        self.tips.set_tip(eventbox, 'Display only changesets matching these'
                 ' comma separated case insensitive keywords')
-        vbox.pack_start(hbox, False, False, 4)
+        vbox.pack_start(eventbox, False, False, 4)
 
         hbox = gtk.HBox()
         self.dateentry = gtk.Entry()
@@ -129,9 +139,11 @@ class FilterDialog(gtk.Dialog):
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.dateentry, True, True, 4)
         hbox.pack_start(self.helpbutton, False, False, 4)
-        self.tips.set_tip(hbox, 'Display only changesets matching this'
+        eventbox = gtk.EventBox()
+        eventbox.add(hbox)
+        self.tips.set_tip(eventbox, 'Display only changesets matching this'
                 ' date specification')
-        vbox.pack_start(hbox, False, False, 4)
+        vbox.pack_start(eventbox, False, False, 4)
 
         self.searchradio.connect('toggled', self.searchtoggle)
         self.revradio.connect('toggled', self.revtoggle)
