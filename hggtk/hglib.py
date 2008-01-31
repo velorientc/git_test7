@@ -67,6 +67,7 @@ class GtkUi(ui.ui):
             self.outputq = outputq
             self.dialogq = dialogq
             self.responseq = responseq
+        self.interactive = True
 
     def write(self, *args):
         if self.buffers:
