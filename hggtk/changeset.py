@@ -18,7 +18,7 @@ import StringIO
 
 from mercurial.i18n import _
 from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands, patch
+from mercurial import cmdutil, util, ui, hg, commands, patch, revlog
 from gdialog import *
 from hgcmd import CmdDialog
 
@@ -266,6 +266,8 @@ class ChangeSet(GDialog):
             
         _menu = gtk.Menu()
         _menu.append(create_menu('_view at revision', self._view_file_rev))
+        self._save_menu = create_menu('_save at revision', self._save_file_rev)
+        _menu.append(self._save_menu)
         _menu.append(create_menu('_file history', self._file_history))
         self._ann_menu = create_menu('_annotate file', self._ann_file)
         _menu.append(self._ann_menu)
@@ -407,9 +409,13 @@ class ChangeSet(GDialog):
         # cannot be annotated at this revision (since this changeset
         # does not appear in the filelog)
         ctx = self.repo.changectx(self.currev)
-        fctx = ctx.filectx(self.curfile)
-        can_annotate = fctx.filelog().linkrev(fctx.filenode()) == ctx.rev()
-        self._ann_menu.set_sensitive(can_annotate)
+        try:
+            fctx = ctx.filectx(self.curfile)
+            has_filelog = fctx.filelog().linkrev(fctx.filenode()) == ctx.rev()
+        except revlog.LookupError:
+            has_filelog = False
+        self._ann_menu.set_sensitive(has_filelog)
+        self._save_menu.set_sensitive(has_filelog)
         return True
 
     def _file_row_act(self, tree, path, column) :
@@ -418,9 +424,23 @@ class ChangeSet(GDialog):
         self._filemenu.get_children()[0].activate()
         return True
 
+    def _save_file_rev(self, menuitem):
+        file, ext = os.path.splitext(os.path.basename(self.curfile))
+        filename = "%s@%d%s" % (file, self.currev, ext)
+        fd = NativeSaveFileDialogWrapper(Title = "Save file to",
+                                         InitialDir=self.cwd,
+                                         FileName=filename)
+        result = fd.run()
+        if result:
+            import Queue
+            import hglib
+            q = Queue.Queue()
+            cpath = util.canonpath(self.repo.root, self.cwd, self.curfile)
+            hglib.hgcmd_toq(self.repo.root, q, 'cat', '--rev',
+                str(self.currev), '--output', result, cpath)
+
     def _view_file_rev(self, menuitem):
         '''User selected view file revision from the file list context menu'''
-        # TODO
         rev = self.currev
         parents = self.parents
         if len(parents) == 0:
