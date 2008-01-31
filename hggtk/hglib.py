@@ -333,6 +333,7 @@ def hgcmd_toq(path, q, *args):
     class Qui(ui.ui):
         def __init__(self):
             ui.ui.__init__(self)
+            self.interactive = False
 
         def write(self, *args):
             if self.buffers:
