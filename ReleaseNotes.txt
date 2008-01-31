@@ -1,0 +1,61 @@
+                    Release Notes for TortoiseHg
+
+This file contains last minute notes to users about the releases, which may not
+be included in the documentation or README files included with the distribution
+kits.  It also contains change information, for users who are interested in
+what bugs have been fixed, and what features have been added in the current
+version.
+
+
+New features in 0.2
+
+  * Gtools has been integrated into TortoiseHg proper. It is no longer
+    bundled as a Mercurial extension. The graphlog extension is now enabled
+    again by default (only usable from the CLI, however).
+      
+  * Context menu icons, application window icons. The context menu has been
+    simplified.
+      
+  * The changelog browser has a number of new features (filters and context
+    menu options). The tag browser and changelog tagging features have been
+    merged into this tool.
+      
+  * Hgview is now the default history viewer, hgk is being deprecated.
+   
+  * An email dialog for interfacing with the patchbomb extension. It can be
+    reached from the synchronize dialog and from the changelog browser.
+     
+  * A new configuration tool (replacing hg-config dialogs) that allows you
+    to configure TortoiseHg and Mercurial.
+      
+  * Most dialogs now use HgThread and GtkUI to run hg commands. These 
+    classes run the command in a background thread and provide GUI prompts
+    for when user interaction is necessary (http web auth, etc). For some 
+    commands, it also provides a progress bar.
+      
+  * A preview of the new Mercurial merge back end. The python hgmerge.py 
+    script is being integrated into Mercurial, and this installer has a
+    preview of how that will work. You need to unset any ui.merge in your
+    Mercurial.ini file in order for it to work properly. If you don't 
+    configure anything it will use simplemerge to automatically perform 
+    merges. If conflicts are found it falls back to kdiff3 to resolve 
+    them interactively.
+      
+  * Slight improvement on speed of overlay icons display.
+    
+  * A new 'about' dialog.
+
+Bugs fixed in 0.2
+
+  * [SF Bug #1851395] Overlay icons and context menus are no longer 
+    restricted to MS-Explorer. So other file managers, such as Total 
+    Commander, should be supported.
+      
+  * [SF Bug #1844722] Users can now create repositories inside repository
+     via the context menu.
+
+Changes since 0.2rc1
+
+  - N/A -
+
+
