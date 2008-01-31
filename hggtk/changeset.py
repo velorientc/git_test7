@@ -441,6 +441,9 @@ class ChangeSet(GDialog):
 
     def _view_file_rev(self, menuitem):
         '''User selected view file revision from the file list context menu'''
+        if not self.curfile:
+            # ignore view events for the [Description] row
+            return
         rev = self.currev
         parents = self.parents
         if len(parents) == 0:
