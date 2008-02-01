@@ -41,6 +41,8 @@ New features in 0.3
 
   * Performance improvements in Mercurial itself (cset 0973501e5f4a)
 
+  * New installer bitmap from Peer Sommerlund
+
   * Misc: The Synchronize dialog has been improved.  The Web Serve
     dialog no longer requires a subprocess to run the web server.  The
     configuration dialog has a number of bug fixes for the paths tab,
