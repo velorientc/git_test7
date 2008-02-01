@@ -48,6 +48,14 @@ New features in 0.3
     types (current, suggested, history). Http authentication has been
     fixed.  The hg integration library has seen major cleanups.
 
+Bug Fixes in 0.3:
+
+  * [ 1863086 ] "Revision Graph" fail on UNC path
+    Fixed by removing hgk from base install.  Integrated log viewer
+    is UNC path safe.
+  * [ 1851395 ] Total Commander problem
+  * [ 1882074 ] global name 'p' is not defined
+
 New features in 0.2
 
   * Gtools has been integrated into TortoiseHg proper. It is no longer
