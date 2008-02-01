@@ -19,21 +19,6 @@ from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
 from vis.treeview import TreeView
 import gtklib
 
-# simple XPM image for close button on notebook tabs
-close_xpm = [
-    "8 7 2 1",
-    "X c #000000",
-    "  c #ffffff",
-    "XX    XX",
-    " XX  XX ",
-    "  XXXX  ",
-    "   XX   ",
-    "  XXXX  ",
-    " XX  XX ",
-    "XX    XX",
-    ]
-close_pixbuf = gtk.gdk.pixbuf_new_from_xpm_data(close_xpm)
-
 class DataMineDialog(GDialog):
     COL_REVID = 0
     COL_TEXT = 1
@@ -146,6 +131,21 @@ class DataMineDialog(GDialog):
     def _search_clicked(self, button, data):
         self.add_search_page()
 
+    def create_tab_close_button(self):
+        button = gtk.Button()
+        iconBox = gtk.HBox(False, 0)
+        image = gtk.Image()
+        image.set_from_stock(gtk.STOCK_CLOSE, gtk.ICON_SIZE_MENU)
+        gtk.Button.set_relief(button, gtk.RELIEF_NONE)
+        settings = gtk.Widget.get_settings(button)
+        (w,h) = gtk.icon_size_lookup_for_settings(settings, gtk.ICON_SIZE_MENU)
+        gtk.Widget.set_size_request(button, w + 4, h + 4)
+        image.show()
+        iconBox.pack_start(image, True, False, 0)
+        button.add(iconBox)
+        iconBox.show()
+        return button
+
     def add_search_page(self):
         frame = gtk.Frame()
         frame.set_border_width(10)
@@ -221,11 +221,8 @@ class DataMineDialog(GDialog):
 
         hbox = gtk.HBox()
         lbl = gtk.Label('Search %d' % self.newpagecount)
-        image = gtk.Image()
-        image.set_from_pixbuf(close_pixbuf)
-        close = gtk.Button()
+        close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
-        close.set_image(image)
         hbox.pack_start(lbl, True, True, 2)
         hbox.pack_start(close, False, False)
         hbox.show_all()
@@ -277,11 +274,8 @@ class DataMineDialog(GDialog):
 
         hbox = gtk.HBox()
         lbl = gtk.Label('Search "%s"' % re.split()[0])
-        image = gtk.Image()
-        image.set_from_pixbuf(close_pixbuf)
-        close = gtk.Button()
+        close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
-        close.set_image(image)
         hbox.pack_start(lbl, True, True, 2)
         hbox.pack_start(close, False, False)
         hbox.show_all()
@@ -415,11 +409,8 @@ class DataMineDialog(GDialog):
 
         hbox = gtk.HBox()
         lbl = gtk.Label(os.path.basename(path) + '@' + revid)
-        image = gtk.Image()
-        image.set_from_pixbuf(close_pixbuf)
-        close = gtk.Button()
+        close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
-        close.set_image(image)
         hbox.pack_start(lbl, True, True, 2)
         hbox.pack_start(close, False, False)
         hbox.show_all()
@@ -512,11 +503,8 @@ class DataMineDialog(GDialog):
 
         hbox = gtk.HBox()
         lbl = gtk.Label(os.path.basename(path) + '@' + str(rev))
-        image = gtk.Image()
-        image.set_from_pixbuf(close_pixbuf)
-        close = gtk.Button()
+        close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
-        close.set_image(image)
         hbox.pack_start(lbl, True, True, 2)
         hbox.pack_start(close, False, False)
         hbox.show_all()
