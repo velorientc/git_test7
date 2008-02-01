@@ -48,9 +48,6 @@ New features in 0.3
     types (current, suggested, history). Http authentication has been
     fixed.  The hg integration library has seen major cleanups.
 
-  * TortoisePlink was downgraded to avoid MSVC-2005 runtime library
-    problems.
-
 New features in 0.2
 
   * Gtools has been integrated into TortoiseHg proper. It is no longer
