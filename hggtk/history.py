@@ -450,9 +450,10 @@ class GLog(GDialog):
         from hgemail import EmailDialog
         rev = self.currow[treemodel.REVID]
         dlg = EmailDialog(self.repo.root, ['--rev', str(rev)])
+        dlg.set_transient_for(self)
         dlg.show_all()
-        dlg.run()
-        dlg.hide()
+        dlg.present()
+        dlg.set_transient_for(None)
 
     def _checkout(self, menuitem):
         rev = self.currow[treemodel.REVID]

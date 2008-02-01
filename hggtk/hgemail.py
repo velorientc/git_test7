@@ -17,29 +17,41 @@ from mercurial import hg, ui, extensions
 from thgconfig import ConfigDialog
 from hgcmd import CmdDialog
 
-class EmailDialog(gtk.Dialog):
+class EmailDialog(gtk.Window):
     """ Send patches or bundles via email """
     def __init__(self, root='', revargs=[]):
         """ Initialize the Dialog """
-        buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-        super(EmailDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
-                                           buttons=buttons)
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+
         shlib.set_tortoise_icon(self, 'hg.ico')
         self.root = root
         self.revargs = revargs
         
         self.tbar = gtk.Toolbar()
+        self.tips = gtk.Tooltips()
+
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+                self._close_clicked, 'Close Window')
+
         tbuttons = [
                 self._toolbutton(gtk.STOCK_GOTO_LAST, 'Send',
-                                 self._on_send_clicked),
+                                 self._on_send_clicked,
+                                 'Send email(s)'),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_PREFERENCES, 'configure',
-                                 self._on_conf_clicked),
-                gtk.SeparatorToolItem(),
+                                 self._on_conf_clicked,
+                                 'Configure email settings'),
+                sep,
+                self._btn_close
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
+        mainvbox = gtk.VBox()
+        self.add(mainvbox)
+        mainvbox.pack_start(self.tbar, False, False, 2)
 
         # set dialog title
         if revargs[0] in ('--outgoing', '-o'):
@@ -55,7 +67,7 @@ class EmailDialog(gtk.Dialog):
         flagframe = gtk.Frame('Options')
         hbox.pack_start(envframe, True, True, 4)
         hbox.pack_start(flagframe, False, False, 4)
-        self.vbox.pack_start(hbox, False, True, 4)
+        mainvbox.pack_start(hbox, False, True, 4)
 
         vbox = gtk.VBox()
         envframe.add(vbox)
@@ -147,19 +159,18 @@ class EmailDialog(gtk.Dialog):
                 ' the effects of the entire patch series.  When emailing'
                 ' a bundle, these fields make up the message subject and body.'
                 ' The description field is unused when sending a single patch')
-        self.vbox.pack_start(frame, True, True, 4)
+        mainvbox.pack_start(frame, True, True, 4)
 
         self.connect('map_event', self._on_window_map_event)
 
-    def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
-        if menu:
-            tbutton = gtk.MenuToolButton(stock)
-            tbutton.set_menu(menu)
-        else:
-            tbutton = gtk.ToolButton(stock)
-            
+    def _close_clicked(self, toolbutton, data=None):
+        self.destroy()
+
+    def _toolbutton(self, stock, label, handler, tip):
+        tbutton = gtk.ToolButton(stock)
         tbutton.set_label(label)
-        tbutton.connect('clicked', handler, userdata)
+        tbutton.set_tooltip(self.tips, tip)
+        tbutton.connect('clicked', handler)
         return tbutton
         
     def _on_window_map_event(self, event, param):
@@ -216,7 +227,7 @@ class EmailDialog(gtk.Dialog):
                 self._plain.set_active(True)
                 self._plain.set_sensitive(False)
 
-    def _on_conf_clicked(self, button, userdata):
+    def _on_conf_clicked(self, button):
         dlg = ConfigDialog(self.root, False)
         dlg.show_all()
         dlg.focus_field('email.from')
@@ -224,7 +235,7 @@ class EmailDialog(gtk.Dialog):
         dlg.hide()
         self._refresh(False)
 
-    def _on_send_clicked(self, button, userdata):
+    def _on_send_clicked(self, button):
         def record_new_value(cpath, history, newvalue):
             if not newvalue: return
             if cpath not in history:
@@ -301,7 +312,7 @@ def run(root='', **opts):
     # place for testing purposes.
     dialog = EmailDialog(root, ['tip'])
     dialog.show_all()
-    dialog.connect('response', gtk.main_quit)
+    dialog.connect('destroy', gtk.main_quit)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()

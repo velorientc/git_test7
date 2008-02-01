@@ -293,9 +293,10 @@ class SynchDialog(gtk.Window):
             return
         from hgemail import EmailDialog
         dlg = EmailDialog(self.root, ['--outgoing', path])
+        dlg.set_transient_for(self)
         dlg.show_all()
-        dlg.run()
-        dlg.hide()
+        dlg.present()
+        dlg.set_transient_for(None)
 
     def _incoming_clicked(self, toolbutton, data=None):
         cmd = ['incoming']
