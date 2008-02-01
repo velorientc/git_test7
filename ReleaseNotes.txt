@@ -6,6 +6,50 @@ kits.  It also contains change information, for users who are interested in
 what bugs have been fixed, and what features have been added in the current
 version.
 
+New features in 0.3
+
+  * Major improvements to changelog browser.  It is now good enough to
+    deprecate both hgk and hgview.  Neither are bundled with the 0.3
+    binary installer, but both can be added by the user if they wish.
+    Support for external revision log viewers will be dropped in 0.4.
+
+  * The new changelog browser supports filtering by file pattern,
+    keywords, dates, and branches.  It is capable of graphing both the
+    repository changelog and individual filelogs.  Changeset coloring by
+    author is optional (tortoisehg.authorcolor).  All changeset graphing
+    is done incrementally in batches (tortoisehg.graphlimit: 500)
+
+  * New DataMine application for searching history (hg grep) and
+    inspecting file histories (hg annotate).  This new application is
+    tabbed to facilitate debugging sessions where search results and
+    annotations can be grouped together for easy cross-reference.
+
+  * New changeset browser, supports multiple parents intrinsically and
+    supports a number of file-revision features (view at revision, save
+    at revision, annotate at revision, revert to revision, etc).  The
+    new changeset browser is also integrated into the changelog browser.
+
+  * Standardized window layouts.  Close buttons have been moved to the
+    toolbar.  Dialogs that use progress bars now use a standard status
+    bar/progress bar widget.  Tooltips have been added.
+
+  * Hgtk wrapper application for launching TortoiseHg dialogs from the
+    command line
+
+  * Support for an external visual editor: tortoisehg.editor.  Takes
+    precedence over ui.editor when viewing files with TortoiseHg
+
+  * Performance improvements in Mercurial itself (cset 0973501e5f4a)
+
+  * Misc: The Synchronize dialog has been improved.  The Web Serve
+    dialog no longer requires a subprocess to run the web server.  The
+    configuration dialog has a number of bug fixes for the paths tab,
+    and now has separators in the drop-down boxes for the varying value
+    types (current, suggested, history). Http authentication has been
+    fixed.  The hg integration library has seen major cleanups.
+
+  * TortoisePlink was downgraded to avoid MSVC-2005 runtime library
+    problems.
 
 New features in 0.2
 
