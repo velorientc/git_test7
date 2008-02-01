@@ -153,6 +153,7 @@ class EmailDialog(gtk.Window):
         self.descview.modify_font(pango.FontDescription("Monospace"))
         self.descbuffer = self.descview.get_buffer()
         scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.descview)
         frame = gtk.Frame('Patch Series (Bundle) Description')
