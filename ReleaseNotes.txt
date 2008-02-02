@@ -57,6 +57,7 @@ Bug Fixes in 0.3:
     is UNC path safe.
   * [ 1851395 ] Total Commander problem
   * [ 1882074 ] global name 'p' is not defined
+  * [ 1854443 ] View changelog fails
 
 New features in 0.2
 
