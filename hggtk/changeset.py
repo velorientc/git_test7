@@ -175,10 +175,23 @@ class ChangeSet(GDialog):
         filelist.append(('[Description]', 'begmark', False, ()))
 
         # inserts the marks
+        pctx = self.repo.changectx(parent)
         for f, mark, offset, stats in fileoffs:
             pos = buf.get_iter_at_offset(offset)
             buf.create_mark(mark, pos)
-            filelist.append((f, mark, True, (stats[0],stats[1],statmax)))
+            # This is probably too clever by half, but it works.  If
+            # we're unable to lookup the file in the current manifest it
+            # means it was just deleted.  If we can't find it in the
+            # parent, it means it was just added.  Else it was modified.
+            try:
+                fs = 'R  ' + f
+                ctx.filectx(f)
+                fs = 'A  ' + f
+                pctx.filectx(f)
+                fs = 'M  ' + f
+            except revlog.LookupError:
+                pass
+            filelist.append((fs, mark, True, (stats[0],stats[1],statmax)))
 
         sob, eob = buf.get_bounds()
         buf.apply_tag_by_name("mono", sob, eob)
@@ -382,7 +395,7 @@ class ChangeSet(GDialog):
         mark = self._buffer.get_mark(model[iter][1])
         self.textview.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
         if model[iter][2]:
-            self.curfile = model[iter][0]
+            self.curfile = model[iter][0][3:]
         else:
             self.curfile = None
 
