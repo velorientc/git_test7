@@ -746,7 +746,7 @@ def run(root='', cwd='', files=[], **opts):
     cmdoptions = {
         'all':False, 'clean':False, 'ignored':False, 'modified':True,
         'added':True, 'removed':True, 'deleted':True, 'unknown':False, 'rev':[],
-        'exclude':[], 'include':[], 'debug':True,'verbose':True
+        'exclude':[], 'include':[], 'debug':True,'verbose':True,'git':False
     }
     
     dialog = GStatus(u, repo, cwd, files, cmdoptions, True)
