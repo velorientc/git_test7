@@ -6,6 +6,16 @@ kits.  It also contains change information, for users who are interested in
 what bugs have been fixed, and what features have been added in the current
 version.
 
+New features in 0.4
+
+  * Changeset viewer shows 'MAR' file status
+
+  * Installer now requires admin priviledges in order to prevent an
+    upgrade from requiring two reboots.
+
+Bug Fixes in 0.4:
+  * [ 1884919 ] Change Log hscroller
+
 New features in 0.3
 
   * Major improvements to changelog browser.  It is now good enough to
