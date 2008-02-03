@@ -18,7 +18,8 @@ import StringIO
 
 from mercurial.i18n import _
 from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands, patch, revlog
+from mercurial import cmdutil, util, ui, hg, commands
+from mercurial import context, patch, revlog
 from gdialog import *
 from hgcmd import CmdDialog
 
@@ -147,7 +148,6 @@ class ChangeSet(GDialog):
 
         log = util.fromlocal(ctx.description())
         buf.insert(eob, '\n' + log + '\n\n')
-        offset = eob.get_offset()
 
         if self.parent_toggle.get_active():
             parent = self.repo.changelog.node(parents[1])
@@ -155,11 +155,29 @@ class ChangeSet(GDialog):
             parent = self.repo.changelog.node(parents[0])
         else:
             parent = nullid
-        out = StringIO.StringIO()
-        patch.diff(self.repo, node1=parent, node2=ctx.node(),
-                files=ctx.files(), fp=out)
-        txt = out.getvalue()
+
+        buf.create_mark('begmark', buf.get_start_iter())
+        filelist.append(('*', '[Description]', 'begmark', False, ()))
+        pctx = self.repo.changectx(parent)
+
+        iterator = self.diff_generator(parent, ctx.node(), ctx.files())
+        gobject.idle_add(self.get_diffs, iterator, rev, pctx, buf, filelist)
+
+    def get_diffs(self, iterator, rev, pctx, buf, filelist):
+        if self.currev != rev:
+            return False
+
+        try:
+            status, file, txt = iterator.next()
+        except StopIteration:
+            # TODO: apply more efficiently
+            sob, eob = buf.get_bounds()
+            buf.apply_tag_by_name("mono", sob, eob)
+            return False
+
         lines = unicode(txt, 'latin-1', 'replace').splitlines()
+        eob = buf.get_end_iter()
+        offset = eob.get_offset()
         fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset)
         for l in lines:
             buf.insert(eob, l)
@@ -171,30 +189,169 @@ class ChangeSet(GDialog):
             txt = buf.get_text(i0, i1)
             buf.apply_tag_by_name(name, i0, i1)
             
-        buf.create_mark('begmark', buf.get_start_iter())
-        filelist.append(('*', '[Description]', 'begmark', False, ()))
-
         # inserts the marks
-        pctx = self.repo.changectx(parent)
         for f, mark, offset, stats in fileoffs:
             pos = buf.get_iter_at_offset(offset)
+            mark = 'mark_%d' % offset
             buf.create_mark(mark, pos)
-            # This is probably too clever by half, but it works.  If
-            # we're unable to lookup the file in the current manifest it
-            # means it was just deleted.  If we can't find it in the
-            # parent, it means it was just added.  Else it was modified.
-            try:
-                s = 'R'
-                ctx.filectx(f)
-                s = 'A'
-                pctx.filectx(f)
-                s = 'M'
-            except revlog.LookupError:
-                pass
-            filelist.append((s, f, mark, True, (stats[0],stats[1],statmax)))
+            filelist.append((status, file, mark, True, stats))
+        return True
 
-        sob, eob = buf.get_bounds()
-        buf.apply_tag_by_name("mono", sob, eob)
+    # Hacked up version of mercurial.patch.diff()
+    # Use git mode by default (to show copies, renames, permissions) but
+    # never show binary diffs.  It operates as a generator, so it can be
+    # called iteratively to get file diffs from a changeset
+    def diff_generator(self, node1, node2, files):
+        repo = self.repo
+
+        ccache = {}
+        def getctx(r):
+            if r not in ccache:
+                ccache[r] = context.changectx(repo, r)
+            return ccache[r]
+
+        flcache = {}
+        def getfilectx(f, ctx):
+            flctx = ctx.filectx(f, filelog=flcache.get(f))
+            if f not in flcache:
+                flcache[f] = flctx._filelog
+            return flctx
+
+        # reading the data for node1 early allows it to play nicely
+        # with repo.status and the revlog cache.
+        ctx1 = context.changectx(repo, node1)
+        # force manifest reading
+        man1 = ctx1.manifest()
+        date1 = util.datestr(ctx1.date())
+
+        changes = repo.status(node1, node2, files)[:5]
+        modified, added, removed, deleted, unknown = changes
+
+        if not modified and not added and not removed:
+            return
+
+        ctx2 = context.changectx(repo, node2)
+        execf2 = ctx2.manifest().execf
+        linkf2 = ctx2.manifest().linkf
+
+        # returns False if there was no rename between ctx1 and ctx2
+        # returns None if the file was created between ctx1 and ctx2
+        # returns the (file, node) present in ctx1 that was renamed to f in ctx2
+        # This will only really work if c1 is the Nth 1st parent of c2.
+        def renamed(c1, c2, man, f):
+            startrev = c1.rev()
+            c = c2
+            crev = c.rev()
+            if crev is None:
+                crev = repo.changelog.count()
+            orig = f
+            files = (f,)
+            while crev > startrev:
+                if f in files:
+                    try:
+                        src = getfilectx(f, c).renamed()
+                    except revlog.LookupError:
+                        return None
+                    if src:
+                        f = src[0]
+                crev = c.parents()[0].rev()
+                # try to reuse
+                c = getctx(crev)
+                files = c.files()
+            if f not in man:
+                return None
+            if f == orig:
+                return False
+            return f
+
+        r = [short(node) for node in [node1, node2] if node]
+
+        copied = {}
+        c1, c2 = ctx1, ctx2
+        files = added
+        man = man1
+        if node2 and ctx1.rev() >= ctx2.rev():
+            # renamed() starts at c2 and walks back in history until c1.
+            # Since ctx1.rev() >= ctx2.rev(), invert ctx2 and ctx1 to
+            # detect (inverted) copies.
+            c1, c2 = ctx2, ctx1
+            files = removed
+            man = ctx2.manifest()
+        for f in files:
+            src = renamed(c1, c2, man, f)
+            if src:
+                copied[f] = src
+        if ctx1 == c2:
+            # invert the copied dict
+            copied = dict([(v, k) for (k, v) in copied.iteritems()])
+        # If we've renamed file foo to bar (copied['bar'] = 'foo'),
+        # avoid showing a diff for foo if we're going to show
+        # the rename to bar.
+        srcs = [x[1] for x in copied.iteritems() if x[0] in added]
+
+        all = modified + added + removed
+        all.sort()
+        gone = {}
+
+        for f in all:
+            to = None
+            tn = None
+            dodiff = True
+            header = []
+            if f in man1:
+                to = getfilectx(f, ctx1).data()
+            if f not in removed:
+                tn = getfilectx(f, ctx2).data()
+            a, b = f, f
+            def gitmode(x, l):
+                return l and '120000' or (x and '100755' or '100644')
+            def addmodehdr(header, omode, nmode):
+                if omode != nmode:
+                    header.append('old mode %s\n' % omode)
+                    header.append('new mode %s\n' % nmode)
+
+            if f in added:
+                s = 'A'
+                mode = gitmode(execf2(f), linkf2(f))
+                if f in copied:
+                    a = copied[f]
+                    omode = gitmode(man1.execf(a), man1.linkf(a))
+                    addmodehdr(header, omode, mode)
+                    if a in removed and a not in gone:
+                        op = 'rename'
+                        gone[a] = 1
+                    else:
+                        op = 'copy'
+                    header.append('%s from %s\n' % (op, a))
+                    header.append('%s to %s\n' % (op, f))
+                    to = getfilectx(a, ctx1).data()
+                else:
+                    header.append('new file mode %s\n' % mode)
+                if util.binary(tn):
+                    dodiff = 'binary'
+            elif f in removed:
+                s = 'R'
+                if f in srcs:
+                    dodiff = False
+                else:
+                    mode = gitmode(man1.execf(f), man1.linkf(f))
+                    header.append('deleted file mode %s\n' % mode)
+            else:
+                s = 'M'
+                omode = gitmode(man1.execf(f), man1.linkf(f))
+                nmode = gitmode(execf2(f), linkf2(f))
+                addmodehdr(header, omode, nmode)
+                if util.binary(to) or util.binary(tn):
+                    dodiff = 'binary'
+            r = None
+            header.insert(0, 'diff --git a/%s b/%s\n' % (a, b))
+            if dodiff == 'binary':
+                text = 'binary file has changed.\n'
+            else:
+                text = patch.mdiff.unidiff(to, date1,
+                                    tn, util.datestr(ctx2.date()),
+                                    a, b, r, opts=patch.mdiff.defaultopts)
+            yield (s, f, ''.join(header) + text)
 
     def prepare_diff(self, difflines, offset):
         '''Borrowed from hgview; parses changeset diffs'''
