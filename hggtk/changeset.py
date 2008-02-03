@@ -172,7 +172,7 @@ class ChangeSet(GDialog):
             buf.apply_tag_by_name(name, i0, i1)
             
         buf.create_mark('begmark', buf.get_start_iter())
-        filelist.append(('[Description]', 'begmark', False, ()))
+        filelist.append(('*', '[Description]', 'begmark', False, ()))
 
         # inserts the marks
         pctx = self.repo.changectx(parent)
@@ -184,14 +184,14 @@ class ChangeSet(GDialog):
             # means it was just deleted.  If we can't find it in the
             # parent, it means it was just added.  Else it was modified.
             try:
-                fs = 'R  ' + f
+                s = 'R'
                 ctx.filectx(f)
-                fs = 'A  ' + f
+                s = 'A'
                 pctx.filectx(f)
-                fs = 'M  ' + f
+                s = 'M'
             except revlog.LookupError:
                 pass
-            filelist.append((fs, mark, True, (stats[0],stats[1],statmax)))
+            filelist.append((s, f, mark, True, (stats[0],stats[1],statmax)))
 
         sob, eob = buf.get_bounds()
         buf.apply_tag_by_name("mono", sob, eob)
@@ -324,13 +324,17 @@ class ChangeSet(GDialog):
         filelist_tree.connect('popup-menu', self._file_popup_menu)
         filelist_tree.connect('row-activated', self._file_row_act)
 
-        self._filelist = gtk.ListStore(gobject.TYPE_STRING, # filename
+        self._filelist = gtk.ListStore(
+                gobject.TYPE_STRING,   # MAR status
+                gobject.TYPE_STRING,   # filename
                 gobject.TYPE_PYOBJECT, # mark
                 gobject.TYPE_PYOBJECT, # give cmenu
                 gobject.TYPE_PYOBJECT  # diffstats
                 )
         filelist_tree.set_model(self._filelist)
-        column = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=0)
+        column = gtk.TreeViewColumn('Stat', gtk.CellRendererText(), text=0)
+        filelist_tree.append_column(column)
+        column = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=1)
         filelist_tree.append_column(column)
 
         list_frame = gtk.Frame()
@@ -395,7 +399,7 @@ class ChangeSet(GDialog):
         mark = self._buffer.get_mark(model[iter][1])
         self.textview.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
         if model[iter][2]:
-            self.curfile = model[iter][0][3:]
+            self.curfile = model[iter][1]
         else:
             self.curfile = None
 
