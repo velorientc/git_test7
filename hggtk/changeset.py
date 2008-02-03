@@ -396,9 +396,9 @@ class ChangeSet(GDialog):
         if not iter:
             return
         # scroll to file in details window
-        mark = self._buffer.get_mark(model[iter][1])
+        mark = self._buffer.get_mark(model[iter][2])
         self.textview.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
-        if model[iter][2]:
+        if model[iter][3]:
             self.curfile = model[iter][1]
         else:
             self.curfile = None
