@@ -341,8 +341,8 @@ class ChangeSet(GDialog):
         list_frame.add(scroller)
 
         self._hpaned = gtk.HPaned()
-        self._hpaned.pack1(details_frame, True, True)
-        self._hpaned.pack2(list_frame, True, True)
+        self._hpaned.pack1(list_frame, True, True)
+        self._hpaned.pack2(details_frame, True, True)
         self._hpaned.set_position(self._setting_hpos)
         return self._hpaned
 
