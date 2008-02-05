@@ -18,8 +18,7 @@ import Queue
 import os
 import threading
 from mercurial import hg, ui, util 
-from mercurial.node import *
-from dialog import error_dialog
+from dialog import error_dialog, warning_dialog
 from hglib import HgThread
 from shlib import set_tortoise_icon
 import gtklib
@@ -31,11 +30,14 @@ class SynchDialog(gtk.Window):
 
         set_tortoise_icon(self, 'menusynch.ico')
         self.root = root
+        self.cwd = cwd
         self.selected_path = None
 
         self.set_default_size(610, 400)
 
         self.paths = self._get_paths()
+        self.origchangecount = self.repo.changelog.count()
+
         name = self.repo.ui.config('web', 'name') or os.path.basename(root)
         self.set_title("TortoiseHg Synchronize - " + name)
 
@@ -181,8 +183,74 @@ class SynchDialog(gtk.Window):
         self.textbuffer = self.textview.get_buffer()
         vbox.pack_start(scrolledwindow, True, True)
 
+        self.buttonhbox = gtk.HBox()
+        self.viewpulled = gtk.Button('View Pulled Revisions')
+        self.viewpulled.connect('clicked', self._view_pulled_changes)
+        self.updatetip = gtk.Button('Update to Tip')
+        self.updatetip.connect('clicked', self._update_to_tip)
+        self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
+        self.buttonhbox.pack_start(self.updatetip, False, False, 2)
+        vbox.pack_start(self.buttonhbox, False, False, 2)
+
         self.stbar = gtklib.StatusBar()
         vbox.pack_start(self.stbar, False, False, 2)
+        self.connect('map', self.update_buttons)
+
+    def update_buttons(self, *args):
+        self.buttonhbox.hide()
+        self.repo.invalidate()
+        tip = self.repo.changelog.count()
+        if self.origchangecount == tip:
+            self.viewpulled.hide()
+        else:
+            self.buttonhbox.show()
+            self.viewpulled.show()
+
+        self.repo.dirstate.invalidate()
+        parent = self.repo.workingctx().parents()[0].rev()
+        if parent == tip-1:
+            self.updatetip.hide()
+        else:
+            self.buttonhbox.show()
+            self.updatetip.show()
+
+    def _view_pulled_changes(self, button):
+        from history import GLog
+        revs = (self.repo.changelog.count()-1, self.origchangecount)
+        opts = {'revrange' : revs}
+        dialog = GLog(self.ui, self.repo, self.cwd, [], opts, False)
+        dialog.display()
+
+    def _update_to_tip(self, button):
+        self.repo.invalidate()
+        wc = self.repo.workingctx()
+        pl = wc.parents()
+        p1, p2 = pl[0], self.repo.changectx('tip')
+        pa = p1.ancestor(p2)
+        warning = ''
+        flags = []
+        if len(pl) > 1:
+            warning = "Outstanding uncommitted merges"
+        elif pa != p1 and pa != p2:
+            warning = "Checkout spans branches"
+        elif wc.files():
+            warning = "Outstanding uncommitted changes"
+        if warning:
+            flags = ['--clean']
+            msg = 'Lose all changes in your working directory?'
+            warning += ', requires clean checkout'
+            if warning_dialog(msg, warning) != gtk.RESPONSE_OK:
+                return
+        self.write("", False)
+
+        # execute command and show output on text widget
+        gobject.timeout_add(10, self.process_queue)
+
+        cmdline = ['update', '-v', '-R', self.repo.root] + flags + ['tip']
+        self.hgthread = HgThread(cmdline)
+        self.hgthread.start()
+        self.stbar.begin()
+        self.stbar.set_status_text('hg ' + ' '.join(cmdline))
         
     def _pull_menu(self):
         menu = gtk.Menu()
@@ -196,7 +264,8 @@ class SynchDialog(gtk.Window):
     def _get_paths(self, sort="value"):
         """ retrieve symbolic paths """
         try:
-            self.repo = hg.repository(ui.ui(), path=self.root)
+            self.ui = ui.ui()
+            self.repo = hg.repository(self.ui, path=self.root)
             paths = self.repo.ui.configitems('paths')
             if sort:
                 if sort == "value":
@@ -363,7 +432,10 @@ class SynchDialog(gtk.Window):
                 self.write(msg)
             except Queue.Empty:
                 pass
+
         if threading.activeCount() == 1:
+            # Update button states
+            self.update_buttons()
             self.stbar.end()
             return False # Stop polling this function
         else:

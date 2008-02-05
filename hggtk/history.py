@@ -198,7 +198,10 @@ class GLog(GDialog):
         self.currow = None
         if self.pats == [self.repo.root] or self.pats == ['']:
             self.pats = []
-        if hasattr(self, 'curfile'):
+        if 'revrange' in self.opts:
+            self.custombutton.set_active(True)
+            self.graphview.refresh(True, None, self.opts)
+        elif hasattr(self, 'curfile'):
             opts = {'filehist' : self.curfile}
             self.custombutton.set_active(True)
             self.graphview.refresh(True, None, opts)
