@@ -75,7 +75,7 @@ class ServeDialog(gtk.Window):
         sep = gtk.SeparatorToolItem()
         sep.set_expand(True)
         sep.set_draw(False)
-        self._button_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
+        self._button_close = self._toolbutton(gtk.STOCK_CLOSE, 'Quit',
                 self._close_clicked)
 
         tbuttons = [
