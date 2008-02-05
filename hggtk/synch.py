@@ -87,8 +87,8 @@ class SynchDialog(gtk.Window):
         sep.set_expand(True)
         sep.set_draw(False)
         self.tbar.insert(sep, -1)
-        button = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._close_clicked, tip='Close Application')
+        button = self._toolbutton(gtk.STOCK_CLOSE, 'Quit',
+                self._close_clicked, tip='Quit Application')
         self.tbar.insert(button, -1)
         vbox = gtk.VBox()
         self.add(vbox)
