@@ -351,7 +351,7 @@ class ChangeSet(GDialog):
                 text = patch.mdiff.unidiff(to, date1,
                                     tn, util.datestr(ctx2.date()),
                                     a, b, r, opts=patch.mdiff.defaultopts)
-            yield (s, f, ''.join(header) + text)
+            if header or text: yield (s, f, ''.join(header) + text)
 
     def prepare_diff(self, difflines, offset):
         '''Borrowed from hgview; parses changeset diffs'''
