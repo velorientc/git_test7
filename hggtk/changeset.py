@@ -160,11 +160,13 @@ class ChangeSet(GDialog):
         filelist.append(('*', '[Description]', 'begmark', False, ()))
         pctx = self.repo.changectx(parent)
 
-        iterator = self.diff_generator(parent, ctx.node(), ctx.files())
-        gobject.idle_add(self.get_diffs, iterator, rev, pctx, buf, filelist)
+        nodes = parent, ctx.node()
+        iterator = self.diff_generator(*nodes)
+        gobject.idle_add(self.get_diffs, iterator, nodes, pctx, buf, filelist)
+        self.curnodes = nodes
 
-    def get_diffs(self, iterator, rev, pctx, buf, filelist):
-        if self.currev != rev:
+    def get_diffs(self, iterator, nodes, pctx, buf, filelist):
+        if self.curnodes != nodes:
             return False
 
         try:
@@ -201,7 +203,7 @@ class ChangeSet(GDialog):
     # Use git mode by default (to show copies, renames, permissions) but
     # never show binary diffs.  It operates as a generator, so it can be
     # called iteratively to get file diffs from a changeset
-    def diff_generator(self, node1, node2, files):
+    def diff_generator(self, node1, node2):
         repo = self.repo
 
         ccache = {}
@@ -217,20 +219,21 @@ class ChangeSet(GDialog):
                 flcache[f] = flctx._filelog
             return flctx
 
-        # reading the data for node1 early allows it to play nicely
-        # with repo.status and the revlog cache.
-        ctx1 = context.changectx(repo, node1)
+        ctx1 = context.changectx(repo, node1) # parent
+        ctx2 = context.changectx(repo, node2) # current
+
+        if node1 == repo.changelog.parents(node2)[0]:
+            filelist = ctx2.files()
+        else:
+            changes = repo.status(node1, node2, None)[:5]
+            modified, added, removed, deleted, unknown = changes
+            filelist = modified + added + removed
+
+
         # force manifest reading
         man1 = ctx1.manifest()
         date1 = util.datestr(ctx1.date())
 
-        changes = repo.status(node1, node2, files)[:5]
-        modified, added, removed, deleted, unknown = changes
-
-        if not modified and not added and not removed:
-            return
-
-        ctx2 = context.changectx(repo, node2)
         execf2 = ctx2.manifest().execf
         linkf2 = ctx2.manifest().linkf
 
@@ -264,43 +267,40 @@ class ChangeSet(GDialog):
                 return False
             return f
 
-        r = [short(node) for node in [node1, node2] if node]
+        status = {}
+        def filestatus(f):
+            if f in status:
+                return status[f]
+            try:
+                # Determine file status by presence in manifests
+                s = 'R'
+                ctx2.filectx(f)
+                s = 'A'
+                ctx1.filectx(f)
+                s = 'M'
+            except revlog.LookupError:
+                pass
+            status[f] = s
+            return s
 
         copied = {}
-        c1, c2 = ctx1, ctx2
-        files = added
-        man = man1
-        if node2 and ctx1.rev() >= ctx2.rev():
-            # renamed() starts at c2 and walks back in history until c1.
-            # Since ctx1.rev() >= ctx2.rev(), invert ctx2 and ctx1 to
-            # detect (inverted) copies.
-            c1, c2 = ctx2, ctx1
-            files = removed
-            man = ctx2.manifest()
-        for f in files:
-            src = renamed(c1, c2, man, f)
+        for f in filelist:
+            src = renamed(ctx1, ctx2, man1, f)
             if src:
                 copied[f] = src
-        if ctx1 == c2:
-            # invert the copied dict
-            copied = dict([(v, k) for (k, v) in copied.iteritems()])
-        # If we've renamed file foo to bar (copied['bar'] = 'foo'),
-        # avoid showing a diff for foo if we're going to show
-        # the rename to bar.
-        srcs = [x[1] for x in copied.iteritems() if x[0] in added]
 
-        all = modified + added + removed
-        all.sort()
+        srcs = [x[1] for x in copied.iteritems() if filestatus(x[0]) == 'A']
+
         gone = {}
-
-        for f in all:
+        for f in filelist:
+            s = filestatus(f)
             to = None
             tn = None
             dodiff = True
             header = []
             if f in man1:
                 to = getfilectx(f, ctx1).data()
-            if f not in removed:
+            if s != 'R':
                 tn = getfilectx(f, ctx2).data()
             a, b = f, f
             def gitmode(x, l):
@@ -310,14 +310,13 @@ class ChangeSet(GDialog):
                     header.append('old mode %s\n' % omode)
                     header.append('new mode %s\n' % nmode)
 
-            if f in added:
-                s = 'A'
+            if s == 'A':
                 mode = gitmode(execf2(f), linkf2(f))
                 if f in copied:
                     a = copied[f]
                     omode = gitmode(man1.execf(a), man1.linkf(a))
                     addmodehdr(header, omode, mode)
-                    if a in removed and a not in gone:
+                    if filestatus(a) == 'R' and a not in gone:
                         op = 'rename'
                         gone[a] = 1
                     else:
@@ -329,28 +328,27 @@ class ChangeSet(GDialog):
                     header.append('new file mode %s\n' % mode)
                 if util.binary(tn):
                     dodiff = 'binary'
-            elif f in removed:
-                s = 'R'
+            elif s == 'R':
                 if f in srcs:
                     dodiff = False
                 else:
                     mode = gitmode(man1.execf(f), man1.linkf(f))
                     header.append('deleted file mode %s\n' % mode)
             else:
-                s = 'M'
                 omode = gitmode(man1.execf(f), man1.linkf(f))
                 nmode = gitmode(execf2(f), linkf2(f))
                 addmodehdr(header, omode, nmode)
                 if util.binary(to) or util.binary(tn):
                     dodiff = 'binary'
-            r = None
             header.insert(0, 'diff --git a/%s b/%s\n' % (a, b))
             if dodiff == 'binary':
                 text = 'binary file has changed.\n'
-            else:
+            elif dodiff:
                 text = patch.mdiff.unidiff(to, date1,
                                     tn, util.datestr(ctx2.date()),
-                                    a, b, r, opts=patch.mdiff.defaultopts)
+                                    a, b, None, opts=patch.mdiff.defaultopts)
+            else:
+                text = ''
             if header or text: yield (s, f, ''.join(header) + text)
 
     def prepare_diff(self, difflines, offset):
@@ -369,7 +367,7 @@ class ChangeSet(GDialog):
         statmax = 0
         for i,l in enumerate(difflines):
             if l.startswith("diff"):
-                f = l.split()[-1]
+                f = l.split()[-1][2:]
                 txt = DIFFHDR % f
                 addtag( "greybg", offset, len(txt) )
                 outlines.append(txt)
