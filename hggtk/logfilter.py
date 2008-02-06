@@ -153,6 +153,7 @@ class FilterDialog(gtk.Dialog):
         self.searchradio.set_active(True)
         self.branchradio.set_active(True)
         self.revradio.set_active(True)
+        self.rev0Entry.grab_focus()
 
         # show them all
         self.show_all()
