@@ -20,6 +20,8 @@ New features in 0.4
 
 Bug Fixes in 0.4:
   * [ 1884919 ] Change Log hscroller
+  * TortoiseHg program groups now read 'hgproc' with hg.ico.
+    In earlier versions, it used 'Python' with python.ico
 
 New features in 0.3
 
