@@ -1,7 +1,7 @@
 #_
 # Configuration dialog for TortoiseHg and Mercurial
 #
-# Copyright (C) 2007 Steve Borho <steve@borho.org>
+# Copyright (C) 2008 Steve Borho <steve@borho.org>
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
@@ -9,7 +9,7 @@ import gtk
 import gobject
 import os
 import pango
-from mercurial import hg, ui, cmdutil, util
+from mercurial import hg, ui, cmdutil, util, filemerge
 from dialog import error_dialog, question_dialog
 import shlib
 import shelve
@@ -262,13 +262,10 @@ class ConfigDialog(gtk.Dialog):
         self.fill_frame(self.email_frame, self._email_info)
 
         self._hgmerge_info = (
-                ('Default 3-way Merge Tool', 'hgmerge.interactive',
-                    ['gpyfm', 'kdiff3', 'tortoisemerge', 'p4merge',
-                        'meld', 'tkdiff', 'filemerge', 'ecmerge',
-                        'xxdiff', 'guiffy', 'diffmerge'],
+                ('Default 3-way Merge Tool', 'ui.merge', [],
 'Textual merge program for resolving merge conflicts.  If left'
-' unspecified, the hgmerge wrapper will use the first applicable'
-' tool it finds on your system'),)
+' unspecified, the Mercurial will use the first applicable'
+' tool it finds on your system or default to its internal algorithm.'),)
         self.hgmerge_frame = self.add_page(notebook, 'Merge')
         self.fill_frame(self.hgmerge_frame, self._hgmerge_info)
         # TODO add ability to specify file extension based merge tools
@@ -415,6 +412,17 @@ class ConfigDialog(gtk.Dialog):
                 for name, value in self.ui.configitems('extdiff'):
                     if name.startswith('cmd.'):
                         values.append(name[4:])
+            elif cpath == 'ui.merge':
+                # Special case, add [merge-tools] to possible values
+                tools = []
+                for key, value in self.ui.configitems('merge-tools'):
+                    t = key.split('.')[0]
+                    if t not in tools:
+                        tools.append(t)
+                for t in tools:
+                    # Ensure the tool is installed
+                    if filemerge._findtool(self.ui, t):
+                        values.append(t)
 
             currow = None
             vlist.append([_unspecstr, False])
