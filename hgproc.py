@@ -7,7 +7,7 @@
 import os
 import sys
 from mercurial import ui
-from tortoise.thgutil import find_path, get_prog_root, shellquote
+from tortoise.thgutil import get_prog_root
 
 # always use hg exe installed with TortoiseHg
 thgdir = get_prog_root()
@@ -96,16 +96,6 @@ def parse(args):
     cmdline.extend(args)
     cmdline.extend(option['files'])
     option['cmdline'] = cmdline
-
-    # Failsafe choice for merge tool
-    if os.environ.get('HGMERGE', None):
-        pass
-    elif ui.ui().config('ui', 'merge', None):
-        pass
-    else:
-        path = find_path('simplemerge') or 'simplemerge'
-        os.environ['HGMERGE'] = '%s -L my -L other' % shellquote(path)
-        print "override HGMERGE =", os.environ['HGMERGE']
 
     global _dialogs
     dialog = _dialogs.get(option['hgcmd'], hgcmd)

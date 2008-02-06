@@ -1,14 +1,9 @@
 # setup.py
 # A distutils setup script to register TortoiseHg COM server
-#
 
 # To build stand-alone package, use 'python setup.py py2exe' then use
 # InnoSetup to build the installer.  By default, the installer will be
 # created as dist\Output\setup.exe.
-
-# To build a source installer for use with the Mercurial NSI
-# installer, use 
-# 'python setup.py bdist_wininst --install-script=thg_postinstall.py'
 
 import time
 import sys
@@ -53,23 +48,7 @@ if 'py2exe' in sys.argv:
                         "icon_resources": [(1, "icons/tortoise/python.ico")]}
             ]
     extra['com_server'] = ["tortoisehg"]
-    extra['console'] = ["contrib/hg", "hgutils/simplemerge"]
-
-elif 'bdist_msi' in sys.argv or 'bdist_wininst' in sys.argv:
-    # C:\Python25\share\tortoisehg\icons\...
-    _data_files = [(os.path.join('share/tortoisehg', root),
-                [os.path.join(root, file_) for file_ in files])
-                for root, dirs, files in os.walk('icons')]
-
-    # C:\Python25\share\tortoisehg\*.bat, *.py
-    _data_files.append(('share/tortoisehg',
-        ['hgproc.py', 'hgproc.bat', 'tortoisehg.py']))
-
-    # C:\Python25\mercurial\hgrc.d\tortoisehg.rc
-    _data_files.append(('mercurial/hgrc.d', ['installer/tortoisehg.rc']))
-
-    # C:\Python25\Scripts\tracelog.bat, thg_postinstall.py
-    extra['scripts'] = ['installer/tracelog.bat', 'installer/thg_postinstall.py']
+    extra['console'] = ["contrib/hg"]
 
 opts = {
    "py2exe" : {
@@ -99,7 +78,7 @@ setup(name="TortoiseHg",
         url='http://tortoisehg.sourceforge.net',
         description='Windows shell extension for Mercurial VCS',
         license='GNU GPL2',
-        packages=['tortoise', 'hggtk'],
+        packages=['tortoise', 'hggtk', 'hggtk.vis', 'hggtk.iniparse'],
         data_files = _data_files,
         options=opts,
         **extra
