@@ -354,11 +354,10 @@ class ContextMenuExtension:
                            _("Search revisions of files for a text pattern"),
                            self._grep, icon="menurepobrowse.ico"))
                            
-            has_view = ui.ui().config('tortoisehg', 'view', '') != ''
-            result.append(TortoiseMenu(_("Revision Graph"),
-                           _("View history with DAG graph"),
-                           self._view, icon="menurevisiongraph.ico",
-                           state=has_view))
+            if repo.ui.config('tortoisehg', 'view'):
+                result.append(TortoiseMenu(_("Revision Graph"),
+                               _("View history with DAG graph"),
+                               self._view, icon="menurevisiongraph.ico")
 
             result.append(TortoiseMenuSep())
 
