@@ -73,9 +73,6 @@ class ConfigDialog(gtk.Dialog):
                 ('Commit Tool', 'tortoisehg.commit', ['qct', 'internal'],
                     'Select commit tool launched by TortoiseHg. Qct is'
                     ' not included, must be installed separately'),
-                ('Revision Graph Viewer', 'tortoisehg.view', ['hgk', 'hgview'],
-                    'Select revision graph (DAG) viewer launched by'
-                    ' TortoiseHg'),
                 ('Visual Diff Tool', 'tortoisehg.vdiff', [],
                     'Specify the visual diff tool; must be extdiff command'),
                 ('Visual Editor', 'tortoisehg.editor', [],
