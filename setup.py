@@ -46,10 +46,14 @@ if 'py2exe' in sys.argv:
                   for f in os.listdir(hgextdir)])
     _data_files = [(root, [os.path.join(root, file_) for file_ in files])
                         for root, dirs, files in os.walk('icons')]
-    extra['windows'] = [{"script":"hggtk/tracelog.py",
-                        "icon_resources": [(1, "icons/tortoise/python.ico")]}]
+    extra['windows'] = [
+            {"script":"hgproc.py",
+                        "icon_resources": [(1, "icons/tortoise/hg.ico")]},
+            {"script":"hggtk/tracelog.py",
+                        "icon_resources": [(1, "icons/tortoise/python.ico")]}
+            ]
     extra['com_server'] = ["tortoisehg"]
-    extra['console'] = ["contrib/hg", "hgproc.py", "hgutils/simplemerge"]
+    extra['console'] = ["contrib/hg", "hgutils/simplemerge"]
 
 elif 'bdist_msi' in sys.argv or 'bdist_wininst' in sys.argv:
     # C:\Python25\share\tortoisehg\icons\...
