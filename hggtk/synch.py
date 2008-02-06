@@ -232,7 +232,7 @@ class SynchDialog(gtk.Window):
         if len(pl) > 1:
             warning = "Outstanding uncommitted merges"
         elif pa != p1 and pa != p2:
-            warning = "Checkout spans branches"
+            warning = "Update spans branches"
         elif wc.files():
             warning = "Outstanding uncommitted changes"
         if warning:

@@ -327,7 +327,7 @@ class ContextMenuExtension:
                            self._annotate, icon="menublame.ico"))
 
             result.append(TortoiseMenuSep())
-            result.append(TortoiseMenu(_("Checkout Revision"),
+            result.append(TortoiseMenu(_("Update To Revision"),
                            _("update working directory"),
                            self._update, icon="menucheckout.ico"))
 
