@@ -172,9 +172,6 @@ class ChangeSet(GDialog):
         try:
             status, file, txt = iterator.next()
         except StopIteration:
-            # TODO: apply more efficiently
-            sob, eob = buf.get_bounds()
-            buf.apply_tag_by_name("mono", sob, eob)
             return False
 
         lines = unicode(txt, 'latin-1', 'replace').splitlines()
@@ -197,6 +194,8 @@ class ChangeSet(GDialog):
             mark = 'mark_%d' % offset
             buf.create_mark(mark, pos)
             filelist.append((status, file, mark, True, stats))
+        sob, eob = buf.get_bounds()
+        buf.apply_tag_by_name("mono", pos, eob)
         return True
 
     # Hacked up version of mercurial.patch.diff()
