@@ -14,11 +14,10 @@ import pango
 import StringIO
 
 from mercurial.node import *
-from mercurial import ui, hg, commands
+from mercurial import ui, hg, commands, extensions
 from gdialog import *
 from changeset import ChangeSet
 from logfilter import FilterDialog
-from hgcmd import CmdDialog
 from update import UpdateDialog
 from merge import MergeDialog
 from vis import treemodel
@@ -317,6 +316,13 @@ class GLog(GDialog):
         self._cmenu_diff = create_menu('_diff with mark', self._diff_revs)
         _menu.append(self._cmenu_diff)
         _menu.append(create_menu('backout revision', self._backout_rev))
+        try:
+            # Ensure mq extension is loaded
+            extensions.loadall(self.ui)
+            extensions.find('mq')
+            _menu.append(create_menu('strip revision', self._strip_rev))
+        except KeyError:
+            pass
         _menu.show_all()
         return _menu
  
@@ -386,6 +392,21 @@ class GLog(GDialog):
         vbox.pack_start(self.stbar, False, False)
 
         return vbox
+
+    def _strip_rev(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        res = Confirm('Strip Revision(s)', [], self,
+                'Remove revision %d and all descendants?' % rev).run()
+        if res != gtk.RESPONSE_YES:
+            return
+        from hgcmd import CmdDialog
+        cmdline = ['hg', 'strip', str(rev)]
+        dlg = CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.repo.invalidate()
+        self.reload_log()
 
     def _backout_rev(self, menuitem):
         from backout import BackoutDialog
