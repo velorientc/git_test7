@@ -23,6 +23,12 @@ Bug Fixes in 0.4:
   * TortoiseHg program groups now read 'hgproc' with hg.ico.
     In earlier versions, it used 'Python' with python.ico
 
+Fixes in Mercurial since 0.3:
+  * qimport fixed on Windows
+  * new built-in filemerge system replaces hgmerge patches
+  * many fixes for keyword extension
+  * new -U (context lines) argument for diff and qdiff commands
+
 New features in 0.3
 
   * Major improvements to changelog browser.  It is now good enough to
