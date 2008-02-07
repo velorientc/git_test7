@@ -357,7 +357,7 @@ class ContextMenuExtension:
             if repo.ui.config('tortoisehg', 'view'):
                 result.append(TortoiseMenu(_("Revision Graph"),
                                _("View history with DAG graph"),
-                               self._view, icon="menurevisiongraph.ico")
+                               self._view, icon="menurevisiongraph.ico"))
 
             result.append(TortoiseMenuSep())
 
