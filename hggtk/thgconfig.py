@@ -9,7 +9,7 @@ import gtk
 import gobject
 import os
 import pango
-from mercurial import hg, ui, cmdutil, util, filemerge
+from mercurial import hg, ui, cmdutil, util
 from dialog import error_dialog, question_dialog
 import shlib
 import shelve
@@ -414,15 +414,19 @@ class ConfigDialog(gtk.Dialog):
                         values.append(name[4:])
             elif cpath == 'ui.merge':
                 # Special case, add [merge-tools] to possible values
-                tools = []
-                for key, value in self.ui.configitems('merge-tools'):
-                    t = key.split('.')[0]
-                    if t not in tools:
-                        tools.append(t)
-                for t in tools:
-                    # Ensure the tool is installed
-                    if filemerge._findtool(self.ui, t):
-                        values.append(t)
+                try:
+                    from mercurial import filemerge
+                    tools = []
+                    for key, value in self.ui.configitems('merge-tools'):
+                        t = key.split('.')[0]
+                        if t not in tools:
+                            tools.append(t)
+                    for t in tools:
+                        # Ensure the tool is installed
+                        if filemerge._findtool(self.ui, t):
+                            values.append(t)
+                except ImportError:
+                    pass
 
             currow = None
             vlist.append([_unspecstr, False])
