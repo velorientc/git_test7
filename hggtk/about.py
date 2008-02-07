@@ -59,7 +59,7 @@ class AboutDialog(gtk.AboutDialog):
         self.set_version("(version %s)" % tortoise.version.get_version())
         if hasattr(self, 'set_wrap_license'):
             self.set_wrap_license(True)
-        self.set_copyright("Copyright 2007 TK Soh and others")
+        self.set_copyright("Copyright 2008 TK Soh and others")
 
         hg_icon = os.path.normpath(shlib.get_tortoise_icon('hg.ico'))
         prog_root = os.path.dirname(os.path.dirname(os.path.dirname(hg_icon)))
