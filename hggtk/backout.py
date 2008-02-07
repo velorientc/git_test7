@@ -22,6 +22,7 @@ class BackoutDialog(gtk.Window):
         self.root = root
         self.set_title('Backout changeset - ' + rev)
         self.set_default_size(600, 400)
+        self.notify_func = None
         
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
@@ -78,6 +79,10 @@ class BackoutDialog(gtk.Window):
     def _close_clicked(self, toolbutton, data=None):
         self.destroy()
 
+    def set_notify_func(self, func, *args):
+        self.notify_func = func
+        self.notify_args = args
+
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
         rev = histselect.select(self.root)
@@ -102,6 +107,8 @@ class BackoutDialog(gtk.Window):
         dlg.show_all()
         dlg.run()
         dlg.hide()
+        if self.notify_func:
+            self.notify_func(self.notify_args)
 
 def run(root='', **opts):
     # This dialog is intended to be launched by the changelog browser

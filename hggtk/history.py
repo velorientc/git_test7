@@ -316,6 +316,7 @@ class GLog(GDialog):
         _menu.append(create_menu('mark rev for diff', self._mark_rev))
         self._cmenu_diff = create_menu('_diff with mark', self._diff_revs)
         _menu.append(self._cmenu_diff)
+        _menu.append(create_menu('backout revision', self._backout_rev))
         _menu.show_all()
         return _menu
  
@@ -385,6 +386,18 @@ class GLog(GDialog):
         vbox.pack_start(self.stbar, False, False)
 
         return vbox
+
+    def _backout_rev(self, menuitem):
+        from backout import BackoutDialog
+        rev = self.currow[treemodel.REVID]
+        rev = short(self.repo.changelog.node(rev))
+        parents = [x.node() for x in self.repo.workingctx().parents()]
+        dialog = BackoutDialog(self.repo.root, rev)
+        dialog.set_transient_for(self)
+        dialog.show_all()
+        dialog.set_notify_func(self.checkout_completed, parents)
+        dialog.present()
+        dialog.set_transient_for(None)
 
     def _diff_revs(self, menuitem):
         from status import GStatus
