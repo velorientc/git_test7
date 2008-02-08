@@ -196,6 +196,8 @@ class GCommit(GStatus):
             dlg.focus_field('ui.username')
             dlg.run()
             dlg.hide()
+            self.repo = hg.repository(ui.ui(), self.repo.root)
+            self.ui = self.repo.ui
 
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
