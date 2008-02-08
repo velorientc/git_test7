@@ -203,6 +203,8 @@ class GCommit(GStatus):
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
         cmdline  = ["hg", "commit", "--verbose", "--repository", self.repo.root]
+        if self.opts['addremove']:
+            cmdline += ['--addremove']
         cmdline += ['--message', self.opts['message']]
         cmdline += files
         dialog = CmdDialog(cmdline, True)
