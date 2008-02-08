@@ -36,11 +36,12 @@ class DataMineDialog(GDialog):
         pass
 
     def get_tbbuttons(self):
+        self.stop_button = self.make_toolbutton(gtk.STOCK_STOP, 'Stop', 
+                self._stop_search, tip='Stop operation on current tab')
         return [
             self.make_toolbutton(gtk.STOCK_FIND, 'New Search', 
                 self._search_clicked, tip='Open new search tab'),
-            self.make_toolbutton(gtk.STOCK_STOP, 'Stop Search', 
-                self._stop_search, tip='Stop search on current tab')
+            self.stop_button
             ]
 
     def prepare_display(self):
@@ -72,6 +73,7 @@ class DataMineDialog(GDialog):
 
         self.stbar = gtklib.StatusBar()
         vbox.pack_start(self.stbar, False, False, 2)
+        self.stop_button.set_sensitive(False)
         return vbox
 
     def grep_context_menu(self):
@@ -270,6 +272,7 @@ class DataMineDialog(GDialog):
         thread = thread2.Thread(target=hgcmd_toq, args=args)
         thread.start()
         frame._mythread = thread
+        self.stop_button.set_sensitive(True)
 
         model.clear()
         search_hbox.set_sensitive(False)
@@ -303,6 +306,8 @@ class DataMineDialog(GDialog):
         if thread.isAlive():
             return True
         else:
+            if threading.activeCount() == 1:
+                self.stop_button.set_sensitive(False)
             frame._mythread = None
             search_hbox.set_sensitive(True)
             regexp.grab_focus()
@@ -500,6 +505,8 @@ class DataMineDialog(GDialog):
                 '--rev', str(rev), path]
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
+        frame._mythread = thread
+        self.stop_button.set_sensitive(True)
 
         # date of selected revision
         ctx = self.repo.changectx(long(rev))
@@ -524,9 +531,9 @@ class DataMineDialog(GDialog):
         self.notebook.set_tab_label(frame, hbox)
 
         gobject.timeout_add(50, self.annotate_wait, thread, q, model,
-                curdate, colormap)
+                curdate, colormap, frame)
 
-    def annotate_wait(self, thread, q, model, curdate, colormap):
+    def annotate_wait(self, thread, q, model, curdate, colormap, frame):
         """
         Handle all the messages currently in the queue (if any).
         """
@@ -545,6 +552,9 @@ class DataMineDialog(GDialog):
         if thread.isAlive():
             return True
         else:
+            if threading.activeCount() == 1:
+                self.stop_button.set_sensitive(False)
+            frame._mythread = None
             self.stbar.end()
             return False
 
