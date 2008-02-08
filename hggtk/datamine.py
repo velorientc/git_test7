@@ -9,7 +9,7 @@ import os
 import pango
 import Queue
 import re
-import threading
+import threading, thread2
 import time
 from mercurial import hg, ui, util, revlog
 from hglib import hgcmd_toq
@@ -36,8 +36,11 @@ class DataMineDialog(GDialog):
         pass
 
     def get_tbbuttons(self):
-        return [ self.make_toolbutton(gtk.STOCK_FIND, 'New Search', 
-            self._search_clicked, tip='Open new search tab')
+        return [
+            self.make_toolbutton(gtk.STOCK_FIND, 'New Search', 
+                self._search_clicked, tip='Open new search tab'),
+            self.make_toolbutton(gtk.STOCK_STOP, 'Stop Search', 
+                self._stop_search, tip='Stop search on current tab')
             ]
 
     def prepare_display(self):
@@ -264,8 +267,9 @@ class DataMineDialog(GDialog):
         for x in excs:
             if x: args.extend(['-X', x])
         args.append(re)
-        thread = threading.Thread(target=hgcmd_toq, args=args)
+        thread = thread2.Thread(target=hgcmd_toq, args=args)
         thread.start()
+        frame._mythread = thread
 
         model.clear()
         search_hbox.set_sensitive(False)
@@ -282,9 +286,9 @@ class DataMineDialog(GDialog):
         self.notebook.set_tab_label(frame, hbox)
 
         gobject.timeout_add(50, self.grep_wait, thread, q, model,
-                search_hbox, regexp)
+                search_hbox, regexp, frame)
 
-    def grep_wait(self, thread, q, model, search_hbox, regexp):
+    def grep_wait(self, thread, q, model, search_hbox, regexp, frame):
         """
         Handle all the messages currently in the queue (if any).
         """
@@ -299,6 +303,7 @@ class DataMineDialog(GDialog):
         if thread.isAlive():
             return True
         else:
+            frame._mythread = None
             search_hbox.set_sensitive(True)
             regexp.grab_focus()
             self.stbar.end()
@@ -315,6 +320,14 @@ class DataMineDialog(GDialog):
             self.currev = model[iter][self.COL_REVID]
             self.curpath = model[iter][self.COL_PATH]
             self.stbar.set_status_text(model[iter][self.COL_TOOLTIP])
+
+    def _stop_search(self, button, widget):
+        num = self.notebook.get_current_page()
+        frame = self.notebook.get_nth_page(num)
+        if hasattr(frame, '_mythread') and frame._mythread:
+            frame._mythread.terminate()
+            frame._mythread.join()
+            frame._mythread = None
 
     def close_page(self, button, widget):
         '''Close page button has been pressed'''
