@@ -90,6 +90,10 @@ class ConfigDialog(gtk.Dialog):
         self._user_info = (
                 ('Username', 'ui.username', [], 
                     'Name associated with commits'),
+                ('3-way Merge Tool', 'ui.merge', [],
+'Graphical merge program for resolving merge conflicts.  If left'
+' unspecified, the Mercurial will use the first applicable'
+' tool it finds on your system or default to its internal algorithm.'),
                 ('Editor', 'ui.editor', [],
                     'The editor to use during a commit and other'
                     ' instances where Mercurial needs multiline input from'
@@ -261,14 +265,23 @@ class ConfigDialog(gtk.Dialog):
         self.email_frame = self.add_page(notebook, 'Email')
         self.fill_frame(self.email_frame, self._email_info)
 
-        self._hgmerge_info = (
-                ('Default 3-way Merge Tool', 'ui.merge', [],
-'Textual merge program for resolving merge conflicts.  If left'
-' unspecified, the Mercurial will use the first applicable'
-' tool it finds on your system or default to its internal algorithm.'),)
-        self.hgmerge_frame = self.add_page(notebook, 'Merge')
-        self.fill_frame(self.hgmerge_frame, self._hgmerge_info)
-        # TODO add ability to specify file extension based merge tools
+        self._diff_info = (
+                ('Git Format', 'diff.git', ['False', 'True'],
+                    'Use git extended diff format.'),
+                ('No Dates', 'diff.nodates', ['False', 'True'],
+                    'Do no include dates in diff headers.'),
+                ('Show Function', 'diff.showfunc', ['False', 'True'],
+                    'Show which function each change is in.'),
+                ('Ignore White Space', 'diff.ignorews', ['False', 'True'],
+                    'Ignore white space when comparing lines.'),
+                ('Ignore WS Amount', 'diff.ignorewsamount', ['False', 'True'],
+                    'Ignore changes in the amount of white space.'),
+                ('Ignore Blank Lines', 'diff.ignoreblanklines',
+                    ['False', 'True'],
+                    'Ignore changes whose lines are all blank.'),
+                )
+        self.diff_frame = self.add_page(notebook, 'Diff')
+        self.fill_frame(self.diff_frame, self._diff_info)
 
         # Force dialog into clean state in the beginning
         self._btn_apply.set_sensitive(False)
@@ -537,8 +550,6 @@ class ConfigDialog(gtk.Dialog):
             for name in list(self.ini.paths):
                 if name not in ('default', 'default-push'):
                     del self.ini['paths'][name]
-
-        # TODO: Add special code for flushing hgmerge extensions
 
         # Flush changes on all pages
         for vbox, info, widgets in self.pages:
