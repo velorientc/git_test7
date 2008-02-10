@@ -177,7 +177,7 @@ class ChangeSet(GDialog):
         lines = unicode(txt, 'latin-1', 'replace').splitlines()
         eob = buf.get_end_iter()
         offset = eob.get_offset()
-        fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset)
+        fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, file)
         for l in lines:
             buf.insert(eob, l)
 
@@ -189,7 +189,7 @@ class ChangeSet(GDialog):
             buf.apply_tag_by_name(name, i0, i1)
             
         # inserts the marks
-        for f, mark, offset, stats in fileoffs:
+        for mark, offset, stats in fileoffs:
             pos = buf.get_iter_at_offset(offset)
             mark = 'mark_%d' % offset
             buf.create_mark(mark, pos)
@@ -350,7 +350,7 @@ class ChangeSet(GDialog):
                 text = ''
             if header or text: yield (s, f, ''.join(header) + text)
 
-    def prepare_diff(self, difflines, offset):
+    def prepare_diff(self, difflines, offset, fname):
         '''Borrowed from hgview; parses changeset diffs'''
         DIFFHDR = "=== %s ===\n"
         idx = 0
@@ -366,15 +366,14 @@ class ChangeSet(GDialog):
         statmax = 0
         for i,l in enumerate(difflines):
             if l.startswith("diff"):
-                f = l.split()[-1][2:]
-                txt = DIFFHDR % f
+                txt = DIFFHDR % fname
                 addtag( "greybg", offset, len(txt) )
                 outlines.append(txt)
                 markname = "file%d" % idx
                 idx += 1
                 statmax = max( statmax, stats[0]+stats[1] )
                 stats = [0,0]
-                filespos.append(( f, markname, offset, stats ))
+                filespos.append(( markname, offset, stats ))
                 offset += len(txt)
                 continue
             elif l.startswith("+++"):
