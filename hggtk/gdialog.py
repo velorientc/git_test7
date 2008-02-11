@@ -485,6 +485,7 @@ class GDialog(gtk.Window):
             self._parse_config()
             return
             
+        file = util.localpath(file)
         thread = threading.Thread(target=doedit, name='edit:'+file)
         thread.setDaemon(True)
         thread.start()

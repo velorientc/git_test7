@@ -595,7 +595,8 @@ class ChangeSet(GDialog):
         return True
 
     def _save_file_rev(self, menuitem):
-        file, ext = os.path.splitext(os.path.basename(self.curfile))
+        file = util.localpath(self.curfile)
+        file, ext = os.path.splitext(os.path.basename(file))
         filename = "%s@%d%s" % (file, self.currev, ext)
         fd = NativeSaveFileDialogWrapper(Title = "Save file to",
                                          InitialDir=self.cwd,
