@@ -343,9 +343,16 @@ class ChangeSet(GDialog):
             if dodiff == 'binary':
                 text = 'binary file has changed.\n'
             elif dodiff:
-                text = patch.mdiff.unidiff(to, date1,
+                try:
+                    text = patch.mdiff.unidiff(to, date1,
                                     tn, util.datestr(ctx2.date()),
-                                    a, b, None, opts=patch.mdiff.defaultopts)
+                                    fn1=a, fn2=b, r=None,
+                                    opts=patch.mdiff.defaultopts)
+                except TypeError:
+                    # hg-0.9.5 and before
+                    text = patch.mdiff.unidiff(to, date1,
+                                    tn, util.datestr(ctx2.date()),
+                                    f, None, opts=patch.mdiff.defaultopts)
             else:
                 text = ''
             if header or text: yield (s, f, ''.join(header) + text)
