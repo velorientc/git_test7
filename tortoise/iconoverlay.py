@@ -254,7 +254,7 @@ def make_icon_overlay(name, icon, state, clsid):
     """
     classname = "%sOverlay" % name
     prog_id = "Mercurial.ShellExtension.%s" % classname
-    desc = "Merucurial icon overlay shell extension for %s files" % name.lower()
+    desc = "Mercurial icon overlay shell extension for %s files" % name.lower()
     reg = [
         (_winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Explorer\ShellIconOverlayIdentifiers\%s" % name) ]
     cls = type(
