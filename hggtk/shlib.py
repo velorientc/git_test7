@@ -71,7 +71,7 @@ if os.name == 'nt':
             if pidl is None:
                 continue
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
-                                 shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSHNOWAIT,
+                                 shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSH,
                                  pidl,
                                  None)
 else:
