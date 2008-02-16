@@ -107,8 +107,8 @@ if __name__=='__main__':
     if option.has_key('--time'):
         timeit()
         
-    if option.has_key('--lsprod'):
-        lsprof(get_states)  # fixme: lsprof traceback on win32 (only?)
+    if option.has_key('--lsprof'):
+        lsprof(get_states)
     elif option.has_key('--profile'):
         profile(get_states)
     else:
