@@ -18,7 +18,7 @@ import Queue
 import os
 import threading
 from mercurial import hg, ui, util 
-from dialog import error_dialog, warning_dialog
+from dialog import error_dialog, question_dialog
 from hglib import HgThread
 from shlib import set_tortoise_icon
 import gtklib
@@ -239,7 +239,7 @@ class SynchDialog(gtk.Window):
             flags = ['--clean']
             msg = 'Lose all changes in your working directory?'
             warning += ', requires clean checkout'
-            if warning_dialog(msg, warning) != gtk.RESPONSE_OK:
+            if question_dialog(msg, warning) != gtk.RESPONSE_YES:
                 return
         self.write("", False)
 
