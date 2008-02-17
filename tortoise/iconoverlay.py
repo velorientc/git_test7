@@ -86,6 +86,7 @@ class IconOverlayExtension(object):
     _public_methods_ = [
         "GetOverlayInfo", "GetPriority", "IsMemberOf"
         ]
+    _reg_threading_ = 'Apartment'
 
     def GetOverlayInfo(self): 
         icon = thgutil.get_icon_path("status", self.icon)
