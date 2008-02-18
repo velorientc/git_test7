@@ -92,8 +92,9 @@ class ConfigDialog(gtk.Dialog):
                     'Name associated with commits'),
                 ('3-way Merge Tool', 'ui.merge', [],
 'Graphical merge program for resolving merge conflicts.  If left'
-' unspecified, the Mercurial will use the first applicable'
-' tool it finds on your system or default to its internal algorithm.'),
+' unspecified, Mercurial will use the first applicable tool it finds'
+' on your system or use its internal merge tool that leaves conflict'
+' markers in place.'),
                 ('Editor', 'ui.editor', [],
                     'The editor to use during a commit and other'
                     ' instances where Mercurial needs multiline input from'
