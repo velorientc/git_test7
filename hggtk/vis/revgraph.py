@@ -44,7 +44,14 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None):
                     continue
             # New head.
             revs.append(curr_rev)
-            rev_color[curr_rev] = nextcolor ; nextcolor += 1
+            rev_color[curr_rev] = curcolor = nextcolor ; nextcolor += 1
+            r = __get_parents(repo, curr_rev)
+            while r:
+                r0 = r[0]
+                if r0 < stop_rev: break
+                if r0 in rev_color: break
+                rev_color[r0] = curcolor
+                r = __get_parents(repo, r0)
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
@@ -52,14 +59,15 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None):
         # Add parents to next_revs.
         parents = __get_parents(repo, curr_rev)
         parents_to_add = []
+        preferred_color = curcolor
         for parent in parents:
             if parent not in next_revs:
                 parents_to_add.append(parent)
-                if len(parents) > 1:
-                    rev_color[parent] = nextcolor ; nextcolor += 1
-                else:
-                    rev_color[parent] = curcolor
-        parents_to_add.sort()
+                if parent not in rev_color:
+                    if preferred_color:
+                        rev_color[parent] = preferred_color; preferred_color = None
+                    else:
+                        rev_color[parent] = nextcolor ; nextcolor += 1
         next_revs[rev_index:rev_index + 1] = parents_to_add
 
         lines = []
