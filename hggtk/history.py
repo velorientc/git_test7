@@ -29,14 +29,7 @@ class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
     """
     def get_title(self):
-        title = os.path.basename(self.repo.root) + ' log ' 
-        if 'rev' in self.opts and self.opts['rev']:
-            title += '--rev ' + ':'.join(self.opts['rev'])
-        if not self.pats or self.pats == ['']:
-            return title
-        if len(self.pats) > 1 or not os.path.isdir(self.pats[0]):
-            title += '{search} ' + ' '.join(self.pats)
-        return title
+        return os.path.basename(self.repo.root) + ' log' 
 
     def get_icon(self):
         return 'menulog.ico'
@@ -188,24 +181,29 @@ class GLog(GDialog):
 
     def open_with_file(self, file):
         '''Call this before display() to open with file history'''
-        self.curfile = file
+        self.opts['filehist'] = file
 
     def prepare_display(self):
         '''Called at end of display() method'''
         self._last_rev = None
         self._filter = "all"
         self.currow = None
-        if self.pats == [self.repo.root] or self.pats == ['']:
-            self.pats = []
-        if 'revrange' in self.opts:
+        self.curfile = None
+
+        if 'filehist' in self.opts:
             self.custombutton.set_active(True)
             self.graphview.refresh(True, None, self.opts)
-        elif hasattr(self, 'curfile'):
-            opts = {'filehist' : self.curfile}
+            del self.opts['filehist']
+        elif 'revrange' in self.opts:
             self.custombutton.set_active(True)
-            self.graphview.refresh(True, None, opts)
+            self.graphview.refresh(True, None, self.opts)
+        elif self.pats == [self.repo.root] or self.pats == ['']:
+            self.pats = []
+            self.reload_log()
+        elif self.pats:
+            self.custombutton.set_active(True)
+            self.graphview.refresh(False, self.pats, self.opts)
         else:
-            self.curfile = None
             self.reload_log()
 
     def save_settings(self):
@@ -271,12 +269,7 @@ class GLog(GDialog):
                 filter = filteropts.get('pats', [])
                 self.graphview.refresh(False, filter, self.opts)
         elif self._filter == "all":
-            if not self.pats:
-                self.graphview.refresh(True, None, self.opts)
-            elif len(self.pats) > 1 or not os.path.isdir(self.pats[0]):
-                self.graphview.refresh(False, self.pats, self.opts)
-            else:
-                self.graphview.refresh(True, None, self.opts)
+            self.graphview.refresh(True, None, self.opts)
         elif self._filter == "only_merges":
             self.opts['only_merges'] = True
             self.graphview.refresh(False, [], self.opts)
