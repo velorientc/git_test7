@@ -189,6 +189,8 @@ class GLog(GDialog):
         self._filter = "all"
         self.currow = None
         self.curfile = None
+        self.opts['rev'] = [] # This option is dangerous - used directly by hg
+        self.opts['revs'] = None
 
         if 'filehist' in self.opts:
             self.custombutton.set_active(True)
@@ -253,7 +255,6 @@ class GLog(GDialog):
         os.chdir(self.repo.root)  # paths relative to repo root do not work otherwise
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
-        self.opts['rev'] = [] # This option is dangerous - used directly by hg
         self.opts['revs'] = None
         self.opts['no_merges'] = False
         self.opts['only_merges'] = False
