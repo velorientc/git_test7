@@ -37,6 +37,15 @@ overlay_cache = {}
 S_OK = 0
 S_FALSE = 1
 
+# overlay icons display setting
+show_overlay_icons = False
+
+def get_show_icons():
+    global show_overlay_icons
+    val = ui.ui().config('tortoisehg', 'overlayicons', "enabled")
+    show_overlay_icons = val == 'enabled'
+    print "show_icons = ", show_overlay_icons
+
 def subdirs(p):
     oldp = ""
     if os.path.isdir(p):    
@@ -88,6 +97,9 @@ class IconOverlayExtension(object):
         ]
 
     def GetOverlayInfo(self): 
+        # retrieve overlay icons display settting
+        get_show_icons()
+        
         icon = thgutil.get_icon_path("status", self.icon)
         print "icon = ", icon
 
@@ -240,6 +252,11 @@ class IconOverlayExtension(object):
         return status
 
     def IsMemberOf(self, path, attrib):
+        global show_overlay_icons
+        
+        if not show_overlay_icons:
+            return S_FALSE
+            
         if self._get_state(path) == self.state:
             return S_OK
         return S_FALSE
