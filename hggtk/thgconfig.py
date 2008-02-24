@@ -83,7 +83,10 @@ class ConfigDialog(gtk.Dialog):
                     ' non-trivial parents, black for normal. Default: False'),
                 ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
                     'The number of revisions to read and display in the'
-                    ' changelog viewer in a single batch. Default: 500'))
+                    ' changelog viewer in a single batch. Default: 500'),
+                ('Overlay Icons', 'tortoisehg.overlayicons', ['enabled', 'disabled'],
+                    'Disable/enable overlay icons in Explorer windows'
+                    ' (needs logout/login to take effect!)'))
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
         self.fill_frame(self.tortoise_frame, self._tortoise_info)
 
