@@ -42,9 +42,9 @@ show_overlay_icons = False
 
 def get_show_icons():
     global show_overlay_icons
-    val = ui.ui().config('tortoisehg', 'overlayicons', "enabled")
-    show_overlay_icons = val == 'enabled'
-    print "show_icons = ", show_overlay_icons
+    overlayicons = ui.ui().config('tortoisehg', 'overlayicons', '')
+    print "tortoisehg.overlayicons = ", overlayicons
+    show_overlay_icons = overlayicons != 'disabled'
 
 def subdirs(p):
     oldp = ""
