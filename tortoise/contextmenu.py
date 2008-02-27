@@ -18,7 +18,7 @@ import _winreg
 from mercurial import hg
 from mercurial import repo as _repo
 from thgutil import *
-import iconoverlay
+import thgconfig
 
 # FIXME: quick workaround traceback caused by missing "closed" 
 # attribute in win32trace.
@@ -431,14 +431,12 @@ class ContextMenuExtension:
         self._run_dialog('config')
 
     def _config_update_shell(self, parent_window):
-        # update overlay icons display setting
-        iconoverlay.get_show_icons()
-        show_overlay = iconoverlay.show_overlay_icons and 'enabled' or 'disabled'
-        
+        thgconfig.read()
+        show_overlay = thgconfig.show_overlay_icons and 'enabled' or 'disabled'
         # feedback
         title = "TortoiseHg Shell Settings"
         msg = "Shell settings updated:\n\n"
-        msg += "Overlay icons is " + show_overlay
+        msg += "Overlay icons are " + show_overlay
         win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONINFORMATION)
 
     def _vdiff(self, parent_window):

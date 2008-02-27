@@ -10,6 +10,7 @@ import _winreg
 from mercurial import hg, cmdutil, util
 from mercurial import repo as _repo
 import thgutil
+import thgconfig
 import sys
 
 # FIXME: quick workaround traceback caused by missing "closed" 
@@ -36,15 +37,6 @@ overlay_cache = {}
 # some misc constants
 S_OK = 0
 S_FALSE = 1
-
-# overlay icons display setting
-show_overlay_icons = False
-
-def get_show_icons():
-    global show_overlay_icons
-    overlayicons = ui.ui().config('tortoisehg', 'overlayicons', '')
-    print "tortoisehg.overlayicons = ", overlayicons
-    show_overlay_icons = overlayicons != 'disabled'
 
 def subdirs(p):
     oldp = ""
@@ -97,8 +89,7 @@ class IconOverlayExtension(object):
         ]
 
     def GetOverlayInfo(self): 
-        # retrieve overlay icons display settting
-        get_show_icons()
+        thgconfig.read()
         
         icon = thgutil.get_icon_path("status", self.icon)
         print "icon = ", icon
@@ -251,10 +242,8 @@ class IconOverlayExtension(object):
         print "%s: %s" % (path, status)
         return status
 
-    def IsMemberOf(self, path, attrib):
-        global show_overlay_icons
-        
-        if not show_overlay_icons:
+    def IsMemberOf(self, path, attrib):      
+        if not thgconfig.show_overlay_icons:
             return S_FALSE
             
         if self._get_state(path) == self.state:
