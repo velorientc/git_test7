@@ -191,6 +191,7 @@ class GLog(GDialog):
         self.curfile = None
         self.opts['rev'] = [] # This option is dangerous - used directly by hg
         self.opts['revs'] = None
+        self.restore_cwd()  # paths relative to repo root do not work otherwise
 
         if 'filehist' in self.opts:
             self.custombutton.set_active(True)
