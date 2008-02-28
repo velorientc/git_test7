@@ -86,7 +86,7 @@ class CmdDialog(gtk.Dialog):
         return True
 
     def _response(self, widget, response_id):
-        if threading.activeCount() > 1:
+        if self.hgthread.isAlive():
             widget.emit_stop_by_name('response')
     
     def _on_window_map_event(self, event, param):
@@ -117,7 +117,7 @@ class CmdDialog(gtk.Dialog):
             except Queue.Empty:
                 pass
         self.update_progress()
-        if threading.activeCount() == 1:
+        if not self.hgthread.isAlive():
             self._button_ok.set_sensitive(True)
             self.returncode = self.hgthread.return_code()
             return False # Stop polling this function
@@ -128,7 +128,7 @@ class CmdDialog(gtk.Dialog):
         if not self.pbar:
             return          # progress bar not enabled
             
-        if threading.activeCount() == 1:
+        if not self.hgthread.isAlive():
             self.pbar.unmap()
         else:
             # pulse the progress bar every ~100ms
