@@ -206,7 +206,7 @@ class GCommit(GStatus):
         if self.opts['addremove']:
             cmdline += ['--addremove']
         cmdline += ['--message', self.opts['message']]
-        cmdline += files
+        cmdline += [self.repo.wjoin(x) for x in files]
         dialog = CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
         dialog.run()

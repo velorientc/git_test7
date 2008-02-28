@@ -350,18 +350,10 @@ class GDialog(gtk.Window):
             self.load_settings(settings)
 
 
-    def restore_cwd(self):
-        # extdiff works on relative directories to avoid showing temp paths. Since another thread
-        # could be running that changed cwd, we always need to set it back. This is a race condition
-        # but not likely to be a problem.
-        os.chdir(self.repo.root)
-
-
     def _hg_call_wrapper(self, title, command, showoutput=True):
         """Run the specified command and display any resulting aborts, messages, 
         and errors 
         """
-        self.restore_cwd()
         textout = ''
         saved = sys.stderr
         errors = StringIO.StringIO()
@@ -388,9 +380,8 @@ class GDialog(gtk.Window):
 
     def _diff_file(self, stat, file):
         def dodiff():
-            self.restore_cwd()
             extdiff.dodiff(self.ui, self.repo, self.diffcmd, [self.diffopts],
-                            [file], self.opts)
+                            [self.repo.wjoin(file)], self.opts)
 
         if self.diffcmd == 'diff':
             Prompt('No visual diff configured',

@@ -306,7 +306,6 @@ class GStatus(GDialog):
         """Clear out the existing ListStore model and reload it from the repository status. 
         Also recheck and reselect files that remain in the list.
         """
-        self.restore_cwd()
         self.repo.dirstate.invalidate()
         self.repo.invalidate()
 
@@ -439,6 +438,7 @@ class GStatus(GDialog):
 
 
     def _hg_remove(self, files):
+        wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
             Prompt('Nothing Removed', 'Remove is not enabled when multiple revisions are specified.', self).run()
             return
@@ -446,7 +446,7 @@ class GStatus(GDialog):
         # Create new opts, so nothing unintented gets through
         removeopts = self.merge_opts(commands.table['^remove|rm'][1], ('include', 'exclude'))
         def dohgremove():
-            commands.remove(self.ui, self.repo, *files, **removeopts)
+            commands.remove(self.ui, self.repo, *wfiles, **removeopts)
         success, outtext = self._hg_call_wrapper('Remove', dohgremove)
         if success:
             self.reload_status()
@@ -455,11 +455,11 @@ class GStatus(GDialog):
     def _tree_selection_changed(self, selection, force):
         ''' Update the diff text '''
         def dohgdiff():
-            self.restore_cwd()
             difftext = StringIO.StringIO()
             try:
                 if len(files) != 0:
-                    fns, matchfn, anypats = cmdutil.matchpats(self.repo, files, self.opts)
+                    wfiles = [self.repo.wjoin(x) for x in files]
+                    fns, matchfn, anypats = cmdutil.matchpats(self.repo, wfiles, self.opts)
                     patch.diff(self.repo, self._node1, self._node2, fns, match=matchfn,
                                fp=difftext, opts=patch.diffopts(self.ui, self.opts))
 
@@ -563,6 +563,7 @@ class GStatus(GDialog):
 
 
     def _hg_revert(self, files):
+        wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
             Prompt('Nothing Reverted', 'Revert is not enabled when multiple revisions are specified.', self).run()
             return
@@ -572,7 +573,7 @@ class GStatus(GDialog):
         key = '^revert' in commands.table and '^revert' or 'revert'
         revertopts = self.merge_opts(commands.table[key][1], ('include', 'exclude', 'rev'))
         def dohgrevert():
-            commands.revert(self.ui, self.repo, *files, **revertopts)
+            commands.revert(self.ui, self.repo, *wfiles, **revertopts)
 
         # TODO: Ask which revision when multiple parents (currently just shows abort message)
         # TODO: Don't need to prompt when reverting added or removed files
@@ -585,7 +586,7 @@ class GStatus(GDialog):
         if dialog.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
-                shell_notify(files)
+                shell_notify(wfiles)
                 self.reload_status()
 
     def _add_clicked(self, toolbutton, data=None):
@@ -603,13 +604,14 @@ class GStatus(GDialog):
 
 
     def _hg_add(self, files):
+        wfiles = [self.repo.wjoin(x) for x in files]
         # Create new opts, so nothing unintented gets through
         addopts = self.merge_opts(commands.table['^add'][1], ('include', 'exclude'))
         def dohgadd():
-            commands.add(self.ui, self.repo, *files, **addopts)
+            commands.add(self.ui, self.repo, *wfiles, **addopts)
         success, outtext = self._hg_call_wrapper('Add', dohgadd)
         if success:
-            shell_notify(files)
+            shell_notify(wfiles)
             self.reload_status()
 
 
