@@ -10,7 +10,7 @@ import _winreg
 from mercurial import hg, cmdutil, util
 from mercurial import repo as _repo
 import thgutil
-import thgconfig
+import shellconf
 import sys
 
 # FIXME: quick workaround traceback caused by missing "closed" 
@@ -89,7 +89,7 @@ class IconOverlayExtension(object):
         ]
 
     def GetOverlayInfo(self): 
-        thgconfig.read()
+        shellconf.read()
         
         icon = thgutil.get_icon_path("status", self.icon)
         print "icon = ", icon
@@ -243,7 +243,7 @@ class IconOverlayExtension(object):
         return status
 
     def IsMemberOf(self, path, attrib):      
-        if not thgconfig.show_overlay_icons:
+        if not shellconf.show_overlay_icons:
             return S_FALSE
             
         if self._get_state(path) == self.state:

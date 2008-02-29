@@ -18,7 +18,7 @@ import _winreg
 from mercurial import hg
 from mercurial import repo as _repo
 from thgutil import *
-import thgconfig
+import shellconf
 
 # FIXME: quick workaround traceback caused by missing "closed" 
 # attribute in win32trace.
@@ -431,8 +431,8 @@ class ContextMenuExtension:
         self._run_dialog('config')
 
     def _config_update_shell(self, parent_window):
-        thgconfig.read()
-        show_overlay = thgconfig.show_overlay_icons and 'enabled' or 'disabled'
+        shellconf.read()
+        show_overlay = shellconf.show_overlay_icons and 'enabled' or 'disabled'
         # feedback
         title = "TortoiseHg Shell Settings"
         msg = "Shell settings updated:\n\n"
