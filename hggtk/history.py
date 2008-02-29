@@ -252,7 +252,7 @@ class GLog(GDialog):
 
     def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""
-        self.restore_cwd()  # paths relative to repo root do not work otherwise
+        os.chdir(self.repo.root)  # paths relative to repo root do not work otherwise
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
         self.opts['rev'] = [] # This option is dangerous - used directly by hg
