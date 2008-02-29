@@ -382,20 +382,21 @@ class ContextMenuExtension:
                                _("create a new repository in this directory"),
                                self._init, icon="menucreaterepos.ico"))
 
-            result.append(TortoiseMenuSep())
-            
-            optmenu = TortoiseSubmenu(_("Settings"),icon="menusettings.ico")
-            optmenu.add_menu(_("Global"),
-                             _("Configure user wide settings"),
-                             self._config_user)
+        # config setttings menu
+        result.append(TortoiseMenuSep())
+        optmenu = TortoiseSubmenu(_("Settings"),icon="menusettings.ico")
+        optmenu.add_menu(_("Global"),
+                         _("Configure user wide settings"),
+                         self._config_user)
+        if repo:
             optmenu.add_menu(_("Repository"),
                              _("Configure settings local to this repository"),
                              self._config_repo)
-            optmenu.add_sep()
-            optmenu.add_menu(_("Update Shell Settings"),
-                             _("Update TortoiseHg shell extension settings"),
-                             self._config_update_shell)
-            result.append(optmenu)
+        optmenu.add_sep()
+        optmenu.add_menu(_("Update Shell Settings"),
+                         _("Update TortoiseHg shell extension settings"),
+                         self._config_update_shell)
+        result.append(optmenu)
 
         return result
 
