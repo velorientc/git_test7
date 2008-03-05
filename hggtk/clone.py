@@ -193,6 +193,17 @@ class CloneDialog(gtk.Window):
         if rev is not None:
             self._rev_input.set_text(rev)
             
+    def _add_src_to_recent(self, src):
+        srclist = [x[0] for x in self._srclist]
+        if src in srclist:
+            return
+        
+        srclist.append(src)
+        srclist.sort()
+        self._srclist.clear()
+        for p in srclist:
+            self._srclist.append([p])
+            
     def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
         src = self._src_input.get_text()
@@ -239,6 +250,8 @@ class CloneDialog(gtk.Window):
             import traceback
             error_dialog("Clone error", traceback.format_exc())
             return False
+
+        self._add_src_to_recent(src)
 
 def run(cwd='', files=[], **opts):
     dialog = CloneDialog(cwd, repos=files)
