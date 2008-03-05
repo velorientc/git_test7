@@ -17,7 +17,7 @@ from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
-from shlib import set_tortoise_icon
+import shlib
 
 class CloneDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
@@ -25,7 +25,7 @@ class CloneDialog(gtk.Window):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
-        set_tortoise_icon(self, 'menuclone.ico')
+        shlib.set_tortoise_icon(self, 'menuclone.ico')
         if cwd: os.chdir(cwd)
         
         # set dialog title
@@ -35,6 +35,7 @@ class CloneDialog(gtk.Window):
 
         self._src_path = ''
         self._dest_path = ''
+        self._history = shlib.read_history('clone')
         
         try:
             self._src_path = repos[0]
@@ -93,7 +94,9 @@ class CloneDialog(gtk.Window):
         vbox.pack_start(srcbox, False, False, 2)
         
         # add pre-defined src paths to pull-down list
-        paths = [x[1] for x in ui.ui().configitems('paths')]
+        sympaths = [x[1] for x in ui.ui().configitems('paths')]
+        recentsrc = self._history.get('src_paths', [])
+        paths = list(set(sympaths + recentsrc))
         paths.sort()
         for p in paths: self._srclist.append([p])
 
@@ -194,15 +197,25 @@ class CloneDialog(gtk.Window):
             self._rev_input.set_text(rev)
             
     def _add_src_to_recent(self, src):
+        if os.path.exists(src):
+            src = os.path.abspath(src)
+
         srclist = [x[0] for x in self._srclist]
         if src in srclist:
             return
         
+        # update drop-down list
         srclist.append(src)
         srclist.sort()
         self._srclist.clear()
         for p in srclist:
             self._srclist.append([p])
+            
+        # save path to recent list in history
+        if not 'src_paths' in self._history:
+            self._history['src_paths'] = []
+        self._history['src_paths'].append(src)
+        shlib.save_history(self._history, 'clone')
             
     def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
