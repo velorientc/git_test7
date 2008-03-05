@@ -80,15 +80,22 @@ class CloneDialog(gtk.Window):
         lbl = gtk.Label("Source Path:")
         lbl.set_property("width-chars", ewidth)
         lbl.set_alignment(0, 0.5)
-        self._src_input = gtk.Entry()
+
+        self._srclist = gtk.ListStore(str)
+        self._srclistbox = gtk.ComboBoxEntry(self._srclist, 0)
+        self._src_input = self._srclistbox.get_child()
         self._src_input.set_text(self._src_path)
         self._btn_src_browse = gtk.Button("Browse...")
         self._btn_src_browse.connect('clicked', self._btn_src_clicked)
         srcbox.pack_start(lbl, False, False)
-        srcbox.pack_start(self._src_input, True, True)
+        srcbox.pack_start(self._srclistbox, True, True)
         srcbox.pack_end(self._btn_src_browse, False, False, 5)
         vbox.pack_start(srcbox, False, False, 2)
         
+        # add pre-defined src paths to pull-down list
+        paths = [x[1] for x in ui.ui().configitems('paths')]
+        paths.sort()
+        for p in paths: self._srclist.append([p])
 
         # clone destination
         destbox = gtk.HBox()
