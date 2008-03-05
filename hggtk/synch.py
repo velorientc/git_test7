@@ -101,8 +101,8 @@ class SynchDialog(gtk.Window):
         lbl.connect('clicked', self._btn_remotepath_clicked)
         
         # revisions  combo box
-        self.revlist = gtk.ListStore(str)
-        self._pathbox = gtk.ComboBoxEntry(self.revlist, 0)
+        self.pathlist = gtk.ListStore(str)
+        self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self._pathtext = self._pathbox.get_child()
         
         defrow = None
@@ -114,7 +114,7 @@ class SynchDialog(gtk.Window):
                     defpushrow = row
             elif name == 'default-push':
                 defpushrow = row
-            self.revlist.append([path])
+            self.pathlist.append([path])
 
         if repos:
             self._pathtext.set_text(repos[0])
@@ -349,9 +349,9 @@ class SynchDialog(gtk.Window):
         dlg.run()
         dlg.hide()
         self.paths = self._get_paths()
-        self.revlist.clear()
+        self.pathlist.clear()
         for row, (name, path) in enumerate(self.paths):
-            self.revlist.append([path])
+            self.pathlist.append([path])
 
     def _email_clicked(self, toolbutton, data=None):
         path = self._pathtext.get_text()
