@@ -194,7 +194,7 @@ class EmailDialog(gtk.Window):
             for v in history[cpath]:
                 vlist.append([v])
 
-        history = shlib.read_history()
+        history = shlib.Settings('config_history')
         try:
             repo = hg.repository(ui.ui(), path=self.root)
             self.repo = repo
@@ -281,12 +281,12 @@ class EmailDialog(gtk.Window):
                 self._refresh(False)
                 return
 
-        history = shlib.read_history()
+        history = shlib.Settings('config_history')
         record_new_value('email.to', history, totext)
         record_new_value('email.cc', history, cctext)
         record_new_value('email.from', history, fromtext)
         record_new_value('email.subject', history, subjtext)
-        shlib.save_history(history)
+        history.write()
 
         cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
         cmdline += ['--repository', self.repo.root]
