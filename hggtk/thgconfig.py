@@ -66,7 +66,7 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
         self.pages = []
         self.tooltips = gtk.Tooltips()
-        self.history = shlib.read_history()
+        self.history = shlib.Settings('config_history')
 
         # create pages for each section of configuration file
         self._tortoise_info = (
@@ -535,7 +535,7 @@ class ConfigDialog(gtk.Dialog):
 
     def _apply_clicked(self, *args):
         # Reload history, since it may have been modified externally
-        self.history = shlib.read_history()
+        self.history.read()
 
         # flush changes on paths page
         if len(self.pathlist):
@@ -561,7 +561,7 @@ class ConfigDialog(gtk.Dialog):
                 newvalue = widgets[w].child.get_text()
                 self.record_new_value(cpath, newvalue)
 
-        shlib.save_history(self.history)
+        self.history.write()
         try:
             f = open(self.fn, "w")
             f.write(str(self.ini))

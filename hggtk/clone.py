@@ -35,7 +35,7 @@ class CloneDialog(gtk.Window):
 
         self._src_path = ''
         self._dest_path = ''
-        self._history = shlib.read_history('clone')
+        self._settings = shlib.Settings('clone')
         
         try:
             self._src_path = repos[0]
@@ -95,7 +95,7 @@ class CloneDialog(gtk.Window):
         
         # add pre-defined src paths to pull-down list
         sympaths = [x[1] for x in ui.ui().configitems('paths')]
-        recentsrc = self._history.get('src_paths', [])
+        recentsrc = self._settings.get('src_paths', [])
         paths = list(set(sympaths + recentsrc))
         paths.sort()
         for p in paths: self._srclist.append([p])
@@ -212,10 +212,10 @@ class CloneDialog(gtk.Window):
             self._srclist.append([p])
             
         # save path to recent list in history
-        if not 'src_paths' in self._history:
-            self._history['src_paths'] = []
-        self._history['src_paths'].append(src)
-        shlib.save_history(self._history, 'clone')
+        if not 'src_paths' in self._settings:
+            self._settings['src_paths'] = []
+        self._settings['src_paths'].append(src)
+        self._settings.write()
             
     def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
