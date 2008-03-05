@@ -11,6 +11,25 @@ import os
 import shelve
 import time
 
+class Settings(dict):
+    def __init__(self, key):
+        self.key = key
+        self.path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
+        if not os.path.exists(os.path.dirname(self.path)):
+            os.makedirs(os.path.dirname(self.path))
+        self.read()
+        
+    def read(self):
+        self.clear()
+        dbase = shelve.open(self.path)
+        self.update(dbase.get(self.key, {}))
+        dbase.close()
+
+    def write(self):
+        dbase = shelve.open(self.path)
+        dbase[self.key] = self
+        dbase.close()
+
 def get_system_times():
     t = os.times()
     if t[4] == 0.0: # Windows leaves this as zero, so use time.clock()
