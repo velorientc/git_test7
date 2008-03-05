@@ -36,23 +36,6 @@ def get_system_times():
         t = (t[0], t[1], t[2], t[3], time.clock())
     return t
     
-def read_history(key='config_history'):
-    path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
-    if not os.path.exists(os.path.dirname(path)):
-        os.makedirs(os.path.dirname(path))
-    dbase = shelve.open(path)
-    dict = dbase.get(key, {})
-    dbase.close()
-    return dict
-
-def save_history(dict, key='config_history'):
-    path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
-    if not os.path.exists(os.path.dirname(path)):
-        os.makedirs(os.path.dirname(path))
-    dbase = shelve.open(path)
-    dbase[key] = dict
-    dbase.close()
-
 def set_tortoise_icon(window, icon):
     window.set_icon_from_file(get_tortoise_icon(icon))
 
