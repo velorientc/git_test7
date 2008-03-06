@@ -27,7 +27,7 @@ class Settings(dict):
 
     def write(self):
         dbase = shelve.open(self.path)
-        dbase[self.key] = self
+        dbase[self.key] = dict(self)
         dbase.close()
 
 def get_system_times():
