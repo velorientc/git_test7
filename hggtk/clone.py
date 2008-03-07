@@ -13,6 +13,7 @@ except:
 import os
 import sys
 import gtk
+import pango
 from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
@@ -82,10 +83,19 @@ class CloneDialog(gtk.Window):
         lbl.set_property("width-chars", ewidth)
         lbl.set_alignment(0, 0.5)
 
+        # create drop-down list for source paths
         self._srclist = gtk.ListStore(str)
         self._srclistbox = gtk.ComboBoxEntry(self._srclist, 0)
         self._src_input = self._srclistbox.get_child()
         self._src_input.set_text(self._src_path)
+
+        # replace the drop-down widget so we can modify it's properties
+        self._srclistbox.clear()
+        cell = gtk.CellRendererText()
+        cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
+        self._srclistbox.pack_start(cell)
+        self._srclistbox.add_attribute(cell, 'text', 0)
+
         self._btn_src_browse = gtk.Button("Browse...")
         self._btn_src_browse.connect('clicked', self._btn_src_clicked)
         srcbox.pack_start(lbl, False, False)
