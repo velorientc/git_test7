@@ -13,11 +13,12 @@ except:
 import os
 import sys
 import gtk
+import pango
 from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *
-from shlib import set_tortoise_icon
+import shlib
 
 class CloneDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
@@ -25,7 +26,7 @@ class CloneDialog(gtk.Window):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
-        set_tortoise_icon(self, 'menuclone.ico')
+        shlib.set_tortoise_icon(self, 'menuclone.ico')
         if cwd: os.chdir(cwd)
         
         # set dialog title
@@ -35,6 +36,7 @@ class CloneDialog(gtk.Window):
 
         self._src_path = ''
         self._dest_path = ''
+        self._settings = shlib.Settings('clone')
         
         try:
             self._src_path = repos[0]
@@ -80,15 +82,33 @@ class CloneDialog(gtk.Window):
         lbl = gtk.Label("Source Path:")
         lbl.set_property("width-chars", ewidth)
         lbl.set_alignment(0, 0.5)
-        self._src_input = gtk.Entry()
+
+        # create drop-down list for source paths
+        self._srclist = gtk.ListStore(str)
+        self._srclistbox = gtk.ComboBoxEntry(self._srclist, 0)
+        self._src_input = self._srclistbox.get_child()
         self._src_input.set_text(self._src_path)
+
+        # replace the drop-down widget so we can modify it's properties
+        self._srclistbox.clear()
+        cell = gtk.CellRendererText()
+        cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
+        self._srclistbox.pack_start(cell)
+        self._srclistbox.add_attribute(cell, 'text', 0)
+
         self._btn_src_browse = gtk.Button("Browse...")
         self._btn_src_browse.connect('clicked', self._btn_src_clicked)
         srcbox.pack_start(lbl, False, False)
-        srcbox.pack_start(self._src_input, True, True)
+        srcbox.pack_start(self._srclistbox, True, True)
         srcbox.pack_end(self._btn_src_browse, False, False, 5)
         vbox.pack_start(srcbox, False, False, 2)
         
+        # add pre-defined src paths to pull-down list
+        sympaths = [x[1] for x in ui.ui().configitems('paths')]
+        recentsrc = self._settings.get('src_paths', [])
+        paths = list(set(sympaths + recentsrc))
+        paths.sort()
+        for p in paths: self._srclist.append([p])
 
         # clone destination
         destbox = gtk.HBox()
@@ -186,6 +206,27 @@ class CloneDialog(gtk.Window):
         if rev is not None:
             self._rev_input.set_text(rev)
             
+    def _add_src_to_recent(self, src):
+        if os.path.exists(src):
+            src = os.path.abspath(src)
+
+        srclist = [x[0] for x in self._srclist]
+        if src in srclist:
+            return
+        
+        # update drop-down list
+        srclist.append(src)
+        srclist.sort()
+        self._srclist.clear()
+        for p in srclist:
+            self._srclist.append([p])
+            
+        # save path to recent list in history
+        if not 'src_paths' in self._settings:
+            self._settings['src_paths'] = []
+        self._settings['src_paths'].append(src)
+        self._settings.write()
+            
     def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
         src = self._src_input.get_text()
@@ -232,6 +273,8 @@ class CloneDialog(gtk.Window):
             import traceback
             error_dialog("Clone error", traceback.format_exc())
             return False
+
+        self._add_src_to_recent(src)
 
 def run(cwd='', files=[], **opts):
     dialog = CloneDialog(cwd, repos=files)

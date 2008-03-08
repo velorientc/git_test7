@@ -20,7 +20,7 @@ import threading
 from mercurial import hg, ui, util 
 from dialog import error_dialog, question_dialog
 from hglib import HgThread
-from shlib import set_tortoise_icon
+import shlib
 import gtklib
 
 class SynchDialog(gtk.Window):
@@ -28,11 +28,17 @@ class SynchDialog(gtk.Window):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
-        set_tortoise_icon(self, 'menusynch.ico')
+        shlib.set_tortoise_icon(self, 'menusynch.ico')
         self.root = root
         self.cwd = cwd
         self.selected_path = None
-
+        
+        # persistent app data
+        self._settings = shlib.Settings('synch')
+        if not 'src_paths' in self._settings:
+            self._settings['src_paths'] = []
+        self.recent_paths = self._settings['src_paths']
+        
         self.set_default_size(610, 400)
 
         self.paths = self._get_paths()
@@ -101,8 +107,8 @@ class SynchDialog(gtk.Window):
         lbl.connect('clicked', self._btn_remotepath_clicked)
         
         # revisions  combo box
-        self.revlist = gtk.ListStore(str)
-        self._pathbox = gtk.ComboBoxEntry(self.revlist, 0)
+        self.pathlist = gtk.ListStore(str)
+        self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self._pathtext = self._pathbox.get_child()
         
         defrow = None
@@ -114,7 +120,7 @@ class SynchDialog(gtk.Window):
                     defpushrow = row
             elif name == 'default-push':
                 defpushrow = row
-            self.revlist.append([path])
+            self.pathlist.append([path])
 
         if repos:
             self._pathtext.set_text(repos[0])
@@ -123,6 +129,9 @@ class SynchDialog(gtk.Window):
         elif defpushrow is not None:
             self._pathbox.set_active(defpushrow)
 
+        for p in self.recent_paths:
+            self.pathlist.append([p])
+            
         # create checkbox to disable proxy
         self._use_proxy = gtk.CheckButton("use proxy server")        
         if ui.ui().config('http_proxy', 'host', ''):   
@@ -349,9 +358,9 @@ class SynchDialog(gtk.Window):
         dlg.run()
         dlg.hide()
         self.paths = self._get_paths()
-        self.revlist.clear()
+        self.pathlist.clear()
         for row, (name, path) in enumerate(self.paths):
-            self.revlist.append([path])
+            self.pathlist.append([path])
 
     def _email_clicked(self, toolbutton, data=None):
         path = self._pathtext.get_text()
@@ -413,6 +422,27 @@ class SynchDialog(gtk.Window):
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmd + [remote_path]))
         
+        self._add_src_to_recent(remote_path)
+        
+    def _add_src_to_recent(self, src):
+        if os.path.exists(src):
+            src = os.path.abspath(src)
+
+        srclist = [x[0] for x in self.pathlist]
+        if src in srclist:
+            return
+        
+        # update drop-down list
+        srclist.append(src)
+        srclist.sort()
+        self.pathlist.clear()
+        for p in srclist:
+            self.pathlist.append([p])
+            
+        # save path to recent list in history
+        self.recent_paths.append(src)
+        self._settings.write()
+
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
         if append:
