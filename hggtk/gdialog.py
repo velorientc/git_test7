@@ -27,7 +27,7 @@ from mercurial.i18n import _
 from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
-from shlib import shell_notify, set_tortoise_icon
+from shlib import shell_notify, set_tortoise_icon, Settings
 from thgconfig import ConfigDialog
 
 class SimpleMessage(gtk.MessageDialog):
@@ -97,6 +97,7 @@ class GDialog(gtk.Window):
         self.opts = opts
         self.main = main
         self.tmproot = None
+        self.settings = Settings(self.__class__.__name__)
 
     ### Following methods are meant to be overridden by subclasses ###
 
@@ -312,42 +313,21 @@ class GDialog(gtk.Window):
 
     def _destroying(self, gtkobj):
         try:
-            file = None
             settings = self.save_settings()
-            versioned = (GDialog.settings_version, settings)
-            dirname = os.path.join(os.path.expanduser('~'), '.hgext/gtools')
-            filename = os.path.join(dirname, self.__class__.__name__)
-            try:
-                if not os.path.exists(dirname):
-                    os.makedirs(dirname)
-                file = open(filename, 'wb')
-                cPickle.dump(versioned, file, cPickle.HIGHEST_PROTOCOL)
-            except (IOError, cPickle.PickleError):
-                pass
+            self.settings['settings_version'] = GDialog.settings_version
+            self.settings['dialogs'] = settings
+            self.settings.write()
         finally:
-            if file:
-                file.close()
             if self.main:
                 gtk.main_quit()
 
 
     def _load_settings(self):
-        try:
-            file = None
-            settings = None
-            dirname = os.path.join(os.path.expanduser('~'), '.hgext/gtools')
-            filename = os.path.join(dirname, self.__class__.__name__)
-            try:
-                file = open(filename, 'rb')
-                versioned = cPickle.load(file)
-                if versioned[0] == GDialog.settings_version:
-                    settings = versioned[1]
-            except (IOError, cPickle.PickleError), inst:
-                pass
-        finally:
-            if file:
-                file.close()
-            self.load_settings(settings)
+        settings = {}
+        version = self.settings.get('settings_version', None)
+        if version == GDialog.settings_version:
+            settings = self.settings.get('dialogs', {})
+        self.load_settings(settings)
 
 
     def _hg_call_wrapper(self, title, command, showoutput=True):
