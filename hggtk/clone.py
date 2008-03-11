@@ -265,7 +265,7 @@ class CloneDialog(gtk.Window):
     def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
         src = self._src_input.get_text()
-        dest = self._dest_input.get_text()
+        dest = self._dest_input.get_text() or os.path.basename(src)
         remotecmd = self._remote_cmd.get_text()
         rev = self._rev_input.get_text()
         
