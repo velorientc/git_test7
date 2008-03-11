@@ -115,14 +115,29 @@ class CloneDialog(gtk.Window):
         lbl = gtk.Label("Destination Path:")
         lbl.set_property("width-chars", ewidth)
         lbl.set_alignment(0, 0.5)
-        self._dest_input = gtk.Entry()
+        self._destlist = gtk.ListStore(str)
+        self._destlistbox = gtk.ComboBoxEntry(self._destlist, 0)
+        self._dest_input = self._destlistbox.get_child()
         self._dest_input.set_text(self._dest_path)
+        # replace the drop-down widget so we can modify it's properties
+        self._destlistbox.clear()
+        cell = gtk.CellRendererText()
+        cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
+        self._destlistbox.pack_start(cell)
+        self._destlistbox.add_attribute(cell, 'text', 0)
+        
         self._btn_dest_browse = gtk.Button("Browse...")
         self._btn_dest_browse.connect('clicked', self._btn_dest_clicked)
         destbox.pack_start(lbl, False, False)
-        destbox.pack_start(self._dest_input, True, True)
+        destbox.pack_start(self._destlistbox, True, True)
         destbox.pack_end(self._btn_dest_browse, False, False, 5)
         vbox.pack_start(destbox, False, False, 2)
+        
+        # add pre-defined dest paths to pull-down list
+        recentdest = self._settings.get('dest_paths', [])
+        paths = list(set(sympaths + recentdest))
+        paths.sort()
+        for p in paths: self._destlist.append([p])
 
         # revision input
         revbox = gtk.HBox()
@@ -226,6 +241,27 @@ class CloneDialog(gtk.Window):
             self._settings['src_paths'] = []
         self._settings['src_paths'].append(src)
         self._settings.write()
+
+    def _add_dest_to_recent(self, dest):
+        if os.path.exists(dest):
+            dest = os.path.abspath(dest)
+
+        destlist = [x[0] for x in self._destlist]
+        if dest in destlist:
+            return
+
+        # update drop-down list
+        destlist.append(dest)
+        destlist.sort()
+        self._destlist.clear()
+        for p in destlist:
+            self._destlist.append([p])
+ 
+        # save path to recent list in history
+        if not 'dest_paths' in self._settings:
+            self._settings['dest_paths'] = []
+        self._settings['dest_paths'].append(dest)
+        self._settings.write()
             
     def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
@@ -275,6 +311,7 @@ class CloneDialog(gtk.Window):
             return False
 
         self._add_src_to_recent(src)
+        self._add_dest_to_recent(dest)
 
 def run(cwd='', files=[], **opts):
     dialog = CloneDialog(cwd, repos=files)
