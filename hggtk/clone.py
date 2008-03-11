@@ -135,9 +135,8 @@ class CloneDialog(gtk.Window):
         
         # add pre-defined dest paths to pull-down list
         recentdest = self._settings.get('dest_paths', [])
-        paths = list(set(sympaths + recentdest))
-        paths.sort()
-        for p in paths: self._destlist.append([p])
+        for p in recentdest:
+            self._destlist.append([p])
 
         # revision input
         revbox = gtk.HBox()
