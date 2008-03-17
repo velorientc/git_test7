@@ -85,7 +85,7 @@ class TreeModel(gtk.GenericTreeModel):
             ctx = self.repo.changectx(revid)
 
             summary = ctx.description().replace('\0', '')
-            summary = summary.split('\n')[0]
+            summary = unicode(summary.split('\n')[0], 'latin-1', 'replace')
             summary = gobject.markup_escape_text(summary)
             node = self.repo.lookup(revid)
             tags = ', '.join(self.repo.nodetags(node))
