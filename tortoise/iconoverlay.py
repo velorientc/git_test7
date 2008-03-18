@@ -10,7 +10,6 @@ import _winreg
 from mercurial import hg, cmdutil, util
 from mercurial import repo as _repo
 import thgutil
-import shellconf
 import sys
 
 # FIXME: quick workaround traceback caused by missing "closed" 
@@ -89,8 +88,6 @@ class IconOverlayExtension(object):
         ]
 
     def GetOverlayInfo(self): 
-        shellconf.read()
-        
         icon = thgutil.get_icon_path("status", self.icon)
         print "icon = ", icon
 
@@ -171,6 +168,15 @@ class IconOverlayExtension(object):
             
         try:
             repo = hg.repository(ui.ui(), path=root)
+
+            # check if to display overlay icons in this repo
+            show_overlay = repo.ui.config('tortoisehg', 'overlayicons', 'enabled')
+            print "%s: overlay icons %s" % (path, show_overlay)
+            if show_overlay != 'enabled':
+                overlay_cache = {}
+                for f in get_cache_list(path):
+                    overlay_cache[f] = (UNKNOWN, tc)
+                return NOT_IN_TREE
         except _repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
@@ -242,10 +248,7 @@ class IconOverlayExtension(object):
         print "%s: %s" % (path, status)
         return status
 
-    def IsMemberOf(self, path, attrib):      
-        if not shellconf.show_overlay_icons:
-            return S_FALSE
-            
+    def IsMemberOf(self, path, attrib):                  
         if self._get_state(path) == self.state:
             return S_OK
         return S_FALSE
