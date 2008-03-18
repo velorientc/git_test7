@@ -223,7 +223,7 @@ class IconOverlayExtension(object):
             print "IsMemberOf: _get_state() took %d ticks" % \
                     (win32api.GetTickCount() - tc)
             
-def make_icon_overlay(name, icon, state, clsid):
+def make_icon_overlay(name, icon_type, state, clsid):
     """
     Make an icon overlay COM class.
 
@@ -235,11 +235,11 @@ def make_icon_overlay(name, icon, state, clsid):
     prog_id = "Mercurial.ShellExtension.%s" % classname
     desc = "Mercurial icon overlay shell extension for %s files" % name.lower()
     reg = [
-        (_winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Explorer\ShellIconOverlayIdentifiers\%s" % name) ]
+        (_winreg.HKEY_LOCAL_MACHINE, r"Software\TortoiseOverlays\%s" % icon_type) ]
     cls = type(
             classname,
             (IconOverlayExtension, ),
-            dict(_reg_clsid_=clsid, _reg_progid_=prog_id, _reg_desc_=desc, registry_keys=reg, icon=icon, state=state))
+            dict(_reg_clsid_=clsid, _reg_progid_=prog_id, _reg_desc_=desc, registry_keys=reg, stringKey="HG", state=state))
 
     _overlay_classes.append(cls)
     # We need to register the class as global, as pythoncom will
@@ -247,9 +247,9 @@ def make_icon_overlay(name, icon, state, clsid):
     globals()[classname] = cls
 
 _overlay_classes = []
-make_icon_overlay("Changed", "changed.ico", MODIFIED, "{102C6A24-5F38-4186-B64A-237011809FAB}")
-make_icon_overlay("Unchanged", "unchanged.ico", UNCHANGED, "{00FEE959-5773-424B-88AC-A01BFC8E4555}")
-make_icon_overlay("Added", "added.ico", ADDED, "{8447DB75-5875-4BA8-9F38-A727DAA484A0}")
+make_icon_overlay("Changed", "Modified", MODIFIED, "{4D0F33E1-654C-4A1B-9BE8-E47A98752BAB}")
+make_icon_overlay("Unchanged", "Normal", UNCHANGED, "{4D0F33E2-654C-4A1B-9BE8-E47A98752BAB}")
+make_icon_overlay("Added", "Added", ADDED, "{4D0F33E3-654C-4A1B-9BE8-E47A98752BAB}")
 
 def get_overlay_classes():
     """
