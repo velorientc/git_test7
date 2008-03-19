@@ -52,12 +52,14 @@ def add_dirs(list):
 class IconOverlayExtension(object):
     """
     Class to implement icon overlays for source controlled files.
+    Specialized classes are created for each overlay icon.
 
     Displays a different icon based on version control status.
 
     NOTE: The system allocates only 15 slots in _total_ for all
         icon overlays; we (will) use 6, tortoisecvs uses 7... not a good
-        recipe for a happy system.
+        recipe for a happy system. By utilizing the TortoiseOverlay.dll
+        we can share overlay slots with the other tortoises.
     """
     
     counter = 0
