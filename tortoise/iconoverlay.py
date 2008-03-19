@@ -69,13 +69,7 @@ class IconOverlayExtension(object):
     _reg_threading_ = 'Apartment'
 
     def GetOverlayInfo(self): 
-        icon = thgutil.get_icon_path("status", self.icon)
-        print "icon = ", icon
-
-        if icon:
-            return (icon, 0, shellcon.ISIOI_ICONFILE)
-        else:
-            return ("", 0, 0) 
+        return ("", 0, 0) 
 
     def GetPriority(self):
         return 0
