@@ -23,6 +23,8 @@ from hglib import HgThread
 import shlib
 import gtklib
 
+HistorySize = 10
+
 class SynchDialog(gtk.Window):
     def __init__(self, cwd='', root = '', repos=[]):
         """ Initialize the Dialog. """
@@ -35,9 +37,6 @@ class SynchDialog(gtk.Window):
         
         # persistent app data
         self._settings = shlib.Settings('synch')
-        if not 'src_paths' in self._settings:
-            self._settings['src_paths'] = []
-        self.recent_paths = self._settings['src_paths']
         
         self.set_default_size(610, 400)
 
@@ -129,8 +128,10 @@ class SynchDialog(gtk.Window):
         elif defpushrow is not None:
             self._pathbox.set_active(defpushrow)
 
-        for p in self.recent_paths:
-            self.pathlist.append([p])
+        sympaths = [x[1] for x in self.paths]
+        for p in self._settings.get('src_paths', []):
+            if p not in sympaths:
+                self.pathlist.append([p])
             
         # create checkbox to disable proxy
         self._use_proxy = gtk.CheckButton("use proxy server")        
@@ -423,25 +424,35 @@ class SynchDialog(gtk.Window):
         self.stbar.set_status_text('hg ' + ' '.join(cmd + [remote_path]))
         
         self._add_src_to_recent(remote_path)
-        
+
+    def _update_setting_list(self, key, path):
+        paths = self._settings.get(key, [])
+        if path in paths:
+            paths.remove(path)
+        paths.append(path)
+        while len(paths) > HistorySize:
+            del paths[0]
+        self._settings[key] = paths
+
     def _add_src_to_recent(self, src):
         if os.path.exists(src):
             src = os.path.abspath(src)
 
         srclist = [x[0] for x in self.pathlist]
-        if src in srclist:
-            return
         
         # update drop-down list
-        srclist.append(src)
+        if src not in srclist:
+            srclist.append(src)
         srclist.sort()
         self.pathlist.clear()
         for p in srclist:
             self.pathlist.append([p])
             
         # save path to recent list in history
-        self.recent_paths.append(src)
-        self._settings.write()
+        sympaths = [x[1] for x in self.paths]
+        if src not in sympaths:
+            self._update_setting_list('src_paths', src)
+            self._settings.write()
 
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
