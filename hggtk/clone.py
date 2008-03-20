@@ -88,6 +88,7 @@ class CloneDialog(gtk.Window):
         self._srclistbox = gtk.ComboBoxEntry(self._srclist, 0)
         self._src_input = self._srclistbox.get_child()
         self._src_input.set_text(self._src_path)
+        self._src_input.set_position(-1)
 
         # replace the drop-down widget so we can modify it's properties
         self._srclistbox.clear()
@@ -119,6 +120,8 @@ class CloneDialog(gtk.Window):
         self._destlistbox = gtk.ComboBoxEntry(self._destlist, 0)
         self._dest_input = self._destlistbox.get_child()
         self._dest_input.set_text(self._dest_path)
+        self._dest_input.set_position(-1)
+
         # replace the drop-down widget so we can modify it's properties
         self._destlistbox.clear()
         cell = gtk.CellRendererText()
