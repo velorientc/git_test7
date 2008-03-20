@@ -20,6 +20,8 @@ from mercurial.i18n import _
 from mercurial.node import *
 import shlib
 
+HistorySize = 10
+
 class CloneDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, cwd='', repos=[]):
@@ -222,26 +224,32 @@ class CloneDialog(gtk.Window):
         rev = histselect.select(self.root)
         if rev is not None:
             self._rev_input.set_text(rev)
-            
+
+    def _update_setting_list(self, key, path):
+        paths = self._settings.get(key, [])
+        if path in paths:
+            paths.remove(path)
+        paths.append(path)
+        while len(paths) > HistorySize:
+            del paths[0]
+        self._settings[key] = paths
+
     def _add_src_to_recent(self, src):
         if os.path.exists(src):
             src = os.path.abspath(src)
 
         srclist = [x[0] for x in self._srclist]
-        if src in srclist:
-            return
         
         # update drop-down list
-        srclist.append(src)
+        if src not in srclist:
+            srclist.append(src)
         srclist.sort()
         self._srclist.clear()
         for p in srclist:
             self._srclist.append([p])
             
         # save path to recent list in history
-        if not 'src_paths' in self._settings:
-            self._settings['src_paths'] = []
-        self._settings['src_paths'].append(src)
+        self._update_setting_list('src_paths', src)
         self._settings.write()
 
     def _add_dest_to_recent(self, dest):
@@ -249,20 +257,17 @@ class CloneDialog(gtk.Window):
             dest = os.path.abspath(dest)
 
         destlist = [x[0] for x in self._destlist]
-        if dest in destlist:
-            return
 
         # update drop-down list
-        destlist.append(dest)
+        if dest not in destlist:
+            destlist.append(dest)
         destlist.sort()
         self._destlist.clear()
         for p in destlist:
             self._destlist.append([p])
  
         # save path to recent list in history
-        if not 'dest_paths' in self._settings:
-            self._settings['dest_paths'] = []
-        self._settings['dest_paths'].append(dest)
+        self._update_setting_list('dest_paths', dest)
         self._settings.write()
             
     def _btn_clone_clicked(self, toolbutton, data=None):
