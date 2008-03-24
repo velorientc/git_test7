@@ -11,24 +11,104 @@ import os
 import shelve
 import time
 
-class Settings(dict):
-    def __init__(self, key):
-        self.key = key
-        self.path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
-        if not os.path.exists(os.path.dirname(self.path)):
-            os.makedirs(os.path.dirname(self.path))
+class SimpleMRUList(object):
+    def __init__(self, size=10, reflist=[]):
+        self._size = size
+        self._list = reflist
+
+    def __iter__(self):
+        for elem in self._list:
+            yield elem
+
+    def add(self, val):
+        if val in self._list:
+            self._list.remove(val)
+        self._list.append(val)
+        self.flush()
+
+    def get_size(self):
+        return self._size
+
+    def set_size(self, size):
+        self._size = size
+        self.flush()
+
+    def flush(self):
+        while len(self._list) > self._size:
+            del self._list[0]
+
+class Settings(object):
+    version = 1.0
+
+    def __init__(self, appname, path=None):
+        self._appname = appname
+        self._data = {}
+        self._path = path and path or self._get_path(appname)
+        self._audit()
         self.read()
-        
+
+    def get_value(self, key, default=None, create=False):
+        if key in self._data:
+            return self._data[key]
+        elif create == True:
+            self._data[key] = default
+        return default
+
+    def set_value(self, key, value):
+        self._data[key] = value
+
+    def mrul(self, key, size=10):
+        ''' wrapper method to create a most-recently-used (MRU) list '''
+        ls = self.get_value(key, [], True)
+        ml = SimpleMRUList(size=size, reflist=ls)
+        return ml
+    
+    def get_keys(self):
+        return self._data.keys()
+
+    def get_appname(self):
+        return self._appname
+
     def read(self):
-        self.clear()
-        dbase = shelve.open(self.path)
-        self.update(dbase.get(self.key, {}))
+        self._data.clear()
+        if not os.path.exists(self._path):
+            return
+
+        dbase = shelve.open(self._path)
+        self._dbappname = dbase['APPNAME']
+        self.version = dbase['VERSION']
+        self._data.update(dbase.get('DATA', {}))
         dbase.close()
 
     def write(self):
-        dbase = shelve.open(self.path)
-        dbase[self.key] = dict(self)
+        self._write(self._path, self._data)
+
+    def _write(self, appname, data):
+        dbase = shelve.open(self._get_path(appname))
+        dbase['VERSION'] = Settings.version
+        dbase['APPNAME'] = appname
+        dbase['DATA'] = data
         dbase.close()
+
+    def _get_path(self, appname):
+        return os.path.join(os.path.expanduser('~'), '.tortoisehg',
+                'settings', appname)
+
+    def _audit(self):
+        if os.path.exists(os.path.dirname(self._path)):
+            return
+        os.makedirs(os.path.dirname(self._path))
+        self._import()
+
+    def _import(self):
+        # import old settings data (TortoiseHg <= 0.3)
+        old_path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
+        if os.path.isfile(old_path):
+            print "converting old history..."
+            olddb = shelve.open(old_path)
+            for key in olddb.keys():
+                self._write(key, olddb[key])
+            olddb.close()
 
 def get_system_times():
     t = os.times()

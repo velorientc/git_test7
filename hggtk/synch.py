@@ -37,7 +37,8 @@ class SynchDialog(gtk.Window):
         
         # persistent app data
         self._settings = shlib.Settings('synch')
-        
+        self._recent_src = self._settings.mrul('src_paths')
+
         self.set_default_size(610, 400)
 
         self.paths = self._get_paths()
@@ -129,7 +130,7 @@ class SynchDialog(gtk.Window):
             self._pathbox.set_active(defpushrow)
 
         sympaths = [x[1] for x in self.paths]
-        for p in self._settings.get('src_paths', []):
+        for p in self._recent_src:
             if p not in sympaths:
                 self.pathlist.append([p])
             
@@ -425,34 +426,21 @@ class SynchDialog(gtk.Window):
         
         self._add_src_to_recent(remote_path)
 
-    def _update_setting_list(self, key, path):
-        paths = self._settings.get(key, [])
-        if path in paths:
-            paths.remove(path)
-        paths.append(path)
-        while len(paths) > HistorySize:
-            del paths[0]
-        self._settings[key] = paths
-
     def _add_src_to_recent(self, src):
         if os.path.exists(src):
             src = os.path.abspath(src)
 
-        srclist = [x[0] for x in self.pathlist]
-        
-        # update drop-down list
-        if src not in srclist:
-            srclist.append(src)
-        srclist.sort()
-        self.pathlist.clear()
-        for p in srclist:
-            self.pathlist.append([p])
-            
         # save path to recent list in history
-        sympaths = [x[1] for x in self.paths]
-        if src not in sympaths:
-            self._update_setting_list('src_paths', src)
-            self._settings.write()
+        self._recent_src.add(src)
+        self._settings.write()
+
+        # update drop-down list
+        self.pathlist.clear()
+        sympaths = [x[1] for x in ui.ui().configitems('paths')]
+        paths = list(set(sympaths + [x for x in self._recent_src]))
+        paths.sort()
+        for p in paths:
+            self.pathlist.append([p])
 
     def write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')

@@ -39,7 +39,9 @@ class CloneDialog(gtk.Window):
         self._src_path = ''
         self._dest_path = ''
         self._settings = shlib.Settings('clone')
-        
+        self._recent_src = self._settings.mrul('src_paths')
+        self._recent_dest = self._settings.mrul('dest_paths')
+
         try:
             self._src_path = repos[0]
             self._dest_path = repos[1]
@@ -108,10 +110,10 @@ class CloneDialog(gtk.Window):
         
         # add pre-defined src paths to pull-down list
         sympaths = [x[1] for x in ui.ui().configitems('paths')]
-        recentsrc = self._settings.get('src_paths', [])
-        paths = list(set(sympaths + recentsrc))
+        paths = list(set(sympaths + [x for x in self._recent_src]))
         paths.sort()
-        for p in paths: self._srclist.append([p])
+        for p in paths:
+            self._srclist.append([p])
 
         # clone destination
         destbox = gtk.HBox()
@@ -138,9 +140,10 @@ class CloneDialog(gtk.Window):
         destbox.pack_end(self._btn_dest_browse, False, False, 5)
         vbox.pack_start(destbox, False, False, 2)
         
-        # add pre-defined dest paths to pull-down list
-        recentdest = self._settings.get('dest_paths', [])
-        for p in recentdest:
+        # add most-recent dest paths to pull-down list
+        paths = list(self._recent_dest)
+        paths.sort()
+        for p in paths:
             self._destlist.append([p])
 
         # revision input
@@ -225,51 +228,37 @@ class CloneDialog(gtk.Window):
         if rev is not None:
             self._rev_input.set_text(rev)
 
-    def _update_setting_list(self, key, path):
-        paths = self._settings.get(key, [])
-        if path in paths:
-            paths.remove(path)
-        paths.append(path)
-        while len(paths) > HistorySize:
-            del paths[0]
-        self._settings[key] = paths
-
     def _add_src_to_recent(self, src):
         if os.path.exists(src):
             src = os.path.abspath(src)
 
-        srclist = [x[0] for x in self._srclist]
-        
-        # update drop-down list
-        if src not in srclist:
-            srclist.append(src)
-        srclist.sort()
-        self._srclist.clear()
-        for p in srclist:
-            self._srclist.append([p])
-            
         # save path to recent list in history
-        self._update_setting_list('src_paths', src)
+        self._recent_src.add(src)
         self._settings.write()
+
+        # update drop-down list
+        self._srclist.clear()
+        sympaths = [x[1] for x in ui.ui().configitems('paths')]
+        paths = list(set(sympaths + [x for x in self._recent_src]))
+        paths.sort()
+        for p in paths:
+            self._srclist.append([p])
 
     def _add_dest_to_recent(self, dest):
         if os.path.exists(dest):
             dest = os.path.abspath(dest)
 
-        destlist = [x[0] for x in self._destlist]
-
-        # update drop-down list
-        if dest not in destlist:
-            destlist.append(dest)
-        destlist.sort()
+        # save path to recent list in history
+        self._recent_dest.add(dest)
+        self._settings.write()
+        
+        # update drop down list
+        paths = list(self._recent_dest)
+        paths.sort()
         self._destlist.clear()
-        for p in destlist:
+        for p in paths:
             self._destlist.append([p])
  
-        # save path to recent list in history
-        self._update_setting_list('dest_paths', dest)
-        self._settings.write()
-            
     def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
         src = self._src_input.get_text()

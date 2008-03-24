@@ -453,9 +453,9 @@ class ConfigDialog(gtk.Dialog):
                     vlist.append([v, False])
                     if v == curvalue:
                         currow = len(vlist) - 1
-            if cpath in self.history:
+            if cpath in self.history.get_keys():
                 separator = False
-                for v in self.history[cpath]:
+                for v in self.history.get_value(cpath):
                     if v in values: continue
                     if not separator:
                         vlist.append(['History', True])
@@ -527,11 +527,11 @@ class ConfigDialog(gtk.Dialog):
         self.ini[section][key] = newvalue
         if not keephistory:
             return
-        if cpath not in self.history:
-            self.history[cpath] = []
-        elif newvalue in self.history[cpath]:
-            self.history[cpath].remove(newvalue)
-        self.history[cpath].insert(0, newvalue)
+        if cpath not in self.history.get_keys():
+            self.history.set_value(cpath, [])
+        elif newvalue in self.history.get_keys():
+            self.history.get_value(cpath).remove(newvalue)
+        self.history.get_value(cpath).insert(0, newvalue)
 
     def _apply_clicked(self, *args):
         # Reload history, since it may have been modified externally

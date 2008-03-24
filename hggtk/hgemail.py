@@ -189,9 +189,9 @@ class EmailDialog(gtk.Window):
     def _refresh(self, initial):
         def fill_history(history, vlist, cpath):
             vlist.clear()
-            if cpath not in history:
+            if cpath not in history.get_keys():
                 return
-            for v in history[cpath]:
+            for v in history.get_value(cpath):
                 vlist.append([v])
 
         history = shlib.Settings('config_history')
@@ -248,11 +248,11 @@ class EmailDialog(gtk.Window):
     def _on_send_clicked(self, button):
         def record_new_value(cpath, history, newvalue):
             if not newvalue: return
-            if cpath not in history:
-                history[cpath] = []
-            elif newvalue in history[cpath]:
-                history[cpath].remove(newvalue)
-            history[cpath].insert(0, newvalue)
+            if cpath not in history.get_keys():
+                history.set_value(cpath, [])
+            elif newvalue in history.get_value(cpath):
+                history.get_value(cpath).remove(newvalue)
+            history.get_value(cpath).insert(0, newvalue)
 
         totext = self._tobox.child.get_text()
         cctext = self._ccbox.child.get_text()

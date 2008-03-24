@@ -314,8 +314,8 @@ class GDialog(gtk.Window):
     def _destroying(self, gtkobj):
         try:
             settings = self.save_settings()
-            self.settings['settings_version'] = GDialog.settings_version
-            self.settings['dialogs'] = settings
+            self.settings.set_value('settings_version', GDialog.settings_version)
+            self.settings.set_value('dialogs', settings)
             self.settings.write()
         finally:
             if self.main:
@@ -324,9 +324,9 @@ class GDialog(gtk.Window):
 
     def _load_settings(self):
         settings = {}
-        version = self.settings.get('settings_version', None)
+        version = self.settings.get_value('settings_version', None)
         if version == GDialog.settings_version:
-            settings = self.settings.get('dialogs', {})
+            settings = self.settings.get_value('dialogs', {})
         self.load_settings(settings)
 
 
