@@ -91,15 +91,61 @@ class GCommit(GStatus):
             self._commit_clicked, tip='commit'))
         return tbbuttons
 
+    def changed_cb(self, combobox):
+        model = combobox.get_model()
+        index = combobox.get_active()
+        if index >= 0:
+            buffer = self.text.get_buffer()
+            begin, end = buffer.get_bounds()
+            cur_msg = buffer.get_text(begin, end)
+            if len(cur_msg):
+                response = Confirm('Discard Message', [], self,
+                        'Discard current commit message?').run()
+                if response != gtk.RESPONSE_YES:
+                    return
+            buffer.set_text(model[index][1])
+
+    def _update_recent_messages(self, msg=None):
+        if msg is not None:
+            self._mru_messages.add(msg)
+            self.settings.write()
+
+        liststore = self.msg_cbbox.get_model()
+        liststore.clear()
+        for msg in self._mru_messages:
+            sumline = msg.split("\n")[0]
+            liststore.append([sumline, msg])
+        #self.msg_cbbox.set_active(-1)
 
     def get_body(self):
         status_body = GStatus.get_body(self)
 
+        vbox = gtk.VBox()
+        
+        mbox = gtk.HBox()
+        label = gtk.Label('Recent Commit Messages: ')
+        mbox.pack_start(label, False, False, 2)
+        self.msg_cbbox = gtk.combo_box_new_text()
+        liststore = gtk.ListStore(str, str)
+        self.msg_cbbox = gtk.ComboBox(liststore)
+        cell = gtk.CellRendererText()
+        self.msg_cbbox.pack_start(cell, True)
+        self.msg_cbbox.add_attribute(cell, 'text', 0)
+        #cell = gtk.CellRendererText()
+        #self.msg_cbbox.pack_start(cell, True)
+        #self.msg_cbbox.add_attribute(cell, 'text', 1)
+        mbox.pack_start(self.msg_cbbox)
+        vbox.pack_start(mbox, False, False)
+        self._mru_messages = self.settings.mrul('recent_messages')
+        self._update_recent_messages()
+        self.msg_cbbox.connect('changed', self.changed_cb)
+        
         frame = gtk.Frame()
         frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         frame.add(scroller)
+        vbox.pack_start(frame)
         
         self.text = gtk.TextView()
         self.text.set_wrap_mode(gtk.WRAP_WORD)
@@ -107,7 +153,7 @@ class GCommit(GStatus):
         scroller.add(self.text)
         
         self._vpaned = gtk.VPaned()
-        self._vpaned.add1(frame)
+        self._vpaned.add1(vbox)
         self._vpaned.add2(status_body)
         self._vpaned.set_position(self._setting_vpos)
         return self._vpaned
@@ -214,6 +260,7 @@ class GCommit(GStatus):
 
         # refresh overlay icons and commit dialog
         self.text.set_buffer(gtk.TextBuffer())
+        self._update_recent_messages(self.opts['message'])
         shell_notify([self.cwd] + files)
         self.reload_status()
 
