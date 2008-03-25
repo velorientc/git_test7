@@ -23,7 +23,7 @@ class SimpleMRUList(object):
     def add(self, val):
         if val in self._list:
             self._list.remove(val)
-        self._list.append(val)
+        self._list.insert(0, val)
         self.flush()
 
     def get_size(self):
@@ -35,7 +35,7 @@ class SimpleMRUList(object):
 
     def flush(self):
         while len(self._list) > self._size:
-            del self._list[0]
+            del self._list[-1]
 
 class Settings(object):
     version = 1.0
