@@ -235,7 +235,7 @@ class ServeDialog(gtk.Window):
 
         while not gservice or not hasattr(gservice, 'httpd'):
             time.sleep(0.1)
-        self._url = 'http://%s:%d/' % (gservice.httpd.addr, port)
+        self._url = 'http://%s:%d/' % (gservice.httpd.fqaddr, port)
         gobject.timeout_add(10, self.process_queue, q)
         
     def _stop_server(self):
@@ -277,7 +277,7 @@ def thg_serve(ui, repo, **opts):
             util.set_signal_handler()
             try:
                 parentui = ui.parentui or ui
-                optlist = ("name templates style address port ipv6"
+                optlist = ("name templates style address port prefix ipv6"
                            " accesslog errorlog webdir_conf certificate")
                 for o in optlist.split():
                     if opts[o]:
@@ -290,16 +290,22 @@ def thg_serve(ui, repo, **opts):
 
             if not ui.verbose: return
 
-            if self.httpd.port != 80:
-                ui.status(_('listening at http://%s:%d/\n') %
-                          (self.httpd.addr, self.httpd.port))
+            if self.httpd.prefix:
+                prefix = self.httpd.prefix.strip('/') + '/'
             else:
-                ui.status(_('listening at http://%s/\n') % self.httpd.addr)
+                prefix = ''
+
+            port = ':%d' % self.httpd.port
+            if port == ':80':
+                port = ''
+
+            ui.status(_('listening at http://%s%s/%s (%s:%d)\n') %
+                      (self.httpd.fqaddr, port, prefix, self.httpd.addr, self.httpd.port))
 
         def stop(self):
             self.stopped = True
             # issue request to trigger handle_request() and quit
-            addr = '%s:%d' % (self.httpd.addr, self.httpd.port)
+            addr = '%s:%d' % (self.httpd.fqaddr, self.httpd.port)
             conn = httplib.HTTPConnection(addr)
             conn.request("GET", "/")
             res = conn.getresponse()
@@ -324,6 +330,7 @@ thg_serve_cmd =  {"^serve":
           ('E', 'errorlog', '', _('name of error log file to write to')),
           ('p', 'port', 0, _('port to use (default: 8000)')),
           ('a', 'address', '', _('address to use')),
+          ('', 'prefix', '', _('prefix path to serve from (default: server root)')),
           ('n', 'name', '',
            _('name to show in web pages (default: working dir)')),
           ('', 'webdir-conf', '', _('name of the webdir config file'
