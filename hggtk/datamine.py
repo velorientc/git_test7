@@ -25,6 +25,7 @@ class DataMineDialog(GDialog):
     COL_TOOLTIP = 2
     COL_PATH = 3
     COL_COLOR = 4
+    COL_USER = 5
 
     def get_title(self):
         return 'DataMining - ' + os.path.basename(self.repo.root)
@@ -75,6 +76,17 @@ class DataMineDialog(GDialog):
         vbox.pack_start(self.stbar, False, False, 2)
         self.stop_button.set_sensitive(False)
         return vbox
+
+    def ann_header_context_menu(self, treeview):
+        _menu = gtk.Menu()
+        _button = gtk.CheckMenuItem("Filename")
+        _button.connect("toggled", self.toggle_annatate_columns, treeview, 1)
+        _menu.append(_button)
+        _button = gtk.CheckMenuItem("User")
+        _button.connect("toggled", self.toggle_annatate_columns, treeview, 2)
+        _menu.append(_button)
+        _menu.show_all()
+        return _menu
 
     def grep_context_menu(self):
         _menu = gtk.Menu()
@@ -130,8 +142,8 @@ class DataMineDialog(GDialog):
         summary = summary.split('\n')[0]
         date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
         desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
-        self.changedesc[rev] = desc
-        return desc
+        self.changedesc[rev] = (desc, author)
+        return (desc, author)
 
     def _search_clicked(self, button, data):
         self.add_search_page()
@@ -301,7 +313,7 @@ class DataMineDialog(GDialog):
                 (path, revid, text) = line.split(':', 2)
             except ValueError:
                 continue
-            tip = self.get_rev_desc(long(revid))
+            tip, user = self.get_rev_desc(long(revid))
             model.append((revid, text, tip, path))
         if thread.isAlive():
             return True
@@ -340,6 +352,22 @@ class DataMineDialog(GDialog):
         if num != -1 and self.notebook.get_n_pages() > 1:
             self.notebook.remove_page(num)
 
+    def _add_header_context_menu(self, col, menu):
+        lb = gtk.Label(col.get_title())
+        lb.show()
+        col.set_widget(lb)
+        wgt = lb.get_parent()
+        while wgt and type(wgt) != gtk.Button:
+            wgt = wgt.get_parent()
+        wgt.connect("button-press-event", self._tree_header_button_press,
+                menu)
+
+    def _tree_header_button_press(self, widget, event, menu):
+        if event.button == 3:
+            menu.popup(None, None, None, event.button, event.time)
+            return True
+        return False
+
     def add_annotate_page(self, path, revid):
         '''
         Add new annotation page to notebook.  Start scan of
@@ -371,13 +399,11 @@ class DataMineDialog(GDialog):
         graphview.set_property('date-column-visible', True)
 
         hbox = gtk.HBox()
-        showfilename = gtk.CheckButton('Show Filename')
         followlabel = gtk.Label('')
         follow = gtk.Button('Follow')
         follow.connect('clicked', self.follow_rename)
         follow.hide()
         follow.set_sensitive(False)
-        hbox.pack_start(showfilename, False, False)
         hbox.pack_start(gtk.Label(''), True, True)
         hbox.pack_start(followlabel, False, False)
         hbox.pack_start(follow, False, False)
@@ -392,11 +418,15 @@ class DataMineDialog(GDialog):
         treeview.connect('popup-menu', self._ann_popup_menu)
         treeview.connect('row-activated', self._ann_row_act)
 
-        results = gtk.ListStore(str, str, str, str, str)
+        results = gtk.ListStore(str, str, str, str, str, str)
         treeview.set_model(results)
-        for title, width, col in (('Rev', 10, self.COL_REVID),
-                ('File', 15, self.COL_PATH),
-                ('Matches', 80, self.COL_TEXT)):
+
+        context_menu = self.ann_header_context_menu(treeview)
+        for title, width, col, visible in (
+                ('Rev', 10, self.COL_REVID, True),
+                ('File', 15, self.COL_PATH, False),
+                ('User', 15, self.COL_USER, False),
+                ('Matches', 80, self.COL_TEXT, True)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
             cell.set_property("ellipsize", pango.ELLIPSIZE_START)
@@ -408,7 +438,10 @@ class DataMineDialog(GDialog):
             column.pack_start(cell, expand=True)
             column.add_attribute(cell, "text", col)
             column.add_attribute(cell, "background", self.COL_COLOR)
+            column.set_visible(visible)
             treeview.append_column(column)
+            self._add_header_context_menu(column, context_menu)
+        treeview.set_headers_clickable(True)
         if hasattr(treeview, 'set_tooltip_column'):
             treeview.set_tooltip_column(self.COL_TOOLTIP)
         results.path = path
@@ -439,8 +472,6 @@ class DataMineDialog(GDialog):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
 
-        showfilename.connect('toggled', self.toggle_filename_col, treeview)
-        treeview.get_column(1).set_visible(False)
         graphview.connect('revision-selected', self.log_selection_changed,
                 path, followlabel, follow)
 
@@ -450,9 +481,9 @@ class DataMineDialog(GDialog):
                 self._ann_button_release)
         graphview.treeview.connect('popup-menu', self._ann_popup_menu)
 
-    def toggle_filename_col(self, button, treeview):
+    def toggle_annatate_columns(self, button, treeview, col):
         b = button.get_active()
-        treeview.get_column(1).set_visible(b)
+        treeview.get_column(col).set_visible(b)
 
     def log_selection_changed(self, graphview, path, label, button):
         row = graphview.get_revision()
@@ -545,10 +576,10 @@ class DataMineDialog(GDialog):
                 rowrev = long(revid)
             except ValueError:
                 continue
-            tip = self.get_rev_desc(rowrev)
+            tip, user = self.get_rev_desc(rowrev)
             ctx = self.repo.changectx(rowrev)
             color = colormap.get_color(ctx, curdate)
-            model.append((revid, text, tip, path.strip(), color))
+            model.append((revid, text, tip, path.strip(), color, user))
         if thread.isAlive():
             return True
         else:
