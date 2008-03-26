@@ -276,8 +276,14 @@ def thg_serve(ui, repo, **opts):
             self.stopped = True
             util.set_signal_handler()
             try:
-                if 'name' in opts:
-                    ui.setconfig('web', 'name', opts['name'])
+                parentui = ui.parentui or ui
+                optlist = ("name templates style address port ipv6"
+                           " accesslog errorlog webdir_conf certificate")
+                for o in optlist.split():
+                    if opts[o]:
+                        parentui.setconfig("web", o, str(opts[o]))
+                        if (repo is not None) and (repo.ui != parentui):
+                            repo.ui.setconfig("web", o, str(opts[o]))
                 self.httpd = server.create_server(ui, repo)
             except socket.error, inst:
                 raise util.Abort(_('cannot start server: ') + inst.args[1])
