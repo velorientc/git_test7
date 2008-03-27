@@ -62,7 +62,6 @@ def entry_dialog(msg, visible=True, default='', respfunc=None):
     entry.set_activates_default(True)
     dialog.vbox.pack_start(gtk.Label(msg), True, True, 6)
     dialog.vbox.pack_start(entry, False, False, 6)
-    dialog.vbox.set_spacing(6)
     dialog.set_default_response(gtk.RESPONSE_OK)
     dialog.show_all()
     if respfunc:
