@@ -284,7 +284,6 @@ def thg_serve(ui, repo, **opts):
                         parentui.setconfig("web", o, str(opts[o]))
                         if (repo is not None) and (repo.ui != parentui):
                             repo.ui.setconfig("web", o, str(opts[o]))
-                print "opts:", opts
                 self.httpd = server.create_server(ui, repo)
             except socket.error, inst:
                 raise util.Abort(_('cannot start server: ') + inst.args[1])
