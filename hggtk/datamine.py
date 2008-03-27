@@ -213,12 +213,13 @@ class DataMineDialog(GDialog):
 
         results = gtk.ListStore(str, str, str, str)
         treeview.set_model(results)
-        for title, width, col in (('Rev', 10, self.COL_REVID),
-                ('File', 25, self.COL_PATH),
-                ('Matches', 80, self.COL_TEXT)):
+        for title, width, col, emode in (
+                ('Rev', 10, self.COL_REVID, pango.ELLIPSIZE_NONE),
+                ('File', 25, self.COL_PATH, pango.ELLIPSIZE_START),
+                ('Matches', 80, self.COL_TEXT, pango.ELLIPSIZE_END)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
-            cell.set_property("ellipsize", pango.ELLIPSIZE_START)
+            cell.set_property("ellipsize", emode)
             cell.set_property("family", "Monospace")
             column = gtk.TreeViewColumn(title)
             column.set_resizable(True)
@@ -424,14 +425,14 @@ class DataMineDialog(GDialog):
         treeview.set_model(results)
 
         context_menu = self.ann_header_context_menu(treeview)
-        for title, width, col, visible in (
-                ('Rev', 10, self.COL_REVID, True),
-                ('File', 15, self.COL_PATH, False),
-                ('User', 15, self.COL_USER, False),
-                ('Matches', 80, self.COL_TEXT, True)):
+        for title, width, col, emode, visible in (
+                ('Rev', 10, self.COL_REVID, pango.ELLIPSIZE_NONE, True),
+                ('File', 15, self.COL_PATH, pango.ELLIPSIZE_START, False),
+                ('User', 15, self.COL_USER, pango.ELLIPSIZE_END, False),
+                ('Matches', 80, self.COL_TEXT, pango.ELLIPSIZE_END, True)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
-            cell.set_property("ellipsize", pango.ELLIPSIZE_START)
+            cell.set_property("ellipsize", emode)
             cell.set_property("family", "Monospace")
             column = gtk.TreeViewColumn(title)
             column.set_resizable(True)
