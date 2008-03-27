@@ -5,6 +5,7 @@ import traceback
 import threading
 import Queue
 from mercurial import hg, ui, util, extensions, commands, hook
+from mercurial.repo import RepoError
 from mercurial.node import *
 from mercurial.i18n import _
 from dialog import entry_dialog
@@ -175,7 +176,7 @@ class HgThread(threading.Thread):
             self.ret = ret or 0
             if self.postfunc:
                 self.postfunc(ret)
-        except hg.RepoError, e:
+        except RepoError, e:
             self.ui.write_err(str(e))
         except util.Abort, e:
             self.ui.write_err(str(e))
@@ -294,10 +295,10 @@ def thgdispatch(ui, path=None, args=[]):
             ui.setconfig("bundle", "mainreporoot", repo.root)
             if not repo.local():
                 raise util.Abort(_("repository '%s' is not local") % path)
-        except hg.RepoError:
+        except RepoError:
             if cmd not in commands.optionalrepo.split():
                 if not path:
-                    raise hg.RepoError(_("There is no Mercurial repository here"
+                    raise RepoError(_("There is no Mercurial repository here"
                                          " (.hg not found)"))
                 raise
         d = lambda: func(ui, repo, *args, **cmdoptions)
