@@ -244,8 +244,6 @@ class SynchDialog(gtk.Window):
             warning = "Outstanding uncommitted merges"
         elif pa != p1 and pa != p2:
             warning = "Update spans branches"
-        elif wc.files():
-            warning = "Outstanding uncommitted changes"
         if warning:
             flags = ['--clean']
             msg = 'Lose all changes in your working directory?'
