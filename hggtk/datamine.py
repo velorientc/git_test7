@@ -357,10 +357,12 @@ class DataMineDialog(GDialog):
         lb.show()
         col.set_widget(lb)
         wgt = lb.get_parent()
-        while wgt and type(wgt) != gtk.Button:
+        while wgt:
+            if type(wgt) == gtk.Button:
+                wgt.connect("button-press-event",
+                        self._tree_header_button_press, menu)
+                break
             wgt = wgt.get_parent()
-        wgt.connect("button-press-event", self._tree_header_button_press,
-                menu)
 
     def _tree_header_button_press(self, widget, event, menu):
         if event.button == 3:
