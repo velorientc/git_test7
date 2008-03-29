@@ -39,6 +39,7 @@ class ServeDialog(gtk.Window):
         self.connect('delete-event', self._delete)
 
         # Pipe stderr, stdout to self.write
+        self._queue = Queue.Queue()
         sys.stdout = self
         sys.stderr = self
 
@@ -227,8 +228,7 @@ class ServeDialog(gtk.Window):
         global gservice
         gservice = None
 
-        q = Queue.Queue()
-        args = [self._root, q, 'serve', '--name', self.webname,
+        args = [self._root, self._queue, 'serve', '--name', self.webname,
                 '--port', str(port)]
         thread = threading.Thread(target=hglib.hgcmd_toq, args=args)
         thread.start()
@@ -236,7 +236,7 @@ class ServeDialog(gtk.Window):
         while not gservice or not hasattr(gservice, 'httpd'):
             time.sleep(0.1)
         self._url = 'http://%s:%d/' % (gservice.httpd.fqaddr, port)
-        gobject.timeout_add(10, self.process_queue, q)
+        gobject.timeout_add(10, self.process_queue)
         
     def _stop_server(self):
         if gservice and not gservice.stopped:
@@ -245,7 +245,10 @@ class ServeDialog(gtk.Window):
     def flush(self, *args):
         pass
 
-    def write(self, msg, append=True):
+    def write(self, msg):
+        self._queue.put(msg)
+        
+    def _write(self, msg, append=True):
         msg = unicode(msg, 'iso-8859-1')
         if append:
             enditer = self.textbuffer.get_end_iter()
@@ -253,14 +256,14 @@ class ServeDialog(gtk.Window):
         else:
             self.textbuffer.set_text(msg)
 
-    def process_queue(self, q):
+    def process_queue(self):
         """
         Handle all the messages currently in the queue (if any).
         """
-        while q.qsize():
+        while self._queue.qsize():
             try:
-                msg = q.get(0)
-                self.write(msg)
+                msg = self._queue.get(0)
+                self._write(msg)
             except Queue.Empty:
                 pass
 
