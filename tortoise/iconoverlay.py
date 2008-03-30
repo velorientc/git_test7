@@ -170,9 +170,9 @@ class IconOverlayExtension(object):
             repo = hg.repository(ui.ui(), path=root)
 
             # check if to display overlay icons in this repo
-            show_overlay = repo.ui.config('tortoisehg', 'overlayicons', 'enabled')
-            print "%s: overlay icons %s" % (path, show_overlay)
-            if show_overlay != 'enabled':
+            show_overlay = repo.ui.configlist('tortoisehg', 'overlayicons', [])
+            print "%s: overlay icons = " % path, show_overlay
+            if 'disabled' in show_overlay:
                 overlay_cache = {}
                 for f in get_cache_list(path):
                     overlay_cache[f] = (UNKNOWN, tc)
