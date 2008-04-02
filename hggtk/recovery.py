@@ -18,6 +18,7 @@ import Queue
 import os
 import threading
 from mercurial import hg, ui, util 
+from mercurial.repo import RepoError
 from mercurial.node import *
 from dialog import error_dialog, question_dialog
 from hglib import HgThread
@@ -127,7 +128,7 @@ class RecoveryDialog(gtk.Window):
             return
         try:
             repo = hg.repository(ui.ui(), path=self.root)
-        except hg.RepoError:
+        except RepoError:
             self.write("Unable to find repo at %s\n" % (self.root), False)
             return
         pl = repo.workingctx().parents()

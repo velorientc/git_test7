@@ -13,6 +13,7 @@ import gtk
 from gdialog import *
 from mercurial.node import *
 from mercurial import cmdutil, util, hg, ui
+from mercurial.repo import RepoError
 from shlib import shell_notify, set_tortoise_icon
 
 class FilterDialog(gtk.Dialog):
@@ -30,7 +31,7 @@ class FilterDialog(gtk.Dialog):
 
         try:
             self.repo = hg.repository(ui.ui(), path=root)
-        except hg.RepoError:
+        except RepoError:
             return None
 
         self.set_default_size(350, 120)

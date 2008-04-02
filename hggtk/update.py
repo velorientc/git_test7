@@ -13,6 +13,7 @@ import gtk
 from dialog import *
 from mercurial.node import *
 from mercurial import util, hg, ui
+from mercurial.repo import RepoError
 from shlib import shell_notify, set_tortoise_icon
 from hglib import rootpath
 
@@ -30,7 +31,7 @@ class UpdateDialog(gtk.Window):
         u = ui.ui()
         try:
             self.repo = hg.repository(u, path=self.root)
-        except hg.RepoError:
+        except RepoError:
             return None
 
         # set dialog title
@@ -135,7 +136,7 @@ class UpdateDialog(gtk.Window):
             # FIXME: force hg to refresh parents info
             del self.repo
             self.repo = hg.repository(ui.ui(), path=self.root)
-        except hg.RepoError:
+        except RepoError:
             return None
 
         # populate parent rev data

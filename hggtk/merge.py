@@ -14,6 +14,7 @@ from mercurial.node import *
 from mercurial import util, hg, ui
 from hgcmd import CmdDialog
 from shlib import set_tortoise_icon, shell_notify
+from mercurial.repo import RepoError
 import histselect
 
 class MergeDialog(gtk.Window):
@@ -135,7 +136,7 @@ class MergeDialog(gtk.Window):
             # FIXME: force hg to refresh parents info
             del self.repo
             self.repo = hg.repository(ui.ui(), path=self.root)
-        except hg.RepoError:
+        except RepoError:
             return None
 
         # populate parent rev data

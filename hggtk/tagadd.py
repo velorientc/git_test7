@@ -15,6 +15,7 @@ import sys
 import gtk
 from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
+from mercurial.repo import RepoError
 from mercurial.i18n import _
 from mercurial.node import *
 
@@ -34,7 +35,7 @@ class TagAddDialog(gtk.Window):
 
         try:
             self.repo = hg.repository(ui.ui(), path=self.root)
-        except hg.RepoError:
+        except RepoError:
             pass
 
         # build dialog

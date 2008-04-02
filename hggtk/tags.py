@@ -14,6 +14,7 @@ import sys
 import gtk
 import gobject
 from mercurial import hg, ui, cmdutil, util, node
+from mercurial.repo import RepoError
 from mercurial.i18n import _
 
 def get_tag_list(path):
@@ -21,7 +22,7 @@ def get_tag_list(path):
     u = ui.ui()
     try:
         repo = hg.repository(u, path=root)
-    except hg.RepoError:
+    except RepoError:
         return None
 
     l = repo.tagslist()

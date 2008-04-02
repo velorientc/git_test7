@@ -10,6 +10,7 @@ import gobject
 import os
 import pango
 from mercurial import hg, ui, cmdutil, util
+from mercurial.repo import RepoError
 from dialog import error_dialog, question_dialog
 import shlib
 import shelve
@@ -29,7 +30,7 @@ class ConfigDialog(gtk.Dialog):
         self.ui = ui.ui()
         try:
             repo = hg.repository(self.ui, path=root)
-        except hg.RepoError:
+        except RepoError:
             repo = None
             if configrepo:
                 error_dialog('No repository found', 'no repo at ' + root)

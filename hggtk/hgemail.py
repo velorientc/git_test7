@@ -14,6 +14,7 @@ import shlib
 from tempfile import mkstemp
 from dialog import *
 from mercurial import hg, ui, extensions
+from mercurial.repo import RepoError
 from thgconfig import ConfigDialog
 from hgcmd import CmdDialog
 
@@ -198,7 +199,7 @@ class EmailDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=self.root)
             self.repo = repo
-        except hg.RepoError:
+        except RepoError:
             self.repo = None
             return
 

@@ -18,6 +18,7 @@ import Queue
 import os
 import threading
 from mercurial import hg, ui, util 
+from mercurial.repo import RepoError
 from dialog import error_dialog, question_dialog
 from hglib import HgThread
 import shlib
@@ -285,7 +286,7 @@ class SynchDialog(gtk.Window):
                     raise "unknown sort key '%s'" % sort
                 paths.sort(sortfunc)
             return paths
-        except hg.RepoError:
+        except RepoError:
             return None
 
     def _btn_remotepath_clicked(self, button):
