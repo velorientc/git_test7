@@ -186,7 +186,7 @@ class ConfigDialog(gtk.Dialog):
                 ('Contact', 'web.contact', ['unknown'],
                     'Name or email address of the person in charge of the'
                     ' repository.'),
-                ('Style', 'web.style', ['default', 'gitweb', 'old'],
+                ('Style', 'web.style', ['default', 'gitweb', 'coal', 'old'],
                     'Which template map style to use'),
                 ('Archive Formats', 'web.allow_archive', ['bz2', 'gz', 'zip'],
                     'Comma separated list of archive formats allowed for'
