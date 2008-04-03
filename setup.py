@@ -9,6 +9,11 @@ import time
 import sys
 import os
 
+# non-Win32 platforms doesn't require setup
+if os.name != 'nt':
+    sys.stderr.write("abort: %s is for Win32 platforms only" % sys.argv[0])
+    sys.exit(1)
+
 # ModuleFinder can't handle runtime changes to __path__, but win32com uses them
 
 try:
