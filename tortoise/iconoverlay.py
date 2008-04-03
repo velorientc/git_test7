@@ -25,45 +25,25 @@ UNCHANGED = "unchanged"
 ADDED = "added"
 MODIFIED = "modified"
 UNKNOWN = "unknown"
-NOT_IN_TREE = "not in tree"
-NO_DIRSTATE = "dirstate not found"
-CONTROL_FILE = "control file"
+NOT_IN_REPO = "n/a"
 
 # file status cache
-CACHE_TIMEOUT = 3000
+CACHE_TIMEOUT = 5000
 overlay_cache = {}
+cache_tick_count = 0
+cache_root = None
+cache_pdir = None
 
 # some misc constants
 S_OK = 0
 S_FALSE = 1
 
-def subdirs(p):
-    oldp = ""
-    if os.path.isdir(p):    
-        yield p
-    while 1:
-        oldp = p
-        p = os.path.dirname(p)
-        if p == oldp:
-            return
-        yield p
-
-def get_cache_list(path):
-    """
-    get a list of file/folders which reside in the same directory as 'path' 
-    """
-    pathdir = os.path.dirname(path)
-    return [os.path.join(pathdir, x) for x in os.listdir(pathdir) if x <> ".hg"]
-
-def get_dirs(list):
-    return set([os.path.dirname(p) for p in list])
-    
 def add_dirs(list):
     dirs = set()
     for f in list:
         dir = os.path.dirname(f)
         if dir in dirs:
-           continue
+            continue
         while dir:
             dirs.add(dir)
             dir = os.path.dirname(dir)
@@ -119,7 +99,9 @@ class IconOverlayExtension(object):
         """
         Get the state of a given path in source control.
         """
-        global overlay_cache
+        global overlay_cache, cache_tick_count
+        global cache_root, cache_pdir
+        
         #print "called: _get_state(%s)" % path
         tc = win32api.GetTickCount()
         
@@ -130,130 +112,111 @@ class IconOverlayExtension(object):
             path = upath
 
         # check if path is cached
-        if path in overlay_cache:
-            if tc - overlay_cache[path][1] < CACHE_TIMEOUT:
-                status = overlay_cache[path][0]
+        pdir = os.path.dirname(path)
+        if cache_pdir == pdir and overlay_cache:
+            if tc - cache_tick_count < CACHE_TIMEOUT:
+                try:
+                    status = overlay_cache[path]
+                except:
+                    status = UNKNOWN
                 print "%s: %s (cached)" % (path, status)
                 return status
+            else:
+                print "Timed out!!"
+                overlay_cache.clear()
 
         # path is a drive
         if path.endswith(":\\"):
-            overlay_cache[path] = (UNKNOWN, tc)
-            return NOT_IN_TREE
-                
-        if os.path.basename(path) == ".hg":
-            print "%s: skip directory" % path
-            overlay_cache[path] = (UNKNOWN, tc)
-            return NOT_IN_TREE      # ignore .hg directories (for efficiency)
+            overlay_cache[path] = UNKNOWN
+            return NOT_IN_REPO
 
         # open repo
-        root = thgutil.find_root(path)
-        #print "_get_state: root = ", root
+        if cache_pdir == pdir:
+            root = cache_root
+        else:
+            print "find new root"
+            cache_pdir = pdir
+            cache_root = root = thgutil.find_root(pdir)
+        print "_get_state: root = ", root
         if root is None:
-            #print "_get_state: not in repo"
-            overlay_cache = {}
-            for f in get_cache_list(path):
-                overlay_cache[f] = (UNKNOWN, tc)
-            return NOT_IN_TREE
+            print "_get_state: not in repo"
+            overlay_cache = {None : None}
+            cache_tick_count = win32api.GetTickCount()
+            return NOT_IN_REPO
 
-        # skip root direcory to improve speed
-        if root == path:
-            #print "_get_state: skip repo root"
-            overlay_cache[path] = (UNKNOWN, tc)
-            return NOT_IN_TREE
-            
-        # can't get correct status without dirstate
-        if not os.path.exists(os.path.join(root, ".hg", "dirstate")):
-            #print "_get_state: dirstate not found"
-            return NO_DIRSTATE
-            
         try:
+            tc1 = win32api.GetTickCount()
             repo = hg.repository(ui.ui(), path=root)
+            print "hg.repository() took %d ticks" % (win32api.GetTickCount() - tc1)
 
             # check if to display overlay icons in this repo
             show_overlay = repo.ui.configlist('tortoisehg', 'overlayicons', [])
             print "%s: overlay icons = " % path, show_overlay
             if 'disabled' in show_overlay:
-                overlay_cache = {}
-                for f in get_cache_list(path):
-                    overlay_cache[f] = (UNKNOWN, tc)
-                return NOT_IN_TREE
+                overlay_cache = {None : None}
+                cache_tick_count = win32api.GetTickCount()
+                return NOT_IN_REPO
         except _repo.RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % dir
-            overlay_cache[path] = (UNKNOWN, tc)
-            return NOT_IN_TREE
+            overlay_cache[path] = UNKNOWN
+            return NOT_IN_REPO
 
         # get file status
         tc1 = win32api.GetTickCount()
-        cache_list = get_cache_list(path)
-        #print "cache_list: ", "\n".join(cache_list)
-        
-        dirstate_list = [ os.path.normpath(os.path.join(root, x[0])) 
-                          for x in repo.dirstate._map.items() ]
-        ndirs = []
-        for d in get_dirs(dirstate_list):
-            ndirs.extend(subdirs(d))
-        dirstate_list.extend(set(ndirs))
-        #print "dirstate_list: ", "\n".join(dirstate_list)
-        
-        tracked_list = [ x for x in cache_list if x in dirstate_list ]
-        #print "tracked_list: ", "\n".join(tracked_list)
 
         modified, added, removed, deleted = [], [], [], []
         unknown, ignored, clean = [], [], []
         files = []
-        if tracked_list:
-            try:
-                files, matchfn, anypats = cmdutil.matchpats(repo, tracked_list)
-                modified, added, removed, deleted, unknown, ignored, clean = [
-                        n for n in repo.status(files=files, list_clean=True)]
+        try:
+            files, matchfn, anypats = cmdutil.matchpats(repo, [pdir])
+            modified, added, removed, deleted, unknown, ignored, clean = \
+                    repo.status(files=files, list_ignored=True, 
+                            list_clean=True, list_unknown=True)
 
-                # add directory status to list
-                add_dirs(clean)
-                add_dirs(modified)
-                add_dirs(added)
-                add_dirs(removed)
-                add_dirs(deleted)
-            except util.Abort, inst:
-                print "abort: %s" % inst
-                print "treat as unknown : %s" % path
-                return UNKNOWN
-            
-            print "status() took %d ticks" % (win32api.GetTickCount() - tc1)
+            # add directory status to list
+            for grp in (clean,modified,added,removed,deleted,ignored,unknown):
+                add_dirs(grp)
+        except util.Abort, inst:
+            print "abort: %s" % inst
+            print "treat as unknown : %s" % path
+            return UNKNOWN
+        
+        print "status() took %d ticks" % (win32api.GetTickCount() - tc1)
                 
         # cached file info
         tc = win32api.GetTickCount()
         overlay_cache = {}
-        for f in files:
-            if f in modified:
-                status = MODIFIED
-            elif f in added:
-                status = ADDED
-            elif f in clean:
-                status = UNCHANGED
-            else:
-                status = UNKNOWN
-            fpath = os.path.join(repo.root, os.path.normpath(f))
-            overlay_cache[fpath] = (status, tc)
-            #print "cache:", fpath, status
-        
-        for f in cache_list:
-            if not f in overlay_cache:
-                overlay_cache[f] = (UNKNOWN, tc)
+        for grp, st in (
+                (ignored, UNKNOWN),
+                (unknown, UNKNOWN),                
+                (clean, UNCHANGED),
+                (added, ADDED),
+                (removed, MODIFIED),
+                (deleted, MODIFIED),
+                (modified, MODIFIED)):
+            for f in grp:
+                fpath = os.path.join(repo.root, os.path.normpath(f))
+                overlay_cache[fpath] = st
 
         if path in overlay_cache:
-            status = overlay_cache[path][0]
+            status = overlay_cache[path]
         else:
-            status = UNKNOWN
+            status = overlay_cache[path] = UNKNOWN
         print "%s: %s" % (path, status)
+        cache_tick_count = win32api.GetTickCount()
         return status
 
     def IsMemberOf(self, path, attrib):                  
-        if self._get_state(path) == self.state:
-            return S_OK
-        return S_FALSE
-
+        try:
+            tc = win32api.GetTickCount()
+            if self._get_state(path) == self.state:
+                return S_OK
+            return S_FALSE
+        finally:
+            print "IsMemberOf: _get_state() took %d ticks" % \
+                    (win32api.GetTickCount() - tc)
+            
 def make_icon_overlay(name, icon, state, clsid):
     """
     Make an icon overlay COM class.
