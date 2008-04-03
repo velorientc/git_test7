@@ -150,9 +150,15 @@ class IconOverlayExtension(object):
             print "hg.repository() took %d ticks" % (win32api.GetTickCount() - tc1)
 
             # check if to display overlay icons in this repo
-            show_overlay = repo.ui.configlist('tortoisehg', 'overlayicons', [])
-            print "%s: overlay icons = " % path, show_overlay
-            if 'disabled' in show_overlay:
+            global_opts = ui.ui().configlist('tortoisehg', 'overlayicons', [])
+            repo_opts = repo.ui.configlist('tortoisehg', 'overlayicons', [])
+            
+            print "%s: global overlayicons = " % path, global_opts
+            print "%s: repo overlayicons = " % path, repo_opts
+            is_netdrive =  thgutil.netdrive_status(path) is not None
+            if (is_netdrive and 'localdisks' in global_opts) \
+                    or 'disabled' in repo_opts:
+                print "%s: overlayicons disabled" % path
                 overlay_cache = {None : None}
                 cache_tick_count = win32api.GetTickCount()
                 return NOT_IN_REPO
