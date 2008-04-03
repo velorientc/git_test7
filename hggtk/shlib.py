@@ -12,9 +12,11 @@ import shelve
 import time
 
 class SimpleMRUList(object):
-    def __init__(self, size=10, reflist=[]):
+    def __init__(self, size=10, reflist=[], compact=True):
         self._size = size
         self._list = reflist
+        if compact:
+            self.compact()
 
     def __iter__(self):
         for elem in self._list:
@@ -36,6 +38,15 @@ class SimpleMRUList(object):
     def flush(self):
         while len(self._list) > self._size:
             del self._list[-1]
+
+    def compact(self):
+        ''' remove duplicate in list '''
+        list = []
+        for v in self._list:
+            if v not in list:
+                list.append(v)
+        self._list[:] = list
+
 
 class Settings(object):
     version = 1.0
