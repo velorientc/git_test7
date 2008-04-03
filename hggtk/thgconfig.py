@@ -456,7 +456,7 @@ class ConfigDialog(gtk.Dialog):
                         currow = len(vlist) - 1
             if cpath in self.history.get_keys():
                 separator = False
-                for v in self.history.get_value(cpath):
+                for v in self.history.mrul(cpath):
                     if v in values: continue
                     if not separator:
                         vlist.append(['History', True])
@@ -532,7 +532,8 @@ class ConfigDialog(gtk.Dialog):
             self.history.set_value(cpath, [])
         elif newvalue in self.history.get_keys():
             self.history.get_value(cpath).remove(newvalue)
-        self.history.get_value(cpath).insert(0, newvalue)
+        self.history.mrul(cpath).add(newvalue)
+        pass
 
     def _apply_clicked(self, *args):
         # Reload history, since it may have been modified externally
