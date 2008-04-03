@@ -533,7 +533,6 @@ class ConfigDialog(gtk.Dialog):
         elif newvalue in self.history.get_keys():
             self.history.get_value(cpath).remove(newvalue)
         self.history.mrul(cpath).add(newvalue)
-        pass
 
     def _apply_clicked(self, *args):
         # Reload history, since it may have been modified externally
