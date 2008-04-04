@@ -290,6 +290,7 @@ class ConfigDialog(gtk.Dialog):
 
         # Force dialog into clean state in the beginning
         self._btn_apply.set_sensitive(False)
+        self._refresh_vlist()
         self.dirty = False
 
     def _delete(self, widget, event):
@@ -422,57 +423,6 @@ class ConfigDialog(gtk.Dialog):
             combo.set_row_separator_func(lambda model, iter: model[iter][1])
             widgets.append(combo)
 
-            # Get currently configured value from this config file
-            curvalue = self.get_ini_config(cpath)
-
-            if cpath == 'tortoisehg.vdiff':
-                # Special case, add extdiff.cmd.* to possible values
-                for name, value in self.ui.configitems('extdiff'):
-                    if name.startswith('cmd.'):
-                        values.append(name[4:])
-            elif cpath == 'ui.merge':
-                # Special case, add [merge-tools] to possible values
-                try:
-                    from mercurial import filemerge
-                    tools = []
-                    for key, value in self.ui.configitems('merge-tools'):
-                        t = key.split('.')[0]
-                        if t not in tools:
-                            tools.append(t)
-                    for t in tools:
-                        # Ensure the tool is installed
-                        if filemerge._findtool(self.ui, t):
-                            values.append(t)
-                except ImportError:
-                    pass
-
-            currow = None
-            vlist.append([_unspecstr, False])
-            if values:
-                vlist.append(['Suggested', True])
-                for v in values:
-                    vlist.append([v, False])
-                    if v == curvalue:
-                        currow = len(vlist) - 1
-            if cpath in self.history.get_keys():
-                separator = False
-                for v in self.history.mrul(cpath):
-                    if v in values: continue
-                    if not separator:
-                        vlist.append(['History', True])
-                        separator = True
-                    vlist.append([v, False])
-                    if v == curvalue:
-                        currow = len(vlist) - 1
-
-            if curvalue is None:
-                combo.set_active(0)
-            elif currow is None:
-                combo.child.set_text(curvalue)
-            else:
-                combo.set_active(currow)
-
-
             lbl = gtk.Label(label + ':')
             lbl.set_alignment(1.0, 0.0)
             eventbox = gtk.EventBox()
@@ -484,6 +434,63 @@ class ConfigDialog(gtk.Dialog):
         self.pages.append((vbox, info, widgets))
         return vbox
         
+    def _refresh_vlist(self):
+        for vbox, info, widgets in self.pages:
+            for row, (label, cpath, values, tooltip) in enumerate(info):
+                combo = widgets[row]
+                vlist = combo.get_model()
+                vlist.clear()
+
+                # Get currently configured value from this config file
+                curvalue = self.get_ini_config(cpath)
+
+                if cpath == 'tortoisehg.vdiff':
+                    # Special case, add extdiff.cmd.* to possible values
+                    for name, value in self.ui.configitems('extdiff'):
+                        if name.startswith('cmd.') and name[4:] not in values:
+                            values.append(name[4:])
+                elif cpath == 'ui.merge':
+                    # Special case, add [merge-tools] to possible values
+                    try:
+                        from mercurial import filemerge
+                        tools = []
+                        for key, value in self.ui.configitems('merge-tools'):
+                            t = key.split('.')[0]
+                            if t not in tools:
+                                tools.append(t)
+                        for t in tools:
+                            # Ensure the tool is installed
+                            if filemerge._findtool(self.ui, t):
+                                values.append(t)
+                    except ImportError:
+                        pass
+
+                currow = None
+                vlist.append([_unspecstr, False])
+                if values:
+                    vlist.append(['Suggested', True])
+                    for v in values:
+                        vlist.append([v, False])
+                        if v == curvalue:
+                            currow = len(vlist) - 1
+                if cpath in self.history.get_keys():
+                    separator = False
+                    for v in self.history.mrul(cpath):
+                        if v in values: continue
+                        if not separator:
+                            vlist.append(['History', True])
+                            separator = True
+                        vlist.append([v, False])
+                        if v == curvalue:
+                            currow = len(vlist) - 1
+
+                if curvalue is None:
+                    combo.set_active(0)
+                elif currow is None:
+                    combo.child.set_text(curvalue)
+                else:
+                    combo.set_active(currow)
+
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
         frame.set_border_width(10)
@@ -563,6 +570,8 @@ class ConfigDialog(gtk.Dialog):
                 self.record_new_value(cpath, newvalue)
 
         self.history.write()
+        self._refresh_vlist()
+        
         try:
             f = open(self.fn, "w")
             f.write(str(self.ini))
