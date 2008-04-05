@@ -24,8 +24,6 @@ from hglib import HgThread
 import shlib
 import gtklib
 
-HistorySize = 10
-
 class SynchDialog(gtk.Window):
     def __init__(self, cwd='', root = '', repos=[]):
         """ Initialize the Dialog. """

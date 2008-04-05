@@ -20,8 +20,6 @@ from mercurial.i18n import _
 from mercurial.node import *
 import shlib
 
-HistorySize = 10
-
 class CloneDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, cwd='', repos=[]):
