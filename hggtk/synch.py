@@ -17,7 +17,7 @@ import pango
 import Queue
 import os
 import threading
-from mercurial import hg, ui, util 
+from mercurial import hg, ui, util, extensions
 from mercurial.repo import RepoError
 from dialog import error_dialog, question_dialog
 from hglib import HgThread
@@ -42,6 +42,9 @@ class SynchDialog(gtk.Window):
 
         self.paths = self._get_paths()
         self.origchangecount = self.repo.changelog.count()
+
+        # load the fetch extension explicitly
+        extensions.load(self.ui, 'fetch', None)
 
         name = self.repo.ui.config('web', 'name') or os.path.basename(root)
         self.set_title("TortoiseHg Synchronize - " + name)
@@ -263,6 +266,8 @@ class SynchDialog(gtk.Window):
     def _pull_menu(self):
         menu = gtk.Menu()
            
+        self._pull_fetch = gtk.CheckMenuItem("Do fetch")
+        menu.append(self._pull_fetch)
         self._pull_update = gtk.CheckMenuItem("Update to new tip")
         menu.append(self._pull_update)
         
@@ -328,11 +333,14 @@ class SynchDialog(gtk.Window):
         return tbutton
         
     def _pull_clicked(self, toolbutton, data=None):
-        cmd = ['pull']
-        if self._pull_update.get_active():
-            cmd.append('--update')
-        if self._force.get_active():
-            cmd.append('--force')
+        if self._pull_fetch.get_active():
+            cmd = ['fetch', '--message', 'merge']
+        else:
+            cmd = ['pull']
+            if self._pull_update.get_active():
+                cmd.append('--update')
+            if self._force.get_active():
+                cmd.append('--force')
         self._exec_cmd(cmd)
     
     def _push_clicked(self, toolbutton, data=None):
