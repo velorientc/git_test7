@@ -8,22 +8,58 @@ version.
 
 New features in 0.4
 
+  * Added user config 'tortoisehg.overlayicons' [True|False|localdisks],
+    to enable/disable overlay icons in selected repos. The 'localdisks' 
+    global option disables overlay icons for repos reside on network drives.
+
   * Changeset viewer shows 'MAR' file status and uses background threads
-    to load changeset diffs.  File list has been moved to the left hand
+    to load changeset diffs. File list has been moved to the left hand
     side.
 
+  * Added 'strip' and 'backout' functions to history browser.
+
   * Two convenience functions added to Synchronize dialog: 'View Pulled
-    Changes', and 'Update to Tip'
+    Changes', and 'Update to Tip'. Also added support for Fetch extension
+    to Synchronize dialog.
+
+  * Grep searches in Datamine dialog can now be interrupted.
+
+  * Recall recently committed messages in native Commit dialog
+
+  * Recall recently accessed source and destination paths in Synchronize
+    and Clone dialogs
+
+  * Add column for user names on annotate pages of Datamine dialog.
+
+  * Hgk ('Revision Graph') is officially replaced by TortoiseHg's 
+    history browser.
 
   * Installer now requires admin priviledges in order to prevent an
-    upgrade from requiring two reboots.
+    upgrade from requiring two reboots. 
+
+  * New TortoiseHg logo in About dialog, contributed by Peer Sommerlund.
+
+  * Updated Hg icon (on context menu and dialogs) to new droplet design 
+    from Mercurial 1.0
+
+  * Several minor bugfixes and improvements.
 
 Bug Fixes in 0.4:
-  * [ 1884919 ] Change Log hscroller
+
   * TortoiseHg program groups now read 'hgproc' with hg.ico.
     In earlier versions, it used 'Python' with python.ico
+  * Fixed random crashes on web server.
+  * Fixed addremove behavior in Commit dialog
+  * [ 1884919 ] Change Log hscroller
+  * [ 1925985 ] HTTP port field not effective
+  * [ 1914859 ] Global options should show up more often
+  * [ 1914550 ] Changelog: Problems with german umlaut characters
+  * [ 1902446 ] Commit claims file not under root while kdiff is open.
+  * [ 1895443 ] Overlay: ThreadingModel registry setting
+  * [ 1892791 ] Windows Explorer painfully slow for network drives
 
 Fixes in Mercurial since 0.3:
+
   * qimport fixed on Windows
   * new built-in filemerge system replaces hgmerge patches
   * many fixes for keyword extension
