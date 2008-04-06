@@ -157,7 +157,7 @@ class IconOverlayExtension(object):
             print "%s: repo overlayicons = " % path, repo_opts
             is_netdrive =  thgutil.netdrive_status(path) is not None
             if (is_netdrive and 'localdisks' in global_opts) \
-                    or 'disabled' in repo_opts:
+                    or 'False' in repo_opts:
                 print "%s: overlayicons disabled" % path
                 overlay_cache = {None : None}
                 cache_tick_count = win32api.GetTickCount()
