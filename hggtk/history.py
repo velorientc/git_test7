@@ -312,13 +312,12 @@ class GLog(GDialog):
         self._cmenu_diff = create_menu('_diff with mark', self._diff_revs)
         _menu.append(self._cmenu_diff)
         _menu.append(create_menu('backout revision', self._backout_rev))
-        try:
-            # Ensure mq extension is loaded
-            extensions.loadall(self.ui)
-            extensions.find('mq')
-            _menu.append(create_menu('strip revision', self._strip_rev))
-        except KeyError:
-            pass
+        
+        # need mq extension for strip command
+        extensions.loadall(self.ui)
+        extensions.load(self.ui, 'mq', None)
+        _menu.append(create_menu('strip revision', self._strip_rev))
+        
         _menu.show_all()
         return _menu
  
