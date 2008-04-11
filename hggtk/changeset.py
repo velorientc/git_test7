@@ -182,7 +182,11 @@ class ChangeSet(GDialog):
         except StopIteration:
             return False
 
-        lines = unicode(txt, 'latin-1', 'replace').splitlines()
+        try:
+            utxt = unicode(txt, util._encoding, 'strict')
+        except UnicodeDecodeError:
+            utxt = unicode(txt, util._fallbackencoding, 'replace')
+        lines = utxt.splitlines()
         eob = buf.get_end_iter()
         offset = eob.get_offset()
         fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, file)
