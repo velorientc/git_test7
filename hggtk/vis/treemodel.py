@@ -85,7 +85,11 @@ class TreeModel(gtk.GenericTreeModel):
             ctx = self.repo.changectx(revid)
 
             summary = ctx.description().replace('\0', '')
-            summary = unicode(summary.split('\n')[0], 'latin-1', 'replace')
+            summary = summary.split('\n')[0]
+            try:
+                summary = unicode(summary)
+            except UnicodeDecodeError:
+                summary = unicode(summary, util._fallbackencoding, 'replace')
             summary = gobject.markup_escape_text(summary)
             node = self.repo.lookup(revid)
             tags = ', '.join(self.repo.nodetags(node))
