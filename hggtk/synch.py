@@ -19,7 +19,7 @@ import os
 import threading
 from mercurial import hg, ui, util, extensions
 from mercurial.repo import RepoError
-from dialog import error_dialog, question_dialog
+from dialog import error_dialog, question_dialog, info_dialog
 from hglib import HgThread
 import shlib
 import gtklib
