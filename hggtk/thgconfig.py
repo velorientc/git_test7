@@ -45,9 +45,11 @@ class ConfigDialog(gtk.Dialog):
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
             self.set_title('TortoiseHg Configure Repository - ' + name)
+            self.root = repo.root
         else:
             self.rcpath = util.user_rcpath()
             self.set_title('TortoiseHg Configure User-Global Settings')
+            self.root = None
 
         shlib.set_tortoise_icon(self, 'menusettings.ico')
         self.ini = self.load_config(self.rcpath)
@@ -344,12 +346,16 @@ class ConfigDialog(gtk.Dialog):
         self.dirty_event()
 
     def _test_path(self, *args):
+        if not self.root:
+            error_dialog('No Repository Found', 
+                    'Path testing cannot work without a repository')
+            return
         testpath = self._pathpathedit.get_text()
         if not testpath:
             return
         if testpath[0] == '~':
             testpath = os.path.expanduser(testpath)
-        cmdline = ['hg', 'incoming', '--verbose', testpath]
+        cmdline = ['hg', 'incoming', '--repository', self.root, '--verbose', testpath]
         from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
