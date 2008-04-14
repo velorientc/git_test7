@@ -114,6 +114,7 @@ class CmdDialog(gtk.Dialog):
                 msg = self.hgthread.getqueue().get(0)
                 msg = unicode(msg, 'iso-8859-1')
                 self.textbuffer.insert(enditer, msg)
+                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
         self.update_progress()
