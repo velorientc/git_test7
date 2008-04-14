@@ -452,6 +452,7 @@ class SynchDialog(gtk.Window):
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)
+            self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
         else:
             self.textbuffer.set_text(msg)
 
