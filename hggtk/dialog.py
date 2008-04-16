@@ -22,6 +22,7 @@ except:
 
 import gtk
 import gtk.glade
+from gtklib import MessageDialog
 
 
 def about():
@@ -35,7 +36,7 @@ def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK,
     
     :param message: the message you want to display.
     """
-    dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL, type=type,
+    dialog = MessageDialog(flags=gtk.DIALOG_MODAL, type=type,
                                buttons=buttons)
     dialog.set_title(title)
     dialog.set_markup('<big><b>' + primary + '</b></big>')

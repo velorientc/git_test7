@@ -29,27 +29,28 @@ from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
 from shlib import shell_notify, set_tortoise_icon, Settings
 from thgconfig import ConfigDialog
+from gtklib import MessageDialog
 
-class SimpleMessage(gtk.MessageDialog):
+
+class SimpleMessage(MessageDialog):
     def run(self):
-        response = gtk.MessageDialog.run(self)
+        response = MessageDialog.run(self)
         self.destroy()
         return response
 
 
 class Prompt(SimpleMessage):
     def __init__(self, title, message, parent):
-        gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
+        SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE)
         self.set_title(title)
         self.set_markup('<b>' + message + '</b>')
-
 
 class Confirm(SimpleMessage):
     """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO 
     """
     def __init__(self, title, files, parent, primary=None):
-        gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
+        SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
         self.set_title('Confirm ' + title)
         if primary is None:
