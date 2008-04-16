@@ -157,7 +157,7 @@ class ServeDialog(gtk.Window):
         check if server is running, or to terminate if running
         '''
         if gservice and not gservice.stopped:
-            if question_dialog("Really Exit?",
+            if question_dialog(self, "Really Exit?",
                     "Server process is still running\n" +
                     "Exiting will stop the server.") != gtk.RESPONSE_YES:
                 return False
@@ -223,7 +223,7 @@ class ServeDialog(gtk.Window):
         except:
             try: port = int(self.defport)
             except: port = 8000
-            error_dialog("Invalid port 2048..65535", "Defaulting to " +
+            error_dialog(self, "Invalid port 2048..65535", "Defaulting to " +
                     self.defport)
         
         global gservice

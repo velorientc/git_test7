@@ -83,8 +83,8 @@ class MessageDialog(gtk.Dialog):
         self._image_frame = gtk.Frame()
         self._image_frame.set_shadow_type(gtk.SHADOW_NONE)
         self._image = gtk.Image()
-        imageid = MessageDialog.image_map[type]
-        self._image.set_from_stock(imageid, gtk.ICON_SIZE_DIALOG)
+        self._image.set_from_stock(MessageDialog.image_map[type],
+                gtk.ICON_SIZE_DIALOG)
         self._image_frame.add(self._image)
         hbox.pack_start(self._image_frame, padding=5)
 

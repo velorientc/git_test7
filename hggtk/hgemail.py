@@ -207,7 +207,7 @@ class EmailDialog(gtk.Window):
             if name == 'patchbomb':
                 break
         else:
-            error_dialog('Email not enabled',
+            error_dialog(self, 'Email not enabled',
                     'You must enable the patchbomb extension to use this tool')
             self.response(gtk.RESPONSE_CANCEL)
 
@@ -261,11 +261,11 @@ class EmailDialog(gtk.Window):
         subjtext = self._subjbox.child.get_text()
 
         if not totext:
-            info_dialog('Info required', 'You must specify a recipient')
+            info_dialog(self, 'Info required', 'You must specify a recipient')
             self._tobox.grab_focus()
             return
         if not fromtext:
-            info_dialog('Info required', 'You must specify a sender address')
+            info_dialog(self, 'Info required', 'You must specify a sender address')
             self._frombox.grab_focus()
             return
         if not self.repo:
@@ -273,7 +273,7 @@ class EmailDialog(gtk.Window):
 
         if self.repo.ui.config('email', 'method', 'smtp') == 'smtp':
             if not self.repo.ui.config('smtp', 'host'):
-                info_dialog('Info required', 'You must configure SMTP')
+                info_dialog(self, 'Info required', 'You must configure SMTP')
                 dlg = ConfigDialog(self.root, False)
                 dlg.show_all()
                 dlg.focus_field('smtp.host')

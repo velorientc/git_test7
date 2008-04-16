@@ -97,7 +97,7 @@ class RecoveryDialog(gtk.Window):
 
     def _close_clicked(self, *args):
         if threading.activeCount() != 1:
-            error_dialog("Can't close now", "command is running")
+            error_dialog(self, "Can't close now", "command is running")
         else:
             gtk.main_quit()
         
@@ -122,7 +122,7 @@ class RecoveryDialog(gtk.Window):
         return tbutton
         
     def _clean_clicked(self, toolbutton, data=None):
-        response = question_dialog("Clean repository",
+        response = question_dialog(self, "Clean repository",
                 "%s ?" % os.path.basename(self.root))
         if not response == gtk.RESPONSE_YES:
             return
@@ -141,7 +141,7 @@ class RecoveryDialog(gtk.Window):
         shell_notify([self.cwd])
 
     def _rollback_clicked(self, toolbutton, data=None):
-        response = question_dialog("Rollback repository",
+        response = question_dialog(self, "Rollback repository",
                 "%s ?" % os.path.basename(self.root))
         if not response == gtk.RESPONSE_YES:
             return

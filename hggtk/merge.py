@@ -202,10 +202,10 @@ class MergeDialog(gtk.Window):
         rev = self._rev_input.get_text()
         
         if not rev:
-            error_dialog("Can't unmerge", "please select revision to unmerge")
+            error_dialog(self, "Can't unmerge", "please select revision to unmerge")
             return
         
-        response = question_dialog("Undo merge",
+        response = question_dialog(self, "Undo merge",
                                    "and checkout revision %s?" % rev)
         if response != gtk.RESPONSE_YES:
             return
@@ -224,10 +224,10 @@ class MergeDialog(gtk.Window):
         force = self._chbox_force.get_active()
         
         if not rev:
-            error_dialog("Can't merge", "please enter revision to merge")
+            error_dialog(self, "Can't merge", "please enter revision to merge")
             return
         
-        response = question_dialog("Really want to merge?",
+        response = question_dialog(self, "Really want to merge?",
                                    "with revision %s" % rev)
         if response != gtk.RESPONSE_YES:
             return

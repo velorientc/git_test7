@@ -172,10 +172,10 @@ class UpdateDialog(gtk.Window):
         overwrite = self._overwrite.get_active()
         
         if not rev:
-            error_dialog("Can't update", "please enter revision to update to")
+            error_dialog(self, "Can't update", "please enter revision to update to")
             return
         
-        response = question_dialog("Really want to update?",
+        response = question_dialog(self, "Really want to update?",
                                    "to revision %s" % rev)
         if response != gtk.RESPONSE_YES:
             return

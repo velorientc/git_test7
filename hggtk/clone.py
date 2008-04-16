@@ -273,7 +273,7 @@ class CloneDialog(gtk.Window):
         
         # verify input
         if src == "":
-            error_dialog("Source path is empty", "Please enter")
+            error_dialog(self, "Source path is empty", "Please enter")
             self._src_input.grab_focus()
             return False
         
@@ -307,11 +307,11 @@ class CloneDialog(gtk.Window):
             dlg.run()
             dlg.hide()
         except util.Abort, inst:
-            error_dialog("Clone aborted", str(inst))
+            error_dialog(self, "Clone aborted", str(inst))
             return False
         except:
             import traceback
-            error_dialog("Clone error", traceback.format_exc())
+            error_dialog(self, "Clone error", traceback.format_exc())
             return False
 
         self._add_src_to_recent(src)

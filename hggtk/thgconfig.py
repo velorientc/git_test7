@@ -33,7 +33,7 @@ class ConfigDialog(gtk.Dialog):
         except RepoError:
             repo = None
             if configrepo:
-                error_dialog('No repository found', 'no repo at ' + root)
+                error_dialog(self, 'No repository found', 'no repo at ' + root)
                 self.response(gtk.RESPONSE_CANCEL)
 
         # Catch close events
@@ -301,7 +301,7 @@ class ConfigDialog(gtk.Dialog):
 
     def _response(self, widget, response_id):
         if self.dirty:
-            if question_dialog('Quit without saving?',
+            if question_dialog(self, 'Quit without saving?',
                 'Yes to abandon changes, No to continue') != gtk.RESPONSE_YES:
                 widget.emit_stop_by_name('response')
 
@@ -584,7 +584,7 @@ class ConfigDialog(gtk.Dialog):
             f.write(str(self.ini))
             f.close()
         except IOError, e:
-            error_dialog('Unable to write back configuration file', str(e))
+            error_dialog(self, 'Unable to write back configuration file', str(e))
 
         self._btn_apply.set_sensitive(False)
         self.dirty = False

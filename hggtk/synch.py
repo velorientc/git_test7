@@ -250,7 +250,7 @@ class SynchDialog(gtk.Window):
             flags = ['--clean']
             msg = 'Lose all changes in your working directory?'
             warning += ', requires clean checkout'
-            if question_dialog(msg, warning) != gtk.RESPONSE_YES:
+            if question_dialog(self, msg, warning) != gtk.RESPONSE_YES:
                 return
         self.write("", False)
 
@@ -307,13 +307,13 @@ class SynchDialog(gtk.Window):
         
     def _close_clicked(self, toolbutton, data=None):
         if threading.activeCount() != 1:
-            error_dialog("Can't close now", "command is running")
+            error_dialog(self, "Can't close now", "command is running")
         else:
             gtk.main_quit()
         
     def _delete(self, widget, event):
         if threading.activeCount() != 1:
-            error_dialog("Can't close now", "command is running")
+            error_dialog(self, "Can't close now", "command is running")
             return True
         else:
             gtk.main_quit()
@@ -372,7 +372,7 @@ class SynchDialog(gtk.Window):
     def _email_clicked(self, toolbutton, data=None):
         path = self._pathtext.get_text()
         if not path:
-            info_dialog('No repository selected',
+            info_dialog(self, 'No repository selected',
                     'Select a peer repository to compare with')
             self._pathbox.grab_focus()
             return
@@ -424,7 +424,7 @@ class SynchDialog(gtk.Window):
 
         # execute command and show output on text widget
         gobject.timeout_add(10, self.process_queue)
-        self.hgthread = HgThread(cmdline)
+        self.hgthread = HgThread(cmdline, parent=self)
         self.hgthread.start()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmd + [remote_path]))

@@ -176,25 +176,26 @@ class TagAddDialog(gtk.Window):
         
         # verify input
         if name == "":
-            error_dialog("Tag input is empty", "Please enter tag name")
+            error_dialog(self, "Tag input is empty", "Please enter tag name")
             self._tag_input.grab_focus()
             return False
         if use_msg and not message:
-            error_dialog("Custom commit message is empty", "Please enter commit message")
+            error_dialog(self, "Custom commit message is empty",
+                    "Please enter commit message")
             self._commit_message.grab_focus()
             return False
             
         # add tag to repo        
         try:
             self._add_hg_tag(name, rev, message, is_local, force=force)
-            info_dialog("Tagging completed", "Tag '%s' has been added" % name)
+            info_dialog(self, "Tagging completed", "Tag '%s' has been added" % name)
             self._refresh()
         except util.Abort, inst:
-            error_dialog("Error in tagging", str(inst))
+            error_dialog(self, "Error in tagging", str(inst))
             return False
         except:
             import traceback
-            error_dialog("Error in tagging", traceback.format_exc())
+            error_dialog(self, "Error in tagging", traceback.format_exc())
             return False
     
     def _do_rm_tag(self):
@@ -206,7 +207,7 @@ class TagAddDialog(gtk.Window):
         
         # verify input
         if name == "":
-            error_dialog("Tag name is empty", "Please select tag name to remove")
+            error_dialog(self, "Tag name is empty", "Please select tag name to remove")
             self._tag_input.grab_focus()
             return False
             
@@ -217,14 +218,14 @@ class TagAddDialog(gtk.Window):
             
         try:
             self._rm_hg_tag(name, message, is_local)
-            info_dialog("Tagging completed", "Tag '%s' has been removed" % name)
+            info_dialog(self, "Tagging completed", "Tag '%s' has been removed" % name)
             self._refresh()
         except util.Abort, inst:
-            error_dialog("Error in tagging", str(inst))
+            error_dialog(self, "Error in tagging", str(inst))
             return False
         except:
             import traceback
-            error_dialog("Error in tagging", traceback.format_exc())
+            error_dialog(self, "Error in tagging", traceback.format_exc())
             return False
         
     

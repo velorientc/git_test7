@@ -182,11 +182,11 @@ class HistoryDialog(gtk.Dialog):
             while q.qsize(): out += q.get(0)
             self.hgout = out
         except util.Abort, inst:
-            error_dialog("Error in %s command" % cmd, "abort: %s" % inst)
+            error_dialog(self, "Error in %s command" % cmd, "abort: %s" % inst)
             return False
         except:
             import traceback
-            error_dialog("Error in %s command" % cmd,
+            error_dialog(self, "Error in %s command" % cmd,
                     "Traceback:\n%s" % traceback.format_exc())
             return False
         return True

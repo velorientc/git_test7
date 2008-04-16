@@ -117,7 +117,7 @@ class HgThread(threading.Thread):
     feedback from Mercurial can be handled by the user via dialog
     windows.
     '''
-    def __init__(self, args=[], postfunc=None):
+    def __init__(self, args=[], postfunc=None, parent=None):
         self.outputq = Queue.Queue()
         self.dialogq = Queue.Queue()
         self.responseq = Queue.Queue()
@@ -125,6 +125,7 @@ class HgThread(threading.Thread):
         self.args = args
         self.ret = None
         self.postfunc = postfunc
+        self.parent = parent
         threading.Thread.__init__(self)
 
     def getqueue(self):
@@ -142,7 +143,7 @@ class HgThread(threading.Thread):
         '''Polled every 10ms to serve dialogs for the background thread'''
         try:
             (prompt, visible, default) = self.dialogq.get_nowait()
-            self.dlg = entry_dialog(prompt, visible, default,
+            self.dlg = entry_dialog(self.parent, prompt, visible, default,
                     self.dialog_response)
         except Queue.Empty:
             pass
