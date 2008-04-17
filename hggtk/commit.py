@@ -294,6 +294,13 @@ def launch(root='', files=[], cwd='', main=True):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
+    
+    # move cwd to repo root if repo is merged, so we can show
+    # all the changed files
+    if len(repo.workingctx().parents()) > 1 and repo.root != cwd:
+        cwd = repo.root
+        repo = hg.repository(u, path=cwd)
+        files = [cwd]
 
     ct = repo.ui.config('tortoisehg', 'commit', 'internal')
     if ct != 'internal':
@@ -330,6 +337,9 @@ def run(root='', files=[], cwd='', **opts):
 
 if __name__ == "__main__":
     import sys
+    from hglib import rootpath
+
     opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    opts['cwd'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
+    opts['root'] = rootpath(opts['cwd'])
     run(**opts)
