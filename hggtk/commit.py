@@ -181,7 +181,26 @@ class GCommit(GStatus):
                 live = True
         return live
 
+
+    def reload_status(self):
+        success = GStatus.reload_status(self)
+        self._check_merge()
+        return success
+
+
     ### End of overridable methods ###
+
+    def _check_merge(self):
+        # disable the checkboxes on the filelist if repo in merging state
+        merged = len(self.repo.workingctx().parents()) > 1
+        cbcell = self.tree.get_column(0).get_cell_renderers()[0]
+        cbcell.set_property("activatable", not merged)
+        
+        # select all changes if repo is merged
+        if merged:
+            for entry in self.model:
+                if entry[1] in 'MARD':
+                    entry[0] = True
 
 
     def _commit_clicked(self, toolbutton, data=None):
