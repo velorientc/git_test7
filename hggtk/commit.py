@@ -188,16 +188,23 @@ class GCommit(GStatus):
         if not self._ready_message():
             return True
 
-        commitable = 'MAR'
-        addremove_list = self._relevant_files('?!')
-        if len(addremove_list) and self._should_addremove(addremove_list):
-            commitable += '?!'
-
-        commit_list = self._relevant_files(commitable)
-        if len(commit_list) > 0:
-            self._hg_commit(commit_list)
+        if len(self.repo.workingctx().parents()) > 1:
+            msg = 'The repo contains merges, you must commit all files.\n\n' \
+                  'Proceed with commit?'
+            response = Confirm('Commit Merges', [], self, msg).run() 
+            if response == gtk.RESPONSE_YES:
+                self._hg_commit([])
         else:
-            Prompt('Nothing Commited', 'No committable files selected', self).run()
+            commitable = 'MAR'
+            addremove_list = self._relevant_files('?!')
+            if len(addremove_list) and self._should_addremove(addremove_list):
+                commitable += '?!'
+
+            commit_list = self._relevant_files(commitable)
+            if len(commit_list) > 0:
+                self._hg_commit(commit_list)
+            else:
+                Prompt('Nothing Commited', 'No committable files selected', self).run()
         return True
 
 
