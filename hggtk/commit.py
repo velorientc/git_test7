@@ -196,11 +196,14 @@ class GCommit(GStatus):
         cbcell = self.tree.get_column(0).get_cell_renderers()[0]
         cbcell.set_property("activatable", not merged)
         
-        # select all changes if repo is merged
         if merged:
+            # select all changes if repo is merged
             for entry in self.model:
                 if entry[1] in 'MARD':
                     entry[0] = True
+
+            # pre-fill commit message
+            self.text.get_buffer().set_text('merge')
 
 
     def _commit_clicked(self, toolbutton, data=None):
