@@ -31,11 +31,15 @@ class CmdDialog(gtk.Dialog):
 
         # construct dialog
         self.set_default_size(width, height)
+
+        self._button_stop = gtk.Button("Stop")
+        self._button_stop.connect('clicked', self._on_stop_clicked)
+        self.action_area.pack_start(self._button_stop)
         
         self._button_ok = gtk.Button("Close")
         self._button_ok.connect('clicked', self._on_ok_clicked)
-        self.action_area.pack_end(self._button_ok)
-        
+        self.action_area.pack_start(self._button_ok)
+
         self.connect('delete-event', self._delete)
         self.connect('response', self._response)
 
@@ -82,6 +86,9 @@ class CmdDialog(gtk.Dialog):
         """ Ok button clicked handler. """
         self.response(gtk.RESPONSE_ACCEPT)
         
+    def _on_stop_clicked(self, button):
+        self.hgthread.terminate()
+    
     def _delete(self, widget, event):
         return True
 
@@ -93,6 +100,7 @@ class CmdDialog(gtk.Dialog):
         self.hgthread = HgThread(self.cmdline[1:])
         self.hgthread.start()
         self._button_ok.set_sensitive(False)
+        self._button_stop.set_sensitive(True)        
         gobject.timeout_add(10, self.process_queue)
     
     def write(self, msg, append=True):
@@ -120,7 +128,10 @@ class CmdDialog(gtk.Dialog):
         self.update_progress()
         if not self.hgthread.isAlive():
             self._button_ok.set_sensitive(True)
+            self._button_stop.set_sensitive(False)            
             self.returncode = self.hgthread.return_code()
+            if self.returncode is None:
+                self.write("[command interrupted]")
             return False # Stop polling this function
         else:
             return True

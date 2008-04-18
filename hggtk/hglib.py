@@ -2,7 +2,7 @@ import gtk
 import os.path
 import sys
 import traceback
-import threading
+import threading, thread2
 import Queue
 from mercurial import hg, ui, util, extensions, commands, hook
 from mercurial.repo import RepoError
@@ -110,7 +110,7 @@ class GtkUi(ui.ui):
         traceback.print_exc()
         return True
 
-class HgThread(threading.Thread):
+class HgThread(thread2.Thread):
     '''
     Run an hg command in a background thread, implies output is being
     sent to a rendered text buffer interactively and requests for
@@ -126,7 +126,7 @@ class HgThread(threading.Thread):
         self.ret = None
         self.postfunc = postfunc
         self.parent = parent
-        threading.Thread.__init__(self)
+        thread2.Thread.__init__(self)
 
     def getqueue(self):
         return self.outputq

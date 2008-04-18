@@ -54,6 +54,9 @@ class SynchDialog(gtk.Window):
         # toolbar
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
+        self._stop_button = self._toolbutton(gtk.STOCK_STOP,
+                'Stop', self._stop_clicked, tip='Stop the hg operation')
+        self._stop_button.set_sensitive(False)
         tbuttons = [
                 self._toolbutton(gtk.STOCK_GO_DOWN,
                                  'Incoming', 
@@ -82,6 +85,8 @@ class SynchDialog(gtk.Window):
                                  self._email_clicked,
                                  tip='Email local outgoing changes to'
                                  ' one or more recipients'),
+                gtk.SeparatorToolItem(),
+                self._stop_button,
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_PREFERENCES,
                                  'Configure',
@@ -407,7 +412,14 @@ class SynchDialog(gtk.Window):
             cmd.append('--newest-first')
         self._exec_cmd(cmd)
         
+    def _stop_clicked(self, toolbutton, data=None):
+        if self.hgthread and self.hgthread.isAlive():
+            self.hgthread.terminate()
+            self._stop_button.set_sensitive(False)
+
     def _exec_cmd(self, cmd):
+        self._stop_button.set_sensitive(True)
+
         proxy_host = ui.ui().config('http_proxy', 'host', '')
         use_proxy = self._use_proxy.get_active()
         text_entry = self._pathbox.get_child()
@@ -472,6 +484,9 @@ class SynchDialog(gtk.Window):
             # Update button states
             self.update_buttons()
             self.stbar.end()
+            self._stop_button.set_sensitive(False)
+            if self.hgthread.return_code() is None:
+                self.write("[command interrupted]")
             return False # Stop polling this function
         else:
             return True
