@@ -98,6 +98,7 @@ class GDialog(gtk.Window):
         self.opts = opts
         self.main = main
         self.tmproot = None
+        self.toolbuttons = {}
         self.settings = Settings(self.__class__.__name__)
 
     ### Following methods are meant to be overridden by subclasses ###
@@ -250,7 +251,12 @@ class GDialog(gtk.Window):
         tbutton.set_use_underline(True)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
+        self.toolbuttons[label] = tbutton
         return tbutton
+
+
+    def get_toolbutton(self, label):
+        return self.toolbuttons[label]
 
 
     def _setup_gtk(self):

@@ -91,6 +91,7 @@ class GCommit(GStatus):
             self._commit_clicked, tip='commit'))
         return tbbuttons
 
+
     def changed_cb(self, combobox):
         model = combobox.get_model()
         index = combobox.get_active()
@@ -195,6 +196,12 @@ class GCommit(GStatus):
         merged = len(self.repo.workingctx().parents()) > 1
         cbcell = self.tree.get_column(0).get_cell_renderers()[0]
         cbcell.set_property("activatable", not merged)
+        
+        self.get_toolbutton('Re_vert').set_sensitive(not merged)
+        self.get_toolbutton('_Add').set_sensitive(not merged)
+        self.get_toolbutton('_Remove').set_sensitive(not merged)
+        self.get_toolbutton('_Select').set_sensitive(not merged)
+        self.get_toolbutton('_Deselect').set_sensitive(not merged)
         
         if merged:
             # select all changes if repo is merged
