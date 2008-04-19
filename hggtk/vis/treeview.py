@@ -14,6 +14,7 @@ import treemodel
 import re
 from graphcell import CellRendererGraph
 from revgraph import *
+from mercurial.node import hex
 
 
 class TreeView(gtk.ScrolledWindow):
@@ -89,6 +90,11 @@ class TreeView(gtk.ScrolledWindow):
         Case insensitive
         """
         key = key.lower()
+
+        node = hex(model.get_value(iter, treemodel.REVISION)[treemodel.NODE])
+        if node.startswith(key):
+            return False
+
         for col in (treemodel.REVID, treemodel.TAGS, treemodel.COMMITER,
                 treemodel.MESSAGE):
             if key in model.get_value(iter, col).lower():
