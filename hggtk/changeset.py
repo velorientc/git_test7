@@ -106,7 +106,8 @@ class ChangeSet(GDialog):
     def _fill_buffer(self, buf, rev, ctx, filelist):
         def title_line(title, text, tag):
             pad = ' ' * (12 - len(title))
-            buf.insert_with_tags_by_name(eob, title + pad + text, tag)
+            utext = util.fromlocal(title + pad + text)
+            buf.insert_with_tags_by_name(eob, utext, tag)
             buf.insert(eob, "\n")
 
         # TODO: Add toggle for gmtime/localtime

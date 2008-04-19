@@ -95,9 +95,10 @@ class TreeModel(gtk.GenericTreeModel):
             tags = ', '.join(self.repo.nodetags(node))
 
             if '<' in ctx.user():
-                author = self.author_re.sub('', ctx.user()).strip(' ')
+                author = util.fromlocal((self.author_re.sub('',
+                        ctx.user()).strip(' ')))
             else:
-                author = util.shortuser(ctx.user())
+                author = util.fromlocal(util.shortuser(ctx.user()))
 
             date = strftime("%Y-%m-%d %H:%M:%S", gmtime(ctx.date()[0]))
 
