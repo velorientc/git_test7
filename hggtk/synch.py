@@ -276,6 +276,10 @@ class SynchDialog(gtk.Window):
         self._pull_update = gtk.CheckMenuItem("Update to new tip")
         menu.append(self._pull_update)
         
+        # restore states from previous session
+        st = self._settings.get_value('_pull_update_state', False)
+        self._pull_update.set_active(st)
+        
         menu.show_all()
         return menu
         
@@ -311,18 +315,24 @@ class SynchDialog(gtk.Window):
         dialog.destroy()
         
     def _close_clicked(self, toolbutton, data=None):
-        if threading.activeCount() != 1:
-            error_dialog(self, "Can't close now", "command is running")
-        else:
-            gtk.main_quit()
-        
-    def _delete(self, widget, event):
+        self._do_close()
+
+    def _do_close(self):
         if threading.activeCount() != 1:
             error_dialog(self, "Can't close now", "command is running")
             return True
         else:
+            self._save_settings()
             gtk.main_quit()
-    
+        
+    def _save_settings(self):
+        self._settings.set_value('_pull_update_state',
+                self._pull_update.get_active())
+        self._settings.write()
+
+    def _delete(self, widget, event):
+        self._do_close()
+   
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
         if menu:
