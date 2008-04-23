@@ -106,7 +106,7 @@ class TreeModel(gtk.GenericTreeModel):
             summary = summary.split('\n')[0]
             summary = gobject.markup_escape_text(toutf(summary))
             node = self.repo.lookup(revid)
-            tags = ', '.join(self.repo.nodetags(node))
+            tags = toutf(', '.join(self.repo.nodetags(node)))
 
             if '<' in ctx.user():
                 author = toutf(self.author_re.sub('', ctx.user()).strip(' '))
