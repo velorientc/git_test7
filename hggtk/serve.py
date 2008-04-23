@@ -250,7 +250,7 @@ class ServeDialog(gtk.Window):
         self._queue.put(msg)
         
     def _write(self, msg, append=True):
-        msg = unicode(msg, 'iso-8859-1')
+        msg = hglib.toutf(msg)
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)

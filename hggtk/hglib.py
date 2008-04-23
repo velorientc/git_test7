@@ -33,6 +33,32 @@ try:
 finally:
     demandimport.enable()
 
+def toutf(s):
+    """
+    Convert a string to UTF-8 encoding
+    
+    Based on mercurial.util.tolocal()
+    """
+    for e in ('utf-8', util._encoding):
+        try:
+            return s.decode(e, 'strict').encode('utf-8')
+        except UnicodeDecodeError:
+            pass
+    return s.decode(util._fallbackencoding, 'replace').encode('utf-8')
+
+def fromutf(s):
+    """
+    Convert UTF-8 encoded string to local.
+    
+    It's primarily used on strings converted to UTF-8 by toutf().
+    """
+    try:
+        return s.decode('utf-8').encode(util._encoding)
+    except UnicodeDecodeError:
+        pass
+    except UnicodeEncodeError:
+        pass
+    return s.decode('utf-8').encode(util._fallbackencoding)
 
 def rootpath(path=None):
     """ find Mercurial's repo root of path """

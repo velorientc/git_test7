@@ -20,7 +20,7 @@ import threading
 from mercurial import hg, ui, util, extensions
 from mercurial.repo import RepoError
 from dialog import error_dialog, question_dialog, info_dialog
-from hglib import HgThread
+from hglib import HgThread, toutf
 import shlib
 import gtklib
 
@@ -470,7 +470,7 @@ class SynchDialog(gtk.Window):
             self.pathlist.append([p])
 
     def write(self, msg, append=True):
-        msg = unicode(msg, 'iso-8859-1')
+        msg = toutf(msg)
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)

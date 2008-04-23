@@ -13,7 +13,7 @@ import pango
 import os
 import threading
 import Queue
-from hglib import HgThread, hgcmd_toq
+from hglib import HgThread, hgcmd_toq, toutf
 from shlib import set_tortoise_icon, get_system_times
 
 class CmdDialog(gtk.Dialog):
@@ -104,7 +104,7 @@ class CmdDialog(gtk.Dialog):
         gobject.timeout_add(10, self.process_queue)
     
     def write(self, msg, append=True):
-        msg = unicode(msg, 'iso-8859-1')
+        msg = toutf(msg, 'iso-8859-1')
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)
@@ -120,8 +120,7 @@ class CmdDialog(gtk.Dialog):
         while self.hgthread.getqueue().qsize():
             try:
                 msg = self.hgthread.getqueue().get(0)
-                msg = unicode(msg, 'iso-8859-1')
-                self.textbuffer.insert(enditer, msg)
+                self.textbuffer.insert(enditer, toutf(msg))
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass

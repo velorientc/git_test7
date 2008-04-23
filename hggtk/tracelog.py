@@ -13,6 +13,8 @@ import threading
 import Queue
 import win32trace
 
+from hglib import toutf
+
 class TraceLog():
     def __init__(self):
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -111,7 +113,7 @@ class TraceLog():
                 self.queue.put(msg)
         
     def write(self, msg, append=True):
-        msg = unicode(msg, 'iso-8859-1')
+        msg = toutf(msg)
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)

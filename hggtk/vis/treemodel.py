@@ -29,6 +29,24 @@ TAGS = 11
 MARKED = 12
 FGCOLOR = 13
 
+# FIXME:
+# this function is a copy of hglib.touft(), but I've 
+# trouble importing hglib (resides one dir level above )
+# into this module.
+#
+# Note: Python 2.5's new import syntax causes problem
+#       when importing this module from command line.
+def toutf(s):
+    """
+    Convert a string to UTF-8 encoding
+    """
+    for e in ('utf-8', util._encoding):
+        try:
+            return s.decode(e, 'strict').encode('utf-8')
+        except UnicodeDecodeError:
+            pass
+    return s.decode(util._fallbackencoding, 'replace').encode('utf-8')
+
 class TreeModel(gtk.GenericTreeModel):
 
     def __init__ (self, repo, graphdata, color_func):
@@ -86,19 +104,14 @@ class TreeModel(gtk.GenericTreeModel):
 
             summary = ctx.description().replace('\0', '')
             summary = summary.split('\n')[0]
-            try:
-                summary = unicode(summary)
-            except UnicodeDecodeError:
-                summary = unicode(summary, util._fallbackencoding, 'replace')
-            summary = gobject.markup_escape_text(summary)
+            summary = gobject.markup_escape_text(toutf(summary))
             node = self.repo.lookup(revid)
             tags = ', '.join(self.repo.nodetags(node))
 
             if '<' in ctx.user():
-                author = util.fromlocal((self.author_re.sub('',
-                        ctx.user()).strip(' ')))
+                author = toutf(self.author_re.sub('', ctx.user()).strip(' '))
             else:
-                author = util.fromlocal(util.shortuser(ctx.user()))
+                author = toutf(util.shortuser(ctx.user()))
 
             date = strftime("%Y-%m-%d %H:%M:%S", gmtime(ctx.date()[0]))
 

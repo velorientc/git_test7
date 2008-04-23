@@ -21,7 +21,7 @@ from mercurial import hg, ui, util
 from mercurial.repo import RepoError
 from mercurial.node import *
 from dialog import error_dialog, question_dialog
-from hglib import HgThread
+from hglib import HgThread, toutf
 from shlib import set_tortoise_icon, shell_notify
 import gtklib
 
@@ -173,7 +173,7 @@ class RecoveryDialog(gtk.Window):
         self.stbar.set_status_text('hg ' + ' '.join(cmdline))
         
     def write(self, msg, append=True):
-        msg = unicode(msg, 'iso-8859-1')
+        msg = toutf(msg)
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)

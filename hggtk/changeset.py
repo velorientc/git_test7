@@ -22,6 +22,7 @@ from mercurial import cmdutil, util, ui, hg, commands
 from mercurial import context, patch, revlog
 from gdialog import *
 from hgcmd import CmdDialog
+from hglib import toutf
 
 
 class ChangeSet(GDialog):
@@ -106,7 +107,7 @@ class ChangeSet(GDialog):
     def _fill_buffer(self, buf, rev, ctx, filelist):
         def title_line(title, text, tag):
             pad = ' ' * (12 - len(title))
-            utext = util.fromlocal(title + pad + text)
+            utext = toutf(title + pad + text)
             buf.insert_with_tags_by_name(eob, utext, tag)
             buf.insert(eob, "\n")
 
@@ -125,10 +126,7 @@ class ChangeSet(GDialog):
         for p in parents:
             pctx = self.repo.changectx(p)
             summary = pctx.description().splitlines()[0]
-            try:
-                summary = unicode(summary)
-            except UnicodeDecodeError:
-                summary = unicode(summary, util._fallbackencoding, 'replace')
+            summary = toutf(summary)
             change = str(p) + ':' + short(self.repo.changelog.node(p))
             title = 'parent:'
             title += ' ' * (12 - len(title))
@@ -139,10 +137,7 @@ class ChangeSet(GDialog):
         for n in self.repo.changelog.children(ctx.node()):
             cctx = self.repo.changectx(n)
             summary = cctx.description().splitlines()[0]
-            try:
-                summary = unicode(summary)
-            except UnicodeDecodeError:
-                summary = unicode(summary, util._fallbackencoding, 'replace')
+            summary = toutf(summary)
             childrev = self.repo.changelog.rev(n)
             change = str(childrev) + ':' + short(n)
             title = 'child:'
@@ -155,7 +150,7 @@ class ChangeSet(GDialog):
             childrev = self.repo.changelog.rev(n)
         if tags: title_line('tags:', tags, 'tag')
 
-        log = util.fromlocal(ctx.description())
+        log = toutf(ctx.description())
         buf.insert(eob, '\n' + log + '\n\n')
 
         if self.parent_toggle.get_active():
@@ -183,16 +178,12 @@ class ChangeSet(GDialog):
         except StopIteration:
             return False
 
-        try:
-            utxt = unicode(txt, util._encoding, 'strict')
-        except UnicodeDecodeError:
-            utxt = unicode(txt, util._fallbackencoding, 'replace')
-        lines = utxt.splitlines()
+        lines = txt.splitlines()
         eob = buf.get_end_iter()
         offset = eob.get_offset()
         fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, file)
         for l in lines:
-            buf.insert(eob, l)
+            buf.insert(eob, toutf(l))
 
         # inserts the tags
         for name, p0, p1 in tags:
@@ -206,7 +197,7 @@ class ChangeSet(GDialog):
             pos = buf.get_iter_at_offset(offset)
             mark = 'mark_%d' % offset
             buf.create_mark(mark, pos)
-            filelist.append((status, file, mark, True, stats))
+            filelist.append((status, toutf(file), mark, True, stats))
         sob, eob = buf.get_bounds()
         buf.apply_tag_by_name("mono", pos, eob)
         return True

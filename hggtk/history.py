@@ -22,6 +22,7 @@ from update import UpdateDialog
 from merge import MergeDialog
 from vis import treemodel
 from vis.treeview import TreeView
+from hglib import toutf
 import gtklib
 
 
