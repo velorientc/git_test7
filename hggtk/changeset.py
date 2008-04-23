@@ -22,7 +22,7 @@ from mercurial import cmdutil, util, ui, hg, commands
 from mercurial import context, patch, revlog
 from gdialog import *
 from hgcmd import CmdDialog
-from hglib import toutf
+from hglib import toutf, fromutf
 
 
 class ChangeSet(GDialog):
@@ -490,10 +490,10 @@ class ChangeSet(GDialog):
 
         self._filelist = gtk.ListStore(
                 gobject.TYPE_STRING,   # MAR status
-                gobject.TYPE_STRING,   # filename
+                gobject.TYPE_STRING,   # filename (utf-8 encoded)
                 gobject.TYPE_PYOBJECT, # mark
                 gobject.TYPE_PYOBJECT, # give cmenu
-                gobject.TYPE_PYOBJECT  # diffstats
+                gobject.TYPE_PYOBJECT, # diffstats
                 )
         filelist_tree.set_model(self._filelist)
         column = gtk.TreeViewColumn('Stat', gtk.CellRendererText(), text=0)
@@ -563,7 +563,7 @@ class ChangeSet(GDialog):
         mark = self._buffer.get_mark(model[iter][2])
         self.textview.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
         if model[iter][3]:
-            self.curfile = model[iter][1]
+            self.curfile = fromutf(model[iter][1])
         else:
             self.curfile = None
 
