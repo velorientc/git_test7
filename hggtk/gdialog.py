@@ -173,9 +173,9 @@ class GDialog(gtk.Window):
 
     def _parse_config(self):
         # defaults    
-        self.fontcomment = 'courier 10'
-        self.fontdiff = 'courier 10'
-        self.fontlist = 'courier 9'
+        self.fontcomment = 'monospace 10'
+        self.fontdiff = 'monospace 10'
+        self.fontlist = 'monospace 9'
         self.diffopts = ''
         self.diffcmd = ''
         self.diffbottom = ''

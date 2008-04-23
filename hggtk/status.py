@@ -473,7 +473,7 @@ class GStatus(GDialog):
                 difftext.seek(0)
                 iter = buffer.get_start_iter()
                 for line in difftext:
-                    line = util.fromlocal(line)
+                    line = toutf(line)
                     if line.startswith('---') or line.startswith('+++'):
                         buffer.insert_with_tags_by_name(iter, line, 'header')
                     elif line.startswith('-'):
