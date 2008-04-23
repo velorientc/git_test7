@@ -12,7 +12,7 @@ import re
 import threading, thread2
 import time
 from mercurial import hg, ui, util, revlog
-from hglib import hgcmd_toq
+from hglib import hgcmd_toq, toutf, fromutf
 from gdialog import *
 from vis import treemodel
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
@@ -315,7 +315,7 @@ class DataMineDialog(GDialog):
             except ValueError:
                 continue
             tip, user = self.get_rev_desc(long(revid))
-            model.append((revid, text, tip, path))
+            model.append((revid, toutf(text), tip, toutf(path)))
         if thread.isAlive():
             return True
         else:
@@ -336,8 +336,8 @@ class DataMineDialog(GDialog):
         if path is not None and model is not None:
             iter = model.get_iter(path)
             self.currev = model[iter][self.COL_REVID]
-            self.curpath = model[iter][self.COL_PATH]
-            self.stbar.set_status_text(model[iter][self.COL_TOOLTIP])
+            self.curpath = fromutf(model[iter][self.COL_PATH])
+            self.stbar.set_status_text(toutf(model[iter][self.COL_TOOLTIP]))
 
     def _stop_search(self, button, widget):
         num = self.notebook.get_current_page()
@@ -462,14 +462,14 @@ class DataMineDialog(GDialog):
         frame.show_all()
 
         hbox = gtk.HBox()
-        lbl = gtk.Label(os.path.basename(path) + '@' + revid)
+        lbl = gtk.Label(toutf(os.path.basename(path) + '@' + revid))
         close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
         hbox.pack_start(lbl, True, True, 2)
         hbox.pack_start(close, False, False)
         hbox.show_all()
         num = self.notebook.append_page_menu(frame, 
-                hbox, gtk.Label(path + '@' + revid))
+                hbox, gtk.Label(toutf(path + '@' + revid)))
 
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
@@ -498,7 +498,7 @@ class DataMineDialog(GDialog):
         if info:
             (rpath, node) = info
             frev = self.repo.file(rpath).linkrev(node)
-            button.set_label('%s@%s' % (rpath, frev))
+            button.set_label(toutf('%s@%s' % (rpath, frev)))
             button.show()
             button.set_sensitive(True)
             label.set_text('Follow Rename:')
@@ -553,10 +553,10 @@ class DataMineDialog(GDialog):
 
         model.clear()
         self.stbar.begin()
-        self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
+        self.stbar.set_status_text(toutf('hg ' + ' '.join(args[2:])))
 
         hbox = gtk.HBox()
-        lbl = gtk.Label(os.path.basename(path) + '@' + str(rev))
+        lbl = gtk.Label(toutf(os.path.basename(path) + '@' + str(rev)))
         close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
         hbox.pack_start(lbl, True, True, 2)
@@ -582,7 +582,8 @@ class DataMineDialog(GDialog):
             tip, user = self.get_rev_desc(rowrev)
             ctx = self.repo.changectx(rowrev)
             color = colormap.get_color(ctx, curdate)
-            model.append((revid, text, tip, path.strip(), color, user))
+            model.append((revid, toutf(text), tip, toutf(path.strip()),
+                    color, toutf(user)))
         if thread.isAlive():
             return True
         else:
