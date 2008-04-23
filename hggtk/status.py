@@ -26,6 +26,7 @@ from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
 from hgext import extdiff
 from shlib import shell_notify
+from hglib import toutf
 from gdialog import *
 
 class GStatus(GDialog):
@@ -182,7 +183,7 @@ class GStatus(GDialog):
         self._menus['I'] = ignored_menu
         self._menus['!'] = deleted_menu
 
-        self.model = gtk.ListStore(bool, str, str)
+        self.model = gtk.ListStore(bool, str, str, str)
         self.model.set_sort_func(1001, self._sort_by_stat)
         self.model.set_default_sort_func(self._sort_by_stat)
 
@@ -344,7 +345,7 @@ class GStatus(GDialog):
                                     if self.test_opt(ct[0])] or changetypes) :
             for file in changes:
                 file = util.localpath(file)
-                self.model.append([file in recheck, char, file])
+                self.model.append([file in recheck, char, toutf(file), file])
 
         selection = self.tree.get_selection()
         selected = False
@@ -489,7 +490,7 @@ class GStatus(GDialog):
                 difftext.close()
 
         if self.showdiff_toggle.get_active():
-            files = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
+            files = [self.model[iter][3] for iter in self.tree.get_selection().get_selected_rows()[1]]
             if force or files != self._last_files:
                 self._last_files = files
                 self._hg_call_wrapper('Diff', dohgdiff)
@@ -668,7 +669,7 @@ class GStatus(GDialog):
 
 
     def _relevant_files(self, stats):
-        return [item[2] for item in self.model if item[0] and item[1] in stats]
+        return [item[3] for item in self.model if item[0] and item[1] in stats]
 
 
     def _context_menu_act(self, menuitem, handler):
