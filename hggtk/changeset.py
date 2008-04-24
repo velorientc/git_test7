@@ -183,7 +183,7 @@ class ChangeSet(GDialog):
         offset = eob.get_offset()
         fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, file)
         for l in lines:
-            buf.insert(eob, toutf(l))
+            buf.insert(eob, l)
 
         # inserts the tags
         for name, p0, p1 in tags:
@@ -375,9 +375,10 @@ class ChangeSet(GDialog):
                 tags.append( [name, offset, offset+length] )
         stats = [0,0]
         statmax = 0
-        for i,l in enumerate(difflines):
+        for i,l1 in enumerate(difflines):
+            l = toutf(l1)
             if l.startswith("diff"):
-                txt = DIFFHDR % fname
+                txt = toutf(DIFFHDR % fname)
                 addtag( "greybg", offset, len(txt) )
                 outlines.append(txt)
                 markname = "file%d" % idx
@@ -385,7 +386,7 @@ class ChangeSet(GDialog):
                 statmax = max( statmax, stats[0]+stats[1] )
                 stats = [0,0]
                 filespos.append(( markname, offset, stats ))
-                offset += len(txt)
+                offset += len(txt.decode('utf-8'))
                 continue
             elif l.startswith("+++"):
                 continue
@@ -402,7 +403,7 @@ class ChangeSet(GDialog):
             else:
                 tag = "black"
             l = l+"\n"
-            length = len(l)
+            length = len(l.decode('utf-8'))
             addtag( tag, offset, length )
             outlines.append( l )
             offset += length
