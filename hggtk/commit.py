@@ -218,11 +218,9 @@ class GCommit(GStatus):
             return True
 
         if len(self.repo.workingctx().parents()) > 1:
-            msg = 'The repo contains merges, you must commit all files.\n\n' \
-                  'Proceed with commit?'
-            response = Confirm('Commit Merges', [], self, msg).run() 
-            if response == gtk.RESPONSE_YES:
-                self._hg_commit([])
+            # as of Mercurial 1.0, merges must be committed without
+            # specifying file list.
+            self._hg_commit([])
         else:
             commitable = 'MAR'
             addremove_list = self._relevant_files('?!')
