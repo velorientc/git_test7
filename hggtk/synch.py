@@ -321,7 +321,6 @@ class SynchDialog(gtk.Window):
     def _do_close(self):
         if self._cmd_running():
             error_dialog(self, "Can't close now", "command is running")
-            return True
         else:
             self._save_settings()
             gtk.main_quit()
@@ -333,6 +332,7 @@ class SynchDialog(gtk.Window):
 
     def _delete(self, widget, event):
         self._do_close()
+        return True
    
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
