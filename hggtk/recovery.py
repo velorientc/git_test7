@@ -34,6 +34,7 @@ class RecoveryDialog(gtk.Window):
         self.root = root
         self.cwd = cwd
         self.selected_path = None
+        self.hgthread = None
         self.connect('delete-event', self._delete)
 
         self.set_default_size(600, 400)
@@ -101,14 +102,15 @@ class RecoveryDialog(gtk.Window):
         vbox.pack_start(self.stbar, False, False, 2)
 
     def _close_clicked(self, *args):
-        if threading.activeCount() != 1:
-            error_dialog(self, "Can't close now", "command is running")
-        else:
-            gtk.main_quit()
+        self._do_close()
         
     def _delete(self, widget, event):
-        if threading.activeCount() != 1:
-            return True
+        self._do_close()
+        return True
+
+    def _do_close(self):
+        if self._cmd_running():
+            error_dialog(self, "Can't close now", "command is running")
         else:
             gtk.main_quit()
         
@@ -167,6 +169,11 @@ class RecoveryDialog(gtk.Window):
             self._stop_button.set_sensitive(False)
 
     def _exec_cmd(self, cmd, postfunc=None):
+        if self._cmd_running():
+            error_dialog(self, "Can't run now",
+                "Pleas try again after the previous command is completed")
+            return
+
         self._stop_button.set_sensitive(True)
         cmdline = cmd
         cmdline.append('--verbose')
@@ -183,6 +190,12 @@ class RecoveryDialog(gtk.Window):
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmdline))
         
+    def _cmd_running(self):
+        if self.hgthread and self.hgthread.isAlive():
+            return True
+        else:
+            return False
+
     def write(self, msg, append=True):
         msg = toutf(msg)
         if append:
@@ -202,14 +215,14 @@ class RecoveryDialog(gtk.Window):
                 self.write(msg)
             except Queue.Empty:
                 pass
-        if threading.activeCount() == 1:
+        if self._cmd_running():
+            return True
+        else:
             self.stbar.end()
             self._stop_button.set_sensitive(False)
             if self.hgthread.return_code() is None:
                 self.write("[command interrupted]")
             return False # Stop polling this function
-        else:
-            return True
 
 def run(cwd='', root='', **opts):
     dialog = RecoveryDialog(cwd, root)
