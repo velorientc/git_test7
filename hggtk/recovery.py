@@ -44,6 +44,9 @@ class RecoveryDialog(gtk.Window):
         # toolbar
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
+        self._stop_button = self._toolbutton(gtk.STOCK_STOP,
+                'Stop', self._stop_clicked, tip='Stop the hg operation')
+        self._stop_button.set_sensitive(False)
         tbuttons = [
                 self._toolbutton(gtk.STOCK_CLEAR,
                                  'clean', 
@@ -65,6 +68,8 @@ class RecoveryDialog(gtk.Window):
                                  'verify',
                                  self._verify_clicked,
                                  tip='Validate repository consistency'),
+                gtk.SeparatorToolItem(),
+                self._stop_button,
                 gtk.SeparatorToolItem(),
             ]
         for btn in tbuttons:
@@ -156,7 +161,13 @@ class RecoveryDialog(gtk.Window):
         cmd = ['verify']
         self._exec_cmd(cmd)
     
-    def _exec_cmd(self, cmd, postfunc=None):            
+    def _stop_clicked(self, toolbutton, data=None):
+        if self.hgthread and self.hgthread.isAlive():
+            self.hgthread.terminate()
+            self._stop_button.set_sensitive(False)
+
+    def _exec_cmd(self, cmd, postfunc=None):
+        self._stop_button.set_sensitive(True)
         cmdline = cmd
         cmdline.append('--verbose')
         cmdline.append('--repository')
@@ -193,6 +204,9 @@ class RecoveryDialog(gtk.Window):
                 pass
         if threading.activeCount() == 1:
             self.stbar.end()
+            self._stop_button.set_sensitive(False)
+            if self.hgthread.return_code() is None:
+                self.write("[command interrupted]")
             return False # Stop polling this function
         else:
             return True
