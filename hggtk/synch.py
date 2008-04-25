@@ -33,6 +33,7 @@ class SynchDialog(gtk.Window):
         self.root = root
         self.cwd = cwd
         self.selected_path = None
+        self.hgthread = None
         
         # persistent app data
         self._settings = shlib.Settings('synch')
@@ -318,7 +319,7 @@ class SynchDialog(gtk.Window):
         self._do_close()
 
     def _do_close(self):
-        if threading.activeCount() != 1:
+        if self._cmd_running():
             error_dialog(self, "Can't close now", "command is running")
             return True
         else:
@@ -423,11 +424,16 @@ class SynchDialog(gtk.Window):
         self._exec_cmd(cmd)
         
     def _stop_clicked(self, toolbutton, data=None):
-        if self.hgthread and self.hgthread.isAlive():
+        if self._cmd_running():
             self.hgthread.terminate()
             self._stop_button.set_sensitive(False)
 
     def _exec_cmd(self, cmd):
+        if self._cmd_running():
+            error_dialog(self, "Can't run now",
+                "Pleas try again after the previous command is completed")
+            return
+
         self._stop_button.set_sensitive(True)
 
         proxy_host = ui.ui().config('http_proxy', 'host', '')
@@ -453,6 +459,12 @@ class SynchDialog(gtk.Window):
         
         self._add_src_to_recent(remote_path)
 
+    def _cmd_running(self):
+        if self.hgthread and self.hgthread.isAlive():
+            return True
+        else:
+            return False
+        
     def _add_src_to_recent(self, src):
         if os.path.exists(src):
             src = os.path.abspath(src)
@@ -490,7 +502,9 @@ class SynchDialog(gtk.Window):
             except Queue.Empty:
                 pass
 
-        if threading.activeCount() == 1:
+        if self._cmd_running():
+            return True
+        else:
             # Update button states
             self.update_buttons()
             self.stbar.end()
@@ -498,8 +512,6 @@ class SynchDialog(gtk.Window):
             if self.hgthread.return_code() is None:
                 self.write("[command interrupted]")
             return False # Stop polling this function
-        else:
-            return True
 
 def run(cwd='', root='', files=[], **opts):
     dialog = SynchDialog(cwd, root, files)
