@@ -13,6 +13,19 @@ import re
 from time import (strftime, gmtime)
 from mercurial import util
 
+# FIXME: dirty hack to import toutf() from hggtk.hglib.
+#
+# Python 2.5's relative imports doesn't seem to work either,
+# when running history.py directly.
+#
+# Besides, we want to be compatible older Python versions.
+try:
+    # when history.py is invoked directly
+    from hglib import toutf
+except ImportError:
+    # when history.py is imported and called from hgproc.py
+    from hggtk.hglib import toutf
+
 # treemodel row enumerated attributes
 LINES = 0
 NODE = 1
@@ -28,24 +41,6 @@ HEAD = 10
 TAGS = 11
 MARKED = 12
 FGCOLOR = 13
-
-# FIXME:
-# this function is a copy of hglib.touft(), but I've 
-# trouble importing hglib (resides one dir level above )
-# into this module.
-#
-# Note: Python 2.5's new import syntax causes problem
-#       when importing this module from command line.
-def toutf(s):
-    """
-    Convert a string to UTF-8 encoding
-    """
-    for e in ('utf-8', util._encoding):
-        try:
-            return s.decode(e, 'strict').encode('utf-8')
-        except UnicodeDecodeError:
-            pass
-    return s.decode(util._fallbackencoding, 'replace').encode('utf-8')
 
 class TreeModel(gtk.GenericTreeModel):
 
