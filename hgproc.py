@@ -110,7 +110,7 @@ def run_trapped(args):
         from hggtk.dialog import error_dialog
         tr = traceback.format_exc()
         print tr
-        error_dialog("Error executing hgproc", tr)
+        error_dialog(None, "Error executing hgproc", tr)
 
 if __name__=='__main__':
     #dlg = parse(['-c', 'help', '--', '-v'])
