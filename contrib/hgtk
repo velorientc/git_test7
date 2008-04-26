@@ -47,6 +47,15 @@ def main(command):
         if norm not in sys.path:
             sys.path.append(norm)
 
+        try:
+            # assuming TortoiseHg source layout, with hgtk in contrib
+            path = os.path.dirname(os.path.abspath(__file__))
+            norm = os.path.normpath(os.path.join(path, '..'))
+            if norm not in sys.path:
+                sys.path.append(norm)
+        except NameError: # __file__ is not always available
+            pass
+
     try:
         from hggtk import hglib
     except ImportError:
