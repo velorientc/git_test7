@@ -104,7 +104,7 @@ class CmdDialog(gtk.Dialog):
         gobject.timeout_add(10, self.process_queue)
     
     def write(self, msg, append=True):
-        msg = toutf(msg, 'iso-8859-1')
+        msg = toutf(msg)
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)
