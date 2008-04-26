@@ -236,7 +236,7 @@ class GLog(GDialog):
 
         # Allocate ChangeSet instance to use internally
         self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
-                self.opts, False)
+                self.opts, False, self.stbar)
         self.changeview.display(False)
         self.changeview.glog_parent = self
 

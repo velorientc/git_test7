@@ -23,11 +23,16 @@ from mercurial import context, patch, revlog
 from gdialog import *
 from hgcmd import CmdDialog
 from hglib import toutf, fromutf
+from gtklib import StatusBar
 
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
     """
+    def __init__(self, ui, repo, cwd, pats, opts, main, stbar=None):
+        GDialog.__init__(self, ui, repo, cwd, pats, opts, main)
+        self.stbar = stbar
+
     def get_title(self):
         title = os.path.basename(self.repo.root) + ' changeset '
         title += self.opts['rev'][0]
@@ -105,6 +110,8 @@ class ChangeSet(GDialog):
             self.textview.thaw_child_notify()
 
     def _fill_buffer(self, buf, rev, ctx, filelist):
+        self.stbar.begin('Retrieving changeset data...')
+        
         def title_line(title, text, tag):
             pad = ' ' * (12 - len(title))
             utext = toutf(title + pad + text)
@@ -176,6 +183,7 @@ class ChangeSet(GDialog):
         try:
             status, file, txt = iterator.next()
         except StopIteration:
+            self.stbar.end()
             return False
 
         lines = txt.splitlines()
@@ -513,7 +521,19 @@ class ChangeSet(GDialog):
         self._hpaned.pack1(list_frame, True, True)
         self._hpaned.pack2(details_frame, True, True)
         self._hpaned.set_position(self._setting_hpos)
-        return self._hpaned
+
+        if self.stbar:
+            # embedded by changelog browser
+            return self._hpaned
+        else:
+            # add status bar for main app
+            vbox = gtk.VBox()
+            vbox.pack_start(self._hpaned, True, True)
+            self.stbar = StatusBar()
+            self.stbar.show()
+            vbox.pack_start(gtk.HSeparator(), False, False)
+            vbox.pack_start(self.stbar, False, False)
+            return vbox
 
     def setup_tags(self):
         """Creates the tags to be used inside the TextView"""
