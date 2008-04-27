@@ -66,6 +66,7 @@ Changes and bug fixes since 0.4RC1:
     as well as any dialogs that use hgcmd dialog, including Update and 
     Clone dialogs.
   * Show progress on status bar when updating changeset viewer.
+  * Support Mercurial's HGENCODING environment variable.
   * [ Feature 1944469 ] Save and recall pull-update option in Synchronize
     dialog across sessions.
   * [ Bug 1939794 ] Unable to Merge changes with builtin commit UI.
