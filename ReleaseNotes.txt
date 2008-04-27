@@ -6,8 +6,9 @@ kits.  It also contains change information, for users who are interested in
 what bugs have been fixed, and what features have been added in the current
 version.
 
-New features in 0.4
 
+New features in 0.4
+    
   * Added user config 'tortoisehg.overlayicons' [True|False|localdisks],
     to enable/disable overlay icons in selected repos. The 'localdisks' 
     global option disables overlay icons for repos reside on network drives.
@@ -19,8 +20,9 @@ New features in 0.4
   * Added 'strip' and 'backout' functions to history browser.
 
   * Two convenience functions added to Synchronize dialog: 'View Pulled
-    Changes', and 'Update to Tip'. Also added support for Fetch extension
-    to Synchronize dialog.
+    Changes', and 'Update to Tip'. 
+    
+  * Added support for Fetch extension to Synchronize dialog [ 1914855 ].
 
   * Grep searches in Datamine dialog can now be interrupted.
 
@@ -44,7 +46,7 @@ New features in 0.4
 
   * Several minor bugfixes and improvements.
 
-Bug Fixes in 0.4:
+Bug fixes in 0.4:
 
   * TortoiseHg program groups now read 'hgproc' with hg.ico.
     In earlier versions, it used 'Python' with python.ico
@@ -57,6 +59,23 @@ Bug Fixes in 0.4:
   * [ 1902446 ] Commit claims file not under root while kdiff is open.
   * [ 1895443 ] Overlay: ThreadingModel registry setting
   * [ 1892791 ] Windows Explorer painfully slow for network drives
+
+Changes and bug fixes since 0.4RC1:
+
+  * Added buttons to stop command execution in Synchronize, Recovery,
+    as well as any dialogs that use hgcmd dialog, including Update and 
+    Clone dialogs.
+  * Show progress on status bar when updating changeset viewer.
+  * [ Feature 1944469 ] Save and recall pull-update option in Synchronize
+    dialog across sessions.
+  * [ Bug 1939794 ] Unable to Merge changes with builtin commit UI.
+  * [ Bug 1941545 ] Clone log window doesn't scroll.
+  * [ Bug 1943382 ] hgproc.bat not executable without "installer"
+  * [ Bug 1941368 ] Configure Repository "Test" button results broken.
+  * [ Bug 1939911 ] Modal Dialogs aren't staying on top on application switch
+  * [ Bug 1941376 ] hgtk with no parameters gives no help.
+  * [ Bug 1937966 ] Changelog: utf8 messages handled incorrectly
+  * [ Bug 1942777 ] National characters are not handled correctly.
 
 Fixes in Mercurial since 0.3:
 
