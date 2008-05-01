@@ -281,8 +281,11 @@ class GLog(GDialog):
             self.opts['no_merges'] = True
             self.graphview.refresh(False, [], self.opts)
         elif self._filter == "tagged":
-            tagged = [hex(r) for t, r in self.repo.tagslist()]
-            tagged.reverse()
+            tagged = []
+            for t, r in self.repo.tagslist():
+                hr = hex(r)
+                if hr not in tagged:
+                    tagged.insert(0, hr)
             self.opts['revs'] = tagged
             self.graphview.refresh(False, [], self.opts)
         elif self._filter == "parents":
