@@ -30,6 +30,7 @@ from hgext import extdiff
 from shlib import shell_notify, set_tortoise_icon, Settings
 from thgconfig import ConfigDialog
 from gtklib import MessageDialog
+from hglib import toutf
 
 
 class SimpleMessage(MessageDialog):
@@ -43,8 +44,8 @@ class Prompt(SimpleMessage):
     def __init__(self, title, message, parent):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE)
-        self.set_title(title)
-        self.set_markup('<b>' + message + '</b>')
+        self.set_title(toutf(title))
+        self.set_markup('<b>' + toutf(message) + '</b>')
 
 class Confirm(SimpleMessage):
     """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO 
@@ -52,18 +53,18 @@ class Confirm(SimpleMessage):
     def __init__(self, title, files, parent, primary=None):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
-        self.set_title('Confirm ' + title)
+        self.set_title(toutf('Confirm ' + title))
         if primary is None:
             primary = title + ' file' + ((len(files) > 1 and 's') or '') + '?'
         primary = '<b>' + primary + '</b>'
-        self.set_markup(primary)
+        self.set_markup(toutf(primary))
         message = ''
         for i, file in enumerate(files):
             message += '   ' + file + '\n'
             if i == 9: 
                 message += '   ...\n'
                 break
-        self.format_secondary_text(message)
+        self.format_secondary_text(toutf(message))
 
 
 class GDialog(gtk.Window):
