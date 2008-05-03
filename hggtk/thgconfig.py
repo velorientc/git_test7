@@ -87,6 +87,9 @@ class ConfigDialog(gtk.Dialog):
                 ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
                     'The number of revisions to read and display in the'
                     ' changelog viewer in a single batch. Default: 500'),
+                ('Copy Hash', 'tortoisehg.copyhash', ['False', 'True'],
+                    'Allow the changelog viewer to copy hash of currently'
+                    ' selected changeset into the clipboard. Default: False'),
                 ('Overlay Icons', 'tortoisehg.overlayicons',
                     ['False', 'True', 'localdisks'],
                     'Display overlay icons in Explorer windows.'
