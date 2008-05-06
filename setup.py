@@ -49,7 +49,7 @@ if 'py2exe' in sys.argv:
     extra['windows'] = [
             {"script":"hgproc.py",
                         "icon_resources": [(1, "icons/tortoise/hg.ico")]},
-            {"script":"hggtk/tracelog.py",
+            {"script":"tracelog.py",
                         "icon_resources": [(1, "icons/tortoise/python.ico")]}
             ]
     extra['com_server'] = ["tortoisehg"]
