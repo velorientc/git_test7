@@ -13,7 +13,11 @@ import threading
 import Queue
 import win32trace
 
-from hglib import toutf
+try:
+    from hggtk.hglib import toutf
+except ImportError:
+    def toutf(s):
+        return s
 
 class TraceLog():
     def __init__(self):
