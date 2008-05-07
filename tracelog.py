@@ -16,8 +16,10 @@ import win32trace
 try:
     from hggtk.hglib import toutf
 except ImportError:
+    import locale
+    _encoding = locale.getpreferredencoding()
     def toutf(s):
-        return s
+        return s.decode(_encoding, 'replace').encode('utf-8')
 
 class TraceLog():
     def __init__(self):
