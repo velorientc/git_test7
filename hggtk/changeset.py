@@ -121,7 +121,8 @@ class ChangeSet(GDialog):
         # TODO: Add toggle for gmtime/localtime
         eob = buf.get_end_iter()
         date = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(ctx.date()[0]))
-        self.clipboard.set_text(short(ctx.node()))
+        if self.clipboard:
+            self.clipboard.set_text(short(ctx.node()))
         change = str(rev) + ':' + short(ctx.node())
         tags = ' '.join(ctx.tags())
         parents = self.parents
@@ -468,8 +469,11 @@ class ChangeSet(GDialog):
         return _menu
 
     def get_body(self):
-        sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
-        self.clipboard = gtk.Clipboard(selection=sel)
+        if self.repo.ui.configbool('tortoisehg', 'copyhash'):
+            sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
+            self.clipboard = gtk.Clipboard(selection=sel)
+        else:
+            self.clipboard = None
         self._filemenu = self.file_context_menu()
 
         details_frame = gtk.Frame()
