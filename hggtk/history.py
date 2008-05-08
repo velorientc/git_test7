@@ -323,8 +323,9 @@ class GLog(GDialog):
  
     def tree_diff_context_menu(self):
         _menu = gtk.Menu()
-        _menu.append(create_menu('_diff to selected', self._diff_revs))
-
+        _menu.append(create_menu('_diff with selected', self._diff_revs))
+        _menu.append(create_menu('visual diff with selected',
+                self._vdiff_selected))
         _menu.show_all()
         return _menu
  
@@ -437,6 +438,11 @@ class GLog(GDialog):
         dialog = GStatus(self.ui, self.repo, self.cwd, [], statopts, False)
         dialog.display()
         return True
+
+    def _vdiff_selected(self, menuitem):
+        rev0, rev1 = self._revs
+        self.opts['rev'] = ["%s:%s" % (rev0, rev1)]
+        self._diff_file(None, '')
 
     def _mark_rev(self, menuitem):
         rev = self.currow[treemodel.REVID]
