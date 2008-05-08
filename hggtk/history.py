@@ -25,6 +25,11 @@ from vis.treeview import TreeView
 from hglib import toutf
 import gtklib
 
+def create_menu(label, callback):
+    menuitem = gtk.MenuItem(label, True)
+    menuitem.connect('activate', callback)
+    menuitem.set_border_width(1)
+    return menuitem
 
 class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -298,12 +303,6 @@ class GLog(GDialog):
             self.graphview.refresh(False, [], self.opts)
 
     def tree_context_menu(self):
-        def create_menu(label, callback):
-            menuitem = gtk.MenuItem(label, True)
-            menuitem.connect('activate', callback)
-            menuitem.set_border_width(1)
-            return menuitem
-            
         _menu = gtk.Menu()
         _menu.append(create_menu('di_splay', self._show_status))
         _menu.append(create_menu('_checkout', self._checkout))
@@ -312,9 +311,6 @@ class GLog(GDialog):
         _menu.append(create_menu('_export patch', self._export_patch))
         _menu.append(create_menu('e_mail patch', self._email_patch))
         _menu.append(create_menu('add/remove _tag', self._add_tag))
-        _menu.append(create_menu('mark rev for diff', self._mark_rev))
-        self._cmenu_diff = create_menu('_diff with mark', self._diff_revs)
-        _menu.append(self._cmenu_diff)
         _menu.append(create_menu('backout revision', self._backout_rev))
         
         # need mq extension for strip command
@@ -325,9 +321,17 @@ class GLog(GDialog):
         _menu.show_all()
         return _menu
  
+    def tree_diff_context_menu(self):
+        _menu = gtk.Menu()
+        _menu.append(create_menu('_diff to selected', self._diff_revs))
+
+        _menu.show_all()
+        return _menu
+ 
     def get_body(self):
         self._filter_dialog = None
         self._menu = self.tree_context_menu()
+        self._menu2 = self.tree_diff_context_menu()
 
         self.tree_frame = gtk.Frame()
         self.tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -340,8 +344,9 @@ class GLog(GDialog):
         self.graphview.connect('revision-selected', self.selection_changed)
         self.graphview.connect('revisions-loaded', self.revisions_loaded)
 
-        self.tree.connect('button-release-event', self._tree_button_release)
-        self.tree.connect('popup-menu', self._tree_popup_menu)
+        #self.tree.connect('button-release-event', self._tree_button_release)
+        self.tree.connect('button-press-event', self._tree_button_press)
+        #self.tree.connect('popup-menu', self._tree_popup_menu)
         self.tree.connect('row-activated', self._tree_row_act)
         #self.tree.modify_font(pango.FontDescription(self.fontlist))
         
@@ -422,8 +427,7 @@ class GLog(GDialog):
     def _diff_revs(self, menuitem):
         from status import GStatus
         from gtools import cmdtable
-        rev0 = self.graphview.get_mark_rev()
-        rev1 = self.currow[treemodel.REVID]
+        rev0, rev1 = self._revs
         statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
                 ('include', 'exclude', 'git'))
         statopts['rev'] = ['%u:%u' % (rev0, rev1)]
@@ -541,6 +545,23 @@ class GLog(GDialog):
             self._tree_popup_menu(widget, event.button, event.time)
         return False
 
+    def _tree_button_press(self, widget, event):
+        if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
+            gtk.gdk.CONTROL_MASK)):
+            crow = widget.get_path_at_pos(int(event.x), int(event.y))[0]
+            (model, pathlist) = widget.get_selection().get_selected_rows()
+            if pathlist == []:
+                return False
+            srow = pathlist[0]
+            if srow == crow:
+                self._tree_popup_menu(widget, event.button, event.time)
+            else:
+                self._revs = (int(model[srow][treemodel.REVID]),
+                        int(model[crow][treemodel.REVID]))
+                self._tree_popup_menu_diff(widget, event.button, event.time)
+            return True
+        return False
+
     def _tree_popup_menu(self, treeview, button=0, time=0) :
         selrev = self.currow[treemodel.REVID]
         
@@ -550,12 +571,15 @@ class GLog(GDialog):
         can_merge = selrev not in parents and \
                     len(self.repo.heads()) > 1 and \
                     len(parents) < 2
-        can_diff = self.graphview.get_mark_rev() is not None
         self._cmenu_merge.set_sensitive(can_merge)
-        self._cmenu_diff.set_sensitive(can_diff)
 
         # display the context menu
         self._menu.popup(None, None, None, button, time)
+        return True
+
+    def _tree_popup_menu_diff(self, treeview, button=0, time=0):        
+        # display the context menu
+        self._menu2.popup(None, None, None, button, time)
         return True
 
     def _tree_row_act(self, tree, path, column) :
