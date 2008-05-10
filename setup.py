@@ -66,7 +66,8 @@ opts = {
        #    the dist directory created by py2exe.
        #    also needed is the GTK's share/themes (as dist/share/themes), 
        #    for dialogs to display in MS-Windows XP theme.
-       "includes" : "pango,atk,pangocairo,cairo,gobject," + ",".join(hgextmods),
+       "includes" : "dbhash,pango,atk,pangocairo,cairo,gobject," + \
+                    ",".join(hgextmods),
    }
 }
 
