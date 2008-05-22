@@ -188,7 +188,7 @@ class GDialog(gtk.Window):
             # default to tortoisehg's configuration
             vdiff = self.ui.config('tortoisehg', 'vdiff')
             if vdiff:
-                self.diffcmd = self.ui.config('extdiff', 'cmd.'+vdiff)
+                self.diffcmd = self.ui.config('extdiff', 'cmd.'+vdiff) or vdiff
             else:
                 self.diffcmd = 'diff'
                 if not self.diffopts :
