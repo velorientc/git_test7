@@ -68,7 +68,7 @@ def main(command):
     root = hglib.rootpath(cwd)
     opts = { 'root' : root, 'cwd' : cwd }
 
-    if root is None and command not in nonrepo_commands:
+    if not root and command not in nonrepo_commands:
         print 'No repository found, and', command, 'requires one.'
         sys.exit(1)
 
