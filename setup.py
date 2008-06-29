@@ -49,7 +49,7 @@ if 'py2exe' in sys.argv:
     extra['windows'] = [
             {"script":"hgproc.py",
                         "icon_resources": [(1, "icons/tortoise/hg.ico")]},
-            {"script":"hggtk/tracelog.py",
+            {"script":"tracelog.py",
                         "icon_resources": [(1, "icons/tortoise/python.ico")]}
             ]
     extra['com_server'] = ["tortoisehg"]
@@ -66,7 +66,8 @@ opts = {
        #    the dist directory created by py2exe.
        #    also needed is the GTK's share/themes (as dist/share/themes), 
        #    for dialogs to display in MS-Windows XP theme.
-       "includes" : "pango,atk,pangocairo,cairo,gobject," + ",".join(hgextmods),
+       "includes" : "dbhash,pango,atk,pangocairo,cairo,gobject," + \
+                    ",".join(hgextmods),
    }
 }
 
