@@ -520,7 +520,18 @@ class ContextMenuExtension:
         if rv == 2:
             return
         try:
+            # initialize the repo
             hg.repository(ui.ui(), dest, create=1)
+            
+            # create the .hgignore file, mainly to workaround
+            # Explorer's problem in creating files with name
+            # that start with a dot.
+            hgignore = os.path.join(dest, '.hgignore')
+            if not os.path.exists(hgignore):
+                try:
+                    open(hgignore, 'wb')
+                except:
+                    pass
         except:
             msg = "Error creating repo"
             win32ui.MessageBox(msg, title, 
