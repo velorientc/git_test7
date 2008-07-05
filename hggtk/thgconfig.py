@@ -295,8 +295,8 @@ class ConfigDialog(gtk.Dialog):
         self.fill_frame(self.diff_frame, self._diff_info)
 
         # Force dialog into clean state in the beginning
-        self._btn_apply.set_sensitive(False)
         self._refresh_vlist()
+        self._btn_apply.set_sensitive(False)
         self.dirty = False
 
     def _delete(self, widget, event):
