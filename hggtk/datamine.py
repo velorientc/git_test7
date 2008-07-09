@@ -254,6 +254,11 @@ class DataMineDialog(GDialog):
         regexp.connect('activate', self.trigger_search, objs)
         includes.connect('activate', self.trigger_search, objs)
         excludes.connect('activate', self.trigger_search, objs)
+        # Includes/excludes must disable following copies
+        objs = (includes, excludes, follow)
+        includes.connect('changed', self._update_following_possible, objs)
+        excludes.connect('changed', self._update_following_possible, objs)
+        
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
@@ -370,6 +375,13 @@ class DataMineDialog(GDialog):
             menu.popup(None, None, None, event.button, event.time)
             return True
         return False
+
+    def _update_following_possible(self, widget, objs):
+        (includes, excludes, follow) = objs
+        allow = not includes.get_text() and not excludes.get_text()
+        if not allow:
+            follow.set_active(False)
+        follow.set_sensitive(allow)
 
     def add_annotate_page(self, path, revid):
         '''
