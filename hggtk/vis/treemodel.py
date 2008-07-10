@@ -48,7 +48,7 @@ class TreeModel(gtk.GenericTreeModel):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
         self.repo = repo
-        self.parents = [x.rev() for x in repo.workingctx().parents()]
+        self.parents = [x.rev() for x in repo.changectx(None).parents()]
         self.heads = [repo.changelog.rev(x) for x in repo.heads()]
         self.line_graph_data = graphdata
         self.author_re = re.compile('<.*@.*>', 0)

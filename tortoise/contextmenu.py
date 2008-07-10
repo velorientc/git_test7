@@ -335,14 +335,14 @@ class ContextMenuExtension:
                            self._update, icon="menucheckout.ico"))
 
             can_merge = len(repo.heads()) > 1 and \
-                        len(repo.workingctx().parents()) < 2
+                        len(repo.changectx(None).parents()) < 2
             result.append(TortoiseMenu(_("Merge Revisions"),
                            _("merge working directory with another revision"),
                            self._merge, icon="menumerge.ico",
                            state=can_merge))
 
             # show un-merge menu per merge status of working directory
-            if len(repo.workingctx().parents()) > 1:
+            if len(repo.changectx(None).parents()) > 1:
                 result.append(TortoiseMenu(_("Undo Merge"),
                                _("Undo merge by updating to revision"),
                                self._merge, icon="menuunmerge.ico"))

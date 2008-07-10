@@ -258,7 +258,7 @@ class ChangeSet(GDialog):
             c = c2
             crev = c.rev()
             if crev is None:
-                crev = repo.changelog.count()
+                crev = len(repo.changelog)
             orig = f
             files = (f,)
             while crev > startrev:

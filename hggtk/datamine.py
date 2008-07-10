@@ -378,7 +378,7 @@ class DataMineDialog(GDialog):
         revision 'revid'.
         '''
         if revid == '.':
-            ctx = self.repo.workingctx().parents()[0]
+            ctx = self.repo.changectx(None).parents()[0]
             try:
                 fctx = ctx.filectx(path)
             except revlog.LookupError:

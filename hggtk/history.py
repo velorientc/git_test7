@@ -294,7 +294,7 @@ class GLog(GDialog):
             self.opts['revs'] = tagged
             self.graphview.refresh(False, [], self.opts)
         elif self._filter == "parents":
-            repo_parents = [x.rev() for x in self.repo.workingctx().parents()]
+            repo_parents = [x.rev() for x in self.repo.changectx(None).parents()]
             self.opts['revs'] = [str(x) for x in repo_parents]
             self.graphview.refresh(False, [], self.opts)
         elif self._filter == "heads":
@@ -417,7 +417,7 @@ class GLog(GDialog):
         from backout import BackoutDialog
         rev = self.currow[treemodel.REVID]
         rev = short(self.repo.changelog.node(rev))
-        parents = [x.node() for x in self.repo.workingctx().parents()]
+        parents = [x.node() for x in self.repo.changectx(None).parents()]
         dialog = BackoutDialog(self.repo.root, rev)
         dialog.set_transient_for(self)
         dialog.show_all()
@@ -503,7 +503,7 @@ class GLog(GDialog):
 
     def _checkout(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        parents = [x.node() for x in self.repo.workingctx().parents()]
+        parents = [x.node() for x in self.repo.changectx(None).parents()]
         dialog = UpdateDialog(self.cwd, rev)
         dialog.set_transient_for(self)
         dialog.show_all()
@@ -512,13 +512,13 @@ class GLog(GDialog):
         dialog.set_transient_for(None)
 
     def checkout_completed(self, oldparents):
-        newparents = [x.node() for x in self.repo.workingctx().parents()]
+        newparents = [x.node() for x in self.repo.changectx(None).parents()]
         if not oldparents == newparents:
             self.reload_log()
 
     def _merge(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        parents = [x.node() for x in self.repo.workingctx().parents()]
+        parents = [x.node() for x in self.repo.changectx(None).parents()]
         node = short(self.repo.changelog.node(rev))
         dialog = MergeDialog(self.repo.root, self.cwd, node)
         dialog.set_transient_for(self)
@@ -528,7 +528,7 @@ class GLog(GDialog):
         dialog.set_transient_for(None)
 
     def merge_completed(self, oldparents):
-        newparents = [x.node() for x in self.repo.workingctx().parents()]
+        newparents = [x.node() for x in self.repo.changectx(None).parents()]
         if not oldparents == newparents:
             self.reload_log()
 
@@ -573,7 +573,7 @@ class GLog(GDialog):
         
         # disable/enable menus as required
         parents = [self.repo.changelog.rev(x.node()) for x in
-                   self.repo.workingctx().parents()]
+                   self.repo.changectx(None).parents()]
         can_merge = selrev not in parents and \
                     len(self.repo.heads()) > 1 and \
                     len(parents) < 2

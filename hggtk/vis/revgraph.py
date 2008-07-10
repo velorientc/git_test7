@@ -90,7 +90,7 @@ def filelog_grapher(repo, path):
     Graph the ancestry of a single file (log).  Deletions show
     up as breaks in the graph.
     '''
-    filerev = repo.file(path).count() - 1
+    filerev = len(repo.file(path)) - 1
     revs = []
     rev_color = {}
     nextcolor = 0

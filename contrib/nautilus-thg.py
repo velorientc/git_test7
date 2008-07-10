@@ -221,8 +221,8 @@ class HgExtension(nautilus.MenuProvider,
             items.append(item)
             return items
 
-        if len(repo.workingctx().parents()) > 1:
-            self.rev0 = repo.workingctx().parents()[0].rev()
+        if len(repo.changectx(None).parents()) > 1:
+            self.rev0 = repo.changectx(None).parents()[0].rev()
             item = nautilus.MenuItem('HgNautilus::undomerge',
                                  'Undo Merge',
                                  'Clean checkout of original parent revision',
@@ -494,7 +494,7 @@ class HgExtension(nautilus.MenuProvider,
         emblem, status = self._get_file_status(repo, localpath)
 
         # Get the information from Mercurial
-        ctx = repo.workingctx().parents()[0]
+        ctx = repo.changectx(None).parents()[0]
         try:
             fctx = ctx.filectx(localpath)
             rev = fctx.filelog().linkrev(fctx.filenode())

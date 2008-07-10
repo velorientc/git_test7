@@ -42,7 +42,7 @@ class SynchDialog(gtk.Window):
         self.set_default_size(610, 400)
 
         self.paths = self._get_paths()
-        self.origchangecount = self.repo.changelog.count()
+        self.origchangecount = len(self.repo.changelog)
 
         # load the fetch extension explicitly
         extensions.load(self.ui, 'fetch', None)
@@ -218,7 +218,7 @@ class SynchDialog(gtk.Window):
     def update_buttons(self, *args):
         self.buttonhbox.hide()
         self.repo.invalidate()
-        tip = self.repo.changelog.count()
+        tip = len(self.repo.changelog)
         if self.origchangecount == tip:
             self.viewpulled.hide()
         else:
@@ -226,7 +226,7 @@ class SynchDialog(gtk.Window):
             self.viewpulled.show()
 
         self.repo.dirstate.invalidate()
-        parent = self.repo.workingctx().parents()[0].rev()
+        parent = self.repo.changectx(None).parents()[0].rev()
         if parent == tip-1:
             self.updatetip.hide()
         else:
@@ -235,14 +235,14 @@ class SynchDialog(gtk.Window):
 
     def _view_pulled_changes(self, button):
         from history import GLog
-        revs = (self.repo.changelog.count()-1, self.origchangecount)
+        revs = (len(self.repo.changelog)-1, self.origchangecount)
         opts = {'revrange' : revs}
         dialog = GLog(self.ui, self.repo, self.cwd, [], opts, False)
         dialog.display()
 
     def _update_to_tip(self, button):
         self.repo.invalidate()
-        wc = self.repo.workingctx()
+        wc = self.repo.changectx(None)
         pl = wc.parents()
         p1, p2 = pl[0], self.repo.changectx('tip')
         pa = p1.ancestor(p2)

@@ -108,7 +108,7 @@ class RevisionDialog(gtk.Dialog):
     def tip(self, repo):
         """ Show the tip revision """
         repo.ui.pushbuffer()
-        cmdutil.show_changeset(repo.ui, repo, {}).show(nullrev+repo.changelog.count())
+        cmdutil.show_changeset(repo.ui, repo, {}).show(nullrev+len(repo.changelog))
         text = repo.ui.popbuffer()
         return text
         

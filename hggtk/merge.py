@@ -140,7 +140,7 @@ class MergeDialog(gtk.Window):
             return None
 
         # populate parent rev data
-        self._parents = [x.node() for x in self.repo.workingctx().parents()]
+        self._parents = [x.node() for x in self.repo.changectx(None).parents()]
         self._parent_revs.set_sensitive(True)
         self._parent_revs.set_text(", ".join([short(x) for x in self._parents]))
         self._parent_revs.set_sensitive(False)
@@ -160,7 +160,7 @@ class MergeDialog(gtk.Window):
             
         # populate revision data        
         heads = self.repo.heads()
-        tip = self.repo.changelog.node(nullrev+self.repo.changelog.count())
+        tip = self.repo.changelog.node(nullrev+len(self.repo.changelog))
         self._revlist.clear()
         self._rev_input.set_text("")
         for i, node in enumerate(heads):

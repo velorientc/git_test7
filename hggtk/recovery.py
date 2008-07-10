@@ -138,7 +138,7 @@ class RecoveryDialog(gtk.Window):
         except RepoError:
             self.write("Unable to find repo at %s\n" % (self.root), False)
             return
-        pl = repo.workingctx().parents()
+        pl = repo.changectx(None).parents()
         cmd = ['update', '--clean', '--rev', str(pl[0].rev())]
         self._exec_cmd(cmd, postfunc=self._notify)
 

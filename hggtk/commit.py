@@ -193,7 +193,7 @@ class GCommit(GStatus):
 
     def _check_merge(self):
         # disable the checkboxes on the filelist if repo in merging state
-        merged = len(self.repo.workingctx().parents()) > 1
+        merged = len(self.repo.changectx(None).parents()) > 1
         cbcell = self.tree.get_column(0).get_cell_renderers()[0]
         cbcell.set_property("activatable", not merged)
         
@@ -217,7 +217,7 @@ class GCommit(GStatus):
         if not self._ready_message():
             return True
 
-        if len(self.repo.workingctx().parents()) > 1:
+        if len(self.repo.changectx(None).parents()) > 1:
             # as of Mercurial 1.0, merges must be committed without
             # specifying file list.
             self._hg_commit([])
@@ -305,7 +305,7 @@ def launch(root='', files=[], cwd='', main=True):
     
     # move cwd to repo root if repo is merged, so we can show
     # all the changed files
-    if len(repo.workingctx().parents()) > 1 and repo.root != cwd:
+    if len(repo.changectx(None).parents()) > 1 and repo.root != cwd:
         cwd = repo.root
         repo = hg.repository(u, path=cwd)
         files = [cwd]

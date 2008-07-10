@@ -112,7 +112,7 @@ class TreeView(gtk.ScrolledWindow):
                     node = b[pats]
                     start = self.repo.changelog.rev(node)
                 else:
-                    start = self.repo.changelog.count() - 1
+                    start = len(self.repo.changelog) - 1
             elif opts['revrange']:
                 if len(opts['revrange']) >= 2:
                     start, end = opts['revrange']
@@ -120,7 +120,7 @@ class TreeView(gtk.ScrolledWindow):
                     start = opts['revrange'][0]
                     end = start
             else:
-                start = self.repo.changelog.count() - 1
+                start = len(self.repo.changelog) - 1
             self.grapher = revision_grapher(self.repo, start, end, pats)
         elif opts.get('revs', None):
             self.grapher = dumb_log_generator(self.repo, opts['revs'])
