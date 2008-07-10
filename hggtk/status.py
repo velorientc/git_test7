@@ -322,7 +322,8 @@ class GStatus(GDialog):
             n for n in self.repo.status(node1=self._node1, node2=self._node2,
                                  match=matcher,
                                  ignored=self.test_opt('ignored'),
-                                 clean=self.test_opt('clean'))]
+                                 clean=self.test_opt('clean'),
+                                 unknown=self.test_opt('unknown'))]
 
         changetypes = (('modified', 'M', modified),
                        ('added', 'A', added),
