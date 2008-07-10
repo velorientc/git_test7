@@ -246,8 +246,7 @@ class ChangeSet(GDialog):
         man1 = ctx1.manifest()
         date1 = util.datestr(ctx1.date())
 
-        execf2 = ctx2.manifest().execf
-        linkf2 = ctx2.manifest().linkf
+        flags2 = ctx2.manifest().flags
 
         # returns False if there was no rename between ctx1 and ctx2
         # returns None if the file was created between ctx1 and ctx2
@@ -315,18 +314,18 @@ class ChangeSet(GDialog):
             if s != 'R':
                 tn = getfilectx(f, ctx2).data()
             a, b = f, f
-            def gitmode(x, l):
-                return l and '120000' or (x and '100755' or '100644')
+            def gitmode(flags):
+                return 'l' in flags or 'x' in flags
             def addmodehdr(header, omode, nmode):
                 if omode != nmode:
                     header.append('old mode %s\n' % omode)
                     header.append('new mode %s\n' % nmode)
 
             if s == 'A':
-                mode = gitmode(execf2(f), linkf2(f))
+                mode = gitmode(flags2(f))
                 if f in copied:
                     a = copied[f]
-                    omode = gitmode(man1.execf(a), man1.linkf(a))
+                    omode = gitmode(man1.flags(a))
                     addmodehdr(header, omode, mode)
                     if filestatus(a) == 'R' and a not in gone:
                         op = 'rename'
@@ -344,11 +343,11 @@ class ChangeSet(GDialog):
                 if f in srcs:
                     dodiff = False
                 else:
-                    mode = gitmode(man1.execf(f), man1.linkf(f))
+                    mode = gitmode(man1.flags(f))
                     header.append('deleted file mode %s\n' % mode)
             else:
-                omode = gitmode(man1.execf(f), man1.linkf(f))
-                nmode = gitmode(execf2(f), linkf2(f))
+                omode = gitmode(man1.flags(f))
+                nmode = gitmode(flags2(f))
                 addmodehdr(header, omode, nmode)
                 if util.binary(to) or util.binary(tn):
                     dodiff = 'binary'
