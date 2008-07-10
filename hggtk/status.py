@@ -583,6 +583,8 @@ class GStatus(GDialog):
             revertopts['rev'] = revertopts['rev'][0]
             dialog = Confirm('Revert', files, self, 'Revert files to revision ' + revertopts['rev'] + '?')
         else:
+            # rev options needs extra tweaking since it must be an empty string when unspecified for revert command
+            revertopts['rev'] = ''
             dialog = Confirm('Revert', files, self)
         if dialog.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
