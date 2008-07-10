@@ -173,12 +173,11 @@ class IconOverlayExtension(object):
 
         modified, added, removed, deleted = [], [], [], []
         unknown, ignored, clean = [], [], []
-        files = []
         try:
-            files, matchfn, anypats = cmdutil.matchpats(repo, [pdir])
+            matcher = cmdutil.match(repo, [pdir])
             modified, added, removed, deleted, unknown, ignored, clean = \
-                    repo.status(files=files, list_ignored=True, 
-                            list_clean=True, list_unknown=True)
+                    repo.status(match=matcher, ignored=True, 
+                            clean=True, unknown=True)
 
             # add directory status to list
             for grp in (clean,modified,added,removed,deleted,ignored,unknown):

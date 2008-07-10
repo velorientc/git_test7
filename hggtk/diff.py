@@ -111,8 +111,9 @@ class DiffWindow(gtk.Window):
         except hg.RepoError:
             return None
 
-        self.files, matchfn, anypats = cmdutil.matchpats(self.repo, self.files)
-        modified, added, removed = self.repo.status(files=self.files)[0:3]
+        matcher = cmdutil.match(self.repo, self.files)
+        modified, added, removed = self.repo.status(match=matcher)[0:3]
+        self.files = matcher.files()
 
         self.model.clear()
         self.model.append(None, [ "Complete Diff", "" ])

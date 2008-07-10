@@ -315,14 +315,14 @@ class GStatus(GDialog):
         
         # node2 is None (the working dir) when 0 or 1 rev is specificed
         self._node1, self._node2 = cmdutil.revpair(self.repo, self.opts.get('rev'))
-    
-        files, matchfn, anypats = cmdutil.matchpats(self.repo, self.pats, self.opts)
+
+        matcher = cmdutil.match(self.repo, self.pats, self.opts)
         cwd = (self.pats and self.repo.getcwd()) or ''
         modified, added, removed, deleted, unknown, ignored, clean = [
-            n for n in self.repo.status(node1=self._node1, node2=self._node2, files=files,
-                                 match=matchfn,
-                                 list_ignored=self.test_opt('ignored'),
-                                 list_clean=self.test_opt('clean'))]
+            n for n in self.repo.status(node1=self._node1, node2=self._node2,
+                                 match=matcher,
+                                 ignored=self.test_opt('ignored'),
+                                 clean=self.test_opt('clean'))]
 
         changetypes = (('modified', 'M', modified),
                        ('added', 'A', added),
@@ -460,8 +460,8 @@ class GStatus(GDialog):
             try:
                 if len(files) != 0:
                     wfiles = [self.repo.wjoin(x) for x in files]
-                    fns, matchfn, anypats = cmdutil.matchpats(self.repo, wfiles, self.opts)
-                    patch.diff(self.repo, self._node1, self._node2, fns, match=matchfn,
+                    matcher = cmdutil.match(self.repo, wfiles, self.opts)
+                    patch.diff(self.repo, self._node1, self._node2, match=matcher,
                                fp=difftext, opts=patch.diffopts(self.ui, self.opts))
 
                 buffer = gtk.TextBuffer()
