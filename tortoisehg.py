@@ -73,6 +73,14 @@ def RegisterServer(cls):
     # Add the appropriate shell extension registry keys
     for category, keyname in cls.registry_keys: 
         _winreg.SetValue(category, keyname, _winreg.REG_SZ, cls._reg_clsid_)
+        
+    # register the extension on Approved list
+    try:
+        apath = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+        key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, apath, 0, _winreg.KEY_WRITE)
+        _winreg.SetValueEx(key, cls._reg_clsid_, 0, _winreg.REG_SZ, 'TortoiseHg')
+    except:
+        pass
 
     print cls._reg_desc_, "registration complete."
 
@@ -84,6 +92,15 @@ def UnregisterServer(cls):
             import errno
             if details.errno != errno.ENOENT:
                 raise
+
+    # unregister the extension from Approved list
+    try:
+        apath = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+        key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, apath, 0, _winreg.KEY_WRITE)
+        _winreg.DeleteValue(key, cls._reg_clsid_)
+    except:
+        pass
+
     print cls._reg_desc_, "unregistration complete."
 
 if __name__=='__main__':
