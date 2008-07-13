@@ -60,6 +60,23 @@ Bug fixes in 0.4:
   * [ 1895443 ] Overlay: ThreadingModel registry setting
   * [ 1892791 ] Windows Explorer painfully slow for network drives
 
+Changes and bug fixes since 0.4RC2:
+
+  * Fixed traceback in tracelog, which was broken in 0.4RC2.
+  * Right-click to diff/visual-diff to selected changeset, which replaced
+    the earlier diff-to-marked function.
+  * Create .hgignore file automatically when initializing new repo.
+  * Fix traceback when users try to enable internal commit dialog with
+    an empty 'commit' in mercurial.ini's 'tortoisehg' section.
+  * Handle empty cmd.differ entries in hgrc like hg does
+  * Register context menu and overlay icon extension onto the Explorer's 
+    Approved list.
+  * Fixed UTF-8 encoding errors in hgcmd and several error message dialogs.
+  * New transparent TortoiseHg logo in About dialog, again by Peer Sommerlund.
+  * New 32x32 icons for dialogs to provide nicer icons when navigating 
+    through the applications with Alt-Tab on Windows.
+  * Minor improvement/fixes on hgtk to simplify installation on *nix systems.
+  
 Changes and bug fixes since 0.4RC1:
 
   * Added buttons to stop command execution in Synchronize, Recovery,
