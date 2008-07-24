@@ -38,7 +38,7 @@ class DataMineDialog(GDialog):
 
     def get_tbbuttons(self):
         self.stop_button = self.make_toolbutton(gtk.STOCK_STOP, 'Stop', 
-                self._stop_search, tip='Stop operation on current tab')
+                self._stop_current_search, tip='Stop operation on current tab')
         return [
             self.make_toolbutton(gtk.STOCK_FIND, 'New Search', 
                 self._search_clicked, tip='Open new search tab'),
@@ -76,6 +76,10 @@ class DataMineDialog(GDialog):
         vbox.pack_start(self.stbar, False, False, 2)
         self.stop_button.set_sensitive(False)
         return vbox
+
+    def _destroying(self, gtkobj):
+        self._stop_all_searches()
+        GDialog._destroying(self, gtkobj)
 
     def ann_header_context_menu(self, treeview):
         _menu = gtk.Menu()
@@ -339,9 +343,17 @@ class DataMineDialog(GDialog):
             self.curpath = fromutf(model[iter][self.COL_PATH])
             self.stbar.set_status_text(toutf(model[iter][self.COL_TOOLTIP]))
 
-    def _stop_search(self, button, widget):
+    def _stop_current_search(self, button, widget):
         num = self.notebook.get_current_page()
         frame = self.notebook.get_nth_page(num)
+        self._stop_search(frame)
+
+    def _stop_all_searches(self):
+        for num in xrange(self.notebook.get_n_pages()):
+            frame = self.notebook.get_nth_page(num)
+            self._stop_search(frame)
+
+    def _stop_search(self, frame):
         if hasattr(frame, '_mythread') and frame._mythread:
             frame._mythread.terminate()
             frame._mythread.join()
