@@ -50,11 +50,12 @@ def main(command):
         try:
             # assuming TortoiseHg source layout, with hgtk in contrib
             path = os.path.dirname(os.path.realpath(__file__))
-            norm = os.path.normpath(os.path.join(path, '..'))
-            if norm not in sys.path:
-                sys.path.append(norm)
-        except NameError: # __file__ is not always available
-            pass
+        except NameError:
+            # __file__ not available in pdb mode
+            path = os.path.dirname(sys.argv[0])
+        norm = os.path.normpath(os.path.join(path, '..'))
+        if norm not in sys.path:
+            sys.path.append(norm)
 
     try:
         from hggtk import hglib
