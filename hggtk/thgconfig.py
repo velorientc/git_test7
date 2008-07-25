@@ -45,13 +45,14 @@ class ConfigDialog(gtk.Dialog):
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
             self.set_title('TortoiseHg Configure Repository - ' + name)
+            shlib.set_tortoise_icon(self, 'settings_repo.ico')
             self.root = repo.root
         else:
             self.rcpath = util.user_rcpath()
             self.set_title('TortoiseHg Configure User-Global Settings')
+            shlib.set_tortoise_icon(self, 'settings_user.ico')
             self.root = None
 
-        shlib.set_tortoise_icon(self, 'menusettings.ico')
         self.ini = self.load_config(self.rcpath)
 
         # Create a new notebook, place the position of the tabs
