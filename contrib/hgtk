@@ -5,10 +5,15 @@
 #
 # Modify this line to the location of your tortoisehg repository
 # or set TORTOISEHG_PATH in your environment
+
 tortoisehg_dir = '~/tools/tortoisehg-dev'
 
 import os
 import sys
+import pygtk
+pygtk.require('2.0')
+import gtk
+import mercurial
 
 dialogs = '''log synch status clone merge update userconfig repoconfig
 serve recovery commit datamine about'''
