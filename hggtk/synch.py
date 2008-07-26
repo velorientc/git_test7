@@ -347,22 +347,40 @@ class SynchDialog(gtk.Window):
             tbutton.set_tooltip(self.tips, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
+
+    def _get_advanced_options(self):
+        opts = {}
+        if self._showpatch.get_active():
+            opts['patch'] = ['--patch']
+        if self._nomerge.get_active():
+            opts['no-merges'] = ['--no-merges']
+        if self._force.get_active():
+            opts['force'] = ['--force']
+        if self._newestfirst.get_active():
+            opts['newest-first'] = ['--newest-first']
+        target_rev = self._reventry.get_text().strip()
+        if target_rev != "":
+            opts['rev'] = ['--rev', target_rev]
+            
+        return opts
         
     def _pull_clicked(self, toolbutton, data=None):
+        aopts = self._get_advanced_options()
         if self._pull_fetch.get_active():
             cmd = ['fetch', '--message', 'merge']
         else:
             cmd = ['pull']
+            cmd += aopts.get('force', [])
             if self._pull_update.get_active():
                 cmd.append('--update')
-            if self._force.get_active():
-                cmd.append('--force')
+        cmd += aopts.get('rev', [])
         self._exec_cmd(cmd)
     
     def _push_clicked(self, toolbutton, data=None):
+        aopts = self._get_advanced_options()
         cmd = ['push']
-        if self._force.get_active():
-            cmd.append('--force')
+        cmd += aopts.get('rev', [])
+        cmd += aopts.get('force', [])
         self._exec_cmd(cmd)
         
     def _conf_clicked(self, toolbutton, data=None):
@@ -400,27 +418,23 @@ class SynchDialog(gtk.Window):
         dlg.set_transient_for(None)
 
     def _incoming_clicked(self, toolbutton, data=None):
+        aopts = self._get_advanced_options()
         cmd = ['incoming']
-        if self._showpatch.get_active():
-            cmd.append('--patch')
-        if self._nomerge.get_active():
-            cmd.append('--no-merges')
-        if self._force.get_active():
-            cmd.append('--force')
-        if self._newestfirst.get_active():
-            cmd.append('--newest-first')
+        cmd += aopts.get('rev', [])
+        cmd += aopts.get('patch', [])
+        cmd += aopts.get('no-merges', [])
+        cmd += aopts.get('force', [])
+        cmd += aopts.get('newest-first', [])
         self._exec_cmd(cmd)
         
     def _outgoing_clicked(self, toolbutton, data=None):
+        aopts = self._get_advanced_options()
         cmd = ['outgoing']
-        if self._showpatch.get_active():
-            cmd.append('--patch')
-        if self._nomerge.get_active():
-            cmd.append('--no-merges')
-        if self._force.get_active():
-            cmd.append('--force')
-        if self._newestfirst.get_active():
-            cmd.append('--newest-first')
+        cmd += aopts.get('rev', [])
+        cmd += aopts.get('patch', [])
+        cmd += aopts.get('no-merges', [])
+        cmd += aopts.get('force', [])
+        cmd += aopts.get('newest-first', [])
         self._exec_cmd(cmd)
         
     def _stop_clicked(self, toolbutton, data=None):
