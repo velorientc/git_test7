@@ -437,6 +437,7 @@ class ConfigDialog(gtk.Dialog):
             lbl = gtk.Label(label + ':')
             lbl.set_alignment(1.0, 0.0)
             eventbox = gtk.EventBox()
+            eventbox.set_visible_window(False)
             eventbox.add(lbl)
             table.attach(eventbox, 0, 1, row, row+1, gtk.FILL, 0, 4, 3)
             table.attach(combo, 1, 2, row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
