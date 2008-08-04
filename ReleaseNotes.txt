@@ -60,6 +60,19 @@ Bug fixes in 0.4:
   * [ 1895443 ] Overlay: ThreadingModel registry setting
   * [ 1892791 ] Windows Explorer painfully slow for network drives
 
+Changes and bug fixes since 0.4RC3:
+
+  * Activated target revision option in Synchronize window that had been
+    dormant so far (as reported by Doug Philips).
+  * Terminate all backgrounded searches in Datamine window upon exit, so
+    the associated Python process may terminate immediately too.
+  * New icons by Peer Sommerlund for configuration windows to represent 
+    repo and user config respectively.
+  * Theme improvement in the Configuration windows (by Peter Ruibal).
+  * Detect PyGtk and Mercurial installation more accurately in Hgtk
+  * Removed 'square-boxes' in license window (of About window) caused by 
+    extra form-feed characters.
+
 Changes and bug fixes since 0.4RC2:
 
   * Fixed traceback in tracelog, which was broken in 0.4RC2.
