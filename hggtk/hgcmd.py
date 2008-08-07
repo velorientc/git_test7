@@ -130,7 +130,7 @@ class CmdDialog(gtk.Dialog):
             self._button_stop.set_sensitive(False)            
             self.returncode = self.hgthread.return_code()
             if self.returncode is None:
-                self.write("[command interrupted]")
+                self.write("\n[command interrupted]")
             return False # Stop polling this function
         else:
             return True
