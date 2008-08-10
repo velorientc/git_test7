@@ -351,7 +351,7 @@ class ConfigDialog(gtk.Dialog):
 
     def _test_path(self, *args):
         if not self.root:
-            error_dialog('No Repository Found', 
+            error_dialog(self, 'No Repository Found', 
                     'Path testing cannot work without a repository')
             return
         testpath = self._pathpathedit.get_text()
