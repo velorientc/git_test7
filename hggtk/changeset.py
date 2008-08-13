@@ -726,7 +726,6 @@ class ChangeSet(GDialog):
         if dialog.run() == gtk.RESPONSE_NO:
             return
         cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), self.curfile]
-        self.restore_cwd()
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
