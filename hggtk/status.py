@@ -183,6 +183,11 @@ class GStatus(GDialog):
         self._menus['I'] = ignored_menu
         self._menus['!'] = deleted_menu
 
+        # model stores the file list.
+        # model[0] = file checked (marked for commit)
+        # model[1] = changetype char
+        # model[2] = file path as UTF-8
+        # model[3] = file path
         self.model = gtk.ListStore(bool, str, str, str)
         self.model.set_sort_func(1001, self._sort_by_stat)
         self.model.set_default_sort_func(self._sort_by_stat)
