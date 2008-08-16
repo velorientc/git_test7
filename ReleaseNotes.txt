@@ -17,6 +17,10 @@ New features in 0.4
     to load changeset diffs. File list has been moved to the left hand
     side.
 
+  * Added buttons to stop command execution in Synchronize, Recovery,
+    as well as any dialogs that use hgcmd dialog, including Update and 
+    Clone dialogs.
+
   * Added 'strip' and 'backout' functions to history browser.
 
   * Two convenience functions added to Synchronize dialog: 'View Pulled
@@ -35,9 +39,6 @@ New features in 0.4
 
   * Hgk ('Revision Graph') is officially replaced by TortoiseHg's 
     history browser.
-
-  * Installer now requires admin priviledges in order to prevent an
-    upgrade from requiring two reboots. 
 
   * New TortoiseHg logo in About dialog, contributed by Peer Sommerlund.
 
@@ -59,6 +60,11 @@ Bug fixes in 0.4:
   * [ 1902446 ] Commit claims file not under root while kdiff is open.
   * [ 1895443 ] Overlay: ThreadingModel registry setting
   * [ 1892791 ] Windows Explorer painfully slow for network drives
+
+Changes and bug fixes since 0.4RC4:
+
+  * Fixed traceback when revert file in changeset or log windows.
+  * Fixed traceback when testing paths in Configure window.
 
 Changes and bug fixes since 0.4RC3:
 
