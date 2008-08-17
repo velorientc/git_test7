@@ -18,7 +18,7 @@ import mercurial
 dialogs = '''log synch status clone merge update userconfig repoconfig
 serve recovery commit datamine about'''
 
-nonrepo_commands = 'clone about'
+nonrepo_commands = 'userconfig clone about'
 
 def help():
     print 'TortoiseHg Dialog Wrapper\n'
