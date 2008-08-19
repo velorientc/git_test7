@@ -168,8 +168,13 @@ class HgExtension(nautilus.MenuProvider,
         repo = self.get_repo_for_path(path)
         cwd = os.path.isdir(path) and path or os.path.dirname(path)
 
+        if repo is not None:
+            root = repo.root
+        else:
+            root = cwd
+
         cmdopts  = [sys.executable, self.hgproc]
-        cmdopts += ['--root', repo.root]
+        cmdopts += ['--root', root]
         cmdopts += ['--cwd', cwd]
         cmdopts += ['--command', hgcmd]
 
