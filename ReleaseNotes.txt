@@ -6,6 +6,9 @@ kits.  It also contains change information, for users who are interested in
 what bugs have been fixed, and what features have been added in the current
 version.
 
+New features and improvement in 0.4.1
+
+  * Installer-only release to link with Mercurial 1.0.2
 
 New features and improvement in 0.4
 
