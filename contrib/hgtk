@@ -10,10 +10,6 @@ tortoisehg_dir = '~/tools/tortoisehg-dev'
 
 import os
 import sys
-import pygtk
-pygtk.require('2.0')
-import gtk
-import mercurial
 
 dialogs = '''log synch status clone merge update userconfig repoconfig
 serve recovery commit datamine about'''
@@ -64,11 +60,16 @@ def main(command):
 
     try:
         from hggtk import hglib
-    except ImportError:
-        # fix "tortoisehg_dir" at the top of this script, or ...
-        print 'Please set TORTOISEHG_PATH to location of your ' \
-                'tortoisehg repository'
+    except ImportError, inst:
+        m = str(inst).split()[-1]
+        print "abort: could not import module %s!\n" % m
+        if m in "hglib hggtk".split():
+            # fix "tortoisehg_dir" at the top of this script, or ...
+            print 'Please set TORTOISEHG_PATH to location of your ' \
+                    'tortoisehg repository'
         sys.exit(1)
+    except:
+        raise
 
     cwd = os.getcwd()
     root = hglib.rootpath(cwd)
