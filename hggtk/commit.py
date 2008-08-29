@@ -69,6 +69,7 @@ class GCommit(GStatus):
             for entry in self.model : 
                 if entry[1] in 'MAR':
                     entry[0] = True
+            self._update_check_count()
 
 
     def save_settings(self):
@@ -208,6 +209,7 @@ class GCommit(GStatus):
             for entry in self.model:
                 if entry[1] in 'MARD':
                     entry[0] = True
+            self._update_check_count()
 
             # pre-fill commit message
             self.text.get_buffer().set_text('merge')

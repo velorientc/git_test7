@@ -47,6 +47,7 @@ class GStatus(GDialog):
     def auto_check(self):
         if self.test_opt('check'):
             for entry in self.model : entry[0] = True
+            self._update_check_count()
 
 
     def get_menu_info(self):
@@ -286,8 +287,24 @@ class GStatus(GDialog):
             self._show_checks[type] = check
             col += row
             row = not row
-        return table
+            
+        self.counter = gtk.Label('')
+        self.counter.set_alignment(1.0, 0.0) # right up
+
+        hbox = gtk.HBox()
+        hbox.pack_start(table, expand=False)
+        hbox.pack_end(self.counter, expand=True, padding=2)
         
+        return hbox
+
+    def _update_check_count(self):
+        file_count = 0
+        check_count = 0
+        for row in self.model:
+            file_count = file_count + 1
+            if row[0]:
+                check_count = check_count + 1
+        self.counter.set_text(_('%d selected, %d total') % (check_count, file_count))
 
     def prepare_display(self):
         self._ready = True
@@ -352,6 +369,8 @@ class GStatus(GDialog):
                 file = util.localpath(file)
                 self.model.append([file in recheck, char, toutf(file), file])
 
+        self._update_check_count()
+        
         selection = self.tree.get_selection()
         selected = False
         for row in self.model:
@@ -391,6 +410,7 @@ class GStatus(GDialog):
 
     def _select_toggle(self, cellrenderer, path):
         self.model[path][0] = not self.model[path][0]
+        self._update_check_count()
         return True
 
 
@@ -670,6 +690,7 @@ class GStatus(GDialog):
 
     def _sel_desel_clicked(self, toolbutton, state):
         for entry in self.model : entry[0] = state
+        self._update_check_count()
         return True
 
 

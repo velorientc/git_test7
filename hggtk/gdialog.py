@@ -302,12 +302,7 @@ class GDialog(gtk.Window):
         # Subclass provides extra stuff in bottom hbox
         extras = self.get_extras()
         if extras:
-            hbox = gtk.HBox(False, 0)
-            hbox.set_border_width(6)
-            hbox.pack_start(extras, False, False)
-            # Hack! this prevents mysterious silent crashes.
-            hbox.pack_start(gtk.Label(''), True, True)
-            vbox.pack_end(hbox, False, False, 0)
+            vbox.pack_end(extras, False, False, 0)
 
         self.connect('destroy', self._destroying)
         self.connect('delete_event', self.should_live)
