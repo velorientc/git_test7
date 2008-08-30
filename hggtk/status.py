@@ -44,6 +44,9 @@ class GStatus(GDialog):
 
     ### Following methods are meant to be overridden by subclasses ###
 
+    def init(self):
+        GDialog.init(self)
+        
     def auto_check(self):
         if self.test_opt('check'):
             for entry in self.model : entry[0] = True

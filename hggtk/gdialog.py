@@ -101,8 +101,12 @@ class GDialog(gtk.Window):
         self.tmproot = None
         self.toolbuttons = {}
         self.settings = Settings(self.__class__.__name__)
+        self.init()
 
     ### Following methods are meant to be overridden by subclasses ###
+
+    def init(self):
+        pass
 
     def parse_opts(self):
         pass
