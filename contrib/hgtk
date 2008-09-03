@@ -143,7 +143,7 @@ def runcommand(ui, args):
 
     path = hglib.rootpath(os.getcwd())
     if options['repository']:
-        path = options['repository']
+        path = ui.expandpath(options['repository'])
 
     if cmd not in nonrepo_commands.split():
         try:
