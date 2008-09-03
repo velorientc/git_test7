@@ -149,7 +149,6 @@ def runcommand(ui, args):
             # try to guess the repo from first of file args
             root = None
             if args:
-                from hggtk import hglib
                 root=hglib.rootpath(args[0])
             if root:
                 cmdoptions['root'] = os.path.abspath(root)
