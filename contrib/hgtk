@@ -5,9 +5,8 @@
 # Copyright (C) 2008 Steve Borho <steve@borho.org>
 # Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
 
-# Modify this line to the location of your tortoisehg repository
-# or set TORTOISEHG_PATH in your environment
-
+# set TORTOISEHG_PATH in your environment to point the location
+# of your tortoisehg repository, or modify 'tortoisehg_dir' below:
 tortoisehg_dir = '~/tools/tortoisehg-dev'
 
 import os
