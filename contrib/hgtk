@@ -141,8 +141,16 @@ def runcommand(ui, args):
         raise
 
     path = hglib.rootpath(os.getcwd())
+    if path:
+        try:
+            lui = _ui.ui(parentui=ui)
+            lui.readconfig(os.path.join(path, ".hg", "hgrc"))
+        except IOError:
+            pass
+    else:
+        lui = ui
     if options['repository']:
-        path = ui.expandpath(options['repository'])
+        path = lui.expandpath(options['repository'])
 
     if cmd not in nonrepo_commands.split():
         try:
