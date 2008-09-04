@@ -445,7 +445,7 @@ globalopts = [
 table = {
     "^about": (about, [], _('hgtk about')),
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
-    "^commit|ci": (commit, [], _('hgtk commit')),
+    "^commit|ci": (commit, [], _('hgtk commit [FILE]...')),
     "^datamine": (datamine, [], _('hgtk datamine')),
     "^log|history": (log, [], _('hgtk log [FILE]')),
     "^merge": (merge, [], _('hgtk merge')),
