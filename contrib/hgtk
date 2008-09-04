@@ -237,6 +237,7 @@ def status(ui, *pats, **opts):
     """
 
     from hggtk.status import run
+    opts['files'] = [os.path.abspath(x) for x in pats]
     run(**opts)
 
 def synch(ui, **opts):
@@ -451,7 +452,7 @@ table = {
     "^merge": (merge, [], _('hgtk merge')),
     "^recovery": (recovery, [], _('hgtk recovery')),
     "^synch": (synch, [], _('hgtk synch')),
-    "^status": (status, [], _('hgtk status')),
+    "^status": (status, [], _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
     "^serve": (serve, [], _('hgtk serve')),
