@@ -233,7 +233,7 @@ def serve(ui, **opts):
 def status(ui, *pats, **opts):
     """file status viewer
 
-    Also do add and remove.
+    Also do add, remove and revert.
     """
 
     from hggtk.status import run
