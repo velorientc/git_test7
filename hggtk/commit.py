@@ -39,6 +39,10 @@ class GCommit(GStatus):
 
     ### Overrides of base class methods ###
 
+    def init(self):
+        GStatus.init(self)
+        self._last_commit_id = None
+
     def parse_opts(self):
         GStatus.parse_opts(self)
 
@@ -69,6 +73,7 @@ class GCommit(GStatus):
             for entry in self.model : 
                 if entry[1] in 'MAR':
                     entry[0] = True
+            self._update_check_count()
 
 
     def save_settings(self):
@@ -87,6 +92,10 @@ class GCommit(GStatus):
 
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
+        tbbuttons.insert(2, gtk.SeparatorToolItem())
+        self._undo_button = self.make_toolbutton(gtk.STOCK_UNDO, '_Undo',
+            self._undo_clicked, tip='undo recent commit')
+        tbbuttons.insert(2, self._undo_button)
         tbbuttons.insert(2, self.make_toolbutton(gtk.STOCK_OK, '_Commit',
             self._commit_clicked, tip='commit'))
         return tbbuttons
@@ -186,10 +195,17 @@ class GCommit(GStatus):
     def reload_status(self):
         success = GStatus.reload_status(self)
         self._check_merge()
+        self._check_undo()
         return success
 
 
     ### End of overridable methods ###
+
+    def _check_undo(self):
+        can_undo = os.path.exists(self.repo.sjoin("undo")) and \
+                self._last_commit_id is not None
+        self._undo_button.set_sensitive(can_undo)
+
 
     def _check_merge(self):
         # disable the checkboxes on the filelist if repo in merging state
@@ -208,6 +224,7 @@ class GCommit(GStatus):
             for entry in self.model:
                 if entry[1] in 'MARD':
                     entry[0] = True
+            self._update_check_count()
 
             # pre-fill commit message
             self.text.get_buffer().set_text('merge')
@@ -240,6 +257,28 @@ class GCommit(GStatus):
             if stat not in '?!' or self._should_addremove([file]):
                 self._hg_commit([file])
         return True
+
+
+    def _undo_clicked(self, toolbutton, data=None):
+        response = Confirm('Undo commit', [], self, 'Undo last commit').run() 
+        if response != gtk.RESPONSE_YES:
+            return
+            
+        tip = self._get_tip_rev(True)
+        if not tip == self._last_commit_id:
+            Prompt('Undo commit', 
+                    'Unable to undo!\n\n'
+                    'Tip revision differs from last commit.',
+                    self).run()
+            return
+            
+        try:
+            self.repo.rollback()
+            self._last_commit_id = None
+            self.reload_status()
+        except:
+            Prompt('Undo commit', 'Errors during rollback!',
+                    self).run()
 
 
     def _should_addremove(self, files):
@@ -296,7 +335,15 @@ class GCommit(GStatus):
         self.text.set_buffer(gtk.TextBuffer())
         self._update_recent_messages(self.opts['message'])
         shell_notify([self.cwd] + files)
+        self._last_commit_id = self._get_tip_rev(True)
         self.reload_status()
+
+    def _get_tip_rev(self, refresh=False):
+        if refresh:
+            self.repo.invalidate()
+        cl = self.repo.changelog
+        tip = cl.node(nullrev + cl.count())
+        return hex(tip)
 
 def launch(root='', files=[], cwd='', main=True):
     u = ui.ui()

@@ -45,13 +45,14 @@ class ConfigDialog(gtk.Dialog):
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
             self.set_title('TortoiseHg Configure Repository - ' + name)
+            shlib.set_tortoise_icon(self, 'settings_repo.ico')
             self.root = repo.root
         else:
             self.rcpath = util.user_rcpath()
             self.set_title('TortoiseHg Configure User-Global Settings')
+            shlib.set_tortoise_icon(self, 'settings_user.ico')
             self.root = None
 
-        shlib.set_tortoise_icon(self, 'menusettings.ico')
         self.ini = self.load_config(self.rcpath)
 
         # Create a new notebook, place the position of the tabs
@@ -350,7 +351,7 @@ class ConfigDialog(gtk.Dialog):
 
     def _test_path(self, *args):
         if not self.root:
-            error_dialog('No Repository Found', 
+            error_dialog(self, 'No Repository Found', 
                     'Path testing cannot work without a repository')
             return
         testpath = self._pathpathedit.get_text()
@@ -436,6 +437,7 @@ class ConfigDialog(gtk.Dialog):
             lbl = gtk.Label(label + ':')
             lbl.set_alignment(1.0, 0.0)
             eventbox = gtk.EventBox()
+            eventbox.set_visible_window(False)
             eventbox.add(lbl)
             table.attach(eventbox, 0, 1, row, row+1, gtk.FILL, 0, 4, 3)
             table.attach(combo, 1, 2, row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)

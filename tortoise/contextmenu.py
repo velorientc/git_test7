@@ -386,11 +386,11 @@ class ContextMenuExtension:
         optmenu = TortoiseSubmenu(_("Settings"),icon="menusettings.ico")
         optmenu.add_menu(_("Global"),
                          _("Configure user wide settings"),
-                         self._config_user)
+                         self._config_user, icon="settings_user.ico")
         if repo:
             optmenu.add_menu(_("Repository"),
                              _("Configure settings local to this repository"),
-                             self._config_repo)
+                             self._config_repo, icon="settings_repo.ico")
         result.append(optmenu)
 
         return result
