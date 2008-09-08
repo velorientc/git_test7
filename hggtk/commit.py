@@ -342,7 +342,7 @@ class GCommit(GStatus):
         if refresh:
             self.repo.invalidate()
         cl = self.repo.changelog
-        tip = cl.node(nullrev + cl.count())
+        tip = cl.node(nullrev + len(cl))
         return hex(tip)
 
 def launch(root='', files=[], cwd='', main=True):
