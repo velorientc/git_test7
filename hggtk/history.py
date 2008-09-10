@@ -457,17 +457,18 @@ class GLog(GDialog):
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
         
+        def refresh(*args):
+            self.repo.invalidate()
+            newtags = self.repo.tagslist()
+            if newtags != oldtags:
+                self.reload_log()
+
         dialog = TagAddDialog(self.repo.root, rev=str(rev))
         dialog.set_transient_for(self)
+        dialog.connect('destroy', refresh)
         dialog.show_all()
         dialog.present()
         dialog.set_transient_for(None)
-        
-        # refresh if new tags added
-        self.repo.invalidate()
-        newtags = self.repo.tagslist()
-        if newtags != oldtags:
-            self.reload_log()
 
     def _show_status(self, menuitem):
         rev = self.currow[treemodel.REVID]
