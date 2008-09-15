@@ -129,12 +129,24 @@ class ContextMenuExtension:
         ]
 
     registry_keys = [
-        (_winreg.HKEY_CLASSES_ROOT, r"*\shellex\ContextMenuHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Directory\Background\shellex\ContextMenuHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Directory\shellex\ContextMenuHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Folder\shellex\ContextMenuHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Directory\shellex\DragDropHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Folder\shellex\DragDropHandlers\TortoiseHg"),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"*\shellex\ContextMenuHandlers\TortoiseHg", 
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Directory\Background\shellex\ContextMenuHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Directory\shellex\ContextMenuHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Folder\shellex\ContextMenuHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Directory\shellex\DragDropHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Folder\shellex\DragDropHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
         ]
 
     def __init__(self):

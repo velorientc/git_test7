@@ -26,6 +26,16 @@ from tortoise.iconoverlay import ChangedOverlay, AddedOverlay, UnchangedOverlay
 bin_path = os.path.dirname(os.path.join(os.getcwd(), sys.argv[0]))
 print "bin path = ", bin_path
 
+def check_tortoise_overlays():
+    # TortoiseOverlays must be installed, and we must be able to write there.
+    try:
+        hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
+                               r"Software\TortoiseOverlays", 0,
+                               _winreg.KEY_ALL_ACCESS)
+    except WindowsError:
+        print "TortoiseOverlays is not installed."
+        sys.exit(1)
+
 # TortoiseHg registry setup
 def register_tortoise_path(unregister=False):
     key = r"Software\TortoiseHg"
@@ -39,6 +49,7 @@ def register_tortoise_path(unregister=False):
 
 # for COM registration via py2exe
 def DllRegisterServer():
+    check_tortoise_overlays()
     RegisterServer(ContextMenuExtension)
     RegisterServer(ChangedOverlay)
     RegisterServer(AddedOverlay)
@@ -71,8 +82,11 @@ def RegisterServer(cls):
         pass
         
     # Add the appropriate shell extension registry keys
-    for category, keyname in cls.registry_keys: 
-        _winreg.SetValue(category, keyname, _winreg.REG_SZ, cls._reg_clsid_)
+    for category, keyname, values in cls.registry_keys:
+        hkey = _winreg.CreateKey(category, keyname)
+        for (name, val) in values:
+            # todo: handle ints?
+            _winreg.SetValueEx(hkey, name, 0, _winreg.REG_SZ, val)
         
     # register the extension on Approved list
     try:
@@ -85,13 +99,14 @@ def RegisterServer(cls):
     print cls._reg_desc_, "registration complete."
 
 def UnregisterServer(cls):
-    for category, keyname in cls.registry_keys:
-        try:
-            _winreg.DeleteKey(category, keyname)
-        except WindowsError, details:
-            import errno
-            if details.errno != errno.ENOENT:
-                raise
+    for category, keyname, values in cls.registry_keys:
+        hkey = _winreg.OpenKey(category, keyname, 0, _winreg.KEY_ALL_ACCESS)
+        for (name, val) in values:
+            # todo: handle ints?
+            try:
+                _winreg.DeleteValue(hkey, name)
+            except WindowsError, exc:
+                print "Failed to remove registry key %s: %s" % (keyname, exc)
 
     # unregister the extension from Approved list
     try:
@@ -104,6 +119,8 @@ def UnregisterServer(cls):
     print cls._reg_desc_, "unregistration complete."
 
 if __name__=='__main__':
+    check_tortoise_overlays()
+
     from win32com.server import register
     register.UseCommandLine(ContextMenuExtension,
             finalize_register = lambda: RegisterServer(ContextMenuExtension),
