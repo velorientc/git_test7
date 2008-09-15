@@ -52,12 +52,14 @@ def add_dirs(list):
 class IconOverlayExtension(object):
     """
     Class to implement icon overlays for source controlled files.
+    Specialized classes are created for each overlay icon.
 
     Displays a different icon based on version control status.
 
     NOTE: The system allocates only 15 slots in _total_ for all
         icon overlays; we (will) use 6, tortoisecvs uses 7... not a good
-        recipe for a happy system.
+        recipe for a happy system. By utilizing the TortoiseOverlay.dll
+        we can share overlay slots with the other tortoises.
     """
     
     counter = 0
@@ -73,21 +75,6 @@ class IconOverlayExtension(object):
 
     def GetPriority(self):
         return 0
-
-    def _get_installed_overlays():
-        key = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE,
-                                    "Software\\Microsoft\\Windows\\" +
-                                        "CurrentVersion\\Explorer\\" +
-                                        "ShellIconOverlayIdentifiers",
-                                    0,
-                                    win32con.KEY_READ)
-        keys = win32api.RegEnumKeyEx(key)
-        handlercount = len(keys)
-        print "number of overlay handlers installed = %d" % handlercount
-        for i, k in enumerate(keys):
-            print i, k
-        win32api.RegCloseKey(key)
-        return handlercount
         
     def _get_state(self, upath):
         """
@@ -247,9 +234,3 @@ _overlay_classes = []
 make_icon_overlay("Changed", "Modified", MODIFIED, "{4D0F33E1-654C-4A1B-9BE8-E47A98752BAB}")
 make_icon_overlay("Unchanged", "Normal", UNCHANGED, "{4D0F33E2-654C-4A1B-9BE8-E47A98752BAB}")
 make_icon_overlay("Added", "Added", ADDED, "{4D0F33E3-654C-4A1B-9BE8-E47A98752BAB}")
-
-def get_overlay_classes():
-    """
-    Get a list of all registerable icon overlay classes
-    """
-    return _overlay_classes
