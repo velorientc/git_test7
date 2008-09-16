@@ -254,9 +254,12 @@ class TreeView(gtk.ScrolledWindow):
     def refresh(self, graphcol, pats, opts):
         self.repo.invalidate()
         self.repo.dirstate.invalidate()
-        self.create_log_generator(graphcol, pats, opts)
-        self.pbar.begin()
-        gobject.idle_add(self.populate, self.get_revision())
+        if self.repo.changelog.count() > 0:
+            self.create_log_generator(graphcol, pats, opts)
+            self.pbar.begin()
+            gobject.idle_add(self.populate, self.get_revision())
+        else:
+            self.pbar.set_status_text('Repository is empty')
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
