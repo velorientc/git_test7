@@ -332,11 +332,12 @@ class GCommit(GStatus):
         dialog.hide()
 
         # refresh overlay icons and commit dialog
-        self.text.set_buffer(gtk.TextBuffer())
-        self._update_recent_messages(self.opts['message'])
-        shell_notify([self.cwd] + files)
-        self._last_commit_id = self._get_tip_rev(True)
-        self.reload_status()
+        if dialog.return_code() == 0:
+            self.text.set_buffer(gtk.TextBuffer())
+            self._update_recent_messages(self.opts['message'])
+            shell_notify([self.cwd] + files)
+            self._last_commit_id = self._get_tip_rev(True)
+            self.reload_status()
 
     def _get_tip_rev(self, refresh=False):
         if refresh:
