@@ -149,6 +149,9 @@ class CmdDialog(gtk.Dialog):
             self.last_pbar_update = tm
             self.pbar.pulse()
 
+    def return_code(self):
+        return self.hgthread.return_code()
+
 def run(cmdline=[], gui=True, **opts):
     if not gui:
         q = Queue.Queue()
