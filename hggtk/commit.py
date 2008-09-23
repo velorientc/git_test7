@@ -29,6 +29,7 @@ from gdialog import *
 from gtools import cmdtable
 from status import GStatus
 from hgcmd import CmdDialog
+from hglib import fromutf
 
 class GCommit(GStatus):
     """GTK+ based dialog for displaying repository status and committing changes.
@@ -324,7 +325,7 @@ class GCommit(GStatus):
         cmdline  = ["hg", "commit", "--verbose", "--repository", self.repo.root]
         if self.opts['addremove']:
             cmdline += ['--addremove']
-        cmdline += ['--message', self.opts['message']]
+        cmdline += ['--message', fromutf(self.opts['message'])]
         cmdline += [self.repo.wjoin(x) for x in files]
         dialog = CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
