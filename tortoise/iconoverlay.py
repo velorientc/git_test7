@@ -52,12 +52,14 @@ def add_dirs(list):
 class IconOverlayExtension(object):
     """
     Class to implement icon overlays for source controlled files.
+    Specialized classes are created for each overlay icon.
 
     Displays a different icon based on version control status.
 
     NOTE: The system allocates only 15 slots in _total_ for all
         icon overlays; we (will) use 6, tortoisecvs uses 7... not a good
-        recipe for a happy system.
+        recipe for a happy system. By utilizing the TortoiseOverlay.dll
+        we can share overlay slots with the other tortoises.
     """
     
     counter = 0
@@ -69,31 +71,10 @@ class IconOverlayExtension(object):
     _reg_threading_ = 'Apartment'
 
     def GetOverlayInfo(self): 
-        icon = thgutil.get_icon_path("status", self.icon)
-        print "icon = ", icon
-
-        if icon:
-            return (icon, 0, shellcon.ISIOI_ICONFILE)
-        else:
-            return ("", 0, 0) 
+        return ("", 0, 0) 
 
     def GetPriority(self):
         return 0
-
-    def _get_installed_overlays():
-        key = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE,
-                                    "Software\\Microsoft\\Windows\\" +
-                                        "CurrentVersion\\Explorer\\" +
-                                        "ShellIconOverlayIdentifiers",
-                                    0,
-                                    win32con.KEY_READ)
-        keys = win32api.RegEnumKeyEx(key)
-        handlercount = len(keys)
-        print "number of overlay handlers installed = %d" % handlercount
-        for i, k in enumerate(keys):
-            print i, k
-        win32api.RegCloseKey(key)
-        return handlercount
         
     def _get_state(self, upath):
         """
@@ -222,7 +203,7 @@ class IconOverlayExtension(object):
             print "IsMemberOf: _get_state() took %d ticks" % \
                     (win32api.GetTickCount() - tc)
             
-def make_icon_overlay(name, icon, state, clsid):
+def make_icon_overlay(name, icon_type, state, clsid):
     """
     Make an icon overlay COM class.
 
@@ -234,11 +215,14 @@ def make_icon_overlay(name, icon, state, clsid):
     prog_id = "Mercurial.ShellExtension.%s" % classname
     desc = "Mercurial icon overlay shell extension for %s files" % name.lower()
     reg = [
-        (_winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Explorer\ShellIconOverlayIdentifiers\%s" % name) ]
+            (_winreg.HKEY_LOCAL_MACHINE,
+             r"Software\TortoiseOverlays\%s" % icon_type,
+             [("TortoiseHg", clsid)])
+        ]
     cls = type(
             classname,
             (IconOverlayExtension, ),
-            dict(_reg_clsid_=clsid, _reg_progid_=prog_id, _reg_desc_=desc, registry_keys=reg, icon=icon, state=state))
+            dict(_reg_clsid_=clsid, _reg_progid_=prog_id, _reg_desc_=desc, registry_keys=reg, stringKey="HG", state=state))
 
     _overlay_classes.append(cls)
     # We need to register the class as global, as pythoncom will
@@ -246,12 +230,6 @@ def make_icon_overlay(name, icon, state, clsid):
     globals()[classname] = cls
 
 _overlay_classes = []
-make_icon_overlay("Changed", "changed.ico", MODIFIED, "{102C6A24-5F38-4186-B64A-237011809FAB}")
-make_icon_overlay("Unchanged", "unchanged.ico", UNCHANGED, "{00FEE959-5773-424B-88AC-A01BFC8E4555}")
-make_icon_overlay("Added", "added.ico", ADDED, "{8447DB75-5875-4BA8-9F38-A727DAA484A0}")
-
-def get_overlay_classes():
-    """
-    Get a list of all registerable icon overlay classes
-    """
-    return _overlay_classes
+make_icon_overlay("Changed", "Modified", MODIFIED, "{4D0F33E1-654C-4A1B-9BE8-E47A98752BAB}")
+make_icon_overlay("Unchanged", "Normal", UNCHANGED, "{4D0F33E2-654C-4A1B-9BE8-E47A98752BAB}")
+make_icon_overlay("Added", "Added", ADDED, "{4D0F33E3-654C-4A1B-9BE8-E47A98752BAB}")

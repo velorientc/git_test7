@@ -53,7 +53,7 @@ if 'py2exe' in sys.argv:
                         "icon_resources": [(1, "icons/tortoise/python.ico")]}
             ]
     extra['com_server'] = ["tortoisehg"]
-    extra['console'] = ["contrib/hg"]
+    extra['console'] = ["contrib/hg", "contrib/hgtk"]
 
 opts = {
    "py2exe" : {

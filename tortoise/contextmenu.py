@@ -129,12 +129,24 @@ class ContextMenuExtension:
         ]
 
     registry_keys = [
-        (_winreg.HKEY_CLASSES_ROOT, r"*\shellex\ContextMenuHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Directory\Background\shellex\ContextMenuHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Directory\shellex\ContextMenuHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Folder\shellex\ContextMenuHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Directory\shellex\DragDropHandlers\TortoiseHg"),
-        (_winreg.HKEY_CLASSES_ROOT, r"Folder\shellex\DragDropHandlers\TortoiseHg"),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"*\shellex\ContextMenuHandlers\TortoiseHg", 
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Directory\Background\shellex\ContextMenuHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Directory\shellex\ContextMenuHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Folder\shellex\ContextMenuHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Directory\shellex\DragDropHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
+        (_winreg.HKEY_CLASSES_ROOT,
+         r"Folder\shellex\DragDropHandlers\TortoiseHg",
+         [(None, _reg_clsid_)]),
         ]
 
     def __init__(self):
@@ -514,6 +526,9 @@ class ContextMenuExtension:
 
     def _init(self, parent_window):
         dest = self._folder or self._filenames[0]
+        if os.path.isfile(dest):
+            dest = os.path.dirname(dest)
+
         msg = "Create Hg repository in %s?" % (dest)
         title = "Mercurial: init"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)

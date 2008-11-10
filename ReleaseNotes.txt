@@ -6,11 +6,43 @@ kits.  It also contains change information, for users who are interested in
 what bugs have been fixed, and what features have been added in the current
 version.
 
-New features and improvement in 0.4.1
+New features and improvement in 0.5:
+
+  * Explorer shell extensions:
+    - share overlay icons with TortoiseSVN 1.5.x via TortoiseSVN's 
+	  TortoiseOverlays project (by Peer Sommerlund)
+
+  * New mercurial-like command line syntax for hgtk, with help support.
+
+  * The gPyFm merge-tool is not longer bundled (see bug 2119067)
+  
+  * Interal commit dialog:
+	- show number of files selected (also apply to Status dialog)
+	- add 'Undo' button to rollback last commit.
+	- do not clear commit message window if commit fails
+    - accept commit message in multi-byte charset (fix bug 2116362)
+	
+  * Synchronize dialog:
+    - load patchbomb extension automatically (by Peer Sommerlund)
+
+  
+Bug fixes in 0.5:
+  
+  * [ 2119138 ] Merge-tool priority fix (by Mads Kiilerich)
+  * [ 2116362 ] Internal commit tool not support gbk comment
+  * [ 2113989 ] Can't create repository via Explorer context menu (when 
+                a file is selected)	
+  * [ 2103749 ] Changelog viewer doesn't refresh after making local tag
+  
+  * nautilus: fix error when there is no repo in the current directory
+    (by Germán Póo-Caamaño)
+
+
+New features and improvement in 0.4.1:
 
   * Installer-only release to link with Mercurial 1.0.2
 
-New features and improvement in 0.4
+New features and improvement in 0.4:
 
   * Updated to work, and link, with Mercurial 1.0.1
 

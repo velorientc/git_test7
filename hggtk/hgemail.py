@@ -203,13 +203,7 @@ class EmailDialog(gtk.Window):
             self.repo = None
             return
 
-        for name, module in extensions.extensions():
-            if name == 'patchbomb':
-                break
-        else:
-            error_dialog(self, 'Email not enabled',
-                    'You must enable the patchbomb extension to use this tool')
-            self.response(gtk.RESPONSE_CANCEL)
+        extensions.load(self.repo.ui, 'patchbomb', None)
 
         if initial:
             # Only zap these fields at startup
