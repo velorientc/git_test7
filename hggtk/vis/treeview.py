@@ -254,7 +254,7 @@ class TreeView(gtk.ScrolledWindow):
     def refresh(self, graphcol, pats, opts):
         self.repo.invalidate()
         self.repo.dirstate.invalidate()
-        if self.repo.changelog.count() > 0:
+        if len(self.repo.changelog) > 0:
             self.create_log_generator(graphcol, pats, opts)
             self.pbar.begin()
             gobject.idle_add(self.populate, self.get_revision())
