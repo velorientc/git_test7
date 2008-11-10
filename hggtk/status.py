@@ -485,38 +485,35 @@ class GStatus(GDialog):
     def _tree_selection_changed(self, selection, force):
         ''' Update the diff text '''
         def dohgdiff():
-            difftext = StringIO.StringIO()
-            try:
-                if len(files) != 0:
-                    wfiles = [self.repo.wjoin(x) for x in files]
-                    matcher = cmdutil.match(self.repo, wfiles, self.opts)
-                    patch.diff(self.repo, self._node1, self._node2, match=matcher,
-                               fp=difftext, opts=patch.diffopts(self.ui, self.opts))
+            difftext = []
+            if len(files) != 0:
+                wfiles = [self.repo.wjoin(x) for x in files]
+                matcher = cmdutil.match(self.repo, wfiles, self.opts)
+                for s in patch.diff(self.repo, self._node1, self._node2, match=matcher,
+                                    opts=patch.diffopts(self.ui, self.opts)):
+                    difftext.extend(s.splitlines(True))
 
-                buffer = gtk.TextBuffer()
-                buffer.create_tag('removed', foreground='#900000')
-                buffer.create_tag('added', foreground='#006400')
-                buffer.create_tag('position', foreground='#FF8000')
-                buffer.create_tag('header', foreground='#000090')
+            buffer = gtk.TextBuffer()
+            buffer.create_tag('removed', foreground='#900000')
+            buffer.create_tag('added', foreground='#006400')
+            buffer.create_tag('position', foreground='#FF8000')
+            buffer.create_tag('header', foreground='#000090')
 
-                difftext.seek(0)
-                iter = buffer.get_start_iter()
-                for line in difftext:
-                    line = toutf(line)
-                    if line.startswith('---') or line.startswith('+++'):
-                        buffer.insert_with_tags_by_name(iter, line, 'header')
-                    elif line.startswith('-'):
-                        buffer.insert_with_tags_by_name(iter, line, 'removed')
-                    elif line.startswith('+'):
-                        buffer.insert_with_tags_by_name(iter, line, 'added')
-                    elif line.startswith('@@'):
-                        buffer.insert_with_tags_by_name(iter, line, 'position')
-                    else:
-                        buffer.insert(iter, line)
+            iter = buffer.get_start_iter()
+            for line in difftext:
+                line = toutf(line)
+                if line.startswith('---') or line.startswith('+++'):
+                    buffer.insert_with_tags_by_name(iter, line, 'header')
+                elif line.startswith('-'):
+                    buffer.insert_with_tags_by_name(iter, line, 'removed')
+                elif line.startswith('+'):
+                    buffer.insert_with_tags_by_name(iter, line, 'added')
+                elif line.startswith('@@'):
+                    buffer.insert_with_tags_by_name(iter, line, 'position')
+                else:
+                    buffer.insert(iter, line)
 
-                self.diff_text.set_buffer(buffer)
-            finally:
-                difftext.close()
+            self.diff_text.set_buffer(buffer)
 
         if self.showdiff_toggle.get_active():
             files = [self.model[iter][3] for iter in self.tree.get_selection().get_selected_rows()[1]]
