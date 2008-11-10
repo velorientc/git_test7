@@ -46,7 +46,7 @@ def _parse(ui, args):
 
     if args:
         cmd, args = args[0], args[1:]
-        aliases, i = cmdutil.findcmd(ui, cmd, table)
+        aliases, i = cmdutil.findcmd(cmd, table)
         cmd = aliases[0]
         c = list(i[1])
     else:
@@ -283,7 +283,7 @@ def help_(ui, name=None, with_version=False):
         if with_version:
             version_(ui)
             ui.write('\n')
-        aliases, i = cmdutil.findcmd(ui, name, table)
+        aliases, i = cmdutil.findcmd(name, table)
         # synopsis
         ui.write("%s\n" % i[2])
 
