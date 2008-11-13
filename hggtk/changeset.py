@@ -133,8 +133,11 @@ class ChangeSet(GDialog):
         title_line('user/date:', ctx.user() + '\t' + date, 'changeset')
         for p in parents:
             pctx = self.repo.changectx(p)
-            summary = pctx.description().splitlines()[0]
-            summary = toutf(summary)
+            try:
+                summary = pctx.description().splitlines()[0]
+                summary = toutf(summary)
+            except:
+                summary = ""
             change = str(p) + ':' + short(self.repo.changelog.node(p))
             title = 'parent:'
             title += ' ' * (12 - len(title))
@@ -144,8 +147,11 @@ class ChangeSet(GDialog):
             buf.insert(eob, "\n")
         for n in self.repo.changelog.children(ctx.node()):
             cctx = self.repo.changectx(n)
-            summary = cctx.description().splitlines()[0]
-            summary = toutf(summary)
+            try:
+                summary = cctx.description().splitlines()[0]
+                summary = toutf(summary)
+            except:
+                summary = ""
             childrev = self.repo.changelog.rev(n)
             change = str(childrev) + ':' + short(n)
             title = 'child:'
