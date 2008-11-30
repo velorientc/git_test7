@@ -707,7 +707,7 @@ class GStatus(GDialog):
 
         list, paths = selection.get_selected_rows() 
         path = paths[0]
-        handler(list[path][1], list[path][2])
+        handler(list[path][1], list[path][3])
         return True
 
 
