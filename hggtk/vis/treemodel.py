@@ -101,7 +101,11 @@ class TreeModel(gtk.GenericTreeModel):
             summary = summary.split('\n')[0]
             summary = gobject.markup_escape_text(toutf(summary))
             node = self.repo.lookup(revid)
-            tags = toutf(', '.join(self.repo.nodetags(node)))
+            tags = self.repo.nodetags(node)
+            taglist = toutf(', '.join(tags))
+            for tag in tags:
+                summary = '<span background="#ffffaa"> %s </span> %s' % (
+                        tag, summary)
 
             if '<' in ctx.user():
                 author = toutf(self.author_re.sub('', ctx.user()).strip(' '))
@@ -115,7 +119,7 @@ class TreeModel(gtk.GenericTreeModel):
             color = self.color_func(parents, revid, author)
 
             revision = (None, node, revid, None, summary,
-                    author, date, None, parents, wc_parent, head, tags,
+                    author, date, None, parents, wc_parent, head, taglist,
                     None, color)
             self.revisions[revid] = revision
         else:
