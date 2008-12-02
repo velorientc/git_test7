@@ -13,6 +13,7 @@ import re
 from time import (strftime, gmtime)
 from mercurial import util
 from mercurial.node import short
+from mercurial.hgweb import webutil
 
 # FIXME: dirty hack to import toutf() from hggtk.hglib.
 #
@@ -110,11 +111,16 @@ class TreeModel(gtk.GenericTreeModel):
                 summary = '<span background="#ffffaa"> %s </span> %s' % (
                         tag, summary)
 
-            # show no-default branch names in head changesets
-            branch = ctx.branch()
-            if revid in self.heads and branch != "default":
+            # show branch names per hgweb's logic
+            branches = webutil.nodebranchdict(self.repo, ctx)
+            inbranches = webutil.nodeinbranch(self.repo, ctx)
+            for branch in branches:
                 summary = '<span background="#aaffaa"> %s </span> %s' % (
-                        branch, summary)
+                         branch['name'], summary)
+            for branch in inbranches:
+                summary = '<span background="#d5dde6"> %s </span> %s' % (
+                         branch['name'], summary)
+
 
             if '<' in ctx.user():
                 author = toutf(self.author_re.sub('', ctx.user()).strip(' '))
