@@ -129,16 +129,16 @@ class GLog(GDialog):
     def _view_menu(self):
         menu = gtk.Menu()
 
-        button = gtk.CheckMenuItem("Show Ids")
+        button = gtk.CheckMenuItem("Show Rev")
         button.connect("toggled", self.toggle_view_column,
                 'rev-column-visible')
         button.set_active(True)
         button.set_draw_as_radio(True)
         menu.append(button)
-        button = gtk.CheckMenuItem("Show Tags")
+        button = gtk.CheckMenuItem("Show ID")
         button.connect("toggled", self.toggle_view_column,
-                'tags-column-visible')
-        button.set_active(True)
+                'id-column-visible')
+        button.set_active(False)
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem("Show Date")

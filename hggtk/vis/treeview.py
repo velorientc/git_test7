@@ -48,12 +48,12 @@ class TreeView(gtk.ScrolledWindow):
                                  gobject.PARAM_READWRITE),
         'rev-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Rev',
-                                 'Show revision id column',
+                                 'Show revision number column',
                                  False,
                                  gobject.PARAM_READWRITE),
-        'tags-column-visible': (gobject.TYPE_BOOLEAN,
+        'id-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Tags',
-                                 'Show tags column',
+                                 'Show revision ID column',
                                  False,
                                  gobject.PARAM_READWRITE),
     }
@@ -186,8 +186,8 @@ class TreeView(gtk.ScrolledWindow):
     def do_get_property(self, property):
         if property.name == 'date-column-visible':
             return self.date_column.get_visible()
-        elif property.name == 'tags-column-visible':
-            return self.tag_column.get_visible()
+        elif property.name == 'id-column-visible':
+            return self.id_column.get_visible()
         elif property.name == 'rev-column-visible':
             return self.rev_column.get_visible()
         elif property.name == 'repo':
@@ -202,8 +202,8 @@ class TreeView(gtk.ScrolledWindow):
     def do_set_property(self, property, value):
         if property.name == 'date-column-visible':
             self.date_column.set_visible(value)
-        elif property.name == 'tags-column-visible':
-            self.tag_column.set_visible(value)
+        elif property.name == 'id-column-visible':
+            self.id_column.set_visible(value)
         elif property.name == 'rev-column-visible':
             self.rev_column.set_visible(value)
         elif property.name == 'repo':
@@ -319,17 +319,17 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.rev_column)
 
         cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 10)
+        cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.tag_column = gtk.TreeViewColumn("Tag")
-        self.tag_column.set_visible(False)
-        self.tag_column.set_resizable(True)
-        self.tag_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.tag_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.tag_column.pack_start(cell, expand=True)
-        self.tag_column.add_attribute(cell, "text", treemodel.TAGS)
-        self.tag_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.treeview.append_column(self.tag_column)
+        self.id_column = gtk.TreeViewColumn("ID")
+        self.id_column.set_visible(False)
+        self.id_column.set_resizable(True)
+        self.id_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.id_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.id_column.pack_start(cell, expand=True)
+        self.id_column.add_attribute(cell, "text", treemodel.HEXID)
+        self.id_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        self.treeview.append_column(self.id_column)
 
         cell = gtk.CellRendererText()
         mcell = gtk.CellRendererPixbuf()

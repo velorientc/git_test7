@@ -12,6 +12,7 @@ import gobject
 import re
 from time import (strftime, gmtime)
 from mercurial import util
+from mercurial.node import short
 
 # FIXME: dirty hack to import toutf() from hggtk.hglib.
 #
@@ -41,6 +42,7 @@ HEAD = 10
 TAGS = 11
 MARKED = 12
 FGCOLOR = 13
+HEXID = 14
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -75,6 +77,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == TAGS: return gobject.TYPE_STRING
         if index == MARKED: return gobject.TYPE_BOOLEAN
         if index == FGCOLOR: return gobject.TYPE_STRING
+        if index == HEXID: return gobject.TYPE_STRING
 
     def on_get_iter(self, path):
         return path[0]
@@ -120,7 +123,7 @@ class TreeModel(gtk.GenericTreeModel):
 
             revision = (None, node, revid, None, summary,
                     author, date, None, parents, wc_parent, head, taglist,
-                    None, color)
+                    None, color, short(node))
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
