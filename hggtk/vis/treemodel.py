@@ -110,6 +110,12 @@ class TreeModel(gtk.GenericTreeModel):
                 summary = '<span background="#ffffaa"> %s </span> %s' % (
                         tag, summary)
 
+            # show no-default branch names in head changesets
+            branch = ctx.branch()
+            if revid in self.heads and branch != "default":
+                summary = '<span background="#aaffaa"> %s </span> %s' % (
+                        branch, summary)
+
             if '<' in ctx.user():
                 author = toutf(self.author_re.sub('', ctx.user()).strip(' '))
             else:
