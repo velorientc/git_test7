@@ -107,19 +107,20 @@ class TreeModel(gtk.GenericTreeModel):
             node = self.repo.lookup(revid)
             tags = self.repo.nodetags(node)
             taglist = toutf(', '.join(tags))
+            tstr = ''
             for tag in tags:
-                summary = '<span background="#ffffaa"> %s </span> %s' % (
-                        tag, summary)
+                tstr += '<span background="#ffffaa"> %s </span> ' % tag
 
             # show branch names per hgweb's logic
             branches = webutil.nodebranchdict(self.repo, ctx)
             inbranches = webutil.nodeinbranch(self.repo, ctx)
+            bstr = ''
             for branch in branches:
-                summary = '<span background="#aaffaa"> %s </span> %s' % (
-                         branch['name'], summary)
+                bstr += '<span background="#aaffaa"> %s </span> ' % \
+                        branch['name']
             for branch in inbranches:
-                summary = '<span background="#d5dde6"> %s </span> %s' % (
-                         branch['name'], summary)
+                bstr += '<span background="#d5dde6"> %s </span> ' % \
+                        branch['name']
 
 
             if '<' in ctx.user():
@@ -132,8 +133,9 @@ class TreeModel(gtk.GenericTreeModel):
             wc_parent = revid in self.parents
             head = revid in self.heads
             color = self.color_func(parents, revid, author)
-
-            revision = (None, node, revid, None, summary,
+            sumstr = bstr + tstr + summary
+            
+            revision = (None, node, revid, None, sumstr,
                     author, date, None, parents, wc_parent, head, taglist,
                     None, color, short(node))
             self.revisions[revid] = revision
