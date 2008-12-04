@@ -622,7 +622,7 @@ class ChangeSet(GDialog):
         ctx = self.repo.changectx(self.currev)
         try:
             fctx = ctx.filectx(self.curfile)
-            has_filelog = fctx.linkrev() == ctx.rev()
+            has_filelog = fctx.filelog().linkrev(fctx.filenode()) == ctx.rev()
         except revlog.LookupError:
             has_filelog = False
         self._ann_menu.set_sensitive(has_filelog)
