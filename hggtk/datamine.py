@@ -411,7 +411,7 @@ class DataMineDialog(GDialog):
                 Prompt('File is unrevisioned',
                         'Unable to annotate ' + path, self).run()
                 return
-            rev = fctx.filelog().linkrev(fctx.filenode())
+            rev = fctx.filelog().linkrev(fctx.filerev())
             revid = str(rev)
         else:
             rev = long(revid)
@@ -523,7 +523,8 @@ class DataMineDialog(GDialog):
         info = filectx.renamed()
         if info:
             (rpath, node) = info
-            frev = self.repo.file(rpath).linkrev(node)
+            fl = self.repo.file(rpath)
+            frev = fl.linkrev(fl.rev(node))
             button.set_label(toutf('%s@%s' % (rpath, frev)))
             button.show()
             button.set_sensitive(True)
