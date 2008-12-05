@@ -281,7 +281,7 @@ class DataMineDialog(GDialog):
             return
         
         q = Queue.Queue()
-        args = [self.repo.root, q, 'grep']
+        args = [self.repo.root, q, 'grep', '--config', 'defaults.grep=']
         if follow.get_active():     args.append('--follow')
         if ignorecase.get_active(): args.append('--ignore-case')
         if linenum.get_active():    args.append('--line-number')
@@ -562,8 +562,8 @@ class DataMineDialog(GDialog):
         '''
         (frame, model, path) = objs
         q = Queue.Queue()
-        args = [self.repo.root, q, 'annotate', '--follow', '--number',
-                '--rev', str(rev), path]
+        args = [self.repo.root, q, '--config', 'defaults.annotate=',
+                'annotate', '--follow', '--number', '--rev', str(rev), path]
         thread = threading.Thread(target=hgcmd_toq, args=args)
         thread.start()
         frame._mythread = thread
