@@ -243,11 +243,17 @@ def _earlygetopt(aliases, args):
     return values
 
 _loaded = {}
-def thgdispatch(ui, path=None, args=[]):
+def thgdispatch(ui, path=None, args=[], nodefaults=True):
     '''
     Replicate functionality of mercurial dispatch but force the use
     of the passed in ui for all purposes
     '''
+    
+    # clear all user-defined command defaults
+    if nodefaults:
+        for k, v in ui.configitems('defaults'):
+            ui.setconfig('defaults', k, '')
+
     # read --config before doing anything else
     # (e.g. to change trust settings for reading .hg/hgrc)
     config = _earlygetopt(['--config'], args)
