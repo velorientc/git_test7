@@ -387,13 +387,11 @@ class ConfigDialog(gtk.Dialog):
 
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
-        if ( len(self.pathdata) 
-        and self.pathtree.get_selection().count_selected_rows() ):
-            self._delpathbutton.set_sensitive(True)
-            self._testpathbutton.set_sensitive(True)
-        else:
-            self._delpathbutton.set_sensitive(False)
-            self._testpathbutton.set_sensitive(False)
+        path_selected = ( len(self.pathdata) > 0
+            and self.pathtree.get_selection().count_selected_rows() > 0)
+        repo_available = self.root is not None
+        self._delpathbutton.set_sensitive(path_selected)
+        self._testpathbutton.set_sensitive(repo_available and path_selected)
 
     def fill_frame(self, frame, info):
         widgets = []
