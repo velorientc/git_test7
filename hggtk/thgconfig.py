@@ -164,15 +164,18 @@ class ConfigDialog(gtk.Dialog):
         vbox.add(scrolledwindow)
 
         buttonbox = gtk.HBox()
-        self.addButton = gtk.Button("Add")
+        self.addButton = gtk.Button("_Add")
+        self.addButton.set_use_underline(True)
         self.addButton.connect('clicked', self._add_path)
         buttonbox.pack_start(self.addButton)
 
-        self._delpathbutton = gtk.Button("Remove")
+        self._delpathbutton = gtk.Button("_Remove")
+        self._delpathbutton.set_use_underline(True)
         self._delpathbutton.connect('clicked', self._remove_path)
         buttonbox.pack_start(self._delpathbutton)
 
-        self._testpathbutton = gtk.Button("Test")
+        self._testpathbutton = gtk.Button("_Test")
+        self._testpathbutton.set_use_underline(True)
         self._testpathbutton.connect('clicked', self._test_path)
         buttonbox.pack_start(self._testpathbutton)
 
