@@ -127,23 +127,41 @@ class ConfigDialog(gtk.Dialog):
         self.paths_frame = self.add_page(notebook, 'Paths')
         vbox = self.fill_frame(self.paths_frame, self._paths_info)
 
+        # Initialize data model for 'Paths' tab
+        self.pathdata = gtk.ListStore(
+                gobject.TYPE_STRING,
+                gobject.TYPE_STRING)
+        if 'paths' in list(self.ini):
+            for name in self.ini['paths']:
+                if name in ('default', 'default-push'): continue
+                path = self.ini['paths'][name]
+                iter = self.pathdata.insert_before(None, None)
+                self.pathdata.set_value(iter, 0, "%s" % name)
+                self.pathdata.set_value(iter, 1, "%s" % path)
+
+        # Define view model for 'Paths' tab
         self.pathtree = gtk.TreeView()
-        self.pathsel = self.pathtree.get_selection()
-        self.pathsel.connect("changed", self._pathlist_rowchanged)
-        column = gtk.TreeViewColumn('Peer Repository Paths',
-                gtk.CellRendererText(), text=2)
-        self.pathtree.append_column(column) 
+        self.pathtree.set_model(self.pathdata)
+        self.pathtree.connect("cursor-changed", self._pathtree_changed)
+        
+        renderer = gtk.CellRendererText()
+        renderer.set_property('editable', True)
+        renderer.connect('edited', self.on_alias_edit)
+        column = gtk.TreeViewColumn('Alias', 
+                renderer, text=0)
+        self.pathtree.append_column(column)
+        
+        renderer = gtk.CellRendererText()
+        renderer.set_property('editable', True)
+        renderer.connect('edited', self.on_path_edit)
+        column = gtk.TreeViewColumn('Repository Path',
+                renderer, text=1)
+        self.pathtree.append_column(column)
+        
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.pathtree)
         vbox.add(scrolledwindow)
-
-        self.pathlist = []
-        if 'paths' in list(self.ini):
-            for name in self.ini['paths']:
-                if name in ('default', 'default-push'): continue
-                self.pathlist.append((name, self.ini['paths'][name]))
-        self.curpathrow = 0
 
         buttonbox = gtk.HBox()
         self.addButton = gtk.Button("Add")
@@ -154,32 +172,10 @@ class ConfigDialog(gtk.Dialog):
         self._delpathbutton.connect('clicked', self._remove_path)
         buttonbox.pack_start(self._delpathbutton)
 
-        self._refreshpathbutton = gtk.Button("Refresh")
-        self._refreshpathbutton.connect('clicked', self._refresh_path)
-        buttonbox.pack_start(self._refreshpathbutton)
-
         self._testpathbutton = gtk.Button("Test")
         self._testpathbutton.connect('clicked', self._test_path)
         buttonbox.pack_start(self._testpathbutton)
 
-        table = gtk.Table(2, 2, False)
-        lbl = gtk.Label('Name:')
-        lbl.set_alignment(1.0, 0.0)
-        self._pathnameedit = gtk.Entry()
-        self._pathnameedit.set_sensitive(False)
-        table.attach(lbl, 0, 1, 0, 1, gtk.FILL, 0, 4, 3)
-        table.attach(self._pathnameedit, 1, 2, 0, 1,
-                gtk.FILL|gtk.EXPAND, 0, 4, 3)
-
-        lbl = gtk.Label('Path:')
-        lbl.set_alignment(1.0, 0.0)
-        self._pathpathedit = gtk.Entry()
-        self._pathpathedit.set_sensitive(False)
-        table.attach(lbl, 0, 1, 1, 2, gtk.FILL, 0, 4, 3)
-        table.attach(self._pathpathedit, 1, 2, 1, 2,
-                gtk.FILL|gtk.EXPAND, 0, 4, 3)
-
-        vbox.pack_start(table, False, False, 4)
         vbox.pack_start(buttonbox, False, False, 4)
         self.refresh_path_list()
 
@@ -317,14 +313,28 @@ class ConfigDialog(gtk.Dialog):
                     self.notebook.set_current_page(page_num)
                     widgets[w].grab_focus()
                     return
-
+                    
+    def on_alias_edit(self, cell, path, new_text):
+        dirty = self.pathdata[path][0] != new_text
+        self.pathdata[path][0] = new_text
+        if dirty:
+            self.dirty_event()
+    
+    def on_path_edit(self, cell, path, new_text):
+        dirty = self.pathdata[path][1] != new_text
+        self.pathdata[path][1] = new_text
+        if dirty:
+            self.dirty_event()
+        
     def new_path(self, newpath):
         '''Add a new path to [paths], give default name, focus'''
-        self.pathlist.append(('new', newpath))
-        self.curpathrow = len(self.pathlist)-1
+        iter = self.pathdata.insert_before(None, None)
+        self.pathdata.set_value(iter, 0, 'new')
+        self.pathdata.set_value(iter, 1, '%s' % newpath)
+        self.pathtree.get_selection().select_iter(iter)
         self.refresh_path_list()
+        # This method may be called from hggtk.sync, so ensure page is visible
         self.notebook.set_current_page(2)
-        self._pathnameedit.grab_focus()
         self.dirty_event()
 
     def dirty_event(self, *args):
@@ -333,28 +343,32 @@ class ConfigDialog(gtk.Dialog):
             self.dirty = True
 
     def _add_path(self, *args):
-        if len(self.pathlist):
-            self.pathlist.append(self.pathlist[self.curpathrow])
-        else:
-            self.pathlist.append(('new', 'http://'))
-        self.curpathrow = len(self.pathlist)-1
-        self.refresh_path_list()
-        self._pathnameedit.grab_focus()
-        self.dirty_event()
+        self.new_path('http://')
 
     def _remove_path(self, *args):
-        del self.pathlist[self.curpathrow]
-        if self.curpathrow > len(self.pathlist)-1:
-            self.curpathrow = len(self.pathlist)-1
+        selection = self.pathtree.get_selection()
+        if not selection.count_selected_rows():
+            return
+        model, iter = selection.get_selected()
+        next_iter = self.pathdata.iter_next(iter)
+        del self.pathdata[iter]
+        if next_iter:
+            selection.select_iter(next_iter)
+        elif len(self.pathdata):
+            selection.select_path(len(self.pathdata) - 1)
         self.refresh_path_list()
         self.dirty_event()
 
     def _test_path(self, *args):
+        selection = self.pathtree.get_selection()
+        if not selection.count_selected_rows():
+            return
         if not self.root:
             error_dialog(self, 'No Repository Found', 
                     'Path testing cannot work without a repository')
             return
-        testpath = self._pathpathedit.get_text()
+        model, iter = selection.get_selected()
+        testpath = model[iter][1]
         if not testpath:
             return
         if testpath[0] == '~':
@@ -364,61 +378,19 @@ class ConfigDialog(gtk.Dialog):
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-
-    def _refresh_path(self, *args):
-        name, path = (self._pathnameedit.get_text(),
-                self._pathpathedit.get_text())
-        if name == 'default':
-            vbox, info, widgets = self.pages[2]
-            widgets[0].child.set_text(path)
-            del self.pathlist[self.curpathrow]
-        elif name == 'default-push':
-            vbox, info, widgets = self.pages[2]
-            widgets[1].child.set_text(path)
-            del self.pathlist[self.curpathrow]
-        else:
-            self.pathlist[self.curpathrow] = (name, path)
+        
+    def _pathtree_changed(self, sel):
         self.refresh_path_list()
-        self.dirty_event()
-
-    def _pathlist_rowchanged(self, sel):
-        model, iter = sel.get_selected()
-        if not iter:
-            return
-        self._pathnameedit.set_text(model.get(iter, 0)[0])
-        self._pathpathedit.set_text(model.get(iter, 1)[0])
-        self._pathnameedit.set_sensitive(True)
-        self._pathpathedit.set_sensitive(True)
-        self.curpathrow = model.get(iter, 3)[0]
 
     def refresh_path_list(self):
-        model = gtk.ListStore(gobject.TYPE_PYOBJECT,
-                gobject.TYPE_PYOBJECT,
-                gobject.TYPE_STRING,
-                gobject.TYPE_PYOBJECT)
-        row = 0
-        for (name, path) in self.pathlist:
-            iter = model.insert_before(None, None)
-            model.set_value(iter, 0, name)
-            model.set_value(iter, 1, path)
-            model.set_value(iter, 2, "%s = %s" % (name, path))
-            model.set_value(iter, 3, row)
-            row += 1
-        self.pathtree.set_model(model)
-        if len(self.pathlist):
+        """Update sensitivity of buttons"""
+        if ( len(self.pathdata) 
+        and self.pathtree.get_selection().count_selected_rows() ):
             self._delpathbutton.set_sensitive(True)
             self._testpathbutton.set_sensitive(True)
-            self._refreshpathbutton.set_sensitive(True)
         else:
             self._delpathbutton.set_sensitive(False)
             self._testpathbutton.set_sensitive(False)
-            self._refreshpathbutton.set_sensitive(False)
-            self._pathnameedit.set_text('')
-            self._pathpathedit.set_text('')
-            self._pathnameedit.set_sensitive(False)
-            self._pathpathedit.set_sensitive(False)
-        if self.curpathrow >= 0 and self.curpathrow < len(self.pathlist):
-            self.pathsel.select_path(self.curpathrow)
 
     def fill_frame(self, frame, info):
         widgets = []
@@ -558,10 +530,11 @@ class ConfigDialog(gtk.Dialog):
         self.history.read()
 
         # flush changes on paths page
-        if len(self.pathlist):
-            self._refresh_path(None)
+        if len(self.pathdata):
             refreshlist = []
-            for (name, path) in self.pathlist:
+            for row in self.pathdata:
+                name = row[0]
+                path = row[1]
                 cpath = '.'.join(['paths', name])
                 self.record_new_value(cpath, path, False)
                 refreshlist.append(name)
