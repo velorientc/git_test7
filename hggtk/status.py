@@ -400,7 +400,6 @@ class GStatus(GDialog):
         menu = gtk.Menu()
         for entry in entries:
             menu.append(self._make_menuitem(entry[0], entry[1]))
-        menu.set_size_request(90, -1)
         menu.show_all()
         return menu
 
