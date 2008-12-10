@@ -620,6 +620,7 @@ def run(root='', cwd='', files=[], **opts):
 if __name__ == "__main__":
     import sys
     opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
+    path = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
+    opts['root'] = os.path.abspath(path)
     opts['files'] = [opts['root']]
     run(**opts)
