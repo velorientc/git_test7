@@ -24,6 +24,7 @@ import pango
 from mercurial.i18n import _
 from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch
+from mercurial import merge as merge_
 from hgext import extdiff
 from shlib import shell_notify
 from hglib import toutf
@@ -55,31 +56,53 @@ class GStatus(GDialog):
 
     def get_menu_info(self):
         """Returns menu info in this order:
-            merge, addrem, unknown, clean, ignored, deleted 
+            merge, addrem, unknown, clean, ignored, deleted, 
+            unresolved, resolved 
         """
         return (
+                # merge
                 (('_difference', self._diff_file),
                     ('_view right', self._view_file), 
                     ('view _left', self._view_left_file),
                     ('_revert', self._revert_file),
                     ('l_og', self._log_file)),
+                # addrem
                 (('_difference', self._diff_file),
                     ('_view', self._view_file), 
                     ('_revert', self._revert_file), 
                     ('l_og', self._log_file)),
+                # unknown
                 (('_view', self._view_file),
                     ('_delete', self._delete_file), 
                     ('_add', self._add_file),
                     ('_ignore', self._ignore_file)),
+                # clean
                 (('_view', self._view_file),
                     ('re_move', self._remove_file),
                     ('l_og', self._log_file)),
+                # ignored
                 (('_view', self._view_file),
                     ('_delete', self._delete_file)),
+                # deleted
                 (('_view', self._view_file),
                     ('_revert', self._revert_file), 
                     ('re_move', self._remove_file),
-                    ('l_og', self._log_file))
+                    ('l_og', self._log_file)),
+                # unresolved
+                (('_difference', self._diff_file),
+                    ('_view right', self._view_file), 
+                    ('view _left', self._view_left_file),
+                    ('_revert', self._revert_file),
+                    ('l_og', self._log_file),
+                    ('resolve', self._do_resolve),
+                    ('mark resolved', self._mark_resolved)),
+                # resolved
+                (('_difference', self._diff_file),
+                    ('_view right', self._view_file), 
+                    ('view _left', self._view_left_file),
+                    ('_revert', self._revert_file),
+                    ('l_og', self._log_file),
+                    ('unmark resolved', self._unmark_resolved)),
                 )
 
     ### End of overridable methods ###
@@ -169,13 +192,16 @@ class GStatus(GDialog):
 
         # TODO: should generate menus dynamically during right-click, currently
         # there can be entires that are not always supported or relavant.
-        merge, addrem, unknown, clean, ignored, deleted  = self.get_menu_info()
+        merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
+                = self.get_menu_info()
         merge_menu = self.make_menu(merge)
         addrem_menu = self.make_menu(addrem)
         unknown_menu = self.make_menu(unknown)
         clean_menu = self.make_menu(clean)
         ignored_menu = self.make_menu(ignored)
         deleted_menu = self.make_menu(deleted)
+        resolved_menu = self.make_menu(resolved)
+        unresolved_menu = self.make_menu(unresolved)
 
         # Dictionary with a key of file-stat and values containing context-menus
         self._menus = {}
@@ -186,13 +212,15 @@ class GStatus(GDialog):
         self._menus['C'] = clean_menu
         self._menus['I'] = ignored_menu
         self._menus['!'] = deleted_menu
+        self._menus['MR'] = resolved_menu
+        self._menus['MU'] = unresolved_menu
 
         # model stores the file list.
         # model[0] = file checked (marked for commit)
         # model[1] = changetype char
         # model[2] = file path as UTF-8
         # model[3] = file path
-        self.model = gtk.ListStore(bool, str, str, str)
+        self.model = gtk.ListStore(bool, str, str, str, str)
         self.model.set_sort_func(1001, self._sort_by_stat)
         self.model.set_default_sort_func(self._sort_by_stat)
 
@@ -233,6 +261,13 @@ class GStatus(GDialog):
         col1.set_sort_column_id(1001)
         col1.set_resizable(False)
         self.tree.append_column(col1)
+        
+        col = gtk.TreeViewColumn('ms', stat_cell)
+        col.add_attribute(stat_cell, 'text', 4)
+        #col.set_cell_data_func(stat_cell, self._text_color)
+        col.set_sort_column_id(4)
+        col.set_resizable(False)
+        self.tree.append_column(col)
         
         col2 = gtk.TreeViewColumn('path', path_cell)
         col2.add_attribute(path_cell, 'text', 2)
@@ -363,6 +398,10 @@ class GStatus(GDialog):
         recheck = [entry[2] for entry in self.model if entry[0]]
         reselect = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
 
+        # merge-state of files
+        from mercurial import merge as merge_
+        ms = merge_.mergestate(self.repo)
+        
         # Load the new data into the tree's model
         self.tree.hide()
         self.model.clear()
@@ -370,8 +409,10 @@ class GStatus(GDialog):
         for opt, char, changes in ([ct for ct in explicit_changetypes
                                     if self.test_opt(ct[0])] or changetypes) :
             for file in changes:
+                mst = file in ms and ms[file].upper() or ""
                 file = util.localpath(file)
-                self.model.append([file in recheck, char, toutf(file), file])
+                self.model.append([file in recheck, char, toutf(file),
+                        file, mst])
 
         self._update_check_count()
         
@@ -689,6 +730,25 @@ class GStatus(GDialog):
         self.reload_status()
         return True
 
+    def _mark_resolved(self, stat, file):
+        ms = merge_.mergestate(self.repo)
+        ms.mark(util.pconvert(file), "r")
+        self.reload_status()
+
+
+    def _unmark_resolved(self, stat, file):
+        ms = merge_.mergestate(self.repo)
+        ms.mark(util.pconvert(file), "u")
+        self.reload_status()
+
+
+    def _do_resolve(self, stat, file):
+        ms = merge_.mergestate(self.repo)
+        wctx = self.repo[None]
+        mctx = wctx.parents()[-1]
+        ms.resolve(util.pconvert(file), wctx, mctx)
+        self.reload_status()
+
 
     def _sel_desel_clicked(self, toolbutton, state):
         for entry in self.model : entry[0] = state
@@ -726,15 +786,22 @@ class GStatus(GDialog):
             self._tree_popup_menu(widget, event.button, event.time)
         return False
 
-
+    def _get_file_context_menu(self, rowdata):
+        st = rowdata[1]
+        ms = rowdata[4]
+        if ms:
+            menu = self._menus['M' + ms]
+        else:
+            menu = self._menus[st]
+        return menu
+            
     def _tree_popup_menu(self, widget, button=0, time=0) :
         selection = self.tree.get_selection()
         if selection.count_selected_rows() != 1:
             return False
 
         list, paths = selection.get_selected_rows() 
-        path = paths[0]
-        menu = self._menus[list[path][1]]
+        menu = self._get_file_context_menu(list[paths[0]])
         menu.popup(None, None, None, button, time)
         return True
 
@@ -764,8 +831,7 @@ class GStatus(GDialog):
             return False
 
         list, paths = selection.get_selected_rows() 
-        path = paths[0]
-        menu = self._menus[list[path][1]]
+        menu = self._get_file_context_menu(list[paths[0]])
         menu.get_children()[0].activate()
         return True
 

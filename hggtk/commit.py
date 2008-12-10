@@ -173,13 +173,17 @@ class GCommit(GStatus):
     def get_menu_info(self):
         """Returns menu info in this order: merge, addrem, unknown, clean, ignored, deleted
         """
-        merge, addrem, unknown, clean, ignored, deleted  = GStatus.get_menu_info(self)
+        merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
+                = GStatus.get_menu_info(self)
         return (merge + (('_commit', self._commit_file),),
                 addrem + (('_commit', self._commit_file),),
                 unknown + (('_commit', self._commit_file),),
                 clean,
                 ignored,
-                deleted + (('_commit', self._commit_file),))
+                deleted + (('_commit', self._commit_file),),
+                unresolved,
+                resolved,
+               )
 
 
     def should_live(self, widget=None, event=None):
