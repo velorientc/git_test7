@@ -12,6 +12,7 @@ import pango
 import threading
 import Queue
 import win32trace
+import time
 
 try:
     from hggtk.hglib import toutf
@@ -103,7 +104,9 @@ class TraceLog():
         while self.queue.qsize():
             try:
                 msg = self.queue.get(0)
-                self.write(msg)
+                ts = '[%s] ' % time.strftime('%c')
+                for line in msg.splitlines(True):
+                    self.write(ts + line)
             except Queue.Empty:
                 pass
                 
