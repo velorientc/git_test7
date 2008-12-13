@@ -24,7 +24,7 @@ import mercurial.ui as _ui
 class ParseError(Exception):
     """Exception raised on errors in parsing the command line."""
 
-nonrepo_commands = 'userconfig clone about help'
+nonrepo_commands = 'userconfig clone init about help'
 
 def dispatch(args):
     "run the command specified in args"
@@ -207,6 +207,13 @@ def repoconfig(ui, *pats, **opts):
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
+    run(**opts)
+
+def hginit(ui, dest=None, **opts):
+    """repository initialization tool"""
+    from hggtk.hginit import run
+    if dest:
+        opts['files'] = [dest]
     run(**opts)
 
 def log(ui, *pats, **opts):
@@ -448,6 +455,7 @@ table = {
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
     "^commit|ci": (commit, [], _('hgtk commit [FILE]...')),
     "^datamine": (datamine, [], _('hgtk datamine')),
+    "^init": (hginit, [], _('hgtk init [DEST]')),
     "^log|history": (log, [], _('hgtk log [FILE]')),
     "^merge": (merge, [], _('hgtk merge')),
     "^recovery": (recovery, [], _('hgtk recovery')),
