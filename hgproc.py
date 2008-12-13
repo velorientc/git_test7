@@ -35,7 +35,7 @@ if not sys.stdin.isatty():
 # Map hgproc commands to dialog modules in hggtk/
 from hggtk import commit, status, addremove, tagadd, tags, history, merge
 from hggtk import diff, revisions, update, serve, clone, synch, hgcmd, about
-from hggtk import recovery, thgconfig, datamine
+from hggtk import recovery, thgconfig, datamine, hginit
 _dialogs = { 'commit' : commit,    'status' : status,    'revert' : status,
              'add'    : addremove, 'remove' : addremove, 'tag'    : tagadd,
              'tags'   : tags,      'log'    : history,   'history': history,
@@ -43,7 +43,7 @@ _dialogs = { 'commit' : commit,    'status' : status,    'revert' : status,
              'parents': revisions, 'heads'  : revisions, 'update' : update,
              'clone'  : clone,     'serve'  : serve,     'synch'  : synch,
              'about'  : about,     'config' : thgconfig, 'recovery': recovery,
-             'datamine': datamine }
+             'datamine': datamine, 'init'   : hginit }
 
 def get_list_from_file(filename):
     fd = open(filename, "r")

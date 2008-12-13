@@ -525,32 +525,7 @@ class ContextMenuExtension:
         open_dialog('outgoing', cmdopts, root=src, filelist=[dest])
 
     def _init(self, parent_window):
-        dest = self._folder or self._filenames[0]
-        if os.path.isfile(dest):
-            dest = os.path.dirname(dest)
-
-        msg = "Create Hg repository in %s?" % (dest)
-        title = "Mercurial: init"
-        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
-        if rv == 2:
-            return
-        try:
-            # initialize the repo
-            hg.repository(ui.ui(), dest, create=1)
-            
-            # create the .hgignore file, mainly to workaround
-            # Explorer's problem in creating files with name
-            # that start with a dot.
-            hgignore = os.path.join(dest, '.hgignore')
-            if not os.path.exists(hgignore):
-                try:
-                    open(hgignore, 'wb')
-                except:
-                    pass
-        except:
-            msg = "Error creating repo"
-            win32ui.MessageBox(msg, title, 
-                               win32con.MB_OK|win32con.MB_ICONERROR)
+        self._run_dialog('init')
             
     def _status(self, parent_window):
         self._run_dialog('status')
