@@ -43,7 +43,6 @@ Example:
 
 import re
 import config
-from sets import Set
 from ConfigParser import DEFAULTSECT, ParsingError, MissingSectionHeaderError
 
 class LineType(object):
@@ -349,7 +348,7 @@ class INISection(config.ConfigNamespace):
         del self._options[key]
 
     def __iter__(self):
-        d = Set()
+        d = set()
         for l in self._lines:
             for x in l.contents:
                 if isinstance(x, LineContainer):
@@ -439,7 +438,7 @@ class INIConfig(config.ConfigNamespace):
         del self._sections[key]
 
     def __iter__(self):
-        d = Set()
+        d = set()
         for x in self._data.contents:
             if isinstance(x, LineContainer):
                 if x.name not in d:
