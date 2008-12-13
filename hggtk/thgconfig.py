@@ -335,6 +335,10 @@ class ConfigDialog(gtk.Dialog):
         self.pathdata.set_value(iter, 0, 'new')
         self.pathdata.set_value(iter, 1, '%s' % newpath)
         self.pathtree.get_selection().select_iter(iter)
+        self.pathtree.set_cursor(
+                self.pathdata.get_path(iter),
+                self.pathtree.get_column(0), 
+                start_editing=True)
         self.refresh_path_list()
         # This method may be called from hggtk.sync, so ensure page is visible
         self.notebook.set_current_page(2)
