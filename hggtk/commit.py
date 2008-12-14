@@ -313,7 +313,14 @@ class GCommit(GStatus):
 
     def _hg_commit(self, files):
         if not self.repo.ui.config('ui', 'username'):
-            Prompt('Username not configured', 'Please enter a username', self).run()
+            Prompt('Commit: Invalid username',
+                    'Your username has not been configured.\n\n'
+                    'Please configure your username and try again',
+                    self).run()
+
+            # bring up the config dialog for user to enter their username.
+            # But since we can't be sure they will do it right, we will
+            # have them to retry, to re-trigger the checking mechanism. 
             from thgconfig import ConfigDialog
             dlg = ConfigDialog(self.repo.root, False)
             dlg.show_all()
@@ -322,6 +329,7 @@ class GCommit(GStatus):
             dlg.hide()
             self.repo = hg.repository(ui.ui(), self.repo.root)
             self.ui = self.repo.ui
+            return
 
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
