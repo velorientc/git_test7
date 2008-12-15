@@ -312,6 +312,7 @@ class GLog(GDialog):
         _menu.append(create_menu('e_mail patch', self._email_patch))
         _menu.append(create_menu('add/remove _tag', self._add_tag))
         _menu.append(create_menu('backout revision', self._backout_rev))
+        _menu.append(create_menu('_revert', self._revert))
         
         # need mq extension for strip command
         extensions.loadall(self.ui)
@@ -424,6 +425,23 @@ class GLog(GDialog):
         dialog.set_notify_func(self.checkout_completed, parents)
         dialog.present()
         dialog.set_transient_for(None)
+
+    def _revert(self,menuitem):
+        rev = self.currow[treemodel.REVID]
+        res = Confirm('Revert Revision(s)', [], self,
+                'Revert all files to revision %d?\nThis will overwrite your '
+                'local changes' % rev).run()
+
+        if res != gtk.RESPONSE_YES:
+            return
+
+        cmdline = ['hg', 'revert','--verbose','-a','-r', str(rev)]
+
+        from hgcmd import CmdDialog
+        dlg = CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
 
     def _diff_revs(self, menuitem):
         from status import GStatus
