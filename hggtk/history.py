@@ -426,7 +426,7 @@ class GLog(GDialog):
         dialog.present()
         dialog.set_transient_for(None)
 
-    def _revert(self,menuitem):
+    def _revert(self, menuitem):
         rev = self.currow[treemodel.REVID]
         res = Confirm('Revert Revision(s)', [], self,
                 'Revert all files to revision %d?\nThis will overwrite your '
@@ -435,7 +435,7 @@ class GLog(GDialog):
         if res != gtk.RESPONSE_YES:
             return
 
-        cmdline = ['hg', 'revert','--verbose','-a','-r', str(rev)]
+        cmdline = ['hg', 'revert', '--verbose', '-a', '-r', str(rev)]
 
         from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
