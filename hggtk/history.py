@@ -435,7 +435,7 @@ class GLog(GDialog):
         if res != gtk.RESPONSE_YES:
             return
 
-        cmdline = ['hg', 'revert', '--verbose', '-a', '-r', str(rev)]
+        cmdline = ['hg', 'revert', '--verbose', '--all', '--rev', str(rev)]
 
         from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
