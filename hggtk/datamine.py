@@ -28,7 +28,6 @@ class DataMineDialog(GDialog):
     COL_PATH = 3
     COL_COLOR = 4
     COL_USER = 5
-    COL_LINENUM = 6
 
     def get_title(self):
         return 'DataMining - ' + os.path.basename(self.repo.root)
@@ -448,12 +447,11 @@ class DataMineDialog(GDialog):
         treeview.connect('popup-menu', self._ann_popup_menu)
         treeview.connect('row-activated', self._ann_row_act)
 
-        results = gtk.ListStore(str, str, str, str, str, str, str)
+        results = gtk.ListStore(str, str, str, str, str, str)
         treeview.set_model(results)
 
         context_menu = self.ann_header_context_menu(treeview)
         for title, width, col, emode, visible in (
-                ('Line', 8, self.COL_LINENUM, pango.ELLIPSIZE_NONE, True),
                 ('Rev', 10, self.COL_REVID, pango.ELLIPSIZE_NONE, True),
                 ('File', 15, self.COL_PATH, pango.ELLIPSIZE_START, False),
                 ('User', 15, self.COL_USER, pango.ELLIPSIZE_END, False),
@@ -612,7 +610,7 @@ class DataMineDialog(GDialog):
             ctx = self.repo.changectx(rowrev)
             color = colormap.get_color(ctx, curdate)
             model.append((revid, toutf(text), tip, toutf(path.strip()),
-                    color, toutf(user), len(model)+1))
+                    color, toutf(user)))
         if thread.isAlive():
             return True
         else:
