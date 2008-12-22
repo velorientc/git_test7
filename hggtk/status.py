@@ -102,7 +102,7 @@ class GStatus(GDialog):
                     ('view _left', self._view_left_file),
                     ('_revert', self._revert_file),
                     ('l_og', self._log_file),
-                    ('unmark resolved', self._unmark_resolved)),
+                    ('mark unresolved', self._unmark_resolved)),
                 )
 
     ### End of overridable methods ###
