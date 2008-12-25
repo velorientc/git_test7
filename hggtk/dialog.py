@@ -54,8 +54,10 @@ def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
     :param respfunc: callback function for when dialog exits
     :returns if respfunc returns dialog, else return response text
     """
+    buttons = (gtk.STOCK_OK, gtk.RESPONSE_OK,
+            gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
     dialog = gtk.Dialog(parent=parent, flags=gtk.DIALOG_MODAL,
-            buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK))
+            buttons=buttons)
     dialog.set_title('TortoiseHg Prompt')
     entry = gtk.Entry()
     entry.set_text(default or '')
