@@ -29,6 +29,7 @@ from hgext import extdiff
 from shlib import shell_notify
 from hglib import toutf, rootpath
 from gdialog import *
+from dialog import entry_dialog
 
 class GStatus(GDialog):
     """GTK+ based dialog for displaying repository status
@@ -79,6 +80,7 @@ class GStatus(GDialog):
                 # clean
                 (('_view', self._view_file),
                     ('re_move', self._remove_file),
+                    ('re_name', self._rename_file),
                     ('l_og', self._log_file)),
                 # ignored
                 (('_view', self._view_file),
@@ -507,6 +509,14 @@ class GStatus(GDialog):
 
     def _remove_file(self, stat, file):
         self._hg_remove([file])
+        return True
+
+
+    def _rename_file(self, stat, file):
+        fdir, fname = os.path.split(file)
+        newfile = entry_dialog(self, "Rename file to:", True, fname)
+        if newfile and newfile != fname:
+            self._hg_move([file, os.path.join(fdir, newfile)])
         return True
 
 
