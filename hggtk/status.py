@@ -27,7 +27,7 @@ from mercurial import cmdutil, util, ui, hg, commands, patch
 from mercurial import merge as merge_
 from hgext import extdiff
 from shlib import shell_notify
-from hglib import toutf
+from hglib import toutf, rootpath
 from gdialog import *
 
 class GStatus(GDialog):
@@ -151,6 +151,9 @@ class GStatus(GDialog):
                         self._revert_clicked, tip='revert'),
                     self.make_toolbutton(gtk.STOCK_ADD, '_Add',
                         self._add_clicked, tip='add'),
+                    self.make_toolbutton(gtk.STOCK_JUMP_TO, 'Move',
+                        self._move_clicked,
+                        tip='move selected files to other directory'),
                     self.make_toolbutton(gtk.STOCK_DELETE, '_Remove',
                         self._remove_clicked, tip='remove'),
                     gtk.SeparatorToolItem(),
@@ -522,6 +525,24 @@ class GStatus(GDialog):
             self.reload_status()
 
 
+    def _hg_move(self, files):
+        wfiles = [self.repo.wjoin(x) for x in files]
+        if self.count_revs() > 1:
+            Prompt('Nothing Moved', 'Move is not enabled when '
+                    'multiple revisions are specified.', self).run()
+            return
+
+        # Create new opts, so nothing unintented gets through
+        moveopts = self.merge_opts(commands.table['rename|mv'][1],
+                ('include', 'exclude'))
+        def dohgmove():
+            #moveopts['force'] = True
+            commands.rename(self.ui, self.repo, *wfiles, **moveopts)
+        success, outtext = self._hg_call_wrapper('Move', dohgmove)
+        if success:
+            self.reload_status()
+
+
     def _tree_selection_changed(self, selection, force):
         ''' Update the diff text '''
         def dohgdiff():
@@ -693,6 +714,37 @@ class GStatus(GDialog):
             self._delete_files(delete_list)
         if not remove_list and not delete_list:
             Prompt('Nothing Removed', 'No removable files selected', self).run()
+        return True
+
+    def _move_clicked(self, toolbutton, data=None):
+        move_list = self._relevant_files('C')
+        if move_list:
+            # get destination directory to files into
+            dialog = gtk.FileChooserDialog(title="Move files to diretory...",
+                    parent=self,
+                    action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                    buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
+                             gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+            dialog.set_default_response(gtk.RESPONSE_OK)
+            dialog.set_current_folder(self.repo.root)
+            response = dialog.run()
+            destdir = dialog.get_filename()
+            dialog.destroy()
+            if response != gtk.RESPONSE_OK:
+                return True
+            
+            # verify directory
+            destroot = rootpath(destdir)
+            if destroot != self.repo.root:
+                Prompt('Nothing Moved', "Can't move outside repo!", self).run()
+                return True
+            
+            # move the files to dest directory
+            move_list.append(destdir)
+            self._hg_move(move_list)
+        else:
+            Prompt('Nothing Moved', 'No movable files selected\n\n'
+                    'Note: only clean files can be moved.', self).run()
         return True
 
     def _delete_file(self, stat, file):
