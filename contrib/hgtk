@@ -460,7 +460,7 @@ table = {
     "^merge": (merge, [], _('hgtk merge')),
     "^recovery": (recovery, [], _('hgtk recovery')),
     "^synch": (synch, [], _('hgtk synch')),
-    "^status": (status, [], _('hgtk status [FILE]...')),
+    "^status|st": (status, [], _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
     "^serve": (serve, [], _('hgtk serve')),
