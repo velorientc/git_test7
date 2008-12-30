@@ -495,10 +495,9 @@ class NativeSaveFileDialogWrapper:
     def tortoiseHgIsInstalled(self):
         import _winreg
         try:
-            hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,r"Software\Microsoft\Windows\CurrentVersion\Explorer\ShellIconOverlayIdentifiers\Changed")
-            if hkey:
-                cls = _winreg.QueryValue(hkey,"")
-                return cls == "{102C6A24-5F38-4186-B64A-237011809FAB}"
+            _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
+                    r"Software\TortoiseHg")
+            return True
         except WindowsError: #reg key not found
             pass
         return False
