@@ -241,20 +241,26 @@ class ContextMenuExtension:
             # get other menus for hg submenu
             commands = self._get_commands()
 
-        # add common menu items
-        commands.append(TortoiseMenuSep())
-        commands.append(TortoiseMenu(_("About"),
-                       _("About TortoiseHg"),
-                       self._about, icon="menuabout.ico"))
+            # add common menu items
+            commands.append(TortoiseMenuSep())
+            commands.append(TortoiseMenu(_("About"),
+                           _("About TortoiseHg"),
+                           self._about, icon="menuabout.ico"))
        
-        # create submenus with Hg commands
-        thgmenu.append(TortoiseSubmenu("TortoiseHG", commands, icon="hg.ico"))
-        thgmenu.append(TortoiseMenuSep())
-        
-        idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
+        if commands:
+            # create submenus with Hg commands
+            thgmenu.append(TortoiseSubmenu("TortoiseHG", commands,
+                    icon="hg.ico"))
+            thgmenu.append(TortoiseMenuSep())
+            
+            idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0,
+                    idCmdFirst)
 
-        # Return total number of menus & submenus we've added
-        return idCmd
+            # Return total number of menus & submenus we've added
+            return idCmd
+        else:
+            # no applicable Hg actions
+            return 0
 
     def _get_commands_dragdrop(self):
         """
