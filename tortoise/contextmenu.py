@@ -337,9 +337,17 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Undo Changes"),
                            _("Revert selected files"),
                            self._revert, icon="menurevert.ico"))
+
+            # we can only annotate file but not directories
+            annotatible = len(self._filenames) > 0
+            for f in self._filenames:
+                if not os.path.isfile(f):
+                    annotatible = False
+                    break
             result.append(TortoiseMenu(_("Annotate Files"),
                            _("show changeset information per file line"),
-                           self._annotate, icon="menublame.ico"))
+                           self._annotate, icon="menublame.ico",
+                           state=annotatible))
 
             result.append(TortoiseMenuSep())
             result.append(TortoiseMenu(_("Update To Revision"),
