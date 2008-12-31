@@ -315,7 +315,8 @@ class ContextMenuExtension:
                            self._clone, icon="menuclone.ico"))
             result.append(TortoiseMenu(_("Create Repository Here"),
                            _("create a new repository in this directory"),
-                           self._init, icon="menucreaterepos.ico"))
+                           self._init, icon="menucreaterepos.ico",
+                           state=os.path.isdir(rpath)))
         else:
             result.append(TortoiseMenu(_("View File Status"),
                            _("Repository status"),
@@ -399,7 +400,8 @@ class ContextMenuExtension:
             if repo.root != rpath:
                 result.append(TortoiseMenu(_("Create Repository Here"),
                                _("create a new repository in this directory"),
-                               self._init, icon="menucreaterepos.ico"))
+                               self._init, icon="menucreaterepos.ico",
+                               state=os.path.isdir(rpath)))
 
         # config setttings menu
         result.append(TortoiseMenuSep())
