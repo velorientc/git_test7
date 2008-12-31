@@ -400,6 +400,8 @@ class ContextMenuExtension:
             result.append(TortoiseMenu(_("Web Server"),
                            _("start web server for this repository"),
                            self._serve, icon="proxy.ico"))
+
+            result.append(TortoiseMenuSep())
             result.append(TortoiseMenu(_("Create Clone"),
                            _("Clone a repository here"),
                            self._clone, icon="menuclone.ico"))
