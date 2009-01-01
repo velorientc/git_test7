@@ -307,6 +307,7 @@ class ChangeSet(GDialog):
                 copied[f] = src
 
         srcs = [x[1] for x in copied.iteritems() if filestatus(x[0]) == 'A']
+        gitmode = {'l': '120000', 'x': '100755', '': '100644'}
 
         gone = {}
         for f in filelist:
@@ -320,18 +321,16 @@ class ChangeSet(GDialog):
             if s != 'R':
                 tn = getfilectx(f, ctx2).data()
             a, b = f, f
-            def gitmode(flags):
-                return 'l' in flags or 'x' in flags
             def addmodehdr(header, omode, nmode):
                 if omode != nmode:
                     header.append('old mode %s\n' % omode)
                     header.append('new mode %s\n' % nmode)
 
             if s == 'A':
-                mode = gitmode(flags2(f))
+                mode = gitmode[flags2(f)]
                 if f in copied:
                     a = copied[f]
-                    omode = gitmode(man1.flags(a))
+                    omode = gitmode[man1.flags(a)]
                     addmodehdr(header, omode, mode)
                     if filestatus(a) == 'R' and a not in gone:
                         op = 'rename'
@@ -349,11 +348,11 @@ class ChangeSet(GDialog):
                 if f in srcs:
                     dodiff = False
                 else:
-                    mode = gitmode(man1.flags(f))
+                    mode = gitmode[man1.flags(f)]
                     header.append('deleted file mode %s\n' % mode)
             else:
-                omode = gitmode(man1.flags(f))
-                nmode = gitmode(flags2(f))
+                omode = gitmode[man1.flags(f)]
+                nmode = gitmode[flags2(f)]
                 addmodehdr(header, omode, nmode)
                 if util.binary(to) or util.binary(tn):
                     dodiff = 'binary'
