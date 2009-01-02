@@ -12,6 +12,7 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 import gtk
 import pango
 import sys
+from hglib import gettabwidth
 from mercurial import hg, ui, cmdutil, util, patch
 from mercurial.i18n import _
 from shlib import set_tortoise_icon
@@ -76,6 +77,7 @@ class DiffWindow(gtk.Window):
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
         pane.pack2(scrollwin)
         scrollwin.show()
+        self.tabwidth = gettabwidth(self.ui)
 
         try:
             import gtksourceview
@@ -158,7 +160,10 @@ class DiffWindow(gtk.Window):
             specific_files = self.files
 
         diff = self._get_hg_diff(specific_files)
-        self.buffer.set_text(diff.decode(sys.getdefaultencoding(), 'replace'))
+        diff = diff.decode(sys.getdefaultencoding(), 'replace')
+        if self.tabwidth:
+            diff = diff.expandtabs(self.tabwidth)
+        self.buffer.set_text(diff)
 
     def _get_hg_diff(self, files):
         self.repo.ui.pushbuffer()
