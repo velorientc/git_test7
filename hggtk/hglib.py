@@ -72,6 +72,16 @@ def rootpath(path=None):
             return ''
     return p
 
+def gettabwidth(ui):
+    tabwidth = ui.config('tortoisehg', 'tabwidth')
+    try:
+        tabwidth = int(tabwidth)
+        if tabwidth < 1 or tabwidth > 16:
+            tabwidth = None
+    except (ValueError, TypeError), e:
+        tabwidth = None
+    return tabwidth
+
 
 class GtkUi(ui.ui):
     '''

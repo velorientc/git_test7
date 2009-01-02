@@ -376,6 +376,8 @@ class ChangeSet(GDialog):
 
     def prepare_diff(self, difflines, offset, fname):
         '''Borrowed from hgview; parses changeset diffs'''
+        import hglib
+        tw = hglib.gettabwidth(self.ui)
         DIFFHDR = "=== %s ===\n"
         idx = 0
         outlines = []
@@ -405,16 +407,22 @@ class ChangeSet(GDialog):
                 continue
             elif l.startswith("---"):
                 continue
+            elif l.startswith("@@"):
+                tag = "blue"
             elif l.startswith("+"):
                 tag = "green"
                 stats[0] += 1
+                if tw:
+                    l = l[0] + l[1:].expandtabs(tw)
             elif l.startswith("-"):
                 stats[1] += 1
                 tag = "red"
-            elif l.startswith("@@"):
-                tag = "blue"
+                if tw:
+                    l = l[0] + l[1:].expandtabs(tw)
             else:
                 tag = "black"
+                if tw:
+                    l = l[0] + l[1:].expandtabs(tw)
             l = l+"\n"
             length = len(l.decode('utf-8'))
             addtag( tag, offset, length )
