@@ -14,7 +14,7 @@ import re
 import threading, thread2
 import time
 from mercurial import hg, ui, util, revlog
-from hglib import hgcmd_toq, toutf, fromutf
+from hglib import hgcmd_toq, toutf, fromutf, gettabwidth
 from gdialog import *
 from vis import treemodel
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
@@ -58,6 +58,7 @@ class DataMineDialog(GDialog):
 
     def load_settings(self, settings):
         GDialog.load_settings(self, settings)
+        self.tabwidth = gettabwidth(self.ui)
         # settings['datamine']
 
     def get_body(self):
@@ -327,6 +328,8 @@ class DataMineDialog(GDialog):
             except ValueError:
                 continue
             tip, user = self.get_rev_desc(long(revid))
+            if self.tabwidth:
+                text = text.expandtabs(self.tabwidth)
             model.append((revid, toutf(text), tip, toutf(path)))
         if thread.isAlive():
             return True
@@ -611,6 +614,8 @@ class DataMineDialog(GDialog):
             tip, user = self.get_rev_desc(rowrev)
             ctx = self.repo.changectx(rowrev)
             color = colormap.get_color(ctx, curdate)
+            if self.tabwidth:
+                text = text.expandtabs(self.tabwidth)
             model.append((revid, toutf(text), tip, toutf(path.strip()),
                     color, toutf(user), len(model)+1))
         if thread.isAlive():
