@@ -27,7 +27,7 @@ from mercurial import cmdutil, util, ui, hg, commands, patch
 from mercurial import merge as merge_
 from hgext import extdiff
 from shlib import shell_notify
-from hglib import toutf, rootpath
+from hglib import toutf, rootpath, gettabwidth
 from gdialog import *
 from dialog import entry_dialog
 
@@ -190,6 +190,8 @@ class GStatus(GDialog):
         else:
             self._setting_pos = 64000
             self._setting_lastpos = 270
+        self.tabwidth = gettabwidth(self.ui)
+
 
 
     def get_body(self):
@@ -576,12 +578,18 @@ class GStatus(GDialog):
                 if line.startswith('---') or line.startswith('+++'):
                     buffer.insert_with_tags_by_name(iter, line, 'header')
                 elif line.startswith('-'):
+                    if self.tabwidth:
+                        line = line[0] + line[1:].expandtabs(self.tabwidth)
                     buffer.insert_with_tags_by_name(iter, line, 'removed')
                 elif line.startswith('+'):
+                    if self.tabwidth:
+                        line = line[0] + line[1:].expandtabs(self.tabwidth)
                     buffer.insert_with_tags_by_name(iter, line, 'added')
                 elif line.startswith('@@'):
                     buffer.insert_with_tags_by_name(iter, line, 'position')
                 else:
+                    if self.tabwidth:
+                        line = line[0] + line[1:].expandtabs(self.tabwidth)
                     buffer.insert(iter, line)
 
             self.diff_text.set_buffer(buffer)
