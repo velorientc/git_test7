@@ -87,10 +87,10 @@ class DataMineDialog(GDialog):
     def ann_header_context_menu(self, treeview):
         _menu = gtk.Menu()
         _button = gtk.CheckMenuItem("Filename")
-        _button.connect("toggled", self.toggle_annatate_columns, treeview, 1)
+        _button.connect("toggled", self.toggle_annatate_columns, treeview, 2)
         _menu.append(_button)
         _button = gtk.CheckMenuItem("User")
-        _button.connect("toggled", self.toggle_annatate_columns, treeview, 2)
+        _button.connect("toggled", self.toggle_annatate_columns, treeview, 3)
         _menu.append(_button)
         _menu.show_all()
         return _menu
