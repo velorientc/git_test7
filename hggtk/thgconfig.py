@@ -81,6 +81,9 @@ class ConfigDialog(gtk.Dialog):
                     'Specify the visual diff tool; must be extdiff command'),
                 ('Visual Editor', 'tortoisehg.editor', [],
                     'Specify the visual editor used to view files, etc'),
+                ('Tab Width', 'tortoisehg.tabwidth', [],
+                    'Specify the number of spaces to expand tabs.'
+                    ' Default: Not expanded'),
                 ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
                     'Color changesets by author name.  If not enabled,'
                     ' the changes are colored green for merge, red for'
