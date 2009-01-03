@@ -463,7 +463,8 @@ table = {
     "^status|st": (status, [], _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
-    "^serve": (serve, [], _('hgtk serve')),
+    "^serve": (serve, [('', 'webdir-conf', '', _('name of the webdir config file'))],
+        _('hgtk serve [OPTS]')),
     "^update|checkout|co": (update, [], _('hgtk update')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
 }
