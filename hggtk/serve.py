@@ -32,7 +32,7 @@ from shlib import set_tortoise_icon
 gservice = None
 class ServeDialog(gtk.Window):
     """ Dialog to run web server"""
-    def __init__(self, cwd='', root=''):
+    def __init__(self, cwd='', root='', webdir_conf=''):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
@@ -50,6 +50,7 @@ class ServeDialog(gtk.Window):
 
         self._url = None
         self._root = root
+        self._webdirconf = webdir_conf
         if cwd:
             os.chdir(cwd)
         
@@ -129,7 +130,10 @@ class ServeDialog(gtk.Window):
         self.defport = repo.ui.config('web', 'port') or '8000'
         self.webname = repo.ui.config('web', 'name') or \
                 os.path.basename(self._root)
-        self.set_title("hg serve - " + self.webname)
+        if self._webdirconf:
+            self.set_title("hg serve %s - %s" % (self._webdirconf, self.webname))
+        else:
+            self.set_title("hg serve - " + self.webname)
 
     def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
         if menu:
@@ -229,8 +233,12 @@ class ServeDialog(gtk.Window):
         global gservice
         gservice = None
 
-        args = [self._root, self._queue, 'serve', '--name', self.webname,
-                '--port', str(port)]
+        args = [self._root, self._queue, 'serve', '--port', str(port)]
+        if self._webdirconf:
+            args.append('--webdir-conf=' + self._webdirconf)
+        else:
+            args.append('--name')
+            args.append(self.webname)
         thread = threading.Thread(target=hglib.hgcmd_toq, args=args)
         thread.start()
 
@@ -346,8 +354,8 @@ thg_serve_cmd =  {"^serve":
          _('hg serve [OPTION]...'))}
 
 
-def run(cwd='', root='', **opts):
-    dialog = ServeDialog(cwd, root)
+def run(cwd='', root='', webdir_conf='', **opts):
+    dialog = ServeDialog(cwd, root, webdir_conf)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
@@ -358,5 +366,8 @@ if __name__ == "__main__":
     import sys
     opts = {}
     opts['cwd'] = os.getcwd()
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
+    if len(sys.argv) == 2 and sys.argv[1].endswith('.conf'):
+        opts['webdir_conf'] = sys.argv[1]
+    else:
+        opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
     run(**opts)
