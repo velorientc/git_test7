@@ -698,7 +698,7 @@ class GStatus(GDialog):
                 self.reload_status()
 
     def _add_clicked(self, toolbutton, data=None):
-        add_list = self._relevant_files('?')
+        add_list = self._relevant_files('?I')
         if len(add_list) > 0:
             self._hg_add(add_list)
         else:
