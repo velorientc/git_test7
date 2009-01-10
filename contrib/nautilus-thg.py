@@ -12,7 +12,7 @@
 import gconf
 import gtk
 import gobject
-from mercurial import hg, ui, util, repo
+from mercurial import hg, ui, repo, match
 from mercurial.node import short
 import nautilus
 import os
@@ -195,36 +195,40 @@ class HgExtension(nautilus.MenuProvider,
 
     def get_background_items(self, window, vfs_file):
         '''Build context menu for current directory'''
-        items = []
+        mainitem = nautilus.MenuItem('HgNautilus', 'Mercurial', '')
+        submenu = nautilus.Menu()
+        mainitem.set_submenu(submenu)
+
         path = self.get_path_for_vfs_file(vfs_file)
         if path is None:
             return
+
         repo = self.get_repo_for_path(path)
         if repo is None:
+            ''' The name given to nautilus.MenuItem decides the
+                of the menu, which is ordered alpahbetically '''
             item = nautilus.MenuItem('HgNautilus::newtree',
                                  'Create New Repository',
                                  'Make directory versioned',
                                  self.icon('menucreaterepos.ico'))
             item.connect('activate', self._init_cb, vfs_file)
-            items.append(item)
+            submenu.append_item(item)
+
             item = nautilus.MenuItem('HgNautilus::clone',
                                  'Create Clone',
                                  'Create clone here from source',
                                  self.icon('menuclone.ico'))
             item.connect('activate', self._clone_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::about',
+            submenu.append_item(item)
+
+            item = nautilus.MenuItem('HgNautilus::99about',
                                  'About TortoiseHg',
                                  'Information about TortoiseHg installation',
                                  self.icon('menuabout.ico'))
             item.connect('activate', self._about_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::terminal',
-                                 'Open Terminal Here',
-                                 'Open terminal in current directory')
-            item.connect('activate', self._open_terminal_cb, vfs_file)
-            items.append(item)
-            return items
+            submenu.append_item(item)
+
+            return mainitem,
 
         if len(repo.changectx(None).parents()) > 1:
             self.rev0 = repo.changectx(None).parents()[0].rev()
@@ -233,131 +237,127 @@ class HgExtension(nautilus.MenuProvider,
                                  'Clean checkout of original parent revision',
                                  self.icon('menuunmerge.ico'))
             item.connect('activate', self._unmerge_cb, vfs_file)
-            items.append(item)
+            submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::commit',
+        item = nautilus.MenuItem('HgNautilus::10commit',
                              'Commit',
                              'Commit changes',
                              self.icon('menucommit.ico'))
         item.connect('activate', self._commit_cb, [vfs_file])
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::status',
+        item = nautilus.MenuItem('HgNautilus::20status',
                              'Show Status',
                              'Show Repository Status',
                              self.icon('menushowchanged.ico'))
         item.connect('activate', self._status_cb, vfs_file)
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::diff',
+        item = nautilus.MenuItem('HgNautilus::30diff',
                              'Visual Diff',
                              'Show Changes to Repository',
                              self.icon('menudiff.ico'))
         item.connect('activate', self._diff_cb, [vfs_file])
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::dag',
+        item = nautilus.MenuItem('HgNautilus::40dag',
                              'Revision History',
                              'Show revision DAG',
                              self.icon('menurevisiongraph.ico'))
         item.connect('activate', self._history_cb, [vfs_file])
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::datamine',
+        item = nautilus.MenuItem('HgNautilus::50datamine',
                              'Data Mining',
                              'Search revision history',
                              self.icon('menulog.ico'))
         item.connect('activate', self._datamine_cb, [vfs_file])
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::sync',
+        item = nautilus.MenuItem('HgNautilus::60sync',
                              'Synchronize',
                              'Sync with another repository',
                              self.icon('menusynch.ico'))
         item.connect('activate', self._sync_cb, vfs_file)
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::serve',
+        item = nautilus.MenuItem('HgNautilus::70serve',
                              'Web Server',
                              'Start internal web server',
                              self.icon('proxy.ico'))
         item.connect('activate', self._serve_cb, vfs_file)
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::recover',
+        item = nautilus.MenuItem('HgNautilus::75recover',
                              'Recovery',
                              'General repair and recovery of repository',
                              self.icon('general.ico'))
         item.connect('activate', self._recovery_cb, vfs_file)
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::repoconfig',
+        item = nautilus.MenuItem('HgNautilus::80repoconfig',
                              'Repository Settings',
                              'Configure Mercurial settings for this repo',
                              self.icon('menusettings.ico'))
         item.connect('activate', self._thgconfig_repo_cb, vfs_file)
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::userconfig',
+        item = nautilus.MenuItem('HgNautilus::85userconfig',
                              'User-Global Settings',
                              'Configure global Mercurial settings',
                              self.icon('menusettings.ico'))
         item.connect('activate', self._thgconfig_user_cb, vfs_file)
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::about',
+        item = nautilus.MenuItem('HgNautilus::99about',
                              'About TortoiseHg',
                              'Information about TortoiseHg installation',
                              self.icon('menuabout.ico'))
         item.connect('activate', self._about_cb, vfs_file)
-        items.append(item)
+        submenu.append_item(item)
 
-        item = nautilus.MenuItem('HgNautilus::terminal',
-                             'Open Terminal Here',
-                             'Open terminal in current directory')
-        item.connect('activate', self._open_terminal_cb, vfs_file)
-        items.append(item)
-        return items
+        return mainitem,
 
     def get_file_items(self, window, vfs_files):
+        mainitem = nautilus.MenuItem('HgNautilus', 'Mercurial', '')
+        submenu = nautilus.Menu()
+        mainitem.set_submenu(submenu)
+
         '''Build context menu for selected files'''
-        items = []
         if not vfs_files:
-            return items
+            return None
 
         vfs_file = vfs_files[0]
         path = self.get_path_for_vfs_file(vfs_file)
         repo = self.get_repo_for_path(path)
         if repo is None:
             if not vfs_file.is_directory():
-                return items
+                return None
 
             # Menu for unrevisioned subdirectory
             name = vfs_files[0].get_name()
-            item = nautilus.MenuItem('HgNautilus::newtree',
+            item = nautilus.MenuItem('HgNautilus::10newtree',
                                  'Make directory versioned',
                                  'Create Repository in %s' % name,
                                  self.icon('menucreaterepos.ico'))
             item.connect('activate', self._init_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::clone',
+            submenu.append_item(item)
+
+            item = nautilus.MenuItem('HgNautilus::20clone',
                                  'Create clone from source',
                                  'Create Clone in %s' % name,
                                  self.icon('menuclone.ico'))
             item.connect('activate', self._clone_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::about',
+            submenu.append_item(item)
+
+            item = nautilus.MenuItem('HgNautilus::99about',
                                  'About TortoiseHg',
                                  'Information about TortoiseHg installation',
                                  self.icon('menuabout.ico'))
             item.connect('activate', self._about_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::terminal',
-                                 'Open Terminal Here',
-                                 'Open Terminal in %s' % name)
-            item.connect('activate', self._open_terminal_cb, vfs_file)
-            items.append(item)
-            return items
+            submenu.append_item(item)
+
+            return mainitem,
 
         localpaths = []
         for vfs_file in vfs_files:
@@ -367,60 +367,65 @@ class HgExtension(nautilus.MenuProvider,
             localpath = path[len(repo.root)+1:]
             localpaths.append(localpath)
 
-        changes = repo.dirstate.status(localpaths, util.always, True, True)
+        if not localpaths:
+            return
+        path = localpaths[0]
+        cwd = os.path.isdir(path) and path or os.path.dirname(path)
+        matcher = match.exact(repo.root, cwd, localpaths)
+        changes = repo.dirstate.status(matcher, True, True, True)
         (lookup, modified, added, removed, deleted, unknown,
                 ignored, clean) = changes
 
         # Add menu items based on states list
         if unknown:
-            item = nautilus.MenuItem('HgNautilus::add',
+            item = nautilus.MenuItem('HgNautilus::30add',
                                  'Add Files',
                                  'Add unversioned files',
                                  self.icon('menuadd.ico'))
             item.connect('activate', self._add_cb, vfs_files)
-            items.append(item)
+            submenu.append_item(item)
 
         if modified or added or removed or deleted or unknown:
-            item = nautilus.MenuItem('HgNautilus::commit',
+            item = nautilus.MenuItem('HgNautilus::40commit',
                                  'Commit Files',
                                  'Commit changes',
                                  self.icon('menucommit.ico'))
             item.connect('activate', self._commit_cb, vfs_files)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::revert',
+            submenu.append_item(item)
+
+            item = nautilus.MenuItem('HgNautilus::50revert',
                                  'Undo Changes',
                                  'Revert changes to files',
                                  self.icon('menurevert.ico'))
             item.connect('activate', self._revert_cb, vfs_files)
-            items.append(item)
+            submenu.append_item(item)
 
         if modified or clean:
-            item = nautilus.MenuItem('HgNautilus::log',
+            item = nautilus.MenuItem('HgNautilus::60log',
                                  'File Changelog',
                                  'Show file revision history',
                                  self.icon('menulog.ico'))
             item.connect('activate', self._history_cb, vfs_files)
-            items.append(item)
             item = nautilus.MenuItem('HgNautilus::annotate',
                                  'Annotate File',
                                  'Annotate file at current revision',
                                  self.icon('menulog.ico'))
             item.connect('activate', self._datamine_cb, vfs_files)
-            items.append(item)
+            submenu.append_item(item)
 
 
         if modified:
-            item = nautilus.MenuItem('HgNautilus::diff',
+            item = nautilus.MenuItem('HgNautilus::70diff',
                                  'File Diffs',
                                  'Show file changes',
                                  self.icon('menudiff.ico'))
             item.connect('activate', self._diff_cb, vfs_files)
-            items.append(item)
+            submenu.append_item(item)
 
-        return items
+        return mainitem,
 
     def get_columns(self):
-        return nautilus.Column("HgNautilus::hg_status",
+        return nautilus.Column("HgNautilus::80hg_status",
                                "hg_status",
                                "HG Status",
                                "Version control status"),
@@ -431,7 +436,8 @@ class HgExtension(nautilus.MenuProvider,
 
         # This is not what the API is optimized for, but this appears
         # to work efficiently enough
-        changes = repo.dirstate.status([localpath], util.always, True, True)
+        matcher = match.always(repo.root, localpath)
+        changes = repo.dirstate.status(matcher, True, True, True)
         (lookup, modified, added, removed, deleted, unknown,
                 ignored, clean) = changes
 
