@@ -158,11 +158,6 @@ class GStatus(GDialog):
                         tip='move selected files to other directory'),
                     self.make_toolbutton(gtk.STOCK_DELETE, '_Remove',
                         self._remove_clicked, tip='remove'),
-                    gtk.SeparatorToolItem(),
-                    self.make_toolbutton(gtk.STOCK_YES, '_Select',
-                        self._sel_desel_clicked, True, tip='select'),
-                    self.make_toolbutton(gtk.STOCK_NO, '_Deselect',
-                        self._sel_desel_clicked, False, tip='deselect'),
                     gtk.SeparatorToolItem()]
 
         self.showdiff_toggle = gtk.ToggleToolButton(gtk.STOCK_JUSTIFY_FILL)
@@ -256,11 +251,12 @@ class GStatus(GDialog):
         stat_cell = gtk.CellRendererText()
 
         if self.count_revs() < 2:
-            col0 = gtk.TreeViewColumn('select', toggle_cell)
+            col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', 0)
-            col0.set_sort_column_id(0)
+            #col0.set_sort_column_id(0)
             col0.set_resizable(False)
             self.tree.append_column(col0)
+            self.selcb = self._add_header_checkbox(col0, self._sel_clicked)
         
         col1 = gtk.TreeViewColumn('st', stat_cell)
         col1.add_attribute(stat_cell, 'text', 1)
@@ -312,6 +308,7 @@ class GStatus(GDialog):
         self._diffpane.pack2(diff_frame, True, True)
         self._diffpane.set_position(self._setting_pos)
         self._diffpane_moved_id = self._diffpane.connect('notify::position', self._diffpane_moved)
+        self.tree.set_headers_clickable(True)
         return self._diffpane
 
 
@@ -342,6 +339,29 @@ class GStatus(GDialog):
         
         return hbox
 
+    def _add_header_checkbox(self, col, post=None, pre=None, toggle=False):
+        def cbclick(hdr, cb):
+            state = cb.get_active()
+            if pre:
+                pre(state)
+            if toggle:
+                cb.set_active(not state)
+            if post:
+                post(not state)
+            
+        cb = gtk.CheckButton(col.get_title())
+        cb.show()
+        col.set_widget(cb)
+        wgt = cb.get_parent()
+        while wgt:
+            if type(wgt) == gtk.Button:
+                wgt.connect("clicked", cbclick, cb)
+                return cb
+            wgt = wgt.get_parent()
+        print "Warning: checkbox action not connected"
+        return
+
+
     def _update_check_count(self):
         file_count = 0
         check_count = 0
@@ -350,6 +370,7 @@ class GStatus(GDialog):
             if row[0]:
                 check_count = check_count + 1
         self.counter.set_text(_('%d selected, %d total') % (check_count, file_count))
+        self.selcb.set_active(file_count == check_count)
 
     def prepare_display(self):
         self._ready = True
@@ -820,7 +841,7 @@ class GStatus(GDialog):
         self.reload_status()
 
 
-    def _sel_desel_clicked(self, toolbutton, state):
+    def _sel_clicked(self, state):
         for entry in self.model : entry[0] = state
         self._update_check_count()
         return True
