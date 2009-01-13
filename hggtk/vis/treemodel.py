@@ -10,7 +10,6 @@ dialog.  Other portions stolen from graphlog extension.
 import gtk
 import gobject
 import re
-from time import (strftime, gmtime)
 from mercurial import util
 from mercurial.node import short
 from mercurial.hgweb import webutil
@@ -23,10 +22,10 @@ from mercurial.hgweb import webutil
 # Besides, we want to be compatible older Python versions.
 try:
     # when history.py is invoked directly
-    from hglib import toutf
+    from hglib import toutf, displaytime
 except ImportError:
     # when history.py is imported and called from hgproc.py
-    from hggtk.hglib import toutf
+    from hggtk.hglib import toutf, displaytime
 
 # treemodel row enumerated attributes
 LINES = 0
@@ -128,7 +127,7 @@ class TreeModel(gtk.GenericTreeModel):
             else:
                 author = toutf(util.shortuser(ctx.user()))
 
-            date = strftime("%Y-%m-%d %H:%M:%S", gmtime(ctx.date()[0]))
+            date = displaytime(ctx.date())
 
             wc_parent = revid in self.parents
             head = revid in self.heads

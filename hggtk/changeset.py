@@ -22,9 +22,8 @@ from mercurial import cmdutil, util, ui, hg, commands
 from mercurial import context, patch, revlog
 from gdialog import *
 from hgcmd import CmdDialog
-from hglib import toutf, fromutf
+from hglib import toutf, fromutf, displaytime
 from gtklib import StatusBar
-
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -120,7 +119,7 @@ class ChangeSet(GDialog):
 
         # TODO: Add toggle for gmtime/localtime
         eob = buf.get_end_iter()
-        date = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(ctx.date()[0]))
+        date = displaytime(ctx.date())
         if self.clipboard:
             self.clipboard.set_text(short(ctx.node()))
         change = str(rev) + ':' + short(ctx.node())

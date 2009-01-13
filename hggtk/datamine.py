@@ -14,7 +14,7 @@ import re
 import threading, thread2
 import time
 from mercurial import hg, ui, util, revlog
-from hglib import hgcmd_toq, toutf, fromutf, gettabwidth
+from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime
 from gdialog import *
 from vis import treemodel
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
@@ -148,7 +148,7 @@ class DataMineDialog(GDialog):
         author = util.shortuser(ctx.user())
         summary = ctx.description().replace('\0', '')
         summary = summary.split('\n')[0]
-        date = time.strftime("%y-%m-%d %H:%M", time.gmtime(ctx.date()[0]))
+        date = displaytime(ctx.date())
         desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
         self.changedesc[rev] = (desc, author)
         return (desc, author)

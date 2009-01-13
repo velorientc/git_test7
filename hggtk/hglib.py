@@ -387,3 +387,6 @@ def hgcmd_toq(path, q, *args):
                     q.put(str(a))
     u = Qui()
     return thgdispatch(u, path, list(args))
+
+def displaytime(date):
+    return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')

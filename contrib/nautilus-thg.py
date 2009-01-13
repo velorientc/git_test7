@@ -21,6 +21,7 @@ import sys
 import tempfile
 import time
 import urllib
+from hggtk.hglib import displaytime
 
 TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
 TERMINAL_KEY = '/desktop/gnome/applications/terminal/exec'
@@ -513,7 +514,7 @@ class HgExtension(nautilus.MenuProvider,
             rev = ctx.rev()
         ctx = repo.changectx(rev)
         node = short(ctx.node())
-        date = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(ctx.date()[0]))
+        date = displaytime(ctx.date())
         parents = '\n'.join([short(p.node()) for p in ctx.parents()])
         description = ctx.description()
         user = ctx.user()
