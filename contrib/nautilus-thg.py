@@ -12,7 +12,7 @@
 import gconf
 import gtk
 import gobject
-from mercurial import hg, ui, repo, match
+from mercurial import hg, ui, repo, match, util
 from mercurial.node import short
 import nautilus
 import os
@@ -21,8 +21,6 @@ import sys
 import tempfile
 import time
 import urllib
-from hggtk.hglib import displaytime
-
 TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
 TERMINAL_KEY = '/desktop/gnome/applications/terminal/exec'
 
@@ -514,7 +512,7 @@ class HgExtension(nautilus.MenuProvider,
             rev = ctx.rev()
         ctx = repo.changectx(rev)
         node = short(ctx.node())
-        date = displaytime(ctx.date())
+        date = util.datestr(ctx.date(), '%Y-%m-%d %H:%M:%S %1%2')
         parents = '\n'.join([short(p.node()) for p in ctx.parents()])
         description = ctx.description()
         user = ctx.user()
