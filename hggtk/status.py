@@ -23,13 +23,14 @@ import pango
 
 from mercurial.i18n import _
 from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands, patch
+from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff
 from mercurial import merge as merge_
 from hgext import extdiff
 from shlib import shell_notify
 from hglib import toutf, rootpath, gettabwidth
 from gdialog import *
 from dialog import entry_dialog
+import hgshelve
 
 class GStatus(GDialog):
     """GTK+ based dialog for displaying repository status
@@ -168,6 +169,17 @@ class GStatus(GDialog):
         self.showdiff_toggle.set_active(False)
         self._showdiff_toggled_id = self.showdiff_toggle.connect('toggled', self._showdiff_toggled )
         tbuttons.append(self.showdiff_toggle)
+        
+        self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, 'Shelve',
+                self._shelve_clicked, tip='set aside selected changes')
+        self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, 'Unshelve',
+                self._unshelve_clicked, tip='restore shelved changes')
+        tbuttons += [
+                gtk.SeparatorToolItem(),
+                self.shelve_btn,
+                self.unshelve_btn,
+            ]
+
         return tbuttons
 
 
@@ -298,7 +310,24 @@ class GStatus(GDialog):
         self.diff_text.set_wrap_mode(gtk.WRAP_NONE)
         self.diff_text.set_editable(False)
         self.diff_text.modify_font(pango.FontDescription(self.fontdiff))
-        scroller.add(self.diff_text)
+
+        # use treeview to diff hunks
+        self.diff_model = gtk.ListStore(bool, str, 'gboolean')
+        self.diff_tree = gtk.TreeView(self.diff_model)
+        self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
+        self.diff_tree.set_property('enable-grid-lines', True)
+        self.diff_tree.connect('button-press-event', 
+                self._diff_tree_button_press)
+        
+        diff_hunk_cell = gtk.CellRendererText()
+        diff_hunk_cell.set_property('cell-background', '#EEEEEE')
+        diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell, markup=1,
+                cell_background_set=2)
+        diffcol.set_resizable(True)
+        self.diff_tree.append_column(diffcol)
+        
+        scroller.add(self.diff_tree)
 
         if self.diffbottom:
             self._diffpane = gtk.VPaned()
@@ -487,6 +516,9 @@ class GStatus(GDialog):
         self._update_check_count()
         return True
 
+    def _select_diff_toggle(self, cellrenderer, path):
+        self.diff_model[path][0] = not self.diff_model[path][0]
+        return True
 
     def _show_toggle(self, check, type):
         self.opts[type] = check.get_active()
@@ -617,6 +649,43 @@ class GStatus(GDialog):
 
 
     def _tree_selection_changed(self, selection, force):
+        if self.showdiff_toggle.get_active():
+            files = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
+            if force or files != self._last_files:
+                self._last_files = files
+                #self._show_diff_text(files)
+                self._show_diff_hunks(files)
+        return False
+
+    def _diff_tree_button_press(self, widget, event):
+        if event.button == 1:
+            tup = widget.get_path_at_pos(int(event.x), int(event.y))
+            if tup is None:
+                return False
+            path = tup[0]
+            
+            def get_hunk_pos(filename):
+                l = []
+                for n, hunk in enumerate(self._shelve_chunks):
+                    if hunk.filename() == filename:
+                        l.append(n)
+                return l
+            
+            # cliked on header hunk to select/unselect all hunks in file 
+            hunk = self._shelve_chunks[path[0]]
+            if isinstance(hunk, hgshelve.header):
+                l = get_hunk_pos(hunk.filename())
+                selection = self.diff_tree.get_selection()
+                selected = selection.path_is_selected(path)
+                for i in l:
+                    if selected:
+                        selection.unselect_path((i,))
+                    else:
+                        selection.select_path((i,))
+                return True     # stop further event handling
+        return False    # try next handler
+
+    def _show_diff_text(self, files):
         ''' Update the diff text '''
         def dohgdiff():
             difftext = []
@@ -655,13 +724,67 @@ class GStatus(GDialog):
 
             self.diff_text.set_buffer(buffer)
 
-        if self.showdiff_toggle.get_active():
-            files = [self.model[iter][3] for iter in self.tree.get_selection().get_selected_rows()[1]]
-            if force or files != self._last_files:
-                self._last_files = files
-                self._hg_call_wrapper('Diff', dohgdiff)
-        return False
+        self._hg_call_wrapper('Diff', dohgdiff)
+ 
+    def _show_diff_hunks(self, files):
+        ''' Update the diff text '''
+        def markup(chunk):
+            import cgi
+            hunk = ""
+            chunk.seek(0)
+            lines = chunk.readlines()
+            lines[-1] = lines[-1].strip('\n\r')
+            for line in lines:
+                line = cgi.escape(util.fromlocal(line))
+                if line.startswith('---') or line.startswith('+++'):
+                    hunk += '<span foreground="#000090">%s</span>' % line
+                elif line.startswith('-'):
+                    hunk += '<span foreground="#900000">%s</span>' % line
+                elif line.startswith('+'):
+                    hunk += '<span foreground="#006400">%s</span>' % line
+                elif line.startswith('@@'):
+                    hunk = '<span foreground="#FF8000">%s</span>' % line
+                else:
+                    hunk += line
 
+            return hunk
+
+        def dohgdiff():
+            self.diff_model.clear()
+            try:
+                difftext = []
+                if len(files) != 0:
+                    wfiles = [self.repo.wjoin(x) for x in files]
+                    matcher = cmdutil.match(self.repo, wfiles, self.opts)
+                    diffopts = mdiff.diffopts(git=True, nodates=True)
+                    for s in patch.diff(self.repo, self._node1, self._node2,
+                            match=matcher, opts=diffopts):
+                        difftext.extend(s.splitlines(True))
+                difftext = StringIO.StringIO(''.join(difftext))
+                difftext.seek(0)
+                self._shelve_chunks = hgshelve.parsepatch(difftext)
+                
+                for chunk in self._shelve_chunks:
+                    fp = StringIO.StringIO()
+                    chunk.pretty(fp)
+                    markedup = markup(fp)
+                    isheader = isinstance(chunk, hgshelve.header)
+                    self.diff_model.append([True, markedup, isheader])
+            finally:
+                difftext.close()
+
+        self._hg_call_wrapper('Diff', dohgdiff)
+
+    def _has_shelve_file(self):
+        return os.path.exists(self.repo.join('shelve'))
+        
+    def _activate_shelve_buttons(self, status):
+        if status:
+            self.shelve_btn.set_sensitive(True)
+            self.unshelve_btn.set_sensitive(self._has_shelve_file())
+        else:
+            self.shelve_btn.set_sensitive(False)
+            self.unshelve_btn.set_sensitive(False)
 
     def _showdiff_toggled(self, togglebutton, data=None):
         # prevent movement events while setting position
@@ -675,6 +798,7 @@ class GStatus(GDialog):
             self._diffpane.set_position(64000)
             self.diff_text.set_buffer(gtk.TextBuffer())
 
+        self._activate_shelve_buttons(togglebutton.get_active())
         self._diffpane.handler_unblock(self._diffpane_moved_id)
         return True
 
@@ -695,6 +819,7 @@ class GStatus(GDialog):
             self.showdiff_toggle.set_active(True)
             self._tree_selection_changed(self.tree.get_selection(), True)
 
+        self._activate_shelve_buttons(self.showdiff_toggle.get_active())
         self.showdiff_toggle.handler_unblock(self._showdiff_toggled_id)
         return False
         
@@ -783,6 +908,73 @@ class GStatus(GDialog):
             shell_notify(wfiles)
             self.reload_status()
 
+    def _shelve_selected(self):
+        treeselection = self.diff_tree.get_selection()
+        (model, pathlist) = treeselection.get_selected_rows()
+        hlist = [x[0] for x in pathlist]
+        if not hlist:
+            Prompt('Shelve', 'Please select diff chunks to shelve',
+                    self).run()
+            return
+
+        doforce = False
+        doappend = False
+        if self._has_shelve_file():
+            from gtklib import MessageDialog
+            dialog = MessageDialog(flags=gtk.DIALOG_MODAL)
+            dialog.set_title('Shelve')
+            dialog.set_markup('<b>Shelve file exists!</b>')
+            dialog.add_buttons('Overwrite', 1, 'Append', 2, 'Cancel', -1)
+            dialog.set_transient_for(self)
+            rval = dialog.run()
+            dialog.destroy()
+            if rval == -1:
+                return
+            if rval == 1:
+                doforce = True
+            if rval == 2:
+                doappend = True
+
+        # capture the selected hunks to shelve
+        fc = []
+        sc = []
+        for n, c in enumerate(self._shelve_chunks):
+            if isinstance(c, hgshelve.header):
+                if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
+                    sc += fc
+                fc = [c]
+            elif n in hlist:
+                fc.append(c)
+        if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
+            sc += fc
+                
+        def filter_patch(ui, chunks):
+            return sc
+
+        # shelve them!
+        self.ui.interactive = True  # hgshelve only works 'interactively'
+        opts = {'addremove': None, 'include': [], 'force': doforce,
+                'append': doappend, 'exclude': []}
+        hgshelve.filterpatch = filter_patch
+        hgshelve.shelve(self.ui, self.repo, **opts)
+        self.reload_status()
+        
+    def _unshelve(self):
+        opts = {'addremove': None, 'include': [], 'force': None,
+                'append': None, 'exclude': [], 'inspect': None}
+        try:
+            hgshelve.unshelve(self.ui, self.repo, **opts)
+            self.reload_status()
+        except:
+            pass
+
+    def _shelve_clicked(self, toolbutton, data=None):
+        self._shelve_selected()
+        self._activate_shelve_buttons(True)
+
+    def _unshelve_clicked(self, toolbutton, data=None):
+        self._unshelve()
+        self._activate_shelve_buttons(True)
 
     def _remove_clicked(self, toolbutton, data=None):
         remove_list = self._relevant_files('C')
@@ -975,7 +1167,7 @@ class GStatus(GDialog):
 
 def run(root='', cwd='', files=[], **opts):
     u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
+    u.updateopts(debug=False, traceback=False, quiet=True)
     repo = hg.repository(u, path=root)
 
     cmdoptions = {
