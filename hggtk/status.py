@@ -868,11 +868,18 @@ class GStatus(GDialog):
 
 
     def _sel_clicked(self, state):
-        for entry in self.model : entry[0] = state
-        self._update_check_count()
+        self._select_files(state)
         return True
 
 
+    def _select_files(self, state, ctype=None):
+        for entry in self.model:
+            if ctype and not entry[1] in ctype:
+                continue
+            entry[0] = state
+        self._update_check_count()
+
+    
     def _relevant_files(self, stats):
         return [item[3] for item in self.model if item[0] and item[1] in stats]
 
