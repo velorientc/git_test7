@@ -81,6 +81,7 @@ class GStatus(GDialog):
                 (('_view', self._view_file),
                     ('re_move', self._remove_file),
                     ('re_name', self._rename_file),
+                    ('_copy', self._copy_file),
                     ('l_og', self._log_file)),
                 # ignored
                 (('_view', self._view_file),
@@ -543,6 +544,14 @@ class GStatus(GDialog):
         return True
 
 
+    def _copy_file(self, stat, file):
+        fdir, fname = os.path.split(file)
+        newfile = entry_dialog(self, "Copy file to:", True, fname)
+        if newfile and newfile != fname:
+            self._hg_copy([file, os.path.join(fdir, newfile)])
+        return True
+
+
     def _hg_remove(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
@@ -572,6 +581,23 @@ class GStatus(GDialog):
             #moveopts['force'] = True
             commands.rename(self.ui, self.repo, *wfiles, **moveopts)
         success, outtext = self._hg_call_wrapper('Move', dohgmove)
+        if success:
+            self.reload_status()
+
+
+    def _hg_copy(self, files):
+        wfiles = [self.repo.wjoin(x) for x in files]
+        if self.count_revs() > 1:
+            Prompt('Nothing Copied', 'Copy is not enabled when '
+                    'multiple revisions are specified.', self).run()
+            return
+
+        # Create new opts, so nothing unintented gets through
+        cmdopts = self.merge_opts(commands.table['copy|cp'][1],
+                ('include', 'exclude'))
+        def dohgcopy():
+            commands.copy(self.ui, self.repo, *wfiles, **cmdopts)
+        success, outtext = self._hg_call_wrapper('Copy', dohgcopy)
         if success:
             self.reload_status()
 
