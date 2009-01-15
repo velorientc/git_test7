@@ -545,10 +545,23 @@ class GStatus(GDialog):
 
 
     def _copy_file(self, stat, file):
+        file = self.repo.wjoin(file)
         fdir, fname = os.path.split(file)
-        newfile = entry_dialog(self, "Copy file to:", True, fname)
-        if newfile and newfile != fname:
-            self._hg_copy([file, os.path.join(fdir, newfile)])
+        dialog = gtk.FileChooserDialog(parent=self,
+                title='Copy file to',
+                action=gtk.FILE_CHOOSER_ACTION_SAVE,
+                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
+                         gtk.STOCK_COPY,gtk.RESPONSE_OK))
+        dialog.set_default_response(gtk.RESPONSE_OK)
+        dialog.set_current_folder(fdir)
+        dialog.set_current_name(fname)
+        response = dialog.run()
+        newfile=file
+        if response == gtk.RESPONSE_OK:
+            newfile = dialog.get_filename()
+        dialog.destroy()
+        if newfile != file:
+            self._hg_copy([file, newfile])
         return True
 
 
