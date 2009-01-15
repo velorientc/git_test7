@@ -370,8 +370,9 @@ class GStatus(GDialog):
             file_count = file_count + 1
             if row[0]:
                 check_count = check_count + 1
-        self.counter.set_text(_('%d selected, %d total') % (check_count, file_count))
-        self.selcb.set_active(file_count == check_count)
+        self.counter.set_text(_('%d selected, %d total') % 
+                (check_count, file_count))
+        self.selcb.set_active(file_count and file_count == check_count)
 
     def prepare_display(self):
         self._ready = True
