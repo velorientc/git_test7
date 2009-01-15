@@ -15,7 +15,6 @@ import gtk
 import pango
 
 from mercurial.i18n import _
-from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff
 from mercurial import merge as merge_
 from shlib import shell_notify

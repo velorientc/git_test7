@@ -18,11 +18,16 @@ import gtk
 import shlex
 from mercurial.i18n import _
 from mercurial import hg, util, fancyopts, commands, cmdutil
-from mercurial.repo import RepoError
 import mercurial.ui as _ui
 
-class ParseError(Exception):
-    """Exception raised on errors in parsing the command line."""
+try:
+    from mercurial.error import RepoError, UnknownCommand, AmbiguousCommand
+    from mercurial.error import ParseError
+except ImportError:
+    from mercurial.repo import RepoError
+    from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
+    class ParseError(Exception):
+        """Exception raised on errors in parsing the command line."""
 
 nonrepo_commands = 'userconfig clone init about help'
 
@@ -82,11 +87,11 @@ def _runcatch(ui, args):
             help_(ui, inst.args[0])
         else:
             ui.warn(_("hgtk: %s\n") % inst.args[1])
-            help_('shortlist')
-    except cmdutil.AmbiguousCommand, inst:
+            help_(ui, 'shortlist')
+    except AmbiguousCommand, inst:
         ui.warn(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
-    except cmdutil.UnknownCommand, inst:
+    except UnknownCommand, inst:
         ui.warn(_("hgtk: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
     except RepoError, inst:

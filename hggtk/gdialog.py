@@ -24,8 +24,8 @@ import gobject
 import pango
 
 from mercurial.i18n import _
-from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands, patch
+from mercurial.node import short
+from mercurial import cmdutil, util, ui, hg, commands
 from hgext import extdiff
 from shlib import shell_notify, set_tortoise_icon, Settings
 from thgconfig import ConfigDialog

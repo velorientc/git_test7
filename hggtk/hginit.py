@@ -11,7 +11,8 @@ import sys
 import gtk
 import pango
 from dialog import error_dialog, info_dialog
-from mercurial import hg, ui, util, repo
+from mercurial import hg, ui, util
+from hglib import RepoError
 import shlib
 
 class InitDialog(gtk.Window):
@@ -146,7 +147,7 @@ class InitDialog(gtk.Window):
 
         try:
             hg.repository(u, dest, create=1)
-        except repo.RepoError, inst:
+        except RepoError, inst:
             error_dialog(self, "Unable to create new repository",
                     str(inst))
             return False

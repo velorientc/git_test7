@@ -14,7 +14,7 @@ import shlib
 from tempfile import mkstemp
 from dialog import *
 from mercurial import hg, ui, extensions
-from mercurial.repo import RepoError
+from hglib import RepoError
 from thgconfig import ConfigDialog
 from hgcmd import CmdDialog
 

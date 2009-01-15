@@ -12,7 +12,7 @@
 import gconf
 import gtk
 import gobject
-from mercurial import hg, ui, repo, match, util
+from mercurial import hg, ui, match, util
 from mercurial.node import short
 import nautilus
 import os
@@ -21,6 +21,12 @@ import sys
 import tempfile
 import time
 import urllib
+
+try:
+    from mercurial.error import RepoError
+except ImportError:
+    from mercurial.repo import RepoError
+
 TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
 TERMINAL_KEY = '/desktop/gnome/applications/terminal/exec'
 
@@ -71,7 +77,7 @@ class HgExtension(nautilus.MenuProvider,
             self.cacheroot = p
             self.cacherepo = hg.repository(ui.ui(), path=p)
             return self.cacherepo
-        except repo.RepoError:
+        except RepoError:
             self.cacheroot = None
             self.cacherepo = None
             return None

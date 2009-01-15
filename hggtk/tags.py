@@ -14,8 +14,8 @@ import sys
 import gtk
 import gobject
 from mercurial import hg, ui, cmdutil, util, node
-from mercurial.repo import RepoError
 from mercurial.i18n import _
+from hglib import RepoError
 
 def get_tag_list(path):
     root = path

@@ -12,7 +12,7 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 import gtk
 import pango
 import sys
-from hglib import gettabwidth
+from hglib import gettabwidth, RepoError
 from mercurial import hg, ui, cmdutil, util, patch
 from mercurial.i18n import _
 from shlib import set_tortoise_icon
@@ -110,7 +110,7 @@ class DiffWindow(gtk.Window):
         self.ui = ui.ui()
         try:
             self.repo = hg.repository(self.ui, path=self.root)
-        except hg.RepoError:
+        except RepoError:
             return None
 
         matcher = cmdutil.match(self.repo, self.files)

@@ -16,6 +16,7 @@ import tempfile
 import cStringIO
 
 from mercurial.i18n import _
+from mercurial.node import *
 from mercurial import ui, hg
 from shlib import shell_notify
 from gdialog import *

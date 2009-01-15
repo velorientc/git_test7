@@ -15,9 +15,9 @@ import sys
 import gtk
 from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
-from mercurial.repo import RepoError
 from mercurial.i18n import _
-from mercurial.node import *
+from mercurial.node import short
+from hglib import RepoError
 
 class TagAddDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """

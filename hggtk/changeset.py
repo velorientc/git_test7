@@ -16,14 +16,17 @@ import gobject
 import pango
 import StringIO
 
-from mercurial.i18n import _
 from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands
-from mercurial import context, patch, revlog
+from mercurial import cmdutil, context, util, ui, hg, patch
 from gdialog import *
 from hgcmd import CmdDialog
 from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand
 from gtklib import StatusBar
+
+try:
+    from mercurial.error import LookupError
+except ImportError:
+    from mercurial.revlog import LookupError
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -268,7 +271,7 @@ class ChangeSet(GDialog):
                 if f in files:
                     try:
                         src = getfilectx(f, c).renamed()
-                    except revlog.LookupError:
+                    except LookupError:
                         return None
                     if src:
                         f = src[0]
@@ -293,7 +296,7 @@ class ChangeSet(GDialog):
                 s = 'A'
                 ctx1.filectx(f)
                 s = 'M'
-            except revlog.LookupError:
+            except LookupError:
                 pass
             status[f] = s
             return s
@@ -623,7 +626,7 @@ class ChangeSet(GDialog):
         try:
             fctx = ctx.filectx(self.curfile)
             has_filelog = fctx.filelog().linkrev(fctx.filerev()) == ctx.rev()
-        except revlog.LookupError:
+        except LookupError:
             has_filelog = False
         self._ann_menu.set_sensitive(has_filelog)
         self._save_menu.set_sensitive(has_filelog)

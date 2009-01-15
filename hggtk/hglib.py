@@ -5,10 +5,14 @@ import traceback
 import threading, thread2
 import Queue
 from mercurial import hg, ui, util, extensions, commands, hook
-from mercurial.repo import RepoError
-from mercurial.node import *
 from mercurial.i18n import _
 from dialog import entry_dialog
+
+try:
+    from mercurial.error import RepoError, ParseError
+except ImportError:
+    from mercurial.repo import RepoError
+    from mercurial.cmdutil import ParseError
 
 try:
     try:
