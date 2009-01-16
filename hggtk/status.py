@@ -299,8 +299,8 @@ class GStatus(GDialog):
         diff_frame.add(scroller)
         
         # use treeview to diff hunks
-        # rejected, difftext, !isheader
-        self.diff_model = gtk.ListStore(bool, str, bool)
+        # rejected, difftext, !isheader, isheader, chunkid
+        self.diff_model = gtk.ListStore(bool, str, bool, bool, int)
         self.diff_tree = gtk.TreeView(self.diff_model)
         self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
@@ -313,11 +313,9 @@ class GStatus(GDialog):
         
         diff_hunk_cell = gtk.CellRendererText()
         diff_hunk_cell.set_property('cell-background', '#EEEEEE')
-        diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell, markup=1,
-                cell_background_set=2)
+        diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell, strikethrough=0, 
+                markup=1, strikethrough_set=2, cell_background_set=3)
         diffcol.set_resizable(True)
-        diffcol.add_attribute(diff_hunk_cell, "strikethrough", 0)
-        diffcol.add_attribute(diff_hunk_cell, "strikethrough-set", 2)
         self.diff_tree.append_column(diffcol)
         
         scroller.add(self.diff_tree)
@@ -477,6 +475,9 @@ class GStatus(GDialog):
         if not selected:
             selection.select_path((0,))
 
+        files = [row[3] for row in self.model]
+        self._show_diff_hunks(files)
+
         self.tree.show()
         self.tree.grab_focus()
         return True
@@ -508,9 +509,6 @@ class GStatus(GDialog):
         self._update_check_count()
         return True
 
-    def _select_diff_toggle(self, cellrenderer, path):
-        self.diff_model[path][0] = not self.diff_model[path][0]
-        return True
 
     def _show_toggle(self, check, type):
         self.opts[type] = check.get_active()
@@ -641,42 +639,46 @@ class GStatus(GDialog):
 
 
     def _tree_selection_changed(self, selection, force):
-        if self.showdiff_toggle.get_active():
-            files = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
-            if force or files != self._last_files:
-                self._last_files = files
-                self._show_diff_hunks(files)
+        # TODO: SJB Zoom diff_tree to first diff of this file
+        #if self.showdiff_toggle.get_active():
+        #    files = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
+        #    if force or files != self._last_files:
+        #        self._last_files = files
+        #        self._show_diff_hunks(files)
         return False
 
     def _diff_tree_row_act(self, tree, path, column):
-        self.diff_model[path][0] = not self.diff_model[path][0]
+        if self.diff_model[path][2]:
+            self.diff_model[path][0] = not self.diff_model[path][0]
 
     def _diff_tree_button_press(self, widget, event):
-        if event.button == 1:
-            tup = widget.get_path_at_pos(int(event.x), int(event.y))
-            if tup is None:
-                return False
-            path = tup[0]
-            
-            def get_hunk_pos(filename):
-                l = []
-                for n, hunk in enumerate(self._shelve_chunks):
-                    if hunk.filename() == filename:
-                        l.append(n)
-                return l
-            
-            # cliked on header hunk to select/unselect all hunks in file 
-            hunk = self._shelve_chunks[path[0]]
-            if isinstance(hunk, hgshelve.header):
-                l = get_hunk_pos(hunk.filename())
-                selection = self.diff_tree.get_selection()
-                selected = selection.path_is_selected(path)
-                for i in l:
-                    if selected:
-                        selection.unselect_path((i,))
-                    else:
-                        selection.select_path((i,))
-                return True     # stop further event handling
+        # Used to select all of file patch, will be no longer necessary
+        #   activating rows in file list will set/clear all patch parts
+        #if event.button == 1:
+        #    tup = widget.get_path_at_pos(int(event.x), int(event.y))
+        #    if tup is None:
+        #        return False
+        #    path = tup[0]
+        #    
+        #    def get_hunk_pos(filename):
+        #        l = []
+        #        for n, hunk in enumerate(self._shelve_chunks):
+        #            if hunk.filename() == filename:
+        #                l.append(n)
+        #        return l
+        #    
+        #    # cliked on header hunk to select/unselect all hunks in file 
+        #    hunk = self._shelve_chunks[path[0]]
+        #    if isinstance(hunk, hgshelve.header):
+        #        l = get_hunk_pos(hunk.filename())
+        #        selection = self.diff_tree.get_selection()
+        #        selected = selection.path_is_selected(path)
+        #        for i in l:
+        #            if selected:
+        #                selection.unselect_path((i,))
+        #            else:
+        #                selection.select_path((i,))
+        #        return True     # stop further event handling
         return False    # try next handler
 
     def _show_diff_hunks(self, files):
@@ -717,12 +719,12 @@ class GStatus(GDialog):
                 difftext.seek(0)
                 self._shelve_chunks = hgshelve.parsepatch(difftext)
                 
-                for chunk in self._shelve_chunks:
+                for n, chunk in enumerate(self._shelve_chunks):
                     fp = cStringIO.StringIO()
                     chunk.pretty(fp)
                     markedup = markup(fp)
                     isheader = isinstance(chunk, hgshelve.header)
-                    self.diff_model.append([False, markedup, not isheader])
+                    self.diff_model.append([False, markedup, not isheader, isheader, n])
             finally:
                 difftext.close()
 
@@ -862,9 +864,8 @@ class GStatus(GDialog):
             self.reload_status()
 
     def _shelve_selected(self):
-        treeselection = self.diff_tree.get_selection()
-        (model, pathlist) = treeselection.get_selected_rows()
-        hlist = [x[0] for x in pathlist]
+        # get list of hunks that have not been rejected
+        hlist = [x[4] for x in self.diff_model if not x[0]]
         if not hlist:
             Prompt('Shelve', 'Please select diff chunks to shelve',
                     self).run()
