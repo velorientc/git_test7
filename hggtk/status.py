@@ -7,7 +7,7 @@
 
 
 import os
-import StringIO
+import cStringIO
 
 import pygtk
 pygtk.require('2.0')
@@ -712,12 +712,12 @@ class GStatus(GDialog):
                     for s in patch.diff(self.repo, self._node1, self._node2,
                             match=matcher, opts=diffopts):
                         difftext.extend(s.splitlines(True))
-                difftext = StringIO.StringIO(''.join(difftext))
+                difftext = cStringIO.StringIO(''.join(difftext))
                 difftext.seek(0)
                 self._shelve_chunks = hgshelve.parsepatch(difftext)
                 
                 for chunk in self._shelve_chunks:
-                    fp = StringIO.StringIO()
+                    fp = cStringIO.StringIO()
                     chunk.pretty(fp)
                     markedup = markup(fp)
                     isheader = isinstance(chunk, hgshelve.header)
