@@ -300,7 +300,7 @@ class GStatus(GDialog):
         
         # use treeview to diff hunks
         # rejected, difftext, !isheader
-        self.diff_model = gtk.ListStore(bool, str, 'gboolean')
+        self.diff_model = gtk.ListStore(bool, str, bool)
         self.diff_tree = gtk.TreeView(self.diff_model)
         self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
