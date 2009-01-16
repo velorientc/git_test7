@@ -304,11 +304,14 @@ class GStatus(GDialog):
         self.diff_text.modify_font(pango.FontDescription(self.fontdiff))
 
         # use treeview to diff hunks
+        # rejected, difftext, !isheader
         self.diff_model = gtk.ListStore(bool, str, 'gboolean')
         self.diff_tree = gtk.TreeView(self.diff_model)
         self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
         self.diff_tree.set_property('enable-grid-lines', True)
+        self.diff_tree.connect('row-activated',
+                self._diff_tree_row_act)
         self.diff_tree.connect('button-press-event', 
                 self._diff_tree_button_press)
         
@@ -317,6 +320,8 @@ class GStatus(GDialog):
         diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell, markup=1,
                 cell_background_set=2)
         diffcol.set_resizable(True)
+        diffcol.add_attribute(diff_hunk_cell, "strikethrough", 0)
+        diffcol.add_attribute(diff_hunk_cell, "strikethrough-set", 2)
         self.diff_tree.append_column(diffcol)
         
         scroller.add(self.diff_tree)
@@ -648,6 +653,9 @@ class GStatus(GDialog):
                 self._show_diff_hunks(files)
         return False
 
+    def _diff_tree_row_act(self, tree, path, column):
+        self.diff_model[path][0] = not self.diff_model[path][0]
+
     def _diff_tree_button_press(self, widget, event):
         if event.button == 1:
             tup = widget.get_path_at_pos(int(event.x), int(event.y))
@@ -760,7 +768,7 @@ class GStatus(GDialog):
                     chunk.pretty(fp)
                     markedup = markup(fp)
                     isheader = isinstance(chunk, hgshelve.header)
-                    self.diff_model.append([True, markedup, isheader])
+                    self.diff_model.append([False, markedup, not isheader])
             finally:
                 difftext.close()
 
