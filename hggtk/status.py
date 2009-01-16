@@ -298,11 +298,6 @@ class GStatus(GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         diff_frame.add(scroller)
         
-        self.diff_text = gtk.TextView()
-        self.diff_text.set_wrap_mode(gtk.WRAP_NONE)
-        self.diff_text.set_editable(False)
-        self.diff_text.modify_font(pango.FontDescription(self.fontdiff))
-
         # use treeview to diff hunks
         # rejected, difftext, !isheader
         self.diff_model = gtk.ListStore(bool, str, 'gboolean')
@@ -649,7 +644,6 @@ class GStatus(GDialog):
             files = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
             if force or files != self._last_files:
                 self._last_files = files
-                #self._show_diff_text(files)
                 self._show_diff_hunks(files)
         return False
 
@@ -684,47 +678,6 @@ class GStatus(GDialog):
                 return True     # stop further event handling
         return False    # try next handler
 
-    def _show_diff_text(self, files):
-        ''' Update the diff text '''
-        def dohgdiff():
-            difftext = []
-            if len(files) != 0:
-                wfiles = [self.repo.wjoin(x) for x in files]
-                matcher = cmdutil.match(self.repo, wfiles, self.opts)
-                for s in patch.diff(self.repo, self._node1, self._node2, match=matcher,
-                                    opts=patch.diffopts(self.ui, self.opts)):
-                    difftext.extend(s.splitlines(True))
-
-            buffer = gtk.TextBuffer()
-            buffer.create_tag('removed', foreground='#900000')
-            buffer.create_tag('added', foreground='#006400')
-            buffer.create_tag('position', foreground='#FF8000')
-            buffer.create_tag('header', foreground='#000090')
-
-            iter = buffer.get_start_iter()
-            for line in difftext:
-                line = toutf(line)
-                if line.startswith('---') or line.startswith('+++'):
-                    buffer.insert_with_tags_by_name(iter, line, 'header')
-                elif line.startswith('-'):
-                    if self.tabwidth:
-                        line = line[0] + line[1:].expandtabs(self.tabwidth)
-                    buffer.insert_with_tags_by_name(iter, line, 'removed')
-                elif line.startswith('+'):
-                    if self.tabwidth:
-                        line = line[0] + line[1:].expandtabs(self.tabwidth)
-                    buffer.insert_with_tags_by_name(iter, line, 'added')
-                elif line.startswith('@@'):
-                    buffer.insert_with_tags_by_name(iter, line, 'position')
-                else:
-                    if self.tabwidth:
-                        line = line[0] + line[1:].expandtabs(self.tabwidth)
-                    buffer.insert(iter, line)
-
-            self.diff_text.set_buffer(buffer)
-
-        self._hg_call_wrapper('Diff', dohgdiff)
- 
     def _show_diff_hunks(self, files):
         ''' Update the diff text '''
         def markup(chunk):
@@ -795,7 +748,7 @@ class GStatus(GDialog):
         else:
             self._setting_lastpos = self._diffpane.get_position()
             self._diffpane.set_position(64000)
-            self.diff_text.set_buffer(gtk.TextBuffer())
+            #self.diff_text.set_buffer(gtk.TextBuffer())
 
         self._activate_shelve_buttons(togglebutton.get_active())
         self._diffpane.handler_unblock(self._diffpane_moved_id)
@@ -813,7 +766,7 @@ class GStatus(GDialog):
         if self.showdiff_toggle.get_active():
             if paned.get_position() >=  sizemax - 55:
                 self.showdiff_toggle.set_active(False)
-                self.diff_text.set_buffer(gtk.TextBuffer())
+                #self.diff_text.set_buffer(gtk.TextBuffer())
         elif paned.get_position() < sizemax - 55:
             self.showdiff_toggle.set_active(True)
             self._tree_selection_changed(self.tree.get_selection(), True)
