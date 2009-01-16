@@ -7,25 +7,17 @@
 
 
 import os
-import threading
 import StringIO
-import sys
-import shutil
-import tempfile
-import datetime
-import cPickle
 
 import pygtk
 pygtk.require('2.0')
 import gtk
-import gobject
 import pango
 
 from mercurial.i18n import _
 from mercurial.node import *
 from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff
 from mercurial import merge as merge_
-from hgext import extdiff
 from shlib import shell_notify
 from hglib import toutf, rootpath, gettabwidth
 from gdialog import *
@@ -458,7 +450,6 @@ class GStatus(GDialog):
         reselect = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
 
         # merge-state of files
-        from mercurial import merge as merge_
         ms = merge_.mergestate(self.repo)
         
         # Load the new data into the tree's model
