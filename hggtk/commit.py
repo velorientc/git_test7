@@ -6,27 +6,14 @@
 #
 
 import os
-import threading
-import StringIO
-import sys
-import shutil
-import tempfile
-import datetime
-import cPickle
-
 import pygtk
 pygtk.require('2.0')
 import gtk
-import gobject
 import pango
 
-from mercurial.i18n import _
-from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands, patch
-from hgext import extdiff
+from mercurial import ui, hg
 from shlib import shell_notify
 from gdialog import *
-from gtools import cmdtable
 from status import GStatus
 from hgcmd import CmdDialog
 from hglib import fromutf
