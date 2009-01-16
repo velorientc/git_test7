@@ -24,6 +24,13 @@ from gdialog import *
 from dialog import entry_dialog
 import hgshelve
 
+# diff_model row enumerations
+DM_REJECTED = 0
+DM_CHUNK_TEXT = 1
+DM_NOT_HEADER_CHUNK = 2
+DM_HEADER_CHUNK = 3
+DM_CHUNK_ID = 4
+
 class GStatus(GDialog):
     """GTK+ based dialog for displaying repository status
 
@@ -299,7 +306,6 @@ class GStatus(GDialog):
         diff_frame.add(scroller)
         
         # use treeview to diff hunks
-        # rejected, difftext, !isheader, isheader, chunkid
         self.diff_model = gtk.ListStore(bool, str, bool, bool, int)
         self.diff_tree = gtk.TreeView(self.diff_model)
         self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
@@ -313,8 +319,11 @@ class GStatus(GDialog):
         
         diff_hunk_cell = gtk.CellRendererText()
         diff_hunk_cell.set_property('cell-background', '#EEEEEE')
-        diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell, strikethrough=0, 
-                markup=1, strikethrough_set=2, cell_background_set=3)
+        diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell,
+                strikethrough=DM_REJECTED, 
+                markup=DM_CHUNK_TEXT,
+                strikethrough_set=DM_NOT_HEADER_CHUNK,
+                cell_background_set=DM_HEADER_CHUNK)
         diffcol.set_resizable(True)
         self.diff_tree.append_column(diffcol)
         
@@ -652,8 +661,8 @@ class GStatus(GDialog):
     def _diff_tree_row_act(self, tree, path, column):
         # strikethrough-set property seems to be broken, so manually
         # filter header chunks here using !isheader property of diffmodel.
-        if self.diff_model[path][2]:
-            self.diff_model[path][0] = not self.diff_model[path][0]
+        if self.diff_model[path][DM_NOT_HEADER_CHUNK]:
+            self.diff_model[path][DM_REJECTED] = not self.diff_model[path][DM_REJECTED]
 
     def _diff_tree_button_press(self, widget, event):
         # Used to select all of file patch, will be no longer necessary
@@ -869,7 +878,7 @@ class GStatus(GDialog):
 
     def _shelve_selected(self):
         # get list of hunks that have not been rejected
-        hlist = [x[4] for x in self.diff_model if not x[0]]
+        hlist = [x[DM_CHUNK_ID] for x in self.diff_model if not x[DM_REJECTED]]
         if not hlist:
             Prompt('Shelve', 'Please select diff chunks to shelve',
                     self).run()

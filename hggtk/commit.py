@@ -18,7 +18,7 @@ from mercurial.i18n import _
 from mercurial import ui, hg
 from shlib import shell_notify
 from gdialog import *
-from status import GStatus
+from status import GStatus, DM_REJECTED, DM_HEADER_CHUNK, DM_CHUNK_ID
 from hgcmd import CmdDialog
 from hglib import fromutf
 
@@ -250,9 +250,9 @@ class GCommit(GStatus):
     def _commit_selected(self, files):
         import hgshelve
         # 1a. get list of chunks not rejected
-        hlist = [x[4] for x in self.diff_model if not x[0]]
+        hlist = [x[DM_CHUNK_ID] for x in self.diff_model if not x[DM_REJECTED]]
         # 1b. ignore header chunks
-        nlist = [n for n in hlist if not self.diff_model[n][3]]
+        nlist = [n for n in hlist if not self.diff_model[n][DM_HEADER_CHUNK]]
         if not nlist:
             Prompt('Commit', 'Please select diff chunks to commit',
                     self).run()
