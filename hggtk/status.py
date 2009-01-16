@@ -462,8 +462,8 @@ class GStatus(GDialog):
             for file in changes:
                 mst = file in ms and ms[file].upper() or ""
                 file = util.localpath(file)
-                self.model.append([file in recheck, char, toutf(file),
-                        file, mst])
+                checked = file in recheck or char in 'MAR'
+                self.model.append([checked, char, toutf(file), file, mst])
 
         self._update_check_count()
         
