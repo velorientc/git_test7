@@ -309,6 +309,7 @@ class GStatus(GDialog):
                 self._diff_tree_row_act)
         self.diff_tree.connect('button-press-event', 
                 self._diff_tree_button_press)
+        self.diff_tree.set_enable_search(False)
         
         diff_hunk_cell = gtk.CellRendererText()
         diff_hunk_cell.set_property('cell-background', '#EEEEEE')
@@ -764,7 +765,7 @@ class GStatus(GDialog):
             sizemax = self._diffpane.get_allocation().width
 
         if self.showdiff_toggle.get_active():
-            if paned.get_position() >=  sizemax - 55:
+            if paned.get_position() >= sizemax - 55:
                 self.showdiff_toggle.set_active(False)
                 #self.diff_text.set_buffer(gtk.TextBuffer())
         elif paned.get_position() < sizemax - 55:
