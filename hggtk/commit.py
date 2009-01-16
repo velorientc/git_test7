@@ -8,9 +8,13 @@
 import os
 import pygtk
 pygtk.require('2.0')
+import errno
 import gtk
 import pango
+import tempfile
+import cStringIO
 
+from mercurial.i18n import _
 from mercurial import ui, hg
 from shlib import shell_notify
 from gdialog import *
@@ -236,10 +240,97 @@ class GCommit(GStatus):
 
             commit_list = self._relevant_files(commitable)
             if len(commit_list) > 0:
-                self._hg_commit(commit_list)
+                #self._hg_commit(commit_list)
+                self._commit_selected(commit_list)
+                return True
             else:
                 Prompt('Nothing Commited', 'No committable files selected', self).run()
         return True
+
+    def _commit_selected(self, files):
+        import hgshelve
+        # 1a. get list of chunks not rejected
+        hlist = [x[4] for x in self.diff_model if not x[0]]
+        # 1b. ignore header chunks
+        nlist = [n for n in hlist if not self.diff_model[n][3]]
+        if not nlist:
+            Prompt('Commit', 'Please select diff chunks to commit',
+                    self).run()
+            return
+
+        repo, chunks, ui = self.repo, self._shelve_chunks, self.ui
+
+        # 2. backup changed files, so we can restore them in the end
+        backups = {}
+        backupdir = repo.join('record-backups')
+        try:
+            os.mkdir(backupdir)
+        except OSError, err:
+            if err.errno != errno.EEXIST:
+                Prompt('Commit', 'Unable to create ' + backupdir,
+                        self).run()
+                return
+        try:
+            # backup continues
+            for f in files:
+                if f not in self.modified:
+                    continue
+                fd, tmpname = tempfile.mkstemp(prefix=f.replace('/', '_')+'.',
+                                               dir=backupdir)
+                os.close(fd)
+                ui.debug(_('backup %r as %r\n') % (f, tmpname))
+                util.copyfile(repo.wjoin(f), tmpname)
+                backups[f] = tmpname
+
+            fp = cStringIO.StringIO()
+            for n, c in enumerate(chunks):
+                if c.filename() in backups and n in hlist:
+                    c.write(fp)
+            dopatch = fp.tell()
+            fp.seek(0)
+
+            # 3a. apply filtered patch to clean repo  (clean)
+            if backups:
+                hg.revert(repo, repo.dirstate.parents()[0], backups.has_key)
+
+            # 3b. (apply)
+            if dopatch:
+                try:
+                    ui.debug(_('applying patch\n'))
+                    ui.debug(fp.getvalue())
+                    patch.internalpatch(fp, ui, 1, repo.root)
+                except patch.PatchError, err:
+                    s = str(err)
+                    if s:
+                        raise util.Abort(s)
+                    else:
+                        Prompt('Commit', 'Unable to apply patch', self).run()
+                        raise util.Abort(_('patch failed to apply'))
+            del fp
+
+            # 4. We prepared working directory according to filtered patch.
+            #    Now is the time to delegate the job to commit/qrefresh or the like!
+
+            # it is important to first chdir to repo root -- we'll call a
+            # highlevel command with list of pathnames relative to repo root
+            cwd = os.getcwd()
+            os.chdir(repo.root)
+            try:
+                self._hg_commit(files)
+            finally:
+                os.chdir(cwd)
+
+            return 0
+        finally:
+            # 5. finally restore backed-up files
+            try:
+                for realname, tmpname in backups.iteritems():
+                    ui.debug(_('restoring %r to %r\n') % (tmpname, realname))
+                    util.copyfile(tmpname, repo.wjoin(realname))
+                    os.unlink(tmpname)
+                os.rmdir(backupdir)
+            except OSError:
+                pass
 
 
     def _commit_file(self, stat, file):

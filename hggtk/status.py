@@ -428,12 +428,14 @@ class GStatus(GDialog):
 
         matcher = cmdutil.match(self.repo, self.pats, self.opts)
         cwd = (self.pats and self.repo.getcwd()) or ''
-        modified, added, removed, deleted, unknown, ignored, clean = [
-            n for n in self.repo.status(node1=self._node1, node2=self._node2,
+        status = [n for n in self.repo.status(node1=self._node1, node2=self._node2,
                                  match=matcher,
                                  ignored=self.test_opt('ignored'),
                                  clean=self.test_opt('clean'),
                                  unknown=self.test_opt('unknown'))]
+
+        (modified, added, removed, deleted, unknown, ignored, clean) = status
+        self.modified = modified
 
         changetypes = (('modified', 'M', modified),
                        ('added', 'A', added),
@@ -648,6 +650,8 @@ class GStatus(GDialog):
         return False
 
     def _diff_tree_row_act(self, tree, path, column):
+        # strikethrough-set property seems to be broken, so manually
+        # filter header chunks here using !isheader property of diffmodel.
         if self.diff_model[path][2]:
             self.diff_model[path][0] = not self.diff_model[path][0]
 
