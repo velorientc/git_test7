@@ -407,7 +407,9 @@ class GStatus(GDialog):
 
     def prepare_display(self):
         self._ready = True
-        self._last_files = []
+        self._last_file = None
+        self._shelve_chunks = []
+        self._filechunks = {}
         # If the status load failed, no reason to continue
         if not self.reload_status():
             raise util.Abort('could not load status')
@@ -655,12 +657,17 @@ class GStatus(GDialog):
 
 
     def _tree_selection_changed(self, selection, force):
-        # TODO: SJB Zoom diff_tree to first diff of this file
-        #if self.showdiff_toggle.get_active():
-        #    files = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
-        #    if force or files != self._last_files:
-        #        self._last_files = files
-        #        self._show_diff_hunks(files)
+        if self.showdiff_toggle.get_active():
+            sel = self.tree.get_selection().get_selected_rows()[1]
+            if not sel:
+                self._last_file = None
+                return False
+            file = self.model[sel[0]][2]
+            if force or file != self._last_file:
+                self._last_file = file
+                if file in self._filechunks:
+                    row = self._filechunks[file][0]
+                    self.diff_tree.scroll_to_cell((row, ), None, True)
         return False
 
     def _diff_tree_row_act(self, tree, path, column):
@@ -736,12 +743,17 @@ class GStatus(GDialog):
                 difftext = cStringIO.StringIO(''.join(difftext))
                 difftext.seek(0)
                 self._shelve_chunks = hgshelve.parsepatch(difftext)
+                self._filechunks = {}
                 
                 for n, chunk in enumerate(self._shelve_chunks):
                     fp = cStringIO.StringIO()
                     chunk.pretty(fp)
                     markedup = markup(fp)
                     isheader = isinstance(chunk, hgshelve.header)
+                    if isheader:
+                        self._filechunks[chunk.filename()] = [len(self.diff_model)]
+                    else:
+                        self._filechunks[chunk.filename()].append(len(self.diff_model))
                     self.diff_model.append([False, markedup, not isheader, isheader, n])
             finally:
                 difftext.close()
