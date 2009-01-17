@@ -7,29 +7,29 @@
 
 
 import os
-import threading
-import StringIO
-import sys
-import shutil
-import tempfile
-import datetime
-import cPickle
+import cStringIO
 
 import pygtk
 pygtk.require('2.0')
 import gtk
-import gobject
 import pango
 
 from mercurial.i18n import _
 from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands, patch
+from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff
 from mercurial import merge as merge_
-from hgext import extdiff
 from shlib import shell_notify
 from hglib import toutf, rootpath, gettabwidth
 from gdialog import *
 from dialog import entry_dialog
+import hgshelve
+
+# diff_model row enumerations
+DM_REJECTED = 0
+DM_CHUNK_TEXT = 1
+DM_NOT_HEADER_CHUNK = 2
+DM_HEADER_CHUNK = 3
+DM_CHUNK_ID = 4
 
 class GStatus(GDialog):
     """GTK+ based dialog for displaying repository status
@@ -168,6 +168,17 @@ class GStatus(GDialog):
         self.showdiff_toggle.set_active(False)
         self._showdiff_toggled_id = self.showdiff_toggle.connect('toggled', self._showdiff_toggled )
         tbuttons.append(self.showdiff_toggle)
+        
+        self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, 'Shelve',
+                self._shelve_clicked, tip='set aside selected changes')
+        self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, 'Unshelve',
+                self._unshelve_clicked, tip='restore shelved changes')
+        tbuttons += [
+                gtk.SeparatorToolItem(),
+                self.shelve_btn,
+                self.unshelve_btn,
+            ]
+
         return tbuttons
 
 
@@ -295,11 +306,29 @@ class GStatus(GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         diff_frame.add(scroller)
         
-        self.diff_text = gtk.TextView()
-        self.diff_text.set_wrap_mode(gtk.WRAP_NONE)
-        self.diff_text.set_editable(False)
-        self.diff_text.modify_font(pango.FontDescription(self.fontdiff))
-        scroller.add(self.diff_text)
+        # use treeview to diff hunks
+        self.diff_model = gtk.ListStore(bool, str, bool, bool, int)
+        self.diff_tree = gtk.TreeView(self.diff_model)
+        self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
+        self.diff_tree.set_property('enable-grid-lines', True)
+        self.diff_tree.connect('row-activated',
+                self._diff_tree_row_act)
+        self.diff_tree.connect('button-press-event', 
+                self._diff_tree_button_press)
+        self.diff_tree.set_enable_search(False)
+        
+        diff_hunk_cell = gtk.CellRendererText()
+        diff_hunk_cell.set_property('cell-background', '#EEEEEE')
+        diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell,
+                strikethrough=DM_REJECTED, 
+                markup=DM_CHUNK_TEXT,
+                strikethrough_set=DM_NOT_HEADER_CHUNK,
+                cell_background_set=DM_HEADER_CHUNK)
+        diffcol.set_resizable(True)
+        self.diff_tree.append_column(diffcol)
+        
+        scroller.add(self.diff_tree)
 
         if self.diffbottom:
             self._diffpane = gtk.VPaned()
@@ -410,12 +439,14 @@ class GStatus(GDialog):
 
         matcher = cmdutil.match(self.repo, self.pats, self.opts)
         cwd = (self.pats and self.repo.getcwd()) or ''
-        modified, added, removed, deleted, unknown, ignored, clean = [
-            n for n in self.repo.status(node1=self._node1, node2=self._node2,
+        status = [n for n in self.repo.status(node1=self._node1, node2=self._node2,
                                  match=matcher,
                                  ignored=self.test_opt('ignored'),
                                  clean=self.test_opt('clean'),
                                  unknown=self.test_opt('unknown'))]
+
+        (modified, added, removed, deleted, unknown, ignored, clean) = status
+        self.modified = modified
 
         changetypes = (('modified', 'M', modified),
                        ('added', 'A', added),
@@ -431,7 +462,6 @@ class GStatus(GDialog):
         reselect = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
 
         # merge-state of files
-        from mercurial import merge as merge_
         ms = merge_.mergestate(self.repo)
         
         # Load the new data into the tree's model
@@ -443,8 +473,8 @@ class GStatus(GDialog):
             for file in changes:
                 mst = file in ms and ms[file].upper() or ""
                 file = util.localpath(file)
-                self.model.append([file in recheck, char, toutf(file),
-                        file, mst])
+                checked = file in recheck or char in 'MAR'
+                self.model.append([checked, char, toutf(file), file, mst])
 
         self._update_check_count()
         
@@ -458,8 +488,14 @@ class GStatus(GDialog):
         if not selected:
             selection.select_path((0,))
 
+        files = [row[3] for row in self.model]
+        self._show_diff_hunks(files)
+
         self.tree.show()
-        self.tree.grab_focus()
+        if hasattr(self, 'text'):
+            self.text.grab_focus()
+        else:
+            self.tree.grab_focus()
         return True
 
 
@@ -619,51 +655,109 @@ class GStatus(GDialog):
 
 
     def _tree_selection_changed(self, selection, force):
-        ''' Update the diff text '''
-        def dohgdiff():
-            difftext = []
-            if len(files) != 0:
-                wfiles = [self.repo.wjoin(x) for x in files]
-                matcher = cmdutil.match(self.repo, wfiles, self.opts)
-                for s in patch.diff(self.repo, self._node1, self._node2, match=matcher,
-                                    opts=patch.diffopts(self.ui, self.opts)):
-                    difftext.extend(s.splitlines(True))
-
-            buffer = gtk.TextBuffer()
-            buffer.create_tag('removed', foreground='#900000')
-            buffer.create_tag('added', foreground='#006400')
-            buffer.create_tag('position', foreground='#FF8000')
-            buffer.create_tag('header', foreground='#000090')
-
-            iter = buffer.get_start_iter()
-            for line in difftext:
-                line = toutf(line)
-                if line.startswith('---') or line.startswith('+++'):
-                    buffer.insert_with_tags_by_name(iter, line, 'header')
-                elif line.startswith('-'):
-                    if self.tabwidth:
-                        line = line[0] + line[1:].expandtabs(self.tabwidth)
-                    buffer.insert_with_tags_by_name(iter, line, 'removed')
-                elif line.startswith('+'):
-                    if self.tabwidth:
-                        line = line[0] + line[1:].expandtabs(self.tabwidth)
-                    buffer.insert_with_tags_by_name(iter, line, 'added')
-                elif line.startswith('@@'):
-                    buffer.insert_with_tags_by_name(iter, line, 'position')
-                else:
-                    if self.tabwidth:
-                        line = line[0] + line[1:].expandtabs(self.tabwidth)
-                    buffer.insert(iter, line)
-
-            self.diff_text.set_buffer(buffer)
-
-        if self.showdiff_toggle.get_active():
-            files = [self.model[iter][3] for iter in self.tree.get_selection().get_selected_rows()[1]]
-            if force or files != self._last_files:
-                self._last_files = files
-                self._hg_call_wrapper('Diff', dohgdiff)
+        # TODO: SJB Zoom diff_tree to first diff of this file
+        #if self.showdiff_toggle.get_active():
+        #    files = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
+        #    if force or files != self._last_files:
+        #        self._last_files = files
+        #        self._show_diff_hunks(files)
         return False
 
+    def _diff_tree_row_act(self, tree, path, column):
+        # strikethrough-set property seems to be broken, so manually
+        # filter header chunks here using !isheader property of diffmodel.
+        if self.diff_model[path][DM_NOT_HEADER_CHUNK]:
+            self.diff_model[path][DM_REJECTED] = not self.diff_model[path][DM_REJECTED]
+
+    def _diff_tree_button_press(self, widget, event):
+        # Used to select all of file patch, will be no longer necessary
+        #   activating rows in file list will set/clear all patch parts
+        #if event.button == 1:
+        #    tup = widget.get_path_at_pos(int(event.x), int(event.y))
+        #    if tup is None:
+        #        return False
+        #    path = tup[0]
+        #    
+        #    def get_hunk_pos(filename):
+        #        l = []
+        #        for n, hunk in enumerate(self._shelve_chunks):
+        #            if hunk.filename() == filename:
+        #                l.append(n)
+        #        return l
+        #    
+        #    # cliked on header hunk to select/unselect all hunks in file 
+        #    hunk = self._shelve_chunks[path[0]]
+        #    if isinstance(hunk, hgshelve.header):
+        #        l = get_hunk_pos(hunk.filename())
+        #        selection = self.diff_tree.get_selection()
+        #        selected = selection.path_is_selected(path)
+        #        for i in l:
+        #            if selected:
+        #                selection.unselect_path((i,))
+        #            else:
+        #                selection.select_path((i,))
+        #        return True     # stop further event handling
+        return False    # try next handler
+
+    def _show_diff_hunks(self, files):
+        ''' Update the diff text '''
+        def markup(chunk):
+            import cgi
+            hunk = ""
+            chunk.seek(0)
+            lines = chunk.readlines()
+            lines[-1] = lines[-1].strip('\n\r')
+            for line in lines:
+                line = cgi.escape(util.fromlocal(line))
+                if line.startswith('---') or line.startswith('+++'):
+                    hunk += '<span foreground="#000090">%s</span>' % line
+                elif line.startswith('-'):
+                    hunk += '<span foreground="#900000">%s</span>' % line
+                elif line.startswith('+'):
+                    hunk += '<span foreground="#006400">%s</span>' % line
+                elif line.startswith('@@'):
+                    hunk = '<span foreground="#FF8000">%s</span>' % line
+                else:
+                    hunk += line
+
+            return hunk
+
+        def dohgdiff():
+            self.diff_model.clear()
+            try:
+                difftext = []
+                if len(files) != 0:
+                    wfiles = [self.repo.wjoin(x) for x in files]
+                    matcher = cmdutil.match(self.repo, wfiles, self.opts)
+                    diffopts = mdiff.diffopts(git=True, nodates=True)
+                    for s in patch.diff(self.repo, self._node1, self._node2,
+                            match=matcher, opts=diffopts):
+                        difftext.extend(s.splitlines(True))
+                difftext = cStringIO.StringIO(''.join(difftext))
+                difftext.seek(0)
+                self._shelve_chunks = hgshelve.parsepatch(difftext)
+                
+                for n, chunk in enumerate(self._shelve_chunks):
+                    fp = cStringIO.StringIO()
+                    chunk.pretty(fp)
+                    markedup = markup(fp)
+                    isheader = isinstance(chunk, hgshelve.header)
+                    self.diff_model.append([False, markedup, not isheader, isheader, n])
+            finally:
+                difftext.close()
+
+        self._hg_call_wrapper('Diff', dohgdiff)
+
+    def _has_shelve_file(self):
+        return os.path.exists(self.repo.join('shelve'))
+        
+    def _activate_shelve_buttons(self, status):
+        if status:
+            self.shelve_btn.set_sensitive(True)
+            self.unshelve_btn.set_sensitive(self._has_shelve_file())
+        else:
+            self.shelve_btn.set_sensitive(False)
+            self.unshelve_btn.set_sensitive(False)
 
     def _showdiff_toggled(self, togglebutton, data=None):
         # prevent movement events while setting position
@@ -675,8 +769,9 @@ class GStatus(GDialog):
         else:
             self._setting_lastpos = self._diffpane.get_position()
             self._diffpane.set_position(64000)
-            self.diff_text.set_buffer(gtk.TextBuffer())
+            #self.diff_text.set_buffer(gtk.TextBuffer())
 
+        self._activate_shelve_buttons(togglebutton.get_active())
         self._diffpane.handler_unblock(self._diffpane_moved_id)
         return True
 
@@ -690,13 +785,14 @@ class GStatus(GDialog):
             sizemax = self._diffpane.get_allocation().width
 
         if self.showdiff_toggle.get_active():
-            if paned.get_position() >=  sizemax - 55:
+            if paned.get_position() >= sizemax - 55:
                 self.showdiff_toggle.set_active(False)
-                self.diff_text.set_buffer(gtk.TextBuffer())
+                #self.diff_text.set_buffer(gtk.TextBuffer())
         elif paned.get_position() < sizemax - 55:
             self.showdiff_toggle.set_active(True)
             self._tree_selection_changed(self.tree.get_selection(), True)
 
+        self._activate_shelve_buttons(self.showdiff_toggle.get_active())
         self.showdiff_toggle.handler_unblock(self._showdiff_toggled_id)
         return False
         
@@ -785,6 +881,72 @@ class GStatus(GDialog):
             shell_notify(wfiles)
             self.reload_status()
 
+    def _shelve_selected(self):
+        # get list of hunks that have not been rejected
+        hlist = [x[DM_CHUNK_ID] for x in self.diff_model if not x[DM_REJECTED]]
+        if not hlist:
+            Prompt('Shelve', 'Please select diff chunks to shelve',
+                    self).run()
+            return
+
+        doforce = False
+        doappend = False
+        if self._has_shelve_file():
+            from gtklib import MessageDialog
+            dialog = MessageDialog(flags=gtk.DIALOG_MODAL)
+            dialog.set_title('Shelve')
+            dialog.set_markup('<b>Shelve file exists!</b>')
+            dialog.add_buttons('Overwrite', 1, 'Append', 2, 'Cancel', -1)
+            dialog.set_transient_for(self)
+            rval = dialog.run()
+            dialog.destroy()
+            if rval == -1:
+                return
+            if rval == 1:
+                doforce = True
+            if rval == 2:
+                doappend = True
+
+        # capture the selected hunks to shelve
+        fc = []
+        sc = []
+        for n, c in enumerate(self._shelve_chunks):
+            if isinstance(c, hgshelve.header):
+                if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
+                    sc += fc
+                fc = [c]
+            elif n in hlist:
+                fc.append(c)
+        if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
+            sc += fc
+                
+        def filter_patch(ui, chunks):
+            return sc
+
+        # shelve them!
+        self.ui.interactive = True  # hgshelve only works 'interactively'
+        opts = {'addremove': None, 'include': [], 'force': doforce,
+                'append': doappend, 'exclude': []}
+        hgshelve.filterpatch = filter_patch
+        hgshelve.shelve(self.ui, self.repo, **opts)
+        self.reload_status()
+        
+    def _unshelve(self):
+        opts = {'addremove': None, 'include': [], 'force': None,
+                'append': None, 'exclude': [], 'inspect': None}
+        try:
+            hgshelve.unshelve(self.ui, self.repo, **opts)
+            self.reload_status()
+        except:
+            pass
+
+    def _shelve_clicked(self, toolbutton, data=None):
+        self._shelve_selected()
+        self._activate_shelve_buttons(True)
+
+    def _unshelve_clicked(self, toolbutton, data=None):
+        self._unshelve()
+        self._activate_shelve_buttons(True)
 
     def _remove_clicked(self, toolbutton, data=None):
         remove_list = self._relevant_files('C')
@@ -977,7 +1139,7 @@ class GStatus(GDialog):
 
 def run(root='', cwd='', files=[], **opts):
     u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
+    u.updateopts(debug=False, traceback=False, quiet=True)
     repo = hg.repository(u, path=root)
 
     cmdoptions = {

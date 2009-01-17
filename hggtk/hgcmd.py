@@ -126,8 +126,9 @@ class CmdDialog(gtk.Dialog):
                 pass
         self.update_progress()
         if not self.hgthread.isAlive():
-            self._button_ok.set_sensitive(True)
             self._button_stop.set_sensitive(False)            
+            self._button_ok.set_sensitive(True)
+            self._button_ok.grab_focus()
             self.returncode = self.hgthread.return_code()
             if self.returncode is None:
                 self.write("\n[command interrupted]")
