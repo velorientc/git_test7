@@ -251,6 +251,7 @@ class GStatus(GDialog):
         path_cell = gtk.CellRendererText()
         stat_cell = gtk.CellRendererText()
 
+        self.selcb = None
         if self.count_revs() < 2:
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', 0)
@@ -372,7 +373,8 @@ class GStatus(GDialog):
                 check_count = check_count + 1
         self.counter.set_text(_('%d selected, %d total') % 
                 (check_count, file_count))
-        self.selcb.set_active(file_count and file_count == check_count)
+        if self.selcb:
+            self.selcb.set_active(file_count and file_count == check_count)
 
     def prepare_display(self):
         self._ready = True
