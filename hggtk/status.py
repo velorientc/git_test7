@@ -490,7 +490,10 @@ class GStatus(GDialog):
         self._show_diff_hunks(files)
 
         self.tree.show()
-        self.tree.grab_focus()
+        if hasattr(self, 'text'):
+            self.text.grab_focus()
+        else:
+            self.tree.grab_focus()
         return True
 
 
