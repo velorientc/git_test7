@@ -87,9 +87,10 @@ class GCommit(GStatus):
         tbbuttons.insert(2, gtk.SeparatorToolItem())
         self._undo_button = self.make_toolbutton(gtk.STOCK_UNDO, '_Undo',
             self._undo_clicked, tip='undo recent commit')
+        self._commit_button = self.make_toolbutton(gtk.STOCK_OK, '_Commit',
+            self._commit_clicked, tip='commit')
         tbbuttons.insert(2, self._undo_button)
-        tbbuttons.insert(2, self.make_toolbutton(gtk.STOCK_OK, '_Commit',
-            self._commit_clicked, tip='commit'))
+        tbbuttons.insert(2, self._commit_button)
         return tbbuttons
 
 
@@ -158,6 +159,12 @@ class GCommit(GStatus):
         self._vpaned.add1(vbox)
         self._vpaned.add2(status_body)
         self._vpaned.set_position(self._setting_vpos)
+
+        # make ctrl-o trigger commit button
+        accel_group = gtk.AccelGroup()
+        self.add_accel_group(accel_group)
+        self._commit_button.add_accelerator("clicked", accel_group, ord("o"),
+                              gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE) 
         return self._vpaned
 
 
