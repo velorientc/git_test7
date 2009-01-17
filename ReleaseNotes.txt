@@ -6,6 +6,79 @@ kits.  It also contains change information, for users who are interested in
 what bugs have been fixed, and what features have been added in the current
 version.
 
+
+New features and improvement in 0.6:
+
+  * Updated to Mercurial 1.1.X (1.1.2, as of release). 
+  
+    WARNING:
+    The GUI tools in TortoiseHg 0.6, including hgtk, have been updated to work
+    exclusively with Merecurial 1.1.X, and will not work with older (pre-1.1), 
+    and perhaps even the later, releases of Mercurial.
+  
+  * Explorer shell extensions:
+    - Display all available menus in primary context menus, with non-applicable
+      menus disabled per selected objects.
+    - Improved 'sensitivity' of context menus. For example, the 'Create 
+      Repository Here' menu will be disabled if the selected object is a file.
+
+  * General improvement and updates:
+    - New 'Tab Width' config option in 'TortoiseHG' page to expand tab
+      characters in source lines displayed, with maximum of 16 spaces
+      allowed (Default: disabled)
+    - All commit dates are now displayed in local time, with time zone info.
+    - Make GUI opearations immuned to mercurial commands defaults (defined in
+      [defaults] section of mercurial.ini)
+    - Detect and support WinMerge in Mercurial's merge-tools list.
+
+  * New initialization (create new repo) window:
+    - Option to create special files (specially .hgignore)
+    - Option to create older (non-fncache) repo format.
+
+  * Changelog viewer:
+    - Removed Tags column. Tags are now displayed in summary lines.
+    - Add display of branch names in summary lines. Branch names are colored
+      with color scheme of gitweb style.
+    - Add file context menu to revert files to selected changeset
+
+  * Status window (changes apply also to the internal commit window):
+    - Support Mercurial's new 'resolve' command: with new 'ms' (merge state)
+      column in file-list area, plus new context menus to resolve merge
+      conflict and mark/unmark merge state.
+    - Replace Select & Deselect tool buttons with checkbox on the file-list
+      header.
+    - Add preliminary support for moving, renaming and copying of clean
+      (managed) files.
+    - Ignored files can not be added.
+    
+  * Datamining (grep and annotate) window:
+    - Add source line numbers to annotate lines.
+    
+  * Conguration window:
+    - New in-place editing support in 'paths' page.
+    - Updated hgweb style list per Mercurial 1.1
+    
+  * Hgtk:
+    - Add 'init' command.
+    - Add --webdir-conf option to 'serve' command.
+    - Support command shortcut matching like hg. So 'hgtk cl' will bring up
+      the clone window.
+    
+  * Nautilus:
+    - Removed 'Open Terminal Here' menu options
+
+  * Python trace collector:
+    - Show timestamp on output lines to assist debugging.
+
+Bug fixes in 0.6:
+    
+  * Fix context menu actions problem on non-ascii filenames
+    in status window [SF Bug 2151552].
+
+  * Fix missing parent/child fields in commit headers of changeset window,
+    mainly caused by empty commit messages in the parent/child changesets 
+
+
 New features and improvement in 0.5:
 
   * Explorer shell extensions:
