@@ -13,23 +13,23 @@ New features and improvement in 0.6:
   
     WARNING:
     The GUI tools in TortoiseHg 0.6, including hgtk, have been updated to work
-    exclusively with Merecurial 1.1.X, and will not work with older (pre-1.1), 
+    exclusively with Merecurial 1.1.X, and will not work with older (pre 1.1), 
     and perhaps even the later, releases of Mercurial.
   
   * Explorer shell extensions:
-    - Display all available menus in primary context menus, with non-applicable
-      menus disabled per selected objects.
+    - Display all available menus in primary context menu, with non-applicable
+      menu items disabled per selected objects.
     - Improved 'sensitivity' of context menus. For example, the 'Create 
       Repository Here' menu will be disabled if the selected object is a file.
 
   * General improvement and updates:
-    - New 'Tab Width' config option in 'TortoiseHG' page to expand tab
-      characters in source lines displayed, with maximum of 16 spaces
-      allowed (Default: disabled)
+    - Tab characters in source/diff lines can be expanded optionally with the
+      new 'tabwidth' config option.
     - All commit dates are now displayed in local time, with time zone info.
-    - Make GUI opearations immuned to mercurial commands defaults (defined in
+    - GUI opearations are immuned to mercurial commands defaults (defined in
       [defaults] section of mercurial.ini)
-    - Detect and support WinMerge in Mercurial's merge-tools list.
+    - WinMerge has been added Mercurial's merge-tools list, and will be 
+      detected and used automatically (subject to priority).
 
   * New initialization (create new repo) window:
     - Option to create special files (specially .hgignore)
@@ -54,9 +54,12 @@ New features and improvement in 0.6:
   * Datamining (grep and annotate) window:
     - Add source line numbers to annotate lines.
     
-  * Conguration window:
+  * Configuration window:
     - New in-place editing support in 'paths' page.
     - Updated hgweb style list per Mercurial 1.1
+    - New 'Tab Width' config option in 'TortoiseHG' page to expand tab
+      characters in source lines displayed, with maximum of 16 spaces
+      allowed (Default: disabled)
     
   * Hgtk:
     - Add 'init' command.
