@@ -77,6 +77,9 @@ class ConfigDialog(gtk.Dialog):
                 ('Commit Tool', 'tortoisehg.commit', ['qct', 'internal'],
                     'Select commit tool launched by TortoiseHg. Qct is'
                     ' not included, must be installed separately'),
+                ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
+                    'Move diff panel below file list in status and '
+                    'commit dialogs.  Default: False'),
                 ('Visual Diff Tool', 'tortoisehg.vdiff', [],
                     'Specify the visual diff tool; must be extdiff command'),
                 ('Visual Editor', 'tortoisehg.editor', [],
