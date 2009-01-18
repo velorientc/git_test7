@@ -523,15 +523,17 @@ class GStatus(GDialog):
 
 
     def _select_toggle(self, cellrenderer, path):
+        '''User manually toggled file status'''
         self.model[path][0] = not self.model[path][0]
-        # Update chunk toggle state to match file toggle state
-        file = self.model[path][2]
-        if file in self._filechunks:
-            for n in self._filechunks[file][1:]:
-                self.diff_model[n][DM_REJECTED] = not self.model[path][0]
+        self._update_chunk_state(self.model[path])
         self._update_check_count()
         return True
 
+    def _update_chunk_state(self, entry):
+        '''Update chunk toggle state to match file toggle state'''
+        file = entry[2]
+        for n in self._filechunks[file][1:]:
+            self.diff_model[n][DM_REJECTED] = not entry[0]
 
     def _show_toggle(self, check, type):
         self.opts[type] = check.get_active()
@@ -1102,7 +1104,9 @@ class GStatus(GDialog):
         for entry in self.model:
             if ctype and not entry[1] in ctype:
                 continue
-            entry[0] = state
+            if entry[0] != state:
+                entry[0] = state
+                self._update_chunk_state(entry)
         self._update_check_count()
 
     
