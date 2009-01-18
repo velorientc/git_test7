@@ -1,17 +1,14 @@
 #
 # hgignore.py - TortoiseHg's dialog for editing .hgignore
 #
-# Copyright (C) 2008 Steve Borho <steve@borho.org>
+# Copyright (C) 2008-2009 Steve Borho <steve@borho.org>
 #
 
 import os
-import gobject
 import gtk
-import pango
-import string
 from dialog import *
 import hglib
-from mercurial import hg, ui
+from mercurial import hg, ui, match
 
 class HgIgnoreDialog(gtk.Window):
     """ Edit a reposiory .hgignore file """
@@ -88,7 +85,6 @@ class HgIgnoreDialog(gtk.Window):
         self.pattree = pattree
         frame.add(scrolledwindow)
 
-
         frame = gtk.Frame('Unknown Files')
         hbox.pack_start(frame, True, True, 4)
         unknowntree = gtk.TreeView()
@@ -100,9 +96,10 @@ class HgIgnoreDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.set_border_width(4)
         scrolledwindow.add(unknowntree)
-        model = gtk.ListStore(gobject.TYPE_STRING)
+        model = gtk.ListStore(str)
         unknowntree.set_model(model)
         unknowntree.set_headers_visible(False)
+        self.unkmodel = model
         frame.add(scrolledwindow)
 
         mainvbox.pack_start(hbox, True, True)
@@ -138,12 +135,23 @@ class HgIgnoreDialog(gtk.Window):
             self.doseoln = os.name == 'nt'
             l = []
 
-        model = gtk.ListStore(gobject.TYPE_STRING)
-        l = [string.strip(line) for line in l]
+        model = gtk.ListStore(str)
         for line in l:
-            model.append([line])
+            model.append([line.strip()])
         self.pattree.set_model(model)
         self.ignorelines = l
+
+        try: repo = hg.repository(ui.ui(), path=self.root)
+        except:
+            print 'no repository found'
+            gtk.main_quit()
+
+        matcher = match.always(repo.root, repo.root)
+        changes = repo.dirstate.status(matcher, ignored=False, clean=False, unknown=True)
+        (lookup, modified, added, removed, deleted, unknown, ignored, clean) = changes
+        self.unkmodel.clear()
+        for u in unknown:
+            self.unkmodel.append([u])
 
     def write_ignore_lines(self):
         if doseoln:
