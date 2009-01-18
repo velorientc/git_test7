@@ -247,9 +247,6 @@ class GStatus(GDialog):
         self.tree.set_reorderable(False)
         self.tree.set_enable_search(True)
         self.tree.set_search_column(2)
-        self.tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        self.tree.get_selection().connect('changed',
-                self._tree_selection_changed, False)
         if hasattr(self.tree, 'set_rubber_banding'):
             self.tree.set_rubber_banding(True)
         self.tree.modify_font(pango.FontDescription(self.fontlist))
@@ -263,7 +260,7 @@ class GStatus(GDialog):
         stat_cell = gtk.CellRendererText()
 
         self.selcb = None
-        if self.count_revs() < 2:
+        if self.count_revs() < 2 and len(self.repo.changectx(None).parents()) == 1:
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', 0)
             #col0.set_sort_column_id(0)
@@ -306,29 +303,42 @@ class GStatus(GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         diff_frame.add(scroller)
         
-        # use treeview to diff hunks
-        self.diff_model = gtk.ListStore(bool, str, bool, bool, int)
-        self.diff_tree = gtk.TreeView(self.diff_model)
-        self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
-        self.diff_tree.set_property('enable-grid-lines', True)
-        self.diff_tree.connect('row-activated',
-                self._diff_tree_row_act)
-        self.diff_tree.connect('button-press-event', 
-                self._diff_tree_button_press)
-        self.diff_tree.set_enable_search(False)
-        
-        diff_hunk_cell = gtk.CellRendererText()
-        diff_hunk_cell.set_property('cell-background', '#EEEEEE')
-        diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell,
-                strikethrough=DM_REJECTED, 
-                markup=DM_CHUNK_TEXT,
-                strikethrough_set=DM_NOT_HEADER_CHUNK,
-                cell_background_set=DM_HEADER_CHUNK)
-        diffcol.set_resizable(True)
-        self.diff_tree.append_column(diffcol)
-        
-        scroller.add(self.diff_tree)
+        if self.count_revs() == 2 or len(self.repo.changectx(None).parents()) == 1:
+            # use treeview to diff hunks
+            self.diff_model = gtk.ListStore(bool, str, bool, bool, int)
+            self.diff_tree = gtk.TreeView(self.diff_model)
+            self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+            self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
+            self.diff_tree.set_headers_visible(False)
+            self.diff_tree.set_property('enable-grid-lines', True)
+            self.diff_tree.connect('row-activated',
+                    self._diff_tree_row_act)
+            self.diff_tree.set_enable_search(False)
+            
+            diff_hunk_cell = gtk.CellRendererText()
+            diff_hunk_cell.set_property('cell-background', '#EEEEEE')
+            diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell,
+                    strikethrough=DM_REJECTED, 
+                    markup=DM_CHUNK_TEXT,
+                    strikethrough_set=DM_NOT_HEADER_CHUNK,
+                    cell_background_set=DM_HEADER_CHUNK)
+            diffcol.set_resizable(True)
+            self.diff_tree.append_column(diffcol)
+            self.tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+            self.tree.get_selection().connect('changed',
+                    self._tree_selection_changed, False)
+            scroller.add(self.diff_tree)
+        else:
+            # display merge diffs in simple text view
+            self.merge_diff_text = gtk.TextView()
+            self.merge_diff_text.set_wrap_mode(gtk.WRAP_NONE)
+            self.merge_diff_text.set_editable(False)
+            self.merge_diff_text.modify_font(pango.FontDescription(self.fontdiff))
+            self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
+            self.tree.get_selection().connect('changed',
+                    self._merge_tree_selection_changed, False)
+            self._activate_shelve_buttons(False)
+            scroller.add(self.merge_diff_text)
 
         if self.diffbottom:
             self._diffpane = gtk.VPaned()
@@ -662,6 +672,59 @@ class GStatus(GDialog):
         if success:
             self.reload_status()
 
+    def _merge_tree_selection_changed(self, selection, force):
+        ''' Update the diff text with merge diff to both parents'''
+        def dohgdiff():
+            difftext = ['===== Diff to first parent =====\n']
+            wfiles = [self.repo.wjoin(file)]
+            matcher = cmdutil.match(self.repo, wfiles, self.opts)
+            for s in patch.diff(self.repo, self.repo.dirstate.parents()[0], None,
+                    match=matcher, opts=patch.diffopts(self.ui, self.opts)):
+                difftext.extend(s.splitlines(True))
+            difftext.append('\n===== Diff to second parent =====\n')
+            for s in patch.diff(self.repo, self.repo.dirstate.parents()[1], None,
+                    match=matcher, opts=patch.diffopts(self.ui, self.opts)):
+                difftext.extend(s.splitlines(True))
+
+            buffer = gtk.TextBuffer()
+            buffer.create_tag('removed', foreground='#900000')
+            buffer.create_tag('added', foreground='#006400')
+            buffer.create_tag('position', foreground='#FF8000')
+            buffer.create_tag('header', foreground='#000090')
+
+            iter = buffer.get_start_iter()
+            for line in difftext:
+                line = toutf(line)
+                if line.startswith('---') or line.startswith('+++'):
+                    buffer.insert_with_tags_by_name(iter, line, 'header')
+                elif line.startswith('-'):
+                    if self.tabwidth:
+                        line = line[0] + line[1:].expandtabs(self.tabwidth)
+                    buffer.insert_with_tags_by_name(iter, line, 'removed')
+                elif line.startswith('+'):
+                    if self.tabwidth:
+                        line = line[0] + line[1:].expandtabs(self.tabwidth)
+                    buffer.insert_with_tags_by_name(iter, line, 'added')
+                elif line.startswith('@@'):
+                    buffer.insert_with_tags_by_name(iter, line, 'position')
+                else:
+                    if self.tabwidth:
+                        line = line[0] + line[1:].expandtabs(self.tabwidth)
+                    buffer.insert(iter, line)
+
+            self.merge_diff_text.set_buffer(buffer)
+
+        if self.showdiff_toggle.get_active():
+            sel = self.tree.get_selection().get_selected_rows()[1]
+            if not sel:
+                self._last_file = None
+                return False
+            file = self.model[sel[0]][2]
+            if force or file != self._last_file:
+                self._last_file = file
+                self._hg_call_wrapper('Diff', dohgdiff)
+        return False
+
 
     def _tree_selection_changed(self, selection, force):
         if self.showdiff_toggle.get_active():
@@ -679,6 +742,7 @@ class GStatus(GDialog):
                     selection.unselect_all()
                     selection.select_path((row,))
         return False
+
 
     def _diff_tree_row_act(self, tree, path, column):
         row = self.diff_model[path]
@@ -711,35 +775,6 @@ class GStatus(GDialog):
                     self._update_check_count()
                 return
 
-    def _diff_tree_button_press(self, widget, event):
-        # Used to select all of file patch, will be no longer necessary
-        #   activating rows in file list will set/clear all patch parts
-        #if event.button == 1:
-        #    tup = widget.get_path_at_pos(int(event.x), int(event.y))
-        #    if tup is None:
-        #        return False
-        #    path = tup[0]
-        #    
-        #    def get_hunk_pos(filename):
-        #        l = []
-        #        for n, hunk in enumerate(self._shelve_chunks):
-        #            if hunk.filename() == filename:
-        #                l.append(n)
-        #        return l
-        #    
-        #    # cliked on header hunk to select/unselect all hunks in file 
-        #    hunk = self._shelve_chunks[path[0]]
-        #    if isinstance(hunk, hgshelve.header):
-        #        l = get_hunk_pos(hunk.filename())
-        #        selection = self.diff_tree.get_selection()
-        #        selected = selection.path_is_selected(path)
-        #        for i in l:
-        #            if selected:
-        #                selection.unselect_path((i,))
-        #            else:
-        #                selection.select_path((i,))
-        #        return True     # stop further event handling
-        return False    # try next handler
 
     def _show_diff_hunks(self, files):
         ''' Update the diff text '''
@@ -796,6 +831,8 @@ class GStatus(GDialog):
             finally:
                 difftext.close()
 
+        if hasattr(self, 'merge_diff_text'):
+            return
         self._hg_call_wrapper('Diff', dohgdiff)
 
     def _has_shelve_file(self):
@@ -814,14 +851,18 @@ class GStatus(GDialog):
         self._diffpane.handler_block(self._diffpane_moved_id)
 
         if togglebutton.get_active():
-            self._tree_selection_changed(self.tree.get_selection(), True)
+            if hasattr(self, 'merge_diff_text'):
+                self._merge_tree_selection_changed(self.tree.get_selection(), True)
+                self._activate_shelve_buttons(False)
+            else:
+                self._activate_shelve_buttons(True)
+                self._tree_selection_changed(self.tree.get_selection(), True)
             self._diffpane.set_position(self._setting_lastpos)
         else:
             self._setting_lastpos = self._diffpane.get_position()
             self._diffpane.set_position(64000)
-            #self.diff_text.set_buffer(gtk.TextBuffer())
+            self._activate_shelve_buttons(False)
 
-        self._activate_shelve_buttons(togglebutton.get_active())
         self._diffpane.handler_unblock(self._diffpane_moved_id)
         return True
 
@@ -837,12 +878,16 @@ class GStatus(GDialog):
         if self.showdiff_toggle.get_active():
             if paned.get_position() >= sizemax - 55:
                 self.showdiff_toggle.set_active(False)
-                #self.diff_text.set_buffer(gtk.TextBuffer())
+            self._activate_shelve_buttons(self.showdiff_toggle.get_active())
         elif paned.get_position() < sizemax - 55:
             self.showdiff_toggle.set_active(True)
-            self._tree_selection_changed(self.tree.get_selection(), True)
+            if hasattr(self, 'merge_diff_text'):
+                self._merge_tree_selection_changed(self.tree.get_selection(), True)
+                self._activate_shelve_buttons(False)
+            else:
+                self._tree_selection_changed(self.tree.get_selection(), True)
+                self._activate_shelve_buttons(True)
 
-        self._activate_shelve_buttons(self.showdiff_toggle.get_active())
         self.showdiff_toggle.handler_unblock(self._showdiff_toggled_id)
         return False
         

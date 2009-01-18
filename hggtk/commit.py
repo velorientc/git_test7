@@ -213,16 +213,11 @@ class GCommit(GStatus):
     def _check_merge(self):
         # disable the checkboxes on the filelist if repo in merging state
         merged = len(self.repo.changectx(None).parents()) > 1
-        cbcell = self.tree.get_column(0).get_cell_renderers()[0]
-        cbcell.set_property("activatable", not merged)
         
         self.get_toolbutton('Re_vert').set_sensitive(not merged)
         self.get_toolbutton('_Add').set_sensitive(not merged)
         self.get_toolbutton('_Remove').set_sensitive(not merged)
         self.get_toolbutton('Move').set_sensitive(not merged)
-        self.tree.set_sensitive(not merged)
-        # Allow chunk selection for shelving
-        #self.diff_tree.set_sensitive(not merged)
         
         if merged:
             # select all changes if repo is merged
