@@ -673,6 +673,9 @@ class GStatus(GDialog):
                 if file in self._filechunks:
                     row = self._filechunks[file][0]
                     self.diff_tree.scroll_to_cell((row, ), None, True)
+                    selection = self.diff_tree.get_selection()
+                    selection.unselect_all()
+                    selection.select_path((row,))
         return False
 
     def _diff_tree_row_act(self, tree, path, column):
@@ -772,9 +775,10 @@ class GStatus(GDialog):
                         difftext.extend(s.splitlines(True))
                 difftext = cStringIO.StringIO(''.join(difftext))
                 difftext.seek(0)
+
                 self._shelve_chunks = hgshelve.parsepatch(difftext)
                 self._filechunks = {}
-                
+                skip = False
                 for n, chunk in enumerate(self._shelve_chunks):
                     fp = cStringIO.StringIO()
                     chunk.pretty(fp)
@@ -782,9 +786,11 @@ class GStatus(GDialog):
                     isheader = isinstance(chunk, hgshelve.header)
                     if isheader:
                         self._filechunks[chunk.filename()] = [len(self.diff_model)]
-                    else:
+                        self.diff_model.append([False, markedup, False, True, n])
+                        skip = chunk.special()
+                    elif skip != True:
                         self._filechunks[chunk.filename()].append(len(self.diff_model))
-                    self.diff_model.append([False, markedup, not isheader, isheader, n])
+                        self.diff_model.append([False, markedup, True, False, n])
             finally:
                 difftext.close()
 
