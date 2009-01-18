@@ -188,7 +188,10 @@ class GCommit(GStatus):
         # If there are more than a few character typed into the commit
         # message, ask if the exit should continue.
         live = False
-        if self.text.get_buffer().get_char_count() > 10:
+        buffer = self.text.get_buffer()
+        begin, end = buffer.get_bounds()
+        cur_msg = buffer.get_text(begin, end)
+        if buffer.get_char_count() > 10 and cur_msg != self.qheader:
             dialog = Confirm('Exit', [], self, 'Discard commit message and exit?')
             if dialog.run() == gtk.RESPONSE_NO:
                 live = True
@@ -198,6 +201,7 @@ class GCommit(GStatus):
     def reload_status(self):
         success = GStatus.reload_status(self)
         self._check_merge()
+        self._check_patch_queue()
         self._check_undo()
         return success
 
@@ -229,6 +233,19 @@ class GCommit(GStatus):
             # pre-fill commit message
             self.text.get_buffer().set_text('merge')
 
+
+    def _check_patch_queue(self):
+        '''See if an MQ patch is applied, switch to qrefresh mode'''
+        self.qheader = None
+        if not hasattr(self.repo, 'mq'): return
+        if not self.repo.mq.applied: return
+        patch = self.repo.mq.lookup('qtip')
+        ph = self.repo.mq.readheaders(patch)
+        title = os.path.basename(self.repo.root) + ' qrefresh ' + patch
+        self.set_title(title)
+        self.qheader = '\n'.join(ph.message)
+        self.text.get_buffer().set_text(self.qheader)
+        self.get_toolbutton('_Commit').set_label('QRefresh')
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
@@ -411,11 +428,15 @@ class GCommit(GStatus):
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
-        cmdline  = ["hg", "commit", "--verbose", "--repository", self.repo.root]
-        if self.opts['addremove']:
-            cmdline += ['--addremove']
-        cmdline += ['--message', fromutf(self.opts['message'])]
-        cmdline += [self.repo.wjoin(x) for x in files]
+        if self.qheader:
+            cmdline  = ["hg", "qrefresh", "--verbose", "--repository", self.repo.root]
+            cmdline += ['--message', fromutf(self.opts['message'])]
+        else:
+            cmdline  = ["hg", "commit", "--verbose", "--repository", self.repo.root]
+            if self.opts['addremove']:
+                cmdline += ['--addremove']
+            cmdline += ['--message', fromutf(self.opts['message'])]
+            cmdline += [self.repo.wjoin(x) for x in files]
         dialog = CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
         dialog.run()
@@ -423,10 +444,11 @@ class GCommit(GStatus):
 
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
-            self.text.set_buffer(gtk.TextBuffer())
-            self._update_recent_messages(self.opts['message'])
             shell_notify([self.cwd] + files)
-            self._last_commit_id = self._get_tip_rev(True)
+            if not self.qheader:
+                self.text.set_buffer(gtk.TextBuffer())
+                self._update_recent_messages(self.opts['message'])
+                self._last_commit_id = self._get_tip_rev(True)
 
     def _get_tip_rev(self, refresh=False):
         if refresh:
