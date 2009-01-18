@@ -461,7 +461,7 @@ def launch(root='', files=[], cwd='', main=True):
     cmdoptions = {
         'user':'', 'date':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
-        'unknown':False, 'ignored':False, 
+        'unknown':True, 'ignored':False, 
         'exclude':[], 'include':[],
         'check': False, 'git':False, 'logfile':'', 'addremove':False,
     }
