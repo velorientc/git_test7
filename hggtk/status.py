@@ -524,6 +524,11 @@ class GStatus(GDialog):
 
     def _select_toggle(self, cellrenderer, path):
         self.model[path][0] = not self.model[path][0]
+        # Update chunk toggle state to match file toggle state
+        file = self.model[path][2]
+        if file in self._filechunks:
+            for n in self._filechunks[file][1:]:
+                self.diff_model[n][DM_REJECTED] = not self.model[path][0]
         self._update_check_count()
         return True
 
