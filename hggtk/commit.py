@@ -199,6 +199,7 @@ class GCommit(GStatus):
 
 
     def reload_status(self):
+        if not self._ready: return False
         success = GStatus.reload_status(self)
         self._check_merge()
         self._check_patch_queue()
