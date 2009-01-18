@@ -239,6 +239,7 @@ class GCommit(GStatus):
             # as of Mercurial 1.0, merges must be committed without
             # specifying file list.
             self._hg_commit([])
+            self.reload_status()
         else:
             commitable = 'MAR'
             addremove_list = self._relevant_files('?!')
@@ -247,7 +248,6 @@ class GCommit(GStatus):
 
             commit_list = self._relevant_files(commitable)
             if len(commit_list) > 0:
-                #self._hg_commit(commit_list)
                 self._commit_selected(commit_list)
                 return True
             else:
@@ -332,6 +332,7 @@ class GCommit(GStatus):
                 os.rmdir(backupdir)
             except OSError:
                 pass
+            self.reload_status()
 
 
     def _commit_file(self, stat, file):
@@ -427,7 +428,6 @@ class GCommit(GStatus):
             self._update_recent_messages(self.opts['message'])
             shell_notify([self.cwd] + files)
             self._last_commit_id = self._get_tip_rev(True)
-            self.reload_status()
 
     def _get_tip_rev(self, refresh=False):
         if refresh:
