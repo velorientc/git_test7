@@ -832,6 +832,7 @@ class GStatus(GDialog):
                 difftext.close()
 
         if hasattr(self, 'merge_diff_text'):
+            self.merge_diff_text.set_buffer(gtk.TextBuffer())
             return
         self._hg_call_wrapper('Diff', dohgdiff)
 
