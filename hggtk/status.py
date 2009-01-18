@@ -1064,15 +1064,9 @@ class GStatus(GDialog):
 
 
     def _ignore_file(self, stat, file):
-        ignore = open(self.repo.wjoin('.hgignore'), 'a')
-        try:
-            try:
-                ignore.write('glob:' + util.pconvert(file) + '\n')
-            except IOError:
-                Prompt('Ignore Failed', 'Could not update .hgignore', self).run()
-        finally:
-            ignore.close()
-        self.reload_status()
+        import hgignore
+        dialog = hgignore.HgIgnoreDialog(self.repo.root, util.pconvert(file))
+        dialog.show_all()
         return True
 
     def _mark_resolved(self, stat, file):

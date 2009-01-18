@@ -12,7 +12,7 @@ from mercurial import hg, ui, match
 
 class HgIgnoreDialog(gtk.Window):
     """ Edit a reposiory .hgignore file """
-    def __init__(self, root=''):
+    def __init__(self, root='', fileglob=''):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
@@ -54,6 +54,7 @@ class HgIgnoreDialog(gtk.Window):
         hbox.pack_start(glob_button, False, False, 4)
         glob_button.connect('clicked', self.add_glob, glob_entry)
         glob_entry.connect('activate', self.add_glob, glob_entry)
+        glob_entry.set_text(fileglob)
         self.glob_entry = glob_entry
         mainvbox.pack_start(hbox, False, False)
 
