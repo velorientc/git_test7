@@ -219,6 +219,10 @@ class GCommit(GStatus):
         self.get_toolbutton('Re_vert').set_sensitive(not merged)
         self.get_toolbutton('_Add').set_sensitive(not merged)
         self.get_toolbutton('_Remove').set_sensitive(not merged)
+        self.get_toolbutton('Move').set_sensitive(not merged)
+        self.tree.set_sensitive(not merged)
+        # Allow chunk selection for shelving
+        #self.diff_tree.set_sensitive(not merged)
         
         if merged:
             # select all changes if repo is merged
