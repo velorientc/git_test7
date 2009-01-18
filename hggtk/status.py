@@ -671,10 +671,35 @@ class GStatus(GDialog):
         return False
 
     def _diff_tree_row_act(self, tree, path, column):
-        # strikethrough-set property seems to be broken, so manually
-        # filter header chunks here using !isheader property of diffmodel.
-        if self.diff_model[path][DM_NOT_HEADER_CHUNK]:
-            self.diff_model[path][DM_REJECTED] = not self.diff_model[path][DM_REJECTED]
+        row = self.diff_model[path]
+        chunk = self._shelve_chunks[row[DM_CHUNK_ID]]
+        file = chunk.filename()
+        if file not in self._filechunks: return
+        if row[DM_HEADER_CHUNK]:
+            for n in self._filechunks[file][1:]:
+                self.diff_model[n][DM_REJECTED] = not self.diff_model[n][DM_REJECTED]
+            newvalue = False
+            for n in self._filechunks[file][1:]:
+                if not self.diff_model[n][DM_REJECTED]:
+                    newvalue = True
+                    break
+        else:
+            row[DM_REJECTED] = not row[DM_REJECTED]
+            if row[DM_REJECTED]:
+                # File has at least one inactive chunk, check others
+                for n in self._filechunks[file][1:]:
+                    if not self.diff_model[n][DM_REJECTED]:
+                        return
+                newvalue = False
+            else:
+                newvalue = True
+        # Update file's check status
+        for fr in self.model:
+            if fr[2] == file:
+                if fr[0] != newvalue:
+                    fr[0] = newvalue
+                    self._update_check_count()
+                return
 
     def _diff_tree_button_press(self, widget, event):
         # Used to select all of file patch, will be no longer necessary
