@@ -258,13 +258,6 @@ class GCommit(GStatus):
         import hgshelve
         # 1a. get list of chunks not rejected
         hlist = [x[DM_CHUNK_ID] for x in self.diff_model if not x[DM_REJECTED]]
-        # 1b. ignore header chunks
-        nlist = [n for n in hlist if not self.diff_model[n][DM_HEADER_CHUNK]]
-        if not nlist:
-            Prompt('Commit', 'Please select diff chunks to commit',
-                    self).run()
-            return
-
         repo, chunks, ui = self.repo, self._shelve_chunks, self.ui
 
         # 2. backup changed files, so we can restore them in the end
@@ -280,8 +273,9 @@ class GCommit(GStatus):
         try:
             # backup continues
             for f in files:
-                if f not in self.modified:
-                    continue
+                if f not in self._filechunks: continue
+                if len(self._filechunks[f]) == 1: continue
+                if f not in self.modified: continue
                 fd, tmpname = tempfile.mkstemp(prefix=f.replace('/', '_')+'.',
                                                dir=backupdir)
                 os.close(fd)
