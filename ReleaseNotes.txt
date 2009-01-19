@@ -49,7 +49,7 @@ New features and improvement in 0.6:
       header.
     - Add preliminary support for moving, renaming and copying of clean
       (managed) files.
-    - Ignored files can not be added.
+    - Ignored files can now be added.
     
   * Datamining (grep and annotate) window:
     - Add source line numbers to annotate lines.
