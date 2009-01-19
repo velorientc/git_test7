@@ -542,6 +542,7 @@ class GStatus(GDialog):
     def _update_chunk_state(self, entry):
         '''Update chunk toggle state to match file toggle state'''
         file = entry[2]
+        if file not in self._filechunks: return
         for n in self._filechunks[file][1:]:
             self.diff_model[n][DM_REJECTED] = not entry[0]
 
