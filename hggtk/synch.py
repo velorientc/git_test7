@@ -20,9 +20,10 @@ import threading
 from mercurial import hg, ui, util, extensions
 from mercurial.repo import RepoError
 from dialog import error_dialog, question_dialog, info_dialog
-from hglib import HgThread, toutf
+from hglib import HgThread, toutf, rootpath
 import shlib
 import gtklib
+import urllib
 
 class SynchDialog(gtk.Window):
     def __init__(self, cwd='', root = '', repos=[]):
@@ -124,7 +125,12 @@ class SynchDialog(gtk.Window):
         self.pathlist = gtk.ListStore(str)
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self._pathtext = self._pathbox.get_child()
-        
+
+        # support dropping of repos or bundle files
+        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
+                [("text/plain", 0, 80)], gtk.gdk.ACTION_COPY)
+        self.connect('drag_data_received', self._drag_receive)
+
         defrow = None
         defpushrow = None
         for row, (name, path) in enumerate(self.paths):
@@ -219,6 +225,26 @@ class SynchDialog(gtk.Window):
         self.stbar = gtklib.StatusBar()
         vbox.pack_start(self.stbar, False, False, 2)
         self.connect('map', self.update_buttons)
+        self._last_drop_time = None
+
+    def _drag_receive(self, widget, context, x, y, selection, targetType, time):
+        if targetType == 80 and time != self._last_drop_time:
+            if selection.targets_include_uri():
+                files = selection.get_uris()
+                gobject.idle_add(self._set_path, files[0])
+            else:
+                file = selection.get_text().split()[0].strip()
+                gobject.idle_add(self._set_path, file)
+            self._last_drop_time = time
+
+    def _set_path(self, uri):
+        if not uri.startswith("file://"):
+            return
+        path = urllib.unquote(uri[7:])
+        if rootpath(path) == path:
+            self._pathtext.set_text(path)
+        elif not os.path.isdir(path) and path.endswith('.hg'):
+            self._pathtext.set_text(path)
 
     def update_buttons(self, *args):
         self.buttonhbox.hide()
