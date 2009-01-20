@@ -14,8 +14,8 @@ import gobject
 import pango
 import shlib
 
-import tortoise.version
-import mercurial.version
+from tortoise.__version__ import version as thgversion
+from mercurial.__version__ import version as hgversion
 
 def browse_url(url):
     import threading
@@ -46,7 +46,7 @@ class AboutDialog(gtk.AboutDialog):
         super(AboutDialog, self).__init__()
 
         lib_versions = ', '.join([
-                "Mercurial-%s" % mercurial.version.get_version(),
+                "Mercurial-%s" % hgversion,
                 "Python-%s" % make_version(sys.version_info[0:3]),
                 "PyGTK-%s" % make_version(gtk.pygtk_version),
                 "GTK-%s" % make_version(gtk.gtk_version),
@@ -56,7 +56,7 @@ class AboutDialog(gtk.AboutDialog):
 
         self.set_website("http://tortoisehg.sourceforge.net/")
         self.set_name("TortoiseHg")
-        self.set_version("(version %s)" % tortoise.version.get_version())
+        self.set_version("(version %s)" % thgversion)
         if hasattr(self, 'set_wrap_license'):
             self.set_wrap_license(True)
         self.set_copyright("Copyright 2008 TK Soh and others")
