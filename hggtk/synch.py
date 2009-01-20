@@ -110,9 +110,15 @@ class SynchDialog(gtk.Window):
         
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Button("Remote Path:")
+        lbl = gtk.Button("Repo:")
         lbl.unset_flags(gtk.CAN_FOCUS)
         lbl.connect('clicked', self._btn_remotepath_clicked)
+        revbox.pack_start(lbl, False, False)
+
+        lbl = gtk.Button("Bundle:")
+        lbl.unset_flags(gtk.CAN_FOCUS)
+        lbl.connect('clicked', self._btn_bundlepath_clicked)
+        revbox.pack_start(lbl, False, False)
         
         # revisions  combo box
         self.pathlist = gtk.ListStore(str)
@@ -149,7 +155,6 @@ class SynchDialog(gtk.Window):
         else:
             self._use_proxy.set_sensitive(False)
 
-        revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._pathbox, True, True)
         revbox.pack_end(self._use_proxy, False, False)
         vbox.pack_start(revbox, False, False, 2)
@@ -310,6 +315,23 @@ class SynchDialog(gtk.Window):
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
         dialog.set_default_response(gtk.RESPONSE_OK)
         dialog.set_current_folder(self.root)
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            self._pathtext.set_text(dialog.get_filename())
+        dialog.destroy()
+
+    def _btn_bundlepath_clicked(self, button):
+        """ select bundle to read from """
+        dialog = gtk.FileChooserDialog(title="Select Bundle",
+                action=gtk.FILE_CHOOSER_ACTION_OPEN,
+                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
+                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        dialog.set_default_response(gtk.RESPONSE_OK)
+        dialog.set_current_folder(self.root)
+        filter = gtk.FileFilter()
+        filter.set_name("Bundle (*.hg")
+        filter.add_pattern("*.hg")
+        dialog.add_filter(filter)
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             self._pathtext.set_text(dialog.get_filename())
