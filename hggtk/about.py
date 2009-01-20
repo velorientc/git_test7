@@ -14,8 +14,20 @@ import gobject
 import pango
 import shlib
 
-from tortoise.__version__ import version as thgversion
-from mercurial.__version__ import version as hgversion
+try:
+    # post 1.1.2
+    from mercurial import util
+    hgversion = util.version()
+except AttributeError:
+    # <= 1.1.2
+    from mercurial import version
+    hgversion = version.get_version()
+
+try:
+    import tortoise.version
+    thgversion = tortoise.version.get_version()
+except ImportError:
+    thgversion = "unknown"
 
 def browse_url(url):
     import threading

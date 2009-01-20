@@ -13,11 +13,8 @@ import _winreg
 if hasattr(sys, "frozen") and sys.frozen == 'dll':
     import win32traceutil
 
-# specify version string, otherwise 'hg identify' will be used:
-version = ''
-
-import tortoise.version
-tortoise.version.remember_version(version)
+# ensure version has been recorded
+os.popen('python setup.py --version')
 
 # shell extension classes
 from tortoise.contextmenu import ContextMenuExtension

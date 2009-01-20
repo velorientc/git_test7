@@ -10,7 +10,7 @@ import sys
 import os
 
 # non-Win32 platforms doesn't require setup
-if os.name != 'nt':
+if os.name != 'nt' and '--version' not in sys.argv:
     sys.stderr.write("abort: %s is for Win32 platforms only" % sys.argv[0])
     sys.exit(1)
 
@@ -32,7 +32,10 @@ except ImportError:
     pass
 
 from distutils.core import setup
-import py2exe
+try: import py2exe
+except ImportError:
+    if '--version' not in sys.argv:
+        raise
 
 _data_files = []
 extra = {}
