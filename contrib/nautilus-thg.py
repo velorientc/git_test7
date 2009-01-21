@@ -507,7 +507,7 @@ class HgExtension(nautilus.MenuProvider,
         ctx = repo.changectx(None).parents()[0]
         try:
             fctx = ctx.filectx(localpath)
-            rev = fctx.filelog().linkrev(fctx.filenode())
+            rev = fctx.filelog().linkrev(fctx.filerev())
         except:
             rev = ctx.rev()
         ctx = repo.changectx(rev)
