@@ -8,7 +8,7 @@ import os
 import sys
 import gtk
 from shlib import shell_notify
-from mercurial import hg, ui, commands, match
+from mercurial import hg, ui, commands, util
 from mercurial.repo import RepoError
 
 class DetectRenameDialog(gtk.Window):
@@ -42,7 +42,6 @@ def run(fname='', **opts):
 
 def rename_resp(dialog, response):
     if response != gtk.RESPONSE_OK:
-        print 'no response'
         gtk.main_quit()
         return
     try:
@@ -59,15 +58,13 @@ def rename_resp(dialog, response):
     opts['after'] = False
     opts['dry_run'] = False
 
-    # Sigh, some errors go to stdout, which is regrettable
-    repo.ui.pushbuffer()
-    commands.rename(repo.ui, repo, dialog.orig, new_name, **opts)
-    out = repo.ui.popbuffer()
-    if out:
+    try:
+        # Sigh, some errors go to ui.warn(), which is regrettable
+        commands.rename(repo.ui, repo, dialog.orig, new_name, **opts)
+        gtk.main_quit()
+    except util.Abort, e:
         from dialog import error_dialog
-        dialog = error_dialog(None, 'rename error', out)
-        dialog.run()
-    gtk.main_quit()
+        error_dialog(None, 'rename error', str(e))
 
 if __name__ == "__main__":
     opts = {'fname' : sys.argv[1]}
