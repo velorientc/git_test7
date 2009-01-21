@@ -34,11 +34,7 @@ class BackoutDialog(gtk.Window):
         tbuttons = [
                 self._toolbutton(gtk.STOCK_GO_BACK, 'Backout',
                                  self._backout_clicked,
-                                 'Backout selected changeset'),
-                sep,
-                self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                                 self._close_clicked,
-                                 'Close Window')
+                                 'Backout selected changeset')
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -75,9 +71,6 @@ class BackoutDialog(gtk.Window):
                 'Commit message text for new changeset that reverses the'
                 '  effect of the change being backed out.')
         vbox.pack_start(frame, True, True, 4)
-
-    def _close_clicked(self, toolbutton, data=None):
-        self.destroy()
 
     def set_notify_func(self, func, *args):
         self.notify_func = func

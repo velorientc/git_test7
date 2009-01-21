@@ -68,13 +68,6 @@ class CloneDialog(gtk.Window):
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self.tbar.insert(sep, -1)
-        button = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._close_clicked, tip='Close Application')
-        self.tbar.insert(button, -1)
         vbox = gtk.VBox()
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
@@ -184,9 +177,6 @@ class CloneDialog(gtk.Window):
         self._remote_cmd = gtk.Entry()
         vbox.pack_end(self._remote_cmd, False, False, 1)
         vbox.pack_end(lbl, False, False, 1)
-
-    def _close_clicked(self, toolbutton, data=None):
-        gtk.main_quit()
 
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):

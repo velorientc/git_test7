@@ -59,17 +59,10 @@ class MergeDialog(gtk.Window):
                 self._btn_unmerge_clicked,
                 tip='Undo merging and return working directory to'
                     ' one of it parent revision')
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._close_clicked, tip='Close Application')
         tbuttons = [
                 self._btn_merge,
                 gtk.SeparatorToolItem(),
-                self._btn_unmerge,
-                sep,
-                self._btn_close
+                self._btn_unmerge
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -112,9 +105,6 @@ class MergeDialog(gtk.Window):
         
         # show them all
         self._refresh()
-
-    def _close_clicked(self, toolbutton, data=None):
-        self.destroy()
 
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):

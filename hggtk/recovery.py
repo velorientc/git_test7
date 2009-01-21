@@ -75,13 +75,6 @@ class RecoveryDialog(gtk.Window):
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self.tbar.insert(sep, -1)
-        button = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._close_clicked, tip='Close Application')
-        self.tbar.insert(button, -1)
         vbox = gtk.VBox()
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
@@ -101,9 +94,6 @@ class RecoveryDialog(gtk.Window):
         self.stbar = gtklib.StatusBar()
         vbox.pack_start(self.stbar, False, False, 2)
 
-    def _close_clicked(self, *args):
-        self._do_close()
-        
     def _delete(self, widget, event):
         self._do_close()
         return True

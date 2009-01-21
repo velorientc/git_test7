@@ -31,12 +31,6 @@ class EmailDialog(gtk.Window):
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
 
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._close_clicked, 'Close Window')
-
         tbuttons = [
                 self._toolbutton(gtk.STOCK_GOTO_LAST, 'Send',
                                  self._on_send_clicked,
@@ -44,9 +38,7 @@ class EmailDialog(gtk.Window):
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_PREFERENCES, 'configure',
                                  self._on_conf_clicked,
-                                 'Configure email settings'),
-                sep,
-                self._btn_close
+                                 'Configure email settings')
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -173,9 +165,6 @@ class EmailDialog(gtk.Window):
         mainvbox.pack_start(frame, True, True, 4)
 
         self.connect('map_event', self._on_window_map_event)
-
-    def _close_clicked(self, toolbutton, data=None):
-        self.destroy()
 
     def _toolbutton(self, stock, label, handler, tip):
         tbutton = gtk.ToolButton(stock)

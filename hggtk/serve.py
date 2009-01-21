@@ -75,11 +75,6 @@ class ServeDialog(gtk.Window):
                                               'Configure',
                                               self._on_conf_clicked,
                                               None)
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self._button_close = self._toolbutton(gtk.STOCK_CLOSE, 'Quit',
-                self._close_clicked)
 
         tbuttons = [
                 self._button_start,
@@ -88,8 +83,6 @@ class ServeDialog(gtk.Window):
                 self._button_browse,
                 gtk.SeparatorToolItem(),
                 self._button_conf,
-                sep,
-                self._button_close,
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -146,10 +139,6 @@ class ServeDialog(gtk.Window):
         tbutton.connect('clicked', handler, userdata)
         return tbutton
             
-    def _close_clicked(self, *args):
-        if self._server_stopped() == True:
-            gtk.main_quit()
-        
     def _delete(self, widget, event):
         if self._server_stopped() == True:
             gtk.main_quit()

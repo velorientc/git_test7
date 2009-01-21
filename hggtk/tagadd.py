@@ -48,12 +48,6 @@ class TagAddDialog(gtk.Window):
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
         
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._close_clicked, tip='Close Application')
-
         self._btn_addtag = self._toolbutton(
                 gtk.STOCK_ADD,
                 'Add', 
@@ -66,9 +60,7 @@ class TagAddDialog(gtk.Window):
                 tip='Remove tag from repository')
         tbuttons = [
                 self._btn_addtag,
-                self._btn_rmtag,
-                sep,
-                self._btn_close,
+                self._btn_rmtag
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -149,9 +141,6 @@ class TagAddDialog(gtk.Window):
                 continue
             self._tagslist.append([tagname])
             
-    def _close_clicked(self, toolbutton, data=None):
-        self.destroy()
-
     def _btn_tag_clicked(self, button):
         """ select tag from tags dialog """
         import tags

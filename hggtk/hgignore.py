@@ -26,19 +26,11 @@ class HgIgnoreDialog(gtk.Window):
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
 
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._close_clicked, 'Close Window')
-
         tbuttons = [
                 self._toolbutton(gtk.STOCK_REFRESH,
                     'Refresh',
                     self._refresh_clicked,
-                    tip='Reload hgignore'),
-                sep,
-                self._btn_close
+                    tip='Reload hgignore')
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -156,9 +148,6 @@ class HgIgnoreDialog(gtk.Window):
             f.close()
         except IOError:
             pass
-
-    def _close_clicked(self, toolbutton, data=None):
-        self.destroy()
 
     def _toolbutton(self, stock, label, handler, tip):
         tbutton = gtk.ToolButton(stock)

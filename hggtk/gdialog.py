@@ -283,19 +283,6 @@ class GDialog(gtk.Window):
         tbuttons =  self.get_tbbuttons()
         for tbutton in tbuttons:
             toolbar.insert(tbutton, -1)
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        toolbar.insert(sep, -1)
-        if self.main:
-            name = 'Quit'
-            tip = 'Close Application'
-        else:
-            name = 'Close'
-            tip = 'Close Window'
-        button = self.make_toolbutton(gtk.STOCK_CLOSE, name,
-                self._quit_clicked, tip=tip)
-        toolbar.insert(button, -1)
         self.toolbar = toolbar
         vbox.pack_start(toolbar, False, False, 0)
 
@@ -310,12 +297,6 @@ class GDialog(gtk.Window):
 
         self.connect('destroy', self._destroying)
         self.connect('delete_event', self.should_live)
-
-
-
-    def _quit_clicked(self, button, data=None):
-        if not self.should_live():
-            self.destroy()
 
 
     def _destroying(self, gtkobj):

@@ -56,15 +56,8 @@ class UpdateDialog(gtk.Window):
                 'Update', 
                 self._btn_update_clicked,
                 tip='Update working directory to selected revision')
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self._btn_close = self._toolbutton(gtk.STOCK_CLOSE, 'Close',
-                self._close_clicked, tip='Close Application')
         tbuttons = [
                 self._btn_update,
-                sep,
-                self._btn_close,
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -112,9 +105,6 @@ class UpdateDialog(gtk.Window):
         
         # show them all
         self._refresh()
-
-    def _close_clicked(self, toolbutton, data=None):
-        self.destroy()
 
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
