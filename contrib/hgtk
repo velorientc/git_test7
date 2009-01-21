@@ -204,6 +204,12 @@ def repoconfig(ui, *pats, **opts):
     opts['files'] = opts['root']
     run(**opts)
 
+def rename(ui, *pats, **opts):
+    """repository configuration editor"""
+    from hggtk.rename import run
+    opts['fname'] = pats[0]
+    run(**opts)
+
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
@@ -463,6 +469,7 @@ table = {
     "^status|st": (status, [], _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
+    "^rename|mv": (rename, [], _('hgtk rename FILE')),
     "^serve": 
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
