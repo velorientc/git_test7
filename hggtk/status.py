@@ -786,7 +786,7 @@ class GStatus(GDialog):
             lines = chunk.readlines()
             lines[-1] = lines[-1].strip('\n\r')
             for line in lines:
-                line = cgi.escape(util.fromlocal(line))
+                line = cgi.escape(toutf(line))
                 if line.startswith('---') or line.startswith('+++'):
                     hunk += '<span foreground="#000090">%s</span>' % line
                 elif line.startswith('-'):
