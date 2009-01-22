@@ -74,19 +74,42 @@ class ConfigDialog(gtk.Dialog):
 
         # create pages for each section of configuration file
         self._tortoise_info = (
-                ('Commit Tool', 'tortoisehg.commit', ['qct', 'internal'],
-                    'Select commit tool launched by TortoiseHg. Qct is'
-                    ' not included, must be installed separately'),
-                ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
-                    'Move diff panel below file list in status and '
-                    'commit dialogs.  Default: False'),
-                ('Visual Diff Tool', 'tortoisehg.vdiff', [],
-                    'Specify the visual diff tool; must be extdiff command'),
+                ('3-way Merge Tool', 'ui.merge', [],
+'Graphical merge program for resolving merge conflicts.  If left'
+' unspecified, Mercurial will use the first applicable tool it finds'
+' on your system or use its internal merge tool that leaves conflict'
+' markers in place.'),
+                ('Visual Diff Command', 'tortoisehg.vdiff', [],
+                    'Specify visual diff tool; must be an extdiff command'),
                 ('Visual Editor', 'tortoisehg.editor', [],
                     'Specify the visual editor used to view files, etc'),
+                ('CLI Editor', 'ui.editor', [],
+                    'The editor to use during a commit and other'
+                    ' instances where Mercurial needs multiline input from'
+                    ' the user.  Only used by CLI commands.'),
                 ('Tab Width', 'tortoisehg.tabwidth', [],
                     'Specify the number of spaces to expand tabs.'
                     ' Default: Not expanded'),
+                ('Overlay Icons', 'tortoisehg.overlayicons',
+                    ['False', 'True', 'localdisks'],
+                    'Display overlay icons in Explorer windows.'
+                    ' Default: True'))
+        self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
+        self.fill_frame(self.tortoise_frame, self._tortoise_info)
+
+        self._commit_info = (
+                ('Username', 'ui.username', [], 
+                    'Name associated with commits'),
+                ('Commit Tool', 'tortoisehg.commit', ['internal', 'qct'],
+                    'Select commit tool launched by TortoiseHg. Qct must'
+                    ' must be installed separately'),
+                ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
+                    'Move diff panel below file list in status and'
+                    ' commit dialogs.  Default: False'))
+        self.commit_frame = self.add_page(notebook, 'Commit')
+        self.fill_frame(self.commit_frame, self._commit_info)
+
+        self._log_info = (
                 ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
                     'Color changesets by author name.  If not enabled,'
                     ' the changes are colored green for merge, red for'
@@ -96,32 +119,9 @@ class ConfigDialog(gtk.Dialog):
                     ' changelog viewer in a single batch. Default: 500'),
                 ('Copy Hash', 'tortoisehg.copyhash', ['False', 'True'],
                     'Allow the changelog viewer to copy hash of currently'
-                    ' selected changeset into the clipboard. Default: False'),
-                ('Overlay Icons', 'tortoisehg.overlayicons',
-                    ['False', 'True', 'localdisks'],
-                    'Display overlay icons in Explorer windows.'
-                    ' Default: True'))
-        self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
-        self.fill_frame(self.tortoise_frame, self._tortoise_info)
-
-        self._user_info = (
-                ('Username', 'ui.username', [], 
-                    'Name associated with commits'),
-                ('3-way Merge Tool', 'ui.merge', [],
-'Graphical merge program for resolving merge conflicts.  If left'
-' unspecified, Mercurial will use the first applicable tool it finds'
-' on your system or use its internal merge tool that leaves conflict'
-' markers in place.'),
-                ('Editor', 'ui.editor', [],
-                    'The editor to use during a commit and other'
-                    ' instances where Mercurial needs multiline input from'
-                    ' the user.  Only required by CLI commands.'),
-                ('Verbose', 'ui.verbose', ['False', 'True'],
-                    'Increase the amount of output printed'),
-                ('Debug', 'ui.debug', ['False', 'True'],
-                    'Print debugging information'))
-        self.user_frame = self.add_page(notebook, 'User')
-        self.fill_frame(self.user_frame, self._user_info)
+                    ' selected changeset into the clipboard. Default: False'))
+        self.log_frame = self.add_page(notebook, 'Changelog')
+        self.fill_frame(self.log_frame, self._log_info)
 
         self._paths_info = (
                 ('default', 'paths.default', [],
