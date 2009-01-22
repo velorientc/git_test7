@@ -117,7 +117,6 @@ class ChangeSet(GDialog):
             buf.insert_with_tags_by_name(eob, utext, tag)
             buf.insert(eob, "\n")
 
-        # TODO: Add toggle for gmtime/localtime
         eob = buf.get_end_iter()
         date = displaytime(ctx.date())
         if self.clipboard:
