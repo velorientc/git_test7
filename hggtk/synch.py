@@ -128,7 +128,7 @@ class SynchDialog(gtk.Window):
 
         # support dropping of repos or bundle files
         self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
-                [("text/plain", 0, 80)], gtk.gdk.ACTION_COPY)
+                [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
         self.connect('drag_data_received', self._drag_receive)
 
         defrow = None
@@ -228,13 +228,9 @@ class SynchDialog(gtk.Window):
         self._last_drop_time = None
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
-        if targetType == 80 and time != self._last_drop_time:
-            if selection.targets_include_uri():
-                files = selection.get_uris()
-                gobject.idle_add(self._set_path, files[0])
-            else:
-                file = selection.get_text().split()[0].strip()
-                gobject.idle_add(self._set_path, file)
+        if time != self._last_drop_time:
+            files = selection.get_uris()
+            gobject.idle_add(self._set_path, files[0])
             self._last_drop_time = time
 
     def _set_path(self, uri):
