@@ -207,6 +207,8 @@ def repoconfig(ui, *pats, **opts):
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     from hggtk.rename import run
+    if len(pats) != 1:
+        raise util.Abort("rename takes a single path argument")
     opts['fname'] = pats[0]
     run(**opts)
 
