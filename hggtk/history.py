@@ -69,7 +69,7 @@ class GLog(GDialog):
         self.graphview.set_property(property, bool)
 
     def _more_clicked(self, button):
-        self.graphview.next_revision_batch()
+        self.graphview.next_revision_batch(self.limit)
 
     def _load_all_clicked(self, button):
         self.graphview.load_all_revisions()
@@ -221,23 +221,25 @@ class GLog(GDialog):
                 self._hpaned.get_position())
         return settings
 
+    def get_graphlimit(self, suggestion):
+        limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
+        limit_opt = suggestion or limit_opt
+        try:
+            limit = int(limit_opt)
+        except ValueError:
+            return 0
+        if limit <= 0:
+            return 0
+        return limit
+
     def load_settings(self, settings):
         '''Called at beginning of display() method'''
-        limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
-        if limit_opt:
-            try:
-                limit = int(limit_opt)
-            except ValueError:
-                limit = 0
-            if limit <= 0:
-                limit = None
-        else:
-            limit = None
 
         # Allocate TreeView instance to use internally
-        self.limit = limit
+        self.limit = self.get_graphlimit(self.opts['limit'])
         self.stbar = gtklib.StatusBar()
-        self.graphview = TreeView(self.repo, limit, self.stbar)
+        self.graphview = TreeView(self.repo, self.limit, self.stbar)
+        self.limit = self.get_graphlimit(None)
 
         # Allocate ChangeSet instance to use internally
         self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
@@ -613,7 +615,7 @@ class GLog(GDialog):
         self._menu.get_children()[0].activate()
         return True
 
-def run(root='', cwd='', files=[], **opts):
+def run(root='', cwd='', files=[], limit='', **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -622,7 +624,7 @@ def run(root='', cwd='', files=[], **opts):
 
     cmdoptions = {
         'follow':False, 'follow-first':False, 'copies':False, 'keyword':[],
-        'limit':0, 'rev':[], 'removed':False, 'no_merges':False, 'date':None,
+        'limit':limit, 'rev':[], 'removed':False, 'no_merges':False, 'date':None,
         'only_merges':None, 'prune':[], 'git':False, 'verbose':False,
         'include':[], 'exclude':[]
     }
@@ -641,4 +643,5 @@ if __name__ == "__main__":
     path = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
     opts['root'] = os.path.abspath(path)
     opts['files'] = [opts['root']]
+    opts['limit'] = ''
     run(**opts)
