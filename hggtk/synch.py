@@ -355,7 +355,7 @@ class SynchDialog(gtk.Window):
         dialog.set_default_response(gtk.RESPONSE_OK)
         dialog.set_current_folder(self.root)
         filter = gtk.FileFilter()
-        filter.set_name("Bundle (*.hg")
+        filter.set_name("Bundle (*.hg)")
         filter.add_pattern("*.hg")
         dialog.add_filter(filter)
         response = dialog.run()
