@@ -22,7 +22,7 @@ from mercurial import cmdutil, util, ui, hg, commands
 from mercurial import context, patch, revlog
 from gdialog import *
 from hgcmd import CmdDialog
-from hglib import toutf, fromutf, displaytime
+from hglib import toutf, fromutf, displaytime, gettabwidth, hgcmd_toq
 from gtklib import StatusBar
 
 class ChangeSet(GDialog):
@@ -374,8 +374,7 @@ class ChangeSet(GDialog):
 
     def prepare_diff(self, difflines, offset, fname):
         '''Borrowed from hgview; parses changeset diffs'''
-        import hglib
-        tw = hglib.gettabwidth(self.ui)
+        tw = gettabwidth(self.ui)
         DIFFHDR = "=== %s ===\n"
         idx = 0
         outlines = []
@@ -650,10 +649,9 @@ class ChangeSet(GDialog):
         result = fd.run()
         if result:
             import Queue
-            import hglib
             q = Queue.Queue()
             cpath = util.canonpath(self.repo.root, self.cwd, self.curfile)
-            hglib.hgcmd_toq(self.repo.root, q, 'cat', '--rev',
+            hgcmd_toq(self.repo.root, q, 'cat', '--rev',
                 str(self.currev), '--output', result, cpath)
 
     def _view_file_rev(self, menuitem):
