@@ -205,7 +205,7 @@ def repoconfig(ui, *pats, **opts):
     run(**opts)
 
 def rename(ui, *pats, **opts):
-    """repository configuration editor"""
+    """rename a single file or directory"""
     from hggtk.rename import run
     opts['fname'] = pats[0]
     run(**opts)
