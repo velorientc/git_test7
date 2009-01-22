@@ -256,6 +256,11 @@ def status(ui, *pats, **opts):
 def synch(ui, **opts):
     """repository synchronization tool"""
     from hggtk.synch import run
+    cmd = sys.argv[1] 
+    if 'push'.startswith(cmd) or 'outgoing'.startswith(cmd):
+        opts['pushmode'] = True
+    else:
+        opts['pushmode'] = False
     run(**opts)
 
 def update(ui, **opts):

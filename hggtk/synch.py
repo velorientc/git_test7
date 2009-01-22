@@ -26,7 +26,7 @@ import gtklib
 import urllib
 
 class SynchDialog(gtk.Window):
-    def __init__(self, cwd='', root = '', repos=[]):
+    def __init__(self, cwd='', root = '', repos=[], pushmode=False):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
@@ -144,10 +144,10 @@ class SynchDialog(gtk.Window):
 
         if repos:
             self._pathtext.set_text(repos[0])
+        elif defpushrow is not None and pushmode:
+            self._pathbox.set_active(defpushrow)
         elif defrow is not None:
             self._pathbox.set_active(defrow)
-        elif defpushrow is not None:
-            self._pathbox.set_active(defpushrow)
 
         sympaths = [x[1] for x in self.paths]
         for p in self._recent_src:
@@ -575,8 +575,8 @@ class SynchDialog(gtk.Window):
                 self.write("[command interrupted]")
             return False # Stop polling this function
 
-def run(cwd='', root='', files=[], **opts):
-    dialog = SynchDialog(cwd, root, files)
+def run(cwd='', root='', files=[], pushmode=False, **opts):
+    dialog = SynchDialog(cwd, root, files, pushmode)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
