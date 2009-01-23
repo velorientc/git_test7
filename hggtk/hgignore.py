@@ -76,20 +76,24 @@ class HgIgnoreDialog(gtk.Window):
         frame = gtk.Frame('Filters')
         hbox.pack_start(frame, True, True, 4)
         pattree = gtk.TreeView()
-        pattree.connect('button-press-event', self.tree_button_press)
         pattree.set_reorderable(False)
         sel = pattree.get_selection()
         sel.set_mode(gtk.SELECTION_SINGLE)
         sel.connect("changed", self.pattern_rowchanged)
         col = gtk.TreeViewColumn('Patterns', gtk.CellRendererText(), text=0)
         pattree.append_column(col) 
+        pattree.set_headers_visible(False)
+        self.pattree = pattree
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.set_border_width(4)
         scrolledwindow.add(pattree)
-        pattree.set_headers_visible(False)
-        self.pattree = pattree
-        frame.add(scrolledwindow)
+        remove = gtk.Button("Remove Selected")
+        remove.connect("pressed", self.remove_pressed, sel)
+        vbox = gtk.VBox()
+        vbox.pack_start(scrolledwindow, True, True, 2)
+        vbox.pack_start(remove, False, False, 2)
+        frame.add(vbox)
 
         frame = gtk.Frame('Unknown Files')
         hbox.pack_start(frame, True, True, 4)
@@ -113,32 +117,10 @@ class HgIgnoreDialog(gtk.Window):
         glob_entry.grab_focus()
         self.connect('map_event', self._on_window_map_event)
 
-    def tree_button_press(self, widget, event):
-        if event.button != 3:
-            return False
-        if event.state & (gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK):
-            return False
-
-        path = widget.get_path_at_pos(int(event.x), int(event.y))[0]
-        selection = widget.get_selection()
-        rows = selection.get_selected_rows()
-        if path[0] not in rows[1]:
-            selection.unselect_all()
-            selection.select_path(path[0])
-
-        menu = gtk.Menu()
-        menuitem = gtk.MenuItem('Remove', True)
-        menuitem.connect('activate', self.remove_ignore_line, path[0])
-        menuitem.set_border_width(1)
-        menu.append(menuitem)
-        menu.show_all()
-        menu.popup(None, None, None, 0, 0)
-        return True
-
-    def remove_ignore_line(self, menuitem, linenum):
-        model = self.pattree.get_model()
-        del model[linenum]
-        del self.ignorelines[linenum]
+    def remove_pressed(self, widget, selection):
+        model, rows = selection.get_selected_rows()
+        del model[rows[0]]
+        del self.ignorelines[rows[0][0]]
         self.write_ignore_lines()
         self.refresh()
 
