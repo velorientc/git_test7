@@ -1118,7 +1118,12 @@ class GStatus(GDialog):
         import hgignore
         dialog = hgignore.HgIgnoreDialog(self.repo.root, util.pconvert(file))
         dialog.show_all()
+        dialog.set_notify_func(self.ignoremask_updated)
         return True
+
+    def ignoremask_updated(self):
+        '''User has changed the ignore mask in hgignore dialog'''
+        self.reload_status()
 
     def _mark_resolved(self, stat, file):
         ms = merge_.mergestate(self.repo)

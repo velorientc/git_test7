@@ -19,6 +19,7 @@ class HgIgnoreDialog(gtk.Window):
         self.root = root
         self.set_title('Ignore mask for ' + os.path.basename(root))
         self.set_default_size(630, 400)
+        self.notify_func = None
 
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
@@ -170,6 +171,9 @@ class HgIgnoreDialog(gtk.Window):
     def _refresh_clicked(self, togglebutton, data=None):
         self.refresh()
 
+    def set_notify_func(self, func):
+        self.notify_func = func
+
     def refresh(self):
         try: repo = hg.repository(ui.ui(), path=self.root)
         except: gtk.main_quit()
@@ -206,6 +210,7 @@ class HgIgnoreDialog(gtk.Window):
         except IOError:
             pass
         shell_notify(self.repo.wjoin('.hgignore'))
+        if self.notify_func: self.notify_func()
 
     def _close_clicked(self, toolbutton, data=None):
         self.destroy()
