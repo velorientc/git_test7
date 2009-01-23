@@ -307,9 +307,13 @@ class GCommit(GStatus):
             dopatch = fp.tell()
             fp.seek(0)
 
-            # 3a. apply filtered patch to clean repo  (clean)
             if backups:
-                hg.revert(repo, repo.dirstate.parents()[0], backups.has_key)
+                if self.qheader is not None:
+                    # 3a. apply filtered patch to top patch's parent
+                    hg.revert(repo, self._node1, backups.has_key)
+                else:
+                    # 3a. apply filtered patch to clean repo  (clean)
+                    hg.revert(repo, repo.dirstate.parents()[0], backups.has_key)
 
             # 3b. (apply)
             if dopatch:
@@ -429,15 +433,13 @@ class GCommit(GStatus):
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
-        if self.qheader:
-            cmdline  = ["hg", "qrefresh", "--verbose", "--repository", self.repo.root]
-            cmdline += ['--message', fromutf(self.opts['message'])]
-        else:
-            cmdline  = ["hg", "commit", "--verbose", "--repository", self.repo.root]
-            if self.opts['addremove']:
-                cmdline += ['--addremove']
-            cmdline += ['--message', fromutf(self.opts['message'])]
-            cmdline += [self.repo.wjoin(x) for x in files]
+        cmdline  = ["hg", "commit", "--verbose", "--repository", self.repo.root]
+        if self.qheader is not None:
+            cmdline[1] = 'qrefresh'
+        if self.opts['addremove']:
+            cmdline += ['--addremove']
+        cmdline += ['--message', fromutf(self.opts['message'])]
+        cmdline += [self.repo.wjoin(x) for x in files]
         dialog = CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
         dialog.run()
@@ -446,7 +448,7 @@ class GCommit(GStatus):
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
             shell_notify([self.cwd] + files)
-            if not self.qheader:
+            if self.qheader is not None:
                 self.text.set_buffer(gtk.TextBuffer())
                 self._update_recent_messages(self.opts['message'])
                 self._last_commit_id = self._get_tip_rev(True)

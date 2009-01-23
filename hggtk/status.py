@@ -446,8 +446,13 @@ class GStatus(GDialog):
         # The following code was copied from the status function in mercurial\commands.py
         # and modified slightly to work here
         
-        # node2 is None (the working dir) when 0 or 1 rev is specificed
-        self._node1, self._node2 = cmdutil.revpair(self.repo, self.opts.get('rev'))
+        if hasattr(self.repo, 'mq') and self.repo.mq.applied:
+            # when a patch is applied, show diffs to parent of top patch
+            self._node1 = self.repo.lookup(-3)
+            self._node2 = None
+        else:
+            # node2 is None (the working dir) when 0 or 1 rev is specificed
+            self._node1, self._node2 = cmdutil.revpair(self.repo, self.opts.get('rev'))
 
         matcher = cmdutil.match(self.repo, self.pats, self.opts)
         cwd = (self.pats and self.repo.getcwd()) or ''
