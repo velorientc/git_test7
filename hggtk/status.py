@@ -780,13 +780,12 @@ class GStatus(GDialog):
     def _show_diff_hunks(self, files):
         ''' Update the diff text '''
         def markup(chunk):
-            import cgi
             hunk = ""
             chunk.seek(0)
             lines = chunk.readlines()
             lines[-1] = lines[-1].strip('\n\r')
             for line in lines:
-                line = cgi.escape(toutf(line))
+                line = gobject.markup_escape_text(toutf(line))
                 if line.startswith('---') or line.startswith('+++'):
                     hunk += '<span foreground="#000090">%s</span>' % line
                 elif line.startswith('-'):
