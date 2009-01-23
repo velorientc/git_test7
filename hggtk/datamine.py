@@ -20,7 +20,6 @@ from vis import treemodel
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
 from vis.treeview import TreeView
 import gtklib
-import cgi
 
 class DataMineDialog(GDialog):
     COL_REVID = 0
@@ -151,7 +150,7 @@ class DataMineDialog(GDialog):
         summary = summary.split('\n')[0]
         date = displaytime(ctx.date())
         desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
-        desc = cgi.escape(desc)
+        desc = gobject.markup_escape_text(desc)
         self.changedesc[rev] = (desc, author)
         return (desc, author)
 
