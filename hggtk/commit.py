@@ -448,7 +448,7 @@ class GCommit(GStatus):
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
             shell_notify([self.cwd] + files)
-            if self.qheader is not None:
+            if self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
                 self._update_recent_messages(self.opts['message'])
                 self._last_commit_id = self._get_tip_rev(True)
