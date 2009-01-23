@@ -397,12 +397,18 @@ def shelve(ui, repo, *pats, **opts):
         raise util.Abort(_('shelve data already exists'))
             
     def shelvefunc(ui, repo, message, match, opts):
+        # If an MQ patch is applied, consider all qdiff changes
+        if hasattr(repo, 'mq') and repo.mq.applied:
+            basenode = self.repo.lookup(-3)
+        else:
+            basenode = repo.dirstate.parents()[0]
+
         changes = repo.status(match=match)[:5]
         modified, added, removed = changes[:3]
         files = modified + added + removed
         diffopts = mdiff.diffopts(git=True, nodates=True)
-        patch_diff = ''.join(patch.diff(repo, repo.dirstate.parents()[0],
-                           match=match, changes=changes, opts=diffopts))
+        patch_diff = ''.join(patch.diff(repo, basenode, match=match,
+                             changes=changes, opts=diffopts))
         
         fp = cStringIO.StringIO(patch_diff)
         ac = parsepatch(fp)
@@ -448,7 +454,7 @@ def shelve(ui, repo, *pats, **opts):
             try:
                 # 3a. apply filtered patch to clean repo (clean)
                 if backups:
-                    hg.revert(repo, repo.dirstate.parents()[0], backups.has_key)
+                    hg.revert(repo, basenode, backups.has_key)
 
                 # 3b. apply filtered patch to clean repo (apply)
                 if dopatch:
