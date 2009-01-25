@@ -26,8 +26,8 @@ import hgshelve
 
 # diff_model row enumerations
 DM_REJECTED = 0
-DM_CHUNK_TEXT = 1
-DM_NOT_HEADER_CHUNK = 2
+DM_NOT_REJECTED = 1
+DM_CHUNK_TEXT = 2
 DM_HEADER_CHUNK = 3
 DM_CHUNK_ID = 4
 
@@ -301,11 +301,10 @@ class GStatus(GDialog):
         diff_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        diff_frame.add(scroller)
-        
+
         if self.count_revs() == 2 or len(self.repo.changectx(None).parents()) == 1:
             # use treeview to diff hunks
-            self.diff_model = gtk.ListStore(bool, str, bool, bool, int)
+            self.diff_model = gtk.ListStore(bool, bool, str, bool, int)
             self.diff_tree = gtk.TreeView(self.diff_model)
             self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
@@ -314,20 +313,25 @@ class GStatus(GDialog):
             self.diff_tree.connect('row-activated',
                     self._diff_tree_row_act)
             self.diff_tree.set_enable_search(False)
+            self.diff_tree.set_headers_visible(False)
             
             diff_hunk_cell = gtk.CellRendererText()
             diff_hunk_cell.set_property('cell-background', '#EEEEEE')
-            diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell,
-                    strikethrough=DM_REJECTED, 
-                    markup=DM_CHUNK_TEXT,
-                    strikethrough_set=DM_NOT_HEADER_CHUNK,
-                    cell_background_set=DM_HEADER_CHUNK)
+            diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell)
             diffcol.set_resizable(True)
             self.diff_tree.append_column(diffcol)
             self.tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             self.tree.get_selection().connect('changed',
                     self._tree_selection_changed, False)
             scroller.add(self.diff_tree)
+
+            vbox = gtk.VBox()
+            visiblerejects = gtk.CheckButton("Show Rejected Chunks")
+            visiblerejects.connect('toggled', self._toggle_rejects, diffcol, diff_hunk_cell)
+            vbox.pack_start(visiblerejects, False, False, 2)
+            vbox.pack_start(scroller, True, True, 2)
+            self._toggle_rejects(visiblerejects, diffcol, diff_hunk_cell)
+            diff_frame.add(vbox)
         else:
             # display merge diffs in simple text view
             self.merge_diff_text = gtk.TextView()
@@ -339,6 +343,7 @@ class GStatus(GDialog):
                     self._merge_tree_selection_changed, False)
             self._activate_shelve_buttons(False)
             scroller.add(self.merge_diff_text)
+            diff_frame.add(scroller)
 
         if self.diffbottom:
             self._diffpane = gtk.VPaned()
@@ -352,6 +357,19 @@ class GStatus(GDialog):
         self.tree.set_headers_clickable(True)
         return self._diffpane
 
+
+    def _toggle_rejects(self, widget, diffcol, cell):
+        diffcol.clear_attributes(cell)
+        if widget.get_active():
+            diffcol.set_attributes(cell,
+                    strikethrough=DM_REJECTED, 
+                    markup=DM_CHUNK_TEXT,
+                    cell_background_set=DM_HEADER_CHUNK)
+        else:
+            diffcol.set_attributes(cell,
+                    visible=DM_NOT_REJECTED, 
+                    markup=DM_CHUNK_TEXT,
+                    cell_background_set=DM_HEADER_CHUNK)
 
     def get_extras(self):
         table = gtk.Table(rows=2, columns=3)
@@ -549,6 +567,7 @@ class GStatus(GDialog):
         file = entry[2]
         if file not in self._filechunks: return
         for n in self._filechunks[file][1:]:
+            self.diff_model[n][DM_NOT_REJECTED] = entry[0]
             self.diff_model[n][DM_REJECTED] = not entry[0]
 
     def _show_toggle(self, check, type):
@@ -749,37 +768,40 @@ class GStatus(GDialog):
                     selection.select_path((row,))
         return False
 
-
     def _diff_tree_row_act(self, tree, path, column):
-        row = self.diff_model[path]
-        chunk = self._shelve_chunks[row[DM_CHUNK_ID]]
-        file = chunk.filename()
-        if file not in self._filechunks: return
-        if row[DM_HEADER_CHUNK]:
-            for n in self._filechunks[file][1:]:
-                self.diff_model[n][DM_REJECTED] = not self.diff_model[n][DM_REJECTED]
-            newvalue = False
-            for n in self._filechunks[file][1:]:
-                if not self.diff_model[n][DM_REJECTED]:
-                    newvalue = True
-                    break
-        else:
-            row[DM_REJECTED] = not row[DM_REJECTED]
-            if row[DM_REJECTED]:
-                # File has at least one inactive chunk, check others
+        try:
+            row = self.diff_model[path]
+            chunk = self._shelve_chunks[row[DM_CHUNK_ID]]
+            file = chunk.filename()
+            if file not in self._filechunks: return
+            if row[DM_HEADER_CHUNK]:
+                for n in self._filechunks[file][1:]:
+                    self.diff_model[n][DM_REJECTED] = not self.diff_model[n][DM_REJECTED]
+                newvalue = False
                 for n in self._filechunks[file][1:]:
                     if not self.diff_model[n][DM_REJECTED]:
-                        return
-                newvalue = False
+                        newvalue = True
+                        break
             else:
-                newvalue = True
-        # Update file's check status
-        for fr in self.model:
-            if fr[2] == file:
-                if fr[0] != newvalue:
-                    fr[0] = newvalue
-                    self._update_check_count()
-                return
+                row[DM_REJECTED] = not row[DM_REJECTED]
+                if row[DM_REJECTED]:
+                    # File has at least one inactive chunk, check others
+                    for n in self._filechunks[file][1:]:
+                        if not self.diff_model[n][DM_REJECTED]:
+                            return
+                    newvalue = False
+                else:
+                    newvalue = True
+            # Update file's check status
+            for fr in self.model:
+                if fr[2] == file:
+                    if fr[0] != newvalue:
+                        fr[0] = newvalue
+                        self._update_check_count()
+                    return
+        finally:
+            for row in self.diff_model:
+                row[DM_NOT_REJECTED] = not row[DM_REJECTED]
 
 
     def _show_diff_hunks(self, files):
@@ -828,11 +850,11 @@ class GStatus(GDialog):
                     isheader = isinstance(chunk, hgshelve.header)
                     if isheader:
                         self._filechunks[chunk.filename()] = [len(self.diff_model)]
-                        self.diff_model.append([False, markedup, False, True, n])
+                        self.diff_model.append([False, True, markedup, True, n])
                         skip = chunk.special()
                     elif skip != True:
                         self._filechunks[chunk.filename()].append(len(self.diff_model))
-                        self.diff_model.append([False, markedup, True, False, n])
+                        self.diff_model.append([False, True, markedup, False, n])
             finally:
                 difftext.close()
 
