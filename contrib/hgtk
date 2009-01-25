@@ -207,9 +207,13 @@ def repoconfig(ui, *pats, **opts):
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     from hggtk.rename import run
-    if len(pats) != 1:
-        raise util.Abort("rename takes a single path argument")
-    opts['fname'] = pats[0]
+    if not pats or len(pats) > 2:
+        raise util.Abort("rename takes one or two path arguments")
+    try:
+        opts['fname'] = pats[0]
+        opts['target'] = pats[1] or pats[0]
+    except IndexError:
+        pass
     run(**opts)
 
 def datamine(ui, *pats, **opts):
@@ -478,7 +482,7 @@ table = {
     "^status|st": (status, [], _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
-    "^rename|mv": (rename, [], _('hgtk rename FILE')),
+    "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
     "^serve": 
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],

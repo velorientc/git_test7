@@ -30,10 +30,10 @@ class DetectRenameDialog(gtk.Window):
     def _adj_changed(self, adj):
         print adj.get_value()
 
-def run(fname='', **opts):
+def run(fname='', target='', **opts):
     from dialog import entry_dialog
     title = 'Rename ' + fname
-    dialog = entry_dialog(None, title, True, fname, rename_resp)
+    dialog = entry_dialog(None, title, True, target or fname, rename_resp)
     dialog.orig = fname
     dialog.show_all()
     dialog.connect('destroy', gtk.main_quit)
@@ -83,4 +83,6 @@ def rename_resp(dialog, response):
 
 if __name__ == "__main__":
     opts = {'fname' : sys.argv[1]}
+    if len(sys.argv) == 3:
+        opts['target'] = sys.argv[2]
     run(**opts)
