@@ -360,7 +360,8 @@ class GStatus(GDialog):
         self._diffpane.pack1(tree_frame, True, False)
         self._diffpane.pack2(diff_frame, True, True)
         self._diffpane.set_position(self._setting_pos)
-        self._diffpane_moved_id = self._diffpane.connect('notify::position', self._diffpane_moved)
+        self._diffpane_moved_id = self._diffpane.connect('notify::position',
+                self._diffpane_moved)
         self.tree.set_headers_clickable(True)
         return self._diffpane
 
