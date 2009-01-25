@@ -11,6 +11,7 @@ pygtk.require('2.0')
 import errno
 import gtk
 import pango
+import shutil
 import tempfile
 import cStringIO
 
@@ -314,6 +315,9 @@ class GCommit(GStatus):
                 else:
                     # 3a. apply filtered patch to clean repo  (clean)
                     hg.revert(repo, repo.dirstate.parents()[0], backups.has_key)
+                # Reapply permissions back to clean files
+                for realname, tmpname in backups.iteritems():
+                    shutil.copymode(tmpname, repo.wjoin(realname))
 
             # 3b. (apply)
             if dopatch:
