@@ -223,23 +223,28 @@ class GLog(GDialog):
 
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
-        limit_opt = suggestion or limit_opt
-        try:
-            limit = int(limit_opt)
-        except ValueError:
-            return 0
-        if limit <= 0:
-            return 0
-        return limit
+        l = 0
+        for limit in (suggestion, limit_opt):
+            try:
+                l = int(limit)
+                if l > 0:
+                    return l
+            except (TypeError, ValueError), e:
+                pass
+        return l or 500
 
     def load_settings(self, settings):
         '''Called at beginning of display() method'''
 
-        # Allocate TreeView instance to use internally
-        self.limit = self.get_graphlimit(self.opts['limit'])
         self.stbar = gtklib.StatusBar()
-        self.graphview = TreeView(self.repo, self.limit, self.stbar)
         self.limit = self.get_graphlimit(None)
+
+        # Allocate TreeView instance to use internally
+        if 'limit' in self.opts:
+            firstlimit = self.get_graphlimit(self.opts['limit'])
+            self.graphview = TreeView(self.repo, firstlimit, self.stbar)
+        else:
+            self.graphview = TreeView(self.repo, self.limit, self.stbar)
 
         # Allocate ChangeSet instance to use internally
         self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
