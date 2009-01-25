@@ -19,6 +19,7 @@ New features and improvement since 0.6:
     Improved support for merge (two parent) commits.
 
   * Synchronize window now supports bundle files (*.hg).
+    Recognizes whether it has been launched in push or pull mode
 
   * New rename window for simple file or directory renames.
 
