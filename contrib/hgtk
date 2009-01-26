@@ -216,6 +216,12 @@ def rename(ui, *pats, **opts):
         pass
     run(**opts)
 
+def guess(ui, *pats, **opts):
+    """guess previous renames or copies"""
+    from hggtk.rename import run
+    opts['detect'] = True
+    run(**opts)
+
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
@@ -483,6 +489,7 @@ table = {
     "^status|st": (status, [], _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
+    "^guess": (guess, [], _('hgtk guess')),
     "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
     "^serve": 
         (serve,

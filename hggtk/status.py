@@ -523,6 +523,9 @@ class GStatus(GDialog):
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         self.modified = modified
 
+        if not self.opts.get('rev') and deleted and unknown:
+            print "Suggest to detect renames"
+
         changetypes = (('modified', 'M', modified),
                        ('added', 'A', added),
                        ('removed', 'R', removed),
