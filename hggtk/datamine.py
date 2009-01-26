@@ -461,7 +461,7 @@ class DataMineDialog(GDialog):
                 ('Rev', 10, self.COL_REVID, pango.ELLIPSIZE_NONE, True),
                 ('File', 15, self.COL_PATH, pango.ELLIPSIZE_START, False),
                 ('User', 15, self.COL_USER, pango.ELLIPSIZE_END, False),
-                ('Matches', 80, self.COL_TEXT, pango.ELLIPSIZE_END, True)):
+                ('Source', 80, self.COL_TEXT, pango.ELLIPSIZE_END, True)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
             cell.set_property("ellipsize", emode)
