@@ -219,6 +219,7 @@ def rename(ui, *pats, **opts):
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
+    opts['files'] = sys.argv[2:] or []
     run(**opts)
 
 def hginit(ui, dest=None, **opts):
