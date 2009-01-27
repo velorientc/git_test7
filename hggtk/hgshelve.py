@@ -455,9 +455,6 @@ def shelve(ui, repo, *pats, **opts):
                 # 3a. apply filtered patch to clean repo (clean)
                 if backups:
                     hg.revert(repo, basenode, backups.has_key)
-                    # Reapply permissions back to clean files
-                    for realname, tmpname in backups.iteritems():
-                        shutil.copymode(tmpname, repo.wjoin(realname))
 
                 # 3b. apply filtered patch to clean repo (apply)
                 if dopatch:
@@ -520,7 +517,9 @@ def unshelve(ui, repo, *pats, **opts):
             try:
                 try:
                     fp.seek(0)
-                    internalpatch(fp, ui, 1, repo.root)
+                    pfiles = {}
+                    internalpatch(fp, ui, 1, repo.root, files=pfiles)
+                    patch.updatedir(ui, repo, pfiles)
                     patchdone = 1
                 except:
                     if opts['force']:
