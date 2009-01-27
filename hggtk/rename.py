@@ -185,6 +185,11 @@ class DetectRenameDialog(gtk.Window):
             for row in cmodel:
                 if row[1] == dest:
                     row[3] = False
+            # Remove destination file from unknown list
+            unkmodel = unktree.get_model()
+            for i, row in enumerate(unkmodel):
+                if row[0] == dest:
+                    del unkmodel[i]
 
     def candidate_row_act(self, ctree, path, column, unktree):
         'User activated row of candidate list'
