@@ -24,12 +24,16 @@ class DetectRenameDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         self.root = root
-        self.set_title('Detect Copies and Renames in %s' % os.path.basename(root))
+        self.set_title('Detect Copies/Renames in %s' % os.path.basename(root))
         self.set_default_size(610, 400)
+        self.settings = shlib.Settings('rename')
+        self.connect('delete-event', self.save_settings)
 
-        adjustment = gtk.Adjustment(50, 0, 100, 1)
-        adjustment.connect('value-changed', self.adj_changed)
-        hscale = gtk.HScale(adjustment)
+        self.adjustment = gtk.Adjustment(50, 0, 100, 1)
+        value = self.settings.get_value('percent', None)
+        if value:
+            self.adjustment.set_value(value)
+        hscale = gtk.HScale(self.adjustment)
         frame = gtk.Frame('Minimum Simularity Percentage')
         frame.add(hscale)
         topvbox = gtk.VBox()
@@ -90,8 +94,6 @@ class DetectRenameDialog(gtk.Window):
         self.hpaned = gtk.HPaned()
         self.hpaned.pack1(unknownframe, True, True)
         self.hpaned.pack2(candidateframe, True, True)
-
-        self.settings = shlib.Settings('rename')
         pos = self.settings.get_value('hpaned', None)
         if pos:
             self.hpaned.set_position(pos)
@@ -110,14 +112,14 @@ class DetectRenameDialog(gtk.Window):
         diffview.set_editable(False)
         scroller.add(diffview)
 
-        vpaned = gtk.VPaned()
-        vpaned.pack1(topvbox, True, False)
-        vpaned.pack2(diffframe)
+        self.vpaned = gtk.VPaned()
+        self.vpaned.pack1(topvbox, True, False)
+        self.vpaned.pack2(diffframe)
         pos = self.settings.get_value('vpaned', None)
         if pos:
             self.vpaned.set_position(pos)
 
-        self.add(vpaned)
+        self.add(self.vpaned)
         self.connect('map_event', self.on_window_map_event)
 
     def on_window_map_event(self, event, param):
@@ -130,6 +132,12 @@ class DetectRenameDialog(gtk.Window):
         self.status = repo.status(node1=repo.dirstate.parents()[0], node2=None,
                 match=matcher, ignored=False, clean=True, unknown=True)
         #(modified, added, removed, deleted, unknown, ignored, clean) = status
+
+    def save_settings(self, widget, event):
+        self.settings.set_value('vpaned', self.vpaned.get_position())
+        self.settings.set_value('hpaned', self.hpaned.get_position())
+        self.settings.set_value('percent', self.adjustment.get_value())
+        self.settings.write()
 
     def find_renames(self, widget, unktree):
         '''User pressed 'find renames' button'''
