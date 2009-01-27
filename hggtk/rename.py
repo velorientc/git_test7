@@ -25,15 +25,14 @@ class DetectRenameDialog(gtk.Window):
 
         self.root = root
         self.set_title('Detect Copies/Renames in %s' % os.path.basename(root))
-        self.set_default_size(610, 400)
         self.settings = shlib.Settings('rename')
-        self.connect('delete-event', self.save_settings)
+        dims = self.settings.get_value('dims', (800, 600))
+        self.set_default_size(dims[0], dims[1])
 
-        self.adjustment = gtk.Adjustment(50, 0, 100, 1)
+        adjustment = gtk.Adjustment(50, 0, 100, 1)
         value = self.settings.get_value('percent', None)
-        if value:
-            self.adjustment.set_value(value)
-        hscale = gtk.HScale(self.adjustment)
+        if value: adjustment.set_value(value)
+        hscale = gtk.HScale(adjustment)
         frame = gtk.Frame('Minimum Simularity Percentage')
         frame.add(hscale)
         topvbox = gtk.VBox()
@@ -52,9 +51,7 @@ class DetectRenameDialog(gtk.Window):
         vbox = gtk.VBox()
         vbox.pack_start(scroller, True, True, 2)
         fr = gtk.Button('Find Renames')
-        fr.connect('pressed', self.find_renames, unknowntree)
         fc = gtk.Button('Find Copies')
-        fc.connect('pressed', self.find_copies, unknowntree)
         hbox = gtk.HBox()
         hbox.pack_start(fr, True, True, 2)
         hbox.pack_start(fc, True, True, 2)
@@ -63,19 +60,28 @@ class DetectRenameDialog(gtk.Window):
         unknownframe = gtk.Frame('Unrevisioned Files')
         unknownframe.add(vbox)
 
-        # source, dest, percent match
-        cmodel = gtk.ListStore(str, str, str)
+        # source, dest, percent match, sensitive
+        cmodel = gtk.ListStore(str, str, str, bool)
         ctree = gtk.TreeView(cmodel)
-        col = gtk.TreeViewColumn('Source', gtk.CellRendererText(), text=0)
+        ctree.set_rules_hint(True)
+        ctree.set_reorderable(False)
+        ctree.set_enable_search(True)
+        ctree.connect('cursor-changed', self.show_diff)
+        sel = ctree.get_selection()
+        sel.set_mode(gtk.SELECTION_SINGLE)
+        col = gtk.TreeViewColumn('Source', gtk.CellRendererText(),
+                text=0, sensitive=3)
         col.set_resizable(True)
         ctree.append_column(col)
-        col = gtk.TreeViewColumn('Dest', gtk.CellRendererText(), text=1)
+        col = gtk.TreeViewColumn('Dest', gtk.CellRendererText(),
+                text=1, sensitive=3)
         col.set_resizable(True)
         ctree.append_column(col)
-        col = gtk.TreeViewColumn('%', gtk.CellRendererText(), text=2)
+        col = gtk.TreeViewColumn('%', gtk.CellRendererText(),
+                text=2, sensitive=3)
         col.set_resizable(True)
         ctree.append_column(col)
-        ctree.connect('row-activated', self.candidate_row_act)
+        ctree.connect('row-activated', self.candidate_row_act, unknowntree)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(ctree)
@@ -83,7 +89,9 @@ class DetectRenameDialog(gtk.Window):
         vbox = gtk.VBox()
         vbox.pack_start(scroller, True, True, 2)
         ac = gtk.Button('Accept Match')
-        fr.connect('pressed', self.accept_match, ctree)
+        fc.connect('pressed', self.find_copies, unknowntree, ctree)
+        fr.connect('pressed', self.find_renames, unknowntree, ctree)
+        ac.connect('pressed', self.accept_match, unknowntree, ctree)
         hbox = gtk.HBox()
         hbox.pack_start(ac, False, False, 2)
         vbox.pack_start(hbox, False, False, 2)
@@ -91,14 +99,13 @@ class DetectRenameDialog(gtk.Window):
         candidateframe = gtk.Frame('Candidate Matches')
         candidateframe.add(vbox)
 
-        self.hpaned = gtk.HPaned()
-        self.hpaned.pack1(unknownframe, True, True)
-        self.hpaned.pack2(candidateframe, True, True)
+        hpaned = gtk.HPaned()
+        hpaned.pack1(unknownframe, True, True)
+        hpaned.pack2(candidateframe, True, True)
         pos = self.settings.get_value('hpaned', None)
-        if pos:
-            self.hpaned.set_position(pos)
+        if pos: hpaned.set_position(pos)
 
-        topvbox.pack_start(self.hpaned, True, True, 2)
+        topvbox.pack_start(hpaned, True, True, 2)
 
         diffframe = gtk.Frame('Differences from Source to Dest')
         diffframe.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -112,17 +119,21 @@ class DetectRenameDialog(gtk.Window):
         diffview.set_editable(False)
         scroller.add(diffview)
 
-        self.vpaned = gtk.VPaned()
-        self.vpaned.pack1(topvbox, True, False)
-        self.vpaned.pack2(diffframe)
+        vpaned = gtk.VPaned()
+        vpaned.pack1(topvbox, True, False)
+        vpaned.pack2(diffframe)
         pos = self.settings.get_value('vpaned', None)
-        if pos:
-            self.vpaned.set_position(pos)
+        if pos: vpaned.set_position(pos)
 
-        self.add(self.vpaned)
-        self.connect('map_event', self.on_window_map_event)
+        self.add(vpaned)
+        self.connect('map_event', self.on_window_map_event, unkmodel, cmodel)
+        self.connect('delete-event', self.save_settings,
+                hpaned, vpaned, adjustment)
 
-    def on_window_map_event(self, event, param):
+    def on_window_map_event(self, event, param, unkmodel, cmodel):
+        self.refresh(unkmodel, cmodel)
+
+    def refresh(self, unkmodel, cmodel):
         try:
             repo = hg.repository(ui.ui(), self.root)
         except RepoError:
@@ -130,33 +141,66 @@ class DetectRenameDialog(gtk.Window):
 
         matcher = match.always(repo.root, repo.root)
         self.status = repo.status(node1=repo.dirstate.parents()[0], node2=None,
-                match=matcher, ignored=False, clean=True, unknown=True)
+                match=matcher, ignored=False, clean=False, unknown=True)
         #(modified, added, removed, deleted, unknown, ignored, clean) = status
+        unkmodel.clear()
+        for u in self.status[4]:
+            unkmodel.append( [u] )
+        cmodel.clear()
 
-    def save_settings(self, widget, event):
-        self.settings.set_value('vpaned', self.vpaned.get_position())
-        self.settings.set_value('hpaned', self.hpaned.get_position())
-        self.settings.set_value('percent', self.adjustment.get_value())
+    def save_settings(self, widget, event, hpaned, vpaned, adjustment):
+        self.settings.set_value('vpaned', vpaned.get_position())
+        self.settings.set_value('hpaned', hpaned.get_position())
+        self.settings.set_value('percent', adjustment.get_value())
+        rect = self.get_allocation()
+        self.settings.set_value('dims', (rect.width, rect.height))
         self.settings.write()
 
-    def find_renames(self, widget, unktree):
+    def find_renames(self, widget, unktree, ctree):
         'User pressed "find renames" button'
-        pass
+        # Fake a rename find operation
+        cmodel = ctree.get_model()
+        cmodel.clear()
+        umodel, paths = unktree.get_selection().get_selected_rows()
+        if not paths: return
+        u = umodel[paths[0]][0]
+        for d in self.status[3]:
+            cmodel.append( [d, u, '10', True] )
 
-    def find_copies(self, widget, unktree):
+    def find_copies(self, widget, unktree, ctree):
         'User pressed "find copies" button'
         pass
 
-    def accept_match(self, widget, ctree):
+    def accept_match(self, widget, unktree, ctree):
         'User pressed "accept match" button'
-        pass
+        cmodel, paths = ctree.get_selection().get_selected_rows()
+        for path in paths:
+            row = cmodel[path]
+            src, dest, percent, sensitive = row
+            if not sensitive: continue
+            print 'hg copy --after', src, dest
+            if src in self.status[3]:
+                print 'hg rm', src
+            # Mark all rows with this target file as non-sensitive
+            for row in cmodel:
+                if row[1] == dest:
+                    row[3] = False
 
-    def candidate_row_act(self, tree, path, column):
+    def candidate_row_act(self, ctree, path, column, unktree):
         'User activated row of candidate list'
-        pass # accept copy or rename
+        self.accept_match(ctree, unktree, ctree)
 
-    def adj_changed(self, adj):
-        newvalue = adj.get_value()
+    def show_diff(self, tree):
+        'User selected a row in the candidate tree'
+        model, paths = tree.get_selection().get_selected_rows()
+        for path in paths:
+            row = model[path]
+            src, dest, percent, sensitive = row
+            if sensitive:
+                print 'show diffs from', src, 'to', dest
+                if src in self.status[3]:
+                    print src, 'must be resurrected'
+
 
 def run(fname='', target='', detect=True, root='', **opts):
     if detect:
