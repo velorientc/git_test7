@@ -18,9 +18,9 @@ except ImportError:
     from mercurial.error import RepoError
 
 class DetectRenameDialog(gtk.Window):
-    """ Detect renames after they occur """
+    'Detect renames after they occur'
     def __init__(self, root=''):
-        """ Initialize the Dialog """
+        'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         self.root = root
@@ -140,19 +140,19 @@ class DetectRenameDialog(gtk.Window):
         self.settings.write()
 
     def find_renames(self, widget, unktree):
-        '''User pressed 'find renames' button'''
+        'User pressed "find renames" button'
         pass
 
     def find_copies(self, widget, unktree):
-        '''User pressed 'find copies' button'''
+        'User pressed "find copies" button'
         pass
 
     def accept_match(self, widget, ctree):
-        '''User pressed 'accept match' button'''
+        'User pressed "accept match" button'
         pass
 
     def candidate_row_act(self, tree, path, column):
-        '''User activated row of candidate list'''
+        'User activated row of candidate list'
         pass # accept copy or rename
 
     def adj_changed(self, adj):
