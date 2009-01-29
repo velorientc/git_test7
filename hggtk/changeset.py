@@ -22,7 +22,7 @@ from mercurial import cmdutil, util, ui, hg, commands
 from mercurial import context, patch, revlog
 from gdialog import *
 from hgcmd import CmdDialog
-from hglib import toutf, fromutf, displaytime, gettabwidth, hgcmd_toq
+from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand
 from gtklib import StatusBar
 
 class ChangeSet(GDialog):
@@ -374,7 +374,6 @@ class ChangeSet(GDialog):
 
     def prepare_diff(self, difflines, offset, fname):
         '''Borrowed from hgview; parses changeset diffs'''
-        tw = gettabwidth(self.ui)
         DIFFHDR = "=== %s ===\n"
         idx = 0
         outlines = []
@@ -409,17 +408,14 @@ class ChangeSet(GDialog):
             elif l.startswith("+"):
                 tag = "green"
                 stats[0] += 1
-                if tw:
-                    l = l[0] + l[1:].expandtabs(tw)
+                l = diffexpand(l)
             elif l.startswith("-"):
                 stats[1] += 1
                 tag = "red"
-                if tw:
-                    l = l[0] + l[1:].expandtabs(tw)
+                l = diffexpand(l)
             else:
                 tag = "black"
-                if tw:
-                    l = l[0] + l[1:].expandtabs(tw)
+                l = diffexpand(l)
             l = l+"\n"
             length = len(l.decode('utf-8'))
             addtag( tag, offset, length )
