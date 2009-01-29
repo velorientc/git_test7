@@ -17,6 +17,21 @@ try:
 except ImportError:
     from mercurial.error import RepoError
 
+# This function and some key bits below borrowed ruthelessly from
+# Peter Arrenbrecht <peter.arrenbrecht@gmail.com>
+# Thanks!
+def findmoves(repo, added, removed, threshold):
+    '''find renamed files -- yields (before, after, score) tuples'''
+    ctx = repo['.']
+    for r in removed:
+        rr = ctx.filectx(r).data()
+        bestname, bestscore = None, threshold
+        for a in added:
+            aa = repo.wread(a)
+            if aa == rr:
+                yield r, a, 1.0
+                break
+
 class DetectRenameDialog(gtk.Window):
     'Detect renames after they occur'
     def __init__(self, root=''):
@@ -40,6 +55,7 @@ class DetectRenameDialog(gtk.Window):
 
         unkmodel = gtk.ListStore(str)
         unknowntree = gtk.TreeView(unkmodel)
+        unknowntree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         col = gtk.TreeViewColumn('File', gtk.CellRendererText(), text=0)
         unknowntree.append_column(col)
         unknowntree.set_enable_search(True)
@@ -86,12 +102,13 @@ class DetectRenameDialog(gtk.Window):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(ctree)
 
+        args = (unknowntree, ctree, adjustment)
         vbox = gtk.VBox()
         vbox.pack_start(scroller, True, True, 2)
         ac = gtk.Button('Accept Match')
-        fc.connect('pressed', self.find_copies, unknowntree, ctree)
-        fr.connect('pressed', self.find_renames, unknowntree, ctree)
-        ac.connect('pressed', self.accept_match, unknowntree, ctree)
+        fc.connect('pressed', self.find_copies, *args)
+        fr.connect('pressed', self.find_renames, *args)
+        ac.connect('pressed', self.accept_match, *args)
         hbox = gtk.HBox()
         hbox.pack_start(ac, False, False, 2)
         vbox.pack_start(hbox, False, False, 2)
@@ -126,27 +143,24 @@ class DetectRenameDialog(gtk.Window):
         if pos: vpaned.set_position(pos)
 
         self.add(vpaned)
-        self.connect('map_event', self.on_window_map_event, unkmodel, cmodel)
+        self.connect('map_event', self.on_window_map_event, unkmodel)
         self.connect('delete-event', self.save_settings,
                 hpaned, vpaned, adjustment)
 
-    def on_window_map_event(self, event, param, unkmodel, cmodel):
-        self.refresh(unkmodel, cmodel)
+    def on_window_map_event(self, event, param, unkmodel):
+        self.refresh(unkmodel)
 
-    def refresh(self, unkmodel, cmodel):
-        try:
-            repo = hg.repository(ui.ui(), self.root)
-        except RepoError:
-            return
-
+    def refresh(self, unkmodel):
+        try: repo = hg.repository(ui.ui(), self.root)
+        except RepoError: return
         matcher = match.always(repo.root, repo.root)
-        self.status = repo.status(node1=repo.dirstate.parents()[0], node2=None,
+        status = repo.status(node1=repo.dirstate.parents()[0], node2=None,
                 match=matcher, ignored=False, clean=False, unknown=True)
-        #(modified, added, removed, deleted, unknown, ignored, clean) = status
+        (modified, added, removed, deleted, unknown, ignored, clean) = status
         unkmodel.clear()
-        for u in self.status[4]:
-            unkmodel.append( [u] )
-        cmodel.clear()
+        for u in unknown: unkmodel.append( [u] )
+        for u in added:   unkmodel.append( [u] )
+        self.deleted = deleted
 
     def save_settings(self, widget, event, hpaned, vpaned, adjustment):
         self.settings.set_value('vpaned', vpaned.get_position())
@@ -156,44 +170,74 @@ class DetectRenameDialog(gtk.Window):
         self.settings.set_value('dims', (rect.width, rect.height))
         self.settings.write()
 
-    def find_renames(self, widget, unktree, ctree):
+    def find_renames(self, widget, unktree, ctree, adj):
         'User pressed "find renames" button'
-        # Fake a rename find operation
         cmodel = ctree.get_model()
         cmodel.clear()
         umodel, paths = unktree.get_selection().get_selected_rows()
-        if not paths: return
-        u = umodel[paths[0]][0]
-        for d in self.status[3]:
-            cmodel.append( [d, u, '10', True] )
+        if not paths:
+            return
+        tgts = [ umodel[p][0] for p in paths ]
+        try:
+            repo = hg.repository(ui.ui(), self.root)
+        except RepoError:
+            return
 
-    def find_copies(self, widget, unktree, ctree):
+        srcs = []
+        audit_path = util.path_auditor(repo.root)
+        m = cmdutil.match(repo)
+        for abs in repo.walk(m):
+            target = repo.wjoin(abs)
+            good = True
+            try:
+                audit_path(abs)
+            except:
+                good = False
+            status = repo.dirstate[abs]
+            if status != 'r' and (not good or not util.lexists(target)
+                or (os.path.isdir(target) and not os.path.islink(target))):
+                srcs.append(abs)
+            elif not adj and status == 'n':
+                # looking for copies, so any revisioned file is a
+                # potential source (yes, this will be expensive)
+                # Added and removed files are not considered as copy
+                # sources.
+                srcs.append(abs)
+        if adj:
+            simularity = adj.get_value() / 100.0;
+            gen = findmoves
+        else:
+            simularity = 1.0
+            gen = cmdutil.findrenames
+        for old, new, score in gen(repo, tgts, srcs, simularity):
+            cmodel.append( [old, new, score*100, True] )
+
+    def find_copies(self, widget, unktree, ctree, adj):
         'User pressed "find copies" button'
-        pass
+        # call rename function with simularity = 100%
+        self.find_renames(widget, unktree, ctree, None)
 
-    def accept_match(self, widget, unktree, ctree):
+    def accept_match(self, widget, unktree, ctree, adj):
         'User pressed "accept match" button'
+        try: repo = hg.repository(ui.ui(), self.root)
+        except RepoError: return
         cmodel, paths = ctree.get_selection().get_selected_rows()
         for path in paths:
             row = cmodel[path]
             src, dest, percent, sensitive = row
             if not sensitive: continue
-            print 'hg copy --after', src, dest
-            if src in self.status[3]:
-                print 'hg rm', src
+            repo.copy(src, dest)
+            if src in self.deleted:
+                repo.remove([src])
             # Mark all rows with this target file as non-sensitive
             for row in cmodel:
                 if row[1] == dest:
                     row[3] = False
-            # Remove destination file from unknown list
-            unkmodel = unktree.get_model()
-            for i, row in enumerate(unkmodel):
-                if row[0] == dest:
-                    del unkmodel[i]
+            self.refresh(unktree.get_model())
 
     def candidate_row_act(self, ctree, path, column, unktree):
         'User activated row of candidate list'
-        self.accept_match(ctree, unktree, ctree)
+        self.accept_match(ctree, unktree, ctree, None)
 
     def show_diff(self, tree):
         'User selected a row in the candidate tree'
@@ -203,7 +247,7 @@ class DetectRenameDialog(gtk.Window):
             src, dest, percent, sensitive = row
             if sensitive:
                 print 'show diffs from', src, 'to', dest
-                if src in self.status[3]:
+                if src in self.deleted:
                     print src, 'must be resurrected'
 
 
