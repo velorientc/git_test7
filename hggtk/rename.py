@@ -11,7 +11,8 @@ import pango
 import cStringIO
 import shlib
 from dialog import error_dialog
-from mercurial import hg, ui, cmdutil, match, util
+from mercurial import hg, ui, mdiff, cmdutil, match, util
+from hglib import toutf, diffexpand
 try:
     from mercurial.repo import RepoError
 except ImportError:
@@ -40,12 +41,12 @@ class DetectRenameDialog(gtk.Window):
 
         self.root = root
         self.set_title('Detect Copies/Renames in %s' % os.path.basename(root))
-        self.settings = shlib.Settings('rename')
-        dims = self.settings.get_value('dims', (800, 600))
+        settings = shlib.Settings('rename')
+        dims = settings.get_value('dims', (800, 600))
         self.set_default_size(dims[0], dims[1])
 
         adjustment = gtk.Adjustment(50, 0, 100, 1)
-        value = self.settings.get_value('percent', None)
+        value = settings.get_value('percent', None)
         if value: adjustment.set_value(value)
         hscale = gtk.HScale(adjustment)
         frame = gtk.Frame('Minimum Simularity Percentage')
@@ -82,9 +83,7 @@ class DetectRenameDialog(gtk.Window):
         ctree.set_rules_hint(True)
         ctree.set_reorderable(False)
         ctree.set_enable_search(True)
-        ctree.connect('cursor-changed', self.show_diff)
-        sel = ctree.get_selection()
-        sel.set_mode(gtk.SELECTION_SINGLE)
+        ctree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         col = gtk.TreeViewColumn('Source', gtk.CellRendererText(),
                 text=0, sensitive=3)
         col.set_resizable(True)
@@ -119,7 +118,7 @@ class DetectRenameDialog(gtk.Window):
         hpaned = gtk.HPaned()
         hpaned.pack1(unknownframe, True, True)
         hpaned.pack2(candidateframe, True, True)
-        pos = self.settings.get_value('hpaned', None)
+        pos = settings.get_value('hpaned', None)
         if pos: hpaned.set_position(pos)
 
         topvbox.pack_start(hpaned, True, True, 2)
@@ -130,8 +129,9 @@ class DetectRenameDialog(gtk.Window):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         diffframe.add(scroller)
         
-        self.diffbuf = gtk.TextBuffer()
-        diffview = gtk.TextView(self.diffbuf)
+        diffbuf = gtk.TextBuffer()
+        diffview = gtk.TextView(diffbuf)
+        diffview.modify_font(pango.FontDescription('monospace'))
         diffview.set_wrap_mode(gtk.WRAP_NONE)
         diffview.set_editable(False)
         scroller.add(diffview)
@@ -139,36 +139,38 @@ class DetectRenameDialog(gtk.Window):
         vpaned = gtk.VPaned()
         vpaned.pack1(topvbox, True, False)
         vpaned.pack2(diffframe)
-        pos = self.settings.get_value('vpaned', None)
+        pos = settings.get_value('vpaned', None)
         if pos: vpaned.set_position(pos)
 
         self.add(vpaned)
+        ctree.connect('cursor-changed', self.show_diff, diffview)
         self.connect('map_event', self.on_window_map_event, unkmodel)
         self.connect('delete-event', self.save_settings,
-                hpaned, vpaned, adjustment)
+                settings, hpaned, vpaned, adjustment)
 
     def on_window_map_event(self, event, param, unkmodel):
         self.refresh(unkmodel)
 
     def refresh(self, unkmodel):
-        try: repo = hg.repository(ui.ui(), self.root)
-        except RepoError: return
+        try:
+            repo = hg.repository(ui.ui(), self.root)
+        except RepoError:
+            return
         matcher = match.always(repo.root, repo.root)
         status = repo.status(node1=repo.dirstate.parents()[0], node2=None,
                 match=matcher, ignored=False, clean=False, unknown=True)
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         unkmodel.clear()
         for u in unknown: unkmodel.append( [u] )
-        for u in added:   unkmodel.append( [u] )
         self.deleted = deleted
 
-    def save_settings(self, widget, event, hpaned, vpaned, adjustment):
-        self.settings.set_value('vpaned', vpaned.get_position())
-        self.settings.set_value('hpaned', hpaned.get_position())
-        self.settings.set_value('percent', adjustment.get_value())
+    def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
+        settings.set_value('vpaned', vpaned.get_position())
+        settings.set_value('hpaned', hpaned.get_position())
+        settings.set_value('percent', adjustment.get_value())
         rect = self.get_allocation()
-        self.settings.set_value('dims', (rect.width, rect.height))
-        self.settings.write()
+        settings.set_value('dims', (rect.width, rect.height))
+        settings.write()
 
     def find_renames(self, widget, unktree, ctree, adj):
         'User pressed "find renames" button'
@@ -205,12 +207,12 @@ class DetectRenameDialog(gtk.Window):
                 srcs.append(abs)
         if adj:
             simularity = adj.get_value() / 100.0;
-            gen = findmoves
+            gen = cmdutil.findrenames
         else:
             simularity = 1.0
-            gen = cmdutil.findrenames
+            gen = findmoves
         for old, new, score in gen(repo, tgts, srcs, simularity):
-            cmodel.append( [old, new, score*100, True] )
+            cmodel.append( [old, new, '%d%%' % (score*100), True] )
 
     def find_copies(self, widget, unktree, ctree, adj):
         'User pressed "find copies" button'
@@ -219,13 +221,16 @@ class DetectRenameDialog(gtk.Window):
 
     def accept_match(self, widget, unktree, ctree, adj):
         'User pressed "accept match" button'
-        try: repo = hg.repository(ui.ui(), self.root)
-        except RepoError: return
+        try:
+            repo = hg.repository(ui.ui(), self.root)
+        except RepoError:
+            return
         cmodel, paths = ctree.get_selection().get_selected_rows()
         for path in paths:
             row = cmodel[path]
             src, dest, percent, sensitive = row
-            if not sensitive: continue
+            if not sensitive:
+                continue
             repo.copy(src, dest)
             if src in self.deleted:
                 repo.remove([src])
@@ -233,22 +238,59 @@ class DetectRenameDialog(gtk.Window):
             for row in cmodel:
                 if row[1] == dest:
                     row[3] = False
-            self.refresh(unktree.get_model())
+        self.refresh(unktree.get_model())
 
     def candidate_row_act(self, ctree, path, column, unktree):
         'User activated row of candidate list'
         self.accept_match(ctree, unktree, ctree, None)
 
-    def show_diff(self, tree):
+    def show_diff(self, tree, diffview):
         'User selected a row in the candidate tree'
+        try:
+            repo = hg.repository(ui.ui(), self.root)
+        except RepoError:
+            return
+
+        # TODO: this is a common function, should be generalized
+        buffer = gtk.TextBuffer()
+        buffer.create_tag('removed', foreground='#900000')
+        buffer.create_tag('added', foreground='#006400')
+        buffer.create_tag('position', foreground='#FF8000')
+        buffer.create_tag('header', foreground='#000090')
+
+        iter = buffer.get_start_iter()
         model, paths = tree.get_selection().get_selected_rows()
         for path in paths:
             row = model[path]
             src, dest, percent, sensitive = row
-            if sensitive:
-                print 'show diffs from', src, 'to', dest
-                if src in self.deleted:
-                    print src, 'must be resurrected'
+            if not sensitive:
+                continue
+            ctx = repo['.']
+            aa = repo.wread(dest)
+            rr = ctx.filectx(src).data()
+            opts = mdiff.defaultopts
+            difftext = mdiff.unidiff(rr, '', aa, '', src, dest, None, opts=opts)
+            if not difftext:
+                l = '\n== %s and %s have identical contents ==\n' % (src, dest)
+                buffer.insert(iter, l)
+                continue
+            difflines = difftext.splitlines(True)
+            for line in difflines:
+                line = toutf(line)
+                if line.startswith('---') or line.startswith('+++'):
+                    buffer.insert_with_tags_by_name(iter, line, 'header')
+                elif line.startswith('-'):
+                    line = diffexpand(line)
+                    buffer.insert_with_tags_by_name(iter, line, 'removed')
+                elif line.startswith('+'):
+                    line = diffexpand(line)
+                    buffer.insert_with_tags_by_name(iter, line, 'added')
+                elif line.startswith('@@'):
+                    buffer.insert_with_tags_by_name(iter, line, 'position')
+                else:
+                    line = diffexpand(line)
+                    buffer.insert(iter, line)
+        diffview.set_buffer(buffer)
 
 
 def run(fname='', target='', detect=True, root='', **opts):
