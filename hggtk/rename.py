@@ -248,6 +248,7 @@ class DetectRenameDialog(gtk.Window):
             repo.copy(src, dest)
             if src in self.deleted:
                 repo.remove([src])
+            shlib.shell_notify([src, dest])
             # Mark all rows with this target file as non-sensitive
             for row in cmodel:
                 if row[1] == dest:
