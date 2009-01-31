@@ -84,18 +84,28 @@ class DetectRenameDialog(gtk.Window):
         ctree.set_reorderable(False)
         ctree.set_enable_search(True)
         ctree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        col = gtk.TreeViewColumn('Source', gtk.CellRendererText(),
-                text=0, sensitive=3)
+
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 30)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_START)
+        col = gtk.TreeViewColumn('Source', cell, text=0, sensitive=3)
         col.set_resizable(True)
         ctree.append_column(col)
-        col = gtk.TreeViewColumn('Dest', gtk.CellRendererText(),
-                text=1, sensitive=3)
+
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 30)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_START)
+        col = gtk.TreeViewColumn('Dest', cell, text=1, sensitive=3)
         col.set_resizable(True)
         ctree.append_column(col)
-        col = gtk.TreeViewColumn('%', gtk.CellRendererText(),
-                text=2, sensitive=3)
+
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 5)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_NONE)
+        col = gtk.TreeViewColumn('%', cell, text=2, sensitive=3)
         col.set_resizable(True)
         ctree.append_column(col)
+
         ctree.connect('row-activated', self.candidate_row_act, unknowntree)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
