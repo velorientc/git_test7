@@ -161,7 +161,11 @@ class DetectRenameDialog(gtk.Window):
                 match=matcher, ignored=False, clean=False, unknown=True)
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         unkmodel.clear()
-        for u in unknown: unkmodel.append( [u] )
+        for u in unknown:
+            unkmodel.append( [u] )
+        for a in added:
+            if not repo.dirstate.copied(a):
+                unkmodel.append( [a] )
         self.deleted = deleted
 
     def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
@@ -196,7 +200,7 @@ class DetectRenameDialog(gtk.Window):
             except:
                 good = False
             status = repo.dirstate[abs]
-            if status != 'r' and (not good or not util.lexists(target)
+            if (not good or not util.lexists(target)
                 or (os.path.isdir(target) and not os.path.islink(target))):
                 srcs.append(abs)
             elif not adj and status == 'n':
