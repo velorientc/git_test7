@@ -15,13 +15,15 @@ New features and improvement since 0.6:
     or shelving of selected changes.
     Modified, Added, and Removed files are preselected for commit.
     Added a ctrl-o key accelerator for initiating a commit.
-    Added basic support for refreshing an applied MQ patch.
+    Added support for refreshing an applied MQ patch.
     Improved support for merge (two parent) commits.
 
   * Synchronize window now supports bundle files (*.hg).
     Recognizes whether it has been launched in push or pull mode
 
   * New rename window for simple file or directory renames.
+
+  * New rename guessing dialog for detecting renames after they happen.
 
   * New tool for managing an .hgignore file.
 
@@ -31,7 +33,7 @@ New features and improvement since 0.6:
 
   * Hgtk: added --limit option to log.
           added aliases to dialogs that support many operations.
-          added rename command.
+          added rename and guess commands.
 
 New features and improvement in 0.6:
 
