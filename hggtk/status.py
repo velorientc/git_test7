@@ -58,7 +58,7 @@ class GStatus(GDialog):
         
     def auto_check(self):
         if self.test_opt('check'):
-            for entry in self.model:
+            for entry in self.filemodel:
                 entry[FM_CHECKED] = True
             self._update_check_count()
 
@@ -239,23 +239,23 @@ class GStatus(GDialog):
         self._menus['MU'] = unresolved_menu
 
         # model stores the file list.
-        self.model = gtk.ListStore(bool, str, str, str, str)
-        self.model.set_sort_func(1001, self._sort_by_stat)
-        self.model.set_default_sort_func(self._sort_by_stat)
+        self.filemodel = gtk.ListStore(bool, str, str, str, str, bool)
+        self.filemodel.set_sort_func(1001, self._sort_by_stat)
+        self.filemodel.set_default_sort_func(self._sort_by_stat)
 
-        self.tree = gtk.TreeView(self.model)
-        self.tree.connect('button-press-event', self._tree_button_press)
-        self.tree.connect('button-release-event', self._tree_button_release)
-        self.tree.connect('popup-menu', self._tree_popup_menu)
-        self.tree.connect('row-activated', self._tree_row_act)
-        self.tree.connect('key-press-event', self._tree_key_press)
-        self.tree.set_reorderable(False)
-        self.tree.set_enable_search(True)
-        self.tree.set_search_column(2)
-        if hasattr(self.tree, 'set_rubber_banding'):
-            self.tree.set_rubber_banding(True)
-        self.tree.modify_font(pango.FontDescription(self.fontlist))
-        self.tree.set_headers_clickable(True)
+        self.filetree = gtk.TreeView(self.filemodel)
+        self.filetree.connect('button-press-event', self._tree_button_press)
+        self.filetree.connect('button-release-event', self._tree_button_release)
+        self.filetree.connect('popup-menu', self._tree_popup_menu)
+        self.filetree.connect('row-activated', self._tree_row_act)
+        self.filetree.connect('key-press-event', self._tree_key_press)
+        self.filetree.set_reorderable(False)
+        self.filetree.set_enable_search(True)
+        self.filetree.set_search_column(2)
+        if hasattr(self.filetree, 'set_rubber_banding'):
+            self.filetree.set_rubber_banding(True)
+        self.filetree.modify_font(pango.FontDescription(self.fontlist))
+        self.filetree.set_headers_clickable(True)
         
         toggle_cell = gtk.CellRendererToggle()
         toggle_cell.connect('toggled', self._select_toggle)
@@ -270,7 +270,7 @@ class GStatus(GDialog):
             col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
             #col0.set_sort_column_id(0)
             col0.set_resizable(False)
-            self.tree.append_column(col0)
+            self.filetree.append_column(col0)
             self.selcb = self._add_header_checkbox(col0, self._sel_clicked)
         
         col1 = gtk.TreeViewColumn('st', stat_cell)
@@ -278,25 +278,25 @@ class GStatus(GDialog):
         col1.set_cell_data_func(stat_cell, self._text_color)
         col1.set_sort_column_id(1001)
         col1.set_resizable(False)
-        self.tree.append_column(col1)
+        self.filetree.append_column(col1)
         
         col = gtk.TreeViewColumn('ms', stat_cell)
         col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
         #col.set_cell_data_func(stat_cell, self._text_color)
         col.set_sort_column_id(4)
         col.set_resizable(False)
-        self.tree.append_column(col)
+        self.filetree.append_column(col)
         
         col2 = gtk.TreeViewColumn('path', path_cell)
         col2.add_attribute(path_cell, 'text', FM_PATH_UTF8)
         col2.set_cell_data_func(path_cell, self._text_color)
         col2.set_sort_column_id(2)
         col2.set_resizable(True)
-        self.tree.append_column(col2)
+        self.filetree.append_column(col2)
        
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.add(self.tree)
+        scroller.add(self.filetree)
         
         tree_frame = gtk.Frame()
         tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -331,8 +331,8 @@ class GStatus(GDialog):
             diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell)
             diffcol.set_resizable(True)
             self.diff_tree.append_column(diffcol)
-            self.tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-            self.tree.get_selection().connect('changed',
+            self.filetree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+            self.filetree.get_selection().connect('changed',
                     self._tree_selection_changed, False)
             scroller.add(self.diff_tree)
 
@@ -350,8 +350,8 @@ class GStatus(GDialog):
             self.merge_diff_text.set_wrap_mode(gtk.WRAP_NONE)
             self.merge_diff_text.set_editable(False)
             self.merge_diff_text.modify_font(pango.FontDescription(self.fontdiff))
-            self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-            self.tree.get_selection().connect('changed',
+            self.filetree.get_selection().set_mode(gtk.SELECTION_SINGLE)
+            self.filetree.get_selection().connect('changed',
                     self._merge_tree_selection_changed, False)
             self._activate_shelve_buttons(False)
             scroller.add(self.merge_diff_text)
@@ -367,7 +367,7 @@ class GStatus(GDialog):
         self._diffpane.set_position(self._setting_pos)
         self._diffpane_moved_id = self._diffpane.connect('notify::position',
                 self._diffpane_moved)
-        self.tree.set_headers_clickable(True)
+        self.filetree.set_headers_clickable(True)
         return self._diffpane
 
     def _patch_button_release(self, widget, event):
@@ -469,7 +469,7 @@ class GStatus(GDialog):
     def _update_check_count(self):
         file_count = 0
         check_count = 0
-        for row in self.model:
+        for row in self.filemodel:
             file_count = file_count + 1
             if row[FM_CHECKED]:
                 check_count = check_count + 1
@@ -539,7 +539,7 @@ class GStatus(GDialog):
         explicit_changetypes = changetypes + (('clean', 'C', clean),)
 
         # List of the currently checked and selected files to pass on to the new data
-        model, paths = self.tree.get_selection().get_selected_rows()
+        model, paths = self.filetree.get_selection().get_selected_rows()
         recheck = [entry[FM_PATH_UTF8] for entry in model if entry[FM_CHECKED]]
         reselect = [model[iter][FM_PATH_UTF8] for iter in paths]
 
@@ -547,17 +547,17 @@ class GStatus(GDialog):
         ms = merge_.mergestate(self.repo)
         
         # Load the new data into the tree's model
-        self.tree.hide()
-        self.model.clear()
+        self.filetree.hide()
+        self.filemodel.clear()
     
         for opt, char, changes in ([ct for ct in explicit_changetypes
                                     if self.test_opt(ct[0])] or changetypes) :
             for file in changes:
                 mst = file in ms and ms[file].upper() or ""
                 file = util.localpath(file)
-                self.model.append([file in recheck, char, toutf(file), file, mst])
+                self.filemodel.append([file in recheck, char, toutf(file), file, mst, False])
 
-        selection = self.tree.get_selection()
+        selection = self.filetree.get_selection()
         selected = False
         for row in model:
             if row[FM_PATH_UTF8] in reselect:
@@ -567,14 +567,14 @@ class GStatus(GDialog):
         if not selected:
             selection.select_path((0,))
 
-        files = [row[FM_PATH] for row in self.model]
+        files = [row[FM_PATH] for row in self.filemodel]
         self._show_diff_hunks(files)
 
-        self.tree.show()
+        self.filetree.show()
         if hasattr(self, 'text'):
             self.text.grab_focus()
         else:
-            self.tree.grab_focus()
+            self.filetree.grab_focus()
         return True
 
 
@@ -603,8 +603,8 @@ class GStatus(GDialog):
 
     def _select_toggle(self, cellrenderer, path):
         '''User manually toggled file status'''
-        self.model[path][FM_CHECKED] = not self.model[path][FM_CHECKED]
-        self._update_chunk_state(self.model[path])
+        self.filemodel[path][FM_CHECKED] = not self.filemodel[path][FM_CHECKED]
+        self._update_chunk_state(self.filemodel[path])
         self._update_check_count()
         return True
 
@@ -783,11 +783,11 @@ class GStatus(GDialog):
             self.merge_diff_text.set_buffer(buffer)
 
         if self.showdiff_toggle.get_active():
-            sel = self.tree.get_selection().get_selected_rows()[1]
+            sel = self.filetree.get_selection().get_selected_rows()[1]
             if not sel:
                 self._last_file = None
                 return False
-            file = self.model[sel[0]][2]
+            file = self.filemodel[sel[0]][FM_PATH_UTF8]
             if force or file != self._last_file:
                 self._last_file = file
                 self._hg_call_wrapper('Diff', dohgdiff)
@@ -796,11 +796,11 @@ class GStatus(GDialog):
 
     def _tree_selection_changed(self, selection, force):
         if self.showdiff_toggle.get_active():
-            sel = self.tree.get_selection().get_selected_rows()[1]
+            sel = self.filetree.get_selection().get_selected_rows()[1]
             if not sel:
                 self._last_file = None
                 return False
-            file = self.model[sel[0]][2]
+            file = self.filemodel[sel[0]][FM_PATH_UTF8]
             if force or file != self._last_file:
                 self._last_file = file
                 if file in self._filechunks:
@@ -923,11 +923,11 @@ class GStatus(GDialog):
 
         if togglebutton.get_active():
             if hasattr(self, 'merge_diff_text'):
-                self._merge_tree_selection_changed(self.tree.get_selection(), True)
+                self._merge_tree_selection_changed(self.filetree.get_selection(), True)
                 self._activate_shelve_buttons(False)
             else:
                 self._activate_shelve_buttons(True)
-                self._tree_selection_changed(self.tree.get_selection(), True)
+                self._tree_selection_changed(self.filetree.get_selection(), True)
             self._diffpane.set_position(self._setting_lastpos)
         else:
             self._setting_lastpos = self._diffpane.get_position()
@@ -953,10 +953,10 @@ class GStatus(GDialog):
         elif paned.get_position() < sizemax - 55:
             self.showdiff_toggle.set_active(True)
             if hasattr(self, 'merge_diff_text'):
-                self._merge_tree_selection_changed(self.tree.get_selection(), True)
+                self._merge_tree_selection_changed(self.filetree.get_selection(), True)
                 self._activate_shelve_buttons(False)
             else:
-                self._tree_selection_changed(self.tree.get_selection(), True)
+                self._tree_selection_changed(self.filetree.get_selection(), True)
                 self._activate_shelve_buttons(True)
 
         self.showdiff_toggle.handler_unblock(self._showdiff_toggled_id)
@@ -1216,7 +1216,7 @@ class GStatus(GDialog):
 
 
     def _select_files(self, state, ctype=None):
-        for entry in self.model:
+        for entry in self.filemodel:
             if ctype and not entry[FM_STATUS] in ctype:
                 continue
             if entry[FM_CHECKED] != state:
@@ -1226,12 +1226,12 @@ class GStatus(GDialog):
 
     
     def _relevant_files(self, stats):
-        return [item[FM_PATH] for item in self.model \
+        return [item[FM_PATH] for item in self.filemodel \
                 if item[FM_CHECKED] and item[FM_STATUS] in stats]
 
 
     def _context_menu_act(self, menuitem, handler):
-        selection = self.tree.get_selection()
+        selection = self.filetree.get_selection()
         assert(selection.count_selected_rows() == 1)
 
         list, paths = selection.get_selected_rows() 
@@ -1266,7 +1266,7 @@ class GStatus(GDialog):
         return menu
             
     def _tree_popup_menu(self, widget, button=0, time=0) :
-        selection = self.tree.get_selection()
+        selection = self.filetree.get_selection()
         if selection.count_selected_rows() != 1:
             return False
 
@@ -1282,7 +1282,7 @@ class GStatus(GDialog):
                 list[path][FM_CHECKED] = not list[path][FM_CHECKED]
                 self._update_chunk_state(list[path])
 
-            selection = self.tree.get_selection()
+            selection = self.filetree.get_selection()
             selection.selected_foreach(toggler)
             return True
         return False
@@ -1297,7 +1297,7 @@ class GStatus(GDialog):
             self._ignore_next_act = False
             return True
 
-        selection = self.tree.get_selection()
+        selection = self.filetree.get_selection()
         if selection.count_selected_rows() != 1:
             return False
 

@@ -63,7 +63,7 @@ class GCommit(GStatus):
 
     def auto_check(self):
         if self.test_opt('check'):
-            for entry in self.model : 
+            for entry in self.filemodel : 
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self._update_check_count()
@@ -230,7 +230,7 @@ class GCommit(GStatus):
         
         if merged:
             # select all changes if repo is merged
-            for entry in self.model:
+            for entry in self.filemodel:
                 if entry[FM_STATUS] in 'MARD':
                     entry[FM_CHECKED] = True
             self._update_check_count()
