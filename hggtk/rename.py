@@ -16,6 +16,7 @@ import threading, thread2
 from dialog import error_dialog
 from mercurial import hg, ui, mdiff, cmdutil, match, util
 from hglib import toutf, diffexpand
+import gtklib
 try:
     from mercurial.repo import RepoError
 except ImportError:
@@ -114,7 +115,8 @@ class DetectRenameDialog(gtk.Window):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(ctree)
 
-        args = (unknowntree, ctree, adjustment)
+        stbar = gtklib.StatusBar()
+        args = (unknowntree, ctree, adjustment, stbar)
         vbox = gtk.VBox()
         vbox.pack_start(scroller, True, True, 2)
         ac = gtk.Button('Accept Match')
@@ -155,7 +157,11 @@ class DetectRenameDialog(gtk.Window):
         pos = settings.get_value('vpaned', None)
         if pos: vpaned.set_position(pos)
 
-        self.add(vpaned)
+        vbox = gtk.VBox()
+        vbox.pack_start(vpaned, True, True, 2)
+        vbox.pack_start(stbar, False, False, 2)
+        self.add(vbox)
+
         ctree.connect('cursor-changed', self.show_diff, diffview)
         self.connect('map_event', self.on_window_map_event, unkmodel)
         self.connect('delete-event', self.save_settings,
@@ -190,12 +196,7 @@ class DetectRenameDialog(gtk.Window):
     def unknown_wait(self, thread, q, unkmodel):
         while q.qsize():
             unkmodel.append( [q.get(0)] )
-        if thread.isAlive():
-            return True
-        else:
-            #if threading.activeCount() == 1:
-            #    self.stop_button.set_sensitive(False)
-            return False
+        return thread.isAlive()
 
     def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
         settings.set_value('vpaned', vpaned.get_position())
@@ -205,7 +206,7 @@ class DetectRenameDialog(gtk.Window):
         settings.set_value('dims', (rect.width, rect.height))
         settings.write()
 
-    def find_renames(self, widget, unktree, ctree, adj):
+    def find_renames(self, widget, unktree, ctree, adj, stbar):
         'User pressed "find renames" button'
         cmodel = ctree.get_model()
         cmodel.clear()
@@ -213,11 +214,19 @@ class DetectRenameDialog(gtk.Window):
         if not paths:
             return
         tgts = [ umodel[p][0] for p in paths ]
+        q = Queue.Queue()
+        thread = thread2.Thread(target=self.search_thread,
+                args=(self.root, q, tgts, adj))
+        thread.start()
+        stbar.begin()
+        stbar.set_status_text('find source of ' + ', '.join(tgts))
+        gobject.timeout_add(50, self.search_wait, thread, q, cmodel, stbar)
+
+    def search_thread(self, root, q, tgts, adj):
         try:
-            repo = hg.repository(ui.ui(), self.root)
+            repo = hg.repository(ui.ui(), root)
         except RepoError:
             return
-
         srcs = []
         audit_path = util.path_auditor(repo.root)
         m = cmdutil.match(repo)
@@ -245,14 +254,23 @@ class DetectRenameDialog(gtk.Window):
             simularity = 1.0
             gen = findmoves
         for old, new, score in gen(repo, tgts, srcs, simularity):
-            cmodel.append( [old, new, '%d%%' % (score*100), True] )
+            q.put( [old, new, '%d%%' % (score*100), True] )
 
-    def find_copies(self, widget, unktree, ctree, adj):
+    def search_wait(self, thread, q, cmodel, stbar):
+        while q.qsize():
+            cmodel.append( q.get(0) )
+        if thread.isAlive():
+            return True
+        else:
+            stbar.end()
+            return False
+
+    def find_copies(self, widget, unktree, ctree, adj, stbar):
         'User pressed "find copies" button'
         # call rename function with simularity = 100%
-        self.find_renames(widget, unktree, ctree, None)
+        self.find_renames(widget, unktree, ctree, None, stbar)
 
-    def accept_match(self, widget, unktree, ctree, adj):
+    def accept_match(self, widget, unktree, ctree, adj, stbar):
         'User pressed "accept match" button'
         try:
             repo = hg.repository(ui.ui(), self.root)
