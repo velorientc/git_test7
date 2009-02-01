@@ -1281,6 +1281,7 @@ class GStatus(GDialog):
         if event.keyval == 32:
             def toggler(list, path, iter):
                 list[path][FM_CHECKED] = not list[path][FM_CHECKED]
+                self._update_chunk_state(list[path])
 
             selection = self.tree.get_selection()
             selection.selected_foreach(toggler)
