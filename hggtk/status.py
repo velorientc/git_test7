@@ -143,8 +143,15 @@ class GStatus(GDialog):
 
 
     def get_title(self):
-        return os.path.basename(self.repo.root) + ' status ' + ':'.join(self.opts['rev'])\
-               + ' ' + ' '.join(self.pats)
+        root = os.path.basename(self.repo.root)
+        revs = self.opts.get('rev')
+        if revs:
+            return root + ' status ' + ':'.join(revs) + ' ' + ' '.join(self.pats)
+        elif self.mqmode:
+            patch = self.repo.mq.lookup('qtip')
+            return root + ' applied MQ patch ' + patch
+        else:
+            return root + ' status ' + ' '.join(self.pats)
 
     def get_icon(self):
         return 'menushowchanged.ico'
@@ -180,15 +187,18 @@ class GStatus(GDialog):
                 self._showdiff_toggled )
         tbuttons.append(self.showdiff_toggle)
         
-        self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, 'Shelve',
-                self._shelve_clicked, tip='set aside selected changes')
-        self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, 'Unshelve',
-                self._unshelve_clicked, tip='restore shelved changes')
-        tbuttons += [
-                gtk.SeparatorToolItem(),
-                self.shelve_btn,
-                self.unshelve_btn,
-            ]
+        # Shelving does not work when visualizing diffs between
+        # revisions (though this could eventually be made to work)
+        if not self.opts.get('rev'):
+            self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, 'Shelve',
+                    self._shelve_clicked, tip='set aside selected changes')
+            self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, 'Unshelve',
+                    self._unshelve_clicked, tip='restore shelved changes')
+            tbuttons += [
+                    gtk.SeparatorToolItem(),
+                    self.shelve_btn,
+                    self.unshelve_btn,
+                ]
 
         return tbuttons
 
@@ -209,6 +219,9 @@ class GStatus(GDialog):
         else:
             self._setting_pos = 64000
             self._setting_lastpos = 270
+        self.mqmode = None
+        if hasattr(self.repo, 'mq') and self.repo.mq.applied:
+            self.mqmode = True
 
 
     def get_body(self):
@@ -509,7 +522,7 @@ class GStatus(GDialog):
         # The following code was copied from the status function in mercurial\commands.py
         # and modified slightly to work here
         
-        if hasattr(self.repo, 'mq') and self.repo.mq.applied:
+        if self.mqmode and not self.opts.get('rev'):
             # when a patch is applied, show diffs to parent of top patch
             self._node1 = self.repo.lookup(-3)
             self._node2 = None
@@ -1316,7 +1329,8 @@ def run(root='', cwd='', files=[], **opts):
     cmdoptions = {
         'all':False, 'clean':False, 'ignored':False, 'modified':True,
         'added':True, 'removed':True, 'deleted':True, 'unknown':True, 'rev':[],
-        'exclude':[], 'include':[], 'debug':True,'verbose':True,'git':False
+        'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
+        'check':True
     }
     
     dialog = GStatus(u, repo, cwd, files, cmdoptions, True)
