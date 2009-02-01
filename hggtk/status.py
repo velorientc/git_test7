@@ -30,6 +30,7 @@ FM_STATUS = 1
 FM_PATH_UTF8 = 2
 FM_PATH = 3
 FM_MERGE_STATUS = 4
+FM_PARTIAL_SELECTED = 5
 
 # diff_model row enumerations
 DM_REJECTED = 0
@@ -268,6 +269,7 @@ class GStatus(GDialog):
         if self.count_revs() < 2 and len(self.repo.changectx(None).parents()) == 1:
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
+            col0.add_attribute(toggle_cell, 'inconsistent', FM_PARTIAL_SELECTED)
             #col0.set_sort_column_id(0)
             col0.set_resizable(False)
             self.filetree.append_column(col0)
@@ -612,6 +614,7 @@ class GStatus(GDialog):
         '''Update chunk toggle state to match file toggle state'''
         file = entry[FM_PATH]
         if file not in self._filechunks: return
+        entry[FM_PARTIAL_SELECTED] = False
         for n in self._filechunks[file][1:]:
             self.diff_model[n][DM_NOT_REJECTED] = entry[FM_CHECKED]
             self.diff_model[n][DM_REJECTED] = not entry[FM_CHECKED]
@@ -811,39 +814,37 @@ class GStatus(GDialog):
                     selection.select_path((row,))
         return False
 
-    def _diff_tree_row_act(self, tree, path, column):
+    def _diff_tree_row_act(self, dtree, path, column):
+        dmodel = dtree.get_model()
         try:
-            row = self.diff_model[path]
+            row = dmodel[path]
             chunk = self._shelve_chunks[row[DM_CHUNK_ID]]
             file = chunk.filename()
-            if file not in self._filechunks: return
+            if file not in self._filechunks:
+                return
+            fchunks = self._filechunks[file][1:]
             if row[DM_HEADER_CHUNK]:
-                for n in self._filechunks[file][1:]:
-                    self.diff_model[n][DM_REJECTED] = not self.diff_model[n][DM_REJECTED]
-                newvalue = False
-                for n in self._filechunks[file][1:]:
-                    if not self.diff_model[n][DM_REJECTED]:
-                        newvalue = True
-                        break
+                for n in fchunks:
+                    dmodel[n][DM_REJECTED] = not dmodel[n][DM_REJECTED]
             else:
                 row[DM_REJECTED] = not row[DM_REJECTED]
-                if row[DM_REJECTED]:
-                    # File has at least one inactive chunk, check others
-                    for n in self._filechunks[file][1:]:
-                        if not self.diff_model[n][DM_REJECTED]:
-                            return
-                    newvalue = False
-                else:
-                    newvalue = True
+
+            # Determine file's chunk status
+            rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
+            nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
+            newvalue = nonrej and True or False
+            partial = rej and nonrej and True or False
+
             # Update file's check status
-            for fr in self.model:
-                if fr[2] == file:
-                    if fr[0] != newvalue:
-                        fr[0] = newvalue
-                        self._update_check_count()
-                    return
+            for fr in self.filemodel:
+                if fr[FM_PATH] != file:
+                    continue
+                fr[FM_PARTIAL_SELECTED] = partial
+                if fr[FM_CHECKED] != newvalue:
+                    fr[FM_CHECKED] = newvalue
+                    self._update_check_count()
         finally:
-            for row in self.diff_model:
+            for row in dmodel:
                 row[DM_NOT_REJECTED] = not row[DM_REJECTED]
 
 
