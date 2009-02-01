@@ -224,7 +224,7 @@ class DetectRenameDialog(gtk.Window):
                 args=(self.root, q, tgts, adj))
         thread.start()
         stbar.begin()
-        stbar.set_status_text('find source of ' + ', '.join(tgts))
+        stbar.set_status_text('finding source of ' + ', '.join(tgts))
         gobject.timeout_add(50, self.search_wait, thread, q, cmodel, stbar)
 
     def search_thread(self, root, q, tgts, adj):
@@ -323,7 +323,7 @@ class DetectRenameDialog(gtk.Window):
             opts = mdiff.defaultopts
             difftext = mdiff.unidiff(rr, '', aa, '', src, dest, None, opts=opts)
             if not difftext:
-                l = '\n== %s and %s have identical contents ==\n' % (src, dest)
+                l = '== %s and %s have identical contents ==\n\n' % (src, dest)
                 buffer.insert(iter, l)
                 continue
             difflines = difftext.splitlines(True)
