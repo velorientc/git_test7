@@ -85,7 +85,7 @@ class header(object):
     diff_re = re.compile('diff --git a/(.*) b/(.*)$')
     allhunks_re = re.compile('(?:index|new file|deleted file) ')
     pretty_re = re.compile('(?:new file|deleted file) ')
-    special_re = re.compile('(?:index|new|deleted|copy|rename) ')
+    special_re = re.compile('(?:index|new file|deleted|copy|rename) ')
 
     def __init__(self, header):
         self.header = header
