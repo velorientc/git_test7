@@ -486,7 +486,6 @@ class GStatus(GDialog):
         # If the status load failed, no reason to continue
         if not self.reload_status():
             raise util.Abort('could not load status')
-        self.auto_check()
 
 
     def _displayed(self, widget, event):
@@ -559,8 +558,6 @@ class GStatus(GDialog):
                 file = util.localpath(file)
                 self.model.append([file in recheck, char, toutf(file), file, mst])
 
-        self._update_check_count()
-        
         selection = self.tree.get_selection()
         selected = False
         for row in model:
@@ -585,6 +582,8 @@ class GStatus(GDialog):
     def reload_status(self):
         if not self._ready: return False
         success, outtext = self._hg_call_wrapper('Status', self._do_reload_status)
+        self.auto_check()
+        self._update_check_count()
         return success
 
 
