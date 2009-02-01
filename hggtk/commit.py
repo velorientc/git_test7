@@ -387,8 +387,7 @@ class GCommit(GStatus):
             self._last_commit_id = None
             self.reload_status()
         except:
-            Prompt('Undo commit', 'Errors during rollback!',
-                    self).run()
+            Prompt('Undo commit', 'Errors during rollback!', self).run()
 
 
     def _should_addremove(self, files):
@@ -439,7 +438,7 @@ class GCommit(GStatus):
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
-        cmdline  = ["hg", "commit", "--verbose", "--repository", self.repo.root]
+        cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
         if self.qheader is not None:
             cmdline[1] = 'qrefresh'
         if self.opts['addremove']:
