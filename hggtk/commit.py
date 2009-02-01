@@ -3,6 +3,7 @@
 #
 # Copyright 2007 Brad Schick, brad at gmail . com
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright (C) 2009 Steve Borho <steve@borho.org>
 #
 
 import os
@@ -192,8 +193,11 @@ class GCommit(GStatus):
         begin, end = buffer.get_bounds()
         cur_msg = buffer.get_text(begin, end)
         if buffer.get_char_count() > 10 and cur_msg != self.qheader:
-            dialog = Confirm('Exit', [], self, 'Discard commit message and exit?')
-            if dialog.run() == gtk.RESPONSE_NO:
+            dialog = Confirm('Exit', [], self, 'Save commit message at exit?')
+            res = dialog.run()
+            if res == gtk.RESPONSE_YES:
+                self._update_recent_messages(cur_msg)
+            elif res != gtk.RESPONSE_NO:
                 live = True
         return live
 
