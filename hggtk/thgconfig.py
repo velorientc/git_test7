@@ -114,6 +114,9 @@ class ConfigDialog(gtk.Dialog):
                     'Color changesets by author name.  If not enabled,'
                     ' the changes are colored green for merge, red for'
                     ' non-trivial parents, black for normal. Default: False'),
+                ('Long Summary', 'tortoisehg.longsummary', ['False', 'True'],
+                    'Concatenate multiple lines of changeset summary'
+                    ' until they reach 80 characters. Default: False'),
                 ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
                     'The number of revisions to read and display in the'
                     ' changelog viewer in a single batch. Default: 500'),
