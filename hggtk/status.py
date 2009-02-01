@@ -893,7 +893,8 @@ class GStatus(GDialog):
                     markedup = markup(fp)
                     isheader = isinstance(chunk, hgshelve.header)
                     if isheader:
-                        self._filechunks[chunk.filename()] = [len(self.diff_model)]
+                        for f in chunk.files():
+                            self._filechunks[f] = [len(self.diff_model)]
                         self.diff_model.append([False, True, markedup, True, n])
                         skip = chunk.special()
                     elif skip != True:
