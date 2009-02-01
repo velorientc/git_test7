@@ -493,7 +493,7 @@ def launch(root='', files=[], cwd='', main=True):
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
         'unknown':True, 'ignored':False, 
         'exclude':[], 'include':[],
-        'check': False, 'git':False, 'logfile':'', 'addremove':False,
+        'check': True, 'git':False, 'logfile':'', 'addremove':False,
     }
     
     dialog = GCommit(u, repo, cwd, files, cmdoptions, main)
