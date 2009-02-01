@@ -142,7 +142,8 @@ class GStatus(GDialog):
 
 
     def get_title(self):
-        return os.path.basename(self.repo.root) + ' status ' + ':'.join(self.opts['rev'])  + ' ' + ' '.join(self.pats)
+        return os.path.basename(self.repo.root) + ' status ' + ':'.join(self.opts['rev'])\
+               + ' ' + ' '.join(self.pats)
 
     def get_icon(self):
         return 'menushowchanged.ico'
@@ -174,7 +175,8 @@ class GStatus(GDialog):
         self.showdiff_toggle.set_label('_Show Diff')
         self.showdiff_toggle.set_tooltip(self.tooltips, 'show diff pane')
         self.showdiff_toggle.set_active(False)
-        self._showdiff_toggled_id = self.showdiff_toggle.connect('toggled', self._showdiff_toggled )
+        self._showdiff_toggled_id = self.showdiff_toggle.connect('toggled',
+                self._showdiff_toggled )
         tbuttons.append(self.showdiff_toggle)
         
         self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, 'Shelve',
@@ -192,7 +194,8 @@ class GStatus(GDialog):
 
     def save_settings(self):
         settings = GDialog.save_settings(self)
-        settings['gstatus'] = (self._diffpane.get_position(), self._setting_lastpos)
+        settings['gstatus'] = (self._diffpane.get_position(),
+                               self._setting_lastpos)
         return settings
 
 
