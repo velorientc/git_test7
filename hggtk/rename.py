@@ -7,9 +7,12 @@
 import os
 import sys
 import gtk
+import gobject
 import pango
 import cStringIO
 import shlib
+import Queue
+import threading, thread2
 from dialog import error_dialog
 from mercurial import hg, ui, mdiff, cmdutil, match, util
 from hglib import toutf, diffexpand
@@ -162,21 +165,37 @@ class DetectRenameDialog(gtk.Window):
         self.refresh(unkmodel)
 
     def refresh(self, unkmodel):
+        q = Queue.Queue()
+        unkmodel.clear()
+        thread = thread2.Thread(target=self.unknown_thread,
+                args=(self.root, q))
+        thread.start()
+        gobject.timeout_add(50, self.unknown_wait, thread, q, unkmodel)
+
+    def unknown_thread(self, root, q):
         try:
-            repo = hg.repository(ui.ui(), self.root)
+            repo = hg.repository(ui.ui(), root)
         except RepoError:
             return
         matcher = match.always(repo.root, repo.root)
         status = repo.status(node1=repo.dirstate.parents()[0], node2=None,
                 match=matcher, ignored=False, clean=False, unknown=True)
         (modified, added, removed, deleted, unknown, ignored, clean) = status
-        unkmodel.clear()
         for u in unknown:
-            unkmodel.append( [u] )
+            q.put( u )
         for a in added:
             if not repo.dirstate.copied(a):
-                unkmodel.append( [a] )
-        self.deleted = deleted
+                q.put( a )
+
+    def unknown_wait(self, thread, q, unkmodel):
+        while q.qsize():
+            unkmodel.append( [q.get(0)] )
+        if thread.isAlive():
+            return True
+        else:
+            #if threading.activeCount() == 1:
+            #    self.stop_button.set_sensitive(False)
+            return False
 
     def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
         settings.set_value('vpaned', vpaned.get_position())
@@ -245,9 +264,10 @@ class DetectRenameDialog(gtk.Window):
             src, dest, percent, sensitive = row
             if not sensitive:
                 continue
-            repo.copy(src, dest)
-            if src in self.deleted:
+            if not os.path.exists(repo.wjoin(src)):
+                # Mark missing rename source as removed
                 repo.remove([src])
+            repo.copy(src, dest)
             shlib.shell_notify([src, dest])
             # Mark all rows with this target file as non-sensitive
             for row in cmodel:
