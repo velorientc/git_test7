@@ -1258,8 +1258,8 @@ class GStatus(GDialog):
         return False
 
     def _get_file_context_menu(self, rowdata):
-        st = rowdata[1]
-        ms = rowdata[4]
+        st = rowdata[FM_STATUS]
+        ms = rowdata[FM_MERGE_STATUS]
         if ms:
             menu = self._menus['M' + ms]
         else:
