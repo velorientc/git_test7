@@ -473,8 +473,7 @@ class GStatus(GDialog):
             file_count = file_count + 1
             if row[FM_CHECKED]:
                 check_count = check_count + 1
-        self.counter.set_text(_('%d selected, %d total') % 
-                (check_count, file_count))
+        self.counter.set_text(_('%d selected, %d total') % (check_count, file_count))
         if self.selcb:
             self.selcb.set_active(file_count and file_count == check_count)
 
