@@ -24,6 +24,13 @@ from gdialog import *
 from dialog import entry_dialog
 import hgshelve
 
+# file model row enumerations
+FM_CHECKED = 0
+FM_STATUS = 1
+FM_PATH_UTF8 = 2
+FM_PATH = 3
+FM_MERGE_STATUS = 4
+
 # diff_model row enumerations
 DM_REJECTED = 0
 DM_NOT_REJECTED = 1
@@ -51,7 +58,8 @@ class GStatus(GDialog):
         
     def auto_check(self):
         if self.test_opt('check'):
-            for entry in self.model : entry[0] = True
+            for entry in self.model:
+                entry[FM_CHECKED] = True
             self._update_check_count()
 
 
@@ -228,10 +236,6 @@ class GStatus(GDialog):
         self._menus['MU'] = unresolved_menu
 
         # model stores the file list.
-        # model[0] = file checked (marked for commit)
-        # model[1] = changetype char
-        # model[2] = file path as UTF-8
-        # model[3] = file path
         self.model = gtk.ListStore(bool, str, str, str, str)
         self.model.set_sort_func(1001, self._sort_by_stat)
         self.model.set_default_sort_func(self._sort_by_stat)
@@ -260,28 +264,28 @@ class GStatus(GDialog):
         self.selcb = None
         if self.count_revs() < 2 and len(self.repo.changectx(None).parents()) == 1:
             col0 = gtk.TreeViewColumn('', toggle_cell)
-            col0.add_attribute(toggle_cell, 'active', 0)
+            col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
             #col0.set_sort_column_id(0)
             col0.set_resizable(False)
             self.tree.append_column(col0)
             self.selcb = self._add_header_checkbox(col0, self._sel_clicked)
         
         col1 = gtk.TreeViewColumn('st', stat_cell)
-        col1.add_attribute(stat_cell, 'text', 1)
+        col1.add_attribute(stat_cell, 'text', FM_STATUS)
         col1.set_cell_data_func(stat_cell, self._text_color)
         col1.set_sort_column_id(1001)
         col1.set_resizable(False)
         self.tree.append_column(col1)
         
         col = gtk.TreeViewColumn('ms', stat_cell)
-        col.add_attribute(stat_cell, 'text', 4)
+        col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
         #col.set_cell_data_func(stat_cell, self._text_color)
         col.set_sort_column_id(4)
         col.set_resizable(False)
         self.tree.append_column(col)
         
         col2 = gtk.TreeViewColumn('path', path_cell)
-        col2.add_attribute(path_cell, 'text', 2)
+        col2.add_attribute(path_cell, 'text', FM_PATH_UTF8)
         col2.set_cell_data_func(path_cell, self._text_color)
         col2.set_sort_column_id(2)
         col2.set_resizable(True)
@@ -464,7 +468,7 @@ class GStatus(GDialog):
         check_count = 0
         for row in self.model:
             file_count = file_count + 1
-            if row[0]:
+            if row[FM_CHECKED]:
                 check_count = check_count + 1
         self.counter.set_text(_('%d selected, %d total') % 
                 (check_count, file_count))
@@ -534,8 +538,9 @@ class GStatus(GDialog):
         explicit_changetypes = changetypes + (('clean', 'C', clean),)
 
         # List of the currently checked and selected files to pass on to the new data
-        recheck = [entry[2] for entry in self.model if entry[0]]
-        reselect = [self.model[iter][2] for iter in self.tree.get_selection().get_selected_rows()[1]]
+        model, paths = self.tree.get_selection().get_selected_rows()
+        recheck = [entry[FM_PATH_UTF8] for entry in model if entry[FM_CHECKED]]
+        reselect = [model[iter][FM_PATH_UTF8] for iter in paths]
 
         # merge-state of files
         ms = merge_.mergestate(self.repo)
@@ -556,15 +561,15 @@ class GStatus(GDialog):
         
         selection = self.tree.get_selection()
         selected = False
-        for row in self.model:
-            if row[2] in reselect:
+        for row in model:
+            if row[FM_PATH_UTF8] in reselect:
                 selection.select_iter(row.iter)
                 selected = True
 
         if not selected:
             selection.select_path((0,))
 
-        files = [row[3] for row in self.model]
+        files = [row[FM_PATH] for row in self.model]
         self._show_diff_hunks(files)
 
         self.tree.show()
@@ -598,18 +603,18 @@ class GStatus(GDialog):
 
     def _select_toggle(self, cellrenderer, path):
         '''User manually toggled file status'''
-        self.model[path][0] = not self.model[path][0]
+        self.model[path][FM_CHECKED] = not self.model[path][FM_CHECKED]
         self._update_chunk_state(self.model[path])
         self._update_check_count()
         return True
 
     def _update_chunk_state(self, entry):
         '''Update chunk toggle state to match file toggle state'''
-        file = entry[2]
+        file = entry[FM_PATH_UTF8]
         if file not in self._filechunks: return
         for n in self._filechunks[file][1:]:
-            self.diff_model[n][DM_NOT_REJECTED] = entry[0]
-            self.diff_model[n][DM_REJECTED] = not entry[0]
+            self.diff_model[n][DM_NOT_REJECTED] = entry[FM_CHECKED]
+            self.diff_model[n][DM_REJECTED] = not entry[FM_CHECKED]
 
     def _show_toggle(self, check, type):
         self.opts[type] = check.get_active()
@@ -619,7 +624,7 @@ class GStatus(GDialog):
 
     def _sort_by_stat(self, model, iter1, iter2):
         order = 'MAR!?IC'
-        lhs, rhs = (model.get_value(iter1, 1), model.get_value(iter2, 1))
+        lhs, rhs = (model.get_value(iter1, FM_STATUS), model.get_value(iter2, FM_STATUS))
 
         # GTK+ bug that calls sort before a full row is inserted causing values to be None.
         # When this happens, just return any value since the call is irrelevant and will be
@@ -632,7 +637,7 @@ class GStatus(GDialog):
         
 
     def _text_color(self, column, text_renderer, list, row_iter):
-        stat = list[row_iter][1]
+        stat = list[row_iter][FM_STATUS]
         if stat == 'M':  
             text_renderer.set_property('foreground', '#000090')
         elif stat == 'A':
@@ -1212,16 +1217,17 @@ class GStatus(GDialog):
 
     def _select_files(self, state, ctype=None):
         for entry in self.model:
-            if ctype and not entry[1] in ctype:
+            if ctype and not entry[FM_STATUS] in ctype:
                 continue
-            if entry[0] != state:
-                entry[0] = state
+            if entry[FM_CHECKED] != state:
+                entry[FM_CHECKED] = state
                 self._update_chunk_state(entry)
         self._update_check_count()
 
     
     def _relevant_files(self, stats):
-        return [item[3] for item in self.model if item[0] and item[1] in stats]
+        return [item[FM_PATH] for item in self.model \
+                if item[FM_CHECKED] and item[FM_STATUS] in stats]
 
 
     def _context_menu_act(self, menuitem, handler):
@@ -1273,7 +1279,7 @@ class GStatus(GDialog):
     def _tree_key_press(self, tree, event):
         if event.keyval == 32:
             def toggler(list, path, iter):
-                list[path][0] = not list[path][0]
+                list[path][FM_CHECKED] = not list[path][FM_CHECKED]
 
             selection = self.tree.get_selection()
             selection.selected_foreach(toggler)

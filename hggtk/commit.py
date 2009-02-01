@@ -19,7 +19,7 @@ from mercurial.i18n import _
 from mercurial import ui, hg
 from shlib import shell_notify
 from gdialog import *
-from status import GStatus, DM_REJECTED, DM_HEADER_CHUNK, DM_CHUNK_ID
+from status import *
 from hgcmd import CmdDialog
 from hglib import fromutf
 
@@ -64,8 +64,8 @@ class GCommit(GStatus):
     def auto_check(self):
         if self.test_opt('check'):
             for entry in self.model : 
-                if entry[1] in 'MAR':
-                    entry[0] = True
+                if entry[FM_STATUS] in 'MAR':
+                    entry[FM_CHECKED] = True
             self._update_check_count()
 
 
@@ -231,8 +231,8 @@ class GCommit(GStatus):
         if merged:
             # select all changes if repo is merged
             for entry in self.model:
-                if entry[1] in 'MARD':
-                    entry[0] = True
+                if entry[FM_STATUS] in 'MARD':
+                    entry[FM_CHECKED] = True
             self._update_check_count()
 
             # pre-fill commit message
