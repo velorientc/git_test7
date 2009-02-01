@@ -144,8 +144,13 @@ class DetectRenameDialog(gtk.Window):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         diffframe.add(scroller)
         
-        diffbuf = gtk.TextBuffer()
-        diffview = gtk.TextView(diffbuf)
+        buffer = gtk.TextBuffer()
+        buffer.create_tag('removed', foreground='#900000')
+        buffer.create_tag('added', foreground='#006400')
+        buffer.create_tag('position', foreground='#FF8000')
+        buffer.create_tag('header', foreground='#000090')
+
+        diffview = gtk.TextView(buffer)
         diffview.modify_font(pango.FontDescription('monospace'))
         diffview.set_wrap_mode(gtk.WRAP_NONE)
         diffview.set_editable(False)
@@ -162,7 +167,7 @@ class DetectRenameDialog(gtk.Window):
         vbox.pack_start(stbar, False, False, 2)
         self.add(vbox)
 
-        ctree.connect('cursor-changed', self.show_diff, diffview)
+        ctree.connect('cursor-changed', self.show_diff, buffer)
         self.connect('map_event', self.on_window_map_event, unkmodel)
         self.connect('delete-event', self.save_settings,
                 settings, hpaned, vpaned, adjustment)
@@ -297,20 +302,14 @@ class DetectRenameDialog(gtk.Window):
         'User activated row of candidate list'
         self.accept_match(ctree, unktree, ctree, None)
 
-    def show_diff(self, tree, diffview):
+    def show_diff(self, tree, buffer):
         'User selected a row in the candidate tree'
         try:
             repo = hg.repository(ui.ui(), self.root)
         except RepoError:
             return
 
-        # TODO: this is a common function, should be generalized
-        buffer = gtk.TextBuffer()
-        buffer.create_tag('removed', foreground='#900000')
-        buffer.create_tag('added', foreground='#006400')
-        buffer.create_tag('position', foreground='#FF8000')
-        buffer.create_tag('header', foreground='#000090')
-
+        buffer.set_text('')
         iter = buffer.get_start_iter()
         model, paths = tree.get_selection().get_selected_rows()
         for path in paths:
@@ -343,8 +342,6 @@ class DetectRenameDialog(gtk.Window):
                 else:
                     line = diffexpand(line)
                     buffer.insert(iter, line)
-        diffview.set_buffer(buffer)
-
 
 def run(fname='', target='', detect=True, root='', **opts):
     if detect:
