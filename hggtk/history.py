@@ -330,11 +330,16 @@ class GLog(GDialog):
         _menu.show_all()
         return _menu
  
+    def _restore_original_selection(self, widget, *args):
+        self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
+        self.tree.get_selection().select_path(self._orig_sel)
+ 
     def tree_diff_context_menu(self):
         _menu = gtk.Menu()
         _menu.append(create_menu('_diff with selected', self._diff_revs))
         _menu.append(create_menu('visual diff with selected',
                 self._vdiff_selected))
+        _menu.connect_after('selection-done', self._restore_original_selection)
         _menu.show_all()
         return _menu
  
@@ -603,6 +608,9 @@ class GLog(GDialog):
             if srow == crow:
                 self._tree_popup_menu(widget, event.button, event.time)
             else:
+                widget.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+                widget.get_selection().select_path(crow)
+                self._orig_sel = srow
                 self._revs = (int(model[srow][treemodel.REVID]),
                         int(model[crow][treemodel.REVID]))
                 self._tree_popup_menu_diff(widget, event.button, event.time)
