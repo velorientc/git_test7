@@ -303,15 +303,24 @@ class SynchDialog(gtk.Window):
         
     def _pull_menu(self):
         menu = gtk.Menu()
-           
-        self._pull_fetch = gtk.CheckMenuItem("Do fetch")
-        menu.append(self._pull_fetch)
-        self._pull_update = gtk.CheckMenuItem("Update to new tip")
-        menu.append(self._pull_update)
+
+        # define menu items
+        self._pull_default = gtk.RadioMenuItem(None, "Default Pull")
+        self._pull_update  = gtk.RadioMenuItem(self._pull_default, "Update to new tip")
+        self._pull_fetch   = gtk.RadioMenuItem(self._pull_default, "Do fetch")
+        self._pull_menu_items = [
+            self._pull_default, 
+            self._pull_update,
+            self._pull_fetch,
+        ]
+        
+        # add them to the menu
+        for item in self._pull_menu_items:
+            menu.append(item)
         
         # restore states from previous session
-        st = self._settings.get_value('_pull_update_state', False)
-        self._pull_update.set_active(st)
+        st = self._settings.get_value('_pull_default_state', 0)
+        self._pull_menu_items[st].set_active(True)
         
         menu.show_all()
         return menu
@@ -379,8 +388,10 @@ class SynchDialog(gtk.Window):
             gtk.main_quit()
         
     def _save_settings(self):
-        self._settings.set_value('_pull_update_state',
-                self._pull_update.get_active())
+        pullstate = 0
+        for i in xrange(0, len(self._pull_menu_items)):
+            if self._pull_menu_items[i].get_active(): pullstate = i
+        self._settings.set_value('_pull_default_state', pullstate) 
         self._settings.write()
 
     def _delete(self, widget, event):
