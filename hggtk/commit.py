@@ -127,6 +127,12 @@ class GCommit(GStatus):
         vbox = gtk.VBox()
         
         mbox = gtk.HBox()
+
+        label = gtk.Label('Branch: ')
+        mbox.pack_start(label, False, False, 2)
+        self.branchentry = gtk.Entry()
+        mbox.pack_start(self.branchentry, False, False, 2)
+
         label = gtk.Label('Recent Commit Messages: ')
         mbox.pack_start(label, False, False, 2)
         self.msg_cbbox = gtk.combo_box_new_text()
@@ -205,6 +211,7 @@ class GCommit(GStatus):
     def reload_status(self):
         if not self._ready: return False
         success = GStatus.reload_status(self)
+        self.branchentry.set_text(self.repo.dirstate.branch())
         self._check_merge()
         self._check_patch_queue()
         self._check_undo()
@@ -434,6 +441,10 @@ class GCommit(GStatus):
             self.repo = hg.repository(ui.ui(), self.repo.root)
             self.ui = self.repo.ui
             return
+
+        newbranch = self.branchentry.get_text()
+        if newbranch != self.repo.dirstate.branch():
+            self.repo.dirstate.setbranch(newbranch)
 
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
