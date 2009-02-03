@@ -84,6 +84,12 @@ class RecoveryDialog(gtk.Window):
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
         
+        # ctrl-Q quits
+        accel_group = gtk.AccelGroup()
+        self.add_accel_group(accel_group)
+        button.add_accelerator("clicked", accel_group, ord("q"),
+                               gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE) 
+
         # hg output window
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
