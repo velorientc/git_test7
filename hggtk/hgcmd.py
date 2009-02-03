@@ -43,6 +43,12 @@ class CmdDialog(gtk.Dialog):
         self.connect('delete-event', self._delete)
         self.connect('response', self._response)
 
+        # ctrl-Q quits
+        accel_group = gtk.AccelGroup()
+        self.add_accel_group(accel_group)
+        self._button_ok.add_accelerator("clicked", accel_group, ord("q"),
+                               gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE) 
+
         self.pbar = None
         if progressbar:
             self.last_pbar_update = 0
