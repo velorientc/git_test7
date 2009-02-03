@@ -44,6 +44,7 @@ class DetectRenameDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         self.root = root
+        self.notify_func = None
         self.set_title('Detect Copies/Renames in %s' % os.path.basename(root))
         settings = shlib.Settings('rename')
         dims = settings.get_value('dims', (800, 600))
@@ -174,6 +175,9 @@ class DetectRenameDialog(gtk.Window):
         self.connect('delete-event', self.save_settings,
                 settings, hpaned, vpaned, adjustment)
 
+    def set_notify_func(self, func):
+        self.notify_func = func
+
     def on_window_map_event(self, event, param, unkmodel):
         self.refresh(unkmodel)
 
@@ -294,6 +298,8 @@ class DetectRenameDialog(gtk.Window):
                 repo.remove([src])
             repo.copy(src, dest)
             shlib.shell_notify([src, dest])
+            if self.notify_func:
+                self.notify_func()
             # Mark all rows with this target file as non-sensitive
             for row in cmodel:
                 if row[1] == dest:
