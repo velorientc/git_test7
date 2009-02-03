@@ -317,6 +317,7 @@ class GLog(GDialog):
         _menu.append(self._cmenu_merge)
         _menu.append(create_menu('_export patch', self._export_patch))
         _menu.append(create_menu('e_mail patch', self._email_patch))
+        _menu.append(create_menu('_bundle rev:tip', self._bundle_rev_to_tip))
         _menu.append(create_menu('add/remove _tag', self._add_tag))
         _menu.append(create_menu('backout revision', self._backout_rev))
         _menu.append(create_menu('_revert', self._revert))
@@ -517,6 +518,20 @@ class GLog(GDialog):
             def dohgexport():
                 commands.export(self.ui,self.repo,str(rev),**exportOpts)
             success, outtext = self._hg_call_wrapper("Export",dohgexport,False)
+
+    def _bundle_rev_to_tip(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        filename = "%s_rev%s_to_tip.hg" % (os.path.basename(self.repo.root), rev)
+        result = NativeSaveFileDialogWrapper(Title = "Write bundle to",
+                                         InitialDir=self.repo.root,
+                                         FileName=filename).run()
+        if result:
+            from hgcmd import CmdDialog
+            cmdline = ['hg', 'bundle', '--base', str(rev), result]
+            dlg = CmdDialog(cmdline)
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
 
     def _email_patch(self, menuitem):
         from hgemail import EmailDialog
