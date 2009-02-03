@@ -443,9 +443,22 @@ class GCommit(GStatus):
             self.ui = self.repo.ui
             return
 
-        newbranch = self.branchentry.get_text()
+        newbranch = fromutf(self.branchentry.get_text())
         if newbranch != self.repo.dirstate.branch():
-            self.repo.dirstate.setbranch(newbranch)
+            if newbranch in self.repo.branchtags():
+                if newbranch not in [p.branch() for p in self.repo.parents()]:
+                    response = Confirm('Override Branch', [], self,
+                        'A branch named "%s" already exists,\n'
+                        'override?' % newbranch).run()
+                else:
+                    response = gtk.RESPONSE_YES
+            else:
+                response = Confirm('New Branch', [], self,
+                        'Create new named branch "%s"?' % newbranch).run()
+            if response == gtk.RESPONSE_YES:
+                self.repo.dirstate.setbranch(newbranch)
+            elif response != gtk.RESPONSE_NO:
+                return
 
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
