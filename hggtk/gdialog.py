@@ -299,6 +299,12 @@ class GDialog(gtk.Window):
         self.toolbar = toolbar
         vbox.pack_start(toolbar, False, False, 0)
 
+        # ctrl-Q quits
+        accel_group = gtk.AccelGroup()
+        self.add_accel_group(accel_group)
+        button.add_accelerator("clicked", accel_group, ord("q"),
+                               gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE) 
+
         # Subclass returns the main body
         body = self.get_body()
         vbox.pack_start(body, True, True, 0)
