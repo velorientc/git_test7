@@ -28,6 +28,7 @@ class CmdDialog(gtk.Dialog):
         set_tortoise_icon(self, 'hg.ico')
         self.cmdline = cmdline
         self.returncode = None
+        self.hgthread = None
 
         # construct dialog
         self.set_default_size(width, height)
@@ -93,13 +94,14 @@ class CmdDialog(gtk.Dialog):
         self.response(gtk.RESPONSE_ACCEPT)
         
     def _on_stop_clicked(self, button):
-        self.hgthread.terminate()
+        if self.hgthread:
+            self.hgthread.terminate()
     
     def _delete(self, widget, event):
         return True
 
     def _response(self, widget, response_id):
-        if self.hgthread.isAlive():
+        if self.hgthread and self.hgthread.isAlive():
             widget.emit_stop_by_name('response')
     
     def _on_window_map_event(self, event, param):
@@ -157,7 +159,10 @@ class CmdDialog(gtk.Dialog):
             self.pbar.pulse()
 
     def return_code(self):
-        return self.hgthread.return_code()
+        if self.hgthread:
+            return self.hgthread.return_code()
+        else:
+            return False
 
 def run(cmdline=[], gui=True, **opts):
     if not gui:
