@@ -84,6 +84,7 @@ class GStatus(GDialog):
                 (('_view', self._view_file),
                     ('_delete', self._delete_file), 
                     ('_add', self._add_file),
+                    ('_guess rename', self._guess_rename),
                     ('_ignore', self._ignore_file)),
                 # clean
                 (('_view', self._view_file),
@@ -1192,6 +1193,11 @@ class GStatus(GDialog):
             self.reload_status()
         return True
 
+    def _guess_rename(self, stat, file):
+        import rename
+        dialog = rename.DetectRenameDialog(self.repo.root)
+        dialog.show_all()
+        dialog.set_notify_func(self.ignoremask_updated)
 
     def _ignore_file(self, stat, file):
         import hgignore
