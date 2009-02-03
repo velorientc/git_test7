@@ -80,6 +80,12 @@ class ServeDialog(gtk.Window):
         self._button_close = self._toolbutton(gtk.STOCK_CLOSE, 'Quit',
                 self._close_clicked)
 
+        # ctrl-Q quits
+        accel_group = gtk.AccelGroup()
+        self.add_accel_group(accel_group)
+        self._button_close.add_accelerator("clicked", accel_group, ord("q"),
+                               gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE) 
+
         tbuttons = [
                 self._button_start,
                 self._button_stop,
