@@ -124,9 +124,9 @@ class HistoryDialog(gtk.Dialog):
         
     def _get_hg_history(self, rev=None, limit=10):    
         # get history
-        options = {}
-        if rev: options['rev'] = [rev]
-        if limit: options['limit'] = limit
+        options = []
+        if rev: options += ['--rev', rev]
+        if limit: options += ['--limit', str(limit)]
         self._do_hg_cmd('log', options)
         
         # parse log output
@@ -176,7 +176,7 @@ class HistoryDialog(gtk.Dialog):
                   
         try:
             q = Queue.Queue()
-            args = [cmd] + [os.path.join(self.root, x) for x in self.files]
+            args = [cmd] + options + [os.path.join(self.root, x) for x in self.files]
             hglib.hgcmd_toq(self.root, q, *args, **{})
             out = ''
             while q.qsize(): out += q.get(0)
