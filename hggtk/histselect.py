@@ -142,7 +142,7 @@ class HistoryDialog(gtk.Dialog):
                 name, value = re.split(':\s+', x, 1)
                 if name not in cs:
                     cs[name] = []
-                cs[name].append(value)
+                cs[name].append(hglib.toutf(value))
         if cs:
             histlist.append(cs)
         
