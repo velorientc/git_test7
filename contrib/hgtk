@@ -26,8 +26,7 @@ try:
 except ImportError:
     from mercurial.repo import RepoError
     from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
-    class ParseError(Exception):
-        """Exception raised on errors in parsing the command line."""
+    from mercurial.dispatch import ParseError
 
 nonrepo_commands = 'userconfig clone init about help'
 
