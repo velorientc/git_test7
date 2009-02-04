@@ -12,7 +12,7 @@ try:
     from mercurial.error import RepoError, ParseError
 except ImportError:
     from mercurial.repo import RepoError
-    from mercurial.cmdutil import ParseError
+    from mercurial.dispatch import ParseError
 
 try:
     try:
