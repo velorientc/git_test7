@@ -143,6 +143,10 @@ class GDialog(gtk.Window):
 
 
     def should_live(self, widget=None, event=None):
+        if self.main:
+            self._destroying(widget)
+        else:
+            self.destroy()
         return False
 
 

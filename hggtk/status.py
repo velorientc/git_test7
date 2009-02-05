@@ -506,10 +506,6 @@ class GStatus(GDialog):
         self._diffpane_moved(self._diffpane)
         return False
 
-
-    def should_live(self, widget=None, event=None):
-        return False
-
     ### End of overrides ###
 
     def _do_reload_status(self):

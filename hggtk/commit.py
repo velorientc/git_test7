@@ -206,6 +206,8 @@ class GCommit(GStatus):
                 self._update_recent_messages(cur_msg)
             elif res != gtk.RESPONSE_NO:
                 live = True
+        if not live and self.main:
+            self._destroying(widget)
         return live
 
 
