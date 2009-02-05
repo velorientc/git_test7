@@ -270,6 +270,7 @@ class GCommit(GStatus):
             # as of Mercurial 1.0, merges must be committed without
             # specifying file list.
             self._hg_commit([])
+            shell_notify(self._relevant_files('MAR'))
             self.reload_status()
         else:
             commitable = 'MAR'
