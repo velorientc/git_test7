@@ -24,7 +24,6 @@ import time
 import hglib
 from dialog import question_dialog, error_dialog
 from mercurial import hg, ui, commands, cmdutil, util
-from mercurial.repo import RepoError
 from mercurial.hgweb import server
 from mercurial.i18n import _
 from shlib import set_tortoise_icon
@@ -117,7 +116,7 @@ class ServeDialog(gtk.Window):
     def _get_config(self):
         try:
             repo = hg.repository(ui.ui(), path=self._root)
-        except RepoError:
+        except hglib.RepoError:
             print 'no repository found'
             gtk.main_quit()
         self.defport = repo.ui.config('web', 'port') or '8000'

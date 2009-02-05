@@ -18,11 +18,15 @@ import gtk
 import shlex
 from mercurial.i18n import _
 from mercurial import hg, util, fancyopts, commands, cmdutil
-from mercurial.repo import RepoError
 import mercurial.ui as _ui
 
-class ParseError(Exception):
-    """Exception raised on errors in parsing the command line."""
+try:
+    from mercurial.error import RepoError, UnknownCommand, AmbiguousCommand
+    from mercurial.error import ParseError
+except ImportError:
+    from mercurial.repo import RepoError
+    from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
+    from mercurial.dispatch import ParseError
 
 nonrepo_commands = 'userconfig clone init about help'
 
@@ -82,11 +86,11 @@ def _runcatch(ui, args):
             help_(ui, inst.args[0])
         else:
             ui.warn(_("hgtk: %s\n") % inst.args[1])
-            help_('shortlist')
-    except cmdutil.AmbiguousCommand, inst:
+            help_(ui, 'shortlist')
+    except AmbiguousCommand, inst:
         ui.warn(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
-    except cmdutil.UnknownCommand, inst:
+    except UnknownCommand, inst:
         ui.warn(_("hgtk: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
     except RepoError, inst:
@@ -204,9 +208,28 @@ def repoconfig(ui, *pats, **opts):
     opts['files'] = opts['root']
     run(**opts)
 
+def rename(ui, *pats, **opts):
+    """rename a single file or directory"""
+    from hggtk.rename import run
+    if not pats or len(pats) > 2:
+        raise util.Abort("rename takes one or two path arguments")
+    try:
+        opts['fname'] = pats[0]
+        opts['target'] = pats[1] or pats[0]
+    except IndexError:
+        pass
+    run(**opts)
+
+def guess(ui, *pats, **opts):
+    """guess previous renames or copies"""
+    from hggtk.rename import run
+    opts['detect'] = True
+    run(**opts)
+
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
+    opts['files'] = sys.argv[2:] or []
     run(**opts)
 
 def hginit(ui, dest=None, **opts):
@@ -250,6 +273,11 @@ def status(ui, *pats, **opts):
 def synch(ui, **opts):
     """repository synchronization tool"""
     from hggtk.synch import run
+    cmd = sys.argv[1] 
+    if 'push'.startswith(cmd) or 'outgoing'.startswith(cmd):
+        opts['pushmode'] = True
+    else:
+        opts['pushmode'] = False
     run(**opts)
 
 def update(ui, **opts):
@@ -454,15 +482,19 @@ table = {
     "^about": (about, [], _('hgtk about')),
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
     "^commit|ci": (commit, [], _('hgtk commit [FILE]...')),
-    "^datamine": (datamine, [], _('hgtk datamine')),
+    "^datamine|annotate|blame": (datamine, [], _('hgtk datamine')),
     "^init": (hginit, [], _('hgtk init [DEST]')),
-    "^log|history": (log, [], _('hgtk log [FILE]')),
+    "^log|history": (log,
+        [('l', 'limit', '', _('limit number of changes displayed'))],
+        _('hgtk log [OPTIONS] [FILE]')),
     "^merge": (merge, [], _('hgtk merge')),
-    "^recovery": (recovery, [], _('hgtk recovery')),
-    "^synch": (synch, [], _('hgtk synch')),
+    "^recovery|rollback|verify": (recovery, [], _('hgtk recovery')),
+    "^synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
     "^status|st": (status, [], _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
+    "^guess": (guess, [], _('hgtk guess')),
+    "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
     "^serve": 
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],

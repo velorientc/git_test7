@@ -12,9 +12,9 @@ import gtk
 from dialog import *
 from mercurial.node import *
 from mercurial import util, hg, ui
+from hglib import RepoError
 from hgcmd import CmdDialog
 from shlib import set_tortoise_icon, shell_notify
-from mercurial.repo import RepoError
 import histselect
 
 class MergeDialog(gtk.Window):

@@ -5,10 +5,14 @@ import traceback
 import threading, thread2
 import Queue
 from mercurial import hg, ui, util, extensions, commands, hook
-from mercurial.repo import RepoError
-from mercurial.node import *
 from mercurial.i18n import _
 from dialog import entry_dialog
+
+try:
+    from mercurial.error import RepoError, ParseError
+except ImportError:
+    from mercurial.repo import RepoError
+    from mercurial.dispatch import ParseError
 
 try:
     try:
@@ -72,15 +76,26 @@ def rootpath(path=None):
             return ''
     return p
 
+_tabwidth = None
 def gettabwidth(ui):
+    global _tabwidth
     tabwidth = ui.config('tortoisehg', 'tabwidth')
     try:
         tabwidth = int(tabwidth)
         if tabwidth < 1 or tabwidth > 16:
-            tabwidth = None
+            tabwidth = 0
     except (ValueError, TypeError), e:
-        tabwidth = None
+        tabwidth = 0
+    _tabwidth = tabwidth
     return tabwidth
+
+def diffexpand(line):
+    'Expand tabs in a line of diff/patch text'
+    if _tabwidth is None:
+        gettabwidth(ui.ui())
+    if not _tabwidth or len(line) < 2:
+        return line
+    return line[0] + line[1:].expandtabs(_tabwidth)
 
 
 class GtkUi(ui.ui):

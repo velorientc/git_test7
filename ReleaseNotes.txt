@@ -6,6 +6,34 @@ kits.  It also contains change information, for users who are interested in
 what bugs have been fixed, and what features have been added in the current
 version.
 
+New features and improvement since 0.6:
+
+  * Status window now supports shelving of selected changes.
+    Unknown files are now displayed by default, hg status convention.
+
+  * Commit window now supports commit of selected changes (record-style)
+    or shelving of selected changes.
+    Modified, Added, and Removed files are preselected for commit.
+    Added a ctrl-o key accelerator for initiating a commit.
+    Added support for refreshing an applied MQ patch.
+    Improved support for merge (two parent) commits.
+
+  * Synchronize window now supports bundle files (*.hg).
+    Recognizes whether it has been launched in push or pull mode
+
+  * New rename window for simple file or directory renames.
+
+  * New rename guessing dialog for detecting renames after they happen.
+
+  * New tool for managing an .hgignore file.
+
+  * The configuration window has been reorganized for simplicity.
+
+  * Nautilus: Fixed file version detection.
+
+  * Hgtk: added --limit option to log.
+          added aliases to dialogs that support many operations.
+          added rename and guess commands.
 
 New features and improvement in 0.6:
 

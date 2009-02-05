@@ -215,7 +215,8 @@ class TreeView(gtk.ScrolledWindow):
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
-    def next_revision_batch(self):
+    def next_revision_batch(self, size):
+        self.batchsize = size
         self.limit += self.batchsize
         self.pbar.begin()
         gobject.idle_add(self.populate)

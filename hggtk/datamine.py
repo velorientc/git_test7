@@ -150,6 +150,7 @@ class DataMineDialog(GDialog):
         summary = summary.split('\n')[0]
         date = displaytime(ctx.date())
         desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
+        desc = gobject.markup_escape_text(desc)
         self.changedesc[rev] = (desc, author)
         return (desc, author)
 
@@ -460,7 +461,7 @@ class DataMineDialog(GDialog):
                 ('Rev', 10, self.COL_REVID, pango.ELLIPSIZE_NONE, True),
                 ('File', 15, self.COL_PATH, pango.ELLIPSIZE_START, False),
                 ('User', 15, self.COL_USER, pango.ELLIPSIZE_END, False),
-                ('Matches', 80, self.COL_TEXT, pango.ELLIPSIZE_END, True)):
+                ('Source', 80, self.COL_TEXT, pango.ELLIPSIZE_END, True)):
             cell = gtk.CellRendererText()
             cell.set_property("width-chars", width)
             cell.set_property("ellipsize", emode)

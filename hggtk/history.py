@@ -69,7 +69,7 @@ class GLog(GDialog):
         self.graphview.set_property(property, bool)
 
     def _more_clicked(self, button):
-        self.graphview.next_revision_batch()
+        self.graphview.next_revision_batch(self.limit)
 
     def _load_all_clicked(self, button):
         self.graphview.load_all_revisions()
@@ -221,23 +221,30 @@ class GLog(GDialog):
                 self._hpaned.get_position())
         return settings
 
+    def get_graphlimit(self, suggestion):
+        limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
+        l = 0
+        for limit in (suggestion, limit_opt):
+            try:
+                l = int(limit)
+                if l > 0:
+                    return l
+            except (TypeError, ValueError), e:
+                pass
+        return l or 500
+
     def load_settings(self, settings):
         '''Called at beginning of display() method'''
-        limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
-        if limit_opt:
-            try:
-                limit = int(limit_opt)
-            except ValueError:
-                limit = 0
-            if limit <= 0:
-                limit = None
-        else:
-            limit = None
+
+        self.stbar = gtklib.StatusBar()
+        self.limit = self.get_graphlimit(None)
 
         # Allocate TreeView instance to use internally
-        self.limit = limit
-        self.stbar = gtklib.StatusBar()
-        self.graphview = TreeView(self.repo, limit, self.stbar)
+        if 'limit' in self.opts:
+            firstlimit = self.get_graphlimit(self.opts['limit'])
+            self.graphview = TreeView(self.repo, firstlimit, self.stbar)
+        else:
+            self.graphview = TreeView(self.repo, self.limit, self.stbar)
 
         # Allocate ChangeSet instance to use internally
         self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
@@ -310,6 +317,7 @@ class GLog(GDialog):
         _menu.append(self._cmenu_merge)
         _menu.append(create_menu('_export patch', self._export_patch))
         _menu.append(create_menu('e_mail patch', self._email_patch))
+        _menu.append(create_menu('_bundle rev:tip', self._bundle_rev_to_tip))
         _menu.append(create_menu('add/remove _tag', self._add_tag))
         _menu.append(create_menu('backout revision', self._backout_rev))
         _menu.append(create_menu('_revert', self._revert))
@@ -511,6 +519,20 @@ class GLog(GDialog):
                 commands.export(self.ui,self.repo,str(rev),**exportOpts)
             success, outtext = self._hg_call_wrapper("Export",dohgexport,False)
 
+    def _bundle_rev_to_tip(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        filename = "%s_rev%s_to_tip.hg" % (os.path.basename(self.repo.root), rev)
+        result = NativeSaveFileDialogWrapper(Title = "Write bundle to",
+                                         InitialDir=self.repo.root,
+                                         FileName=filename).run()
+        if result:
+            from hgcmd import CmdDialog
+            cmdline = ['hg', 'bundle', '--base', str(rev), result]
+            dlg = CmdDialog(cmdline)
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
+
     def _email_patch(self, menuitem):
         from hgemail import EmailDialog
         rev = self.currow[treemodel.REVID]
@@ -613,7 +635,7 @@ class GLog(GDialog):
         self._menu.get_children()[0].activate()
         return True
 
-def run(root='', cwd='', files=[], **opts):
+def run(root='', cwd='', files=[], limit='', **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -622,7 +644,7 @@ def run(root='', cwd='', files=[], **opts):
 
     cmdoptions = {
         'follow':False, 'follow-first':False, 'copies':False, 'keyword':[],
-        'limit':0, 'rev':[], 'removed':False, 'no_merges':False, 'date':None,
+        'limit':limit, 'rev':[], 'removed':False, 'no_merges':False, 'date':None,
         'only_merges':None, 'prune':[], 'git':False, 'verbose':False,
         'include':[], 'exclude':[]
     }
@@ -641,4 +663,5 @@ if __name__ == "__main__":
     path = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
     opts['root'] = os.path.abspath(path)
     opts['files'] = [opts['root']]
+    opts['limit'] = ''
     run(**opts)

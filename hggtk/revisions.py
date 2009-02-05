@@ -14,12 +14,11 @@ import gtk
 import gobject
 import pango
 from mercurial import hg, ui, cmdutil, util
-from mercurial.repo import RepoError
 from mercurial.i18n import _
-from mercurial.node import *
 from dialog import error_dialog, question_dialog
 from revtree import RevisionTree
 from shlib import set_tortoise_icon
+from hglib import RepoError
 
 class RevisionDialog(gtk.Dialog):
     def __init__(self, root=''):

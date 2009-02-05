@@ -17,11 +17,9 @@ import pango
 import Queue
 import os
 import threading
-from mercurial import hg, ui, util 
-from mercurial.repo import RepoError
-from mercurial.node import *
+from mercurial import hg, ui, util
 from dialog import error_dialog, question_dialog
-from hglib import HgThread, toutf
+from hglib import HgThread, toutf, RepoError
 from shlib import set_tortoise_icon, shell_notify
 import gtklib
 

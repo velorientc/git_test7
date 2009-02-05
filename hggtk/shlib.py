@@ -8,6 +8,7 @@ of the GNU General Public License, incorporated herein by reference.
 """
 
 import os
+import gtk
 import shelve
 import time
 
@@ -129,6 +130,13 @@ def get_system_times():
     
 def set_tortoise_icon(window, icon):
     window.set_icon_from_file(get_tortoise_icon(icon))
+    # Global keybindings for TortoiseHg
+    window.connect('key-press-event', window_key)
+
+def window_key(window, event):
+    if event.keyval == ord('q') and (event.state & gtk.gdk.CONTROL_MASK):
+        devent = gtk.gdk.Event(gtk.gdk.DELETE)
+        window.emit('delete_event', devent)
 
 def get_tortoise_icon(icon):
     '''Find a tortoise icon, apply to PyGtk window'''

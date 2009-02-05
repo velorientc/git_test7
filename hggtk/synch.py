@@ -18,14 +18,14 @@ import Queue
 import os
 import threading
 from mercurial import hg, ui, util, extensions
-from mercurial.repo import RepoError
 from dialog import error_dialog, question_dialog, info_dialog
-from hglib import HgThread, toutf
+from hglib import HgThread, toutf, rootpath, RepoError
 import shlib
 import gtklib
+import urllib
 
 class SynchDialog(gtk.Window):
-    def __init__(self, cwd='', root = '', repos=[]):
+    def __init__(self, cwd='', root = '', repos=[], pushmode=False):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
@@ -103,15 +103,26 @@ class SynchDialog(gtk.Window):
         
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Button("Remote Path:")
+        lbl = gtk.Button("Repo:")
         lbl.unset_flags(gtk.CAN_FOCUS)
         lbl.connect('clicked', self._btn_remotepath_clicked)
+        revbox.pack_start(lbl, False, False)
+
+        lbl = gtk.Button("Bundle:")
+        lbl.unset_flags(gtk.CAN_FOCUS)
+        lbl.connect('clicked', self._btn_bundlepath_clicked)
+        revbox.pack_start(lbl, False, False)
         
         # revisions  combo box
         self.pathlist = gtk.ListStore(str)
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self._pathtext = self._pathbox.get_child()
-        
+
+        # support dropping of repos or bundle files
+        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
+                [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
+        self.connect('drag_data_received', self._drag_receive)
+
         defrow = None
         defpushrow = None
         for row, (name, path) in enumerate(self.paths):
@@ -125,10 +136,10 @@ class SynchDialog(gtk.Window):
 
         if repos:
             self._pathtext.set_text(repos[0])
+        elif defpushrow is not None and pushmode:
+            self._pathbox.set_active(defpushrow)
         elif defrow is not None:
             self._pathbox.set_active(defrow)
-        elif defpushrow is not None:
-            self._pathbox.set_active(defpushrow)
 
         sympaths = [x[1] for x in self.paths]
         for p in self._recent_src:
@@ -142,7 +153,6 @@ class SynchDialog(gtk.Window):
         else:
             self._use_proxy.set_sensitive(False)
 
-        revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._pathbox, True, True)
         revbox.pack_end(self._use_proxy, False, False)
         vbox.pack_start(revbox, False, False, 2)
@@ -207,6 +217,22 @@ class SynchDialog(gtk.Window):
         self.stbar = gtklib.StatusBar()
         vbox.pack_start(self.stbar, False, False, 2)
         self.connect('map', self.update_buttons)
+        self._last_drop_time = None
+
+    def _drag_receive(self, widget, context, x, y, selection, targetType, time):
+        if time != self._last_drop_time:
+            files = selection.get_uris()
+            gobject.idle_add(self._set_path, files[0])
+            self._last_drop_time = time
+
+    def _set_path(self, uri):
+        if not uri.startswith("file://"):
+            return
+        path = urllib.unquote(uri[7:])
+        if rootpath(path) == path:
+            self._pathtext.set_text(path)
+        elif not os.path.isdir(path) and path.endswith('.hg'):
+            self._pathtext.set_text(path)
 
     def update_buttons(self, *args):
         self.buttonhbox.hide()
@@ -228,8 +254,8 @@ class SynchDialog(gtk.Window):
 
     def _view_pulled_changes(self, button):
         from history import GLog
-        revs = (len(self.repo.changelog)-1, self.origchangecount)
-        opts = {'revrange' : revs}
+        countpulled = len(self.repo.changelog) - self.origchangecount
+        opts = {'limit' : countpulled }
         dialog = GLog(self.ui, self.repo, self.cwd, [], opts, False)
         dialog.display()
 
@@ -303,6 +329,23 @@ class SynchDialog(gtk.Window):
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
         dialog.set_default_response(gtk.RESPONSE_OK)
         dialog.set_current_folder(self.root)
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            self._pathtext.set_text(dialog.get_filename())
+        dialog.destroy()
+
+    def _btn_bundlepath_clicked(self, button):
+        """ select bundle to read from """
+        dialog = gtk.FileChooserDialog(title="Select Bundle",
+                action=gtk.FILE_CHOOSER_ACTION_OPEN,
+                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
+                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        dialog.set_default_response(gtk.RESPONSE_OK)
+        dialog.set_current_folder(self.root)
+        filter = gtk.FileFilter()
+        filter.set_name("Bundle (*.hg)")
+        filter.add_pattern("*.hg")
+        dialog.add_filter(filter)
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             self._pathtext.set_text(dialog.get_filename())
@@ -520,8 +563,8 @@ class SynchDialog(gtk.Window):
                 self.write("[command interrupted]")
             return False # Stop polling this function
 
-def run(cwd='', root='', files=[], **opts):
-    dialog = SynchDialog(cwd, root, files)
+def run(cwd='', root='', files=[], pushmode=False, **opts):
+    dialog = SynchDialog(cwd, root, files, pushmode)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()

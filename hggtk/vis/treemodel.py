@@ -101,7 +101,14 @@ class TreeModel(gtk.GenericTreeModel):
             ctx = self.repo.changectx(revid)
 
             summary = ctx.description().replace('\0', '')
-            summary = summary.split('\n')[0]
+            if self.repo.ui.configbool('tortoisehg', 'longsummary'):
+                lines = summary.split('\n')
+                summary = lines.pop(0)
+                while len(summary) < 80 and lines:
+                    summary += '  ' + lines.pop(0)
+                summary = summary[0:80]
+            else:
+                summary = summary.split('\n')[0]
             summary = gobject.markup_escape_text(toutf(summary))
             node = self.repo.lookup(revid)
             tags = self.repo.nodetags(node)

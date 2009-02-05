@@ -11,9 +11,8 @@ import os
 import sys
 import gtk
 from gdialog import *
-from mercurial.node import *
 from mercurial import cmdutil, util, hg, ui
-from mercurial.repo import RepoError
+from hglib import RepoError
 from shlib import shell_notify, set_tortoise_icon
 
 class FilterDialog(gtk.Dialog):

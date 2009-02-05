@@ -11,11 +11,10 @@ import os
 import sys
 import gtk
 from dialog import *
-from mercurial.node import *
 from mercurial import util, hg, ui
-from mercurial.repo import RepoError
+from mercurial.node import *
 from shlib import shell_notify, set_tortoise_icon
-from hglib import rootpath
+from hglib import rootpath, RepoError
 
 class UpdateDialog(gtk.Window):
     """ Dialog to update Mercurial repo """

@@ -16,14 +16,17 @@ import gobject
 import pango
 import StringIO
 
-from mercurial.i18n import _
 from mercurial.node import *
-from mercurial import cmdutil, util, ui, hg, commands
-from mercurial import context, patch, revlog
+from mercurial import cmdutil, context, util, ui, hg, patch
 from gdialog import *
 from hgcmd import CmdDialog
-from hglib import toutf, fromutf, displaytime
+from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand
 from gtklib import StatusBar
+
+try:
+    from mercurial.error import LookupError
+except ImportError:
+    from mercurial.revlog import LookupError
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -117,7 +120,6 @@ class ChangeSet(GDialog):
             buf.insert_with_tags_by_name(eob, utext, tag)
             buf.insert(eob, "\n")
 
-        # TODO: Add toggle for gmtime/localtime
         eob = buf.get_end_iter()
         date = displaytime(ctx.date())
         if self.clipboard:
@@ -269,7 +271,7 @@ class ChangeSet(GDialog):
                 if f in files:
                     try:
                         src = getfilectx(f, c).renamed()
-                    except revlog.LookupError:
+                    except LookupError:
                         return None
                     if src:
                         f = src[0]
@@ -294,7 +296,7 @@ class ChangeSet(GDialog):
                 s = 'A'
                 ctx1.filectx(f)
                 s = 'M'
-            except revlog.LookupError:
+            except LookupError:
                 pass
             status[f] = s
             return s
@@ -375,8 +377,6 @@ class ChangeSet(GDialog):
 
     def prepare_diff(self, difflines, offset, fname):
         '''Borrowed from hgview; parses changeset diffs'''
-        import hglib
-        tw = hglib.gettabwidth(self.ui)
         DIFFHDR = "=== %s ===\n"
         idx = 0
         outlines = []
@@ -411,17 +411,14 @@ class ChangeSet(GDialog):
             elif l.startswith("+"):
                 tag = "green"
                 stats[0] += 1
-                if tw:
-                    l = l[0] + l[1:].expandtabs(tw)
+                l = diffexpand(l)
             elif l.startswith("-"):
                 stats[1] += 1
                 tag = "red"
-                if tw:
-                    l = l[0] + l[1:].expandtabs(tw)
+                l = diffexpand(l)
             else:
                 tag = "black"
-                if tw:
-                    l = l[0] + l[1:].expandtabs(tw)
+                l = diffexpand(l)
             l = l+"\n"
             length = len(l.decode('utf-8'))
             addtag( tag, offset, length )
@@ -629,7 +626,7 @@ class ChangeSet(GDialog):
         try:
             fctx = ctx.filectx(self.curfile)
             has_filelog = fctx.filelog().linkrev(fctx.filerev()) == ctx.rev()
-        except revlog.LookupError:
+        except LookupError:
             has_filelog = False
         self._ann_menu.set_sensitive(has_filelog)
         self._save_menu.set_sensitive(has_filelog)
@@ -651,10 +648,9 @@ class ChangeSet(GDialog):
         result = fd.run()
         if result:
             import Queue
-            import hglib
             q = Queue.Queue()
             cpath = util.canonpath(self.repo.root, self.cwd, self.curfile)
-            hglib.hgcmd_toq(self.repo.root, q, 'cat', '--rev',
+            hgcmd_toq(self.repo.root, q, 'cat', '--rev',
                 str(self.currev), '--output', result, cpath)
 
     def _view_file_rev(self, menuitem):
