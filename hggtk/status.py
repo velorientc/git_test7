@@ -625,6 +625,7 @@ class GStatus(GDialog):
         file = entry[FM_PATH]
         if file not in self._filechunks: return
         entry[FM_PARTIAL_SELECTED] = False
+        self._update_partial(self.diff_model, file, False)
         for n in self._filechunks[file][1:]:
             self.diff_model[n][DM_NOT_REJECTED] = entry[FM_CHECKED]
             self.diff_model[n][DM_REJECTED] = not entry[FM_CHECKED]
@@ -839,24 +840,35 @@ class GStatus(GDialog):
             if row[DM_HEADER_CHUNK]:
                 for n in fchunks:
                     dmodel[n][DM_REJECTED] = fr[FM_CHECKED]
-                fr[FM_CHECKED] = not fr[FM_CHECKED]
-                fr[FM_PARTIAL_SELECTED] = False
-                self._update_check_count()
+                newvalue = not fr[FM_CHECKED]
+                partial = False
             else:
                 row[DM_REJECTED] = not row[DM_REJECTED]
                 rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
                 nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
                 newvalue = nonrej and True or False
                 partial = rej and nonrej and True or False
-                # Update file's check status
+
+            # Update file's check status
+            if fr[FM_PARTIAL_SELECTED] != partial:
                 fr[FM_PARTIAL_SELECTED] = partial
-                if fr[FM_CHECKED] != newvalue:
-                    fr[FM_CHECKED] = newvalue
-                    self._update_check_count()
+                self._update_partial(dmodel, file, partial)
+            if fr[FM_CHECKED] != newvalue:
+                fr[FM_CHECKED] = newvalue
+                self._update_check_count()
         finally:
             for row in dmodel:
                 row[DM_NOT_REJECTED] = not row[DM_REJECTED]
 
+    def _update_partial(self, dmodel, file, partial):
+        hc = self._filechunks[file][0]
+        row = dmodel[hc]
+        markup = row[DM_CHUNK_TEXT]
+        tag = ' ** Partial **'
+        if partial and not markup.endswith(tag):
+            row[DM_CHUNK_TEXT] = markup + tag
+        elif markup.endswith(tag):
+            row[DM_CHUNK_TEXT] = markup[0:-len(tag)]
 
     def _show_diff_hunks(self, files):
         ''' Update the diff text '''
