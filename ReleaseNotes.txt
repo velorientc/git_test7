@@ -18,8 +18,10 @@ New features and improvement since 0.6:
     Added support for refreshing an applied MQ patch.
     Improved support for merge (two parent) commits.
 
-  * Synchronize window now supports bundle files (*.hg).
+  * Synchronize window now supports reading bundle files (*.hg).
     Recognizes whether it has been launched in push or pull mode
+
+  * The changelog window can now generate bundle files 
 
   * New rename window for simple file or directory renames.
 
