@@ -352,8 +352,9 @@ class GStatus(GDialog):
             scroller.add(self.diff_tree)
 
             vbox = gtk.VBox()
-            visiblerejects = gtk.CheckButton("Show Rejected Chunks")
-            visiblerejects.connect('toggled', self._toggle_rejects, diffcol, diff_hunk_cell)
+            visiblerejects = gtk.CheckButton("Hide Rejected Chunks")
+            visiblerejects.connect('toggled', self._toggle_rejects, diffcol,
+                    diff_hunk_cell)
             vbox.pack_start(visiblerejects, False, False, 2)
             vbox.pack_start(scroller, True, True, 2)
             self._toggle_rejects(visiblerejects, diffcol, diff_hunk_cell)
@@ -422,12 +423,12 @@ class GStatus(GDialog):
         diffcol.clear_attributes(cell)
         if widget.get_active():
             diffcol.set_attributes(cell,
-                    strikethrough=DM_REJECTED, 
+                    visible=DM_NOT_REJECTED, 
                     markup=DM_CHUNK_TEXT,
                     cell_background_set=DM_HEADER_CHUNK)
         else:
             diffcol.set_attributes(cell,
-                    visible=DM_NOT_REJECTED, 
+                    strikethrough=DM_REJECTED, 
                     markup=DM_CHUNK_TEXT,
                     cell_background_set=DM_HEADER_CHUNK)
 
