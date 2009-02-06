@@ -22,6 +22,7 @@ New features and improvement since 0.6:
     Recognizes whether it has been launched in push or pull mode
 
   * The changelog window can now generate bundle files 
+    Multiline change summaries can optionally be concatenated
 
   * New rename window for simple file or directory renames.
 
