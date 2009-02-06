@@ -831,23 +831,23 @@ class GStatus(GDialog):
             file = chunk.filename()
             if file not in self._filechunks:
                 return
+            for fr in self.filemodel:
+                if fr[FM_PATH] == file:
+                    break
             fchunks = self._filechunks[file][1:]
             if row[DM_HEADER_CHUNK]:
                 for n in fchunks:
-                    dmodel[n][DM_REJECTED] = not dmodel[n][DM_REJECTED]
+                    dmodel[n][DM_REJECTED] = fr[FM_CHECKED]
+                fr[FM_CHECKED] = not fr[FM_CHECKED]
+                fr[FM_PARTIAL_SELECTED] = False
+                self._update_check_count()
             else:
                 row[DM_REJECTED] = not row[DM_REJECTED]
-
-            # Determine file's chunk status
-            rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
-            nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
-            newvalue = nonrej and True or False
-            partial = rej and nonrej and True or False
-
-            # Update file's check status
-            for fr in self.filemodel:
-                if fr[FM_PATH] != file:
-                    continue
+                rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
+                nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
+                newvalue = nonrej and True or False
+                partial = rej and nonrej and True or False
+                # Update file's check status
                 fr[FM_PARTIAL_SELECTED] = partial
                 if fr[FM_CHECKED] != newvalue:
                     fr[FM_CHECKED] = newvalue
