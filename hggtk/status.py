@@ -33,10 +33,9 @@ FM_PARTIAL_SELECTED = 5
 
 # diff_model row enumerations
 DM_REJECTED = 0
-DM_NOT_REJECTED = 1
-DM_CHUNK_TEXT = 2
-DM_HEADER_CHUNK = 3
-DM_CHUNK_ID = 4
+DM_CHUNK_TEXT = 1
+DM_HEADER_CHUNK = 2
+DM_CHUNK_ID = 3
 
 class GStatus(GDialog):
     """GTK+ based dialog for displaying repository status
@@ -328,7 +327,7 @@ class GStatus(GDialog):
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
             self.clipboard = gtk.Clipboard(selection=sel)
 
-            self.diff_model = gtk.ListStore(bool, bool, str, bool, int)
+            self.diff_model = gtk.ListStore(bool, str, bool, int)
             self.diff_tree = gtk.TreeView(self.diff_model)
             self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
@@ -352,12 +351,8 @@ class GStatus(GDialog):
             scroller.add(self.diff_tree)
 
             vbox = gtk.VBox()
-            visiblerejects = gtk.CheckButton("Hide Rejected Chunks")
-            #visiblerejects.connect('toggled', self._toggle_rejects, diffcol,
-            #        diff_hunk_cell)
-            #vbox.pack_start(visiblerejects, False, False, 2)
             vbox.pack_start(scroller, True, True, 2)
-            self._toggle_rejects(visiblerejects, diffcol, diff_hunk_cell)
+
             diff_frame.add(vbox)
         else:
             # display merge diffs in simple text view
@@ -418,15 +413,6 @@ class GStatus(GDialog):
             self._shelve_chunks[chunkid].write(fp)
         fp.seek(0)
         self.clipboard.set_text(fp.read())
-
-    def _toggle_rejects(self, widget, diffcol, cell):
-        diffcol.clear_attributes(cell)
-        diffcol.add_attribute(cell, 'markup', DM_CHUNK_TEXT)
-        diffcol.add_attribute(cell, 'cell_background_set', DM_HEADER_CHUNK)
-        if widget.get_active():
-            diffcol.add_attribute(cell, 'visible', DM_NOT_REJECTED)
-        else:
-            diffcol.add_attribute(cell, 'strikethrough', DM_REJECTED)
 
     def get_extras(self):
         table = gtk.Table(rows=2, columns=3)
@@ -623,7 +609,6 @@ class GStatus(GDialog):
         entry[FM_PARTIAL_SELECTED] = False
         self._update_partial(self.diff_model, file, False)
         for n in self._filechunks[file][1:]:
-            self.diff_model[n][DM_NOT_REJECTED] = entry[FM_CHECKED]
             self.diff_model[n][DM_REJECTED] = not entry[FM_CHECKED]
 
     def _show_toggle(self, check, type):
@@ -823,38 +808,34 @@ class GStatus(GDialog):
 
     def _diff_tree_row_act(self, dtree, path, column):
         dmodel = dtree.get_model()
-        try:
-            row = dmodel[path]
-            chunk = self._shelve_chunks[row[DM_CHUNK_ID]]
-            file = chunk.filename()
-            if file not in self._filechunks:
-                return
-            for fr in self.filemodel:
-                if fr[FM_PATH] == file:
-                    break
-            fchunks = self._filechunks[file][1:]
-            if row[DM_HEADER_CHUNK]:
-                for n in fchunks:
-                    dmodel[n][DM_REJECTED] = fr[FM_CHECKED]
-                newvalue = not fr[FM_CHECKED]
-                partial = False
-            else:
-                row[DM_REJECTED] = not row[DM_REJECTED]
-                rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
-                nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
-                newvalue = nonrej and True or False
-                partial = rej and nonrej and True or False
+        row = dmodel[path]
+        chunk = self._shelve_chunks[row[DM_CHUNK_ID]]
+        file = chunk.filename()
+        if file not in self._filechunks:
+            return
+        for fr in self.filemodel:
+            if fr[FM_PATH] == file:
+                break
+        fchunks = self._filechunks[file][1:]
+        if row[DM_HEADER_CHUNK]:
+            for n in fchunks:
+                dmodel[n][DM_REJECTED] = fr[FM_CHECKED]
+            newvalue = not fr[FM_CHECKED]
+            partial = False
+        else:
+            row[DM_REJECTED] = not row[DM_REJECTED]
+            rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
+            nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
+            newvalue = nonrej and True or False
+            partial = rej and nonrej and True or False
 
-            # Update file's check status
-            if fr[FM_PARTIAL_SELECTED] != partial:
-                fr[FM_PARTIAL_SELECTED] = partial
-                self._update_partial(dmodel, file, partial)
-            if fr[FM_CHECKED] != newvalue:
-                fr[FM_CHECKED] = newvalue
-                self._update_check_count()
-        finally:
-            for row in dmodel:
-                row[DM_NOT_REJECTED] = not row[DM_REJECTED]
+        # Update file's check status
+        if fr[FM_PARTIAL_SELECTED] != partial:
+            fr[FM_PARTIAL_SELECTED] = partial
+            self._update_partial(dmodel, file, partial)
+        if fr[FM_CHECKED] != newvalue:
+            fr[FM_CHECKED] = newvalue
+            self._update_check_count()
 
     def _update_partial(self, dmodel, file, partial):
         hc = self._filechunks[file][0]
@@ -913,11 +894,12 @@ class GStatus(GDialog):
                     if isheader:
                         for f in chunk.files():
                             self._filechunks[f] = [len(self.diff_model)]
-                        self.diff_model.append([False, True, markedup, True, n])
+                        self.diff_model.append([False, markedup, True, n])
                         skip = chunk.special()
                     elif skip != True:
-                        self._filechunks[chunk.filename()].append(len(self.diff_model))
-                        self.diff_model.append([False, True, markedup, False, n])
+                        f = chunk.filename()
+                        self._filechunks[f].append(len(self.diff_model))
+                        self.diff_model.append([False, markedup, False, n])
             finally:
                 difftext.close()
 
