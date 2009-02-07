@@ -1,78 +1,110 @@
 # setup.py
-# A distutils setup script to register TortoiseHg COM server
-
-# To build stand-alone package, use 'python setup.py py2exe' then use
-# InnoSetup to build the installer.  By default, the installer will be
-# created as dist\Output\setup.exe.
+# A distutils setup script to install TortoiseHg in Windows and Posix
+# environments.  In Windows, it will register TortoiseHG COM server.
+#
+# For Windows:
+#   To build stand-alone package, use 'python setup.py py2exe' then use
+#   InnoSetup to build the installer.  By default, the installer will be
+#   created as dist\Output\setup.exe.
+#
 
 import time
 import sys
 import os
-
-# non-Win32 platforms doesn't require setup
-if os.name != 'nt' and '--version' not in sys.argv:
-    sys.stderr.write("abort: %s is for Win32 platforms only" % sys.argv[0])
-    sys.exit(1)
-
-# ModuleFinder can't handle runtime changes to __path__, but win32com uses them
-
-try:
-    # if this doesn't work, try import modulefinder
-    import py2exe.mf as modulefinder
-    import win32com
-    for p in win32com.__path__[1:]:
-        modulefinder.AddPackagePath("win32com", p)
-    for extra in ["win32com.shell"]: #,"win32com.mapi"
-        __import__(extra)
-        m = sys.modules[extra]
-        for p in m.__path__[1:]:
-            modulefinder.AddPackagePath(extra, p)
-except ImportError:
-    # no build path setup, no worries.
-    pass
-
 from distutils.core import setup
-try: import py2exe
-except ImportError:
-    if '--version' not in sys.argv:
-        raise
 
-_data_files = []
-extra = {}
-hgextmods = []
 
-if 'py2exe' in sys.argv:
-    # FIXME: quick hack to include installed hg extensions in py2exe binary
-    import hgext
-    hgextdir = os.path.dirname(hgext.__file__)
-    hgextmods = set(["hgext." + os.path.splitext(f)[0]
-                  for f in os.listdir(hgextdir)])
-    _data_files = [(root, [os.path.join(root, file_) for file_ in files])
-                        for root, dirs, files in os.walk('icons')]
-    extra['windows'] = [
-            {"script":"hgproc.py",
-                        "icon_resources": [(1, "icons/tortoise/hg.ico")]},
-            {"script":"tracelog.py",
-                        "icon_resources": [(1, "icons/tortoise/python.ico")]}
-            ]
-    extra['com_server'] = ["tortoisehg"]
-    extra['console'] = ["contrib/hg", "contrib/hgtk"]
+def setup_windows():
+    # Specific definitios for Windows NT-alike installations
+    _scripts = []
+    _data_files = []
+    _packages = ['hggtk', 'hggtk.vis', 'hggtk.iniparse', 'tortoise']
+    opts = {}
+    extra = {}
+    hgextmods = []
 
-opts = {
-   "py2exe" : {
-       # Don't pull in all this MFC stuff used by the makepy UI.
-       "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list",
+    # ModuleFinder can't handle runtime changes to __path__, 
+    # but win32com uses them
 
-       # add library files to support PyGtk-based dialogs/windows
-       # Note:
-       #    after py2exe build, copy GTK's etc and lib directories into
-       #    the dist directory created by py2exe.
-       #    also needed is the GTK's share/themes (as dist/share/themes), 
-       #    for dialogs to display in MS-Windows XP theme.
-       "includes" : "dbhash,pango,atk,pangocairo,cairo,gobject," + \
-                    ",".join(hgextmods),
-   }
-}
+    try:
+        # if this doesn't work, try import modulefinder
+        import py2exe.mf as modulefinder
+        import win32com
+        for p in win32com.__path__[1:]:
+            modulefinder.AddPackagePath("win32com", p)
+        for extra in ["win32com.shell"]: #,"win32com.mapi"
+            __import__(extra)
+            m = sys.modules[extra]
+            for p in m.__path__[1:]:
+                modulefinder.AddPackagePath(extra, p)
+    except ImportError:
+        # no build path setup, no worries.
+        pass
+
+    try: import py2exe
+    except ImportError:
+        if '--version' not in sys.argv:
+            raise
+
+    if 'py2exe' in sys.argv:
+        # FIXME: quick hack to include installed hg extensions in py2exe binary
+        import hgext
+        hgextdir = os.path.dirname(hgext.__file__)
+        hgextmods = set(["hgext." + os.path.splitext(f)[0]
+                      for f in os.listdir(hgextdir)])
+        _data_files = [(root, [os.path.join(root, file_) for file_ in files])
+                            for root, dirs, files in os.walk('icons')]
+        extra['windows'] = [
+                {"script":"hgproc.py",
+                            "icon_resources": [(1, "icons/tortoise/hg.ico")]},
+                {"script":"tracelog.py",
+                            "icon_resources": [(1, "icons/tortoise/python.ico")]}
+                ]
+        extra['com_server'] = ["tortoisehg"]
+        extra['console'] = ["contrib/hg", "contrib/hgtk"]
+
+    opts = {
+       "py2exe" : {
+           # Don't pull in all this MFC stuff used by the makepy UI.
+           "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list",
+
+           # add library files to support PyGtk-based dialogs/windows
+           # Note:
+           #    after py2exe build, copy GTK's etc and lib directories into
+           #    the dist directory created by py2exe.
+           #    also needed is the GTK's share/themes (as dist/share/themes), 
+           #    for dialogs to display in MS-Windows XP theme.
+           "includes" : "dbhash,pango,atk,pangocairo,cairo,gobject," + \
+                        ",".join(hgextmods),
+       }
+    }
+
+    return _scripts, _packages, _data_files, opts, extra
+
+
+def setup_posix():
+    # Specific definitios for Posix installations
+    _opts = {}
+    _extra = {}
+    _scripts = ['contrib/hgtk', 'hgproc.py']
+    _packages = ['hggtk', 'hggtk.vis', 'hggtk.iniparse', 'tortoise']
+    _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
+        [os.path.join(root, file_) for file_ in files])
+        for root, dirs, files in os.walk('icons')]
+    _data_files += [('lib/nautilus/extensions-2.0/python',
+                     ['contrib/nautilus-thg.py'])]
+
+    return _scripts, _packages, _data_files, _opts, _extra
+
+
+if os.name == "nt":
+    (scripts, packages, data_files, opts, extra) = setup_windows()
+else:
+    (scripts, packages, data_files, opts, extra) = setup_posix()
+
+
+# specify version string, otherwise 'hg identify' will be used:
+version = ''
 
 try:
     l = os.popen('hg id -it').read().split()
@@ -85,20 +117,21 @@ try:
 except OSError:
     version = "unknown"
 
-f = file("tortoise/__version__.py", "w")
+f = file(os.path.join("tortoise", "__version__.py"), "w")
 f.write('# this file is autogenerated by setup.py\n')
 f.write('version = "%s"\n' % version)
 f.close()
 
-setup(name="TortoiseHg",
+setup(name="tortoisehg",
         version=version,
         author='TK Soh',
         author_email='teekaysoh@gmail.com',
         url='http://tortoisehg.sourceforge.net',
         description='Windows shell extension for Mercurial VCS',
         license='GNU GPL2',
-        packages=['tortoise', 'hggtk', 'hggtk.vis', 'hggtk.iniparse'],
-        data_files = _data_files,
-        options=opts,
+        scripts=scripts,
+        packages=packages,
+        data_files=data_files,
+        options=opts, # in Linux an empty 'options' gives a warning.
         **extra
     )
