@@ -858,7 +858,7 @@ class GStatus(GDialog):
         tag = ' ** Partial **'
         if partial and not markup.endswith(tag):
             row[DM_CHUNK_TEXT] = markup + tag
-        elif markup.endswith(tag):
+        elif not partial and markup.endswith(tag):
             row[DM_CHUNK_TEXT] = markup[0:-len(tag)]
 
     def _show_diff_hunks(self, files):
