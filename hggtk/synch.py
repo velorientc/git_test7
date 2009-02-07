@@ -134,6 +134,11 @@ class SynchDialog(gtk.Window):
                 defpushrow = row
             self.pathlist.append([path])
 
+        sympaths = [x[1] for x in self.paths]
+        for p in self._recent_src:
+            if p not in sympaths:
+                self.pathlist.append([p])
+            
         if repos:
             self._pathtext.set_text(repos[0])
         elif defpushrow is not None and pushmode:
@@ -141,11 +146,6 @@ class SynchDialog(gtk.Window):
         elif defrow is not None:
             self._pathbox.set_active(defrow)
 
-        sympaths = [x[1] for x in self.paths]
-        for p in self._recent_src:
-            if p not in sympaths:
-                self.pathlist.append([p])
-            
         # create checkbox to disable proxy
         self._use_proxy = gtk.CheckButton("use proxy server")        
         if ui.ui().config('http_proxy', 'host', ''):   
