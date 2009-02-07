@@ -145,7 +145,7 @@ class IconOverlayExtension(object):
                 return NOT_IN_REPO
         except _repo.RepoError:
             # We aren't in a working tree
-            print "%s: not in repo" % dir
+            print "%s: not in repo" % pdir
             overlay_cache[path] = UNKNOWN
             return NOT_IN_REPO
 
