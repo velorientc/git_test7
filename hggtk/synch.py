@@ -114,8 +114,9 @@ class SynchDialog(gtk.Window):
         revbox.pack_start(lbl, False, False)
         
         # revisions  combo box
-        self.pathlist = gtk.ListStore(str)
+        self.pathlist = gtk.ListStore(str, bool)
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
+        self._pathbox.set_row_separator_func(lambda model, iter: model[iter][1])
         self._pathtext = self._pathbox.get_child()
 
         # support dropping of repos or bundle files
@@ -132,13 +133,17 @@ class SynchDialog(gtk.Window):
                     defpushrow = row
             elif name == 'default-push':
                 defpushrow = row
-            self.pathlist.append([path])
+            self.pathlist.append([path, False])
 
         sympaths = [x[1] for x in self.paths]
+        separator = False
         for p in self._recent_src:
             if p not in sympaths:
-                self.pathlist.append([p])
-            
+                if not separator:
+                    self.pathlist.append(['-'*20, True])
+                    separator = True
+                self.pathlist.append([p, False])
+
         if repos:
             self._pathtext.set_text(repos[0])
         elif defpushrow is not None and pushmode:
@@ -437,7 +442,15 @@ class SynchDialog(gtk.Window):
         self.paths = self._get_paths()
         self.pathlist.clear()
         for row, (name, path) in enumerate(self.paths):
-            self.pathlist.append([path])
+            self.pathlist.append([path, False])
+        sympaths = [x[1] for x in self.paths]
+        separator = False
+        for p in self._recent_src:
+            if p not in sympaths:
+                if not separator:
+                    self.pathlist.append(['-'*20, True])
+                    separator = True
+                self.pathlist.append([p, False])
 
     def _email_clicked(self, toolbutton, data=None):
         path = self._pathtext.get_text()
