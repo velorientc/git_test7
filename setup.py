@@ -19,7 +19,6 @@ def setup_windows():
     _scripts = []
     _data_files = []
     _packages = ['hggtk', 'hggtk.vis', 'hggtk.iniparse', 'tortoise']
-    opts = {}
     extra = {}
     hgextmods = []
 
@@ -63,7 +62,7 @@ def setup_windows():
         extra['com_server'] = ["tortoisehg"]
         extra['console'] = ["contrib/hg", "contrib/hgtk"]
 
-    opts = {
+    extra['options'] = {
        "py2exe" : {
            # Don't pull in all this MFC stuff used by the makepy UI.
            "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list",
@@ -79,12 +78,11 @@ def setup_windows():
        }
     }
 
-    return _scripts, _packages, _data_files, opts, extra
+    return _scripts, _packages, _data_files, extra
 
 
 def setup_posix():
     # Specific definitios for Posix installations
-    _opts = {}
     _extra = {}
     _scripts = ['contrib/hgtk', 'hgproc.py']
     _packages = ['hggtk', 'hggtk.vis', 'hggtk.iniparse', 'tortoise']
@@ -94,13 +92,13 @@ def setup_posix():
     _data_files += [('lib/nautilus/extensions-2.0/python',
                      ['contrib/nautilus-thg.py'])]
 
-    return _scripts, _packages, _data_files, _opts, _extra
+    return _scripts, _packages, _data_files, _extra
 
 
 if os.name == "nt":
-    (scripts, packages, data_files, opts, extra) = setup_windows()
+    (scripts, packages, data_files, extra) = setup_windows()
 else:
-    (scripts, packages, data_files, opts, extra) = setup_posix()
+    (scripts, packages, data_files, extra) = setup_posix()
 
 
 # specify version string, otherwise 'hg identify' will be used:
@@ -132,6 +130,5 @@ setup(name="tortoisehg",
         scripts=scripts,
         packages=packages,
         data_files=data_files,
-        options=opts, # in Linux an empty 'options' gives a warning.
         **extra
     )
