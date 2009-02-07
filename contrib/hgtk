@@ -119,7 +119,7 @@ def runcommand(ui, args):
         path = os.environ.get('TORTOISEHG_PATH') or tortoisehg_dir
         norm = os.path.normpath(os.path.expanduser(path))
         if norm not in sys.path:
-            sys.path.append(norm)
+            sys.path.insert(0, norm)
 
         try:
             # assuming TortoiseHg source layout, with hgtk in contrib
