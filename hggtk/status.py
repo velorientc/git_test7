@@ -340,16 +340,30 @@ class GStatus(GDialog):
             self.diff_tree.connect('button-release-event',
                     self._patch_button_release)
             
-            diff_hunk_cell = gtk.CellRendererText()
-            diff_hunk_cell.set_property('cell-background', '#EEEEEE')
-            diffcol = gtk.TreeViewColumn('diff', diff_hunk_cell)
+            cell = gtk.CellRendererText()
+            diffcol = gtk.TreeViewColumn('diff', cell)
             diffcol.set_resizable(True)
+            diffcol.add_attribute(cell, 'markup', DM_CHUNK_TEXT)
+
+            # differentiate header chunks
+            cell.set_property('cell-background', '#EEEEEE')
+            diffcol.add_attribute(cell, 'cell_background_set', DM_HEADER_CHUNK)
+
+            # Rejected hunks are given darker background, smaller font
+            cell.set_property('background', '#CCCCCC')
+            cell.set_property('scale', pango.SCALE_X_SMALL)
+            diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
+            diffcol.add_attribute(cell, 'scale-set', DM_REJECTED)
+            #diffcol.add_attribute(cell, 'strikethrough', DM_REJECTED)
+
             self.diff_tree.append_column(diffcol)
             self.filetree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             self.filetree.get_selection().connect('changed',
                     self._tree_selection_changed, False)
             scroller.add(self.diff_tree)
 
+            # This vbox left here in case we want to add widgets at
+            # the top of the diff pane again.
             vbox = gtk.VBox()
             vbox.pack_start(scroller, True, True, 2)
 
