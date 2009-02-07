@@ -351,7 +351,7 @@ class ConfigDialog(gtk.Dialog):
                 start_editing=True)
         self.refresh_path_list()
         # This method may be called from hggtk.sync, so ensure page is visible
-        self.notebook.set_current_page(2)
+        self.notebook.set_current_page(3)
         self.dirty_event()
 
     def dirty_event(self, *args):
