@@ -32,11 +32,11 @@ def setup_windows():
         import win32com
         for p in win32com.__path__[1:]:
             modulefinder.AddPackagePath("win32com", p)
-        for extra in ["win32com.shell"]: #,"win32com.mapi"
-            __import__(extra)
-            m = sys.modules[extra]
+        for e in ["win32com.shell"]: #,"win32com.mapi"
+            __import__(e)
+            m = sys.modules[e]
             for p in m.__path__[1:]:
-                modulefinder.AddPackagePath(extra, p)
+                modulefinder.AddPackagePath(e, p)
     except ImportError:
         # no build path setup, no worries.
         pass
