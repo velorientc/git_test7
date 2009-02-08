@@ -9,15 +9,11 @@ from mercurial.i18n import _
 from dialog import entry_dialog
 
 try:
-    from mercurial.error import RepoError, ParseError
+    from mercurial.error import RepoError, ParseError, LookupError
 except ImportError:
     from mercurial.repo import RepoError
     from mercurial.dispatch import ParseError
-
-try:
     from mercurial.revlog import LookupError
-except ImportError:
-    from mercurial.error import LookupError
 
 try:
     try:
