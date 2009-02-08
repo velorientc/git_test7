@@ -104,7 +104,7 @@ class HgIgnoreDialog(gtk.Window):
         self.add(mainvbox)
 
         glob_entry.grab_focus()
-        self.connect('map_event', self._on_window_map_event)
+        self.connect('map_event', self.on_window_map_event)
 
     def remove_pressed(self, widget, selection):
         model, rows = selection.get_selected_rows()
@@ -136,7 +136,7 @@ class HgIgnoreDialog(gtk.Window):
         self.write_ignore_lines()
         self.refresh()
 
-    def _on_window_map_event(self, event, param):
+    def on_window_map_event(self, event, param):
         self.refresh()
 
     def refresh_clicked(self, togglebutton, data=None):
