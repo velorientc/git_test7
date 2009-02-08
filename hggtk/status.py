@@ -618,7 +618,7 @@ class GStatus(GDialog):
 
     def _update_chunk_state(self, entry):
         '''Update chunk toggle state to match file toggle state'''
-        file = entry[FM_PATH]
+        file = util.pconvert(entry[FM_PATH])
         if file not in self._filechunks: return
         entry[FM_PARTIAL_SELECTED] = False
         self._update_partial(self.diff_model, file, False)
@@ -809,7 +809,7 @@ class GStatus(GDialog):
             if not sel:
                 self._last_file = None
                 return False
-            file = self.filemodel[sel[0]][FM_PATH_UTF8]
+            file = util.pconvert(self.filemodel[sel[0]][FM_PATH])
             if force or file != self._last_file:
                 self._last_file = file
                 if file in self._filechunks:
@@ -828,7 +828,7 @@ class GStatus(GDialog):
         if file not in self._filechunks:
             return
         for fr in self.filemodel:
-            if fr[FM_PATH] == file:
+            if util.pconvert(fr[FM_PATH]) == file:
                 break
         fchunks = self._filechunks[file][1:]
         if row[DM_HEADER_CHUNK]:
