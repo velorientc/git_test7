@@ -11,9 +11,9 @@ from shlib import shell_notify
 from mercurial import hg, ui, match
 
 class HgIgnoreDialog(gtk.Window):
-    """ Edit a reposiory .hgignore file """
+    'Edit a reposiory .hgignore file'
     def __init__(self, root='', fileglob=''):
-        """ Initialize the Dialog """
+        'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         self.root = root
