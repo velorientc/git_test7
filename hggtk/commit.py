@@ -57,7 +57,11 @@ class GCommit(GStatus):
 
 
     def get_title(self):
-        return os.path.basename(self.repo.root) + ' commit ' + ' '.join(self.pats) + ' ' + self.opts['user'] + ' ' + self.opts['date']
+        root = os.path.basename(self.repo.root)
+        user = self.opts.get('user')
+        date = self.opts.get('date')
+        pats = ' '.join(self.pats)
+        return ' '.join([root, 'commit', pats, user, date])
 
     def get_icon(self):
         return 'menucommit.ico'
