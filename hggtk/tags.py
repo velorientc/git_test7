@@ -33,7 +33,7 @@ def get_tag_list(path):
         try:
             hn = hexfunc(n)
             r, c = repo.changelog.rev(n), hexfunc(n)
-        except revlog.LookupError:
+        except LookupError:
             r, c = "?", hn
 
         taglist.append((t, r, c))
