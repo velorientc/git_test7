@@ -80,6 +80,8 @@ class DetectRenameDialog(gtk.Window):
         hbox.pack_start(fr, True, True, 2)
         hbox.pack_start(fc, True, True, 2)
         vbox.pack_start(hbox, False, False, 2)
+        fr.set_sensitive(False)
+        fc.set_sensitive(False)
 
         unknownframe = gtk.Frame('Unrevisioned Files')
         unknownframe.add(vbox)
@@ -113,22 +115,18 @@ class DetectRenameDialog(gtk.Window):
         col.set_resizable(True)
         ctree.append_column(col)
 
-        ctree.connect('row-activated', self.candidate_row_act, unknowntree)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(ctree)
 
         stbar = gtklib.StatusBar()
-        args = (unknowntree, ctree, adjustment, stbar)
         vbox = gtk.VBox()
         vbox.pack_start(scroller, True, True, 2)
         ac = gtk.Button('Accept Match')
-        fc.connect('pressed', self.find_copies, *args)
-        fr.connect('pressed', self.find_renames, *args)
-        ac.connect('pressed', self.accept_match, *args)
         hbox = gtk.HBox()
         hbox.pack_start(ac, False, False, 2)
         vbox.pack_start(hbox, False, False, 2)
+        ac.set_sensitive(False)
 
         candidateframe = gtk.Frame('Candidate Matches')
         candidateframe.add(vbox)
@@ -170,7 +168,14 @@ class DetectRenameDialog(gtk.Window):
         vbox.pack_start(stbar, False, False, 2)
         self.add(vbox)
 
-        ctree.connect('cursor-changed', self.show_diff, buffer)
+        args = (unknowntree, ctree, adjustment, stbar)
+        fc.connect('pressed', self.find_copies, *args)
+        fr.connect('pressed', self.find_renames, *args)
+        ac.connect('pressed', self.accept_match, *args)
+
+        unknowntree.get_selection().connect('changed', self.unknown_sel_change, fr, fc)
+        ctree.connect('row-activated', self.candidate_row_act, unknowntree, stbar)
+        ctree.get_selection().connect('changed', self.show_diff, buffer, ac)
         self.connect('map_event', self.on_window_map_event, unkmodel)
         self.connect('delete-event', self.save_settings,
                 settings, hpaned, vpaned, adjustment)
@@ -306,12 +311,23 @@ class DetectRenameDialog(gtk.Window):
                     row[3] = False
         self.refresh(unktree.get_model())
 
-    def candidate_row_act(self, ctree, path, column, unktree):
+    def candidate_row_act(self, ctree, path, column, unktree, stbar):
         'User activated row of candidate list'
-        self.accept_match(ctree, unktree, ctree, None)
+        self.accept_match(ctree, unktree, ctree, None, stbar)
 
-    def show_diff(self, tree, buffer):
+    def unknown_sel_change(self, selection, fr, fc):
+        'User selected a row in the unknown tree'
+        model, paths = selection.get_selected_rows()
+        sensitive = paths and True or False
+        fr.set_sensitive(sensitive)
+        fc.set_sensitive(sensitive)
+
+    def show_diff(self, selection, buffer, ac):
         'User selected a row in the candidate tree'
+        model, paths = selection.get_selected_rows()
+        sensitive = paths and True or False
+        ac.set_sensitive(sensitive)
+
         try:
             repo = hg.repository(ui.ui(), self.root)
         except RepoError:
@@ -319,7 +335,6 @@ class DetectRenameDialog(gtk.Window):
 
         buffer.set_text('')
         iter = buffer.get_start_iter()
-        model, paths = tree.get_selection().get_selected_rows()
         for path in paths:
             row = model[path]
             src, dest, percent, sensitive = row
