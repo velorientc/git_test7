@@ -926,6 +926,8 @@ class GStatus(GDialog):
         return os.path.exists(self.repo.join('shelve'))
         
     def _activate_shelve_buttons(self, status):
+        if not hasattr(self, 'shelve_btn'):
+            return
         if status:
             self.shelve_btn.set_sensitive(True)
             self.unshelve_btn.set_sensitive(self._has_shelve_file())
