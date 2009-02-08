@@ -293,6 +293,7 @@ class GCommit(GStatus):
     def _commit_selected(self, files):
         import hgshelve
         # 1a. get list of chunks not rejected
+        files = [util.pconvert(f) for f in files]
         hlist = [x[DM_CHUNK_ID] for x in self.diff_model if not x[DM_REJECTED]]
         repo, chunks, ui = self.repo, self._shelve_chunks, self.ui
 
