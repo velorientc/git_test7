@@ -114,35 +114,20 @@ class SynchDialog(gtk.Window):
         revbox.pack_start(lbl, False, False)
         
         # revisions  combo box
-        self.pathlist = gtk.ListStore(str, bool)
+        self.pathlist = gtk.ListStore(str, str, bool)
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
-        self._pathbox.set_row_separator_func(lambda model, iter: model[iter][1])
+        self._pathbox.set_row_separator_func(lambda model, iter: model[iter][2])
         self._pathtext = self._pathbox.get_child()
-
-        # support dropping of repos or bundle files
-        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
-                [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
-        self.connect('drag_data_received', self._drag_receive)
-
+        self.fill_path_combo()
         defrow = None
         defpushrow = None
-        for row, (name, path) in enumerate(self.paths):
+        for iter, (path, name, sep) in enumerate(self.pathlist):
             if name == 'default':
-                defrow = row
+                defrow = iter
                 if defpushrow is None:
-                    defpushrow = row
+                    defpushrow = iter
             elif name == 'default-push':
-                defpushrow = row
-            self.pathlist.append([path, False])
-
-        sympaths = [x[1] for x in self.paths]
-        separator = False
-        for p in self._recent_src:
-            if p not in sympaths:
-                if not separator:
-                    self.pathlist.append(['-'*20, True])
-                    separator = True
-                self.pathlist.append([p, False])
+                defpushrow = iter
 
         if repos:
             self._pathtext.set_text(repos[0])
@@ -150,6 +135,13 @@ class SynchDialog(gtk.Window):
             self._pathbox.set_active(defpushrow)
         elif defrow is not None:
             self._pathbox.set_active(defrow)
+        else:
+            self._pathbox.set_active(0)
+
+        # support dropping of repos or bundle files
+        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
+                [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
+        self.connect('drag_data_received', self._drag_receive)
 
         # create checkbox to disable proxy
         self._use_proxy = gtk.CheckButton("use proxy server")        
@@ -223,6 +215,21 @@ class SynchDialog(gtk.Window):
         vbox.pack_start(self.stbar, False, False, 2)
         self.connect('map', self.update_buttons)
         self._last_drop_time = None
+
+    def fill_path_combo(self):
+        self.pathlist.clear()
+        sympaths = []
+        for name, path in self.paths:
+            sympaths.append(path)
+            self.pathlist.append([path, name, False])
+        separator = False
+        for p in self._recent_src:
+            if p in sympaths:
+                continue
+            if not separator:
+                self.pathlist.append(['-'*20, '', True])
+                separator = True
+            self.pathlist.append([p, '', False])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
         if time != self._last_drop_time:
@@ -440,17 +447,7 @@ class SynchDialog(gtk.Window):
         dlg.run()
         dlg.hide()
         self.paths = self._get_paths()
-        self.pathlist.clear()
-        for row, (name, path) in enumerate(self.paths):
-            self.pathlist.append([path, False])
-        sympaths = [x[1] for x in self.paths]
-        separator = False
-        for p in self._recent_src:
-            if p not in sympaths:
-                if not separator:
-                    self.pathlist.append(['-'*20, True])
-                    separator = True
-                self.pathlist.append([p, False])
+        self.fill_path_combo()
 
     def _email_clicked(self, toolbutton, data=None):
         path = self._pathtext.get_text()
@@ -537,12 +534,7 @@ class SynchDialog(gtk.Window):
         self._settings.write()
 
         # update drop-down list
-        self.pathlist.clear()
-        sympaths = [x[1] for x in ui.ui().configitems('paths')]
-        paths = list(set(sympaths + [x for x in self._recent_src]))
-        paths.sort()
-        for p in paths:
-            self.pathlist.append([p])
+        self.fill_path_combo()
 
     def write(self, msg, append=True):
         msg = toutf(msg)
