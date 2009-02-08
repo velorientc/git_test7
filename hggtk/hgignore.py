@@ -58,7 +58,6 @@ class HgIgnoreDialog(gtk.Window):
         pattree.set_reorderable(False)
         sel = pattree.get_selection()
         sel.set_mode(gtk.SELECTION_SINGLE)
-        sel.connect("changed", self.pattern_rowchanged)
         col = gtk.TreeViewColumn('Patterns', gtk.CellRendererText(), text=0)
         pattree.append_column(col) 
         pattree.set_headers_visible(False)
@@ -72,6 +71,7 @@ class HgIgnoreDialog(gtk.Window):
         bhbox = gtk.HBox()
         remove = gtk.Button("Remove Selected")
         remove.connect("pressed", self.remove_pressed, sel)
+        remove.set_sensitive(False)
         bhbox.pack_start(remove, False, False, 2)
         vbox.pack_start(bhbox, False, False, 2)
         frame.add(vbox)
@@ -79,8 +79,6 @@ class HgIgnoreDialog(gtk.Window):
         frame = gtk.Frame('Unknown Files')
         hbox.pack_start(frame, True, True, 4)
         unknowntree = gtk.TreeView()
-        sel = unknowntree.get_selection()
-        sel.connect("changed", self.unknown_rowchanged)
         col = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=0)
         unknowntree.append_column(col) 
         scrolledwindow = gtk.ScrolledWindow()
@@ -104,6 +102,8 @@ class HgIgnoreDialog(gtk.Window):
         self.add(mainvbox)
 
         glob_entry.grab_focus()
+        pattree.get_selection().connect('changed', self.pattree_rowchanged, remove)
+        unknowntree.get_selection().connect('changed', self.unknown_rowchanged)
         self.connect('map_event', self.on_window_map_event)
 
     def remove_pressed(self, widget, selection):
@@ -113,10 +113,10 @@ class HgIgnoreDialog(gtk.Window):
         self.write_ignore_lines()
         self.refresh()
 
-    def pattern_rowchanged(self, sel):
+    def pattree_rowchanged(self, sel, remove):
         model, iter = sel.get_selected()
-        if not iter:
-            return
+        sensitive = iter and True or False
+        remove.set_sensitive(sensitive)
 
     def unknown_rowchanged(self, sel):
         model, iter = sel.get_selected()
