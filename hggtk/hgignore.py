@@ -17,7 +17,7 @@ class HgIgnoreDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         self.root = root
-        self.set_title('Ignore mask for ' + os.path.basename(root))
+        self.set_title('Ignore filter for ' + os.path.basename(root))
         self.set_default_size(630, 400)
         self.notify_func = None
 
