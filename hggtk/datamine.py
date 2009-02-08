@@ -14,7 +14,7 @@ import re
 import threading, thread2
 import time
 from mercurial import hg, ui, util, revlog
-from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime
+from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime, LookupError
 from gdialog import *
 from vis import treemodel
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
@@ -412,7 +412,7 @@ class DataMineDialog(GDialog):
             ctx = self.repo.changectx(None).parents()[0]
             try:
                 fctx = ctx.filectx(path)
-            except revlog.LookupError:
+            except LookupError:
                 Prompt('File is unrevisioned',
                         'Unable to annotate ' + path, self).run()
                 return

@@ -20,13 +20,8 @@ from mercurial.node import *
 from mercurial import cmdutil, context, util, ui, hg, patch
 from gdialog import *
 from hgcmd import CmdDialog
-from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand
+from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand, LookupError
 from gtklib import StatusBar
-
-try:
-    from mercurial.error import LookupError
-except ImportError:
-    from mercurial.revlog import LookupError
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs

@@ -15,6 +15,11 @@ except ImportError:
     from mercurial.dispatch import ParseError
 
 try:
+    from mercurial.revlog import LookupError
+except ImportError:
+    from mercurial.error import LookupError
+
+try:
     try:
         from mercurial import demandimport
     except:
