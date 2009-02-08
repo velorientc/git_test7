@@ -21,20 +21,7 @@ class HgIgnoreDialog(gtk.Window):
         self.set_default_size(630, 400)
         self.notify_func = None
 
-        self.tbar = gtk.Toolbar()
-        self.tips = gtk.Tooltips()
-
-        tbuttons = [
-                self._toolbutton(gtk.STOCK_REFRESH,
-                    'Refresh',
-                    self._refresh_clicked,
-                    tip='Reload hgignore')
-            ]
-        for btn in tbuttons:
-            self.tbar.insert(btn, -1)
         mainvbox = gtk.VBox()
-        self.add(mainvbox)
-        mainvbox.pack_start(self.tbar, False, False, 2)
 
         hbox = gtk.HBox()
         lbl = gtk.Label('Glob:')
@@ -104,9 +91,17 @@ class HgIgnoreDialog(gtk.Window):
         unknowntree.set_model(model)
         unknowntree.set_headers_visible(False)
         self.unkmodel = model
-        frame.add(scrolledwindow)
+        vbox = gtk.VBox()
+        vbox.pack_start(scrolledwindow, True, True, 2)
+        bhbox = gtk.HBox()
+        refresh = gtk.Button("Refresh")
+        refresh.connect("pressed", self.refresh_clicked, sel)
+        bhbox.pack_start(refresh, False, False, 2)
+        vbox.pack_start(bhbox, False, False, 2)
+        frame.add(vbox)
 
         mainvbox.pack_start(hbox, True, True)
+        self.add(mainvbox)
 
         glob_entry.grab_focus()
         self.connect('map_event', self._on_window_map_event)
@@ -144,7 +139,7 @@ class HgIgnoreDialog(gtk.Window):
     def _on_window_map_event(self, event, param):
         self.refresh()
 
-    def _refresh_clicked(self, togglebutton, data=None):
+    def refresh_clicked(self, togglebutton, data=None):
         self.refresh()
 
     def set_notify_func(self, func):
