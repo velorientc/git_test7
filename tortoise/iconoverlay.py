@@ -8,9 +8,13 @@ import win32con
 from win32com.shell import shell, shellcon
 import _winreg
 from mercurial import hg, cmdutil, util
-from mercurial import repo as _repo
 import thgutil
 import sys
+
+try:
+    from mercurial.error import RepoError
+except ImportError:
+    from mercurial.repo import RepoError
 
 # FIXME: quick workaround traceback caused by missing "closed" 
 # attribute in win32trace.
@@ -143,7 +147,7 @@ class IconOverlayExtension(object):
                 overlay_cache = {None : None}
                 cache_tick_count = win32api.GetTickCount()
                 return NOT_IN_REPO
-        except _repo.RepoError:
+        except RepoError:
             # We aren't in a working tree
             print "%s: not in repo" % pdir
             overlay_cache[path] = UNKNOWN

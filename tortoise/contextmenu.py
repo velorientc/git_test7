@@ -16,8 +16,12 @@ import win32gui_struct
 import win32api
 import _winreg
 from mercurial import hg
-from mercurial import repo as _repo
 from thgutil import *
+
+try:
+    from mercurial.error import RepoError
+except ImportError:
+    from mercurial.repo import RepoError
 
 # FIXME: quick workaround traceback caused by missing "closed" 
 # attribute in win32trace.
@@ -64,7 +68,7 @@ def open_repo(path):
         try:
             repo = hg.repository(ui.ui(), path=root)
             return repo
-        except _repo.RepoError:
+        except RepoError:
             pass
 
     return None
