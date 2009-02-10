@@ -349,9 +349,11 @@ class GStatus(GDialog):
                     self._tree_selection_changed, False)
             scroller.add(self.diff_tree)
 
-            # This vbox left here in case we want to add widgets at
-            # the top of the diff pane again.
             vbox = gtk.VBox()
+            self.selectlabel = gtk.Label()
+            hbox = gtk.HBox()
+            hbox.pack_start(self.selectlabel, False, False, 2)
+            vbox.pack_start(hbox, False, False, 2)
             vbox.pack_start(scroller, True, True, 2)
 
             diff_frame.add(vbox)
