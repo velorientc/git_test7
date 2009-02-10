@@ -1,7 +1,7 @@
 #
 # TortoiseHg About dialog
 #
-# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright (C) 2007-9 TK Soh <teekaysoh@gmail.com>
 #
 
 import os
@@ -66,12 +66,12 @@ class AboutDialog(gtk.AboutDialog):
         
         comment = "Several icons are courtesy of the TortoiseSVN project"
 
-        self.set_website("http://tortoisehg.sourceforge.net/")
+        self.set_website("http://bitbucket.org/tortoisehg/stable/")
         self.set_name("TortoiseHg")
         self.set_version("(version %s)" % thgversion)
         if hasattr(self, 'set_wrap_license'):
             self.set_wrap_license(True)
-        self.set_copyright("Copyright 2008 TK Soh and others")
+        self.set_copyright("Copyright 2009 TK Soh and others")
 
         thg_logo = os.path.normpath(shlib.get_tortoise_icon('thg_logo_92x50.png'))
         thg_icon = os.path.normpath(shlib.get_tortoise_icon('thg_logo.ico'))
