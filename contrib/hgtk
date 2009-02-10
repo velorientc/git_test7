@@ -197,6 +197,12 @@ def commit(ui, *pats, **opts):
     opts['files'] = [os.path.abspath(x) for x in pats]
     run(**opts)
 
+def shelve(ui, *pats, **opts):
+    """shelve/unshelve tool"""
+    from hggtk.thgshelve import run
+    opts['files'] = [os.path.abspath(x) for x in pats]
+    run(**opts)
+
 def userconfig(ui, **opts):
     """user configuration editor"""
     from hggtk.thgconfig import run
@@ -489,6 +495,7 @@ table = {
         _('hgtk log [OPTIONS] [FILE]')),
     "^merge": (merge, [], _('hgtk merge')),
     "^recovery|rollback|verify": (recovery, [], _('hgtk recovery')),
+    "^shelve|unshelve": (shelve, [], _('hgtk shelve')),
     "^synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
     "^status|st": (status, [], _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
