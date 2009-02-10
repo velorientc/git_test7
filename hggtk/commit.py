@@ -169,9 +169,6 @@ class GCommit(GStatus):
         self._vpaned.add2(status_body)
         self._vpaned.set_position(self._setting_vpos)
 
-        self.selectlabel.set_text(
-                _('toggle change hunks to leave them out of commit'))
-
         # make ctrl-o trigger commit button
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
@@ -251,6 +248,10 @@ class GCommit(GStatus):
 
             # pre-fill commit message
             self.text.get_buffer().set_text('merge')
+        else:
+            self.selectlabel.set_text(
+                _('toggle change hunks to leave them out of commit'))
+
 
 
     def _check_patch_queue(self):
