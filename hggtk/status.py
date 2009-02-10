@@ -203,8 +203,8 @@ class GStatus(GDialog):
             self._setting_pos = mysettings[0]
             self._setting_lastpos = mysettings[1]
         else:
-            self._setting_pos = 64000
-            self._setting_lastpos = 270
+            self._setting_pos = 270
+            self._setting_lastpos = 64000
         self.mqmode = None
         if hasattr(self.repo, 'mq') and self.repo.mq.applied:
             self.mqmode = True
