@@ -160,6 +160,13 @@ def get_tortoise_icon(icon):
         print 'icon not found', icon
         return None
 
+def version():
+    try:
+        import __version__
+        return __version__.version
+    except ImportError:
+        return 'unknown'
+
 if os.name == 'nt':
     def shell_notify(paths):
         try:

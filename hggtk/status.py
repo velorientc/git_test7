@@ -185,19 +185,6 @@ class GStatus(GDialog):
         self._showdiff_toggled_id = self.showdiff_toggle.connect('toggled',
                 self._showdiff_toggled )
         tbuttons.append(self.showdiff_toggle)
-        
-        # Shelving does not work when visualizing diffs between
-        # revisions (though this could eventually be made to work)
-        if not self.opts.get('rev'):
-            self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, 'Shelve',
-                    self._shelve_clicked, tip='set aside selected changes')
-            self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, 'Unshelve',
-                    self._unshelve_clicked, tip='restore shelved changes')
-            tbuttons += [
-                    gtk.SeparatorToolItem(),
-                    self.shelve_btn,
-                    self.unshelve_btn,
-                ]
 
         return tbuttons
 
@@ -216,8 +203,8 @@ class GStatus(GDialog):
             self._setting_pos = mysettings[0]
             self._setting_lastpos = mysettings[1]
         else:
-            self._setting_pos = 64000
-            self._setting_lastpos = 270
+            self._setting_pos = 270
+            self._setting_lastpos = 64000
         self.mqmode = None
         if hasattr(self.repo, 'mq') and self.repo.mq.applied:
             self.mqmode = True
@@ -362,9 +349,11 @@ class GStatus(GDialog):
                     self._tree_selection_changed, False)
             scroller.add(self.diff_tree)
 
-            # This vbox left here in case we want to add widgets at
-            # the top of the diff pane again.
             vbox = gtk.VBox()
+            self.selectlabel = gtk.Label()
+            hbox = gtk.HBox()
+            hbox.pack_start(self.selectlabel, False, False, 2)
+            vbox.pack_start(hbox, False, False, 2)
             vbox.pack_start(scroller, True, True, 2)
 
             diff_frame.add(vbox)
@@ -378,7 +367,6 @@ class GStatus(GDialog):
             self.filetree.get_selection().set_mode(gtk.SELECTION_SINGLE)
             self.filetree.get_selection().connect('changed',
                     self._merge_tree_selection_changed, False)
-            self._activate_shelve_buttons(False)
             scroller.add(self.merge_diff_text)
             diff_frame.add(scroller)
 
@@ -925,16 +913,6 @@ class GStatus(GDialog):
     def _has_shelve_file(self):
         return os.path.exists(self.repo.join('shelve'))
         
-    def _activate_shelve_buttons(self, status):
-        if not hasattr(self, 'shelve_btn'):
-            return
-        if status:
-            self.shelve_btn.set_sensitive(True)
-            self.unshelve_btn.set_sensitive(self._has_shelve_file())
-        else:
-            self.shelve_btn.set_sensitive(False)
-            self.unshelve_btn.set_sensitive(False)
-
     def _showdiff_toggled(self, togglebutton, data=None):
         # prevent movement events while setting position
         self._diffpane.handler_block(self._diffpane_moved_id)
@@ -942,15 +920,12 @@ class GStatus(GDialog):
         if togglebutton.get_active():
             if hasattr(self, 'merge_diff_text'):
                 self._merge_tree_selection_changed(self.filetree.get_selection(), True)
-                self._activate_shelve_buttons(False)
             else:
-                self._activate_shelve_buttons(True)
                 self._tree_selection_changed(self.filetree.get_selection(), True)
             self._diffpane.set_position(self._setting_lastpos)
         else:
             self._setting_lastpos = self._diffpane.get_position()
             self._diffpane.set_position(64000)
-            self._activate_shelve_buttons(False)
 
         self._diffpane.handler_unblock(self._diffpane_moved_id)
         return True
@@ -967,15 +942,13 @@ class GStatus(GDialog):
         if self.showdiff_toggle.get_active():
             if paned.get_position() >= sizemax - 55:
                 self.showdiff_toggle.set_active(False)
-            self._activate_shelve_buttons(self.showdiff_toggle.get_active())
         elif paned.get_position() < sizemax - 55:
             self.showdiff_toggle.set_active(True)
+            selection = self.filetree.get_selection()
             if hasattr(self, 'merge_diff_text'):
-                self._merge_tree_selection_changed(self.filetree.get_selection(), True)
-                self._activate_shelve_buttons(False)
+                self._merge_tree_selection_changed(selection, True)
             else:
-                self._tree_selection_changed(self.filetree.get_selection(), True)
-                self._activate_shelve_buttons(True)
+                self._tree_selection_changed(selection, True)
 
         self.showdiff_toggle.handler_unblock(self._showdiff_toggled_id)
         return False
@@ -1064,73 +1037,6 @@ class GStatus(GDialog):
         if success:
             shell_notify(wfiles)
             self.reload_status()
-
-    def _shelve_selected(self):
-        # get list of hunks that have not been rejected
-        hlist = [x[DM_CHUNK_ID] for x in self.diff_model if not x[DM_REJECTED]]
-        if not hlist:
-            Prompt('Shelve', 'Please select diff chunks to shelve',
-                    self).run()
-            return
-
-        doforce = False
-        doappend = False
-        if self._has_shelve_file():
-            from gtklib import MessageDialog
-            dialog = MessageDialog(flags=gtk.DIALOG_MODAL)
-            dialog.set_title('Shelve')
-            dialog.set_markup('<b>Shelve file exists!</b>')
-            dialog.add_buttons('Overwrite', 1, 'Append', 2, 'Cancel', -1)
-            dialog.set_transient_for(self)
-            rval = dialog.run()
-            dialog.destroy()
-            if rval == -1:
-                return
-            if rval == 1:
-                doforce = True
-            if rval == 2:
-                doappend = True
-
-        # capture the selected hunks to shelve
-        fc = []
-        sc = []
-        for n, c in enumerate(self._shelve_chunks):
-            if isinstance(c, hgshelve.header):
-                if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
-                    sc += fc
-                fc = [c]
-            elif n in hlist:
-                fc.append(c)
-        if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
-            sc += fc
-                
-        def filter_patch(ui, chunks):
-            return sc
-
-        # shelve them!
-        self.ui.interactive = True  # hgshelve only works 'interactively'
-        opts = {'addremove': None, 'include': [], 'force': doforce,
-                'append': doappend, 'exclude': []}
-        hgshelve.filterpatch = filter_patch
-        hgshelve.shelve(self.ui, self.repo, **opts)
-        self.reload_status()
-        
-    def _unshelve(self):
-        opts = {'addremove': None, 'include': [], 'force': None,
-                'append': None, 'exclude': [], 'inspect': None}
-        try:
-            hgshelve.unshelve(self.ui, self.repo, **opts)
-            self.reload_status()
-        except:
-            pass
-
-    def _shelve_clicked(self, toolbutton, data=None):
-        self._shelve_selected()
-        self._activate_shelve_buttons(True)
-
-    def _unshelve_clicked(self, toolbutton, data=None):
-        self._unshelve()
-        self._activate_shelve_buttons(True)
 
     def _remove_clicked(self, toolbutton, data=None):
         remove_list = self._relevant_files('C')
