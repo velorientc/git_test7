@@ -23,12 +23,6 @@ except AttributeError:
     from mercurial import version
     hgversion = version.get_version()
 
-try:
-    import tortoise.version
-    thgversion = tortoise.version.get_version()
-except ImportError:
-    thgversion = "unknown"
-
 def browse_url(url):
     import threading
     def start_browser():
@@ -68,7 +62,7 @@ class AboutDialog(gtk.AboutDialog):
 
         self.set_website("http://bitbucket.org/tortoisehg/stable/")
         self.set_name("TortoiseHg")
-        self.set_version("(version %s)" % thgversion)
+        self.set_version("(version %s)" % shlib.version())
         if hasattr(self, 'set_wrap_license'):
             self.set_wrap_license(True)
         self.set_copyright("Copyright 2009 TK Soh and others")

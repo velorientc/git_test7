@@ -3,7 +3,7 @@ syntax: glob
 *.orig
 *.rej
 *.pyc
-tortoise/__version__.py
+hggtk/__version__.py
 build/
 dist/
 Output/
