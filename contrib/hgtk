@@ -2,11 +2,17 @@
 #
 # front-end script for TortoiseHg dialogs
 #
-# Copyright (C) 2008 Steve Borho <steve@borho.org>
+# Copyright (C) 2008-9 Steve Borho <steve@borho.org>
 # Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
 
-# set TORTOISEHG_PATH in your environment to point the location
-# of your tortoisehg repository, or modify 'tortoisehg_dir' below:
+shortlicense = '''\
+Copyright (C) 2009 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+'''
+
+# The recommended usage is to symlink this file into your path.
+# alternatively, you can change this line or set TORTOISEHG_PATH
 tortoisehg_dir = '~/tools/tortoisehg-dev'
 
 import os
@@ -322,7 +328,7 @@ def help_(ui, name=None, with_version=False):
 
     def helpcmd(name):
         if with_version:
-            version_(ui)
+            version(ui)
             ui.write('\n')
         aliases, i = cmdutil.findcmd(name, table)
         # synopsis
@@ -439,7 +445,7 @@ def help_(ui, name=None, with_version=False):
     else:
         # program name
         if ui.verbose or with_version:
-            version_(ui)
+            version(ui)
         else:
             ui.status(_("Hgtk - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"))
         ui.status('\n')
@@ -473,9 +479,11 @@ def help_(ui, name=None, with_version=False):
             else:
                 ui.write("%s\n" % first)
 
-def version_(ui):
+def version(ui, **opts):
     """output version and copyright information"""
-    pass
+    import hggtk.shlib
+    ui.write("%s\n" % hggtk.shlib.version())
+    if ui.verbose: ui.write(shortlicense)
 
 globalopts = [
     ('R', 'repository', '',
@@ -507,6 +515,9 @@ table = {
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
          _('hgtk serve [OPTION]...')),
     "^update|checkout|co": (update, [], _('hgtk update')),
+    "^version": (version,
+        [('v', 'verbose', None, _('print license'))],
+        _('hgtk version [OPTION]')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
 }
 
