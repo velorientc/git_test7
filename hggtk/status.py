@@ -275,7 +275,7 @@ class GStatus(GDialog):
             # show file selection checkboxes only when applicable
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
-            col0.add_attribute(toggle_cell, 'inconsistent', FM_PARTIAL_SELECTED)
+            col0.add_attribute(toggle_cell, 'radio', FM_PARTIAL_SELECTED)
             col0.set_resizable(False)
             self.filetree.append_column(col0)
             self.selcb = self._add_header_checkbox(col0, self._sel_clicked)
