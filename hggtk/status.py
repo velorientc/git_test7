@@ -2,7 +2,8 @@
 # status.py - status dialog for TortoiseHg
 #
 # Copyright 2007 Brad Schick, brad at gmail . com
-# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright (C) 2007-8 TK Soh <teekaysoh@gmail.com>
+# Copyright (C) 2008-7 Steve Borho <steve@borho.org>
 #
 
 
