@@ -289,7 +289,6 @@ class GStatus(GDialog):
         
         col = gtk.TreeViewColumn('ms', stat_cell)
         col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
-        #col.set_cell_data_func(stat_cell, self._text_color)
         col.set_sort_column_id(4)
         col.set_resizable(False)
         self.filetree.append_column(col)
