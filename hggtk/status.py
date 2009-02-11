@@ -146,7 +146,8 @@ class GStatus(GDialog):
         root = os.path.basename(self.repo.root)
         revs = self.opts.get('rev')
         if revs:
-            return root + ' status ' + ':'.join(revs) + ' ' + ' '.join(self.pats)
+            r = ':'.join(revs)
+            return ' '.join([root, 'status', r]) + ' '.join(self.pats)
         elif self.mqmode:
             patch = self.repo.mq.lookup('qtip')
             return root + ' applied MQ patch ' + patch
