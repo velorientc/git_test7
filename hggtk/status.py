@@ -623,11 +623,12 @@ class GStatus(GDialog):
 
     def _sort_by_stat(self, model, iter1, iter2):
         order = 'MAR!?IC'
-        lhs, rhs = (model.get_value(iter1, FM_STATUS), model.get_value(iter2, FM_STATUS))
-
-        # GTK+ bug that calls sort before a full row is inserted causing values to be None.
-        # When this happens, just return any value since the call is irrelevant and will be
-        # followed by another with the correct (non-None) value
+        lhs, rhs = (model.get_value(iter1, FM_STATUS),
+                    model.get_value(iter2, FM_STATUS))
+        # GTK+ bug that calls sort before a full row is inserted causing
+        # values to be None.  When this happens, just return any value
+        # since the call is irrelevant and will be followed by another
+        # with the correct (non-None) value
         if None in (lhs, rhs) :
             return 0
 
