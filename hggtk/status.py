@@ -335,7 +335,7 @@ class GStatus(GDialog):
                     pango.FontDescription)
             self.diff_tree = gtk.TreeView(self.diff_model)
             self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-            #self.diff_tree.modify_font(self.difffont)
+            self.diff_tree.modify_font(self.difffont)
             self.diff_tree.set_headers_visible(False)
             self.diff_tree.set_property('enable-grid-lines', True)
             self.diff_tree.connect('row-activated',
