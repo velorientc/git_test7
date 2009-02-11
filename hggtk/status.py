@@ -360,7 +360,9 @@ class GStatus(GDialog):
             self.rejfont.set_weight(pango.WEIGHT_LIGHT)
             diffcol.add_attribute(cell, 'font-desc', DM_FONT)
             cell.set_property('background', '#EEEEEE')
+            cell.set_property('foreground', '#444444')
             diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
+            diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
 
             self.diff_tree.append_column(diffcol)
             self.filetree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
