@@ -34,9 +34,12 @@ FM_PARTIAL_SELECTED = 5
 
 # diff_model row enumerations
 DM_REJECTED = 0
-DM_CHUNK_TEXT = 1
-DM_HEADER_CHUNK = 2
-DM_CHUNK_ID = 3
+DM_MARKUP = 1
+DM_TEXT = 2
+DM_DISPLAYED = 3
+DM_IS_HEADER = 4
+DM_CHUNK_ID = 5
+DM_FONT = 6
 
 class GStatus(GDialog):
     """GTK+ based dialog for displaying repository status
@@ -267,11 +270,12 @@ class GStatus(GDialog):
         stat_cell = gtk.CellRendererText()
 
         self.selcb = None
-        if self.count_revs() < 2 and len(self.repo.changectx(None).parents()) == 1:
+        ismerge = len(self.repo.changectx(None).parents()) == 2
+        if self.count_revs() < 2 and not ismerge:
+            # show file selection checkboxes only when applicable
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
             col0.add_attribute(toggle_cell, 'inconsistent', FM_PARTIAL_SELECTED)
-            #col0.set_sort_column_id(0)
             col0.set_resizable(False)
             self.filetree.append_column(col0)
             self.selcb = self._add_header_checkbox(col0, self._sel_clicked)
@@ -310,16 +314,29 @@ class GStatus(GDialog):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
-        if self.count_revs() == 2 or len(self.repo.changectx(None).parents()) == 1:
-            # use treeview to diff hunks
-
+        self.difffont = pango.FontDescription(self.fontlist)
+        if len(self.repo.changectx(None).parents()) == 2:
+            # display merge diffs in simple text view
+            self.clipboard = None
+            self.merge_diff_text = gtk.TextView()
+            self.merge_diff_text.set_wrap_mode(gtk.WRAP_NONE)
+            self.merge_diff_text.set_editable(False)
+            self.merge_diff_text.modify_font(self.difffont)
+            self.filetree.get_selection().set_mode(gtk.SELECTION_SINGLE)
+            self.filetree.get_selection().connect('changed',
+                    self._merge_tree_selection_changed, False)
+            scroller.add(self.merge_diff_text)
+            diff_frame.add(scroller)
+        else:
+            # use treeview to show selectable diff hunks
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
             self.clipboard = gtk.Clipboard(selection=sel)
 
-            self.diff_model = gtk.ListStore(bool, str, bool, int)
+            self.diff_model = gtk.ListStore(bool, str, str, str, bool, int,
+                    pango.FontDescription)
             self.diff_tree = gtk.TreeView(self.diff_model)
             self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-            self.diff_tree.modify_font(pango.FontDescription(self.fontlist))
+            #self.diff_tree.modify_font(self.difffont)
             self.diff_tree.set_headers_visible(False)
             self.diff_tree.set_property('enable-grid-lines', True)
             self.diff_tree.connect('row-activated',
@@ -332,18 +349,19 @@ class GStatus(GDialog):
             cell = gtk.CellRendererText()
             diffcol = gtk.TreeViewColumn('diff', cell)
             diffcol.set_resizable(True)
-            diffcol.add_attribute(cell, 'markup', DM_CHUNK_TEXT)
+            diffcol.add_attribute(cell, 'markup', DM_DISPLAYED)
 
             # differentiate header chunks
             cell.set_property('cell-background', '#EEEEEE')
-            diffcol.add_attribute(cell, 'cell_background_set', DM_HEADER_CHUNK)
+            diffcol.add_attribute(cell, 'cell_background_set', DM_IS_HEADER)
 
-            # Rejected hunks are given darker background, smaller font
-            cell.set_property('background', '#CCCCCC')
-            cell.set_property('scale', pango.SCALE_X_SMALL)
+            # differentiate rejected hunks
+            self.rejfont = self.difffont.copy()
+            self.rejfont.set_style(pango.STYLE_ITALIC)
+            self.rejfont.set_weight(pango.WEIGHT_LIGHT)
+            diffcol.add_attribute(cell, 'font-desc', DM_FONT)
+            cell.set_property('background', '#EEEEEE')
             diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
-            diffcol.add_attribute(cell, 'scale-set', DM_REJECTED)
-            #diffcol.add_attribute(cell, 'strikethrough', DM_REJECTED)
 
             self.diff_tree.append_column(diffcol)
             self.filetree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
@@ -359,18 +377,6 @@ class GStatus(GDialog):
             vbox.pack_start(scroller, True, True, 2)
 
             diff_frame.add(vbox)
-        else:
-            # display merge diffs in simple text view
-            self.clipboard = None
-            self.merge_diff_text = gtk.TextView()
-            self.merge_diff_text.set_wrap_mode(gtk.WRAP_NONE)
-            self.merge_diff_text.set_editable(False)
-            self.merge_diff_text.modify_font(pango.FontDescription(self.fontdiff))
-            self.filetree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-            self.filetree.get_selection().connect('changed',
-                    self._merge_tree_selection_changed, False)
-            scroller.add(self.merge_diff_text)
-            diff_frame.add(scroller)
 
         if self.diffbottom:
             self._diffpane = gtk.VPaned()
@@ -614,6 +620,16 @@ class GStatus(GDialog):
         self._update_partial(self.diff_model, file, False)
         for n in self._filechunks[file][1:]:
             self.diff_model[n][DM_REJECTED] = not entry[FM_CHECKED]
+            self._update_diff_model_row(self.diff_model[n])
+
+    def _update_diff_model_row(self, row):
+        if row[DM_REJECTED]:
+            row[DM_FONT] = self.rejfont
+            row[DM_DISPLAYED] = row[DM_TEXT]
+        else:
+            row[DM_FONT] = self.difffont
+            row[DM_DISPLAYED] = row[DM_MARKUP]
+
 
     def _show_toggle(self, check, type):
         self.opts[type] = check.get_active()
@@ -822,13 +838,15 @@ class GStatus(GDialog):
             if util.pconvert(fr[FM_PATH]) == file:
                 break
         fchunks = self._filechunks[file][1:]
-        if row[DM_HEADER_CHUNK]:
+        if row[DM_IS_HEADER]:
             for n in fchunks:
                 dmodel[n][DM_REJECTED] = fr[FM_CHECKED]
+                self._update_diff_model_row(dmodel[n])
             newvalue = not fr[FM_CHECKED]
             partial = False
         else:
             row[DM_REJECTED] = not row[DM_REJECTED]
+            self._update_diff_model_row(row)
             rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
             nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
             newvalue = nonrej and True or False
@@ -845,12 +863,12 @@ class GStatus(GDialog):
     def _update_partial(self, dmodel, file, partial):
         hc = self._filechunks[file][0]
         row = dmodel[hc]
-        markup = row[DM_CHUNK_TEXT]
+        displayed = row[DM_DISPLAYED]
         tag = ' ** Partial **'
-        if partial and not markup.endswith(tag):
-            row[DM_CHUNK_TEXT] = markup + tag
-        elif not partial and markup.endswith(tag):
-            row[DM_CHUNK_TEXT] = markup[0:-len(tag)]
+        if partial and not displayed.endswith(tag):
+            row[DM_DISPLAYED] = displayed + tag
+        elif not partial and displayed.endswith(tag):
+            row[DM_DISPLAYED] = displayed[0:-len(tag)]
 
     def _show_diff_hunks(self, files):
         ''' Update the diff text '''
@@ -871,7 +889,15 @@ class GStatus(GDialog):
                     hunk = '<span foreground="#FF8000">%s</span>' % line
                 else:
                     hunk += line
+            return hunk
 
+        def unmarkup(fp):
+            hunk = ""
+            fp.seek(0)
+            lines = fp.readlines()
+            lines[-1] = lines[-1].strip('\n\r')
+            for line in lines:
+                hunk += gobject.markup_escape_text(toutf(line))
             return hunk
 
         def dohgdiff():
@@ -895,16 +921,21 @@ class GStatus(GDialog):
                     fp = cStringIO.StringIO()
                     chunk.pretty(fp)
                     markedup = markup(fp)
+                    text = unmarkup(fp)
                     isheader = isinstance(chunk, hgshelve.header)
                     if isheader:
                         for f in chunk.files():
                             self._filechunks[f] = [len(self.diff_model)]
-                        self.diff_model.append([False, markedup, True, n])
+                        row = [False, markedup, text, markedup,
+                               True, n, self.difffont]
+                        self.diff_model.append(row)
                         skip = chunk.special()
                     elif skip != True:
                         f = chunk.filename()
                         self._filechunks[f].append(len(self.diff_model))
-                        self.diff_model.append([False, markedup, False, n])
+                        row = [False, markedup, text, markedup,
+                               False, n, self.difffont]
+                        self.diff_model.append(row)
             finally:
                 difftext.close()
 
