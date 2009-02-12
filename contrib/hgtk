@@ -34,7 +34,7 @@ except ImportError:
     from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
     from mercurial.dispatch import ParseError
 
-nonrepo_commands = 'userconfig clone init about help'
+nonrepo_commands = 'userconfig clone init about help version'
 
 def dispatch(args):
     "run the command specified in args"
