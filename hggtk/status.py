@@ -351,7 +351,7 @@ class GStatus(GDialog):
             diffcol.add_attribute(cell, 'markup', DM_DISPLAYED)
 
             # differentiate header chunks
-            cell.set_property('cell-background', '#EEEEEE')
+            cell.set_property('cell-background', '#DDDDDD')
             diffcol.add_attribute(cell, 'cell_background_set', DM_IS_HEADER)
 
             # differentiate rejected hunks
