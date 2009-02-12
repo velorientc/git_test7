@@ -356,7 +356,7 @@ class GStatus(GDialog):
 
             # differentiate rejected hunks
             self.rejfont = self.difffont.copy()
-            self.rejfont.set_style(pango.STYLE_ITALIC)
+            #self.rejfont.set_style(pango.STYLE_ITALIC)
             self.rejfont.set_weight(pango.WEIGHT_LIGHT)
             diffcol.add_attribute(cell, 'font-desc', DM_FONT)
             cell.set_property('background', '#EEEEEE')
