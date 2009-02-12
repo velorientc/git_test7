@@ -147,10 +147,9 @@ class DataMineDialog(GDialog):
         ctx = self.repo.changectx(rev)
         author = util.shortuser(ctx.user())
         summary = ctx.description().replace('\0', '')
-        summary = summary.split('\n')[0]
+        summary = gobject.markup_escape_text(summary.split('\n')[0])
         date = displaytime(ctx.date())
         desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
-        desc = gobject.markup_escape_text(desc)
         self.changedesc[rev] = (desc, author)
         return (desc, author)
 
