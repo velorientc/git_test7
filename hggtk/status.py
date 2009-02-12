@@ -335,7 +335,6 @@ class GStatus(GDialog):
                     pango.FontDescription)
             self.diff_tree = gtk.TreeView(self.diff_model)
             self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-            self.diff_tree.modify_font(self.difffont)
             self.diff_tree.set_headers_visible(False)
             self.diff_tree.set_property('enable-grid-lines', True)
             self.diff_tree.connect('row-activated',
@@ -353,6 +352,8 @@ class GStatus(GDialog):
             # differentiate header chunks
             cell.set_property('cell-background', '#DDDDDD')
             diffcol.add_attribute(cell, 'cell_background_set', DM_IS_HEADER)
+            self.headerfont = self.difffont.copy()
+            self.headerfont.set_weight(pango.WEIGHT_HEAVY)
 
             # differentiate rejected hunks
             self.rejfont = self.difffont.copy()
@@ -928,7 +929,7 @@ class GStatus(GDialog):
                         for f in chunk.files():
                             self._filechunks[f] = [len(self.diff_model)]
                         row = [False, markedup, text, markedup,
-                               True, n, self.difffont]
+                               True, n, self.headerfont]
                         self.diff_model.append(row)
                         skip = chunk.special()
                     elif skip != True:
