@@ -558,10 +558,10 @@ class GStatus(GDialog):
     
         for opt, char, changes in ([ct for ct in explicit_changetypes
                                     if self.test_opt(ct[0])] or changetypes) :
-            for file in changes:
-                mst = file in ms and ms[file].upper() or ""
-                file = util.localpath(file)
-                self.filemodel.append([file in recheck, char, toutf(file), file, mst, False])
+            for wfile in changes:
+                mst = wfile in ms and ms[wfile].upper() or ""
+                wfile = util.localpath(wfile)
+                self.filemodel.append([wfile in recheck, char, toutf(wfile), wfile, mst, False])
 
         selection = self.filetree.get_selection()
         selected = False
@@ -616,11 +616,11 @@ class GStatus(GDialog):
 
     def _update_chunk_state(self, entry):
         '''Update chunk toggle state to match file toggle state'''
-        file = util.pconvert(entry[FM_PATH])
-        if file not in self._filechunks: return
+        wfile = util.pconvert(entry[FM_PATH])
+        if wfile not in self._filechunks: return
         entry[FM_PARTIAL_SELECTED] = False
-        self._update_partial(self.diff_model, file, False)
-        for n in self._filechunks[file][1:]:
+        self._update_partial(self.diff_model, wfile, False)
+        for n in self._filechunks[wfile][1:]:
             self.diff_model[n][DM_REJECTED] = not entry[FM_CHECKED]
             self._update_diff_model_row(self.diff_model[n])
 
@@ -674,26 +674,26 @@ class GStatus(GDialog):
             text_renderer.set_property('foreground', 'black')
 
 
-    def _view_left_file(self, stat, file):
-        return self._view_file(stat, file, True)
+    def _view_left_file(self, stat, wfile):
+        return self._view_file(stat, wfile, True)
 
 
-    def _remove_file(self, stat, file):
-        self._hg_remove([file])
+    def _remove_file(self, stat, wfile):
+        self._hg_remove([wfile])
         return True
 
 
-    def _rename_file(self, stat, file):
-        fdir, fname = os.path.split(file)
+    def _rename_file(self, stat, wfile):
+        fdir, fname = os.path.split(wfile)
         newfile = entry_dialog(self, "Rename file to:", True, fname)
         if newfile and newfile != fname:
-            self._hg_move([file, os.path.join(fdir, newfile)])
+            self._hg_move([wfile, os.path.join(fdir, newfile)])
         return True
 
 
-    def _copy_file(self, stat, file):
-        file = self.repo.wjoin(file)
-        fdir, fname = os.path.split(file)
+    def _copy_file(self, stat, wfile):
+        wfile = self.repo.wjoin(wfile)
+        fdir, fname = os.path.split(wfile)
         dialog = gtk.FileChooserDialog(parent=self,
                 title='Copy file to',
                 action=gtk.FILE_CHOOSER_ACTION_SAVE,
@@ -703,12 +703,12 @@ class GStatus(GDialog):
         dialog.set_current_folder(fdir)
         dialog.set_current_name(fname)
         response = dialog.run()
-        newfile=file
+        newfile=wfile
         if response == gtk.RESPONSE_OK:
             newfile = dialog.get_filename()
         dialog.destroy()
-        if newfile != file:
-            self._hg_copy([file, newfile])
+        if newfile != wfile:
+            self._hg_copy([wfile, newfile])
         return True
 
 
@@ -765,7 +765,7 @@ class GStatus(GDialog):
         ''' Update the diff text with merge diff to both parents'''
         def dohgdiff():
             difftext = ['===== Diff to first parent =====\n']
-            wfiles = [self.repo.wjoin(file)]
+            wfiles = [self.repo.wjoin(wfile)]
             matcher = cmdutil.match(self.repo, wfiles, self.opts)
             for s in patch.diff(self.repo, self.repo.dirstate.parents()[0], None,
                     match=matcher, opts=patch.diffopts(self.ui, self.opts)):
@@ -805,9 +805,9 @@ class GStatus(GDialog):
             if not sel:
                 self._last_file = None
                 return False
-            file = self.filemodel[sel[0]][FM_PATH_UTF8]
-            if force or file != self._last_file:
-                self._last_file = file
+            wfile = self.filemodel[sel[0]][FM_PATH_UTF8]
+            if force or wfile != self._last_file:
+                self._last_file = wfile
                 self._hg_call_wrapper('Diff', dohgdiff)
         return False
 
@@ -818,11 +818,11 @@ class GStatus(GDialog):
             if not sel:
                 self._last_file = None
                 return False
-            file = util.pconvert(self.filemodel[sel[0]][FM_PATH])
-            if force or file != self._last_file:
-                self._last_file = file
-                if file in self._filechunks:
-                    row = self._filechunks[file][0]
+            wfile = util.pconvert(self.filemodel[sel[0]][FM_PATH])
+            if force or wfile != self._last_file:
+                self._last_file = wfile
+                if wfile in self._filechunks:
+                    row = self._filechunks[wfile][0]
                     self.diff_tree.scroll_to_cell((row, ), None, True)
                     selection = self.diff_tree.get_selection()
                     selection.unselect_all()
@@ -833,13 +833,13 @@ class GStatus(GDialog):
         dmodel = dtree.get_model()
         row = dmodel[path]
         chunk = self._shelve_chunks[row[DM_CHUNK_ID]]
-        file = chunk.filename()
-        if file not in self._filechunks:
+        wfile = chunk.filename()
+        if wfile not in self._filechunks:
             return
         for fr in self.filemodel:
-            if util.pconvert(fr[FM_PATH]) == file:
+            if util.pconvert(fr[FM_PATH]) == wfile:
                 break
-        fchunks = self._filechunks[file][1:]
+        fchunks = self._filechunks[wfile][1:]
         if row[DM_IS_HEADER]:
             for n in fchunks:
                 dmodel[n][DM_REJECTED] = fr[FM_CHECKED]
@@ -857,13 +857,13 @@ class GStatus(GDialog):
         # Update file's check status
         if fr[FM_PARTIAL_SELECTED] != partial:
             fr[FM_PARTIAL_SELECTED] = partial
-            self._update_partial(dmodel, file, partial)
+            self._update_partial(dmodel, wfile, partial)
         if fr[FM_CHECKED] != newvalue:
             fr[FM_CHECKED] = newvalue
             self._update_check_count()
 
-    def _update_partial(self, dmodel, file, partial):
-        hc = self._filechunks[file][0]
+    def _update_partial(self, dmodel, wfile, partial):
+        hc = self._filechunks[wfile][0]
         row = dmodel[hc]
         displayed = row[DM_DISPLAYED]
         tag = ' ** Partial **'
@@ -1004,18 +1004,18 @@ class GStatus(GDialog):
         return True
 
 
-    def _revert_file(self, stat, file):
-        self._hg_revert([file])
+    def _revert_file(self, stat, wfile):
+        self._hg_revert([wfile])
         return True
 
 
-    def _log_file(self, stat, file):
+    def _log_file(self, stat, wfile):
         from gtools import cmdtable
         from history import GLog
         
         # Might want to include 'rev' here... trying without
         statopts = self.merge_opts(cmdtable['glog|ghistory'][1], ('include', 'exclude', 'git'))
-        dialog = GLog(self.ui, self.repo, self.cwd, [file], statopts, False)
+        dialog = GLog(self.ui, self.repo, self.cwd, [wfile], statopts, False)
         dialog.display()
         return True
 
@@ -1058,8 +1058,8 @@ class GStatus(GDialog):
         return True
 
 
-    def _add_file(self, stat, file):
-        self._hg_add([file])
+    def _add_file(self, stat, wfile):
+        self._hg_add([wfile])
         return True
 
 
@@ -1116,16 +1116,16 @@ class GStatus(GDialog):
                     'Note: only clean files can be moved.', self).run()
         return True
 
-    def _delete_file(self, stat, file):
-        self._delete_files([file])
+    def _delete_file(self, stat, wfile):
+        self._delete_files([wfile])
 
     def _delete_files(self, files):
         dialog = Confirm('Delete unrevisioned', files, self)
         if dialog.run() == gtk.RESPONSE_YES :
             errors = ''
-            for file in files:
+            for wfile in files:
                 try: 
-                    os.unlink(self.repo.wjoin(file))
+                    os.unlink(self.repo.wjoin(wfile))
                 except Exception, inst:
                     errors += str(inst) + '\n\n'
 
@@ -1138,15 +1138,15 @@ class GStatus(GDialog):
             self.reload_status()
         return True
 
-    def _guess_rename(self, stat, file):
+    def _guess_rename(self, stat, wfile):
         import rename
         dialog = rename.DetectRenameDialog(self.repo.root)
         dialog.show_all()
         dialog.set_notify_func(self.ignoremask_updated)
 
-    def _ignore_file(self, stat, file):
+    def _ignore_file(self, stat, wfile):
         import hgignore
-        dialog = hgignore.HgIgnoreDialog(self.repo.root, util.pconvert(file))
+        dialog = hgignore.HgIgnoreDialog(self.repo.root, util.pconvert(wfile))
         dialog.show_all()
         dialog.set_notify_func(self.ignoremask_updated)
         return True
@@ -1155,23 +1155,23 @@ class GStatus(GDialog):
         '''User has changed the ignore mask in hgignore dialog'''
         self.reload_status()
 
-    def _mark_resolved(self, stat, file):
+    def _mark_resolved(self, stat, wfile):
         ms = merge_.mergestate(self.repo)
-        ms.mark(util.pconvert(file), "r")
+        ms.mark(util.pconvert(wfile), "r")
         self.reload_status()
 
 
-    def _unmark_resolved(self, stat, file):
+    def _unmark_resolved(self, stat, wfile):
         ms = merge_.mergestate(self.repo)
-        ms.mark(util.pconvert(file), "u")
+        ms.mark(util.pconvert(wfile), "u")
         self.reload_status()
 
 
-    def _do_resolve(self, stat, file):
+    def _do_resolve(self, stat, wfile):
         ms = merge_.mergestate(self.repo)
         wctx = self.repo[None]
         mctx = wctx.parents()[-1]
-        ms.resolve(util.pconvert(file), wctx, mctx)
+        ms.resolve(util.pconvert(wfile), wctx, mctx)
         self.reload_status()
 
 
