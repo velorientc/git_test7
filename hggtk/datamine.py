@@ -213,6 +213,7 @@ class DataMineDialog(GDialog):
 
         treeview = gtk.TreeView()
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
+        treeview.set_rules_hint(True)
         treeview.set_property('fixed-height-mode', True)
         treeview.connect("cursor-changed", self._grep_selection_changed)
         treeview.connect('button-release-event', self._grep_button_release)
