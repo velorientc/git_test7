@@ -10,7 +10,6 @@ import gobject
 import os
 import pango
 import Queue
-import re
 import threading, thread2
 import time
 from mercurial import hg, ui, util, revlog
@@ -276,8 +275,8 @@ class DataMineDialog(GDialog):
     def trigger_search(self, button, objs):
         (model, frame, regexp, follow, ignorecase, 
                 excludes, includes, linenum, showall, search_hbox) = objs
-        re = regexp.get_text()
-        if not re:
+        retext = regexp.get_text()
+        if not retext:
             Prompt('No regular expression given',
                     'You must provide a search expression', self).run()
             regexp.grab_focus()
@@ -295,7 +294,7 @@ class DataMineDialog(GDialog):
             if i: args.extend(['-I', i])
         for x in excs:
             if x: args.extend(['-X', x])
-        args.append(re)
+        args.append(retext)
         thread = thread2.Thread(target=hgcmd_toq, args=args)
         thread.start()
         frame._mythread = thread
@@ -307,7 +306,7 @@ class DataMineDialog(GDialog):
         self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
 
         hbox = gtk.HBox()
-        lbl = gtk.Label('Search "%s"' % re.split()[0])
+        lbl = gtk.Label('Search "%s"' % retext.split()[0])
         close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
         hbox.pack_start(lbl, True, True, 2)
