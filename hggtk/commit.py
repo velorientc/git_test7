@@ -294,9 +294,10 @@ class GCommit(GStatus):
     def _commit_selected(self, files):
         import hgshelve
         # 1a. get list of chunks not rejected
-        files = [util.pconvert(f) for f in files]
-        hlist = [x[DM_CHUNK_ID] for x in self.diff_model if not x[DM_REJECTED]]
         repo, chunks, ui = self.repo, self._shelve_chunks, self.ui
+        model = self.diff_model
+        files = [util.pconvert(f) for f in files]
+        hlist = [x[DM_CHUNK_ID] for x in model if not x[DM_REJECTED]]
 
         # 2. backup changed files, so we can restore them in the end
         backups = {}
@@ -311,9 +312,12 @@ class GCommit(GStatus):
         try:
             # backup continues
             for f in files:
-                if f not in self._filechunks: continue
-                if len(self._filechunks[f]) == 1: continue
                 if f not in self.modified: continue
+                fh = self._filechunks.get(f)
+                if not fh or len(fh) < 2: continue
+                # unfiltered files do not go through backup-revert-patch cycle
+                rejected = [x for x in fh[1:] if model[x][DM_REJECTED]]
+                if len(rejected) == 0: continue
                 fd, tmpname = tempfile.mkstemp(prefix=f.replace('/', '_')+'.',
                                                dir=backupdir)
                 os.close(fd)
