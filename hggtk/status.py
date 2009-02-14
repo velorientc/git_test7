@@ -932,7 +932,7 @@ class GStatus(GDialog):
                                True, n, self.headerfont]
                         self.diff_model.append(row)
                         skip = chunk.special()
-                    elif skip != True:
+                    elif not skip:
                         f = chunk.filename()
                         self._filechunks[f].append(len(self.diff_model))
                         row = [False, markedup, text, markedup,
