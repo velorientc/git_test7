@@ -144,9 +144,9 @@ class ConfigDialog(gtk.Dialog):
             for name in self.ini['paths']:
                 if name in ('default', 'default-push'): continue
                 path = self.ini['paths'][name]
-                iter = self.pathdata.insert_before(None, None)
-                self.pathdata.set_value(iter, 0, "%s" % name)
-                self.pathdata.set_value(iter, 1, "%s" % path)
+                i = self.pathdata.insert_before(None, None)
+                self.pathdata.set_value(i, 0, "%s" % name)
+                self.pathdata.set_value(i, 1, "%s" % path)
 
         # Define view model for 'Paths' tab
         self.pathtree = gtk.TreeView()
@@ -341,12 +341,12 @@ class ConfigDialog(gtk.Dialog):
         
     def new_path(self, newpath):
         '''Add a new path to [paths], give default name, focus'''
-        iter = self.pathdata.insert_before(None, None)
-        self.pathdata.set_value(iter, 0, 'new')
-        self.pathdata.set_value(iter, 1, '%s' % newpath)
-        self.pathtree.get_selection().select_iter(iter)
+        i = self.pathdata.insert_before(None, None)
+        self.pathdata.set_value(i, 0, 'new')
+        self.pathdata.set_value(i, 1, '%s' % newpath)
+        self.pathtree.get_selection().select_iter(i)
         self.pathtree.set_cursor(
-                self.pathdata.get_path(iter),
+                self.pathdata.get_path(i),
                 self.pathtree.get_column(0), 
                 start_editing=True)
         self.refresh_path_list()
@@ -366,9 +366,9 @@ class ConfigDialog(gtk.Dialog):
         selection = self.pathtree.get_selection()
         if not selection.count_selected_rows():
             return
-        model, iter = selection.get_selected()
-        next_iter = self.pathdata.iter_next(iter)
-        del self.pathdata[iter]
+        model, path = selection.get_selected()
+        next_iter = self.pathdata.iter_next(path)
+        del self.pathdata[path]
         if next_iter:
             selection.select_iter(next_iter)
         elif len(self.pathdata):
@@ -384,8 +384,8 @@ class ConfigDialog(gtk.Dialog):
             error_dialog(self, 'No Repository Found', 
                     'Path testing cannot work without a repository')
             return
-        model, iter = selection.get_selected()
-        testpath = model[iter][1]
+        model, path = selection.get_selected()
+        testpath = model[path][1]
         if not testpath:
             return
         if testpath[0] == '~':
@@ -418,7 +418,7 @@ class ConfigDialog(gtk.Dialog):
             vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
             combo.connect("changed", self.dirty_event)
-            combo.set_row_separator_func(lambda model, iter: model[iter][1])
+            combo.set_row_separator_func(lambda model, path: model[path][1])
             widgets.append(combo)
 
             lbl = gtk.Label(label + ':')
