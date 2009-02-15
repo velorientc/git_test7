@@ -17,6 +17,10 @@ from mercurial import hg, ui, cmdutil, util, patch
 from mercurial.i18n import _
 from shlib import set_tortoise_icon
 
+class NoSuchFile(Exception):
+    def __init__(self, filename):
+        self.filename = filename
+
 class DiffWindow(gtk.Window):
     """Diff window.
 
