@@ -11,7 +11,6 @@ except:
     pass
 
 import os
-import sys
 import gtk
 from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
