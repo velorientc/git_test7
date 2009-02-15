@@ -18,6 +18,16 @@ New features and improvement since 0.6:
     Added support for refreshing an applied MQ patch.
     Improved support for merge (two parent) commits.
 
+  * Qct has been unbundled and must be downloaded separately.  We
+    strongly suggest you use the internal tool instead, as it has better
+    change selection support than Qct and it is much better integrated
+    into TortoiseHg.
+
+  * The tortoisehg.commit configuration setting has been obsoleted.
+    TortoiseHg will always use the internal commit tool by default,
+    unless the user selects Qct as the prefered *external* commit tool.
+    Settings->Global->Commit tab->External Commit Tool
+
   * Synchronize window now supports reading bundle files (*.hg).
     Recognizes whether it has been launched in push or pull mode
 

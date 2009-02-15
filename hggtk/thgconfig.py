@@ -43,9 +43,9 @@ _tortoise_info = (
 _commit_info = (
     ('Username', 'ui.username', [], 
         'Name associated with commits'),
-    ('Commit Tool', 'tortoisehg.commit', ['internal', 'qct'],
-        'Select commit tool launched by TortoiseHg. Qct must'
-        ' must be installed separately'),
+    ('External Commit Tool', 'tortoisehg.extcommit', ['None', 'qct'],
+        'Select commit tool launched by TortoiseHg. Qct must must be'
+        ' installed separately.  Default: None'),
     ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
         'Move diff panel below file list in status and'
         ' commit dialogs.  Default: False'))

@@ -514,8 +514,8 @@ def launch(root='', files=[], cwd='', main=True):
         repo = hg.repository(u, path=cwd)
         files = [cwd]
 
-    ct = repo.ui.config('tortoisehg', 'commit', 'internal')
-    if ct not in ['', 'internal']:
+    ct = repo.ui.config('tortoisehg', 'extcommit', None)
+    if ct == 'qct':
         from hglib import thgdispatch
         args = ['--repository', root, ct]
         try:
