@@ -183,13 +183,6 @@ class HgIgnoreDialog(gtk.Window):
             pass
         shell_notify(self.repo.wjoin('.hgignore'))
         if self.notify_func: self.notify_func()
-
-    def _toolbutton(self, stock, label, handler, tip):
-        tbutton = gtk.ToolButton(stock)
-        tbutton.set_label(label)
-        tbutton.set_tooltip(self.tips, tip)
-        tbutton.connect('clicked', handler)
-        return tbutton
         
 def run(root='', **opts):
     dialog = HgIgnoreDialog(root)

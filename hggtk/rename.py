@@ -15,7 +15,7 @@ import Queue
 import threading, thread2
 from dialog import error_dialog
 from mercurial import hg, ui, mdiff, cmdutil, match, util, commands
-from hglib import toutf, diffexpand
+from hglib import toutf, diffexpand, rootpath
 import gtklib
 try:
     from mercurial.repo import RepoError
@@ -145,13 +145,13 @@ class DetectRenameDialog(gtk.Window):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         diffframe.add(scroller)
         
-        buffer = gtk.TextBuffer()
-        buffer.create_tag('removed', foreground='#900000')
-        buffer.create_tag('added', foreground='#006400')
-        buffer.create_tag('position', foreground='#FF8000')
-        buffer.create_tag('header', foreground='#000090')
+        buf = gtk.TextBuffer()
+        buf.create_tag('removed', foreground='#900000')
+        buf.create_tag('added', foreground='#006400')
+        buf.create_tag('position', foreground='#FF8000')
+        buf.create_tag('header', foreground='#000090')
 
-        diffview = gtk.TextView(buffer)
+        diffview = gtk.TextView(buf)
         diffview.modify_font(pango.FontDescription('monospace'))
         diffview.set_wrap_mode(gtk.WRAP_NONE)
         diffview.set_editable(False)
@@ -175,7 +175,7 @@ class DetectRenameDialog(gtk.Window):
 
         unknowntree.get_selection().connect('changed', self.unknown_sel_change, fr, fc)
         ctree.connect('row-activated', self.candidate_row_act, unknowntree, stbar)
-        ctree.get_selection().connect('changed', self.show_diff, buffer, ac)
+        ctree.get_selection().connect('changed', self.show_diff, buf, ac)
         self.connect('map_event', self.on_window_map_event, unkmodel)
         self.connect('delete-event', self.save_settings,
                 settings, hpaned, vpaned, adjustment)
@@ -322,7 +322,7 @@ class DetectRenameDialog(gtk.Window):
         fr.set_sensitive(sensitive)
         fc.set_sensitive(sensitive)
 
-    def show_diff(self, selection, buffer, ac):
+    def show_diff(self, selection, buf, ac):
         'User selected a row in the candidate tree'
         model, paths = selection.get_selected_rows()
         sensitive = paths and True or False
@@ -333,8 +333,8 @@ class DetectRenameDialog(gtk.Window):
         except RepoError:
             return
 
-        buffer.set_text('')
-        iter = buffer.get_start_iter()
+        buf.set_text('')
+        bufiter = buf.get_start_iter()
         for path in paths:
             row = model[path]
             src, dest, percent, sensitive = row
@@ -347,24 +347,24 @@ class DetectRenameDialog(gtk.Window):
             difftext = mdiff.unidiff(rr, '', aa, '', src, dest, None, opts=opts)
             if not difftext:
                 l = '== %s and %s have identical contents ==\n\n' % (src, dest)
-                buffer.insert(iter, l)
+                buf.insert(bufiter, l)
                 continue
             difflines = difftext.splitlines(True)
             for line in difflines:
                 line = toutf(line)
                 if line.startswith('---') or line.startswith('+++'):
-                    buffer.insert_with_tags_by_name(iter, line, 'header')
+                    buf.insert_with_tags_by_name(bufiter, line, 'header')
                 elif line.startswith('-'):
                     line = diffexpand(line)
-                    buffer.insert_with_tags_by_name(iter, line, 'removed')
+                    buf.insert_with_tags_by_name(bufiter, line, 'removed')
                 elif line.startswith('+'):
                     line = diffexpand(line)
-                    buffer.insert_with_tags_by_name(iter, line, 'added')
+                    buf.insert_with_tags_by_name(bufiter, line, 'added')
                 elif line.startswith('@@'):
-                    buffer.insert_with_tags_by_name(iter, line, 'position')
+                    buf.insert_with_tags_by_name(bufiter, line, 'position')
                 else:
                     line = diffexpand(line)
-                    buffer.insert(iter, line)
+                    buf.insert(bufiter, line)
 
 def run(fname='', target='', detect=True, root='', **opts):
     if detect:
@@ -388,8 +388,7 @@ def rename_resp(dialog, response):
         gtk.main_quit()
         return
     try:
-        import hglib
-        root = hglib.rootpath()
+        root = rootpath()
         repo = hg.repository(ui.ui(), root)
     except ImportError, RepoError:
         gtk.main_quit()
@@ -403,30 +402,29 @@ def rename_resp(dialog, response):
 
     saved = sys.stderr
     errors = cStringIO.StringIO()
-    quit = False
+    toquit = False
     try:
         sys.stderr = errors
         repo.ui.pushbuffer()
         try:
             commands.rename(repo.ui, repo, dialog.orig, new_name, **opts)
-            quit = True
+            toquit = True
         except util.Abort, inst:
             error_dialog(None, 'rename error', str(inst))
-            quit = False
+            toquit = False
     finally:
         sys.stderr = saved
         textout = errors.getvalue() + repo.ui.popbuffer() 
         errors.close()
         if len(textout) > 1:
             error_dialog(None, 'rename error', textout)
-        elif quit:
+        elif toquit:
             gtk.main_quit()
 
 if __name__ == "__main__":
     opts = {'fname' : sys.argv[1]}
     if '--detect' in sys.argv:
-        import hglib
-        opts['root'] = hglib.rootpath()
+        opts['root'] = rootpath()
         opts['detect'] = True
     elif len(sys.argv) == 3:
         opts['target'] = sys.argv[2]

@@ -116,18 +116,18 @@ class SynchDialog(gtk.Window):
         # revisions  combo box
         self.pathlist = gtk.ListStore(str, str, bool)
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
-        self._pathbox.set_row_separator_func(lambda model, iter: model[iter][2])
+        self._pathbox.set_row_separator_func(lambda model, i: model[i][2])
         self._pathtext = self._pathbox.get_child()
         self.fill_path_combo()
         defrow = None
         defpushrow = None
-        for iter, (path, name, sep) in enumerate(self.pathlist):
+        for i, (path, name, sep) in enumerate(self.pathlist):
             if name == 'default':
-                defrow = iter
+                defrow = i
                 if defpushrow is None:
-                    defpushrow = iter
+                    defpushrow = i
             elif name == 'default-push':
-                defpushrow = iter
+                defpushrow = i
 
         if repos:
             self._pathtext.set_text(repos[0])
@@ -354,10 +354,10 @@ class SynchDialog(gtk.Window):
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
         dialog.set_default_response(gtk.RESPONSE_OK)
         dialog.set_current_folder(self.root)
-        filter = gtk.FileFilter()
-        filter.set_name("Bundle (*.hg)")
-        filter.add_pattern("*.hg")
-        dialog.add_filter(filter)
+        filefilter = gtk.FileFilter()
+        filefilter.set_name("Bundle (*.hg)")
+        filefilter.add_pattern("*.hg")
+        dialog.add_filter(filefilter)
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             self._pathtext.set_text(dialog.get_filename())

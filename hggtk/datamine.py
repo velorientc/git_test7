@@ -13,7 +13,7 @@ import Queue
 import threading, thread2
 import time
 from mercurial import hg, ui, util, revlog
-from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime, LookupError
+from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime, LookupError, rootpath
 from gdialog import *
 from vis import treemodel
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
@@ -545,8 +545,8 @@ class DataMineDialog(GDialog):
 
     def log_activate(self, treeview, path, column, objs):
         model = treeview.get_model()
-        iter = model.get_iter(path)
-        rev = model.get_value(iter, treemodel.REVID)
+        logiter = model.get_iter(path)
+        rev = model.get_value(logiter, treemodel.REVID)
         self.trigger_annotate(rev, objs)
 
     def revisions_loaded(self, graphview, rev):
@@ -635,10 +635,10 @@ class DataMineDialog(GDialog):
         (path, focus) = treeview.get_cursor()
         model = treeview.get_model()
         if path is not None and model is not None:
-            iter = model.get_iter(path)
-            self.currev = model[iter][self.COL_REVID]
+            anniter = model.get_iter(path)
+            self.currev = model[anniter][self.COL_REVID]
             self.path = model.path
-            self.stbar.set_status_text(model[iter][self.COL_TOOLTIP])
+            self.stbar.set_status_text(model[anniter][self.COL_TOOLTIP])
 
     def _ann_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
@@ -677,8 +677,8 @@ def run(root='', cwd='', files=[], **opts):
         if os.path.isfile(f):
             cf.append(util.canonpath(root, cwd, f))
         elif os.path.isdir(f):
-            Prompt('Invalid path', "Can't annotate directory: %s" % f,
-                    dialog).run()
+            Prompt('Invalid path',
+                    'Cannot annotate directory: %s' % f, None).run()
 
     dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
     dialog.display()
@@ -695,9 +695,8 @@ def run(root='', cwd='', files=[], **opts):
 
 if __name__ == "__main__":
     import sys
-    import hglib
     opts = {}
     opts['cwd'] = os.getcwd()
-    opts['root'] = hglib.rootpath()
+    opts['root'] = rootpath()
     opts['files'] = sys.argv[1:] or []
     run(**opts)

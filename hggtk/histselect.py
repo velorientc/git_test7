@@ -119,8 +119,8 @@ class HistoryDialog(gtk.Dialog):
         model, selpaths = tv.get_selection().get_selected_rows()
         if not selpaths: return
         cs = model[selpaths[0]][1]
-        rev, id = cs.split(':')
-        self.selected = (rev, id)
+        rev, csid = cs.split(':')
+        self.selected = (rev, csid)
         
     def _get_hg_history(self, rev=None, limit=10):    
         # get history

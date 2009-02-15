@@ -133,12 +133,12 @@ class GStatus(GDialog):
             for check in self._show_checks.values():
                 check.set_active(True)
         else:
-            set = False
+            wasset = False
             for opt in self.opts :
                 if opt in self._show_checks and self.opts[opt]:
-                    set = True
+                    wasset = True
                     self._show_checks[opt].set_active(True)
-            if not set:
+            if not wasset:
                 for check in [item[1] for item in self._show_checks.iteritems() 
                               if item[0] in ('modified', 'added', 'removed', 
                                              'deleted', 'unknown')]:
@@ -436,11 +436,11 @@ class GStatus(GDialog):
         if self.count_revs() <= 1:
             checks += ('deleted', 'unknown', 'clean', 'ignored')
 
-        for type in checks:
-            check = gtk.CheckButton('_' + type)
-            check.connect('toggled', self._show_toggle, type)
+        for ctype in checks:
+            check = gtk.CheckButton('_' + ctype)
+            check.connect('toggled', self._show_toggle, ctype)
             table.attach(check, col, col+1, row, row+1)
-            self._show_checks[type] = check
+            self._show_checks[ctype] = check
             col += row
             row = not row
             
@@ -547,7 +547,7 @@ class GStatus(GDialog):
         # List of the currently checked and selected files to pass on to the new data
         model, paths = self.filetree.get_selection().get_selected_rows()
         recheck = [entry[FM_PATH_UTF8] for entry in model if entry[FM_CHECKED]]
-        reselect = [model[iter][FM_PATH_UTF8] for iter in paths]
+        reselect = [model[path][FM_PATH_UTF8] for path in paths]
 
         # merge-state of files
         ms = merge_.mergestate(self.repo)
@@ -633,8 +633,8 @@ class GStatus(GDialog):
             row[DM_DISPLAYED] = row[DM_MARKUP]
 
 
-    def _show_toggle(self, check, type):
-        self.opts[type] = check.get_active()
+    def _show_toggle(self, check, toggletype):
+        self.opts[toggletype] = check.get_active()
         self.reload_status()
         return True
 
@@ -654,8 +654,8 @@ class GStatus(GDialog):
         return min(max(result, -1), 1)
         
 
-    def _text_color(self, column, text_renderer, list, row_iter):
-        stat = list[row_iter][FM_STATUS]
+    def _text_color(self, column, text_renderer, model, row_iter):
+        stat = model[row_iter][FM_STATUS]
         if stat == 'M':  
             text_renderer.set_property('foreground', '#000090')
         elif stat == 'A':
@@ -775,28 +775,28 @@ class GStatus(GDialog):
                     match=matcher, opts=patch.diffopts(self.ui, self.opts)):
                 difftext.extend(s.splitlines(True))
 
-            buffer = gtk.TextBuffer()
-            buffer.create_tag('removed', foreground='#900000')
-            buffer.create_tag('added', foreground='#006400')
-            buffer.create_tag('position', foreground='#FF8000')
-            buffer.create_tag('header', foreground='#000090')
+            buf = gtk.TextBuffer()
+            buf.create_tag('removed', foreground='#900000')
+            buf.create_tag('added', foreground='#006400')
+            buf.create_tag('position', foreground='#FF8000')
+            buf.create_tag('header', foreground='#000090')
 
-            iter = buffer.get_start_iter()
+            bufiter = buf.get_start_iter()
             for line in difftext:
                 line = toutf(line)
                 if line.startswith('---') or line.startswith('+++'):
-                    buffer.insert_with_tags_by_name(iter, line, 'header')
+                    buf.insert_with_tags_by_name(bufiter, line, 'header')
                 elif line.startswith('-'):
                     line = diffexpand(line)
-                    buffer.insert_with_tags_by_name(iter, line, 'removed')
+                    buf.insert_with_tags_by_name(bufiter, line, 'removed')
                 elif line.startswith('+'):
                     line = diffexpand(line)
-                    buffer.insert_with_tags_by_name(iter, line, 'added')
+                    buf.insert_with_tags_by_name(bufiter, line, 'added')
                 elif line.startswith('@@'):
-                    buffer.insert_with_tags_by_name(iter, line, 'position')
+                    buf.insert_with_tags_by_name(bufiter, line, 'position')
                 else:
                     line = diffexpand(line)
-                    buffer.insert(iter, line)
+                    buf.insert(bufiter, line)
 
             self.merge_diff_text.set_buffer(buffer)
 
@@ -1199,9 +1199,9 @@ class GStatus(GDialog):
         selection = self.filetree.get_selection()
         assert(selection.count_selected_rows() == 1)
 
-        list, paths = selection.get_selected_rows() 
+        model, paths = selection.get_selected_rows() 
         path = paths[0]
-        handler(list[path][1], list[path][3])
+        handler(model[path][1], model[path][3])
         return True
 
 
@@ -1235,17 +1235,17 @@ class GStatus(GDialog):
         if selection.count_selected_rows() != 1:
             return False
 
-        list, paths = selection.get_selected_rows() 
-        menu = self._get_file_context_menu(list[paths[0]])
+        model, paths = selection.get_selected_rows() 
+        menu = self._get_file_context_menu(model[paths[0]])
         menu.popup(None, None, None, button, time)
         return True
 
 
     def _tree_key_press(self, tree, event):
         if event.keyval == 32:
-            def toggler(list, path, iter):
-                list[path][FM_CHECKED] = not list[path][FM_CHECKED]
-                self._update_chunk_state(list[path])
+            def toggler(model, path, bufiter):
+                model[path][FM_CHECKED] = not model[path][FM_CHECKED]
+                self._update_chunk_state(model[path])
 
             selection = self.filetree.get_selection()
             selection.selected_foreach(toggler)
@@ -1266,8 +1266,8 @@ class GStatus(GDialog):
         if selection.count_selected_rows() != 1:
             return False
 
-        list, paths = selection.get_selected_rows() 
-        menu = self._get_file_context_menu(list[paths[0]])
+        model, paths = selection.get_selected_rows() 
+        menu = self._get_file_context_menu(model[paths[0]])
         menu.get_children()[0].activate()
         return True
 

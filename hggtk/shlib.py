@@ -42,11 +42,11 @@ class SimpleMRUList(object):
 
     def compact(self):
         ''' remove duplicate in list '''
-        list = []
+        newlist = []
         for v in self._list:
-            if v not in list:
-                list.append(v)
-        self._list[:] = list
+            if v not in newlist:
+                newlist.append(v)
+        self._list[:] = newlist
 
 
 class Settings(object):
@@ -62,7 +62,7 @@ class Settings(object):
     def get_value(self, key, default=None, create=False):
         if key in self._data:
             return self._data[key]
-        elif create == True:
+        elif create:
             self._data[key] = default
         return default
 
@@ -128,8 +128,8 @@ def get_system_times():
         t = (t[0], t[1], t[2], t[3], time.clock())
     return t
     
-def set_tortoise_icon(window, icon):
-    window.set_icon_from_file(get_tortoise_icon(icon))
+def set_tortoise_icon(window, thgicon):
+    window.set_icon_from_file(get_tortoise_icon(thgicon))
     # Global keybindings for TortoiseHg
     window.connect('key-press-event', window_key)
 
@@ -138,26 +138,26 @@ def window_key(window, event):
         devent = gtk.gdk.Event(gtk.gdk.DELETE)
         window.emit('delete_event', devent)
 
-def get_tortoise_icon(icon):
+def get_tortoise_icon(thgicon):
     '''Find a tortoise icon, apply to PyGtk window'''
     # The context menu should set this variable
     var = os.environ.get('THG_ICON_PATH', None)
     paths = var and [ var ] or []
     try:
         # Else try relative paths from hggtk, the repository layout
-        dir = os.path.dirname(__file__)
-        paths.append(os.path.join(dir, '..', 'icons'))
+        fdir = os.path.dirname(__file__)
+        paths.append(os.path.join(fdir, '..', 'icons'))
         # ... or the source installer layout
-        paths.append(os.path.join(dir, '..', '..', '..',
+        paths.append(os.path.join(fdir, '..', '..', '..',
             'share', 'tortoisehg', 'icons'))
     except NameError: # __file__ is not always available
         pass
     for p in paths:
-        path = os.path.join(p, 'tortoise', icon)
+        path = os.path.join(p, 'tortoise', thgicon)
         if os.path.isfile(path):
             return path
     else:
-        print 'icon not found', icon
+        print 'icon not found', thgicon
         return None
 
 def version():

@@ -139,7 +139,7 @@ class ServeDialog(gtk.Window):
         return tbutton
             
     def _delete(self, widget, event):
-        if self._server_stopped() == True:
+        if self._server_stopped():
             gtk.main_quit()
         else:
             return True

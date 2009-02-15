@@ -10,7 +10,6 @@ try:
 except:
     pass
 
-import sys
 import gtk
 import gobject
 from mercurial import hg, ui, cmdutil, util, node

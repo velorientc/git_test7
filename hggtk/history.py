@@ -65,8 +65,8 @@ class GLog(GDialog):
              ] + self.changeview.get_tbbuttons()
 
     def toggle_view_column(self, button, property):
-        bool = button.get_active()
-        self.graphview.set_property(property, bool)
+        active = button.get_active()
+        self.graphview.set_property(property, active)
 
     def _more_clicked(self, button):
         self.graphview.next_revision_batch(self.limit)
@@ -254,12 +254,12 @@ class GLog(GDialog):
 
         GDialog.load_settings(self, settings)
         if settings:
-            set = settings['glog']
-            if type(set) == int:
-                self._setting_vpos = set
+            data = settings['glog']
+            if type(data) == int:
+                self._setting_vpos = data
                 self._setting_hpos = -1
             else:
-                (self._setting_vpos, self._setting_hpos) = set
+                (self._setting_vpos, self._setting_hpos) = data
         else:
             self._setting_vpos = -1
             self._setting_hpos = -1
@@ -282,8 +282,8 @@ class GLog(GDialog):
             if 'revrange' in filteropts or 'branch' in filteropts:
                 self.graphview.refresh(True, branch, self.opts)
             else:
-                filter = filteropts.get('pats', [])
-                self.graphview.refresh(False, filter, self.opts)
+                pattern = filteropts.get('pats', [])
+                self.graphview.refresh(False, pattern, self.opts)
         elif self._filter == "all":
             self.graphview.refresh(True, None, self.opts)
         elif self._filter == "only_merges":

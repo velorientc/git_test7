@@ -313,7 +313,6 @@ def run(root='', **opts):
     gtk.gdk.threads_leave()
 
 if __name__ == "__main__":
-    import sys
     opts = {}
     opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
     run(**opts)
