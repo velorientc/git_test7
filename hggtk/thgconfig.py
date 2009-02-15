@@ -18,6 +18,164 @@ import iniparse
 
 _unspecstr = '<unspecified>'
 
+_tortoise_info = (
+    ('3-way Merge Tool', 'ui.merge', [],
+        'Graphical merge program for resolving merge conflicts.  If left'
+        ' unspecified, Mercurial will use the first applicable tool it finds'
+        ' on your system or use its internal merge tool that leaves conflict'
+        ' markers in place.'),
+    ('Visual Diff Command', 'tortoisehg.vdiff', [],
+        'Specify visual diff tool; must be an extdiff command'),
+    ('Visual Editor', 'tortoisehg.editor', [],
+        'Specify the visual editor used to view files, etc'),
+    ('CLI Editor', 'ui.editor', [],
+        'The editor to use during a commit and other'
+        ' instances where Mercurial needs multiline input from'
+        ' the user.  Only used by CLI commands.'),
+    ('Tab Width', 'tortoisehg.tabwidth', [],
+        'Specify the number of spaces to expand tabs.'
+        ' Default: Not expanded'),
+    ('Overlay Icons', 'tortoisehg.overlayicons',
+        ['False', 'True', 'localdisks'],
+        'Display overlay icons in Explorer windows.'
+        ' Default: True'))
+
+_commit_info = (
+    ('Username', 'ui.username', [], 
+        'Name associated with commits'),
+    ('Commit Tool', 'tortoisehg.commit', ['internal', 'qct'],
+        'Select commit tool launched by TortoiseHg. Qct must'
+        ' must be installed separately'),
+    ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
+        'Move diff panel below file list in status and'
+        ' commit dialogs.  Default: False'))
+
+_log_info = (
+    ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
+        'Color changesets by author name.  If not enabled,'
+        ' the changes are colored green for merge, red for'
+        ' non-trivial parents, black for normal. Default: False'),
+    ('Long Summary', 'tortoisehg.longsummary', ['False', 'True'],
+        'Concatenate multiple lines of changeset summary'
+        ' until they reach 80 characters. Default: False'),
+    ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
+        'The number of revisions to read and display in the'
+        ' changelog viewer in a single batch. Default: 500'),
+    ('Copy Hash', 'tortoisehg.copyhash', ['False', 'True'],
+        'Allow the changelog viewer to copy hash of currently'
+        ' selected changeset into the clipboard. Default: False'))
+
+_paths_info = (
+    ('default', 'paths.default', [],
+        'Directory or URL to use when pulling if no source is specified.'
+        ' Default is set to repository from which the repository was cloned.'),
+    ('default-push', 'paths.default-push', [],
+        'Optional. Directory or URL to use when pushing if no'
+        ' destination is specified.'''))
+
+_web_info = (
+    ('Name', 'web.name', ['unknown'],
+        'Repository name to use in the web interface.  Default'
+        ' is the working directory.'),
+    ('Description', 'web.description', ['unknown'],
+        'Textual description of the repository''s purpose or'
+        ' contents.'),
+    ('Contact', 'web.contact', ['unknown'],
+        'Name or email address of the person in charge of the'
+        ' repository.'),
+    ('Style', 'web.style',
+        ['paper', 'monoblue', 'coal', 'spartan', 'gitweb', 'old'],
+        'Which template map style to use'),
+    ('Archive Formats', 'web.allow_archive', ['bz2', 'gz', 'zip'],
+        'Comma separated list of archive formats allowed for'
+        ' downloading'),
+    ('Port', 'web.port', ['8000'], 'Port to listen on'),
+    ('Push Requires SSL', 'web.push_ssl', ['True', 'False'],
+        'Whether to require that inbound pushes be transported'
+        ' over SSL to prevent password sniffing.'),
+    ('Stripes', 'web.stripes', ['1', '0'],
+        'How many lines a "zebra stripe" should span in multiline'
+        ' output. Default is 1; set to 0 to disable.'),
+    ('Max Files', 'web.maxfiles', ['10'],
+        'Maximum number of files to list per changeset.'),
+    ('Max Changes', 'web.maxfiles', ['10'],
+        'Maximum number of changes to list on the changelog.'),
+    ('Allow Push', 'web.allow_push', ['*'],
+        'Whether to allow pushing to the repository. If empty or not'
+        ' set, push is not allowed. If the special value "*", any remote'
+        ' user can push, including unauthenticated users. Otherwise, the'
+        ' remote user must have been authenticated, and the authenticated'
+        ' user name must be present in this list (separated by whitespace'
+        ' or ","). The contents of the allow_push list are examined after'
+        ' the deny_push list.'),
+    ('Deny Push', 'web.deny_push', ['*'],
+        'Whether to deny pushing to the repository. If empty or not set,'
+        ' push is not denied. If the special value "*", all remote users'
+        ' are denied push. Otherwise, unauthenticated users are all'
+        ' denied, and any authenticated user name present in this list'
+        ' (separated by whitespace or ",") is also denied. The contents'
+        ' of the deny_push list are examined before the allow_push list.'),
+    ('Encoding', 'web.encoding', ['UTF-8'],
+        'Character encoding name'))
+
+_proxy_info = (
+    ('host', 'http_proxy.host', [],
+        'Host name and (optional) port of proxy server, for'
+        ' example "myproxy:8000"'),
+    ('no', 'http_proxy.no', [],
+        'Optional. Comma-separated list of host names that'
+        ' should bypass the proxy'),
+    ('passwd', 'http_proxy.passwd', [],
+        'Optional. Password to authenticate with at the'
+        ' proxy server'),
+    ('user', 'http_proxy.user', [],
+        'Optional. User name to authenticate with at the'
+        ' proxy server'))
+
+_email_info = (
+    ('From', 'email.from', [],
+        'Email address to use in "From" header and SMTP envelope'),
+    ('To', 'email.to', [],
+        'Comma-separated list of recipient email addresses'),
+    ('Cc', 'email.cc', [],
+        'Comma-separated list of carbon copy recipient email'
+        ' addresses'),
+    ('Bcc', 'email.bcc', [],
+        'Comma-separated list of blind carbon copy recipient'
+        ' email addresses'),
+    ('method', 'email.method', ['smtp'],
+'Optional. Method to use to send email messages. If value is "smtp" (default),'
+' use SMTP (configured below).  Otherwise, use as name of program to run that'
+' acts like sendmail (takes "-f" option for sender, list of recipients on'
+' command line, message on stdin). Normally, setting this to "sendmail" or'
+' "/usr/sbin/sendmail" is enough to use sendmail to send messages.'),
+    ('SMTP Host', 'smtp.host', [], 'Host name of mail server'),
+    ('SMTP Port', 'smtp.port', ['25'],
+        'Port to connect to on mail server. Default: 25'),
+    ('SMTP TLS', 'smtp.tls', ['False', 'True'],
+        'Connect to mail server using TLS.  Default: False'),
+    ('SMTP Username', 'smtp.username', [],
+        'Username to authenticate to SMTP server with'),
+    ('SMTP Password', 'smtp.password', [],
+        'Password to authenticate to SMTP server with'),
+    ('Local Hostname', 'smtp.local_hostname', [],
+        'Hostname the sender can use to identify itself to MTA'))
+
+_diff_info = (
+    ('Git Format', 'diff.git', ['False', 'True'],
+        'Use git extended diff format.'),
+    ('No Dates', 'diff.nodates', ['False', 'True'],
+        'Do no include dates in diff headers.'),
+    ('Show Function', 'diff.showfunc', ['False', 'True'],
+        'Show which function each change is in.'),
+    ('Ignore White Space', 'diff.ignorews', ['False', 'True'],
+        'Ignore white space when comparing lines.'),
+    ('Ignore WS Amount', 'diff.ignorewsamount', ['False', 'True'],
+        'Ignore changes in the amount of white space.'),
+    ('Ignore Blank Lines', 'diff.ignoreblanklines',
+        ['False', 'True'],
+        'Ignore changes whose lines are all blank.'))
+
 class ConfigDialog(gtk.Dialog):
     def __init__(self, root='',
             configrepo=False,
@@ -73,68 +231,17 @@ class ConfigDialog(gtk.Dialog):
         self.history = shlib.Settings('config_history')
 
         # create pages for each section of configuration file
-        self._tortoise_info = (
-                ('3-way Merge Tool', 'ui.merge', [],
-'Graphical merge program for resolving merge conflicts.  If left'
-' unspecified, Mercurial will use the first applicable tool it finds'
-' on your system or use its internal merge tool that leaves conflict'
-' markers in place.'),
-                ('Visual Diff Command', 'tortoisehg.vdiff', [],
-                    'Specify visual diff tool; must be an extdiff command'),
-                ('Visual Editor', 'tortoisehg.editor', [],
-                    'Specify the visual editor used to view files, etc'),
-                ('CLI Editor', 'ui.editor', [],
-                    'The editor to use during a commit and other'
-                    ' instances where Mercurial needs multiline input from'
-                    ' the user.  Only used by CLI commands.'),
-                ('Tab Width', 'tortoisehg.tabwidth', [],
-                    'Specify the number of spaces to expand tabs.'
-                    ' Default: Not expanded'),
-                ('Overlay Icons', 'tortoisehg.overlayicons',
-                    ['False', 'True', 'localdisks'],
-                    'Display overlay icons in Explorer windows.'
-                    ' Default: True'))
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
-        self.fill_frame(self.tortoise_frame, self._tortoise_info)
+        self.fill_frame(self.tortoise_frame, _tortoise_info)
 
-        self._commit_info = (
-                ('Username', 'ui.username', [], 
-                    'Name associated with commits'),
-                ('Commit Tool', 'tortoisehg.commit', ['internal', 'qct'],
-                    'Select commit tool launched by TortoiseHg. Qct must'
-                    ' must be installed separately'),
-                ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
-                    'Move diff panel below file list in status and'
-                    ' commit dialogs.  Default: False'))
         self.commit_frame = self.add_page(notebook, 'Commit')
-        self.fill_frame(self.commit_frame, self._commit_info)
+        self.fill_frame(self.commit_frame, _commit_info)
 
-        self._log_info = (
-                ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
-                    'Color changesets by author name.  If not enabled,'
-                    ' the changes are colored green for merge, red for'
-                    ' non-trivial parents, black for normal. Default: False'),
-                ('Long Summary', 'tortoisehg.longsummary', ['False', 'True'],
-                    'Concatenate multiple lines of changeset summary'
-                    ' until they reach 80 characters. Default: False'),
-                ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
-                    'The number of revisions to read and display in the'
-                    ' changelog viewer in a single batch. Default: 500'),
-                ('Copy Hash', 'tortoisehg.copyhash', ['False', 'True'],
-                    'Allow the changelog viewer to copy hash of currently'
-                    ' selected changeset into the clipboard. Default: False'))
         self.log_frame = self.add_page(notebook, 'Changelog')
-        self.fill_frame(self.log_frame, self._log_info)
+        self.fill_frame(self.log_frame, _log_info)
 
-        self._paths_info = (
-                ('default', 'paths.default', [],
-'Directory or URL to use when pulling if no source is specified.'
-' Default is set to repository from which the current repository was cloned.'),
-                ('default-push', 'paths.default-push', [],
-'Optional. Directory or URL to use when pushing if no'
-' destination is specified.'''))
         self.paths_frame = self.add_page(notebook, 'Paths')
-        vbox = self.fill_frame(self.paths_frame, self._paths_info)
+        vbox = self.fill_frame(self.paths_frame, _paths_info)
 
         # Initialize data model for 'Paths' tab
         self.pathdata = gtk.ListStore(
@@ -191,118 +298,17 @@ class ConfigDialog(gtk.Dialog):
         vbox.pack_start(buttonbox, False, False, 4)
         self.refresh_path_list()
 
-
-        self._web_info = (
-                ('Name', 'web.name', ['unknown'],
-                    'Repository name to use in the web interface.  Default'
-                    ' is the working directory.'),
-                ('Description', 'web.description', ['unknown'],
-                    'Textual description of the repository''s purpose or'
-                    ' contents.'),
-                ('Contact', 'web.contact', ['unknown'],
-                    'Name or email address of the person in charge of the'
-                    ' repository.'),
-                ('Style', 'web.style',
-                    ['paper', 'monoblue', 'coal', 'spartan', 'gitweb', 'old'],
-                    'Which template map style to use'),
-                ('Archive Formats', 'web.allow_archive', ['bz2', 'gz', 'zip'],
-                    'Comma separated list of archive formats allowed for'
-                    ' downloading'),
-                ('Port', 'web.port', ['8000'], 'Port to listen on'),
-                ('Push Requires SSL', 'web.push_ssl', ['True', 'False'],
-                    'Whether to require that inbound pushes be transported'
-                    ' over SSL to prevent password sniffing.'),
-                ('Stripes', 'web.stripes', ['1', '0'],
-                    'How many lines a "zebra stripe" should span in multiline'
-                    ' output. Default is 1; set to 0 to disable.'),
-                ('Max Files', 'web.maxfiles', ['10'],
-                    'Maximum number of files to list per changeset.'),
-                ('Max Changes', 'web.maxfiles', ['10'],
-                    'Maximum number of changes to list on the changelog.'),
-                ('Allow Push', 'web.allow_push', ['*'],
-'Whether to allow pushing to the repository. If empty or not'
-' set, push is not allowed. If the special value "*", any remote'
-' user can push, including unauthenticated users. Otherwise, the'
-' remote user must have been authenticated, and the authenticated'
-' user name must be present in this list (separated by whitespace'
-' or ","). The contents of the allow_push list are examined after'
-' the deny_push list.'),
-                ('Deny Push', 'web.deny_push', ['*'],
-'Whether to deny pushing to the repository. If empty or not set,'
-' push is not denied. If the special value "*", all remote users'
-' are denied push. Otherwise, unauthenticated users are all'
-' denied, and any authenticated user name present in this list'
-' (separated by whitespace or ",") is also denied. The contents'
-' of the deny_push list are examined before the allow_push list.'),
-                ('Encoding', 'web.encoding', ['UTF-8'],
-                    'Character encoding name'))
         self.web_frame = self.add_page(notebook, 'Web')
-        self.fill_frame(self.web_frame, self._web_info)
+        self.fill_frame(self.web_frame, _web_info)
 
-        self._proxy_info = (
-                ('host', 'http_proxy.host', [],
-                    'Host name and (optional) port of proxy server, for'
-                    ' example "myproxy:8000"'),
-                ('no', 'http_proxy.no', [],
-                    'Optional. Comma-separated list of host names that'
-                    ' should bypass the proxy'),
-                ('passwd', 'http_proxy.passwd', [],
-                    'Optional. Password to authenticate with at the'
-                    ' proxy server'),
-                ('user', 'http_proxy.user', [],
-                    'Optional. User name to authenticate with at the'
-                    ' proxy server'))
         self.proxy_frame = self.add_page(notebook, 'Proxy')
-        self.fill_frame(self.proxy_frame, self._proxy_info)
+        self.fill_frame(self.proxy_frame, _proxy_info)
 
-        self._email_info = (
-                ('From', 'email.from', [],
-                    'Email address to use in "From" header and SMTP envelope'),
-                ('To', 'email.to', [],
-                    'Comma-separated list of recipient email addresses'),
-                ('Cc', 'email.cc', [],
-                    'Comma-separated list of carbon copy recipient email'
-                    ' addresses'),
-                ('Bcc', 'email.bcc', [],
-                    'Comma-separated list of blind carbon copy recipient'
-                    ' email addresses'),
-                ('method', 'email.method', ['smtp'],
-'Optional. Method to use to send email messages. If value is "smtp" (default),'
-' use SMTP (configured below).  Otherwise, use as name of program to run that'
-' acts like sendmail (takes "-f" option for sender, list of recipients on'
-' command line, message on stdin). Normally, setting this to "sendmail" or'
-' "/usr/sbin/sendmail" is enough to use sendmail to send messages.'),
-                ('SMTP Host', 'smtp.host', [], 'Host name of mail server'),
-                ('SMTP Port', 'smtp.port', ['25'],
-                    'Port to connect to on mail server. Default: 25'),
-                ('SMTP TLS', 'smtp.tls', ['False', 'True'],
-                    'Connect to mail server using TLS.  Default: False'),
-                ('SMTP Username', 'smtp.username', [],
-                    'Username to authenticate to SMTP server with'),
-                ('SMTP Password', 'smtp.password', [],
-                    'Password to authenticate to SMTP server with'),
-                ('Local Hostname', 'smtp.local_hostname', [],
-                    'Hostname the sender can use to identify itself to MTA'))
         self.email_frame = self.add_page(notebook, 'Email')
-        self.fill_frame(self.email_frame, self._email_info)
+        self.fill_frame(self.email_frame, _email_info)
 
-        self._diff_info = (
-                ('Git Format', 'diff.git', ['False', 'True'],
-                    'Use git extended diff format.'),
-                ('No Dates', 'diff.nodates', ['False', 'True'],
-                    'Do no include dates in diff headers.'),
-                ('Show Function', 'diff.showfunc', ['False', 'True'],
-                    'Show which function each change is in.'),
-                ('Ignore White Space', 'diff.ignorews', ['False', 'True'],
-                    'Ignore white space when comparing lines.'),
-                ('Ignore WS Amount', 'diff.ignorewsamount', ['False', 'True'],
-                    'Ignore changes in the amount of white space.'),
-                ('Ignore Blank Lines', 'diff.ignoreblanklines',
-                    ['False', 'True'],
-                    'Ignore changes whose lines are all blank.'),
-                )
         self.diff_frame = self.add_page(notebook, 'Diff')
-        self.fill_frame(self.diff_frame, self._diff_info)
+        self.fill_frame(self.diff_frame, _diff_info)
 
         # Force dialog into clean state in the beginning
         self._refresh_vlist()
@@ -390,7 +396,8 @@ class ConfigDialog(gtk.Dialog):
             return
         if testpath[0] == '~':
             testpath = os.path.expanduser(testpath)
-        cmdline = ['hg', 'incoming', '--repository', self.root, '--verbose', testpath]
+        cmdline = ['hg', 'incoming', '--repository', self.root,
+                   '--verbose', testpath]
         from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
@@ -577,7 +584,7 @@ class ConfigDialog(gtk.Dialog):
             f.write(str(self.ini))
             f.close()
         except IOError, e:
-            error_dialog(self, 'Unable to write back configuration file', str(e))
+            error_dialog(self, 'Unable to write configuration file', str(e))
 
         self._btn_apply.set_sensitive(False)
         self.dirty = False
