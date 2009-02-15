@@ -116,9 +116,9 @@ class HistoryDialog(gtk.Dialog):
         self.treeview.append_column(column)
 
     def _cursor_changed(self, tv):
-        (model, iter) = tv.get_selection().get_selected()
-        path = self.model.get_path(iter)
-        cs = self.history[path[0]]['changeset'][0]
+        model, selpaths = tv.get_selection().get_selected_rows()
+        if not selpaths: return
+        cs = model[selpaths[0]][1]
         rev, id = cs.split(':')
         self.selected = (rev, id)
         
@@ -231,21 +231,6 @@ class HistoryDialog(gtk.Dialog):
             return True
         return False
 
-    def _get_selected_revision(self):
-        treeselection = treeview.get_selection()
-        mode = treeselection.get_mode()
-        list = []
-        if mode == gtk.SELECTION_MULTIPLE:
-            (model, pathlist) = treeselection.get_selected_rows()
-            for p in pathlist:
-                iter = model.get_iter(p)
-                list.append(model.get_value(iter, index))
-        else:
-            (model, iter) = treeselection.get_selected()
-            list.append(model.get_value(iter, index))
-        
-        return list
-        
 def run(root='', files=[], **opts):
     dialog = HistoryDialog(root=root, files=files)
     dialog.show_all()
