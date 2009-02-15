@@ -190,7 +190,6 @@ class TagAddDialog(gtk.Window):
         # gather input data
         is_local = self._local_tag.get_active()
         name = self._tag_input.get_text()
-        rev = self._rev_input.get_text()
         use_msg = self._use_msg.get_active()
         
         # verify input
