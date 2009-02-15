@@ -127,9 +127,12 @@ class GShelve(GStatus):
             self.shelve_btn.set_sensitive(False)
             self.unshelve_btn.set_sensitive(False)
 
-    def _shelve_selected(self):
+    def _shelve_selected(self, file=None):
         # get list of hunks that have not been rejected
+        chunks = self._shelve_chunks
         hlist = [x[DM_CHUNK_ID] for x in self.diff_model if not x[DM_REJECTED]]
+        if file:
+            hlist = [cid for cid in hlist if chunks[cid].filename() == file]
         if not hlist:
             Prompt('Shelve', 'Please select diff chunks to shelve',
                     self).run()
@@ -156,7 +159,7 @@ class GShelve(GStatus):
         # capture the selected hunks to shelve
         fc = []
         sc = []
-        for n, c in enumerate(self._shelve_chunks):
+        for n, c in enumerate(chunks):
             if isinstance(c, hgshelve.header):
                 if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
                     sc += fc
@@ -195,7 +198,8 @@ class GShelve(GStatus):
         self._activate_shelve_buttons(True)
 
     def _shelve_file(self, stat, file):
-        self._hg_shelve([file])
+        self._shelve_selected(file)
+        self._activate_shelve_buttons(True)
         return True
 
 
