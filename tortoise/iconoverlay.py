@@ -119,7 +119,7 @@ class IconOverlayExtension(object):
         if cache_pdir == pdir:
             root = cache_root
         else:
-            print "find new root"
+            print "find new root from", upath, "was", cache_pdir
             cache_pdir = pdir
             cache_root = root = thgutil.find_root(pdir)
         print "_get_state: root = ", root
