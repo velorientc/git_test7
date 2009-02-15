@@ -35,7 +35,7 @@ def internalpatch(patchobj, ui, strip, cwd, reverse=False, files={}):
         if cwd:
             os.chdir(curdir)
     if ret < 0:
-        raise PatchError
+        raise patch.PatchError
     return ret > 0
 
 def scanpatch(fp):
