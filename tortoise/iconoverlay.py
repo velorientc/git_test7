@@ -119,10 +119,10 @@ class IconOverlayExtension(object):
         if cache_pdir == pdir:
             root = cache_root
         else:
-            print "find new root from", upath, "was", cache_pdir
+            print "find new root from", path, "was", cache_pdir
             cache_pdir = pdir
             cache_root = root = thgutil.find_root(pdir)
-        print "_get_state: root = ", root
+        print "_get_state: new root = ", root
         if root is None:
             print "_get_state: not in repo"
             overlay_cache = {None : None}
@@ -138,8 +138,8 @@ class IconOverlayExtension(object):
             global_opts = ui.ui().configlist('tortoisehg', 'overlayicons', [])
             repo_opts = repo.ui.configlist('tortoisehg', 'overlayicons', [])
             
-            print "%s: global overlayicons = " % path, global_opts
-            print "%s: repo overlayicons = " % path, repo_opts
+            # print "%s: global overlayicons = " % path, global_opts
+            # print "%s: repo overlayicons = " % path, repo_opts
             is_netdrive =  thgutil.netdrive_status(path) is not None
             if (is_netdrive and 'localdisks' in global_opts) \
                     or 'False' in repo_opts:
@@ -204,8 +204,8 @@ class IconOverlayExtension(object):
                 return S_OK
             return S_FALSE
         finally:
-            print "IsMemberOf: _get_state() took %d ticks" % \
-                    (win32api.GetTickCount() - tc)
+            print "IsMemberOf(%s): _get_state() took %d ticks" % \
+                    (self.state, win32api.GetTickCount() - tc)
             
 def make_icon_overlay(name, icon_type, state, clsid):
     """
