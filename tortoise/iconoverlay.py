@@ -10,6 +10,7 @@ import _winreg
 from mercurial import hg, cmdutil, util
 import thgutil
 import sys
+import threading
 
 try:
     from mercurial.error import RepoError
@@ -37,6 +38,8 @@ overlay_cache = {}
 cache_tick_count = 0
 cache_root = None
 cache_pdir = None
+
+cache_lock = threading.Semaphore()
 
 # some misc constants
 S_OK = 0
@@ -198,12 +201,15 @@ class IconOverlayExtension(object):
         return status
 
     def IsMemberOf(self, path, attrib):                  
+        global cache_lock
         try:
+            cache_lock.acquire()
             tc = win32api.GetTickCount()
             if self._get_state(path) == self.state:
                 return S_OK
             return S_FALSE
         finally:
+            cache_lock.release()
             print "IsMemberOf(%s): _get_state() took %d ticks" % \
                     (self.state, win32api.GetTickCount() - tc)
             
