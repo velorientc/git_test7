@@ -149,15 +149,16 @@ class HgIgnoreDialog(gtk.Window):
         try: repo = hg.repository(ui.ui(), path=self.root)
         except: gtk.main_quit()
         matcher = match.always(repo.root, repo.root)
-        changes = repo.dirstate.status(matcher, ignored=False, clean=False, unknown=True)
-        (lookup, modified, added, removed, deleted, unknown, ignored, clean) = changes
+        changes = repo.dirstate.status(matcher, unknown=True)
+        (lookup, modified, added, removed,
+         deleted, unknown, ignored, clean) = changes
         self.unkmodel.clear()
         for u in unknown:
             self.unkmodel.append([u])
         try:
             l = open(repo.wjoin('.hgignore'), 'rb').readlines()
             self.doseoln = l[0].endswith('\r\n')
-        except IOError, ValueError:
+        except (IOError, ValueError), e:
             self.doseoln = os.name == 'nt'
             l = []
 
