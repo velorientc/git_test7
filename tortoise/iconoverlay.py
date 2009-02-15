@@ -97,7 +97,7 @@ class IconOverlayExtension(object):
             path = upath
 
         # check if path is cached
-        pdir = os.path.dirname(path)
+        pdir = os.path.isdir(path) and path or os.path.dirname(path)
         if cache_pdir == pdir and overlay_cache:
             if tc - cache_tick_count < CACHE_TIMEOUT:
                 try:
@@ -119,7 +119,7 @@ class IconOverlayExtension(object):
         if cache_pdir == pdir:
             root = cache_root
         else:
-            print "find new root from", upath, "was", cache_pdir
+            print "find new root at", pdir, "Was", cache_pdir
             cache_pdir = pdir
             cache_root = root = thgutil.find_root(pdir)
         print "_get_state: root = ", root
