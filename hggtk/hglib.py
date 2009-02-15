@@ -85,7 +85,7 @@ def gettabwidth(ui):
         tabwidth = int(tabwidth)
         if tabwidth < 1 or tabwidth > 16:
             tabwidth = 0
-    except (ValueError, TypeError), e:
+    except (ValueError, TypeError):
         tabwidth = 0
     _tabwidth = tabwidth
     return tabwidth
@@ -372,7 +372,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     # Run actual command
     try:
         ret = d()
-    except TypeError, inst:
+    except TypeError:
         # was this an argument error?
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 2: # no

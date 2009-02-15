@@ -194,9 +194,10 @@ class FilterDialog(gtk.Dialog):
                 opts['keyword'] = [w.strip() for w in kw.split(',')]
             if date:
                 try:
-                    df = util.matchdate(date)
+                    # return of matchdate not used, just sanity checking
+                    util.matchdate(date)
                     opts['date'] = date
-                except Exception, e:
+                except (ValueError, util.Abort), e:
                     Prompt('Invalid date specification', str(e), self).run()
                     self.dateentry.grab_focus()
                     return
@@ -206,10 +207,10 @@ class FilterDialog(gtk.Dialog):
             if not rev1:
                 rev1 = rev0
             try:
-                range = cmdutil.revrange(self.repo, [rev0, rev1])
-                range.sort()
-                range.reverse()
-                opts['revrange'] = range
+                rrange = cmdutil.revrange(self.repo, [rev0, rev1])
+                rrange.sort()
+                rrange.reverse()
+                opts['revrange'] = rrange
             except Exception, e:
                 Prompt('Invalid revision range', str(e), self).run()
                 self.rev0Entry.grab_focus()

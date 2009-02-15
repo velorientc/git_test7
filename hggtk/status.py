@@ -522,7 +522,6 @@ class GStatus(GDialog):
             self._node1, self._node2 = cmdutil.revpair(self.repo, self.opts.get('rev'))
 
         matcher = cmdutil.match(self.repo, self.pats, self.opts)
-        cwd = (self.pats and self.repo.getcwd()) or ''
         status = [n for n in self.repo.status(node1=self._node1, node2=self._node2,
                                  match=matcher,
                                  ignored=self.test_opt('ignored'),

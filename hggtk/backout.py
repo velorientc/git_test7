@@ -6,7 +6,6 @@
 #
 
 import os
-import sys
 import gtk
 import pango
 from dialog import *

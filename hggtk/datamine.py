@@ -11,7 +11,6 @@ import os
 import pango
 import Queue
 import threading, thread2
-import time
 from mercurial import hg, ui, util, revlog
 from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime, LookupError, rootpath
 from gdialog import *

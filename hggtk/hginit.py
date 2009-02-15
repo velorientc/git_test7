@@ -8,7 +8,6 @@ import pygtk
 pygtk.require("2.0")
 import os
 import gtk
-import pango
 from dialog import error_dialog, info_dialog
 from mercurial import hg, ui, util
 from hglib import RepoError

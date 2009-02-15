@@ -5,8 +5,6 @@
 #
 
 import os
-import subprocess
-
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -712,9 +710,9 @@ class ChangeSet(GDialog):
             self.glog_parent.graphview.refresh(True, None, opts)
         else:
             # Else launch our own GLog instance
-            from history import GLog
-            dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root],
-                    {}, False)
+            import history
+            dialog = history.GLog(self.ui, self.repo, self.cwd,
+                                  [self.repo.root], {}, False)
             dialog.open_with_file(self.curfile)
             dialog.display()
 

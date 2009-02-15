@@ -292,7 +292,6 @@ class GCommit(GStatus):
         return True
 
     def _commit_selected(self, files):
-        import hgshelve
         # 1a. get list of chunks not rejected
         repo, chunks, ui = self.repo, self._shelve_chunks, self.ui
         model = self.diff_model
@@ -520,10 +519,10 @@ def launch(root='', files=[], cwd='', main=True):
         from hglib import thgdispatch
         args = ['--repository', root, ct]
         try:
-            ret = thgdispatch(repo.ui, args=args)
+            thgdispatch(repo.ui, args=args)
         except SystemExit:
             pass
-        return None
+        return
 
     cmdoptions = {
         'user':'', 'date':'',

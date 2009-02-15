@@ -11,8 +11,6 @@ except:
     pass
 
 import gtk
-import gobject
-import pango
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import *

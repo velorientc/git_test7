@@ -12,7 +12,7 @@ import pango
 import cStringIO
 import shlib
 import Queue
-import threading, thread2
+import thread2
 from dialog import error_dialog
 from mercurial import hg, ui, mdiff, cmdutil, match, util, commands
 from hglib import toutf, diffexpand, rootpath
@@ -30,7 +30,6 @@ def findmoves(repo, added, removed, threshold):
     ctx = repo['.']
     for r in removed:
         rr = ctx.filectx(r).data()
-        bestname, bestscore = None, threshold
         for a in added:
             aa = repo.wread(a)
             if aa == rr:

@@ -229,7 +229,7 @@ class GLog(GDialog):
                 l = int(limit)
                 if l > 0:
                     return l
-            except (TypeError, ValueError), e:
+            except (TypeError, ValueError):
                 pass
         return l or 500
 
@@ -276,7 +276,6 @@ class GLog(GDialog):
         self.opts['revrange'] = filteropts.get('revrange', None)
         self.opts['date'] = filteropts.get('date', None)
         self.opts['keyword'] = filteropts.get('keyword', [])
-        revs = []
         if filteropts:
             branch = filteropts.get('branch', None)
             if 'revrange' in filteropts or 'branch' in filteropts:
@@ -482,11 +481,9 @@ class GLog(GDialog):
     def _add_tag(self, menuitem):
         from tagadd import TagAddDialog
 
-        rev = self.currow[treemodel.REVID]
-        parents = self.currow[treemodel.PARENTS]
-        
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
+        rev = self.currow[treemodel.REVID]
         
         def refresh(*args):
             self.repo.invalidate()

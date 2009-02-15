@@ -158,7 +158,7 @@ class HgIgnoreDialog(gtk.Window):
         try:
             l = open(repo.wjoin('.hgignore'), 'rb').readlines()
             self.doseoln = l[0].endswith('\r\n')
-        except (IOError, ValueError), e:
+        except (IOError, ValueError):
             self.doseoln = os.name == 'nt'
             l = []
 

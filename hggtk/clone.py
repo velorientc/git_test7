@@ -218,7 +218,7 @@ class CloneDialog(gtk.Window):
     def _btn_rev_clicked(self, button):
         """ select revision from history dialog """
         import histselect
-        rev = histselect.select(self.root)
+        rev = histselect.select()
         if rev is not None:
             self._rev_input.set_text(rev)
 

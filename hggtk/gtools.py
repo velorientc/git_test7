@@ -47,13 +47,10 @@ diffcmd diffopts file_rev1 file_rev2
 import mercurial.demandimport; mercurial.demandimport.disable()
 
 import os
-import sys
 
 import pygtk
 pygtk.require('2.0')
 import gtk
-import gobject
-import pango
 
 from mercurial.i18n import _
 from mercurial.node import *

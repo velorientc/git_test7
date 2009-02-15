@@ -9,7 +9,6 @@ import os
 import sys
 import gtk
 import pango
-import shelve
 import shlib
 from tempfile import mkstemp
 from dialog import *

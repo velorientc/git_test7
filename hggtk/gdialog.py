@@ -59,8 +59,8 @@ class Confirm(SimpleMessage):
         primary = '<b>' + primary + '</b>'
         self.set_markup(toutf(primary))
         message = ''
-        for i, file in enumerate(files):
-            message += '   ' + file + '\n'
+        for i, f in enumerate(files):
+            message += '   ' + f + '\n'
             if i == 9: 
                 message += '   ...\n'
                 break
@@ -231,12 +231,12 @@ class GDialog(gtk.Window):
 
 
     def global_opts(self):
-        globals = {}
+        globalopts = {}
         hgglobals = [opt[1].replace('-', '_') for opt in commands.globalopts if opt[1] != 'help']
         for key in self.opts:
             if key in  hgglobals :
-                globals[key] = self.opts[key]
-        return globals
+                globalopts[key] = self.opts[key]
+        return globalopts
 
 
     def count_revs(self):
@@ -488,11 +488,11 @@ class NativeSaveFileDialogWrapper:
         return False
 
     def runWindows(self):
-        import win32gui, win32con, os
-        filter = ""
-        for name, pattern in self.Filter.iteritems():
-            filter += name + "\0" + pattern + "\0"
-        customfilter = "\0"
+        import win32gui, win32con
+        #filter = ""
+        #for name, pattern in self.Filter.iteritems():
+        #    filter += name + "\0" + pattern + "\0"
+        #customfilter = "\0"
 
         fname, customfilter, flags=win32gui.GetSaveFileNameW(
             InitialDir=self.InitialDir,
