@@ -96,9 +96,9 @@ class TagsDialog(gtk.Dialog):
         
     def _get_selected_tag(self, tv):
         treeselection = tv.get_selection()
-        mode = treeselection.get_mode()
-        (model, iter) = treeselection.get_selected()
-        self.selected = model.get_value(iter, 0)
+        model, paths = treeselection.get_selected_rows()
+        if paths:
+            self.selected = model[paths[0]][0]
 
 def run(root='', **opts):
     dialog = TagsDialog(root=root)
