@@ -672,16 +672,19 @@ def run(root='', cwd='', files=[], **opts):
         'include':[], 'exclude':[]
     }
 
-    dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
-    dialog.display()
+    cf = []
     for f in files:
         if os.path.isfile(f):
-            cf = util.canonpath(root, cwd, f) 
-            dialog.add_annotate_page(cf, '.')
+            cf.append(util.canonpath(root, cwd, f))
         elif os.path.isdir(f):
             Prompt('Invalid path', "Can't annotate directory: %s" % f,
                     dialog).run()
-                    
+
+    dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
+    dialog.display()
+
+    for f in cf:
+        dialog.add_annotate_page(f, '.')
     if not dialog.notebook.get_n_pages():
         dialog.add_search_page()
 
