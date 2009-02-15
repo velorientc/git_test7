@@ -6,8 +6,6 @@
 
 import os
 import subprocess
-import sys
-import time
 
 import pygtk
 pygtk.require('2.0')
@@ -184,7 +182,7 @@ class ChangeSet(GDialog):
             return False
 
         try:
-            status, file, txt = iterator.next()
+            status, wfile, txt = iterator.next()
         except StopIteration:
             self.stbar.end()
             return False
@@ -192,7 +190,7 @@ class ChangeSet(GDialog):
         lines = txt.splitlines()
         eob = buf.get_end_iter()
         offset = eob.get_offset()
-        fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, file)
+        fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, wfile)
         for l in lines:
             buf.insert(eob, l)
 
@@ -208,7 +206,7 @@ class ChangeSet(GDialog):
             pos = buf.get_iter_at_offset(offset)
             mark = 'mark_%d' % offset
             buf.create_mark(mark, pos)
-            filelist.append((status, toutf(file), mark, True, stats))
+            filelist.append((status, toutf(wfile), mark, True, stats))
         sob, eob = buf.get_bounds()
         buf.apply_tag_by_name("mono", pos, eob)
         return True
@@ -422,10 +420,10 @@ class ChangeSet(GDialog):
         statmax = max( statmax, stats[0]+stats[1] )
         return filespos, tags, outlines, statmax
 
-    def link_event(self, tag, widget, event, iter):
+    def link_event(self, tag, widget, event, liter):
         if event.type != gtk.gdk.BUTTON_RELEASE:
             return
-        text = self.get_link_text(tag, widget, iter)
+        text = self.get_link_text(tag, widget, liter)
         if not text:
             return
         linkrev = long(text.split(':')[0])
@@ -435,13 +433,13 @@ class ChangeSet(GDialog):
         else:
             self.load_details(linkrev)
 
-    def get_link_text(self, tag, widget, iter):
+    def get_link_text(self, tag, widget, liter):
         """handle clicking on a link in a textview"""
         text_buffer = widget.get_buffer()
-        beg = iter.copy()
+        beg = liter.copy()
         while not beg.begins_tag(tag):
             beg.backward_char()
-        end = iter.copy()
+        end = liter.copy()
         while not end.ends_tag(tag):
             end.forward_char()
         text = text_buffer.get_text(beg, end)
@@ -584,14 +582,14 @@ class ChangeSet(GDialog):
         tag_table.add( link_tag )
 
     def _filelist_rowchanged(self, sel):
-        model, iter = sel.get_selected()
-        if not iter:
+        model, path = sel.get_selected()
+        if not path:
             return
         # scroll to file in details window
-        mark = self._buffer.get_mark(model[iter][2])
+        mark = self._buffer.get_mark(model[path][2])
         self.textview.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
-        if model[iter][3]:
-            self.curfile = fromutf(model[iter][1])
+        if model[path][3]:
+            self.curfile = fromutf(model[path][1])
         else:
             self.curfile = None
 
@@ -634,9 +632,9 @@ class ChangeSet(GDialog):
         return True
 
     def _save_file_rev(self, menuitem):
-        file = util.localpath(self.curfile)
-        file, ext = os.path.splitext(os.path.basename(file))
-        filename = "%s@%d%s" % (file, self.currev, ext)
+        wfile = util.localpath(self.curfile)
+        wfile, ext = os.path.splitext(os.path.basename(wfile))
+        filename = "%s@%d%s" % (wfile, self.currev, ext)
         fd = NativeSaveFileDialogWrapper(Title = "Save file to",
                                          InitialDir=self.cwd,
                                          FileName=filename)

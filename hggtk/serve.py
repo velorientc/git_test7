@@ -351,7 +351,6 @@ def run(cwd='', root='', webdir_conf='', **opts):
     gtk.gdk.threads_leave()
     
 if __name__ == "__main__":
-    import sys
     opts = {}
     opts['cwd'] = os.getcwd()
     if len(sys.argv) == 2 and sys.argv[1].endswith('.conf'):

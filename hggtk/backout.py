@@ -57,8 +57,8 @@ class BackoutDialog(gtk.Window):
         self.logview = gtk.TextView(buffer=None)
         self.logview.set_editable(True)
         self.logview.modify_font(pango.FontDescription("Monospace"))
-        buffer = self.logview.get_buffer()
-        buffer.set_text('Backed out changeset: ' + rev)
+        buf = self.logview.get_buffer()
+        buf.set_text('Backed out changeset: ' + rev)
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -81,8 +81,8 @@ class BackoutDialog(gtk.Window):
         rev = histselect.select(self.root)
         if rev is not None:
             self.reventry.set_text(rev)
-            buffer = self.logview.get_buffer()
-            buffer.set_text('Backed out changeset: ' + rev)
+            buf = self.logview.get_buffer()
+            buf.set_text('Backed out changeset: ' + rev)
 
     def _toolbutton(self, stock, label, handler, tip):
         tbutton = gtk.ToolButton(stock)
@@ -92,10 +92,10 @@ class BackoutDialog(gtk.Window):
         return tbutton
         
     def _backout_clicked(self, button):
-        buffer = self.logview.get_buffer()
-        start, end = buffer.get_bounds()
+        buf = self.logview.get_buffer()
+        start, end = buf.get_bounds()
         cmdline = ['hg', 'backout', '--rev', self.reventry.get_text(),
-            '--message', buffer.get_text(start, end)]
+            '--message', buf.get_text(start, end)]
         dlg = CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()

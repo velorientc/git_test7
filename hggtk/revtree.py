@@ -83,19 +83,19 @@ class RevisionTree(gtk.ScrolledWindow):
         self.treeview.expand_all()
 
     def _cursor_changed(self, tv):
-        (model, iter) = tv.get_selection().get_selected()
-        path = self.model.get_path(iter)
-        cs = self.history[path[0]]['changeset'][0]
-        rev, id = cs.split(':')
-        self.selected = (rev, id)
+        model, selpaths = tv.get_selection().get_selected_rows()
+        if not selpaths: return
+        cs = model[selpaths[0]][1]
+        rev, csid = cs.split(':')
+        self.selected = (rev, csid)
 
     def get_revision(self, index):
         import string
         try:
             cs = self.history[index]
             revpair = cs['changeset'][0]
-            revnum, id = revpair.split(':')
-            return string.atoi(revnum), id
+            revnum, csid = revpair.split(':')
+            return string.atoi(revnum), csid
         except:
             return None
 

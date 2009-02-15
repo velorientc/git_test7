@@ -45,14 +45,14 @@ class GCommit(GStatus):
             self.opts['rev'] = ''
 
         if self.test_opt('message'):
-            buffer = gtk.TextBuffer()
-            buffer.set_text(self.opts['message'])
-            self.text.set_buffer(buffer)
+            buf = gtk.TextBuffer()
+            buf.set_text(self.opts['message'])
+            self.text.set_buffer(buf)
 
         if self.test_opt('logfile'):
-            buffer = gtk.TextBuffer()
-            buffer.set_text('Comment will be read from file ' + self.opts['logfile'])
-            self.text.set_buffer(buffer)
+            buf = gtk.TextBuffer()
+            buf.set_text('Comment will be read from file ' + self.opts['logfile'])
+            self.text.set_buffer(buf)
             self.text.set_sensitive(False)
 
 
@@ -104,15 +104,15 @@ class GCommit(GStatus):
         model = combobox.get_model()
         index = combobox.get_active()
         if index >= 0:
-            buffer = self.text.get_buffer()
-            begin, end = buffer.get_bounds()
-            cur_msg = buffer.get_text(begin, end)
+            buf = self.text.get_buffer()
+            begin, end = buf.get_bounds()
+            cur_msg = buf.get_text(begin, end)
             if len(cur_msg):
                 response = Confirm('Discard Message', [], self,
                         'Discard current commit message?').run()
                 if response != gtk.RESPONSE_YES:
                     return
-            buffer.set_text(model[index][1])
+            buf.set_text(model[index][1])
 
     def _update_recent_messages(self, msg=None):
         if msg is not None:
@@ -197,10 +197,10 @@ class GCommit(GStatus):
         # If there are more than a few character typed into the commit
         # message, ask if the exit should continue.
         live = False
-        buffer = self.text.get_buffer()
-        begin, end = buffer.get_bounds()
-        cur_msg = buffer.get_text(begin, end)
-        if buffer.get_char_count() > 10 and cur_msg != self.qheader:
+        buf = self.text.get_buffer()
+        begin, end = buf.get_bounds()
+        cur_msg = buf.get_text(begin, end)
+        if buf.get_char_count() > 10 and cur_msg != self.qheader:
             dialog = Confirm('Exit', [], self, 'Save commit message at exit?')
             res = dialog.run()
             if res == gtk.RESPONSE_YES:

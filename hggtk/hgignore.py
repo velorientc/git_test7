@@ -114,15 +114,15 @@ class HgIgnoreDialog(gtk.Window):
         self.refresh()
 
     def pattree_rowchanged(self, sel, remove):
-        model, iter = sel.get_selected()
-        sensitive = iter and True or False
+        model, paths = sel.get_selected()
+        sensitive = paths and True or False
         remove.set_sensitive(sensitive)
 
     def unknown_rowchanged(self, sel):
-        model, iter = sel.get_selected()
-        if not iter:
+        model, paths = sel.get_selected()
+        if not paths:
             return
-        self.glob_entry.set_text(model[iter][0])
+        self.glob_entry.set_text(model[paths][0])
 
     def add_glob(self, widget, glob_entry):
         newglob = glob_entry.get_text()

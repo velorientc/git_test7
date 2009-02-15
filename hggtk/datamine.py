@@ -349,10 +349,10 @@ class DataMineDialog(GDialog):
         (path, focus) = treeview.get_cursor()
         model = treeview.get_model()
         if path is not None and model is not None:
-            iter = model.get_iter(path)
-            self.currev = model[iter][self.COL_REVID]
-            self.curpath = fromutf(model[iter][self.COL_PATH])
-            self.stbar.set_status_text(toutf(model[iter][self.COL_TOOLTIP]))
+            paths = model.get_iter(path)
+            self.currev = model[paths][self.COL_REVID]
+            self.curpath = fromutf(model[paths][self.COL_PATH])
+            self.stbar.set_status_text(toutf(model[paths][self.COL_TOOLTIP]))
 
     def _stop_current_search(self, button, widget):
         num = self.notebook.get_current_page()
