@@ -14,7 +14,7 @@ import shlib
 import Queue
 import threading, thread2
 from dialog import error_dialog
-from mercurial import hg, ui, mdiff, cmdutil, match, util
+from mercurial import hg, ui, mdiff, cmdutil, match, util, commands
 from hglib import toutf, diffexpand
 import gtklib
 try:

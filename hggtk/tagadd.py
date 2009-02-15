@@ -16,7 +16,7 @@ import gtk
 from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
-from mercurial.node import short
+from mercurial.node import short, nullid
 from hglib import RepoError
 
 class TagAddDialog(gtk.Window):
