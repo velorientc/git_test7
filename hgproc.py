@@ -35,7 +35,7 @@ if not sys.stdin.isatty():
 # Map hgproc commands to dialog modules in hggtk/
 from hggtk import commit, status, addremove, tagadd, tags, history, merge
 from hggtk import diff, revisions, update, serve, clone, synch, hgcmd, about
-from hggtk import recovery, thgconfig, datamine, hginit, shelve, rename
+from hggtk import recovery, thgconfig, datamine, hginit, thgshelve, rename
 from hggtk import hgignore
 _dialogs = { 'commit' : commit,    'status' : status,    'revert' : status,
              'add'    : addremove, 'remove' : addremove, 'tag'    : tagadd,
