@@ -225,11 +225,8 @@ def rename(ui, *pats, **opts):
     from hggtk.rename import run
     if not pats or len(pats) > 2:
         raise util.Abort("rename takes one or two path arguments")
-    try:
-        opts['fname'] = pats[0]
-        opts['target'] = pats[1] or pats[0]
-    except IndexError:
-        pass
+    opts['files'] = pats
+    opts['detect'] = False
     run(**opts)
 
 def guess(ui, *pats, **opts):

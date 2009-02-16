@@ -365,7 +365,13 @@ class DetectRenameDialog(gtk.Window):
                     line = diffexpand(line)
                     buf.insert(bufiter, line)
 
-def run(fname='', target='', detect=True, root='', **opts):
+def run(files = [], detect=False, root='', **opts):
+    fname, target = '', ''
+    try:
+        fname = files[0]
+        target = files[1]
+    except IndexError:
+        pass
     if detect:
         dialog = DetectRenameDialog(root)
         dialog.show_all()
@@ -421,10 +427,11 @@ def rename_resp(dialog, response):
             gtk.main_quit()
 
 if __name__ == "__main__":
-    opts = {'fname' : sys.argv[1]}
     if '--detect' in sys.argv:
         opts['root'] = rootpath()
         opts['detect'] = True
     elif len(sys.argv) == 3:
-        opts['target'] = sys.argv[2]
+        opts = {'files' : sys.argv[1:2] }
+    else:
+        opts = {'files' : [sys.argv[1]] }
     run(**opts)
