@@ -38,8 +38,11 @@ def register_tortoise_path(unregister=False):
     key = r"Software\TortoiseHg"
     cat = _winreg.HKEY_LOCAL_MACHINE
     if (unregister):
-        _winreg.DeleteKey(cat, key)
-        print "TortoiseHg unregistered"
+        try:
+            _winreg.DeleteKey(cat, key)
+            print "TortoiseHg unregistered"
+        except WindowsError:
+            print 'TortoiseHg was not registered'
     else:
         _winreg.SetValue(cat, key, _winreg.REG_SZ, bin_path)
         print "TortoiseHg registered"
