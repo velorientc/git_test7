@@ -24,6 +24,8 @@ def find_root(path):
         p = os.path.dirname(p)
         if p == oldp:
             return None
+        if not os.access(p, os.R_OK):
+            return None
     return p
 
 if os.name == 'nt':
