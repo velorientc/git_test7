@@ -328,9 +328,19 @@ class ContextMenuExtension:
                            self._init, icon="menucreaterepos.ico",
                            state=os.path.isdir(rpath)))
         else:
+            for f in self._filenames:
+                if f.endswith('.hgignore'):
+                    result.append(TortoiseMenu(_("Modify ignore filter"),
+                           _("Modify repository ignore filter"),
+                           self._hgignore, icon="general.ico")) # needs ico
+                    break
+
             result.append(TortoiseMenu(_("View File Status"),
                            _("Repository status"),
                            self._status, icon="menushowchanged.ico"))
+            result.append(TortoiseMenu(_("(Un)Shelve Changes"),
+                           _("Shelve repository changes"),
+                           self._shelve, icon="general.ico")) # needs ico
 
             # Visual Diff (any extdiff command)
             has_vdiff = repo.ui.config('tortoisehg', 'vdiff', '') != ''
@@ -339,6 +349,15 @@ class ContextMenuExtension:
                            self._vdiff, icon="TortoiseMerge.ico",
                            state=has_vdiff))
                            
+            if len(self._filenames) == 0:
+                result.append(TortoiseMenu(_("Guess Renames"),
+                       _("Detect renames and copies"),
+                       self._guess_rename, icon="general.ico")) # needs ico
+            elif len(self._filenames) == 1:
+                result.append(TortoiseMenu(_("Rename file"),
+                       _("Rename file or directory"),
+                       self._rename, icon="general.ico")) # needs ico
+
             result.append(TortoiseMenu(_("Add Files"),
                            _("Add files to Hg repository"),
                            self._add, icon="menuadd.ico"))
@@ -549,6 +568,22 @@ class ContextMenuExtension:
     def _init(self, parent_window):
         self._run_dialog('init')
             
+    def _shelve(self, parent_window):
+        self._run_dialog('shelve')
+
+    def _hgignore(self, parent_window):
+        self._run_dialog('hgignore')
+
+    def _rename(self, parent_window):
+        src = self._filenames[0]
+        root = self._folder
+        cmdopts = "--verbose"
+        open_dialog('rename', cmdopts, root, filelist=[src])
+
+    def _guess_rename(self, parent_window):
+        root = self._folder
+        open_dialog('rename', '--detect', root)
+
     def _status(self, parent_window):
         self._run_dialog('status')
 
