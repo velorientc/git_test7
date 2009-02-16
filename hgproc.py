@@ -56,7 +56,7 @@ def get_list_from_file(filename):
 def get_option(args):
     import getopt
     long_opt_list = ('command=', 'exepath=', 'listfile=', 'root=', 'cwd=',
-            'deletelistfile', 'nogui')
+            'deletelistfile', 'nogui', 'detect')
     opts, args = getopt.getopt(args, "c:e:l:dR:", long_opt_list)
     # Set default options
     options = {}

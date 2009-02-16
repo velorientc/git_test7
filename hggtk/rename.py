@@ -365,7 +365,7 @@ class DetectRenameDialog(gtk.Window):
                     line = diffexpand(line)
                     buf.insert(bufiter, line)
 
-def run(files = [], detect=False, root='', **opts):
+def run(files = [], detect=False, root='', cwd='', **opts):
     fname, target = '', ''
     try:
         fname = files[0]
@@ -378,6 +378,10 @@ def run(files = [], detect=False, root='', **opts):
         dialog.connect('destroy', gtk.main_quit)
     else:
         from dialog import entry_dialog
+        if cwd: os.chdir(cwd)
+        fname = util.normpath(fname)
+        if target:
+            target = util.normpath(target)
         title = 'Rename ' + fname
         dialog = entry_dialog(None, title, True, target or fname, rename_resp)
         dialog.orig = fname
@@ -395,7 +399,7 @@ def rename_resp(dialog, response):
     try:
         root = rootpath()
         repo = hg.repository(ui.ui(), root)
-    except ImportError, RepoError:
+    except (ImportError, RepoError):
         gtk.main_quit()
         return
 
@@ -414,7 +418,7 @@ def rename_resp(dialog, response):
         try:
             commands.rename(repo.ui, repo, dialog.orig, new_name, **opts)
             toquit = True
-        except util.Abort, inst:
+        except (util.Abort, RepoError), inst:
             error_dialog(None, 'rename error', str(inst))
             toquit = False
     finally:

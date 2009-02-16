@@ -576,13 +576,17 @@ class ContextMenuExtension:
 
     def _rename(self, parent_window):
         src = self._filenames[0]
-        root = self._folder
+        if self._folder:
+            cwd = self._folder
+        elif self._filenames:
+            f = self._filenames[0]
+            cwd = os.path.isdir(f) and f or os.path.dirname(f)
         cmdopts = "--verbose"
-        open_dialog('rename', cmdopts, root, filelist=[src])
+        open_dialog('rename', cmdopts, cwd=cwd, filelist=[src])
 
     def _guess_rename(self, parent_window):
         root = self._folder
-        open_dialog('rename', '--detect', root)
+        open_dialog('rename --detect', None, root)
 
     def _status(self, parent_window):
         self._run_dialog('status')
