@@ -797,7 +797,7 @@ class GStatus(GDialog):
                     line = diffexpand(line)
                     buf.insert(bufiter, line)
 
-            self.merge_diff_text.set_buffer(buffer)
+            self.merge_diff_text.set_buffer(buf)
 
         if self.showdiff_toggle.get_active():
             sel = self.filetree.get_selection().get_selected_rows()[1]
