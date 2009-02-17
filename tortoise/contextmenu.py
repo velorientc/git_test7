@@ -330,15 +330,15 @@ class ContextMenuExtension:
         else:
             for f in self._filenames:
                 if f.endswith('.hgignore'):
-                    result.append(TortoiseMenu(_("Modify ignore filter"),
-                           _("Modify repository ignore filter"),
+                    result.append(TortoiseMenu(_("Edit Ignore Filter"),
+                           _("Edit repository ignore filter"),
                            self._hgignore, icon="general.ico")) # needs ico
                     break
 
             result.append(TortoiseMenu(_("View File Status"),
                            _("Repository status"),
                            self._status, icon="menushowchanged.ico"))
-            result.append(TortoiseMenu(_("(Un)Shelve Changes"),
+            result.append(TortoiseMenu(_("Shelve Changes"),
                            _("Shelve repository changes"),
                            self._shelve, icon="general.ico")) # needs ico
 
@@ -354,7 +354,7 @@ class ContextMenuExtension:
                        _("Detect renames and copies"),
                        self._guess_rename, icon="general.ico")) # needs ico
             elif len(self._filenames) == 1:
-                result.append(TortoiseMenu(_("Rename file"),
+                result.append(TortoiseMenu(_("Rename File"),
                        _("Rename file or directory"),
                        self._rename, icon="general.ico")) # needs ico
 
