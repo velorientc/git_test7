@@ -248,9 +248,9 @@ class GCommit(GStatus):
 
             # pre-fill commit message
             self.text.get_buffer().set_text('merge')
-        else:
-            self.selectlabel.set_text(
-                _('toggle change hunks to leave them out of commit'))
+        #else:
+        #    self.selectlabel.set_text(
+        #        _('toggle change hunks to leave them out of commit'))
 
 
 
