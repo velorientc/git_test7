@@ -65,6 +65,13 @@ class Confirm(SimpleMessage):
                 message += '   ...\n'
                 break
         self.format_secondary_text(toutf(message))
+        accel_group = gtk.AccelGroup()
+        self.add_accel_group(accel_group)
+        buttons = self.get_children()[0].get_children()[1].get_children()
+        buttons[1].add_accelerator("clicked", accel_group, ord("y"),
+                              0, gtk.ACCEL_VISIBLE) 
+        buttons[0].add_accelerator("clicked", accel_group, ord("n"),
+                              0, gtk.ACCEL_VISIBLE) 
 
 
 class GDialog(gtk.Window):
