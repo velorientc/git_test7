@@ -617,13 +617,14 @@ class GStatus(GDialog):
         '''Update chunk toggle state to match file toggle state'''
         wfile = util.pconvert(entry[FM_PATH])
         if wfile not in self._filechunks: return
-        entry[FM_PARTIAL_SELECTED] = False
-        self._update_partial(self.diff_model, wfile, False)
+        selected = entry[FM_CHECKED]
         for n in self._filechunks[wfile][1:]:
-            self.diff_model[n][DM_REJECTED] = not entry[FM_CHECKED]
-            self._update_diff_model_row(self.diff_model[n])
+            self.diff_model[n][DM_REJECTED] = not selected
+            self._update_diff_hunk(self.diff_model[n])
+        entry[FM_PARTIAL_SELECTED] = False
+        self._update_diff_header(self.diff_model, wfile, selected)
 
-    def _update_diff_model_row(self, row):
+    def _update_diff_hunk(self, row):
         if row[DM_REJECTED]:
             row[DM_FONT] = self.rejfont
             row[DM_DISPLAYED] = row[DM_TEXT]
@@ -631,6 +632,17 @@ class GStatus(GDialog):
             row[DM_FONT] = self.difffont
             row[DM_DISPLAYED] = row[DM_MARKUP]
 
+    def _update_diff_header(self, dmodel, wfile, selected):
+        hc = self._filechunks[wfile][0]
+        row = dmodel[hc]
+        displayed = row[DM_DISPLAYED]
+        sel = lambda x: not dmodel[hc+x+1][DM_REJECTED]
+        newtext = self._shelve_chunks[row[DM_CHUNK_ID]].selpretty(sel)
+        row[DM_DISPLAYED] = newtext
+        if selected:
+            row[DM_FONT] = self.headerfont
+        else:
+            row[DM_FONT] = self.rejfont
 
     def _show_toggle(self, check, toggletype):
         self.opts[toggletype] = check.get_active()
@@ -842,12 +854,12 @@ class GStatus(GDialog):
         if row[DM_IS_HEADER]:
             for n in fchunks:
                 dmodel[n][DM_REJECTED] = fr[FM_CHECKED]
-                self._update_diff_model_row(dmodel[n])
+                self._update_diff_hunk(dmodel[n])
             newvalue = not fr[FM_CHECKED]
             partial = False
         else:
             row[DM_REJECTED] = not row[DM_REJECTED]
-            self._update_diff_model_row(row)
+            self._update_diff_hunk(row)
             rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
             nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
             newvalue = nonrej and True or False
@@ -856,20 +868,10 @@ class GStatus(GDialog):
         # Update file's check status
         if fr[FM_PARTIAL_SELECTED] != partial:
             fr[FM_PARTIAL_SELECTED] = partial
-            self._update_partial(dmodel, wfile, partial)
         if fr[FM_CHECKED] != newvalue:
             fr[FM_CHECKED] = newvalue
             self._update_check_count()
-
-    def _update_partial(self, dmodel, wfile, partial):
-        hc = self._filechunks[wfile][0]
-        row = dmodel[hc]
-        displayed = row[DM_DISPLAYED]
-        tag = ' ** Partial **'
-        if partial and not displayed.endswith(tag):
-            row[DM_DISPLAYED] = displayed + tag
-        elif not partial and displayed.endswith(tag):
-            row[DM_DISPLAYED] = displayed[0:-len(tag)]
+        self._update_diff_header(dmodel, wfile, newvalue)
 
     def _show_diff_hunks(self, files):
         ''' Update the diff text '''
@@ -919,19 +921,19 @@ class GStatus(GDialog):
                 self._filechunks = {}
                 skip = False
                 for n, chunk in enumerate(self._shelve_chunks):
-                    fp = cStringIO.StringIO()
-                    chunk.pretty(fp)
-                    markedup = markup(fp)
-                    text = unmarkup(fp)
-                    isheader = isinstance(chunk, hgshelve.header)
-                    if isheader:
+                    if isinstance(chunk, hgshelve.header):
+                        text = chunk.selpretty(lambda x: True)
                         for f in chunk.files():
                             self._filechunks[f] = [len(self.diff_model)]
-                        row = [False, markedup, text, markedup,
+                        row = [False, text, text, text,
                                True, n, self.headerfont]
                         self.diff_model.append(row)
                         skip = chunk.special()
                     elif not skip:
+                        fp = cStringIO.StringIO()
+                        chunk.pretty(fp)
+                        markedup = markup(fp)
+                        text = unmarkup(fp)
                         f = chunk.filename()
                         self._filechunks[f].append(len(self.diff_model))
                         row = [False, markedup, text, markedup,

@@ -96,6 +96,32 @@ class header(object):
             if h.startswith('index '):
                 return True
 
+    def selpretty(self, selected):
+        str = ''
+        for h in self.header:
+            if h.startswith('index '):
+                str += _('this modifies a binary file (all or nothing)\n')
+                break
+            if self.pretty_re.match(h):
+                str += h
+                if self.binary():
+                    str += _('this is a binary file\n')
+                break
+            if h.startswith('---'):
+                hunks = len(self.hunks)
+                shunks, lines, slines = 0, 0, 0
+                for i, h in enumerate(self.hunks):
+                    lines += h.added + h.removed
+                    if selected(i):
+                        shunks += 1
+                        slines += h.added + h.removed
+                str += _('total: %d hunks (%d changed lines); '
+                        'selected: %d hunks (%d changed lines)') % (hunks,
+                                lines, shunks, slines)
+                break
+            str += h
+        return str
+
     def pretty(self, fp):
         for h in self.header:
             if h.startswith('index '):
