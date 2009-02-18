@@ -644,11 +644,9 @@ class GStatus(GDialog):
         displayed = row[DM_DISPLAYED]
         sel = lambda x: not dmodel[hc+x+1][DM_REJECTED]
         newtext = self._shelve_chunks[row[DM_CHUNK_ID]].selpretty(sel)
+        if not selected:
+            newtext = "<span foreground='#888888'>" + newtext + "</span>"
         row[DM_DISPLAYED] = newtext
-        if selected:
-            row[DM_FONT] = self.headerfont
-        else:
-            row[DM_FONT] = self.rejfont
 
     def _show_toggle(self, check, toggletype):
         self.opts[toggletype] = check.get_active()

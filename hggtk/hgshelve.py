@@ -115,8 +115,8 @@ class header(object):
                     if selected(i):
                         shunks += 1
                         slines += h.added + h.removed
-                str += _('total: %d hunks (%d changed lines); '
-                        'selected: %d hunks (%d changed lines)') % (hunks,
+                str += _('<i>total: %d hunks (%d changed lines); '
+                        'selected: %d hunks (%d changed lines)</i>') % (hunks,
                                 lines, shunks, slines)
                 break
             str += h
