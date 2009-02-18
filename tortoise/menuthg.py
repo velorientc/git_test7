@@ -25,17 +25,17 @@ class TortoiseMenu(object):
         self.state = state
         self.icon = icon
 
-    def isSubmenu():
-        return false
+    def isSubmenu(self):
+        return False
 
-    def isSep():
-        return false
+    def isSep(self):
+        return False
 
 
 class TortoiseSubmenu(TortoiseMenu):
 
     def __init__(self, menutext, helptext, menus=[], icon=None):
-        TortoiseMenu.__init(self, menutext, helptext, None, icon)
+        TortoiseMenu.__init__(self, menutext, helptext, None, icon)
         self.menus = menus[:]
 
     def add_menu(self, menutext, helptext, handler, icon=None, state=True):
@@ -51,17 +51,29 @@ class TortoiseSubmenu(TortoiseMenu):
     def append(self, entry):
         self.menus.append(entry)
 
-    def isSubmenu():
-        return true
+    def isSubmenu(self):
+        return True
 
 
 class TortoiseMenuSep(object):
 
-    def isSubmenu():
-        return false
+    def isSubmenu(self):
+        return False
 
-    def isSep():
-        return true
+    def isSep(self):
+        return True
+
+    
+def open_repo(path):
+    root = find_root(path)
+    if root:
+        try:
+            repo = hg.repository(ui.ui(), path=root)
+            return repo
+        except RepoError:
+            pass
+
+    return None
 
 
 class menuThg:
@@ -78,7 +90,10 @@ class menuThg:
         Commands are instances of TortoiseMenu, TortoiseMenuSep or TortoiseMenu
         """
 
-        print "_get_commands_dragdrop() on %s" % ", ".join(self._filenames)
+        try:
+            print "_get_commands_dragdrop() on %s" % ", ".join(files)
+        except:
+            print "_get_commands_dragdrop() on some files"
 
         # we can only accept dropping one item
         if len(srcfiles) > 1:
@@ -117,11 +132,20 @@ class menuThg:
 
         Commands are instances of TortoiseMenu, TortoiseMenuSep or TortoiseMenu
         """
-
-        print "_get_commands() on %s" % ", ".join(self._filenames)
+        try:
+            print "_get_commands() on %s" % ", ".join(files)
+        except:
+            print "_get_commands() on some files"
 
         # open repo
-        repo = open_repo(files[0])
+        if type(files) != list:
+            files = [files]
+        if not files:
+            return []
+        rpath = files[0]
+        repo = open_repo(rpath)
+
+        thgmenu = []
 
         if repo:
             thgmenu.append(TortoiseMenu(_("HG Commit..."),
@@ -140,12 +164,12 @@ class menuThg:
                       state=os.path.isdir(rpath)))
         else:
 
-            for f in self._filenames:
+            for f in files:
                 if f.endswith('.hgignore'):
                     menu.append(TortoiseMenu(_("Modify ignore filter"),
                               _("Modify repository ignore filter"),
                               self.handlers._hgignore, icon="general.ico")) # needs ico
-                     break
+                    break
  
             menu.append(TortoiseMenu(_("View File Status"),
                       _("Repository status"),
@@ -162,12 +186,12 @@ class menuThg:
                       self.handlers._vdiff, icon="TortoiseMerge.ico",
                       state=has_vdiff))
 
-            if len(self._filenames) == 0:
+            if len(files) == 0:
                 menu.append(TortoiseMenu(_("Guess Renames"),
                        _("Detect renames and copies"),
                        self.handlers._guess_rename, icon="general.ico")) # needs ico
-            elif len(self._filenames) == 1:
-                result.append(TortoiseMenu(_("Rename file"),
+            elif len(files) == 1:
+                menu.append(TortoiseMenu(_("Rename file"),
                        _("Rename file or directory"),
                        self.handlers._rename, icon="general.ico")) # needs ico
 
@@ -183,7 +207,7 @@ class menuThg:
 
             # we can only annotate file but not directories
             annotatible = len(files) > 0
-            for f in self._filenames:
+            for f in files:
                 if not os.path.isfile(f):
                     annotatible = False
                     break
@@ -269,3 +293,4 @@ class menuThg:
         thgmenu.append(menu)
         thgmenu.append(TortoiseMenuSep())
         return thgmenu
+
