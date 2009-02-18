@@ -22,7 +22,7 @@ from update import UpdateDialog
 from merge import MergeDialog
 from vis import treemodel
 from vis.treeview import TreeView
-from hglib import toutf
+from hglib import toutf, LookupError
 import gtklib
 
 def create_menu(label, callback):
@@ -522,14 +522,18 @@ class GLog(GDialog):
             success, outtext = self._hg_call_wrapper("Export",dohgexport,False)
 
     def _bundle_rev_to_tip(self, menuitem):
-        rev = self.currow[treemodel.REVID]
-        filename = "%s_rev%s_to_tip.hg" % (os.path.basename(self.repo.root), rev)
+        try:
+            rev = int(self.currow[treemodel.REVID])
+            parent = self.repo[rev].parents()[0].rev()
+        except (ValueError, LookupError):
+            return
+        filename = "%s_rev%d_to_tip.hg" % (os.path.basename(self.repo.root), rev)
         result = NativeSaveFileDialogWrapper(Title = "Write bundle to",
                                          InitialDir=self.repo.root,
                                          FileName=filename).run()
         if result:
             from hgcmd import CmdDialog
-            cmdline = ['hg', 'bundle', '--base', str(rev), result]
+            cmdline = ['hg', 'bundle', '--base', str(parent), result]
             dlg = CmdDialog(cmdline)
             dlg.show_all()
             dlg.run()
