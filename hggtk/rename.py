@@ -58,12 +58,12 @@ class DetectRenameDialog(gtk.Window):
         topvbox = gtk.VBox()
         topvbox.pack_start(frame, False, False, 2)
 
-        unkmodel = gtk.ListStore(str)
+        unkmodel = gtk.ListStore(str, str)
         unknowntree = gtk.TreeView(unkmodel)
         unknowntree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         cell = gtk.CellRendererText()
         cell.set_property("ellipsize", pango.ELLIPSIZE_START)
-        col = gtk.TreeViewColumn('File', cell, text=0)
+        col = gtk.TreeViewColumn('File', cell, text=1)
         unknowntree.append_column(col)
         unknowntree.set_enable_search(True)
         unknowntree.set_headers_visible(False)
@@ -86,7 +86,7 @@ class DetectRenameDialog(gtk.Window):
         unknownframe.add(vbox)
 
         # source, dest, percent match, sensitive
-        cmodel = gtk.ListStore(str, str, str, bool)
+        cmodel = gtk.ListStore(str, str, str, str, str, bool)
         ctree = gtk.TreeView(cmodel)
         ctree.set_rules_hint(True)
         ctree.set_reorderable(False)
@@ -96,21 +96,21 @@ class DetectRenameDialog(gtk.Window):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 30)
         cell.set_property("ellipsize", pango.ELLIPSIZE_START)
-        col = gtk.TreeViewColumn('Source', cell, text=0, sensitive=3)
+        col = gtk.TreeViewColumn('Source', cell, text=1, sensitive=5)
         col.set_resizable(True)
         ctree.append_column(col)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 30)
         cell.set_property("ellipsize", pango.ELLIPSIZE_START)
-        col = gtk.TreeViewColumn('Dest', cell, text=1, sensitive=3)
+        col = gtk.TreeViewColumn('Dest', cell, text=3, sensitive=5)
         col.set_resizable(True)
         ctree.append_column(col)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 5)
         cell.set_property("ellipsize", pango.ELLIPSIZE_NONE)
-        col = gtk.TreeViewColumn('%', cell, text=2, sensitive=3)
+        col = gtk.TreeViewColumn('%', cell, text=4, sensitive=5)
         col.set_resizable(True)
         ctree.append_column(col)
 
@@ -210,7 +210,8 @@ class DetectRenameDialog(gtk.Window):
 
     def unknown_wait(self, thread, q, unkmodel):
         while q.qsize():
-            unkmodel.append( [q.get(0)] )
+            wfile = q.get(0)
+            unkmodel.append( [wfile, toutf(wfile)] )
         return thread.isAlive()
 
     def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
@@ -269,11 +270,12 @@ class DetectRenameDialog(gtk.Window):
             simularity = 1.0
             gen = findmoves
         for old, new, score in gen(repo, tgts, srcs, simularity):
-            q.put( [old, new, '%d%%' % (score*100), True] )
+            q.put( [old, new, '%d%%' % (score*100)] )
 
     def search_wait(self, thread, q, cmodel, stbar):
         while q.qsize():
-            cmodel.append( q.get(0) )
+            source, dest, sim = q.get(0)
+            cmodel.append( [source, toutf(source), dest, toutf(dest), sim, True] )
         if thread.isAlive():
             return True
         else:
@@ -294,7 +296,7 @@ class DetectRenameDialog(gtk.Window):
         cmodel, paths = ctree.get_selection().get_selected_rows()
         for path in paths:
             row = cmodel[path]
-            src, dest, percent, sensitive = row
+            src, usrc, dest, udest, percent, sensitive = row
             if not sensitive:
                 continue
             if not os.path.exists(repo.wjoin(src)):
@@ -306,8 +308,8 @@ class DetectRenameDialog(gtk.Window):
                 self.notify_func()
             # Mark all rows with this target file as non-sensitive
             for row in cmodel:
-                if row[1] == dest:
-                    row[3] = False
+                if row[2] == dest:
+                    row[5] = False
         self.refresh(unktree.get_model())
 
     def candidate_row_act(self, ctree, path, column, unktree, stbar):
@@ -336,7 +338,7 @@ class DetectRenameDialog(gtk.Window):
         bufiter = buf.get_start_iter()
         for path in paths:
             row = model[path]
-            src, dest, percent, sensitive = row
+            src, usrc, dest, udest, percent, sensitive = row
             if not sensitive:
                 continue
             ctx = repo['.']
