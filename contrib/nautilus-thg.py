@@ -14,6 +14,7 @@ import gtk
 import gobject
 from mercurial import hg, ui, match, util
 from mercurial.node import short
+import tortoise.menuthg
 import nautilus
 import os
 import subprocess
@@ -45,6 +46,8 @@ class HgExtension(nautilus.MenuProvider,
         os.environ['THG_ICON_PATH'] = os.path.join(thgpath, 'icons')
         self.hgproc = os.path.join(thgpath, 'hgproc.py')
         self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
+        self.menu = tortoise.menuthg.menuThg()
+        self.menu.handlers = self
 
     def icon(self, iname):
         return os.path.join(self.ipath, iname)
@@ -82,7 +85,7 @@ class HgExtension(nautilus.MenuProvider,
             self.cacherepo = None
             return None
 
-    def _open_terminal_cb(self, window, vfs_file):
+    def _open_terminal(self, window, vfs_file):
         path = self.get_path_for_vfs_file(vfs_file)
         if path is None:
             return
@@ -90,24 +93,24 @@ class HgExtension(nautilus.MenuProvider,
         terminal = self.client.get_string(TERMINAL_KEY)
         os.system('%s &' % terminal)
 
-    def _about_cb(self, window, vfs_file):
+    def _about(self, window, vfs_file):
         self._run_dialog('about', [vfs_file])
 
-    def _add_cb(self, window, vfs_files):
+    def _add(self, window, vfs_files):
         self._run_dialog('add', vfs_files)
         self.clear_cached_repo()
 
-    def _clone_cb(self, window, vfs_file):
+    def _clone(self, window, vfs_file):
         self._run_dialog('clone', [vfs_file])
 
-    def _commit_cb(self, window, vfs_files):
+    def _commit(self, window, vfs_files):
         self._run_dialog('commit', vfs_files)
         self.clear_cached_repo()
 
-    def _datamine_cb(self, window, vfs_files):
+    def _datamine(self, window, vfs_files):
         self._run_dialog('datamine', vfs_files)
 
-    def _diff_cb(self, window, vfs_files):
+    def _diff(self, window, vfs_files):
         path = self.get_path_for_vfs_file(vfs_files[0])
         if path is None:
             return
@@ -123,38 +126,38 @@ class HgExtension(nautilus.MenuProvider,
             paths = [self.get_path_for_vfs_file(f) for f in vfs_files]
             subprocess.Popen(cmdline + paths, shell=False, cwd=cwd)
 
-    def _history_cb(self, window, vfs_files):
+    def _history(self, window, vfs_files):
         self._run_dialog('history', vfs_files)
         self.clear_cached_repo()
 
-    def _init_cb(self, window, vfs_file):
+    def _init(self, window, vfs_file):
         self._run_dialog('init', [vfs_file])
 
-    def _recovery_cb(self, window, vfs_file):
+    def _recovery(self, window, vfs_file):
         self._run_dialog('recovery', [vfs_file])
         self.clear_cached_repo()
 
-    def _revert_cb(self, window, vfs_files):
+    def _revert(self, window, vfs_files):
         self._run_dialog('revert', vfs_files)
         self.clear_cached_repo()
 
-    def _serve_cb(self, window, vfs_file):
+    def _serve(self, window, vfs_file):
         self._run_dialog('serve', [vfs_file], filelist=False)
 
-    def _status_cb(self, window, vfs_file):
+    def _status(self, window, vfs_file):
         self._run_dialog('status', [vfs_file])
 
-    def _sync_cb(self, window, vfs_file):
+    def _sync(self, window, vfs_file):
         self._run_dialog('synch', [vfs_file], filelist=False)
         self.clear_cached_repo()
 
-    def _thgconfig_repo_cb(self, window, vfs_file):
+    def _thgconfig_repo(self, window, vfs_file):
         self._run_dialog('config', [vfs_file])
 
-    def _thgconfig_user_cb(self, window, vfs_file):
+    def _thgconfig_user(self, window, vfs_file):
         self._run_dialog('config', [vfs_file], filelist=False)
 
-    def _unmerge_cb(self, window, vfs_file):
+    def _unmerge(self, window, vfs_file):
         self._run_dialog('checkout', [vfs_file], filelist=False,
                 extras=['--', '--clean', str(self.rev0)])
         self.clear_cached_repo()
@@ -198,8 +201,43 @@ class HgExtension(nautilus.MenuProvider,
         self.cacherepo = None
         self.cacheroot = None
 
+    def buildMenu(self, menus, vfsfile, pos=0):
+        '''Build menu'''
+        items = []
+        for menu_info in menus:
+            pos += 1
+            id = 'HgNautilus::%02d' % pos
+            if menu_info.isSep():
+               #can not insert a separator till now
+                pass
+            elif menu_info.isSubmenu():
+                if nautilus.__dict__.get('Menu'):
+                    item = nautilus.MenuItem(id, menu_info.menutext,
+                            menu_info.helptext)
+                    submenu = nautilus.Menu()
+                    item.set_submenu(submenu)
+                    for subitem in self.buildMenu(menu_info.get_menus(), vfsfile):
+                        submenu.append_item(subitem)
+                    items.append(item)
+                else: #submenu not suported
+                    for subitem in self.buildMenu(menu_info.get_menus(), vfsfile, pos):
+                        items.append_item(subitem)
+                        pos+= 1
+            else:
+                if menu_info.state:
+                    item = nautilus.MenuItem(id,
+                                 menu_info.menutext,
+                                 menu_info.helptext,
+                                 self.icon(menu_info.icon))
+                    print 'h=', menu_info.handler, ', n=', menu_info.name ##########
+                    item.connect('activate', menu_info.handler, vfsfile)
+                    items.append(item)
+        return items
+
     def get_background_items(self, window, vfs_file):
         '''Build context menu for current directory'''
+        files = [self.get_path_for_vfs_file(vfs_file)]
+        return self.buildMenu(self.menu.get_commands(files), vfs_file)
         mainitem = nautilus.MenuItem('HgNautilus', 'Mercurial', '')
         submenu = nautilus.Menu()
         mainitem.set_submenu(submenu)
@@ -324,6 +362,10 @@ class HgExtension(nautilus.MenuProvider,
         return mainitem,
 
     def get_file_items(self, window, vfs_files):
+        '''Build context menu for selected files/directories'''
+
+        files = [self.get_path_for_vfs_file(f) for f in vfs_files]
+        return self.buildMenu(self.menu.get_commands(files), vfs_files)
         mainitem = nautilus.MenuItem('HgNautilus', 'Mercurial', '')
         submenu = nautilus.Menu()
         mainitem.set_submenu(submenu)
