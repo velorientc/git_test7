@@ -339,7 +339,7 @@ class ContextMenuExtension:
                            _("Repository status"),
                            self._status, icon="menushowchanged.ico"))
             result.append(TortoiseMenu(_("Shelve Changes"),
-                           _("Shelve repository changes"),
+                           _("Shelve or unshelve repository changes"),
                            self._shelve, icon="general.ico")) # needs ico
 
             # Visual Diff (any extdiff command)
