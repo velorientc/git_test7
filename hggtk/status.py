@@ -169,7 +169,11 @@ class GStatus(GDialog):
             self._refresh_clicked, tip='refresh'),
                      gtk.SeparatorToolItem()]
 
-        if self.count_revs() < 2:
+        if self.count_revs() == 2:
+            tbuttons += [
+                    self.make_toolbutton(gtk.STOCK_SAVE_AS, 'Save As',
+                        self._save_clicked, tip='Save selected changes')]
+        else:
             tbuttons += [
                     self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 'Re_vert',
                         self._revert_clicked, tip='revert'),
@@ -270,8 +274,7 @@ class GStatus(GDialog):
         stat_cell = gtk.CellRendererText()
 
         self.selcb = None
-        ismerge = len(self.repo.changectx(None).parents()) == 2
-        if self.count_revs() < 2 and not ismerge:
+        if len(self.repo.changectx(None).parents()) != 2:
             # show file selection checkboxes only when applicable
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
@@ -501,6 +504,12 @@ class GStatus(GDialog):
         self._diffpane_moved(self._diffpane)
         return False
 
+    def auto_check(self):
+        if self.opts.get('rev'):
+            for entry in self.filemodel: 
+                entry[FM_CHECKED] = True
+            self._update_check_count()
+
     ### End of overrides ###
 
     def _do_reload_status(self):
@@ -530,9 +539,6 @@ class GStatus(GDialog):
 
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         self.modified = modified
-
-        if not self.opts.get('rev') and deleted and unknown:
-            print "Suggest to detect copies or renames"
 
         changetypes = (('modified', 'M', modified),
                        ('added', 'A', added),
@@ -995,6 +1001,33 @@ class GStatus(GDialog):
         self.reload_status()
         return True
 
+    def _save_clicked(self, toolbutton, data=None):
+        'Write selected diff hunks to a patch file'
+        revrange = self.opts.get('rev')[0]
+        filename = "%s.patch" % revrange.replace(':', '_to_')
+        fd = NativeSaveFileDialogWrapper(Title = "Save patch to",
+                                         InitialDir=self.repo.root,
+                                         FileName=filename)
+        result = fd.run()
+        if not result:
+            return
+
+        cids = []
+        dmodel = self.diff_model
+        for row in self.filemodel:
+            if row[FM_CHECKED]:
+                wfile = util.pconvert(row[FM_PATH])
+                fc = self._filechunks[wfile]
+                cids.append(fc[0])
+                cids += [dmodel[r][DM_CHUNK_ID] for r in fc[1:] if not dmodel[r][DM_REJECTED]]
+        try:
+            fp = open(result, "w")
+            for cid in cids:
+                self._shelve_chunks[cid].write(fp)
+        except OSError:
+            pass
+        finally:
+            fp.close()
 
     def _revert_clicked(self, toolbutton, data=None):
         revert_list = self._relevant_files('MAR!')
