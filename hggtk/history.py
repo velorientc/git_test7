@@ -525,6 +525,8 @@ class GLog(GDialog):
         try:
             rev = int(self.currow[treemodel.REVID])
             parent = self.repo[rev].parents()[0].rev()
+            # Special case for revision 0's parent.
+            if parent == -1: parent = 'null'
         except (ValueError, LookupError):
             return
         filename = "%s_rev%d_to_tip.hg" % (os.path.basename(self.repo.root), rev)
