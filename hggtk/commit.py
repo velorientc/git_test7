@@ -111,6 +111,7 @@ class GCommit(GStatus):
                 response = Confirm('Discard Message', [], self,
                         'Discard current commit message?').run()
                 if response != gtk.RESPONSE_YES:
+                    combobox.set_active(-1)
                     return
             buf.set_text(model[index][1])
 
