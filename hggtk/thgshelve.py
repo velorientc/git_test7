@@ -35,6 +35,8 @@ class GShelve(GStatus):
 
     def parse_opts(self):
         GStatus.parse_opts(self)
+        if not self.test_opt('rev'):
+            self.opts['rev'] = ''
 
     def get_title(self):
         root = os.path.basename(self.repo.root)
