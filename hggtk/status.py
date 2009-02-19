@@ -411,6 +411,9 @@ class GStatus(GDialog):
 
     def copy_to_clipboard(self, treeview):
         'Write highlighted hunks to the clipboard'
+        if not treeview.is_focus():
+            # ignore ctrl-c not directed at treeview
+            return False
         model, paths = treeview.get_selection().get_selected_rows()
         cids = [ model[row][DM_CHUNK_ID] for row, in paths ]
         headers = {}
