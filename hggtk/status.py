@@ -169,7 +169,11 @@ class GStatus(GDialog):
             self._refresh_clicked, tip='refresh'),
                      gtk.SeparatorToolItem()]
 
-        if self.count_revs() < 2:
+        if self.count_revs() == 2:
+            tbuttons += [
+                    self.make_toolbutton(gtk.STOCK_SAVE_AS, 'Save As',
+                        self._save_clicked, tip='Save selected changes')]
+        else:
             tbuttons += [
                     self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, 'Re_vert',
                         self._revert_clicked, tip='revert'),
@@ -270,8 +274,7 @@ class GStatus(GDialog):
         stat_cell = gtk.CellRendererText()
 
         self.selcb = None
-        ismerge = len(self.repo.changectx(None).parents()) == 2
-        if self.count_revs() < 2 and not ismerge:
+        if len(self.repo.changectx(None).parents()) != 2:
             # show file selection checkboxes only when applicable
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
@@ -371,14 +374,14 @@ class GStatus(GDialog):
                     self._tree_selection_changed, False)
             scroller.add(self.diff_tree)
 
-            vbox = gtk.VBox()
-            self.selectlabel = gtk.Label()
-            hbox = gtk.HBox()
-            hbox.pack_start(self.selectlabel, False, False, 2)
-            vbox.pack_start(hbox, False, False, 2)
-            vbox.pack_start(scroller, True, True, 2)
-
-            diff_frame.add(vbox)
+            #vbox = gtk.VBox()
+            #self.selectlabel = gtk.Label()
+            #hbox = gtk.HBox()
+            #hbox.pack_start(self.selectlabel, False, False, 2)
+            #vbox.pack_start(hbox, False, False, 2)
+            #vbox.pack_start(scroller, True, True, 2)
+            #diff_frame.add(vbox)
+            diff_frame.add(scroller)
 
         if self.diffbottom:
             self._diffpane = gtk.VPaned()
@@ -501,6 +504,12 @@ class GStatus(GDialog):
         self._diffpane_moved(self._diffpane)
         return False
 
+    def auto_check(self):
+        if self.opts.get('rev'):
+            for entry in self.filemodel: 
+                entry[FM_CHECKED] = True
+            self._update_check_count()
+
     ### End of overrides ###
 
     def _do_reload_status(self):
@@ -530,9 +539,6 @@ class GStatus(GDialog):
 
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         self.modified = modified
-
-        if not self.opts.get('rev') and deleted and unknown:
-            print "Suggest to detect copies or renames"
 
         changetypes = (('modified', 'M', modified),
                        ('added', 'A', added),
@@ -617,13 +623,14 @@ class GStatus(GDialog):
         '''Update chunk toggle state to match file toggle state'''
         wfile = util.pconvert(entry[FM_PATH])
         if wfile not in self._filechunks: return
-        entry[FM_PARTIAL_SELECTED] = False
-        self._update_partial(self.diff_model, wfile, False)
+        selected = entry[FM_CHECKED]
         for n in self._filechunks[wfile][1:]:
-            self.diff_model[n][DM_REJECTED] = not entry[FM_CHECKED]
-            self._update_diff_model_row(self.diff_model[n])
+            self.diff_model[n][DM_REJECTED] = not selected
+            self._update_diff_hunk(self.diff_model[n])
+        entry[FM_PARTIAL_SELECTED] = False
+        self._update_diff_header(self.diff_model, wfile, selected)
 
-    def _update_diff_model_row(self, row):
+    def _update_diff_hunk(self, row):
         if row[DM_REJECTED]:
             row[DM_FONT] = self.rejfont
             row[DM_DISPLAYED] = row[DM_TEXT]
@@ -631,6 +638,17 @@ class GStatus(GDialog):
             row[DM_FONT] = self.difffont
             row[DM_DISPLAYED] = row[DM_MARKUP]
 
+    def _update_diff_header(self, dmodel, wfile, selected):
+        hc = self._filechunks[wfile][0]
+        row = dmodel[hc]
+        displayed = row[DM_DISPLAYED]
+        sel = lambda x: not dmodel[hc+x+1][DM_REJECTED]
+        newtext = self._shelve_chunks[row[DM_CHUNK_ID]].selpretty(sel)
+        row[DM_DISPLAYED] = newtext
+        if selected:
+            row[DM_FONT] = self.headerfont
+        else:
+            row[DM_FONT] = self.rejfont
 
     def _show_toggle(self, check, toggletype):
         self.opts[toggletype] = check.get_active()
@@ -797,7 +815,7 @@ class GStatus(GDialog):
                     line = diffexpand(line)
                     buf.insert(bufiter, line)
 
-            self.merge_diff_text.set_buffer(buffer)
+            self.merge_diff_text.set_buffer(buf)
 
         if self.showdiff_toggle.get_active():
             sel = self.filetree.get_selection().get_selected_rows()[1]
@@ -842,12 +860,12 @@ class GStatus(GDialog):
         if row[DM_IS_HEADER]:
             for n in fchunks:
                 dmodel[n][DM_REJECTED] = fr[FM_CHECKED]
-                self._update_diff_model_row(dmodel[n])
+                self._update_diff_hunk(dmodel[n])
             newvalue = not fr[FM_CHECKED]
             partial = False
         else:
             row[DM_REJECTED] = not row[DM_REJECTED]
-            self._update_diff_model_row(row)
+            self._update_diff_hunk(row)
             rej = [ n for n in fchunks if dmodel[n][DM_REJECTED] ]
             nonrej = [ n for n in fchunks if not dmodel[n][DM_REJECTED] ]
             newvalue = nonrej and True or False
@@ -856,20 +874,10 @@ class GStatus(GDialog):
         # Update file's check status
         if fr[FM_PARTIAL_SELECTED] != partial:
             fr[FM_PARTIAL_SELECTED] = partial
-            self._update_partial(dmodel, wfile, partial)
         if fr[FM_CHECKED] != newvalue:
             fr[FM_CHECKED] = newvalue
             self._update_check_count()
-
-    def _update_partial(self, dmodel, wfile, partial):
-        hc = self._filechunks[wfile][0]
-        row = dmodel[hc]
-        displayed = row[DM_DISPLAYED]
-        tag = ' ** Partial **'
-        if partial and not displayed.endswith(tag):
-            row[DM_DISPLAYED] = displayed + tag
-        elif not partial and displayed.endswith(tag):
-            row[DM_DISPLAYED] = displayed[0:-len(tag)]
+        self._update_diff_header(dmodel, wfile, newvalue)
 
     def _show_diff_hunks(self, files):
         ''' Update the diff text '''
@@ -919,19 +927,19 @@ class GStatus(GDialog):
                 self._filechunks = {}
                 skip = False
                 for n, chunk in enumerate(self._shelve_chunks):
-                    fp = cStringIO.StringIO()
-                    chunk.pretty(fp)
-                    markedup = markup(fp)
-                    text = unmarkup(fp)
-                    isheader = isinstance(chunk, hgshelve.header)
-                    if isheader:
+                    if isinstance(chunk, hgshelve.header):
+                        text = chunk.selpretty(lambda x: True)
                         for f in chunk.files():
                             self._filechunks[f] = [len(self.diff_model)]
-                        row = [False, markedup, text, markedup,
+                        row = [False, text, text, text,
                                True, n, self.headerfont]
                         self.diff_model.append(row)
                         skip = chunk.special()
                     elif not skip:
+                        fp = cStringIO.StringIO()
+                        chunk.pretty(fp)
+                        markedup = markup(fp)
+                        text = unmarkup(fp)
                         f = chunk.filename()
                         self._filechunks[f].append(len(self.diff_model))
                         row = [False, markedup, text, markedup,
@@ -993,6 +1001,33 @@ class GStatus(GDialog):
         self.reload_status()
         return True
 
+    def _save_clicked(self, toolbutton, data=None):
+        'Write selected diff hunks to a patch file'
+        revrange = self.opts.get('rev')[0]
+        filename = "%s.patch" % revrange.replace(':', '_to_')
+        fd = NativeSaveFileDialogWrapper(Title = "Save patch to",
+                                         InitialDir=self.repo.root,
+                                         FileName=filename)
+        result = fd.run()
+        if not result:
+            return
+
+        cids = []
+        dmodel = self.diff_model
+        for row in self.filemodel:
+            if row[FM_CHECKED]:
+                wfile = util.pconvert(row[FM_PATH])
+                fc = self._filechunks[wfile]
+                cids.append(fc[0])
+                cids += [dmodel[r][DM_CHUNK_ID] for r in fc[1:] if not dmodel[r][DM_REJECTED]]
+        try:
+            fp = open(result, "w")
+            for cid in cids:
+                self._shelve_chunks[cid].write(fp)
+        except OSError:
+            pass
+        finally:
+            fp.close()
 
     def _revert_clicked(self, toolbutton, data=None):
         revert_list = self._relevant_files('MAR!')

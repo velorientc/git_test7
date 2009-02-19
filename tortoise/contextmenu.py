@@ -349,8 +349,7 @@ class ContextMenuExtension(menuThg.menuThg):
         open_dialog('rename', cmdopts, cwd=cwd, filelist=[src])
 
     def _guess_rename(self, parent_window):
-        root = self._folder
-        open_dialog('rename --detect', None, root)
+        self._run_dialog('rename --detect')
 
     def _status(self, parent_window):
         self._run_dialog('status')

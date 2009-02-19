@@ -111,6 +111,7 @@ class GCommit(GStatus):
                 response = Confirm('Discard Message', [], self,
                         'Discard current commit message?').run()
                 if response != gtk.RESPONSE_YES:
+                    combobox.set_active(-1)
                     return
             buf.set_text(model[index][1])
 
@@ -248,9 +249,9 @@ class GCommit(GStatus):
 
             # pre-fill commit message
             self.text.get_buffer().set_text('merge')
-        else:
-            self.selectlabel.set_text(
-                _('toggle change hunks to leave them out of commit'))
+        #else:
+        #    self.selectlabel.set_text(
+        #        _('toggle change hunks to leave them out of commit'))
 
 
 

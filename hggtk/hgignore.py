@@ -149,7 +149,8 @@ class HgIgnoreDialog(gtk.Window):
         try: repo = hg.repository(ui.ui(), path=self.root)
         except: gtk.main_quit()
         matcher = match.always(repo.root, repo.root)
-        changes = repo.dirstate.status(matcher, unknown=True)
+        changes = repo.dirstate.status(matcher, ignored=False, clean=False,
+                                       unknown=True)
         (lookup, modified, added, removed,
          deleted, unknown, ignored, clean) = changes
         self.unkmodel.clear()

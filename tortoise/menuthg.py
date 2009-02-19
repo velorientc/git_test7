@@ -166,8 +166,8 @@ class menuThg:
 
             for f in files:
                 if f.endswith('.hgignore'):
-                    menu.append(TortoiseMenu(_("Modify ignore filter"),
-                              _("Modify repository ignore filter"),
+                    menu.append(TortoiseMenu(_("Edit Ignore Filter"),
+                              _("Edit repository ignore filter"),
                               self.handlers._hgignore, icon="general.ico")) # needs ico
                     break
  
@@ -175,8 +175,8 @@ class menuThg:
                       _("Repository status"),
                       self.handlers._status, icon="menushowchanged.ico"))
 
-            menu.append(TortoiseMenu(_("(Un)Shelve Changes"),
-                      _("Shelve repository changes"),
+            menu.append(TortoiseMenu(_("Shelve Changes"),
+                      _("Shelve or unshelve repository changes"),
                       self.handlers._shelve, icon="general.ico")) # needs ico
 
             # Visual Diff (any extdiff command)
@@ -191,7 +191,7 @@ class menuThg:
                        _("Detect renames and copies"),
                        self.handlers._guess_rename, icon="general.ico")) # needs ico
             elif len(files) == 1:
-                menu.append(TortoiseMenu(_("Rename file"),
+                menu.append(TortoiseMenu(_("Rename File"),
                        _("Rename file or directory"),
                        self.handlers._rename, icon="general.ico")) # needs ico
 

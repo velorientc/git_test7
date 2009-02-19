@@ -85,8 +85,8 @@ class GShelve(GStatus):
         self._vpaned.set_position(self._setting_vpos)
         self._activate_shelve_buttons(True)
 
-        self.selectlabel.set_text(
-            _('toggle change hunks to leave them in your working directory'))
+        #self.selectlabel.set_text(
+        #    _('toggle change hunks to leave them in your working directory'))
         return self._vpaned
 
 
@@ -211,7 +211,7 @@ def launch(root='', files=[], cwd='', main=True):
     cmdoptions = {
         'user':'', 'date':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
-        'unknown':True, 'ignored':False, 
+        'unknown':False, 'ignored':False, 
         'exclude':[], 'include':[],
         'check': True, 'git':False, 'logfile':'', 'addremove':False,
     }
