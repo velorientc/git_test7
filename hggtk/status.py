@@ -336,7 +336,22 @@ class GStatus(GDialog):
 
             self.diff_model = gtk.ListStore(bool, str, str, str, bool, int,
                     pango.FontDescription)
+
+            # Create a new signal for our purposes
+            newsigname = 'copy-clipboard'
+            gobject.signal_new(newsigname, gtk.TreeView, 
+                    gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
+
             self.diff_tree = gtk.TreeView(self.diff_model)
+            self.diff_tree.connect(newsigname, self.copy_to_clipboard)
+
+            # set CTRL-c accelerator for copy-clipboard
+            accelgroup = gtk.AccelGroup()
+            self.add_accel_group(accelgroup)
+            key, modifier = gtk.accelerator_parse('<Control>c')
+            self.diff_tree.add_accelerator(newsigname, accelgroup, key,
+                            modifier, gtk.ACCEL_VISIBLE)
+
             self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             self.diff_tree.set_headers_visible(False)
             self.diff_tree.set_property('enable-grid-lines', True)
@@ -344,9 +359,7 @@ class GStatus(GDialog):
                     self._diff_tree_row_act)
             self.diff_tree.set_enable_search(False)
             self.diff_tree.set_headers_visible(False)
-            self.diff_tree.connect('button-release-event',
-                    self._patch_button_release)
-            
+
             cell = gtk.CellRendererText()
             diffcol = gtk.TreeViewColumn('diff', cell)
             diffcol.set_resizable(True)
@@ -396,36 +409,23 @@ class GStatus(GDialog):
         self.filetree.set_headers_clickable(True)
         return self._diffpane
 
-    def _patch_button_release(self, widget, event):
-        '''Detect release of right mouse button on diff tree'''
-        if event.button == 3 and not (event.state & gtk.gdk.CONTROL_MASK):
-            self._diff_popup_menu(widget, event)
-        return False
-
-    def _diff_popup_menu(self, tree, event):
-        sel = tree.get_selection()
-        model, paths = sel.get_selected_rows()
-        path = tree.get_path_at_pos(int(event.x), int(event.y))[0]
-        if path not in paths:
-            sel.unselect_all()
-            sel.select_path(path)
-            paths = [path]
-        if not self.clipboard:
-            return
-
-        menu = gtk.Menu()
-        menuitem = gtk.MenuItem('Copy to Clipboard', True)
-        menuitem.connect('activate', self.copy_to_clipboard, paths)
-        menuitem.set_border_width(1)
-        menu.append(menuitem)
-        menu.show_all()
-        menu.popup(None, None, None, 0, 0)
-
-    def copy_to_clipboard(self, menu, paths):
+    def copy_to_clipboard(self, treeview):
+        'Write highlighted hunks to the clipboard'
+        model, paths = treeview.get_selection().get_selected_rows()
+        cids = [ model[row][DM_CHUNK_ID] for row, in paths ]
+        headers = {}
         fp = cStringIO.StringIO()
-        for row, in paths:
-            chunkid = self.diff_model[row][DM_CHUNK_ID]
-            self._shelve_chunks[chunkid].write(fp)
+        for cid in cids:
+            chunk = self._shelve_chunks[cid]
+            wfile = chunk.filename()
+            if not isinstance(chunk, hgshelve.header):
+                # Ensure each hunk has a file header
+                if wfile not in headers:
+                    hrow = self._filechunks[wfile][0]
+                    hcid = model[hrow][DM_CHUNK_ID]
+                    self._shelve_chunks[hcid].write(fp)
+            headers[wfile] = cid
+            chunk.write(fp)
         fp.seek(0)
         self.clipboard.set_text(fp.read())
 
