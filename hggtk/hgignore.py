@@ -8,6 +8,7 @@ import os
 import gtk
 from dialog import *
 from shlib import shell_notify
+from hglib import fromutf, toutf
 from mercurial import hg, ui, match
 
 class HgIgnoreDialog(gtk.Window):
@@ -34,7 +35,7 @@ class HgIgnoreDialog(gtk.Window):
         hbox.pack_start(glob_button, False, False, 4)
         glob_button.connect('clicked', self.add_glob, glob_entry)
         glob_entry.connect('activate', self.add_glob, glob_entry)
-        glob_entry.set_text(fileglob)
+        glob_entry.set_text(toutf(fileglob))
         self.glob_entry = glob_entry
         mainvbox.pack_start(hbox, False, False)
 
@@ -85,7 +86,7 @@ class HgIgnoreDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.set_border_width(4)
         scrolledwindow.add(unknowntree)
-        model = gtk.ListStore(str)
+        model = gtk.ListStore(str, str)
         unknowntree.set_model(model)
         unknowntree.set_headers_visible(False)
         self.unkmodel = model
@@ -125,7 +126,7 @@ class HgIgnoreDialog(gtk.Window):
         self.glob_entry.set_text(model[paths][0])
 
     def add_glob(self, widget, glob_entry):
-        newglob = glob_entry.get_text()
+        newglob = fromutf(glob_entry.get_text())
         self.ignorelines.append('glob:' + newglob)
         self.write_ignore_lines()
         self.refresh()
@@ -155,7 +156,7 @@ class HgIgnoreDialog(gtk.Window):
          deleted, unknown, ignored, clean) = changes
         self.unkmodel.clear()
         for u in unknown:
-            self.unkmodel.append([u])
+            self.unkmodel.append([toutf(u), u])
         try:
             l = open(repo.wjoin('.hgignore'), 'rb').readlines()
             self.doseoln = l[0].endswith('\r\n')
@@ -166,7 +167,7 @@ class HgIgnoreDialog(gtk.Window):
         model = gtk.ListStore(str)
         self.ignorelines = []
         for line in l:
-            model.append([line.strip()])
+            model.append([toutf(line.strip())])
             self.ignorelines.append(line.strip())
         self.pattree.set_model(model)
         self.repo = repo
