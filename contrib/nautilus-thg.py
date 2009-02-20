@@ -148,7 +148,7 @@ class HgExtension(nautilus.MenuProvider,
     def _status(self, window, info):
         self._run_dialog('status')
 
-    def _sync(self, window, info):
+    def _synch(self, window, info):
         self._run_dialog('synch', filelist=False)
         self.clear_cached_repo()
 
@@ -184,9 +184,6 @@ class HgExtension(nautilus.MenuProvider,
         print "not supported" # will be replaced
 
     def _grep(self, window, info):
-        print "not supported" # will be replaced
-
-    def _synch(self, window, info):
         print "not supported" # will be replaced
 
     def _run_dialog(self, hgcmd, filelist=True, extras=[]):
