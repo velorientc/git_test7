@@ -12,6 +12,7 @@ from mercurial.i18n import _
 from mercurial import cmdutil, commands, cmdutil, hg, mdiff, patch, revlog
 from mercurial import util, fancyopts
 import copy, cStringIO, errno, operator, os, re, shutil, tempfile
+import hglib
 
 lines_re = re.compile(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@\s*(.*)')
 
@@ -103,7 +104,7 @@ class header(object):
                 str += _('this modifies a binary file (all or nothing)\n')
                 break
             if self.pretty_re.match(h):
-                str += h
+                str += hglib.toutf(h)
                 if self.binary():
                     str += _('this is a binary file\n')
                 break
@@ -119,7 +120,7 @@ class header(object):
                         'selected: %d hunks (%d changed lines)</i>') % (hunks,
                                 lines, shunks, slines)
                 break
-            str += h
+            str += hglib.toutf(h)
         return str
 
     def pretty(self, fp):
