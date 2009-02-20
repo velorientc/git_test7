@@ -326,18 +326,18 @@ class HgExtension(nautilus.MenuProvider,
         file.add_string_attribute('hg_status', status)
 
     # property page borrowed from http://www.gnome.org/~gpoo/hg/nautilus-hg/
-    def __add_row(self, table, row, label_item, label_value):
+    def __add_row(self, row, label_item, label_value):
         label = gtk.Label(label_item)
         label.set_use_markup(True)
         label.set_alignment(1, 0)
-        table.attach(label, 0, 1, row, row + 1, gtk.FILL, gtk.FILL, 0, 0)
+        self.table.attach(label, 0, 1, row, row + 1, gtk.FILL, gtk.FILL, 0, 0)
         label.show()
 
         label = gtk.Label(label_value)
         label.set_use_markup(True)
         label.set_alignment(0, 1)
         label.show()
-        table.attach(label, 1, 2, row, row + 1, gtk.FILL, 0, 0, 0)
+        self.table.attach(label, 1, 2, row, row + 1, gtk.FILL, 0, 0, 0)
 
     def get_property_pages(self, vfs_files):
         if len(vfs_files) != 1:
@@ -349,7 +349,6 @@ class HgExtension(nautilus.MenuProvider,
         repo = self.get_repo_for_path(path)
         if repo is None:
             return
-
         localpath = path[len(repo.root)+1:]
         emblem, status = self._get_file_status(repo, localpath)
 
@@ -372,22 +371,21 @@ class HgExtension(nautilus.MenuProvider,
 
         self.property_label = gtk.Label('Mercurial')
 
-        table = gtk.Table(7, 2, False)
-        table.set_border_width(5)
-        table.set_row_spacings(5)
-        table.set_col_spacings(5)
+        self.table = gtk.Table(7, 2, False)
+        self.table.set_border_width(5)
+        self.table.set_row_spacings(5)
+        self.table.set_col_spacings(5)
 
-        self.__add_row(table, 0, '<b>Status</b>:', status)
-        self.__add_row(table, 1, '<b>Last-Commit-Revision</b>:', str(rev))
-        self.__add_row(table, 2, '<b>Last-Commit-Description</b>:', description)
-        self.__add_row(table, 3, '<b>Last-Commit-Date</b>:', date)
-        self.__add_row(table, 4, '<b>Last-Commit-User</b>:', user)
+        self.__add_row(0, '<b>Status</b>:', status)
+        self.__add_row(1, '<b>Last-Commit-Revision</b>:', str(rev))
+        self.__add_row(2, '<b>Last-Commit-Description</b>:', description)
+        self.__add_row(3, '<b>Last-Commit-Date</b>:', date)
+        self.__add_row(4, '<b>Last-Commit-User</b>:', user)
         if tags:
-            self.__add_row(table, 5, '<b>Tags</b>:', tags)
+            self.__add_row(5, '<b>Tags</b>:', tags)
         if branch != 'default':
-            self.__add_row(table, 6, '<b>Branch</b>:', branch)
+            self.__add_row(6, '<b>Branch</b>:', branch)
 
-        table.show()
-
+        self.table.show()
         return nautilus.PropertyPage("MercurialPropertyPage::status",
-                                     self.property_label, table),
+                                     self.property_label, self.table),
