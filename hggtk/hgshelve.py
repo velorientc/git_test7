@@ -116,9 +116,11 @@ class header(object):
                     if selected(i):
                         shunks += 1
                         slines += h.added + h.removed
-                str += _('<i>total: %d hunks (%d changed lines); '
-                        'selected: %d hunks (%d changed lines)</i>') % (hunks,
+                str += "<span foreground='#000088'>"
+                str += _('total: %d hunks (%d changed lines); '
+                        'selected: %d hunks (%d changed lines)') % (hunks,
                                 lines, shunks, slines)
+                str += "</span>"
                 break
             str += hglib.toutf(h)
         return str
