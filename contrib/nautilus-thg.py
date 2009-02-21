@@ -1,6 +1,6 @@
-# Trivial Mercurial plugin for Nautilus
+# TortoiseHg plugin for Nautilus
 #
-# Copyright (C) 2007 Steve Borho
+# Copyright (C) 2007-9 Steve Borho
 #
 # Stolen mercilessly from nautilus-bzr, thanks guys
 # Copyright (C) 2006 Jeff Bailey
