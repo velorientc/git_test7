@@ -228,7 +228,8 @@ class menuThg:
                       _("View revision history"),
                       self.handlers._history, icon="menulog.ico"))
 
-            menu.append(TortoiseMenu(_("Search Repository"),
+            if len(files) == 0:
+                menu.append(TortoiseMenu(_("Search Repository"),
                       _("Search revisions of files for a text pattern"),
                       self.handlers._grep, icon="menurepobrowse.ico"))
 
