@@ -184,18 +184,18 @@ class HgExtension(nautilus.MenuProvider,
         self.clear_cached_repo()
 
     def _shelve(self, window, info):
-        print "not supported" # will be replaced
+        self._run_dialog('shelve')
 
     _vdiff=_diff
 
     def _rename(self, window, info):
-        print "not supported" # will be replaced
+        self._run_dialog('rename')
 
     def _remove(self, window, info):
-        print "not supported" # will be replaced
+        self._run_dialog('status')
 
     def _annotate(self, window, info):
-        print "not supported" # will be replaced
+        self._run_dialog('datamine')
 
     def _update(self, window, info):
         print "not supported" # will be replaced
@@ -204,7 +204,7 @@ class HgExtension(nautilus.MenuProvider,
         print "not supported" # will be replaced
 
     def _grep(self, window, info):
-        print "not supported" # will be replaced
+        self._run_dialog('datamine')
 
     def _run_dialog(self, hgcmd, filelist=True, extras=[]):
         '''
