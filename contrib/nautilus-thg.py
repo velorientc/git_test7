@@ -29,7 +29,6 @@ except ImportError:
     from mercurial.repo import RepoError
 
 TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
-TERMINAL_KEY = '/desktop/gnome/applications/terminal/exec'
 
 class HgExtension(nautilus.MenuProvider,
                   nautilus.ColumnProvider,
@@ -86,14 +85,6 @@ class HgExtension(nautilus.MenuProvider,
             return None
 
 #start dialogs
-    def _open_terminal(self, window, info):
-        path = self.get_path_for_vfs_file(vfs_file)
-        if path is None:
-            return
-        os.chdir(path)
-        terminal = self.client.get_string(TERMINAL_KEY)
-        os.system('%s &' % terminal)
-
     def _about(self, window, info):
         self._run_dialog('about', filelist=False)
 
