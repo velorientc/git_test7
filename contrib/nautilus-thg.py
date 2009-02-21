@@ -9,24 +9,28 @@
 #
 # Published under the GNU GPL
 
-import gconf
 import gtk
 import gobject
-from mercurial import hg, ui, match, util
-from mercurial.node import short
-import tortoise.menuthg
-import nautilus
 import os
+import nautilus
 import subprocess
 import sys
 import tempfile
-import time
 import urllib
 
+try:
+    from mercurial import hg, ui, match, util
+except ImportError:
+    # workaround to use user's local python libs
+    userlib = os.path.expanduser('~/lib/python')
+    if os.path.exists(userlib) and userlib not in sys.path:
+        sys.path.append(userlib)
+    from mercurial import hg, ui, match, util
 try:
     from mercurial.error import RepoError
 except ImportError:
     from mercurial.repo import RepoError
+from mercurial.node import short
 
 TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
 
@@ -38,11 +42,36 @@ class HgExtension(nautilus.MenuProvider,
     def __init__(self):
         self.cacherepo = None
         self.cacheroot = None
-        self.client = gconf.client_get_default()
-        thgpath = os.environ.get('TORTOISEHG_PATH',
-                os.path.expanduser(TORTOISEHG_PATH))
-        os.environ['TORTOISEHG_PATH'] = thgpath
-        os.environ['THG_ICON_PATH'] = os.path.join(thgpath, 'icons')
+
+        # check if nautilus-thg.py is a symlink first
+        pfile = __file__
+        if pfile.endswith('.pyc'):
+            pfile = pfile[:-1]
+        path = os.path.dirname(os.path.realpath(pfile))
+        thgpath = os.path.normpath(os.path.join(path, '..'))
+        testpath = os.path.join(thgpath, 'tortoise')
+        if os.path.isdir(testpath):
+            if thgpath not in sys.path:
+                sys.path.append(thgpath)
+        else:
+            # try environment or hard-coded path
+            thgpath = os.environ.get('TORTOISEHG_PATH', TORTOISEHG_PATH)
+            thgpath = os.path.normpath(os.path.expanduser(thgpath))
+            if os.path.exists(thgpath) and thgpath not in sys.path:
+                sys.path.insert(0, thgpath)
+        # else assume tortoise is already in PYTHONPATH
+        try:
+            import tortoise.menuthg
+        except ImportError:
+            print 'unable to import tortoise.menuthg'
+            self.menu = None
+            return
+
+        self.env = os.environ
+        self.env['PYTHONPATH'] = ':'.join(sys.path)
+        self.env['TORTOISEHG_PATH'] = thgpath
+        self.env['THG_ICON_PATH'] = os.path.join(thgpath, 'icons')
+
         self.hgproc = os.path.join(thgpath, 'hgproc.py')
         self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
         self.menu = tortoise.menuthg.menuThg()
@@ -116,7 +145,7 @@ class HgExtension(nautilus.MenuProvider,
             cmdline = ['hg', diffcmd]
             cwd = os.path.isdir(path) and path or os.path.dirname(path)
             paths = [self.get_path_for_vfs_file(f) for f in vfs_files]
-            subprocess.Popen(cmdline + paths, shell=False, cwd=cwd)
+            subprocess.Popen(cmdline+paths, shell=False, env=self.env, cwd=cwd)
 
     def _history(self, window, info):
         self._run_dialog('history')
@@ -209,7 +238,7 @@ class HgExtension(nautilus.MenuProvider,
             cmdopts += ['--listfile', tmpfile, '--deletelistfile']
         cmdopts.extend(extras)
 
-        subprocess.Popen(cmdopts, cwd=cwd, shell=False)
+        subprocess.Popen(cmdopts, cwd=cwd, env=self.env, shell=False)
 
         # Remove cached repo object, dirstate may change
         self.cacherepo = None
@@ -256,12 +285,12 @@ class HgExtension(nautilus.MenuProvider,
 
     def get_background_items(self, window, vfs_file):
         '''Build context menu for current directory'''
-        if vfs_file:
+        if vfs_file and self.menu:
             return self.buildMenu(self.menu.get_commands, [vfs_file])
 
     def get_file_items(self, window, vfs_files):
         '''Build context menu for selected files/directories'''
-        if vfs_files:
+        if vfs_files and self.menu:
             return self.buildMenu(self.menu.get_commands, vfs_files)
 
     def get_columns(self):
