@@ -233,11 +233,6 @@ class menuThg:
                       _("Search revisions of files for a text pattern"),
                       self.handlers._grep, icon="menurepobrowse.ico"))
 
-            if repo.ui.config('tortoisehg', 'view'):
-                menu.append(TortoiseMenu(_("Revision Graph"),
-                          _("View history with DAG graph"),
-                          self.handlers._view, icon="menurevisiongraph.ico"))
-
             menu.append(TortoiseMenuSep())
 
             menu.append(TortoiseMenu(_("Synchronize..."),
