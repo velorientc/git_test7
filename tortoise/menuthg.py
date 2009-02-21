@@ -187,15 +187,16 @@ class menuThg:
                        _("Rename file or directory"),
                        self.handlers._rename, icon="general.ico"))
 
-            menu.append(TortoiseMenu(_("Add Files"),
-                      _("Add files to Hg repository"),
-                      self.handlers._add, icon="menuadd.ico"))
-            menu.append(TortoiseMenu(_("Remove Files"),
-                      _("Remove selected files on the next commit"),
-                      self.handlers._remove, icon="menudelete.ico"))
-            menu.append(TortoiseMenu(_("Undo Changes"),
-                      _("Revert selected files"),
-                      self.handlers._revert, icon="menurevert.ico"))
+            if len(files):
+                menu.append(TortoiseMenu(_("Add Files"),
+                          _("Add files to Hg repository"),
+                          self.handlers._add, icon="menuadd.ico"))
+                menu.append(TortoiseMenu(_("Remove Files"),
+                          _("Remove selected files on the next commit"),
+                          self.handlers._remove, icon="menudelete.ico"))
+                menu.append(TortoiseMenu(_("Undo Changes"),
+                          _("Revert selected files"),
+                          self.handlers._revert, icon="menurevert.ico"))
 
             # we can only annotate file but not directories
             menu.append(TortoiseMenu(_("Annotate Files"),
