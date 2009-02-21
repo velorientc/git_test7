@@ -90,11 +90,6 @@ class menuThg:
         Commands are instances of TortoiseMenu, TortoiseMenuSep or TortoiseMenu
         """
 
-        try:
-            print "_get_commands_dragdrop() on %s" % ", ".join(files)
-        except:
-            print "_get_commands_dragdrop() on some files"
-
         # we can only accept dropping one item
         if len(srcfiles) > 1:
             return []
@@ -102,9 +97,6 @@ class menuThg:
         # open repo
         drag_repo = None
         drop_repo = None
-
-        print "drag = %s" % self.srcfiles[0]
-        print "drop = %s" % self.destfolder
 
         drag_path = self.srcfiles[0]
         drag_repo = open_repo(drag_path)
@@ -132,11 +124,6 @@ class menuThg:
 
         Commands are instances of TortoiseMenu, TortoiseMenuSep or TortoiseMenu
         """
-        try:
-            print "_get_commands() on %s" % ", ".join(files)
-        except:
-            print "_get_commands() on some files"
-
         # open repo
         if type(files) != list:
             files = [files]
