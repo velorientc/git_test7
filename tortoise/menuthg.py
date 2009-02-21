@@ -150,13 +150,18 @@ class menuThg:
                       self.handlers._init, icon="menucreaterepos.ico",
                       state=os.path.isdir(rpath)))
         else:
-
+            canannotate = len(files) > 0
+            hashgignore = False
             for f in files:
+                if not os.path.isfile(f):
+                    canannotate = False
                 if f.endswith('.hgignore'):
-                    menu.append(TortoiseMenu(_("Edit Ignore Filter"),
-                              _("Edit repository ignore filter"),
-                              self.handlers._hgignore, icon="general.ico")) # needs ico
-                    break
+                    hashgignore = True
+
+            if hashgignore: # needs ico
+                menu.append(TortoiseMenu(_("Edit Ignore Filter"),
+                          _("Edit repository ignore filter"),
+                          self.handlers._hgignore, icon="general.ico"))
  
             menu.append(TortoiseMenu(_("View File Status"),
                       _("Repository status"),
@@ -173,14 +178,14 @@ class menuThg:
                       self.handlers._vdiff, icon="TortoiseMerge.ico",
                       state=has_vdiff))
 
-            if len(files) == 0:
+            if len(files) == 0: # needs ico
                 menu.append(TortoiseMenu(_("Guess Renames"),
                        _("Detect renames and copies"),
-                       self.handlers._guess_rename, icon="general.ico")) # needs ico
-            elif len(files) == 1:
+                       self.handlers._guess_rename, icon="general.ico"))
+            elif len(files) == 1: # needs ico
                 menu.append(TortoiseMenu(_("Rename File"),
                        _("Rename file or directory"),
-                       self.handlers._rename, icon="general.ico")) # needs ico
+                       self.handlers._rename, icon="general.ico"))
 
             menu.append(TortoiseMenu(_("Add Files"),
                       _("Add files to Hg repository"),
@@ -193,33 +198,28 @@ class menuThg:
                       self.handlers._revert, icon="menurevert.ico"))
 
             # we can only annotate file but not directories
-            annotatible = len(files) > 0
-            for f in files:
-                if not os.path.isfile(f):
-                    annotatible = False
-                    break
             menu.append(TortoiseMenu(_("Annotate Files"),
                       _("show changeset information per file line"),
                       self.handlers._annotate, icon="menublame.ico",
-                      state=annotatible))
+                      state=canannotate))
 
             menu.append(TortoiseMenuSep())
             menu.append(TortoiseMenu(_("Update To Revision"),
                       _("update working directory"),
                       self.handlers._update, icon="menucheckout.ico"))
 
-            can_merge = len(repo.heads()) > 1 and \
+            canmerge = len(repo.heads()) > 1 and \
                       len(repo.changectx(None).parents()) < 2
             menu.append(TortoiseMenu(_("Merge Revisions"),
                       _("merge working directory with another revision"),
                       self.handlers._merge, icon="menumerge.ico",
-                      state=can_merge))
+                      state=canmerge))
 
-            in_merge = len(repo.changectx(None).parents()) > 1
+            inmerge = len(repo.changectx(None).parents()) > 1
             menu.append(TortoiseMenu(_("Undo Merge"),
                       _("Undo merge by updating to revision"),
                       self.handlers._merge, icon="menuunmerge.ico",
-                      state=in_merge))
+                      state=inmerge))
 
             menu.append(TortoiseMenuSep())
 
