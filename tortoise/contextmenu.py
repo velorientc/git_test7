@@ -17,7 +17,7 @@ import win32api
 import _winreg
 from mercurial import hg
 from thgutil import *
-import menuThg
+import menuthg
 
 try:
     from mercurial.error import RepoError
@@ -85,7 +85,7 @@ def run_program(cmdline):
                            stdin=subprocess.PIPE)
     
 """Windows shell extension that adds context menu items to Mercurial repository"""
-class ContextMenuExtension(menuThg.menuThg):
+class ContextMenuExtension(menuthg.menuThg):
     _reg_progid_ = "Mercurial.ShellExtension.ContextMenu"
     _reg_desc_ = "Mercurial Shell Extension"
     _reg_clsid_ = "{EEE9936B-73ED-4D45-80C9-AF918354F885}"
@@ -120,7 +120,7 @@ class ContextMenuExtension(menuThg.menuThg):
         self._folder = None
         self._filenames = []
         self._handlers = {}
-        menuThg.__init__(self)
+        menuthg.menuThg.__init__(self)
 
     def Initialize(self, folder, dataobj, hkey):
         if folder:
@@ -191,26 +191,22 @@ class ContextMenuExtension(menuThg.menuThg):
         # The number '30000' is just a guess based on my observation
         print "idCmdFirst = ", idCmdFirst
         if idCmdFirst >= 30000:
-            thgmenu.append(TortoiseMenuSep())
+            thgmenu.append(menuthg.TortoiseMenuSep())
             
         # As we are a context menu handler, we can ignore verbs.
         self._handlers = {}
         if self._folder and self._filenames:
             # get menus with drag-n-drop support
-            thgmenu.append(self._get_commands_dragdrop(self._filenames, self._folder))
+            thgmenu+= self.get_commands_dragdrop(self._filenames, self._folder)
         else:
                               
             # get menus for hg menu
-            thgmenu.append(self._get_commands(self._filenames))
+            thgmenu+= self.get_commands(self._filenames)
   
-            idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0,
-                    idCmdFirst)
+        idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
 
-            # Return total number of menus & submenus we've added
-            return idCmd
-        else:
-            # no applicable Hg actions
-            return 0
+        # Return total number of menus & submenus we've added
+        return idCmd
 
     def InvokeCommand(self, ci):
         mask, hwnd, verb, params, dir, nShow, hotkey, hicon = ci
