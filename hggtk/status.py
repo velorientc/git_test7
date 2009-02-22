@@ -555,8 +555,8 @@ class GStatus(GDialog):
 
         # List of the currently checked and selected files to pass on to the new data
         model, paths = self.filetree.get_selection().get_selected_rows()
-        recheck = [entry[FM_PATH_UTF8] for entry in model if entry[FM_CHECKED]]
-        reselect = [model[path][FM_PATH_UTF8] for path in paths]
+        recheck = [entry[FM_PATH] for entry in model if entry[FM_CHECKED]]
+        reselect = [model[path][FM_PATH] for path in paths]
 
         # merge-state of files
         ms = merge_.mergestate(self.repo)
@@ -575,7 +575,7 @@ class GStatus(GDialog):
         selection = self.filetree.get_selection()
         selected = False
         for row in model:
-            if row[FM_PATH_UTF8] in reselect:
+            if row[FM_PATH] in reselect:
                 selection.select_iter(row.iter)
                 selected = True
 
@@ -824,7 +824,7 @@ class GStatus(GDialog):
             if not sel:
                 self._last_file = None
                 return False
-            wfile = self.filemodel[sel[0]][FM_PATH_UTF8]
+            wfile = self.filemodel[sel[0]][FM_PATH]
             if force or wfile != self._last_file:
                 self._last_file = wfile
                 self._hg_call_wrapper('Diff', dohgdiff)
