@@ -19,7 +19,7 @@ from mercurial.i18n import _
 from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff
 from mercurial import merge as merge_
 from shlib import shell_notify
-from hglib import toutf, rootpath, diffexpand
+from hglib import toutf, fromutf, rootpath, diffexpand
 from gdialog import *
 from dialog import entry_dialog
 import hgshelve
@@ -1145,7 +1145,7 @@ class GStatus(GDialog):
                 return True
             
             # move the files to dest directory
-            move_list.append(destdir)
+            move_list.append(fromutf(destdir))
             self._hg_move(move_list)
         else:
             Prompt('Nothing Moved', 'No movable files selected\n\n'
