@@ -10,7 +10,7 @@ import os
 import gtk
 from dialog import error_dialog, info_dialog
 from mercurial import hg, ui, util
-from hglib import RepoError
+from hglib import toutf, fromutf, RepoError
 import shlib
 
 class InitDialog(gtk.Window):
@@ -21,7 +21,7 @@ class InitDialog(gtk.Window):
         
         # set dialog title and icon
         self.cwd = cwd and cwd or os.getcwd()
-        title = 'Hg init - %s' % (self.cwd)
+        title = 'Hg init - %s' % toutf(self.cwd)
         self.set_title(title)
         shlib.set_tortoise_icon(self, 'menucreaterepos.ico')
 
@@ -66,7 +66,7 @@ class InitDialog(gtk.Window):
         lbl.set_property("width-chars", 12)
         lbl.set_alignment(0, 0.5)
         self._dest_input = gtk.Entry()
-        self._dest_input.set_text(self._dest_path)
+        self._dest_input.set_text(toutf(self._dest_path))
         self._dest_input.set_position(-1)
 
         self._btn_dest_browse = gtk.Button("...")
@@ -127,7 +127,7 @@ class InitDialog(gtk.Window):
 
     def _btn_init_clicked(self, toolbutton, data=None):
         # gather input data
-        dest = self._dest_input.get_text()
+        dest = fromutf(self._dest_input.get_text())
         
         # verify input
         if dest == "":
@@ -171,7 +171,7 @@ class InitDialog(gtk.Window):
                     pass
         
         info_dialog(self, "New repository created",
-                "in directory %s" % os.path.abspath(dest))
+                "in directory %s" % toutf(os.path.abspath(dest)))
 
 def run(cwd='', files=[], **opts):
     dialog = InitDialog(cwd, repos=files)
