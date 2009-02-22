@@ -14,7 +14,7 @@ from dialog import *
 from mercurial import util, hg, ui
 from mercurial.node import *
 from shlib import shell_notify, set_tortoise_icon
-from hglib import rootpath, RepoError
+from hglib import rootpath, toutf, RepoError
 
 class UpdateDialog(gtk.Window):
     """ Dialog to update Mercurial repo """
@@ -34,7 +34,7 @@ class UpdateDialog(gtk.Window):
             return None
 
         # set dialog title
-        title = "hg update - %s" % self.cwd
+        title = "hg update - %s" % toutf(self.cwd)
         self.set_title(title)
 
         self._create()
