@@ -52,7 +52,7 @@ class HgExtension(nautilus.MenuProvider,
         testpath = os.path.join(thgpath, 'tortoise')
         if os.path.isdir(testpath):
             if thgpath not in sys.path:
-                sys.path.append(thgpath)
+                sys.path.insert(0, thgpath)
         else:
             # try environment or hard-coded path
             thgpath = os.environ.get('TORTOISEHG_PATH', TORTOISEHG_PATH)
