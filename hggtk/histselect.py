@@ -118,7 +118,8 @@ class HistoryDialog(gtk.Dialog):
     def _cursor_changed(self, tv):
         model, selpaths = tv.get_selection().get_selected_rows()
         if not selpaths: return
-        cs = model[selpaths[0]][1]
+        index = selpaths[0][0]
+        cs = self.history[index]['changeset'][0]
         rev, csid = cs.split(':')
         self.selected = (rev, csid)
         
