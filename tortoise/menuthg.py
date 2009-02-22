@@ -18,10 +18,10 @@ except ImportError:
 
 class TortoiseMenu(object):
 
-    def __init__(self, menutext, helptext, handler, icon=None, state=True):
+    def __init__(self, menutext, helptext, hgcmd, icon=None, state=True):
         self.menutext = menutext
         self.helptext = helptext
-        self.handler = handler
+        self.hgcmd = hgcmd
         self.state = state
         self.icon = icon
 
@@ -38,9 +38,9 @@ class TortoiseSubmenu(TortoiseMenu):
         TortoiseMenu.__init__(self, menutext, helptext, None, icon)
         self.menus = menus[:]
 
-    def add_menu(self, menutext, helptext, handler, icon=None, state=True):
+    def add_menu(self, menutext, helptext, hgcmd, icon=None, state=True):
         self.menus.append(TortoiseMenu(menutext, helptext,
-                handler, icon, state))
+                hgcmd, icon, state))
 
     def add_sep(self):
         self.menus.append(TortoiseMenuSep())
@@ -80,7 +80,6 @@ class menuThg:
     """shell extension that adds context menu items"""
 
     def __init__(self):
-        self.handlers = self
         self.name = "TortoiseHG"
 
     def get_commands_dragdrop(self, srcfiles, destfolder):
@@ -110,12 +109,12 @@ class menuThg:
         thgmenu = []
         thgmenu.append(TortoiseMenu(_("Create Clone"),
                   _("Create clone here from source"),
-                  self.handlers._clone_here, icon="menuclone.ico"))
+                  'clone', icon="menuclone.ico"))
 
         if drop_repo:
             thgmenu.append(TortoiseMenu(_("Synchronize"),
                      _("Synchronize with dragged repository"),
-                     self.handlers._synch_here, icon="menusynch.py"))
+                     'synch', icon="menusynch.py"))
         return thgmenu
 
     def get_commands(self, files):
@@ -137,18 +136,18 @@ class menuThg:
         if repo:
             thgmenu.append(TortoiseMenu(_("HG Commit..."),
                       _("Commit changes in repository"),
-                      self.handlers._commit, icon="menucommit.ico"))
+                      'commit', icon="menucommit.ico"))
 
         menu = TortoiseSubmenu(self.name, "Mercurial", [], icon="hg.ico")
 
         if repo is None:
             menu.append(TortoiseMenu(_("Clone a Repository"),
                       _("clone a repository"),
-                      self.handlers._clone, icon="menuclone.ico"))
+                      'clone', icon="menuclone.ico"))
+        if os.path.isdir(rpath):
             menu.append(TortoiseMenu(_("Create Repository Here"),
                       _("create a new repository in this directory"),
-                      self.handlers._init, icon="menucreaterepos.ico",
-                      state=os.path.isdir(rpath)))
+                      'init', icon="menucreaterepos.ico"))
         else:
             canannotate = len(files) > 0
             hashgignore = False
@@ -161,99 +160,99 @@ class menuThg:
             if hashgignore: # needs ico
                 menu.append(TortoiseMenu(_("Edit Ignore Filter"),
                           _("Edit repository ignore filter"),
-                          self.handlers._hgignore, icon="general.ico"))
+                          'hgignore', icon="general.ico"))
  
             menu.append(TortoiseMenu(_("View File Status"),
                       _("Repository status"),
-                      self.handlers._status, icon="menushowchanged.ico"))
+                      'status', icon="menushowchanged.ico"))
 
             menu.append(TortoiseMenu(_("Shelve Changes"),
                       _("Shelve or unshelve repository changes"),
-                      self.handlers._shelve, icon="general.ico")) # needs ico
+                      'shelve', icon="general.ico")) # needs ico
 
             # Visual Diff (any extdiff command)
             has_vdiff = repo.ui.config('tortoisehg', 'vdiff', '') != ''
-            menu.append(TortoiseMenu(_("Visual Diff"),
+            if has_vdiff:
+                menu.append(TortoiseMenu(_("Visual Diff"),
                       _("View changes using GUI diff tool"),
-                      self.handlers._vdiff, icon="TortoiseMerge.ico",
-                      state=has_vdiff))
+                      'vdiff', icon="TortoiseMerge.ico"))
 
             if len(files) == 0: # needs ico
                 menu.append(TortoiseMenu(_("Guess Renames"),
                        _("Detect renames and copies"),
-                       self.handlers._guess_rename, icon="general.ico"))
+                       'guess', icon="general.ico"))
             elif len(files) == 1: # needs ico
                 menu.append(TortoiseMenu(_("Rename File"),
                        _("Rename file or directory"),
-                       self.handlers._rename, icon="general.ico"))
+                       'rename', icon="general.ico"))
 
             if len(files):
                 menu.append(TortoiseMenu(_("Add Files"),
                           _("Add files to Hg repository"),
-                          self.handlers._add, icon="menuadd.ico"))
+                          'add', icon="menuadd.ico"))
                 menu.append(TortoiseMenu(_("Remove Files"),
                           _("Remove selected files on the next commit"),
-                          self.handlers._remove, icon="menudelete.ico"))
+                          'remove', icon="menudelete.ico"))
                 menu.append(TortoiseMenu(_("Undo Changes"),
                           _("Revert selected files"),
-                          self.handlers._revert, icon="menurevert.ico"))
+                          'revert', icon="menurevert.ico"))
 
             # we can only annotate file but not directories
-            menu.append(TortoiseMenu(_("Annotate Files"),
+            if canannotate:
+                menu.append(TortoiseMenu(_("Annotate Files"),
                       _("show changeset information per file line"),
-                      self.handlers._annotate, icon="menublame.ico",
-                      state=canannotate))
+                      'annotate', icon="menublame.ico"))
 
             menu.append(TortoiseMenuSep())
             menu.append(TortoiseMenu(_("Update To Revision"),
                       _("update working directory"),
-                      self.handlers._update, icon="menucheckout.ico"))
+                      'update', icon="menucheckout.ico"))
 
             canmerge = len(repo.heads()) > 1 and \
                       len(repo.changectx(None).parents()) < 2
-            menu.append(TortoiseMenu(_("Merge Revisions"),
+            if canmerge:
+                menu.append(TortoiseMenu(_("Merge Revisions"),
                       _("merge working directory with another revision"),
-                      self.handlers._merge, icon="menumerge.ico",
-                      state=canmerge))
+                      'merge', icon="menumerge.ico"))
 
             inmerge = len(repo.changectx(None).parents()) > 1
-            menu.append(TortoiseMenu(_("Undo Merge"),
+            if inmerge:
+                menu.append(TortoiseMenu(_("Undo Merge"),
                       _("Undo merge by updating to revision"),
-                      self.handlers._merge, icon="menuunmerge.ico",
-                      state=inmerge))
+                      'unmerge', icon="menuunmerge.ico"))
 
             menu.append(TortoiseMenuSep())
 
             menu.append(TortoiseMenu(_("View Changelog"),
                       _("View revision history"),
-                      self.handlers._history, icon="menulog.ico"))
+                      'history', icon="menulog.ico"))
 
             if len(files) == 0:
                 menu.append(TortoiseMenu(_("Search Repository"),
                       _("Search revisions of files for a text pattern"),
-                      self.handlers._grep, icon="menurepobrowse.ico"))
+                      'grep', icon="menurepobrowse.ico"))
 
-            menu.append(TortoiseMenuSep())
+                menu.append(TortoiseMenuSep())
 
-            menu.append(TortoiseMenu(_("Synchronize..."),
-                      _("Synchronize with remote repository"),
-                      self.handlers._synch, icon="menusynch.ico"))
-            menu.append(TortoiseMenu(_("Recovery..."),
-                      _("General repair and recovery of repository"),
-                      self.handlers._recovery, icon="general.ico"))
-            menu.append(TortoiseMenu(_("Web Server"),
-                      _("start web server for this repository"),
-                      self.handlers._serve, icon="proxy.ico"))
+                menu.append(TortoiseMenu(_("Synchronize..."),
+                          _("Synchronize with remote repository"),
+                          '_synch', icon="menusynch.ico"))
+                menu.append(TortoiseMenu(_("Recovery..."),
+                          _("General repair and recovery of repository"),
+                          'recovery', icon="general.ico"))
+                menu.append(TortoiseMenu(_("Web Server"),
+                          _("start web server for this repository"),
+                          'serve', icon="proxy.ico"))
 
             menu.append(TortoiseMenuSep())
             menu.append(TortoiseMenu(_("Create Clone"),
                       _("Clone a repository here"),
-                      self.handlers._clone, icon="menuclone.ico"))
-            can_init = repo.root != rpath and os.path.isdir(rpath)
-            menu.append(TortoiseMenu(_("Create Repository Here"),
+                      'clone', icon="menuclone.ico"))
+            caninit = repo.root != rpath and os.path.isdir(rpath)
+            if caninit:
+                menu.append(TortoiseMenu(_("Create Repository Here"),
                       _("create a new repository in this directory"),
-                      self.handlers._init, icon="menucreaterepos.ico",
-                      state=can_init))
+                      'init', icon="menucreaterepos.ico"))
 
         # config settings menu
         menu.append(TortoiseMenuSep())
@@ -261,18 +260,17 @@ class menuThg:
                   icon="menusettings.ico")
         optmenu.add_menu(_("Global"),
                   _("Configure user wide settings"),
-                  self.handlers._config_user, icon="settings_user.ico")
+                  'userconfig', icon="settings_user.ico")
         if repo:
             optmenu.add_menu(_("Repository"),
                       _("Configure settings local to this repository"),
-                      self.handlers._config_repo,
-                      icon="settings_repo.ico")
+                      'repoconfig', icon="settings_repo.ico")
         menu.append(optmenu)
 
         # add common menu items
         menu.append(TortoiseMenuSep())
         menu.append(TortoiseMenu(_("About"), _("About TortoiseHg"),
-                  self.handlers._about, icon="menuabout.ico"))
+                  'about', icon="menuabout.ico"))
 
         thgmenu.append(menu)
         thgmenu.append(TortoiseMenuSep())

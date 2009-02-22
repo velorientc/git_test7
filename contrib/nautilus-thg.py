@@ -33,6 +33,8 @@ except ImportError:
 from mercurial.node import short
 
 TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
+nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
+nocachecmds = 'about serve repoconfig userconfig'.split()
 
 class HgExtension(nautilus.MenuProvider,
                   nautilus.ColumnProvider,
@@ -61,9 +63,12 @@ class HgExtension(nautilus.MenuProvider,
                 sys.path.insert(0, thgpath)
         # else assume tortoise is already in PYTHONPATH
         try:
+            import tortoise.thgutil
             import tortoise.menuthg
-        except ImportError:
-            print 'unable to import tortoise.menuthg'
+        except ImportError, e:
+            # if thgutil is not found, then repository cannot be found
+            # if menuthg is not found, you have an older version in sys.path
+            print e
             self.menu = None
             return
 
@@ -75,7 +80,6 @@ class HgExtension(nautilus.MenuProvider,
         self.hgproc = os.path.join(thgpath, 'hgproc.py')
         self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
         self.menu = tortoise.menuthg.menuThg()
-        self.menu.handlers = self
 
     def icon(self, iname):
         return os.path.join(self.ipath, iname)
@@ -84,10 +88,6 @@ class HgExtension(nautilus.MenuProvider,
         if vfs_file.get_uri_scheme() != 'file':
             return None
         return urllib.unquote(vfs_file.get_uri()[7:])
-
-    def clear_cached_repo(self):
-        self.cacheroot = None
-        self.cacherepo = None
 
     def get_repo_for_path(self, path):
         '''
@@ -114,102 +114,9 @@ class HgExtension(nautilus.MenuProvider,
             return None
 
 #start dialogs
-    def _about(self, window, info):
-        self._run_dialog('about', filelist=False)
-
-    def _add(self, window, vfs_files):
-        self._run_dialog('add')
-        self.clear_cached_repo()
-
-    def _clone(self, window, info):
-        self._run_dialog('clone')
-
-    def _commit(self, window, vfs_files):
-        self._run_dialog('commit')
-        self.clear_cached_repo()
-
-    def _datamine(self, window, vfs_files):
-        self._run_dialog('datamine')
-
-    def _diff(self, window, vfs_files):
-        path = self.files[0]
-        if path is None:
-            return
-        repo = self.get_repo_for_path(path)
-        if repo is None:
-            return
-        diffcmd = repo.ui.config('tortoisehg', 'vdiff', None)
-        if diffcmd is None:
-            self._run_dialog('diff')
-        else:
-            cmdline = ['hg', diffcmd]
-            cwd = os.path.isdir(path) and path or os.path.dirname(path)
-            paths = [self.get_path_for_vfs_file(f) for f in vfs_files]
-            subprocess.Popen(cmdline+paths, shell=False, env=self.env, cwd=cwd)
-
-    def _history(self, window, info):
-        self._run_dialog('history')
-        self.clear_cached_repo()
-
-    def _init(self, window, info):
-        self._run_dialog('init')
-
-    def _recovery(self, window, info):
-        self._run_dialog('recovery')
-        self.clear_cached_repo()
-
-    def _revert(self, window, vfs_files):
-        self._run_dialog('revert')
-        self.clear_cached_repo()
-
-    def _serve(self, window, info):
-        self._run_dialog('serve', filelist=False)
-
-    def _status(self, window, info):
-        self._run_dialog('status')
-
-    def _synch(self, window, info):
-        self._run_dialog('synch', filelist=False)
-        self.clear_cached_repo()
-
-    def _config_repo(self, window, info):
-        self._run_dialog('config')
-
-    def _config_user(self, window, info):
-        self._run_dialog('config', filelist=False)
-
-    def _unmerge(self, window, info):
-        self._run_dialog('checkout', filelist=False,
-                extras=['--', '--clean', str(self.rev0)])
-        self.clear_cached_repo()
-
-    def _shelve(self, window, info):
-        self._run_dialog('shelve')
-
-    _vdiff=_diff
-
-    def _rename(self, window, info):
-        self._run_dialog('rename')
-
-    def _remove(self, window, info):
-        self._run_dialog('status')
-
-    def _annotate(self, window, info):
-        self._run_dialog('datamine')
-
-    def _update(self, window, info):
-        print "not supported" # will be replaced
-
-    def _merge(self, window, info):
-        print "not supported" # will be replaced
-
-    def _grep(self, window, info):
-        self._run_dialog('datamine')
-
-    def _run_dialog(self, hgcmd, filelist=True, extras=[]):
+    def run_dialog(self, menuitem, hgcmd):
         '''
         hgcmd - hgproc subcommand
-        filelist  - bool for whether to generate file list for hgproc
         '''
         paths = self.files
         if paths[0] is None:
@@ -224,25 +131,37 @@ class HgExtension(nautilus.MenuProvider,
         else:
             root = cwd
 
+        if hgcmd == 'vdiff':
+            diffcmd = repo.ui.config('tortoisehg', 'vdiff', None)
+            if diffcmd is None:
+                hgcmd = 'diff'
+            else:
+                cmdline = ['hg', diffcmd]
+                cwd = os.path.isdir(path) and path or os.path.dirname(path)
+                paths = [self.get_path_for_vfs_file(f) for f in vfs_files]
+                subprocess.Popen(cmdline+paths, shell=False, env=self.env,
+                                 cwd=cwd)
+                return
+
         cmdopts  = [sys.executable, self.hgproc]
         cmdopts += ['--root', root]
         cmdopts += ['--cwd', cwd]
         cmdopts += ['--command', hgcmd]
 
-        if filelist:
+        if hgcmd not in nofilecmds:
             # Use temporary file to store file list (avoid shell command
             # line limitations)
             fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
             os.write(fd, "\n".join(paths))
             os.close(fd)
             cmdopts += ['--listfile', tmpfile, '--deletelistfile']
-        cmdopts.extend(extras)
 
         subprocess.Popen(cmdopts, cwd=cwd, env=self.env, shell=False)
 
-        # Remove cached repo object, dirstate may change
-        self.cacherepo = None
-        self.cacheroot = None
+        if hgcmd not in nocachecmds:
+            # Remove cached repo object, dirstate may change
+            self.cacherepo = None
+            self.cacheroot = None
 
     def buildMenu(self, menuf, vfsfile):
         '''Build menu'''
@@ -258,7 +177,7 @@ class HgExtension(nautilus.MenuProvider,
             pos += 1
             idstr = 'HgNautilus::%02d' % pos
             if menu_info.isSep():
-               #can not insert a separator till now
+                # can not insert a separator till now
                 pass
             elif menu_info.isSubmenu():
                 if nautilus.__dict__.get('Menu'):
@@ -279,7 +198,7 @@ class HgExtension(nautilus.MenuProvider,
                                  menu_info.menutext,
                                  menu_info.helptext,
                                  self.icon(menu_info.icon))
-                    item.connect('activate', menu_info.handler, '')
+                    item.connect('activate', self.run_dialog, menu_info.hgcmd)
                     items.append(item)
         return items
 
