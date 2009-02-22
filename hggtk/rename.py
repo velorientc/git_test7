@@ -15,7 +15,7 @@ import Queue
 import thread2
 from dialog import error_dialog
 from mercurial import hg, ui, mdiff, cmdutil, match, util, commands
-from hglib import toutf, diffexpand, rootpath
+from hglib import toutf, fromutf, diffexpand, rootpath
 import gtklib
 try:
     from mercurial.repo import RepoError
@@ -383,9 +383,11 @@ def run(files = [], detect=False, root='', cwd='', **opts):
         if cwd: os.chdir(cwd)
         fname = util.normpath(fname)
         if target:
-            target = util.normpath(target)
-        title = 'Rename ' + fname
-        dialog = entry_dialog(None, title, True, target or fname, rename_resp)
+            target = toutf(util.normpath(target))
+        else:
+            target = toutf(fname)
+        title = 'Rename ' + toutf(fname)
+        dialog = entry_dialog(None, title, True, target, rename_resp)
         dialog.orig = fname
         dialog.show_all()
         dialog.connect('destroy', gtk.main_quit)
@@ -405,7 +407,7 @@ def rename_resp(dialog, response):
         gtk.main_quit()
         return
 
-    new_name = dialog.entry.get_text()
+    new_name = fromutf(dialog.entry.get_text())
     opts = {}
     opts['force'] = False # Checkbox? Nah.
     opts['after'] = False
