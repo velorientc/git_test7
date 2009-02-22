@@ -7,7 +7,7 @@
 import os
 import gtk
 from dialog import *
-from shlib import shell_notify
+from shlib import shell_notify, set_tortoise_icon
 from hglib import fromutf, toutf
 from mercurial import hg, ui, match
 
@@ -16,6 +16,7 @@ class HgIgnoreDialog(gtk.Window):
     def __init__(self, root='', fileglob=''):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        set_tortoise_icon(self, 'general.ico')
 
         self.root = root
         self.set_title('Ignore filter for ' + os.path.basename(root))
