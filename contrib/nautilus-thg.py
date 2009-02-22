@@ -167,15 +167,15 @@ class HgExtension(nautilus.MenuProvider,
         '''Build menu'''
 
         self.files = [self.get_path_for_vfs_file(f) for f in vfsfile]
+        self.pos = 0
         return self._buildMenu(menuf(self.files))
 
     def _buildMenu(self, menus, pos=0):
         '''Build menu'''
-
         items = []
         for menu_info in menus:
-            pos += 1
-            idstr = 'HgNautilus::%02d' % pos
+            idstr = 'HgNautilus::%02d' % self.pos
+            self.pos += 1
             if menu_info.isSep():
                 # can not insert a separator till now
                 pass
@@ -189,9 +189,8 @@ class HgExtension(nautilus.MenuProvider,
                         submenu.append_item(subitem)
                     items.append(item)
                 else: #submenu not suported
-                    for subitem in self._buildMenu(menu_info.get_menus(), pos):
+                    for subitem in self._buildMenu(menu_info.get_menus()):
                         items.append(subitem)
-                        pos+= 1
             else:
                 if menu_info.state:
                     item = nautilus.MenuItem(idstr,
