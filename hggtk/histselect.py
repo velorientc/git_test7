@@ -35,7 +35,7 @@ class HistoryDialog(gtk.Dialog):
         set_tortoise_icon(self, 'menulog.ico')
         # set dialog title
         title = "hg log "
-        if root: title += " - %s" % root
+        if root: title += " - %s" % hglib.toutf(root)
         self.set_title(title)
 
         self.root = root
