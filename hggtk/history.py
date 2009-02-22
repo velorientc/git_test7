@@ -626,9 +626,7 @@ class GLog(GDialog):
         # disable/enable menus as required
         parents = [self.repo.changelog.rev(x.node()) for x in
                    self.repo.changectx(None).parents()]
-        can_merge = selrev not in parents and \
-                    len(self.repo.heads()) > 1 and \
-                    len(parents) < 2
+        can_merge = selrev not in parents and len(parents) < 2
         self._cmenu_merge.set_sensitive(can_merge)
 
         # display the context menu
