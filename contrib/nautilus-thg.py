@@ -161,7 +161,8 @@ class HgExtension(nautilus.MenuProvider,
             files = []
             repo = self.get_repo_for_path(cwd)
         else:
-            cwd = os.path.dirname(files[0])
+            f = files[0]
+            cwd = os.path.isdir(f) and f or os.path.dirname(f)
             repo = self.get_repo_for_path(cwd)
         if repo:
             menus = self.menu.get_commands(repo, cwd, files)
