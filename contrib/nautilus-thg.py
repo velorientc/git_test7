@@ -140,7 +140,7 @@ class HgExtension(nautilus.MenuProvider,
             fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
             os.write(fd, "\n".join(self.files))
             os.close(fd)
-            cmdopts += ['--listfile', tmpfile, '--deletelistfile']
+            cmdopts += ['--listfile', tmpfile]
 
         subprocess.Popen(cmdopts, cwd=cwd, env=self.env, shell=False)
 
