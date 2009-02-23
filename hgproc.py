@@ -106,5 +106,5 @@ def run_trapped(args):
         error_dialog(None, "Error executing hgproc", tr)
 
 if __name__=='__main__':
-    print "hgproc sys.argv =", sys.argv
+    print "hgproc@%s(%s)" % (os.getcwd(), sys.argv)
     dlg = run_trapped(sys.argv[1:])
