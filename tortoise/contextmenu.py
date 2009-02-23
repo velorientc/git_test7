@@ -36,32 +36,6 @@ ui.ui.write_err = write_err
 S_OK = 0
 S_FALSE = 1
 
-def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], gui=True):
-    app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
-
-    if filelist:
-        fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
-        os.write(fd, "\n".join(filelist))
-        os.close(fd)
-
-    # start gpopen
-    gpopts = "--command %s" % cmd
-    if root:
-        gpopts += " --root %s" % shellquote(root)
-    if filelist:
-        gpopts += " --listfile %s --deletelistfile" % (shellquote(tmpfile))
-    if cwd:
-        gpopts += " --cwd %s" % shellquote(cwd)
-    if not gui:
-        gpopts += " --nogui"
-
-    cmdline = '%s %s -- %s' % (shellquote(app_path), gpopts, cmdopts)
-
-    try:
-        run_program(cmdline)
-    except win32api.error, details:
-        win32ui.MessageBox("Error executing command - %s" % (details), "gpopen")
-
 def get_clone_repo_name(dir, repo_name):
     dest_clone = os.path.join(dir, repo_name)
     if os.path.exists(dest_clone):
@@ -73,17 +47,6 @@ def get_clone_repo_name(dir, repo_name):
         i += 1
     return dest_clone
 
-def run_program(cmdline):
-    print "run_program: %s" % (cmdline)
-
-    import subprocess
-    pop = subprocess.Popen(cmdline, 
-                           shell=False,
-                           creationflags=win32con.CREATE_NO_WINDOW,
-                           stderr=subprocess.STDOUT,
-                           stdout=subprocess.PIPE,
-                           stdin=subprocess.PIPE)
-    
 """Windows shell extension that adds context menu items to Mercurial repository"""
 class ContextMenuExtension(menuthg.menuThg):
     _reg_progid_ = "Mercurial.ShellExtension.ContextMenu"
@@ -117,21 +80,21 @@ class ContextMenuExtension(menuthg.menuThg):
         ]
 
     def __init__(self):
-        self._folder = None
-        self._filenames = []
-        self._handlers = {}
+        self.folder = None
+        self.fnames = []
+        self.menuitems = {}
         menuthg.menuThg.__init__(self)
 
     def Initialize(self, folder, dataobj, hkey):
         if folder:
-            self._folder = shell.SHGetPathFromIDList(folder)
+            self.folder = shell.SHGetPathFromIDList(folder)
 
         if dataobj:
             format_etc = win32con.CF_HDROP, None, 1, -1, pythoncom.TYMED_HGLOBAL
             sm = dataobj.GetData(format_etc)
             num_files = shell.DragQueryFile(sm.data_handle, -1)
             for i in range(num_files):
-                self._filenames.append(shell.DragQueryFile(sm.data_handle, i))
+                self.fnames.append(shell.DragQueryFile(sm.data_handle, i))
 
     def _create_menu(self, parent, menus, pos, idCmd, idCmdFirst):
         for menu_info in menus:
@@ -156,7 +119,7 @@ class ContextMenuExtension(menuthg.menuThg):
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(parent, pos, True, item)
-                self._handlers[idCmd] = ("", lambda x,y: 0)
+                self._handlers[idCmd] = ("", "")
             else:
                 fstate = win32con.MF_BYCOMMAND
                 if menu_info.state is False:
@@ -175,7 +138,7 @@ class ContextMenuExtension(menuthg.menuThg):
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(parent, pos, True, item)
-                self._handlers[idCmd] = (menu_info.helptext, menu_info.handler)
+                self._handlers[idCmd] = (menu_info.helptext, menu_info.hgcmd)
             idCmd += 1
             pos += 1
         return idCmd
@@ -184,7 +147,7 @@ class ContextMenuExtension(menuthg.menuThg):
         if uFlags & shellcon.CMF_DEFAULTONLY:
             return 0
 
-        thgmenu = []    # hg menus
+        thgmenu = []
 
         # a brutal hack to detect if we are the first menu to go on to the 
         # context menu. If we are not the first, then add a menu separator
@@ -192,19 +155,30 @@ class ContextMenuExtension(menuthg.menuThg):
         print "idCmdFirst = ", idCmdFirst
         if idCmdFirst >= 30000:
             thgmenu.append(menuthg.TortoiseMenuSep())
-            
         # As we are a context menu handler, we can ignore verbs.
-        self._handlers = {}
-        if self._folder and self._filenames:
-            # get menus with drag-n-drop support
-            thgmenu+= self.get_commands_dragdrop(self._filenames, self._folder)
-        else:
-                              
-            # get menus for hg menu
-            thgmenu+= self.get_commands(self._filenames)
-  
-        idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
 
+        if self.folder:
+            cwd = self.folder
+        elif self.fnames:
+            f = self.fnames[0]
+            cwd = os.path.isdir(f) and f or os.path.dirname(f)
+
+        self._handlers = {}
+        if self.folder and self.fnames:
+            # get menus with drag-n-drop support
+            thgmenu += self.get_commands_dragdrop(self.fnames, self.folder)
+            repo = menuthg.open_repo(self.folder)
+        else:
+            # get menus for hg menu
+            repo = menuthg.open_repo(cwd)
+            if repo:
+                thgmenu += self.get_commands(repo, cwd, self.fnames)
+            else:
+                thgmenu += self.get_norepo_commands(cwd, self.fnames)
+  
+        self.cwd = cwd
+        self.repo = repo
+        idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
         # Return total number of menus & submenus we've added
         return idCmd
 
@@ -213,13 +187,13 @@ class ContextMenuExtension(menuthg.menuThg):
         if verb >> 16:
             # This is a textual verb invocation... not supported.
             return S_FALSE
-        if verb not in self._handlers:
+        if verb not in self.menuitems:
             raise Exception("Unsupported command id %i!" % verb)
-        self._handlers[verb][1](hwnd)
+        self.run_dialog(self.menuitems[verb][1])
 
     def GetCommandString(self, cmd, uFlags):
         if uFlags & shellcon.GCS_VALIDATEA or uFlags & shellcon.GCS_VALIDATEW:
-            if cmd in self._handlers:
+            if cmd in self.menuitems:
                 return S_OK
             return S_FALSE
         if uFlags & shellcon.GCS_VERBA or uFlags & shellcon.GCS_VERBW:
@@ -227,222 +201,34 @@ class ContextMenuExtension(menuthg.menuThg):
         if uFlags & shellcon.GCS_HELPTEXTA or uFlags & shellcon.GCS_HELPTEXTW:
             # The win32com.shell implementation encodes the resultant
             # string into the correct encoding depending on the flags.
-            return self._handlers[cmd][0]
+            return self.menuitems[cmd][0]
         return S_FALSE
 
-    def _commit(self, parent_window):
-        self._run_dialog('commit')
-
-    def _config_user(self, parent_window):
-        self._run_dialog('config', noargs=True)
-
-    def _config_repo(self, parent_window):
-        self._run_dialog('config')
-
-    def _vdiff(self, parent_window):
-        '''[tortoisehg] vdiff = <any extdiff command>'''
-        diff = ui.ui().config('tortoisehg', 'vdiff', None)
-        if not diff:
-            msg = "You must configure tortoisehg.vdiff in your Mercurial.ini"
-            title = "Visual Diff Not Configured"
-            win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
-            return
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        open_dialog(diff, root=root, filelist=targets, gui=False)
-
-    def _view(self, parent_window):
-        '''[tortoisehg] view = [hgk | hgview]'''
-        view = ui.ui().config('tortoisehg', 'view', '')
-        if not view:
-            msg = "You must configure tortoisehg.view in your Mercurial.ini"
-            title = "Revision Graph Tool Not Configured"
-            win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
-            return
-
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        if view == 'hgview':
-            hgviewpath = find_path('hgview')
-            cmd = "%s --repository=%s" % \
-                    (shellquote(hgviewpath), shellquote(root))
-            if len(self._filenames) == 1:
-                cmd += " --file=%s" % shellquote(self._filenames[0])
-            run_program(cmd)
-        else:
-            if view == 'hgk':
-                open_dialog('view', root=root, gui=False)
-            else:
-                msg = "Revision graph viewer %s not recognized" % view
-                title = "Unknown history tool"
-                win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
-
-    def _history(self, parent_window):
-        self._log(parent_window)
-
-    def _clone_here(self, parent_window):
-        src = self._filenames[0]
-        dest = self._folder
-        repo_name = os.path.basename(src)
-        dest_clone = get_clone_repo_name(dest, repo_name)
-        cmdopts = "--verbose"
-        repos = [src, dest_clone]
-        open_dialog('clone', cmdopts, cwd=dest, filelist=repos)
-
-    def _push_here(self, parent_window):
-        src = self._filenames[0]
-        dest = self._folder
-        msg = "Push changes from %s into %s?" % (src, dest)
-        title = "Mercurial: push"
-        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
-        if rv == 2:
-            return
-
-        cmdopts = "--verbose"
-        open_dialog('push', cmdopts, root=src, filelist=[dest])
-
-    def _pull_here(self, parent_window):
-        src = self._filenames[0]
-        dest = self._folder
-        msg = "Pull changes from %s?" % (src)
-        title = "Mercurial: pull"
-        rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
-        if rv == 2:
-            return
-
-        cmdopts = "--verbose"
-        open_dialog('pull', cmdopts, root=src, filelist=[dest])
-
-    def _incoming_here(self, parent_window):
-        src = self._filenames[0]
-        dest = self._folder
-        cmdopts = "--verbose"
-        open_dialog('incoming', cmdopts, root=src, filelist=[dest])
-
-    def _outgoing_here(self, parent_window):
-        src = self._filenames[0]
-        dest = self._folder
-        cmdopts = "--verbose"
-        open_dialog('outgoing', cmdopts, root=src, filelist=[dest])
-
-    def _init(self, parent_window):
-        self._run_dialog('init')
-            
-    def _shelve(self, parent_window):
-        self._run_dialog('shelve')
-
-    def _hgignore(self, parent_window):
-        self._run_dialog('hgignore')
-
-    def _rename(self, parent_window):
-        src = self._filenames[0]
-        if self._folder:
-            cwd = self._folder
-        elif self._filenames:
-            f = self._filenames[0]
-            cwd = os.path.isdir(f) and f or os.path.dirname(f)
-        cmdopts = "--verbose"
-        open_dialog('rename', cmdopts, cwd=cwd, filelist=[src])
-
-    def _guess_rename(self, parent_window):
-        self._run_dialog('rename --detect')
-
-    def _status(self, parent_window):
-        self._run_dialog('status')
-
-    def _clone(self, parent_window):
-        self._run_dialog('clone', True)
-
-    def _synch(self, parent_window):
-        self._run_dialog('synch', True)
-
-    def _synch_here(self, parent_window):
-        self._run_dialog('synch', False)
-        
-    def _pull(self, parent_window):
-        self._run_dialog('pull', True)
-
-    def _push(self, parent_window):
-        self._run_dialog('push', True)
-
-    def _incoming(self, parent_window):
-        self._run_dialog('incoming', True)
-
-    def _outgoing(self, parent_window):
-        self._run_dialog('outgoing', True)
-
-    def _serve(self, parent_window):
-        self._run_dialog('serve', noargs=True)
-
-    def _add(self, parent_window):
-        self._run_dialog('add', modal=True)
-
-    def _remove(self, parent_window):
-        self._run_dialog('remove')
-
-    def _revert(self, parent_window):
-        self._run_dialog('status')
-
-    def _tip(self, parent_window):
-        self._run_dialog('tip', True)
-
-    def _parents(self, parent_window):
-        self._run_dialog('parents', True)
-
-    def _heads(self, parent_window):
-        self._run_dialog('heads', True)
-
-    def _log(self, parent_window):
-        self._run_dialog('log', verbose=False)
-
-    def _show_tags(self, parent_window):
-        self._run_dialog('tags', True, verbose=False)
-
-    def _add_tag(self, parent_window):
-        self._run_dialog('tag', True, verbose=False)
-
-    def _diff(self, parent_window):
-        self._run_dialog('diff')
-
-    def _merge(self, parent_window):
-        self._run_dialog('merge', noargs=True)
-
-    def _recovery(self, parent_window):
-        self._run_dialog('recovery')
-
-    def _update(self, parent_window):
-        self._run_dialog('update', noargs=True)
-
-    def _grep(self, parent_window):
-        # open datamine dialog with no file brings up a search tab
-        self._run_dialog('datamine', noargs=True)
-
-    def _annotate(self, parent_window):
-        # open datamine dialog with files brings up the annotate
-        # tabs for each file
-        self._run_dialog('datamine')
-
-    def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
-        if self._folder:
-            cwd = self._folder
-        elif self._filenames:
-            f = self._filenames[0]
-            cwd = os.path.isdir(f) and f or os.path.dirname(f)
-        else:
-            win32ui.MessageBox("Can't get cwd!", 'Hg ERROR', 
-                   win32con.MB_OK|win32con.MB_ICONERROR)
-            return
-
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        filelist = []
-        if noargs == False:
-            filelist = targets
-        cmdopts = "%s" % (verbose and "--verbose" or "")
-        open_dialog(hgcmd, cmdopts, cwd=cwd, root=root, filelist=filelist)
-
-    def _help(self, parent_window):
-        open_dialog('help', '--verbose')
-
-    def _about(self, parent_window):
-        open_dialog('about')
+    def run_dialog(self, hgcmd):
+        cwd = self.cwd
+        if self.repo:
+            # Convert filenames to be relative to cwd
+            files = []
+            for f in self.fnames:
+                files.append(util.canonpath(self.repo.root, cwd, f))
+            self.fnames = files
+        gpopts = "--command %s " % hgcmd
+        if filelist:
+            fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
+            os.write(fd, "\n".join(self.fnames))
+            os.close(fd)
+            gpopts += " --listfile %s --deletelistfile" % (shellquote(tmpfile))
+        app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
+        cmdline = shellquote(app_path) + gpopts
+        try:
+            import subprocess
+            pop = subprocess.Popen(cmdline, 
+                           shell=False,
+                           cwd=cwd,
+                           creationflags=win32con.CREATE_NO_WINDOW,
+                           stderr=subprocess.STDOUT,
+                           stdout=subprocess.PIPE,
+                           stdin=subprocess.PIPE)
+        except win32api.error, details:
+            win32ui.MessageBox("Error executing command - %s" % (details),
+                    "gpopen")
