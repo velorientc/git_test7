@@ -132,8 +132,6 @@ class HgExtension(nautilus.MenuProvider,
                 return
 
         cmdopts  = [sys.executable, self.hgproc]
-        if repo: cmdopts += ['--root', repo.root]
-        cmdopts += ['--cwd', cwd]
         cmdopts += ['--command', hgcmd]
 
         if hgcmd not in nofilecmds and self.files:
