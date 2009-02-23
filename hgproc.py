@@ -7,7 +7,7 @@
 import os
 import sys
 from mercurial import ui
-from tortoise.thgutil import get_prog_root
+from tortoise.thgutil import get_prog_root, find_root
 
 # always use hg exe installed with TortoiseHg
 thgdir = get_prog_root()
@@ -45,7 +45,7 @@ _dialogs = { 'commit' : commit,    'status' : status,    'revert' : status,
              'clone'  : clone,     'serve'  : serve,     'synch'  : synch,
              'about'  : about,     'config' : thgconfig, 'recovery': recovery,
              'datamine': datamine, 'init'   : hginit,    'shelve' : thgshelve,
-             'hgignore': hgignore, 'rename' : rename }
+             'hgignore': hgignore, 'rename' : rename,    'guess'  : rename}
 
 def get_list_from_file(filename):
     fd = open(filename, "r")
@@ -55,15 +55,15 @@ def get_list_from_file(filename):
 
 def get_option(args):
     import getopt
-    long_opt_list = ('command=', 'exepath=', 'listfile=', 'root=', 'cwd=',
-            'deletelistfile', 'nogui', 'detect')
-    opts, args = getopt.getopt(args, "c:e:l:dR:", long_opt_list)
+    long_opt_list = ('command=', 'listfile=')
+    opts, args = getopt.getopt(args, "c:l:", long_opt_list)
     # Set default options
     options = {}
+    cwd = os.getcwd()
     options['hgcmd'] = 'help'
-    options['cwd'] = os.getcwd()
+    options['cwd'] = cwd
+    options['root'] = find_root(cwd)
     options['files'] = []
-    options['gui'] = True
     listfile = None
     delfile = False
     
@@ -72,38 +72,27 @@ def get_option(args):
             options['hgcmd'] = a
         elif o in ("-l", "--listfile"):
             listfile = a
-        elif o in ("-d", "--deletelistfile"):
-            delfile = True
-        elif o in ("--nogui"):
-            options['gui'] = False
-        elif o in ("-R", "--root"):
-            options['root'] = a
-        elif o in ("--cwd"):
-            options['cwd'] = a
-        elif o in ("--detect"):
-            options['detect'] = True
 
     if listfile:
         options['files'] = get_list_from_file(listfile)
-        if delfile:
-            os.unlink(listfile)
+        os.unlink(listfile)
 
     return (options, args)
 
 def parse(args):
-    option, args = get_option(args)
+    opts, args = get_option(args)
     
-    cmdline = ['hg', option['hgcmd']] 
-    if 'root' in option:
+    cmdline = ['hg', opts['hgcmd']] 
+    if opts.get('root'):
         cmdline.append('--repository')
-        cmdline.append(option['root'])
+        cmdline.append(opts['root'])
     cmdline.extend(args)
-    cmdline.extend(option['files'])
-    option['cmdline'] = cmdline
+    cmdline.extend(opts['files'])
+    opts['cmdline'] = cmdline
 
     global _dialogs
-    dialog = _dialogs.get(option['hgcmd'], hgcmd)
-    dialog.run(**option)
+    dialog = _dialogs.get(opts['hgcmd'], hgcmd)
+    dialog.run(**opts)
 
 
 def run_trapped(args):
@@ -117,10 +106,5 @@ def run_trapped(args):
         error_dialog(None, "Error executing hgproc", tr)
 
 if __name__=='__main__':
-    #dlg = parse(['-c', 'help', '--', '-v'])
-    #dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
-    #dlg = parse(['-c', 'status', '--root', 'c:\hg\h1', ])
-    #dlg = parse(['-c', 'add', '--root', 'c:\hg\h1', '--listfile', 'c:\\hg\\h1\\f1', '--notify'])
-    #dlg = parse(['-c', 'rollback', '--root', 'c:\\hg\\h1'])
     print "hgproc sys.argv =", sys.argv
     dlg = run_trapped(sys.argv[1:])
