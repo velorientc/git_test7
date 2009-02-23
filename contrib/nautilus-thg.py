@@ -118,18 +118,8 @@ class HgExtension(nautilus.MenuProvider,
         '''
         hgcmd - hgproc subcommand
         '''
-        paths = self.files
-        if paths[0] is None:
-            return
-
-        path = paths[0]
-        repo = self.get_repo_for_path(path)
-        cwd = os.path.isdir(path) and path or os.path.dirname(path)
-
-        if repo is not None:
-            root = repo.root
-        else:
-            root = cwd
+        cwd = self.cwd
+        repo = self.get_repo_for_path(cwd)
 
         if hgcmd == 'vdiff':
             diffcmd = repo.ui.config('tortoisehg', 'vdiff', None)
@@ -137,22 +127,20 @@ class HgExtension(nautilus.MenuProvider,
                 hgcmd = 'diff'
             else:
                 cmdline = ['hg', diffcmd]
-                cwd = os.path.isdir(path) and path or os.path.dirname(path)
-                paths = [self.get_path_for_vfs_file(f) for f in vfs_files]
-                subprocess.Popen(cmdline+paths, shell=False, env=self.env,
-                                 cwd=cwd)
+                cmdline.extend(self.files)
+                subprocess.Popen(cmdline, shell=False, env=self.env, cwd=cwd)
                 return
 
         cmdopts  = [sys.executable, self.hgproc]
-        cmdopts += ['--root', root]
+        if repo: cmdopts += ['--root', repo.root]
         cmdopts += ['--cwd', cwd]
         cmdopts += ['--command', hgcmd]
 
-        if hgcmd not in nofilecmds:
+        if hgcmd not in nofilecmds and self.files:
             # Use temporary file to store file list (avoid shell command
             # line limitations)
             fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
-            os.write(fd, "\n".join(paths))
+            os.write(fd, "\n".join(self.files))
             os.close(fd)
             cmdopts += ['--listfile', tmpfile, '--deletelistfile']
 
@@ -163,14 +151,28 @@ class HgExtension(nautilus.MenuProvider,
             self.cacherepo = None
             self.cacheroot = None
 
-    def buildMenu(self, menuf, vfsfile):
+    def buildMenu(self, vfs_files, bg):
         '''Build menu'''
-
-        self.files = [self.get_path_for_vfs_file(f) for f in vfsfile]
         self.pos = 0
-        return self._buildMenu(menuf(self.files))
+        self.files = []
+        files = [self.get_path_for_vfs_file(f) for f in vfs_files]
+        if bg:
+            cwd = files[0]
+            files = []
+            repo = self.get_repo_for_path(cwd)
+        else:
+            cwd = os.path.dirname(files[0])
+            repo = self.get_repo_for_path(cwd)
+        if repo:
+            menus = self.menu.get_commands(repo, cwd, files)
+            for f in files:
+                self.files.append(util.canonpath(repo.root, cwd, f))
+        else:
+            menus = self.menu.get_norepo_commands(cwd, files)
+        self.cwd = cwd
+        return self._buildMenu(menus)
 
-    def _buildMenu(self, menus, pos=0):
+    def _buildMenu(self, menus):
         '''Build menu'''
         items = []
         for menu_info in menus:
@@ -204,12 +206,12 @@ class HgExtension(nautilus.MenuProvider,
     def get_background_items(self, window, vfs_file):
         '''Build context menu for current directory'''
         if vfs_file and self.menu:
-            return self.buildMenu(self.menu.get_commands, [vfs_file])
+            return self.buildMenu([vfs_file], True)
 
     def get_file_items(self, window, vfs_files):
         '''Build context menu for selected files/directories'''
         if vfs_files and self.menu:
-            return self.buildMenu(self.menu.get_commands, vfs_files)
+            return self.buildMenu(vfs_files, False)
 
     def get_columns(self):
         return nautilus.Column("HgNautilus::80hg_status",
