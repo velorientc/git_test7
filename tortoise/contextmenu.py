@@ -210,7 +210,12 @@ class ContextMenuExtension(menuthg.menuThg):
             # Convert filenames to be relative to cwd
             files = []
             for f in self.fnames:
-                files.append(util.canonpath(self.repo.root, cwd, f))
+                cpath = util.canonpath(self.repo.root, cwd, f)
+                if cpath.startswith(cwd):
+                    cpath = cpath[len(cwd+os.sep):]
+                    files.append(cpath)
+                else:
+                    files.append(f)
             self.fnames = files
         gpopts = "--command %s " % hgcmd
         if filelist:
