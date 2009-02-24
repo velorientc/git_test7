@@ -233,7 +233,7 @@ class menuThg:
 
             menu.append(TortoiseMenu(_("Synchronize..."),
                       _("Synchronize with remote repository"),
-                      '_synch', icon="menusynch.ico"))
+                      'synch', icon="menusynch.ico"))
             menu.append(TortoiseMenu(_("Recovery..."),
                       _("General repair and recovery of repository"),
                       'recovery', icon="general.ico"))
