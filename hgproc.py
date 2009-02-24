@@ -4,8 +4,14 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
+import pygtk
+pygtk.require('2.0')
+import gtk
+
 import os
 import sys
+
+from mercurial import demandimport; demandimport.enable()
 from mercurial import ui
 from tortoise.thgutil import get_prog_root
 
