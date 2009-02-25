@@ -121,7 +121,6 @@ def get_state(upath, repo=None):
         return UNKNOWN
 
     print "status() took %d ticks" % (GetTickCount() - tc1)
-    print repostate###
     modified, added, removed, deleted, unknown, ignored, clean = repostate
     # cached file info
     tc = GetTickCount()
