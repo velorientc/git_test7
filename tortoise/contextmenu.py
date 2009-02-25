@@ -15,7 +15,7 @@ import win32gui
 import win32gui_struct
 import win32api
 import _winreg
-from mercurial import hg
+from mercurial import hg, util
 from thgutil import *
 import menuthg
 
@@ -119,7 +119,7 @@ class ContextMenuExtension(menuthg.menuThg):
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(parent, pos, True, item)
-                self._handlers[idCmd] = ("", "")
+                self.menuitems[idCmd] = ("", "")
             else:
                 fstate = win32con.MF_BYCOMMAND
                 if menu_info.state is False:
@@ -138,7 +138,7 @@ class ContextMenuExtension(menuthg.menuThg):
                 
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(parent, pos, True, item)
-                self._handlers[idCmd] = (menu_info.helptext, menu_info.hgcmd)
+                self.menuitems[idCmd] = (menu_info.helptext, menu_info.hgcmd)
             idCmd += 1
             pos += 1
         return idCmd
@@ -163,7 +163,7 @@ class ContextMenuExtension(menuthg.menuThg):
             f = self.fnames[0]
             cwd = os.path.isdir(f) and f or os.path.dirname(f)
 
-        self._handlers = {}
+        self.menuitems = {}
         if self.folder and self.fnames:
             # get menus with drag-n-drop support
             thgmenu += self.get_commands_dragdrop(self.fnames, self.folder)
@@ -217,8 +217,8 @@ class ContextMenuExtension(menuthg.menuThg):
                 else:
                     files.append(f)
             self.fnames = files
-        gpopts = "--command %s " % hgcmd
-        if filelist:
+        gpopts = " --command %s " % hgcmd
+        if self.fnames:
             fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
             os.write(fd, "\n".join(self.fnames))
             os.close(fd)
