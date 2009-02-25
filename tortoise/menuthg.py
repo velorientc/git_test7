@@ -227,7 +227,7 @@ class menuThg:
         if len(files) == 0:
             menu.append(TortoiseMenu(_("Search Repository"),
                       _("Search revisions of files for a text pattern"),
-                      'grep', icon="menurepobrowse.ico"))
+                      'datamine', icon="menurepobrowse.ico"))
 
             menu.append(TortoiseMenuSep())
 
