@@ -114,11 +114,14 @@ class HgExtension(nautilus.MenuProvider,
             return None
 
 #start dialogs
-    def run_dialog(self, menuitem, hgcmd):
+    def run_dialog(self, menuitem, hgcmd, cwd = None):
         '''
         hgcmd - hgproc subcommand
         '''
-        cwd = self.cwd
+        if cwd: #bg
+            self.files = []
+        else:
+            cwd = self.cwd
         repo = self.get_repo_for_path(cwd)
 
         if hgcmd == 'vdiff':
@@ -177,7 +180,7 @@ class HgExtension(nautilus.MenuProvider,
         return self._buildMenu(menus)
 
     def _buildMenu(self, menus):
-        '''Build menu'''
+        '''Build one level of a menu'''
         items = []
         for menu_info in menus:
             idstr = 'HgNautilus::%02d' % self.pos
@@ -203,7 +206,8 @@ class HgExtension(nautilus.MenuProvider,
                                  menu_info.menutext,
                                  menu_info.helptext,
                                  self.icon(menu_info.icon))
-                    item.connect('activate', self.run_dialog, menu_info.hgcmd)
+                    item.connect('activate', self.run_dialog, menu_info.hgcmd, 
+                        self.files and None or self.cwd)
                     items.append(item)
         return items
 
@@ -211,6 +215,8 @@ class HgExtension(nautilus.MenuProvider,
         '''Build context menu for current directory'''
         if vfs_file and self.menu:
             return self.buildMenu([vfs_file], True)
+        else:
+            self.files = []
 
     def get_file_items(self, window, vfs_files):
         '''Build context menu for selected files/directories'''
