@@ -182,6 +182,10 @@ class HgExtension(nautilus.MenuProvider,
     def _buildMenu(self, menus):
         '''Build one level of a menu'''
         items = []
+	if self.files:
+            passcwd = None
+        else: #bg
+            passcwd = self.cwd
         for menu_info in menus:
             idstr = 'HgNautilus::%02d' % self.pos
             self.pos += 1
@@ -206,8 +210,7 @@ class HgExtension(nautilus.MenuProvider,
                                  menu_info.menutext,
                                  menu_info.helptext,
                                  self.icon(menu_info.icon))
-                    item.connect('activate', self.run_dialog, menu_info.hgcmd, 
-                        self.files and None or self.cwd)
+                    item.connect('activate', self.run_dialog, menu_info.hgcmd, passcwd)
                     items.append(item)
         return items
 
