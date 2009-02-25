@@ -193,7 +193,7 @@ class HgExtension(nautilus.MenuProvider,
                 # can not insert a separator till now
                 pass
             elif menu_info.isSubmenu():
-                if nautilus.__dict__.get('Menu'):
+                if hasattr(nautilus, 'Menu'):
                     item = nautilus.MenuItem(idstr, menu_info.menutext,
                             menu_info.helptext)
                     submenu = nautilus.Menu()
