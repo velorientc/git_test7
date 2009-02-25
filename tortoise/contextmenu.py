@@ -222,7 +222,7 @@ class ContextMenuExtension(menuthg.menuThg):
             fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
             os.write(fd, "\n".join(self.fnames))
             os.close(fd)
-            gpopts += " --listfile %s --deletelistfile" % (shellquote(tmpfile))
+            gpopts += " --listfile %s" % (shellquote(tmpfile))
         app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
         cmdline = shellquote(app_path) + gpopts
         try:
