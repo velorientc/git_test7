@@ -169,5 +169,12 @@ else: # Not Windows
         path = os.environ.get('TORTOISEHG_PATH', defpath)
         return os.path.isdir(path) and path or os.path.dirname(path)
 
+    def netdrive_status(drive):
+        """
+        return True if a network drive is accessible (connected, ...),
+        or None if <drive> is not a network drive
+        """
+        return None
+
     def icon_to_bitmap(iconPathName):
         pass

@@ -36,6 +36,7 @@ TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
 nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
 nocachecmds = 'about serve repoconfig userconfig'.split()
 
+
 class HgExtension(nautilus.MenuProvider,
                   nautilus.ColumnProvider,
                   nautilus.InfoProvider,
@@ -113,7 +114,6 @@ class HgExtension(nautilus.MenuProvider,
             self.cacherepo = None
             return None
 
-#start dialogs
     def run_dialog(self, menuitem, hgcmd, cwd = None):
         '''
         hgcmd - hgproc subcommand
@@ -233,47 +233,25 @@ class HgExtension(nautilus.MenuProvider,
                                "Version control status"),
 
     def _get_file_status(self, repo, localpath):
-        emblem = None
-        status = '?'
-
-        # This is not what the API is optimized for, but this appears
-        # to work efficiently enough
-        matcher = match.always(repo.root, localpath)
-        changes = repo.dirstate.status(matcher, True, True, True)
-        (lookup, modified, added, removed, deleted, unknown,
-                ignored, clean) = changes
-
-        if localpath in clean:
-            emblem = 'default'
-            status = 'clean'
-        elif localpath in modified:
-            emblem = 'cvs-modified'
-            status = 'modified'
-        elif localpath in added:
-            emblem = 'cvs-aded'
-            status = 'added'
-        elif localpath in unknown:
-            emblem = 'new'
-            status = 'unrevisioned'
-        elif localpath in ignored:
-            status = 'ignored'
-        elif localpath in deleted:
-            # Should be hard to reach this state
-            emblem = 'stockmail-priority-high'
-            status = 'deleted'
+        from tortoise import cachethg
+        cachestate = cachethg.get_state(localpath, repo)
+        cache2state = {cachethg.UNCHANGED: ('default', 'clean'),
+                       cachethg.ADDED: ('cvs-aded', 'added'),
+                       cachethg.MODIFIED: ('cvs-modified', 'modified'),
+                       cachethg.UNKNOWN: ('new', 'unrevisioned'),
+                       cachethg.IGNORED: (None, 'ignored'),
+                       cachethg.NOT_IN_REPO: (None, '')}
+        emblem, status = cache2state.get(cachestate)
+        if status == None:
+            status = '?'
         return emblem, status
-
 
     def update_file_info(self, file):
         '''Return emblem and hg status for this file'''
         path = self.get_path_for_vfs_file(file)
-        if path is None or file.is_directory():
+        if not path:
             return
-        repo = self.get_repo_for_path(path)
-        if repo is None:
-            return
-        localpath = path[len(repo.root)+1:]
-        emblem, status = self._get_file_status(repo, localpath)
+        emblem, status = self._get_file_status(self.cacherepo, path)
         if emblem is not None:
             file.add_emblem(emblem)
         file.add_string_attribute('hg_status', status)
@@ -303,7 +281,7 @@ class HgExtension(nautilus.MenuProvider,
         if repo is None:
             return
         localpath = path[len(repo.root)+1:]
-        emblem, status = self._get_file_status(repo, localpath)
+        emblem, status = self._get_file_status(repo, path)
 
         # Get the information from Mercurial
         ctx = repo.changectx(None).parents()[0]
