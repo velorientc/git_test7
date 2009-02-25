@@ -3,7 +3,7 @@
 #
 # Copyright 2007 Brad Schick, brad at gmail . com
 # Copyright (C) 2007-8 TK Soh <teekaysoh@gmail.com>
-# Copyright (C) 2008-7 Steve Borho <steve@borho.org>
+# Copyright (C) 2008-9 Steve Borho <steve@borho.org>
 #
 
 
@@ -920,7 +920,7 @@ class GStatus(GDialog):
                 diffopts = mdiff.diffopts(git=True, nodates=True)
                 for s in patch.diff(self.repo, self._node1, self._node2,
                         match=matcher, opts=diffopts):
-                        difflines.extend(s.splitlines(True))
+                    difflines.extend(s.splitlines(True))
             try:
                 difftext = cStringIO.StringIO(''.join(difflines))
                 difftext.seek(0)
