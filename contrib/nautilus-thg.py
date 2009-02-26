@@ -140,14 +140,18 @@ class HgExtension(nautilus.MenuProvider,
         cmdopts  = [sys.executable, self.hgproc, hgcmd]
 
         if hgcmd not in nofilecmds and self.files:
-            # Use temporary file to store file list (avoid shell command
+            # Use stdin to pass file list (avoid shell command
             # line limitations)
-            fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
-            os.write(fd, "\n".join(self.files))
-            os.close(fd)
-            cmdopts += ['--listfile', tmpfile]
+            pipe = subprocess.PIPE
+            cmdopts += ['--listfile', '-']
+        else:
+            pipe = None
 
-        subprocess.Popen(cmdopts, cwd=cwd, env=self.env, shell=False)
+        stdin = subprocess.Popen(cmdopts, cwd=cwd, stdin=pipe, env=self.env, shell=False).stdin
+
+        if pipe:
+            stdin.write('\n'.join(self.files))
+            stdin.close()
 
         if hgcmd not in nocachecmds:
             # Remove cached repo object, dirstate may change
