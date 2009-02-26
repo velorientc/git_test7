@@ -217,13 +217,15 @@ class ContextMenuExtension(menuthg.menuThg):
                 else:
                     files.append(f)
             self.fnames = files
-        gpopts = " --command %s " % hgcmd
+        gpopts = " %s" % hgcmd
         if self.fnames:
             fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
             os.write(fd, "\n".join(self.fnames))
             os.close(fd)
             gpopts += " --listfile %s" % (shellquote(tmpfile))
-        app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
+        app_path = find_path("hgtk", get_prog_root(), '.EXE;.BAT')
+        if not app_path:
+            app_path = find_path("hgtk", None, '.EXE;.BAT')
         cmdline = shellquote(app_path) + gpopts
         try:
             import subprocess
