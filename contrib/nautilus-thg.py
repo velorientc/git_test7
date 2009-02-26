@@ -163,14 +163,12 @@ class HgExtension(nautilus.MenuProvider,
         self.pos = 0
         self.files = []
         files = [self.get_path_for_vfs_file(f) for f in vfs_files]
-        if bg:
+        if bg or len(files) == 1 and vfs_files[0].is_directory():
             cwd = files[0]
             files = []
-            repo = self.get_repo_for_path(cwd)
         else:
-            f = files[0]
-            cwd = os.path.isdir(f) and f or os.path.dirname(f)
-            repo = self.get_repo_for_path(cwd)
+            cwd = os.path.dirname(files[0])
+        repo = self.get_repo_for_path(cwd)
         if repo:
             menus = self.menu.get_commands(repo, cwd, files)
             for f in files:
