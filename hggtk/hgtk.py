@@ -70,7 +70,6 @@ def _parse(ui, args):
 
     if args:
         cmd, args = args[0], args[1:]
-        print table
         aliases, i = cmdutil.findcmd(cmd, table, ui.config("ui", "strict"))
         cmd = aliases[0]
         c = list(i[1])
@@ -98,7 +97,6 @@ def _parse(ui, args):
         del options['listfile']
         args += get_list_from_file(listfile)
 
-    print 'args=', args, '\noptions=', options, '\ncmdoptions=', cmdoptions ###
     return (cmd, cmd and i[0] or None, args, options, cmdoptions)
 
 def _runcatch(ui, args):
