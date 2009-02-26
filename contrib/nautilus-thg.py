@@ -78,7 +78,10 @@ class HgExtension(nautilus.MenuProvider,
         self.env['TORTOISEHG_PATH'] = thgpath
         self.env['THG_ICON_PATH'] = os.path.join(thgpath, 'icons')
 
-        self.hgproc = os.path.join(thgpath, 'hgproc.py')
+        self.hgproc = tortoise.thgutil.find_path('hgtk',
+              tortoise.thgutil.get_prog_root())
+        if not self.hgproc:
+            self.hgproc = tortoise.thgutil.find_path('hgtk')
         self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
         self.menu = tortoise.menuthg.menuThg()
 
@@ -134,8 +137,7 @@ class HgExtension(nautilus.MenuProvider,
                 subprocess.Popen(cmdline, shell=False, env=self.env, cwd=cwd)
                 return
 
-        cmdopts  = [sys.executable, self.hgproc]
-        cmdopts += ['--command', hgcmd]
+        cmdopts  = [sys.executable, self.hgproc, hgcmd]
 
         if hgcmd not in nofilecmds and self.files:
             # Use temporary file to store file list (avoid shell command
