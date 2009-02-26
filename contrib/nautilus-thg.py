@@ -240,7 +240,7 @@ class HgExtension(nautilus.MenuProvider,
         from tortoise import cachethg
         cachestate = cachethg.get_state(localpath, repo)
         cache2state = {cachethg.UNCHANGED: ('default', 'clean'),
-                       cachethg.ADDED: ('cvs-aded', 'added'),
+                       cachethg.ADDED: ('cvs-added', 'added'),
                        cachethg.MODIFIED: ('cvs-modified', 'modified'),
                        cachethg.UNKNOWN: ('new', 'unrevisioned'),
                        cachethg.IGNORED: (None, 'ignored'),
