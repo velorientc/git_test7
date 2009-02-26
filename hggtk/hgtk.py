@@ -70,6 +70,7 @@ def _parse(ui, args):
 
     if args:
         cmd, args = args[0], args[1:]
+        print table
         aliases, i = cmdutil.findcmd(cmd, table, ui.config("ui", "strict"))
         cmd = aliases[0]
         c = list(i[1])
