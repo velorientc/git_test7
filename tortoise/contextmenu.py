@@ -161,7 +161,11 @@ class ContextMenuExtension(menuthg.menuThg):
             cwd = self.folder
         elif self.fnames:
             f = self.fnames[0]
-            cwd = os.path.isdir(f) and f or os.path.dirname(f)
+            if len(self.fnames) == 1 and os.path.isdir(f):
+                cwd = f
+                self.fnames = []
+            else:
+                cwd = os.path.dirname(f)
 
         self.menuitems = {}
         if self.folder and self.fnames:
