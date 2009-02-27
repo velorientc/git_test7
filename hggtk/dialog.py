@@ -14,14 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
+import pygtk
+pygtk.require("2.0")
 import gtk
-import gtk.glade
 from gtklib import MessageDialog
 
 
