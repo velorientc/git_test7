@@ -11,21 +11,24 @@
 
 import gtk
 import gobject
-import os
 import nautilus
-import subprocess
-import sys
-import tempfile
-import urllib
 
 try:
-    from mercurial import hg, ui, match, util
+    from mercurial import demandimport
 except ImportError:
     # workaround to use user's local python libs
     userlib = os.path.expanduser('~/lib/python')
     if os.path.exists(userlib) and userlib not in sys.path:
         sys.path.append(userlib)
-    from mercurial import hg, ui, match, util
+    from mercurial import demandimport
+demandimport.enable()
+
+import os
+import subprocess
+import sys
+import urllib
+
+from mercurial import hg, ui, match, util
 try:
     from mercurial.error import RepoError
 except ImportError:
