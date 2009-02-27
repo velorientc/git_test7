@@ -172,10 +172,14 @@ class HgExtension(nautilus.MenuProvider,
         repo = self.get_repo_for_path(cwd)
         if repo:
             menus = self.menu.get_commands(repo, cwd, files)
+            if cwd == repo.root:
+                cwd_rel = ''
+            else:
+                cwd_rel = cwd[len(repo.root+os.sep):] + os.sep
             for f in files:
                 cpath = util.canonpath(repo.root, cwd, f)
-                if cpath.startswith(cwd):
-                    cpath = cpath[len(cwd+os.sep):]
+                if cpath.startswith(cwd_rel):
+                    cpath = cpath[len(cwd_rel):]
                     self.files.append(cpath)
                 else:
                     self.files.append(f)
