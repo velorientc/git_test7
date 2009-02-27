@@ -45,6 +45,7 @@ class HgExtension(nautilus.MenuProvider,
     def __init__(self):
         self.cacherepo = None
         self.cacheroot = None
+        self.scanStack = []
 
         # check if nautilus-thg.py is a symlink first
         pfile = __file__
@@ -251,14 +252,24 @@ class HgExtension(nautilus.MenuProvider,
         return emblem, status
 
     def update_file_info(self, file):
-        '''Return emblem and hg status for this file'''
-        path = self.get_path_for_vfs_file(file)
+        '''Queue file for emblem and hg status update'''
+        self.scanStack.append(file)
+        if len(self.scanStack) == 1:
+            gobject.idle_add(self.fileinfo_on_idle)
+
+    def fileinfo_on_idle(self):
+        '''Update emblem and hg status for files when there is time'''
+        if not self.scanStack:
+            return False
+        vfs_file = self.scanStack.pop()
+        path = self.get_path_for_vfs_file(vfs_file)
         if not path:
-            return
+            return True
         emblem, status = self._get_file_status(self.cacherepo, path)
         if emblem is not None:
-            file.add_emblem(emblem)
-        file.add_string_attribute('hg_status', status)
+            vfs_file.add_emblem(emblem)
+        vfs_file.add_string_attribute('hg_status', status)
+        return True
 
     # property page borrowed from http://www.gnome.org/~gpoo/hg/nautilus-hg/
     def __add_row(self, row, label_item, label_value):
