@@ -22,6 +22,7 @@ import gtk
 from mercurial import demandimport; demandimport.enable()
 from mercurial.i18n import _
 from mercurial import hg, util, fancyopts, commands, cmdutil
+import pdb
 import mercurial.ui as _ui
 
 try:
