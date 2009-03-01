@@ -43,7 +43,7 @@ class GShelve(GStatus):
         return ' '.join([root, 'shelve'])
 
     def get_icon(self):
-        return 'menucommit.ico'
+        return 'shelve.ico'
 
     def auto_check(self):
         if self.test_opt('check'):

@@ -42,7 +42,7 @@ class DetectRenameDialog(gtk.Window):
     def __init__(self, root=''):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        set_tortoise_icon(self, 'general.ico')
+        set_tortoise_icon(self, 'detect_rename.ico')
 
         self.root = root
         self.notify_func = None

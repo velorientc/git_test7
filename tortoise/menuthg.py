@@ -156,10 +156,10 @@ class menuThg:
             if f.endswith('.hgignore'):
                 hashgignore = True
 
-        if hashgignore: # needs ico
+        if hashgignore:
             menu.append(TortoiseMenu(_("Edit Ignore Filter"),
                       _("Edit repository ignore filter"),
-                      'hgignore', icon="general.ico"))
+                      'hgignore', icon="ignore.ico"))
 
         menu.append(TortoiseMenu(_("View File Status"),
                   _("Repository status"),
@@ -167,7 +167,7 @@ class menuThg:
 
         menu.append(TortoiseMenu(_("Shelve Changes"),
                   _("Shelve or unshelve repository changes"),
-                  'shelve', icon="general.ico")) # needs ico
+                  'shelve', icon="shelve.ico"))
 
         # Visual Diff (any extdiff command)
         has_vdiff = repo.ui.config('tortoisehg', 'vdiff', '') != ''
@@ -176,10 +176,10 @@ class menuThg:
                       _("View changes using GUI diff tool"),
                       'vdiff', icon="TortoiseMerge.ico"))
 
-        if len(files) == 0: # needs ico
+        if len(files) == 0:
             menu.append(TortoiseMenu(_("Guess Renames"),
                       _("Detect renames and copies"),
-                      'guess', icon="general.ico"))
+                      'guess', icon="detect_rename.ico"))
         elif len(files) == 1: # needs ico
             menu.append(TortoiseMenu(_("Rename File"),
                       _("Rename file or directory"),
