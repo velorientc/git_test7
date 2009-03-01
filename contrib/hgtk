@@ -22,6 +22,7 @@ import gtk
 from mercurial import demandimport; demandimport.enable()
 from mercurial.i18n import _
 from mercurial import hg, util, fancyopts, commands, cmdutil
+import pdb
 import mercurial.ui as _ui
 
 try:
@@ -45,7 +46,15 @@ def dispatch(args):
     except util.Abort, inst:
         sys.stderr.write(_("abort: %s\n") % inst)
         return -1
-    return _runcatch(u, args)
+    if '--debugger' in args:
+        pdb.set_trace()
+    try:
+        return _runcatch(u, args)
+    except:
+        if '--debugger' in args:
+            pdb.post_mortem(sys.exc_info()[2])
+        u.print_exc()
+        raise
 
 def _parse(ui, args):
     options = {}
@@ -490,6 +499,7 @@ globalopts = [
      _('repository root directory or symbolic path name')),
     ('v', 'verbose', None, _('enable additional output')),
     ('h', 'help', None, _('display help and exit')),
+    ('', 'debugger', None, _('start debugger')),
 ]
 
 table = {
