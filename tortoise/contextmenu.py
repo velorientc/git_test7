@@ -352,7 +352,7 @@ class ContextMenuExtension:
             if len(self._filenames) == 0:
                 result.append(TortoiseMenu(_("Guess Renames"),
                        _("Detect renames and copies"),
-                       self._guess_rename, icon="general.ico")) # needs ico
+                       self._guess_rename, icon="detect_rename.ico"))
             elif len(self._filenames) == 1:
                 result.append(TortoiseMenu(_("Rename File"),
                        _("Rename file or directory"),
