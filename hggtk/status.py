@@ -913,16 +913,15 @@ class GStatus(GDialog):
 
         def dohgdiff():
             self.diff_model.clear()
-            difflines = []
-            if len(files) != 0:
-                wfiles = [self.repo.wjoin(x) for x in files]
-                matcher = cmdutil.match(self.repo, wfiles, self.opts)
-                diffopts = mdiff.diffopts(git=True, nodates=True)
-                for s in patch.diff(self.repo, self._node1, self._node2,
-                        match=matcher, opts=diffopts):
-                    difflines.extend(s.splitlines(True))
+            difftext = cStringIO.StringIO()
             try:
-                difftext = cStringIO.StringIO(''.join(difflines))
+                if len(files) != 0:
+                    wfiles = [self.repo.wjoin(x) for x in files]
+                    matcher = cmdutil.match(self.repo, wfiles, self.opts)
+                    diffopts = mdiff.diffopts(git=True, nodates=True)
+                    for s in patch.diff(self.repo, self._node1, self._node2,
+                            match=matcher, opts=diffopts):
+                        difftext.writelines(s.splitlines(True))
                 difftext.seek(0)
 
                 self._shelve_chunks = hgshelve.parsepatch(difftext)

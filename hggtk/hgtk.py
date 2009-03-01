@@ -45,7 +45,15 @@ def dispatch(args):
     except util.Abort, inst:
         sys.stderr.write(_("abort: %s\n") % inst)
         return -1
-    return _runcatch(u, args)
+    if '--debugger' in args:
+        pdb.set_trace()
+    try:
+        return _runcatch(u, args)
+    except:
+        if '--debugger' in args:
+            pdb.post_mortem(sys.exc_info()[2])
+        ui.print_exc()
+        raise
 
 def get_list_from_file(filename):
     try:
