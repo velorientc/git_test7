@@ -52,7 +52,7 @@ def dispatch(args):
     except:
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
-        ui.print_exc()
+        u.print_exc()
         raise
 
 def get_list_from_file(filename):
