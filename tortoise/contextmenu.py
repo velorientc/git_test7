@@ -332,7 +332,7 @@ class ContextMenuExtension:
                 if f.endswith('.hgignore'):
                     result.append(TortoiseMenu(_("Edit Ignore Filter"),
                            _("Edit repository ignore filter"),
-                           self._hgignore, icon="general.ico")) # needs ico
+                           self._hgignore, icon="ignore.ico"))
                     break
 
             result.append(TortoiseMenu(_("View File Status"),
