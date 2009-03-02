@@ -186,7 +186,9 @@ class GShelve(GStatus):
         opts = {'addremove': None, 'include': [], 'force': None,
                 'append': None, 'exclude': [], 'inspect': None}
         try:
+            self.ui.quiet = True
             hgshelve.unshelve(self.ui, self.repo, **opts)
+            self.ui.quiet = False
             self.reload_status()
         except:
             pass
