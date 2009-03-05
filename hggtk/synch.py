@@ -19,7 +19,7 @@ import os
 import threading
 from mercurial import hg, ui, util, extensions
 from dialog import error_dialog, question_dialog, info_dialog
-from hglib import HgThread, toutf, rootpath, RepoError
+from hglib import HgThread, fromutf, toutf, rootpath, RepoError
 import shlib
 import gtklib
 import urllib
@@ -433,7 +433,7 @@ class SynchDialog(gtk.Window):
         self._exec_cmd(cmd)
         
     def _conf_clicked(self, toolbutton, data=None):
-        newpath = self._pathtext.get_text()
+        newpath = self._pathtext.get_text().strip()
         for name, path in self.paths:
             if path == newpath:
                 newpath = None
@@ -451,7 +451,7 @@ class SynchDialog(gtk.Window):
         self.fill_path_combo()
 
     def _email_clicked(self, toolbutton, data=None):
-        path = self._pathtext.get_text()
+        path = self._pathtext.get_text().strip()
         if not path:
             info_dialog(self, 'No repository selected',
                     'Select a peer repository to compare with')
@@ -500,7 +500,7 @@ class SynchDialog(gtk.Window):
         proxy_host = ui.ui().config('http_proxy', 'host', '')
         use_proxy = self._use_proxy.get_active()
         text_entry = self._pathbox.get_child()
-        remote_path = str(text_entry.get_text())
+        remote_path = fromutf(text_entry.get_text().strip())
         
         cmdline = cmd[:]
         cmdline += ['--verbose', '--repository', self.root]
