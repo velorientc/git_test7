@@ -93,7 +93,7 @@ class HgExtension(nautilus.MenuProvider,
         return os.path.join(self.ipath, iname)
 
     def get_path_for_vfs_file(self, vfs_file):
-        if vfs_file.get_uri_scheme() != 'file':
+        if vfs_file.is_gone() or vfs_file.get_uri_scheme() != 'file':
             return None
         return urllib.unquote(vfs_file.get_uri()[7:])
 
@@ -166,7 +166,13 @@ class HgExtension(nautilus.MenuProvider,
         '''Build menu'''
         self.pos = 0
         self.files = []
-        files = [self.get_path_for_vfs_file(f) for f in vfs_files]
+        files =  []
+        for vfs_file in vfs_files:
+            f = self.get_path_for_vfs_file(vfs_file)
+            if f:
+                files.append(f)
+        if not files:
+            return
         if bg or len(files) == 1 and vfs_files[0].is_directory():
             cwd = files[0]
             files = []
