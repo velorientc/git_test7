@@ -359,6 +359,10 @@ class SynchDialog(gtk.Window):
         filefilter.set_name("Bundle (*.hg)")
         filefilter.add_pattern("*.hg")
         dialog.add_filter(filefilter)
+        filefilter = gtk.FileFilter()
+        filefilter.set_name("Bundle (*)")
+        filefilter.add_pattern("*")
+        dialog.add_filter(filefilter)
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             self._pathtext.set_text(dialog.get_filename())
