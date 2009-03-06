@@ -643,10 +643,11 @@ class GStatus(GDialog):
             row[DM_DISPLAYED] = row[DM_MARKUP]
 
     def _update_diff_header(self, dmodel, wfile, selected):
-        hc = self._filechunks[wfile][0]
+        fc = self._filechunks[wfile]
+        hc = fc[0]
+        lasthunk = len(fc)-1
         row = dmodel[hc]
-        displayed = row[DM_DISPLAYED]
-        sel = lambda x: not dmodel[hc+x+1][DM_REJECTED]
+        sel = lambda x: x >= lasthunk or not dmodel[hc+x+1][DM_REJECTED]
         newtext = self._shelve_chunks[row[DM_CHUNK_ID]].selpretty(sel)
         if not selected:
             newtext = "<span foreground='#888888'>" + newtext + "</span>"
