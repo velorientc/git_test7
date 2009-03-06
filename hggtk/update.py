@@ -18,7 +18,7 @@ from hglib import rootpath, toutf, RepoError
 
 class UpdateDialog(gtk.Window):
     """ Dialog to update Mercurial repo """
-    def __init__(self, cwd='', rev=''):
+    def __init__(self, cwd='', rev=None):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         set_tortoise_icon(self, 'menucheckout.ico')
@@ -141,7 +141,7 @@ class UpdateDialog(gtk.Window):
             if node == tip:
                 status += ", tip"
             self._revlist.append([short(node), "(%s)" %status])
-        if self.rev:
+        if self.rev is not None:
             self._revbox.get_child().set_text(str(self.rev))
         else:
             self._revbox.set_active(0)
@@ -182,7 +182,7 @@ class UpdateDialog(gtk.Window):
         self._refresh()
         shell_notify([self.cwd])
 
-def run(cwd='', rev='', **opts):
+def run(cwd='', rev=None, **opts):
     dialog = UpdateDialog(cwd, rev)
     dialog.connect('destroy', gtk.main_quit)
     dialog.show_all()
