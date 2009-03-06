@@ -130,7 +130,7 @@ class SynchDialog(gtk.Window):
                 defpushrow = i
 
         if repos:
-            self._pathtext.set_text(repos[0])
+            self._pathtext.set_text(toutf(repos[0]))
         elif defpushrow is not None and pushmode:
             self._pathbox.set_active(defpushrow)
         elif defrow is not None:
@@ -222,7 +222,7 @@ class SynchDialog(gtk.Window):
         sympaths = []
         for name, path in self.paths:
             sympaths.append(path)
-            self.pathlist.append([path, name, False])
+            self.pathlist.append([toutf(path), name, False])
         separator = False
         for p in self._recent_src:
             if p in sympaths:
@@ -230,7 +230,7 @@ class SynchDialog(gtk.Window):
             if not separator:
                 self.pathlist.append(['-'*20, '', True])
                 separator = True
-            self.pathlist.append([p, '', False])
+            self.pathlist.append([toutf(p), '', False])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
         if time != self._last_drop_time:
@@ -243,9 +243,9 @@ class SynchDialog(gtk.Window):
             return
         path = urllib.unquote(uri[7:])
         if rootpath(path) == path:
-            self._pathtext.set_text(path)
+            self._pathtext.set_text(toutf(path))
         elif not os.path.isdir(path) and path.endswith('.hg'):
-            self._pathtext.set_text(path)
+            self._pathtext.set_text(toutf(path))
 
     def update_buttons(self, *args):
         self.buttonhbox.hide()
@@ -433,7 +433,7 @@ class SynchDialog(gtk.Window):
         self._exec_cmd(cmd)
         
     def _conf_clicked(self, toolbutton, data=None):
-        newpath = self._pathtext.get_text().strip()
+        newpath = fromutf(self._pathtext.get_text()).strip()
         for name, path in self.paths:
             if path == newpath:
                 newpath = None
@@ -451,7 +451,7 @@ class SynchDialog(gtk.Window):
         self.fill_path_combo()
 
     def _email_clicked(self, toolbutton, data=None):
-        path = self._pathtext.get_text().strip()
+        path = fromutf(self._pathtext.get_text()).strip()
         if not path:
             info_dialog(self, 'No repository selected',
                     'Select a peer repository to compare with')
@@ -500,7 +500,7 @@ class SynchDialog(gtk.Window):
         proxy_host = ui.ui().config('http_proxy', 'host', '')
         use_proxy = self._use_proxy.get_active()
         text_entry = self._pathbox.get_child()
-        remote_path = fromutf(text_entry.get_text().strip())
+        remote_path = fromutf(text_entry.get_text()).strip()
         
         cmdline = cmd[:]
         cmdline += ['--verbose', '--repository', self.root]

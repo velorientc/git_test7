@@ -11,7 +11,7 @@ import os
 import pango
 from mercurial import hg, ui, cmdutil, util
 from dialog import error_dialog, question_dialog
-from hglib import RepoError
+from hglib import RepoError, toutf, fromutf
 import shlib
 import shelve
 import iniparse
@@ -252,8 +252,8 @@ class ConfigDialog(gtk.Dialog):
                 if name in ('default', 'default-push'): continue
                 path = self.ini['paths'][name]
                 i = self.pathdata.insert_before(None, None)
-                self.pathdata.set_value(i, 0, "%s" % name)
-                self.pathdata.set_value(i, 1, "%s" % path)
+                self.pathdata.set_value(i, 0, "%s" % toutf(name))
+                self.pathdata.set_value(i, 1, "%s" % toutf(path))
 
         # Define view model for 'Paths' tab
         self.pathtree = gtk.TreeView()
@@ -263,15 +263,13 @@ class ConfigDialog(gtk.Dialog):
         renderer = gtk.CellRendererText()
         renderer.set_property('editable', True)
         renderer.connect('edited', self.on_alias_edit)
-        column = gtk.TreeViewColumn('Alias', 
-                renderer, text=0)
+        column = gtk.TreeViewColumn('Alias', renderer, text=0)
         self.pathtree.append_column(column)
         
         renderer = gtk.CellRendererText()
         renderer.set_property('editable', True)
         renderer.connect('edited', self.on_path_edit)
-        column = gtk.TreeViewColumn('Repository Path',
-                renderer, text=1)
+        column = gtk.TreeViewColumn('Repository Path', renderer, text=1)
         self.pathtree.append_column(column)
         
         scrolledwindow = gtk.ScrolledWindow()
@@ -349,7 +347,7 @@ class ConfigDialog(gtk.Dialog):
         '''Add a new path to [paths], give default name, focus'''
         i = self.pathdata.insert_before(None, None)
         self.pathdata.set_value(i, 0, 'new')
-        self.pathdata.set_value(i, 1, '%s' % newpath)
+        self.pathdata.set_value(i, 1, '%s' % toutf(newpath))
         self.pathtree.get_selection().select_iter(i)
         self.pathtree.set_cursor(
                 self.pathdata.get_path(i),
@@ -391,7 +389,7 @@ class ConfigDialog(gtk.Dialog):
                     'Path testing cannot work without a repository')
             return
         model, path = selection.get_selected()
-        testpath = model[path][1]
+        testpath = fromutf(model[path][1])
         if not testpath:
             return
         if testpath[0] == '~':
@@ -476,7 +474,7 @@ class ConfigDialog(gtk.Dialog):
                 if values:
                     vlist.append(['Suggested', True])
                     for v in values:
-                        vlist.append([v, False])
+                        vlist.append([toutf(v), False])
                         if v == curvalue:
                             currow = len(vlist) - 1
                 if cpath in self.history.get_keys():
@@ -486,14 +484,14 @@ class ConfigDialog(gtk.Dialog):
                         if not separator:
                             vlist.append(['History', True])
                             separator = True
-                        vlist.append([v, False])
+                        vlist.append([toutf(v), False])
                         if v == curvalue:
                             currow = len(vlist) - 1
 
                 if curvalue is None:
                     combo.set_active(0)
                 elif currow is None:
-                    combo.child.set_text(curvalue)
+                    combo.child.set_text(toutf(curvalue))
                 else:
                     combo.set_active(currow)
 
@@ -573,7 +571,7 @@ class ConfigDialog(gtk.Dialog):
         # Flush changes on all pages
         for vbox, info, widgets in self.pages:
             for w, (label, cpath, values, tip) in enumerate(info):
-                newvalue = widgets[w].child.get_text()
+                newvalue = fromutf(widgets[w].child.get_text())
                 self.record_new_value(cpath, newvalue)
 
         self.history.write()

@@ -13,7 +13,7 @@ import shlib
 from tempfile import mkstemp
 from dialog import *
 from mercurial import hg, ui, extensions
-from hglib import RepoError
+from hglib import RepoError, fromutf, toutf
 from thgconfig import ConfigDialog
 from hgcmd import CmdDialog
 
@@ -195,10 +195,10 @@ class EmailDialog(gtk.Window):
 
         if initial:
             # Only zap these fields at startup
-            self._tobox.child.set_text(repo.ui.config('email', 'to', ''))
-            self._ccbox.child.set_text(repo.ui.config('email', 'cc', ''))
-            self._frombox.child.set_text(repo.ui.config('email', 'from', ''))
-            self._subjbox.child.set_text(repo.ui.config('email', 'subject', ''))
+            self._tobox.child.set_text(fromutf(repo.ui.config('email', 'to', '')))
+            self._ccbox.child.set_text(fromutf(repo.ui.config('email', 'cc', '')))
+            self._frombox.child.set_text(fromutf(repo.ui.config('email', 'from', '')))
+            self._subjbox.child.set_text(fromutf(repo.ui.config('email', 'subject', '')))
         fill_history(history, self._tolist, 'email.to')
         fill_history(history, self._cclist, 'email.cc')
         fill_history(history, self._fromlist, 'email.from')
@@ -237,10 +237,10 @@ class EmailDialog(gtk.Window):
                 history.get_value(cpath).remove(newvalue)
             history.get_value(cpath).insert(0, newvalue)
 
-        totext = self._tobox.child.get_text()
-        cctext = self._ccbox.child.get_text()
-        fromtext = self._frombox.child.get_text()
-        subjtext = self._subjbox.child.get_text()
+        totext = fromutf(self._tobox.child.get_text())
+        cctext = fromutf(self._ccbox.child.get_text())
+        fromtext = fromutf(self._frombox.child.get_text())
+        subjtext = fromutf(self._subjbox.child.get_text())
 
         if not totext:
             info_dialog(self, 'Info required', 'You must specify a recipient')
