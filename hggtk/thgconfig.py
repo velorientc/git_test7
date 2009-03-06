@@ -553,8 +553,8 @@ class ConfigDialog(gtk.Dialog):
         if len(self.pathdata):
             refreshlist = []
             for row in self.pathdata:
-                name = row[0]
-                path = row[1]
+                name = fromutf(row[0])
+                path = fromutf(row[1])
                 cpath = '.'.join(['paths', name])
                 self.record_new_value(cpath, path, False)
                 refreshlist.append(name)
