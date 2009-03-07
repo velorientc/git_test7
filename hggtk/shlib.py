@@ -150,6 +150,8 @@ def get_tortoise_icon(thgicon):
         # ... or the unix installer layout
         paths.append(os.path.join(fdir, '..', '..', '..',
             'share', 'pixmaps', 'tortoisehg', 'icons'))
+        paths.append(os.path.join(fdir, '..', '..', '..', '..',
+            'share', 'pixmaps', 'tortoisehg', 'icons'))
     except NameError: # __file__ is not always available
         pass
     for p in paths:
