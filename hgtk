@@ -12,8 +12,6 @@ This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
 
-TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
-
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -33,13 +31,14 @@ if not hasattr(sys, "frozen"):
         if thgpath not in sys.path:
             sys.path.insert(0, thgpath)
     else:
-        # try environment or hard-coded path
-        thgpath = os.environ.get('TORTOISEHG_PATH', TORTOISEHG_PATH)
-        thgpath = os.path.normpath(os.path.expanduser(thgpath))
-        if os.path.exists(thgpath) and thgpath not in sys.path:
-            sys.path.insert(0, thgpath)
-        # else assume tortoise is already in PYTHONPATH
+        # try environment
+        thgpath = os.environ.get('TORTOISEHG_PATH')
+        if thgpath:
+            thgpath = os.path.normpath(os.path.expanduser(thgpath))
+            if os.path.exists(thgpath) and thgpath not in sys.path:
+                sys.path.insert(0, thgpath)
 
+# else assume tortoise is already in PYTHONPATH
 try:
     import hggtk.hgtk
 except ImportError:
