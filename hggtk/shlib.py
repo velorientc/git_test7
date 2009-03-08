@@ -103,8 +103,11 @@ class Settings(object):
         dbase.close()
 
     def _get_path(self, appname):
-        return os.path.join(os.path.expanduser('~'), '.tortoisehg',
-                'settings', appname)
+        if os.name == 'nt':
+            return os.path.join(os.environ.get('APPDATA'), 'TortoiseHg', appname)
+        else:
+            return os.path.join(os.path.expanduser('~'), '.tortoisehg',
+                    'settings', appname)
 
     def _audit(self):
         if os.path.exists(os.path.dirname(self._path)):
@@ -113,14 +116,27 @@ class Settings(object):
         self._import()
 
     def _import(self):
-        # import old settings data (TortoiseHg <= 0.3)
-        old_path = os.path.join(os.path.expanduser('~'), '.hgext', 'tortoisehg')
-        if os.path.isfile(old_path):
-            print "converting old history..."
-            olddb = shelve.open(old_path)
+        # import old settings data dir (TortoiseHg <= 0.7)
+        home = os.path.expanduser('~')
+        if os.name == 'nt':
+            olddir = os.path.join(home, '.tortoisehg', 'settings')
+            newdir = os.path.join(os.environ.get('APPDATA'), 'TortoiseHg')
+            if os.path.isdir(olddir):
+                for f in os.listdir(olddir):
+                    src = os.path.join(olddir, f)
+                    dst = os.path.join(newdir, f)
+                    os.rename(src, dst)
+                os.removedirs(olddir)
+
+        # import old settings data file (TortoiseHg <= 0.3)
+        oldpath = os.path.join(home, '.hgext', 'tortoisehg')
+        if os.path.isfile(oldpath):
+            olddb = shelve.open(oldpath)
             for key in olddb.keys():
                 self._write(key, olddb[key])
             olddb.close()
+            os.unlink(oldpath)
+            os.removedirs(os.path.dirname(oldpath))
 
 def get_system_times():
     t = os.times()
