@@ -1,7 +1,7 @@
 #_
 # Configuration dialog for TortoiseHg and Mercurial
 #
-# Copyright (C) 2008 Steve Borho <steve@borho.org>
+# Copyright (C) 2008-9 Steve Borho <steve@borho.org>
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
@@ -216,10 +216,20 @@ class ConfigDialog(gtk.Dialog):
         # Create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
-        self.vbox.pack_start(notebook)
+        self.vbox.pack_start(notebook, False, False)
         notebook.show()
         self.show_tabs = True
         self.show_border = True
+
+        descframe = gtk.Frame('Description')
+        vbox = gtk.VBox()
+        self.desctext = gtk.TextView()
+        self.desctext.set_wrap_mode(gtk.WRAP_WORD)
+        self.desctext.set_editable(False)
+        vbox.pack_start(self.desctext, False, False)
+        vbox.set_border_width(10)
+        descframe.add(vbox)
+        self.vbox.pack_start(descframe, True, True)
 
         self._btn_apply = gtk.Button("Apply")
         self._btn_apply.connect('clicked', self._apply_clicked)
@@ -412,6 +422,9 @@ class ConfigDialog(gtk.Dialog):
         self._delpathbutton.set_sensitive(path_selected)
         self._testpathbutton.set_sensitive(repo_available and path_selected)
 
+    def set_help(self, widget, event, tooltip):
+        self.desctext.get_buffer().set_text(tooltip)
+
     def fill_frame(self, frame, info):
         widgets = []
         table = gtk.Table(len(info), 2, False)
@@ -423,6 +436,7 @@ class ConfigDialog(gtk.Dialog):
             vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
             combo.connect("changed", self.dirty_event)
+            combo.child.connect("focus-in-event", self.set_help, tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
             widgets.append(combo)
 
