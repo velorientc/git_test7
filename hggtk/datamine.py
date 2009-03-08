@@ -75,6 +75,7 @@ class DataMineDialog(GDialog):
         vbox.pack_start(self.notebook, True, True, 2)
 
         self.stbar = gtklib.StatusBar()
+        self.stbar.sttext.set_property('use-markup', True)
         vbox.pack_start(self.stbar, False, False, 2)
         self.stop_button.set_sensitive(False)
         return vbox
