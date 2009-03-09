@@ -6,7 +6,25 @@ kits.  It also contains change information, for users who are interested in
 what bugs have been fixed, and what features have been added in the current
 version.
 
-New features and improvements since 0.6:
+The ReleaseNotes page on the TortosieHg Wiki is usually kept up to date.
+http://bitbucket.org/tortoisehg/wiki/ReleaseNotes
+
+Bug fixes since 0.7:
+
+* thgutil: UNC paths should be filtered by 'localdisks' config
+* serve: direct web browser at loopback address
+* shlib: moved app data to %APPDATA%\TortoiseHg on Windows
+* thgconfig: UTF-8 fixes
+* thgconfig: show description of selected item
+* thgconfig: move 'bottom diffs' to tortoisehg page
+* datamine: fix markup problem in status bar
+* sync: allow bundles without .hg extension
+* sync: handle non-ascii paths and aliases
+* status: prevent traceback caused by toggling rename diffs
+* update: fix update to rev 0 from changelog viewer
+* hgtK: follow 'hg version' convention for 'hgtk version'
+
+New features and improvements in 0.7:
 
   * Status window now supports shelving of selected changes.
     Unknown files are now displayed by default, hg status convention.
