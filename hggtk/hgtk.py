@@ -268,7 +268,7 @@ def guess(ui, *pats, **opts):
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
-    opts['files'] = sys.argv[2:] or []
+    opts['files'] = pats or []
     opts['cwd'] = os.getcwd()
     run(**opts)
 
