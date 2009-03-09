@@ -64,7 +64,7 @@ def get_list_from_file(filename):
             fd = open(filename, "r")
             lines = [ x.replace("\n", "") for x in fd.readlines() ]
             fd.close()
-            os.unlink(listfile)
+            os.unlink(filename)
         return lines
     except IOError, e:
         sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
