@@ -68,9 +68,14 @@ class AboutDialog(gtk.AboutDialog):
         thg_logo = os.path.normpath(shlib.get_tortoise_icon('thg_logo_92x50.png'))
         thg_icon = os.path.normpath(shlib.get_tortoise_icon('thg_logo.ico'))
         prog_root = os.path.dirname(os.path.dirname(os.path.dirname(thg_icon)))
-        license_file = os.path.join(prog_root, "COPYING.txt")
+        try:
+            license_file = os.path.join(prog_root, "COPYING.txt")
+            self.set_license(file(license_file).read())
+        except IOError:
+            import hgtk
+            license = hgtk.shortlicense.splitlines()[1:]
+            self.set_license('\n'.join(license))
 
-        self.set_license(file(license_file).read())
         self.set_comments("with " + lib_versions + "\n\n" + comment)
         self.set_logo(gtk.gdk.pixbuf_new_from_file(thg_logo))
         self.set_icon_from_file(thg_icon)
