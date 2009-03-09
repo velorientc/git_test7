@@ -35,6 +35,9 @@ _tortoise_info = (
     ('Tab Width', 'tortoisehg.tabwidth', [],
         'Specify the number of spaces to expand tabs.'
         ' Default: Not expanded'),
+    ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
+        'Show the diff panel below the file list in status, shelve, and'
+        ' commit dialogs.  Default: False'),
     ('Overlay Icons', 'tortoisehg.overlayicons',
         ['False', 'True', 'localdisks'],
         'Display overlay icons in Explorer windows.'
@@ -45,10 +48,7 @@ _commit_info = (
         'Name associated with commits'),
     ('External Commit Tool', 'tortoisehg.extcommit', ['None', 'qct'],
         'Select commit tool launched by TortoiseHg. Qct must must be'
-        ' installed separately.  Default: None'),
-    ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
-        'Move diff panel below file list in status and'
-        ' commit dialogs.  Default: False'))
+        ' installed separately.  Default: None'))
 
 _log_info = (
     ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
