@@ -112,8 +112,11 @@ class Settings(object):
     def _audit(self):
         if os.path.exists(os.path.dirname(self._path)):
             return
-        os.makedirs(os.path.dirname(self._path))
-        self._import()
+        try:
+            os.makedirs(os.path.dirname(self._path))
+            self._import()
+        except:
+            pass
 
     def _import(self):
         # import old settings data dir (TortoiseHg <= 0.7)
