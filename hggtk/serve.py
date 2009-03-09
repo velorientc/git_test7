@@ -232,7 +232,9 @@ class ServeDialog(gtk.Window):
 
         while not gservice or not hasattr(gservice, 'httpd'):
             time.sleep(0.1)
-        self._url = 'http://%s:%d/' % (gservice.httpd.fqaddr, port)
+        # gservice.httpd.fqaddr turned out to be unreliable, so use
+        # loopback addr directly
+        self._url = 'http://127.0.0.1:%d/' % (port)
         gobject.timeout_add(10, self.process_queue)
         
     def _stop_server(self):
