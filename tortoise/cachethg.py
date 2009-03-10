@@ -94,14 +94,11 @@ def get_state(upath, repo=None):
             repo = hg.repository(ui.ui(), path=root)
         print "hg.repository() took %d ticks" % (GetTickCount() - tc1)
         # check if to display overlay icons in this repo
-        global_opts = ui.ui().configlist('tortoisehg', 'overlayicons', [])
-        repo_opts = repo.ui.configlist('tortoisehg', 'overlayicons', [])
-
-        print "%s: global overlayicons = " % path, global_opts
-        print "%s: repo overlayicons = " % path, repo_opts
-        is_netdrive = thgutil.netdrive_status(path) is not None
-        if (is_netdrive and 'localdisks' in global_opts) \
-                or 'False' in repo_opts:
+        overlayopt = repo.ui.config('tortoisehg', 'overlayicons', ' ').lower()
+        print "%s: repo overlayicons = " % path, overlayopt
+        if overlayopt == 'localdisk':
+            overlayopt = bool(thgutil.netdrive_status(path))
+        if not overlayopt or overlayopt in 'false off no'.split():
             print "%s: overlayicons disabled" % path
             overlay_cache = {None: None}
             cache_tick_count = GetTickCount()
@@ -142,10 +139,7 @@ def get_state(upath, repo=None):
         for f in grp:
             fpath = os.path.join(root, os.path.normpath(f))
             overlay_cache[fpath] = st
-    if path in overlay_cache:
-        status = overlay_cache[path]
-    else:
-        status = overlay_cache[path] = UNKNOWN
+    status = overlay_cache.get(path, UNKNOWN)
     print "%s: %s" % (path, status)
     cache_tick_count = GetTickCount()
     return status
