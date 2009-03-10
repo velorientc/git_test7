@@ -82,6 +82,12 @@ def get_state(upath, repo=None):
         overlay_cache = {None: None}
         cache_tick_count = GetTickCount()
         return NOT_IN_REPO
+    hgdir = os.path.join(root, '.hg', '')
+    if pdir == hgdir[:-1] or pdir.startswith(hgdir):
+        if not overlay_cache:
+            cache_tick_count = GetTickCount()
+        overlay_cache[pdir] = NOT_IN_REPO
+        return NOT_IN_REPO
     try:
         tc1 = GetTickCount()
         if not repo or repo.root == cache_root:
