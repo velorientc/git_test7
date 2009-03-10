@@ -4,9 +4,9 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 
 import os
-#import tempfile
 from mercurial import hg
 from thgutil import *
+import cachethg
 from mercurial import ui
 from mercurial.i18n import _
 
@@ -142,62 +142,85 @@ class menuThg:
 
         Commands are instances of TortoiseMenu, TortoiseMenuSep or TortoiseMenu
         """
-        thgmenu = []
-        thgmenu.append(TortoiseMenu(_("HG Commit..."),
-                     _("Commit changes in repository"),
-                     'commit', icon="menucommit.ico"))
-
-        menu = TortoiseSubmenu(self.name, "Mercurial", [], icon="hg.ico")
-        canannotate = len(files) > 0
+        states = set()
+        onlyfiles = len(files) > 0
         hashgignore = False
+        inroot = False
         for f in files:
             if not os.path.isfile(f):
-                canannotate = False
+                onlyfiles = False
             if f.endswith('.hgignore'):
                 hashgignore = True
+            states.add(cachethg.get_state(f))
+        if not files:
+            if repo.root == os.path.realpath(cwd):
+                inroot = True
+                #cache does not return state for root
+                if not cachethg.overlay_cache:
+                    cachethg.get_state(os.path.join(cwd,'.hg'))
+                states = set(cachethg.overlay_cache.values())
+            else:
+                states.add(cachethg.get_state(cwd))
 
-        if hashgignore:
+        changed = bool(states & set([cachethg.ADDED, cachethg.MODIFIED]))
+        modified = cachethg.MODIFIED in states
+        tracked = changed or cachethg.MODIFIED in states
+        new = bool(states & set([cachethg.UNKNOWN, cachethg.IGNORED]))
+
+        thgmenu = []
+        if changed or cachethg.UNKNOWN in states:
+            thgmenu.append(TortoiseMenu(_("HG Commit..."),
+                      _("Commit changes in repository"),
+                      'commit', icon="menucommit.ico"))
+
+        menu = TortoiseSubmenu(self.name, "Mercurial", [], icon="hg.ico")
+
+        if hashgignore or new and len(states) == 1:
             menu.append(TortoiseMenu(_("Edit Ignore Filter"),
                       _("Edit repository ignore filter"),
                       'hgignore', icon="ignore.ico"))
 
-        menu.append(TortoiseMenu(_("View File Status"),
-                  _("Repository status"),
-                  'status', icon="menushowchanged.ico"))
+        if changed or cachethg.UNKNOWN in states:
+            menu.append(TortoiseMenu(_("View File Status"),
+                      _("Repository status"),
+                      'status', icon="menushowchanged.ico"))
 
-        menu.append(TortoiseMenu(_("Shelve Changes"),
+        if modified:
+            menu.append(TortoiseMenu(_("Shelve Changes"),
                   _("Shelve or unshelve repository changes"),
                   'shelve', icon="shelve.ico"))
 
         # Visual Diff (any extdiff command)
         has_vdiff = repo.ui.config('tortoisehg', 'vdiff', '') != ''
-        if has_vdiff:
+        if has_vdiff and modified:
             menu.append(TortoiseMenu(_("Visual Diff"),
                       _("View changes using GUI diff tool"),
                       'vdiff', icon="TortoiseMerge.ico"))
 
-        if len(files) == 0:
+        if len(files) == 0 and cachethg.UNKNOWN in states:
             menu.append(TortoiseMenu(_("Guess Renames"),
                       _("Detect renames and copies"),
                       'guess', icon="detect_rename.ico"))
-        elif len(files) == 1: # needs ico
+        elif len(files) == 1 and tracked: # needs ico
             menu.append(TortoiseMenu(_("Rename File"),
                       _("Rename file or directory"),
                       'rename', icon="general.ico"))
 
-        if len(files):
+        if files and new:
             menu.append(TortoiseMenu(_("Add Files"),
                       _("Add files to Hg repository"),
                       'add', icon="menuadd.ico"))
+        if files and tracked:
             menu.append(TortoiseMenu(_("Remove Files"),
                       _("Remove selected files on the next commit"),
                       'remove', icon="menudelete.ico"))
+        if files and changed:
             menu.append(TortoiseMenu(_("Undo Changes"),
                       _("Revert selected files"),
                       'revert', icon="menurevert.ico"))
 
         # we can only annotate file but not directories
-        if canannotate:
+        if onlyfiles and tracked:
             menu.append(TortoiseMenu(_("Annotate Files"),
                       _("show changeset information per file line"),
                       'datamine', icon="menublame.ico"))
@@ -220,7 +243,8 @@ class menuThg:
 
         menu.append(TortoiseMenuSep())
 
-        menu.append(TortoiseMenu(_("View Changelog"),
+        if tracked:
+            menu.append(TortoiseMenu(_("View Changelog"),
                   _("View revision history"),
                   'history', icon="menulog.ico"))
 
@@ -241,14 +265,14 @@ class menuThg:
                       _("start web server for this repository"),
                       'serve', icon="proxy.ico"))
 
-        menu.append(TortoiseMenuSep())
-        menu.append(TortoiseMenu(_("Create Clone"),
-                  _("Clone a repository here"),
-                  'clone', icon="menuclone.ico"))
-        if repo.root != cwd:
-            menu.append(TortoiseMenu(_("Create Repository Here"),
-                  _("create a new repository in this directory"),
-                  'init', icon="menucreaterepos.ico"))
+            menu.append(TortoiseMenuSep())
+            menu.append(TortoiseMenu(_("Create Clone"),
+                      _("Clone a repository here"),
+                      'clone', icon="menuclone.ico"))
+            if repo.root != cwd:
+                menu.append(TortoiseMenu(_("Create Repository Here"),
+                      _("create a new repository in this directory"),
+                      'init', icon="menucreaterepos.ico"))
 
         # config settings menu
         menu.append(TortoiseMenuSep())
