@@ -92,7 +92,7 @@ def get_state(upath, repo=None):
         tc1 = GetTickCount()
         if not repo or repo.root == cache_root:
             repo = hg.repository(ui.ui(), path=root)
-        print "hg.repository() took %d ticks" % (GetTickCount() - tc1)
+        print "hg.repository() took %g ticks" % (GetTickCount() - tc1)
         # check if to display overlay icons in this repo
         overlayopt = repo.ui.config('tortoisehg', 'overlayicons', ' ').lower()
         print "%s: repo overlayicons = " % path, overlayopt
@@ -123,7 +123,7 @@ def get_state(upath, repo=None):
         print "treat as unknown : %s" % path
         return UNKNOWN
 
-    print "status() took %d ticks" % (GetTickCount() - tc1)
+    print "status() took %g ticks" % (GetTickCount() - tc1)
     modified, added, removed, deleted, unknown, ignored, clean = repostate
     # cached file info
     tc = GetTickCount()
