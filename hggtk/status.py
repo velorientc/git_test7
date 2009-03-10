@@ -1285,6 +1285,7 @@ class GStatus(GDialog):
 
             selection = self.filetree.get_selection()
             selection.selected_foreach(toggler)
+            self._update_check_count()
             return True
         return False
 
