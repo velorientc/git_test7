@@ -140,7 +140,7 @@ def get_state(upath, repo=None):
             (deleted, MODIFIED),
             (modified, MODIFIED)):
         for f in grp:
-            fpath = os.path.join(repo.root, os.path.normpath(f))
+            fpath = os.path.join(root, os.path.normpath(f))
             overlay_cache[fpath] = st
     if path in overlay_cache:
         status = overlay_cache[path]
