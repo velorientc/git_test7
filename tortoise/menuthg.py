@@ -151,7 +151,7 @@ class menuThg:
                 onlyfiles = False
             if f.endswith('.hgignore'):
                 hashgignore = True
-            states.add(cachethg.get_state(f))
+            states.add(cachethg.get_state(f, repo))
         if not files:
             if repo.root == os.path.realpath(cwd):
                 inroot = True
