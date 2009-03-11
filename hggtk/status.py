@@ -955,9 +955,6 @@ class GStatus(GDialog):
             return
         self._hg_call_wrapper('Diff', dohgdiff)
 
-    def _has_shelve_file(self):
-        return os.path.exists(self.repo.join('shelve'))
-        
     def _showdiff_toggled(self, togglebutton, data=None):
         # prevent movement events while setting position
         self._diffpane.handler_block(self._diffpane_moved_id)

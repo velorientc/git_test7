@@ -121,6 +121,9 @@ class GShelve(GStatus):
 
     ### End of overridable methods ###
 
+    def _has_shelve_file(self):
+        return os.path.exists(self.repo.join('shelve'))
+        
     def _activate_shelve_buttons(self, status):
         if status:
             self.shelve_btn.set_sensitive(True)
