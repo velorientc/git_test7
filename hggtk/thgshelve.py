@@ -151,12 +151,12 @@ class GShelve(GStatus):
             dialog.set_transient_for(self)
             rval = dialog.run()
             dialog.destroy()
-            if rval == -1:
-                return
             if rval == 1:
                 doforce = True
-            if rval == 2:
+            elif rval == 2:
                 doappend = True
+            else:
+                return
 
         # capture the selected hunks to shelve
         fc = []
