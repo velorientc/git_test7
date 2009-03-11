@@ -59,7 +59,9 @@ def get_state(upath, repo=None):
     pdir = os.path.dirname(path)
     if cache_pdir == pdir and overlay_cache:
         if tc - cache_tick_count < CACHE_TIMEOUT:
-            status = overlay_cache.get(path, NOT_IN_REPO)
+            status = overlay_cache.get(path)
+            if not status:
+                status = overlay_cache.get(pdir, NOT_IN_REPO)
             print "%s: %s (cached)" % (path, status)
             return status
         else:
@@ -67,7 +69,7 @@ def get_state(upath, repo=None):
             overlay_cache.clear()
      # path is a drive
     if path.endswith(":\\"):
-        overlay_cache[path] = UNKNOWN
+        overlay_cache[path] = NOT_IN_REPO
         return NOT_IN_REPO
      # open repo
     if cache_pdir == pdir:
