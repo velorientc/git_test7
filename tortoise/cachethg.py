@@ -106,8 +106,17 @@ def get_state(upath, repo=None):
     except RepoError:
         # We aren't in a working tree
         print "%s: not in repo" % pdir
-        overlay_cache[path] = UNKNOWN
-        return NOT_IN_REPO
+        if not overlay_cache:
+            cache_tick_count = GetTickCount()
+        overlay_cache[pdir] = IGNORED
+        return IGNORED
+    except StandardError, e:
+        print "error while handling %s:" % pdir
+        print e
+        if not overlay_cache:
+            cache_tick_count = GetTickCount()
+        overlay_cache[pdir] = UNKNOWN
+        return UNKNOWN
      # get file status
     tc1 = GetTickCount()
 

@@ -120,6 +120,9 @@ class HgExtension(nautilus.MenuProvider,
             self.cacheroot = None
             self.cacherepo = None
             return None
+        except StandardError, e:
+            print e
+            return None
 
     def run_dialog(self, menuitem, hgcmd, cwd = None):
         '''
