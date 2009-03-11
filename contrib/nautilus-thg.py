@@ -262,9 +262,7 @@ class HgExtension(nautilus.MenuProvider,
                        cachethg.UNKNOWN: ('new', 'unrevisioned'),
                        cachethg.IGNORED: (None, 'ignored'),
                        cachethg.NOT_IN_REPO: (None, '')}
-        emblem, status = cache2state.get(cachestate)
-        if status == None:
-            status = '?'
+        emblem, status = cache2state.get(cachestate, (None, '?'))
         return emblem, status
 
     def update_file_info(self, file):
