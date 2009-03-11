@@ -196,16 +196,11 @@ class menuThg:
                 onlyfiles = False
             if f.endswith('.hgignore'):
                 hashgignore = True
-            states.add(cachethg.get_state(f, repo))
+            states.update(cachethg.get_states(f, repo))
         if not files:
-            if repo.root == os.path.realpath(cwd):
-                inroot = True
-                #cache does not return state for root
-                if not cachethg.overlay_cache:
-                    cachethg.get_state(os.path.join(cwd,'.hg'))
-                states = set(cachethg.overlay_cache.values())
-            else:
-                states.add(cachethg.get_state(cwd))
+            states.update(cachethg.get_states(cwd, repo))
+            if cachethg.ROOT in states and len(states) == 1:
+                states.add(cachethg.MODIFIED)
 
         changed = bool(states & set([cachethg.ADDED, cachethg.MODIFIED]))
         modified = cachethg.MODIFIED in states
