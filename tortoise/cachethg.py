@@ -90,9 +90,9 @@ def get_state(upath, repo=None):
         return NOT_IN_REPO
     try:
         tc1 = GetTickCount()
-        if not repo or repo.root == cache_root:
+        if not repo or (repo.root != root and repo.root != os.path.realpath(root)):
             repo = hg.repository(ui.ui(), path=root)
-        print "hg.repository() took %g ticks" % (GetTickCount() - tc1)
+            print "hg.repository() took %g ticks" % (GetTickCount() - tc1)
         # check if to display overlay icons in this repo
         overlayopt = repo.ui.config('tortoisehg', 'overlayicons', ' ').lower()
         print "%s: repo overlayicons = " % path, overlayopt
