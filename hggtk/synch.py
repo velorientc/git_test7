@@ -155,8 +155,9 @@ class SynchDialog(gtk.Window):
         revbox.pack_end(self._use_proxy, False, False)
         vbox.pack_start(revbox, False, False, 2)
 
-        expander = gtk.Expander('Advanced Options')
+        self.expander = expander = gtk.Expander('Advanced Options')
         expander.set_expanded(False)
+        expander.connect_after('activate', self._expanded)
         hbox = gtk.HBox()
         expander.add(hbox)
 
@@ -216,6 +217,8 @@ class SynchDialog(gtk.Window):
         vbox.pack_start(self.stbar, False, False, 2)
         self.connect('map', self.update_buttons)
         self._last_drop_time = None
+        
+        self.load_settings()
 
     def fill_path_combo(self):
         self.pathlist.clear()
@@ -388,6 +391,7 @@ class SynchDialog(gtk.Window):
             gtk.main_quit()
         
     def _save_settings(self):
+        self.update_settings()
         pullstate = 0
         for i in xrange(0, len(self._pull_menu_items)):
             if self._pull_menu_items[i].get_active(): pullstate = i
@@ -583,6 +587,32 @@ class SynchDialog(gtk.Window):
             if self.hgthread.return_code() is None:
                 self.write("[command interrupted]")
             return False # Stop polling this function
+    
+    AdvancedDefaults = {
+        'expander.expanded': False, 
+        '_reventry.text': '', 
+        '_force.active': False,
+        '_showpatch.active': False, 
+        '_newestfirst.active': False, 
+        '_nomerge.active': False,}
+
+    def _expanded(self, expander):
+        if not expander.get_expanded():
+            self.load_settings(SynchDialog.AdvancedDefaults.get)
+
+    def load_settings(self, get_value = None):
+        get_value = get_value or self._settings.get_value
+        for key, default in SynchDialog.AdvancedDefaults.iteritems():
+            member, attr = key.split('.')
+            value = get_value(key, default)
+            getattr(getattr(self, member), 'set_%s'%attr)(value)
+        
+    def update_settings(self, set_value = None):
+        set_value = set_value or self._settings.set_value
+        for key, default in SynchDialog.AdvancedDefaults.iteritems():
+            member, attr = key.split('.')
+            value = getattr(getattr(self, member), 'get_%s'%attr)()
+            set_value(key, value)
 
 def run(cwd='', root='', files=[], pushmode=False, **opts):
     dialog = SynchDialog(cwd, root, files, pushmode)
