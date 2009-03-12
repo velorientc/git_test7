@@ -86,9 +86,6 @@ class GShelve(GStatus):
         self._vpaned.add2(status_body)
         self._vpaned.set_position(self._setting_vpos)
         self._activate_shelve_buttons(True)
-
-        #self.selectlabel.set_text(
-        #    _('toggle change hunks to leave them in your working directory'))
         return self._vpaned
 
 
@@ -121,6 +118,9 @@ class GShelve(GStatus):
 
     ### End of overridable methods ###
 
+    def _has_shelve_file(self):
+        return os.path.exists(self.repo.join('shelve'))
+        
     def _activate_shelve_buttons(self, status):
         if status:
             self.shelve_btn.set_sensitive(True)
@@ -151,12 +151,12 @@ class GShelve(GStatus):
             dialog.set_transient_for(self)
             rval = dialog.run()
             dialog.destroy()
-            if rval == -1:
-                return
             if rval == 1:
                 doforce = True
-            if rval == 2:
+            elif rval == 2:
                 doappend = True
+            else:
+                return
 
         # capture the selected hunks to shelve
         fc = []

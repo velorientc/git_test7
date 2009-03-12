@@ -413,7 +413,8 @@ class GStatus(GDialog):
     def copy_to_clipboard(self, treeview):
         'Write highlighted hunks to the clipboard'
         if not treeview.is_focus():
-            # ignore ctrl-c not directed at treeview
+            w = self.get_focus()
+            w.emit('copy-clipboard')
             return False
         model, paths = treeview.get_selection().get_selected_rows()
         cids = [ model[row][DM_CHUNK_ID] for row, in paths ]
@@ -955,9 +956,6 @@ class GStatus(GDialog):
             return
         self._hg_call_wrapper('Diff', dohgdiff)
 
-    def _has_shelve_file(self):
-        return os.path.exists(self.repo.join('shelve'))
-        
     def _showdiff_toggled(self, togglebutton, data=None):
         # prevent movement events while setting position
         self._diffpane.handler_block(self._diffpane_moved_id)
@@ -1285,6 +1283,7 @@ class GStatus(GDialog):
 
             selection = self.filetree.get_selection()
             selection.selected_foreach(toggler)
+            self._update_check_count()
             return True
         return False
 

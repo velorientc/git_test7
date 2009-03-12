@@ -7,6 +7,9 @@ of the GNU General Public License, incorporated herein by reference.
 
 """
 
+import dumbdbm, anydbm
+anydbm._defaultmod = dumbdbm
+
 import os
 import gtk
 import shelve

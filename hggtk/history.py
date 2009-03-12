@@ -132,19 +132,19 @@ class GLog(GDialog):
         button = gtk.CheckMenuItem("Show Rev")
         button.connect("toggled", self.toggle_view_column,
                 'rev-column-visible')
-        button.set_active(True)
+        button.set_active(self._show_rev)
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem("Show ID")
         button.connect("toggled", self.toggle_view_column,
                 'id-column-visible')
-        button.set_active(False)
+        button.set_active(self._show_id)
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem("Show Date")
         button.connect("toggled", self.toggle_view_column,
                 'date-column-visible')
-        button.set_active(True)
+        button.set_active(self._show_date)
         button.set_draw_as_radio(True)
         menu.append(button)
         menu.show_all()
@@ -218,7 +218,10 @@ class GLog(GDialog):
     def save_settings(self):
         settings = GDialog.save_settings(self)
         settings['glog'] = (self._vpaned.get_position(),
-                self._hpaned.get_position())
+                self._hpaned.get_position(),
+                self.graphview.get_property('rev-column-visible'),
+                self.graphview.get_property('date-column-visible'),
+                self.graphview.get_property('id-column-visible'))
         return settings
 
     def get_graphlimit(self, suggestion):
@@ -253,16 +256,18 @@ class GLog(GDialog):
         self.changeview.glog_parent = self
 
         GDialog.load_settings(self, settings)
+        self._setting_vpos = -1
+        self._setting_hpos = -1
+        self._show_rev, self._show_date, self._show_id = True, True, False
         if settings:
             data = settings['glog']
             if type(data) == int:
                 self._setting_vpos = data
-                self._setting_hpos = -1
-            else:
+            elif len(data) == 2:
                 (self._setting_vpos, self._setting_hpos) = data
-        else:
-            self._setting_vpos = -1
-            self._setting_hpos = -1
+            elif len(data) == 5:
+                (self._setting_vpos, self._setting_hpos,
+                 self._show_rev, self._show_date, self._show_id) = data
 
     def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""
