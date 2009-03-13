@@ -141,7 +141,7 @@ class TreeModel(gtk.GenericTreeModel):
             
             revision = (None, node, revid, None, sumstr,
                     author, date, None, parents, wc_parent, head, taglist,
-                    None, color, short(node))
+                    color, short(node))
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
