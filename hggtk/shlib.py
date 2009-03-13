@@ -8,6 +8,7 @@ of the GNU General Public License, incorporated herein by reference.
 """
 
 import dumbdbm, anydbm
+saved_default = anydbm._defaultmod
 anydbm._defaultmod = dumbdbm
 
 import os
@@ -86,7 +87,18 @@ class Settings(object):
 
     def read(self):
         self._data.clear()
-        if not os.path.exists(self._path):
+        if os.path.exists(self._path):
+            # One-time import of <=0.7 config file
+            anydbm._defaultmod = saved_default
+            dbase = shelve.open(self._path)
+            self._dbappname = dbase['APPNAME']
+            self.version = dbase['VERSION']
+            self._data.update(dbase.get('DATA', {}))
+            dbase.close()
+            anydbm._defaultmod = dumbdbm
+            os.unlink(self._path)
+            return
+        if not os.path.exists(self._path+'.dat'):
             return
 
         dbase = shelve.open(self._path)
