@@ -117,6 +117,9 @@ def open_repo(path):
             return repo
         except RepoError:
             pass
+        except StandardError, e:
+            print "error while opening repo %s:" % path
+            print e
 
     return None
 
