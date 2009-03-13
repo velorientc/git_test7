@@ -209,11 +209,11 @@ class menuThg:
 
         changed = bool(states & set([cachethg.ADDED, cachethg.MODIFIED]))
         modified = cachethg.MODIFIED in states
-        tracked = changed or cachethg.MODIFIED in states
+        tracked = changed or modified
         new = bool(states & set([cachethg.UNKNOWN, cachethg.IGNORED]))
 
         menu = thg_menu(repo.ui, self.name)
-        if changed or cachethg.UNKNOWN in states:
+        if changed or cachethg.UNKNOWN in states or 'qtip' in repo['.'].tags():
             menu.add_menu(_("HG Commit..."),
                       _("Commit changes in repository"),
                       'commit', icon="menucommit.ico")
