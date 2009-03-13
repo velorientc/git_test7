@@ -80,7 +80,6 @@ class TreeView(gtk.ScrolledWindow):
         self.batchsize = limit
         self.repo = repo
         self.currev = None
-        self.marked_rev = None
         self.construct_treeview()
         self.pbar = pbar
 
@@ -166,7 +165,6 @@ class TreeView(gtk.ScrolledWindow):
             self.model = treemodel.TreeModel(self.repo, self.graphdata,
                     self.color_func)
             self.treeview.set_model(self.model)
-            self.model.marked_rev = self.marked_rev
 
         self.graph_cell.columns_len = self.max_cols
         width = self.graph_cell.get_size(self.treeview)[2]
@@ -370,16 +368,6 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.date_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.treeview.append_column(self.date_column)
-
-    def set_mark_rev(self, rev):
-        '''User has marked a revision for diff'''
-        self.marked_rev = long(rev)
-        self.msg_column.queue_resize()
-        if self.model:
-            self.model.marked_rev = self.marked_rev
-
-    def get_mark_rev(self):
-        return self.marked_rev
 
     def text_color_orig(self, parents, rev, author):
         if len(parents) == 2:

@@ -110,8 +110,6 @@ class GLog(GDialog):
         revs = []
         if self.currow is not None:
             revs.append(self.currow[treemodel.REVID])
-        if self.graphview.get_mark_rev() is not None:
-            revs.append(self.graphview.get_mark_rev())
             
         dlg = FilterDialog(self.repo.root, revs, self.pats,
                 filterfunc=do_reload)
@@ -478,10 +476,6 @@ class GLog(GDialog):
         rev0, rev1 = self._revs
         self.opts['rev'] = ["%s:%s" % (rev0, rev1)]
         self._diff_file(None, '')
-
-    def _mark_rev(self, menuitem):
-        rev = self.currow[treemodel.REVID]
-        self.graphview.set_mark_rev(rev)
 
     def _add_tag(self, menuitem):
         from tagadd import TagAddDialog

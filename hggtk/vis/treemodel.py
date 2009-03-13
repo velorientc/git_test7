@@ -40,9 +40,8 @@ PARENTS = 8
 WCPARENT = 9
 HEAD = 10
 TAGS = 11
-MARKED = 12
-FGCOLOR = 13
-HEXID = 14
+FGCOLOR = 12
+HEXID = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -75,7 +74,6 @@ class TreeModel(gtk.GenericTreeModel):
         if index == WCPARENT: return gobject.TYPE_BOOLEAN
         if index == HEAD: return gobject.TYPE_BOOLEAN
         if index == TAGS: return gobject.TYPE_STRING
-        if index == MARKED: return gobject.TYPE_BOOLEAN
         if index == FGCOLOR: return gobject.TYPE_STRING
         if index == HEXID: return gobject.TYPE_STRING
 
@@ -150,8 +148,6 @@ class TreeModel(gtk.GenericTreeModel):
 
         if column == REVISION:
             return revision
-        if column == MARKED:
-            return revid == self.marked_rev
         return revision[column]
 
     def on_iter_next(self, rowref):

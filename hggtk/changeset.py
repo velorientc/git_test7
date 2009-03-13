@@ -458,12 +458,6 @@ class ChangeSet(GDialog):
         self._ann_menu = create_menu('_annotate file', self._ann_file)
         _menu.append(self._ann_menu)
         _menu.append(create_menu('_revert file contents', self._revert_file))
-        self._file_diff_to_mark_menu = create_menu('_diff file to mark',
-                self._diff_file_to_mark)
-        self._file_diff_from_mark_menu = create_menu('diff file _from mark',
-                self._diff_file_from_mark)
-        _menu.append(self._file_diff_to_mark_menu)
-        _menu.append(self._file_diff_from_mark_menu)
         _menu.show_all()
         return _menu
 
@@ -600,12 +594,6 @@ class ChangeSet(GDialog):
     def _file_popup_menu(self, treeview, button=0, time=0):
         if self.curfile is None:
             return
-        if self.graphview:
-            is_mark = self.graphview.get_mark_rev() is not None
-        else:
-            is_mark = False
-        self._file_diff_to_mark_menu.set_sensitive(is_mark)
-        self._file_diff_from_mark_menu.set_sensitive(is_mark)
         self._filemenu.popup(None, None, None, button, time)
 
         # If the filelog entry this changeset references does not link
@@ -659,41 +647,8 @@ class ChangeSet(GDialog):
         self._node1, self._node2 = cmdutil.revpair(self.repo, [pair])
         self._view_file('M', self.curfile, force_left=False)
 
-    def _diff_file_to_mark(self, menuitem):
-        '''User selected diff to mark from the file list context menu'''
-        from status import GStatus
-        from gtools import cmdtable
-        rev0 = self.graphview.get_mark_rev()
-        rev1 = self.currev
-        statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
-                ('include', 'exclude', 'git'))
-        statopts['rev'] = ['%u:%u' % (rev1, rev0)]
-        statopts['modified'] = True
-        statopts['added'] = True
-        statopts['removed'] = True
-        dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile],
-                statopts, False)
-        dialog.display()
-        return True
-
-    def _diff_file_from_mark(self, menuitem):
-        '''User selected diff from mark from the file list context menu'''
-        from status import GStatus
-        from gtools import cmdtable
-        rev0 = self.graphview.get_mark_rev()
-        rev1 = self.currev
-        statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
-                ('include', 'exclude', 'git'))
-        statopts['rev'] = ['%u:%u' % (rev0, rev1)]
-        statopts['modified'] = True
-        statopts['added'] = True
-        statopts['removed'] = True
-        dialog = GStatus(self.ui, self.repo, self.cwd, [self.curfile],
-                statopts, False)
-        dialog.display()
-
     def _ann_file(self, menuitem):
-        '''User selected diff from mark from the file list context menu'''
+        '''User selected annotate file from the file list context menu'''
         from datamine import DataMineDialog
         rev = self.currev
         dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {}, False)
