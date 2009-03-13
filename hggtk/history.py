@@ -314,7 +314,7 @@ class GLog(GDialog):
     def tree_context_menu(self):
         _menu = gtk.Menu()
         _menu.append(create_menu('di_splay', self._show_status))
-        _menu.append(create_menu('_checkout', self._checkout))
+        _menu.append(create_menu('_update', self._checkout))
         self._cmenu_merge = create_menu('_merge with', self._merge)
         _menu.append(self._cmenu_merge)
         _menu.append(create_menu('_export patch', self._export_patch))
