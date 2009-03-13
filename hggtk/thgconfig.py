@@ -31,13 +31,13 @@ _tortoise_info = (
     ('CLI Editor', 'ui.editor', [],
         'The editor to use during a commit and other'
         ' instances where Mercurial needs multiline input from'
-        ' the user.  Only used by CLI commands.'),
+        ' the user.  Only used by command line interface commands.'),
     ('Tab Width', 'tortoisehg.tabwidth', [],
         'Specify the number of spaces to expand tabs.'
         ' Default: Not expanded'),
     ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
         'Show the diff panel below the file list in status, shelve, and'
-        ' commit dialogs.  Default: False'),
+        ' commit dialogs.  Default: False (show diffs to right of file list)'),
     ('Overlay Icons', 'tortoisehg.overlayicons',
         ['False', 'True', 'localdisks'],
         'Display overlay icons in Explorer windows.'
@@ -47,8 +47,8 @@ _commit_info = (
     ('Username', 'ui.username', [], 
         'Name associated with commits'),
     ('External Commit Tool', 'tortoisehg.extcommit', ['None', 'qct'],
-        'Select commit tool launched by TortoiseHg. Qct must must be'
-        ' installed separately.  Default: None'))
+        'Select commit tool launched by TortoiseHg. Qct is no longer'
+        ' included.  Default: None (use the builtin tool)'))
 
 _log_info = (
     ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
@@ -56,7 +56,7 @@ _log_info = (
         ' the changes are colored green for merge, red for'
         ' non-trivial parents, black for normal. Default: False'),
     ('Long Summary', 'tortoisehg.longsummary', ['False', 'True'],
-        'Concatenate multiple lines of changeset summary'
+        'If true, concatenate multiple lines of changeset summary'
         ' until they reach 80 characters. Default: False'),
     ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
         'The number of revisions to read and display in the'
@@ -119,16 +119,16 @@ _web_info = (
         'Character encoding name'))
 
 _proxy_info = (
-    ('host', 'http_proxy.host', [],
+    ('Host', 'http_proxy.host', [],
         'Host name and (optional) port of proxy server, for'
         ' example "myproxy:8000"'),
-    ('no', 'http_proxy.no', [],
+    ('Bypass List', 'http_proxy.no', [],
         'Optional. Comma-separated list of host names that'
         ' should bypass the proxy'),
-    ('passwd', 'http_proxy.passwd', [],
+    ('Password', 'http_proxy.passwd', [],
         'Optional. Password to authenticate with at the'
         ' proxy server'),
-    ('user', 'http_proxy.user', [],
+    ('User', 'http_proxy.user', [],
         'Optional. User name to authenticate with at the'
         ' proxy server'))
 
@@ -159,22 +159,23 @@ _email_info = (
     ('SMTP Password', 'smtp.password', [],
         'Password to authenticate to SMTP server with'),
     ('Local Hostname', 'smtp.local_hostname', [],
-        'Hostname the sender can use to identify itself to MTA'))
+        'Hostname the sender can use to identify itself to the mail '
+        ' transfer agent.'))
 
 _diff_info = (
     ('Git Format', 'diff.git', ['False', 'True'],
-        'Use git extended diff format.'),
+        'Use git extended diff header format. Default: False'),
     ('No Dates', 'diff.nodates', ['False', 'True'],
-        'Do no include dates in diff headers.'),
+        'Do not include modification dates in diff headers. Default: False'),
     ('Show Function', 'diff.showfunc', ['False', 'True'],
-        'Show which function each change is in.'),
+        'Show which function each change is in. Default: False'),
     ('Ignore White Space', 'diff.ignorews', ['False', 'True'],
-        'Ignore white space when comparing lines.'),
+        'Ignore white space when comparing lines. Default: False'),
     ('Ignore WS Amount', 'diff.ignorewsamount', ['False', 'True'],
-        'Ignore changes in the amount of white space.'),
+        'Ignore changes in the amount of white space. Default: False'),
     ('Ignore Blank Lines', 'diff.ignoreblanklines',
         ['False', 'True'],
-        'Ignore changes whose lines are all blank.'))
+        'Ignore changes whose lines are all blank. Default: False'))
 
 class ConfigDialog(gtk.Dialog):
     def __init__(self, root='',
