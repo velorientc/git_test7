@@ -151,7 +151,7 @@ class GStatus(GDialog):
         if revs:
             r = ':'.join(revs)
             return ' '.join([root, 'status', r]) + ' '.join(self.pats)
-        elif self.mqmode:
+        elif self.mqmode and hasattr(self, 'text'):
             patch = self.repo.mq.lookup('qtip')
             return root + ' applied MQ patch ' + patch
         else:
@@ -524,10 +524,10 @@ class GStatus(GDialog):
         self.repo.dirstate.invalidate()
         self.repo.invalidate()
 
-        # The following code was copied from the status function in mercurial\commands.py
-        # and modified slightly to work here
+        # The following code was copied from the status function in
+        # mercurial\commands.py and modified slightly to work here
         
-        if self.mqmode and not self.opts.get('rev'):
+        if self.mqmode and not self.opts.get('rev') and hasattr(self, 'text'):
             # when a patch is applied, show diffs to parent of top patch
             self._node1 = self.repo.lookup(-3)
             self._node2 = None
