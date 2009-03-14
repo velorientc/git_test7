@@ -71,15 +71,15 @@ _paths_info = (
         ' Default is set to repository from which the repository was cloned.'),
     ('default-push', 'paths.default-push', [],
         'Optional. Directory or URL to use when pushing if no'
-        ' destination is specified.'''))
+        ' destination is specified.'))
 
 _web_info = (
     ('Name', 'web.name', ['unknown'],
         'Repository name to use in the web interface.  Default'
         ' is the working directory.'),
     ('Description', 'web.description', ['unknown'],
-        'Textual description of the repository''s purpose or'
-        ' contents.'),
+        "Textual description of the repository's purpose or"
+        " contents."),
     ('Contact', 'web.contact', ['unknown'],
         'Name or email address of the person in charge of the'
         ' repository.'),
