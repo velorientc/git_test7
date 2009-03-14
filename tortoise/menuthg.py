@@ -100,9 +100,9 @@ class thg_menu(object):
 
     def get(self):
         menu = self.menus[0]
-        for submenu in menus[1:]:
-            menu.add(TortoiseSubmenu(self.name, 'Mercurial', submenu, "hg.ico"))
-        menu.add(TortoseMenuSep())
+        for submenu in self.menus[1:]:
+            menu.append(TortoiseSubmenu(self.name, 'Mercurial', submenu, "hg.ico"))
+        menu.append(TortoiseMenuSep())
         return menu
 
     def __iter__(self):
