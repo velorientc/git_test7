@@ -196,7 +196,7 @@ class ConfigDialog(gtk.Dialog):
                 self.response(gtk.RESPONSE_CANCEL)
 
         # Catch close events
-        self.set_default_size(700, 300)
+        #self.set_default_size(700, 300)
         self.connect('delete-event', self._delete)
         self.connect('response', self._response)
 
@@ -414,37 +414,38 @@ class ConfigDialog(gtk.Dialog):
         self._delpathbutton.set_sensitive(path_selected)
         self._testpathbutton.set_sensitive(repo_available and path_selected)
 
-    def set_help(self, widget, event, label, tooltip):
-        label.set_text(tooltip)
+    def set_help(self, widget, event, buffer, tooltip):
+        text = ' '.join(tooltip.splitlines())
+        buffer.set_text(text)
 
     def fill_frame(self, frame, info):
         widgets = []
 
         descframe = gtk.Frame('Description')
-        fvbox = gtk.VBox()
-        desclabel = gtk.Label()
-        desclabel.set_line_wrap(True)
-        desclabel.set_alignment(0.0, 0.0)
-        fvbox.pack_start(desclabel, True, True, 2)
-        fvbox.set_border_width(5)
-        descframe.add(fvbox)
+        desctext = gtk.TextView()
+        desctext.set_wrap_mode(gtk.WRAP_WORD)
+        desctext.set_editable(False)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add(desctext)
+        descframe.add(scrolledwindow)
 
-        hbox = gtk.HBox()
         vbox = gtk.VBox()
         table = gtk.Table(len(info), 2, False)
         vbox.pack_start(table, False, False, 2)
-
-        hbox.pack_start(vbox, False, False, 2)
-        hbox.pack_start(descframe, True, True, 2)
-        frame.add(hbox)
+        if info != _paths_info:
+            vbox.pack_start(gtk.Label(), True, True, 2)
+        vbox.pack_start(descframe, False, False, 2)
+        frame.add(vbox)
 
         for row, (label, cpath, values, tooltip) in enumerate(info):
             vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
             combo.connect("changed", self.dirty_event)
             combo.child.connect("focus-in-event", self.set_help,
-                    desclabel, tooltip)
+                    desctext.get_buffer(), tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
+            combo.child.set_width_chars(40)
             widgets.append(combo)
 
             lbl = gtk.Label(label + ':')
@@ -519,7 +520,6 @@ class ConfigDialog(gtk.Dialog):
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
         frame.set_border_width(10)
-        frame.set_size_request(508, 500)
         frame.show()
 
         label = gtk.Label(tab)
