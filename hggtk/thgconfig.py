@@ -33,11 +33,13 @@ _tortoise_info = (
         ' instances where Mercurial needs multiline input from'
         ' the user.  Only used by command line interface commands.'),
     ('Tab Width', 'tortoisehg.tabwidth', [],
-        'Specify the number of spaces to expand tabs.'
+        'Specify the number of spaces that tabs expand to in various'
+        ' TortoiseHG windows.'
         ' Default: Not expanded'),
     ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
         'Show the diff panel below the file list in status, shelve, and'
-        ' commit dialogs.  Default: False (show diffs to right of file list)'),
+        ' commit dialogs.'
+        ' Default: False (show diffs to right of file list)'),
     ('Overlay Icons', 'tortoisehg.overlayicons',
         ['False', 'True', 'localdisks'],
         'Display overlay icons in Explorer windows.'
@@ -47,39 +49,45 @@ _commit_info = (
     ('Username', 'ui.username', [], 
         'Name associated with commits'),
     ('External Commit Tool', 'tortoisehg.extcommit', ['None', 'qct'],
-        'Select commit tool launched by TortoiseHg. Qct is no longer'
-        ' included.  Default: None (use the builtin tool)'))
+        'Select commit tool launched by TortoiseHg. (Qct is no longer'
+        ' distributed as part of TortoiseHG.)'
+        ' Default: None (use the builtin tool)'))
 
 _log_info = (
     ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
         'Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
-        ' non-trivial parents, black for normal. Default: False'),
+        ' non-trivial parents, black for normal.'
+        ' Default: False'),
     ('Long Summary', 'tortoisehg.longsummary', ['False', 'True'],
         'If true, concatenate multiple lines of changeset summary'
-        ' until they reach 80 characters. Default: False'),
+        ' until they reach 80 characters.'
+        ' Default: False'),
     ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
         'The number of revisions to read and display in the'
-        ' changelog viewer in a single batch. Default: 500'),
+        ' changelog viewer in a single batch.'
+        ' Default: 500'),
     ('Copy Hash', 'tortoisehg.copyhash', ['False', 'True'],
-        'Allow the changelog viewer to copy hash of currently'
-        ' selected changeset into the clipboard. Default: False'))
+        'Allow the changelog viewer to copy the changeset hash'
+        ' of the currently selected changeset into the clipboard.'
+        ' Default: False'))
 
 _paths_info = (
     ('default', 'paths.default', [],
-        'Directory or URL to use when pulling if no source is specified.'
-        ' Default is set to repository from which the repository was cloned.'),
+        'Directory or URL to use when pulling, if no source is specified.'
+        ' Default is set to the repository from which the repository'
+        ' was cloned.'),
     ('default-push', 'paths.default-push', [],
-        'Optional. Directory or URL to use when pushing if no'
+        'Optional. Directory or URL to use when pushing, if no'
         ' destination is specified.'))
 
 _web_info = (
     ('Name', 'web.name', ['unknown'],
-        'Repository name to use in the web interface.  Default'
-        ' is the working directory.'),
+        'Repository name to use in the web interface.'
+        ' Default is the working directory.'),
     ('Description', 'web.description', ['unknown'],
-        "Textual description of the repository's purpose or"
-        " contents."),
+        'Textual description of the repository's purpose or'
+        ' contents.'),
     ('Contact', 'web.contact', ['unknown'],
         'Name or email address of the person in charge of the'
         ' repository.'),
@@ -94,8 +102,8 @@ _web_info = (
         'Whether to require that inbound pushes be transported'
         ' over SSL to prevent password sniffing.'),
     ('Stripes', 'web.stripes', ['1', '0'],
-        'How many lines a "zebra stripe" should span in multiline'
-        ' output. Default is 1; set to 0 to disable.'),
+        'How many lines a "zebra stripe" should span in multiline output.'
+        ' Default is 1; set to 0 to disable.'),
     ('Max Files', 'web.maxfiles', ['10'],
         'Maximum number of files to list per changeset.'),
     ('Max Changes', 'web.maxfiles', ['10'],
@@ -134,7 +142,7 @@ _proxy_info = (
 
 _email_info = (
     ('From', 'email.from', [],
-        'Email address to use in "From" header and SMTP envelope'),
+        'Email address to use in the "From" header and for the SMTP envelope'),
     ('To', 'email.to', [],
         'Comma-separated list of recipient email addresses'),
     ('Cc', 'email.cc', [],
@@ -151,31 +159,38 @@ _email_info = (
 ' "/usr/sbin/sendmail" is enough to use sendmail to send messages.'),
     ('SMTP Host', 'smtp.host', [], 'Host name of mail server'),
     ('SMTP Port', 'smtp.port', ['25'],
-        'Port to connect to on mail server. Default: 25'),
+        'Port to connect to on mail server.'
+        ' Default: 25'),
     ('SMTP TLS', 'smtp.tls', ['False', 'True'],
-        'Connect to mail server using TLS.  Default: False'),
+        'Connect to mail server using TLS.'
+        ' Default: False'),
     ('SMTP Username', 'smtp.username', [],
-        'Username to authenticate to SMTP server with'),
+        'Username to authenticate to mail server with'),
     ('SMTP Password', 'smtp.password', [],
-        'Password to authenticate to SMTP server with'),
+        'Password to authenticate to mail server with'),
     ('Local Hostname', 'smtp.local_hostname', [],
-        'Hostname the sender can use to identify itself to the mail '
-        ' transfer agent.'))
+        'Hostname the sender can use to identify itself to the mail server.'))
 
 _diff_info = (
     ('Git Format', 'diff.git', ['False', 'True'],
-        'Use git extended diff header format. Default: False'),
+        'Use git extended diff header format.'
+        ' Default: False'),
     ('No Dates', 'diff.nodates', ['False', 'True'],
-        'Do not include modification dates in diff headers. Default: False'),
+        'Do not include modification dates in diff headers.'
+        ' Default: False'),
     ('Show Function', 'diff.showfunc', ['False', 'True'],
-        'Show which function each change is in. Default: False'),
+        'Show which function each change is in.'
+        ' Default: False'),
     ('Ignore White Space', 'diff.ignorews', ['False', 'True'],
-        'Ignore white space when comparing lines. Default: False'),
+        'Ignore white space when comparing lines.'
+        ' Default: False'),
     ('Ignore WS Amount', 'diff.ignorewsamount', ['False', 'True'],
-        'Ignore changes in the amount of white space. Default: False'),
+        'Ignore changes in the amount of white space.'
+        ' Default: False'),
     ('Ignore Blank Lines', 'diff.ignoreblanklines',
         ['False', 'True'],
-        'Ignore changes whose lines are all blank. Default: False'))
+        'Ignore changes whose lines are all blank.'
+        ' Default: False'))
 
 class ConfigDialog(gtk.Dialog):
     def __init__(self, root='',
