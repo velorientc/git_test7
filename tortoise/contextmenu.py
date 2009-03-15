@@ -213,7 +213,7 @@ class ContextMenuExtension(menuthg.menuThg):
         if self.repo:
             # Convert filenames to be relative to cwd
             files = []
-            cwd_rel = cwd[len(repo.root+os.sep):]
+            cwd_rel = cwd[len(self.repo.root+os.sep):]
             for f in self.fnames:
                 cpath = util.canonpath(self.repo.root, cwd, f)
                 if cpath.startswith(cwd_rel):
