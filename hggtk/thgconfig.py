@@ -33,11 +33,13 @@ _tortoise_info = (
         ' instances where Mercurial needs multiline input from'
         ' the user.  Only used by command line interface commands.'),
     ('Tab Width', 'tortoisehg.tabwidth', [],
-        'Specify the number of spaces to expand tabs.'
+        'Specify the number of spaces that tabs expand to in various'
+        ' TortoiseHG windows.'
         ' Default: Not expanded'),
     ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
         'Show the diff panel below the file list in status, shelve, and'
-        ' commit dialogs.  Default: False (show diffs to right of file list)'),
+        ' commit dialogs.'
+        ' Default: False (show diffs to right of file list)'),
     ('Overlay Icons', 'tortoisehg.overlayicons',
         ['False', 'True', 'localdisks'],
         'Display overlay icons in Explorer windows.'
@@ -47,39 +49,45 @@ _commit_info = (
     ('Username', 'ui.username', [], 
         'Name associated with commits'),
     ('External Commit Tool', 'tortoisehg.extcommit', ['None', 'qct'],
-        'Select commit tool launched by TortoiseHg. Qct is no longer'
-        ' included.  Default: None (use the builtin tool)'))
+        'Select commit tool launched by TortoiseHg. (Qct is no longer'
+        ' distributed as part of TortoiseHG.)'
+        ' Default: None (use the builtin tool)'))
 
 _log_info = (
     ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
         'Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
-        ' non-trivial parents, black for normal. Default: False'),
+        ' non-trivial parents, black for normal.'
+        ' Default: False'),
     ('Long Summary', 'tortoisehg.longsummary', ['False', 'True'],
         'If true, concatenate multiple lines of changeset summary'
-        ' until they reach 80 characters. Default: False'),
+        ' until they reach 80 characters.'
+        ' Default: False'),
     ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
         'The number of revisions to read and display in the'
-        ' changelog viewer in a single batch. Default: 500'),
+        ' changelog viewer in a single batch.'
+        ' Default: 500'),
     ('Copy Hash', 'tortoisehg.copyhash', ['False', 'True'],
-        'Allow the changelog viewer to copy hash of currently'
-        ' selected changeset into the clipboard. Default: False'))
+        'Allow the changelog viewer to copy the changeset hash'
+        ' of the currently selected changeset into the clipboard.'
+        ' Default: False'))
 
 _paths_info = (
     ('default', 'paths.default', [],
-        'Directory or URL to use when pulling if no source is specified.'
-        ' Default is set to repository from which the repository was cloned.'),
+        'Directory or URL to use when pulling, if no source is specified.'
+        ' Default is set to the repository from which the repository'
+        ' was cloned.'),
     ('default-push', 'paths.default-push', [],
-        'Optional. Directory or URL to use when pushing if no'
-        ' destination is specified.'''))
+        'Optional. Directory or URL to use when pushing, if no'
+        ' destination is specified.'))
 
 _web_info = (
     ('Name', 'web.name', ['unknown'],
-        'Repository name to use in the web interface.  Default'
-        ' is the working directory.'),
+        'Repository name to use in the web interface.'
+        ' Default is the working directory.'),
     ('Description', 'web.description', ['unknown'],
-        'Textual description of the repository''s purpose or'
-        ' contents.'),
+        "Textual description of the repository's purpose or"
+        " contents."),
     ('Contact', 'web.contact', ['unknown'],
         'Name or email address of the person in charge of the'
         ' repository.'),
@@ -94,8 +102,8 @@ _web_info = (
         'Whether to require that inbound pushes be transported'
         ' over SSL to prevent password sniffing.'),
     ('Stripes', 'web.stripes', ['1', '0'],
-        'How many lines a "zebra stripe" should span in multiline'
-        ' output. Default is 1; set to 0 to disable.'),
+        'How many lines a "zebra stripe" should span in multiline output.'
+        ' Default is 1; set to 0 to disable.'),
     ('Max Files', 'web.maxfiles', ['10'],
         'Maximum number of files to list per changeset.'),
     ('Max Changes', 'web.maxfiles', ['10'],
@@ -134,7 +142,7 @@ _proxy_info = (
 
 _email_info = (
     ('From', 'email.from', [],
-        'Email address to use in "From" header and SMTP envelope'),
+        'Email address to use in the "From" header and for the SMTP envelope'),
     ('To', 'email.to', [],
         'Comma-separated list of recipient email addresses'),
     ('Cc', 'email.cc', [],
@@ -151,31 +159,38 @@ _email_info = (
 ' "/usr/sbin/sendmail" is enough to use sendmail to send messages.'),
     ('SMTP Host', 'smtp.host', [], 'Host name of mail server'),
     ('SMTP Port', 'smtp.port', ['25'],
-        'Port to connect to on mail server. Default: 25'),
+        'Port to connect to on mail server.'
+        ' Default: 25'),
     ('SMTP TLS', 'smtp.tls', ['False', 'True'],
-        'Connect to mail server using TLS.  Default: False'),
+        'Connect to mail server using TLS.'
+        ' Default: False'),
     ('SMTP Username', 'smtp.username', [],
-        'Username to authenticate to SMTP server with'),
+        'Username to authenticate to mail server with'),
     ('SMTP Password', 'smtp.password', [],
-        'Password to authenticate to SMTP server with'),
+        'Password to authenticate to mail server with'),
     ('Local Hostname', 'smtp.local_hostname', [],
-        'Hostname the sender can use to identify itself to the mail '
-        ' transfer agent.'))
+        'Hostname the sender can use to identify itself to the mail server.'))
 
 _diff_info = (
     ('Git Format', 'diff.git', ['False', 'True'],
-        'Use git extended diff header format. Default: False'),
+        'Use git extended diff header format.'
+        ' Default: False'),
     ('No Dates', 'diff.nodates', ['False', 'True'],
-        'Do not include modification dates in diff headers. Default: False'),
+        'Do not include modification dates in diff headers.'
+        ' Default: False'),
     ('Show Function', 'diff.showfunc', ['False', 'True'],
-        'Show which function each change is in. Default: False'),
+        'Show which function each change is in.'
+        ' Default: False'),
     ('Ignore White Space', 'diff.ignorews', ['False', 'True'],
-        'Ignore white space when comparing lines. Default: False'),
+        'Ignore white space when comparing lines.'
+        ' Default: False'),
     ('Ignore WS Amount', 'diff.ignorewsamount', ['False', 'True'],
-        'Ignore changes in the amount of white space. Default: False'),
+        'Ignore changes in the amount of white space.'
+        ' Default: False'),
     ('Ignore Blank Lines', 'diff.ignoreblanklines',
         ['False', 'True'],
-        'Ignore changes whose lines are all blank. Default: False'))
+        'Ignore changes whose lines are all blank.'
+        ' Default: False'))
 
 class ConfigDialog(gtk.Dialog):
     def __init__(self, root='',
@@ -196,7 +211,7 @@ class ConfigDialog(gtk.Dialog):
                 self.response(gtk.RESPONSE_CANCEL)
 
         # Catch close events
-        self.set_default_size(700, 300)
+        #self.set_default_size(700, 300)
         self.connect('delete-event', self._delete)
         self.connect('response', self._response)
 
@@ -414,37 +429,38 @@ class ConfigDialog(gtk.Dialog):
         self._delpathbutton.set_sensitive(path_selected)
         self._testpathbutton.set_sensitive(repo_available and path_selected)
 
-    def set_help(self, widget, event, label, tooltip):
-        label.set_text(tooltip)
+    def set_help(self, widget, event, buffer, tooltip):
+        text = ' '.join(tooltip.splitlines())
+        buffer.set_text(text)
 
     def fill_frame(self, frame, info):
         widgets = []
 
         descframe = gtk.Frame('Description')
-        fvbox = gtk.VBox()
-        desclabel = gtk.Label()
-        desclabel.set_line_wrap(True)
-        desclabel.set_alignment(0.0, 0.0)
-        fvbox.pack_start(desclabel, True, True, 2)
-        fvbox.set_border_width(5)
-        descframe.add(fvbox)
+        desctext = gtk.TextView()
+        desctext.set_wrap_mode(gtk.WRAP_WORD)
+        desctext.set_editable(False)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add(desctext)
+        descframe.add(scrolledwindow)
 
-        hbox = gtk.HBox()
         vbox = gtk.VBox()
         table = gtk.Table(len(info), 2, False)
         vbox.pack_start(table, False, False, 2)
-
-        hbox.pack_start(vbox, False, False, 2)
-        hbox.pack_start(descframe, True, True, 2)
-        frame.add(hbox)
+        if info != _paths_info:
+            vbox.pack_start(gtk.Label(), True, True, 2)
+        vbox.pack_start(descframe, False, False, 2)
+        frame.add(vbox)
 
         for row, (label, cpath, values, tooltip) in enumerate(info):
             vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
             combo.connect("changed", self.dirty_event)
             combo.child.connect("focus-in-event", self.set_help,
-                    desclabel, tooltip)
+                    desctext.get_buffer(), tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
+            combo.child.set_width_chars(40)
             widgets.append(combo)
 
             lbl = gtk.Label(label + ':')
@@ -519,7 +535,6 @@ class ConfigDialog(gtk.Dialog):
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
         frame.set_border_width(10)
-        frame.set_size_request(508, 500)
         frame.show()
 
         label = gtk.Label(tab)
