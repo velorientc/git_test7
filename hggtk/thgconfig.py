@@ -86,8 +86,8 @@ _web_info = (
         'Repository name to use in the web interface.'
         ' Default is the working directory.'),
     ('Description', 'web.description', ['unknown'],
-        'Textual description of the repository's purpose or'
-        ' contents.'),
+        "Textual description of the repository's purpose or"
+        " contents."),
     ('Contact', 'web.contact', ['unknown'],
         'Name or email address of the person in charge of the'
         ' repository.'),
