@@ -97,11 +97,11 @@ class thg_menu(object):
                   menutext, helptext, hgcmd, icon, state))
 
     def add_sep(self):
-        for s in self.sep:
-            s = True
+        self.sep = [True for _s in self.sep]
+
 
     def get(self):
-        menu = self.menus[0]
+        menu = self.menus[0][:]
         for submenu in self.menus[1:]:
             menu.append(TortoiseSubmenu(self.name, 'Mercurial', submenu, "hg.ico"))
         menu.append(TortoiseMenuSep())
