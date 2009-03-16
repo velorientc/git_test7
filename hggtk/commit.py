@@ -493,7 +493,7 @@ class GCommit(GStatus):
         if qnew:
             qnew = fromutf(qnew)
             cmdline[1] = 'qnew'
-            cmdline += '--force'
+            cmdline.append('--force')
         elif self.qheader is not None:
             cmdline[1] = 'qrefresh'
         if self.opts['addremove']:
@@ -512,6 +512,7 @@ class GCommit(GStatus):
             shell_notify([self.cwd] + files)
             if qnew:
                 self.self.qnew_name.set_text('')
+                self.repo.invalidate()
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
                 self._update_recent_messages(self.opts['message'])
