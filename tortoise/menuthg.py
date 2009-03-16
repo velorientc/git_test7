@@ -57,6 +57,8 @@ class TortoiseSubmenu(TortoiseMenu):
 
 class TortoiseMenuSep(object):
 
+    hgcmd = '----'
+
     def isSubmenu(self):
         return False
 

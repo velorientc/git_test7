@@ -208,7 +208,7 @@ class HgExtension(nautilus.MenuProvider,
         else: #bg
             passcwd = self.cwd
         for menu_info in menus:
-            idstr = 'HgNautilus::%02d' % self.pos
+            idstr = 'HgNautilus::%02d%s' % (self.pos, menu_info.hgcmd)
             self.pos += 1
             if menu_info.isSep():
                 # can not insert a separator till now
