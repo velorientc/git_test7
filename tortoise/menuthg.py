@@ -75,7 +75,7 @@ class thg_menu(object):
         self.sep = [False]
 
     def add_menu(self, menutext, helptext, hgcmd, icon=None, state=True):
-        pos = self.ui.config('tortoisehg_menu', hgcmd)
+        pos = self.ui.config('tortoisehg', 'menu.' + hgcmd)
         if pos:
             if pos.isdigit():
                 pos = int(pos)
