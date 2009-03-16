@@ -314,7 +314,7 @@ class TreeView(gtk.ScrolledWindow):
         self.rev_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.rev_column.pack_start(cell, expand=True)
         self.rev_column.add_attribute(cell, "text", treemodel.REVID)
-        #self.rev_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        self.rev_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.treeview.append_column(self.rev_column)
 
         cell = gtk.CellRendererText()
