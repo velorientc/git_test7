@@ -181,9 +181,11 @@ def get_tortoise_icon(thgicon):
         # Else try relative paths from hggtk, the repository layout
         fdir = os.path.dirname(__file__)
         paths.append(os.path.join(fdir, '..', 'icons'))
-        # ... or the source installer layout
+        # ... or the unix installer layout
         paths.append(os.path.join(fdir, '..', '..', '..',
-            'share', 'tortoisehg', 'icons'))
+            'share', 'pixmaps', 'tortoisehg', 'icons'))
+        paths.append(os.path.join(fdir, '..', '..', '..', '..',
+            'share', 'pixmaps', 'tortoisehg', 'icons'))
     except NameError: # __file__ is not always available
         pass
     for p in paths:

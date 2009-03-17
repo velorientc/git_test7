@@ -56,6 +56,20 @@ def dispatch(args):
         u.print_exc()
         raise
 
+def get_list_from_file(filename):
+    try:
+        if filename == '-':
+            lines = [ x.replace("\n", "") for x in sys.stdin.readlines() ]
+        else:
+            fd = open(filename, "r")
+            lines = [ x.replace("\n", "") for x in fd.readlines() ]
+            fd.close()
+            os.unlink(filename)
+        return lines
+    except IOError, e:
+        sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
+        return []
+
 def _parse(ui, args):
     options = {}
     cmdoptions = {}
@@ -88,6 +102,11 @@ def _parse(ui, args):
         n = o[1]
         options[n] = cmdoptions[n]
         del cmdoptions[n]
+
+    listfile = options.get('listfile')
+    if listfile:
+        del options['listfile']
+        args += get_list_from_file(listfile)
 
     return (cmd, cmd and i[0] or None, args, options, cmdoptions)
 
@@ -249,7 +268,7 @@ def guess(ui, *pats, **opts):
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
-    opts['files'] = sys.argv[2:] or []
+    opts['files'] = pats or []
     opts['cwd'] = os.getcwd()
     run(**opts)
 
@@ -500,7 +519,7 @@ globalopts = [
      _('repository root directory or symbolic path name')),
     ('v', 'verbose', None, _('enable additional output')),
     ('h', 'help', None, _('display help and exit')),
-    ('', 'debugger', None, _('start debugger')),
+    ('l', 'listfile', '', _('read file list from file')),
 ]
 
 table = {

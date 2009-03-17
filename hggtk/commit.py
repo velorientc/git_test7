@@ -139,6 +139,16 @@ class GCommit(GStatus):
         self.branchentry = gtk.Entry()
         mbox.pack_start(self.branchentry, False, False, 2)
 
+        if hasattr(self.repo, 'mq'):
+            label = gtk.Label('QNew: ')
+            mbox.pack_start(label, False, False, 2)
+            self.qnew_name = gtk.Entry()
+            self.qnew_name.set_width_chars(6)
+            self.qnew_name.connect('changed', self._qnew_changed)
+            mbox.pack_start(self.qnew_name, False, False, 2)
+        else:
+            self.qnew_name = None
+
         label = gtk.Label('Recent Commit Messages: ')
         mbox.pack_start(label, False, False, 2)
         self.msg_cbbox = gtk.combo_box_new_text()
@@ -266,7 +276,9 @@ class GCommit(GStatus):
         self.set_title(title)
         self.qheader = '\n'.join(ph.message)
         self.text.get_buffer().set_text(self.qheader)
-        self.get_toolbutton('_Commit').set_label('QRefresh')
+        c_btn = self.get_toolbutton('_Commit')
+        c_btn.set_label('QRefresh')
+        c_btn.set_tooltip(self.tooltips, self.mqmode and 'QRefresh' or 'QNew')
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
@@ -477,11 +489,18 @@ class GCommit(GStatus):
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
         cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
-        if self.qheader is not None:
+        qnew = self.qnew_name and self.qnew_name.get_text().strip()
+        if qnew:
+            qnew = fromutf(qnew)
+            cmdline[1] = 'qnew'
+            cmdline.append('--force')
+        elif self.qheader is not None:
             cmdline[1] = 'qrefresh'
         if self.opts['addremove']:
             cmdline += ['--addremove']
         cmdline += ['--message', fromutf(self.opts['message'])]
+        if qnew:
+            cmdline += [qnew]
         cmdline += [self.repo.wjoin(x) for x in files]
         dialog = CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
@@ -491,7 +510,10 @@ class GCommit(GStatus):
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
             shell_notify([self.cwd] + files)
-            if self.qheader is None:
+            if qnew:
+                self.self.qnew_name.set_text('')
+                self.repo.invalidate()
+            elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
                 self._update_recent_messages(self.opts['message'])
                 self._last_commit_id = self._get_tip_rev(True)
@@ -502,6 +524,17 @@ class GCommit(GStatus):
         cl = self.repo.changelog
         tip = cl.node(nullrev + len(cl))
         return hex(tip)
+
+    def _qnew_changed(self, element):
+        mqmode = self.mqmode
+        self.mqmode = not self.qnew_name.get_text().strip()
+        if mqmode != self.mqmode:
+            c_btn = self.get_toolbutton('_Commit')
+            c_btn.set_label(self.mqmode and 'QRefresh' or 'QNew')
+            c_btn.set_tooltip(self.tooltips, self.mqmode and 'QRefresh' or 'QNew')
+            self.reload_status()
+            self.qnew_name.grab_focus() # set focus back
+            
 
 def launch(root='', files=[], cwd='', main=True):
     u = ui.ui()
