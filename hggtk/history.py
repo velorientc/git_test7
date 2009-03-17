@@ -512,6 +512,9 @@ class GLog(GDialog):
         result = fd.run()
 
         if result:
+            if os.path.exists(result):
+                os.remove(result)
+            
             # In case new export args are added in the future, merge the
             # hg defaults
             exportOpts= self.merge_opts(commands.table['^export'][1], ())
