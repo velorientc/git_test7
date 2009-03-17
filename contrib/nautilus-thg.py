@@ -114,8 +114,8 @@ class HgExtension(nautilus.MenuProvider,
         repo = self.get_repo_for_path(path)
         if repo is None:
             return
-        diffcmd = repo.ui.config('tortoisehg', 'vdiff', None)
-        if diffcmd is None:
+        diffcmd = repo.ui.config('tortoisehg', 'vdiff', 'vdiff')
+        if not diffcmd:
             self._run_dialog('diff', vfs_files)
         else:
             cmdline = ['hg', diffcmd]

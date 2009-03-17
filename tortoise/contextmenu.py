@@ -343,7 +343,7 @@ class ContextMenuExtension:
                            self._shelve, icon="shelve.ico"))
 
             # Visual Diff (any extdiff command)
-            has_vdiff = repo.ui.config('tortoisehg', 'vdiff', '') != ''
+            has_vdiff = repo.ui.config('tortoisehg', 'vdiff', 'vdiff') != ''
             result.append(TortoiseMenu(_("Visual Diff"),
                            _("View changes using GUI diff tool"),
                            self._vdiff, icon="TortoiseMerge.ico",
@@ -481,7 +481,7 @@ class ContextMenuExtension:
 
     def _vdiff(self, parent_window):
         '''[tortoisehg] vdiff = <any extdiff command>'''
-        diff = ui.ui().config('tortoisehg', 'vdiff', None)
+        diff = ui.ui().config('tortoisehg', 'vdiff', 'vdiff')
         if not diff:
             msg = "You must configure tortoisehg.vdiff in your Mercurial.ini"
             title = "Visual Diff Not Configured"
