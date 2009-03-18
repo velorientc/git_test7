@@ -341,6 +341,8 @@ class GLog(GDialog):
         _menu.append(create_menu('_diff with selected', self._diff_revs))
         _menu.append(create_menu('visual diff with selected',
                 self._vdiff_selected))
+        _menu.append(create_menu('email from here to selected', self._email_revs))
+        _menu.append(create_menu('bundle from here to selected', self._bundle_revs))
         _menu.connect_after('selection-done', self._restore_original_selection)
         _menu.show_all()
         return _menu
@@ -476,6 +478,38 @@ class GLog(GDialog):
         rev0, rev1 = self._revs
         self.opts['rev'] = ["%s:%s" % (rev0, rev1)]
         self._diff_file(None, '')
+
+    def _email_revs(self, menuitem):
+        from hgemail import EmailDialog
+        revs = list(self._revs)
+        revs.sort()
+        opts = ['--rev', str(revs[0]) + ':' + str(revs[1])]
+        dlg = EmailDialog(self.repo.root, opts)
+        dlg.set_transient_for(self)
+        dlg.show_all()
+        dlg.present()
+        dlg.set_transient_for(None)
+
+    def _bundle_revs(self, menuitem):
+        revs = list(self._revs)
+        revs.sort()
+        parent = self.repo[revs[0]].parents()[0].rev()
+        # Special case for revision 0's parent.
+        if parent == -1: parent = 'null'
+
+        filename = "%s_rev%d_to_rev%s.hg" % (os.path.basename(self.repo.root),
+                   revs[0], revs[1])
+        result = NativeSaveFileDialogWrapper(Title = "Write bundle to",
+                                         InitialDir=self.repo.root,
+                                         FileName=filename).run()
+        if result:
+            from hgcmd import CmdDialog
+            cmdline = ['hg', 'bundle', '--base', str(parent),
+                      '--rev', str(revs[1]), result]
+            dlg = CmdDialog(cmdline)
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
 
     def _add_tag(self, menuitem):
         from tagadd import TagAddDialog
