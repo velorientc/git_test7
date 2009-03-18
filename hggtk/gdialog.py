@@ -522,6 +522,7 @@ class NativeSaveFileDialogWrapper:
                     , gtk.RESPONSE_CANCEL
                     , gtk.STOCK_SAVE
                     , gtk.RESPONSE_OK))
+        file_save.set_do_overwrite_confirmation(True)
         file_save.set_default_response(gtk.RESPONSE_OK)
         file_save.set_current_folder(self.InitialDir)
         file_save.set_current_name(self.FileName)
