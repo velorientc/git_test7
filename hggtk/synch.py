@@ -470,14 +470,20 @@ class SynchDialog(gtk.Window):
         self.fill_path_combo()
 
     def _email_clicked(self, toolbutton, data=None):
+        opts = []
         path = fromutf(self._pathtext.get_text()).strip()
-        if not path:
+        rev = self._get_advanced_options().get('rev')
+        if path:
+            opts.extend(['--outgoing', path])
+        elif not rev:
             info_dialog(self, 'No repository selected',
                     'Select a peer repository to compare with')
             self._pathbox.grab_focus()
             return
+        if rev:
+            opts.extend(rev)
         from hgemail import EmailDialog
-        dlg = EmailDialog(self.root, ['--outgoing', path])
+        dlg = EmailDialog(self.root, opts)
         dlg.set_transient_for(self)
         dlg.show_all()
         dlg.present()
