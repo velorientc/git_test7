@@ -511,7 +511,7 @@ class GCommit(GStatus):
         if dialog.return_code() == 0:
             shell_notify([self.cwd] + files)
             if qnew:
-                self.self.qnew_name.set_text('')
+                self.qnew_name.set_text('')
                 self.repo.invalidate()
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
