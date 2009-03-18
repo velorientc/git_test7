@@ -267,6 +267,7 @@ class GCommit(GStatus):
 
     def _check_patch_queue(self):
         '''See if an MQ patch is applied, switch to qrefresh mode'''
+        self.branchentry.set_sensitive(True)
         self.qheader = None
         if not hasattr(self.repo, 'mq'): return
         if not self.repo.mq.applied: return
@@ -279,6 +280,7 @@ class GCommit(GStatus):
         c_btn = self.get_toolbutton('_Commit')
         c_btn.set_label('QRefresh')
         c_btn.set_tooltip(self.tooltips, self.mqmode and 'QRefresh' or 'QNew')
+        self.branchentry.set_sensitive(False)
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
