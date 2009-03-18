@@ -514,6 +514,10 @@ class GCommit(GStatus):
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
             shell_notify([self.cwd] + files)
+            buf = self.text.get_buffer()
+            if buf.get_modified():
+                self._update_recent_messages(self.opts['message'])
+                buf.set_modified(False)
             if qnew:
                 self.qnew_name.set_text('')
                 self.repo.invalidate()
@@ -521,7 +525,6 @@ class GCommit(GStatus):
                 _mq.__init__(_mq.ui, _mq.basepath, _mq.path)
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
-                self._update_recent_messages(self.opts['message'])
                 self._last_commit_id = self._get_tip_rev(True)
 
     def _get_tip_rev(self, refresh=False):
