@@ -516,6 +516,8 @@ class GCommit(GStatus):
             if qnew:
                 self.qnew_name.set_text('')
                 self.repo.invalidate()
+                _mq = self.repo.mq
+                _mq.__init__(_mq.ui, _mq.basepath, _mq.path)
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
                 self._update_recent_messages(self.opts['message'])
@@ -538,7 +540,7 @@ class GCommit(GStatus):
             c_btn = self.get_toolbutton('_Commit')
             c_btn.set_label(self.mqmode and 'QRefresh' or 'QNew')
             c_btn.set_tooltip(self.tooltips, self.mqmode and 'QRefresh' or 'QNew')
-            self.reload_status()
+            success, outtext = self._hg_call_wrapper('Status', self._do_reload_status)
             self.qnew_name.grab_focus() # set focus back
             
 
