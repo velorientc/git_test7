@@ -227,13 +227,6 @@ class SynchDialog(gtk.Window):
             sympaths.append(path)
             self.pathlist.append([toutf(path), name, False])
         separator = False
-        for p in self._recent_src:
-            if p in sympaths:
-                continue
-            if not separator:
-                self.pathlist.append(['-'*20, '', True])
-                separator = True
-            self.pathlist.append([toutf(p), '', False])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
         if time != self._last_drop_time:
