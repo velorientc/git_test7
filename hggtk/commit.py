@@ -299,7 +299,8 @@ class GCommit(GStatus):
             commit_list = self._relevant_files(commitable)
             if len(commit_list) > 0:
                 self._commit_selected(commit_list)
-                return True
+            elif len(self.filemodel) == 0 and self._get_qnew_name():
+                self._commit_selected([])
             else:
                 Prompt('Nothing Commited', 'No committable files selected', self).run()
         return True
@@ -489,7 +490,7 @@ class GCommit(GStatus):
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
         cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
-        qnew = self.qnew_name and self.qnew_name.get_text().strip()
+        qnew = self._get_qnew_name()
         if qnew:
             qnew = fromutf(qnew)
             cmdline[1] = 'qnew'
@@ -524,6 +525,9 @@ class GCommit(GStatus):
         cl = self.repo.changelog
         tip = cl.node(nullrev + len(cl))
         return hex(tip)
+
+    def _get_qnew_name(self):
+        return self.qnew_name and self.qnew_name.get_text().strip() or ''
 
     def _qnew_changed(self, element):
         mqmode = self.mqmode
