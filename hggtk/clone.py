@@ -39,6 +39,9 @@ class CloneDialog(gtk.Window):
         self._recent_src = self._settings.mrul('src_paths')
         self._recent_dest = self._settings.mrul('dest_paths')
 
+        sync_settings = shlib.Settings('synch')
+        self._sync_src = sync_settings.mrul('src_paths')
+
         try:
             self._src_path = repos[0]
             self._dest_path = repos[1]
@@ -100,7 +103,9 @@ class CloneDialog(gtk.Window):
         
         # add pre-defined src paths to pull-down list
         sympaths = [x[1] for x in ui.ui().configitems('paths')]
-        paths = list(set(sympaths + [x for x in self._recent_src]))
+        recent = [x for x in self._recent_src]
+        sync = [x for x in self._sync_src]
+        paths = list(set(sympaths + recent + syncsrc))
         paths.sort()
         for p in paths:
             self._srclist.append([p])
