@@ -120,6 +120,7 @@ class GtkUi(ui.ui):
             self.outputq = outputq
             self.dialogq = dialogq
             self.responseq = responseq
+        self.setconfig('ui', 'interactive', 'True')
         self.interactive = True
 
     def write(self, *args):
