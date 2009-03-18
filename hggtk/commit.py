@@ -266,20 +266,22 @@ class GCommit(GStatus):
 
     def _check_patch_queue(self):
         '''See if an MQ patch is applied, switch to qrefresh mode'''
-        self.branchentry.set_sensitive(True)
+        mqmode = hasattr(self.repo, 'mq') and self.repo.mq.applied
         self.qheader = None
-        if not hasattr(self.repo, 'mq'): return
-        if not self.repo.mq.applied: return
-        patch = self.repo.mq.lookup('qtip')
-        ph = self.repo.mq.readheaders(patch)
-        title = os.path.basename(self.repo.root) + ' qrefresh ' + patch
-        self.set_title(title)
-        self.qheader = '\n'.join(ph.message)
-        self.text.get_buffer().set_text(self.qheader)
-        c_btn = self.get_toolbutton('_Commit')
-        c_btn.set_label('QRefresh')
-        c_btn.set_tooltip(self.tooltips, self.mqmode and 'QRefresh' or 'QNew')
-        self.branchentry.set_sensitive(False)
+        if mqmode:
+            patch = self.repo.mq.lookup('qtip')
+            ph = self.repo.mq.readheaders(patch)
+            title = os.path.basename(self.repo.root) + ' qrefresh ' + patch
+            self.set_title(title)
+            self.qheader = '\n'.join(ph.message)
+            buf = self.text.get_buffer()
+            if buf.get_char_count() == 0 or not buf.get_modified():
+                buf.set_text(self.qheader)
+                buf.set_modified(False)
+            c_btn = self.get_toolbutton('_Commit')
+            c_btn.set_label('QRefresh')
+            c_btn.set_tooltip(self.tooltips, self.mqmode and 'QRefresh' or 'QNew')
+        self.branchentry.set_sensitive(not mqmode)
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
