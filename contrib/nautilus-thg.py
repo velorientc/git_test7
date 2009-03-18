@@ -135,8 +135,8 @@ class HgExtension(nautilus.MenuProvider,
         repo = self.get_repo_for_path(cwd)
 
         if hgcmd == 'vdiff':
-        diffcmd = repo.ui.config('tortoisehg', 'vdiff', 'vdiff')
-        if not diffcmd:
+            diffcmd = repo.ui.config('tortoisehg', 'vdiff', 'vdiff')
+            if not diffcmd:
                 hgcmd = 'diff'
             else:
                 cmdline = ['hg', diffcmd]
