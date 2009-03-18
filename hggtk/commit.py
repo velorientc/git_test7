@@ -105,15 +105,14 @@ class GCommit(GStatus):
         index = combobox.get_active()
         if index >= 0:
             buf = self.text.get_buffer()
-            begin, end = buf.get_bounds()
-            cur_msg = buf.get_text(begin, end)
-            if len(cur_msg):
+            if buf.get_char_count() and buf.get_modified():
                 response = Confirm('Discard Message', [], self,
                         'Discard current commit message?').run()
                 if response != gtk.RESPONSE_YES:
                     combobox.set_active(-1)
                     return
             buf.set_text(model[index][1])
+            buf.set_modified(False)
 
     def _update_recent_messages(self, msg=None):
         if msg is not None:
@@ -209,9 +208,7 @@ class GCommit(GStatus):
         # message, ask if the exit should continue.
         live = False
         buf = self.text.get_buffer()
-        begin, end = buf.get_bounds()
-        cur_msg = buf.get_text(begin, end)
-        if buf.get_char_count() > 10 and cur_msg != self.qheader:
+        if buf.get_char_count() > 10 and buf.get_modified():
             dialog = Confirm('Exit', [], self, 'Save commit message at exit?')
             res = dialog.run()
             if res == gtk.RESPONSE_YES:
@@ -258,7 +255,9 @@ class GCommit(GStatus):
             self._update_check_count()
 
             # pre-fill commit message
-            self.text.get_buffer().set_text('merge')
+            buf = self.text.get_buffer()
+            buf.set_text('merge')
+            buf.set_modified(False)
         #else:
         #    self.selectlabel.set_text(
         #        _('toggle change hunks to leave them out of commit'))
@@ -439,16 +438,16 @@ class GCommit(GStatus):
 
 
     def _ready_message(self):
-        begin, end = self.text.get_buffer().get_bounds()
-        message = self.text.get_buffer().get_text(begin, end) 
-        if not self.test_opt('logfile') and not message:
+        if self.test_opt('logfile'):
+            return
+        buf = self.text.get_buffer()
+        if buf.get_char_count() == 0:
             Prompt('Nothing Commited', 'Please enter commit message', self).run()
             self.text.grab_focus()
             return False
-        else:
-            if not self.test_opt('logfile'):
-                self.opts['message'] = message
-            return True
+        begin, end = buf.get_bounds()
+        self.opts['message'] = buf.get_text(begin, end)
+        return True
 
 
     def _hg_commit(self, files):
