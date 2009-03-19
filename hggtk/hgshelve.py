@@ -434,7 +434,7 @@ def shelve(ui, repo, *pats, **opts):
         else:
             basenode = repo.dirstate.parents()[0]
 
-        changes = repo.status(match=match)[:5]
+        changes = repo.status(node1=basenode, match=match)[:5]
         modified, added, removed = changes[:3]
         files = modified + added + removed
         diffopts = mdiff.diffopts(git=True, nodates=True)
