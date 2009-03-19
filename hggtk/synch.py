@@ -227,13 +227,6 @@ class SynchDialog(gtk.Window):
             sympaths.append(path)
             self.pathlist.append([toutf(path), name, False])
         separator = False
-        for p in self._recent_src:
-            if p in sympaths:
-                continue
-            if not separator:
-                self.pathlist.append(['-'*20, '', True])
-                separator = True
-            self.pathlist.append([toutf(p), '', False])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
         if time != self._last_drop_time:
@@ -470,14 +463,20 @@ class SynchDialog(gtk.Window):
         self.fill_path_combo()
 
     def _email_clicked(self, toolbutton, data=None):
+        opts = []
         path = fromutf(self._pathtext.get_text()).strip()
-        if not path:
+        rev = self._get_advanced_options().get('rev')
+        if path:
+            opts.extend(['--outgoing', path])
+        elif not rev:
             info_dialog(self, 'No repository selected',
                     'Select a peer repository to compare with')
             self._pathbox.grab_focus()
             return
+        if rev:
+            opts.extend(rev)
         from hgemail import EmailDialog
-        dlg = EmailDialog(self.root, ['--outgoing', path])
+        dlg = EmailDialog(self.root, opts)
         dlg.set_transient_for(self)
         dlg.show_all()
         dlg.present()
