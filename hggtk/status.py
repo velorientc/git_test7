@@ -16,7 +16,7 @@ import gtk
 import pango
 
 from mercurial.i18n import _
-from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff
+from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff, extensions
 from mercurial import merge as merge_
 from shlib import shell_notify
 from hglib import toutf, fromutf, rootpath, diffexpand
@@ -58,6 +58,7 @@ class GStatus(GDialog):
 
     def init(self):
         GDialog.init(self)
+        self.mode = 'status'
         
     def auto_check(self):
         if self.test_opt('check'):
@@ -151,7 +152,7 @@ class GStatus(GDialog):
         if revs:
             r = ':'.join(revs)
             return ' '.join([root, 'status', r]) + ' '.join(self.pats)
-        elif self.mqmode and hasattr(self, 'text'):
+        elif self.mqmode and self.mode != 'status':
             patch = self.repo.mq.lookup('qtip')
             return root + ' applied MQ patch ' + patch
         else:
@@ -518,32 +519,35 @@ class GStatus(GDialog):
     ### End of overrides ###
 
     def _do_reload_status(self):
-        """Clear out the existing ListStore model and reload it from the repository status. 
-        Also recheck and reselect files that remain in the list.
+        """Clear out the existing ListStore model and reload it from the
+        repository status.  Also recheck and reselect files that remain
+        in the list.
         """
-        self.repo.dirstate.invalidate()
-        self.repo.invalidate()
+        repo = self.repo
+        # TODO - SJB - just realloc the repository here
+        repo.dirstate.invalidate()
+        repo.invalidate()
+        if hasattr(repo, 'mq'):
+            mq = extensions.find('mq')
+            repo.mq = mq.queue(repo.ui, repo.join(""))
+            self.mqmode = repo.mq.applied
+            self.set_title(self.get_title())
 
-        # The following code was copied from the status function in
-        # mercurial\commands.py and modified slightly to work here
-        
-        if self.mqmode and not self.opts.get('rev') and hasattr(self, 'text'):
+        if self.mqmode and self.mode != 'status':
             # when a patch is applied, show diffs to parent of top patch
-            self._node1 = self.repo.lookup(-3)
-            self._node2 = None
+            n1, n2 = repo.lookup(-3), None
         else:
             # node2 is None (the working dir) when 0 or 1 rev is specificed
-            self._node1, self._node2 = cmdutil.revpair(self.repo, self.opts.get('rev'))
+            n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
 
-        matcher = cmdutil.match(self.repo, self.pats, self.opts)
-        status = [n for n in self.repo.status(node1=self._node1, node2=self._node2,
-                                 match=matcher,
-                                 ignored=self.test_opt('ignored'),
-                                 clean=self.test_opt('clean'),
-                                 unknown=self.test_opt('unknown'))]
+        matcher = cmdutil.match(repo, self.pats, self.opts)
+        status = repo.status(node1=n1, node2=n2, match=matcher,
+                             ignored=self.test_opt('ignored'),
+                             clean=self.test_opt('clean'),
+                             unknown=self.test_opt('unknown'))
 
         (modified, added, removed, deleted, unknown, ignored, clean) = status
-        self.modified = modified
+        self._node1, self._node2, self.modified = n1, n2, modified
 
         changetypes = (('modified', 'M', modified),
                        ('added', 'A', added),
@@ -560,7 +564,7 @@ class GStatus(GDialog):
         reselect = [model[path][FM_PATH] for path in paths]
 
         # merge-state of files
-        ms = merge_.mergestate(self.repo)
+        ms = merge_.mergestate(repo)
         
         # Load the new data into the tree's model
         self.filetree.hide()
@@ -587,7 +591,7 @@ class GStatus(GDialog):
         self._show_diff_hunks(files)
 
         self.filetree.show()
-        if hasattr(self, 'text'):
+        if self.mode == 'commit':
             self.text.grab_focus()
         else:
             self.filetree.grab_focus()

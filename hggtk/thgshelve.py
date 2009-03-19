@@ -32,6 +32,7 @@ class GShelve(GStatus):
 
     def init(self):
         GStatus.init(self)
+        self.mode = 'shelve'
 
     def parse_opts(self):
         GStatus.parse_opts(self)

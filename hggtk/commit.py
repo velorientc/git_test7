@@ -35,6 +35,7 @@ class GCommit(GStatus):
 
     def init(self):
         GStatus.init(self)
+        self.mode = 'commit'
         self._last_commit_id = None
 
     def parse_opts(self):
@@ -259,7 +260,9 @@ class GCommit(GStatus):
         '''See if an MQ patch is applied, switch to qrefresh mode'''
         self.qheader = None
         if not hasattr(self.repo, 'mq'): return
-        if not self.repo.mq.applied: return
+        if not self.repo.mq.applied:
+            self.get_toolbutton('_Commit').set_label('_Commit')
+            return
         patch = self.repo.mq.lookup('qtip')
         ph = self.repo.mq.readheaders(patch)
         title = os.path.basename(self.repo.root) + ' qrefresh ' + patch
