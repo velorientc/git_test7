@@ -7,15 +7,7 @@ of the GNU General Public License, incorporated herein by reference.
 
 """
 
-import os.path, re
-
-_quotere = None
-def shellquote(s):
-    global _quotere
-    if _quotere is None:
-        _quotere = re.compile(r'(\\*)("|\\$)')
-    return '"%s"' % _quotere.sub(r'\1\1\\\2', s)
-    return "'%s'" % s.replace("'", "'\\''")
+import os.path
 
 def find_root(path):
     p = os.path.isdir(path) and path or os.path.dirname(path)
@@ -51,15 +43,6 @@ if os.name == 'nt':
                 if os.path.exists(ppath + ext):
                     return ppath + ext
         return None
-
-
-    def shell_notify(path):
-        pidl, ignore = shell.SHILCreateFromPath(path, 0)
-        print "notify: ", shell.SHGetPathFromIDList(pidl)
-        shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
-                             shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSHNOWAIT,
-                             pidl,
-                             None)
 
     def get_icon_path(*args):
         dir = get_prog_root()
@@ -161,9 +144,6 @@ else: # Not Windows
             if os.access(ppath, os.X_OK):
                 return ppath
         return None
-
-    def shell_notify(path):
-        pass
 
     def get_icon_path(*args):
         return None
