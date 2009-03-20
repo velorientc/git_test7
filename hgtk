@@ -6,12 +6,6 @@
 # Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
 #
 
-shortlicense = '''\
-Copyright (C) 2009 Steve Borho <steve@borho.org>.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-'''
-
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -48,4 +42,3 @@ except ImportError:
     sys.exit(-1)
 
 sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
-

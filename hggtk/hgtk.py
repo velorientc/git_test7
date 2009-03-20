@@ -11,15 +11,6 @@ This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
 
-# The recommended usage is to symlink this file into your path.
-# alternatively, you can change this line or set TORTOISEHG_PATH
-tortoisehg_dir = '~/tools/tortoisehg-dev'
-
-import pygtk
-pygtk.require('2.0')
-import gtk
-
-from mercurial import demandimport; demandimport.enable()
 from mercurial.i18n import _
 from mercurial import hg, util, fancyopts, commands, cmdutil
 import pdb
@@ -150,36 +141,8 @@ def runcommand(ui, args):
         # Py2exe environment
         thgdir = os.path.dirname(sys.executable)
         os.environ['THG_ICON_PATH'] = os.path.join(thgdir, 'icons')
-    else:
-        # Add TortoiseHg to python path
-        path = os.environ.get('TORTOISEHG_PATH') or tortoisehg_dir
-        norm = os.path.normpath(os.path.expanduser(path))
-        if norm not in sys.path:
-            sys.path.insert(0, norm)
 
-        try:
-            # assuming TortoiseHg source layout, with hgtk in contrib
-            path = os.path.dirname(os.path.realpath(__file__))
-        except NameError:
-            # __file__ not available in pdb mode
-            path = os.path.dirname(sys.argv[0])
-        norm = os.path.normpath(os.path.join(path, '..'))
-        if norm not in sys.path:
-            sys.path.append(norm)
-
-    try:
-        from hggtk import hglib
-    except ImportError, inst:
-        m = str(inst).split()[-1]
-        if m in "hglib hggtk".split():
-            # fix "tortoisehg_dir" at the top of this script, or ...
-            raise util.Abort(_('Please set TORTOISEHG_PATH to location '
-                    'of your tortoisehg repository'))
-        else:
-            raise util.Abort(_('could not import module %s!\n' % m))
-    except:
-        raise
-
+    import hglib
     path = hglib.rootpath(os.getcwd())
     if path:
         try:
