@@ -263,7 +263,6 @@ def status(ui, *pats, **opts):
 
     Also do add, remove and revert.
     """
-
     from hggtk.status import run
     opts['files'] = [os.path.abspath(x) for x in pats]
     run(**opts)
@@ -282,6 +281,13 @@ def update(ui, **opts):
     """update/checkout tool"""
     from hggtk.update import run
     run(**opts)
+
+def vdiff(ui, *pats, **opts):
+    """launch configured visual diff tool"""
+    from mercurial import dispatch
+    vdiff = ui.config('tortoisehg', 'vdiff', 'vdiff')
+    if vdiff:
+        dispatch.dispatch([vdiff] + list(pats))
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False):
@@ -503,6 +509,7 @@ table = {
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
          _('hgtk serve [OPTION]...')),
     "^update|checkout|co": (update, [], _('hgtk update')),
+    "^vdiff": (vdiff, [], _('launch visual diff tool')),
     "^version": (version,
         [('v', 'verbose', None, _('print license'))],
         _('hgtk version [OPTION]')),
