@@ -230,8 +230,9 @@ class ContextMenuExtension(menuthg.menuThg):
             cmdline = ['hgtk.exe', hgcmd]
         elif not hasattr(sys, 'frozen'):
             pypath = os.path.join(get_prog_root(), 'hgtk')
-            if os.path.exists(pypath):
-                cmdline = [sys.executable, pypath, hgcmd]
+            pyexe = os.path.join(sys.exec_prefix, 'python.exe')
+            if os.path.exists(pypath) and os.path.exists(pyexe):
+                cmdline = [pyexe, pypath, hgcmd]
         if not cmdline:
             win32ui.MessageBox('Unable to find ' + pypath, 'run_dialog')
             return
