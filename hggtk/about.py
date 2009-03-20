@@ -11,6 +11,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 import shlib
+from mercurial.i18n import _
 
 try:
     # post 1.1.2
@@ -56,7 +57,7 @@ class AboutDialog(gtk.AboutDialog):
                 "GTK-%s" % make_version(gtk.gtk_version),
             ])
         
-        comment = "Several icons are courtesy of the TortoiseSVN project"
+        comment = _("Several icons are courtesy of the TortoiseSVN project")
 
         self.set_website("http://bitbucket.org/tortoisehg/stable/")
         self.set_name("TortoiseHg")

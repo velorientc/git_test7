@@ -4,14 +4,10 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
-import os
+import pygtk
+pygtk.require("2.0")
 import gtk
+import os
 import pango
 from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
@@ -62,9 +58,9 @@ class CloneDialog(gtk.Window):
         
         self._btn_clone = self._toolbutton(
                 gtk.STOCK_COPY,
-                'clone', 
+                _('clone'), 
                 self._btn_clone_clicked,
-                tip='Clone a repository')
+                tip=_('Clone a repository'))
         tbuttons = [
                 self._btn_clone,
             ]
@@ -76,8 +72,8 @@ class CloneDialog(gtk.Window):
 
         # clone source
         srcbox = gtk.HBox()
-        lbl = gtk.Label("Source Path:")
-        lbl.set_property("width-chars", ewidth)
+        lbl = gtk.Label(_('Source Path:'))
+        lbl.set_property('width-chars', ewidth)
         lbl.set_alignment(0, 0.5)
 
         # create drop-down list for source paths
@@ -94,7 +90,7 @@ class CloneDialog(gtk.Window):
         self._srclistbox.pack_start(cell)
         self._srclistbox.add_attribute(cell, 'text', 0)
 
-        self._btn_src_browse = gtk.Button("Browse...")
+        self._btn_src_browse = gtk.Button(_('Browse...'))
         self._btn_src_browse.connect('clicked', self._btn_src_clicked)
         srcbox.pack_start(lbl, False, False)
         srcbox.pack_start(self._srclistbox, True, True)
@@ -112,8 +108,8 @@ class CloneDialog(gtk.Window):
 
         # clone destination
         destbox = gtk.HBox()
-        lbl = gtk.Label("Destination Path:")
-        lbl.set_property("width-chars", ewidth)
+        lbl = gtk.Label(_('Destination Path:'))
+        lbl.set_property('width-chars', ewidth)
         lbl.set_alignment(0, 0.5)
         self._destlist = gtk.ListStore(str)
         self._destlistbox = gtk.ComboBoxEntry(self._destlist, 0)
@@ -128,7 +124,7 @@ class CloneDialog(gtk.Window):
         self._destlistbox.pack_start(cell)
         self._destlistbox.add_attribute(cell, 'text', 0)
         
-        self._btn_dest_browse = gtk.Button("Browse...")
+        self._btn_dest_browse = gtk.Button(_('Browse...'))
         self._btn_dest_browse.connect('clicked', self._btn_dest_clicked)
         destbox.pack_start(lbl, False, False)
         destbox.pack_start(self._destlistbox, True, True)
@@ -143,14 +139,14 @@ class CloneDialog(gtk.Window):
 
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label("Clone To Revision:")
-        lbl.set_property("width-chars", ewidth)
+        lbl = gtk.Label(_('Clone To Revision:'))
+        lbl.set_property('width-chars', ewidth)
         lbl.set_alignment(0, 0.5)
         self._rev_input = gtk.Entry()
         self._rev_input.set_text("")
-        self._opt_allrev = gtk.CheckButton("Clone all revisions")
+        self._opt_allrev = gtk.CheckButton(_('Clone all revisions'))
         self._opt_allrev.set_active(True)
-        self._btn_rev_browse = gtk.Button("Select...")
+        self._btn_rev_browse = gtk.Button(_('Select...'))
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._rev_input, False, False)
@@ -160,10 +156,10 @@ class CloneDialog(gtk.Window):
 
         # options
         option_box = gtk.VBox()
-        self._opt_update = gtk.CheckButton("do not update the new working directory")
-        self._opt_pull = gtk.CheckButton("use pull protocol to copy metadata")
-        self._opt_uncomp = gtk.CheckButton("use uncompressed transfer")
-        self._opt_proxy = gtk.CheckButton("use proxy server")        
+        self._opt_update = gtk.CheckButton(_('do not update the new working directory')
+        self._opt_pull = gtk.CheckButton(_('use pull protocol to copy metadata'))
+        self._opt_uncomp = gtk.CheckButton(_('use uncompressed transfer'))
+        self._opt_proxy = gtk.CheckButton(_('use proxy server'))
         option_box.pack_start(self._opt_update, False, False)
         option_box.pack_start(self._opt_pull, False, False)
         option_box.pack_start(self._opt_uncomp, False, False)
@@ -176,7 +172,7 @@ class CloneDialog(gtk.Window):
             self._opt_proxy.set_sensitive(False)
 
         # remote cmd
-        lbl = gtk.Label("Remote Cmd:")
+        lbl = gtk.Label(_('Remote Cmd:'))
         lbl.set_alignment(0, 0.5)
         self._remote_cmd = gtk.Entry()
         vbox.pack_end(self._remote_cmd, False, False, 1)
@@ -267,7 +263,7 @@ class CloneDialog(gtk.Window):
         
         # verify input
         if src == "":
-            error_dialog(self, "Source path is empty", "Please enter")
+            error_dialog(self, _('Source path is empty'), _('Please enter'))
             self._src_input.grab_focus()
             return False
         
@@ -295,17 +291,16 @@ class CloneDialog(gtk.Window):
             if dest:
                 cmdline.append(dest)
 
-            print "cmdline: ", ' '.join(cmdline)
             from hgcmd import CmdDialog
             dlg = CmdDialog(cmdline)
             dlg.run()
             dlg.hide()
         except util.Abort, inst:
-            error_dialog(self, "Clone aborted", str(inst))
+            error_dialog(self, _('Clone aborted'), str(inst))
             return False
         except:
             import traceback
-            error_dialog(self, "Clone error", traceback.format_exc())
+            error_dialog(self, _('Clone error'), traceback.format_exc())
             return False
 
         self._add_src_to_recent(src)

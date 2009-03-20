@@ -92,10 +92,10 @@ class GCommit(GStatus):
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
         tbbuttons.insert(2, gtk.SeparatorToolItem())
-        self._undo_button = self.make_toolbutton(gtk.STOCK_UNDO, '_Undo',
-            self._undo_clicked, tip='undo recent commit')
-        self._commit_button = self.make_toolbutton(gtk.STOCK_OK, '_Commit',
-            self._commit_clicked, tip='commit')
+        self._undo_button = self.make_toolbutton(gtk.STOCK_UNDO, _('_Undo'),
+            self._undo_clicked, tip=_('undo recent commit'))
+        self._commit_button = self.make_toolbutton(gtk.STOCK_OK, _('_Commit'),
+            self._commit_clicked, tip=_('commit'))
         tbbuttons.insert(2, self._undo_button)
         tbbuttons.insert(2, self._commit_button)
         return tbbuttons
@@ -107,8 +107,8 @@ class GCommit(GStatus):
         if index >= 0:
             buf = self.text.get_buffer()
             if buf.get_char_count() and buf.get_modified():
-                response = Confirm('Discard Message', [], self,
-                        'Discard current commit message?').run()
+                response = Confirm(_('Discard Message'), [], self,
+                        _('Discard current commit message?')).run()
                 if response != gtk.RESPONSE_YES:
                     combobox.set_active(-1)
                     return
@@ -134,7 +134,7 @@ class GCommit(GStatus):
         
         mbox = gtk.HBox()
 
-        label = gtk.Label('Branch: ')
+        label = gtk.Label(_('Branch: '))
         mbox.pack_start(label, False, False, 2)
         self.branchentry = gtk.Entry()
         mbox.pack_start(self.branchentry, False, False, 2)
@@ -149,7 +149,7 @@ class GCommit(GStatus):
         else:
             self.qnew_name = None
 
-        label = gtk.Label('Recent Commit Messages: ')
+        label = gtk.Label(_('Recent Commit Messages: '))
         mbox.pack_start(label, False, False, 2)
         self.msg_cbbox = gtk.combo_box_new_text()
         liststore = gtk.ListStore(str, str)
@@ -189,7 +189,8 @@ class GCommit(GStatus):
 
 
     def get_menu_info(self):
-        """Returns menu info in this order: merge, addrem, unknown, clean, ignored, deleted
+        """Returns menu info in this order: merge, addrem, unknown,
+        clean, ignored, deleted
         """
         merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
                 = GStatus.get_menu_info(self)
@@ -210,7 +211,7 @@ class GCommit(GStatus):
         live = False
         buf = self.text.get_buffer()
         if buf.get_char_count() > 10 and buf.get_modified():
-            dialog = Confirm('Exit', [], self, 'Save commit message at exit?')
+            dialog = Confirm(_('Exit'), [], self, _('Save commit message at exit?'))
             res = dialog.run()
             if res == gtk.RESPONSE_YES:
                 self._update_recent_messages(cur_msg)
@@ -243,10 +244,10 @@ class GCommit(GStatus):
         # disable the checkboxes on the filelist if repo in merging state
         merged = len(self.repo.changectx(None).parents()) > 1
         
-        self.get_toolbutton('Re_vert').set_sensitive(not merged)
-        self.get_toolbutton('_Add').set_sensitive(not merged)
-        self.get_toolbutton('_Remove').set_sensitive(not merged)
-        self.get_toolbutton('Move').set_sensitive(not merged)
+        self.get_toolbutton(_('Re_vert')).set_sensitive(not merged)
+        self.get_toolbutton(_('_Add')).set_sensitive(not merged)
+        self.get_toolbutton(_('_Remove')).set_sensitive(not merged)
+        self.get_toolbutton(_('Move')).set_sensitive(not merged)
         
         if merged:
             # select all changes if repo is merged
@@ -257,7 +258,7 @@ class GCommit(GStatus):
 
             # pre-fill commit message
             buf = self.text.get_buffer()
-            buf.set_text('merge')
+            buf.set_text(_('merge'))
             buf.set_modified(False)
         #else:
         #    self.selectlabel.set_text(
@@ -279,13 +280,13 @@ class GCommit(GStatus):
             if buf.get_char_count() == 0 or not buf.get_modified():
                 buf.set_text(self.qheader)
                 buf.set_modified(False)
-            c_btn = self.get_toolbutton('_Commit')
-            c_btn.set_label('QRefresh')
-            c_btn.set_tooltip(self.tooltips, self.mqmode and 'QRefresh' or 'QNew')
+            c_btn = self.get_toolbutton(_('_Commit'))
+            c_btn.set_label(_('QRefresh'))
+            c_btn.set_tooltip(self.tooltips, self.mqmode and _('QRefresh') or _('QNew'))
         else:
-            c_btn = self.get_toolbutton('_Commit')
-            c_btn.set_label('_Commit')
-            c_btn.set_tooltip(self.tooltips, 'commit')
+            c_btn = self.get_toolbutton(('_Commit'))
+            c_btn.set_label(_('_Commit'))
+            c_btn.set_tooltip(self.tooltips, _('commit'))
         self.branchentry.set_sensitive(not mqmode)
 
     def _commit_clicked(self, toolbutton, data=None):
@@ -327,7 +328,7 @@ class GCommit(GStatus):
             os.mkdir(backupdir)
         except OSError, err:
             if err.errno != errno.EEXIST:
-                Prompt('Commit', 'Unable to create ' + backupdir,
+                Prompt(_('Commit'), _('Unable to create ') + backupdir,
                         self).run()
                 return
         try:
@@ -374,7 +375,7 @@ class GCommit(GStatus):
                     if s:
                         raise util.Abort(s)
                     else:
-                        Prompt('Commit', 'Unable to apply patch', self).run()
+                        Prompt(_('Commit'), _('Unable to apply patch'), self).run()
                         raise util.Abort(_('patch failed to apply'))
             del fp
 
@@ -412,15 +413,15 @@ class GCommit(GStatus):
 
 
     def _undo_clicked(self, toolbutton, data=None):
-        response = Confirm('Undo commit', [], self, 'Undo last commit').run() 
+        response = Confirm(_('Undo commit'), [], self, _('Undo last commit')).run() 
         if response != gtk.RESPONSE_YES:
             return
             
         tip = self._get_tip_rev(True)
         if not tip == self._last_commit_id:
-            Prompt('Undo commit', 
-                    'Unable to undo!\n\n'
-                    'Tip revision differs from last commit.',
+            Prompt(_('Undo commit'), 
+                    _('Unable to undo!\n\n'
+                    'Tip revision differs from last commit.'),
                     self).run()
             return
             
@@ -429,14 +430,14 @@ class GCommit(GStatus):
             self._last_commit_id = None
             self.reload_status()
         except:
-            Prompt('Undo commit', 'Errors during rollback!', self).run()
+            Prompt(_('Undo commit'), _('Errors during rollback!'), self).run()
 
 
     def _should_addremove(self, files):
         if self.test_opt('addremove'):
             return True
         else:
-            response = Confirm('Add/Remove', files, self).run() 
+            response = Confirm(_('Add/Remove'), files, self).run() 
             if response == gtk.RESPONSE_YES:
                 # This will stay set for further commits (meaning no more prompts). Problem?
                 self.opts['addremove'] = True
@@ -449,7 +450,8 @@ class GCommit(GStatus):
             return
         buf = self.text.get_buffer()
         if buf.get_char_count() == 0:
-            Prompt('Nothing Commited', 'Please enter commit message', self).run()
+            Prompt(_('Nothing Commited'),
+                   _('Please enter commit message'), self).run()
             self.text.grab_focus()
             return False
         begin, end = buf.get_bounds()
@@ -459,9 +461,9 @@ class GCommit(GStatus):
 
     def _hg_commit(self, files):
         if not self.repo.ui.config('ui', 'username'):
-            Prompt('Commit: Invalid username',
-                    'Your username has not been configured.\n\n'
-                    'Please configure your username and try again',
+            Prompt(_('Commit: Invalid username'),
+                   _('Your username has not been configured.\n\n'
+                    'Please configure your username and try again'),
                     self).run()
 
             # bring up the config dialog for user to enter their username.
@@ -481,14 +483,14 @@ class GCommit(GStatus):
         if newbranch != self.repo.dirstate.branch():
             if newbranch in self.repo.branchtags():
                 if newbranch not in [p.branch() for p in self.repo.parents()]:
-                    response = Confirm('Override Branch', [], self,
-                        'A branch named "%s" already exists,\n'
-                        'override?' % newbranch).run()
+                    response = Confirm(_('Override Branch'), [], self,
+                        _('A branch named "%s" already exists,\n'
+                        'override?') % newbranch).run()
                 else:
                     response = gtk.RESPONSE_YES
             else:
-                response = Confirm('New Branch', [], self,
-                        'Create new named branch "%s"?' % newbranch).run()
+                response = Confirm(_('New Branch'), [], self,
+                        _('Create new named branch "%s"?') % newbranch).run()
             if response == gtk.RESPONSE_YES:
                 self.repo.dirstate.setbranch(newbranch)
             elif response != gtk.RESPONSE_NO:
@@ -546,9 +548,9 @@ class GCommit(GStatus):
         mqmode = self.mqmode
         self.mqmode = not self.qnew_name.get_text().strip()
         if mqmode != self.mqmode:
-            c_btn = self.get_toolbutton('_Commit')
-            c_btn.set_label(self.mqmode and 'QRefresh' or 'QNew')
-            c_btn.set_tooltip(self.tooltips, self.mqmode and 'QRefresh' or 'QNew')
+            c_btn = self.get_toolbutton(_('_Commit'))
+            c_btn.set_label(self.mqmode and _('QRefresh') or _('QNew'))
+            c_btn.set_tooltip(self.tooltips, self.mqmode and _('QRefresh') or _)('QNew')
             success, outtext = self._hg_call_wrapper('Status', self._do_reload_status)
             self.qnew_name.grab_focus() # set focus back
             
