@@ -14,13 +14,11 @@ except ImportError:
     from time import time as GetTickCount
     CACHE_TIMEOUT = 5.0
 
-UNCHANGED = "unchanged"
-ADDED = "added"
-MODIFIED = "modified"
-UNKNOWN = "unknown"
-IGNORED = "ignored"
-NOT_IN_REPO = "n/a"
-ROOT = "root"
+STATUS_STATES = 'MAR!?IC'
+MODIFIED, ADDED, REMOVED, DELETED, UNKNOWN, IGNORED, UNCHANGED = STATUS_STATES
+NOT_IN_REPO = ' '
+ROOT = "r"
+
 
 # file status cache
 overlay_cache = {}
@@ -47,7 +45,8 @@ def get_state(upath, repo=None):
     """
     Get the state of a given path in source control.
     """
-    return get_states(upath, repo)[-1]
+    states = get_states(upath, repo)
+    return states and states[0] or NOT_IN_REPO
 
 
 def get_states(upath, repo=None):
@@ -73,9 +72,9 @@ def get_states(upath, repo=None):
             if not status:
                 if os.path.isdir(os.path.join(path, '.hg')):
                     add(path, ROOT)
-                    status = ROOT,
+                    status = ROOT
                 else:
-                    status = overlay_cache.get(pdir, [NOT_IN_REPO])
+                    status = overlay_cache.get(pdir, NOT_IN_REPO)
             print "%s: %s (cached)" % (path, status)
             return status
         else:
@@ -85,7 +84,7 @@ def get_states(upath, repo=None):
      # path is a drive
     if path.endswith(":\\"):
         add(path, NOT_IN_REPO)
-        return [NOT_IN_REPO]
+        return NOT_IN_REPO
      # open repo
     if cache_pdir == pdir:
         root = cache_root
@@ -94,7 +93,7 @@ def get_states(upath, repo=None):
         root = thgutil.find_root(path)
         if root == path:
             add(path, ROOT)
-            return [ROOT]
+            return ROOT
         cache_root = root
         cache_pdir = pdir
 
@@ -103,11 +102,11 @@ def get_states(upath, repo=None):
         print "_get_state: not in repo"
         overlay_cache = {None: None}
         cache_tick_count = GetTickCount()
-        return [NOT_IN_REPO]
+        return NOT_IN_REPO
     hgdir = os.path.join(root, '.hg', '')
     if pdir == hgdir[:-1] or pdir.startswith(hgdir):
         add(pdir, NOT_IN_REPO)
-        return [NOT_IN_REPO]
+        return NOT_IN_REPO
     try:
         tc1 = GetTickCount()
         if not repo or (repo.root != root and repo.root != os.path.realpath(root)):
@@ -122,17 +121,17 @@ def get_states(upath, repo=None):
             print "%s: overlayicons disabled" % path
             overlay_cache = {None: None}
             cache_tick_count = GetTickCount()
-            return [NOT_IN_REPO]
+            return NOT_IN_REPO
     except RepoError:
         # We aren't in a working tree
         print "%s: not in repo" % pdir
         add(pdir, IGNORED)
-        return [IGNORED]
+        return IGNORED
     except StandardError, e:
         print "error while handling %s:" % pdir
         print e
         add(pdir, UNKNOWN)
-        return [UNKNOWN]
+        return UNKNOWN
      # get file status
     tc1 = GetTickCount()
 
@@ -143,32 +142,25 @@ def get_states(upath, repo=None):
     except util.Abort, inst:
         print "abort: %s" % inst
         print "treat as unknown : %s" % path
-        return [UNKNOWN]
+        return UNKNOWN
 
     print "status() took %g ticks" % (GetTickCount() - tc1)
-    modified, added, removed, deleted, unknown, ignored, clean = repostate
     # cached file info
     tc = GetTickCount()
     overlay_cache = {}
-    for grp, st in (
-            (ignored, IGNORED),
-            (unknown, UNKNOWN),
-            (clean, UNCHANGED),
-            (added, ADDED),
-            (removed, MODIFIED),
-            (deleted, MODIFIED),
-            (modified, MODIFIED)):
+    add(root, ROOT)
+    states = zip(repostate, STATUS_STATES)
+    states[-1], states[-2] = states[-2], states[-1] #clean before ignored
+    for grp, st in states:
         add_dirs(grp)
         for f in grp:
             fpath = os.path.join(root, os.path.normpath(f))
             add(fpath, st)
-    add(root, ROOT)
-    status = overlay_cache.get(path, [UNKNOWN])
+    status = overlay_cache.get(path, UNKNOWN)
     print "\n%s: %s" % (path, status)
     cache_tick_count = GetTickCount()
     return status
 
 
 def add(path, state):
-    c = overlay_cache.setdefault(path, [])
-    c.append(state)
+    overlay_cache[path] = overlay_cache.get(path, '') + state
