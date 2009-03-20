@@ -179,6 +179,11 @@ def about(ui, **opts):
     from hggtk.about import run
     run(**opts)
 
+def add(ui, *pats, **opts):
+    """add files"""
+    from mercurial import dispatch
+    dispatch.dispatch(['add'] + list(pats))
+
 def clone(ui, source=None, dest=None, **opts):
     """clone tool"""
     from hggtk.clone import run
@@ -488,6 +493,7 @@ globalopts = [
 
 table = {
     "^about": (about, [], _('hgtk about')),
+    "^add": (add, [], _('hgtk add [FILE]...')),
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
     "^commit|ci": (commit, [], _('hgtk commit [FILE]...')),
     "^datamine|annotate|blame": (datamine, [], _('hgtk datamine')),
