@@ -35,6 +35,7 @@ class GCommit(GStatus):
 
     def init(self):
         GStatus.init(self)
+        self.mode = 'commit'
         self._last_commit_id = None
 
     def parse_opts(self):
