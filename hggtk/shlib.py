@@ -166,9 +166,9 @@ def set_tortoise_icon(window, thgicon):
     ico = get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)
     # Global keybindings for TortoiseHg
-    window.connect('key-press-event', window_key)
+    window.connect('key-press-event', window_key_press)
 
-def window_key(window, event):
+def window_key_press(window, event):
     if event.keyval == ord('q') and (event.state & gtk.gdk.CONTROL_MASK):
         devent = gtk.gdk.Event(gtk.gdk.DELETE)
         window.emit('delete_event', devent)
