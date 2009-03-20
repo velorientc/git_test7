@@ -1,5 +1,5 @@
 import os
-from mercurial import hg, cmdutil, util, ui
+from mercurial import hg, cmdutil, util, ui, node, merge
 import thgutil
 import sys
 try:
@@ -18,7 +18,7 @@ STATUS_STATES = 'MAR!?IC'
 MODIFIED, ADDED, REMOVED, DELETED, UNKNOWN, IGNORED, UNCHANGED = STATUS_STATES
 NOT_IN_REPO = ' '
 ROOT = "r"
-
+UNRESOLVED = 'U'
 
 # file status cache
 overlay_cache = {}
@@ -145,11 +145,24 @@ def get_states(upath, repo=None):
         return UNKNOWN
 
     print "status() took %g ticks" % (GetTickCount() - tc1)
+
+    mergestate = repo.dirstate.parents()[1] != node.nullid and \
+              hasattr(merge, 'mergestate')
+
     # cached file info
     tc = GetTickCount()
     overlay_cache = {}
     add(root, ROOT)
-    states = zip(repostate, STATUS_STATES)
+    states = STATUS_STATES
+    if mergestate:
+        mstate = merge.mergestate(repo)
+        unresolved = [f for f in mstate if mstate[f] == 'u']
+        if unresolved:
+            modified = repostate[0]
+            modified[:] = set(modified) - set(unresolved)
+            repostate.insert(0, unresolved)
+            states = [UNRESOLVED] + states
+    states = zip(repostate, states)
     states[-1], states[-2] = states[-2], states[-1] #clean before ignored
     for grp, st in states:
         add_dirs(grp)
@@ -157,7 +170,7 @@ def get_states(upath, repo=None):
             fpath = os.path.join(root, os.path.normpath(f))
             add(fpath, st)
     status = overlay_cache.get(path, UNKNOWN)
-    print "\n%s: %s" % (path, status)
+    print "%s: %s" % (path, status)
     cache_tick_count = GetTickCount()
     return status
 
