@@ -137,11 +137,6 @@ def runcommand(ui, args):
     elif not cmd:
         return help_(ui, 'shortlist')
 
-    if hasattr(sys, "frozen"):
-        # Py2exe environment
-        thgdir = os.path.dirname(sys.executable)
-        os.environ['THG_ICON_PATH'] = os.path.join(thgdir, 'icons')
-
     import hglib
     path = hglib.rootpath(os.getcwd())
     if path:
