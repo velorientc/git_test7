@@ -206,7 +206,8 @@ class menuThg:
 
         changed = bool(states & set([cachethg.ADDED, cachethg.MODIFIED]))
         modified = cachethg.MODIFIED in states
-        tracked = changed or modified
+        clean = cachethg.UNCHANGED in states
+        tracked = changed or modified or clean
         new = bool(states & set([cachethg.UNKNOWN, cachethg.IGNORED]))
 
         menu = thg_menu(repo.ui, self.name)
@@ -255,7 +256,7 @@ class menuThg:
                       _("Remove selected files on the next commit"),
                       'remove', icon="menudelete.ico")
         if files and changed:
-            menu.add_menu(_("Undo Changes"),
+            menu.add_menu(_("Revert Changes"),
                       _("Revert selected files"),
                       'revert', icon="menurevert.ico")
 
@@ -266,22 +267,6 @@ class menuThg:
                       'datamine', icon="menublame.ico")
 
         menu.add_sep()
-        menu.add_menu(_("Update To Revision"),
-                  _("update working directory"),
-                  'update', icon="menucheckout.ico")
-
-        if len(repo.changectx(None).parents()) < 2:
-            menu.add_menu(_("Merge Revisions"),
-                  _("merge working directory with another revision"),
-                  'merge', icon="menumerge.ico")
-
-        inmerge = len(repo.changectx(None).parents()) > 1
-        if inmerge:
-            menu.add_menu(_("Undo Merge"),
-                  _("Undo merge by updating to revision"),
-                  'merge', icon="menuunmerge.ico")
-
-        menu.add_sep()
 
         if tracked:
             menu.add_menu(_("View Changelog"),
@@ -289,7 +274,23 @@ class menuThg:
                   'history', icon="menulog.ico")
 
         if len(files) == 0:
-            menu.add_menu(_("Search Repository"),
+            menu.add_sep()
+            menu.add_menu(_("Update To Revision"),
+                      _("update working directory"),
+                      'update', icon="menucheckout.ico")
+
+            if len(repo.changectx(None).parents()) < 2:
+                menu.add_menu(_("Merge Revisions"),
+                      _("merge working directory with another revision"),
+                      'merge', icon="menumerge.ico")
+
+            inmerge = len(repo.changectx(None).parents()) > 1
+            if inmerge:
+                menu.add_menu(_("Undo Merge"),
+                      _("Undo merge by updating to revision"),
+                      'merge', icon="menuunmerge.ico")
+
+            menu.add_menu(_("Search History"),
                       _("Search revisions of files for a text pattern"),
                       'datamine', icon="menurepobrowse.ico")
 
@@ -314,14 +315,14 @@ class menuThg:
                       _("create a new repository in this directory"),
                       'init', icon="menucreaterepos.ico")
 
-        # config settings menu
-        menu.add_sep()
-        menu.add_menu(_("Global"),
-                  _("Configure user wide settings"),
-                  'userconfig', icon="settings_user.ico")
-        menu.add_menu(_("Repository"),
-                  _("Configure settings local to this repository"),
-                  'repoconfig', icon="settings_repo.ico")
+            # config settings menu
+            menu.add_sep()
+            menu.add_menu(_("Global Settings"),
+                      _("Configure user wide settings"),
+                      'userconfig', icon="settings_user.ico")
+            menu.add_menu(_("Repository Settings"),
+                      _("Configure settings local to this repository"),
+                      'repoconfig', icon="settings_repo.ico")
 
         # add common menu items
         menu.add_sep()
