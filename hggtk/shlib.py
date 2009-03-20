@@ -163,7 +163,8 @@ def get_system_times():
     return t
     
 def set_tortoise_icon(window, thgicon):
-    window.set_icon_from_file(get_tortoise_icon(thgicon))
+    ico = get_tortoise_icon(thgicon)
+    if ico: window.set_icon_from_file(ico)
     # Global keybindings for TortoiseHg
     window.connect('key-press-event', window_key)
 
