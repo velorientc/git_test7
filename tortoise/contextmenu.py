@@ -5,6 +5,7 @@
 
 import os
 import tempfile
+import subprocess
 import pythoncom
 from win32com.shell import shell, shellcon
 import win32con
@@ -222,25 +223,30 @@ class ContextMenuExtension(menuthg.menuThg):
                 else:
                     files.append(f)
             self.fnames = files
-        gpopts = " %s" % hgcmd
+
+        cmdline = None
+        exepath = os.path.join(get_prog_root(), 'hgtk.exe')
+        if os.path.exists(exepath):
+            cmdline = ['hgtk.exe', hgcmd]
+        elif not hasattr(sys, 'frozen'):
+            pypath = os.path.join(get_prog_root(), 'hgtk')
+            if os.path.exists(pypath):
+                cmdline = [sys.executable, pypath, hgcmd]
+        if not cmdline:
+            win32ui.MessageBox('Unable to find ' + pypath, 'run_dialog')
+            return
         if self.fnames:
-            fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
-            os.write(fd, "\n".join(self.fnames))
-            os.close(fd)
-            gpopts += " --listfile %s" % (shellquote(tmpfile))
-        app_path = find_path("hgtk", get_prog_root(), '.EXE;.BAT')
-        if not app_path:
-            app_path = find_path("hgtk", None, '.EXE;.BAT')
-        cmdline = shellquote(app_path) + gpopts
+            cmdline += ['--listfile', '-']
         try:
-            import subprocess
-            pop = subprocess.Popen(cmdline, 
+            proc = subprocess.Popen(cmdline,
                            shell=False,
                            cwd=cwd,
                            creationflags=win32con.CREATE_NO_WINDOW,
                            stderr=subprocess.STDOUT,
                            stdout=subprocess.PIPE,
                            stdin=subprocess.PIPE)
+            if self.fnames:
+                proc.stdin.write('\n'.join(self.fnames))
+                proc.stdin.close()
         except win32api.error, details:
-            win32ui.MessageBox("Error executing command - %s" % (details),
-                    "gpopen")
+            win32ui.MessageBox('Error executing - ' + details, 'run_dialog')
