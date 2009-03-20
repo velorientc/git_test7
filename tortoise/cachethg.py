@@ -113,7 +113,8 @@ def get_states(upath, repo=None):
                     add(path, ROOT)
                     status = ROOT
                 else:
-                    status = overlay_cache.get(pdir, NOT_IN_REPO)
+                    status = overlay_cache.get(pdir + '*', NOT_IN_REPO)
+                    add(path, status)
             debugf("%s: %s (cached)", (path, status))
             return status
         else:
@@ -180,12 +181,12 @@ def get_states(upath, repo=None):
     except RepoError:
         # We aren't in a working tree
         debugf("%s: not in repo", pdir)
-        add(pdir, IGNORED)
+        add(pdir + '*', IGNORED)
         return IGNORED
     except Exception, e:
         debugf("error while handling %s:", pdir)
         debugf(e)
-        add(pdir, UNKNOWN)
+        add(pdir + '*', UNKNOWN)
         return UNKNOWN
 
      # get file status
@@ -208,6 +209,7 @@ def get_states(upath, repo=None):
     tc = GetTickCount()
     overlay_cache = {}
     add(root, ROOT)
+    add(os.path.join(root, '.hg'), NOT_IN_REPO)
     states = STATUS_STATES
     if mergestate:
         mstate = merge.mergestate(repo)
