@@ -92,10 +92,10 @@ class GCommit(GStatus):
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
         tbbuttons.insert(2, gtk.SeparatorToolItem())
-        self._undo_button = self.make_toolbutton(gtk.STOCK_UNDO, '_Undo',
-            self._undo_clicked, tip='undo recent commit')
-        self._commit_button = self.make_toolbutton(gtk.STOCK_OK, '_Commit',
-            self._commit_clicked, tip='commit')
+        self._undo_button = self.make_toolbutton(gtk.STOCK_UNDO, _('_Undo'),
+            self._undo_clicked, tip=_('undo recent commit'))
+        self._commit_button = self.make_toolbutton(gtk.STOCK_OK, _('_Commit'),
+            self._commit_clicked, tip=_('commit'))
         tbbuttons.insert(2, self._undo_button)
         tbbuttons.insert(2, self._commit_button)
         return tbbuttons
@@ -106,15 +106,14 @@ class GCommit(GStatus):
         index = combobox.get_active()
         if index >= 0:
             buf = self.text.get_buffer()
-            begin, end = buf.get_bounds()
-            cur_msg = buf.get_text(begin, end)
-            if len(cur_msg):
-                response = Confirm('Discard Message', [], self,
-                        'Discard current commit message?').run()
+            if buf.get_char_count() and buf.get_modified():
+                response = Confirm(_('Discard Message'), [], self,
+                        _('Discard current commit message?')).run()
                 if response != gtk.RESPONSE_YES:
                     combobox.set_active(-1)
                     return
             buf.set_text(model[index][1])
+            buf.set_modified(False)
 
     def _update_recent_messages(self, msg=None):
         if msg is not None:
@@ -135,12 +134,22 @@ class GCommit(GStatus):
         
         mbox = gtk.HBox()
 
-        label = gtk.Label('Branch: ')
+        label = gtk.Label(_('Branch: '))
         mbox.pack_start(label, False, False, 2)
         self.branchentry = gtk.Entry()
         mbox.pack_start(self.branchentry, False, False, 2)
 
-        label = gtk.Label('Recent Commit Messages: ')
+        if hasattr(self.repo, 'mq'):
+            label = gtk.Label('QNew: ')
+            mbox.pack_start(label, False, False, 2)
+            self.qnew_name = gtk.Entry()
+            self.qnew_name.set_width_chars(6)
+            self.qnew_name.connect('changed', self._qnew_changed)
+            mbox.pack_start(self.qnew_name, False, False, 2)
+        else:
+            self.qnew_name = None
+
+        label = gtk.Label(_('Recent Commit Messages: '))
         mbox.pack_start(label, False, False, 2)
         self.msg_cbbox = gtk.combo_box_new_text()
         liststore = gtk.ListStore(str, str)
@@ -180,7 +189,8 @@ class GCommit(GStatus):
 
 
     def get_menu_info(self):
-        """Returns menu info in this order: merge, addrem, unknown, clean, ignored, deleted
+        """Returns menu info in this order: merge, addrem, unknown,
+        clean, ignored, deleted
         """
         merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
                 = GStatus.get_menu_info(self)
@@ -200,10 +210,8 @@ class GCommit(GStatus):
         # message, ask if the exit should continue.
         live = False
         buf = self.text.get_buffer()
-        begin, end = buf.get_bounds()
-        cur_msg = buf.get_text(begin, end)
-        if buf.get_char_count() > 10 and cur_msg != self.qheader:
-            dialog = Confirm('Exit', [], self, 'Save commit message at exit?')
+        if buf.get_char_count() > 10 and buf.get_modified():
+            dialog = Confirm(_('Exit'), [], self, _('Save commit message at exit?'))
             res = dialog.run()
             if res == gtk.RESPONSE_YES:
                 self._update_recent_messages(cur_msg)
@@ -236,10 +244,10 @@ class GCommit(GStatus):
         # disable the checkboxes on the filelist if repo in merging state
         merged = len(self.repo.changectx(None).parents()) > 1
         
-        self.get_toolbutton('Re_vert').set_sensitive(not merged)
-        self.get_toolbutton('_Add').set_sensitive(not merged)
-        self.get_toolbutton('_Remove').set_sensitive(not merged)
-        self.get_toolbutton('Move').set_sensitive(not merged)
+        self.get_toolbutton(_('Re_vert')).set_sensitive(not merged)
+        self.get_toolbutton(_('_Add')).set_sensitive(not merged)
+        self.get_toolbutton(_('_Remove')).set_sensitive(not merged)
+        self.get_toolbutton(_('Move')).set_sensitive(not merged)
         
         if merged:
             # select all changes if repo is merged
@@ -249,7 +257,9 @@ class GCommit(GStatus):
             self._update_check_count()
 
             # pre-fill commit message
-            self.text.get_buffer().set_text('merge')
+            buf = self.text.get_buffer()
+            buf.set_text(_('merge'))
+            buf.set_modified(False)
         #else:
         #    self.selectlabel.set_text(
         #        _('toggle change hunks to leave them out of commit'))
@@ -258,18 +268,26 @@ class GCommit(GStatus):
 
     def _check_patch_queue(self):
         '''See if an MQ patch is applied, switch to qrefresh mode'''
+        mqmode = hasattr(self.repo, 'mq') and self.repo.mq.applied
         self.qheader = None
-        if not hasattr(self.repo, 'mq'): return
-        if not self.repo.mq.applied:
-            self.get_toolbutton('_Commit').set_label('_Commit')
-            return
-        patch = self.repo.mq.lookup('qtip')
-        ph = self.repo.mq.readheaders(patch)
-        title = os.path.basename(self.repo.root) + ' qrefresh ' + patch
-        self.set_title(title)
-        self.qheader = '\n'.join(ph.message)
-        self.text.get_buffer().set_text(self.qheader)
-        self.get_toolbutton('_Commit').set_label('QRefresh')
+        if mqmode:
+            patch = self.repo.mq.lookup('qtip')
+            ph = self.repo.mq.readheaders(patch)
+            title = os.path.basename(self.repo.root) + ' qrefresh ' + patch
+            self.set_title(title)
+            self.qheader = '\n'.join(ph.message)
+            buf = self.text.get_buffer()
+            if buf.get_char_count() == 0 or not buf.get_modified():
+                buf.set_text(self.qheader)
+                buf.set_modified(False)
+            c_btn = self.get_toolbutton(_('_Commit'))
+            c_btn.set_label(_('QRefresh'))
+            c_btn.set_tooltip(self.tooltips, self.mqmode and _('QRefresh') or _('QNew'))
+        else:
+            c_btn = self.get_toolbutton(('_Commit'))
+            c_btn.set_label(_('_Commit'))
+            c_btn.set_tooltip(self.tooltips, _('commit'))
+        self.branchentry.set_sensitive(not mqmode)
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
@@ -290,7 +308,8 @@ class GCommit(GStatus):
             commit_list = self._relevant_files(commitable)
             if len(commit_list) > 0:
                 self._commit_selected(commit_list)
-                return True
+            elif len(self.filemodel) == 0 and self._get_qnew_name():
+                self._commit_selected([])
             else:
                 Prompt('Nothing Commited', 'No committable files selected', self).run()
         return True
@@ -309,7 +328,7 @@ class GCommit(GStatus):
             os.mkdir(backupdir)
         except OSError, err:
             if err.errno != errno.EEXIST:
-                Prompt('Commit', 'Unable to create ' + backupdir,
+                Prompt(_('Commit'), _('Unable to create ') + backupdir,
                         self).run()
                 return
         try:
@@ -356,7 +375,7 @@ class GCommit(GStatus):
                     if s:
                         raise util.Abort(s)
                     else:
-                        Prompt('Commit', 'Unable to apply patch', self).run()
+                        Prompt(_('Commit'), _('Unable to apply patch'), self).run()
                         raise util.Abort(_('patch failed to apply'))
             del fp
 
@@ -394,15 +413,15 @@ class GCommit(GStatus):
 
 
     def _undo_clicked(self, toolbutton, data=None):
-        response = Confirm('Undo commit', [], self, 'Undo last commit').run() 
+        response = Confirm(_('Undo commit'), [], self, _('Undo last commit')).run() 
         if response != gtk.RESPONSE_YES:
             return
             
         tip = self._get_tip_rev(True)
         if not tip == self._last_commit_id:
-            Prompt('Undo commit', 
-                    'Unable to undo!\n\n'
-                    'Tip revision differs from last commit.',
+            Prompt(_('Undo commit'), 
+                    _('Unable to undo!\n\n'
+                    'Tip revision differs from last commit.'),
                     self).run()
             return
             
@@ -411,14 +430,14 @@ class GCommit(GStatus):
             self._last_commit_id = None
             self.reload_status()
         except:
-            Prompt('Undo commit', 'Errors during rollback!', self).run()
+            Prompt(_('Undo commit'), _('Errors during rollback!'), self).run()
 
 
     def _should_addremove(self, files):
         if self.test_opt('addremove'):
             return True
         else:
-            response = Confirm('Add/Remove', files, self).run() 
+            response = Confirm(_('Add/Remove'), files, self).run() 
             if response == gtk.RESPONSE_YES:
                 # This will stay set for further commits (meaning no more prompts). Problem?
                 self.opts['addremove'] = True
@@ -427,23 +446,24 @@ class GCommit(GStatus):
 
 
     def _ready_message(self):
-        begin, end = self.text.get_buffer().get_bounds()
-        message = self.text.get_buffer().get_text(begin, end) 
-        if not self.test_opt('logfile') and not message:
-            Prompt('Nothing Commited', 'Please enter commit message', self).run()
+        if self.test_opt('logfile'):
+            return
+        buf = self.text.get_buffer()
+        if buf.get_char_count() == 0:
+            Prompt(_('Nothing Commited'),
+                   _('Please enter commit message'), self).run()
             self.text.grab_focus()
             return False
-        else:
-            if not self.test_opt('logfile'):
-                self.opts['message'] = message
-            return True
+        begin, end = buf.get_bounds()
+        self.opts['message'] = buf.get_text(begin, end)
+        return True
 
 
     def _hg_commit(self, files):
         if not self.repo.ui.config('ui', 'username'):
-            Prompt('Commit: Invalid username',
-                    'Your username has not been configured.\n\n'
-                    'Please configure your username and try again',
+            Prompt(_('Commit: Invalid username'),
+                   _('Your username has not been configured.\n\n'
+                    'Please configure your username and try again'),
                     self).run()
 
             # bring up the config dialog for user to enter their username.
@@ -463,14 +483,14 @@ class GCommit(GStatus):
         if newbranch != self.repo.dirstate.branch():
             if newbranch in self.repo.branchtags():
                 if newbranch not in [p.branch() for p in self.repo.parents()]:
-                    response = Confirm('Override Branch', [], self,
-                        'A branch named "%s" already exists,\n'
-                        'override?' % newbranch).run()
+                    response = Confirm(_('Override Branch'), [], self,
+                        _('A branch named "%s" already exists,\n'
+                        'override?') % newbranch).run()
                 else:
                     response = gtk.RESPONSE_YES
             else:
-                response = Confirm('New Branch', [], self,
-                        'Create new named branch "%s"?' % newbranch).run()
+                response = Confirm(_('New Branch'), [], self,
+                        _('Create new named branch "%s"?') % newbranch).run()
             if response == gtk.RESPONSE_YES:
                 self.repo.dirstate.setbranch(newbranch)
             elif response != gtk.RESPONSE_NO:
@@ -480,11 +500,18 @@ class GCommit(GStatus):
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
         cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
-        if self.qheader is not None:
+        qnew = self._get_qnew_name()
+        if qnew:
+            qnew = fromutf(qnew)
+            cmdline[1] = 'qnew'
+            cmdline.append('--force')
+        elif self.qheader is not None:
             cmdline[1] = 'qrefresh'
         if self.opts['addremove']:
             cmdline += ['--addremove']
         cmdline += ['--message', fromutf(self.opts['message'])]
+        if qnew:
+            cmdline += [qnew]
         cmdline += [self.repo.wjoin(x) for x in files]
         dialog = CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
@@ -494,9 +521,17 @@ class GCommit(GStatus):
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
             shell_notify([self.cwd] + files)
-            if self.qheader is None:
-                self.text.set_buffer(gtk.TextBuffer())
+            buf = self.text.get_buffer()
+            if buf.get_modified():
                 self._update_recent_messages(self.opts['message'])
+                buf.set_modified(False)
+            if qnew:
+                self.qnew_name.set_text('')
+                self.repo.invalidate()
+                _mq = self.repo.mq
+                _mq.__init__(_mq.ui, _mq.basepath, _mq.path)
+            elif self.qheader is None:
+                self.text.set_buffer(gtk.TextBuffer())
                 self._last_commit_id = self._get_tip_rev(True)
 
     def _get_tip_rev(self, refresh=False):
@@ -505,6 +540,20 @@ class GCommit(GStatus):
         cl = self.repo.changelog
         tip = cl.node(nullrev + len(cl))
         return hex(tip)
+
+    def _get_qnew_name(self):
+        return self.qnew_name and self.qnew_name.get_text().strip() or ''
+
+    def _qnew_changed(self, element):
+        mqmode = self.mqmode
+        self.mqmode = not self.qnew_name.get_text().strip()
+        if mqmode != self.mqmode:
+            c_btn = self.get_toolbutton(_('_Commit'))
+            c_btn.set_label(self.mqmode and _('QRefresh') or _('QNew'))
+            c_btn.set_tooltip(self.tooltips, self.mqmode and _('QRefresh') or _)('QNew')
+            success, outtext = self._hg_call_wrapper('Status', self._do_reload_status)
+            self.qnew_name.grab_focus() # set focus back
+            
 
 def launch(root='', files=[], cwd='', main=True):
     u = ui.ui()
