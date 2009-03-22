@@ -13,9 +13,6 @@ import _winreg
 if hasattr(sys, "frozen") and sys.frozen == 'dll':
     import win32traceutil
 
-# ensure version has been recorded
-os.popen('python setup.py --version')
-
 # shell extension classes
 from tortoise.contextmenu import ContextMenuExtension
 from tortoise.iconoverlay import ChangedOverlay, AddedOverlay, UnchangedOverlay
