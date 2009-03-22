@@ -133,7 +133,7 @@ class HgIgnoreDialog(gtk.Window):
         self.refresh()
 
     def add_regexp(self, widget, regexp_entry):
-        newregexp = regexp_entry.get_text()
+        newregexp = fromutf(regexp_entry.get_text())
         self.ignorelines.append('regexp:' + newregexp)
         self.write_ignore_lines()
         self.refresh()
