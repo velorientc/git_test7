@@ -6,22 +6,18 @@
 # of the GNU General Public License, incorporated herein by reference.
 # 
 
-import mercurial.demandimport; mercurial.demandimport.disable()
-
-import os
-import threading
-import StringIO
-import sys
-import shutil
-import tempfile
-import datetime
-import cPickle
-
 import pygtk
 pygtk.require('2.0')
 import gtk
 import gobject
 import pango
+
+import os
+import threading
+import cStringIO
+import sys
+import shutil
+import tempfile
 
 from mercurial.i18n import _
 from mercurial.node import short
@@ -31,7 +27,6 @@ from shlib import shell_notify, set_tortoise_icon, Settings
 from thgconfig import ConfigDialog
 from gtklib import MessageDialog
 from hglib import toutf
-
 
 class SimpleMessage(MessageDialog):
     def run(self):
@@ -335,7 +330,7 @@ class GDialog(gtk.Window):
         """
         textout = ''
         saved = sys.stderr
-        errors = StringIO.StringIO()
+        errors = cStringIO.StringIO()
         try:
             sys.stderr = errors
             self.ui.pushbuffer()

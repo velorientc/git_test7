@@ -217,7 +217,7 @@ def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     from hggtk.rename import run
     if not pats or len(pats) > 2:
-        raise util.Abort("rename takes one or two path arguments")
+        raise util.Abort(_('rename takes one or two path arguments'))
     opts['files'] = pats
     opts['detect'] = False
     run(**opts)
@@ -479,7 +479,7 @@ def help_(ui, name=None, with_version=False):
 def version(ui, **opts):
     """output version and copyright information"""
     import hggtk.shlib
-    ui.write("TortoiseHg Dialogs (version %s)\n" % hggtk.shlib.version())
+    ui.write(_('TortoiseHg Dialogs (version %s)\n') % hggtk.shlib.version())
     if not ui.quiet:
         ui.write(shortlicense)
 

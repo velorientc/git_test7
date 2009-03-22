@@ -150,7 +150,7 @@ class GtkUi(ui.ui):
                 if not pat or re.match(pat, r):
                     return r
                 else:
-                    self.write(_("unrecognized response\n"))
+                    self.write(_('unrecognized response\n'))
             except EOFError:
                 raise util.Abort(_('response expected'))
 
@@ -224,9 +224,9 @@ class HgThread(thread2.Thread):
                 if origui:
                     ui.ui = origui
             if ret:
-                self.ui.write('[command returned code %d]\n' % int(ret))
+                self.ui.write(_('[command returned code %d]\n') % int(ret))
             else:
-                self.ui.write('[command completed successfully]\n')
+                self.ui.write(_('[command completed successfully]\n'))
             self.ret = ret or 0
             if self.postfunc:
                 self.postfunc(ret)
@@ -320,8 +320,8 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         cmdtable = getattr(module, 'cmdtable', {})
         overrides = [cmd for cmd in cmdtable if cmd in commands.table]
         if overrides:
-            ui.warn(_("extension '%s' overrides commands: %s\n")
-                    % (name, " ".join(overrides)))
+            ui.warn(_("extension '%s' overrides commands: %s\n") %
+                    (name, " ".join(overrides)))
         commands.table.update(cmdtable)
         _loaded[name] = 1
 
@@ -358,8 +358,8 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         except RepoError:
             if cmd not in commands.optionalrepo.split():
                 if not path:
-                    raise RepoError(_("There is no Mercurial repository here"
-                                         " (.hg not found)"))
+                    raise RepoError(_('There is no Mercurial repository here'
+                                         ' (.hg not found)'))
                 raise
         d = lambda: func(ui, repo, *args, **cmdoptions)
     else:
@@ -378,7 +378,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 2: # no
             raise
-        raise ParseError(cmd, _("invalid arguments"))
+        raise ParseError(cmd, _('invalid arguments'))
 
     # run post-hook, passing command result
     hook.hook(ui, repo, "post-%s" % cmd, False, args=" ".join(fullargs),
