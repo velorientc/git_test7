@@ -194,7 +194,7 @@ def get_tortoise_icon(thgicon):
         if os.path.isfile(path):
             return path
     else:
-        print 'icon not found', thgicon
+        print _('icon not found'), thgicon
         return None
 
 def version():
@@ -202,7 +202,7 @@ def version():
         import __version__
         return __version__.version
     except ImportError:
-        return 'unknown'
+        return _('unknown')
 
 if os.name == 'nt':
     def shell_notify(paths):
@@ -217,8 +217,7 @@ if os.name == 'nt':
                 continue
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
                                  shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSH,
-                                 pidl,
-                                 None)
+                                 pidl, None)
 else:
     def shell_notify(paths):
         pass

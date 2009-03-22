@@ -13,6 +13,7 @@ import gtk
 from dialog import *
 from mercurial import util, hg, ui
 from mercurial.node import *
+from mercurial.i18n import _
 from shlib import shell_notify, set_tortoise_icon
 from hglib import rootpath, toutf, RepoError
 
@@ -51,10 +52,9 @@ class UpdateDialog(gtk.Window):
         self.tips = gtk.Tooltips()
         
         self._btn_update = self._toolbutton(
-                gtk.STOCK_REVERT_TO_SAVED,
-                'Update', 
+                gtk.STOCK_REVERT_TO_SAVED, _('Update'),
                 self._btn_update_clicked,
-                tip='Update working directory to selected revision')
+                tip=_('Update working directory to selected revision'))
         tbuttons = [
                 self._btn_update,
             ]
@@ -66,8 +66,8 @@ class UpdateDialog(gtk.Window):
         
         # repo parent revisions
         parentbox = gtk.HBox()
-        lbl = gtk.Label("Parent revisions:")
-        lbl.set_property("width-chars", 18)
+        lbl = gtk.Label(_('Parent revisions:'))
+        lbl.set_property('width-chars', 18)
         lbl.set_alignment(0, 0.5)
         self._parent_revs = gtk.Entry()
         self._parent_revs.set_sensitive(False)
@@ -77,8 +77,8 @@ class UpdateDialog(gtk.Window):
 
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label("Update to revision:")
-        lbl.set_property("width-chars", 18)
+        lbl = gtk.Label(_('Update to revision:'))
+        lbl.set_property('width-chars', 18)
         lbl.set_alignment(0, 0.5)
         
         # revisions  combo box
@@ -92,14 +92,14 @@ class UpdateDialog(gtk.Window):
         self._rev_input = self._revbox.get_child()
         
         # setup buttons
-        self._btn_rev_browse = gtk.Button("Browse...")
+        self._btn_rev_browse = gtk.Button(_('Browse...'))
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._revbox, False, False)
         revbox.pack_start(self._btn_rev_browse, False, False, 5)
         vbox.pack_start(revbox, False, False, 2)
 
-        self._overwrite = gtk.CheckButton("Overwrite local changes")
+        self._overwrite = gtk.CheckButton(_('Overwrite local changes'))
         vbox.pack_end(self._overwrite, False, False, 10)
         
         # show them all
@@ -161,11 +161,12 @@ class UpdateDialog(gtk.Window):
         overwrite = self._overwrite.get_active()
         
         if not rev:
-            error_dialog(self, "Can't update", "please enter revision to update to")
+            error_dialog(self, _('Cannot update'),
+                         _('please enter revision to update to'))
             return
         
-        response = question_dialog(self, "Really want to update?",
-                                   "to revision %s" % rev)
+        response = question_dialog(self, _('Really want to update?'),
+                                   _('to revision %s') % rev)
         if response != gtk.RESPONSE_YES:
             return
             
