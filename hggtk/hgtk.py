@@ -479,7 +479,9 @@ def help_(ui, name=None, with_version=False):
 def version(ui, **opts):
     """output version and copyright information"""
     import hggtk.shlib
-    ui.write(_('TortoiseHg Dialogs (version %s)\n') % hggtk.shlib.version())
+    ui.write(_('TortoiseHg Dialogs (version %s), '
+               'Mercurial (version %s)\n') %
+               (hggtk.shlib.version(), util.version()))
     if not ui.quiet:
         ui.write(shortlicense)
 
