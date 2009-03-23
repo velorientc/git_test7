@@ -11,15 +11,6 @@ This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
 
-# The recommended usage is to symlink this file into your path.
-# alternatively, you can change this line or set TORTOISEHG_PATH
-tortoisehg_dir = '~/tools/tortoisehg-dev'
-
-import pygtk
-pygtk.require('2.0')
-import gtk
-
-from mercurial import demandimport; demandimport.enable()
 from mercurial.i18n import _
 from mercurial import hg, util, fancyopts, commands, cmdutil
 import pdb
@@ -56,6 +47,20 @@ def dispatch(args):
         u.print_exc()
         raise
 
+def get_list_from_file(filename):
+    try:
+        if filename == '-':
+            lines = [ x.replace("\n", "") for x in sys.stdin.readlines() ]
+        else:
+            fd = open(filename, "r")
+            lines = [ x.replace("\n", "") for x in fd.readlines() ]
+            fd.close()
+            os.unlink(filename)
+        return lines
+    except IOError, e:
+        sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
+        return []
+
 def _parse(ui, args):
     options = {}
     cmdoptions = {}
@@ -88,6 +93,11 @@ def _parse(ui, args):
         n = o[1]
         options[n] = cmdoptions[n]
         del cmdoptions[n]
+
+    listfile = options.get('listfile')
+    if listfile:
+        del options['listfile']
+        args += get_list_from_file(listfile)
 
     return (cmd, cmd and i[0] or None, args, options, cmdoptions)
 
@@ -127,40 +137,7 @@ def runcommand(ui, args):
     elif not cmd:
         return help_(ui, 'shortlist')
 
-    if hasattr(sys, "frozen"):
-        # Py2exe environment
-        thgdir = os.path.dirname(sys.executable)
-        os.environ['THG_ICON_PATH'] = os.path.join(thgdir, 'icons')
-    else:
-        # Add TortoiseHg to python path
-        path = os.environ.get('TORTOISEHG_PATH') or tortoisehg_dir
-        norm = os.path.normpath(os.path.expanduser(path))
-        if norm not in sys.path:
-            sys.path.insert(0, norm)
-
-        try:
-            # assuming TortoiseHg source layout, with hgtk in contrib
-            path = os.path.dirname(os.path.realpath(__file__))
-        except NameError:
-            # __file__ not available in pdb mode
-            path = os.path.dirname(sys.argv[0])
-        norm = os.path.normpath(os.path.join(path, '..'))
-        if norm not in sys.path:
-            sys.path.append(norm)
-
-    try:
-        from hggtk import hglib
-    except ImportError, inst:
-        m = str(inst).split()[-1]
-        if m in "hglib hggtk".split():
-            # fix "tortoisehg_dir" at the top of this script, or ...
-            raise util.Abort(_('Please set TORTOISEHG_PATH to location '
-                    'of your tortoisehg repository'))
-        else:
-            raise util.Abort(_('could not import module %s!\n' % m))
-    except:
-        raise
-
+    import hglib
     path = hglib.rootpath(os.getcwd())
     if path:
         try:
@@ -202,6 +179,11 @@ def about(ui, **opts):
     from hggtk.about import run
     run(**opts)
 
+def add(ui, *pats, **opts):
+    """add files"""
+    from mercurial import dispatch
+    dispatch.dispatch(['add'] + list(pats))
+
 def clone(ui, source=None, dest=None, **opts):
     """clone tool"""
     from hggtk.clone import run
@@ -235,7 +217,7 @@ def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     from hggtk.rename import run
     if not pats or len(pats) > 2:
-        raise util.Abort("rename takes one or two path arguments")
+        raise util.Abort(_('rename takes one or two path arguments'))
     opts['files'] = pats
     opts['detect'] = False
     run(**opts)
@@ -249,7 +231,7 @@ def guess(ui, *pats, **opts):
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
-    opts['files'] = sys.argv[2:] or []
+    opts['files'] = pats or []
     opts['cwd'] = os.getcwd()
     run(**opts)
 
@@ -276,17 +258,25 @@ def recovery(ui, *pats, **opts):
     from hggtk.recovery import run
     run(**opts)
 
+def remove(ui, *pats, **opts):
+    """file status viewer in remove mode"""
+    from hggtk.status import run
+    opts['files'] = [os.path.abspath(x) for x in pats]
+    run(**opts)
+
+def revert(ui, *pats, **opts):
+    """file status viewer in revert mode"""
+    from hggtk.status import run
+    opts['files'] = [os.path.abspath(x) for x in pats]
+    run(**opts)
+
 def serve(ui, **opts):
     """web server"""
     from hggtk.serve import run
     run(**opts)
 
 def status(ui, *pats, **opts):
-    """file status viewer
-
-    Also do add, remove and revert.
-    """
-
+    """file status viewer"""
     from hggtk.status import run
     opts['files'] = [os.path.abspath(x) for x in pats]
     run(**opts)
@@ -305,6 +295,13 @@ def update(ui, **opts):
     """update/checkout tool"""
     from hggtk.update import run
     run(**opts)
+
+def vdiff(ui, *pats, **opts):
+    """launch configured visual diff tool"""
+    from mercurial import dispatch
+    vdiff = ui.config('tortoisehg', 'vdiff', 'vdiff')
+    if vdiff:
+        dispatch.dispatch([vdiff] + list(pats))
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False):
@@ -491,7 +488,9 @@ def help_(ui, name=None, with_version=False):
 def version(ui, **opts):
     """output version and copyright information"""
     import hggtk.shlib
-    ui.write("TortoiseHg Dialogs (version %s)\n" % hggtk.shlib.version())
+    ui.write(_('TortoiseHg Dialogs (version %s), '
+               'Mercurial (version %s)\n') %
+               (hggtk.shlib.version(), util.version()))
     if not ui.quiet:
         ui.write(shortlicense)
 
@@ -500,11 +499,12 @@ globalopts = [
      _('repository root directory or symbolic path name')),
     ('v', 'verbose', None, _('enable additional output')),
     ('h', 'help', None, _('display help and exit')),
-    ('', 'debugger', None, _('start debugger')),
+    ('l', 'listfile', '', _('read file list from file')),
 ]
 
 table = {
     "^about": (about, [], _('hgtk about')),
+    "^add": (add, [], _('hgtk add [FILE]...')),
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
     "^commit|ci": (commit, [], _('hgtk commit [FILE]...')),
     "^datamine|annotate|blame": (datamine, [], _('hgtk datamine')),
@@ -520,12 +520,15 @@ table = {
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
     "^guess": (guess, [], _('hgtk guess')),
+    "^remove|rm": (revert, [], _('hgtk remove [FILE]...')),
     "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
+    "^revert": (revert, [], _('hgtk revert [FILE]...')),
     "^serve": 
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
          _('hgtk serve [OPTION]...')),
     "^update|checkout|co": (update, [], _('hgtk update')),
+    "^vdiff": (vdiff, [], _('launch visual diff tool')),
     "^version": (version,
         [('v', 'verbose', None, _('print license'))],
         _('hgtk version [OPTION]')),

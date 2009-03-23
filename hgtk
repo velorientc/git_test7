@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+#
+# front-end script for TortoiseHg dialogs
+#
+# Copyright (C) 2008-9 Steve Borho <steve@borho.org>
+# Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
+#
+
+import pygtk
+pygtk.require('2.0')
+import gtk
+
+from mercurial import demandimport; demandimport.enable()
+import sys
+
+if not hasattr(sys, "frozen"):
+    import os
+    # check if hggtk is a symlink first
+    pfile = __file__
+    if pfile.endswith('.pyc'):
+        pfile = pfile[:-1]
+    thgpath = os.path.dirname(os.path.realpath(pfile))
+    testpath = os.path.join(thgpath, 'hggtk')
+    if os.path.isdir(testpath):
+        if thgpath not in sys.path:
+            sys.path.insert(0, thgpath)
+    else:
+        # try environment
+        thgpath = os.environ.get('TORTOISEHG_PATH')
+        if thgpath:
+            thgpath = os.path.normpath(os.path.expanduser(thgpath))
+            if os.path.exists(thgpath) and thgpath not in sys.path:
+                sys.path.insert(0, thgpath)
+
+# else assume tortoise is already in PYTHONPATH
+try:
+    import hggtk.hgtk
+except ImportError:
+    sys.stderr.write("abort: couldn't find hggtk libraries in [%s]\n" %
+                     ' '.join(sys.path))
+    sys.stderr.write("(check your install and PYTHONPATH)\n")
+    sys.exit(-1)
+
+sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))

@@ -18,11 +18,8 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 from gtklib import MessageDialog
+from mercurial.i18n import _
 
-
-def about():
-    raise "About dialog currently under construction"
-    
 def _message_dialog(parent, type, primary, secondary, buttons=gtk.BUTTONS_OK,
                     title="TortoiseHg"):
     """ Display a given type of MessageDialog with the given message.
@@ -53,7 +50,7 @@ def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
             gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
     dialog = gtk.Dialog(parent=parent, flags=gtk.DIALOG_MODAL,
             buttons=buttons)
-    dialog.set_title('TortoiseHg Prompt')
+    dialog.set_title(_('TortoiseHg Prompt'))
     entry = gtk.Entry()
     entry.set_text(default or '')
     entry.set_visibility(visible)

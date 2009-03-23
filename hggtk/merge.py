@@ -6,11 +6,11 @@
 
 import pygtk
 pygtk.require("2.0")
-
-import sys
 import gtk
+import sys
 from dialog import *
 from mercurial.node import *
+from mercurial.i18n import _
 from mercurial import util, hg, ui
 from hglib import RepoError
 from hgcmd import CmdDialog
@@ -49,16 +49,16 @@ class MergeDialog(gtk.Window):
         
         self._btn_merge = self._toolbutton(
                 gtk.STOCK_CONNECT,
-                'merge', 
+                _('merge'),
                 self._btn_merge_clicked,
                 menu=self._merge_menu(),
-                tip='Merge working revision with selected revision')
+                tip=_('Merge working revision with selected revision'))
         self._btn_unmerge = self._toolbutton(
                 gtk.STOCK_DISCONNECT,
-                'unmerge', 
+                _('unmerge'),
                 self._btn_unmerge_clicked,
-                tip='Undo merging and return working directory to'
-                    ' one of it parent revision')
+                tip=_('Undo merging and return working directory to'
+                    ' one of it parent revision'))
         tbuttons = [
                 self._btn_merge,
                 gtk.SeparatorToolItem(),
@@ -72,8 +72,8 @@ class MergeDialog(gtk.Window):
         
         # repo parent revisions
         parentbox = gtk.HBox()
-        lbl = gtk.Label("Parent revision(s):")
-        lbl.set_property("width-chars", 18)
+        lbl = gtk.Label(_('Parent revision(s):'))
+        lbl.set_property('width-chars', 18)
         lbl.set_alignment(0, 0.5)
         self._parent_revs = gtk.Entry()
         parentbox.pack_start(lbl, False, False)
@@ -82,8 +82,8 @@ class MergeDialog(gtk.Window):
 
         # revision input
         revbox = gtk.HBox()
-        self._rev_lbl = gtk.Label("Merge with revision:")
-        self._rev_lbl.set_property("width-chars", 18)
+        self._rev_lbl = gtk.Label(_('Merge with revision:'))
+        self._rev_lbl.set_property('width-chars', 18)
         self._rev_lbl.set_alignment(0, 0.5)
         
         # revisions  combo box
@@ -96,7 +96,7 @@ class MergeDialog(gtk.Window):
         self._revbox.add_attribute(cell, 'text', 1)
         self._rev_input = self._revbox.get_child()
 
-        self._btn_rev_browse = gtk.Button("Browse...")
+        self._btn_rev_browse = gtk.Button(_('Browse...'))
         self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(self._rev_lbl, False, False)
         revbox.pack_start(self._revbox, False, False)
@@ -140,12 +140,12 @@ class MergeDialog(gtk.Window):
         if is_merged:
             self._btn_merge.set_sensitive(False)
             self._btn_unmerge.set_sensitive(True)
-            self._rev_lbl.set_text("Unmerge to revision:")
+            self._rev_lbl.set_text(_('Unmerge to revision:'))
             self._btn_rev_browse.set_sensitive(False)
         else:
             self._btn_merge.set_sensitive(True)
             self._btn_unmerge.set_sensitive(False)
-            self._rev_lbl.set_text("Merge with revision:")
+            self._rev_lbl.set_text(_('Merge with revision:'))
             self._btn_rev_browse.set_sensitive(True)
             
         # populate revision data        
@@ -170,7 +170,7 @@ class MergeDialog(gtk.Window):
     def _merge_menu(self):
         menu = gtk.Menu()
         
-        self._chbox_force = gtk.CheckMenuItem("Allow merge with uncommited changes")
+        self._chbox_force = gtk.CheckMenuItem(_('Allow merge with uncommited changes'))
         menu.append(self._chbox_force)
         
         menu.show_all()
@@ -192,15 +192,17 @@ class MergeDialog(gtk.Window):
         rev = self._rev_input.get_text()
         
         if not rev:
-            error_dialog(self, "Can't unmerge", "please select revision to unmerge")
+            error_dialog(self, _('Cannot unmerge'),
+                    _('please select revision to unmerge'))
             return
-        
-        response = question_dialog(self, "Undo merge",
-                                   "and checkout revision %s?" % rev)
+
+        response = question_dialog(self, _('Undo merge'),
+                                   _('and checkout revision %s?') % rev)
         if response != gtk.RESPONSE_YES:
             return
 
-        cmdline = ['hg', 'update', '-R', self.root, '--rev', rev, '--clean', '--verbose']
+        cmdline = ['hg', 'update', '-R', self.root, '--rev', rev,
+                   '--clean', '--verbose']
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
@@ -214,11 +216,12 @@ class MergeDialog(gtk.Window):
         force = self._chbox_force.get_active()
         
         if not rev:
-            error_dialog(self, "Can't merge", "please enter revision to merge")
+            error_dialog(self, _('Cannot merge'),
+                    _('please enter revision to merge'))
             return
         
-        response = question_dialog(self, "Really want to merge?",
-                                   "with revision %s" % rev)
+        response = question_dialog(self, _('Really want to merge?'), 
+                                   _('with revision %s') % rev)
         if response != gtk.RESPONSE_YES:
             return
 

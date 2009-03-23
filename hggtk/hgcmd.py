@@ -6,7 +6,6 @@
 
 import pygtk
 pygtk.require("2.0")
-
 import gtk
 import gobject
 import pango
@@ -15,6 +14,7 @@ import threading
 import Queue
 from hglib import HgThread, hgcmd_toq, toutf
 from shlib import set_tortoise_icon, get_system_times
+from mercurial.i18n import _
 
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, progressbar=True, width=520, height=400):
@@ -33,11 +33,11 @@ class CmdDialog(gtk.Dialog):
         # construct dialog
         self.set_default_size(width, height)
 
-        self._button_stop = gtk.Button("Stop")
+        self._button_stop = gtk.Button(_('Stop'))
         self._button_stop.connect('clicked', self._on_stop_clicked)
         self.action_area.pack_start(self._button_stop)
         
-        self._button_ok = gtk.Button("Close")
+        self._button_ok = gtk.Button(_('Close'))
         self._button_ok.connect('clicked', self._on_ok_clicked)
         self.action_area.pack_start(self._button_ok)
 
@@ -74,7 +74,7 @@ class CmdDialog(gtk.Dialog):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription("Monospace"))
+        self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
         
@@ -86,7 +86,7 @@ class CmdDialog(gtk.Dialog):
     def _on_ok_clicked(self, button):
         """ Ok button clicked handler. """
         self.response(gtk.RESPONSE_ACCEPT)
-        
+
     def _on_stop_clicked(self, button):
         if self.hgthread:
             self.hgthread.terminate()
@@ -133,7 +133,7 @@ class CmdDialog(gtk.Dialog):
             self._button_ok.grab_focus()
             self.returncode = self.hgthread.return_code()
             if self.returncode is None:
-                self.write("\n[command interrupted]")
+                self.write(_('\n[command interrupted]'))
             return False # Stop polling this function
         else:
             return True

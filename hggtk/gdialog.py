@@ -6,22 +6,18 @@
 # of the GNU General Public License, incorporated herein by reference.
 # 
 
-import mercurial.demandimport; mercurial.demandimport.disable()
-
-import os
-import threading
-import StringIO
-import sys
-import shutil
-import tempfile
-import datetime
-import cPickle
-
 import pygtk
 pygtk.require('2.0')
 import gtk
 import gobject
 import pango
+
+import os
+import threading
+import cStringIO
+import sys
+import shutil
+import tempfile
 
 from mercurial.i18n import _
 from mercurial.node import short
@@ -31,7 +27,6 @@ from shlib import shell_notify, set_tortoise_icon, Settings
 from thgconfig import ConfigDialog
 from gtklib import MessageDialog
 from hglib import toutf
-
 
 class SimpleMessage(MessageDialog):
     def run(self):
@@ -53,7 +48,7 @@ class Confirm(SimpleMessage):
     def __init__(self, title, files, parent, primary=None):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
-        self.set_title(toutf('Confirm ' + title))
+        self.set_title(toutf(_('Confirm ') + title))
         if primary is None:
             primary = title + ' file' + ((len(files) > 1 and 's') or '') + '?'
         primary = '<b>' + primary + '</b>'
@@ -330,19 +325,19 @@ class GDialog(gtk.Window):
 
 
     def _hg_call_wrapper(self, title, command, showoutput=True):
-        """Run the specified command and display any resulting aborts, messages, 
-        and errors 
+        """Run the specified command and display any resulting aborts,
+        messages, and errors 
         """
         textout = ''
         saved = sys.stderr
-        errors = StringIO.StringIO()
+        errors = cStringIO.StringIO()
         try:
             sys.stderr = errors
             self.ui.pushbuffer()
             try:
                 command()
             except util.Abort, inst:
-                Prompt(title + ' Aborted', str(inst), self).run()
+                Prompt(title + _(' Aborted'), str(inst), self).run()
                 return False, ''
         finally:
             sys.stderr = saved
@@ -353,7 +348,7 @@ class GDialog(gtk.Window):
             prompttext += errors.getvalue()
             errors.close()
             if len(prompttext) > 1:
-                Prompt(title + ' Messages and Errors', prompttext, self).run()
+                Prompt(title + _(' Messages and Errors'), prompttext, self).run()
 
         return True, textout
 
@@ -363,8 +358,8 @@ class GDialog(gtk.Window):
                             [self.repo.wjoin(file)], self.opts)
 
         if self.diffcmd == 'diff':
-            Prompt('No visual diff configured',
-                    'Please select a visual diff application.', self).run()
+            Prompt(_('No visual diff configured'),
+                   _('Please select a visual diff application.'), self).run()
             dlg = ConfigDialog(self.repo.root, False)
             dlg.show_all()
             dlg.focus_field('tortoisehg.vdiff')
@@ -444,8 +439,8 @@ class GDialog(gtk.Window):
                 self.ui.config('ui', 'editor') or
                 os.environ.get('EDITOR', 'vi'))
         if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-            Prompt('No visual editor configured',
-                    'Please configure a visual editor.', self).run()
+            Prompt(_('No visual editor configured'),
+                   _('Please configure a visual editor.'), self).run()
             dlg = ConfigDialog(self.repo.root, False)
             dlg.show_all()
             dlg.focus_field('tortoisehg.editor')
@@ -461,8 +456,9 @@ class GDialog(gtk.Window):
         thread.start()
 
 class NativeSaveFileDialogWrapper:
-    """Wrap the windows file dialog, or display default gtk dialog if that isn't available"""
-    def __init__(self, InitialDir = None, Title = "Save File", 
+    """Wrap the windows file dialog, or display default gtk dialog if
+    that isn't available"""
+    def __init__(self, InitialDir = None, Title = _('Save File'), 
                  Filter = {"All files": "*.*"}, FilterIndex = 1, FileName = ''):
         import os.path
         if InitialDir == None:
@@ -474,25 +470,12 @@ class NativeSaveFileDialogWrapper:
         self.FilterIndex = FilterIndex
 
     def run(self):
-        """run the file dialog, either return a file name, or False if the user aborted the dialog"""
+        """run the file dialog, either return a file name, or False if
+        the user aborted the dialog"""
         try:
-            import win32gui
-            if self.tortoiseHgIsInstalled(): #as of 20071021, the file dialog will hang if the tortoiseHg shell extension is installed. I have no clue why, yet - Tyberius Prime
-                   return self.runCompatible()
-            else:
-                    return self.runWindows()
+            return self.runWindows()
         except ImportError:
             return self.runCompatible()
-
-    def tortoiseHgIsInstalled(self):
-        import _winreg
-        try:
-            _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
-                    r"Software\TortoiseHg")
-            return True
-        except WindowsError: #reg key not found
-            pass
-        return False
 
     def runWindows(self):
         import win32gui, win32con
@@ -513,10 +496,10 @@ class NativeSaveFileDialogWrapper:
         if fname:
             return fname
         else:
-           return False
+            return False
 
     def runCompatible(self):
-        file_save =gtk.FileChooserDialog(self.Title,None,
+        file_save = gtk.FileChooserDialog(self.Title,None,
                 gtk.FILE_CHOOSER_ACTION_SAVE
                 , (gtk.STOCK_CANCEL
                     , gtk.RESPONSE_CANCEL
