@@ -258,16 +258,25 @@ def recovery(ui, *pats, **opts):
     from hggtk.recovery import run
     run(**opts)
 
+def remove(ui, *pats, **opts):
+    """file status viewer in remove mode"""
+    from hggtk.status import run
+    opts['files'] = [os.path.abspath(x) for x in pats]
+    run(**opts)
+
+def revert(ui, *pats, **opts):
+    """file status viewer in revert mode"""
+    from hggtk.status import run
+    opts['files'] = [os.path.abspath(x) for x in pats]
+    run(**opts)
+
 def serve(ui, **opts):
     """web server"""
     from hggtk.serve import run
     run(**opts)
 
 def status(ui, *pats, **opts):
-    """file status viewer
-
-    Also do add, remove and revert.
-    """
+    """file status viewer"""
     from hggtk.status import run
     opts['files'] = [os.path.abspath(x) for x in pats]
     run(**opts)
@@ -511,7 +520,9 @@ table = {
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
     "^guess": (guess, [], _('hgtk guess')),
+    "^remove|rm": (revert, [], _('hgtk remove [FILE]...')),
     "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
+    "^revert": (revert, [], _('hgtk revert [FILE]...')),
     "^serve": 
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
