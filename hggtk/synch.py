@@ -135,9 +135,6 @@ class SynchDialog(gtk.Window):
             self._pathbox.set_active(defpushrow)
         elif defrow is not None:
             self._pathbox.set_active(defrow)
-        else:
-            if len(self.pathlist) > 1 and not self.pathlist[0][3]:
-                self._pathbox.set_active(0)
 
         # support dropping of repos or bundle files
         self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
