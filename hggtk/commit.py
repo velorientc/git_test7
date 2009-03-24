@@ -25,10 +25,9 @@ from hgcmd import CmdDialog
 from hglib import fromutf
 
 class GCommit(GStatus):
-    """GTK+ based dialog for displaying repository status and committing changes.
-
-    Also provides related operations like add, delete, remove, revert, refresh,
-    ignore, diff, and edit.
+    """GTK+ based dialog for displaying repository status and committing
+    changes.  Also provides related operations like add, delete, remove,
+    revert, refresh, ignore, diff, and edit.
     """
 
     ### Overrides of base class methods ###
@@ -211,7 +210,8 @@ class GCommit(GStatus):
         live = False
         buf = self.text.get_buffer()
         if buf.get_char_count() > 10 and buf.get_modified():
-            dialog = Confirm(_('Exit'), [], self, _('Save commit message at exit?'))
+            dialog = Confirm(_('Exit'), [], self,
+                    _('Save commit message at exit?'))
             res = dialog.run()
             if res == gtk.RESPONSE_YES:
                 self._update_recent_messages(cur_msg)
