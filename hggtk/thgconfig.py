@@ -442,7 +442,7 @@ class ConfigDialog(gtk.Dialog):
         desctext.set_wrap_mode(gtk.WRAP_WORD)
         desctext.set_editable(False)
         scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(desctext)
         descframe.add(scrolledwindow)
 
