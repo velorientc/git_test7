@@ -116,12 +116,14 @@ class GCommit(GStatus):
 
     def _first_msg_popdown(self, combo, shown):
         combo.disconnect(self.popupid)
+        self.popupid = None
         self._update_recent_messages()
 
     def _update_recent_messages(self, msg=None):
         if msg is not None:
             self._mru_messages.add(msg)
             self.settings.write()
+            if self.popupid is not None: return
         liststore = self.msg_cbbox.get_model()
         liststore.clear()
         for msg in self._mru_messages:
