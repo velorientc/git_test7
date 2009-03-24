@@ -1318,8 +1318,9 @@ def run(root='', cwd='', files=[], **opts):
     u.updateopts(debug=False, traceback=False, quiet=True)
     repo = hg.repository(u, path=root)
 
+    showclean = files and True or False
     cmdoptions = {
-        'all':False, 'clean':False, 'ignored':False, 'modified':True,
+        'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
         'added':True, 'removed':True, 'deleted':True, 'unknown':True, 'rev':[],
         'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
         'check':True
