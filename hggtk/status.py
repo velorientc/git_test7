@@ -66,7 +66,6 @@ class GStatus(GDialog):
                 entry[FM_CHECKED] = True
             self._update_check_count()
 
-
     def get_menu_info(self):
         """Returns menu info in this order:
             merge, addrem, unknown, clean, ignored, deleted, 
@@ -151,12 +150,11 @@ class GStatus(GDialog):
         revs = self.opts.get('rev')
         if revs:
             r = ':'.join(revs)
-            return ' '.join([root, 'status', r]) + ' '.join(self.pats)
-        elif self.mqmode and self.mode != 'status':
-            patch = self.repo.mq.lookup('qtip')
-            return root + _(' applied MQ patch ') + patch
+            return ' '.join([root, 'status', r])
+        elif self.pats:
+            return root + ' filtered status'
         else:
-            return root + ' status ' + ' '.join(self.pats)
+            return root + ' status'
 
     def get_icon(self):
         return 'menushowchanged.ico'
