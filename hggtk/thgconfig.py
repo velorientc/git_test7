@@ -276,6 +276,7 @@ class ConfigDialog(gtk.Dialog):
         # Define view model for 'Paths' tab
         self.pathtree = gtk.TreeView()
         self.pathtree.set_model(self.pathdata)
+        self.pathtree.set_enable_search(False)
         self.pathtree.connect("cursor-changed", self._pathtree_changed)
         
         renderer = gtk.CellRendererText()
