@@ -61,7 +61,7 @@ class GStatus(GDialog):
         self.mode = 'status'
         
     def auto_check(self):
-        if self.test_opt('check'):
+        if self.pats or self.opts.get('check'):
             for entry in self.filemodel:
                 entry[FM_CHECKED] = True
             self._update_check_count()
@@ -509,12 +509,6 @@ class GStatus(GDialog):
     def _displayed(self, widget, event):
         self._diffpane_moved(self._diffpane)
         return False
-
-    def auto_check(self):
-        if self.opts.get('rev'):
-            for entry in self.filemodel: 
-                entry[FM_CHECKED] = True
-            self._update_check_count()
 
     ### End of overrides ###
 
