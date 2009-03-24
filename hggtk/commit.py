@@ -114,17 +114,19 @@ class GCommit(GStatus):
             buf.set_text(model[index][1])
             buf.set_modified(False)
 
+    def _first_msg_popdown(self, combo, shown):
+        combo.disconnect(self.popupid)
+        self._update_recent_messages()
+
     def _update_recent_messages(self, msg=None):
         if msg is not None:
             self._mru_messages.add(msg)
             self.settings.write()
-
         liststore = self.msg_cbbox.get_model()
         liststore.clear()
         for msg in self._mru_messages:
             sumline = msg.split("\n")[0]
             liststore.append([sumline, msg])
-        #self.msg_cbbox.set_active(-1)
 
     def get_body(self):
         status_body = GStatus.get_body(self)
@@ -136,31 +138,32 @@ class GCommit(GStatus):
         label = gtk.Label(_('Branch: '))
         mbox.pack_start(label, False, False, 2)
         self.branchentry = gtk.Entry()
+        self.branchentry.set_width_chars(12)
         mbox.pack_start(self.branchentry, False, False, 2)
 
         if hasattr(self.repo, 'mq'):
             label = gtk.Label('QNew: ')
             mbox.pack_start(label, False, False, 2)
             self.qnew_name = gtk.Entry()
-            self.qnew_name.set_width_chars(6)
+            self.qnew_name.set_width_chars(12)
             self.qnew_name.connect('changed', self._qnew_changed)
             mbox.pack_start(self.qnew_name, False, False, 2)
         else:
             self.qnew_name = None
 
-        label = gtk.Label(_('Recent Commit Messages: '))
-        mbox.pack_start(label, False, False, 2)
-        self.msg_cbbox = gtk.combo_box_new_text()
         liststore = gtk.ListStore(str, str)
         self.msg_cbbox = gtk.ComboBox(liststore)
         cell = gtk.CellRendererText()
         self.msg_cbbox.pack_start(cell, True)
         self.msg_cbbox.add_attribute(cell, 'text', 0)
+        liststore.append([_('Recent Commit Messages...'), ''])
+        self.msg_cbbox.set_active(0)
+        self.popupid = self.msg_cbbox.connect('notify::popup-shown',
+                                              self._first_msg_popdown)
+        self.msg_cbbox.connect('changed', self.changed_cb)
         mbox.pack_start(self.msg_cbbox)
         vbox.pack_start(mbox, False, False)
         self._mru_messages = self.settings.mrul('recent_messages')
-        self._update_recent_messages()
-        self.msg_cbbox.connect('changed', self.changed_cb)
         
         frame = gtk.Frame()
         frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
