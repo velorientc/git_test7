@@ -234,7 +234,7 @@ class ConfigDialog(gtk.Dialog):
         # Create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
-        self.vbox.pack_start(notebook, False, False)
+        self.vbox.pack_start(notebook, True, True)
         notebook.show()
         self.show_tabs = True
         self.show_border = True
