@@ -222,6 +222,7 @@ class DataMineDialog(GDialog):
 
         results = gtk.ListStore(str, str, str, str)
         treeview.set_model(results)
+        treeview.set_search_equal_func(self.search_in_grep)
         for title, width, col, emode in (
                 (_('Rev'), 10, self.COL_REVID, pango.ELLIPSIZE_NONE),
                 (_('File'), 25, self.COL_PATH, pango.ELLIPSIZE_START),
@@ -272,6 +273,17 @@ class DataMineDialog(GDialog):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
         regexp.grab_focus()
+
+    def search_in_grep(self, model, column, key, iter):
+        """Searches all fields shown in the tree when the user hits crtr+f,
+        not just the ones that are set via tree.set_search_column.
+        Case insensitive
+        """
+        key = key.lower()
+        for col in (self.COL_PATH, self.COL_TEXT):
+            if key in model.get_value(iter, col).lower():
+                return False
+        return True
 
     def trigger_search(self, button, objs):
         (model, frame, regexp, follow, ignorecase, 
@@ -454,6 +466,7 @@ class DataMineDialog(GDialog):
 
         results = gtk.ListStore(str, str, str, str, str, str, str)
         treeview.set_model(results)
+        treeview.set_search_equal_func(self.search_in_file)
 
         context_menu = self.ann_header_context_menu(treeview)
         for title, width, col, emode, visible in (
@@ -515,6 +528,17 @@ class DataMineDialog(GDialog):
         graphview.treeview.connect('button-release-event',
                 self._ann_button_release)
         graphview.treeview.connect('popup-menu', self._ann_popup_menu)
+
+    def search_in_file(self, model, column, key, iter):
+        """Searches all fields shown in the tree when the user hits crtr+f,
+        not just the ones that are set via tree.set_search_column.
+        Case insensitive
+        """
+        key = key.lower()
+        for col in (self.COL_USER, self.COL_TEXT):
+            if key in model.get_value(iter, col).lower():
+                return False
+        return True
 
     def toggle_annatate_columns(self, button, treeview, col):
         b = button.get_active()
