@@ -8,7 +8,6 @@ of the GNU General Public License, incorporated herein by reference.
 """
 
 import dumbdbm, anydbm
-saved_default = anydbm._defaultmod
 anydbm._defaultmod = dumbdbm
 
 import os
@@ -87,20 +86,8 @@ class Settings(object):
 
     def read(self):
         self._data.clear()
-        if os.path.exists(self._path):
-            # One-time import of <=0.7 config file
-            anydbm._defaultmod = saved_default
-            dbase = shelve.open(self._path)
-            self._dbappname = dbase['APPNAME']
-            self.version = dbase['VERSION']
-            self._data.update(dbase.get('DATA', {}))
-            dbase.close()
-            anydbm._defaultmod = dumbdbm
-            os.unlink(self._path)
-            return
         if not os.path.exists(self._path+'.dat'):
             return
-
         dbase = shelve.open(self._path)
         self._dbappname = dbase['APPNAME']
         self.version = dbase['VERSION']
@@ -115,7 +102,11 @@ class Settings(object):
         dbase['VERSION'] = Settings.version
         dbase['APPNAME'] = appname
         dbase['DATA'] = data
-        dbase.close()
+        try:
+            dbase.close()
+        except IOError:
+            pass # Don't care too much about permission errors
+
 
     def _get_path(self, appname):
         if os.name == 'nt':
@@ -127,34 +118,7 @@ class Settings(object):
     def _audit(self):
         if os.path.exists(os.path.dirname(self._path)):
             return
-        try:
-            os.makedirs(os.path.dirname(self._path))
-            self._import()
-        except:
-            pass
-
-    def _import(self):
-        # import old settings data dir (TortoiseHg <= 0.7)
-        home = os.path.expanduser('~')
-        if os.name == 'nt':
-            olddir = os.path.join(home, '.tortoisehg', 'settings')
-            newdir = os.path.join(os.environ.get('APPDATA'), 'TortoiseHg')
-            if os.path.isdir(olddir):
-                for f in os.listdir(olddir):
-                    src = os.path.join(olddir, f)
-                    dst = os.path.join(newdir, f)
-                    os.rename(src, dst)
-                os.removedirs(olddir)
-
-        # import old settings data file (TortoiseHg <= 0.3)
-        oldpath = os.path.join(home, '.hgext', 'tortoisehg')
-        if os.path.isfile(oldpath):
-            olddb = shelve.open(oldpath)
-            for key in olddb.keys():
-                self._write(key, olddb[key])
-            olddb.close()
-            os.unlink(oldpath)
-            os.removedirs(os.path.dirname(oldpath))
+        os.makedirs(os.path.dirname(self._path))
 
 def get_system_times():
     t = os.times()
