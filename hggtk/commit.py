@@ -36,6 +36,7 @@ class GCommit(GStatus):
         GStatus.init(self)
         self.mode = 'commit'
         self._last_commit_id = None
+        self.qnew = False
 
     def parse_opts(self):
         GStatus.parse_opts(self)
@@ -61,6 +62,11 @@ class GCommit(GStatus):
         user = self.opts.get('user')
         date = self.opts.get('date')
         pats = ' '.join(self.pats)
+        if self.qnew:
+            return root + ' qnew'
+        elif self.mqmode:
+            patch = self.repo.mq.lookup('qtip')
+            return root + ' qrefresh ' + patch
         return ' '.join([root, 'commit', pats, user, date])
 
     def get_icon(self):
@@ -273,26 +279,32 @@ class GCommit(GStatus):
 
     def _check_patch_queue(self):
         '''See if an MQ patch is applied, switch to qrefresh mode'''
-        mqmode = hasattr(self.repo, 'mq') and self.repo.mq.applied
         self.qheader = None
-        if mqmode:
+        if self.mqmode:
             patch = self.repo.mq.lookup('qtip')
             ph = self.repo.mq.readheaders(patch)
-            title = os.path.basename(self.repo.root) + ' qrefresh ' + patch
-            self.set_title(title)
             self.qheader = '\n'.join(ph.message)
             buf = self.text.get_buffer()
             if buf.get_char_count() == 0 or not buf.get_modified():
                 buf.set_text(self.qheader)
                 buf.set_modified(False)
             c_btn = self.get_toolbutton(_('_Commit'))
-            c_btn.set_label(_('QRefresh'))
-            c_btn.set_tooltip(self.tooltips, self.mqmode and _('QRefresh') or _('QNew'))
+            if self.qnew:
+                c_btn.set_label(_('QNew'))
+                c_btn.set_tooltip(self.tooltips, _('QNew'))
+                self._hg_call_wrapper('Status', self._do_reload_status)
+            else:
+                c_btn.set_label(_('QRefresh'))
+                c_btn.set_tooltip(self.tooltips, _('QRefresh'))
+        elif self.qnew:
+            c_btn = self.get_toolbutton(_('_Commit'))
+            c_btn.set_label(_('QNew'))
+            c_btn.set_tooltip(self.tooltips, _('QNew'))
         else:
             c_btn = self.get_toolbutton(('_Commit'))
             c_btn.set_label(_('_Commit'))
             c_btn.set_tooltip(self.tooltips, _('commit'))
-        self.branchentry.set_sensitive(not mqmode)
+        self.branchentry.set_sensitive(not (self.mqmode or self.qnew))
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
@@ -313,7 +325,7 @@ class GCommit(GStatus):
             commit_list = self._relevant_files(commitable)
             if len(commit_list) > 0:
                 self._commit_selected(commit_list)
-            elif len(self.filemodel) == 0 and self._get_qnew_name():
+            elif len(self.filemodel) == 0 and self.qnew:
                 self._commit_selected([])
             else:
                 Prompt('Nothing Commited', 'No committable files selected', self).run()
@@ -505,9 +517,7 @@ class GCommit(GStatus):
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
         cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
-        qnew = self._get_qnew_name()
-        if qnew:
-            qnew = fromutf(qnew)
+        if self.qnew:
             cmdline[1] = 'qnew'
             cmdline.append('--force')
         elif self.qheader is not None:
@@ -515,8 +525,8 @@ class GCommit(GStatus):
         if self.opts['addremove']:
             cmdline += ['--addremove']
         cmdline += ['--message', fromutf(self.opts['message'])]
-        if qnew:
-            cmdline += [qnew]
+        if self.qnew:
+            cmdline += [fromutf(self._get_qnew_name())]
         cmdline += [self.repo.wjoin(x) for x in files]
         dialog = CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
@@ -530,9 +540,11 @@ class GCommit(GStatus):
             if buf.get_modified():
                 self._update_recent_messages(self.opts['message'])
                 buf.set_modified(False)
-            if qnew:
+            if self.qnew:
                 self.qnew_name.set_text('')
                 self.repo.invalidate()
+                self.state = 'commit'
+                self.qnew = False
                 _mq = self.repo.mq
                 _mq.__init__(_mq.ui, _mq.basepath, _mq.path)
             elif self.qheader is None:
@@ -550,15 +562,12 @@ class GCommit(GStatus):
         return self.qnew_name and self.qnew_name.get_text().strip() or ''
 
     def _qnew_changed(self, element):
-        mqmode = self.mqmode
-        self.mqmode = not self.qnew_name.get_text().strip()
-        if mqmode != self.mqmode:
-            c_btn = self.get_toolbutton(_('_Commit'))
-            c_btn.set_label(self.mqmode and _('QRefresh') or _('QNew'))
-            c_btn.set_tooltip(self.tooltips, self.mqmode and _('QRefresh') or _)('QNew')
-            success, outtext = self._hg_call_wrapper('Status', self._do_reload_status)
+        qnew = bool(self._get_qnew_name())
+        if self.qnew != qnew:
+            self.qnew = qnew
+            self.mode = qnew and 'status' or 'commit'
+            self.reload_status()
             self.qnew_name.grab_focus() # set focus back
-            
 
 def launch(root='', files=[], cwd='', main=True):
     u = ui.ui()
