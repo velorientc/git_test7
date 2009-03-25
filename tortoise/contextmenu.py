@@ -239,6 +239,8 @@ class ContextMenuExtension(menuthg.menuThg):
         if self.fnames:
             cmdline += ['--listfile', '-']
         try:
+            print "run_dialog: cmdline = ", cmdline
+            print "run_dialog: fnames = ", self.fnames
             proc = subprocess.Popen(cmdline,
                            shell=False,
                            cwd=cwd,
