@@ -15,6 +15,7 @@ import os
 import gtk
 import shelve
 import time
+from mercurial.i18n import _
 
 class SimpleMRUList(object):
     def __init__(self, size=10, reflist=[], compact=True):
