@@ -196,12 +196,11 @@ class GLog(GDialog):
         self.curfile = None
         self.opts['rev'] = [] # This option is dangerous - used directly by hg
         self.opts['revs'] = None
-        os.chdir(self.repo.root)  # paths relative to repo root do not work otherwise
+        os.chdir(self.repo.root)  # for paths relative to repo root
 
         if 'filehist' in self.opts:
             self.custombutton.set_active(True)
-            self.graphview.refresh(True, None, self.opts)
-            del self.opts['filehist']
+            self.reload_log({'pats' : [self.opts['filehist']]})
         elif 'revrange' in self.opts:
             self.custombutton.set_active(True)
             self.graphview.refresh(True, None, self.opts)
@@ -210,7 +209,7 @@ class GLog(GDialog):
             self.reload_log()
         elif self.pats:
             self.custombutton.set_active(True)
-            self.graphview.refresh(False, self.pats, self.opts)
+            self.reload_log({'pats' : self.pats})
         else:
             self.reload_log()
 
@@ -270,7 +269,7 @@ class GLog(GDialog):
 
     def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""
-        os.chdir(self.repo.root)  # paths relative to repo root do not work otherwise
+        os.chdir(self.repo.root)  # for paths relative to repo root
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
         self.opts['rev'] = []
@@ -281,12 +280,12 @@ class GLog(GDialog):
         self.opts['date'] = filteropts.get('date', None)
         self.opts['keyword'] = filteropts.get('keyword', [])
         if filteropts:
-            branch = filteropts.get('branch', None)
             if 'revrange' in filteropts or 'branch' in filteropts:
+                branch = filteropts.get('branch', None)
                 self.graphview.refresh(True, branch, self.opts)
             else:
-                pattern = filteropts.get('pats', [])
-                self.graphview.refresh(False, pattern, self.opts)
+                self.pats = filteropts.get('pats', [])
+                self.graphview.refresh(False, self.pats, self.opts)
         elif self._filter == "all":
             self.graphview.refresh(True, None, self.opts)
         elif self._filter == "only_merges":
@@ -465,22 +464,25 @@ class GLog(GDialog):
 
     def _diff_revs(self, menuitem):
         from status import GStatus
-        from gtools import cmdtable
         rev0, rev1 = self._revs
-        statopts = self.merge_opts(cmdtable['gstatus|gst'][1],
+        statopts = self.merge_opts(commands.table['^status|st'][1],
                 ('include', 'exclude', 'git'))
         statopts['rev'] = ['%u:%u' % (rev0, rev1)]
         statopts['modified'] = True
         statopts['added'] = True
         statopts['removed'] = True
-        dialog = GStatus(self.ui, self.repo, self.cwd, [], statopts, False)
+        dialog = GStatus(self.ui, self.repo, self.cwd, self.pats,
+                         statopts, False)
         dialog.display()
         return True
 
     def _vdiff_selected(self, menuitem):
         rev0, rev1 = self._revs
         self.opts['rev'] = ["%s:%s" % (rev0, rev1)]
-        self._diff_file(None, '')
+        if len(self.pats) == 1:
+            self._diff_file(None, self.pats[0])
+        else:
+            self._diff_file(None, '')
 
     def _email_revs(self, menuitem):
         from hgemail import EmailDialog

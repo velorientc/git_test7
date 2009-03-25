@@ -148,13 +148,9 @@ class GStatus(GDialog):
     def get_title(self):
         root = os.path.basename(self.repo.root)
         revs = self.opts.get('rev')
-        if revs:
-            r = ':'.join(revs)
-            return ' '.join([root, 'status', r])
-        elif self.pats:
-            return root + ' filtered status'
-        else:
-            return root + ' status'
+        name = self.pats and 'filtered status' or 'status'
+        r = revs and ':'.join(revs) or ''
+        return ' '.join([root, name, r])
 
     def get_icon(self):
         return 'menushowchanged.ico'

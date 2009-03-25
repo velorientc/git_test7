@@ -660,9 +660,9 @@ class ChangeSet(GDialog):
         if self.glog_parent:
             # If this changeset browser is embedded in glog, send
             # send this event to the main app
-            opts = {'filehist' : self.curfile}
+            opts = {'pats' : [self.curfile]}
             self.glog_parent.custombutton.set_active(True)
-            self.glog_parent.graphview.refresh(True, None, opts)
+            self.glog_parent.reload_log(opts)
         else:
             # Else launch our own GLog instance
             import history
