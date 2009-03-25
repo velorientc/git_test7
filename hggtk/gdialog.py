@@ -22,6 +22,7 @@ pygtk.require('2.0')
 import gtk
 import gobject
 import pango
+import shlex
 
 from mercurial.i18n import _
 from mercurial.node import short
@@ -186,13 +187,32 @@ class GDialog(gtk.Window):
     def test_opt(self, opt):
         return opt in self.opts and self.opts[opt]
 
+    def _parse_extdiff_cmd(self, usercmd):
+        for cmd, path in self.ui.configitems('extdiff'):
+            if cmd.startswith('cmd.'):
+                cmd = cmd[4:]
+                if cmd != usercmd:
+                    continue
+                if not path:
+                    path = cmd
+                diffopts = self.ui.config('extdiff', 'opts.' + cmd, '')
+                diffopts = diffopts and [diffopts] or []
+            elif cmd == usercmd:
+                # command = path opts
+                if path:
+                    diffopts = shlex.split(path)
+                    path = diffopts.pop(0)
+                else:
+                    path, diffopts = cmd, []
+            return path, diffopts
+        return None, None
 
     def _parse_config(self):
         # defaults    
         self.fontcomment = 'monospace 10'
         self.fontdiff = 'monospace 10'
         self.fontlist = 'monospace 9'
-        self.diffopts = ''
+        self.diffopts = []
         self.diffcmd = ''
         self.diffbottom = ''
 
@@ -203,11 +223,11 @@ class GDialog(gtk.Window):
             # default to tortoisehg's configuration
             vdiff = self.ui.config('tortoisehg', 'vdiff', 'vdiff')
             if vdiff:
-                self.diffcmd = self.ui.config('extdiff', 'cmd.'+vdiff) or vdiff
+                self.diffcmd, self.diffopts = self._parse_extdiff_cmd(vdiff)
             else:
                 self.diffcmd = 'diff'
-                if not self.diffopts :
-                    self.diffopts = '-Npru'
+                if not self.diffopts:
+                    self.diffopts = ['-Npru']
 
         if not self.diffbottom:
             self.diffbottom = False
@@ -359,7 +379,7 @@ class GDialog(gtk.Window):
 
     def _diff_file(self, stat, file):
         def dodiff():
-            extdiff.dodiff(self.ui, self.repo, self.diffcmd, [self.diffopts],
+            extdiff.dodiff(self.ui, self.repo, self.diffcmd, self.diffopts,
                             [self.repo.wjoin(file)], self.opts)
 
         if self.diffcmd == 'diff':
