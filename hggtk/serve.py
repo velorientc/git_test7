@@ -5,12 +5,8 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
+import pygtk
+pygtk.require("2.0")
 import gtk
 import gobject
 import httplib
@@ -23,6 +19,7 @@ import threading
 import time
 import hglib
 from dialog import question_dialog, error_dialog
+from mercurial.i18n import _
 from mercurial import hg, ui, commands, cmdutil, util
 from mercurial.hgweb import server
 from mercurial.i18n import _
@@ -58,22 +55,23 @@ class ServeDialog(gtk.Window):
         
         # toolbar
         self.tbar = gtk.Toolbar()
+        self.tooltips = gtk.Tooltips()
         self._button_start = self._toolbutton(gtk.STOCK_MEDIA_PLAY,
-                                              'Start', 
+                                              _('Start'),
                                               self._on_start_clicked,
-                                              None)
+                                              tip=_('Start server'))
         self._button_stop  = self._toolbutton(gtk.STOCK_MEDIA_STOP,
-                                              'Stop',
+                                              _('Stop'),
                                               self._on_stop_clicked,
-                                              None)
+                                              tip=_('Stop server'))
         self._button_browse = self._toolbutton(gtk.STOCK_HOME,
-                                              'Browse',
+                                              _('Browse'),
                                               self._on_browse_clicked,
-                                              None)
+                                              tip=_('Launch browser to view repository'))
         self._button_conf = self._toolbutton(gtk.STOCK_PREFERENCES,
-                                              'Configure',
+                                              _('Configure'),
                                               self._on_conf_clicked,
-                                              None)
+                                              tip=_('Configure web settings'))
 
         tbuttons = [
                 self._button_start,
@@ -92,8 +90,8 @@ class ServeDialog(gtk.Window):
         
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label("HTTP Port:")
-        lbl.set_property("width-chars", 16)
+        lbl = gtk.Label(_('HTTP Port:'))
+        lbl.set_property('width-chars', 16)
         lbl.set_alignment(0, 0.5)
         self._port_input = gtk.Entry()
         self._port_input.set_text(self.defport)
@@ -106,7 +104,7 @@ class ServeDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription("Monospace"))
+        self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
@@ -117,7 +115,7 @@ class ServeDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=self._root)
         except hglib.RepoError:
-            print 'no repository found'
+            print _('no repository found')
             gtk.main_quit()
         self.defport = repo.ui.config('web', 'port') or '8000'
         self.webname = repo.ui.config('web', 'name') or \
@@ -127,13 +125,17 @@ class ServeDialog(gtk.Window):
         else:
             self.set_title("hg serve - " + self.webname)
 
-    def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
+    def _toolbutton(self, stock, label, handler, menu=None,
+            userdata=None, tip=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
             
+        if tip:
+            tbutton.set_tooltip(self.tooltips, tip)
+        
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
@@ -149,9 +151,9 @@ class ServeDialog(gtk.Window):
         check if server is running, or to terminate if running
         '''
         if gservice and not gservice.stopped:
-            if question_dialog(self, "Really Exit?",
-                    "Server process is still running\n" +
-                    "Exiting will stop the server.") != gtk.RESPONSE_YES:
+            if question_dialog(self, _('Really Exit?'),
+                    _('Server process is still running\n'
+                      'Exiting will stop the server.')) != gtk.RESPONSE_YES:
                 return False
             else:
                 self._stop_server()
@@ -215,8 +217,8 @@ class ServeDialog(gtk.Window):
         except:
             try: port = int(self.defport)
             except: port = 8000
-            error_dialog(self, "Invalid port 2048..65535", "Defaulting to " +
-                    self.defport)
+            error_dialog(self, _('Invalid port 2048..65535'),
+                    _('Defaulting to ') + self.defport)
         
         global gservice
         gservice = None

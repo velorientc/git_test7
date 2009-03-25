@@ -9,6 +9,7 @@ import gtk
 import gobject
 import os
 import pango
+from mercurial.i18n import _
 from mercurial import hg, ui, cmdutil, util
 from dialog import error_dialog, question_dialog
 from hglib import RepoError, toutf, fromutf
@@ -16,181 +17,180 @@ import shlib
 import shelve
 import iniparse
 
-_unspecstr = '<unspecified>'
+_unspecstr = _('<unspecified>')
 
 _tortoise_info = (
-    ('3-way Merge Tool', 'ui.merge', [],
-        'Graphical merge program for resolving merge conflicts.  If left'
+    (_('3-way Merge Tool'), 'ui.merge', [],
+        _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
         ' on your system or use its internal merge tool that leaves conflict'
-        ' markers in place.'),
-    ('Visual Diff Command', 'tortoisehg.vdiff', [],
-        'Specify visual diff tool; must be an extdiff command'),
-    ('Visual Editor', 'tortoisehg.editor', [],
-        'Specify the visual editor used to view files, etc'),
-    ('CLI Editor', 'ui.editor', [],
-        'The editor to use during a commit and other'
+        ' markers in place.')),
+    (_('Visual Diff Command'), 'tortoisehg.vdiff', [],
+        _('Specify visual diff tool; must be an extdiff command')),
+    (_('Visual Editor'), 'tortoisehg.editor', [],
+        _('Specify the visual editor used to view files, etc')),
+    (_('CLI Editor'), 'ui.editor', [],
+        _('The editor to use during a commit and other'
         ' instances where Mercurial needs multiline input from'
-        ' the user.  Only used by command line interface commands.'),
-    ('Tab Width', 'tortoisehg.tabwidth', [],
-        'Specify the number of spaces that tabs expand to in various'
+        ' the user.  Only used by command line interface commands.')),
+    (_('Tab Width'), 'tortoisehg.tabwidth', [],
+        _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHG windows.'
-        ' Default: Not expanded'),
-    ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
-        'Show the diff panel below the file list in status, shelve, and'
+        ' Default: Not expanded')),
+    (_('Bottom Diffs'), 'gtools.diffbottom', ['False', 'True'],
+        _('Show the diff panel below the file list in status, shelve, and'
         ' commit dialogs.'
-        ' Default: False (show diffs to right of file list)'),
-    ('Overlay Icons', 'tortoisehg.overlayicons',
+        ' Default: False (show diffs to right of file list)')),
+    (_('Overlay Icons'), 'tortoisehg.overlayicons',
         ['False', 'True', 'localdisks'],
-        'Display overlay icons in Explorer windows.'
-        ' Default: True'))
+        _('Display overlay icons in Explorer windows.'
+        ' Default: True')))
 
 _commit_info = (
-    ('Username', 'ui.username', [], 
-        'Name associated with commits'),
-    ('External Commit Tool', 'tortoisehg.extcommit', ['None', 'qct'],
-        'Select commit tool launched by TortoiseHg. (Qct is no longer'
+    (_('Username'), 'ui.username', [], 
+        _('Name associated with commits')),
+    (_('External Commit Tool'), 'tortoisehg.extcommit', ['None', 'qct'],
+        _('Select commit tool launched by TortoiseHg. (Qct is no longer'
         ' distributed as part of TortoiseHG.)'
-        ' Default: None (use the builtin tool)'))
+        ' Default: None (use the builtin tool)')))
 
 _log_info = (
-    ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
-        'Color changesets by author name.  If not enabled,'
+    (_('Author Coloring'), 'tortoisehg.authorcolor', ['False', 'True'],
+        _('Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
         ' non-trivial parents, black for normal.'
-        ' Default: False'),
-    ('Long Summary', 'tortoisehg.longsummary', ['False', 'True'],
-        'If true, concatenate multiple lines of changeset summary'
+        ' Default: False')),
+    (_('Long Summary'), 'tortoisehg.longsummary', ['False', 'True'],
+        _('If true, concatenate multiple lines of changeset summary'
         ' until they reach 80 characters.'
-        ' Default: False'),
-    ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
-        'The number of revisions to read and display in the'
+        ' Default: False')),
+    (_('Log Batch Size'), 'tortoisehg.graphlimit', ['500'],
+        _('The number of revisions to read and display in the'
         ' changelog viewer in a single batch.'
-        ' Default: 500'),
-    ('Copy Hash', 'tortoisehg.copyhash', ['False', 'True'],
-        'Allow the changelog viewer to copy the changeset hash'
+        ' Default: 500')),
+    (_('Copy Hash'), 'tortoisehg.copyhash', ['False', 'True'],
+        _('Allow the changelog viewer to copy the changeset hash'
         ' of the currently selected changeset into the clipboard.'
-        ' Default: False'))
+        ' Default: False')))
 
 _paths_info = (
     ('default', 'paths.default', [],
-        'Directory or URL to use when pulling, if no source is specified.'
+        _('Directory or URL to use when pulling, if no source is specified.'
         ' Default is set to the repository from which the repository'
-        ' was cloned.'),
+        ' was cloned.')),
     ('default-push', 'paths.default-push', [],
-        'Optional. Directory or URL to use when pushing, if no'
-        ' destination is specified.'))
+        _('Optional. Directory or URL to use when pushing, if no'
+        ' destination is specified.')))
 
 _web_info = (
-    ('Name', 'web.name', ['unknown'],
-        'Repository name to use in the web interface.'
-        ' Default is the working directory.'),
-    ('Description', 'web.description', ['unknown'],
-        "Textual description of the repository's purpose or"
-        " contents."),
-    ('Contact', 'web.contact', ['unknown'],
-        'Name or email address of the person in charge of the'
-        ' repository.'),
-    ('Style', 'web.style',
+    (_('Name'), 'web.name', ['unknown'],
+        _('Repository name to use in the web interface.'
+        ' Default is the working directory.')),
+    (_('Description'), 'web.description', ['unknown'],
+        _("Textual description of the repository's purpose or"
+        " contents.")),
+    (_('Contact'), 'web.contact', ['unknown'],
+        _('Name or email address of the person in charge of the'
+        ' repository.')),
+    (_('Style'), 'web.style',
         ['paper', 'monoblue', 'coal', 'spartan', 'gitweb', 'old'],
-        'Which template map style to use'),
-    ('Archive Formats', 'web.allow_archive', ['bz2', 'gz', 'zip'],
-        'Comma separated list of archive formats allowed for'
-        ' downloading'),
-    ('Port', 'web.port', ['8000'], 'Port to listen on'),
-    ('Push Requires SSL', 'web.push_ssl', ['True', 'False'],
-        'Whether to require that inbound pushes be transported'
-        ' over SSL to prevent password sniffing.'),
-    ('Stripes', 'web.stripes', ['1', '0'],
-        'How many lines a "zebra stripe" should span in multiline output.'
-        ' Default is 1; set to 0 to disable.'),
-    ('Max Files', 'web.maxfiles', ['10'],
-        'Maximum number of files to list per changeset.'),
-    ('Max Changes', 'web.maxfiles', ['10'],
-        'Maximum number of changes to list on the changelog.'),
-    ('Allow Push', 'web.allow_push', ['*'],
-        'Whether to allow pushing to the repository. If empty or not'
+        _('Which template map style to use')),
+    (_('Archive Formats'), 'web.allow_archive', ['bz2', 'gz', 'zip'],
+        _('Comma separated list of archive formats allowed for'
+        ' downloading')),
+    (_('Port'), 'web.port', ['8000'], _('Port to listen on')),
+    (_('Push Requires SSL'), 'web.push_ssl', ['True', 'False'],
+        _('Whether to require that inbound pushes be transported'
+        ' over SSL to prevent password sniffing.')),
+    (_('Stripes'), 'web.stripes', ['1', '0'],
+        _('How many lines a "zebra stripe" should span in multiline output.'
+        ' Default is 1; set to 0 to disable.')),
+    (_('Max Files'), 'web.maxfiles', ['10'],
+        _('Maximum number of files to list per changeset.')),
+    (_('Max Changes'), 'web.maxfiles', ['10'],
+        _('Maximum number of changes to list on the changelog.')),
+    (_('Allow Push'), 'web.allow_push', ['*'],
+        _('Whether to allow pushing to the repository. If empty or not'
         ' set, push is not allowed. If the special value "*", any remote'
         ' user can push, including unauthenticated users. Otherwise, the'
         ' remote user must have been authenticated, and the authenticated'
         ' user name must be present in this list (separated by whitespace'
         ' or ","). The contents of the allow_push list are examined after'
-        ' the deny_push list.'),
-    ('Deny Push', 'web.deny_push', ['*'],
-        'Whether to deny pushing to the repository. If empty or not set,'
+        ' the deny_push list.')),
+    (_('Deny Push'), 'web.deny_push', ['*'],
+        _('Whether to deny pushing to the repository. If empty or not set,'
         ' push is not denied. If the special value "*", all remote users'
         ' are denied push. Otherwise, unauthenticated users are all'
         ' denied, and any authenticated user name present in this list'
         ' (separated by whitespace or ",") is also denied. The contents'
-        ' of the deny_push list are examined before the allow_push list.'),
-    ('Encoding', 'web.encoding', ['UTF-8'],
-        'Character encoding name'))
+        ' of the deny_push list are examined before the allow_push list.')),
+    (_('Encoding'), 'web.encoding', ['UTF-8'],
+        _('Character encoding name')))
 
 _proxy_info = (
-    ('Host', 'http_proxy.host', [],
-        'Host name and (optional) port of proxy server, for'
-        ' example "myproxy:8000"'),
-    ('Bypass List', 'http_proxy.no', [],
-        'Optional. Comma-separated list of host names that'
-        ' should bypass the proxy'),
-    ('Password', 'http_proxy.passwd', [],
-        'Optional. Password to authenticate with at the'
-        ' proxy server'),
-    ('User', 'http_proxy.user', [],
-        'Optional. User name to authenticate with at the'
-        ' proxy server'))
+    (_('Host'), 'http_proxy.host', [],
+        _('Host name and (optional) port of proxy server, for'
+        ' example "myproxy:8000"')),
+    (_('Bypass List'), 'http_proxy.no', [],
+        _('Optional. Comma-separated list of host names that'
+        ' should bypass the proxy')),
+    (_('Password'), 'http_proxy.passwd', [],
+        _('Optional. Password to authenticate with at the'
+        ' proxy server')),
+    (_('User'), 'http_proxy.user', [],
+        _('Optional. User name to authenticate with at the'
+        ' proxy server')))
 
 _email_info = (
-    ('From', 'email.from', [],
-        'Email address to use in the "From" header and for the SMTP envelope'),
-    ('To', 'email.to', [],
-        'Comma-separated list of recipient email addresses'),
-    ('Cc', 'email.cc', [],
-        'Comma-separated list of carbon copy recipient email'
-        ' addresses'),
-    ('Bcc', 'email.bcc', [],
-        'Comma-separated list of blind carbon copy recipient'
-        ' email addresses'),
-    ('method', 'email.method', ['smtp'],
-'Optional. Method to use to send email messages. If value is "smtp" (default),'
+    (_('From'), 'email.from', [],
+        _('Email address to use in the "From" header and for the SMTP envelope')),
+    (_('To'), 'email.to', [],
+        _('Comma-separated list of recipient email addresses')),
+    (_('Cc'), 'email.cc', [],
+        _('Comma-separated list of carbon copy recipient email'
+        ' addresses')),
+    (_('Bcc'), 'email.bcc', [],
+        _('Comma-separated list of blind carbon copy recipient'
+        ' email addresses')),
+    (_('method'), 'email.method', ['smtp'],
+_('Optional. Method to use to send email messages. If value is "smtp" (default),'
 ' use SMTP (configured below).  Otherwise, use as name of program to run that'
 ' acts like sendmail (takes "-f" option for sender, list of recipients on'
 ' command line, message on stdin). Normally, setting this to "sendmail" or'
-' "/usr/sbin/sendmail" is enough to use sendmail to send messages.'),
-    ('SMTP Host', 'smtp.host', [], 'Host name of mail server'),
-    ('SMTP Port', 'smtp.port', ['25'],
-        'Port to connect to on mail server.'
-        ' Default: 25'),
-    ('SMTP TLS', 'smtp.tls', ['False', 'True'],
-        'Connect to mail server using TLS.'
-        ' Default: False'),
-    ('SMTP Username', 'smtp.username', [],
-        'Username to authenticate to mail server with'),
-    ('SMTP Password', 'smtp.password', [],
-        'Password to authenticate to mail server with'),
-    ('Local Hostname', 'smtp.local_hostname', [],
-        'Hostname the sender can use to identify itself to the mail server.'))
+' "/usr/sbin/sendmail" is enough to use sendmail to send messages.')),
+    (_('SMTP Host'), 'smtp.host', [], _('Host name of mail server')),
+    (_('SMTP Port'), 'smtp.port', ['25'],
+        _('Port to connect to on mail server.'
+        ' Default: 25')),
+    (_('SMTP TLS'), 'smtp.tls', ['False', 'True'],
+        _('Connect to mail server using TLS.'
+        ' Default: False')),
+    (_('SMTP Username'), 'smtp.username', [],
+        _('Username to authenticate to mail server with')),
+    (_('SMTP Password'), 'smtp.password', [],
+        _('Password to authenticate to mail server with')),
+    (_('Local Hostname'), 'smtp.local_hostname', [],
+        _('Hostname the sender can use to identify itself to the mail server.')))
 
 _diff_info = (
-    ('Git Format', 'diff.git', ['False', 'True'],
-        'Use git extended diff header format.'
-        ' Default: False'),
-    ('No Dates', 'diff.nodates', ['False', 'True'],
-        'Do not include modification dates in diff headers.'
-        ' Default: False'),
-    ('Show Function', 'diff.showfunc', ['False', 'True'],
-        'Show which function each change is in.'
-        ' Default: False'),
-    ('Ignore White Space', 'diff.ignorews', ['False', 'True'],
-        'Ignore white space when comparing lines.'
-        ' Default: False'),
-    ('Ignore WS Amount', 'diff.ignorewsamount', ['False', 'True'],
-        'Ignore changes in the amount of white space.'
-        ' Default: False'),
-    ('Ignore Blank Lines', 'diff.ignoreblanklines',
-        ['False', 'True'],
-        'Ignore changes whose lines are all blank.'
-        ' Default: False'))
+    (_('Git Format'), 'diff.git', ['False', 'True'],
+        _('Use git extended diff header format.'
+        ' Default: False')),
+    (_('No Dates'), 'diff.nodates', ['False', 'True'],
+        _('Do not include modification dates in diff headers.'
+        ' Default: False')),
+    (_('Show Function'), 'diff.showfunc', ['False', 'True'],
+        _('Show which function each change is in.'
+        ' Default: False')),
+    (_('Ignore White Space'), 'diff.ignorews', ['False', 'True'],
+        _('Ignore white space when comparing lines.'
+        ' Default: False')),
+    (_('Ignore WS Amount'), 'diff.ignorewsamount', ['False', 'True'],
+        _('Ignore changes in the amount of white space.'
+        ' Default: False')),
+    (_('Ignore Blank Lines'), 'diff.ignoreblanklines', ['False', 'True'],
+        _('Ignore changes whose lines are all blank.'
+        ' Default: False')))
 
 class ConfigDialog(gtk.Dialog):
     def __init__(self, root='',
@@ -207,7 +207,8 @@ class ConfigDialog(gtk.Dialog):
         except RepoError:
             repo = None
             if configrepo:
-                error_dialog(self, 'No repository found', 'no repo at ' + root)
+                error_dialog(self, _('No repository found'),
+                             _('no repo at ') + root)
                 self.response(gtk.RESPONSE_CANCEL)
 
         # Catch close events
@@ -219,12 +220,12 @@ class ConfigDialog(gtk.Dialog):
             self.ui = repo.ui
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.set_title('TortoiseHg Configure Repository - ' + name)
+            self.set_title(_('TortoiseHg Configure Repository - ') + name)
             shlib.set_tortoise_icon(self, 'settings_repo.ico')
             self.root = repo.root
         else:
             self.rcpath = util.user_rcpath()
-            self.set_title('TortoiseHg Configure User-Global Settings')
+            self.set_title(_('TortoiseHg Configure User-Global Settings'))
             shlib.set_tortoise_icon(self, 'settings_user.ico')
             self.root = None
 
@@ -233,12 +234,12 @@ class ConfigDialog(gtk.Dialog):
         # Create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
-        self.vbox.pack_start(notebook, False, False)
+        self.vbox.pack_start(notebook, True, True)
         notebook.show()
         self.show_tabs = True
         self.show_border = True
 
-        self._btn_apply = gtk.Button("Apply")
+        self._btn_apply = gtk.Button(_('Apply'))
         self._btn_apply.connect('clicked', self._apply_clicked)
         self.action_area.pack_end(self._btn_apply)
 
@@ -251,13 +252,13 @@ class ConfigDialog(gtk.Dialog):
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
         self.fill_frame(self.tortoise_frame, _tortoise_info)
 
-        self.commit_frame = self.add_page(notebook, 'Commit')
+        self.commit_frame = self.add_page(notebook, _('Commit'))
         self.fill_frame(self.commit_frame, _commit_info)
 
-        self.log_frame = self.add_page(notebook, 'Changelog')
+        self.log_frame = self.add_page(notebook, _('Changelog'))
         self.fill_frame(self.log_frame, _log_info)
 
-        self.paths_frame = self.add_page(notebook, 'Paths')
+        self.paths_frame = self.add_page(notebook, _('Paths'))
         vbox = self.fill_frame(self.paths_frame, _paths_info)
 
         # Initialize data model for 'Paths' tab
@@ -275,18 +276,19 @@ class ConfigDialog(gtk.Dialog):
         # Define view model for 'Paths' tab
         self.pathtree = gtk.TreeView()
         self.pathtree.set_model(self.pathdata)
+        self.pathtree.set_enable_search(False)
         self.pathtree.connect("cursor-changed", self._pathtree_changed)
         
         renderer = gtk.CellRendererText()
         renderer.set_property('editable', True)
         renderer.connect('edited', self.on_alias_edit)
-        column = gtk.TreeViewColumn('Alias', renderer, text=0)
+        column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
         self.pathtree.append_column(column)
         
         renderer = gtk.CellRendererText()
         renderer.set_property('editable', True)
         renderer.connect('edited', self.on_path_edit)
-        column = gtk.TreeViewColumn('Repository Path', renderer, text=1)
+        column = gtk.TreeViewColumn(_('Repository Path'), renderer, text=1)
         self.pathtree.append_column(column)
         
         scrolledwindow = gtk.ScrolledWindow()
@@ -295,17 +297,17 @@ class ConfigDialog(gtk.Dialog):
         vbox.add(scrolledwindow)
 
         buttonbox = gtk.HBox()
-        self.addButton = gtk.Button("_Add")
+        self.addButton = gtk.Button(_('_Add'))
         self.addButton.set_use_underline(True)
         self.addButton.connect('clicked', self._add_path)
         buttonbox.pack_start(self.addButton)
 
-        self._delpathbutton = gtk.Button("_Remove")
+        self._delpathbutton = gtk.Button(_('_Remove'))
         self._delpathbutton.set_use_underline(True)
         self._delpathbutton.connect('clicked', self._remove_path)
         buttonbox.pack_start(self._delpathbutton)
 
-        self._testpathbutton = gtk.Button("_Test")
+        self._testpathbutton = gtk.Button(_('_Test'))
         self._testpathbutton.set_use_underline(True)
         self._testpathbutton.connect('clicked', self._test_path)
         buttonbox.pack_start(self._testpathbutton)
@@ -313,16 +315,16 @@ class ConfigDialog(gtk.Dialog):
         vbox.pack_start(buttonbox, False, False, 4)
         self.refresh_path_list()
 
-        self.web_frame = self.add_page(notebook, 'Web')
+        self.web_frame = self.add_page(notebook, _('Web'))
         self.fill_frame(self.web_frame, _web_info)
 
-        self.proxy_frame = self.add_page(notebook, 'Proxy')
+        self.proxy_frame = self.add_page(notebook, _('Proxy'))
         self.fill_frame(self.proxy_frame, _proxy_info)
 
-        self.email_frame = self.add_page(notebook, 'Email')
+        self.email_frame = self.add_page(notebook, _('Email'))
         self.fill_frame(self.email_frame, _email_info)
 
-        self.diff_frame = self.add_page(notebook, 'Diff')
+        self.diff_frame = self.add_page(notebook, _('Diff'))
         self.fill_frame(self.diff_frame, _diff_info)
 
         # Force dialog into clean state in the beginning
@@ -335,9 +337,9 @@ class ConfigDialog(gtk.Dialog):
 
     def _response(self, widget, response_id):
         if self.dirty:
-            if question_dialog(self, 'Quit without saving?',
-                'Yes to abandon changes, No to continue') != gtk.RESPONSE_YES:
-                widget.emit_stop_by_name('response')
+            if question_dialog(self, _('Quit without saving?'),
+               _('Yes to abandon changes, No to continue')) != gtk.RESPONSE_YES:
+               widget.emit_stop_by_name('response')
 
     def focus_field(self, focusfield):
         '''Set page and focus to requested datum'''
@@ -402,8 +404,8 @@ class ConfigDialog(gtk.Dialog):
         if not selection.count_selected_rows():
             return
         if not self.root:
-            error_dialog(self, 'No Repository Found', 
-                    'Path testing cannot work without a repository')
+            error_dialog(self, _('No Repository Found'),
+                    _('Path testing cannot work without a repository'))
             return
         model, path = selection.get_selected()
         testpath = fromutf(model[path][1])
@@ -436,12 +438,12 @@ class ConfigDialog(gtk.Dialog):
     def fill_frame(self, frame, info):
         widgets = []
 
-        descframe = gtk.Frame('Description')
+        descframe = gtk.Frame(_('Description'))
         desctext = gtk.TextView()
         desctext.set_wrap_mode(gtk.WRAP_WORD)
         desctext.set_editable(False)
         scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(desctext)
         descframe.add(scrolledwindow)
 
@@ -456,8 +458,8 @@ class ConfigDialog(gtk.Dialog):
         for row, (label, cpath, values, tooltip) in enumerate(info):
             vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
-            combo.connect("changed", self.dirty_event)
-            combo.child.connect("focus-in-event", self.set_help,
+            combo.connect('changed', self.dirty_event)
+            combo.child.connect('focus-in-event', self.set_help,
                     desctext.get_buffer(), tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
             combo.child.set_width_chars(40)
@@ -509,7 +511,7 @@ class ConfigDialog(gtk.Dialog):
                 currow = None
                 vlist.append([_unspecstr, False])
                 if values:
-                    vlist.append(['Suggested', True])
+                    vlist.append([_('Suggested'), True])
                     for v in values:
                         vlist.append([toutf(v), False])
                         if v == curvalue:
@@ -519,7 +521,7 @@ class ConfigDialog(gtk.Dialog):
                     for v in self.history.mrul(cpath):
                         if v in values: continue
                         if not separator:
-                            vlist.append(['History', True])
+                            vlist.append([_('History'), True])
                             separator = True
                         vlist.append([toutf(v), False])
                         if v == curvalue:
@@ -556,8 +558,8 @@ class ConfigDialog(gtk.Dialog):
                 break
         else:
             fn = rcpath[0]
-            f = open(fn, "w")
-            f.write("# Generated by tortoisehg-config\n")
+            f = open(fn, 'w')
+            f.write(_('# Generated by tortoisehg-config\n'))
             f.close()
         self.fn = fn
         return iniparse.INIConfig(file(fn), optionxformvalue=None)
@@ -618,7 +620,7 @@ class ConfigDialog(gtk.Dialog):
             f.write(str(self.ini))
             f.close()
         except IOError, e:
-            error_dialog(self, 'Unable to write configuration file', str(e))
+            error_dialog(self, _('Unable to write configuration file'), str(e))
 
         self._btn_apply.set_sensitive(False)
         self.dirty = False

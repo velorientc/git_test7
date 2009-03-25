@@ -14,6 +14,7 @@ import shlib
 import Queue
 import thread2
 from dialog import error_dialog
+from mercurial.i18n import _
 from mercurial import hg, ui, mdiff, cmdutil, match, util, commands
 from hglib import toutf, fromutf, diffexpand, rootpath
 from shlib import set_tortoise_icon
@@ -46,7 +47,7 @@ class DetectRenameDialog(gtk.Window):
 
         self.root = root
         self.notify_func = None
-        self.set_title('Detect Copies/Renames in %s' % os.path.basename(root))
+        self.set_title(_('Detect Copies/Renames in %s') % os.path.basename(root))
         settings = shlib.Settings('rename')
         dims = settings.get_value('dims', (800, 600))
         self.set_default_size(dims[0], dims[1])
@@ -55,7 +56,7 @@ class DetectRenameDialog(gtk.Window):
         value = settings.get_value('percent', None)
         if value: adjustment.set_value(value)
         hscale = gtk.HScale(adjustment)
-        frame = gtk.Frame('Minimum Simularity Percentage')
+        frame = gtk.Frame(_('Minimum Simularity Percentage'))
         frame.add(hscale)
         topvbox = gtk.VBox()
         topvbox.pack_start(frame, False, False, 2)
@@ -75,8 +76,8 @@ class DetectRenameDialog(gtk.Window):
 
         vbox = gtk.VBox()
         vbox.pack_start(scroller, True, True, 2)
-        fr = gtk.Button('Find Renames')
-        fc = gtk.Button('Find Copies')
+        fr = gtk.Button(_('Find Renames'))
+        fc = gtk.Button(_('Find Copies'))
         hbox = gtk.HBox()
         hbox.pack_start(fr, False, False, 2)
         hbox.pack_start(fc, False, False, 2)
@@ -84,7 +85,7 @@ class DetectRenameDialog(gtk.Window):
         fr.set_sensitive(False)
         fc.set_sensitive(False)
 
-        unknownframe = gtk.Frame('Unrevisioned Files')
+        unknownframe = gtk.Frame(_('Unrevisioned Files'))
         unknownframe.add(vbox)
 
         # source, dest, percent match, sensitive
@@ -96,22 +97,22 @@ class DetectRenameDialog(gtk.Window):
         ctree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 
         cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 30)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_START)
-        col = gtk.TreeViewColumn('Source', cell, text=1, sensitive=5)
+        cell.set_property('width-chars', 30)
+        cell.set_property('ellipsize', pango.ELLIPSIZE_START)
+        col = gtk.TreeViewColumn(_('Source'), cell, text=1, sensitive=5)
         col.set_resizable(True)
         ctree.append_column(col)
 
         cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 30)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_START)
-        col = gtk.TreeViewColumn('Dest', cell, text=3, sensitive=5)
+        cell.set_property('width-chars', 30)
+        cell.set_property('ellipsize', pango.ELLIPSIZE_START)
+        col = gtk.TreeViewColumn(_('Dest'), cell, text=3, sensitive=5)
         col.set_resizable(True)
         ctree.append_column(col)
 
         cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 5)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_NONE)
+        cell.set_property('width-chars', 5)
+        cell.set_property('ellipsize', pango.ELLIPSIZE_NONE)
         col = gtk.TreeViewColumn('%', cell, text=4, sensitive=5)
         col.set_resizable(True)
         ctree.append_column(col)
@@ -123,13 +124,13 @@ class DetectRenameDialog(gtk.Window):
         stbar = gtklib.StatusBar()
         vbox = gtk.VBox()
         vbox.pack_start(scroller, True, True, 2)
-        ac = gtk.Button('Accept Match')
+        ac = gtk.Button(_('Accept Match'))
         hbox = gtk.HBox()
         hbox.pack_start(ac, False, False, 2)
         vbox.pack_start(hbox, False, False, 2)
         ac.set_sensitive(False)
 
-        candidateframe = gtk.Frame('Candidate Matches')
+        candidateframe = gtk.Frame(_('Candidate Matches'))
         candidateframe.add(vbox)
 
         hpaned = gtk.HPaned()
@@ -140,7 +141,7 @@ class DetectRenameDialog(gtk.Window):
 
         topvbox.pack_start(hpaned, True, True, 2)
 
-        diffframe = gtk.Frame('Differences from Source to Dest')
+        diffframe = gtk.Frame(_('Differences from Source to Dest'))
         diffframe.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -237,7 +238,7 @@ class DetectRenameDialog(gtk.Window):
                 args=(self.root, q, tgts, adj))
         thread.start()
         stbar.begin()
-        stbar.set_status_text('finding source of ' + ', '.join(tgts))
+        stbar.set_status_text(_('finding source of ') + ', '.join(tgts))
         gobject.timeout_add(50, self.search_wait, thread, q, cmodel, stbar)
 
     def search_thread(self, root, q, tgts, adj):
@@ -349,7 +350,7 @@ class DetectRenameDialog(gtk.Window):
             opts = mdiff.defaultopts
             difftext = mdiff.unidiff(rr, '', aa, '', src, dest, None, opts=opts)
             if not difftext:
-                l = '== %s and %s have identical contents ==\n\n' % (src, dest)
+                l = _('== %s and %s have identical contents ==\n\n') % (src, dest)
                 buf.insert(bufiter, l)
                 continue
             difflines = difftext.splitlines(True)
@@ -425,14 +426,14 @@ def rename_resp(dialog, response):
             commands.rename(repo.ui, repo, dialog.orig, new_name, **opts)
             toquit = True
         except (util.Abort, RepoError), inst:
-            error_dialog(None, 'rename error', str(inst))
+            error_dialog(None, _('rename error'), str(inst))
             toquit = False
     finally:
         sys.stderr = saved
         textout = errors.getvalue() + repo.ui.popbuffer() 
         errors.close()
         if len(textout) > 1:
-            error_dialog(None, 'rename error', textout)
+            error_dialog(None, _('rename error'), textout)
         elif toquit:
             gtk.main_quit()
 

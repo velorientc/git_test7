@@ -14,6 +14,7 @@ import os
 import gtk
 import shelve
 import time
+from mercurial.i18n import _
 
 class SimpleMRUList(object):
     def __init__(self, size=10, reflist=[], compact=True):
@@ -127,11 +128,12 @@ def get_system_times():
     return t
     
 def set_tortoise_icon(window, thgicon):
-    window.set_icon_from_file(get_tortoise_icon(thgicon))
+    ico = get_tortoise_icon(thgicon)
+    if ico: window.set_icon_from_file(ico)
     # Global keybindings for TortoiseHg
-    window.connect('key-press-event', window_key)
+    window.connect('key-press-event', window_key_press)
 
-def window_key(window, event):
+def window_key_press(window, event):
     if event.keyval == ord('q') and (event.state & gtk.gdk.CONTROL_MASK):
         devent = gtk.gdk.Event(gtk.gdk.DELETE)
         window.emit('delete_event', devent)
@@ -145,9 +147,11 @@ def get_tortoise_icon(thgicon):
         # Else try relative paths from hggtk, the repository layout
         fdir = os.path.dirname(__file__)
         paths.append(os.path.join(fdir, '..', 'icons'))
-        # ... or the source installer layout
+        # ... or the unix installer layout
         paths.append(os.path.join(fdir, '..', '..', '..',
-            'share', 'tortoisehg', 'icons'))
+            'share', 'pixmaps', 'tortoisehg', 'icons'))
+        paths.append(os.path.join(fdir, '..', '..', '..', '..',
+            'share', 'pixmaps', 'tortoisehg', 'icons'))
     except NameError: # __file__ is not always available
         pass
     for p in paths:
@@ -155,7 +159,7 @@ def get_tortoise_icon(thgicon):
         if os.path.isfile(path):
             return path
     else:
-        print 'icon not found', thgicon
+        print _('icon not found'), thgicon
         return None
 
 def version():
@@ -163,7 +167,7 @@ def version():
         import __version__
         return __version__.version
     except ImportError:
-        return 'unknown'
+        return _('unknown')
 
 if os.name == 'nt':
     def shell_notify(paths):
@@ -178,8 +182,7 @@ if os.name == 'nt':
                 continue
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
                                  shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSH,
-                                 pidl,
-                                 None)
+                                 pidl, None)
 else:
     def shell_notify(paths):
         pass

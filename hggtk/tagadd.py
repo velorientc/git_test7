@@ -4,12 +4,8 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
+import pygtk
+pygtk.require("2.0")
 import os
 import gtk
 from dialog import question_dialog, error_dialog, info_dialog
@@ -25,8 +21,8 @@ class TagAddDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         # set dialog title
-        title = "hg tag "
-        title += " - %s" % (root or os.getcwd())
+        title = 'hg tag '
+        title += ' - %s' % (root or os.getcwd())
         self.set_title(title)
 
         self.root = root
@@ -48,15 +44,13 @@ class TagAddDialog(gtk.Window):
         self.tips = gtk.Tooltips()
         
         self._btn_addtag = self._toolbutton(
-                gtk.STOCK_ADD,
-                'Add', 
+                gtk.STOCK_ADD, _('Add'),
                 self._btn_addtag_clicked,
-                tip='Add tag to selected version')
+                tip=_('Add tag to selected version'))
         self._btn_rmtag = self._toolbutton(
-                gtk.STOCK_DELETE,
-                'Remove', 
+                gtk.STOCK_DELETE, _('Remove'),
                 self._btn_rmtag_clicked,
-                tip='Remove tag from repository')
+                tip=_('Remove tag from repository'))
         tbuttons = [
                 self._btn_addtag,
                 self._btn_rmtag
@@ -69,8 +63,8 @@ class TagAddDialog(gtk.Window):
 
         # tag name input
         tagbox = gtk.HBox()
-        lbl = gtk.Label("Tag:")
-        lbl.set_property("width-chars", 10)
+        lbl = gtk.Label(_('Tag:'))
+        lbl.set_property('width-chars', 10)
         lbl.set_alignment(0, 0.5)
         self._tagslist = gtk.ListStore(str)
         self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
@@ -82,8 +76,8 @@ class TagAddDialog(gtk.Window):
 
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label("Revision:")
-        lbl.set_property("width-chars", 10)
+        lbl = gtk.Label(_('Revision:'))
+        lbl.set_property('width-chars', 10)
         lbl.set_alignment(0, 0.5)
         self._rev_input = gtk.Entry()
         self._rev_input.set_text(rev)
@@ -93,16 +87,16 @@ class TagAddDialog(gtk.Window):
 
         # tag options
         option_box = gtk.VBox()
-        self._local_tag = gtk.CheckButton("Tag is local")
-        self._replace_tag = gtk.CheckButton("Replace existing tag")
-        self._use_msg = gtk.CheckButton("Use custom commit message")
+        self._local_tag = gtk.CheckButton(_('Tag is local'))
+        self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
+        self._use_msg = gtk.CheckButton(_('Use custom commit message'))
         option_box.pack_start(self._local_tag, False, False)
         option_box.pack_start(self._replace_tag, False, False)
         option_box.pack_start(self._use_msg, False, False)
         vbox.pack_start(option_box, False, False, 15)
 
         # commit message
-        lbl = gtk.Label("Commit message:")
+        lbl = gtk.Label(_('Commit message:'))
         lbl.set_alignment(0, 0.5)
         self._commit_message = gtk.Entry()
         vbox.pack_end(self._commit_message, False, False, 1)
@@ -163,27 +157,29 @@ class TagAddDialog(gtk.Window):
         message = self._commit_message.get_text()
         
         # verify input
-        if name == "":
-            error_dialog(self, "Tag input is empty", "Please enter tag name")
+        if name == '':
+            error_dialog(self, _('Tag input is empty'),
+                         _('Please enter tag name'))
             self._tag_input.grab_focus()
             return False
         if use_msg and not message:
-            error_dialog(self, "Custom commit message is empty",
-                    "Please enter commit message")
+            error_dialog(self, _('Custom commit message is empty'),
+                         _('Please enter commit message'))
             self._commit_message.grab_focus()
             return False
             
         # add tag to repo        
         try:
             self._add_hg_tag(name, rev, message, is_local, force=force)
-            info_dialog(self, "Tagging completed", "Tag '%s' has been added" % name)
+            info_dialog(self, _('Tagging completed'),
+                              _('Tag "%s" has been added') % name)
             self._refresh()
         except util.Abort, inst:
-            error_dialog(self, "Error in tagging", str(inst))
+            error_dialog(self, _('Error in tagging'), str(inst))
             return False
         except:
             import traceback
-            error_dialog(self, "Error in tagging", traceback.format_exc())
+            error_dialog(self, _('Error in tagging'), traceback.format_exc())
             return False
     
     def _do_rm_tag(self):
@@ -193,8 +189,9 @@ class TagAddDialog(gtk.Window):
         use_msg = self._use_msg.get_active()
         
         # verify input
-        if name == "":
-            error_dialog(self, "Tag name is empty", "Please select tag name to remove")
+        if name == '':
+            error_dialog(self, _('Tag name is empty'),
+                         _('Please select tag name to remove'))
             self._tag_input.grab_focus()
             return False
             
@@ -205,14 +202,15 @@ class TagAddDialog(gtk.Window):
             
         try:
             self._rm_hg_tag(name, message, is_local)
-            info_dialog(self, "Tagging completed", "Tag '%s' has been removed" % name)
+            info_dialog(self, _('Tagging completed'),
+                              _('Tag "%s" has been removed'), % name)
             self._refresh()
         except util.Abort, inst:
-            error_dialog(self, "Error in tagging", str(inst))
+            error_dialog(self, _('Error in tagging'), str(inst))
             return False
         except:
             import traceback
-            error_dialog(self, "Error in tagging", traceback.format_exc())
+            error_dialog(self, _('Error in tagging'), traceback.format_exc())
             return False
         
     
@@ -227,13 +225,13 @@ class TagAddDialog(gtk.Window):
             message = _('Added tag %s for changeset %s') % (name, short(r))
 
         if name in self.repo.tags() and not force:
-            raise util.Abort("Tag '%s' already exist" % name)
+            raise util.Abort(_("Tag '%s' already exist") % name)
             
         self.repo.tag(name, r, message, local, user, date)
 
     def _rm_hg_tag(self, name, message, local, user=None, date=None):
         if not name in self.repo.tags():
-            raise util.Abort("Tag '%s' does not exist" % name)
+            raise util.Abort(_("Tag '%s' does not exist") % name)
             
         if not message:
             message = _('Removed tag %s') % name
