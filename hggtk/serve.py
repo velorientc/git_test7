@@ -55,22 +55,23 @@ class ServeDialog(gtk.Window):
         
         # toolbar
         self.tbar = gtk.Toolbar()
+        self.tooltips = gtk.Tooltips()
         self._button_start = self._toolbutton(gtk.STOCK_MEDIA_PLAY,
                                               _('Start'),
                                               self._on_start_clicked,
-                                              _('Start server'))
+                                              tip=_('Start server'))
         self._button_stop  = self._toolbutton(gtk.STOCK_MEDIA_STOP,
                                               _('Stop'),
                                               self._on_stop_clicked,
-                                              _('Stop server'))
+                                              tip=_('Stop server'))
         self._button_browse = self._toolbutton(gtk.STOCK_HOME,
                                               _('Browse'),
                                               self._on_browse_clicked,
-                                              _('Launch browser'))
+                                              tip=_('Launch browser to view repository'))
         self._button_conf = self._toolbutton(gtk.STOCK_PREFERENCES,
                                               _('Configure'),
                                               self._on_conf_clicked,
-                                              _('Configure web settings'))
+                                              tip=_('Configure web settings'))
 
         tbuttons = [
                 self._button_start,
@@ -124,13 +125,17 @@ class ServeDialog(gtk.Window):
         else:
             self.set_title("hg serve - " + self.webname)
 
-    def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
+    def _toolbutton(self, stock, label, handler, menu=None,
+            userdata=None, tip=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
             
+        if tip:
+            tbutton.set_tooltip(self.tooltips, tip)
+        
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
