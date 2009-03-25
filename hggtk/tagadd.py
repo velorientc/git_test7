@@ -203,7 +203,7 @@ class TagAddDialog(gtk.Window):
         try:
             self._rm_hg_tag(name, message, is_local)
             info_dialog(self, _('Tagging completed'),
-                              _('Tag "%s" has been removed'), % name)
+                              _('Tag "%s" has been removed') % name)
             self._refresh()
         except util.Abort, inst:
             error_dialog(self, _('Error in tagging'), str(inst))
