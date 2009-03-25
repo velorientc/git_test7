@@ -100,7 +100,7 @@ class CloneDialog(gtk.Window):
         # add pre-defined src paths to pull-down list
         sympaths = [x[1] for x in ui.ui().configitems('paths')]
         recent = [x for x in self._recent_src]
-        sync = [x for x in self._sync_src]
+        syncsrc = [x for x in self._sync_src]
         paths = list(set(sympaths + recent + syncsrc))
         paths.sort()
         for p in paths:
@@ -156,7 +156,7 @@ class CloneDialog(gtk.Window):
 
         # options
         option_box = gtk.VBox()
-        self._opt_update = gtk.CheckButton(_('do not update the new working directory')
+        self._opt_update = gtk.CheckButton(_('do not update the new working directory'))
         self._opt_pull = gtk.CheckButton(_('use pull protocol to copy metadata'))
         self._opt_uncomp = gtk.CheckButton(_('use uncompressed transfer'))
         self._opt_proxy = gtk.CheckButton(_('use proxy server'))
