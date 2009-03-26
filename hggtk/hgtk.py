@@ -219,13 +219,11 @@ def rename(ui, *pats, **opts):
     if not pats or len(pats) > 2:
         raise util.Abort(_('rename takes one or two path arguments'))
     opts['files'] = pats
-    opts['detect'] = False
     run(**opts)
 
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
-    from hggtk.rename import run
-    opts['detect'] = True
+    from hggtk.guess import run
     run(**opts)
 
 def datamine(ui, *pats, **opts):
