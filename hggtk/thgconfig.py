@@ -8,13 +8,11 @@
 import gtk
 import gobject
 import os
-import pango
 from mercurial.i18n import _
-from mercurial import hg, ui, cmdutil, util
+from mercurial import hg, ui, util
 from dialog import error_dialog, question_dialog
 from hglib import RepoError, toutf, fromutf
 import shlib
-import shelve
 import iniparse
 
 _unspecstr = _('<unspecified>')
