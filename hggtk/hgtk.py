@@ -174,7 +174,7 @@ def runcommand(ui, args):
             raise
         raise ParseError(cmd, _("invalid arguments"))
 
-def about(ui, **opts):
+def about(ui, *pats, **opts):
     """about TortoiseHg"""
     from hggtk.about import run
     run(**opts)
