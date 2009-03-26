@@ -53,10 +53,6 @@ class InitDialog(gtk.Window):
         sep = gtk.SeparatorToolItem()
         sep.set_expand(True)
         sep.set_draw(False)
-        self.tbar.insert(sep, -1)
-        button = self._toolbutton(gtk.STOCK_CLOSE, _('Close'),
-                self._close_clicked, tip=_('Close Application'))
-        self.tbar.insert(button, -1)
         vbox = gtk.VBox()
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
@@ -94,9 +90,6 @@ class InitDialog(gtk.Window):
             self._opt_oldrepoformat.set_active(not usefncache)
         except:
             pass
-
-    def _close_clicked(self, toolbutton, data=None):
-        gtk.main_quit()
 
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
