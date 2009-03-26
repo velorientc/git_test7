@@ -45,21 +45,10 @@ class GCommit(GStatus):
         if not self.test_opt('rev'):
             self.opts['rev'] = ''
 
-        if self.test_opt('message'):
-            buf = gtk.TextBuffer()
-            buf.set_text(self.opts['message'])
-            self.text.set_buffer(buf)
-
-        if self.test_opt('logfile'):
-            buf = gtk.TextBuffer()
-            buf.set_text('Comment will be read from file ' + self.opts['logfile'])
-            self.text.set_buffer(buf)
-            self.text.set_sensitive(False)
-
-
     def get_title(self):
         root = os.path.basename(self.repo.root)
         user = self.opts.get('user')
+        if user: user = 'as ' + user
         date = self.opts.get('date')
         pats = ' '.join(self.pats)
         if self.qnew:
@@ -463,8 +452,6 @@ class GCommit(GStatus):
 
 
     def _ready_message(self):
-        if self.test_opt('logfile'):
-            return
         buf = self.text.get_buffer()
         if buf.get_char_count() == 0:
             Prompt(_('Nothing Commited'),
@@ -524,6 +511,10 @@ class GCommit(GStatus):
             cmdline[1] = 'qrefresh'
         if self.opts['addremove']:
             cmdline += ['--addremove']
+        if self.opts['user']:
+            cmdline.extend(['--user', self.opts['user']])
+        if self.opts['date']:
+            cmdline.extend(['--date', self.opts['date']])
         cmdline += ['--message', fromutf(self.opts['message'])]
         if self.qnew:
             cmdline += [fromutf(self._get_qnew_name())]
@@ -569,7 +560,7 @@ class GCommit(GStatus):
             self.reload_status()
             self.qnew_name.grab_focus() # set focus back
 
-def launch(root='', files=[], cwd='', main=True):
+def launch(root='', files=[], cwd='', main=True, **opts):
     u = ui.ui()
     u.updateopts(debug=False, traceback=False)
     repo = hg.repository(u, path=root)
@@ -592,11 +583,12 @@ def launch(root='', files=[], cwd='', main=True):
         return
 
     cmdoptions = {
-        'user':'', 'date':'',
+        'user':opts.get('user', ''), 'date':opts.get('date', ''),
+        'logfile':'', 'message':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
         'unknown':True, 'ignored':False, 
         'exclude':[], 'include':[],
-        'check': True, 'git':False, 'logfile':'', 'addremove':False,
+        'check': True, 'git':False, 'addremove':False,
     }
     
     dialog = GCommit(u, repo, cwd, files, cmdoptions, main)
@@ -608,7 +600,7 @@ def run(root='', files=[], cwd='', **opts):
     # TODO: Not clear if this is best; user may expect repo wide
     if not files and cwd:
         files = [cwd]
-    if launch(root, files, cwd, True):
+    if launch(root, files, cwd, True, **opts):
         gtk.gdk.threads_init()
         gtk.gdk.threads_enter()
         gtk.main()
@@ -617,7 +609,6 @@ def run(root='', files=[], cwd='', **opts):
 if __name__ == "__main__":
     import sys
     from hglib import rootpath
-
     opts = {}
     opts['cwd'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
     opts['root'] = rootpath(opts['cwd'])
