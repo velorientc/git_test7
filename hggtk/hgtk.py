@@ -28,7 +28,7 @@ import os
 import sys
 import traceback
 
-nonrepo_commands = 'userconfig clone init about help version'
+nonrepo_commands = 'userconfig clone debugcomplete init about help version'
 
 def dispatch(args):
     "run the command specified in args"
@@ -492,6 +492,27 @@ def version(ui, **opts):
     if not ui.quiet:
         ui.write(shortlicense)
 
+def debugcomplete(ui, cmd='', **opts):
+    """output list of possible commands"""
+    if opts.get('options'):
+        options = []
+        otables = [globalopts]
+        if cmd:
+            aliases, entry = cmdutil.findcmd(cmd, table, False)
+            otables.append(entry[1])
+        for t in otables:
+            for o in t:
+                if o[0]:
+                    options.append('-%s' % o[0])
+                options.append('--%s' % o[1])
+        ui.write("%s\n" % "\n".join(options))
+        return
+
+    cmdlist = cmdutil.findpossible(cmd, table)
+    if ui.verbose:
+        cmdlist = [' '.join(c[0]) for c in cmdlist.values()]
+    ui.write("%s\n" % "\n".join(util.sort(cmdlist)))
+
 globalopts = [
     ('R', 'repository', '',
      _('repository root directory or symbolic path name')),
@@ -533,6 +554,9 @@ table = {
     "^version": (version,
         [('v', 'verbose', None, _('print license'))],
         _('hgtk version [OPTION]')),
+    "debugcomplete": (debugcomplete,
+         [('o', 'options', None, _('show the command options'))],
+         _('[-o] CMD')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
 }
 
