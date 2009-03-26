@@ -214,7 +214,8 @@ class GCommit(GStatus):
                     _('Save commit message at exit?'))
             res = dialog.run()
             if res == gtk.RESPONSE_YES:
-                self._update_recent_messages(cur_msg)
+                begin, end = buf.get_bounds()
+                self._update_recent_messages(buf.get_text(begin, end))
             elif res != gtk.RESPONSE_NO:
                 live = True
         if not live and self.main:
