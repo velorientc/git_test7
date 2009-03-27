@@ -150,7 +150,7 @@ def get_states(upath, repo=None):
         return IGNORED
     except StandardError, e:
         debugf("error while handling %s:", pdir)
-        debugf(e)
+        debugf(str(e))
         add(pdir, UNKNOWN)
         return UNKNOWN
      # get file status
@@ -161,7 +161,7 @@ def get_states(upath, repo=None):
         repostate = repo.status(match=matcher, ignored=True,
                         clean=True, unknown=True)
     except util.Abort, inst:
-        debugf("abort: %s", inst)
+        debugf("abort: %s", str(inst))
         debugf("treat as unknown : %s", path)
         return UNKNOWN
 
