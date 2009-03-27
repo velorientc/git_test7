@@ -126,10 +126,10 @@ if __name__=='__main__':
             finalize_register = lambda: RegisterServer(ContextMenuExtension),
             finalize_unregister = lambda: UnregisterServer(ContextMenuExtension))
     
-    for cls in (ChangedOverlay, AddedOverlay, UnchangedOverlay):
-        register.UseCommandLine(cls,
-                finalize_register = lambda: RegisterServer(cls),
-                finalize_unregister = lambda: UnregisterServer(cls))
+    for overlay in overlays:
+        register.UseCommandLine(overlay,
+                finalize_register = lambda: RegisterServer(overlay),
+                finalize_unregister = lambda: UnregisterServer(overlay))
 
     if "--unregister" in sys.argv[1:]:
         register_tortoise_path(unregister=True)
