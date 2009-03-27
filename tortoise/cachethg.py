@@ -8,18 +8,26 @@ except ImportError:
     from mercurial.repo import RepoError
 
 debugging = False
+enabled = True
+localonly = False
+includepaths = []
+excludepaths = []
 
 try:
+    from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
     from win32api import GetTickCount
     CACHE_TIMEOUT = 5000
-    import _winreg
     try:
-        hkey = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
-                           r"Software\TortoiseHg", 0,
-                           _winreg.KEY_ALL_ACCESS)
-        val = _winreg.QueryValueEx(hkey, 'OverlayDebug')[0]
-        if val in ('1', 'True'):
-            debugging = True
+        hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+        enabled = QueryValueEx(hkey, 'EnableOverlays')[0] in ('1', 'True')
+        localonly = QueryValueEx(hkey, 'LocalDisksOnly')[0] in ('1', 'True')
+        incs = QueryValueEx(hkey, 'IncludePath')[0]
+        excs = QueryValueEx(hkey, 'ExcludePath')[0]
+        debugging = QueryValueEx(hkey, 'OverlayDebug')[0] in ('1', 'True')
+        for p in incs.split(';'):
+            includepaths.append(p.strip())
+        for p in excs.split(';'):
+            excludepaths.append(p.strip())
     except EnvironmentError:
         pass
 except ImportError:
@@ -31,6 +39,10 @@ if debugging:
     def debugf(str, args=None):
         if args: print str % args
         else:    print str
+    print 'Enabled', enabled
+    print 'LocalDisksOnly', localonly
+    print 'IncludePaths', includepaths
+    print 'ExcludePaths', excludepaths
 else:
     def debugf(str, args=None):
         pass
@@ -76,6 +88,8 @@ def get_states(upath, repo=None):
     """
     global overlay_cache, cache_tick_count
     global cache_root, cache_pdir
+    global enabled, localonly
+    global includepaths, excludepaths
 
     #debugf("called: _get_state(%s)", path)
     tc = GetTickCount()
@@ -129,30 +143,50 @@ def get_states(upath, repo=None):
         add(pdir, NOT_IN_REPO)
         return NOT_IN_REPO
     try:
+        if not enabled:
+            overlay_cache = {None: None}
+            cache_tick_count = GetTickCount()
+            debugf("overlayicons disabled")
+            return NOT_IN_REPO
+
         tc1 = GetTickCount()
-        if not repo or (repo.root != root and repo.root != os.path.realpath(root)):
+        real = os.path.realpath(root)
+        if not repo or (repo.root != root and repo.root != real):
             repo = hg.repository(ui.ui(), path=root)
             debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
-        # check if to display overlay icons in this repo
-        overlayopt = repo.ui.config('tortoisehg', 'overlayicons', ' ').lower()
-        debugf("%s: repo overlayicons = %s", (path, overlayopt))
-        if overlayopt == 'localdisk':
-            overlayopt = bool(thgutil.netdrive_status(path))
-        if not overlayopt or overlayopt in 'false off no'.split():
-            debugf("%s: overlayicons disabled", path)
+
+        if localonly and thgutil.netdrive_status(path):
+            debugf("%s: is a network drive", path)
             overlay_cache = {None: None}
             cache_tick_count = GetTickCount()
             return NOT_IN_REPO
+        if includepaths:
+            for p in includepaths:
+                if path.startswith(p):
+                    break;
+            else:
+                debugf("%s: is not in an include path", path)
+                overlay_cache = {None: None}
+                cache_tick_count = GetTickCount()
+                return NOT_IN_REPO
+        if excludepaths:
+            for p in excludepaths:
+                if path.startswith(p):
+                    debugf("%s: is in an exclude path", path)
+                    overlay_cache = {None: None}
+                    cache_tick_count = GetTickCount()
+                    return NOT_IN_REPO
     except RepoError:
         # We aren't in a working tree
         debugf("%s: not in repo", pdir)
         add(pdir, IGNORED)
         return IGNORED
-    except StandardError, e:
+    except Exception, e:
         debugf("error while handling %s:", pdir)
         debugf(e)
         add(pdir, UNKNOWN)
         return UNKNOWN
+
      # get file status
     tc1 = GetTickCount()
 
