@@ -147,14 +147,14 @@ class menuThg:
         drag_repo = None
         drop_repo = None
 
-        drag_path = self.srcfiles[0]
+        drag_path = srcfiles[0]
         drag_repo = open_repo(drag_path)
         if not drag_repo:
             return []
         if drag_repo and drag_repo.root != drag_path:
             return []   # dragged item must be a hg repo root directory
 
-        drop_repo = open_repo(self._folder)
+        drop_repo = open_repo(destfolder)
 
         menu = thg_menu(drag_repo.ui, self.name)
         menu.add_menu(_("Create Clone"),
