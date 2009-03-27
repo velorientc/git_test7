@@ -145,6 +145,8 @@ class GtkUi(ui.ui):
                 # send request to main thread, await response
                 self.dialogq.put( (msg, True, default) )
                 r = self.responseq.get(True)
+                if r is None:
+                    raise EOFError
                 if not r:
                     return default
                 if not pat or re.match(pat, r):
@@ -157,7 +159,10 @@ class GtkUi(ui.ui):
     def getpass(self, prompt=None, default=None):
         # send request to main thread, await response
         self.dialogq.put( (prompt or _('password: '), False, default) )
-        return self.responseq.get(True)
+        r = self.responseq.get(True)
+        if r is None:
+            raise util.Abort(_('response expected'))
+        return r
 
     def print_exc(self):
         traceback.print_exc()
