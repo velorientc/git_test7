@@ -6,6 +6,11 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
+import pythoncom
+from mercurial import demandimport
+demandimport.ignore.append('win32traceutil')
+demandimport.enable()
+
 import os
 import sys
 import _winreg
