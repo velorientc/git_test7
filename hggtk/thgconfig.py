@@ -272,7 +272,7 @@ class ConfigDialog(gtk.Dialog):
         self.diff_frame = self.add_page(notebook, _('Diff'))
         self.fill_frame(self.diff_frame, _diff_info)
 
-        if not configrepo: # and os.name == 'nt':
+        if not configrepo and os.name == 'nt':
             self.shellframe = self.add_page(notebook, _('Shell Ext'))
             self.fill_shell_frame(self.shellframe)
 
@@ -591,7 +591,7 @@ class ConfigDialog(gtk.Dialog):
             except EnvironmentError: pass
             try: promoteditems = QueryValueEx(hkey, 'PromotedItems')[0]
             except EnvironmentError: pass
-        except ImportError:
+        except (ImportError, WindowsError):
             pass
 
         self.shellapps.set_text(shellapps)
@@ -618,7 +618,7 @@ class ConfigDialog(gtk.Dialog):
             if check.get_active():
                 promoted.append(cmd)
         try:
-            from _winreg import HKEY_CURRENT_USER, OpenKey, SetValue
+            from _winreg import HKEY_CURRENT_USER, CreateKey, SetValue
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
             SetValue(hkey, 'ShellApps', shellapps)
             SetValue(hkey, 'EnableOverlays', overlayenable)
