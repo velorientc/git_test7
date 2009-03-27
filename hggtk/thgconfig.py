@@ -618,16 +618,16 @@ class ConfigDialog(gtk.Dialog):
             if check.get_active():
                 promoted.append(cmd)
         try:
-            from _winreg import HKEY_CURRENT_USER, CreateKey, SetValue
+            from _winreg import HKEY_CURRENT_USER, CreateKey, SetValueEx, REG_SZ
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
-            SetValue(hkey, 'ShellApps', shellapps)
-            SetValue(hkey, 'EnableOverlays', overlayenable)
-            SetValue(hkey, 'LocalDisksOnly', localdisks)
-            SetValue(hkey, 'OverlayDebug', overlaydebug)
-            SetValue(hkey, 'IncludePath', includepath)
-            SetValue(hkey, 'ExcludePath', excludepath)
-            SetValue(hkey, 'ContextMenuDebug', cmenudebug)
-            SetValue(hkey, 'PromotedItems', ','.join(promoted))
+            SetValueEx(hkey, 'ShellApps', 0, REG_SZ, shellapps)
+            SetValueEx(hkey, 'EnableOverlays', 0, REG_SZ, overlayenable)
+            SetValueEx(hkey, 'LocalDisksOnly', 0, REG_SZ, localdisks)
+            SetValueEx(hkey, 'OverlayDebug', 0, REG_SZ, overlaydebug)
+            SetValueEx(hkey, 'IncludePath', 0, REG_SZ, includepath)
+            SetValueEx(hkey, 'ExcludePath', 0, REG_SZ, excludepath)
+            SetValueEx(hkey, 'ContextMenuDebug', 0, REG_SZ, cmenudebug)
+            SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
         except ImportError:
             pass
 
