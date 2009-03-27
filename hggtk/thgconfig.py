@@ -250,10 +250,6 @@ class ConfigDialog(gtk.Dialog):
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
         self.fill_frame(self.tortoise_frame, _tortoise_info)
 
-        if not configrepo:# and os.name == 'nt':
-            self.shellframe = self.add_page(notebook, _('Shell Ext'))
-            self.fill_shell_frame(self.shellframe)
-
         self.commit_frame = self.add_page(notebook, _('Commit'))
         self.fill_frame(self.commit_frame, _commit_info)
 
@@ -262,60 +258,7 @@ class ConfigDialog(gtk.Dialog):
 
         self.paths_frame = self.add_page(notebook, _('Paths'))
         vbox = self.fill_frame(self.paths_frame, _paths_info)
-
-        # Initialize data model for 'Paths' tab
-        self.pathdata = gtk.ListStore(
-                gobject.TYPE_STRING,
-                gobject.TYPE_STRING)
-        if 'paths' in list(self.ini):
-            for name in self.ini['paths']:
-                if name in ('default', 'default-push'): continue
-                path = self.ini['paths'][name]
-                i = self.pathdata.insert_before(None, None)
-                self.pathdata.set_value(i, 0, "%s" % toutf(name))
-                self.pathdata.set_value(i, 1, "%s" % toutf(path))
-
-        # Define view model for 'Paths' tab
-        self.pathtree = gtk.TreeView()
-        self.pathtree.set_model(self.pathdata)
-        self.pathtree.set_enable_search(False)
-        self.pathtree.connect("cursor-changed", self._pathtree_changed)
-        
-        renderer = gtk.CellRendererText()
-        renderer.set_property('editable', True)
-        renderer.connect('edited', self.on_alias_edit)
-        column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
-        self.pathtree.append_column(column)
-        
-        renderer = gtk.CellRendererText()
-        renderer.set_property('editable', True)
-        renderer.connect('edited', self.on_path_edit)
-        column = gtk.TreeViewColumn(_('Repository Path'), renderer, text=1)
-        self.pathtree.append_column(column)
-        
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(self.pathtree)
-        vbox.add(scrolledwindow)
-
-        buttonbox = gtk.HBox()
-        self.addButton = gtk.Button(_('_Add'))
-        self.addButton.set_use_underline(True)
-        self.addButton.connect('clicked', self._add_path)
-        buttonbox.pack_start(self.addButton)
-
-        self._delpathbutton = gtk.Button(_('_Remove'))
-        self._delpathbutton.set_use_underline(True)
-        self._delpathbutton.connect('clicked', self._remove_path)
-        buttonbox.pack_start(self._delpathbutton)
-
-        self._testpathbutton = gtk.Button(_('_Test'))
-        self._testpathbutton.set_use_underline(True)
-        self._testpathbutton.connect('clicked', self._test_path)
-        buttonbox.pack_start(self._testpathbutton)
-
-        vbox.pack_start(buttonbox, False, False, 4)
-        self.refresh_path_list()
+        self.fill_path_frame(vbox)
 
         self.web_frame = self.add_page(notebook, _('Web'))
         self.fill_frame(self.web_frame, _web_info)
@@ -328,6 +271,10 @@ class ConfigDialog(gtk.Dialog):
 
         self.diff_frame = self.add_page(notebook, _('Diff'))
         self.fill_frame(self.diff_frame, _diff_info)
+
+        if not configrepo and os.name == 'nt':
+            self.shellframe = self.add_page(notebook, _('Shell Ext'))
+            self.fill_shell_frame(self.shellframe)
 
         # Force dialog into clean state in the beginning
         self._refresh_vlist()
@@ -432,6 +379,61 @@ class ConfigDialog(gtk.Dialog):
         repo_available = self.root is not None
         self._delpathbutton.set_sensitive(path_selected)
         self._testpathbutton.set_sensitive(repo_available and path_selected)
+
+    def fill_path_frame(self, vbox):
+        # Initialize data model for 'Paths' tab
+        self.pathdata = gtk.ListStore(
+                gobject.TYPE_STRING,
+                gobject.TYPE_STRING)
+        if 'paths' in list(self.ini):
+            for name in self.ini['paths']:
+                if name in ('default', 'default-push'): continue
+                path = self.ini['paths'][name]
+                i = self.pathdata.insert_before(None, None)
+                self.pathdata.set_value(i, 0, "%s" % toutf(name))
+                self.pathdata.set_value(i, 1, "%s" % toutf(path))
+
+        # Define view model for 'Paths' tab
+        self.pathtree = gtk.TreeView()
+        self.pathtree.set_model(self.pathdata)
+        self.pathtree.set_enable_search(False)
+        self.pathtree.connect("cursor-changed", self._pathtree_changed)
+        
+        renderer = gtk.CellRendererText()
+        renderer.set_property('editable', True)
+        renderer.connect('edited', self.on_alias_edit)
+        column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
+        self.pathtree.append_column(column)
+        
+        renderer = gtk.CellRendererText()
+        renderer.set_property('editable', True)
+        renderer.connect('edited', self.on_path_edit)
+        column = gtk.TreeViewColumn(_('Repository Path'), renderer, text=1)
+        self.pathtree.append_column(column)
+        
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add(self.pathtree)
+        vbox.add(scrolledwindow)
+
+        buttonbox = gtk.HBox()
+        self.addButton = gtk.Button(_('_Add'))
+        self.addButton.set_use_underline(True)
+        self.addButton.connect('clicked', self._add_path)
+        buttonbox.pack_start(self.addButton)
+
+        self._delpathbutton = gtk.Button(_('_Remove'))
+        self._delpathbutton.set_use_underline(True)
+        self._delpathbutton.connect('clicked', self._remove_path)
+        buttonbox.pack_start(self._delpathbutton)
+
+        self._testpathbutton = gtk.Button(_('_Test'))
+        self._testpathbutton.set_use_underline(True)
+        self._testpathbutton.connect('clicked', self._test_path)
+        buttonbox.pack_start(self._testpathbutton)
+
+        vbox.pack_start(buttonbox, False, False, 4)
+        self.refresh_path_list()
 
     def set_help(self, widget, event, buffer, tooltip):
         text = ' '.join(tooltip.splitlines())
