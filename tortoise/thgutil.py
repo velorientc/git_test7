@@ -74,7 +74,7 @@ if os.name == 'nt':
             if drv['local'] == letter:
                 info = win32net.NetUseGetInfo(None, letter, 1)
                 return info['status'] == USE_OK
-        return None
+        return False
     
     bitmap_cache = {}
     def icon_to_bitmap(iconPathName):
