@@ -272,7 +272,7 @@ class ConfigDialog(gtk.Dialog):
         self.diff_frame = self.add_page(notebook, _('Diff'))
         self.fill_frame(self.diff_frame, _diff_info)
 
-        if not configrepo and os.name == 'nt':
+        if not configrepo: # and os.name == 'nt':
             self.shellframe = self.add_page(notebook, _('Shell Ext'))
             self.fill_shell_frame(self.shellframe)
 
@@ -518,28 +518,33 @@ class ConfigDialog(gtk.Dialog):
                          row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
             self.cmptoggles[cmd] = check
             tooltip = _('Promote menu item "%s" to top menu') % cmd
+            check.connect('toggled', self.dirty_event)
             check.connect('focus-in-event', self.set_help,
                     desctext.get_buffer(), tooltip)
 
         tooltip = _('A comma (,) separated list of applications that'
                   ' the shell extensions will support.  If unspecified,'
                   ' the default is explorer.exe')
+        self.shellapps.connect('changed', self.dirty_event)
         self.shellapps.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
         tooltip = _('Enable/Disable the overlay icons globally')
         self.ovenable.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
         tooltip = _('Only enable overlays on local disks')
+        self.lclonly.connect('toggled', self.dirty_event)
         self.lclonly.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
         tooltip = _('Enable the overlay code to emit debug messages'
                 ' that the TortoiseHg tracelog application can receive.')
+        self.ovdebug.connect('toggled', self.dirty_event)
         self.ovdebug.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
         tooltip = _('A list of semicolon (;) separated paths that the'
                 ' overlays will respect.  This include filter is applied'
                 ' after the local disk check.  If unspecified, the default'
                 ' is to display in all repositories.')
+        self.ovinclude.connect('changed', self.dirty_event)
         self.ovinclude.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
         tooltip = _('A list of semicolon (;) separated paths that are'
@@ -547,10 +552,12 @@ class ConfigDialog(gtk.Dialog):
                 ' applied after the local disk check and include filters.'
                 ' So there is no need to exclude paths outside of your'
                 ' include filter.  Default is no exclusion.')
+        self.ovexclude.connect('changed', self.dirty_event)
         self.ovexclude.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
         tooltip = _('Enable the context menu code to emit debug messages'
                 ' that the TortoiseHg tracelog application can receive.')
+        self.cmdebug.connect('toggled', self.dirty_event)
         self.cmdebug.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
         self.load_shell_configs()
@@ -598,11 +605,38 @@ class ConfigDialog(gtk.Dialog):
         for cmd, check in self.cmptoggles.iteritems():
             check.set_active(cmd in promoted)
 
+    def save_shell_configs(self):
+        shellapps = self.shellapps.get_text()
+        overlayenable = self.ovenable.get_active() and '1' or '0'
+        localdisks = self.lclonly.get_active() and '1' or '0'
+        overlaydebug = self.ovdebug.get_active() and '1' or '0'
+        includepath = self.ovinclude.get_text()
+        excludepath = self.ovexclude.get_text()
+        cmenudebug = self.cmdebug.get_active() and '1' or '0'
+        promoted = []
+        for cmd, check in self.cmptoggles.iteritems():
+            if check.get_active():
+                promoted.append(cmd)
+        try:
+            from _winreg import HKEY_CURRENT_USER, OpenKey, SetValue
+            hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+            SetValue(hkey, 'ShellApps', shellapps)
+            SetValue(hkey, 'EnableOverlays', overlayenable)
+            SetValue(hkey, 'LocalDisksOnly', localdisks)
+            SetValue(hkey, 'OverlayDebug', overlaydebug)
+            SetValue(hkey, 'IncludePath', includepath)
+            SetValue(hkey, 'ExcludePath', excludepath)
+            SetValue(hkey, 'ContextMenuDebug', cmenudebug)
+            SetValue(hkey, 'PromotedItems', ','.join(promoted))
+        except ImportError:
+            pass
+
     def ovenable_toggled(self, check):
         self.lclonly.set_sensitive(check.get_active())
         self.ovdebug.set_sensitive(check.get_active())
         self.ovinclude.set_sensitive(check.get_active())
         self.ovexclude.set_sensitive(check.get_active())
+        self.dirty_event()
 
     def fill_frame(self, frame, info):
         widgets = []
@@ -792,6 +826,7 @@ class ConfigDialog(gtk.Dialog):
         except IOError, e:
             error_dialog(self, _('Unable to write configuration file'), str(e))
 
+        self.save_shell_configs()
         self._btn_apply.set_sensitive(False)
         self.dirty = False
         return 0
