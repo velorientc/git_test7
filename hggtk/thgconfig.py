@@ -443,6 +443,15 @@ class ConfigDialog(gtk.Dialog):
         'Fill special tab for shell extension configurations'
         vbox = gtk.VBox()
         frame.add(vbox)
+
+        # Text entry for supported applications
+        hbox = gtk.HBox()
+        vbox.pack_start(hbox, False, False, 2)
+        lbl = gtk.Label(_('Supported applications:'))
+        hbox.pack_start(lbl, False, False, 10)
+        self.shellapps = gtk.Entry()
+        hbox.pack_start(self.shellapps, True, True, 10)
+
         ovframe = gtk.Frame(_('Overlay configuration'))
         ovframe.set_border_width(10)
         vbox.pack_start(ovframe, False, False, 2)
@@ -502,6 +511,11 @@ class ConfigDialog(gtk.Dialog):
             check.connect('focus-in-event', self.set_help,
                     desctext.get_buffer(), tooltip)
 
+        tooltip = _('A comma (,) separated list of applications that'
+                  ' the shell extensions will support.  If unspecified,'
+                  ' the default is explorer.exe')
+        self.shellapps.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
         tooltip = _('Enable/Disable the overlay icons globally')
         self.ovenable.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
