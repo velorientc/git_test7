@@ -4,9 +4,10 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 
 import os
+import sys
 import tempfile
-import subprocess
 import pythoncom
+import subprocess
 from win32com.shell import shell, shellcon
 import win32con
 import win32process
@@ -16,7 +17,7 @@ import win32gui
 import win32gui_struct
 import win32api
 import _winreg
-from mercurial import hg, util
+from mercurial import util
 from thgutil import *
 import menuthg
 
@@ -36,17 +37,6 @@ ui.ui.write_err = write_err
 
 S_OK = 0
 S_FALSE = 1
-
-def get_clone_repo_name(dir, repo_name):
-    dest_clone = os.path.join(dir, repo_name)
-    if os.path.exists(dest_clone):
-        dest_clone = os.path.join(dir, "Clone of " + repo_name)
-
-    i = 2
-    while os.path.exists(dest_clone):
-        dest_clone = os.path.join(dir, "Clone of (%s) %s" % (i, repo_name))
-        i += 1
-    return dest_clone
 
 """Windows shell extension that adds context menu items to Mercurial repository"""
 class ContextMenuExtension(menuthg.menuThg):
