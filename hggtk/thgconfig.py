@@ -457,12 +457,15 @@ class ConfigDialog(gtk.Dialog):
         vbox.pack_start(ovframe, False, False, 2)
         ovcvbox = gtk.VBox()
         ovframe.add(ovcvbox)
+        hbox = gtk.HBox()
+        ovcvbox.pack_start(hbox, False, False, 2)
         self.ovenable = gtk.CheckButton(_('Enable overlays'))
-        ovcvbox.pack_start(self.ovenable, False, False, 2)
+        hbox.pack_start(self.ovenable, False, False, 2)
+        self.ovenable.connect('toggled', self.ovenable_toggled)
         self.lclonly = gtk.CheckButton(_('Local disks only'))
-        ovcvbox.pack_start(self.lclonly, False, False, 2)
+        hbox.pack_start(self.lclonly, False, False, 2)
         self.ovdebug = gtk.CheckButton(_('Enable debug logging'))
-        ovcvbox.pack_start(self.ovdebug, False, False, 2)
+        hbox.pack_start(self.ovdebug, False, False, 2)
         table = gtk.Table(2, 2, False)
         ovcvbox.pack_start(table, False, False, 2)
 
@@ -507,11 +510,13 @@ class ConfigDialog(gtk.Dialog):
         rows = (len(shellcmds) + 2) / 3
         table = gtk.Table(rows, 3, False)
         cmcvbox.pack_start(table, False, False, 2)
+        self.cmptoggles = {}
         for i, cmd in enumerate(shellcmds):
             row, col = divmod(i, 3)
             check = gtk.CheckButton(cmd)
             table.attach(check, col, col+1,
                          row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+            self.cmptoggles[cmd] = check
             tooltip = _('Promote menu item "%s" to top menu') % cmd
             check.connect('focus-in-event', self.set_help,
                     desctext.get_buffer(), tooltip)
@@ -524,7 +529,7 @@ class ConfigDialog(gtk.Dialog):
         tooltip = _('Enable/Disable the overlay icons globally')
         self.ovenable.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
-        tooltip = _('Only use overlays on local disks')
+        tooltip = _('Only enable overlays on local disks')
         self.lclonly.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
         tooltip = _('Enable the overlay code to emit debug messages'
@@ -548,6 +553,56 @@ class ConfigDialog(gtk.Dialog):
                 ' that the TortoiseHg tracelog application can receive.')
         self.cmdebug.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
+        self.load_shell_configs()
+
+    def load_shell_configs(self):
+        shellapps = 'explorer.exe'
+        includepath = ''
+        excludepath = ''
+        overlayenable = True
+        overlaydebug = False
+        localdisks = False
+        cmenudebug = False
+        promoteditems = 'commit'
+        try:
+            from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
+            hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+            t = ('1', 'True')
+            try: shellapps = QueryValueEx(hkey, 'ShellApps')[0]
+            except EnvironmentError: pass
+            try: overlayenable = QueryValueEx(hkey, 'EnableOverlays')[0] in t
+            except EnvironmentError: pass
+            try: localdisks = QueryValueEx(hkey, 'LocalDisksOnly')[0] in t
+            except EnvironmentError: pass
+            try: overlaydebug = QueryValueEx(hkey, 'OverlayDebug')[0] in t
+            except EnvironmentError: pass
+            try: includepath = QueryValueEx(hkey, 'IncludePath')[0]
+            except EnvironmentError: pass
+            try: excludepath = QueryValueEx(hkey, 'ExcludePath')[0]
+            except EnvironmentError: pass
+            try: cmenudebug = QueryValueEx(hkey, 'ContextMenuDebug')[0] in t
+            except EnvironmentError: pass
+            try: promoteditems = QueryValueEx(hkey, 'PromotedItems')[0]
+            except EnvironmentError: pass
+        except ImportError:
+            pass
+
+        self.shellapps.set_text(shellapps)
+        self.ovenable.set_active(overlayenable)
+        self.lclonly.set_active(localdisks)
+        self.ovdebug.set_active(overlaydebug)
+        self.ovinclude.set_text(includepath)
+        self.ovexclude.set_text(excludepath)
+        self.cmdebug.set_active(cmenudebug)
+        promoted = [pi.strip() for pi in promoteditems.split(',')]
+        for cmd, check in self.cmptoggles.iteritems():
+            check.set_active(cmd in promoted)
+
+    def ovenable_toggled(self, check):
+        self.lclonly.set_sensitive(check.get_active())
+        self.ovdebug.set_sensitive(check.get_active())
+        self.ovinclude.set_sensitive(check.get_active())
+        self.ovexclude.set_sensitive(check.get_active())
 
     def fill_frame(self, frame, info):
         widgets = []
