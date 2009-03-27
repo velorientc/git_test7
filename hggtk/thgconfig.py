@@ -461,6 +461,8 @@ class ConfigDialog(gtk.Dialog):
         ovcvbox.pack_start(self.ovenable, False, False, 2)
         self.lclonly = gtk.CheckButton(_('Local disks only'))
         ovcvbox.pack_start(self.lclonly, False, False, 2)
+        self.ovdebug = gtk.CheckButton(_('Enable debug logging'))
+        ovcvbox.pack_start(self.ovdebug, False, False, 2)
         table = gtk.Table(2, 2, False)
         ovcvbox.pack_start(table, False, False, 2)
 
@@ -496,6 +498,9 @@ class ConfigDialog(gtk.Dialog):
         vbox.pack_start(gtk.Label(), True, True, 2)
         vbox.pack_start(descframe, False, False, 2)
 
+        self.cmdebug = gtk.CheckButton(_('Enable debug logging'))
+        cmcvbox.pack_start(self.cmdebug, False, False, 2)
+
         lbl = gtk.Label(_('Promote menu items to the top menu'))
         cmcvbox.pack_start(lbl, False, False, 2)
 
@@ -522,6 +527,10 @@ class ConfigDialog(gtk.Dialog):
         tooltip = _('Only use overlays on local disks')
         self.lclonly.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
+        tooltip = _('Enable the overlay code to emit debug messages'
+                ' that the TortoiseHg tracelog application can receive.')
+        self.ovdebug.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
         tooltip = _('A list of semicolon (;) separated paths that the'
                 ' overlays will respect.  This include filter is applied'
                 ' after the local disk check.  If unspecified, the default'
@@ -534,6 +543,10 @@ class ConfigDialog(gtk.Dialog):
                 ' So there is no need to exclude paths outside of your'
                 ' include filter.  Default is no exclusion.')
         self.ovexclude.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('Enable the context menu code to emit debug messages'
+                ' that the TortoiseHg tracelog application can receive.')
+        self.cmdebug.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
 
     def fill_frame(self, frame, info):
