@@ -159,12 +159,7 @@ class EmailDialog(gtk.Window):
         eventbox = gtk.EventBox()
         eventbox.add(vbox)
         frame.add(eventbox)
-        self.tooltips.set_tip(eventbox, 
-                _('Patch series description is sent in initial summary'
-                ' email with [PATCH 0 of N] subject.  It should describe'
-                ' the effects of the entire patch series.  When emailing'
-                ' a bundle, these fields make up the message subject and body.'
-                ' The description field is unused when sending a single patch'))
+        self._eventbox = eventbox
         mainvbox.pack_start(frame, True, True, 4)
 
         self.connect('map_event', self._on_window_map_event)
@@ -203,6 +198,22 @@ class EmailDialog(gtk.Window):
             self._ccbox.child.set_text(fromutf(repo.ui.config('email', 'cc', '')))
             self._frombox.child.set_text(fromutf(repo.ui.config('email', 'from', '')))
             self._subjbox.child.set_text(fromutf(repo.ui.config('email', 'subject', '')))
+            self._intro = False
+            for arg in extensions.find('patchbomb').cmdtable['email'][1]:
+                if arg[1] == 'intro':
+                    self._intro = True
+                    break
+            if self._intro:
+                addtip = ''
+            else:
+                addtip = ' ' + _('The description field is unused '
+                               'when sending a single patch.')
+            self.tooltips.set_tip(self._eventbox, 
+                    _('Patch series description is sent in initial summary'
+                    ' email with [PATCH 0 of N] subject.  It should describe'
+                    ' the effects of the entire patch series.  When emailing'
+                    ' a bundle, these fields make up the message subject and body.')
+                    + addtip)
         fill_history(history, self._tolist, 'email.to')
         fill_history(history, self._cclist, 'email.cc')
         fill_history(history, self._fromlist, 'email.from')
@@ -291,6 +302,8 @@ class EmailDialog(gtk.Window):
             cmdline.insert(2, '--test')
         if subjtext:
             cmdline += ['--subject', subjtext]
+            if self._intro:
+                cmdline += ['--intro']
         if self._bundle.get_active():
             cmdline += ['--bundle']
             if '--outgoing' in self.revargs:
