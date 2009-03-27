@@ -7,12 +7,33 @@ try:
 except ImportError:
     from mercurial.repo import RepoError
 
+debugging = False
+
 try:
     from win32api import GetTickCount
     CACHE_TIMEOUT = 5000
+    import _winreg
+    try:
+        hkey = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
+                           r"Software\TortoiseHg", 0,
+                           _winreg.KEY_ALL_ACCESS)
+        val = QueryValueEx(hkey, 'OverlayDebug')[0]
+        if val in ('1', 'True'):
+            debugging = True
+    except EnvironmentError:
+        pass
 except ImportError:
     from time import time as GetTickCount
     CACHE_TIMEOUT = 5.0
+
+if debugging:
+    import win32traceutil
+    def debugf(str, args=None):
+        if args: print str % args
+        else:    print str
+else:
+    def debugf(str, args=None):
+        pass
 
 UNCHANGED = "unchanged"
 ADDED = "added"
@@ -57,7 +78,7 @@ def get_states(upath, repo=None):
     global overlay_cache, cache_tick_count
     global cache_root, cache_pdir
 
-    #print "called: _get_state(%s)" % path
+    #debugf("called: _get_state(%s)", path)
     tc = GetTickCount()
 
     try:
@@ -76,10 +97,10 @@ def get_states(upath, repo=None):
                     status = ROOT,
                 else:
                     status = overlay_cache.get(pdir, [NOT_IN_REPO])
-            print "%s: %s (cached)" % (path, status)
+            debugf("%s: %s (cached)", (path, status))
             return status
         else:
-            print "Timed out!! ",
+            debugf("Timed out!!")
             overlay_cache.clear()
             cache_tick_count = GetTickCount()
      # path is a drive
@@ -90,7 +111,7 @@ def get_states(upath, repo=None):
     if cache_pdir == pdir:
         root = cache_root
     else:
-        print "find new root ",
+        debugf("find new root")
         root = thgutil.find_root(path)
         if root == path:
             add(path, ROOT)
@@ -98,12 +119,12 @@ def get_states(upath, repo=None):
         cache_root = root
         cache_pdir = pdir
 
-    print "_get_state: root = ", root
     if root is None:
-        print "_get_state: not in repo"
+        debugf("_get_state: not in repo")
         overlay_cache = {None: None}
         cache_tick_count = GetTickCount()
         return [NOT_IN_REPO]
+    debugf("_get_state: root = " + root)
     hgdir = os.path.join(root, '.hg', '')
     if pdir == hgdir[:-1] or pdir.startswith(hgdir):
         add(pdir, NOT_IN_REPO)
@@ -112,25 +133,25 @@ def get_states(upath, repo=None):
         tc1 = GetTickCount()
         if not repo or (repo.root != root and repo.root != os.path.realpath(root)):
             repo = hg.repository(ui.ui(), path=root)
-            print "hg.repository() took %g ticks" % (GetTickCount() - tc1)
+            debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
         # check if to display overlay icons in this repo
         overlayopt = repo.ui.config('tortoisehg', 'overlayicons', ' ').lower()
-        print "%s: repo overlayicons = " % path, overlayopt
+        debugf("%s: repo overlayicons = ", (path, overlayopt))
         if overlayopt == 'localdisk':
             overlayopt = bool(thgutil.netdrive_status(path))
         if not overlayopt or overlayopt in 'false off no'.split():
-            print "%s: overlayicons disabled" % path
+            debugf("%s: overlayicons disabled", path)
             overlay_cache = {None: None}
             cache_tick_count = GetTickCount()
             return [NOT_IN_REPO]
     except RepoError:
         # We aren't in a working tree
-        print "%s: not in repo" % pdir
+        debugf("%s: not in repo", pdir)
         add(pdir, IGNORED)
         return [IGNORED]
     except StandardError, e:
-        print "error while handling %s:" % pdir
-        print e
+        debugf("error while handling %s:", pdir)
+        debugf(e)
         add(pdir, UNKNOWN)
         return [UNKNOWN]
      # get file status
@@ -141,11 +162,11 @@ def get_states(upath, repo=None):
         repostate = repo.status(match=matcher, ignored=True,
                         clean=True, unknown=True)
     except util.Abort, inst:
-        print "abort: %s" % inst
-        print "treat as unknown : %s" % path
+        debugf("abort: %s", inst)
+        debugf("treat as unknown : %s", path)
         return [UNKNOWN]
 
-    print "status() took %g ticks" % (GetTickCount() - tc1)
+    debugf("status() took %g ticks", (GetTickCount() - tc1))
     modified, added, removed, deleted, unknown, ignored, clean = repostate
     # cached file info
     tc = GetTickCount()
@@ -164,7 +185,7 @@ def get_states(upath, repo=None):
             add(fpath, st)
     add(root, ROOT)
     status = overlay_cache.get(path, [UNKNOWN])
-    print "\n%s: %s" % (path, status)
+    debugf("\n%s: %s", (path, status))
     cache_tick_count = GetTickCount()
     return status
 

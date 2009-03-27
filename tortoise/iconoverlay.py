@@ -11,21 +11,13 @@ from mercurial import hg, cmdutil, util
 import thgutil
 import sys
 import threading
+import cachethg
+from cachethg import debugf
 
 try:
     from mercurial.error import RepoError
 except ImportError:
     from mercurial.repo import RepoError
-
-# FIXME: quick workaround traceback caused by missing "closed" 
-# attribute in win32trace.
-from mercurial import ui
-def write_err(self, *args):
-    for a in args:
-        sys.stderr.write(str(a))
-ui.ui.write_err = write_err
-
-import cachethg
 
 cache_lock = threading.Semaphore()
 
@@ -71,8 +63,8 @@ class IconOverlayExtension(object):
             return S_FALSE
         finally:
             cache_lock.release()
-            print "IsMemberOf(%s): _get_state() took %d ticks" % \
-                    (self.state, win32api.GetTickCount() - tc)
+            debugf("IsMemberOf(%s): _get_state() took %d ticks",
+                    (self.state, win32api.GetTickCount() - tc))
             
 def make_icon_overlay(name, icon_type, state, clsid):
     """

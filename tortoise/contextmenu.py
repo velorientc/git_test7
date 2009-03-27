@@ -26,14 +26,24 @@ try:
 except ImportError:
     from mercurial.repo import RepoError
 
-# FIXME: quick workaround traceback caused by missing "closed" 
-# attribute in win32trace.
-import sys
-from mercurial import ui
-def write_err(self, *args):
-    for a in args:
-        sys.stderr.write(str(a))
-ui.ui.write_err = write_err
+debugging = False
+
+try:
+    import _winreg
+    try:
+        hkey = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
+                           r"Software\TortoiseHg", 0,
+                           _winreg.KEY_ALL_ACCESS)
+        val = QueryValueEx(hkey, 'ContextMenuDebug')[0]
+        if val in ('1', 'True'):
+            debugging = True
+    except EnvironmentError:
+        pass
+except ImportError:
+    pass
+
+if debugging:
+    import win32traceutil
 
 S_OK = 0
 S_FALSE = 1
