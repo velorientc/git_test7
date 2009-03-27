@@ -135,7 +135,7 @@ def get_states(upath, repo=None):
             debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
         # check if to display overlay icons in this repo
         overlayopt = repo.ui.config('tortoisehg', 'overlayicons', ' ').lower()
-        debugf("%s: repo overlayicons = ", (path, overlayopt))
+        debugf("%s: repo overlayicons = %s", (path, overlayopt))
         if overlayopt == 'localdisk':
             overlayopt = bool(thgutil.netdrive_status(path))
         if not overlayopt or overlayopt in 'false off no'.split():
@@ -150,7 +150,7 @@ def get_states(upath, repo=None):
         return IGNORED
     except StandardError, e:
         debugf("error while handling %s:", pdir)
-        debugf(str(e))
+        debugf(e)
         add(pdir, UNKNOWN)
         return UNKNOWN
      # get file status
@@ -161,7 +161,7 @@ def get_states(upath, repo=None):
         repostate = repo.status(match=matcher, ignored=True,
                         clean=True, unknown=True)
     except util.Abort, inst:
-        debugf("abort: %s", str(inst))
+        debugf("abort: %s", inst)
         debugf("treat as unknown : %s", path)
         return UNKNOWN
 
