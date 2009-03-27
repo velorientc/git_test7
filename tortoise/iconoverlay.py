@@ -107,3 +107,5 @@ modified = cachethg.REMOVED + cachethg.DELETED + cachethg.MODIFIED
 make_icon_overlay("Changed", "Modified", modified, THG_CLSID)
 make_icon_overlay("Unchanged", "Normal", cachethg.UNCHANGED, THG_CLSID)
 make_icon_overlay("Added", "Added", cachethg.ADDED, THG_CLSID)
+make_icon_overlay("Ignored", "Ignored", cachethg.IGNORED, THG_CLSID)
+make_icon_overlay("Conflict", "Conflict", cachethg.UNRESOLVED, THG_CLSID)
