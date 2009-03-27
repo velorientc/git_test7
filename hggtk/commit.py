@@ -535,7 +535,7 @@ class GCommit(GStatus):
             if self.qnew:
                 self.qnew_name.set_text('')
                 self.repo.invalidate()
-                self.state = 'commit'
+                self.mode = 'commit'
                 self.qnew = False
                 _mq = self.repo.mq
                 _mq.__init__(_mq.ui, _mq.basepath, _mq.path)
