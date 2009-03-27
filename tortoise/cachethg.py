@@ -25,9 +25,13 @@ try:
         excs = QueryValueEx(hkey, 'ExcludePath')[0]
         debugging = QueryValueEx(hkey, 'OverlayDebug')[0] in ('1', 'True')
         for p in incs.split(';'):
-            includepaths.append(p.strip())
+            path = p.strip()
+            if path:
+                includepaths.append(path)
         for p in excs.split(';'):
-            excludepaths.append(p.strip())
+            path = p.strip()
+            if path:
+                excludepath.append(path)
     except EnvironmentError:
         pass
 except ImportError:
