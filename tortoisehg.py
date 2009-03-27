@@ -17,7 +17,10 @@ import _winreg
 
 # shell extension classes
 from tortoise.contextmenu import ContextMenuExtension
-from tortoise.iconoverlay import ChangedOverlay, AddedOverlay, UnchangedOverlay
+import tortoise.iconoverlay
+
+overlays = [getattr(tortoise.iconoverlay, overlay) for overlay in
+            tortoise.iconoverlay.__dict__ if overlay.endswith('Overlay')]
 
 bin_path = os.path.dirname(os.path.join(os.getcwd(), sys.argv[0]))
 print "bin path = ", bin_path
@@ -50,17 +53,15 @@ def register_tortoise_path(unregister=False):
 def DllRegisterServer():
     check_tortoise_overlays()
     RegisterServer(ContextMenuExtension)
-    RegisterServer(ChangedOverlay)
-    RegisterServer(AddedOverlay)
-    RegisterServer(UnchangedOverlay)
+    for overlay in overlays:
+        RegisterServer(overlay)
     register_tortoise_path()
 
 # for COM registration via py2exe
 def DllUnregisterServer():
     UnregisterServer(ContextMenuExtension)
-    UnregisterServer(ChangedOverlay)
-    UnregisterServer(AddedOverlay)
-    UnregisterServer(UnchangedOverlay)
+    for for overlay in overlays:
+        UnregisterServer(overlay)
     register_tortoise_path(unregister=True)
 
 def RegisterServer(cls):

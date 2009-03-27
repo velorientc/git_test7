@@ -261,7 +261,9 @@ class HgExtension(nautilus.MenuProvider,
                        cachethg.MODIFIED: ('cvs-modified', 'modified'),
                        cachethg.UNKNOWN: ('new', 'unrevisioned'),
                        cachethg.IGNORED: (None, 'ignored'),
-                       cachethg.NOT_IN_REPO: (None, '')}
+                       cachethg.NOT_IN_REPO: (None, ''),
+                       cachethg.ROOT: ('generic', 'root'),
+                       cachethg.UNRESOLVED: ('cvs-confilict', 'unresolved')}
         emblem, status = cache2state.get(cachestate, (None, '?'))
         return emblem, status
 
