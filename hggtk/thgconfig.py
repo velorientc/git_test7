@@ -38,11 +38,11 @@ _tortoise_info = (
     (_('Bottom Diffs'), 'gtools.diffbottom', ['False', 'True'],
         _('Show the diff panel below the file list in status, shelve, and'
         ' commit dialogs.'
-        ' Default: False (show diffs to right of file list)')),
-    (_('Overlay Icons'), 'tortoisehg.overlayicons',
-        ['False', 'True', 'localdisks'],
-        _('Display overlay icons in Explorer windows.'
-        ' Default: True')))
+        ' Default: False (show diffs to right of file list)')))
+
+shellcmds = '''about add clone commit datamine init log merge recovery
+shelve synch status userconfig repoconfig guess remove rename revert
+serve update vdiff'''.split()
 
 _commit_info = (
     (_('Username'), 'ui.username', [], 
@@ -250,6 +250,10 @@ class ConfigDialog(gtk.Dialog):
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
         self.fill_frame(self.tortoise_frame, _tortoise_info)
 
+        if not configrepo:# and os.name == 'nt':
+            self.shellframe = self.add_page(notebook, _('Shell Ext'))
+            self.fill_shell_frame(self.shellframe)
+
         self.commit_frame = self.add_page(notebook, _('Commit'))
         self.fill_frame(self.commit_frame, _commit_info)
 
@@ -433,10 +437,94 @@ class ConfigDialog(gtk.Dialog):
         text = ' '.join(tooltip.splitlines())
         buffer.set_text(text)
 
+    def fill_shell_frame(self, frame):
+        'Fill special tab for shell extension configurations'
+        vbox = gtk.VBox()
+        frame.add(vbox)
+        ovframe = gtk.Frame(_('Overlay configuration'))
+        ovframe.set_border_width(10)
+        vbox.pack_start(ovframe, False, False, 2)
+        ovcvbox = gtk.VBox()
+        ovframe.add(ovcvbox)
+        self.ovenable = gtk.CheckButton(_('Enable Overlays'))
+        ovcvbox.pack_start(self.ovenable, False, False, 2)
+        self.lclonly = gtk.CheckButton(_('Local disks only'))
+        ovcvbox.pack_start(self.lclonly, False, False, 2)
+        table = gtk.Table(2, 2, False)
+        ovcvbox.pack_start(table, False, False, 2)
+
+        # Text entry for overlay include path
+        lbl = gtk.Label(_('include path:'))
+        lbl.set_alignment(1.0, 0.0)
+        self.ovinclude = gtk.Entry()
+        table.attach(lbl, 0, 1, 0, 1, gtk.FILL, 0, 4, 3)
+        table.attach(self.ovinclude, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+
+        # Text entry for overlay include path
+        lbl = gtk.Label(_('exclude path:'))
+        lbl.set_alignment(1.0, 0.0)
+        self.ovexclude = gtk.Entry()
+        table.attach(lbl, 0, 1, 1, 2, gtk.FILL, 0, 4, 3)
+        table.attach(self.ovexclude, 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+
+        cmframe = gtk.Frame(_('Context menu configuration'))
+        cmframe.set_border_width(10)
+        vbox.pack_start(cmframe, False, False, 2)
+        cmcvbox = gtk.VBox()
+        cmframe.add(cmcvbox)
+
+        descframe = gtk.Frame(_('Description'))
+        descframe.set_border_width(10)
+        desctext = gtk.TextView()
+        desctext.set_wrap_mode(gtk.WRAP_WORD)
+        desctext.set_editable(False)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add(desctext)
+        descframe.add(scrolledwindow)
+        vbox.pack_start(gtk.Label(), True, True, 2)
+        vbox.pack_start(descframe, False, False, 2)
+
+        lbl = gtk.Label(_('Promote menu items to the top menu'))
+        cmcvbox.pack_start(lbl, False, False, 2)
+
+        rows = (len(shellcmds) + 2) / 3
+        table = gtk.Table(rows, 3, False)
+        cmcvbox.pack_start(table, False, False, 2)
+        for i, cmd in enumerate(shellcmds):
+            row, col = divmod(i, 3)
+            check = gtk.CheckButton(cmd)
+            table.attach(check, col, col+1,
+                         row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+            tooltip = _('Promote menu item "%s" to top menu') % cmd
+            check.connect('focus-in-event', self.set_help,
+                    desctext.get_buffer(), tooltip)
+
+        tooltip = _('Enable/Disable the overlay icons globally')
+        self.ovenable.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('Only use overlays on local disks')
+        self.lclonly.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('A list of semicolon (;) separated paths that the'
+                ' overlays will respect.  This include filter is applied'
+                ' after the local disk check.  If unspecified, the default'
+                ' is to display in all repositories.')
+        self.ovinclude.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('A list of semicolon (;) separated paths that are'
+                ' excluded by the overlay system.  This exclude filter is'
+                ' applied after the local disk check and include filters.'
+                ' So there is no need to exclude paths outside of your'
+                ' include filter.  Default is no exclusion.')
+        self.ovexclude.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+
     def fill_frame(self, frame, info):
         widgets = []
 
         descframe = gtk.Frame(_('Description'))
+        descframe.set_border_width(10)
         desctext = gtk.TextView()
         desctext.set_wrap_mode(gtk.WRAP_WORD)
         desctext.set_editable(False)
