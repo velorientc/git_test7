@@ -457,7 +457,7 @@ class ConfigDialog(gtk.Dialog):
         vbox.pack_start(ovframe, False, False, 2)
         ovcvbox = gtk.VBox()
         ovframe.add(ovcvbox)
-        self.ovenable = gtk.CheckButton(_('Enable Overlays'))
+        self.ovenable = gtk.CheckButton(_('Enable overlays'))
         ovcvbox.pack_start(self.ovenable, False, False, 2)
         self.lclonly = gtk.CheckButton(_('Local disks only'))
         ovcvbox.pack_start(self.lclonly, False, False, 2)
@@ -465,14 +465,14 @@ class ConfigDialog(gtk.Dialog):
         ovcvbox.pack_start(table, False, False, 2)
 
         # Text entry for overlay include path
-        lbl = gtk.Label(_('include path:'))
+        lbl = gtk.Label(_('Include path:'))
         lbl.set_alignment(1.0, 0.0)
         self.ovinclude = gtk.Entry()
         table.attach(lbl, 0, 1, 0, 1, gtk.FILL, 0, 4, 3)
         table.attach(self.ovinclude, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
 
         # Text entry for overlay include path
-        lbl = gtk.Label(_('exclude path:'))
+        lbl = gtk.Label(_('Exclude path:'))
         lbl.set_alignment(1.0, 0.0)
         self.ovexclude = gtk.Entry()
         table.attach(lbl, 0, 1, 1, 2, gtk.FILL, 0, 4, 3)
