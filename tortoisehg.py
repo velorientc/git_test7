@@ -60,7 +60,7 @@ def DllRegisterServer():
 # for COM registration via py2exe
 def DllUnregisterServer():
     UnregisterServer(ContextMenuExtension)
-    for for overlay in overlays:
+    for overlay in overlays:
         UnregisterServer(overlay)
     register_tortoise_path(unregister=True)
 
