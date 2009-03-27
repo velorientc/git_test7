@@ -162,8 +162,8 @@ class InitDialog(gtk.Window):
                 except:
                     pass
         
-        info_dialog(self, _('New repository created in directory %s') %
-                toutf(os.path.abspath(dest)))
+        info_dialog(self, _('New repository created'),
+                _('in directory %s') % toutf(os.path.abspath(dest)))
 
 def run(cwd='', files=[], **opts):
     dialog = InitDialog(cwd, repos=files)
