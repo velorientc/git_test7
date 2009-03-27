@@ -12,6 +12,7 @@
 import gtk
 import gobject
 import nautilus
+import gnomevfs
 
 try:
     from mercurial import demandimport
@@ -64,18 +65,43 @@ class HgExtension(nautilus.MenuProvider,
         self.cacherepo = None
         self.cacheroot = None
         self.scanStack = []
+        self.allvfs = {}
+        self.inv_dirs = set()
 
         from thgutil import menuthg
         self.hgtk = paths.find_in_path('hgtk')
         self.menu = menuthg.menuThg()
+        self.notify = os.path.expanduser('~/.tortoisehg/notify')
+        try:
+            f = open(self.notify, 'w')
+            f.close()
+            ds_uri = gnomevfs.get_uri_from_local_path(self.notify)
+            self.gmon = gnomevfs.monitor_add(ds_uri,
+                      gnomevfs.MONITOR_FILE, self.notified)
+        except (gnomevfs.NotSupportedError, IOError), e:
+            debugf('no notification because of %s', e)
+            self.notify = ''
 
     def icon(self, iname):
         return paths.get_tortoise_icon(iname)
 
-    def get_path_for_vfs_file(self, vfs_file):
-        if vfs_file.is_gone() or vfs_file.get_uri_scheme() != 'file':
+    def get_path_for_vfs_file(self, vfs_file, store=True):
+        if vfs_file.get_uri_scheme() != 'file':
             return None
-        return urllib.unquote(vfs_file.get_uri()[7:])
+        path = urllib.unquote(vfs_file.get_uri()[7:])
+        if vfs_file.is_gone():
+            self.allvfs.pop(path, '')
+            return None
+        if store:
+            self.allvfs[path] = vfs_file
+        return path
+
+    def get_vfs(self, path):
+        vfs = self.allvfs.get(path, None)
+        if vfs and vfs.is_gone():
+            del self.allvfs[path]
+            return None
+        return vfs
 
     def get_repo_for_path(self, path):
         '''
@@ -238,6 +264,50 @@ class HgExtension(nautilus.MenuProvider,
             vfs_file.add_emblem(emblem)
         vfs_file.add_string_attribute('hg_status', status)
         return True
+
+    def notified(self, mon_uri=None, event_uri=None, event=None):
+        debugf('notified from hgtk, %s', event, level='n')
+        f = open(self.notify, 'a+')
+        files = None
+        try:
+            files = [line[:-1] for line in f if line]
+            if files:
+                f.truncate(0)
+        finally:
+            f.close()
+        if not files:
+            return
+        root = os.path.commonprefix(files)
+        root = paths.find_root(root)
+        self.invalidate(files, root)
+
+    def invalidate(self, paths, root = ''):
+        from tortoise import cachethg
+        started = bool(self.inv_dirs)
+        if cachethg.cache_pdir == root and root not in self.inv_dirs:
+            cachethg.overlay_cache.clear()
+        self.inv_dirs.update([os.path.dirname(root), '/', ''])
+        for path in paths:
+            path = os.path.join(root, path)
+            while path not in self.inv_dirs:
+                self.inv_dirs.add(path)
+                path = os.path.dirname(path)
+                if cachethg.cache_pdir == path:
+                    cachethg.overlay_cache.clear()
+        if started:
+            return
+        if len(paths) > 1:
+            self._invalidate_dirs()
+        else:
+            #group invalidation of directories
+            gobject.timeout_add(200, self._invalidate_dirs)
+
+    def _invalidate_dirs(self):
+        for path in self.inv_dirs:
+            vfs = self.get_vfs(path)
+            if vfs:
+                vfs.invalidate_extension_info()
+        self.inv_dirs.clear()
 
     # property page borrowed from http://www.gnome.org/~gpoo/hg/nautilus-hg/
     def __add_row(self, row, label_item, label_value):

@@ -178,4 +178,17 @@ if os.name == 'nt':
                                  pidl, None)
 else:
     def shell_notify(paths):
-        pass
+        if not paths:
+            return
+        notify = os.environ.get('THG_NOTIFY', '.tortoisehg/notify')
+        if not os.path.isabs(notify):
+            notify = os.path.join(os.path.expanduser('~'), notify)
+            os.environ['THG_NOTIFY'] = notify
+        if not os.path.isfile(notify):
+            return
+        f_notify = open(notify, 'w')
+        try:
+            f_notify.write('\n'.join([os.path.abspath(path) for path in paths]))
+        finally:
+            f_notify.close()
+
