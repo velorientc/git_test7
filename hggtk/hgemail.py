@@ -35,6 +35,9 @@ class EmailDialog(gtk.Window):
                 self._toolbutton(gtk.STOCK_GOTO_LAST, _('send'),
                                  self._on_send_clicked,
                                  _('Send email(s)')),
+                self._toolbutton(gtk.STOCK_FIND, _('test'),
+                                 self._on_test_clicked,
+                                 _('Show email(s) which would be sent')),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_PREFERENCES, _('configure'),
                                  self._on_conf_clicked,
@@ -230,6 +233,12 @@ class EmailDialog(gtk.Window):
         self._refresh(False)
 
     def _on_send_clicked(self, button):
+        self.send()
+
+    def _on_test_clicked(self, button):
+        self.send(True)
+
+    def send(self, test = False):
         def record_new_value(cpath, history, newvalue):
             if not newvalue: return
             if cpath not in history.get_keys():
@@ -256,7 +265,7 @@ class EmailDialog(gtk.Window):
         if not self.repo:
             return
 
-        if self.repo.ui.config('email', 'method', 'smtp') == 'smtp':
+        if self.repo.ui.config('email', 'method', 'smtp') == 'smtp' and not test:
             if not self.repo.ui.config('smtp', 'host'):
                 info_dialog(self, _('Info required'),
                             _('You must configure SMTP'))
@@ -268,15 +277,18 @@ class EmailDialog(gtk.Window):
                 self._refresh(False)
                 return
 
-        history = shlib.Settings('config_history')
-        record_new_value('email.to', history, totext)
-        record_new_value('email.cc', history, cctext)
-        record_new_value('email.from', history, fromtext)
-        record_new_value('email.subject', history, subjtext)
-        history.write()
+        if not test:
+            history = shlib.Settings('config_history')
+            record_new_value('email.to', history, totext)
+            record_new_value('email.cc', history, cctext)
+            record_new_value('email.from', history, fromtext)
+            record_new_value('email.subject', history, subjtext)
+            history.write()
 
         cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
         cmdline += ['--repository', self.repo.root]
+        if test:
+            cmdline.insert(2, '--test')
         if subjtext:
             cmdline += ['--subject', subjtext]
         if self._bundle.get_active():
