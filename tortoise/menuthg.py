@@ -15,6 +15,19 @@ try:
 except ImportError:
     from mercurial.repo import RepoError
 
+promoted = []
+try:
+    from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
+    try:
+        hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+        pl = QueryValueEx(hkey, 'PromotedItems')[0]
+        for item in pl.split(','):
+            item = item.strip()
+            if item: promoted.append(str(item))
+    except EnvironmentError:
+        pass
+except ImportError:
+    pass
 
 class TortoiseMenu(object):
 
@@ -75,18 +88,11 @@ class thg_menu(object):
         self.sep = [False]
 
     def add_menu(self, menutext, helptext, hgcmd, icon=None, state=True):
-        pos = self.ui.config('tortoisehg', 'menu.' + hgcmd)
-        if pos:
-            if pos.isdigit():
-                pos = int(pos)
-            else:
-                pos = pos[0].lower() not in 'nfm' # no, false, main menu
-        elif hgcmd == 'commit':
+        global promoted
+        if hgcmd in promoted:
             pos = 0
         else:
             pos = 1
-        if pos < 0:
-            return
         while len(self.menus) <= pos: #add Submenu
             self.menus.append([])
             self.sep.append(False)
