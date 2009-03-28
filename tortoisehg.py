@@ -80,7 +80,7 @@ def RegisterServer(cls):
         path = _winreg.QueryValue(_winreg.HKEY_CLASSES_ROOT, key)
         _winreg.SetValue(_winreg.HKEY_CLASSES_ROOT, key, _winreg.REG_SZ, "%s;%s" % (path, hg_path))
     except Exception, e:
-        print e
+        print 'register COM path failed', e
         
     # Add the appropriate shell extension registry keys
     for category, keyname, values in cls.registry_keys:
@@ -95,7 +95,7 @@ def RegisterServer(cls):
         key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, apath, 0, _winreg.KEY_WRITE)
         _winreg.SetValueEx(key, cls._reg_clsid_, 0, _winreg.REG_SZ, 'TortoiseHg')
     except Exception, e:
-        print e
+        print 'register to approved list failed', e
 
     print cls._reg_desc_, "registration complete."
 
@@ -115,7 +115,7 @@ def UnregisterServer(cls):
         key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, apath, 0, _winreg.KEY_WRITE)
         _winreg.DeleteValue(key, cls._reg_clsid_)
     except Exception, e:
-        print e
+        print 'remove from approved list failed', e
 
     print cls._reg_desc_, "unregistration complete."
 
