@@ -4,10 +4,9 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 
 import os
-from mercurial import hg
-from thgutil import *
 import cachethg
-from mercurial import ui
+from thgutil import *
+from mercurial import hg, ui
 from mercurial.i18n import _
 
 try:
@@ -25,9 +24,14 @@ try:
             item = item.strip()
             if item: promoted.append(str(item))
     except EnvironmentError:
-        pass
+        promoted = ['commit']
 except ImportError:
-    pass
+    # fallback method for non-win32 platforms
+    u = ui.ui()
+    pl = u.config('tortoisehg', 'promoteditems', 'commit')
+    for item in pl.split(','):
+        item = item.strip()
+        if item: promoted.append(str(item))
 
 class TortoiseMenu(object):
 
