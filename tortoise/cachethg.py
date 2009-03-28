@@ -152,13 +152,6 @@ def get_states(upath, repo=None):
             cache_tick_count = GetTickCount()
             debugf("overlayicons disabled")
             return NOT_IN_REPO
-
-        tc1 = GetTickCount()
-        real = os.path.realpath(root)
-        if not repo or (repo.root != root and repo.root != real):
-            repo = hg.repository(ui.ui(), path=root)
-            debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
-
         if localonly and thgutil.netdrive_status(path):
             debugf("%s: is a network drive", path)
             overlay_cache = {None: None}
@@ -167,19 +160,23 @@ def get_states(upath, repo=None):
         if includepaths:
             for p in includepaths:
                 if path.startswith(p):
-                    break;
+                    break
             else:
                 debugf("%s: is not in an include path", path)
                 overlay_cache = {None: None}
                 cache_tick_count = GetTickCount()
                 return NOT_IN_REPO
-        if excludepaths:
-            for p in excludepaths:
-                if path.startswith(p):
-                    debugf("%s: is in an exclude path", path)
-                    overlay_cache = {None: None}
-                    cache_tick_count = GetTickCount()
-                    return NOT_IN_REPO
+        for p in excludepaths:
+            if path.startswith(p):
+                debugf("%s: is in an exclude path", path)
+                overlay_cache = {None: None}
+                cache_tick_count = GetTickCount()
+                return NOT_IN_REPO
+        tc1 = GetTickCount()
+        real = os.path.realpath(root)
+        if not repo or (repo.root != root and repo.root != real):
+            repo = hg.repository(ui.ui(), path=root)
+            debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
     except RepoError:
         # We aren't in a working tree
         debugf("%s: not in repo", pdir)
