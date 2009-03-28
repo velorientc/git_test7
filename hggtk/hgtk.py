@@ -44,8 +44,9 @@ def dispatch(args):
     except:
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
-        u.print_exc()
-        raise
+        error = traceback.format_exc()
+        from bugreport import run
+        run(**{'cmd':' '.join(sys.argv[1:]), 'error':error})
 
 def get_list_from_file(filename):
     try:
@@ -567,6 +568,3 @@ table = {
          _('[-o] CMD')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
 }
-
-if __name__=='__main__':
-    sys.exit(dispatch(sys.argv[1:]))
