@@ -167,6 +167,9 @@ class ContextMenuExtension(menuthg.menuThg):
                 self.fnames = []
             else:
                 cwd = os.path.dirname(f)
+        else:
+            print 'No cwd found'
+            cwd = ''
 
         self.menuitems = {}
         if self.folder and self.fnames:
