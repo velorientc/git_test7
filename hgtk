@@ -37,7 +37,7 @@ try:
     import hggtk.hgtk
 except ImportError:
     sys.stderr.write("abort: couldn't find hggtk libraries in [%s]\n" %
-                     ' '.join(sys.path))
+                     ';'.join(sys.path))
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
