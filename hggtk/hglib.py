@@ -10,33 +10,24 @@ from dialog import entry_dialog
 
 try:
     from mercurial.error import RepoError, ParseError, LookupError
+    from mercurial.error import UnknownCommand, AmbiguousCommand
 except ImportError:
+    from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
     from mercurial.repo import RepoError
     from mercurial.dispatch import ParseError
     from mercurial.revlog import LookupError
 
+from mercurial import demandimport
+demandimport.disable()
 try:
-    try:
-        from mercurial import demandimport
-    except:
-        from mercurial.commands import demandimport # pre 0.9.5
-    demandimport.disable()
-
-    try:
-        # Mercurail 0.9.4
-        from mercurial.cmdutil import parse
-        from mercurial.cmdutil import parseconfig as _parseconfig
-    except:
-        try:
-            # Mercurail <= 0.9.3
-            from mercurial.commands import parse
-            from mercurial.commands import parseconfig as _parseconfig
-        except:
-            # Mercurail 0.9.5
-            from mercurial.dispatch import _parse as parse
-            from mercurial.dispatch import _parseconfig
-finally:
-    demandimport.enable()
+    # Mercurial 0.9.4
+    from mercurial.cmdutil import parse
+    from mercurial.cmdutil import parseconfig as _parseconfig
+except:
+    # Mercurial 0.9.5
+    from mercurial.dispatch import _parse as parse
+    from mercurial.dispatch import _parseconfig
+demandimport.enable()
 
 def toutf(s):
     """
