@@ -12,19 +12,12 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
 
 from mercurial.i18n import _
-from mercurial import hg, util, fancyopts, commands, cmdutil
-import pdb
 import mercurial.ui as _ui
-
-try:
-    from mercurial.error import RepoError, UnknownCommand, AmbiguousCommand
-    from mercurial.error import ParseError
-except ImportError:
-    from mercurial.repo import RepoError
-    from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
-    from mercurial.dispatch import ParseError
+from mercurial import hg, util, fancyopts, cmdutil
+from hglib import RepoError, UnknownCommand, AmbiguousCommand, ParseError
 
 import os
+import pdb
 import sys
 import traceback
 
