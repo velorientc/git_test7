@@ -188,8 +188,8 @@ class HgIgnoreDialog(gtk.Window):
         shell_notify(self.repo.wjoin('.hgignore'))
         if self.notify_func: self.notify_func()
         
-def run(root='', **opts):
-    dialog = HgIgnoreDialog(root)
+def run(root='', fileglob='', **opts):
+    dialog = HgIgnoreDialog(root, fileglob)
     dialog.show_all()
     dialog.connect('destroy', gtk.main_quit)
     gtk.gdk.threads_init()
