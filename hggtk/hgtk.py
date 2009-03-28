@@ -233,6 +233,13 @@ def datamine(ui, *pats, **opts):
     opts['cwd'] = os.getcwd()
     run(**opts)
 
+def hgignore(ui, *pats, **opts):
+    """repository initialization tool"""
+    from hggtk.hgignore import run
+    if pats and not pats[0].endswith('.hgignore'):
+        opts['fileglob'] = pats[0]
+    run(**opts)
+
 def hginit(ui, dest=None, **opts):
     """repository initialization tool"""
     from hggtk.hginit import run
@@ -530,6 +537,7 @@ table = {
          ('d', 'date', '', _('record datecode as commit date'))],
         _('hgtk commit [OPTIONS] [FILE]...')),
     "^datamine|annotate|blame": (datamine, [], _('hgtk datamine')),
+    "^hgignore|ignore|filter": (hgignore, [], _('hgtk hgignore [FILE]')),
     "^init": (hginit, [], _('hgtk init [DEST]')),
     "^log|history": (log,
         [('l', 'limit', '', _('limit number of changes displayed'))],
