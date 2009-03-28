@@ -93,7 +93,9 @@ def make_icon_overlay(name, icon_type, state, clsid):
     globals()[classname] = cls
 
 _overlay_classes = []
-make_icon_overlay("Changed", "Modified", cachethg.MODIFIED, "{4D0F33E1-654C-4A1B-9BE8-E47A98752BAB}")
+modified = cachethg.REMOVED + cachethg.DELETED + cachethg.MODIFIED
+
+make_icon_overlay("Changed", "Modified", modified, "{4D0F33E1-654C-4A1B-9BE8-E47A98752BAB}")
 make_icon_overlay("Unchanged", "Normal", cachethg.UNCHANGED, "{4D0F33E2-654C-4A1B-9BE8-E47A98752BAB}")
 make_icon_overlay("Added", "Added", cachethg.ADDED, "{4D0F33E3-654C-4A1B-9BE8-E47A98752BAB}")
 make_icon_overlay("Ignored", "Ignored", cachethg.IGNORED, "{4D0F33E4-654C-4A1B-9BE8-E47A98752BAB}")
