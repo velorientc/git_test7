@@ -17,10 +17,11 @@ import _winreg
 
 # shell extension classes
 from tortoise.contextmenu import ContextMenuExtension
-import tortoise.iconoverlay
+from tortoise.iconoverlay import ChangedOverlay, AddedOverlay, UnchangedOverlay
+from tortoise.iconoverlay import ConflictOverlay, IgnoredOverlay
 
-overlays = [getattr(tortoise.iconoverlay, overlay) for overlay in
-            tortoise.iconoverlay.__dict__ if overlay.endswith('Overlay')]
+overlays = (ChangedOverlay, AddedOverlay, UnchangedOverlay,
+            ConflictOverlay, IgnoredOverlay)
 
 bin_path = os.path.dirname(os.path.join(os.getcwd(), sys.argv[0]))
 print "bin path = ", bin_path
