@@ -29,8 +29,6 @@ class CloneDialog(gtk.Window):
         title += " - %s" % (os.getcwd())
         self.set_title(title)
 
-        self._src_path = ''
-        self._dest_path = ''
         self._settings = shlib.Settings('clone')
         self._recent_src = self._settings.mrul('src_paths')
         self._recent_dest = self._settings.mrul('dest_paths')
@@ -38,11 +36,13 @@ class CloneDialog(gtk.Window):
         sync_settings = shlib.Settings('synch')
         self._sync_src = sync_settings.mrul('src_paths')
 
-        try:
+        self._src_path = ''
+        self._dest_path = os.getcwd()
+        if len(repos) > 1:
             self._src_path = repos[0]
             self._dest_path = repos[1]
-        except:
-            pass
+        elif len(repos):
+            self._src_path = repos[0]
             
         # build dialog
         self._create()
