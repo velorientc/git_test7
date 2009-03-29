@@ -383,7 +383,7 @@ class GDialog(gtk.Window):
             extdiff.dodiff(self.ui, self.repo, self.diffcmd, self.diffopts,
                             [self.repo.wjoin(file)], self.opts)
 
-        if self.diffcmd == 'diff':
+        if not self.diffcmd or self.diffcmd == 'diff':
             Prompt('No visual diff configured',
                     'Please select a visual diff application.', self).run()
             dlg = ConfigDialog(self.repo.root, False)
