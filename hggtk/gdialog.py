@@ -192,6 +192,7 @@ class GDialog(gtk.Window):
                     path = cmd
                 diffopts = self.ui.config('extdiff', 'opts.' + cmd, '')
                 diffopts = diffopts and [diffopts] or []
+                return path, diffopts
             elif cmd == usercmd:
                 # command = path opts
                 if path:
@@ -199,7 +200,7 @@ class GDialog(gtk.Window):
                     path = diffopts.pop(0)
                 else:
                     path, diffopts = cmd, []
-            return path, diffopts
+                return path, diffopts
         return None, None
 
     def _parse_config(self):
@@ -377,7 +378,7 @@ class GDialog(gtk.Window):
             extdiff.dodiff(self.ui, self.repo, self.diffcmd, self.diffopts,
                             [self.repo.wjoin(file)], self.opts)
 
-        if self.diffcmd == 'diff':
+        if not self.diffcmd or self.diffcmd == 'diff':
             Prompt(_('No visual diff configured'),
                    _('Please select a visual diff application.'), self).run()
             dlg = ConfigDialog(self.repo.root, False)
