@@ -25,8 +25,7 @@ class CloneDialog(gtk.Window):
         if cwd: os.chdir(cwd)
         
         # set dialog title
-        title = "hg clone "
-        title += " - %s" % (os.getcwd())
+        title = 'hg clone'
         self.set_title(title)
 
         self._settings = shlib.Settings('clone')
@@ -262,7 +261,7 @@ class CloneDialog(gtk.Window):
         rev = self._rev_input.get_text()
         
         # verify input
-        if src == "":
+        if src == '':
             error_dialog(self, _('Source path is empty'), _('Please enter'))
             self._src_input.grab_focus()
             return False
