@@ -197,6 +197,7 @@ class GDialog(gtk.Window):
                     path = cmd
                 diffopts = self.ui.config('extdiff', 'opts.' + cmd, '')
                 diffopts = diffopts and [diffopts] or []
+                return path, diffopts
             elif cmd == usercmd:
                 # command = path opts
                 if path:
@@ -204,7 +205,7 @@ class GDialog(gtk.Window):
                     path = diffopts.pop(0)
                 else:
                     path, diffopts = cmd, []
-            return path, diffopts
+                return path, diffopts
         return None, None
 
     def _parse_config(self):
