@@ -177,15 +177,12 @@ class DetectRenameDialog(gtk.Window):
         ctree.connect('row-activated',
                       self.candidate_row_act, unknowntree, stbar)
         ctree.get_selection().connect('changed', self.show_diff, buf, ac)
-        self.connect('map_event', self.on_window_map_event, unkmodel)
         self.connect('delete-event', self.save_settings,
                 settings, hpaned, vpaned, adjustment)
+        gobject.idle_add(self.refresh, unkmodel)
 
     def set_notify_func(self, func):
         self.notify_func = func
-
-    def on_window_map_event(self, event, param, unkmodel):
-        self.refresh(unkmodel)
 
     def refresh(self, unkmodel):
         q = Queue.Queue()

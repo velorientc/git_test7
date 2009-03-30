@@ -33,7 +33,6 @@ class BugReport(GDialog):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(textview)
-        self.connect('map-event', self.displayed, textview.get_buffer())
         vbox = gtk.VBox()
         vbox.pack_start(scroller, True, True, 2)
         hbbox = gtk.HButtonBox()
@@ -42,9 +41,7 @@ class BugReport(GDialog):
         close = gtk.Button(_('Close'))
         close.connect('clicked', gtk.main_quit)
         hbbox.add(close)
-        return vbox
 
-    def displayed(self, widget, event, buffer):
         from about import hgversion
         import shlib
         text = _('\n\nPlease report this bug to'
@@ -53,7 +50,8 @@ class BugReport(GDialog):
                 hgversion, shlib.version())
         text += _('Command: %s\n') % (self.opts['cmd'])
         text += self.opts['error']
-        buffer.set_text(text)
+        textview.get_buffer().set_text(text)
+        return vbox
 
 
 def run(**opts):

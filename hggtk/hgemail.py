@@ -7,6 +7,7 @@
 
 import os
 import sys
+import gobject
 import gtk
 import pango
 import shlib
@@ -161,8 +162,7 @@ class EmailDialog(gtk.Window):
         frame.add(eventbox)
         self._eventbox = eventbox
         mainvbox.pack_start(frame, True, True, 4)
-
-        self.connect('map_event', self._on_window_map_event)
+        gobject.idle_add(self._refresh, True)
 
     def _toolbutton(self, stock, label, handler, tip):
         tbutton = gtk.ToolButton(stock)
@@ -171,9 +171,6 @@ class EmailDialog(gtk.Window):
         tbutton.connect('clicked', handler)
         return tbutton
         
-    def _on_window_map_event(self, event, param):
-        self._refresh(True)
-
     def _refresh(self, initial):
         def fill_history(history, vlist, cpath):
             vlist.clear()

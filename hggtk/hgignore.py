@@ -6,6 +6,7 @@
 
 import os
 import gtk
+import gobject
 from dialog import *
 from shlib import shell_notify, set_tortoise_icon
 from hglib import fromutf, toutf
@@ -107,7 +108,7 @@ class HgIgnoreDialog(gtk.Window):
         glob_entry.grab_focus()
         pattree.get_selection().connect('changed', self.pattree_rowchanged, remove)
         unknowntree.get_selection().connect('changed', self.unknown_rowchanged)
-        self.connect('map_event', self.on_window_map_event)
+        gobject.idle_add(self.refresh)
 
     def remove_pressed(self, widget, selection):
         model, rows = selection.get_selected_rows()
@@ -137,9 +138,6 @@ class HgIgnoreDialog(gtk.Window):
         newregexp = fromutf(regexp_entry.get_text())
         self.ignorelines.append('regexp:' + newregexp)
         self.write_ignore_lines()
-        self.refresh()
-
-    def on_window_map_event(self, event, param):
         self.refresh()
 
     def refresh_clicked(self, togglebutton, data=None):
