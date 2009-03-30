@@ -142,7 +142,7 @@ class GCommit(GStatus):
             label = gtk.Label('QNew: ')
             mbox.pack_start(label, False, False, 2)
             self.qnew_name = gtk.Entry()
-            self.qnew_name.set_width_chars(12)
+            self.qnew_name.set_width_chars(20)
             self.qnew_name.connect('changed', self._qnew_changed)
             mbox.pack_start(self.qnew_name, False, False, 2)
         else:
