@@ -51,7 +51,8 @@ class CmdDialog(gtk.Dialog):
             hbox = gtk.HBox()
             
             self.status_text = gtk.Label()
-            self.status_text.set_text(toutf(" ".join(cmdline).replace("\n", " ")))
+            text = toutf(' '.join(cmdline).replace('\n', ' '))
+            self.status_text.set_text(text)
             self.status_text.set_alignment(0, 0.5)
             self.status_text.set_ellipsize(pango.ELLIPSIZE_END)
             hbox.pack_start(self.status_text, True, True, 3)
