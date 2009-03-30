@@ -100,11 +100,12 @@ class CmdDialog(gtk.Dialog):
             widget.emit_stop_by_name('response')
     
     def _on_window_map_event(self, event, param):
-        self.hgthread = HgThread(self.cmdline[1:])
-        self.hgthread.start()
-        self._button_ok.set_sensitive(False)
-        self._button_stop.set_sensitive(True)        
-        gobject.timeout_add(10, self.process_queue)
+        if self.hgthread is None:
+            self.hgthread = HgThread(self.cmdline[1:])
+            self.hgthread.start()
+            self._button_ok.set_sensitive(False)
+            self._button_stop.set_sensitive(True)        
+            gobject.timeout_add(10, self.process_queue)
     
     def write(self, msg, append=True):
         msg = toutf(msg)
