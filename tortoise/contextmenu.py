@@ -26,30 +26,12 @@ try:
 except ImportError:
     from mercurial.repo import RepoError
 
-debugging = False
-
-try:
-    import _winreg
-    try:
-        hkey = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
-                           r"Software\TortoiseHg", 0,
-                           _winreg.KEY_ALL_ACCESS)
-        val = _winreg.QueryValueEx(hkey, 'ContextMenuDebug')[0]
-        if val in ('1', 'True'):
-            debugging = True
-    except EnvironmentError:
-        pass
-except ImportError:
-    pass
-
+import debugthg:
+debugging = debugthg.debug('M')
 if debugging:
-    import win32traceutil
-    def debugf(str, args=None):
-        if args: print str % args
-        else:    print str
+    debugf = debugthg.debugf
 else:
-    def debugf(str, args=None):
-        pass
+    debugf = debugthg.debugf_No
 
 appfiltered = False
 try:

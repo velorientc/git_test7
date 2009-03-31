@@ -2,6 +2,7 @@ import os
 from mercurial import hg, cmdutil, util, ui, node, merge
 import thgutil
 import sys
+import debugthg
 try:
     from mercurial.error import RepoError
 except ImportError:
@@ -37,19 +38,16 @@ try:
 except ImportError:
     from time import time as GetTickCount
     CACHE_TIMEOUT = 5.0
+    debugging = debugthg.debug('O')
 
 if debugging:
-    import win32traceutil
-    def debugf(str, args=None):
-        if args: print str % args
-        else:    print str
-    print 'Enabled', enabled
-    print 'LocalDisksOnly', localonly
-    print 'IncludePaths', includepaths
-    print 'ExcludePaths', excludepaths
+    debugf = debugthg.debugf
+    debugf('Enabled %s', enabled)
+    debugf('LocalDisksOnly %s', localonly)
+    debugf('IncludePaths %s', includepaths)
+    debugf('ExcludePaths %s', excludepaths)
 else:
-    def debugf(str, args=None):
-        pass
+    debugf = debugthg.debugf_No
 
 STATUS_STATES = 'MAR!?IC'
 MODIFIED, ADDED, REMOVED, DELETED, UNKNOWN, IGNORED, UNCHANGED = STATUS_STATES
