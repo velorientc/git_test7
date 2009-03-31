@@ -276,7 +276,10 @@ class GCommit(GStatus):
             self.qheader = '\n'.join(ph.message)
             buf = self.text.get_buffer()
             if buf.get_char_count() == 0 or not buf.get_modified():
-                buf.set_text(self.qheader)
+                if self.qnew:
+                    buf.set_text('')
+                else:
+                    buf.set_text(self.qheader)
                 buf.set_modified(False)
             c_btn = self.get_toolbutton(_('_Commit'))
             if self.qnew:
@@ -290,6 +293,10 @@ class GCommit(GStatus):
             c_btn = self.get_toolbutton(_('_Commit'))
             c_btn.set_label(_('QNew'))
             c_btn.set_tooltip(self.tooltips, _('QNew'))
+            buf = self.text.get_buffer()
+            if not buf.get_modified():
+                buf.set_text('')
+                buf.set_modified(False)
         else:
             c_btn = self.get_toolbutton(('_Commit'))
             c_btn.set_label(_('_Commit'))
