@@ -505,7 +505,7 @@ class SynchDialog(gtk.Window):
 
     def _exec_cmd(self, cmd):
         if self._cmd_running():
-            error_dialog(self, _('Cannott run now'),
+            error_dialog(self, _('Cannot run now'),
                 _('Please try again after the previous command is completed'))
             return
 
