@@ -137,6 +137,22 @@ class EmailDialog(gtk.Window):
                 ' Upstream users can pull from them. This is the safest'
                 ' way to send changes to recipient Mercurial users.'))
 
+        hbox = gtk.HBox()
+        vbox.pack_start(hbox, False, False, 2)
+
+        self._attach = gtk.CheckButton(_('attach'))
+        self.tooltips.set_tip(self._attach, 
+                _('send patches as attachments'))
+        self._inline = gtk.CheckButton(_('inline'))
+        self.tooltips.set_tip(self._inline, 
+                _('send patches as inline attachments'))
+        self._diffstat = gtk.CheckButton(_('diffstat'))
+        self.tooltips.set_tip(self._diffstat, 
+                _('add diffstat output to messages'))
+        hbox.pack_start(self._attach, True, True, 2)
+        hbox.pack_start(self._inline, True, True, 2)
+        hbox.pack_start(self._diffstat, True, True, 2)
+
         vbox = gtk.VBox()
         hbox = gtk.HBox()
         self._subjlist = gtk.ListStore(str)
@@ -220,6 +236,9 @@ class EmailDialog(gtk.Window):
         self._git.set_sensitive(True)
         self._bundle.set_sensitive(True)
         self._plain.set_sensitive(True)
+        self._inline.set_sensitive(True)
+        self._attach.set_sensitive(True)
+        self._diffstat.set_sensitive(True)
         defaults = repo.ui.config('defaults', 'email', '').split()
         for flag in defaults:
             if flag in ('-g', '--git'):
@@ -231,6 +250,15 @@ class EmailDialog(gtk.Window):
             if flag in ('--plain'):
                 self._plain.set_active(True)
                 self._plain.set_sensitive(False)
+            if flag in ('i', '--inline'):
+                self._inline.set_active(True)
+                self._inline.set_sensitive(False)
+            if flag in ('a', '--attach'):
+                self._attach.set_active(True)
+                self._attach.set_sensitive(False)
+            if flag in ('d', '--diffstat'):
+                self._diffstat.set_active(True)
+                self._diffstat.set_sensitive(False)
 
     def _on_conf_clicked(self, button):
         dlg = ConfigDialog(self.root, False)
@@ -307,6 +335,9 @@ class EmailDialog(gtk.Window):
                 self.revargs.remove('--outgoing')
         elif self._plain.get_active():  cmdline += ['--plain']
         elif self._git.get_active():    cmdline += ['--git']
+        if self._inline.get_active():   cmdline += ['--inline']
+        if self._attach.get_active():   cmdline += ['--attach']
+        if self._diffstat.get_active(): cmdline += ['--diffstat']
         start = self.descbuffer.get_start_iter()
         end = self.descbuffer.get_end_iter()
         desc = self.descbuffer.get_text(start, end)
