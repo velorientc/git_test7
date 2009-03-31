@@ -239,6 +239,8 @@ class CloneDialog(gtk.Window):
             self._srclist.append([p])
 
     def _add_dest_to_recent(self, dest):
+        if not dest:
+            return
         if os.path.exists(dest):
             dest = os.path.abspath(dest)
 
@@ -265,6 +267,14 @@ class CloneDialog(gtk.Window):
             error_dialog(self, _('Source path is empty'), _('Please enter'))
             self._src_input.grab_focus()
             return False
+
+        if dest == os.getcwd():
+            if os.listdir(dest):
+                # cur dir has files, specify no dest, let hg take
+                # basename
+                dest = None
+            else:
+                dest = '.'
         
         # start cloning        
         try:            
