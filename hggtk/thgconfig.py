@@ -275,6 +275,7 @@ class ConfigDialog(gtk.Dialog):
         if not configrepo and os.name == 'nt':
             self.shellframe = self.add_page(notebook, _('Shell Ext'))
             self.fill_shell_frame(self.shellframe)
+        self.configrepo = configrepo
 
         # Force dialog into clean state in the beginning
         self._refresh_vlist()
@@ -826,7 +827,8 @@ class ConfigDialog(gtk.Dialog):
         except IOError, e:
             error_dialog(self, _('Unable to write configuration file'), str(e))
 
-        self.save_shell_configs()
+        if not self.configrepo and os.name == 'nt':
+            self.save_shell_configs()
         self._btn_apply.set_sensitive(False)
         self.dirty = False
         return 0
