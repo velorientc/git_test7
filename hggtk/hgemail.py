@@ -323,7 +323,10 @@ class EmailDialog(gtk.Window):
 
         cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
         cmdline += ['--repository', self.repo.root]
+        oldpager = os.environ.get('PAGER')
         if test:
+            if oldpager:
+                del os.environ['PAGER']
             cmdline.insert(2, '--test')
         if subjtext:
             cmdline += ['--subject', subjtext]
@@ -353,6 +356,8 @@ class EmailDialog(gtk.Window):
             dlg.run()
             dlg.hide()
         finally:
+            if oldpager:
+                os.environ['PAGER'] = oldpager
             os.unlink(tmpfile)
 
 def run(root='', **opts):
