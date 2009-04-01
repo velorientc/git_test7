@@ -171,9 +171,17 @@ if os.name == 'nt':
             from win32com.shell import shell, shellcon
         except ImportError:
             return
+        dirs = []
         for path in paths:
             abspath = os.path.abspath(path)
-            pidl, ignore = shell.SHILCreateFromPath(abspath, 0)
+            if not os.path.isdir(abspath):
+                abspath = os.path.dirname(abspath)
+            if abspath not in dirs:
+                dirs.append(abspath)
+        # send notifications to deepest directories first
+        dirs.sort(lambda x, y: len(y) - len(x))
+        for dir in dirs:
+            pidl, ignore = shell.SHILCreateFromPath(dir, 0)
             if pidl is None:
                 continue
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
