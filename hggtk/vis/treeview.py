@@ -56,6 +56,12 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show revision ID column',
                                  False,
                                  gobject.PARAM_READWRITE),
+
+        'branch-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Branch',
+                                 'Show branch',
+                                 False,
+                                 gobject.PARAM_READWRITE),
     }
 
     __gsignals__ = {
@@ -203,6 +209,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.id_column.get_visible()
         elif property.name == 'rev-column-visible':
             return self.rev_column.get_visible()
+        elif property.name == 'branch-column-visible':
+            return self.branch_column.get_visible()
         elif property.name == 'repo':
             return self.repo
         elif property.name == 'limit':
@@ -219,6 +227,8 @@ class TreeView(gtk.ScrolledWindow):
             self.id_column.set_visible(value)
         elif property.name == 'rev-column-visible':
             self.rev_column.set_visible(value)
+        elif property.name == 'branch-column-visible':
+            self.branch_column.set_visible(value)
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'limit':
@@ -355,6 +365,19 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.id_column)
 
         cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 15)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        self.branch_column = gtk.TreeViewColumn("Branch")
+        self.branch_column.set_visible(False)
+        self.branch_column.set_resizable(True)
+        self.branch_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.branch_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.branch_column.pack_start(cell, expand=True)
+        self.branch_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        self.branch_column.add_attribute(cell, "markup", treemodel.BRANCHES)
+        self.treeview.append_column(self.branch_column)
+        cell = gtk.CellRendererText()
+
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.msg_column = gtk.TreeViewColumn("Summary")

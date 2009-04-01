@@ -146,6 +146,12 @@ class GLog(GDialog):
         button.set_active(self._show_date)
         button.set_draw_as_radio(True)
         menu.append(button)
+        button = gtk.CheckMenuItem("Show Branch")
+        button.connect("toggled", self.toggle_view_column,
+                'branch-column-visible')
+        button.set_active(self._show_branch)
+        button.set_draw_as_radio(True)
+        menu.append(button)
         menu.show_all()
         return menu
 
@@ -219,7 +225,8 @@ class GLog(GDialog):
                 self._hpaned.get_position(),
                 self.graphview.get_property('rev-column-visible'),
                 self.graphview.get_property('date-column-visible'),
-                self.graphview.get_property('id-column-visible'))
+                self.graphview.get_property('id-column-visible'),
+                self.graphview.get_property('branch-column-visible'))
         return settings
 
     def get_graphlimit(self, suggestion):
@@ -256,7 +263,7 @@ class GLog(GDialog):
         GDialog.load_settings(self, settings)
         self._setting_vpos = -1
         self._setting_hpos = -1
-        self._show_rev, self._show_date, self._show_id = True, True, False
+        self._show_rev, self._show_date, self._show_id, self._show_branch = True, True, False, False
         if settings:
             data = settings['glog']
             if type(data) == int:
@@ -266,6 +273,9 @@ class GLog(GDialog):
             elif len(data) == 5:
                 (self._setting_vpos, self._setting_hpos,
                  self._show_rev, self._show_date, self._show_id) = data
+            elif len(data) == 6:
+                (self._setting_vpos, self._setting_hpos,
+                 self._show_rev, self._show_date, self._show_id, self._show_branch) = data
 
     def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""
