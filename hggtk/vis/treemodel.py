@@ -129,8 +129,6 @@ class TreeModel(gtk.GenericTreeModel):
                         branch['name']
             for branch in inbranches:
                 branchstr += branch['name']
-                bstr += '<span background="#d5dde6"> %s </span> ' % \
-                        branch['name']
 
 
             if '<' in ctx.user():
