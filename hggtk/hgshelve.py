@@ -80,7 +80,7 @@ def scanpatch(fp):
             if m:
                 yield 'range', m.groups()
             else:
-                raise patch.PatchError('unknown patch content: %r' % line)
+                raise patch.PatchError(_('unknown patch content: %r') % line)
 
 class header(object):
     diff_re = re.compile('diff --git a/(.*) b/(.*)$')
@@ -282,7 +282,7 @@ def parsepatch(fp):
         try:
             p.transitions[state][newstate](p, data)
         except KeyError:
-            raise patch.PatchError('unhandled transition: %s -> %s' %
+            raise patch.PatchError(_('unhandled transition: %s -> %s') %
                                    (state, newstate))
         state = newstate
     return p.finished()
@@ -388,7 +388,7 @@ def makebackup(ui, repo, dir, files):
         fd, tmpname = tempfile.mkstemp(prefix=f.replace('/', '_')+'.',
                                        dir=dir)
         os.close(fd)
-        ui.debug('backup %r as %r\n' % (f, tmpname))
+        ui.debug(_('backup %r as %r\n') % (f, tmpname))
         util.copyfile(repo.wjoin(f), tmpname)
         backups[f] = tmpname
 
@@ -489,14 +489,14 @@ def shelve(ui, repo, *pats, **opts):
 
                 # 3b. apply filtered patch to clean repo (apply)
                 if dopatch:
-                    ui.debug('applying patch\n')
+                    ui.debug(_('applying patch\n'))
                     ui.debug(fp.getvalue())
                     patch.internalpatch(fp, ui, 1, repo.root)
                 del fp
 
                 # 3c. apply filtered patch to clean repo (shelve)
                 if doshelve:
-                    ui.debug("saving patch to shelve\n")
+                    ui.debug(_('saving patch to shelve\n'))
                     if opts['append']:
                         f = repo.opener('shelve', "a")
                     else:
@@ -507,9 +507,9 @@ def shelve(ui, repo, *pats, **opts):
             except:
                 try:
                     for realname, tmpname in backups.iteritems():
-                        ui.debug('restoring %r to %r\n' % (tmpname, realname))
+                        ui.debug(_('restoring %r to %r\n') % (tmpname, realname))
                         util.copyfile(tmpname, repo.wjoin(realname))
-                    ui.debug('removing shelve file\n')
+                    ui.debug(_('removing shelve file\n'))
                     os.unlink(repo.join('shelve'))
                 except OSError:
                     pass
@@ -518,7 +518,7 @@ def shelve(ui, repo, *pats, **opts):
         finally:
             try:
                 for realname, tmpname in backups.iteritems():
-                    ui.debug('removing backup for %r : %r\n' % (realname, tmpname))
+                    ui.debug(_('removing backup for %r : %r\n') % (realname, tmpname))
                     os.unlink(tmpname)
                 os.rmdir(backupdir)
             except OSError:
@@ -543,7 +543,7 @@ def unshelve(ui, repo, *pats, **opts):
             backupdir = repo.join('shelve-backups')
             backups = makebackup(ui, repo, backupdir, set(files))
 
-            ui.debug('applying shelved patch\n')
+            ui.debug(_('applying shelved patch\n'))
             patchdone = 0
             try:
                 try:
@@ -556,24 +556,24 @@ def unshelve(ui, repo, *pats, **opts):
                     if opts['force']:
                         patchdone = 1
                     else:
-                        ui.status('restoring backup files\n')
+                        ui.status(_('restoring backup files\n'))
                         for realname, tmpname in backups.iteritems():
-                            ui.debug('restoring %r to %r\n' % 
+                            ui.debug(_('restoring %r to %r\n') % 
                                      (tmpname, realname))
                             util.copyfile(tmpname, repo.wjoin(realname))
             finally:
                 try:
-                    ui.debug('removing backup files\n')
+                    ui.debug(_('removing backup files\n'))
                     shutil.rmtree(backupdir, True)
                 except OSError:
                     pass
 
             if patchdone:
-                ui.debug("removing shelved patches\n")
+                ui.debug(_('removing shelved patches\n'))
                 os.unlink(repo.join('shelve'))
-                ui.status("unshelve completed\n")
+                ui.status(_('unshelve completed\n'))
     except IOError:
-        ui.warn('nothing to unshelve\n')
+        ui.warn(_('nothing to unshelve\n'))
     
 cmdtable = {
     "shelve":

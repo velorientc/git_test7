@@ -10,6 +10,7 @@ import gtk
 import pango
 from dialog import *
 from hgcmd import CmdDialog
+from mercurial.i18n import _
 import histselect
 
 class BackoutDialog(gtk.Window):
@@ -19,7 +20,7 @@ class BackoutDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         self.root = root
-        self.set_title('Backout changeset - ' + rev)
+        self.set_title(_('Backout changeset - ') + rev)
         self.set_default_size(600, 400)
         self.notify_func = None
         
@@ -31,9 +32,9 @@ class BackoutDialog(gtk.Window):
         sep.set_draw(False)
 
         tbuttons = [
-                self._toolbutton(gtk.STOCK_GO_BACK, 'Backout',
+                self._toolbutton(gtk.STOCK_GO_BACK, _('Backout'),
                                  self._backout_clicked,
-                                 'Backout selected changeset')
+                                 _('Backout selected changeset'))
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -44,31 +45,31 @@ class BackoutDialog(gtk.Window):
         # From: combo box
         self.reventry = gtk.Entry()
         self.reventry.set_text(rev)
-        self.browse = gtk.Button("Browse...")
+        self.browse = gtk.Button(_('Browse...'))
         self.browse.connect('clicked', self._btn_rev_clicked)
 
         hbox = gtk.HBox()
-        hbox.pack_start(gtk.Label('Revision to backout:'), False, False, 4)
+        hbox.pack_start(gtk.Label(_('Revision to backout:')), False, False, 4)
         hbox.pack_start(self.reventry, True, True, 4)
         hbox.pack_start(self.browse, False, False, 4)
         vbox.pack_start(hbox, False, False, 4)
 
         self.logview = gtk.TextView(buffer=None)
         self.logview.set_editable(True)
-        self.logview.modify_font(pango.FontDescription("Monospace"))
+        self.logview.modify_font(pango.FontDescription('Monospace'))
         buf = self.logview.get_buffer()
-        buf.set_text('Backed out changeset: ' + rev)
+        buf.set_text(_('Backed out changeset: ') + rev)
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.logview)
         scrolledwindow.set_border_width(4)
-        frame = gtk.Frame('Backout commit message')
+        frame = gtk.Frame(_('Backout commit message'))
         frame.set_border_width(4)
         frame.add(scrolledwindow)
         self.tips.set_tip(frame, 
-                'Commit message text for new changeset that reverses the'
-                '  effect of the change being backed out.')
+                _('Commit message text for new changeset that reverses the'
+                '  effect of the change being backed out.'))
         vbox.pack_start(frame, True, True, 4)
 
     def set_notify_func(self, func, *args):
@@ -81,7 +82,7 @@ class BackoutDialog(gtk.Window):
         if rev is not None:
             self.reventry.set_text(rev)
             buf = self.logview.get_buffer()
-            buf.set_text('Backed out changeset: ' + rev)
+            buf.set_text(_('Backed out changeset: ') + rev)
 
     def _toolbutton(self, stock, label, handler, tip):
         tbutton = gtk.ToolButton(stock)
@@ -104,8 +105,8 @@ class BackoutDialog(gtk.Window):
 
 def run(root='', **opts):
     # This dialog is intended to be launched by the changelog browser
-    # It's not expected to be used from hgproc or the command line.  I
-    # leave this path in place for testing purposes.
+    # It's not expected to be used from hgtk.  I leave this path in
+    # place for testing purposes.
     dialog = BackoutDialog(root, 'tip')
     dialog.show_all()
     dialog.connect('destroy', gtk.main_quit)

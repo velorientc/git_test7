@@ -1,18 +1,15 @@
 # setup.py
 # A distutils setup script to install TortoiseHg in Windows and Posix
-# environments.  In Windows, it will register TortoiseHG COM server.
+# environments.
 #
-# For Windows:
-#   To build stand-alone package, use 'python setup.py py2exe' then use
-#   InnoSetup to build the installer.  By default, the installer will be
-#   created as dist\Output\setup.exe.
-#
+# On Windows, this script is mostly used to build a stand-alone
+# TortoiseHg package.  See installer\build.txt for details. The other
+# use is to report the current version of the TortoiseHg source.
 
 import time
 import sys
 import os
 from distutils.core import setup
-
 
 def setup_windows():
     # Specific definitios for Windows NT-alike installations
@@ -54,8 +51,6 @@ def setup_windows():
         _data_files = [(root, [os.path.join(root, file_) for file_ in files])
                             for root, dirs, files in os.walk('icons')]
         extra['windows'] = [
-                {"script":"hgproc.py",
-                            "icon_resources": [(1, "icons/tortoise/hg.ico")]},
                 {"script":"tracelog.py",
                             "icon_resources": [(1, "icons/tortoise/python.ico")]}
                 ]
@@ -84,7 +79,7 @@ def setup_windows():
 def setup_posix():
     # Specific definitios for Posix installations
     _extra = {}
-    _scripts = ['contrib/hgtk', 'hgproc.py']
+    _scripts = ['hgtk']
     _packages = ['hggtk', 'hggtk.vis', 'hggtk.iniparse', 'tortoise']
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
@@ -97,12 +92,10 @@ def setup_posix():
 
 if os.name == "nt":
     (scripts, packages, data_files, extra) = setup_windows()
+    desc='Windows shell extension for Mercurial VCS',
 else:
     (scripts, packages, data_files, extra) = setup_posix()
-
-
-# specify version string, otherwise 'hg identify' will be used:
-version = ''
+    desc='TortoiseHg dialogs for Mercurial VCS',
 
 try:
     l = os.popen('hg id -it').read().split()
@@ -111,7 +104,6 @@ try:
     version = l and l[-1] or 'unknown' # latest tag or revision number
     if version.endswith('+'):
         version += time.strftime('%Y%m%d')
-
 except OSError:
     version = "unknown"
 
@@ -125,7 +117,7 @@ setup(name="tortoisehg",
         author='TK Soh',
         author_email='teekaysoh@gmail.com',
         url='http://bitbucket.org/tortoisehg/stable/',
-        description='Windows shell extension for Mercurial VCS',
+        description=desc,
         license='GNU GPL2',
         scripts=scripts,
         packages=packages,
