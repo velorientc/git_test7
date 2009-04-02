@@ -219,13 +219,16 @@ class ContextMenuExtension(menuthg.menuThg):
             files = []
             cwd_rel = cwd[len(self.repo.root+os.sep):]
             for f in self.fnames:
-                cpath = util.canonpath(self.repo.root, cwd, f)
-                if cpath.startswith(cwd_rel):
-                    if cwd_rel:
-                        cpath = cpath[len(cwd_rel+os.sep):]
-                    files.append(cpath)
-                else:
-                    files.append(f)
+                try:
+                    cpath = util.canonpath(self.repo.root, cwd, f)
+                    if cpath.startswith(cwd_rel):
+                        if cwd_rel:
+                            cpath = cpath[len(cwd_rel+os.sep):]
+                        files.append(cpath)
+                    else:
+                        files.append(f)
+                except util.Abort: # canonpath will abort on .hg/ paths
+                    pass
             self.fnames = files
 
         cmdline = None

@@ -189,12 +189,15 @@ class HgExtension(nautilus.MenuProvider,
             else:
                 cwd_rel = cwd[len(repo.root+os.sep):] + os.sep
             for f in files:
-                cpath = util.canonpath(repo.root, cwd, f)
-                if cpath.startswith(cwd_rel):
-                    cpath = cpath[len(cwd_rel):]
-                    self.files.append(cpath)
-                else:
-                    self.files.append(f)
+                try:
+                    cpath = util.canonpath(repo.root, cwd, f)
+                    if cpath.startswith(cwd_rel):
+                        cpath = cpath[len(cwd_rel):]
+                        self.files.append(cpath)
+                    else:
+                        self.files.append(f)
+                except util.Abort: # canonpath will abort on .hg/ paths
+                    pass
         else:
             menus = self.menu.get_norepo_commands(cwd, files)
         self.cwd = cwd
