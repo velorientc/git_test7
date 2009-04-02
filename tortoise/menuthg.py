@@ -6,7 +6,7 @@
 import os
 import cachethg
 import thgutil
-from mercurial import hg, ui
+from mercurial import hg, ui, node
 from mercurial.i18n import _
 
 try:
@@ -289,13 +289,12 @@ class menuThg:
                       _("update working directory"),
                       'update', icon="menucheckout.ico")
 
-            if len(repo.changectx(None).parents()) < 2:
+            inmerge = repo.dirstate.parents()[1] != node.nullid
+            if not inmerge:
                 menu.add_menu(_("Merge Revisions"),
                       _("merge working directory with another revision"),
                       'merge', icon="menumerge.ico")
-
-            inmerge = len(repo.changectx(None).parents()) > 1
-            if inmerge:
+            else:
                 menu.add_menu(_("Undo Merge"),
                       _("Undo merge by updating to revision"),
                       'merge', icon="menuunmerge.ico")
