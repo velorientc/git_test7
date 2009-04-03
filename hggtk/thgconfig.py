@@ -564,7 +564,7 @@ class ConfigDialog(gtk.Dialog):
 
     def record_new_value(self, cpath, newvalue, keephistory=True):
         section, key = cpath.split('.', 1)
-        if newvalue == _unspecstr:
+        if newvalue == _unspecstr or newvalue == '':
             try:
                 del self.ini[section][key]
             except KeyError:
