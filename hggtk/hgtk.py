@@ -14,7 +14,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 from mercurial.i18n import _
 import mercurial.ui as _ui
 from mercurial import hg, util, fancyopts, cmdutil
-from hglib import RepoError, UnknownCommand, AmbiguousCommand, ParseError
+import hglib
 
 import os
 import pdb
@@ -62,7 +62,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
     except fancyopts.getopt.GetoptError, inst:
-        raise ParseError(None, inst)
+        raise hglib.ParseError(None, inst)
 
     if args:
         cmd, args = args[0], args[1:]
@@ -80,7 +80,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions)
     except fancyopts.getopt.GetoptError, inst:
-        raise ParseError(cmd, inst)
+        raise hglib.ParseError(cmd, inst)
 
     # separate global options back out
     for o in globalopts:
@@ -101,20 +101,20 @@ def _runcatch(ui, args):
             return runcommand(ui, args)
         finally:
             ui.flush()
-    except ParseError, inst:
+    except hglib.ParseError, inst:
         if inst.args[0]:
             ui.warn(_("hgtk %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
             ui.warn(_("hgtk: %s\n") % inst.args[1])
             help_(ui, 'shortlist')
-    except AmbiguousCommand, inst:
+    except hglib.AmbiguousCommand, inst:
         ui.warn(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
-    except UnknownCommand, inst:
+    except hglib.UnknownCommand, inst:
         ui.warn(_("hgtk: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
-    except RepoError, inst:
+    except hglib.RepoError, inst:
         ui.warn(_("abort: %s!\n") % inst)
     except util.Abort, inst:
         ui.warn(_("abort: %s\n") % inst)
@@ -131,7 +131,6 @@ def runcommand(ui, args):
     elif not cmd:
         return help_(ui, 'shortlist')
 
-    import hglib
     path = hglib.rootpath(os.getcwd())
     if path:
         try:
@@ -147,7 +146,7 @@ def runcommand(ui, args):
     if cmd not in nonrepo_commands.split():
         try:
             repo = hg.repository(ui, path=path)
-        except RepoError, inst:
+        except hglib.RepoError, inst:
             # try to guess the repo from first of file args
             root = None
             if args:
@@ -155,7 +154,7 @@ def runcommand(ui, args):
             if path:
                 repo = hg.repository(ui, path=path)
             else:
-                raise RepoError(_("There is no Mercurial repository here"
+                raise hglib.RepoError(_("There is no Mercurial repository here"
                         " (.hg not found)"))
         cmdoptions['root'] = os.path.abspath(path)
 
@@ -166,7 +165,7 @@ def runcommand(ui, args):
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 1: # no
             raise
-        raise ParseError(cmd, _("invalid arguments"))
+        raise hglib.ParseError(cmd, _("invalid arguments"))
 
 def about(ui, *pats, **opts):
     """about TortoiseHg"""
@@ -297,10 +296,9 @@ def update(ui, **opts):
 
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
-    from mercurial import dispatch
-    vdiff = ui.config('tortoisehg', 'vdiff', 'vdiff')
-    if vdiff:
-        dispatch.dispatch([vdiff] + list(pats))
+    from hggtk.visdiff import visualdiff
+    repo = hg.repository(ui, path=hglib.rootpath(os.getcwd()))
+    visualdiff(repo, pats, opts)
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False):
@@ -402,7 +400,7 @@ def help_(ui, name=None, with_version=False):
                 v = i
                 header = l[-1]
         if not v:
-            raise cmdutil.UnknownCommand(name)
+            raise hglib.UnknownCommand(name)
 
         # description
         doc = help.helptable[v]
@@ -418,7 +416,7 @@ def help_(ui, name=None, with_version=False):
         try:
             mod = extensions.find(name)
         except KeyError:
-            raise cmdutil.UnknownCommand(name)
+            raise hglib.UnknownCommand(name)
 
         doc = (mod.__doc__ or _('No help text available')).splitlines(0)
         ui.write(_('%s extension - %s\n') % (name.split('.')[-1], doc[0]))
@@ -442,7 +440,7 @@ def help_(ui, name=None, with_version=False):
                 f(name)
                 i = None
                 break
-            except cmdutil.UnknownCommand, inst:
+            except hglib.UnknownCommand, inst:
                 i = inst
         if i:
             raise i
