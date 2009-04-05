@@ -74,14 +74,14 @@ class FileSelectionDialog(gtk.Dialog):
         model, paths = selection.get_selected_rows()
         st, fname = model[paths[0]]
         dir1, dir2, dir2root, tmproot = self.diffs
-        if st == 'M':
-            dir1 = os.path.join(dir1, util.localpath(fname))
+        if st == 'A':
+            dir1 = os.devnull
             dir2 = os.path.join(dir2root, dir2, util.localpath(fname))
         elif st == 'R':
             dir1 = os.path.join(dir1, util.localpath(fname))
             dir2 = os.devnull
         else:
-            dir1 = os.devnull
+            dir1 = os.path.join(dir1, util.localpath(fname))
             dir2 = os.path.join(dir2root, dir2, util.localpath(fname))
         cmdline = [diffpath] + diffopts + [dir1, dir2]
         subprocess.Popen(cmdline, shell=False, cwd=tmproot,
@@ -148,7 +148,6 @@ def visualdiff(repo, pats, opts):
         return
 
     tmproot = tempfile.mkdtemp(prefix='extdiff.')
-    dir2root = ''
     dir2 = ''
     try:
         # Always make a copy of node1
@@ -158,7 +157,7 @@ def visualdiff(repo, pats, opts):
         # If node2 in not the wc or there is >1 change, copy it
         if node2:
             dir2 = snapshot_node(repo, modified + added, node2, tmproot)
-        elif changes == 1:
+        else:
             # This lets the diff tool open the changed file directly
             dir2root = repo.root
 
