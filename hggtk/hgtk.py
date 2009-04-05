@@ -227,7 +227,7 @@ def datamine(ui, *pats, **opts):
     run(**opts)
 
 def hgignore(ui, *pats, **opts):
-    """repository initialization tool"""
+    """ignore filter editor"""
     from hggtk.hgignore import run
     if pats and not pats[0].endswith('.hgignore'):
         opts['fileglob'] = pats[0]
