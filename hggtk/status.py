@@ -350,11 +350,10 @@ class GStatus(GDialog):
 
             self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             self.diff_tree.set_headers_visible(False)
+            self.diff_tree.set_enable_search(False)
             self.diff_tree.set_property('enable-grid-lines', True)
             self.diff_tree.connect('row-activated',
                     self._diff_tree_row_act)
-            self.diff_tree.set_enable_search(False)
-            self.diff_tree.set_headers_visible(False)
 
             cell = gtk.CellRendererText()
             diffcol = gtk.TreeViewColumn('diff', cell)
