@@ -7,11 +7,13 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
+import gtk
 from mercurial.i18n import _
 from mercurial.node import short
 from mercurial import cmdutil, util, commands
 from gdialog import Prompt
 import os, shlex, subprocess, shutil, tempfile
+import shlib
 
 try:
     import win32con
@@ -19,9 +21,85 @@ try:
 except ImportError:
     openflags = 0
 
-def showfiles(repo, modified, removed, added, dir1, dir2):
+diffpath, diffopts = None, None
+
+class FileSelectionDialog(gtk.Dialog):
+    'Dialog for selecting visual diff candidates'
+    def __init__(self, modified, added, removed, dir1, dir2, dir2root, tmproot):
+        'Initialize the Dialog'
+        gtk.Dialog.__init__(self)
+        shlib.set_tortoise_icon(self, 'menushowchanged.ico')
+        self.set_title('Visual Diffs')
+        self.diffs = (dir1, dir2, dir2root, tmproot)
+        self.set_default_size(400, 150)
+
+        scroller = gtk.ScrolledWindow()
+        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        model = gtk.ListStore(str, str)
+        treeview = gtk.TreeView(model)
+        treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
+        scroller.add(treeview)
+        self.vbox.pack_start(scroller, True, True)
+
+        treeview.connect('row-activated', self.rowactivated)
+        treeview.set_headers_visible(False)
+        treeview.set_property('enable-grid-lines', True)
+        treeview.set_enable_search(False)
+
+        cell = gtk.CellRendererText()
+        stcol = gtk.TreeViewColumn('Status', cell)
+        stcol.set_resizable(True)
+        stcol.add_attribute(cell, 'text', 0)
+        treeview.append_column(stcol)
+
+        cell = gtk.CellRendererText()
+        fcol = gtk.TreeViewColumn('Filename', cell)
+        fcol.set_resizable(True)
+        fcol.add_attribute(cell, 'text', 1)
+        treeview.append_column(fcol)
+
+        for m in modified:
+            treeview.get_model().append(['M', m])
+        for a in added:
+            treeview.get_model().append(['A', a])
+        for r in removed:
+            treeview.get_model().append(['R', r])
+
+    def rowactivated(self, tree, path, column):
+        global diffpath, diffopts
+        selection = tree.get_selection()
+        if selection.count_selected_rows() != 1:
+            return False
+        model, paths = selection.get_selected_rows()
+        st, fname = model[paths[0]]
+        dir1, dir2, dir2root, tmproot = self.diffs
+        if st == 'M':
+            dir1 = os.path.join(dir1, util.localpath(fname))
+            dir2 = os.path.join(dir2root, dir2, util.localpath(fname))
+        elif st == 'R':
+            dir1 = os.path.join(dir1, util.localpath(fname))
+            dir2 = os.devnull
+        else:
+            dir1 = os.devnull
+            dir2 = os.path.join(dir2root, dir2, util.localpath(fname))
+        cmdline = [diffpath] + diffopts + [dir1, dir2]
+        subprocess.Popen(cmdline, shell=False, cwd=tmproot,
+                       creationflags=openflags,
+                       stderr=subprocess.PIPE,
+                       stdout=subprocess.PIPE,
+                       stdin=subprocess.PIPE).wait()
+
+def showfiles(modified, removed, added, dir1, dir2, dir2root, tmproot):
     '''open a treeview dialog to allow user to select files'''
-    print 'showfiles', modified, removed, added
+    dialog = FileSelectionDialog(modified, added, removed,
+            dir1, dir2, dir2root, tmproot)
+    dialog.show_all()
+    dialog.connect('destroy', gtk.main_quit)
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
 
 def snapshot_node(repo, files, node, tmproot):
     '''snapshot files as of some revision'''
@@ -45,7 +123,6 @@ def snapshot_node(repo, files, node, tmproot):
         open(dest, 'wb').write(data)
     return dirname
 
-diffpath, diffopts = None, None
 def visualdiff(repo, pats, opts):
     global diffpath, diffopts
     if diffpath is None:
@@ -72,6 +149,7 @@ def visualdiff(repo, pats, opts):
 
     tmproot = tempfile.mkdtemp(prefix='extdiff.')
     dir2root = ''
+    dir2 = ''
     try:
         # Always make a copy of node1
         dir1 = snapshot_node(repo, modified + removed, node1, tmproot)
@@ -82,7 +160,6 @@ def visualdiff(repo, pats, opts):
             dir2 = snapshot_node(repo, modified + added, node2, tmproot)
         elif changes == 1:
             # This lets the diff tool open the changed file directly
-            dir2 = ''
             dir2root = repo.root
 
         # If only one change, diff the files instead of the directories
@@ -103,7 +180,7 @@ def visualdiff(repo, pats, opts):
                            stdout=subprocess.PIPE,
                            stdin=subprocess.PIPE).wait()
         else:
-            showfiles(repo, modified, removed, added, dir1, dir2)
+            showfiles(modified, removed, added, dir1, dir2, dir2root, tmproot)
     finally:
         shutil.rmtree(tmproot)
 
@@ -121,7 +198,7 @@ def init(ui):
             diffopts = ui.config('extdiff', 'opts.' + cmd, '')
             diffopts = diffopts and [diffopts] or []
             return path, diffopts
-        elif cmd == usercmd:
+        elif cmd == vdiff:
             # command = path opts
             if path:
                 diffopts = shlex.split(path)
