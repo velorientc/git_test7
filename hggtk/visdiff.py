@@ -25,11 +25,12 @@ diffpath, diffopts = None, None
 
 class FileSelectionDialog(gtk.Dialog):
     'Dialog for selecting visual diff candidates'
-    def __init__(self, modified, added, removed, dir1, dir2, dir2root, tmproot):
+    def __init__(self, title, modified, added, removed,
+            dir1, dir2, dir2root, tmproot):
         'Initialize the Dialog'
         gtk.Dialog.__init__(self)
         shlib.set_tortoise_icon(self, 'menushowchanged.ico')
-        self.set_title('Visual Diffs')
+        self.set_title('Visual Diffs - ' + title)
         self.diffs = (dir1, dir2, dir2root, tmproot)
         self.set_default_size(400, 150)
 
@@ -90,9 +91,9 @@ class FileSelectionDialog(gtk.Dialog):
                        stdout=subprocess.PIPE,
                        stdin=subprocess.PIPE).wait()
 
-def showfiles(modified, removed, added, dir1, dir2, dir2root, tmproot):
+def showfiles(title, modified, removed, added, dir1, dir2, dir2root, tmproot):
     '''open a treeview dialog to allow user to select files'''
-    dialog = FileSelectionDialog(modified, added, removed,
+    dialog = FileSelectionDialog(title, modified, added, removed,
             dir1, dir2, dir2root, tmproot)
     dialog.show_all()
     dialog.connect('destroy', gtk.main_quit)
@@ -136,9 +137,14 @@ def visualdiff(repo, pats, opts):
     change = opts.get('change')
 
     if change:
+        title = _('changeset ') + str(change)
         node2 = repo.lookup(change)
         node1 = repo[node2].parents()[0].node()
     else:
+        if revs:
+            title = _('revision(s) ') + str(revs)
+        else:
+            title = _('working changes')
         node1, node2 = cmdutil.revpair(repo, revs)
 
     matcher = cmdutil.match(repo, pats, opts)
@@ -179,7 +185,8 @@ def visualdiff(repo, pats, opts):
                            stdout=subprocess.PIPE,
                            stdin=subprocess.PIPE).wait()
         else:
-            showfiles(modified, removed, added, dir1, dir2, dir2root, tmproot)
+            showfiles(title, modified, removed, added,
+                    dir1, dir2, dir2root, tmproot)
     finally:
         shutil.rmtree(tmproot)
 
