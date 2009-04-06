@@ -33,9 +33,11 @@ try:
     from mercurial import encoding
     _encoding = encoding.encoding
     _encodingmode = encoding.encodingmode
+    _fallbackencoding = encoding.fallbackencoding
 except ImportError:
     _encoding = util._encoding
     _encodingmode = util._encodingmode
+    _fallbackencoding = util._fallbackencoding
 
 def toutf(s):
     """
@@ -48,7 +50,7 @@ def toutf(s):
             return s.decode(e, 'strict').encode('utf-8')
         except UnicodeDecodeError:
             pass
-    return s.decode(util._fallbackencoding, 'replace').encode('utf-8')
+    return s.decode(_fallbackencoding, 'replace').encode('utf-8')
 
 def fromutf(s):
     """
@@ -62,7 +64,7 @@ def fromutf(s):
         pass
     except UnicodeEncodeError:
         pass
-    return s.decode('utf-8').encode(util._fallbackencoding)
+    return s.decode('utf-8').encode(_fallbackencoding)
 
 def rootpath(path=None):
     """ find Mercurial's repo root of path """
@@ -332,7 +334,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     # check for fallback encoding
     fallback = ui.config('ui', 'fallbackencoding')
     if fallback:
-        util._fallbackencoding = fallback
+        _fallbackencoding = fallback
 
     fullargs = args
     cmd, func, args, options, cmdoptions = parse(ui, args)
