@@ -11,6 +11,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 import shlib
+from mercurial.i18n import _
 
 try:
     # post 1.1.2
@@ -56,7 +57,7 @@ class AboutDialog(gtk.AboutDialog):
                 "GTK-%s" % make_version(gtk.gtk_version),
             ])
         
-        comment = "Several icons are courtesy of the TortoiseSVN project"
+        comment = _("Several icons are courtesy of the TortoiseSVN project")
 
         self.set_website("http://bitbucket.org/tortoisehg/stable/")
         self.set_name("TortoiseHg")
@@ -68,9 +69,14 @@ class AboutDialog(gtk.AboutDialog):
         thg_logo = os.path.normpath(shlib.get_tortoise_icon('thg_logo_92x50.png'))
         thg_icon = os.path.normpath(shlib.get_tortoise_icon('thg_logo.ico'))
         prog_root = os.path.dirname(os.path.dirname(os.path.dirname(thg_icon)))
-        license_file = os.path.join(prog_root, "COPYING.txt")
+        try:
+            license_file = os.path.join(prog_root, "COPYING.txt")
+            self.set_license(file(license_file).read())
+        except IOError:
+            import hgtk
+            license = hgtk.shortlicense.splitlines()[1:]
+            self.set_license('\n'.join(license))
 
-        self.set_license(file(license_file).read())
         self.set_comments("with " + lib_versions + "\n\n" + comment)
         self.set_logo(gtk.gdk.pixbuf_new_from_file(thg_logo))
         self.set_icon_from_file(thg_icon)

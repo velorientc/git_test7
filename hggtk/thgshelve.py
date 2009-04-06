@@ -71,10 +71,10 @@ class GShelve(GStatus):
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
         tbbuttons.insert(2, gtk.SeparatorToolItem())
-        self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, 'Shelve',
-                self._shelve_clicked, tip='set aside selected changes')
-        self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, 'Unshelve',
-                self._unshelve_clicked, tip='restore shelved changes')
+        self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, _('Shelve'),
+                self._shelve_clicked, tip=_('set aside selected changes'))
+        self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, _('Unshelve'),
+                self._unshelve_clicked, tip=_('restore shelved changes'))
         tbbuttons.insert(2, self.unshelve_btn)
         tbbuttons.insert(2, self.shelve_btn)
         return tbbuttons
@@ -137,7 +137,7 @@ class GShelve(GStatus):
         if file:
             hlist = [cid for cid in hlist if chunks[cid].filename() == file]
         if not hlist:
-            Prompt('Shelve', 'Please select diff chunks to shelve',
+            Prompt(_('Shelve'), _('Please select diff chunks to shelve'),
                     self).run()
             return
 
@@ -146,9 +146,11 @@ class GShelve(GStatus):
         if self._has_shelve_file():
             from gtklib import MessageDialog
             dialog = MessageDialog(flags=gtk.DIALOG_MODAL)
-            dialog.set_title('Shelve')
-            dialog.set_markup('<b>Shelve file exists!</b>')
-            dialog.add_buttons('Overwrite', 1, 'Append', 2, 'Cancel', -1)
+            dialog.set_title(_('Shelve'))
+            dialog.set_markup(_('<b>Shelve file exists!</b>'))
+            dialog.add_buttons(_('Overwrite'), 1,
+                               _('Append'), 2,
+                               _('Cancel'), -1)
             dialog.set_transient_for(self)
             rval = dialog.run()
             dialog.destroy()
