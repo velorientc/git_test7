@@ -107,6 +107,10 @@ class GLog(GDialog):
         def close_filter_dialog(dialog, response_id):
             dialog.hide()
 
+        def delete_event(dialog, event, data=None):
+            # return True to prevent the dialog from being destroyed
+            return True     
+
         revs = []
         if self.currow is not None:
             revs.append(self.currow[treemodel.REVID])
@@ -114,6 +118,7 @@ class GLog(GDialog):
         dlg = FilterDialog(self.repo.root, revs, self.pats,
                 filterfunc=do_reload)
         dlg.connect('response', close_filter_dialog)
+        dlg.connect('delete-event', delete_event)
         dlg.set_modal(False)
         dlg.show()
         
