@@ -29,13 +29,21 @@ except:
     from mercurial.dispatch import _parseconfig
 demandimport.enable()
 
+try:
+    from mercurial import encoding
+    _encoding = encoding.encoding
+    _encodingmode = encoding.encodingmode
+except ImportError:
+    _encoding = util._encoding
+    _encodingmode = util._encodingmode
+
 def toutf(s):
     """
     Convert a string to UTF-8 encoding
     
     Based on mercurial.util.tolocal()
     """
-    for e in ('utf-8', util._encoding):
+    for e in ('utf-8', _encoding):
         try:
             return s.decode(e, 'strict').encode('utf-8')
         except UnicodeDecodeError:
@@ -49,7 +57,7 @@ def fromutf(s):
     It's primarily used on strings converted to UTF-8 by toutf().
     """
     try:
-        return s.decode('utf-8').encode(util._encoding)
+        return s.decode('utf-8').encode(_encoding)
     except UnicodeDecodeError:
         pass
     except UnicodeEncodeError:
@@ -330,9 +338,9 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     cmd, func, args, options, cmdoptions = parse(ui, args)
 
     if options["encoding"]:
-        util._encoding = options["encoding"]
+        _encoding = options["encoding"]
     if options["encodingmode"]:
-        util._encodingmode = options["encodingmode"]
+        _encodingmode = options["encodingmode"]
     ui.updateopts(options["verbose"], options["debug"], options["quiet"],
                  not options["noninteractive"], options["traceback"])
 
