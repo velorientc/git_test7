@@ -89,7 +89,7 @@ class FileSelectionDialog(gtk.Dialog):
                        creationflags=openflags,
                        stderr=subprocess.PIPE,
                        stdout=subprocess.PIPE,
-                       stdin=subprocess.PIPE).wait()
+                       stdin=subprocess.PIPE)
 
 def showfiles(title, modified, removed, added, dir1, dir2, dir2root, tmproot):
     '''open a treeview dialog to allow user to select files'''
