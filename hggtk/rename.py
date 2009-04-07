@@ -421,6 +421,7 @@ def rename_resp(dialog, response):
     try:
         sys.stderr = errors
         repo.ui.pushbuffer()
+        repo.ui.quiet = True
         try:
             commands.rename(repo.ui, repo, dialog.orig, new_name, **opts)
             toquit = True
