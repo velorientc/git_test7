@@ -11,13 +11,13 @@ pygtk.require('2.0')
 import gtk
 
 from mercurial import demandimport; demandimport.enable()
+import os
 import sys
 
 if hasattr(sys, "frozen"):
     thgdir = os.path.dirname(sys.executable)
     os.environ['THG_ICON_PATH'] = os.path.join(thgdir, 'icons')
 else:
-    import os
     # check if hggtk is a symlink first
     pfile = __file__
     if pfile.endswith('.pyc'):
