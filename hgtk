@@ -13,7 +13,10 @@ import gtk
 from mercurial import demandimport; demandimport.enable()
 import sys
 
-if not hasattr(sys, "frozen"):
+if hasattr(sys, "frozen"):
+    thgdir = os.path.dirname(sys.executable)
+    os.environ['THG_ICON_PATH'] = os.path.join(thgdir, 'icons')
+else:
     import os
     # check if hggtk is a symlink first
     pfile = __file__
