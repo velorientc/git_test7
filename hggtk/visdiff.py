@@ -142,7 +142,7 @@ def visualdiff(repo, pats, opts):
         node1 = repo[node2].parents()[0].node()
     else:
         if revs:
-            title = _('revision(s) ') + str(revs)
+            title = _('revision(s) ') + str(revs[0])
         else:
             title = _('working changes')
         node1, node2 = cmdutil.revpair(repo, revs)
@@ -155,6 +155,7 @@ def visualdiff(repo, pats, opts):
 
     tmproot = tempfile.mkdtemp(prefix='extdiff.')
     dir2 = ''
+    dir2root = ''
     try:
         # Always make a copy of node1
         dir1 = snapshot_node(repo, modified + removed, node1, tmproot)
