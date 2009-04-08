@@ -232,12 +232,9 @@ class ChangeSet(GDialog):
         ctx1 = context.changectx(repo, node1) # parent
         ctx2 = context.changectx(repo, node2) # current
 
-        if node1 == repo.changelog.parents(node2)[0]:
-            filelist = ctx2.files()
-        else:
-            changes = repo.status(node1, node2, None)[:5]
-            modified, added, removed, deleted, unknown = changes
-            filelist = modified + added + removed
+        changes = repo.status(node1, node2, None)[:5]
+        modified, added, removed, deleted, unknown = changes
+        filelist = modified + added + removed
 
 
         # force manifest reading
