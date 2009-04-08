@@ -6,12 +6,12 @@
 
 import pygtk
 pygtk.require("2.0")
-
+import gtk
 import os
 import sys
-import gtk
 from gdialog import *
 from mercurial import cmdutil, util, hg, ui
+from mercurial.i18n import _
 from hglib import RepoError
 from shlib import shell_notify, set_tortoise_icon
 
@@ -42,9 +42,9 @@ class FilterDialog(gtk.Dialog):
         tbuttons = [
                 self._toolbutton(
                     gtk.STOCK_FIND,
-                    'Apply', 
+                    _('Apply'), 
                     self._btn_apply_clicked,
-                    tip='Apply filter to revision history'),
+                    tip=_('Apply filter to revision history')),
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
@@ -52,21 +52,21 @@ class FilterDialog(gtk.Dialog):
         
         # branch: combo box
         hbox = gtk.HBox()
-        self.branchradio = gtk.RadioButton(None, 'Branch')
+        self.branchradio = gtk.RadioButton(None, _('Branch'))
         self.branchlist = gtk.ListStore(str)
         self.branchbox = gtk.ComboBoxEntry(self.branchlist, 0)
         hbox.pack_start(self.branchradio, False, False, 4)
         hbox.pack_start(self.branchbox, True, True, 4)
         eventbox = gtk.EventBox()
         eventbox.add(hbox)
-        self.tips.set_tip(eventbox, 'View revision graph of named branch')
+        self.tips.set_tip(eventbox, _('View revision graph of named branch'))
         self.vbox.pack_start(eventbox, False, False, 4)
         for name in self.repo.branchtags().keys():
             self.branchlist.append([name])
 
         # Revision range entries
         hbox = gtk.HBox()
-        self.revradio = gtk.RadioButton(self.branchradio, 'Rev Range')
+        self.revradio = gtk.RadioButton(self.branchradio, _('Rev Range'))
         self.rev0Entry = gtk.Entry()
         self.rev0Entry.connect('activate', self._btn_apply_clicked)
         self.rev1Entry = gtk.Entry()
@@ -76,7 +76,7 @@ class FilterDialog(gtk.Dialog):
         hbox.pack_start(self.rev1Entry, True, False, 4)
         eventbox = gtk.EventBox()
         eventbox.add(hbox)
-        self.tips.set_tip(eventbox, 'View range of revisions')
+        self.tips.set_tip(eventbox, _('View range of revisions'))
         self.vbox.pack_start(eventbox, False, False, 4)
         if revs:
             self.rev0Entry.set_text(str(revs[0]))
@@ -84,11 +84,12 @@ class FilterDialog(gtk.Dialog):
             self.rev1Entry.set_text(str(revs[1]))
 
         hbox = gtk.HBox()
-        self.searchradio = gtk.RadioButton(self.branchradio, 'Search Filter')
+        self.searchradio = gtk.RadioButton(self.branchradio, _('Search Filter'))
         hbox.pack_start(self.searchradio, False, False, 4)
         eventbox = gtk.EventBox()
         eventbox.add(hbox)
-        self.tips.set_tip(eventbox, 'Search repository changelog with criteria')
+        self.tips.set_tip(eventbox, _('Search repository changelog with'
+                ' criteria'))
         self.vbox.pack_start(eventbox, False, False, 4)
 
         self.searchframe = gtk.Frame()
@@ -99,15 +100,15 @@ class FilterDialog(gtk.Dialog):
         hbox = gtk.HBox()
         self.filesentry = gtk.Entry()
         self.filesentry.connect('activate', self._btn_apply_clicked)
-        lbl = gtk.Label('File(s):')
-        lbl.set_property("width-chars", 10)
+        lbl = gtk.Label(_('File(s):'))
+        lbl.set_property('width-chars', 10)
         lbl.set_alignment(0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.filesentry, True, True, 4)
         eventbox = gtk.EventBox()
         eventbox.add(hbox)
-        self.tips.set_tip(eventbox, 'Display only changesets affecting these'
-                ' comma separated file paths')
+        self.tips.set_tip(eventbox, _('Display only changesets affecting these'
+                ' comma separated file paths'))
         vbox.pack_start(eventbox, False, False, 4)
         if files:
             self.filesentry.set_text(', '.join(files))
@@ -115,15 +116,15 @@ class FilterDialog(gtk.Dialog):
         hbox = gtk.HBox()
         self.kwentry = gtk.Entry()
         self.kwentry.connect('activate', self._btn_apply_clicked)
-        lbl = gtk.Label('Keyword(s):')
-        lbl.set_property("width-chars", 10)
+        lbl = gtk.Label(_('Keyword(s):'))
+        lbl.set_property('width-chars', 10)
         lbl.set_alignment(0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.kwentry, True, True, 4)
         eventbox = gtk.EventBox()
         eventbox.add(hbox)
-        self.tips.set_tip(eventbox, 'Display only changesets matching these'
-                ' comma separated case insensitive keywords')
+        self.tips.set_tip(eventbox, _('Display only changesets matching these'
+                ' comma separated case insensitive keywords'))
         vbox.pack_start(eventbox, False, False, 4)
 
         hbox = gtk.HBox()
@@ -131,18 +132,18 @@ class FilterDialog(gtk.Dialog):
         self.dateentry.connect('activate', self._btn_apply_clicked)
         self.helpbutton = gtk.Button("?")
         self.helpbutton.set_relief(gtk.RELIEF_NONE)
-        self.tips.set_tip(self.helpbutton, 'Help on date formats')
+        self.tips.set_tip(self.helpbutton, _('Help on date formats'))
         self.helpbutton.connect('clicked', self._date_help)
-        lbl = gtk.Label('Date:')
-        lbl.set_property("width-chars", 10)
+        lbl = gtk.Label(_('Date:'))
+        lbl.set_property('width-chars', 10)
         lbl.set_alignment(0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self.dateentry, True, True, 4)
         hbox.pack_start(self.helpbutton, False, False, 4)
         eventbox = gtk.EventBox()
         eventbox.add(hbox)
-        self.tips.set_tip(eventbox, 'Display only changesets matching this'
-                ' date specification')
+        self.tips.set_tip(eventbox, _('Display only changesets matching this'
+                ' date specification'))
         vbox.pack_start(eventbox, False, False, 4)
 
         self.searchradio.connect('toggled', self.searchtoggle)
@@ -198,7 +199,7 @@ class FilterDialog(gtk.Dialog):
                     util.matchdate(date)
                     opts['date'] = date
                 except (ValueError, util.Abort), e:
-                    Prompt('Invalid date specification', str(e), self).run()
+                    Prompt(_('Invalid date specification'), str(e), self).run()
                     self.dateentry.grab_focus()
                     return
         elif self.revradio.get_active():
@@ -212,7 +213,7 @@ class FilterDialog(gtk.Dialog):
                 rrange.reverse()
                 opts['revrange'] = rrange
             except Exception, e:
-                Prompt('Invalid revision range', str(e), self).run()
+                Prompt(_('Invalid revision range'), str(e), self).run()
                 self.rev0Entry.grab_focus()
                 return
         elif self.branchradio.get_active():

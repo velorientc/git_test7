@@ -10,33 +10,34 @@ from dialog import entry_dialog
 
 try:
     from mercurial.error import RepoError, ParseError, LookupError
+    from mercurial.error import UnknownCommand, AmbiguousCommand
 except ImportError:
+    from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
     from mercurial.repo import RepoError
     from mercurial.dispatch import ParseError
     from mercurial.revlog import LookupError
 
+from mercurial import demandimport
+demandimport.disable()
 try:
-    try:
-        from mercurial import demandimport
-    except:
-        from mercurial.commands import demandimport # pre 0.9.5
-    demandimport.disable()
+    # Mercurial 0.9.4
+    from mercurial.cmdutil import parse
+    from mercurial.cmdutil import parseconfig as _parseconfig
+except:
+    # Mercurial 0.9.5
+    from mercurial.dispatch import _parse as parse
+    from mercurial.dispatch import _parseconfig
+demandimport.enable()
 
-    try:
-        # Mercurail 0.9.4
-        from mercurial.cmdutil import parse
-        from mercurial.cmdutil import parseconfig as _parseconfig
-    except:
-        try:
-            # Mercurail <= 0.9.3
-            from mercurial.commands import parse
-            from mercurial.commands import parseconfig as _parseconfig
-        except:
-            # Mercurail 0.9.5
-            from mercurial.dispatch import _parse as parse
-            from mercurial.dispatch import _parseconfig
-finally:
-    demandimport.enable()
+try:
+    from mercurial import encoding
+    _encoding = encoding.encoding
+    _encodingmode = encoding.encodingmode
+    _fallbackencoding = encoding.fallbackencoding
+except ImportError:
+    _encoding = util._encoding
+    _encodingmode = util._encodingmode
+    _fallbackencoding = util._fallbackencoding
 
 def toutf(s):
     """
@@ -44,12 +45,12 @@ def toutf(s):
     
     Based on mercurial.util.tolocal()
     """
-    for e in ('utf-8', util._encoding):
+    for e in ('utf-8', _encoding):
         try:
             return s.decode(e, 'strict').encode('utf-8')
         except UnicodeDecodeError:
             pass
-    return s.decode(util._fallbackencoding, 'replace').encode('utf-8')
+    return s.decode(_fallbackencoding, 'replace').encode('utf-8')
 
 def fromutf(s):
     """
@@ -58,12 +59,12 @@ def fromutf(s):
     It's primarily used on strings converted to UTF-8 by toutf().
     """
     try:
-        return s.decode('utf-8').encode(util._encoding)
+        return s.decode('utf-8').encode(_encoding)
     except UnicodeDecodeError:
         pass
     except UnicodeEncodeError:
         pass
-    return s.decode('utf-8').encode(util._fallbackencoding)
+    return s.decode('utf-8').encode(_fallbackencoding)
 
 def rootpath(path=None):
     """ find Mercurial's repo root of path """
@@ -120,6 +121,7 @@ class GtkUi(ui.ui):
             self.outputq = outputq
             self.dialogq = dialogq
             self.responseq = responseq
+        self.setconfig('ui', 'interactive', 'True')
         self.interactive = True
 
     def write(self, *args):
@@ -144,19 +146,24 @@ class GtkUi(ui.ui):
                 # send request to main thread, await response
                 self.dialogq.put( (msg, True, default) )
                 r = self.responseq.get(True)
+                if r is None:
+                    raise EOFError
                 if not r:
                     return default
                 if not pat or re.match(pat, r):
                     return r
                 else:
-                    self.write(_("unrecognized response\n"))
+                    self.write(_('unrecognized response\n'))
             except EOFError:
                 raise util.Abort(_('response expected'))
 
     def getpass(self, prompt=None, default=None):
         # send request to main thread, await response
         self.dialogq.put( (prompt or _('password: '), False, default) )
-        return self.responseq.get(True)
+        r = self.responseq.get(True)
+        if r is None:
+            raise util.Abort(_('response expected'))
+        return r
 
     def print_exc(self):
         traceback.print_exc()
@@ -223,9 +230,9 @@ class HgThread(thread2.Thread):
                 if origui:
                     ui.ui = origui
             if ret:
-                self.ui.write('[command returned code %d]\n' % int(ret))
+                self.ui.write(_('[command returned code %d]\n') % int(ret))
             else:
-                self.ui.write('[command completed successfully]\n')
+                self.ui.write(_('[command completed successfully]\n'))
             self.ret = ret or 0
             if self.postfunc:
                 self.postfunc(ret)
@@ -319,23 +326,23 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         cmdtable = getattr(module, 'cmdtable', {})
         overrides = [cmd for cmd in cmdtable if cmd in commands.table]
         if overrides:
-            ui.warn(_("extension '%s' overrides commands: %s\n")
-                    % (name, " ".join(overrides)))
+            ui.warn(_("extension '%s' overrides commands: %s\n") %
+                    (name, " ".join(overrides)))
         commands.table.update(cmdtable)
         _loaded[name] = 1
 
     # check for fallback encoding
     fallback = ui.config('ui', 'fallbackencoding')
     if fallback:
-        util._fallbackencoding = fallback
+        _fallbackencoding = fallback
 
     fullargs = args
     cmd, func, args, options, cmdoptions = parse(ui, args)
 
     if options["encoding"]:
-        util._encoding = options["encoding"]
+        _encoding = options["encoding"]
     if options["encodingmode"]:
-        util._encodingmode = options["encodingmode"]
+        _encodingmode = options["encodingmode"]
     ui.updateopts(options["verbose"], options["debug"], options["quiet"],
                  not options["noninteractive"], options["traceback"])
 
@@ -357,8 +364,8 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         except RepoError:
             if cmd not in commands.optionalrepo.split():
                 if not path:
-                    raise RepoError(_("There is no Mercurial repository here"
-                                         " (.hg not found)"))
+                    raise RepoError(_('There is no Mercurial repository here'
+                                         ' (.hg not found)'))
                 raise
         d = lambda: func(ui, repo, *args, **cmdoptions)
     else:
@@ -377,7 +384,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 2: # no
             raise
-        raise ParseError(cmd, _("invalid arguments"))
+        raise ParseError(cmd, _('invalid arguments'))
 
     # run post-hook, passing command result
     hook.hook(ui, repo, "post-%s" % cmd, False, args=" ".join(fullargs),

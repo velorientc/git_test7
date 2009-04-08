@@ -6,10 +6,12 @@
 
 import os
 import gtk
+import gobject
 from dialog import *
 from shlib import shell_notify, set_tortoise_icon
 from hglib import fromutf, toutf
 from mercurial import hg, ui, match
+from mercurial.i18n import _
 
 class HgIgnoreDialog(gtk.Window):
     'Edit a reposiory .hgignore file'
@@ -19,20 +21,20 @@ class HgIgnoreDialog(gtk.Window):
         set_tortoise_icon(self, 'ignore.ico')
 
         self.root = root
-        self.set_title('Ignore filter for ' + os.path.basename(root))
+        self.set_title(_('Ignore filter for ') + os.path.basename(root))
         self.set_default_size(630, 400)
         self.notify_func = None
 
         mainvbox = gtk.VBox()
 
         hbox = gtk.HBox()
-        lbl = gtk.Label('Glob:')
-        lbl.set_property("width-chars", 7)
+        lbl = gtk.Label(_('Glob:'))
+        lbl.set_property('width-chars', 7)
         lbl.set_alignment(1.0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         glob_entry = gtk.Entry()
         hbox.pack_start(glob_entry, True, True, 4)
-        glob_button = gtk.Button('add')
+        glob_button = gtk.Button(_('add'))
         hbox.pack_start(glob_button, False, False, 4)
         glob_button.connect('clicked', self.add_glob, glob_entry)
         glob_entry.connect('activate', self.add_glob, glob_entry)
@@ -41,26 +43,26 @@ class HgIgnoreDialog(gtk.Window):
         mainvbox.pack_start(hbox, False, False)
 
         hbox = gtk.HBox()
-        lbl = gtk.Label('Regexp:')
-        lbl.set_property("width-chars", 7)
+        lbl = gtk.Label(_('Regexp:'))
+        lbl.set_property('width-chars', 7)
         lbl.set_alignment(1.0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         regexp_entry = gtk.Entry()
         hbox.pack_start(regexp_entry, True, True, 4)
-        regexp_button = gtk.Button('add')
+        regexp_button = gtk.Button(_('add'))
         hbox.pack_start(regexp_button, False, False, 4)
         regexp_button.connect('clicked', self.add_regexp, regexp_entry)
         regexp_entry.connect('activate', self.add_regexp, regexp_entry)
         mainvbox.pack_start(hbox, False, False)
 
         hbox = gtk.HBox()
-        frame = gtk.Frame('Filters')
+        frame = gtk.Frame(_('Filters'))
         hbox.pack_start(frame, True, True, 4)
         pattree = gtk.TreeView()
         pattree.set_reorderable(False)
         sel = pattree.get_selection()
         sel.set_mode(gtk.SELECTION_SINGLE)
-        col = gtk.TreeViewColumn('Patterns', gtk.CellRendererText(), text=0)
+        col = gtk.TreeViewColumn(_('Patterns'), gtk.CellRendererText(), text=0)
         pattree.append_column(col) 
         pattree.set_headers_visible(False)
         self.pattree = pattree
@@ -71,17 +73,17 @@ class HgIgnoreDialog(gtk.Window):
         vbox = gtk.VBox()
         vbox.pack_start(scrolledwindow, True, True, 2)
         bhbox = gtk.HBox()
-        remove = gtk.Button("Remove Selected")
-        remove.connect("pressed", self.remove_pressed, sel)
+        remove = gtk.Button(_('Remove Selected'))
+        remove.connect('pressed', self.remove_pressed, sel)
         remove.set_sensitive(False)
         bhbox.pack_start(remove, False, False, 2)
         vbox.pack_start(bhbox, False, False, 2)
         frame.add(vbox)
 
-        frame = gtk.Frame('Unknown Files')
+        frame = gtk.Frame(_('Unknown Files'))
         hbox.pack_start(frame, True, True, 4)
         unknowntree = gtk.TreeView()
-        col = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=0)
+        col = gtk.TreeViewColumn(_('Files'), gtk.CellRendererText(), text=0)
         unknowntree.append_column(col) 
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -94,8 +96,8 @@ class HgIgnoreDialog(gtk.Window):
         vbox = gtk.VBox()
         vbox.pack_start(scrolledwindow, True, True, 2)
         bhbox = gtk.HBox()
-        refresh = gtk.Button("Refresh")
-        refresh.connect("pressed", self.refresh_clicked, sel)
+        refresh = gtk.Button(_('Refresh'))
+        refresh.connect('pressed', self.refresh_clicked, sel)
         bhbox.pack_start(refresh, False, False, 2)
         vbox.pack_start(bhbox, False, False, 2)
         frame.add(vbox)
@@ -106,7 +108,7 @@ class HgIgnoreDialog(gtk.Window):
         glob_entry.grab_focus()
         pattree.get_selection().connect('changed', self.pattree_rowchanged, remove)
         unknowntree.get_selection().connect('changed', self.unknown_rowchanged)
-        self.connect('map_event', self.on_window_map_event)
+        gobject.idle_add(self.refresh)
 
     def remove_pressed(self, widget, selection):
         model, rows = selection.get_selected_rows()
@@ -136,9 +138,6 @@ class HgIgnoreDialog(gtk.Window):
         newregexp = fromutf(regexp_entry.get_text())
         self.ignorelines.append('regexp:' + newregexp)
         self.write_ignore_lines()
-        self.refresh()
-
-    def on_window_map_event(self, event, param):
         self.refresh()
 
     def refresh_clicked(self, togglebutton, data=None):
@@ -187,8 +186,8 @@ class HgIgnoreDialog(gtk.Window):
         shell_notify(self.repo.wjoin('.hgignore'))
         if self.notify_func: self.notify_func()
         
-def run(root='', **opts):
-    dialog = HgIgnoreDialog(root)
+def run(root='', fileglob='', **opts):
+    dialog = HgIgnoreDialog(root, fileglob)
     dialog.show_all()
     dialog.connect('destroy', gtk.main_quit)
     gtk.gdk.threads_init()

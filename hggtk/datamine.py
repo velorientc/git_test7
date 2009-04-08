@@ -12,6 +12,7 @@ import pango
 import Queue
 import threading, thread2
 from mercurial import hg, ui, util, revlog
+from mercurial.i18n import _
 from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime, LookupError, rootpath
 from gdialog import *
 from vis import treemodel
@@ -29,7 +30,7 @@ class DataMineDialog(GDialog):
     COL_LINENUM = 6
 
     def get_title(self):
-        return 'DataMining - ' + os.path.basename(self.repo.root)
+        return _('DataMining') + ' - ' + os.path.basename(self.repo.root)
 
     def get_icon(self):
         return 'menurepobrowse.ico'
@@ -38,11 +39,11 @@ class DataMineDialog(GDialog):
         pass
 
     def get_tbbuttons(self):
-        self.stop_button = self.make_toolbutton(gtk.STOCK_STOP, 'Stop', 
-                self._stop_current_search, tip='Stop operation on current tab')
+        self.stop_button = self.make_toolbutton(gtk.STOCK_STOP, _('Stop'), 
+                self._stop_current_search, tip=_('Stop operation on current tab'))
         return [
-            self.make_toolbutton(gtk.STOCK_FIND, 'New Search', 
-                self._search_clicked, tip='Open new search tab'),
+            self.make_toolbutton(gtk.STOCK_FIND, _('New Search'), 
+                self._search_clicked, tip=_('Open new search tab')),
             self.stop_button
             ]
 
@@ -86,26 +87,26 @@ class DataMineDialog(GDialog):
 
     def ann_header_context_menu(self, treeview):
         _menu = gtk.Menu()
-        _button = gtk.CheckMenuItem("Filename")
-        _button.connect("toggled", self.toggle_annatate_columns, treeview, 2)
+        _button = gtk.CheckMenuItem(_('Filename'))
+        _button.connect('toggled', self.toggle_annatate_columns, treeview, 2)
         _menu.append(_button)
-        _button = gtk.CheckMenuItem("User")
-        _button.connect("toggled", self.toggle_annatate_columns, treeview, 3)
+        _button = gtk.CheckMenuItem(_('User'))
+        _button.connect('toggled', self.toggle_annatate_columns, treeview, 3)
         _menu.append(_button)
         _menu.show_all()
         return _menu
 
     def grep_context_menu(self):
         _menu = gtk.Menu()
-        _menu.append(create_menu('di_splay change', self._cmenu_display))
-        _menu.append(create_menu('_annotate file', self._cmenu_annotate))
-        _menu.append(create_menu('_file history', self._cmenu_file_log))
+        _menu.append(create_menu(_('di_splay change'), self._cmenu_display))
+        _menu.append(create_menu(_('_annotate file'), self._cmenu_annotate))
+        _menu.append(create_menu(_('_file history'), self._cmenu_file_log))
         _menu.show_all()
         return _menu
 
     def annotate_context_menu(self):
         _menu = gtk.Menu()
-        _menu.append(create_menu('di_splay change', self._cmenu_display))
+        _menu.append(create_menu(_('di_splay change'), self._cmenu_display))
         _menu.show_all()
         return _menu
 
@@ -181,29 +182,29 @@ class DataMineDialog(GDialog):
         if self.cwd.startswith(self.repo.root):
             includes.set_text(util.canonpath(self.repo.root, self.cwd, '.'))
         excludes = gtk.Entry()
-        search = gtk.Button('Search')
-        search_hbox.pack_start(gtk.Label('Regexp:'), False, False, 4)
+        search = gtk.Button(_('Search'))
+        search_hbox.pack_start(gtk.Label(_('Regexp:')), False, False, 4)
         search_hbox.pack_start(regexp, True, True, 4)
-        search_hbox.pack_start(gtk.Label('Includes:'), False, False, 4)
+        search_hbox.pack_start(gtk.Label(_('Includes:')), False, False, 4)
         search_hbox.pack_start(includes, True, True, 4)
-        search_hbox.pack_start(gtk.Label('Excludes:'), False, False, 4)
+        search_hbox.pack_start(gtk.Label(_('Excludes:')), False, False, 4)
         search_hbox.pack_start(excludes, True, True, 4)
         search_hbox.pack_start(search, False, False)
-        self.tooltips.set_tip(search, 'Start this search')
-        self.tooltips.set_tip(regexp, 'Regular expression search pattern')
-        self.tooltips.set_tip(includes, 'Comma separated list of'
+        self.tooltips.set_tip(search, _('Start this search'))
+        self.tooltips.set_tip(regexp, _('Regular expression search pattern'))
+        self.tooltips.set_tip(includes, _('Comma separated list of'
                 ' inclusion patterns.  By default, the entire repository'
-                ' is searched.')
-        self.tooltips.set_tip(excludes, 'Comma separated list of'
+                ' is searched.'))
+        self.tooltips.set_tip(excludes, _('Comma separated list of'
                 ' exclusion patterns.  Exclusion patterns are applied'
-                ' after inclusion patterns.')
+                ' after inclusion patterns.'))
         vbox.pack_start(search_hbox, False, False, 4)
 
         hbox = gtk.HBox()
-        follow = gtk.CheckButton('Follow copies and renames')
-        ignorecase = gtk.CheckButton('Ignore case')
-        linenum = gtk.CheckButton('Show line numbers')
-        showall = gtk.CheckButton('Show all matching revisions')
+        follow = gtk.CheckButton(_('Follow copies and renames'))
+        ignorecase = gtk.CheckButton(_('Ignore case'))
+        linenum = gtk.CheckButton(_('Show line numbers'))
+        showall = gtk.CheckButton(_('Show all matching revisions'))
         hbox.pack_start(follow, False, False, 4)
         hbox.pack_start(ignorecase, False, False, 4)
         hbox.pack_start(linenum, False, False, 4)
@@ -221,20 +222,21 @@ class DataMineDialog(GDialog):
 
         results = gtk.ListStore(str, str, str, str)
         treeview.set_model(results)
+        treeview.set_search_equal_func(self.search_in_grep)
         for title, width, col, emode in (
-                ('Rev', 10, self.COL_REVID, pango.ELLIPSIZE_NONE),
-                ('File', 25, self.COL_PATH, pango.ELLIPSIZE_START),
-                ('Matches', 80, self.COL_TEXT, pango.ELLIPSIZE_END)):
+                (_('Rev'), 10, self.COL_REVID, pango.ELLIPSIZE_NONE),
+                (_('File'), 25, self.COL_PATH, pango.ELLIPSIZE_START),
+                (_('Matches'), 80, self.COL_TEXT, pango.ELLIPSIZE_END)):
             cell = gtk.CellRendererText()
-            cell.set_property("width-chars", width)
-            cell.set_property("ellipsize", emode)
-            cell.set_property("family", "Monospace")
+            cell.set_property('width-chars', width)
+            cell.set_property('ellipsize', emode)
+            cell.set_property('family', 'Monospace')
             column = gtk.TreeViewColumn(title)
             column.set_resizable(True)
             column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
-            column.add_attribute(cell, "text", col)
+            column.add_attribute(cell, 'text', col)
             treeview.append_column(column)
         if hasattr(treeview, 'set_tooltip_column'):
             treeview.set_tooltip_column(self.COL_TOOLTIP)
@@ -246,7 +248,7 @@ class DataMineDialog(GDialog):
         frame.show_all()
 
         hbox = gtk.HBox()
-        lbl = gtk.Label('Search %d' % self.newpagecount)
+        lbl = gtk.Label(_('Search %d') % self.newpagecount)
         close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
         hbox.pack_start(lbl, True, True, 2)
@@ -272,13 +274,24 @@ class DataMineDialog(GDialog):
         self.notebook.set_current_page(num)
         regexp.grab_focus()
 
+    def search_in_grep(self, model, column, key, iter):
+        """Searches all fields shown in the tree when the user hits crtr+f,
+        not just the ones that are set via tree.set_search_column.
+        Case insensitive
+        """
+        key = key.lower()
+        for col in (self.COL_PATH, self.COL_TEXT):
+            if key in model.get_value(iter, col).lower():
+                return False
+        return True
+
     def trigger_search(self, button, objs):
         (model, frame, regexp, follow, ignorecase, 
                 excludes, includes, linenum, showall, search_hbox) = objs
         retext = regexp.get_text()
         if not retext:
-            Prompt('No regular expression given',
-                    'You must provide a search expression', self).run()
+            Prompt(_('No regular expression given'),
+                   _('You must provide a search expression'), self).run()
             regexp.grab_focus()
             return
         
@@ -306,7 +319,7 @@ class DataMineDialog(GDialog):
         self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
 
         hbox = gtk.HBox()
-        lbl = gtk.Label('Search "%s"' % retext.split()[0])
+        lbl = gtk.Label(_('Search "%s"') % retext.split()[0])
         close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
         hbox.pack_start(lbl, True, True, 2)
@@ -412,8 +425,8 @@ class DataMineDialog(GDialog):
             try:
                 fctx = ctx.filectx(path)
             except LookupError:
-                Prompt('File is unrevisioned',
-                        'Unable to annotate ' + path, self).run()
+                Prompt(_('File is unrevisioned'),
+                       _('Unable to annotate ') + path, self).run()
                 return
             rev = fctx.filelog().linkrev(fctx.filerev())
             revid = str(rev)
@@ -433,7 +446,7 @@ class DataMineDialog(GDialog):
 
         hbox = gtk.HBox()
         followlabel = gtk.Label('')
-        follow = gtk.Button('Follow')
+        follow = gtk.Button(_('Follow'))
         follow.connect('clicked', self.follow_rename)
         follow.hide()
         follow.set_sensitive(False)
@@ -453,25 +466,26 @@ class DataMineDialog(GDialog):
 
         results = gtk.ListStore(str, str, str, str, str, str, str)
         treeview.set_model(results)
+        treeview.set_search_equal_func(self.search_in_file)
 
         context_menu = self.ann_header_context_menu(treeview)
         for title, width, col, emode, visible in (
-                ('Line', 8, self.COL_LINENUM, pango.ELLIPSIZE_NONE, True),
-                ('Rev', 10, self.COL_REVID, pango.ELLIPSIZE_NONE, True),
-                ('File', 15, self.COL_PATH, pango.ELLIPSIZE_START, False),
-                ('User', 15, self.COL_USER, pango.ELLIPSIZE_END, False),
-                ('Source', 80, self.COL_TEXT, pango.ELLIPSIZE_END, True)):
+                (_('Line'), 8, self.COL_LINENUM, pango.ELLIPSIZE_NONE, True),
+                (_('Rev'), 10, self.COL_REVID, pango.ELLIPSIZE_NONE, True),
+                (_('File'), 15, self.COL_PATH, pango.ELLIPSIZE_START, False),
+                (_('User'), 15, self.COL_USER, pango.ELLIPSIZE_END, False),
+                (_('Source'), 80, self.COL_TEXT, pango.ELLIPSIZE_END, True)):
             cell = gtk.CellRendererText()
-            cell.set_property("width-chars", width)
-            cell.set_property("ellipsize", emode)
-            cell.set_property("family", "Monospace")
+            cell.set_property('width-chars', width)
+            cell.set_property('ellipsize', emode)
+            cell.set_property('family', 'Monospace')
             column = gtk.TreeViewColumn(title)
             column.set_resizable(True)
             column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
-            column.add_attribute(cell, "text", col)
-            column.add_attribute(cell, "background", self.COL_COLOR)
+            column.add_attribute(cell, 'text', col)
+            column.add_attribute(cell, 'background', self.COL_COLOR)
             column.set_visible(visible)
             treeview.append_column(column)
             self._add_header_context_menu(column, context_menu)
@@ -515,6 +529,17 @@ class DataMineDialog(GDialog):
                 self._ann_button_release)
         graphview.treeview.connect('popup-menu', self._ann_popup_menu)
 
+    def search_in_file(self, model, column, key, iter):
+        """Searches all fields shown in the tree when the user hits crtr+f,
+        not just the ones that are set via tree.set_search_column.
+        Case insensitive
+        """
+        key = key.lower()
+        for col in (self.COL_USER, self.COL_TEXT):
+            if key in model.get_value(iter, col).lower():
+                return False
+        return True
+
     def toggle_annatate_columns(self, button, treeview, col):
         b = button.get_active()
         treeview.get_column(col).set_visible(b)
@@ -533,7 +558,7 @@ class DataMineDialog(GDialog):
             button.set_label(toutf('%s@%s' % (rpath, frev)))
             button.show()
             button.set_sensitive(True)
-            label.set_text('Follow Rename:')
+            label.set_text(_('Follow Rename:'))
         else:
             button.hide()
             button.set_sensitive(False)
@@ -677,8 +702,8 @@ def run(root='', cwd='', files=[], **opts):
         if os.path.isfile(f):
             cf.append(util.canonpath(root, cwd, f))
         elif os.path.isdir(f):
-            Prompt('Invalid path',
-                    'Cannot annotate directory: %s' % f, None).run()
+            Prompt(_('Invalid path'),
+                   _('Cannot annotate directory: %s') % f, None).run()
 
     dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
     dialog.display()

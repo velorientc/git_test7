@@ -122,6 +122,7 @@ class ChangeSet(GDialog):
         title_line('changeset:', change, 'changeset')
         if ctx.branch() != 'default':
             title_line('branch:', ctx.branch(), 'greybg')
+        title_line('changesetid:', hex(ctx.node()), 'changeset')
         title_line('user/date:', ctx.user() + '\t' + date, 'changeset')
         for p in parents:
             pctx = self.repo.changectx(p)
@@ -448,6 +449,7 @@ class ChangeSet(GDialog):
             return menuitem
             
         _menu = gtk.Menu()
+        _menu.append(create_menu('_visual diff', self._diff_file_rev))
         _menu.append(create_menu('_view at revision', self._view_file_rev))
         self._save_menu = create_menu('_save at revision', self._save_file_rev)
         _menu.append(self._save_menu)
@@ -629,6 +631,20 @@ class ChangeSet(GDialog):
             hgcmd_toq(self.repo.root, q, 'cat', '--rev',
                 str(self.currev), '--output', result, cpath)
 
+    def _diff_file_rev(self, menuitem):
+        '''User selected visual diff file revision from the file list context menu'''
+        if not self.curfile:
+            # ignore view events for the [Description] row
+            return
+        rev = self.currev
+        parents = self.parents
+        if len(parents) == 0:
+            parent = rev-1
+        else:
+            parent = parents[0]
+        self.opts['rev'] = [str(parent), str(rev)]
+        self._diff_file('M', self.curfile)
+
     def _view_file_rev(self, menuitem):
         '''User selected view file revision from the file list context menu'''
         if not self.curfile:
@@ -657,9 +673,9 @@ class ChangeSet(GDialog):
         if self.glog_parent:
             # If this changeset browser is embedded in glog, send
             # send this event to the main app
-            opts = {'filehist' : self.curfile}
+            opts = {'pats' : [self.curfile]}
             self.glog_parent.custombutton.set_active(True)
-            self.glog_parent.graphview.refresh(True, None, opts)
+            self.glog_parent.reload_log(opts)
         else:
             # Else launch our own GLog instance
             import history
