@@ -35,8 +35,8 @@ class CloneDialog(gtk.Window):
         sync_settings = shlib.Settings('synch')
         self._sync_src = sync_settings.mrul('src_paths')
 
-        self._src_path = ''
-        self._dest_path = os.getcwd()
+        self._src_path = os.getcwd()
+        self._dest_path = self._src_path
         if len(repos) > 1:
             self._src_path = repos[0]
             self._dest_path = repos[1]
