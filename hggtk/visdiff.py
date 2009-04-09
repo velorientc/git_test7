@@ -93,7 +93,12 @@ class FileSelectionDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=rootpath())
-            gobject.idle_add(self.find_files, repo, pats, opts, model)
+            self.diffpath, self.diffopts = self.readtool(repo.ui)
+            if self.diffpath:
+                gobject.idle_add(self.find_files, repo, pats, opts, model)
+            else:
+                Prompt(_('No visual diff tool'), 
+                       _('No visual diff tool has been configured'), None).run()
         except RepoError:
             pass
 
@@ -122,12 +127,6 @@ class FileSelectionDialog(gtk.Dialog):
         return '', None
 
     def find_files(self, repo, pats, opts, model):
-        self.diffpath, self.diffopts = self.readtool(repo.ui)
-        if not self.diffpath:
-            Prompt(_('No visual diff tool'), 
-                   _('No tool has been configured'), self).run()
-            return
-
         revs = opts.get('rev')
         change = opts.get('change')
 
@@ -142,16 +141,15 @@ class FileSelectionDialog(gtk.Dialog):
                 title = _('working changes')
             node1, node2 = cmdutil.revpair(repo, revs)
 
-        matcher = cmdutil.match(repo, pats, opts)
-        modified, added, removed = repo.status(node1, node2, matcher)[:3]
-        if not (modified or added or removed):
-            Prompt(_('No files to diff'), _('No modified files'), self).run()
-            return
-
         title = _('Visual Diffs - ') + title
         if pats:
             title += ' filtered'
         self.set_title(title)
+
+        matcher = cmdutil.match(repo, pats, opts)
+        modified, added, removed = repo.status(node1, node2, matcher)[:3]
+        if not (modified or added or removed):
+            return
 
         tmproot = tempfile.mkdtemp(prefix='extdiff.')
         self.connect('destroy', self.delete_tmproot, tmproot)
