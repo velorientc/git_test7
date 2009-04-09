@@ -297,8 +297,7 @@ def update(ui, **opts):
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
     from hggtk.visdiff import run
-    repo = hg.repository(ui, path=hglib.rootpath(os.getcwd()))
-    run(repo, pats, **opts)
+    run(pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False):

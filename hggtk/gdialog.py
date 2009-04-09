@@ -342,7 +342,7 @@ class GDialog(gtk.Window):
 
     def _diff_file(self, stat, file):
         from visdiff import FileSelectionDialog
-        dialog = FileSelectionDialog(self.repo, [file], self.opts)
+        dialog = FileSelectionDialog([file], self.opts)
         dialog.show_all()
 
     def _view_file(self, stat, file, force_left=False):

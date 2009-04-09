@@ -11,8 +11,9 @@ import gtk
 import gobject
 from mercurial.i18n import _
 from mercurial.node import short
-from mercurial import cmdutil, util, commands
+from mercurial import hg, ui, cmdutil, util, commands
 from gdialog import Prompt
+from hglib import RepoError, rootpath
 import os, shlex, subprocess, shutil, tempfile
 import shlib
 
@@ -46,7 +47,7 @@ def snapshot_node(repo, files, node, tmproot):
 
 class FileSelectionDialog(gtk.Dialog):
     'Dialog for selecting visual diff candidates'
-    def __init__(self, repo, pats, opts):
+    def __init__(self, pats, opts):
         'Initialize the Dialog'
         gtk.Dialog.__init__(self)
         self.set_title('Visual Diffs')
@@ -79,7 +80,11 @@ class FileSelectionDialog(gtk.Dialog):
         fcol.add_attribute(cell, 'text', 1)
         treeview.append_column(fcol)
 
-        gobject.idle_add(self.find_files, repo, pats, opts, model)
+        try:
+            repo = hg.repository(ui.ui(), path=rootpath())
+            gobject.idle_add(self.find_files, repo, pats, opts, model)
+        except RepoError:
+            pass
 
     def readtool(self, ui):
         vdiff = ui.config('tortoisehg', 'vdiff', 'vdiff')
@@ -186,8 +191,8 @@ class FileSelectionDialog(gtk.Dialog):
                        stdout=subprocess.PIPE,
                        stdin=subprocess.PIPE)
 
-def run(repo, pats, **opts):
-    dialog = FileSelectionDialog(repo, pats, opts)
+def run(pats, **opts):
+    dialog = FileSelectionDialog(pats, opts)
     dialog.connect('destroy', gtk.main_quit)
     dialog.show_all()
     gtk.gdk.threads_init()
