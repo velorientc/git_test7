@@ -167,27 +167,7 @@ def visualdiff(repo, pats, opts):
         else:
             # This lets the diff tool open the changed file directly
             dir2root = repo.root
-
-        # If only one change, diff the files instead of the directories
-        if changes == 1 :
-            if len(modified):
-                dir1 = os.path.join(dir1, util.localpath(modified[0]))
-                dir2 = os.path.join(dir2root, dir2, util.localpath(modified[0]))
-            elif len(removed) :
-                dir1 = os.path.join(dir1, util.localpath(removed[0]))
-                dir2 = os.devnull
-            else:
-                dir1 = os.devnull
-                dir2 = os.path.join(dir2root, dir2, util.localpath(added[0]))
-            cmdline = [diffpath] + diffopts + [dir1, dir2]
-            subprocess.Popen(cmdline, shell=False, cwd=tmproot,
-                           creationflags=openflags,
-                           stderr=subprocess.PIPE,
-                           stdout=subprocess.PIPE,
-                           stdin=subprocess.PIPE).wait()
-        else:
-            showfiles(title, modified, removed, added,
-                    dir1, dir2, dir2root, tmproot)
+        showfiles(title, modified, removed, added, dir1, dir2, dir2root, tmproot)
     finally:
         shutil.rmtree(tmproot)
 
