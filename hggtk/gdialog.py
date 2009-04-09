@@ -374,25 +374,9 @@ class GDialog(gtk.Window):
         return True, textout
 
     def _diff_file(self, stat, file):
-        def dodiff():
-            extdiff.dodiff(self.ui, self.repo, self.diffcmd, self.diffopts,
-                            [self.repo.wjoin(file)], self.opts)
-
-        if not self.diffcmd or self.diffcmd == 'diff':
-            Prompt(_('No visual diff configured'),
-                   _('Please select a visual diff application.'), self).run()
-            dlg = ConfigDialog(self.repo.root, False)
-            dlg.show_all()
-            dlg.focus_field('tortoisehg.vdiff')
-            dlg.run()
-            dlg.hide()
-            self.ui = ui.ui()
-            self._parse_config()
-            return
-        thread = threading.Thread(target=dodiff, name='diff:'+file)
-        thread.setDaemon(True)
-        thread.start()
-
+        from visdiff import FileSelectionDialog
+        dialog = FileSelectionDialog(self.repo, [file], self.opts)
+        dialog.show_all()
 
     def _view_file(self, stat, file, force_left=False):
         import atexit
