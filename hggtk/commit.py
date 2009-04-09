@@ -423,6 +423,8 @@ class GCommit(GStatus):
         if self._ready_message():
             if stat not in '?!' or self._should_addremove([file]):
                 self._hg_commit([file])
+                shell_notify([file])
+                self.reload_status()
         return True
 
 
