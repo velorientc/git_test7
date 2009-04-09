@@ -632,17 +632,11 @@ class ChangeSet(GDialog):
                 str(self.currev), '--output', result, cpath)
 
     def _diff_file_rev(self, menuitem):
-        '''User selected visual diff file revision from the file list context menu'''
+        'User selected visual diff file revision from the file list context menu'
         if not self.curfile:
             # ignore view events for the [Description] row
             return
-        rev = self.currev
-        parents = self.parents
-        if len(parents) == 0:
-            parent = rev-1
-        else:
-            parent = parents[0]
-        self.opts['rev'] = [str(parent), str(rev)]
+        self.opts['change'] = str(self.currev)
         self._diff_file('M', self.curfile)
 
     def _view_file_rev(self, menuitem):
