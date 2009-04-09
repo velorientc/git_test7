@@ -132,7 +132,10 @@ class FileSelectionDialog(gtk.Dialog):
             Prompt(_('No files to diff'), _('No modified files'), self).run()
             return
 
-        self.set_title('Visual Diffs - ' + title)
+        title = _('Visual Diffs - ') + title
+        if pats:
+            title += ' filtered'
+        self.set_title(title)
 
         tmproot = tempfile.mkdtemp(prefix='extdiff.')
         self.connect('destroy', self.delete_tmproot, tmproot)
