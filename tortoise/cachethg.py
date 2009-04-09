@@ -105,9 +105,11 @@ def get_states(upath, repo=None):
         path = upath
      # check if path is cached
     pdir = os.path.dirname(path)
-    if cache_pdir == pdir and overlay_cache:
+    status = overlay_cache.get(path, '')
+    if overlay_cache and (cache_pdir == pdir or cache_pdir and
+              status not in ' r' and path.startswith(cache_pdir)):
+        #use cached data when pdir has not changed or when the cached state is a repo state
         if tc - cache_tick_count < CACHE_TIMEOUT:
-            status = overlay_cache.get(path)
             if not status:
                 if os.path.isdir(os.path.join(path, '.hg')):
                     add(path, ROOT)
@@ -115,7 +117,9 @@ def get_states(upath, repo=None):
                 else:
                     status = overlay_cache.get(pdir + '*', NOT_IN_REPO)
                     add(path, status)
-            debugf("%s: %s (cached)", (path, status))
+                debugf("%s: %s (cached~)", (path, status))
+            else:
+                debugf("%s: %s (cached)", (path, status))
             return status
         else:
             debugf("Timed out!!")
@@ -132,7 +136,10 @@ def get_states(upath, repo=None):
         debugf("find new root")
         root = thgutil.find_root(path)
         if root == path:
+            if not overlay_cache:
+                cache_root = pdir
             add(path, ROOT)
+            debugf("%s: r", path)
             return ROOT
         cache_root = root
         cache_pdir = pdir
@@ -174,8 +181,8 @@ def get_states(upath, repo=None):
                 cache_tick_count = GetTickCount()
                 return NOT_IN_REPO
         tc1 = GetTickCount()
-        real = os.path.realpath(root)
-        if not repo or (repo.root != root and repo.root != real):
+        real = os.path.realpath #only test if necessary (symlink in path)
+        if not repo or (repo.root != root and repo.root != real(root)):
             repo = hg.repository(ui.ui(), path=root)
             debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
     except RepoError:
