@@ -54,6 +54,10 @@ class FileSelectionDialog(gtk.Dialog):
         shlib.set_tortoise_icon(self, 'menushowchanged.ico')
         self.set_default_size(400, 150)
 
+        lbl = gtk.Label(_('Temporary files are removed when this dialog'
+            ' is closed'))
+        self.vbox.pack_start(lbl, False, False, 2)
+
         scroller = gtk.ScrolledWindow()
         scroller.set_shadow_type(gtk.SHADOW_IN)
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
