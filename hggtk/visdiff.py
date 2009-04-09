@@ -61,7 +61,14 @@ class FileSelectionDialog(gtk.Dialog):
         treeview = gtk.TreeView(model)
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
         scroller.add(treeview)
-        self.vbox.pack_start(scroller, True, True)
+        self.vbox.pack_start(scroller, True, True, 2)
+
+        settings = shlib.Settings('visdiff')
+        single = settings.get_value('launchsingle', False)
+        check = gtk.CheckButton(_('Always launch single files'))
+        check.set_active(single)
+        self.vbox.pack_start(check, False, False, 2)
+        self.singlecheck = check
 
         treeview.connect('row-activated', self.rowactivated)
         treeview.set_headers_visible(False)
@@ -164,8 +171,13 @@ class FileSelectionDialog(gtk.Dialog):
             model.append(['A', a])
         for r in removed:
             model.append(['R', r])
+        if len(model) == 1 and self.singlecheck.get_active():
+            self.launch(*model[0])
 
     def delete_tmproot(self, _, tmproot):
+        settings = shlib.Settings('visdiff')
+        settings.set_value('launchsingle', self.singlecheck.get_active())
+        settings.write()
         shutil.rmtree(tmproot)
 
     def rowactivated(self, tree, path, column):
@@ -173,7 +185,9 @@ class FileSelectionDialog(gtk.Dialog):
         if selection.count_selected_rows() != 1:
             return False
         model, paths = selection.get_selected_rows()
-        st, fname = model[paths[0]]
+        self.launch(*model[paths[0]])
+
+    def launch(self, st, fname):
         dir1, dir2, dir2root, tmproot = self.dirs
         if st == 'A':
             dir1 = os.devnull
