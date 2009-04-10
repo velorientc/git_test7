@@ -535,7 +535,7 @@ class GStatus(GDialog):
 
         if self.mqmode and self.mode != 'status':
             # when a patch is applied, show diffs to parent of top patch
-            qtip = repo[None].parents()[0]
+            qtip = repo['.']
             n1 = qtip.parents()[0].node()
             n2 = None
         else:
