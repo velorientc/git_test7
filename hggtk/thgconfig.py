@@ -72,6 +72,11 @@ _log_info = (
         ' Default: False')))
 
 _paths_info = (
+    ('After pull operation', 'tortoisehg.postpull',
+        ['none', 'update', 'fetch', 'rebase'],
+        _('Operation which is performed directly after a successful pull.'
+          ' update equates to pull --update, fetch equates to the fetch'
+          ' extension, rebase equates to pull --rebase.  Default: none')),
     ('default', 'paths.default', [],
         _('Directory or URL to use when pulling, if no source is specified.'
         ' Default is set to the repository from which the repository'
