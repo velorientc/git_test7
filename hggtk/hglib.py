@@ -3,6 +3,7 @@ import os.path
 import sys
 import traceback
 import threading, thread2
+import urllib2
 import Queue
 from mercurial import hg, ui, util, extensions, commands, hook
 from mercurial.i18n import _
@@ -242,6 +243,8 @@ class HgThread(thread2.Thread):
             self.ui.write_err(str(e))
             if self.ui.traceback:
                 self.ui.print_exc()
+        except urllib2.HTTPError, e:
+            self.ui.write_err(str(e) + '\n')
         except Exception, e:
             self.ui.write_err(str(e))
             self.ui.print_exc()
