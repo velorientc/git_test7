@@ -44,6 +44,38 @@ except ImportError:
 
 if debugging:
     import win32traceutil
+    def debugf(str, args=None):
+        if args: print str % args
+        else:    print str
+else:
+    def debugf(str, args=None):
+        pass
+
+appfiltered = False
+try:
+    try:
+        # This will fail on windows < NT
+        proc = win32api.GetCurrentProcess()
+        app = win32process.GetModuleFileNameEx(proc, 0)
+    except:
+        app = win32api.GetModuleFileName(0)
+    app = str(os.path.basename(app)).lower()
+
+    if not app.startswith('tortoisehg'):
+        from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
+        hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+        filter = str(QueryValueEx(hkey, 'ShellApps')[0])
+        for f in filter.split(','):
+            f = f.strip().lower()
+            if f == '*':
+                break
+            elif f == app:
+                break
+        else:
+            debugf("app %s filtered, does not match %s", (app, filter))
+            appfiltered = True
+except (ImportError, EnvironmentError):
+    pass
 
 S_OK = 0
 S_FALSE = 1
@@ -88,6 +120,7 @@ class ContextMenuExtension(menuthg.menuThg):
         menuthg.menuThg.__init__(self)
 
     def Initialize(self, folder, dataobj, hkey):
+        if appfiltered: return
         if folder:
             self.folder = shell.SHGetPathFromIDList(folder)
 
@@ -146,6 +179,8 @@ class ContextMenuExtension(menuthg.menuThg):
         return idCmd
 
     def QueryContextMenu(self, hMenu, indexMenu, idCmdFirst, idCmdLast, uFlags):
+        if appfiltered:
+            return 0
         if uFlags & shellcon.CMF_DEFAULTONLY:
             return 0
 
@@ -154,9 +189,9 @@ class ContextMenuExtension(menuthg.menuThg):
             item, extra = win32gui_struct.EmptyMENUITEMINFO()
             win32gui.GetMenuItemInfo(hMenu, i, True, item)
             info = win32gui_struct.UnpackMENUITEMINFO(item)
-            # print "UnpackMENUINFO(%d):" % i, info
+            # debugf("UnpackMENUINFO(%d):" + str(info), i)
             if info[7] == ThgMenuName:
-                print "TortoiseHG menu already exists!"
+                debugf("TortoiseHG menu already exists!")
                 return 0
 
         thgmenu = []
@@ -164,7 +199,7 @@ class ContextMenuExtension(menuthg.menuThg):
         # a brutal hack to detect if we are the first menu to go on to the 
         # context menu. If we are not the first, then add a menu separator
         # The number '30000' is just a guess based on my observation
-        print "idCmdFirst = ", idCmdFirst
+        debugf("idCmdFirst = " + str(idCmdFirst))
         if idCmdFirst >= 30000:
             thgmenu.append(menuthg.TortoiseMenuSep())
         # As we are a context menu handler, we can ignore verbs.
@@ -179,7 +214,7 @@ class ContextMenuExtension(menuthg.menuThg):
             else:
                 cwd = os.path.dirname(f)
         else:
-            print 'No cwd found'
+            debugf('No cwd found')
             cwd = ''
 
         self.menuitems = {}
@@ -257,8 +292,8 @@ class ContextMenuExtension(menuthg.menuThg):
         if self.fnames:
             cmdline += ['--listfile', '-']
         try:
-            print "run_dialog: cmdline = ", cmdline
-            print "run_dialog: fnames = ", self.fnames
+            debugf("run_dialog: cmdline = " + str(cmdline))
+            debugf("run_dialog: fnames = " + str(self.fnames))
             proc = subprocess.Popen(cmdline,
                            shell=False,
                            cwd=cwd,
