@@ -119,12 +119,12 @@ class SynchDialog(gtk.Window):
         self.fill_path_combo()
         defrow = None
         defpushrow = None
-        for i, (path, name) in enumerate(self.pathlist):
-            if name == 'default':
+        for i, (path, alias) in enumerate(self.pathlist):
+            if alias == 'default':
                 defrow = i
                 if defpushrow is None:
                     defpushrow = i
-            elif name == 'default-push':
+            elif alias == 'default-push':
                 defpushrow = i
 
         if repos:
@@ -217,8 +217,8 @@ class SynchDialog(gtk.Window):
 
     def fill_path_combo(self):
         self.pathlist.clear()
-        for name, path in self.paths:
-            self.pathlist.append([toutf(path), toutf(name)])
+        for alias, path in self.paths:
+            self.pathlist.append([toutf(path), toutf(alias)])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
         if time != self._last_drop_time:
@@ -440,7 +440,7 @@ class SynchDialog(gtk.Window):
         
     def _conf_clicked(self, toolbutton, data=None):
         newpath = fromutf(self._pathtext.get_text()).strip()
-        for name, path in self.paths:
+        for alias, path in self.paths:
             if path == newpath:
                 newpath = None
                 break
