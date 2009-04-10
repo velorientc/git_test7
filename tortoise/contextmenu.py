@@ -47,6 +47,7 @@ if debugging:
 
 S_OK = 0
 S_FALSE = 1
+ThgMenuName = 'TortoiseHG'
 
 """Windows shell extension that adds context menu items to Mercurial repository"""
 class ContextMenuExtension(menuthg.menuThg):
@@ -147,6 +148,16 @@ class ContextMenuExtension(menuthg.menuThg):
     def QueryContextMenu(self, hMenu, indexMenu, idCmdFirst, idCmdLast, uFlags):
         if uFlags & shellcon.CMF_DEFAULTONLY:
             return 0
+
+        # skip if TortoiseHG menus have already been added
+        for i in range(win32gui.GetMenuItemCount(hMenu)):
+            item, extra = win32gui_struct.EmptyMENUITEMINFO()
+            win32gui.GetMenuItemInfo(hMenu, i, True, item)
+            info = win32gui_struct.UnpackMENUITEMINFO(item)
+            # print "UnpackMENUINFO(%d):" % i, info
+            if info[7] == ThgMenuName:
+                print "TortoiseHG menu already exists!"
+                return 0
 
         thgmenu = []
 
