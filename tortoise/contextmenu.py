@@ -34,6 +34,7 @@ ui.ui.write_err = write_err
 
 S_OK = 0
 S_FALSE = 1
+ThgMenuName = 'TortoiseHG'
 
 class TortoiseMenu(object):
     def __init__(self, menutext, helptext, handler, icon=None, state=True):
@@ -220,6 +221,16 @@ class ContextMenuExtension:
         if uFlags & shellcon.CMF_DEFAULTONLY:
             return 0
 
+        # skip if TortoiseHG menus have already been added
+        for i in range(win32gui.GetMenuItemCount(hMenu)):
+            item, extra = win32gui_struct.EmptyMENUITEMINFO()
+            win32gui.GetMenuItemInfo(hMenu, i, True, item)
+            info = win32gui_struct.UnpackMENUITEMINFO(item)
+            # print "UnpackMENUINFO(%d):" % i, info
+            if info[7] == ThgMenuName:
+                print "TortoiseHG menu already exists!"
+                return 0
+
         thgmenu = []    # hg menus
 
         # a brutal hack to detect if we are the first menu to go on to the 
@@ -253,7 +264,7 @@ class ContextMenuExtension:
        
         if commands:
             # create submenus with Hg commands
-            thgmenu.append(TortoiseSubmenu("TortoiseHG", commands,
+            thgmenu.append(TortoiseSubmenu(ThgMenuName, commands,
                     icon="hg.ico"))
             thgmenu.append(TortoiseMenuSep())
             
