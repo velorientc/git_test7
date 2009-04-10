@@ -674,7 +674,7 @@ class ConfigDialog(gtk.Dialog):
 
         tooltip = _('A comma (,) separated list of applications that'
                   ' the shell extensions will support.  If unspecified,'
-                  ' the default is explorer.exe')
+                  ' it defaults to asterisk (*), supporting all apps')
         self.shellapps.connect('changed', self.dirty_event)
         self.shellapps.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
@@ -713,7 +713,7 @@ class ConfigDialog(gtk.Dialog):
         self.load_shell_configs()
 
     def load_shell_configs(self):
-        shellapps = 'explorer.exe'
+        shellapps = '*'
         includepath = ''
         excludepath = ''
         overlayenable = True
