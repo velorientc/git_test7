@@ -513,6 +513,9 @@ class SynchDialog(gtk.Window):
         use_proxy = self._use_proxy.get_active()
         text_entry = self._pathbox.get_child()
         remote_path = fromutf(text_entry.get_text()).strip()
+        for alias, path in self.paths:
+            if remote_path == alias:
+                remote_path = path
         
         cmdline = cmd[:]
         cmdline += ['--verbose', '--repository', self.root]
