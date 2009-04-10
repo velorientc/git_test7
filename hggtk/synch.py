@@ -113,7 +113,7 @@ class SynchDialog(gtk.Window):
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self._pathtext = self._pathbox.get_child()
         cell = gtk.CellRendererText()
-        self._pathbox.pack_end(cell, True)
+        self._pathbox.pack_end(cell, False)
         self._pathbox.add_attribute(cell, 'text', 1)
 
         self.fill_path_combo()
