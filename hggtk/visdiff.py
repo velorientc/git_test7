@@ -95,7 +95,7 @@ class FileSelectionDialog(gtk.Dialog):
             repo = hg.repository(ui.ui(), path=rootpath())
             self.diffpath, self.diffopts = self.readtool(repo.ui)
             if self.diffpath:
-                gobject.idle_add(self.find_files, repo, pats, opts, model)
+                self.find_files(repo, pats, opts, model)
             else:
                 Prompt(_('No visual diff tool'), 
                        _('No visual diff tool has been configured'), None).run()
@@ -149,6 +149,10 @@ class FileSelectionDialog(gtk.Dialog):
         matcher = cmdutil.match(repo, pats, opts)
         modified, added, removed = repo.status(node1, node2, matcher)[:3]
         if not (modified or added or removed):
+            Prompt(_('No file changes'), 
+                   _('There are no file changes to view'), self).run()
+            # GTK+ locks up if this is done immediately here
+            gobject.idle_add(self.destroy)
             return
 
         tmproot = tempfile.mkdtemp(prefix='extdiff.')
