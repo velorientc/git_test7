@@ -62,7 +62,6 @@ class SynchDialog(gtk.Window):
                 self._toolbutton(gtk.STOCK_GOTO_BOTTOM,
                                  _('   Pull   '),
                                  self._pull_clicked,
-                                 self._pull_menu(),
                                  tip=_('Pull changes from selected'
                                  ' repository')),
                 gtk.SeparatorToolItem(),
@@ -146,6 +145,20 @@ class SynchDialog(gtk.Window):
         else:
             self._use_proxy.set_sensitive(False)
 
+        frame = gtk.Frame(_('Post pull operation'))
+        hbox = gtk.HBox()
+        self.nothingradio = gtk.RadioButton(None, _('Nothing'))
+        self.updateradio = gtk.RadioButton(self.nothingradio, _('Update'))
+        self.fetchradio = gtk.RadioButton(self.nothingradio, _('Fetch'))
+        self.rebaseradio = gtk.RadioButton(self.nothingradio, _('Rebase'))
+        hbox.pack_start(self.nothingradio, True, True, 2)
+        hbox.pack_start(self.updateradio, True, True, 2)
+        hbox.pack_start(self.fetchradio, True, True, 2)
+        hbox.pack_start(self.rebaseradio, True, True, 2)
+        frame.add(hbox)
+        frame.set_border_width(2)
+        vbox.pack_start(frame, False, False, 2)
+
         revbox.pack_start(self._pathbox, True, True)
         revbox.pack_end(self._use_proxy, False, False)
         vbox.pack_start(revbox, False, False, 2)
@@ -214,6 +227,17 @@ class SynchDialog(gtk.Window):
         self._last_drop_time = None
         
         self.load_settings()
+        self.update_pull_setting()
+
+    def update_pull_setting(self):
+        ppull = self.repo.ui.config('tortoisehg', 'postpull', 'None')
+        self.nothingradio.set_active(True)
+        if ppull == 'update':
+            self.updateradio.set_active(True)
+        elif ppull == 'fetch':
+            self.fetchradio.set_active(True)
+        elif ppull == 'rebase':
+            self.rebaseradio.set_active(True)
 
     def fill_path_combo(self):
         self.pathlist.clear()
@@ -289,32 +313,6 @@ class SynchDialog(gtk.Window):
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmdline))
         
-    def _pull_menu(self):
-        menu = gtk.Menu()
-
-        # define menu items
-        self._pull_default = gtk.RadioMenuItem(None, _('Default Pull'))
-        self._pull_update  = gtk.RadioMenuItem(self._pull_default,
-                                               _('Update to new tip'))
-        self._pull_fetch   = gtk.RadioMenuItem(self._pull_default,
-                                               _('Do fetch'))
-        self._pull_menu_items = [
-            self._pull_default, 
-            self._pull_update,
-            self._pull_fetch,
-        ]
-        
-        # add them to the menu
-        for item in self._pull_menu_items:
-            menu.append(item)
-        
-        # restore states from previous session
-        st = self._settings.get_value('_pull_default_state', 0)
-        self._pull_menu_items[st].set_active(True)
-        
-        menu.show_all()
-        return menu
-        
     def _get_paths(self, sort="value"):
         """ retrieve symbolic paths """
         try:
@@ -379,10 +377,6 @@ class SynchDialog(gtk.Window):
         
     def _save_settings(self):
         self.update_settings()
-        pullstate = 0
-        for i in xrange(0, len(self._pull_menu_items)):
-            if self._pull_menu_items[i].get_active(): pullstate = i
-        self._settings.set_value('_pull_default_state', pullstate) 
         self._settings.write()
 
     def _delete(self, widget, event):
@@ -421,13 +415,15 @@ class SynchDialog(gtk.Window):
         
     def _pull_clicked(self, toolbutton, data=None):
         aopts = self._get_advanced_options()
-        if self._pull_fetch.get_active():
+        if self.fetchradio.get_active():
             cmd = ['fetch', '--message', 'merge']
         else:
             cmd = ['pull']
             cmd += aopts.get('force', [])
-            if self._pull_update.get_active():
+            if self.updateradio.get_active():
                 cmd.append('--update')
+            elif self.rebaseradio.get_active():
+                cmd.append('--rebase')
         cmd += aopts.get('rev', [])
         self._exec_cmd(cmd)
     
@@ -455,6 +451,7 @@ class SynchDialog(gtk.Window):
         dlg.hide()
         self.paths = self._get_paths()
         self.fill_path_combo()
+        self.update_pull_setting()
 
     def _email_clicked(self, toolbutton, data=None):
         opts = []
