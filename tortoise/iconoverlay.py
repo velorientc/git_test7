@@ -5,6 +5,7 @@
 import os
 import win32api
 import win32con
+import win32process
 from win32com.shell import shell, shellcon
 import _winreg
 from mercurial import hg, cmdutil, util
@@ -25,6 +26,31 @@ cache_lock = threading.Semaphore()
 S_OK = 0
 S_FALSE = 1
 
+appfiltered = False
+try:
+    try:
+        # This will fail on windows < NT
+        proc = win32api.GetCurrentProcess()
+        app = win32process.GetModuleFileNameEx(proc, 0)
+    except:
+        app = win32api.GetModuleFileName(0)
+    app = str(os.path.basename(app)).lower()
+
+    if not app.startswith('tortoisehg'):
+        from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
+        hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+        filter = str(QueryValueEx(hkey, 'ShellApps')[0])
+        for f in filter.split(','):
+            f = f.strip().lower()
+            if f == '*':
+                break
+            elif f == app:
+                break
+        else:
+            debugf("app %s filtered, does not match %s", (app, filter))
+            appfiltered = True
+except (ImportError, EnvironmentError):
+    pass
 
 class IconOverlayExtension(object):
     """
@@ -54,6 +80,7 @@ class IconOverlayExtension(object):
         return 0
         
     def IsMemberOf(self, path, attrib):                  
+        if appfiltered: return S_FALSE
         global cache_lock
         try:
             cache_lock.acquire()
