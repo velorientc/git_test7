@@ -5,8 +5,6 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import pygtk
-pygtk.require("2.0")
 import gtk
 import gobject
 import pango
@@ -111,14 +109,13 @@ class SynchDialog(gtk.Window):
         revbox.pack_start(lbl, False, False)
         
         # revisions  combo box
-        self.pathlist = gtk.ListStore(str, str, bool)
+        self.pathlist = gtk.ListStore(str, str)
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
-        self._pathbox.set_row_separator_func(lambda model, i: model[i][2])
         self._pathtext = self._pathbox.get_child()
         self.fill_path_combo()
         defrow = None
         defpushrow = None
-        for i, (path, name, sep) in enumerate(self.pathlist):
+        for i, (path, name) in enumerate(self.pathlist):
             if name == 'default':
                 defrow = i
                 if defpushrow is None:
@@ -216,11 +213,8 @@ class SynchDialog(gtk.Window):
 
     def fill_path_combo(self):
         self.pathlist.clear()
-        sympaths = []
         for name, path in self.paths:
-            sympaths.append(path)
-            self.pathlist.append([toutf(path), name, False])
-        separator = False
+            self.pathlist.append([toutf(path), toutf(name)])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
         if time != self._last_drop_time:
