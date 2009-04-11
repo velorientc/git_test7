@@ -497,7 +497,7 @@ class GLog(GDialog):
         if len(self.pats) == 1:
             self._diff_file(None, self.pats[0])
         else:
-            self._diff_file(None, '')
+            self._diff_file(None, None)
 
     def _email_revs(self, menuitem):
         from hgemail import EmailDialog
