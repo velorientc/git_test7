@@ -638,6 +638,7 @@ class ChangeSet(GDialog):
             return
         self.opts['change'] = str(self.currev)
         self._diff_file('M', self.curfile)
+        del self.opts['change']
 
     def _view_file_rev(self, menuitem):
         '''User selected view file revision from the file list context menu'''
