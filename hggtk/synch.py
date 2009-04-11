@@ -12,7 +12,7 @@ import Queue
 import os
 import threading
 from mercurial.i18n import _
-from mercurial import hg, ui, util, extensions
+from mercurial import hg, ui, util, extensions, url
 from dialog import error_dialog, question_dialog, info_dialog
 from hglib import HgThread, fromutf, toutf, rootpath, RepoError
 import shlib
@@ -254,6 +254,7 @@ class SynchDialog(gtk.Window):
     def fill_path_combo(self):
         self.pathlist.clear()
         for alias, path in self.paths:
+            path = url.hidepassword(path)
             self.pathlist.append([toutf(path), toutf(alias)])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
@@ -513,6 +514,8 @@ class SynchDialog(gtk.Window):
         remote_path = fromutf(text_entry.get_text()).strip()
         for alias, path in self.paths:
             if remote_path == alias:
+                remote_path = path
+            elif remote_path == url.hidepassword(path):
                 remote_path = path
         
         cmdline = cmd[:]
