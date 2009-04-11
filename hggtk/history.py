@@ -332,6 +332,7 @@ class GLog(GDialog):
         _menu.append(create_menu(_('_update'), self._checkout))
         self._cmenu_merge = create_menu(_('_merge with'), self._merge)
         _menu.append(self._cmenu_merge)
+        _menu.append(create_menu(_('_copy hash'), self._copy_hash))
         _menu.append(create_menu(_('_export patch'), self._export_patch))
         _menu.append(create_menu(_('e_mail patch'), self._email_patch))
         _menu.append(create_menu(_('_bundle rev:tip'), self._bundle_rev_to_tip))
@@ -556,6 +557,13 @@ class GLog(GDialog):
         statopts = {'rev' : [str(rev)] }
         dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts, False)
         dialog.display()
+
+    def _copy_hash(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        node = self.repo[rev].node()
+        sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
+        clipboard = gtk.Clipboard(selection=sel)
+        clipboard.set_text(hex(node))
 
     def _export_patch(self, menuitem):
         rev = self.currow[treemodel.REVID]
