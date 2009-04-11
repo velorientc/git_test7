@@ -122,7 +122,6 @@ class ChangeSet(GDialog):
         title_line('changeset:', change, 'changeset')
         if ctx.branch() != 'default':
             title_line('branch:', ctx.branch(), 'greybg')
-        title_line('changesetid:', hex(ctx.node()), 'changeset')
         title_line('user/date:', ctx.user() + '\t' + date, 'changeset')
         for p in parents:
             pctx = self.repo.changectx(p)
