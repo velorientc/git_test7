@@ -171,20 +171,31 @@ class SynchDialog(gtk.Window):
         expander.add(hbox)
 
         revvbox = gtk.VBox()
-        revhbox = gtk.HBox()
         self._reventry = gtk.Entry()
+        self._cmdentry = gtk.Entry()
         self._force = gtk.CheckButton(_('Force pull or push'))
         self.tips.set_tip(self._force, _('Run even when remote repository'
                 ' is unrelated.'))
 
+        revhbox = gtk.HBox()
         revhbox.pack_start(gtk.Label(_('Target Revision:')), False, False, 2)
         revhbox.pack_start(self._reventry, True, True, 2)
-        eventbox = gtk.EventBox()
-        eventbox.add(revhbox)
-        self.tips.set_tip(eventbox, _('A specific revision up to which you'
+        reveventbox = gtk.EventBox()
+        reveventbox.add(revhbox)
+        self.tips.set_tip(reveventbox, _('A specific revision up to which you'
                 ' would like to push or pull.'))
-        revvbox.pack_start(eventbox, True, True, 8)
-        revvbox.pack_start(self._force, False, False, 2)
+
+        cmdhbox = gtk.HBox()
+        cmdhbox.pack_start(gtk.Label(_('Remote Command:')), False, False, 2)
+        cmdhbox.pack_start(self._cmdentry, True, True, 2)
+        cmdeventbox = gtk.EventBox()
+        cmdeventbox.add(cmdhbox)
+        self.tips.set_tip(cmdeventbox, _('Name of hg executable on remote'
+                ' machine.'))
+
+        revvbox.pack_start(self._force, False, False, 8)
+        revvbox.pack_start(reveventbox, True, True, 2)
+        revvbox.pack_start(cmdeventbox, True, True, 2)
         hbox.pack_start(revvbox, True, True, 4)
 
         frame = gtk.Frame(_('Incoming/Outgoing'))
@@ -390,6 +401,9 @@ class SynchDialog(gtk.Window):
             opts['force'] = ['--force']
         if self._newestfirst.get_active():
             opts['newest-first'] = ['--newest-first']
+        remotecmd = self._cmdentry.get_text().strip()
+        if remotecmd != "":
+            opts['remotecmd'] = ['--remotecmd', remotecmd]
         target_rev = self._reventry.get_text().strip()
         if target_rev != "":
             opts['rev'] = ['--rev', target_rev]
@@ -403,6 +417,7 @@ class SynchDialog(gtk.Window):
         else:
             cmd = ['pull']
             cmd += aopts.get('force', [])
+            cmd += aopts.get('remotecmd', [])
             if self.updateradio.get_active():
                 cmd.append('--update')
             elif self.rebaseradio.get_active():
@@ -415,6 +430,7 @@ class SynchDialog(gtk.Window):
         cmd = ['push']
         cmd += aopts.get('rev', [])
         cmd += aopts.get('force', [])
+        cmd += aopts.get('remotecmd', [])
         self._exec_cmd(cmd)
         
     def _conf_clicked(self, toolbutton, data=None):
@@ -464,6 +480,7 @@ class SynchDialog(gtk.Window):
         cmd += aopts.get('no-merges', [])
         cmd += aopts.get('force', [])
         cmd += aopts.get('newest-first', [])
+        cmd += aopts.get('remotecmd', [])
         self._exec_cmd(cmd)
         
     def _outgoing_clicked(self, toolbutton, data=None):
@@ -474,6 +491,7 @@ class SynchDialog(gtk.Window):
         cmd += aopts.get('no-merges', [])
         cmd += aopts.get('force', [])
         cmd += aopts.get('newest-first', [])
+        cmd += aopts.get('remotecmd', [])
         self._exec_cmd(cmd)
         
     def _stop_clicked(self, toolbutton, data=None):
@@ -567,6 +585,7 @@ class SynchDialog(gtk.Window):
     AdvancedDefaults = {
         'expander.expanded': False, 
         '_reventry.text': '', 
+        '_cmdentry.text': '', 
         '_force.active': False,
         '_showpatch.active': False, 
         '_newestfirst.active': False, 
