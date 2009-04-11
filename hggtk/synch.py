@@ -39,8 +39,9 @@ class SynchDialog(gtk.Window):
         self.paths = self._get_paths()
         self.origchangecount = len(self.repo.changelog)
 
-        # load the fetch extension explicitly
+        # load the fetch and rebase extensions explicitly
         extensions.load(self.ui, 'fetch', None)
+        extensions.load(self.ui, 'rebase', None)
 
         name = self.repo.ui.config('web', 'name') or os.path.basename(root)
         self.set_title(_('TortoiseHg Synchronize - ') + name)
