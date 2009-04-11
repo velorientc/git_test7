@@ -22,7 +22,7 @@ _tortoise_info = (
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
         ' on your system or use its internal merge tool that leaves conflict'
-        ' markers in place.')),
+        ' markers in place.  Chose internal:merge to force conflict markers.')),
     (_('Visual Diff Command'), 'tortoisehg.vdiff', [],
         _('Specify visual diff tool; must be an extdiff command')),
     (_('Visual Editor'), 'tortoisehg.editor', [],
@@ -719,6 +719,7 @@ class ConfigDialog(gtk.Dialog):
                             # Ensure the tool is installed
                             if filemerge._findtool(self.ui, t):
                                 values.append(t)
+                        values.append('internal:merge')
                     except ImportError:
                         pass
 
