@@ -214,9 +214,9 @@ class SynchDialog(gtk.Window):
         vbox.pack_start(scrolledwindow, True, True)
 
         self.buttonhbox = gtk.HBox()
-        self.viewpulled = gtk.Button(_('View Pulled Revisions'))
+        self.viewpulled = gtk.Button(_('View pulled revisions'))
         self.viewpulled.connect('clicked', self._view_pulled_changes)
-        self.updatetip = gtk.Button(_('Update to Tip'))
+        self.updatetip = gtk.Button(_('Update to branch tip'))
         self.updatetip.connect('clicked', self._update_to_tip)
         self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
         self.buttonhbox.pack_start(self.updatetip, False, False, 2)
@@ -270,9 +270,10 @@ class SynchDialog(gtk.Window):
             self.buttonhbox.show()
             self.viewpulled.show()
 
-        self.repo.dirstate.invalidate()
-        parent = self.repo.changectx(None).parents()[0].rev()
-        if parent == tip-1:
+        wc = self.repo[None]
+        branchhead = self.repo.branchtags()[wc.branch()]
+        parents = self.repo.parents()
+        if len(parents) > 1 or parents[0].node() == branchhead:
             self.updatetip.hide()
         else:
             self.buttonhbox.show()
@@ -286,29 +287,10 @@ class SynchDialog(gtk.Window):
         dialog.display()
 
     def _update_to_tip(self, button):
-        self.repo.invalidate()
-        wc = self.repo.changectx(None)
-        pl = wc.parents()
-        p1, p2 = pl[0], self.repo.changectx('tip')
-        pa = p1.ancestor(p2)
-        warning = ''
-        flags = []
-        if len(pl) > 1:
-            warning = _('Outstanding uncommitted merges')
-        elif pa != p1 and pa != p2:
-            warning = _('Update spans branches')
-        if warning:
-            flags = ['--clean']
-            msg = _('Lose all changes in your working directory?')
-            warning += _(', requires clean checkout')
-            if question_dialog(self, msg, warning) != gtk.RESPONSE_YES:
-                return
-        self.write("", False)
-
         # execute command and show output on text widget
         gobject.timeout_add(10, self.process_queue)
-
-        cmdline = ['update', '-v', '-R', self.repo.root] + flags + ['tip']
+        self.write("", False)
+        cmdline = ['update', '-v']
         self.hgthread = HgThread(cmdline)
         self.hgthread.start()
         self.stbar.begin()
