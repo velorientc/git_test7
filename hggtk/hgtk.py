@@ -27,12 +27,8 @@ def dispatch(args):
     "run the command specified in args"
     try:
         u = _ui.ui(traceback='--traceback' in args)
-    except util.Abort, inst:
-        sys.stderr.write(_("abort: %s\n") % inst)
-        return -1
-    if '--debugger' in args:
-        pdb.set_trace()
-    try:
+        if '--debugger' in args:
+            pdb.set_trace()
         return _runcatch(u, args)
     except:
         if '--debugger' in args:
@@ -116,8 +112,6 @@ def _runcatch(ui, args):
         help_(ui, 'shortlist')
     except hglib.RepoError, inst:
         ui.warn(_("abort: %s!\n") % inst)
-    except util.Abort, inst:
-        ui.warn(_("abort: %s\n") % inst)
         
     return -1
 
