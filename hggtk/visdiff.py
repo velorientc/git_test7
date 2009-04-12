@@ -112,7 +112,7 @@ class FileSelectionDialog(gtk.Dialog):
                     if name == preferred:
                         defrow = i
                 combo.connect('changed', self.toolselect, tools)
-                combo.set_active(i)
+                combo.set_active(defrow)
                 hbox.pack_start(lbl, False, False, 2)
                 hbox.pack_start(combo, False, False, 2)
             else:
