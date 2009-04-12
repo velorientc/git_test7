@@ -48,17 +48,11 @@ def register_tortoise_path(unregister=False):
 def DllRegisterServer():
     check_tortoise_overlays()
     RegisterServer(ContextMenuExtension)
-    RegisterServer(ChangedOverlay)
-    RegisterServer(AddedOverlay)
-    RegisterServer(UnchangedOverlay)
     register_tortoise_path()
 
 # for COM registration via py2exe
 def DllUnregisterServer():
     UnregisterServer(ContextMenuExtension)
-    UnregisterServer(ChangedOverlay)
-    UnregisterServer(AddedOverlay)
-    UnregisterServer(UnchangedOverlay)
     register_tortoise_path(unregister=True)
 
 def RegisterServer(cls):
@@ -122,11 +116,6 @@ if __name__=='__main__':
     register.UseCommandLine(ContextMenuExtension,
             finalize_register = lambda: RegisterServer(ContextMenuExtension),
             finalize_unregister = lambda: UnregisterServer(ContextMenuExtension))
-    
-    for cls in (ChangedOverlay, AddedOverlay, UnchangedOverlay):
-        register.UseCommandLine(cls,
-                finalize_register = lambda: RegisterServer(cls),
-                finalize_unregister = lambda: UnregisterServer(cls))
 
     if "--unregister" in sys.argv[1:]:
         register_tortoise_path(unregister=True)

@@ -13,7 +13,7 @@ import sys
 
 from mercurial import demandimport; demandimport.enable()
 from mercurial import ui
-from tortoise.thgutil import get_prog_root
+from tortoise.thgutil import get_prog_root, find_root
 
 # always use hg exe installed with TortoiseHg
 thgdir = get_prog_root()
@@ -101,6 +101,11 @@ def parse(args):
     
     cmdline = ['hg', option['hgcmd']] 
     if 'root' in option:
+        cmdline.append('--repository')
+        cmdline.append(option['root'])
+    elif 'cwd' in option:
+        root = find_root(option['cwd'])
+        option['root'] = root
         cmdline.append('--repository')
         cmdline.append(option['root'])
     cmdline.extend(args)
