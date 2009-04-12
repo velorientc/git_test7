@@ -67,11 +67,13 @@ class FileSelectionDialog(gtk.Dialog):
         scroller.add(treeview)
         self.vbox.pack_start(scroller, True, True, 2)
 
+        hbox = gtk.HBox()
+        self.vbox.pack_start(hbox, False, False, 2)
         settings = shlib.Settings('visdiff')
         single = settings.get_value('launchsingle', False)
         check = gtk.CheckButton(_('Always launch single files'))
         check.set_active(single)
-        self.vbox.pack_start(check, False, False, 2)
+        hbox.pack_start(check, True, True, 2)
         self.singlecheck = check
 
         treeview.connect('row-activated', self.rowactivated)
@@ -93,38 +95,57 @@ class FileSelectionDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=rootpath())
-            self.diffpath, self.diffopts = self.readtool(repo.ui)
-            if self.diffpath:
-                self.find_files(repo, pats, opts, model)
-            else:
-                Prompt(_('No visual diff tool'), 
-                       _('No visual diff tool has been configured'), None).run()
         except RepoError:
-            pass
+            # hgtk should catch this earlier
+            Prompt(_('No repository'), 
+                   _('No repository found here'), None).run()
+            return
 
-    def readtool(self, ui):
-        vdiff = ui.config('tortoisehg', 'vdiff', 'vdiff')
-        if not vdiff:
-            return '', None
+        tools = self.readtools(repo.ui)
+        preferred = repo.ui.config('tortoisehg', 'vdiff', 'vdiff')
+        if preferred and preferred in tools:
+            if len(tools) > 1:
+                lbl = gtk.Label(_('Select diff tool'))
+                combo = gtk.combo_box_new_text()
+                for i, name in enumerate(tools.iterkeys()):
+                    combo.append_text(name)
+                    if name == preferred:
+                        defrow = i
+                combo.connect('changed', self.toolselect, tools)
+                combo.set_active(i)
+                hbox.pack_start(lbl, False, False, 2)
+                hbox.pack_start(combo, False, False, 2)
+            else:
+                self.diffpath, self.diffopts = tools[preferred]
+            self.find_files(repo, pats, opts, model)
+        else:
+            Prompt(_('No visual diff tool'), 
+                   _('No visual diff tool has been configured'), None).run()
+
+    def toolselect(self, combo, tools):
+        sel = combo.get_active_text()
+        if sel in tools:
+            self.diffpath, self.diffopts = tools[sel]
+
+    def readtools(self, ui):
+        tools = {}
         for cmd, path in ui.configitems('extdiff'):
             if cmd.startswith('cmd.'):
                 cmd = cmd[4:]
-                if cmd != vdiff:
-                    continue
                 if not path:
                     path = cmd
                 diffopts = ui.config('extdiff', 'opts.' + cmd, '')
                 diffopts = diffopts and [diffopts] or []
-                return path, diffopts
-            elif cmd == vdiff:
+                tools[cmd] = [path, diffopts]
+            else:
                 # command = path opts
                 if path:
                     diffopts = shlex.split(path)
                     path = diffopts.pop(0)
                 else:
                     path, diffopts = cmd, []
-                return path, diffopts
-        return '', None
+                tools[cmd] = [path, diffopts]
+        return tools
 
     def find_files(self, repo, pats, opts, model):
         revs = opts.get('rev')
