@@ -78,14 +78,7 @@ _paths_info = (
         ['none', 'update', 'fetch', 'rebase'],
         _('Operation which is performed directly after a successful pull.'
           ' update equates to pull --update, fetch equates to the fetch'
-          ' extension, rebase equates to pull --rebase.  Default: none')),
-    ('default', 'paths.default', [],
-        _('Directory or URL to use when pulling, if no source is specified.'
-        ' Default is set to the repository from which the repository'
-        ' was cloned.')),
-    ('default-push', 'paths.default-push', [],
-        _('Optional. Directory or URL to use when pushing, if no'
-        ' destination is specified.')))
+          ' extension, rebase equates to pull --rebase.  Default: none')),)
 
 _web_info = (
     (_('Name'), 'web.name', ['unknown'],
@@ -395,7 +388,6 @@ class ConfigDialog(gtk.Dialog):
                 gobject.TYPE_STRING)
         if 'paths' in list(self.ini):
             for name in self.ini['paths']:
-                if name in ('default', 'default-push'): continue
                 path = self.ini['paths'][name]
                 i = self.pathdata.insert_before(None, None)
                 self.pathdata.set_value(i, 0, "%s" % toutf(name))
@@ -824,8 +816,7 @@ class ConfigDialog(gtk.Dialog):
                     del self.ini['paths'][name]
         elif 'paths' in list(self.ini):
             for name in list(self.ini.paths):
-                if name not in ('default', 'default-push'):
-                    del self.ini['paths'][name]
+                del self.ini['paths'][name]
 
         # Flush changes on all pages
         for vbox, info, widgets in self.pages:
