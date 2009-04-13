@@ -113,7 +113,7 @@ else:
     desc='TortoiseHg dialogs for Mercurial VCS'
 
 try:
-    l = os.popen('hg id -it').read().split()
+    l = os.popen('hg -R . id -it').read().split()
     while len(l) > 1 and l[-1][0].isalpha(): # remove non-numbered tags
         l.pop()
     version = l and l[-1] or 'unknown' # latest tag or revision number
