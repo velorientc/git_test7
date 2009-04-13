@@ -17,6 +17,8 @@ import iniparse
 
 _unspecstr = _('<unspecified>')
 
+_pwfields = ('http_proxy.passwd', 'smtp.password')
+
 _tortoise_info = (
     (_('3-way Merge Tool'), 'ui.merge', [],
         _('Graphical merge program for resolving merge conflicts.  If left'
@@ -673,6 +675,8 @@ class ConfigDialog(gtk.Dialog):
                     desctext.get_buffer(), tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
             combo.child.set_width_chars(40)
+            if cpath in _pwfields:
+                combo.child.set_visibility(False)
             widgets.append(combo)
 
             lbl = gtk.Label(label + ':')
@@ -690,6 +694,7 @@ class ConfigDialog(gtk.Dialog):
     def _refresh_vlist(self):
         for vbox, info, widgets in self.pages:
             for row, (label, cpath, values, tooltip) in enumerate(info):
+                ispw = cpath in _pwfields
                 combo = widgets[row]
                 vlist = combo.get_model()
                 vlist.clear()
@@ -724,14 +729,15 @@ class ConfigDialog(gtk.Dialog):
                         pass
 
                 currow = None
-                vlist.append([_unspecstr, False])
+                if not ispw: 
+                    vlist.append([_unspecstr, False])
                 if values:
                     vlist.append([_('Suggested'), True])
                     for v in values:
                         vlist.append([toutf(v), False])
                         if v == curvalue:
                             currow = len(vlist) - 1
-                if cpath in self.history.get_keys():
+                if cpath in self.history.get_keys() and not ispw:
                     separator = False
                     for v in self.history.mrul(cpath):
                         if v in values: continue
