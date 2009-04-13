@@ -129,8 +129,8 @@ if version != 'unknown' or not os.path.exists(verfile):
     f.write('version = "%s"\n' % version)
     f.close()
 else:
-    from hggtk import shlib
-    version = shlib.version()
+    import hggtk.__version__
+    version = hggtk.__version__.version
 
 setup(name="tortoisehg",
         version=version,
