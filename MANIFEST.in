@@ -1,0 +1,3 @@
+recursive-include icons *.png *.ico *.svg
+include contrib/_hgtk
+include contrib/nautilus-thg.py
