@@ -81,6 +81,7 @@ if os.name == 'nt':
         return True if a network drive is accessible (connected, ...),
         or None if <drive> is not a network drive
         """
+        print "netdrive_status: checking ", drive
         if hasattr(os.path, 'splitunc'):
             unc, rest = os.path.splitunc(drive)
             if unc: # All UNC paths (\\host\mount) are considered nonlocal
