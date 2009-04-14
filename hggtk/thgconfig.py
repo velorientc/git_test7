@@ -223,13 +223,14 @@ class PathEditDialog(gtk.Dialog):
         frame = gtk.Frame()
         self.vbox.pack_start(frame, False, False, 2)
         vbox = gtk.VBox()
+        vbox.set_border_width(10)
         frame.add(vbox)
         frame.set_border_width(10)
 
         self.protcombo = gtk.combo_box_new_text()
         for p in self._protocols:
             self.protcombo.append_text(p)
-        vbox.pack_start(self.protcombo, False, False, 2)
+        vbox.pack_start(self.protcombo, False, False, 10)
 
         hbox = gtk.HBox()
         hbox.pack_start(self.entries['Host'][1], False, False, 2)
