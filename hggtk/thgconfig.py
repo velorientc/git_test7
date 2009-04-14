@@ -448,12 +448,12 @@ class ConfigDialog(gtk.Dialog):
         '''Add a new path to [paths], give default name, focus'''
         i = self.pathdata.insert_before(None, None)
         self.pathdata.set_value(i, 0, 'new')
-        self.pathdata.set_value(i, 1, '%s' % toutf(newpath))
+        self.pathdata.set_value(i, 1, '%s' % toutf(url.hidepassword(newpath)))
+        self.pathdata.set_value(i, 2, '%s' % toutf(newpath))
         self.pathtree.get_selection().select_iter(i)
         self.pathtree.set_cursor(
                 self.pathdata.get_path(i),
-                self.pathtree.get_column(0), 
-                start_editing=True)
+                self.pathtree.get_column(0))
         self.refresh_path_list()
         # This method may be called from hggtk.sync, so ensure page is visible
         self.notebook.set_current_page(3)
