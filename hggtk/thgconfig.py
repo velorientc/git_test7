@@ -8,8 +8,10 @@
 import gtk
 import gobject
 import os
+import re
+import urlparse
 from mercurial.i18n import _
-from mercurial import hg, ui, util
+from mercurial import hg, ui, util, url
 from dialog import error_dialog, question_dialog
 from hglib import RepoError, toutf, fromutf
 import shlib
@@ -190,6 +192,149 @@ _diff_info = (
         _('Ignore changes whose lines are all blank.'
         ' Default: False')))
 
+class PathEditDialog(gtk.Dialog):
+    _protocols = ['ssh', 'http', 'https', 'local']
+
+    def __init__(self, path, alias):
+        gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
+                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        self.connect('response', self.response)
+        self.set_title(_('Edit remote repository path'))
+        self.newpath, self.newalias = None, None
+
+        self.entries = {}
+        for name in ('URL', 'Port', 'Folder', 'Host', 'User',
+                'Password', 'Alias'):
+            entry = gtk.Entry()
+            label = gtk.Label(name)
+            self.entries[name] = (entry, label)
+
+        self.entries['URL'][0].set_width_chars(50)
+        self.entries['URL'][0].set_editable(False)
+        self.entries['Password'][0].set_visibility(False)
+
+        hbox = gtk.HBox()
+        hbox.pack_start(self.entries['Alias'][1], False, False, 2)
+        hbox.pack_start(self.entries['Alias'][0], False, False, 2)
+        hbox.pack_start(self.entries['URL'][1], False, False, 2)
+        hbox.pack_start(self.entries['URL'][0], True, True, 2)
+        self.vbox.pack_start(hbox, False, False, 2)
+
+        frame = gtk.Frame()
+        self.vbox.pack_start(frame, False, False, 2)
+        vbox = gtk.VBox()
+        frame.add(vbox)
+        frame.set_border_width(10)
+
+        self.protcombo = gtk.combo_box_new_text()
+        for p in self._protocols:
+            self.protcombo.append_text(p)
+        vbox.pack_start(self.protcombo, False, False, 2)
+
+        hbox = gtk.HBox()
+        hbox.pack_start(self.entries['Host'][1], False, False, 2)
+        hbox.pack_start(self.entries['Host'][0], True, True, 2)
+        hbox.pack_start(self.entries['Port'][1], False, False, 2)
+        hbox.pack_start(self.entries['Port'][0], False, False, 2)
+        vbox.pack_start(hbox, False, False, 2)
+
+        for n in ('Folder', 'User', 'Password'):
+            hbox = gtk.HBox()
+            hbox.pack_start(self.entries[n][1], False, False, 2)
+            hbox.pack_start(self.entries[n][0], True, True, 2)
+            vbox.pack_start(hbox, False, False, 2)
+
+        user, host, port, folder, pw, scheme = self.urlparse(path)
+
+        self.entries['URL'][0].set_text(path)
+        self.entries['Alias'][0].set_text(alias)
+        self.entries['User'][0].set_text(user or '')
+        self.entries['Host'][0].set_text(host or '')
+        self.entries['Port'][0].set_text(port or '')
+        self.entries['Folder'][0].set_text(folder or '')
+        self.entries['Password'][0].set_text(pw or '')
+        for n, (e, l) in self.entries.iteritems():
+            e.connect('changed', self.changed)
+
+        self.lastproto = None
+        self.protcombo.connect('changed', self.changed)
+        i = self._protocols.index(scheme)
+        self.protcombo.set_active(i)
+        self.show_all()
+
+    def urlparse(self, path):
+        if path.startswith('ssh://'):
+            m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
+            user = m.group(2)
+            host = m.group(3)
+            port = m.group(5)
+            folder = m.group(7) or "."
+            passwd = ''
+            scheme = 'ssh'
+        elif path.startswith('http'):
+            snpaqf = urlparse.urlparse(path)
+            scheme, netloc, folder, params, query, fragment = snpaqf
+            host, port, user, passwd = url.netlocsplit(netloc)
+            if folder.startswith('/'): folder = folder[1:]
+        else:
+            user, host, port, passwd = [''] * 4
+            folder = path
+            scheme = 'local'
+        return user, host, port, folder, passwd, scheme
+
+    def changed(self, combo):
+        newurl = self.buildurl()
+        self.entries['URL'][0].set_text(url.hidepassword(newurl))
+        proto = self.protcombo.get_active_text()
+        if proto == self.lastproto:
+            return
+        self.lastproto = proto
+        if proto == 'local':
+            for n in ('User', 'Password', 'Port', 'Host'):
+                self.entries[n][0].set_sensitive(False)
+                self.entries[n][1].set_sensitive(False)
+        elif proto == 'ssh':
+            for n in ('User', 'Port', 'Host'):
+                self.entries[n][0].set_sensitive(True)
+                self.entries[n][1].set_sensitive(True)
+            self.entries['Password'][0].set_sensitive(False)
+            self.entries['Password'][1].set_sensitive(False)
+        else:
+            for n in ('User', 'Password', 'Port', 'Host'):
+                self.entries[n][0].set_sensitive(True)
+                self.entries[n][1].set_sensitive(True)
+
+    def response(self, widget, response_id):
+        if response_id != gtk.RESPONSE_CLOSE:
+            self.destroy()
+            return
+        self.newpath = fromutf(self.buildurl())
+        self.newalias = fromutf(self.entries['Alias'][0].get_text())
+        self.destroy()
+
+    def buildurl(self):
+        proto = self.protcombo.get_active_text()
+        host = self.entries['Host'][0].get_text()
+        port = self.entries['Port'][0].get_text()
+        folder = self.entries['Folder'][0].get_text()
+        user = self.entries['User'][0].get_text()
+        pwd = self.entries['Password'][0].get_text()
+        if proto == 'ssh':
+            ret = 'ssh://'
+            if user:
+                ret += user + '@'
+            ret += host
+            if port:
+                ret += ':' + port
+            ret += '/' + folder
+        elif proto == 'local':
+            ret = folder
+        else:
+            ret = proto + '://'
+            netloc = url.netlocunsplit(host, port, user, pwd)
+            ret += netloc + '/' + folder
+        return ret
+
 class ConfigDialog(gtk.Dialog):
     def __init__(self, root='',
             configrepo=False,
@@ -210,7 +355,6 @@ class ConfigDialog(gtk.Dialog):
                 self.response(gtk.RESPONSE_CANCEL)
 
         # Catch close events
-        #self.set_default_size(700, 300)
         self.connect('delete-event', self._delete)
         self.connect('response', self._response)
 
@@ -256,7 +400,7 @@ class ConfigDialog(gtk.Dialog):
         self.log_frame = self.add_page(notebook, _('Changelog'))
         self.fill_frame(self.log_frame, _log_info)
 
-        self.paths_frame = self.add_page(notebook, _('Paths'))
+        self.paths_frame = self.add_page(notebook, _('Synch'))
         vbox = self.fill_frame(self.paths_frame, _paths_info)
         self.fill_path_frame(vbox)
 
@@ -300,18 +444,6 @@ class ConfigDialog(gtk.Dialog):
                     widgets[w].grab_focus()
                     return
                     
-    def on_alias_edit(self, cell, path, new_text):
-        dirty = self.pathdata[path][0] != new_text
-        self.pathdata[path][0] = new_text
-        if dirty:
-            self.dirty_event()
-    
-    def on_path_edit(self, cell, path, new_text):
-        dirty = self.pathdata[path][1] != new_text
-        self.pathdata[path][1] = new_text
-        if dirty:
-            self.dirty_event()
-        
     def new_path(self, newpath):
         '''Add a new path to [paths], give default name, focus'''
         i = self.pathdata.insert_before(None, None)
@@ -334,6 +466,19 @@ class ConfigDialog(gtk.Dialog):
 
     def _add_path(self, *args):
         self.new_path('http://')
+
+    def _edit_path(self, *args):
+        selection = self.pathtree.get_selection()
+        if not selection.count_selected_rows():
+            return
+        model, path = selection.get_selected()
+        dialog = PathEditDialog(model[path][2], model[path][0])
+        dialog.run()
+        if dialog.newpath:
+            model[path][0] = dialog.newalias
+            model[path][1] = url.hidepassword(dialog.newpath)
+            model[path][2] = dialog.newpath
+            self.dirty_event()
 
     def _remove_path(self, *args):
         selection = self.pathtree.get_selection()
@@ -363,51 +508,50 @@ class ConfigDialog(gtk.Dialog):
             return
         if testpath[0] == '~':
             testpath = os.path.expanduser(testpath)
-        cmdline = ['hg', 'incoming', '--repository', self.root,
-                   '--verbose', testpath]
+        cmdline = ['hg', 'incoming', '--verbose', testpath]
         from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-        
+
     def _pathtree_changed(self, sel):
         self.refresh_path_list()
 
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
-        path_selected = ( len(self.pathdata) > 0
+        path_selected = (len(self.pathdata) > 0
             and self.pathtree.get_selection().count_selected_rows() > 0)
         repo_available = self.root is not None
+        self._editpathbutton.set_sensitive(path_selected)
         self._delpathbutton.set_sensitive(path_selected)
         self._testpathbutton.set_sensitive(repo_available and path_selected)
 
-    def fill_path_frame(self, vbox):
+    def fill_path_frame(self, frvbox):
+        frame = gtk.Frame(_('Remote repository paths'))
+        frame.set_border_width(10)
+        frvbox.pack_start(frame, True, True, 2)
+        vbox = gtk.VBox()
+        vbox.set_border_width(5)
+        frame.add(vbox)
+
         # Initialize data model for 'Paths' tab
-        self.pathdata = gtk.ListStore(
-                gobject.TYPE_STRING,
-                gobject.TYPE_STRING)
+        self.pathdata = gtk.ListStore(str, str, str)
         if 'paths' in list(self.ini):
             for name in self.ini['paths']:
                 path = self.ini['paths'][name]
-                i = self.pathdata.insert_before(None, None)
-                self.pathdata.set_value(i, 0, "%s" % toutf(name))
-                self.pathdata.set_value(i, 1, "%s" % toutf(path))
+                safepath = toutf(url.hidepassword(path))
+                self.pathdata.append([toutf(name), safepath, toutf(path)])
 
         # Define view model for 'Paths' tab
-        self.pathtree = gtk.TreeView()
-        self.pathtree.set_model(self.pathdata)
+        self.pathtree = gtk.TreeView(self.pathdata)
         self.pathtree.set_enable_search(False)
         self.pathtree.connect("cursor-changed", self._pathtree_changed)
-        
+
         renderer = gtk.CellRendererText()
-        renderer.set_property('editable', True)
-        renderer.connect('edited', self.on_alias_edit)
         column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
         self.pathtree.append_column(column)
         
         renderer = gtk.CellRendererText()
-        renderer.set_property('editable', True)
-        renderer.connect('edited', self.on_path_edit)
         column = gtk.TreeViewColumn(_('Repository Path'), renderer, text=1)
         self.pathtree.append_column(column)
         
@@ -421,6 +565,11 @@ class ConfigDialog(gtk.Dialog):
         self.addButton.set_use_underline(True)
         self.addButton.connect('clicked', self._add_path)
         buttonbox.pack_start(self.addButton)
+
+        self._editpathbutton = gtk.Button(_('_Edit'))
+        self._editpathbutton.set_use_underline(True)
+        self._editpathbutton.connect('clicked', self._edit_path)
+        buttonbox.pack_start(self._editpathbutton)
 
         self._delpathbutton = gtk.Button(_('_Remove'))
         self._delpathbutton.set_use_underline(True)
@@ -805,7 +954,7 @@ class ConfigDialog(gtk.Dialog):
             refreshlist = []
             for row in self.pathdata:
                 name = fromutf(row[0])
-                path = fromutf(row[1])
+                path = fromutf(row[2])
                 cpath = '.'.join(['paths', name])
                 self.record_new_value(cpath, path, False)
                 refreshlist.append(name)
