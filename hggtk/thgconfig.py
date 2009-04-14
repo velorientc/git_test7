@@ -308,8 +308,8 @@ class PathEditDialog(gtk.Dialog):
         if response_id != gtk.RESPONSE_CLOSE:
             self.destroy()
             return
-        self.newpath = fromutf(self.buildurl())
-        self.newalias = fromutf(self.entries['Alias'][0].get_text())
+        self.newpath = self.buildurl()
+        self.newalias = self.entries['Alias'][0].get_text()
         self.destroy()
 
     def buildurl(self):
