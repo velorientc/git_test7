@@ -5,7 +5,7 @@
 
 import os
 import cachethg
-from thgutil import *
+import thgutil
 from mercurial import hg, ui
 from mercurial.i18n import _
 
@@ -122,7 +122,7 @@ class thg_menu(object):
 
 
 def open_repo(path):
-    root = find_root(path)
+    root = thgutil.find_root(path)
     if root:
         try:
             repo = hg.repository(ui.ui(), path=root)
