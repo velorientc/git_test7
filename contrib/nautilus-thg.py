@@ -134,17 +134,7 @@ class HgExtension(nautilus.MenuProvider,
             cwd = self.cwd
         repo = self.get_repo_for_path(cwd)
 
-        if hgcmd == 'vdiff':
-            diffcmd = repo.ui.config('tortoisehg', 'vdiff', 'vdiff')
-            if not diffcmd:
-                hgcmd = 'diff'
-            else:
-                cmdline = ['hg', diffcmd]
-                cmdline.extend(self.files)
-                subprocess.Popen(cmdline, shell=False, env=self.env, cwd=cwd)
-                return
-
-        cmdopts  = [sys.executable, self.hgproc, hgcmd]
+        cmdopts = [sys.executable, self.hgproc, hgcmd]
 
         if hgcmd not in nofilecmds and self.files:
             # Use stdin to pass file list (avoid shell command
