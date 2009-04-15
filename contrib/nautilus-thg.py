@@ -82,10 +82,10 @@ class HgExtension(nautilus.MenuProvider,
         self.env['TORTOISEHG_PATH'] = thgpath
         self.env['THG_ICON_PATH'] = os.path.join(thgpath, 'icons')
 
-        self.hgproc = tortoise.thgutil.find_path('hgtk',
+        self.hgtk = tortoise.thgutil.find_path('hgtk',
               tortoise.thgutil.get_prog_root())
-        if not self.hgproc:
-            self.hgproc = tortoise.thgutil.find_path('hgtk')
+        if not self.hgtk:
+            self.hgtk = tortoise.thgutil.find_path('hgtk')
         self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
         self.menu = tortoise.menuthg.menuThg()
 
@@ -124,9 +124,9 @@ class HgExtension(nautilus.MenuProvider,
             print e
             return None
 
-    def run_dialog(self, menuitem, hgcmd, cwd = None):
+    def run_dialog(self, menuitem, hgtkcmd, cwd = None):
         '''
-        hgcmd - hgproc subcommand
+        hgtkcmd - hgtk subcommand
         '''
         if cwd: #bg
             self.files = []
@@ -134,9 +134,9 @@ class HgExtension(nautilus.MenuProvider,
             cwd = self.cwd
         repo = self.get_repo_for_path(cwd)
 
-        cmdopts = [sys.executable, self.hgproc, hgcmd]
+        cmdopts = [sys.executable, self.hgtk, hgtkcmd]
 
-        if hgcmd not in nofilecmds and self.files:
+        if hgtkcmd not in nofilecmds and self.files:
             # Use stdin to pass file list (avoid shell command
             # line limitations)
             pipe = subprocess.PIPE
@@ -150,7 +150,7 @@ class HgExtension(nautilus.MenuProvider,
             stdin.write('\n'.join(self.files))
             stdin.close()
 
-        if hgcmd not in nocachecmds:
+        if hgtkcmd not in nocachecmds:
             # Remove cached repo object, dirstate may change
             self.cacherepo = None
             self.cacheroot = None
