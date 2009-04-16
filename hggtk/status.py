@@ -11,7 +11,6 @@ import os
 import cStringIO
 
 import pygtk
-pygtk.require('2.0')
 import gtk
 import pango
 
@@ -255,7 +254,7 @@ class GStatus(GDialog):
         self.filetree.connect('key-press-event', self._tree_key_press)
         self.filetree.set_reorderable(False)
         self.filetree.set_enable_search(True)
-        self.filetree.set_search_column(2)
+        self.filetree.set_search_equal_func(self.search_filelist)
         if hasattr(self.filetree, 'set_rubber_banding'):
             self.filetree.set_rubber_banding(True)
         self.filetree.modify_font(pango.FontDescription(self.fontlist))
@@ -403,6 +402,13 @@ class GStatus(GDialog):
                 self._diffpane_moved)
         self.filetree.set_headers_clickable(True)
         return self._diffpane
+
+    def search_filelist(self, model, column, key, iter):
+        'case insensitive filename search'
+        key = key.lower()
+        if key in model.get_value(iter, FM_PATH).lower():
+            return False
+        return True
 
     def copy_to_clipboard(self, treeview):
         'Write highlighted hunks to the clipboard'
