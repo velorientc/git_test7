@@ -59,6 +59,7 @@ class HgIgnoreDialog(gtk.Window):
         frame = gtk.Frame(_('Filters'))
         hbox.pack_start(frame, True, True, 4)
         pattree = gtk.TreeView()
+        pattree.set_enable_search(False)
         pattree.set_reorderable(False)
         sel = pattree.get_selection()
         sel.set_mode(gtk.SELECTION_SINGLE)
@@ -83,6 +84,7 @@ class HgIgnoreDialog(gtk.Window):
         frame = gtk.Frame(_('Unknown Files'))
         hbox.pack_start(frame, True, True, 4)
         unknowntree = gtk.TreeView()
+        unknowntree.set_search_equal_func(self.unknown_search)
         col = gtk.TreeViewColumn(_('Files'), gtk.CellRendererText(), text=0)
         unknowntree.append_column(col) 
         scrolledwindow = gtk.ScrolledWindow()
@@ -109,6 +111,13 @@ class HgIgnoreDialog(gtk.Window):
         pattree.get_selection().connect('changed', self.pattree_rowchanged, remove)
         unknowntree.get_selection().connect('changed', self.unknown_rowchanged)
         gobject.idle_add(self.refresh)
+
+    def unknown_search(self, model, column, key, iter):
+        'case insensitive filename search'
+        key = key.lower()
+        if key in model.get_value(iter, 0).lower():
+            return False
+        return True
 
     def remove_pressed(self, widget, selection):
         model, rows = selection.get_selected_rows()
