@@ -90,7 +90,7 @@ class DetectRenameDialog(gtk.Window):
         ctree = gtk.TreeView(cmodel)
         ctree.set_rules_hint(True)
         ctree.set_reorderable(False)
-        ctree.set_enable_search(True)
+        ctree.set_enable_search(False)
         ctree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 
         cell = gtk.CellRendererText()
