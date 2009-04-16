@@ -64,6 +64,7 @@ class FileSelectionDialog(gtk.Dialog):
         model = gtk.ListStore(str, str)
         treeview = gtk.TreeView(model)
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
+        treeview.set_search_equal_func(self.search_filelist)
         scroller.add(treeview)
         self.vbox.pack_start(scroller, True, True, 2)
 
@@ -121,6 +122,13 @@ class FileSelectionDialog(gtk.Dialog):
         else:
             Prompt(_('No visual diff tool'), 
                    _('No visual diff tool has been configured'), None).run()
+
+    def search_filelist(self, model, column, key, iter):
+        'case insensitive filename search'
+        key = key.lower()
+        if key in model.get_value(iter, 1).lower():
+            return False
+        return True
 
     def toolselect(self, combo, tools):
         sel = combo.get_active_text()
