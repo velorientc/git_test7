@@ -94,6 +94,7 @@ class HistoryDialog(gtk.Dialog):
         """ create history display """
         self.model = gtk.TreeStore(str, str)
         self.treeview.connect('cursor-changed', self._cursor_changed)
+        self.treeview.set_enable_search(False)
         #self.treeview.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
