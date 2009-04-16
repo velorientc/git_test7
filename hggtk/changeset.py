@@ -491,6 +491,7 @@ class ChangeSet(GDialog):
                 self._file_button_release)
         filelist_tree.connect('popup-menu', self._file_popup_menu)
         filelist_tree.connect('row-activated', self._file_row_act)
+        filelist_tree.set_search_equal_func(self.search_filelist)
 
         self._filelist = gtk.ListStore(
                 gobject.TYPE_STRING,   # MAR status
@@ -529,6 +530,13 @@ class ChangeSet(GDialog):
             vbox.pack_start(gtk.HSeparator(), False, False)
             vbox.pack_start(self.stbar, False, False)
             return vbox
+
+    def search_filelist(self, model, column, key, iter):
+        'case insensitive filename search'
+        key = key.lower()
+        if key in model.get_value(iter, 1).lower():
+            return False
+        return True
 
     def setup_tags(self):
         """Creates the tags to be used inside the TextView"""
