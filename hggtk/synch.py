@@ -274,22 +274,27 @@ class SynchDialog(gtk.Window):
 
     def update_buttons(self, *args):
         self.buttonhbox.hide()
-        self.repo.invalidate()
-        tip = len(self.repo.changelog)
+        try:
+            # open a new repo, rebase can confuse cached repo
+            repo = hg.repository(ui.ui(), path=self.root)
+        except RepoError:
+            return
+        tip = len(repo.changelog)
         if self.origchangecount == tip:
             self.viewpulled.hide()
         else:
             self.buttonhbox.show()
             self.viewpulled.show()
 
-        wc = self.repo[None]
-        branchhead = self.repo.branchtags()[wc.branch()]
-        parents = self.repo.parents()
+        wc = repo[None]
+        branchhead = repo.branchtags()[wc.branch()]
+        parents = repo.parents()
         if len(parents) > 1 or parents[0].node() == branchhead:
             self.updatetip.hide()
         else:
             self.buttonhbox.show()
             self.updatetip.show()
+        self.repo = repo
 
     def _view_pulled_changes(self, button):
         from history import GLog
