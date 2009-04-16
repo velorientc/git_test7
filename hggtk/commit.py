@@ -8,7 +8,6 @@
 
 import os
 import pygtk
-pygtk.require('2.0')
 import errno
 import gtk
 import pango
@@ -24,6 +23,60 @@ from status import *
 from hgcmd import CmdDialog
 from hglib import fromutf
 
+class BranchOperationDialog(gtk.Dialog):
+    def __init__(self, branch, close):
+        gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
+                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        self.connect('response', self.response)
+        self.set_title(_('Branch Operations'))
+        self.newbranch = None
+        self.closebranch = False
+
+        lbl = gtk.Label(_('Changes take effect on next commit'))
+        nochanges = gtk.RadioButton(None, _('No branch changes'))
+        self.newbranchradio = gtk.RadioButton(nochanges,
+                _('Open a new named branch'))
+        self.closebranchradio = gtk.RadioButton(nochanges,
+                _('Close current named branch'))
+        self.branchentry = gtk.Entry()
+
+        hbox = gtk.HBox()
+        hbox.pack_start(self.newbranchradio, False, False, 2)
+        hbox.pack_start(self.branchentry, True, True, 2)
+        self.vbox.pack_start(hbox, True, True, 2)
+        hbox = gtk.HBox()
+        hbox.pack_start(self.closebranchradio, True, True, 2)
+        self.vbox.pack_start(hbox, True, True, 2)
+        hbox = gtk.HBox()
+        hbox.pack_start(nochanges, True, True, 2)
+        self.vbox.pack_start(hbox, True, True, 2)
+        self.vbox.pack_start(lbl, True, True, 10)
+        self.newbranchradio.connect('toggled', self.nbtoggle)
+
+        self.newbranchradio.set_active(True)
+        if branch:
+            self.branchentry.set_text(branch)
+            self.newbranchradio.set_active(True)
+        elif close:
+            self.closebranchradio.set_active(True)
+        else:
+            nochanges.set_active(True)
+        self.show_all()
+
+    def nbtoggle(self, radio):
+        self.branchentry.set_sensitive(radio.get_active())
+
+    def response(self, widget, response_id):
+        if response_id != gtk.RESPONSE_CLOSE:
+            self.destroy()
+            return
+        if self.newbranchradio.get_active():
+            self.newbranch = self.branchentry.get_text()
+        elif self.closebranchradio.get_active():
+            self.closebranch = True
+        self.destroy()
+
+
 class GCommit(GStatus):
     """GTK+ based dialog for displaying repository status and committing
     changes.  Also provides related operations like add, delete, remove,
@@ -35,6 +88,8 @@ class GCommit(GStatus):
     def init(self):
         GStatus.init(self)
         self.mode = 'commit'
+        self.nextbranch = None
+        self.closebranch = False
         self._last_commit_id = None
         self.qnew = False
 
@@ -125,6 +180,17 @@ class GCommit(GStatus):
             sumline = msg.split("\n")[0]
             liststore.append([sumline, msg])
 
+    def branch_clicked(self, button):
+        dialog = BranchOperationDialog(self.nextbranch, self.closebranch)
+        dialog.run()
+        self.nextbranch = None
+        self.closebranch = False
+        if dialog.newbranch:
+            self.nextbranch = dialog.newbranch
+        elif dialog.closebranch:
+            self.closebranch = True
+        self.refresh_branchop()
+
     def get_body(self):
         status_body = GStatus.get_body(self)
 
@@ -132,11 +198,9 @@ class GCommit(GStatus):
         
         mbox = gtk.HBox()
 
-        label = gtk.Label(_('Branch: '))
-        mbox.pack_start(label, False, False, 2)
-        self.branchentry = gtk.Entry()
-        self.branchentry.set_width_chars(12)
-        mbox.pack_start(self.branchentry, False, False, 2)
+        self.branchbutton = gtk.Button()
+        self.branchbutton.connect('clicked', self.branch_clicked)
+        mbox.pack_start(self.branchbutton, False, False, 2)
 
         if hasattr(self.repo, 'mq'):
             label = gtk.Label('QNew: ')
@@ -226,14 +290,23 @@ class GCommit(GStatus):
     def reload_status(self):
         if not self._ready: return False
         success = GStatus.reload_status(self)
-        self.branchentry.set_text(self.repo.dirstate.branch())
         self._check_merge()
         self._check_patch_queue()
         self._check_undo()
+        self.refresh_branchop()
         return success
 
 
     ### End of overridable methods ###
+
+    def refresh_branchop(self):
+        if self.nextbranch:
+            text = _('new branch: ') + self.nextbranch
+        elif self.closebranch:
+            text = _('close branch: ') + self.repo[None].branch()
+        else:
+            text = _('branch: ') + self.repo[None].branch()
+        self.branchbutton.set_label(text)
 
     def _check_undo(self):
         can_undo = os.path.exists(self.repo.sjoin("undo")) and \
@@ -301,7 +374,7 @@ class GCommit(GStatus):
             c_btn = self.get_toolbutton(('_Commit'))
             c_btn.set_label(_('_Commit'))
             c_btn.set_tooltip(self.tooltips, _('commit'))
-        self.branchentry.set_sensitive(not (self.mqmode or self.qnew))
+        self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
@@ -325,7 +398,8 @@ class GCommit(GStatus):
             elif len(self.filemodel) == 0 and self.qnew:
                 self._commit_selected([])
             else:
-                Prompt('Nothing Commited', 'No committable files selected', self).run()
+                Prompt(_('Nothing Commited'),
+                       _('No committable files selected'), self).run()
         return True
 
     def _commit_selected(self, files):
@@ -493,8 +567,10 @@ class GCommit(GStatus):
             self.ui = self.repo.ui
             return
 
-        newbranch = fromutf(self.branchentry.get_text())
-        if newbranch != self.repo.dirstate.branch():
+        cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
+
+        if self.nextbranch:
+            newbranch = fromutf(self.nextbranch)
             if newbranch in self.repo.branchtags():
                 if newbranch not in [p.branch() for p in self.repo.parents()]:
                     response = Confirm(_('Override Branch'), [], self,
@@ -509,11 +585,12 @@ class GCommit(GStatus):
                 self.repo.dirstate.setbranch(newbranch)
             elif response != gtk.RESPONSE_NO:
                 return
+        elif self.closebranch:
+            cmdline.append('--close-branch')
 
         # call the threaded CmdDialog to do the commit, so the the large commit
         # won't get locked up by potential large commit. CmdDialog will also
         # display the progress of the commit operation.
-        cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
         if self.qnew:
             cmdline[1] = 'qnew'
             cmdline.append('--force')
@@ -537,6 +614,8 @@ class GCommit(GStatus):
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
             shell_notify([self.cwd] + files)
+            self.closebranch = False
+            self.nextbranch = None
             buf = self.text.get_buffer()
             if buf.get_modified():
                 self._update_recent_messages(self.opts['message'])
