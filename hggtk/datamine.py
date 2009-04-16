@@ -4,7 +4,6 @@
 # Copyright (C) 2008 Steve Borho <steve@borho.org>
 
 import pygtk
-pygtk.require('2.0')
 import gtk
 import gobject
 import os
