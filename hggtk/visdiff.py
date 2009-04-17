@@ -233,10 +233,12 @@ class FileSelectionDialog(gtk.Dialog):
         else:
             dir1 = os.path.join(dir1, util.localpath(fname))
             dir2 = os.path.join(dir2root, dir2, util.localpath(fname))
-        cmdline = ('%s %s %s %s' %
+        if os.name == 'nt':
+            cmdline = ('%s %s %s %s' %
                    (util.shellquote(self.diffpath), ' '.join(self.diffopts),
                     util.shellquote(dir1), util.shellquote(dir2)))
-        #cmdline = [self.diffpath] + self.diffopts + [dir1, dir2]
+        else:
+            cmdline = [self.diffpath] + self.diffopts + [dir1, dir2]
         subprocess.Popen(cmdline, shell=False, cwd=tmproot,
                        creationflags=openflags,
                        stderr=subprocess.PIPE,
