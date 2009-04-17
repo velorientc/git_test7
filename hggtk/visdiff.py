@@ -165,7 +165,7 @@ class FileSelectionDialog(gtk.Dialog):
             node1 = repo[node2].parents()[0].node()
         else:
             if revs:
-                title = _('revision(s) ') + str(revs[0])
+                title = _('revision(s) ') + ' to '.join(revs)
             else:
                 title = _('working changes')
             node1, node2 = cmdutil.revpair(repo, revs)
