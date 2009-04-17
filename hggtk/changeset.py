@@ -449,6 +449,7 @@ class ChangeSet(GDialog):
             
         _menu = gtk.Menu()
         _menu.append(create_menu('_visual diff', self._diff_file_rev))
+        _menu.append(create_menu('diff to _local', self._diff_to_local))
         _menu.append(create_menu('_view at revision', self._view_file_rev))
         self._save_menu = create_menu('_save at revision', self._save_file_rev)
         _menu.append(self._save_menu)
@@ -637,6 +638,13 @@ class ChangeSet(GDialog):
             cpath = util.canonpath(self.repo.root, self.cwd, self.curfile)
             hgcmd_toq(self.repo.root, q, 'cat', '--rev',
                 str(self.currev), '--output', result, cpath)
+
+    def _diff_to_local(self, menuitem):
+        if not self.curfile:
+            # ignore view events for the [Description] row
+            return
+        self.opts['rev'] = [str(self.currev), '.']
+        self._diff_file('M', self.curfile)
 
     def _diff_file_rev(self, menuitem):
         'User selected visual diff file revision from the file list context menu'
