@@ -528,7 +528,9 @@ class GStatus(GDialog):
 
         if self.mqmode and self.mode != 'status':
             # when a patch is applied, show diffs to parent of top patch
-            n1, n2 = repo.lookup(-3), None
+            qtip = repo[None].parents()[0]
+            n1 = qtip.parents()[0].node()
+            n2 = None
         else:
             # node2 is None (the working dir) when 0 or 1 rev is specificed
             n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
