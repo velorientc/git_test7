@@ -13,6 +13,7 @@ import gtk
 from mercurial import demandimport; demandimport.enable()
 import os
 import sys
+import cStringIO
 
 if hasattr(sys, "frozen"):
     thgdir = os.path.dirname(sys.executable)
@@ -44,4 +45,14 @@ except ImportError:
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
-sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
+sys.stderr = cStringIO.StringIO()
+ret = hggtk.hgtk.dispatch(sys.argv[1:])
+sys.stderr.seek(0)
+for l in sys.stderr.readlines():
+    if l.startswith('Traceback'):
+        from hggtk.bugreport import run
+        sys.stderr.seek(0)
+        error = 'Recoverable runtime error (stderr):\n' + sys.stderr.read()
+        run(**{'cmd':' '.join(sys.argv[1:]), 'error':error})
+        break
+sys.exit(ret)
