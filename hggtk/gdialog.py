@@ -7,7 +7,6 @@
 # 
 
 import pygtk
-pygtk.require('2.0')
 import gtk
 import gobject
 import pango
@@ -23,11 +22,9 @@ import tempfile
 from mercurial.i18n import _
 from mercurial.node import short
 from mercurial import cmdutil, util, ui, hg, commands
-from hgext import extdiff
-from shlib import shell_notify, set_tortoise_icon, Settings
-from thgconfig import ConfigDialog
 from gtklib import MessageDialog
-from hglib import toutf
+import shlib
+import hglib
 
 class SimpleMessage(MessageDialog):
     def run(self):
@@ -40,8 +37,8 @@ class Prompt(SimpleMessage):
     def __init__(self, title, message, parent):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE)
-        self.set_title(toutf(title))
-        self.set_markup('<b>' + toutf(message) + '</b>')
+        self.set_title(hglib.toutf(title))
+        self.set_markup('<b>' + hglib.toutf(message) + '</b>')
 
 class Confirm(SimpleMessage):
     """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO 
@@ -49,18 +46,18 @@ class Confirm(SimpleMessage):
     def __init__(self, title, files, parent, primary=None):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
-        self.set_title(toutf(_('Confirm ') + title))
+        self.set_title(hglib.toutf(_('Confirm ') + title))
         if primary is None:
             primary = title + ' file' + ((len(files) > 1 and 's') or '') + '?'
         primary = '<b>' + primary + '</b>'
-        self.set_markup(toutf(primary))
+        self.set_markup(hglib.toutf(primary))
         message = ''
         for i, f in enumerate(files):
             message += '   ' + f + '\n'
             if i == 9: 
                 message += '   ...\n'
                 break
-        self.format_secondary_text(toutf(message))
+        self.format_secondary_text(hglib.toutf(message))
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
         buttons = self.get_children()[0].get_children()[1].get_children()
@@ -103,7 +100,7 @@ class GDialog(gtk.Window):
         self.main = main
         self.tmproot = None
         self.toolbuttons = {}
-        self.settings = Settings(self.__class__.__name__)
+        self.settings = shlib.Settings(self.__class__.__name__)
         self.init()
 
     ### Following methods are meant to be overridden by subclasses ###
@@ -260,7 +257,7 @@ class GDialog(gtk.Window):
 
     def _setup_gtk(self):
         self.set_title(self.get_title())
-        set_tortoise_icon(self, self.get_icon())
+        shlib.set_tortoise_icon(self, self.get_icon())
         
         # Minimum size
         minx, miny = self.get_minsize()
@@ -415,6 +412,7 @@ class GDialog(gtk.Window):
                 self.ui.config('ui', 'editor') or
                 os.environ.get('EDITOR', 'vi'))
         if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+            from thgconfig import ConfigDialog
             Prompt(_('No visual editor configured'),
                    _('Please configure a visual editor.'), self).run()
             dlg = ConfigDialog(self.repo.root, False)
