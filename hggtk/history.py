@@ -17,12 +17,9 @@ from mercurial.i18n import _
 from mercurial import ui, hg, commands, extensions
 from gdialog import *
 from changeset import ChangeSet
-from logfilter import FilterDialog
-from update import UpdateDialog
-from merge import MergeDialog
 from vis import treemodel
 from vis.treeview import TreeView
-from hglib import toutf, LookupError
+import hglib
 import gtklib
 
 def create_menu(label, callback):
@@ -115,6 +112,7 @@ class GLog(GDialog):
         if self.currow is not None:
             revs.append(self.currow[treemodel.REVID])
             
+        from logfilter import FilterDialog
         dlg = FilterDialog(self.repo.root, revs, self.pats,
                 filterfunc=do_reload)
         dlg.connect('response', close_filter_dialog)
@@ -590,7 +588,7 @@ class GLog(GDialog):
             parent = self.repo[rev].parents()[0].rev()
             # Special case for revision 0's parent.
             if parent == -1: parent = 'null'
-        except (ValueError, LookupError):
+        except (ValueError, hglib.LookupError):
             return
         filename = "%s_rev%d_to_tip.hg" % (os.path.basename(self.repo.root), rev)
         result = NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
@@ -614,6 +612,7 @@ class GLog(GDialog):
         dlg.set_transient_for(None)
 
     def _checkout(self, menuitem):
+        from update import UpdateDialog
         rev = self.currow[treemodel.REVID]
         parents = [x.node() for x in self.repo.changectx(None).parents()]
         dialog = UpdateDialog(self.cwd, rev)
@@ -629,6 +628,7 @@ class GLog(GDialog):
             self.reload_log()
 
     def _merge(self, menuitem):
+        from merge import MergeDialog
         rev = self.currow[treemodel.REVID]
         parents = [x.node() for x in self.repo.changectx(None).parents()]
         node = short(self.repo.changelog.node(rev))
