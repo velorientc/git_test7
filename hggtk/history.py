@@ -326,6 +326,8 @@ class GLog(GDialog):
     def tree_context_menu(self):
         _menu = gtk.Menu()
         _menu.append(create_menu(_('di_splay'), self._show_status))
+        _menu.append(create_menu(_('visualize change'), self._vdiff_change))
+        _menu.append(create_menu(_('diff to local'), self._vdiff_local))
         _menu.append(create_menu(_('_update'), self._checkout))
         self._cmenu_merge = create_menu(_('_merge with'), self._merge)
         _menu.append(self._cmenu_merge)
@@ -474,6 +476,23 @@ class GLog(GDialog):
         dlg.show_all()
         dlg.run()
         dlg.hide()
+
+    def _vdiff_change(self, menuitem, pats=[]):
+        from visdiff import FileSelectionDialog
+        rev = self.currow[treemodel.REVID]
+        dialog = FileSelectionDialog(pats, {'change' : rev})
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+
+    def _vdiff_local(self, menuitem, pats=[]):
+        from visdiff import FileSelectionDialog
+        rev = self.currow[treemodel.REVID]
+        opts = {'rev' : ["%s:." % rev]}
+        dialog = FileSelectionDialog(pats, opts)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
 
     def _diff_revs(self, menuitem):
         from status import GStatus
