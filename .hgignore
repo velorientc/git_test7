@@ -9,3 +9,6 @@ dist/
 Output/
 .*.swp
 Thumbs.db
+*.o
+*.dll
+*.exe

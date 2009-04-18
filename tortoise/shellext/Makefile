@@ -7,7 +7,8 @@ OBJECTS = ContextMenu.o \
         TortoiseUtils.o \
         PipeUtils.o \
         ShellUtils2.o \
-        StringUtils.o
+        StringUtils.o \
+        dirstate.o
 
 DEFFILE=ShellExt.def
 
