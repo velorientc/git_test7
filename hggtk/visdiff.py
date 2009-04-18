@@ -241,11 +241,15 @@ class FileSelectionDialog(gtk.Dialog):
                     util.shellquote(dir1), util.shellquote(dir2)))
         else:
             cmdline = [self.diffpath] + self.diffopts + [dir1, dir2]
-        subprocess.Popen(cmdline, shell=False, cwd=tmproot,
+        try:
+            subprocess.Popen(cmdline, shell=False, cwd=tmproot,
                        creationflags=openflags,
                        stderr=subprocess.PIPE,
                        stdout=subprocess.PIPE,
                        stdin=subprocess.PIPE)
+        except (WindowsError, EnvironmentError), e:
+            Prompt(_('Tool launch failure'), 
+                    _('%s : %s') % (self.diffpath, str(e)), None).run()
 
 def run(pats, **opts):
     dialog = FileSelectionDialog(pats, opts)
