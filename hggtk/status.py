@@ -1047,12 +1047,9 @@ class GStatus(GDialog):
 
 
     def _log_file(self, stat, wfile):
-        from gtools import cmdtable
         from history import GLog
-        
         # Might want to include 'rev' here... trying without
-        statopts = self.merge_opts(cmdtable['glog|ghistory'][1], ('include', 'exclude', 'git'))
-        dialog = GLog(self.ui, self.repo, self.cwd, [wfile], statopts, False)
+        dialog = GLog(self.ui, self.repo, self.cwd, [wfile], self.opts, False)
         dialog.display()
         return True
 
