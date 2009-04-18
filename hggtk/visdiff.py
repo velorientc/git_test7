@@ -145,6 +145,8 @@ class FileSelectionDialog(gtk.Dialog):
                 diffopts = ui.config('extdiff', 'opts.' + cmd, '')
                 diffopts = diffopts and [diffopts] or []
                 tools[cmd] = [path, diffopts]
+            elif cmd.startswith('opts.'):
+                continue
             else:
                 # command = path opts
                 if path:
