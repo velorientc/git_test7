@@ -727,6 +727,7 @@ class GLog(GDialog):
         return True
 
 def run(ui, *pats, **opts):
+    limit = opts.get('limit')
     cmdoptions = {
         'follow':False, 'follow-first':False, 'copies':False, 'keyword':[],
         'limit':limit, 'rev':[], 'removed':False, 'no_merges':False,
@@ -734,7 +735,7 @@ def run(ui, *pats, **opts):
         'verbose':False, 'include':[], 'exclude':[]
     }
 
-    dialog = GLog(u, None, None, pats, cmdoptions, True)
+    dialog = GLog(ui, None, None, pats, cmdoptions, True)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     dialog.display()
