@@ -27,7 +27,7 @@ from shlib import set_tortoise_icon
 gservice = None
 class ServeDialog(gtk.Window):
     """ Dialog to run web server"""
-    def __init__(self, cwd='', root='', webdir_conf=''):
+    def __init__(self, webdir_conf):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
@@ -44,11 +44,8 @@ class ServeDialog(gtk.Window):
         commands.table.update(thg_serve_cmd)
 
         self._url = None
-        self._root = root
+        self._root = hglib.rootpath()
         self._webdirconf = webdir_conf
-        if cwd:
-            os.chdir(cwd)
-        
         self._get_config()
         self.set_default_size(500, 300)
         
@@ -202,7 +199,7 @@ class ServeDialog(gtk.Window):
     
     def _on_conf_clicked(self, *args):
         from thgconfig import ConfigDialog
-        dlg = ConfigDialog(self._root, True)
+        dlg = ConfigDialog(True)
         dlg.show_all()
         dlg.focus_field('web.name')
         dlg.run()
@@ -344,20 +341,10 @@ thg_serve_cmd =  {"^serve":
           ('', 'certificate', '', _('SSL certificate file'))],
          _('hg serve [OPTION]...'))}
 
-
-def run(cwd='', root='', webdir_conf='', **opts):
-    dialog = ServeDialog(cwd, root, webdir_conf)
+def run(ui, *pats, **opts):
+    dialog = ServeDialog(opts.get('webdir_conf'))
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-    
-if __name__ == "__main__":
-    opts = {}
-    opts['cwd'] = os.getcwd()
-    if len(sys.argv) == 2 and sys.argv[1].endswith('.conf'):
-        opts['webdir_conf'] = sys.argv[1]
-    else:
-        opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
-    run(**opts)

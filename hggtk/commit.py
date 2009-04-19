@@ -558,7 +558,7 @@ class GCommit(GStatus):
             # But since we can't be sure they will do it right, we will
             # have them to retry, to re-trigger the checking mechanism. 
             from thgconfig import ConfigDialog
-            dlg = ConfigDialog(self.repo.root, False)
+            dlg = ConfigDialog(False)
             dlg.show_all()
             dlg.focus_field('ui.username')
             dlg.run()
@@ -649,28 +649,7 @@ class GCommit(GStatus):
             self.reload_status()
             self.qnew_name.grab_focus() # set focus back
 
-def launch(root='', files=[], cwd='', main=True, **opts):
-    u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
-    repo = hg.repository(u, path=root)
-    
-    # move cwd to repo root if repo is merged, so we can show
-    # all the changed files
-    if len(repo.changectx(None).parents()) > 1 and repo.root != cwd:
-        cwd = repo.root
-        repo = hg.repository(u, path=cwd)
-        files = [cwd]
-
-    ct = repo.ui.config('tortoisehg', 'extcommit', None)
-    if ct == 'qct':
-        from hglib import thgdispatch
-        args = ['--repository', root, ct]
-        try:
-            thgdispatch(repo.ui, args=args)
-        except SystemExit:
-            pass
-        return
-
+def run(_ui, *pats, **opts):
     cmdoptions = {
         'user':opts.get('user', ''), 'date':opts.get('date', ''),
         'logfile':'', 'message':'',
@@ -680,25 +659,9 @@ def launch(root='', files=[], cwd='', main=True, **opts):
         'check': True, 'git':False, 'addremove':False,
     }
     
-    dialog = GCommit(u, repo, cwd, files, cmdoptions, main)
+    dialog = GCommit(_ui, None, None, pats, cmdoptions, True)
     dialog.display()
-    return dialog
-    
-def run(root='', files=[], cwd='', **opts):
-    # If no files or directories were selected, take current dir
-    # TODO: Not clear if this is best; user may expect repo wide
-    if not files and cwd:
-        files = [cwd]
-    if launch(root, files, cwd, True, **opts):
-        gtk.gdk.threads_init()
-        gtk.gdk.threads_enter()
-        gtk.main()
-        gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    from hglib import rootpath
-    opts = {}
-    opts['cwd'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    opts['root'] = rootpath(opts['cwd'])
-    run(**opts)
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()

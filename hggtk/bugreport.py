@@ -55,17 +55,10 @@ class BugReport(GDialog):
         textview.get_buffer().set_text(text)
         return vbox
 
-
-def run(**opts):
-    dialog = BugReport(ui.ui(), None, None, None, opts, True)
+def run(_ui, *pats, **opts):
+    dialog = BugReport(_ui, None, None, None, opts, True)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     dialog.display()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    opts = {}
-    opts['cmd'] = 'command'
-    opts['error'] = 'test error'
-    run(**opts)

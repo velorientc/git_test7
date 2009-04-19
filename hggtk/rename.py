@@ -14,12 +14,11 @@ from mercurial import hg, ui, util, commands
 from hglib import toutf, fromutf, rootpath, RepoError
 import gtklib
 
-def run(files = [], root='', cwd='', **opts):
-    if cwd: os.chdir(cwd)
+def run(ui, *pats, **opts):
     fname, target = '', ''
     try:
-        fname = files[0]
-        target = files[1]
+        fname = pats[0]
+        target = pats[1]
     except IndexError:
         pass
     from dialog import entry_dialog
@@ -76,13 +75,3 @@ def rename_resp(dialog, response):
             error_dialog(None, _('rename error'), textout)
         elif toquit:
             gtk.main_quit()
-
-if __name__ == "__main__":
-    if '--detect' in sys.argv:
-        opts['root'] = rootpath()
-        opts['detect'] = True
-    elif len(sys.argv) == 3:
-        opts = {'files' : sys.argv[1:2] }
-    else:
-        opts = {'files' : [sys.argv[1]] }
-    run(**opts)

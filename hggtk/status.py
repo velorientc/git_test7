@@ -9,7 +9,6 @@
 
 import os
 import cStringIO
-
 import pygtk
 import gtk
 import pango
@@ -1311,29 +1310,17 @@ class GStatus(GDialog):
         menu.get_children()[0].activate()
         return True
 
-def run(root='', cwd='', files=[], **opts):
-    u = ui.ui()
-    u.updateopts(debug=False, traceback=False, quiet=True)
-    repo = hg.repository(u, path=root)
-
-    showclean = files and True or False
+def run(ui, *pats, **opts):
+    showclean = pats and True or False
     cmdoptions = {
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
         'added':True, 'removed':True, 'deleted':True, 'unknown':True, 'rev':[],
         'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
         'check':True
     }
-    
-    dialog = GStatus(u, repo, cwd, files, cmdoptions, True)
-
+    dialog = GStatus(ui, None, None, pats, cmdoptions, True)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     dialog.display()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
-    run(**opts)

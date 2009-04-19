@@ -7,21 +7,21 @@
 import os
 import gtk
 import gobject
-from dialog import *
-from shlib import shell_notify, set_tortoise_icon
-from hglib import fromutf, toutf
 from mercurial import hg, ui, match
 from mercurial.i18n import _
+from dialog import *
+from shlib import shell_notify, set_tortoise_icon
+import hglib
 
 class HgIgnoreDialog(gtk.Window):
     'Edit a reposiory .hgignore file'
-    def __init__(self, root='', fileglob=''):
+    def __init__(self, fileglob='', *pats):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         set_tortoise_icon(self, 'ignore.ico')
 
-        self.root = root
-        self.set_title(_('Ignore filter for ') + os.path.basename(root))
+        self.root = hglib.rootpath()
+        self.set_title(_('Ignore filter for ') + os.path.basename(self.root))
         self.set_default_size(630, 400)
         self.notify_func = None
 
@@ -38,7 +38,7 @@ class HgIgnoreDialog(gtk.Window):
         hbox.pack_start(glob_button, False, False, 4)
         glob_button.connect('clicked', self.add_glob, glob_entry)
         glob_entry.connect('activate', self.add_glob, glob_entry)
-        glob_entry.set_text(toutf(fileglob))
+        glob_entry.set_text(hglib.toutf(fileglob))
         self.glob_entry = glob_entry
         mainvbox.pack_start(hbox, False, False)
 
@@ -138,13 +138,13 @@ class HgIgnoreDialog(gtk.Window):
         self.glob_entry.set_text(model[paths][0])
 
     def add_glob(self, widget, glob_entry):
-        newglob = fromutf(glob_entry.get_text())
+        newglob = hglib.fromutf(glob_entry.get_text())
         self.ignorelines.append('glob:' + newglob)
         self.write_ignore_lines()
         self.refresh()
 
     def add_regexp(self, widget, regexp_entry):
-        newregexp = fromutf(regexp_entry.get_text())
+        newregexp = hglib.fromutf(regexp_entry.get_text())
         self.ignorelines.append('regexp:' + newregexp)
         self.write_ignore_lines()
         self.refresh()
@@ -165,7 +165,7 @@ class HgIgnoreDialog(gtk.Window):
          deleted, unknown, ignored, clean) = changes
         self.unkmodel.clear()
         for u in unknown:
-            self.unkmodel.append([toutf(u), u])
+            self.unkmodel.append([hglib.toutf(u), u])
         try:
             l = open(repo.wjoin('.hgignore'), 'rb').readlines()
             self.doseoln = l[0].endswith('\r\n')
@@ -176,7 +176,7 @@ class HgIgnoreDialog(gtk.Window):
         model = gtk.ListStore(str)
         self.ignorelines = []
         for line in l:
-            model.append([toutf(line.strip())])
+            model.append([hglib.toutf(line.strip())])
             self.ignorelines.append(line.strip())
         self.pattree.set_model(model)
         self.repo = repo
@@ -195,16 +195,13 @@ class HgIgnoreDialog(gtk.Window):
         shell_notify(self.repo.wjoin('.hgignore'))
         if self.notify_func: self.notify_func()
         
-def run(root='', fileglob='', **opts):
-    dialog = HgIgnoreDialog(root, fileglob)
+def run(_ui, *pats, **opts):
+    if pats and pats[0].endswith('.hgignore'):
+        pats = []
+    dialog = HgIgnoreDialog(*pats)
     dialog.show_all()
     dialog.connect('destroy', gtk.main_quit)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import hglib
-    opts = {'root' : hglib.rootpath()}
-    run(**opts)

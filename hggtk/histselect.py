@@ -232,15 +232,6 @@ class HistoryDialog(gtk.Dialog):
             return True
         return False
 
-def run(root='', files=[], **opts):
-    dialog = HistoryDialog(root=root, files=files)
-    dialog.show_all()
-    dialog.connect('response', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-    
 def select(root='', files=[]):
     dialog = HistoryDialog(root=root, files=files, select=True)
     resp = dialog.run()
@@ -249,9 +240,3 @@ def select(root='', files=[]):
         rev = dialog.selected[1]
     dialog.hide()
     return rev
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1:] or []
-    run(**opts)

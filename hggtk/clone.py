@@ -16,13 +16,11 @@ import shlib
 
 class CloneDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, cwd='', repos=[]):
+    def __init__(self, repos=[]):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-
         shlib.set_tortoise_icon(self, 'menuclone.ico')
-        if cwd: os.chdir(cwd)
-        
+
         # set dialog title
         title = 'hg clone'
         self.set_title(title)
@@ -320,17 +318,10 @@ class CloneDialog(gtk.Window):
         self._add_src_to_recent(src)
         self._add_dest_to_recent(dest)
 
-def run(cwd='', files=[], **opts):
-    dialog = CloneDialog(cwd, repos=files)
+def run(_ui, *pats, **opts):
+    dialog = CloneDialog(pats)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-    
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['cwd'] = os.getcwd()
-    opts['files'] = sys.argv[1:]
-    run(**opts)

@@ -16,7 +16,6 @@ from dialog import *
 from mercurial import hg, ui, extensions
 from mercurial.i18n import _
 from hglib import RepoError, fromutf, toutf
-from thgconfig import ConfigDialog
 from hgcmd import CmdDialog
 
 class EmailDialog(gtk.Window):
@@ -261,7 +260,8 @@ class EmailDialog(gtk.Window):
                 self._diffstat.set_sensitive(False)
 
     def _on_conf_clicked(self, button):
-        dlg = ConfigDialog(self.root, False)
+        from thgconfig import ConfigDialog
+        dlg = ConfigDialog(False)
         dlg.show_all()
         dlg.focus_field('email.from')
         dlg.run()
@@ -303,9 +303,10 @@ class EmailDialog(gtk.Window):
 
         if self.repo.ui.config('email', 'method', 'smtp') == 'smtp' and not test:
             if not self.repo.ui.config('smtp', 'host'):
+                from thgconfig import ConfigDialog
                 info_dialog(self, _('Info required'),
                             _('You must configure SMTP'))
-                dlg = ConfigDialog(self.root, False)
+                dlg = ConfigDialog(False)
                 dlg.show_all()
                 dlg.focus_field('smtp.host')
                 dlg.run()
@@ -359,20 +360,3 @@ class EmailDialog(gtk.Window):
             if oldpager:
                 os.environ['PAGER'] = oldpager
             os.unlink(tmpfile)
-
-def run(root='', **opts):
-    # In most use cases, this dialog will be launched by other
-    # hggtk tools like glog and synch.  It's not expected to be
-    # used from hgtk.  I leave this path in place for testing purposes.
-    dialog = EmailDialog(root, ['tip'])
-    dialog.show_all()
-    dialog.connect('destroy', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    run(**opts)

@@ -17,12 +17,11 @@ from hglib import rootpath, toutf, RepoError
 
 class UpdateDialog(gtk.Window):
     """ Dialog to update Mercurial repo """
-    def __init__(self, cwd='', rev=None):
+    def __init__(self, rev=None):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         set_tortoise_icon(self, 'menucheckout.ico')
-        self.cwd = cwd or os.getcwd()
-        self.root = rootpath(self.cwd)
+        self.root = rootpath()
         self.rev = rev
         self.notify_func = None
         
@@ -33,7 +32,7 @@ class UpdateDialog(gtk.Window):
             return None
 
         # set dialog title
-        title = "hg update - %s" % toutf(self.cwd)
+        title = "hg update - %s" % toutf(self.root)
         self.set_title(title)
 
         self._create()
@@ -179,20 +178,13 @@ class UpdateDialog(gtk.Window):
         if self.notify_func:
             self.notify_func(self.notify_args)
         self._refresh()
-        shell_notify([self.cwd])
+        shell_notify([self.root])
 
-def run(cwd='', rev=None, **opts):
-    dialog = UpdateDialog(cwd, rev)
+def run(ui, *pats, **opts):
+    dialog = UpdateDialog()
     dialog.connect('destroy', gtk.main_quit)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['cwd'] = len(sys.argv) > 1 and sys.argv[1] or ''
-    #opts['rev'] = 123
-    run(**opts)

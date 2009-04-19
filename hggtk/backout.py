@@ -102,21 +102,3 @@ class BackoutDialog(gtk.Window):
         dlg.hide()
         if self.notify_func:
             self.notify_func(self.notify_args)
-
-def run(root='', **opts):
-    # This dialog is intended to be launched by the changelog browser
-    # It's not expected to be used from hgtk.  I leave this path in
-    # place for testing purposes.
-    dialog = BackoutDialog(root, 'tip')
-    dialog.show_all()
-    dialog.connect('destroy', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    run(**opts)

@@ -158,22 +158,3 @@ class CmdDialog(gtk.Dialog):
             return self.hgthread.return_code()
         else:
             return False
-
-def run(cmdline=[], gui=True, **opts):
-    if not gui:
-        q = Queue.Queue()
-        hgcmd_toq(None, q, *cmdline[1:])
-        return
-
-    dlg = CmdDialog(cmdline)
-    dlg.connect('response', gtk.main_quit)
-    dlg.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-    
-if __name__ == "__main__":
-    import sys
-    run(sys.argv)
-

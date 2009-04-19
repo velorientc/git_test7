@@ -47,7 +47,19 @@ class DataMineDialog(GDialog):
             ]
 
     def prepare_display(self):
-        os.chdir(self.repo.root)
+        root = self.repo.root
+        cf = []
+        for f in self.pats:
+            if os.path.isfile(f):
+                cf.append(util.canonpath(root, self.cwd, f))
+            elif os.path.isdir(f):
+                Prompt(_('Invalid path'),
+                       _('Cannot annotate directory: %s') % f, None).run()
+        for f in cf:
+            self.add_annotate_page(f, '.')
+        if not self.notebook.get_n_pages():
+            self.add_search_page()
+        os.chdir(root)
 
     def save_settings(self):
         settings = GDialog.save_settings(self)
@@ -684,43 +696,16 @@ def create_menu(label, callback):
     menuitem.set_border_width(1)
     return menuitem
 
-def run(root='', cwd='', files=[], **opts):
-    u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
-    repo = hg.repository(u, path=root)
-
+def run(ui, *pats, **opts):
     cmdoptions = {
         'follow':False, 'follow-first':False, 'copies':False, 'keyword':[],
         'limit':0, 'rev':[], 'removed':False, 'no_merges':False, 'date':None,
         'only_merges':None, 'prune':[], 'git':False, 'verbose':False,
         'include':[], 'exclude':[]
     }
-
-    cf = []
-    for f in files:
-        if os.path.isfile(f):
-            cf.append(util.canonpath(root, cwd, f))
-        elif os.path.isdir(f):
-            Prompt(_('Invalid path'),
-                   _('Cannot annotate directory: %s') % f, None).run()
-
-    dialog = DataMineDialog(u, repo, cwd, files, cmdoptions, True)
+    dialog = DataMineDialog(ui, None, None, pats, cmdoptions, True)
     dialog.display()
-
-    for f in cf:
-        dialog.add_annotate_page(f, '.')
-    if not dialog.notebook.get_n_pages():
-        dialog.add_search_page()
-
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['cwd'] = os.getcwd()
-    opts['root'] = rootpath()
-    opts['files'] = sys.argv[1:] or []
-    run(**opts)

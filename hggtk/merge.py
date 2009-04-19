@@ -11,14 +11,14 @@ from dialog import *
 from mercurial.node import *
 from mercurial.i18n import _
 from mercurial import util, hg, ui
-from hglib import RepoError
 from hgcmd import CmdDialog
 from shlib import set_tortoise_icon, shell_notify
 import histselect
+import hglib
 
 class MergeDialog(gtk.Window):
     """ Dialog to merge revisions of a Mercurial repo """
-    def __init__(self, root='', cwd='', rev=''):
+    def __init__(self, root='', rev=''):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
@@ -28,8 +28,7 @@ class MergeDialog(gtk.Window):
         if root: title += " - %s" % root
         self.set_title(title)
 
-        self.root = root
-        self.cwd = cwd or root
+        self.root = root or hglib.rootpath()
         self.rev = rev
         self.repo = None
         self.notify_func = None
@@ -125,7 +124,7 @@ class MergeDialog(gtk.Window):
             # FIXME: force hg to refresh parents info
             del self.repo
             self.repo = hg.repository(ui.ui(), path=self.root)
-        except RepoError:
+        except hglib.RepoError:
             return None
 
         # populate parent rev data
@@ -207,7 +206,7 @@ class MergeDialog(gtk.Window):
         dlg.hide()
         if self.notify_func:
             self.notify_func(self.notify_args)
-        shell_notify([self.cwd])
+        shell_notify([self.root])
         self._refresh()
         
     def _do_merge(self):
@@ -231,22 +230,16 @@ class MergeDialog(gtk.Window):
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-        shell_notify([self.cwd])
+        shell_notify([self.root])
         if self.notify_func:
             self.notify_func(self.notify_args)
         self._refresh()
 
-def run(root='', cwd='', rev='', **opts):
-    dialog = MergeDialog(root, cwd, rev)
+def run(ui, *pats, **opts):
+    dialog = MergeDialog()
     dialog.connect('destroy', gtk.main_quit)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
-    run(**opts)

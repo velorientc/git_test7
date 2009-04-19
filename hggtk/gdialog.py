@@ -91,10 +91,10 @@ class GDialog(gtk.Window):
 
     def __init__(self, ui, repo, cwd, pats, opts, main):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        self.cwd = cwd
+        self.cwd = cwd or os.getcwd()
         self.ui = ui
         self.ui.interactive=False
-        self.repo = repo
+        self.repo = repo or hg.repository(ui, path=hglib.rootpath())
         self.pats = pats
         self.opts = opts
         self.main = main
@@ -333,7 +333,8 @@ class GDialog(gtk.Window):
             prompttext += errors.getvalue()
             errors.close()
             if len(prompttext) > 1:
-                Prompt(title + _(' Messages and Errors'), prompttext, self).run()
+                Prompt(title + _(' Messages and Errors'),
+                       prompttext, self).run()
 
         return True, textout
 
@@ -415,7 +416,7 @@ class GDialog(gtk.Window):
             from thgconfig import ConfigDialog
             Prompt(_('No visual editor configured'),
                    _('Please configure a visual editor.'), self).run()
-            dlg = ConfigDialog(self.repo.root, False)
+            dlg = ConfigDialog(False)
             dlg.show_all()
             dlg.focus_field('tortoisehg.editor')
             dlg.run()

@@ -20,13 +20,12 @@ import gtklib
 import urllib
 
 class SynchDialog(gtk.Window):
-    def __init__(self, cwd='', root = '', repos=[], pushmode=False):
+    def __init__(self, repos=[], pushmode=False):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         shlib.set_tortoise_icon(self, 'menusynch.ico')
-        self.root = root
-        self.cwd = cwd
+        self.root = rootpath()
         self.selected_path = None
         self.hgthread = None
         
@@ -43,7 +42,7 @@ class SynchDialog(gtk.Window):
         extensions.load(self.ui, 'fetch', None)
         extensions.load(self.ui, 'rebase', None)
 
-        name = self.repo.ui.config('web', 'name') or os.path.basename(root)
+        name = self.repo.ui.config('web', 'name') or os.path.basename(self.root)
         self.set_title(_('TortoiseHg Synchronize - ') + name)
 
         self.connect('delete-event', self._delete)
@@ -300,7 +299,7 @@ class SynchDialog(gtk.Window):
         from history import GLog
         countpulled = len(self.repo.changelog) - self.origchangecount
         opts = {'limit' : countpulled }
-        dialog = GLog(self.ui, self.repo, self.cwd, [], opts, False)
+        dialog = GLog(self.ui, None, None, [], opts, False)
         dialog.display()
 
     def _update_to_tip(self, button):
@@ -446,7 +445,7 @@ class SynchDialog(gtk.Window):
                 newpath = None
                 break
         from thgconfig import ConfigDialog
-        dlg = ConfigDialog(self.root, True)
+        dlg = ConfigDialog(True)
         dlg.show_all()
         if newpath:
             dlg.new_path(newpath)
@@ -617,13 +616,10 @@ class SynchDialog(gtk.Window):
             value = getattr(getattr(self, member), 'get_%s'%attr)()
             set_value(key, value)
 
-def run(cwd='', root='', files=[], pushmode=False, **opts):
-    dialog = SynchDialog(cwd, root, files, pushmode)
+def run(ui, *pats, **opts):
+    dialog = SynchDialog(pats, opts.get('pushmode') or False)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-    
-if __name__ == "__main__":
-    run(**{})

@@ -230,14 +230,3 @@ class FilterDialog(gtk.Dialog):
         dlg = CmdDialog(['hg', 'help', 'dates'], False)
         dlg.run()
         dlg.hide()
-
-if __name__ == "__main__":
-    # this dialog is not designed for standalone use
-    # this is for debugging only
-    dialog = FilterDialog()
-    dialog.show_all()
-    dialog.connect('response', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()

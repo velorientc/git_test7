@@ -36,14 +36,14 @@ def findmoves(repo, added, removed, threshold):
 
 class DetectRenameDialog(gtk.Window):
     'Detect renames after they occur'
-    def __init__(self, root=''):
+    def __init__(self):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         set_tortoise_icon(self, 'detect_rename.ico')
 
-        self.root = root
+        self.root = rootpath()
         self.notify_func = None
-        path = toutf(os.path.basename(root))
+        path = toutf(os.path.basename(self.root))
         self.set_title(_('Detect Copies/Renames in ') + path)
         settings = shlib.Settings('rename')
         dims = settings.get_value('dims', (800, 600))
@@ -366,15 +366,11 @@ class DetectRenameDialog(gtk.Window):
                     line = diffexpand(line)
                     buf.insert(bufiter, line)
 
-def run(root='', **opts):
-    dialog = DetectRenameDialog(root)
+def run(ui, *pats, **opts):
+    dialog = DetectRenameDialog()
     dialog.show_all()
     dialog.connect('destroy', gtk.main_quit)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    opts['root'] = rootpath()
-    run(**opts)

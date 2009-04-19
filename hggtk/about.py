@@ -84,13 +84,10 @@ class AboutDialog(gtk.AboutDialog):
         # close the About dialog...
         self.connect('response', gtk.main_quit)
 
-def run(*args, **opts):
+def run(_ui, *pats, **opts):
     dialog = AboutDialog()
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    run()

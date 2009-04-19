@@ -208,40 +208,19 @@ class GShelve(GStatus):
         self._activate_shelve_buttons(True)
         return True
 
-
-def launch(root='', files=[], cwd='', main=True):
-    u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
-    repo = hg.repository(u, path=root)
-    
+def run(_ui, *pats, **opts):
     cmdoptions = {
-        'user':'', 'date':'',
+        'user':opts.get('user', ''), 'date':opts.get('date', ''),
+        'logfile':'', 'message':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
-        'unknown':False, 'ignored':False, 
+        'unknown':True, 'ignored':False,
         'exclude':[], 'include':[],
-        'check': True, 'git':False, 'logfile':'', 'addremove':False,
+        'check': True, 'git':False, 'addremove':False,
     }
-    
-    dialog = GShelve(u, repo, cwd, files, cmdoptions, main)
+
+    dialog = GShelve(_ui, None, None, pats, cmdoptions, True)
     dialog.display()
-    return dialog
-    
-def run(root='', files=[], cwd='', **opts):
-    # If no files or directories were selected, take current dir
-    # TODO: Not clear if this is best; user may expect repo wide
-    if not files and cwd:
-        files = [cwd]
-    if launch(root, files, cwd, True):
-        gtk.gdk.threads_init()
-        gtk.gdk.threads_enter()
-        gtk.main()
-        gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    from hglib import rootpath
-
-    opts = {}
-    opts['cwd'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    opts['root'] = rootpath(opts['cwd'])
-    run(**opts)
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()

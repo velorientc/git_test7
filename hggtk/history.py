@@ -634,7 +634,7 @@ class GLog(GDialog):
         from update import UpdateDialog
         rev = self.currow[treemodel.REVID]
         parents = [x.node() for x in self.repo.changectx(None).parents()]
-        dialog = UpdateDialog(self.cwd, rev)
+        dialog = UpdateDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.set_notify_func(self.checkout_completed, parents)
@@ -651,7 +651,7 @@ class GLog(GDialog):
         rev = self.currow[treemodel.REVID]
         parents = [x.node() for x in self.repo.changectx(None).parents()]
         node = short(self.repo.changelog.node(rev))
-        dialog = MergeDialog(self.repo.root, self.cwd, node)
+        dialog = MergeDialog(self.repo.root, node)
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.set_notify_func(self.merge_completed, parents)
@@ -726,33 +726,17 @@ class GLog(GDialog):
         self._menu.get_children()[0].activate()
         return True
 
-def run(root='', cwd='', files=[], limit='', **opts):
-    u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
-    repo = hg.repository(u, path=root)
-
-    files = [util.canonpath(root, cwd, f) for f in files]
-
+def run(ui, *pats, **opts):
     cmdoptions = {
         'follow':False, 'follow-first':False, 'copies':False, 'keyword':[],
-        'limit':limit, 'rev':[], 'removed':False, 'no_merges':False, 'date':None,
-        'only_merges':None, 'prune':[], 'git':False, 'verbose':False,
-        'include':[], 'exclude':[]
+        'limit':limit, 'rev':[], 'removed':False, 'no_merges':False,
+        'date':None, 'only_merges':None, 'prune':[], 'git':False,
+        'verbose':False, 'include':[], 'exclude':[]
     }
 
-    dialog = GLog(u, repo, cwd, files, cmdoptions, True)
-
+    dialog = GLog(u, None, None, pats, cmdoptions, True)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     dialog.display()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    path = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    opts['root'] = os.path.abspath(path)
-    opts['files'] = [opts['root']]
-    opts['limit'] = ''
-    run(**opts)

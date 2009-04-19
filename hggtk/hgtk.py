@@ -35,7 +35,7 @@ def dispatch(args):
             pdb.post_mortem(sys.exc_info()[2])
         error = traceback.format_exc()
         from bugreport import run
-        run(**{'cmd':' '.join(sys.argv[1:]), 'error':error})
+        run(u, **{'cmd':' '.join(sys.argv[1:]), 'error':error})
 
 def get_list_from_file(filename):
     try:
@@ -164,116 +164,118 @@ def runcommand(ui, args):
 def about(ui, *pats, **opts):
     """about TortoiseHg"""
     from hggtk.about import run
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def add(ui, *pats, **opts):
     """add files"""
     from mercurial import dispatch
     dispatch.dispatch(['add'] + list(pats))
 
-def clone(ui, source=None, dest=None, **opts):
+def clone(ui, *pats, **opts):
     """clone tool"""
     from hggtk.clone import run
-    opts['files'] = [os.path.abspath(x) for x in (source, dest) if x]
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def commit(ui, *pats, **opts):
     """commit tool"""
+    ct = ui.config('tortoisehg', 'extcommit', None)
+    if ct == 'qct':
+        from hglib import thgdispatch
+        args = ['--repository', root, ct]
+        try:
+            thgdispatch(repo.ui, args=args)
+        except SystemExit:
+            pass
+        return
+    # move cwd to repo root if repo is merged, so we can show
+    # all the changed files
+    repo = hg.repository(ui, path=hglib.rootpath())
+    if len(repo.changectx(None).parents()) > 1:
+        os.chdir(repo.root)
+        pats = []
     from hggtk.commit import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def shelve(ui, *pats, **opts):
     """shelve/unshelve tool"""
     from hggtk.thgshelve import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    run(ui, *pats, **opts)
 
-def userconfig(ui, **opts):
+def userconfig(ui, *pats, **opts):
     """user configuration editor"""
     from hggtk.thgconfig import run
-    run(**opts)
+    opts['repomode'] = False
+    run(ui, *pats, **opts)
 
 def repoconfig(ui, *pats, **opts):
     """repository configuration editor"""
     from hggtk.thgconfig import run
-    opts['files'] = opts['root']
-    run(**opts)
+    opts['repomode'] = True
+    run(ui, *pats, **opts)
 
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     from hggtk.rename import run
     if not pats or len(pats) > 2:
         raise util.Abort(_('rename takes one or two path arguments'))
-    opts['files'] = pats
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
     from hggtk.guess import run
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
-    opts['files'] = pats or []
-    opts['cwd'] = os.getcwd()
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def hgignore(ui, *pats, **opts):
     """ignore filter editor"""
     from hggtk.hgignore import run
-    if pats and not pats[0].endswith('.hgignore'):
-        opts['fileglob'] = pats[0]
-    run(**opts)
+    run(ui, *pats, **opts)
 
-def hginit(ui, dest=None, **opts):
+def hginit(ui, *pats, **opts):
     """repository initialization tool"""
     from hggtk.hginit import run
-    if dest:
-        opts['files'] = [dest]
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def log(ui, *pats, **opts):
     """changelog viewer"""
     from hggtk.history import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def merge(ui, node=None, rev=None, **opts):
-    """merge tool """
+    """merge tool"""
     from hggtk.merge import run
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def recovery(ui, *pats, **opts):
     """recover, rollback & verify"""
     from hggtk.recovery import run
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def remove(ui, *pats, **opts):
     """file status viewer in remove mode"""
     from hggtk.status import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def revert(ui, *pats, **opts):
     """file status viewer in revert mode"""
     from hggtk.status import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    run(ui, *pats, **opts)
 
-def serve(ui, **opts):
+def serve(ui, *pats, **opts):
     """web server"""
     from hggtk.serve import run
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def status(ui, *pats, **opts):
     """file status viewer"""
     from hggtk.status import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    run(ui, *pats, **opts)
 
-def synch(ui, **opts):
+def synch(ui, *pats, **opts):
     """repository synchronization tool"""
     from hggtk.synch import run
     cmd = sys.argv[1] 
@@ -281,17 +283,17 @@ def synch(ui, **opts):
         opts['pushmode'] = True
     else:
         opts['pushmode'] = False
-    run(**opts)
+    run(ui, *pats, **opts)
 
-def update(ui, **opts):
+def update(ui, *pats, **opts):
     """update/checkout tool"""
     from hggtk.update import run
-    run(**opts)
+    run(ui, *pats, **opts)
 
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
     from hggtk.visdiff import run
-    run(pats, **opts)
+    run(ui, *pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False):

@@ -705,23 +705,3 @@ class ChangeSet(GDialog):
         dlg.run()
         dlg.hide()
         shell_notify([self.curfile])
-
-def run(root='', cwd='', files=[], **opts):
-    u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
-    repo = hg.repository(u, path=root)
-
-    dialog = ChangeSet(u, repo, cwd, files, opts, True)
-    dialog.display()
-
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    opts['rev'] = ['750']
-    run(**opts)

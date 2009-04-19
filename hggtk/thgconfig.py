@@ -13,7 +13,7 @@ import urlparse
 from mercurial.i18n import _
 from mercurial import hg, ui, util, url
 from dialog import error_dialog, question_dialog
-from hglib import RepoError, toutf, fromutf
+from hglib import RepoError, toutf, fromutf, rootpath
 import shlib
 import iniparse
 
@@ -337,17 +337,14 @@ class PathEditDialog(gtk.Dialog):
         return ret
 
 class ConfigDialog(gtk.Dialog):
-    def __init__(self, root='',
-            configrepo=False,
-            focusfield=None,
-            newpath=None):
+    def __init__(self, configrepo=False, focusfield=None, newpath=None):
         """ Initialize the Dialog. """        
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
         self.ui = ui.ui()
         try:
-            repo = hg.repository(self.ui, path=root)
+            repo = hg.repository(self.ui, path=rootpath())
         except RepoError:
             repo = None
             if configrepo:
@@ -990,25 +987,11 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
         return 0
 
-def run(root='', cmdline=[], files=[], **opts):
-    dialog = ConfigDialog(root, bool(files))
+def run(ui, *pats, **opts):
+    dialog = ConfigDialog(opts.get('repomode') or False)
     dialog.show_all()
     dialog.connect('response', gtk.main_quit)
-    if '--focusfield' in cmdline:
-        field = cmdline[cmdline.index('--focusfield')+1]
-        dialog.focus_field(field)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    # example command lines
-    # python hggtk/thgconfig.py --focusfield ui.editor
-    # python hggtk/thgconfig.py --focusfield paths.default --configrepo
-    import sys
-    opts = {}
-    opts['root'] = os.getcwd()
-    opts['cmdline'] = sys.argv
-    opts['files'] = '--configrepo' in sys.argv and ['.'] or []
-    run(**opts)

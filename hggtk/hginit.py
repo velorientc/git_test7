@@ -15,7 +15,7 @@ import shlib
 
 class InitDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, cwd='', repos=[]):
+    def __init__(self, repos=[]):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         
@@ -164,17 +164,10 @@ class InitDialog(gtk.Window):
         info_dialog(self, _('New repository created'),
                 _('in directory %s') % toutf(os.path.abspath(dest)))
 
-def run(cwd='', files=[], **opts):
-    dialog = InitDialog(cwd, repos=files)
+def run(ui, *pats, **opts):
+    dialog = InitDialog(repos=pats)
     dialog.show_all()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
     gtk.gdk.threads_leave()
-    
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['cwd'] = os.getcwd()
-    opts['files'] = sys.argv[1:]
-    run(**opts)

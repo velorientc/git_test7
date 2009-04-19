@@ -236,24 +236,3 @@ class TagAddDialog(gtk.Window):
             message = _('Removed tag %s') % name
         r = self.repo.changectx(nullid).node()
         self.repo.tag(name, r, message, local, user, date)
-    
-def run(root='', tag='', rev='', **opts):
-    dialog = TagAddDialog(root, tag, rev)
-
-    # the dialog maybe called by another window/dialog, so we only
-    # enable the close dialog handler if dialog is run as mainapp
-    dialog.connect('destroy', gtk.main_quit)
-    
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
-    #opts['tag'] = 'mytag'
-    #opts['rev'] = '-1'
-    run(**opts)

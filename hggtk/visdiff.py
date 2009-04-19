@@ -47,7 +47,7 @@ def snapshot_node(repo, files, node, tmproot):
 
 class FileSelectionDialog(gtk.Dialog):
     'Dialog for selecting visual diff candidates'
-    def __init__(self, pats, opts):
+    def __init__(self, canonpats, opts):
         'Initialize the Dialog'
         gtk.Dialog.__init__(self)
         self.set_title('Visual Diffs')
@@ -121,7 +121,7 @@ class FileSelectionDialog(gtk.Dialog):
             cwd = os.getcwd()
             try:
                 os.chdir(repo.root)
-                self.find_files(repo, pats, opts, model)
+                self.find_files(repo, canonpats, opts, model)
             finally:
                 os.chdir(cwd)
         else:
@@ -256,8 +256,12 @@ class FileSelectionDialog(gtk.Dialog):
             Prompt(_('Tool launch failure'), 
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
 
-def run(pats, **opts):
-    dialog = FileSelectionDialog(pats, opts)
+def run(ui, *pats, **opts):
+    root = rootpath()
+    canonpats = []
+    for f in pats:
+        canonpats.append(util.canonpath(root, os.getcwd(), f))
+    dialog = FileSelectionDialog(canonpats, opts)
     dialog.connect('destroy', gtk.main_quit)
     dialog.show_all()
     gtk.gdk.threads_init()
