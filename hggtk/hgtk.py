@@ -16,6 +16,7 @@ import mercurial.ui as _ui
 from mercurial import hg, util, fancyopts, cmdutil
 import hglib
 import gtk
+import gobject
 
 import os
 import pdb
@@ -167,10 +168,12 @@ def runcommand(ui, args):
         raise hglib.ParseError(cmd, _("invalid arguments"))
 
 def gtkrun(mainwin):
-    mainwin.show_all()
     if hasattr(mainwin, 'display'):
         mainwin.display()
+    mainwin.show_all()
     mainwin.connect('destroy', gtk.main_quit)
+    if 'response' in gobject.signal_list_names(mainwin):
+        mainwin.connect('response', gtk.main_quit)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()
