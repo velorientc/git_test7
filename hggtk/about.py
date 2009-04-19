@@ -8,7 +8,6 @@ import os
 import sys
 
 import pygtk
-pygtk.require('2.0')
 import gtk
 import shlib
 from mercurial.i18n import _

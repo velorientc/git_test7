@@ -5,7 +5,6 @@
 #
 
 import pygtk
-pygtk.require("2.0")
 import os
 import gtk
 from dialog import error_dialog, info_dialog

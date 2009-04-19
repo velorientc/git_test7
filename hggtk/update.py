@@ -5,8 +5,6 @@
 #
 
 import pygtk
-pygtk.require("2.0")
-
 import os
 import sys
 import gtk
