@@ -118,7 +118,12 @@ class FileSelectionDialog(gtk.Dialog):
                 hbox.pack_start(combo, False, False, 2)
             else:
                 self.diffpath, self.diffopts = tools[preferred]
-            self.find_files(repo, pats, opts, model)
+            cwd = os.getcwd()
+            try:
+                os.chdir(repo.root)
+                self.find_files(repo, pats, opts, model)
+            finally:
+                os.chdir(cwd)
         else:
             Prompt(_('No visual diff tool'), 
                    _('No visual diff tool has been configured'), None).run()
