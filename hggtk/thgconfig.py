@@ -890,11 +890,11 @@ class ConfigDialog(gtk.Dialog):
                         if v == curvalue:
                             currow = len(vlist) - 1
 
-                if curvalue is None:
+                if curvalue is None and len(vlist):
                     combo.set_active(0)
-                elif currow is None:
+                elif currow is None and curvalue:
                     combo.child.set_text(toutf(curvalue))
-                else:
+                elif currow:
                     combo.set_active(currow)
 
     def add_page(self, notebook, tab):
