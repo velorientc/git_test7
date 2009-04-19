@@ -30,12 +30,7 @@ def run(ui, *pats, **opts):
     title = 'Rename ' + toutf(fname)
     dialog = entry_dialog(None, title, True, target, rename_resp)
     dialog.orig = fname
-    dialog.show_all()
-    dialog.connect('destroy', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return dialog
 
 def rename_resp(dialog, response):
     if response != gtk.RESPONSE_OK:

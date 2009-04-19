@@ -198,10 +198,4 @@ class HgIgnoreDialog(gtk.Window):
 def run(_ui, *pats, **opts):
     if pats and pats[0].endswith('.hgignore'):
         pats = []
-    dialog = HgIgnoreDialog(*pats)
-    dialog.show_all()
-    dialog.connect('destroy', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return HgIgnoreDialog(*pats)

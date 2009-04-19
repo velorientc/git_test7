@@ -15,6 +15,7 @@ from mercurial.i18n import _
 import mercurial.ui as _ui
 from mercurial import hg, util, fancyopts, cmdutil
 import hglib
+import gtk
 
 import os
 import pdb
@@ -35,7 +36,11 @@ def dispatch(args):
             pdb.post_mortem(sys.exc_info()[2])
         error = traceback.format_exc()
         from bugreport import run
-        run(u, **{'cmd':' '.join(sys.argv[1:]), 'error':error})
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['error'] = error
+        print error
+        gtkrun(run(u, **opts))
 
 def get_list_from_file(filename):
     try:
@@ -161,10 +166,20 @@ def runcommand(ui, args):
             raise
         raise hglib.ParseError(cmd, _("invalid arguments"))
 
+def gtkrun(mainwin):
+    mainwin.show_all()
+    if hasattr(mainwin, 'display'):
+        mainwin.display()
+    mainwin.connect('destroy', gtk.main_quit)
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
+
 def about(ui, *pats, **opts):
     """about TortoiseHg"""
     from hggtk.about import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def add(ui, *pats, **opts):
     """add files"""
@@ -174,7 +189,7 @@ def add(ui, *pats, **opts):
 def clone(ui, *pats, **opts):
     """clone tool"""
     from hggtk.clone import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def commit(ui, *pats, **opts):
     """commit tool"""
@@ -194,86 +209,86 @@ def commit(ui, *pats, **opts):
         os.chdir(repo.root)
         pats = []
     from hggtk.commit import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def shelve(ui, *pats, **opts):
     """shelve/unshelve tool"""
     from hggtk.thgshelve import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def userconfig(ui, *pats, **opts):
     """user configuration editor"""
     from hggtk.thgconfig import run
     opts['repomode'] = False
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def repoconfig(ui, *pats, **opts):
     """repository configuration editor"""
     from hggtk.thgconfig import run
     opts['repomode'] = True
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     from hggtk.rename import run
     if not pats or len(pats) > 2:
         raise util.Abort(_('rename takes one or two path arguments'))
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
     from hggtk.guess import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def hgignore(ui, *pats, **opts):
     """ignore filter editor"""
     from hggtk.hgignore import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def hginit(ui, *pats, **opts):
     """repository initialization tool"""
     from hggtk.hginit import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def log(ui, *pats, **opts):
     """changelog viewer"""
     from hggtk.history import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def merge(ui, node=None, rev=None, **opts):
     """merge tool"""
     from hggtk.merge import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def recovery(ui, *pats, **opts):
     """recover, rollback & verify"""
     from hggtk.recovery import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def remove(ui, *pats, **opts):
     """file status viewer in remove mode"""
     from hggtk.status import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def revert(ui, *pats, **opts):
     """file status viewer in revert mode"""
     from hggtk.status import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def serve(ui, *pats, **opts):
     """web server"""
     from hggtk.serve import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def status(ui, *pats, **opts):
     """file status viewer"""
     from hggtk.status import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def synch(ui, *pats, **opts):
     """repository synchronization tool"""
@@ -283,17 +298,17 @@ def synch(ui, *pats, **opts):
         opts['pushmode'] = True
     else:
         opts['pushmode'] = False
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def update(ui, *pats, **opts):
     """update/checkout tool"""
     from hggtk.update import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
     from hggtk.visdiff import run
-    run(ui, *pats, **opts)
+    gtkrun(run(ui, *pats, **opts))
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False):

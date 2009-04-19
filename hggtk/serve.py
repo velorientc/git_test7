@@ -342,9 +342,4 @@ thg_serve_cmd =  {"^serve":
          _('hg serve [OPTION]...'))}
 
 def run(ui, *pats, **opts):
-    dialog = ServeDialog(opts.get('webdir_conf'))
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return ServeDialog(opts.get('webdir_conf'))

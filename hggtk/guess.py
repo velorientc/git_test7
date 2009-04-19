@@ -367,10 +367,4 @@ class DetectRenameDialog(gtk.Window):
                     buf.insert(bufiter, line)
 
 def run(ui, *pats, **opts):
-    dialog = DetectRenameDialog()
-    dialog.show_all()
-    dialog.connect('destroy', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return DetectRenameDialog()

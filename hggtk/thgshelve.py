@@ -217,10 +217,4 @@ def run(_ui, *pats, **opts):
         'exclude':[], 'include':[],
         'check': True, 'git':False, 'addremove':False,
     }
-
-    dialog = GShelve(_ui, None, None, pats, cmdoptions, True)
-    dialog.display()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return GShelve(_ui, None, None, pats, cmdoptions, True)

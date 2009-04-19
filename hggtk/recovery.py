@@ -208,9 +208,4 @@ class RecoveryDialog(gtk.Window):
             return False # Stop polling this function
 
 def run(ui, *pats, **opts):
-    dialog = RecoveryDialog(root)
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return RecoveryDialog()

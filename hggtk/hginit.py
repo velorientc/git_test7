@@ -165,9 +165,4 @@ class InitDialog(gtk.Window):
                 _('in directory %s') % toutf(os.path.abspath(dest)))
 
 def run(ui, *pats, **opts):
-    dialog = InitDialog(repos=pats)
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return InitDialog(pats)

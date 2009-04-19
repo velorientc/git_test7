@@ -617,9 +617,4 @@ class SynchDialog(gtk.Window):
             set_value(key, value)
 
 def run(ui, *pats, **opts):
-    dialog = SynchDialog(pats, opts.get('pushmode') or False)
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return SynchDialog(pats, opts.get('pushmode'))

@@ -319,9 +319,4 @@ class CloneDialog(gtk.Window):
         self._add_dest_to_recent(dest)
 
 def run(_ui, *pats, **opts):
-    dialog = CloneDialog(pats)
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return CloneDialog(pats)

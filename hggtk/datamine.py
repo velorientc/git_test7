@@ -703,9 +703,4 @@ def run(ui, *pats, **opts):
         'only_merges':None, 'prune':[], 'git':False, 'verbose':False,
         'include':[], 'exclude':[]
     }
-    dialog = DataMineDialog(ui, None, None, pats, cmdoptions, True)
-    dialog.display()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return DataMineDialog(ui, None, None, pats, cmdoptions, True)

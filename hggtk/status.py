@@ -1318,9 +1318,4 @@ def run(ui, *pats, **opts):
         'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
         'check':True
     }
-    dialog = GStatus(ui, None, None, pats, cmdoptions, True)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    dialog.display()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return GStatus(ui, None, None, pats, cmdoptions, True)

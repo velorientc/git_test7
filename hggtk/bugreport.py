@@ -56,9 +56,4 @@ class BugReport(GDialog):
         return vbox
 
 def run(_ui, *pats, **opts):
-    dialog = BugReport(_ui, None, None, None, opts, True)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    dialog.display()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return BugReport(_ui, None, None, None, opts, True)

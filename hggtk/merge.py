@@ -236,10 +236,4 @@ class MergeDialog(gtk.Window):
         self._refresh()
 
 def run(ui, *pats, **opts):
-    dialog = MergeDialog()
-    dialog.connect('destroy', gtk.main_quit)
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return MergeDialog()

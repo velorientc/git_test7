@@ -988,10 +988,4 @@ class ConfigDialog(gtk.Dialog):
         return 0
 
 def run(ui, *pats, **opts):
-    dialog = ConfigDialog(opts.get('repomode') or False)
-    dialog.show_all()
-    dialog.connect('response', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return ConfigDialog(opts.get('repomode'))

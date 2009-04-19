@@ -79,15 +79,10 @@ class AboutDialog(gtk.AboutDialog):
         self.set_comments("with " + lib_versions + "\n\n" + comment)
         self.set_logo(gtk.gdk.pixbuf_new_from_file(thg_logo))
         self.set_icon_from_file(thg_icon)
-        
+
         # somehow clicking on the Close button doesn't automatically
         # close the About dialog...
         self.connect('response', gtk.main_quit)
 
 def run(_ui, *pats, **opts):
-    dialog = AboutDialog()
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return AboutDialog()

@@ -734,10 +734,4 @@ def run(ui, *pats, **opts):
         'date':None, 'only_merges':None, 'prune':[], 'git':False,
         'verbose':False, 'include':[], 'exclude':[]
     }
-
-    dialog = GLog(ui, None, None, pats, cmdoptions, True)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    dialog.display()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    return GLog(ui, None, None, pats, cmdoptions, True)
