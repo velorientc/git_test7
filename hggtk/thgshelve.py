@@ -7,7 +7,6 @@
 #
 
 import os
-import pygtk
 import gtk
 import cStringIO
 

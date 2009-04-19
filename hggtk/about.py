@@ -6,8 +6,6 @@
 
 import os
 import sys
-
-import pygtk
 import gtk
 import shlib
 from mercurial.i18n import _

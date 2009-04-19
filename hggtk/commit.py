@@ -7,7 +7,6 @@
 #
 
 import os
-import pygtk
 import errno
 import gtk
 import pango

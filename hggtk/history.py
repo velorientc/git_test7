@@ -6,7 +6,6 @@
 #
 
 import os
-import pygtk
 import gtk
 import gobject
 import pango

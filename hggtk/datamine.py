@@ -3,7 +3,6 @@
 #
 # Copyright (C) 2008 Steve Borho <steve@borho.org>
 
-import pygtk
 import gtk
 import gobject
 import os

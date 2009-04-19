@@ -4,7 +4,6 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import pygtk
 import os
 import gtk
 from dialog import question_dialog, error_dialog, info_dialog

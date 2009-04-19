@@ -9,7 +9,6 @@
 
 import os
 import cStringIO
-import pygtk
 import gtk
 import pango
 

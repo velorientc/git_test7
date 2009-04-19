@@ -4,7 +4,6 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import pygtk
 import gtk
 import os
 import pango

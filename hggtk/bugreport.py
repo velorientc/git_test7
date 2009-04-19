@@ -4,10 +4,8 @@
 # Copyright (C) 2009 Steve Borho <steve@borho.org>
 #
 
-import pygtk
 import gtk
 import pango
-
 from mercurial.i18n import _
 from hglib import toutf, fromutf, rootpath, diffexpand
 from gdialog import *

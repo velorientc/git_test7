@@ -6,7 +6,6 @@
 # of the GNU General Public License, incorporated herein by reference.
 # 
 
-import pygtk
 import gtk
 import gobject
 import pango
