@@ -385,6 +385,13 @@ class GLog(GDialog):
         self.tree.connect('row-activated', self._tree_row_act)
         #self.tree.modify_font(pango.FontDescription(self.fontlist))
         
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        key, modifier = gtk.accelerator_parse('<Control>d')
+        self.tree.add_accelerator('thg-diff', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        self.tree.connect('thg-diff', self.thgdiff)
+
         hbox = gtk.HBox()
         hbox.pack_start(self.graphview, True, True, 0)
         vbox = gtk.VBox()
@@ -431,6 +438,9 @@ class GLog(GDialog):
         vbox.pack_start(self.stbar, False, False)
 
         return vbox
+
+    def thgdiff(self, treeview):
+        self._vdiff_change(None)
 
     def _strip_rev(self, menuitem):
         rev = self.currow[treemodel.REVID]

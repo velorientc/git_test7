@@ -24,12 +24,12 @@ import traceback
 
 nonrepo_commands = 'userconfig clone debugcomplete init about help version'
 
-if 'copy-clipboard' not in gobject.signal_list_names(gtk.TreeView):
-    gobject.signal_new('copy-clipboard', gtk.TreeView,
-            gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
-    gobject.signal_new('thg-exit', gtk.Window,
-            gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
-    gobject.signal_new('thg-close', gtk.Window,
+# Add TortoiseHg signals, hooked to key accelerators in shlib
+for sig in ('copy-clipboard', 'thg-diff'):
+    gobject.signal_new(sig, gtk.TreeView,
+        gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
+for sig in ('thg-exit', 'thg-close', 'thg-refresh'):
+    gobject.signal_new(sig, gtk.Window,
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 
 def dispatch(args):

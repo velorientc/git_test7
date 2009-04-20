@@ -132,14 +132,23 @@ def set_tortoise_icon(window, thgicon):
     if ico: window.set_icon_from_file(ico)
 
 def set_tortoise_keys(window):
+    'Set default TortoiseHg keyboard accelerators'
+    from hgtk import thgexit
+
     accelgroup = gtk.AccelGroup()
     window.add_accel_group(accelgroup)
     key, modifier = gtk.accelerator_parse('<Control>w')
-    window.add_accelerator('thg-close', accelgroup, key, modifier, gtk.ACCEL_VISIBLE)
-    window.connect('thg-close', thgclose)
+    window.add_accelerator('thg-close', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
     key, modifier = gtk.accelerator_parse('<Control>q')
-    window.add_accelerator('thg-exit', accelgroup, key, modifier, gtk.ACCEL_VISIBLE)
-    from hgtk import thgexit
+    window.add_accelerator('thg-exit', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+    key, modifier = gtk.accelerator_parse('F5')
+    window.add_accelerator('thg-refresh', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+
+    # connect ctrl-w and ctrl-q to every window
+    window.connect('thg-close', thgclose)
     window.connect('thg-exit', thgexit)
 
 def thgclose(window):

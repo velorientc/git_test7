@@ -459,6 +459,7 @@ class ChangeSet(GDialog):
         return _menu
 
     def get_body(self):
+        self.curfile = None
         if self.repo.ui.configbool('tortoisehg', 'copyhash'):
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
             self.clipboard = gtk.Clipboard(selection=sel)
@@ -491,6 +492,16 @@ class ChangeSet(GDialog):
         filelist_tree.connect('popup-menu', self._file_popup_menu)
         filelist_tree.connect('row-activated', self._file_row_act)
         filelist_tree.set_search_equal_func(self.search_filelist)
+
+        accelgroup = gtk.AccelGroup()
+        if self.glog_parent:
+            self.glog_parent.add_accel_group(accelgroup)
+        else:
+            self.add_accel_group(accelgroup)
+        key, modifier = gtk.accelerator_parse('<Control>d')
+        filelist_tree.add_accelerator('thg-diff', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        filelist_tree.connect('thg-diff', self.thgdiff)
 
         self._filelist = gtk.ListStore(
                 gobject.TYPE_STRING,   # MAR status
@@ -615,6 +626,17 @@ class ChangeSet(GDialog):
         self._ann_menu.set_sensitive(has_filelog)
         self._save_menu.set_sensitive(has_filelog)
         return True
+
+    def thgdiff(self, treeview):
+        # Do not steal ctrl-d from changelog treeview
+        if not treeview.is_focus() and self.glog_parent:
+            w = self.glog_parent.get_focus()
+            if isinstance(w, gtk.TreeView):
+                w.emit('thg-diff')
+            return False
+        if self.curfile is None:
+            return False
+        self._diff_file('M', self.curfile)
 
     def _file_row_act(self, tree, path, column) :
         """Default action is the first entry in the context menu

@@ -257,7 +257,14 @@ class GStatus(GDialog):
             self.filetree.set_rubber_banding(True)
         self.filetree.modify_font(pango.FontDescription(self.fontlist))
         self.filetree.set_headers_clickable(True)
-        
+
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        key, modifier = gtk.accelerator_parse('<Control>d')
+        self.filetree.add_accelerator('thg-diff', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        self.filetree.connect('thg-diff', self.thgdiff)
+
         toggle_cell = gtk.CellRendererToggle()
         toggle_cell.connect('toggled', self._select_toggle)
         toggle_cell.set_property('activatable', True)
@@ -329,16 +336,13 @@ class GStatus(GDialog):
             self.diff_model = gtk.ListStore(bool, str, str, str, bool, int,
                     pango.FontDescription)
 
-            newsigname = 'copy-clipboard'
             self.diff_tree = gtk.TreeView(self.diff_model)
-            self.diff_tree.connect(newsigname, self.copy_to_clipboard)
 
             # set CTRL-c accelerator for copy-clipboard
-            accelgroup = gtk.AccelGroup()
-            self.add_accel_group(accelgroup)
             key, modifier = gtk.accelerator_parse('<Control>c')
-            self.diff_tree.add_accelerator(newsigname, accelgroup, key,
+            self.diff_tree.add_accelerator('copy-clipboard', accelgroup, key,
                             modifier, gtk.ACCEL_VISIBLE)
+            self.diff_tree.connect('copy-clipboard', self.copy_to_clipboard)
 
             self.diff_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             self.diff_tree.set_headers_visible(False)
@@ -402,6 +406,12 @@ class GStatus(GDialog):
         if key in model.get_value(iter, FM_PATH).lower():
             return False
         return True
+
+    def thgdiff(self, treeview):
+        selection = treeview.get_selection()
+        model, paths = selection.get_selected_rows() 
+        row = model[paths[0]]
+        self._diff_file(row[FM_STATUS], row[FM_PATH])
 
     def copy_to_clipboard(self, treeview):
         'Write highlighted hunks to the clipboard'
@@ -1233,7 +1243,7 @@ class GStatus(GDialog):
 
         model, paths = selection.get_selected_rows() 
         path = paths[0]
-        handler(model[path][1], model[path][3])
+        handler(model[path][FM_STATUS], model[path][FM_PATH])
         return True
 
 
