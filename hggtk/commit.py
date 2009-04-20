@@ -195,9 +195,9 @@ class GCommit(GStatus):
         status_body = GStatus.get_body(self)
 
         vbox = gtk.VBox()
-        
         mbox = gtk.HBox()
 
+        self.connect('thg-accept', self.thgaccept)
         self.branchbutton = gtk.Button()
         self.branchbutton.connect('clicked', self.branch_clicked)
         mbox.pack_start(self.branchbutton, False, False, 2)
@@ -242,14 +242,10 @@ class GCommit(GStatus):
         self._vpaned.add1(vbox)
         self._vpaned.add2(status_body)
         self._vpaned.set_position(self._setting_vpos)
-
-        # make ctrl-o trigger commit button
-        accel_group = gtk.AccelGroup()
-        self.add_accel_group(accel_group)
-        self._commit_button.add_accelerator("clicked", accel_group, ord("o"),
-                              gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE) 
         return self._vpaned
 
+    def thgaccept(self, window):
+        self._commit_clicked(None)
 
     def get_menu_info(self):
         """Returns menu info in this order: merge, addrem, unknown,

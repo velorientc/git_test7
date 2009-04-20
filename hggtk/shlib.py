@@ -146,6 +146,9 @@ def set_tortoise_keys(window):
     key, modifier = gtk.accelerator_parse('F5')
     window.add_accelerator('thg-refresh', accelgroup, key, modifier,
             gtk.ACCEL_VISIBLE)
+    key, modifier = gtk.accelerator_parse('<Control>Return')
+    window.add_accelerator('thg-accept', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
 
     # connect ctrl-w and ctrl-q to every window
     window.connect('thg-close', thgclose)

@@ -28,7 +28,7 @@ nonrepo_commands = 'userconfig clone debugcomplete init about help version'
 for sig in ('copy-clipboard', 'thg-diff'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
-for sig in ('thg-exit', 'thg-close', 'thg-refresh'):
+for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept'):
     gobject.signal_new(sig, gtk.Window,
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 
