@@ -23,6 +23,7 @@ class ChangeSet(GDialog):
     def __init__(self, ui, repo, cwd, pats, opts, main, stbar=None):
         GDialog.__init__(self, ui, repo, cwd, pats, opts, main)
         self.stbar = stbar
+        self.glog_parent = None
 
     def get_title(self):
         title = os.path.basename(self.repo.root) + ' changeset '
