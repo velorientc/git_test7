@@ -5,19 +5,18 @@
 #
 
 import os
-import pygtk
-pygtk.require('2.0')
 import gtk
 import gobject
 import pango
 import StringIO
 
-from mercurial.node import *
+from mercurial.node import short, nullrev
 from mercurial import cmdutil, context, util, ui, hg, patch
-from gdialog import *
+from gdialog import GDialog, Confirm
 from hgcmd import CmdDialog
 from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand, LookupError
 from gtklib import StatusBar
+from shlib import shell_notify
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -25,6 +24,7 @@ class ChangeSet(GDialog):
     def __init__(self, ui, repo, cwd, pats, opts, main, stbar=None):
         GDialog.__init__(self, ui, repo, cwd, pats, opts, main)
         self.stbar = stbar
+        self.glog_parent = None
 
     def get_title(self):
         title = os.path.basename(self.repo.root) + ' changeset '
@@ -448,6 +448,8 @@ class ChangeSet(GDialog):
             return menuitem
             
         _menu = gtk.Menu()
+        _menu.append(create_menu('_visual diff', self._diff_file_rev))
+        _menu.append(create_menu('diff to _local', self._diff_to_local))
         _menu.append(create_menu('_view at revision', self._view_file_rev))
         self._save_menu = create_menu('_save at revision', self._save_file_rev)
         _menu.append(self._save_menu)
@@ -459,6 +461,7 @@ class ChangeSet(GDialog):
         return _menu
 
     def get_body(self):
+        self.curfile = None
         if self.repo.ui.configbool('tortoisehg', 'copyhash'):
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
             self.clipboard = gtk.Clipboard(selection=sel)
@@ -490,6 +493,17 @@ class ChangeSet(GDialog):
                 self._file_button_release)
         filelist_tree.connect('popup-menu', self._file_popup_menu)
         filelist_tree.connect('row-activated', self._file_row_act)
+        filelist_tree.set_search_equal_func(self.search_filelist)
+
+        accelgroup = gtk.AccelGroup()
+        if self.glog_parent:
+            self.glog_parent.add_accel_group(accelgroup)
+        else:
+            self.add_accel_group(accelgroup)
+        key, modifier = gtk.accelerator_parse('<Control>d')
+        filelist_tree.add_accelerator('thg-diff', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        filelist_tree.connect('thg-diff', self.thgdiff)
 
         self._filelist = gtk.ListStore(
                 gobject.TYPE_STRING,   # MAR status
@@ -528,6 +542,13 @@ class ChangeSet(GDialog):
             vbox.pack_start(gtk.HSeparator(), False, False)
             vbox.pack_start(self.stbar, False, False)
             return vbox
+
+    def search_filelist(self, model, column, key, iter):
+        'case insensitive filename search'
+        key = key.lower()
+        if key in model.get_value(iter, 1).lower():
+            return False
+        return True
 
     def setup_tags(self):
         """Creates the tags to be used inside the TextView"""
@@ -608,6 +629,17 @@ class ChangeSet(GDialog):
         self._save_menu.set_sensitive(has_filelog)
         return True
 
+    def thgdiff(self, treeview):
+        # Do not steal ctrl-d from changelog treeview
+        if not treeview.is_focus() and self.glog_parent:
+            w = self.glog_parent.get_focus()
+            if isinstance(w, gtk.TreeView):
+                w.emit('thg-diff')
+            return False
+        if self.curfile is None:
+            return False
+        self._diff_file('M', self.curfile)
+
     def _file_row_act(self, tree, path, column) :
         """Default action is the first entry in the context menu
         """
@@ -628,6 +660,22 @@ class ChangeSet(GDialog):
             cpath = util.canonpath(self.repo.root, self.cwd, self.curfile)
             hgcmd_toq(self.repo.root, q, 'cat', '--rev',
                 str(self.currev), '--output', result, cpath)
+
+    def _diff_to_local(self, menuitem):
+        if not self.curfile:
+            # ignore view events for the [Description] row
+            return
+        self.opts['rev'] = [str(self.currev), '.']
+        self._diff_file('M', self.curfile)
+
+    def _diff_file_rev(self, menuitem):
+        'User selected visual diff file revision from the file list context menu'
+        if not self.curfile:
+            # ignore view events for the [Description] row
+            return
+        self.opts['change'] = str(self.currev)
+        self._diff_file('M', self.curfile)
+        del self.opts['change']
 
     def _view_file_rev(self, menuitem):
         '''User selected view file revision from the file list context menu'''
@@ -657,9 +705,9 @@ class ChangeSet(GDialog):
         if self.glog_parent:
             # If this changeset browser is embedded in glog, send
             # send this event to the main app
-            opts = {'filehist' : self.curfile}
+            opts = {'pats' : [self.curfile]}
             self.glog_parent.custombutton.set_active(True)
-            self.glog_parent.graphview.refresh(True, None, opts)
+            self.glog_parent.reload_log(opts)
         else:
             # Else launch our own GLog instance
             import history
@@ -680,23 +728,3 @@ class ChangeSet(GDialog):
         dlg.run()
         dlg.hide()
         shell_notify([self.curfile])
-
-def run(root='', cwd='', files=[], **opts):
-    u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
-    repo = hg.repository(u, path=root)
-
-    dialog = ChangeSet(u, repo, cwd, files, opts, True)
-    dialog.display()
-
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    opts['rev'] = ['750']
-    run(**opts)

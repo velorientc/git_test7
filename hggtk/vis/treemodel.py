@@ -42,12 +42,14 @@ HEAD = 10
 TAGS = 11
 FGCOLOR = 12
 HEXID = 13
+BRANCHES = 14
 
 class TreeModel(gtk.GenericTreeModel):
 
     def __init__ (self, repo, graphdata, color_func):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
+        self.branch_names = {}
         self.repo = repo
         self.parents = [x.rev() for x in repo.changectx(None).parents()]
         self.heads = [repo.changelog.rev(x) for x in repo.heads()]
@@ -76,6 +78,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == TAGS: return gobject.TYPE_STRING
         if index == FGCOLOR: return gobject.TYPE_STRING
         if index == HEXID: return gobject.TYPE_STRING
+        if index == BRANCHES: return gobject.TYPE_STRING
 
     def on_get_iter(self, path):
         return path[0]
@@ -119,12 +122,13 @@ class TreeModel(gtk.GenericTreeModel):
             branches = webutil.nodebranchdict(self.repo, ctx)
             inbranches = webutil.nodeinbranch(self.repo, ctx)
             bstr = ''
+            branchstr = ''
             for branch in branches:
+                branchstr += branch['name']
                 bstr += '<span background="#aaffaa"> %s </span> ' % \
                         branch['name']
             for branch in inbranches:
-                bstr += '<span background="#d5dde6"> %s </span> ' % \
-                        branch['name']
+                branchstr += branch['name']
 
 
             if '<' in ctx.user():
@@ -143,11 +147,15 @@ class TreeModel(gtk.GenericTreeModel):
                     author, date, None, parents, wc_parent, head, taglist,
                     color, short(node))
             self.revisions[revid] = revision
+            self.branch_names[revid] = branchstr
         else:
             revision = self.revisions[revid]
+            branchstr = self.branch_names[revid]
 
         if column == REVISION:
             return revision
+        if column == BRANCHES:
+            return branchstr
         return revision[column]
 
     def on_iter_next(self, rowref):

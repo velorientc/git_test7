@@ -4,11 +4,10 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import pygtk
-pygtk.require('2.0')
 import gtk
 import gobject
 import pango
+from mercurial.i18n import _
 
 class StatusBar(gtk.HBox):
     def __init__(self, extra=None):
@@ -33,13 +32,13 @@ class StatusBar(gtk.HBox):
         self.pbar.pulse()
         return True
 
-    def begin(self, msg="Running", timeout=100):
+    def begin(self, msg=_('Running'), timeout=100):
         self.pbox.set_child_visible(True)
         self.pbox.map()
         self.set_status_text(msg)
         self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
 
-    def end(self, msg="Done", unmap=True):
+    def end(self, msg=_('Done'), unmap=True):
         gobject.source_remove(self._timeout_event)
         self.set_status_text(msg)
         if unmap:
