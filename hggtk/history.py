@@ -391,6 +391,7 @@ class GLog(GDialog):
         self.tree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         self.tree.connect('thg-diff', self.thgdiff)
+        self.connect('thg-refresh', self.thgrefresh)
 
         hbox = gtk.HBox()
         hbox.pack_start(self.graphview, True, True, 0)
@@ -680,6 +681,9 @@ class GLog(GDialog):
             self.changeview.opts['rev'] = [str(rev)]
             self.changeview.load_details(rev)
         return False
+
+    def thgrefresh(self, window):
+        self.reload_log()
 
     def _refresh_clicked(self, toolbutton, data=None):
         self.reload_log()

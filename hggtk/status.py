@@ -264,6 +264,7 @@ class GStatus(GDialog):
         self.filetree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         self.filetree.connect('thg-diff', self.thgdiff)
+        self.connect('thg-refresh', self.thgrefresh)
 
         toggle_cell = gtk.CellRendererToggle()
         toggle_cell.connect('toggled', self._select_toggle)
@@ -412,6 +413,9 @@ class GStatus(GDialog):
         model, paths = selection.get_selected_rows() 
         row = model[paths[0]]
         self._diff_file(row[FM_STATUS], row[FM_PATH])
+
+    def thgrefresh(self, window):
+        self.reload_status()
 
     def copy_to_clipboard(self, treeview):
         'Write highlighted hunks to the clipboard'

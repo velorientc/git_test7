@@ -101,6 +101,7 @@ class HgIgnoreDialog(gtk.Window):
         bhbox = gtk.HBox()
         refresh = gtk.Button(_('Refresh'))
         refresh.connect('pressed', self.refresh_clicked, sel)
+        self.connect('thg-refresh', self.thgrefresh)
         bhbox.pack_start(refresh, False, False, 2)
         vbox.pack_start(bhbox, False, False, 2)
         frame.add(vbox)
@@ -148,6 +149,9 @@ class HgIgnoreDialog(gtk.Window):
         newregexp = hglib.fromutf(regexp_entry.get_text())
         self.ignorelines.append('regexp:' + newregexp)
         self.write_ignore_lines()
+        self.refresh()
+
+    def thgrefresh(self, window):
         self.refresh()
 
     def refresh_clicked(self, togglebutton, data=None):
