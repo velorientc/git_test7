@@ -91,7 +91,7 @@ class HgExtension(nautilus.MenuProvider,
 
         import tortoise.debugthg
         global debugf
-        if tortoise.debugthg.level('N')
+        if tortoise.debugthg.debug('N'):
             debugf = tortoise.debugthg.debugf
         else:
             debugf = tortoise.debugthg.debugf_No
