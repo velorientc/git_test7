@@ -278,7 +278,7 @@ def log(ui, *pats, **opts):
     from hggtk.history import run
     gtkrun(run(ui, *pats, **opts))
 
-def merge(ui, node=None, rev=None, **opts):
+def merge(ui, *pats, **opts):
     """merge tool"""
     from hggtk.merge import run
     gtkrun(run(ui, *pats, **opts))
