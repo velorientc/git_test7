@@ -49,7 +49,7 @@ sys.stderr = cStringIO.StringIO()
 ret = hggtk.hgtk.dispatch(sys.argv[1:])
 sys.stderr.seek(0)
 for l in sys.stderr.readlines():
-    if l.startswith('Traceback'):
+    if l.startswith('Traceback') or l.startswith('TypeError'):
         from hggtk.bugreport import run
         from mercurial import ui
         from hggtk.hgtk import gtkrun
