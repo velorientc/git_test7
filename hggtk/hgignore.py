@@ -184,7 +184,7 @@ class HgIgnoreDialog(gtk.Window):
             f.close()
         except IOError:
             pass
-        shell_notify(self.repo.wjoin('.hgignore'))
+        shell_notify([self.repo.wjoin('.hgignore')])
         if self.notify_func: self.notify_func()
         
 def run(root='', **opts):
