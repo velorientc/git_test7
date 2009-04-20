@@ -430,7 +430,7 @@ def shelve(ui, repo, *pats, **opts):
     def shelvefunc(ui, repo, message, match, opts):
         # If an MQ patch is applied, consider all qdiff changes
         if hasattr(repo, 'mq') and repo.mq.applied:
-            qtip = repo[None].parents()[0]
+            qtip = repo['.']
             basenode = qtip.parents()[0].node()
         else:
             basenode = repo.dirstate.parents()[0]
