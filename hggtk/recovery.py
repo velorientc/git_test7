@@ -15,15 +15,16 @@ from mercurial.i18n import _
 from mercurial import hg, ui, util
 from dialog import error_dialog, question_dialog
 from hglib import HgThread, toutf, RepoError, rootpath
-from shlib import set_tortoise_icon, shell_notify
+import shlib
 import gtklib
 
 class RecoveryDialog(gtk.Window):
     def __init__(self):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        shlib.set_tortoise_icon(self, 'general.ico')
+        shlib.set_tortoise_keys(self)
 
-        set_tortoise_icon(self, 'general.ico')
         self.root = rootpath()
         self.selected_path = None
         self.hgthread = None
@@ -127,7 +128,7 @@ class RecoveryDialog(gtk.Window):
     def _notify(self, ret, *args):
         import time
         time.sleep(0.5)     # give fs some time to pick up changes
-        shell_notify([self.root])
+        shlib.shell_notify([self.root])
 
     def _rollback_clicked(self, toolbutton, data=None):
         response = question_dialog(self, _('Rollback repository'),

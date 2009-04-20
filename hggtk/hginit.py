@@ -17,12 +17,13 @@ class InitDialog(gtk.Window):
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        shlib.set_tortoise_icon(self, 'menucreaterepos.ico')
+        shlib.set_tortoise_keys(self)
         
         # set dialog title and icon
         self.cwd = cwd and cwd or os.getcwd()
         title = 'hg init - %s' % toutf(self.cwd)
         self.set_title(title)
-        shlib.set_tortoise_icon(self, 'menucreaterepos.ico')
 
         # preconditioning info
         self._dest_path = os.path.abspath(repos and repos[0] or os.getcwd())

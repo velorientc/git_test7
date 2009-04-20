@@ -17,13 +17,20 @@ from mercurial import hg, util, fancyopts, cmdutil
 import hglib
 import gtk
 import gobject
-
 import os
 import pdb
 import sys
 import traceback
 
 nonrepo_commands = 'userconfig clone debugcomplete init about help version'
+
+if 'copy-clipboard' not in gobject.signal_list_names(gtk.TreeView):
+    gobject.signal_new('copy-clipboard', gtk.TreeView,
+            gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
+    gobject.signal_new('thg-exit', gtk.Window,
+            gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
+    gobject.signal_new('thg-close', gtk.Window,
+            gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 
 def dispatch(args):
     "run the command specified in args"
@@ -41,7 +48,7 @@ def dispatch(args):
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = error
         print error
-        gtkrun(run(u, **opts))
+        run(u, **opts)
 
 def get_list_from_file(filename):
     try:
@@ -167,13 +174,21 @@ def runcommand(ui, args):
             raise
         raise hglib.ParseError(cmd, _("invalid arguments"))
 
-def gtkrun(mainwin):
-    if hasattr(mainwin, 'display'):
-        mainwin.display()
-    mainwin.show_all()
-    mainwin.connect('destroy', gtk.main_quit)
-    if 'response' in gobject.signal_list_names(mainwin):
-        mainwin.connect('response', gtk.main_quit)
+mainwindow = None
+def thgexit(win):
+    if hasattr(mainwindow, 'should_live'):
+        if mainwindow.should_live(): return
+    mainwindow.destroy()
+
+def gtkrun(win):
+    global mainwindow
+    mainwindow = win
+    if hasattr(win, 'display'):
+        win.display()
+    win.show_all()
+    if 'response' in gobject.signal_list_names(win):
+        win.connect('response', gtk.main_quit)
+    win.connect('destroy', gtk.main_quit)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     gtk.main()

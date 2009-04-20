@@ -16,7 +16,6 @@ from dialog import *
 from mercurial import hg, ui, extensions
 from mercurial.i18n import _
 from hglib import RepoError, fromutf, toutf
-from hgcmd import CmdDialog
 
 class EmailDialog(gtk.Window):
     """ Send patches or bundles via email """
@@ -25,6 +24,7 @@ class EmailDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
         shlib.set_tortoise_icon(self, 'hg.ico')
+        shlib.set_tortoise_keys(self)
         self.root = root
         self.revargs = revargs
         
@@ -352,6 +352,7 @@ class EmailDialog(gtk.Window):
             cmdline += ['--desc', tmpfile]
             cmdline.extend(self.revargs)
 
+            from hgcmd import CmdDialog
             dlg = CmdDialog(cmdline)
             dlg.show_all()
             dlg.run()

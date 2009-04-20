@@ -11,7 +11,7 @@ from mercurial.node import *
 from mercurial.i18n import _
 from mercurial import util, hg, ui
 from hgcmd import CmdDialog
-from shlib import set_tortoise_icon, shell_notify
+import shlib
 import histselect
 import hglib
 
@@ -20,8 +20,9 @@ class MergeDialog(gtk.Window):
     def __init__(self, root='', rev=''):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        shlib.set_tortoise_icon(self, 'menumerge.ico')
+        shlib.set_tortoise_keys(self)
 
-        set_tortoise_icon(self, 'menumerge.ico')
         # set dialog title
         title = "hg merge"
         if root: title += " - %s" % root
@@ -205,7 +206,7 @@ class MergeDialog(gtk.Window):
         dlg.hide()
         if self.notify_func:
             self.notify_func(self.notify_args)
-        shell_notify([self.root])
+        shlib.shell_notify([self.root])
         self._refresh()
         
     def _do_merge(self):
@@ -229,7 +230,7 @@ class MergeDialog(gtk.Window):
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-        shell_notify([self.root])
+        shlib.shell_notify([self.root])
         if self.notify_func:
             self.notify_func(self.notify_args)
         self._refresh()

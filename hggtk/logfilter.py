@@ -11,7 +11,7 @@ from gdialog import *
 from mercurial import cmdutil, util, hg, ui
 from mercurial.i18n import _
 from hglib import RepoError
-from shlib import shell_notify, set_tortoise_icon
+import shlib
 
 class FilterDialog(gtk.Dialog):
     """ Dialog for creating log filters """
@@ -20,8 +20,9 @@ class FilterDialog(gtk.Dialog):
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(FilterDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
+        shlib.set_tortoise_icon(self, 'menucheckout.ico')
+        shlib.set_tortoise_keys(self)
 
-        set_tortoise_icon(self, 'menucheckout.ico')
         self.set_title("hg log filter - %s" % os.path.basename(root))
 
         self.filterfunc = filterfunc

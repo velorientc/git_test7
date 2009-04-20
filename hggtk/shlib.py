@@ -130,13 +130,22 @@ def get_system_times():
 def set_tortoise_icon(window, thgicon):
     ico = get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)
-    # Global keybindings for TortoiseHg
-    window.connect('key-press-event', window_key_press)
 
-def window_key_press(window, event):
-    if event.keyval == ord('q') and (event.state & gtk.gdk.CONTROL_MASK):
-        devent = gtk.gdk.Event(gtk.gdk.DELETE)
-        window.emit('delete_event', devent)
+def set_tortoise_keys(window):
+    accelgroup = gtk.AccelGroup()
+    window.add_accel_group(accelgroup)
+    key, modifier = gtk.accelerator_parse('<Control>w')
+    window.add_accelerator('thg-close', accelgroup, key, modifier, gtk.ACCEL_VISIBLE)
+    window.connect('thg-close', thgclose)
+    key, modifier = gtk.accelerator_parse('<Control>q')
+    window.add_accelerator('thg-exit', accelgroup, key, modifier, gtk.ACCEL_VISIBLE)
+    from hgtk import thgexit
+    window.connect('thg-exit', thgexit)
+
+def thgclose(window):
+    if hasattr(window, 'should_live'):
+        if window.should_live(): return
+    window.destroy()
 
 def get_tortoise_icon(thgicon):
     '''Find a tortoise icon, apply to PyGtk window'''

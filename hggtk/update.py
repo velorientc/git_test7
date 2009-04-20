@@ -11,15 +11,16 @@ from dialog import *
 from mercurial import util, hg, ui
 from mercurial.node import *
 from mercurial.i18n import _
-from shlib import shell_notify, set_tortoise_icon
 from hglib import rootpath, toutf, RepoError
+import shlib
 
 class UpdateDialog(gtk.Window):
     """ Dialog to update Mercurial repo """
     def __init__(self, rev=None):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        set_tortoise_icon(self, 'menucheckout.ico')
+        shlib.set_tortoise_icon(self, 'menucheckout.ico')
+        shlib.set_tortoise_keys(self)
         self.root = rootpath()
         self.rev = rev
         self.notify_func = None
@@ -177,7 +178,7 @@ class UpdateDialog(gtk.Window):
         if self.notify_func:
             self.notify_func(self.notify_args)
         self._refresh()
-        shell_notify([self.root])
+        shlib.shell_notify([self.root])
 
 def run(ui, *pats, **opts):
     return UpdateDialog()

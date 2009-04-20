@@ -46,6 +46,7 @@ def make_version(tuple):
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
         super(AboutDialog, self).__init__()
+        shlib.set_tortoise_keys(self)
 
         lib_versions = ', '.join([
                 "Mercurial-%s" % hgversion,

@@ -29,9 +29,8 @@ class ServeDialog(gtk.Window):
     def __init__(self, webdir_conf):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-
-        set_tortoise_icon(self, 'proxy.ico')
-        self.connect('delete-event', self._delete)
+        shlib.set_tortoise_icon(self, 'proxy.ico')
+        shlib.set_tortoise_keys(self)
 
         # Pipe stderr, stdout to self.write
         self._queue = Queue.Queue()
@@ -135,11 +134,11 @@ class ServeDialog(gtk.Window):
         tbutton.connect('clicked', handler, userdata)
         return tbutton
             
-    def _delete(self, widget, event):
+    def should_live(self, widget, event):
         if self._server_stopped():
-            gtk.main_quit()
-        else:
             return True
+        else:
+            return False
 
     def _server_stopped(self):
         '''

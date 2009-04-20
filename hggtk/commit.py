@@ -26,6 +26,7 @@ class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        shlib.set_tortoise_keys(self)
         self.connect('response', self.response)
         self.set_title(_('Branch Operations'))
         self.newbranch = None

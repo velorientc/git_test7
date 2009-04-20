@@ -10,7 +10,7 @@ import gobject
 from mercurial import hg, ui, match
 from mercurial.i18n import _
 from dialog import *
-from shlib import shell_notify, set_tortoise_icon
+import shlib
 import hglib
 
 class HgIgnoreDialog(gtk.Window):
@@ -18,7 +18,8 @@ class HgIgnoreDialog(gtk.Window):
     def __init__(self, fileglob='', *pats):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        set_tortoise_icon(self, 'ignore.ico')
+        shlib.set_tortoise_icon(self, 'ignore.ico')
+        shlib.set_tortoise_keys(self)
 
         self.root = hglib.rootpath()
         self.set_title(_('Ignore filter for ') + os.path.basename(self.root))
@@ -192,7 +193,7 @@ class HgIgnoreDialog(gtk.Window):
             f.close()
         except IOError:
             pass
-        shell_notify(self.repo.wjoin('.hgignore'))
+        shlib.shell_notify(self.repo.wjoin('.hgignore'))
         if self.notify_func: self.notify_func()
         
 def run(_ui, *pats, **opts):

@@ -50,8 +50,10 @@ class FileSelectionDialog(gtk.Dialog):
     def __init__(self, canonpats, opts):
         'Initialize the Dialog'
         gtk.Dialog.__init__(self)
-        self.set_title('Visual Diffs')
         shlib.set_tortoise_icon(self, 'menushowchanged.ico')
+        shlib.set_tortoise_keys(self)
+
+        self.set_title('Visual Diffs')
         self.set_default_size(400, 150)
 
         lbl = gtk.Label(_('Temporary files are removed when this dialog'

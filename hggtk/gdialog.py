@@ -257,6 +257,7 @@ class GDialog(gtk.Window):
     def _setup_gtk(self):
         self.set_title(self.get_title())
         shlib.set_tortoise_icon(self, self.get_icon())
+        shlib.set_tortoise_keys(self)
         
         # Minimum size
         minx, miny = self.get_minsize()

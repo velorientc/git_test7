@@ -10,7 +10,7 @@ import sys
 from dialog import question_dialog, error_dialog
 from mercurial import util
 from mercurial.i18n import _
-from shlib import set_tortoise_icon
+import shlib
 import hglib
 
 class HistoryDialog(gtk.Dialog):
@@ -25,8 +25,9 @@ class HistoryDialog(gtk.Dialog):
             buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(HistoryDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
                                            buttons=buttons)
+        shlib.set_tortoise_icon(self, 'menulog.ico')
+        shlib.set_tortoise_keys(self)
 
-        set_tortoise_icon(self, 'menulog.ico')
         # set dialog title
         title = "hg log "
         if root: title += " - %s" % hglib.toutf(root)

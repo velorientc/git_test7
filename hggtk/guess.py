@@ -17,7 +17,7 @@ from dialog import error_dialog
 from mercurial.i18n import _
 from mercurial import hg, ui, mdiff, cmdutil, match, util, commands
 from hglib import toutf, fromutf, diffexpand, rootpath, RepoError
-from shlib import set_tortoise_icon
+import shlib
 import gtklib
 
 # This function and some key bits below borrowed ruthelessly from
@@ -39,7 +39,8 @@ class DetectRenameDialog(gtk.Window):
     def __init__(self):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        set_tortoise_icon(self, 'detect_rename.ico')
+        shlib.set_tortoise_icon(self, 'detect_rename.ico')
+        shlib.set_tortoise_keys(self)
 
         self.root = rootpath()
         self.notify_func = None

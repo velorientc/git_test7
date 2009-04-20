@@ -198,6 +198,7 @@ class PathEditDialog(gtk.Dialog):
     def __init__(self, path, alias):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        shlib.set_tortoise_keys(self)
         self.connect('response', self.response)
         self.set_title(_('Edit remote repository path'))
         self.newpath, self.newalias = None, None
@@ -341,6 +342,7 @@ class ConfigDialog(gtk.Dialog):
         """ Initialize the Dialog. """        
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        shlib.set_tortoise_keys(self)
 
         self.ui = ui.ui()
         try:
@@ -353,8 +355,7 @@ class ConfigDialog(gtk.Dialog):
                 self.response(gtk.RESPONSE_CANCEL)
 
         # Catch close events
-        self.connect('delete-event', self._delete)
-        self.connect('response', self._response)
+        self.connect('response', self.should_live)
 
         if configrepo:
             self.ui = repo.ui
@@ -424,14 +425,13 @@ class ConfigDialog(gtk.Dialog):
         self._btn_apply.set_sensitive(False)
         self.dirty = False
 
-    def _delete(self, widget, event):
-        return True
-
-    def _response(self, widget, response_id):
+    def should_live(self, *args):
         if self.dirty:
             if question_dialog(self, _('Quit without saving?'),
                _('Yes to abandon changes, No to continue')) != gtk.RESPONSE_YES:
-               widget.emit_stop_by_name('response')
+               self.emit_stop_by_name('response')
+               return True
+        return False
 
     def focus_field(self, focusfield):
         '''Set page and focus to requested datum'''

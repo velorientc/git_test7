@@ -19,6 +19,7 @@ class CloneDialog(gtk.Window):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         shlib.set_tortoise_icon(self, 'menuclone.ico')
+        shlib.set_tortoise_keys(self)
 
         # set dialog title
         title = 'hg clone'

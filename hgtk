@@ -51,8 +51,10 @@ sys.stderr.seek(0)
 for l in sys.stderr.readlines():
     if l.startswith('Traceback'):
         from hggtk.bugreport import run
+        from mercurial import ui
+        from hggtk.hgtk import gtkrun
         sys.stderr.seek(0)
         error = 'Recoverable runtime error (stderr):\n' + sys.stderr.read()
-        run(**{'cmd':' '.join(sys.argv[1:]), 'error':error})
+        gtkrun(run(ui.ui(), **{'cmd':' '.join(sys.argv[1:]), 'error':error}))
         break
 sys.exit(ret)

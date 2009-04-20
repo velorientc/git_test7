@@ -10,8 +10,8 @@ import pango
 import os
 import threading
 import Queue
+import shlib
 from hglib import HgThread, hgcmd_toq, toutf
-from shlib import set_tortoise_icon, get_system_times
 from mercurial.i18n import _
 
 class CmdDialog(gtk.Dialog):
@@ -23,7 +23,8 @@ class CmdDialog(gtk.Dialog):
                             #buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
                             )
 
-        set_tortoise_icon(self, 'hg.ico')
+        shlib.set_tortoise_icon(self, 'hg.ico')
+        shlib.set_tortoise_keys(self)
         self.cmdline = cmdline
         self.returncode = None
         self.hgthread = None
@@ -146,7 +147,7 @@ class CmdDialog(gtk.Dialog):
             self.pbar.unmap()
         else:
             # pulse the progress bar every ~100ms
-            tm = get_system_times()[4]
+            tm = shlib.get_system_times()[4]
             if tm - self.last_pbar_update < 0.100:
                 return
             self.last_pbar_update = tm

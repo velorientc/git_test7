@@ -329,12 +329,7 @@ class GStatus(GDialog):
             self.diff_model = gtk.ListStore(bool, str, str, str, bool, int,
                     pango.FontDescription)
 
-            # Create a new signal for our purposes
             newsigname = 'copy-clipboard'
-            if newsigname not in gobject.signal_list_names(gtk.TreeView):
-                gobject.signal_new(newsigname, gtk.TreeView, 
-                        gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
-
             self.diff_tree = gtk.TreeView(self.diff_model)
             self.diff_tree.connect(newsigname, self.copy_to_clipboard)
 

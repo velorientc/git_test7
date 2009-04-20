@@ -12,12 +12,14 @@ from dialog import *
 from hgcmd import CmdDialog
 from mercurial.i18n import _
 import histselect
+import shlib
 
 class BackoutDialog(gtk.Window):
     """ Backout effect of a changeset """
     def __init__(self, root='', rev=''):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        shlib.set_tortoise_keys(self)
 
         self.root = root
         self.set_title(_('Backout changeset - ') + rev)

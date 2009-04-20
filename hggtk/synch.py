@@ -23,8 +23,9 @@ class SynchDialog(gtk.Window):
     def __init__(self, repos=[], pushmode=False):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-
         shlib.set_tortoise_icon(self, 'menusynch.ico')
+        shlib.set_tortoise_keys(self)
+
         self.root = rootpath()
         self.selected_path = None
         self.hgthread = None

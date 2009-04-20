@@ -11,12 +11,14 @@ from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 from mercurial.node import short, nullid
 from hglib import RepoError
+import shlib
 
 class TagAddDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, root='', tag='', rev=''):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        shlib.set_tortoise_keys(self)
 
         # set dialog title
         title = 'hg tag '
