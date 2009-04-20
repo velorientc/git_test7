@@ -39,10 +39,6 @@ class SynchDialog(gtk.Window):
         self.paths = self._get_paths()
         self.origchangecount = len(self.repo.changelog)
 
-        # load the fetch and rebase extensions explicitly
-        extensions.load(self.ui, 'fetch', None)
-        extensions.load(self.ui, 'rebase', None)
-
         name = self.repo.ui.config('web', 'name') or os.path.basename(self.root)
         self.set_title(_('TortoiseHg Synchronize - ') + name)
 
@@ -420,6 +416,8 @@ class SynchDialog(gtk.Window):
         aopts = self._get_advanced_options()
         if self.fetchradio.get_active():
             cmd = ['fetch', '--message', 'merge']
+            # load the fetch extensions explicitly
+            extensions.load(self.ui, 'fetch', None)
         else:
             cmd = ['pull']
             cmd += aopts.get('force', [])
@@ -428,6 +426,8 @@ class SynchDialog(gtk.Window):
                 cmd.append('--update')
             elif self.rebaseradio.get_active():
                 cmd.append('--rebase')
+            # load the rebase extensions explicitly
+            extensions.load(self.ui, 'rebase', None)
         cmd += aopts.get('rev', [])
         self._exec_cmd(cmd)
     
