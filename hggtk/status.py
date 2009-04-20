@@ -11,13 +11,14 @@ import os
 import cStringIO
 import gtk
 import pango
+import gobject
 
 from mercurial.i18n import _
 from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff, extensions
 from mercurial import merge as merge_
 from shlib import shell_notify
 from hglib import toutf, fromutf, rootpath, diffexpand
-from gdialog import *
+from gdialog import GDialog, Confirm, Prompt
 from dialog import entry_dialog
 import hgshelve
 

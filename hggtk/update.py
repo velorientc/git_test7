@@ -7,9 +7,9 @@
 import os
 import sys
 import gtk
-from dialog import *
+from dialog import error_dialog, question_dialog
 from mercurial import util, hg, ui
-from mercurial.node import *
+from mercurial.node import short, nullrev
 from mercurial.i18n import _
 from hglib import rootpath, toutf, RepoError
 import shlib

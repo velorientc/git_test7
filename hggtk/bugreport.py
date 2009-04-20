@@ -8,7 +8,7 @@ import gtk
 import pango
 from mercurial.i18n import _
 from hglib import toutf, fromutf, rootpath, diffexpand
-from gdialog import *
+from gdialog import GDialog
 from dialog import entry_dialog
 
 class BugReport(GDialog):

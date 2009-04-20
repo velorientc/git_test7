@@ -13,8 +13,8 @@ import cStringIO
 from mercurial.i18n import _
 from mercurial import ui, hg
 from shlib import shell_notify
-from gdialog import *
-from status import *
+from gdialog import Confirm
+from status import GStatus, FM_STATUS, FM_CHECKED, DM_CHUNK_ID, DM_REJECTED
 from hgcmd import CmdDialog
 from hglib import fromutf
 import hgshelve

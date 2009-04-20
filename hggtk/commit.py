@@ -14,13 +14,14 @@ import tempfile
 import cStringIO
 
 from mercurial.i18n import _
-from mercurial.node import *
-from mercurial import ui, hg
-from shlib import shell_notify
-from gdialog import *
-from status import *
+from mercurial.node import hex, nullrev
+from mercurial import ui, hg, util, patch
+from gdialog import Prompt, Confirm
+from status import GStatus, FM_STATUS, FM_CHECKED, DM_REJECTED, DM_CHUNK_ID
 from hgcmd import CmdDialog
 from hglib import fromutf
+import shlib
+from shlib import shell_notify
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close):

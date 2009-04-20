@@ -9,7 +9,6 @@ import gtk
 import gobject
 from mercurial import hg, ui, match
 from mercurial.i18n import _
-from dialog import *
 import shlib
 import hglib
 

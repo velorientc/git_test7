@@ -10,12 +10,13 @@ import gobject
 import pango
 import StringIO
 
-from mercurial.node import *
+from mercurial.node import short, nullrev
 from mercurial import cmdutil, context, util, ui, hg, patch
-from gdialog import *
+from gdialog import GDialog, Confirm
 from hgcmd import CmdDialog
 from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand, LookupError
 from gtklib import StatusBar
+from shlib import shell_notify
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs

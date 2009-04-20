@@ -6,8 +6,8 @@
 
 import gtk
 import sys
-from dialog import *
-from mercurial.node import *
+from dialog import error_dialog, question_dialog
+from mercurial.node import short, nullrev
 from mercurial.i18n import _
 from mercurial import util, hg, ui
 from hgcmd import CmdDialog

@@ -7,7 +7,7 @@
 import gtk
 import os
 import sys
-from gdialog import *
+from gdialog import GDialog
 from mercurial import cmdutil, util, hg, ui
 from mercurial.i18n import _
 from hglib import RepoError

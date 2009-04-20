@@ -12,7 +12,7 @@ import threading, thread2
 from mercurial import hg, ui, util, revlog
 from mercurial.i18n import _
 from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime, LookupError, rootpath
-from gdialog import *
+from gdialog import GDialog
 from vis import treemodel
 from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
 from vis.treeview import TreeView

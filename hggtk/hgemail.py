@@ -12,7 +12,7 @@ import gtk
 import pango
 import shlib
 from tempfile import mkstemp
-from dialog import *
+from dialog import info_dialog
 from mercurial import hg, ui, extensions
 from mercurial.i18n import _
 from hglib import RepoError, fromutf, toutf

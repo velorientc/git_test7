@@ -8,7 +8,7 @@
 import os
 import gtk
 import pango
-from dialog import *
+from dialog import GDialog
 from hgcmd import CmdDialog
 from mercurial.i18n import _
 import histselect

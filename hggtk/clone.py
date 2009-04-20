@@ -10,7 +10,6 @@ import pango
 from dialog import question_dialog, error_dialog, info_dialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
-from mercurial.node import *
 import shlib
 
 class CloneDialog(gtk.Window):
