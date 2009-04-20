@@ -89,6 +89,13 @@ class HgExtension(nautilus.MenuProvider,
         self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
         self.menu = tortoise.menuthg.menuThg()
 
+        import tortoise.debugthg
+        global debugf
+        if tortoise.debugthg.level('N')
+            debugf = tortoise.debugthg.debugf
+        else:
+            debugf = tortoise.debugthg.debugf_No
+
     def icon(self, iname):
         return os.path.join(self.ipath, iname)
 
@@ -121,7 +128,7 @@ class HgExtension(nautilus.MenuProvider,
             self.cacherepo = None
             return None
         except StandardError, e:
-            print e
+            debugf(e)
             return None
 
     def run_dialog(self, menuitem, hgtkcmd, cwd = None):
