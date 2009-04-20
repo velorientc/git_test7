@@ -85,7 +85,6 @@ class GLog(GDialog):
         from datamine import DataMineDialog
         dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {}, False)
         dialog.display()
-        dialog.add_search_page()
 
     def _filter_clicked(self, toolbutton, data=None):
         if self._filter_dialog:
