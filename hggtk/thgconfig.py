@@ -10,6 +10,7 @@ import gobject
 import os
 import re
 import urlparse
+import threading
 from mercurial.i18n import _
 from mercurial import hg, ui, util, url
 from dialog import error_dialog, question_dialog
@@ -342,6 +343,7 @@ class ConfigDialog(gtk.Dialog):
         """ Initialize the Dialog. """        
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        self.add_button(gtk.STOCK_EDIT, gtk.RESPONSE_YES)
         shlib.set_tortoise_keys(self)
 
         self.ui = ui.ui()
@@ -426,6 +428,31 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
 
     def should_live(self, *args):
+        if len(args) == 2 and args[1] == gtk.RESPONSE_YES:
+            def doedit():
+                util.system("%s \"%s\"" % (editor, self.fn))
+            # reload configs, in case they have been written since opened
+            if self.configrepo:
+                repo = hg.repository(ui.ui(), path=rootpath())
+                u = repo.ui
+            else:
+                u = ui.ui()
+            editor = (u.config('tortoisehg', 'editor') or
+                    u.config('gtools', 'editor') or
+                    os.environ.get('HGEDITOR') or
+                    u.config('ui', 'editor') or
+                    os.environ.get('EDITOR', 'vi'))
+            if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+                import gdialog
+                gdialog.Prompt(_('No visual editor configured'),
+                       _('Please configure a visual editor.'), self).run()
+                self.focus_field('tortoisehg.editor')
+                self.emit_stop_by_name('response')
+                return True
+            thread = threading.Thread(target=doedit, name='edit config')
+            thread.setDaemon(True)
+            thread.start()
+            return False
         if self.dirty:
             if question_dialog(self, _('Quit without saving?'),
                _('Yes to abandon changes, No to continue')) != gtk.RESPONSE_YES:
