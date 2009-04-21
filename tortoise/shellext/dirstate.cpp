@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "stdafx.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -113,7 +115,6 @@ void dirstate_add_entry(dirstate *pd, const direntry *pe)
 }
 
 
-typedef unsigned long uint32_t;
 static uint32_t ntohl(uint32_t x)
 {
 	return ((x & 0x000000ffUL) << 24) |
@@ -258,11 +259,17 @@ int HgQueryDirstate(const char* hgroot, const char* abspath, char* relpathloc, c
 	char* temp;
 
 	if (0 != lstat(abspath, pstat))
+	{
+		TDEBUG_TRACE("HgQueryDirstate: lstat returns non-null");
 		return 0;
+    }
 
 	*ppd = dirstate_get(hgroot);
 	if (!*ppd)
+	{
+		TDEBUG_TRACE("HgQueryDirstate: dirstate_get returns NULL");
 		return 0;
+	}
 
 	temp = relpathloc;
 	while (*temp)
@@ -334,14 +341,25 @@ int HgQueryDirstateFile(const char* hgroot, const char* abspath, char* relpathlo
 	struct _stat stat;
 	unsigned ix;
 
+	TDEBUG_TRACE("HgQueryDirstateFile: search for " << abspath);
+	TDEBUG_TRACE("HgQueryDirstateFile: hgroot = " << hgroot);
+
 	if (!HgQueryDirstate(hgroot, abspath, relpathloc, &pd, &stat))
+	{
+		TDEBUG_TRACE("HgQueryDirstateFile: HgQueryDirstate returns false");
 		return 0;
+	}
+
+	TDEBUG_TRACE("HgQueryDirstateFile: pd->num_entries = " << pd->num_entries);
+	TDEBUG_TRACE("HgQueryDirstateFile: relpathloc = " << relpathloc);
 
 	for (ix = 0; ix < pd->num_entries; ix++)
 	{
 		if (0 == strncmp(relpathloc, pd->entries[ix].name, MAX_PATH))
 		{
+			TDEBUG_TRACE("HgQueryDirstateFile: found relpathloc");
 			*outStatus = mapdirstate(&pd->entries[ix], &stat);
+			TDEBUG_TRACE("HgQueryDirstateFile: *outStatus = " << *outStatus);
 			return *outStatus != '?';
 		}
 	}

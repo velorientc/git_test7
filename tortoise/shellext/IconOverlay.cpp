@@ -3,6 +3,11 @@
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "PipeUtils.h"
+#include "common.h"
+#include "dirstate.h"
+
+#include <shlwapi.h>
+
 
 STDMETHODIMP CShellExt::GetOverlayInfo(LPWSTR pwszIconFile, int cchMax,
         int *pIndex, DWORD *pdwFlags)
@@ -51,28 +56,53 @@ STDMETHODIMP CShellExt::GetPriority(int *pPriority)
     return S_OK;
 }
 
-#define BUFSIZE 512
 
 STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 {
-    TCHAR status[BUFSIZE] = TEXT("");
-    int bufsize = BUFSIZE * sizeof(TCHAR);    
     std::string mbstr = WideToMultibyte(pwszPath);
 
     TDEBUG_TRACE("IsMemberOf: search for " << mbstr.c_str());
-    int cbRead = query_pipe(mbstr.c_str(), status, bufsize);
 
-    if (cbRead < 0)
+    char path[MAX_PATH] = "";
+    strncat(path, mbstr.c_str(), MAX_PATH);
+
+    std::string hgroot;
+
+    if (!HgFindRoot(path, &hgroot))
+    {
+        TDEBUG_TRACE("IsMemberOf: HgFindRoot returns false");
         return S_FALSE;
-    else if (myTortoiseClass == TORTOISE_OLE_ADDED &&
-            strcmp(status, "added") == 0)
+    }
+
+    TDEBUG_TRACE("IsMemberOf: hgroot = " << hgroot);
+
+    if (PathIsDirectory(path))
+        return S_FALSE;
+
+    size_t offset = hgroot.length();
+    if (path[offset] == '\\')
+        offset++;
+    const char* relpathptr = path + offset;
+
+    char relpath[MAX_PATH] = "";
+    strncat(relpath, relpathptr, MAX_PATH);
+
+    char status = 0;
+
+    if (!HgQueryDirstateFile(hgroot.c_str(), path, relpath, &status))
+    {
+        TDEBUG_TRACE("IsMemberOf: HgQueryDirstateFile returns false");
+        return S_FALSE;
+    }
+
+    TDEBUG_TRACE("IsMemberOf: status = " << status);
+
+    if (myTortoiseClass == TORTOISE_OLE_ADDED && status == 'A')
         return S_OK;
-    else if (myTortoiseClass == TORTOISE_OLE_MODIFIED &&
-            strcmp(status, "modified") == 0)
+    else if (myTortoiseClass == TORTOISE_OLE_MODIFIED && status == 'M')
         return S_OK;
-    else if (myTortoiseClass == TORTOISE_OLE_UNCHANGED &&
-            strcmp(status, "unchanged") == 0)
+    else if (myTortoiseClass == TORTOISE_OLE_UNCHANGED && status == 'C')
         return S_OK;
-       
+
     return S_FALSE;
 }
