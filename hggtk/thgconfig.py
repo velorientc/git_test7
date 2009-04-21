@@ -428,6 +428,11 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
 
     def should_live(self, *args):
+        if self.dirty:
+            if question_dialog(self, _('Quit without saving?'),
+               _('Yes to abandon changes, No to continue')) != gtk.RESPONSE_YES:
+               self.emit_stop_by_name('response')
+               return True
         if len(args) == 2 and args[1] == gtk.RESPONSE_YES:
             def doedit():
                 util.system("%s \"%s\"" % (editor, self.fn))
@@ -452,12 +457,6 @@ class ConfigDialog(gtk.Dialog):
             thread = threading.Thread(target=doedit, name='edit config')
             thread.setDaemon(True)
             thread.start()
-            return False
-        if self.dirty:
-            if question_dialog(self, _('Quit without saving?'),
-               _('Yes to abandon changes, No to continue')) != gtk.RESPONSE_YES:
-               self.emit_stop_by_name('response')
-               return True
         return False
 
     def focus_field(self, focusfield):
