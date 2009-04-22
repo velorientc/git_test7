@@ -20,35 +20,35 @@
 
 bool HgFindRoot(char* path, std::string* root)
 {
-	char temp1[MAX_PATH];
-	char temp2[MAX_PATH];
+    char temp1[MAX_PATH];
+    char temp2[MAX_PATH];
 
-	char* dir = temp1;
-	char* other = temp2;
+    char* dir = temp1;
+    char* other = temp2;
 
-	if (!GetFullPathName(path, MAX_PATH, dir, NULL))
-		return false;
+    if (!GetFullPathName(path, MAX_PATH, dir, NULL))
+        return false;
 
-	bool found = false;
-	while (dir)
-	{
-		other = PathCombine(other, dir, ".\\.hg\\store");
-		if (found = PathIsDirectory(other))
-			break;
+    bool found = false;
+    while (dir)
+    {
+        other = PathCombine(other, dir, ".\\.hg\\store");
+        if (found = PathIsDirectory(other))
+            break;
 
-		// search parent
-		if (PathIsRoot(dir))
-			dir = NULL;
-		else
-		{
-			char* temp = PathCombine(other, dir, "..");
-			other = dir;
-			dir = temp;
-		}
-	}
+        // search parent
+        if (PathIsRoot(dir))
+            dir = NULL;
+        else
+        {
+            char* temp = PathCombine(other, dir, "..");
+            other = dir;
+            dir = temp;
+        }
+    }
 
-	if (found)
-		*root = dir;
-	return found;
+    if (found)
+        *root = dir;
+    return found;
 }
 
