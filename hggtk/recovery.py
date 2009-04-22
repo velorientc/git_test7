@@ -32,7 +32,7 @@ class RecoveryDialog(gtk.Window):
 
         self.set_default_size(600, 400)
 
-        name = os.path.basename(os.path.abspath(root))
+        name = os.path.basename(os.path.abspath(self.root))
         self.set_title(_('TortoiseHg Recovery - ') + name)
 
         # toolbar
