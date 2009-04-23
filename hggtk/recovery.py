@@ -5,68 +5,63 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
 import gtk
 import gobject
 import pango
 import Queue
 import os
 import threading
+from mercurial.i18n import _
 from mercurial import hg, ui, util
 from dialog import error_dialog, question_dialog
-from hglib import HgThread, toutf, RepoError
-from shlib import set_tortoise_icon, shell_notify
+from hglib import HgThread, toutf, RepoError, rootpath
+import shlib
 import gtklib
 
 class RecoveryDialog(gtk.Window):
-    def __init__(self, cwd='', root=''):
+    def __init__(self):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        shlib.set_tortoise_icon(self, 'general.ico')
+        shlib.set_tortoise_keys(self)
 
-        set_tortoise_icon(self, 'general.ico')
-        self.root = root
-        self.cwd = cwd
+        self.root = rootpath()
         self.selected_path = None
         self.hgthread = None
         self.connect('delete-event', self._delete)
 
         self.set_default_size(600, 400)
 
-        name = os.path.basename(os.path.abspath(root))
-        self.set_title("TortoiseHg Recovery - " + name)
+        name = os.path.basename(os.path.abspath(self.root))
+        self.set_title(_('TortoiseHg Recovery - ') + name)
 
         # toolbar
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
         self._stop_button = self._toolbutton(gtk.STOCK_STOP,
-                'Stop', self._stop_clicked, tip='Stop the hg operation')
+                _('Stop'), self._stop_clicked, tip=_('Stop the hg operation'))
         self._stop_button.set_sensitive(False)
         tbuttons = [
                 self._toolbutton(gtk.STOCK_CLEAR,
-                                 'clean', 
+                                 _('clean'),
                                  self._clean_clicked,
-                                 tip='Clean checkout, undo all changes'),
+                                 tip=_('Clean checkout, undo all changes')),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_UNDO,
-                                 'rollback', 
+                                 _('rollback'),
                                  self._rollback_clicked,
-                                 tip='Rollback (undo) last transaction to'
-                                     ' repository (pull, commit, etc)'),
+                                 tip=_('Rollback (undo) last transaction to'
+                                     ' repository (pull, commit, etc)')),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_CLEAR,
-                                 'recover',
+                                 _('recover'),
                                  self._recover_clicked,
-                                 tip='Recover from interrupted operation'),
+                                 tip=_('Recover from interrupted operation')),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_APPLY,
-                                 'verify',
+                                 _('verify'),
                                  self._verify_clicked,
-                                 tip='Validate repository consistency'),
+                                 tip=_('Validate repository consistency')),
                 gtk.SeparatorToolItem(),
                 self._stop_button,
                 gtk.SeparatorToolItem(),
@@ -83,7 +78,7 @@ class RecoveryDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription("Monospace"))
+        self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
@@ -98,7 +93,7 @@ class RecoveryDialog(gtk.Window):
 
     def _do_close(self):
         if self._cmd_running():
-            error_dialog(self, "Can't close now", "command is running")
+            error_dialog(self, _('Cannot close now'), _('command is running'))
         else:
             gtk.main_quit()
         
@@ -117,14 +112,14 @@ class RecoveryDialog(gtk.Window):
         return tbutton
         
     def _clean_clicked(self, toolbutton, data=None):
-        response = question_dialog(self, "Clean repository",
+        response = question_dialog(self, _('Clean repository'),
                 "%s ?" % os.path.basename(self.root))
         if not response == gtk.RESPONSE_YES:
             return
         try:
             repo = hg.repository(ui.ui(), path=self.root)
         except RepoError:
-            self.write("Unable to find repo at %s\n" % (self.root), False)
+            self.write(_('Unable to find repo at %s\n') % (self.root), False)
             return
         pl = repo.changectx(None).parents()
         cmd = ['update', '--clean', '--rev', str(pl[0].rev())]
@@ -133,10 +128,10 @@ class RecoveryDialog(gtk.Window):
     def _notify(self, ret, *args):
         import time
         time.sleep(0.5)     # give fs some time to pick up changes
-        shell_notify([self.cwd])
+        shlib.shell_notify([self.root])
 
     def _rollback_clicked(self, toolbutton, data=None):
-        response = question_dialog(self, "Rollback repository",
+        response = question_dialog(self, _('Rollback repository'),
                 "%s ?" % os.path.basename(self.root))
         if not response == gtk.RESPONSE_YES:
             return
@@ -158,8 +153,8 @@ class RecoveryDialog(gtk.Window):
 
     def _exec_cmd(self, cmd, postfunc=None):
         if self._cmd_running():
-            error_dialog(self, "Can't run now",
-                "Pleas try again after the previous command is completed")
+            error_dialog(self, _('Cannot run now'),
+                _('Please try again after the previous command is completed'))
             return
 
         self._stop_button.set_sensitive(True)
@@ -209,17 +204,8 @@ class RecoveryDialog(gtk.Window):
             self.stbar.end()
             self._stop_button.set_sensitive(False)
             if self.hgthread.return_code() is None:
-                self.write("[command interrupted]")
+                self.write(_('[command interrupted]'))
             return False # Stop polling this function
 
-def run(cwd='', root='', **opts):
-    dialog = RecoveryDialog(cwd, root)
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-    
-if __name__ == "__main__":
-    import sys
-    run(*sys.argv[1:])
+def run(ui, *pats, **opts):
+    return RecoveryDialog()

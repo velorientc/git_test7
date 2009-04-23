@@ -8,225 +8,367 @@
 import gtk
 import gobject
 import os
-import pango
-from mercurial import hg, ui, cmdutil, util
+import re
+import urlparse
+import threading
+from mercurial.i18n import _
+from mercurial import hg, ui, util, url
 from dialog import error_dialog, question_dialog
-from hglib import RepoError, toutf, fromutf
+from hglib import RepoError, toutf, fromutf, rootpath
 import shlib
-import shelve
 import iniparse
 
-_unspecstr = '<unspecified>'
+_unspecstr = _('<unspecified>')
 
 _pwfields = ('http_proxy.passwd', 'smtp.password')
 
 _tortoise_info = (
-    ('3-way Merge Tool', 'ui.merge', [],
-        'Graphical merge program for resolving merge conflicts.  If left'
+    (_('3-way Merge Tool'), 'ui.merge', [],
+        _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
         ' on your system or use its internal merge tool that leaves conflict'
-        ' markers in place.'),
-    ('Visual Diff Command', 'tortoisehg.vdiff', [],
-        'Specify visual diff tool; must be an extdiff command'),
-    ('Visual Editor', 'tortoisehg.editor', [],
-        'Specify the visual editor used to view files, etc'),
-    ('CLI Editor', 'ui.editor', [],
-        'The editor to use during a commit and other'
+        ' markers in place.  Chose internal:merge to force conflict markers.')),
+    (_('Visual Diff Command'), 'tortoisehg.vdiff', [],
+        _('Specify visual diff tool; must be an extdiff command')),
+    (_('Visual Editor'), 'tortoisehg.editor', [],
+        _('Specify the visual editor used to view files, etc')),
+    (_('CLI Editor'), 'ui.editor', [],
+        _('The editor to use during a commit and other'
         ' instances where Mercurial needs multiline input from'
-        ' the user.  Only used by command line interface commands.'),
-    ('Tab Width', 'tortoisehg.tabwidth', [],
-        'Specify the number of spaces that tabs expand to in various'
+        ' the user.  Only used by command line interface commands.')),
+    (_('Tab Width'), 'tortoisehg.tabwidth', [],
+        _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHG windows.'
-        ' Default: Not expanded'),
-    ('Bottom Diffs', 'gtools.diffbottom', ['False', 'True'],
-        'Show the diff panel below the file list in status, shelve, and'
+        ' Default: Not expanded')),
+    (_('Bottom Diffs'), 'gtools.diffbottom', ['False', 'True'],
+        _('Show the diff panel below the file list in status, shelve, and'
         ' commit dialogs.'
-        ' Default: False (show diffs to right of file list)'),
-    ('Overlay Icons', 'tortoisehg.overlayicons',
-        ['False', 'True', 'localdisks'],
-        'Display overlay icons in Explorer windows.'
-        ' Default: True'))
+        ' Default: False (show diffs to right of file list)')))
+
+shellcmds = '''about add clone commit datamine init log merge recovery
+shelve synch status userconfig repoconfig guess remove rename revert
+serve update vdiff'''.split()
 
 _commit_info = (
-    ('Username', 'ui.username', [], 
-        'Name associated with commits'),
-    ('External Commit Tool', 'tortoisehg.extcommit', ['None', 'qct'],
-        'Select commit tool launched by TortoiseHg. (Qct is no longer'
+    (_('Username'), 'ui.username', [], 
+        _('Name associated with commits')),
+    (_('External Commit Tool'), 'tortoisehg.extcommit', ['None', 'qct'],
+        _('Select commit tool launched by TortoiseHg. (Qct is no longer'
         ' distributed as part of TortoiseHG.)'
-        ' Default: None (use the builtin tool)'))
+        ' Default: None (use the builtin tool)')))
 
 _log_info = (
-    ('Author Coloring', 'tortoisehg.authorcolor', ['False', 'True'],
-        'Color changesets by author name.  If not enabled,'
+    (_('Author Coloring'), 'tortoisehg.authorcolor', ['False', 'True'],
+        _('Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
         ' non-trivial parents, black for normal.'
-        ' Default: False'),
-    ('Long Summary', 'tortoisehg.longsummary', ['False', 'True'],
-        'If true, concatenate multiple lines of changeset summary'
+        ' Default: False')),
+    (_('Long Summary'), 'tortoisehg.longsummary', ['False', 'True'],
+        _('If true, concatenate multiple lines of changeset summary'
         ' until they reach 80 characters.'
-        ' Default: False'),
-    ('Log Batch Size', 'tortoisehg.graphlimit', ['500'],
-        'The number of revisions to read and display in the'
+        ' Default: False')),
+    (_('Log Batch Size'), 'tortoisehg.graphlimit', ['500'],
+        _('The number of revisions to read and display in the'
         ' changelog viewer in a single batch.'
-        ' Default: 500'),
-    ('Copy Hash', 'tortoisehg.copyhash', ['False', 'True'],
-        'Allow the changelog viewer to copy the changeset hash'
+        ' Default: 500')),
+    (_('Copy Hash'), 'tortoisehg.copyhash', ['False', 'True'],
+        _('Allow the changelog viewer to copy the changeset hash'
         ' of the currently selected changeset into the clipboard.'
-        ' Default: False'))
+        ' Default: False')))
 
 _paths_info = (
-    ('default', 'paths.default', [],
-        'Directory or URL to use when pulling, if no source is specified.'
-        ' Default is set to the repository from which the repository'
-        ' was cloned.'),
-    ('default-push', 'paths.default-push', [],
-        'Optional. Directory or URL to use when pushing, if no'
-        ' destination is specified.'))
+    ('After pull operation', 'tortoisehg.postpull',
+        ['none', 'update', 'fetch', 'rebase'],
+        _('Operation which is performed directly after a successful pull.'
+          ' update equates to pull --update, fetch equates to the fetch'
+          ' extension, rebase equates to pull --rebase.  Default: none')),)
 
 _web_info = (
-    ('Name', 'web.name', ['unknown'],
-        'Repository name to use in the web interface.'
-        ' Default is the working directory.'),
-    ('Description', 'web.description', ['unknown'],
-        "Textual description of the repository's purpose or"
-        " contents."),
-    ('Contact', 'web.contact', ['unknown'],
-        'Name or email address of the person in charge of the'
-        ' repository.'),
-    ('Style', 'web.style',
+    (_('Name'), 'web.name', ['unknown'],
+        _('Repository name to use in the web interface.'
+        ' Default is the working directory.')),
+    (_('Description'), 'web.description', ['unknown'],
+        _("Textual description of the repository's purpose or"
+        " contents.")),
+    (_('Contact'), 'web.contact', ['unknown'],
+        _('Name or email address of the person in charge of the'
+        ' repository.')),
+    (_('Style'), 'web.style',
         ['paper', 'monoblue', 'coal', 'spartan', 'gitweb', 'old'],
-        'Which template map style to use'),
-    ('Archive Formats', 'web.allow_archive', ['bz2', 'gz', 'zip'],
-        'Comma separated list of archive formats allowed for'
-        ' downloading'),
-    ('Port', 'web.port', ['8000'], 'Port to listen on'),
-    ('Push Requires SSL', 'web.push_ssl', ['True', 'False'],
-        'Whether to require that inbound pushes be transported'
-        ' over SSL to prevent password sniffing.'),
-    ('Stripes', 'web.stripes', ['1', '0'],
-        'How many lines a "zebra stripe" should span in multiline output.'
-        ' Default is 1; set to 0 to disable.'),
-    ('Max Files', 'web.maxfiles', ['10'],
-        'Maximum number of files to list per changeset.'),
-    ('Max Changes', 'web.maxfiles', ['10'],
-        'Maximum number of changes to list on the changelog.'),
-    ('Allow Push', 'web.allow_push', ['*'],
-        'Whether to allow pushing to the repository. If empty or not'
+        _('Which template map style to use')),
+    (_('Archive Formats'), 'web.allow_archive', ['bz2', 'gz', 'zip'],
+        _('Comma separated list of archive formats allowed for'
+        ' downloading')),
+    (_('Port'), 'web.port', ['8000'], _('Port to listen on')),
+    (_('Push Requires SSL'), 'web.push_ssl', ['True', 'False'],
+        _('Whether to require that inbound pushes be transported'
+        ' over SSL to prevent password sniffing.')),
+    (_('Stripes'), 'web.stripes', ['1', '0'],
+        _('How many lines a "zebra stripe" should span in multiline output.'
+        ' Default is 1; set to 0 to disable.')),
+    (_('Max Files'), 'web.maxfiles', ['10'],
+        _('Maximum number of files to list per changeset.')),
+    (_('Max Changes'), 'web.maxfiles', ['10'],
+        _('Maximum number of changes to list on the changelog.')),
+    (_('Allow Push'), 'web.allow_push', ['*'],
+        _('Whether to allow pushing to the repository. If empty or not'
         ' set, push is not allowed. If the special value "*", any remote'
         ' user can push, including unauthenticated users. Otherwise, the'
         ' remote user must have been authenticated, and the authenticated'
         ' user name must be present in this list (separated by whitespace'
         ' or ","). The contents of the allow_push list are examined after'
-        ' the deny_push list.'),
-    ('Deny Push', 'web.deny_push', ['*'],
-        'Whether to deny pushing to the repository. If empty or not set,'
+        ' the deny_push list.')),
+    (_('Deny Push'), 'web.deny_push', ['*'],
+        _('Whether to deny pushing to the repository. If empty or not set,'
         ' push is not denied. If the special value "*", all remote users'
         ' are denied push. Otherwise, unauthenticated users are all'
         ' denied, and any authenticated user name present in this list'
         ' (separated by whitespace or ",") is also denied. The contents'
-        ' of the deny_push list are examined before the allow_push list.'),
-    ('Encoding', 'web.encoding', ['UTF-8'],
-        'Character encoding name'))
+        ' of the deny_push list are examined before the allow_push list.')),
+    (_('Encoding'), 'web.encoding', ['UTF-8'],
+        _('Character encoding name')))
 
 _proxy_info = (
-    ('Host', 'http_proxy.host', [],
-        'Host name and (optional) port of proxy server, for'
-        ' example "myproxy:8000"'),
-    ('Bypass List', 'http_proxy.no', [],
-        'Optional. Comma-separated list of host names that'
-        ' should bypass the proxy'),
-    ('Password', 'http_proxy.passwd', [],
-        'Optional. Password to authenticate with at the'
-        ' proxy server'),
-    ('User', 'http_proxy.user', [],
-        'Optional. User name to authenticate with at the'
-        ' proxy server'))
+    (_('Host'), 'http_proxy.host', [],
+        _('Host name and (optional) port of proxy server, for'
+        ' example "myproxy:8000"')),
+    (_('Bypass List'), 'http_proxy.no', [],
+        _('Optional. Comma-separated list of host names that'
+        ' should bypass the proxy')),
+    (_('Password'), 'http_proxy.passwd', [],
+        _('Optional. Password to authenticate with at the'
+        ' proxy server')),
+    (_('User'), 'http_proxy.user', [],
+        _('Optional. User name to authenticate with at the'
+        ' proxy server')))
 
 _email_info = (
-    ('From', 'email.from', [],
-        'Email address to use in the "From" header and for the SMTP envelope'),
-    ('To', 'email.to', [],
-        'Comma-separated list of recipient email addresses'),
-    ('Cc', 'email.cc', [],
-        'Comma-separated list of carbon copy recipient email'
-        ' addresses'),
-    ('Bcc', 'email.bcc', [],
-        'Comma-separated list of blind carbon copy recipient'
-        ' email addresses'),
-    ('method', 'email.method', ['smtp'],
-'Optional. Method to use to send email messages. If value is "smtp" (default),'
+    (_('From'), 'email.from', [],
+        _('Email address to use in the "From" header and for the SMTP envelope')),
+    (_('To'), 'email.to', [],
+        _('Comma-separated list of recipient email addresses')),
+    (_('Cc'), 'email.cc', [],
+        _('Comma-separated list of carbon copy recipient email'
+        ' addresses')),
+    (_('Bcc'), 'email.bcc', [],
+        _('Comma-separated list of blind carbon copy recipient'
+        ' email addresses')),
+    (_('method'), 'email.method', ['smtp'],
+_('Optional. Method to use to send email messages. If value is "smtp" (default),'
 ' use SMTP (configured below).  Otherwise, use as name of program to run that'
 ' acts like sendmail (takes "-f" option for sender, list of recipients on'
 ' command line, message on stdin). Normally, setting this to "sendmail" or'
-' "/usr/sbin/sendmail" is enough to use sendmail to send messages.'),
-    ('SMTP Host', 'smtp.host', [], 'Host name of mail server'),
-    ('SMTP Port', 'smtp.port', ['25'],
-        'Port to connect to on mail server.'
-        ' Default: 25'),
-    ('SMTP TLS', 'smtp.tls', ['False', 'True'],
-        'Connect to mail server using TLS.'
-        ' Default: False'),
-    ('SMTP Username', 'smtp.username', [],
-        'Username to authenticate to mail server with'),
-    ('SMTP Password', 'smtp.password', [],
-        'Password to authenticate to mail server with'),
-    ('Local Hostname', 'smtp.local_hostname', [],
-        'Hostname the sender can use to identify itself to the mail server.'))
+' "/usr/sbin/sendmail" is enough to use sendmail to send messages.')),
+    (_('SMTP Host'), 'smtp.host', [], _('Host name of mail server')),
+    (_('SMTP Port'), 'smtp.port', ['25'],
+        _('Port to connect to on mail server.'
+        ' Default: 25')),
+    (_('SMTP TLS'), 'smtp.tls', ['False', 'True'],
+        _('Connect to mail server using TLS.'
+        ' Default: False')),
+    (_('SMTP Username'), 'smtp.username', [],
+        _('Username to authenticate to mail server with')),
+    (_('SMTP Password'), 'smtp.password', [],
+        _('Password to authenticate to mail server with')),
+    (_('Local Hostname'), 'smtp.local_hostname', [],
+        _('Hostname the sender can use to identify itself to the mail server.')))
 
 _diff_info = (
-    ('Git Format', 'diff.git', ['False', 'True'],
-        'Use git extended diff header format.'
-        ' Default: False'),
-    ('No Dates', 'diff.nodates', ['False', 'True'],
-        'Do not include modification dates in diff headers.'
-        ' Default: False'),
-    ('Show Function', 'diff.showfunc', ['False', 'True'],
-        'Show which function each change is in.'
-        ' Default: False'),
-    ('Ignore White Space', 'diff.ignorews', ['False', 'True'],
-        'Ignore white space when comparing lines.'
-        ' Default: False'),
-    ('Ignore WS Amount', 'diff.ignorewsamount', ['False', 'True'],
-        'Ignore changes in the amount of white space.'
-        ' Default: False'),
-    ('Ignore Blank Lines', 'diff.ignoreblanklines',
-        ['False', 'True'],
-        'Ignore changes whose lines are all blank.'
-        ' Default: False'))
+    (_('Git Format'), 'diff.git', ['False', 'True'],
+        _('Use git extended diff header format.'
+        ' Default: False')),
+    (_('No Dates'), 'diff.nodates', ['False', 'True'],
+        _('Do not include modification dates in diff headers.'
+        ' Default: False')),
+    (_('Show Function'), 'diff.showfunc', ['False', 'True'],
+        _('Show which function each change is in.'
+        ' Default: False')),
+    (_('Ignore White Space'), 'diff.ignorews', ['False', 'True'],
+        _('Ignore white space when comparing lines.'
+        ' Default: False')),
+    (_('Ignore WS Amount'), 'diff.ignorewsamount', ['False', 'True'],
+        _('Ignore changes in the amount of white space.'
+        ' Default: False')),
+    (_('Ignore Blank Lines'), 'diff.ignoreblanklines', ['False', 'True'],
+        _('Ignore changes whose lines are all blank.'
+        ' Default: False')))
+
+class PathEditDialog(gtk.Dialog):
+    _protocols = ['ssh', 'http', 'https', 'local']
+
+    def __init__(self, path, alias):
+        gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
+                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        shlib.set_tortoise_keys(self)
+        self.connect('response', self.response)
+        self.set_title(_('Edit remote repository path'))
+        self.newpath, self.newalias = None, None
+
+        self.entries = {}
+        for name in ('URL', 'Port', 'Folder', 'Host', 'User',
+                'Password', 'Alias'):
+            entry = gtk.Entry()
+            label = gtk.Label(name)
+            self.entries[name] = (entry, label)
+
+        self.entries['URL'][0].set_width_chars(50)
+        self.entries['URL'][0].set_editable(False)
+        self.entries['Password'][0].set_visibility(False)
+
+        hbox = gtk.HBox()
+        hbox.pack_start(self.entries['Alias'][1], False, False, 2)
+        hbox.pack_start(self.entries['Alias'][0], False, False, 2)
+        hbox.pack_start(self.entries['URL'][1], False, False, 2)
+        hbox.pack_start(self.entries['URL'][0], True, True, 2)
+        self.vbox.pack_start(hbox, False, False, 2)
+
+        frame = gtk.Frame()
+        self.vbox.pack_start(frame, False, False, 2)
+        vbox = gtk.VBox()
+        vbox.set_border_width(10)
+        frame.add(vbox)
+        frame.set_border_width(10)
+
+        self.protcombo = gtk.combo_box_new_text()
+        for p in self._protocols:
+            self.protcombo.append_text(p)
+        vbox.pack_start(self.protcombo, False, False, 10)
+
+        hbox = gtk.HBox()
+        hbox.pack_start(self.entries['Host'][1], False, False, 2)
+        hbox.pack_start(self.entries['Host'][0], True, True, 2)
+        hbox.pack_start(self.entries['Port'][1], False, False, 2)
+        hbox.pack_start(self.entries['Port'][0], False, False, 2)
+        vbox.pack_start(hbox, False, False, 2)
+
+        for n in ('Folder', 'User', 'Password'):
+            hbox = gtk.HBox()
+            hbox.pack_start(self.entries[n][1], False, False, 2)
+            hbox.pack_start(self.entries[n][0], True, True, 2)
+            vbox.pack_start(hbox, False, False, 2)
+
+        user, host, port, folder, pw, scheme = self.urlparse(path)
+
+        self.entries['URL'][0].set_text(path)
+        self.entries['Alias'][0].set_text(alias)
+        self.entries['User'][0].set_text(user or '')
+        self.entries['Host'][0].set_text(host or '')
+        self.entries['Port'][0].set_text(port or '')
+        self.entries['Folder'][0].set_text(folder or '')
+        self.entries['Password'][0].set_text(pw or '')
+        for n, (e, l) in self.entries.iteritems():
+            e.connect('changed', self.changed)
+
+        self.lastproto = None
+        self.protcombo.connect('changed', self.changed)
+        i = self._protocols.index(scheme)
+        self.protcombo.set_active(i)
+        self.show_all()
+
+    def urlparse(self, path):
+        if path.startswith('ssh://'):
+            m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
+            user = m.group(2)
+            host = m.group(3)
+            port = m.group(5)
+            folder = m.group(7) or "."
+            passwd = ''
+            scheme = 'ssh'
+        elif path.startswith('http'):
+            snpaqf = urlparse.urlparse(path)
+            scheme, netloc, folder, params, query, fragment = snpaqf
+            host, port, user, passwd = url.netlocsplit(netloc)
+            if folder.startswith('/'): folder = folder[1:]
+        else:
+            user, host, port, passwd = [''] * 4
+            folder = path
+            scheme = 'local'
+        return user, host, port, folder, passwd, scheme
+
+    def changed(self, combo):
+        newurl = self.buildurl()
+        self.entries['URL'][0].set_text(url.hidepassword(newurl))
+        proto = self.protcombo.get_active_text()
+        if proto == self.lastproto:
+            return
+        self.lastproto = proto
+        if proto == 'local':
+            for n in ('User', 'Password', 'Port', 'Host'):
+                self.entries[n][0].set_sensitive(False)
+                self.entries[n][1].set_sensitive(False)
+        elif proto == 'ssh':
+            for n in ('User', 'Port', 'Host'):
+                self.entries[n][0].set_sensitive(True)
+                self.entries[n][1].set_sensitive(True)
+            self.entries['Password'][0].set_sensitive(False)
+            self.entries['Password'][1].set_sensitive(False)
+        else:
+            for n in ('User', 'Password', 'Port', 'Host'):
+                self.entries[n][0].set_sensitive(True)
+                self.entries[n][1].set_sensitive(True)
+
+    def response(self, widget, response_id):
+        if response_id != gtk.RESPONSE_CLOSE:
+            self.destroy()
+            return
+        self.newpath = self.buildurl()
+        self.newalias = self.entries['Alias'][0].get_text()
+        self.destroy()
+
+    def buildurl(self):
+        proto = self.protcombo.get_active_text()
+        host = self.entries['Host'][0].get_text()
+        port = self.entries['Port'][0].get_text()
+        folder = self.entries['Folder'][0].get_text()
+        user = self.entries['User'][0].get_text()
+        pwd = self.entries['Password'][0].get_text()
+        if proto == 'ssh':
+            ret = 'ssh://'
+            if user:
+                ret += user + '@'
+            ret += host
+            if port:
+                ret += ':' + port
+            ret += '/' + folder
+        elif proto == 'local':
+            ret = folder
+        else:
+            ret = proto + '://'
+            netloc = url.netlocunsplit(host, port, user, pwd)
+            ret += netloc + '/' + folder
+        return ret
 
 class ConfigDialog(gtk.Dialog):
-    def __init__(self, root='',
-            configrepo=False,
-            focusfield=None,
-            newpath=None):
+    def __init__(self, configrepo=False, focusfield=None, newpath=None):
         """ Initialize the Dialog. """        
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        self.add_button(gtk.STOCK_EDIT, gtk.RESPONSE_YES)
+        shlib.set_tortoise_keys(self)
 
         self.ui = ui.ui()
         try:
-            repo = hg.repository(self.ui, path=root)
+            repo = hg.repository(self.ui, path=rootpath())
         except RepoError:
             repo = None
             if configrepo:
-                error_dialog(self, 'No repository found', 'no repo at ' + root)
+                error_dialog(self, _('No repository found'),
+                             _('no repo at ') + root)
                 self.response(gtk.RESPONSE_CANCEL)
 
         # Catch close events
-        #self.set_default_size(700, 300)
-        self.connect('delete-event', self._delete)
-        self.connect('response', self._response)
+        self.connect('response', self.should_live)
 
         if configrepo:
             self.ui = repo.ui
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.set_title('TortoiseHg Configure Repository - ' + name)
+            self.set_title(_('TortoiseHg Configure Repository - ') + name)
             shlib.set_tortoise_icon(self, 'settings_repo.ico')
             self.root = repo.root
         else:
             self.rcpath = util.user_rcpath()
-            self.set_title('TortoiseHg Configure User-Global Settings')
+            self.set_title(_('TortoiseHg Configure User-Global Settings'))
             shlib.set_tortoise_icon(self, 'settings_user.ico')
             self.root = None
 
@@ -235,12 +377,12 @@ class ConfigDialog(gtk.Dialog):
         # Create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
-        self.vbox.pack_start(notebook, False, False)
+        self.vbox.pack_start(notebook, True, True)
         notebook.show()
         self.show_tabs = True
         self.show_border = True
 
-        self._btn_apply = gtk.Button("Apply")
+        self._btn_apply = gtk.Button(_('Apply'))
         self._btn_apply.connect('clicked', self._apply_clicked)
         self.action_area.pack_end(self._btn_apply)
 
@@ -253,93 +395,69 @@ class ConfigDialog(gtk.Dialog):
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
         self.fill_frame(self.tortoise_frame, _tortoise_info)
 
-        self.commit_frame = self.add_page(notebook, 'Commit')
+        self.commit_frame = self.add_page(notebook, _('Commit'))
         self.fill_frame(self.commit_frame, _commit_info)
 
-        self.log_frame = self.add_page(notebook, 'Changelog')
+        self.log_frame = self.add_page(notebook, _('Changelog'))
         self.fill_frame(self.log_frame, _log_info)
 
-        self.paths_frame = self.add_page(notebook, 'Paths')
+        self.paths_frame = self.add_page(notebook, _('Synch'))
         vbox = self.fill_frame(self.paths_frame, _paths_info)
+        self.fill_path_frame(vbox)
 
-        # Initialize data model for 'Paths' tab
-        self.pathdata = gtk.ListStore(
-                gobject.TYPE_STRING,
-                gobject.TYPE_STRING)
-        if 'paths' in list(self.ini):
-            for name in self.ini['paths']:
-                if name in ('default', 'default-push'): continue
-                path = self.ini['paths'][name]
-                i = self.pathdata.insert_before(None, None)
-                self.pathdata.set_value(i, 0, "%s" % toutf(name))
-                self.pathdata.set_value(i, 1, "%s" % toutf(path))
-
-        # Define view model for 'Paths' tab
-        self.pathtree = gtk.TreeView()
-        self.pathtree.set_model(self.pathdata)
-        self.pathtree.connect("cursor-changed", self._pathtree_changed)
-        
-        renderer = gtk.CellRendererText()
-        renderer.set_property('editable', True)
-        renderer.connect('edited', self.on_alias_edit)
-        column = gtk.TreeViewColumn('Alias', renderer, text=0)
-        self.pathtree.append_column(column)
-        
-        renderer = gtk.CellRendererText()
-        renderer.set_property('editable', True)
-        renderer.connect('edited', self.on_path_edit)
-        column = gtk.TreeViewColumn('Repository Path', renderer, text=1)
-        self.pathtree.append_column(column)
-        
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(self.pathtree)
-        vbox.add(scrolledwindow)
-
-        buttonbox = gtk.HBox()
-        self.addButton = gtk.Button("_Add")
-        self.addButton.set_use_underline(True)
-        self.addButton.connect('clicked', self._add_path)
-        buttonbox.pack_start(self.addButton)
-
-        self._delpathbutton = gtk.Button("_Remove")
-        self._delpathbutton.set_use_underline(True)
-        self._delpathbutton.connect('clicked', self._remove_path)
-        buttonbox.pack_start(self._delpathbutton)
-
-        self._testpathbutton = gtk.Button("_Test")
-        self._testpathbutton.set_use_underline(True)
-        self._testpathbutton.connect('clicked', self._test_path)
-        buttonbox.pack_start(self._testpathbutton)
-
-        vbox.pack_start(buttonbox, False, False, 4)
-        self.refresh_path_list()
-
-        self.web_frame = self.add_page(notebook, 'Web')
+        self.web_frame = self.add_page(notebook, _('Web'))
         self.fill_frame(self.web_frame, _web_info)
 
-        self.proxy_frame = self.add_page(notebook, 'Proxy')
+        self.proxy_frame = self.add_page(notebook, _('Proxy'))
         self.fill_frame(self.proxy_frame, _proxy_info)
 
-        self.email_frame = self.add_page(notebook, 'Email')
+        self.email_frame = self.add_page(notebook, _('Email'))
         self.fill_frame(self.email_frame, _email_info)
 
-        self.diff_frame = self.add_page(notebook, 'Diff')
+        self.diff_frame = self.add_page(notebook, _('Diff'))
         self.fill_frame(self.diff_frame, _diff_info)
+
+        if not configrepo and os.name == 'nt':
+            self.shellframe = self.add_page(notebook, _('Shell Ext'))
+            self.fill_shell_frame(self.shellframe)
+        self.configrepo = configrepo
 
         # Force dialog into clean state in the beginning
         self._refresh_vlist()
         self._btn_apply.set_sensitive(False)
         self.dirty = False
 
-    def _delete(self, widget, event):
-        return True
-
-    def _response(self, widget, response_id):
+    def should_live(self, *args):
         if self.dirty:
-            if question_dialog(self, 'Quit without saving?',
-                'Yes to abandon changes, No to continue') != gtk.RESPONSE_YES:
-                widget.emit_stop_by_name('response')
+            if question_dialog(self, _('Quit without saving?'),
+               _('Yes to abandon changes, No to continue')) != gtk.RESPONSE_YES:
+               self.emit_stop_by_name('response')
+               return True
+        if len(args) == 2 and args[1] == gtk.RESPONSE_YES:
+            def doedit():
+                util.system("%s \"%s\"" % (editor, self.fn))
+            # reload configs, in case they have been written since opened
+            if self.configrepo:
+                repo = hg.repository(ui.ui(), path=rootpath())
+                u = repo.ui
+            else:
+                u = ui.ui()
+            editor = (u.config('tortoisehg', 'editor') or
+                    u.config('gtools', 'editor') or
+                    os.environ.get('HGEDITOR') or
+                    u.config('ui', 'editor') or
+                    os.environ.get('EDITOR', 'vi'))
+            if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+                import gdialog
+                gdialog.Prompt(_('No visual editor configured'),
+                       _('Please configure a visual editor.'), self).run()
+                self.focus_field('tortoisehg.editor')
+                self.emit_stop_by_name('response')
+                return True
+            thread = threading.Thread(target=doedit, name='edit config')
+            thread.setDaemon(True)
+            thread.start()
+        return False
 
     def focus_field(self, focusfield):
         '''Set page and focus to requested datum'''
@@ -350,28 +468,16 @@ class ConfigDialog(gtk.Dialog):
                     widgets[w].grab_focus()
                     return
                     
-    def on_alias_edit(self, cell, path, new_text):
-        dirty = self.pathdata[path][0] != new_text
-        self.pathdata[path][0] = new_text
-        if dirty:
-            self.dirty_event()
-    
-    def on_path_edit(self, cell, path, new_text):
-        dirty = self.pathdata[path][1] != new_text
-        self.pathdata[path][1] = new_text
-        if dirty:
-            self.dirty_event()
-        
     def new_path(self, newpath):
         '''Add a new path to [paths], give default name, focus'''
         i = self.pathdata.insert_before(None, None)
         self.pathdata.set_value(i, 0, 'new')
-        self.pathdata.set_value(i, 1, '%s' % toutf(newpath))
+        self.pathdata.set_value(i, 1, '%s' % toutf(url.hidepassword(newpath)))
+        self.pathdata.set_value(i, 2, '%s' % toutf(newpath))
         self.pathtree.get_selection().select_iter(i)
         self.pathtree.set_cursor(
                 self.pathdata.get_path(i),
-                self.pathtree.get_column(0), 
-                start_editing=True)
+                self.pathtree.get_column(0))
         self.refresh_path_list()
         # This method may be called from hggtk.sync, so ensure page is visible
         self.notebook.set_current_page(3)
@@ -384,6 +490,19 @@ class ConfigDialog(gtk.Dialog):
 
     def _add_path(self, *args):
         self.new_path('http://')
+
+    def _edit_path(self, *args):
+        selection = self.pathtree.get_selection()
+        if not selection.count_selected_rows():
+            return
+        model, path = selection.get_selected()
+        dialog = PathEditDialog(model[path][2], model[path][0])
+        dialog.run()
+        if dialog.newpath:
+            model[path][0] = dialog.newalias
+            model[path][1] = url.hidepassword(dialog.newpath)
+            model[path][2] = dialog.newpath
+            self.dirty_event()
 
     def _remove_path(self, *args):
         selection = self.pathtree.get_selection()
@@ -404,8 +523,8 @@ class ConfigDialog(gtk.Dialog):
         if not selection.count_selected_rows():
             return
         if not self.root:
-            error_dialog(self, 'No Repository Found', 
-                    'Path testing cannot work without a repository')
+            error_dialog(self, _('No Repository Found'),
+                    _('Path testing cannot work without a repository'))
             return
         model, path = selection.get_selected()
         testpath = fromutf(model[path][1])
@@ -413,37 +532,295 @@ class ConfigDialog(gtk.Dialog):
             return
         if testpath[0] == '~':
             testpath = os.path.expanduser(testpath)
-        cmdline = ['hg', 'incoming', '--repository', self.root,
-                   '--verbose', testpath]
+        cmdline = ['hg', 'incoming', '--verbose', testpath]
         from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-        
+
     def _pathtree_changed(self, sel):
         self.refresh_path_list()
 
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
-        path_selected = ( len(self.pathdata) > 0
+        path_selected = (len(self.pathdata) > 0
             and self.pathtree.get_selection().count_selected_rows() > 0)
         repo_available = self.root is not None
+        self._editpathbutton.set_sensitive(path_selected)
         self._delpathbutton.set_sensitive(path_selected)
         self._testpathbutton.set_sensitive(repo_available and path_selected)
+
+    def fill_path_frame(self, frvbox):
+        frame = gtk.Frame(_('Remote repository paths'))
+        frame.set_border_width(10)
+        frvbox.pack_start(frame, True, True, 2)
+        vbox = gtk.VBox()
+        vbox.set_border_width(5)
+        frame.add(vbox)
+
+        # Initialize data model for 'Paths' tab
+        self.pathdata = gtk.ListStore(str, str, str)
+        if 'paths' in list(self.ini):
+            for name in self.ini['paths']:
+                path = self.ini['paths'][name]
+                safepath = toutf(url.hidepassword(path))
+                self.pathdata.append([toutf(name), safepath, toutf(path)])
+
+        # Define view model for 'Paths' tab
+        self.pathtree = gtk.TreeView(self.pathdata)
+        self.pathtree.set_enable_search(False)
+        self.pathtree.connect("cursor-changed", self._pathtree_changed)
+
+        renderer = gtk.CellRendererText()
+        column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
+        self.pathtree.append_column(column)
+        
+        renderer = gtk.CellRendererText()
+        column = gtk.TreeViewColumn(_('Repository Path'), renderer, text=1)
+        self.pathtree.append_column(column)
+        
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add(self.pathtree)
+        vbox.add(scrolledwindow)
+
+        buttonbox = gtk.HBox()
+        self.addButton = gtk.Button(_('_Add'))
+        self.addButton.set_use_underline(True)
+        self.addButton.connect('clicked', self._add_path)
+        buttonbox.pack_start(self.addButton)
+
+        self._editpathbutton = gtk.Button(_('_Edit'))
+        self._editpathbutton.set_use_underline(True)
+        self._editpathbutton.connect('clicked', self._edit_path)
+        buttonbox.pack_start(self._editpathbutton)
+
+        self._delpathbutton = gtk.Button(_('_Remove'))
+        self._delpathbutton.set_use_underline(True)
+        self._delpathbutton.connect('clicked', self._remove_path)
+        buttonbox.pack_start(self._delpathbutton)
+
+        self._testpathbutton = gtk.Button(_('_Test'))
+        self._testpathbutton.set_use_underline(True)
+        self._testpathbutton.connect('clicked', self._test_path)
+        buttonbox.pack_start(self._testpathbutton)
+
+        vbox.pack_start(buttonbox, False, False, 4)
+        self.refresh_path_list()
 
     def set_help(self, widget, event, buffer, tooltip):
         text = ' '.join(tooltip.splitlines())
         buffer.set_text(text)
 
-    def fill_frame(self, frame, info):
-        widgets = []
+    def fill_shell_frame(self, frame):
+        'Fill special tab for shell extension configurations'
+        vbox = gtk.VBox()
+        frame.add(vbox)
 
-        descframe = gtk.Frame('Description')
+        # Text entry for supported applications
+        hbox = gtk.HBox()
+        vbox.pack_start(hbox, False, False, 2)
+        lbl = gtk.Label(_('Supported applications:'))
+        hbox.pack_start(lbl, False, False, 10)
+        self.shellapps = gtk.Entry()
+        hbox.pack_start(self.shellapps, True, True, 10)
+
+        ovframe = gtk.Frame(_('Overlay configuration'))
+        ovframe.set_border_width(10)
+        vbox.pack_start(ovframe, False, False, 2)
+        ovcvbox = gtk.VBox()
+        ovframe.add(ovcvbox)
+        hbox = gtk.HBox()
+        ovcvbox.pack_start(hbox, False, False, 2)
+        self.ovenable = gtk.CheckButton(_('Enable overlays'))
+        hbox.pack_start(self.ovenable, False, False, 2)
+        self.ovenable.connect('toggled', self.ovenable_toggled)
+        self.lclonly = gtk.CheckButton(_('Local disks only'))
+        hbox.pack_start(self.lclonly, False, False, 2)
+        self.ovdebug = gtk.CheckButton(_('Enable debug logging'))
+        hbox.pack_start(self.ovdebug, False, False, 2)
+        table = gtk.Table(2, 2, False)
+        ovcvbox.pack_start(table, False, False, 2)
+
+        # Text entry for overlay include path
+        lbl = gtk.Label(_('Include path:'))
+        lbl.set_alignment(1.0, 0.0)
+        self.ovinclude = gtk.Entry()
+        table.attach(lbl, 0, 1, 0, 1, gtk.FILL, 0, 4, 3)
+        table.attach(self.ovinclude, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+
+        # Text entry for overlay include path
+        lbl = gtk.Label(_('Exclude path:'))
+        lbl.set_alignment(1.0, 0.0)
+        self.ovexclude = gtk.Entry()
+        table.attach(lbl, 0, 1, 1, 2, gtk.FILL, 0, 4, 3)
+        table.attach(self.ovexclude, 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+
+        cmframe = gtk.Frame(_('Context menu configuration'))
+        cmframe.set_border_width(10)
+        vbox.pack_start(cmframe, False, False, 2)
+        cmcvbox = gtk.VBox()
+        cmframe.add(cmcvbox)
+
+        descframe = gtk.Frame(_('Description'))
+        descframe.set_border_width(10)
         desctext = gtk.TextView()
         desctext.set_wrap_mode(gtk.WRAP_WORD)
         desctext.set_editable(False)
         scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add(desctext)
+        descframe.add(scrolledwindow)
+        vbox.pack_start(gtk.Label(), True, True, 2)
+        vbox.pack_start(descframe, False, False, 2)
+
+        self.cmdebug = gtk.CheckButton(_('Enable debug logging'))
+        cmcvbox.pack_start(self.cmdebug, False, False, 2)
+
+        lbl = gtk.Label(_('Promote menu items to the top menu'))
+        cmcvbox.pack_start(lbl, False, False, 2)
+
+        rows = (len(shellcmds) + 2) / 3
+        table = gtk.Table(rows, 3, False)
+        cmcvbox.pack_start(table, False, False, 2)
+        self.cmptoggles = {}
+        for i, cmd in enumerate(shellcmds):
+            row, col = divmod(i, 3)
+            check = gtk.CheckButton(cmd)
+            table.attach(check, col, col+1,
+                         row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+            self.cmptoggles[cmd] = check
+            tooltip = _('Promote menu item "%s" to top menu') % cmd
+            check.connect('toggled', self.dirty_event)
+            check.connect('focus-in-event', self.set_help,
+                    desctext.get_buffer(), tooltip)
+
+        tooltip = _('A comma (,) separated list of applications that'
+                  ' the shell extensions will support.  If unspecified,'
+                  ' it defaults to asterisk (*), supporting all apps')
+        self.shellapps.connect('changed', self.dirty_event)
+        self.shellapps.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('Enable/Disable the overlay icons globally')
+        self.ovenable.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('Only enable overlays on local disks')
+        self.lclonly.connect('toggled', self.dirty_event)
+        self.lclonly.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('Enable the overlay code to emit debug messages'
+                ' that the TortoiseHg tracelog application can receive.')
+        self.ovdebug.connect('toggled', self.dirty_event)
+        self.ovdebug.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('A list of semicolon (;) separated paths that the'
+                ' overlays will respect.  This include filter is applied'
+                ' after the local disk check.  If unspecified, the default'
+                ' is to display in all repositories.')
+        self.ovinclude.connect('changed', self.dirty_event)
+        self.ovinclude.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('A list of semicolon (;) separated paths that are'
+                ' excluded by the overlay system.  This exclude filter is'
+                ' applied after the local disk check and include filters.'
+                ' So there is no need to exclude paths outside of your'
+                ' include filter.  Default is no exclusion.')
+        self.ovexclude.connect('changed', self.dirty_event)
+        self.ovexclude.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        tooltip = _('Enable the context menu code to emit debug messages'
+                ' that the TortoiseHg tracelog application can receive.')
+        self.cmdebug.connect('toggled', self.dirty_event)
+        self.cmdebug.connect('focus-in-event', self.set_help,
+                desctext.get_buffer(), tooltip)
+        self.load_shell_configs()
+
+    def load_shell_configs(self):
+        shellapps = '*'
+        includepath = ''
+        excludepath = ''
+        overlayenable = True
+        overlaydebug = False
+        localdisks = False
+        cmenudebug = False
+        promoteditems = 'commit'
+        try:
+            from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
+            hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+            t = ('1', 'True')
+            try: shellapps = QueryValueEx(hkey, 'ShellApps')[0]
+            except EnvironmentError: pass
+            try: overlayenable = QueryValueEx(hkey, 'EnableOverlays')[0] in t
+            except EnvironmentError: pass
+            try: localdisks = QueryValueEx(hkey, 'LocalDisksOnly')[0] in t
+            except EnvironmentError: pass
+            try: overlaydebug = QueryValueEx(hkey, 'OverlayDebug')[0] in t
+            except EnvironmentError: pass
+            try: includepath = QueryValueEx(hkey, 'IncludePath')[0]
+            except EnvironmentError: pass
+            try: excludepath = QueryValueEx(hkey, 'ExcludePath')[0]
+            except EnvironmentError: pass
+            try: cmenudebug = QueryValueEx(hkey, 'ContextMenuDebug')[0] in t
+            except EnvironmentError: pass
+            try: promoteditems = QueryValueEx(hkey, 'PromotedItems')[0]
+            except EnvironmentError: pass
+        except (ImportError, WindowsError):
+            pass
+
+        self.shellapps.set_text(shellapps)
+        self.ovenable.set_active(overlayenable)
+        self.lclonly.set_active(localdisks)
+        self.ovdebug.set_active(overlaydebug)
+        self.ovinclude.set_text(includepath)
+        self.ovexclude.set_text(excludepath)
+        self.cmdebug.set_active(cmenudebug)
+        promoted = [pi.strip() for pi in promoteditems.split(',')]
+        for cmd, check in self.cmptoggles.iteritems():
+            check.set_active(cmd in promoted)
+
+    def save_shell_configs(self):
+        shellapps = self.shellapps.get_text()
+        overlayenable = self.ovenable.get_active() and '1' or '0'
+        localdisks = self.lclonly.get_active() and '1' or '0'
+        overlaydebug = self.ovdebug.get_active() and '1' or '0'
+        includepath = self.ovinclude.get_text()
+        excludepath = self.ovexclude.get_text()
+        cmenudebug = self.cmdebug.get_active() and '1' or '0'
+        promoted = []
+        for cmd, check in self.cmptoggles.iteritems():
+            if check.get_active():
+                promoted.append(cmd)
+        try:
+            from _winreg import HKEY_CURRENT_USER, CreateKey, SetValueEx, REG_SZ
+            hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+            SetValueEx(hkey, 'ShellApps', 0, REG_SZ, shellapps)
+            SetValueEx(hkey, 'EnableOverlays', 0, REG_SZ, overlayenable)
+            SetValueEx(hkey, 'LocalDisksOnly', 0, REG_SZ, localdisks)
+            SetValueEx(hkey, 'OverlayDebug', 0, REG_SZ, overlaydebug)
+            SetValueEx(hkey, 'IncludePath', 0, REG_SZ, includepath)
+            SetValueEx(hkey, 'ExcludePath', 0, REG_SZ, excludepath)
+            SetValueEx(hkey, 'ContextMenuDebug', 0, REG_SZ, cmenudebug)
+            SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
+        except ImportError:
+            pass
+
+    def ovenable_toggled(self, check):
+        self.lclonly.set_sensitive(check.get_active())
+        self.ovdebug.set_sensitive(check.get_active())
+        self.ovinclude.set_sensitive(check.get_active())
+        self.ovexclude.set_sensitive(check.get_active())
+        self.dirty_event()
+
+    def fill_frame(self, frame, info):
+        widgets = []
+
+        descframe = gtk.Frame(_('Description'))
+        descframe.set_border_width(10)
+        desctext = gtk.TextView()
+        desctext.set_wrap_mode(gtk.WRAP_WORD)
+        desctext.set_editable(False)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(desctext)
         descframe.add(scrolledwindow)
 
@@ -458,8 +835,8 @@ class ConfigDialog(gtk.Dialog):
         for row, (label, cpath, values, tooltip) in enumerate(info):
             vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
-            combo.connect("changed", self.dirty_event)
-            combo.child.connect("focus-in-event", self.set_help,
+            combo.connect('changed', self.dirty_event)
+            combo.child.connect('focus-in-event', self.set_help,
                     desctext.get_buffer(), tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
             combo.child.set_width_chars(40)
@@ -493,8 +870,12 @@ class ConfigDialog(gtk.Dialog):
                 if cpath == 'tortoisehg.vdiff':
                     # Special case, add extdiff.cmd.* to possible values
                     for name, value in self.ui.configitems('extdiff'):
-                        if name.startswith('cmd.') and name[4:] not in values:
-                            values.append(name[4:])
+                        if name.startswith('cmd.'):
+                            if name[4:] not in values:
+                                values.append(name[4:])
+                        elif not name.startswith('opts.'):
+                            if name not in values:
+                                values.append(name)
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     try:
@@ -508,14 +889,15 @@ class ConfigDialog(gtk.Dialog):
                             # Ensure the tool is installed
                             if filemerge._findtool(self.ui, t):
                                 values.append(t)
+                        values.append('internal:merge')
                     except ImportError:
                         pass
 
                 currow = None
-                if not ispw:
+                if not ispw: 
                     vlist.append([_unspecstr, False])
                 if values:
-                    vlist.append(['Suggested', True])
+                    vlist.append([_('Suggested'), True])
                     for v in values:
                         vlist.append([toutf(v), False])
                         if v == curvalue:
@@ -525,7 +907,7 @@ class ConfigDialog(gtk.Dialog):
                     for v in self.history.mrul(cpath):
                         if v in values: continue
                         if not separator:
-                            vlist.append(['History', True])
+                            vlist.append([_('History'), True])
                             separator = True
                         vlist.append([toutf(v), False])
                         if v == curvalue:
@@ -562,8 +944,8 @@ class ConfigDialog(gtk.Dialog):
                 break
         else:
             fn = rcpath[0]
-            f = open(fn, "w")
-            f.write("# Generated by tortoisehg-config\n")
+            f = open(fn, 'w')
+            f.write(_('# Generated by tortoisehg-config\n'))
             f.close()
         self.fn = fn
         return iniparse.INIConfig(file(fn), optionxformvalue=None)
@@ -596,7 +978,7 @@ class ConfigDialog(gtk.Dialog):
             refreshlist = []
             for row in self.pathdata:
                 name = fromutf(row[0])
-                path = fromutf(row[1])
+                path = fromutf(row[2])
                 cpath = '.'.join(['paths', name])
                 self.record_new_value(cpath, path, False)
                 refreshlist.append(name)
@@ -607,8 +989,7 @@ class ConfigDialog(gtk.Dialog):
                     del self.ini['paths'][name]
         elif 'paths' in list(self.ini):
             for name in list(self.ini.paths):
-                if name not in ('default', 'default-push'):
-                    del self.ini['paths'][name]
+                del self.ini['paths'][name]
 
         # Flush changes on all pages
         for vbox, info, widgets in self.pages:
@@ -624,31 +1005,13 @@ class ConfigDialog(gtk.Dialog):
             f.write(str(self.ini))
             f.close()
         except IOError, e:
-            error_dialog(self, 'Unable to write configuration file', str(e))
+            error_dialog(self, _('Unable to write configuration file'), str(e))
 
+        if not self.configrepo and os.name == 'nt':
+            self.save_shell_configs()
         self._btn_apply.set_sensitive(False)
         self.dirty = False
         return 0
 
-def run(root='', cmdline=[], files=[], **opts):
-    dialog = ConfigDialog(root, bool(files))
-    dialog.show_all()
-    dialog.connect('response', gtk.main_quit)
-    if '--focusfield' in cmdline:
-        field = cmdline[cmdline.index('--focusfield')+1]
-        dialog.focus_field(field)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    # example command lines
-    # python hggtk/thgconfig.py --focusfield ui.editor
-    # python hggtk/thgconfig.py --focusfield paths.default --configrepo
-    import sys
-    opts = {}
-    opts['root'] = os.getcwd()
-    opts['cmdline'] = sys.argv
-    opts['files'] = '--configrepo' in sys.argv and ['.'] or []
-    run(**opts)
+def run(ui, *pats, **opts):
+    return ConfigDialog(opts.get('repomode'))
