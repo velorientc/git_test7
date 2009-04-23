@@ -457,6 +457,8 @@ class ConfigDialog(gtk.Dialog):
             thread = threading.Thread(target=doedit, name='edit config')
             thread.setDaemon(True)
             thread.start()
+            self.emit_stop_by_name('response')
+            return True
         return False
 
     def focus_field(self, focusfield):
