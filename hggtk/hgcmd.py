@@ -19,6 +19,9 @@ from shlib import set_tortoise_icon, get_system_times
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, progressbar=True, width=520, height=400):
         title = 'hg ' + ' '.join(cmdline[1:])
+        if len(title) > 80:
+            title = toutf(title[:80] + '...')
+        title = toutf(title.replace('\n', ' '))
         gtk.Dialog.__init__(self,
                             title=title,
                             flags=gtk.DIALOG_MODAL, 
@@ -51,7 +54,7 @@ class CmdDialog(gtk.Dialog):
             hbox = gtk.HBox()
             
             self.status_text = gtk.Label()
-            self.status_text.set_text(toutf(" ".join(cmdline).replace("\n", " ")))
+            self.status_text.set_text(title)
             self.status_text.set_alignment(0, 0.5)
             self.status_text.set_ellipsize(pango.ELLIPSIZE_END)
             hbox.pack_start(self.status_text, True, True, 3)
