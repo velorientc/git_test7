@@ -66,11 +66,11 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
     char path[MAX_PATH] = "";
     strncat(path, mbstr.c_str(), MAX_PATH);
 
-    std::string hgroot;
+    std::string hgroot = GetHgRepoRoot(path);
 
-    if (!HgFindRoot(path, &hgroot))
+    if (hgroot.empty())
     {
-        TDEBUG_TRACE("IsMemberOf: HgFindRoot returns false");
+        TDEBUG_TRACE("IsMemberOf: Not a Hg repo (hgroot is empty)");
         return S_FALSE;
     }
 
