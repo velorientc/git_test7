@@ -18,7 +18,6 @@ from mercurial.node import hex, nullrev
 from mercurial import ui, hg, util, patch
 from gdialog import Prompt, Confirm
 from status import GStatus, FM_STATUS, FM_CHECKED, DM_REJECTED, DM_CHUNK_ID
-from hgcmd import CmdDialog
 from hglib import fromutf
 import shlib
 from shlib import shell_notify
@@ -603,6 +602,7 @@ class GCommit(GStatus):
         if self.qnew:
             cmdline += [fromutf(self._get_qnew_name())]
         cmdline += [self.repo.wjoin(x) for x in files]
+        from hgcmd import CmdDialog
         dialog = CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
         dialog.run()

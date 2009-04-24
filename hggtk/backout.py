@@ -8,8 +8,6 @@
 import os
 import gtk
 import pango
-from dialog import GDialog
-from hgcmd import CmdDialog
 from mercurial.i18n import _
 import histselect
 import shlib
@@ -98,6 +96,7 @@ class BackoutDialog(gtk.Window):
         start, end = buf.get_bounds()
         cmdline = ['hg', 'backout', '--rev', self.reventry.get_text(),
             '--message', buf.get_text(start, end)]
+        from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()

@@ -13,10 +13,9 @@ import StringIO
 from mercurial.node import short, nullrev
 from mercurial import cmdutil, context, util, ui, hg, patch
 from gdialog import GDialog, Confirm
-from hgcmd import CmdDialog
 from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand, LookupError
 from gtklib import StatusBar
-from shlib import shell_notify
+import shlib
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -724,7 +723,8 @@ class ChangeSet(GDialog):
         if dialog.run() == gtk.RESPONSE_NO:
             return
         cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), self.curfile]
+        from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-        shell_notify([self.curfile])
+        shlib.shell_notify([self.curfile])
