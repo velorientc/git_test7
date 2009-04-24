@@ -75,9 +75,6 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 
     TDEBUG_TRACE("IsMemberOf: hgroot = " << hgroot);
 
-    if (PathIsDirectory(path))
-        return S_FALSE;
-
     size_t offset = hgroot.length();
     if (path[offset] == '\\')
         offset++;
@@ -88,10 +85,27 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 
     char status = 0;
 
-    if (!HgQueryDirstateFile(hgroot.c_str(), path, relpath, &status))
+    if (PathIsDirectory(path))
     {
-        TDEBUG_TRACE("IsMemberOf: HgQueryDirstateFile returns false");
-        return S_FALSE;
+        if (!strlen(relpath))
+            return S_FALSE; // don't show icon on repo root dir
+
+        if (strncmp(relpath, ".hg", 3) == 0)
+            return S_FALSE; // don't descend into .hg dir
+
+        if (!HgQueryDirstateDirectory(hgroot.c_str(), path, relpath, &status))
+        {
+            TDEBUG_TRACE("IsMemberOf: HgQueryDirstateDirectory returns false");
+            return S_FALSE;
+        }
+    }
+    else 
+    {
+        if (!HgQueryDirstateFile(hgroot.c_str(), path, relpath, &status))
+        {
+            TDEBUG_TRACE("IsMemberOf: HgQueryDirstateFile returns false");
+            return S_FALSE;
+        }
     }
 
     TDEBUG_TRACE("IsMemberOf: status = " << status);
