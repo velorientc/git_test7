@@ -20,7 +20,7 @@ class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, progressbar=True, width=520, height=400):
         title = 'hg ' + ' '.join(cmdline[1:])
         if len(title) > 80:
-            title = toutf(title[:80] + '...')
+            title = title[:80] + '...'
         title = toutf(title.replace('\n', ' '))
         gtk.Dialog.__init__(self,
                             title=title,
