@@ -26,7 +26,7 @@ try:
 except ImportError:
     from mercurial.repo import RepoError
 
-import debugthg:
+import debugthg
 debugging = debugthg.debug('M')
 if debugging:
     debugf = debugthg.debugf
