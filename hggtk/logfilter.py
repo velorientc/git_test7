@@ -22,6 +22,10 @@ class FilterDialog(gtk.Dialog):
         shlib.set_tortoise_icon(self, 'menucheckout.ico')
         shlib.set_tortoise_keys(self)
 
+        self._btn_apply = gtk.Button(_('Apply'))
+        self._btn_apply.connect('clicked', self._btn_apply_clicked)
+        self.action_area.pack_end(self._btn_apply)
+
         self.set_title("hg log filter - %s" % os.path.basename(root))
 
         self.filterfunc = filterfunc
@@ -33,20 +37,7 @@ class FilterDialog(gtk.Dialog):
 
         self.set_default_size(350, 120)
 
-        # add toolbar with tooltips
-        self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
-
-        tbuttons = [
-                self._toolbutton(
-                    gtk.STOCK_FIND,
-                    _('Apply'), 
-                    self._btn_apply_clicked,
-                    tip=_('Apply filter to revision history')),
-            ]
-        for btn in tbuttons:
-            self.tbar.insert(btn, -1)
-        self.vbox.pack_start(self.tbar, False, False, 2)
         
         # branch: combo box
         hbox = gtk.HBox()
