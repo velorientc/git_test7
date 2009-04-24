@@ -16,12 +16,12 @@ import sys
 import threading
 import time
 import hglib
+import shlib
 from dialog import question_dialog, error_dialog
 from mercurial.i18n import _
 from mercurial import hg, ui, commands, cmdutil, util
 from mercurial.hgweb import server
 from mercurial.i18n import _
-from shlib import set_tortoise_icon
 
 gservice = None
 class ServeDialog(gtk.Window):
@@ -31,6 +31,8 @@ class ServeDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         shlib.set_tortoise_icon(self, 'proxy.ico')
         shlib.set_tortoise_keys(self)
+
+        self.connect('delete-event', self._delete)
 
         # Pipe stderr, stdout to self.write
         self._queue = Queue.Queue()
@@ -133,11 +135,14 @@ class ServeDialog(gtk.Window):
         tbutton.connect('clicked', handler, userdata)
         return tbutton
             
-    def should_live(self, widget, event):
-        if self._server_stopped():
-            return True
+    def _delete(self, widget, event):
+        if not self.should_live():
+            self.destroy()
         else:
-            return False
+            return True
+
+    def should_live(self):
+        return not self._server_stopped()
 
     def _server_stopped(self):
         '''
