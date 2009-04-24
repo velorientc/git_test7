@@ -286,7 +286,7 @@ int HgQueryDirstate(const char* hgroot, const char* abspath, char* relpathloc, c
 
 int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc, char* outStatus)
 {
-    const dirstate* pd;
+    const dirstate* pd = 0;
     struct _stat stat;
 
     if (!HgQueryDirstate(hgroot, abspath, relpathloc, &pd, &stat))
@@ -302,10 +302,12 @@ int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc
 
     for (unsigned ix = 0; ix < pd->num_entries && !modified; ix++)
     {
-        if (0 != strncmp(relpathloc, pd->entries[ix].name, len))
+        const direntry& e = pd->entries[ix];
+
+        if (0 != strncmp(relpathloc, e.name, len))
             continue;
 
-        switch (pd->entries[ix].state)
+        switch (e.state)
         {
         case 'n':
             if (!modified)
@@ -313,9 +315,9 @@ int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc
                 temp[0] = '\0';
                 strncat(temp, hgroot, MAX_PATH);
                 strcat(temp, "/");
-                strncat(temp, pd->entries[ix].name, MAX_PATH);
+                strncat(temp, e.name, MAX_PATH);
                 if (0 == lstat(temp, &stat))
-                    modified = (mapdirstate(&pd->entries[ix], &stat) == 'M');
+                    modified = (mapdirstate(&e, &stat) == 'M');
             }
             break;
         case 'm':
