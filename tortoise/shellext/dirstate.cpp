@@ -298,7 +298,7 @@ int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc
 
     rootlen = strlen(hgroot);
     len = strlen(relpathloc);
-    for (ix = 0; ix < pd->num_entries && !a; ix++)
+    for (ix = 0; ix < pd->num_entries && !m; ix++)
     {
         if (0 != strncmp(relpathloc, pd->entries[ix].name, len))
             continue;
@@ -325,10 +325,10 @@ int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc
         }
     }
 
-    if (a)
-        *outStatus = 'A';
-    else if (m)
+    if (m)
         *outStatus = 'M';
+    else if (a)
+        *outStatus = 'A';
     else
         *outStatus = 'C';
 
