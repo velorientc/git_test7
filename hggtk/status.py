@@ -524,6 +524,10 @@ class GStatus(GDialog):
         repository status.  Also recheck and reselect files that remain
         in the list.
         """
+        selection = self.filetree.get_selection()
+        if selection is None:
+            return
+
         repo = self.repo
         # TODO - SJB - just realloc the repository here
         repo.dirstate.invalidate()
@@ -562,7 +566,7 @@ class GStatus(GDialog):
         explicit_changetypes = changetypes + (('clean', 'C', clean),)
 
         # List of the currently checked and selected files to pass on to the new data
-        model, paths = self.filetree.get_selection().get_selected_rows()
+        model, paths = selection.get_selected_rows()
         recheck = [entry[FM_PATH] for entry in model if entry[FM_CHECKED]]
         reselect = [model[path][FM_PATH] for path in paths]
 
@@ -581,7 +585,6 @@ class GStatus(GDialog):
                 self.filemodel.append([wfile in recheck, char,
                                        toutf(wfile), wfile, mst, False])
 
-        selection = self.filetree.get_selection()
         selected = False
         for row in model:
             if row[FM_PATH] in reselect:
