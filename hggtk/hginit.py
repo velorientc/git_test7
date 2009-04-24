@@ -33,8 +33,7 @@ class InitDialog(gtk.Window):
 
     def _create(self):
         self.set_default_size(350, 150)
-        self.connect('destroy', gtk.main_quit)
-        
+
         # add toolbar with tooltips
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()

@@ -109,8 +109,7 @@ class ServeDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=self._root)
         except hglib.RepoError:
-            print _('no repository found')
-            gtk.main_quit()
+            self.destroy()
         self.defport = repo.ui.config('web', 'port') or '8000'
         self.webname = repo.ui.config('web', 'name') or \
                 os.path.basename(self._root)

@@ -88,14 +88,15 @@ class RecoveryDialog(gtk.Window):
         vbox.pack_start(self.stbar, False, False, 2)
 
     def _delete(self, widget, event):
-        self._do_close()
+        if not self.should_live():
+            self.destroy()
         return True
 
-    def _do_close(self):
+    def should_live(self):
         if self._cmd_running():
             error_dialog(self, _('Cannot close now'), _('command is running'))
-        else:
-            gtk.main_quit()
+            return True
+        return False
         
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):

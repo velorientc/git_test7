@@ -34,13 +34,13 @@ def run(ui, *pats, **opts):
 
 def rename_resp(dialog, response):
     if response != gtk.RESPONSE_OK:
-        gtk.main_quit()
+        dialog.destroy()
         return
     try:
         root = rootpath()
         repo = hg.repository(ui.ui(), root)
     except (ImportError, RepoError):
-        gtk.main_quit()
+        dialog.destroy()
         return
 
     new_name = fromutf(dialog.entry.get_text())
@@ -69,4 +69,4 @@ def rename_resp(dialog, response):
         if len(textout) > 1:
             error_dialog(None, _('rename error'), textout)
         elif toquit:
-            gtk.main_quit()
+            dialog.destroy()

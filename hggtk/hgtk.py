@@ -47,6 +47,7 @@ def dispatch(args):
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = error
+        # TODO: keep track of whether gtk.main() is running
         print error
         run(u, **opts)
 

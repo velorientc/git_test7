@@ -361,23 +361,18 @@ class SynchDialog(gtk.Window):
             self._pathtext.set_text(dialog.get_filename())
         dialog.destroy()
         
-    def _close_clicked(self, toolbutton, data=None):
-        self._do_close()
-
-    def _do_close(self):
+    def should_live(self):
         if self._cmd_running():
             error_dialog(self, _('Cannot close now'), _('command is running'))
+            return True
         else:
-            self._save_settings()
-            gtk.main_quit()
+            self.update_settings()
+            self._settings.write()
+            return False
         
-    def _save_settings(self):
-        self.update_settings()
-        self._settings.write()
-
     def _delete(self, widget, event):
-        self._do_close()
-        return True
+        if not self.should_live():
+            self.destroy()
    
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):

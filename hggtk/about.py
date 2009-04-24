@@ -78,10 +78,10 @@ class AboutDialog(gtk.AboutDialog):
         self.set_comments("with " + lib_versions + "\n\n" + comment)
         self.set_logo(gtk.gdk.pixbuf_new_from_file(thg_logo))
         self.set_icon_from_file(thg_icon)
+        self.connect('response', self.response)
 
-        # somehow clicking on the Close button doesn't automatically
-        # close the About dialog...
-        self.connect('response', gtk.main_quit)
+    def response(self, widget, respid):
+        self.destroy()
 
 def run(_ui, *pats, **opts):
     return AboutDialog()

@@ -161,7 +161,7 @@ class HgIgnoreDialog(gtk.Window):
 
     def refresh(self):
         try: repo = hg.repository(ui.ui(), path=self.root)
-        except: gtk.main_quit()
+        except: self.destroy()
         matcher = match.always(repo.root, repo.root)
         changes = repo.dirstate.status(matcher, ignored=False, clean=False,
                                        unknown=True)

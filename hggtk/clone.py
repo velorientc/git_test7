@@ -44,7 +44,6 @@ class CloneDialog(gtk.Window):
 
     def _create(self):
         self.set_default_size(520, 180)
-        self.connect('destroy', gtk.main_quit)
         ewidth = 16
         
         # add toolbar with tooltips
