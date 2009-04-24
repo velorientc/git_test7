@@ -123,7 +123,7 @@ class DataMineDialog(GDialog):
     def _cmenu_display(self, menuitem):
         from changeset import ChangeSet
         statopts = {'rev' : [self.currev] }
-        dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts, False)
+        dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
         dialog.display()
 
     def _cmenu_annotate(self, menuitem):
@@ -131,7 +131,7 @@ class DataMineDialog(GDialog):
 
     def _cmenu_file_log(self, menuitem):
         from history import GLog
-        dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root], {}, False)
+        dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root], {})
         dialog.open_with_file(self.curpath)
         dialog.display()
 
@@ -702,4 +702,4 @@ def run(ui, *pats, **opts):
         'only_merges':None, 'prune':[], 'git':False, 'verbose':False,
         'include':[], 'exclude':[]
     }
-    return DataMineDialog(ui, None, None, pats, cmdoptions, True)
+    return DataMineDialog(ui, None, None, pats, cmdoptions)

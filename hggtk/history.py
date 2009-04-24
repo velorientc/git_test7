@@ -83,7 +83,7 @@ class GLog(GDialog):
 
     def _datamine_clicked(self, toolbutton, data=None):
         from datamine import DataMineDialog
-        dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {}, False)
+        dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dialog.display()
 
     def _filter_clicked(self, toolbutton, data=None):
@@ -256,7 +256,7 @@ class GLog(GDialog):
 
         # Allocate ChangeSet instance to use internally
         self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
-                self.opts, False, self.stbar)
+                self.opts, self.stbar)
         self.changeview.display(False)
         self.changeview.glog_parent = self
 
@@ -513,7 +513,7 @@ class GLog(GDialog):
         statopts['added'] = True
         statopts['removed'] = True
         dialog = GStatus(self.ui, self.repo, self.cwd, self.pats,
-                         statopts, False)
+                         statopts)
         dialog.display()
         return True
 
@@ -580,7 +580,7 @@ class GLog(GDialog):
     def _show_status(self, menuitem):
         rev = self.currow[treemodel.REVID]
         statopts = {'rev' : [str(rev)] }
-        dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts, False)
+        dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
         dialog.display()
 
     def _copy_hash(self, menuitem):
@@ -750,4 +750,4 @@ def run(ui, *pats, **opts):
     canonpats = []
     for f in pats:
         canonpats.append(util.canonpath(root, os.getcwd(), f))
-    return GLog(ui, None, None, canonpats, cmdoptions, True)
+    return GLog(ui, None, None, canonpats, cmdoptions)

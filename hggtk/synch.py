@@ -296,7 +296,7 @@ class SynchDialog(gtk.Window):
         from history import GLog
         countpulled = len(self.repo.changelog) - self.origchangecount
         opts = {'limit' : countpulled }
-        dialog = GLog(self.ui, None, None, [], opts, False)
+        dialog = GLog(self.ui, None, None, [], opts)
         dialog.display()
 
     def _update_to_tip(self, button):

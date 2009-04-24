@@ -20,8 +20,8 @@ import shlib
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
     """
-    def __init__(self, ui, repo, cwd, pats, opts, main, stbar=None):
-        GDialog.__init__(self, ui, repo, cwd, pats, opts, main)
+    def __init__(self, ui, repo, cwd, pats, opts, stbar=None):
+        GDialog.__init__(self, ui, repo, cwd, pats, opts)
         self.stbar = stbar
         self.glog_parent = None
 
@@ -695,7 +695,7 @@ class ChangeSet(GDialog):
         '''User selected annotate file from the file list context menu'''
         from datamine import DataMineDialog
         rev = self.currev
-        dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {}, False)
+        dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dialog.display()
         dialog.add_annotate_page(self.curfile, str(rev))
 
@@ -711,7 +711,7 @@ class ChangeSet(GDialog):
             # Else launch our own GLog instance
             import history
             dialog = history.GLog(self.ui, self.repo, self.cwd,
-                                  [self.repo.root], {}, False)
+                                  [self.repo.root], {})
             dialog.open_with_file(self.curfile)
             dialog.display()
 

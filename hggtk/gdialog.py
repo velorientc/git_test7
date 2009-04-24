@@ -88,7 +88,7 @@ class GDialog(gtk.Window):
     # "Constants"
     settings_version = 1
 
-    def __init__(self, ui, repo, cwd, pats, opts, main):
+    def __init__(self, ui, repo, cwd, pats, opts):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.cwd = cwd or os.getcwd()
         self.ui = ui
@@ -96,7 +96,6 @@ class GDialog(gtk.Window):
         self.repo = repo or hg.repository(ui, path=hglib.rootpath())
         self.pats = pats
         self.opts = opts
-        self.main = main
         self.tmproot = None
         self.toolbuttons = {}
         self.settings = shlib.Settings(self.__class__.__name__)
@@ -142,10 +141,7 @@ class GDialog(gtk.Window):
 
 
     def should_live(self, widget=None, event=None):
-        if self.main:
-            self._destroying(widget)
-        else:
-            self.destroy()
+        self._destroying(widget)
         return False
 
 
@@ -287,18 +283,14 @@ class GDialog(gtk.Window):
             vbox.pack_end(extras, False, False, 0)
 
         self.connect('destroy', self._destroying)
-        self.connect('delete_event', self.should_live)
+        #self.connect('delete_event', self.should_live)
 
 
     def _destroying(self, gtkobj):
-        try:
-            settings = self.save_settings()
-            self.settings.set_value('settings_version', GDialog.settings_version)
-            self.settings.set_value('dialogs', settings)
-            self.settings.write()
-        finally:
-            if self.main:
-                gtk.main_quit()
+        settings = self.save_settings()
+        self.settings.set_value('settings_version', GDialog.settings_version)
+        self.settings.set_value('dialogs', settings)
+        self.settings.write()
 
 
     def _load_settings(self):

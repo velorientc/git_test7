@@ -1060,7 +1060,7 @@ class GStatus(GDialog):
     def _log_file(self, stat, wfile):
         from history import GLog
         # Might want to include 'rev' here... trying without
-        dialog = GLog(self.ui, self.repo, self.cwd, [wfile], self.opts, False)
+        dialog = GLog(self.ui, self.repo, self.cwd, [wfile], self.opts)
         dialog.display()
         return True
 
@@ -1330,4 +1330,4 @@ def run(ui, *pats, **opts):
         'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
         'check':True
     }
-    return GStatus(ui, None, None, pats, cmdoptions, True)
+    return GStatus(ui, None, None, pats, cmdoptions)

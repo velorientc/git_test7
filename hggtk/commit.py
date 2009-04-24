@@ -655,4 +655,4 @@ def run(_ui, *pats, **opts):
         'exclude':[], 'include':[],
         'check': True, 'git':False, 'addremove':False,
     }
-    return GCommit(_ui, None, None, pats, cmdoptions, True)
+    return GCommit(_ui, None, None, pats, cmdoptions)

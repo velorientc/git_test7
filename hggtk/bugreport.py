@@ -54,4 +54,4 @@ class BugReport(GDialog):
         return vbox
 
 def run(_ui, *pats, **opts):
-    return BugReport(_ui, None, None, None, opts, True)
+    return BugReport(_ui, None, None, None, opts)

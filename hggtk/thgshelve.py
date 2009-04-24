@@ -216,4 +216,4 @@ def run(_ui, *pats, **opts):
         'exclude':[], 'include':[],
         'check': True, 'git':False, 'addremove':False,
     }
-    return GShelve(_ui, None, None, pats, cmdoptions, True)
+    return GShelve(_ui, None, None, pats, cmdoptions)
