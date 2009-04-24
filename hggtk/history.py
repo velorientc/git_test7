@@ -746,4 +746,8 @@ def run(ui, *pats, **opts):
         'date':None, 'only_merges':None, 'prune':[], 'git':False,
         'verbose':False, 'include':[], 'exclude':[]
     }
-    return GLog(ui, None, None, pats, cmdoptions, True)
+    root = hglib.rootpath()
+    canonpats = []
+    for f in pats:
+        canonpats.append(util.canonpath(root, os.getcwd(), f))
+    return GLog(ui, None, None, canonpats, cmdoptions, True)
