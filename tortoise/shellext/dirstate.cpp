@@ -107,7 +107,7 @@ class dirstatecache
     {
         const dirstate* dstate;
         __time64_t      mtime;
-        std::string     path;
+        std::string     hgroot;
 
         entry(): dstate(0), mtime(0) {}
     };
@@ -179,14 +179,14 @@ const dirstate* dirstatecache::get(const char* hgroot)
 
     for (;iter != _cache.end(); ++iter)
     {
-        if (path == iter->path)
+        if (hgroot == iter->hgroot)
             break;
     }
 
     if (iter == _cache.end())
     {     
         entry e;
-        e.path = path;
+        e.hgroot = hgroot;
         iter = _cache.insert(iter, e);
     }
 
