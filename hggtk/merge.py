@@ -10,7 +10,7 @@ from dialog import error_dialog, question_dialog
 from mercurial.node import short, nullrev
 from mercurial.i18n import _
 from mercurial import util, hg, ui
-from hgcmd import CmdDialog
+import hgcmd
 import shlib
 import histselect
 import hglib
@@ -201,7 +201,7 @@ class MergeDialog(gtk.Window):
 
         cmdline = ['hg', 'update', '-R', self.root, '--rev', rev,
                    '--clean', '--verbose']
-        dlg = CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
         if self.notify_func:
@@ -227,7 +227,7 @@ class MergeDialog(gtk.Window):
         if force:
             cmdline.append("--force")
 
-        dlg = CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
         shlib.shell_notify([self.root])
