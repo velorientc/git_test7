@@ -202,15 +202,15 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 }
 
 
-char mapdirstate(const direntry* entry, const struct _stat* stat)
+char mapdirstate(const direntry& e, const struct _stat& stat)
 {
-    switch (entry->state)
+    switch (e.state)
     {
     case 'n':
-        if (entry->mtime == (unsigned)stat->st_mtime
-            && entry->size == (unsigned)stat->st_size
+        if (e.mtime == (unsigned)stat.st_mtime
+            && e.size == (unsigned)stat.st_size
 #ifndef WIN32
-            && entry->mode == stat->st_mode
+            && e.mode == stat.st_mode
 #endif
             )
             return 'C';
@@ -289,7 +289,7 @@ int HgQueryDirstateDirectory(
                 temp += "/";
                 temp += e.name;
                 if (0 == lstat(temp.c_str(), &stat))
-                    modified = (mapdirstate(&e, &stat) == 'M');
+                    modified = (mapdirstate(e, stat) == 'M');
             }
             break;
         case 'm':
@@ -337,7 +337,7 @@ int HgQueryDirstateFile(
         if (0 == strncmp(relpathloc, pd->entries[ix].name.c_str(), MAX_PATH))
         {
             TDEBUG_TRACE("HgQueryDirstateFile: found relpathloc");
-            outStatus = mapdirstate(&pd->entries[ix], &stat);
+            outStatus = mapdirstate(pd->entries[ix], stat);
             TDEBUG_TRACE("HgQueryDirstateFile: outStatus = " << outStatus);
             return outStatus != '?';
         }
