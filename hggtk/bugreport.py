@@ -7,6 +7,7 @@
 import gtk
 import pango
 from mercurial.i18n import _
+from mercurial import extensions
 from hglib import toutf, fromutf, rootpath, diffexpand
 from gdialog import GDialog
 from dialog import entry_dialog
@@ -49,6 +50,8 @@ class BugReport(GDialog):
         text += _('Mercurial version (%s).  TortoiseHg version (%s)\n') % (
                 hgversion, shlib.version())
         text += _('Command: %s\n') % (self.opts['cmd'])
+        extlist = [x[0] for x in extensions.extensions()]
+        text += _('** Extensions loaded: %s\n') % ', '.join(extlist)
         text += self.opts['error']
         textview.get_buffer().set_text(text)
         return vbox
