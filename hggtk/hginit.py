@@ -21,7 +21,7 @@ class InitDialog(gtk.Window):
         shlib.set_tortoise_keys(self)
         
         # set dialog title and icon
-        self.cwd = cwd and cwd or os.getcwd()
+        self.cwd = os.getcwd()
         title = 'hg init - %s' % toutf(self.cwd)
         self.set_title(title)
 
