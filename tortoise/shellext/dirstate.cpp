@@ -276,6 +276,7 @@ int HgQueryDirstateDirectory(
 
     bool added = false;
     bool modified = false;
+    bool empty = true;
 
     size_t rootlen = strlen(hgroot);
     size_t len = strlen(relpathloc);
@@ -286,6 +287,8 @@ int HgQueryDirstateDirectory(
 
         if (0 != strncmp(relpathloc, e.name.c_str(), len))
             continue;
+        
+        empty = false;
 
         switch (e.state)
         {
@@ -312,6 +315,8 @@ int HgQueryDirstateDirectory(
         *outStatus = 'M';
     else if (added)
         *outStatus = 'A';
+    else if (empty)
+        *outStatus = '?';
     else
         *outStatus = 'C';
 
