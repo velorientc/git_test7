@@ -146,15 +146,28 @@ class GDialog(gtk.Window):
 
 
     def save_settings(self):
+        settings = {}
         rect = self.get_allocation()
-        return {'gdialog': (rect.width, rect.height)}
-
-
-    def load_settings(self, settings):
-        if settings:
-            self._setting_defsize = settings['gdialog']
+        if self.ismaximized:
+            settings['gdialog-rect'] = self._setting_defsize
+            settings['gdialog-pos'] = self._setting_winpos
         else:
-            self._setting_defsize = (678, 585)
+            settings['gdialog-rect'] = (rect.width, rect.height)
+            settings['gdialog-pos'] = self.lastpos
+        settings['gdialog-ismax'] = self.ismaximized
+        return settings
+
+
+    def load_settings(self, settings={}):
+        self._setting_defsize = (678, 585)
+        self._setting_winpos = (0, 0)
+        self._setting_wasmax = False
+        if 'gdialog-rect' in settings:
+            self._setting_defsize = settings['gdialog-rect']
+        if 'gdialog-pos' in settings:
+            self._setting_winpos = settings['gdialog-pos']
+        if 'gdialog-ismax' in settings:
+            self._setting_wasmax = settings['gdialog-ismax']
 
     ### End of overridable methods ###
 
@@ -249,11 +262,25 @@ class GDialog(gtk.Window):
     def get_toolbutton(self, label):
         return self.toolbuttons[label]
 
+    def windowstate(self, window, event):
+        if event.changed_mask & gtk.gdk.WINDOW_STATE_MAXIMIZED:
+            if event.new_window_state & gtk.gdk.WINDOW_STATE_MAXIMIZED:
+                self.ismaximized = True
+            else:
+                self.ismaximized = False
+
+    def setfocus(self, window, event):
+        self.lastpos = self.get_position()
 
     def _setup_gtk(self):
         self.set_title(self.get_title())
         shlib.set_tortoise_icon(self, self.get_icon())
         shlib.set_tortoise_keys(self)
+
+        self.ismaximized = False
+        self.lastpos = self._setting_winpos
+        self.connect('window-state-event', self.windowstate)
+        self.connect('set-focus', self.setfocus)
         
         # Minimum size
         minx, miny = self.get_minsize()
@@ -261,7 +288,10 @@ class GDialog(gtk.Window):
         # Initial size
         defx, defy = self.get_defsize()
         self.set_default_size(defx, defy)
-        
+        if self._setting_wasmax:
+            self.maximize()
+        self.move(self._setting_winpos[0], self._setting_winpos[1])
+
         vbox = gtk.VBox(False, 0)
         self.add(vbox)
         
