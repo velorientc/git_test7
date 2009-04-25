@@ -48,13 +48,19 @@ except ImportError:
 sys.stderr = cStringIO.StringIO()
 ret = hggtk.hgtk.dispatch(sys.argv[1:])
 sys.stderr.seek(0)
-for l in sys.stderr.readlines():
-    if l.startswith('Traceback') or l.startswith('TypeError'):
-        from hggtk.bugreport import run
-        from mercurial import ui
-        from hggtk.hgtk import gtkrun
-        sys.stderr.seek(0)
-        error = 'Recoverable runtime error (stderr):\n' + sys.stderr.read()
-        gtkrun(run(ui.ui(), **{'cmd':' '.join(sys.argv[1:]), 'error':error}))
-        break
+if 'THGDEBUG' in os.environ:
+    print sys.stderr.read()
+else:
+    for l in sys.stderr.readlines():
+        if l.startswith('Traceback') or l.startswith('TypeError'):
+            from hggtk.bugreport import run
+            from hggtk.hgtk import gtkrun
+            from mercurial import ui
+            sys.stderr.seek(0)
+            error = 'Recoverable runtime error (stderr):\n' + sys.stderr.read()
+            opts = {}
+            opts['cmd'] = ' '.join(sys.argv[1:])
+            opts['error'] = error
+            gtkrun(run(ui.ui(), **opts))
+            break
 sys.exit(ret)
