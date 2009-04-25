@@ -16,6 +16,8 @@
 
 #include "stdafx.h"
 
+#include "dirstate.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
