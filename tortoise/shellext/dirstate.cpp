@@ -269,7 +269,7 @@ int HgQueryDirstate(
 
 
 int HgQueryDirstateDirectory(
-    const char* hgroot, char* abspath, char* relpathloc, char& outStatus)
+    const char* hgroot, const char* abspath, char* relpathloc, char& outStatus)
 {
     const dirstate* pd = 0;
     struct _stat stat;
