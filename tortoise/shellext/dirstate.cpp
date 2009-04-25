@@ -202,21 +202,6 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 }
 
 
-static char *revhash_string(const char revhash[HASH_LENGTH])
-{
-    unsigned ix;
-    static char rev_string[HASH_LENGTH * 2 + 1];
-    static char *hexval = "0123456789abcdef";
-    for (ix = 0; ix < HASH_LENGTH; ++ix)
-    {
-        rev_string[ix * 2] = hexval[(revhash[ix] >> 4) & 0xf];
-        rev_string[ix * 2 + 1] = hexval[revhash[ix] & 0xf];
-    }
-    rev_string[sizeof(rev_string)] = 0;
-    return rev_string;
-}
-
-
 char mapdirstate(const direntry* entry, const struct _stat* stat)
 {
     switch (entry->state)
@@ -359,6 +344,21 @@ int HgQueryDirstateFile(
     }
 
     return 0;
+}
+
+
+static char *revhash_string(const char revhash[HASH_LENGTH])
+{
+    unsigned ix;
+    static char rev_string[HASH_LENGTH * 2 + 1];
+    static char *hexval = "0123456789abcdef";
+    for (ix = 0; ix < HASH_LENGTH; ++ix)
+    {
+        rev_string[ix * 2] = hexval[(revhash[ix] >> 4) & 0xf];
+        rev_string[ix * 2 + 1] = hexval[revhash[ix] & 0xf];
+    }
+    rev_string[sizeof(rev_string)] = 0;
+    return rev_string;
 }
 
 
