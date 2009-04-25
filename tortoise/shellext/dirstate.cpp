@@ -97,11 +97,16 @@ struct dirstatecache
     std::string     path;
 
     dirstatecache(): dstate(0), next(0), mtime(0) {}
+    static const dirstate* get(const char* hgroot);
 
 private:
+    static dirstatecache* _cache;
+
     dirstatecache(const dirstatecache&);             // not implemented
     dirstatecache& operator=(const dirstatecache&);  // not implemented
 };
+
+dirstatecache* dirstatecache::_cache = 0;
 
 
 static uint32_t ntohl(uint32_t x)
@@ -154,8 +159,7 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
 }
 
 
-dirstatecache* _cache = 0;
-const dirstate* dirstate_get(const char* hgroot)
+const dirstate* dirstatecache::get(const char* hgroot)
 {
     std::string path = hgroot;
     path += "/.hg/dirstate";
@@ -244,10 +248,10 @@ int HgQueryDirstate(
         return 0;
     }
 
-    ppd = dirstate_get(hgroot);
+    ppd = dirstatecache::get(hgroot);
     if (!ppd)
     {
-        TDEBUG_TRACE("HgQueryDirstate: dirstate_get returns NULL");
+        TDEBUG_TRACE("HgQueryDirstate: dirstatecache::get returns NULL");
         return 0;
     }
 
