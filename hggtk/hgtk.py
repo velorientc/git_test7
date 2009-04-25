@@ -13,7 +13,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 from mercurial.i18n import _
 import mercurial.ui as _ui
-from mercurial import hg, util, fancyopts, cmdutil
+from mercurial import hg, util, fancyopts, cmdutil, extensions
 import hglib
 import gtk
 import gobject
@@ -150,6 +150,16 @@ def runcommand(ui, args):
         lui = ui
     if options['repository']:
         path = lui.expandpath(options['repository'])
+
+    _loaded = {}
+    extensions.loadall(ui)
+    for name, module in extensions.extensions():
+        if name in _loaded:
+            continue
+        extsetup = getattr(module, 'extsetup', None)
+        if extsetup:
+            extsetup()
+        _loaded[name] = 1
 
     if cmd not in nonrepo_commands.split():
         try:
