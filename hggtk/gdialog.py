@@ -227,7 +227,8 @@ class GDialog(gtk.Window):
 
     def global_opts(self):
         globalopts = {}
-        hgglobals = [opt[1].replace('-', '_') for opt in commands.globalopts if opt[1] != 'help']
+        hgglobals = [opt[1] for opt in commands.globalopts if opt[1] != 'help']
+        hgglobals = [f.replace('-', '_') for f in hgglobals]
         for key in self.opts:
             if key in  hgglobals :
                 globalopts[key] = self.opts[key]
