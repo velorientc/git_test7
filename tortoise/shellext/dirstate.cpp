@@ -269,7 +269,7 @@ int HgQueryDirstate(
 
 
 int HgQueryDirstateDirectory(
-    const char* hgroot, char* abspath, char* relpathloc, char* outStatus)
+    const char* hgroot, char* abspath, char* relpathloc, char& outStatus)
 {
     const dirstate* pd = 0;
     struct _stat stat;
@@ -315,20 +315,20 @@ int HgQueryDirstateDirectory(
     }
 
     if (modified)
-        *outStatus = 'M';
+        outStatus = 'M';
     else if (added)
-        *outStatus = 'A';
+        outStatus = 'A';
     else if (empty)
-        *outStatus = '?';
+        outStatus = '?';
     else
-        *outStatus = 'C';
+        outStatus = 'C';
 
     return 1;
 }
 
 
 int HgQueryDirstateFile(
-    const char* hgroot, const char* abspath, char* relpathloc, char* outStatus)
+    const char* hgroot, const char* abspath, char* relpathloc, char& outStatus)
 {
     const dirstate* pd = 0;
     struct _stat stat;
@@ -350,9 +350,9 @@ int HgQueryDirstateFile(
         if (0 == strncmp(relpathloc, pd->entries[ix].name.c_str(), MAX_PATH))
         {
             TDEBUG_TRACE("HgQueryDirstateFile: found relpathloc");
-            *outStatus = mapdirstate(&pd->entries[ix], &stat);
-            TDEBUG_TRACE("HgQueryDirstateFile: *outStatus = " << *outStatus);
-            return *outStatus != '?';
+            outStatus = mapdirstate(&pd->entries[ix], &stat);
+            TDEBUG_TRACE("HgQueryDirstateFile: outStatus = " << outStatus);
+            return outStatus != '?';
         }
     }
 

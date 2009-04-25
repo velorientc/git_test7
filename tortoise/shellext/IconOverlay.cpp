@@ -93,7 +93,7 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
         if (strncmp(relpath, ".hg", 3) == 0)
             return S_FALSE; // don't descend into .hg dir
 
-        if (!HgQueryDirstateDirectory(hgroot.c_str(), path, relpath, &status))
+        if (!HgQueryDirstateDirectory(hgroot.c_str(), path, relpath, status))
         {
             TDEBUG_TRACE("IsMemberOf: HgQueryDirstateDirectory returns false");
             return S_FALSE;
@@ -101,7 +101,7 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
     }
     else 
     {
-        if (!HgQueryDirstateFile(hgroot.c_str(), path, relpath, &status))
+        if (!HgQueryDirstateFile(hgroot.c_str(), path, relpath, status))
         {
             TDEBUG_TRACE("IsMemberOf: HgQueryDirstateFile returns false");
             return S_FALSE;
