@@ -86,6 +86,15 @@ struct dirstate
 
     static std::auto_ptr<dirstate> read(const char *path);
     void add(const direntry& e) { entries.push_back(e); }
+
+private:
+    static uint32_t ntohl(uint32_t x)
+    {
+        return ((x & 0x000000ffUL) << 24) |
+               ((x & 0x0000ff00UL) <<  8) |
+               ((x & 0x00ff0000UL) >>  8) |
+               ((x & 0xff000000UL) >> 24);
+    }
 };
 
 
@@ -109,15 +118,6 @@ private:
 };
 
 dirstatecache* dirstatecache::_cache = 0;
-
-
-static uint32_t ntohl(uint32_t x)
-{
-    return ((x & 0x000000ffUL) << 24) |
-           ((x & 0x0000ff00UL) <<  8) |
-           ((x & 0x00ff0000UL) >>  8) |
-           ((x & 0xff000000UL) >> 24);
-}
 
 
 std::auto_ptr<dirstate> dirstate::read(const char *path)
