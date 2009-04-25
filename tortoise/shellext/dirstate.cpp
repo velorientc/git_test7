@@ -133,8 +133,6 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
 
     fread(&pd->parent1, sizeof(char), HASH_LENGTH, f);
     fread(&pd->parent2, sizeof(char), HASH_LENGTH, f);
-    
-    char temp[MAX_PATH] = "";
 
     while (fread(&e.state, sizeof(e.state), 1, f) == 1)
     {
@@ -148,9 +146,9 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
         e.mtime = ntohl(e.mtime);
         e.length = ntohl(e.length);
 
-        fread(temp, sizeof(char), e.length, f);
-        temp[e.length] = 0;
-        e.name = temp;
+        std::vector<char> t(e.length+1, 0);
+        fread(&t[0], sizeof(char), e.length, f);
+        e.name = &t[0];
 
         pd->add(e);
     }
