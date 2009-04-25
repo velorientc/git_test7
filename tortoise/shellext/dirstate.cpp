@@ -23,6 +23,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <vector>
+
 
 #ifdef WIN32
 
@@ -64,55 +66,42 @@ int lstat(const char* file, struct _stat* pstat)
 #define HASH_LENGTH 20
 
 
-typedef struct _direntry
+struct direntry
 {
     unsigned char state;
     unsigned mode;
     unsigned size;
     unsigned mtime;
     unsigned length;
-    char *name;
-    char *origname;
-} direntry;
+    std::string name;
+};
 
 
-typedef struct _dirstate
+struct dirstate
 {
     char parent1[HASH_LENGTH];
     char parent2[HASH_LENGTH];
 
-    unsigned num_entries;
-    direntry *entries;
-    unsigned __entries_length;
-} dirstate;
+    std::vector<direntry> entries;
+
+    static std::auto_ptr<dirstate> read(const char *path);
+    void add(const direntry& e) { entries.push_back(e); }
+};
 
 
-typedef struct _dirstatecache
+struct dirstatecache
 {
     const dirstate* dstate;
-    struct _dirstatecache* next;
-    __time64_t mtime;
-    char path[MAX_PATH];
-} dirstatecache;
+    dirstatecache*  next;
+    __time64_t      mtime;
+    std::string     path;
 
+    dirstatecache(): dstate(0), next(0), mtime(0) {}
 
-void *xalloc(size_t n, size_t size)
-{
-    void *p = calloc(n, size);
-    if (!p) exit(1);
-    return p;
-}
-
-
-void dirstate_add_entry(dirstate *pd, const direntry *pe)
-{
-    if (pd->num_entries == pd->__entries_length)
-    {
-        pd->__entries_length = pd->__entries_length ? 2 * pd->__entries_length : 1;
-        pd->entries = (direntry*) realloc(pd->entries, pd->__entries_length * sizeof(direntry));
-    }
-    pd->entries[pd->num_entries++] = *pe;
-}
+private:
+    dirstatecache(const dirstatecache&);             // not implemented
+    dirstatecache& operator=(const dirstatecache&);  // not implemented
+};
 
 
 static uint32_t ntohl(uint32_t x)
@@ -124,22 +113,24 @@ static uint32_t ntohl(uint32_t x)
 }
 
 
-dirstate *dirstate_new(const char *path)
+std::auto_ptr<dirstate> dirstate::read(const char *path)
 {
     direntry e;
     FILE *f = NULL;
-    dirstate *pd = NULL;
 
     f = fopen(path, "rb");
-    if (f == NULL) return NULL;
-    pd = (dirstate*)xalloc(1, sizeof(dirstate));
+    if (f == NULL)
+        return std::auto_ptr<dirstate>(0);
+
+    std::auto_ptr<dirstate> pd(new dirstate());
+
     fread(&pd->parent1, sizeof(char), HASH_LENGTH, f);
     fread(&pd->parent2, sizeof(char), HASH_LENGTH, f);
+    
+    char temp[MAX_PATH] = "";
 
     while (fread(&e.state, sizeof(e.state), 1, f) == 1)
     {
-        e.name = e.origname = 0;
-
         fread(&e.mode, sizeof(e.mode), 1, f);
         fread(&e.size, sizeof(e.size), 1, f);
         fread(&e.mtime, sizeof(e.mtime), 1, f);
@@ -150,10 +141,11 @@ dirstate *dirstate_new(const char *path)
         e.mtime = ntohl(e.mtime);
         e.length = ntohl(e.length);
 
-        e.name = (char*) malloc(e.length * sizeof(char) + 1);
-        fread(e.name, sizeof(char), e.length, f);
-        e.name[e.length] = 0;
-        dirstate_add_entry(pd, &e);
+        fread(temp, sizeof(char), e.length, f);
+        temp[e.length] = 0;
+        e.name = temp;
+
+        pd->add(e);
     }
 
     fclose(f);
@@ -162,22 +154,11 @@ dirstate *dirstate_new(const char *path)
 }
 
 
-void dirstate_free(const dirstate *pd)
-{
-    unsigned ix;
-    for (ix = 0; ix < pd->num_entries; ++ix)
-        free(pd->entries[ix].name);
-    free(pd->entries);
-    free((void*)pd);
-}
-
-
 dirstatecache* _cache = NULL;
 const dirstate* dirstate_get(const char* hgroot)
 {
     char path[MAX_PATH+1] = "";
     struct _stat stat;
-    dirstatecache* head;
 
     strncat(path, hgroot, MAX_PATH);
     strncat(path, "/.hg/dirstate", MAX_PATH);
@@ -185,29 +166,28 @@ const dirstate* dirstate_get(const char* hgroot)
     if (0 != lstat(path, &stat))
         return NULL;
 
-    head = _cache;
+    dirstatecache* head = _cache;
     while (head)
     {
-        if (strncmp(path, head->path, MAX_PATH) == 0)
+        if (strncmp(path, head->path.c_str(), MAX_PATH) == 0)
             break;
         head = head->next;
     }
 
     if (!head)
     {
-        head = (dirstatecache*)xalloc(1, sizeof(dirstatecache));
+        head = new dirstatecache();
         head->next = _cache;
         _cache = head;
-        head->path[0] = '\0';
-        strncat(head->path, path, MAX_PATH);
+        head->path = path;
     }
 
     if (head->mtime < stat.st_mtime)
     {
         head->mtime = stat.st_mtime;
         if (head->dstate)
-            dirstate_free(head->dstate);
-        head->dstate = dirstate_new(path);
+            delete head->dstate;
+        head->dstate = dirstate::read(path).release();
     }
 
     return head->dstate;
@@ -255,41 +235,40 @@ char mapdirstate(const direntry* entry, const struct _stat* stat)
 }
 
 
-int HgQueryDirstate(const char* hgroot, const char* abspath, char* relpathloc, const dirstate** ppd, 	struct _stat* pstat)
+int HgQueryDirstate(
+    const char* hgroot, const char* abspath, char* relpathloc, 
+    const dirstate*& ppd, struct _stat& pstat)
 {
-    char* temp;
-
-    if (0 != lstat(abspath, pstat))
+    if (0 != lstat(abspath, &pstat))
     {
         TDEBUG_TRACE("HgQueryDirstate: lstat returns non-null");
         return 0;
     }
 
-    *ppd = dirstate_get(hgroot);
-    if (!*ppd)
+    ppd = dirstate_get(hgroot);
+    if (!ppd)
     {
         TDEBUG_TRACE("HgQueryDirstate: dirstate_get returns NULL");
         return 0;
     }
 
-    temp = relpathloc;
-    while (*temp)
+    for (char* t = relpathloc; *t; ++t)
     {
-        if (*temp == '\\')
-            *temp = '/';
-        temp++;
+        if (*t == '\\')
+            *t = '/';
     }
 
     return 1;
 }
 
 
-int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc, char* outStatus)
+int HgQueryDirstateDirectory(
+    const char* hgroot, char* abspath, char* relpathloc, char* outStatus)
 {
     const dirstate* pd = 0;
     struct _stat stat;
 
-    if (!HgQueryDirstate(hgroot, abspath, relpathloc, &pd, &stat))
+    if (!HgQueryDirstate(hgroot, abspath, relpathloc, pd, stat))
         return 0;
 
     bool added = false;
@@ -298,13 +277,11 @@ int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc
     size_t rootlen = strlen(hgroot);
     size_t len = strlen(relpathloc);
 
-    char temp[2*MAX_PATH+10] = "";
-
-    for (unsigned ix = 0; ix < pd->num_entries && !modified; ix++)
+    for (unsigned ix = 0; ix < pd->entries.size() && !modified; ix++)
     {
         const direntry& e = pd->entries[ix];
 
-        if (0 != strncmp(relpathloc, e.name, len))
+        if (0 != strncmp(relpathloc, e.name.c_str(), len))
             continue;
 
         switch (e.state)
@@ -312,11 +289,10 @@ int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc
         case 'n':
             if (!modified)
             {
-                temp[0] = '\0';
-                strncat(temp, hgroot, MAX_PATH);
-                strcat(temp, "/");
-                strncat(temp, e.name, MAX_PATH);
-                if (0 == lstat(temp, &stat))
+                std::string temp = hgroot;
+                temp += "/";
+                temp += e.name;
+                if (0 == lstat(temp.c_str(), &stat))
                     modified = (mapdirstate(&e, &stat) == 'M');
             }
             break;
@@ -340,16 +316,16 @@ int HgQueryDirstateDirectory(const char* hgroot, char* abspath, char* relpathloc
 }
 
 
-int HgQueryDirstateFile(const char* hgroot, const char* abspath, char* relpathloc, char* outStatus)
+int HgQueryDirstateFile(
+    const char* hgroot, const char* abspath, char* relpathloc, char* outStatus)
 {
-    const dirstate* pd;
+    const dirstate* pd = 0;
     struct _stat stat;
-    unsigned ix;
 
     TDEBUG_TRACE("HgQueryDirstateFile: search for " << abspath);
     TDEBUG_TRACE("HgQueryDirstateFile: hgroot = " << hgroot);
 
-    if (!HgQueryDirstate(hgroot, abspath, relpathloc, &pd, &stat))
+    if (!HgQueryDirstate(hgroot, abspath, relpathloc, pd, stat))
     {
         TDEBUG_TRACE("HgQueryDirstateFile: HgQueryDirstate returns false");
         return 0;
@@ -358,9 +334,9 @@ int HgQueryDirstateFile(const char* hgroot, const char* abspath, char* relpathlo
     TDEBUG_TRACE("HgQueryDirstateFile: pd->num_entries = " << pd->num_entries);
     TDEBUG_TRACE("HgQueryDirstateFile: relpathloc = " << relpathloc);
 
-    for (ix = 0; ix < pd->num_entries; ix++)
+    for (unsigned ix = 0; ix < pd->entries.size(); ix++)
     {
-        if (0 == strncmp(relpathloc, pd->entries[ix].name, MAX_PATH))
+        if (0 == strncmp(relpathloc, pd->entries[ix].name.c_str(), MAX_PATH))
         {
             TDEBUG_TRACE("HgQueryDirstateFile: found relpathloc");
             *outStatus = mapdirstate(&pd->entries[ix], &stat);
@@ -371,26 +347,3 @@ int HgQueryDirstateFile(const char* hgroot, const char* abspath, char* relpathlo
 
     return 0;
 }
-
-
-#if 0
-int main(int argc, char *argv[])
-{
-    dirstate *pd = dirstate_new(".hg/dirstate");
-    time_t t;
-    char *s;
-    unsigned ix;
-    printf("parent1: %s\n", revhash_string(pd->parent1));
-    printf("parent2: %s\n", revhash_string(pd->parent2));
-    printf("entries: %d\n\n", pd->num_entries);
-    for (ix = 0; ix < pd->num_entries; ++ix)
-    {
-        t = pd->entries[ix].mtime;
-        s = ctime(&t);
-        s[strlen(s) - 1] = '\0';
-        printf("%s %s\n", s, pd->entries[ix].name);
-    }
-    dirstate_free(pd);
-    return 0;
-}
-#endif
