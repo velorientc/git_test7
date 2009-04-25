@@ -117,7 +117,7 @@ class dirstatecache
     static std::list<entry> _cache;
 
 public:
-    static const dirstate* get(const char* hgroot);
+    static const dirstate* get(const std::string& hgroot);
 };
 
 std::list<dirstatecache::entry> dirstatecache::_cache;
@@ -165,7 +165,7 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
 }
 
 
-const dirstate* dirstatecache::get(const char* hgroot)
+const dirstate* dirstatecache::get(const std::string& hgroot)
 {
     std::string path = hgroot;
     path += "/.hg/dirstate";
