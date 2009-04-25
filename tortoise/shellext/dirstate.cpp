@@ -116,10 +116,10 @@ static uint32_t ntohl(uint32_t x)
 std::auto_ptr<dirstate> dirstate::read(const char *path)
 {
     direntry e;
-    FILE *f = NULL;
+    FILE *f = 0;
 
     f = fopen(path, "rb");
-    if (f == NULL)
+    if (!f)
         return std::auto_ptr<dirstate>(0);
 
     std::auto_ptr<dirstate> pd(new dirstate());
@@ -154,7 +154,7 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
 }
 
 
-dirstatecache* _cache = NULL;
+dirstatecache* _cache = 0;
 const dirstate* dirstate_get(const char* hgroot)
 {
     std::string path = hgroot;
@@ -163,7 +163,7 @@ const dirstate* dirstate_get(const char* hgroot)
     struct _stat stat;
 
     if (0 != lstat(path.c_str(), &stat))
-        return NULL;
+        return 0;
 
     dirstatecache* head = _cache;
     while (head)
