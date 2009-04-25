@@ -122,8 +122,7 @@ class GtkUi(ui.ui):
             self.outputq = outputq
             self.dialogq = dialogq
             self.responseq = responseq
-        self.setconfig('ui', 'interactive', 'True')
-        self.interactive = True
+        self.setconfig('ui', 'interactive', 'on')
 
     def write(self, *args):
         if self.buffers:
@@ -293,8 +292,14 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     # read --config before doing anything else
     # (e.g. to change trust settings for reading .hg/hgrc)
     config = _earlygetopt(['--config'], args)
-    if config:
-        ui.updateopts(config=_parseconfig(config))
+    if hasattr(ui, 'verbosity_constraints'):
+        # Mercurial 1.2
+        if config:
+            for section, name, value in _parseconfig(config):
+                self.setconfig(section, name, value)
+    else:
+        # Mercurial 1.3
+        _parseconfig(ui, config)
 
     # check for cwd
     cwd = _earlygetopt(['--cwd'], args)
@@ -346,8 +351,14 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         _encoding = options["encoding"]
     if options["encodingmode"]:
         _encodingmode = options["encodingmode"]
-    ui.updateopts(options["verbose"], options["debug"], options["quiet"],
-                 not options["noninteractive"], options["traceback"])
+    if options['verbose'] or options['debug'] or options['quiet']:
+        ui.setconfig('ui', 'verbose', str(bool(options['verbose'])))
+        ui.setconfig('ui', 'debug', str(bool(options['debug'])))
+        ui.setconfig('ui', 'quiet', str(bool(options['quiet'])))
+    if options['traceback']:
+        ui.setconfig('ui', 'traceback', 'on')
+    if options['noninteractive']:
+        ui.setconfig('ui', 'interactive', 'off')
 
     if options['help']:
         return commands.help_(ui, cmd, options['version'])
@@ -403,7 +414,7 @@ def hgcmd_toq(path, q, *args):
     class Qui(ui.ui):
         def __init__(self):
             ui.ui.__init__(self)
-            self.interactive = False
+            self.setconfig('ui', 'interactive', 'off')
 
         def write(self, *args):
             if self.buffers:

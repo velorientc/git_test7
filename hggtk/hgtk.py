@@ -35,7 +35,9 @@ for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept'):
 def dispatch(args):
     "run the command specified in args"
     try:
-        u = _ui.ui(traceback='--traceback' in args)
+        u = _ui.ui()
+        if '--traceback' in args:
+            u.setconfig('ui', 'traceback', 'on')
         if '--debugger' in args:
             pdb.set_trace()
         return _runcatch(u, args)
@@ -132,7 +134,7 @@ def _runcatch(ui, args):
 def runcommand(ui, args):
     fullargs = args
     cmd, func, args, options, cmdoptions = _parse(ui, args)
-    ui.updateopts(options["verbose"])
+    ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
 
     if options['help']:
         return help_(ui, cmd)
