@@ -177,7 +177,7 @@ const dirstate* dirstatecache::get(const char* hgroot)
 
     for (;iter != _cache.end(); ++iter)
     {
-        if (strncmp(path.c_str(), iter->path.c_str(), MAX_PATH) == 0)
+        if (path == iter->path)
             break;
     }
 
