@@ -89,7 +89,7 @@ struct dirstate
 };
 
 
-struct dirstatecache
+class dirstatecache
 {
     const dirstate* dstate;
     dirstatecache*  next;
@@ -97,6 +97,8 @@ struct dirstatecache
     std::string     path;
 
     dirstatecache(): dstate(0), next(0), mtime(0) {}
+    
+public:
     static const dirstate* get(const char* hgroot);
 
 private:
