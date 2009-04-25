@@ -331,7 +331,7 @@ int HgQueryDirstateFile(
         return 0;
     }
 
-    TDEBUG_TRACE("HgQueryDirstateFile: pd->num_entries = " << pd->num_entries);
+    TDEBUG_TRACE("HgQueryDirstateFile: pd->entries.size() = " << pd->entries.size());
     TDEBUG_TRACE("HgQueryDirstateFile: relpathloc = " << relpathloc);
 
     for (unsigned ix = 0; ix < pd->entries.size(); ix++)
