@@ -13,6 +13,7 @@ from mercurial.node import short, nullrev
 from mercurial.i18n import _
 from hglib import rootpath, toutf, RepoError
 import shlib
+import hgcmd
 
 class UpdateDialog(gtk.Window):
     """ Dialog to update Mercurial repo """
@@ -171,8 +172,7 @@ class UpdateDialog(gtk.Window):
         if overwrite: 
             cmdline.append('--clean')
 
-        from hgcmd import CmdDialog
-        dlg = CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
         if self.notify_func:
