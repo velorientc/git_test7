@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 
 #include <vector>
+#include <list>
 
 
 #ifdef WIN32
@@ -100,24 +101,24 @@ private:
 
 class dirstatecache
 {
-    const dirstate* dstate;
-    dirstatecache*  next;
-    __time64_t      mtime;
-    std::string     path;
+    struct entry
+    {
+        const dirstate* dstate;
+        __time64_t      mtime;
+        std::string     path;
 
-    dirstatecache(): dstate(0), next(0), mtime(0) {}
-    
+        entry(): dstate(0), mtime(0) {}
+    };
+
+    typedef std::list<entry>::iterator Iter;
+
+    static std::list<entry> _cache;
+
 public:
     static const dirstate* get(const char* hgroot);
-
-private:
-    static dirstatecache* _cache;
-
-    dirstatecache(const dirstatecache&);             // not implemented
-    dirstatecache& operator=(const dirstatecache&);  // not implemented
 };
 
-dirstatecache* dirstatecache::_cache = 0;
+std::list<dirstatecache::entry> dirstatecache::_cache;
 
 
 std::auto_ptr<dirstate> dirstate::read(const char *path)
@@ -171,32 +172,31 @@ const dirstate* dirstatecache::get(const char* hgroot)
 
     if (0 != lstat(path.c_str(), &stat))
         return 0;
+    
+    Iter iter = _cache.begin();
 
-    dirstatecache* head = _cache;
-    while (head)
+    for (;iter != _cache.end(); ++iter)
     {
-        if (strncmp(path.c_str(), head->path.c_str(), MAX_PATH) == 0)
+        if (strncmp(path.c_str(), iter->path.c_str(), MAX_PATH) == 0)
             break;
-        head = head->next;
     }
 
-    if (!head)
+    if (iter == _cache.end())
+    {     
+        entry e;
+        e.path = path;
+        iter = _cache.insert(iter, e);
+    }
+
+    if (iter->mtime < stat.st_mtime)
     {
-        head = new dirstatecache();
-        head->next = _cache;
-        _cache = head;
-        head->path = path;
+        iter->mtime = stat.st_mtime;
+        if (iter->dstate)
+            delete iter->dstate;
+        iter->dstate = dirstate::read(path.c_str()).release();
     }
 
-    if (head->mtime < stat.st_mtime)
-    {
-        head->mtime = stat.st_mtime;
-        if (head->dstate)
-            delete head->dstate;
-        head->dstate = dirstate::read(path.c_str()).release();
-    }
-
-    return head->dstate;
+    return iter->dstate;
 }
 
 
