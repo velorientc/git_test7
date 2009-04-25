@@ -347,3 +347,25 @@ int HgQueryDirstateFile(
 
     return 0;
 }
+
+
+#if 0
+int main(int argc, char *argv[])
+{
+    std::auto_ptr<dirstate> pd = dirstate::read(".hg/dirstate");
+    time_t t;
+    char *s;
+    unsigned ix;
+    printf("parent1: %s\n", revhash_string(pd->parent1));
+    printf("parent2: %s\n", revhash_string(pd->parent2));
+    printf("entries: %d\n\n", pd->entries.size());
+    for (ix = 0; ix < pd->entries.size(); ++ix)
+    {
+        t = pd->entries[ix].mtime;
+        s = ctime(&t);
+        s[strlen(s) - 1] = '\0';
+        printf("%s %s\n", s, pd->entries[ix].name.c_str());
+    }
+    return 0;
+}
+#endif
