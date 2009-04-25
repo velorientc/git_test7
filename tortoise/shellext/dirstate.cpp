@@ -157,19 +157,18 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
 dirstatecache* _cache = NULL;
 const dirstate* dirstate_get(const char* hgroot)
 {
-    char path[MAX_PATH+1] = "";
+    std::string path = hgroot;
+    path += "/.hg/dirstate";
+
     struct _stat stat;
 
-    strncat(path, hgroot, MAX_PATH);
-    strncat(path, "/.hg/dirstate", MAX_PATH);
-
-    if (0 != lstat(path, &stat))
+    if (0 != lstat(path.c_str(), &stat))
         return NULL;
 
     dirstatecache* head = _cache;
     while (head)
     {
-        if (strncmp(path, head->path.c_str(), MAX_PATH) == 0)
+        if (strncmp(path.c_str(), head->path.c_str(), MAX_PATH) == 0)
             break;
         head = head->next;
     }
@@ -187,7 +186,7 @@ const dirstate* dirstate_get(const char* hgroot)
         head->mtime = stat.st_mtime;
         if (head->dstate)
             delete head->dstate;
-        head->dstate = dirstate::read(path).release();
+        head->dstate = dirstate::read(path.c_str()).release();
     }
 
     return head->dstate;
