@@ -80,17 +80,16 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
         offset++;
     const char* relpathptr = path + offset;
 
-    char relpath[MAX_PATH] = "";
-    strncat(relpath, relpathptr, MAX_PATH);
+    std::string relpath = relpathptr;
 
     char status = 0;
 
     if (PathIsDirectory(path))
     {
-        if (!strlen(relpath))
+        if (relpath.size() == 0)
             return S_FALSE; // don't show icon on repo root dir
 
-        if (strncmp(relpath, ".hg", 3) == 0)
+        if (relpath.compare(0, 3, ".hg") == 0)
             return S_FALSE; // don't descend into .hg dir
 
         if (!HgQueryDirstateDirectory(hgroot.c_str(), path, relpath, status))

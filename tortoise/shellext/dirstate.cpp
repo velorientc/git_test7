@@ -229,7 +229,7 @@ char mapdirstate(const direntry& e, const struct _stat& stat)
 
 
 int HgQueryDirstate(
-    const char* hgroot, const char* abspath, char* relpathloc, 
+    const char* hgroot, const char* abspath, std::string& relpath, 
     const dirstate*& ppd, struct _stat& rstat)
 {
     if (0 != lstat(abspath, rstat))
@@ -245,10 +245,10 @@ int HgQueryDirstate(
         return 0;
     }
 
-    for (char* t = relpathloc; *t; ++t)
+    for (size_t i = 0; i < relpath.size(); ++i)
     {
-        if (*t == '\\')
-            *t = '/';
+        if (relpath[i] == '\\')
+            relpath[i] = '/';
     }
 
     return 1;
@@ -256,12 +256,13 @@ int HgQueryDirstate(
 
 
 int HgQueryDirstateDirectory(
-    const char* hgroot, const char* abspath, char* relpathloc, char& outStatus)
+    const char* hgroot, const char* abspath,
+    std::string& relpath, char& outStatus)
 {
     const dirstate* pd = 0;
     struct _stat stat;
 
-    if (!HgQueryDirstate(hgroot, abspath, relpathloc, pd, stat))
+    if (!HgQueryDirstate(hgroot, abspath, relpath, pd, stat))
         return 0;
 
     bool added = false;
@@ -269,13 +270,13 @@ int HgQueryDirstateDirectory(
     bool empty = true;
 
     size_t rootlen = strlen(hgroot);
-    size_t len = strlen(relpathloc);
+    size_t len = relpath.size();
 
     for (unsigned ix = 0; ix < pd->entries.size() && !modified; ix++)
     {
         const direntry& e = pd->entries[ix];
 
-        if (0 != strncmp(relpathloc, e.name.c_str(), len))
+        if (e.name.compare(0, len, relpath) != 0)
             continue;
         
         empty = false;
@@ -315,7 +316,8 @@ int HgQueryDirstateDirectory(
 
 
 int HgQueryDirstateFile(
-    const char* hgroot, const char* abspath, char* relpathloc, char& outStatus)
+    const char* hgroot, const char* abspath,
+    std::string& relpath, char& outStatus)
 {
     const dirstate* pd = 0;
     struct _stat stat;
@@ -323,20 +325,20 @@ int HgQueryDirstateFile(
     TDEBUG_TRACE("HgQueryDirstateFile: search for " << abspath);
     TDEBUG_TRACE("HgQueryDirstateFile: hgroot = " << hgroot);
 
-    if (!HgQueryDirstate(hgroot, abspath, relpathloc, pd, stat))
+    if (!HgQueryDirstate(hgroot, abspath, relpath, pd, stat))
     {
         TDEBUG_TRACE("HgQueryDirstateFile: HgQueryDirstate returns false");
         return 0;
     }
 
     TDEBUG_TRACE("HgQueryDirstateFile: pd->entries.size() = " << pd->entries.size());
-    TDEBUG_TRACE("HgQueryDirstateFile: relpathloc = " << relpathloc);
+    TDEBUG_TRACE("HgQueryDirstateFile: relpath = " << relpath);
 
     for (unsigned ix = 0; ix < pd->entries.size(); ix++)
     {
-        if (0 == strncmp(relpathloc, pd->entries[ix].name.c_str(), MAX_PATH))
+        if (relpath == pd->entries[ix].name)
         {
-            TDEBUG_TRACE("HgQueryDirstateFile: found relpathloc");
+            TDEBUG_TRACE("HgQueryDirstateFile: found relpath");
             outStatus = mapdirstate(pd->entries[ix], stat);
             TDEBUG_TRACE("HgQueryDirstateFile: outStatus = " << outStatus);
             return outStatus != '?';
