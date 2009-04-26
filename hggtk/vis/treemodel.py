@@ -130,7 +130,6 @@ class TreeModel(gtk.GenericTreeModel):
             for branch in inbranches:
                 branchstr += branch['name']
 
-
             if '<' in ctx.user():
                 author = toutf(self.author_re.sub('', ctx.user()).strip(' '))
             else:
@@ -141,7 +140,10 @@ class TreeModel(gtk.GenericTreeModel):
             wc_parent = revid in self.parents
             head = revid in self.heads
             color = self.color_func(parents, revid, author)
-            sumstr = bstr + tstr + summary
+            if wc_parent:
+                sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
+            else:
+                sumstr = bstr + tstr + summary
             
             revision = (None, node, revid, None, sumstr,
                     author, date, None, parents, wc_parent, head, taglist,

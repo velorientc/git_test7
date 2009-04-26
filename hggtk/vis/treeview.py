@@ -387,7 +387,6 @@ class TreeView(gtk.ScrolledWindow):
         self.msg_column.pack_end(cell, expand=True)
         self.msg_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
-        self.msg_column.add_attribute(cell, "underline", treemodel.WCPARENT)
         self.treeview.append_column(self.msg_column)
 
         cell = gtk.CellRendererText()
