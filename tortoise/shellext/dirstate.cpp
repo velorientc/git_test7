@@ -86,6 +86,8 @@ struct dirstate
     char parent2[HASH_LENGTH];
 
     std::vector<direntry> entries;
+    
+    typedef std::vector<direntry>::const_iterator Iter;
 
     static std::auto_ptr<dirstate> read(const char *path);
     void add(const direntry& e) { entries.push_back(e); }
@@ -272,9 +274,10 @@ int HgQueryDirstateDirectory(
     size_t rootlen = strlen(hgroot);
     size_t len = relpath.size();
 
-    for (unsigned ix = 0; ix < pd->entries.size() && !modified; ix++)
+    for (dirstate::Iter iter = pd->entries.begin(); 
+         iter != pd->entries.end() && !modified; ++iter)
     {
-        const direntry& e = pd->entries[ix];
+        const direntry& e = *iter;
 
         if (e.name.compare(0, len, relpath) != 0)
             continue;
@@ -334,12 +337,15 @@ int HgQueryDirstateFile(
     TDEBUG_TRACE("HgQueryDirstateFile: pd->entries.size() = " << pd->entries.size());
     TDEBUG_TRACE("HgQueryDirstateFile: relpath = " << relpath);
 
-    for (unsigned ix = 0; ix < pd->entries.size(); ix++)
+    for (dirstate::Iter iter = pd->entries.begin(); 
+         iter != pd->entries.end(); ++iter)
     {
-        if (relpath == pd->entries[ix].name)
+        const direntry& e = *iter;
+
+        if (relpath == e.name)
         {
             TDEBUG_TRACE("HgQueryDirstateFile: found relpath");
-            outStatus = mapdirstate(pd->entries[ix], stat);
+            outStatus = mapdirstate(e, stat);
             TDEBUG_TRACE("HgQueryDirstateFile: outStatus = " << outStatus);
             return outStatus != '?';
         }
