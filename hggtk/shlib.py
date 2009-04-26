@@ -14,6 +14,7 @@ import os
 import gtk
 import shelve
 import time
+import hgtk
 from mercurial.i18n import _
 
 class SimpleMRUList(object):
@@ -154,8 +155,7 @@ def set_tortoise_keys(window):
 
 def thgexit(window):
     if thgclose(window):
-        from hgtk import thgexit
-        thgexit(window)
+        hgtk.thgexit(window)
 
 def thgclose(window):
     if hasattr(window, 'should_live'):
