@@ -54,6 +54,23 @@ class HgIgnoreDialog(gtk.Window):
         regexp_button.connect('clicked', self.add_regexp, regexp_entry)
         regexp_entry.connect('activate', self.add_regexp, regexp_entry)
         mainvbox.pack_start(hbox, False, False)
+        mainvbox.set_border_width(2)
+
+        try: repo = hg.repository(ui.ui(), path=self.root)
+        except: self.destroy()
+        ignorefiles = [repo.wjoin('.hgignore')]
+        for name, value in repo.ui.configitems('ui'):
+            if name == 'ignore' or name.startswith('ignore.'):
+                ignorefiles.append(os.path.expanduser(value))
+
+        if len(ignorefiles) > 1:
+            combo = gtk.combo_box_new_text()
+            for f in ignorefiles:
+                combo.append_text(f)
+            combo.set_active(0)
+            combo.connect('changed', self.fileselect)
+            mainvbox.pack_start(combo, False, False, 4)
+        self.ignorefile = ignorefiles[0]
 
         hbox = gtk.HBox()
         frame = gtk.Frame(_('Filters'))
@@ -79,6 +96,7 @@ class HgIgnoreDialog(gtk.Window):
         remove.set_sensitive(False)
         bhbox.pack_start(remove, False, False, 2)
         vbox.pack_start(bhbox, False, False, 2)
+        vbox.set_border_width(2)
         frame.add(vbox)
 
         frame = gtk.Frame(_('Unknown Files'))
@@ -103,6 +121,7 @@ class HgIgnoreDialog(gtk.Window):
         self.connect('thg-refresh', self.thgrefresh)
         bhbox.pack_start(refresh, False, False, 2)
         vbox.pack_start(bhbox, False, False, 2)
+        vbox.set_border_width(2)
         frame.add(vbox)
 
         mainvbox.pack_start(hbox, True, True)
@@ -112,6 +131,11 @@ class HgIgnoreDialog(gtk.Window):
         pattree.get_selection().connect('changed', self.pattree_rowchanged, remove)
         unknowntree.get_selection().connect('changed', self.unknown_rowchanged)
         gobject.idle_add(self.refresh)
+
+    def fileselect(self, combo):
+        'select another ignore file'
+        self.ignorefile = combo.get_active_text()
+        self.refresh()
 
     def unknown_search(self, model, column, key, iter):
         'case insensitive filename search'
@@ -171,7 +195,7 @@ class HgIgnoreDialog(gtk.Window):
         for u in unknown:
             self.unkmodel.append([hglib.toutf(u), u])
         try:
-            l = open(repo.wjoin('.hgignore'), 'rb').readlines()
+            l = open(self.ignorefile, 'rb').readlines()
             self.doseoln = l[0].endswith('\r\n')
         except (IOError, ValueError, IndexError):
             self.doseoln = os.name == 'nt'
@@ -191,12 +215,12 @@ class HgIgnoreDialog(gtk.Window):
         else:
             out = [line + '\n' for line in self.ignorelines]
         try:
-            f = open(self.repo.wjoin('.hgignore'), 'wb')
+            f = open(self.ignorefile, 'wb')
             f.writelines(out)
             f.close()
         except IOError:
             pass
-        shlib.shell_notify([self.repo.wjoin('.hgignore')])
+        shlib.shell_notify([self.ignorefile])
         if self.notify_func: self.notify_func()
         
 def run(_ui, *pats, **opts):
