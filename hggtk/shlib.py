@@ -133,8 +133,6 @@ def set_tortoise_icon(window, thgicon):
 
 def set_tortoise_keys(window):
     'Set default TortoiseHg keyboard accelerators'
-    from hgtk import thgexit
-
     accelgroup = gtk.AccelGroup()
     window.add_accel_group(accelgroup)
     key, modifier = gtk.accelerator_parse('<Control>w')
@@ -154,10 +152,17 @@ def set_tortoise_keys(window):
     window.connect('thg-close', thgclose)
     window.connect('thg-exit', thgexit)
 
+def thgexit(window):
+    if thgclose(window):
+        from hgtk import thgexit
+        thgexit(window)
+
 def thgclose(window):
     if hasattr(window, 'should_live'):
-        if window.should_live(): return
+        if window.should_live():
+            return False
     window.destroy()
+    return True
 
 def get_tortoise_icon(thgicon):
     '''Find a tortoise icon, apply to PyGtk window'''
