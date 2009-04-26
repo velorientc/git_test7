@@ -231,7 +231,7 @@ char mapdirstate(const direntry& e, const struct _stat& stat)
 
 
 int HgQueryDirstate(
-    const char* hgroot, const char* abspath, std::string& relpath, 
+    const std::string& hgroot, const char* abspath, std::string& relpath, 
     const dirstate*& ppd, struct _stat& rstat)
 {
     if (0 != lstat(abspath, rstat))
@@ -258,7 +258,7 @@ int HgQueryDirstate(
 
 
 int HgQueryDirstateDirectory(
-    const char* hgroot, const char* abspath,
+    const std::string& hgroot, const char* abspath,
     std::string& relpath, char& outStatus)
 {
     const dirstate* pd = 0;
@@ -271,7 +271,7 @@ int HgQueryDirstateDirectory(
     bool modified = false;
     bool empty = true;
 
-    size_t rootlen = strlen(hgroot);
+    size_t rootlen = hgroot.size();
     size_t len = relpath.size();
 
     for (dirstate::Iter iter = pd->entries.begin(); 
@@ -319,7 +319,7 @@ int HgQueryDirstateDirectory(
 
 
 int HgQueryDirstateFile(
-    const char* hgroot, const char* abspath,
+    const std::string& hgroot, const char* abspath,
     std::string& relpath, char& outStatus)
 {
     const dirstate* pd = 0;
