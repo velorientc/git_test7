@@ -189,7 +189,6 @@ HICON GetTortoiseIcon(const std::string& iconname)
 
 std::string GetHgRepoRoot(const std::string& path)
 {
-    TDEBUG_TRACE("    GetHgRepoRoot: find repo root for " << path);            
     std::string p = IsDirectory(path)? path : DirName(path);
     while (!IsDirectory(p + "\\.hg"))
     {

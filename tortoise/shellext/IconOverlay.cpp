@@ -60,17 +60,10 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 {
     std::string path = WideToMultibyte(pwszPath);
 
-    TDEBUG_TRACE("IsMemberOf: search for " << path);
-
     std::string hgroot = GetHgRepoRoot(path);
 
     if (hgroot.empty())
-    {
-        TDEBUG_TRACE("IsMemberOf: Not a Hg repo (hgroot is empty)");
         return S_FALSE;
-    }
-
-    TDEBUG_TRACE("IsMemberOf: hgroot = " << hgroot);
 
     size_t offset = hgroot.length();
     if (path[offset] == '\\')
@@ -90,21 +83,13 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
             return S_FALSE; // don't descend into .hg dir
 
         if (!HgQueryDirstateDirectory(hgroot, path, relpath, status))
-        {
-            TDEBUG_TRACE("IsMemberOf: HgQueryDirstateDirectory returns false");
             return S_FALSE;
-        }
     }
     else 
     {
         if (!HgQueryDirstateFile(hgroot, path, relpath, status))
-        {
-            TDEBUG_TRACE("IsMemberOf: HgQueryDirstateFile returns false");
             return S_FALSE;
-        }
     }
-
-    TDEBUG_TRACE("IsMemberOf: status = " << status);
 
     if (myTortoiseClass == TORTOISE_OLE_ADDED && status == 'A')
         return S_OK;

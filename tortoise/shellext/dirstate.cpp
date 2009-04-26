@@ -133,9 +133,14 @@ private:
 
 std::auto_ptr<dirstate> dirstate::read(const char *path)
 {
+    TDEBUG_TRACE("dirstate::read: path = " << path);
+
     FILE *f = fopen(path, "rb");
     if (!f)
+    {
+        TDEBUG_TRACE("dirstate::read: returning 0");
         return std::auto_ptr<dirstate>(0);
+    }
 
     std::auto_ptr<dirstate> pd(new dirstate());
 
@@ -168,6 +173,8 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
     }
 
     fclose(f);
+
+    TDEBUG_TRACE("dirstate::read: done. size = " << pd->entries.size());
 
     return pd;
 }
@@ -214,9 +221,16 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
     }
 
     if (iter == _cache.end())
-    {     
+    {
+        if (_cache.size() >= 10)
+        {
+            TDEBUG_TRACE("dirstatecache::get: dropping " << _cache.back().hgroot);
+            delete _cache.back().dstate;
+            _cache.pop_back();
+        }
         entry e;
         e.hgroot = hgroot;
+        TDEBUG_TRACE("dirstatecache::get: adding " << hgroot);
         _cache.push_front(e);
         iter = _cache.begin();
     }
@@ -246,7 +260,7 @@ int HgQueryDirstate(
     ppd = dirstatecache::get(hgroot);
     if (!ppd)
     {
-        TDEBUG_TRACE("HgQueryDirstate: dirstatecache::get returns NULL");
+        TDEBUG_TRACE("HgQueryDirstate: dirstatecache::get returns 0");
         return 0;
     }
 
@@ -328,17 +342,11 @@ int HgQueryDirstateFile(
     const dirstate* pd = 0;
     struct _stat stat;
 
-    TDEBUG_TRACE("HgQueryDirstateFile: search for " << abspath);
-    TDEBUG_TRACE("HgQueryDirstateFile: hgroot = " << hgroot);
-
     if (!HgQueryDirstate(hgroot, abspath, relpath, pd, stat))
     {
-        TDEBUG_TRACE("HgQueryDirstateFile: HgQueryDirstate returns false");
+        TDEBUG_TRACE("HgQueryDirstateFile: HgQueryDirstate returns 0");
         return 0;
     }
-
-    TDEBUG_TRACE("HgQueryDirstateFile: pd->entries.size() = " << pd->entries.size());
-    TDEBUG_TRACE("HgQueryDirstateFile: relpath = " << relpath);
 
     for (dirstate::Iter iter = pd->entries.begin(); 
          iter != pd->entries.end(); ++iter)
@@ -347,9 +355,7 @@ int HgQueryDirstateFile(
 
         if (relpath == e.name)
         {
-            TDEBUG_TRACE("HgQueryDirstateFile: found relpath");
             outStatus = e.status(stat);
-            TDEBUG_TRACE("HgQueryDirstateFile: outStatus = " << outStatus);
             return outStatus != '?';
         }
     }
