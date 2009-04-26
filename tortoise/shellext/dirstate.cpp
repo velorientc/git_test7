@@ -82,6 +82,32 @@ struct direntry
 };
 
 
+char direntry::status(const struct _stat& stat) const
+{
+    switch (this->state)
+    {
+    case 'n':
+        if (this->mtime == (unsigned)stat.st_mtime
+            && this->size == (unsigned)stat.st_size
+#ifndef WIN32
+            && this->mode == stat.st_mode
+#endif
+            )
+            return 'C';
+        else
+            return 'M';
+    case 'm':
+        return 'M';
+    case 'r':
+        return 'R';
+    case 'a':
+        return 'A';
+    default:
+        return '?';
+    }
+}
+
+
 struct dirstate
 {
     char parent1[HASH_LENGTH];
@@ -203,32 +229,6 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
     }
 
     return iter->dstate;
-}
-
-
-char direntry::status(const struct _stat& stat) const
-{
-    switch (this->state)
-    {
-    case 'n':
-        if (this->mtime == (unsigned)stat.st_mtime
-            && this->size == (unsigned)stat.st_size
-#ifndef WIN32
-            && this->mode == stat.st_mode
-#endif
-            )
-            return 'C';
-        else
-            return 'M';
-    case 'm':
-        return 'M';
-    case 'r':
-        return 'R';
-    case 'a':
-        return 'A';
-    default:
-        return '?';
-    }
 }
 
 
