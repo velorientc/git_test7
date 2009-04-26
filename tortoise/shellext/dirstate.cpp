@@ -131,28 +131,6 @@ private:
 };
 
 
-class dirstatecache
-{
-    struct entry
-    {
-        const dirstate* dstate;
-        __time64_t      mtime;
-        std::string     hgroot;
-
-        entry(): dstate(0), mtime(0) {}
-    };
-
-    typedef std::list<entry>::iterator Iter;
-
-    static std::list<entry> _cache;
-
-public:
-    static const dirstate* get(const std::string& hgroot);
-};
-
-std::list<dirstatecache::entry> dirstatecache::_cache;
-
-
 std::auto_ptr<dirstate> dirstate::read(const char *path)
 {
     FILE *f = fopen(path, "rb");
@@ -193,6 +171,28 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
 
     return pd;
 }
+
+
+class dirstatecache
+{
+    struct entry
+    {
+        const dirstate* dstate;
+        __time64_t      mtime;
+        std::string     hgroot;
+
+        entry(): dstate(0), mtime(0) {}
+    };
+
+    typedef std::list<entry>::iterator Iter;
+
+    static std::list<entry> _cache;
+
+public:
+    static const dirstate* get(const std::string& hgroot);
+};
+
+std::list<dirstatecache::entry> dirstatecache::_cache;
 
 
 const dirstate* dirstatecache::get(const std::string& hgroot)
