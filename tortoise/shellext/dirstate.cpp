@@ -217,7 +217,8 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
     {     
         entry e;
         e.hgroot = hgroot;
-        iter = _cache.insert(iter, e);
+        _cache.push_front(e);
+        iter = _cache.begin();
     }
 
     if (iter->mtime < stat.st_mtime)
