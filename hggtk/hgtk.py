@@ -558,6 +558,7 @@ globalopts = [
      _('repository root directory or symbolic path name')),
     ('v', 'verbose', None, _('enable additional output')),
     ('h', 'help', None, _('display help and exit')),
+    ('', 'debugger', None, _('start debugger')),
     ('l', 'listfile', '', _('read file list from file')),
 ]
 
