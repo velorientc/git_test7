@@ -46,7 +46,7 @@
 static __int64 days_between_epochs = 134774; /* days between 1.1.1601 and 1.1.1970 */
 static __int64 secs_between_epochs = (__int64)days_between_epochs * 86400;
 
-int lstat(const char* file, struct _stat* pstat)
+int lstat(const char* file, struct _stat& rstat)
 {
     WIN32_FIND_DATA data;
     HANDLE hfind;
@@ -57,8 +57,8 @@ int lstat(const char* file, struct _stat* pstat)
         return -1;
     FindClose(hfind);
 
-    pstat->st_mtime = *(__int64*)&data.ftLastWriteTime / 10000000 - secs_between_epochs;
-    pstat->st_size = (data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) | data.nFileSizeLow;
+    rstat.st_mtime = *(__int64*)&data.ftLastWriteTime / 10000000 - secs_between_epochs;
+    rstat.st_size = (data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) | data.nFileSizeLow;
 
     return 0;
 }
@@ -172,7 +172,7 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 
     struct _stat stat;
 
-    if (0 != lstat(path.c_str(), &stat))
+    if (0 != lstat(path.c_str(), stat))
         return 0;
     
     Iter iter = _cache.begin();
@@ -230,9 +230,9 @@ char mapdirstate(const direntry& e, const struct _stat& stat)
 
 int HgQueryDirstate(
     const char* hgroot, const char* abspath, char* relpathloc, 
-    const dirstate*& ppd, struct _stat& pstat)
+    const dirstate*& ppd, struct _stat& rstat)
 {
-    if (0 != lstat(abspath, &pstat))
+    if (0 != lstat(abspath, rstat))
     {
         TDEBUG_TRACE("HgQueryDirstate: lstat returns non-null");
         return 0;
@@ -288,7 +288,7 @@ int HgQueryDirstateDirectory(
                 std::string temp = hgroot;
                 temp += "/";
                 temp += e.name;
-                if (0 == lstat(temp.c_str(), &stat))
+                if (0 == lstat(temp.c_str(), stat))
                     modified = (mapdirstate(e, stat) == 'M');
             }
             break;
