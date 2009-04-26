@@ -390,6 +390,10 @@ class GLog(GDialog):
         self.tree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         self.tree.connect('thg-diff', self.thgdiff)
+        key, modifier = gtk.accelerator_parse('<Control>p')
+        self.tree.add_accelerator('thg-parent', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        self.tree.connect('thg-parent', self.thgparent)
         self.connect('thg-refresh', self.thgrefresh)
 
         hbox = gtk.HBox()
@@ -440,7 +444,13 @@ class GLog(GDialog):
         return vbox
 
     def thgdiff(self, treeview):
+        'ctrl-d handler'
         self._vdiff_change(None)
+
+    def thgparent(self, treeview):
+        'ctrl-p handler'
+        parent = self.repo['.'].rev()
+        self.graphview.set_revision_id(parent)
 
     def _strip_rev(self, menuitem):
         rev = self.currow[treemodel.REVID]

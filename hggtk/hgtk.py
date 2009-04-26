@@ -25,7 +25,7 @@ import traceback
 nonrepo_commands = 'userconfig clone debugcomplete init about help version'
 
 # Add TortoiseHg signals, hooked to key accelerators in shlib
-for sig in ('copy-clipboard', 'thg-diff'):
+for sig in ('copy-clipboard', 'thg-diff', 'thg-parent'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept'):
