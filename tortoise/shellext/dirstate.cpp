@@ -78,7 +78,7 @@ struct direntry
     unsigned length;
     std::string name;
 
-    char mapdirstate(const struct _stat& stat) const;
+    char status(const struct _stat& stat) const;
 };
 
 
@@ -206,7 +206,7 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 }
 
 
-char direntry::mapdirstate(const struct _stat& stat) const
+char direntry::status(const struct _stat& stat) const
 {
     switch (this->state)
     {
@@ -295,7 +295,7 @@ int HgQueryDirstateDirectory(
                 temp += "/";
                 temp += e.name;
                 if (0 == lstat(temp.c_str(), stat))
-                    modified = (e.mapdirstate(stat) == 'M');
+                    modified = (e.status(stat) == 'M');
             }
             break;
         case 'm':
@@ -347,7 +347,7 @@ int HgQueryDirstateFile(
         if (relpath == e.name)
         {
             TDEBUG_TRACE("HgQueryDirstateFile: found relpath");
-            outStatus = e.mapdirstate(stat);
+            outStatus = e.status(stat);
             TDEBUG_TRACE("HgQueryDirstateFile: outStatus = " << outStatus);
             return outStatus != '?';
         }
