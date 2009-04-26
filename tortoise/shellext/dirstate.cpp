@@ -234,10 +234,10 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 
 
 int HgQueryDirstate(
-    const std::string& hgroot, const char* abspath, std::string& relpath, 
+    const std::string& hgroot, const std::string& abspath, std::string& relpath,
     const dirstate*& ppd, struct _stat& rstat)
 {
-    if (0 != lstat(abspath, rstat))
+    if (0 != lstat(abspath.c_str(), rstat))
     {
         TDEBUG_TRACE("HgQueryDirstate: lstat returns non-null");
         return 0;
@@ -261,7 +261,7 @@ int HgQueryDirstate(
 
 
 int HgQueryDirstateDirectory(
-    const std::string& hgroot, const char* abspath,
+    const std::string& hgroot, const std::string& abspath,
     std::string& relpath, char& outStatus)
 {
     const dirstate* pd = 0;
@@ -322,7 +322,7 @@ int HgQueryDirstateDirectory(
 
 
 int HgQueryDirstateFile(
-    const std::string& hgroot, const char* abspath,
+    const std::string& hgroot, const std::string& abspath,
     std::string& relpath, char& outStatus)
 {
     const dirstate* pd = 0;

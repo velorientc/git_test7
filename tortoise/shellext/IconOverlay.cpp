@@ -58,12 +58,9 @@ STDMETHODIMP CShellExt::GetPriority(int *pPriority)
 
 STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 {
-    std::string mbstr = WideToMultibyte(pwszPath);
+    std::string path = WideToMultibyte(pwszPath);
 
-    TDEBUG_TRACE("IsMemberOf: search for " << mbstr.c_str());
-
-    char path[MAX_PATH] = "";
-    strncat(path, mbstr.c_str(), MAX_PATH);
+    TDEBUG_TRACE("IsMemberOf: search for " << path);
 
     std::string hgroot = GetHgRepoRoot(path);
 
@@ -78,13 +75,13 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
     size_t offset = hgroot.length();
     if (path[offset] == '\\')
         offset++;
-    const char* relpathptr = path + offset;
+    const char* relpathptr = path.c_str() + offset;
 
     std::string relpath = relpathptr;
 
     char status = 0;
 
-    if (PathIsDirectory(path))
+    if (PathIsDirectory(path.c_str()))
     {
         if (relpath.size() == 0)
             return S_FALSE; // don't show icon on repo root dir
