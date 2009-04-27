@@ -108,17 +108,26 @@ char direntry::status(const struct _stat& stat) const
 }
 
 
-struct dirstate
+class dirstate
 {
+    typedef std::vector<direntry> EntriesT;
+
+    EntriesT entries;
+
+public:
+    typedef EntriesT::size_type size_type;
+    typedef EntriesT::const_iterator Iter;
+
     char parent1[HASH_LENGTH];
     char parent2[HASH_LENGTH];
 
-    std::vector<direntry> entries;
-    
-    typedef std::vector<direntry>::const_iterator Iter;
-
     static std::auto_ptr<dirstate> read(const char *path);
+
     void add(const direntry& e) { entries.push_back(e); }
+
+    Iter begin() const { return entries.begin(); }
+    Iter end() const { return entries.end(); }
+    size_type size() const { return entries.size(); }
 
 private:
     static uint32_t ntohl(uint32_t x)
@@ -246,7 +255,7 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
         }
         iter->dstate = dirstate::read(path.c_str()).release();
         TDEBUG_TRACE("dirstatecache::get: " 
-            << iter->dstate->entries.size() << " entries read. "
+            << iter->dstate->size() << " entries read. "
             << _cache.size() << " repos in cache");
     }
 
@@ -303,8 +312,8 @@ int HgQueryDirstateDirectory(
     size_t rootlen = hgroot.size();
     size_t len = relpath.size();
 
-    for (dirstate::Iter iter = pd->entries.begin(); 
-         iter != pd->entries.end() && !modified; ++iter)
+    for (dirstate::Iter iter = pd->begin(); 
+         iter != pd->end() && !modified; ++iter)
     {
         const direntry& e = *iter;
 
@@ -362,8 +371,7 @@ int HgQueryDirstateFile(
         return 0;
     }
 
-    for (dirstate::Iter iter = pd->entries.begin(); 
-         iter != pd->entries.end(); ++iter)
+    for (dirstate::Iter iter = pd->begin(); iter != pd->end(); ++iter)
     {
         const direntry& e = *iter;
 
@@ -401,13 +409,13 @@ void testread()
     unsigned ix;
     printf("parent1: %s\n", revhash_string(pd->parent1));
     printf("parent2: %s\n", revhash_string(pd->parent2));
-    printf("entries: %d\n\n", pd->entries.size());
-    for (ix = 0; ix < pd->entries.size(); ++ix)
+    printf("entries: %d\n\n", pd->size());
+    for (dirstate::Iter i = pd->begin(); i != pd->end(); ++i)
     {
-        t = pd->entries[ix].mtime;
+        t = i->mtime;
         s = ctime(&t);
         s[strlen(s) - 1] = '\0';
-        printf("%s %s\n", s, pd->entries[ix].name.c_str());
+        printf("%s %s\n", s, i->name.c_str());
     }
 }
 
