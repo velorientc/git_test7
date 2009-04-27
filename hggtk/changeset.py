@@ -499,7 +499,8 @@ class ChangeSet(GDialog):
             self.glog_parent.add_accel_group(accelgroup)
         else:
             self.add_accel_group(accelgroup)
-        key, modifier = gtk.accelerator_parse('<Control>d')
+        mod = shlib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'d')
         filelist_tree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         filelist_tree.connect('thg-diff', self.thgdiff)

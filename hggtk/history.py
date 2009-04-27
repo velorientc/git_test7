@@ -386,11 +386,12 @@ class GLog(GDialog):
         
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
-        key, modifier = gtk.accelerator_parse('<Control>d')
+        mod = shlib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'d')
         self.tree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         self.tree.connect('thg-diff', self.thgdiff)
-        key, modifier = gtk.accelerator_parse('<Control>p')
+        key, modifier = gtk.accelerator_parse(mod+'p')
         self.tree.add_accelerator('thg-parent', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         self.tree.connect('thg-parent', self.thgparent)

@@ -11,6 +11,7 @@ import dumbdbm, anydbm
 anydbm._defaultmod = dumbdbm
 
 import os
+import sys
 import gtk
 import shelve
 import time
@@ -133,20 +134,31 @@ def set_tortoise_icon(window, thgicon):
     ico = get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)
 
+def get_thg_modifier():
+    if sys.platform == 'darwin':
+        return '<Mod1>'
+    else:
+        return '<Control>'
+
 def set_tortoise_keys(window):
     'Set default TortoiseHg keyboard accelerators'
+    if sys.platform == 'darwin':
+        mask = gtk.accelerator_get_default_mod_mask()
+        mask |= gtk.gdk.MOD1_MASK;
+        gtk.accelerator_set_default_mod_mask(mask)
+    mod = get_thg_modifier()
     accelgroup = gtk.AccelGroup()
     window.add_accel_group(accelgroup)
-    key, modifier = gtk.accelerator_parse('<Control>w')
+    key, modifier = gtk.accelerator_parse(mod+'w')
     window.add_accelerator('thg-close', accelgroup, key, modifier,
             gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse('<Control>q')
+    key, modifier = gtk.accelerator_parse(mod+'q')
     window.add_accelerator('thg-exit', accelgroup, key, modifier,
             gtk.ACCEL_VISIBLE)
     key, modifier = gtk.accelerator_parse('F5')
     window.add_accelerator('thg-refresh', accelgroup, key, modifier,
             gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse('<Control>Return')
+    key, modifier = gtk.accelerator_parse(mod+'Return')
     window.add_accelerator('thg-accept', accelgroup, key, modifier,
             gtk.ACCEL_VISIBLE)
 

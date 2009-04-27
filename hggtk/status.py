@@ -16,10 +16,10 @@ import gobject
 from mercurial.i18n import _
 from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff, extensions
 from mercurial import merge as merge_
-from shlib import shell_notify
 from hglib import toutf, fromutf, rootpath, diffexpand
 from gdialog import GDialog, Confirm, Prompt
-from dialog import entry_dialog
+import dialog
+import shlib
 import hgshelve
 
 # file model row enumerations
@@ -261,7 +261,8 @@ class GStatus(GDialog):
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
-        key, modifier = gtk.accelerator_parse('<Control>d')
+        mod = shlib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'d')
         self.filetree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         self.filetree.connect('thg-diff', self.thgdiff)
@@ -341,7 +342,8 @@ class GStatus(GDialog):
             self.diff_tree = gtk.TreeView(self.diff_model)
 
             # set CTRL-c accelerator for copy-clipboard
-            key, modifier = gtk.accelerator_parse('<Control>c')
+            mod = shlib.get_thg_modifier()
+            key, modifier = gtk.accelerator_parse(mod+'c')
             self.diff_tree.add_accelerator('copy-clipboard', accelgroup, key,
                             modifier, gtk.ACCEL_VISIBLE)
             self.diff_tree.connect('copy-clipboard', self.copy_to_clipboard)
@@ -717,7 +719,7 @@ class GStatus(GDialog):
 
     def _rename_file(self, stat, wfile):
         fdir, fname = os.path.split(wfile)
-        newfile = entry_dialog(self, _('Rename file to:'), True, fname)
+        newfile = dialog.entry_dialog(self, _('Rename file to:'), True, fname)
         if newfile and newfile != fname:
             self._hg_move([wfile, os.path.join(fdir, newfile)])
         return True
@@ -1093,7 +1095,7 @@ class GStatus(GDialog):
         if dialog.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
-                shell_notify(wfiles)
+                shlib.shell_notify(wfiles)
                 self.reload_status()
 
     def _add_clicked(self, toolbutton, data=None):
@@ -1119,7 +1121,7 @@ class GStatus(GDialog):
             commands.add(self.ui, self.repo, *wfiles, **addopts)
         success, outtext = self._hg_call_wrapper('Add', dohgadd)
         if success:
-            shell_notify(wfiles)
+            shlib.shell_notify(wfiles)
             self.reload_status()
 
     def _remove_clicked(self, toolbutton, data=None):
