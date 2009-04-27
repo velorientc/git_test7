@@ -235,7 +235,7 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
             TDEBUG_TRACE("dirstatecache::get: reading " << hgroot);
         }
         iter->dstate = dirstate::read(path).release();
-        TDEBUG_TRACE("dirstatecache::get: " 
+        TDEBUG_TRACE("dirstatecache::get: "
             << iter->dstate->size() << " entries read. "
             << _cache.size() << " repos in cache");
     }
@@ -250,7 +250,7 @@ int HgQueryDirstate(
 {
     if (0 != lstat(abspath.c_str(), rstat))
     {
-        TDEBUG_TRACE("HgQueryDirstate: lstat(" << abspath <<") fails");
+        TDEBUG_TRACE("HgQueryDirstate: lstat(" << abspath << ") fails");
         return 0;
     }
 
@@ -281,8 +281,7 @@ int HgQueryDirstateDirectory(
     if (!HgQueryDirstate(hgroot, abspath, relpath, pd, stat))
     {
         TDEBUG_TRACE("HgQueryDirstateDirectory: HgQueryDirstate returns 0."
-            << " hgroot = " << hgroot
-            << ", abspath = " << abspath);
+            << " hgroot = " << hgroot << ", abspath = " << abspath);
         return 0;
     }
 
@@ -293,14 +292,14 @@ int HgQueryDirstateDirectory(
     size_t rootlen = hgroot.size();
     size_t len = relpath.size();
 
-    for (dirstate::Iter iter = pd->begin(); 
+    for (dirstate::Iter iter = pd->begin();
          iter != pd->end() && !modified; ++iter)
     {
         const direntry& e = *iter;
 
         if (e.name.compare(0, len, relpath) != 0)
             continue;
-        
+
         empty = false;
 
         switch (e.state)
@@ -347,8 +346,7 @@ int HgQueryDirstateFile(
     if (!HgQueryDirstate(hgroot, abspath, relpath, pd, stat))
     {
         TDEBUG_TRACE("HgQueryDirstateFile: HgQueryDirstate returns 0."
-            << " hgroot = " << hgroot
-            << ", abspath = " << abspath);
+            << " hgroot = " << hgroot << ", abspath = " << abspath);
         return 0;
     }
 
