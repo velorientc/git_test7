@@ -18,30 +18,11 @@
 
 #include "dirstate.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
 #include <vector>
 #include <list>
 
 
 #ifdef WIN32
-
-#ifndef _WINBASE_
-#include <windef.h>   // needed by winbase.h
-#include <stdarg.h>   // needed by winbase.h
-#include <winbase.h>
-#endif
-
-#include <string.h>
-#include <_mingw.h>
-
-#define MAX_PATH          260
-
 
 static __int64 days_between_epochs = 134774; /* days between 1.1.1601 and 1.1.1970 */
 static __int64 secs_between_epochs = (__int64)days_between_epochs * 86400;
