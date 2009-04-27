@@ -57,7 +57,7 @@ class GStatus(GDialog):
     def init(self):
         GDialog.init(self)
         self.mode = 'status'
-        
+
     def auto_check(self):
         if self.pats or self.opts.get('check'):
             for entry in self.filemodel:
@@ -66,24 +66,24 @@ class GStatus(GDialog):
 
     def get_menu_info(self):
         """Returns menu info in this order:
-            merge, addrem, unknown, clean, ignored, deleted, 
-            unresolved, resolved 
+            merge, addrem, unknown, clean, ignored, deleted,
+            unresolved, resolved
         """
         return (
                 # merge
                 ((_('_difference'), self._diff_file),
-                    (_('_view right'), self._view_file), 
+                    (_('_view right'), self._view_file),
                     (_('view _left'), self._view_left_file),
                     (_('_revert'), self._revert_file),
                     (_('l_og'), self._log_file)),
                 # addrem
                 ((_('_difference'), self._diff_file),
-                    (_('_view'), self._view_file), 
-                    (_('_revert'), self._revert_file), 
+                    (_('_view'), self._view_file),
+                    (_('_revert'), self._revert_file),
                     (_('l_og'), self._log_file)),
                 # unknown
                 ((_('_view'), self._view_file),
-                    (_('_delete'), self._delete_file), 
+                    (_('_delete'), self._delete_file),
                     (_('_add'), self._add_file),
                     (_('_guess rename'), self._guess_rename),
                     (_('_ignore'), self._ignore_file)),
@@ -98,12 +98,12 @@ class GStatus(GDialog):
                     (_('_delete'), self._delete_file)),
                 # deleted
                 ((_('_view'), self._view_file),
-                    (_('_revert'), self._revert_file), 
+                    (_('_revert'), self._revert_file),
                     (_('re_move'), self._remove_file),
                     (_('l_og'), self._log_file)),
                 # unresolved
                 ((_('_difference'), self._diff_file),
-                    (_('_view right'), self._view_file), 
+                    (_('_view right'), self._view_file),
                     (_('view _left'), self._view_left_file),
                     (_('_revert'), self._revert_file),
                     (_('l_og'), self._log_file),
@@ -111,7 +111,7 @@ class GStatus(GDialog):
                     (_('mark resolved'), self._mark_resolved)),
                 # resolved
                 ((_('_difference'), self._diff_file),
-                    (_('_view right'), self._view_file), 
+                    (_('_view right'), self._view_file),
                     (_('view _left'), self._view_left_file),
                     (_('_revert'), self._revert_file),
                     (_('l_og'), self._log_file),
@@ -137,8 +137,8 @@ class GStatus(GDialog):
                     wasset = True
                     self._show_checks[opt].set_active(True)
             if not wasset:
-                for check in [item[1] for item in self._show_checks.iteritems() 
-                              if item[0] in ('modified', 'added', 'removed', 
+                for check in [item[1] for item in self._show_checks.iteritems()
+                              if item[0] in ('modified', 'added', 'removed',
                                              'deleted', 'unknown')]:
                     check.set_active(True)
 
@@ -284,31 +284,31 @@ class GStatus(GDialog):
             col0.set_resizable(False)
             self.filetree.append_column(col0)
             self.selcb = self._add_header_checkbox(col0, self._sel_clicked)
-        
+
         col1 = gtk.TreeViewColumn(_('st'), stat_cell)
         col1.add_attribute(stat_cell, 'text', FM_STATUS)
         col1.set_cell_data_func(stat_cell, self._text_color)
         col1.set_sort_column_id(1001)
         col1.set_resizable(False)
         self.filetree.append_column(col1)
-        
+
         col = gtk.TreeViewColumn(_('ms'), stat_cell)
         col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
         col.set_sort_column_id(4)
         col.set_resizable(False)
         self.filetree.append_column(col)
-        
+
         col2 = gtk.TreeViewColumn(_('path'), path_cell)
         col2.add_attribute(path_cell, 'text', FM_PATH_UTF8)
         col2.set_cell_data_func(path_cell, self._text_color)
         col2.set_sort_column_id(2)
         col2.set_resizable(True)
         self.filetree.append_column(col2)
-       
+
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(self.filetree)
-        
+
         tree_frame = gtk.Frame()
         tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         tree_frame.add(scroller)
@@ -413,7 +413,7 @@ class GStatus(GDialog):
 
     def thgdiff(self, treeview):
         selection = treeview.get_selection()
-        model, paths = selection.get_selected_rows() 
+        model, paths = selection.get_selected_rows()
         row = model[paths[0]]
         self._diff_file(row[FM_STATUS], row[FM_PATH])
 
@@ -461,14 +461,14 @@ class GStatus(GDialog):
             self._show_checks[ctype] = check
             col += row
             row = not row
-            
+
         self.counter = gtk.Label('')
         self.counter.set_alignment(1.0, 0.0) # right up
 
         hbox = gtk.HBox()
         hbox.pack_start(table, expand=False)
         hbox.pack_end(self.counter, expand=True, padding=2)
-        
+
         return hbox
 
     def _add_header_checkbox(self, col, post=None, pre=None, toggle=False):
@@ -480,7 +480,7 @@ class GStatus(GDialog):
                 cb.set_active(not state)
             if post:
                 post(not state)
-            
+
         cb = gtk.CheckButton(col.get_title())
         cb.show()
         col.set_widget(cb)
@@ -564,7 +564,7 @@ class GStatus(GDialog):
                        ('deleted', '!', deleted),
                        ('unknown', '?', unknown),
                        ('ignored', 'I', ignored))
-    
+
         explicit_changetypes = changetypes + (('clean', 'C', clean),)
 
         # List of the currently checked and selected files to pass on to the new data
@@ -574,11 +574,11 @@ class GStatus(GDialog):
 
         # merge-state of files
         ms = merge_.mergestate(repo)
-        
+
         # Load the new data into the tree's model
         self.filetree.hide()
         self.filemodel.clear()
-    
+
         for opt, char, changes in ([ct for ct in explicit_changetypes
                                     if self.test_opt(ct[0])] or changetypes) :
             for wfile in changes:
@@ -686,11 +686,11 @@ class GStatus(GDialog):
 
         result = order.find(lhs) - order.find(rhs)
         return min(max(result, -1), 1)
-        
+
 
     def _text_color(self, column, text_renderer, model, row_iter):
         stat = model[row_iter][FM_STATUS]
-        if stat == 'M':  
+        if stat == 'M':
             text_renderer.set_property('foreground', '#000090')
         elif stat == 'A':
             text_renderer.set_property('foreground', '#006400')
@@ -749,7 +749,7 @@ class GStatus(GDialog):
     def _hg_remove(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
-            Prompt(_('Nothing Removed'), 
+            Prompt(_('Nothing Removed'),
               _('Remove is not enabled when multiple revisions are specified.'),
               self).run()
             return
@@ -1010,7 +1010,7 @@ class GStatus(GDialog):
 
         self.showdiff_toggle.handler_unblock(self._showdiff_toggled_id)
         return False
-        
+
 
     def _refresh_clicked(self, toolbutton, data=None):
         self.reload_status()
@@ -1070,7 +1070,7 @@ class GStatus(GDialog):
     def _hg_revert(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
-            Prompt(_('Nothing Reverted'), 
+            Prompt(_('Nothing Reverted'),
                    _('Revert not allowed when viewing revision range.'),
                    self).run()
             return
@@ -1152,14 +1152,14 @@ class GStatus(GDialog):
             dialog.destroy()
             if response != gtk.RESPONSE_OK:
                 return True
-            
+
             # verify directory
             destroot = rootpath(destdir)
             if destroot != self.repo.root:
                 Prompt(_('Nothing Moved'),
                        _('Cannot move outside repo!'), self).run()
                 return True
-            
+
             # move the files to dest directory
             move_list.append(fromutf(destdir))
             self._hg_move(move_list)
@@ -1176,7 +1176,7 @@ class GStatus(GDialog):
         if dialog.run() == gtk.RESPONSE_YES :
             errors = ''
             for wfile in files:
-                try: 
+                try:
                     os.unlink(self.repo.wjoin(wfile))
                 except Exception, inst:
                     errors += str(inst) + '\n\n'
@@ -1241,7 +1241,7 @@ class GStatus(GDialog):
                 self._update_chunk_state(entry)
         self._update_check_count()
 
-    
+
     def _relevant_files(self, stats):
         return [item[FM_PATH] for item in self.filemodel \
                 if item[FM_CHECKED] and item[FM_STATUS] in stats]
@@ -1251,7 +1251,7 @@ class GStatus(GDialog):
         selection = self.filetree.get_selection()
         assert(selection.count_selected_rows() == 1)
 
-        model, paths = selection.get_selected_rows() 
+        model, paths = selection.get_selected_rows()
         path = paths[0]
         handler(model[path][FM_STATUS], model[path][FM_PATH])
         return True
@@ -1281,13 +1281,13 @@ class GStatus(GDialog):
         else:
             menu = self._menus[st]
         return menu
-            
+
     def _tree_popup_menu(self, widget, button=0, time=0) :
         selection = self.filetree.get_selection()
         if selection.count_selected_rows() != 1:
             return False
 
-        model, paths = selection.get_selected_rows() 
+        model, paths = selection.get_selected_rows()
         menu = self._get_file_context_menu(model[paths[0]])
         menu.popup(None, None, None, button, time)
         return True
@@ -1319,7 +1319,7 @@ class GStatus(GDialog):
         if selection.count_selected_rows() != 1:
             return False
 
-        model, paths = selection.get_selected_rows() 
+        model, paths = selection.get_selected_rows()
         menu = self._get_file_context_menu(model[paths[0]])
         menu.get_children()[0].activate()
         return True

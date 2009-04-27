@@ -64,7 +64,7 @@ def rename_resp(dialog, response):
             toquit = False
     finally:
         sys.stderr = saved
-        textout = errors.getvalue() + repo.ui.popbuffer() 
+        textout = errors.getvalue() + repo.ui.popbuffer()
         errors.close()
         if len(textout) > 1:
             error_dialog(None, _('rename error'), textout)

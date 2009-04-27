@@ -144,7 +144,7 @@ class DetectRenameDialog(gtk.Window):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         diffframe.add(scroller)
-        
+
         buf = gtk.TextBuffer()
         buf.create_tag('removed', foreground='#900000')
         buf.create_tag('added', foreground='#006400')

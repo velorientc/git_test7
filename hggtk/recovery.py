@@ -71,7 +71,7 @@ class RecoveryDialog(gtk.Window):
         vbox = gtk.VBox()
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
-        
+
         # hg output window
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -97,7 +97,7 @@ class RecoveryDialog(gtk.Window):
             error_dialog(self, _('Cannot close now'), _('command is running'))
             return True
         return False
-        
+
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
         if menu:
@@ -105,13 +105,13 @@ class RecoveryDialog(gtk.Window):
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
-            
+
         tbutton.set_label(label)
         if tip:
             tbutton.set_tooltip(self.tips, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
-        
+
     def _clean_clicked(self, toolbutton, data=None):
         response = question_dialog(self, _('Clean repository'),
                 "%s ?" % os.path.basename(self.root))
@@ -138,15 +138,15 @@ class RecoveryDialog(gtk.Window):
             return
         cmd = ['rollback']
         self._exec_cmd(cmd, postfunc=self._notify)
-        
+
     def _recover_clicked(self, toolbutton, data=None):
         cmd = ['recover']
         self._exec_cmd(cmd)
-        
+
     def _verify_clicked(self, toolbutton, data=None):
         cmd = ['verify']
         self._exec_cmd(cmd)
-    
+
     def _stop_clicked(self, toolbutton, data=None):
         if self.hgthread and self.hgthread.isAlive():
             self.hgthread.terminate()
@@ -163,7 +163,7 @@ class RecoveryDialog(gtk.Window):
         cmdline.append('--verbose')
         cmdline.append('--repository')
         cmdline.append(self.root)
-        
+
         # show command to be executed
         self.write("", False)
 
@@ -173,7 +173,7 @@ class RecoveryDialog(gtk.Window):
         self.hgthread.start()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmdline))
-        
+
     def _cmd_running(self):
         if self.hgthread and self.hgthread.isAlive():
             return True

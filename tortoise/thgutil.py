@@ -50,7 +50,7 @@ if os.name == 'nt':
         if not os.path.isfile(icon):
             return None
         return icon
-        
+
     def get_prog_root():
         key = r"Software\TortoiseHg"
         cat = _winreg.HKEY_LOCAL_MACHINE
@@ -75,7 +75,7 @@ if os.name == 'nt':
                 info = win32net.NetUseGetInfo(None, letter, 1)
                 return info['status'] == USE_OK
         return False
-    
+
     bitmap_cache = {}
     def icon_to_bitmap(iconPathName):
         """
@@ -84,24 +84,24 @@ if os.name == 'nt':
         adapted from pywin32's demo program win32gui_menu.py
         """
         global bitmap_cache
-            
+
         cx = GetSystemMetrics(win32con.SM_CXMENUCHECK)
         cy = GetSystemMetrics(win32con.SM_CYMENUCHECK)
-        
+
         # use icon image with size smaller but closer to menu size
         if cx >= 16:
             ico_x = ico_y = 16
         else:
             ico_x = ico_y = 12
         ico_idx = "%d:%d", (cx, cy)
-        
+
         # see if icon has been cached
         try:
             return bitmap_cache[iconPathName][ico_idx]
         except:
             pass
 
-        hicon = LoadImage(0, iconPathName, win32con.IMAGE_ICON, ico_x, ico_y, 
+        hicon = LoadImage(0, iconPathName, win32con.IMAGE_ICON, ico_x, ico_y,
                 win32con.LR_LOADFROMFILE)
 
         hdcBitmap = CreateCompatibleDC(0)
@@ -112,25 +112,25 @@ if os.name == 'nt':
         # Fill the background.
         brush = GetSysColorBrush(win32con.COLOR_MENU)
         FillRect(hdcBitmap, (0, 0, cx, cy), brush)
-        
+
         # we try to center the icon image within the bitmap without resizing
         # the icon, so that the icon will be display as closely level to the
         # menu text as possible.
         startx = int((cx-ico_x)/2)
-        starty = int((cx-ico_y)/2)    
+        starty = int((cx-ico_y)/2)
         DrawIconEx(hdcBitmap, startx, starty, hicon, ico_x, ico_y, 0, 0,
                 win32con.DI_NORMAL)
-                
+
         # store bitmap to cache
         if iconPathName not in bitmap_cache:
             bitmap_cache[iconPathName] = {}
         bitmap_cache[iconPathName][ico_idx] = hbm
-        
+
         # restore settings
         SelectObject(hdcBitmap, hbmOld)
         DeleteDC(hdcBitmap)
         DestroyIcon(hicon)
-        
+
         return hbm
 
 else: # Not Windows
@@ -147,7 +147,7 @@ else: # Not Windows
 
     def get_icon_path(*args):
         return None
-        
+
     def get_prog_root():
         defpath = os.path.dirname(os.path.dirname(__file__))
         path = os.environ.get('TORTOISEHG_PATH', defpath)

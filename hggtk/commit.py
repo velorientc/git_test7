@@ -118,7 +118,7 @@ class GCommit(GStatus):
 
     def auto_check(self):
         if self.test_opt('check'):
-            for entry in self.filemodel : 
+            for entry in self.filemodel :
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self._update_check_count()
@@ -225,19 +225,19 @@ class GCommit(GStatus):
         mbox.pack_start(self.msg_cbbox)
         vbox.pack_start(mbox, False, False)
         self._mru_messages = self.settings.mrul('recent_messages')
-        
+
         frame = gtk.Frame()
         frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         frame.add(scroller)
         vbox.pack_start(frame)
-        
+
         self.text = gtk.TextView()
         self.text.set_wrap_mode(gtk.WRAP_WORD)
         self.text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.text)
-        
+
         self._vpaned = gtk.VPaned()
         self._vpaned.add1(vbox)
         self._vpaned.add2(status_body)
@@ -313,12 +313,12 @@ class GCommit(GStatus):
     def _check_merge(self):
         # disable the checkboxes on the filelist if repo in merging state
         merged = len(self.repo.changectx(None).parents()) > 1
-        
+
         self.get_toolbutton(_('Re_vert')).set_sensitive(not merged)
         self.get_toolbutton(_('_Add')).set_sensitive(not merged)
         self.get_toolbutton(_('_Remove')).set_sensitive(not merged)
         self.get_toolbutton(_('Move')).set_sensitive(not merged)
-        
+
         if merged:
             # select all changes if repo is merged
             for entry in self.filemodel:
@@ -499,18 +499,18 @@ class GCommit(GStatus):
 
 
     def _undo_clicked(self, toolbutton, data=None):
-        response = Confirm(_('Undo commit'), [], self, _('Undo last commit')).run() 
+        response = Confirm(_('Undo commit'), [], self, _('Undo last commit')).run()
         if response != gtk.RESPONSE_YES:
             return
-            
+
         tip = self._get_tip_rev(True)
         if not tip == self._last_commit_id:
-            Prompt(_('Undo commit'), 
+            Prompt(_('Undo commit'),
                     _('Unable to undo!\n\n'
                     'Tip revision differs from last commit.'),
                     self).run()
             return
-            
+
         try:
             self.repo.rollback()
             self._last_commit_id = None
@@ -523,7 +523,7 @@ class GCommit(GStatus):
         if self.test_opt('addremove'):
             return True
         else:
-            response = Confirm(_('Add/Remove'), files, self).run() 
+            response = Confirm(_('Add/Remove'), files, self).run()
             if response == gtk.RESPONSE_YES:
                 # This will stay set for further commits (meaning no more prompts). Problem?
                 self.opts['addremove'] = True
@@ -552,7 +552,7 @@ class GCommit(GStatus):
 
             # bring up the config dialog for user to enter their username.
             # But since we can't be sure they will do it right, we will
-            # have them to retry, to re-trigger the checking mechanism. 
+            # have them to retry, to re-trigger the checking mechanism.
             from thgconfig import ConfigDialog
             dlg = ConfigDialog(False)
             dlg.show_all()
@@ -651,7 +651,7 @@ def run(_ui, *pats, **opts):
         'user':opts.get('user', ''), 'date':opts.get('date', ''),
         'logfile':'', 'message':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
-        'unknown':True, 'ignored':False, 
+        'unknown':True, 'ignored':False,
         'exclude':[], 'include':[],
         'check': True, 'git':False, 'addremove':False,
     }

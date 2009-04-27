@@ -31,7 +31,7 @@ class GLog(GDialog):
     """GTK+ based dialog for displaying repository logs
     """
     def get_title(self):
-        return os.path.basename(self.repo.root) + ' log' 
+        return os.path.basename(self.repo.root) + ' log'
 
     def get_icon(self):
         return 'menulog.ico'
@@ -104,12 +104,12 @@ class GLog(GDialog):
 
         def delete_event(dialog, event, data=None):
             # return True to prevent the dialog from being destroyed
-            return True     
+            return True
 
         revs = []
         if self.currow is not None:
             revs.append(self.currow[treemodel.REVID])
-            
+
         from logfilter import FilterDialog
         dlg = FilterDialog(self.repo.root, revs, self.pats,
                 filterfunc=do_reload)
@@ -117,7 +117,7 @@ class GLog(GDialog):
         dlg.connect('delete-event', delete_event)
         dlg.set_modal(False)
         dlg.show()
-        
+
         self._filter_dialog = dlg
 
     def _filter_selected(self, widget, data=None):
@@ -157,36 +157,36 @@ class GLog(GDialog):
 
     def _filter_menu(self):
         menu = gtk.Menu()
-        
+
         button = gtk.RadioMenuItem(None, _('Show All Revisions'))
         button.set_active(True)
         button.connect('toggled', self._filter_selected, 'all')
         menu.append(button)
-        
+
         button = gtk.RadioMenuItem(button, _('Show Tagged Revisions'))
         button.connect('toggled', self._filter_selected, 'tagged')
         menu.append(button)
-       
+
         button = gtk.RadioMenuItem(button, _('Show Parent Revisions'))
         button.connect('toggled', self._filter_selected, 'parents')
         menu.append(button)
-       
+
         button = gtk.RadioMenuItem(button, _('Show Head Revisions'))
         button.connect('toggled', self._filter_selected, 'heads')
         menu.append(button)
-       
+
         button = gtk.RadioMenuItem(button, _('Show Only Merge Revisions'))
         button.connect('toggled', self._filter_selected, 'only_merges')
         menu.append(button)
-       
+
         button = gtk.RadioMenuItem(button, _('Show Non-Merge Revisions'))
         button.connect('toggled', self._filter_selected, 'no_merges')
         menu.append(button)
-       
+
         self.custombutton = gtk.RadioMenuItem(button, _('Custom Filter'))
         self.custombutton.set_sensitive(False)
         menu.append(self.custombutton)
-       
+
         menu.show_all()
         return menu
 
@@ -336,19 +336,19 @@ class GLog(GDialog):
         _menu.append(create_menu(_('add/remove _tag'), self._add_tag))
         _menu.append(create_menu(_('backout revision'), self._backout_rev))
         _menu.append(create_menu(_('_revert'), self._revert))
-        
+
         # need mq extension for strip command
         extensions.loadall(self.ui)
         extensions.load(self.ui, 'mq', None)
         _menu.append(create_menu(_('strip revision'), self._strip_rev))
-        
+
         _menu.show_all()
         return _menu
- 
+
     def _restore_original_selection(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
         self.tree.get_selection().select_path(self._orig_sel)
- 
+
     def tree_diff_context_menu(self):
         _menu = gtk.Menu()
         _menu.append(create_menu(_('_diff with selected'), self._diff_revs))
@@ -361,7 +361,7 @@ class GLog(GDialog):
         _menu.connect_after('selection-done', self._restore_original_selection)
         _menu.show_all()
         return _menu
- 
+
     def get_body(self):
         self._filter_dialog = None
         self._menu = self.tree_context_menu()
@@ -371,7 +371,7 @@ class GLog(GDialog):
         self.tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 
         # PyGtk 2.6 and below did not automatically register types
-        if gobject.pygtk_version < (2, 8, 0): 
+        if gobject.pygtk_version < (2, 8, 0):
             gobject.type_register(TreeView)
 
         self.tree = self.graphview.treeview
@@ -383,7 +383,7 @@ class GLog(GDialog):
         #self.tree.connect('popup-menu', self._tree_popup_menu)
         self.tree.connect('row-activated', self._tree_row_act)
         #self.tree.modify_font(pango.FontDescription(self.fontlist))
-        
+
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
         mod = shlib.get_thg_modifier()
@@ -574,7 +574,7 @@ class GLog(GDialog):
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
         rev = self.currow[treemodel.REVID]
-        
+
         def refresh(*args):
             self.repo.invalidate()
             newtags = self.repo.tagslist()
@@ -612,7 +612,7 @@ class GLog(GDialog):
         if result:
             if os.path.exists(result):
                 os.remove(result)
-            
+
             # In case new export args are added in the future, merge the
             # hg defaults
             exportOpts= self.merge_opts(commands.table['^export'][1], ())
@@ -727,7 +727,7 @@ class GLog(GDialog):
 
     def _tree_popup_menu(self, treeview, button=0, time=0) :
         selrev = self.currow[treemodel.REVID]
-        
+
         # disable/enable menus as required
         parents = [self.repo.changelog.rev(x.node()) for x in
                    self.repo.changectx(None).parents()]
@@ -738,7 +738,7 @@ class GLog(GDialog):
         self._menu.popup(None, None, None, button, time)
         return True
 
-    def _tree_popup_menu_diff(self, treeview, button=0, time=0):        
+    def _tree_popup_menu_diff(self, treeview, button=0, time=0):
         # display the context menu
         self._menu2.popup(None, None, None, button, time)
         return True

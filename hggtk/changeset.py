@@ -103,7 +103,7 @@ class ChangeSet(GDialog):
 
     def _fill_buffer(self, buf, rev, ctx, filelist):
         self.stbar.begin('Retrieving changeset data...')
-        
+
         def title_line(title, text, tag):
             pad = ' ' * (12 - len(title))
             utext = toutf(title + pad + text)
@@ -197,7 +197,7 @@ class ChangeSet(GDialog):
             i1 = buf.get_iter_at_offset(p1)
             txt = buf.get_text(i0, i1)
             buf.apply_tag_by_name(name, i0, i1)
-            
+
         # inserts the marks
         for mark, offset, stats in fileoffs:
             pos = buf.get_iter_at_offset(offset)
@@ -438,14 +438,14 @@ class ChangeSet(GDialog):
             end.forward_char()
         text = text_buffer.get_text(beg, end)
         return text
-        
+
     def file_context_menu(self):
         def create_menu(label, callback):
             menuitem = gtk.MenuItem(label, True)
             menuitem.connect('activate', callback)
             menuitem.set_border_width(1)
             return menuitem
-            
+
         _menu = gtk.Menu()
         _menu.append(create_menu('_visual diff', self._diff_file_rev))
         _menu.append(create_menu('diff to _local', self._diff_to_local))
@@ -473,7 +473,7 @@ class ChangeSet(GDialog):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         details_frame.add(scroller)
-        
+
         details_text = gtk.TextView()
         details_text.set_wrap_mode(gtk.WRAP_NONE)
         details_text.set_editable(False)

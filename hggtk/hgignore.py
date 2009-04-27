@@ -81,7 +81,7 @@ class HgIgnoreDialog(gtk.Window):
         sel = pattree.get_selection()
         sel.set_mode(gtk.SELECTION_SINGLE)
         col = gtk.TreeViewColumn(_('Patterns'), gtk.CellRendererText(), text=0)
-        pattree.append_column(col) 
+        pattree.append_column(col)
         pattree.set_headers_visible(False)
         self.pattree = pattree
         scrolledwindow = gtk.ScrolledWindow()
@@ -104,7 +104,7 @@ class HgIgnoreDialog(gtk.Window):
         unknowntree = gtk.TreeView()
         unknowntree.set_search_equal_func(self.unknown_search)
         col = gtk.TreeViewColumn(_('Files'), gtk.CellRendererText(), text=0)
-        unknowntree.append_column(col) 
+        unknowntree.append_column(col)
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.set_border_width(4)
@@ -222,7 +222,7 @@ class HgIgnoreDialog(gtk.Window):
             pass
         shlib.shell_notify([self.ignorefile])
         if self.notify_func: self.notify_func()
-        
+
 def run(_ui, *pats, **opts):
     if pats and pats[0].endswith('.hgignore'):
         pats = []

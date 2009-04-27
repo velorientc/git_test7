@@ -46,7 +46,7 @@ class GShelve(GStatus):
 
     def auto_check(self):
         if self.test_opt('check'):
-            for entry in self.filemodel : 
+            for entry in self.filemodel :
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self._update_check_count()
@@ -119,7 +119,7 @@ class GShelve(GStatus):
 
     def _has_shelve_file(self):
         return os.path.exists(self.repo.join('shelve'))
-        
+
     def _activate_shelve_buttons(self, status):
         if status:
             self.shelve_btn.set_sensitive(True)
@@ -171,7 +171,7 @@ class GShelve(GStatus):
                 fc.append(c)
         if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
             sc += fc
-                
+
         def filter_patch(ui, chunks):
             return sc
 
@@ -182,7 +182,7 @@ class GShelve(GStatus):
         hgshelve.filterpatch = filter_patch
         hgshelve.shelve(self.ui, self.repo, **opts)
         self.reload_status()
-        
+
     def _unshelve(self):
         opts = {'addremove': None, 'include': [], 'force': None,
                 'append': None, 'exclude': [], 'inspect': None}

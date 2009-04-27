@@ -48,7 +48,7 @@ class ServeDialog(gtk.Window):
         self._webdirconf = webdir_conf
         self._get_config()
         self.set_default_size(500, 300)
-        
+
         # toolbar
         self.tbar = gtk.Toolbar()
         self.tooltips = gtk.Tooltips()
@@ -83,7 +83,7 @@ class ServeDialog(gtk.Window):
         vbox = gtk.VBox()
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
-        
+
         # revision input
         revbox = gtk.HBox()
         lbl = gtk.Label(_('HTTP Port:'))
@@ -127,14 +127,14 @@ class ServeDialog(gtk.Window):
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
-            
+
         if tip:
             tbutton.set_tooltip(self.tooltips, tip)
-        
+
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
-            
+
     def _delete(self, widget, event):
         if not self.should_live():
             self.destroy()
@@ -170,11 +170,11 @@ class ServeDialog(gtk.Window):
             self._button_stop.set_sensitive(False)
             self._button_browse.set_sensitive(False)
             self._button_conf.set_sensitive(True)
-            
+
     def _on_start_clicked(self, *args):
         self._start_server()
         self._set_button_states()
-        
+
     def _on_stop_clicked(self, *args):
         self._stop_server()
 
@@ -185,7 +185,7 @@ class ServeDialog(gtk.Window):
                 if os.name == 'nt':
                     try:
                         import win32api, win32con
-                        win32api.ShellExecute(0, "open", self._url, None, "", 
+                        win32api.ShellExecute(0, "open", self._url, None, "",
                             win32con.SW_SHOW)
                     except:
                         # Firefox likes to create exceptions at launch,
@@ -198,7 +198,7 @@ class ServeDialog(gtk.Window):
                             '/desktop/gnome/url-handlers/http/command') + '&'
                     os.system(browser % self._url)
             threading.Thread(target=start_browser).start()
-    
+
     def _on_conf_clicked(self, *args):
         from thgconfig import ConfigDialog
         dlg = ConfigDialog(True)
@@ -217,7 +217,7 @@ class ServeDialog(gtk.Window):
             except: port = 8000
             error_dialog(self, _('Invalid port 2048..65535'),
                     _('Defaulting to ') + self.defport)
-        
+
         global gservice
         gservice = None
 
@@ -236,7 +236,7 @@ class ServeDialog(gtk.Window):
         # loopback addr directly
         self._url = 'http://127.0.0.1:%d/' % (port)
         gobject.timeout_add(10, self.process_queue)
-        
+
     def _stop_server(self):
         if gservice and not gservice.stopped:
             gservice.stop()
@@ -246,7 +246,7 @@ class ServeDialog(gtk.Window):
 
     def write(self, msg):
         self._queue.put(msg)
-        
+
     def _write(self, msg, append=True):
         msg = hglib.toutf(msg)
         if append:
@@ -271,7 +271,7 @@ class ServeDialog(gtk.Window):
             return False # Stop polling this function
         else:
             return True
-        
+
 def thg_serve(ui, repo, **opts):
     class service:
         def init(self):

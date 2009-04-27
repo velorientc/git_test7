@@ -19,7 +19,7 @@ class InitDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         shlib.set_tortoise_icon(self, 'menucreaterepos.ico')
         shlib.set_tortoise_keys(self)
-        
+
         # set dialog title and icon
         self.cwd = os.getcwd()
         title = 'hg init - %s' % toutf(self.cwd)
@@ -37,10 +37,10 @@ class InitDialog(gtk.Window):
         # add toolbar with tooltips
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
-        
+
         self._btn_init = self._toolbutton(
                 gtk.STOCK_NEW,
-                _('Create'), 
+                _('Create'),
                 self._btn_init_clicked,
                 tip=_('Create a new repository in destination directory'))
         tbuttons = [
@@ -70,7 +70,7 @@ class InitDialog(gtk.Window):
         srcbox.pack_start(self._dest_input, True, True)
         srcbox.pack_end(self._btn_dest_browse, False, False, 5)
         vbox.pack_start(srcbox, False, False, 2)
-        
+
         # options
         option_box = gtk.VBox()
         self._opt_specialfiles = gtk.CheckButton(
@@ -96,13 +96,13 @@ class InitDialog(gtk.Window):
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
-            
+
         tbutton.set_label(label)
         if tip:
             tbutton.set_tooltip(self.tips, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
-        
+
     def _btn_dest_clicked(self, button):
         """ select source folder to clone """
         dialog = gtk.FileChooserDialog(title=None,
@@ -120,17 +120,17 @@ class InitDialog(gtk.Window):
     def _btn_init_clicked(self, toolbutton, data=None):
         # gather input data
         dest = fromutf(self._dest_input.get_text())
-        
+
         # verify input
         if dest == "":
             error_dialog(self, _('Destination path is empty'),
                     _('Please enter the directory path'))
             self._dest_input.grab_focus()
             return False
-        
+
         # start
         u = ui.ui()
-        
+
         # fncache is the new default repo format in Mercurial 1.1
         if self._opt_oldrepoformat.get_active():
             u.setconfig('format', 'usefncache', 'False')
@@ -145,7 +145,7 @@ class InitDialog(gtk.Window):
             return False
         except:
             import traceback
-            error_dialog(self, _('Error when creating repository'), 
+            error_dialog(self, _('Error when creating repository'),
                     traceback.format_exc())
             return False
 
@@ -159,7 +159,7 @@ class InitDialog(gtk.Window):
                     open(hgignore, 'wb')
                 except:
                     pass
-        
+
         info_dialog(self, _('New repository created'),
                 _('in directory %s') % toutf(os.path.abspath(dest)))
 

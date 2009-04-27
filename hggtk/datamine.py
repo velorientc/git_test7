@@ -37,10 +37,10 @@ class DataMineDialog(GDialog):
         pass
 
     def get_tbbuttons(self):
-        self.stop_button = self.make_toolbutton(gtk.STOCK_STOP, _('Stop'), 
+        self.stop_button = self.make_toolbutton(gtk.STOCK_STOP, _('Stop'),
                 self._stop_current_search, tip=_('Stop operation on current tab'))
         return [
-            self.make_toolbutton(gtk.STOCK_FIND, _('New Search'), 
+            self.make_toolbutton(gtk.STOCK_FIND, _('New Search'),
                 self._search_clicked, tip=_('Open new search tab')),
             self.stop_button
             ]
@@ -71,7 +71,7 @@ class DataMineDialog(GDialog):
         # settings['datamine']
 
     def get_body(self):
-        """ Initialize the Dialog. """        
+        """ Initialize the Dialog. """
         self.grep_cmenu = self.grep_context_menu()
         self.ann_cmenu = self.annotate_context_menu()
         self.changedesc = {}
@@ -278,7 +278,7 @@ class DataMineDialog(GDialog):
         objs = (includes, excludes, follow)
         includes.connect('changed', self._update_following_possible, objs)
         excludes.connect('changed', self._update_following_possible, objs)
-        
+
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
@@ -296,7 +296,7 @@ class DataMineDialog(GDialog):
         return True
 
     def trigger_search(self, button, objs):
-        (model, frame, regexp, follow, ignorecase, 
+        (model, frame, regexp, follow, ignorecase,
                 excludes, includes, linenum, showall, search_hbox) = objs
         retext = regexp.get_text()
         if not retext:
@@ -304,7 +304,7 @@ class DataMineDialog(GDialog):
                    _('You must provide a search expression'), self).run()
             regexp.grab_focus()
             return
-        
+
         q = Queue.Queue()
         args = [self.repo.root, q, 'grep']
         if follow.get_active():     args.append('--follow')
@@ -523,7 +523,7 @@ class DataMineDialog(GDialog):
         hbox.pack_start(lbl, True, True, 2)
         hbox.pack_start(close, False, False)
         hbox.show_all()
-        num = self.notebook.append_page_menu(frame, 
+        num = self.notebook.append_page_menu(frame,
                 hbox, gtk.Label(toutf(path + '@' + revid)))
 
         if hasattr(self.notebook, 'set_tab_reorderable'):

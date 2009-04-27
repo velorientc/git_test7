@@ -23,7 +23,7 @@ class BackoutDialog(gtk.Window):
         self.set_title(_('Backout changeset - ') + rev)
         self.set_default_size(600, 400)
         self.notify_func = None
-        
+
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
 
@@ -67,7 +67,7 @@ class BackoutDialog(gtk.Window):
         frame = gtk.Frame(_('Backout commit message'))
         frame.set_border_width(4)
         frame.add(scrolledwindow)
-        self.tips.set_tip(frame, 
+        self.tips.set_tip(frame,
                 _('Commit message text for new changeset that reverses the'
                 '  effect of the change being backed out.'))
         vbox.pack_start(frame, True, True, 4)
@@ -90,7 +90,7 @@ class BackoutDialog(gtk.Window):
         tbutton.set_tooltip(self.tips, tip)
         tbutton.connect('clicked', handler)
         return tbutton
-        
+
     def _backout_clicked(self, button):
         buf = self.logview.get_buffer()
         start, end = buf.get_bounds()

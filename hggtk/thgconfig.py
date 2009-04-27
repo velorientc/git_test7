@@ -50,7 +50,7 @@ shelve synch status userconfig repoconfig guess remove rename revert
 serve update vdiff'''.split()
 
 _commit_info = (
-    (_('Username'), 'ui.username', [], 
+    (_('Username'), 'ui.username', [],
         _('Name associated with commits')),
     (_('External Commit Tool'), 'tortoisehg.extcommit', ['None', 'qct'],
         _('Select commit tool launched by TortoiseHg. (Qct is no longer'
@@ -340,7 +340,7 @@ class PathEditDialog(gtk.Dialog):
 
 class ConfigDialog(gtk.Dialog):
     def __init__(self, configrepo=False, focusfield=None, newpath=None):
-        """ Initialize the Dialog. """        
+        """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         self.add_button(gtk.STOCK_EDIT, gtk.RESPONSE_YES)
@@ -469,7 +469,7 @@ class ConfigDialog(gtk.Dialog):
                     self.notebook.set_current_page(page_num)
                     widgets[w].grab_focus()
                     return
-                    
+
     def new_path(self, newpath):
         '''Add a new path to [paths], give default name, focus'''
         i = self.pathdata.insert_before(None, None)
@@ -576,11 +576,11 @@ class ConfigDialog(gtk.Dialog):
         renderer = gtk.CellRendererText()
         column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
         self.pathtree.append_column(column)
-        
+
         renderer = gtk.CellRendererText()
         column = gtk.TreeViewColumn(_('Repository Path'), renderer, text=1)
         self.pathtree.append_column(column)
-        
+
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.pathtree)
@@ -859,7 +859,7 @@ class ConfigDialog(gtk.Dialog):
 
         self.pages.append((vbox, info, widgets))
         return vbox
-        
+
     def _refresh_vlist(self):
         for vbox, info, widgets in self.pages:
             for row, (label, cpath, values, tooltip) in enumerate(info):
@@ -898,7 +898,7 @@ class ConfigDialog(gtk.Dialog):
                         pass
 
                 currow = None
-                if not ispw: 
+                if not ispw:
                     vlist.append([_unspecstr, False])
                 if values:
                     vlist.append([_('Suggested'), True])
@@ -941,7 +941,7 @@ class ConfigDialog(gtk.Dialog):
             return self.ini[section][key]
         except KeyError:
             return None
-        
+
     def load_config(self, rcpath):
         for fn in rcpath:
             if os.path.exists(fn):
@@ -1003,7 +1003,7 @@ class ConfigDialog(gtk.Dialog):
 
         self.history.write()
         self._refresh_vlist()
-        
+
         try:
             f = open(self.fn, "w")
             f.write(str(self.ini))

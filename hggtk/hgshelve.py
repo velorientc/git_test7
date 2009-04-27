@@ -19,7 +19,7 @@ lines_re = re.compile(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@\s*(.*)')
 def internalpatch(patchobj, ui, strip, cwd, reverse=False, files={}):
     """use builtin patch to apply <patchobj> to the working directory.
     returns whether patch was applied with fuzz factor.
-    
+
     Adapted from patch.internalpatch() to support reverse patching.
     """
     try:
@@ -30,7 +30,7 @@ def internalpatch(patchobj, ui, strip, cwd, reverse=False, files={}):
         curdir = os.getcwd()
         os.chdir(cwd)
     try:
-        ret = patch.applydiff(ui, fp, files, strip=strip, 
+        ret = patch.applydiff(ui, fp, files, strip=strip,
                               reverse=reverse)
     finally:
         if cwd:
@@ -426,7 +426,7 @@ def shelve(ui, repo, *pats, **opts):
     forced = opts['force'] or opts['append']
     if os.path.exists(repo.join('shelve')) and not forced:
         raise util.Abort(_('shelve data already exists'))
-            
+
     def shelvefunc(ui, repo, message, match, opts):
         # If an MQ patch is applied, consider all qdiff changes
         if hasattr(repo, 'mq') and repo.mq.applied:
@@ -441,7 +441,7 @@ def shelve(ui, repo, *pats, **opts):
         diffopts = mdiff.diffopts(git=True, nodates=True)
         patch_diff = ''.join(patch.diff(repo, basenode, match=match,
                              changes=changes, opts=diffopts))
-        
+
         fp = cStringIO.StringIO(patch_diff)
         ac = parsepatch(fp)
         fp.close()
@@ -466,7 +466,7 @@ def shelve(ui, repo, *pats, **opts):
         try:
             bkfiles = [f for f in newfiles if f in modified]
             backups = makebackup(ui, repo, backupdir, bkfiles)
-            
+
             # patch to shelve
             sp = cStringIO.StringIO()
             for c in chunks:
@@ -559,7 +559,7 @@ def unshelve(ui, repo, *pats, **opts):
                     else:
                         ui.status(_('restoring backup files\n'))
                         for realname, tmpname in backups.iteritems():
-                            ui.debug(_('restoring %r to %r\n') % 
+                            ui.debug(_('restoring %r to %r\n') %
                                      (tmpname, realname))
                             util.copyfile(tmpname, repo.wjoin(realname))
             finally:
@@ -575,7 +575,7 @@ def unshelve(ui, repo, *pats, **opts):
                 ui.status(_('unshelve completed\n'))
     except IOError:
         ui.warn(_('nothing to unshelve\n'))
-    
+
 cmdtable = {
     "shelve":
         (shelve,
@@ -590,7 +590,7 @@ cmdtable = {
     "unshelve":
         (unshelve,
          [('i', 'inspect', None, _('inspect shelved changes only')),
-          ('f', 'force', None, 
+          ('f', 'force', None,
            _('proceed even if patches do not unshelve cleanly')),
          ],
          _('hg unshelve [OPTION]... [FILE]...')),

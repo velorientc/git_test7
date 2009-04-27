@@ -23,7 +23,7 @@ class HistoryDialog(gtk.Dialog):
                       gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
         else:
             buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-        super(HistoryDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
+        super(HistoryDialog, self).__init__(flags=gtk.DIALOG_MODAL,
                                            buttons=buttons)
         shlib.set_tortoise_icon(self, 'menulog.ico')
         shlib.set_tortoise_keys(self)
@@ -44,15 +44,15 @@ class HistoryDialog(gtk.Dialog):
         # build dialog
         self._create()
 
-        # display history 
+        # display history
         self._generate_history()
 
     def _create(self):
         self.set_default_size(650, 400)
-        
+
         self._hbox = gtk.VBox()
         self.vbox.pack_start(self._hbox, True, True)
-        
+
         # add treeview to list change files
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_IN)
@@ -62,7 +62,7 @@ class HistoryDialog(gtk.Dialog):
         self._create_treestore()
         scrolledwindow.add(self.treeview)
         self._hbox.pack_start(scrolledwindow, True, True)
-        
+
         self._button_box = gtk.HBox()
         self._hbox.pack_start(self._button_box, False, False, 10)
 
@@ -75,7 +75,7 @@ class HistoryDialog(gtk.Dialog):
         self._button_box.pack_start(self._btn_goto_next, False, False)
         self._btn_goto_first = gtk.Button('(0)')
         self._button_box.pack_start(self._btn_goto_first, False, False)
-        
+
         self._btn_goto_tip.connect('clicked', self._on_goto_clicked, 'tip')
         self._btn_goto_next.connect('clicked', self._on_goto_clicked, 'next')
         self._btn_goto_prev.connect('clicked', self._on_goto_clicked, 'prev')
@@ -86,7 +86,7 @@ class HistoryDialog(gtk.Dialog):
         #self._button_box.pack_end(self._search_input, False, False)
         #self._btn_search = gtk.Button("Search:")
         #self._button_box.pack_end(self._btn_search, False, False, 3)
-        
+
         # show them all
         self.vbox.show_all()
 
@@ -98,9 +98,9 @@ class HistoryDialog(gtk.Dialog):
         #self.treeview.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
-        
+
         cell = gtk.CellRendererText()
-        
+
         column = gtk.TreeViewColumn()
         column.pack_start(cell, expand=True)
         column.add_attribute(cell, 'text', 0)
@@ -118,14 +118,14 @@ class HistoryDialog(gtk.Dialog):
         cs = self.history[index]['changeset'][0]
         rev, csid = cs.split(':')
         self.selected = (rev, csid)
-        
-    def _get_hg_history(self, rev=None, limit=10):    
+
+    def _get_hg_history(self, rev=None, limit=10):
         # get history
         options = []
         if rev: options += ['--rev', rev]
         if limit: options += ['--limit', str(limit)]
         self._do_hg_cmd('log', options)
-        
+
         # parse log output
         import re
         histlist = []
@@ -145,9 +145,9 @@ class HistoryDialog(gtk.Dialog):
                     pass
         if cs:
             histlist.append(cs)
-        
+
         return histlist
-        
+
     def _generate_history(self):
         # clear changed files display
         self.model.clear()
@@ -167,13 +167,13 @@ class HistoryDialog(gtk.Dialog):
                     self.model.append(titer, [ fld + ":", v ])
 
         self.treeview.expand_all()
-        
+
         if self.start_rev == 'tip':
             self.tip_rev = self._get_revision_on_page(0)
-        
+
     def _do_hg_cmd(self, cmd, options):
         import os.path
-                  
+
         try:
             q = Queue.Queue()
             args = [cmd] + options + [os.path.join(self.root, x) for x in self.files]
@@ -211,7 +211,7 @@ class HistoryDialog(gtk.Dialog):
             self.start_rev = next_start
 
         self._generate_history()
-    
+
     def _get_revision_on_page(self, index):
         import string
         cs = self.history[index]
@@ -225,7 +225,7 @@ class HistoryDialog(gtk.Dialog):
         if 'tip' in tags:
             return True
         return False
-        
+
     def _is_first_revision(self, index):
         rev = self._get_revision_on_page(index)
         if rev == 0:

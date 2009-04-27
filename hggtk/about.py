@@ -24,7 +24,7 @@ def browse_url(url):
     def start_browser():
         if os.name == 'nt':
             import win32api, win32con
-            win32api.ShellExecute(0, "open", url, None, "", 
+            win32api.ShellExecute(0, "open", url, None, "",
                 win32con.SW_SHOW)
         else:
             import gconf
@@ -36,13 +36,13 @@ def browse_url(url):
 
 def url_handler(dialog, link, user_data):
 	browse_url(link)
-    
+
 gtk.about_dialog_set_url_hook(url_handler, None)
 
 def make_version(tuple):
     vers = ".".join([str(x) for x in tuple])
     return vers
-    
+
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
         super(AboutDialog, self).__init__()
@@ -54,7 +54,7 @@ class AboutDialog(gtk.AboutDialog):
                 "PyGTK-%s" % make_version(gtk.pygtk_version),
                 "GTK-%s" % make_version(gtk.gtk_version),
             ])
-        
+
         comment = _("Several icons are courtesy of the TortoiseSVN project")
 
         self.set_website("http://bitbucket.org/tortoisehg/stable/")

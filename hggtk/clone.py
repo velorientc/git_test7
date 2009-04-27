@@ -38,21 +38,21 @@ class CloneDialog(gtk.Window):
             self._dest_path = repos[1]
         elif len(repos):
             self._src_path = repos[0]
-            
+
         # build dialog
         self._create()
 
     def _create(self):
         self.set_default_size(520, 180)
         ewidth = 16
-        
+
         # add toolbar with tooltips
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
-        
+
         self._btn_clone = self._toolbutton(
                 gtk.STOCK_COPY,
-                _('clone'), 
+                _('clone'),
                 self._btn_clone_clicked,
                 tip=_('Clone a repository'))
         tbuttons = [
@@ -90,7 +90,7 @@ class CloneDialog(gtk.Window):
         srcbox.pack_start(self._srclistbox, True, True)
         srcbox.pack_end(self._btn_src_browse, False, False, 5)
         vbox.pack_start(srcbox, False, False, 2)
-        
+
         # add pre-defined src paths to pull-down list
         sympaths = [x[1] for x in ui.ui().configitems('paths')]
         recent = [x for x in self._recent_src]
@@ -117,14 +117,14 @@ class CloneDialog(gtk.Window):
         cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
         self._destlistbox.pack_start(cell)
         self._destlistbox.add_attribute(cell, 'text', 0)
-        
+
         self._btn_dest_browse = gtk.Button(_('Browse...'))
         self._btn_dest_browse.connect('clicked', self._btn_dest_clicked)
         destbox.pack_start(lbl, False, False)
         destbox.pack_start(self._destlistbox, True, True)
         destbox.pack_end(self._btn_dest_browse, False, False, 5)
         vbox.pack_start(destbox, False, False, 2)
-        
+
         # add most-recent dest paths to pull-down list
         paths = list(self._recent_dest)
         paths.sort()
@@ -160,7 +160,7 @@ class CloneDialog(gtk.Window):
         option_box.pack_start(self._opt_proxy, False, False)
         vbox.pack_start(option_box, False, False, 15)
 
-        if ui.ui().config('http_proxy', 'host', ''):   
+        if ui.ui().config('http_proxy', 'host', ''):
             self._opt_proxy.set_active(True)
         else:
             self._opt_proxy.set_sensitive(False)
@@ -179,7 +179,7 @@ class CloneDialog(gtk.Window):
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
-            
+
         tbutton.set_label(label)
         if tip:
             tbutton.set_tooltip(self.tips, tip)
@@ -197,7 +197,7 @@ class CloneDialog(gtk.Window):
         if response == gtk.RESPONSE_OK:
             self._dest_input.set_text(dialog.get_filename())
         dialog.destroy()
-        
+
     def _btn_src_clicked(self, button):
         """ select source folder to clone """
         dialog = gtk.FileChooserDialog(title=None,
@@ -242,21 +242,21 @@ class CloneDialog(gtk.Window):
         # save path to recent list in history
         self._recent_dest.add(dest)
         self._settings.write()
-        
+
         # update drop down list
         paths = list(self._recent_dest)
         paths.sort()
         self._destlist.clear()
         for p in paths:
             self._destlist.append([p])
- 
+
     def _btn_clone_clicked(self, toolbutton, data=None):
         # gather input data
         src = self._src_input.get_text()
         dest = self._dest_input.get_text() or os.path.basename(src)
         remotecmd = self._remote_cmd.get_text()
         rev = self._rev_input.get_text()
-        
+
         # verify input
         if src == '':
             error_dialog(self, _('Source path is empty'), _('Please enter'))
@@ -276,9 +276,9 @@ class CloneDialog(gtk.Window):
                 dest = None
             else:
                 dest = '.'
-        
-        # start cloning        
-        try:            
+
+        # start cloning
+        try:
             cmdline = ['hg', 'clone']
             if self._opt_update.get_active():
                 cmdline.append('--noupdate')
@@ -289,10 +289,10 @@ class CloneDialog(gtk.Window):
             if not (self._opt_proxy.get_active() and
                     ui.ui().config('http_proxy', 'host', '')):
                 cmdline += ["--config", "http_proxy.host="]
-            if remotecmd:   
+            if remotecmd:
                 cmdline.append('--remotecmd')
                 cmdline.append(remotecmd)
-            if not self._opt_allrev.get_active() and rev:   
+            if not self._opt_allrev.get_active() and rev:
                 cmdline.append('--rev')
                 cmdline.append(rev)
 

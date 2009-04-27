@@ -21,9 +21,9 @@ from mercurial.i18n import _
 def _message_dialog(parent, type, primary, secondary, buttons=gtk.BUTTONS_OK,
                     title="TortoiseHg"):
     """ Display a given type of MessageDialog with the given message.
-    
+
     :param type: message dialog type
-    
+
     :param message: the message you want to display.
     """
     dialog = MessageDialog(parent, flags=gtk.DIALOG_MODAL, type=type,

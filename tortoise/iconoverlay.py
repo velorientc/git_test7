@@ -64,7 +64,7 @@ class IconOverlayExtension(object):
         recipe for a happy system. By utilizing the TortoiseOverlay.dll
         we can share overlay slots with the other tortoises.
     """
-    
+
     counter = 0
 
     _com_interfaces_ = [shell.IID_IShellIconOverlayIdentifier]
@@ -73,13 +73,13 @@ class IconOverlayExtension(object):
         ]
     _reg_threading_ = 'Apartment'
 
-    def GetOverlayInfo(self): 
-        return ("", 0, 0) 
+    def GetOverlayInfo(self):
+        return ("", 0, 0)
 
     def GetPriority(self):
         return 0
-        
-    def IsMemberOf(self, path, attrib):                  
+
+    def IsMemberOf(self, path, attrib):
         if appfiltered: return S_FALSE
         global cache_lock
         try:
@@ -92,13 +92,13 @@ class IconOverlayExtension(object):
             cache_lock.release()
             debugf("IsMemberOf(%s): _get_state() took %d ticks",
                     (self.state, win32api.GetTickCount() - tc))
-            
+
 def make_icon_overlay(name, icon_type, state, clsid):
     """
     Make an icon overlay COM class.
 
     Used to create different COM server classes for highlighting the
-    files with different source controlled states (eg: unchanged, 
+    files with different source controlled states (eg: unchanged,
     modified, ...).
     """
     classname = "%sOverlay" % name

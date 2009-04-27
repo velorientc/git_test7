@@ -100,7 +100,7 @@ class FileSelectionDialog(gtk.Dialog):
             repo = hg.repository(ui.ui(), path=rootpath())
         except RepoError:
             # hgtk should catch this earlier
-            Prompt(_('No repository'), 
+            Prompt(_('No repository'),
                    _('No repository found here'), None).run()
             return
 
@@ -127,7 +127,7 @@ class FileSelectionDialog(gtk.Dialog):
             finally:
                 os.chdir(cwd)
         else:
-            Prompt(_('No visual diff tool'), 
+            Prompt(_('No visual diff tool'),
                    _('No visual diff tool has been configured'), None).run()
 
     def search_filelist(self, model, column, key, iter):
@@ -187,7 +187,7 @@ class FileSelectionDialog(gtk.Dialog):
         matcher = cmdutil.match(repo, pats, opts)
         modified, added, removed = repo.status(node1, node2, matcher)[:3]
         if not (modified or added or removed):
-            Prompt(_('No file changes'), 
+            Prompt(_('No file changes'),
                    _('There are no file changes to view'), self).run()
             # GTK+ locks up if this is done immediately here
             gobject.idle_add(self.destroy)
@@ -255,7 +255,7 @@ class FileSelectionDialog(gtk.Dialog):
                        stdout=subprocess.PIPE,
                        stdin=subprocess.PIPE)
         except (WindowsError, EnvironmentError), e:
-            Prompt(_('Tool launch failure'), 
+            Prompt(_('Tool launch failure'),
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
 
 def run(ui, *pats, **opts):

@@ -81,7 +81,7 @@ class Settings(object):
         ls = self.get_value(key, [], True)
         ml = SimpleMRUList(size=size, reflist=ls)
         return ml
-    
+
     def get_keys(self):
         return self._data.keys()
 
@@ -129,7 +129,7 @@ def get_system_times():
     if t[4] == 0.0: # Windows leaves this as zero, so use time.clock()
         t = (t[0], t[1], t[2], t[3], time.clock())
     return t
-    
+
 def set_tortoise_icon(window, thgicon):
     ico = get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)
@@ -227,7 +227,7 @@ if os.name == 'nt':
             pidl, ignore = shell.SHILCreateFromPath(dir, 0)
             if pidl is None:
                 continue
-            shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
+            shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM,
                                  shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSH,
                                  pidl, None)
 else:

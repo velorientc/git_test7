@@ -43,7 +43,7 @@ except ImportError:
 def toutf(s):
     """
     Convert a string to UTF-8 encoding
-    
+
     Based on mercurial.util.tolocal()
     """
     for e in ('utf-8', _encoding):
@@ -56,7 +56,7 @@ def toutf(s):
 def fromutf(s):
     """
     Convert UTF-8 encoded string to local.
-    
+
     It's primarily used on strings converted to UTF-8 by toutf().
     """
     try:
@@ -293,7 +293,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     Replicate functionality of mercurial dispatch but force the use
     of the passed in ui for all purposes
     '''
-    
+
     # clear all user-defined command defaults
     if nodefaults:
         for k, v in ui.configitems('defaults'):

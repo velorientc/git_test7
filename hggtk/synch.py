@@ -29,7 +29,7 @@ class SynchDialog(gtk.Window):
         self.root = rootpath()
         self.selected_path = None
         self.hgthread = None
-        
+
         # persistent app data
         self._settings = shlib.Settings('synch')
         self._recent_src = self._settings.mrul('src_paths')
@@ -91,7 +91,7 @@ class SynchDialog(gtk.Window):
         vbox = gtk.VBox()
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
-        
+
         # sync target info
         targethbox = gtk.HBox()
         lbl = gtk.Button(_('Repo:'))
@@ -103,7 +103,7 @@ class SynchDialog(gtk.Window):
         lbl.unset_flags(gtk.CAN_FOCUS)
         lbl.connect('clicked', self._btn_bundlepath_clicked)
         targethbox.pack_start(lbl, False, False)
-        
+
         # revisions combo box
         self.pathlist = gtk.ListStore(str, str)
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
@@ -138,7 +138,7 @@ class SynchDialog(gtk.Window):
 
         # create checkbox to disable proxy
         self._use_proxy = gtk.CheckButton(_('use proxy server'))
-        if ui.ui().config('http_proxy', 'host', ''):   
+        if ui.ui().config('http_proxy', 'host', ''):
             self._use_proxy.set_active(True)
         else:
             self._use_proxy.set_sensitive(False)
@@ -215,7 +215,6 @@ class SynchDialog(gtk.Window):
         iovbox.pack_start(self._newestfirst, False, False, 2)
         iovbox.pack_start(self._nomerge, False, False, 2)
         frame.add(iovbox)
-        vbox.pack_start(expander, False, False, 2)
 
         # hg output window
         scrolledwindow = gtk.ScrolledWindow()
@@ -242,7 +241,7 @@ class SynchDialog(gtk.Window):
         vbox.pack_start(self.stbar, False, False, 2)
         self.connect('map', self.update_buttons)
         self._last_drop_time = None
-        
+
         self.load_settings()
         self.update_pull_setting()
 
@@ -317,7 +316,7 @@ class SynchDialog(gtk.Window):
         self.hgthread.start()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmdline))
-        
+
     def _get_paths(self, sort="value"):
         """ retrieve symbolic paths """
         try:
@@ -369,7 +368,7 @@ class SynchDialog(gtk.Window):
         if response == gtk.RESPONSE_OK:
             self._pathtext.set_text(dialog.get_filename())
         dialog.destroy()
-        
+
     def should_live(self):
         if self._cmd_running():
             error_dialog(self, _('Cannot close now'), _('command is running'))
@@ -378,11 +377,11 @@ class SynchDialog(gtk.Window):
             self.update_settings()
             self._settings.write()
             return False
-        
+
     def _delete(self, widget, event):
         if not self.should_live():
             self.destroy()
-   
+
     def _toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
         if menu:
@@ -390,7 +389,7 @@ class SynchDialog(gtk.Window):
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
-            
+
         tbutton.set_label(label)
         if tip:
             tbutton.set_tooltip(self.tips, tip)
@@ -413,9 +412,9 @@ class SynchDialog(gtk.Window):
         target_rev = self._reventry.get_text().strip()
         if target_rev != "":
             opts['rev'] = ['--rev', target_rev]
-            
+
         return opts
-        
+
     def _pull_clicked(self, toolbutton, data=None):
         aopts = self._get_advanced_options()
         if self.fetchradio.get_active():
@@ -434,7 +433,7 @@ class SynchDialog(gtk.Window):
             extensions.load(self.ui, 'rebase', None)
         cmd += aopts.get('rev', [])
         self._exec_cmd(cmd)
-    
+
     def _push_clicked(self, toolbutton, data=None):
         aopts = self._get_advanced_options()
         cmd = ['push']
@@ -442,7 +441,7 @@ class SynchDialog(gtk.Window):
         cmd += aopts.get('force', [])
         cmd += aopts.get('remotecmd', [])
         self._exec_cmd(cmd)
-        
+
     def _conf_clicked(self, toolbutton, data=None):
         newpath = fromutf(self._pathtext.get_text()).strip()
         for alias, path in self.paths:
@@ -492,7 +491,7 @@ class SynchDialog(gtk.Window):
         cmd += aopts.get('newest-first', [])
         cmd += aopts.get('remotecmd', [])
         self._exec_cmd(cmd)
-        
+
     def _outgoing_clicked(self, toolbutton, data=None):
         aopts = self._get_advanced_options()
         cmd = ['outgoing']
@@ -503,7 +502,7 @@ class SynchDialog(gtk.Window):
         cmd += aopts.get('newest-first', [])
         cmd += aopts.get('remotecmd', [])
         self._exec_cmd(cmd)
-        
+
     def _stop_clicked(self, toolbutton, data=None):
         if self._cmd_running():
             self.hgthread.terminate()
@@ -526,13 +525,13 @@ class SynchDialog(gtk.Window):
                 remote_path = path
             elif remote_path == url.hidepassword(path):
                 remote_path = path
-        
+
         cmdline = cmd[:]
         cmdline += ['--verbose', '--repository', self.root]
         if proxy_host and not use_proxy:
             cmdline += ["--config", "http_proxy.host="]
         cmdline += [remote_path]
-        
+
         # show command to be executed
         self.write("", False)
 
@@ -542,7 +541,7 @@ class SynchDialog(gtk.Window):
         self.hgthread.start()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmd + [remote_path]))
-        
+
         self._add_src_to_recent(remote_path)
 
     def _cmd_running(self):
@@ -550,7 +549,7 @@ class SynchDialog(gtk.Window):
             return True
         else:
             return False
-        
+
     def _add_src_to_recent(self, src):
         if os.path.exists(src):
             src = os.path.abspath(src)
@@ -593,14 +592,14 @@ class SynchDialog(gtk.Window):
             if self.hgthread.return_code() is None:
                 self.write(_('[command interrupted]'))
             return False # Stop polling this function
-    
+
     AdvancedDefaults = {
-        'expander.expanded': False, 
-        '_reventry.text': '', 
-        '_cmdentry.text': '', 
+        'expander.expanded': False,
+        '_reventry.text': '',
+        '_cmdentry.text': '',
         '_force.active': False,
-        '_showpatch.active': False, 
-        '_newestfirst.active': False, 
+        '_showpatch.active': False,
+        '_newestfirst.active': False,
         '_nomerge.active': False,}
 
     def _expanded(self, expander):
@@ -613,7 +612,7 @@ class SynchDialog(gtk.Window):
             member, attr = key.split('.')
             value = get_value(key, default)
             getattr(getattr(self, member), 'set_%s'%attr)(value)
-        
+
     def update_settings(self, set_value = None):
         set_value = set_value or self._settings.set_value
         for key, default in SynchDialog.AdvancedDefaults.iteritems():

@@ -4,7 +4,7 @@
 #
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
-# 
+#
 
 import gtk
 import gobject
@@ -40,7 +40,7 @@ class Prompt(SimpleMessage):
         self.set_markup('<b>' + hglib.toutf(message) + '</b>')
 
 class Confirm(SimpleMessage):
-    """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO 
+    """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO
     """
     def __init__(self, title, files, parent, primary=None):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
@@ -53,7 +53,7 @@ class Confirm(SimpleMessage):
         message = ''
         for i, f in enumerate(files):
             message += '   ' + f + '\n'
-            if i == 9: 
+            if i == 9:
                 message += '   ...\n'
                 break
         self.format_secondary_text(hglib.toutf(message))
@@ -61,9 +61,9 @@ class Confirm(SimpleMessage):
         self.add_accel_group(accel_group)
         buttons = self.get_children()[0].get_children()[1].get_children()
         buttons[1].add_accelerator("clicked", accel_group, ord("y"),
-                              0, gtk.ACCEL_VISIBLE) 
+                              0, gtk.ACCEL_VISIBLE)
         buttons[0].add_accelerator("clicked", accel_group, ord("n"),
-                              0, gtk.ACCEL_VISIBLE) 
+                              0, gtk.ACCEL_VISIBLE)
 
 
 class GDialog(gtk.Window):
@@ -121,7 +121,7 @@ class GDialog(gtk.Window):
 
 
     def get_defsize(self):
-        return self._setting_defsize 
+        return self._setting_defsize
 
 
     def get_tbbuttons(self):
@@ -188,7 +188,7 @@ class GDialog(gtk.Window):
         return opt in self.opts and self.opts[opt]
 
     def _parse_config(self):
-        # defaults    
+        # defaults
         self.fontcomment = 'monospace 10'
         self.fontdiff = 'monospace 10'
         self.fontlist = 'monospace 9'
@@ -282,7 +282,7 @@ class GDialog(gtk.Window):
         self.lastpos = self._setting_winpos
         self.connect('window-state-event', self.windowstate)
         self.connect('set-focus', self.setfocus)
-        
+
         # Minimum size
         minx, miny = self.get_minsize()
         self.set_size_request(minx, miny)
@@ -295,7 +295,7 @@ class GDialog(gtk.Window):
 
         vbox = gtk.VBox(False, 0)
         self.add(vbox)
-        
+
         self.tooltips = gtk.Tooltips()
         toolbar = gtk.Toolbar()
         tbuttons =  self.get_tbbuttons()
@@ -307,7 +307,7 @@ class GDialog(gtk.Window):
         # Subclass returns the main body
         body = self.get_body()
         vbox.pack_start(body, True, True, 0)
-        
+
         # Subclass provides extra stuff in bottom hbox
         extras = self.get_extras()
         if extras:
@@ -334,7 +334,7 @@ class GDialog(gtk.Window):
 
     def _hg_call_wrapper(self, title, command, showoutput=True):
         """Run the specified command and display any resulting aborts,
-        messages, and errors 
+        messages, and errors
         """
         textout = ''
         saved = sys.stderr
@@ -349,7 +349,7 @@ class GDialog(gtk.Window):
                 return False, ''
         finally:
             sys.stderr = saved
-            textout = self.ui.popbuffer() 
+            textout = self.ui.popbuffer()
             prompttext = ''
             if showoutput:
                 prompttext = textout + '\n'
@@ -372,7 +372,7 @@ class GDialog(gtk.Window):
 
     def _view_file(self, stat, file, force_left=False):
         import atexit
-        
+
         def cleanup():
             shutil.rmtree(self.tmproot)
 
@@ -429,7 +429,7 @@ class GDialog(gtk.Window):
             util.system("%s \"%s\"" % (editor, file_path),
                         environ={'HGUSER': self.ui.username()},
                         onerr=util.Abort, errprefix=_('edit failed'))
-                
+
         editor = (self.ui.config('tortoisehg', 'editor') or
                 self.ui.config('gtools', 'editor') or
                 os.environ.get('HGEDITOR') or
@@ -447,7 +447,7 @@ class GDialog(gtk.Window):
             self.ui = ui.ui()
             self._parse_config()
             return
-            
+
         file = util.localpath(file)
         thread = threading.Thread(target=doedit, name='edit:'+file)
         thread.setDaemon(True)
@@ -456,7 +456,7 @@ class GDialog(gtk.Window):
 class NativeSaveFileDialogWrapper:
     """Wrap the windows file dialog, or display default gtk dialog if
     that isn't available"""
-    def __init__(self, InitialDir = None, Title = _('Save File'), 
+    def __init__(self, InitialDir = None, Title = _('Save File'),
                  Filter = {"All files": "*.*"}, FilterIndex = 1, FileName = ''):
         import os.path
         if InitialDir == None:
@@ -485,7 +485,7 @@ class NativeSaveFileDialogWrapper:
         fname, customfilter, flags=win32gui.GetSaveFileNameW(
             InitialDir=self.InitialDir,
             Flags=win32con.OFN_EXPLORER,
-            File=self.FileName, 
+            File=self.FileName,
             DefExt='py',
             Title=self.Title,
             Filter="",

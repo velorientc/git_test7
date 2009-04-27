@@ -17,7 +17,7 @@ class FilterDialog(gtk.Dialog):
     def __init__(self, root='', revs=[], files=[], filterfunc=None):
         """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-        super(FilterDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
+        super(FilterDialog, self).__init__(flags=gtk.DIALOG_MODAL,
                                            buttons=buttons)
         shlib.set_tortoise_icon(self, 'menucheckout.ico')
         shlib.set_tortoise_keys(self)
@@ -38,7 +38,7 @@ class FilterDialog(gtk.Dialog):
         self.set_default_size(350, 120)
 
         self.tips = gtk.Tooltips()
-        
+
         # branch: combo box
         hbox = gtk.HBox()
         self.branchradio = gtk.RadioButton(None, _('Branch'))
@@ -101,7 +101,7 @@ class FilterDialog(gtk.Dialog):
         vbox.pack_start(eventbox, False, False, 4)
         if files:
             self.filesentry.set_text(', '.join(files))
-        
+
         hbox = gtk.HBox()
         self.kwentry = gtk.Entry()
         self.kwentry.connect('activate', self._btn_apply_clicked)
@@ -165,13 +165,13 @@ class FilterDialog(gtk.Dialog):
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
-            
+
         tbutton.set_label(label)
         if tip:
             tbutton.set_tooltip(self.tips, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
-        
+
     def _btn_apply_clicked(self, button, data=None):
         opts = {}
         if self.searchradio.get_active():
@@ -214,7 +214,7 @@ class FilterDialog(gtk.Dialog):
 
         if self.filterfunc:
             self.filterfunc(opts)
-        
+
     def _date_help(self, button):
         from hgcmd import CmdDialog
         dlg = CmdDialog(['hg', 'help', 'dates'], False)

@@ -81,14 +81,14 @@ def RegisterServer(cls):
         _winreg.SetValue(_winreg.HKEY_CLASSES_ROOT, key, _winreg.REG_SZ, "%s;%s" % (path, hg_path))
     except Exception, e:
         print 'register COM path failed', e
-        
+
     # Add the appropriate shell extension registry keys
     for category, keyname, values in cls.registry_keys:
         hkey = _winreg.CreateKey(category, keyname)
         for (name, val) in values:
             # todo: handle ints?
             _winreg.SetValueEx(hkey, name, 0, _winreg.REG_SZ, val)
-        
+
     # register the extension on Approved list
     try:
         apath = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
@@ -126,7 +126,7 @@ if __name__=='__main__':
     register.UseCommandLine(ContextMenuExtension,
             finalize_register = lambda: RegisterServer(ContextMenuExtension),
             finalize_unregister = lambda: UnregisterServer(ContextMenuExtension))
-    
+
     for overlay in overlays:
         register.UseCommandLine(overlay,
                 finalize_register = lambda: RegisterServer(overlay),
@@ -137,4 +137,4 @@ if __name__=='__main__':
     else:
         register_tortoise_path()
 
-    
+

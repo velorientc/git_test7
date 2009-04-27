@@ -128,7 +128,7 @@ def _runcatch(ui, args):
         help_(ui, 'shortlist')
     except hglib.RepoError, inst:
         ui.warn(_("abort: %s!\n") % inst)
-        
+
     return -1
 
 def runcommand(ui, args):
@@ -324,7 +324,7 @@ def status(ui, *pats, **opts):
 def synch(ui, *pats, **opts):
     """repository synchronization tool"""
     from hggtk.synch import run
-    cmd = sys.argv[1] 
+    cmd = sys.argv[1]
     if 'push'.startswith(cmd) or 'outgoing'.startswith(cmd):
         opts['pushmode'] = True
     else:
@@ -589,7 +589,7 @@ table = {
     "^remove|rm": (revert, [], _('hgtk remove [FILE]...')),
     "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
     "^revert": (revert, [], _('hgtk revert [FILE]...')),
-    "^serve": 
+    "^serve":
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
          _('hgtk serve [OPTION]...')),

@@ -22,7 +22,7 @@ class CmdDialog(gtk.Dialog):
         title = toutf(title.replace('\n', ' '))
         gtk.Dialog.__init__(self,
                             title=title,
-                            flags=gtk.DIALOG_MODAL, 
+                            flags=gtk.DIALOG_MODAL,
                             #buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
                             )
 
@@ -38,7 +38,7 @@ class CmdDialog(gtk.Dialog):
         self._button_stop = gtk.Button(_('Stop'))
         self._button_stop.connect('clicked', self._on_stop_clicked)
         self.action_area.pack_start(self._button_stop)
-        
+
         self._button_ok = gtk.Button(_('Close'))
         self._button_ok.connect('clicked', self._on_ok_clicked)
         self.action_area.pack_start(self._button_ok)
@@ -51,7 +51,7 @@ class CmdDialog(gtk.Dialog):
             self.last_pbar_update = 0
 
             hbox = gtk.HBox()
-            
+
             self.status_text = gtk.Label()
             self.status_text.set_text(title)
             self.status_text.set_alignment(0, 0.5)
@@ -62,7 +62,7 @@ class CmdDialog(gtk.Dialog):
             align = gtk.Alignment(0.0, 0.0, 1, 0)
             hbox.pack_end(align, False, False, 3)
             align.show()
-            
+
             # create the progress bar
             self.pbar = gtk.ProgressBar()
             align.add(self.pbar)
@@ -79,7 +79,7 @@ class CmdDialog(gtk.Dialog):
         self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
-        
+
         self.vbox.pack_start(scrolledwindow, True, True)
         self.connect('map_event', self._on_window_map_event)
 
@@ -92,22 +92,22 @@ class CmdDialog(gtk.Dialog):
     def _on_stop_clicked(self, button):
         if self.hgthread:
             self.hgthread.terminate()
-    
+
     def _delete(self, widget, event):
         return True
 
     def _response(self, widget, response_id):
         if self.hgthread and self.hgthread.isAlive():
             widget.emit_stop_by_name('response')
-    
+
     def _on_window_map_event(self, event, param):
         if self.hgthread is None:
             self.hgthread = HgThread(self.cmdline[1:])
             self.hgthread.start()
             self._button_ok.set_sensitive(False)
-            self._button_stop.set_sensitive(True)        
+            self._button_stop.set_sensitive(True)
             gobject.timeout_add(10, self.process_queue)
-    
+
     def write(self, msg, append=True):
         msg = toutf(msg)
         if append:
@@ -131,7 +131,7 @@ class CmdDialog(gtk.Dialog):
                 pass
         self.update_progress()
         if not self.hgthread.isAlive():
-            self._button_stop.set_sensitive(False)            
+            self._button_stop.set_sensitive(False)
             self._button_ok.set_sensitive(True)
             self._button_ok.grab_focus()
             self.returncode = self.hgthread.return_code()
@@ -144,7 +144,7 @@ class CmdDialog(gtk.Dialog):
     def update_progress(self):
         if not self.pbar:
             return          # progress bar not enabled
-            
+
         if not self.hgthread.isAlive():
             self.pbar.unmap()
         else:

@@ -76,7 +76,7 @@ class ContextMenuExtension(menuthg.menuThg):
 
     registry_keys = [
         (_winreg.HKEY_CLASSES_ROOT,
-         r"*\shellex\ContextMenuHandlers\TortoiseHg", 
+         r"*\shellex\ContextMenuHandlers\TortoiseHg",
          [(None, _reg_clsid_)]),
         (_winreg.HKEY_CLASSES_ROOT,
          r"Directory\Background\shellex\ContextMenuHandlers\TortoiseHg",
@@ -116,8 +116,8 @@ class ContextMenuExtension(menuthg.menuThg):
     def _create_menu(self, parent, menus, pos, idCmd, idCmdFirst):
         for menu_info in menus:
             if menu_info.isSep():
-                win32gui.InsertMenu(parent, pos, 
-                        win32con.MF_BYPOSITION|win32con.MF_SEPARATOR, 
+                win32gui.InsertMenu(parent, pos,
+                        win32con.MF_BYPOSITION|win32con.MF_SEPARATOR,
                         idCmdFirst + idCmd, None)
             elif menu_info.isSubmenu():
                 submenu = win32gui.CreatePopupMenu()
@@ -126,14 +126,14 @@ class ContextMenuExtension(menuthg.menuThg):
                 opt = {
                     'text' : menu_info.menutext,
                     'wID' : idCmdFirst + idCmd,
-                    'hSubMenu' : submenu, 
+                    'hSubMenu' : submenu,
                 }
 
                 if menu_info.icon:
                     icon_path = get_icon_path("tortoise", menu_info.icon)
                     opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
                             icon_to_bitmap(icon_path)
-                
+
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(parent, pos, True, item)
                 self.menuitems[idCmd] = ("", "")
@@ -141,7 +141,7 @@ class ContextMenuExtension(menuthg.menuThg):
                 fstate = win32con.MF_BYCOMMAND
                 if menu_info.state is False:
                     fstate |= win32con.MF_GRAYED
-                
+
                 opt = {
                     'text' : menu_info.menutext,
                     'fState' : fstate,
@@ -152,7 +152,7 @@ class ContextMenuExtension(menuthg.menuThg):
                     icon_path = get_icon_path("tortoise", menu_info.icon)
                     opt['hbmpChecked'] = opt['hbmpUnchecked'] = \
                             icon_to_bitmap(icon_path)
-                
+
                 item, _ = win32gui_struct.PackMENUITEMINFO(**opt)
                 win32gui.InsertMenuItem(parent, pos, True, item)
                 self.menuitems[idCmd] = (menu_info.helptext, menu_info.hgcmd)
@@ -178,7 +178,7 @@ class ContextMenuExtension(menuthg.menuThg):
 
         thgmenu = []
 
-        # a brutal hack to detect if we are the first menu to go on to the 
+        # a brutal hack to detect if we are the first menu to go on to the
         # context menu. If we are not the first, then add a menu separator
         # The number '30000' is just a guess based on my observation
         debugf("idCmdFirst = " + str(idCmdFirst))
@@ -211,7 +211,7 @@ class ContextMenuExtension(menuthg.menuThg):
                 thgmenu += self.get_commands(repo, cwd, self.fnames)
             else:
                 thgmenu += self.get_norepo_commands(cwd, self.fnames)
-  
+
         self.cwd = cwd
         self.repo = repo
         idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
