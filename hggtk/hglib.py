@@ -100,6 +100,18 @@ def diffexpand(line):
         return line
     return line[0] + line[1:].expandtabs(_tabwidth)
 
+def uiwrite(u, args):
+    '''
+    write args if there are buffers
+    returns True if the caller shall handle writing
+    '''
+    buffers = getattr(u, '_buffers', None)
+    if buffers == None:
+        buffers = u.buffers
+    if buffers:
+        ui.ui.write(u, *args)
+        return False
+    return True
 
 def calliffunc(f):
     return hasattr(f, '__call__') and f() or f
@@ -125,9 +137,7 @@ class GtkUi(ui.ui):
         self.setconfig('ui', 'interactive', 'on')
 
     def write(self, *args):
-        if self.buffers:
-            self.buffers[-1].extend([str(a) for a in args])
-        else:
+        if uiwrite(self, args):
             for a in args:
                 self.outputq.put(str(a))
 
@@ -417,9 +427,7 @@ def hgcmd_toq(path, q, *args):
             self.setconfig('ui', 'interactive', 'off')
 
         def write(self, *args):
-            if self.buffers:
-                self.buffers[-1].extend([str(a) for a in args])
-            else:
+            if uiwrite(self, args):
                 for a in args:
                     q.put(str(a))
     u = Qui()
