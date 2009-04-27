@@ -1326,9 +1326,10 @@ class GStatus(GDialog):
 
 def run(ui, *pats, **opts):
     showclean = pats and True or False
+    rev = opts.get('rev', [])
     cmdoptions = {
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
-        'added':True, 'removed':True, 'deleted':True, 'unknown':True, 'rev':[],
+        'added':True, 'removed':True, 'deleted':True, 'unknown':True, 'rev': rev,
         'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
         'check':True
     }
