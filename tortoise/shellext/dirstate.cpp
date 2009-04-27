@@ -393,8 +393,7 @@ static char *revhash_string(const char revhash[HASH_LENGTH])
 }
 
 
-#if 0
-int main(int argc, char *argv[])
+void testread()
 {
     std::auto_ptr<dirstate> pd = dirstate::read(".hg/dirstate");
     time_t t;
@@ -410,6 +409,13 @@ int main(int argc, char *argv[])
         s[strlen(s) - 1] = '\0';
         printf("%s %s\n", s, pd->entries[ix].name.c_str());
     }
+}
+
+
+#if 0
+int main(int argc, char *argv[])
+{
+    testread();
     return 0;
 }
 #endif
