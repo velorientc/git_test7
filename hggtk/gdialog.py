@@ -92,7 +92,7 @@ class GDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.cwd = cwd or os.getcwd()
         self.ui = ui
-        self.ui.interactive=False
+        self.ui.setconfig('ui', 'interactive', 'off')
         self.repo = repo or hg.repository(ui, path=hglib.rootpath())
         self.pats = pats
         self.opts = opts

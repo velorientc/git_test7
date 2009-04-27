@@ -420,7 +420,7 @@ def shelve(ui, repo, *pats, **opts):
 
     ? - display help'''
 
-    if not ui.interactive:
+    if not hglib.calliffunc(ui.interactive):
         raise util.Abort(_('shelve can only be run interactively'))
 
     forced = opts['force'] or opts['append']

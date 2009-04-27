@@ -101,6 +101,9 @@ def diffexpand(line):
     return line[0] + line[1:].expandtabs(_tabwidth)
 
 
+def calliffunc(f):
+    return hasattr(f, '__call__') and f() or f
+
 class GtkUi(ui.ui):
     '''
     PyGtk enabled mercurial.ui subclass.  All this code will be running
@@ -137,7 +140,7 @@ class GtkUi(ui.ui):
 
     def prompt(self, msg, pat=None, default="y"):
         import re
-        if not self.interactive: return default
+        if not calliffunc(self.interactive): return default
         while True:
             try:
                 # send request to main thread, await response

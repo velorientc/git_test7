@@ -176,7 +176,7 @@ class GShelve(GStatus):
             return sc
 
         # shelve them!
-        self.ui.interactive = True  # hgshelve only works 'interactively'
+        self.ui.setconfig('ui', 'interactive', 'on')  # hgshelve only works 'interactively'
         opts = {'addremove': None, 'include': [], 'force': doforce,
                 'append': doappend, 'exclude': []}
         hgshelve.filterpatch = filter_patch
