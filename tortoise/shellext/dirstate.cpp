@@ -133,8 +133,6 @@ private:
 
 std::auto_ptr<dirstate> dirstate::read(const char *path)
 {
-    TDEBUG_TRACE("dirstate::read: path = " << path);
-
     FILE *f = fopen(path, "rb");
     if (!f)
     {
@@ -173,8 +171,6 @@ std::auto_ptr<dirstate> dirstate::read(const char *path)
     }
 
     fclose(f);
-
-    TDEBUG_TRACE("dirstate::read: done. size = " << pd->entries.size());
 
     return pd;
 }
@@ -226,11 +222,11 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
         {
             TDEBUG_TRACE("dirstatecache::get: dropping " << _cache.back().hgroot);
             delete _cache.back().dstate;
+            _cache.back().dstate = 0;
             _cache.pop_back();
         }
         entry e;
         e.hgroot = hgroot;
-        TDEBUG_TRACE("dirstatecache::get: adding " << hgroot);
         _cache.push_front(e);
         iter = _cache.begin();
     }
@@ -238,9 +234,17 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
     if (iter->mtime < stat.st_mtime)
     {
         iter->mtime = stat.st_mtime;
-        if (iter->dstate)
+        if (iter->dstate) {
             delete iter->dstate;
+            iter->dstate = 0;
+            TDEBUG_TRACE("dirstatecache::get: refreshing " << hgroot);
+        } else {
+            TDEBUG_TRACE("dirstatecache::get: reading " << hgroot);
+        }
         iter->dstate = dirstate::read(path.c_str()).release();
+        TDEBUG_TRACE("dirstatecache::get: " 
+            << iter->dstate->entries.size() << " entries read. "
+            << _cache.size() << " repos in cache");
     }
 
     return iter->dstate;
