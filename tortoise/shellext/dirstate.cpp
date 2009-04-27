@@ -121,7 +121,7 @@ public:
     char parent1[HASH_LENGTH];
     char parent2[HASH_LENGTH];
 
-    static std::auto_ptr<dirstate> read(const char *path);
+    static std::auto_ptr<dirstate> read(const std::string& path);
 
     void add(const direntry& e) { entries.push_back(e); }
 
@@ -140,9 +140,9 @@ private:
 };
 
 
-std::auto_ptr<dirstate> dirstate::read(const char *path)
+std::auto_ptr<dirstate> dirstate::read(const std::string& path)
 {
-    FILE *f = fopen(path, "rb");
+    FILE *f = fopen(path.c_str(), "rb");
     if (!f)
     {
         TDEBUG_TRACE("dirstate::read: can't open " << path);
@@ -253,7 +253,7 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
         } else {
             TDEBUG_TRACE("dirstatecache::get: reading " << hgroot);
         }
-        iter->dstate = dirstate::read(path.c_str()).release();
+        iter->dstate = dirstate::read(path).release();
         TDEBUG_TRACE("dirstatecache::get: " 
             << iter->dstate->size() << " entries read. "
             << _cache.size() << " repos in cache");
