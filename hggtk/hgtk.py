@@ -144,7 +144,7 @@ def runcommand(ui, args):
     path = hglib.rootpath(os.getcwd())
     if path:
         try:
-            lui = _ui.ui(parentui=ui)
+            lui = hasattr(_ui, 'copy') and _ui.copy() or _ui.ui(ui)
             lui.readconfig(os.path.join(path, ".hg", "hgrc"))
         except IOError:
             pass

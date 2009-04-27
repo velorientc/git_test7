@@ -109,15 +109,12 @@ class GtkUi(ui.ui):
     main thread to pickup.
     '''
     def __init__(self, outputq=None, dialogq=None, responseq=None,
-            parentui=None):
-        super(GtkUi, self).__init__()
-        if parentui:
-            self.parentui = parentui.parentui or parentui
-            self.cdata = ui.dupconfig(self.parentui.cdata)
-            self.verbose = parentui.verbose
-            self.outputq = parentui.outputq
-            self.dialogq = parentui.dialogq
-            self.responseq = parentui.responseq
+            src=None):
+        super(GtkUi, self).__init__(src)
+        if src:
+            self.outputq = src.outputq
+            self.dialogq = src.dialogq
+            self.responseq = src.responseq
         else:
             self.outputq = outputq
             self.dialogq = dialogq
