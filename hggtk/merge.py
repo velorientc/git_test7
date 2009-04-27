@@ -6,10 +6,11 @@
 
 import gtk
 import sys
-from dialog import error_dialog, question_dialog
+from dialog import error_dialog
 from mercurial.node import short, nullrev
 from mercurial.i18n import _
 from mercurial import util, hg, ui
+import gdialog
 import hgcmd
 import shlib
 import histselect
@@ -194,8 +195,8 @@ class MergeDialog(gtk.Window):
                     _('please select revision to unmerge'))
             return
 
-        response = question_dialog(self, _('Undo merge'),
-                                   _('and checkout revision %s?') % rev)
+        response = gdialog.Confirm(_('undo merge'), [], self,
+                                   _('and checkout revision %s?') % rev).run()
         if response != gtk.RESPONSE_YES:
             return
 
@@ -218,8 +219,8 @@ class MergeDialog(gtk.Window):
                     _('please enter revision to merge'))
             return
 
-        response = question_dialog(self, _('Really want to merge?'),
-                                   _('with revision %s') % rev)
+        response = gdialog.Confirm(_('merge'), [], self,
+                                   _('with revision %s') % rev).run()
         if response != gtk.RESPONSE_YES:
             return
 

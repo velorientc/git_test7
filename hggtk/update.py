@@ -7,13 +7,14 @@
 import os
 import sys
 import gtk
-from dialog import error_dialog, question_dialog
+from dialog import error_dialog
 from mercurial import util, hg, ui
 from mercurial.node import short, nullrev
 from mercurial.i18n import _
 from hglib import rootpath, toutf, RepoError
 import shlib
 import hgcmd
+import gdialog
 
 class UpdateDialog(gtk.Window):
     """ Dialog to update Mercurial repo """
@@ -163,8 +164,8 @@ class UpdateDialog(gtk.Window):
                          _('please enter revision to update to'))
             return
 
-        response = question_dialog(self, _('Really want to update?'),
-                                   _('to revision %s') % rev)
+        response = gdialog.Confirm(_('update'), [], self,
+                                   _('to revision %s') % rev).run()
         if response != gtk.RESPONSE_YES:
             return
 

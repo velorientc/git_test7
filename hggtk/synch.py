@@ -13,7 +13,7 @@ import os
 import threading
 from mercurial.i18n import _
 from mercurial import hg, ui, util, extensions, url
-from dialog import error_dialog, question_dialog, info_dialog
+from dialog import error_dialog, info_dialog
 from hglib import HgThread, fromutf, toutf, rootpath, RepoError
 import shlib
 import gtklib

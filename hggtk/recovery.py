@@ -13,8 +13,9 @@ import os
 import threading
 from mercurial.i18n import _
 from mercurial import hg, ui, util
-from dialog import error_dialog, question_dialog
+from dialog import error_dialog
 from hglib import HgThread, toutf, RepoError, rootpath
+import gdialog
 import shlib
 import gtklib
 
@@ -113,9 +114,9 @@ class RecoveryDialog(gtk.Window):
         return tbutton
 
     def _clean_clicked(self, toolbutton, data=None):
-        response = question_dialog(self, _('Clean repository'),
-                "%s ?" % os.path.basename(self.root))
-        if not response == gtk.RESPONSE_YES:
+        response = gdialog.Confirm(_('Clean repository'), [], self,
+                "%s ?" % os.path.basename(self.root)).run()
+        if response != gtk.RESPONSE_YES:
             return
         try:
             repo = hg.repository(ui.ui(), path=self.root)
@@ -132,9 +133,9 @@ class RecoveryDialog(gtk.Window):
         shlib.shell_notify([self.root])
 
     def _rollback_clicked(self, toolbutton, data=None):
-        response = question_dialog(self, _('Rollback repository'),
-                "%s ?" % os.path.basename(self.root))
-        if not response == gtk.RESPONSE_YES:
+        response = gdialog.Confirm(_('Rollback repository'), [], self,
+                "%s ?" % os.path.basename(self.root)).run()
+        if response != gtk.RESPONSE_YES:
             return
         cmd = ['rollback']
         self._exec_cmd(cmd, postfunc=self._notify)

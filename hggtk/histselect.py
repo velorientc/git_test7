@@ -7,7 +7,7 @@
 import gtk
 import Queue
 import sys
-from dialog import question_dialog, error_dialog
+from dialog import error_dialog
 from mercurial import util
 from mercurial.i18n import _
 import shlib

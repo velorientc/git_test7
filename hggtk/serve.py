@@ -17,7 +17,8 @@ import threading
 import time
 import hglib
 import shlib
-from dialog import question_dialog, error_dialog
+import gdialog
+from dialog import error_dialog
 from mercurial.i18n import _
 from mercurial import hg, ui, commands, cmdutil, util
 from mercurial.hgweb import server
@@ -149,13 +150,14 @@ class ServeDialog(gtk.Window):
         check if server is running, or to terminate if running
         '''
         if gservice and not gservice.stopped:
-            if question_dialog(self, _('Really Exit?'),
+            ret = gdialog.Confirm(_('Really Exit?'), [], self,
                     _('Server process is still running\n'
-                      'Exiting will stop the server.')) != gtk.RESPONSE_YES:
-                return False
-            else:
+                      'Exiting will stop the server.')).run()
+            if ret == gtk.RESPONSE_YES:
                 self._stop_server()
                 return True
+            else:
+                return False
         else:
             return True
 

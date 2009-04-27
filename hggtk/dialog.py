@@ -83,8 +83,3 @@ def info_dialog(parent, primary, secondary):
 def warning_dialog(parent, primary, secondary):
     """ Display a warning dialog with the given message. """
     return _message_dialog(parent, gtk.MESSAGE_WARNING, primary, secondary)
-
-def question_dialog(parent, primary, secondary):
-    """ Display a dialog with the given question. """
-    return _message_dialog(parent, gtk.MESSAGE_QUESTION, primary, secondary,
-            gtk.BUTTONS_YES_NO)

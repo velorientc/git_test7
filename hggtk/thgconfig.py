@@ -13,9 +13,10 @@ import urlparse
 import threading
 from mercurial.i18n import _
 from mercurial import hg, ui, util, url
-from dialog import error_dialog, question_dialog
+from dialog import error_dialog
 from hglib import RepoError, toutf, fromutf, rootpath
 import shlib
+import gdialog
 import iniparse
 
 _unspecstr = _('<unspecified>')
@@ -429,8 +430,9 @@ class ConfigDialog(gtk.Dialog):
 
     def should_live(self, *args):
         if self.dirty:
-            if question_dialog(self, _('Quit without saving?'),
-               _('Yes to abandon changes, No to continue')) != gtk.RESPONSE_YES:
+            ret = gdialog.Confirm(_('quit without saving?'), [], self,
+               _('Yes to abandon changes, No to continue')).run()
+            if ret != gtk.RESPONSE_YES:
                self.emit_stop_by_name('response')
                return True
         if len(args) == 2 and args[1] == gtk.RESPONSE_YES:
@@ -448,7 +450,6 @@ class ConfigDialog(gtk.Dialog):
                     u.config('ui', 'editor') or
                     os.environ.get('EDITOR', 'vi'))
             if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-                import gdialog
                 gdialog.Prompt(_('No visual editor configured'),
                        _('Please configure a visual editor.'), self).run()
                 self.focus_field('tortoisehg.editor')
