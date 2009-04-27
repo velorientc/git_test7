@@ -289,8 +289,8 @@ int HgQueryDirstateDirectory(
     bool modified = false;
     bool empty = true;
 
-    size_t rootlen = hgroot.size();
-    size_t len = relpath.size();
+    const size_t len = relpath.size();
+    const std::string hgroot_slash = hgroot + "/";
 
     for (dirstate::Iter iter = pd->begin();
          iter != pd->end() && !modified; ++iter)
@@ -305,11 +305,8 @@ int HgQueryDirstateDirectory(
         switch (e.state)
         {
         case 'n':
-            if (!modified)
             {
-                std::string temp = hgroot;
-                temp += "/";
-                temp += e.name;
+                std::string temp = hgroot_slash + e.name;
                 if (0 == lstat(temp.c_str(), stat))
                     modified = (e.status(stat) == 'M');
             }
