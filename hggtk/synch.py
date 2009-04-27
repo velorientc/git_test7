@@ -446,7 +446,7 @@ class SynchDialog(gtk.Window):
         if newpath:
             dlg.new_path(newpath)
         else:
-            dlg.focus_field('paths.default')
+            dlg.focus_field('tortoisehg.postpull')
         dlg.run()
         dlg.hide()
         self.paths = self._get_paths()
