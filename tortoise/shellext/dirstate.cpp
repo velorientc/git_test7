@@ -47,9 +47,6 @@ int lstat(const char* file, struct _stat& rstat)
 #endif
 
 
-#define HASH_LENGTH 20
-
-
 struct direntry
 {
     unsigned char state;
@@ -87,6 +84,9 @@ char direntry::status(const struct _stat& stat) const
         return '?';
     }
 }
+
+
+#define HASH_LENGTH 20
 
 
 class dirstate
