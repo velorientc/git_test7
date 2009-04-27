@@ -34,7 +34,7 @@ class SynchDialog(gtk.Window):
         self._settings = shlib.Settings('synch')
         self._recent_src = self._settings.mrul('src_paths')
 
-        self.set_default_size(610, 400)
+        self.set_default_size(655, 552)
 
         self.paths = self._get_paths()
         self.origchangecount = len(self.repo.changelog)
@@ -92,25 +92,26 @@ class SynchDialog(gtk.Window):
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
         
-        # revision input
-        revbox = gtk.HBox()
+        # sync target info
+        targethbox = gtk.HBox()
         lbl = gtk.Button(_('Repo:'))
         lbl.unset_flags(gtk.CAN_FOCUS)
         lbl.connect('clicked', self._btn_remotepath_clicked)
-        revbox.pack_start(lbl, False, False)
+        targethbox.pack_start(lbl, False, False)
 
         lbl = gtk.Button(_('Bundle:'))
         lbl.unset_flags(gtk.CAN_FOCUS)
         lbl.connect('clicked', self._btn_bundlepath_clicked)
-        revbox.pack_start(lbl, False, False)
+        targethbox.pack_start(lbl, False, False)
         
-        # revisions  combo box
+        # revisions combo box
         self.pathlist = gtk.ListStore(str, str)
         self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self._pathtext = self._pathbox.get_child()
         cell = gtk.CellRendererText()
         self._pathbox.pack_end(cell, False)
         self._pathbox.add_attribute(cell, 'text', 1)
+        targethbox.pack_start(self._pathbox, True, True)
 
         self.fill_path_combo()
         defrow = None
@@ -143,28 +144,36 @@ class SynchDialog(gtk.Window):
             self._use_proxy.set_sensitive(False)
 
         frame = gtk.Frame(_('Post pull operation'))
-        hbox = gtk.HBox()
+        ppvbox = gtk.VBox()
         self.nothingradio = gtk.RadioButton(None, _('Nothing'))
         self.updateradio = gtk.RadioButton(self.nothingradio, _('Update'))
         self.fetchradio = gtk.RadioButton(self.nothingradio, _('Fetch'))
         self.rebaseradio = gtk.RadioButton(self.nothingradio, _('Rebase'))
-        hbox.pack_start(self.nothingradio, True, True, 2)
-        hbox.pack_start(self.updateradio, True, True, 2)
-        hbox.pack_start(self.fetchradio, True, True, 2)
-        hbox.pack_start(self.rebaseradio, True, True, 2)
-        frame.add(hbox)
+        ppvbox.pack_start(self.nothingradio, True, True, 2)
+        ppvbox.pack_start(self.updateradio, True, True, 2)
+        ppvbox.pack_start(self.fetchradio, True, True, 2)
+        ppvbox.pack_start(self.rebaseradio, True, True, 2)
+        frame.add(ppvbox)
         frame.set_border_width(2)
-        vbox.pack_start(frame, False, False, 2)
-
-        revbox.pack_start(self._pathbox, True, True)
-        revbox.pack_end(self._use_proxy, False, False)
-        vbox.pack_start(revbox, False, False, 2)
 
         self.expander = expander = gtk.Expander(_('Advanced Options'))
         expander.set_expanded(False)
         expander.connect_after('activate', self._expanded)
         hbox = gtk.HBox()
         expander.add(hbox)
+
+        leftvbox = gtk.VBox()
+        leftvbox.pack_start(frame, False, False, 2)
+        leftvbox.pack_start(self._use_proxy, False, False, 3)
+
+        rightvbox = gtk.VBox()
+        rightvbox.pack_start(targethbox, False, False, 2)
+        rightvbox.pack_start(expander, True, True, 2)
+
+        tophbox = gtk.HBox()
+        tophbox.pack_start(rightvbox, True, True, 2)
+        tophbox.pack_start(leftvbox, False, False, 2)
+        vbox.pack_start(tophbox, False, False, 2)
 
         revvbox = gtk.VBox()
         self._reventry = gtk.Entry()
@@ -201,11 +210,11 @@ class SynchDialog(gtk.Window):
         self._newestfirst = gtk.CheckButton(_('Show Newest First'))
         self._nomerge = gtk.CheckButton(_('Show No Merges'))
 
-        hbox = gtk.HBox()
-        hbox.pack_start(self._showpatch, False, False, 2)
-        hbox.pack_start(self._newestfirst, False, False, 2)
-        hbox.pack_start(self._nomerge, False, False, 2)
-        frame.add(hbox)
+        iovbox = gtk.VBox()
+        iovbox.pack_start(self._showpatch, False, False, 2)
+        iovbox.pack_start(self._newestfirst, False, False, 2)
+        iovbox.pack_start(self._nomerge, False, False, 2)
+        frame.add(iovbox)
         vbox.pack_start(expander, False, False, 2)
 
         # hg output window
