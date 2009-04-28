@@ -259,7 +259,7 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 
 static int HgQueryDirstateDirectory(
     const std::string& hgroot, const dirstate* pd,
-    std::string& relpath, char& outStatus)
+    const std::string& relpath, char& outStatus)
 {
     bool added = false;
     bool modified = false;
@@ -312,7 +312,7 @@ static int HgQueryDirstateDirectory(
 
 
 static int HgQueryDirstateFile(
-    const dirstate* pd, std::string& relpath, 
+    const dirstate* pd, const std::string& relpath, 
     const struct _stat& stat, char& outStatus)
 {
     for (dirstate::Iter iter = pd->begin(); iter != pd->end(); ++iter)
