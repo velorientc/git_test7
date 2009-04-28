@@ -72,16 +72,16 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 
     std::string relpath = relpathptr;
 
+    if (relpath.size() == 0)
+        return S_FALSE; // don't show icon on repo root dir
+
+    if (relpath.compare(0, 3, ".hg") == 0)
+        return S_FALSE; // don't descend into .hg dir
+
     char status = 0;
 
     if (PathIsDirectory(path.c_str()))
     {
-        if (relpath.size() == 0)
-            return S_FALSE; // don't show icon on repo root dir
-
-        if (relpath.compare(0, 3, ".hg") == 0)
-            return S_FALSE; // don't descend into .hg dir
-
         if (!HgQueryDirstateDirectory(hgroot, path, relpath, status))
             return S_FALSE;
     }
