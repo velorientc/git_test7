@@ -72,7 +72,7 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 
     std::string relpath = relpathptr;
 
-    if (relpath.size() == 0)
+    if (relpath.empty())
         return S_FALSE; // don't show icon on repo root dir
 
     if (relpath.compare(0, 3, ".hg") == 0)
