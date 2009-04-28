@@ -258,7 +258,7 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 
 
 static int HgQueryDirstateDirectory(
-    const std::string& hgroot, const dirstate* pd,
+    const std::string& hgroot, const dirstate& ds,
     const std::string& relpath, char& outStatus)
 {
     bool added = false;
@@ -270,8 +270,8 @@ static int HgQueryDirstateDirectory(
 
     struct _stat stat;
 
-    for (dirstate::Iter iter = pd->begin();
-         iter != pd->end() && !modified; ++iter)
+    for (dirstate::Iter iter = ds.begin();
+         iter != ds.end() && !modified; ++iter)
     {
         const direntry& e = *iter;
 
@@ -312,10 +312,10 @@ static int HgQueryDirstateDirectory(
 
 
 static int HgQueryDirstateFile(
-    const dirstate* pd, const std::string& relpath, 
+    const dirstate& ds, const std::string& relpath, 
     const struct _stat& stat, char& outStatus)
 {
-    for (dirstate::Iter iter = pd->begin(); iter != pd->end(); ++iter)
+    for (dirstate::Iter iter = ds.begin(); iter != ds.end(); ++iter)
     {
         const direntry& e = *iter;
 
@@ -358,14 +358,14 @@ int HgQueryDirstate(
     if (relpath.compare(0, 3, ".hg") == 0)
         return 0; // don't descend into .hg dir
 
-    const dirstate* pd = dirstatecache::get(hgroot);
-    if (!pd)
+    const dirstate* pds = dirstatecache::get(hgroot);
+    if (!pds)
     {
         TDEBUG_TRACE("HgQueryDirstate: dirstatecache::get(" << hgroot << ") returns 0");
         return 0;
     }
 
-    if (filterStatus == 'A' && pd->num_added() == 0)
+    if (filterStatus == 'A' && pds->num_added() == 0)
         return 0;
 
     for (size_t i = 0; i < relpath.size(); ++i)
@@ -377,9 +377,9 @@ int HgQueryDirstate(
     int res = 0;
 
     if (PathIsDirectory(path.c_str()))
-        res = HgQueryDirstateDirectory(hgroot, pd, relpath, outStatus);
+        res = HgQueryDirstateDirectory(hgroot, *pds, relpath, outStatus);
     else 
-        res = HgQueryDirstateFile(pd, relpath, stat, outStatus);
+        res = HgQueryDirstateFile(*pds, relpath, stat, outStatus);
 
     return res;
 }
