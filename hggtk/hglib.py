@@ -229,9 +229,9 @@ class HgThread(thread2.Thread):
         try:
             # Some commands create repositories, and thus must create
             # new ui() instances.  For those, we monkey-patch ui.ui()
-            # as briefly as possible
+            # as briefly as possible (till Mercurial 1.2)
             origui = None
-            if self.args[0] in ('clone', 'init'):
+            if self.args[0] in ('clone', 'init') and not hasattr(self.ui, 'copy'):
                 origui = ui.ui
                 ui.ui = GtkUi
             try:
@@ -381,7 +381,9 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     if cmd not in commands.norepo.split():
         try:
             repo = hg.repository(ui, path=path)
-            repo.ui = ui
+            if not hasattr(ui, 'copy'):
+                #Mercurial 1.2
+                repo.ui = ui
             ui.setconfig("bundle", "mainreporoot", repo.root)
             if not repo.local():
                 raise util.Abort(_("repository '%s' is not local") % path)
