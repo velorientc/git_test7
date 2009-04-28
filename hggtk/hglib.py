@@ -116,8 +116,12 @@ class GtkUi(ui.ui):
     def __init__(self, src=None, outputq=None, dialogq=None, responseq=None,
             parentui=None):
         if parentui:
+            # Mercurial 1.2
+            super(GtkUi, self).__init__(parentui=parentui)
             src = parentui
-        super(GtkUi, self).__init__(src)
+        else:
+            # Mercurial 1.3
+            super(GtkUi, self).__init__(src)
         if src:
             self.outputq = src.outputq
             self.dialogq = src.dialogq
@@ -302,7 +306,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     config = _earlygetopt(['--config'], args)
     if config:
         for section, name, value in dispatch._parseconfig(config):
-            self.setconfig(section, name, value)
+            ui.setconfig(section, name, value)
 
     # check for cwd
     cwd = _earlygetopt(['--cwd'], args)
