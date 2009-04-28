@@ -17,6 +17,7 @@
 #include "stdafx.h"
 
 #include "dirstate.h"
+#include "TortoiseUtils.h"
 
 #include <shlwapi.h>
 
@@ -320,16 +321,32 @@ static int HgQueryDirstateFile(
 }
 
 
-int HgQueryDirstate(
-    const std::string& hgroot, const std::string& abspath,
-    const std::string& relpath_in, char& outStatus)
+int HgQueryDirstate(const std::string& path, char& outStatus)
 {
     struct _stat stat;
-    if (0 != lstat(abspath.c_str(), stat))
+    if (0 != lstat(path.c_str(), stat))
     {
-        TDEBUG_TRACE("HgQueryDirstate: lstat(" << abspath << ") fails");
+        TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") fails");
         return 0;
     }
+
+    std::string hgroot = GetHgRepoRoot(path);
+
+    if (hgroot.empty())
+        return 0;
+
+    size_t offset = hgroot.length();
+    if (path[offset] == '\\')
+        offset++;
+    const char* relpathptr = path.c_str() + offset;
+
+    std::string relpath = relpathptr;
+
+    if (relpath.empty())
+        return 0; // don't show icon on repo root dir
+
+    if (relpath.compare(0, 3, ".hg") == 0)
+        return 0; // don't descend into .hg dir
 
     const dirstate* pd = dirstatecache::get(hgroot);
     if (!pd)
@@ -338,7 +355,6 @@ int HgQueryDirstate(
         return 0;
     }
 
-    std::string relpath = relpath_in;
     for (size_t i = 0; i < relpath.size(); ++i)
     {
         if (relpath[i] == '\\')
@@ -347,7 +363,7 @@ int HgQueryDirstate(
 
     int res = 0;
 
-    if (PathIsDirectory(abspath.c_str()))
+    if (PathIsDirectory(path.c_str()))
         res = HgQueryDirstateDirectory(hgroot, pd, relpath, outStatus);
     else 
         res = HgQueryDirstateFile(pd, relpath, stat, outStatus);
