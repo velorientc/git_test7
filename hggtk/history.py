@@ -498,21 +498,13 @@ class GLog(GDialog):
         dlg.hide()
 
     def _vdiff_change(self, menuitem, pats=[]):
-        from visdiff import FileSelectionDialog
         rev = self.currow[treemodel.REVID]
-        dialog = FileSelectionDialog(pats, {'change' : rev})
-        dialog.show_all()
-        dialog.run()
-        dialog.hide()
+        self._do_diff(pats, {'change' : rev}, modal=True)
 
     def _vdiff_local(self, menuitem, pats=[]):
-        from visdiff import FileSelectionDialog
         rev = self.currow[treemodel.REVID]
         opts = {'rev' : ["%s:." % rev]}
-        dialog = FileSelectionDialog(pats, opts)
-        dialog.show_all()
-        dialog.run()
-        dialog.hide()
+        self._do_diff(pats, opts, modal=True)
 
     def _diff_revs(self, menuitem):
         from status import GStatus

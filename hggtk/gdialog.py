@@ -361,14 +361,48 @@ class GDialog(gtk.Window):
 
         return True, textout
 
-    def _diff_file(self, stat, file):
-        from visdiff import FileSelectionDialog
-        if file:
-            pats = [file]
+    def _do_diff(self, patterns, options, modal=False):
+        import visdiff
+
+        if self.ui.configbool('tortoisehg', 'vdiffnowin'):
+            from hgext import extdiff
+            tools = visdiff.readtools(self.ui)
+            preferred = self.ui.config('tortoisehg', 'vdiff', 'vdiff')
+            if not preferred or preferred not in tools:
+                Prompt(_('No visual diff configured'),
+                       _('Please select a visual diff application.'), self).run()
+                dlg = ConfigDialog(self.repo.root, False)
+                dlg.show_all()
+                dlg.focus_field('tortoisehg.vdiff')
+                dlg.run()
+                dlg.hide()
+                self.ui = ui.ui()
+                self._parse_config()
+                return
+
+            file = len(patterns) == 1 and patterns[0] or ''
+            diffcmd, diffopts = tools[preferred]
+            opts = {'change': options.get('change')}
+            if not opts['change']:
+                opts['rev'] = options.get('rev')
+
+            def dodiff():
+                extdiff.dodiff(self.ui, self.repo, diffcmd, diffopts,
+                               [self.repo.wjoin(file)], opts)
+
+            thread = threading.Thread(target=dodiff, name='diff:' + file)
+            thread.setDaemon(True)
+            thread.start()
+
         else:
-            pats = []
-        dialog = FileSelectionDialog(pats, self.opts)
-        dialog.show_all()
+            dialog = visdiff.FileSelectionDialog(patterns, options)
+            dialog.show_all()
+            if modal:
+                dialog.run()
+                dialog.hide()
+
+    def _diff_file(self, stat, file):
+        self._do_diff(file and [file] or [], self.opts)
 
     def _view_file(self, stat, file, force_left=False):
         import atexit

@@ -104,7 +104,7 @@ class FileSelectionDialog(gtk.Dialog):
                    _('No repository found here'), None).run()
             return
 
-        tools = self.readtools(repo.ui)
+        tools = readtools(repo.ui)
         preferred = repo.ui.config('tortoisehg', 'vdiff', 'vdiff')
         if preferred and preferred in tools:
             if len(tools) > 1:
@@ -141,28 +141,6 @@ class FileSelectionDialog(gtk.Dialog):
         sel = combo.get_active_text()
         if sel in tools:
             self.diffpath, self.diffopts = tools[sel]
-
-    def readtools(self, ui):
-        tools = {}
-        for cmd, path in ui.configitems('extdiff'):
-            if cmd.startswith('cmd.'):
-                cmd = cmd[4:]
-                if not path:
-                    path = cmd
-                diffopts = ui.config('extdiff', 'opts.' + cmd, '')
-                diffopts = diffopts and [diffopts] or []
-                tools[cmd] = [path, diffopts]
-            elif cmd.startswith('opts.'):
-                continue
-            else:
-                # command = path opts
-                if path:
-                    diffopts = shlex.split(path)
-                    path = diffopts.pop(0)
-                else:
-                    path, diffopts = cmd, []
-                tools[cmd] = [path, diffopts]
-        return tools
 
     def find_files(self, repo, pats, opts, model):
         revs = opts.get('rev')
@@ -257,6 +235,28 @@ class FileSelectionDialog(gtk.Dialog):
         except (WindowsError, EnvironmentError), e:
             Prompt(_('Tool launch failure'),
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
+
+def readtools(ui):
+    tools = {}
+    for cmd, path in ui.configitems('extdiff'):
+        if cmd.startswith('cmd.'):
+            cmd = cmd[4:]
+            if not path:
+                path = cmd
+            diffopts = ui.config('extdiff', 'opts.' + cmd, '')
+            diffopts = diffopts and [diffopts] or []
+            tools[cmd] = [path, diffopts]
+        elif cmd.startswith('opts.'):
+            continue
+        else:
+            # command = path opts
+            if path:
+                diffopts = shlex.split(path)
+                path = diffopts.pop(0)
+            else:
+                path, diffopts = cmd, []
+            tools[cmd] = [path, diffopts]
+    return tools
 
 def run(ui, *pats, **opts):
     root = rootpath()
