@@ -45,12 +45,12 @@ except ImportError:
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
-sys.stderr = cStringIO.StringIO()
-ret = hggtk.hgtk.dispatch(sys.argv[1:])
-sys.stderr.seek(0)
 if 'THGDEBUG' in os.environ:
-    print sys.stderr.read()
+    sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
 else:
+    sys.stderr = cStringIO.StringIO()
+    ret = hggtk.hgtk.dispatch(sys.argv[1:])
+    sys.stderr.seek(0)
     for l in sys.stderr.readlines():
         if l.startswith('Traceback') or l.startswith('TypeError'):
             from hggtk.bugreport import run
@@ -63,4 +63,4 @@ else:
             opts['error'] = error
             gtkrun(run(ui.ui(), **opts))
             break
-sys.exit(ret)
+    sys.exit(ret)

@@ -5,6 +5,7 @@
 #
 
 import gtk
+import os
 import pango
 from mercurial.i18n import _
 from mercurial import extensions
@@ -45,11 +46,13 @@ class BugReport(GDialog):
 
         from about import hgversion
         import shlib
-        text = _('\n\nPlease report this bug to'
+        text = _('\n** Please report this bug to'
+                ' tortoisehg-discuss@lists.sourceforge.net or'
                 ' http://bitbucket.org/tortoisehg/stable/issues\n')
-        text += _('Mercurial version (%s).  TortoiseHg version (%s)\n') % (
+        text += _('** Mercurial version (%s).  TortoiseHg version (%s)\n') % (
                 hgversion, shlib.version())
-        text += _('Command: %s\n') % (self.opts['cmd'])
+        text += _('** Command: %s\n') % (self.opts['cmd'])
+        text += _('** CWD: %s\n') % os.getcwd()
         extlist = [x[0] for x in extensions.extensions()]
         text += _('** Extensions loaded: %s\n') % ', '.join(extlist)
         text += self.opts['error']
