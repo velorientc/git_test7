@@ -43,6 +43,8 @@ class CmdDialog(gtk.Dialog):
         self._button_ok.connect('clicked', self._on_ok_clicked)
         self.action_area.pack_start(self._button_ok)
 
+        self.connect('thg-accept', self._on_ok_clicked)
+
         self.connect('delete-event', self._delete)
         self.connect('response', self._response)
 
