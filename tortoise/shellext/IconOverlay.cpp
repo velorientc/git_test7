@@ -60,8 +60,12 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 {
     std::string path = WideToMultibyte(pwszPath);
 
+    char filterStatus = 0;
+    if (myTortoiseClass == TORTOISE_OLE_ADDED)
+       filterStatus = 'A';
+    
     char status = 0;
-    if (!HgQueryDirstate(path, status))
+    if (!HgQueryDirstate(path, filterStatus, status))
         return S_FALSE;
 
     if (myTortoiseClass == TORTOISE_OLE_ADDED && status == 'A')

@@ -98,6 +98,8 @@ class dirstate
     typedef std::deque<direntry> EntriesT;
 
     EntriesT entries;
+    
+    unsigned num_added_; // number of entries that have state 'a'
 
 public:
     typedef EntriesT::size_type size_type;
@@ -113,8 +115,12 @@ public:
     Iter begin() const { return entries.begin(); }
     Iter end() const { return entries.end(); }
     size_type size() const { return entries.size(); }
+    
+    unsigned num_added() const { return num_added_; }
 
 private:
+    dirstate(): num_added_(0) {}
+
     static uint32_t ntohl(uint32_t x)
     {
         return ((x & 0x000000ffUL) << 24) |
@@ -160,6 +166,9 @@ std::auto_ptr<dirstate> dirstate::read(const std::string& path)
         temp[e.length] = 0;
 
         e.name = &temp[0];
+
+        if (e.state == 'a')
+            ++pd->num_added_;
 
         pd->add(e);
     }
@@ -321,7 +330,8 @@ static int HgQueryDirstateFile(
 }
 
 
-int HgQueryDirstate(const std::string& path, char& outStatus)
+int HgQueryDirstate(
+    const std::string& path, const char& filterStatus, char& outStatus)
 {
     struct _stat stat;
     if (0 != lstat(path.c_str(), stat))
@@ -354,6 +364,9 @@ int HgQueryDirstate(const std::string& path, char& outStatus)
         TDEBUG_TRACE("HgQueryDirstate: dirstatecache::get(" << hgroot << ") returns 0");
         return 0;
     }
+
+    if (filterStatus == 'A' && pd->num_added() == 0)
+        return 0;
 
     for (size_t i = 0; i < relpath.size(); ++i)
     {
