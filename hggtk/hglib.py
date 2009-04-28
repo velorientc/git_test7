@@ -18,17 +18,7 @@ except ImportError:
     from mercurial.dispatch import ParseError
     from mercurial.revlog import LookupError
 
-from mercurial import demandimport
-demandimport.disable()
-try:
-    # Mercurial 0.9.4
-    from mercurial.cmdutil import parse
-    from mercurial.cmdutil import parseconfig as _parseconfig
-except:
-    # Mercurial 0.9.5
-    from mercurial.dispatch import _parse as parse
-    from mercurial.dispatch import _parseconfig
-demandimport.enable()
+from mercurial import dispatch
 
 try:
     from mercurial import encoding
@@ -305,11 +295,11 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     if hasattr(ui, 'verbosity_constraints'):
         # Mercurial 1.2
         if config:
-            for section, name, value in _parseconfig(config):
+            for section, name, value in dispatch._parseconfig(config):
                 self.setconfig(section, name, value)
     else:
         # Mercurial 1.3
-        _parseconfig(ui, config)
+        dispatch._parseconfig(ui, config)
 
     # check for cwd
     cwd = _earlygetopt(['--cwd'], args)
@@ -355,7 +345,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         _fallbackencoding = fallback
 
     fullargs = args
-    cmd, func, args, options, cmdoptions = parse(ui, args)
+    cmd, func, args, options, cmdoptions = dispatch._parse(ui, args)
 
     if options["encoding"]:
         _encoding = options["encoding"]
