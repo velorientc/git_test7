@@ -219,18 +219,23 @@ class HgThread(thread2.Thread):
 
     def run(self):
         try:
-            # Some commands create repositories, and thus must create
-            # new ui() instances.  For those, we monkey-patch ui.ui()
-            # as briefly as possible (till Mercurial 1.2)
-            origui = None
-            if self.args[0] in ('clone', 'init') and not hasattr(self.ui, 'copy'):
-                origui = ui.ui
-                ui.ui = GtkUi
-            try:
-                ret = thgdispatch(self.ui, None, self.args)
-            finally:
-                if origui:
-                    ui.ui = origui
+            ret = None
+            if hasattr(self.ui, 'copy'):
+                # Mercurial 1.3
+                ret = dispatch._dispatch(self.ui, self.args)
+            else:
+                # Mercurial 1.2
+                # Some commands create repositories, and thus must create
+                # new ui() instances.  For those, we monkey-patch ui.ui()
+                # as briefly as possible.
+                if self.args[0] in ('clone', 'init'):
+                    origui = ui.ui
+                    ui.ui = GtkUi
+                try:
+                    ret = thgdispatch(self.ui, None, self.args)
+                finally:
+                    if origui:
+                        ui.ui = origui
             if ret:
                 self.ui.write(_('[command returned code %d]\n') % int(ret))
             else:
@@ -294,14 +299,9 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     # read --config before doing anything else
     # (e.g. to change trust settings for reading .hg/hgrc)
     config = _earlygetopt(['--config'], args)
-    if hasattr(ui, 'verbosity_constraints'):
-        # Mercurial 1.2
-        if config:
-            for section, name, value in dispatch._parseconfig(config):
-                self.setconfig(section, name, value)
-    else:
-        # Mercurial 1.3
-        dispatch._parseconfig(ui, config)
+    if config:
+        for section, name, value in dispatch._parseconfig(config):
+            self.setconfig(section, name, value)
 
     # check for cwd
     cwd = _earlygetopt(['--cwd'], args)
@@ -373,9 +373,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     if cmd not in commands.norepo.split():
         try:
             repo = hg.repository(ui, path=path)
-            if not hasattr(ui, 'copy'):
-                #Mercurial 1.2
-                repo.ui = ui
+            repo.ui = ui
             ui.setconfig("bundle", "mainreporoot", repo.root)
             if not repo.local():
                 raise util.Abort(_("repository '%s' is not local") % path)
