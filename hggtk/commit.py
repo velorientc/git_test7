@@ -17,7 +17,8 @@ from mercurial.i18n import _
 from mercurial.node import hex, nullrev
 from mercurial import ui, hg, util, patch
 from gdialog import Prompt, Confirm
-from status import GStatus, FM_STATUS, FM_CHECKED, DM_REJECTED, DM_CHUNK_ID
+from status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH_UTF8
+from status import DM_REJECTED, DM_CHUNK_ID
 from hglib import fromutf
 import shlib
 from shlib import shell_notify
@@ -234,6 +235,7 @@ class GCommit(GStatus):
         vbox.pack_start(frame)
 
         self.text = gtk.TextView()
+        self.text.connect('populate-popup', self._msg_add_to_popup)
         self.text.set_wrap_mode(gtk.WRAP_WORD)
         self.text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.text)
@@ -645,6 +647,30 @@ class GCommit(GStatus):
             self.mode = qnew and 'status' or 'commit'
             self.reload_status()
             self.qnew_name.grab_focus() # set focus back
+            
+    def _msg_add_to_popup(self, textview, menu):
+        menu_items = ((None, _('----'), None),
+                      (None, _('Paste _Filenames'), self._msg_paste_fnames),
+                     )
+        for stock, label, handler in menu_items:
+            if label == '----':
+                menuitem = gtk.SeparatorMenuItem()
+            elif stock:
+                menuitem = gtk.ImageMenuItem(stock)
+            else:
+                menuitem = gtk.MenuItem(label)
+            if handler:
+                menuitem.connect('activate', handler)
+            menu.append(menuitem)
+        menu.show_all()
+        
+    def _msg_paste_fnames(self, sender):
+        buf = self.text.get_buffer()
+        fnames = [ file[FM_PATH_UTF8] for file in self.filemodel
+                   if file[FM_CHECKED] ]
+        buf.delete_selection(True, True)
+        buf.insert_at_cursor('\n'.join([fname for fname in fnames]))    
+                        
 
 def run(_ui, *pats, **opts):
     cmdoptions = {
