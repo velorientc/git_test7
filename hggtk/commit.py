@@ -669,7 +669,7 @@ class GCommit(GStatus):
         fnames = [ file[FM_PATH_UTF8] for file in self.filemodel
                    if file[FM_CHECKED] ]
         buf.delete_selection(True, True)
-        buf.insert_at_cursor('\n'.join([fname for fname in fnames]))    
+        buf.insert_at_cursor('\n'.join(fnames))    
                         
 
 def run(_ui, *pats, **opts):
