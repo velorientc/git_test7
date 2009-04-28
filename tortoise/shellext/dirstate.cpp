@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <list>
+#include <deque>
 
 
 #ifdef WIN32
@@ -91,7 +92,7 @@ char direntry::status(const struct _stat& stat) const
 
 class dirstate
 {
-    typedef std::vector<direntry> EntriesT;
+    typedef std::deque<direntry> EntriesT;
 
     EntriesT entries;
 
