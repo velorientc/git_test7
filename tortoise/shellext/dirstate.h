@@ -3,12 +3,8 @@
 
 #include <string>
 
-int HgQueryDirstateFile(
+int HgQueryDirstate(
     const std::string& hgroot, const std::string& abspath,
-    std::string& relpath, char& outStatus);
-
-int HgQueryDirstateDirectory(
-    const std::string& hgroot, const std::string& abspath,
-    std::string& relpath, char& outStatus);
+    const std::string& relpath, char& outStatus);
 
 #endif

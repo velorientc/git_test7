@@ -70,7 +70,7 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
         offset++;
     const char* relpathptr = path.c_str() + offset;
 
-    std::string relpath = relpathptr;
+    const std::string relpath = relpathptr;
 
     if (relpath.empty())
         return S_FALSE; // don't show icon on repo root dir
@@ -79,17 +79,8 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
         return S_FALSE; // don't descend into .hg dir
 
     char status = 0;
-
-    if (PathIsDirectory(path.c_str()))
-    {
-        if (!HgQueryDirstateDirectory(hgroot, path, relpath, status))
-            return S_FALSE;
-    }
-    else 
-    {
-        if (!HgQueryDirstateFile(hgroot, path, relpath, status))
-            return S_FALSE;
-    }
+    if (!HgQueryDirstate(hgroot, path, relpath, status))
+        return S_FALSE;
 
     if (myTortoiseClass == TORTOISE_OLE_ADDED && status == 'A')
         return S_OK;

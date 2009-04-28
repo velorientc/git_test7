@@ -18,6 +18,8 @@
 
 #include "dirstate.h"
 
+#include <shlwapi.h>
+
 #include <vector>
 #include <list>
 #include <deque>
@@ -245,23 +247,10 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 }
 
 
-int HgQueryDirstateDirectory(
-    const std::string& hgroot, const std::string& abspath,
+static int HgQueryDirstateDirectory(
+    const std::string& hgroot, const dirstate* pd,
     std::string& relpath, char& outStatus)
 {
-    const dirstate* pd = dirstatecache::get(hgroot);
-    if (!pd)
-    {
-        TDEBUG_TRACE("HgQueryDirstateDirectory: dirstatecache::get(" << hgroot << ") returns 0");
-        return 0;
-    }
-
-    for (size_t i = 0; i < relpath.size(); ++i)
-    {
-        if (relpath[i] == '\\')
-            relpath[i] = '/';
-    }
-
     bool added = false;
     bool modified = false;
     bool empty = true;
@@ -312,30 +301,10 @@ int HgQueryDirstateDirectory(
 }
 
 
-int HgQueryDirstateFile(
-    const std::string& hgroot, const std::string& abspath,
-    std::string& relpath, char& outStatus)
+static int HgQueryDirstateFile(
+    const dirstate* pd, std::string& relpath, 
+    const struct _stat& stat, char& outStatus)
 {
-    struct _stat stat;
-    if (0 != lstat(abspath.c_str(), stat))
-    {
-        TDEBUG_TRACE("HgQueryDirstateFile: lstat(" << abspath << ") fails");
-        return 0;
-    }
-
-    const dirstate* pd = dirstatecache::get(hgroot);
-    if (!pd)
-    {
-        TDEBUG_TRACE("HgQueryDirstateFile: dirstatecache::get(" << hgroot << ") returns 0");
-        return 0;
-    }
-
-    for (size_t i = 0; i < relpath.size(); ++i)
-    {
-        if (relpath[i] == '\\')
-            relpath[i] = '/';
-    }
-
     for (dirstate::Iter iter = pd->begin(); iter != pd->end(); ++iter)
     {
         const direntry& e = *iter;
@@ -348,6 +317,42 @@ int HgQueryDirstateFile(
     }
 
     return 0;
+}
+
+
+int HgQueryDirstate(
+    const std::string& hgroot, const std::string& abspath,
+    const std::string& relpath_in, char& outStatus)
+{
+    struct _stat stat;
+    if (0 != lstat(abspath.c_str(), stat))
+    {
+        TDEBUG_TRACE("HgQueryDirstate: lstat(" << abspath << ") fails");
+        return 0;
+    }
+
+    const dirstate* pd = dirstatecache::get(hgroot);
+    if (!pd)
+    {
+        TDEBUG_TRACE("HgQueryDirstate: dirstatecache::get(" << hgroot << ") returns 0");
+        return 0;
+    }
+
+    std::string relpath = relpath_in;
+    for (size_t i = 0; i < relpath.size(); ++i)
+    {
+        if (relpath[i] == '\\')
+            relpath[i] = '/';
+    }
+
+    int res = 0;
+
+    if (PathIsDirectory(abspath.c_str()))
+        res = HgQueryDirstateDirectory(hgroot, pd, relpath, outStatus);
+    else 
+        res = HgQueryDirstateFile(pd, relpath, stat, outStatus);
+
+    return res;
 }
 
 
