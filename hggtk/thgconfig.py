@@ -31,6 +31,11 @@ _tortoise_info = (
         ' markers in place.  Chose internal:merge to force conflict markers.')),
     (_('Visual Diff Command'), 'tortoisehg.vdiff', [],
         _('Specify visual diff tool; must be an extdiff command')),
+    (_('Skip Diff Window'), 'tortoisehg.vdiffnowin', ['False', 'True'],
+        _("Bypass the builtin visual diff dialog and directly use your"
+          " visual diff tool's directory diff feature.  Only enable this"
+          " feature if you know your diff tool has a valid extdiff"
+          " configuration.  Default: False")),
     (_('Visual Editor'), 'tortoisehg.editor', [],
         _('Specify the visual editor used to view files, etc')),
     (_('CLI Editor'), 'ui.editor', [],
