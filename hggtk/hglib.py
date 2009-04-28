@@ -113,8 +113,10 @@ class GtkUi(ui.ui):
     Instead, it places output and dialog requests onto queues for the
     main thread to pickup.
     '''
-    def __init__(self, outputq=None, dialogq=None, responseq=None,
-            src=None):
+    def __init__(self, src=None, outputq=None, dialogq=None, responseq=None,
+            parentui=None):
+        if parentui:
+            src = parentui
         super(GtkUi, self).__init__(src)
         if src:
             self.outputq = src.outputq
@@ -180,7 +182,7 @@ class HgThread(thread2.Thread):
         self.outputq = Queue.Queue()
         self.dialogq = Queue.Queue()
         self.responseq = Queue.Queue()
-        self.ui = GtkUi(self.outputq, self.dialogq, self.responseq)
+        self.ui = GtkUi(None, self.outputq, self.dialogq, self.responseq)
         self.args = args
         self.ret = None
         self.postfunc = postfunc
