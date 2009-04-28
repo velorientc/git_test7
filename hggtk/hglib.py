@@ -422,8 +422,8 @@ def hgcmd_toq(path, q, *args):
     object.  Assumes command is completely noninteractive.
     '''
     class Qui(ui.ui):
-        def __init__(self):
-            ui.ui.__init__(self)
+        def __init__(self, src=None):
+            super(Qui, self).__init__(src)
             self.setconfig('ui', 'interactive', 'off')
 
         def write(self, *args):
