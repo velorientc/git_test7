@@ -276,14 +276,17 @@ int HgQueryDirstateDirectory(
     const std::string& hgroot, const std::string& abspath,
     std::string& relpath, char& outStatus)
 {
-    const dirstate* pd = 0;
-    struct _stat stat;
-
-    if (!HgQueryDirstate(hgroot, abspath, relpath, pd, stat))
+    const dirstate* pd = dirstatecache::get(hgroot);
+    if (!pd)
     {
-        TDEBUG_TRACE("HgQueryDirstateDirectory: HgQueryDirstate returns 0."
-            << " hgroot = " << hgroot << ", abspath = " << abspath);
+        TDEBUG_TRACE("HgQueryDirstateDirectory: dirstatecache::get(" << hgroot << ") returns 0");
         return 0;
+    }
+
+    for (size_t i = 0; i < relpath.size(); ++i)
+    {
+        if (relpath[i] == '\\')
+            relpath[i] = '/';
     }
 
     bool added = false;
@@ -292,6 +295,8 @@ int HgQueryDirstateDirectory(
 
     const size_t len = relpath.size();
     const std::string hgroot_slash = hgroot + "/";
+
+    struct _stat stat;
 
     for (dirstate::Iter iter = pd->begin();
          iter != pd->end() && !modified; ++iter)
@@ -338,14 +343,24 @@ int HgQueryDirstateFile(
     const std::string& hgroot, const std::string& abspath,
     std::string& relpath, char& outStatus)
 {
-    const dirstate* pd = 0;
     struct _stat stat;
-
-    if (!HgQueryDirstate(hgroot, abspath, relpath, pd, stat))
+    if (0 != lstat(abspath.c_str(), stat))
     {
-        TDEBUG_TRACE("HgQueryDirstateFile: HgQueryDirstate returns 0."
-            << " hgroot = " << hgroot << ", abspath = " << abspath);
+        TDEBUG_TRACE("HgQueryDirstateFile: lstat(" << abspath << ") fails");
         return 0;
+    }
+
+    const dirstate* pd = dirstatecache::get(hgroot);
+    if (!pd)
+    {
+        TDEBUG_TRACE("HgQueryDirstateFile: dirstatecache::get(" << hgroot << ") returns 0");
+        return 0;
+    }
+
+    for (size_t i = 0; i < relpath.size(); ++i)
+    {
+        if (relpath[i] == '\\')
+            relpath[i] = '/';
     }
 
     for (dirstate::Iter iter = pd->begin(); iter != pd->end(); ++iter)
