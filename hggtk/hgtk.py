@@ -581,7 +581,7 @@ table = {
     "^shelve|unshelve": (shelve, [], _('hgtk shelve')),
     "^synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
     "^status|st": (status,
-        [('r', 'rev', _('revisions to campare'))],
+        [('r', 'rev', '', _('revisions to compare'))],
         _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
