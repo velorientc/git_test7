@@ -649,14 +649,12 @@ class GCommit(GStatus):
             self.qnew_name.grab_focus() # set focus back
             
     def _msg_add_to_popup(self, textview, menu):
-        menu_items = ((None, _('----'), None),
-                      (None, _('Paste _Filenames'), self._msg_paste_fnames),
+        menu_items = (('----', None),
+                      (_('Paste _Filenames'), self._msg_paste_fnames),
                      )
-        for stock, label, handler in menu_items:
+        for label, handler in menu_items:
             if label == '----':
                 menuitem = gtk.SeparatorMenuItem()
-            elif stock:
-                menuitem = gtk.ImageMenuItem(stock)
             else:
                 menuitem = gtk.MenuItem(label)
             if handler:
