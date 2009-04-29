@@ -61,7 +61,17 @@ _commit_info = (
     (_('External Commit Tool'), 'tortoisehg.extcommit', ['None', 'qct'],
         _('Select commit tool launched by TortoiseHg. (Qct is no longer'
         ' distributed as part of TortoiseHG.)'
-        ' Default: None (use the builtin tool)')))
+        ' Default: None (use the builtin tool)')),
+    (_('Summary Line Length'), 'tortoisehg.summarylen', ['70'],
+       _('Maximum length of the commit message summary line.'
+         ' If set, TortoiseHG will issue a warning if the'
+         ' summary line is too long or not separated by a'
+         ' blank line.')),
+    (_('Message Line Length'), 'tortoisehg.messagewrap', ['80'],
+       _('Word wrap length of the commit message.  If'
+         ' set, the popup menu can be used to format'
+         ' the message and a warning will be issued'
+         ' if any lines are too long at commit.')))
 
 _log_info = (
     (_('Author Coloring'), 'tortoisehg.authorcolor', ['False', 'True'],
