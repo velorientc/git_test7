@@ -539,6 +539,49 @@ class GCommit(GStatus):
                    _('Please enter commit message'), self).run()
             self.text.grab_focus()
             return False
+
+        try:
+            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
+            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
+        except (TypeError, ValueError):
+            Prompt(_('Error'),
+                   _('Message format configuration error'),
+                   self).run()
+            self._msg_config(None)
+            return
+        
+        lines = buf.get_text(buf.get_start_iter(),
+                             buf.get_end_iter()).splitlines()
+        
+        if sumlen and len(lines[0].rstrip()) > sumlen:
+            resp = Confirm(_('Commit'), [], self,
+                           _('The summary line length of %i is greater than'
+                             ' %i.\n\nIgnore format policy and continue'
+                             ' commit?') %
+                                (len(lines[0].rstrip()), sumlen)).run()
+            if resp != gtk.RESPONSE_YES:
+                return False
+        if sumlen and len(lines) > 1 and len(lines[1].strip()):
+            resp = Confirm(_('Commit'), [], self,
+                           _('The summary line is not followed by a blank'
+                             ' line.\n\nIgnore format policy and continue'
+                             ' commit?')).run()
+            if resp != gtk.RESPONSE_YES:
+                return False
+        if maxlen:
+            start = int(sumlen > 0)
+            tmp = [len(x.rstrip()) > maxlen for x in lines[start:]]
+            errs = [str(x[1]+start+1) for x in zip(tmp, range(len(tmp)))
+                    if x[0]]
+            if errs:
+                resp = Confirm(_('Commit'), [], self,
+                               _('The following lines are over the %i-'
+                                 'character limit: %s.\n\nIgnore format'
+                                 ' policy and continue commit?') %
+                                    (maxlen, ', '.join(errs))).run()
+                if resp != gtk.RESPONSE_YES:
+                    return False
+        
         begin, end = buf.get_bounds()
         self.opts['message'] = buf.get_text(begin, end)
         return True
@@ -691,8 +734,8 @@ class GCommit(GStatus):
         
         if sumlen and len(lines[0].rstrip()) > sumlen:
             Prompt(_('Warning'),
-                   _('The summary line length of %i is greater than %i' %
-                         (len(lines[0].rstrip()), sumlen)),
+                   _('The summary line length of %i is greater than %i') %
+                         (len(lines[0].rstrip()), sumlen),
                    self).run()
         if sumlen and len(lines) > 1 and len(lines[1].strip()):
             Prompt(_('Warning'),
