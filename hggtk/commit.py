@@ -678,7 +678,7 @@ class GCommit(GStatus):
             maxlen = 0
         if not (sumlen or maxlen):
             Prompt(_('Info required'),
-                   _('Word wrap needs to be configured'),
+                   _('Message format needs to be configured'),
                    self).run()
             self._msg_config(None)
             return
@@ -690,13 +690,13 @@ class GCommit(GStatus):
             return
         
         if sumlen and len(lines[0].rstrip()) > sumlen:
-            Prompt(_('Summary Length Violation'),
+            Prompt(_('Warning'),
                    _('The summary line length of %i is greater than %i' %
                          (len(lines[0].rstrip()), sumlen)),
                    self).run()
         if sumlen and len(lines) > 1 and len(lines[1].strip()):
-            Prompt(_('Summary Separation Violation'),
-                   _('The summary line should be followed by a blank line'),
+            Prompt(_('Warning'),
+                   _('The summary line is not followed by a blank line'),
                    self).run()
         if not maxlen:
             return
