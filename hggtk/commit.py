@@ -236,7 +236,6 @@ class GCommit(GStatus):
 
         self.text = gtk.TextView()
         self.text.connect('populate-popup', self._msg_add_to_popup)
-        self.text.set_wrap_mode(gtk.WRAP_WORD)
         self.text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.text)
 
@@ -651,7 +650,8 @@ class GCommit(GStatus):
     def _msg_add_to_popup(self, textview, menu):
         menu_items = (('----', None),
                       (_('Paste _Filenames'), self._msg_paste_fnames),
-                     )
+                      (_('App_ly Format'), self._msg_word_wrap),
+                      (_('C_onfigure Format'), self._msg_config))
         for label, handler in menu_items:
             if label == '----':
                 menuitem = gtk.SeparatorMenuItem()
@@ -668,7 +668,66 @@ class GCommit(GStatus):
                    if file[FM_CHECKED] ]
         buf.delete_selection(True, True)
         buf.insert_at_cursor('\n'.join(fnames))    
-                        
+
+    def _msg_word_wrap(self, sender):
+        try:
+            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
+            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
+        except (TypeError, ValueError):
+            sumlen = 0
+            maxlen = 0
+        if not (sumlen or maxlen):
+            Prompt(_('Info required'),
+                   _('Word wrap needs to be configured'),
+                   self).run()
+            self._msg_config(None)
+            return
+
+        buf = self.text.get_buffer()
+        lines = buf.get_text(buf.get_start_iter(),
+                             buf.get_end_iter()).splitlines()
+        if not lines:
+            return
+        
+        if sumlen and len(lines[0].rstrip()) > sumlen:
+            Prompt(_('Summary Length Violation'),
+                   _('The summary line length of %i is greater than %i' %
+                         (len(lines[0].rstrip()), sumlen)),
+                   self).run()
+        if sumlen and len(lines) > 1 and len(lines[1].strip()):
+            Prompt(_('Summary Separation Violation'),
+                   _('The summary line should be followed by a blank line'),
+                   self).run()
+        if not maxlen:
+            return
+        
+        lnum = int(sumlen > 0)
+        while lnum < len(lines):
+            lines[lnum] = lines[lnum].rstrip() + ' '
+            if lines[lnum].endswith('. '):
+                lines[lnum] += ' '
+            if len(lines[lnum].rstrip()) > maxlen:
+                ind = lines[lnum].rfind(' ', 0, maxlen+1) + 1
+                if ind > 0:
+                    if lnum == len(lines)-1 or not lines[lnum+1].strip():
+                        lines.insert(lnum+1, lines[lnum][ind:].lstrip())
+                    else:
+                        lines[lnum+1] = lines[lnum][ind:].lstrip() \
+                                        + lines[lnum+1]
+                    lines[lnum] = lines[lnum][0:ind].rstrip() + ' '
+            lnum += 1
+        buf.set_text('\n'.join(lines))                       
+
+    def _msg_config(self, sender):
+        from thgconfig import ConfigDialog
+        dlg = ConfigDialog(True)
+        dlg.show_all()
+        dlg.focus_field('tortoisehg.summarylen')
+        dlg.run()
+        dlg.hide()
+        self.repo = hg.repository(self.ui, self.repo.root)
+        return
+
 
 def run(_ui, *pats, **opts):
     cmdoptions = {
