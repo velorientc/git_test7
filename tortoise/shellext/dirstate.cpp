@@ -185,8 +185,9 @@ class dirstatecache
         const dirstate* dstate;
         __time64_t      mtime;
         std::string     hgroot;
+        unsigned        tickcount;
 
-        entry(): dstate(0), mtime(0) {}
+        entry(): dstate(0), mtime(0), tickcount(0) {}
     };
 
     typedef std::list<entry>::iterator Iter;
@@ -202,17 +203,6 @@ std::list<dirstatecache::entry> dirstatecache::_cache;
 
 const dirstate* dirstatecache::get(const std::string& hgroot)
 {
-    std::string path = hgroot;
-    path += "/.hg/dirstate";
-
-    struct _stat stat;
-
-    if (0 != lstat(path.c_str(), stat))
-    {
-        TDEBUG_TRACE("dirstatecache::get: lstat(" << path <<") fails");
-        return 0;
-    }
-
     Iter iter = _cache.begin();
 
     for (;iter != _cache.end(); ++iter)
@@ -220,6 +210,8 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
         if (hgroot == iter->hgroot)
             break;
     }
+
+    bool isnew = false;
 
     if (iter == _cache.end())
     {
@@ -234,9 +226,30 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
         e.hgroot = hgroot;
         _cache.push_front(e);
         iter = _cache.begin();
+        isnew = true;
     }
 
-    if (iter->mtime < stat.st_mtime)
+    unsigned tc = GetTickCount();
+
+    std::string path = hgroot +"/.hg/dirstate";
+
+    struct _stat stat;
+
+    bool stat_done = false;
+
+    if (isnew || (tc - iter->tickcount) > 500)
+    {
+        if (0 != lstat(path.c_str(), stat))
+        {
+            TDEBUG_TRACE("dirstatecache::get: lstat(" << path <<") failed");
+            return 0;
+        }
+        iter->tickcount = tc;
+        stat_done = true;
+        TDEBUG_TRACE("dirstatecache::get: lstat(" << path <<") ok ");
+    }
+
+    if (stat_done && iter->mtime < stat.st_mtime)
     {
         iter->mtime = stat.st_mtime;
         if (iter->dstate) {
