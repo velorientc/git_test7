@@ -146,7 +146,7 @@ class GLog(GDialog):
         button.set_active(self._show_date)
         button.set_draw_as_radio(True)
         menu.append(button)
-        button = gtk.CheckMenuItem("Show Branch")
+        button = gtk.CheckMenuItem(_("Show Branch"))
         button.connect("toggled", self.toggle_view_column,
                 'branch-column-visible')
         button.set_active(self._show_branch)
