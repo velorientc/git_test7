@@ -1090,7 +1090,8 @@ class GStatus(GDialog):
             # rev options needs extra tweaking since is not an array for
             # revert command
             revertopts['rev'] = revertopts['rev'][0]
-            dialog = Confirm('Revert', files, self, 'Revert files to revision ' + revertopts['rev'] + '?')
+            dialog = Confirm(_('Revert'), files, self,
+                    _('Revert files to revision ') + revertopts['rev'] + '?')
         else:
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
