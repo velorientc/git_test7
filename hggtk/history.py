@@ -167,7 +167,11 @@ class GLog(GDialog):
         button.connect('toggled', self._filter_selected, 'tagged')
         menu.append(button)
 
-        button = gtk.RadioMenuItem(button, _('Show Parent Revisions'))
+        button = gtk.RadioMenuItem(button, _('Show Revision Ancestry'))
+        button.connect('toggled', self._filter_selected, 'ancestry')
+        menu.append(button)
+
+        button = gtk.RadioMenuItem(button, _('Show Working Parents'))
         button.connect('toggled', self._filter_selected, 'parents')
         menu.append(button)
 
@@ -304,6 +308,12 @@ class GLog(GDialog):
         elif self._filter == "no_merges":
             self.opts['no_merges'] = True
             self.graphview.refresh(False, [], self.opts)
+        elif self._filter == "ancestry":
+            if not self.currow:
+                return
+            range = [self.currow[treemodel.REVID], 0]
+            sopts = {'noheads': True, 'revrange': range}
+            self.graphview.refresh(True, None, sopts)
         elif self._filter == "tagged":
             tagged = []
             for t, r in self.repo.tagslist():

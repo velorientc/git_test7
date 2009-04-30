@@ -135,7 +135,9 @@ class TreeView(gtk.ScrolledWindow):
                     end = start
             else:
                 start = len(self.repo.changelog) - 1
-            self.grapher = revision_grapher(self.repo, start, end, pats)
+            noheads = opts.get('noheads', False)
+            self.grapher = revision_grapher(self.repo, start, end, pats,
+                    noheads)
         elif opts.get('revs', None):
             self.grapher = dumb_log_generator(self.repo, opts['revs'])
         else:
