@@ -354,9 +354,8 @@ int HgQueryDirstate(
     if (relpath.empty())
         return 0; // don't show icon on repo root dir
 
-    bool isdir = PathIsDirectory(path.c_str());
-
-    if (isdir && relpath.size() >= 3 && relpath.compare(0, 3, ".hg") == 0)
+    if (relpath == ".hg" 
+            || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
         return 0; // don't descend into .hg dir
 
     const dirstate* pds = dirstatecache::get(hgroot);
@@ -377,7 +376,7 @@ int HgQueryDirstate(
 
     int res = 0;
 
-    if (isdir)
+    if (PathIsDirectory(path.c_str()))
         res = HgQueryDirstateDirectory(hgroot, *pds, relpath, outStatus);
     else 
         res = HgQueryDirstateFile(*pds, relpath, stat, outStatus);
