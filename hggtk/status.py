@@ -567,7 +567,8 @@ class GStatus(GDialog):
 
         explicit_changetypes = changetypes + (('clean', 'C', clean),)
 
-        # List of the currently checked and selected files to pass on to the new data
+        # List of the currently checked and selected files to pass on to
+        # the new data
         model, paths = selection.get_selected_rows()
         recheck = [entry[FM_PATH] for entry in model if entry[FM_CHECKED]]
         reselect = [model[path][FM_PATH] for path in paths]
