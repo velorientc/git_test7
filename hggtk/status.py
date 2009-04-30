@@ -580,7 +580,7 @@ class GStatus(GDialog):
         self.filemodel.clear()
 
         for opt, char, changes in ([ct for ct in explicit_changetypes
-                                    if self.test_opt(ct[0])] or changetypes) :
+                                    if self.test_opt(ct[0])] or changetypes):
             for wfile in changes:
                 mst = wfile in ms and ms[wfile].upper() or ""
                 wfile = util.localpath(wfile)

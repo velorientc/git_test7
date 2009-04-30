@@ -331,10 +331,6 @@ class GCommit(GStatus):
             buf = self.text.get_buffer()
             buf.set_text(_('merge'))
             buf.set_modified(False)
-        #else:
-        #    self.selectlabel.set_text(
-        #        _('toggle change hunks to leave them out of commit'))
-
 
 
     def _check_patch_queue(self):
