@@ -231,7 +231,7 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 
     unsigned tc = GetTickCount();
 
-    std::string path = hgroot +"/.hg/dirstate";
+    std::string path = hgroot + "\\.hg\\dirstate";
 
     struct _stat stat;
 
