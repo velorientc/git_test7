@@ -228,6 +228,7 @@ class HgThread(thread2.Thread):
                 # Some commands create repositories, and thus must create
                 # new ui() instances.  For those, we monkey-patch ui.ui()
                 # as briefly as possible.
+                origui = None
                 if self.args[0] in ('clone', 'init'):
                     origui = ui.ui
                     ui.ui = GtkUi
