@@ -38,6 +38,13 @@ class Prompt(SimpleMessage):
                 gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE)
         self.set_title(hglib.toutf(title))
         self.set_markup('<b>' + hglib.toutf(message) + '</b>')
+        mod = shlib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'Return')
+        accel_group = gtk.AccelGroup()
+        self.add_accel_group(accel_group)
+        buttons = self.get_children()[0].get_children()[1].get_children()
+        buttons[0].add_accelerator("clicked", accel_group, key,
+                modifier, gtk.ACCEL_VISIBLE)
 
 class Confirm(SimpleMessage):
     """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO
