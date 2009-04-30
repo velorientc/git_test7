@@ -1078,18 +1078,22 @@ class GStatus(GDialog):
         # Create new opts,  so nothing unintented gets through.
         # commands.table revert key changed after 0.9.5, in change d4ec6d61b3ee
         key = '^revert' in commands.table and '^revert' or 'revert'
-        revertopts = self.merge_opts(commands.table[key][1], ('include', 'exclude', 'rev'))
+        revertopts = self.merge_opts(commands.table[key][1],
+                ('include', 'exclude', 'rev'))
         def dohgrevert():
             commands.revert(self.ui, self.repo, *wfiles, **revertopts)
 
-        # TODO: Ask which revision when multiple parents (currently just shows abort message)
+        # TODO: Ask which revision when multiple parents (currently just
+        # shows abort message)
         # TODO: Don't need to prompt when reverting added or removed files
         if self.count_revs() == 1:
-            # rev options needs extra tweaking since is not an array for revert command
+            # rev options needs extra tweaking since is not an array for
+            # revert command
             revertopts['rev'] = revertopts['rev'][0]
             dialog = Confirm('Revert', files, self, 'Revert files to revision ' + revertopts['rev'] + '?')
         else:
-            # rev options needs extra tweaking since it must be an empty string when unspecified for revert command
+            # rev options needs extra tweaking since it must be an empty
+            # string when unspecified for revert command
             revertopts['rev'] = ''
             dialog = Confirm('Revert', files, self)
         if dialog.run() == gtk.RESPONSE_YES:
