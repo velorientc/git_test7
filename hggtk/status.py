@@ -609,6 +609,7 @@ class GStatus(GDialog):
 
     def reload_status(self):
         if not self._ready: return False
+        self._last_file = None
         success, outtext = self._hg_call_wrapper('Status', self._do_reload_status)
         self.auto_check()
         self._update_check_count()
@@ -967,7 +968,6 @@ class GStatus(GDialog):
                 difftext.close()
 
         if hasattr(self, 'merge_diff_text'):
-            self.merge_diff_text.set_buffer(gtk.TextBuffer())
             return
         self._hg_call_wrapper('Diff', dohgdiff)
 
