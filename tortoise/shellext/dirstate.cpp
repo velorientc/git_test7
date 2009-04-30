@@ -348,7 +348,7 @@ int HgQueryDirstate(
     struct _stat stat;
     if (0 != lstat(path.c_str(), stat))
     {
-        TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") fails");
+        TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") failed");
         return 0;
     }
 
