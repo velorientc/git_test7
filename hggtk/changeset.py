@@ -10,6 +10,7 @@ import gobject
 import pango
 import StringIO
 
+from mercurial.i18n import _
 from mercurial.node import short, nullrev
 from mercurial import cmdutil, context, util, ui, hg, patch
 from gdialog import GDialog, Confirm
@@ -36,8 +37,8 @@ class ChangeSet(GDialog):
     def get_tbbuttons(self):
         self.parent_toggle = gtk.ToggleToolButton(gtk.STOCK_UNDO)
         self.parent_toggle.set_use_underline(True)
-        self.parent_toggle.set_label('_other parent')
-        self.parent_toggle.set_tooltip(self.tooltips, 'diff other parent')
+        self.parent_toggle.set_label(_('_other parent'))
+        self.parent_toggle.set_tooltip(self.tooltips, _('diff other parent'))
         self.parent_toggle.set_sensitive(False)
         self.parent_toggle.set_active(False)
         self.parent_toggle.connect('toggled', self._parent_toggled)
@@ -102,7 +103,7 @@ class ChangeSet(GDialog):
             self.textview.thaw_child_notify()
 
     def _fill_buffer(self, buf, rev, ctx, filelist):
-        self.stbar.begin('Retrieving changeset data...')
+        self.stbar.begin(_('Retrieving changeset data...'))
 
         def title_line(title, text, tag):
             pad = ' ' * (12 - len(title))
@@ -118,10 +119,10 @@ class ChangeSet(GDialog):
         tags = ' '.join(ctx.tags())
         parents = self.parents
 
-        title_line('changeset:', change, 'changeset')
+        title_line(_('changeset:'), change, 'changeset')
         if ctx.branch() != 'default':
-            title_line('branch:', ctx.branch(), 'greybg')
-        title_line('user/date:', ctx.user() + '\t' + date, 'changeset')
+            title_line(_('branch:'), ctx.branch(), 'greybg')
+        title_line(_('user/date:'), ctx.user() + '\t' + date, 'changeset')
         for p in parents:
             pctx = self.repo.changectx(p)
             try:
@@ -130,7 +131,7 @@ class ChangeSet(GDialog):
             except:
                 summary = ""
             change = str(p) + ':' + short(self.repo.changelog.node(p))
-            title = 'parent:'
+            title = _('parent:')
             title += ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title, 'parent')
             buf.insert_with_tags_by_name(eob, change, 'link')
@@ -145,7 +146,7 @@ class ChangeSet(GDialog):
                 summary = ""
             childrev = self.repo.changelog.rev(n)
             change = str(childrev) + ':' + short(n)
-            title = 'child:'
+            title = _('child:')
             title += ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title, 'parent')
             buf.insert_with_tags_by_name(eob, change, 'link')
@@ -153,7 +154,7 @@ class ChangeSet(GDialog):
             buf.insert(eob, "\n")
         for n in self.repo.changelog.children(ctx.node()):
             childrev = self.repo.changelog.rev(n)
-        if tags: title_line('tags:', tags, 'tag')
+        if tags: title_line(_('tags:'), tags, 'tag')
 
         log = toutf(ctx.description())
         buf.insert(eob, '\n' + log + '\n\n')
@@ -166,7 +167,7 @@ class ChangeSet(GDialog):
             parent = nullid
 
         buf.create_mark('begmark', buf.get_start_iter())
-        filelist.append(('*', '[Description]', 'begmark', False, ()))
+        filelist.append(('*', _('[Description]'), 'begmark', False, ()))
         pctx = self.repo.changectx(parent)
 
         nodes = parent, ctx.node()
@@ -329,7 +330,7 @@ class ChangeSet(GDialog):
                     header.append('%s to %s\n' % (op, f))
                     to = getfilectx(a, ctx1).data()
                 else:
-                    header.append('new file mode %s\n' % mode)
+                    header.append(_('new file mode %s\n') % mode)
                 if util.binary(tn):
                     dodiff = 'binary'
             elif s == 'R':
@@ -337,7 +338,7 @@ class ChangeSet(GDialog):
                     dodiff = False
                 else:
                     mode = gitmode[man1.flags(f)]
-                    header.append('deleted file mode %s\n' % mode)
+                    header.append(_('deleted file mode %s\n') % mode)
             else:
                 omode = gitmode[man1.flags(f)]
                 nmode = gitmode[flags2(f)]
@@ -346,7 +347,7 @@ class ChangeSet(GDialog):
                     dodiff = 'binary'
             header.insert(0, 'diff --git a/%s b/%s\n' % (a, b))
             if dodiff == 'binary':
-                text = 'binary file has changed.\n'
+                text = _('binary file has changed.\n')
             elif dodiff:
                 try:
                     text = patch.mdiff.unidiff(to, date1,
@@ -447,15 +448,15 @@ class ChangeSet(GDialog):
             return menuitem
 
         _menu = gtk.Menu()
-        _menu.append(create_menu('_visual diff', self._diff_file_rev))
-        _menu.append(create_menu('diff to _local', self._diff_to_local))
-        _menu.append(create_menu('_view at revision', self._view_file_rev))
-        self._save_menu = create_menu('_save at revision', self._save_file_rev)
+        _menu.append(create_menu(_('_visual diff'), self._diff_file_rev))
+        _menu.append(create_menu(_('diff to _local'), self._diff_to_local))
+        _menu.append(create_menu(_('_view at revision'), self._view_file_rev))
+        self._save_menu = create_menu(_('_save at revision'), self._save_file_rev)
         _menu.append(self._save_menu)
-        _menu.append(create_menu('_file history', self._file_history))
-        self._ann_menu = create_menu('_annotate file', self._ann_file)
+        _menu.append(create_menu(_('_file history'), self._file_history))
+        self._ann_menu = create_menu(_('_annotate file'), self._ann_file)
         _menu.append(self._ann_menu)
-        _menu.append(create_menu('_revert file contents', self._revert_file))
+        _menu.append(create_menu(_('_revert file contents'), self._revert_file))
         _menu.show_all()
         return _menu
 
@@ -513,9 +514,9 @@ class ChangeSet(GDialog):
                 gobject.TYPE_PYOBJECT, # diffstats
                 )
         filelist_tree.set_model(self._filelist)
-        column = gtk.TreeViewColumn('Stat', gtk.CellRendererText(), text=0)
+        column = gtk.TreeViewColumn(_('Stat'), gtk.CellRendererText(), text=0)
         filelist_tree.append_column(column)
-        column = gtk.TreeViewColumn('Files', gtk.CellRendererText(), text=1)
+        column = gtk.TreeViewColumn(_('Files'), gtk.CellRendererText(), text=1)
         filelist_tree.append_column(column)
 
         list_frame = gtk.Frame()
@@ -719,8 +720,8 @@ class ChangeSet(GDialog):
     def _revert_file(self, menuitem):
         '''User selected file revert from the file list context menu'''
         rev = self.currev
-        dialog = Confirm('revert file to old revision', [], self,
-                'Revert %s to contents at revision %d?' % (self.curfile, rev))
+        dialog = Confirm(_('revert file to old revision'), [], self,
+                _('Revert %s to contents at revision %d?') % (self.curfile, rev))
         if dialog.run() == gtk.RESPONSE_NO:
             return
         cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), self.curfile]
