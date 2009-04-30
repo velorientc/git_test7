@@ -11,50 +11,61 @@ This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
 
-# The recommended usage is to symlink this file into your path.
-# alternatively, you can change this line or set TORTOISEHG_PATH
-tortoisehg_dir = '~/tools/tortoisehg-dev'
-
-import pygtk
-pygtk.require('2.0')
-import gtk
-
-from mercurial import demandimport; demandimport.enable()
 from mercurial.i18n import _
-from mercurial import hg, util, fancyopts, commands, cmdutil
-import pdb
 import mercurial.ui as _ui
-
-try:
-    from mercurial.error import RepoError, UnknownCommand, AmbiguousCommand
-    from mercurial.error import ParseError
-except ImportError:
-    from mercurial.repo import RepoError
-    from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
-    from mercurial.dispatch import ParseError
-
+from mercurial import hg, util, fancyopts, cmdutil, extensions
+import hglib
+import gtk
+import gobject
 import os
+import pdb
 import sys
 import traceback
 
-nonrepo_commands = 'userconfig clone init about help version'
+nonrepo_commands = 'userconfig clone debugcomplete init about help version'
+
+# Add TortoiseHg signals, hooked to key accelerators in shlib
+for sig in ('copy-clipboard', 'thg-diff', 'thg-parent'):
+    gobject.signal_new(sig, gtk.TreeView,
+        gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
+for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept'):
+    gobject.signal_new(sig, gtk.Window,
+            gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 
 def dispatch(args):
     "run the command specified in args"
     try:
-        u = _ui.ui(traceback='--traceback' in args)
-    except util.Abort, inst:
-        sys.stderr.write(_("abort: %s\n") % inst)
-        return -1
-    if '--debugger' in args:
-        pdb.set_trace()
-    try:
+        u = _ui.ui()
+        if '--traceback' in args:
+            u.setconfig('ui', 'traceback', 'on')
+        if '--debugger' in args:
+            pdb.set_trace()
         return _runcatch(u, args)
     except:
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
-        u.print_exc()
-        raise
+        error = traceback.format_exc()
+        from bugreport import run
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['error'] = error
+        # TODO: keep track of whether gtk.main() is running
+        print error
+        run(u, **opts)
+
+def get_list_from_file(filename):
+    try:
+        if filename == '-':
+            lines = [ x.replace("\n", "") for x in sys.stdin.readlines() ]
+        else:
+            fd = open(filename, "r")
+            lines = [ x.replace("\n", "") for x in fd.readlines() ]
+            fd.close()
+            os.unlink(filename)
+        return lines
+    except IOError, e:
+        sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
+        return []
 
 def _parse(ui, args):
     options = {}
@@ -63,7 +74,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
     except fancyopts.getopt.GetoptError, inst:
-        raise ParseError(None, inst)
+        raise hglib.ParseError(None, inst)
 
     if args:
         cmd, args = args[0], args[1:]
@@ -81,13 +92,18 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions)
     except fancyopts.getopt.GetoptError, inst:
-        raise ParseError(cmd, inst)
+        raise hglib.ParseError(cmd, inst)
 
     # separate global options back out
     for o in globalopts:
         n = o[1]
         options[n] = cmdoptions[n]
         del cmdoptions[n]
+
+    listfile = options.get('listfile')
+    if listfile:
+        del options['listfile']
+        args += get_list_from_file(listfile)
 
     return (cmd, cmd and i[0] or None, args, options, cmdoptions)
 
@@ -97,74 +113,38 @@ def _runcatch(ui, args):
             return runcommand(ui, args)
         finally:
             ui.flush()
-    except ParseError, inst:
+    except hglib.ParseError, inst:
         if inst.args[0]:
             ui.warn(_("hgtk %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
             ui.warn(_("hgtk: %s\n") % inst.args[1])
             help_(ui, 'shortlist')
-    except AmbiguousCommand, inst:
+    except hglib.AmbiguousCommand, inst:
         ui.warn(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
-    except UnknownCommand, inst:
+    except hglib.UnknownCommand, inst:
         ui.warn(_("hgtk: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
-    except RepoError, inst:
+    except hglib.RepoError, inst:
         ui.warn(_("abort: %s!\n") % inst)
-    except util.Abort, inst:
-        ui.warn(_("abort: %s\n") % inst)
-        
+
     return -1
 
 def runcommand(ui, args):
     fullargs = args
     cmd, func, args, options, cmdoptions = _parse(ui, args)
-    ui.updateopts(options["verbose"])
+    ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
 
     if options['help']:
         return help_(ui, cmd)
     elif not cmd:
         return help_(ui, 'shortlist')
 
-    if hasattr(sys, "frozen"):
-        # Py2exe environment
-        thgdir = os.path.dirname(sys.executable)
-        os.environ['THG_ICON_PATH'] = os.path.join(thgdir, 'icons')
-    else:
-        # Add TortoiseHg to python path
-        path = os.environ.get('TORTOISEHG_PATH') or tortoisehg_dir
-        norm = os.path.normpath(os.path.expanduser(path))
-        if norm not in sys.path:
-            sys.path.insert(0, norm)
-
-        try:
-            # assuming TortoiseHg source layout, with hgtk in contrib
-            path = os.path.dirname(os.path.realpath(__file__))
-        except NameError:
-            # __file__ not available in pdb mode
-            path = os.path.dirname(sys.argv[0])
-        norm = os.path.normpath(os.path.join(path, '..'))
-        if norm not in sys.path:
-            sys.path.append(norm)
-
-    try:
-        from hggtk import hglib
-    except ImportError, inst:
-        m = str(inst).split()[-1]
-        if m in "hglib hggtk".split():
-            # fix "tortoisehg_dir" at the top of this script, or ...
-            raise util.Abort(_('Please set TORTOISEHG_PATH to location '
-                    'of your tortoisehg repository'))
-        else:
-            raise util.Abort(_('could not import module %s!\n' % m))
-    except:
-        raise
-
     path = hglib.rootpath(os.getcwd())
     if path:
         try:
-            lui = _ui.ui(parentui=ui)
+            lui = hasattr(_ui, 'copy') and _ui.copy() or _ui.ui(ui)
             lui.readconfig(os.path.join(path, ".hg", "hgrc"))
         except IOError:
             pass
@@ -173,10 +153,20 @@ def runcommand(ui, args):
     if options['repository']:
         path = lui.expandpath(options['repository'])
 
+    _loaded = {}
+    extensions.loadall(ui)
+    for name, module in extensions.extensions():
+        if name in _loaded:
+            continue
+        extsetup = getattr(module, 'extsetup', None)
+        if extsetup:
+            extsetup()
+        _loaded[name] = 1
+
     if cmd not in nonrepo_commands.split():
         try:
             repo = hg.repository(ui, path=path)
-        except RepoError, inst:
+        except hglib.RepoError, inst:
             # try to guess the repo from first of file args
             root = None
             if args:
@@ -184,7 +174,7 @@ def runcommand(ui, args):
             if path:
                 repo = hg.repository(ui, path=path)
             else:
-                raise RepoError(_("There is no Mercurial repository here"
+                raise hglib.RepoError(_("There is no Mercurial repository here"
                         " (.hg not found)"))
         cmdoptions['root'] = os.path.abspath(path)
 
@@ -195,116 +185,161 @@ def runcommand(ui, args):
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 1: # no
             raise
-        raise ParseError(cmd, _("invalid arguments"))
+        raise hglib.ParseError(cmd, _("invalid arguments"))
 
-def about(ui, **opts):
+mainwindow = None
+def thgexit(win):
+    if hasattr(mainwindow, 'should_live'):
+        if mainwindow.should_live(): return
+    mainwindow.destroy()
+
+def gtkrun(win):
+    global mainwindow
+    mainwindow = win
+    if hasattr(win, 'display'):
+        win.display()
+    win.show_all()
+    if 'response' in gobject.signal_list_names(win):
+        win.connect('response', gtk.main_quit)
+    win.connect('destroy', gtk.main_quit)
+    gtk.gdk.threads_init()
+    gtk.gdk.threads_enter()
+    gtk.main()
+    gtk.gdk.threads_leave()
+
+def about(ui, *pats, **opts):
     """about TortoiseHg"""
     from hggtk.about import run
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
-def clone(ui, source=None, dest=None, **opts):
+def add(ui, *pats, **opts):
+    """add files"""
+    from mercurial import dispatch
+    dispatch.dispatch(['add'] + list(pats))
+
+def clone(ui, *pats, **opts):
     """clone tool"""
     from hggtk.clone import run
-    opts['files'] = [os.path.abspath(x) for x in (source, dest) if x]
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def commit(ui, *pats, **opts):
     """commit tool"""
+    ct = ui.config('tortoisehg', 'extcommit', None)
+    if ct == 'qct':
+        from hglib import thgdispatch
+        args = ['--repository', root, ct]
+        try:
+            thgdispatch(repo.ui, args=args)
+        except SystemExit:
+            pass
+        return
+    # move cwd to repo root if repo is merged, so we can show
+    # all the changed files
+    repo = hg.repository(ui, path=hglib.rootpath())
+    if len(repo.changectx(None).parents()) > 1:
+        os.chdir(repo.root)
+        pats = []
     from hggtk.commit import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def shelve(ui, *pats, **opts):
     """shelve/unshelve tool"""
     from hggtk.thgshelve import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
-def userconfig(ui, **opts):
+def userconfig(ui, *pats, **opts):
     """user configuration editor"""
     from hggtk.thgconfig import run
-    run(**opts)
+    opts['repomode'] = False
+    gtkrun(run(ui, *pats, **opts))
 
 def repoconfig(ui, *pats, **opts):
     """repository configuration editor"""
     from hggtk.thgconfig import run
-    opts['files'] = opts['root']
-    run(**opts)
+    opts['repomode'] = True
+    gtkrun(run(ui, *pats, **opts))
 
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     from hggtk.rename import run
     if not pats or len(pats) > 2:
-        raise util.Abort("rename takes one or two path arguments")
-    opts['files'] = pats
-    opts['detect'] = False
-    run(**opts)
+        raise util.Abort(_('rename takes one or two path arguments'))
+    gtkrun(run(ui, *pats, **opts))
 
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
-    from hggtk.rename import run
-    opts['detect'] = True
-    run(**opts)
+    from hggtk.guess import run
+    gtkrun(run(ui, *pats, **opts))
 
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
     from hggtk.datamine import run
-    opts['files'] = sys.argv[2:] or []
-    opts['cwd'] = os.getcwd()
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
-def hginit(ui, dest=None, **opts):
+def hgignore(ui, *pats, **opts):
+    """ignore filter editor"""
+    from hggtk.hgignore import run
+    gtkrun(run(ui, *pats, **opts))
+
+def hginit(ui, *pats, **opts):
     """repository initialization tool"""
     from hggtk.hginit import run
-    if dest:
-        opts['files'] = [dest]
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def log(ui, *pats, **opts):
     """changelog viewer"""
     from hggtk.history import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
-def merge(ui, node=None, rev=None, **opts):
-    """merge tool """
+def merge(ui, *pats, **opts):
+    """merge tool"""
     from hggtk.merge import run
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def recovery(ui, *pats, **opts):
     """recover, rollback & verify"""
     from hggtk.recovery import run
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
-def serve(ui, **opts):
+def remove(ui, *pats, **opts):
+    """file status viewer in remove mode"""
+    from hggtk.status import run
+    gtkrun(run(ui, *pats, **opts))
+
+def revert(ui, *pats, **opts):
+    """file status viewer in revert mode"""
+    from hggtk.status import run
+    gtkrun(run(ui, *pats, **opts))
+
+def serve(ui, *pats, **opts):
     """web server"""
     from hggtk.serve import run
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
 def status(ui, *pats, **opts):
-    """file status viewer
-
-    Also do add, remove and revert.
-    """
-
+    """file status viewer"""
     from hggtk.status import run
-    opts['files'] = [os.path.abspath(x) for x in pats]
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
-def synch(ui, **opts):
+def synch(ui, *pats, **opts):
     """repository synchronization tool"""
     from hggtk.synch import run
-    cmd = sys.argv[1] 
+    cmd = sys.argv[1]
     if 'push'.startswith(cmd) or 'outgoing'.startswith(cmd):
         opts['pushmode'] = True
     else:
         opts['pushmode'] = False
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
 
-def update(ui, **opts):
+def update(ui, *pats, **opts):
     """update/checkout tool"""
     from hggtk.update import run
-    run(**opts)
+    gtkrun(run(ui, *pats, **opts))
+
+def vdiff(ui, *pats, **opts):
+    """launch configured visual diff tool"""
+    from hggtk.visdiff import run
+    gtkrun(run(ui, *pats, **opts))
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False):
@@ -406,7 +441,7 @@ def help_(ui, name=None, with_version=False):
                 v = i
                 header = l[-1]
         if not v:
-            raise cmdutil.UnknownCommand(name)
+            raise hglib.UnknownCommand(name)
 
         # description
         doc = help.helptable[v]
@@ -422,7 +457,7 @@ def help_(ui, name=None, with_version=False):
         try:
             mod = extensions.find(name)
         except KeyError:
-            raise cmdutil.UnknownCommand(name)
+            raise hglib.UnknownCommand(name)
 
         doc = (mod.__doc__ or _('No help text available')).splitlines(0)
         ui.write(_('%s extension - %s\n') % (name.split('.')[-1], doc[0]))
@@ -446,7 +481,7 @@ def help_(ui, name=None, with_version=False):
                 f(name)
                 i = None
                 break
-            except cmdutil.UnknownCommand, inst:
+            except hglib.UnknownCommand, inst:
                 i = inst
         if i:
             raise i
@@ -491,9 +526,32 @@ def help_(ui, name=None, with_version=False):
 def version(ui, **opts):
     """output version and copyright information"""
     import hggtk.shlib
-    ui.write("TortoiseHg Dialogs (version %s)\n" % hggtk.shlib.version())
+    ui.write(_('TortoiseHg Dialogs (version %s), '
+               'Mercurial (version %s)\n') %
+               (hggtk.shlib.version(), util.version()))
     if not ui.quiet:
         ui.write(shortlicense)
+
+def debugcomplete(ui, cmd='', **opts):
+    """output list of possible commands"""
+    if opts.get('options'):
+        options = []
+        otables = [globalopts]
+        if cmd:
+            aliases, entry = cmdutil.findcmd(cmd, table, False)
+            otables.append(entry[1])
+        for t in otables:
+            for o in t:
+                if o[0]:
+                    options.append('-%s' % o[0])
+                options.append('--%s' % o[1])
+        ui.write("%s\n" % "\n".join(options))
+        return
+
+    cmdlist = cmdutil.findpossible(cmd, table)
+    if ui.verbose:
+        cmdlist = [' '.join(c[0]) for c in cmdlist.values()]
+    ui.write("%s\n" % "\n".join(util.sort(cmdlist)))
 
 globalopts = [
     ('R', 'repository', '',
@@ -501,13 +559,19 @@ globalopts = [
     ('v', 'verbose', None, _('enable additional output')),
     ('h', 'help', None, _('display help and exit')),
     ('', 'debugger', None, _('start debugger')),
+    ('l', 'listfile', '', _('read file list from file')),
 ]
 
 table = {
     "^about": (about, [], _('hgtk about')),
+    "^add": (add, [], _('hgtk add [FILE]...')),
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
-    "^commit|ci": (commit, [], _('hgtk commit [FILE]...')),
+    "^commit|ci": (commit,
+        [('u', 'user', '', _('record user as committer')),
+         ('d', 'date', '', _('record datecode as commit date'))],
+        _('hgtk commit [OPTIONS] [FILE]...')),
     "^datamine|annotate|blame": (datamine, [], _('hgtk datamine')),
+    "^hgignore|ignore|filter": (hgignore, [], _('hgtk hgignore [FILE]')),
     "^init": (hginit, [], _('hgtk init [DEST]')),
     "^log|history": (log,
         [('l', 'limit', '', _('limit number of changes displayed'))],
@@ -516,21 +580,29 @@ table = {
     "^recovery|rollback|verify": (recovery, [], _('hgtk recovery')),
     "^shelve|unshelve": (shelve, [], _('hgtk shelve')),
     "^synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
-    "^status|st": (status, [], _('hgtk status [FILE]...')),
+    "^status|st": (status,
+        [('r', 'rev', '', _('revisions to compare'))],
+        _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
     "^repoconfig": (repoconfig, [], _('hgtk repoconfig')),
     "^guess": (guess, [], _('hgtk guess')),
+    "^remove|rm": (revert, [], _('hgtk remove [FILE]...')),
     "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
-    "^serve": 
+    "^revert": (revert, [], _('hgtk revert [FILE]...')),
+    "^serve":
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
          _('hgtk serve [OPTION]...')),
     "^update|checkout|co": (update, [], _('hgtk update')),
+    "^vdiff": (vdiff,
+        [('c', 'change', '', _('changeset to view in diff tool')),
+         ('r', 'rev', [], _('revisions to view in diff tool'))],
+            _('launch visual diff tool')),
     "^version": (version,
         [('v', 'verbose', None, _('print license'))],
         _('hgtk version [OPTION]')),
+    "debugcomplete": (debugcomplete,
+         [('o', 'options', None, _('show the command options'))],
+         _('[-o] CMD')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
 }
-
-if __name__=='__main__':
-    sys.exit(dispatch(sys.argv[1:]))

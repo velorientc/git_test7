@@ -6,16 +6,22 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
+import pythoncom
+from mercurial import demandimport
+demandimport.ignore.append('win32traceutil')
+demandimport.enable()
+
 import os
 import sys
 import _winreg
 
-if hasattr(sys, "frozen") and sys.frozen == 'dll':
-    import win32traceutil
-
 # shell extension classes
 from tortoise.contextmenu import ContextMenuExtension
 from tortoise.iconoverlay import ChangedOverlay, AddedOverlay, UnchangedOverlay
+from tortoise.iconoverlay import ConflictOverlay, IgnoredOverlay
+
+overlays = (ChangedOverlay, AddedOverlay, UnchangedOverlay,
+            ConflictOverlay, IgnoredOverlay)
 
 bin_path = os.path.dirname(os.path.join(os.getcwd(), sys.argv[0]))
 print "bin path = ", bin_path
@@ -48,17 +54,15 @@ def register_tortoise_path(unregister=False):
 def DllRegisterServer():
     check_tortoise_overlays()
     RegisterServer(ContextMenuExtension)
-    RegisterServer(ChangedOverlay)
-    RegisterServer(AddedOverlay)
-    RegisterServer(UnchangedOverlay)
+    for overlay in overlays:
+        RegisterServer(overlay)
     register_tortoise_path()
 
 # for COM registration via py2exe
 def DllUnregisterServer():
     UnregisterServer(ContextMenuExtension)
-    UnregisterServer(ChangedOverlay)
-    UnregisterServer(AddedOverlay)
-    UnregisterServer(UnchangedOverlay)
+    for overlay in overlays:
+        UnregisterServer(overlay)
     register_tortoise_path(unregister=True)
 
 def RegisterServer(cls):
@@ -75,23 +79,23 @@ def RegisterServer(cls):
         key = "CLSID\\%s\\PythonCOMPath" % cls._reg_clsid_
         path = _winreg.QueryValue(_winreg.HKEY_CLASSES_ROOT, key)
         _winreg.SetValue(_winreg.HKEY_CLASSES_ROOT, key, _winreg.REG_SZ, "%s;%s" % (path, hg_path))
-    except:
-        pass
-        
+    except Exception, e:
+        print 'register COM path failed', e
+
     # Add the appropriate shell extension registry keys
     for category, keyname, values in cls.registry_keys:
         hkey = _winreg.CreateKey(category, keyname)
         for (name, val) in values:
             # todo: handle ints?
             _winreg.SetValueEx(hkey, name, 0, _winreg.REG_SZ, val)
-        
+
     # register the extension on Approved list
     try:
         apath = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
         key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, apath, 0, _winreg.KEY_WRITE)
         _winreg.SetValueEx(key, cls._reg_clsid_, 0, _winreg.REG_SZ, 'TortoiseHg')
-    except:
-        pass
+    except Exception, e:
+        print 'register to approved list failed', e
 
     print cls._reg_desc_, "registration complete."
 
@@ -110,8 +114,8 @@ def UnregisterServer(cls):
         apath = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
         key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, apath, 0, _winreg.KEY_WRITE)
         _winreg.DeleteValue(key, cls._reg_clsid_)
-    except:
-        pass
+    except Exception, e:
+        print 'remove from approved list failed', e
 
     print cls._reg_desc_, "unregistration complete."
 
@@ -122,15 +126,15 @@ if __name__=='__main__':
     register.UseCommandLine(ContextMenuExtension,
             finalize_register = lambda: RegisterServer(ContextMenuExtension),
             finalize_unregister = lambda: UnregisterServer(ContextMenuExtension))
-    
-    for cls in (ChangedOverlay, AddedOverlay, UnchangedOverlay):
-        register.UseCommandLine(cls,
-                finalize_register = lambda: RegisterServer(cls),
-                finalize_unregister = lambda: UnregisterServer(cls))
+
+    for overlay in overlays:
+        register.UseCommandLine(overlay,
+                finalize_register = lambda: RegisterServer(overlay),
+                finalize_unregister = lambda: UnregisterServer(overlay))
 
     if "--unregister" in sys.argv[1:]:
         register_tortoise_path(unregister=True)
     else:
         register_tortoise_path()
 
-    
+

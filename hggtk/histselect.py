@@ -4,19 +4,13 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
-import sys
 import gtk
 import Queue
-from dialog import question_dialog, error_dialog
+import sys
+from dialog import error_dialog
 from mercurial import util
 from mercurial.i18n import _
-from shlib import set_tortoise_icon
+import shlib
 import hglib
 
 class HistoryDialog(gtk.Dialog):
@@ -29,10 +23,11 @@ class HistoryDialog(gtk.Dialog):
                       gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
         else:
             buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-        super(HistoryDialog, self).__init__(flags=gtk.DIALOG_MODAL, 
+        super(HistoryDialog, self).__init__(flags=gtk.DIALOG_MODAL,
                                            buttons=buttons)
+        shlib.set_tortoise_icon(self, 'menulog.ico')
+        shlib.set_tortoise_keys(self)
 
-        set_tortoise_icon(self, 'menulog.ico')
         # set dialog title
         title = "hg log "
         if root: title += " - %s" % hglib.toutf(root)
@@ -49,15 +44,15 @@ class HistoryDialog(gtk.Dialog):
         # build dialog
         self._create()
 
-        # display history 
+        # display history
         self._generate_history()
 
     def _create(self):
         self.set_default_size(650, 400)
-        
+
         self._hbox = gtk.VBox()
         self.vbox.pack_start(self._hbox, True, True)
-        
+
         # add treeview to list change files
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_IN)
@@ -67,20 +62,20 @@ class HistoryDialog(gtk.Dialog):
         self._create_treestore()
         scrolledwindow.add(self.treeview)
         self._hbox.pack_start(scrolledwindow, True, True)
-        
+
         self._button_box = gtk.HBox()
         self._hbox.pack_start(self._button_box, False, False, 10)
 
         # add navigation controls
-        self._btn_goto_tip = gtk.Button("Tip")
+        self._btn_goto_tip = gtk.Button(_('Tip'))
         self._button_box.pack_start(self._btn_goto_tip, False, False)
-        self._btn_goto_prev = gtk.Button("Prev")
+        self._btn_goto_prev = gtk.Button(_('Prev'))
         self._button_box.pack_start(self._btn_goto_prev, False, False)
-        self._btn_goto_next = gtk.Button("Next")
+        self._btn_goto_next = gtk.Button(_('Next'))
         self._button_box.pack_start(self._btn_goto_next, False, False)
-        self._btn_goto_first = gtk.Button("(0)")
+        self._btn_goto_first = gtk.Button('(0)')
         self._button_box.pack_start(self._btn_goto_first, False, False)
-        
+
         self._btn_goto_tip.connect('clicked', self._on_goto_clicked, 'tip')
         self._btn_goto_next.connect('clicked', self._on_goto_clicked, 'next')
         self._btn_goto_prev.connect('clicked', self._on_goto_clicked, 'prev')
@@ -91,28 +86,29 @@ class HistoryDialog(gtk.Dialog):
         #self._button_box.pack_end(self._search_input, False, False)
         #self._btn_search = gtk.Button("Search:")
         #self._button_box.pack_end(self._btn_search, False, False, 3)
-        
+
         # show them all
         self.vbox.show_all()
 
     def _create_treestore(self):
         """ create history display """
         self.model = gtk.TreeStore(str, str)
-        self.treeview.connect("cursor-changed", self._cursor_changed)
+        self.treeview.connect('cursor-changed', self._cursor_changed)
+        self.treeview.set_enable_search(False)
         #self.treeview.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
-        
+
         cell = gtk.CellRendererText()
-        
+
         column = gtk.TreeViewColumn()
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 0)
+        column.add_attribute(cell, 'text', 0)
         self.treeview.append_column(column)
 
         column = gtk.TreeViewColumn()
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 1)
+        column.add_attribute(cell, 'text', 1)
         self.treeview.append_column(column)
 
     def _cursor_changed(self, tv):
@@ -122,14 +118,14 @@ class HistoryDialog(gtk.Dialog):
         cs = self.history[index]['changeset'][0]
         rev, csid = cs.split(':')
         self.selected = (rev, csid)
-        
-    def _get_hg_history(self, rev=None, limit=10):    
+
+    def _get_hg_history(self, rev=None, limit=10):
         # get history
         options = []
         if rev: options += ['--rev', rev]
         if limit: options += ['--limit', str(limit)]
         self._do_hg_cmd('log', options)
-        
+
         # parse log output
         import re
         histlist = []
@@ -149,9 +145,9 @@ class HistoryDialog(gtk.Dialog):
                     pass
         if cs:
             histlist.append(cs)
-        
+
         return histlist
-        
+
     def _generate_history(self):
         # clear changed files display
         self.model.clear()
@@ -171,13 +167,13 @@ class HistoryDialog(gtk.Dialog):
                     self.model.append(titer, [ fld + ":", v ])
 
         self.treeview.expand_all()
-        
+
         if self.start_rev == 'tip':
             self.tip_rev = self._get_revision_on_page(0)
-        
+
     def _do_hg_cmd(self, cmd, options):
         import os.path
-                  
+
         try:
             q = Queue.Queue()
             args = [cmd] + options + [os.path.join(self.root, x) for x in self.files]
@@ -186,12 +182,13 @@ class HistoryDialog(gtk.Dialog):
             while q.qsize(): out += q.get(0)
             self.hgout = out
         except util.Abort, inst:
-            error_dialog(self, "Error in %s command" % cmd, "abort: %s" % inst)
+            error_dialog(self, _('Error in %s command') % cmd,
+                    _('abort: %s') % inst)
             return False
         except:
             import traceback
-            error_dialog(self, "Error in %s command" % cmd,
-                    "Traceback:\n%s" % traceback.format_exc())
+            error_dialog(self, _('Error in %s command') % cmd,
+                    _('Traceback:\n%s') % traceback.format_exc())
             return False
         return True
 
@@ -214,7 +211,7 @@ class HistoryDialog(gtk.Dialog):
             self.start_rev = next_start
 
         self._generate_history()
-    
+
     def _get_revision_on_page(self, index):
         import string
         cs = self.history[index]
@@ -228,22 +225,13 @@ class HistoryDialog(gtk.Dialog):
         if 'tip' in tags:
             return True
         return False
-        
+
     def _is_first_revision(self, index):
         rev = self._get_revision_on_page(index)
         if rev == 0:
             return True
         return False
 
-def run(root='', files=[], **opts):
-    dialog = HistoryDialog(root=root, files=files)
-    dialog.show_all()
-    dialog.connect('response', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-    
 def select(root='', files=[]):
     dialog = HistoryDialog(root=root, files=files, select=True)
     resp = dialog.run()
@@ -252,9 +240,3 @@ def select(root='', files=[]):
         rev = dialog.selected[1]
     dialog.hide()
     return rev
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1:] or []
-    run(**opts)

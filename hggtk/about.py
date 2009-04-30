@@ -6,11 +6,9 @@
 
 import os
 import sys
-
-import pygtk
-pygtk.require('2.0')
 import gtk
 import shlib
+from mercurial.i18n import _
 
 try:
     # post 1.1.2
@@ -26,7 +24,7 @@ def browse_url(url):
     def start_browser():
         if os.name == 'nt':
             import win32api, win32con
-            win32api.ShellExecute(0, "open", url, None, "", 
+            win32api.ShellExecute(0, "open", url, None, "",
                 win32con.SW_SHOW)
         else:
             import gconf
@@ -38,16 +36,17 @@ def browse_url(url):
 
 def url_handler(dialog, link, user_data):
 	browse_url(link)
-    
+
 gtk.about_dialog_set_url_hook(url_handler, None)
 
 def make_version(tuple):
     vers = ".".join([str(x) for x in tuple])
     return vers
-    
+
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
         super(AboutDialog, self).__init__()
+        shlib.set_tortoise_keys(self)
 
         lib_versions = ', '.join([
                 "Mercurial-%s" % hgversion,
@@ -55,8 +54,8 @@ class AboutDialog(gtk.AboutDialog):
                 "PyGTK-%s" % make_version(gtk.pygtk_version),
                 "GTK-%s" % make_version(gtk.gtk_version),
             ])
-        
-        comment = "Several icons are courtesy of the TortoiseSVN project"
+
+        comment = _("Several icons are courtesy of the TortoiseSVN project")
 
         self.set_website("http://bitbucket.org/tortoisehg/stable/")
         self.set_name("TortoiseHg")
@@ -68,24 +67,21 @@ class AboutDialog(gtk.AboutDialog):
         thg_logo = os.path.normpath(shlib.get_tortoise_icon('thg_logo_92x50.png'))
         thg_icon = os.path.normpath(shlib.get_tortoise_icon('thg_logo.ico'))
         prog_root = os.path.dirname(os.path.dirname(os.path.dirname(thg_icon)))
-        license_file = os.path.join(prog_root, "COPYING.txt")
+        try:
+            license_file = os.path.join(prog_root, "COPYING.txt")
+            self.set_license(file(license_file).read())
+        except IOError:
+            import hgtk
+            license = hgtk.shortlicense.splitlines()[1:]
+            self.set_license('\n'.join(license))
 
-        self.set_license(file(license_file).read())
         self.set_comments("with " + lib_versions + "\n\n" + comment)
         self.set_logo(gtk.gdk.pixbuf_new_from_file(thg_logo))
         self.set_icon_from_file(thg_icon)
-        
-        # somehow clicking on the Close button doesn't automatically
-        # close the About dialog...
-        self.connect('response', gtk.main_quit)
+        self.connect('response', self.response)
 
-def run(*args, **opts):
-    dialog = AboutDialog()
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    def response(self, widget, respid):
+        self.destroy()
 
-if __name__ == "__main__":
-    run()
+def run(_ui, *pats, **opts):
+    return AboutDialog()

@@ -56,6 +56,12 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show revision ID column',
                                  False,
                                  gobject.PARAM_READWRITE),
+
+        'branch-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Branch',
+                                 'Show branch',
+                                 False,
+                                 gobject.PARAM_READWRITE),
     }
 
     __gsignals__ = {
@@ -83,6 +89,11 @@ class TreeView(gtk.ScrolledWindow):
         self.construct_treeview()
         self.pbar = pbar
 
+    def set_repo(self, repo, pbar=None):
+        self.repo = repo
+        self.pbar = pbar
+        self.set_author_color()
+
     def search_in_tree(self, model, column, key, iter, data):
         """Searches all fields shown in the tree when the user hits crtr+f,
         not just the ones that are set via tree.set_search_column.
@@ -101,6 +112,10 @@ class TreeView(gtk.ScrolledWindow):
         return True
 
     def create_log_generator(self, graphcol, pats, opts):
+        if self.repo is None:
+            self.grapher = None
+            return
+
         if 'filehist' in opts:
             self.grapher = filelog_grapher(self.repo, opts['filehist'])
         elif graphcol:
@@ -136,6 +151,10 @@ class TreeView(gtk.ScrolledWindow):
         """Fill the treeview with contents.
         """
         stopped = False
+        if self.repo is None:
+            stopped = True
+            return False
+
         try:
             (rev, node, lines, parents) = self.grapher.next()
             self.max_cols = max(self.max_cols, len(lines))
@@ -157,7 +176,8 @@ class TreeView(gtk.ScrolledWindow):
 
         if not len(self.graphdata):
             self.treeview.set_model(None)
-            self.pbar.end()
+            if self.pbar is not None:
+                self.pbar.end()
             self.emit('revisions-loaded')
             return False
 
@@ -178,7 +198,8 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
         if revision is not None:
             self.set_revision_id(revision[treemodel.REVID])
-        self.pbar.end()
+        if self.pbar is not None:
+            self.pbar.end()
         return False
 
     def do_get_property(self, property):
@@ -188,6 +209,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.id_column.get_visible()
         elif property.name == 'rev-column-visible':
             return self.rev_column.get_visible()
+        elif property.name == 'branch-column-visible':
+            return self.branch_column.get_visible()
         elif property.name == 'repo':
             return self.repo
         elif property.name == 'limit':
@@ -204,6 +227,8 @@ class TreeView(gtk.ScrolledWindow):
             self.id_column.set_visible(value)
         elif property.name == 'rev-column-visible':
             self.rev_column.set_visible(value)
+        elif property.name == 'branch-column-visible':
+            self.branch_column.set_visible(value)
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'limit':
@@ -216,12 +241,14 @@ class TreeView(gtk.ScrolledWindow):
     def next_revision_batch(self, size):
         self.batchsize = size
         self.limit += self.batchsize
-        self.pbar.begin()
+        if self.pbar is not None:
+            self.pbar.begin()
         gobject.idle_add(self.populate)
 
     def load_all_revisions(self):
         self.limit = None
-        self.pbar.begin()
+        if self.pbar is not None:
+            self.pbar.begin()
         gobject.idle_add(self.populate)
 
     def get_revision(self):
@@ -251,14 +278,33 @@ class TreeView(gtk.ScrolledWindow):
         return self.get_property('parents')
         
     def refresh(self, graphcol, pats, opts):
-        self.repo.invalidate()
-        self.repo.dirstate.invalidate()
-        if len(self.repo.changelog) > 0:
-            self.create_log_generator(graphcol, pats, opts)
-            self.pbar.begin()
-            gobject.idle_add(self.populate, self.get_revision())
-        else:
-            self.pbar.set_status_text('Repository is empty')
+        if self.repo is not None:
+            self.repo.invalidate()
+            self.repo.dirstate.invalidate()
+            if len(self.repo.changelog) > 0:
+                self.create_log_generator(graphcol, pats, opts)
+                if self.pbar is not None:
+                    self.pbar.begin()
+                gobject.idle_add(self.populate, self.get_revision())
+            else:
+                self.pbar.set_status_text('Repository is empty')
+
+    def set_author_color(self):
+        # If user has configured authorcolor in [tortoisehg], color
+        # rows by author matches
+        self.author_pats = []
+        self.color_func =  self.text_color_orig
+
+        if self.repo is not None:
+            for k, v in self.repo.ui.configitems('tortoisehg'):
+                if not k.startswith('authorcolor.'): continue
+                pat = k[12:]
+                self.author_pats.append((re.compile(pat, re.I), v))
+            if self.author_pats or self.repo.ui.configbool('tortoisehg',
+                    'authorcolor'):
+                self.color_func = self.text_color_author
+            else:
+                self.color_func = self.text_color_orig
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
@@ -266,19 +312,7 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.set_reorderable(False)
         self.treeview.set_enable_search(True)
         self.treeview.set_search_equal_func(self.search_in_tree, None)
-        
-        # If user has configured authorcolor in [tortoisehg], color
-        # rows by author matches
-        self.author_pats = []
-        for k, v in self.repo.ui.configitems('tortoisehg'):
-            if not k.startswith('authorcolor.'): continue
-            pat = k[12:]
-            self.author_pats.append((re.compile(pat, re.I), v))
-        if self.author_pats or self.repo.ui.configbool('tortoisehg',
-                'authorcolor'):
-            self.color_func = self.text_color_author
-        else:
-            self.color_func = self.text_color_orig
+        self.set_author_color()
 
         # Fix old PyGTK (<1.12) bug - by JAM
         set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
@@ -331,6 +365,19 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.id_column)
 
         cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 15)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        self.branch_column = gtk.TreeViewColumn("Branch")
+        self.branch_column.set_visible(False)
+        self.branch_column.set_resizable(True)
+        self.branch_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.branch_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.branch_column.pack_start(cell, expand=True)
+        self.branch_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        self.branch_column.add_attribute(cell, "markup", treemodel.BRANCHES)
+        self.treeview.append_column(self.branch_column)
+        cell = gtk.CellRendererText()
+
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.msg_column = gtk.TreeViewColumn("Summary")
@@ -340,7 +387,6 @@ class TreeView(gtk.ScrolledWindow):
         self.msg_column.pack_end(cell, expand=True)
         self.msg_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
-        self.msg_column.add_attribute(cell, "underline", treemodel.WCPARENT)
         self.treeview.append_column(self.msg_column)
 
         cell = gtk.CellRendererText()

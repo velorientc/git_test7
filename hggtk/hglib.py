@@ -3,6 +3,7 @@ import os.path
 import sys
 import traceback
 import threading, thread2
+import urllib2
 import Queue
 from mercurial import hg, ui, util, extensions, commands, hook
 from mercurial.i18n import _
@@ -10,60 +11,51 @@ from dialog import entry_dialog
 
 try:
     from mercurial.error import RepoError, ParseError, LookupError
+    from mercurial.error import UnknownCommand, AmbiguousCommand
 except ImportError:
+    from mercurial.cmdutil import UnknownCommand, AmbiguousCommand
     from mercurial.repo import RepoError
     from mercurial.dispatch import ParseError
     from mercurial.revlog import LookupError
 
-try:
-    try:
-        from mercurial import demandimport
-    except:
-        from mercurial.commands import demandimport # pre 0.9.5
-    demandimport.disable()
+from mercurial import dispatch
 
-    try:
-        # Mercurail 0.9.4
-        from mercurial.cmdutil import parse
-        from mercurial.cmdutil import parseconfig as _parseconfig
-    except:
-        try:
-            # Mercurail <= 0.9.3
-            from mercurial.commands import parse
-            from mercurial.commands import parseconfig as _parseconfig
-        except:
-            # Mercurail 0.9.5
-            from mercurial.dispatch import _parse as parse
-            from mercurial.dispatch import _parseconfig
-finally:
-    demandimport.enable()
+try:
+    from mercurial import encoding
+    _encoding = encoding.encoding
+    _encodingmode = encoding.encodingmode
+    _fallbackencoding = encoding.fallbackencoding
+except ImportError:
+    _encoding = util._encoding
+    _encodingmode = util._encodingmode
+    _fallbackencoding = util._fallbackencoding
 
 def toutf(s):
     """
     Convert a string to UTF-8 encoding
-    
+
     Based on mercurial.util.tolocal()
     """
-    for e in ('utf-8', util._encoding):
+    for e in ('utf-8', _encoding):
         try:
             return s.decode(e, 'strict').encode('utf-8')
         except UnicodeDecodeError:
             pass
-    return s.decode(util._fallbackencoding, 'replace').encode('utf-8')
+    return s.decode(_fallbackencoding, 'replace').encode('utf-8')
 
 def fromutf(s):
     """
     Convert UTF-8 encoded string to local.
-    
+
     It's primarily used on strings converted to UTF-8 by toutf().
     """
     try:
-        return s.decode('utf-8').encode(util._encoding)
+        return s.decode('utf-8').encode(_encoding)
     except UnicodeDecodeError:
         pass
     except UnicodeEncodeError:
         pass
-    return s.decode('utf-8').encode(util._fallbackencoding)
+    return s.decode('utf-8').encode(_fallbackencoding)
 
 def rootpath(path=None):
     """ find Mercurial's repo root of path """
@@ -98,6 +90,21 @@ def diffexpand(line):
         return line
     return line[0] + line[1:].expandtabs(_tabwidth)
 
+def uiwrite(u, args):
+    '''
+    write args if there are buffers
+    returns True if the caller shall handle writing
+    '''
+    buffers = getattr(u, '_buffers', None)
+    if buffers == None:
+        buffers = u.buffers
+    if buffers:
+        ui.ui.write(u, *args)
+        return False
+    return True
+
+def calliffunc(f):
+    return hasattr(f, '__call__') and f() or f
 
 class GtkUi(ui.ui):
     '''
@@ -106,26 +113,23 @@ class GtkUi(ui.ui):
     Instead, it places output and dialog requests onto queues for the
     main thread to pickup.
     '''
-    def __init__(self, outputq=None, dialogq=None, responseq=None,
+    def __init__(self, src=None, outputq=None, dialogq=None, responseq=None,
             parentui=None):
-        super(GtkUi, self).__init__()
         if parentui:
-            self.parentui = parentui.parentui or parentui
-            self.cdata = ui.dupconfig(self.parentui.cdata)
-            self.verbose = parentui.verbose
-            self.outputq = parentui.outputq
-            self.dialogq = parentui.dialogq
-            self.responseq = parentui.responseq
+            src = parentui
+        super(GtkUi, self).__init__(src)
+        if src:
+            self.outputq = src.outputq
+            self.dialogq = src.dialogq
+            self.responseq = src.responseq
         else:
             self.outputq = outputq
             self.dialogq = dialogq
             self.responseq = responseq
-        self.interactive = True
+        self.setconfig('ui', 'interactive', 'on')
 
     def write(self, *args):
-        if self.buffers:
-            self.buffers[-1].extend([str(a) for a in args])
-        else:
+        if uiwrite(self, args):
             for a in args:
                 self.outputq.put(str(a))
 
@@ -138,25 +142,30 @@ class GtkUi(ui.ui):
 
     def prompt(self, msg, pat=None, default="y"):
         import re
-        if not self.interactive: return default
+        if not calliffunc(self.interactive): return default
         while True:
             try:
                 # send request to main thread, await response
                 self.dialogq.put( (msg, True, default) )
                 r = self.responseq.get(True)
+                if r is None:
+                    raise EOFError
                 if not r:
                     return default
                 if not pat or re.match(pat, r):
                     return r
                 else:
-                    self.write(_("unrecognized response\n"))
+                    self.write(_('unrecognized response\n'))
             except EOFError:
                 raise util.Abort(_('response expected'))
 
     def getpass(self, prompt=None, default=None):
         # send request to main thread, await response
         self.dialogq.put( (prompt or _('password: '), False, default) )
-        return self.responseq.get(True)
+        r = self.responseq.get(True)
+        if r is None:
+            raise util.Abort(_('response expected'))
+        return r
 
     def print_exc(self):
         traceback.print_exc()
@@ -173,7 +182,7 @@ class HgThread(thread2.Thread):
         self.outputq = Queue.Queue()
         self.dialogq = Queue.Queue()
         self.responseq = Queue.Queue()
-        self.ui = GtkUi(self.outputq, self.dialogq, self.responseq)
+        self.ui = GtkUi(None, self.outputq, self.dialogq, self.responseq)
         self.args = args
         self.ret = None
         self.postfunc = postfunc
@@ -210,22 +219,27 @@ class HgThread(thread2.Thread):
 
     def run(self):
         try:
-            # Some commands create repositories, and thus must create
-            # new ui() instances.  For those, we monkey-patch ui.ui()
-            # as briefly as possible
-            origui = None
-            if self.args[0] in ('clone', 'init'):
-                origui = ui.ui
-                ui.ui = GtkUi
-            try:
-                ret = thgdispatch(self.ui, None, self.args)
-            finally:
-                if origui:
-                    ui.ui = origui
-            if ret:
-                self.ui.write('[command returned code %d]\n' % int(ret))
+            ret = None
+            if hasattr(self.ui, 'copy'):
+                # Mercurial 1.3
+                ret = dispatch._dispatch(self.ui, self.args)
             else:
-                self.ui.write('[command completed successfully]\n')
+                # Mercurial 1.2
+                # Some commands create repositories, and thus must create
+                # new ui() instances.  For those, we monkey-patch ui.ui()
+                # as briefly as possible.
+                if self.args[0] in ('clone', 'init'):
+                    origui = ui.ui
+                    ui.ui = GtkUi
+                try:
+                    ret = thgdispatch(self.ui, None, self.args)
+                finally:
+                    if origui:
+                        ui.ui = origui
+            if ret:
+                self.ui.write(_('[command returned code %d]\n') % int(ret))
+            else:
+                self.ui.write(_('[command completed successfully]\n'))
             self.ret = ret or 0
             if self.postfunc:
                 self.postfunc(ret)
@@ -235,6 +249,8 @@ class HgThread(thread2.Thread):
             self.ui.write_err(str(e))
             if self.ui.traceback:
                 self.ui.print_exc()
+        except urllib2.HTTPError, e:
+            self.ui.write_err(str(e) + '\n')
         except Exception, e:
             self.ui.write_err(str(e))
             self.ui.print_exc()
@@ -274,7 +290,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     Replicate functionality of mercurial dispatch but force the use
     of the passed in ui for all purposes
     '''
-    
+
     # clear all user-defined command defaults
     if nodefaults:
         for k, v in ui.configitems('defaults'):
@@ -284,7 +300,8 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     # (e.g. to change trust settings for reading .hg/hgrc)
     config = _earlygetopt(['--config'], args)
     if config:
-        ui.updateopts(config=_parseconfig(config))
+        for section, name, value in dispatch._parseconfig(config):
+            self.setconfig(section, name, value)
 
     # check for cwd
     cwd = _earlygetopt(['--cwd'], args)
@@ -319,25 +336,31 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         cmdtable = getattr(module, 'cmdtable', {})
         overrides = [cmd for cmd in cmdtable if cmd in commands.table]
         if overrides:
-            ui.warn(_("extension '%s' overrides commands: %s\n")
-                    % (name, " ".join(overrides)))
+            ui.warn(_("extension '%s' overrides commands: %s\n") %
+                    (name, " ".join(overrides)))
         commands.table.update(cmdtable)
         _loaded[name] = 1
 
     # check for fallback encoding
     fallback = ui.config('ui', 'fallbackencoding')
     if fallback:
-        util._fallbackencoding = fallback
+        _fallbackencoding = fallback
 
     fullargs = args
-    cmd, func, args, options, cmdoptions = parse(ui, args)
+    cmd, func, args, options, cmdoptions = dispatch._parse(ui, args)
 
     if options["encoding"]:
-        util._encoding = options["encoding"]
+        _encoding = options["encoding"]
     if options["encodingmode"]:
-        util._encodingmode = options["encodingmode"]
-    ui.updateopts(options["verbose"], options["debug"], options["quiet"],
-                 not options["noninteractive"], options["traceback"])
+        _encodingmode = options["encodingmode"]
+    if options['verbose'] or options['debug'] or options['quiet']:
+        ui.setconfig('ui', 'verbose', str(bool(options['verbose'])))
+        ui.setconfig('ui', 'debug', str(bool(options['debug'])))
+        ui.setconfig('ui', 'quiet', str(bool(options['quiet'])))
+    if options['traceback']:
+        ui.setconfig('ui', 'traceback', 'on')
+    if options['noninteractive']:
+        ui.setconfig('ui', 'interactive', 'off')
 
     if options['help']:
         return commands.help_(ui, cmd, options['version'])
@@ -357,8 +380,8 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         except RepoError:
             if cmd not in commands.optionalrepo.split():
                 if not path:
-                    raise RepoError(_("There is no Mercurial repository here"
-                                         " (.hg not found)"))
+                    raise RepoError(_('There is no Mercurial repository here'
+                                         ' (.hg not found)'))
                 raise
         d = lambda: func(ui, repo, *args, **cmdoptions)
     else:
@@ -377,7 +400,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 2: # no
             raise
-        raise ParseError(cmd, _("invalid arguments"))
+        raise ParseError(cmd, _('invalid arguments'))
 
     # run post-hook, passing command result
     hook.hook(ui, repo, "post-%s" % cmd, False, args=" ".join(fullargs),
@@ -391,14 +414,12 @@ def hgcmd_toq(path, q, *args):
     object.  Assumes command is completely noninteractive.
     '''
     class Qui(ui.ui):
-        def __init__(self):
-            ui.ui.__init__(self)
-            self.interactive = False
+        def __init__(self, src=None):
+            super(Qui, self).__init__(src)
+            self.setconfig('ui', 'interactive', 'off')
 
         def write(self, *args):
-            if self.buffers:
-                self.buffers[-1].extend([str(a) for a in args])
-            else:
+            if uiwrite(self, args):
                 for a in args:
                     q.put(str(a))
     u = Qui()

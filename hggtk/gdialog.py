@@ -4,35 +4,26 @@
 #
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
-# 
+#
 
-import mercurial.demandimport; mercurial.demandimport.disable()
-
-import os
-import threading
-import StringIO
-import sys
-import shutil
-import tempfile
-import datetime
-import cPickle
-
-import pygtk
-pygtk.require('2.0')
 import gtk
 import gobject
 import pango
 import shlex
 
+import os
+import threading
+import cStringIO
+import sys
+import shutil
+import tempfile
+
 from mercurial.i18n import _
 from mercurial.node import short
 from mercurial import cmdutil, util, ui, hg, commands
-from hgext import extdiff
-from shlib import shell_notify, set_tortoise_icon, Settings
-from thgconfig import ConfigDialog
 from gtklib import MessageDialog
-from hglib import toutf
-
+import shlib
+import hglib
 
 class SimpleMessage(MessageDialog):
     def run(self):
@@ -45,34 +36,34 @@ class Prompt(SimpleMessage):
     def __init__(self, title, message, parent):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE)
-        self.set_title(toutf(title))
-        self.set_markup('<b>' + toutf(message) + '</b>')
+        self.set_title(hglib.toutf(title))
+        self.set_markup('<b>' + hglib.toutf(message) + '</b>')
 
 class Confirm(SimpleMessage):
-    """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO 
+    """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO
     """
     def __init__(self, title, files, parent, primary=None):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
-        self.set_title(toutf('Confirm ' + title))
+        self.set_title(hglib.toutf(_('Confirm ') + title))
         if primary is None:
             primary = title + ' file' + ((len(files) > 1 and 's') or '') + '?'
         primary = '<b>' + primary + '</b>'
-        self.set_markup(toutf(primary))
+        self.set_markup(hglib.toutf(primary))
         message = ''
         for i, f in enumerate(files):
             message += '   ' + f + '\n'
-            if i == 9: 
+            if i == 9:
                 message += '   ...\n'
                 break
-        self.format_secondary_text(toutf(message))
+        self.format_secondary_text(hglib.toutf(message))
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
         buttons = self.get_children()[0].get_children()[1].get_children()
         buttons[1].add_accelerator("clicked", accel_group, ord("y"),
-                              0, gtk.ACCEL_VISIBLE) 
+                              0, gtk.ACCEL_VISIBLE)
         buttons[0].add_accelerator("clicked", accel_group, ord("n"),
-                              0, gtk.ACCEL_VISIBLE) 
+                              0, gtk.ACCEL_VISIBLE)
 
 
 class GDialog(gtk.Window):
@@ -97,18 +88,17 @@ class GDialog(gtk.Window):
     # "Constants"
     settings_version = 1
 
-    def __init__(self, ui, repo, cwd, pats, opts, main):
+    def __init__(self, ui, repo, cwd, pats, opts):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        self.cwd = cwd
+        self.cwd = cwd or os.getcwd()
         self.ui = ui
-        self.ui.interactive=False
-        self.repo = repo
+        self.ui.setconfig('ui', 'interactive', 'off')
+        self.repo = repo or hg.repository(ui, path=hglib.rootpath())
         self.pats = pats
         self.opts = opts
-        self.main = main
         self.tmproot = None
         self.toolbuttons = {}
-        self.settings = Settings(self.__class__.__name__)
+        self.settings = shlib.Settings(self.__class__.__name__)
         self.init()
 
     ### Following methods are meant to be overridden by subclasses ###
@@ -131,7 +121,7 @@ class GDialog(gtk.Window):
 
 
     def get_defsize(self):
-        return self._setting_defsize 
+        return self._setting_defsize
 
 
     def get_tbbuttons(self):
@@ -151,23 +141,33 @@ class GDialog(gtk.Window):
 
 
     def should_live(self, widget=None, event=None):
-        if self.main:
-            self._destroying(widget)
-        else:
-            self.destroy()
+        self._destroying(widget)
         return False
 
 
     def save_settings(self):
+        settings = {}
         rect = self.get_allocation()
-        return {'gdialog': (rect.width, rect.height)}
-
-
-    def load_settings(self, settings):
-        if settings:
-            self._setting_defsize = settings['gdialog']
+        if self.ismaximized:
+            settings['gdialog-rect'] = self._setting_defsize
+            settings['gdialog-pos'] = self._setting_winpos
         else:
-            self._setting_defsize = (678, 585)
+            settings['gdialog-rect'] = (rect.width, rect.height)
+            settings['gdialog-pos'] = self.lastpos
+        settings['gdialog-ismax'] = self.ismaximized
+        return settings
+
+
+    def load_settings(self, settings={}):
+        self._setting_defsize = (678, 585)
+        self._setting_winpos = (0, 0)
+        self._setting_wasmax = False
+        if 'gdialog-rect' in settings:
+            self._setting_defsize = settings['gdialog-rect']
+        if 'gdialog-pos' in settings:
+            self._setting_winpos = settings['gdialog-pos']
+        if 'gdialog-ismax' in settings:
+            self._setting_wasmax = settings['gdialog-ismax']
 
     ### End of overridable methods ###
 
@@ -187,48 +187,15 @@ class GDialog(gtk.Window):
     def test_opt(self, opt):
         return opt in self.opts and self.opts[opt]
 
-    def _parse_extdiff_cmd(self, usercmd):
-        for cmd, path in self.ui.configitems('extdiff'):
-            if cmd.startswith('cmd.'):
-                cmd = cmd[4:]
-                if cmd != usercmd:
-                    continue
-                if not path:
-                    path = cmd
-                diffopts = self.ui.config('extdiff', 'opts.' + cmd, '')
-                diffopts = diffopts and [diffopts] or []
-                return path, diffopts
-            elif cmd == usercmd:
-                # command = path opts
-                if path:
-                    diffopts = shlex.split(path)
-                    path = diffopts.pop(0)
-                else:
-                    path, diffopts = cmd, []
-                return path, diffopts
-        return None, None
-
     def _parse_config(self):
-        # defaults    
+        # defaults
         self.fontcomment = 'monospace 10'
         self.fontdiff = 'monospace 10'
         self.fontlist = 'monospace 9'
-        self.diffopts = []
-        self.diffcmd = ''
         self.diffbottom = ''
 
         for attr, setting in self.ui.configitems('gtools'):
             if setting : setattr(self, attr, setting)
-
-        if not self.diffcmd :
-            # default to tortoisehg's configuration
-            vdiff = self.ui.config('tortoisehg', 'vdiff', 'vdiff')
-            if vdiff:
-                self.diffcmd, self.diffopts = self._parse_extdiff_cmd(vdiff)
-            else:
-                self.diffcmd = 'diff'
-                if not self.diffopts:
-                    self.diffopts = ['-Npru']
 
         if not self.diffbottom:
             self.diffbottom = False
@@ -260,7 +227,8 @@ class GDialog(gtk.Window):
 
     def global_opts(self):
         globalopts = {}
-        hgglobals = [opt[1].replace('-', '_') for opt in commands.globalopts if opt[1] != 'help']
+        hgglobals = [opt[1] for opt in commands.globalopts if opt[1] != 'help']
+        hgglobals = [f.replace('-', '_') for f in hgglobals]
         for key in self.opts:
             if key in  hgglobals :
                 globalopts[key] = self.opts[key]
@@ -295,21 +263,39 @@ class GDialog(gtk.Window):
     def get_toolbutton(self, label):
         return self.toolbuttons[label]
 
+    def windowstate(self, window, event):
+        if event.changed_mask & gtk.gdk.WINDOW_STATE_MAXIMIZED:
+            if event.new_window_state & gtk.gdk.WINDOW_STATE_MAXIMIZED:
+                self.ismaximized = True
+            else:
+                self.ismaximized = False
+
+    def setfocus(self, window, event):
+        self.lastpos = self.get_position()
 
     def _setup_gtk(self):
         self.set_title(self.get_title())
-        set_tortoise_icon(self, self.get_icon())
-        
+        shlib.set_tortoise_icon(self, self.get_icon())
+        shlib.set_tortoise_keys(self)
+
+        self.ismaximized = False
+        self.lastpos = self._setting_winpos
+        self.connect('window-state-event', self.windowstate)
+        self.connect('set-focus', self.setfocus)
+
         # Minimum size
         minx, miny = self.get_minsize()
         self.set_size_request(minx, miny)
         # Initial size
         defx, defy = self.get_defsize()
         self.set_default_size(defx, defy)
-        
+        if self._setting_wasmax:
+            self.maximize()
+        self.move(self._setting_winpos[0], self._setting_winpos[1])
+
         vbox = gtk.VBox(False, 0)
         self.add(vbox)
-        
+
         self.tooltips = gtk.Tooltips()
         toolbar = gtk.Toolbar()
         tbuttons =  self.get_tbbuttons()
@@ -321,25 +307,21 @@ class GDialog(gtk.Window):
         # Subclass returns the main body
         body = self.get_body()
         vbox.pack_start(body, True, True, 0)
-        
+
         # Subclass provides extra stuff in bottom hbox
         extras = self.get_extras()
         if extras:
             vbox.pack_end(extras, False, False, 0)
 
         self.connect('destroy', self._destroying)
-        self.connect('delete_event', self.should_live)
+        #self.connect('delete_event', self.should_live)
 
 
     def _destroying(self, gtkobj):
-        try:
-            settings = self.save_settings()
-            self.settings.set_value('settings_version', GDialog.settings_version)
-            self.settings.set_value('dialogs', settings)
-            self.settings.write()
-        finally:
-            if self.main:
-                gtk.main_quit()
+        settings = self.save_settings()
+        self.settings.set_value('settings_version', GDialog.settings_version)
+        self.settings.set_value('dialogs', settings)
+        self.settings.write()
 
 
     def _load_settings(self):
@@ -351,57 +333,80 @@ class GDialog(gtk.Window):
 
 
     def _hg_call_wrapper(self, title, command, showoutput=True):
-        """Run the specified command and display any resulting aborts, messages, 
-        and errors 
+        """Run the specified command and display any resulting aborts,
+        messages, and errors
         """
         textout = ''
         saved = sys.stderr
-        errors = StringIO.StringIO()
+        errors = cStringIO.StringIO()
         try:
             sys.stderr = errors
             self.ui.pushbuffer()
             try:
                 command()
             except util.Abort, inst:
-                Prompt(title + ' Aborted', str(inst), self).run()
+                Prompt(title + _(' Aborted'), str(inst), self).run()
                 return False, ''
         finally:
             sys.stderr = saved
-            textout = self.ui.popbuffer() 
+            textout = self.ui.popbuffer()
             prompttext = ''
             if showoutput:
                 prompttext = textout + '\n'
             prompttext += errors.getvalue()
             errors.close()
             if len(prompttext) > 1:
-                Prompt(title + ' Messages and Errors', prompttext, self).run()
+                Prompt(title + _(' Messages and Errors'),
+                       prompttext, self).run()
 
         return True, textout
 
+    def _do_diff(self, patterns, options, modal=False):
+        import visdiff
+
+        if self.ui.configbool('tortoisehg', 'vdiffnowin'):
+            from hgext import extdiff
+            tools = visdiff.readtools(self.ui)
+            preferred = self.ui.config('tortoisehg', 'vdiff', 'vdiff')
+            if not preferred or preferred not in tools:
+                Prompt(_('No visual diff configured'),
+                       _('Please select a visual diff application.'), self).run()
+                dlg = ConfigDialog(self.repo.root, False)
+                dlg.show_all()
+                dlg.focus_field('tortoisehg.vdiff')
+                dlg.run()
+                dlg.hide()
+                self.ui = ui.ui()
+                self._parse_config()
+                return
+
+            file = len(patterns) == 1 and patterns[0] or ''
+            diffcmd, diffopts = tools[preferred]
+            opts = {'change': options.get('change')}
+            if not opts['change']:
+                opts['rev'] = options.get('rev')
+
+            def dodiff():
+                extdiff.dodiff(self.ui, self.repo, diffcmd, diffopts,
+                               [self.repo.wjoin(file)], opts)
+
+            thread = threading.Thread(target=dodiff, name='diff:' + file)
+            thread.setDaemon(True)
+            thread.start()
+
+        else:
+            dialog = visdiff.FileSelectionDialog(patterns, options)
+            dialog.show_all()
+            if modal:
+                dialog.run()
+                dialog.hide()
+
     def _diff_file(self, stat, file):
-        def dodiff():
-            extdiff.dodiff(self.ui, self.repo, self.diffcmd, self.diffopts,
-                            [self.repo.wjoin(file)], self.opts)
-
-        if not self.diffcmd or self.diffcmd == 'diff':
-            Prompt('No visual diff configured',
-                    'Please select a visual diff application.', self).run()
-            dlg = ConfigDialog(self.repo.root, False)
-            dlg.show_all()
-            dlg.focus_field('tortoisehg.vdiff')
-            dlg.run()
-            dlg.hide()
-            self.ui = ui.ui()
-            self._parse_config()
-            return
-        thread = threading.Thread(target=dodiff, name='diff:'+file)
-        thread.setDaemon(True)
-        thread.start()
-
+        self._do_diff(file and [file] or [], self.opts)
 
     def _view_file(self, stat, file, force_left=False):
         import atexit
-        
+
         def cleanup():
             shutil.rmtree(self.tmproot)
 
@@ -458,16 +463,17 @@ class GDialog(gtk.Window):
             util.system("%s \"%s\"" % (editor, file_path),
                         environ={'HGUSER': self.ui.username()},
                         onerr=util.Abort, errprefix=_('edit failed'))
-                
+
         editor = (self.ui.config('tortoisehg', 'editor') or
                 self.ui.config('gtools', 'editor') or
                 os.environ.get('HGEDITOR') or
                 self.ui.config('ui', 'editor') or
                 os.environ.get('EDITOR', 'vi'))
         if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-            Prompt('No visual editor configured',
-                    'Please configure a visual editor.', self).run()
-            dlg = ConfigDialog(self.repo.root, False)
+            from thgconfig import ConfigDialog
+            Prompt(_('No visual editor configured'),
+                   _('Please configure a visual editor.'), self).run()
+            dlg = ConfigDialog(False)
             dlg.show_all()
             dlg.focus_field('tortoisehg.editor')
             dlg.run()
@@ -475,15 +481,16 @@ class GDialog(gtk.Window):
             self.ui = ui.ui()
             self._parse_config()
             return
-            
+
         file = util.localpath(file)
         thread = threading.Thread(target=doedit, name='edit:'+file)
         thread.setDaemon(True)
         thread.start()
 
 class NativeSaveFileDialogWrapper:
-    """Wrap the windows file dialog, or display default gtk dialog if that isn't available"""
-    def __init__(self, InitialDir = None, Title = "Save File", 
+    """Wrap the windows file dialog, or display default gtk dialog if
+    that isn't available"""
+    def __init__(self, InitialDir = None, Title = _('Save File'),
                  Filter = {"All files": "*.*"}, FilterIndex = 1, FileName = ''):
         import os.path
         if InitialDir == None:
@@ -495,25 +502,12 @@ class NativeSaveFileDialogWrapper:
         self.FilterIndex = FilterIndex
 
     def run(self):
-        """run the file dialog, either return a file name, or False if the user aborted the dialog"""
+        """run the file dialog, either return a file name, or False if
+        the user aborted the dialog"""
         try:
-            import win32gui
-            if self.tortoiseHgIsInstalled(): #as of 20071021, the file dialog will hang if the tortoiseHg shell extension is installed. I have no clue why, yet - Tyberius Prime
-                   return self.runCompatible()
-            else:
-                    return self.runWindows()
+            return self.runWindows()
         except ImportError:
             return self.runCompatible()
-
-    def tortoiseHgIsInstalled(self):
-        import _winreg
-        try:
-            _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
-                    r"Software\TortoiseHg")
-            return True
-        except WindowsError: #reg key not found
-            pass
-        return False
 
     def runWindows(self):
         import win32gui, win32con
@@ -525,7 +519,7 @@ class NativeSaveFileDialogWrapper:
         fname, customfilter, flags=win32gui.GetSaveFileNameW(
             InitialDir=self.InitialDir,
             Flags=win32con.OFN_EXPLORER,
-            File=self.FileName, 
+            File=self.FileName,
             DefExt='py',
             Title=self.Title,
             Filter="",
@@ -534,10 +528,10 @@ class NativeSaveFileDialogWrapper:
         if fname:
             return fname
         else:
-           return False
+            return False
 
     def runCompatible(self):
-        file_save =gtk.FileChooserDialog(self.Title,None,
+        file_save = gtk.FileChooserDialog(self.Title,None,
                 gtk.FILE_CHOOSER_ACTION_SAVE
                 , (gtk.STOCK_CANCEL
                     , gtk.RESPONSE_CANCEL
