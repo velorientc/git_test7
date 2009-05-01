@@ -145,9 +145,13 @@ class GtkUi(ui.ui):
     def flush(self):
         pass
 
-    def prompt(self, msg, pat=None, choices=None, default="y"):
+    def prompt(self, msg, choices=None, default="y"):
         import re
         if not calliffunc(self.interactive): return default
+        if isinstance(choices, str):
+            pat = choices
+        else:
+            pat = None
         while True:
             try:
                 # send request to main thread, await response
@@ -209,6 +213,7 @@ class HgThread(thread2.Thread):
                 dlg = gdialog.CustomPrompt('Hg Prompt', prompt,
                         self.parent, choices, default)
                 dlg.connect('response', self.prompt_response)
+                dlg.show_all()
             else:
                 dlg = entry_dialog(self.parent, prompt, visible, default,
                     self.dialog_response)
