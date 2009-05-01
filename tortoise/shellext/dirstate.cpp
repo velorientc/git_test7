@@ -100,9 +100,13 @@ class Directory
 
     DirsT  subdirs_;
     FilesT files_;
+    
+    unsigned tickcount_;
+    char status_;
 
 public:
-    Directory(Directory* p, const std::string& n): parent_(p), name_(n) {}
+    Directory(Directory* p, const std::string& n): 
+        parent_(p), name_(n), tickcount_(0), status_(-1) {}
     ~Directory();
 
     std::string path(const std::string& n = "") const;
@@ -115,6 +119,9 @@ public:
     char status(const std::string& hgroot);
 
     void print() const;
+
+private:
+    char status_imp(const std::string& hgroot);
 };
 
 
@@ -125,6 +132,7 @@ Directory::~Directory()
         delete *i;
     }
 }
+
 
 int splitbase(const std::string& n, std::string& base, std::string& rest)
 {
@@ -258,13 +266,13 @@ std::string Directory::path(const std::string& n) const
 }
 
 
-char Directory::status(const std::string& hgroot)
+char Directory::status_imp(const std::string& hgroot)
 {
     bool added = false;
 
     for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
     {
-        char s = (*i)->status(hgroot);
+        char s = (*i)->status_imp(hgroot);
         if (s == 'M')
             return 'M';
         if (s == 'A')
@@ -279,7 +287,8 @@ char Directory::status(const std::string& hgroot)
 
         if (0 != lstat(p.c_str(), stat))
         {
-            TDEBUG_TRACE("Directory(" << path() << ")::status: lstat(" << p << ") failed");
+            TDEBUG_TRACE("Directory(" << path() 
+                << ")::status_imp: lstat(" << p << ") failed");
             continue;
         }
 
@@ -295,6 +304,23 @@ char Directory::status(const std::string& hgroot)
         return 'A';
 
     return 'C';
+}
+
+
+char Directory::status(const std::string& hgroot)
+{
+    if (status_ != -1)
+    {
+        unsigned tc = GetTickCount();
+        if (tc - tickcount_ < 3000) {
+            return status_;
+        }
+    }
+
+    status_ = status_imp(hgroot);
+    tickcount_ = GetTickCount();
+
+    return status_;
 }
 
 
