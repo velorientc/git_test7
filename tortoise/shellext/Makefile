@@ -8,6 +8,7 @@ OBJECTS = ContextMenu.o \
         PipeUtils.o \
         ShellUtils2.o \
         StringUtils.o \
+        Directory.o \
         dirstate.o
 
 DEFFILE=ShellExt.def
