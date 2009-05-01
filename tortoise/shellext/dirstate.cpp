@@ -449,7 +449,7 @@ std::auto_ptr<dirstate> dirstate::read(const std::string& path)
 }
 
 
-class dirstatecache
+class Dirstatecache
 {
     struct entry
     {
@@ -469,10 +469,10 @@ public:
     static dirstate* get(const std::string& hgroot);
 };
 
-std::list<dirstatecache::entry> dirstatecache::_cache;
+std::list<Dirstatecache::entry> Dirstatecache::_cache;
 
 
-dirstate* dirstatecache::get(const std::string& hgroot)
+dirstate* Dirstatecache::get(const std::string& hgroot)
 {
     Iter iter = _cache.begin();
 
@@ -488,7 +488,7 @@ dirstate* dirstatecache::get(const std::string& hgroot)
     {
         if (_cache.size() >= 10)
         {
-            TDEBUG_TRACE("dirstatecache::get: dropping " << _cache.back().hgroot);
+            TDEBUG_TRACE("Dirstatecache::get: dropping " << _cache.back().hgroot);
             delete _cache.back().dstate;
             _cache.back().dstate = 0;
             _cache.pop_back();
@@ -512,12 +512,12 @@ dirstate* dirstatecache::get(const std::string& hgroot)
     {
         if (0 != lstat(path.c_str(), stat))
         {
-            TDEBUG_TRACE("dirstatecache::get: lstat(" << path <<") failed");
+            TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") failed");
             return 0;
         }
         iter->tickcount = tc;
         stat_done = true;
-        TDEBUG_TRACE("dirstatecache::get: lstat(" << path <<") ok ");
+        TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") ok ");
     }
 
     if (stat_done && iter->mtime < stat.st_mtime)
@@ -526,12 +526,12 @@ dirstate* dirstatecache::get(const std::string& hgroot)
         if (iter->dstate) {
             delete iter->dstate;
             iter->dstate = 0;
-            TDEBUG_TRACE("dirstatecache::get: refreshing " << hgroot);
+            TDEBUG_TRACE("Dirstatecache::get: refreshing " << hgroot);
         } else {
-            TDEBUG_TRACE("dirstatecache::get: reading " << hgroot);
+            TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
         }
         iter->dstate = dirstate::read(path).release();
-        TDEBUG_TRACE("dirstatecache::get: "
+        TDEBUG_TRACE("Dirstatecache::get: "
             << _cache.size() << " repos in cache");
     }
 
@@ -563,10 +563,10 @@ int HgQueryDirstate(
             || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
         return 0; // don't descend into .hg dir
 
-    dirstate* pds = dirstatecache::get(hgroot);
+    dirstate* pds = Dirstatecache::get(hgroot);
     if (!pds)
     {
-        TDEBUG_TRACE("HgQueryDirstate: dirstatecache::get(" << hgroot << ") returns 0");
+        TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" << hgroot << ") returns 0");
         return 0;
     }
 
