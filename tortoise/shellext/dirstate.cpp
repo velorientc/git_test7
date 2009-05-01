@@ -260,12 +260,19 @@ std::string Directory::path(const std::string& n) const
 
 char Directory::status(const std::string& hgroot)
 {
-    char res = 0;
-    struct _stat stat;
     bool added = false;
-    
-    const std::string hrs = hgroot + '\\';
 
+    for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
+    {
+        char s = (*i)->status(hgroot);
+        if (s == 'M')
+            return 'M';
+        if (s == 'A')
+            added = true;
+    }
+
+    struct _stat stat;
+    const std::string hrs = hgroot + '\\';
     for (FilesT::iterator i = files_.begin(); i != files_.end(); ++i)
     {
         std::string p =  hrs + path(i->name);
@@ -278,15 +285,6 @@ char Directory::status(const std::string& hgroot)
 
         char s = i->status(stat);
 
-        if (s == 'M')
-            return 'M';
-        if (s == 'A')
-            added = true;
-    }
-
-    for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
-    {
-        char s = (*i)->status(hgroot);
         if (s == 'M')
             return 'M';
         if (s == 'A')
