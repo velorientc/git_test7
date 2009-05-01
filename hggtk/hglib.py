@@ -5,6 +5,7 @@ import traceback
 import threading, thread2
 import urllib2
 import Queue
+import gdialog
 from mercurial import hg, ui, util, extensions, commands, hook
 from mercurial.i18n import _
 from dialog import entry_dialog
@@ -144,13 +145,13 @@ class GtkUi(ui.ui):
     def flush(self):
         pass
 
-    def prompt(self, msg, pat=None, default="y"):
+    def prompt(self, msg, pat=None, choices=None, default="y"):
         import re
         if not calliffunc(self.interactive): return default
         while True:
             try:
                 # send request to main thread, await response
-                self.dialogq.put( (msg, True, default) )
+                self.dialogq.put( (msg, True, choices, default) )
                 r = self.responseq.get(True)
                 if r is None:
                     raise EOFError
@@ -165,7 +166,7 @@ class GtkUi(ui.ui):
 
     def getpass(self, prompt=None, default=None):
         # send request to main thread, await response
-        self.dialogq.put( (prompt or _('password: '), False, default) )
+        self.dialogq.put( (prompt or _('password: '), False, None, default) )
         r = self.responseq.get(True)
         if r is None:
             raise util.Abort(_('response expected'))
@@ -207,18 +208,30 @@ class HgThread(thread2.Thread):
     def process_dialogs(self):
         '''Polled every 10ms to serve dialogs for the background thread'''
         try:
-            (prompt, visible, default) = self.dialogq.get_nowait()
-            self.dlg = entry_dialog(self.parent, prompt, visible, default,
+            (prompt, visible, choices, default) = self.dialogq.get_nowait()
+            if choices:
+                dlg = gdialog.CustomPrompt('Hg Prompt', prompt,
+                        self.parent, choices, default)
+                dlg.connect('response', self.prompt_response)
+            else:
+                dlg = entry_dialog(self.parent, prompt, visible, default,
                     self.dialog_response)
         except Queue.Empty:
             pass
 
-    def dialog_response(self, widget, response_id):
+    def prompt_response(self, dialog, response_id):
+        dialog.destroy()
+        if response_id == gtk.RESPONSE_DELETE_EVENT:
+            raise util.Abort('No response')
+        else:
+            self.responseq.put(chr(response_id))
+
+    def dialog_response(self, dialog, response_id):
         if response_id == gtk.RESPONSE_OK:
-            text = self.dlg.entry.get_text()
+            text = dialog.entry.get_text()
         else:
             text = None
-        self.dlg.destroy()
+        dialog.destroy()
         self.responseq.put(text)
 
     def run(self):
