@@ -516,15 +516,10 @@ dirstate* dirstatecache::get(const std::string& hgroot)
 int HgQueryDirstate(
     const std::string& path, const char& filterStatus, char& outStatus)
 {
-    struct _stat stat;
-    if (0 != lstat(path.c_str(), stat))
-    {
-        TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") failed");
+    if (PathIsRoot(path.c_str()))
         return 0;
-    }
 
     std::string hgroot = GetHgRepoRoot(path);
-
     if (hgroot.empty())
         return 0;
 
@@ -570,6 +565,13 @@ int HgQueryDirstate(
         const direntry* e = pds->root().get(relpath);
         if (!e)
             return 0;
+
+        struct _stat stat;
+        if (0 != lstat(path.c_str(), stat)) {
+            TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") failed");
+            return 0;
+        }
+
         outStatus = e->status(stat);
     }
 
