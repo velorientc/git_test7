@@ -50,7 +50,7 @@ int lstat(const char* file, struct _stat& rstat)
 #endif
 
 
-struct direntry
+struct Direntry
 {
     unsigned char state;
     unsigned mode;
@@ -64,7 +64,7 @@ struct direntry
 };
 
 
-char direntry::status(const struct _stat& stat) const
+char Direntry::status(const struct _stat& stat) const
 {
     switch (this->state)
     {
@@ -93,7 +93,7 @@ char direntry::status(const struct _stat& stat) const
 class Directory
 {
     typedef std::vector<Directory*> DirsT;
-    typedef std::vector<direntry> FilesT;
+    typedef std::vector<Direntry> FilesT;
     
     Directory* parent_;
     std::string name_;
@@ -111,9 +111,9 @@ public:
 
     std::string path(const std::string& n = "") const;
 
-    int add(const std::string& relpath, direntry& e);
+    int add(const std::string& relpath, Direntry& e);
 
-    const direntry* get(const std::string& relpath) const;
+    const Direntry* get(const std::string& relpath) const;
     Directory* Directory::getdir(const std::string& n);
 
     char status(const std::string& hgroot);
@@ -157,7 +157,7 @@ int splitbase(const std::string& n, std::string& base, std::string& rest)
 }
 
 
-int Directory::add(const std::string& n, direntry& e)
+int Directory::add(const std::string& n, Direntry& e)
 {
     std::string base;
     std::string rest;
@@ -193,7 +193,7 @@ int Directory::add(const std::string& n, direntry& e)
 }
 
 
-const direntry* Directory::get(const std::string& n) const
+const Direntry* Directory::get(const std::string& n) const
 {
     std::string base;
     std::string rest;
@@ -381,7 +381,7 @@ public:
     
     Directory& root() { return root_; }
 
-    void add(const std::string& relpath, direntry& e) {
+    void add(const std::string& relpath, Direntry& e) {
         root_.add(relpath, e);
         ++num_entries_; 
     }
@@ -417,7 +417,7 @@ std::auto_ptr<Dirstate> Dirstate::read(const std::string& path)
     fread(&pd->parent1, sizeof(char), HASH_LENGTH, f);
     fread(&pd->parent2, sizeof(char), HASH_LENGTH, f);
 
-    direntry e;
+    Direntry e;
 
     std::vector<char> temp(MAX_PATH+10, 0);
 
@@ -588,7 +588,7 @@ int HgQueryDirstate(
     }
     else
     {
-        const direntry* e = pds->root().get(relpath);
+        const Direntry* e = pds->root().get(relpath);
         if (!e)
             return 0;
 
