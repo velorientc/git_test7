@@ -67,6 +67,7 @@ class DataMineDialog(GDialog):
 
     def load_settings(self, settings):
         GDialog.load_settings(self, settings)
+        self.connect('thg-close', self._close_current_page)
         self.tabwidth = gettabwidth(self.ui)
         # settings['datamine']
 
@@ -376,6 +377,12 @@ class DataMineDialog(GDialog):
             self.currev = model[paths][self.COL_REVID]
             self.curpath = fromutf(model[paths][self.COL_PATH])
             self.stbar.set_status_text(toutf(model[paths][self.COL_TOOLTIP]))
+
+    def _close_current_page(self, window):
+        num = self.notebook.get_current_page()
+        if num != -1 and self.notebook.get_n_pages():
+            self.notebook.remove_page(num)
+            self.emit_stop_by_name('thg-close')
 
     def _stop_current_search(self, button, widget):
         num = self.notebook.get_current_page()
