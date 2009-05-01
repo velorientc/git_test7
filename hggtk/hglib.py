@@ -172,10 +172,6 @@ class GtkUi(ui.ui):
             raise util.Abort(_('response expected'))
         return r
 
-    def print_exc(self):
-        traceback.print_exc()
-        return True
-
 class HgThread(thread2.Thread):
     '''
     Run an hg command in a background thread, implies output is being
@@ -265,13 +261,10 @@ class HgThread(thread2.Thread):
             self.ui.write_err(str(e))
         except util.Abort, e:
             self.ui.write_err(str(e))
-            if self.ui.traceback:
-                self.ui.print_exc()
         except urllib2.HTTPError, e:
             self.ui.write_err(str(e) + '\n')
         except Exception, e:
             self.ui.write_err(str(e))
-            self.ui.print_exc()
 
 def _earlygetopt(aliases, args):
     """Return list of values for an option (or aliases).
@@ -302,6 +295,7 @@ def _earlygetopt(aliases, args):
             pos += 1
     return values
 
+# this function is only needed for Mercurial versions < 1.3
 _loaded = {}
 def thgdispatch(ui, path=None, args=[], nodefaults=True):
     '''
@@ -441,7 +435,11 @@ def hgcmd_toq(path, q, *args):
                 for a in args:
                     q.put(str(a))
     u = Qui()
-    return thgdispatch(u, path, list(args))
+    if hasattr(ui.ui, 'copy'):
+        # Mercurial 1.3
+        return dispatch._dispatch(u, list(args))
+    else:
+        return thgdispatch(u, path, list(args))
 
 def displaytime(date):
     return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
