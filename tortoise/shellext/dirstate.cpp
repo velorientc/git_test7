@@ -57,6 +57,7 @@ struct direntry
     unsigned size;
     unsigned mtime;
     unsigned length;
+    
     std::string name;
 
     char status(const struct _stat& stat) const;
@@ -89,36 +90,284 @@ char direntry::status(const struct _stat& stat) const
 }
 
 
+class Directory
+{
+    typedef std::vector<Directory*> DirsT;
+    typedef std::vector<direntry> FilesT;
+    
+    Directory* parent_;
+    std::string name_;
+
+    DirsT  subdirs_;
+    FilesT files_;
+
+public:
+    Directory(Directory* p, const std::string& n): parent_(p), name_(n) {}
+    ~Directory();
+
+    std::string path(const std::string& n = "") const;
+
+    int add(const std::string& relpath, direntry& e);
+
+    const direntry* get(const std::string& relpath) const;
+    Directory* Directory::getdir(const std::string& n);
+
+    char status(const std::string& hgroot);
+
+    void print() const;
+};
+
+
+Directory::~Directory()
+{
+    for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
+    {
+        delete *i;
+    }
+}
+
+int splitbase(const std::string& n, std::string& base, std::string& rest)
+{
+    if (n.empty())
+        return 0;
+
+    size_t x = n.find_first_of ('/');
+    if (x == std::string::npos)
+    {
+        base.clear();
+        rest = n;
+        return 1;
+    }
+
+    if (x == 0 || x == n.length()-1)
+        return 0;
+
+    base = n.substr(0, x);
+    rest = n.substr(x+1);
+
+    return 1;
+}
+
+
+int Directory::add(const std::string& n, direntry& e)
+{
+    std::string base;
+    std::string rest;
+
+    if (!splitbase(n, base, rest)) {
+        TDEBUG_TRACE("Directory(" << path() << ")::add(" << n << "): splitbase returned 0");
+        return 0;
+    }
+
+    if (base.empty())
+    {
+        e.name = n;
+        files_.push_back(e);
+        return 1;
+    }
+
+    Directory* d = 0;
+    for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
+    {
+        if ((*i)->name_ == base) {
+            d = *i;
+            break;
+        }
+    }
+
+    if (!d)
+    {
+        d = new Directory(this, base);
+        subdirs_.push_back(d);
+    }
+
+    return d->add(rest, e);
+}
+
+
+const direntry* Directory::get(const std::string& n) const
+{
+    std::string base;
+    std::string rest;
+
+    if (!splitbase(n, base, rest))
+    {
+        TDEBUG_TRACE("Directory(" << path() << ")::get(" << n << "): splitbase returned 0");
+        return 0;
+    }
+
+    if (base.empty())
+    {
+        for (FilesT::const_iterator i = files_.begin(); i != files_.end(); ++i)
+        {
+            if (i->name == n)
+                return &(*i);
+        }
+        return 0;
+    }
+
+    for (DirsT::const_iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
+    {
+        if ((*i)->name_ == base)
+            return (*i)->get(rest);
+    }
+
+    TDEBUG_TRACE("Directory(" << path() << ")::get(" << n << "): unknown subdir");
+    return 0;
+}
+
+
+Directory* Directory::getdir(const std::string& n)
+{
+    std::string base;
+    std::string rest;
+
+    if (!splitbase(n, base, rest))
+    {
+        TDEBUG_TRACE("Directory(" << path() << ")::getdir(" << n << "): splitbase returned 0");
+        return 0;
+    }
+
+    const bool leaf = base.empty();
+    const std::string& searchstr = (leaf ? n : base);
+
+    for (DirsT::const_iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
+    {
+        if ((*i)->name_ == searchstr)
+        {
+            if (leaf)
+                return *i;
+            return (*i)->getdir(rest);
+        }
+    }
+
+    return 0;
+}
+
+
+std::string Directory::path(const std::string& n) const
+{
+    if (name_.empty())
+        return n;
+    std::string res = name_;
+    if (!n.empty())
+        res += "/" + n;
+    if (!parent_)
+        return res;
+    return parent_->path(res);
+}
+
+
+char Directory::status(const std::string& hgroot)
+{
+    char res = 0;
+    struct _stat stat;
+    bool added = false;
+    
+    const std::string hrs = hgroot + '\\';
+
+    for (FilesT::iterator i = files_.begin(); i != files_.end(); ++i)
+    {
+        std::string p =  hrs + path(i->name);
+
+        if (0 != lstat(p.c_str(), stat))
+        {
+            TDEBUG_TRACE("Directory(" << path() << ")::status: lstat(" << p << ") failed");
+            continue;
+        }
+
+        char s = i->status(stat);
+
+        if (s == 'M')
+            return 'M';
+        if (s == 'A')
+            added = true;
+    }
+
+    for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
+    {
+        char s = (*i)->status(hgroot);
+        if (s == 'M')
+            return 'M';
+        if (s == 'A')
+            added = true;
+    }
+
+    if (added)
+        return 'A';
+
+    return 'C';
+}
+
+
+void Directory::print() const
+{
+    for (DirsT::const_iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
+    {
+        const Directory* d = *i;
+        if (!d)
+        {
+            TDEBUG_TRACE("Directory(" << path() << ")::print: error: d is 0");
+            return;
+        }
+        d->print();
+    }
+
+    std::string base = path();
+
+    time_t t;
+    std::string s;
+    char* ctime_res = 0;
+
+    for (FilesT::const_iterator i = files_.begin(); i != files_.end(); ++i)
+    {
+        std::string p = (!base.empty() ? base + "/" + i->name : i->name);
+        t = i->mtime;
+        ctime_res = ctime(&t);
+        if (ctime_res) {
+            s = ctime_res;
+            s.resize(s.size() - 1); // strip ending '\n'
+        }
+        else {
+            s = "unset";
+        }
+        printf(
+            "%c %6o %10u %-24s %s\n", 
+            i->state, i->mode, i->length, s.c_str(), p.c_str()
+        );
+    }
+}
+
+
 #define HASH_LENGTH 20
 
 
 class dirstate
 {
-    typedef std::vector<direntry> EntriesT;
+    Directory root_;
 
-    EntriesT entries;
-    
     unsigned num_added_; // number of entries that have state 'a'
+    unsigned num_entries_;
 
 public:
-    typedef EntriesT::size_type size_type;
-    typedef EntriesT::const_iterator Iter;
-
     char parent1[HASH_LENGTH];
     char parent2[HASH_LENGTH];
 
     static std::auto_ptr<dirstate> read(const std::string& path);
+    
+    Directory& root() { return root_; }
 
-    void add(const direntry& e) { entries.push_back(e); }
-
-    Iter begin() const { return entries.begin(); }
-    Iter end() const { return entries.end(); }
-    size_type size() const { return entries.size(); }
+    void add(const std::string& relpath, direntry& e) {
+        root_.add(relpath, e);
+        ++num_entries_; 
+    }
     
     unsigned num_added() const { return num_added_; }
+    unsigned size() const { return num_entries_; }
 
 private:
-    dirstate(): num_added_(0) {}
+    dirstate()
+    : root_(0, ""), num_added_(0), num_entries_(0) {}
 
     static uint32_t ntohl(uint32_t x)
     {
@@ -164,12 +413,10 @@ std::auto_ptr<dirstate> dirstate::read(const std::string& path)
         fread(&temp[0], sizeof(char), e.length, f);
         temp[e.length] = 0;
 
-        e.name = &temp[0];
-
         if (e.state == 'a')
             ++pd->num_added_;
 
-        pd->add(e);
+        pd->add(&temp[0], e);
     }
 
     fclose(f);
@@ -182,7 +429,7 @@ class dirstatecache
 {
     struct entry
     {
-        const dirstate* dstate;
+        dirstate*       dstate;
         __time64_t      mtime;
         std::string     hgroot;
         unsigned        tickcount;
@@ -195,13 +442,13 @@ class dirstatecache
     static std::list<entry> _cache;
 
 public:
-    static const dirstate* get(const std::string& hgroot);
+    static dirstate* get(const std::string& hgroot);
 };
 
 std::list<dirstatecache::entry> dirstatecache::_cache;
 
 
-const dirstate* dirstatecache::get(const std::string& hgroot)
+dirstate* dirstatecache::get(const std::string& hgroot)
 {
     Iter iter = _cache.begin();
 
@@ -261,7 +508,6 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
         }
         iter->dstate = dirstate::read(path).release();
         TDEBUG_TRACE("dirstatecache::get: "
-            << iter->dstate->size() << " entries read. "
             << _cache.size() << " repos in cache");
     }
 
@@ -270,75 +516,30 @@ const dirstate* dirstatecache::get(const std::string& hgroot)
 
 
 static int HgQueryDirstateDirectory(
-    const std::string& hgroot, const dirstate& ds,
+    const std::string& hgroot, dirstate& ds,
     const std::string& relpath, char& outStatus)
 {
-    bool added = false;
-    bool modified = false;
-    bool empty = true;
-
-    const size_t len = relpath.size();
-    const std::string hgroot_slash = hgroot + "/";
-
-    struct _stat stat;
-
-    for (dirstate::Iter iter = ds.begin();
-         iter != ds.end() && !modified; ++iter)
-    {
-        const direntry& e = *iter;
-
-        if (e.name.compare(0, len, relpath) != 0)
-            continue;
-
-        empty = false;
-
-        switch (e.state)
-        {
-        case 'n':
-            {
-                std::string temp = hgroot_slash + e.name;
-                if (0 == lstat(temp.c_str(), stat))
-                    modified = (e.status(stat) == 'M');
-            }
-            break;
-        case 'm':
-            modified = true;
-            break;
-        case 'a':
-            added = true;
-            break;
-        }
-    }
-
-    if (modified)
-        outStatus = 'M';
-    else if (added)
-        outStatus = 'A';
-    else if (empty)
-        outStatus = '?';
-    else
-        outStatus = 'C';
-
-    return 1;
+    Directory* dir = ds.root().getdir(relpath);
+    
+    if (!dir)
+        return 0;
+    
+    outStatus = dir->status(hgroot);
 }
 
 
 static int HgQueryDirstateFile(
-    const dirstate& ds, const std::string& relpath, 
+    dirstate& ds, const std::string& relpath, 
     const struct _stat& stat, char& outStatus)
 {
-    for (dirstate::Iter iter = ds.begin(); iter != ds.end(); ++iter)
-    {
-        const direntry& e = *iter;
+    const direntry* e = ds.root().get(relpath);
+    
+    if (!e)
+        return 0;
 
-        if (relpath == e.name)
-        {
-            outStatus = e.status(stat);
-            return outStatus != '?';
-        }
-    }
+    outStatus = e->status(stat);
 
-    return 0;
+    return outStatus != '?';
 }
 
 
@@ -371,7 +572,7 @@ int HgQueryDirstate(
             || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
         return 0; // don't descend into .hg dir
 
-    const dirstate* pds = dirstatecache::get(hgroot);
+    dirstate* pds = dirstatecache::get(hgroot);
     if (!pds)
     {
         TDEBUG_TRACE("HgQueryDirstate: dirstatecache::get(" << hgroot << ") returns 0");
@@ -416,23 +617,22 @@ static char *revhash_string(const char revhash[HASH_LENGTH])
 void testread()
 {
     std::auto_ptr<dirstate> pd = dirstate::read(".hg/dirstate");
+    if (!pd.get()) {
+        printf("error: could not read .hg/dirstate\n");
+        return;
+    }
     time_t t;
     char *s;
     unsigned ix;
     printf("parent1: %s\n", revhash_string(pd->parent1));
     printf("parent2: %s\n", revhash_string(pd->parent2));
     printf("entries: %d\n\n", pd->size());
-    for (dirstate::Iter i = pd->begin(); i != pd->end(); ++i)
-    {
-        t = i->mtime;
-        s = ctime(&t);
-        s[strlen(s) - 1] = '\0';
-        printf("%s %s\n", s, i->name.c_str());
-    }
+
+    pd->root().print();
 }
 
 
-#if 0
+#ifdef APPMAIN
 int main(int argc, char *argv[])
 {
     testread();
