@@ -366,7 +366,7 @@ void Directory::print() const
 #define HASH_LENGTH 20
 
 
-class dirstate
+class Dirstate
 {
     Directory root_;
 
@@ -377,7 +377,7 @@ public:
     char parent1[HASH_LENGTH];
     char parent2[HASH_LENGTH];
 
-    static std::auto_ptr<dirstate> read(const std::string& path);
+    static std::auto_ptr<Dirstate> read(const std::string& path);
     
     Directory& root() { return root_; }
 
@@ -390,7 +390,7 @@ public:
     unsigned size() const { return num_entries_; }
 
 private:
-    dirstate()
+    Dirstate()
     : root_(0, ""), num_added_(0), num_entries_(0) {}
 
     static uint32_t ntohl(uint32_t x)
@@ -403,16 +403,16 @@ private:
 };
 
 
-std::auto_ptr<dirstate> dirstate::read(const std::string& path)
+std::auto_ptr<Dirstate> Dirstate::read(const std::string& path)
 {
     FILE *f = fopen(path.c_str(), "rb");
     if (!f)
     {
-        TDEBUG_TRACE("dirstate::read: can't open " << path);
-        return std::auto_ptr<dirstate>(0);
+        TDEBUG_TRACE("Dirstate::read: can't open " << path);
+        return std::auto_ptr<Dirstate>(0);
     }
 
-    std::auto_ptr<dirstate> pd(new dirstate());
+    std::auto_ptr<Dirstate> pd(new Dirstate());
 
     fread(&pd->parent1, sizeof(char), HASH_LENGTH, f);
     fread(&pd->parent2, sizeof(char), HASH_LENGTH, f);
@@ -453,7 +453,7 @@ class Dirstatecache
 {
     struct entry
     {
-        dirstate*       dstate;
+        Dirstate*       dstate;
         __time64_t      mtime;
         std::string     hgroot;
         unsigned        tickcount;
@@ -466,13 +466,13 @@ class Dirstatecache
     static std::list<entry> _cache;
 
 public:
-    static dirstate* get(const std::string& hgroot);
+    static Dirstate* get(const std::string& hgroot);
 };
 
 std::list<Dirstatecache::entry> Dirstatecache::_cache;
 
 
-dirstate* Dirstatecache::get(const std::string& hgroot)
+Dirstate* Dirstatecache::get(const std::string& hgroot)
 {
     Iter iter = _cache.begin();
 
@@ -530,7 +530,7 @@ dirstate* Dirstatecache::get(const std::string& hgroot)
         } else {
             TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
         }
-        iter->dstate = dirstate::read(path).release();
+        iter->dstate = Dirstate::read(path).release();
         TDEBUG_TRACE("Dirstatecache::get: "
             << _cache.size() << " repos in cache");
     }
@@ -563,7 +563,7 @@ int HgQueryDirstate(
             || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
         return 0; // don't descend into .hg dir
 
-    dirstate* pds = Dirstatecache::get(hgroot);
+    Dirstate* pds = Dirstatecache::get(hgroot);
     if (!pds)
     {
         TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" << hgroot << ") returns 0");
@@ -622,7 +622,7 @@ static char *revhash_string(const char revhash[HASH_LENGTH])
 
 void testread()
 {
-    std::auto_ptr<dirstate> pd = dirstate::read(".hg/dirstate");
+    std::auto_ptr<Dirstate> pd = Dirstate::read(".hg/dirstate");
     if (!pd.get()) {
         printf("error: could not read .hg/dirstate\n");
         return;
