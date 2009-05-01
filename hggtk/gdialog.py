@@ -46,6 +46,28 @@ class Prompt(SimpleMessage):
         buttons[0].add_accelerator("clicked", accel_group, key,
                 modifier, gtk.ACCEL_VISIBLE)
 
+class CustomPrompt(SimpleMessage):
+    ''' Custom prompt dialog.  Provide a list of choices with ampersands
+    to delineate response given for each choice (and keyboard
+    accelerator).  Default must be one of the choice responses.
+    '''
+    # ret = CustomPrompt('Title', 'Message', self, ('&Yes', 'N&o'), 'o').run()
+    # ret will be (gtk.RESPONSE_DELETE_EVENT, ord('y'), or ord('o'))
+    def __init__(self, title, message, parent, choices, default=None):
+        SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
+                gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE)
+        self.set_title(hglib.toutf(title))
+        self.set_markup('<b>' + hglib.toutf(message) + '</b>')
+        accel_group = gtk.AccelGroup()
+        self.add_accel_group(accel_group)
+        for s in choices:
+            char = s[s.index('&')+1].lower()
+            button = self.add_button(s.replace('&', '_'), ord(char))
+            button.add_accelerator('clicked', accel_group, ord(char), 0,
+                    gtk.ACCEL_VISIBLE)
+        if default:
+            self.set_default_response(ord(default))
+
 class Confirm(SimpleMessage):
     """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO
     """
