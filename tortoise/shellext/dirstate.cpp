@@ -515,34 +515,6 @@ dirstate* dirstatecache::get(const std::string& hgroot)
 }
 
 
-static int HgQueryDirstateDirectory(
-    const std::string& hgroot, dirstate& ds,
-    const std::string& relpath, char& outStatus)
-{
-    Directory* dir = ds.root().getdir(relpath);
-    
-    if (!dir)
-        return 0;
-    
-    outStatus = dir->status(hgroot);
-}
-
-
-static int HgQueryDirstateFile(
-    dirstate& ds, const std::string& relpath, 
-    const struct _stat& stat, char& outStatus)
-{
-    const direntry* e = ds.root().get(relpath);
-    
-    if (!e)
-        return 0;
-
-    outStatus = e->status(stat);
-
-    return outStatus != '?';
-}
-
-
 int HgQueryDirstate(
     const std::string& path, const char& filterStatus, char& outStatus)
 {
@@ -588,14 +560,22 @@ int HgQueryDirstate(
             relpath[i] = '/';
     }
 
-    int res = 0;
-
     if (PathIsDirectory(path.c_str()))
-        res = HgQueryDirstateDirectory(hgroot, *pds, relpath, outStatus);
-    else 
-        res = HgQueryDirstateFile(*pds, relpath, stat, outStatus);
+    {
+        Directory* dir = pds->root().getdir(relpath);
+        if (!dir)
+            return 0;
+        outStatus = dir->status(hgroot);
+    }
+    else
+    {
+        const direntry* e = pds->root().get(relpath);
+        if (!e)
+            return 0;
+        outStatus = e->status(stat);
+    }
 
-    return res;
+    return 1;
 }
 
 
