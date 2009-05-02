@@ -22,21 +22,21 @@
 #include <shlwapi.h>
 
 
-static __int64 days_between_epochs = 134774; /* days between 1.1.1601 and 1.1.1970 */
-static __int64 secs_between_epochs = (__int64)days_between_epochs * 86400;
-
 int lstat(const char* file, struct _stat& rstat)
 {
-    WIN32_FIND_DATA data;
-    HANDLE hfind;
-    __int64 temp;
+    const __int64 days_between_epochs = 134774L; /* days between 1.1.1601 and 1.1.1970 */
+    const __int64 secs_between_epochs = (__int64)days_between_epochs * 86400L;
+    const __int64 divisor = 10000000L;
 
-    hfind = FindFirstFile(file, &data);
+    WIN32_FIND_DATAA data;
+    HANDLE hfind;
+
+    hfind = FindFirstFileA(file, &data);
     if (hfind == INVALID_HANDLE_VALUE)
         return -1;
     FindClose(hfind);
 
-    rstat.st_mtime = *(__int64*)&data.ftLastWriteTime / 10000000 - secs_between_epochs;
+    rstat.st_mtime = *(__int64*)&data.ftLastWriteTime / divisor - secs_between_epochs;
     rstat.st_size = (data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) | data.nFileSizeLow;
 
     return 0;
