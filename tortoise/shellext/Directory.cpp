@@ -224,14 +224,13 @@ char Directory::status_imp(const std::string& hgroot)
     const std::string hrs = hgroot + '\\';
     for (FilesT::iterator i = files_.begin(); i != files_.end(); ++i)
     {
+        if (i->state == 'r')
+            return 'M'; // file was removed, report dir as modified
+
         std::string p =  hrs + path(i->name);
 
         if (0 != lstat(p.c_str(), stat))
-        {
-            TDEBUG_TRACE("Directory(" << path() 
-                << ")::status_imp: lstat(" << p << ") failed");
-            continue;
-        }
+            return 'M'; // file is missing, report dir as modified
 
         char s = i->status(stat);
 
