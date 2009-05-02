@@ -22,7 +22,7 @@
 #include <shlwapi.h>
 
 
-int lstat(const char* file, struct _stat& rstat)
+int lstat(const char* file, thg_stat& rstat)
 {
     const __int64 days_between_epochs = 134774L; /* days between 1.1.1601 and 1.1.1970 */
     const __int64 secs_between_epochs = (__int64)days_between_epochs * 86400L;
@@ -36,20 +36,21 @@ int lstat(const char* file, struct _stat& rstat)
         return -1;
     FindClose(hfind);
 
-    rstat.st_mtime = *(__int64*)&data.ftLastWriteTime / divisor - secs_between_epochs;
-    rstat.st_size = (data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) | data.nFileSizeLow;
+    rstat.mtime = *(__int64*)&data.ftLastWriteTime / divisor - secs_between_epochs;
+    rstat.size = (data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) | data.nFileSizeLow;
+    rstat.isdir = (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 
     return 0;
 }
 
 
-char Direntry::status(const struct _stat& stat) const
+char Direntry::status(const thg_stat& stat) const
 {
     switch (this->state)
     {
     case 'n':
-        if (this->mtime == (unsigned)stat.st_mtime
-            && this->size == (unsigned)stat.st_size
+        if (this->mtime == (unsigned)stat.mtime
+            && this->size == (unsigned)stat.size
             )
             return 'C';
         else
@@ -220,7 +221,7 @@ char Directory::status_imp(const std::string& hgroot)
             added = true;
     }
 
-    struct _stat stat;
+    thg_stat stat;
     const std::string hrs = hgroot + '\\';
     for (FilesT::iterator i = files_.begin(); i != files_.end(); ++i)
     {

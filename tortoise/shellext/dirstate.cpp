@@ -167,7 +167,7 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
 
     std::string path = hgroot + "\\.hg\\dirstate";
 
-    struct _stat stat;
+    thg_stat stat;
 
     bool stat_done = false;
 
@@ -183,9 +183,9 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
         TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") ok ");
     }
 
-    if (stat_done && iter->mtime < stat.st_mtime)
+    if (stat_done && iter->mtime < stat.mtime)
     {
-        iter->mtime = stat.st_mtime;
+        iter->mtime = stat.mtime;
         if (iter->dstate) {
             delete iter->dstate;
             iter->dstate = 0;
@@ -258,7 +258,7 @@ int HgQueryDirstate(
         if (!e)
             return 0;
 
-        struct _stat stat;
+        thg_stat stat;
         if (0 != lstat(path.c_str(), stat)) {
             TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") failed");
             return 0;

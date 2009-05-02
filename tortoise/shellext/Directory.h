@@ -21,7 +21,14 @@
 #include <vector>
 
 
-int lstat(const char* file, struct _stat& rstat);
+struct thg_stat
+{
+    unsigned size;
+    unsigned mtime;
+    bool     isdir;
+};
+
+int lstat(const char* file, thg_stat& rstat);
 
 
 struct Direntry
@@ -34,7 +41,7 @@ struct Direntry
     
     std::string name;
 
-    char status(const struct _stat& stat) const;
+    char status(const thg_stat& stat) const;
 };
 
 
