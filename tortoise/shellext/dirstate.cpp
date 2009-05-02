@@ -193,8 +193,11 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
         } else {
             TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
         }
+        unsigned tc0 = GetTickCount();
         iter->dstate = Dirstate::read(path).release();
-        TDEBUG_TRACE("Dirstatecache::get: "
+        unsigned tc1 = GetTickCount();
+        unsigned delta = tc1 - tc0;
+        TDEBUG_TRACE("Dirstatecache::get: read done in " << delta << " ticks, "
             << _cache.size() << " repos in cache");
     }
 
