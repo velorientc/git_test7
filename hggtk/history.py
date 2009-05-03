@@ -483,7 +483,7 @@ class GLog(GDialog):
         rev = self.currow[treemodel.REVID]
         rev = short(self.repo.changelog.node(rev))
         parents = [x.node() for x in self.repo.changectx(None).parents()]
-        dialog = BackoutDialog(self.repo.root, rev)
+        dialog = BackoutDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.set_notify_func(self.checkout_completed, parents)
