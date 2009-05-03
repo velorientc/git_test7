@@ -11,7 +11,7 @@ from dialog import error_dialog
 from mercurial import util, hg, ui
 from mercurial.node import short, nullrev
 from mercurial.i18n import _
-from hglib import rootpath, toutf, RepoError
+import hglib
 import shlib
 import hgcmd
 import gdialog
@@ -30,11 +30,12 @@ class UpdateDialog(gtk.Window):
         self.notify_func = None
 
         try:
-            repo = hg.repository(ui.ui())
-        except RepoError:
-            self.destroy()
+            repo = hg.repository(ui.ui(), path=hglib.rootpath())
+        except hglib.RepoError:
+            gobject.idle_add(self.destroy)
+            return
 
-        title = "hg update - %s" % toutf(os.path.basename(repo.root))
+        title = "hg update - %s" % hglib.toutf(os.path.basename(repo.root))
         self.set_title(title)
 
         vbox = gtk.VBox()
