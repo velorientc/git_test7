@@ -285,20 +285,6 @@ class menuThg:
 
         if len(files) == 0:
             menu.add_sep()
-            menu.add_menu(_("Update To Revision"),
-                      _("update working directory"),
-                      'update', icon="menucheckout.ico")
-
-            inmerge = repo.dirstate.parents()[1] != node.nullid
-            if not inmerge:
-                menu.add_menu(_("Merge Revisions"),
-                      _("merge working directory with another revision"),
-                      'merge', icon="menumerge.ico")
-            else:
-                menu.add_menu(_("Undo Merge"),
-                      _("Undo merge by updating to revision"),
-                      'merge', icon="menuunmerge.ico")
-
             menu.add_menu(_("Search History"),
                       _("Search revisions of files for a text pattern"),
                       'datamine', icon="menurepobrowse.ico")
