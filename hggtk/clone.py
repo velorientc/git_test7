@@ -140,11 +140,8 @@ class CloneDialog(gtk.Window):
         self._rev_input.set_text("")
         self._opt_allrev = gtk.CheckButton(_('Clone all revisions'))
         self._opt_allrev.set_active(True)
-        self._btn_rev_browse = gtk.Button(_('Select...'))
-        self._btn_rev_browse.connect('clicked', self._btn_rev_clicked)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._rev_input, False, False)
-        #revbox.pack_start(self._btn_rev_browse, False, False, 5)
         revbox.pack_start(self._opt_allrev, False, False)
         vbox.pack_start(revbox, False, False, 2)
 
@@ -209,13 +206,6 @@ class CloneDialog(gtk.Window):
         if response == gtk.RESPONSE_OK:
             self._src_input.set_text(dialog.get_filename())
         dialog.destroy()
-
-    def _btn_rev_clicked(self, button):
-        """ select revision from history dialog """
-        import histselect
-        rev = histselect.select()
-        if rev is not None:
-            self._rev_input.set_text(rev)
 
     def _add_src_to_recent(self, src):
         if os.path.exists(src):
