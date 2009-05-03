@@ -18,6 +18,8 @@
 #ifndef DIRENTRY_H
 #define DIRENTRY_H
 
+#include <vector>
+
 
 struct thg_stat
 {
@@ -29,17 +31,27 @@ struct thg_stat
 int lstat(const char* file, thg_stat& rstat);
 
 
-struct Direntry
+class Direntry
 {
+public:
     unsigned char state;
     unsigned mode;
     unsigned size;
     unsigned mtime;
-    unsigned length;
     
     std::string name;
 
+    int read(FILE* f, std::vector<char>& relpath);
     char status(const thg_stat& stat) const;
+
+private:
+    static uint32_t ntohl(uint32_t x)
+    {
+        return ((x & 0x000000ffUL) << 24) |
+               ((x & 0x0000ff00UL) <<  8) |
+               ((x & 0x00ff0000UL) >>  8) |
+               ((x & 0xff000000UL) >> 24);
+    }
 };
 
 #endif

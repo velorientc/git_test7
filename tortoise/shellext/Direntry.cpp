@@ -42,6 +42,31 @@ int lstat(const char* file, thg_stat& rstat)
 }
 
 
+int Direntry::read(FILE* f, std::vector<char>& relpath)
+{
+    if (fread(&state, sizeof(state), 1, f) != 1)
+        return 0;
+
+    unsigned length = 0;
+
+    fread(&mode, sizeof(mode), 1, f);
+    fread(&size, sizeof(size), 1, f);
+    fread(&mtime, sizeof(mtime), 1, f);
+    fread(&length, sizeof(length), 1, f);
+
+    mode = ntohl(mode);
+    size = ntohl(size);
+    mtime = ntohl(mtime);
+    length = ntohl(length);
+
+    relpath.resize(length + 1, 0);
+    fread(&relpath[0], sizeof(char), length, f);
+    relpath[length] = 0;
+
+    return 1;
+}
+
+
 char Direntry::status(const thg_stat& stat) const
 {
     switch (this->state)

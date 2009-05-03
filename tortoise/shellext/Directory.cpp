@@ -251,7 +251,7 @@ void Directory::print() const
         }
         printf(
             "%c %6o %10u %-24s %s\n", 
-            i->state, i->mode, i->length, s.c_str(), p.c_str()
+            i->state, i->mode, i->size, s.c_str(), p.c_str()
         );
     }
 }

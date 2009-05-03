@@ -55,14 +55,6 @@ public:
 private:
     Dirstate()
     : root_(0, ""), num_added_(0), num_entries_(0) {}
-
-    static uint32_t ntohl(uint32_t x)
-    {
-        return ((x & 0x000000ffUL) << 24) |
-               ((x & 0x0000ff00UL) <<  8) |
-               ((x & 0x00ff0000UL) >>  8) |
-               ((x & 0xff000000UL) >> 24);
-    }
 };
 
 
@@ -81,29 +73,13 @@ std::auto_ptr<Dirstate> Dirstate::read(const std::string& path)
     fread(&pd->parent2, sizeof(char), HASH_LENGTH, f);
 
     Direntry e;
-
-    std::vector<char> temp(MAX_PATH+10, 0);
-
-    while (fread(&e.state, sizeof(e.state), 1, f) == 1)
+    std::vector<char> relpath(MAX_PATH + 10, 0);
+    while (e.read(f, relpath))
     {
-        fread(&e.mode, sizeof(e.mode), 1, f);
-        fread(&e.size, sizeof(e.size), 1, f);
-        fread(&e.mtime, sizeof(e.mtime), 1, f);
-        fread(&e.length, sizeof(e.length), 1, f);
-
-        e.mode = ntohl(e.mode);
-        e.size = ntohl(e.size);
-        e.mtime = ntohl(e.mtime);
-        e.length = ntohl(e.length);
-
-        temp.resize(e.length+1, 0);
-        fread(&temp[0], sizeof(char), e.length, f);
-        temp[e.length] = 0;
-
         if (e.state == 'a')
             ++pd->num_added_;
 
-        pd->add(&temp[0], e);
+        pd->add(&relpath[0], e);
     }
 
     fclose(f);
