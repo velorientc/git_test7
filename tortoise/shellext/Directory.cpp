@@ -81,7 +81,7 @@ int Directory::add(const std::string& n, Direntry& e)
 
     if (!d)
     {
-        d = new Directory(this, base);
+        d = new Directory(this, base, path());
         subdirs_.push_back(d);
     }
 
@@ -149,16 +149,15 @@ Directory* Directory::getdir(const std::string& n)
 }
 
 
-std::string Directory::path(const std::string& n) const
+std::string Directory::path() const 
 {
+    if (basepath_.empty())
+        return name_;
+
     if (name_.empty())
-        return n;
-    std::string res = name_;
-    if (!n.empty())
-        res += "/" + n;
-    if (!parent_)
-        return res;
-    return parent_->path(res);
+        return basepath_;
+
+    return basepath_ + "/" + name_; 
 }
 
 
@@ -176,14 +175,13 @@ char Directory::status_imp(const std::string& hgroot)
     }
 
     Winstat stat;
-    const std::string hrs = hgroot + '\\';
+    const std::string basepath = hgroot + "/" + path() + "/";
     for (FilesT::iterator i = files_.begin(); i != files_.end(); ++i)
     {
         if (i->state == 'r')
             return 'M'; // file was removed, report dir as modified
 
-        std::string p =  hrs + path(i->name);
-
+        std::string p = basepath + i->name;
         if (0 != stat.lstat(p.c_str()))
             return 'M'; // file is missing, report dir as modified
 

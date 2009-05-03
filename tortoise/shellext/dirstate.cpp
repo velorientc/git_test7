@@ -55,7 +55,7 @@ public:
 
 private:
     Dirstate()
-    : root_(0, ""), num_added_(0), num_entries_(0) {}
+    : root_(0, "", ""), num_added_(0), num_entries_(0) {}
 };
 
 

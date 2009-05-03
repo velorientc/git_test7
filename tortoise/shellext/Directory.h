@@ -21,15 +21,17 @@
 #include "Direntry.h"
 
 #include <vector>
+#include <string>
 
 
 class Directory
 {
     typedef std::vector<Directory*> DirsT;
     typedef std::vector<Direntry> FilesT;
-    
-    Directory* parent_;
-    std::string name_;
+
+    Directory* const parent_;
+    const std::string name_;
+    const std::string basepath_;
 
     DirsT  subdirs_;
     FilesT files_;
@@ -38,11 +40,12 @@ class Directory
     char status_;
 
 public:
-    Directory(Directory* p, const std::string& n): 
-        parent_(p), name_(n), tickcount_(0), status_(-1) {}
+    Directory(Directory* p, const std::string& n, const std::string& basepath): 
+        parent_(p), name_(n), basepath_(basepath), tickcount_(0), status_(-1) {}
+
     ~Directory();
 
-    std::string path(const std::string& n = "") const;
+    std::string path() const;
 
     int add(const std::string& relpath, Direntry& e);
 
