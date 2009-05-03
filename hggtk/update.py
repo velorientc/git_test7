@@ -84,8 +84,8 @@ class UpdateDialog(gtk.Window):
         key, modifier = gtk.accelerator_parse(mod+'Return')
         update.add_accelerator('clicked', accelgroup, key, modifier,
                 gtk.ACCEL_VISIBLE)
-        update.grab_focus()
         hbbox.add(update)
+        update.grab_focus()
 
     def update(self, button, combo, repo):
         overwrite = self.overwrite.get_active()
