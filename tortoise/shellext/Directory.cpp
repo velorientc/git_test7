@@ -19,53 +19,6 @@
 
 #include "Directory.h"
 
-#include <shlwapi.h>
-
-
-int lstat(const char* file, thg_stat& rstat)
-{
-    const __int64 days_between_epochs = 134774L; /* days between 1.1.1601 and 1.1.1970 */
-    const __int64 secs_between_epochs = (__int64)days_between_epochs * 86400L;
-    const __int64 divisor = 10000000L;
-
-    WIN32_FIND_DATAA data;
-    HANDLE hfind;
-
-    hfind = FindFirstFileA(file, &data);
-    if (hfind == INVALID_HANDLE_VALUE)
-        return -1;
-    FindClose(hfind);
-
-    rstat.mtime = *(__int64*)&data.ftLastWriteTime / divisor - secs_between_epochs;
-    rstat.size = (data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) | data.nFileSizeLow;
-    rstat.isdir = (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-
-    return 0;
-}
-
-
-char Direntry::status(const thg_stat& stat) const
-{
-    switch (this->state)
-    {
-    case 'n':
-        if (this->mtime == (unsigned)stat.mtime
-            && this->size == (unsigned)stat.size
-            )
-            return 'C';
-        else
-            return 'M';
-    case 'm':
-        return 'M';
-    case 'r':
-        return 'R';
-    case 'a':
-        return 'A';
-    default:
-        return '?';
-    }
-}
-
 
 Directory::~Directory()
 {

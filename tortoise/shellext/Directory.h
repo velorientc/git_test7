@@ -18,31 +18,9 @@
 #ifndef DIRECTORY_H
 #define DIRECTORY_H
 
+#include "Direntry.h"
+
 #include <vector>
-
-
-struct thg_stat
-{
-    unsigned size;
-    unsigned mtime;
-    bool     isdir;
-};
-
-int lstat(const char* file, thg_stat& rstat);
-
-
-struct Direntry
-{
-    unsigned char state;
-    unsigned mode;
-    unsigned size;
-    unsigned mtime;
-    unsigned length;
-    
-    std::string name;
-
-    char status(const thg_stat& stat) const;
-};
 
 
 class Directory
