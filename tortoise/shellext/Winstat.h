@@ -1,6 +1,5 @@
 
 // Copyright (C) 2009 Benjamin Pollack
-// Copyright (C) 2009 Adrian Buehlmann
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,35 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DIRENTRY_H
-#define DIRENTRY_H
+#ifndef WINSTAT_H
+#define WINSTAT_H
 
-#include <vector>
-
-class Winstat;
-
-class Direntry
+class Winstat
 {
 public:
-    unsigned char state;
-    unsigned mode;
     unsigned size;
     unsigned mtime;
-    
-    std::string name;
+    bool     isdir;
 
-    int read(FILE* f, std::vector<char>& relpath);
-    char status(const Winstat& stat) const;
-
-private:
-    static uint32_t ntohl(uint32_t x)
-    {
-        return ((x & 0x000000ffUL) << 24) |
-               ((x & 0x0000ff00UL) <<  8) |
-               ((x & 0x00ff0000UL) >>  8) |
-               ((x & 0xff000000UL) >> 24);
-    }
+    int lstat(const char* file);
 };
 
 #endif
-

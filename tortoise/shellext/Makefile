@@ -8,6 +8,7 @@ OBJECTS = ContextMenu.o \
         PipeUtils.o \
         ShellUtils2.o \
         StringUtils.o \
+        Winstat.o \
         Direntry.o \
         Directory.o \
         dirstate.o

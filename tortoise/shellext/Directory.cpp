@@ -18,6 +18,7 @@
 #include "stdafx.h"
 
 #include "Directory.h"
+#include "Winstat.h"
 
 
 Directory::~Directory()
@@ -174,7 +175,7 @@ char Directory::status_imp(const std::string& hgroot)
             added = true;
     }
 
-    thg_stat stat;
+    Winstat stat;
     const std::string hrs = hgroot + '\\';
     for (FilesT::iterator i = files_.begin(); i != files_.end(); ++i)
     {
@@ -183,7 +184,7 @@ char Directory::status_imp(const std::string& hgroot)
 
         std::string p =  hrs + path(i->name);
 
-        if (0 != lstat(p.c_str(), stat))
+        if (0 != stat.lstat(p.c_str()))
             return 'M'; // file is missing, report dir as modified
 
         char s = i->status(stat);

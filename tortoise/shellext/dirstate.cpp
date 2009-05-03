@@ -19,6 +19,7 @@
 #include "dirstate.h"
 #include "Directory.h"
 #include "TortoiseUtils.h"
+#include "Winstat.h"
 
 #include <shlwapi.h>
 
@@ -143,13 +144,13 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
 
     std::string path = hgroot + "\\.hg\\dirstate";
 
-    thg_stat stat;
+    Winstat stat;
 
     bool stat_done = false;
 
     if (isnew || (tc - iter->tickcount) > 500)
     {
-        if (0 != lstat(path.c_str(), stat))
+        if (0 != stat.lstat(path.c_str()))
         {
             TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") failed");
             return 0;
@@ -234,8 +235,8 @@ int HgQueryDirstate(
         if (!e)
             return 0;
 
-        thg_stat stat;
-        if (0 != lstat(path.c_str(), stat)) {
+        Winstat stat;
+        if (0 != stat.lstat(path.c_str())) {
             TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") failed");
             return 0;
         }
