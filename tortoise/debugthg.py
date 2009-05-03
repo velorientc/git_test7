@@ -5,7 +5,7 @@ try:
         hkey = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
                            r"Software\TortoiseHg", 0,
                            _winreg.KEY_ALL_ACCESS)
-        val = QueryValueEx(hkey, 'OverlayDebug')[0]
+        val = _winreg.QueryValueEx(hkey, 'OverlayDebug')[0]
         if val in ('1', 'True'):
             debugging += 'O'
         val = _winreg.QueryValueEx(hkey, 'ContextMenuDebug')[0]
