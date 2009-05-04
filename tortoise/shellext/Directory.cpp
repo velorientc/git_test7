@@ -21,6 +21,17 @@
 #include "Winstat.h"
 
 
+Directory::Directory(
+    Directory* p, const std::string& n, const std::string& basepath
+):
+    parent_(p), name_(n), tickcount_(0), status_(-1) 
+{
+    path_ = basepath;
+    if (!n.empty())
+        path_ += "/" + n;
+}
+
+
 Directory::~Directory()
 {
     for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
@@ -146,18 +157,6 @@ Directory* Directory::getdir(const std::string& n)
     }
 
     return 0;
-}
-
-
-std::string Directory::path() const 
-{
-    if (basepath_.empty())
-        return name_;
-
-    if (name_.empty())
-        return basepath_;
-
-    return basepath_ + "/" + name_; 
 }
 
 
