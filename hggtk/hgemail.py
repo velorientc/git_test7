@@ -56,7 +56,7 @@ class EmailDialog(gtk.Window):
             self.set_title(_('Email revision(s) ') + ' '.join(revargs[1:]))
         else:
             self.set_title(_('Email Mercurial Patches'))
-        self.set_default_size(630, 400)
+        self.set_default_size(650, 450)
 
         hbox = gtk.HBox()
         envframe = gtk.Frame(_('Envelope'))
@@ -73,7 +73,7 @@ class EmailDialog(gtk.Window):
         self._tolist = gtk.ListStore(str)
         self._tobox = gtk.ComboBoxEntry(self._tolist, 0)
         lbl = gtk.Label(_('To:'))
-        lbl.set_property('width-chars', 5)
+        lbl.set_property('width-chars', 10)
         lbl.set_alignment(1.0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self._tobox, True, True, 4)
@@ -84,7 +84,7 @@ class EmailDialog(gtk.Window):
         self._cclist = gtk.ListStore(str)
         self._ccbox = gtk.ComboBoxEntry(self._cclist, 0)
         lbl = gtk.Label(_('Cc:'))
-        lbl.set_property('width-chars', 5)
+        lbl.set_property('width-chars', 10)
         lbl.set_alignment(1.0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self._ccbox, True, True, 4)
@@ -95,11 +95,22 @@ class EmailDialog(gtk.Window):
         self._fromlist = gtk.ListStore(str)
         self._frombox = gtk.ComboBoxEntry(self._fromlist, 0)
         lbl = gtk.Label(_('From:'))
-        lbl.set_property('width-chars', 5)
+        lbl.set_property('width-chars', 10)
         lbl.set_alignment(1.0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         hbox.pack_start(self._frombox, True, True, 4)
         vbox.pack_start(hbox, False, False, 4)
+
+        hbox = gtk.HBox()
+        self._replyto = gtk.Entry()
+        lbl = gtk.Label(_('In-Reply-To:'))
+        lbl.set_property('width-chars', 10)
+        lbl.set_alignment(1.0, 0.5)
+        hbox.pack_start(lbl, False, False, 4)
+        hbox.pack_start(self._replyto, True, True, 4)
+        vbox.pack_start(hbox, False, False, 4)
+        self.tips.set_tip(self._replyto,
+            _('Message identifier to reply to, for threading'))
 
         vbox = gtk.VBox()
         flagframe.add(vbox)
@@ -211,10 +222,12 @@ class EmailDialog(gtk.Window):
             self._frombox.child.set_text(fromutf(repo.ui.config('email', 'from', '')))
             self._subjbox.child.set_text(fromutf(repo.ui.config('email', 'subject', '')))
             self._intro = False
+            self._in_reply_to = False
             for arg in extensions.find('patchbomb').cmdtable['email'][1]:
                 if arg[1] == 'intro':
                     self._intro = True
-                    break
+                elif arg[1] == 'in-reply-to':
+                    self._in_reply_to = True
             if self._intro:
                 addtip = ''
             else:
@@ -287,6 +300,7 @@ class EmailDialog(gtk.Window):
         cctext = fromutf(self._ccbox.child.get_text())
         fromtext = fromutf(self._frombox.child.get_text())
         subjtext = fromutf(self._subjbox.child.get_text())
+        inreplyto = fromutf(self._replyto.get_text())
 
         if not totext:
             info_dialog(self, _('Info required'),
@@ -323,7 +337,6 @@ class EmailDialog(gtk.Window):
             history.write()
 
         cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
-        cmdline += ['--repository', self.repo.root]
         oldpager = os.environ.get('PAGER')
         if test:
             if oldpager:
@@ -342,6 +355,8 @@ class EmailDialog(gtk.Window):
         if self._inline.get_active():   cmdline += ['--inline']
         if self._attach.get_active():   cmdline += ['--attach']
         if self._diffstat.get_active(): cmdline += ['--diffstat']
+        if inreplyto and self._in_reply_to:
+            cmdline += ['--in-reply-to', inreplyto]
         start = self.descbuffer.get_start_iter()
         end = self.descbuffer.get_end_iter()
         desc = self.descbuffer.get_text(start, end)
