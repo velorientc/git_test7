@@ -125,7 +125,8 @@ class DataMineDialog(GDialog):
     def _annotate_parent(self, menuitem, objs):
         if not self.currev:
             return
-        self.trigger_annotate(self.currev, objs)
+        parent = self.repo[self.currev].parents()[0].rev()
+        self.trigger_annotate(parent, objs)
 
     def _cmenu_display(self, menuitem):
         from changeset import ChangeSet
