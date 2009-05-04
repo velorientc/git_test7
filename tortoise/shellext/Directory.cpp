@@ -110,35 +110,51 @@ int Directory::add(const std::string& n_in, Direntry& e)
 }
 
 
-const Direntry* Directory::get(const std::string& n) const
+const Direntry* Directory::get(const std::string& n_in) const
 {
     std::string base;
     std::string rest;
 
-    if (!splitbase(n, base, rest))
-    {
-        TDEBUG_TRACE("Directory(" << path() << ")::get(" << n << "): splitbase returned 0");
-        return 0;
-    }
+    std::string n = n_in;
+    const Directory* cur = this;
 
-    if (base.empty())
+    for (;;)
     {
-        for (FilesT::const_iterator i = files_.begin(); i != files_.end(); ++i)
+        loopstart:
+
+        if (!splitbase(n, base, rest))
         {
-            if (i->name == n)
-                return &(*i);
+            TDEBUG_TRACE("Directory(" << path() << ")::get(" 
+                << n_in << "): splitbase returned 0");
+            return 0;
         }
+
+        if (base.empty())
+        {
+            for (FilesT::const_iterator i = cur->files_.begin();
+                    i != cur->files_.end(); ++i)
+            {
+                if (i->name == n)
+                    return &(*i);
+            }
+            return 0;
+        }
+
+        for (DirsT::const_iterator i = cur->subdirs_.begin();
+                i != cur->subdirs_.end(); ++i)
+        {
+            if ((*i)->name_ == base)
+            {
+                cur = *i;
+                n = rest;
+                goto loopstart;
+            }
+        }
+
+        TDEBUG_TRACE("Directory(" << path() << ")::get("
+            << n_in << "): unknown subdir");
         return 0;
     }
-
-    for (DirsT::const_iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
-    {
-        if ((*i)->name_ == base)
-            return (*i)->get(rest);
-    }
-
-    TDEBUG_TRACE("Directory(" << path() << ")::get(" << n << "): unknown subdir");
-    return 0;
 }
 
 
