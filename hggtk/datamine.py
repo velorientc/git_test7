@@ -74,7 +74,6 @@ class DataMineDialog(GDialog):
     def get_body(self):
         """ Initialize the Dialog. """
         self.grep_cmenu = self.grep_context_menu()
-        self.ann_cmenu = self.annotate_context_menu()
         self.changedesc = {}
         self.newpagecount = 1
         vbox = gtk.VBox()
@@ -115,11 +114,18 @@ class DataMineDialog(GDialog):
         _menu.show_all()
         return _menu
 
-    def annotate_context_menu(self):
+    def annotate_context_menu(self, opts):
         _menu = gtk.Menu()
         _menu.append(create_menu(_('di_splay change'), self._cmenu_display))
+        _menu.append(create_menu(_('_annotate parent'),
+            self._annotate_parent, opts))
         _menu.show_all()
         return _menu
+
+    def _annotate_parent(self, menuitem, objs):
+        if not self.currev:
+            return
+        self.trigger_annotate(self.currev, objs)
 
     def _cmenu_display(self, menuitem):
         from changeset import ChangeSet
@@ -476,10 +482,6 @@ class DataMineDialog(GDialog):
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
         treeview.set_property('fixed-height-mode', True)
         treeview.set_border_width(0)
-        treeview.connect("cursor-changed", self._ann_selection_changed)
-        treeview.connect('button-release-event', self._ann_button_release)
-        treeview.connect('popup-menu', self._ann_popup_menu)
-        treeview.connect('row-activated', self._ann_row_act)
 
         results = gtk.ListStore(str, str, str, str, str, str, str)
         treeview.set_model(results)
@@ -543,8 +545,13 @@ class DataMineDialog(GDialog):
         objs = (frame, treeview.get_model(), path)
         graphview.treeview.connect('row-activated', self.log_activate, objs)
         graphview.treeview.connect('button-release-event',
-                self._ann_button_release)
-        graphview.treeview.connect('popup-menu', self._ann_popup_menu)
+                self._ann_button_release, objs)
+        graphview.treeview.connect('popup-menu', self._ann_popup_menu, objs)
+
+        treeview.connect("cursor-changed", self._ann_selection_changed)
+        treeview.connect('button-release-event', self._ann_button_release, objs)
+        treeview.connect('popup-menu', self._ann_popup_menu, objs)
+        treeview.connect('row-activated', self._ann_row_act, objs)
 
     def search_in_file(self, model, column, key, iter):
         """Searches all fields shown in the tree when the user hits crtr+f,
@@ -682,23 +689,25 @@ class DataMineDialog(GDialog):
             self.path = model.path
             self.stbar.set_status_text(model[anniter][self.COL_TOOLTIP])
 
-    def _ann_button_release(self, widget, event):
+    def _ann_button_release(self, widget, event, objs):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
             gtk.gdk.CONTROL_MASK)):
-            self._ann_popup_menu(widget, event.button, event.time)
+            self._ann_popup_menu(widget, event.button, event.time, objs)
         return False
 
-    def _ann_popup_menu(self, treeview, button=0, time=0):
-        self.ann_cmenu.popup(None, None, None, button, time)
+    def _ann_popup_menu(self, treeview, button, time, objs):
+        ann_cmenu = self.annotate_context_menu(objs)
+        ann_cmenu.popup(None, None, None, button, time)
         return True
 
-    def _ann_row_act(self, tree, path, column):
-        self.ann_cmenu.get_children()[0].activate()
+    def _ann_row_act(self, tree, path, column, objs):
+        ann_cmenu = self.annotate_context_menu(objs)
+        ann_cmenu.get_children()[0].activate()
 
 
-def create_menu(label, callback):
+def create_menu(label, callback, *args):
     menuitem = gtk.MenuItem(label, True)
-    menuitem.connect('activate', callback)
+    menuitem.connect('activate', callback, *args)
     menuitem.set_border_width(1)
     return menuitem
 
