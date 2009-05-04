@@ -164,33 +164,44 @@ std::string Directory::path() const
 char Directory::status_imp(const std::string& hgroot)
 {
     bool added = false;
-
-    for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
-    {
-        char s = (*i)->status_imp(hgroot);
-        if (s == 'M')
-            return 'M';
-        if (s == 'A')
-            added = true;
-    }
+    
+    std::vector<Directory*> todo;
+    todo.push_back(this);
 
     Winstat stat;
-    const std::string basepath = hgroot + "/" + path() + "/";
-    for (FilesT::iterator i = files_.begin(); i != files_.end(); ++i)
+    std::string basepath;
+ 
+    while (!todo.empty())
     {
-        if (i->state == 'r')
-            return 'M'; // file was removed, report dir as modified
+        Directory* const d = todo.back();
+        todo.pop_back();
 
-        std::string p = basepath + i->name;
-        if (0 != stat.lstat(p.c_str()))
-            return 'M'; // file is missing, report dir as modified
+        //TDEBUG_TRACE("Directory(" << path() << ")::status_imp: "
+        //    "popped '" << d->path() << "'");
 
-        char s = i->status(stat);
+        if (!d->files_.empty())
+        {
+            basepath = hgroot + "/" + d->path() + "/";
 
-        if (s == 'M')
-            return 'M';
-        if (s == 'A')
-            added = true;
+            for (FilesT::iterator i = d->files_.begin(); i != d->files_.end(); ++i)
+            {
+                if (i->state == 'r')
+                    return 'M'; // file was removed, report dir as modified
+
+                std::string p = basepath + i->name;
+                if (0 != stat.lstat(p.c_str()))
+                    return 'M'; // file is missing, report dir as modified
+
+                char s = i->status(stat);
+
+                if (s == 'M')
+                    return 'M';
+                if (s == 'A')
+                    added = true;
+            }
+        }
+
+        todo.insert(todo.end(), d->subdirs_.begin(), d->subdirs_.end());
     }
 
     if (added)
