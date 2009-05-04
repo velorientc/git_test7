@@ -107,15 +107,16 @@ class BackoutDialog(gtk.Window):
         self.notify_func = func
         self.notify_args = args
 
-    def backout(self, button, buf, rev):
+    def backout(self, button, buf, revstr):
         start, end = buf.get_bounds()
         msg = buf.get_text(start, end)
-        cmdline = ['hg', 'backout', '--rev', self.reventry.get_text(),
-            '--message', msg]
+        cmdline = ['hg', 'backout', '--rev', revstr, '--message', msg]
         from hgcmd import CmdDialog
         dlg = CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
         dlg.hide()
-        if self.notify_func:
-            self.notify_func(self.notify_args)
+        if dlg.returncode == 0:
+            if self.notify_func:
+                self.notify_func(self.notify_args)
+            self.destroy()
