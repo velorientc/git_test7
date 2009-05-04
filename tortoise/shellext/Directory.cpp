@@ -64,39 +64,49 @@ int splitbase(const std::string& n, std::string& base, std::string& rest)
 }
 
 
-int Directory::add(const std::string& n, Direntry& e)
+int Directory::add(const std::string& n_in, Direntry& e)
 {
     std::string base;
     std::string rest;
-
-    if (!splitbase(n, base, rest)) {
-        TDEBUG_TRACE("Directory(" << path() << ")::add(" << n << "): splitbase returned 0");
-        return 0;
-    }
-
-    if (base.empty())
+    
+    std::string n = n_in;
+    Directory* cur = this;
+    
+    for (;;)
     {
-        e.name = n;
-        files_.push_back(e);
-        return 1;
-    }
 
-    Directory* d = 0;
-    for (DirsT::iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
-    {
-        if ((*i)->name_ == base) {
-            d = *i;
-            break;
+        if (!splitbase(n, base, rest)) {
+            TDEBUG_TRACE("Directory(" << path() << ")::add(" << n_in 
+                << "): splitbase returned 0");
+            return 0;
         }
-    }
 
-    if (!d)
-    {
-        d = new Directory(this, base, path());
-        subdirs_.push_back(d);
-    }
+        if (base.empty())
+        {
+            e.name = n;
+            cur->files_.push_back(e);
+            return 1;
+        }
 
-    return d->add(rest, e);
+        Directory* d = 0;
+        for (DirsT::iterator i = cur->subdirs_.begin(); 
+                i != cur->subdirs_.end(); ++i)
+        {
+            if ((*i)->name_ == base) {
+                d = *i;
+                break;
+            }
+        }
+
+        if (!d)
+        {
+            d = new Directory(cur, base, cur->path());
+            cur->subdirs_.push_back(d);
+        }
+
+        n = rest;
+        cur = d;
+    }
 }
 
 
