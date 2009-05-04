@@ -753,7 +753,7 @@ class GCommit(GStatus):
                     else:
                         lines[lnum+1] = lines[lnum][ind:].lstrip() \
                                         + lines[lnum+1]
-                    lines[lnum] = lines[lnum][0:ind].rstrip() + ' '
+                    lines[lnum] = lines[lnum][0:ind].rstrip()
             lnum += 1
         buf.set_text('\n'.join(lines))                       
 
