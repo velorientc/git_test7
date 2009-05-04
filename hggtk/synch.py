@@ -225,6 +225,7 @@ class SynchDialog(gtk.Window):
         self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
+        self.textview.connect('populate-popup', self._add_to_popup)
         self.textbuffer = self.textview.get_buffer()
         vbox.pack_start(scrolledwindow, True, True)
 
@@ -619,6 +620,27 @@ class SynchDialog(gtk.Window):
             member, attr = key.split('.')
             value = getattr(getattr(self, member), 'get_%s'%attr)()
             set_value(key, value)
+
+    def _add_to_popup(self, textview, menu):
+        menu_items = (('----', None),
+                      (_('Toggle _Wordwrap'), self._toggle_wordwrap),
+                     )
+        for label, handler in menu_items:
+            if label == '----':
+                menuitem = gtk.SeparatorMenuItem()
+            else:
+                menuitem = gtk.MenuItem(label)
+            if handler:
+                menuitem.connect('activate', handler)
+            menu.append(menuitem)
+        menu.show_all()
+
+    def _toggle_wordwrap(self, sender):
+        if self.textview.get_wrap_mode() != gtk.WRAP_NONE:
+            self.textview.set_wrap_mode(gtk.WRAP_NONE)
+        else:
+            self.textview.set_wrap_mode(gtk.WRAP_WORD)
+
 
 def run(ui, *pats, **opts):
     return SynchDialog(pats, opts.get('pushmode'))
