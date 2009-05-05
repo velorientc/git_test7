@@ -477,6 +477,7 @@ class ChangeSet(GDialog):
 
         details_text = gtk.TextView()
         details_text.set_wrap_mode(gtk.WRAP_NONE)
+        details_text.connect('populate-popup', self._add_to_popup)
         details_text.set_editable(False)
         details_text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(details_text)
@@ -730,3 +731,23 @@ class ChangeSet(GDialog):
         dlg.run()
         dlg.hide()
         shlib.shell_notify([self.curfile])
+
+    def _add_to_popup(self, textview, menu):
+        menu_items = (('----', None),
+                      (_('Toggle _Wordwrap'), self._toggle_wordwrap),
+                     )
+        for label, handler in menu_items:
+            if label == '----':
+                menuitem = gtk.SeparatorMenuItem()
+            else:
+                menuitem = gtk.MenuItem(label)
+            if handler:
+                menuitem.connect('activate', handler)
+            menu.append(menuitem)
+        menu.show_all()
+
+    def _toggle_wordwrap(self, sender):
+        if self.textview.get_wrap_mode() != gtk.WRAP_NONE:
+            self.textview.set_wrap_mode(gtk.WRAP_NONE)
+        else:
+            self.textview.set_wrap_mode(gtk.WRAP_WORD)
