@@ -146,7 +146,7 @@ class GStatus(GDialog):
     def get_title(self):
         root = os.path.basename(self.repo.root)
         revs = self.opts.get('rev')
-        name = self.pats and 'filtered status' or 'status'
+        name = self.pats and _('filtered status') or _('status')
         r = revs and ':'.join(revs) or ''
         return ' '.join([root, name, r])
 
@@ -455,7 +455,7 @@ class GStatus(GDialog):
             checks += ('deleted', 'unknown', 'clean', 'ignored')
 
         for ctype in checks:
-            check = gtk.CheckButton('_' + ctype)
+            check = gtk.CheckButton('_' + _(ctype))
             check.connect('toggled', self._show_toggle, ctype)
             table.attach(check, col, col+1, row, row+1)
             self._show_checks[ctype] = check
