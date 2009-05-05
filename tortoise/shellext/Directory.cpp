@@ -158,31 +158,43 @@ const Direntry* Directory::get(const std::string& n_in) const
 }
 
 
-Directory* Directory::getdir(const std::string& n)
+Directory* Directory::getdir(const std::string& n_in)
 {
     std::string base;
     std::string rest;
 
-    if (!splitbase(n, base, rest))
+    std::string n = n_in;
+    const Directory* cur = this;
+
+    for (;;)
     {
-        TDEBUG_TRACE("Directory(" << path() << ")::getdir(" << n << "): splitbase returned 0");
+        loopstart:
+
+        if (!splitbase(n, base, rest))
+        {
+            TDEBUG_TRACE("Directory(" << path() << ")::getdir("
+                << n_in << "): splitbase returned 0");
+            return 0;
+        }
+
+        const bool leaf = base.empty();
+        const std::string& searchstr = (leaf ? n : base);
+
+        for (DirsT::const_iterator i = cur->subdirs_.begin();
+                i != cur->subdirs_.end(); ++i)
+        {
+            if ((*i)->name_ == searchstr)
+            {
+                if (leaf)
+                    return *i;
+                cur = *i;
+                n = rest;
+                goto loopstart;
+            }
+        }
+
         return 0;
     }
-
-    const bool leaf = base.empty();
-    const std::string& searchstr = (leaf ? n : base);
-
-    for (DirsT::const_iterator i = subdirs_.begin(); i != subdirs_.end(); ++i)
-    {
-        if ((*i)->name_ == searchstr)
-        {
-            if (leaf)
-                return *i;
-            return (*i)->getdir(rest);
-        }
-    }
-
-    return 0;
 }
 
 
