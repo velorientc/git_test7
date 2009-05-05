@@ -26,9 +26,12 @@ Directory::Directory(
 ):
     parent_(p), name_(n), tickcount_(0), status_(-1) 
 {
-    path_ = basepath;
-    if (!n.empty())
-        path_ += "/" + n;
+    if (n.empty())
+        path_ = basepath;
+    else if (basepath.empty())
+        path_ = n;
+    else
+        path_ = basepath + '/' + n;
 }
 
 
