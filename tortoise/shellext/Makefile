@@ -25,12 +25,12 @@ ifeq ($(DEBUG),1)
 CXXFLAGS+=-D_DEBUG
 endif
 
-all: PipeUtils $(DLLNAME)
+all: PipeUtils.exe $(DLLNAME)
 	
 $(DLLNAME): $(OBJECTS)
 	g++ -o $@ $(OBJECTS) $(LDFLAGS)
 
-PipeUtils: PipeUtils.cpp PipeUtils.h StringUtils.o TortoiseUtils.o
+PipeUtils.exe: PipeUtils.cpp PipeUtils.h StringUtils.o TortoiseUtils.o
 	g++ -o $@ $(CXXFLAGS) -DAPPMAIN $< StringUtils.o TortoiseUtils.o
 
 clean:
