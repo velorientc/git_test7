@@ -202,6 +202,12 @@ int HgQueryDirstate(
     if (relpath.empty())
         return 0; // don't show icon on repo root dir
 
+    for (size_t i = 0; i < relpath.size(); ++i)
+    {
+        if (relpath[i] == '\\')
+            relpath[i] = '/';
+    }
+
     if (relpath == ".hg" 
             || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
         return 0; // don't descend into .hg dir
@@ -215,12 +221,6 @@ int HgQueryDirstate(
 
     if (filterStatus == 'A' && pds->num_added() == 0)
         return 0;
-
-    for (size_t i = 0; i < relpath.size(); ++i)
-    {
-        if (relpath[i] == '\\')
-            relpath[i] = '/';
-    }
 
     if (PathIsDirectory(path.c_str()))
     {
