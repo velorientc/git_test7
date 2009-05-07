@@ -54,17 +54,6 @@ int HgQueryDirstate(
             || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
         return 0; // don't descend into .hg dir
 
-    Dirstate* pds = Dirstatecache::get(hgroot);
-    if (!pds)
-    {
-        TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 
-            << hgroot << ") returns no Dirstate");
-        return 0;
-    }
-
-    if (filterStatus == 'A' && pds->num_added() == 0)
-        return 0;
-
     if (PathIsDirectory(path.c_str()))
     {
         std::auto_ptr<DirectoryStatus> pds(new DirectoryStatus());
@@ -75,6 +64,17 @@ int HgQueryDirstate(
     }
     else
     {
+        Dirstate* pds = Dirstatecache::get(hgroot);
+        if (!pds)
+        {
+            TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 
+                << hgroot << ") returns no Dirstate");
+            return 0;
+        }
+
+        if (filterStatus == 'A' && pds->num_added() == 0)
+            return 0;
+
         const Direntry* e = pds->root().get(relpath);
         if (!e)
             return 0;
