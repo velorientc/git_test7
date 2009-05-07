@@ -21,8 +21,6 @@
 
 char DirectoryStatus::status(const std::string& relpath) const
 {
-    TDEBUG_TRACE("DirectoryStatus::status(" << relpath << ")");
-
     char res = 'C';
     bool added = false;
     bool modified = false;
@@ -32,8 +30,6 @@ char DirectoryStatus::status(const std::string& relpath) const
         const E& e = *i;
         if (e.path_.compare(0, relpath.length(), relpath) == 0)
         {
-            TDEBUG_TRACE("DirectoryStatus::status(" << relpath << "):"
-                << " found '" << e.path_ << "'");
             if (e.status_ == 'r' || e.status_ == 'm')
             {
                 modified = true;
@@ -51,7 +47,6 @@ char DirectoryStatus::status(const std::string& relpath) const
     else
         res = 'C';
 
-    TDEBUG_TRACE("DirectoryStatus::status(" << relpath << "): returns " << res);
     return res;
 }
 
@@ -65,7 +60,7 @@ int DirectoryStatus::read(const std::string& hgroot)
     FILE *f = fopen(p.c_str(), "rb");
     if (!f)
     {
-        TDEBUG_TRACE("DirectoryStatus::read: can't open " << p);
+        TDEBUG_TRACE("DirectoryStatus::read: can't open '" << p << "'");
         return 0;
     }
 
