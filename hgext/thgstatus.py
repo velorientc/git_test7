@@ -46,20 +46,11 @@ def thgstatus(ui, repo, source='default', **opts):
         dirstatus[dirname(fn)] = 'm'
     for fn in removed:
         dirstatus[dirname(fn)] = 'r'
-    nmodified, nadded, nremoved = 0, 0, 0
     f = open(cachefilepath(repo), 'wb')
     for dn in sorted(dirstatus):
         s = dirstatus[dn]
-        if (s == 'm'):
-            nmodified += 1
-        elif (s == 'a'):
-            nadded += 1
-        elif (s == 'r'):
-            nremoved +=1
         f.write(dirstatus[dn] + dn + '\n')
     f.close()
-    ui.status(_("updated cached directory status: "
-        "%i modified, %i added, %i removed\n") % (nmodified, nadded, nremoved))
 
 cmdtable = {
     'thgstatus':
