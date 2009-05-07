@@ -3,7 +3,7 @@
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "PipeUtils.h"
-#include "dirstate.h"
+#include "QueryDirstate.h"
 
 #include <shlwapi.h>
 
