@@ -48,7 +48,6 @@ def thgstatus(ui, repo, source='default', **opts):
         dirstatus[dirname(fn)] = 'r'
     f = open(cachefilepath(repo), 'wb')
     for dn in sorted(dirstatus):
-        s = dirstatus[dn]
         f.write(dirstatus[dn] + dn + '\n')
     f.close()
 
