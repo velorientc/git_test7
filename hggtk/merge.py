@@ -139,6 +139,7 @@ class MergeDialog(gtk.Window):
         import commit
         dlg = commit.run(ui.ui())
         dlg.set_modal(True)
+        dlg.set_notify_func(self.notify_func, self.notify_args)
         dlg.display()
 
     def undo(self, button, local, merge, commit):

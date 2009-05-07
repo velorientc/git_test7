@@ -93,6 +93,11 @@ class GCommit(GStatus):
         self.closebranch = False
         self._last_commit_id = None
         self.qnew = False
+        self.notify_func = None
+
+    def set_notify_func(self, func, args):
+        self.notify_func = func
+        self.notify_args = args
 
     def parse_opts(self):
         GStatus.parse_opts(self)
@@ -651,6 +656,8 @@ class GCommit(GStatus):
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
             shell_notify([self.cwd] + files)
+            if self.notify_func:
+                self.notify_func(self.notify_args)
             self.closebranch = False
             self.nextbranch = None
             buf = self.text.get_buffer()
