@@ -304,7 +304,7 @@ class SynchDialog(gtk.Window):
     def _view_pulled_changes(self, button):
         from history import GLog
         countpulled = len(self.repo.changelog) - self.origchangecount
-        opts = {'limit' : countpulled }
+        opts = {'limit' : countpulled, 'from-synch' : True}
         dialog = GLog(self.ui, None, None, [], opts)
         dialog.display()
 

@@ -41,7 +41,7 @@ class GLog(GDialog):
         self.ui.quiet = False
 
     def get_tbbuttons(self):
-        return [
+        tbar = [
                 self.make_toolbutton(gtk.STOCK_REFRESH,
                     _('Re_fresh'),
                     self._refresh_clicked,
@@ -59,6 +59,20 @@ class GLog(GDialog):
                     tip=_('Search Repository History')),
                 gtk.SeparatorToolItem()
              ] + self.changeview.get_tbbuttons()
+        if not self.opts.get('from-synch'):
+            tbar += [
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_NETWORK,
+                                 _('Synchronize'),
+                                 self._synch_clicked,
+                                 tip=_('Launch synchronize tool')),
+                    ]
+        return tbar
+
+    def _synch_clicked(self, toolbutton, data):
+        from synch import SynchDialog
+        dlg = SynchDialog([], False)
+        dlg.show_all()
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
