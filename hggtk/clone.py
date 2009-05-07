@@ -264,6 +264,11 @@ class CloneDialog(gtk.Window):
                 dest = None
             else:
                 dest = '.'
+        else:
+            abs = os.path.abspath(dest)
+            dirabs = os.path.dirname(abs)
+            if dirabs == src:
+                dest = os.path.join(os.path.dirname(dirabs), dest)
 
         # start cloning
         try:
