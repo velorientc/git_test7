@@ -215,7 +215,8 @@ class PathEditDialog(gtk.Dialog):
 
     def __init__(self, path, alias):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
-                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                              gtk.STOCK_OK, gtk.RESPONSE_OK))
         shlib.set_tortoise_keys(self)
         self.connect('response', self.response)
         self.set_title(_('Edit remote repository path'))
@@ -325,7 +326,7 @@ class PathEditDialog(gtk.Dialog):
                 self.entries[n][1].set_sensitive(True)
 
     def response(self, widget, response_id):
-        if response_id != gtk.RESPONSE_CLOSE:
+        if response_id != gtk.RESPONSE_OK:
             self.destroy()
             return
         self.newpath = self.buildurl()
