@@ -24,7 +24,7 @@
 Directory::Directory(
     Directory* p, const std::string& n, const std::string& basepath
 ):
-    parent_(p), name_(n), tickcount_(0), status_(-1) 
+    parent_(p), name_(n)
 {
     if (n.empty())
         path_ = basepath;
@@ -198,73 +198,6 @@ Directory* Directory::getdir(const std::string& n_in)
 
         return 0;
     }
-}
-
-
-char Directory::status_imp(const std::string& hgroot)
-{
-    bool added = false;
-    
-    std::vector<Directory*> todo;
-    todo.push_back(this);
-
-    Winstat stat;
-    std::string basepath;
- 
-    while (!todo.empty())
-    {
-        Directory* const d = todo.back();
-        todo.pop_back();
-
-        //TDEBUG_TRACE("Directory(" << path() << ")::status_imp: "
-        //    "popped '" << d->path() << "'");
-
-        if (!d->files_.empty())
-        {
-            basepath = hgroot + "/" + d->path() + "/";
-
-            for (FilesT::iterator i = d->files_.begin(); i != d->files_.end(); ++i)
-            {
-                if (i->state == 'r')
-                    return 'M'; // file was removed, report dir as modified
-
-                std::string p = basepath + i->name;
-                if (0 != stat.lstat(p.c_str()))
-                    return 'M'; // file is missing, report dir as modified
-
-                char s = i->status(stat);
-
-                if (s == 'M')
-                    return 'M';
-                if (s == 'A')
-                    added = true;
-            }
-        }
-
-        todo.insert(todo.end(), d->subdirs_.begin(), d->subdirs_.end());
-    }
-
-    if (added)
-        return 'A';
-
-    return 'C';
-}
-
-
-char Directory::status(const std::string& hgroot)
-{
-    if (status_ != -1)
-    {
-        unsigned tc = GetTickCount();
-        if (tc - tickcount_ < 3000) {
-            return status_;
-        }
-    }
-
-    status_ = status_imp(hgroot);
-    tickcount_ = GetTickCount();
-
-    return status_;
 }
 
 

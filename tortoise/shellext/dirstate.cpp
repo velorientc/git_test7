@@ -89,30 +89,140 @@ std::auto_ptr<Dirstate> Dirstate::read(const std::string& path)
 }
 
 
+class DirectoryStatus
+{
+    struct E
+    {
+        std::string path_;
+        char status_;
+
+        E(): status_(0) {}
+    };
+
+    typedef std::vector<E> V;
+    V v_;
+
+public:
+    int read(const std::string& hgroot);
+    char status(const std::string& relpath) const;
+};
+
+
+char DirectoryStatus::status(const std::string& relpath) const
+{
+    TDEBUG_TRACE("DirectoryStatus::status(" << relpath << ")");
+
+    char res = 'C';
+    bool added = false;
+    bool modified = false;
+
+    for (V::const_iterator i = v_.begin(); i != v_.end(); ++i)
+    {
+        const E& e = *i;
+        if (e.path_.compare(0, relpath.length(), relpath) == 0)
+        {
+            TDEBUG_TRACE("DirectoryStatus::status(" << relpath << "):"
+                << " found '" << e.path_ << "'");
+            if (e.status_ == 'r' || e.status_ == 'm')
+            {
+                modified = true;
+                break;
+            }
+            if (e.status_ == 'a')
+                added = true;
+        }
+    }
+
+    if (modified)
+        res = 'M';
+    else if (added)
+        res = 'A';
+    else
+        res = 'C';
+
+    TDEBUG_TRACE("DirectoryStatus::status(" << relpath << "): returns " << res);
+    return res;
+}
+
+
+int DirectoryStatus::read(const std::string& hgroot)
+{
+    v_.clear();
+
+    std::string p = hgroot + "\\.hg\\thgstatus";
+
+    FILE *f = fopen(p.c_str(), "rb");
+    if (!f)
+    {
+        TDEBUG_TRACE("DirectoryStatus::read: can't open " << p);
+        return 0;
+    }
+
+    char state;
+    std::vector<char> path(MAX_PATH);
+
+    DirectoryStatus::E e;
+
+    while (fread(&state, sizeof(state), 1, f) == 1)
+    {
+        e.status_ = state;
+
+        path.clear();
+        char t;
+        while (fread(&t, sizeof(t), 1, f) == 1 && t != '\n')
+        {
+            path.push_back(t);
+            if (path.size() > 1000)
+                return 0;
+        }
+        path.push_back(0);
+
+        e.path_ = &path[0];
+
+        v_.push_back(e);
+    }
+
+    fclose(f);
+
+    TDEBUG_TRACE("DirectoryStatus::read(" << hgroot << "): done. "
+        << v_.size() << " entries read");
+
+    return 1;
+}
+
+
 class Dirstatecache
 {
-    struct entry
+    struct E
     {
         Dirstate*       dstate;
-        __time64_t      mtime;
+        __time64_t      dstate_mtime;
+
+        DirectoryStatus* tstate;
+        __time64_t       tstate_mtime;
+
         std::string     hgroot;
         unsigned        tickcount;
 
-        entry(): dstate(0), mtime(0), tickcount(0) {}
+        E()
+        : dstate(0), dstate_mtime(0), 
+          tstate(0), tstate_mtime(0), tickcount(0) {}         
     };
 
-    typedef std::list<entry>::iterator Iter;
+    typedef std::list<E>::iterator Iter;
 
-    static std::list<entry> _cache;
+    static std::list<E> _cache;
 
 public:
-    static Dirstate* get(const std::string& hgroot);
+    static int get(const std::string& hgroot,
+        Dirstate*& outDirstate, DirectoryStatus*& outDirectoryStatus);
 };
 
-std::list<Dirstatecache::entry> Dirstatecache::_cache;
+std::list<Dirstatecache::E> Dirstatecache::_cache;
 
 
-Dirstate* Dirstatecache::get(const std::string& hgroot)
+int Dirstatecache::get(const std::string& hgroot,
+    Dirstate*& outDirstate, DirectoryStatus*& outDirectoryStatus)
 {
     Iter iter = _cache.begin();
 
@@ -133,7 +243,7 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
             _cache.back().dstate = 0;
             _cache.pop_back();
         }
-        entry e;
+        E e;
         e.hgroot = hgroot;
         _cache.push_front(e);
         iter = _cache.begin();
@@ -160,9 +270,9 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
         TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") ok ");
     }
 
-    if (stat_done && iter->mtime < stat.mtime)
+    if (stat_done && iter->dstate_mtime < stat.mtime)
     {
-        iter->mtime = stat.mtime;
+        iter->dstate_mtime = stat.mtime;
         if (iter->dstate) {
             delete iter->dstate;
             iter->dstate = 0;
@@ -178,7 +288,19 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
             << _cache.size() << " repos in cache");
     }
 
-    return iter->dstate;
+    delete iter->tstate;
+    iter->tstate = 0;
+
+    {
+        std::auto_ptr<DirectoryStatus> pds(new DirectoryStatus());
+        if (pds->read(hgroot))
+            iter->tstate = pds.release();
+    }
+
+    outDirstate = iter->dstate;
+    outDirectoryStatus = iter->tstate;
+
+    return 1;
 }
 
 
@@ -212,10 +334,13 @@ int HgQueryDirstate(
             || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
         return 0; // don't descend into .hg dir
 
-    Dirstate* pds = Dirstatecache::get(hgroot);
+    Dirstate* pds = 0;
+    DirectoryStatus* pts = 0;
+    Dirstatecache::get(hgroot, pds, pts);
     if (!pds)
     {
-        TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" << hgroot << ") returns 0");
+        TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 
+            << hgroot << ") returns no Dirstate");
         return 0;
     }
 
@@ -224,10 +349,10 @@ int HgQueryDirstate(
 
     if (PathIsDirectory(path.c_str()))
     {
-        Directory* dir = pds->root().getdir(relpath);
-        if (!dir)
+        if (!pts)
             return 0;
-        outStatus = dir->status(hgroot);
+            
+        outStatus = pts->status(relpath);
     }
     else
     {

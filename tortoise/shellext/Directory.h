@@ -35,9 +35,6 @@ class Directory
 
     DirsT  subdirs_;
     FilesT files_;
-    
-    unsigned tickcount_;
-    char status_;
 
 public:
     Directory(Directory* p, const std::string& n, const std::string& basepath);
@@ -50,12 +47,7 @@ public:
     const Direntry* get(const std::string& relpath) const;
     Directory* Directory::getdir(const std::string& n);
 
-    char status(const std::string& hgroot);
-
     void print() const;
-
-private:
-    char status_imp(const std::string& hgroot);
 };
 
 #endif
