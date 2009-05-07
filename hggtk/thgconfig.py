@@ -15,6 +15,7 @@ from hglib import RepoError, toutf, fromutf
 import shlib
 import shelve
 import iniparse
+import gdialog
 
 _unspecstr = '<unspecified>'
 
@@ -596,6 +597,10 @@ class ConfigDialog(gtk.Dialog):
             refreshlist = []
             for row in self.pathdata:
                 name = fromutf(row[0])
+                if not name:
+                    gdialog.Prompt(_('Invalid path'),
+                           _('Skipped saving path with no alias'), self).run()
+                    continue
                 path = fromutf(row[1])
                 cpath = '.'.join(['paths', name])
                 self.record_new_value(cpath, path, False)
