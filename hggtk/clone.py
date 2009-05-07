@@ -24,6 +24,7 @@ class CloneDialog(gtk.Window):
         title = 'hg clone'
         self.set_title(title)
 
+        self.ui = ui.ui()
         self._settings = shlib.Settings('clone')
         self._recent_src = self._settings.mrul('src_paths')
         self._recent_dest = self._settings.mrul('dest_paths')
@@ -92,7 +93,7 @@ class CloneDialog(gtk.Window):
         vbox.pack_start(srcbox, False, False, 2)
 
         # add pre-defined src paths to pull-down list
-        sympaths = [x[1] for x in ui.ui().configitems('paths')]
+        sympaths = [x[1] for x in self.ui.configitems('paths')]
         recent = [x for x in self._recent_src]
         syncsrc = [x for x in self._sync_src]
         paths = list(set(sympaths + recent + syncsrc))
@@ -157,7 +158,7 @@ class CloneDialog(gtk.Window):
         option_box.pack_start(self._opt_proxy, False, False)
         vbox.pack_start(option_box, False, False, 15)
 
-        if ui.ui().config('http_proxy', 'host', ''):
+        if self.ui.config('http_proxy', 'host'):
             self._opt_proxy.set_active(True)
         else:
             self._opt_proxy.set_sensitive(False)
@@ -217,7 +218,7 @@ class CloneDialog(gtk.Window):
 
         # update drop-down list
         self._srclist.clear()
-        sympaths = [x[1] for x in ui.ui().configitems('paths')]
+        sympaths = [x[1] for x in self.ui.configitems('paths')]
         paths = list(set(sympaths + [x for x in self._recent_src]))
         paths.sort()
         for p in paths:
@@ -276,9 +277,9 @@ class CloneDialog(gtk.Window):
                 cmdline.append('--uncompressed')
             if self._opt_pull.get_active():
                 cmdline.append('--pull')
-            if not (self._opt_proxy.get_active() and
-                    ui.ui().config('http_proxy', 'host', '')):
-                cmdline += ["--config", "http_proxy.host="]
+            if self.ui.config('http_proxy', 'host'):
+                if not self._opt_proxy.get_active():
+                    cmdline += ["--config", "http_proxy.host="]
             if remotecmd:
                 cmdline.append('--remotecmd')
                 cmdline.append(remotecmd)
