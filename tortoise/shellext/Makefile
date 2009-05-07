@@ -14,6 +14,7 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         ShellUtils2.o \
         StringUtils.o \
         dirstate.o \
+        Dirstatecache.o \
         QueryDirstate.o
 
 BASE_LDFLAGS=-lole32 -lkernel32 -luser32 -lgdi32 -lshlwapi -lwininet \

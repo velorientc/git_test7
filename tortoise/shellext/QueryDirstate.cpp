@@ -20,108 +20,11 @@
 #include "QueryDirstate.h"
 #include "dirstate.h"
 #include "DirectoryStatus.h"
+#include "Dirstatecache.h"
 #include "TortoiseUtils.h"
 #include "Winstat.h"
 
 #include <shlwapi.h>
-
-#include <vector>
-#include <list>
-
-
-#define HASH_LENGTH 20
-
-
-class Dirstatecache
-{
-    struct E
-    {
-        Dirstate*       dstate;
-        __time64_t      dstate_mtime;
-
-        std::string     hgroot;
-        unsigned        tickcount;
-
-        E(): dstate(0), dstate_mtime(0), tickcount(0) {}         
-    };
-
-public:
-    static Dirstate* get(const std::string& hgroot);
-};
-
-
-Dirstate* Dirstatecache::get(const std::string& hgroot)
-{
-    typedef std::list<E>::iterator Iter;
-
-    static std::list<Dirstatecache::E> _cache;
-
-    Iter iter = _cache.begin();
-
-    for (;iter != _cache.end(); ++iter)
-    {
-        if (hgroot == iter->hgroot)
-            break;
-    }
-
-    bool isnew = false;
-
-    if (iter == _cache.end())
-    {
-        if (_cache.size() >= 10)
-        {
-            TDEBUG_TRACE("Dirstatecache::get: dropping " << _cache.back().hgroot);
-            delete _cache.back().dstate;
-            _cache.back().dstate = 0;
-            _cache.pop_back();
-        }
-        E e;
-        e.hgroot = hgroot;
-        _cache.push_front(e);
-        iter = _cache.begin();
-        isnew = true;
-    }
-
-    unsigned tc = GetTickCount();
-
-    std::string path = hgroot + "\\.hg\\dirstate";
-
-    Winstat stat;
-
-    bool stat_done = false;
-
-    if (isnew || (tc - iter->tickcount) > 500)
-    {
-        if (0 != stat.lstat(path.c_str()))
-        {
-            TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") failed");
-            return 0;
-        }
-        iter->tickcount = tc;
-        stat_done = true;
-        TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") ok ");
-    }
-
-    if (stat_done && iter->dstate_mtime < stat.mtime)
-    {
-        iter->dstate_mtime = stat.mtime;
-        if (iter->dstate) {
-            delete iter->dstate;
-            iter->dstate = 0;
-            TDEBUG_TRACE("Dirstatecache::get: refreshing " << hgroot);
-        } else {
-            TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
-        }
-        unsigned tc0 = GetTickCount();
-        iter->dstate = Dirstate::read(path).release();
-        unsigned tc1 = GetTickCount();
-        unsigned delta = tc1 - tc0;
-        TDEBUG_TRACE("Dirstatecache::get: read done in " << delta << " ticks, "
-            << _cache.size() << " repos in cache");
-    }
-
-    return iter->dstate;
-}
 
 
 int HgQueryDirstate(
