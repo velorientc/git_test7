@@ -321,9 +321,6 @@ int HgQueryDirstate(
 
     std::string relpath = relpathptr;
 
-    if (relpath.empty())
-        return 0; // don't show icon on repo root dir
-
     for (size_t i = 0; i < relpath.size(); ++i)
     {
         if (relpath[i] == '\\')
