@@ -600,6 +600,10 @@ class GStatus(GDialog):
         files = [row[FM_PATH] for row in self.filemodel]
         self._show_diff_hunks(files)
 
+        # clear buffer after a merge commit
+        if not files and hasattr(self, 'merge_diff_text'):
+            self.merge_diff_text.set_buffer(gtk.TextBuffer())
+
         self.filetree.show()
         if self.mode == 'commit':
             self.text.grab_focus()
