@@ -97,15 +97,10 @@ class Dirstatecache
         Dirstate*       dstate;
         __time64_t      dstate_mtime;
 
-        DirectoryStatus* tstate;
-        __time64_t       tstate_mtime;
-
         std::string     hgroot;
         unsigned        tickcount;
 
-        E()
-        : dstate(0), dstate_mtime(0), 
-          tstate(0), tstate_mtime(0), tickcount(0) {}         
+        E(): dstate(0), dstate_mtime(0), tickcount(0) {}         
     };
 
     typedef std::list<E>::iterator Iter;
@@ -113,15 +108,13 @@ class Dirstatecache
     static std::list<E> _cache;
 
 public:
-    static int get(const std::string& hgroot,
-        Dirstate*& outDirstate, DirectoryStatus*& outDirectoryStatus);
+    static Dirstate* get(const std::string& hgroot);
 };
 
 std::list<Dirstatecache::E> Dirstatecache::_cache;
 
 
-int Dirstatecache::get(const std::string& hgroot,
-    Dirstate*& outDirstate, DirectoryStatus*& outDirectoryStatus)
+Dirstate* Dirstatecache::get(const std::string& hgroot)
 {
     Iter iter = _cache.begin();
 
@@ -187,19 +180,7 @@ int Dirstatecache::get(const std::string& hgroot,
             << _cache.size() << " repos in cache");
     }
 
-    delete iter->tstate;
-    iter->tstate = 0;
-
-    {
-        std::auto_ptr<DirectoryStatus> pds(new DirectoryStatus());
-        if (pds->read(hgroot))
-            iter->tstate = pds.release();
-    }
-
-    outDirstate = iter->dstate;
-    outDirectoryStatus = iter->tstate;
-
-    return 1;
+    return iter->dstate;
 }
 
 
@@ -230,9 +211,7 @@ int HgQueryDirstate(
             || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
         return 0; // don't descend into .hg dir
 
-    Dirstate* pds = 0;
-    DirectoryStatus* pts = 0;
-    Dirstatecache::get(hgroot, pds, pts);
+    Dirstate* pds = Dirstatecache::get(hgroot);
     if (!pds)
     {
         TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 
@@ -245,10 +224,11 @@ int HgQueryDirstate(
 
     if (PathIsDirectory(path.c_str()))
     {
-        if (!pts)
+        std::auto_ptr<DirectoryStatus> pds(new DirectoryStatus());
+        if (!pds->read(hgroot))
             return 0;
-            
-        outStatus = pts->status(relpath);
+
+        outStatus = pds->status(relpath);
     }
     else
     {
