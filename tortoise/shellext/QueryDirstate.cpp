@@ -45,19 +45,17 @@ class Dirstatecache
         E(): dstate(0), dstate_mtime(0), tickcount(0) {}         
     };
 
-    typedef std::list<E>::iterator Iter;
-
-    static std::list<E> _cache;
-
 public:
     static Dirstate* get(const std::string& hgroot);
 };
 
-std::list<Dirstatecache::E> Dirstatecache::_cache;
-
 
 Dirstate* Dirstatecache::get(const std::string& hgroot)
 {
+    typedef std::list<E>::iterator Iter;
+
+    static std::list<Dirstatecache::E> _cache;
+
     Iter iter = _cache.begin();
 
     for (;iter != _cache.end(); ++iter)
