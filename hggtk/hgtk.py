@@ -115,19 +115,19 @@ def _runcatch(ui, args):
             ui.flush()
     except hglib.ParseError, inst:
         if inst.args[0]:
-            ui.warn(_("hgtk %s: %s\n") % (inst.args[0], inst.args[1]))
+            ui.status(_("hgtk %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
-            ui.warn(_("hgtk: %s\n") % inst.args[1])
+            ui.status(_("hgtk: %s\n") % inst.args[1])
             help_(ui, 'shortlist')
     except hglib.AmbiguousCommand, inst:
-        ui.warn(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
+        ui.status(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
     except hglib.UnknownCommand, inst:
-        ui.warn(_("hgtk: unknown command '%s'\n") % inst.args[0])
+        ui.status(_("hgtk: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
     except hglib.RepoError, inst:
-        ui.warn(_("abort: %s!\n") % inst)
+        ui.status(_("abort: %s!\n") % inst)
 
     return -1
 
