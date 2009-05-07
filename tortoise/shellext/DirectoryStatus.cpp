@@ -101,9 +101,10 @@ struct CacheEntry
 {
     std::string     hgroot_;
     DirectoryStatus ds_;
+    bool            readfailed_;
     unsigned        tickcount_;
 
-    CacheEntry(): tickcount_(0) {};
+    CacheEntry(): readfailed_(false), tickcount_(0) {};
 };
 
 
@@ -113,17 +114,15 @@ DirectoryStatus* DirectoryStatus::get(const std::string& hgroot)
     
     unsigned tc = GetTickCount();
 
-    if (ce.hgroot_ == hgroot && (tc - ce.tickcount_) < 2000)
-        return &ce.ds_;
+    if (ce.hgroot_ != hgroot || (tc - ce.tickcount_) > 2000)
+    {
+        ce.hgroot_.clear();
+        ce.readfailed_ = (ce.ds_.read(hgroot) == 0);
+        ce.hgroot_ = hgroot;
+        ce.tickcount_ = GetTickCount();
+    }
 
-    ce.hgroot_.clear();
-
-    if (ce.ds_.read(hgroot) == 0)
-        return 0;
-
-    ce.hgroot_ = hgroot;
-    ce.tickcount_ = GetTickCount();
-    return &ce.ds_;
+    return (ce.readfailed_ ? 0 : &ce.ds_);
 }
 
 
