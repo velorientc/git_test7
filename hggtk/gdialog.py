@@ -164,7 +164,7 @@ class GDialog(gtk.Window):
 
 
     def load_settings(self, settings):
-        if settings:
+        if settings and 'gdialog' in settings:
             self._setting_defsize = settings['gdialog']
         else:
             self._setting_defsize = (678, 585)
