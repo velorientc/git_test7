@@ -47,23 +47,8 @@ class CloneDialog(gtk.Window):
         self.set_default_size(520, 180)
         ewidth = 16
 
-        # add toolbar with tooltips
-        self.tbar = gtk.Toolbar()
-        self.tips = gtk.Tooltips()
-
-        self._btn_clone = self._toolbutton(
-                gtk.STOCK_COPY,
-                _('clone'),
-                self._btn_clone_clicked,
-                tip=_('Clone a repository'))
-        tbuttons = [
-                self._btn_clone,
-            ]
-        for btn in tbuttons:
-            self.tbar.insert(btn, -1)
         vbox = gtk.VBox()
         self.add(vbox)
-        vbox.pack_start(self.tbar, False, False, 2)
 
         # clone source
         srcbox = gtk.HBox()
@@ -167,22 +152,34 @@ class CloneDialog(gtk.Window):
         lbl = gtk.Label(_('Remote Cmd:'))
         lbl.set_alignment(0, 0.5)
         self._remote_cmd = gtk.Entry()
-        vbox.pack_end(self._remote_cmd, False, False, 1)
-        vbox.pack_end(lbl, False, False, 1)
+        vbox.pack_start(self._remote_cmd, False, False, 1)
+        vbox.pack_start(lbl, False, False, 1)
 
-    def _toolbutton(self, stock, label, handler,
-                    menu=None, userdata=None, tip=None):
-        if menu:
-            tbutton = gtk.MenuToolButton(stock)
-            tbutton.set_menu(menu)
-        else:
-            tbutton = gtk.ToolButton(stock)
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = shlib.get_thg_modifier()
 
-        tbutton.set_label(label)
-        if tip:
-            tbutton.set_tooltip(self.tips, tip)
-        tbutton.connect('clicked', handler, userdata)
-        return tbutton
+        hbbox = gtk.HButtonBox()
+        hbbox.set_layout(gtk.BUTTONBOX_END)
+        vbox.pack_start(hbbox, False, False, 2)
+
+        close = gtk.Button(_('Close'))
+        close.connect('clicked', lambda x: self.destroy())
+        key, modifier = gtk.accelerator_parse('Escape')
+        close.add_accelerator('clicked', accelgroup, key, 0,
+                gtk.ACCEL_VISIBLE)
+        self._close_button = close
+        hbbox.add(close)
+
+        clone = gtk.Button(_('Clone'))
+        key, modifier = gtk.accelerator_parse(mod+'Return')
+        clone.add_accelerator('clicked', accelgroup, key, modifier,
+                gtk.ACCEL_VISIBLE)
+        clone.connect('activate', self._btn_clone_clicked)
+        hbbox.add(clone)
+
+        self._destlistbox.grab_focus()
+        self._destlistbox.child.connect('activate', self._btn_clone_clicked)
 
     def _btn_dest_clicked(self, button):
         """ select folder as clone destination """
@@ -306,6 +303,7 @@ class CloneDialog(gtk.Window):
 
         self._add_src_to_recent(src)
         self._add_dest_to_recent(dest)
+        self._close_button.grab_focus()
 
 def run(_ui, *pats, **opts):
     return CloneDialog(pats)
