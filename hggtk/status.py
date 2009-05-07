@@ -17,7 +17,7 @@ from mercurial.i18n import _
 from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff, extensions
 from mercurial import merge as merge_
 from hglib import toutf, fromutf, rootpath, diffexpand
-from gdialog import GDialog, Confirm, Prompt
+from gdialog import GDialog, Confirm, Prompt, NativeSaveFileDialogWrapper
 import dialog
 import shlib
 import hgshelve

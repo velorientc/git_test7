@@ -13,7 +13,7 @@ import StringIO
 from mercurial.i18n import _
 from mercurial.node import short, nullrev, nullid
 from mercurial import cmdutil, context, util, ui, hg, patch
-from gdialog import GDialog, Confirm
+from gdialog import GDialog, Confirm, NativeSaveFileDialogWrapper
 from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand, LookupError
 from gtklib import StatusBar
 import shlib
