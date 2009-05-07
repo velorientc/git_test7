@@ -24,7 +24,7 @@ def cachefilepath(repo):
 def dirname(f):
     return '/'.join(f.split('/')[:-1])
 
-def thgstatus(ui, repo, source='default', **opts):
+def thgstatus(ui, repo, **opts):
     '''update directory status cache for TortoiseHg
 
     Caches the information provided by 'hg status' in the file .hg/thgstatus
