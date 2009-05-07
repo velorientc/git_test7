@@ -139,8 +139,17 @@ class MergeDialog(gtk.Window):
         import commit
         dlg = commit.run(ui.ui())
         dlg.set_modal(True)
-        dlg.set_notify_func(self.notify_func, self.notify_args)
+        dlg.set_notify_func(self.commit_notify, dlg)
         dlg.display()
+
+    def commit_notify(self, dlg):
+        # refresh the log tool
+        if self.notify_func:
+            self.notify_func(self.notify_args)
+        # close merge dialog
+        self.destroy()
+        # close commit tool after allowing it to finish post-processing
+        gobject.idle_add(dlg.destroy)
 
     def undo(self, button, local, merge, commit):
         response = gdialog.Confirm(_('undo merge'), [], self,
