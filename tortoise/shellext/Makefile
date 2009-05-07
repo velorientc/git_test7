@@ -1,5 +1,9 @@
 
-OBJECTS_DIRSTATE = TortoiseUtils.o Direntry.o Directory.o Winstat.o
+OBJECTS_DIRSTATE = TortoiseUtils.o \
+        Direntry.o \
+        Directory.o \
+        Winstat.o \
+        DirectoryStatus.o
 
 OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         ContextMenu.o \

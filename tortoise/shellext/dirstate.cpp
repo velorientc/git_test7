@@ -18,6 +18,7 @@
 
 #include "dirstate.h"
 #include "Directory.h"
+#include "DirectoryStatus.h"
 #include "TortoiseUtils.h"
 #include "Winstat.h"
 
@@ -86,108 +87,6 @@ std::auto_ptr<Dirstate> Dirstate::read(const std::string& path)
     fclose(f);
 
     return pd;
-}
-
-
-class DirectoryStatus
-{
-    struct E
-    {
-        std::string path_;
-        char status_;
-
-        E(): status_(0) {}
-    };
-
-    typedef std::vector<E> V;
-    V v_;
-
-public:
-    int read(const std::string& hgroot);
-    char status(const std::string& relpath) const;
-};
-
-
-char DirectoryStatus::status(const std::string& relpath) const
-{
-    TDEBUG_TRACE("DirectoryStatus::status(" << relpath << ")");
-
-    char res = 'C';
-    bool added = false;
-    bool modified = false;
-
-    for (V::const_iterator i = v_.begin(); i != v_.end(); ++i)
-    {
-        const E& e = *i;
-        if (e.path_.compare(0, relpath.length(), relpath) == 0)
-        {
-            TDEBUG_TRACE("DirectoryStatus::status(" << relpath << "):"
-                << " found '" << e.path_ << "'");
-            if (e.status_ == 'r' || e.status_ == 'm')
-            {
-                modified = true;
-                break;
-            }
-            if (e.status_ == 'a')
-                added = true;
-        }
-    }
-
-    if (modified)
-        res = 'M';
-    else if (added)
-        res = 'A';
-    else
-        res = 'C';
-
-    TDEBUG_TRACE("DirectoryStatus::status(" << relpath << "): returns " << res);
-    return res;
-}
-
-
-int DirectoryStatus::read(const std::string& hgroot)
-{
-    v_.clear();
-
-    std::string p = hgroot + "\\.hg\\thgstatus";
-
-    FILE *f = fopen(p.c_str(), "rb");
-    if (!f)
-    {
-        TDEBUG_TRACE("DirectoryStatus::read: can't open " << p);
-        return 0;
-    }
-
-    char state;
-    std::vector<char> path(MAX_PATH);
-
-    DirectoryStatus::E e;
-
-    while (fread(&state, sizeof(state), 1, f) == 1)
-    {
-        e.status_ = state;
-
-        path.clear();
-        char t;
-        while (fread(&t, sizeof(t), 1, f) == 1 && t != '\n')
-        {
-            path.push_back(t);
-            if (path.size() > 1000)
-                return 0;
-        }
-        path.push_back(0);
-
-        e.path_ = &path[0];
-
-        v_.push_back(e);
-    }
-
-    fclose(f);
-
-    TDEBUG_TRACE("DirectoryStatus::read(" << hgroot << "): done. "
-        << v_.size() << " entries read");
-
-    return 1;
 }
 
 
