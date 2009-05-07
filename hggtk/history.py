@@ -672,8 +672,7 @@ class GLog(GDialog):
         from merge import MergeDialog
         rev = self.currow[treemodel.REVID]
         parents = [x.node() for x in self.repo.changectx(None).parents()]
-        node = short(self.repo.changelog.node(rev))
-        dialog = MergeDialog(self.repo.root, node)
+        dialog = MergeDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.set_notify_func(self.merge_completed, parents)
