@@ -59,7 +59,7 @@ def thgstatus(ui, repo, source='default', **opts):
         f.write(dirstatus[dn] + dn + '\n')
     f.close()
     ui.status(_("updated cached directory status: "
-        "%i modified, %i added, %i removed") % (nmodified, nadded, nremoved))
+        "%i modified, %i added, %i removed\n") % (nmodified, nadded, nremoved))
 
 cmdtable = {
     'thgstatus':
