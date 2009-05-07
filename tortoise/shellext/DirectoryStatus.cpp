@@ -95,3 +95,35 @@ int DirectoryStatus::read(const std::string& hgroot)
 
     return 1;
 }
+
+
+struct CacheEntry
+{
+    std::string     hgroot_;
+    DirectoryStatus ds_;
+    unsigned        tickcount_;
+
+    CacheEntry(): tickcount_(0) {};
+};
+
+
+DirectoryStatus* DirectoryStatus::get(const std::string& hgroot)
+{
+    static CacheEntry ce;
+    
+    unsigned tc = GetTickCount();
+
+    if (ce.hgroot_ == hgroot && (tc - ce.tickcount_) < 2000)
+        return &ce.ds_;
+
+    ce.hgroot_.clear();
+
+    if (ce.ds_.read(hgroot) == 0)
+        return 0;
+
+    ce.hgroot_ = hgroot;
+    ce.tickcount_ = GetTickCount();
+    return &ce.ds_;
+}
+
+

@@ -32,6 +32,9 @@ class DirectoryStatus
     V v_;
 
 public:
-    int read(const std::string& hgroot);
+    static DirectoryStatus* get(const std::string& hgroot);
     char status(const std::string& relpath) const;
+
+private:
+    int read(const std::string& hgroot);
 };

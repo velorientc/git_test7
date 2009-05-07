@@ -56,8 +56,8 @@ int HgQueryDirstate(
 
     if (PathIsDirectory(path.c_str()))
     {
-        std::auto_ptr<DirectoryStatus> pds(new DirectoryStatus());
-        if (!pds->read(hgroot))
+        DirectoryStatus* pds = DirectoryStatus::get(hgroot);
+        if (!pds)
             return 0;
 
         outStatus = pds->status(relpath);
