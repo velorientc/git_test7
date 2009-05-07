@@ -276,7 +276,7 @@ class CloneDialog(gtk.Window):
                 cmdline.append('--pull')
             if self.ui.config('http_proxy', 'host'):
                 if not self._opt_proxy.get_active():
-                    cmdline += ["--config", "http_proxy.host="]
+                    cmdline += ['--config', 'http_proxy.host=']
             if remotecmd:
                 cmdline.append('--remotecmd')
                 cmdline.append(remotecmd)
