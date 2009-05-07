@@ -30,7 +30,7 @@ char DirectoryStatus::status(const std::string& relpath) const
         const E& e = *i;
         if (e.path_.compare(0, relpath.length(), relpath) == 0)
         {
-            if (e.status_ == 'r' || e.status_ == 'm')
+            if (e.status_ == 'm' || e.status_ == 'r')
             {
                 modified = true;
                 break;
