@@ -369,7 +369,6 @@ class GStatus(GDialog):
 
             # differentiate rejected hunks
             self.rejfont = self.difffont.copy()
-            #self.rejfont.set_style(pango.STYLE_ITALIC)
             self.rejfont.set_weight(pango.WEIGHT_LIGHT)
             diffcol.add_attribute(cell, 'font-desc', DM_FONT)
             cell.set_property('background', '#EEEEEE')
@@ -382,14 +381,6 @@ class GStatus(GDialog):
             self.filetree.get_selection().connect('changed',
                     self._tree_selection_changed, False)
             scroller.add(self.diff_tree)
-
-            #vbox = gtk.VBox()
-            #self.selectlabel = gtk.Label()
-            #hbox = gtk.HBox()
-            #hbox.pack_start(self.selectlabel, False, False, 2)
-            #vbox.pack_start(hbox, False, False, 2)
-            #vbox.pack_start(scroller, True, True, 2)
-            #diff_frame.add(vbox)
             diff_frame.add(scroller)
 
         if self.diffbottom:
