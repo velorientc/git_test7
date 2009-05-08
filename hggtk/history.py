@@ -456,8 +456,7 @@ class GLog(GDialog):
         self._vpaned = gtk.VPaned()
         self._vpaned.pack1(self.tree_frame, True, False)
         self._vpaned.pack2(self._hpaned)
-        self._vpaned.set_position(self._setting_vpos)
-        self._hpaned.set_position(self._setting_hpos)
+        gobject.idle_add(self.realize_settings)
 
         vbox = gtk.VBox()
         vbox.pack_start(self._vpaned, True, True)
@@ -465,8 +464,11 @@ class GLog(GDialog):
         # Append status bar
         vbox.pack_start(gtk.HSeparator(), False, False)
         vbox.pack_start(self.stbar, False, False)
-
         return vbox
+
+    def realize_settings(self):
+        self._vpaned.set_position(self._setting_vpos)
+        self._hpaned.set_position(self._setting_hpos)
 
     def thgdiff(self, treeview):
         'ctrl-d handler'

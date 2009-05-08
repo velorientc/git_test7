@@ -10,6 +10,7 @@
 import os
 import cStringIO
 import gtk
+import gobject
 import pango
 import gobject
 
@@ -398,11 +399,14 @@ class GStatus(GDialog):
 
         self._diffpane.pack1(tree_frame, True, False)
         self._diffpane.pack2(diff_frame, True, True)
-        self._diffpane.set_position(self._setting_pos)
         self._diffpane_moved_id = self._diffpane.connect('notify::position',
                 self._diffpane_moved)
         self.filetree.set_headers_clickable(True)
+        gobject.idle_add(self.realize_status_settings)
         return self._diffpane
+
+    def realize_status_settings(self):
+        self._diffpane.set_position(self._setting_pos)
 
     def search_filelist(self, model, column, key, iter):
         'case insensitive filename search'

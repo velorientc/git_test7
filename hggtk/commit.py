@@ -9,6 +9,7 @@
 import os
 import errno
 import gtk
+import gobject
 import pango
 import tempfile
 import cStringIO
@@ -247,8 +248,11 @@ class GCommit(GStatus):
         self._vpaned = gtk.VPaned()
         self._vpaned.add1(vbox)
         self._vpaned.add2(status_body)
-        self._vpaned.set_position(self._setting_vpos)
+        gobject.idle_add(self.realize_settings)
         return self._vpaned
+
+    def realize_settings(self):
+        self._vpaned.set_position(self._setting_vpos)
 
     def thgaccept(self, window):
         self._commit_clicked(None)
