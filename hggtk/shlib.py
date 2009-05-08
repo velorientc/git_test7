@@ -7,17 +7,15 @@ of the GNU General Public License, incorporated herein by reference.
 
 """
 
-import dumbdbm, anydbm
-anydbm._defaultmod = dumbdbm
-
 import os
 import sys
 import gtk
-import shelve
+import cPickle
 import time
 import hgtk
 import gobject
 from mercurial.i18n import _
+from mercurial import util
 
 class SimpleMRUList(object):
     def __init__(self, size=10, reflist=[], compact=True):
@@ -90,37 +88,30 @@ class Settings(object):
 
     def read(self):
         self._data.clear()
-        if not os.path.exists(self._path+'.dat'):
-            return
-        dbase = shelve.open(self._path)
-        try:
-            self._dbappname = dbase['APPNAME']
-            self.version = dbase['VERSION']
-            self._data.update(dbase.get('DATA', {}))
-        except KeyError:
-            pass
-        dbase.close()
+        if os.path.exists(self._path):
+            try:
+                f = file(self._path, 'rb')
+                self._data = cPickle.loads(f.read())
+                f.close()
+            except Exception:
+                pass
 
     def write(self):
         self._write(self._path, self._data)
 
     def _write(self, appname, data):
-        dbase = shelve.open(self._get_path(appname))
-        dbase['VERSION'] = Settings.version
-        dbase['APPNAME'] = appname
-        dbase['DATA'] = data
-        try:
-            dbase.close()
-        except IOError:
-            pass # Don't care too much about permission errors
-
+        s = cPickle.dumps(data)
+        f = util.atomictempfile(appname, 'wb', None)
+        f.write(s)
+        f.rename()
 
     def _get_path(self, appname):
         if os.name == 'nt':
-            return os.path.join(os.environ.get('APPDATA'), 'TortoiseHg', appname)
+            return os.path.join(os.environ.get('APPDATA'), 'TortoiseHg',
+                    appname)
         else:
             return os.path.join(os.path.expanduser('~'), '.tortoisehg',
-                    'settings', appname)
+                    appname)
 
     def _audit(self):
         if os.path.exists(os.path.dirname(self._path)):
