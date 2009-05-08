@@ -93,9 +93,12 @@ class Settings(object):
         if not os.path.exists(self._path+'.dat'):
             return
         dbase = shelve.open(self._path)
-        self._dbappname = dbase['APPNAME']
-        self.version = dbase['VERSION']
-        self._data.update(dbase.get('DATA', {}))
+        try:
+            self._dbappname = dbase['APPNAME']
+            self.version = dbase['VERSION']
+            self._data.update(dbase.get('DATA', {}))
+        except KeyError:
+            pass
         dbase.close()
 
     def write(self):
@@ -212,6 +215,7 @@ if os.name == 'nt':
     def shell_notify(paths):
         try:
             from win32com.shell import shell, shellcon
+            import pywintypes
         except ImportError:
             return
         dirs = []
@@ -224,7 +228,10 @@ if os.name == 'nt':
         # send notifications to deepest directories first
         dirs.sort(lambda x, y: len(y) - len(x))
         for dir in dirs:
-            pidl, ignore = shell.SHILCreateFromPath(dir, 0)
+            try:
+                pidl, ignore = shell.SHILCreateFromPath(dir, 0)
+            except pywintypes.com_error:
+                return
             if pidl is None:
                 continue
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM,
