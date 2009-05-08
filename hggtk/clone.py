@@ -7,7 +7,7 @@
 import gtk
 import os
 import pango
-from dialog import error_dialog
+import gdialog
 from mercurial import hg, ui, cmdutil, util
 from mercurial.i18n import _
 import shlib
@@ -245,13 +245,14 @@ class CloneDialog(gtk.Window):
 
         # verify input
         if src == '':
-            error_dialog(self, _('Source path is empty'), _('Please enter'))
+            gdialog.Prompt(_('Source path is empty'),
+                    _('Please enter a valid source path'), self).run()
             self._src_input.grab_focus()
             return False
 
         if src == dest:
-            error_dialog(self, _('Source and dest are the same'),
-                    _('Please specify a different destination'))
+            gdialog.Prompt(_('Source and dest are the same'),
+                    _('Please specify a different destination'), self).run()
             self._dest_input.grab_focus()
             return False
 
@@ -297,11 +298,12 @@ class CloneDialog(gtk.Window):
             dlg.run()
             dlg.hide()
         except util.Abort, inst:
-            error_dialog(self, _('Clone aborted'), str(inst))
+            gdialog.Prompt(_('Clone aborted'), str(inst), self).run()
             return False
         except:
             import traceback
-            error_dialog(self, _('Clone error'), traceback.format_exc())
+            gdialog.Prompt(_('Clone error'),
+                    traceback.format_exc(), self).run()
             return False
 
         self._add_src_to_recent(src)
