@@ -173,7 +173,7 @@ class CloneDialog(gtk.Window):
         key, modifier = gtk.accelerator_parse(mod+'Return')
         clone.add_accelerator('clicked', accelgroup, key, modifier,
                 gtk.ACCEL_VISIBLE)
-        clone.connect('activate', self._btn_clone_clicked)
+        clone.connect('clicked', self._btn_clone_clicked)
         hbbox.add(clone)
 
         self._destlistbox.grab_focus()
