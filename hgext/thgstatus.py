@@ -17,12 +17,16 @@
 
 from mercurial.i18n import _
 from mercurial import commands
+import os
 
 def cachefilepath(repo):
     return repo.root + "/.hg/thgstatus"
 
 def dirname(f):
     return '/'.join(f.split('/')[:-1])
+
+def showentry(f, e):
+    f("%s %s\n" % (e[0], e[1:-1]))
 
 def thgstatus(ui, repo, **opts):
     '''update directory status cache for TortoiseHg
@@ -37,6 +41,23 @@ def thgstatus(ui, repo, **opts):
     If the file is empty, then the repo is clean.
     '''
 
+    if opts.get('remove'):
+        try:
+            os.remove(cachefilepath(repo))
+        except OSError:
+            pass
+        return
+
+    if opts.get('show'):
+        try:
+            f = open(cachefilepath(repo), 'rb')
+            for e in f:
+                showentry(ui.status, e)
+            f.close()
+        except IOError:
+            ui.status("*no status*\n")
+        return
+
     repostate = repo.status()
     modified, added, removed, deleted, unknown, ignored, clean = repostate
     dirstatus = {}
@@ -48,12 +69,16 @@ def thgstatus(ui, repo, **opts):
         dirstatus[dirname(fn)] = 'r'
     f = open(cachefilepath(repo), 'wb')
     for dn in sorted(dirstatus):
-        f.write(dirstatus[dn] + dn + '\n')
+        e = dirstatus[dn] + dn + '\n'
+        f.write(e)
+        showentry(ui.note, e)
     f.close()
 
 cmdtable = {
     'thgstatus':
         (thgstatus,
-        [ ],
+        [ ('',  'remove', None, _('remove the status file')),
+          ('s', 'show', None, _('just show the contents of '
+                                'the status file (no update)')) ],
         _('hg thgstatus')),
 }
