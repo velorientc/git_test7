@@ -281,7 +281,8 @@ class GLog(GDialog):
         GDialog.load_settings(self, settings)
         self._setting_vpos = -1
         self._setting_hpos = -1
-        self._show_rev, self._show_date, self._show_id, self._show_branch = True, True, False, False
+        (self._show_rev, self._show_date, self._show_id,
+                self._show_branch) = True, True, False, False
         if settings:
             data = settings['glog']
             if type(data) == int:
@@ -293,7 +294,8 @@ class GLog(GDialog):
                  self._show_rev, self._show_date, self._show_id) = data
             elif len(data) == 6:
                 (self._setting_vpos, self._setting_hpos,
-                 self._show_rev, self._show_date, self._show_id, self._show_branch) = data
+                 self._show_rev, self._show_date, self._show_id,
+                 self._show_branch) = data
 
     def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""
