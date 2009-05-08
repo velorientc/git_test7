@@ -89,9 +89,12 @@ class Settings(object):
         if not os.path.exists(self._path+'.dat'):
             return
         dbase = shelve.open(self._path)
-        self._dbappname = dbase['APPNAME']
-        self.version = dbase['VERSION']
-        self._data.update(dbase.get('DATA', {}))
+        try:
+            self._dbappname = dbase['APPNAME']
+            self.version = dbase['VERSION']
+            self._data.update(dbase.get('DATA', {}))
+        except KeyError:
+            pass
         dbase.close()
 
     def write(self):
