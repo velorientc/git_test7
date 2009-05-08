@@ -43,7 +43,7 @@ class CloneDialog(gtk.Window):
 
     def _create(self):
         self.set_default_size(520, 180)
-        ewidth = 16
+        ewidth = 18
 
         vbox = gtk.VBox()
         self.add(vbox)
