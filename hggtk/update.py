@@ -35,7 +35,7 @@ class UpdateDialog(gtk.Window):
             gobject.idle_add(self.destroy)
             return
 
-        title = "hg update - %s" % hglib.toutf(os.path.basename(repo.root))
+        title = _('Update - %s') % hglib.toutf(os.path.basename(repo.root))
         self.set_title(title)
 
         vbox = gtk.VBox()

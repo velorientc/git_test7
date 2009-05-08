@@ -117,9 +117,10 @@ class ServeDialog(gtk.Window):
         self.webname = repo.ui.config('web', 'name') or \
                 os.path.basename(self._root)
         if self._webdirconf:
-            self.set_title("hg serve %s - %s" % (self._webdirconf, self.webname))
+            self.set_title(_('Serve %s - %s') %
+                    (self._webdirconf, self.webname))
         else:
-            self.set_title("hg serve - " + self.webname)
+            self.set_title(_('Serve - ') + self.webname)
 
     def _toolbutton(self, stock, label, handler, menu=None,
             userdata=None, tip=None):

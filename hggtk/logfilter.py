@@ -26,7 +26,7 @@ class FilterDialog(gtk.Dialog):
         self._btn_apply.connect('clicked', self._btn_apply_clicked)
         self.action_area.pack_end(self._btn_apply)
 
-        self.set_title("hg log filter - %s" % os.path.basename(root))
+        self.set_title(_("Log Filter - %s") % os.path.basename(root))
 
         self.filterfunc = filterfunc
 

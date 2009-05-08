@@ -15,6 +15,7 @@ import re
 from graphcell import CellRendererGraph
 from revgraph import *
 from mercurial.node import hex
+from mercurial.i18n import _
 
 
 class TreeView(gtk.ScrolledWindow):
@@ -328,7 +329,7 @@ class TreeView(gtk.ScrolledWindow):
         self.add(self.treeview)
 
         self.graph_cell = CellRendererGraph()
-        self.graph_column = gtk.TreeViewColumn('Graph')
+        self.graph_column = gtk.TreeViewColumn(_('Graph'))
         self.graph_column.set_resizable(True)
         self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.graph_column.pack_start(self.graph_cell, expand=False)
@@ -343,7 +344,7 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 8)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.rev_column = gtk.TreeViewColumn("Rev")
+        self.rev_column = gtk.TreeViewColumn(_('Rev'))
         self.rev_column.set_visible(False)
         self.rev_column.set_resizable(True)
         self.rev_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
@@ -356,7 +357,7 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.id_column = gtk.TreeViewColumn("ID")
+        self.id_column = gtk.TreeViewColumn(_('ID'))
         self.id_column.set_visible(False)
         self.id_column.set_resizable(True)
         self.id_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
@@ -369,7 +370,7 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.branch_column = gtk.TreeViewColumn("Branch")
+        self.branch_column = gtk.TreeViewColumn(_('Branch'))
         self.branch_column.set_visible(False)
         self.branch_column.set_resizable(True)
         self.branch_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
@@ -382,7 +383,7 @@ class TreeView(gtk.ScrolledWindow):
 
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.msg_column = gtk.TreeViewColumn("Summary")
+        self.msg_column = gtk.TreeViewColumn(_('Summary'))
         self.msg_column.set_resizable(True)
         self.msg_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.msg_column.set_fixed_width(cell.get_size(self.treeview)[2])
@@ -394,7 +395,7 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.committer_column = gtk.TreeViewColumn("User")
+        self.committer_column = gtk.TreeViewColumn(_('User'))
         self.committer_column.set_resizable(True)
         self.committer_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.committer_column.set_fixed_width(cell.get_size(self.treeview)[2])
@@ -407,7 +408,7 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.date_column = gtk.TreeViewColumn("Date")
+        self.date_column = gtk.TreeViewColumn(_('Date'))
         self.date_column.set_visible(False)
         self.date_column.set_resizable(True)
         self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)

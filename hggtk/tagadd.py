@@ -20,9 +20,7 @@ class TagAddDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         shlib.set_tortoise_keys(self)
 
-        # set dialog title
-        title = 'hg tag '
-        title += ' - %s' % (root or os.getcwd())
+        title = _('TortoiseHg Tag - %s') % (root or os.getcwd())
         self.set_title(title)
 
         self.root = root

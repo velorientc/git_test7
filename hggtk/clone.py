@@ -20,9 +20,7 @@ class CloneDialog(gtk.Window):
         shlib.set_tortoise_icon(self, 'menuclone.ico')
         shlib.set_tortoise_keys(self)
 
-        # set dialog title
-        title = 'hg clone'
-        self.set_title(title)
+        self.set_title(_('TortoiseHg Clone'))
 
         self.ui = ui.ui()
         self._settings = shlib.Settings('clone')
