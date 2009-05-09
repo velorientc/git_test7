@@ -163,7 +163,7 @@ class GCommit(GStatus):
         if index >= 0:
             buf = self.text.get_buffer()
             if buf.get_char_count() and buf.get_modified():
-                response = Confirm(_('Discard Message'), [], self,
+                response = Confirm(_('Confirm Discard Message'), [], self,
                         _('Discard current commit message?')).run()
                 if response != gtk.RESPONSE_YES:
                     combobox.set_active(-1)
@@ -280,7 +280,7 @@ class GCommit(GStatus):
         live = False
         buf = self.text.get_buffer()
         if buf.get_char_count() > 10 and buf.get_modified():
-            dialog = Confirm(_('Exit'), [], self,
+            dialog = Confirm(_('Confirm Exit'), [], self,
                     _('Save commit message at exit?'))
             res = dialog.run()
             if res == gtk.RESPONSE_YES:
@@ -505,7 +505,8 @@ class GCommit(GStatus):
 
 
     def _undo_clicked(self, toolbutton, data=None):
-        response = Confirm(_('Undo commit'), [], self, _('Undo last commit')).run()
+        response = Confirm(_('Confirm Undo commit'),
+                [], self, _('Undo last commit')).run()
         if response != gtk.RESPONSE_YES:
             return
 
@@ -529,7 +530,7 @@ class GCommit(GStatus):
         if self.test_opt('addremove'):
             return True
         else:
-            response = Confirm(_('Add/Remove'), files, self).run()
+            response = Confirm(_('Confirm Add/Remove'), files, self).run()
             if response == gtk.RESPONSE_YES:
                 # This will stay set for further commits (meaning no more prompts). Problem?
                 self.opts['addremove'] = True
@@ -559,7 +560,7 @@ class GCommit(GStatus):
                              buf.get_end_iter()).splitlines()
         
         if sumlen and len(lines[0].rstrip()) > sumlen:
-            resp = Confirm(_('Commit'), [], self,
+            resp = Confirm(_('Confirm Commit'), [], self,
                            _('The summary line length of %i is greater than'
                              ' %i.\n\nIgnore format policy and continue'
                              ' commit?') %
@@ -567,7 +568,7 @@ class GCommit(GStatus):
             if resp != gtk.RESPONSE_YES:
                 return False
         if sumlen and len(lines) > 1 and len(lines[1].strip()):
-            resp = Confirm(_('Commit'), [], self,
+            resp = Confirm(_('Confirm Commit'), [], self,
                            _('The summary line is not followed by a blank'
                              ' line.\n\nIgnore format policy and continue'
                              ' commit?')).run()
@@ -579,7 +580,7 @@ class GCommit(GStatus):
             errs = [str(x[1]+start+1) for x in zip(tmp, range(len(tmp)))
                     if x[0]]
             if errs:
-                resp = Confirm(_('Commit'), [], self,
+                resp = Confirm(_('Confirm Commit'), [], self,
                                _('The following lines are over the %i-'
                                  'character limit: %s.\n\nIgnore format'
                                  ' policy and continue commit?') %
@@ -618,13 +619,13 @@ class GCommit(GStatus):
             newbranch = fromutf(self.nextbranch)
             if newbranch in self.repo.branchtags():
                 if newbranch not in [p.branch() for p in self.repo.parents()]:
-                    response = Confirm(_('Override Branch'), [], self,
+                    response = Confirm(_('Confirm Override Branch'), [], self,
                         _('A branch named "%s" already exists,\n'
                         'override?') % newbranch).run()
                 else:
                     response = gtk.RESPONSE_YES
             else:
-                response = Confirm(_('New Branch'), [], self,
+                response = Confirm(_('Confirm New Branch'), [], self,
                         _('Create new named branch "%s"?') % newbranch).run()
             if response == gtk.RESPONSE_YES:
                 self.repo.dirstate.setbranch(newbranch)

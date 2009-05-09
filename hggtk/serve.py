@@ -151,7 +151,7 @@ class ServeDialog(gtk.Window):
         check if server is running, or to terminate if running
         '''
         if gservice and not gservice.stopped:
-            ret = gdialog.Confirm(_('Really Exit?'), [], self,
+            ret = gdialog.Confirm(_('Confirm Really Exit?'), [], self,
                     _('Server process is still running\n'
                       'Exiting will stop the server.')).run()
             if ret == gtk.RESPONSE_YES:

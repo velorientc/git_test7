@@ -152,7 +152,7 @@ class MergeDialog(gtk.Window):
         gobject.idle_add(dlg.destroy)
 
     def undo(self, button, local, merge, commit):
-        response = gdialog.Confirm(_('undo merge'), [], self,
+        response = gdialog.Confirm(_('Confirm undo merge'), [], self,
                        _('Clean checkout of original revision?')).run()
         if response != gtk.RESPONSE_YES:
             return

@@ -74,7 +74,7 @@ class Confirm(SimpleMessage):
     def __init__(self, title, files, parent, primary=None):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
-        self.set_title(hglib.toutf(_('Confirm ') + title))
+        self.set_title(hglib.toutf(title))
         if primary is None:
             primary = title + ' file' + ((len(files) > 1 and 's') or '') + '?'
         primary = '<b>' + primary + '</b>'

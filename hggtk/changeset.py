@@ -721,7 +721,7 @@ class ChangeSet(GDialog):
     def _revert_file(self, menuitem):
         '''User selected file revert from the file list context menu'''
         rev = self.currev
-        dialog = Confirm(_('revert file to old revision'), [], self,
+        dialog = Confirm(_('Confirm revert file to old revision'), [], self,
                 _('Revert %s to contents at revision %d?') % (self.curfile, rev))
         if dialog.run() == gtk.RESPONSE_NO:
             return

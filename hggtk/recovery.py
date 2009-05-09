@@ -114,7 +114,7 @@ class RecoveryDialog(gtk.Window):
         return tbutton
 
     def _clean_clicked(self, toolbutton, data=None):
-        response = gdialog.Confirm(_('Clean repository'), [], self,
+        response = gdialog.Confirm(_('Confirm clean repository'), [], self,
                 "%s ?" % os.path.basename(self.root)).run()
         if response != gtk.RESPONSE_YES:
             return
@@ -133,7 +133,7 @@ class RecoveryDialog(gtk.Window):
         shlib.shell_notify([self.root])
 
     def _rollback_clicked(self, toolbutton, data=None):
-        response = gdialog.Confirm(_('Rollback repository'), [], self,
+        response = gdialog.Confirm(_('Confirm rollback repository'), [], self,
                 "%s ?" % os.path.basename(self.root)).run()
         if response != gtk.RESPONSE_YES:
             return

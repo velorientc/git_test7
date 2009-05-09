@@ -483,7 +483,7 @@ class GLog(GDialog):
 
     def _strip_rev(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        res = Confirm(_('Strip Revision(s)'), [], self,
+        res = Confirm(_('Confirm Strip Revision(s)'), [], self,
                 _('Remove revision %d and all descendants?') % rev).run()
         if res != gtk.RESPONSE_YES:
             return
@@ -510,7 +510,7 @@ class GLog(GDialog):
 
     def _revert(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        res = Confirm(_('Revert Revision(s)'), [], self,
+        res = Confirm(_('Confirm Revert Revision(s)'), [], self,
                 _('Revert all files to revision %d?\nThis will overwrite your '
                   'local changes') % rev).run()
 
