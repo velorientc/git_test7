@@ -194,20 +194,20 @@ class GStatus(GDialog):
 
     def save_settings(self):
         settings = GDialog.save_settings(self)
-        settings['gstatus'] = (self._diffpane.get_position(),
-                               self._setting_lastpos)
+        settings['gstatus-hpane'] = self._diffpane.get_position()
+        settings['gstatus-lastpos'] = self._setting_lastpos
         return settings
 
 
     def load_settings(self, settings):
         GDialog.load_settings(self, settings)
-        if settings:
-            mysettings = settings['gstatus']
-            self._setting_pos = mysettings[0]
-            self._setting_lastpos = mysettings[1]
-        else:
-            self._setting_pos = 270
-            self._setting_lastpos = 64000
+        self._setting_pos = 270
+        self._setting_lastpos = 64000
+        try:
+            self._setting_pos = settings['gstatus-hpane']
+            self._setting_lastpos = settings['gstatus-lastpos']
+        except KeyError:
+            pass
         self.mqmode = None
         if hasattr(self.repo, 'mq') and self.repo.mq.applied:
             self.mqmode = True

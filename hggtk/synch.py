@@ -32,7 +32,6 @@ class SynchDialog(gtk.Window):
 
         # persistent app data
         self._settings = shlib.Settings('synch')
-        self._recent_src = self._settings.mrul('src_paths')
 
         self.set_default_size(655, 552)
 
@@ -555,8 +554,8 @@ class SynchDialog(gtk.Window):
         if os.path.exists(src):
             src = os.path.abspath(src)
 
-        # save path to recent list in history
-        self._recent_src.add(src)
+        # save src path to recent list in history (read by clone tool)
+        self._settings.mrul('src_paths').add(src)
         self._settings.write()
 
         # update drop-down list

@@ -19,16 +19,13 @@ class CloneDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         shlib.set_tortoise_icon(self, 'menuclone.ico')
         shlib.set_tortoise_keys(self)
-
+        self.set_default_size(520, 180)
         self.set_title(_('TortoiseHg Clone'))
 
         self.ui = ui.ui()
         self._settings = shlib.Settings('clone')
         self._recent_src = self._settings.mrul('src_paths')
         self._recent_dest = self._settings.mrul('dest_paths')
-
-        sync_settings = shlib.Settings('synch')
-        self._sync_src = sync_settings.mrul('src_paths')
 
         self._src_path = os.getcwd()
         self._dest_path = self._src_path
@@ -38,11 +35,6 @@ class CloneDialog(gtk.Window):
         elif len(repos):
             self._src_path = repos[0]
 
-        # build dialog
-        self._create()
-
-    def _create(self):
-        self.set_default_size(520, 180)
         ewidth = 18
 
         vbox = gtk.VBox()
@@ -76,9 +68,10 @@ class CloneDialog(gtk.Window):
         vbox.pack_start(srcbox, False, False, 2)
 
         # add pre-defined src paths to pull-down list
+        sync_src = shlib.Settings('synch').mrul('src_paths')
         sympaths = [x[1] for x in self.ui.configitems('paths')]
         recent = [x for x in self._recent_src]
-        syncsrc = [x for x in self._sync_src]
+        syncsrc = [x for x in sync_src]
         paths = list(set(sympaths + recent + syncsrc))
         paths.sort()
         for p in paths:

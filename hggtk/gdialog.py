@@ -115,8 +115,6 @@ class GDialog(gtk.Window):
     """
 
     # "Constants"
-    settings_version = 1
-
     def __init__(self, ui, repo, cwd, pats, opts):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.cwd = cwd or os.getcwd()
@@ -187,16 +185,16 @@ class GDialog(gtk.Window):
         return settings
 
 
-    def load_settings(self, settings={}):
+    def load_settings(self, settings):
         self._setting_defsize = (678, 585)
         self._setting_winpos = (0, 0)
         self._setting_wasmax = False
-        if 'gdialog-rect' in settings:
+        try:
             self._setting_defsize = settings['gdialog-rect']
-        if 'gdialog-pos' in settings:
             self._setting_winpos = settings['gdialog-pos']
-        if 'gdialog-ismax' in settings:
             self._setting_wasmax = settings['gdialog-ismax']
+        except KeyError:
+            pass
 
     ### End of overridable methods ###
 
@@ -343,21 +341,16 @@ class GDialog(gtk.Window):
             vbox.pack_end(extras, False, False, 0)
 
         self.connect('destroy', self._destroying)
-        #self.connect('delete_event', self.should_live)
 
 
     def _destroying(self, gtkobj):
         settings = self.save_settings()
-        self.settings.set_value('settings_version', GDialog.settings_version)
         self.settings.set_value('dialogs', settings)
         self.settings.write()
 
 
     def _load_settings(self):
-        settings = {}
-        version = self.settings.get_value('settings_version', None)
-        if version == GDialog.settings_version:
-            settings = self.settings.get_value('dialogs', {})
+        settings = self.settings.get_value('dialogs', {})
         self.load_settings(settings)
 
 

@@ -408,7 +408,7 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
         self.pages = []
         self.tooltips = gtk.Tooltips()
-        self.history = shlib.Settings('config_history')
+        self.history = shlib.Settings('thgconfig')
 
         # create pages for each section of configuration file
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')

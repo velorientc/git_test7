@@ -133,16 +133,17 @@ class GCommit(GStatus):
 
     def save_settings(self):
         settings = GStatus.save_settings(self)
-        settings['gcommit'] = self._vpaned.get_position()
+        settings['commit-vpane'] = self._vpaned.get_position()
         return settings
 
 
     def load_settings(self, settings):
         GStatus.load_settings(self, settings)
-        if settings:
-            self._setting_vpos = settings['gcommit']
-        else:
-            self._setting_vpos = -1
+        self._setting_vpos = -1
+        try:
+            self._setting_vpos = settings['commit-vpane']
+        except KeyError:
+            pass
 
 
     def get_tbbuttons(self):

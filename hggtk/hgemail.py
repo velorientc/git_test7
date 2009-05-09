@@ -205,7 +205,7 @@ class EmailDialog(gtk.Window):
             for v in history.get_value(cpath):
                 vlist.append([v])
 
-        history = shlib.Settings('config_history')
+        history = shlib.Settings('email')
         try:
             repo = hg.repository(ui.ui(), path=self.root)
             self.repo = repo

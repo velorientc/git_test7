@@ -145,25 +145,25 @@ class GLog(GDialog):
         button = gtk.CheckMenuItem(_('Show Rev'))
         button.connect("toggled", self.toggle_view_column,
                 'rev-column-visible')
-        button.set_active(self._show_rev)
+        button.set_active(self.showcol.get('rev', True))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Show ID'))
         button.connect("toggled", self.toggle_view_column,
                 'id-column-visible')
-        button.set_active(self._show_id)
+        button.set_active(self.showcol.get('id', False))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Show Date'))
         button.connect("toggled", self.toggle_view_column,
                 'date-column-visible')
-        button.set_active(self._show_date)
+        button.set_active(self.showcol.get('date', True))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_("Show Branch"))
         button.connect("toggled", self.toggle_view_column,
                 'branch-column-visible')
-        button.set_active(self._show_branch)
+        button.set_active(self.showcol.get('branch', False))
         button.set_draw_as_radio(True)
         menu.append(button)
         menu.show_all()
@@ -237,16 +237,6 @@ class GLog(GDialog):
         else:
             self.reload_log()
 
-    def save_settings(self):
-        settings = GDialog.save_settings(self)
-        settings['glog'] = (self._vpaned.get_position(),
-                self._hpaned.get_position(),
-                self.graphview.get_property('rev-column-visible'),
-                self.graphview.get_property('date-column-visible'),
-                self.graphview.get_property('id-column-visible'),
-                self.graphview.get_property('branch-column-visible'))
-        return settings
-
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
         l = 0
@@ -258,6 +248,15 @@ class GLog(GDialog):
             except (TypeError, ValueError):
                 pass
         return l or 500
+
+    def save_settings(self):
+        settings = GDialog.save_settings(self)
+        settings['glog-vpane'] = self._vpaned.get_position()
+        settings['glog-hpane'] = self._hpaned.get_position()
+        for col in ('rev', 'date', 'id', 'branch'):
+            vis = self.graphview.get_property(col+'-column-visible')
+            settings['glog-vis-'+col] = vis
+        return settings
 
     def load_settings(self, settings):
         '''Called at beginning of display() method'''
@@ -281,21 +280,15 @@ class GLog(GDialog):
         GDialog.load_settings(self, settings)
         self._setting_vpos = -1
         self._setting_hpos = -1
-        (self._show_rev, self._show_date, self._show_id,
-                self._show_branch) = True, True, False, False
-        if settings:
-            data = settings['glog']
-            if type(data) == int:
-                self._setting_vpos = data
-            elif len(data) == 2:
-                (self._setting_vpos, self._setting_hpos) = data
-            elif len(data) == 5:
-                (self._setting_vpos, self._setting_hpos,
-                 self._show_rev, self._show_date, self._show_id) = data
-            elif len(data) == 6:
-                (self._setting_vpos, self._setting_hpos,
-                 self._show_rev, self._show_date, self._show_id,
-                 self._show_branch) = data
+        self.showcol = {}
+        try:
+            self._setting_vpos = settings['glog-vpane']
+            self._setting_hpos = settings['glog-hpane']
+            for col in ('rev', 'date', 'id', 'branch'):
+                vis = settings['glog-vis-'+col]
+                self.showcol[col] = vis
+        except KeyError:
+            pass
 
     def reload_log(self, filteropts={}):
         """Send refresh event to treeview object"""

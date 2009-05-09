@@ -55,8 +55,6 @@ class SimpleMRUList(object):
 
 
 class Settings(object):
-    version = 1.0
-
     def __init__(self, appname, path=None):
         self._appname = appname
         self._data = {}

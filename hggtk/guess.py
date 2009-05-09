@@ -46,7 +46,7 @@ class DetectRenameDialog(gtk.Window):
         self.notify_func = None
         path = toutf(os.path.basename(self.root))
         self.set_title(_('Detect Copies/Renames in ') + path)
-        settings = shlib.Settings('rename')
+        settings = shlib.Settings('guess')
         dims = settings.get_value('dims', (800, 600))
         self.set_default_size(dims[0], dims[1])
 
