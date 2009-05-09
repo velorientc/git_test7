@@ -15,6 +15,7 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         dirstate.o \
         Dirstatecache.o \
         DirectoryStatus.o \
+        HgRepoRoot.o \
         QueryDirstate.o
 
 BASE_LDFLAGS=-lole32 -lkernel32 -luser32 -lgdi32 -lshlwapi -lwininet \

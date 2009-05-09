@@ -21,100 +21,10 @@
 #include "dirstate.h"
 #include "DirectoryStatus.h"
 #include "Dirstatecache.h"
-#include "TortoiseUtils.h"
+#include "HgRepoRoot.h"
 #include "Winstat.h"
 
 #include <shlwapi.h>
-
-
-class HgRepoRoot
-{
-    struct E
-    {
-        std::string hgroot_;
-        unsigned    tickcount_;
-        unsigned    hitcount_;
-        E(): tickcount_(0), hitcount_(0) {}
-    };
-    
-    // true, if p is a subdir of refp, or identical
-    static bool is_subdir(const std::string& refp, const std::string& p);
-
-public:
-    static const std::string& get(const std::string& path);
-};
-
-
-bool HgRepoRoot::is_subdir(const std::string& refp, const std::string& p)
-{
-    // refp = "foo\bar"
-    // p    = "foo\bar\ping" -> return true
-
-    if (refp.size() > p.size())
-        return false;
-
-    if (p.compare(0, refp.size(), refp) != 0)
-        return false;
-
-    if (refp.size() == p.size())
-        return true;
-
-    // p is longer than refp
-
-    char c = p[refp.size()];
-
-    // refp = "foo\bar"
-    // p    = "foo\bar2", c is '2' -> return false
-
-    if (c == '\\' || c == '/')
-        return true;
-
-    return false;
-}
-
-
-const std::string& HgRepoRoot::get(const std::string& path)
-{
-    static E cache;
-
-    if (!cache.hgroot_.empty() 
-        && is_subdir(cache.hgroot_, path))
-    {
-        unsigned tc = GetTickCount();
-        if (tc - cache.tickcount_ < 2000)
-        {
-            ++cache.hitcount_;
-            return cache.hgroot_;
-        }
-    }
-
-    std::string r = GetHgRepoRoot(path);
-
-    bool show_hitcount = !cache.hgroot_.empty() && cache.hitcount_ > 0;
-    if (show_hitcount)
-        TDEBUG_TRACE("HgRepoRoot::get: '"
-            << cache.hgroot_ << "' had " << cache.hitcount_ << " hits");
-
-    cache.hitcount_ = 0;
-
-    if (r.empty())
-    {
-        cache.hgroot_.clear();
-        cache.tickcount_ = 0;
-    }
-    else
-    {
-        if (show_hitcount)
-        {
-            const char* verb = (r != cache.hgroot_ ? "caching" : "refreshing" );
-            TDEBUG_TRACE("HgRepoRoot::get: " << verb << " '" << cache.hgroot_ << "'");
-        }
-        cache.hgroot_ = r;
-        cache.tickcount_ = GetTickCount();
-    }
-
-    return cache.hgroot_;
-}
 
 
 int HgQueryDirstate(
