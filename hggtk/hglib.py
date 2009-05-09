@@ -150,6 +150,7 @@ class GtkUi(ui.ui):
         if not calliffunc(self.interactive): return default
         if isinstance(choices, str):
             pat = choices
+            choices = None
         else:
             pat = None
         while True:
