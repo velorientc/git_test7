@@ -5,12 +5,6 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
 import gtk
 import gobject
 import httplib
@@ -22,20 +16,23 @@ import sys
 import threading
 import time
 import hglib
-from dialog import question_dialog, error_dialog
+import shlib
+import gdialog
+from dialog import error_dialog
+from mercurial.i18n import _
 from mercurial import hg, ui, commands, cmdutil, util
 from mercurial.hgweb import server
 from mercurial.i18n import _
-from shlib import set_tortoise_icon
 
 gservice = None
 class ServeDialog(gtk.Window):
     """ Dialog to run web server"""
-    def __init__(self, cwd='', root='', webdir_conf=''):
+    def __init__(self, webdir_conf):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        shlib.set_tortoise_icon(self, 'proxy.ico')
+        shlib.set_tortoise_keys(self)
 
-        set_tortoise_icon(self, 'proxy.ico')
         self.connect('delete-event', self._delete)
 
         # Pipe stderr, stdout to self.write
@@ -48,32 +45,30 @@ class ServeDialog(gtk.Window):
         commands.table.update(thg_serve_cmd)
 
         self._url = None
-        self._root = root
+        self._root = hglib.rootpath()
         self._webdirconf = webdir_conf
-        if cwd:
-            os.chdir(cwd)
-        
         self._get_config()
         self.set_default_size(500, 300)
-        
+
         # toolbar
         self.tbar = gtk.Toolbar()
+        self.tooltips = gtk.Tooltips()
         self._button_start = self._toolbutton(gtk.STOCK_MEDIA_PLAY,
-                                              'Start', 
+                                              _('Start'),
                                               self._on_start_clicked,
-                                              None)
+                                              tip=_('Start server'))
         self._button_stop  = self._toolbutton(gtk.STOCK_MEDIA_STOP,
-                                              'Stop',
+                                              _('Stop'),
                                               self._on_stop_clicked,
-                                              None)
+                                              tip=_('Stop server'))
         self._button_browse = self._toolbutton(gtk.STOCK_HOME,
-                                              'Browse',
+                                              _('Browse'),
                                               self._on_browse_clicked,
-                                              None)
+                                              tip=_('Launch browser to view repository'))
         self._button_conf = self._toolbutton(gtk.STOCK_PREFERENCES,
-                                              'Configure',
+                                              _('Configure'),
                                               self._on_conf_clicked,
-                                              None)
+                                              tip=_('Configure web settings'))
 
         tbuttons = [
                 self._button_start,
@@ -89,11 +84,11 @@ class ServeDialog(gtk.Window):
         vbox = gtk.VBox()
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
-        
+
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label("HTTP Port:")
-        lbl.set_property("width-chars", 16)
+        lbl = gtk.Label(_('HTTP Port:'))
+        lbl.set_property('width-chars', 16)
         lbl.set_alignment(0, 0.5)
         self._port_input = gtk.Entry()
         self._port_input.set_text(self.defport)
@@ -106,7 +101,7 @@ class ServeDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription("Monospace"))
+        self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
@@ -117,45 +112,53 @@ class ServeDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=self._root)
         except hglib.RepoError:
-            print 'no repository found'
-            gtk.main_quit()
+            self.destroy()
         self.defport = repo.ui.config('web', 'port') or '8000'
         self.webname = repo.ui.config('web', 'name') or \
                 os.path.basename(self._root)
         if self._webdirconf:
-            self.set_title("hg serve %s - %s" % (self._webdirconf, self.webname))
+            self.set_title(_('Serve %s - %s') %
+                    (self._webdirconf, self.webname))
         else:
-            self.set_title("hg serve - " + self.webname)
+            self.set_title(_('Serve - ') + self.webname)
 
-    def _toolbutton(self, stock, label, handler, menu=None, userdata=None):
+    def _toolbutton(self, stock, label, handler, menu=None,
+            userdata=None, tip=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
         else:
             tbutton = gtk.ToolButton(stock)
-            
+
+        if tip:
+            tbutton.set_tooltip(self.tooltips, tip)
+
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
-            
+
     def _delete(self, widget, event):
-        if self._server_stopped():
-            gtk.main_quit()
+        if not self.should_live():
+            self.destroy()
         else:
             return True
+
+    def should_live(self):
+        return not self._server_stopped()
 
     def _server_stopped(self):
         '''
         check if server is running, or to terminate if running
         '''
         if gservice and not gservice.stopped:
-            if question_dialog(self, "Really Exit?",
-                    "Server process is still running\n" +
-                    "Exiting will stop the server.") != gtk.RESPONSE_YES:
-                return False
-            else:
+            ret = gdialog.Confirm(_('Confirm Really Exit?'), [], self,
+                    _('Server process is still running\n'
+                      'Exiting will stop the server.')).run()
+            if ret == gtk.RESPONSE_YES:
                 self._stop_server()
                 return True
+            else:
+                return False
         else:
             return True
 
@@ -170,11 +173,11 @@ class ServeDialog(gtk.Window):
             self._button_stop.set_sensitive(False)
             self._button_browse.set_sensitive(False)
             self._button_conf.set_sensitive(True)
-            
+
     def _on_start_clicked(self, *args):
         self._start_server()
         self._set_button_states()
-        
+
     def _on_stop_clicked(self, *args):
         self._stop_server()
 
@@ -185,7 +188,7 @@ class ServeDialog(gtk.Window):
                 if os.name == 'nt':
                     try:
                         import win32api, win32con
-                        win32api.ShellExecute(0, "open", self._url, None, "", 
+                        win32api.ShellExecute(0, "open", self._url, None, "",
                             win32con.SW_SHOW)
                     except:
                         # Firefox likes to create exceptions at launch,
@@ -198,10 +201,10 @@ class ServeDialog(gtk.Window):
                             '/desktop/gnome/url-handlers/http/command') + '&'
                     os.system(browser % self._url)
             threading.Thread(target=start_browser).start()
-    
+
     def _on_conf_clicked(self, *args):
         from thgconfig import ConfigDialog
-        dlg = ConfigDialog(self._root, True)
+        dlg = ConfigDialog(True)
         dlg.show_all()
         dlg.focus_field('web.name')
         dlg.run()
@@ -215,9 +218,9 @@ class ServeDialog(gtk.Window):
         except:
             try: port = int(self.defport)
             except: port = 8000
-            error_dialog(self, "Invalid port 2048..65535", "Defaulting to " +
-                    self.defport)
-        
+            error_dialog(self, _('Invalid port 2048..65535'),
+                    _('Defaulting to ') + self.defport)
+
         global gservice
         gservice = None
 
@@ -236,7 +239,7 @@ class ServeDialog(gtk.Window):
         # loopback addr directly
         self._url = 'http://127.0.0.1:%d/' % (port)
         gobject.timeout_add(10, self.process_queue)
-        
+
     def _stop_server(self):
         if gservice and not gservice.stopped:
             gservice.stop()
@@ -246,7 +249,7 @@ class ServeDialog(gtk.Window):
 
     def write(self, msg):
         self._queue.put(msg)
-        
+
     def _write(self, msg, append=True):
         msg = hglib.toutf(msg)
         if append:
@@ -271,21 +274,23 @@ class ServeDialog(gtk.Window):
             return False # Stop polling this function
         else:
             return True
-        
+
 def thg_serve(ui, repo, **opts):
     class service:
         def init(self):
             self.stopped = True
             util.set_signal_handler()
             try:
-                parentui = ui.parentui or ui
+                baseui = (getattr(repo, 'baseui', None) or
+                          getattr(ui, 'parentui', None) or ui)
+                repoui = repo and repo.ui != baseui and repo.ui or None
                 optlist = ("name templates style address port prefix ipv6"
                            " accesslog errorlog webdir_conf certificate")
                 for o in optlist.split():
                     if opts[o]:
-                        parentui.setconfig("web", o, str(opts[o]))
-                        if (repo is not None) and (repo.ui != parentui):
-                            repo.ui.setconfig("web", o, str(opts[o]))
+                        baseui.setconfig("web", o, str(opts[o]))
+                        if repoui:
+                            repoui.setconfig("web", o, str(opts[o]))
                 self.httpd = server.create_server(ui, repo)
             except socket.error, inst:
                 raise util.Abort(_('cannot start server: ') + inst.args[1])
@@ -343,20 +348,5 @@ thg_serve_cmd =  {"^serve":
           ('', 'certificate', '', _('SSL certificate file'))],
          _('hg serve [OPTION]...'))}
 
-
-def run(cwd='', root='', webdir_conf='', **opts):
-    dialog = ServeDialog(cwd, root, webdir_conf)
-    dialog.show_all()
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-    
-if __name__ == "__main__":
-    opts = {}
-    opts['cwd'] = os.getcwd()
-    if len(sys.argv) == 2 and sys.argv[1].endswith('.conf'):
-        opts['webdir_conf'] = sys.argv[1]
-    else:
-        opts['root'] = len(sys.argv) > 1 and sys.argv[1] or ''
-    run(**opts)
+def run(ui, *pats, **opts):
+    return ServeDialog(opts.get('webdir_conf'))

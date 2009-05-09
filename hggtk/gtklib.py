@@ -4,11 +4,10 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import pygtk
-pygtk.require('2.0')
 import gtk
 import gobject
 import pango
+from mercurial.i18n import _
 
 class StatusBar(gtk.HBox):
     def __init__(self, extra=None):
@@ -21,25 +20,25 @@ class StatusBar(gtk.HBox):
         self.pbox = gtk.HBox()
         self.pbox.pack_start(gtk.VSeparator(), False, False)
         self.pbox.pack_start(self.pbar, False, False)
-        
+
         self.pack_start(self.sttext, padding=1)
         if extra:
             self.pack_end(extra, False, False)
         self.pack_end(self.pbox, False, False, padding=1)
         self.pbox.set_child_visible(False)
         self.show_all()
-        
+
     def _pulse_timer(self, now=False):
         self.pbar.pulse()
         return True
 
-    def begin(self, msg="Running", timeout=100):
+    def begin(self, msg=_('Running'), timeout=100):
         self.pbox.set_child_visible(True)
         self.pbox.map()
         self.set_status_text(msg)
         self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
 
-    def end(self, msg="Done", unmap=True):
+    def end(self, msg=_('Done'), unmap=True):
         gobject.source_remove(self._timeout_event)
         self.set_status_text(msg)
         if unmap:
@@ -49,7 +48,7 @@ class StatusBar(gtk.HBox):
 
     def set_status_text(self, msg):
         self.sttext.set_text(str(msg))
-        
+
     def set_pulse_step(self, val):
         self.pbar.set_pulse_step(val)
 
@@ -70,12 +69,12 @@ class MessageDialog(gtk.Dialog):
             gtk.MESSAGE_QUESTION : gtk.STOCK_DIALOG_QUESTION,
             gtk.MESSAGE_ERROR : gtk.STOCK_DIALOG_ERROR,
     }
-    
+
     def __init__(self, parent=None, flags=0, type=gtk.MESSAGE_INFO,
             buttons=gtk.BUTTONS_NONE, message_format=None):
         gtk.Dialog.__init__(self,
                 parent=parent,
-                flags=flags | gtk.DIALOG_NO_SEPARATOR, 
+                flags=flags | gtk.DIALOG_NO_SEPARATOR,
                 buttons=MessageDialog.button_map[buttons])
         self.set_resizable(False)
 

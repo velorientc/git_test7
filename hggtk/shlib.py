@@ -7,13 +7,15 @@ of the GNU General Public License, incorporated herein by reference.
 
 """
 
-import dumbdbm, anydbm
-anydbm._defaultmod = dumbdbm
-
 import os
+import sys
 import gtk
-import shelve
+import cPickle
 import time
+import hgtk
+import gobject
+from mercurial.i18n import _
+from mercurial import util
 
 class SimpleMRUList(object):
     def __init__(self, size=10, reflist=[], compact=True):
@@ -53,8 +55,6 @@ class SimpleMRUList(object):
 
 
 class Settings(object):
-    version = 1.0
-
     def __init__(self, appname, path=None):
         self._appname = appname
         self._data = {}
@@ -77,7 +77,7 @@ class Settings(object):
         ls = self.get_value(key, [], True)
         ml = SimpleMRUList(size=size, reflist=ls)
         return ml
-    
+
     def get_keys(self):
         return self._data.keys()
 
@@ -86,34 +86,30 @@ class Settings(object):
 
     def read(self):
         self._data.clear()
-        if not os.path.exists(self._path+'.dat'):
-            return
-        dbase = shelve.open(self._path)
-        self._dbappname = dbase['APPNAME']
-        self.version = dbase['VERSION']
-        self._data.update(dbase.get('DATA', {}))
-        dbase.close()
+        if os.path.exists(self._path):
+            try:
+                f = file(self._path, 'rb')
+                self._data = cPickle.loads(f.read())
+                f.close()
+            except Exception:
+                pass
 
     def write(self):
         self._write(self._path, self._data)
 
     def _write(self, appname, data):
-        dbase = shelve.open(self._get_path(appname))
-        dbase['VERSION'] = Settings.version
-        dbase['APPNAME'] = appname
-        dbase['DATA'] = data
-        try:
-            dbase.close()
-        except IOError:
-            pass # Don't care too much about permission errors
-
+        s = cPickle.dumps(data)
+        f = util.atomictempfile(appname, 'wb', None)
+        f.write(s)
+        f.rename()
 
     def _get_path(self, appname):
         if os.name == 'nt':
-            return os.path.join(os.environ.get('APPDATA'), 'TortoiseHg', appname)
+            return os.path.join(os.environ.get('APPDATA'), 'TortoiseHg',
+                    appname)
         else:
             return os.path.join(os.path.expanduser('~'), '.tortoisehg',
-                    'settings', appname)
+                    appname)
 
     def _audit(self):
         if os.path.exists(os.path.dirname(self._path)):
@@ -125,16 +121,53 @@ def get_system_times():
     if t[4] == 0.0: # Windows leaves this as zero, so use time.clock()
         t = (t[0], t[1], t[2], t[3], time.clock())
     return t
-    
-def set_tortoise_icon(window, thgicon):
-    window.set_icon_from_file(get_tortoise_icon(thgicon))
-    # Global keybindings for TortoiseHg
-    window.connect('key-press-event', window_key)
 
-def window_key(window, event):
-    if event.keyval == ord('q') and (event.state & gtk.gdk.CONTROL_MASK):
-        devent = gtk.gdk.Event(gtk.gdk.DELETE)
-        window.emit('delete_event', devent)
+def set_tortoise_icon(window, thgicon):
+    ico = get_tortoise_icon(thgicon)
+    if ico: window.set_icon_from_file(ico)
+
+def get_thg_modifier():
+    if sys.platform == 'darwin':
+        return '<Mod1>'
+    else:
+        return '<Control>'
+
+def set_tortoise_keys(window):
+    'Set default TortoiseHg keyboard accelerators'
+    if sys.platform == 'darwin':
+        mask = gtk.accelerator_get_default_mod_mask()
+        mask |= gtk.gdk.MOD1_MASK;
+        gtk.accelerator_set_default_mod_mask(mask)
+    mod = get_thg_modifier()
+    accelgroup = gtk.AccelGroup()
+    window.add_accel_group(accelgroup)
+    key, modifier = gtk.accelerator_parse(mod+'w')
+    window.add_accelerator('thg-close', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+    key, modifier = gtk.accelerator_parse(mod+'q')
+    window.add_accelerator('thg-exit', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+    key, modifier = gtk.accelerator_parse('F5')
+    window.add_accelerator('thg-refresh', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+    key, modifier = gtk.accelerator_parse(mod+'Return')
+    window.add_accelerator('thg-accept', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+
+    # connect ctrl-w and ctrl-q to every window
+    window.connect('thg-close', thgclose)
+    window.connect('thg-exit', thgexit)
+
+def thgexit(window):
+    if thgclose(window):
+        gobject.idle_add(hgtk.thgexit, window)
+
+def thgclose(window):
+    if hasattr(window, 'should_live'):
+        if window.should_live():
+            return False
+    window.destroy()
+    return True
 
 def get_tortoise_icon(thgicon):
     '''Find a tortoise icon, apply to PyGtk window'''
@@ -145,9 +178,11 @@ def get_tortoise_icon(thgicon):
         # Else try relative paths from hggtk, the repository layout
         fdir = os.path.dirname(__file__)
         paths.append(os.path.join(fdir, '..', 'icons'))
-        # ... or the source installer layout
+        # ... or the unix installer layout
         paths.append(os.path.join(fdir, '..', '..', '..',
-            'share', 'tortoisehg', 'icons'))
+            'share', 'pixmaps', 'tortoisehg', 'icons'))
+        paths.append(os.path.join(fdir, '..', '..', '..', '..',
+            'share', 'pixmaps', 'tortoisehg', 'icons'))
     except NameError: # __file__ is not always available
         pass
     for p in paths:
@@ -155,7 +190,7 @@ def get_tortoise_icon(thgicon):
         if os.path.isfile(path):
             return path
     else:
-        print 'icon not found', thgicon
+        print _('icon not found'), thgicon
         return None
 
 def version():
@@ -163,12 +198,13 @@ def version():
         import __version__
         return __version__.version
     except ImportError:
-        return 'unknown'
+        return _('unknown')
 
 if os.name == 'nt':
     def shell_notify(paths):
         try:
             from win32com.shell import shell, shellcon
+            import pywintypes
         except ImportError:
             return
         dirs = []
@@ -181,13 +217,15 @@ if os.name == 'nt':
         # send notifications to deepest directories first
         dirs.sort(lambda x, y: len(y) - len(x))
         for dir in dirs:
-            pidl, ignore = shell.SHILCreateFromPath(dir, 0)
+            try:
+                pidl, ignore = shell.SHILCreateFromPath(dir, 0)
+            except pywintypes.com_error:
+                return
             if pidl is None:
                 continue
-            shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM, 
+            shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM,
                                  shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSH,
-                                 pidl,
-                                 None)
+                                 pidl, None)
 else:
     def shell_notify(paths):
         pass

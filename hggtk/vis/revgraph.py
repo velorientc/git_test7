@@ -14,7 +14,7 @@ from mercurial import cmdutil, util, ui
 def __get_parents(repo, rev):
     return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
 
-def revision_grapher(repo, start_rev, stop_rev, branch=None):
+def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False):
     """incremental revision grapher
 
     This generator function walks through the revision history from
@@ -37,6 +37,9 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None):
     while curr_rev >= stop_rev:
         # Compute revs and next_revs.
         if curr_rev not in revs:
+            if noheads and curr_rev != start_rev:
+                curr_rev -= 1
+                continue
             if branch:
                 ctx = repo.changectx(curr_rev)
                 if ctx.branch() != branch:
