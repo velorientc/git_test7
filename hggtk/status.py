@@ -73,8 +73,8 @@ class GStatus(GDialog):
         return (
                 # merge
                 ((_('_difference'), self._diff_file),
-                    (_('_view right'), self._view_file),
-                    (_('view _left'), self._view_left_file),
+                    (_('edit'), self._view_file),
+                    (_('view other'), self._view_left_file),
                     (_('_revert'), self._revert_file),
                     (_('l_og'), self._log_file)),
                 # addrem
@@ -104,16 +104,16 @@ class GStatus(GDialog):
                     (_('l_og'), self._log_file)),
                 # unresolved
                 ((_('_difference'), self._diff_file),
-                    (_('_view right'), self._view_file),
-                    (_('view _left'), self._view_left_file),
+                    (_('edit'), self._view_file),
+                    (_('view other'), self._view_left_file),
                     (_('_revert'), self._revert_file),
                     (_('l_og'), self._log_file),
                     (_('resolve'), self._do_resolve),
                     (_('mark resolved'), self._mark_resolved)),
                 # resolved
                 ((_('_difference'), self._diff_file),
-                    (_('_view right'), self._view_file),
-                    (_('view _left'), self._view_left_file),
+                    (_('edit'), self._view_file),
+                    (_('view other'), self._view_left_file),
                     (_('_revert'), self._revert_file),
                     (_('l_og'), self._log_file),
                     (_('mark unresolved'), self._unmark_resolved)),
