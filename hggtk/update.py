@@ -62,7 +62,7 @@ class UpdateDialog(gtk.Window):
         for t in tags:
             combo.append_text(t)
 
-        self.overwrite = gtk.CheckButton(_('Overwrite local changes'))
+        self.overwrite = gtk.CheckButton(_('Overwrite local changes (--clean)'))
         vbox.pack_start(self.overwrite, False, False, 10)
 
         hbbox = gtk.HButtonBox()
