@@ -63,6 +63,8 @@ const std::string& HgRepoRoot::get(const std::string& path)
         }
     }
 
+    TDEBUG_TRACE("HgRepoRoot::get: calling GetHgRepoRoot('" << path << ")");
+
     std::string r = GetHgRepoRoot(path);
 
     bool show_hitcount = !cache.hgroot_.empty() && cache.hitcount_ > 0;

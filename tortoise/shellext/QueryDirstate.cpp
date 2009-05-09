@@ -27,9 +27,36 @@
 #include <shlwapi.h>
 
 
+class QueryResult
+{
+public:
+    std::string path_;
+    char        status_;
+    unsigned    tickcount_;
+    QueryResult(): status_(0), tickcount_(0) {}
+};
+
+
 int HgQueryDirstate(
     const std::string& path, const char& filterStatus, char& outStatus)
 {
+    static QueryResult last;
+
+    if (path.empty())
+        return 0;
+
+    unsigned tc = GetTickCount();
+
+    if (last.path_ == path && (tc - last.tickcount_ < 1000)) 
+    {
+        outStatus = last.status_;
+        return 1;
+    }
+
+    last.path_ = path;
+    last.status_ = 0;
+    last.tickcount_ = tc;
+
     if (PathIsRoot(path.c_str()))
         return 0;
 
@@ -88,5 +115,7 @@ int HgQueryDirstate(
         outStatus = e->status(stat);
     }
 
+    last.status_ = outStatus;
+    last.tickcount_ = GetTickCount();
     return 1;
 }
