@@ -11,6 +11,7 @@ import gtklib
 from thgutil.i18n import _
 from thgutil.hglib import hgversion
 from thgutil import shlib
+from thgutil import paths
 
 def browse_url(url):
     import threading
@@ -57,11 +58,10 @@ class AboutDialog(gtk.AboutDialog):
             self.set_wrap_license(True)
         self.set_copyright("Copyright 2009 TK Soh and others")
 
-        thg_logo = os.path.normpath(shlib.get_tortoise_icon('thg_logo_92x50.png'))
-        thg_icon = os.path.normpath(shlib.get_tortoise_icon('thg_logo.ico'))
-        prog_root = os.path.dirname(os.path.dirname(os.path.dirname(thg_icon)))
+        thg_logo = paths.get_tortoise_icon('thg_logo_92x50.png')
+        thg_icon = paths.get_tortoise_icon('thg_logo.ico')
         try:
-            license_file = os.path.join(prog_root, "COPYING.txt")
+            license_file = paths.get_license_path()
             self.set_license(file(license_file).read())
         except IOError:
             import hgtk
