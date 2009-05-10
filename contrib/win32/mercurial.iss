@@ -75,11 +75,9 @@ Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 [Run]
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.4.11886-win32.msi"" /qn /norestart ALLUSERS=1"; StatusMsg: Installing TortoiseOverlays.dll ...
-Filename: regsvr32.exe; Parameters: "/s ""{app}\THgShell.dll"""; StatusMsg: Installing shell extension...
 
 [UninstallRun]
 Filename: {app}\add_path.exe; Parameters: /del {app}
-Filename: regsvr32.exe; Parameters: "/s /u ""{app}\THgShell.dll"""
 
 [UninstallDelete]
 Type: files; Name: {app}\Mercurial.url
