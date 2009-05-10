@@ -12,7 +12,7 @@ from mercurial import util, hg, ui
 from mercurial.node import short, nullrev
 
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, paths
 
 import hgcmd
 import gdialog
@@ -32,7 +32,7 @@ class UpdateDialog(gtk.Window):
         self.notify_func = None
 
         try:
-            repo = hg.repository(ui.ui(), path=hglib.rootpath())
+            repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return

@@ -20,7 +20,7 @@ from mercurial import hg, ui, commands, cmdutil, util
 from mercurial.hgweb import server
 
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, paths
 
 import dialog 
 import gdialog
@@ -47,7 +47,7 @@ class ServeDialog(gtk.Window):
         commands.table.update(thg_serve_cmd)
 
         self._url = None
-        self._root = hglib.rootpath()
+        self._root = paths.find_root()
         self._webdirconf = webdir_conf
         self._get_config()
         self.set_default_size(500, 300)

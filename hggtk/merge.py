@@ -11,7 +11,7 @@ import gobject
 from mercurial import hg, ui
 
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, paths
 
 import gtklib
 import gdialog
@@ -33,7 +33,7 @@ class MergeDialog(gtk.Window):
             return
 
         try:
-            repo = hg.repository(ui.ui(), path=hglib.rootpath())
+            repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return

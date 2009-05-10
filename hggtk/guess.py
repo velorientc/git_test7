@@ -15,9 +15,8 @@ import Queue
 from mercurial import hg, ui, mdiff, cmdutil, match, util
 
 from thgutil.i18n import _
-from thgutil.hglib import toutf, fromutf, diffexpand, rootpath, RepoError
-from thgutil import thread2
-from thgutil import shlib
+from thgutil.hglib import toutf, fromutf, diffexpand, RepoError
+from thgutil import shlib, paths, thread2
 
 import gtklib
 
@@ -43,7 +42,7 @@ class DetectRenameDialog(gtk.Window):
         gtklib.set_tortoise_icon(self, 'detect_rename.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.root = rootpath()
+        self.root = paths.find_root()
         self.notify_func = None
         path = toutf(os.path.basename(self.root))
         self.set_title(_('Detect Copies/Renames in ') + path)
@@ -227,10 +226,10 @@ class DetectRenameDialog(gtk.Window):
         'User pressed "find renames" button'
         cmodel = ctree.get_model()
         cmodel.clear()
-        umodel, paths = unktree.get_selection().get_selected_rows()
-        if not paths:
+        umodel, upaths = unktree.get_selection().get_selected_rows()
+        if not upaths:
             return
-        tgts = [ umodel[p][0] for p in paths ]
+        tgts = [ umodel[p][0] for p in upaths ]
         q = Queue.Queue()
         thread = thread2.Thread(target=self.search_thread,
                 args=(self.root, q, tgts, adj))
@@ -294,8 +293,8 @@ class DetectRenameDialog(gtk.Window):
             repo = hg.repository(ui.ui(), self.root)
         except RepoError:
             return
-        cmodel, paths = ctree.get_selection().get_selected_rows()
-        for path in paths:
+        cmodel, upaths = ctree.get_selection().get_selected_rows()
+        for path in upaths:
             row = cmodel[path]
             src, usrc, dest, udest, percent, sensitive = row
             if not sensitive:
@@ -319,15 +318,15 @@ class DetectRenameDialog(gtk.Window):
 
     def unknown_sel_change(self, selection, fr, fc):
         'User selected a row in the unknown tree'
-        model, paths = selection.get_selected_rows()
-        sensitive = paths and True or False
+        model, upaths = selection.get_selected_rows()
+        sensitive = upaths and True or False
         fr.set_sensitive(sensitive)
         fc.set_sensitive(sensitive)
 
     def show_diff(self, selection, buf, ac):
         'User selected a row in the candidate tree'
-        model, paths = selection.get_selected_rows()
-        sensitive = paths and True or False
+        model, cpaths = selection.get_selected_rows()
+        sensitive = cpaths and True or False
         ac.set_sensitive(sensitive)
 
         try:
@@ -337,7 +336,7 @@ class DetectRenameDialog(gtk.Window):
 
         buf.set_text('')
         bufiter = buf.get_start_iter()
-        for path in paths:
+        for path in cpaths:
             row = model[path]
             src, usrc, dest, udest, percent, sensitive = row
             if not sensitive:

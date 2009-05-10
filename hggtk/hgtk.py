@@ -22,7 +22,7 @@ import mercurial.ui as _ui
 from mercurial import hg, util, fancyopts, cmdutil, extensions
 
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, paths
 
 nonrepo_commands = 'userconfig clone debugcomplete init about help version'
 
@@ -143,7 +143,7 @@ def runcommand(ui, args):
     elif not cmd:
         return help_(ui, 'shortlist')
 
-    path = hglib.rootpath(os.getcwd())
+    path = paths.find_root(os.getcwd())
     if path:
         try:
             lui = hasattr(_ui, 'copy') and _ui.copy() or _ui.ui(ui)
@@ -172,7 +172,7 @@ def runcommand(ui, args):
             # try to guess the repo from first of file args
             root = None
             if args:
-                path = hglib.rootpath(args[0])
+                path = paths.find_root(args[0])
             if path:
                 repo = hg.repository(ui, path=path)
             else:
@@ -228,16 +228,15 @@ def commit(ui, *pats, **opts):
     """commit tool"""
     ct = ui.config('tortoisehg', 'extcommit', None)
     if ct == 'qct':
-        from hglib import thgdispatch
-        args = ['--repository', root, ct]
+        from mercurial import dispatch
         try:
-            thgdispatch(repo.ui, args=args)
+            dispatch.dispatch(ct, *pats, **opts)
         except SystemExit:
             pass
         return
     # move cwd to repo root if repo is merged, so we can show
     # all the changed files
-    repo = hg.repository(ui, path=hglib.rootpath())
+    repo = hg.repository(ui, path=paths.find_root())
     if len(repo.changectx(None).parents()) > 1:
         os.chdir(repo.root)
         pats = []

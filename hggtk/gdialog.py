@@ -22,8 +22,7 @@ from mercurial.node import short
 from mercurial import cmdutil, util, ui, hg, commands
 
 from thgutil.i18n import _
-from thgutil import shlib
-from thgutil import hglib
+from thgutil import shlib, hglib, paths
 
 import gtklib
 
@@ -122,7 +121,7 @@ class GDialog(gtk.Window):
         self.cwd = cwd or os.getcwd()
         self.ui = ui
         self.ui.setconfig('ui', 'interactive', 'off')
-        self.repo = repo or hg.repository(ui, path=hglib.rootpath())
+        self.repo = repo or hg.repository(ui, path=paths.find_root())
         self.pats = pats
         self.opts = opts
         self.tmproot = None

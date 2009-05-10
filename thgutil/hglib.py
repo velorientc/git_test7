@@ -10,11 +10,12 @@ import gtk
 import os
 import sys
 import traceback
-import threading, thread2
 import urllib2
 import Queue
 from mercurial import hg, ui, util, extensions, commands, hook
+
 from i18n import _
+import paths
 
 try:
     from mercurial.error import RepoError, ParseError, LookupError
@@ -72,18 +73,6 @@ def fromutf(s):
     except UnicodeEncodeError:
         pass
     return s.decode('utf-8').encode(_fallbackencoding)
-
-def rootpath(path=None):
-    """ find Mercurial's repo root of path """
-    if not path:
-        path = os.getcwd()
-    p = os.path.isdir(path) and path or os.path.dirname(path)
-    while not os.path.isdir(os.path.join(p, ".hg")):
-        oldp = p
-        p = os.path.dirname(p)
-        if p == oldp:
-            return ''
-    return p
 
 _tabwidth = None
 def gettabwidth(ui):
@@ -204,7 +193,7 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
         os.chdir(cwd[-1])
 
     # read the local repository .hgrc into a local ui object
-    path = rootpath(path) or ""
+    path = paths.find_root(path) or ""
     if path:
         try:
             ui.readconfig(os.path.join(path, ".hg", "hgrc"))

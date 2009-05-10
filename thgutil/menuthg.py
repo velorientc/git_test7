@@ -4,15 +4,13 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 
 import os
-import cachethg
-import thgutil
-from mercurial import hg, ui, node
-from mercurial.i18n import _
 
-try:
-    from mercurial.error import RepoError
-except ImportError:
-    from mercurial.repo import RepoError
+from mercurial import hg, ui, node
+
+from i18n import _
+import cachethg
+import paths
+import hglib
 
 promoted = []
 try:
@@ -122,12 +120,12 @@ class thg_menu(object):
 
 
 def open_repo(path):
-    root = thgutil.find_root(path)
+    root = paths.find_root(path)
     if root:
         try:
             repo = hg.repository(ui.ui(), path=root)
             return repo
-        except RepoError:
+        except hglib.RepoError:
             pass
         except StandardError, e:
             print "error while opening repo %s:" % path

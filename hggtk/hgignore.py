@@ -11,8 +11,7 @@ import gobject
 from mercurial import hg, ui, match
 
 from thgutil.i18n import _
-from thgutil import shlib
-from thgutil import hglib
+from thgutil import shlib, hglib, paths
 
 import gtklib
 
@@ -24,7 +23,7 @@ class HgIgnoreDialog(gtk.Window):
         gtklib.set_tortoise_icon(self, 'ignore.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.root = hglib.rootpath()
+        self.root = paths.find_root()
         self.set_title(_('Ignore filter for ') + os.path.basename(self.root))
         self.set_default_size(630, 400)
         self.notify_func = None
@@ -156,15 +155,15 @@ class HgIgnoreDialog(gtk.Window):
         self.refresh()
 
     def pattree_rowchanged(self, sel, remove):
-        model, paths = sel.get_selected()
-        sensitive = paths and True or False
+        model, ppaths = sel.get_selected()
+        sensitive = ppaths and True or False
         remove.set_sensitive(sensitive)
 
     def unknown_rowchanged(self, sel):
-        model, paths = sel.get_selected()
-        if not paths:
+        model, upaths = sel.get_selected()
+        if not upaths:
             return
-        self.glob_entry.set_text(model[paths][0])
+        self.glob_entry.set_text(model[uupaths][0])
 
     def add_glob(self, widget, glob_entry):
         newglob = hglib.fromutf(glob_entry.get_text())

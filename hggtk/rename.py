@@ -11,7 +11,7 @@ import cStringIO
 from mercurial import hg, ui, util, commands
 
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, paths
 
 import dialog
 
@@ -38,7 +38,7 @@ def rename_resp(dialog, response):
         dialog.destroy()
         return
     try:
-        root = hglib.rootpath()
+        root = paths.find_root()
         repo = hg.repository(ui.ui(), root)
     except (ImportError, hglib.RepoError):
         dialog.destroy()

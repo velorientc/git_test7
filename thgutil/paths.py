@@ -13,8 +13,8 @@ except ImportError:
 
 import os
 
-def find_root(path):
-    p = os.path.isdir(path) and path or os.path.dirname(path)
+def find_root(path=None):
+    p = path or os.getcwd()
     while not os.path.isdir(os.path.join(p, ".hg")):
         oldp = p
         p = os.path.dirname(p)

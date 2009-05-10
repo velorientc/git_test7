@@ -14,8 +14,7 @@ import os
 from mercurial import hg, ui, util
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import shlib
+from thgutil import hglib, shlib, paths
 
 import gdialog
 import dialog
@@ -29,7 +28,7 @@ class RecoveryDialog(gtk.Window):
         gtklib.set_tortoise_icon(self, 'general.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.root = hglib.rootpath()
+        self.root = paths.find_root()
         self.selected_path = None
         self.hgthread = None
         self.connect('delete-event', self._delete)

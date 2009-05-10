@@ -15,7 +15,7 @@ from mercurial.node import *
 from mercurial import ui, hg, commands, extensions
 
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, paths
 
 from gdialog import *
 from changeset import ChangeSet
@@ -772,7 +772,7 @@ def run(ui, *pats, **opts):
         'date':None, 'only_merges':None, 'prune':[], 'git':False,
         'verbose':False, 'include':[], 'exclude':[]
     }
-    root = hglib.rootpath()
+    root = paths.find_root()
     canonpats = []
     for f in pats:
         canonpats.append(util.canonpath(root, os.getcwd(), f))

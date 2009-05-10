@@ -1,12 +1,10 @@
 import os
-from mercurial import hg, cmdutil, util, ui, node, merge
-import thgutil
 import sys
+
+from mercurial import hg, cmdutil, util, ui, node, merge
+import paths
 import debugthg
-try:
-    from mercurial.error import RepoError
-except ImportError:
-    from mercurial.repo import RepoError
+import hglib
 
 debugging = False
 enabled = True
@@ -132,7 +130,7 @@ def get_states(upath, repo=None):
         root = cache_root
     else:
         debugf("find new root")
-        root = thgutil.find_root(path)
+        root = paths.find_root(path)
         if root == path:
             if not overlay_cache:
                 cache_root = pdir
@@ -158,7 +156,7 @@ def get_states(upath, repo=None):
             cache_tick_count = GetTickCount()
             debugf("overlayicons disabled")
             return NOT_IN_REPO
-        if localonly and thgutil.netdrive_status(path):
+        if localonly and paths.netdrive_status(path):
             debugf("%s: is a network drive", path)
             overlay_cache = {None: None}
             cache_tick_count = GetTickCount()
@@ -183,7 +181,7 @@ def get_states(upath, repo=None):
         if not repo or (repo.root != root and repo.root != real(root)):
             repo = hg.repository(ui.ui(), path=root)
             debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
-    except RepoError:
+    except hglib.RepoError:
         # We aren't in a working tree
         debugf("%s: not in repo", pdir)
         add(pdir + '*', IGNORED)

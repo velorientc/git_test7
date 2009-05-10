@@ -12,7 +12,7 @@ import pango
 
 from mercurial import hg, ui
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, paths
 import gtklib
 
 class BackoutDialog(gtk.Window):
@@ -27,7 +27,7 @@ class BackoutDialog(gtk.Window):
         self.notify_func = None
 
         try:
-            repo = hg.repository(ui.ui(), path=hglib.rootpath())
+            repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return

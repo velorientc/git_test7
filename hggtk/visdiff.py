@@ -19,8 +19,7 @@ from mercurial.node import short
 from mercurial import hg, ui, cmdutil, util, commands
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import shlib
+from thgutil import hglib, shlib, paths
 
 import gdialog
 import gtklib
@@ -105,7 +104,7 @@ class FileSelectionDialog(gtk.Dialog):
         treeview.append_column(fcol)
 
         try:
-            repo = hg.repository(ui.ui(), path=hglib.rootpath())
+            repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
             # hgtk should catch this earlier
             gdialog.Prompt(_('No repository'),
@@ -267,7 +266,7 @@ def readtools(ui):
     return tools
 
 def run(ui, *pats, **opts):
-    root = hglib.rootpath()
+    root = paths.find_root()
     canonpats = []
     for f in pats:
         canonpats.append(util.canonpath(root, os.getcwd(), f))

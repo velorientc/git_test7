@@ -15,8 +15,7 @@ import urllib
 from mercurial import hg, ui, util, extensions, url
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import shlib
+from thgutil import hglib, shlib, paths
 
 import dialog
 import gtklib
@@ -29,7 +28,7 @@ class SynchDialog(gtk.Window):
         gtklib.set_tortoise_icon(self, 'menusynch.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.root = hglib.rootpath()
+        self.root = paths.find_root()
         self.selected_path = None
         self.hgthread = None
 
@@ -38,7 +37,7 @@ class SynchDialog(gtk.Window):
 
         self.set_default_size(655, 552)
 
-        self.paths = self._get_paths()
+        self._paths = self._get_paths()
         self.origchangecount = len(self.repo.changelog)
 
         name = self.repo.ui.config('web', 'name') or os.path.basename(self.root)
@@ -260,7 +259,7 @@ class SynchDialog(gtk.Window):
 
     def fill_path_combo(self):
         self.pathlist.clear()
-        for alias, path in self.paths:
+        for alias, path in self._paths:
             path = url.hidepassword(path)
             self.pathlist.append([hglib.toutf(path), hglib.toutf(alias)])
 
@@ -274,7 +273,7 @@ class SynchDialog(gtk.Window):
         if not uri.startswith('file://'):
             return
         path = urllib.unquote(uri[7:])
-        if hglib.rootpath(path) == path:
+        if paths.find_root(path) == path:
             self._pathtext.set_text(hglib.toutf(path))
         elif not os.path.isdir(path) and path.endswith('.hg'):
             self._pathtext.set_text(hglib.toutf(path))
@@ -325,7 +324,7 @@ class SynchDialog(gtk.Window):
         try:
             self.ui = ui.ui()
             self.repo = hg.repository(self.ui, path=self.root)
-            paths = self.repo.ui.configitems('paths')
+            uipaths = self.repo.ui.configitems('paths')
             if sort:
                 if sort == "value":
                     sortfunc = lambda a,b: cmp(a[1], b[1])
@@ -333,8 +332,8 @@ class SynchDialog(gtk.Window):
                     sortfunc = lambda a,b: cmp(a[0], b[0])
                 else:
                     raise _("unknown sort key '%s'") % sort
-                paths.sort(sortfunc)
-            return paths
+                uipaths.sort(sortfunc)
+            return uipaths
         except hglib.RepoError:
             return None
 
@@ -448,7 +447,7 @@ class SynchDialog(gtk.Window):
 
     def _conf_clicked(self, toolbutton, data=None):
         newpath = hglib.fromutf(self._pathtext.get_text()).strip()
-        for alias, path in self.paths:
+        for alias, path in self._paths:
             if path == newpath:
                 newpath = None
                 break
@@ -461,7 +460,7 @@ class SynchDialog(gtk.Window):
             dlg.focus_field('tortoisehg.postpull')
         dlg.run()
         dlg.hide()
-        self.paths = self._get_paths()
+        self._paths = self._get_paths()
         self.fill_path_combo()
         self.update_pull_setting()
 
@@ -524,7 +523,7 @@ class SynchDialog(gtk.Window):
         use_proxy = self._use_proxy.get_active()
         text_entry = self._pathbox.get_child()
         remote_path = hglib.fromutf(text_entry.get_text()).strip()
-        for alias, path in self.paths:
+        for alias, path in self._paths:
             if remote_path == alias:
                 remote_path = path
             elif remote_path == url.hidepassword(path):

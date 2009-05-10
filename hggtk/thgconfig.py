@@ -14,9 +14,7 @@ import threading
 from mercurial import hg, ui, util, url
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import iniparse
-from thgutil import shlib
+from thgutil import hglib, shlib, paths, iniparse
 
 import dialog
 import gdialog
@@ -369,7 +367,7 @@ class ConfigDialog(gtk.Dialog):
 
         self.ui = ui.ui()
         try:
-            repo = hg.repository(self.ui, path=hglib.rootpath())
+            repo = hg.repository(self.ui, path=paths.find_root())
         except hglib.RepoError:
             repo = None
             if configrepo:
@@ -460,7 +458,7 @@ class ConfigDialog(gtk.Dialog):
                 util.system("%s \"%s\"" % (editor, self.fn))
             # reload configs, in case they have been written since opened
             if self.configrepo:
-                repo = hg.repository(ui.ui(), path=hglib.rootpath())
+                repo = hg.repository(ui.ui(), path=paths.find_root())
                 u = repo.ui
             else:
                 u = ui.ui()

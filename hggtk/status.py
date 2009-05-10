@@ -18,8 +18,7 @@ from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff, extensions
 from mercurial import merge as merge_
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import shlib
+from thgutil import hglib, shlib, paths
 
 from gdialog import GDialog, Confirm, Prompt, NativeSaveFileDialogWrapper
 import dialog
@@ -411,8 +410,8 @@ class GStatus(GDialog):
 
     def thgdiff(self, treeview):
         selection = treeview.get_selection()
-        model, paths = selection.get_selected_rows()
-        row = model[paths[0]]
+        model, tpaths = selection.get_selected_rows()
+        row = model[tpaths[0]]
         self._diff_file(row[FM_STATUS], row[FM_PATH])
 
     def thgrefresh(self, window):
@@ -424,8 +423,8 @@ class GStatus(GDialog):
             w = self.get_focus()
             w.emit('copy-clipboard')
             return False
-        model, paths = treeview.get_selection().get_selected_rows()
-        cids = [ model[row][DM_CHUNK_ID] for row, in paths ]
+        model, tpaths = treeview.get_selection().get_selected_rows()
+        cids = [ model[row][DM_CHUNK_ID] for row, in tpaths ]
         headers = {}
         fp = cStringIO.StringIO()
         for cid in cids:
@@ -567,9 +566,9 @@ class GStatus(GDialog):
 
         # List of the currently checked and selected files to pass on to
         # the new data
-        model, paths = selection.get_selected_rows()
+        model, tpaths = selection.get_selected_rows()
         recheck = [entry[FM_PATH] for entry in model if entry[FM_CHECKED]]
-        reselect = [model[path][FM_PATH] for path in paths]
+        reselect = [model[path][FM_PATH] for path in tpaths]
 
         # merge-state of files
         ms = merge_.mergestate(repo)
@@ -1162,7 +1161,7 @@ class GStatus(GDialog):
                 return True
 
             # verify directory
-            destroot = hglib.rootpath(destdir)
+            destroot = paths.find_root(destdir)
             if destroot != self.repo.root:
                 Prompt(_('Nothing Moved'),
                        _('Cannot move outside repo!'), self).run()
@@ -1259,8 +1258,8 @@ class GStatus(GDialog):
         selection = self.filetree.get_selection()
         assert(selection.count_selected_rows() == 1)
 
-        model, paths = selection.get_selected_rows()
-        path = paths[0]
+        model, tpaths = selection.get_selected_rows()
+        path = tpaths[0]
         handler(model[path][FM_STATUS], model[path][FM_PATH])
         return True
 
@@ -1295,8 +1294,8 @@ class GStatus(GDialog):
         if selection.count_selected_rows() != 1:
             return False
 
-        model, paths = selection.get_selected_rows()
-        menu = self._get_file_context_menu(model[paths[0]])
+        model, tpaths = selection.get_selected_rows()
+        menu = self._get_file_context_menu(model[tpaths[0]])
         menu.popup(None, None, None, button, time)
         return True
 
@@ -1327,8 +1326,8 @@ class GStatus(GDialog):
         if selection.count_selected_rows() != 1:
             return False
 
-        model, paths = selection.get_selected_rows()
-        menu = self._get_file_context_menu(model[paths[0]])
+        model, tpaths = selection.get_selected_rows()
+        menu = self._get_file_context_menu(model[tpaths[0]])
         menu.get_children()[0].activate()
         return True
 
