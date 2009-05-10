@@ -170,10 +170,7 @@ end;
 function InitializeSetup(): Boolean;
 var
  ThgSwReg: String;
- CRLF: String;
- msg: String;
 begin
- CRLF := chr(10) + chr(13);
  Result := True;
 
  {abort installation if TortoiseHg 0.4 or earlier is installed}
