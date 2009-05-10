@@ -86,7 +86,9 @@ else: # Not Windows
 
     def find_in_path(pgmname):
         """ return first executable found in search path """
+        global bin_path
         ospath = os.environ['PATH'].split(os.pathsep)
+        ospath.insert(0, bin_path or get_prog_root())
         for path in ospath:
             ppath = os.path.join(path, pgmname)
             if os.access(ppath, os.X_OK):
@@ -94,9 +96,6 @@ else: # Not Windows
         return None
 
     def get_prog_root():
-        global bin_path
-        if bin_path:
-            return bin_path
         path = os.path.dirname(os.path.dirname(__file__))
         return path
 
