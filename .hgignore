@@ -3,7 +3,8 @@ syntax: glob
 *.orig
 *.rej
 *.pyc
-hggtk/__version__.py
+thgutil/__version__.py
+thgutil/__paths__.py
 build/
 dist/
 Output/
