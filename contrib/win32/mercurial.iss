@@ -74,11 +74,11 @@ Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 [Run]
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.4.11886-win32.msi"" /qn /norestart ALLUSERS=1"; StatusMsg: Installing TortoiseOverlays.dll ...
-Filename: regsvr32.exe; Parameters: "/s ""{app}\tortoisehg.dll"""; StatusMsg: Installing shell extension...
+Filename: regsvr32.exe; Parameters: "/s ""{app}\THgShell.dll"""; StatusMsg: Installing shell extension...
 
 [UninstallRun]
 Filename: {app}\add_path.exe; Parameters: /del {app}
-Filename: regsvr32.exe; Parameters: "/s /u ""{app}\tortoisehg.dll"""
+Filename: regsvr32.exe; Parameters: "/s /u ""{app}\THgShell.dll"""
 
 [UninstallDelete]
 Type: files; Name: {app}\Mercurial.url
@@ -181,8 +181,8 @@ begin
  if RegQueryStringValue(HKLM, 'Software\TortoiseHg', '', ThgSwReg) then
  begin
   IsUpgrade := True;
-  {gpyfm was unbundled after 0.4, so it's a good guess}
-  if (FileExists(ThgSwReg + '\gpyfm.exe')) then
+  {if old shell extensions are found, force uninstall and reboot}
+  if (FileExists(ThgSwReg + '\tortoisehg.dll')) then
   begin
     msg := 'TortoiseHg Setup Error:' + CRLF + CRLF +
       'The version of TortoiseHg installed is too old to upgrade in place.' + CRLF +
