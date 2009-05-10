@@ -18,16 +18,21 @@ void CShellExt::DoHgProc(const std::string &cmd)
     std::string hgcmd = Quote(dir + "\\hgtk.exe") + cmd;
     
     std::string cwd;
-    std::vector<std::string> filelist;
+    std::string filelist;
     if (!myFolder.empty())
     {
         cwd = myFolder;
-        filelist.push_back(GetHgRepoRoot(myFolder));
+        filelist = GetHgRepoRoot(myFolder);
+        filelist += "\n";
     }
     else if (!myFiles.empty())
     {
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
-        filelist = myFiles;
+        for( DWORD i = 0 ; i < myFiles.size() ; i++ )
+        {
+            filelist += myFiles[i];
+            filelist += "\n";
+        }
     }
     else
     {
@@ -35,7 +40,7 @@ void CShellExt::DoHgProc(const std::string &cmd)
         return;
     }
 
-    if (!filelist.empty())
+    if ( !filelist.empty() )
         hgcmd += " --listfile -";
 
     LaunchCommand(hgcmd, cwd, filelist);

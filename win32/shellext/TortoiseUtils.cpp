@@ -91,7 +91,7 @@ std::string GetTHgProgRoot()
 // Note: if the command is a batch file and the [full] path to the
 //       batch contains spaces, the path must be double-quoted.
 //      (see http://www.encocoservices.com/createprocess.html)
-bool LaunchCommand(const std::string& command, const std::string& cwd, std::vector<std::string> filelist)
+bool LaunchCommand(const std::string& command, const std::string& cwd, const std::string& filelist)
 {
    TDEBUG_TRACE("LaunchCommand: " << command);
    PROCESS_INFORMATION processInfo;
@@ -142,18 +142,10 @@ bool LaunchCommand(const std::string& command, const std::string& cwd, std::vect
       return false;
    }
 
-   std::string writename;
-   for( DWORD i = 0 ; i < filelist.size(); i++ )
+   if( !filelist.empty() )
    {
-       bool bSuccess;
        DWORD dwWritten;
-
-       writename = filelist[i];
-       writename.push_back('\n');
-               
-       bSuccess = WriteFile(hChildStd_IN_Wr, writename.c_str(), writename.size(), &dwWritten, NULL);
-       if ( !bSuccess )
-           break; 
+       WriteFile(hChildStd_IN_Wr, filelist.c_str(), filelist.size(), &dwWritten, NULL);
    }
  
    if ( !CloseHandle(hChildStd_IN_Wr) ) 
