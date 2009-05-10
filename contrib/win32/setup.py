@@ -130,7 +130,7 @@ class build_mo(build):
             modir = join('locale', po[:-3], 'LC_MESSAGES')
             for mf in ('hg.mo', 'tortoisehg.mo'):
                 mofile = join(modir, mf)
-                if not os.path.exist(mofile):
+                if not os.path.exists(mofile):
                     continue
                 cmd = ['msgfmt', '-v', '-o', mofile, pofile]
                 if sys.platform != 'sunos5':
