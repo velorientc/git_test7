@@ -35,7 +35,6 @@ except ImportError:
     from mercurial.repo import RepoError
 from mercurial.node import short
 
-TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
 nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
 nocachecmds = 'about serve repoconfig userconfig'.split()
 
@@ -60,44 +59,26 @@ class HgExtension(nautilus.MenuProvider,
         if os.path.isdir(testpath):
             if thgpath not in sys.path:
                 sys.path.insert(0, thgpath)
-        else:
-            # try environment or hard-coded path
-            thgpath = os.environ.get('TORTOISEHG_PATH', TORTOISEHG_PATH)
-            thgpath = os.path.normpath(os.path.expanduser(thgpath))
-            if os.path.exists(thgpath) and thgpath not in sys.path:
-                sys.path.insert(0, thgpath)
-        # else assume tortoise is already in PYTHONPATH
+        # else assume thgutil is already in PYTHONPATH
         try:
-            import tortoise.thgutil
-            import tortoise.menuthg
+            from thgutil import paths, debugthg, menuthg
         except ImportError, e:
-            # if thgutil is not found, then repository cannot be found
-            # if menuthg is not found, you have an older version in sys.path
             print e
             self.menu = None
             return
 
-        self.env = os.environ
-        self.env['PYTHONPATH'] = ':'.join(sys.path)
-        self.env['TORTOISEHG_PATH'] = thgpath
-        self.env['THG_ICON_PATH'] = os.path.join(thgpath, 'icons')
+        self.hgtk = paths.find_in_path('hgtk')
+        self.menu = menuthg.menuThg()
 
-        self.hgtk = tortoise.thgutil.find_path('hgtk',
-              tortoise.thgutil.get_prog_root())
-        if not self.hgtk:
-            self.hgtk = tortoise.thgutil.find_path('hgtk')
-        self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
-        self.menu = tortoise.menuthg.menuThg()
-
-        import tortoise.debugthg
         global debugf
-        if tortoise.debugthg.debug('N'):
-            debugf = tortoise.debugthg.debugf
+        if debugthg.debug('N'):
+            debugf = debugthg.debugf
         else:
-            debugf = tortoise.debugthg.debugf_No
+            debugf = debugthg.debugf_No
 
     def icon(self, iname):
-        return os.path.join(self.ipath, iname)
+        from thgutil import paths
+        return paths.get_tortoise_icon(iname)
 
     def get_path_for_vfs_file(self, vfs_file):
         if vfs_file.is_gone() or vfs_file.get_uri_scheme() != 'file':
@@ -118,12 +99,13 @@ class HgExtension(nautilus.MenuProvider,
 
         if p == self.cacheroot:
             return self.cacherepo
+        from thgutil import hglib
         # Keep one repo cached
         try:
             self.cacheroot = p
             self.cacherepo = hg.repository(ui.ui(), path=p)
             return self.cacherepo
-        except RepoError:
+        except hglib.RepoError:
             self.cacheroot = None
             self.cacherepo = None
             return None
@@ -144,18 +126,15 @@ class HgExtension(nautilus.MenuProvider,
         cmdopts = [sys.executable, self.hgtk, hgtkcmd]
 
         if hgtkcmd not in nofilecmds and self.files:
-            # Use stdin to pass file list (avoid shell command
-            # line limitations)
             pipe = subprocess.PIPE
             cmdopts += ['--listfile', '-']
         else:
             pipe = None
 
-        stdin = subprocess.Popen(cmdopts, cwd=cwd, stdin=pipe, env=self.env, shell=False).stdin
-
+        proc = subprocess.Popen(cmdopts, cwd=cwd, stdin=pipe, shell=False)
         if pipe:
-            stdin.write('\n'.join(self.files))
-            stdin.close()
+            proc.stdin.write('\n'.join(self.files))
+            proc.stdin.close()
 
         if hgtkcmd not in nocachecmds:
             # Remove cached repo object, dirstate may change
@@ -231,7 +210,8 @@ class HgExtension(nautilus.MenuProvider,
                                  menu_info.menutext,
                                  menu_info.helptext,
                                  self.icon(menu_info.icon))
-                    item.connect('activate', self.run_dialog, menu_info.hgcmd, passcwd)
+                    item.connect('activate', self.run_dialog, menu_info.hgcmd,
+                            passcwd)
                     items.append(item)
         return items
 
@@ -254,7 +234,7 @@ class HgExtension(nautilus.MenuProvider,
                                "Version control status"),
 
     def _get_file_status(self, repo, localpath):
-        from tortoise import cachethg
+        from thgutil import cachethg
         cachestate = cachethg.get_state(localpath, repo)
         cache2state = {cachethg.UNCHANGED: ('default', 'clean'),
                        cachethg.ADDED: ('cvs-added', 'added'),
@@ -315,7 +295,7 @@ class HgExtension(nautilus.MenuProvider,
         emblem, status = self._get_file_status(repo, path)
 
         # Get the information from Mercurial
-        ctx = repo.changectx(None).parents()[0]
+        ctx = repo['.']
         try:
             fctx = ctx.filectx(localpath)
             rev = fctx.filelog().linkrev(fctx.filerev())
