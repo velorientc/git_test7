@@ -21,7 +21,6 @@
 #include "dirstate.h"
 #include "DirectoryStatus.h"
 #include "Dirstatecache.h"
-#include "HgRepoRoot.h"
 #include "Winstat.h"
 #include "TortoiseUtils.h"
 
