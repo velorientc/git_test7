@@ -46,6 +46,7 @@ Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
 Source: ..\contrib\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: win32\shellext\THgShell.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\library.zip; DestDir: {app}
 Source: doc\*.html; DestDir: {app}\docs
@@ -180,23 +181,7 @@ begin
  {abort installation if TortoiseHg 0.4 or earlier is installed}
  if RegQueryStringValue(HKLM, 'Software\TortoiseHg', '', ThgSwReg) then
  begin
-  IsUpgrade := True;
-  {if old shell extensions are found, force uninstall and reboot}
-  if (FileExists(ThgSwReg + '\tortoisehg.dll')) then
-  begin
-    msg := 'TortoiseHg Setup Error:' + CRLF + CRLF +
-      'The version of TortoiseHg installed is too old to upgrade in place.' + CRLF +
-      'You must uninstall it before installing this version.' + CRLF + CRLF +
-      'Please uninstall the existing version, then run the installer again ' +
-      'to continue.';
-    MsgBox(msg, mbError, MB_OK);
-    Result := False; {quit and abort installation}
-  end else begin
-    msg := 'Your current site-wide Mercurial.ini will be copied into' + CRLF +
-           ThgSwReg + '\backup' + CRLF +
-           'After install you may merge changes back into the new Mercurial.ini'
-    MsgBox(msg, mbInformation, MB_OK);
-  end;
+   IsUpgrade := True;
  end;
 end;
 
@@ -210,3 +195,5 @@ begin
       Result := False; 
   end; 
 end; 
+
+#include "registry.iss"
