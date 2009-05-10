@@ -7,9 +7,9 @@ of the GNU General Public License, incorporated herein by reference.
 """
 
 try:
-    from __paths__ import icon_path, bin_path, license_path
+    from __paths__ import icon_path, bin_path, license_path, locale_path
 except ImportError:
-    icon_path, bin_path, license_path = None, None, None
+    icon_path, bin_path, license_path, locale_path = None, None, None, None
 
 import os
 
@@ -38,6 +38,10 @@ def get_tortoise_icon(icon):
 def get_license_path():
     global license_path
     return license_path or os.path.join(get_prog_root(), 'COPYING.txt')
+
+def get_locale_path():
+    global locale_path
+    return locale_path or os.path.join(get_prog_root(), 'locale')
 
 if os.name == 'nt':
     import _winreg

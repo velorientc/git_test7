@@ -8,7 +8,7 @@ of the GNU General Public License, incorporated herein by reference.
 
 import gettext
 from gettext import gettext as _
+import paths
 
-# TODO: get proper path from somewheres
-gettext.bindtextdomain("thg", "c:/path/to/locale")
+gettext.bindtextdomain("thg", paths.get_locale_path())
 gettext.textdomain("thg")
