@@ -6,6 +6,11 @@ This software may be used and distributed according to the terms
 of the GNU General Public License, incorporated herein by reference.
 """
 
+try:
+    from __paths__ import icon_path, bin_path, license_path
+except ImportError:
+    icon_path, bin_path, license_path = None, None, None
+
 import os
 
 def find_root(path):
@@ -20,13 +25,19 @@ def find_root(path):
     return p
 
 def get_tortoise_icon(icon):
-    '''Find a tortoise icon, apply to PyGtk window'''
-    path = os.path.join(get_prog_root(), 'icons', icon)
-    if os.path.isfile(path):
-        return path
+    "Find a tortoisehg icon"
+    global icon_path
+    path = icon_path or os.path.join(get_prog_root(), 'icons')
+    icopath = os.path.join(path, icon)
+    if os.path.isfile(icopath):
+        return icopath
     else:
         print 'icon not found', icon
         return None
+
+def get_license_path():
+    global license_path
+    return license_path or os.path.join(get_prog_root(), 'COPYING.txt')
 
 if os.name == 'nt':
     import _winreg
@@ -34,8 +45,10 @@ if os.name == 'nt':
     USE_OK  = 0     # network drive status
 
     def find_in_path(pgmname):
-        """ return first executable found in search path """
+        "return first executable found in search path"
+        global bin_path
         ospath = os.environ['PATH'].split(os.pathsep)
+        ospath.insert(0, bin_path or get_prog_root())
         pathext = os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD')
         pathext = pathext.lower().split(os.pathsep)
         for path in ospath:
@@ -55,7 +68,7 @@ if os.name == 'nt':
     def netdrive_status(drive):
         """
         return True if a network drive is accessible (connected, ...),
-        or None if <drive> is not a network drive
+        or False if <drive> is not a network drive
         """
         if hasattr(os.path, 'splitunc'):
             unc, rest = os.path.splitunc(drive)
@@ -81,12 +94,15 @@ else: # Not Windows
         return None
 
     def get_prog_root():
+        global bin_path
+        if bin_path:
+            return bin_path
         path = os.path.dirname(os.path.dirname(__file__))
-        return os.path.dirname(path)
+        return path
 
     def netdrive_status(drive):
         """
         return True if a network drive is accessible (connected, ...),
-        or None if <drive> is not a network drive
+        or False if <drive> is not a network drive
         """
-        return None
+        return False
