@@ -28,7 +28,7 @@ import gtklib
 
 class SimpleMessage(gtklib.MessageDialog):
     def run(self):
-        response = MessageDialog.run(self)
+        response = gtklib.MessageDialog.run(self)
         self.destroy()
         return response
 
