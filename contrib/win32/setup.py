@@ -130,7 +130,7 @@ class build_mo(build):
             modir = join('locale', po[:-3], 'LC_MESSAGES')
             for mf in ('hg.mo', 'tortoisehg.mo'):
                 mofile = join(modir, mf)
-                if not os.path.exist(mofile):
+                if not os.path.exists(mofile):
                     continue
                 cmd = ['msgfmt', '-v', '-o', mofile, pofile]
                 if sys.platform != 'sunos5':
@@ -141,7 +141,17 @@ class build_mo(build):
                 self.distribution.data_files.append((join('mercurial', modir),
                                                  [mofile]))
 
+class build_shellext(build):
+    description = "Build TortoiseHg shell extensions"
+
+    def run(self):
+        cwd = os.getcwd()
+        os.chdir("win32/shellext")
+        os.system("mingw32-make")
+        os.chdir(cwd)
+
 build.sub_commands.append(('build_mo', None))
+build.sub_commands.append(('build_shellext', None))
 
 Distribution.pure = 0
 Distribution.global_options.append(('pure', None, "use pure (slow) Python "
@@ -171,7 +181,8 @@ class hg_build_py(build_py):
 
 cmdclass = {'install_data': install_package_data,
             'build_mo': build_mo,
-            'build_py': hg_build_py}
+            'build_py': hg_build_py,
+            'build_shellext' : build_shellext}
 
 ext_modules=[
     Extension('mercurial.base85', ['mercurial/base85.c']),
@@ -182,7 +193,8 @@ ext_modules=[
     ]
 
 packages = ['mercurial', 'mercurial.hgweb', 'hgext', 'hgext.convert',
-            'hgext.highlight', 'hgext.zeroconf', 'hggtk', 'thgutil']
+            'hgext.highlight', 'hgext.zeroconf', 'hggtk',
+            'hggtk.logview', 'thgutil', 'thgutil.iniparse']
 
 try:
     import msvcrt
