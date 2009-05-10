@@ -15,7 +15,7 @@ void CShellExt::DoHgProc(const std::string &cmd)
         TDEBUG_TRACE("DoHgProc: THG root is empty");
         return;
     }
-    std::string hgcmd = Quote(dir + "\\hgtk.exe") + cmd;
+    std::string hgcmd = Quote(dir + "\\hgtk.exe ") + cmd;
     
     std::string cwd;
     std::string filelist;
