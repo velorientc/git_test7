@@ -128,18 +128,15 @@ class build_mo(build):
                 continue
             pofile = join(podir, po)
             modir = join('locale', po[:-3], 'LC_MESSAGES')
-            for mf in ('hg.mo', 'tortoisehg.mo'):
-                mofile = join(modir, mf)
-                if not os.path.exists(mofile):
-                    continue
-                cmd = ['msgfmt', '-v', '-o', mofile, pofile]
-                if sys.platform != 'sunos5':
-                    # msgfmt on Solaris does not know about -c
-                    cmd.append('-c')
-                self.mkpath(modir)
-                self.make_file([pofile], mofile, spawn, (cmd,))
-                self.distribution.data_files.append((join('mercurial', modir),
-                                                 [mofile]))
+            mofile = join(modir, 'hg.mo')
+            cmd = ['msgfmt', '-v', '-o', mofile, pofile]
+            if sys.platform != 'sunos5':
+                # msgfmt on Solaris does not know about -c
+                cmd.append('-c')
+            self.mkpath(modir)
+            self.make_file([pofile], mofile, spawn, (cmd,))
+            self.distribution.data_files.append((join('mercurial', modir),
+                                             [mofile]))
 
 class build_shellext(build):
     description = "Build TortoiseHg shell extensions"
