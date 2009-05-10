@@ -14,14 +14,17 @@ import gobject
 import pango
 import gobject
 
-from mercurial.i18n import _
 from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff, extensions
 from mercurial import merge as merge_
-from hglib import toutf, fromutf, rootpath, diffexpand
+
+from thgutil.i18n import _
+from thgutil import hglib
+from thgutil import shlib
+
 from gdialog import GDialog, Confirm, Prompt, NativeSaveFileDialogWrapper
 import dialog
-import shlib
 import hgshelve
+import gtklib
 
 # file model row enumerations
 FM_CHECKED = 0
@@ -262,7 +265,7 @@ class GStatus(GDialog):
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
-        mod = shlib.get_thg_modifier()
+        mod = gtklib.get_thg_modifier()
         key, modifier = gtk.accelerator_parse(mod+'d')
         self.filetree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
@@ -343,7 +346,7 @@ class GStatus(GDialog):
             self.diff_tree = gtk.TreeView(self.diff_model)
 
             # set CTRL-c accelerator for copy-clipboard
-            mod = shlib.get_thg_modifier()
+            mod = gtklib.get_thg_modifier()
             key, modifier = gtk.accelerator_parse(mod+'c')
             self.diff_tree.add_accelerator('copy-clipboard', accelgroup, key,
                             modifier, gtk.ACCEL_VISIBLE)
@@ -581,7 +584,7 @@ class GStatus(GDialog):
                 mst = wfile in ms and ms[wfile].upper() or ""
                 wfile = util.localpath(wfile)
                 self.filemodel.append([wfile in recheck, char,
-                                       toutf(wfile), wfile, mst, False])
+                                       hglib.toutf(wfile), wfile, mst, False])
 
         selected = False
         for row in model:
@@ -729,19 +732,19 @@ class GStatus(GDialog):
     def _copy_file(self, stat, wfile):
         wfile = self.repo.wjoin(wfile)
         fdir, fname = os.path.split(wfile)
-        dialog = gtk.FileChooserDialog(parent=self,
+        dlg = gtk.FileChooserDialog(parent=self,
                 title=_('Copy file to'),
                 action=gtk.FILE_CHOOSER_ACTION_SAVE,
                 buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                          gtk.STOCK_COPY,gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
-        dialog.set_current_folder(fdir)
-        dialog.set_current_name(fname)
-        response = dialog.run()
+        dlg.set_default_response(gtk.RESPONSE_OK)
+        dlg.set_current_folder(fdir)
+        dlg.set_current_name(fname)
+        response = dlg.run()
         newfile=wfile
         if response == gtk.RESPONSE_OK:
-            newfile = dialog.get_filename()
-        dialog.destroy()
+            newfile = dlg.get_filename()
+        dlg.destroy()
         if newfile != wfile:
             self._hg_copy([wfile, newfile])
         return True
@@ -820,19 +823,19 @@ class GStatus(GDialog):
 
             bufiter = buf.get_start_iter()
             for line in difftext:
-                line = toutf(line)
+                line = hglib.toutf(line)
                 if line.startswith('---') or line.startswith('+++'):
                     buf.insert_with_tags_by_name(bufiter, line, 'header')
                 elif line.startswith('-'):
-                    line = diffexpand(line)
+                    line = hglib.diffexpand(line)
                     buf.insert_with_tags_by_name(bufiter, line, 'removed')
                 elif line.startswith('+'):
-                    line = diffexpand(line)
+                    line = hglib.diffexpand(line)
                     buf.insert_with_tags_by_name(bufiter, line, 'added')
                 elif line.startswith('@@'):
                     buf.insert_with_tags_by_name(bufiter, line, 'position')
                 else:
-                    line = diffexpand(line)
+                    line = hglib.diffexpand(line)
                     buf.insert(bufiter, line)
 
             self.merge_diff_text.set_buffer(buf)
@@ -907,7 +910,7 @@ class GStatus(GDialog):
             lines = chunk.readlines()
             lines[-1] = lines[-1].strip('\n\r')
             for line in lines:
-                line = gobject.markup_escape_text(toutf(line[:128]))
+                line = gobject.markup_escape_text(hglib.toutf(line[:128]))
                 if line.startswith('---') or line.startswith('+++'):
                     hunk += '<span foreground="#000090">%s</span>' % line
                 elif line.startswith('-'):
@@ -926,7 +929,7 @@ class GStatus(GDialog):
             lines = fp.readlines()
             lines[-1] = lines[-1].strip('\n\r')
             for line in lines:
-                hunk += gobject.markup_escape_text(toutf(line[:128]))
+                hunk += gobject.markup_escape_text(hglib.toutf(line[:128]))
             return hunk
 
         def dohgdiff():
@@ -1062,8 +1065,8 @@ class GStatus(GDialog):
     def _log_file(self, stat, wfile):
         from history import GLog
         # Might want to include 'rev' here... trying without
-        dialog = GLog(self.ui, self.repo, self.cwd, [wfile], self.opts)
-        dialog.display()
+        dlg = GLog(self.ui, self.repo, self.cwd, [wfile], self.opts)
+        dlg.display()
         return True
 
 
@@ -1090,14 +1093,14 @@ class GStatus(GDialog):
             # rev options needs extra tweaking since is not an array for
             # revert command
             revertopts['rev'] = revertopts['rev'][0]
-            dialog = Confirm(_('Confirm Revert'), files, self,
+            dlg = Confirm(_('Confirm Revert'), files, self,
                     _('Revert files to revision ') + revertopts['rev'] + '?')
         else:
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
             revertopts['rev'] = ''
-            dialog = Confirm('Confirm Revert', files, self)
-        if dialog.run() == gtk.RESPONSE_YES:
+            dlg = Confirm('Confirm Revert', files, self)
+        if dlg.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
                 shlib.shell_notify(wfiles)
@@ -1145,28 +1148,28 @@ class GStatus(GDialog):
         move_list = self._relevant_files('C')
         if move_list:
             # get destination directory to files into
-            dialog = gtk.FileChooserDialog(title=_('Move files to diretory...'),
+            dlg = gtk.FileChooserDialog(title=_('Move files to diretory...'),
                     parent=self,
                     action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                     buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                              gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-            dialog.set_default_response(gtk.RESPONSE_OK)
-            dialog.set_current_folder(self.repo.root)
-            response = dialog.run()
-            destdir = dialog.get_filename()
-            dialog.destroy()
+            dlg.set_default_response(gtk.RESPONSE_OK)
+            dlg.set_current_folder(self.repo.root)
+            response = dlg.run()
+            destdir = dlg.get_filename()
+            dlg.destroy()
             if response != gtk.RESPONSE_OK:
                 return True
 
             # verify directory
-            destroot = rootpath(destdir)
+            destroot = hglib.rootpath(destdir)
             if destroot != self.repo.root:
                 Prompt(_('Nothing Moved'),
                        _('Cannot move outside repo!'), self).run()
                 return True
 
             # move the files to dest directory
-            move_list.append(fromutf(destdir))
+            move_list.append(hglib.fromutf(destdir))
             self._hg_move(move_list)
         else:
             Prompt(_('Nothing Moved'), _('No movable files selected\n\n'
@@ -1177,8 +1180,8 @@ class GStatus(GDialog):
         self._delete_files([wfile])
 
     def _delete_files(self, files):
-        dialog = Confirm(_('Confirm Delete Unrevisioned'), files, self)
-        if dialog.run() == gtk.RESPONSE_YES :
+        dlg = Confirm(_('Confirm Delete Unrevisioned'), files, self)
+        if dlg.run() == gtk.RESPONSE_YES :
             errors = ''
             for wfile in files:
                 try:
@@ -1197,15 +1200,15 @@ class GStatus(GDialog):
 
     def _guess_rename(self, stat, wfile):
         import rename
-        dialog = rename.DetectRenameDialog(self.repo.root)
-        dialog.show_all()
-        dialog.set_notify_func(self.ignoremask_updated)
+        dlg = rename.DetectRenameDialog(self.repo.root)
+        dlg.show_all()
+        dlg.set_notify_func(self.ignoremask_updated)
 
     def _ignore_file(self, stat, wfile):
         import hgignore
-        dialog = hgignore.HgIgnoreDialog(self.repo.root, util.pconvert(wfile))
-        dialog.show_all()
-        dialog.set_notify_func(self.ignoremask_updated)
+        dlg = hgignore.HgIgnoreDialog(self.repo.root, util.pconvert(wfile))
+        dlg.show_all()
+        dlg.set_notify_func(self.ignoremask_updated)
         return True
 
     def ignoremask_updated(self):

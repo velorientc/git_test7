@@ -6,23 +6,26 @@
 
 import os
 import gtk
-from dialog import error_dialog, info_dialog
+
 from mercurial import hg, ui, util
-from mercurial.i18n import _
-from hglib import toutf, fromutf, RepoError
-import shlib
+
+from thgutil.i18n import _
+from thgutil import hglib
+
+import dialog
+import gtklib
 
 class InitDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_icon(self, 'menucreaterepos.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'menucreaterepos.ico')
+        gtklib.set_tortoise_keys(self)
 
         # set dialog title and icon
         self.cwd = os.getcwd()
-        title = 'hg init - %s' % toutf(self.cwd)
+        title = 'hg init - %s' % hglib.toutf(self.cwd)
         self.set_title(title)
 
         # preconditioning info
@@ -61,7 +64,7 @@ class InitDialog(gtk.Window):
         lbl.set_property('width-chars', 12)
         lbl.set_alignment(0, 0.5)
         self._dest_input = gtk.Entry()
-        self._dest_input.set_text(toutf(self._dest_path))
+        self._dest_input.set_text(hglib.toutf(self._dest_path))
         self._dest_input.set_position(-1)
 
         self._btn_dest_browse = gtk.Button("...")
@@ -105,25 +108,25 @@ class InitDialog(gtk.Window):
 
     def _btn_dest_clicked(self, button):
         """ select source folder to clone """
-        dialog = gtk.FileChooserDialog(title=None,
+        dlg = gtk.FileChooserDialog(title=None,
                 action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                 buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
-        dialog.set_current_folder(self.cwd)
-        response = dialog.run()
+        dlg.set_default_response(gtk.RESPONSE_OK)
+        dlg.set_current_folder(self.cwd)
+        response = dlg.run()
         if response == gtk.RESPONSE_OK:
-            self._dest_input.set_text(dialog.get_filename())
+            self._dest_input.set_text(dlg.get_filename())
             self._dest_input.set_position(-1)
-        dialog.destroy()
+        dlg.destroy()
 
     def _btn_init_clicked(self, toolbutton, data=None):
         # gather input data
-        dest = fromutf(self._dest_input.get_text())
+        dest = hglib.fromutf(self._dest_input.get_text())
 
         # verify input
         if dest == "":
-            error_dialog(self, _('Destination path is empty'),
+            dialog.error_dialog(self, _('Destination path is empty'),
                     _('Please enter the directory path'))
             self._dest_input.grab_focus()
             return False
@@ -137,15 +140,17 @@ class InitDialog(gtk.Window):
 
         try:
             hg.repository(u, dest, create=1)
-        except RepoError, inst:
-            error_dialog(self, _('Unable to create new repository'), str(inst))
+        except hglib.RepoError, inst:
+            dialog.error_dialog(self, _('Unable to create new repository'),
+                    str(inst))
             return False
         except util.Abort, inst:
-            error_dialog(self, _('Error when creating repository'), str(inst))
+            dialog.error_dialog(self, _('Error when creating repository'),
+                    str(inst))
             return False
         except:
             import traceback
-            error_dialog(self, _('Error when creating repository'),
+            dialog.error_dialog(self, _('Error when creating repository'),
                     traceback.format_exc())
             return False
 
@@ -160,8 +165,8 @@ class InitDialog(gtk.Window):
                 except:
                     pass
 
-        info_dialog(self, _('New repository created'),
-                _('in directory %s') % toutf(os.path.abspath(dest)))
+        dialog.info_dialog(self, _('New repository created'),
+                _('in directory %s') % hglib.toutf(os.path.abspath(dest)))
 
 def run(ui, *pats, **opts):
     return InitDialog(pats)

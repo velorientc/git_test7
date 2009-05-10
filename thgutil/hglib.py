@@ -1,14 +1,20 @@
+"""
+hglib.py
+ Copyright (C) 2007 Steve Borho <steve@borho.org>
+
+This software may be used and distributed according to the terms
+of the GNU General Public License, incorporated herein by reference.
+"""
+
 import gtk
-import os.path
+import os
 import sys
 import traceback
 import threading, thread2
 import urllib2
 import Queue
-import gdialog
 from mercurial import hg, ui, util, extensions, commands, hook
-from mercurial.i18n import _
-from dialog import entry_dialog
+from i18n import _
 
 try:
     from mercurial.error import RepoError, ParseError, LookupError
@@ -30,6 +36,15 @@ except ImportError:
     _encoding = util._encoding
     _encodingmode = util._encodingmode
     _fallbackencoding = util._fallbackencoding
+
+try:
+    # post 1.1.2
+    from mercurial import util
+    hgversion = util.version()
+except AttributeError:
+    # <= 1.1.2
+    from mercurial import version
+    hgversion = version.get_version()
 
 def toutf(s):
     """
@@ -107,171 +122,34 @@ def uiwrite(u, args):
 def calliffunc(f):
     return hasattr(f, '__call__') and f() or f
 
-class GtkUi(ui.ui):
+
+def hgcmd_toq(path, q, *args):
     '''
-    PyGtk enabled mercurial.ui subclass.  All this code will be running
-    in a background thread, so it cannot directly call into Gtk.
-    Instead, it places output and dialog requests onto queues for the
-    main thread to pickup.
+    Run an hg command in a background thread, pipe all output to a Queue
+    object.  Assumes command is completely noninteractive.
     '''
-    def __init__(self, src=None, outputq=None, dialogq=None, responseq=None,
-            parentui=None):
-        if parentui:
-            # Mercurial 1.2
-            super(GtkUi, self).__init__(parentui=parentui)
-            src = parentui
-        else:
-            # Mercurial 1.3
-            super(GtkUi, self).__init__(src)
-        if src:
-            self.outputq = src.outputq
-            self.dialogq = src.dialogq
-            self.responseq = src.responseq
-        else:
-            self.outputq = outputq
-            self.dialogq = dialogq
-            self.responseq = responseq
-        self.setconfig('ui', 'interactive', 'on')
+    class Qui(ui.ui):
+        def __init__(self, src=None):
+            super(Qui, self).__init__(src)
+            self.setconfig('ui', 'interactive', 'off')
 
-    def write(self, *args):
-        if uiwrite(self, args):
-            for a in args:
-                self.outputq.put(str(a))
+        def write(self, *args):
+            if uiwrite(self, args):
+                for a in args:
+                    q.put(str(a))
+    u = Qui()
+    if hasattr(ui.ui, 'copy'):
+        # Mercurial 1.3
+        return dispatch._dispatch(u, list(args))
+    else:
+        return thgdispatch(u, path, list(args))
 
-    def write_err(self, *args):
-        for a in args:
-            self.outputq.put('*** ' + str(a))
 
-    def flush(self):
-        pass
+def displaytime(date):
+    return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
 
-    def prompt(self, msg, choices=None, default="y"):
-        import re
-        if not calliffunc(self.interactive): return default
-        if isinstance(choices, str):
-            pat = choices
-            choices = None
-        else:
-            pat = None
-        while True:
-            try:
-                # send request to main thread, await response
-                self.dialogq.put( (msg, True, choices, default) )
-                r = self.responseq.get(True)
-                if r is None:
-                    raise EOFError
-                if not r:
-                    return default
-                if not pat or re.match(pat, r):
-                    return r
-                else:
-                    self.write(_('unrecognized response\n'))
-            except EOFError:
-                raise util.Abort(_('response expected'))
 
-    def getpass(self, prompt=None, default=None):
-        # send request to main thread, await response
-        self.dialogq.put( (prompt or _('password: '), False, None, default) )
-        r = self.responseq.get(True)
-        if r is None:
-            raise util.Abort(_('response expected'))
-        return r
-
-class HgThread(thread2.Thread):
-    '''
-    Run an hg command in a background thread, implies output is being
-    sent to a rendered text buffer interactively and requests for
-    feedback from Mercurial can be handled by the user via dialog
-    windows.
-    '''
-    def __init__(self, args=[], postfunc=None, parent=None):
-        self.outputq = Queue.Queue()
-        self.dialogq = Queue.Queue()
-        self.responseq = Queue.Queue()
-        self.ui = GtkUi(None, self.outputq, self.dialogq, self.responseq)
-        self.args = args
-        self.ret = None
-        self.postfunc = postfunc
-        self.parent = parent
-        thread2.Thread.__init__(self)
-
-    def getqueue(self):
-        return self.outputq
-
-    def return_code(self):
-        '''
-        None - command is incomplete, possibly exited with exception
-        0    - command returned successfully
-               else an error was returned
-        '''
-        return self.ret
-
-    def process_dialogs(self):
-        '''Polled every 10ms to serve dialogs for the background thread'''
-        try:
-            (prompt, visible, choices, default) = self.dialogq.get_nowait()
-            if choices:
-                dlg = gdialog.CustomPrompt('Hg Prompt', prompt,
-                        self.parent, choices, default)
-                dlg.connect('response', self.prompt_response)
-                dlg.show_all()
-            else:
-                dlg = entry_dialog(self.parent, prompt, visible, default,
-                    self.dialog_response)
-        except Queue.Empty:
-            pass
-
-    def prompt_response(self, dialog, response_id):
-        dialog.destroy()
-        if response_id == gtk.RESPONSE_DELETE_EVENT:
-            raise util.Abort('No response')
-        else:
-            self.responseq.put(chr(response_id))
-
-    def dialog_response(self, dialog, response_id):
-        if response_id == gtk.RESPONSE_OK:
-            text = dialog.entry.get_text()
-        else:
-            text = None
-        dialog.destroy()
-        self.responseq.put(text)
-
-    def run(self):
-        try:
-            ret = None
-            if hasattr(self.ui, 'copy'):
-                # Mercurial 1.3
-                ret = dispatch._dispatch(self.ui, self.args)
-            else:
-                # Mercurial 1.2
-                # Some commands create repositories, and thus must create
-                # new ui() instances.  For those, we monkey-patch ui.ui()
-                # as briefly as possible.
-                origui = None
-                if self.args[0] in ('clone', 'init'):
-                    origui = ui.ui
-                    ui.ui = GtkUi
-                try:
-                    ret = thgdispatch(self.ui, None, self.args)
-                finally:
-                    if origui:
-                        ui.ui = origui
-            if ret:
-                self.ui.write(_('[command returned code %d]\n') % int(ret))
-            else:
-                self.ui.write(_('[command completed successfully]\n'))
-            self.ret = ret or 0
-            if self.postfunc:
-                self.postfunc(ret)
-        except RepoError, e:
-            self.ui.write_err(str(e))
-        except util.Abort, e:
-            self.ui.write_err(str(e))
-        except urllib2.HTTPError, e:
-            self.ui.write_err(str(e) + '\n')
-        except Exception, e:
-            self.ui.write_err(str(e))
-
+# the remaining functions are only needed for Mercurial versions < 1.3
 def _earlygetopt(aliases, args):
     """Return list of values for an option (or aliases).
 
@@ -301,7 +179,6 @@ def _earlygetopt(aliases, args):
             pos += 1
     return values
 
-# this function is only needed for Mercurial versions < 1.3
 _loaded = {}
 def thgdispatch(ui, path=None, args=[], nodefaults=True):
     '''
@@ -424,28 +301,3 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     hook.hook(ui, repo, "post-%s" % cmd, False, args=" ".join(fullargs),
             result = ret)
     return ret
-
-
-def hgcmd_toq(path, q, *args):
-    '''
-    Run an hg command in a background thread, pipe all output to a Queue
-    object.  Assumes command is completely noninteractive.
-    '''
-    class Qui(ui.ui):
-        def __init__(self, src=None):
-            super(Qui, self).__init__(src)
-            self.setconfig('ui', 'interactive', 'off')
-
-        def write(self, *args):
-            if uiwrite(self, args):
-                for a in args:
-                    q.put(str(a))
-    u = Qui()
-    if hasattr(ui.ui, 'copy'):
-        # Mercurial 1.3
-        return dispatch._dispatch(u, list(args))
-    else:
-        return thgdispatch(u, path, list(args))
-
-def displaytime(date):
-    return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')

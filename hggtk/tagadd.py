@@ -6,19 +6,23 @@
 
 import os
 import gtk
-from dialog import error_dialog, info_dialog
+import traceback
+
 from mercurial import hg, ui, cmdutil, util
-from mercurial.i18n import _
 from mercurial.node import short, nullid
-from hglib import RepoError
-import shlib
+
+from thgutil.i18n import _
+from thgutil import hglib
+
+import dialog
+import gtklib
 
 class TagAddDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, root='', tag='', rev=''):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_keys(self)
 
         title = _('TortoiseHg Tag - %s') % (root or os.getcwd())
         self.set_title(title)
@@ -28,7 +32,7 @@ class TagAddDialog(gtk.Window):
 
         try:
             self.repo = hg.repository(ui.ui(), path=self.root)
-        except RepoError:
+        except hglib.RepoError:
             pass
 
         # build dialog
@@ -156,12 +160,12 @@ class TagAddDialog(gtk.Window):
 
         # verify input
         if name == '':
-            error_dialog(self, _('Tag input is empty'),
+            dialog.error_dialog(self, _('Tag input is empty'),
                          _('Please enter tag name'))
             self._tag_input.grab_focus()
             return False
         if use_msg and not message:
-            error_dialog(self, _('Custom commit message is empty'),
+            dialog.error_dialog(self, _('Custom commit message is empty'),
                          _('Please enter commit message'))
             self._commit_message.grab_focus()
             return False
@@ -169,15 +173,15 @@ class TagAddDialog(gtk.Window):
         # add tag to repo
         try:
             self._add_hg_tag(name, rev, message, is_local, force=force)
-            info_dialog(self, _('Tagging completed'),
+            dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been added') % name)
             self._refresh()
         except util.Abort, inst:
-            error_dialog(self, _('Error in tagging'), str(inst))
+            dialog.error_dialog(self, _('Error in tagging'), str(inst))
             return False
         except:
-            import traceback
-            error_dialog(self, _('Error in tagging'), traceback.format_exc())
+            dialog.error_dialog(self, _('Error in tagging'),
+                    traceback.format_exc())
             return False
 
     def _do_rm_tag(self):
@@ -188,7 +192,7 @@ class TagAddDialog(gtk.Window):
 
         # verify input
         if name == '':
-            error_dialog(self, _('Tag name is empty'),
+            dialog.error_dialog(self, _('Tag name is empty'),
                          _('Please select tag name to remove'))
             self._tag_input.grab_focus()
             return False
@@ -200,15 +204,15 @@ class TagAddDialog(gtk.Window):
 
         try:
             self._rm_hg_tag(name, message, is_local)
-            info_dialog(self, _('Tagging completed'),
+            dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been removed') % name)
             self._refresh()
         except util.Abort, inst:
-            error_dialog(self, _('Error in tagging'), str(inst))
+            dialog.error_dialog(self, _('Error in tagging'), str(inst))
             return False
         except:
-            import traceback
-            error_dialog(self, _('Error in tagging'), traceback.format_exc())
+            dialog.error_dialog(self, _('Error in tagging'),
+                    traceback.format_exc())
             return False
 
 

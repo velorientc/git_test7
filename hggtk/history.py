@@ -12,13 +12,16 @@ import pango
 import StringIO
 
 from mercurial.node import *
-from mercurial.i18n import _
 from mercurial import ui, hg, commands, extensions
+
+from thgutil.i18n import _
+from thgutil import hglib
+
 from gdialog import *
 from changeset import ChangeSet
-from vis import treemodel
-from vis.treeview import TreeView
-import hglib
+from logview import treemodel
+from logview.treeview import TreeView as LogTreeView
+
 import gtklib
 
 def create_menu(label, callback):
@@ -267,9 +270,9 @@ class GLog(GDialog):
         # Allocate TreeView instance to use internally
         if 'limit' in self.opts:
             firstlimit = self.get_graphlimit(self.opts['limit'])
-            self.graphview = TreeView(self.repo, firstlimit, self.stbar)
+            self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
         else:
-            self.graphview = TreeView(self.repo, self.limit, self.stbar)
+            self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
 
         # Allocate ChangeSet instance to use internally
         self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
@@ -405,7 +408,7 @@ class GLog(GDialog):
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
-        mod = shlib.get_thg_modifier()
+        mod = gtklib.get_thg_modifier()
         key, modifier = gtk.accelerator_parse(mod+'d')
         self.tree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)

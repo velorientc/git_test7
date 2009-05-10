@@ -7,10 +7,13 @@
 import gtk
 import os
 import sys
+
 from mercurial import cmdutil, util, hg, ui
-from mercurial.i18n import _
-from hglib import RepoError
-import shlib
+
+from thgutil.i18n import _
+from thgutil import hglib
+
+import gtklib
 
 class FilterDialog(gtk.Dialog):
     """ Dialog for creating log filters """
@@ -19,8 +22,8 @@ class FilterDialog(gtk.Dialog):
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(FilterDialog, self).__init__(flags=gtk.DIALOG_MODAL,
                                            buttons=buttons)
-        shlib.set_tortoise_icon(self, 'menucheckout.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'menucheckout.ico')
+        gtklib.set_tortoise_keys(self)
 
         self._btn_apply = gtk.Button(_('Apply'))
         self._btn_apply.connect('clicked', self._btn_apply_clicked)
@@ -32,7 +35,7 @@ class FilterDialog(gtk.Dialog):
 
         try:
             self.repo = hg.repository(ui.ui(), path=root)
-        except RepoError:
+        except hglib.RepoError:
             return None
 
         self.set_default_size(350, 120)

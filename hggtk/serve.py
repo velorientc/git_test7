@@ -15,14 +15,16 @@ import socket
 import sys
 import threading
 import time
-import hglib
-import shlib
-import gdialog
-from dialog import error_dialog
-from mercurial.i18n import _
+
 from mercurial import hg, ui, commands, cmdutil, util
 from mercurial.hgweb import server
-from mercurial.i18n import _
+
+from thgutil.i18n import _
+from thgutil import hglib
+
+import dialog 
+import gdialog
+import gtklib
 
 gservice = None
 class ServeDialog(gtk.Window):
@@ -30,8 +32,8 @@ class ServeDialog(gtk.Window):
     def __init__(self, webdir_conf):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_icon(self, 'proxy.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'proxy.ico')
+        gtklib.set_tortoise_keys(self)
 
         self.connect('delete-event', self._delete)
 
@@ -218,7 +220,7 @@ class ServeDialog(gtk.Window):
         except:
             try: port = int(self.defport)
             except: port = 8000
-            error_dialog(self, _('Invalid port 2048..65535'),
+            dialog.error_dialog(self, _('Invalid port 2048..65535'),
                     _('Defaulting to ') + self.defport)
 
         global gservice

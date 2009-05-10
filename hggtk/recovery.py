@@ -10,23 +10,26 @@ import gobject
 import pango
 import Queue
 import os
-import threading
-from mercurial.i18n import _
+
 from mercurial import hg, ui, util
-from dialog import error_dialog
-from hglib import HgThread, toutf, RepoError, rootpath
+
+from thgutil.i18n import _
+from thgutil import hglib
+from thgutil import shlib
+
 import gdialog
-import shlib
+import dialog
 import gtklib
+import hgthread
 
 class RecoveryDialog(gtk.Window):
     def __init__(self):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_icon(self, 'general.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'general.ico')
+        gtklib.set_tortoise_keys(self)
 
-        self.root = rootpath()
+        self.root = hglib.rootpath()
         self.selected_path = None
         self.hgthread = None
         self.connect('delete-event', self._delete)
@@ -95,7 +98,8 @@ class RecoveryDialog(gtk.Window):
 
     def should_live(self):
         if self._cmd_running():
-            error_dialog(self, _('Cannot close now'), _('command is running'))
+            dialog.error_dialog(self, _('Cannot close now'),
+                    _('command is running'))
             return True
         return False
 
@@ -120,7 +124,7 @@ class RecoveryDialog(gtk.Window):
             return
         try:
             repo = hg.repository(ui.ui(), path=self.root)
-        except RepoError:
+        except hglib.RepoError:
             self.write(_('Unable to find repo at %s\n') % (self.root), False)
             return
         pl = repo.changectx(None).parents()
@@ -155,7 +159,7 @@ class RecoveryDialog(gtk.Window):
 
     def _exec_cmd(self, cmd, postfunc=None):
         if self._cmd_running():
-            error_dialog(self, _('Cannot run now'),
+            dialog.error_dialog(self, _('Cannot run now'),
                 _('Please try again after the previous command is completed'))
             return
 
@@ -170,7 +174,7 @@ class RecoveryDialog(gtk.Window):
 
         # execute command and show output on text widget
         gobject.timeout_add(10, self.process_queue)
-        self.hgthread = HgThread(cmdline, postfunc)
+        self.hgthread = hgthread.HgThread(cmdline, postfunc)
         self.hgthread.start()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmdline))
@@ -182,7 +186,7 @@ class RecoveryDialog(gtk.Window):
             return False
 
     def write(self, msg, append=True):
-        msg = toutf(msg)
+        msg = hglib.toutf(msg)
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)

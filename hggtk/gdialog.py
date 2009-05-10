@@ -6,26 +6,28 @@
 # of the GNU General Public License, incorporated herein by reference.
 #
 
-import gtk
-import gobject
-import pango
-import shlex
-
 import os
 import threading
 import cStringIO
 import sys
+import shlex
 import shutil
 import tempfile
 
-from mercurial.i18n import _
+import gtk
+import gobject
+import pango
+
 from mercurial.node import short
 from mercurial import cmdutil, util, ui, hg, commands
-from gtklib import MessageDialog
-import shlib
-import hglib
 
-class SimpleMessage(MessageDialog):
+from thgutil.i18n import _
+from thgutil import shlib
+from thgutil import hglib
+
+import gtklib
+
+class SimpleMessage(gtklib.MessageDialog):
     def run(self):
         response = MessageDialog.run(self)
         self.destroy()
@@ -38,7 +40,7 @@ class Prompt(SimpleMessage):
                 gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE)
         self.set_title(hglib.toutf(title))
         self.set_markup('<b>' + hglib.toutf(message) + '</b>')
-        mod = shlib.get_thg_modifier()
+        mod = gtklib.get_thg_modifier()
         key, modifier = gtk.accelerator_parse(mod+'Return')
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
@@ -302,8 +304,8 @@ class GDialog(gtk.Window):
 
     def _setup_gtk(self):
         self.set_title(self.get_title())
-        shlib.set_tortoise_icon(self, self.get_icon())
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, self.get_icon())
+        gtklib.set_tortoise_keys(self)
 
         self.ismaximized = False
         self.lastpos = self._setting_winpos

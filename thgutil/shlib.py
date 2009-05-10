@@ -9,11 +9,8 @@ of the GNU General Public License, incorporated herein by reference.
 
 import os
 import sys
-import gtk
 import cPickle
 import time
-import hgtk
-import gobject
 from mercurial.i18n import _
 from mercurial import util
 
@@ -121,53 +118,6 @@ def get_system_times():
     if t[4] == 0.0: # Windows leaves this as zero, so use time.clock()
         t = (t[0], t[1], t[2], t[3], time.clock())
     return t
-
-def set_tortoise_icon(window, thgicon):
-    ico = get_tortoise_icon(thgicon)
-    if ico: window.set_icon_from_file(ico)
-
-def get_thg_modifier():
-    if sys.platform == 'darwin':
-        return '<Mod1>'
-    else:
-        return '<Control>'
-
-def set_tortoise_keys(window):
-    'Set default TortoiseHg keyboard accelerators'
-    if sys.platform == 'darwin':
-        mask = gtk.accelerator_get_default_mod_mask()
-        mask |= gtk.gdk.MOD1_MASK;
-        gtk.accelerator_set_default_mod_mask(mask)
-    mod = get_thg_modifier()
-    accelgroup = gtk.AccelGroup()
-    window.add_accel_group(accelgroup)
-    key, modifier = gtk.accelerator_parse(mod+'w')
-    window.add_accelerator('thg-close', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse(mod+'q')
-    window.add_accelerator('thg-exit', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse('F5')
-    window.add_accelerator('thg-refresh', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse(mod+'Return')
-    window.add_accelerator('thg-accept', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-
-    # connect ctrl-w and ctrl-q to every window
-    window.connect('thg-close', thgclose)
-    window.connect('thg-exit', thgexit)
-
-def thgexit(window):
-    if thgclose(window):
-        gobject.idle_add(hgtk.thgexit, window)
-
-def thgclose(window):
-    if hasattr(window, 'should_live'):
-        if window.should_live():
-            return False
-    window.destroy()
-    return True
 
 def get_tortoise_icon(thgicon):
     '''Find a tortoise icon, apply to PyGtk window'''

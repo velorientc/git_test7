@@ -4,15 +4,16 @@
 # Copyright (C) 2009 Steve Borho <steve@borho.org>
 #
 
-import os
 import sys
 import gtk
 import cStringIO
-from dialog import error_dialog
-from mercurial.i18n import _
+
 from mercurial import hg, ui, util, commands
-from hglib import toutf, fromutf, rootpath, RepoError
-import gtklib
+
+from thgutil.i18n import _
+from thgutil import hglib
+
+import dialog
 
 def run(ui, *pats, **opts):
     fname, target = '', ''
@@ -24,10 +25,10 @@ def run(ui, *pats, **opts):
     from dialog import entry_dialog
     fname = util.normpath(fname)
     if target:
-        target = toutf(util.normpath(target))
+        target = hglib.toutf(util.normpath(target))
     else:
-        target = toutf(fname)
-    title = 'Rename ' + toutf(fname)
+        target = hglib.toutf(fname)
+    title = 'Rename ' + hglib.toutf(fname)
     dialog = entry_dialog(None, title, True, target, rename_resp)
     dialog.orig = fname
     return dialog
@@ -37,13 +38,13 @@ def rename_resp(dialog, response):
         dialog.destroy()
         return
     try:
-        root = rootpath()
+        root = hglib.rootpath()
         repo = hg.repository(ui.ui(), root)
-    except (ImportError, RepoError):
+    except (ImportError, hglib.RepoError):
         dialog.destroy()
         return
 
-    new_name = fromutf(dialog.entry.get_text())
+    new_name = hglib.fromutf(dialog.entry.get_text())
     opts = {}
     opts['force'] = False # Checkbox? Nah.
     opts['after'] = False
@@ -59,14 +60,14 @@ def rename_resp(dialog, response):
         try:
             commands.rename(repo.ui, repo, dialog.orig, new_name, **opts)
             toquit = True
-        except (util.Abort, RepoError), inst:
-            error_dialog(None, _('rename error'), str(inst))
+        except (util.Abort, hglib.RepoError), inst:
+            dialog.error_dialog(None, _('rename error'), str(inst))
             toquit = False
     finally:
         sys.stderr = saved
         textout = errors.getvalue() + repo.ui.popbuffer()
         errors.close()
         if len(textout) > 1:
-            error_dialog(None, _('rename error'), textout)
+            dialog.error_dialog(None, _('rename error'), textout)
         elif toquit:
             dialog.destroy()

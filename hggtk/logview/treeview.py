@@ -15,7 +15,7 @@ import re
 from graphcell import CellRendererGraph
 from revgraph import *
 from mercurial.node import hex
-from mercurial.i18n import _
+from thgutil.i18n import _
 
 
 class TreeView(gtk.ScrolledWindow):

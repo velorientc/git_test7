@@ -1,5 +1,5 @@
 """
-util.py - TortoiseHg utility functions
+thgutil.py - TortoiseHg utility functions
  Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 
 This software may be used and distributed according to the terms

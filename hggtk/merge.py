@@ -7,26 +7,23 @@
 import os
 import gtk
 import gobject
-import re
-import sys
 
-from mercurial.node import short, nullrev
-from mercurial.hgweb import webutil
-from mercurial.i18n import _
-from mercurial import util, hg, ui
+from mercurial import hg, ui
 
+from thgutil.i18n import _
+from thgutil import hglib
+
+import gtklib
 import gdialog
 import hgcmd
-import shlib
-import hglib
 
 class MergeDialog(gtk.Window):
     """ Dialog to merge revisions of a Mercurial repo """
     def __init__(self, rev=None):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_icon(self, 'menumerge.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'menumerge.ico')
+        gtklib.set_tortoise_keys(self)
         self.notify_func = None
 
         if not rev:
@@ -68,7 +65,7 @@ class MergeDialog(gtk.Window):
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
-        mod = shlib.get_thg_modifier()
+        mod = gtklib.get_thg_modifier()
 
         hbbox = gtk.HButtonBox()
         hbbox.set_layout(gtk.BUTTONBOX_END)

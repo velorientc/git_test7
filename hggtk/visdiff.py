@@ -9,13 +9,21 @@
 
 import gtk
 import gobject
-from mercurial.i18n import _
+import os
+import shlex
+import subprocess
+import shutil
+import tempfile
+
 from mercurial.node import short
 from mercurial import hg, ui, cmdutil, util, commands
-from gdialog import Prompt
-from hglib import RepoError, rootpath
-import os, shlex, subprocess, shutil, tempfile
-import shlib
+
+from thgutil.i18n import _
+from thgutil import hglib
+from thgutil import shlib
+
+import gdialog
+import gtklib
 
 try:
     import win32con
@@ -50,8 +58,8 @@ class FileSelectionDialog(gtk.Dialog):
     def __init__(self, canonpats, opts):
         'Initialize the Dialog'
         gtk.Dialog.__init__(self)
-        shlib.set_tortoise_icon(self, 'menushowchanged.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'menushowchanged.ico')
+        gtklib.set_tortoise_keys(self)
 
         self.set_title(_('Visual Diffs'))
         self.set_default_size(400, 150)
@@ -97,10 +105,10 @@ class FileSelectionDialog(gtk.Dialog):
         treeview.append_column(fcol)
 
         try:
-            repo = hg.repository(ui.ui(), path=rootpath())
-        except RepoError:
+            repo = hg.repository(ui.ui(), path=hglib.rootpath())
+        except hglib.RepoError:
             # hgtk should catch this earlier
-            Prompt(_('No repository'),
+            gdialog.Prompt(_('No repository'),
                    _('No repository found here'), None).run()
             return
 
@@ -127,7 +135,7 @@ class FileSelectionDialog(gtk.Dialog):
             finally:
                 os.chdir(cwd)
         else:
-            Prompt(_('No visual diff tool'),
+            gdialog.Prompt(_('No visual diff tool'),
                    _('No visual diff tool has been configured'), None).run()
 
     def search_filelist(self, model, column, key, iter):
@@ -165,7 +173,7 @@ class FileSelectionDialog(gtk.Dialog):
         matcher = cmdutil.match(repo, pats, opts)
         modified, added, removed = repo.status(node1, node2, matcher)[:3]
         if not (modified or added or removed):
-            Prompt(_('No file changes'),
+            gdialog.Prompt(_('No file changes'),
                    _('There are no file changes to view'), self).run()
             # GTK+ locks up if this is done immediately here
             gobject.idle_add(self.destroy)
@@ -233,7 +241,7 @@ class FileSelectionDialog(gtk.Dialog):
                        stdout=subprocess.PIPE,
                        stdin=subprocess.PIPE)
         except (WindowsError, EnvironmentError), e:
-            Prompt(_('Tool launch failure'),
+            gdialog.Prompt(_('Tool launch failure'),
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
 
 def readtools(ui):
@@ -259,7 +267,7 @@ def readtools(ui):
     return tools
 
 def run(ui, *pats, **opts):
-    root = rootpath()
+    root = hglib.rootpath()
     canonpats = []
     for f in pats:
         canonpats.append(util.canonpath(root, os.getcwd(), f))

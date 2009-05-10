@@ -13,19 +13,7 @@ import re
 from mercurial import util
 from mercurial.node import short
 from mercurial.hgweb import webutil
-
-# FIXME: dirty hack to import toutf() from hggtk.hglib.
-#
-# Python 2.5's relative imports doesn't seem to work either,
-# when running history.py directly.
-#
-# Besides, we want to be compatible older Python versions.
-try:
-    # when history.py is invoked directly
-    from hglib import toutf, displaytime
-except ImportError:
-    # when history.py is imported and called from hgproc.py
-    from hggtk.hglib import toutf, displaytime
+from thgutil import hglib
 
 # treemodel row enumerated attributes
 LINES = 0
@@ -110,10 +98,10 @@ class TreeModel(gtk.GenericTreeModel):
                 summary = summary[0:80]
             else:
                 summary = summary.split('\n')[0]
-            summary = gobject.markup_escape_text(toutf(summary))
+            summary = gobject.markup_escape_text(hglib.toutf(summary))
             node = self.repo.lookup(revid)
             tags = self.repo.nodetags(node)
-            taglist = toutf(', '.join(tags))
+            taglist = hglib.toutf(', '.join(tags))
             tstr = ''
             for tag in tags:
                 tstr += '<span background="#ffffaa"> %s </span> ' % tag
@@ -131,11 +119,11 @@ class TreeModel(gtk.GenericTreeModel):
                 branchstr += branch['name']
 
             if '<' in ctx.user():
-                author = toutf(self.author_re.sub('', ctx.user()).strip(' '))
+                author = hglib.toutf(self.author_re.sub('', ctx.user()).strip(' '))
             else:
-                author = toutf(util.shortuser(ctx.user()))
+                author = hglib.toutf(util.shortuser(ctx.user()))
 
-            date = displaytime(ctx.date())
+            date = hglib.displaytime(ctx.date())
 
             wc_parent = revid in self.parents
             head = revid in self.heads

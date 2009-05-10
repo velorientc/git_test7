@@ -10,23 +10,26 @@ import gobject
 import pango
 import Queue
 import os
-import threading
-from mercurial.i18n import _
-from mercurial import hg, ui, util, extensions, url
-from dialog import error_dialog, info_dialog
-from hglib import HgThread, fromutf, toutf, rootpath, RepoError
-import shlib
-import gtklib
 import urllib
+
+from mercurial import hg, ui, util, extensions, url
+
+from thgutil.i18n import _
+from thgutil import hglib
+from thgutil import shlib
+
+import dialog
+import gtklib
+import hgthread
 
 class SynchDialog(gtk.Window):
     def __init__(self, repos=[], pushmode=False):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_icon(self, 'menusynch.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'menusynch.ico')
+        gtklib.set_tortoise_keys(self)
 
-        self.root = rootpath()
+        self.root = hglib.rootpath()
         self.selected_path = None
         self.hgthread = None
 
@@ -124,7 +127,7 @@ class SynchDialog(gtk.Window):
                 defpushrow = i
 
         if repos:
-            self._pathtext.set_text(toutf(repos[0]))
+            self._pathtext.set_text(hglib.toutf(repos[0]))
         elif defpushrow is not None and pushmode:
             self._pathbox.set_active(defpushrow)
         elif defrow is not None:
@@ -259,7 +262,7 @@ class SynchDialog(gtk.Window):
         self.pathlist.clear()
         for alias, path in self.paths:
             path = url.hidepassword(path)
-            self.pathlist.append([toutf(path), toutf(alias)])
+            self.pathlist.append([hglib.toutf(path), hglib.toutf(alias)])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
         if time != self._last_drop_time:
@@ -271,17 +274,17 @@ class SynchDialog(gtk.Window):
         if not uri.startswith('file://'):
             return
         path = urllib.unquote(uri[7:])
-        if rootpath(path) == path:
-            self._pathtext.set_text(toutf(path))
+        if hglib.rootpath(path) == path:
+            self._pathtext.set_text(hglib.toutf(path))
         elif not os.path.isdir(path) and path.endswith('.hg'):
-            self._pathtext.set_text(toutf(path))
+            self._pathtext.set_text(hglib.toutf(path))
 
     def update_buttons(self, *args):
         self.buttonhbox.hide()
         try:
             # open a new repo, rebase can confuse cached repo
             repo = hg.repository(ui.ui(), path=self.root)
-        except RepoError:
+        except hglib.RepoError:
             return
         tip = len(repo.changelog)
         if self.origchangecount == tip:
@@ -304,15 +307,15 @@ class SynchDialog(gtk.Window):
         from history import GLog
         countpulled = len(self.repo.changelog) - self.origchangecount
         opts = {'limit' : countpulled, 'from-synch' : True}
-        dialog = GLog(self.ui, None, None, [], opts)
-        dialog.display()
+        dlg = GLog(self.ui, None, None, [], opts)
+        dlg.display()
 
     def _update_to_tip(self, button):
         # execute command and show output on text widget
         gobject.timeout_add(10, self.process_queue)
         self.write("", False)
         cmdline = ['update', '-v']
-        self.hgthread = HgThread(cmdline)
+        self.hgthread = hgthread.HgThread(cmdline)
         self.hgthread.start()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmdline))
@@ -332,46 +335,47 @@ class SynchDialog(gtk.Window):
                     raise _("unknown sort key '%s'") % sort
                 paths.sort(sortfunc)
             return paths
-        except RepoError:
+        except hglib.RepoError:
             return None
 
     def _btn_remotepath_clicked(self, button):
         """ select source folder to clone """
-        dialog = gtk.FileChooserDialog(title=_('Select Repository'),
+        dlg = gtk.FileChooserDialog(title=_('Select Repository'),
                 action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                 buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
-        dialog.set_current_folder(self.root)
-        response = dialog.run()
+        dlg.set_default_response(gtk.RESPONSE_OK)
+        dlg.set_current_folder(self.root)
+        response = dlg.run()
         if response == gtk.RESPONSE_OK:
-            self._pathtext.set_text(dialog.get_filename())
-        dialog.destroy()
+            self._pathtext.set_text(dlg.get_filename())
+        dlg.destroy()
 
     def _btn_bundlepath_clicked(self, button):
         """ select bundle to read from """
-        dialog = gtk.FileChooserDialog(title=_('Select Bundle'),
+        dlg = gtk.FileChooserDialog(title=_('Select Bundle'),
                 action=gtk.FILE_CHOOSER_ACTION_OPEN,
                 buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
-        dialog.set_current_folder(self.root)
+        dlg.set_default_response(gtk.RESPONSE_OK)
+        dlg.set_current_folder(self.root)
         filefilter = gtk.FileFilter()
         filefilter.set_name(_('Bundle (*.hg)'))
         filefilter.add_pattern("*.hg")
-        dialog.add_filter(filefilter)
+        dlg.add_filter(filefilter)
         filefilter = gtk.FileFilter()
         filefilter.set_name(_('Bundle (*)'))
         filefilter.add_pattern("*")
-        dialog.add_filter(filefilter)
-        response = dialog.run()
+        dlg.add_filter(filefilter)
+        response = dlg.run()
         if response == gtk.RESPONSE_OK:
-            self._pathtext.set_text(dialog.get_filename())
-        dialog.destroy()
+            self._pathtext.set_text(dlg.get_filename())
+        dlg.destroy()
 
     def should_live(self):
         if self._cmd_running():
-            error_dialog(self, _('Cannot close now'), _('command is running'))
+            dialog.error_dialog(self, _('Cannot close now'),
+                    _('command is running'))
             return True
         else:
             self.update_settings()
@@ -443,7 +447,7 @@ class SynchDialog(gtk.Window):
         self._exec_cmd(cmd)
 
     def _conf_clicked(self, toolbutton, data=None):
-        newpath = fromutf(self._pathtext.get_text()).strip()
+        newpath = hglib.fromutf(self._pathtext.get_text()).strip()
         for alias, path in self.paths:
             if path == newpath:
                 newpath = None
@@ -463,12 +467,12 @@ class SynchDialog(gtk.Window):
 
     def _email_clicked(self, toolbutton, data=None):
         opts = []
-        path = fromutf(self._pathtext.get_text()).strip()
+        path = hglib.fromutf(self._pathtext.get_text()).strip()
         rev = self._get_advanced_options().get('rev')
         if path:
             opts.extend(['--outgoing', path])
         elif not rev:
-            info_dialog(self, _('No repository selected'),
+            dialog.info_dialog(self, _('No repository selected'),
                         _('Select a peer repository to compare with'))
             self._pathbox.grab_focus()
             return
@@ -510,7 +514,7 @@ class SynchDialog(gtk.Window):
 
     def _exec_cmd(self, cmd):
         if self._cmd_running():
-            error_dialog(self, _('Cannot run now'),
+            dialog.error_dialog(self, _('Cannot run now'),
                 _('Please try again after the previous command is completed'))
             return
 
@@ -519,7 +523,7 @@ class SynchDialog(gtk.Window):
         proxy_host = ui.ui().config('http_proxy', 'host', '')
         use_proxy = self._use_proxy.get_active()
         text_entry = self._pathbox.get_child()
-        remote_path = fromutf(text_entry.get_text()).strip()
+        remote_path = hglib.fromutf(text_entry.get_text()).strip()
         for alias, path in self.paths:
             if remote_path == alias:
                 remote_path = path
@@ -537,7 +541,7 @@ class SynchDialog(gtk.Window):
 
         # execute command and show output on text widget
         gobject.timeout_add(10, self.process_queue)
-        self.hgthread = HgThread(cmdline, parent=self)
+        self.hgthread = hgthread.HgThread(cmdline, parent=self)
         self.hgthread.start()
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmd + [remote_path]))
@@ -562,7 +566,7 @@ class SynchDialog(gtk.Window):
         self.fill_path_combo()
 
     def write(self, msg, append=True):
-        msg = toutf(msg)
+        msg = hglib.toutf(msg)
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)

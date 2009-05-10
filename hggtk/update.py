@@ -7,14 +7,16 @@
 import os
 import sys
 import gtk
-from dialog import error_dialog
+
 from mercurial import util, hg, ui
 from mercurial.node import short, nullrev
-from mercurial.i18n import _
-import hglib
-import shlib
+
+from thgutil.i18n import _
+from thgutil import hglib
+
 import hgcmd
 import gdialog
+import gtklib
 
 _branch_tip_ = _('= Current Branch Tip =')
 
@@ -23,8 +25,8 @@ class UpdateDialog(gtk.Window):
     def __init__(self, rev=None):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_icon(self, 'menucheckout.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'menucheckout.ico')
+        gtklib.set_tortoise_keys(self)
 
         self.set_default_size(350, 120)
         self.notify_func = None
@@ -80,7 +82,7 @@ class UpdateDialog(gtk.Window):
 
         update = gtk.Button(_('Update'))
         update.connect('clicked', self.update, combo, repo)
-        mod = shlib.get_thg_modifier()
+        mod = gtklib.get_thg_modifier()
         key, modifier = gtk.accelerator_parse(mod+'Return')
         update.add_accelerator('clicked', accelgroup, key, modifier,
                 gtk.ACCEL_VISIBLE)

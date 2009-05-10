@@ -11,16 +11,18 @@ This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
 
-from mercurial.i18n import _
-import mercurial.ui as _ui
-from mercurial import hg, util, fancyopts, cmdutil, extensions
-import hglib
-import gtk
-import gobject
 import os
 import pdb
 import sys
 import traceback
+import gtk
+import gobject
+
+import mercurial.ui as _ui
+from mercurial import hg, util, fancyopts, cmdutil, extensions
+
+from thgutil.i18n import _
+from thgutil import hglib
 
 nonrepo_commands = 'userconfig clone debugcomplete init about help version'
 

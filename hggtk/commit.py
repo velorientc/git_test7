@@ -14,21 +14,23 @@ import pango
 import tempfile
 import cStringIO
 
-from mercurial.i18n import _
 from mercurial.node import hex, nullrev
 from mercurial import ui, hg, util, patch
-from gdialog import Prompt, Confirm
+
+from thgutil.i18n import _
+from thgutil import hglib
+from thgutil import shlib
+
 from status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH_UTF8
 from status import DM_REJECTED, DM_CHUNK_ID
-from hglib import fromutf
-import shlib
-from shlib import shell_notify
+import gtklib
+import gdialog
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_keys(self)
         self.connect('response', self.response)
         self.set_title(_('Branch Operations'))
         self.newbranch = None
@@ -164,8 +166,8 @@ class GCommit(GStatus):
         if index >= 0:
             buf = self.text.get_buffer()
             if buf.get_char_count() and buf.get_modified():
-                response = Confirm(_('Confirm Discard Message'), [], self,
-                        _('Discard current commit message?')).run()
+                response = gdialog.Confirm(_('Confirm Discard Message'),
+                        [], self, _('Discard current commit message?')).run()
                 if response != gtk.RESPONSE_YES:
                     combobox.set_active(-1)
                     return
@@ -281,7 +283,7 @@ class GCommit(GStatus):
         live = False
         buf = self.text.get_buffer()
         if buf.get_char_count() > 10 and buf.get_modified():
-            dialog = Confirm(_('Confirm Exit'), [], self,
+            dialog = gdialog.Confirm(_('Confirm Exit'), [], self,
                     _('Save commit message at exit?'))
             res = dialog.run()
             if res == gtk.RESPONSE_YES:
@@ -387,7 +389,7 @@ class GCommit(GStatus):
             # as of Mercurial 1.0, merges must be committed without
             # specifying file list.
             self._hg_commit([])
-            shell_notify(self._relevant_files('MAR'))
+            shlib.shell_notify(self._relevant_files('MAR'))
             self.reload_status()
         else:
             commitable = 'MAR'
@@ -401,7 +403,7 @@ class GCommit(GStatus):
             elif len(self.filemodel) == 0 and self.qnew:
                 self._commit_selected([])
             else:
-                Prompt(_('Nothing Commited'),
+                gdialog.Prompt(_('Nothing Commited'),
                        _('No committable files selected'), self).run()
         return True
 
@@ -419,7 +421,7 @@ class GCommit(GStatus):
             os.mkdir(backupdir)
         except OSError, err:
             if err.errno != errno.EEXIST:
-                Prompt(_('Commit'), _('Unable to create ') + backupdir,
+                gdialog.Prompt(_('Commit'), _('Unable to create ') + backupdir,
                         self).run()
                 return
         try:
@@ -466,7 +468,8 @@ class GCommit(GStatus):
                     if s:
                         raise util.Abort(s)
                     else:
-                        Prompt(_('Commit'), _('Unable to apply patch'), self).run()
+                        gdialog.Prompt(_('Commit'),
+                                _('Unable to apply patch'), self).run()
                         raise util.Abort(_('patch failed to apply'))
             del fp
 
@@ -500,20 +503,20 @@ class GCommit(GStatus):
         if self._ready_message():
             if stat not in '?!' or self._should_addremove([file]):
                 self._hg_commit([file])
-                shell_notify([file])
+                shlib.shell_notify([file])
                 self.reload_status()
         return True
 
 
     def _undo_clicked(self, toolbutton, data=None):
-        response = Confirm(_('Confirm Undo commit'),
+        response = gdialog.Confirm(_('Confirm Undo commit'),
                 [], self, _('Undo last commit')).run()
         if response != gtk.RESPONSE_YES:
             return
 
         tip = self._get_tip_rev(True)
         if not tip == self._last_commit_id:
-            Prompt(_('Undo commit'),
+            gdialog.Prompt(_('Undo commit'),
                     _('Unable to undo!\n\n'
                     'Tip revision differs from last commit.'),
                     self).run()
@@ -524,16 +527,19 @@ class GCommit(GStatus):
             self._last_commit_id = None
             self.reload_status()
         except:
-            Prompt(_('Undo commit'), _('Errors during rollback!'), self).run()
+            gdialog.Prompt(_('Undo commit'),
+                    _('Errors during rollback!'), self).run()
 
 
     def _should_addremove(self, files):
         if self.test_opt('addremove'):
             return True
         else:
-            response = Confirm(_('Confirm Add/Remove'), files, self).run()
+            response = gdialog.Confirm(_('Confirm Add/Remove'),
+                    files, self).run()
             if response == gtk.RESPONSE_YES:
-                # This will stay set for further commits (meaning no more prompts). Problem?
+                # This will stay set for further commits (meaning no
+                # more prompts). Problem?
                 self.opts['addremove'] = True
                 return True
         return False
@@ -542,7 +548,7 @@ class GCommit(GStatus):
     def _ready_message(self):
         buf = self.text.get_buffer()
         if buf.get_char_count() == 0:
-            Prompt(_('Nothing Commited'),
+            gdialog.Prompt(_('Nothing Commited'),
                    _('Please enter commit message'), self).run()
             self.text.grab_focus()
             return False
@@ -551,7 +557,7 @@ class GCommit(GStatus):
             sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
             maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
         except (TypeError, ValueError):
-            Prompt(_('Error'),
+            gdialog.Prompt(_('Error'),
                    _('Message format configuration error'),
                    self).run()
             self._msg_config(None)
@@ -561,7 +567,7 @@ class GCommit(GStatus):
                              buf.get_end_iter()).splitlines()
         
         if sumlen and len(lines[0].rstrip()) > sumlen:
-            resp = Confirm(_('Confirm Commit'), [], self,
+            resp = gdialog.Confirm(_('Confirm Commit'), [], self,
                            _('The summary line length of %i is greater than'
                              ' %i.\n\nIgnore format policy and continue'
                              ' commit?') %
@@ -569,7 +575,7 @@ class GCommit(GStatus):
             if resp != gtk.RESPONSE_YES:
                 return False
         if sumlen and len(lines) > 1 and len(lines[1].strip()):
-            resp = Confirm(_('Confirm Commit'), [], self,
+            resp = gdialog.Confirm(_('Confirm Commit'), [], self,
                            _('The summary line is not followed by a blank'
                              ' line.\n\nIgnore format policy and continue'
                              ' commit?')).run()
@@ -581,7 +587,7 @@ class GCommit(GStatus):
             errs = [str(x[1]+start+1) for x in zip(tmp, range(len(tmp)))
                     if x[0]]
             if errs:
-                resp = Confirm(_('Confirm Commit'), [], self,
+                resp = gdialog.Confirm(_('Confirm Commit'), [], self,
                                _('The following lines are over the %i-'
                                  'character limit: %s.\n\nIgnore format'
                                  ' policy and continue commit?') %
@@ -596,7 +602,7 @@ class GCommit(GStatus):
 
     def _hg_commit(self, files):
         if not self.repo.ui.config('ui', 'username'):
-            Prompt(_('Commit: Invalid username'),
+            gdialog.Prompt(_('Commit: Invalid username'),
                    _('Your username has not been configured.\n\n'
                     'Please configure your username and try again'),
                     self).run()
@@ -617,16 +623,16 @@ class GCommit(GStatus):
         cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
 
         if self.nextbranch:
-            newbranch = fromutf(self.nextbranch)
+            newbranch = hglib.fromutf(self.nextbranch)
             if newbranch in self.repo.branchtags():
                 if newbranch not in [p.branch() for p in self.repo.parents()]:
-                    response = Confirm(_('Confirm Override Branch'), [], self,
-                        _('A branch named "%s" already exists,\n'
+                    response = gdialog.Confirm(_('Confirm Override Branch'),
+                            [], self, _('A branch named "%s" already exists,\n'
                         'override?') % newbranch).run()
                 else:
                     response = gtk.RESPONSE_YES
             else:
-                response = Confirm(_('Confirm New Branch'), [], self,
+                response = gdialog.Confirm(_('Confirm New Branch'), [], self,
                         _('Create new named branch "%s"?') % newbranch).run()
             if response == gtk.RESPONSE_YES:
                 self.repo.dirstate.setbranch(newbranch)
@@ -649,9 +655,9 @@ class GCommit(GStatus):
             cmdline.extend(['--user', self.opts['user']])
         if self.opts['date']:
             cmdline.extend(['--date', self.opts['date']])
-        cmdline += ['--message', fromutf(self.opts['message'])]
+        cmdline += ['--message', hglib.fromutf(self.opts['message'])]
         if self.qnew:
-            cmdline += [fromutf(self._get_qnew_name())]
+            cmdline += [hglib.fromutf(self._get_qnew_name())]
         cmdline += [self.repo.wjoin(x) for x in files]
         from hgcmd import CmdDialog
         dialog = CmdDialog(cmdline, True)
@@ -661,7 +667,7 @@ class GCommit(GStatus):
 
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
-            shell_notify([self.cwd] + files)
+            shlib.shell_notify([self.cwd] + files)
             if self.notify_func:
                 self.notify_func(self.notify_args)
             self.closebranch = False
@@ -729,7 +735,7 @@ class GCommit(GStatus):
             sumlen = 0
             maxlen = 0
         if not (sumlen or maxlen):
-            Prompt(_('Info required'),
+            gdialog.Prompt(_('Info required'),
                    _('Message format needs to be configured'),
                    self).run()
             self._msg_config(None)
@@ -742,12 +748,12 @@ class GCommit(GStatus):
             return
         
         if sumlen and len(lines[0].rstrip()) > sumlen:
-            Prompt(_('Warning'),
+            gdialog.Prompt(_('Warning'),
                    _('The summary line length of %i is greater than %i') %
                          (len(lines[0].rstrip()), sumlen),
                    self).run()
         if sumlen and len(lines) > 1 and len(lines[1].strip()):
-            Prompt(_('Warning'),
+            gdialog.Prompt(_('Warning'),
                    _('The summary line is not followed by a blank line'),
                    self).run()
         if not maxlen:

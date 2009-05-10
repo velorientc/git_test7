@@ -4,14 +4,15 @@
 # Copyright (C) 2009 Steve Borho <steve@borho.org>
 #
 
-import gtk
 import os
+import gtk
 import pango
-from mercurial.i18n import _
+
 from mercurial import extensions
-from hglib import toutf, fromutf, rootpath, diffexpand
+from thgutil.i18n import _
+from thgutil import shlib
 from gdialog import GDialog
-from dialog import entry_dialog
+from about import hgversion
 
 class BugReport(GDialog):
     """GTK+ based dialog for displaying traceback info to the user in a
@@ -44,8 +45,6 @@ class BugReport(GDialog):
         close.connect('clicked', gtk.main_quit)
         hbbox.add(close)
 
-        from about import hgversion
-        import shlib
         text = _('\n** Please report this bug to'
                 ' tortoisehg-discuss@lists.sourceforge.net or'
                 ' http://bitbucket.org/tortoisehg/stable/issues\n')

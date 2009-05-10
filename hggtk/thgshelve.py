@@ -8,10 +8,11 @@
 
 import os
 import gtk
-import cStringIO
 
-from mercurial.i18n import _
 from mercurial import ui, hg
+
+from thgutil.i18n import _
+
 from status import GStatus, FM_STATUS, FM_CHECKED, DM_CHUNK_ID, DM_REJECTED
 import hgshelve
 

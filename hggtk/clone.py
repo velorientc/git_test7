@@ -7,18 +7,19 @@
 import gtk
 import os
 import pango
-import gdialog
 from mercurial import hg, ui, cmdutil, util
-from mercurial.i18n import _
-import shlib
+from thgutil.i18n import _
+from thgutil import shlib
+import gdialog
+import gtklib
 
 class CloneDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_icon(self, 'menuclone.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'menuclone.ico')
+        gtklib.set_tortoise_keys(self)
         self.set_default_size(520, 180)
         self.set_title(_('TortoiseHg Clone'))
 
@@ -148,7 +149,7 @@ class CloneDialog(gtk.Window):
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
-        mod = shlib.get_thg_modifier()
+        mod = gtklib.get_thg_modifier()
 
         hbbox = gtk.HButtonBox()
         hbbox.set_layout(gtk.BUTTONBOX_END)

@@ -8,17 +8,22 @@ import gobject
 import os
 import pango
 import Queue
-import threading, thread2
-from mercurial import hg, ui, util, revlog
-from mercurial.i18n import _
-from hglib import hgcmd_toq, toutf, fromutf, gettabwidth, displaytime, LookupError, rootpath
-from gdialog import GDialog, Prompt
-from vis import treemodel
-from vis.colormap import AnnotateColorMap, AnnotateColorSaturation
-from vis.treeview import TreeView
-import gtklib
+import threading
 
-class DataMineDialog(GDialog):
+from mercurial import hg, ui, util, revlog
+
+from thgutil.i18n import _
+from thgutil.hglib import *
+from thgutil import thread2
+
+from logview import treemodel
+from logview.colormap import AnnotateColorMap, AnnotateColorSaturation
+from logview.treeview import TreeView as LogTreeView
+
+import gtklib
+import gdialog
+
+class DataMineDialog(gdialog.GDialog):
     COL_REVID = 0
     COL_TEXT = 1
     COL_TOOLTIP = 2
@@ -52,7 +57,7 @@ class DataMineDialog(GDialog):
             if os.path.isfile(f):
                 cf.append(util.canonpath(root, self.cwd, f))
             elif os.path.isdir(f):
-                Prompt(_('Invalid path'),
+                gdialog.Prompt(_('Invalid path'),
                        _('Cannot annotate directory: %s') % f, None).run()
         for f in cf:
             self.add_annotate_page(f, '.')
@@ -308,7 +313,7 @@ class DataMineDialog(GDialog):
                 excludes, includes, linenum, showall, search_hbox) = objs
         retext = regexp.get_text()
         if not retext:
-            Prompt(_('No regular expression given'),
+            gdialog.Prompt(_('No regular expression given'),
                    _('You must provide a search expression'), self).run()
             regexp.grab_focus()
             return
@@ -449,7 +454,7 @@ class DataMineDialog(GDialog):
             try:
                 fctx = ctx.filectx(path)
             except LookupError:
-                Prompt(_('File is unrevisioned'),
+                gdialog.Prompt(_('File is unrevisioned'),
                        _('Unable to annotate ') + path, self).run()
                 return
             rev = fctx.filelog().linkrev(fctx.filerev())
@@ -462,7 +467,7 @@ class DataMineDialog(GDialog):
         vbox = gtk.VBox()
 
         # File log revision graph
-        graphview = TreeView(self.repo, 5000, self.stbar)
+        graphview = LogTreeView(self.repo, 5000, self.stbar)
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
         graphview.refresh(True, None, {'filehist':path, 'filerev':rev})
         graphview.set_property('rev-column-visible', True)

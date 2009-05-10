@@ -7,18 +7,22 @@
 import os
 import gtk
 import gobject
+
 from mercurial import hg, ui, match
-from mercurial.i18n import _
-import shlib
-import hglib
+
+from thgutil.i18n import _
+from thgutil import shlib
+from thgutil import hglib
+
+import gtklib
 
 class HgIgnoreDialog(gtk.Window):
     'Edit a reposiory .hgignore file'
     def __init__(self, fileglob='', *pats):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_icon(self, 'ignore.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'ignore.ico')
+        gtklib.set_tortoise_keys(self)
 
         self.root = hglib.rootpath()
         self.set_title(_('Ignore filter for ') + os.path.basename(self.root))
@@ -221,7 +225,8 @@ class HgIgnoreDialog(gtk.Window):
         except IOError:
             pass
         shlib.shell_notify([self.ignorefile])
-        if self.notify_func: self.notify_func()
+        if self.notify_func:
+            self.notify_func()
 
 def run(_ui, *pats, **opts):
     if pats and pats[0].endswith('.hgignore'):

@@ -8,31 +8,32 @@ import gtk
 import gobject
 import pango
 import os
-import threading
 import Queue
-import shlib
-from hglib import HgThread, hgcmd_toq, toutf
-from mercurial.i18n import _
+
+from thgutil.i18n import _
+from thgutil import shlib
+from thgutil import hglib
+
+import gtklib
+import hgthread
 
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, progressbar=True, width=520, height=400):
         title = 'hg ' + ' '.join(cmdline[1:])
         if len(title) > 80:
             title = title[:80] + '...'
-        title = toutf(title.replace('\n', ' '))
+        title = hglib.toutf(title.replace('\n', ' '))
         gtk.Dialog.__init__(self,
                             title=title,
                             flags=gtk.DIALOG_MODAL,
-                            #buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
                             )
 
-        shlib.set_tortoise_icon(self, 'hg.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'hg.ico')
+        gtklib.set_tortoise_keys(self)
         self.cmdline = cmdline
         self.returncode = None
         self.hgthread = None
 
-        # construct dialog
         self.set_default_size(width, height)
 
         self._button_stop = gtk.Button(_('Stop'))
@@ -104,14 +105,14 @@ class CmdDialog(gtk.Dialog):
 
     def _on_window_map_event(self, event, param):
         if self.hgthread is None:
-            self.hgthread = HgThread(self.cmdline[1:])
+            self.hgthread = hgthread.HgThread(self.cmdline[1:])
             self.hgthread.start()
             self._button_ok.set_sensitive(False)
             self._button_stop.set_sensitive(True)
             gobject.timeout_add(10, self.process_queue)
 
     def write(self, msg, append=True):
-        msg = toutf(msg)
+        msg = hglib.toutf(msg)
         if append:
             enditer = self.textbuffer.get_end_iter()
             self.textbuffer.insert(enditer, msg)
@@ -127,7 +128,7 @@ class CmdDialog(gtk.Dialog):
         while self.hgthread.getqueue().qsize():
             try:
                 msg = self.hgthread.getqueue().get(0)
-                self.textbuffer.insert(enditer, toutf(msg))
+                self.textbuffer.insert(enditer, hglib.toutf(msg))
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass

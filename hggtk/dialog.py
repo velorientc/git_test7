@@ -15,26 +15,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import gtk
-from gtklib import MessageDialog
-from mercurial.i18n import _
-
-def _message_dialog(parent, type, primary, secondary, buttons=gtk.BUTTONS_OK,
-                    title="TortoiseHg"):
-    """ Display a given type of MessageDialog with the given message.
-
-    :param type: message dialog type
-
-    :param message: the message you want to display.
-    """
-    dialog = MessageDialog(parent, flags=gtk.DIALOG_MODAL, type=type,
-                               buttons=buttons)
-    dialog.set_title(title)
-    dialog.set_markup('<big><b>' + primary + '</b></big>')
-    dialog.format_secondary_text(secondary)
-    dialog.set_position(gtk.WIN_POS_MOUSE)
-    response = dialog.run()
-    dialog.destroy()
-    return response
+from thgutil.i18n import _
+import gtklib
 
 def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
     """ Allow a user to enter a text string (username/password)
@@ -71,6 +53,26 @@ def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
             text = None
         dialog.destroy()
         return text
+
+# TODO: Deprecate and remove these
+
+def _message_dialog(parent, type, primary, secondary, buttons=gtk.BUTTONS_OK,
+                    title="TortoiseHg"):
+    """ Display a given type of MessageDialog with the given message.
+
+    :param type: message dialog type
+
+    :param message: the message you want to display.
+    """
+    dialog = gtklib.MessageDialog(parent, flags=gtk.DIALOG_MODAL, type=type,
+                               buttons=buttons)
+    dialog.set_title(title)
+    dialog.set_markup('<big><b>' + primary + '</b></big>')
+    dialog.format_secondary_text(secondary)
+    dialog.set_position(gtk.WIN_POS_MOUSE)
+    response = dialog.run()
+    dialog.destroy()
+    return response
 
 def error_dialog(parent, primary, secondary):
     """ Display an error dialog with the given message. """

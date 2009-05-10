@@ -6,19 +6,21 @@
 #
 
 import gtk
-import gobject
 import os
 import re
 import urlparse
 import threading
-from mercurial.i18n import _
+
 from mercurial import hg, ui, util, url
-from dialog import error_dialog
-from hglib import RepoError, toutf, fromutf, rootpath
-import shlib
+
+from thgutil.i18n import _
+from thgutil import hglib
+from thgutil import iniparse
+from thgutil import shlib
+
+import dialog
 import gdialog
-import iniparse
-import gdialog
+import gtklib
 
 _unspecstr = _('<unspecified>')
 
@@ -218,7 +220,7 @@ class PathEditDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                           buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                               gtk.STOCK_OK, gtk.RESPONSE_OK))
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_keys(self)
         self.connect('response', self.response)
         self.set_title(_('Edit remote repository path'))
         self.newpath, self.newalias = None, None
@@ -363,15 +365,15 @@ class ConfigDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         self.add_button(gtk.STOCK_EDIT, gtk.RESPONSE_YES)
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_keys(self)
 
         self.ui = ui.ui()
         try:
-            repo = hg.repository(self.ui, path=rootpath())
-        except RepoError:
+            repo = hg.repository(self.ui, path=hglib.rootpath())
+        except hglib.RepoError:
             repo = None
             if configrepo:
-                error_dialog(self, _('No repository found'),
+                dialog.error_dialog(self, _('No repository found'),
                              _('no repo at ') + root)
                 self.response(gtk.RESPONSE_CANCEL)
 
@@ -383,12 +385,12 @@ class ConfigDialog(gtk.Dialog):
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
             self.set_title(_('TortoiseHg Configure Repository - ') + name)
-            shlib.set_tortoise_icon(self, 'settings_repo.ico')
+            gtklib.set_tortoise_icon(self, 'settings_repo.ico')
             self.root = repo.root
         else:
             self.rcpath = util.user_rcpath()
             self.set_title(_('TortoiseHg Configure User-Global Settings'))
-            shlib.set_tortoise_icon(self, 'settings_user.ico')
+            gtklib.set_tortoise_icon(self, 'settings_user.ico')
             self.root = None
 
         self.ini = self.load_config(self.rcpath)
@@ -458,7 +460,7 @@ class ConfigDialog(gtk.Dialog):
                 util.system("%s \"%s\"" % (editor, self.fn))
             # reload configs, in case they have been written since opened
             if self.configrepo:
-                repo = hg.repository(ui.ui(), path=rootpath())
+                repo = hg.repository(ui.ui(), path=hglib.rootpath())
                 u = repo.ui
             else:
                 u = ui.ui()
@@ -492,9 +494,10 @@ class ConfigDialog(gtk.Dialog):
     def new_path(self, newpath):
         '''Add a new path to [paths], give default name, focus'''
         i = self.pathdata.insert_before(None, None)
+        safepath = url.hidepassword(newpath)
         self.pathdata.set_value(i, 0, 'new')
-        self.pathdata.set_value(i, 1, '%s' % toutf(url.hidepassword(newpath)))
-        self.pathdata.set_value(i, 2, '%s' % toutf(newpath))
+        self.pathdata.set_value(i, 1, '%s' % hglib.toutf(safepath))
+        self.pathdata.set_value(i, 2, '%s' % hglib.toutf(newpath))
         self.pathtree.get_selection().select_iter(i)
         self.pathtree.set_cursor(
                 self.pathdata.get_path(i),
@@ -544,11 +547,11 @@ class ConfigDialog(gtk.Dialog):
         if not selection.count_selected_rows():
             return
         if not self.root:
-            error_dialog(self, _('No Repository Found'),
+            dialog.error_dialog(self, _('No Repository Found'),
                     _('Path testing cannot work without a repository'))
             return
         model, path = selection.get_selected()
-        testpath = fromutf(model[path][1])
+        testpath = hglib.fromutf(model[path][1])
         if not testpath:
             return
         if testpath[0] == '~':
@@ -584,8 +587,9 @@ class ConfigDialog(gtk.Dialog):
         if 'paths' in list(self.ini):
             for name in self.ini['paths']:
                 path = self.ini['paths'][name]
-                safepath = toutf(url.hidepassword(path))
-                self.pathdata.append([toutf(name), safepath, toutf(path)])
+                safepath = hglib.toutf(url.hidepassword(path))
+                self.pathdata.append([hglib.toutf(name), safepath,
+                    hglib.toutf(path)])
 
         # Define view model for 'Paths' tab
         self.pathtree = gtk.TreeView(self.pathdata)
@@ -922,7 +926,7 @@ class ConfigDialog(gtk.Dialog):
                 if values:
                     vlist.append([_('Suggested'), True])
                     for v in values:
-                        vlist.append([toutf(v), False])
+                        vlist.append([hglib.toutf(v), False])
                         if v == curvalue:
                             currow = len(vlist) - 1
                 if cpath in self.history.get_keys() and not ispw:
@@ -932,14 +936,14 @@ class ConfigDialog(gtk.Dialog):
                         if not separator:
                             vlist.append([_('History'), True])
                             separator = True
-                        vlist.append([toutf(v), False])
+                        vlist.append([hglib.toutf(v), False])
                         if v == curvalue:
                             currow = len(vlist) - 1
 
                 if curvalue is None and len(vlist):
                     combo.set_active(0)
                 elif currow is None and curvalue:
-                    combo.child.set_text(toutf(curvalue))
+                    combo.child.set_text(hglib.toutf(curvalue))
                 elif currow:
                     combo.set_active(currow)
 
@@ -1000,8 +1004,8 @@ class ConfigDialog(gtk.Dialog):
         if len(self.pathdata):
             refreshlist = []
             for row in self.pathdata:
-                name = fromutf(row[0])
-                path = fromutf(row[2])
+                name = hglib.fromutf(row[0])
+                path = hglib.fromutf(row[2])
                 if not name:
                     gdialog.Prompt(_('Invalid path'),
                            _('Skipped saving path with no alias'), self).run()
@@ -1021,7 +1025,7 @@ class ConfigDialog(gtk.Dialog):
         # Flush changes on all pages
         for vbox, info, widgets in self.pages:
             for w, (label, cpath, values, tip) in enumerate(info):
-                newvalue = fromutf(widgets[w].child.get_text())
+                newvalue = hglib.fromutf(widgets[w].child.get_text())
                 self.record_new_value(cpath, newvalue)
 
         self.history.write()
@@ -1032,7 +1036,8 @@ class ConfigDialog(gtk.Dialog):
             f.write(str(self.ini))
             f.close()
         except IOError, e:
-            error_dialog(self, _('Unable to write configuration file'), str(e))
+            dialog.error_dialog(self, _('Unable to write configuration file'),
+                    str(e))
 
         if not self.configrepo and os.name == 'nt':
             self.save_shell_configs()

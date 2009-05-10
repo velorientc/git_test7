@@ -9,17 +9,18 @@ import os
 import gtk
 import gobject
 import pango
-from mercurial.i18n import _
+
 from mercurial import hg, ui
-import shlib
-import hglib
+from thgutil.i18n import _
+from thgutil import hglib
+import gtklib
 
 class BackoutDialog(gtk.Window):
     """ Backout effect of a changeset """
     def __init__(self, rev=None):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_keys(self)
 
         self.set_title(_('Backout changeset - ') + rev)
         self.set_default_size(600, 400)
@@ -64,7 +65,7 @@ class BackoutDialog(gtk.Window):
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
-        mod = shlib.get_thg_modifier()
+        mod = gtklib.get_thg_modifier()
 
         hbbox = gtk.HButtonBox()
         hbbox.set_layout(gtk.BUTTONBOX_END)

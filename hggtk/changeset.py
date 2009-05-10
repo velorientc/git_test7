@@ -10,13 +10,15 @@ import gobject
 import pango
 import StringIO
 
-from mercurial.i18n import _
 from mercurial.node import short, nullrev, nullid
 from mercurial import cmdutil, context, util, ui, hg, patch
+
+from thgutil.i18n import _
+from thgutil.hglib import *
+from thgutil import shlib
+
 from gdialog import GDialog, Confirm, NativeSaveFileDialogWrapper
-from hglib import toutf, fromutf, displaytime, hgcmd_toq, diffexpand, LookupError
-from gtklib import StatusBar
-import shlib
+import gtklib
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -501,7 +503,7 @@ class ChangeSet(GDialog):
             self.glog_parent.add_accel_group(accelgroup)
         else:
             self.add_accel_group(accelgroup)
-        mod = shlib.get_thg_modifier()
+        mod = gtklib.get_thg_modifier()
         key, modifier = gtk.accelerator_parse(mod+'d')
         filelist_tree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
@@ -539,7 +541,7 @@ class ChangeSet(GDialog):
             # add status bar for main app
             vbox = gtk.VBox()
             vbox.pack_start(self._hpaned, True, True)
-            self.stbar = StatusBar()
+            self.stbar = gtklib.StatusBar()
             self.stbar.show()
             vbox.pack_start(gtk.HSeparator(), False, False)
             vbox.pack_start(self.stbar, False, False)

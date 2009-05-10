@@ -7,17 +7,10 @@
 import os
 import sys
 import gtk
-import shlib
-from mercurial.i18n import _
-
-try:
-    # post 1.1.2
-    from mercurial import util
-    hgversion = util.version()
-except AttributeError:
-    # <= 1.1.2
-    from mercurial import version
-    hgversion = version.get_version()
+import gtklib
+from thgutil.i18n import _
+from thgutil.hglib import hgversion
+from thgutil import shlib
 
 def browse_url(url):
     import threading
@@ -46,7 +39,7 @@ def make_version(tuple):
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
         super(AboutDialog, self).__init__()
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_keys(self)
 
         lib_versions = ', '.join([
                 "Mercurial-%s" % hgversion,

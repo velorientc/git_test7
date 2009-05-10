@@ -10,12 +10,16 @@ import sys
 import gobject
 import gtk
 import pango
-import shlib
-from tempfile import mkstemp
-from dialog import info_dialog
+import tempfile
+
 from mercurial import hg, ui, extensions
-from mercurial.i18n import _
-from hglib import RepoError, fromutf, toutf
+
+from thgutil.i18n import _
+from thgutil import hglib
+from thgutil import shlib
+
+import gtklib
+import dialog
 
 class EmailDialog(gtk.Window):
     """ Send patches or bundles via email """
@@ -23,8 +27,8 @@ class EmailDialog(gtk.Window):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
-        shlib.set_tortoise_icon(self, 'hg.ico')
-        shlib.set_tortoise_keys(self)
+        gtklib.set_tortoise_icon(self, 'hg.ico')
+        gtklib.set_tortoise_keys(self)
         self.root = root
         self.revargs = revargs
 
@@ -217,10 +221,10 @@ class EmailDialog(gtk.Window):
 
         if initial:
             # Only zap these fields at startup
-            self._tobox.child.set_text(fromutf(repo.ui.config('email', 'to', '')))
-            self._ccbox.child.set_text(fromutf(repo.ui.config('email', 'cc', '')))
-            self._frombox.child.set_text(fromutf(repo.ui.config('email', 'from', '')))
-            self._subjbox.child.set_text(fromutf(repo.ui.config('email', 'subject', '')))
+            self._tobox.child.set_text(hglib.fromutf(repo.ui.config('email', 'to', '')))
+            self._ccbox.child.set_text(hglib.fromutf(repo.ui.config('email', 'cc', '')))
+            self._frombox.child.set_text(hglib.fromutf(repo.ui.config('email', 'from', '')))
+            self._subjbox.child.set_text(hglib.fromutf(repo.ui.config('email', 'subject', '')))
             self._intro = False
             self._in_reply_to = False
             for arg in extensions.find('patchbomb').cmdtable['email'][1]:
@@ -296,19 +300,19 @@ class EmailDialog(gtk.Window):
                 history.get_value(cpath).remove(newvalue)
             history.get_value(cpath).insert(0, newvalue)
 
-        totext = fromutf(self._tobox.child.get_text())
-        cctext = fromutf(self._ccbox.child.get_text())
-        fromtext = fromutf(self._frombox.child.get_text())
-        subjtext = fromutf(self._subjbox.child.get_text())
-        inreplyto = fromutf(self._replyto.get_text())
+        totext = hglib.fromutf(self._tobox.child.get_text())
+        cctext = hglib.fromutf(self._ccbox.child.get_text())
+        fromtext = hglib.fromutf(self._frombox.child.get_text())
+        subjtext = hglib.fromutf(self._subjbox.child.get_text())
+        inreplyto = hglib.fromutf(self._replyto.get_text())
 
         if not totext:
-            info_dialog(self, _('Info required'),
+            dialog.info_dialog(self, _('Info required'),
                         _('You must specify a recipient'))
             self._tobox.grab_focus()
             return
         if not fromtext:
-            info_dialog(self, _('Info required'),
+            dialog.info_dialog(self, _('Info required'),
                         _('You must specify a sender address'))
             self._frombox.grab_focus()
             return
@@ -318,7 +322,7 @@ class EmailDialog(gtk.Window):
         if self.repo.ui.config('email', 'method', 'smtp') == 'smtp' and not test:
             if not self.repo.ui.config('smtp', 'host'):
                 from thgconfig import ConfigDialog
-                info_dialog(self, _('Info required'),
+                dialog.info_dialog(self, _('Info required'),
                             _('You must configure SMTP'))
                 dlg = ConfigDialog(False)
                 dlg.show_all()
@@ -361,7 +365,7 @@ class EmailDialog(gtk.Window):
         end = self.descbuffer.get_end_iter()
         desc = self.descbuffer.get_text(start, end)
         try:
-            fd, tmpfile = mkstemp(prefix="thg_emaildesc_")
+            fd, tmpfile = tempfile.mkstemp(prefix="thg_emaildesc_")
             os.write(fd, desc)
             os.close(fd)
             cmdline += ['--desc', tmpfile]
