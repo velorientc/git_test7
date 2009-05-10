@@ -23,48 +23,124 @@
 #include "Dirstatecache.h"
 #include "HgRepoRoot.h"
 #include "Winstat.h"
+#include "TortoiseUtils.h"
 
 #include <shlwapi.h>
 
 
-class QueryResult
+class QueryState
 {
 public:
-    std::string path_;
-    char        status_;
-    unsigned    tickcount_;
-    QueryResult(): status_(0), tickcount_(0) {}
+    std::string path;
+    bool        isdir;
+    std::string basedir;
+    std::string hgroot;
+
+    char        status;
+    unsigned    tickcount;
+
+    QueryState(): isdir(false), status(0), tickcount(0) {}
 };
+
+
+bool hasHgDir(std::string path)
+{
+    path += "\\.hg";
+    return PathIsDirectory(path.c_str());
+}
+
+
+int findHgRoot(QueryState& cur, QueryState& last, bool outdated)
+{
+    if (cur.isdir)
+    {
+        std::string p = cur.path;
+        p.push_back('\\');
+        if (p.find(".hg\\") != std::string::npos) 
+        {
+            //TDEBUG_TRACE("findHgRoot: skipping '" << cur.path << "'");
+            last = cur;
+            return 0;
+        }
+    }
+
+    if (cur.isdir && hasHgDir(cur.path))
+    {
+        cur.hgroot = cur.path;
+        TDEBUG_TRACE("findHgRoot(" << cur.path << "): hgroot = cur.path");
+        return 1;
+    }
+
+    cur.basedir = DirName(cur.path);
+
+    if (!outdated && !last.basedir.empty() && cur.basedir == last.basedir)
+    {
+        cur.hgroot = last.hgroot;
+        // TDEBUG_TRACE("findHgRoot(" << cur.path << "): hgroot = '" << cur.hgroot
+        //    << "'  (same as last.basedir)");
+        return 1;
+    }
+
+    for (std::string p = cur.basedir;;)
+    {
+        if (hasHgDir(p)) {
+            cur.hgroot = p;
+            TDEBUG_TRACE("findHgRoot(" << cur.path << "): hgroot = '" << cur.hgroot
+                << "' (found repo)");
+            return 1;
+        }
+        std::string p2 = DirName(p);
+        if (p2.size() == p.size())
+            break;
+        p.swap(p2);
+    }
+
+    TDEBUG_TRACE("findHgRoot(" << cur.path << "): NO repo found");
+    last = cur;
+    return 0;
+}
 
 
 int HgQueryDirstate(
     const std::string& path, const char& filterStatus, char& outStatus)
 {
-    static QueryResult last;
+    static QueryState last;
 
     if (path.empty())
         return 0;
 
-    unsigned tc = GetTickCount();
+    QueryState cur;
 
-    if (last.path_ == path && (tc - last.tickcount_ < 1000)) 
+    cur.path = path;
+    cur.tickcount = GetTickCount();
+
+    const bool outdated = cur.tickcount - last.tickcount > 2000;
+
+    if (!outdated && last.path == path) 
     {
-        outStatus = last.status_;
+        outStatus = last.status;
         return 1;
     }
 
-    last.path_ = path;
-    last.status_ = 0;
-    last.tickcount_ = tc;
-
     if (PathIsRoot(path.c_str()))
+    {
+        last = cur;
+        return 0;
+    }
+
+    cur.isdir = PathIsDirectory(cur.path.c_str());
+
+    if (findHgRoot(cur, last, outdated) == 0)
         return 0;
 
-    std::string hgroot = HgRepoRoot::get(path);
-    if (hgroot.empty())
-        return 0;
+    size_t offset = cur.hgroot.length();
 
-    size_t offset = hgroot.length();
+    if (offset == 0)
+    {
+        last = cur;
+        return 0;
+    }
+
     if (path[offset] == '\\')
         offset++;
     const char* relpathptr = path.c_str() + offset;
@@ -77,45 +153,50 @@ int HgQueryDirstate(
             relpath[i] = '/';
     }
 
-    if (relpath == ".hg" 
-            || (relpath.size() > 4 && relpath.compare(0, 4, ".hg/") == 0))
-        return 0; // don't descend into .hg dir
-
-    if (PathIsDirectory(path.c_str()))
+    if (cur.isdir)
     {
-        DirectoryStatus* pds = DirectoryStatus::get(hgroot);
-        if (!pds)
+        DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot);
+        if (!pds) {
+            last = cur;
             return 0;
+        }
 
         outStatus = pds->status(relpath);
     }
     else
     {
-        Dirstate* pds = Dirstatecache::get(hgroot);
+        Dirstate* pds = Dirstatecache::get(cur.hgroot);
         if (!pds)
         {
             TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 
-                << hgroot << ") returns no Dirstate");
+                << cur.hgroot << ") returns no Dirstate");
+            last = cur;
             return 0;
         }
 
-        if (filterStatus == 'A' && pds->num_added() == 0)
+        if (filterStatus == 'A' && pds->num_added() == 0) {
+            last = cur;
             return 0;
+        }
 
         const Direntry* e = pds->root().get(relpath);
-        if (!e)
+        if (!e) {
+            last = cur;
             return 0;
+        }
 
         Winstat stat;
         if (0 != stat.lstat(path.c_str())) {
             TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") failed");
+            last = cur;
             return 0;
         }
 
         outStatus = e->status(stat);
     }
 
-    last.status_ = outStatus;
-    last.tickcount_ = GetTickCount();
+    cur.status = outStatus;
+    cur.tickcount = GetTickCount();
+    last = cur;
     return 1;
 }
