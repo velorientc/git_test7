@@ -50,6 +50,7 @@ def set_tortoise_keys(window):
 
 def thgexit(window):
     if thgclose(window):
+        import hgtk
         gobject.idle_add(hgtk.thgexit, window)
 
 def thgclose(window):
