@@ -4,17 +4,17 @@
 [Setup]
 AppCopyright=Copyright 2005-2009 Matt Mackall and others
 AppName=TortoiseHg
-AppVerName=TortoiseHg-0.7
+AppVerName=TortoiseHg-0.8
 InfoAfterFile=contrib/win32/postinstall.txt
 LicenseFile=COPYING.txt
 ShowLanguageDialog=yes
-AppPublisher=TK Soh and others
+AppPublisher=Steve Borho and others
 AppPublisherURL=http://bitbucket.org/tortoisehg/stable/
 AppSupportURL=http://bitbucket.org/tortoisehg/stable/
 AppUpdatesURL=http://bitbucket.org/tortoisehg/stable/
 AppID=TortoiseHg
 AppContact=teekaysoh@gmail.com
-OutputBaseFilename=TortoiseHg-0.7
+OutputBaseFilename=TortoiseHg-0.8
 DefaultDirName={pf}\TortoiseHg
 SourceDir=..\..
 VersionInfoDescription=Mercurial distributed SCM
@@ -36,18 +36,17 @@ SetupLogging=yes
 
 [Files]
 Source: contrib\mercurial.el; DestDir: {app}/contrib
-Source: contrib\vim\*.*; DestDir: {app}/contrib/Vim
+Source: contrib\vim\*.*; DestDir: {app}/contrib/vim
 Source: contrib\zsh_completion; DestDir: {app}/contrib
 Source: contrib\hgk; DestDir: {app}/contrib
 Source: contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
-Source: ..\stable.snap; DestDir: {app}; DestName: ReleaseNotes.txt
+Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
 Source: ..\contrib\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: dist\*.pyd; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\library.zip; DestDir: {app}
 Source: doc\*.html; DestDir: {app}\docs
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -70,7 +69,6 @@ Filename: {app}\TortoiseHg.url; Section: InternetShortcut; Key: URL; String: htt
 Name: {group}\TortoiseHg Web Site; Filename: {app}\TortoiseHg.url
 Name: {group}\Mercurial Web Site; Filename: {app}\Mercurial.url
 Name: {group}\Mercurial Command Reference; Filename: {app}\docs\hg.1.html
-Name: {group}\Python Trace Collector; Filename: {app}\tracelog.exe
 Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
