@@ -1,0 +1,172 @@
+''' Mercurial revision DAG visualization library
+
+  Implements a gtk.TreeModel which visualizes a Mercurial repository
+  revision history.
+
+Portions of this code stolen mercilessly from bzr-gtk visualization
+dialog.  Other portions stolen from graphlog extension.
+'''
+
+import gtk
+import gobject
+import re
+from mercurial import util
+from mercurial.node import short
+from mercurial.hgweb import webutil
+from thgutil import hglib
+
+# treemodel row enumerated attributes
+LINES = 0
+NODE = 1
+REVID = 2
+LAST_LINES = 3
+MESSAGE = 4
+COMMITER = 5
+TIMESTAMP = 6
+REVISION = 7
+PARENTS = 8
+WCPARENT = 9
+HEAD = 10
+TAGS = 11
+FGCOLOR = 12
+HEXID = 13
+BRANCHES = 14
+
+class TreeModel(gtk.GenericTreeModel):
+
+    def __init__ (self, repo, graphdata, color_func):
+        gtk.GenericTreeModel.__init__(self)
+        self.revisions = {}
+        self.branch_names = {}
+        self.repo = repo
+        self.parents = [x.rev() for x in repo.changectx(None).parents()]
+        self.heads = [repo.changelog.rev(x) for x in repo.heads()]
+        self.line_graph_data = graphdata
+        self.author_re = re.compile('<.*@.*>', 0)
+        self.color_func = color_func
+
+    def on_get_flags(self):
+        return gtk.TREE_MODEL_LIST_ONLY
+
+    def on_get_n_columns(self):
+        return 14
+
+    def on_get_column_type(self, index):
+        if index == NODE: return gobject.TYPE_PYOBJECT
+        if index == LINES: return gobject.TYPE_PYOBJECT
+        if index == REVID: return gobject.TYPE_STRING
+        if index == LAST_LINES: return gobject.TYPE_PYOBJECT
+        if index == MESSAGE: return gobject.TYPE_STRING
+        if index == COMMITER: return gobject.TYPE_STRING
+        if index == TIMESTAMP: return gobject.TYPE_STRING
+        if index == REVISION: return gobject.TYPE_PYOBJECT
+        if index == PARENTS: return gobject.TYPE_PYOBJECT
+        if index == WCPARENT: return gobject.TYPE_BOOLEAN
+        if index == HEAD: return gobject.TYPE_BOOLEAN
+        if index == TAGS: return gobject.TYPE_STRING
+        if index == FGCOLOR: return gobject.TYPE_STRING
+        if index == HEXID: return gobject.TYPE_STRING
+        if index == BRANCHES: return gobject.TYPE_STRING
+
+    def on_get_iter(self, path):
+        return path[0]
+
+    def on_get_path(self, rowref):
+        return rowref
+
+    def on_get_value(self, rowref, column):
+        (revid, node, lines, parents) = self.line_graph_data[rowref]
+
+        if column == REVID: return revid
+        if column == NODE: return node
+        if column == LINES: return lines
+        if column == PARENTS: return parents
+        if column == LAST_LINES:
+            if rowref>0:
+                return self.line_graph_data[rowref-1][2]
+            return []
+
+        if revid not in self.revisions:
+            ctx = self.repo.changectx(revid)
+
+            summary = ctx.description().replace('\0', '')
+            if self.repo.ui.configbool('tortoisehg', 'longsummary'):
+                lines = summary.split('\n')
+                summary = lines.pop(0)
+                while len(summary) < 80 and lines:
+                    summary += '  ' + lines.pop(0)
+                summary = summary[0:80]
+            else:
+                summary = summary.split('\n')[0]
+            summary = gobject.markup_escape_text(hglib.toutf(summary))
+            node = self.repo.lookup(revid)
+            tags = self.repo.nodetags(node)
+            taglist = hglib.toutf(', '.join(tags))
+            tstr = ''
+            for tag in tags:
+                tstr += '<span background="#ffffaa"> %s </span> ' % tag
+
+            # show branch names per hgweb's logic
+            branches = webutil.nodebranchdict(self.repo, ctx)
+            inbranches = webutil.nodeinbranch(self.repo, ctx)
+            bstr = ''
+            branchstr = ''
+            for branch in branches:
+                branchstr += branch['name']
+                bstr += '<span background="#aaffaa"> %s </span> ' % \
+                        branch['name']
+            for branch in inbranches:
+                branchstr += branch['name']
+
+            if '<' in ctx.user():
+                author = hglib.toutf(self.author_re.sub('', ctx.user()).strip(' '))
+            else:
+                author = hglib.toutf(util.shortuser(ctx.user()))
+
+            date = hglib.displaytime(ctx.date())
+
+            wc_parent = revid in self.parents
+            head = revid in self.heads
+            color = self.color_func(parents, revid, author)
+            if wc_parent:
+                sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
+            else:
+                sumstr = bstr + tstr + summary
+            
+            revision = (None, node, revid, None, sumstr,
+                    author, date, None, parents, wc_parent, head, taglist,
+                    color, short(node))
+            self.revisions[revid] = revision
+            self.branch_names[revid] = branchstr
+        else:
+            revision = self.revisions[revid]
+            branchstr = self.branch_names[revid]
+
+        if column == REVISION:
+            return revision
+        if column == BRANCHES:
+            return branchstr
+        return revision[column]
+
+    def on_iter_next(self, rowref):
+        if rowref < len(self.line_graph_data) - 1:
+            return rowref+1
+        return None
+
+    def on_iter_children(self, parent):
+        if parent is None: return 0
+        return None
+
+    def on_iter_has_child(self, rowref):
+        return False
+
+    def on_iter_n_children(self, rowref):
+        if rowref is None: return len(self.line_graph_data)
+        return 0
+
+    def on_iter_nth_child(self, parent, n):
+        if parent is None: return n
+        return None
+
+    def on_iter_parent(self, child):
+        return None

@@ -4,11 +4,61 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import pygtk
-pygtk.require('2.0')
+import sys
 import gtk
 import gobject
 import pango
+
+from thgutil.i18n import _
+from thgutil import hglib, paths
+
+def set_tortoise_icon(window, thgicon):
+    ico = paths.get_tortoise_icon(thgicon)
+    if ico: window.set_icon_from_file(ico)
+
+def get_thg_modifier():
+    if sys.platform == 'darwin':
+        return '<Mod1>'
+    else:
+        return '<Control>'
+
+def set_tortoise_keys(window):
+    'Set default TortoiseHg keyboard accelerators'
+    if sys.platform == 'darwin':
+        mask = gtk.accelerator_get_default_mod_mask()
+        mask |= gtk.gdk.MOD1_MASK;
+        gtk.accelerator_set_default_mod_mask(mask)
+    mod = get_thg_modifier()
+    accelgroup = gtk.AccelGroup()
+    window.add_accel_group(accelgroup)
+    key, modifier = gtk.accelerator_parse(mod+'w')
+    window.add_accelerator('thg-close', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+    key, modifier = gtk.accelerator_parse(mod+'q')
+    window.add_accelerator('thg-exit', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+    key, modifier = gtk.accelerator_parse('F5')
+    window.add_accelerator('thg-refresh', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+    key, modifier = gtk.accelerator_parse(mod+'Return')
+    window.add_accelerator('thg-accept', accelgroup, key, modifier,
+            gtk.ACCEL_VISIBLE)
+
+    # connect ctrl-w and ctrl-q to every window
+    window.connect('thg-close', thgclose)
+    window.connect('thg-exit', thgexit)
+
+def thgexit(window):
+    if thgclose(window):
+        import hgtk
+        gobject.idle_add(hgtk.thgexit, window)
+
+def thgclose(window):
+    if hasattr(window, 'should_live'):
+        if window.should_live():
+            return False
+    window.destroy()
+    return True
 
 class StatusBar(gtk.HBox):
     def __init__(self, extra=None):
@@ -21,25 +71,25 @@ class StatusBar(gtk.HBox):
         self.pbox = gtk.HBox()
         self.pbox.pack_start(gtk.VSeparator(), False, False)
         self.pbox.pack_start(self.pbar, False, False)
-        
+
         self.pack_start(self.sttext, padding=1)
         if extra:
             self.pack_end(extra, False, False)
         self.pack_end(self.pbox, False, False, padding=1)
         self.pbox.set_child_visible(False)
         self.show_all()
-        
+
     def _pulse_timer(self, now=False):
         self.pbar.pulse()
         return True
 
-    def begin(self, msg="Running", timeout=100):
+    def begin(self, msg=_('Running'), timeout=100):
         self.pbox.set_child_visible(True)
         self.pbox.map()
         self.set_status_text(msg)
         self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
 
-    def end(self, msg="Done", unmap=True):
+    def end(self, msg=_('Done'), unmap=True):
         gobject.source_remove(self._timeout_event)
         self.set_status_text(msg)
         if unmap:
@@ -49,9 +99,10 @@ class StatusBar(gtk.HBox):
 
     def set_status_text(self, msg):
         self.sttext.set_text(str(msg))
-        
+
     def set_pulse_step(self, val):
         self.pbar.set_pulse_step(val)
+
 
 class MessageDialog(gtk.Dialog):
     button_map = {
@@ -70,12 +121,12 @@ class MessageDialog(gtk.Dialog):
             gtk.MESSAGE_QUESTION : gtk.STOCK_DIALOG_QUESTION,
             gtk.MESSAGE_ERROR : gtk.STOCK_DIALOG_ERROR,
     }
-    
+
     def __init__(self, parent=None, flags=0, type=gtk.MESSAGE_INFO,
             buttons=gtk.BUTTONS_NONE, message_format=None):
         gtk.Dialog.__init__(self,
                 parent=parent,
-                flags=flags | gtk.DIALOG_NO_SEPARATOR, 
+                flags=flags | gtk.DIALOG_NO_SEPARATOR,
                 buttons=MessageDialog.button_map[buttons])
         self.set_resizable(False)
 

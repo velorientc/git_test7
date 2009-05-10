@@ -7,18 +7,13 @@
 #
 
 import os
-import pygtk
-pygtk.require('2.0')
 import gtk
-import cStringIO
 
-from mercurial.i18n import _
 from mercurial import ui, hg
-from shlib import shell_notify
-from gdialog import *
-from status import *
-from hgcmd import CmdDialog
-from hglib import fromutf
+
+from thgutil.i18n import _
+
+from status import GStatus, FM_STATUS, FM_CHECKED, DM_CHUNK_ID, DM_REJECTED
 import hgshelve
 
 class GShelve(GStatus):
@@ -48,7 +43,7 @@ class GShelve(GStatus):
 
     def auto_check(self):
         if self.test_opt('check'):
-            for entry in self.filemodel : 
+            for entry in self.filemodel :
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self._update_check_count()
@@ -71,10 +66,10 @@ class GShelve(GStatus):
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
         tbbuttons.insert(2, gtk.SeparatorToolItem())
-        self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, 'Shelve',
-                self._shelve_clicked, tip='set aside selected changes')
-        self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, 'Unshelve',
-                self._unshelve_clicked, tip='restore shelved changes')
+        self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, _('Shelve'),
+                self._shelve_clicked, tip=_('set aside selected changes'))
+        self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, _('Unshelve'),
+                self._unshelve_clicked, tip=_('restore shelved changes'))
         tbbuttons.insert(2, self.unshelve_btn)
         tbbuttons.insert(2, self.shelve_btn)
         return tbbuttons
@@ -121,7 +116,7 @@ class GShelve(GStatus):
 
     def _has_shelve_file(self):
         return os.path.exists(self.repo.join('shelve'))
-        
+
     def _activate_shelve_buttons(self, status):
         if status:
             self.shelve_btn.set_sensitive(True)
@@ -137,7 +132,7 @@ class GShelve(GStatus):
         if file:
             hlist = [cid for cid in hlist if chunks[cid].filename() == file]
         if not hlist:
-            Prompt('Shelve', 'Please select diff chunks to shelve',
+            Prompt(_('Shelve'), _('Please select diff chunks to shelve'),
                     self).run()
             return
 
@@ -146,9 +141,11 @@ class GShelve(GStatus):
         if self._has_shelve_file():
             from gtklib import MessageDialog
             dialog = MessageDialog(flags=gtk.DIALOG_MODAL)
-            dialog.set_title('Shelve')
-            dialog.set_markup('<b>Shelve file exists!</b>')
-            dialog.add_buttons('Overwrite', 1, 'Append', 2, 'Cancel', -1)
+            dialog.set_title(_('Shelve'))
+            dialog.set_markup(_('<b>Shelve file exists!</b>'))
+            dialog.add_buttons(_('Overwrite'), 1,
+                               _('Append'), 2,
+                               _('Cancel'), -1)
             dialog.set_transient_for(self)
             rval = dialog.run()
             dialog.destroy()
@@ -171,18 +168,18 @@ class GShelve(GStatus):
                 fc.append(c)
         if len(fc) > 1 or (len(fc) == 1 and fc[0].binary()):
             sc += fc
-                
+
         def filter_patch(ui, chunks):
             return sc
 
         # shelve them!
-        self.ui.interactive = True  # hgshelve only works 'interactively'
+        self.ui.setconfig('ui', 'interactive', 'on')  # hgshelve only works 'interactively'
         opts = {'addremove': None, 'include': [], 'force': doforce,
                 'append': doappend, 'exclude': []}
         hgshelve.filterpatch = filter_patch
         hgshelve.shelve(self.ui, self.repo, **opts)
         self.reload_status()
-        
+
     def _unshelve(self):
         opts = {'addremove': None, 'include': [], 'force': None,
                 'append': None, 'exclude': [], 'inspect': None}
@@ -207,40 +204,13 @@ class GShelve(GStatus):
         self._activate_shelve_buttons(True)
         return True
 
-
-def launch(root='', files=[], cwd='', main=True):
-    u = ui.ui()
-    u.updateopts(debug=False, traceback=False)
-    repo = hg.repository(u, path=root)
-    
+def run(_ui, *pats, **opts):
     cmdoptions = {
-        'user':'', 'date':'',
+        'user':opts.get('user', ''), 'date':opts.get('date', ''),
+        'logfile':'', 'message':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
-        'unknown':False, 'ignored':False, 
+        'unknown':True, 'ignored':False,
         'exclude':[], 'include':[],
-        'check': True, 'git':False, 'logfile':'', 'addremove':False,
+        'check': True, 'git':False, 'addremove':False,
     }
-    
-    dialog = GShelve(u, repo, cwd, files, cmdoptions, main)
-    dialog.display()
-    return dialog
-    
-def run(root='', files=[], cwd='', **opts):
-    # If no files or directories were selected, take current dir
-    # TODO: Not clear if this is best; user may expect repo wide
-    if not files and cwd:
-        files = [cwd]
-    if launch(root, files, cwd, True):
-        gtk.gdk.threads_init()
-        gtk.gdk.threads_enter()
-        gtk.main()
-        gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    from hglib import rootpath
-
-    opts = {}
-    opts['cwd'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    opts['root'] = rootpath(opts['cwd'])
-    run(**opts)
+    return GShelve(_ui, None, None, pats, cmdoptions)
