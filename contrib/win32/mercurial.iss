@@ -48,6 +48,7 @@ Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: win32\shellext\THgShell.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: dist\*.pyd; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\library.zip; DestDir: {app}
 Source: doc\*.html; DestDir: {app}\docs
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
