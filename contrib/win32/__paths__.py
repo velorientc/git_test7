@@ -11,7 +11,9 @@ of the GNU General Public License, incorporated herein by reference.
 # worry about Python shell extensions, we can use the path of the
 # current executable to find our package data.
 
+import os
 import win32api, win32process
+
 proc = win32api.GetCurrentProcess()
 try:
     # This will fail on windows < NT
