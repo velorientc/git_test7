@@ -154,6 +154,8 @@ std::string DirName(const std::string& filename)
         return filename;
     std::string::size_type pos = filename.find_last_of("\\");
     std::string myfilename = filename.substr(0, pos);
+    if (myfilename.size() > 0 && myfilename[myfilename.size()-1] == ':')
+        myfilename.push_back('\\');
     return myfilename;
 }
 

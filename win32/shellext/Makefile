@@ -1,5 +1,8 @@
 
-OBJECTS_DIRSTATE = TortoiseUtils.o Direntry.o Directory.o Winstat.o
+OBJECTS_DIRSTATE = TortoiseUtils.o \
+        Direntry.o \
+        Directory.o \
+        Winstat.o
 
 OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         ContextMenu.o \
@@ -9,7 +12,11 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         PipeUtils.o \
         ShellUtils2.o \
         StringUtils.o \
-        dirstate.o
+        dirstate.o \
+        Dirstatecache.o \
+        DirectoryStatus.o \
+        HgRepoRoot.o \
+        QueryDirstate.o
 
 BASE_LDFLAGS=-lole32 -lkernel32 -luser32 -lgdi32 -lshlwapi -lwininet \
              -lwinmm -luuid

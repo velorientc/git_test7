@@ -1,5 +1,4 @@
 
-// Copyright (C) 2009 Benjamin Pollack
 // Copyright (C) 2009 Adrian Buehlmann
 //
 // This program is free software: you can redistribute it and/or modify
@@ -15,40 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DIRECTORY_H
-#define DIRECTORY_H
-
-#include "Direntry.h"
-
-#include <vector>
 #include <string>
+#include <vector>
 
 
-class Directory
+class DirectoryStatus
 {
-    typedef std::vector<Directory*> DirsT;
-    typedef std::vector<Direntry> FilesT;
+    struct E
+    {
+        std::string path_;
+        char status_;
 
-    Directory* const parent_;
-    const std::string name_;
-    std::string path_;
+        E(): status_(0) {}
+    };
 
-    DirsT  subdirs_;
-    FilesT files_;
+    typedef std::vector<E> V;
+    V v_;
 
 public:
-    Directory(Directory* p, const std::string& n, const std::string& basepath);
-    ~Directory();
+    static DirectoryStatus* get(const std::string& hgroot);
+    char status(const std::string& relpath) const;
 
-    const std::string& path() const { return path_; }
-
-    int add(const std::string& relpath, Direntry& e);
-
-    const Direntry* get(const std::string& relpath) const;
-    Directory* Directory::getdir(const std::string& n);
-
-    void print() const;
+private:
+    int read(const std::string& hgroot);
 };
-
-#endif
-

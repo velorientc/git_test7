@@ -15,42 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _DIRSTATE_H
-#define _DIRSTATE_H
-
-#include "Directory.h"
+#ifndef _DIRSTATECACHE_H
+#define _DIRSTATECACHE_H
 
 #include <string>
 
+class Dirstate;
 
-#define HASH_LENGTH 20
-
-class Dirstate
+class Dirstatecache
 {
-    Directory root_;
+    struct E
+    {
+        Dirstate*       dstate;
+        __time64_t      dstate_mtime;
 
-    unsigned num_added_; // number of entries that have state 'a'
-    unsigned num_entries_;
+        std::string     hgroot;
+        unsigned        tickcount;
+
+        E(): dstate(0), dstate_mtime(0), tickcount(0) {}         
+    };
 
 public:
-    char parent1[HASH_LENGTH];
-    char parent2[HASH_LENGTH];
-
-    static std::auto_ptr<Dirstate> read(const std::string& path);
-    
-    Directory& root() { return root_; }
-
-    void add(const std::string& relpath, Direntry& e) {
-        root_.add(relpath, e);
-        ++num_entries_; 
-    }
-    
-    unsigned num_added() const { return num_added_; }
-    unsigned size() const { return num_entries_; }
-
-private:
-    Dirstate()
-    : root_(0, "", ""), num_added_(0), num_entries_(0) {}
+    static Dirstate* get(const std::string& hgroot);
 };
 
 #endif
