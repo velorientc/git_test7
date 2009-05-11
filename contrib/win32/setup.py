@@ -144,6 +144,7 @@ class build_shellext(build):
     def run(self):
         cwd = os.getcwd()
         os.chdir("win32/shellext")
+        os.environ["DEBUG"] = "1"
         os.system("mingw32-make")
         os.chdir(cwd)
 
