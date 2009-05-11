@@ -91,25 +91,66 @@ std::string GetTHgProgRoot()
 // Note: if the command is a batch file and the [full] path to the
 //       batch contains spaces, the path must be double-quoted.
 //      (see http://www.encocoservices.com/createprocess.html)
-bool LaunchCommand(const std::string& command, bool minimized)
+bool LaunchCommand(const std::string& command, const std::string& cwd, const std::string& filelist)
 {
    TDEBUG_TRACE("LaunchCommand: " << command);
    PROCESS_INFORMATION processInfo;
+   memset(&processInfo, 0, sizeof(processInfo));
+
+   HANDLE hChildStd_IN_Rd = NULL;
+   HANDLE hChildStd_IN_Wr = NULL;
+
+   SECURITY_ATTRIBUTES saAttr; 
+   // Set the bInheritHandle flag so pipe handles are inherited. 
+   saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+   saAttr.bInheritHandle = TRUE; 
+   saAttr.lpSecurityDescriptor = NULL; 
+
+   // Create a pipe for the child process's STDIN. 
+   if (!CreatePipe(&hChildStd_IN_Rd, &hChildStd_IN_Wr, &saAttr, 0)) 
+   {
+      TDEBUG_TRACE("LaunchCommand: unable to create stdin pipe");
+      return false;
+   }
+
+   // Ensure the write handle to the pipe for STDIN is not inherited. 
+   if (!SetHandleInformation(hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0) )
+   {
+      TDEBUG_TRACE("LaunchCommand: unable to clear stdin write handle");
+      return false;
+   }
+ 
    STARTUPINFOA startupInfo;
    memset(&startupInfo, 0, sizeof(startupInfo));
    startupInfo.cb = sizeof(startupInfo);
-   startupInfo.dwFlags = minimized ? STARTF_USESHOWWINDOW : 0;
-   startupInfo.wShowWindow = SW_SHOWMINIMIZED;
-   int res = CreateProcessA(0,
+   startupInfo.hStdInput = hChildStd_IN_Rd;
+   startupInfo.dwFlags |= STARTF_USESTDHANDLES;
+
+   int res = CreateProcessA(NULL,  // No module name, use command line
                             const_cast<char*>(command.c_str()),
-                            0, 0,
+                            NULL,  // Process handle not inherited
+                            NULL,  // Thread handle not inherited
                             FALSE,
                             CREATE_NO_WINDOW,
-                            0, 0, &startupInfo, &processInfo);
-   TDEBUG_TRACE("LaunchCommand: res = " << res);
+                            NULL,  // use parent's environment
+                            const_cast<char*>(cwd.c_str()),
+                            &startupInfo,
+                            &processInfo);
    if (res == 0)
    {
+      TDEBUG_TRACE("LaunchCommand: failed to launch");
       return false;
+   }
+
+   if( !filelist.empty() )
+   {
+       DWORD dwWritten;
+       WriteFile(hChildStd_IN_Wr, filelist.c_str(), filelist.size(), &dwWritten, NULL);
+   }
+ 
+   if ( !CloseHandle(hChildStd_IN_Wr) ) 
+   {
+      TDEBUG_TRACE("LaunchCommand: Unable to close process stdin");
    }
 
    CloseHandle(processInfo.hProcess);
@@ -177,7 +218,7 @@ HICON GetTortoiseIcon(const std::string& iconname)
         return NULL;
     }
 
-    std::string iconpath = thgdir + "\\icons\\tortoise\\" + iconname;
+    std::string iconpath = thgdir + "\\icons\\" + iconname;
     TDEBUG_TRACE("    GetTortoiseIcon: loading " + iconpath);
     HICON h = (HICON) LoadImageA(0, iconpath.c_str(), IMAGE_ICON,
             16, 16, LR_LOADFROMFILE);
@@ -209,3 +250,4 @@ bool IsHgRepo(const std::string& path)
 {
     return !GetHgRepoRoot(path).empty();
 }
+

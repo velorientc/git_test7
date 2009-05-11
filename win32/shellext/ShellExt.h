@@ -67,7 +67,7 @@ class CShellExt :
         std::string             myFolder;
 
     protected:
-        void CShellExt::DoHgProc(const std::string &, bool=false, bool=false);
+        void CShellExt::DoHgProc(const std::string &);
 		
     public:
 		// context menu  actions

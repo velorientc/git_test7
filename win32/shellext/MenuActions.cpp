@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <vector>
 
-void CShellExt::DoHgProc(const std::string &cmd, bool nofiles, bool nogui)
+void CShellExt::DoHgProc(const std::string &cmd)
 {
     std::string dir = GetTHgProgRoot();
     TDEBUG_TRACE("DoHgProc: THG root = " << dir);
@@ -15,22 +15,22 @@ void CShellExt::DoHgProc(const std::string &cmd, bool nofiles, bool nogui)
         TDEBUG_TRACE("DoHgProc: THG root is empty");
         return;
     }
-    std::string hgcmd = Quote(dir + "\\hgproc.bat") + " --command " + cmd;
-    
-    if (nogui)
-        hgcmd += " --nogui";
+    std::string hgcmd = Quote(dir + "\\hgtk.exe") + " " + cmd;
     
     std::string cwd;
-    std::vector<std::string> filelist;
+    std::string filelist;
     if (!myFolder.empty())
     {
         cwd = myFolder;
-        filelist.push_back(GetHgRepoRoot(myFolder));
     }
     else if (!myFiles.empty())
     {
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
-        filelist = myFiles;
+        for( DWORD i = 0 ; i < myFiles.size() ; i++ )
+        {
+            filelist += myFiles[i];
+            filelist += "\n";
+        }
     }
     else
     {
@@ -38,34 +38,13 @@ void CShellExt::DoHgProc(const std::string &cmd, bool nofiles, bool nogui)
         return;
     }
 
-    hgcmd += " --cwd " + Quote(cwd);
-    hgcmd += " --root " + Quote(GetHgRepoRoot(cwd));
-
-    if (!nofiles)
+    if ( !filelist.empty() )
     {
-        std::string tempfile = GetTemporaryFile();
-        SECURITY_ATTRIBUTES sa;
-        memset(&sa, 0, sizeof(sa));
-        sa.nLength = sizeof(sa);
-        sa.bInheritHandle = TRUE;
-
-        TDEBUG_TRACE("DoHgProc: temp file = " << tempfile);
-        HANDLE tempfileHandle = CreateFileA(tempfile.c_str(), GENERIC_WRITE,
-                FILE_SHARE_READ, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-                
-        for (int i=0; i<filelist.size(); i++)
-        {
-            DWORD dwWritten;
-            TDEBUG_TRACE("DoHgProc: temp file adding " <<  filelist[i]);
-            WriteFile(tempfileHandle, filelist[i].c_str(), 
-                    static_cast<DWORD>(filelist[i].size()), &dwWritten, 0);
-        }
-        CloseHandle(tempfileHandle);
-        hgcmd += " --listfile " + Quote(tempfile);
-        hgcmd += " --deletelistfile" ;
+        TDEBUG_TRACE("filelist: " << filelist);
+        hgcmd += " --listfile -";
     }
 
-    LaunchCommand(hgcmd);
+    LaunchCommand(hgcmd, cwd, filelist);
 }
 
 STDMETHODIMP 
@@ -136,7 +115,7 @@ STDMETHODIMP
 CShellExt::CM_Userconf(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd,
 		LPCSTR pszParam, int iShowCmd)
 {
-    DoHgProc("config", true);
+    DoHgProc("userconfig");
     return NOERROR;
 }
 
@@ -144,6 +123,6 @@ STDMETHODIMP
 CShellExt::CM_Repoconf(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd,
 		LPCSTR pszParam, int iShowCmd)
 {
-    DoHgProc("config");
+    DoHgProc("repoconfig");
     return NOERROR;
 }

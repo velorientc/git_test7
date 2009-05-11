@@ -19,7 +19,7 @@ VersionInfoCopyright=Copyright 2007 TK Soh and others
 VersionInfoCompany=TK Soh and others
 InternalCompressLevel=max
 SolidCompression=true
-;SetupIconFile=icons\tortoise\hg.ico
+;SetupIconFile=icons\hg.ico
 AllowNoIcons=true
 DefaultGroupName=TortoiseHg
 PrivilegesRequired=poweruser
@@ -30,4 +30,4 @@ SetupLogging=yes
 Source: THgShell.dll; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\icons\*; DestDir: {app}\icons ; Flags: ignoreversion recursesubdirs createallsubdirs
 
-#include "registry.iss"
+#include "../../contrib/win32/registry.iss"

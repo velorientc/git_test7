@@ -10,5 +10,5 @@ import gettext
 from gettext import gettext as _
 import paths
 
-gettext.bindtextdomain("thg", paths.get_locale_path())
-gettext.textdomain("thg")
+gettext.bindtextdomain("tortoisehg", paths.get_locale_path())
+gettext.textdomain("tortoisehg")

@@ -46,8 +46,8 @@ def setup_windows():
            #    the dist directory created by py2exe.
            #    also needed is the GTK's share/themes (as dist/share/themes), 
            #    for dialogs to display in MS-Windows XP theme.
-           "includes" : includes
-           "optimize" : 1,
+           "includes" : includes,
+           "optimize" : 1
        }
     }
 

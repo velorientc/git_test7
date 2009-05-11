@@ -3,6 +3,8 @@
 ; register TortoiseHg config info
 Root: HKLM; Subkey: Software\TortoiseHgShell;  Flags: uninsdeletekey
 Root: HKLM; Subkey: Software\TortoiseHgShell;  ValueType: string; ValueName: ; ValueData: {app}
+Root: HKLM; Subkey: Software\TortoiseHg;  Flags: uninsdeletekey
+Root: HKLM; Subkey: Software\TortoiseHg;  ValueType: string; ValueName: ; ValueData: {app}
 
 ; Icon handler COM controls
 Root: HKCR; Subkey: CLSID\{{B456DBA0-7BF4-478c-937A-05130C2C212E}; Flags: uninsdeletekey
