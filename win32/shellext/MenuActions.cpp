@@ -15,15 +15,13 @@ void CShellExt::DoHgProc(const std::string &cmd)
         TDEBUG_TRACE("DoHgProc: THG root is empty");
         return;
     }
-    std::string hgcmd = Quote(dir + "\\hgtk.exe ") + cmd;
+    std::string hgcmd = Quote(dir + "\\hgtk.exe") + " " + cmd;
     
     std::string cwd;
     std::string filelist;
     if (!myFolder.empty())
     {
         cwd = myFolder;
-        filelist = GetHgRepoRoot(myFolder);
-        filelist += "\n";
     }
     else if (!myFiles.empty())
     {
@@ -41,7 +39,10 @@ void CShellExt::DoHgProc(const std::string &cmd)
     }
 
     if ( !filelist.empty() )
+    {
+        TDEBUG_TRACE("filelist: " << filelist);
         hgcmd += " --listfile -";
+    }
 
     LaunchCommand(hgcmd, cwd, filelist);
 }
