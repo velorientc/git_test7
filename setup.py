@@ -16,8 +16,9 @@ def setup_windows():
     # Specific definitios for Windows NT-alike installations
     _scripts = []
     _data_files = []
-    _packages = ['hggtk', 'thgutil']
+    _packages = ['hggtk', 'hggtk.logview', 'thgutil', 'thgutil.iniparse']
     extra = {}
+    hgextmods = []
 
     try: import py2exe
     except ImportError:
@@ -25,11 +26,23 @@ def setup_windows():
             raise
 
     if 'py2exe' in sys.argv:
+        # FIXME: quick hack to include installed hg extensions in py2exe binary
+        import hgext
+        hgextdir = os.path.dirname(hgext.__file__)
+        hgextmods = set(["hgext." + os.path.splitext(f)[0]
+                      for f in os.listdir(hgextdir)])
         _data_files = [(root, [os.path.join(root, file_) for file_ in files])
                             for root, dirs, files in os.walk('icons')]
 
     # add library files to support PyGtk-based dialogs/windows
     includes = ['dbhash', 'pango', 'atk', 'pangocairo', 'cairo', 'gobject']
+
+    # Manually include other modules py2exe can't find by itself.
+    if 'hgext.highlight' in hgextmods:
+        includes += ['pygments.*', 'pygments.lexers.*', 'pygments.formatters.*',
+                     'pygments.filters.*', 'pygments.styles.*']
+    if 'hgext.patchbomb' in hgextmods:
+        includes += ['email.*', 'email.mime.*']
 
     extra['options'] = {
        "py2exe" : {
@@ -46,7 +59,7 @@ def setup_windows():
            #    the dist directory created by py2exe.
            #    also needed is the GTK's share/themes (as dist/share/themes), 
            #    for dialogs to display in MS-Windows XP theme.
-           "includes" : includes,
+           "includes" : includes + list(hgextmods),
            "optimize" : 1
        }
     }
@@ -58,7 +71,7 @@ def setup_posix():
     # Specific definitios for Posix installations
     _extra = {}
     _scripts = ['hgtk']
-    _packages = ['hggtk', 'thgutil']
+    _packages = ['hggtk', 'hggtk.logview', 'thgutil', 'thgutil.iniparse']
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('icons')]
