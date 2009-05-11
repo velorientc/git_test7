@@ -126,3 +126,11 @@ CShellExt::CM_Repoconf(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd,
     DoHgProc("repoconfig");
     return NOERROR;
 }
+
+STDMETHODIMP 
+CShellExt::CM_thgstatus(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd,
+		LPCSTR pszParam, int iShowCmd)
+{
+    DoHgProc("thgstatus");
+    return NOERROR;
+}

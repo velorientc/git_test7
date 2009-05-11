@@ -81,6 +81,7 @@ class CShellExt :
         STDMETHODIMP			CM_Recover(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
         STDMETHODIMP			CM_Userconf(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
         STDMETHODIMP			CM_Repoconf(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
+        STDMETHODIMP			CM_thgstatus(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
 
     public:
         CShellExt(TortoiseOLEClass);

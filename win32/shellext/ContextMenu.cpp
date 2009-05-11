@@ -36,6 +36,8 @@ MenuDescription menuDescList[] = {
         "menucheckout.ico", &CShellExt::CM_Update, 0, 0},
     {"recover", "Recovery...", "General repair and recovery of repositor",
         "general.ico", &CShellExt::CM_Recover, 0, 0},
+    {"thgstatus", "Update Icons", "Update icons for this repository",
+        "", &CShellExt::CM_thgstatus, 0, 0},
     {"userconf", "Global Settings", "Configure user wide settings",
         "settings_user.ico", &CShellExt::CM_Userconf, 0, 0},
     {"repoconf", "Repository Settings", "Configure settings local to this repository",
@@ -209,6 +211,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
             InsertMenuItemByName(hSubMenu, "synch", indexSubMenu++, idCmd++, idCmdFirst);
             InsertMenuItemByName(hSubMenu, "recover", indexSubMenu++, idCmd++, idCmdFirst);
             InsertMenuItemByName(hSubMenu, "serve", indexSubMenu++, idCmd++, idCmdFirst);
+            InsertMenuItemByName(hSubMenu, "thgstatus", indexSubMenu++, idCmd++, idCmdFirst);
 
             InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION,
                     0, NULL);

@@ -219,6 +219,11 @@ def add(ui, *pats, **opts):
     from mercurial import dispatch
     dispatch.dispatch(['add'] + list(pats))
 
+def thgstatus(ui, *pats, **opts):
+    """hg thgstatus"""
+    from mercurial import dispatch
+    dispatch.dispatch(['thgstatus'])
+
 def clone(ui, *pats, **opts):
     """clone tool"""
     from hggtk.clone import run
@@ -595,6 +600,7 @@ table = {
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
          _('hgtk serve [OPTION]...')),
+    "thgstatus": (thgstatus, [], _('hgtk thgstatus')),
     "^update|checkout|co": (update,
         [('r', 'rev', '', _('revision to update'))],
         ('hgtk update')),
