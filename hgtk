@@ -6,23 +6,27 @@
 # Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
 #
 
-# if hasattr(sys, "frozen"):
-#     os.environ['PATH'] += ''
+import os
+import sys
+
+if hasattr(sys, "frozen"):
+    pass
+    # os.environ['PATH'] += ''
+else:
+    # if hgtk is a symlink, insert symlink target directory in sys.path
+    thgpath = os.path.dirname(os.path.realpath(__file__))
+    testpath = os.path.join(thgpath, 'thgutil')
+    if os.path.isdir(testpath) and thgpath not in sys.path:
+        sys.path.insert(0, thgpath)
+
 
 import pygtk
 pygtk.require('2.0')
 import gtk
 
 from mercurial import demandimport; demandimport.enable()
-import os
 import sys
 import cStringIO
-
-# if hgtk is a symlink, insert symlink target directory in sys.path
-thgpath = os.path.dirname(os.path.realpath(__file__))
-if os.path.isdir(os.path.join(thgpath, 'thgutil')):
-    if thgpath not in sys.path:
-        sys.path.insert(0, thgpath)
 
 try:
     import hggtk.hgtk
