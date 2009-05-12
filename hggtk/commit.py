@@ -678,11 +678,9 @@ class GCommit(GStatus):
                 buf.set_modified(False)
             if self.qnew:
                 self.qnew_name.set_text('')
-                self.repo.invalidate()
+                hglib.invalidaterepo(self.repo)
                 self.mode = 'commit'
                 self.qnew = False
-                _mq = self.repo.mq
-                _mq.__init__(_mq.ui, _mq.basepath, _mq.path)
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
                 self._last_commit_id = self._get_tip_rev(True)

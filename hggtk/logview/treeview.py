@@ -16,6 +16,7 @@ from graphcell import CellRendererGraph
 from revgraph import *
 from mercurial.node import hex
 from thgutil.i18n import _
+from thgutil import hglib
 
 
 class TreeView(gtk.ScrolledWindow):
@@ -282,8 +283,7 @@ class TreeView(gtk.ScrolledWindow):
         
     def refresh(self, graphcol, pats, opts):
         if self.repo is not None:
-            self.repo.invalidate()
-            self.repo.dirstate.invalidate()
+            hglib.invalidaterepo(self.repo)
             if len(self.repo.changelog) > 0:
                 self.create_log_generator(graphcol, pats, opts)
                 if self.pbar is not None:

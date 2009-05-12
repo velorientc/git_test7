@@ -528,12 +528,8 @@ class GStatus(GDialog):
             return
 
         repo = self.repo
-        # TODO - SJB - just realloc the repository here
-        repo.dirstate.invalidate()
-        repo.invalidate()
+        hglib.invalidaterepo(repo)
         if hasattr(repo, 'mq'):
-            mq = extensions.find('mq')
-            repo.mq = mq.queue(repo.ui, repo.join(""))
             self.mqmode = repo.mq.applied
             self.set_title(self.get_title())
 

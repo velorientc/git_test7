@@ -112,6 +112,15 @@ def calliffunc(f):
     return hasattr(f, '__call__') and f() or f
 
 
+def invalidaterepo(repo):
+    repo.invalidate()
+    repo.dirstate.invalidate()
+    if hasattr(repo, 'mq'):
+        mq = repo.mq
+        mqclass = mq.__class__
+        repo.mq = mqclass(mq.ui, mq.basepath, mq.path)
+
+
 def hgcmd_toq(path, q, *args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue
