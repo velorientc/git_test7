@@ -141,7 +141,7 @@ class HgExtension(nautilus.MenuProvider,
         '''Build menu'''
         self.pos = 0
         self.files = []
-        files =  []
+        files = []
         for vfs_file in vfs_files:
             f = self.get_path_for_vfs_file(vfs_file)
             if f:
@@ -165,7 +165,7 @@ class HgExtension(nautilus.MenuProvider,
     def _buildMenu(self, menus):
         '''Build one level of a menu'''
         items = []
-	if self.files:
+        if self.files:
             passcwd = None
         else: #bg
             passcwd = self.cwd
