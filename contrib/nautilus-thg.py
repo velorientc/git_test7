@@ -53,12 +53,12 @@ class HgExtension(nautilus.MenuProvider,
         pfile = __file__
         if pfile.endswith('.pyc'):
             pfile = pfile[:-1]
-        path = os.path.dirname(os.path.realpath(pfile))
-        thgpath = os.path.normpath(os.path.join(path, '..'))
-        testpath = os.path.join(thgpath, 'tortoise')
-        if os.path.isdir(testpath):
-            if thgpath not in sys.path:
-                sys.path.insert(0, thgpath)
+        path = os.path.dirname(os.path.dirname(os.path.realpath(pfile)))
+        thgpath = os.path.normpath(path)
+        testpath = os.path.join(thgpath, 'thgutil')
+        if os.path.isdir(testpath) and thgpath not in sys.path:
+            sys.path.insert(0, thgpath)
+
         # else assume thgutil is already in PYTHONPATH
         try:
             from thgutil import paths, debugthg, menuthg
