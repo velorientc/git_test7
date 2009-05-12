@@ -10,7 +10,7 @@ import gobject
 import pango
 import Queue
 
-from mercurial import ui
+from mercurial import ui, util
 
 from thgutil.i18n import _
 from thgutil import hglib
