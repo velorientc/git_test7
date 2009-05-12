@@ -18,6 +18,7 @@
 from mercurial.i18n import _
 from mercurial import commands
 import os
+import time
 
 def cachefilepath(repo):
     return repo.root + "/.hg/thgstatus"
@@ -34,11 +35,21 @@ def thgstatus(ui, repo, **opts):
     Caches the information provided by 'hg status' in the file .hg/thgstatus
     which can then be used by the TortoiseHg shell extension to display
     overlay icons for directories.
+
     The file .hg/thgstatus contains one line for each directory that has
     removed, modified or added files (in that order of preference). Each line
     consists of one char for the status of the directory (r, m or a), followed
     by the relative path of the directory in the repo.
     If the file is empty, then the repo is clean.
+
+    Specify --delay to wait until the system clock ticks to the next second
+    before accessing the dirstate. This is useful when the dirstate contains
+    unset entries (in output of "hg debugstate"). unset entries happen if the
+    dirstate was updated within the same second as the respective file in the
+    working tree was updated. This happens with a high probability for example
+    when cloning a repo. The TortoiseHg shell extension will display unset
+    dirstate entries as (potentially false) modified. Specifying --delay ensures
+    that there are no unset entries in the dirstate.
     '''
 
     if opts.get('remove'):
@@ -57,6 +68,12 @@ def thgstatus(ui, repo, **opts):
         except IOError:
             ui.status("*no status*\n")
         return
+
+    if opts.get('delay'):
+        tref = time.time()
+        tdelta = float(int(tref)) + 1.0 - tref
+        if (tdelta > 0.0):
+            time.sleep(tdelta)
 
     repostate = repo.status()
     modified, added, removed, deleted, unknown, ignored, clean = repostate
@@ -77,7 +94,8 @@ def thgstatus(ui, repo, **opts):
 cmdtable = {
     'thgstatus':
         (thgstatus,
-        [ ('',  'remove', None, _('remove the status file')),
+        [ ('',  'delay', None, _('wait until the second ticks over')),
+          ('',  'remove', None, _('remove the status file')),
           ('s', 'show', None, _('just show the contents of '
                                 'the status file (no update)')) ],
         _('hg thgstatus')),
