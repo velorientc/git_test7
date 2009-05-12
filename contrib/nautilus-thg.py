@@ -29,10 +29,6 @@ import sys
 import urllib
 
 from mercurial import hg, ui, match, util
-try:
-    from mercurial.error import RepoError
-except ImportError:
-    from mercurial.repo import RepoError
 from mercurial.node import short
 
 nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
