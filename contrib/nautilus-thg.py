@@ -255,14 +255,23 @@ class HgExtension(nautilus.MenuProvider,
         '''Update emblem and hg status for files when there is time'''
         if not self.scanStack:
             return False
-        vfs_file = self.scanStack.pop()
-        path = self.get_path_for_vfs_file(vfs_file)
-        if not path:
-            return True
-        emblem, status = self._get_file_status(self.cacherepo, path)
-        if emblem is not None:
-            vfs_file.add_emblem(emblem)
-        vfs_file.add_string_attribute('hg_status', status)
+        try:
+            vfs_file = self.scanStack.pop()
+            path = self.get_path_for_vfs_file(vfs_file, False)
+            if not path:
+                return True
+            oldvfs = self.get_vfs(path)
+            if oldvfs and oldvfs != vfs_file:
+                #file has changed on disc (not invalidated)
+                self.get_path_for_vfs_file(vfs_file) #save new vfs
+                root = self.cacherepo and self.cacherepo.root or ''
+                self.invalidate([os.path.dirname(path)], root)
+            emblem, status = self._get_file_status(self.cacherepo, path)
+            if emblem is not None:
+                vfs_file.add_emblem(emblem)
+            vfs_file.add_string_attribute('hg_status', status)
+        except StandardError, e:
+            debugf(e)
         return True
 
     def notified(self, mon_uri=None, event_uri=None, event=None):
