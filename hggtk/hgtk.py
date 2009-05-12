@@ -64,10 +64,30 @@ def get_list_from_file(filename):
             lines = [ x.replace("\n", "") for x in fd.readlines() ]
             fd.close()
             os.unlink(filename)
-        return lines
     except IOError, e:
         sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
         return []
+
+    # Convert absolute file paths to repo/cwd canonical
+    cwd = os.getcwd()
+    root = paths.find_root()
+    if cwd == root:
+        cwd_rel = ''
+    else:
+        cwd_rel = cwd[len(root+os.sep):] + os.sep
+    files = []
+    for f in lines:
+        try:
+            cpath = util.canonpath(root, cwd, f)
+            # canonpath will abort on .hg/ paths
+        except util.Abort:
+            pass
+        if cpath.startswith(cwd_rel):
+            cpath = cpath[len(cwd_rel):]
+            files.append(cpath)
+        else:
+            files.append(f)
+    return files
 
 def _parse(ui, args):
     options = {}
