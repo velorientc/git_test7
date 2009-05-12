@@ -31,7 +31,7 @@ std::string GetTemporaryFile(LPCSTR prefix="THG");
 bool IsDirectory(const std::string&);
 std::string DirName(const std::string&);
 std::string BaseName(const std::string&);
-bool LaunchCommand(const std::string& command, const std::string& cwd, const std::string& filelist);
+bool LaunchCommand(const std::string& command, const std::string& cwd);
 HICON GetTortoiseIcon(const std::string & iconname);
 std::string GetHgRepoRoot(const std::string& path);
 bool IsHgRepo(const std::string& path);

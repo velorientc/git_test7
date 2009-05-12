@@ -18,7 +18,6 @@ void CShellExt::DoHgProc(const std::string &cmd)
     std::string hgcmd = Quote(dir + "\\hgtk.exe") + " " + cmd;
     
     std::string cwd;
-    std::string filelist;
     if (!myFolder.empty())
     {
         cwd = myFolder;
@@ -26,11 +25,27 @@ void CShellExt::DoHgProc(const std::string &cmd)
     else if (!myFiles.empty())
     {
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
-        for( DWORD i = 0 ; i < myFiles.size() ; i++ )
+
+        std::string tempfile = GetTemporaryFile();
+        SECURITY_ATTRIBUTES sa;
+        memset(&sa, 0, sizeof(sa));
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = TRUE;
+
+        TDEBUG_TRACE("DoHgProc: temp file = " << tempfile);
+        HANDLE tempfileHandle = CreateFileA(tempfile.c_str(), GENERIC_WRITE,
+                FILE_SHARE_READ, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+                
+        for (int i=0; i<myFiles.size(); i++)
         {
-            filelist += myFiles[i];
-            filelist += "\n";
+            DWORD dwWritten;
+            TDEBUG_TRACE("DoHgProc: temp file adding " <<  myFiles[i]);
+            WriteFile(tempfileHandle, myFiles[i].c_str(), 
+                    static_cast<DWORD>(myFiles[i].size()), &dwWritten, 0);
+            WriteFile(tempfileHandle, "\n", 1, &dwWritten, 0);
         }
+        CloseHandle(tempfileHandle);
+        hgcmd += " --listfile " + Quote(tempfile);
     }
     else
     {
@@ -38,13 +53,7 @@ void CShellExt::DoHgProc(const std::string &cmd)
         return;
     }
 
-    if ( !filelist.empty() )
-    {
-        TDEBUG_TRACE("filelist: " << filelist);
-        hgcmd += " --listfile -";
-    }
-
-    LaunchCommand(hgcmd, cwd, filelist);
+    LaunchCommand(hgcmd, cwd);
 }
 
 STDMETHODIMP 
