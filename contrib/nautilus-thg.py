@@ -31,6 +31,26 @@ import urllib
 from mercurial import hg, ui, match, util
 from mercurial.node import short
 
+def _thg_path():
+    # check if nautilus-thg.py is a symlink first
+    pfile = __file__
+    if pfile.endswith('.pyc'):
+        pfile = pfile[:-1]
+    path = os.path.dirname(os.path.dirname(os.path.realpath(pfile)))
+    thgpath = os.path.normpath(path)
+    testpath = os.path.join(thgpath, 'thgutil')
+    if os.path.isdir(testpath) and thgpath not in sys.path:
+        sys.path.insert(0, thgpath)
+_thg_path()
+
+from thgutil import paths, debugthg, hglib, cachethg
+
+if debugthg.debug('N'):
+    debugf = debugthg.debugf
+else:
+    debugf = debugthg.debugf_No
+
+
 nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
 nocachecmds = 'about serve repoconfig userconfig'.split()
 
@@ -45,35 +65,11 @@ class HgExtension(nautilus.MenuProvider,
         self.cacheroot = None
         self.scanStack = []
 
-        # check if nautilus-thg.py is a symlink first
-        pfile = __file__
-        if pfile.endswith('.pyc'):
-            pfile = pfile[:-1]
-        path = os.path.dirname(os.path.dirname(os.path.realpath(pfile)))
-        thgpath = os.path.normpath(path)
-        testpath = os.path.join(thgpath, 'thgutil')
-        if os.path.isdir(testpath) and thgpath not in sys.path:
-            sys.path.insert(0, thgpath)
-
-        # else assume thgutil is already in PYTHONPATH
-        try:
-            from thgutil import paths, debugthg, menuthg
-        except ImportError, e:
-            print e
-            self.menu = None
-            return
-
+        from thgutil import menuthg
         self.hgtk = paths.find_in_path('hgtk')
         self.menu = menuthg.menuThg()
 
-        global debugf
-        if debugthg.debug('N'):
-            debugf = debugthg.debugf
-        else:
-            debugf = debugthg.debugf_No
-
     def icon(self, iname):
-        from thgutil import paths
         return paths.get_tortoise_icon(iname)
 
     def get_path_for_vfs_file(self, vfs_file):
@@ -86,16 +82,10 @@ class HgExtension(nautilus.MenuProvider,
         Find mercurial repository for vfs_file
         Returns hg.repo
         '''
-        p = os.path.isdir(path) and path or os.path.dirname(path)
-        while not os.path.isdir(os.path.join(p, ".hg")):
-            oldp = p
-            p = os.path.dirname(p)
-            if p == oldp:
-                return None
+        p = paths.find_root(path)
 
         if p == self.cacheroot:
             return self.cacherepo
-        from thgutil import hglib
         # Keep one repo cached
         try:
             self.cacheroot = p
@@ -217,7 +207,6 @@ class HgExtension(nautilus.MenuProvider,
                                "Version control status"),
 
     def _get_file_status(self, repo, localpath):
-        from thgutil import cachethg
         cachestate = cachethg.get_state(localpath, repo)
         cache2state = {cachethg.UNCHANGED: ('default', 'clean'),
                        cachethg.ADDED: ('cvs-added', 'added'),
