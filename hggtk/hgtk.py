@@ -26,7 +26,7 @@ from thgutil import hglib, paths, shlib
 
 nonrepo_commands = 'userconfig clone debugcomplete init about help version'
 
-# Add TortoiseHg signals, hooked to key accelerators in shlib
+# Add TortoiseHg signals, hooked to key accelerators in gtklib
 for sig in ('copy-clipboard', 'thg-diff', 'thg-parent'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
@@ -218,11 +218,13 @@ def add(ui, *pats, **opts):
     """add files"""
     from mercurial import dispatch
     dispatch.dispatch(['add'] + list(pats))
+    shlib.shell_notify([os.getcwd()])
 
 def thgstatus(ui, *pats, **opts):
     """hg thgstatus"""
     from mercurial import dispatch
     dispatch.dispatch(['thgstatus'])
+    shlib.shell_notify([os.getcwd()])
 
 def clone(ui, *pats, **opts):
     """clone tool"""
