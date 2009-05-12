@@ -53,7 +53,6 @@ else:
 
 
 nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
-nocachecmds = 'about serve repoconfig userconfig'.split()
 
 
 class HgExtension(nautilus.MenuProvider,
@@ -62,8 +61,6 @@ class HgExtension(nautilus.MenuProvider,
                   nautilus.PropertyPageProvider):
 
     def __init__(self):
-        self.cacherepo = None
-        self.cacheroot = None
         self.scanStack = []
         self.allvfs = {}
         self.inv_dirs = set()
@@ -110,16 +107,9 @@ class HgExtension(nautilus.MenuProvider,
         '''
         p = paths.find_root(path)
 
-        if p == self.cacheroot:
-            return self.cacherepo
-        # Keep one repo cached
         try:
-            self.cacheroot = p
-            self.cacherepo = hg.repository(ui.ui(), path=p)
-            return self.cacherepo
+            return hg.repository(ui.ui(), path=p)
         except hglib.RepoError:
-            self.cacheroot = None
-            self.cacherepo = None
             return None
         except StandardError, e:
             debugf(e)
@@ -147,11 +137,6 @@ class HgExtension(nautilus.MenuProvider,
         if pipe:
             proc.stdin.write('\n'.join(self.files))
             proc.stdin.close()
-
-        if hgtkcmd not in nocachecmds:
-            # Remove cached repo object, dirstate may change
-            self.cacherepo = None
-            self.cacheroot = None
 
     def buildMenu(self, vfs_files, bg):
         '''Build menu'''
@@ -232,7 +217,7 @@ class HgExtension(nautilus.MenuProvider,
                                "HG Status",
                                "Version control status"),
 
-    def _get_file_status(self, repo, localpath):
+    def _get_file_status(self, localpath, repo=None):
         cachestate = cachethg.get_state(localpath, repo)
         cache2state = {cachethg.UNCHANGED: ('default', 'clean'),
                        cachethg.ADDED: ('cvs-added', 'added'),
@@ -264,9 +249,8 @@ class HgExtension(nautilus.MenuProvider,
             if oldvfs and oldvfs != vfs_file:
                 #file has changed on disc (not invalidated)
                 self.get_path_for_vfs_file(vfs_file) #save new vfs
-                root = self.cacherepo and self.cacherepo.root or ''
-                self.invalidate([os.path.dirname(path)], root)
-            emblem, status = self._get_file_status(self.cacherepo, path)
+                self.invalidate([os.path.dirname(path)])
+            emblem, status = self._get_file_status(path)
             if emblem is not None:
                 vfs_file.add_emblem(emblem)
             vfs_file.add_string_attribute('hg_status', status)
@@ -343,7 +327,7 @@ class HgExtension(nautilus.MenuProvider,
         if repo is None:
             return
         localpath = path[len(repo.root)+1:]
-        emblem, status = self._get_file_status(repo, path)
+        emblem, status = self._get_file_status(path, repo)
 
         # Get the information from Mercurial
         ctx = repo['.']
