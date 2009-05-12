@@ -81,7 +81,7 @@ def get_list_from_file(filename):
             cpath = util.canonpath(root, cwd, f)
             # canonpath will abort on .hg/ paths
         except util.Abort:
-            pass
+            continue
         if cpath.startswith(cwd_rel):
             cpath = cpath[len(cwd_rel):]
             files.append(cpath)
