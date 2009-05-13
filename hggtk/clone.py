@@ -116,11 +116,8 @@ class CloneDialog(gtk.Window):
         lbl.set_alignment(0, 0.5)
         self._rev_input = gtk.Entry()
         self._rev_input.set_text("")
-        self._opt_allrev = gtk.CheckButton(_('Clone all revisions'))
-        self._opt_allrev.set_active(True)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._rev_input, False, False)
-        revbox.pack_start(self._opt_allrev, False, False)
         vbox.pack_start(revbox, False, False, 2)
 
         # options
@@ -278,7 +275,7 @@ class CloneDialog(gtk.Window):
             if remotecmd:
                 cmdline.append('--remotecmd')
                 cmdline.append(remotecmd)
-            if not self._opt_allrev.get_active() and rev:
+            if rev:
                 cmdline.append('--rev')
                 cmdline.append(rev)
 
