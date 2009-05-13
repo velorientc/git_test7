@@ -66,12 +66,12 @@ class DataMineDialog(gdialog.GDialog):
         os.chdir(root)
 
     def save_settings(self):
-        settings = GDialog.save_settings(self)
+        settings = gdialog.GDialog.save_settings(self)
         settings['datamine'] = ()
         return settings
 
     def load_settings(self, settings):
-        GDialog.load_settings(self, settings)
+        gdialog.GDialog.load_settings(self, settings)
         self.connect('thg-close', self._close_current_page)
         self.tabwidth = gettabwidth(self.ui)
         # settings['datamine']
@@ -98,7 +98,7 @@ class DataMineDialog(gdialog.GDialog):
 
     def _destroying(self, gtkobj):
         self._stop_all_searches()
-        GDialog._destroying(self, gtkobj)
+        gdialog.GDialog._destroying(self, gtkobj)
 
     def ann_header_context_menu(self, treeview):
         _menu = gtk.Menu()
