@@ -407,7 +407,7 @@ class DataMineDialog(gdialog.GDialog):
             self._stop_search(frame)
 
     def _stop_search(self, frame):
-        if hasattr(frame, '_mythread') and frame._mythread:
+        if getattr(frame, '_mythread', None):
             frame._mythread.terminate()
             frame._mythread.join()
             frame._mythread = None
@@ -624,7 +624,7 @@ class DataMineDialog(gdialog.GDialog):
         q = Queue.Queue()
         args = [self.repo.root, q, 'annotate', '--follow', '--number',
                 '--rev', str(rev), path]
-        thread = threading.Thread(target=hgcmd_toq, args=args)
+        thread = thread2.Thread(target=hgcmd_toq, args=args)
         thread.start()
         frame._mythread = thread
         self.stop_button.set_sensitive(True)
