@@ -65,24 +65,8 @@ class CShellExt :
         LPTSTR					*m_ppszFileUserClickedOn;	//	[MAX_PATH]
         std::vector<std::string> myFiles;
         std::string             myFolder;
-
-    protected:
-        void CShellExt::DoHgProc(const std::string &);
+        void                    CShellExt::DoHgtk(const std::string &);
 		
-    public:
-		// context menu  actions
-        STDMETHODIMP			CM_Commit(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_Status(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_Log(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_About(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_Serve(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_Synch(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_Update(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_Recover(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_Userconf(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_Repoconf(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-        STDMETHODIMP			CM_thgstatus(HWND hParent, LPCSTR pszWorkingDir, LPCSTR pszCmd, LPCSTR pszParam, int iShowCmd);
-
     public:
         CShellExt(TortoiseOLEClass);
         ~CShellExt();

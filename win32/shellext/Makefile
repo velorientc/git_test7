@@ -7,7 +7,6 @@ OBJECTS_DIRSTATE = TortoiseUtils.o \
 OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         ContextMenu.o \
         IconOverlay.o \
-        MenuActions.o \
         ShellExt.o \
         PipeUtils.o \
         ShellUtils2.o \
