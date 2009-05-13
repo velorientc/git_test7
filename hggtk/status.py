@@ -918,7 +918,7 @@ class GStatus(GDialog):
             lines = fp.readlines()
             lines[-1] = lines[-1].strip('\n\r')
             for line in lines:
-                line = gobject.markup_escape_text(hglib.toutf(line[:128]))
+                line = gobject.markup_escape_text(toutf(line[:128]))
                 if line[-1] != '\n':
                     line += '\n'
                 hunk += line
