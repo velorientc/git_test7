@@ -10,8 +10,10 @@ import os
 import sys
 
 if hasattr(sys, "frozen"):
-    pass
-    # os.environ['PATH'] += ''
+    # Prepend C:\Program Files\TortoiseHg\gtk (equiv) to the path
+    from thgutil import paths
+    gtkpath = os.path.join(paths.bin_path, 'gtk')
+    os.environ['PATH'] = os.pathsep.join([gtkpath, os.environ['PATH']])
 else:
     # if hgtk is a symlink, insert symlink target directory in sys.path
     thgpath = os.path.dirname(os.path.realpath(__file__))

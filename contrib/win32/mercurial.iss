@@ -48,20 +48,17 @@ Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: win32\shellext\THgShell.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: dist\*.pyd; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\library.zip; DestDir: {app}
 Source: doc\*.html; DestDir: {app}\docs
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: dist\share\*; DestDir: {app}\share; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: dist\lib\*; DestDir: {app}\lib; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: dist\etc\*; DestDir: {app}\etc; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: CONTRIBUTORS; DestDir: {app}; DestName: Contributors.txt
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: ..\icons\hgicon.ico; DestDir: {app}
-Source: ..\files\gtkrc; DestDir: {app}\etc\gtk-2.0; AfterInstall: EditOptions()
+Source: ..\files\gtkrc; DestDir: {app}\gtk\etc\gtk-2.0; AfterInstall: EditOptions()
 
 [INI]
 Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http://www.selenic.com/mercurial/
