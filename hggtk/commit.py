@@ -266,12 +266,12 @@ class GCommit(GStatus):
         """
         merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
                 = GStatus.get_menu_info(self)
-        return (merge + (('_commit', self._commit_file),),
-                addrem + (('_commit', self._commit_file),),
-                unknown + (('_commit', self._commit_file),),
+        return (merge + ((_('_commit'), self._commit_file),),
+                addrem + ((_('_commit'), self._commit_file),),
+                unknown + ((_('_commit'), self._commit_file),),
                 clean,
                 ignored,
-                deleted + (('_commit', self._commit_file),),
+                deleted + ((_('_commit'), self._commit_file),),
                 unresolved,
                 resolved,
                )
