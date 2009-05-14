@@ -2,7 +2,6 @@
 #include "ShellExt.h"
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
-#include "PipeUtils.h"
 #include "QueryDirstate.h"
 
 #include <shlwapi.h>
@@ -27,22 +26,7 @@ STDMETHODIMP CShellExt::GetOverlayInfo(LPWSTR pwszIconFile, int cchMax,
     std::wstring dirWide = MultibyteToWide(dir);
     wcsncpy(pwszIconFile, dirWide.c_str(), cchMax);
     cchMax -= static_cast<int>(dirWide.size()) + 1;    
-/*
-    switch (myTortoiseClass)
-    {
-        case TORTOISE_OLE_ADDED:
-            wcsncat(pwszIconFile, L"\\icons\\status\\added.ico", cchMax);
-            break;
-        case TORTOISE_OLE_MODIFIED:
-            wcsncat(pwszIconFile, L"\\icons\\status\\changed.ico", cchMax);
-            break;
-        case TORTOISE_OLE_UNCHANGED:
-            wcsncat(pwszIconFile, L"\\icons\\status\\unchanged.ico", cchMax);
-            break;
-        default:
-            break;
-    }
-*/    
+
     std::string path = WideToMultibyte(pwszIconFile);
     TDEBUG_TRACE("GetOverlayInfo: icon path = " << path);
     
@@ -58,7 +42,15 @@ STDMETHODIMP CShellExt::GetPriority(int *pPriority)
 
 STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 {
+    std::string cval;
+    if (GetRegistryConfig("EnableOverlays", cval) != 0 && cval == "0")
+        return S_FALSE;
+
     std::string path = WideToMultibyte(pwszPath);
+
+    if (GetRegistryConfig("LocalDisksOnly", cval) != 0 && cval != "0"
+            && PathIsNetworkPath(path.c_str()))
+        return S_FALSE;
 
     char filterStatus = 0;
     if (myTortoiseClass == TORTOISE_OLE_ADDED)
