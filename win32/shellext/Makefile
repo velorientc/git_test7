@@ -8,7 +8,6 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         ContextMenu.o \
         IconOverlay.o \
         ShellExt.o \
-        PipeUtils.o \
         ShellUtils2.o \
         StringUtils.o \
         dirstate.o \
@@ -34,13 +33,10 @@ ifeq ($(DEBUG),1)
 CXXFLAGS+=-D_DEBUG
 endif
 
-all: THgShell.dll dirstate.exe PipeUtils.exe
+all: THgShell.dll dirstate.exe
 
 THgShell.dll: $(OBJECTS_THGSGELL)
 	g++ -o $@ $(OBJECTS_THGSGELL) $(LDFLAGS_THGSGELL)
-
-PipeUtils.exe: PipeUtils.cpp PipeUtils.h StringUtils.o TortoiseUtils.o
-	g++ -o $@ $(CXXFLAGS) -DAPPMAIN $< StringUtils.o TortoiseUtils.o
 
 dirstate.exe: dirstate.cpp dirstate.h $(OBJECTS_DIRSTATE)
 	g++ -o $@ $(CXXFLAGS) -DAPPMAIN $< $(OBJECTS_DIRSTATE) $(LDFLAGS_DIRSTATE)

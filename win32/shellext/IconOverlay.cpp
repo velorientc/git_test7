@@ -2,7 +2,6 @@
 #include "ShellExt.h"
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
-#include "PipeUtils.h"
 #include "QueryDirstate.h"
 
 #include <shlwapi.h>
