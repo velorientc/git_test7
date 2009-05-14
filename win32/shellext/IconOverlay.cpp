@@ -27,22 +27,7 @@ STDMETHODIMP CShellExt::GetOverlayInfo(LPWSTR pwszIconFile, int cchMax,
     std::wstring dirWide = MultibyteToWide(dir);
     wcsncpy(pwszIconFile, dirWide.c_str(), cchMax);
     cchMax -= static_cast<int>(dirWide.size()) + 1;    
-/*
-    switch (myTortoiseClass)
-    {
-        case TORTOISE_OLE_ADDED:
-            wcsncat(pwszIconFile, L"\\icons\\status\\added.ico", cchMax);
-            break;
-        case TORTOISE_OLE_MODIFIED:
-            wcsncat(pwszIconFile, L"\\icons\\status\\changed.ico", cchMax);
-            break;
-        case TORTOISE_OLE_UNCHANGED:
-            wcsncat(pwszIconFile, L"\\icons\\status\\unchanged.ico", cchMax);
-            break;
-        default:
-            break;
-    }
-*/    
+
     std::string path = WideToMultibyte(pwszIconFile);
     TDEBUG_TRACE("GetOverlayInfo: icon path = " << path);
     
