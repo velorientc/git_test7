@@ -447,12 +447,12 @@ class GStatus(GDialog):
 
         self._show_checks = {}
         row, col = 0, 0
-        checks = (_('modified'), _('added'), _('removed'))
+        checks = ('modified', 'added', 'removed')
         if self.count_revs() <= 1:
-            checks += (_('deleted'), _('unknown'), _('clean'), _('ignored'))
+            checks += ('deleted', 'unknown', 'clean', 'ignored')
 
         for ctype in checks:
-            check = gtk.CheckButton('_' + ctype)
+            check = gtk.CheckButton(_('_' + ctype))
             check.connect('toggled', self._show_toggle, ctype)
             table.attach(check, col, col+1, row, row+1)
             self._show_checks[ctype] = check
