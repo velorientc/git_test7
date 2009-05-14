@@ -108,7 +108,7 @@ int GetRegistryConfig(const std::string& name, std::string& res)
     if (rv != ERROR_SUCCESS)
         return 0;
 
-    res = reinterpret_cast<char*>(&Data);
+    res = reinterpret_cast<const char*>(&Data);
     return 1;
 }
 
