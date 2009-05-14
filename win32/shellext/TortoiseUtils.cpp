@@ -90,12 +90,12 @@ std::string GetTHgProgRoot()
 
 int GetRegistryConfig(const std::string& name, std::string& res)
 {
-    std::string subkey = "Software\\TortoiseHg";
-    HKEY hkey = 0;
+    const char* const subkey = "Software\\TortoiseHg";
 
+    HKEY hkey = 0;
     LONG rv = RegOpenKeyExA(
-        HKEY_CURRENT_USER, subkey.c_str(), 0, KEY_READ, &hkey);
-    
+        HKEY_CURRENT_USER, subkey, 0, KEY_READ, &hkey);
+
     if (rv != ERROR_SUCCESS || hkey == 0)
         return 0;
 
