@@ -87,6 +87,32 @@ std::string GetTHgProgRoot()
     return result;
 }
 
+
+int GetRegistryConfig(const std::string& name, std::string& res)
+{
+    std::string subkey = "Software\\TortoiseHg";
+    HKEY hkey = 0;
+
+    LONG rv = RegOpenKeyExA(
+        HKEY_CURRENT_USER, subkey.c_str(), 0, KEY_READ, &hkey);
+    
+    if (rv != ERROR_SUCCESS || hkey == 0)
+        return 0;
+
+    BYTE Data[MAX_PATH] = "";
+    DWORD cbData = MAX_PATH * sizeof(char);
+
+    rv = RegQueryValueExA(
+        hkey, name.c_str(), 0, 0, Data, &cbData);
+
+    if (rv != ERROR_SUCCESS)
+        return 0;
+
+    res = reinterpret_cast<char*>(&Data);
+    return 1;
+}
+
+
 // Start an external command
 // Note: if the command is a batch file and the [full] path to the
 //       batch contains spaces, the path must be double-quoted.
