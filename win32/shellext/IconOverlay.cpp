@@ -64,6 +64,10 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 
     std::string path = WideToMultibyte(pwszPath);
 
+    if (GetRegistryConfig("LocalDisksOnly", cval) != 0 && cval != "0"
+            && PathIsNetworkPath(path.c_str()))
+        return S_FALSE;
+
     char filterStatus = 0;
     if (myTortoiseClass == TORTOISE_OLE_ADDED)
        filterStatus = 'A';
