@@ -24,7 +24,7 @@ def cachefilepath(repo):
     return repo.join("thgstatus")
 
 def dirname(f):
-    return '/'.join(f.split('/')[:-1])
+    return f[:max(0, f.rfind("/"))]
 
 def showentry(f, e):
     f("%s %s\n" % (e[0], e[1:-1]))
