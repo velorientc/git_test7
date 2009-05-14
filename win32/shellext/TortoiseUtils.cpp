@@ -100,7 +100,7 @@ int GetRegistryConfig(const std::string& name, std::string& res)
         return 0;
 
     BYTE Data[MAX_PATH] = "";
-    DWORD cbData = MAX_PATH * sizeof(char);
+    DWORD cbData = MAX_PATH * sizeof(BYTE);
 
     rv = RegQueryValueExA(
         hkey, name.c_str(), 0, 0, Data, &cbData);
