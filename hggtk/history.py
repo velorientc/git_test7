@@ -601,29 +601,32 @@ class GLog(GDialog):
         self.reload_log()
         return True
 
-    def _tree_button_release(self, widget, event) :
+    def _tree_button_release(self, tree, event) :
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
             gtk.gdk.CONTROL_MASK)):
-            self._tree_popup_menu(widget, event.button, event.time)
+            self._tree_popup_menu(tree, event.button, event.time)
         return False
 
-    def _tree_button_press(self, widget, event):
+    def _tree_button_press(self, tree, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
             gtk.gdk.CONTROL_MASK)):
-            crow = widget.get_path_at_pos(int(event.x), int(event.y))[0]
-            (model, pathlist) = widget.get_selection().get_selected_rows()
+            path = tree.get_path_at_pos(int(event.x), int(event.y))
+            if not path:
+                return False
+            crow = path[0]
+            (model, pathlist) = tree.get_selection().get_selected_rows()
             if pathlist == []:
                 return False
             srow = pathlist[0]
             if srow == crow:
-                self._tree_popup_menu(widget, event.button, event.time)
+                self._tree_popup_menu(tree, event.button, event.time)
             else:
-                widget.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-                widget.get_selection().select_path(crow)
+                tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+                tree.get_selection().select_path(crow)
                 self._orig_sel = srow
                 self._revs = (int(model[srow][treemodel.REVID]),
                         int(model[crow][treemodel.REVID]))
-                self._tree_popup_menu_diff(widget, event.button, event.time)
+                self._tree_popup_menu_diff(tree, event.button, event.time)
             return True
         return False
 
