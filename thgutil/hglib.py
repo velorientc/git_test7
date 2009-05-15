@@ -10,7 +10,6 @@ import gtk
 import os
 import sys
 import traceback
-import urllib2
 import Queue
 from mercurial import hg, ui, util, extensions, commands, hook
 

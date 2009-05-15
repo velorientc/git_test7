@@ -9,6 +9,7 @@ import gtk
 import gobject
 import pango
 import Queue
+import urllib2
 
 from mercurial import ui, util
 
