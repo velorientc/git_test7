@@ -26,8 +26,9 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
-from mercurial import demandimport; demandimport.enable()
-import sys
+from mercurial import demandimport;
+demandimport.ignore.append('win32com.shell')
+demandimport.enable()
 import cStringIO
 
 try:
