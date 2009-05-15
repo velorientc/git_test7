@@ -92,7 +92,10 @@ try:
     except ImportError:
         pass
 
-    extra['console'] = ['hg', 'hgtk']
+    extra['console'] = [
+            {'script':'hg',   'icon_resources':[(0,'icons/hg.ico')]},
+            {'script':'hgtk', 'icon_resources':[(0,'icons/thg_logo.ico')]}
+            ]
 except ImportError:
     pass
 
