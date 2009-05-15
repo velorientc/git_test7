@@ -11,6 +11,7 @@ import os
 import sys
 import traceback
 import Queue
+import shlib
 from mercurial import hg, ui, util, extensions, commands, hook
 
 from i18n import _
@@ -297,4 +298,8 @@ def thgdispatch(ui, path=None, args=[], nodefaults=True):
     # run post-hook, passing command result
     hook.hook(ui, repo, "post-%s" % cmd, False, args=" ".join(fullargs),
             result = ret)
+
+    if repo:
+        shlib.update_thgstatus(repo.ui, repo.root, wait=True)
+
     return ret
