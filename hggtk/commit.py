@@ -667,6 +667,7 @@ class GCommit(GStatus):
 
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
+            shlib.update_thgstatus();
             shlib.shell_notify([self.cwd] + files)
             if self.notify_func:
                 self.notify_func(self.notify_args)
