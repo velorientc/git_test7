@@ -13,6 +13,7 @@ import cPickle
 import time
 from mercurial.i18n import _
 from mercurial import util
+from mercurial import hg
 
 class SimpleMRUList(object):
     def __init__(self, size=10, reflist=[], compact=True):
@@ -176,6 +177,54 @@ if os.name == 'nt':
             shell.SHChangeNotify(shellcon.SHCNE_UPDATEITEM,
                                  shellcon.SHCNF_IDLIST | shellcon.SHCNF_FLUSH,
                                  pidl, None)
+
+    def update_thgstatus(ui, root, wait=False):
+        '''Rewrite the file .hg/thgstatus
+
+        Caches the information provided by repo.status() in the file 
+        .hg/thgstatus, which can then be read by the overlay shell extension
+        to display overlay icons for directories.
+
+        The file .hg/thgstatus contains one line for each directory that has
+        removed, modified or added files (in that order of preference). Each
+        line consists of one char for the status of the directory (r, m or a),
+        followed by the relative path of the directory in the repo. If the
+        file .hg/thgstatus is empty, then the repo's working directory is
+        clean.
+
+        Specify wait=True to wait until the system clock ticks to the next
+        second before accessing Mercurial's dirstate. This is useful when
+        Mercurial's .hg/dirstate contains unset entries (in output of
+        "hg debugstate"). unset entries happen if .hg/dirstate was updated
+        within the same second as Mercurial updated the respective file in
+        the working tree. This happens with a high probability for example
+        when cloning a repo. The overlay shell extension will display unset
+        dirstate entries as (potentially false) modified. Specifying wait=True
+        ensures that there are no unset entries left in .hg/dirstate when this
+        function exits.
+        '''
+        if wait:
+            tref = time.time()
+            tdelta = float(int(tref)) + 1.0 - tref
+            if (tdelta > 0.0):
+                time.sleep(tdelta)
+        repo = hg.repository(ui, root) # a fresh repo object is needed
+        repostate = repo.status() # will update .hg/dirstate as a side effect
+        modified, added, removed, deleted, unknown, ignored, clean = repostate
+        dirstatus = {}
+        def dirname(f):
+            return '/'.join(f.split('/')[:-1])
+        for fn in added:
+            dirstatus[dirname(fn)] = 'a'
+        for fn in modified:
+            dirstatus[dirname(fn)] = 'm'
+        for fn in removed:
+            dirstatus[dirname(fn)] = 'r'
+        f = open(repo.root + "\\.hg\\thgstatus", 'wb')
+        for dn in sorted(dirstatus):
+            f.write(dirstatus[dn] + dn + '\n')
+        f.close()
+
 else:
     def shell_notify(paths):
         if not paths:
@@ -191,4 +240,7 @@ else:
             f_notify.write('\n'.join([os.path.abspath(path) for path in paths]))
         finally:
             f_notify.close()
+
+    def update_thgstatus():
+        pass
 
