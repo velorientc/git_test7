@@ -58,7 +58,6 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: CONTRIBUTORS; DestDir: {app}; DestName: Contributors.txt
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: ..\icons\hgicon.ico; DestDir: {app}
-Source: ..\files\gtkrc; DestDir: {app}\gtk\etc\gtk-2.0; AfterInstall: EditOptions()
 
 [INI]
 Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http://www.selenic.com/mercurial/
@@ -99,71 +98,7 @@ begin
     SaveStringsToFile(InFile, InFileLines, False);
 end;
 
-var ThemePage: TInputOptionWizardPage;
 var IsUpgrade: Boolean;
-
-procedure InitializeWizard;
-begin
-  ThemePage := CreateInputOptionPage(wpSelectComponents,
-    'Theme Selection', '',
-    'Please select a theme, then click Next.',
-    True, False);
-  ThemePage.Add('Neutrino (recommended, especially on Vista)');
-  ThemePage.Add('Brushed');
-  ThemePage.Add('Blue-Steel');
-  ThemePage.Add('MS-Windows (original)');
-
-  case GetPreviousData('Theme', '') of
-    'Neutrino': ThemePage.SelectedValueIndex := 0;
-    'Brushed': ThemePage.SelectedValueIndex := 1;
-    'Blue-Steel': ThemePage.SelectedValueIndex := 2;
-    'MS-Windows': ThemePage.SelectedValueIndex := 3;
-  else
-    ThemePage.SelectedValueIndex := 0;
-  end;
-end;
-
-procedure RegisterPreviousData(PreviousDataKey: Integer);
-var
-  Theme: String;
-begin
-  { Store the settings so we can restore them next time }
-  case ThemePage.SelectedValueIndex of
-    0: Theme := 'Neutrino';
-    1: Theme := 'Brushed';
-    2: Theme := 'Blue-Steel';
-    3: Theme := 'MS-Windows';
-  end;
-  SetPreviousData(PreviousDataKey, 'Theme', Theme);
-end;
-
-procedure SetCommentMarker(var lines: TArrayOfString; option: String; selected: boolean);
-var
-  i : integer;
-begin
-  if selected then exit;
-  for i := 0 to pred(GetArrayLength(lines)) do
-    if pos(option, lines[i]) > 0 then 
-    begin
-        lines[i][1] := '#';
-    end;
-end;
-
-procedure EditOptions();
-var
-  lines : TArrayOfString;
-  filename : String;
-begin
-  filename := ExpandConstant(CurrentFilename);
-  LoadStringsFromFile(filename, lines);
-  
-  SetCommentMarker(lines, 'gtk-theme-name = "Neutrino"', ThemePage.SelectedValueIndex = 0);
-  SetCommentMarker(lines, 'gtk-theme-name = "Brushed"', ThemePage.SelectedValueIndex = 1);
-  SetCommentMarker(lines, 'gtk-theme-name = "Blue-Steel"', ThemePage.SelectedValueIndex = 2);
-  SetCommentMarker(lines, 'gtk-theme-name = "MS-Windows"', ThemePage.SelectedValueIndex = 3);
-  
-  SaveStringsToFile(filename, lines, False);
-end;
 
 function InitializeSetup(): Boolean;
 var
@@ -171,7 +106,7 @@ var
 begin
  Result := True;
 
- {abort installation if TortoiseHg 0.4 or earlier is installed}
+ {abort installation if TortoiseHg 0.7 or earlier is installed}
  if RegQueryStringValue(HKLM, 'Software\TortoiseHg', '', ThgSwReg) then
  begin
    IsUpgrade := True;
