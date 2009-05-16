@@ -241,9 +241,8 @@ def add(ui, *pats, **opts):
     shlib.shell_notify([os.getcwd()])
 
 def thgstatus(ui, *pats, **opts):
-    """hg thgstatus"""
-    from mercurial import dispatch
-    dispatch.dispatch(['thgstatus'])
+    """update thgstatus"""
+    shlib.update_thgstatus(ui, paths.find_root())
     shlib.shell_notify([os.getcwd()])
 
 def clone(ui, *pats, **opts):
