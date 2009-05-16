@@ -759,6 +759,7 @@ class GStatus(GDialog):
             commands.remove(self.ui, self.repo, *wfiles, **removeopts)
         success, outtext = self._hg_call_wrapper('Remove', dohgremove)
         if success:
+            shlib.update_thgstatus(self.ui, self.repo.root)
             self.reload_status()
 
 
@@ -777,6 +778,7 @@ class GStatus(GDialog):
             commands.rename(self.ui, self.repo, *wfiles, **moveopts)
         success, outtext = self._hg_call_wrapper('Move', dohgmove)
         if success:
+            shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
             self.reload_status()
 
 
@@ -794,6 +796,7 @@ class GStatus(GDialog):
             commands.copy(self.ui, self.repo, *wfiles, **cmdopts)
         success, outtext = self._hg_call_wrapper('Copy', dohgcopy)
         if success:
+            shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
             self.reload_status()
 
     def _merge_tree_selection_changed(self, selection, force):
@@ -1103,6 +1106,7 @@ class GStatus(GDialog):
         if dlg.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
+                shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
                 shlib.shell_notify(wfiles)
                 self.reload_status()
 
@@ -1129,6 +1133,7 @@ class GStatus(GDialog):
             commands.add(self.ui, self.repo, *wfiles, **addopts)
         success, outtext = self._hg_call_wrapper('Add', dohgadd)
         if success:
+            shlib.update_thgstatus(self.ui, self.repo.root)
             shlib.shell_notify(wfiles)
             self.reload_status()
 
