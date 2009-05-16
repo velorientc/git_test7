@@ -241,6 +241,6 @@ else:
         finally:
             f_notify.close()
 
-    def update_thgstatus():
+    def update_thgstatus(*args, **kws):
         pass
 
