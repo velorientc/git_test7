@@ -210,7 +210,7 @@ if os.name == 'nt':
                 time.sleep(tdelta)
         repo = hg.repository(ui, root) # a fresh repo object is needed
         repostate = repo.status() # will update .hg/dirstate as a side effect
-        modified, added, removed, deleted, unknown, ignored, clean = repostate
+        modified, added, removed, deleted = repostate[:4]
         dirstatus = {}
         def dirname(f):
             return '/'.join(f.split('/')[:-1])
@@ -218,9 +218,9 @@ if os.name == 'nt':
             dirstatus[dirname(fn)] = 'a'
         for fn in modified:
             dirstatus[dirname(fn)] = 'm'
-        for fn in removed:
+        for fn in removed + deleted:
             dirstatus[dirname(fn)] = 'r'
-        f = open(repo.root + "\\.hg\\thgstatus", 'wb')
+        f = open(repo.join("thgstatus"), 'wb')
         for dn in sorted(dirstatus):
             f.write(dirstatus[dn] + dn + '\n')
         f.close()
