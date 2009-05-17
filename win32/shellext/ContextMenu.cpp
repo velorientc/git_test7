@@ -15,6 +15,12 @@ MenuDescription menuDescList[] = {
     {"commit",      "HG Commit...",
                     "Commit changes in repository",
                     "menucommit.ico", 0},
+    {"init",        "Create Repository Here",
+                    "Create a new repository in this directory",
+                    "menucreaterepos.ico", 0},
+    {"clone",       "Clone a Repository",
+                    "Create clone here from source",
+                    "menuclone.ico", 0},
     {"status",      "View File Status",
                     "Repository status & changes",
                     "menushowchanged.ico", 0},
@@ -235,8 +241,14 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
             }
             InsertMenuItemByName(hSubMenu, "repoconf", indexSubMenu++, idCmd++, idCmdFirst);
         }
+        else
+        {
+            InsertMenuItemByName(hSubMenu, "init", indexSubMenu++, idCmd++, idCmdFirst);
+        }
 
         InsertMenuItemByName(hSubMenu, "userconf", indexSubMenu++, idCmd++, idCmdFirst);
+        InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
+        InsertMenuItemByName(hSubMenu, "clone", indexSubMenu++, idCmd++, idCmdFirst);
         InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
         InsertMenuItemByName(hSubMenu, "about", indexSubMenu++, idCmd++, idCmdFirst);
     }
