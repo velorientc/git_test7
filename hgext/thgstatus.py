@@ -76,7 +76,7 @@ def thgstatus(ui, repo, **opts):
             time.sleep(tdelta)
 
     repostate = repo.status()
-    modified, added, removed, deleted, unknown, ignored, clean = repostate
+    modified, added, removed, deleted = repostate[:4]
     dirstatus = {}
     for fn in added:
         dirstatus[dirname(fn)] = 'a'
