@@ -28,6 +28,7 @@ SetupLogging=yes
 
 [Files]
 Source: THgShell.dll; DestDir: {app}; Flags: ignoreversion
+Source: hgtk.cmd; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\icons\*; DestDir: {app}\icons ; Flags: ignoreversion recursesubdirs createallsubdirs
 
 #include "../../contrib/win32/registry.iss"
