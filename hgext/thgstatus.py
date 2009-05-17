@@ -21,7 +21,7 @@ import os
 import time
 
 def cachefilepath(repo):
-    return repo.root + "/.hg/thgstatus"
+    return repo.join("thgstatus")
 
 def dirname(f):
     return '/'.join(f.split('/')[:-1])
