@@ -350,6 +350,8 @@ STDMETHODIMP CShellExt::HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lParam, 
     return NOERROR;
 }
 
+#include "Winstat.h"
+
 void CShellExt::DoHgtk(const std::string &cmd)
 {
     std::string dir = GetTHgProgRoot();
@@ -358,7 +360,16 @@ void CShellExt::DoHgtk(const std::string &cmd)
         TDEBUG_TRACE("DoHgtk: THG root is empty");
         return;
     }
-    std::string hgcmd = Quote(dir + "\\hgtk.exe") + " " + cmd;
+    std::string hgcmd = Quote(dir + "\\hgtk.exe");
+
+    WIN32_FIND_DATAA data;
+    HANDLE hfind = FindFirstFileA(hgcmd.c_str(), &data);
+    if (hfind == INVALID_HANDLE_VALUE)
+        std::string hgcmd = Quote(dir + "\\hgtk.cmd");
+    else
+        FindClose(hfind);
+
+    hgcmd += " " + cmd;
     
     std::string cwd;
     if (!myFolder.empty())
