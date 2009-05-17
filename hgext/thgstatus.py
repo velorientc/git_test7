@@ -90,7 +90,7 @@ def thgstatus(ui, repo, **opts):
         f.write(e)
         showentry(ui.note, e)
     f.close()
-    ui.note("thgstatus updated") 
+    ui.note("thgstatus updated\n") 
 
 cmdtable = {
     'thgstatus':
