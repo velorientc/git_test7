@@ -82,7 +82,7 @@ def thgstatus(ui, repo, **opts):
         dirstatus[dirname(fn)] = 'a'
     for fn in modified:
         dirstatus[dirname(fn)] = 'm'
-    for fn in removed:
+    for fn in removed + deleted:
         dirstatus[dirname(fn)] = 'r'
     f = open(cachefilepath(repo), 'wb')
     for dn in sorted(dirstatus):
