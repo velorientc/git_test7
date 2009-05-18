@@ -14,7 +14,7 @@ import gdialog
 import gtklib
 
 class CloneDialog(gtk.Window):
-    """ Dialog to add tag to Mercurial repo """
+    """ Dialog to clone a Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
