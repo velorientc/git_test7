@@ -16,7 +16,7 @@ import dialog
 import gtklib
 
 class InitDialog(gtk.Window):
-    """ Dialog to add tag to Mercurial repo """
+    """ Dialog to initialize a Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
