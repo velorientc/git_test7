@@ -11,6 +11,7 @@ from mercurial import hg, ui, util
 
 from thgutil.i18n import _
 from thgutil import hglib
+from thgutil import shlib
 
 import dialog
 import gtklib
@@ -164,6 +165,9 @@ class InitDialog(gtk.Window):
                     open(hgignore, 'wb')
                 except:
                     pass
+
+        shlib.update_thgstatus(u, dest, wait=True)
+        shlib.shell_notify(dest)
 
         dialog.info_dialog(self, _('New repository created'),
                 _('in directory %s') % hglib.toutf(os.path.abspath(dest)))
