@@ -76,9 +76,12 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
         TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") ok ");
     }
 
-    if (stat_done && iter->dstate_mtime < stat.mtime)
+    if ( stat_done &&
+            (iter->dstate_mtime != stat.mtime
+             || iter->dstate_size != stat.size) )
     {
         iter->dstate_mtime = stat.mtime;
+        iter->dstate_size = stat.size;
         if (iter->dstate) {
             delete iter->dstate;
             iter->dstate = 0;
