@@ -31,71 +31,89 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
     static std::list<Dirstatecache::E> _cache;
 
     Iter iter = _cache.begin();
-
     for (;iter != _cache.end(); ++iter)
     {
         if (hgroot == iter->hgroot)
             break;
     }
 
-    bool isnew = false;
+    Winstat stat;
+    std::string path = hgroot + "\\.hg\\dirstate";
+
+    unsigned tc = GetTickCount();
+    bool new_stat = false;
 
     if (iter == _cache.end())
     {
-        if (_cache.size() >= 10)
-        {
-            TDEBUG_TRACE("Dirstatecache::get: dropping " << _cache.back().hgroot);
-            delete _cache.back().dstate;
-            _cache.back().dstate = 0;
-            _cache.pop_back();
-        }
-        E e;
-        e.hgroot = hgroot;
-        _cache.push_front(e);
-        iter = _cache.begin();
-        isnew = true;
-    }
-
-    unsigned tc = GetTickCount();
-
-    std::string path = hgroot + "\\.hg\\dirstate";
-
-    Winstat stat;
-
-    bool stat_done = false;
-
-    if (isnew || (tc - iter->tickcount) > 500)
-    {
-        if (0 != stat.lstat(path.c_str()))
+        if (stat.lstat(path.c_str()) != 0)
         {
             TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") failed");
             return 0;
         }
-        iter->tickcount = tc;
-        stat_done = true;
         TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") ok ");
+        new_stat = true;
+
+        if (_cache.size() >= 10)
+        {
+            TDEBUG_TRACE("Dirstatecache::get: dropping "
+                                            << _cache.back().hgroot);
+            delete _cache.back().dstate;
+            _cache.back().dstate = 0;
+            _cache.pop_back();
+        }
+
+        E e;
+        e.hgroot = hgroot;
+        _cache.push_front(e);
+        iter = _cache.begin();
+        iter->tickcount = tc;
     }
 
-    if ( stat_done &&
-            (iter->dstate_mtime != stat.mtime
-             || iter->dstate_size != stat.size) )
+    if (!new_stat && tc - iter->tickcount > 500)
     {
-        iter->dstate_mtime = stat.mtime;
-        iter->dstate_size = stat.size;
-        if (iter->dstate) {
+        if (0 != stat.lstat(path.c_str()))
+        {
+            TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") failed");
+            TDEBUG_TRACE("Dirstatecache::get: dropping " << iter->hgroot);
             delete iter->dstate;
             iter->dstate = 0;
-            TDEBUG_TRACE("Dirstatecache::get: refreshing " << hgroot);
-        } else {
-            TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
+            _cache.erase(iter);
+            return 0;
         }
-        unsigned tc0 = GetTickCount();
-        iter->dstate = Dirstate::read(path).release();
-        unsigned tc1 = GetTickCount();
-        unsigned delta = tc1 - tc0;
-        TDEBUG_TRACE("Dirstatecache::get: read done in " << delta << " ticks, "
-            << _cache.size() << " repos in cache");
+        iter->tickcount = tc;
+        TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") ok ");
+        new_stat = true;
     }
+
+    if (iter->dstate) 
+    {
+        if (!new_stat)
+            return iter->dstate;
+
+        if (iter->dstate_mtime == stat.mtime
+            && iter->dstate_size == stat.size)
+        {
+            return iter->dstate;
+        }
+
+        TDEBUG_TRACE("Dirstatecache::get: refreshing " << hgroot);
+        delete iter->dstate;
+        iter->dstate = 0;
+    } 
+    else 
+    {
+        TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
+    }
+
+    unsigned tc0 = GetTickCount();
+    iter->dstate = Dirstate::read(path).release();
+    unsigned tc1 = GetTickCount();
+    unsigned delta = tc1 - tc0;
+    TDEBUG_TRACE("Dirstatecache::get: read done in " << delta << " ticks, "
+        << _cache.size() << " repos in cache");
+
+    iter->dstate_mtime = stat.mtime;
+    iter->dstate_size = stat.size;
 
     return iter->dstate;
 }
