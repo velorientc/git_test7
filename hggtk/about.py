@@ -29,7 +29,7 @@ def browse_url(url):
     threading.Thread(target=start_browser).start()
 
 def url_handler(dialog, link, user_data):
-	browse_url(link)
+    browse_url(link)
 
 gtk.about_dialog_set_url_hook(url_handler, None)
 
