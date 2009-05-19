@@ -2,6 +2,7 @@
 #include "ShellExt.h"
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
+#include "Dirstatecache.h"
 
 typedef struct {
     std::string name;
@@ -417,6 +418,13 @@ void CShellExt::DoHgtk(const std::string &cmd)
     {
         TDEBUG_TRACE("DoHgtk: can't get cwd");
         return;
+    }
+
+    if (cmd == "thgstatus")
+    {
+        std::string hgroot = GetHgRepoRoot(cwd);
+        if (!hgroot.empty())
+            Dirstatecache::invalidate(hgroot);
     }
 
     LaunchCommand(hgcmd, cwd);
