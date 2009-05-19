@@ -641,14 +641,6 @@ class ConfigDialog(gtk.Dialog):
         vbox = gtk.VBox()
         frame.add(vbox)
 
-        # Text entry for supported applications
-        hbox = gtk.HBox()
-        vbox.pack_start(hbox, False, False, 2)
-        lbl = gtk.Label(_('Supported applications:'))
-        hbox.pack_start(lbl, False, False, 10)
-        self.shellapps = gtk.Entry()
-        hbox.pack_start(self.shellapps, True, True, 10)
-
         ovframe = gtk.Frame(_('Overlay configuration'))
         ovframe.set_border_width(10)
         vbox.pack_start(ovframe, False, False, 2)
@@ -720,12 +712,6 @@ class ConfigDialog(gtk.Dialog):
             check.connect('focus-in-event', self.set_help,
                     desctext.get_buffer(), tooltip)
 
-        tooltip = _('A comma (,) separated list of applications that'
-                  ' the shell extensions will support.  If unspecified,'
-                  ' it defaults to asterisk (*), supporting all apps')
-        self.shellapps.connect('changed', self.dirty_event)
-        self.shellapps.connect('focus-in-event', self.set_help,
-                desctext.get_buffer(), tooltip)
         tooltip = _('Enable/Disable the overlay icons globally')
         self.ovenable.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
@@ -761,7 +747,6 @@ class ConfigDialog(gtk.Dialog):
         self.load_shell_configs()
 
     def load_shell_configs(self):
-        shellapps = '*'
         includepath = ''
         excludepath = ''
         overlayenable = True
@@ -773,8 +758,6 @@ class ConfigDialog(gtk.Dialog):
             from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
             hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
             t = ('1', 'True')
-            try: shellapps = QueryValueEx(hkey, 'ShellApps')[0]
-            except EnvironmentError: pass
             try: overlayenable = QueryValueEx(hkey, 'EnableOverlays')[0] in t
             except EnvironmentError: pass
             try: localdisks = QueryValueEx(hkey, 'LocalDisksOnly')[0] in t
@@ -792,7 +775,6 @@ class ConfigDialog(gtk.Dialog):
         except (ImportError, WindowsError):
             pass
 
-        self.shellapps.set_text(shellapps)
         self.ovenable.set_active(overlayenable)
         self.lclonly.set_active(localdisks)
         self.ovdebug.set_active(overlaydebug)
@@ -804,7 +786,6 @@ class ConfigDialog(gtk.Dialog):
             check.set_active(cmd in promoted)
 
     def save_shell_configs(self):
-        shellapps = self.shellapps.get_text()
         overlayenable = self.ovenable.get_active() and '1' or '0'
         localdisks = self.lclonly.get_active() and '1' or '0'
         overlaydebug = self.ovdebug.get_active() and '1' or '0'
@@ -818,7 +799,6 @@ class ConfigDialog(gtk.Dialog):
         try:
             from _winreg import HKEY_CURRENT_USER, CreateKey, SetValueEx, REG_SZ
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
-            SetValueEx(hkey, 'ShellApps', 0, REG_SZ, shellapps)
             SetValueEx(hkey, 'EnableOverlays', 0, REG_SZ, overlayenable)
             SetValueEx(hkey, 'LocalDisksOnly', 0, REG_SZ, localdisks)
             SetValueEx(hkey, 'OverlayDebug', 0, REG_SZ, overlaydebug)
