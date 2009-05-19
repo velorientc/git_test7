@@ -19,8 +19,8 @@
 
 struct Winstat64
 {
-    __time64_t mtime;
-    __int64    size;
+    __int64  mtime;
+    __int64  size;
     int lstat(const char* path);
 };
 

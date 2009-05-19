@@ -28,9 +28,9 @@ int Winstat64::lstat(const char* path)
         return -1;
     FindClose(hfind);
 
-    this->mtime = *(__time64_t*)&data.ftLastWriteTime;
-    this->size = ((__int64)data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) 
-                    | data.nFileSizeLow;
+    this->mtime = ((__int64)data.ftLastWriteTime.dwHighDateTime << 32)
+                          + data.ftLastWriteTime.dwLowDateTime;
+    this->size = ((__int64)data.nFileSizeHigh << 32) + data.nFileSizeLow;
 
     return 0;
 }
