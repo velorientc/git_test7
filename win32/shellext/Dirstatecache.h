@@ -41,6 +41,7 @@ class Dirstatecache
 
 public:
     static Dirstate* get(const std::string& hgroot);
+    static void invalidate(const std::string& hgroot);
 };
 
 #endif

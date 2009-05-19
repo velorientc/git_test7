@@ -120,3 +120,24 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
 
     return iter->dstate;
 }
+
+
+void Dirstatecache::invalidate(const std::string& hgroot)
+{
+    typedef std::list<E>::iterator Iter;
+
+    if (hgroot.empty())
+        return;
+
+    for (Iter i = cache().begin(); i != cache().end(); ++i)
+    {
+        if (hgroot == i->hgroot)
+        {
+            delete i->dstate;
+            i->dstate = 0;
+            cache().erase(i);
+            TDEBUG_TRACE("Dirstatecache::invalidate(" << hgroot << ")");
+            break;
+        }
+    }
+}
