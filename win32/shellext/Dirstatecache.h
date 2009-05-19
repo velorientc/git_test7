@@ -28,7 +28,7 @@ class Dirstatecache
     struct E
     {
         Dirstate*       dstate;
-        __time64_t      dstate_mtime;
+        __int64         dstate_mtime;
         __int64         dstate_size;
 
         std::string     hgroot;
