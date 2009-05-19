@@ -29,7 +29,7 @@ class Dirstatecache
     {
         Dirstate*       dstate;
         __time64_t      dstate_mtime;
-        unsigned        dstate_size;
+        __int64         dstate_size;
 
         std::string     hgroot;
         unsigned        tickcount;

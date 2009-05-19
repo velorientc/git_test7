@@ -29,6 +29,32 @@ std::list<Dirstatecache::E>& Dirstatecache::cache()
 }
 
 
+struct Winstat64
+{
+    __time64_t mtime;
+    __int64    size;
+    int lstat(const char* path);
+};
+
+
+int Winstat64::lstat(const char* path)
+{
+    WIN32_FIND_DATAA data;
+    HANDLE hfind;
+
+    hfind = FindFirstFileA(path, &data);
+    if (hfind == INVALID_HANDLE_VALUE)
+        return -1;
+    FindClose(hfind);
+
+    this->mtime = *(__time64_t*)&data.ftLastWriteTime;
+    this->size = ((__int64)data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) 
+                    | data.nFileSizeLow;
+
+    return 0;
+}
+
+
 Dirstate* Dirstatecache::get(const std::string& hgroot)
 {
     typedef std::list<E>::iterator Iter;
@@ -40,7 +66,7 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
             break;
     }
 
-    Winstat stat;
+    Winstat64 stat;
     std::string path = hgroot + "\\.hg\\dirstate";
 
     unsigned tc = GetTickCount();
