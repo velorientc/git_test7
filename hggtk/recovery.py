@@ -11,7 +11,7 @@ import pango
 import Queue
 import os
 
-from mercurial import hg, ui, util
+from mercurial import hg, ui
 
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths

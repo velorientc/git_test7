@@ -7,7 +7,7 @@
 import gtk
 import os
 import pango
-from mercurial import hg, ui, cmdutil, util
+from mercurial import ui, util
 from thgutil.i18n import _
 from thgutil import shlib
 import gdialog

@@ -8,7 +8,7 @@ import os
 import gtk
 import traceback
 
-from mercurial import hg, ui, cmdutil, util
+from mercurial import hg, ui, util
 from mercurial.node import short, nullid
 
 from thgutil.i18n import _

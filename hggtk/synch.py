@@ -12,7 +12,7 @@ import Queue
 import os
 import urllib
 
-from mercurial import hg, ui, util, extensions, url
+from mercurial import hg, ui, extensions, url
 
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths

@@ -10,7 +10,7 @@ import pango
 import Queue
 import threading
 
-from mercurial import hg, ui, util, revlog
+from mercurial import util
 
 from thgutil.i18n import _
 from thgutil.hglib import *

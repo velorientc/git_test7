@@ -16,7 +16,7 @@ import shutil
 import tempfile
 
 from mercurial.node import short
-from mercurial import hg, ui, cmdutil, util, commands
+from mercurial import hg, ui, cmdutil, util
 
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths

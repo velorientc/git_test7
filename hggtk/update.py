@@ -5,17 +5,14 @@
 #
 
 import os
-import sys
 import gtk
 
-from mercurial import util, hg, ui
-from mercurial.node import short, nullrev
+from mercurial import hg, ui
 
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
 import hgcmd
-import gdialog
 import gtklib
 
 _branch_tip_ = _('= Current Branch Tip =')

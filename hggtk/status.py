@@ -14,7 +14,7 @@ import gobject
 import pango
 import gobject
 
-from mercurial import cmdutil, util, ui, hg, commands, patch, mdiff, extensions
+from mercurial import cmdutil, util, commands, patch, mdiff
 from mercurial import merge as merge_
 
 from thgutil.i18n import _
