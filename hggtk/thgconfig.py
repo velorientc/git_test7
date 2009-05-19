@@ -438,7 +438,9 @@ class ConfigDialog(gtk.Dialog):
         if os.name == 'nt':
             self.shellframe = self.add_page(notebook, _('Shell Ext'))
             self.fill_shell_frame(self.shellframe)
-        self.shellframe.set_sensitive(not configrepo)
+            self.shellframe.set_sensitive(not configrepo)
+        else:
+            self.shellframe = None
         self.configrepo = configrepo
 
         # Force dialog into clean state in the beginning
@@ -469,7 +471,8 @@ class ConfigDialog(gtk.Dialog):
             self.set_title(_('TortoiseHg Configure User-Global Settings'))
             gtklib.set_tortoise_icon(self, 'settings_user.ico')
             self.root = None
-        self.shellframe.set_sensitive(not self.configrepo)
+        if self.shellframe:
+            self.shellframe.set_sensitive(not self.configrepo)
         self.ini = self.load_config(self.rcpath)
         self.refresh_vlist()
         self.pathdata.clear()
