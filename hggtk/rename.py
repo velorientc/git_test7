@@ -13,8 +13,6 @@ from mercurial import hg, ui, util, commands
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-import dialog
-
 def run(ui, *pats, **opts):
     fname, target = '', ''
     try:
@@ -29,22 +27,22 @@ def run(ui, *pats, **opts):
     else:
         target = hglib.toutf(fname)
     title = 'Rename ' + hglib.toutf(fname)
-    dialog = entry_dialog(None, title, True, target, rename_resp)
-    dialog.orig = fname
-    return dialog
+    dlg = entry_dialog(None, title, True, target, rename_resp)
+    dlg.orig = fname
+    return dlg
 
-def rename_resp(dialog, response):
+def rename_resp(dlg, response):
     if response != gtk.RESPONSE_OK:
-        dialog.destroy()
+        dlg.destroy()
         return
     try:
         root = paths.find_root()
         repo = hg.repository(ui.ui(), root)
     except (ImportError, hglib.RepoError):
-        dialog.destroy()
+        dlg.destroy()
         return
 
-    new_name = hglib.fromutf(dialog.entry.get_text())
+    new_name = hglib.fromutf(dlg.entry.get_text())
     opts = {}
     opts['force'] = False # Checkbox? Nah.
     opts['after'] = False
@@ -58,16 +56,16 @@ def rename_resp(dialog, response):
         repo.ui.pushbuffer()
         repo.ui.quiet = True
         try:
-            commands.rename(repo.ui, repo, dialog.orig, new_name, **opts)
+            commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
         except (util.Abort, hglib.RepoError), inst:
-            dialog.error_dialog(None, _('rename error'), str(inst))
+            dlg.error_dialog(None, _('rename error'), str(inst))
             toquit = False
     finally:
         sys.stderr = saved
         textout = errors.getvalue() + repo.ui.popbuffer()
         errors.close()
         if len(textout) > 1:
-            dialog.error_dialog(None, _('rename error'), textout)
+            dlg.error_dialog(None, _('rename error'), textout)
         elif toquit:
-            dialog.destroy()
+            dlg.destroy()
