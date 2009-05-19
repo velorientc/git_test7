@@ -163,7 +163,7 @@ class HgIgnoreDialog(gtk.Window):
         model, upaths = sel.get_selected()
         if not upaths:
             return
-        self.glob_entry.set_text(model[uupaths][0])
+        self.glob_entry.set_text(model[upaths][0])
 
     def add_glob(self, widget, glob_entry):
         newglob = hglib.fromutf(glob_entry.get_text())

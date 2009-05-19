@@ -130,7 +130,8 @@ class GShelve(GStatus):
         if file:
             hlist = [cid for cid in hlist if chunks[cid].filename() == file]
         if not hlist:
-            Prompt(_('Shelve'), _('Please select diff chunks to shelve'),
+            gdialog.Prompt(_('Shelve'),
+                    _('Please select diff chunks to shelve'),
                     self).run()
             return
 

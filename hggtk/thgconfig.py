@@ -454,7 +454,7 @@ class ConfigDialog(gtk.Dialog):
     def fileselect(self, combo):
         'select another hgrc file'
         if self.dirty:
-            gdialog.Confirm(_('Unapplied changes'), [], self,
+            ret = gdialog.Confirm(_('Unapplied changes'), [], self,
                    _('Lose changes and switch files?.')).run()
             if ret != gtk.RESPONSE_YES:
                return

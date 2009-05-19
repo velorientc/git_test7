@@ -390,6 +390,7 @@ class GDialog(gtk.Window):
             if not preferred or preferred not in tools:
                 Prompt(_('No visual diff configured'),
                        _('Please select a visual diff application.'), self).run()
+                from thgconfig import ConfigDialog
                 dlg = ConfigDialog(self.repo.root, False)
                 dlg.show_all()
                 dlg.focus_field('tortoisehg.vdiff')

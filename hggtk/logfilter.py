@@ -12,7 +12,7 @@ from mercurial import cmdutil, util, hg, ui
 from thgutil.i18n import _
 from thgutil import hglib
 
-from hggtk import gtklib
+from hggtk import gtklib, gdialog
 
 class FilterDialog(gtk.Dialog):
     """ Dialog for creating log filters """
@@ -190,7 +190,8 @@ class FilterDialog(gtk.Dialog):
                     util.matchdate(date)
                     opts['date'] = date
                 except (ValueError, util.Abort), e:
-                    Prompt(_('Invalid date specification'), str(e), self).run()
+                    gdialog.Prompt(_('Invalid date specification'),
+                            str(e), self).run()
                     self.dateentry.grab_focus()
                     return
         elif self.revradio.get_active():
@@ -204,7 +205,7 @@ class FilterDialog(gtk.Dialog):
                 rrange.reverse()
                 opts['revrange'] = rrange
             except Exception, e:
-                Prompt(_('Invalid revision range'), str(e), self).run()
+                gdialog.Prompt(_('Invalid revision range'), str(e), self).run()
                 self.rev0Entry.grab_focus()
                 return
         elif self.branchradio.get_active():

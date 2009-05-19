@@ -213,7 +213,7 @@ class EmailDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=self.root)
             self.repo = repo
-        except RepoError:
+        except hglib.RepoError:
             self.repo = None
             return
 
