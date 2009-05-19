@@ -12,7 +12,6 @@ import cStringIO
 import gtk
 import gobject
 import pango
-import gobject
 
 from mercurial import cmdutil, util, commands, patch, mdiff
 from mercurial import merge as merge_

@@ -4,10 +4,7 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import sys
 import gtk
-import gobject
-import pango
 import Queue
 import urllib2
 
@@ -15,7 +12,6 @@ from mercurial import ui, util
 
 from thgutil.i18n import _
 from thgutil import hglib
-from thgutil import shlib
 from thgutil import thread2
 
 from hggtk import dialog

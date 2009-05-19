@@ -5,7 +5,6 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import os
 import gtk
 import gobject
 import pango

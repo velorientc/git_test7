@@ -10,7 +10,7 @@ import gobject
 import pango
 
 from thgutil.i18n import _
-from thgutil import hglib, paths
+from thgutil import paths
 
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)

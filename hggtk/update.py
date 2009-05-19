@@ -6,6 +6,7 @@
 
 import os
 import gtk
+import gobject
 
 from mercurial import hg, ui
 

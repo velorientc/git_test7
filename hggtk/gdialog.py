@@ -10,13 +10,9 @@ import os
 import threading
 import cStringIO
 import sys
-import shlex
 import shutil
 import tempfile
-
 import gtk
-import gobject
-import pango
 
 from mercurial.node import short
 from mercurial import cmdutil, util, ui, hg, commands

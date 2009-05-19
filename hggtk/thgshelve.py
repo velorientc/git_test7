@@ -12,7 +12,7 @@ import gtk
 from thgutil.i18n import _
 
 from status import GStatus, FM_STATUS, FM_CHECKED, DM_CHUNK_ID, DM_REJECTED
-from hggtk import hgshelve
+from hggtk import hgshelve, gdialog
 
 class GShelve(GStatus):
     """GTK+ based dialog for displaying repository status and shelving changes.

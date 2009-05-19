@@ -4,9 +4,8 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import gtk
 import os
-import sys
+import gtk
 
 from mercurial import cmdutil, util, hg, ui
 
