@@ -366,9 +366,14 @@ class ConfigDialog(gtk.Dialog):
 
         self.ui = ui.ui()
         try:
-            repo = hg.repository(self.ui, path=paths.find_root())
-            name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
-            self.ui = repo.ui
+            root = paths.find_root()
+            if root:
+                repo = hg.repository(self.ui, root)
+                name = repo.ui.config('web', 'name') or os.path.basename(root)
+                self.ui = repo.ui
+            else:
+                repo = None
+            self.root = root
         except hglib.RepoError:
             repo = None
             if configrepo:
@@ -460,17 +465,15 @@ class ConfigDialog(gtk.Dialog):
 
     def refresh(self):
         if self.configrepo:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
+            repo = hg.repository(ui.ui(), self.root)
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
             self.set_title(_('TortoiseHg Configure Repository - ') + name)
             gtklib.set_tortoise_icon(self, 'settings_repo.ico')
-            self.root = repo.root
         else:
             self.rcpath = util.user_rcpath()
             self.set_title(_('TortoiseHg Configure User-Global Settings'))
             gtklib.set_tortoise_icon(self, 'settings_user.ico')
-            self.root = None
         if self.shellframe:
             self.shellframe.set_sensitive(not self.configrepo)
         self.ini = self.load_config(self.rcpath)
@@ -491,7 +494,7 @@ class ConfigDialog(gtk.Dialog):
             util.system("%s \"%s\"" % (editor, self.fn))
         # reload configs, in case they have been written since opened
         if self.configrepo:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
+            repo = hg.repository(ui.ui(), self.root)
             u = repo.ui
         else:
             u = ui.ui()
