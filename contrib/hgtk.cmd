@@ -6,14 +6,11 @@
 setlocal
 
 :: Uncomment the line below and modify accoringly
-:: set TortoisePath = C:\repos\thg-stable
-if "%TortoisePath%"=="" (goto :notfound)
-
-:hgproc
-python "%TortoisePath%\hgtk" %*
+::set hgtkpath="C:\repos\tortoisehg-crew\hgtk"
+if not exist %hgtkpath% goto :notfound
+python %hgtkpath% %*
 goto end
 
 :notfound
-echo hgtk: Please configure TortoiseHg location in %~f0
-
+echo hgtk: Please configure kgtkpath in %~f0
 :end
