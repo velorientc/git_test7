@@ -377,7 +377,7 @@ void CShellExt::DoHgtk(const std::string &cmd)
     WIN32_FIND_DATAA data;
     HANDLE hfind = FindFirstFileA(hgcmd.c_str(), &data);
     if (hfind == INVALID_HANDLE_VALUE)
-        std::string hgcmd = Quote(dir + "\\hgtk.cmd");
+        hgcmd = Quote(dir + "\\hgtk.cmd");
     else
         FindClose(hfind);
 
