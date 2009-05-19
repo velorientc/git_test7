@@ -21,17 +21,20 @@
 #include "dirstate.h"
 #include "Winstat.h"
 
-#include <list>
+
+std::list<Dirstatecache::E>& Dirstatecache::cache()
+{
+    static std::list<Dirstatecache::E> c;
+    return c;
+}
 
 
 Dirstate* Dirstatecache::get(const std::string& hgroot)
 {
     typedef std::list<E>::iterator Iter;
 
-    static std::list<Dirstatecache::E> _cache;
-
-    Iter iter = _cache.begin();
-    for (;iter != _cache.end(); ++iter)
+    Iter iter = cache().begin();
+    for (;iter != cache().end(); ++iter)
     {
         if (hgroot == iter->hgroot)
             break;
@@ -43,7 +46,7 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
     unsigned tc = GetTickCount();
     bool new_stat = false;
 
-    if (iter == _cache.end())
+    if (iter == cache().end())
     {
         if (stat.lstat(path.c_str()) != 0)
         {
@@ -53,19 +56,19 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
         TDEBUG_TRACE("Dirstatecache::get: lstat(" << path <<") ok ");
         new_stat = true;
 
-        if (_cache.size() >= 10)
+        if (cache().size() >= 10)
         {
             TDEBUG_TRACE("Dirstatecache::get: dropping "
-                                            << _cache.back().hgroot);
-            delete _cache.back().dstate;
-            _cache.back().dstate = 0;
-            _cache.pop_back();
+                                            << cache().back().hgroot);
+            delete cache().back().dstate;
+            cache().back().dstate = 0;
+            cache().pop_back();
         }
 
         E e;
         e.hgroot = hgroot;
-        _cache.push_front(e);
-        iter = _cache.begin();
+        cache().push_front(e);
+        iter = cache().begin();
         iter->tickcount = tc;
     }
 
@@ -77,7 +80,7 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
             TDEBUG_TRACE("Dirstatecache::get: dropping " << iter->hgroot);
             delete iter->dstate;
             iter->dstate = 0;
-            _cache.erase(iter);
+            cache().erase(iter);
             return 0;
         }
         iter->tickcount = tc;
@@ -110,7 +113,7 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
     unsigned tc1 = GetTickCount();
     unsigned delta = tc1 - tc0;
     TDEBUG_TRACE("Dirstatecache::get: read done in " << delta << " ticks, "
-        << _cache.size() << " repos in cache");
+        << cache().size() << " repos in cache");
 
     iter->dstate_mtime = stat.mtime;
     iter->dstate_size = stat.size;

@@ -19,6 +19,7 @@
 #define _DIRSTATECACHE_H
 
 #include <string>
+#include <list>
 
 class Dirstate;
 
@@ -35,6 +36,8 @@ class Dirstatecache
 
         E(): dstate(0), dstate_mtime(0), dstate_size(0), tickcount(0) {}         
     };
+
+    static std::list<E>& cache();
 
 public:
     static Dirstate* get(const std::string& hgroot);
