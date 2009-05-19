@@ -16,7 +16,7 @@
 
 import gtk
 from thgutil.i18n import _
-import gtklib
+from hggtk import gtklib
 
 def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
     """ Allow a user to enter a text string (username/password)

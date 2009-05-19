@@ -18,8 +18,8 @@ from thgutil import hglib
 from thgutil import shlib
 from thgutil import thread2
 
-import dialog
-import gdialog
+from hggtk import dialog
+from hggtk import gdialog
 
 class GtkUi(ui.ui):
     '''

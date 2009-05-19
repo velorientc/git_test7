@@ -17,9 +17,7 @@ from mercurial import hg, ui, extensions, url
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths
 
-import dialog
-import gtklib
-import hgthread
+from hggtk import dialog, gtklib, hgthread
 
 class SynchDialog(gtk.Window):
     def __init__(self, repos=[], pushmode=False):

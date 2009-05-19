@@ -16,10 +16,7 @@ from mercurial import hg, ui
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths
 
-import gdialog
-import dialog
-import gtklib
-import hgthread
+from hggtk import gdialog, dialog, gtklib, hgthread
 
 class RecoveryDialog(gtk.Window):
     def __init__(self):

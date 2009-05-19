@@ -21,10 +21,10 @@ from thgutil.i18n import _
 from thgutil import hglib
 from thgutil import shlib
 
-from status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH_UTF8
-from status import DM_REJECTED, DM_CHUNK_ID
-import gtklib
-import gdialog
+from hggtk.status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH_UTF8
+from hggtk.status import DM_REJECTED, DM_CHUNK_ID
+from hggtk import gtklib
+from hggtk import gdialog
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close):

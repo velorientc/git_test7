@@ -20,10 +20,8 @@ from mercurial import merge as merge_
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths
 
-from gdialog import GDialog, Confirm, Prompt, NativeSaveFileDialogWrapper
-import dialog
-import hgshelve
-import gtklib
+from hggtk.gdialog import GDialog, Confirm, Prompt, NativeSaveFileDialogWrapper
+from hggtk import dialog, hgshelve, gtklib
 
 # file model row enumerations
 FM_CHECKED = 0

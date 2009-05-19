@@ -18,7 +18,7 @@ from thgutil.i18n import _
 from thgutil.hglib import toutf, fromutf, diffexpand, RepoError
 from thgutil import shlib, paths, thread2
 
-import gtklib
+from hggtk import gtklib
 
 # This function and some key bits below borrowed ruthelessly from
 # Peter Arrenbrecht <peter.arrenbrecht@gmail.com>

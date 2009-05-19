@@ -21,8 +21,7 @@ from mercurial import hg, ui, cmdutil, util
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths
 
-import gdialog
-import gtklib
+from hggtk import gdialog, gtklib
 
 try:
     import win32con

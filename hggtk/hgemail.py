@@ -18,8 +18,8 @@ from thgutil.i18n import _
 from thgutil import hglib
 from thgutil import shlib
 
-import gtklib
-import dialog
+from hggtk import gtklib
+from hggtk import dialog
 
 class EmailDialog(gtk.Window):
     """ Send patches or bundles via email """

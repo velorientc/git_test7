@@ -20,8 +20,8 @@ from logview import treemodel
 from logview.colormap import AnnotateColorMap, AnnotateColorSaturation
 from logview.treeview import TreeView as LogTreeView
 
-import gtklib
-import gdialog
+from hggtk import gtklib
+from hggtk import gdialog
 
 class DataMineDialog(gdialog.GDialog):
     COL_REVID = 0

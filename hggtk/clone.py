@@ -10,8 +10,8 @@ import pango
 from mercurial import ui, util
 from thgutil.i18n import _
 from thgutil import shlib
-import gdialog
-import gtklib
+from hggtk import gdialog
+from hggtk import gtklib
 
 class CloneDialog(gtk.Window):
     """ Dialog to clone a Mercurial repo """

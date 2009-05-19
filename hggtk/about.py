@@ -7,11 +7,11 @@
 import os
 import sys
 import gtk
-import gtklib
 from thgutil.i18n import _
 from thgutil.hglib import hgversion
 from thgutil import shlib
 from thgutil import paths
+from hggtk import gtklib
 
 def browse_url(url):
     import threading

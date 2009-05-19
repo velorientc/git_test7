@@ -17,8 +17,8 @@ from thgutil.i18n import _
 from thgutil.hglib import *
 from thgutil import shlib
 
-from gdialog import GDialog, Confirm, NativeSaveFileDialogWrapper
-import gtklib
+from hggtk.gdialog import GDialog, Confirm, NativeSaveFileDialogWrapper
+from hggtk import gtklib
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs

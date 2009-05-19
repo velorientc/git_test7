@@ -14,8 +14,7 @@ from mercurial.node import short, nullid
 from thgutil.i18n import _
 from thgutil import hglib
 
-import dialog
-import gtklib
+from hggtk import dialog, gtklib
 
 class TagAddDialog(gtk.Window):
     """ Dialog to add tag to Mercurial repo """

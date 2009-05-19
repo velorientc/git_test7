@@ -24,7 +24,7 @@ from mercurial import cmdutil, util, ui, hg, commands
 from thgutil.i18n import _
 from thgutil import shlib, hglib, paths
 
-import gtklib
+from hggtk import gtklib
 
 class SimpleMessage(gtklib.MessageDialog):
     def run(self):

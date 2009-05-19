@@ -13,7 +13,7 @@ import pango
 from mercurial import hg, ui
 from thgutil.i18n import _
 from thgutil import hglib, paths
-import gtklib
+from hggtk import gtklib
 
 class BackoutDialog(gtk.Window):
     """ Backout effect of a changeset """

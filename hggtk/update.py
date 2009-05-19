@@ -12,8 +12,7 @@ from mercurial import hg, ui
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-import hgcmd
-import gtklib
+from hggtk import hgcmd, gtklib
 
 _branch_tip_ = _('= Current Branch Tip =')
 

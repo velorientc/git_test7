@@ -13,7 +13,7 @@ from mercurial import cmdutil, util, hg, ui
 from thgutil.i18n import _
 from thgutil import hglib
 
-import gtklib
+from hggtk import gtklib
 
 class FilterDialog(gtk.Dialog):
     """ Dialog for creating log filters """

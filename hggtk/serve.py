@@ -22,9 +22,7 @@ from mercurial.hgweb import server
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-import dialog 
-import gdialog
-import gtklib
+from hggtk import dialog, gdialog, gtklib
 
 gservice = None
 class ServeDialog(gtk.Window):

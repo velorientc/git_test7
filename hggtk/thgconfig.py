@@ -16,9 +16,7 @@ from mercurial import hg, ui, util, url
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths, iniparse
 
-import dialog
-import gdialog
-import gtklib
+from hggtk import dialog, gdialog, gtklib
 
 _unspecstr = _('<unspecified>')
 

@@ -13,7 +13,7 @@ from mercurial import hg, ui, match
 from thgutil.i18n import _
 from thgutil import shlib, hglib, paths
 
-import gtklib
+from hggtk import gtklib
 
 class HgIgnoreDialog(gtk.Window):
     'Edit a reposiory .hgignore file'

@@ -22,7 +22,7 @@ from changeset import ChangeSet
 from logview import treemodel
 from logview.treeview import TreeView as LogTreeView
 
-import gtklib
+from hggtk import gtklib
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)

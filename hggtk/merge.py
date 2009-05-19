@@ -13,9 +13,9 @@ from mercurial import hg, ui
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-import gtklib
-import gdialog
-import hgcmd
+from hggtk import gtklib
+from hggtk import gdialog
+from hggtk import hgcmd
 
 class MergeDialog(gtk.Window):
     """ Dialog to merge revisions of a Mercurial repo """
