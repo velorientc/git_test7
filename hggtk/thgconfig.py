@@ -362,12 +362,13 @@ class ConfigDialog(gtk.Dialog):
         """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
-        self.add_button(gtk.STOCK_EDIT, gtk.RESPONSE_YES)
         gtklib.set_tortoise_keys(self)
 
         self.ui = ui.ui()
         try:
             repo = hg.repository(self.ui, path=paths.find_root())
+            name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
+            self.ui = repo.ui
         except hglib.RepoError:
             repo = None
             if configrepo:
@@ -378,20 +379,18 @@ class ConfigDialog(gtk.Dialog):
         # Catch close events
         self.connect('response', self.should_live)
 
-        if configrepo:
-            self.ui = repo.ui
-            name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
-            self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.set_title(_('TortoiseHg Configure Repository - ') + name)
-            gtklib.set_tortoise_icon(self, 'settings_repo.ico')
-            self.root = repo.root
-        else:
-            self.rcpath = util.user_rcpath()
-            self.set_title(_('TortoiseHg Configure User-Global Settings'))
-            gtklib.set_tortoise_icon(self, 'settings_user.ico')
-            self.root = None
+        combo = gtk.combo_box_new_text()
+        combo.append_text(_('User global settings'))
+        if repo:
+            combo.append_text(_('%s repository settings') % name)
+        combo.connect('changed', self.fileselect)
 
-        self.ini = self.load_config(self.rcpath)
+        hbox = gtk.HBox()
+        hbox.pack_start(combo, False, False, 2)
+        edit = gtk.Button(_('Edit File'))
+        hbox.pack_start(edit, False, False, 2)
+        edit.connect('clicked', self.edit_clicked)
+        self.vbox.pack_start(hbox, False, False, 4)
 
         # Create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
@@ -436,15 +435,78 @@ class ConfigDialog(gtk.Dialog):
         self.diff_frame = self.add_page(notebook, _('Diff'))
         self.fill_frame(self.diff_frame, _diff_info)
 
-        if not configrepo and os.name == 'nt':
+        if os.name == 'nt':
             self.shellframe = self.add_page(notebook, _('Shell Ext'))
             self.fill_shell_frame(self.shellframe)
+        self.shellframe.set_sensitive(not configrepo)
         self.configrepo = configrepo
 
         # Force dialog into clean state in the beginning
-        self._refresh_vlist()
         self._btn_apply.set_sensitive(False)
         self.dirty = False
+        combo.set_active(configrepo and 1 or 0)
+
+    def fileselect(self, combo):
+        'select another hgrc file'
+        if self.dirty:
+            gdialog.Confirm(_('Unapplied changes'), [], self,
+                   _('Lose changes and switch files?.')).run()
+            if ret != gtk.RESPONSE_YES:
+               return
+        self.configrepo = combo.get_active() and True or False
+        self.refresh()
+
+    def refresh(self):
+        if self.configrepo:
+            repo = hg.repository(ui.ui(), path=paths.find_root())
+            name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
+            self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
+            self.set_title(_('TortoiseHg Configure Repository - ') + name)
+            gtklib.set_tortoise_icon(self, 'settings_repo.ico')
+            self.root = repo.root
+        else:
+            self.rcpath = util.user_rcpath()
+            self.set_title(_('TortoiseHg Configure User-Global Settings'))
+            gtklib.set_tortoise_icon(self, 'settings_user.ico')
+            self.root = None
+        self.shellframe.set_sensitive(not self.configrepo)
+        self.ini = self.load_config(self.rcpath)
+        self.refresh_vlist()
+        self.pathdata.clear()
+        if 'paths' in list(self.ini):
+            for name in self.ini['paths']:
+                path = self.ini['paths'][name]
+                safepath = hglib.toutf(url.hidepassword(path))
+                self.pathdata.append([hglib.toutf(name), safepath,
+                    hglib.toutf(path)])
+        self.refresh_path_list()
+        self._btn_apply.set_sensitive(False)
+        self.dirty = False
+
+    def edit_clicked(self, button):
+        def doedit():
+            util.system("%s \"%s\"" % (editor, self.fn))
+        # reload configs, in case they have been written since opened
+        if self.configrepo:
+            repo = hg.repository(ui.ui(), path=paths.find_root())
+            u = repo.ui
+        else:
+            u = ui.ui()
+        editor = (u.config('tortoisehg', 'editor') or
+                u.config('gtools', 'editor') or
+                os.environ.get('HGEDITOR') or
+                u.config('ui', 'editor') or
+                os.environ.get('EDITOR', 'vi'))
+        if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+            gdialog.Prompt(_('No visual editor configured'),
+                   _('Please configure a visual editor.'), self).run()
+            self.focus_field('tortoisehg.editor')
+            self.emit_stop_by_name('response')
+            return True
+        thread = threading.Thread(target=doedit, name='edit config')
+        thread.setDaemon(True)
+        thread.start()
+        return True
 
     def should_live(self, *args):
         if self.dirty:
@@ -453,31 +515,6 @@ class ConfigDialog(gtk.Dialog):
             if ret != gtk.RESPONSE_YES:
                self.emit_stop_by_name('response')
                return True
-        if len(args) == 2 and args[1] == gtk.RESPONSE_YES:
-            def doedit():
-                util.system("%s \"%s\"" % (editor, self.fn))
-            # reload configs, in case they have been written since opened
-            if self.configrepo:
-                repo = hg.repository(ui.ui(), path=paths.find_root())
-                u = repo.ui
-            else:
-                u = ui.ui()
-            editor = (u.config('tortoisehg', 'editor') or
-                    u.config('gtools', 'editor') or
-                    os.environ.get('HGEDITOR') or
-                    u.config('ui', 'editor') or
-                    os.environ.get('EDITOR', 'vi'))
-            if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-                gdialog.Prompt(_('No visual editor configured'),
-                       _('Please configure a visual editor.'), self).run()
-                self.focus_field('tortoisehg.editor')
-                self.emit_stop_by_name('response')
-                return True
-            thread = threading.Thread(target=doedit, name='edit config')
-            thread.setDaemon(True)
-            thread.start()
-            self.emit_stop_by_name('response')
-            return True
         return False
 
     def focus_field(self, focusfield):
@@ -583,12 +620,6 @@ class ConfigDialog(gtk.Dialog):
 
         # Initialize data model for 'Paths' tab
         self.pathdata = gtk.ListStore(str, str, str)
-        if 'paths' in list(self.ini):
-            for name in self.ini['paths']:
-                path = self.ini['paths'][name]
-                safepath = hglib.toutf(url.hidepassword(path))
-                self.pathdata.append([hglib.toutf(name), safepath,
-                    hglib.toutf(path)])
 
         # Define view model for 'Paths' tab
         self.pathtree = gtk.TreeView(self.pathdata)
@@ -630,7 +661,6 @@ class ConfigDialog(gtk.Dialog):
         buttonbox.pack_start(self._testpathbutton)
 
         vbox.pack_start(buttonbox, False, False, 4)
-        self.refresh_path_list()
 
     def set_help(self, widget, event, buffer, tooltip):
         text = ' '.join(tooltip.splitlines())
@@ -834,7 +864,7 @@ class ConfigDialog(gtk.Dialog):
         self.pages.append((vbox, info, widgets))
         return vbox
 
-    def _refresh_vlist(self):
+    def refresh_vlist(self):
         for vbox, info, widgets in self.pages:
             for row, (label, cpath, values, tooltip) in enumerate(info):
                 ispw = cpath in _pwfields
@@ -980,7 +1010,7 @@ class ConfigDialog(gtk.Dialog):
                 self.record_new_value(cpath, newvalue)
 
         self.history.write()
-        self._refresh_vlist()
+        self.refresh_vlist()
 
         try:
             f = open(self.fn, "w")
