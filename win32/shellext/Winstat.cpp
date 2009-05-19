@@ -33,8 +33,9 @@ int Winstat::lstat(const char* file)
         return -1;
     FindClose(hfind);
 
-    this->mtime = *(__int64*)&data.ftLastWriteTime / divisor - secs_between_epochs;
-    this->size = (data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) | data.nFileSizeLow;
+    this->mtime = (((__int64)data.ftLastWriteTime.dwHighDateTime << 32) + 
+        data.ftLastWriteTime.dwLowDateTime) / divisor - secs_between_epochs;
+    this->size = ((__int64)data.nFileSizeHigh << 32) + data.nFileSizeLow;
     this->isdir = (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 
     return 0;
