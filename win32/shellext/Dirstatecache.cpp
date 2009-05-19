@@ -19,39 +19,13 @@
 
 #include "Dirstatecache.h"
 #include "dirstate.h"
-#include "Winstat.h"
+#include "Winstat64.h"
 
 
 std::list<Dirstatecache::E>& Dirstatecache::cache()
 {
     static std::list<Dirstatecache::E> c;
     return c;
-}
-
-
-struct Winstat64
-{
-    __time64_t mtime;
-    __int64    size;
-    int lstat(const char* path);
-};
-
-
-int Winstat64::lstat(const char* path)
-{
-    WIN32_FIND_DATAA data;
-    HANDLE hfind;
-
-    hfind = FindFirstFileA(path, &data);
-    if (hfind == INVALID_HANDLE_VALUE)
-        return -1;
-    FindClose(hfind);
-
-    this->mtime = *(__time64_t*)&data.ftLastWriteTime;
-    this->size = ((__int64)data.nFileSizeHigh << sizeof(data.nFileSizeHigh)) 
-                    | data.nFileSizeLow;
-
-    return 0;
 }
 
 

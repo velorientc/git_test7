@@ -11,6 +11,7 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         ShellUtils2.o \
         StringUtils.o \
         dirstate.o \
+        Winstat64.o \
         Dirstatecache.o \
         DirectoryStatus.o \
         QueryDirstate.o
