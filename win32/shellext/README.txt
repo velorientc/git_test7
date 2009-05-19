@@ -5,7 +5,7 @@ those details):
 
 1) install mingw32
 2) build this directory by running mingw32-make
-3) copy contrib/hgtk.cmd to this directory and set TortoisePath as needed
+3) copy contrib/hgtk.cmd to this directory and set hgtkpath as needed
 4) install inno setup tool suite
 5) open ThgShell.iss in the inno setup editor and run the script
 
