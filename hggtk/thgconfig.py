@@ -512,6 +512,7 @@ class ConfigDialog(gtk.Dialog):
 
     def _add_path(self, *args):
         self.new_path('http://')
+        self._edit_path()
 
     def _edit_path(self, *args):
         selection = self.pathtree.get_selection()
