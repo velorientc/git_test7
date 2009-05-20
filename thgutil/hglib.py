@@ -113,10 +113,15 @@ def calliffunc(f):
 def invalidaterepo(repo):
     repo.invalidate()
     repo.dirstate.invalidate()
-    if hasattr(repo, 'mq'):
+    if 'mq' in repo.__dict__: #do not create if it did not exist
         mq = repo.mq
-        mqclass = mq.__class__
-        repo.mq = mqclass(mq.ui, mq.basepath, mq.path)
+        if hasattr(mq, 'invalidate'):
+            #Mercurial 1.3
+            mq.invalidate()
+        else:
+            #Mercurial 1.2
+            mqclass = mq.__class__
+            repo.mq = mqclass(mq.ui, mq.basepath, mq.path)
 
 
 def hgcmd_toq(path, q, *args):
