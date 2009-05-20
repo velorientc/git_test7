@@ -87,6 +87,18 @@ class MergeDialog(gtk.Window):
         hbbox.add(undo)
         hbbox.add(close)
 
+        vlist = gtk.ListStore(str, bool)
+        combo = gtk.ComboBoxEntry(vlist, 0)
+        self.mergetool = combo
+        combo.set_row_separator_func(lambda model, path: model[path][1])
+        combo.child.set_width_chars(8)
+        lbl = gtk.Label(_('mergetool:'))
+        hbbox.add(lbl)
+        hbbox.add(combo)
+        vlist.append(('', False))
+        for tool in hglib.mergetools(repo.ui):
+            vlist.append((hglib.toutf(tool), False))
+
         commit.connect('clicked', self.commit)
         undo.connect('clicked', self.undo, local, merge, commit)
         merge.connect('clicked', self.merge, other, commit, undo)
@@ -98,15 +110,25 @@ class MergeDialog(gtk.Window):
 
     def merge(self, button, other, commit, undo):
         cmdline = ['hg', 'merge', '--rev', other]
+        tool = hglib.fromutf(self.mergetool.child.get_text())
+        if tool:
+            oldmergeenv = os.environ.get('HGMERGE')
+            os.environ['HGMERGE'] = tool
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
         repo = hg.repository(ui.ui(), path=paths.find_root())
         if len(repo.parents()) == 1:
             return
+        if tool:
+            if oldmergeenv:
+                os.environ['HGMERGE'] = oldmergeenv
+            else:
+                del os.environ['HGMERGE']
         if self.notify_func:
             self.notify_func(self.notify_args)
         button.set_sensitive(False)
+        self.mergetool.set_sensitive(False)
         undo.set_sensitive(True)
         commit.set_sensitive(True)
         commit.grab_focus()
@@ -141,6 +163,7 @@ class MergeDialog(gtk.Window):
         button.set_sensitive(False)
         commit.set_sensitive(False)
         merge.set_sensitive(True)
+        self.mergetool.set_sensitive(True)
         merge.grab_focus()
 
 def run(ui, *pats, **opts):
