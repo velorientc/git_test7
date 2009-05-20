@@ -943,21 +943,7 @@ class ConfigDialog(gtk.Dialog):
                                 values.append(name)
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
-                    try:
-                        tools = []
-                        for key, value in self.ui.configitems('merge-tools'):
-                            t = key.split('.')[0]
-                            if t not in tools:
-                                tools.append(t)
-                        for t in tools:
-                            # Ensure the tool is installed
-                            if filemerge._findtool(self.ui, t):
-                                values.append(t)
-                        values.append('internal:merge')
-                        values.append('internal:prompt')
-                        values.append('internal:dump')
-                    except ImportError:
-                        pass
+                    hglib.mergetools(self.ui, values)
 
                 currow = None
                 if not ispw:

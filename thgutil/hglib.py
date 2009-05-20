@@ -125,6 +125,27 @@ def canonpaths(list):
                 # May already be canonical
                 canonpats.append(f)
     return canonpats
+    
+    
+def mergetools(ui, values=None):
+    'returns the configured merge tools and the internal ones'
+    if values == None:
+        values = []
+    from mercurial import filemerge
+    for key, value in ui.configitems('merge-tools'):
+        t = key.split('.')[0]
+        if t not in values:
+            # Ensure the tool is installed
+            if filemerge._findtool(ui, t):
+                values.append(t)
+    values.append('internal:merge')
+    values.append('internal:prompt')
+    values.append('internal:dump')
+    values.append('internal:local')
+    values.append('internal:other')
+    values.append('internal:fail')
+    return values
+
 
 def hgcmd_toq(path, q, *args):
     '''
