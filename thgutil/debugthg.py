@@ -18,7 +18,7 @@ try:
 except ImportError:
     import os
     debugging = os.environ.get("DEBUG_THG", "")
-    if debugging.lower() in (1, "true"):
+    if debugging.lower() in ("1", "true"):
         debugging = True
 
 def debugf_No(str, args=None, level=''):
