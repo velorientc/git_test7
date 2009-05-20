@@ -158,16 +158,14 @@ if os.name == 'nt':
             import pywintypes
         except ImportError:
             return
-        dirs = []
+        dirs = set()
         for path in paths:
             abspath = os.path.abspath(path)
             if not os.path.isdir(abspath):
                 abspath = os.path.dirname(abspath)
-            if abspath not in dirs:
-                dirs.append(abspath)
+            dirs.add(abspath)
         # send notifications to deepest directories first
-        dirs.sort(lambda x, y: len(y) - len(x))
-        for dir in dirs:
+        for dir in sorted(dirs, key=len, reverse=True):
             try:
                 pidl, ignore = shell.SHILCreateFromPath(dir, 0)
             except pywintypes.com_error:
