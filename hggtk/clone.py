@@ -303,7 +303,7 @@ class CloneDialog(gtk.Window):
 
         if dlg.return_code() == 0:
             shlib.update_thgstatus(self.ui, dest, wait=True)
-            shlib.shell_notify(dest)
+            shlib.shell_notify([dest])
 
 def run(_ui, *pats, **opts):
     return CloneDialog(pats)
