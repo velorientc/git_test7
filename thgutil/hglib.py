@@ -45,6 +45,12 @@ except AttributeError:
     from mercurial import version
     hgversion = version.get_version()
 
+try:
+    from mercurial.util import WinIOError
+except:
+    class WinIOError(Exception):
+        'WinIOError stub'
+
 def toutf(s):
     """
     Convert a string to UTF-8 encoding
