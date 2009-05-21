@@ -687,22 +687,6 @@ class ConfigDialog(gtk.Dialog):
         self.ovenable.connect('toggled', self.ovenable_toggled)
         self.lclonly = gtk.CheckButton(_('Local disks only'))
         hbox.pack_start(self.lclonly, False, False, 2)
-        table = gtk.Table(2, 2, False)
-        ovcvbox.pack_start(table, False, False, 2)
-
-        # Text entry for overlay include path
-        lbl = gtk.Label(_('Include path:'))
-        lbl.set_alignment(1.0, 0.0)
-        self.ovinclude = gtk.Entry()
-        table.attach(lbl, 0, 1, 0, 1, gtk.FILL, 0, 4, 3)
-        table.attach(self.ovinclude, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
-
-        # Text entry for overlay include path
-        lbl = gtk.Label(_('Exclude path:'))
-        lbl.set_alignment(1.0, 0.0)
-        self.ovexclude = gtk.Entry()
-        table.attach(lbl, 0, 1, 1, 2, gtk.FILL, 0, 4, 3)
-        table.attach(self.ovexclude, 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, 0, 4, 3)
 
         cmframe = gtk.Frame(_('Context menu configuration'))
         cmframe.set_border_width(10)
@@ -748,26 +732,9 @@ class ConfigDialog(gtk.Dialog):
         self.lclonly.connect('toggled', self.dirty_event)
         self.lclonly.connect('focus-in-event', self.set_help,
                 desctext.get_buffer(), tooltip)
-        tooltip = _('A list of semicolon (;) separated paths that the'
-                ' overlays will respect.  This include filter is applied'
-                ' after the local disk check.  If unspecified, the default'
-                ' is to display in all repositories.')
-        self.ovinclude.connect('changed', self.dirty_event)
-        self.ovinclude.connect('focus-in-event', self.set_help,
-                desctext.get_buffer(), tooltip)
-        tooltip = _('A list of semicolon (;) separated paths that are'
-                ' excluded by the overlay system.  This exclude filter is'
-                ' applied after the local disk check and include filters.'
-                ' So there is no need to exclude paths outside of your'
-                ' include filter.  Default is no exclusion.')
-        self.ovexclude.connect('changed', self.dirty_event)
-        self.ovexclude.connect('focus-in-event', self.set_help,
-                desctext.get_buffer(), tooltip)
         self.load_shell_configs()
 
     def load_shell_configs(self):
-        includepath = ''
-        excludepath = ''
         overlayenable = True
         localdisks = False
         promoteditems = 'commit'
@@ -779,10 +746,6 @@ class ConfigDialog(gtk.Dialog):
             except EnvironmentError: pass
             try: localdisks = QueryValueEx(hkey, 'LocalDisksOnly')[0] in t
             except EnvironmentError: pass
-            try: includepath = QueryValueEx(hkey, 'IncludePath')[0]
-            except EnvironmentError: pass
-            try: excludepath = QueryValueEx(hkey, 'ExcludePath')[0]
-            except EnvironmentError: pass
             try: promoteditems = QueryValueEx(hkey, 'PromotedItems')[0]
             except EnvironmentError: pass
         except (ImportError, WindowsError):
@@ -790,8 +753,6 @@ class ConfigDialog(gtk.Dialog):
 
         self.ovenable.set_active(overlayenable)
         self.lclonly.set_active(localdisks)
-        self.ovinclude.set_text(includepath)
-        self.ovexclude.set_text(excludepath)
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         for cmd, check in self.cmptoggles.iteritems():
             check.set_active(cmd in promoted)
@@ -799,8 +760,6 @@ class ConfigDialog(gtk.Dialog):
     def save_shell_configs(self):
         overlayenable = self.ovenable.get_active() and '1' or '0'
         localdisks = self.lclonly.get_active() and '1' or '0'
-        includepath = self.ovinclude.get_text()
-        excludepath = self.ovexclude.get_text()
         promoted = []
         for cmd, check in self.cmptoggles.iteritems():
             if check.get_active():
@@ -810,16 +769,12 @@ class ConfigDialog(gtk.Dialog):
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
             SetValueEx(hkey, 'EnableOverlays', 0, REG_SZ, overlayenable)
             SetValueEx(hkey, 'LocalDisksOnly', 0, REG_SZ, localdisks)
-            SetValueEx(hkey, 'IncludePath', 0, REG_SZ, includepath)
-            SetValueEx(hkey, 'ExcludePath', 0, REG_SZ, excludepath)
             SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
         except ImportError:
             pass
 
     def ovenable_toggled(self, check):
         self.lclonly.set_sensitive(check.get_active())
-        self.ovinclude.set_sensitive(check.get_active())
-        self.ovexclude.set_sensitive(check.get_active())
         self.dirty_event()
 
     def fill_frame(self, frame, info):
