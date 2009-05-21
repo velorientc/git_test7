@@ -51,8 +51,8 @@ _tortoise_info = (
         ' Default: False (show diffs to right of file list)')))
 
 shellcmds = '''about add clone commit datamine init log merge recovery
-shelve synch status userconfig repoconfig guess remove rename revert
-serve update vdiff'''.split()
+shelve synch status thgstatus userconfig repoconfig guess remove rename
+revert serve update vdiff'''.split()
 
 _commit_info = (
     (_('Username'), 'ui.username', [],
