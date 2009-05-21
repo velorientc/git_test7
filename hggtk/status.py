@@ -449,7 +449,7 @@ class GStatus(GDialog):
             checks += (_('deleted'), _('unknown'), _('clean'), _('ignored'))
 
         for ctype in checks:
-            check = gtk.CheckButton('_' + ctype)
+            check = gtk.CheckButton(ctype)
             check.connect('toggled', self._show_toggle, ctype)
             table.attach(check, col, col+1, row, row+1)
             self._show_checks[ctype] = check
