@@ -54,7 +54,7 @@ MenuDescription menuDescList[] = {
                     "general.ico", 0},
     {"thgstatus",   "Update Icons",
                     "Update icons for this repository",
-                    "", 0},
+                    "menumerge.ico", 0},
     {"userconf",    "Global Settings",
                     "Configure user wide settings",
                     "settings_user.ico", 0},
