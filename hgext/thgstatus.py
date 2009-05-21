@@ -86,18 +86,27 @@ def thgstatus(ui, repo, **opts):
         dirstatus[dirname(fn)] = 'm'
     for fn in removed + deleted:
         dirstatus[dirname(fn)] = 'r'
+
     f = open(cachefilepath(repo), 'wb')
     for dn in sorted(dirstatus):
         e = dirstatus[dn] + dn + '\n'
         f.write(e)
         showentry(ui.note, e)
     f.close()
+
+    if opts.get('notify'):
+        from mercurial import demandimport
+        demandimport.disable()
+        from thgutil import shlib
+        shlib.shell_notify([os.getcwd()])
+        demandimport.enable()
     ui.note("thgstatus updated\n") 
 
 cmdtable = {
     'thgstatus':
         (thgstatus,
         [ ('',  'delay', None, _('wait until the second ticks over')),
+          ('n', 'notify', None, _('notify the shell')),
           ('',  'remove', None, _('remove the status file')),
           ('s', 'show', None, _('just show the contents of '
                                 'the status file (no update)')) ],
