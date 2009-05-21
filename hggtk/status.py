@@ -444,15 +444,21 @@ class GStatus(GDialog):
 
         self._show_checks = {}
         row, col = 0, 0
-        checks = (_('modified'), _('added'), _('removed'))
+        # Tuple: (ctype, translated label)
+        checks = (('modified', _('modified')),
+                  ('added', _('added')),
+                  ('removed', _('removed')))
         if self.count_revs() <= 1:
-            checks += (_('deleted'), _('unknown'), _('clean'), _('ignored'))
+            checks += (('deleted', _('deleted')),
+                       ('unknown', _('unknown')),
+                       ('close', _('clean')),
+                       ('ignored', _('ignored')))
 
-        for ctype in checks:
-            check = gtk.CheckButton(ctype)
-            check.connect('toggled', self._show_toggle, ctype)
+        for ctuple in checks:
+            check = gtk.CheckButton(ctuple[1])
+            check.connect('toggled', self._show_toggle, ctuple[0])
             table.attach(check, col, col+1, row, row+1)
-            self._show_checks[ctype] = check
+            self._show_checks[ctuple[0]] = check
             col += row
             row = not row
 
