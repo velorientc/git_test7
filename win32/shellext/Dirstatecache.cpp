@@ -20,6 +20,31 @@
 #include "Dirstatecache.h"
 #include "dirstate.h"
 #include "Winstat64.h"
+#include "TortoiseUtils.h"
+#include "StringUtils.h"
+
+
+void call_thgstatus(const std::string& cwd)
+{
+    std::string dir = GetTHgProgRoot();
+    if (dir.empty())
+    {
+        TDEBUG_TRACE("call_thgstatus: THG root is empty");
+        return;
+    }
+    std::string hgcmd = dir + "\\hgtk.exe";
+
+    WIN32_FIND_DATAA data;
+    HANDLE hfind = FindFirstFileA(hgcmd.c_str(), &data);
+    if (hfind == INVALID_HANDLE_VALUE)
+        hgcmd = dir + "\\hgtk.cmd";
+    else
+        FindClose(hfind);
+
+    hgcmd = Quote(hgcmd) + " thgstatus --notify .";
+
+    LaunchCommand(hgcmd, cwd);
+}
 
 
 std::list<Dirstatecache::E>& Dirstatecache::cache()
@@ -29,7 +54,8 @@ std::list<Dirstatecache::E>& Dirstatecache::cache()
 }
 
 
-Dirstate* Dirstatecache::get(const std::string& hgroot)
+Dirstate* Dirstatecache::get(
+    const std::string& hgroot, const std::string& cwd)
 {
     typedef std::list<E>::iterator Iter;
 
@@ -114,8 +140,14 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
     if (unset)
     {
         TDEBUG_TRACE("Dirstatecache::get: ignored (unset entries)");
+        if (!iter->unset)
+        {
+            call_thgstatus(cwd);
+            iter->unset = true;
+        }
         return iter->dstate;
     }
+    iter->unset = false;
 
     delete iter->dstate;
     iter->dstate = ds.release();

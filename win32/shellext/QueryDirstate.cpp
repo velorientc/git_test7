@@ -164,7 +164,7 @@ int HgQueryDirstate(
     }
     else
     {
-        Dirstate* pds = Dirstatecache::get(cur.hgroot);
+        Dirstate* pds = Dirstatecache::get(cur.hgroot, cur.basedir);
         if (!pds)
         {
             TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 

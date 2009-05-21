@@ -33,14 +33,21 @@ class Dirstatecache
 
         std::string     hgroot;
         unsigned        tickcount;
+        bool            unset;
 
-        E(): dstate(0), dstate_mtime(0), dstate_size(0), tickcount(0) {}         
+        E(): 
+            dstate(0), 
+            dstate_mtime(0), 
+            dstate_size(0), 
+            tickcount(0),
+            unset(false)
+        {}         
     };
 
     static std::list<E>& cache();
 
 public:
-    static Dirstate* get(const std::string& hgroot);
+    static Dirstate* get(const std::string& hgroot, const std::string& cwd);
     static void invalidate(const std::string& hgroot);
 };
 
