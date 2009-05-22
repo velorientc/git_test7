@@ -11,12 +11,12 @@ import re
 import urlparse
 import threading
 
-from mercurial import hg, ui, util, url
+from mercurial import hg, ui, util, url, filemerge
 
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths, iniparse
 
-from hggtk import dialog, gdialog, gtklib
+from hggtk import dialog, gdialog, gtklib, hgcmd
 
 _unspecstr = _('<unspecified>')
 
@@ -597,8 +597,7 @@ class ConfigDialog(gtk.Dialog):
         if testpath[0] == '~':
             testpath = os.path.expanduser(testpath)
         cmdline = ['hg', 'incoming', '--verbose', testpath]
-        from hgcmd import CmdDialog
-        dlg = CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
 
@@ -846,7 +845,6 @@ class ConfigDialog(gtk.Dialog):
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     try:
-                        from mercurial import filemerge
                         tools = []
                         for key, value in self.ui.configitems('merge-tools'):
                             t = key.split('.')[0]
