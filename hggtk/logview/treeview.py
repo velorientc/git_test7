@@ -12,11 +12,14 @@ import gobject
 import pango
 import treemodel
 import re
-from graphcell import CellRendererGraph
-from revgraph import *
+
 from mercurial.node import hex
+
 from thgutil.i18n import _
 from thgutil import hglib
+
+from hggtk.logview.graphcell import CellRendererGraph
+from hggtk.logview.revgraph import *
 
 
 class TreeView(gtk.ScrolledWindow):
