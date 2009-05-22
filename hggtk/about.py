@@ -7,14 +7,16 @@
 import os
 import sys
 import gtk
+import threading
+
 from thgutil.i18n import _
 from thgutil.hglib import hgversion
 from thgutil import shlib
 from thgutil import paths
-from hggtk import gtklib
+
+from hggtk import gtklib, hgtk
 
 def browse_url(url):
-    import threading
     def start_browser():
         if os.name == 'nt':
             import win32api, win32con
@@ -64,7 +66,6 @@ class AboutDialog(gtk.AboutDialog):
             license_file = paths.get_license_path()
             self.set_license(file(license_file).read())
         except IOError:
-            import hgtk
             license = hgtk.shortlicense.splitlines()[1:]
             self.set_license('\n'.join(license))
 
