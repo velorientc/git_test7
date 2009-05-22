@@ -47,7 +47,7 @@ def dispatch(args):
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
         error = traceback.format_exc()
-        from bugreport import run
+        from hggtk.bugreport import run
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = error
