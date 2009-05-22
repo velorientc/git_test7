@@ -12,7 +12,7 @@ from mercurial import cmdutil, util, hg, ui
 from thgutil.i18n import _
 from thgutil import hglib
 
-from hggtk import gtklib, gdialog
+from hggtk import gtklib, gdialog, hgcmd
 
 class FilterDialog(gtk.Dialog):
     """ Dialog for creating log filters """
@@ -219,7 +219,6 @@ class FilterDialog(gtk.Dialog):
             self.filterfunc(opts)
 
     def _date_help(self, button):
-        from hgcmd import CmdDialog
-        dlg = CmdDialog(['hg', 'help', 'dates'], False)
+        dlg = hgcmd.CmdDialog(['hg', 'help', 'dates'], False)
         dlg.run()
         dlg.hide()
