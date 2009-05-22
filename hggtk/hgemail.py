@@ -15,11 +15,9 @@ import tempfile
 from mercurial import hg, ui, extensions
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import shlib
+from thgutil import hglib, shlib
 
-from hggtk import gtklib
-from hggtk import dialog
+from hggtk import gtklib, dialog, thgconfig, hgcmd
 
 class EmailDialog(gtk.Window):
     """ Send patches or bundles via email """
@@ -277,8 +275,7 @@ class EmailDialog(gtk.Window):
                 self._diffstat.set_sensitive(False)
 
     def _on_conf_clicked(self, button):
-        from thgconfig import ConfigDialog
-        dlg = ConfigDialog(False)
+        dlg = thgconfig.ConfigDialog(False)
         dlg.show_all()
         dlg.focus_field('email.from')
         dlg.run()
@@ -321,10 +318,9 @@ class EmailDialog(gtk.Window):
 
         if self.repo.ui.config('email', 'method', 'smtp') == 'smtp' and not test:
             if not self.repo.ui.config('smtp', 'host'):
-                from thgconfig import ConfigDialog
                 dialog.info_dialog(self, _('Info required'),
                             _('You must configure SMTP'))
-                dlg = ConfigDialog(False)
+                dlg = thgconfig.ConfigDialog(False)
                 dlg.show_all()
                 dlg.focus_field('smtp.host')
                 dlg.run()
@@ -371,8 +367,7 @@ class EmailDialog(gtk.Window):
             cmdline += ['--desc', tmpfile]
             cmdline.extend(self.revargs)
 
-            from hgcmd import CmdDialog
-            dlg = CmdDialog(cmdline)
+            dlg = hgcmd.CmdDialog(cmdline)
             dlg.show_all()
             dlg.run()
             dlg.hide()
