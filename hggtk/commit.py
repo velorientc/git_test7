@@ -23,8 +23,7 @@ from thgutil import shlib
 
 from hggtk.status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH_UTF8
 from hggtk.status import DM_REJECTED, DM_CHUNK_ID
-from hggtk import gtklib
-from hggtk import gdialog
+from hggtk import gtklib, thgconfig, gdialog, hgcmd
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close):
@@ -610,8 +609,7 @@ class GCommit(GStatus):
             # bring up the config dialog for user to enter their username.
             # But since we can't be sure they will do it right, we will
             # have them to retry, to re-trigger the checking mechanism.
-            from thgconfig import ConfigDialog
-            dlg = ConfigDialog(False)
+            dlg = thgconfig.ConfigDialog(False)
             dlg.show_all()
             dlg.focus_field('ui.username')
             dlg.run()
@@ -659,8 +657,7 @@ class GCommit(GStatus):
         if self.qnew:
             cmdline += [hglib.fromutf(self._get_qnew_name())]
         cmdline += [self.repo.wjoin(x) for x in files]
-        from hgcmd import CmdDialog
-        dialog = CmdDialog(cmdline, True)
+        dialog = hgcmd.CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
         dialog.run()
         dialog.hide()
@@ -776,8 +773,7 @@ class GCommit(GStatus):
         buf.set_text('\n'.join(lines))                       
 
     def _msg_config(self, sender):
-        from thgconfig import ConfigDialog
-        dlg = ConfigDialog(True)
+        dlg = thgconfig.ConfigDialog(True)
         dlg.show_all()
         dlg.focus_field('tortoisehg.summarylen')
         dlg.run()
