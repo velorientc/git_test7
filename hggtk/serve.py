@@ -22,7 +22,7 @@ from mercurial.hgweb import server
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-from hggtk import dialog, gdialog, gtklib
+from hggtk import dialog, gdialog, gtklib, thgconfig
 
 gservice = None
 class ServeDialog(gtk.Window):
@@ -203,8 +203,7 @@ class ServeDialog(gtk.Window):
             threading.Thread(target=start_browser).start()
 
     def _on_conf_clicked(self, *args):
-        from thgconfig import ConfigDialog
-        dlg = ConfigDialog(True)
+        dlg = thgconfig.ConfigDialog(True)
         dlg.show_all()
         dlg.focus_field('web.name')
         dlg.run()
