@@ -13,9 +13,7 @@ from mercurial import hg, ui
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-from hggtk import gtklib
-from hggtk import gdialog
-from hggtk import hgcmd
+from hggtk import gtklib, commit, gdialog, hgcmd
 
 class MergeDialog(gtk.Window):
     """ Dialog to merge revisions of a Mercurial repo """
@@ -133,7 +131,6 @@ class MergeDialog(gtk.Window):
         commit.grab_focus()
 
     def commit(self, button):
-        import commit
         dlg = commit.run(ui.ui())
         dlg.set_modal(True)
         dlg.set_notify_func(self.commit_notify, dlg)
