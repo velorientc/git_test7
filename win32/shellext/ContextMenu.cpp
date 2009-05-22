@@ -94,7 +94,6 @@ menuDescListEntries RepoNoFilesMenu[] = {
 
 menuDescListEntries RepoFilesMenu[] = {
     Commit, Log, Add, Revert, Rename, Remove, Separator,
-    Repoconf, Userconf, Separator,
     About, EndOfList
 };
 
