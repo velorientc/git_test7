@@ -17,7 +17,7 @@ from mercurial import hg, ui, extensions, url
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths
 
-from hggtk import dialog, gtklib, hgthread
+from hggtk import dialog, gtklib, hgthread, history, thgconfig, hgemail
 
 class SynchDialog(gtk.Window):
     def __init__(self, repos=[], pushmode=False):
@@ -301,10 +301,9 @@ class SynchDialog(gtk.Window):
         self.repo = repo
 
     def _view_pulled_changes(self, button):
-        from history import GLog
         countpulled = len(self.repo.changelog) - self.origchangecount
         opts = {'limit' : countpulled, 'from-synch' : True}
-        dlg = GLog(self.ui, None, None, [], opts)
+        dlg = history.GLog(self.ui, None, None, [], opts)
         dlg.display()
 
     def _update_to_tip(self, button):
@@ -449,8 +448,7 @@ class SynchDialog(gtk.Window):
             if path == newpath:
                 newpath = None
                 break
-        from thgconfig import ConfigDialog
-        dlg = ConfigDialog(True)
+        dlg = thgconfig.ConfigDialog(True)
         dlg.show_all()
         if newpath:
             dlg.new_path(newpath)
@@ -475,8 +473,7 @@ class SynchDialog(gtk.Window):
             return
         if rev:
             opts.extend(rev)
-        from hgemail import EmailDialog
-        dlg = EmailDialog(self.root, opts)
+        dlg = hgemail.EmailDialog(self.root, opts)
         dlg.set_transient_for(self)
         dlg.show_all()
         dlg.present()
