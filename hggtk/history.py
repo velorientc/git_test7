@@ -22,7 +22,8 @@ from changeset import ChangeSet
 from logview import treemodel
 from logview.treeview import TreeView as LogTreeView
 
-from hggtk import gtklib
+from hggtk import gtklib, hgcmd, synch, datamine, logfilter
+from hggtk import backout, status, hgemail, tagadd, update, merge
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
@@ -73,8 +74,7 @@ class GLog(GDialog):
         return tbar
 
     def _synch_clicked(self, toolbutton, data):
-        from synch import SynchDialog
-        dlg = SynchDialog([], False)
+        dlg = synch.SynchDialog([], False)
         dlg.show_all()
 
     def toggle_view_column(self, button, property):
@@ -99,9 +99,8 @@ class GLog(GDialog):
         self.allbutton.set_sensitive(False)
 
     def _datamine_clicked(self, toolbutton, data=None):
-        from datamine import DataMineDialog
-        dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {})
-        dialog.display()
+        dlg = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
+        dlg.display()
 
     def _filter_clicked(self, toolbutton, data=None):
         if self._filter_dialog:
@@ -127,8 +126,7 @@ class GLog(GDialog):
         if self.currow is not None:
             revs.append(self.currow[treemodel.REVID])
 
-        from logfilter import FilterDialog
-        dlg = FilterDialog(self.repo.root, revs, self.pats,
+        dlg = logfilter.FilterDialog(self.repo.root, revs, self.pats,
                 filterfunc=do_reload)
         dlg.connect('response', close_filter_dialog)
         dlg.connect('delete-event', delete_event)
@@ -483,9 +481,8 @@ class GLog(GDialog):
                 _('Remove revision %d and all descendants?') % rev).run()
         if res != gtk.RESPONSE_YES:
             return
-        from hgcmd import CmdDialog
         cmdline = ['hg', 'strip', str(rev)]
-        dlg = CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
         dlg.hide()
@@ -493,16 +490,15 @@ class GLog(GDialog):
         self.reload_log()
 
     def _backout_rev(self, menuitem):
-        from backout import BackoutDialog
         rev = self.currow[treemodel.REVID]
         rev = short(self.repo.changelog.node(rev))
         parents = [x.node() for x in self.repo.changectx(None).parents()]
-        dialog = BackoutDialog(rev)
-        dialog.set_transient_for(self)
-        dialog.show_all()
-        dialog.set_notify_func(self.checkout_completed, parents)
-        dialog.present()
-        dialog.set_transient_for(None)
+        dlg = backout.BackoutDialog(rev)
+        dlg.set_transient_for(self)
+        dlg.show_all()
+        dlg.set_notify_func(self.checkout_completed, parents)
+        dlg.present()
+        dlg.set_transient_for(None)
 
     def _revert(self, menuitem):
         rev = self.currow[treemodel.REVID]
@@ -515,8 +511,7 @@ class GLog(GDialog):
 
         cmdline = ['hg', 'revert', '--verbose', '--all', '--rev', str(rev)]
 
-        from hgcmd import CmdDialog
-        dlg = CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
         dlg.hide()
@@ -531,7 +526,6 @@ class GLog(GDialog):
         self._do_diff(pats, opts, modal=True)
 
     def _diff_revs(self, menuitem):
-        from status import GStatus
         rev0, rev1 = self._revs
         statopts = self.merge_opts(commands.table['^status|st'][1],
                 ('include', 'exclude', 'git'))
@@ -539,7 +533,7 @@ class GLog(GDialog):
         statopts['modified'] = True
         statopts['added'] = True
         statopts['removed'] = True
-        dialog = GStatus(self.ui, self.repo, self.cwd, self.pats,
+        dialog = status.GStatus(self.ui, self.repo, self.cwd, self.pats,
                          statopts)
         dialog.display()
         return True
@@ -553,11 +547,10 @@ class GLog(GDialog):
             self._diff_file(None, None)
 
     def _email_revs(self, menuitem):
-        from hgemail import EmailDialog
         revs = list(self._revs)
         revs.sort()
         opts = ['--rev', str(revs[0]) + ':' + str(revs[1])]
-        dlg = EmailDialog(self.repo.root, opts)
+        dlg = hgemail.EmailDialog(self.repo.root, opts)
         dlg.set_transient_for(self)
         dlg.show_all()
         dlg.present()
@@ -576,17 +569,14 @@ class GLog(GDialog):
                                          InitialDir=self.repo.root,
                                          FileName=filename).run()
         if result:
-            from hgcmd import CmdDialog
             cmdline = ['hg', 'bundle', '--base', str(parent),
                       '--rev', str(revs[1]), result]
-            dlg = CmdDialog(cmdline)
+            dlg = hgcmd.CmdDialog(cmdline)
             dlg.show_all()
             dlg.run()
             dlg.hide()
 
     def _add_tag(self, menuitem):
-        from tagadd import TagAddDialog
-
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
         rev = self.currow[treemodel.REVID]
@@ -597,7 +587,7 @@ class GLog(GDialog):
             if newtags != oldtags:
                 self.reload_log()
 
-        dialog = TagAddDialog(self.repo.root, rev=str(rev))
+        dialog = tagadd.TagAddDialog(self.repo.root, rev=str(rev))
         dialog.set_transient_for(self)
         dialog.connect('destroy', refresh)
         dialog.show_all()
@@ -650,27 +640,24 @@ class GLog(GDialog):
                                          InitialDir=self.repo.root,
                                          FileName=filename).run()
         if result:
-            from hgcmd import CmdDialog
             cmdline = ['hg', 'bundle', '--base', str(parent), result]
-            dlg = CmdDialog(cmdline)
+            dlg = hgcmd.CmdDialog(cmdline)
             dlg.show_all()
             dlg.run()
             dlg.hide()
 
     def _email_patch(self, menuitem):
-        from hgemail import EmailDialog
         rev = self.currow[treemodel.REVID]
-        dlg = EmailDialog(self.repo.root, ['--rev', str(rev)])
+        dlg = hgemail.EmailDialog(self.repo.root, ['--rev', str(rev)])
         dlg.set_transient_for(self)
         dlg.show_all()
         dlg.present()
         dlg.set_transient_for(None)
 
     def _checkout(self, menuitem):
-        from update import UpdateDialog
         rev = self.currow[treemodel.REVID]
         parents = [x.node() for x in self.repo.changectx(None).parents()]
-        dialog = UpdateDialog(rev)
+        dialog = update.UpdateDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.set_notify_func(self.checkout_completed, parents)
@@ -683,10 +670,9 @@ class GLog(GDialog):
             self.reload_log()
 
     def _merge(self, menuitem):
-        from merge import MergeDialog
         rev = self.currow[treemodel.REVID]
         parents = [x.node() for x in self.repo.changectx(None).parents()]
-        dialog = MergeDialog(rev)
+        dialog = merge.MergeDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
         dialog.set_notify_func(self.merge_completed, parents)
