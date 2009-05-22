@@ -525,12 +525,6 @@ class NativeSaveFileDialogWrapper:
             return self.runCompatible()
 
     def runWindows(self):
-        import win32gui, win32con
-        #filter = ""
-        #for name, pattern in self.Filter.iteritems():
-        #    filter += name + "\0" + pattern + "\0"
-        #customfilter = "\0"
-
         fname, customfilter, flags=win32gui.GetSaveFileNameW(
             InitialDir=self.InitialDir,
             Flags=win32con.OFN_EXPLORER,
