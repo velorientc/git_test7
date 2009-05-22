@@ -13,14 +13,16 @@ import sys
 import shutil
 import tempfile
 import gtk
+import atexit
 
 from mercurial.node import short
 from mercurial import cmdutil, util, ui, hg, commands
+from hgext import extdiff
 
 from thgutil.i18n import _
 from thgutil import shlib, hglib, paths
 
-from hggtk import gtklib
+from hggtk import gtklib, visdiff, thgconfig
 
 class SimpleMessage(gtklib.MessageDialog):
     def run(self):
@@ -381,17 +383,13 @@ class GDialog(gtk.Window):
         return True, textout
 
     def _do_diff(self, patterns, options, modal=False):
-        import visdiff
-
         if self.ui.configbool('tortoisehg', 'vdiffnowin'):
-            from hgext import extdiff
             tools = visdiff.readtools(self.ui)
             preferred = self.ui.config('tortoisehg', 'vdiff', 'vdiff')
             if not preferred or preferred not in tools:
                 Prompt(_('No visual diff configured'),
                        _('Please select a visual diff application.'), self).run()
-                from thgconfig import ConfigDialog
-                dlg = ConfigDialog(self.repo.root, False)
+                dlg = thgconfig.ConfigDialog(self.repo.root, False)
                 dlg.show_all()
                 dlg.focus_field('tortoisehg.vdiff')
                 dlg.run()
@@ -425,8 +423,6 @@ class GDialog(gtk.Window):
         self._do_diff(file and [file] or [], self.opts)
 
     def _view_file(self, stat, file, force_left=False):
-        import atexit
-
         def cleanup():
             shutil.rmtree(self.tmproot)
 
@@ -490,10 +486,9 @@ class GDialog(gtk.Window):
                 self.ui.config('ui', 'editor') or
                 os.environ.get('EDITOR', 'vi'))
         if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-            from thgconfig import ConfigDialog
             Prompt(_('No visual editor configured'),
                    _('Please configure a visual editor.'), self).run()
-            dlg = ConfigDialog(False)
+            dlg = thgconfig.ConfigDialog(False)
             dlg.show_all()
             dlg.focus_field('tortoisehg.editor')
             dlg.run()
@@ -512,7 +507,6 @@ class NativeSaveFileDialogWrapper:
     that isn't available"""
     def __init__(self, InitialDir = None, Title = _('Save File'),
                  Filter = {"All files": "*.*"}, FilterIndex = 1, FileName = ''):
-        import os.path
         if InitialDir == None:
             InitialDir = os.path.expanduser("~")
         self.InitialDir = InitialDir
@@ -525,6 +519,7 @@ class NativeSaveFileDialogWrapper:
         """run the file dialog, either return a file name, or False if
         the user aborted the dialog"""
         try:
+            import win32gui, win32con
             return self.runWindows()
         except ImportError:
             return self.runCompatible()
