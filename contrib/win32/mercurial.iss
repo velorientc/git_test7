@@ -36,6 +36,7 @@ SetupLogging=yes
 
 [Files]
 Source: contrib\mercurial.el; DestDir: {app}/contrib
+Source: contrib\refreshicons.cmd; DestDir: {app}/contrib
 Source: contrib\vim\*.*; DestDir: {app}/contrib/vim
 Source: contrib\zsh_completion; DestDir: {app}/contrib
 Source: contrib\hgk; DestDir: {app}/contrib
