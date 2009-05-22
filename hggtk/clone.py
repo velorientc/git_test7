@@ -37,7 +37,7 @@ class CloneDialog(gtk.Window):
         elif len(repos):
             self._src_path = repos[0]
 
-        ewidth = 18
+        ewidth = 20
 
         vbox = gtk.VBox()
         self.add(vbox)
