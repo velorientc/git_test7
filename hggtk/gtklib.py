@@ -12,6 +12,8 @@ import pango
 from thgutil.i18n import _
 from thgutil import paths
 
+from hggtk import hgtk
+
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)
@@ -50,7 +52,6 @@ def set_tortoise_keys(window):
 
 def thgexit(window):
     if thgclose(window):
-        import hgtk
         gobject.idle_add(hgtk.thgexit, window)
 
 def thgclose(window):
