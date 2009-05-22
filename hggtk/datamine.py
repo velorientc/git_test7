@@ -16,12 +16,11 @@ from thgutil.i18n import _
 from thgutil.hglib import *
 from thgutil import thread2
 
-from logview import treemodel
-from logview.colormap import AnnotateColorMap, AnnotateColorSaturation
-from logview.treeview import TreeView as LogTreeView
+from hggtk.logview import treemodel
+from hggtk.logview.colormap import AnnotateColorMap, AnnotateColorSaturation
+from hggtk.logview.treeview import TreeView as LogTreeView
 
-from hggtk import gtklib
-from hggtk import gdialog
+from hggtk import gtklib, gdialog, changeset, history
 
 class DataMineDialog(gdialog.GDialog):
     COL_REVID = 0
@@ -134,17 +133,15 @@ class DataMineDialog(gdialog.GDialog):
         self.trigger_annotate(parent, objs)
 
     def _cmenu_display(self, menuitem):
-        from changeset import ChangeSet
         statopts = {'rev' : [self.currev] }
-        dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
+        dialog = changeset.ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
         dialog.display()
 
     def _cmenu_annotate(self, menuitem):
         self.add_annotate_page(self.curpath, self.currev)
 
     def _cmenu_file_log(self, menuitem):
-        from history import GLog
-        dialog = GLog(self.ui, self.repo, self.cwd, [self.repo.root], {})
+        dialog = history.GLog(self.ui, self.repo, self.cwd, [self.repo.root], {})
         dialog.open_with_file(self.curpath)
         dialog.display()
 
