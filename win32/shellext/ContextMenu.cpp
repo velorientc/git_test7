@@ -68,8 +68,39 @@ MenuDescription menuDescList[] = {
                     "Show About Dialog",
                     "menuabout.ico", 0},
 
+    /* Add new items here */
+
     // template
     {"", "", "", ".ico", 0},
+};
+
+/* These enumerations must match the order of menuDescList */
+enum menuDescListEntries {
+    Commit, Init, Clone, Status, Shelve, Add, Revert, Remove, Rename,
+    Log, Synch, Serve, Update, Recover, Thgstatus, Userconf, Repoconf,
+    About,
+    /* Add new items here */
+    Separator, EndOfList
+};
+
+menuDescListEntries RepoNoFilesMenu[] = {
+    Commit, Status, Shelve, Separator, 
+    Log, Separator,
+    Update, Separator,
+    Synch, Clone, Recover, Serve, Thgstatus, Separator,
+    Repoconf, Userconf, Separator,
+    About, EndOfList
+};
+
+menuDescListEntries RepoFilesMenu[] = {
+    Commit, Log, Add, Revert, Rename, Remove, Separator,
+    Repoconf, Userconf, Separator,
+    About, EndOfList
+};
+
+menuDescListEntries NoRepoMenu[] = {
+    Clone, Init, Userconf, Separator,
+    About, EndOfList
 };
 
 typedef std::map<std::string, MenuDescription> MenuDescriptionMap;
@@ -96,7 +127,7 @@ void InitMenuMaps()
             MenuDescMap[md.name] = md;
         }
     }
-           
+
     MenuIdMap.clear();
 }
 
@@ -190,8 +221,43 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     if (!bAppendItems)
         return NOERROR;
 
+    int sz = sizeof(menuDescList) / sizeof(MenuDescription);
+    bool promoted[ sz ];
+    memset(&promoted, 0, sizeof(promoted));
+
+    std::string cval;
+    if (GetRegistryConfig("PromotedItems", cval) != 0 && cval == "0")
+        return S_FALSE;
+
+    size_t found;
+    do
+    {
+        if( cval.empty() )
+            break;
+
+        found = cval.find_first_of(',');
+
+        std::string key;
+        if( found == std::string::npos )
+            key = cval;
+        else
+        {
+            key = cval.substr(0, found);
+            cval = cval.substr(found+1);
+        }
+
+        for( UINT i = 0 ; i < sz ; i++ )
+        {
+            if( !key.compare(menuDescList[i].name) )
+            {
+                promoted[i] = true;
+                break;
+            }
+        }
+    }
+    while (found != std::string::npos);
+
     // check if target directory is a Mercurial repository
-    bool isHgrepo = false;
     std::string cwd;
     if (!myFolder.empty())
     {
@@ -201,60 +267,46 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     {
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
     }
+    bool isHgrepo = false;
     if (!cwd.empty())
         isHgrepo = IsHgRepo(cwd);
-    
-    // start building TortoiseHg menus and submenus
-    InsertMenu(hMenu, indexMenu, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
-    indexMenu++;
 
+    /* We have three menu types: files-selected, no-files-selected, no-repo */
+    menuDescListEntries *entries;
     if (isHgrepo)
-        InsertMenuItemByName(hMenu, "commit", indexMenu++, idCmd++, idCmdFirst);
+        if (myFiles.empty())
+            entries = RepoNoFilesMenu;
+        else
+            entries = RepoFilesMenu;
+    else
+        entries = NoRepoMenu;
 
-    TDEBUG_TRACE("  CShellExt::QueryContextMenu: adding sub menus");
+    // start building TortoiseHg menus and submenus
+    InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
+
+    menuDescListEntries *walk;
+    for( walk = entries ; *walk != EndOfList ; walk++ )
+    {
+        UINT idx = (UINT) *walk;
+        if( promoted[idx] )
+            InsertMenuItemByName(hMenu, menuDescList[idx].name, indexMenu++, idCmd++, idCmdFirst);
+    }
 
     HMENU hSubMenu = CreatePopupMenu();
     if (hSubMenu)
     {
         int indexSubMenu = 0;
-        if (isHgrepo)
+        for( walk = entries ; *walk != EndOfList ; walk++ )
         {
-            if (myFiles.empty())
-            {
-                InsertMenuItemByName(hSubMenu, "status", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenuItemByName(hSubMenu, "shelve", indexSubMenu++, idCmd++, idCmdFirst);
+            if( *walk == Separator )
                 InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
-                InsertMenuItemByName(hSubMenu, "log", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
-                InsertMenuItemByName(hSubMenu, "update", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
-                InsertMenuItemByName(hSubMenu, "synch", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenuItemByName(hSubMenu, "recover", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenuItemByName(hSubMenu, "serve", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenuItemByName(hSubMenu, "thgstatus", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
-            }
             else
             {
-                InsertMenuItemByName(hSubMenu, "log", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenuItemByName(hSubMenu, "add", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenuItemByName(hSubMenu, "revert", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenuItemByName(hSubMenu, "rename", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenuItemByName(hSubMenu, "remove", indexSubMenu++, idCmd++, idCmdFirst);
-                InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
+                UINT idx = (UINT) *walk;
+                if( !promoted[idx] )
+                    InsertMenuItemByName(hSubMenu, menuDescList[idx].name, indexSubMenu++, idCmd++, idCmdFirst);
             }
-            InsertMenuItemByName(hSubMenu, "repoconf", indexSubMenu++, idCmd++, idCmdFirst);
         }
-        else
-        {
-            InsertMenuItemByName(hSubMenu, "init", indexSubMenu++, idCmd++, idCmdFirst);
-        }
-
-        InsertMenuItemByName(hSubMenu, "userconf", indexSubMenu++, idCmd++, idCmdFirst);
-        InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
-        InsertMenuItemByName(hSubMenu, "clone", indexSubMenu++, idCmd++, idCmdFirst);
-        InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
-        InsertMenuItemByName(hSubMenu, "about", indexSubMenu++, idCmd++, idCmdFirst);
     }
 
     TDEBUG_TRACE("  CShellExt::QueryContextMenu: adding main THG menu");
@@ -294,8 +346,6 @@ STDMETHODIMP
 CShellExt::GetCommandString(UINT idCmd, UINT uFlags, UINT FAR *reserved,
 		LPSTR pszName, UINT cchMax)
 {
-    TDEBUG_TRACE("CShellExt::GetCommandString");
-
 	*pszName = 0;
 	char *psz;
 
