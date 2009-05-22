@@ -10,7 +10,6 @@ dialog.  Other portions stolen from graphlog extension.
 import gtk
 import gobject
 import pango
-import treemodel
 import re
 
 from mercurial.node import hex
@@ -18,6 +17,7 @@ from mercurial.node import hex
 from thgutil.i18n import _
 from thgutil import hglib
 
+from hggtk.logview import treemodel
 from hggtk.logview.graphcell import CellRendererGraph
 from hggtk.logview.revgraph import *
 
