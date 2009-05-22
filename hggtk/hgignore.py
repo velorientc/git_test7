@@ -32,7 +32,7 @@ class HgIgnoreDialog(gtk.Window):
 
         hbox = gtk.HBox()
         lbl = gtk.Label(_('Glob:'))
-        lbl.set_property('width-chars', 7)
+        lbl.set_property('width-chars', 9)
         lbl.set_alignment(1.0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         glob_entry = gtk.Entry()
@@ -47,7 +47,7 @@ class HgIgnoreDialog(gtk.Window):
 
         hbox = gtk.HBox()
         lbl = gtk.Label(_('Regexp:'))
-        lbl.set_property('width-chars', 7)
+        lbl.set_property('width-chars', 9)
         lbl.set_alignment(1.0, 0.5)
         hbox.pack_start(lbl, False, False, 4)
         regexp_entry = gtk.Entry()
