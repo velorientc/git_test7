@@ -12,7 +12,7 @@ import pango
 from mercurial import hg, ui
 from thgutil.i18n import _
 from thgutil import hglib, paths
-from hggtk import gtklib
+from hggtk import gtklib, hgcmd
 
 class BackoutDialog(gtk.Window):
     """ Backout effect of a changeset """
@@ -111,8 +111,7 @@ class BackoutDialog(gtk.Window):
         start, end = buf.get_bounds()
         msg = buf.get_text(start, end)
         cmdline = ['hg', 'backout', '--rev', revstr, '--message', msg]
-        from hgcmd import CmdDialog
-        dlg = CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
         dlg.hide()
