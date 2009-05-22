@@ -11,8 +11,8 @@ import gtk
 
 from thgutil.i18n import _
 
-from status import GStatus, FM_STATUS, FM_CHECKED, DM_CHUNK_ID, DM_REJECTED
-from hggtk import hgshelve, gdialog
+from hggtk.status import GStatus, FM_STATUS, FM_CHECKED, DM_CHUNK_ID, DM_REJECTED
+from hggtk import hgshelve, gdialog, gtklib
 
 class GShelve(GStatus):
     """GTK+ based dialog for displaying repository status and shelving changes.
@@ -138,8 +138,7 @@ class GShelve(GStatus):
         doforce = False
         doappend = False
         if self._has_shelve_file():
-            from gtklib import MessageDialog
-            dialog = MessageDialog(flags=gtk.DIALOG_MODAL)
+            dialog = gtklib.MessageDialog(flags=gtk.DIALOG_MODAL)
             dialog.set_title(_('Shelve'))
             dialog.set_markup(_('<b>Shelve file exists!</b>'))
             dialog.add_buttons(_('Overwrite'), 1,
