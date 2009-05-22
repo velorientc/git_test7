@@ -21,6 +21,7 @@ from thgutil import hglib, shlib, paths
 
 from hggtk.gdialog import GDialog, Confirm, Prompt, NativeSaveFileDialogWrapper
 from hggtk import dialog, hgshelve, gtklib
+from hggtk import history, rename, hgignore
 
 # file model row enumerations
 FM_CHECKED = 0
@@ -1069,9 +1070,8 @@ class GStatus(GDialog):
 
 
     def _log_file(self, stat, wfile):
-        from history import GLog
         # Might want to include 'rev' here... trying without
-        dlg = GLog(self.ui, self.repo, self.cwd, [wfile], self.opts)
+        dlg = history.GLog(self.ui, self.repo, self.cwd, [wfile], self.opts)
         dlg.display()
         return True
 
@@ -1207,13 +1207,11 @@ class GStatus(GDialog):
         return True
 
     def _guess_rename(self, stat, wfile):
-        import rename
         dlg = rename.DetectRenameDialog(self.repo.root)
         dlg.show_all()
         dlg.set_notify_func(self.ignoremask_updated)
 
     def _ignore_file(self, stat, wfile):
-        import hgignore
         dlg = hgignore.HgIgnoreDialog(self.repo.root, util.pconvert(wfile))
         dlg.show_all()
         dlg.set_notify_func(self.ignoremask_updated)
