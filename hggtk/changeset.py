@@ -8,7 +8,7 @@ import os
 import gtk
 import gobject
 import pango
-import StringIO
+import Queue
 
 from mercurial.node import short, nullrev, nullid
 from mercurial import cmdutil, context, util, ui, hg, patch
@@ -18,7 +18,7 @@ from thgutil.hglib import *
 from thgutil import shlib
 
 from hggtk.gdialog import GDialog, Confirm, NativeSaveFileDialogWrapper
-from hggtk import gtklib
+from hggtk import gtklib, hgcmd, datamine, history
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -659,7 +659,6 @@ class ChangeSet(GDialog):
                                          FileName=filename)
         result = fd.run()
         if result:
-            import Queue
             q = Queue.Queue()
             cpath = util.canonpath(self.repo.root, self.cwd, self.curfile)
             hgcmd_toq(self.repo.root, q, 'cat', '--rev',
@@ -698,9 +697,8 @@ class ChangeSet(GDialog):
 
     def _ann_file(self, menuitem):
         '''User selected annotate file from the file list context menu'''
-        from datamine import DataMineDialog
         rev = self.currev
-        dialog = DataMineDialog(self.ui, self.repo, self.cwd, [], {})
+        dialog = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dialog.display()
         dialog.add_annotate_page(self.curfile, str(rev))
 
@@ -714,7 +712,6 @@ class ChangeSet(GDialog):
             self.glog_parent.reload_log(opts)
         else:
             # Else launch our own GLog instance
-            import history
             dialog = history.GLog(self.ui, self.repo, self.cwd,
                                   [self.repo.root], {})
             dialog.open_with_file(self.curfile)
@@ -728,8 +725,7 @@ class ChangeSet(GDialog):
         if dialog.run() == gtk.RESPONSE_NO:
             return
         cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), self.curfile]
-        from hgcmd import CmdDialog
-        dlg = CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
         shlib.shell_notify([self.curfile])
