@@ -13,6 +13,8 @@ from mercurial import hg, ui, util, commands
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
+from hggtk import dialog
+
 def run(ui, *pats, **opts):
     fname, target = '', ''
     try:
@@ -20,14 +22,13 @@ def run(ui, *pats, **opts):
         target = pats[1]
     except IndexError:
         pass
-    from dialog import entry_dialog
     fname = util.normpath(fname)
     if target:
         target = hglib.toutf(util.normpath(target))
     else:
         target = hglib.toutf(fname)
     title = 'Rename ' + hglib.toutf(fname)
-    dlg = entry_dialog(None, title, True, target, rename_resp)
+    dlg = dialog.entry_dialog(None, title, True, target, rename_resp)
     dlg.orig = fname
     return dlg
 
