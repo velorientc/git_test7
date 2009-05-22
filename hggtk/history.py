@@ -17,13 +17,13 @@ from mercurial import ui, hg, commands, extensions
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-from gdialog import *
-from changeset import ChangeSet
-from logview import treemodel
-from logview.treeview import TreeView as LogTreeView
+from hggtk.gdialog import *
+from hggtk.logview import treemodel
+from hggtk.logview.treeview import TreeView as LogTreeView
 
 from hggtk import gtklib, hgcmd, synch, datamine, logfilter
 from hggtk import backout, status, hgemail, tagadd, update, merge
+from hggtk import changeset
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
@@ -273,7 +273,7 @@ class GLog(GDialog):
             self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
 
         # Allocate ChangeSet instance to use internally
-        self.changeview = ChangeSet(self.ui, self.repo, self.cwd, [],
+        self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
                 self.opts, self.stbar)
         self.changeview.display(False)
         self.changeview.glog_parent = self
@@ -597,7 +597,7 @@ class GLog(GDialog):
     def _show_status(self, menuitem):
         rev = self.currow[treemodel.REVID]
         statopts = {'rev' : [str(rev)] }
-        dialog = ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
+        dialog = changeset.ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
         dialog.display()
 
     def _copy_hash(self, menuitem):
