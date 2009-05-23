@@ -11,9 +11,9 @@ import pango
 from mercurial import extensions
 from thgutil.i18n import _
 from thgutil import hglib, version
-from hggtk.gdialog import GDialog
+from hggtk import gdialog
 
-class BugReport(GDialog):
+class BugReport(gdialog.GDialog):
     """GTK+ based dialog for displaying traceback info to the user in a
     cut-paste friendly manner.  And include a number of useful bit of
     information like version numbers, etc.
