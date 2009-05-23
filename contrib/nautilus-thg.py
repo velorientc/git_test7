@@ -275,7 +275,6 @@ class HgExtension(nautilus.MenuProvider,
         self.invalidate(files, root)
 
     def invalidate(self, paths, root = ''):
-        from tortoise import cachethg
         started = bool(self.inv_dirs)
         if cachethg.cache_pdir == root and root not in self.inv_dirs:
             cachethg.overlay_cache.clear()
