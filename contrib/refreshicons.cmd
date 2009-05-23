@@ -4,4 +4,4 @@
  
 for /F "tokens=*" %%G in ('dir /b /A:D') do (
   echo %%G
-  hg -R %%G thgstatus)
+  hg -R %%G thgstatus --notify %%G)
