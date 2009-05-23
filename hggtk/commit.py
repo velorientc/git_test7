@@ -129,6 +129,7 @@ class GCommit(GStatus):
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self._update_check_count()
+        self.opts['check'] = False
 
 
     def save_settings(self):
@@ -322,15 +323,12 @@ class GCommit(GStatus):
 
 
     def _check_merge(self):
-        # disable the checkboxes on the filelist if repo in merging state
-        merged = len(self.repo.changectx(None).parents()) > 1
+        self.get_toolbutton(_('Re_vert')).set_sensitive(not self.merging)
+        self.get_toolbutton(_('_Add')).set_sensitive(not self.merging)
+        self.get_toolbutton(_('_Remove')).set_sensitive(not self.merging)
+        self.get_toolbutton(_('Move')).set_sensitive(not self.merging)
 
-        self.get_toolbutton(_('Re_vert')).set_sensitive(not merged)
-        self.get_toolbutton(_('_Add')).set_sensitive(not merged)
-        self.get_toolbutton(_('_Remove')).set_sensitive(not merged)
-        self.get_toolbutton(_('Move')).set_sensitive(not merged)
-
-        if merged:
+        if self.merging:
             # select all changes if repo is merged
             for entry in self.filemodel:
                 if entry[FM_STATUS] in 'MARD':
@@ -381,14 +379,11 @@ class GCommit(GStatus):
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
-            return True
+            return
 
-        if len(self.repo.changectx(None).parents()) > 1:
-            # as of Mercurial 1.0, merges must be committed without
-            # specifying file list.
+        if self.merging:
+            # merges must be committed without specifying file list.
             self._hg_commit([])
-            shlib.shell_notify(self._relevant_files('MAR'))
-            self.reload_status()
         else:
             commitable = 'MAR'
             addremove_list = self._relevant_files('?!')
@@ -403,7 +398,10 @@ class GCommit(GStatus):
             else:
                 gdialog.Prompt(_('Nothing Commited'),
                        _('No committable files selected'), self).run()
-        return True
+                return
+        self.reload_status()
+        shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
+        shlib.shell_notify(self._relevant_files('MAR'))
 
     def _commit_selected(self, files):
         # 1a. get list of chunks not rejected
@@ -494,15 +492,15 @@ class GCommit(GStatus):
                 os.rmdir(backupdir)
             except OSError:
                 pass
-            self.reload_status()
 
 
     def _commit_file(self, stat, file):
         if self._ready_message():
             if stat not in '?!' or self._should_addremove([file]):
                 self._hg_commit([file])
-                shlib.shell_notify([file])
                 self.reload_status()
+                shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
+                shlib.shell_notify([file])
         return True
 
 
@@ -663,12 +661,9 @@ class GCommit(GStatus):
 
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
-            shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
-            shlib.shell_notify([self.cwd] + files)
-            if self.notify_func:
-                self.notify_func(self.notify_args)
             self.closebranch = False
             self.nextbranch = None
+            self.opts['check'] = True  # recheck MAR after commit
             buf = self.text.get_buffer()
             if buf.get_modified():
                 self._update_recent_messages(self.opts['message'])
@@ -681,6 +676,8 @@ class GCommit(GStatus):
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
                 self._last_commit_id = self._get_tip_rev(True)
+            if self.notify_func:
+                self.notify_func(self.notify_args)
 
     def _get_tip_rev(self, refresh=False):
         if refresh:
