@@ -212,6 +212,9 @@ class GStatus(gdialog.GDialog):
 
 
     def get_body(self):
+        wctx = self.repo[None]
+        self.merging = len(wctx.parents()) == 2
+
         self.connect('map-event', self._displayed)
 
         # TODO: should generate menus dynamically during right-click, currently
@@ -274,8 +277,9 @@ class GStatus(gdialog.GDialog):
         path_cell = gtk.CellRendererText()
         stat_cell = gtk.CellRendererText()
 
-        self.selcb = None
-        if len(self.repo['.'].parents()) != 2:
+        if self.merging:
+            self.selcb = None
+        else:
             # show file selection checkboxes only when applicable
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
@@ -291,7 +295,7 @@ class GStatus(gdialog.GDialog):
         col1.set_resizable(False)
         self.filetree.append_column(col1)
 
-        if len(self.repo['.'].parents()) == 2:
+        if self.merging:
             col = gtk.TreeViewColumn(_('ms'), stat_cell)
             col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
             col.set_sort_column_id(4)
@@ -319,7 +323,7 @@ class GStatus(gdialog.GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
         self.difffont = pango.FontDescription(self.fontlist)
-        if len(self.repo.changectx(None).parents()) == 2:
+        if self.merging:
             # display merge diffs in simple text view
             self.clipboard = None
             self.merge_diff_text = gtk.TextView()
@@ -809,8 +813,9 @@ class GStatus(gdialog.GDialog):
         def dohgdiff():
             difftext = [_('===== Diff to first parent =====\n')]
             wfiles = [self.repo.wjoin(wfile)]
+            wctx = self.repo[None]
             matcher = cmdutil.match(self.repo, wfiles, self.opts)
-            for s in patch.diff(self.repo, self.repo.dirstate.parents()[0], None,
+            for s in patch.diff(self.repo, wctx.p1().node(), None,
                     match=matcher, opts=patch.diffopts(self.ui, self.opts)):
                 difftext.extend(s.splitlines(True))
             difftext.append(_('\n===== Diff to second parent =====\n'))
