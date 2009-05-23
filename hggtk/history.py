@@ -21,7 +21,7 @@ from hggtk.gdialog import *
 from hggtk.logview import treemodel
 from hggtk.logview.treeview import TreeView as LogTreeView
 
-from hggtk import gtklib, hgcmd, synch, datamine, logfilter
+from hggtk import gtklib, hgcmd, datamine, logfilter
 from hggtk import backout, status, hgemail, tagadd, update, merge
 from hggtk import changeset
 
@@ -74,6 +74,7 @@ class GLog(GDialog):
         return tbar
 
     def _synch_clicked(self, toolbutton, data):
+        from hggtk import synch
         dlg = synch.SynchDialog([], False)
         dlg.show_all()
 

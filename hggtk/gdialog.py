@@ -22,7 +22,7 @@ from hgext import extdiff
 from thgutil.i18n import _
 from thgutil import shlib, hglib, paths
 
-from hggtk import gtklib, visdiff, thgconfig
+from hggtk import gtklib
 
 class SimpleMessage(gtklib.MessageDialog):
     def run(self):
@@ -383,6 +383,7 @@ class GDialog(gtk.Window):
         return True, textout
 
     def _do_diff(self, patterns, options, modal=False):
+        from hggtk import visdiff, thgconfig
         if self.ui.configbool('tortoisehg', 'vdiffnowin'):
             tools = visdiff.readtools(self.ui)
             preferred = self.ui.config('tortoisehg', 'vdiff', 'vdiff')
@@ -423,6 +424,7 @@ class GDialog(gtk.Window):
         self._do_diff(file and [file] or [], self.opts)
 
     def _view_file(self, stat, file, force_left=False):
+        from hggtk import thgconfig
         def cleanup():
             shutil.rmtree(self.tmproot)
 

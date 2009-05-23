@@ -18,7 +18,7 @@ from thgutil.hglib import *
 from thgutil import shlib
 
 from hggtk.gdialog import GDialog, Confirm, NativeSaveFileDialogWrapper
-from hggtk import gtklib, hgcmd, datamine, history
+from hggtk import gtklib, hgcmd
 
 class ChangeSet(GDialog):
     """GTK+ based dialog for displaying repository logs
@@ -697,6 +697,7 @@ class ChangeSet(GDialog):
 
     def _ann_file(self, menuitem):
         '''User selected annotate file from the file list context menu'''
+        from hggtk import datamine
         rev = self.currev
         dialog = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dialog.display()
@@ -712,6 +713,7 @@ class ChangeSet(GDialog):
             self.glog_parent.reload_log(opts)
         else:
             # Else launch our own GLog instance
+            from hggtk import history
             dialog = history.GLog(self.ui, self.repo, self.cwd,
                                   [self.repo.root], {})
             dialog.open_with_file(self.curfile)

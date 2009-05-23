@@ -20,8 +20,7 @@ from thgutil.i18n import _
 from thgutil import hglib, shlib, paths
 
 from hggtk.gdialog import GDialog, Confirm, Prompt, NativeSaveFileDialogWrapper
-from hggtk import dialog, hgshelve, gtklib
-from hggtk import history, rename, hgignore
+from hggtk import dialog, hgshelve, gtklib, rename, hgignore
 
 # file model row enumerations
 FM_CHECKED = 0
@@ -1071,6 +1070,7 @@ class GStatus(GDialog):
 
     def _log_file(self, stat, wfile):
         # Might want to include 'rev' here... trying without
+        from hggtk import history
         dlg = history.GLog(self.ui, self.repo, self.cwd, [wfile], self.opts)
         dlg.display()
         return True

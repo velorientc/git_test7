@@ -20,7 +20,7 @@ from hggtk.logview import treemodel
 from hggtk.logview.colormap import AnnotateColorMap, AnnotateColorSaturation
 from hggtk.logview.treeview import TreeView as LogTreeView
 
-from hggtk import gtklib, gdialog, changeset, history
+from hggtk import gtklib, gdialog, changeset
 
 class DataMineDialog(gdialog.GDialog):
     COL_REVID = 0
@@ -141,6 +141,7 @@ class DataMineDialog(gdialog.GDialog):
         self.add_annotate_page(self.curpath, self.currev)
 
     def _cmenu_file_log(self, menuitem):
+        from hggtk import history
         dialog = history.GLog(self.ui, self.repo, self.cwd, [self.repo.root], {})
         dialog.open_with_file(self.curpath)
         dialog.display()
