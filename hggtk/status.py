@@ -328,7 +328,7 @@ class GStatus(gdialog.GDialog):
             self.merge_diff_text.modify_font(self.difffont)
             self.filetree.get_selection().set_mode(gtk.SELECTION_SINGLE)
             self.filetree.get_selection().connect('changed',
-                    self._merge_tree_selection_changed, False)
+                    self.merge_sel_changed, False)
             scroller.add(self.merge_diff_text)
             diff_frame.add(scroller)
         else:
@@ -378,7 +378,7 @@ class GStatus(gdialog.GDialog):
             self.diff_tree.append_column(diffcol)
             self.filetree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             self.filetree.get_selection().connect('changed',
-                    self._tree_selection_changed, False)
+                    self.tree_sel_changed, False)
             scroller.add(self.diff_tree)
             diff_frame.add(scroller)
 
@@ -804,7 +804,7 @@ class GStatus(gdialog.GDialog):
             shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
             self.reload_status()
 
-    def _merge_tree_selection_changed(self, selection, force):
+    def merge_sel_changed(self, selection, force):
         ''' Update the diff text with merge diff to both parents'''
         def dohgdiff():
             difftext = [_('===== Diff to first parent =====\n')]
@@ -814,7 +814,7 @@ class GStatus(gdialog.GDialog):
                     match=matcher, opts=patch.diffopts(self.ui, self.opts)):
                 difftext.extend(s.splitlines(True))
             difftext.append(_('\n===== Diff to second parent =====\n'))
-            for s in patch.diff(self.repo, self.repo.dirstate.parents()[1], None,
+            for s in patch.diff(self.repo, wctx.p2().node(), None,
                     match=matcher, opts=patch.diffopts(self.ui, self.opts)):
                 difftext.extend(s.splitlines(True))
 
@@ -855,7 +855,7 @@ class GStatus(gdialog.GDialog):
         return False
 
 
-    def _tree_selection_changed(self, selection, force):
+    def tree_sel_changed(self, selection, force):
         if self.showdiff_toggle.get_active():
             sel = self.filetree.get_selection().get_selected_rows()[1]
             if not sel:
@@ -988,9 +988,9 @@ class GStatus(gdialog.GDialog):
 
         if togglebutton.get_active():
             if hasattr(self, 'merge_diff_text'):
-                self._merge_tree_selection_changed(self.filetree.get_selection(), True)
+                self.merge_sel_changed(self.filetree.get_selection(), True)
             else:
-                self._tree_selection_changed(self.filetree.get_selection(), True)
+                self.tree_sel_changed(self.filetree.get_selection(), True)
             self._diffpane.set_position(self._setting_lastpos)
         else:
             self._setting_lastpos = self._diffpane.get_position()
@@ -1015,9 +1015,9 @@ class GStatus(gdialog.GDialog):
             self.showdiff_toggle.set_active(True)
             selection = self.filetree.get_selection()
             if hasattr(self, 'merge_diff_text'):
-                self._merge_tree_selection_changed(selection, True)
+                self.merge_sel_changed(selection, True)
             else:
-                self._tree_selection_changed(selection, True)
+                self.tree_sel_changed(selection, True)
 
         self.showdiff_toggle.handler_unblock(self._showdiff_toggled_id)
         return False
