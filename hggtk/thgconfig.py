@@ -19,6 +19,7 @@ from thgutil import hglib, shlib, paths, iniparse
 from hggtk import dialog, gdialog, gtklib, hgcmd
 
 _unspecstr = _('<unspecified>')
+_unspeclocalstr = hglib.fromutf(_unspecstr)
 
 _pwfields = ('http_proxy.passwd', 'smtp.password')
 
@@ -916,8 +917,9 @@ class ConfigDialog(gtk.Dialog):
         return iniparse.INIConfig(file(fn), optionxformvalue=None)
 
     def record_new_value(self, cpath, newvalue, keephistory=True):
+        # 'newvalue' is converted to local encoding
         section, key = cpath.split('.', 1)
-        if newvalue == _unspecstr or newvalue == '':
+        if newvalue == _unspeclocalstr or newvalue == '':
             try:
                 del self.ini[section][key]
             except KeyError:
