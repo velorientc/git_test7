@@ -322,15 +322,12 @@ class GCommit(GStatus):
 
 
     def _check_merge(self):
-        # disable the checkboxes on the filelist if repo in merging state
-        merged = len(self.repo.changectx(None).parents()) > 1
+        self.get_toolbutton(_('Re_vert')).set_sensitive(not self.merging)
+        self.get_toolbutton(_('_Add')).set_sensitive(not self.merging)
+        self.get_toolbutton(_('_Remove')).set_sensitive(not self.merging)
+        self.get_toolbutton(_('Move')).set_sensitive(not self.merging)
 
-        self.get_toolbutton(_('Re_vert')).set_sensitive(not merged)
-        self.get_toolbutton(_('_Add')).set_sensitive(not merged)
-        self.get_toolbutton(_('_Remove')).set_sensitive(not merged)
-        self.get_toolbutton(_('Move')).set_sensitive(not merged)
-
-        if merged:
+        if self.merging:
             # select all changes if repo is merged
             for entry in self.filemodel:
                 if entry[FM_STATUS] in 'MARD':
@@ -383,7 +380,7 @@ class GCommit(GStatus):
         if not self._ready_message():
             return True
 
-        if len(self.repo.changectx(None).parents()) > 1:
+        if self.merging:
             # as of Mercurial 1.0, merges must be committed without
             # specifying file list.
             self._hg_commit([])

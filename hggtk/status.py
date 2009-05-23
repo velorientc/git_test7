@@ -212,8 +212,7 @@ class GStatus(gdialog.GDialog):
 
 
     def get_body(self):
-        wctx = self.repo[None]
-        self.merging = len(wctx.parents()) == 2
+        self.merging = len(self.repo.parents()) == 2
 
         self.connect('map-event', self._displayed)
 
