@@ -276,7 +276,7 @@ class GStatus(GDialog):
         stat_cell = gtk.CellRendererText()
 
         self.selcb = None
-        if len(self.repo.changectx(None).parents()) != 2:
+        if len(self.repo['.'].parents()) != 2:
             # show file selection checkboxes only when applicable
             col0 = gtk.TreeViewColumn('', toggle_cell)
             col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
@@ -292,11 +292,12 @@ class GStatus(GDialog):
         col1.set_resizable(False)
         self.filetree.append_column(col1)
 
-        col = gtk.TreeViewColumn(_('ms'), stat_cell)
-        col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
-        col.set_sort_column_id(4)
-        col.set_resizable(False)
-        self.filetree.append_column(col)
+        if len(self.repo['.'].parents()) == 2:
+            col = gtk.TreeViewColumn(_('ms'), stat_cell)
+            col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
+            col.set_sort_column_id(4)
+            col.set_resizable(False)
+            self.filetree.append_column(col)
 
         col2 = gtk.TreeViewColumn(_('path'), path_cell)
         col2.add_attribute(path_cell, 'text', FM_PATH_UTF8)
