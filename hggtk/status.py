@@ -1103,6 +1103,17 @@ class GStatus(gdialog.GDialog):
             revertopts['rev'] = revertopts['rev'][0]
             dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
                     _('Revert files to revision ') + revertopts['rev'] + '?')
+        elif self.merging:
+            resp = gdialog.CustomPrompt(_('Which parent to revert to?'),
+                    _('Revert file(s) to local or other parent?'),
+                    self, (_('&local'), _('&other')), _('l')).run()
+            if resp == ord(_('l')):
+                revertopts['rev'] = self.repo[None].p1().rev()
+            elif resp == ord(_('o')):
+                revertopts['rev'] = self.repo[None].p2().rev()
+            else:
+                return
+            dlg = None
         else:
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
