@@ -10,6 +10,7 @@ import gobject
 import pango
 import Queue
 import os
+import time
 
 from mercurial import hg, ui
 
@@ -128,7 +129,6 @@ class RecoveryDialog(gtk.Window):
         self._exec_cmd(cmd, postfunc=self._notify)
 
     def _notify(self, ret, *args):
-        import time
         time.sleep(0.5)     # give fs some time to pick up changes
         shlib.shell_notify([self.root])
 

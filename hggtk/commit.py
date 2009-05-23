@@ -18,8 +18,7 @@ from mercurial.node import hex, nullrev
 from mercurial import ui, hg, util, patch
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import shlib
+from thgutil import shlib, hglib
 
 from hggtk.status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH_UTF8
 from hggtk.status import DM_REJECTED, DM_CHUNK_ID

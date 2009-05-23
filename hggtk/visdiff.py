@@ -19,7 +19,7 @@ from mercurial.node import short
 from mercurial import hg, ui, cmdutil, util
 
 from thgutil.i18n import _
-from thgutil import hglib, shlib, paths
+from thgutil import hglib, settings, paths
 
 from hggtk import gdialog, gtklib
 
@@ -78,7 +78,7 @@ class FileSelectionDialog(gtk.Dialog):
 
         hbox = gtk.HBox()
         self.vbox.pack_start(hbox, False, False, 2)
-        settings = shlib.Settings('visdiff')
+        settings = settings.Settings('visdiff')
         single = settings.get_value('launchsingle', False)
         check = gtk.CheckButton(_('Always launch single files'))
         check.set_active(single)
@@ -203,7 +203,7 @@ class FileSelectionDialog(gtk.Dialog):
             self.launch(*model[0])
 
     def delete_tmproot(self, _, tmproot):
-        settings = shlib.Settings('visdiff')
+        settings = settings.Settings('visdiff')
         settings.set_value('launchsingle', self.singlecheck.get_active())
         settings.write()
         shutil.rmtree(tmproot)

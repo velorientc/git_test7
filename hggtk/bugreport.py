@@ -10,9 +10,8 @@ import pango
 
 from mercurial import extensions
 from thgutil.i18n import _
-from thgutil import shlib
+from thgutil import hglib, version
 from hggtk.gdialog import GDialog
-from hggtk.about import hgversion
 
 class BugReport(GDialog):
     """GTK+ based dialog for displaying traceback info to the user in a
@@ -49,7 +48,7 @@ class BugReport(GDialog):
                 ' tortoisehg-discuss@lists.sourceforge.net or'
                 ' http://bitbucket.org/tortoisehg/stable/issues\n')
         text += _('** Mercurial version (%s).  TortoiseHg version (%s)\n') % (
-                hgversion, shlib.version())
+                hglib.hgversion, version.version())
         text += _('** Command: %s\n') % (self.opts['cmd'])
         text += _('** CWD: %s\n') % os.getcwd()
         extlist = [x[0] for x in extensions.extensions()]

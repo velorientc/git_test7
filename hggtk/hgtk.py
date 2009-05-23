@@ -23,6 +23,7 @@ from mercurial import hg, util, fancyopts, cmdutil, extensions
 
 from thgutil.i18n import _
 from thgutil import hglib, paths, shlib
+from thgutil import version as thgversion
 
 nonrepo_commands = 'userconfig clone debugcomplete init about help version'
 
@@ -555,7 +556,7 @@ def version(ui, **opts):
     """output version and copyright information"""
     ui.write(_('TortoiseHg Dialogs (version %s), '
                'Mercurial (version %s)\n') %
-               (shlib.version(), util.version()))
+               (thgversion.version(), hglib.hgversion))
     if not ui.quiet:
         ui.write(shortlicense)
 

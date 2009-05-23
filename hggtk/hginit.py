@@ -10,11 +10,9 @@ import gtk
 from mercurial import hg, ui, util
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import shlib
+from thgutil import hglib, shlib
 
-from hggtk import dialog
-from hggtk import gtklib
+from hggtk import dialog, gtklib
 
 class InitDialog(gtk.Window):
     """ Dialog to initialize a Mercurial repo """

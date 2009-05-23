@@ -16,7 +16,7 @@ from mercurial import hg, ui, mdiff, cmdutil, match, util
 
 from thgutil.i18n import _
 from thgutil.hglib import toutf, fromutf, diffexpand, RepoError
-from thgutil import shlib, paths, thread2
+from thgutil import shlib, paths, thread2, settings
 
 from hggtk import gtklib
 
@@ -46,7 +46,7 @@ class DetectRenameDialog(gtk.Window):
         self.notify_func = None
         path = toutf(os.path.basename(self.root))
         self.set_title(_('Detect Copies/Renames in ') + path)
-        settings = shlib.Settings('guess')
+        settings = settings.Settings('guess')
         dims = settings.get_value('dims', (800, 600))
         self.set_default_size(dims[0], dims[1])
 

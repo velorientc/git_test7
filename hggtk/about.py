@@ -10,9 +10,7 @@ import gtk
 import threading
 
 from thgutil.i18n import _
-from thgutil.hglib import hgversion
-from thgutil import shlib
-from thgutil import paths
+from thgutil import version, paths, hglib
 
 from hggtk import gtklib, hgtk
 
@@ -45,7 +43,7 @@ class AboutDialog(gtk.AboutDialog):
         gtklib.set_tortoise_keys(self)
 
         lib_versions = ', '.join([
-                "Mercurial-%s" % hgversion,
+                "Mercurial-%s" % hglib.hgversion,
                 "Python-%s" % make_version(sys.version_info[0:3]),
                 "PyGTK-%s" % make_version(gtk.pygtk_version),
                 "GTK-%s" % make_version(gtk.gtk_version),
@@ -55,7 +53,7 @@ class AboutDialog(gtk.AboutDialog):
 
         self.set_website("http://bitbucket.org/tortoisehg/stable/")
         self.set_name("TortoiseHg")
-        self.set_version("(version %s)" % shlib.version())
+        self.set_version("(version %s)" % version.version())
         if hasattr(self, 'set_wrap_license'):
             self.set_wrap_license(True)
         self.set_copyright("Copyright 2009 TK Soh and others")

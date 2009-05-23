@@ -14,7 +14,7 @@ import threading
 from mercurial import hg, ui, util, url, filemerge
 
 from thgutil.i18n import _
-from thgutil import hglib, shlib, paths, iniparse
+from thgutil import hglib, settings, paths, iniparse
 
 from hggtk import dialog, gdialog, gtklib, hgcmd
 
@@ -412,7 +412,7 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
         self.pages = []
         self.tooltips = gtk.Tooltips()
-        self.history = shlib.Settings('thgconfig')
+        self.history = settings.Settings('thgconfig')
 
         # create pages for each section of configuration file
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')

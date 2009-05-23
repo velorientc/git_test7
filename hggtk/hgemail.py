@@ -15,7 +15,7 @@ import tempfile
 from mercurial import hg, ui, extensions
 
 from thgutil.i18n import _
-from thgutil import hglib, shlib
+from thgutil import hglib, settings
 
 from hggtk import gtklib, dialog, thgconfig, hgcmd
 
@@ -207,7 +207,7 @@ class EmailDialog(gtk.Window):
             for v in history.get_value(cpath):
                 vlist.append([v])
 
-        history = shlib.Settings('email')
+        history = settings.Settings('email')
         try:
             repo = hg.repository(ui.ui(), path=self.root)
             self.repo = repo
@@ -329,7 +329,7 @@ class EmailDialog(gtk.Window):
                 return
 
         if not test:
-            history = shlib.Settings('config_history')
+            history = settings.Settings('email')
             record_new_value('email.to', history, totext)
             record_new_value('email.cc', history, cctext)
             record_new_value('email.from', history, fromtext)

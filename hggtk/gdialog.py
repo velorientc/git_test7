@@ -20,7 +20,7 @@ from mercurial import cmdutil, util, ui, hg, commands
 from hgext import extdiff
 
 from thgutil.i18n import _
-from thgutil import shlib, hglib, paths
+from thgutil import settings, hglib, paths
 
 from hggtk import gtklib
 
@@ -124,7 +124,7 @@ class GDialog(gtk.Window):
         self.opts = opts
         self.tmproot = None
         self.toolbuttons = {}
-        self.settings = shlib.Settings(self.__class__.__name__)
+        self.settings = settings.Settings(self.__class__.__name__)
         self.init()
 
     ### Following methods are meant to be overridden by subclasses ###

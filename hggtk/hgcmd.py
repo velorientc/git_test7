@@ -11,11 +11,9 @@ import os
 import Queue
 
 from thgutil.i18n import _
-from thgutil import shlib
-from thgutil import hglib
+from thgutil import shlib, hglib
 
-from hggtk import gtklib
-from hggtk import hgthread
+from hggtk import gtklib, hgthread
 
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, progressbar=True, width=520, height=400):

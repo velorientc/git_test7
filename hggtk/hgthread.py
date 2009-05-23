@@ -11,11 +11,9 @@ import urllib2
 from mercurial import ui, util
 
 from thgutil.i18n import _
-from thgutil import hglib
-from thgutil import thread2
+from thgutil import hglib, thread2
 
-from hggtk import dialog
-from hggtk import gdialog
+from hggtk import dialog, gdialog
 
 class GtkUi(ui.ui):
     '''

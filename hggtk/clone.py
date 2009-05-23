@@ -11,7 +11,7 @@ import traceback
 
 from mercurial import ui, util
 from thgutil.i18n import _
-from thgutil import shlib
+from thgutil import shlib, settings
 from hggtk import gdialog, gtklib, hgcmd
 
 class CloneDialog(gtk.Window):
@@ -25,7 +25,7 @@ class CloneDialog(gtk.Window):
         self.set_title(_('TortoiseHg Clone'))
 
         self.ui = ui.ui()
-        self._settings = shlib.Settings('clone')
+        self._settings = settings.Settings('clone')
         self._recent_src = self._settings.mrul('src_paths')
         self._recent_dest = self._settings.mrul('dest_paths')
 
@@ -70,7 +70,7 @@ class CloneDialog(gtk.Window):
         vbox.pack_start(srcbox, False, False, 2)
 
         # add pre-defined src paths to pull-down list
-        sync_src = shlib.Settings('synch').mrul('src_paths')
+        sync_src = settings.Settings('synch').mrul('src_paths')
         sympaths = [x[1] for x in self.ui.configitems('paths')]
         recent = [x for x in self._recent_src]
         syncsrc = [x for x in sync_src]

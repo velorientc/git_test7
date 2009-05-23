@@ -15,7 +15,7 @@ import urllib
 from mercurial import hg, ui, extensions, url
 
 from thgutil.i18n import _
-from thgutil import hglib, shlib, paths
+from thgutil import hglib, settings, paths
 
 from hggtk import dialog, gtklib, hgthread, history, thgconfig, hgemail
 
@@ -31,7 +31,7 @@ class SynchDialog(gtk.Window):
         self.hgthread = None
 
         # persistent app data
-        self._settings = shlib.Settings('synch')
+        self._settings = settings.Settings('synch')
 
         self.set_default_size(655, 552)
 
