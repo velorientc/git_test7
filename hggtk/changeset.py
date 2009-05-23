@@ -10,21 +10,19 @@ import gobject
 import pango
 import Queue
 
-from mercurial.node import short, nullrev, nullid
 from mercurial import cmdutil, context, util, ui, hg, patch
 
 from thgutil.i18n import _
 from thgutil.hglib import *
 from thgutil import shlib
 
-from hggtk.gdialog import GDialog, Confirm, NativeSaveFileDialogWrapper
-from hggtk import gtklib, hgcmd
+from hggtk import gdialog, gtklib, hgcmd
 
-class ChangeSet(GDialog):
+class ChangeSet(gdialog.GDialog):
     """GTK+ based dialog for displaying repository logs
     """
     def __init__(self, ui, repo, cwd, pats, opts, stbar=None):
-        GDialog.__init__(self, ui, repo, cwd, pats, opts)
+        gdialog.GDialog.__init__(self, ui, repo, cwd, pats, opts)
         self.stbar = stbar
         self.glog_parent = None
 
@@ -57,12 +55,12 @@ class ChangeSet(GDialog):
         self.load_details(self.repo.changelog.rev(node0))
 
     def save_settings(self):
-        settings = GDialog.save_settings(self)
+        settings = gdialog.GDialog.save_settings(self)
         settings['changeset'] = self._hpaned.get_position()
         return settings
 
     def load_settings(self, settings):
-        GDialog.load_settings(self, settings)
+        gdialog.GDialog.load_settings(self, settings)
         if settings and 'changeset' in settings:
             self._setting_hpos = settings['changeset']
         else:
@@ -654,7 +652,7 @@ class ChangeSet(GDialog):
         wfile = util.localpath(self.curfile)
         wfile, ext = os.path.splitext(os.path.basename(wfile))
         filename = "%s@%d%s" % (wfile, self.currev, ext)
-        fd = NativeSaveFileDialogWrapper(Title = "Save file to",
+        fd = gdialog.NativeSaveFileDialogWrapper(Title = "Save file to",
                                          InitialDir=self.cwd,
                                          FileName=filename)
         result = fd.run()
@@ -722,8 +720,9 @@ class ChangeSet(GDialog):
     def _revert_file(self, menuitem):
         '''User selected file revert from the file list context menu'''
         rev = self.currev
-        dialog = Confirm(_('Confirm revert file to old revision'), [], self,
-                _('Revert %s to contents at revision %d?') % (self.curfile, rev))
+        dialog = gdialog.Confirm(_('Confirm revert file to old revision'),
+                 [], self, _('Revert %s to contents at revision %d?') %
+                 (self.curfile, rev))
         if dialog.run() == gtk.RESPONSE_NO:
             return
         cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), self.curfile]
