@@ -140,6 +140,9 @@ class GStatus(gdialog.GDialog):
                               if item[0] in ('modified', 'added', 'removed',
                                              'deleted', 'unknown')]:
                     check.set_active(True)
+            if self.pats:
+                for name, check in self._show_checks.iteritems():
+                    check.set_sensitive(False)
 
 
     def get_title(self):
