@@ -19,8 +19,7 @@ from mercurial import merge as merge_
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths
 
-from hggtk.gdialog import GDialog, Confirm, Prompt, NativeSaveFileDialogWrapper
-from hggtk import dialog, hgshelve, gtklib, rename, hgignore
+from hggtk import dialog, gdialog, hgshelve, gtklib, rename, hgignore
 
 # file model row enumerations
 FM_CHECKED = 0
@@ -39,7 +38,7 @@ DM_IS_HEADER = 4
 DM_CHUNK_ID = 5
 DM_FONT = 6
 
-class GStatus(GDialog):
+class GStatus(gdialog.GDialog):
     """GTK+ based dialog for displaying repository status
 
     Also provides related operations like add, delete, remove, revert, refresh,
@@ -55,7 +54,7 @@ class GStatus(GDialog):
     ### Following methods are meant to be overridden by subclasses ###
 
     def init(self):
-        GDialog.init(self)
+        gdialog.GDialog.init(self)
         self.mode = 'status'
 
     def auto_check(self):
@@ -192,14 +191,14 @@ class GStatus(GDialog):
 
 
     def save_settings(self):
-        settings = GDialog.save_settings(self)
+        settings = gdialog.GDialog.save_settings(self)
         settings['gstatus-hpane'] = self._diffpane.get_position()
         settings['gstatus-lastpos'] = self._setting_lastpos
         return settings
 
 
     def load_settings(self, settings):
-        GDialog.load_settings(self, settings)
+        gdialog.GDialog.load_settings(self, settings)
         self._setting_pos = 270
         self._setting_lastpos = 64000
         try:
@@ -752,7 +751,7 @@ class GStatus(GDialog):
     def _hg_remove(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
-            Prompt(_('Nothing Removed'),
+            gdialog.Prompt(_('Nothing Removed'),
               _('Remove is not enabled when multiple revisions are specified.'),
               self).run()
             return
@@ -771,7 +770,7 @@ class GStatus(GDialog):
     def _hg_move(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
-            Prompt(_('Nothing Moved'), _('Move is not enabled when '
+            gdialog.Prompt(_('Nothing Moved'), _('Move is not enabled when '
                     'multiple revisions are specified.'), self).run()
             return
 
@@ -790,7 +789,7 @@ class GStatus(GDialog):
     def _hg_copy(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
-            Prompt(_('Nothing Copied'), _('Copy is not enabled when '
+            gdialog.Prompt(_('Nothing Copied'), _('Copy is not enabled when '
                     'multiple revisions are specified.'), self).run()
             return
 
@@ -1031,7 +1030,7 @@ class GStatus(GDialog):
         'Write selected diff hunks to a patch file'
         revrange = self.opts.get('rev')[0]
         filename = "%s.patch" % revrange.replace(':', '_to_')
-        fd = NativeSaveFileDialogWrapper(Title=_('Save patch to'),
+        fd = gdialog.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
                                          InitialDir=self.repo.root,
                                          FileName=filename)
         result = fd.run()
@@ -1060,7 +1059,7 @@ class GStatus(GDialog):
         if len(revert_list) > 0:
             self._hg_revert(revert_list)
         else:
-            Prompt(_('Nothing Reverted'),
+            gdialog.Prompt(_('Nothing Reverted'),
                    _('No revertable files selected'), self).run()
         return True
 
@@ -1081,7 +1080,7 @@ class GStatus(GDialog):
     def _hg_revert(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
         if self.count_revs() > 1:
-            Prompt(_('Nothing Reverted'),
+            gdialog.Prompt(_('Nothing Reverted'),
                    _('Revert not allowed when viewing revision range.'),
                    self).run()
             return
@@ -1101,14 +1100,14 @@ class GStatus(GDialog):
             # rev options needs extra tweaking since is not an array for
             # revert command
             revertopts['rev'] = revertopts['rev'][0]
-            dlg = Confirm(_('Confirm Revert'), files, self,
+            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
                     _('Revert files to revision ') + revertopts['rev'] + '?')
         else:
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
             revertopts['rev'] = ''
-            dlg = Confirm('Confirm Revert', files, self)
-        if dlg.run() == gtk.RESPONSE_YES:
+            dlg = gdialog.Confirm('Confirm Revert', files, self)
+        if not dlg or dlg.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
                 shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
@@ -1120,7 +1119,7 @@ class GStatus(GDialog):
         if len(add_list) > 0:
             self._hg_add(add_list)
         else:
-            Prompt(_('Nothing Added'),
+            gdialog.Prompt(_('Nothing Added'),
                    _('No addable files selected'), self).run()
         return True
 
@@ -1150,7 +1149,7 @@ class GStatus(GDialog):
         if len(delete_list) > 0:
             self._delete_files(delete_list)
         if not remove_list and not delete_list:
-            Prompt(_('Nothing Removed'),
+            gdialog.Prompt(_('Nothing Removed'),
                    _('No removable files selected'), self).run()
         return True
 
@@ -1174,7 +1173,7 @@ class GStatus(GDialog):
             # verify directory
             destroot = paths.find_root(destdir)
             if destroot != self.repo.root:
-                Prompt(_('Nothing Moved'),
+                gdialog.Prompt(_('Nothing Moved'),
                        _('Cannot move outside repo!'), self).run()
                 return True
 
@@ -1182,7 +1181,7 @@ class GStatus(GDialog):
             move_list.append(hglib.fromutf(destdir))
             self._hg_move(move_list)
         else:
-            Prompt(_('Nothing Moved'), _('No movable files selected\n\n'
+            gdialog.Prompt(_('Nothing Moved'), _('No movable files selected\n\n'
                     'Note: only clean files can be moved.'), self).run()
         return True
 
@@ -1190,7 +1189,7 @@ class GStatus(GDialog):
         self._delete_files([wfile])
 
     def _delete_files(self, files):
-        dlg = Confirm(_('Confirm Delete Unrevisioned'), files, self)
+        dlg = gdialog.Confirm(_('Confirm Delete Unrevisioned'), files, self)
         if dlg.run() == gtk.RESPONSE_YES :
             errors = ''
             for wfile in files:
@@ -1203,7 +1202,7 @@ class GStatus(GDialog):
                 errors = errors.replace('\\\\', '\\')
                 if len(errors) > 500:
                     errors = errors[:errors.find('\n',500)] + '\n...'
-                Prompt(_('Delete Errors'), errors, self).run()
+                gdialog.Prompt(_('Delete Errors'), errors, self).run()
 
             self.reload_status()
         return True
