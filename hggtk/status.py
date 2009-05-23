@@ -494,7 +494,6 @@ class GStatus(gdialog.GDialog):
                 wgt.connect('clicked', cbclick, cb)
                 return cb
             wgt = wgt.get_parent()
-        print 'Warning: checkbox action not connected'
         return
 
 
