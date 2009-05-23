@@ -501,7 +501,8 @@ class GStatus(gdialog.GDialog):
             file_count = file_count + 1
             if row[FM_CHECKED]:
                 check_count = check_count + 1
-        self.counter.set_text(_('%d selected, %d total') % (check_count, file_count))
+        self.counter.set_text(_('%d selected, %d total') % (check_count,
+                              file_count))
         if self.selcb:
             self.selcb.set_active(file_count and file_count == check_count)
 
@@ -1086,16 +1087,12 @@ class GStatus(gdialog.GDialog):
             return
 
         # Create new opts,  so nothing unintented gets through.
-        # commands.table revert key changed after 0.9.5, in change d4ec6d61b3ee
         key = '^revert' in commands.table and '^revert' or 'revert'
         revertopts = self.merge_opts(commands.table[key][1],
-                ('include', 'exclude', 'rev'))
+                                     ('include', 'exclude', 'rev'))
         def dohgrevert():
             commands.revert(self.ui, self.repo, *wfiles, **revertopts)
 
-        # TODO: Ask which revision when multiple parents (currently just
-        # shows abort message)
-        # TODO: Don't need to prompt when reverting added or removed files
         if self.count_revs() == 1:
             # rev options needs extra tweaking since is not an array for
             # revert command
