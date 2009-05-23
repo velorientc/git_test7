@@ -13,6 +13,7 @@ import gtk
 import gobject
 import nautilus
 import gnomevfs
+import os
 
 try:
     from mercurial import demandimport
@@ -24,7 +25,6 @@ except ImportError:
     from mercurial import demandimport
 demandimport.enable()
 
-import os
 import subprocess
 import sys
 import urllib
