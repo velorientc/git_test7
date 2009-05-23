@@ -617,10 +617,10 @@ class GStatus(gdialog.GDialog):
     def reload_status(self):
         if not self._ready: return False
         self._last_file = None
-        success, outtext = self._hg_call_wrapper('Status', self._do_reload_status)
+        res, outtext = self._hg_call_wrapper('Status', self._do_reload_status)
         self.auto_check()
         self._update_check_count()
-        return success
+        return res
 
 
     def make_menu(self, entries):
@@ -1287,8 +1287,9 @@ class GStatus(gdialog.GDialog):
 
 
     def _tree_button_press(self, widget, event) :
-        # Set the flag to ignore the next activation when the shift/control keys are
-        # pressed. This avoids activations with multiple rows selected.
+        # Set the flag to ignore the next activation when the
+        # shift/control keys are pressed. This avoids activations with
+        # multiple rows selected.
         if event.type == gtk.gdk._2BUTTON_PRESS and  \
           (event.state & (gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK)):
             self._ignore_next_act = True
@@ -1298,7 +1299,9 @@ class GStatus(gdialog.GDialog):
 
 
     def _tree_button_release(self, widget, event) :
-        if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK)):
+        if event.button != 3:
+            return False
+        if not (event.state & (gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK)):
             self._tree_popup_menu(widget, event.button, event.time)
         return False
 
@@ -1358,8 +1361,8 @@ def run(ui, *pats, **opts):
     rev = opts.get('rev', [])
     cmdoptions = {
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
-        'added':True, 'removed':True, 'deleted':True, 'unknown':True, 'rev': rev,
+        'added':True, 'removed':True, 'deleted':True, 'unknown':True,
         'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
-        'check':True
+        'rev':rev, 'check':True
     }
     return GStatus(ui, None, None, pats, cmdoptions)
