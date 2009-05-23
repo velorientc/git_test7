@@ -757,7 +757,8 @@ class GStatus(GDialog):
             return
 
         # Create new opts, so nothing unintented gets through
-        removeopts = self.merge_opts(commands.table['^remove|rm'][1], ('include', 'exclude'))
+        removeopts = self.merge_opts(commands.table['^remove|rm'][1],
+                                     ('include', 'exclude'))
         def dohgremove():
             commands.remove(self.ui, self.repo, *wfiles, **removeopts)
         success, outtext = self._hg_call_wrapper('Remove', dohgremove)
