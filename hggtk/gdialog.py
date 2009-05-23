@@ -67,6 +67,11 @@ class CustomPrompt(gtk.MessageDialog):
         if default:
             self.set_default_response(ord(default))
 
+    def run(self):
+        response = gtklib.MessageDialog.run(self)
+        self.destroy()
+        return response
+
 class Confirm(SimpleMessage):
     """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO
     """
