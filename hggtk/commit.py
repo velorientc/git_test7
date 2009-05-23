@@ -129,6 +129,7 @@ class GCommit(GStatus):
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self._update_check_count()
+        self.opts['check'] = False
 
 
     def save_settings(self):
@@ -662,6 +663,7 @@ class GCommit(GStatus):
         if dialog.return_code() == 0:
             self.closebranch = False
             self.nextbranch = None
+            self.opts['check'] = True  # recheck MAR after commit
             buf = self.text.get_buffer()
             if buf.get_modified():
                 self._update_recent_messages(self.opts['message'])
