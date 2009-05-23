@@ -382,6 +382,7 @@ class ConfigDialog(gtk.Dialog):
 
         # Catch close events
         self.connect('response', self.should_live)
+        self.connect('delete-event', self.delete_event)
 
         combo = gtk.combo_box_new_text()
         combo.append_text(_('User global settings'))
@@ -511,6 +512,9 @@ class ConfigDialog(gtk.Dialog):
         thread = threading.Thread(target=doedit, name='edit config')
         thread.setDaemon(True)
         thread.start()
+        return True
+
+    def delete_event(self, dlg, event):
         return True
 
     def should_live(self, *args):
