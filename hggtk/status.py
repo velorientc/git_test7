@@ -1141,7 +1141,7 @@ class GStatus(GDialog):
             self.reload_status()
 
     def _remove_clicked(self, toolbutton, data=None):
-        remove_list = self._relevant_files('C')
+        remove_list = self._relevant_files('C!')
         delete_list = self._relevant_files('?I')
         if len(remove_list) > 0:
             self._hg_remove(remove_list)
