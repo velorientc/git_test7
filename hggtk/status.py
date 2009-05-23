@@ -131,7 +131,7 @@ class GStatus(gdialog.GDialog):
                 check.set_active(True)
         else:
             wasset = False
-            for opt in self.opts :
+            for opt in self.opts:
                 if opt in self._show_checks and self.opts[opt]:
                     wasset = True
                     self._show_checks[opt].set_active(True)
