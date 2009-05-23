@@ -98,7 +98,7 @@ def thgstatus(ui, repo, **opts):
         from mercurial import demandimport
         demandimport.disable()
         from thgutil import shlib
-        shlib.shell_notify([os.getcwd()])
+        shlib.shell_notify(opts.get('notify'))
         demandimport.enable()
     ui.note("thgstatus updated\n") 
 
@@ -106,9 +106,9 @@ cmdtable = {
     'thgstatus':
         (thgstatus,
         [ ('',  'delay', None, _('wait until the second ticks over')),
-          ('n', 'notify', None, _('notify the shell')),
+          ('n', 'notify', [], _('notify the shell for path(s) given')),
           ('',  'remove', None, _('remove the status file')),
           ('s', 'show', None, _('just show the contents of '
                                 'the status file (no update)')) ],
-        _('hg thgstatus')),
+        _('hg thgstatus [OPTION]...')),
 }
