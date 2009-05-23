@@ -379,14 +379,11 @@ class GCommit(GStatus):
 
     def _commit_clicked(self, toolbutton, data=None):
         if not self._ready_message():
-            return True
+            return
 
         if self.merging:
-            # as of Mercurial 1.0, merges must be committed without
-            # specifying file list.
+            # merges must be committed without specifying file list.
             self._hg_commit([])
-            shlib.shell_notify(self._relevant_files('MAR'))
-            self.reload_status()
         else:
             commitable = 'MAR'
             addremove_list = self._relevant_files('?!')
@@ -401,7 +398,10 @@ class GCommit(GStatus):
             else:
                 gdialog.Prompt(_('Nothing Commited'),
                        _('No committable files selected'), self).run()
-        return True
+                return
+        self.reload_status()
+        shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
+        shlib.shell_notify(self._relevant_files('MAR'))
 
     def _commit_selected(self, files):
         # 1a. get list of chunks not rejected
@@ -492,15 +492,15 @@ class GCommit(GStatus):
                 os.rmdir(backupdir)
             except OSError:
                 pass
-            self.reload_status()
 
 
     def _commit_file(self, stat, file):
         if self._ready_message():
             if stat not in '?!' or self._should_addremove([file]):
                 self._hg_commit([file])
-                shlib.shell_notify([file])
                 self.reload_status()
+                shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
+                shlib.shell_notify([file])
         return True
 
 
@@ -678,8 +678,6 @@ class GCommit(GStatus):
                 self._last_commit_id = self._get_tip_rev(True)
             if self.notify_func:
                 self.notify_func(self.notify_args)
-            shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
-            shlib.shell_notify([self.cwd] + files)
 
     def _get_tip_rev(self, refresh=False):
         if refresh:
