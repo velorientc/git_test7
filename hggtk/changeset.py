@@ -69,19 +69,18 @@ class ChangeSet(gdialog.GDialog):
     def load_details(self, rev):
         '''Load selected changeset details into buffer and filelist'''
         self.currev = rev
-        self._buffer.set_text('')
-        self._filelist.clear()
+        ctx = self.repo[rev]
+        if not ctx:
+            return
 
-        parents = [x for x in self.repo.changelog.parentrevs(rev) \
-                if x != nullrev]
-        self.parents = parents
+        parents = ctx.parents()
         title = self.get_title()
         if len(parents) == 2:
             self.parent_toggle.set_sensitive(True)
             if self.parent_toggle.get_active():
-                title += ':' + str(self.parents[1])
+                title += ':' + str(parents[1].rev())
             else:
-                title += ':' + str(self.parents[0])
+                title += ':' + str(parents[0].rev())
         else:
             self.parent_toggle.set_sensitive(False)
             if self.parent_toggle.get_active():
@@ -91,19 +90,44 @@ class ChangeSet(gdialog.GDialog):
                 self.parent_toggle.set_active(False)
                 return
 
-        ctx = self.repo.changectx(rev)
-        if not ctx:
-            self._last_rev = None
-            return False
-        self.set_title(title)
-        self.textview.freeze_child_notify()
-        try:
-            self._fill_buffer(self._buffer, rev, ctx, self._filelist)
-        finally:
-            self.textview.thaw_child_notify()
+        if self.clipboard:
+            self.clipboard.set_text(str(ctx))
 
-    def _fill_buffer(self, buf, rev, ctx, filelist):
-        self.stbar.begin(_('Retrieving changeset data...'))
+        self.set_title(title)
+        if self.parent_toggle.get_active():
+            parent = parents[1].node()
+        elif parents:
+            parent = parents[0].node()
+        else:
+            parent = self.repo[-1]
+
+        self._filelist.clear()
+        self._filelist.append(('*', _('[All Files]'), ''))
+        modified, added, removed = self.repo.status(parent, ctx.node())[:3]
+        for f in modified:
+            self._filelist.append(('M', toutf(f), f))
+        for f in added:
+            self._filelist.append(('A', toutf(f), f))
+        for f in removed:
+            self._filelist.append(('R', toutf(f), f))
+        self.curnodes = (parent, ctx.node())
+        if len(self._filelist) > 1:
+            self._filesel.select_path((1,))
+
+    def _filelist_rowchanged(self, sel):
+        model, path = sel.get_selected()
+        if not path:
+            return
+        status, file_utf8, self.curfile = model[path]
+        self.generate_change_header()
+        if self.curfile:
+            self.append_diff(self.curfile)
+        else:
+            for _, _, f in model:
+                self.append_diff(f)
+
+    def generate_change_header(self):
+        buf, rev = self._buffer, self.currev
 
         def title_line(title, text, tag):
             pad = ' ' * (12 - len(title))
@@ -111,84 +135,63 @@ class ChangeSet(gdialog.GDialog):
             buf.insert_with_tags_by_name(eob, utext, tag)
             buf.insert(eob, "\n")
 
+        buf.set_text('')
+        ctx = self.repo[rev]
+
         eob = buf.get_end_iter()
         date = displaytime(ctx.date())
-        if self.clipboard:
-            self.clipboard.set_text(short(ctx.node()))
-        change = str(rev) + ':' + short(ctx.node())
+        change = str(rev) + ' : ' + str(ctx)
         tags = ' '.join(ctx.tags())
-        parents = self.parents
 
         title_line(_('changeset:'), change, 'changeset')
         if ctx.branch() != 'default':
             title_line(_('branch:'), ctx.branch(), 'greybg')
         title_line(_('user/date:'), ctx.user() + '\t' + date, 'changeset')
-        for p in parents:
-            pctx = self.repo.changectx(p)
+        for pctx in ctx.parents():
             try:
                 summary = pctx.description().splitlines()[0]
                 summary = toutf(summary)
             except:
                 summary = ""
-            change = str(p) + ':' + short(self.repo.changelog.node(p))
+            change = str(pctx.rev()) + ' : ' + str(pctx)
             title = _('parent:')
             title += ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title, 'parent')
             buf.insert_with_tags_by_name(eob, change, 'link')
             buf.insert_with_tags_by_name(eob, ' ' + summary, 'parent')
             buf.insert(eob, "\n")
-        for n in self.repo.changelog.children(ctx.node()):
-            cctx = self.repo.changectx(n)
+        for cctx in ctx.children():
             try:
                 summary = cctx.description().splitlines()[0]
                 summary = toutf(summary)
             except:
                 summary = ""
-            childrev = self.repo.changelog.rev(n)
-            change = str(childrev) + ':' + short(n)
+            change = str(cctx.rev()) + ' : ' + str(cctx)
             title = _('child:')
             title += ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title, 'parent')
             buf.insert_with_tags_by_name(eob, change, 'link')
             buf.insert_with_tags_by_name(eob, ' ' + summary, 'parent')
             buf.insert(eob, "\n")
-        for n in self.repo.changelog.children(ctx.node()):
-            childrev = self.repo.changelog.rev(n)
         if tags: title_line(_('tags:'), tags, 'tag')
 
         log = toutf(ctx.description())
         buf.insert(eob, '\n' + log + '\n\n')
 
-        if self.parent_toggle.get_active():
-            parent = self.repo.changelog.node(parents[1])
-        elif parents:
-            parent = self.repo.changelog.node(parents[0])
-        else:
-            parent = nullid
+    def append_diff(self, file):
+        if not file:
+            return
+        buf, rev = self._buffer, self.currev
+        n1, n2 = self.curnodes
 
-        buf.create_mark('begmark', buf.get_start_iter())
-        filelist.append(('*', _('[Description]'), 'begmark', False, ()))
-        pctx = self.repo.changectx(parent)
+        lines = []
+        matcher = cmdutil.match(self.repo, [file], {'git': True})
+        for s in patch.diff(self.repo, n1, n2, match=matcher):
+                lines.extend(s.splitlines())
 
-        nodes = parent, ctx.node()
-        iterator = self.diff_generator(*nodes)
-        gobject.idle_add(self.get_diffs, iterator, nodes, pctx, buf, filelist)
-        self.curnodes = nodes
-
-    def get_diffs(self, iterator, nodes, pctx, buf, filelist):
-        if self.curnodes != nodes:
-            return False
-
-        try:
-            status, wfile, txt = iterator.next()
-        except StopIteration:
-            self.stbar.end()
-            return False
-
-        lines = txt.splitlines()
         eob = buf.get_end_iter()
         offset = eob.get_offset()
-        fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, wfile)
+        fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, file)
         for l in lines:
             buf.insert(eob, l)
 
@@ -204,164 +207,9 @@ class ChangeSet(gdialog.GDialog):
             pos = buf.get_iter_at_offset(offset)
             mark = 'mark_%d' % offset
             buf.create_mark(mark, pos)
-            filelist.append((status, toutf(wfile), mark, True, stats))
         sob, eob = buf.get_bounds()
         buf.apply_tag_by_name("mono", pos, eob)
         return True
-
-    # Hacked up version of mercurial.patch.diff()
-    # Use git mode by default (to show copies, renames, permissions) but
-    # never show binary diffs.  It operates as a generator, so it can be
-    # called iteratively to get file diffs from a changeset
-    def diff_generator(self, node1, node2):
-        repo = self.repo
-
-        ccache = {}
-        def getctx(r):
-            if r not in ccache:
-                ccache[r] = context.changectx(repo, r)
-            return ccache[r]
-
-        flcache = {}
-        def getfilectx(f, ctx):
-            flctx = ctx.filectx(f, filelog=flcache.get(f))
-            if f not in flcache:
-                flcache[f] = flctx._filelog
-            return flctx
-
-        ctx1 = context.changectx(repo, node1) # parent
-        ctx2 = context.changectx(repo, node2) # current
-
-        changes = repo.status(node1, node2, None)[:5]
-        modified, added, removed, deleted, unknown = changes
-        filelist = modified + added + removed
-
-
-        # force manifest reading
-        man1 = ctx1.manifest()
-        date1 = util.datestr(ctx1.date())
-
-        flags2 = ctx2.manifest().flags
-
-        # returns False if there was no rename between ctx1 and ctx2
-        # returns None if the file was created between ctx1 and ctx2
-        # returns the (file, node) present in ctx1 that was renamed to f in ctx2
-        # This will only really work if c1 is the Nth 1st parent of c2.
-        def renamed(c1, c2, man, f):
-            startrev = c1.rev()
-            c = c2
-            crev = c.rev()
-            if crev is None:
-                crev = len(repo.changelog)
-            orig = f
-            files = (f,)
-            while crev > startrev:
-                if f in files:
-                    try:
-                        src = getfilectx(f, c).renamed()
-                    except LookupError:
-                        return None
-                    if src:
-                        f = src[0]
-                crev = c.parents()[0].rev()
-                # try to reuse
-                c = getctx(crev)
-                files = c.files()
-            if f not in man:
-                return None
-            if f == orig:
-                return False
-            return f
-
-        status = {}
-        def filestatus(f):
-            if f in status:
-                return status[f]
-            try:
-                # Determine file status by presence in manifests
-                s = 'R'
-                ctx2.filectx(f)
-                s = 'A'
-                ctx1.filectx(f)
-                s = 'M'
-            except LookupError:
-                pass
-            status[f] = s
-            return s
-
-        copied = {}
-        for f in filelist:
-            src = renamed(ctx1, ctx2, man1, f)
-            if src:
-                copied[f] = src
-
-        srcs = [x[1] for x in copied.iteritems() if filestatus(x[0]) == 'A']
-        gitmode = {'l': '120000', 'x': '100755', '': '100644'}
-
-        gone = {}
-        for f in filelist:
-            s = filestatus(f)
-            to = None
-            tn = None
-            dodiff = True
-            header = []
-            if f in man1:
-                to = getfilectx(f, ctx1).data()
-            if s != 'R':
-                tn = getfilectx(f, ctx2).data()
-            a, b = f, f
-            def addmodehdr(header, omode, nmode):
-                if omode != nmode:
-                    header.append('old mode %s\n' % omode)
-                    header.append('new mode %s\n' % nmode)
-
-            if s == 'A':
-                mode = gitmode[flags2(f)]
-                if f in copied:
-                    a = copied[f]
-                    omode = gitmode[man1.flags(a)]
-                    addmodehdr(header, omode, mode)
-                    if filestatus(a) == 'R' and a not in gone:
-                        op = 'rename'
-                        gone[a] = 1
-                    else:
-                        op = 'copy'
-                    header.append('%s from %s\n' % (op, a))
-                    header.append('%s to %s\n' % (op, f))
-                    to = getfilectx(a, ctx1).data()
-                else:
-                    header.append(_('new file mode %s\n') % mode)
-                if util.binary(tn):
-                    dodiff = 'binary'
-            elif s == 'R':
-                if f in srcs:
-                    dodiff = False
-                else:
-                    mode = gitmode[man1.flags(f)]
-                    header.append(_('deleted file mode %s\n') % mode)
-            else:
-                omode = gitmode[man1.flags(f)]
-                nmode = gitmode[flags2(f)]
-                addmodehdr(header, omode, nmode)
-                if util.binary(to) or util.binary(tn):
-                    dodiff = 'binary'
-            header.insert(0, 'diff --git a/%s b/%s\n' % (a, b))
-            if dodiff == 'binary':
-                text = _('binary file has changed.\n')
-            elif dodiff:
-                try:
-                    text = patch.mdiff.unidiff(to, date1,
-                                    tn, util.datestr(ctx2.date()),
-                                    fn1=a, fn2=b, r=None,
-                                    opts=patch.mdiff.defaultopts)
-                except TypeError:
-                    # hg-0.9.5 and before
-                    text = patch.mdiff.unidiff(to, date1,
-                                    tn, util.datestr(ctx2.date()),
-                                    f, None, opts=patch.mdiff.defaultopts)
-            else:
-                text = ''
-            if header or text: yield (s, f, ''.join(header) + text)
 
     def prepare_diff(self, difflines, offset, fname):
         '''Borrowed from hgview; parses changeset diffs'''
@@ -461,7 +309,7 @@ class ChangeSet(gdialog.GDialog):
         return _menu
 
     def get_body(self):
-        self.curfile = None
+        self.curfile = ''
         if self.repo.ui.configbool('tortoisehg', 'copyhash'):
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
             self.clipboard = gtk.Clipboard(selection=sel)
@@ -490,6 +338,7 @@ class ChangeSet(gdialog.GDialog):
         filelist_tree = gtk.TreeView()
         filesel = filelist_tree.get_selection()
         filesel.connect("changed", self._filelist_rowchanged)
+        self._filesel = filesel
         filelist_tree.connect('button-release-event',
                 self._file_button_release)
         filelist_tree.connect('popup-menu', self._file_popup_menu)
@@ -510,9 +359,7 @@ class ChangeSet(gdialog.GDialog):
         self._filelist = gtk.ListStore(
                 gobject.TYPE_STRING,   # MAR status
                 gobject.TYPE_STRING,   # filename (utf-8 encoded)
-                gobject.TYPE_PYOBJECT, # mark
-                gobject.TYPE_PYOBJECT, # give cmenu
-                gobject.TYPE_PYOBJECT, # diffstats
+                gobject.TYPE_STRING,   # filename
                 )
         filelist_tree.set_model(self._filelist)
         column = gtk.TreeViewColumn(_('Stat'), gtk.CellRendererText(), text=0)
@@ -593,18 +440,6 @@ class ChangeSet(gdialog.GDialog):
         link_tag.connect("event", self.link_event )
         tag_table.add( link_tag )
 
-    def _filelist_rowchanged(self, sel):
-        model, path = sel.get_selected()
-        if not path:
-            return
-        # scroll to file in details window
-        mark = self._buffer.get_mark(model[path][2])
-        self.textview.scroll_to_mark(mark, 0.0, True, 0.0, 0.0)
-        if model[path][3]:
-            self.curfile = fromutf(model[path][1])
-        else:
-            self.curfile = None
-
     def _file_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
             gtk.gdk.CONTROL_MASK)):
@@ -612,7 +447,7 @@ class ChangeSet(gdialog.GDialog):
         return False
 
     def _file_popup_menu(self, treeview, button=0, time=0):
-        if self.curfile is None:
+        if not self.curfile:
             return
         self._filemenu.popup(None, None, None, button, time)
 
@@ -621,7 +456,7 @@ class ChangeSet(gdialog.GDialog):
         # actually change the contents of this file, and thus the file
         # cannot be annotated at this revision (since this changeset
         # does not appear in the filelog)
-        ctx = self.repo.changectx(self.currev)
+        ctx = self.repo[self.currev]
         try:
             fctx = ctx.filectx(self.curfile)
             has_filelog = fctx.filelog().linkrev(fctx.filerev()) == ctx.rev()
@@ -638,7 +473,7 @@ class ChangeSet(gdialog.GDialog):
             if isinstance(w, gtk.TreeView):
                 w.emit('thg-diff')
             return False
-        if self.curfile is None:
+        if not self.curfile:
             return False
         self._diff_file('M', self.curfile)
 
