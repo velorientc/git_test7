@@ -660,10 +660,6 @@ class GCommit(GStatus):
 
         # refresh overlay icons and commit dialog
         if dialog.return_code() == 0:
-            shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
-            shlib.shell_notify([self.cwd] + files)
-            if self.notify_func:
-                self.notify_func(self.notify_args)
             self.closebranch = False
             self.nextbranch = None
             buf = self.text.get_buffer()
@@ -678,6 +674,10 @@ class GCommit(GStatus):
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
                 self._last_commit_id = self._get_tip_rev(True)
+            if self.notify_func:
+                self.notify_func(self.notify_args)
+            shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
+            shlib.shell_notify([self.cwd] + files)
 
     def _get_tip_rev(self, refresh=False):
         if refresh:
