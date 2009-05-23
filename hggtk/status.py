@@ -1051,7 +1051,8 @@ class GStatus(gdialog.GDialog):
                 wfile = util.pconvert(row[FM_PATH])
                 fc = self._filechunks[wfile]
                 cids.append(fc[0])
-                cids += [dmodel[r][DM_CHUNK_ID] for r in fc[1:] if not dmodel[r][DM_REJECTED]]
+                cids += [dmodel[r][DM_CHUNK_ID] for r in fc[1:]
+                                                if not dmodel[r][DM_REJECTED]]
         try:
             fp = open(result, "w")
             for cid in cids:
@@ -1146,7 +1147,8 @@ class GStatus(gdialog.GDialog):
     def _hg_add(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
         # Create new opts, so nothing unintented gets through
-        addopts = self.merge_opts(commands.table['^add'][1], ('include', 'exclude'))
+        addopts = self.merge_opts(commands.table['^add'][1],
+                                  ('include', 'exclude'))
         def dohgadd():
             commands.add(self.ui, self.repo, *wfiles, **addopts)
         success, outtext = self._hg_call_wrapper('Add', dohgadd)
