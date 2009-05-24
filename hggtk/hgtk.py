@@ -35,6 +35,7 @@ for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept'):
     gobject.signal_new(sig, gtk.Window,
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 
+gtkmainalive = False
 def dispatch(args):
     "run the command specified in args"
     try:
@@ -45,16 +46,19 @@ def dispatch(args):
             pdb.set_trace()
         return _runcatch(u, args)
     except:
+        from hggtk.bugreport import run
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
         error = traceback.format_exc()
-        from hggtk.bugreport import run
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = error
-        # TODO: keep track of whether gtk.main() is running
-        print error
-        run(u, **opts)
+        if gtkmainalive:
+            dlg = run(u, **opts)
+            dlg.display()
+            dlg.show_all()
+        else:
+            gtkrun(run(u, **opts))
 
 def get_list_from_file(filename):
     try:
@@ -207,7 +211,7 @@ def thgexit(win):
     mainwindow.destroy()
 
 def gtkrun(win):
-    global mainwindow
+    global mainwindow, gtkmainalive
     mainwindow = win
     if hasattr(win, 'display'):
         win.display()
@@ -217,7 +221,9 @@ def gtkrun(win):
     win.connect('destroy', gtk.main_quit)
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
+    gtkmainalive = True
     gtk.main()
+    gtkmainalive = False
     gtk.gdk.threads_leave()
 
 def about(ui, *pats, **opts):
