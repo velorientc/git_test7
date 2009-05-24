@@ -618,6 +618,11 @@ class GLog(GDialog):
 
         if result:
             if os.path.exists(result):
+                res = Confirm(_('Confirm Overwrite'), [], self,
+                   _('The file "%s" already exists!\n\n'
+                     'Do you want to overwrite it?') % result).run()
+                if res != gtk.RESPONSE_YES:
+                    return
                 os.remove(result)
 
             # In case new export args are added in the future, merge the
