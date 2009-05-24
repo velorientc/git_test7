@@ -175,6 +175,7 @@ def runcommand(ui, args):
         lui = ui
     if options['repository']:
         path = lui.expandpath(options['repository'])
+        cmdoptions['repository'] = path
 
     _loaded = {}
     extensions.loadall(ui)
