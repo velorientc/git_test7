@@ -708,6 +708,7 @@ class DataMineDialog(gdialog.GDialog):
                 self.stop_button.set_sensitive(False)
             if rows:
                 tview.get_selection().select_path(rows[0])
+                tview.scroll_to_cell(rows[0], use_align=True, row_align=0.5)
                 tview.grab_focus()
             frame._mythread = None
             self.stbar.end()
