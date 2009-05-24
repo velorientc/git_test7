@@ -98,7 +98,7 @@ _log_info = (
         ' Default: False')))
 
 _paths_info = (
-    ('After pull operation', 'tortoisehg.postpull',
+    (_('After pull operation'), 'tortoisehg.postpull',
         ['none', 'update', 'fetch', 'rebase'],
         _('Operation which is performed directly after a successful pull.'
           ' update equates to pull --update, fetch equates to the fetch'
