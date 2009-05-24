@@ -174,7 +174,7 @@ class DataMineDialog(gdialog.GDialog):
     def get_rev_desc(self, rev):
         if rev in self.changedesc:
             return self.changedesc[rev]
-        ctx = self.repo.changectx(rev)
+        ctx = self.repo[rev]
         author = util.shortuser(ctx.user())
         summary = ctx.description().replace('\0', '')
         summary = gobject.markup_escape_text(summary.split('\n')[0])
@@ -465,7 +465,7 @@ class DataMineDialog(gdialog.GDialog):
         revision 'revid'.
         '''
         if revid == '.':
-            ctx = self.repo.changectx(None).parents()[0]
+            ctx = self.repo.parents()[0]
             try:
                 fctx = ctx.filectx(path)
             except LookupError:
@@ -604,7 +604,7 @@ class DataMineDialog(gdialog.GDialog):
         row = graphview.get_revision()
         rev = row[treemodel.REVID]
         self.currev = str(rev)
-        ctx = self.repo.changectx(rev)
+        ctx = self.repo[rev]
         filectx = ctx.filectx(path)
         info = filectx.renamed()
         if info:
@@ -656,7 +656,7 @@ class DataMineDialog(gdialog.GDialog):
         self.stop_button.set_sensitive(True)
 
         # date of selected revision
-        ctx = self.repo.changectx(long(rev))
+        ctx = self.repo[long(rev)]
         curdate = ctx.date()[0]
         # date of initial revision
         fctx = self.repo.filectx(path, fileid=0)
@@ -695,7 +695,7 @@ class DataMineDialog(gdialog.GDialog):
             except ValueError:
                 continue
             tip, user = self.get_rev_desc(rowrev)
-            ctx = self.repo.changectx(rowrev)
+            ctx = self.repo[rowrev]
             color = colormap.get_color(ctx, curdate)
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)

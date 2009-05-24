@@ -87,7 +87,7 @@ class BackoutDialog(gtk.Window):
         backout.connect('clicked', self.backout, buf, rev)
 
     def revdesc(self, repo, revid):
-        ctx = repo.changectx(revid)
+        ctx = repo[revid]
         revstr = str(ctx.rev())
         summary = ctx.description().replace('\0', '')
         summary = summary.split('\n')[0]

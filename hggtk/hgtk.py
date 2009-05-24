@@ -255,7 +255,7 @@ def commit(ui, *pats, **opts):
     # move cwd to repo root if repo is merged, so we can show
     # all the changed files
     repo = hg.repository(ui, path=paths.find_root())
-    if len(repo.changectx(None).parents()) > 1:
+    if len(repo.parents()) > 1:
         os.chdir(repo.root)
         pats = []
     from hggtk.commit import run

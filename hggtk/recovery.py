@@ -124,7 +124,7 @@ class RecoveryDialog(gtk.Window):
         except hglib.RepoError:
             self.write(_('Unable to find repo at %s\n') % (self.root), False)
             return
-        pl = repo.changectx(None).parents()
+        pl = repo.parents()
         cmd = ['update', '--clean', '--rev', str(pl[0].rev())]
         self._exec_cmd(cmd, postfunc=self._notify)
 
