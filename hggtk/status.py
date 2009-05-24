@@ -603,7 +603,7 @@ class GStatus(gdialog.GDialog):
         self._show_diff_hunks(files)
 
         # clear buffer after a merge commit
-        if not files and hasattr(self, 'merge_diff_text'):
+        if not files and self.merging:
             self.merge_diff_text.set_buffer(gtk.TextBuffer())
 
         self.filetree.show()
@@ -985,7 +985,7 @@ class GStatus(gdialog.GDialog):
             finally:
                 difftext.close()
 
-        if hasattr(self, 'merge_diff_text'):
+        if self.merging:
             return
         self._hg_call_wrapper('Diff', dohgdiff)
 
@@ -994,7 +994,7 @@ class GStatus(gdialog.GDialog):
         self._diffpane.handler_block(self._diffpane_moved_id)
 
         if togglebutton.get_active():
-            if hasattr(self, 'merge_diff_text'):
+            if self.merging:
                 self.merge_sel_changed(self.filetree.get_selection(), True)
             else:
                 self.tree_sel_changed(self.filetree.get_selection(), True)
@@ -1021,7 +1021,7 @@ class GStatus(gdialog.GDialog):
         elif paned.get_position() < sizemax - 55:
             self.showdiff_toggle.set_active(True)
             selection = self.filetree.get_selection()
-            if hasattr(self, 'merge_diff_text'):
+            if self.merging:
                 self.merge_sel_changed(selection, True)
             else:
                 self.tree_sel_changed(selection, True)
