@@ -162,6 +162,9 @@ class DataMineDialog(gdialog.GDialog):
         self.grep_cmenu.popup(None, None, None, button, time)
         return True
 
+    def _grep_thgdiff(self, treeview):
+        self._do_diff([], {'change' : self.currev}, modal=True)
+
     def _grep_row_act(self, tree, path, column):
         """Default action is the first entry in the context menu
         """
@@ -246,6 +249,14 @@ class DataMineDialog(gdialog.GDialog):
         treeview.connect('button-release-event', self._grep_button_release)
         treeview.connect('popup-menu', self._grep_popup_menu)
         treeview.connect('row-activated', self._grep_row_act)
+
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'d')
+        treeview.add_accelerator('thg-diff', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        treeview.connect('thg-diff', self._grep_thgdiff)
 
         results = gtk.ListStore(str, str, str, str)
         treeview.set_model(results)
@@ -493,6 +504,14 @@ class DataMineDialog(gdialog.GDialog):
         treeview.set_property('fixed-height-mode', True)
         treeview.set_border_width(0)
 
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'d')
+        treeview.add_accelerator('thg-diff', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        treeview.connect('thg-diff', self._annotate_thgdiff)
+
         results = gtk.ListStore(str, str, str, str, str, str, str)
         treeview.set_model(results)
         treeview.set_search_equal_func(self.search_in_file)
@@ -573,6 +592,9 @@ class DataMineDialog(gdialog.GDialog):
             if key in model.get_value(iter, col).lower():
                 return False
         return True
+
+    def _annotate_thgdiff(self, treeview):
+        self._do_diff([], {'change' : self.currev}, modal=True)
 
     def toggle_annatate_columns(self, button, treeview, col):
         b = button.get_active()
