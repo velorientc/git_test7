@@ -637,7 +637,7 @@ class DataMineDialog(gdialog.GDialog):
         # It's possible that the requested change was not found in the
         # file's filelog history.  In that case, no row will be
         # selected.
-        if path != None:
+        if path != None and column != None:
             treeview.row_activated(path, column)
 
     def trigger_annotate(self, rev, objs):
