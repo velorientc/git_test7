@@ -9,7 +9,6 @@ import gtk
 import traceback
 
 from mercurial import hg, ui, util
-from mercurial.node import short, nullid
 
 from thgutil.i18n import _
 from thgutil import hglib
@@ -218,13 +217,13 @@ class TagAddDialog(gtk.Window):
     def _add_hg_tag(self, name, revision, message, local, user=None,
                     date=None, force=False):
         if name in self.repo.tags() and not force:
-            raise util.Abort(_('a tag named "%s" already exists')
-                             % name)
-        r = self.repo.changectx(revision).node()
+            raise util.Abort(_('a tag named "%s" already exists') % name)
+
+        ctx = self.repo[revision]
+        r = ctx.node()
 
         if not message:
-            message = _('Added tag %s for changeset %s') % (name, short(r))
-
+            message = _('Added tag %s for changeset %s') % (name, str(ctx))
         if name in self.repo.tags() and not force:
             raise util.Abort(_("Tag '%s' already exist") % name)
 
@@ -236,5 +235,5 @@ class TagAddDialog(gtk.Window):
 
         if not message:
             message = _('Removed tag %s') % name
-        r = self.repo.changectx(nullid).node()
+        r = self.repo[-1].node()
         self.repo.tag(name, r, message, local, user, date)

@@ -15,7 +15,6 @@ import tempfile
 import gtk
 import atexit
 
-from mercurial.node import short
 from mercurial import cmdutil, util, ui, hg, commands
 from hgext import extdiff
 
@@ -442,18 +441,19 @@ class GDialog(gtk.Window):
             snapshot files as of some revision
             (adapted from Extdiff extension)
             '''
-            mf = repo.changectx(node).manifest()
+            ctx = repo[node]
+            mf = ctx.manifest()
             dirname = os.path.basename(repo.root)
             if dirname == "":
                 dirname = "root"
-            dirname = '%s.%s' % (dirname, short(node))
+            dirname = '%s.%s' % (dirname, str(ctx))
             base = os.path.join(tmproot, dirname)
             try:
                 os.mkdir(base)
             except:
                 pass
             ui.note(_('making snapshot of %d files from rev %s\n') %
-                    (len(files), short(node)))
+                    (len(files), str(ctx)))
             for fn in files:
                 if not fn in mf:
                     # skipping new file after a merge ?

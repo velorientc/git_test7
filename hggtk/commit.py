@@ -14,7 +14,6 @@ import pango
 import tempfile
 import cStringIO
 
-from mercurial.node import hex, nullrev
 from mercurial import ui, hg, util, patch
 
 from thgutil.i18n import _
@@ -682,9 +681,7 @@ class GCommit(GStatus):
     def _get_tip_rev(self, refresh=False):
         if refresh:
             self.repo.invalidate()
-        cl = self.repo.changelog
-        tip = cl.node(nullrev + len(cl))
-        return hex(tip)
+        return self.repo['tip'].node()
 
     def _get_qnew_name(self):
         return self.qnew_name and self.qnew_name.get_text().strip() or ''

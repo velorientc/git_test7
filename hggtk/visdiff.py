@@ -15,7 +15,6 @@ import subprocess
 import shutil
 import tempfile
 
-from mercurial.node import short
 from mercurial import hg, ui, cmdutil, util
 
 from thgutil.i18n import _
@@ -34,7 +33,7 @@ def snapshot_node(repo, files, node, tmproot):
     dirname = os.path.basename(repo.root)
     if dirname == "":
         dirname = "root"
-    dirname = '%s.%s' % (dirname, short(node))
+    dirname = '%s.%s' % (dirname, str(repo[node]))
     base = os.path.join(tmproot, dirname)
     os.mkdir(base)
     ctx = repo[node]
