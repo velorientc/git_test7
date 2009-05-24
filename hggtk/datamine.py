@@ -140,17 +140,17 @@ class DataMineDialog(gdialog.GDialog):
 
     def _cmenu_display(self, menuitem):
         statopts = {'rev' : [self.currev] }
-        dialog = changeset.ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
-        dialog.display()
+        dlg = changeset.ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
+        dlg.display()
 
     def _cmenu_annotate(self, menuitem):
         self.add_annotate_page(self.curpath, self.currev)
 
     def _cmenu_file_log(self, menuitem):
         from hggtk import history
-        dialog = history.GLog(self.ui, self.repo, self.cwd, [self.repo.root], {})
-        dialog.open_with_file(self.curpath)
-        dialog.display()
+        dlg = history.GLog(self.ui, self.repo, self.cwd, [self.repo.root], {})
+        dlg.open_with_file(self.curpath)
+        dlg.display()
 
     def _grep_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
