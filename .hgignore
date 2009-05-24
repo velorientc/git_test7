@@ -11,6 +11,7 @@ Output/
 .*.swp
 Thumbs.db
 MANIFEST
+*.mo
 *.o
 *.dll
 *.exe
