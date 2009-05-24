@@ -134,7 +134,7 @@ class DataMineDialog(gdialog.GDialog):
         self.trigger_annotate(parent, objs)
 
     def _cmenu_zoom(self, menuitem, objs):
-        (frame, model, path, graphview) = objs
+        (frame, treeview, path, graphview) = objs
         graphview.scroll_to_revision(int(self.currev))
         graphview.set_revision_id(int(self.currev))
 
@@ -552,7 +552,7 @@ class DataMineDialog(gdialog.GDialog):
         graphview.connect('revision-selected', self.log_selection_changed,
                 path, followlabel, follow)
 
-        objs = (frame, treeview.get_model(), path, graphview)
+        objs = (frame, treeview, path, graphview)
         graphview.treeview.connect('row-activated', self.log_activate, objs)
         graphview.treeview.connect('button-release-event',
                 self._ann_button_release, objs)
@@ -624,7 +624,7 @@ class DataMineDialog(gdialog.GDialog):
         background thread to perform the annotation.  Disable the select
         button until this operation is complete.
         '''
-        (frame, model, path, graphview) = objs
+        (frame, treeview, path, graphview) = objs
         q = Queue.Queue()
         args = [self.repo.root, q, 'annotate', '--follow', '--number',
                 '--rev', str(rev), path]
@@ -642,6 +642,7 @@ class DataMineDialog(gdialog.GDialog):
         agedays = (curdate - basedate) / (24 * 60 * 60)
         colormap = AnnotateColorSaturation(agedays)
 
+        model, rows = treeview.get_selection().get_selected_rows()
         model.clear()
         self.stbar.begin()
         self.stbar.set_status_text(toutf('hg ' + ' '.join(args[2:])))
@@ -655,13 +656,14 @@ class DataMineDialog(gdialog.GDialog):
         hbox.show_all()
         self.notebook.set_tab_label(frame, hbox)
 
-        gobject.timeout_add(50, self.annotate_wait, thread, q, model,
-                curdate, colormap, frame)
+        gobject.timeout_add(50, self.annotate_wait, thread, q, treeview,
+                curdate, colormap, frame, rows)
 
-    def annotate_wait(self, thread, q, model, curdate, colormap, frame):
+    def annotate_wait(self, thread, q, tview, curdate, colormap, frame, rows):
         """
         Handle all the messages currently in the queue (if any).
         """
+        model = tview.get_model()
         while q.qsize():
             line = q.get(0).rstrip('\r\n')
             try:
@@ -682,6 +684,9 @@ class DataMineDialog(gdialog.GDialog):
         else:
             if threading.activeCount() == 1:
                 self.stop_button.set_sensitive(False)
+            if rows:
+                tview.get_selection().select_path(rows[0])
+                tview.grab_focus()
             frame._mythread = None
             self.stbar.end()
             return False
