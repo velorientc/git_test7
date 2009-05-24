@@ -35,6 +35,10 @@ public:
     int read(FILE* f, std::vector<char>& relpath);
     char status(const Winstat& stat) const;
 
+    bool unset() const {
+        return (state == 'n') && (mode == 0) && (size == -1) && (mtime == -1);
+    }
+
 private:
     static uint32_t ntohl(uint32_t x)
     {
