@@ -481,6 +481,7 @@ void CShellExt::DoHgtk(const std::string &cmd)
         std::string hgroot = GetHgRepoRoot(cwd);
         if (!hgroot.empty())
             Dirstatecache::invalidate(hgroot);
+        hgcmd += " --notify .";
     }
 
     LaunchCommand(hgcmd, cwd);

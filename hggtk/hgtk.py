@@ -175,6 +175,7 @@ def runcommand(ui, args):
         lui = ui
     if options['repository']:
         path = lui.expandpath(options['repository'])
+        cmdoptions['repository'] = path
 
     _loaded = {}
     extensions.loadall(ui)
@@ -232,9 +233,9 @@ def add(ui, *pats, **opts):
     shlib.shell_notify([os.getcwd()])
 
 def thgstatus(ui, *pats, **opts):
-    """update thgstatus"""
-    shlib.update_thgstatus(ui, paths.find_root())
-    shlib.shell_notify([os.getcwd()])
+    """update TortoiseHg status cache"""
+    from hggtk.thgstatus import run
+    run(ui, *pats, **opts)
 
 def clone(ui, *pats, **opts):
     """clone tool"""
@@ -612,7 +613,13 @@ table = {
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
          _('hgtk serve [OPTION]...')),
-    "thgstatus": (thgstatus, [], _('hgtk thgstatus')),
+    "thgstatus": (thgstatus,
+        [('',  'delay', None, _('wait until the second ticks over')),
+         ('n', 'notify', [], _('notify the shell for path(s) given')),
+         ('',  'remove', None, _('remove the status cache')),
+         ('s', 'show', None, _('show the contents of the'
+                               ' status cache (no update)'))],
+        _('hgtk thgstatus [OPTION]')),
     "^update|checkout|co": (update,
         [('r', 'rev', '', _('revision to update'))],
         ('hgtk update')),
