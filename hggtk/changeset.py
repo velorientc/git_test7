@@ -178,29 +178,28 @@ class ChangeSet(gdialog.GDialog):
         log = toutf(ctx.description())
         buf.insert(eob, '\n' + log + '\n\n')
 
-    def append_diff(self, file):
-        if not file:
+    def append_diff(self, wfile):
+        if not wfile:
             return
         buf, rev = self._buffer, self.currev
         n1, n2 = self.curnodes
 
-        fctx = self.repo[rev].filectx(file)
+        eob = buf.get_end_iter()
+        offset = eob.get_offset()
+
+        fctx = self.repo[rev].filectx(wfile)
         if not fctx:
             return
         if fctx.size() > getmaxdiffsize(self.ui):
             lines = ['diff',
-                     _(' %s is larger than the specified max diff size') % file]
+                    _(' %s is larger than the specified max diff size') % wfile]
         else:
             lines = []
-            matcher = cmdutil.match(self.repo, [file])
+            matcher = cmdutil.match(self.repo, [wfile])
             opts = mdiff.diffopts(git=True, nodates=True)
             for s in patch.diff(self.repo, n1, n2, match=matcher, opts=opts):
                     lines.extend(s.splitlines())
-
-        eob = buf.get_end_iter()
-        offset = eob.get_offset()
-        pos = buf.get_iter_at_offset(offset)
-        tags, lines = self.prepare_diff(lines, offset, file)
+        tags, lines = self.prepare_diff(lines, offset, wfile)
         for l in lines:
             buf.insert(eob, l)
 
@@ -208,10 +207,10 @@ class ChangeSet(gdialog.GDialog):
         for name, p0, p1 in tags:
             i0 = buf.get_iter_at_offset(p0)
             i1 = buf.get_iter_at_offset(p1)
-            txt = buf.get_text(i0, i1)
             buf.apply_tag_by_name(name, i0, i1)
 
         sob, eob = buf.get_bounds()
+        pos = buf.get_iter_at_offset(offset)
         buf.apply_tag_by_name("mono", pos, eob)
         return True
 
