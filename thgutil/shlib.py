@@ -94,7 +94,9 @@ if os.name == 'nt':
             dirstatus[dirname(fn)] = 'r'
         f = open(repo.join("thgstatus"), 'wb')
         for dn in sorted(dirstatus):
-            f.write(dirstatus[dn] + dn + '\n')
+            s = dirstatus[dn]
+            f.write(s + dn + '\n')
+            ui.note("%s %s\n" % (s, dn))
         f.close()
 
 else:
