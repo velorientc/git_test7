@@ -13,9 +13,6 @@ import os
 def cachefilepath(repo):
     return repo.join("thgstatus")
 
-def dirname(f):
-    return f[:max(0, f.rfind("/"))]
-
 def run(_ui, *pats, **opts):
     path = '.'
     if opts.get('repository'):
