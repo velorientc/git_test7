@@ -11,17 +11,15 @@ import gobject
 import pango
 import StringIO
 
-from mercurial.node import *
-from mercurial import ui, hg, commands, extensions
+from mercurial import ui, hg, commands, extensions, util
 
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-from hggtk.gdialog import *
 from hggtk.logview import treemodel
 from hggtk.logview.treeview import TreeView as LogTreeView
 
-from hggtk import gtklib, hgcmd, datamine, logfilter
+from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter
 from hggtk import backout, status, hgemail, tagadd, update, merge
 from hggtk import changeset
 
@@ -31,7 +29,7 @@ def create_menu(label, callback):
     menuitem.set_border_width(1)
     return menuitem
 
-class GLog(GDialog):
+class GLog(gdialog.GDialog):
     """GTK+ based dialog for displaying repository logs
     """
     def get_title(self):
@@ -252,7 +250,7 @@ class GLog(GDialog):
         return l or 500
 
     def save_settings(self):
-        settings = GDialog.save_settings(self)
+        settings = gdialog.GDialog.save_settings(self)
         settings['glog-vpane'] = self._vpaned.get_position()
         settings['glog-hpane'] = self._hpaned.get_position()
         for col in ('rev', 'date', 'id', 'branch'):
@@ -279,7 +277,7 @@ class GLog(GDialog):
         self.changeview.display(False)
         self.changeview.glog_parent = self
 
-        GDialog.load_settings(self, settings)
+        gdialog.GDialog.load_settings(self, settings)
         self._setting_vpos = -1
         self._setting_hpos = -1
         self.showcol = {}
@@ -328,7 +326,7 @@ class GLog(GDialog):
         elif self._filter == "tagged":
             tagged = []
             for t, r in self.repo.tagslist():
-                hr = hex(r)
+                hr = self.repo[r].rev()
                 if hr not in tagged:
                     tagged.insert(0, hr)
             self.opts['revs'] = tagged
@@ -478,7 +476,7 @@ class GLog(GDialog):
 
     def _strip_rev(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        res = Confirm(_('Confirm Strip Revision(s)'), [], self,
+        res = gdialog.Confirm(_('Confirm Strip Revision(s)'), [], self,
                 _('Remove revision %d and all descendants?') % rev).run()
         if res != gtk.RESPONSE_YES:
             return
@@ -503,7 +501,7 @@ class GLog(GDialog):
 
     def _revert(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        res = Confirm(_('Confirm Revert Revision(s)'), [], self,
+        res = gdialog.Confirm(_('Confirm Revert Revision(s)'), [], self,
                 _('Revert all files to revision %d?\nThis will overwrite your '
                   'local changes') % rev).run()
 
@@ -603,10 +601,10 @@ class GLog(GDialog):
 
     def _copy_hash(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        node = self.repo[rev].node()
+        node = str(self.repo[rev])
         sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
         clipboard = gtk.Clipboard(selection=sel)
-        clipboard.set_text(hex(node))
+        clipboard.set_text(node)
 
     def _export_patch(self, menuitem):
         rev = self.currow[treemodel.REVID]
@@ -618,7 +616,7 @@ class GLog(GDialog):
 
         if result:
             if os.path.exists(result):
-                res = Confirm(_('Confirm Overwrite'), [], self,
+                res = gdialog.Confirm(_('Confirm Overwrite'), [], self,
                    _('The file "%s" already exists!\n\n'
                      'Do you want to overwrite it?') % result).run()
                 if res != gtk.RESPONSE_YES:
