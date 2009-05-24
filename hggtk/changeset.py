@@ -10,7 +10,7 @@ import gobject
 import pango
 import Queue
 
-from mercurial import cmdutil, context, util, ui, hg, patch
+from mercurial import cmdutil, context, util, ui, hg, patch, mdiff
 
 from thgutil.i18n import _
 from thgutil.hglib import *
@@ -185,12 +185,14 @@ class ChangeSet(gdialog.GDialog):
         n1, n2 = self.curnodes
 
         lines = []
-        matcher = cmdutil.match(self.repo, [file], {'git': True})
-        for s in patch.diff(self.repo, n1, n2, match=matcher):
+        matcher = cmdutil.match(self.repo, [file])
+        diffopts = mdiff.diffopts(git=True, nodates=True, nobinary=True)
+        for s in patch.diff(self.repo, n1, n2, match=matcher, opts=diffopts):
                 lines.extend(s.splitlines())
 
         eob = buf.get_end_iter()
         offset = eob.get_offset()
+        pos = buf.get_iter_at_offset(offset)
         fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, file)
         for l in lines:
             buf.insert(eob, l)
