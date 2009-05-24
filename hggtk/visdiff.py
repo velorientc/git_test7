@@ -78,8 +78,8 @@ class FileSelectionDialog(gtk.Dialog):
 
         hbox = gtk.HBox()
         self.vbox.pack_start(hbox, False, False, 2)
-        settings = settings.Settings('visdiff')
-        single = settings.get_value('launchsingle', False)
+        vsettings = settings.Settings('visdiff')
+        single = vsettings.get_value('launchsingle', False)
         check = gtk.CheckButton(_('Always launch single files'))
         check.set_active(single)
         hbox.pack_start(check, True, True, 2)
@@ -203,9 +203,9 @@ class FileSelectionDialog(gtk.Dialog):
             self.launch(*model[0])
 
     def delete_tmproot(self, _, tmproot):
-        settings = settings.Settings('visdiff')
-        settings.set_value('launchsingle', self.singlecheck.get_active())
-        settings.write()
+        vsettings = settings.Settings('visdiff')
+        vsettings.set_value('launchsingle', self.singlecheck.get_active())
+        vsettings.write()
         shutil.rmtree(tmproot)
 
     def rowactivated(self, tree, path, column):
