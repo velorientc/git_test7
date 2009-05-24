@@ -163,14 +163,17 @@ class TreeView(gtk.ScrolledWindow):
             return False
 
         try:
-            (rev, node, lines, parents) = self.grapher.next()
-            self.max_cols = max(self.max_cols, len(lines))
-            self.index[rev] = len(self.graphdata)
-            self.graphdata.append( (rev, node, lines, parents) )
-            if self.model:
-                rowref = self.model.get_iter(len(self.graphdata)-1)
-                path = self.model.get_path(rowref) 
-                self.model.row_inserted(path, rowref) 
+            for x in xrange(0, 50):
+                (rev, node, lines, parents) = self.grapher.next()
+                self.max_cols = max(self.max_cols, len(lines))
+                self.index[rev] = len(self.graphdata)
+                self.graphdata.append( (rev, node, lines, parents) )
+                if self.model:
+                    rowref = self.model.get_iter(len(self.graphdata)-1)
+                    path = self.model.get_path(rowref) 
+                    self.model.row_inserted(path, rowref) 
+                if self.limit and len(self.graphdata) < self.limit:
+                    break
         except StopIteration:
             stopped = True
 
