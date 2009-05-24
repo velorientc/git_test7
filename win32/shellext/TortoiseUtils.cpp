@@ -120,6 +120,7 @@ int GetRegistryConfig(const std::string& name, std::string& res)
 bool LaunchCommand(const std::string& command, const std::string& cwd)
 {
    TDEBUG_TRACE("LaunchCommand: " << command);
+   TDEBUG_TRACE("LaunchCommand: in " << cwd);
    PROCESS_INFORMATION processInfo;
    memset(&processInfo, 0, sizeof(processInfo));
 
