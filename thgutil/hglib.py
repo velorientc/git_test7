@@ -81,6 +81,8 @@ def fromutf(s):
 _tabwidth = None
 def gettabwidth(ui):
     global _tabwidth
+    if _tabwidth is not None:
+        return _tabwidth
     tabwidth = ui.config('tortoisehg', 'tabwidth')
     try:
         tabwidth = int(tabwidth)
