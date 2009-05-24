@@ -93,6 +93,21 @@ def gettabwidth(ui):
     _tabwidth = tabwidth
     return tabwidth
 
+_maxdiff = None
+def getmaxdiffsize(ui):
+    global _maxdiff
+    if _maxdiff is not None:
+        return _maxdiff
+    maxdiff = ui.config('tortoisehg', 'maxdiff')
+    try:
+        maxdiff = int(maxdiff)
+        if maxdiff < 1:
+            maxdiff = sys.maxint
+    except (ValueError, TypeError):
+        maxdiff = 1024 # 1MB by default
+    _maxdiff = maxdiff * 1024
+    return _maxdiff
+
 def diffexpand(line):
     'Expand tabs in a line of diff/patch text'
     if _tabwidth is None:
