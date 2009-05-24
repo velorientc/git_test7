@@ -184,11 +184,18 @@ class ChangeSet(gdialog.GDialog):
         buf, rev = self._buffer, self.currev
         n1, n2 = self.curnodes
 
-        lines = []
-        matcher = cmdutil.match(self.repo, [file])
-        diffopts = mdiff.diffopts(git=True, nodates=True, nobinary=True)
-        for s in patch.diff(self.repo, n1, n2, match=matcher, opts=diffopts):
-                lines.extend(s.splitlines())
+        fctx = self.repo[rev].filectx(file)
+        if not fctx:
+            return
+        if fctx.size() > getmaxdiffsize(self.ui):
+            lines = ['diff',
+                     _(' %s is larger than the specified max diff size') % file]
+        else:
+            lines = []
+            matcher = cmdutil.match(self.repo, [file])
+            opts = mdiff.diffopts(git=True, nodates=True)
+            for s in patch.diff(self.repo, n1, n2, match=matcher, opts=opts):
+                    lines.extend(s.splitlines())
 
         eob = buf.get_end_iter()
         offset = eob.get_offset()
