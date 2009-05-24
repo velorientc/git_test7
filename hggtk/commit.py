@@ -138,6 +138,7 @@ class GCommit(GStatus):
 
 
     def load_settings(self, settings):
+        self.connect('delete-event', self._delete)
         GStatus.load_settings(self, settings)
         self._setting_vpos = -1
         try:
@@ -275,6 +276,12 @@ class GCommit(GStatus):
                )
 
 
+    def _delete(self, window, event):
+        if not self.should_live():
+            self.destroy()
+        else:
+            return True
+
     def should_live(self, widget=None, event=None):
         # If there are more than a few character typed into the commit
         # message, ask if the exit should continue.
@@ -287,6 +294,7 @@ class GCommit(GStatus):
             if res == gtk.RESPONSE_YES:
                 begin, end = buf.get_bounds()
                 self._update_recent_messages(buf.get_text(begin, end))
+                buf.set_modified(False)
             elif res != gtk.RESPONSE_NO:
                 live = True
         if not live:
