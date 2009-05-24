@@ -46,10 +46,10 @@ _tortoise_info = (
         _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHG windows.'
         ' Default: Not expanded')),
-    (_('Max Diff Size'), 'tortoisehg.maxdiff', ['1024'],
+    (_('Max Diff Size'), 'tortoisehg.maxdiff', ['1024', '0'],
         _('The maximum size file (in KB) that TortoiseHg will '
         'show changes for in the changelog, status, and commit windows.'
-        ' Default: 1024 (1MB)')),
+        ' A value of zero implies no limit.  Default: 1024 (1MB)')),
     (_('Bottom Diffs'), 'gtools.diffbottom', ['False', 'True'],
         _('Show the diff panel below the file list in status, shelve, and'
         ' commit dialogs.'
