@@ -408,7 +408,7 @@ class GCommit(GStatus):
                 return
         self.reload_status()
         shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
-        shlib.shell_notify(self._relevant_files('MAR'))
+        shlib.shell_notify([self.cwd] + self._relevant_files('MAR'))
 
     def _commit_selected(self, files):
         # 1a. get list of chunks not rejected
