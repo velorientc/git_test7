@@ -112,7 +112,7 @@ class GLog(gdialog.GDialog):
         '''Launch a modeless filter dialog'''
         def do_reload(opts):
             self.custombutton.set_active(True)
-            self.reload_log(opts)
+            self.reload_log(**opts)
 
         def close_filter_dialog(dialog, response_id):
             dialog.hide()
@@ -224,7 +224,7 @@ class GLog(gdialog.GDialog):
 
         if 'filehist' in self.opts:
             self.custombutton.set_active(True)
-            self.reload_log({'pats' : [self.opts['filehist']]})
+            self.reload_log(pats = [self.opts['filehist']])
         elif 'revrange' in self.opts:
             self.custombutton.set_active(True)
             self.graphview.refresh(True, None, self.opts)
@@ -233,7 +233,7 @@ class GLog(gdialog.GDialog):
             self.reload_log()
         elif self.pats:
             self.custombutton.set_active(True)
-            self.reload_log({'pats' : self.pats})
+            self.reload_log(pats = self.pats)
         else:
             self.reload_log()
 
@@ -290,7 +290,7 @@ class GLog(gdialog.GDialog):
         except KeyError:
             pass
 
-    def reload_log(self, filteropts={}):
+    def reload_log(self, **filteropts):
         """Send refresh event to treeview object"""
         os.chdir(self.repo.root)  # for paths relative to repo root
         self.nextbutton.set_sensitive(True)
