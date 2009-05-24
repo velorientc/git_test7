@@ -7,17 +7,21 @@
 '''update TortoiseHg status cache'''
 
 from mercurial import hg
-from thgutil import shlib
+from thgutil import paths, shlib
 import os
 
 def cachefilepath(repo):
     return repo.join("thgstatus")
 
 def run(_ui, *pats, **opts):
-    path = '.'
+    root = paths.find_root()
     if opts.get('repository'):
-        path = opts.get('repository')
-    repo = hg.repository(_ui, path)
+        root = opts.get('repository')
+    if root is None:
+        _ui.status("no repository\n")
+        return
+
+    repo = hg.repository(_ui, root)
 
     if opts.get('remove'):
         try:
@@ -37,7 +41,7 @@ def run(_ui, *pats, **opts):
         return
 
     wait = opts.get('delay') is not None
-    shlib.update_thgstatus(_ui, path, wait=wait)
+    shlib.update_thgstatus(_ui, root, wait=wait)
 
     if opts.get('notify'):
         shlib.shell_notify(opts.get('notify'))
