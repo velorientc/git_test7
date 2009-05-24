@@ -41,7 +41,7 @@ class GShelve(GStatus):
 
     def auto_check(self):
         if self.test_opt('check'):
-            for entry in self.filemodel :
+            for entry in self.filemodel:
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self._update_check_count()
@@ -205,7 +205,6 @@ class GShelve(GStatus):
 def run(_ui, *pats, **opts):
     cmdoptions = {
         'user':opts.get('user', ''), 'date':opts.get('date', ''),
-        'logfile':'', 'message':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
         'unknown':True, 'ignored':False,
         'exclude':[], 'include':[],
