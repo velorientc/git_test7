@@ -1038,7 +1038,7 @@ class GStatus(gdialog.GDialog):
         'Write selected diff hunks to a patch file'
         revrange = self.opts.get('rev')[0]
         filename = "%s.patch" % revrange.replace(':', '_to_')
-        fd = gdialog.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
+        fd = gtklib.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
                                          InitialDir=self.repo.root,
                                          FileName=filename)
         result = fd.run()

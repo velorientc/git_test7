@@ -566,7 +566,7 @@ class GLog(GDialog):
 
         filename = "%s_rev%d_to_rev%s.hg" % (os.path.basename(self.repo.root),
                    revs[0], revs[1])
-        result = NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
+        result = gtklib.NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
                                          InitialDir=self.repo.root,
                                          FileName=filename).run()
         if result:
@@ -611,7 +611,7 @@ class GLog(GDialog):
     def _export_patch(self, menuitem):
         rev = self.currow[treemodel.REVID]
         filename = "%s_rev%s.patch" % (os.path.basename(self.repo.root), rev)
-        fd = NativeSaveFileDialogWrapper(Title=_('Save patch to'),
+        fd = gtklib.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
                                          InitialDir=self.repo.root,
                                          FileName=filename)
         result = fd.run()
@@ -642,7 +642,7 @@ class GLog(GDialog):
         except (ValueError, hglib.LookupError):
             return
         filename = "%s_rev%d_to_tip.hg" % (os.path.basename(self.repo.root), rev)
-        result = NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
+        result = gtklib.NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
                                          InitialDir=self.repo.root,
                                          FileName=filename).run()
         if result:
