@@ -200,7 +200,7 @@ class ChangeSet(gdialog.GDialog):
         eob = buf.get_end_iter()
         offset = eob.get_offset()
         pos = buf.get_iter_at_offset(offset)
-        fileoffs, tags, lines, statmax = self.prepare_diff(lines, offset, file)
+        tags, lines = self.prepare_diff(lines, offset, file)
         for l in lines:
             buf.insert(eob, l)
 
@@ -211,54 +211,38 @@ class ChangeSet(gdialog.GDialog):
             txt = buf.get_text(i0, i1)
             buf.apply_tag_by_name(name, i0, i1)
 
-        # inserts the marks
-        for mark, offset, stats in fileoffs:
-            pos = buf.get_iter_at_offset(offset)
-            mark = 'mark_%d' % offset
-            buf.create_mark(mark, pos)
         sob, eob = buf.get_bounds()
         buf.apply_tag_by_name("mono", pos, eob)
         return True
 
     def prepare_diff(self, difflines, offset, fname):
         '''Borrowed from hgview; parses changeset diffs'''
-        DIFFHDR = "=== %s ===\n"
-        idx = 0
-        outlines = []
-        tags = []
-        filespos = []
         def addtag( name, offset, length ):
             if tags and tags[-1][0] == name and tags[-1][2]==offset:
                 tags[-1][2] += length
             else:
                 tags.append( [name, offset, offset+length] )
-        stats = [0,0]
-        statmax = 0
-        for i,l1 in enumerate(difflines):
+
+        add, rem = 0, 0
+        for l in difflines[3:]:
+            if l.startswith('+'):
+                add += 1
+            elif l.startswith('-'):
+                rem += 1
+        outlines = []
+        tags = []
+        txt = toutf("=== (+%d,-%d) %s ===\n" % (add, rem, fname))
+        addtag( "greybg", offset, len(txt) )
+        outlines.append(txt)
+        offset += len(txt.decode('utf-8'))
+        for l1 in difflines[3:]:
             l = toutf(l1)
-            if l.startswith("diff"):
-                txt = toutf(DIFFHDR % fname)
-                addtag( "greybg", offset, len(txt) )
-                outlines.append(txt)
-                markname = "file%d" % idx
-                idx += 1
-                statmax = max( statmax, stats[0]+stats[1] )
-                stats = [0,0]
-                filespos.append(( markname, offset, stats ))
-                offset += len(txt.decode('utf-8'))
-                continue
-            elif l.startswith("+++"):
-                continue
-            elif l.startswith("---"):
-                continue
-            elif l.startswith("@@"):
+            if l.startswith("@@"):
                 tag = "blue"
             elif l.startswith("+"):
                 tag = "green"
-                stats[0] += 1
                 l = diffexpand(l)
             elif l.startswith("-"):
-                stats[1] += 1
                 tag = "red"
                 l = diffexpand(l)
             else:
@@ -269,8 +253,7 @@ class ChangeSet(gdialog.GDialog):
             addtag( tag, offset, length )
             outlines.append( l )
             offset += length
-        statmax = max( statmax, stats[0]+stats[1] )
-        return filespos, tags, outlines, statmax
+        return tags, outlines
 
     def link_event(self, tag, widget, event, liter):
         if event.type != gtk.gdk.BUTTON_RELEASE:
