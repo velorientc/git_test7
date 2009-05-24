@@ -953,7 +953,8 @@ class GStatus(gdialog.GDialog):
                 if len(files) != 0:
                     wfiles = [self.repo.wjoin(x) for x in files]
                     matcher = cmdutil.match(self.repo, wfiles, self.opts)
-                    diffopts = mdiff.diffopts(git=True, nodates=True)
+                    diffopts = mdiff.diffopts(git=True, nodates=True,
+                            nobinary=True)
                     for s in patch.diff(self.repo, self._node1, self._node2,
                             match=matcher, opts=diffopts):
                         difftext.writelines(s.splitlines(True))
