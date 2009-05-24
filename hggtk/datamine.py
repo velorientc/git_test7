@@ -42,10 +42,12 @@ class DataMineDialog(gdialog.GDialog):
 
     def get_tbbuttons(self):
         self.stop_button = self.make_toolbutton(gtk.STOCK_STOP, _('Stop'),
-                self._stop_current_search, tip=_('Stop operation on current tab'))
+                self._stop_current_search,
+                tip=_('Stop operation on current tab'))
         return [
             self.make_toolbutton(gtk.STOCK_FIND, _('New Search'),
-                self._search_clicked, tip=_('Open new search tab')),
+                self._search_clicked,
+                tip=_('Open new search tab')),
             self.stop_button
             ]
 
@@ -66,14 +68,12 @@ class DataMineDialog(gdialog.GDialog):
 
     def save_settings(self):
         settings = gdialog.GDialog.save_settings(self)
-        settings['datamine'] = ()
         return settings
 
     def load_settings(self, settings):
         gdialog.GDialog.load_settings(self, settings)
         self.connect('thg-close', self._close_current_page)
         self.tabwidth = gettabwidth(self.ui)
-        # settings['datamine']
 
     def get_body(self):
         """ Initialize the Dialog. """
@@ -118,11 +118,12 @@ class DataMineDialog(gdialog.GDialog):
         _menu.show_all()
         return _menu
 
-    def annotate_context_menu(self, opts):
+    def annotate_context_menu(self, objs):
         _menu = gtk.Menu()
+        _menu.append(create_menu(_('_zoom to change'), self._cmenu_zoom, objs))
         _menu.append(create_menu(_('di_splay change'), self._cmenu_display))
         _menu.append(create_menu(_('_annotate parent'),
-            self._annotate_parent, opts))
+            self._annotate_parent, objs))
         _menu.show_all()
         return _menu
 
@@ -131,6 +132,11 @@ class DataMineDialog(gdialog.GDialog):
             return
         parent = self.repo[self.currev].parents()[0].rev()
         self.trigger_annotate(parent, objs)
+
+    def _cmenu_zoom(self, menuitem, objs):
+        (frame, model, path, graphview) = objs
+        graphview.scroll_to_revision(int(self.currev))
+        graphview.set_revision_id(int(self.currev))
 
     def _cmenu_display(self, menuitem):
         statopts = {'rev' : [self.currev] }
@@ -546,7 +552,7 @@ class DataMineDialog(gdialog.GDialog):
         graphview.connect('revision-selected', self.log_selection_changed,
                 path, followlabel, follow)
 
-        objs = (frame, treeview.get_model(), path)
+        objs = (frame, treeview.get_model(), path, graphview)
         graphview.treeview.connect('row-activated', self.log_activate, objs)
         graphview.treeview.connect('button-release-event',
                 self._ann_button_release, objs)
@@ -618,7 +624,7 @@ class DataMineDialog(gdialog.GDialog):
         background thread to perform the annotation.  Disable the select
         button until this operation is complete.
         '''
-        (frame, model, path) = objs
+        (frame, model, path, graphview) = objs
         q = Queue.Queue()
         args = [self.repo.root, q, 'annotate', '--follow', '--number',
                 '--rev', str(rev), path]
