@@ -21,7 +21,7 @@ import gobject
 import mercurial.ui as _ui
 from mercurial import hg, util, fancyopts, cmdutil, extensions
 
-from thgutil.i18n import _
+from thgutil.i18n import agettext as _
 from thgutil import hglib, paths, shlib
 from thgutil import version as thgversion
 
