@@ -186,20 +186,9 @@ def runcommand(ui, args):
             extsetup()
         _loaded[name] = 1
 
-    if cmd not in nonrepo_commands.split():
-        try:
-            repo = hg.repository(ui, path=path)
-        except hglib.RepoError, inst:
-            # try to guess the repo from first of file args
-            root = None
-            if args:
-                path = paths.find_root(args[0])
-            if path:
-                repo = hg.repository(ui, path=path)
-            else:
-                raise hglib.RepoError(_("There is no Mercurial repository here"
-                        " (.hg not found)"))
-        cmdoptions['root'] = os.path.abspath(path)
+    if cmd not in nonrepo_commands.split() and not path:
+        raise hglib.RepoError(_("There is no Mercurial repository here"
+                    " (.hg not found)"))
 
     try:
         return func(ui, *args, **cmdoptions)
