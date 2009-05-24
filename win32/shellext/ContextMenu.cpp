@@ -67,6 +67,9 @@ MenuDescription menuDescList[] = {
     {"about",       "About...",
                     "Show About Dialog",
                     "menuabout.ico", 0},
+    {"datamine",    "Annotate Files",
+                    "Show changeset information per file line",
+                    "menublame.ico", 0},
 
     /* Add new items here */
 
@@ -78,7 +81,7 @@ MenuDescription menuDescList[] = {
 enum menuDescListEntries {
     Commit, Init, Clone, Status, Shelve, Add, Revert, Remove, Rename,
     Log, Synch, Serve, Update, Recover, Thgstatus, Userconf, Repoconf,
-    About,
+    About, Datamine,
     /* Add new items here */
     Separator, EndOfList
 };
@@ -93,7 +96,8 @@ menuDescListEntries RepoNoFilesMenu[] = {
 };
 
 menuDescListEntries RepoFilesMenu[] = {
-    Commit, Status, Log, Add, Revert, Rename, Remove, Separator,
+    Commit, Status, Add, Revert, Rename, Remove, Separator,
+    Log, Datamine, Separator,
     About, EndOfList
 };
 
