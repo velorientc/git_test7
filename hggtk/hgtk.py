@@ -25,7 +25,8 @@ from thgutil.i18n import agettext as _
 from thgutil import hglib, paths, shlib
 from thgutil import version as thgversion
 
-nonrepo_commands = 'userconfig clone debugcomplete init about help version'
+nonrepo_commands = '''userconfig clone debugcomplete init about help
+version thgstatus'''
 
 # Add TortoiseHg signals, hooked to key accelerators in gtklib
 for sig in ('copy-clipboard', 'thg-diff', 'thg-parent'):
@@ -624,7 +625,8 @@ table = {
          ('n', 'notify', [], _('notify the shell for path(s) given')),
          ('',  'remove', None, _('remove the status cache')),
          ('s', 'show', None, _('show the contents of the'
-                               ' status cache (no update)'))],
+                               ' status cache (no update)')),
+         ('',  'all', None, _('udpate all repos in current dir')) ],
         _('hgtk thgstatus [OPTION]')),
     "^update|checkout|co": (update,
         [('r', 'rev', '', _('revision to update'))],

@@ -14,6 +14,20 @@ def cachefilepath(repo):
     return repo.join("thgstatus")
 
 def run(_ui, *pats, **opts):
+
+    if opts.get('all'):
+        roots = []
+        base = os.getcwd()
+        for f in os.listdir(base):
+            r = paths.find_root(os.path.join(base, f))
+            if r is not None:
+                roots.append(r)
+        for r in roots:
+            _ui.note("%s\n" % r) 
+            shlib.update_thgstatus(_ui, r, wait=False)
+            shlib.shell_notify([r])
+        return
+
     root = paths.find_root()
     if opts.get('repository'):
         root = opts.get('repository')
