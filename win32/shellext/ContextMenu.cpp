@@ -102,7 +102,7 @@ menuDescListEntries RepoFilesMenu[] = {
 };
 
 menuDescListEntries NoRepoMenu[] = {
-    Clone, Init, Userconf, Separator,
+    Clone, Init, Userconf, Thgstatus, Separator,
     About, EndOfList
 };
 
@@ -479,9 +479,15 @@ void CShellExt::DoHgtk(const std::string &cmd)
     if (cmd == "thgstatus")
     {
         std::string hgroot = GetHgRepoRoot(cwd);
-        if (!hgroot.empty())
+        if (hgroot.empty())
+        {
+            hgcmd += " --all";
+        }
+        else
+        {
             Dirstatecache::invalidate(hgroot);
-        hgcmd += " --notify .";
+            hgcmd += " --notify .";
+        }
     }
 
     LaunchCommand(hgcmd, cwd);
