@@ -8,7 +8,7 @@ of the GNU General Public License, incorporated herein by reference.
 
 import gettext, sys
 from gettext import gettext as _
-import paths, hglib
+from thgutil import paths, hglib
 
 gettext.bindtextdomain("tortoisehg", paths.get_locale_path())
 gettext.textdomain("tortoisehg")
