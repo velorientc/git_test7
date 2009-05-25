@@ -965,6 +965,8 @@ class GStatus(gdialog.GDialog):
 
         self.filerowstart[wfile] = len(self.diffmodel)
         self.filechunks[wfile] = chunks
+        if not chunks:
+            return
 
         # Set row status based on chunk state
         rej, nonrej = False, False
