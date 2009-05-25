@@ -46,12 +46,12 @@ class DetectRenameDialog(gtk.Window):
         self.notify_func = None
         path = toutf(os.path.basename(self.root))
         self.set_title(_('Detect Copies/Renames in ') + path)
-        settings = settings.Settings('guess')
-        dims = settings.get_value('dims', (800, 600))
+        self._settings = settings.Settings('guess')
+        dims = self._settings.get_value('dims', (800, 600))
         self.set_default_size(dims[0], dims[1])
 
         adjustment = gtk.Adjustment(50, 0, 100, 1)
-        value = settings.get_value('percent', None)
+        value = self._settings.get_value('percent', None)
         if value: adjustment.set_value(value)
         hscale = gtk.HScale(adjustment)
         frame = gtk.Frame(_('Minimum Simularity Percentage'))
@@ -134,7 +134,7 @@ class DetectRenameDialog(gtk.Window):
         hpaned = gtk.HPaned()
         hpaned.pack1(unknownframe, True, True)
         hpaned.pack2(candidateframe, True, True)
-        pos = settings.get_value('hpaned', None)
+        pos = self._settings.get_value('hpaned', None)
         if pos: hpaned.set_position(pos)
 
         topvbox.pack_start(hpaned, True, True, 2)
@@ -160,7 +160,7 @@ class DetectRenameDialog(gtk.Window):
         vpaned = gtk.VPaned()
         vpaned.pack1(topvbox, True, False)
         vpaned.pack2(diffframe)
-        pos = settings.get_value('vpaned', None)
+        pos = self._settings.get_value('vpaned', None)
         if pos: vpaned.set_position(pos)
 
         vbox = gtk.VBox()
@@ -215,12 +215,12 @@ class DetectRenameDialog(gtk.Window):
         return thread.isAlive()
 
     def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
-        settings.set_value('vpaned', vpaned.get_position())
-        settings.set_value('hpaned', hpaned.get_position())
-        settings.set_value('percent', adjustment.get_value())
+        self._settings.set_value('vpaned', vpaned.get_position())
+        self._settings.set_value('hpaned', hpaned.get_position())
+        self._settings.set_value('percent', adjustment.get_value())
         rect = self.get_allocation()
-        settings.set_value('dims', (rect.width, rect.height))
-        settings.write()
+        self._settings.set_value('dims', (rect.width, rect.height))
+        self._settings.write()
 
     def find_renames(self, widget, unktree, ctree, adj, stbar):
         'User pressed "find renames" button'
