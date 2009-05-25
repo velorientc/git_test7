@@ -91,7 +91,7 @@ class GCommit(GStatus):
         self.mode = 'commit'
         self.nextbranch = None
         self.closebranch = False
-        self._last_commit_id = None
+        self.last_commit_id = None
         self.qnew = False
         self.notify_func = None
 
@@ -127,18 +127,18 @@ class GCommit(GStatus):
             for entry in self.filemodel :
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
-            self._update_check_count()
+            self.update_check_count()
         self.opts['check'] = False
 
 
     def save_settings(self):
         settings = GStatus.save_settings(self)
-        settings['commit-vpane'] = self._vpaned.get_position()
+        settings['commit-vpane'] = self.vpaned.get_position()
         return settings
 
 
     def load_settings(self, settings):
-        self.connect('delete-event', self._delete)
+        self.connect('delete-event', self.delete)
         GStatus.load_settings(self, settings)
         self._setting_vpos = -1
         try:
@@ -150,12 +150,12 @@ class GCommit(GStatus):
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
         tbbuttons.insert(2, gtk.SeparatorToolItem())
-        self._undo_button = self.make_toolbutton(gtk.STOCK_UNDO, _('_Undo'),
-            self._undo_clicked, tip=_('undo recent commit'))
-        self._commit_button = self.make_toolbutton(gtk.STOCK_OK, _('_Commit'),
-            self._commit_clicked, tip=_('commit'))
-        tbbuttons.insert(2, self._undo_button)
-        tbbuttons.insert(2, self._commit_button)
+        self.undo_button = self.make_toolbutton(gtk.STOCK_UNDO, _('_Undo'),
+            self.undo_clicked, tip=_('undo recent commit'))
+        self.commit_button = self.make_toolbutton(gtk.STOCK_OK, _('_Commit'),
+            self.commit_clicked, tip=_('commit'))
+        tbbuttons.insert(2, self.undo_button)
+        tbbuttons.insert(2, self.commit_button)
         return tbbuttons
 
 
@@ -173,12 +173,12 @@ class GCommit(GStatus):
             buf.set_text(model[index][1])
             buf.set_modified(False)
 
-    def _first_msg_popdown(self, combo, shown):
+    def first_msg_popdown(self, combo, shown):
         combo.disconnect(self.popupid)
         self.popupid = None
-        self._update_recent_messages()
+        self.update_recent_messages()
 
-    def _update_recent_messages(self, msg=None):
+    def update_recent_messages(self, msg=None):
         if msg is not None:
             self._mru_messages.add(msg)
             self.settings.write()
@@ -216,7 +216,7 @@ class GCommit(GStatus):
             mbox.pack_start(label, False, False, 2)
             self.qnew_name = gtk.Entry()
             self.qnew_name.set_width_chars(20)
-            self.qnew_name.connect('changed', self._qnew_changed)
+            self.qnew_name.connect('changed', self.qnew_changed)
             mbox.pack_start(self.qnew_name, False, False, 2)
         else:
             self.qnew_name = None
@@ -229,7 +229,7 @@ class GCommit(GStatus):
         liststore.append([_('Recent Commit Messages...'), ''])
         self.msg_cbbox.set_active(0)
         self.popupid = self.msg_cbbox.connect('notify::popup-shown',
-                                              self._first_msg_popdown)
+                                              self.first_msg_popdown)
         self.msg_cbbox.connect('changed', self.changed_cb)
         mbox.pack_start(self.msg_cbbox)
         vbox.pack_start(mbox, False, False)
@@ -243,21 +243,21 @@ class GCommit(GStatus):
         vbox.pack_start(frame)
 
         self.text = gtk.TextView()
-        self.text.connect('populate-popup', self._msg_add_to_popup)
+        self.text.connect('populate-popup', self.msg_add_to_popup)
         self.text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.text)
 
-        self._vpaned = gtk.VPaned()
-        self._vpaned.add1(vbox)
-        self._vpaned.add2(status_body)
+        self.vpaned = gtk.VPaned()
+        self.vpaned.add1(vbox)
+        self.vpaned.add2(status_body)
         gobject.idle_add(self.realize_settings)
-        return self._vpaned
+        return self.vpaned
 
     def realize_settings(self):
-        self._vpaned.set_position(self._setting_vpos)
+        self.vpaned.set_position(self._setting_vpos)
 
     def thgaccept(self, window):
-        self._commit_clicked(None)
+        self.commit_clicked(None)
 
     def get_menu_info(self):
         """Returns menu info in this order: merge, addrem, unknown,
@@ -265,18 +265,18 @@ class GCommit(GStatus):
         """
         merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
                 = GStatus.get_menu_info(self)
-        return (merge + ((_('_commit'), self._commit_file),),
-                addrem + ((_('_commit'), self._commit_file),),
-                unknown + ((_('_commit'), self._commit_file),),
+        return (merge + ((_('_commit'), self.commit_file),),
+                addrem + ((_('_commit'), self.commit_file),),
+                unknown + ((_('_commit'), self.commit_file),),
                 clean,
                 ignored,
-                deleted + ((_('_commit'), self._commit_file),),
+                deleted + ((_('_commit'), self.commit_file),),
                 unresolved,
                 resolved,
                )
 
 
-    def _delete(self, window, event):
+    def delete(self, window, event):
         if not self.should_live():
             self.destroy()
         else:
@@ -293,7 +293,7 @@ class GCommit(GStatus):
             res = dialog.run()
             if res == gtk.RESPONSE_YES:
                 begin, end = buf.get_bounds()
-                self._update_recent_messages(buf.get_text(begin, end))
+                self.update_recent_messages(buf.get_text(begin, end))
                 buf.set_modified(False)
             elif res != gtk.RESPONSE_NO:
                 live = True
@@ -303,11 +303,11 @@ class GCommit(GStatus):
 
 
     def reload_status(self):
-        if not self._ready: return False
+        if not self.ready: return False
         success = GStatus.reload_status(self)
-        self._check_merge()
-        self._check_patch_queue()
-        self._check_undo()
+        self.check_merge()
+        self.check_patch_queue()
+        self.check_undo()
         self.refresh_branchop()
         return success
 
@@ -323,13 +323,13 @@ class GCommit(GStatus):
             text = _('branch: ') + self.repo[None].branch()
         self.branchbutton.set_label(text)
 
-    def _check_undo(self):
+    def check_undo(self):
         can_undo = os.path.exists(self.repo.sjoin("undo")) and \
-                self._last_commit_id is not None
-        self._undo_button.set_sensitive(can_undo)
+                self.last_commit_id is not None
+        self.undo_button.set_sensitive(can_undo)
 
 
-    def _check_merge(self):
+    def check_merge(self):
         self.get_toolbutton(_('Re_vert')).set_sensitive(not self.merging)
         self.get_toolbutton(_('_Add')).set_sensitive(not self.merging)
         self.get_toolbutton(_('_Remove')).set_sensitive(not self.merging)
@@ -340,7 +340,7 @@ class GCommit(GStatus):
             for entry in self.filemodel:
                 if entry[FM_STATUS] in 'MARD':
                     entry[FM_CHECKED] = True
-            self._update_check_count()
+            self.update_check_count()
 
             # pre-fill commit message
             buf = self.text.get_buffer()
@@ -348,7 +348,7 @@ class GCommit(GStatus):
             buf.set_modified(False)
 
 
-    def _check_patch_queue(self):
+    def check_patch_queue(self):
         '''See if an MQ patch is applied, switch to qrefresh mode'''
         self.qheader = None
         if self.mqmode:
@@ -384,38 +384,36 @@ class GCommit(GStatus):
             c_btn.set_tooltip(self.tooltips, _('commit'))
         self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
 
-    def _commit_clicked(self, toolbutton, data=None):
-        if not self._ready_message():
+    def commit_clicked(self, toolbutton, data=None):
+        if not self.ready_message():
             return
 
         if self.merging:
             # merges must be committed without specifying file list.
-            self._hg_commit([])
+            self.hg_commit([])
         else:
             commitable = 'MAR'
-            addremove_list = self._relevant_files('?!')
-            if len(addremove_list) and self._should_addremove(addremove_list):
+            addremove_list = self.relevant_files('?!')
+            if len(addremove_list) and self.should_addremove(addremove_list):
                 commitable += '?!'
 
-            commit_list = self._relevant_files(commitable)
+            commit_list = self.relevant_files(commitable)
             if len(commit_list) > 0:
-                self._commit_selected(commit_list)
+                self.commit_selected(commit_list)
             elif len(self.filemodel) == 0 and self.qnew:
-                self._commit_selected([])
+                self.commit_selected([])
             else:
                 gdialog.Prompt(_('Nothing Commited'),
                        _('No committable files selected'), self).run()
                 return
         self.reload_status()
         shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
-        shlib.shell_notify([self.cwd] + self._relevant_files('MAR'))
+        files = [self.repo.wjoin(x) for x in self.relevant_files('MAR')]
+        shlib.shell_notify(files)
 
-    def _commit_selected(self, files):
+    def commit_selected(self, files):
         # 1a. get list of chunks not rejected
-        repo, chunks, ui = self.repo, self._shelve_chunks, self.ui
-        model = self.diff_model
-        files = [util.pconvert(f) for f in files]
-        hlist = [x[DM_CHUNK_ID] for x in model if not x[DM_REJECTED]]
+        repo, ui = self.repo, self.ui
 
         # 2. backup changed files, so we can restore them in the end
         backups = {}
@@ -424,28 +422,31 @@ class GCommit(GStatus):
             os.mkdir(backupdir)
         except OSError, err:
             if err.errno != errno.EEXIST:
-                gdialog.Prompt(_('Commit'), _('Unable to create ') + backupdir,
-                        self).run()
+                gdialog.Prompt(_('Commit'),
+                        _('Unable to create ') + backupdir, self).run()
                 return
         try:
             # backup continues
+            allchunks = []
             for f in files:
                 if f not in self.modified: continue
-                fh = self._filechunks.get(f)
-                if not fh or len(fh) < 2: continue
+                if f not in self.filechunks: continue
+                chunks = self.filechunks[f]
+                if len(chunks) < 2: continue
+
                 # unfiltered files do not go through backup-revert-patch cycle
-                rejected = [x for x in fh[1:] if model[x][DM_REJECTED]]
+                rejected = [c for c in chunks[1:] if not c.active]
                 if len(rejected) == 0: continue
+                allchunks.extend(chunks)
                 fd, tmpname = tempfile.mkstemp(prefix=f.replace('/', '_')+'.',
                                                dir=backupdir)
                 os.close(fd)
-                ui.debug(_('backup %r as %r\n') % (f, tmpname))
                 util.copyfile(repo.wjoin(f), tmpname)
                 backups[f] = tmpname
 
             fp = cStringIO.StringIO()
-            for n, c in enumerate(chunks):
-                if c.filename() in backups and n in hlist:
+            for n, c in enumerate(allchunks):
+                if c.filename() in backups and c.active:
                     c.write(fp)
             dopatch = fp.tell()
             fp.seek(0)
@@ -461,8 +462,6 @@ class GCommit(GStatus):
             # 3b. (apply)
             if dopatch:
                 try:
-                    ui.debug(_('applying patch\n'))
-                    ui.debug(fp.getvalue())
                     pfiles = {}
                     patch.internalpatch(fp, ui, 1, repo.root, files=pfiles)
                     patch.updatedir(ui, repo, pfiles)
@@ -477,14 +476,14 @@ class GCommit(GStatus):
             del fp
 
             # 4. We prepared working directory according to filtered patch.
-            #    Now is the time to delegate the job to commit/qrefresh or the like!
-
+            #    Now is the time to delegate the job to commit/qrefresh
+            #    or the like!
             # it is important to first chdir to repo root -- we'll call a
             # highlevel command with list of pathnames relative to repo root
             cwd = os.getcwd()
             os.chdir(repo.root)
             try:
-                self._hg_commit(files)
+                self.hg_commit(files)
             finally:
                 os.chdir(cwd)
 
@@ -493,7 +492,6 @@ class GCommit(GStatus):
             # 5. finally restore backed-up files
             try:
                 for realname, tmpname in backups.iteritems():
-                    ui.debug(_('restoring %r to %r\n') % (tmpname, realname))
                     util.copyfile(tmpname, repo.wjoin(realname))
                     os.unlink(tmpname)
                 os.rmdir(backupdir)
@@ -501,24 +499,24 @@ class GCommit(GStatus):
                 pass
 
 
-    def _commit_file(self, stat, file):
-        if self._ready_message():
-            if stat not in '?!' or self._should_addremove([file]):
-                self._hg_commit([file])
+    def commit_file(self, stat, file):
+        if self.ready_message():
+            if stat not in '?!' or self.should_addremove([file]):
+                self.hg_commit([file])
                 self.reload_status()
                 shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
-                shlib.shell_notify([file])
+                shlib.shell_notify([self.repo.wjoin(file)])
         return True
 
 
-    def _undo_clicked(self, toolbutton, data=None):
+    def undo_clicked(self, toolbutton, data=None):
         response = gdialog.Confirm(_('Confirm Undo commit'),
                 [], self, _('Undo last commit')).run()
         if response != gtk.RESPONSE_YES:
             return
 
-        tip = self._get_tip_rev(True)
-        if not tip == self._last_commit_id:
+        tip = self.get_tip_rev(True)
+        if not tip == self.last_commit_id:
             gdialog.Prompt(_('Undo commit'),
                     _('Unable to undo!\n\n'
                     'Tip revision differs from last commit.'),
@@ -527,14 +525,14 @@ class GCommit(GStatus):
 
         try:
             self.repo.rollback()
-            self._last_commit_id = None
+            self.last_commit_id = None
             self.reload_status()
         except:
             gdialog.Prompt(_('Undo commit'),
                     _('Errors during rollback!'), self).run()
 
 
-    def _should_addremove(self, files):
+    def should_addremove(self, files):
         if self.test_opt('addremove'):
             return True
         else:
@@ -548,7 +546,7 @@ class GCommit(GStatus):
         return False
 
 
-    def _ready_message(self):
+    def ready_message(self):
         buf = self.text.get_buffer()
         if buf.get_char_count() == 0:
             gdialog.Prompt(_('Nothing Commited'),
@@ -563,7 +561,7 @@ class GCommit(GStatus):
             gdialog.Prompt(_('Error'),
                    _('Message format configuration error'),
                    self).run()
-            self._msg_config(None)
+            self.msg_config(None)
             return
         
         lines = buf.get_text(buf.get_start_iter(),
@@ -603,7 +601,7 @@ class GCommit(GStatus):
         return True
 
 
-    def _hg_commit(self, files):
+    def hg_commit(self, files):
         if not self.repo.ui.config('ui', 'username'):
             gdialog.Prompt(_('Commit: Invalid username'),
                    _('Your username has not been configured.\n\n'
@@ -659,7 +657,7 @@ class GCommit(GStatus):
             cmdline.extend(['--date', self.opts['date']])
         cmdline += ['--message', hglib.fromutf(self.opts['message'])]
         if self.qnew:
-            cmdline += [hglib.fromutf(self._get_qnew_name())]
+            cmdline += [hglib.fromutf(self.get_qnew_name())]
         cmdline += [self.repo.wjoin(x) for x in files]
         dialog = hgcmd.CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
@@ -671,9 +669,10 @@ class GCommit(GStatus):
             self.closebranch = False
             self.nextbranch = None
             self.opts['check'] = True  # recheck MAR after commit
+            self.filechunks = {}       # do not keep chunks
             buf = self.text.get_buffer()
             if buf.get_modified():
-                self._update_recent_messages(self.opts['message'])
+                self.update_recent_messages(self.opts['message'])
                 buf.set_modified(False)
             if self.qnew:
                 self.qnew_name.set_text('')
@@ -682,31 +681,31 @@ class GCommit(GStatus):
                 self.qnew = False
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
-                self._last_commit_id = self._get_tip_rev(True)
+                self.last_commit_id = self.get_tip_rev(True)
             if self.notify_func:
                 self.notify_func(self.notify_args)
 
-    def _get_tip_rev(self, refresh=False):
+    def get_tip_rev(self, refresh=False):
         if refresh:
             self.repo.invalidate()
         return self.repo['tip'].node()
 
-    def _get_qnew_name(self):
+    def get_qnew_name(self):
         return self.qnew_name and self.qnew_name.get_text().strip() or ''
 
-    def _qnew_changed(self, element):
-        qnew = bool(self._get_qnew_name())
+    def qnew_changed(self, element):
+        qnew = bool(self.get_qnew_name())
         if self.qnew != qnew:
             self.qnew = qnew
             self.mode = qnew and 'status' or 'commit'
             self.reload_status()
             self.qnew_name.grab_focus() # set focus back
             
-    def _msg_add_to_popup(self, textview, menu):
+    def msg_add_to_popup(self, textview, menu):
         menu_items = (('----', None),
-                      (_('Paste _Filenames'), self._msg_paste_fnames),
-                      (_('App_ly Format'), self._msg_word_wrap),
-                      (_('C_onfigure Format'), self._msg_config))
+                      (_('Paste _Filenames'), self.msg_paste_fnames),
+                      (_('App_ly Format'), self.msg_word_wrap),
+                      (_('C_onfigure Format'), self.msg_config))
         for label, handler in menu_items:
             if label == '----':
                 menuitem = gtk.SeparatorMenuItem()
@@ -717,14 +716,14 @@ class GCommit(GStatus):
             menu.append(menuitem)
         menu.show_all()
         
-    def _msg_paste_fnames(self, sender):
+    def msg_paste_fnames(self, sender):
         buf = self.text.get_buffer()
         fnames = [ file[FM_PATH_UTF8] for file in self.filemodel
                    if file[FM_CHECKED] ]
         buf.delete_selection(True, True)
         buf.insert_at_cursor('\n'.join(fnames))    
 
-    def _msg_word_wrap(self, sender):
+    def msg_word_wrap(self, sender):
         try:
             sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
             maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
@@ -735,7 +734,7 @@ class GCommit(GStatus):
             gdialog.Prompt(_('Info required'),
                    _('Message format needs to be configured'),
                    self).run()
-            self._msg_config(None)
+            self.msg_config(None)
             return
 
         buf = self.text.get_buffer()
@@ -773,7 +772,7 @@ class GCommit(GStatus):
             lnum += 1
         buf.set_text('\n'.join(lines))                       
 
-    def _msg_config(self, sender):
+    def msg_config(self, sender):
         dlg = thgconfig.ConfigDialog(True)
         dlg.show_all()
         dlg.focus_field('tortoisehg.summarylen')
