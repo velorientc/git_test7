@@ -303,7 +303,7 @@ class DetectRenameDialog(gtk.Window):
                 # Mark missing rename source as removed
                 repo.remove([src])
             repo.copy(src, dest)
-            shlib.shell_notify([src, dest])
+            shlib.shell_notify([repo.wjoin(src), repo.wjoin(dest)])
             if self.notify_func:
                 self.notify_func()
             # Mark all rows with this target file as non-sensitive
