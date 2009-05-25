@@ -12,7 +12,7 @@ import gtk
 from thgutil.i18n import _
 from thgutil import hglib
 
-from hggtk.status import GStatus, FM_STATUS, FM_CHECKED, DM_CHUNK_ID, DM_REJECTED
+from hggtk.status import GStatus, FM_STATUS, FM_CHECKED
 from hggtk import hgshelve, gdialog, gtklib
 
 class GShelve(GStatus):
