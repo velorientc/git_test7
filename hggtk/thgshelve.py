@@ -9,6 +9,8 @@
 import os
 import gtk
 
+from mercurial import util
+
 from thgutil.i18n import _
 from thgutil import hglib
 
@@ -153,7 +155,7 @@ class GShelve(GStatus):
         def filter_patch(ui, chunks):
             accepted = []
             for chunk in chunks:
-                file = chunk.files()[0]
+                file = util.pconvert(chunk.files()[0])
                 if file not in wfiles:
                     # file was not selected for inclusion
                     continue
