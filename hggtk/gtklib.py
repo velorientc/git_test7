@@ -10,7 +10,7 @@ import gobject
 import pango
 
 from thgutil.i18n import _
-from thgutil import paths
+from thgutil import paths, hglib
 
 from hggtk import hgtk
 
@@ -198,7 +198,7 @@ class NativeSaveFileDialogWrapper:
             Flags=win32con.OFN_EXPLORER,
             File=self.FileName,
             DefExt='py',
-            Title=self.Title,
+            Title=hglib.fromutf(self.Title),
             Filter="",
             CustomFilter="",
             FilterIndex=1)
@@ -208,12 +208,10 @@ class NativeSaveFileDialogWrapper:
             return False
 
     def runCompatible(self):
-        file_save = gtk.FileChooserDialog(self.Title,None,
-                gtk.FILE_CHOOSER_ACTION_SAVE
-                , (gtk.STOCK_CANCEL
-                    , gtk.RESPONSE_CANCEL
-                    , gtk.STOCK_SAVE
-                    , gtk.RESPONSE_OK))
+        file_save = gtk.FileChooserDialog(self.Title, None,
+                gtk.FILE_CHOOSER_ACTION_SAVE,
+                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                 gtk.STOCK_SAVE, gtk.RESPONSE_OK))
         file_save.set_do_overwrite_confirmation(True)
         file_save.set_default_response(gtk.RESPONSE_OK)
         file_save.set_current_folder(self.InitialDir)
