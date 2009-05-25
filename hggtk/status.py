@@ -912,7 +912,10 @@ class GStatus(gdialog.GDialog):
         'Get diffs of working file, parse into (c)hunks'
         difftext = cStringIO.StringIO()
         ctx = self.repo[self._node1]
-        fctx = ctx.filectx(wfile)
+        try:
+            fctx = ctx.filectx(wfile)
+        except hglib.LookupError:
+            fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.ui):
             # Fake patch that displays size warning
             lines = ['diff --git -r a/%s b/%s\n' % (wfile, wfile)]
