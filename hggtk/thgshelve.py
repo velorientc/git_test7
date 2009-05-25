@@ -10,6 +10,7 @@ import os
 import gtk
 
 from thgutil.i18n import _
+from thgutil import hglib
 
 from hggtk.status import GStatus, FM_STATUS, FM_CHECKED, DM_CHUNK_ID, DM_REJECTED
 from hggtk import hgshelve, gdialog, gtklib
@@ -33,7 +34,7 @@ class GShelve(GStatus):
             self.opts['rev'] = ''
 
     def get_title(self):
-        root = os.path.basename(self.repo.root)
+        root = hglib.toutf(os.path.basename(self.repo.root))
         return ' '.join([root, 'shelve'])
 
     def get_icon(self):

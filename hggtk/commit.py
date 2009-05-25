@@ -107,7 +107,7 @@ class GCommit(GStatus):
             self.opts['rev'] = ''
 
     def get_title(self):
-        root = os.path.basename(self.repo.root)
+        root = hglib.toutf(os.path.basename(self.repo.root))
         user = self.opts.get('user')
         if user: user = 'as ' + user
         date = self.opts.get('date')

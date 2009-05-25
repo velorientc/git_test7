@@ -146,7 +146,7 @@ class GStatus(gdialog.GDialog):
 
 
     def get_title(self):
-        root = os.path.basename(self.repo.root)
+        root = hglib.toutf(os.path.basename(self.repo.root))
         revs = self.opts.get('rev')
         name = self.pats and _('filtered status') or _('status')
         r = revs and ':'.join(revs) or ''

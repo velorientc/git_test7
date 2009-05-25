@@ -33,7 +33,7 @@ class GLog(gdialog.GDialog):
     """GTK+ based dialog for displaying repository logs
     """
     def get_title(self):
-        return os.path.basename(self.repo.root) + ' log'
+        return hglib.toutf(os.path.basename(self.repo.root)) + ' log'
 
     def get_icon(self):
         return 'menulog.ico'
