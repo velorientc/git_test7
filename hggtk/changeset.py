@@ -551,7 +551,7 @@ class ChangeSet(gdialog.GDialog):
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-        shlib.shell_notify([self.curfile])
+        shlib.shell_notify([self.repo.wjoin(self.curfile)])
 
     def _add_to_popup(self, textview, menu):
         menu_items = (('----', None),
