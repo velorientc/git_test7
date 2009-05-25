@@ -388,11 +388,12 @@ class GCommit(GStatus):
         if not self.ready_message():
             return
 
+        commitable = 'MAR'
         if self.merging:
+            commit_list = self.relevant_files(commitable)
             # merges must be committed without specifying file list.
             self.hg_commit([])
         else:
-            commitable = 'MAR'
             addremove_list = self.relevant_files('?!')
             if len(addremove_list) and self.should_addremove(addremove_list):
                 commitable += '?!'
@@ -408,7 +409,7 @@ class GCommit(GStatus):
                 return
         self.reload_status()
         shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
-        files = [self.repo.wjoin(x) for x in self.relevant_files('MAR')]
+        files = [self.repo.wjoin(x) for x in commit_list]
         shlib.shell_notify(files)
 
     def commit_selected(self, files):
