@@ -19,7 +19,7 @@ from mercurial import merge as merge_
 from thgutil.i18n import _
 from thgutil import hglib, shlib, paths
 
-from hggtk import dialog, gdialog, hgshelve, gtklib, rename, hgignore
+from hggtk import dialog, gdialog, hgshelve, gtklib, guess, hgignore
 
 # file model row enumerations
 FM_CHECKED = 0
@@ -1225,7 +1225,7 @@ class GStatus(gdialog.GDialog):
         return True
 
     def _guess_rename(self, stat, wfile):
-        dlg = rename.DetectRenameDialog(self.repo.root)
+        dlg = guess.DetectRenameDialog()
         dlg.show_all()
         dlg.set_notify_func(self.ignoremask_updated)
 
