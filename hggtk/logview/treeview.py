@@ -172,7 +172,7 @@ class TreeView(gtk.ScrolledWindow):
                     rowref = self.model.get_iter(len(self.graphdata)-1)
                     path = self.model.get_path(rowref) 
                     self.model.row_inserted(path, rowref) 
-                if self.limit and len(self.graphdata) < self.limit:
+                if self.limit and len(self.graphdata) >= self.limit:
                     break
         except StopIteration:
             stopped = True
