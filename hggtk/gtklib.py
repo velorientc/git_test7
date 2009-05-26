@@ -193,19 +193,21 @@ class NativeSaveFileDialogWrapper:
 
     def runWindows(self):
         import win32gui, win32con
-        fname, customfilter, flags=win32gui.GetSaveFileNameW(
-            InitialDir=self.InitialDir,
-            Flags=win32con.OFN_EXPLORER,
-            File=self.FileName,
-            DefExt='py',
-            Title=hglib.fromutf(self.Title),
-            Filter="",
-            CustomFilter="",
-            FilterIndex=1)
-        if fname:
-            return fname
-        else:
-            return False
+        try:
+            fname, customfilter, flags=win32gui.GetSaveFileNameW(
+                InitialDir=self.InitialDir,
+                Flags=win32con.OFN_EXPLORER,
+                File=self.FileName,
+                DefExt='py',
+                Title=hglib.fromutf(self.Title),
+                Filter='',
+                CustomFilter='',
+                FilterIndex=1)
+            if fname:
+                return fname
+        except:
+            pass
+        return False
 
     def runCompatible(self):
         file_save = gtk.FileChooserDialog(self.Title, None,
