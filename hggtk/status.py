@@ -666,6 +666,8 @@ class GStatus(gdialog.GDialog):
         fileentry[FM_PARTIAL_SELECTED] = False
         wfile = fileentry[FM_PATH]
         selected = fileentry[FM_CHECKED]
+        if wfile not in self.filechunks:
+            return
         chunks = self.filechunks[wfile]
         for chunk in chunks:
             chunk.active = selected
@@ -936,6 +938,10 @@ class GStatus(gdialog.GDialog):
     def append_diff_hunks(self, wfile):
         'Append diff hunks of one file to the diffmodel'
         chunks = self.read_file_chunks(wfile)
+        if not chunks:
+            if wfile in self.filechunks:
+                del self.filechunks[wfile]
+            return
         rows = []
         for n, chunk in enumerate(chunks):
             chunk.active = True
@@ -965,8 +971,6 @@ class GStatus(gdialog.GDialog):
 
         self.filerowstart[wfile] = len(self.diffmodel)
         self.filechunks[wfile] = chunks
-        if not chunks:
-            return
 
         # Set row status based on chunk state
         rej, nonrej = False, False
