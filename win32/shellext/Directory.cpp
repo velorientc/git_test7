@@ -154,8 +154,6 @@ const Direntry* Directory::get(const std::string& n_in) const
             }
         }
 
-        TDEBUG_TRACE("Directory(" << path() << ")::get("
-            << n_in << "): unknown subdir");
         return 0;
     }
 }
