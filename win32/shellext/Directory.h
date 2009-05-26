@@ -45,7 +45,7 @@ public:
     int add(const std::string& relpath, Direntry& e);
 
     const Direntry* get(const std::string& relpath) const;
-    Directory* Directory::getdir(const std::string& n);
+    Directory* getdir(const std::string& n);
 
     void print() const;
 };
