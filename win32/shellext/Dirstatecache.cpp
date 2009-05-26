@@ -100,17 +100,26 @@ Dirstate* Dirstatecache::get(const std::string& hgroot)
         }
 
         TDEBUG_TRACE("Dirstatecache::get: refreshing " << hgroot);
-        delete iter->dstate;
-        iter->dstate = 0;
     } 
     else 
     {
         TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
     }
 
+    bool unset = false;
     unsigned tc0 = GetTickCount();
-    iter->dstate = Dirstate::read(path).release();
+    std::auto_ptr<Dirstate> ds = Dirstate::read(path, unset);
     unsigned tc1 = GetTickCount();
+
+    if (unset)
+    {
+        TDEBUG_TRACE("Dirstatecache::get: ignored (unset entries)");
+        return iter->dstate;
+    }
+
+    delete iter->dstate;
+    iter->dstate = ds.release();
+
     unsigned delta = tc1 - tc0;
     TDEBUG_TRACE("Dirstatecache::get: read done in " << delta << " ticks, "
         << cache().size() << " repos in cache");

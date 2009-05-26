@@ -36,8 +36,8 @@ public:
     char parent1[HASH_LENGTH];
     char parent2[HASH_LENGTH];
 
-    static std::auto_ptr<Dirstate> read(const std::string& path);
-    
+    static std::auto_ptr<Dirstate> read(const std::string& path, bool& unset);
+
     Directory& root() { return root_; }
 
     void add(const std::string& relpath, Direntry& e) {

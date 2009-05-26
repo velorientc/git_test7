@@ -20,8 +20,10 @@
 #include "dirstate.h"
 
 
-std::auto_ptr<Dirstate> Dirstate::read(const std::string& path)
+std::auto_ptr<Dirstate> Dirstate::read(const std::string& path, bool& unset)
 {
+    unset = false;
+
     FILE *f = fopen(path.c_str(), "rb");
     if (!f)
     {
@@ -38,6 +40,13 @@ std::auto_ptr<Dirstate> Dirstate::read(const std::string& path)
     std::vector<char> relpath(MAX_PATH + 10, 0);
     while (e.read(f, relpath))
     {
+        if (e.unset())
+        {
+            unset = true;
+            fclose(f);
+            return std::auto_ptr<Dirstate>(0);
+        }
+
         if (e.state == 'a')
             ++pd->num_added_;
 
@@ -67,7 +76,8 @@ static char *revhash_string(const char revhash[HASH_LENGTH])
 
 void testread()
 {
-    std::auto_ptr<Dirstate> pd = Dirstate::read(".hg/dirstate");
+    bool unset;
+    std::auto_ptr<Dirstate> pd = Dirstate::read(".hg/dirstate", unset);
     if (!pd.get()) {
         printf("error: could not read .hg/dirstate\n");
         return;
