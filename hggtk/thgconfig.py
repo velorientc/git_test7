@@ -227,11 +227,14 @@ class PathEditDialog(gtk.Dialog):
         self.newpath, self.newalias = None, None
 
         self.entries = {}
-        for name in ('URL', 'Port', 'Folder', 'Host', 'User',
-                'Password', 'Alias'):
+        # Tuple: (internal name, translated name)
+        for name in (('URL', _('URL')), ('Port', _('Port')),
+                     ('Folder', _('Folder')), ('Host', _('Host')),
+                     ('User', _('User')), ('Password', _('Password')),
+                     ('Alias', _('Alias'))):
             entry = gtk.Entry()
-            label = gtk.Label(name)
-            self.entries[name] = (entry, label)
+            label = gtk.Label(name[1])
+            self.entries[name[0]] = (entry, label)
 
         self.entries['URL'][0].set_width_chars(50)
         self.entries['URL'][0].set_editable(False)
