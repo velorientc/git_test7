@@ -366,7 +366,7 @@ class GCommit(GStatus):
             if self.qnew:
                 c_btn.set_label(_('QNew'))
                 c_btn.set_tooltip(self.tooltips, _('QNew'))
-                self._hg_call_wrapper('Status', self._do_reload_status)
+                self._hg_call_wrapper('Status', self.do_reload_status)
             else:
                 c_btn.set_label(_('QRefresh'))
                 c_btn.set_tooltip(self.tooltips, _('QRefresh'))
