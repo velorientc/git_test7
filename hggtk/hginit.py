@@ -158,7 +158,7 @@ class InitDialog(gtk.Window):
                 except:
                     pass
 
-        shlib.shell_notify(dest)
+        shlib.shell_notify([dest])
 
         dialog.info_dialog(self, _('New repository created'),
                 _('in directory %s') % hglib.toutf(os.path.abspath(dest)))
