@@ -124,7 +124,7 @@ class GCommit(GStatus):
 
     def auto_check(self):
         if self.test_opt('check'):
-            for entry in self.filemodel :
+            for entry in self.filemodel:
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self.update_check_count()
