@@ -178,6 +178,10 @@ class GLog(gdialog.GDialog):
         button.connect('toggled', self.filter_selected, 'all')
         menu.append(button)
 
+        self.newbutton = gtk.RadioMenuItem(button, _('Show New Revisions'))
+        self.newbutton.connect('toggled', self.filter_selected, 'new')
+        menu.append(self.newbutton)
+
         button = gtk.RadioMenuItem(button, _('Show Tagged Revisions'))
         button.connect('toggled', self.filter_selected, 'tagged')
         menu.append(button)
@@ -272,8 +276,9 @@ class GLog(gdialog.GDialog):
         else:
             self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
 
-        origtip = self.opts.get('orig-tip', len(self.repo.changelog))
+        origtip = self.opts.get('orig-tip', len(self.repo))
         self.graphview.set_property('original-tip-revision', origtip)
+        self.origtip = origtip
 
         # Allocate ChangeSet instance to use internally
         self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
@@ -299,6 +304,7 @@ class GLog(gdialog.GDialog):
         os.chdir(self.repo.root)  # for paths relative to repo root
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
+        self.newbutton.set_sensitive(self.origtip != len(self.repo))
         self.opts['rev'] = []
         self.opts['revs'] = None
         self.opts['no_merges'] = False
@@ -314,6 +320,10 @@ class GLog(gdialog.GDialog):
                 self.pats = filteropts.get('pats', [])
                 self.graphview.refresh(False, self.pats, self.opts)
         elif self.filter == "all":
+            self.graphview.refresh(True, None, self.opts)
+        elif self.filter == "new":
+            newtip = len(self.repo)-1
+            self.opts['revrange'] = [newtip, self.origtip+1]
             self.graphview.refresh(True, None, self.opts)
         elif self.filter == "only_merges":
             self.opts['only_merges'] = True
@@ -699,6 +709,7 @@ class GLog(gdialog.GDialog):
         return False
 
     def thgrefresh(self, window):
+        self.repo.invalidate()
         self.reload_log()
 
     def refresh_clicked(self, toolbutton, data=None):
