@@ -20,7 +20,7 @@ from thgutil import hglib, settings, paths
 from hggtk import dialog, gtklib, hgthread, history, thgconfig, hgemail
 
 class SynchDialog(gtk.Window):
-    def __init__(self, repos=[], pushmode=False):
+    def __init__(self, repos=[], pushmode=False, fromlog=False):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'menusynch.ico')
@@ -29,6 +29,8 @@ class SynchDialog(gtk.Window):
         self.root = paths.find_root()
         self.selected_path = None
         self.hgthread = None
+        self.fromlog = fromlog
+        self.notify_func = None
 
         # persistent app data
         self._settings = settings.Settings('synch')
@@ -284,7 +286,7 @@ class SynchDialog(gtk.Window):
         except hglib.RepoError:
             return
         tip = len(repo.changelog)
-        if self.origchangecount == tip:
+        if self.origchangecount == tip or self.fromlog:
             self.viewpulled.hide()
         else:
             self.buttonhbox.show()
@@ -301,8 +303,7 @@ class SynchDialog(gtk.Window):
         self.repo = repo
 
     def _view_pulled_changes(self, button):
-        countpulled = len(self.repo.changelog) - self.origchangecount
-        opts = {'limit' : countpulled, 'from-synch' : True}
+        opts = {'orig-tip' : self.origchangecount, 'from-synch' : True}
         dlg = history.GLog(self.ui, None, None, [], opts)
         dlg.display()
 
@@ -589,6 +590,8 @@ class SynchDialog(gtk.Window):
             self._stop_button.set_sensitive(False)
             if self.hgthread.return_code() is None:
                 self.write(_('[command interrupted]'))
+            if self.notify_func:
+                self.notify_func(self.notify_args)
             return False # Stop polling this function
 
     AdvancedDefaults = {
@@ -637,6 +640,10 @@ class SynchDialog(gtk.Window):
             self.textview.set_wrap_mode(gtk.WRAP_NONE)
         else:
             self.textview.set_wrap_mode(gtk.WRAP_WORD)
+
+    def set_notify_func(self, func, *args):
+        self.notify_func = func
+        self.notify_args = args
 
 
 def run(ui, *pats, **opts):

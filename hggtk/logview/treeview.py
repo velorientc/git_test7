@@ -35,6 +35,11 @@ class TreeView(gtk.ScrolledWindow):
                    'The maximum number of revisions to display',
                    gobject.PARAM_READWRITE),
 
+        'original-tip-revision': (gobject.TYPE_PYOBJECT,
+                   'Tip revision when application opened',
+                   'Revisions above this number will be drawn green',
+                   gobject.PARAM_READWRITE),
+
         'revision': (gobject.TYPE_PYOBJECT,
                      'Revision',
                      'The currently selected revision',
@@ -93,6 +98,7 @@ class TreeView(gtk.ScrolledWindow):
         self.currev = None
         self.construct_treeview()
         self.pbar = pbar
+        self.origtip = None
 
     def set_repo(self, repo, pbar=None):
         self.repo = repo
@@ -227,6 +233,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.limit
         elif property.name == 'revision':
             return self.currev
+        elif property.name == 'original-tip-revision':
+            return self.origtip
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -245,6 +253,8 @@ class TreeView(gtk.ScrolledWindow):
             self.batchsize = value
         elif property.name == 'revision':
             self.set_revision_id(value)
+        elif property.name == 'original-tip-revision':
+            self.origtip = value
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -425,9 +435,11 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.date_column)
 
     def text_color_orig(self, parents, rev, author):
+        if self.origtip is not None and int(rev) > self.origtip:
+            return 'darkgreen'
         if len(parents) == 2:
-            # mark merge changesets green
-            return '#006400'
+            # mark merge changesets blue
+            return 'blue'
         elif len(parents) == 1:
             # detect non-trivial parent
             if long(rev) != parents[0]+1:
@@ -442,6 +454,8 @@ class TreeView(gtk.ScrolledWindow):
     color_cache = {}
 
     def text_color_author(self, parents, rev, author):
+        if self.origtip is not None and int(rev) > self.origtip:
+            return 'darkgreen'
         for re, v in self.author_pats:
             if (re.search(author)):
                 return v

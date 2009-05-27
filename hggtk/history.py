@@ -73,7 +73,8 @@ class GLog(gdialog.GDialog):
 
     def _synch_clicked(self, toolbutton, data):
         from hggtk import synch
-        dlg = synch.SynchDialog([], False)
+        dlg = synch.SynchDialog([], False, True)
+        dlg.set_notify_func(self.thgrefresh, None)
         dlg.show_all()
 
     def toggle_view_column(self, button, property):
@@ -270,6 +271,9 @@ class GLog(gdialog.GDialog):
             self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
         else:
             self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
+
+        origtip = self.opts.get('orig-tip', len(self.repo.changelog))
+        self.graphview.set_property('original-tip-revision', origtip)
 
         # Allocate ChangeSet instance to use internally
         self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
