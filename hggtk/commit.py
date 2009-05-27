@@ -538,7 +538,7 @@ class GCommit(GStatus):
             return True
         else:
             response = gdialog.Confirm(_('Confirm Add/Remove'),
-                    files, self).run()
+                    files, self,_('Add/Remove the following files?')).run()
             if response == gtk.RESPONSE_YES:
                 # This will stay set for further commits (meaning no
                 # more prompts). Problem?
