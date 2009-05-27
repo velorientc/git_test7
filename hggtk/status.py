@@ -527,7 +527,7 @@ class GStatus(gdialog.GDialog):
             return False
         saves = {}
         model, tpaths = treeview.get_selection().get_selected_rows()
-        for row, _ in tpaths:
+        for row, in tpaths:
             wfile, cid = model[row][DM_PATH], model[row][DM_CHUNK_ID]
             if wfile not in saves:
                 saves[wfile] = [cid]
