@@ -92,12 +92,12 @@ if os.name == 'nt':
             dirstatus[dirname(fn)] = 'm'
         for fn in removed + deleted:
             dirstatus[dirname(fn)] = 'r'
-        f = open(repo.join("thgstatus"), 'wb')
+        f = repo.opener('thgstatus', 'wb', atomictemp=True)
         for dn in sorted(dirstatus):
             s = dirstatus[dn]
             f.write(s + dn + '\n')
             ui.note("%s %s\n" % (s, dn))
-        f.close()
+        f.rename()
 
 else:
     def shell_notify(paths):
