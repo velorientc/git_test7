@@ -87,7 +87,6 @@ class GStatus(gdialog.GDialog):
         gdialog.GDialog.init(self)
         self.mode = 'status'
         self.ready = True
-        self.last_file = None
         self.filerowstart = {}
         self.filechunks = {}
 
@@ -634,7 +633,6 @@ class GStatus(gdialog.GDialog):
 
     def reload_status(self):
         if not self.ready: return False
-        self.last_file = None
         res, outtext = self._hg_call_wrapper('Status', self.do_reload_status)
         self.update_check_count()
         return res
@@ -852,12 +850,8 @@ class GStatus(gdialog.GDialog):
         # Update the diff text with merge diff to both parents
         model, paths = selection.get_selected_rows()
         if not paths:
-            self.last_file = None
             return
         wfile = self.filemodel[paths[0]][FM_PATH]
-        if wfile == self.last_file:
-            return
-        self.last_file = wfile
         difftext = [_('===== Diff to first parent =====\n')]
         wfiles = [self.repo.wjoin(wfile)]
         wctx = self.repo[None]
@@ -900,13 +894,9 @@ class GStatus(gdialog.GDialog):
         # Read this file's diffs into diff model
         model, paths = selection.get_selected_rows()
         if not paths:
-            self.last_file = None
             return
         wfile = self.filemodel[paths[0]][FM_PATH]
-        if wfile == self.last_file:
-            return
         # TODO: this could be a for-loop
-        self.last_file = wfile
         self.filerowstart = {}
         self.diffmodel.clear()
         self.append_diff_hunks(wfile)
