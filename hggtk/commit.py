@@ -473,7 +473,7 @@ class GCommit(GStatus):
                     else:
                         gdialog.Prompt(_('Commit'),
                                 _('Unable to apply patch'), self).run()
-                        raise util.Abort(_('patch failed to apply'))
+                        return
             del fp
 
             # 4. We prepared working directory according to filtered patch.
@@ -488,7 +488,7 @@ class GCommit(GStatus):
             finally:
                 os.chdir(cwd)
 
-            return 0
+            return
         finally:
             # 5. finally restore backed-up files
             try:
