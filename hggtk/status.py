@@ -1009,9 +1009,9 @@ class GStatus(gdialog.GDialog):
             if fr[FM_PATH] == wfile:
                 break
         if row[DM_IS_HEADER]:
-            for chunk in chunks[1:]:
-                chunk.active = fr[FM_CHECKED]
-                self.update_diff_hunk(dmodel[startrow+n])
+            for n, chunk in enumerate(chunks[1:]):
+                chunk.active = not fr[FM_CHECKED]
+                self.update_diff_hunk(dmodel[startrow+n+1])
             newvalue = not fr[FM_CHECKED]
             partial = False
         else:
