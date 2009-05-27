@@ -1059,7 +1059,7 @@ class GStatus(gdialog.GDialog):
             for i, chunk in enumerate(chunks):
                 if i == 0:
                     chunk.write(buf)
-                elif not dmodel[start+i][DM_REJECTED]:
+                elif chunk.active:
                     chunk.write(buf)
         buf.seek(0)
         try:
