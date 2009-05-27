@@ -607,6 +607,8 @@ class GStatus(gdialog.GDialog):
                 self.filemodel.append([wfile in recheck, char,
                                        hglib.toutf(wfile), wfile, mst, False])
 
+        self.auto_check()
+
         selected = False
         for row in model:
             if row[FM_PATH] in reselect:
@@ -634,7 +636,6 @@ class GStatus(gdialog.GDialog):
         if not self.ready: return False
         self.last_file = None
         res, outtext = self._hg_call_wrapper('Status', self.do_reload_status)
-        self.auto_check()
         self.update_check_count()
         return res
 
@@ -944,6 +945,7 @@ class GStatus(gdialog.GDialog):
             return
         rows = []
         for n, chunk in enumerate(chunks):
+            # append this attribute to the chunk
             chunk.active = True
             if isinstance(chunk, hgshelve.header):
                 rows.append([False, '', True, wfile, n, self.headerfont])
@@ -975,22 +977,26 @@ class GStatus(gdialog.GDialog):
         # Set row status based on chunk state
         rej, nonrej = False, False
         for n, row in enumerate(rows):
-            if row[DM_IS_HEADER]:
-                row[DM_REJECTED] = not chunks[n].active
-            else:
+            row[DM_REJECTED] = not chunks[n].active
+            if not row[DM_IS_HEADER]:
                 if chunks[n].active:
                     nonrej = True
                 else:
                     rej = True
-                row[DM_REJECTED] = not chunks[n].active
                 self.update_diff_hunk(row)
             self.diffmodel.append(row)
 
-        newvalue = nonrej
-        partial = rej and nonrej
         for fr in self.filemodel:
             if fr[FM_PATH] == wfile:
                 break
+
+        # Do not modify file's selection state if no diff hunks
+        if len(chunks) == 1:
+            self.update_diff_header(self.diffmodel, wfile, fr[FM_CHECKED])
+            return
+
+        newvalue = nonrej
+        partial = rej and nonrej
         if fr[FM_PARTIAL_SELECTED] != partial:
             fr[FM_PARTIAL_SELECTED] = partial
         if fr[FM_CHECKED] != newvalue:
