@@ -933,10 +933,18 @@ class GStatus(gdialog.GDialog):
             if wfile in self.filechunks:
                 del self.filechunks[wfile]
             return
+
+        for fr in self.filemodel:
+            if fr[FM_PATH] == wfile:
+                break
+        else:
+            # should not be possible
+            return
+
         rows = []
         for n, chunk in enumerate(chunks):
-            # append this attribute to the chunk
-            chunk.active = True
+            # chunks take file's selection state by default
+            chunk.active = fr[FM_CHECKED]
             if isinstance(chunk, hgshelve.header):
                 rows.append([False, '', True, wfile, n, self.headerfont])
                 if chunk.special():
@@ -968,22 +976,13 @@ class GStatus(gdialog.GDialog):
         rej, nonrej = False, False
         for n, row in enumerate(rows):
             row[DM_REJECTED] = not chunks[n].active
+            if chunks[n].active:
+                nonrej = True
+            else:
+                rej = True
             if not row[DM_IS_HEADER]:
-                if chunks[n].active:
-                    nonrej = True
-                else:
-                    rej = True
                 self.update_diff_hunk(row)
             self.diffmodel.append(row)
-
-        for fr in self.filemodel:
-            if fr[FM_PATH] == wfile:
-                break
-
-        # Do not modify file's selection state if no diff hunks
-        if len(chunks) == 1:
-            self.update_diff_header(self.diffmodel, wfile, fr[FM_CHECKED])
-            return
 
         newvalue = nonrej
         partial = rej and nonrej
