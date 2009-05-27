@@ -198,7 +198,7 @@ class NativeSaveFileDialogWrapper:
                 InitialDir=self.InitialDir,
                 Flags=win32con.OFN_EXPLORER,
                 File=self.FileName,
-                DefExt='py',
+                DefExt=None,
                 Title=hglib.fromutf(self.Title),
                 Filter='',
                 CustomFilter='',
