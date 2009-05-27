@@ -943,21 +943,22 @@ class GStatus(gdialog.GDialog):
 
         rows = []
         for n, chunk in enumerate(chunks):
-            # chunks take file's selection state by default
-            chunk.active = fr[FM_CHECKED]
             if isinstance(chunk, hgshelve.header):
+                # header chunk is always active
+                chunk.active = True
                 rows.append([False, '', True, wfile, n, self.headerfont])
                 if chunk.special():
                     chunks = chunks[:1]
                     break
             else:
+                # chunks take file's selection state by default
+                chunk.active = fr[FM_CHECKED]
                 rows.append([False, '', False, wfile, n, self.difffont])
 
 
         # recover old chunk selection/rejection states, match fromline
         if wfile in self.filechunks:
             ochunks = self.filechunks[wfile]
-            chunks[0].active = ochunks[0].active
             next = 1
             for oc in ochunks[1:]:
                 for n in xrange(next, len(chunks)):
@@ -975,22 +976,25 @@ class GStatus(gdialog.GDialog):
         # Set row status based on chunk state
         rej, nonrej = False, False
         for n, row in enumerate(rows):
-            row[DM_REJECTED] = not chunks[n].active
-            if chunks[n].active:
-                nonrej = True
-            else:
-                rej = True
             if not row[DM_IS_HEADER]:
+                if chunks[n].active:
+                    nonrej = True
+                else:
+                    rej = True
+                row[DM_REJECTED] = not chunks[n].active
                 self.update_diff_hunk(row)
             self.diffmodel.append(row)
 
-        newvalue = nonrej
-        partial = rej and nonrej
-        if fr[FM_PARTIAL_SELECTED] != partial:
-            fr[FM_PARTIAL_SELECTED] = partial
-        if fr[FM_CHECKED] != newvalue:
-            fr[FM_CHECKED] = newvalue
-            self.update_check_count()
+        if len(rows) == 1:
+            newvalue = fr[FM_CHECKED]
+        else:
+            newvalue = nonrej
+            partial = rej and nonrej
+            if fr[FM_PARTIAL_SELECTED] != partial:
+                fr[FM_PARTIAL_SELECTED] = partial
+            if fr[FM_CHECKED] != newvalue:
+                fr[FM_CHECKED] = newvalue
+                self.update_check_count()
         self.update_diff_header(self.diffmodel, wfile, newvalue)
 
 
