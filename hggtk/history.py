@@ -282,7 +282,6 @@ class GLog(gdialog.GDialog):
 
     def load_settings(self, settings):
         '''Called at beginning of display() method'''
-
         self.stbar = gtklib.StatusBar()
         self.limit = self.get_graphlimit(None)
 
