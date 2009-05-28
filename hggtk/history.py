@@ -310,6 +310,11 @@ class GLog(gdialog.GDialog):
         except KeyError:
             pass
 
+    def refresh_model(self):
+        'Refresh data in the history model, without reloading graph'
+        if self.graphview.model:
+            self.graphview.model.refresh()
+
     def reload_log(self, **filteropts):
         'Send refresh event to treeview object'
         os.chdir(self.repo.root)  # for paths relative to repo root
@@ -606,7 +611,7 @@ class GLog(gdialog.GDialog):
             self.repo.invalidate()
             newtags = self.repo.tagslist()
             if newtags != oldtags:
-                self.reload_log()
+                self.refresh_model()
 
         dialog = tagadd.TagAddDialog(self.repo.root, rev=str(rev))
         dialog.set_transient_for(self)
@@ -693,7 +698,7 @@ class GLog(gdialog.GDialog):
     def checkout_completed(self, oldparents):
         newparents = [x.node() for x in self.repo.parents()]
         if not oldparents == newparents:
-            self.reload_log()
+            self.refresh_model()
 
     def merge(self, menuitem):
         rev = self.currow[treemodel.REVID]
@@ -708,7 +713,7 @@ class GLog(gdialog.GDialog):
     def merge_completed(self, oldparents):
         newparents = [x.node() for x in self.repo.parents()]
         if not oldparents == newparents:
-            self.reload_log()
+            self.refresh_model()
 
     def selection_changed(self, treeview):
         self.currow = self.graphview.get_revision()

@@ -39,11 +39,28 @@ class TreeModel(gtk.GenericTreeModel):
         self.revisions = {}
         self.branch_names = {}
         self.repo = repo
-        self.parents = [x.rev() for x in repo.changectx(None).parents()]
-        self.heads = [repo.changelog.rev(x) for x in repo.heads()]
         self.line_graph_data = graphdata
         self.author_re = re.compile('<.*@.*>', 0)
         self.color_func = color_func
+        self.parents = [x.rev() for x in repo.parents()]
+        self.heads = [repo[x].rev() for x in repo.heads()]
+        self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
+
+    def refresh(self):
+        repo = self.repo
+        oldtags, oldheads, oldparents = self.tagrevs, self.heads, self.parents
+
+        repo.invalidate()
+        repo.dirstate.invalidate()
+
+        self.parents = [x.rev() for x in repo.parents()]
+        self.heads = [repo[x].rev() for x in repo.heads()]
+        self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
+        allrevs = set(oldtags + oldheads + oldparents +
+                      self.parents + self.heads + self.tagrevs)
+        for rev in allrevs:
+            if rev in self.revisions:
+                del self.revisions[rev]
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
