@@ -30,11 +30,10 @@ def create_menu(label, callback):
     return menuitem
 
 class GLog(gdialog.GDialog):
-    """GTK+ based dialog for displaying repository logs
-    """
+    'GTK+ based dialog for displaying repository logs'
     def init(self):
         self.last_rev = None
-        self.filter = "all"
+        self.filter = 'all'
         self.currow = None
         self.curfile = None
 
@@ -101,7 +100,7 @@ class GLog(gdialog.GDialog):
         self.allbutton.set_sensitive(False)
 
     def revisions_loaded(self, graphview):
-        '''Treeview reports log generator has exited'''
+        'Treeview reports log generator has exited'
         if not self.graphview.graphdata:
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
@@ -121,7 +120,7 @@ class GLog(gdialog.GDialog):
             self.show_filter_dialog()
 
     def show_filter_dialog(self):
-        '''Launch a modeless filter dialog'''
+        'Launch a modeless filter dialog'
         def do_reload(opts):
             self.custombutton.set_active(True)
             self.reload_log(**opts)
@@ -155,25 +154,25 @@ class GLog(gdialog.GDialog):
         menu = gtk.Menu()
 
         button = gtk.CheckMenuItem(_('Show Rev'))
-        button.connect("toggled", self.toggle_view_column,
+        button.connect('toggled', self.toggle_view_column,
                 'rev-column-visible')
         button.set_active(self.showcol.get('rev', True))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Show ID'))
-        button.connect("toggled", self.toggle_view_column,
+        button.connect('toggled', self.toggle_view_column,
                 'id-column-visible')
         button.set_active(self.showcol.get('id', False))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Show Date'))
-        button.connect("toggled", self.toggle_view_column,
+        button.connect('toggled', self.toggle_view_column,
                 'date-column-visible')
         button.set_active(self.showcol.get('date', True))
         button.set_draw_as_radio(True)
         menu.append(button)
-        button = gtk.CheckMenuItem(_("Show Branch"))
-        button.connect("toggled", self.toggle_view_column,
+        button = gtk.CheckMenuItem(_('Show Branch'))
+        button.connect('toggled', self.toggle_view_column,
                 'branch-column-visible')
         button.set_active(self.showcol.get('branch', False))
         button.set_draw_as_radio(True)
@@ -225,11 +224,11 @@ class GLog(gdialog.GDialog):
         return menu
 
     def open_with_file(self, file):
-        '''Call this before display() to open with file history'''
+        'Call this before display() to open with file history'
         self.opts['filehist'] = file
 
     def prepare_display(self):
-        '''Called at end of display() method'''
+        'Called at end of display() method'
         self.opts['rev'] = [] # This option is dangerous - used directly by hg
         self.opts['revs'] = None
         os.chdir(self.repo.root)  # for paths relative to repo root
@@ -281,7 +280,7 @@ class GLog(gdialog.GDialog):
         return settings
 
     def load_settings(self, settings):
-        '''Called at beginning of display() method'''
+        'Called at beginning of display() method'
         self.stbar = gtklib.StatusBar()
         self.limit = self.get_graphlimit(None)
 
@@ -312,7 +311,7 @@ class GLog(gdialog.GDialog):
             pass
 
     def reload_log(self, **filteropts):
-        """Send refresh event to treeview object"""
+        'Send refresh event to treeview object'
         os.chdir(self.repo.root)  # for paths relative to repo root
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
@@ -331,25 +330,25 @@ class GLog(gdialog.GDialog):
             else:
                 self.pats = filteropts.get('pats', [])
                 self.graphview.refresh(False, self.pats, self.opts)
-        elif self.filter == "all":
+        elif self.filter == 'all':
             self.graphview.refresh(True, None, self.opts)
-        elif self.filter == "new":
+        elif self.filter == 'new':
             newtip = len(self.repo)-1
             self.opts['revrange'] = [newtip, self.origtip+1]
             self.graphview.refresh(True, None, self.opts)
-        elif self.filter == "only_merges":
+        elif self.filter == 'only_merges':
             self.opts['only_merges'] = True
             self.graphview.refresh(False, [], self.opts)
-        elif self.filter == "no_merges":
+        elif self.filter == 'no_merges':
             self.opts['no_merges'] = True
             self.graphview.refresh(False, [], self.opts)
-        elif self.filter == "ancestry":
+        elif self.filter == 'ancestry':
             if not self.currow:
                 return
             range = [self.currow[treemodel.REVID], 0]
             sopts = {'noheads': True, 'revrange': range}
             self.graphview.refresh(True, None, sopts)
-        elif self.filter == "tagged":
+        elif self.filter == 'tagged':
             tagged = []
             for t, r in self.repo.tagslist():
                 hr = self.repo[r].rev()
@@ -357,11 +356,11 @@ class GLog(gdialog.GDialog):
                     tagged.insert(0, hr)
             self.opts['revs'] = tagged
             self.graphview.refresh(False, [], self.opts)
-        elif self.filter == "parents":
+        elif self.filter == 'parents':
             repo_parents = [x.rev() for x in self.repo.parents()]
             self.opts['revs'] = [str(x) for x in repo_parents]
             self.graphview.refresh(False, [], self.opts)
-        elif self.filter == "heads":
+        elif self.filter == 'heads':
             heads = [self.repo[x].rev() for x in self.repo.heads()]
             self.opts['revs'] = [str(x) for x in heads]
             self.graphview.refresh(False, [], self.opts)
@@ -768,8 +767,7 @@ class GLog(gdialog.GDialog):
         return True
 
     def tree_row_act(self, tree, path, column) :
-        """Default action is the first entry in the context menu
-        """
+        'Default action is the first entry in the context menu'
         self._menu.get_children()[0].activate()
         return True
 
