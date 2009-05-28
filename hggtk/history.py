@@ -80,8 +80,13 @@ class GLog(gdialog.GDialog):
     def synch_clicked(self, toolbutton, data):
         from hggtk import synch
         dlg = synch.SynchDialog([], False, True)
-        dlg.set_notify_func(self.thgrefresh, None)
+        dlg.set_notify_func(self.synch_complete, None)
         dlg.show_all()
+
+    def synch_complete(self, _):
+        self.repo.invalidate()
+        if len(self.repo) != self.origtip:
+            self.newbutton.set_active(True)
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
@@ -229,7 +234,17 @@ class GLog(gdialog.GDialog):
         self.opts['revs'] = None
         os.chdir(self.repo.root)  # for paths relative to repo root
 
-        if 'filehist' in self.opts:
+        origtip = len(self.repo)
+        self.graphview.set_property('original-tip-revision', origtip)
+        self.origtip = origtip
+
+        if 'orig-tip' in self.opts:
+            origtip = self.opts['orig-tip']
+            if origtip != len(self.repo):
+                self.origtip = origtip
+                self.graphview.set_property('original-tip-revision', origtip)
+                self.newbutton.set_active(True)
+        elif 'filehist' in self.opts:
             self.custombutton.set_active(True)
             self.reload_log(pats = [self.opts['filehist']])
         elif 'revrange' in self.opts:
@@ -277,10 +292,6 @@ class GLog(gdialog.GDialog):
             self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
         else:
             self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
-
-        origtip = self.opts.get('orig-tip', len(self.repo))
-        self.graphview.set_property('original-tip-revision', origtip)
-        self.origtip = origtip
 
         # Allocate ChangeSet instance to use internally
         self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
@@ -711,7 +722,6 @@ class GLog(gdialog.GDialog):
         return False
 
     def thgrefresh(self, window):
-        self.repo.invalidate()
         self.reload_log()
 
     def refresh_clicked(self, toolbutton, data=None):
