@@ -32,6 +32,12 @@ def create_menu(label, callback):
 class GLog(gdialog.GDialog):
     """GTK+ based dialog for displaying repository logs
     """
+    def init(self):
+        self.last_rev = None
+        self.filter = "all"
+        self.currow = None
+        self.curfile = None
+
     def get_title(self):
         return hglib.toutf(os.path.basename(self.repo.root)) + ' log'
 
@@ -219,10 +225,6 @@ class GLog(gdialog.GDialog):
 
     def prepare_display(self):
         '''Called at end of display() method'''
-        self.last_rev = None
-        self.filter = "all"
-        self.currow = None
-        self.curfile = None
         self.opts['rev'] = [] # This option is dangerous - used directly by hg
         self.opts['revs'] = None
         os.chdir(self.repo.root)  # for paths relative to repo root
