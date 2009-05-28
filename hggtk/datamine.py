@@ -179,7 +179,8 @@ class DataMineDialog(gdialog.GDialog):
         summary = ctx.description().replace('\0', '')
         summary = gobject.markup_escape_text(summary.split('\n')[0])
         date = displaytime(ctx.date())
-        desc = author+'@'+str(rev)+' '+date+' "'+summary+'"'
+        desc = toutf(author+'@'+str(rev)+' '+date+' "'+summary+'"')
+        author = toutf(author)
         self.changedesc[rev] = (desc, author)
         return (desc, author)
 
@@ -700,7 +701,7 @@ class DataMineDialog(gdialog.GDialog):
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
             model.append((revid, toutf(text[:128]), tip, toutf(path.strip()),
-                    color, toutf(user), len(model)+1))
+                    color, user, len(model)+1))
         if thread.isAlive():
             return True
         else:
