@@ -1138,7 +1138,7 @@ class GStatus(gdialog.GDialog):
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
             revertopts['rev'] = ''
-            dlg = gdialog.Confirm('Confirm Revert', files, self)
+            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,_('Revert the following files?'))
         if not dlg or dlg.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
@@ -1222,7 +1222,7 @@ class GStatus(gdialog.GDialog):
         self.delete_files([wfile])
 
     def delete_files(self, files):
-        dlg = gdialog.Confirm(_('Confirm Delete Unrevisioned'), files, self)
+        dlg = gdialog.Confirm(_('Confirm Delete Unrevisioned'), files, self,_('Delete the following unrevisioned files?'))
         if dlg.run() == gtk.RESPONSE_YES:
             errors = ''
             for wfile in files:
