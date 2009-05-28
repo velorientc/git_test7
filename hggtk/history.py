@@ -289,12 +289,12 @@ class GLog(gdialog.GDialog):
         self.changeview.glog_parent = self
 
         gdialog.GDialog.load_settings(self, settings)
-        self._setting_vpos = -1
-        self._setting_hpos = -1
+        self.setting_vpos = -1
+        self.setting_hpos = -1
         self.showcol = {}
         try:
-            self._setting_vpos = settings['glog-vpane']
-            self._setting_hpos = settings['glog-hpane']
+            self.setting_vpos = settings['glog-vpane']
+            self.setting_hpos = settings['glog-hpane']
             for col in ('rev', 'date', 'id', 'branch'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
@@ -475,8 +475,8 @@ class GLog(gdialog.GDialog):
         return vbox
 
     def realize_settings(self):
-        self.vpaned.set_position(self._setting_vpos)
-        self.hpaned.set_position(self._setting_hpos)
+        self.vpaned.set_position(self.setting_vpos)
+        self.hpaned.set_position(self.setting_hpos)
 
     def thgdiff(self, treeview):
         'ctrl-d handler'
