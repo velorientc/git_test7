@@ -66,6 +66,8 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
         return S_OK;
     else if (myTortoiseClass == TORTOISE_OLE_UNCHANGED && status == 'C')
         return S_OK;
+    else if (myTortoiseClass == TORTOISE_OLE_NOTINREPO && status == '?')
+        return S_OK;
 
     return S_FALSE;
 }

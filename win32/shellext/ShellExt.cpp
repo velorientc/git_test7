@@ -76,6 +76,12 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
         return pcf->QueryInterface(riid, ppvOut);
     }
+    else if (IsEqualIID(rclsid, CLSID_TortoiseHg6))
+    {
+        CDllRegSxClassFactory *pcf = new CDllRegSxClassFactory(TORTOISE_OLE_NOTINREPO);
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
+        return pcf->QueryInterface(riid, ppvOut);
+    }
 	
     return CLASS_E_CLASSNOTAVAILABLE;
 }

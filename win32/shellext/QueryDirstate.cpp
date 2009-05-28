@@ -156,18 +156,19 @@ int HgQueryDirstate(
     {
         DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot);
         if (!pds) {
-            last = cur;
-            return 0;
+            outStatus = '?';
         }
-
-        if (!relpath.empty())
+        else
         {
-            Dirstate* pds2 = Dirstatecache::get(cur.hgroot, cur.basedir);
-            if (pds2 && !pds2->root().getdir(relpath))
-                return 0;
-        }
+            if (!relpath.empty())
+            {
+                Dirstate* pds2 = Dirstatecache::get(cur.hgroot, cur.basedir);
+                if (pds2 && !pds2->root().getdir(relpath))
+                    return 0;
+            }
 
-        outStatus = pds->status(relpath);
+            outStatus = pds->status(relpath);
+        }
     }
     else
     {
