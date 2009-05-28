@@ -11,7 +11,6 @@ import gtk
 import gobject
 import re
 from mercurial import util
-from mercurial.node import short
 from mercurial.hgweb import webutil
 from thgutil import hglib
 
@@ -152,7 +151,7 @@ class TreeModel(gtk.GenericTreeModel):
             
             revision = (None, node, revid, None, sumstr,
                     author, date, None, parents, wc_parent, head, taglist,
-                    color, short(node))
+                    color, str(ctx))
             self.revisions[revid] = revision
             self.branch_names[revid] = branchstr
         else:
