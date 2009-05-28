@@ -74,12 +74,10 @@ class CustomPrompt(gtk.MessageDialog):
 class Confirm(SimpleMessage):
     """Dialog returns gtk.RESPONSE_YES or gtk.RESPONSE_NO
     """
-    def __init__(self, title, files, parent, primary=None):
+    def __init__(self, title, files, parent, primary):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
         self.set_title(hglib.toutf(title))
-        if primary is None:
-            primary = title + '?'
         primary = '<b>' + primary + '</b>'
         self.set_markup(hglib.toutf(primary))
         message = ''
