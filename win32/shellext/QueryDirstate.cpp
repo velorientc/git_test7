@@ -154,21 +154,15 @@ int HgQueryDirstate(
 
     if (cur.isdir)
     {
-        DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot);
-        if (!pds) {
-            outStatus = '?';
-        }
-        else
+        if (!relpath.empty())
         {
-            if (!relpath.empty())
-            {
-                Dirstate* pds2 = Dirstatecache::get(cur.hgroot, cur.basedir);
-                if (pds2 && !pds2->root().getdir(relpath))
-                    return 0;
-            }
-
-            outStatus = pds->status(relpath);
+            Dirstate* pds2 = Dirstatecache::get(cur.hgroot, cur.basedir);
+            if (pds2 && !pds2->root().getdir(relpath))
+                return 0;  // unknown dir -> no icon
         }
+
+        DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot);
+        outStatus = (pds ? pds->status(relpath) : '?');
     }
     else
     {
