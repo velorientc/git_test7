@@ -103,7 +103,7 @@ class TreeModel(gtk.GenericTreeModel):
             return []
 
         if revid not in self.revisions:
-            ctx = self.repo.changectx(revid)
+            ctx = self.repo[revid]
 
             summary = ctx.description().replace('\0', '')
             if self.repo.ui.configbool('tortoisehg', 'longsummary'):
@@ -135,10 +135,11 @@ class TreeModel(gtk.GenericTreeModel):
                 branchstr += branch['name']
 
             if '<' in ctx.user():
-                author = hglib.toutf(self.author_re.sub('', ctx.user()).strip(' '))
+                author = self.author_re.sub('', ctx.user()).strip(' ')
             else:
-                author = hglib.toutf(util.shortuser(ctx.user()))
+                author = util.shortuser(ctx.user())
 
+            author = hglib.toutf(author)
             date = hglib.displaytime(ctx.date())
 
             wc_parent = revid in self.parents
