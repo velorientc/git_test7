@@ -1120,7 +1120,7 @@ class GStatus(gdialog.GDialog):
             # revert command
             revertopts['rev'] = revertopts['rev'][0]
             dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
-                    _('Revert files to revision ') + revertopts['rev'] + '?')
+                    _('Revert files to revision %s?') % revertopts['rev'])
         elif self.merging:
             resp = gdialog.CustomPrompt(_('Which parent to revert to?'),
                     _('Revert file(s) to local or other parent?'),
@@ -1136,7 +1136,8 @@ class GStatus(gdialog.GDialog):
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
             revertopts['rev'] = ''
-            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,_('Revert the following files?'))
+            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
+                    _('Revert the following files?'))
         if not dlg or dlg.run() == gtk.RESPONSE_YES:
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
@@ -1220,7 +1221,8 @@ class GStatus(gdialog.GDialog):
         self.delete_files([wfile])
 
     def delete_files(self, files):
-        dlg = gdialog.Confirm(_('Confirm Delete Unrevisioned'), files, self,_('Delete the following unrevisioned files?'))
+        dlg = gdialog.Confirm(_('Confirm Delete Unrevisioned'), files, self,
+                _('Delete the following unrevisioned files?'))
         if dlg.run() == gtk.RESPONSE_YES:
             errors = ''
             for wfile in files:
