@@ -663,7 +663,10 @@ class ConfigDialog(gtk.Dialog):
 
     def _pathtree_pressed(self, widget, event):
         if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
-            self._edit_path()
+            x, y = int(event.x), int(event.y)
+            pathinfo = self.pathtree.get_path_at_pos(x, y)
+            if pathinfo is not None:
+                self._edit_path()
 
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
