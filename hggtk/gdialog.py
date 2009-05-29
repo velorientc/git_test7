@@ -79,7 +79,7 @@ class Confirm(SimpleMessage):
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
         self.set_title(hglib.toutf(title))
         if primary is None:
-            primary = title + ' file' + ((len(files) > 1 and 's') or '') + '?'
+            primary = title + '?'
         primary = '<b>' + primary + '</b>'
         self.set_markup(hglib.toutf(primary))
         message = ''
