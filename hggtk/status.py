@@ -610,17 +610,18 @@ class GStatus(gdialog.GDialog):
 
         self.auto_check()
 
-        selpath = (0,)
+        firstrow = None
         for i, row in enumerate(model):
             if row[FM_PATH] in reselect:
-                selection.select_iter(row.iter)
-                selpath = (i,)
+                if firstrow is None:
+                    firstrow = i
+                else:
+                    selection.select_iter(row.iter)
         selection.handler_unblock(self.treeselid)
 
         # clear buffer after a merge commit
         if len(model):
-            selection.unselect_path(selpath)
-            selection.select_path(selpath)
+            selection.select_path((firstrow or 0,))
         else:
             if self.merging:
                 self.merge_diff_text.set_buffer(gtk.TextBuffer())
