@@ -218,18 +218,18 @@ class GStatus(gdialog.GDialog):
 
     def save_settings(self):
         settings = gdialog.GDialog.save_settings(self)
-        settings['gstatus-hpane'] = self._diffpane.get_position()
-        settings['gstatus-lastpos'] = self._setting_lastpos
+        settings['gstatus-hpane'] = self.diffpane.get_position()
+        settings['gstatus-lastpos'] = self.setting_lastpos
         return settings
 
 
     def load_settings(self, settings):
         gdialog.GDialog.load_settings(self, settings)
-        self._setting_pos = 270
-        self._setting_lastpos = 64000
+        self.setting_pos = 270
+        self.setting_lastpos = 64000
         try:
-            self._setting_pos = settings['gstatus-hpane']
-            self._setting_lastpos = settings['gstatus-lastpos']
+            self.setting_pos = settings['gstatus-hpane']
+            self.setting_lastpos = settings['gstatus-lastpos']
         except KeyError:
             pass
         self.mqmode = None
@@ -412,15 +412,15 @@ class GStatus(gdialog.GDialog):
             diff_frame.add(scroller)
 
         if self.diffbottom:
-            self._diffpane = gtk.VPaned()
+            self.diffpane = gtk.VPaned()
         else:
-            self._diffpane = gtk.HPaned()
+            self.diffpane = gtk.HPaned()
 
-        self._diffpane.pack1(tree_frame, True, False)
-        self._diffpane.pack2(diff_frame, True, True)
+        self.diffpane.pack1(tree_frame, True, False)
+        self.diffpane.pack2(diff_frame, True, True)
         self.filetree.set_headers_clickable(True)
         gobject.idle_add(self.realize_status_settings)
-        return self._diffpane
+        return self.diffpane
 
 
     def get_extras(self):
@@ -505,7 +505,7 @@ class GStatus(gdialog.GDialog):
         return fm
 
     def realize_status_settings(self):
-        self._diffpane.set_position(self._setting_pos)
+        self.diffpane.set_position(self.setting_pos)
 
     def search_filelist(self, model, column, key, iter):
         'case insensitive filename search'
