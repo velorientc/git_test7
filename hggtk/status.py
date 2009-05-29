@@ -618,11 +618,12 @@ class GStatus(gdialog.GDialog):
         self.auto_check()
 
         selected = False
-        if len(reselect) < 100:  # issue 181 hack
-            for row in model:
-                if row[FM_PATH] in reselect:
-                    selection.select_iter(row.iter)
-                    selected = True
+        self.ready = False
+        for row in model:
+            if row[FM_PATH] in reselect:
+                selection.select_iter(row.iter)
+                selected = True
+        self.ready = True
         if not selected:
             selection.select_path((0,))
 
@@ -858,6 +859,8 @@ class GStatus(gdialog.GDialog):
     def merge_sel_changed(self, selection):
         'Selected row in file tree activated changed (merge mode)'
         # Update the diff text with merge diff to both parents
+        if not self.ready:
+            return
         model, paths = selection.get_selected_rows()
         if not paths:
             return
@@ -902,6 +905,8 @@ class GStatus(gdialog.GDialog):
     def tree_sel_changed(self, selection):
         'Selected row in file tree activated changed'
         # Read this file's diffs into diff model
+        if not self.ready:
+            return
         model, paths = selection.get_selected_rows()
         if not paths:
             return
