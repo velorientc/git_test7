@@ -266,7 +266,10 @@ class GStatus(gdialog.GDialog):
         self._menus['MU'] = unresolved_menu
 
         # model stores the file list.
-        self.filemodel = self.newfilemodel()
+        fm = gtk.ListStore(bool, str, str, str, str, bool)
+        fm.set_sort_func(1001, self.sort_by_stat)
+        fm.set_default_sort_func(self.sort_by_stat)
+        self.filemodel = fm
 
         self.filetree = gtk.TreeView(self.filemodel)
         self.filetree.connect('button-press-event', self.tree_button_press)
@@ -351,9 +354,9 @@ class GStatus(gdialog.GDialog):
             self.merge_diff_text.set_wrap_mode(gtk.WRAP_NONE)
             self.merge_diff_text.set_editable(False)
             self.merge_diff_text.modify_font(self.difffont)
-            self.filetree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-            self.filetree.get_selection().connect('changed',
-                    self.merge_sel_changed)
+            sel = self.filetree.get_selection()
+            sel = set_mode(gtk.SELECTION_SINGLE)
+            self.treeselid = sel.connect('changed', self.merge_sel_changed)
             scroller.add(self.merge_diff_text)
             diff_frame.add(scroller)
         else:
@@ -405,9 +408,9 @@ class GStatus(gdialog.GDialog):
             diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
 
             difftree.append_column(diffcol)
-            self.filetree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-            self.filetree.get_selection().connect('changed',
-                    self.tree_sel_changed)
+            sel = self.filetree.get_selection()
+            sel.set_mode(gtk.SELECTION_MULTIPLE)
+            self.treeselid = sel.connect('changed', self.tree_sel_changed)
             scroller.add(difftree)
             diff_frame.add(scroller)
 
@@ -497,12 +500,6 @@ class GStatus(gdialog.GDialog):
 
 
     ### End of overrides ###
-
-    def newfilemodel(self):
-        fm = gtk.ListStore(bool, str, str, str, str, bool)
-        fm.set_sort_func(1001, self.sort_by_stat)
-        fm.set_default_sort_func(self.sort_by_stat)
-        return fm
 
     def realize_status_settings(self):
         self.diffpane.set_position(self.setting_pos)
@@ -600,35 +597,31 @@ class GStatus(gdialog.GDialog):
 
         # Load the new data into the tree's model
         self.filetree.hide()
-
-        # issue 181 hack, create new model rather than clearing existing model
-        model = self.newfilemodel()
-        self.filemodel = model
-        self.filetree.set_model(model)
-        selection = self.filetree.get_selection()
+        selection.handler_block(self.treeselid)
+        self.filemodel.clear()
 
         for opt, char, changes in ([ct for ct in explicit_changetypes
                                     if self.test_opt(ct[0])] or changetypes):
             for wfile in changes:
                 mst = wfile in ms and ms[wfile].upper() or ""
                 wfile = util.localpath(wfile)
-                self.filemodel.append([wfile in recheck, char,
-                                       hglib.toutf(wfile), wfile, mst, False])
+                model.append([wfile in recheck, char,
+                              hglib.toutf(wfile), wfile, mst, False])
 
         self.auto_check()
 
-        selected = False
-        self.ready = False
-        for row in model:
+        selpath = (0,)
+        for i, row in enumerate(model):
             if row[FM_PATH] in reselect:
                 selection.select_iter(row.iter)
-                selected = True
-        self.ready = True
-        if not selected:
-            selection.select_path((0,))
+                selpath = (i,)
+        selection.handler_unblock(self.treeselid)
 
         # clear buffer after a merge commit
-        if not len(self.filemodel):
+        if len(model):
+            selection.unselect_path(selpath)
+            selection.select_path(selpath)
+        else:
             if self.merging:
                 self.merge_diff_text.set_buffer(gtk.TextBuffer())
             else:
@@ -859,8 +852,6 @@ class GStatus(gdialog.GDialog):
     def merge_sel_changed(self, selection):
         'Selected row in file tree activated changed (merge mode)'
         # Update the diff text with merge diff to both parents
-        if not self.ready:
-            return
         model, paths = selection.get_selected_rows()
         if not paths:
             return
@@ -905,8 +896,6 @@ class GStatus(gdialog.GDialog):
     def tree_sel_changed(self, selection):
         'Selected row in file tree activated changed'
         # Read this file's diffs into diff model
-        if not self.ready:
-            return
         model, paths = selection.get_selected_rows()
         if not paths:
             return
