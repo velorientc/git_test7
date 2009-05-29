@@ -341,7 +341,7 @@ class PathEditDialog(gtk.Dialog):
         newalias = self.entries['Alias'][0].get_text()
         if newalias in self.list:
             ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
-                   _("Overwirte existing '%s' path?") % newalias).run()
+                   _("Overwrite existing '%s' path?") % newalias).run()
             if ret != gtk.RESPONSE_YES:
                 return
         self.newpath = self.buildurl()
@@ -647,7 +647,7 @@ class ConfigDialog(gtk.Dialog):
         rows = [row for row in model if row[0] == 'default']
         if len(rows) > 0:
             ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
-                   _("Overwirte existing '%s' path?") % 'default').run()
+                   _("Overwrite existing '%s' path?") % 'default').run()
             if ret != gtk.RESPONSE_YES:
                 return
             # remove old default path
