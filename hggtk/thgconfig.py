@@ -667,6 +667,9 @@ class ConfigDialog(gtk.Dialog):
             pathinfo = self.pathtree.get_path_at_pos(x, y)
             if pathinfo is not None:
                 self._edit_path()
+        elif event.button == 1:
+            selection = self.pathtree.get_selection()
+            selection.unselect_all()
 
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
