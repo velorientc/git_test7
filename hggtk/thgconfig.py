@@ -618,17 +618,46 @@ class ConfigDialog(gtk.Dialog):
         dlg.run()
         dlg.hide()
 
+    def _default_path(self, *args):
+        selection = self.pathtree.get_selection()
+        if not selection.count_selected_rows():
+            return
+        model, path = selection.get_selected()
+        if model[path][0] == 'default':
+            return
+        # collect rows has 'default' alias
+        rows = [row for row in model if row[0] == 'default']
+        if len(rows) > 0:
+            ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
+                   _("Overwirte existing 'default' path?")).run()
+            if ret != gtk.RESPONSE_YES:
+                return
+            # remove old default path
+            default_iter = rows[0].iter
+            del model[default_iter]
+        # set 'default' alias to selected path
+        model[path][0] = 'default'
+        self.refresh_path_list()
+        self.dirty_event()
+
     def _pathtree_changed(self, sel):
         self.refresh_path_list()
 
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
+        selection = self.pathtree.get_selection()
         path_selected = (len(self.pathdata) > 0
-            and self.pathtree.get_selection().count_selected_rows() > 0)
+            and selection.count_selected_rows() > 0)
         repo_available = self.root is not None
+        if path_selected:
+            model, path = selection.get_selected()
+            default_path = model[path][0] == 'default'
+        else:
+            default_path = False
         self._editpathbutton.set_sensitive(path_selected)
         self._delpathbutton.set_sensitive(path_selected)
         self._testpathbutton.set_sensitive(repo_available and path_selected)
+        self._defaultpathbutton.set_sensitive(not default_path and path_selected)
 
     def fill_path_frame(self, frvbox):
         frame = gtk.Frame(_('Remote repository paths'))
@@ -679,6 +708,11 @@ class ConfigDialog(gtk.Dialog):
         self._testpathbutton.set_use_underline(True)
         self._testpathbutton.connect('clicked', self._test_path)
         buttonbox.pack_start(self._testpathbutton)
+
+        self._defaultpathbutton = gtk.Button(_('Set as _default'))
+        self._defaultpathbutton.set_use_underline(True)
+        self._defaultpathbutton.connect('clicked', self._default_path)
+        buttonbox.pack_start(self._defaultpathbutton)
 
         vbox.pack_start(buttonbox, False, False, 4)
 
