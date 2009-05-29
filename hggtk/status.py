@@ -266,9 +266,7 @@ class GStatus(gdialog.GDialog):
         self._menus['MU'] = unresolved_menu
 
         # model stores the file list.
-        self.filemodel = gtk.ListStore(bool, str, str, str, str, bool)
-        self.filemodel.set_sort_func(1001, self.sort_by_stat)
-        self.filemodel.set_default_sort_func(self.sort_by_stat)
+        self.filemodel = self.newfilemodel()
 
         self.filetree = gtk.TreeView(self.filemodel)
         self.filetree.connect('button-press-event', self.tree_button_press)
@@ -500,6 +498,12 @@ class GStatus(gdialog.GDialog):
 
     ### End of overrides ###
 
+    def newfilemodel(self):
+        fm = gtk.ListStore(bool, str, str, str, str, bool)
+        fm.set_sort_func(1001, self.sort_by_stat)
+        fm.set_default_sort_func(self.sort_by_stat)
+        return fm
+
     def realize_status_settings(self):
         self._diffpane.set_position(self._setting_pos)
 
@@ -596,7 +600,12 @@ class GStatus(gdialog.GDialog):
 
         # Load the new data into the tree's model
         self.filetree.hide()
-        self.filemodel.clear()
+
+        # issue 181 hack, create new model rather than clearing existing model
+        model = self.newfilemodel()
+        self.filemodel = model
+        self.filetree.set_model(model)
+        selection = self.filetree.get_selection()
 
         for opt, char, changes in ([ct for ct in explicit_changetypes
                                     if self.test_opt(ct[0])] or changetypes):
@@ -609,10 +618,11 @@ class GStatus(gdialog.GDialog):
         self.auto_check()
 
         selected = False
-        for row in model:
-            if row[FM_PATH] in reselect:
-                selection.select_iter(row.iter)
-                selected = True
+        if len(reselect) < 100:  # issue 181 hack
+            for row in model:
+                if row[FM_PATH] in reselect:
+                    selection.select_iter(row.iter)
+                    selected = True
         if not selected:
             selection.select_path((0,))
 
