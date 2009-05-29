@@ -223,6 +223,7 @@ class PathEditDialog(gtk.Dialog):
                               gtk.STOCK_OK, gtk.RESPONSE_OK))
         gtklib.set_tortoise_keys(self)
         self.connect('response', self.response)
+        self.connect('key-press-event', self.key_press)
         self.set_title(_('Edit remote repository path'))
         self.newpath, self.newalias = None, None
 
@@ -339,6 +340,10 @@ class PathEditDialog(gtk.Dialog):
         self.newpath = self.buildurl()
         self.newalias = self.entries['Alias'][0].get_text()
         self.destroy()
+
+    def key_press(self, widget, event):
+        if event.keyval in (gtk.keysyms.Return, gtk.keysyms.KP_Enter):
+            self.response(widget, gtk.RESPONSE_OK)
 
     def buildurl(self):
         proto = self.protcombo.get_active_text()
