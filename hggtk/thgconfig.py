@@ -661,6 +661,10 @@ class ConfigDialog(gtk.Dialog):
     def _pathtree_changed(self, sel):
         self.refresh_path_list()
 
+    def _pathtree_pressed(self, widget, event):
+        if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
+            self._edit_path()
+
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
         selection = self.pathtree.get_selection()
@@ -691,7 +695,9 @@ class ConfigDialog(gtk.Dialog):
         # Define view model for 'Paths' tab
         self.pathtree = gtk.TreeView(self.pathdata)
         self.pathtree.set_enable_search(False)
+        self.pathtree.add_events(gtk.gdk.BUTTON_PRESS_MASK)
         self.pathtree.connect("cursor-changed", self._pathtree_changed)
+        self.pathtree.connect("button-press-event", self._pathtree_pressed)
 
         renderer = gtk.CellRendererText()
         column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
