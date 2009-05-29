@@ -42,7 +42,7 @@ def hunk_markup(text):
     hunk = ""
     lines = text.splitlines()
     for line in lines:
-        line = gobject.markup_escape_text(hglib.toutf(line[:128]))
+        line = gobject.markup_escape_text(hglib.toutf(line[:512]))
         if line[-1] != '\n':
             line += '\n'
         if line.startswith('---') or line.startswith('+++'):
@@ -62,7 +62,7 @@ def hunk_unmarkup(text):
     hunk = ""
     lines = text.splitlines()
     for line in lines:
-        line = gobject.markup_escape_text(hglib.toutf(line[:128]))
+        line = gobject.markup_escape_text(hglib.toutf(line[:512]))
         if line[-1] != '\n':
             line += '\n'
         hunk += line

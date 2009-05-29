@@ -382,7 +382,7 @@ class DataMineDialog(gdialog.GDialog):
             tip, user = self.get_rev_desc(long(revid))
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, toutf(text[:128]), tip, toutf(path)))
+            model.append((revid, toutf(text[:512]), tip, toutf(path)))
         if thread.isAlive():
             return True
         else:
@@ -700,7 +700,7 @@ class DataMineDialog(gdialog.GDialog):
             color = colormap.get_color(ctx, curdate)
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, toutf(text[:128]), tip, toutf(path.strip()),
+            model.append((revid, toutf(text[:512]), tip, toutf(path.strip()),
                     color, user, len(model)+1))
         if thread.isAlive():
             return True
