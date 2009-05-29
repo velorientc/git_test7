@@ -217,7 +217,7 @@ _diff_info = (
 class PathEditDialog(gtk.Dialog):
     _protocols = ['ssh', 'http', 'https', 'local']
 
-    def __init__(self, path, alias):
+    def __init__(self, path, alias, list):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                           buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                               gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -226,6 +226,7 @@ class PathEditDialog(gtk.Dialog):
         self.connect('key-press-event', self.key_press)
         self.set_title(_('Edit remote repository path'))
         self.newpath, self.newalias = None, None
+        self.list = list
 
         self.entries = {}
         # Tuple: (internal name, translated name)
@@ -337,8 +338,14 @@ class PathEditDialog(gtk.Dialog):
         if response_id != gtk.RESPONSE_OK:
             self.destroy()
             return
+        newalias = self.entries['Alias'][0].get_text()
+        if newalias in self.list:
+            ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
+                   _("Overwirte existing '%s' path?") % newalias).run()
+            if ret != gtk.RESPONSE_YES:
+                return
         self.newpath = self.buildurl()
-        self.newalias = self.entries['Alias'][0].get_text()
+        self.newalias = newalias
         self.destroy()
 
     def key_press(self, widget, event):
@@ -581,9 +588,16 @@ class ConfigDialog(gtk.Dialog):
         if not selection.count_selected_rows():
             return
         model, path = selection.get_selected()
-        dialog = PathEditDialog(model[path][2], model[path][0])
+        dialog = PathEditDialog(model[path][2], model[path][0],
+                [p[0] for p in self.pathdata if p[0] != model[path][0]])
         dialog.run()
         if dialog.newpath:
+            if model[path][0] != dialog.newalias:
+                # remove existing path
+                rows = [row for row in model if row[0] == dialog.newalias]
+                if len(rows) > 0:
+                    del model[rows[0].iter]
+            # update path info
             model[path][0] = dialog.newalias
             model[path][1] = url.hidepassword(dialog.newpath)
             model[path][2] = dialog.newpath
@@ -633,7 +647,7 @@ class ConfigDialog(gtk.Dialog):
         rows = [row for row in model if row[0] == 'default']
         if len(rows) > 0:
             ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
-                   _("Overwirte existing 'default' path?")).run()
+                   _("Overwirte existing '%s' path?") % 'default').run()
             if ret != gtk.RESPONSE_YES:
                 return
             # remove old default path
