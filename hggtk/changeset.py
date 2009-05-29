@@ -36,7 +36,7 @@ class ChangeSet(gdialog.GDialog):
     def get_tbbuttons(self):
         self.parent_toggle = gtk.ToggleToolButton(gtk.STOCK_UNDO)
         self.parent_toggle.set_use_underline(True)
-        self.parent_toggle.set_label(_('_other parent'))
+        self.parent_toggle.set_label(_('_Other parent'))
         self.parent_toggle.set_tooltip(self.tooltips, _('diff other parent'))
         self.parent_toggle.set_sensitive(False)
         self.parent_toggle.set_active(False)
