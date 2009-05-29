@@ -551,7 +551,11 @@ class ConfigDialog(gtk.Dialog):
         '''Add a new path to [paths], give default name, focus'''
         i = self.pathdata.insert_before(None, None)
         safepath = url.hidepassword(newpath)
-        self.pathdata.set_value(i, 0, 'new')
+        alias, num = 'new', 0
+        while len([row for row in self.pathdata if row[0] == alias]) > 0:
+            num += 1
+            alias = 'new_%d' % num
+        self.pathdata.set_value(i, 0, alias)
         self.pathdata.set_value(i, 1, '%s' % hglib.toutf(safepath))
         self.pathdata.set_value(i, 2, '%s' % hglib.toutf(newpath))
         self.pathtree.get_selection().select_iter(i)
