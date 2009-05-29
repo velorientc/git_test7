@@ -430,7 +430,8 @@ class GCommit(GStatus):
             # backup continues
             allchunks = []
             for f in files:
-                if f not in self.modified: continue
+                cf = util.pconvert(f)
+                if cf not in self.modified: continue
                 if f not in self.filechunks: continue
                 chunks = self.filechunks[f]
                 if len(chunks) < 2: continue
@@ -439,11 +440,11 @@ class GCommit(GStatus):
                 rejected = [c for c in chunks[1:] if not c.active]
                 if len(rejected) == 0: continue
                 allchunks.extend(chunks)
-                fd, tmpname = tempfile.mkstemp(prefix=f.replace('/', '_')+'.',
+                fd, tmpname = tempfile.mkstemp(prefix=cf.replace('/', '_')+'.',
                                                dir=backupdir)
                 os.close(fd)
-                util.copyfile(repo.wjoin(f), tmpname)
-                backups[f] = tmpname
+                util.copyfile(repo.wjoin(cf), tmpname)
+                backups[cf] = tmpname
 
             fp = cStringIO.StringIO()
             for n, c in enumerate(allchunks):
