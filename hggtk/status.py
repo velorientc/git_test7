@@ -86,7 +86,7 @@ class GStatus(gdialog.GDialog):
     def init(self):
         gdialog.GDialog.init(self)
         self.mode = 'status'
-        self.ready = True
+        self.ready = False
         self.filerowstart = {}
         self.filechunks = {}
 
@@ -156,6 +156,7 @@ class GStatus(gdialog.GDialog):
     ### Overrides of base class methods ###
 
     def parse_opts(self):
+        # Disable refresh while we toggle checkboxes
         self.ready = False
 
         # Determine which files to display
@@ -176,6 +177,7 @@ class GStatus(gdialog.GDialog):
             if self.pats:
                 for name, check in self._show_checks.iteritems():
                     check.set_sensitive(False)
+        self.ready = True
 
 
     def get_title(self):
@@ -422,7 +424,6 @@ class GStatus(gdialog.GDialog):
         self.diffpane.pack1(tree_frame, True, False)
         self.diffpane.pack2(diff_frame, True, True)
         self.filetree.set_headers_clickable(True)
-        gobject.idle_add(self.realize_status_settings)
         return self.diffpane
 
 
@@ -493,16 +494,13 @@ class GStatus(gdialog.GDialog):
             self.selcb.set_active(file_count and file_count == check_count)
 
     def prepare_display(self):
-        self.ready = True
-        # If the status load failed, no reason to continue
-        if not self.reload_status():
-            raise util.Abort('could not load status')
-
+        gobject.idle_add(self.realize_status_settings)
 
     ### End of overrides ###
 
     def realize_status_settings(self):
         self.diffpane.set_position(self.setting_pos)
+        self.reload_status()
 
     def search_filelist(self, model, column, key, iter):
         'case insensitive filename search'
