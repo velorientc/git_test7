@@ -5,7 +5,7 @@ from win32com.shell import shell, shellcon
 import _winreg
 from mercurial import hg, cmdutil, util
 from mercurial import repo as _repo
-import thgutil
+from thgutil import paths
 import sys
 import win32serviceutil
 import win32service
@@ -100,7 +100,7 @@ def get_hg_state(upath):
     else:
         print "find new root"
         cache_pdir = pdir
-        cache_root = root = thgutil.find_root(pdir)
+        cache_root = root = paths.find_root(pdir)
     print "_get_state: root = ", root
     if root is None:
         print "_get_state: not in repo"
@@ -119,7 +119,7 @@ def get_hg_state(upath):
         
         print "%s: global overlayicons = " % path, global_opts
         print "%s: repo overlayicons = " % path, repo_opts
-        is_netdrive =  thgutil.netdrive_status(path) is not None
+        is_netdrive =  paths.netdrive_status(path) is not None
         if (is_netdrive and 'localdisks' in global_opts) \
                 or 'False' in repo_opts:
             print "%s: overlayicons disabled" % path

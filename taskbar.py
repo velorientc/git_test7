@@ -1,8 +1,8 @@
 # Creates a task-bar icon.  Run from Python.exe to see the
 # messages printed.
 
-import rpcserver
-import thread2
+from win32 import rpcserver
+from thgutil import thread2
 from win32api import *
 from win32gui import *
 import win32ui
@@ -42,7 +42,7 @@ class MainWindow:
     def _DoCreateIcons(self):
         # Try and find a custom icon
         hinst =  GetModuleHandle(None)
-        from thgutil import get_tortoise_icon
+        from thgutil.paths import get_tortoise_icon
         iconPathName = get_tortoise_icon("hg.ico")
         if os.path.isfile(iconPathName):
             icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
