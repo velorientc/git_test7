@@ -904,7 +904,8 @@ class GStatus(gdialog.GDialog):
         self.filerowstart = {}
         self.diffmodel.clear()
         self.append_diff_hunks(wfile)
-        tree.scroll_to_cell(0, use_align=True, row_align=0.0)
+        if len(self.diffmodel):
+            tree.scroll_to_cell(0, use_align=True, row_align=0.0)
 
     def read_file_chunks(self, wfile):
         'Get diffs of working file, parse into (c)hunks'
