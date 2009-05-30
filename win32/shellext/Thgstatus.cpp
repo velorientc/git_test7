@@ -32,7 +32,9 @@ int Thgstatus::update(const std::string& path)
         NMPWAIT_NOWAIT
     );
 
-    if (fSuccess || ::GetLastError() == ERROR_MORE_DATA)
+    if (fSuccess || 
+        ::GetLastError() == ERROR_MORE_DATA 
+        || ::GetLastError() == ERROR_PIPE_NOT_CONNECTED)
     {
         return 0;
     }
