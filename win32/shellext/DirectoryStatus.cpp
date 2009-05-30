@@ -17,6 +17,7 @@
 #include "stdafx.h"
 
 #include "DirectoryStatus.h"
+#include "Thgstatus.h"
 
 
 char DirectoryStatus::status(const std::string& relpath) const
@@ -61,6 +62,7 @@ int DirectoryStatus::read(const std::string& hgroot)
     if (!f)
     {
         TDEBUG_TRACE("DirectoryStatus::read: can't open '" << p << "'");
+        Thgstatus::update(hgroot);
         return 0;
     }
 
