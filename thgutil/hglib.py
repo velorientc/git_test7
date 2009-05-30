@@ -10,6 +10,7 @@ import os
 import sys
 import traceback
 import shlib
+import time
 from mercurial import hg, ui, util, extensions, commands, hook
 
 from i18n import _
@@ -172,6 +173,8 @@ def hgcmd_toq(path, q, *args):
 def displaytime(date):
     return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
 
+def utctime(date):
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(date[0]))
 
 # the remaining functions are only needed for Mercurial versions < 1.3
 def _earlygetopt(aliases, args):

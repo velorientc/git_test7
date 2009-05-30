@@ -165,10 +165,16 @@ class GLog(gdialog.GDialog):
         button.set_active(self.showcol.get('id', False))
         button.set_draw_as_radio(True)
         menu.append(button)
-        button = gtk.CheckMenuItem(_('Show Date'))
+        button = gtk.CheckMenuItem(_('Show Local Date'))
         button.connect('toggled', self.toggle_view_column,
                 'date-column-visible')
         button.set_active(self.showcol.get('date', True))
+        button.set_draw_as_radio(True)
+        menu.append(button)
+        button = gtk.CheckMenuItem(_('Show UTC Date'))
+        button.connect('toggled', self.toggle_view_column,
+                'utc-column-visible')
+        button.set_active(self.showcol.get('utc', False))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Show Branch'))
@@ -274,7 +280,7 @@ class GLog(gdialog.GDialog):
         settings = gdialog.GDialog.save_settings(self)
         settings['glog-vpane'] = self.vpaned.get_position()
         settings['glog-hpane'] = self.hpaned.get_position()
-        for col in ('rev', 'date', 'id', 'branch'):
+        for col in ('rev', 'date', 'id', 'branch', 'utc'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
         return settings
@@ -304,7 +310,7 @@ class GLog(gdialog.GDialog):
         try:
             self.setting_vpos = settings['glog-vpane']
             self.setting_hpos = settings['glog-hpane']
-            for col in ('rev', 'date', 'id', 'branch'):
+            for col in ('rev', 'date', 'id', 'branch', 'utc'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
         except KeyError:

@@ -29,7 +29,8 @@ HEAD = 10
 TAGS = 11
 FGCOLOR = 12
 HEXID = 13
-BRANCHES = 14
+UTC = 14
+BRANCHES = 15
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -65,7 +66,7 @@ class TreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
 
     def on_get_n_columns(self):
-        return 14
+        return 15
 
     def on_get_column_type(self, index):
         if index == NODE: return gobject.TYPE_PYOBJECT
@@ -83,6 +84,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == FGCOLOR: return gobject.TYPE_STRING
         if index == HEXID: return gobject.TYPE_STRING
         if index == BRANCHES: return gobject.TYPE_STRING
+        if index == UTC: return gobject.TYPE_STRING
 
     def on_get_iter(self, path):
         return path[0]
@@ -141,6 +143,7 @@ class TreeModel(gtk.GenericTreeModel):
 
             author = hglib.toutf(author)
             date = hglib.displaytime(ctx.date())
+            utc = hglib.utctime(ctx.date())
 
             wc_parent = revid in self.parents
             head = revid in self.heads
@@ -152,7 +155,7 @@ class TreeModel(gtk.GenericTreeModel):
             
             revision = (None, node, revid, None, sumstr,
                     author, date, None, parents, wc_parent, head, taglist,
-                    color, str(ctx))
+                    color, str(ctx), utc)
             self.revisions[revid] = revision
             self.branch_names[revid] = branchstr
         else:

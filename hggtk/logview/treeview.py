@@ -56,6 +56,11 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show date column',
                                  False,
                                  gobject.PARAM_READWRITE),
+        'utc-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'UTC',
+                                 'Show UTC/GMT date column',
+                                 False,
+                                 gobject.PARAM_READWRITE),
         'rev-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Rev',
                                  'Show revision number column',
@@ -227,6 +232,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.rev_column.get_visible()
         elif property.name == 'branch-column-visible':
             return self.branch_column.get_visible()
+        elif property.name == 'utc-column-visible':
+            return self.utc_column.get_visible()
         elif property.name == 'repo':
             return self.repo
         elif property.name == 'limit':
@@ -247,6 +254,8 @@ class TreeView(gtk.ScrolledWindow):
             self.rev_column.set_visible(value)
         elif property.name == 'branch-column-visible':
             self.branch_column.set_visible(value)
+        elif property.name == 'utc-column-visible':
+            self.utc_column.set_visible(value)
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'limit':
@@ -424,7 +433,7 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.date_column = gtk.TreeViewColumn(_('Date'))
+        self.date_column = gtk.TreeViewColumn(_('Local Date'))
         self.date_column.set_visible(False)
         self.date_column.set_resizable(True)
         self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
@@ -433,6 +442,19 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.date_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.treeview.append_column(self.date_column)
+
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 20)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        self.utc_column = gtk.TreeViewColumn(_('Universal Date'))
+        self.utc_column.set_visible(False)
+        self.utc_column.set_resizable(True)
+        self.utc_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.utc_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.utc_column.pack_start(cell, expand=True)
+        self.utc_column.add_attribute(cell, "text", treemodel.UTC)
+        self.utc_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        self.treeview.append_column(self.utc_column)
 
     def text_color_orig(self, parents, rev, author):
         if self.origtip is not None and int(rev) > self.origtip:
