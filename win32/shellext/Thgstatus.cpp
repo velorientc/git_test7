@@ -38,6 +38,8 @@ int Thgstatus::update(const std::string& path)
     }
     else
     {
+        TDEBUG_TRACE("Thgstatus::update: CallNamedPipeA failed (" 
+            << ::GetLastError() << ")");
         return -1;
     }
 }
