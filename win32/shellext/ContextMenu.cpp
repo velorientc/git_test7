@@ -3,6 +3,7 @@
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "Dirstatecache.h"
+#include "Thgstatus.h"
 
 typedef struct {
     std::string name;
@@ -486,7 +487,8 @@ void CShellExt::DoHgtk(const std::string &cmd)
         else
         {
             Dirstatecache::invalidate(hgroot);
-            hgcmd += " --notify .";
+            Thgstatus::update(cwd);
+            return;
         }
     }
 
