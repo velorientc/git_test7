@@ -301,7 +301,7 @@ class PathEditDialog(gtk.Dialog):
             folder = m.group(7) or "."
             passwd = ''
             scheme = 'ssh'
-        elif path.startswith('http'):
+        elif path.startswith('http://') or path.startswith('https://'):
             snpaqf = urlparse.urlparse(path)
             scheme, netloc, folder, params, query, fragment = snpaqf
             host, port, user, passwd = url.netlocsplit(netloc)
