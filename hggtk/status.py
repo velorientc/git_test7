@@ -637,9 +637,8 @@ class GStatus(gdialog.GDialog):
 
     def reload_status(self):
         if not self.ready: return False
-        res, outtext = self._hg_call_wrapper('Status', self.do_reload_status)
+        self.do_reload_status()
         self.update_check_count()
-        return res
 
 
     def make_menu(self, entries):
