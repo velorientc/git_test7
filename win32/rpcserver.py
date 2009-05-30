@@ -6,8 +6,12 @@ import _winreg
 from mercurial import hg, cmdutil, util
 from mercurial import repo as _repo
 from thgutil import paths, shlib
+
 import sys
 import time
+import Queue
+import threading
+
 import win32serviceutil
 import win32service
 import win32event
@@ -19,6 +23,7 @@ import winerror
 PIPENAME = "\\\\.\\pipe\\TortoiseHgRpcServer-bc0c27107423"
 PIPEBUFSIZE = 4096
 
+
 # FIXME: quick workaround traceback caused by missing "closed" 
 # attribute in win32trace.
 from mercurial import ui
@@ -26,6 +31,7 @@ def write_err(self, *args):
     for a in args:
         sys.stderr.write(str(a))
 ui.ui.write_err = write_err
+
 
 def update_thgstatus(path):
     print "update_thgstatus(%s)" % path
@@ -47,6 +53,19 @@ def update_thgstatus(path):
             shlib.shell_notify([r])
             print "updated repo %s" % r
     print "update_thgstatus(%s) finished." % path
+
+
+requests = Queue.Queue(0)
+
+class Updater(threading.Thread):
+    def run(self ):
+        while True:
+            r = requests.get()
+            if r is not None:
+                update_thgstatus(r)
+
+Updater().start()
+
 
 class PipeServer:
     def __init__(self):
@@ -116,9 +135,10 @@ class PipeServer:
                     # or before reading the response.
                     # Thats OK - just get the next connection
                     continue
-                        
+
                 try:
-                    update_thgstatus(data)
+                    print "queueing request %s" % data
+                    requests.put(data)
                 except SystemExit:
                     raise SystemExit # interrupted by thread2.terminate()
                 except:
