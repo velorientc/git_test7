@@ -123,12 +123,8 @@ class PipeServer:
                 # read pipe and process request
                 try:
                     hr, data = win32file.ReadFile(pipeHandle, PIPEBUFSIZE)
-                    message = "Processed %d bytes: '%s'" % (len(data), data)
-                    print (message)
-
                     if not data:
                         raise SystemExit  # signal by dispatch terminate
-
                     win32pipe.DisconnectNamedPipe(pipeHandle)
                 except win32file.error:
                     # Client disconnected without sending data
