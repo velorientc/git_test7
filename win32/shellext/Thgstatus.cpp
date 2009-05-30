@@ -29,7 +29,7 @@ int Thgstatus::update(const std::string& path)
 
     fSuccess = ::CallNamedPipeA(
         THG_PIPENAME, (void*)path.c_str(), path.size(), 0, 0, &cbRead,
-        NMPWAIT_NOWAIT
+        200 /* ms */
     );
 
     DWORD err = GetLastError();
