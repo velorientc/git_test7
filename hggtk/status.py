@@ -357,7 +357,7 @@ class GStatus(gdialog.GDialog):
             self.merge_diff_text.set_editable(False)
             self.merge_diff_text.modify_font(self.difffont)
             sel = self.filetree.get_selection()
-            sel = set_mode(gtk.SELECTION_SINGLE)
+            sel.set_mode(gtk.SELECTION_SINGLE)
             self.treeselid = sel.connect('changed', self.merge_sel_changed)
             scroller.add(self.merge_diff_text)
             diff_frame.add(scroller)
