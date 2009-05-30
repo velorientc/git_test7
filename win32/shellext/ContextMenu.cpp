@@ -479,17 +479,8 @@ void CShellExt::DoHgtk(const std::string &cmd)
 
     if (cmd == "thgstatus")
     {
-        std::string hgroot = GetHgRepoRoot(cwd);
-        if (hgroot.empty())
-        {
-            hgcmd += " --all";
-        }
-        else
-        {
-            Dirstatecache::invalidate(hgroot);
-            Thgstatus::update(cwd);
-            return;
-        }
+        Thgstatus::update(cwd);
+        return;
     }
 
     LaunchCommand(hgcmd, cwd);

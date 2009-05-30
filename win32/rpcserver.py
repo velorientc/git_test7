@@ -27,12 +27,24 @@ def write_err(self, *args):
 ui.ui.write_err = write_err
 
 def update_thgstatus(path):
-    print "update thgstatus for path '%s'" % path
+    print "update_thgstatus(%s)" % path
     root = paths.find_root(path)
-    if root is None:
-        return
-    shlib.update_thgstatus(ui.ui(), root, wait=False)
-    shlib.shell_notify([path])
+    _ui = ui.ui();
+    if root is not None:
+        shlib.update_thgstatus(_ui, root, wait=False)
+        shlib.shell_notify([path])
+        print "updated repo %s" % root
+    else:
+        roots = []
+        for f in os.listdir(path):
+            r = paths.find_root(os.path.join(path, f))
+            if r is not None:
+                roots.append(r)
+        for r in roots:
+            shlib.update_thgstatus(_ui, r, wait=False)
+            shlib.shell_notify([r])
+            print "updated repo %s" % r
+    print "update_thgstatus(%s) finished." % path
 
 class PipeServer:
     def __init__(self):
