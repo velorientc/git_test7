@@ -32,16 +32,21 @@ int Thgstatus::update(const std::string& path)
         NMPWAIT_NOWAIT
     );
 
-    if (fSuccess || 
-        ::GetLastError() == ERROR_MORE_DATA 
-        || ::GetLastError() == ERROR_PIPE_NOT_CONNECTED)
+    DWORD err = GetLastError();
+    if (fSuccess || err == ERROR_MORE_DATA || err == ERROR_PIPE_NOT_CONNECTED)
     {
         return 0;
+    }
+    else if (err == ERROR_PIPE_BUSY)
+    {
+        TDEBUG_TRACE("Thgstatus::update: CallNamedPipeA failed. " 
+            "ERROR_PIPE_BUSY");
+        return -1;
     }
     else
     {
         TDEBUG_TRACE("Thgstatus::update: CallNamedPipeA failed (" 
-            << ::GetLastError() << ")");
+            << err << ")");
         return -1;
     }
 }
