@@ -7,6 +7,7 @@ from mercurial import hg, cmdutil, util
 from mercurial import repo as _repo
 from thgutil import paths, shlib
 import sys
+import time
 import win32serviceutil
 import win32service
 import win32event
@@ -32,6 +33,7 @@ def update_thgstatus(path):
     _ui = ui.ui();
     if root is not None:
         shlib.update_thgstatus(_ui, root, wait=False)
+        time.sleep(2)
         shlib.shell_notify([path])
         print "updated repo %s" % root
     else:
