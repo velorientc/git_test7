@@ -581,9 +581,9 @@ class ConfigDialog(gtk.Dialog):
 
     def _add_path(self, *args):
         self.new_path('http://')
-        self._edit_path()
+        self._edit_path(new=True)
 
-    def _edit_path(self, *args):
+    def _edit_path(self, *args, **opts):
         selection = self.pathtree.get_selection()
         if not selection.count_selected_rows():
             return
@@ -601,6 +601,10 @@ class ConfigDialog(gtk.Dialog):
             model[path][0] = dialog.newalias
             model[path][1] = url.hidepassword(dialog.newpath)
             model[path][2] = dialog.newpath
+            self.dirty_event()
+        elif opts.has_key('new') and opts['new'] == True:
+            del self.pathdata[path]
+            self.refresh_path_list()
             self.dirty_event()
 
     def _remove_path(self, *args):
