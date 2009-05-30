@@ -83,6 +83,8 @@ class RecoveryDialog(gtk.Window):
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
+        self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
+                                   foreground='#900000')
         vbox.pack_start(scrolledwindow, True, True)
 
         self.stbar = gtklib.StatusBar()
@@ -189,6 +191,11 @@ class RecoveryDialog(gtk.Window):
         else:
             self.textbuffer.set_text(msg)
 
+    def write_err(self, msg):
+        enditer = self.textbuffer.get_end_iter()
+        self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+        self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
+
     def process_queue(self):
         """
         Handle all the messages currently in the queue (if any).
@@ -200,13 +207,20 @@ class RecoveryDialog(gtk.Window):
                 self.write(msg)
             except Queue.Empty:
                 pass
+        while self.hgthread.geterrqueue().qsize():
+            try:
+                msg = self.hgthread.geterrqueue().get(0)
+                self.write_err(msg)
+            except Queue.Empty:
+                pass
+
         if self._cmd_running():
             return True
         else:
             self.stbar.end()
             self._stop_button.set_sensitive(False)
             if self.hgthread.return_code() is None:
-                self.write(_('[command interrupted]'))
+                self.write_err(_('[command interrupted]'))
             return False # Stop polling this function
 
 def run(ui, *pats, **opts):

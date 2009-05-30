@@ -22,8 +22,8 @@ class GtkUi(ui.ui):
     Instead, it places output and dialog requests onto queues for the
     main thread to pickup.
     '''
-    def __init__(self, src=None, outputq=None, dialogq=None, responseq=None,
-            parentui=None):
+    def __init__(self, src=None, outputq=None, errorq=None, dialogq=None,
+            responseq=None, parentui=None):
         if parentui:
             # Mercurial 1.2
             super(GtkUi, self).__init__(parentui=parentui)
@@ -33,10 +33,12 @@ class GtkUi(ui.ui):
             super(GtkUi, self).__init__(src)
         if src:
             self.outputq = src.outputq
+            self.errorq = src.errorq
             self.dialogq = src.dialogq
             self.responseq = src.responseq
         else:
             self.outputq = outputq
+            self.errorq = errorq
             self.dialogq = dialogq
             self.responseq = responseq
         self.setconfig('ui', 'interactive', 'on')
@@ -48,7 +50,7 @@ class GtkUi(ui.ui):
 
     def write_err(self, *args):
         for a in args:
-            self.outputq.put('*** ' + str(a))
+            self.errorq.put(str(a))
 
     def flush(self):
         pass
@@ -95,9 +97,11 @@ class HgThread(thread2.Thread):
     '''
     def __init__(self, args=[], postfunc=None, parent=None):
         self.outputq = Queue.Queue()
+        self.errorq = Queue.Queue()
         self.dialogq = Queue.Queue()
         self.responseq = Queue.Queue()
-        self.ui = GtkUi(None, self.outputq, self.dialogq, self.responseq)
+        self.ui = GtkUi(None, self.outputq, self.errorq, self.dialogq,
+                        self.responseq)
         self.args = args
         self.ret = None
         self.postfunc = postfunc
@@ -106,6 +110,9 @@ class HgThread(thread2.Thread):
 
     def getqueue(self):
         return self.outputq
+
+    def geterrqueue(self):
+        return self.errorq
 
     def return_code(self):
         '''

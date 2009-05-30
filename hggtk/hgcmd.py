@@ -80,6 +80,8 @@ class CmdDialog(gtk.Dialog):
         self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
+        self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
+                                   foreground='#900000')
 
         self.vbox.pack_start(scrolledwindow, True, True)
         self.connect('map_event', self._on_window_map_event)
@@ -127,6 +129,13 @@ class CmdDialog(gtk.Dialog):
             try:
                 msg = self.hgthread.getqueue().get(0)
                 self.textbuffer.insert(enditer, hglib.toutf(msg))
+                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
+            except Queue.Empty:
+                pass
+        while self.hgthread.geterrqueue().qsize():
+            try:
+                msg = self.hgthread.geterrqueue().get(0)
+                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
