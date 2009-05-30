@@ -45,6 +45,7 @@ Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsource
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
 Source: ..\contrib\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: ..\contrib\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: win32\shellext\THgShell.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
