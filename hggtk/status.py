@@ -408,13 +408,14 @@ class GStatus(gdialog.GDialog):
             cell.set_property('foreground', '#888888')
             diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
             diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
-
             difftree.append_column(diffcol)
-            sel = self.filetree.get_selection()
-            sel.set_mode(gtk.SELECTION_MULTIPLE)
-            self.treeselid = sel.connect('changed', self.tree_sel_changed)
             scroller.add(difftree)
             diff_frame.add(scroller)
+
+            sel = self.filetree.get_selection()
+            sel.set_mode(gtk.SELECTION_MULTIPLE)
+            self.treeselid = sel.connect('changed',
+                    self.tree_sel_changed, difftree)
 
         if self.diffbottom:
             self.diffpane = gtk.VPaned()
@@ -892,7 +893,7 @@ class GStatus(gdialog.GDialog):
         self.merge_diff_text.set_buffer(buf)
 
 
-    def tree_sel_changed(self, selection):
+    def tree_sel_changed(self, selection, tree):
         'Selected row in file tree activated changed'
         # Read this file's diffs into diff model
         model, paths = selection.get_selected_rows()
@@ -903,6 +904,7 @@ class GStatus(gdialog.GDialog):
         self.filerowstart = {}
         self.diffmodel.clear()
         self.append_diff_hunks(wfile)
+        tree.scroll_to_cell(0, use_align=True, row_align=0.0)
 
     def read_file_chunks(self, wfile):
         'Get diffs of working file, parse into (c)hunks'
