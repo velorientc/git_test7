@@ -5,7 +5,7 @@ from win32com.shell import shell, shellcon
 import _winreg
 from mercurial import hg, cmdutil, util
 from mercurial import repo as _repo
-from thgutil import paths
+from thgutil import paths, shlib
 import sys
 import win32serviceutil
 import win32service
@@ -28,7 +28,11 @@ ui.ui.write_err = write_err
 
 def update_thgstatus(path):
     print "update thgstatus for path '%s'" % path
-    pass
+    root = paths.find_root(path)
+    if root is None:
+        return
+    shlib.update_thgstatus(ui.ui(), root, wait=False)
+    shlib.shell_notify([path])
 
 class PipeServer:
     def __init__(self):
@@ -91,23 +95,23 @@ class PipeServer:
 
                     if not data:
                         raise SystemExit  # signal by dispatch terminate
-                        
-                    try:
-                        update_thgstatus(data)
-                    except SystemExit:
-                        raise SystemExit # interrupted by thread2.terminate()
-                    except:
-                        import traceback
-                        print "WARNING: something went wrong in get_hg_state()"
-                        print traceback.format_exc()
-                        status = "ERROR"
-                    
+
                     win32pipe.DisconnectNamedPipe(pipeHandle)
                 except win32file.error:
                     # Client disconnected without sending data
                     # or before reading the response.
                     # Thats OK - just get the next connection
                     continue
+                        
+                try:
+                    update_thgstatus(data)
+                except SystemExit:
+                    raise SystemExit # interrupted by thread2.terminate()
+                except:
+                    import traceback
+                    print "WARNING: something went wrong in get_hg_state()"
+                    print traceback.format_exc()
+                    status = "ERROR" 
 
 if __name__ == '__main__':
     import sys
