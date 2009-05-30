@@ -916,11 +916,13 @@ class GStatus(gdialog.GDialog):
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.ui):
             # Fake patch that displays size warning
-            lines = ['diff --git -r a/%s b/%s\n' % (wfile, wfile)]
+            lines = ['diff --git a/%s b/%s\n' % (wfile, wfile)]
+            lines.append(_('File is larger than the specified max size.\n'))
+            lines.append(_('Hunk selection is disabled for this file.\n'))
             lines.append('--- a/%s\n' % wfile)
             lines.append('+++ b/%s\n' % wfile)
-            lines.append(_('File is larger than the specified max diff size\n'))
             difftext.writelines(lines)
+            difftext.seek(0)
         else:
             wfiles = [self.repo.wjoin(wfile)]
             matcher = cmdutil.match(self.repo, wfiles, self.opts)
