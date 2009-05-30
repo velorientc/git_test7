@@ -93,12 +93,12 @@ class GShelve(GStatus):
         """
         merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
                 = GStatus.get_menu_info(self)
-        return (merge + (('_shelve', self.shelve_file),),
-                addrem + (('_shelve', self.shelve_file),),
-                unknown + (('_shelve', self.shelve_file),),
+        return (merge + ((_('_shelve'), self.shelve_file),),
+                addrem + ((_('_shelve'), self.shelve_file),),
+                unknown + ((_('_shelve'), self.shelve_file),),
                 clean,
                 ignored,
-                deleted + (('_shelve', self.shelve_file),),
+                deleted + ((_('_shelve'), self.shelve_file),),
                 unresolved,
                 resolved,
                )
