@@ -18,7 +18,7 @@
 
 #include "Thgstatus.h"
 
-#define THG_PIPENAME  "\\\\.\\pipe\\PyPipeService"
+#define THG_PIPENAME  "\\\\.\\pipe\\TortoiseHgRpcServer-bc0c27107423"
 
 int Thgstatus::update(const std::string& path)
 {

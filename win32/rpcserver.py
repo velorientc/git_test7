@@ -15,7 +15,7 @@ import win32file
 import pywintypes
 import winerror
 
-PIPENAME = "\\\\.\\pipe\\PyPipeService"
+PIPENAME = "\\\\.\\pipe\\TortoiseHgRpcServer-bc0c27107423"
 PIPEBUFSIZE = 4096
 
 # FIXME: quick workaround traceback caused by missing "closed" 
