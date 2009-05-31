@@ -27,19 +27,19 @@ PIPEBUFSIZE = 4096
 
 def update_batch(batch):
     '''updates thgstatus for all paths in batch'''
-    roots = []
-    notifypaths = []
+    roots = set()
+    notifypaths = set()
     for path in batch:
         r = paths.find_root(path)
         if r is None:
             for n in os.listdir(path):
                 r = paths.find_root(os.path.join(path, n))
-                if (r is not None) and (r not in roots):
-                    roots.append(r)
-                    notifypaths.append(r)
-        elif r not in roots:
-            roots.append(r);
-            notifypaths.append(path)
+                if (r is not None):
+                    roots.add(r)
+                    notifypaths.add(r)
+        else:
+            roots.add(r);
+            notifypaths.add(path)
     if roots:
         _ui = ui.ui();
         for r in sorted(roots):
@@ -47,7 +47,7 @@ def update_batch(batch):
             print "updated repo %s" % r
         if notifypaths:
             time.sleep(2)
-            shlib.shell_notify(notifypaths)
+            shlib.shell_notify(list(notifypaths))
             print "shell notified"
 
 requests = Queue.Queue(0)
