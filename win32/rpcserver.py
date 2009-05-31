@@ -1,10 +1,13 @@
 import os
 import win32api
 import win32con
+
 from win32com.shell import shell, shellcon
 import _winreg
+
 from mercurial import hg, cmdutil, util
 from mercurial import repo as _repo
+
 from thgutil import paths, shlib
 
 import sys
@@ -19,6 +22,7 @@ import win32pipe
 import win32file
 import pywintypes
 import winerror
+
 
 PIPENAME = "\\\\.\\pipe\\TortoiseHgRpcServer-bc0c27107423"
 PIPEBUFSIZE = 4096
@@ -54,7 +58,7 @@ def update_thgstatus(path):
 requests = Queue.Queue(0)
 
 class Updater(threading.Thread):
-    def run(self ):
+    def run(self):
         n = 0
         while True:
             batch = []
@@ -178,5 +182,4 @@ if __name__ == '__main__':
             print "%s = %s" % (path, status)
     else:
         print "usage:\n%s [--server|--client]" % sys.argv[0]
-        
 
