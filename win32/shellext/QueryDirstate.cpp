@@ -23,7 +23,6 @@
 #include "Dirstatecache.h"
 #include "Winstat.h"
 #include "TortoiseUtils.h"
-#include "Thgstatus.h"
 
 #include <shlwapi.h>
 
@@ -195,19 +194,6 @@ int HgQueryDirstate(
         }
 
         outStatus = e->status(stat);
-
-        if (outStatus == 'M')
-        {
-            DirectoryStatus* dirsst = DirectoryStatus::get(cur.hgroot);
-            if (dirsst)
-            {
-                char basedir_status = dirsst->status(cur.basedir);
-                if (basedir_status != 'M')
-                {
-                    Thgstatus::update(cur.hgroot);
-                }
-            }
-        }
     }
 
     cur.status = outStatus;
