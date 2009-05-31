@@ -608,8 +608,9 @@ class GStatus(gdialog.GDialog):
                 ck = wfile in recheck or (wfile not in old and char in 'MAR')
                 model.append([ck, char, hglib.toutf(wfile), wfile, mst, False])
 
-        self.auto_check()
+        self.auto_check() # may check more files
 
+        # recover selections
         firstrow = None
         for i, row in enumerate(model):
             if row[FM_PATH] in reselect:
@@ -619,10 +620,10 @@ class GStatus(gdialog.GDialog):
                     selection.select_iter(row.iter)
         selection.handler_unblock(self.treeselid)
 
-        # clear buffer after a merge commit
         if len(model):
             selection.select_path((firstrow or 0,))
         else:
+            # clear diff pane if no files
             if self.merging:
                 self.merge_diff_text.set_buffer(gtk.TextBuffer())
             else:
