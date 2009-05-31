@@ -135,6 +135,8 @@ Dirstate* Dirstatecache::get(
     iter->dstate_mtime = stat.mtime;
     iter->dstate_size = stat.size;
 
+    Thgstatus::update(cwd);
+
     return iter->dstate;
 }
 
