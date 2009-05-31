@@ -5,8 +5,7 @@ import win32con
 from win32com.shell import shell, shellcon
 import _winreg
 
-from mercurial import hg, cmdutil, util
-from mercurial import repo as _repo
+from mercurial import ui
 
 from thgutil import paths, shlib
 
@@ -15,8 +14,6 @@ import time
 import Queue
 import threading
 
-import win32serviceutil
-import win32service
 import win32event
 import win32pipe
 import win32file
