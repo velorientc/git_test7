@@ -34,13 +34,10 @@ ui.ui.write_err = write_err
 
 
 def update_thgstatus(path):
-    print "update_thgstatus(%s)" % path
     root = paths.find_root(path)
     _ui = ui.ui();
     if root is not None:
         shlib.update_thgstatus(_ui, root, wait=False)
-        time.sleep(2)
-        shlib.shell_notify([path])
         print "updated repo %s" % root
     else:
         roots = []
@@ -52,17 +49,37 @@ def update_thgstatus(path):
             shlib.update_thgstatus(_ui, r, wait=False)
             shlib.shell_notify([r])
             print "updated repo %s" % r
-    print "update_thgstatus(%s) finished." % path
 
 
 requests = Queue.Queue(0)
 
 class Updater(threading.Thread):
     def run(self ):
+        n = 0
         while True:
+            batch = []
             r = requests.get()
-            if r is not None:
-                update_thgstatus(r)
+            print "got request %s (new batch)" % r
+            batch.append(r)
+            print "waiting a bit"
+            time.sleep(0.2)
+            try:
+                while True:
+                    r = requests.get_nowait()
+                    print "got request %s" % r
+                    batch.append(r)
+            except Queue.Empty:
+                pass
+            n += 1
+            msg = "--- batch %i complete with %i requests"
+            msg += ", processing --"
+            print msg % (n, len(batch))
+            if batch:
+                for r in batch:
+                    update_thgstatus(r)
+                time.sleep(2)
+                shlib.shell_notify(batch)
+                print "shell notified"
 
 Updater().start()
 
