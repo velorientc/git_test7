@@ -102,6 +102,7 @@ class MainWindow:
         if self.stop_pipe_server():
             DestroyWindow(self.hwnd)
             print "\n\nGoodbye"
+            sys.exit()
     
     def stop_pipe_server(self):
         max_try = 10
