@@ -160,7 +160,7 @@ class PipeServer:
                     raise SystemExit # interrupted by thread2.terminate()
                 except:
                     import traceback
-                    print "WARNING: something went wrong in get_hg_state()"
+                    print "WARNING: something went wrong in requests.put"
                     print traceback.format_exc()
                     status = "ERROR" 
 
