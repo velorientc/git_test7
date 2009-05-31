@@ -213,7 +213,7 @@ class GDialog(gtk.Window):
 
 
     def test_opt(self, opt):
-        return opt in self.opts and self.opts[opt]
+        return self.opts.get(opt, False)
 
     def _parse_config(self):
         # defaults
