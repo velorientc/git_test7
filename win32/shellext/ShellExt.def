@@ -1,6 +1,6 @@
 ; shellext: Declares the module parameters for the DLL.
 
-LIBRARY      TORTOISEHGSHELL
+LIBRARY      THGSHELL
 DESCRIPTION  'Shell Extensions for TortoiseHg'
 
 EXPORTS
