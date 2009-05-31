@@ -588,8 +588,9 @@ class GStatus(gdialog.GDialog):
         # List of the currently checked and selected files to pass on to
         # the new data
         model, tpaths = selection.get_selected_rows()
-        recheck = [entry[FM_PATH] for entry in model if entry[FM_CHECKED]]
         reselect = [model[path][FM_PATH] for path in tpaths]
+        recheck = [entry[FM_PATH] for entry in model if entry[FM_CHECKED]]
+        old = [entry[FM_PATH] for entry in model]
 
         # merge-state of files
         ms = merge_.mergestate(repo)
@@ -604,8 +605,8 @@ class GStatus(gdialog.GDialog):
             for wfile in changes:
                 mst = wfile in ms and ms[wfile].upper() or ""
                 wfile = util.localpath(wfile)
-                model.append([wfile in recheck, char,
-                              hglib.toutf(wfile), wfile, mst, False])
+                ck = wfile in recheck or (wfile not in old and char in 'MAR')
+                model.append([ck, char, hglib.toutf(wfile), wfile, mst, False])
 
         self.auto_check()
 
