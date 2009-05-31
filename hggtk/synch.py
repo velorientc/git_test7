@@ -38,7 +38,7 @@ class SynchDialog(gtk.Window):
         self.set_default_size(655, 552)
 
         self._paths = self._get_paths()
-        self.origchangecount = len(self.repo.changelog)
+        self.origchangecount = len(self.repo)
 
         name = self.repo.ui.config('web', 'name') or os.path.basename(self.root)
         self.set_title(_('TortoiseHg Synchronize - ') + name)
@@ -287,7 +287,7 @@ class SynchDialog(gtk.Window):
             repo = hg.repository(ui.ui(), path=self.root)
         except hglib.RepoError:
             return
-        tip = len(repo.changelog)
+        tip = len(repo)
         if self.origchangecount == tip or self.fromlog:
             self.viewpulled.hide()
         else:
