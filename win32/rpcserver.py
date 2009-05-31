@@ -37,23 +37,30 @@ def write_err(self, *args):
 ui.ui.write_err = write_err
 
 
-def update_thgstatus(path):
-    root = paths.find_root(path)
-    _ui = ui.ui();
-    if root is not None:
-        shlib.update_thgstatus(_ui, root, wait=False)
-        print "updated repo %s" % root
-    else:
-        roots = []
-        for f in os.listdir(path):
-            r = paths.find_root(os.path.join(path, f))
-            if r is not None:
-                roots.append(r)
-        for r in roots:
+def update_batch(batch):
+    '''updates thgstatus for all paths in batch'''
+    roots = []
+    notifypaths = []
+    for path in batch:
+        r = paths.find_root(path)
+        if r is None:
+            for n in os.listdir(path):
+                r = paths.find_root(os.path.join(path, n))
+                if (r is not None) and (r not in roots):
+                    roots.append(r)
+                    notifypaths.append(r)
+        elif r not in roots:
+            roots.append(r);
+            notifypaths.append(path)
+    if roots:
+        _ui = ui.ui();
+        for r in sorted(roots):
             shlib.update_thgstatus(_ui, r, wait=False)
-            shlib.shell_notify([r])
             print "updated repo %s" % r
-
+        if notifypaths:
+            time.sleep(2)
+            shlib.shell_notify(notifypaths)
+            print "shell notified"
 
 requests = Queue.Queue(0)
 
@@ -63,9 +70,9 @@ class Updater(threading.Thread):
         while True:
             batch = []
             r = requests.get()
-            print "got request %s (new batch)" % r
+            print "got request %s (first in batch)" % r
             batch.append(r)
-            print "waiting a bit"
+            print "wait a bit for additional requests..."
             time.sleep(0.2)
             try:
                 while True:
@@ -75,15 +82,9 @@ class Updater(threading.Thread):
             except Queue.Empty:
                 pass
             n += 1
-            msg = "--- batch %i complete with %i requests"
-            msg += ", processing --"
+            msg = "--- processing batch %i with %i requests ---"
             print msg % (n, len(batch))
-            if batch:
-                for r in batch:
-                    update_thgstatus(r)
-                time.sleep(2)
-                shlib.shell_notify(batch)
-                print "shell notified"
+            update_batch(batch)
 
 Updater().start()
 
