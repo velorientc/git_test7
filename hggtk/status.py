@@ -441,7 +441,7 @@ class GStatus(gdialog.GDialog):
         if self.count_revs() <= 1:
             checks += (('deleted', _('deleted')),
                        ('unknown', _('unknown')),
-                       ('close', _('clean')),
+                       ('clean', _('clean')),
                        ('ignored', _('ignored')))
 
         for ctuple in checks:
