@@ -25,15 +25,6 @@ PIPENAME = r"\\.\pipe\TortoiseHgRpcServer-bc0c27107423"
 PIPEBUFSIZE = 4096
 
 
-# FIXME: quick workaround traceback caused by missing "closed" 
-# attribute in win32trace.
-from mercurial import ui
-def write_err(self, *args):
-    for a in args:
-        sys.stderr.write(str(a))
-ui.ui.write_err = write_err
-
-
 def update_batch(batch):
     '''updates thgstatus for all paths in batch'''
     roots = []
