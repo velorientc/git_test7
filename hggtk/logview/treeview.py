@@ -457,7 +457,7 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.utc_column)
 
     def text_color_orig(self, parents, rev, author):
-        if self.origtip is not None and int(rev) > self.origtip:
+        if self.origtip is not None and int(rev) >= self.origtip:
             return 'darkgreen'
         if len(parents) == 2:
             # mark merge changesets blue
@@ -476,7 +476,7 @@ class TreeView(gtk.ScrolledWindow):
     color_cache = {}
 
     def text_color_author(self, parents, rev, author):
-        if self.origtip is not None and int(rev) > self.origtip:
+        if self.origtip is not None and int(rev) >= self.origtip:
             return 'darkgreen'
         for re, v in self.author_pats:
             if (re.search(author)):

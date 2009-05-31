@@ -78,14 +78,21 @@ class GLog(gdialog.GDialog):
 
     def synch_clicked(self, toolbutton, data):
         from hggtk import synch
+        parents = [x.node() for x in self.repo.parents()]
         dlg = synch.SynchDialog([], False, True)
-        dlg.set_notify_func(self.synch_complete, None)
+        dlg.set_notify_func(self.synch_complete, parents)
         dlg.show_all()
 
-    def synch_complete(self, _):
+    def synch_complete(self, parents):
         self.repo.invalidate()
+        newparents = [x.node() for x in self.repo.parents()]
         if len(self.repo) != self.origtip:
-            self.newbutton.set_active(True)
+            if self.newbutton.get_active():
+                self.reload_log()
+            else:
+                self.newbutton.set_active(True)
+        elif not oldparents == newparents:
+            self.refresh_model()
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
@@ -344,8 +351,7 @@ class GLog(gdialog.GDialog):
         elif self.filter == 'all':
             self.graphview.refresh(True, None, self.opts)
         elif self.filter == 'new':
-            newtip = len(self.repo)-1
-            self.opts['revrange'] = [newtip, self.origtip+1]
+            self.opts['revrange'] = [len(self.repo)-1, self.origtip]
             self.graphview.refresh(True, None, self.opts)
         elif self.filter == 'only_merges':
             self.opts['only_merges'] = True
