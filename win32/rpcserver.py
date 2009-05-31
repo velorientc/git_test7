@@ -21,7 +21,7 @@ import pywintypes
 import winerror
 
 
-PIPENAME = "\\\\.\\pipe\\TortoiseHgRpcServer-bc0c27107423"
+PIPENAME = r"\\.\pipe\TortoiseHgRpcServer-bc0c27107423"
 PIPEBUFSIZE = 4096
 
 
