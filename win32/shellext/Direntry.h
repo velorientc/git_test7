@@ -20,6 +20,11 @@
 
 #include <vector>
 
+// Visual Studio has UINT32 instead of uint32_t
+#ifndef uint32_t
+#define uint32_t UINT32
+#endif
+
 class Winstat;
 
 class Direntry
