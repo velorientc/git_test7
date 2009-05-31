@@ -6,6 +6,7 @@
 
 import os
 import gtk
+import gobject
 
 from mercurial import cmdutil, util, hg, ui
 
@@ -35,7 +36,7 @@ class FilterDialog(gtk.Dialog):
         try:
             self.repo = hg.repository(ui.ui(), path=root)
         except hglib.RepoError:
-            return None
+            gobject.idle_add(self.destroy)
 
         self.set_default_size(350, 120)
 
