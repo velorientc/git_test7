@@ -133,7 +133,7 @@ class DataMineDialog(gdialog.GDialog):
         parent = self.repo[self.currev].parents()[0].rev()
         self.trigger_annotate(parent, objs)
 
-    def menu_zoom(self, menuitem, objs):
+    def cmenu_zoom(self, menuitem, objs):
         (frame, treeview, path, graphview) = objs
         graphview.scroll_to_revision(int(self.currev))
         graphview.set_revision_id(int(self.currev))
