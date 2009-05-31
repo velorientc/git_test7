@@ -301,7 +301,6 @@ class CloneDialog(gtk.Window):
         self._close_button.grab_focus()
 
         if dlg.return_code() == 0:
-            shlib.update_thgstatus(self.ui, dest, wait=True)
             shlib.shell_notify([dest])
 
 def run(_ui, *pats, **opts):
