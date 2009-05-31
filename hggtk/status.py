@@ -576,21 +576,21 @@ class GStatus(gdialog.GDialog):
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         self._node1, self._node2, self.modified = n1, n2, modified
 
-        changetypes = (('modified', 'M', modified),
-                       ('added', 'A', added),
-                       ('removed', 'R', removed),
-                       ('deleted', '!', deleted),
-                       ('unknown', '?', unknown),
-                       ('ignored', 'I', ignored))
-
-        explicit_changetypes = changetypes + (('clean', 'C', clean),)
+        changetypes = (('M', 'modified', modified),
+                       ('A', 'added', added),
+                       ('R', 'removed', removed),
+                       ('!', 'deleted', deleted),
+                       ('?', 'unknown', unknown),
+                       ('I', 'ignored', ignored),
+                       ('C', 'clean', clean))
 
         # List of the currently checked and selected files to pass on to
         # the new data
         model, tpaths = selection.get_selected_rows()
         reselect = [model[path][FM_PATH] for path in tpaths]
-        recheck = [entry[FM_PATH] for entry in model if entry[FM_CHECKED]]
-        old = [entry[FM_PATH] for entry in model]
+        waschecked = {}
+        for entry in model:
+            waschecked[entry[FM_PATH]] = entry[FM_CHECKED]
 
         # merge-state of files
         ms = merge_.mergestate(repo)
@@ -600,13 +600,13 @@ class GStatus(gdialog.GDialog):
         selection.handler_block(self.treeselid)
         self.filemodel.clear()
 
-        for opt, char, changes in ([ct for ct in explicit_changetypes
-                                    if self.test_opt(ct[0])] or changetypes):
-            for wfile in changes:
+        types = [ct for ct in changetypes if self.opts.get(ct[1])]
+        for stat, _, wfiles in types:
+            for wfile in wfiles:
                 mst = wfile in ms and ms[wfile].upper() or ""
                 wfile = util.localpath(wfile)
-                ck = wfile in recheck or (wfile not in old and char in 'MAR')
-                model.append([ck, char, hglib.toutf(wfile), wfile, mst, False])
+                ck = waschecked.get(wfile, stat in 'MAR')
+                model.append([ck, stat, hglib.toutf(wfile), wfile, mst, False])
 
         self.auto_check() # may check more files
 
