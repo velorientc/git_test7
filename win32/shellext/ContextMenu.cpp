@@ -224,7 +224,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     if (!bAppendItems)
         return NOERROR;
 
-    int sz = sizeof(menuDescList) / sizeof(MenuDescription);
+    const int sz = sizeof(menuDescList) / sizeof(MenuDescription);
     bool promoted[ sz ];
     memset(&promoted, 0, sizeof(promoted));
 
