@@ -31,59 +31,60 @@ class SynchDialog(gtk.Window):
         self.hgthread = None
         self.fromlog = fromlog
         self.notify_func = None
+        self.last_drop_time = None
 
         # persistent app data
         self._settings = settings.Settings('synch')
 
         self.set_default_size(655, 552)
 
-        self._paths = self._get_paths()
+        self.paths = self.get_paths()
         self.origchangecount = len(self.repo)
 
         name = self.repo.ui.config('web', 'name') or os.path.basename(self.root)
         self.set_title(_('TortoiseHg Synchronize - ') + name)
 
-        self.connect('delete-event', self._delete)
+        self.connect('delete-event', self.delete)
 
         # toolbar
         self.tbar = gtk.Toolbar()
         self.tips = gtk.Tooltips()
-        self._stop_button = self._toolbutton(gtk.STOCK_STOP,
-                _('Stop'), self._stop_clicked, tip=_('Stop the hg operation'))
-        self._stop_button.set_sensitive(False)
+        self.stop_button = self.toolbutton(gtk.STOCK_STOP,
+                _('Stop'), self.stop_clicked, tip=_('Stop the hg operation'))
+        self.stop_button.set_sensitive(False)
         tbuttons = [
-                self._toolbutton(gtk.STOCK_GO_DOWN,
+                self.toolbutton(gtk.STOCK_GO_DOWN,
                                  _('Incoming'),
-                                 self._incoming_clicked,
+                                 self.incoming_clicked,
                                  tip=_('Display changes that can be pulled'
                                  ' from selected repository')),
-                self._toolbutton(gtk.STOCK_GOTO_BOTTOM,
+                self.toolbutton(gtk.STOCK_GOTO_BOTTOM,
                                  _('   Pull   '),
-                                 self._pull_clicked,
+                                 self.pull_clicked,
                                  tip=_('Pull changes from selected'
                                  ' repository')),
                 gtk.SeparatorToolItem(),
-                self._toolbutton(gtk.STOCK_GO_UP,
+                self.toolbutton(gtk.STOCK_GO_UP,
                                  _('Outgoing'),
-                                 self._outgoing_clicked,
-                                 tip=_('Display local changes that will be pushed'
-                                 ' to selected repository')),
-                self._toolbutton(gtk.STOCK_GOTO_TOP,
+                                 self.outgoing_clicked,
+                                 tip=_('Display local changes that will be '
+                                 ' pushed to selected repository')),
+                self.toolbutton(gtk.STOCK_GOTO_TOP,
                                  _('Push'),
-                                 self._push_clicked,
+                                 self.push_clicked,
                                  tip=_('Push local changes to selected'
                                  ' repository')),
-                self._toolbutton(gtk.STOCK_GOTO_LAST,
+                self.toolbutton(gtk.STOCK_GOTO_LAST,
                                  _('Email'),
-                                 self._email_clicked,
+                                 self.email_clicked,
                                  tip=_('Email local outgoing changes to'
                                  ' one or more recipients')),
                 gtk.SeparatorToolItem(),
-                self._stop_button,
+                self.stop_button,
                 gtk.SeparatorToolItem(),
-                self._toolbutton(gtk.STOCK_PREFERENCES,
+                self.toolbutton(gtk.STOCK_PREFERENCES,
                                  _('Configure'),
-                                 self._conf_clicked,
+                                 self.conf_clicked,
                                  tip=_('Configure peer repository paths')),
                 gtk.SeparatorToolItem(),
             ]
@@ -97,22 +98,22 @@ class SynchDialog(gtk.Window):
         targethbox = gtk.HBox()
         lbl = gtk.Button(_('Repo:'))
         lbl.unset_flags(gtk.CAN_FOCUS)
-        lbl.connect('clicked', self._btn_remotepath_clicked)
+        lbl.connect('clicked', self.btn_remotepath_clicked)
         targethbox.pack_start(lbl, False, False)
 
         lbl = gtk.Button(_('Bundle:'))
         lbl.unset_flags(gtk.CAN_FOCUS)
-        lbl.connect('clicked', self._btn_bundlepath_clicked)
+        lbl.connect('clicked', self.btn_bundlepath_clicked)
         targethbox.pack_start(lbl, False, False)
 
         # revisions combo box
         self.pathlist = gtk.ListStore(str, str)
-        self._pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
-        self._pathtext = self._pathbox.get_child()
+        self.pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
+        self.pathtext = self.pathbox.get_child()
         cell = gtk.CellRendererText()
-        self._pathbox.pack_end(cell, False)
-        self._pathbox.add_attribute(cell, 'text', 1)
-        targethbox.pack_start(self._pathbox, True, True)
+        self.pathbox.pack_end(cell, False)
+        self.pathbox.add_attribute(cell, 'text', 1)
+        targethbox.pack_start(self.pathbox, True, True)
 
         self.fill_path_combo()
         defrow = None
@@ -126,11 +127,11 @@ class SynchDialog(gtk.Window):
                 defpushrow = i
 
         if repos:
-            self._pathtext.set_text(hglib.toutf(repos[0]))
+            self.pathtext.set_text(hglib.toutf(repos[0]))
         elif defpushrow is not None and pushmode:
-            self._pathbox.set_active(defpushrow)
+            self.pathbox.set_active(defpushrow)
         elif defrow is not None:
-            self._pathbox.set_active(defrow)
+            self.pathbox.set_active(defrow)
 
         # support dropping of repos or bundle files
         self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
@@ -138,11 +139,11 @@ class SynchDialog(gtk.Window):
         self.connect('drag_data_received', self._drag_receive)
 
         # create checkbox to disable proxy
-        self._use_proxy = gtk.CheckButton(_('use proxy server'))
+        self.use_proxy = gtk.CheckButton(_('use proxy server'))
         if ui.ui().config('http_proxy', 'host', ''):
-            self._use_proxy.set_active(True)
+            self.use_proxy.set_active(True)
         else:
-            self._use_proxy.set_sensitive(False)
+            self.use_proxy.set_sensitive(False)
 
         frame = gtk.Frame(_('Post pull operation'))
         ppvbox = gtk.VBox()
@@ -159,13 +160,13 @@ class SynchDialog(gtk.Window):
 
         self.expander = expander = gtk.Expander(_('Advanced Options'))
         expander.set_expanded(False)
-        expander.connect_after('activate', self._expanded)
+        expander.connect_after('activate', self.expanded)
         hbox = gtk.HBox()
         expander.add(hbox)
 
         leftvbox = gtk.VBox()
         leftvbox.pack_start(frame, False, False, 2)
-        leftvbox.pack_start(self._use_proxy, False, False, 3)
+        leftvbox.pack_start(self.use_proxy, False, False, 3)
 
         rightvbox = gtk.VBox()
         rightvbox.pack_start(targethbox, False, False, 2)
@@ -177,15 +178,15 @@ class SynchDialog(gtk.Window):
         vbox.pack_start(tophbox, False, False, 2)
 
         revvbox = gtk.VBox()
-        self._reventry = gtk.Entry()
-        self._cmdentry = gtk.Entry()
-        self._force = gtk.CheckButton(_('Force pull or push'))
-        self.tips.set_tip(self._force, _('Run even when remote repository'
+        self.reventry = gtk.Entry()
+        self.cmdentry = gtk.Entry()
+        self.force = gtk.CheckButton(_('Force pull or push'))
+        self.tips.set_tip(self.force, _('Run even when remote repository'
                 ' is unrelated.'))
 
         revhbox = gtk.HBox()
         revhbox.pack_start(gtk.Label(_('Target Revision:')), False, False, 2)
-        revhbox.pack_start(self._reventry, True, True, 2)
+        revhbox.pack_start(self.reventry, True, True, 2)
         reveventbox = gtk.EventBox()
         reveventbox.add(revhbox)
         self.tips.set_tip(reveventbox, _('A specific revision up to which you'
@@ -193,13 +194,13 @@ class SynchDialog(gtk.Window):
 
         cmdhbox = gtk.HBox()
         cmdhbox.pack_start(gtk.Label(_('Remote Command:')), False, False, 2)
-        cmdhbox.pack_start(self._cmdentry, True, True, 2)
+        cmdhbox.pack_start(self.cmdentry, True, True, 2)
         cmdeventbox = gtk.EventBox()
         cmdeventbox.add(cmdhbox)
         self.tips.set_tip(cmdeventbox, _('Name of hg executable on remote'
                 ' machine.'))
 
-        revvbox.pack_start(self._force, False, False, 8)
+        revvbox.pack_start(self.force, False, False, 8)
         revvbox.pack_start(reveventbox, True, True, 2)
         revvbox.pack_start(cmdeventbox, True, True, 2)
         hbox.pack_start(revvbox, True, True, 4)
@@ -207,14 +208,14 @@ class SynchDialog(gtk.Window):
         frame = gtk.Frame(_('Incoming/Outgoing'))
         hbox.pack_start(frame, False, False, 2)
 
-        self._showpatch = gtk.CheckButton(_('Show Patches'))
-        self._newestfirst = gtk.CheckButton(_('Show Newest First'))
-        self._nomerge = gtk.CheckButton(_('Show No Merges'))
+        self.showpatch = gtk.CheckButton(_('Show Patches'))
+        self.newestfirst = gtk.CheckButton(_('Show Newest First'))
+        self.nomerge = gtk.CheckButton(_('Show No Merges'))
 
         iovbox = gtk.VBox()
-        iovbox.pack_start(self._showpatch, False, False, 2)
-        iovbox.pack_start(self._newestfirst, False, False, 2)
-        iovbox.pack_start(self._nomerge, False, False, 2)
+        iovbox.pack_start(self.showpatch, False, False, 2)
+        iovbox.pack_start(self.newestfirst, False, False, 2)
+        iovbox.pack_start(self.nomerge, False, False, 2)
         frame.add(iovbox)
 
         # hg output window
@@ -226,7 +227,7 @@ class SynchDialog(gtk.Window):
         self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
         self.textview.set_editable(False)
-        self.textview.connect('populate-popup', self._add_to_popup)
+        self.textview.connect('populate-popup', self.add_to_popup)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
                                    foreground='#900000')
@@ -243,11 +244,10 @@ class SynchDialog(gtk.Window):
 
         self.stbar = gtklib.StatusBar()
         vbox.pack_start(self.stbar, False, False, 2)
-        self.connect('map', self.update_buttons)
-        self._last_drop_time = None
 
         self.load_settings()
         self.update_pull_setting()
+        gobject.idle_add(self.update_buttons)
 
     def update_pull_setting(self):
         ppull = self.repo.ui.config('tortoisehg', 'postpull', 'None')
@@ -261,24 +261,24 @@ class SynchDialog(gtk.Window):
 
     def fill_path_combo(self):
         self.pathlist.clear()
-        for alias, path in self._paths:
+        for alias, path in self.paths:
             path = url.hidepassword(path)
             self.pathlist.append([hglib.toutf(path), hglib.toutf(alias)])
 
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
-        if time != self._last_drop_time:
+        if time != self.last_drop_time:
             files = selection.get_uris()
             gobject.idle_add(self._set_path, files[0])
-            self._last_drop_time = time
+            self.last_drop_time = time
 
     def _set_path(self, uri):
         if not uri.startswith('file://'):
             return
         path = urllib.unquote(uri[7:])
         if paths.find_root(path) == path:
-            self._pathtext.set_text(hglib.toutf(path))
+            self.pathtext.set_text(hglib.toutf(path))
         elif not os.path.isdir(path) and path.endswith('.hg'):
-            self._pathtext.set_text(hglib.toutf(path))
+            self.pathtext.set_text(hglib.toutf(path))
 
     def update_buttons(self, *args):
         self.buttonhbox.hide()
@@ -319,7 +319,7 @@ class SynchDialog(gtk.Window):
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmdline))
 
-    def _get_paths(self, sort="value"):
+    def get_paths(self, sort="value"):
         """ retrieve symbolic paths """
         try:
             self.ui = ui.ui()
@@ -337,7 +337,7 @@ class SynchDialog(gtk.Window):
         except hglib.RepoError:
             return None
 
-    def _btn_remotepath_clicked(self, button):
+    def btn_remotepath_clicked(self, button):
         """ select source folder to clone """
         dlg = gtk.FileChooserDialog(title=_('Select Repository'),
                 action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -347,10 +347,10 @@ class SynchDialog(gtk.Window):
         dlg.set_current_folder(self.root)
         response = dlg.run()
         if response == gtk.RESPONSE_OK:
-            self._pathtext.set_text(dlg.get_filename())
+            self.pathtext.set_text(dlg.get_filename())
         dlg.destroy()
 
-    def _btn_bundlepath_clicked(self, button):
+    def btn_bundlepath_clicked(self, button):
         """ select bundle to read from """
         dlg = gtk.FileChooserDialog(title=_('Select Bundle'),
                 action=gtk.FILE_CHOOSER_ACTION_OPEN,
@@ -368,11 +368,11 @@ class SynchDialog(gtk.Window):
         dlg.add_filter(filefilter)
         response = dlg.run()
         if response == gtk.RESPONSE_OK:
-            self._pathtext.set_text(dlg.get_filename())
+            self.pathtext.set_text(dlg.get_filename())
         dlg.destroy()
 
     def should_live(self):
-        if self._cmd_running():
+        if self.cmd_running():
             dialog.error_dialog(self, _('Cannot close now'),
                     _('command is running'))
             return True
@@ -381,11 +381,11 @@ class SynchDialog(gtk.Window):
             self._settings.write()
             return False
 
-    def _delete(self, widget, event):
+    def delete(self, widget, event):
         if not self.should_live():
             self.destroy()
 
-    def _toolbutton(self, stock, label, handler,
+    def toolbutton(self, stock, label, handler,
                     menu=None, userdata=None, tip=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
@@ -399,27 +399,27 @@ class SynchDialog(gtk.Window):
         tbutton.connect('clicked', handler, userdata)
         return tbutton
 
-    def _get_advanced_options(self):
+    def get_advanced_options(self):
         opts = {}
-        if self._showpatch.get_active():
+        if self.showpatch.get_active():
             opts['patch'] = ['--patch']
-        if self._nomerge.get_active():
+        if self.nomerge.get_active():
             opts['no-merges'] = ['--no-merges']
-        if self._force.get_active():
+        if self.force.get_active():
             opts['force'] = ['--force']
-        if self._newestfirst.get_active():
+        if self.newestfirst.get_active():
             opts['newest-first'] = ['--newest-first']
-        remotecmd = self._cmdentry.get_text().strip()
+        remotecmd = self.cmdentry.get_text().strip()
         if remotecmd != "":
             opts['remotecmd'] = ['--remotecmd', remotecmd]
-        target_rev = self._reventry.get_text().strip()
+        target_rev = self.reventry.get_text().strip()
         if target_rev != "":
             opts['rev'] = ['--rev', target_rev]
 
         return opts
 
-    def _pull_clicked(self, toolbutton, data=None):
-        aopts = self._get_advanced_options()
+    def pull_clicked(self, toolbutton, data=None):
+        aopts = self.get_advanced_options()
         if self.fetchradio.get_active():
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extensions explicitly
@@ -435,19 +435,19 @@ class SynchDialog(gtk.Window):
             # load the rebase extensions explicitly
             extensions.load(self.ui, 'rebase', None)
         cmd += aopts.get('rev', [])
-        self._exec_cmd(cmd)
+        self.exec_cmd(cmd)
 
-    def _push_clicked(self, toolbutton, data=None):
-        aopts = self._get_advanced_options()
+    def push_clicked(self, toolbutton, data=None):
+        aopts = self.get_advanced_options()
         cmd = ['push']
         cmd += aopts.get('rev', [])
         cmd += aopts.get('force', [])
         cmd += aopts.get('remotecmd', [])
-        self._exec_cmd(cmd)
+        self.exec_cmd(cmd)
 
-    def _conf_clicked(self, toolbutton, data=None):
-        newpath = hglib.fromutf(self._pathtext.get_text()).strip()
-        for alias, path in self._paths:
+    def conf_clicked(self, toolbutton, data=None):
+        newpath = hglib.fromutf(self.pathtext.get_text()).strip()
+        for alias, path in self.paths:
             if path == newpath:
                 newpath = None
                 break
@@ -459,20 +459,20 @@ class SynchDialog(gtk.Window):
             dlg.focus_field('tortoisehg.postpull')
         dlg.run()
         dlg.hide()
-        self._paths = self._get_paths()
+        self.paths = self.get_paths()
         self.fill_path_combo()
         self.update_pull_setting()
 
-    def _email_clicked(self, toolbutton, data=None):
+    def email_clicked(self, toolbutton, data=None):
         opts = []
-        path = hglib.fromutf(self._pathtext.get_text()).strip()
-        rev = self._get_advanced_options().get('rev')
+        path = hglib.fromutf(self.pathtext.get_text()).strip()
+        rev = self.get_advanced_options().get('rev')
         if path:
             opts.extend(['--outgoing', path])
         elif not rev:
             dialog.info_dialog(self, _('No repository selected'),
                         _('Select a peer repository to compare with'))
-            self._pathbox.grab_focus()
+            self.pathbox.grab_focus()
             return
         if rev:
             opts.extend(rev)
@@ -482,8 +482,8 @@ class SynchDialog(gtk.Window):
         dlg.present()
         dlg.set_transient_for(None)
 
-    def _incoming_clicked(self, toolbutton, data=None):
-        aopts = self._get_advanced_options()
+    def incoming_clicked(self, toolbutton, data=None):
+        aopts = self.get_advanced_options()
         cmd = ['incoming']
         cmd += aopts.get('rev', [])
         cmd += aopts.get('patch', [])
@@ -491,10 +491,10 @@ class SynchDialog(gtk.Window):
         cmd += aopts.get('force', [])
         cmd += aopts.get('newest-first', [])
         cmd += aopts.get('remotecmd', [])
-        self._exec_cmd(cmd)
+        self.exec_cmd(cmd)
 
-    def _outgoing_clicked(self, toolbutton, data=None):
-        aopts = self._get_advanced_options()
+    def outgoing_clicked(self, toolbutton, data=None):
+        aopts = self.get_advanced_options()
         cmd = ['outgoing']
         cmd += aopts.get('rev', [])
         cmd += aopts.get('patch', [])
@@ -502,26 +502,26 @@ class SynchDialog(gtk.Window):
         cmd += aopts.get('force', [])
         cmd += aopts.get('newest-first', [])
         cmd += aopts.get('remotecmd', [])
-        self._exec_cmd(cmd)
+        self.exec_cmd(cmd)
 
-    def _stop_clicked(self, toolbutton, data=None):
-        if self._cmd_running():
+    def stop_clicked(self, toolbutton, data=None):
+        if self.cmd_running():
             self.hgthread.terminate()
-            self._stop_button.set_sensitive(False)
+            self.stop_button.set_sensitive(False)
 
-    def _exec_cmd(self, cmd):
-        if self._cmd_running():
+    def exec_cmd(self, cmd):
+        if self.cmd_running():
             dialog.error_dialog(self, _('Cannot run now'),
                 _('Please try again after the previous command is completed'))
             return
 
-        self._stop_button.set_sensitive(True)
+        self.stop_button.set_sensitive(True)
 
         proxy_host = ui.ui().config('http_proxy', 'host', '')
-        use_proxy = self._use_proxy.get_active()
-        text_entry = self._pathbox.get_child()
+        use_proxy = self.use_proxy.get_active()
+        text_entry = self.pathbox.get_child()
         remote_path = hglib.fromutf(text_entry.get_text()).strip()
-        for alias, path in self._paths:
+        for alias, path in self.paths:
             if remote_path == alias:
                 remote_path = path
             elif remote_path == url.hidepassword(path):
@@ -543,15 +543,15 @@ class SynchDialog(gtk.Window):
         self.stbar.begin()
         self.stbar.set_status_text('hg ' + ' '.join(cmd + [remote_path]))
 
-        self._add_src_to_recent(remote_path)
+        self.add_src_to_recent(remote_path)
 
-    def _cmd_running(self):
+    def cmd_running(self):
         if self.hgthread and self.hgthread.isAlive():
             return True
         else:
             return False
 
-    def _add_src_to_recent(self, src):
+    def add_src_to_recent(self, src):
         if os.path.exists(src):
             src = os.path.abspath(src)
 
@@ -594,13 +594,13 @@ class SynchDialog(gtk.Window):
             except Queue.Empty:
                 pass
 
-        if self._cmd_running():
+        if self.cmd_running():
             return True
         else:
             # Update button states
             self.update_buttons()
             self.stbar.end()
-            self._stop_button.set_sensitive(False)
+            self.stop_button.set_sensitive(False)
             if self.hgthread.return_code() is None:
                 self.write_err(_('[command interrupted]'))
             if self.notify_func:
@@ -609,14 +609,14 @@ class SynchDialog(gtk.Window):
 
     AdvancedDefaults = {
         'expander.expanded': False,
-        '_reventry.text': '',
-        '_cmdentry.text': '',
-        '_force.active': False,
-        '_showpatch.active': False,
-        '_newestfirst.active': False,
-        '_nomerge.active': False,}
+        'reventry.text': '',
+        'cmdentry.text': '',
+        'force.active': False,
+        'showpatch.active': False,
+        'newestfirst.active': False,
+        'nomerge.active': False,}
 
-    def _expanded(self, expander):
+    def expanded(self, expander):
         if not expander.get_expanded():
             self.load_settings(SynchDialog.AdvancedDefaults.get)
 
@@ -634,9 +634,9 @@ class SynchDialog(gtk.Window):
             value = getattr(getattr(self, member), 'get_%s'%attr)()
             set_value(key, value)
 
-    def _add_to_popup(self, textview, menu):
+    def add_to_popup(self, textview, menu):
         menu_items = (('----', None),
-                      (_('Toggle _Wordwrap'), self._toggle_wordwrap),
+                      (_('Toggle _Wordwrap'), self.toggle_wordwrap),
                      )
         for label, handler in menu_items:
             if label == '----':
@@ -648,7 +648,7 @@ class SynchDialog(gtk.Window):
             menu.append(menuitem)
         menu.show_all()
 
-    def _toggle_wordwrap(self, sender):
+    def toggle_wordwrap(self, sender):
         if self.textview.get_wrap_mode() != gtk.WRAP_NONE:
             self.textview.set_wrap_mode(gtk.WRAP_NONE)
         else:
