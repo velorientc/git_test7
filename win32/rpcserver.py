@@ -155,7 +155,6 @@ class PipeServer:
                     continue
 
                 try:
-                    print "queueing request %s" % data
                     requests.put(data)
                 except SystemExit:
                     raise SystemExit # interrupted by thread2.terminate()
