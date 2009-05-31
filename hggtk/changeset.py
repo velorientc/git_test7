@@ -19,8 +19,7 @@ from thgutil import shlib
 from hggtk import gdialog, gtklib, hgcmd
 
 class ChangeSet(gdialog.GDialog):
-    """GTK+ based dialog for displaying repository logs
-    """
+    'GTK+ based dialog for displaying repository logs'
     def __init__(self, ui, repo, cwd, pats, opts, stbar=None):
         gdialog.GDialog.__init__(self, ui, repo, cwd, pats, opts)
         self.stbar = stbar
@@ -41,10 +40,10 @@ class ChangeSet(gdialog.GDialog):
         self.parent_toggle.set_tooltip(self.tooltips, _('diff other parent'))
         self.parent_toggle.set_sensitive(False)
         self.parent_toggle.set_active(False)
-        self.parent_toggle.connect('toggled', self._parent_toggled)
+        self.parent_toggle.connect('toggled', self.parent_toggled)
         return [self.parent_toggle]
 
-    def _parent_toggled(self, button):
+    def parent_toggled(self, button):
         self.load_details(self.currev)
 
     def prepare_display(self):
@@ -67,7 +66,7 @@ class ChangeSet(gdialog.GDialog):
             self._setting_hpos = -1
 
     def load_details(self, rev):
-        '''Load selected changeset details into buffer and filelist'''
+        'Load selected changeset details into buffer and filelist'
         self.currev = rev
         ctx = self.repo[rev]
         if not ctx:
@@ -114,7 +113,7 @@ class ChangeSet(gdialog.GDialog):
         if len(self._filelist) > 1:
             self._filesel.select_path((1,))
 
-    def _filelist_rowchanged(self, sel):
+    def filelist_rowchanged(self, sel):
         model, path = sel.get_selected()
         if not path:
             return
@@ -211,11 +210,11 @@ class ChangeSet(gdialog.GDialog):
 
         sob, eob = buf.get_bounds()
         pos = buf.get_iter_at_offset(offset)
-        buf.apply_tag_by_name("mono", pos, eob)
+        buf.apply_tag_by_name('mono', pos, eob)
         return True
 
     def prepare_diff(self, difflines, offset, fname):
-        '''Borrowed from hgview; parses changeset diffs'''
+        'Borrowed from hgview; parses changeset diffs'
         def addtag( name, offset, length ):
             if tags and tags[-1][0] == name and tags[-1][2]==offset:
                 tags[-1][2] += length
@@ -230,22 +229,22 @@ class ChangeSet(gdialog.GDialog):
                 rem += 1
         outlines = []
         tags = []
-        txt = toutf("=== (+%d,-%d) %s ===\n" % (add, rem, fname))
-        addtag( "greybg", offset, len(txt) )
+        txt = toutf('=== (+%d,-%d) %s ===\n' % (add, rem, fname))
+        addtag( 'greybg', offset, len(txt) )
         outlines.append(txt)
         offset += len(txt.decode('utf-8'))
         for l1 in difflines[3:]:
             l = toutf(l1)
-            if l.startswith("@@"):
-                tag = "blue"
-            elif l.startswith("+"):
-                tag = "green"
+            if l.startswith('@@'):
+                tag = 'blue'
+            elif l.startswith('+'):
+                tag = 'green'
                 l = diffexpand(l)
-            elif l.startswith("-"):
-                tag = "red"
+            elif l.startswith('-'):
+                tag = 'red'
                 l = diffexpand(l)
             else:
-                tag = "black"
+                tag = 'black'
                 l = diffexpand(l)
             l = l+"\n"
             length = len(l.decode('utf-8'))
@@ -268,7 +267,7 @@ class ChangeSet(gdialog.GDialog):
             self.load_details(linkrev)
 
     def get_link_text(self, tag, widget, liter):
-        """handle clicking on a link in a textview"""
+        'handle clicking on a link in a textview'
         text_buffer = widget.get_buffer()
         beg = liter.copy()
         while not beg.begins_tag(tag):
@@ -286,18 +285,18 @@ class ChangeSet(gdialog.GDialog):
             menuitem.set_border_width(1)
             return menuitem
 
-        _menu = gtk.Menu()
-        _menu.append(create_menu(_('_visual diff'), self._diff_file_rev))
-        _menu.append(create_menu(_('diff to _local'), self._diff_to_local))
-        _menu.append(create_menu(_('_view at revision'), self._view_file_rev))
-        self._save_menu = create_menu(_('_save at revision'), self._save_file_rev)
-        _menu.append(self._save_menu)
-        _menu.append(create_menu(_('_file history'), self._file_history))
-        self._ann_menu = create_menu(_('_annotate file'), self._ann_file)
-        _menu.append(self._ann_menu)
-        _menu.append(create_menu(_('_revert file contents'), self._revert_file))
-        _menu.show_all()
-        return _menu
+        menu = gtk.Menu()
+        menu.append(create_menu(_('_visual diff'), self.diff_file_rev))
+        menu.append(create_menu(_('diff to _local'), self.diff_to_local))
+        menu.append(create_menu(_('_view at revision'), self.view_file_rev))
+        self.save_menu = create_menu(_('_save at revision'), self.save_file_rev)
+        menu.append(self.save_menu)
+        menu.append(create_menu(_('_file history'), self.file_history))
+        self.ann_menu = create_menu(_('_annotate file'), self.ann_file)
+        menu.append(self.ann_menu)
+        menu.append(create_menu(_('_revert file contents'), self.revert_file))
+        menu.show_all()
+        return menu
 
     def get_body(self):
         self.curfile = ''
@@ -306,7 +305,7 @@ class ChangeSet(gdialog.GDialog):
             self.clipboard = gtk.Clipboard(selection=sel)
         else:
             self.clipboard = None
-        self._filemenu = self.file_context_menu()
+        self.filemenu = self.file_context_menu()
 
         details_frame = gtk.Frame()
         details_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -316,7 +315,7 @@ class ChangeSet(gdialog.GDialog):
 
         details_text = gtk.TextView()
         details_text.set_wrap_mode(gtk.WRAP_NONE)
-        details_text.connect('populate-popup', self._add_to_popup)
+        details_text.connect('populate-popup', self.add_to_popup)
         details_text.set_editable(False)
         details_text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(details_text)
@@ -328,12 +327,12 @@ class ChangeSet(gdialog.GDialog):
 
         filelist_tree = gtk.TreeView()
         filesel = filelist_tree.get_selection()
-        filesel.connect("changed", self._filelist_rowchanged)
+        filesel.connect('changed', self.filelist_rowchanged)
         self._filesel = filesel
         filelist_tree.connect('button-release-event',
-                self._file_button_release)
-        filelist_tree.connect('popup-menu', self._file_popup_menu)
-        filelist_tree.connect('row-activated', self._file_row_act)
+                self.file_button_release)
+        filelist_tree.connect('popup-menu', self.file_popup_menu)
+        filelist_tree.connect('row-activated', self.file_row_act)
         filelist_tree.set_search_equal_func(self.search_filelist)
 
         accelgroup = gtk.AccelGroup()
@@ -391,9 +390,9 @@ class ChangeSet(gdialog.GDialog):
         return True
 
     def setup_tags(self):
-        """Creates the tags to be used inside the TextView"""
+        'Creates the tags to be used inside the TextView'
         def make_texttag( name, **kwargs ):
-            """Helper function generating a TextTag"""
+            'Helper function generating a TextTag'
             tag = gtk.TextTag(name)
             for key, value in kwargs.iteritems():
                 key = key.replace("_","-")
@@ -417,30 +416,30 @@ class ChangeSet(gdialog.GDialog):
         tag_table.add(make_texttag('parent', foreground='#000090',
                 paragraph_background='#F0F0F0'))
 
-        tag_table.add( make_texttag( "mono", family="Monospace" ))
-        tag_table.add( make_texttag( "blue", foreground='blue' ))
-        tag_table.add( make_texttag( "red", foreground='red' ))
-        tag_table.add( make_texttag( "green", foreground='darkgreen' ))
-        tag_table.add( make_texttag( "black", foreground='black' ))
-        tag_table.add( make_texttag( "greybg",
+        tag_table.add( make_texttag( 'mono', family='Monospace' ))
+        tag_table.add( make_texttag( 'blue', foreground='blue' ))
+        tag_table.add( make_texttag( 'red', foreground='red' ))
+        tag_table.add( make_texttag( 'green', foreground='darkgreen' ))
+        tag_table.add( make_texttag( 'black', foreground='black' ))
+        tag_table.add( make_texttag( 'greybg',
                                      paragraph_background='grey',
                                      weight=pango.WEIGHT_BOLD ))
-        tag_table.add( make_texttag( "yellowbg", background='yellow' ))
-        link_tag = make_texttag( "link", foreground="blue",
+        tag_table.add( make_texttag( 'yellowbg', background='yellow' ))
+        link_tag = make_texttag( 'link', foreground='blue',
                                  underline=pango.UNDERLINE_SINGLE )
-        link_tag.connect("event", self.link_event )
+        link_tag.connect('event', self.link_event )
         tag_table.add( link_tag )
 
-    def _file_button_release(self, widget, event):
+    def file_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
             gtk.gdk.CONTROL_MASK)):
-            self._file_popup_menu(widget, event.button, event.time)
+            self.file_popup_menu(widget, event.button, event.time)
         return False
 
-    def _file_popup_menu(self, treeview, button=0, time=0):
+    def file_popup_menu(self, treeview, button=0, time=0):
         if not self.curfile:
             return
-        self._filemenu.popup(None, None, None, button, time)
+        self.filemenu.popup(None, None, None, button, time)
 
         # If the filelog entry this changeset references does not link
         # back to this changeset, it means this changeset did not
@@ -453,8 +452,8 @@ class ChangeSet(gdialog.GDialog):
             has_filelog = fctx.filelog().linkrev(fctx.filerev()) == ctx.rev()
         except LookupError:
             has_filelog = False
-        self._ann_menu.set_sensitive(has_filelog)
-        self._save_menu.set_sensitive(has_filelog)
+        self.ann_menu.set_sensitive(has_filelog)
+        self.save_menu.set_sensitive(has_filelog)
         return True
 
     def thgdiff(self, treeview):
@@ -468,12 +467,12 @@ class ChangeSet(gdialog.GDialog):
             return False
         self._diff_file('M', self.curfile)
 
-    def _file_row_act(self, tree, path, column) :
+    def file_row_act(self, tree, path, column) :
         'Default action is the first entry in the context menu'
-        self._filemenu.get_children()[0].activate()
+        self.filemenu.get_children()[0].activate()
         return True
 
-    def _save_file_rev(self, menuitem):
+    def save_file_rev(self, menuitem):
         wfile = util.localpath(self.curfile)
         wfile, ext = os.path.splitext(os.path.basename(wfile))
         filename = "%s@%d%s" % (wfile, self.currev, ext)
@@ -487,13 +486,13 @@ class ChangeSet(gdialog.GDialog):
             hgcmd_toq(self.repo.root, q, 'cat', '--rev',
                 str(self.currev), '--output', result, cpath)
 
-    def _diff_to_local(self, menuitem):
+    def diff_to_local(self, menuitem):
         if not self.curfile:
             return
         self.opts['rev'] = [str(self.currev), '.']
         self._diff_file('M', self.curfile)
 
-    def _diff_file_rev(self, menuitem):
+    def diff_file_rev(self, menuitem):
         'User selected visual diff file from the file list context menu'
         if not self.curfile:
             return
@@ -501,8 +500,8 @@ class ChangeSet(gdialog.GDialog):
         self._diff_file('M', self.curfile)
         del self.opts['change']
 
-    def _view_file_rev(self, menuitem):
-        '''User selected view file revision from the file list context menu'''
+    def view_file_rev(self, menuitem):
+        'User selected view file revision from the file list context menu'
         if not self.curfile:
             return
         rev = self.currev
@@ -515,16 +514,16 @@ class ChangeSet(gdialog.GDialog):
         self._node1, self._node2 = cmdutil.revpair(self.repo, [pair])
         self._view_file('M', self.curfile, force_left=False)
 
-    def _ann_file(self, menuitem):
-        '''User selected annotate file from the file list context menu'''
+    def ann_file(self, menuitem):
+        'User selected annotate file from the file list context menu'
         from hggtk import datamine
         rev = self.currev
         dialog = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dialog.display()
         dialog.add_annotate_page(self.curfile, str(rev))
 
-    def _file_history(self, menuitem):
-        '''User selected file history from file list context menu'''
+    def file_history(self, menuitem):
+        'User selected file history from file list context menu'
         if self.glog_parent:
             # If this changeset browser is embedded in glog, send
             # send this event to the main app
@@ -539,8 +538,8 @@ class ChangeSet(gdialog.GDialog):
             dialog.open_with_file(self.curfile)
             dialog.display()
 
-    def _revert_file(self, menuitem):
-        '''User selected file revert from the file list context menu'''
+    def revert_file(self, menuitem):
+        'User selected file revert from the file list context menu'
         rev = self.currev
         dialog = gdialog.Confirm(_('Confirm revert file to old revision'),
                  [], self, _('Revert %s to contents at revision %d?') %
@@ -553,9 +552,9 @@ class ChangeSet(gdialog.GDialog):
         dlg.hide()
         shlib.shell_notify([self.repo.wjoin(self.curfile)])
 
-    def _add_to_popup(self, textview, menu):
+    def add_to_popup(self, textview, menu):
         menu_items = (('----', None),
-                      (_('Toggle _Wordwrap'), self._toggle_wordwrap),
+                      (_('Toggle _Wordwrap'), self.toggle_wordwrap),
                      )
         for label, handler in menu_items:
             if label == '----':
@@ -567,7 +566,7 @@ class ChangeSet(gdialog.GDialog):
             menu.append(menuitem)
         menu.show_all()
 
-    def _toggle_wordwrap(self, sender):
+    def toggle_wordwrap(self, sender):
         if self.textview.get_wrap_mode() != gtk.WRAP_NONE:
             self.textview.set_wrap_mode(gtk.WRAP_NONE)
         else:
