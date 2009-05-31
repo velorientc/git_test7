@@ -16,9 +16,8 @@ from thgutil import hglib
 from hggtk import gtklib, gdialog, hgcmd
 
 class FilterDialog(gtk.Dialog):
-    """ Dialog for creating log filters """
+    'Dialog for creating log filters'
     def __init__(self, root='', revs=[], files=[], filterfunc=None):
-        """ Initialize the Dialog """
         buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(FilterDialog, self).__init__(flags=gtk.DIALOG_MODAL,
                                            buttons=buttons)
@@ -29,7 +28,7 @@ class FilterDialog(gtk.Dialog):
         self._btn_apply.connect('clicked', self._btn_apply_clicked)
         self.action_area.pack_end(self._btn_apply)
 
-        self.set_title(_("Log Filter - %s") % os.path.basename(root))
+        self.set_title(_('Log Filter - %s') % os.path.basename(root))
 
         self.filterfunc = filterfunc
 
