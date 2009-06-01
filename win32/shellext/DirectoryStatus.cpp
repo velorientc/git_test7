@@ -19,16 +19,19 @@
 #include "DirectoryStatus.h"
 
 
-char DirectoryStatus::status(const std::string& relpath) const
+char DirectoryStatus::status(const std::string& relpath_) const
 {
     char res = 'C';
     bool added = false;
     bool modified = false;
 
+    const std::string relpath = relpath_ + '/';
+
     for (V::const_iterator i = v_.begin(); i != v_.end(); ++i)
     {
         const E& e = *i;
-        if (e.path_.compare(0, relpath.length(), relpath) == 0)
+        if (relpath_.empty() ||
+            e.path_.compare(0, relpath.length(), relpath) == 0)
         {
             if (e.status_ == 'm' || e.status_ == 'r')
             {
@@ -81,6 +84,7 @@ int DirectoryStatus::read(const std::string& hgroot)
             if (path.size() > 1000)
                 return 0;
         }
+        path.push_back('/');
         path.push_back(0);
 
         e.path_ = &path[0];
