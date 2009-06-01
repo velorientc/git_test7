@@ -91,7 +91,7 @@ class GLog(gdialog.GDialog):
                 self.reload_log()
             else:
                 self.newbutton.set_active(True)
-        elif not oldparents == newparents:
+        elif not parents == newparents:
             self.refresh_model()
 
     def toggle_view_column(self, button, property):
