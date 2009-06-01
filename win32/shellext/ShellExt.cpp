@@ -279,7 +279,7 @@ CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegK
             {
                 UINT uNumFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
                 TDEBUG_TRACE("  hDrop uNumFiles = " << uNumFiles);
-                for (int i = 0; i < uNumFiles; ++i) {
+                for (UINT i = 0; i < uNumFiles; ++i) {
                     if (DragQueryFile(hDrop, i, name, MAX_PATH) > 0)
                     {
                         TDEBUG_TRACE("  DragQueryFile [" << i << "] = " << name);

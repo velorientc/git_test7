@@ -459,7 +459,7 @@ void CShellExt::DoHgtk(const std::string &cmd)
         HANDLE tempfileHandle = CreateFileA(tempfile.c_str(), GENERIC_WRITE,
                 FILE_SHARE_READ, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
                 
-        for (int i=0; i<myFiles.size(); i++)
+        for (std::vector<std::string>::size_type i=0; i<myFiles.size(); i++)
         {
             DWORD dwWritten;
             TDEBUG_TRACE("DoHgtk: temp file adding " <<  myFiles[i]);
