@@ -1,8 +1,6 @@
 # Creates a task-bar icon.  Run from Python.exe to see the
 # messages printed.
 
-from win32 import rpcserver
-from thgutil import thread2
 from win32api import *
 from win32gui import *
 import win32ui
@@ -10,6 +8,9 @@ import win32pipe
 import win32con
 import pywintypes
 import sys, os
+
+from thgutil import thread2
+from win32 import rpcserver
 
 APP_TITLE = "TortoiseHg RPC server"
 
