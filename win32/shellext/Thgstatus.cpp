@@ -18,17 +18,35 @@
 
 #include "Thgstatus.h"
 
-#define THG_PIPENAME  "\\\\.\\pipe\\TortoiseHgRpcServer-bc0c27107423"
+#include <vector>
+
+
+std::string GetPipeName()
+{
+    DWORD size = 260;
+    std::vector<char> buf(size);
+    if (!::GetUserNameA(&buf[0], &size))
+        return "";
+    std::string res = "\\\\.\\pipe\\TortoiseHgRpcServer-bc0c27107423-";
+    res += &buf[0];
+    return res;
+}
+
 
 int Thgstatus::update(const std::string& path)
 {
+    static std::string pname = GetPipeName();
+    
+    if (pname.empty())
+        return 0;
+
     BOOL fSuccess;
     DWORD cbRead;
 
-    TDEBUG_TRACE("Thgstatus::update(" << path  << ")");
+    TDEBUG_TRACE("Thgstatus::update(" << path  << ") for " << pname);
 
     fSuccess = ::CallNamedPipeA(
-        THG_PIPENAME, (void*)path.c_str(), path.size(), 0, 0, &cbRead,
+        pname.c_str(), (void*)path.c_str(), path.size(), 0, 0, &cbRead,
         200 /* ms */
     );
 
