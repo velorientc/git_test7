@@ -589,8 +589,8 @@ class GStatus(gdialog.GDialog):
         model, tpaths = selection.get_selected_rows()
         reselect = [model[path][FM_PATH] for path in tpaths]
         waschecked = {}
-        for entry in model:
-            waschecked[entry[FM_PATH]] = entry[FM_CHECKED]
+        for row in model:
+            waschecked[row[FM_PATH]] = row[FM_CHECKED], row[FM_PARTIAL_SELECTED]
 
         # merge-state of files
         ms = merge_.mergestate(repo)
@@ -605,8 +605,8 @@ class GStatus(gdialog.GDialog):
             for wfile in wfiles:
                 mst = wfile in ms and ms[wfile].upper() or ""
                 wfile = util.localpath(wfile)
-                ck = waschecked.get(wfile, stat in 'MAR')
-                model.append([ck, stat, hglib.toutf(wfile), wfile, mst, False])
+                ck, p = waschecked.get(wfile, (stat in 'MAR', False))
+                model.append([ck, stat, hglib.toutf(wfile), wfile, mst, p])
 
         self.auto_check() # may check more files
 
