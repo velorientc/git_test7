@@ -98,13 +98,18 @@ class MainWindow:
             print "Unknown command -", id
 
     def exit_application(self):
-        print "stopping pipe server..."
         if self.stop_pipe_server():
             DestroyWindow(self.hwnd)
-            print "\n\nGoodbye"
-            sys.exit()
+            print "Goodbye"
     
     def stop_pipe_server(self):
+        print "Stopping pipe server..."
+        if not self.pipethread.isAlive():
+            return True
+
+        # Try the nice way first
+        self.svc.SvcStop()
+
         max_try = 10
         cnt = 1
         while cnt <= max_try and self.pipethread.isAlive():

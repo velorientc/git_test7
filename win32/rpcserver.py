@@ -51,6 +51,7 @@ def update_batch(batch):
             print "shell notified"
 
 requests = Queue.Queue(0)
+_abort_request = r';:;:; Quit ;:;:;'  # any invalid path would do
 
 class Updater(threading.Thread):
     def run(self):
@@ -58,6 +59,9 @@ class Updater(threading.Thread):
         while True:
             batch = []
             r = requests.get()
+            if r == _abort_request:
+                print 'Updater thread quiting'
+                return
             print "got request %s (first in batch)" % r
             batch.append(r)
             print "wait a bit for additional requests..."
@@ -91,6 +95,11 @@ class PipeServer:
         # And create an event to be used in the OVERLAPPED object.
         self.overlapped.hEvent = win32event.CreateEvent(None,0,0,None)
 
+    def SvcStop(self):
+        print 'PipeServer thread quiting'
+        win32event.SetEvent(self.hWaitStop)
+        requests.put(_abort_request)
+
     def SvcDoRun(self):
         # We create our named pipe.
         pipeName = PIPENAME
@@ -111,7 +120,7 @@ class PipeServer:
             sa)
 
         # Loop accepting and processing connections
-        while 1:
+        while True:
             try:
                 hr = win32pipe.ConnectNamedPipe(pipeHandle, self.overlapped)
             except pywintypes.error, inst:
@@ -128,7 +137,7 @@ class PipeServer:
             rc = win32event.WaitForMultipleObjects(waitHandles, 0, timeout)
             if rc==win32event.WAIT_OBJECT_0:
                 # Stop event
-                break
+                return
             else:
                 # read pipe and process request
                 try:
@@ -151,6 +160,8 @@ class PipeServer:
                     print "WARNING: something went wrong in requests.put"
                     print traceback.format_exc()
                     status = "ERROR" 
+        # Clean up when we exit
+        self.SvcStop()
 
 if __name__ == '__main__':
     import sys
