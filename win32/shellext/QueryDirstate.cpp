@@ -31,7 +31,7 @@ class QueryState
 {
 public:
     std::string path;
-    BOOL        isdir;
+    bool        isdir;
     std::string basedir;
     std::string hgroot;
 
@@ -42,9 +42,9 @@ public:
 };
 
 
-BOOL hasHgDir(std::string const& path)
+bool hasHgDir(std::string const& path)
 {
-    return PathIsDirectory((path + "\\.hg").c_str());
+    return PathIsDirectory((path + "\\.hg").c_str()) != 0;
 }
 
 
