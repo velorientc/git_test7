@@ -1,8 +1,6 @@
 # Creates a task-bar icon.  Run from Python.exe to see the
 # messages printed.
 
-import rpcserver
-import thread2
 from win32api import *
 from win32gui import *
 import win32ui
@@ -10,6 +8,9 @@ import win32pipe
 import win32con
 import pywintypes
 import sys, os
+
+from thgutil import thread2
+from win32 import rpcserver
 
 APP_TITLE = "TortoiseHg RPC server"
 
@@ -42,7 +43,7 @@ class MainWindow:
     def _DoCreateIcons(self):
         # Try and find a custom icon
         hinst =  GetModuleHandle(None)
-        from thgutil import get_tortoise_icon
+        from thgutil.paths import get_tortoise_icon
         iconPathName = get_tortoise_icon("hg.ico")
         if os.path.isfile(iconPathName):
             icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
@@ -98,12 +99,18 @@ class MainWindow:
             print "Unknown command -", id
 
     def exit_application(self):
-        print "stopping pipe server..."
         if self.stop_pipe_server():
             DestroyWindow(self.hwnd)
-            print "\n\nGoodbye"
+            print "Goodbye"
     
     def stop_pipe_server(self):
+        print "Stopping pipe server..."
+        if not self.pipethread.isAlive():
+            return True
+
+        # Try the nice way first
+        self.svc.SvcStop()
+
         max_try = 10
         cnt = 1
         while cnt <= max_try and self.pipethread.isAlive():

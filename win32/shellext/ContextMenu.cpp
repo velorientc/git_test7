@@ -3,6 +3,7 @@
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "Dirstatecache.h"
+#include "Thgstatus.h"
 
 typedef struct {
     std::string name;
@@ -478,16 +479,8 @@ void CShellExt::DoHgtk(const std::string &cmd)
 
     if (cmd == "thgstatus")
     {
-        std::string hgroot = GetHgRepoRoot(cwd);
-        if (hgroot.empty())
-        {
-            hgcmd += " --all";
-        }
-        else
-        {
-            Dirstatecache::invalidate(hgroot);
-            hgcmd += " --notify .";
-        }
+        Thgstatus::update(cwd);
+        return;
     }
 
     LaunchCommand(hgcmd, cwd);
