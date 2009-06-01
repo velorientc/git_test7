@@ -69,9 +69,10 @@ std::string GetTHgShellRoot()
     TCHAR lpszValue[MAX_PATH] = "";
     LONG lpcbLonger = MAX_PATH * sizeof(TCHAR);
 
-    RegQueryValue(key, regname, lpszValue, &lpcbLonger);
-    std::string result(reinterpret_cast<char*>(lpszValue));
-    return result;
+    if (RegQueryValue(key, regname, lpszValue, &lpcbLonger) != ERROR_SUCCESS)
+        return "";
+
+    return lpszValue;
 }
 
 
@@ -82,9 +83,10 @@ std::string GetTHgProgRoot()
     TCHAR lpszValue[MAX_PATH] = "";
     LONG lpcbLonger = MAX_PATH * sizeof(TCHAR);
 
-    RegQueryValue(key, regname, lpszValue, &lpcbLonger);
-    std::string result(reinterpret_cast<char*>(lpszValue));
-    return result;
+    if (RegQueryValue(key, regname, lpszValue, &lpcbLonger) != ERROR_SUCCESS)
+        return "";
+
+    return lpszValue;
 }
 
 
