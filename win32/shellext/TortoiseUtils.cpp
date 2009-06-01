@@ -161,14 +161,14 @@ std::string GetTemporaryFile(LPCTSTR prefix)
     }
     else if (GetTempFileName(tempDir, prefix, 0, tempFile) != 0)
     {
-        return std::string(tempFile);
+        return tempFile;
     }
     else
     {
         TDEBUG_TRACE("GetTemporaryFile: Failed to get temporary file");
     }
     
-    return std::string();
+    return "";
 }
 
 
@@ -197,8 +197,7 @@ std::string BaseName(const std::string& filename)
     if (filename.empty())
         return filename;
     std::string::size_type pos = filename.find_last_of("\\");
-    std::string myfilename = filename.substr(pos+1);
-    return myfilename;
+    return filename.substr(pos+1);
 }
 
 HICON GetTortoiseIcon(const std::string& iconname)

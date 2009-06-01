@@ -122,8 +122,8 @@ void InitMenuMaps()
 {
     if (MenuDescMap.empty())
     {
-        int sz = sizeof(menuDescList) / sizeof(MenuDescription);
-        for (int i=0; i < sz; i++)
+        std::size_t sz = sizeof(menuDescList) / sizeof(MenuDescription);
+        for (std::size_t i=0; i < sz; i++)
         {
             MenuDescription md = menuDescList[i];
             TDEBUG_TRACE("InitMenuMaps: adding " << md.name);
@@ -224,7 +224,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     if (!bAppendItems)
         return NOERROR;
 
-    const int sz = sizeof(menuDescList) / sizeof(MenuDescription);
+    const std::size_t sz = sizeof(menuDescList) / sizeof(MenuDescription);
     bool promoted[ sz ];
     memset(&promoted, 0, sizeof(promoted));
 
