@@ -162,23 +162,3 @@ class PipeServer:
                     status = "ERROR" 
         # Clean up when we exit
         self.SvcStop()
-
-if __name__ == '__main__':
-    import sys
-    if '--server' in sys.argv:
-        svc = PipeServer()
-        svc.SvcDoRun()
-    elif '--client' in sys.argv:
-        for x in sys.argv[1:]:
-            if x.startswith('-'):
-                continue
-            path = os.path.abspath(x)
-            try:
-                status = win32pipe.CallNamedPipe(PIPENAME, path, PIPEBUFSIZE, 0)
-            except pywintypes.error, inst:
-                print "can't access named pipe '%s'" % PIPENAME
-                sys.exit()
-            print "%s = %s" % (path, status)
-    else:
-        print "usage:\n%s [--server|--client]" % sys.argv[0]
-
