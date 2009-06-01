@@ -112,7 +112,7 @@ typedef std::map<int, MenuDescription> MenuIdCmdMap;
 MenuDescriptionMap MenuDescMap;
 MenuIdCmdMap MenuIdMap;
 
-void AddMenuList(int idCmd, std::string name)
+void AddMenuList(int idCmd, std::string const& name)
 {    
     TDEBUG_TRACE("AddMenuList: idCmd = " << idCmd << " name = " << name);
     MenuIdMap[idCmd] = MenuDescMap[name];
@@ -135,7 +135,7 @@ void InitMenuMaps()
 }
 
 void InsertMenuItemWithIcon(HMENU hMenu, int indexMenu, int idCmd,
-        std::string menuText, std::string iconName)
+        std::string const& menuText, std::string const& iconName)
 {
 	MENUITEMINFO mi;
 	mi.cbSize = sizeof(mi);
@@ -160,7 +160,7 @@ void InsertMenuItemWithIcon(HMENU hMenu, int indexMenu, int idCmd,
 }
 
 void InsertSubMenuItemWithIcon(HMENU hMenu, HMENU hSubMenu, int indexMenu, int idCmd,
-        std::string menuText, std::string iconName)
+        std::string const& menuText, std::string const& iconName)
 {
     MENUITEMINFO mi;
     mi.cbSize = sizeof(mi);
@@ -185,7 +185,7 @@ void InsertSubMenuItemWithIcon(HMENU hMenu, HMENU hSubMenu, int indexMenu, int i
     InsertMenuItem(hMenu, indexMenu, TRUE, &mi);
 }
 
-void InsertMenuItemByName(HMENU hMenu, std::string name, int indexMenu,
+void InsertMenuItemByName(HMENU hMenu, std::string const& name, int indexMenu,
         int idCmd, int idCmdFirst)
 {
     TDEBUG_TRACE("InsertMenuItemByName: name = " << name);

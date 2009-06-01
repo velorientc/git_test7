@@ -109,7 +109,7 @@ std::string Quote(const std::string& str)
 
 
 // Cuts the first token off a delimited list
-std::string CutFirstToken(std::string& sList, const std::string sDelimiter)
+std::string CutFirstToken(std::string& sList, const std::string& sDelimiter)
 {
    std::string::size_type p = sList.find(sDelimiter);
    std::string sResult;

@@ -42,10 +42,9 @@ public:
 };
 
 
-BOOL hasHgDir(std::string path)
+BOOL hasHgDir(std::string const& path)
 {
-    path += "\\.hg";
-    return PathIsDirectory(path.c_str());
+    return PathIsDirectory((path + "\\.hg").c_str());
 }
 
 
