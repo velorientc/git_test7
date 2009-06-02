@@ -184,7 +184,7 @@ int HgQueryDirstate(
                 return 0;  // unknown dir -> no icon
         }
 
-        DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot);
+        DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot, cur.basedir);
         outStatus = (pds ? pds->status(relpath) : '?');
     }
     else
@@ -220,7 +220,8 @@ int HgQueryDirstate(
 
         if (outStatus == 'M')
         {
-            DirectoryStatus* dirsst = DirectoryStatus::get(cur.hgroot);
+            DirectoryStatus* dirsst = 
+                DirectoryStatus::get(cur.hgroot, cur.basedir);
             if (dirsst)
             {
                 std::string relbase;
