@@ -81,7 +81,6 @@ class RecoveryDialog(gtk.Window):
         self.textview.set_editable(False)
         self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
-        self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
                                    foreground='#900000')
