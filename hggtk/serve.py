@@ -210,6 +210,12 @@ class ServeDialog(gtk.Window):
         self._get_config()
 
     def _start_server(self):
+        def threadfunc(path, q, *args):
+            try:
+                hglib.hgcmd_toq(path, q, *args)
+            except util.Abort, e:
+                self._write(str(e))
+
         # gather input data
         try:
             port = int(self._port_input.get_text())
@@ -228,7 +234,8 @@ class ServeDialog(gtk.Window):
         else:
             args.append('--name')
             args.append(self.webname)
-        thread = threading.Thread(target=hglib.hgcmd_toq, args=args)
+
+        thread = threading.Thread(target=threadfunc, args=args)
         thread.start()
 
         while not gservice or not hasattr(gservice, 'httpd'):
