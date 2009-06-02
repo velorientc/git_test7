@@ -199,7 +199,7 @@ void InsertMenuItemByName(HMENU hMenu, const std::string& name, UINT indexMenu,
         return;
     }
 
-    MenuDescription md = MenuDescMap[name];
+    MenuDescription md = iter->second;
     AddMenuList(idCmd - idCmdFirst, name);
     InsertMenuItemWithIcon(hMenu, indexMenu, idCmd, md.menuText, md.iconName);
 }
@@ -337,7 +337,7 @@ CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmd);
         if(iter != MenuIdMap.end())
         {
-            DoHgtk(MenuIdMap[idCmd].name);
+            DoHgtk(iter->second.name);
             hr = NOERROR;
         }
         else
@@ -354,14 +354,13 @@ CShellExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved,
 {
 	*pszName = 0;
 	char *psz;
-	UINT idCmdU = static_cast<UINT>(idCmd)
 
     TDEBUG_TRACE("CShellExt::GetCommandString: idCmd = " << idCmd);
-    MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmdU);
+    MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter != MenuIdMap.end())
     {
-        TDEBUG_TRACE("CShellExt::GetCommandString: name = " << MenuIdMap[idCmdU].name);
-        psz = (char*)MenuIdMap[idCmdU].helpText.c_str();
+        TDEBUG_TRACE("CShellExt::GetCommandString: name = " << iter->second.name);
+        psz = (char*)iter->second.helpText.c_str();
     }
     else
     {
