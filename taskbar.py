@@ -9,6 +9,7 @@ import win32con
 import pywintypes
 import sys, os
 
+from mercurial import demandimport ; demandimport.enable()
 from thgutil import thread2
 from win32 import rpcserver
 
