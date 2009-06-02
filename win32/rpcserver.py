@@ -56,6 +56,7 @@ def update_batch(batch):
         for r in sorted(roots):
             logmsg('Updating ' + r)
             shlib.update_thgstatus(_ui, r, wait=False)
+            shlib.shell_notify([r])
         if notifypaths:
             time.sleep(2)
             shlib.shell_notify(list(notifypaths))
