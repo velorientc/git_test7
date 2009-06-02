@@ -42,7 +42,7 @@ public:
 };
 
 
-bool hasHgDir(std::string const& path)
+bool hasHgDir(const std::string& path)
 {
     return PathIsDirectory((path + "\\.hg").c_str()) != 0;
 }
