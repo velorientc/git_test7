@@ -238,8 +238,13 @@ class ServeDialog(gtk.Window):
         thread = threading.Thread(target=threadfunc, args=args)
         thread.start()
 
-        while not gservice or not hasattr(gservice, 'httpd'):
+        while True:
             time.sleep(0.1)
+            if gservice and hasattr(gservice, 'httpd'):
+                break
+            if not thread.isAlive():
+                return
+
         # gservice.httpd.fqaddr turned out to be unreliable, so use
         # loopback addr directly
         self._url = 'http://127.0.0.1:%d/' % (port)
