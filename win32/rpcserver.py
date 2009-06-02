@@ -26,6 +26,11 @@ PIPENAME += win32api.GetUserName()
 
 PIPEBUFSIZE = 4096
 
+logq = Queue.Queue(0)
+def logmsg(msg):
+    if logq.qsize() < 100:
+        ts = '[%s] ' % time.strftime('%c')
+        logq.put(ts + msg)
 
 def update_batch(batch):
     '''updates thgstatus for all paths in batch'''
@@ -45,12 +50,12 @@ def update_batch(batch):
     if roots:
         _ui = ui.ui();
         for r in sorted(roots):
+            logmsg('Updating ' + r)
             shlib.update_thgstatus(_ui, r, wait=False)
-            print "updated repo %s" % r
         if notifypaths:
             time.sleep(2)
             shlib.shell_notify(list(notifypaths))
-            print "shell notified"
+            logmsg('Shell notified')
 
 requests = Queue.Queue(0)
 _abort_request = r';:;:; Quit ;:;:;'  # any invalid path would do
@@ -62,7 +67,7 @@ class Updater(threading.Thread):
             batch = []
             r = requests.get()
             if r == _abort_request:
-                print 'Updater thread quiting'
+                logmsg('Updater thread quiting')
                 return
             print "got request %s (first in batch)" % r
             batch.append(r)
