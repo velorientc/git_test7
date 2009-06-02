@@ -21,8 +21,12 @@
 
 class Thgstatus
 {
+    static int SendRequest(const std::string& request);
+
 public:
-    static int update(const std::string& path);
+    static int update(const std::string& path) {
+        return SendRequest("update|" + path);
+    }
 };
 
 #endif

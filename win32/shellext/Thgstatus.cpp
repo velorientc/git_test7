@@ -33,17 +33,15 @@ std::string GetPipeName()
 }
 
 
-int Thgstatus::update(const std::string& path)
+int Thgstatus::SendRequest(const std::string& request)
 {
-    static std::string pname = GetPipeName();
-    
+    static const std::string pname = GetPipeName();
+
     if (pname.empty())
         return 0;
 
     BOOL fSuccess;
     DWORD cbRead;
-    
-    const std::string request = "update|" + path;
 
     TDEBUG_TRACE("Thgstatus::update: sending '" << request  << "' to " << pname);
 
