@@ -505,7 +505,7 @@ class ChangeSet(gdialog.GDialog):
         if not self.curfile:
             return
         rev = self.currev
-        parents = self.parents
+        parents = [x.rev() for x in self.repo[rev].parents()]
         if len(parents) == 0:
             parent = rev-1
         else:
