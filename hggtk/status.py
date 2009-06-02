@@ -321,7 +321,7 @@ class GStatus(gdialog.GDialog):
         col1.set_resizable(False)
         self.filetree.append_column(col1)
 
-        if self.merging:
+        if self.count_revs() <= 1:
             col = gtk.TreeViewColumn(_('ms'), stat_cell)
             col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
             col.set_sort_column_id(4)
