@@ -186,13 +186,13 @@ class NativeSaveFileDialogWrapper:
         """run the file dialog, either return a file name, or False if
         the user aborted the dialog"""
         try:
-            import win32gui, win32con
+            import win32gui, win32con, pywintypes
             return self.runWindows()
         except ImportError:
             return self.runCompatible()
 
     def runWindows(self):
-        import win32gui, win32con
+        import win32gui, win32con, pywintypes
         try:
             fname, customfilter, flags=win32gui.GetSaveFileNameW(
                 InitialDir=self.InitialDir,
@@ -205,7 +205,7 @@ class NativeSaveFileDialogWrapper:
                 FilterIndex=1)
             if fname:
                 return fname
-        except:
+        except pywintypes.error:
             pass
         return False
 
