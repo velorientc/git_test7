@@ -66,13 +66,21 @@ def update(args):
     batch.append(r)
     print "wait a bit for additional requests..."
     time.sleep(0.2)
+    deferred_requests = []
     try:
         while True:
-            r = requests.get_nowait()
-            print "got update request %s" % r
-            batch.append(r)
+            req = requests.get_nowait()
+            s = req.split('|')
+            cmd, args = s[0], s[1:]
+            if cmd == 'update':
+                print "got update request %s" % r
+                batch.append(args[0])
+            else:
+                deferred_requests.append(req)
     except Queue.Empty:
         pass
+    for req in deferred_requests:
+        requests.put(req)
     msg = "processing batch with %i update requests"
     print msg % len(batch)
     update_batch(batch)
@@ -92,7 +100,7 @@ class Updater(threading.Thread):
             if cmd is 'terminate':
                 logmsg('Updater thread terminating')
                 return
-            dispatch(req, cmd, args)                
+            dispatch(req, cmd, args)
 
 Updater().start()
 
