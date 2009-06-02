@@ -63,6 +63,7 @@ class TaskBarUI(gtk.Window):
                 textview.scroll_to_mark(buf.get_insert(), 0)
             except Queue.Empty:
                 pass
+        return True
 
 def run(ui, *pats, **opts):
     return TaskBarUI(opts['queue'])
