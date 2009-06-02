@@ -94,7 +94,10 @@ class Settings(object):
         s = cPickle.dumps(data)
         f = util.atomictempfile(appname, 'wb', None)
         f.write(s)
-        f.rename()
+        try:
+            f.rename()
+        except WindowsError:
+            pass # silently ignore these errors
 
     def _get_path(self, appname):
         if os.name == 'nt':

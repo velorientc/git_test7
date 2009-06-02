@@ -103,7 +103,6 @@ class ServeDialog(gtk.Window):
         self.textview.set_editable(False)
         self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
-        self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
         vbox.pack_start(scrolledwindow, True, True)
         self._set_button_states()
@@ -211,6 +210,12 @@ class ServeDialog(gtk.Window):
         self._get_config()
 
     def _start_server(self):
+        def threadfunc(path, q, *args):
+            try:
+                hglib.hgcmd_toq(path, q, *args)
+            except util.Abort, e:
+                self._write(_('Abort: %s\n') % str(e))
+
         # gather input data
         try:
             port = int(self._port_input.get_text())
@@ -229,11 +234,17 @@ class ServeDialog(gtk.Window):
         else:
             args.append('--name')
             args.append(self.webname)
-        thread = threading.Thread(target=hglib.hgcmd_toq, args=args)
+
+        thread = threading.Thread(target=threadfunc, args=args)
         thread.start()
 
-        while not gservice or not hasattr(gservice, 'httpd'):
+        while True:
             time.sleep(0.1)
+            if gservice and hasattr(gservice, 'httpd'):
+                break
+            if not thread.isAlive():
+                return
+
         # gservice.httpd.fqaddr turned out to be unreliable, so use
         # loopback addr directly
         self._url = 'http://127.0.0.1:%d/' % (port)

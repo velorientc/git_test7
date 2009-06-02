@@ -71,6 +71,9 @@ MenuDescription menuDescList[] = {
     {"datamine",    "Annotate Files",
                     "Show changeset information per file line",
                     "menublame.ico", 0},
+    {"vdiff",       "Visual Diff",
+                    "View changes using GUI diff tool",
+                    "TortoiseMerge.ico", 0},
 
     /* Add new items here */
 
@@ -82,13 +85,13 @@ MenuDescription menuDescList[] = {
 enum menuDescListEntries {
     Commit, Init, Clone, Status, Shelve, Add, Revert, Remove, Rename,
     Log, Synch, Serve, Update, Recover, Thgstatus, Userconf, Repoconf,
-    About, Datamine,
+    About, Datamine, VDiff,
     /* Add new items here */
     Separator, EndOfList
 };
 
 menuDescListEntries RepoNoFilesMenu[] = {
-    Commit, Status, Shelve, Separator, 
+    Commit, Status, Shelve, VDiff, Separator, 
     Log, Separator,
     Update, Separator,
     Synch, Clone, Recover, Serve, Thgstatus, Separator,
@@ -97,7 +100,7 @@ menuDescListEntries RepoNoFilesMenu[] = {
 };
 
 menuDescListEntries RepoFilesMenu[] = {
-    Commit, Status, Add, Revert, Rename, Remove, Separator,
+    Commit, Status, VDiff, Add, Revert, Rename, Remove, Separator,
     Log, Datamine, Separator,
     About, EndOfList
 };
