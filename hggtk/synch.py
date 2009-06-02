@@ -226,7 +226,6 @@ class SynchDialog(gtk.Window):
         self.textview.set_editable(False)
         self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
-        self.textview.set_editable(False)
         self.textview.connect('populate-popup', self.add_to_popup)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
