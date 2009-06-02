@@ -48,6 +48,7 @@ class GShelve(GStatus):
                 if entry[FM_STATUS] in 'MAR':
                     entry[FM_CHECKED] = True
             self.update_check_count()
+        self.opts['check'] = False
 
 
     def save_settings(self):
@@ -180,6 +181,8 @@ class GShelve(GStatus):
         hgshelve.filterpatch = filter_patch
         # shelve them!
         hgshelve.shelve(self.ui, self.repo, **opts)
+        self.opts['check'] = True  # recheck MAR after commit
+        self.filechunks = {}       # do not keep chunks
         self.reload_status()
 
     def unshelve(self):
