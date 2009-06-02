@@ -79,7 +79,7 @@ class CShellExt :
         //	IContextMenu3
         STDMETHODIMP			QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags);
         STDMETHODIMP			InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi);
-        STDMETHODIMP			GetCommandString(UINT idCmd, UINT uFlags, UINT FAR *reserved, LPSTR pszName, UINT cchMax);
+        STDMETHODIMP			GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved, LPSTR pszName, UINT cchMax);
         STDMETHODIMP            HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam);
         STDMETHODIMP            HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *pResult);
 
