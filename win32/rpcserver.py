@@ -32,8 +32,7 @@ def logmsg(msg):
         ts = '[%s] ' % time.strftime('%c')
         logq.put(ts + msg)
 
-def update_batch(batch):
-    '''updates thgstatus for all paths in batch'''
+def getrepos(batch):
     roots = set()
     notifypaths = set()
     for path in batch:
@@ -47,6 +46,11 @@ def update_batch(batch):
         else:
             roots.add(r);
             notifypaths.add(path)
+    return roots, notifypaths
+
+def update_batch(batch):
+    '''updates thgstatus for all paths in batch'''
+    roots, notifypaths = getrepos(batch)
     if roots:
         _ui = ui.ui();
         for r in sorted(roots):
@@ -88,26 +92,15 @@ def update(args):
 def remove(args):
     path = args[0]
     logmsg('Removing ' + path)
-    roots = set()
-    notifypaths = set()
-    r = paths.find_root(path)
-    if r is None:
-        for n in os.listdir(path):
-            r = paths.find_root(os.path.join(path, n))
-            if (r is not None):
-                roots.add(r)
-                notifypaths.add(r)
-    else:
-        roots.add(r);
-        notifypaths.add(path)
+    roots, notifypaths = getrepos([path])
     if roots:
         for r in sorted(roots):
             try:
                 os.remove(os.path.join(r, '.hg', 'thgstatus'))
             except OSError:
                 pass
-    if notifypaths:
-        shlib.shell_notify(list(notifypaths))
+        if notifypaths:
+            shlib.shell_notify(list(notifypaths))
 
 def dispatch(req, cmd, args):
     if cmd == 'update':
