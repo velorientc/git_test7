@@ -576,7 +576,7 @@ def debugcomplete(ui, cmd='', **opts):
     cmdlist = cmdutil.findpossible(cmd, table)
     if ui.verbose:
         cmdlist = [' '.join(c[0]) for c in cmdlist.values()]
-    ui.write("%s\n" % "\n".join(util.sort(cmdlist)))
+    ui.write("%s\n" % "\n".join(sorted(cmdlist)))
 
 globalopts = [
     ('R', 'repository', '',
