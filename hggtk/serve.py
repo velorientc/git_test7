@@ -214,7 +214,7 @@ class ServeDialog(gtk.Window):
             try:
                 hglib.hgcmd_toq(path, q, *args)
             except util.Abort, e:
-                self._write(str(e))
+                self._write(_('Abort: %s\n') % str(e))
 
         # gather input data
         try:
