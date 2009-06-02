@@ -103,7 +103,6 @@ class ServeDialog(gtk.Window):
         self.textview.set_editable(False)
         self.textview.modify_font(pango.FontDescription('Monospace'))
         scrolledwindow.add(self.textview)
-        self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
         vbox.pack_start(scrolledwindow, True, True)
         self._set_button_states()
