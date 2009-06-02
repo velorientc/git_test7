@@ -560,7 +560,7 @@ class GLog(gdialog.GDialog):
 
     def vdiff_local(self, menuitem, pats=[]):
         rev = self.currow[treemodel.REVID]
-        opts = {'rev' : ["%s:." % rev]}
+        opts = {'rev' : ["%s" % rev]}
         self._do_diff(pats, opts, modal=True)
 
     def diff_revs(self, menuitem):
