@@ -58,35 +58,43 @@ def update_batch(batch):
             logmsg('Shell notified')
 
 requests = Queue.Queue(0)
-_abort_request = r';:;:; Quit ;:;:;'  # any invalid path would do
+
+def update(args):
+    batch = []
+    r = args[0]
+    print "got update request %s (first in batch)" % r
+    batch.append(r)
+    print "wait a bit for additional requests..."
+    time.sleep(0.2)
+    try:
+        while True:
+            r = requests.get_nowait()
+            print "got update request %s" % r
+            batch.append(r)
+    except Queue.Empty:
+        pass
+    msg = "processing batch with %i update requests"
+    print msg % len(batch)
+    update_batch(batch)
+
+def dispatch(req, cmd, args):
+    if cmd == 'update':
+        update(args)
+    else:
+        logmsg("Error: unknown request '%s'" % req)
 
 class Updater(threading.Thread):
     def run(self):
-        n = 0
         while True:
-            batch = []
-            r = requests.get()
-            if r == _abort_request:
-                logmsg('Updater thread quiting')
+            req = requests.get()
+            s = req.split('|')
+            cmd, args = s[0], s[1:]
+            if cmd is 'terminate':
+                logmsg('Updater thread terminating')
                 return
-            print "got request %s (first in batch)" % r
-            batch.append(r)
-            print "wait a bit for additional requests..."
-            time.sleep(0.2)
-            try:
-                while True:
-                    r = requests.get_nowait()
-                    print "got request %s" % r
-                    batch.append(r)
-            except Queue.Empty:
-                pass
-            n += 1
-            msg = "--- processing batch %i with %i requests ---"
-            print msg % (n, len(batch))
-            update_batch(batch)
+            dispatch(req, cmd, args)                
 
 Updater().start()
-
 
 class PipeServer:
     def __init__(self):
@@ -103,9 +111,9 @@ class PipeServer:
         self.overlapped.hEvent = win32event.CreateEvent(None,0,0,None)
 
     def SvcStop(self):
-        print 'PipeServer thread quiting'
+        print 'PipeServer thread terminating'
         win32event.SetEvent(self.hWaitStop)
-        requests.put(_abort_request)
+        requests.put('terminate')
 
     def SvcDoRun(self):
         # We create our named pipe.

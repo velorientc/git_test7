@@ -42,11 +42,13 @@ int Thgstatus::update(const std::string& path)
 
     BOOL fSuccess;
     DWORD cbRead;
+    
+    const std::string request = "update|" + path;
 
-    TDEBUG_TRACE("Thgstatus::update(" << path  << ") for " << pname);
+    TDEBUG_TRACE("Thgstatus::update: sending '" << request  << "' to " << pname);
 
     fSuccess = ::CallNamedPipeA(
-        pname.c_str(), (void*)path.c_str(), path.size(), 0, 0, &cbRead,
+        pname.c_str(), (void*)request.c_str(), request.size(), 0, 0, &cbRead,
         200 /* ms */
     );
 
