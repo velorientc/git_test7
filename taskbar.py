@@ -1,8 +1,6 @@
 # Creates a task-bar icon.  Run from Python.exe to see the
 # messages printed.
 
-import rpcserver
-import thread2
 from win32api import *
 from win32gui import *
 import win32ui
@@ -10,6 +8,10 @@ import win32pipe
 import win32con
 import pywintypes
 import sys, os
+
+from mercurial import demandimport ; demandimport.enable()
+from thgutil import thread2
+from win32 import rpcserver
 
 APP_TITLE = "TortoiseHg RPC server"
 
@@ -37,12 +39,13 @@ class MainWindow:
                 0, 0, win32con.CW_USEDEFAULT, win32con.CW_USEDEFAULT, \
                 0, 0, hinst, None)
         UpdateWindow(self.hwnd)
+        self.guithread = None
         self._DoCreateIcons()
 
     def _DoCreateIcons(self):
         # Try and find a custom icon
         hinst =  GetModuleHandle(None)
-        from thgutil import get_tortoise_icon
+        from thgutil.paths import get_tortoise_icon
         iconPathName = get_tortoise_icon("hg.ico")
         if os.path.isfile(iconPathName):
             icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
@@ -89,21 +92,32 @@ class MainWindow:
     def OnCommand(self, hwnd, msg, wparam, lparam):
         id = LOWORD(wparam)
         if id == 1023:
-            # place holder for options dialog
-            msg = "TortoiseHG options dialog in construction"
-            win32ui.MessageBox(msg, 'TortoiseHG options...', win32con.MB_OK)
+            if not self.guithread or not self.guithread.isAlive():
+                self.launchgui()
+            else:
+                msg = "TortoiseHG options dialog already running"
+                win32ui.MessageBox(msg, 'TortoiseHG options...', win32con.MB_OK)
         elif id == 1025:
             self.exit_application()
         else:
             print "Unknown command -", id
 
     def exit_application(self):
-        print "stopping pipe server..."
         if self.stop_pipe_server():
             DestroyWindow(self.hwnd)
-            print "\n\nGoodbye"
+        if self.guithread and self.guithread.isAlive():
+            import gobject
+            gobject.idle_add(self.dialog.destroy)
+        print "Goodbye"
     
     def stop_pipe_server(self):
+        print "Stopping pipe server..."
+        if not self.pipethread.isAlive():
+            return True
+
+        # Try the nice way first
+        self.svc.SvcStop()
+
         max_try = 10
         cnt = 1
         while cnt <= max_try and self.pipethread.isAlive():
@@ -122,6 +136,21 @@ class MainWindow:
         else:
             return True
 
+    def launchgui(self):
+        def launch():
+            import gtk
+            from hggtk import taskbarui, hgtk
+            dlg = taskbarui.TaskBarUI(rpcserver.logq)
+            dlg.show_all()
+            dlg.connect('destroy', gtk.main_quit)
+            self.dialog = dlg
+            gtk.gdk.threads_init()
+            gtk.gdk.threads_enter()
+            gtk.main()
+            gtk.gdk.threads_leave()
+
+        self.guithread = thread2.Thread(target=launch)
+        self.guithread.start()
 
     def start_pipe_server(self):
         def servepipe():

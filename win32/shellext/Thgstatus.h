@@ -14,28 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef _THGSTATUS_H
+#define _THGSTATUS_H
+
 #include <string>
-#include <vector>
 
-
-class DirectoryStatus
+class Thgstatus
 {
-    struct E
-    {
-        std::string path_;
-        char status_;
-
-        E(): status_(0) {}
-    };
-
-    typedef std::vector<E> V;
-    V v_;
+    static int SendRequest(const std::string& request);
 
 public:
-    static DirectoryStatus* get(
-        const std::string& hgroot, const std::string& cwd);
-    char status(const std::string& relpath) const;
-
-private:
-    int read(const std::string& hgroot, const std::string& cwd);
+    static int update(const std::string& path) {
+        return SendRequest("update|" + path);
+    }
+    static int remove(const std::string& path) {
+        return SendRequest("remove|" + path);
+    }
 };
+
+#endif

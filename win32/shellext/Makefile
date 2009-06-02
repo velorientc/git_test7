@@ -14,6 +14,7 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         Winstat64.o \
         Dirstatecache.o \
         DirectoryStatus.o \
+        Thgstatus.o \
         QueryDirstate.o
 
 BASE_LDFLAGS=-lole32 -lkernel32 -luser32 -lgdi32 -lshlwapi -lwininet \

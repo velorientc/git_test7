@@ -236,7 +236,6 @@ def add(ui, *pats, **opts):
     """add files"""
     from mercurial import dispatch as _dispatch
     _dispatch.dispatch(['add'] + list(pats))
-    shlib.update_thgstatus(ui, paths.find_root())
     shlib.shell_notify([os.getcwd()])
 
 def thgstatus(ui, *pats, **opts):
