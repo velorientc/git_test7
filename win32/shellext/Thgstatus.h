@@ -27,6 +27,9 @@ public:
     static int update(const std::string& path) {
         return SendRequest("update|" + path);
     }
+    static int remove(const std::string& path) {
+        return SendRequest("remove|" + path);
+    }
 };
 
 #endif

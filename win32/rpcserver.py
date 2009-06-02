@@ -85,9 +85,35 @@ def update(args):
     print msg % len(batch)
     update_batch(batch)
 
+def remove(args):
+    path = args[0]
+    logmsg('Removing ' + path)
+    roots = set()
+    notifypaths = set()
+    r = paths.find_root(path)
+    if r is None:
+        for n in os.listdir(path):
+            r = paths.find_root(os.path.join(path, n))
+            if (r is not None):
+                roots.add(r)
+                notifypaths.add(r)
+    else:
+        roots.add(r);
+        notifypaths.add(path)
+    if roots:
+        for r in sorted(roots):
+            try:
+                os.remove(os.path.join(r, '.hg', 'thgstatus'))
+            except OSError:
+                pass
+    if notifypaths:
+        shlib.shell_notify(list(notifypaths))
+
 def dispatch(req, cmd, args):
     if cmd == 'update':
         update(args)
+    elif cmd == 'remove':
+        remove(args)
     else:
         logmsg("Error: unknown request '%s'" % req)
 

@@ -482,7 +482,7 @@ void CShellExt::DoHgtk(const std::string &cmd)
 
     if (cmd == "thgstatus")
     {
-        Thgstatus::update(cwd);
+        Thgstatus::remove(cwd);
         return;
     }
 
