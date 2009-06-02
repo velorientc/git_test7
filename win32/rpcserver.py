@@ -73,7 +73,7 @@ def update(args):
             s = req.split('|')
             cmd, args = s[0], s[1:]
             if cmd == 'update':
-                print "got update request %s" % r
+                print "got update request %s" % req
                 batch.append(args[0])
             else:
                 deferred_requests.append(req)
