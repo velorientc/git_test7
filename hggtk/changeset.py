@@ -489,7 +489,7 @@ class ChangeSet(gdialog.GDialog):
     def diff_to_local(self, menuitem):
         if not self.curfile:
             return
-        self.opts['rev'] = [str(self.currev), '.']
+        self.opts['rev'] = [str(self.currev)]
         self._diff_file('M', self.curfile)
 
     def diff_file_rev(self, menuitem):
