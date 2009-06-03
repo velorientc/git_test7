@@ -352,9 +352,7 @@ class GCommit(GStatus):
         '''See if an MQ patch is applied, switch to qrefresh mode'''
         self.qheader = None
         if self.mqmode:
-            patch = self.repo.mq.lookup('qtip')
-            ph = self.repo.mq.readheaders(patch)
-            self.qheader = '\n'.join(ph.message)
+            self.qheader = self.repo['qtip'].description()
             buf = self.text.get_buffer()
             if buf.get_char_count() == 0 or not buf.get_modified():
                 if self.qnew:

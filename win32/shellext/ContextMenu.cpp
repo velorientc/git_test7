@@ -10,7 +10,7 @@ typedef struct {
     std::string menuText;
     std::string helpText;
     std::string iconName;
-    int idCmd;
+    UINT idCmd;
 } MenuDescription;
 
 MenuDescription menuDescList[] = { 
@@ -111,12 +111,12 @@ menuDescListEntries NoRepoMenu[] = {
 };
 
 typedef std::map<std::string, MenuDescription> MenuDescriptionMap;
-typedef std::map<int, MenuDescription> MenuIdCmdMap;
+typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
 
 MenuDescriptionMap MenuDescMap;
 MenuIdCmdMap MenuIdMap;
 
-void AddMenuList(int idCmd, const std::string& name)
+void AddMenuList(UINT idCmd, const std::string& name)
 {    
     TDEBUG_TRACE("AddMenuList: idCmd = " << idCmd << " name = " << name);
     MenuIdMap[idCmd] = MenuDescMap[name];
@@ -138,7 +138,7 @@ void InitMenuMaps()
     MenuIdMap.clear();
 }
 
-void InsertMenuItemWithIcon(HMENU hMenu, int indexMenu, int idCmd,
+void InsertMenuItemWithIcon(HMENU hMenu, UINT indexMenu, UINT idCmd,
         const std::string& menuText, const std::string& iconName)
 {
 	MENUITEMINFO mi;
@@ -163,7 +163,7 @@ void InsertMenuItemWithIcon(HMENU hMenu, int indexMenu, int idCmd,
     InsertMenuItem(hMenu, indexMenu, TRUE, &mi);
 }
 
-void InsertSubMenuItemWithIcon(HMENU hMenu, HMENU hSubMenu, int indexMenu, int idCmd,
+void InsertSubMenuItemWithIcon(HMENU hMenu, HMENU hSubMenu, UINT indexMenu, UINT idCmd,
         const std::string& menuText, const std::string& iconName)
 {
     MENUITEMINFO mi;
@@ -189,8 +189,8 @@ void InsertSubMenuItemWithIcon(HMENU hMenu, HMENU hSubMenu, int indexMenu, int i
     InsertMenuItem(hMenu, indexMenu, TRUE, &mi);
 }
 
-void InsertMenuItemByName(HMENU hMenu, const std::string& name, int indexMenu,
-        int idCmd, int idCmdFirst)
+void InsertMenuItemByName(HMENU hMenu, const std::string& name, UINT indexMenu,
+        UINT idCmd, UINT idCmdFirst)
 {
     TDEBUG_TRACE("InsertMenuItemByName: name = " << name);
     MenuDescriptionMap::iterator iter = MenuDescMap.find(name);
@@ -200,7 +200,7 @@ void InsertMenuItemByName(HMENU hMenu, const std::string& name, int indexMenu,
         return;
     }
 
-    MenuDescription md = MenuDescMap[name];
+    MenuDescription md = iter->second;
     AddMenuList(idCmd - idCmdFirst, name);
     InsertMenuItemWithIcon(hMenu, indexMenu, idCmd, md.menuText, md.iconName);
 }
@@ -302,7 +302,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     HMENU hSubMenu = CreatePopupMenu();
     if (hSubMenu)
     {
-        int indexSubMenu = 0;
+        UINT indexSubMenu = 0;
         for( walk = entries ; *walk != EndOfList ; walk++ )
         {
             if( *walk == Separator )
@@ -338,7 +338,7 @@ CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmd);
         if(iter != MenuIdMap.end())
         {
-            DoHgtk(MenuIdMap[idCmd].name);
+            DoHgtk(iter->second.name);
             hr = NOERROR;
         }
         else
@@ -350,18 +350,18 @@ CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 }
 
 STDMETHODIMP
-CShellExt::GetCommandString(UINT idCmd, UINT uFlags, UINT FAR *reserved,
+CShellExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved,
 		LPSTR pszName, UINT cchMax)
 {
 	*pszName = 0;
 	char *psz;
 
     TDEBUG_TRACE("CShellExt::GetCommandString: idCmd = " << idCmd);
-    MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmd);
+    MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter != MenuIdMap.end())
     {
-        TDEBUG_TRACE("CShellExt::GetCommandString: name = " << MenuIdMap[idCmd].name);
-        psz = (char*)MenuIdMap[idCmd].helpText.c_str();
+        TDEBUG_TRACE("CShellExt::GetCommandString: name = " << iter->second.name);
+        psz = (char*)iter->second.helpText.c_str();
     }
     else
     {

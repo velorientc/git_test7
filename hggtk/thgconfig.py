@@ -526,7 +526,6 @@ class ConfigDialog(gtk.Dialog):
             gdialog.Prompt(_('No visual editor configured'),
                    _('Please configure a visual editor.'), self).run()
             self.focus_field('tortoisehg.editor')
-            self.emit_stop_by_name('response')
             return True
         thread = threading.Thread(target=doedit, name='edit config')
         thread.setDaemon(True)
@@ -539,10 +538,11 @@ class ConfigDialog(gtk.Dialog):
     def should_live(self, *args):
         if self.dirty:
             ret = gdialog.Confirm(_('Confirm quit without saving?'), [], self,
-               _('Yes to abandon changes, No to continue')).run()
+                            _('Yes to abandon changes, No to continue')).run()
             if ret != gtk.RESPONSE_YES:
-               self.emit_stop_by_name('response')
-               return True
+                if len(args) != 0:
+                   self.emit_stop_by_name('response')
+                return True
         return False
 
     def focus_field(self, focusfield):
