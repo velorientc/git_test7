@@ -526,7 +526,6 @@ class ConfigDialog(gtk.Dialog):
             gdialog.Prompt(_('No visual editor configured'),
                    _('Please configure a visual editor.'), self).run()
             self.focus_field('tortoisehg.editor')
-            self.emit_stop_by_name('response')
             return True
         thread = threading.Thread(target=doedit, name='edit config')
         thread.setDaemon(True)
