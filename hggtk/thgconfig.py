@@ -538,7 +538,7 @@ class ConfigDialog(gtk.Dialog):
     def should_live(self, *args):
         if self.dirty:
             ret = gdialog.Confirm(_('Confirm quit without saving?'), [], self,
-               _('Yes to abandon changes, No to continue')).run()
+                            _('Yes to abandon changes, No to continue')).run()
             if ret != gtk.RESPONSE_YES:
                 if len(args) != 0:
                    self.emit_stop_by_name('response')
