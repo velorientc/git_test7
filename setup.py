@@ -11,6 +11,48 @@ import time
 import sys
 import os
 from distutils.core import setup
+from distutils.command.build import build
+from distutils.spawn import spawn, find_executable
+
+
+class build_mo(build):
+
+    description = "build translations (.mo files)"
+
+    def run(self):
+        if not find_executable('msgfmt'):
+            self.warn("could not find msgfmt executable, no translations "
+                     "will be built")
+            return
+
+        podir = 'i18n'
+        if not os.path.isdir(podir):
+            self.warn("could not find %s/ directory" % podir)
+            return
+
+        join = os.path.join
+        for po in os.listdir(podir):
+            if not po.endswith('.po'):
+                continue
+            if not (po.find('tortoisehg-') == 0):
+                self.warn("Found file '%s' that was not tortoisehg .po" % po)
+                continue
+            pofile = join(podir, po)
+            modir = join('locale', po[11:-3], 'LC_MESSAGES')
+            mofile = join(modir, 'tortoisehg.mo')
+            cmd = ['msgfmt', '-v', '-o', mofile, pofile]
+            if sys.platform != 'sunos5':
+                # msgfmt on Solaris does not know about -c
+                cmd.append('-c')
+            self.mkpath(modir)
+            self.make_file([pofile], mofile, spawn, (cmd,))
+            self.distribution.data_files.append((join('tortoisehg', modir),
+                                                 [mofile]))
+
+build.sub_commands.append(('build_mo', None))
+
+cmdclass = {
+        'build_mo': build_mo}
 
 def setup_windows():
     # Specific definitios for Windows NT-alike installations
@@ -118,5 +160,6 @@ setup(name="tortoisehg",
         scripts=scripts,
         packages=packages,
         data_files=data_files,
+        cmdclass=cmdclass,
         **extra
     )

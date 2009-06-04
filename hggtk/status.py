@@ -853,12 +853,13 @@ class GStatus(gdialog.GDialog):
         difftext = [_('===== Diff to first parent =====\n')]
         wfiles = [self.repo.wjoin(wfile)]
         wctx = self.repo[None]
+        pctxs = wctx.parents()
         matcher = cmdutil.match(self.repo, wfiles, self.opts)
-        for s in patch.diff(self.repo, wctx.p1().node(), None,
+        for s in patch.diff(self.repo, pctxs[0].node(), None,
                 match=matcher, opts=patch.diffopts(self.ui, self.opts)):
             difftext.extend(s.splitlines(True))
         difftext.append(_('\n===== Diff to second parent =====\n'))
-        for s in patch.diff(self.repo, wctx.p2().node(), None,
+        for s in patch.diff(self.repo, pctxs[1].node(), None,
                 match=matcher, opts=patch.diffopts(self.ui, self.opts)):
             difftext.extend(s.splitlines(True))
 
