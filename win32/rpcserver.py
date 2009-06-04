@@ -1,4 +1,5 @@
 import os
+import gc
 import win32api
 import win32con
 
@@ -104,6 +105,7 @@ def remove(args):
             shlib.shell_notify(list(notifypaths))
 
 def dispatch(req, cmd, args):
+    print "dispatch(%s)" % req
     if cmd == 'update':
         update(args)
     elif cmd == 'remove':
@@ -121,6 +123,7 @@ class Updater(threading.Thread):
                 logmsg('Updater thread terminating')
                 return
             dispatch(req, cmd, args)
+            gc.collect()
 
 Updater().start()
 
