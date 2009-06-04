@@ -1,17 +1,9 @@
 #ifndef _SHELL_EXT_H_
 #define _SHELL_EXT_H_
 
-#pragma data_seg(".text")
-#include <objbase.h>
-#define INITGUID
-#include <initguid.h>
-#include <shlobj.h>
-#include <shlguid.h>
 #include <vector>
 #include <string>
-#pragma data_seg()
 
-#define DLLREGUNREGNAME	TEXT("DLL Registerer")
 
 enum TortoiseOLEClass
 {
