@@ -164,7 +164,6 @@ class InitDialog(gtk.Window):
                 except:
                     pass
 
-        shlib.update_thgstatus(u, dest, wait=True)
         shlib.shell_notify(dest)
 
         dialog.info_dialog(self, _('New repository created'),

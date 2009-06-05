@@ -406,7 +406,6 @@ class GCommit(GStatus):
                        _('No committable files selected'), self).run()
                 return
         self.reload_status()
-        shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
         files = [self.repo.wjoin(x) for x in commit_list]
         shlib.shell_notify(files)
 
@@ -504,7 +503,6 @@ class GCommit(GStatus):
             if stat not in '?!' or self.should_addremove([file]):
                 self.hg_commit([file])
                 self.reload_status()
-                shlib.update_thgstatus(self.ui, self.repo.root, wait=True)
                 shlib.shell_notify([self.repo.wjoin(file)])
         return True
 

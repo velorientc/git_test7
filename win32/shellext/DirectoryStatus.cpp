@@ -17,6 +17,7 @@
 #include "stdafx.h"
 
 #include "DirectoryStatus.h"
+#include "Thgstatus.h"
 
 
 char DirectoryStatus::status(const std::string& relpath_) const
@@ -54,7 +55,7 @@ char DirectoryStatus::status(const std::string& relpath_) const
 }
 
 
-int DirectoryStatus::read(const std::string& hgroot)
+int DirectoryStatus::read(const std::string& hgroot, const std::string& cwd)
 {
     v_.clear();
 
@@ -64,6 +65,8 @@ int DirectoryStatus::read(const std::string& hgroot)
     if (!f)
     {
         TDEBUG_TRACE("DirectoryStatus::read: can't open '" << p << "'");
+        std::string p = (cwd.size() < hgroot.size() ? hgroot : cwd);
+        Thgstatus::update(p);
         return 0;
     }
 
@@ -112,7 +115,8 @@ struct CacheEntry
 };
 
 
-DirectoryStatus* DirectoryStatus::get(const std::string& hgroot)
+DirectoryStatus* DirectoryStatus::get(
+    const std::string& hgroot, const std::string& cwd)
 {
     static CacheEntry ce;
     
@@ -121,7 +125,7 @@ DirectoryStatus* DirectoryStatus::get(const std::string& hgroot)
     if (ce.hgroot_ != hgroot || (tc - ce.tickcount_) > 2000)
     {
         ce.hgroot_.clear();
-        ce.readfailed_ = (ce.ds_.read(hgroot) == 0);
+        ce.readfailed_ = (ce.ds_.read(hgroot, cwd) == 0);
         ce.hgroot_ = hgroot;
         ce.tickcount_ = GetTickCount();
     }
