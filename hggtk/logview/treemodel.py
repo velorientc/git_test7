@@ -122,7 +122,8 @@ class TreeModel(gtk.GenericTreeModel):
             taglist = hglib.toutf(', '.join(tags))
             tstr = ''
             for tag in tags:
-                tstr += '<span background="#ffffaa"> %s </span> ' % tag
+                tstr += '<span color="%s" background="%s"> %s </span> ' % \
+                        ('black', '#ffffaa', tag)
 
             # show branch names per hgweb's logic
             branches = webutil.nodebranchdict(self.repo, ctx)
@@ -131,8 +132,8 @@ class TreeModel(gtk.GenericTreeModel):
             branchstr = ''
             for branch in branches:
                 branchstr += branch['name']
-                bstr += '<span background="#aaffaa"> %s </span> ' % \
-                        branch['name']
+                bstr += '<span color="%s" background="%s"> %s </span> ' % \
+                        ('black', '#aaffaa', branch['name'])
             for branch in inbranches:
                 branchstr += branch['name']
 
