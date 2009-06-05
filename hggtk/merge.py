@@ -94,7 +94,6 @@ class MergeDialog(gtk.Window):
         undo.connect('clicked', self.undo, local, merge, commit)
         merge.connect('clicked', self.merge, other, commit, undo)
         commit.connect('clicked', self.commit)
-        self.repo = repo
 
     def revdesc(self, repo, revid):
         ctx = repo[revid]
@@ -124,8 +123,8 @@ class MergeDialog(gtk.Window):
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-        self.repo.invalidate()
-        if len(self.repo.parents()) == 1:
+        repo = hg.repository(ui.ui(), path=paths.find_root())
+        if len(repo.parents()) == 1:
             return
         if self.notify_func:
             self.notify_func(self.notify_args)
