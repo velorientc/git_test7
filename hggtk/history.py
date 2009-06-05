@@ -710,6 +710,8 @@ class GLog(gdialog.GDialog):
         dialog.set_transient_for(None)
 
     def checkout_completed(self, oldparents):
+        self.repo.invalidate()
+        self.repo.dirstate.invalidate()
         newparents = [x.node() for x in self.repo.parents()]
         if not oldparents == newparents:
             self.refresh_model()
@@ -722,13 +724,18 @@ class GLog(gdialog.GDialog):
         dialog = merge.MergeDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
-        dialog.set_notify_func(self.merge_completed, parents)
+        dialog.set_notify_func(self.merge_completed, parents, len(self.repo))
         dialog.present()
         dialog.set_transient_for(None)
 
-    def merge_completed(self, oldparents):
+    def merge_completed(self, args):
+        self.repo.invalidate()
+        self.repo.dirstate.invalidate()
+        oldparents, repolen = args
         newparents = [x.node() for x in self.repo.parents()]
-        if not oldparents == newparents:
+        if len(self.repo) != repolen:
+            self.reload_log()
+        elif not oldparents == newparents:
             self.refresh_model()
 
     def selection_changed(self, treeview):
