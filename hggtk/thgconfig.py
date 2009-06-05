@@ -236,10 +236,9 @@ class PathEditDialog(gtk.Dialog):
                      ('Alias', _('Alias'))):
             entry = gtk.Entry()
             label = gtk.Label(name[1])
-            self.entries[name[0]] = (entry, label)
+            self.entries[name[0]] = [entry, label, None]
 
         self.entries['URL'][0].set_width_chars(50)
-        self.entries['URL'][0].set_editable(False)
         self.entries['Password'][0].set_visibility(False)
 
         hbox = gtk.HBox()
@@ -274,23 +273,27 @@ class PathEditDialog(gtk.Dialog):
             hbox.pack_start(self.entries[n][0], True, True, 2)
             vbox.pack_start(hbox, False, False, 2)
 
-        user, host, port, folder, pw, scheme = self.urlparse(path)
+        self.setentries(path, alias)
 
-        self.entries['URL'][0].set_text(path)
-        self.entries['Alias'][0].set_text(alias)
-        self.entries['User'][0].set_text(user or '')
-        self.entries['Host'][0].set_text(host or '')
-        self.entries['Port'][0].set_text(port or '')
-        self.entries['Folder'][0].set_text(folder or '')
-        self.entries['Password'][0].set_text(pw or '')
-        for n, (e, l) in self.entries.iteritems():
-            e.connect('changed', self.changed)
+        self.sethandlers()
 
         self.lastproto = None
         self.protcombo.connect('changed', self.changed)
-        i = self._protocols.index(scheme)
-        self.protcombo.set_active(i)
+        self.update_sensitive()
         self.show_all()
+
+    def sethandlers(self, enable=True):
+        for n, (e, l, h) in self.entries.iteritems():
+            if n == 'URL':
+                if enable:
+                    self.entries[n][2] = e.connect('changed', self.changedurl)
+                else:
+                    e.disconnect(h)
+            else:
+                if enable:
+                    self.entries[n][2] = e.connect('changed', self.changed)
+                else:
+                    e.disconnect(h)
 
     def urlparse(self, path):
         if path.startswith('ssh://'):
@@ -312,9 +315,24 @@ class PathEditDialog(gtk.Dialog):
             scheme = 'local'
         return user, host, port, folder, passwd, scheme
 
-    def changed(self, combo):
-        newurl = self.buildurl()
-        self.entries['URL'][0].set_text(url.hidepassword(newurl))
+    def setentries(self, path, alias=None):
+        if alias == None:
+            alias = self.entries['Alias'][0].get_text()
+
+        user, host, port, folder, pw, scheme = self.urlparse(path)
+
+        self.entries['Alias'][0].set_text(alias)
+        self.entries['URL'][0].set_text(url.hidepassword(path))
+        self.entries['User'][0].set_text(user or '')
+        self.entries['Host'][0].set_text(host or '')
+        self.entries['Port'][0].set_text(port or '')
+        self.entries['Folder'][0].set_text(folder or '')
+        self.entries['Password'][0].set_text(pw or '')
+
+        i = self._protocols.index(scheme)
+        self.protcombo.set_active(i)
+
+    def update_sensitive(self):
         proto = self.protcombo.get_active_text()
         if proto == self.lastproto:
             return
@@ -333,6 +351,19 @@ class PathEditDialog(gtk.Dialog):
             for n in ('User', 'Password', 'Port', 'Host'):
                 self.entries[n][0].set_sensitive(True)
                 self.entries[n][1].set_sensitive(True)
+
+    def changed(self, combo):
+        newurl = self.buildurl()
+        self.sethandlers(False)
+        self.entries['URL'][0].set_text(url.hidepassword(newurl))
+        self.sethandlers(True)
+        self.update_sensitive()
+
+    def changedurl(self, combo):
+        self.sethandlers(False)
+        self.setentries(self.entries['URL'][0].get_text())
+        self.sethandlers(True)
+        self.update_sensitive()
 
     def response(self, widget, response_id):
         if response_id != gtk.RESPONSE_OK:
