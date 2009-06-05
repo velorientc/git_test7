@@ -176,7 +176,7 @@ class GDialog(gtk.Window):
     def save_settings(self):
         settings = {}
         rect = self.get_allocation()
-        if self.ismaximized:
+        if self.ismaximized or self.isiconified:
             settings['gdialog-rect'] = self._setting_defsize
             settings['gdialog-pos'] = self._setting_winpos
         else:
@@ -297,6 +297,11 @@ class GDialog(gtk.Window):
                 self.ismaximized = True
             else:
                 self.ismaximized = False
+        if event.changed_mask & gtk.gdk.WINDOW_STATE_ICONIFIED:
+            if event.new_window_state & gtk.gdk.WINDOW_STATE_ICONIFIED:
+                self.isiconified = True
+            else:
+                self.isiconified = False
 
     def setfocus(self, window, event):
         self.lastpos = self.get_position()
@@ -307,6 +312,7 @@ class GDialog(gtk.Window):
         gtklib.set_tortoise_keys(self)
 
         self.ismaximized = False
+        self.isiconified = False
         self.lastpos = self._setting_winpos
         self.connect('window-state-event', self.windowstate)
         self.connect('set-focus', self.setfocus)
