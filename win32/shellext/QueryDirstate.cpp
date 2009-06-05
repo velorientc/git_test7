@@ -23,6 +23,7 @@
 #include "Dirstatecache.h"
 #include "Winstat.h"
 #include "TortoiseUtils.h"
+#include "Thgstatus.h"
 
 #include <shlwapi.h>
 
@@ -99,6 +100,29 @@ int findHgRoot(QueryState& cur, QueryState& last, bool outdated)
 }
 
 
+int get_relpath(
+    const std::string& hgroot, 
+    const std::string& path,
+    std::string& res
+)
+{
+    size_t offset = hgroot.size();
+    if (offset == 0)
+        return 0;
+
+    if (offset > path.size())
+        return 0;
+
+    if (path[offset] == '\\')
+        offset++;
+    
+    const char* relpathptr = path.c_str() + offset;
+
+    res = relpathptr;
+    return 1;
+}
+
+
 int HgQueryDirstate(
     const std::string& path, const char& filterStatus, char& outStatus)
 {
@@ -160,7 +184,7 @@ int HgQueryDirstate(
                 return 0;  // unknown dir -> no icon
         }
 
-        DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot);
+        DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot, cur.basedir);
         outStatus = (pds ? pds->status(relpath) : '?');
     }
     else
@@ -193,6 +217,30 @@ int HgQueryDirstate(
         }
 
         outStatus = e->status(stat);
+
+        if (outStatus == 'M')
+        {
+            DirectoryStatus* dirsst = 
+                DirectoryStatus::get(cur.hgroot, cur.basedir);
+            if (dirsst)
+            {
+                std::string relbase;
+                if (get_relpath(cur.hgroot, cur.basedir, relbase))
+                {
+                    TDEBUG_TRACE("HgQueryDirstate: relbase = '" 
+                        << relbase << "'");
+
+                    char basedir_status = dirsst->status(relbase);
+                    TDEBUG_TRACE("HgQueryDirstate: basedir_status = " 
+                        << basedir_status);
+
+                    if (basedir_status != 'M')
+                    {
+                        Thgstatus::update(cur.hgroot);
+                    }
+                }
+            }
+        }
     }
 
     cur.status = outStatus;
