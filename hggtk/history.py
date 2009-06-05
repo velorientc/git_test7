@@ -419,6 +419,8 @@ class GLog(gdialog.GDialog):
                  self.email_revs))
         m.append(create_menu(_('bundle from here to selected'),
                  self.bundle_revs))
+        self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
+        m.append(self.cmenu_merge2)
         m.connect_after('selection-done', self.restore_original_selection)
         m.show_all()
         return m
@@ -715,6 +717,8 @@ class GLog(gdialog.GDialog):
     def merge(self, menuitem):
         rev = self.currow[treemodel.REVID]
         parents = [x.node() for x in self.repo.parents()]
+        if rev == self.repo.parents()[0].rev():
+            rev = self.revs[1]
         dialog = merge.MergeDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
@@ -779,6 +783,13 @@ class GLog(gdialog.GDialog):
         return True
 
     def tree_popup_menu_diff(self, treeview, button=0, time=0):
+        selrev = self.revs[0]
+
+        # disable/enable menus as required
+        parents = [x.rev() for x in self.repo.parents()]
+        can_merge = selrev in parents and len(parents) < 2
+        self.cmenu_merge2.set_sensitive(can_merge)
+
         # display the context menu
         self._menu2.popup(None, None, None, button, time)
         return True
