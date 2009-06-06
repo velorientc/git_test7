@@ -18,7 +18,9 @@ import win32file
 import winerror
 import pywintypes
 
-from mercurial import demandimport ; demandimport.enable()
+from mercurial import demandimport
+demandimport.ignore.append('win32com.shell')
+demandimport.enable()
 from mercurial import ui
 from thgutil import thread2, paths, shlib
 
