@@ -119,7 +119,7 @@ class Updater(threading.Thread):
             req = requests.get()
             s = req.split('|')
             cmd, args = s[0], s[1:]
-            if cmd is 'terminate':
+            if cmd == 'terminate':
                 logmsg('Updater thread terminating')
                 return
             dispatch(req, cmd, args)
