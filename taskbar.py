@@ -10,7 +10,7 @@ import Queue
 
 from win32api import *
 from win32gui import *
-import win32ui
+
 import win32pipe
 import win32con
 import win32event
@@ -56,7 +56,7 @@ class MainWindow:
         hinst =  GetModuleHandle(None)
         from thgutil.paths import get_tortoise_icon
         iconPathName = get_tortoise_icon("hg.ico")
-        if os.path.isfile(iconPathName):
+        if iconPathName and os.path.isfile(iconPathName):
             icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
             hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
         else:
@@ -104,8 +104,7 @@ class MainWindow:
             if not self.guithread or not self.guithread.isAlive():
                 self.launchgui()
             else:
-                msg = "TortoiseHG options dialog already running"
-                win32ui.MessageBox(msg, 'TortoiseHG options...', win32con.MB_OK)
+                print "TortoiseHG options dialog already running"
         elif id == 1025:
             self.exit_application()
         else:
