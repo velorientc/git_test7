@@ -33,6 +33,29 @@ APP_TITLE = "TortoiseHg RPC server"
 SHOWLOG_CMD = 1023
 EXIT_CMD = 1025
 
+def SetIcon(hwnd, name):
+    # Try and find a custom icon
+    hinst =  GetModuleHandle(None)
+    from thgutil.paths import get_tortoise_icon
+    iconPathName = get_tortoise_icon("hgB.ico")
+    if iconPathName and os.path.isfile(iconPathName):
+        icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
+        hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
+    else:
+        print "Can't find a Python icon file - using default"
+        hicon = LoadIcon(0, win32con.IDI_APPLICATION)
+
+    flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
+    nid = (hwnd, 0, flags, win32con.WM_USER+20, hicon, APP_TITLE)
+    try:
+        Shell_NotifyIcon(NIM_ADD, nid)
+    except error:
+        # This is common when windows is starting, and this code is hit
+        # before the taskbar has been created.
+        print "Failed to add the taskbar icon - is explorer running?"
+        # but keep running anyway - when explorer starts, we get the
+        # TaskbarCreated message.
+
 class MainWindow:
     def __init__(self):
         msg_TaskbarRestart = RegisterWindowMessage("TaskbarCreated");
@@ -61,28 +84,7 @@ class MainWindow:
         self._DoCreateIcons()
 
     def _DoCreateIcons(self):
-        # Try and find a custom icon
-        hinst =  GetModuleHandle(None)
-        from thgutil.paths import get_tortoise_icon
-        iconPathName = get_tortoise_icon("hg.ico")
-        if iconPathName and os.path.isfile(iconPathName):
-            icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
-            hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
-        else:
-            print "Can't find a Python icon file - using default"
-            hicon = LoadIcon(0, win32con.IDI_APPLICATION)
-
-        flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
-        nid = (self.hwnd, 0, flags, win32con.WM_USER+20, hicon, APP_TITLE)
-        try:
-            Shell_NotifyIcon(NIM_ADD, nid)
-        except error:
-            # This is common when windows is starting, and this code is hit
-            # before the taskbar has been created.
-            print "Failed to add the taskbar icon - is explorer running?"
-            # but keep running anyway - when explorer starts, we get the
-            # TaskbarCreated message.
-
+        SetIcon(self.hwnd, "hg.ico")
         # start namepipe server for hg status
         self.start_pipe_server()
 
