@@ -19,7 +19,7 @@ class TaskBarUI(gtk.Window):
         gtklib.set_tortoise_icon(self, 'hg.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.set_default_size(400, 120)
+        self.set_default_size(500, 220)
         self.set_title(_('TortoiseHg Taskbar'))
 
         vbox = gtk.VBox()
