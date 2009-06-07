@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "POT-Creation-Date: 2009-06-01 05:27+0000\n"
-"PO-Revision-Date: 2009-06-01 04:45+0000\n"
-"Last-Translator: peso <peer.sommerlund@gmail.com>\n"
+"PO-Revision-Date: 2009-06-07 10:07+0100\n"
+"Last-Translator: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -115,7 +115,7 @@ msgstr ""
 
 #: hggtk\changeset.py:175
 msgid "tags:"
-msgstr ""
+msgstr "mærker:"
 
 #: hggtk\changeset.py:194
 msgid " %s is larger than the specified max diff size"
@@ -1456,7 +1456,7 @@ msgstr ""
 
 #: hggtk\history.py:61
 msgid "Filter revisions for display"
-msgstr ""
+msgstr "Filtrer hvilke revisioner der vises"
 
 #: hggtk\history.py:64
 msgid "_DataMine"
@@ -1484,11 +1484,11 @@ msgstr "Vis ID"
 
 #: hggtk\history.py:175
 msgid "Show Local Date"
-msgstr ""
+msgstr "Vis lokal dato"
 
 #: hggtk\history.py:181
 msgid "Show UTC Date"
-msgstr ""
+msgstr "Vis UTC dato"
 
 #: hggtk\history.py:187
 msgid "Show Branch"
@@ -1500,11 +1500,11 @@ msgstr "Vis alle revisioner"
 
 #: hggtk\history.py:204
 msgid "Show New Revisions"
-msgstr ""
+msgstr "Vis nye revisioner"
 
 #: hggtk\history.py:208
 msgid "Show Tagged Revisions"
-msgstr ""
+msgstr "Vis markerede revisioner"
 
 #: hggtk\history.py:212
 msgid "Show Revision Ancestry"
@@ -1568,7 +1568,7 @@ msgstr ""
 
 #: hggtk\history.py:397
 msgid "add/remove _tag"
-msgstr ""
+msgstr "tilføj/fjern _mærke"
 
 #: hggtk\history.py:398
 msgid "backout revision"
@@ -2390,11 +2390,11 @@ msgstr ""
 
 #: hggtk\tagadd.py:25
 msgid "TortoiseHg Tag - %s"
-msgstr ""
+msgstr "TortoiseHg mærke - %s"
 
 #: hggtk\tagadd.py:49
 msgid "Add tag to selected version"
-msgstr ""
+msgstr "Tiløj mærke til valgte revision"
 
 #: hggtk\tagadd.py:51
 msgid "Remove"
@@ -2402,11 +2402,11 @@ msgstr ""
 
 #: hggtk\tagadd.py:53
 msgid "Remove tag from repository"
-msgstr ""
+msgstr "Fjern mærke fra arkiv"
 
 #: hggtk\tagadd.py:66
 msgid "Tag:"
-msgstr ""
+msgstr "Mærke:"
 
 #: hggtk\tagadd.py:79
 msgid "Revision:"
@@ -2414,11 +2414,11 @@ msgstr ""
 
 #: hggtk\tagadd.py:90
 msgid "Tag is local"
-msgstr ""
+msgstr "Mærket er lokalt"
 
 #: hggtk\tagadd.py:91
 msgid "Replace existing tag"
-msgstr ""
+msgstr "Erstat eksisterende mærke"
 
 #: hggtk\tagadd.py:92
 msgid "Use custom commit message"
@@ -2430,11 +2430,11 @@ msgstr "Integrationsbesked:"
 
 #: hggtk\tagadd.py:161
 msgid "Tag input is empty"
-msgstr ""
+msgstr "Mærke-felt er tomt"
 
 #: hggtk\tagadd.py:162
 msgid "Please enter tag name"
-msgstr ""
+msgstr "Mærkenavn mangler"
 
 #: hggtk\tagadd.py:166
 msgid "Custom commit message is empty"
@@ -2442,52 +2442,52 @@ msgstr "Selvvalgt integrationsbesked er tom"
 
 #: hggtk\tagadd.py:174 hggtk\tagadd.py:205
 msgid "Tagging completed"
-msgstr ""
+msgstr "Markering gennemført"
 
 #: hggtk\tagadd.py:175
 msgid "Tag \"%s\" has been added"
-msgstr ""
+msgstr "Mærke \"%s\" er blevet tilføjet"
 
 #: hggtk\tagadd.py:178 hggtk\tagadd.py:181 hggtk\tagadd.py:209
 #: hggtk\tagadd.py:212
 msgid "Error in tagging"
-msgstr ""
+msgstr "Fejl under mærkning"
 
 #: hggtk\tagadd.py:193
 msgid "Tag name is empty"
-msgstr ""
+msgstr "Mærke-navn er ikke udfyldt"
 
 #: hggtk\tagadd.py:194
 msgid "Please select tag name to remove"
-msgstr ""
+msgstr "Vælg et mærke der skal fjernes"
 
 #: hggtk\tagadd.py:206
 msgid "Tag \"%s\" has been removed"
-msgstr ""
+msgstr "Mærke \"%s\" er blevet fjernet"
 
 #: hggtk\tagadd.py:220
 msgid "a tag named \"%s\" already exists"
-msgstr ""
+msgstr "Der findes allerede et mærke med navnet "\%s\""
 
 #: hggtk\tagadd.py:226
 msgid "Added tag %s for changeset %s"
-msgstr ""
+msgstr "Tilføjet mærke %s til ændring %s"
 
 #: hggtk\tagadd.py:228
 msgid "Tag '%s' already exist"
-msgstr ""
+msgstr "Mærke '%s' findes allerede"
 
 #: hggtk\tagadd.py:234
 msgid "Tag '%s' does not exist"
-msgstr ""
+msgstr "Mærke '%s' findes ikke"
 
 #: hggtk\tagadd.py:237
 msgid "Removed tag %s"
-msgstr ""
+msgstr "Mærke %s er fjernet"
 
 #: hggtk\thgconfig.py:21
 msgid "<unspecified>"
-msgstr ""
+msgstr "<uspecificeret>"
 
 #: hggtk\thgconfig.py:27
 msgid "3-way Merge Tool"
@@ -2846,7 +2846,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:177
 msgid "method"
-msgstr ""
+msgstr "metode"
 
 #: hggtk\thgconfig.py:178
 msgid ""
@@ -2864,11 +2864,11 @@ msgstr ""
 
 #: hggtk\thgconfig.py:183
 msgid "SMTP Host"
-msgstr ""
+msgstr "SMTP vært"
 
 #: hggtk\thgconfig.py:184
 msgid "SMTP Port"
-msgstr ""
+msgstr "SMTP port"
 
 #: hggtk\thgconfig.py:185
 msgid "Port to connect to on mail server. Default: 25"
@@ -2876,7 +2876,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:187
 msgid "SMTP TLS"
-msgstr ""
+msgstr "SMTP TLS"
 
 #: hggtk\thgconfig.py:188
 msgid "Connect to mail server using TLS. Default: False"
@@ -2884,7 +2884,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:190
 msgid "SMTP Username"
-msgstr ""
+msgstr "SMTP brugernavn"
 
 #: hggtk\thgconfig.py:191
 msgid "Username to authenticate to mail server with"
@@ -2892,7 +2892,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:192
 msgid "SMTP Password"
-msgstr ""
+msgstr "SMTP kodeord"
 
 #: hggtk\thgconfig.py:193
 msgid "Password to authenticate to mail server with"
@@ -2900,15 +2900,15 @@ msgstr ""
 
 #: hggtk\thgconfig.py:194
 msgid "Local Hostname"
-msgstr ""
+msgstr "Lokalt værtsnavn"
 
 #: hggtk\thgconfig.py:195
 msgid "Hostname the sender can use to identify itself to the mail server."
-msgstr ""
+msgstr "Værtsnavn som afsenderen kan bruge til at identificere sig overfor mail serveren."
 
 #: hggtk\thgconfig.py:198
 msgid "Git Format"
-msgstr ""
+msgstr "Git format"
 
 #: hggtk\thgconfig.py:199
 msgid "Use git extended diff header format. Default: False"
@@ -3108,7 +3108,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:961
 msgid "History"
-msgstr ""
+msgstr "Historik"
 
 #: hggtk\thgconfig.py:999
 msgid "# Generated by tortoisehg-config\n"
