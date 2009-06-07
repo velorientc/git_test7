@@ -26,6 +26,9 @@ from thgutil import thread2, paths, shlib
 
 APP_TITLE = "TortoiseHg RPC server"
 
+SHOWLOG_CMD = 1023
+EXIT_CMD = 1025
+
 class MainWindow:
     def __init__(self):
         msg_TaskbarRestart = RegisterWindowMessage("TaskbarCreated");
@@ -90,9 +93,9 @@ class MainWindow:
     def OnTaskbarNotify(self, hwnd, msg, wparam, lparam):
         if lparam==win32con.WM_RBUTTONUP or lparam==win32con.WM_LBUTTONUP:
             menu = CreatePopupMenu()
-            AppendMenu(menu, win32con.MF_STRING, 1023, 'Options...')
+            AppendMenu(menu, win32con.MF_STRING, SHOWLOG_CMD, 'Options...')
             AppendMenu(menu, win32con.MF_SEPARATOR, 0, '')
-            AppendMenu(menu, win32con.MF_STRING, 1025, 'Exit' )
+            AppendMenu(menu, win32con.MF_STRING, EXIT_CMD, 'Exit' )
             pos = GetCursorPos()
             # See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/menus_0hdi.asp
             SetForegroundWindow(self.hwnd)
@@ -102,12 +105,12 @@ class MainWindow:
 
     def OnCommand(self, hwnd, msg, wparam, lparam):
         id = LOWORD(wparam)
-        if id == 1023:
+        if id == SHOWLOG_CMD:
             if not self.guithread or not self.guithread.isAlive():
                 self.launchgui()
             else:
                 print "TortoiseHG options dialog already running"
-        elif id == 1025:
+        elif id == EXIT_CMD:
             self.exit_application()
         else:
             print "Unknown command -", id
