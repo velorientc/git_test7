@@ -202,10 +202,17 @@ def update_batch(batch):
     roots, notifypaths = getrepos(batch)
     if roots:
         _ui = ui.ui();
+        failedroots = set()
         for r in sorted(roots):
-            logmsg('Updating ' + r)
-            shlib.update_thgstatus(_ui, r, wait=False)
-            shlib.shell_notify([r])
+            try:
+                shlib.update_thgstatus(_ui, r, wait=False)
+                shlib.shell_notify([r])
+                logmsg('Updated ' + r)
+            except IOError:
+                print "IOError on updating %s (check permissions)" % r
+                logmsg('Failed updating %s (check permissions)' % r)
+                failedroots.add(r)
+        notifypaths -= failedroots
         if notifypaths:
             time.sleep(2)
             shlib.shell_notify(list(notifypaths))
