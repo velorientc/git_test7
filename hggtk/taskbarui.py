@@ -9,11 +9,12 @@ import gtk
 import gobject
 
 from thgutil.i18n import _
+from thgutil import hglib, settings
 from hggtk import gtklib
 
 class TaskBarUI(gtk.Window):
     'User interface for the TortoiseHg taskbar application'
-    def __init__(self, inputq):
+    def __init__(self, inputq, requestq):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'hg.ico')
@@ -24,6 +25,48 @@ class TaskBarUI(gtk.Window):
 
         vbox = gtk.VBox()
         self.add(vbox)
+
+        frame = gtk.Frame(_('Exclude Paths'))
+        frame.set_border_width(2)
+        vbox.pack_start(frame, True, True, 2)
+
+        tree = gtk.TreeView()
+        tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
+        tree.set_enable_search(False)
+        tree.set_reorderable(False)
+        cell = gtk.CellRendererText()
+        cell.set_property('editable', True)
+        col = gtk.TreeViewColumn(_('Paths'), cell, text=0)
+        tree.append_column(col)
+        win = gtk.ScrolledWindow()
+        win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        win.set_border_width(4)
+        win.add(tree)
+        model = gtk.ListStore(str)
+        tree.set_model(model)
+        tree.set_headers_visible(False)
+
+        fvbox = gtk.VBox()
+        fvbox.pack_start(win, True, True, 2)
+        bhbox = gtk.HBox()
+        apply = gtk.Button(_('Apply'))
+        add = gtk.Button(_('Add'))
+        delete = gtk.Button(_('Del'))
+        apply.connect('clicked', self.applyclicked, model, requestq)
+        add.connect('clicked', self.addclicked, model, apply)
+        delete.connect('clicked', self.delclicked, tree, apply)
+        cell.connect('edited', self.edited, model, apply)
+        bhbox.pack_start(add, False, False, 2)
+        bhbox.pack_start(delete, False, False, 2)
+        bhbox.pack_end(apply, False, False, 2)
+        fvbox.pack_start(bhbox, False, False, 2)
+        fvbox.set_border_width(2)
+        frame.add(fvbox)
+
+        apply.set_sensitive(False)
+        set = settings.Settings('taskbar')
+        for path in set.get_value('excludes', []):
+            model.append([hglib.toutf(path)])
 
         frame = gtk.Frame(_('Event Log'))
         frame.set_border_width(2)
@@ -62,6 +105,33 @@ class TaskBarUI(gtk.Window):
         from hggtk import about
         dlg = about.AboutDialog()
         dlg.show_all()
+
+    def applyclicked(self, button, model, requests):
+        'apply button clicked'
+        paths = [hglib.fromutf(r[0]) for r in model]
+        set = settings.Settings('taskbar')
+        set.set_value('excludes', paths)
+        set.write()
+        button.set_sensitive(False)
+        requests.put('load-config')
+
+    def edited(self, cell, path, new_text, model, applybutton):
+        dirty = model[path][0] != new_text
+        model[path][0] = new_text
+        if dirty:
+            applybutton.set_sensitive(True)
+
+    def addclicked(self, button, model, applybutton):
+        'add button clicked'
+        model.append(['C:\\'])
+        applybutton.set_sensitive(True)
+
+    def delclicked(self, button, tree, applybutton):
+        'delete button clicked'
+        model, pathlist = tree.get_selection().get_selected_rows()
+        if pathlist:
+            del model[pathlist[0]]
+            applybutton.set_sensitive(True)
 
     def pollq(self, queue, textview):
         'Poll the input queue'

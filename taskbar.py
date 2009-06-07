@@ -22,7 +22,7 @@ from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
 from mercurial import ui
-from thgutil import thread2, paths, shlib
+from thgutil import thread2, paths, shlib, settings
 
 APP_TITLE = "TortoiseHg RPC server"
 
@@ -152,7 +152,7 @@ class MainWindow:
         def launch():
             import gtk
             from hggtk import taskbarui, hgtk
-            dlg = taskbarui.TaskBarUI(logq)
+            dlg = taskbarui.TaskBarUI(logger.getqueue(), requests)
             dlg.show_all()
             dlg.connect('destroy', gtk.main_quit)
             self.dialog = dlg
@@ -160,6 +160,7 @@ class MainWindow:
             gtk.gdk.threads_enter()
             gtk.main()
             gtk.gdk.threads_leave()
+            logger.reset()
 
         self.guithread = thread2.Thread(target=launch)
         self.guithread.start()
@@ -178,11 +179,26 @@ PIPENAME += GetUserName()
 
 PIPEBUFSIZE = 4096
 
-logq = Queue.Queue(0)
-def logmsg(msg):
-    if logq.qsize() < 100:
+class Logger():
+    def __init__(self):
+        self.q = None
+
+    def getqueue(self):
+        self.q = Queue.Queue()
+        return self.q
+
+    def reset(self):
+        self.q = None
+
+    def msg(self, msg):
         ts = '[%s] ' % time.strftime('%c')
-        logq.put(ts + msg)
+        if self.q:
+            self.q.put(ts + msg)
+            print 'L' + ts + msg
+        else:
+            print ts + msg
+
+logger = Logger()
 
 def getrepos(batch):
     roots = set()
@@ -210,16 +226,16 @@ def update_batch(batch):
             try:
                 shlib.update_thgstatus(_ui, r, wait=False)
                 shlib.shell_notify([r])
-                logmsg('Updated ' + r)
+                logger.msg('Updated ' + r)
             except IOError:
                 print "IOError on updating %s (check permissions)" % r
-                logmsg('Failed updating %s (check permissions)' % r)
+                logger.msg('Failed updating %s (check permissions)' % r)
                 failedroots.add(r)
         notifypaths -= failedroots
         if notifypaths:
             time.sleep(2)
             shlib.shell_notify(list(notifypaths))
-            logmsg('Shell notified')
+            logger.msg('Shell notified')
 
 requests = Queue.Queue(0)
 
@@ -251,7 +267,7 @@ def update(args):
 
 def remove(args):
     path = args[0]
-    logmsg('Removing ' + path)
+    logger.msg('Removing ' + path)
     roots, notifypaths = getrepos([path])
     if roots:
         for r in sorted(roots):
@@ -269,18 +285,34 @@ def dispatch(req, cmd, args):
     elif cmd == 'remove':
         remove(args)
     else:
-        logmsg("Error: unknown request '%s'" % req)
+        logger.msg("Error: unknown request '%s'" % req)
 
 class Updater(threading.Thread):
     def run(self):
+        excludes = []
         while True:
             req = requests.get()
             s = req.split('|')
             cmd, args = s[0], s[1:]
             if cmd == 'terminate':
-                logmsg('Updater thread terminating')
+                logger.msg('Updater thread terminating')
                 return
-            dispatch(req, cmd, args)
+            if cmd == 'load-config':
+                logger.msg('Loading configuration')
+                set = settings.Settings('taskbar')
+                excludes = set.get_value('excludes', [])
+                for p in excludes:
+                    logger.msg(' exclude: %s' % p)
+                continue
+            ignored = False
+            for arg in args:
+                for e in excludes:
+                    if arg.startswith(e):
+                        logger.msg('%s command ignored in %s' % (cmd, e))
+                        ignored = True
+                        break
+            if not ignored:
+                dispatch(req, cmd, args)
             gc.collect()
 
 Updater().start()
@@ -298,6 +330,9 @@ class PipeServer:
         
         # And create an event to be used in the OVERLAPPED object.
         self.overlapped.hEvent = win32event.CreateEvent(None,0,0,None)
+
+        # Make updater load exclude masks
+        requests.put('load-config')
 
     def SvcStop(self):
         print 'PipeServer thread terminating'
