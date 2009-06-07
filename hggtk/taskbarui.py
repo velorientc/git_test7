@@ -39,18 +39,29 @@ class TaskBarUI(gtk.Window):
         frame.add(scrolledwindow)
         gobject.timeout_add(10, self.pollq, inputq, textview)
 
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+
         hbbox = gtk.HButtonBox()
         hbbox.set_layout(gtk.BUTTONBOX_END)
         vbox.pack_start(hbbox, False, False, 2)
+
+        about = gtk.Button(_('About'))
+        about.connect('clicked', self.about)
+        key, modifier = gtk.accelerator_parse('Escape')
+        hbbox.add(about)
+
         close = gtk.Button(_('Close'))
         close.connect('clicked', lambda x: self.destroy())
-
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
         key, modifier = gtk.accelerator_parse('Escape')
         close.add_accelerator('clicked', accelgroup, key, 0,
                 gtk.ACCEL_VISIBLE)
         hbbox.add(close)
+
+    def about(self, button):
+        from hggtk import about
+        dlg = about.AboutDialog()
+        dlg.show_all()
 
     def pollq(self, queue, textview):
         'Poll the input queue'
