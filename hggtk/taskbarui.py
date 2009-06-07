@@ -145,16 +145,3 @@ class TaskBarUI(gtk.Window):
             except Queue.Empty:
                 pass
         return True
-
-def run(ui, *pats, **opts):
-    return TaskBarUI(opts['queue'])
-
-'''
-import Queue
-q = Queue.Queue()
-q.put('Test1')
-q.put('Test2')
-from mercurial import ui
-from hggtk import hgtk
-hgtk.gtkrun(run(ui.ui(), queue=q))
-'''
