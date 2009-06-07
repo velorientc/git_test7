@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-06-01 05:27+0000\n"
-"PO-Revision-Date: 2009-06-01 13:28+0000\n"
+"POT-Creation-Date: 2009-06-05 14:45+0000\n"
+"PO-Revision-Date: 2009-06-06 12:28+0000\n"
 "Last-Translator: Yuki Kodama <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-02 08:00+0000\n"
+"X-Launchpad-Export-Date: 2009-06-07 09:04+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -132,12 +132,12 @@ msgstr "取り消し(_U)"
 msgid "undo recent commit"
 msgstr "直前のコミットを取り消す"
 
-#: hggtk\commit.py:155 hggtk\commit.py:365 hggtk\commit.py:374
-#: hggtk\commit.py:382 hggtk\commit.py:383
+#: hggtk\commit.py:155 hggtk\commit.py:363 hggtk\commit.py:372
+#: hggtk\commit.py:380 hggtk\commit.py:381
 msgid "_Commit"
 msgstr "コミット(_C)"
 
-#: hggtk\commit.py:156 hggtk\commit.py:384
+#: hggtk\commit.py:156 hggtk\commit.py:382
 msgid "commit"
 msgstr "コミットする"
 
@@ -153,19 +153,19 @@ msgstr "最近のコミットメッセージ..."
 msgid "Save commit message at exit?"
 msgstr "終了時にコミットメッセージを保存しますか？"
 
-#: hggtk\commit.py:333 hggtk\status.py:208
+#: hggtk\commit.py:333 hggtk\status.py:204
 msgid "Re_vert"
 msgstr "元に戻す(_V)"
 
-#: hggtk\commit.py:334 hggtk\status.py:210 hggtk\thgconfig.py:727
+#: hggtk\commit.py:334 hggtk\status.py:206 hggtk\thgconfig.py:727
 msgid "_Add"
 msgstr "追加(_A)"
 
-#: hggtk\commit.py:335 hggtk\status.py:215 hggtk\thgconfig.py:737
+#: hggtk\commit.py:335 hggtk\status.py:211 hggtk\thgconfig.py:737
 msgid "_Remove"
 msgstr "削除(_R)"
 
-#: hggtk\commit.py:336 hggtk\status.py:212
+#: hggtk\commit.py:336 hggtk\status.py:208
 msgid "Move"
 msgstr "移動"
 
@@ -173,41 +173,41 @@ msgstr "移動"
 msgid "merge"
 msgstr "マージ"
 
-#: hggtk\commit.py:367 hggtk\commit.py:368 hggtk\commit.py:375
-#: hggtk\commit.py:376
+#: hggtk\commit.py:365 hggtk\commit.py:366 hggtk\commit.py:373
+#: hggtk\commit.py:374
 msgid "QNew"
 msgstr "QNew"
 
-#: hggtk\commit.py:371 hggtk\commit.py:372
+#: hggtk\commit.py:369 hggtk\commit.py:370
 msgid "QRefresh"
 msgstr "QRefresh"
 
-#: hggtk\commit.py:407 hggtk\commit.py:554
+#: hggtk\commit.py:405 hggtk\commit.py:552
 msgid "Nothing Commited"
 msgstr "何もコミットされませんでした"
 
-#: hggtk\commit.py:426 hggtk\commit.py:475 hggtk\merge.py:83
+#: hggtk\commit.py:424 hggtk\commit.py:473 hggtk\merge.py:83
 #: hggtk\thgconfig.py:440
 msgid "Commit"
 msgstr "コミット"
 
-#: hggtk\commit.py:427
+#: hggtk\commit.py:425
 msgid "Unable to create "
 msgstr "バックアップディレクトリを作成できませんでした "
 
-#: hggtk\commit.py:476
+#: hggtk\commit.py:474
 msgid "Unable to apply patch"
 msgstr "パッチを適用できませんでした"
 
-#: hggtk\commit.py:516
+#: hggtk\commit.py:514
 msgid "Undo last commit"
-msgstr "最後のコミットを取り消せません"
+msgstr "直前のコミットを取り消しますか？"
 
-#: hggtk\commit.py:522 hggtk\commit.py:533
+#: hggtk\commit.py:520 hggtk\commit.py:531
 msgid "Undo commit"
 msgstr "コミットの取り消し"
 
-#: hggtk\commit.py:523
+#: hggtk\commit.py:521
 msgid ""
 "Unable to undo!\n"
 "\n"
@@ -215,21 +215,21 @@ msgid ""
 msgstr ""
 "取り消しできません！\n"
 "\n"
-"tipリビジョンは最後のコミットとは異なります。"
+"tipリビジョンが直前のコミットとは異なります。"
 
-#: hggtk\commit.py:534
+#: hggtk\commit.py:532
 msgid "Errors during rollback!"
 msgstr "ロールバック中にエラーが発生しました！"
 
-#: hggtk\commit.py:555 hggtk\tagadd.py:167
+#: hggtk\commit.py:553 hggtk\tagadd.py:167
 msgid "Please enter commit message"
 msgstr "コミットメッセージを入力してください"
 
-#: hggtk\commit.py:608
+#: hggtk\commit.py:606
 msgid "Commit: Invalid username"
 msgstr "コミット: 無効なユーザ名です"
 
-#: hggtk\commit.py:609
+#: hggtk\commit.py:607
 msgid ""
 "Your username has not been configured.\n"
 "\n"
@@ -239,7 +239,7 @@ msgstr ""
 "\n"
 "ユーザ名を設定をしてからもう一度試してください。"
 
-#: hggtk\commit.py:632
+#: hggtk\commit.py:630
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
@@ -247,11 +247,11 @@ msgstr ""
 "\"%s\" ブランチは既に存在しています。\n"
 "上書きしますか？"
 
-#: hggtk\commit.py:638
+#: hggtk\commit.py:636
 msgid "Create new named branch \"%s\"?"
 msgstr "新しいブランチ \"%s\" を作成しますか？"
 
-#: hggtk\commit.py:736 hggtk\hgemail.py:307 hggtk\hgemail.py:312
+#: hggtk\commit.py:734 hggtk\hgemail.py:307 hggtk\hgemail.py:312
 #: hggtk\hgemail.py:321
 msgid "Info required"
 msgstr "情報不足です"
@@ -289,8 +289,8 @@ msgstr "ディレクトリにはコメントできません: %s"
 msgid "Filename"
 msgstr "ファイル名"
 
-#: hggtk\datamine.py:107 hggtk\datamine.py:524 hggtk\thgconfig.py:162
-#: hggtk\thgconfig.py:235
+#: hggtk\datamine.py:107 hggtk\datamine.py:524 hggtk\logview\treeview.py:423
+#: hggtk\thgconfig.py:162 hggtk\thgconfig.py:235
 msgid "User"
 msgstr "ユーザ名"
 
@@ -350,7 +350,7 @@ msgstr "行番号の表示"
 msgid "Show all matching revisions"
 msgstr "該当リビジョンを全て表示"
 
-#: hggtk\datamine.py:265 hggtk\datamine.py:522
+#: hggtk\datamine.py:265 hggtk\datamine.py:522 hggtk\logview\treeview.py:372
 msgid "Rev"
 msgstr "リビジョン"
 
@@ -406,27 +406,27 @@ msgstr "名前変更を推定:"
 msgid "TortoiseHg Prompt"
 msgstr "TortoiseHgプロンプト"
 
-#: hggtk\gdialog.py:371
+#: hggtk\gdialog.py:377
 msgid " Aborted"
 msgstr " が中止されました"
 
-#: hggtk\gdialog.py:382
+#: hggtk\gdialog.py:388
 msgid " Messages and Errors"
 msgstr " メッセージとエラー"
 
-#: hggtk\gdialog.py:453
+#: hggtk\gdialog.py:459
 msgid "making snapshot of %d files from rev %s\n"
 msgstr "%d 個のファイルのスナップショットをリビジョン %s からマーク\n"
 
-#: hggtk\gdialog.py:486
+#: hggtk\gdialog.py:492
 msgid "edit failed"
 msgstr "編集に失敗しました"
 
-#: hggtk\gdialog.py:494 hggtk\thgconfig.py:526
+#: hggtk\gdialog.py:500 hggtk\thgconfig.py:526
 msgid "No visual editor configured"
 msgstr "GUIエディタが設定されていません"
 
-#: hggtk\gdialog.py:495 hggtk\thgconfig.py:527
+#: hggtk\gdialog.py:501 hggtk\thgconfig.py:527
 msgid "Please configure a visual editor."
 msgstr "GUIエディタを設定してください"
 
@@ -920,11 +920,11 @@ msgstr "hgtk: 不明なコマンド '%s'\n"
 msgid "abort: %s!\n"
 msgstr "中止: %s!\n"
 
-#: hggtk\hgtk.py:196
+#: hggtk\hgtk.py:196 thgutil\hglib.py:305
 msgid "There is no Mercurial repository here (.hg not found)"
 msgstr "Mercurialリポジトリがありません (.hg ファイルが見つかりません)"
 
-#: hggtk\hgtk.py:206
+#: hggtk\hgtk.py:206 thgutil\hglib.py:325
 msgid "invalid arguments"
 msgstr "引数が正しくありません"
 
@@ -1153,7 +1153,7 @@ msgstr "[-o] コマンド"
 msgid "hgtk help [COMMAND]"
 msgstr "hgtk help [コマンド]"
 
-#: hggtk\history.py:53 hggtk\status.py:198
+#: hggtk\history.py:53 hggtk\status.py:194
 msgid "Re_fresh"
 msgstr "再読み込み(_F)"
 
@@ -1177,17 +1177,17 @@ msgstr "検索(_D)"
 msgid "Search Repository History"
 msgstr "リポジトリの履歴を検索する"
 
-#: hggtk\history.py:73
+#: hggtk\history.py:73 thgutil\menuthg.py:173
 msgid "Synchronize"
 msgstr "同期ツール"
 
 #: hggtk\history.py:163
 msgid "Show Rev"
-msgstr "リビジョン番号を表示"
+msgstr "リビジョン番号の表示"
 
 #: hggtk\history.py:169
 msgid "Show ID"
-msgstr "16進数のチェンジセットIDを表示"
+msgstr "リビジョンIDの表示"
 
 #: hggtk\history.py:199
 msgid "Show All Revisions"
@@ -1195,7 +1195,7 @@ msgstr "全てのリビジョンを表示"
 
 #: hggtk\history.py:208
 msgid "Show Tagged Revisions"
-msgstr "タグの付いたリビジョンのみ表示"
+msgstr "タグ付きリビジョンのみ表示"
 
 #: hggtk\history.py:220
 msgid "Show Head Revisions"
@@ -1221,7 +1221,7 @@ msgstr "別ダイアログで表示(_S)"
 msgid "_update"
 msgstr "更新(_U)"
 
-#: hggtk\history.py:391
+#: hggtk\history.py:391 hggtk\history.py:422
 msgid "_merge with"
 msgstr "マージ(_M)"
 
@@ -1249,8 +1249,8 @@ msgstr "タグの追加/削除(_T)"
 msgid "backout revision"
 msgstr "リビジョンのバックアウト"
 
-#: hggtk\history.py:399 hggtk\status.py:109 hggtk\status.py:114
-#: hggtk\status.py:133 hggtk\status.py:140 hggtk\status.py:148
+#: hggtk\history.py:399 hggtk\status.py:105 hggtk\status.py:110
+#: hggtk\status.py:129 hggtk\status.py:136 hggtk\status.py:144
 msgid "_revert"
 msgstr "元に戻す(_R)"
 
@@ -1274,19 +1274,19 @@ msgstr "ここから選択中のリビジョンまでをメールする"
 msgid "bundle from here to selected"
 msgstr "ここから選択中のリビジョンまでをバンドルする"
 
-#: hggtk\history.py:478
+#: hggtk\history.py:480
 msgid "show next %d revisions"
 msgstr "次の%d個のリビジョンを表示"
 
-#: hggtk\history.py:480
+#: hggtk\history.py:482
 msgid "show all remaining revisions"
 msgstr "残りのリビジョンを全て表示"
 
-#: hggtk\history.py:519
+#: hggtk\history.py:521
 msgid "Remove revision %d and all descendants?"
 msgstr "リビジョン%dとその全ての派生リビジョンを削除しますか？"
 
-#: hggtk\history.py:544
+#: hggtk\history.py:546
 msgid ""
 "Revert all files to revision %d?\n"
 "This will overwrite your local changes"
@@ -1294,11 +1294,11 @@ msgstr ""
 "全てのファイルをリビジョン%dに戻しますか？\n"
 "この操作はワーキングコピーを上書きします。"
 
-#: hggtk\history.py:606 hggtk\history.py:682
+#: hggtk\history.py:608 hggtk\history.py:684
 msgid "Write bundle to"
 msgstr "バンドルの保存"
 
-#: hggtk\history.py:651 hggtk\status.py:1056
+#: hggtk\history.py:653 hggtk\status.py:1053
 msgid "Save patch to"
 msgstr "パッチの保存"
 
@@ -1306,7 +1306,7 @@ msgstr "パッチの保存"
 msgid "Apply"
 msgstr "適用"
 
-#: hggtk\logfilter.py:46
+#: hggtk\logfilter.py:46 hggtk\logview\treeview.py:398
 msgid "Branch"
 msgstr "ブランチ"
 
@@ -1376,59 +1376,43 @@ msgstr "TortoiseHg リカバリツール - "
 msgid "Stop the hg operation"
 msgstr "Mercurialの操作を中止する"
 
-#: hggtk\recovery.py:47 hggtk\status.py:444
-msgid "clean"
-msgstr "クリーン"
-
 #: hggtk\recovery.py:49
 msgid "Clean checkout, undo all changes"
 msgstr "チェックアウトをクリーンして、全ての変更を取り消す"
-
-#: hggtk\recovery.py:52
-msgid "rollback"
-msgstr "ロールバック"
 
 #: hggtk\recovery.py:54
 msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
 msgstr "最後のトランザクションをロールバックする (プル・コミットなど)"
 
-#: hggtk\recovery.py:58
-msgid "recover"
-msgstr "復元"
-
 #: hggtk\recovery.py:60
 msgid "Recover from interrupted operation"
 msgstr "中断された操作を正常な状態に戻す"
-
-#: hggtk\recovery.py:63
-msgid "verify"
-msgstr "検証"
 
 #: hggtk\recovery.py:65
 msgid "Validate repository consistency"
 msgstr "リポジトリの整合性をチェックします"
 
-#: hggtk\recovery.py:100 hggtk\synch.py:376
+#: hggtk\recovery.py:99 hggtk\synch.py:375
 msgid "Cannot close now"
 msgstr "今閉じることはできません"
 
-#: hggtk\recovery.py:101 hggtk\synch.py:377
+#: hggtk\recovery.py:100 hggtk\synch.py:376
 msgid "command is running"
 msgstr "コマンド実行中"
 
-#: hggtk\recovery.py:127
+#: hggtk\recovery.py:126
 msgid "Unable to find repo at %s\n"
 msgstr "%s をリポジトリで見つけることができませんでした\n"
 
-#: hggtk\recovery.py:160 hggtk\synch.py:514
+#: hggtk\recovery.py:159 hggtk\synch.py:513
 msgid "Cannot run now"
 msgstr "今実行できません"
 
-#: hggtk\recovery.py:161 hggtk\synch.py:515
+#: hggtk\recovery.py:160 hggtk\synch.py:514
 msgid "Please try again after the previous command is completed"
 msgstr "前のコマンドが完了したらもう一度試してください"
 
-#: hggtk\recovery.py:223 hggtk\synch.py:605
+#: hggtk\recovery.py:222 hggtk\synch.py:604
 msgid "[command interrupted]"
 msgstr "[コマンド中断]"
 
@@ -1468,7 +1452,7 @@ msgstr "ウェブ設定を編集する"
 msgid "HTTP Port:"
 msgstr "ポート番号:"
 
-#: hggtk\serve.py:155
+#: hggtk\serve.py:154
 msgid ""
 "Server process is still running\n"
 "Exiting will stop the server."
@@ -1476,226 +1460,230 @@ msgstr ""
 "サーバプロセスがまだ動いています\n"
 "サーバを停止しています"
 
-#: hggtk\serve.py:220
+#: hggtk\serve.py:225
 msgid "Invalid port 2048..65535"
 msgstr "無効なポート番号 2048～65535"
 
-#: hggtk\serve.py:221
+#: hggtk\serve.py:226
 msgid "Defaulting to "
 msgstr "デフォルトに戻す： "
 
-#: hggtk\serve.py:295
+#: hggtk\serve.py:306
 msgid "cannot start server: "
 msgstr "サーバを起動できませんでした: "
 
-#: hggtk\serve.py:306
+#: hggtk\serve.py:317
 msgid "listening at http://%s%s/%s (%s:%d)\n"
 msgstr "http://%s%s/%s (%s:%d) で待ち受け中\n"
 
-#: hggtk\serve.py:331
+#: hggtk\serve.py:342
 msgid "name of access log file to write to"
 msgstr "アクセスログファイルの名前"
 
-#: hggtk\serve.py:332
+#: hggtk\serve.py:343
 msgid "run server in background"
 msgstr "サーバをバックグラウンドで実行する"
 
-#: hggtk\serve.py:333
+#: hggtk\serve.py:344
 msgid "used internally by daemon mode"
 msgstr "デーモンモードによって内部的に使用される"
 
-#: hggtk\serve.py:334
+#: hggtk\serve.py:345
 msgid "name of error log file to write to"
 msgstr "エラーログのファイル名"
 
-#: hggtk\serve.py:335
+#: hggtk\serve.py:346
 msgid "port to use (default: 8000)"
 msgstr "待ち受けポート番号(デフォルト: 8000)"
 
-#: hggtk\serve.py:336
+#: hggtk\serve.py:347
 msgid "address to use"
 msgstr "使用するアドレス"
 
-#: hggtk\serve.py:337
+#: hggtk\serve.py:348
 msgid "prefix path to serve from (default: server root)"
 msgstr "サーバURLの接頭辞(デフォルト: サーバのルート)"
 
-#: hggtk\serve.py:339
+#: hggtk\serve.py:350
 msgid "name to show in web pages (default: working dir)"
 msgstr "Webページで表示する名前"
 
-#: hggtk\serve.py:340
+#: hggtk\serve.py:351
 msgid "name of the webdir config file (serve more than one repo)"
 msgstr "Webディレクトリの設定ファイル名(複数のリポジトリを管理する場合)"
 
-#: hggtk\serve.py:342
+#: hggtk\serve.py:353
 msgid "name of file to write process ID to"
 msgstr "プロセスIDを書き込むためのファイル名"
 
-#: hggtk\serve.py:343
+#: hggtk\serve.py:354
 msgid "for remote clients"
 msgstr "リモートクライアント用"
 
-#: hggtk\serve.py:344
+#: hggtk\serve.py:355
 msgid "web templates to use"
 msgstr "使用するWebテンプレート"
 
-#: hggtk\serve.py:345
+#: hggtk\serve.py:356
 msgid "template style to use"
 msgstr "使用するテンプレート"
 
-#: hggtk\serve.py:346
+#: hggtk\serve.py:357
 msgid "use IPv6 in addition to IPv4"
 msgstr "IPv4だけでなくIPv6も使用する"
 
-#: hggtk\serve.py:347
+#: hggtk\serve.py:358
 msgid "SSL certificate file"
 msgstr "SSL証明書のファイル"
 
-#: hggtk\serve.py:348
+#: hggtk\serve.py:359
 msgid "hg serve [OPTION]..."
 msgstr "hg serve [OPTION]..."
 
-#: hggtk\status.py:106 hggtk\status.py:112 hggtk\status.py:137
-#: hggtk\status.py:145
+#: hggtk\status.py:102 hggtk\status.py:108 hggtk\status.py:133
+#: hggtk\status.py:141
 msgid "_difference"
 msgstr "差分(_D)"
 
-#: hggtk\status.py:110 hggtk\status.py:115 hggtk\status.py:127
-#: hggtk\status.py:135 hggtk\status.py:141 hggtk\status.py:149
+#: hggtk\status.py:106 hggtk\status.py:111 hggtk\status.py:123
+#: hggtk\status.py:131 hggtk\status.py:137 hggtk\status.py:145
 msgid "l_og"
 msgstr "ログ(_L)"
 
-#: hggtk\status.py:113 hggtk\status.py:117 hggtk\status.py:123
-#: hggtk\status.py:129 hggtk\status.py:132
+#: hggtk\status.py:109 hggtk\status.py:113 hggtk\status.py:119
+#: hggtk\status.py:125 hggtk\status.py:128
 msgid "_view"
 msgstr "表示(_V)"
 
-#: hggtk\status.py:118 hggtk\status.py:130
+#: hggtk\status.py:114 hggtk\status.py:126
 msgid "_delete"
 msgstr "削除(_D)"
 
-#: hggtk\status.py:119
+#: hggtk\status.py:115
 msgid "_add"
 msgstr "追加(_A)"
 
-#: hggtk\status.py:120
+#: hggtk\status.py:116
 msgid "_guess rename"
 msgstr "名前変更を推定(_G)"
 
-#: hggtk\status.py:121
+#: hggtk\status.py:117
 msgid "_ignore"
 msgstr "無視(_I)"
 
-#: hggtk\status.py:124 hggtk\status.py:134
+#: hggtk\status.py:120 hggtk\status.py:130
 msgid "re_move"
 msgstr "削除(_M)"
 
-#: hggtk\status.py:125
+#: hggtk\status.py:121
 msgid "re_name"
 msgstr "名前変更(_N)"
 
-#: hggtk\status.py:126
+#: hggtk\status.py:122
 msgid "_copy"
 msgstr "コピー(_C)"
 
-#: hggtk\status.py:142
+#: hggtk\status.py:138
 msgid "resolve"
 msgstr "解決"
 
-#: hggtk\status.py:143
+#: hggtk\status.py:139
 msgid "mark resolved"
 msgstr "解決済みとしてマーク"
 
-#: hggtk\status.py:150
+#: hggtk\status.py:146
 msgid "mark unresolved"
 msgstr "未解決としてマーク"
 
-#: hggtk\status.py:199
+#: hggtk\status.py:195
 msgid "refresh"
 msgstr "再読み込み"
 
-#: hggtk\status.py:204
+#: hggtk\status.py:200
 msgid "Save As"
 msgstr "名前を付けて保存"
 
-#: hggtk\status.py:205
+#: hggtk\status.py:201
 msgid "Save selected changes"
 msgstr "選択された変更を保存する"
 
-#: hggtk\status.py:209
+#: hggtk\status.py:205
 msgid "revert"
 msgstr "このリビジョンに戻す"
 
-#: hggtk\status.py:211
+#: hggtk\status.py:207
 msgid "add"
 msgstr "追加"
 
-#: hggtk\status.py:214
+#: hggtk\status.py:210
 msgid "move selected files to other directory"
 msgstr "選択されたファイルを他のディレクトリに移動する"
 
-#: hggtk\status.py:216
+#: hggtk\status.py:212
 msgid "remove"
 msgstr "削除"
 
-#: hggtk\status.py:317
+#: hggtk\status.py:313
 msgid "st"
 msgstr "状態"
 
-#: hggtk\status.py:325
+#: hggtk\status.py:321
 msgid "ms"
 msgstr "マージ"
 
-#: hggtk\status.py:331
+#: hggtk\status.py:327
 msgid "path"
 msgstr "パス"
 
-#: hggtk\status.py:443
+#: hggtk\status.py:439 thgutil\shlib.py:26 thgutil\version.py:16
 msgid "unknown"
 msgstr "不明"
 
-#: hggtk\status.py:492
+#: hggtk\status.py:440
+msgid "clean"
+msgstr "クリーン"
+
+#: hggtk\status.py:488
 msgid "%d selected, %d total"
 msgstr "%d ファイルを選択, 合計 %d ファイル"
 
-#: hggtk\status.py:771
+#: hggtk\status.py:767
 msgid "Rename file to:"
 msgstr "ファイルを名前変更："
 
-#: hggtk\status.py:781
+#: hggtk\status.py:777
 msgid "Copy file to"
 msgstr "ファイルをコピー："
 
-#: hggtk\status.py:801 hggtk\status.py:1190
+#: hggtk\status.py:797 hggtk\status.py:1187
 msgid "Nothing Removed"
 msgstr "削除するものがありません"
 
-#: hggtk\status.py:802
+#: hggtk\status.py:798
 msgid "Remove is not enabled when multiple revisions are specified."
 msgstr "\"削除\"は複数のリビジョンが指定された場合は無効になります"
 
-#: hggtk\status.py:820
+#: hggtk\status.py:816
 msgid "Move is not enabled when multiple revisions are specified."
 msgstr "\"移動\"は複数のリビジョンが指定された場合は無効になります"
 
-#: hggtk\status.py:820 hggtk\status.py:1214 hggtk\status.py:1222
+#: hggtk\status.py:816 hggtk\status.py:1211 hggtk\status.py:1219
 msgid "Nothing Moved"
 msgstr "移動するものがありません"
 
-#: hggtk\status.py:839
+#: hggtk\status.py:835
 msgid "Copy is not enabled when multiple revisions are specified."
 msgstr "\"コピー\"は複数のリビジョンが指定された場合は無効になります"
 
-#: hggtk\status.py:839
+#: hggtk\status.py:835
 msgid "Nothing Copied"
 msgstr "コピーするものがありません"
 
-#: hggtk\status.py:860
+#: hggtk\status.py:856
 msgid "===== Diff to first parent =====\n"
 msgstr "===== 1番目の親リビジョン =====\n"
 
-#: hggtk\status.py:867
+#: hggtk\status.py:864
 msgid ""
 "\n"
 "===== Diff to second parent =====\n"
@@ -1703,39 +1691,39 @@ msgstr ""
 "\n"
 "===== 2番目の親リビジョン =====\n"
 
-#: hggtk\status.py:1091 hggtk\status.py:1112
+#: hggtk\status.py:1088 hggtk\status.py:1109
 msgid "Nothing Reverted"
 msgstr "元に戻すものがありません"
 
-#: hggtk\status.py:1092
+#: hggtk\status.py:1089
 msgid "No revertable files selected"
 msgstr "元に戻せるファイルが選択されていません"
 
-#: hggtk\status.py:1113
+#: hggtk\status.py:1110
 msgid "Revert not allowed when viewing revision range."
 msgstr "リビジョン範囲を表示しているときは元に戻せません"
 
-#: hggtk\status.py:1159
+#: hggtk\status.py:1156
 msgid "Nothing Added"
 msgstr "追加するものがありません"
 
-#: hggtk\status.py:1160
+#: hggtk\status.py:1157
 msgid "No addable files selected"
 msgstr "追加するファイルが選択されていません"
 
-#: hggtk\status.py:1191
+#: hggtk\status.py:1188
 msgid "No removable files selected"
 msgstr "削除するファイルが選択されていません"
 
-#: hggtk\status.py:1198
+#: hggtk\status.py:1195
 msgid "Move files to diretory..."
 msgstr "ファイルを移動する..."
 
-#: hggtk\status.py:1215
+#: hggtk\status.py:1212
 msgid "Cannot move outside repo!"
 msgstr "リポジトリの外には移動できません！"
 
-#: hggtk\status.py:1222
+#: hggtk\status.py:1219
 msgid ""
 "No movable files selected\n"
 "\n"
@@ -1745,7 +1733,7 @@ msgstr ""
 "\n"
 "ヒント： クリーンなファイルしか移動できません"
 
-#: hggtk\status.py:1244
+#: hggtk\status.py:1241
 msgid "Delete Errors"
 msgstr "エラーを削除"
 
@@ -1865,39 +1853,39 @@ msgstr "最新のものを最初に表示"
 msgid "Show No Merges"
 msgstr "マージリビジョン以外を表示"
 
-#: hggtk\synch.py:237
+#: hggtk\synch.py:236
 msgid "View pulled revisions"
 msgstr "プルしたリビジョンを表示"
 
-#: hggtk\synch.py:239
+#: hggtk\synch.py:238
 msgid "Update to branch tip"
 msgstr "tipリビジョンに更新"
 
-#: hggtk\synch.py:334
+#: hggtk\synch.py:333
 msgid "unknown sort key '%s'"
 msgstr "不明なソート基準：'%s'"
 
-#: hggtk\synch.py:342
+#: hggtk\synch.py:341
 msgid "Select Repository"
 msgstr "リポジトリを選択"
 
-#: hggtk\synch.py:355
+#: hggtk\synch.py:354
 msgid "Select Bundle"
 msgstr "バンドルを選択"
 
-#: hggtk\synch.py:362
+#: hggtk\synch.py:361
 msgid "Bundle (*.hg)"
 msgstr "バンドル (*.hg)"
 
-#: hggtk\synch.py:366
+#: hggtk\synch.py:365
 msgid "Bundle (*)"
 msgstr "バンドル (*)"
 
-#: hggtk\synch.py:473
+#: hggtk\synch.py:472
 msgid "No repository selected"
 msgstr "リポジトリが選択されていません"
 
-#: hggtk\synch.py:474
+#: hggtk\synch.py:473
 msgid "Select a peer repository to compare with"
 msgstr "比較対象の2つのリポジトリを選択"
 
@@ -2481,7 +2469,7 @@ msgstr "TortoiseHg リポジトリ設定 "
 msgid "TortoiseHg Configure User-Global Settings"
 msgstr "TortoiseHg グローバル設定"
 
-#: hggtk\thgconfig.py:542
+#: hggtk\thgconfig.py:541
 msgid "Yes to abandon changes, No to continue"
 msgstr "変更を破棄する場合は「はい」、続けるには「いいえ」を選択してください。"
 
@@ -2557,39 +2545,39 @@ msgstr "# tortoisehg-config によって生成されました\n"
 msgid "Unable to write configuration file"
 msgstr "設定ファイルに書き込めません"
 
-#: hggtk\thgshelve.py:70 hggtk\thgshelve.py:132 hggtk\thgshelve.py:140
+#: hggtk\thgshelve.py:71 hggtk\thgshelve.py:133 hggtk\thgshelve.py:141
 msgid "Shelve"
 msgstr "シェルフ"
 
-#: hggtk\thgshelve.py:71
+#: hggtk\thgshelve.py:72
 msgid "set aside selected changes"
 msgstr "選択された変更を一時的に別のところに置いておく"
 
-#: hggtk\thgshelve.py:72
+#: hggtk\thgshelve.py:73
 msgid "Unshelve"
 msgstr "シェルフから戻す"
 
-#: hggtk\thgshelve.py:73
+#: hggtk\thgshelve.py:74
 msgid "restore shelved changes"
 msgstr "シェルフから変更を戻す"
 
-#: hggtk\thgshelve.py:133
+#: hggtk\thgshelve.py:134
 msgid "Please select diff chunks to shelve"
 msgstr "シェルフに保管したいチャンクを選択してください"
 
-#: hggtk\thgshelve.py:141
+#: hggtk\thgshelve.py:142
 msgid "<b>Shelve file exists!</b>"
 msgstr "<b>シェルフには既にファイルが存在します！</b>"
 
-#: hggtk\thgshelve.py:142
+#: hggtk\thgshelve.py:143
 msgid "Overwrite"
 msgstr "上書き"
 
-#: hggtk\thgshelve.py:143
+#: hggtk\thgshelve.py:144
 msgid "Append"
 msgstr "追加"
 
-#: hggtk\thgshelve.py:144
+#: hggtk\thgshelve.py:145
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -2645,39 +2633,229 @@ msgstr "ローカルとの差分"
 msgid "There are no file changes to view"
 msgstr "ローカルとの間に変更点はありませんでした。"
 
+#: thgutil\hglib.py:261
+msgid "extension '%s' overrides commands: %s\n"
+msgstr "\"%s\" エクステンションが \"%s\" コマンドをオーバーライドしています\n"
+
+#: thgutil\hglib.py:301
+msgid "repository '%s' is not local"
+msgstr "リポジトリ '%s' はこのコンピュータ上にありません"
+
+#: thgutil\menuthg.py:168 thgutil\menuthg.py:303
+msgid "Create Clone"
+msgstr "複製の作成"
+
+#: thgutil\menuthg.py:169
+msgid "Create clone here from source"
+msgstr "ここに複製を作成"
+
+#: thgutil\menuthg.py:174
+msgid "Synchronize with dragged repository"
+msgstr "ドラッグされたリポジトリと同期する"
+
+#: thgutil\menuthg.py:180
+msgid "Clone a Repository"
+msgstr "リポジトリを複製する"
+
+#: thgutil\menuthg.py:181
+msgid "clone a repository"
+msgstr "リポジトリを複製する"
+
+#: thgutil\menuthg.py:183 thgutil\menuthg.py:307
+msgid "Create Repository Here"
+msgstr "ここにリポジトリを作成する"
+
+#: thgutil\menuthg.py:184 thgutil\menuthg.py:308
+msgid "create a new repository in this directory"
+msgstr "このディレクトリに新しいリポジトリを作成"
+
+#: thgutil\menuthg.py:186 thgutil\menuthg.py:313
+msgid "Global Settings"
+msgstr "グローバル設定"
+
+#: thgutil\menuthg.py:187 thgutil\menuthg.py:314
+msgid "Configure user wide settings"
+msgstr "このコンピュータのグローバル設定を変更する"
+
+#: thgutil\menuthg.py:190 thgutil\menuthg.py:322
+msgid "About"
+msgstr "バージョン情報"
+
+#: thgutil\menuthg.py:190 thgutil\menuthg.py:322
+msgid "About TortoiseHg"
+msgstr "TortoiseHg について"
+
+#: thgutil\menuthg.py:223
+msgid "HG Commit..."
+msgstr "HG コミット..."
+
+#: thgutil\menuthg.py:224
+msgid "Commit changes in repository"
+msgstr "リポジトリの変更をコミットする"
+
+#: thgutil\menuthg.py:228
+msgid "Edit Ignore Filter"
+msgstr ".hgignore ファイルの編集"
+
+#: thgutil\menuthg.py:229
+msgid "Edit repository ignore filter"
+msgstr "リポジトリの .hgignore ファイルの編集"
+
+#: thgutil\menuthg.py:233
+msgid "View File Status"
+msgstr "ファイルのステータスを表示"
+
+#: thgutil\menuthg.py:234
+msgid "Repository status"
+msgstr "リポジトリのステータス"
+
+#: thgutil\menuthg.py:238
+msgid "Shelve Changes"
+msgstr "変更をシェルフに保存"
+
+#: thgutil\menuthg.py:239
+msgid "Shelve or unshelve repository changes"
+msgstr "リポジトリの変更をシェルフに保存または復元する"
+
+#: thgutil\menuthg.py:245
+msgid "Visual Diff"
+msgstr "ビジュアル Diff"
+
+#: thgutil\menuthg.py:246
+msgid "View changes using GUI diff tool"
+msgstr "変更箇所をGUIの差分表示ツールを使う"
+
+#: thgutil\menuthg.py:250
+msgid "Guess Renames"
+msgstr "名前変更の推定"
+
+#: thgutil\menuthg.py:251
+msgid "Detect renames and copies"
+msgstr "名前変更またはコピーを推定"
+
+#: thgutil\menuthg.py:254
+msgid "Rename File"
+msgstr "ファイル名の変更"
+
+#: thgutil\menuthg.py:255
+msgid "Rename file or directory"
+msgstr "ファイルまたはディレクトリ名の変更"
+
+#: thgutil\menuthg.py:259
+msgid "Add Files"
+msgstr "ファイルを追加"
+
+#: thgutil\menuthg.py:260
+msgid "Add files to Hg repository"
+msgstr "リポジトリにファイルを追加"
+
+#: thgutil\menuthg.py:263
+msgid "Remove Files"
+msgstr "ファイルを削除"
+
+#: thgutil\menuthg.py:264
+msgid "Remove selected files on the next commit"
+msgstr "選択されているファイルを次のコミットで削除"
+
+#: thgutil\menuthg.py:267
+msgid "Revert Changes"
+msgstr "変更を元に戻す"
+
+#: thgutil\menuthg.py:268
+msgid "Revert selected files"
+msgstr "選択されたファイルを前の状態に戻す"
+
+#: thgutil\menuthg.py:273
+msgid "Annotate Files"
+msgstr "ファイルに注記を付ける"
+
+#: thgutil\menuthg.py:274
+msgid "show changeset information per file line"
+msgstr "チェンジセット情報をファイルごとに表示"
+
+#: thgutil\menuthg.py:280
+msgid "View Changelog"
+msgstr "更新履歴を表示"
+
+#: thgutil\menuthg.py:281
+msgid "View revision history"
+msgstr "リビジョン履歴を表示"
+
+#: thgutil\menuthg.py:286
+msgid "Search History"
+msgstr "検索履歴"
+
+#: thgutil\menuthg.py:287
+msgid "Search revisions of files for a text pattern"
+msgstr "このファイルのリビジョンをテキスト検索する"
+
+#: thgutil\menuthg.py:292
+msgid "Synchronize..."
+msgstr "更新..."
+
+#: thgutil\menuthg.py:293
+msgid "Synchronize with remote repository"
+msgstr "リモートリポジトリと同期する"
+
+#: thgutil\menuthg.py:295
+msgid "Recovery..."
+msgstr "リカバリ..."
+
+#: thgutil\menuthg.py:296
+msgid "General repair and recovery of repository"
+msgstr "リポジトリの修復とリカバリ"
+
+#: thgutil\menuthg.py:298
+msgid "Web Server"
+msgstr "ウェブサーバ"
+
+#: thgutil\menuthg.py:299
+msgid "start web server for this repository"
+msgstr "このリポジトリのウェブサーバを開始する"
+
+#: thgutil\menuthg.py:304
+msgid "Clone a repository here"
+msgstr "リポジトリをここに複製する"
+
+#: thgutil\menuthg.py:316
+msgid "Repository Settings"
+msgstr "リポジトリ設定"
+
+#: thgutil\menuthg.py:317
+msgid "Configure settings local to this repository"
+msgstr "このリポジトリの設定を変更する"
+
 #: hggtk\backout.py:37
 msgid "Changeset Description"
 msgstr "チェンジセット情報"
 
-#: hggtk\bugreport.py:47
+#: hggtk\bugreport.py:48
 msgid ""
-"\n"
 "** Please report this bug to tortoisehg-discuss@lists.sourceforge.net or "
 "http://bitbucket.org/tortoisehg/stable/issues\n"
 msgstr ""
-"\n"
 "** このバグを tortoisehg-discuss@lists.sourceforge.net または "
-"http://bitbucket.org/tortoisehg/stable/issues 報告してください\n"
+"http://bitbucket.org/tortoisehg/stable/issues に報告してください\n"
 
-#: hggtk\bugreport.py:50
+#: hggtk\bugreport.py:51
 msgid "** Mercurial version (%s).  TortoiseHg version (%s)\n"
 msgstr "** Mercurial バージョン (%s).  TortoiseHg バージョン (%s)\n"
 
-#: hggtk\bugreport.py:52
+#: hggtk\bugreport.py:53
 msgid "** Command: %s\n"
 msgstr "** コマンド: %s\n"
 
-#: hggtk\bugreport.py:53
+#: hggtk\bugreport.py:54
 msgid "** CWD: %s\n"
 msgstr "** 作業ディレクトリ: %s\n"
 
-#: hggtk\bugreport.py:55
+#: hggtk\bugreport.py:56
 msgid "** Extensions loaded: %s\n"
 msgstr "** 読み込まれた拡張機能: %s\n"
 
 #: hggtk\changeset.py:39
-msgid "_other parent"
-msgstr "もう1つの親"
+msgid "_Other parent"
+msgstr ""
 
 #: hggtk\changeset.py:40
 msgid "diff other parent"
@@ -2747,7 +2925,7 @@ msgstr "ファイルを過去のリビジョンに戻す"
 msgid "Revert %s to contents at revision %d?"
 msgstr "%s をリビジョン %d に戻しますか？"
 
-#: hggtk\changeset.py:557 hggtk\synch.py:639
+#: hggtk\changeset.py:557 hggtk\synch.py:638
 msgid "Toggle _Wordwrap"
 msgstr "行折り返し切り替え"
 
@@ -2808,35 +2986,35 @@ msgstr "閉じるブランチ: "
 msgid "branch: "
 msgstr "ブランチ: "
 
-#: hggtk\commit.py:408
+#: hggtk\commit.py:406
 msgid "No committable files selected"
 msgstr "コミット可能なファイルが選択されていません"
 
-#: hggtk\commit.py:515
+#: hggtk\commit.py:513
 msgid "Confirm Undo commit"
 msgstr "コミットの取り消し"
 
-#: hggtk\commit.py:541
+#: hggtk\commit.py:539
 msgid "Confirm Add/Remove"
 msgstr "追加/削除"
 
-#: hggtk\commit.py:542
+#: hggtk\commit.py:540
 msgid "Add/Remove the following files?"
 msgstr "次のファイルを追加/削除しますか？"
 
-#: hggtk\commit.py:563
+#: hggtk\commit.py:561
 msgid "Error"
 msgstr "エラー"
 
-#: hggtk\commit.py:564
+#: hggtk\commit.py:562
 msgid "Message format configuration error"
 msgstr "フォーマットポリシー設定エラー"
 
-#: hggtk\commit.py:573 hggtk\commit.py:581 hggtk\commit.py:593
+#: hggtk\commit.py:571 hggtk\commit.py:579 hggtk\commit.py:591
 msgid "Confirm Commit"
 msgstr "コミット"
 
-#: hggtk\commit.py:574
+#: hggtk\commit.py:572
 msgid ""
 "The summary line length of %i is greater than %i.\n"
 "\n"
@@ -2846,7 +3024,7 @@ msgstr ""
 "\n"
 "フォーマットポリシーを無視してコミットを続行しますか？"
 
-#: hggtk\commit.py:582
+#: hggtk\commit.py:580
 msgid ""
 "The summary line is not followed by a blank line.\n"
 "\n"
@@ -2856,7 +3034,7 @@ msgstr ""
 "\n"
 "フォーマットポリシーを無視してコミットを続行しますか？"
 
-#: hggtk\commit.py:594
+#: hggtk\commit.py:592
 msgid ""
 "The following lines are over the %i-character limit: %s.\n"
 "\n"
@@ -2866,39 +3044,39 @@ msgstr ""
 "\n"
 "フォーマットポリシーを無視してコミットを続行しますか？"
 
-#: hggtk\commit.py:631
+#: hggtk\commit.py:629
 msgid "Confirm Override Branch"
 msgstr "ブランチの上書き"
 
-#: hggtk\commit.py:637
+#: hggtk\commit.py:635
 msgid "Confirm New Branch"
 msgstr "新規ブランチの作成"
 
-#: hggtk\commit.py:708
+#: hggtk\commit.py:706
 msgid "Paste _Filenames"
 msgstr "ファイル名を貼り付け(_F)"
 
-#: hggtk\commit.py:709
+#: hggtk\commit.py:707
 msgid "App_ly Format"
 msgstr "フォーマットポリシーの適用(_L)"
 
-#: hggtk\commit.py:710
+#: hggtk\commit.py:708
 msgid "C_onfigure Format"
 msgstr "フォーマットポリシーの設定(_O)"
 
-#: hggtk\commit.py:737
+#: hggtk\commit.py:735
 msgid "Message format needs to be configured"
 msgstr "フォーマットポリシーが設定されている必要があります"
 
-#: hggtk\commit.py:749 hggtk\commit.py:754
+#: hggtk\commit.py:747 hggtk\commit.py:752
 msgid "Warning"
 msgstr "警告"
 
-#: hggtk\commit.py:750
+#: hggtk\commit.py:748
 msgid "The summary line length of %i is greater than %i"
 msgstr "要約行の長さ %i は %i より大きいです"
 
-#: hggtk\commit.py:755
+#: hggtk\commit.py:753
 msgid "The summary line is not followed by a blank line"
 msgstr "要約行の最後に空行はありません"
 
@@ -2910,11 +3088,11 @@ msgstr "変更点の詳細"
 msgid "_annotate parent"
 msgstr "親リビジョンにコメントする"
 
-#: hggtk\gdialog.py:393
+#: hggtk\gdialog.py:399
 msgid "No visual diff configured"
 msgstr "GUI 差分表示ツールが設定されていません"
 
-#: hggtk\gdialog.py:394
+#: hggtk\gdialog.py:400
 msgid "Please select a visual diff application."
 msgstr "GUI 差分表示ツールを設定してください。"
 
@@ -2998,19 +3176,19 @@ msgstr "GUIの差分ツールで表示"
 msgid "diff to local"
 msgstr "ローカルとの差分を表示"
 
-#: hggtk\history.py:518
+#: hggtk\history.py:520
 msgid "Confirm Strip Revision(s)"
 msgstr "リビジョンの削除"
 
-#: hggtk\history.py:543
+#: hggtk\history.py:545
 msgid "Confirm Revert Revision(s)"
 msgstr "リビジョンを元に戻す"
 
-#: hggtk\history.py:658 hggtk\thgconfig.py:343 hggtk\thgconfig.py:653
+#: hggtk\history.py:660 hggtk\thgconfig.py:343 hggtk\thgconfig.py:653
 msgid "Confirm Overwrite"
 msgstr "上書きの確認"
 
-#: hggtk\history.py:659
+#: hggtk\history.py:661
 msgid ""
 "The file \"%s\" already exists!\n"
 "\n"
@@ -3023,6 +3201,26 @@ msgstr ""
 #: hggtk\logfilter.py:31
 msgid "Log Filter - %s"
 msgstr "ログフィルタ - %s"
+
+#: hggtk\logview\treeview.py:357
+msgid "Graph"
+msgstr "グラフ"
+
+#: hggtk\logview\treeview.py:385
+msgid "ID"
+msgstr "ID"
+
+#: hggtk\logview\treeview.py:411
+msgid "Summary"
+msgstr "要約"
+
+#: hggtk\logview\treeview.py:436
+msgid "Local Date"
+msgstr "ローカル時間"
+
+#: hggtk\logview\treeview.py:449
+msgid "Universal Date"
+msgstr "UTC時間"
 
 #: hggtk\merge.py:28
 msgid "Unable to merge"
@@ -3052,119 +3250,139 @@ msgstr "取り消し"
 msgid "Merge"
 msgstr "マージ"
 
-#: hggtk\merge.py:149
+#: hggtk\merge.py:152
 msgid "Confirm undo merge"
 msgstr "マージの取り消し"
 
-#: hggtk\merge.py:150
+#: hggtk\merge.py:153
 msgid "Clean checkout of original revision?"
 msgstr "元のリビジョンを完全な形でチェックアウトしますか？"
 
-#: hggtk\recovery.py:120
+#: hggtk\recovery.py:47
+msgid "Clean"
+msgstr ""
+
+#: hggtk\recovery.py:52
+msgid "Rollback"
+msgstr ""
+
+#: hggtk\recovery.py:58
+msgid "Recover"
+msgstr ""
+
+#: hggtk\recovery.py:63
+msgid "Verify"
+msgstr ""
+
+#: hggtk\recovery.py:119
 msgid "Confirm clean repository"
 msgstr "リポジトリのクリーン"
 
-#: hggtk\recovery.py:138
+#: hggtk\recovery.py:137
 msgid "Confirm rollback repository"
 msgstr "リポジトリのロールバック"
 
-#: hggtk\serve.py:120
+#: hggtk\serve.py:119
 msgid "Serve %s - %s"
 msgstr "サーバ %s - %s"
 
-#: hggtk\serve.py:123
+#: hggtk\serve.py:122
 msgid "Serve - "
 msgstr "サーバ - "
 
-#: hggtk\serve.py:154
+#: hggtk\serve.py:153
 msgid "Confirm Really Exit?"
 msgstr "終了"
 
-#: hggtk\status.py:107 hggtk\status.py:138 hggtk\status.py:146
+#: hggtk\serve.py:217
+msgid "Abort: %s\n"
+msgstr "中断: %s\n"
+
+#: hggtk\status.py:103 hggtk\status.py:134 hggtk\status.py:142
 msgid "edit"
 msgstr "編集"
 
-#: hggtk\status.py:108 hggtk\status.py:139 hggtk\status.py:147
+#: hggtk\status.py:104 hggtk\status.py:135 hggtk\status.py:143
 msgid "view other"
 msgstr "他を表示"
 
-#: hggtk\status.py:186
+#: hggtk\status.py:182
 msgid "filtered status"
 msgstr "フィルタ状態"
 
-#: hggtk\status.py:186
+#: hggtk\status.py:182
 msgid "status"
 msgstr "状態"
 
-#: hggtk\status.py:438
+#: hggtk\status.py:434
 msgid "modified"
 msgstr "変更"
 
-#: hggtk\status.py:439
+#: hggtk\status.py:435
 msgid "added"
 msgstr "追加"
 
-#: hggtk\status.py:440
+#: hggtk\status.py:436
 msgid "removed"
 msgstr "削除"
 
-#: hggtk\status.py:442
+#: hggtk\status.py:438
 msgid "deleted"
 msgstr "削除"
 
-#: hggtk\status.py:445
+#: hggtk\status.py:441
 msgid "ignored"
 msgstr "無視"
 
-#: hggtk\status.py:922
+#: hggtk\status.py:919
 msgid "File is larger than the specified max size.\n"
 msgstr "設定されている最大ファイルサイズを超えています。\n"
 
-#: hggtk\status.py:923
+#: hggtk\status.py:920
 msgid "Hunk selection is disabled for this file.\n"
 msgstr "このファイルではハンクの選択が無効化されています。\n"
 
-#: hggtk\status.py:1128 hggtk\status.py:1145
+#: hggtk\status.py:1125 hggtk\status.py:1142
 msgid "Confirm Revert"
 msgstr "元に戻す"
 
-#: hggtk\status.py:1129
+#: hggtk\status.py:1126
 msgid "Revert files to revision %s?"
 msgstr "リビジョン %s にファイルを戻しますか？"
 
-#: hggtk\status.py:1131
+#: hggtk\status.py:1128
 msgid "Which parent to revert to?"
 msgstr "どの親リビジョンに戻しますか？"
 
-#: hggtk\status.py:1132
+#: hggtk\status.py:1129
 msgid "Revert file(s) to local or other parent?"
 msgstr "ローカルまたは他の親リビジョンのファイルに戻しますか？"
 
-#: hggtk\status.py:1133
+#: hggtk\status.py:1130
 msgid "&local"
 msgstr "ローカル(_L)"
 
-#: hggtk\status.py:1133
+#: hggtk\status.py:1130
 msgid "&other"
 msgstr "その他(_O)"
 
-#: hggtk\status.py:1133 hggtk\status.py:1134
+#: hggtk\status.py:1130 hggtk\status.py:1131
 msgid "l"
 msgstr "l"
 
-#: hggtk\status.py:1136
+#: hggtk\status.py:1133
 msgid "o"
 msgstr "o"
 
-#: hggtk\status.py:1146
+#: hggtk\status.py:1143
 msgid "Revert the following files?"
 msgstr "次のファイルを元に戻しますか？"
 
-#: hggtk\status.py:1230
+#: hggtk\status.py:1227
 msgid "Confirm Delete Unrevisioned"
 msgstr "未管理ファイルの削除"
 
-#: hggtk\status.py:1231
+#: hggtk\status.py:1228
 msgid "Delete the following unrevisioned files?"
 msgstr "次の管理されていないファイルを削除しますか？"
 
@@ -3260,7 +3478,7 @@ msgstr "変更の適用を取り消す"
 msgid "Lose changes and switch files?."
 msgstr "変更を破棄して切り替えますか？"
 
-#: hggtk\thgconfig.py:541
+#: hggtk\thgconfig.py:540
 msgid "Confirm quit without saving?"
 msgstr "保存せずに終了しますか？"
 
@@ -3272,8 +3490,8 @@ msgstr "デフォルトにする(_D)"
 msgid "Skipped saving path with no alias"
 msgstr "エイリアスのないパスは保存されません"
 
-#: hggtk\thgshelve.py:96 hggtk\thgshelve.py:97 hggtk\thgshelve.py:98
-#: hggtk\thgshelve.py:101
+#: hggtk\thgshelve.py:97 hggtk\thgshelve.py:98 hggtk\thgshelve.py:99
+#: hggtk\thgshelve.py:102
 msgid "_shelve"
 msgstr "シェルフする(_S)"
 
