@@ -69,6 +69,7 @@ class TagAddDialog(gtk.Window):
         self._tagslist = gtk.ListStore(str)
         self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
         self._tag_input = self._taglistbox.get_child()
+        self._tag_input.connect('activate', self._taginput_activated)
         self._tag_input.set_text(tag)
         tagbox.pack_start(lbl, False, False)
         tagbox.pack_start(self._taglistbox, True, True)
@@ -136,6 +137,9 @@ class TagAddDialog(gtk.Window):
             if tagname == "tip":
                 continue
             self._tagslist.append([tagname])
+
+    def _taginput_activated(self, taginput):
+        self._do_add_tag()
 
     def _btn_tag_clicked(self, button):
         """ select tag from tags dialog """
