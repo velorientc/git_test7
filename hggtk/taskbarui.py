@@ -24,7 +24,7 @@ class TaskBarUI(gtk.Window):
         gtklib.set_tortoise_icon(self, 'hg.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.set_default_size(500, 420)
+        self.set_default_size(400, 520)
         self.set_title(_('TortoiseHg Taskbar'))
 
         about = gtk.Button(_('About'))
@@ -35,7 +35,7 @@ class TaskBarUI(gtk.Window):
         self.add(vbox)
 
         ovframe = gtk.Frame(_('Overlay configuration'))
-        ovframe.set_border_width(10)
+        ovframe.set_border_width(2)
         vbox.pack_start(ovframe, False, False, 2)
         ovcvbox = gtk.VBox()
         ovframe.add(ovcvbox)
@@ -47,27 +47,15 @@ class TaskBarUI(gtk.Window):
         hbox.pack_start(self.lclonly, False, False, 2)
 
         cmframe = gtk.Frame(_('Context menu configuration'))
-        cmframe.set_border_width(10)
+        cmframe.set_border_width(2)
         vbox.pack_start(cmframe, False, False, 2)
         cmcvbox = gtk.VBox()
         cmframe.add(cmcvbox)
 
-        descframe = gtk.Frame(_('Description'))
-        descframe.set_border_width(10)
-        desctext = gtk.TextView()
-        desctext.set_wrap_mode(gtk.WRAP_WORD)
-        desctext.set_editable(False)
-        desctext.set_sensitive(False)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(desctext)
-        descframe.add(scrolledwindow)
-        vbox.pack_start(gtk.Label(), True, True, 2)
-        vbox.pack_start(descframe, False, False, 2)
-
         lbl = gtk.Label(_('Promote menu items to the top menu'))
         cmcvbox.pack_start(lbl, False, False, 2)
 
+        tips = gtk.Tooltips()
         rows = (len(shellcmds) + 2) / 3
         table = gtk.Table(rows, 3, False)
         cmcvbox.pack_start(table, False, False, 2)
@@ -79,18 +67,15 @@ class TaskBarUI(gtk.Window):
                          row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
             self.cmptoggles[cmd] = check
             tooltip = _('Promote menu item "%s" to top menu') % cmd
+            tips.set_tip(check, tooltip)
             check.connect('toggled', lambda x: apply.set_sensitive(True))
-            check.connect('focus-in-event', self.set_help,
-                    desctext.get_buffer(), tooltip)
 
         tooltip = _('Enable/Disable the overlay icons globally')
-        self.ovenable.connect('focus-in-event', self.set_help,
-                desctext.get_buffer(), tooltip)
+        tips.set_tip(self.ovenable, tooltip)
         self.ovenable.connect('toggled', self.ovenable_toggled, apply)
         tooltip = _('Only enable overlays on local disks')
+        tips.set_tip(self.lclonly, tooltip)
         self.lclonly.connect('toggled', lambda x: apply.set_sensitive(True))
-        self.lclonly.connect('focus-in-event', self.set_help,
-                desctext.get_buffer(), tooltip)
         self.load_shell_configs()
 
         frame = gtk.Frame(_('Event Log'))
@@ -115,7 +100,7 @@ class TaskBarUI(gtk.Window):
         vbox.pack_start(hbbox, False, False, 2)
 
         about.connect('clicked', self.about)
-        hbbox.add(about)
+        hbbox.pack_end(about, True, True, 0)
 
         apply.connect('clicked', self.applyclicked)
         apply.set_sensitive(False)
@@ -184,10 +169,6 @@ class TaskBarUI(gtk.Window):
         except ImportError:
             pass
         button.set_sensitive(False)
-
-    def set_help(self, widget, event, buffer, tooltip):
-        text = ' '.join(tooltip.splitlines())
-        buffer.set_text(text)
 
     def ovenable_toggled(self, check, apply):
         self.lclonly.set_sensitive(check.get_active())
