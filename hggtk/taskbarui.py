@@ -34,9 +34,21 @@ class TaskBarUI(gtk.Window):
         vbox = gtk.VBox()
         self.add(vbox)
 
-        ovframe = gtk.Frame(_('Overlay configuration'))
+        # Create a new notebook, place the position of the tabs
+        self.notebook = notebook = gtk.Notebook()
+        notebook.set_tab_pos(gtk.POS_TOP)
+        vbox.pack_start(notebook, True, True)
+        notebook.show()
+        self.show_tabs = True
+        self.show_border = True
+
+        settingsframe = self.add_page(notebook, _('Options'))
+        settingsvbox = gtk.VBox()
+        settingsframe.add(settingsvbox)
+
+        ovframe = gtk.Frame(_('Overlays'))
         ovframe.set_border_width(2)
-        vbox.pack_start(ovframe, False, False, 2)
+        settingsvbox.pack_start(ovframe, False, False, 2)
         ovcvbox = gtk.VBox()
         ovframe.add(ovcvbox)
         hbox = gtk.HBox()
@@ -46,9 +58,9 @@ class TaskBarUI(gtk.Window):
         self.lclonly = gtk.CheckButton(_('Local disks only'))
         hbox.pack_start(self.lclonly, False, False, 2)
 
-        cmframe = gtk.Frame(_('Context menu configuration'))
+        cmframe = gtk.Frame(_('Context Menu'))
         cmframe.set_border_width(2)
-        vbox.pack_start(cmframe, False, False, 2)
+        settingsvbox.pack_start(cmframe, False, False, 2)
         cmcvbox = gtk.VBox()
         cmframe.add(cmcvbox)
 
@@ -78,9 +90,8 @@ class TaskBarUI(gtk.Window):
         self.lclonly.connect('toggled', lambda x: apply.set_sensitive(True))
         self.load_shell_configs()
 
-        frame = gtk.Frame(_('Event Log'))
+        frame = self.add_page(notebook, _('Event Log'))
         frame.set_border_width(2)
-        vbox.pack_start(frame, True, True, 2)
 
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -111,6 +122,14 @@ class TaskBarUI(gtk.Window):
         close.add_accelerator('clicked', accelgroup, key, 0,
                 gtk.ACCEL_VISIBLE)
         hbbox.add(close)
+
+    def add_page(self, notebook, tab):
+        frame = gtk.Frame()
+        frame.set_border_width(5)
+        frame.show()
+        label = gtk.Label(tab)
+        notebook.append_page(frame, label)
+        return frame
 
     def about(self, button):
         from hggtk import about
