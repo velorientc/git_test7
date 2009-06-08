@@ -102,6 +102,9 @@ class TagAddDialog(gtk.Window):
         vbox.pack_end(self._commit_message, False, False, 1)
         vbox.pack_end(lbl, False, False, 1)
 
+        # focus on tag input
+        self._taglistbox.grab_focus()
+
         # show them all
         self._refresh()
         vbox.show_all()
