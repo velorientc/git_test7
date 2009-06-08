@@ -1,4 +1,6 @@
 [Registry]
+; rpc server autostart on logon
+Root: HKLM; Subkey: Software\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: TortoiseHgRpcServer; Flags: uninsdeletevalue; ValueData: {app}\thgtaskbar.exe
 
 ; register TortoiseHg config info
 Root: HKLM; Subkey: Software\TortoiseHgShell;  Flags: uninsdeletekey
