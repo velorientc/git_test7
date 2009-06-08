@@ -227,7 +227,7 @@ class TagAddDialog(gtk.Window):
         if name in self.repo.tags() and not force:
             raise util.Abort(_("Tag '%s' already exist") % name)
 
-        self.repo.tag(name, r, message, local, user, date)
+        self.repo.tag(name, r, hglib.fromutf(message), local, user, date)
 
     def _rm_hg_tag(self, name, message, local, user=None, date=None):
         if not name in self.repo.tags():
