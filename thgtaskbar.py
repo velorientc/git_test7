@@ -24,6 +24,10 @@ demandimport.enable()
 from mercurial import ui
 from thgutil import thread2, paths, shlib
 
+if hasattr(sys, "frozen"):
+    sys.stdout.closed = True
+    sys.stderr.closed = True
+
 APP_TITLE = "TortoiseHg RPC server"
 
 SHOWLOG_CMD = 1023
