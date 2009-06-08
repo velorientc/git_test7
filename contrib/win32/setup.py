@@ -97,7 +97,8 @@ try:
             {'script':'hgtk', 'icon_resources':[(0,'icons/thg_logo.ico')]}
             ]
     extra['windows'] = [
-            {'script':'taskbar.py', 'icon_resources':[(0,'icons/thg_logo.ico')]}
+            {'script':'thgtaskbar.py',
+             'icon_resources':[(0,'icons/thg_logo.ico')]}
             ]
 except ImportError:
     pass
