@@ -22,7 +22,7 @@ from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
 from mercurial import ui
-from thgutil import thread2, paths, shlib, settings
+from thgutil import thread2, paths, shlib
 
 APP_TITLE = "TortoiseHg RPC server"
 
@@ -289,7 +289,6 @@ def dispatch(req, cmd, args):
 
 class Updater(threading.Thread):
     def run(self):
-        excludes = []
         while True:
             req = requests.get()
             s = req.split('|')
@@ -297,22 +296,7 @@ class Updater(threading.Thread):
             if cmd == 'terminate':
                 logger.msg('Updater thread terminating')
                 return
-            if cmd == 'load-config':
-                logger.msg('Loading configuration')
-                set = settings.Settings('taskbar')
-                excludes = set.get_value('excludes', [])
-                for p in excludes:
-                    logger.msg(' exclude: %s' % p)
-                continue
-            ignored = False
-            for arg in args:
-                for e in excludes:
-                    if arg.startswith(e):
-                        logger.msg('%s command ignored in %s' % (cmd, e))
-                        ignored = True
-                        break
-            if not ignored:
-                dispatch(req, cmd, args)
+            dispatch(req, cmd, args)
             gc.collect()
 
 Updater().start()
@@ -330,9 +314,6 @@ class PipeServer:
         
         # And create an event to be used in the OVERLAPPED object.
         self.overlapped.hEvent = win32event.CreateEvent(None,0,0,None)
-
-        # Make updater load exclude masks
-        requests.put('load-config')
 
     def SvcStop(self):
         print 'PipeServer thread terminating'
