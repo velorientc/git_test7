@@ -249,13 +249,27 @@ def update_batch(batch):
 
 requests = Queue.Queue(0)
 
+def get_config():
+    hgighlight_taskbaricon = True
+    try:
+        from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
+        hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
+        t = ('1', 'True')
+        try: hgighlight_taskbaricon = QueryValueEx(hkey, 'HighlightTaskbarIcon')[0] in t
+        except EnvironmentError: pass
+    except (ImportError, WindowsError):
+        pass
+    return hgighlight_taskbaricon
+
 def update(args, hwnd):
     batch = []
     r = args[0]
     print "got update request %s (first in batch)" % r
     batch.append(r)
     print "wait a bit for additional requests..."
-    SetIcon(hwnd, "hgB.ico")
+    highlight = get_config()
+    if highlight:
+        SetIcon(hwnd, "hgB.ico")
     time.sleep(0.2)
     deferred_requests = []
     try:
@@ -275,7 +289,8 @@ def update(args, hwnd):
     msg = "processing batch with %i update requests"
     print msg % len(batch)
     update_batch(batch)
-    SetIcon(hwnd, "hg.ico")
+    if highlight:
+        SetIcon(hwnd, "hg.ico")
 
 def remove(args):
     path = args[0]

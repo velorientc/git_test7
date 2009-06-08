@@ -82,12 +82,27 @@ class TaskBarUI(gtk.Window):
             tips.set_tip(check, tooltip)
             check.connect('toggled', lambda x: apply.set_sensitive(True))
 
+        taskbarframe = gtk.Frame(_('Taskbar'))
+        taskbarframe.set_border_width(2)
+        settingsvbox.pack_start(taskbarframe, False, False, 2)
+        taskbarbox = gtk.VBox()
+        taskbarframe.add(taskbarbox)
+        hbox = gtk.HBox()
+        taskbarbox.pack_start(hbox, False, False, 2)
+        self.hgighlight_taskbaricon = gtk.CheckButton(_('Highlight Icon'))
+        hbox.pack_start(self.hgighlight_taskbaricon, False, False, 2)        
+
         tooltip = _('Enable/Disable the overlay icons globally')
         tips.set_tip(self.ovenable, tooltip)
         self.ovenable.connect('toggled', self.ovenable_toggled, apply)
         tooltip = _('Only enable overlays on local disks')
         tips.set_tip(self.lclonly, tooltip)
         self.lclonly.connect('toggled', lambda x: apply.set_sensitive(True))
+
+        tooltip = _('Highlight the taskbar icon during activity')
+        tips.set_tip(self.hgighlight_taskbaricon, tooltip)
+        self.hgighlight_taskbaricon.connect('toggled', lambda x: apply.set_sensitive(True))
+
         self.load_shell_configs()
 
         frame = self.add_page(notebook, _('Event Log'))
@@ -153,6 +168,7 @@ class TaskBarUI(gtk.Window):
         overlayenable = True
         localdisks = False
         promoteditems = 'commit'
+        hgighlight_taskbaricon = True
         try:
             from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
             hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
@@ -161,6 +177,8 @@ class TaskBarUI(gtk.Window):
             except EnvironmentError: pass
             try: localdisks = QueryValueEx(hkey, 'LocalDisksOnly')[0] in t
             except EnvironmentError: pass
+            try: hgighlight_taskbaricon = QueryValueEx(hkey, 'HighlightTaskbarIcon')[0] in t
+            except EnvironmentError: pass
             try: promoteditems = QueryValueEx(hkey, 'PromotedItems')[0]
             except EnvironmentError: pass
         except (ImportError, WindowsError):
@@ -168,6 +186,7 @@ class TaskBarUI(gtk.Window):
 
         self.ovenable.set_active(overlayenable)
         self.lclonly.set_active(localdisks)
+        self.hgighlight_taskbaricon.set_active(hgighlight_taskbaricon)
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         for cmd, check in self.cmptoggles.iteritems():
             check.set_active(cmd in promoted)
@@ -175,6 +194,7 @@ class TaskBarUI(gtk.Window):
     def applyclicked(self, button):
         overlayenable = self.ovenable.get_active() and '1' or '0'
         localdisks = self.lclonly.get_active() and '1' or '0'
+        hgighlight_taskbaricon = self.hgighlight_taskbaricon.get_active() and '1' or '0'
         promoted = []
         for cmd, check in self.cmptoggles.iteritems():
             if check.get_active():
@@ -184,6 +204,7 @@ class TaskBarUI(gtk.Window):
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
             SetValueEx(hkey, 'EnableOverlays', 0, REG_SZ, overlayenable)
             SetValueEx(hkey, 'LocalDisksOnly', 0, REG_SZ, localdisks)
+            SetValueEx(hkey, 'HighlightTaskbarIcon', 0, REG_SZ, hgighlight_taskbaricon)
             SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
         except ImportError:
             pass
