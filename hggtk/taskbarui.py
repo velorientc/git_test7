@@ -38,7 +38,7 @@ class TaskBarUI(gtk.Window):
         textview.set_editable(False)
         scrolledwindow.add(textview)
         frame.add(scrolledwindow)
-        gobject.timeout_add(10, self.pollq, inputq, textview)
+        gobject.timeout_add(100, self.pollq, inputq, textview)
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
