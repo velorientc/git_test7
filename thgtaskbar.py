@@ -33,6 +33,33 @@ APP_TITLE = "TortoiseHg RPC server"
 SHOWLOG_CMD = 1023
 EXIT_CMD = 1025
 
+def SetIcon(hwnd, name, add=False):
+    # Try and find a custom icon
+    print "SetIcon(%s)" % name
+    hinst =  GetModuleHandle(None)
+    from thgutil.paths import get_tortoise_icon
+    iconPathName = get_tortoise_icon(name)
+    if iconPathName and os.path.isfile(iconPathName):
+        icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
+        hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
+    else:
+        print "Can't find a Python icon file - using default"
+        hicon = LoadIcon(0, win32con.IDI_APPLICATION)
+
+    flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
+    nid = (hwnd, 0, flags, win32con.WM_USER+20, hicon, APP_TITLE)
+    action = NIM_MODIFY
+    if add:
+        action = NIM_ADD
+    try:
+        Shell_NotifyIcon(action, nid)
+    except error:
+        # This is common when windows is starting, and this code is hit
+        # before the taskbar has been created.
+        print "Failed to add the taskbar icon - is explorer running?"
+        # but keep running anyway - when explorer starts, we get the
+        # TaskbarCreated message.
+
 class MainWindow:
     def __init__(self):
         msg_TaskbarRestart = RegisterWindowMessage("TaskbarCreated");
@@ -61,28 +88,7 @@ class MainWindow:
         self._DoCreateIcons()
 
     def _DoCreateIcons(self):
-        # Try and find a custom icon
-        hinst =  GetModuleHandle(None)
-        from thgutil.paths import get_tortoise_icon
-        iconPathName = get_tortoise_icon("hg.ico")
-        if iconPathName and os.path.isfile(iconPathName):
-            icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
-            hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
-        else:
-            print "Can't find a Python icon file - using default"
-            hicon = LoadIcon(0, win32con.IDI_APPLICATION)
-
-        flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
-        nid = (self.hwnd, 0, flags, win32con.WM_USER+20, hicon, APP_TITLE)
-        try:
-            Shell_NotifyIcon(NIM_ADD, nid)
-        except error:
-            # This is common when windows is starting, and this code is hit
-            # before the taskbar has been created.
-            print "Failed to add the taskbar icon - is explorer running?"
-            # but keep running anyway - when explorer starts, we get the
-            # TaskbarCreated message.
-
+        SetIcon(self.hwnd, "hg.ico", add=True)
         # start namepipe server for hg status
         self.start_pipe_server()
 
@@ -171,7 +177,7 @@ class MainWindow:
 
     def start_pipe_server(self):
         def servepipe():
-            self.svc = PipeServer()
+            self.svc = PipeServer(self.hwnd)
             self.svc.SvcDoRun()
 
         self.pipethread = thread2.Thread(target=servepipe)
@@ -243,12 +249,27 @@ def update_batch(batch):
 
 requests = Queue.Queue(0)
 
-def update(args):
+def get_config():
+    hgighlight_taskbaricon = True
+    try:
+        from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
+        hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
+        t = ('1', 'True')
+        try: hgighlight_taskbaricon = QueryValueEx(hkey, 'HighlightTaskbarIcon')[0] in t
+        except EnvironmentError: pass
+    except (ImportError, WindowsError):
+        pass
+    return hgighlight_taskbaricon
+
+def update(args, hwnd):
     batch = []
     r = args[0]
     print "got update request %s (first in batch)" % r
     batch.append(r)
     print "wait a bit for additional requests..."
+    highlight = get_config()
+    if highlight:
+        SetIcon(hwnd, "hgB.ico")
     time.sleep(0.2)
     deferred_requests = []
     try:
@@ -268,6 +289,8 @@ def update(args):
     msg = "processing batch with %i update requests"
     print msg % len(batch)
     update_batch(batch)
+    if highlight:
+        SetIcon(hwnd, "hg.ico")
 
 def remove(args):
     path = args[0]
@@ -282,16 +305,20 @@ def remove(args):
         if notifypaths:
             shlib.shell_notify(list(notifypaths))
 
-def dispatch(req, cmd, args):
+def dispatch(req, cmd, args, hwnd):
     print "dispatch(%s)" % req
     if cmd == 'update':
-        update(args)
+        update(args, hwnd)
     elif cmd == 'remove':
         remove(args)
     else:
         logger.msg("Error: unknown request '%s'" % req)
 
 class Updater(threading.Thread):
+    def __init__(self, hwnd):
+        threading.Thread.__init__(self)
+        self.hwnd = hwnd
+
     def run(self):
         while True:
             req = requests.get()
@@ -300,13 +327,14 @@ class Updater(threading.Thread):
             if cmd == 'terminate':
                 logger.msg('Updater thread terminating')
                 return
-            dispatch(req, cmd, args)
+            dispatch(req, cmd, args, self.hwnd)
             gc.collect()
 
-Updater().start()
-
 class PipeServer:
-    def __init__(self):
+    def __init__(self, hwnd):
+        self.updater = Updater(hwnd)
+        self.updater.start()
+
         # Create an event which we will use to wait on.
         # The "service stop" request will set this event.
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
