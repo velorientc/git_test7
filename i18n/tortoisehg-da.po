@@ -580,7 +580,7 @@ msgstr ""
 msgid ""
 "Comma separated list of inclusion patterns.  By default, the entire "
 "repository is searched."
-msgstr ""
+msgstr "Kommasepareret liste af inkluderingsmønstre. Som udgangspunkt bliver hele depotet gennemsøgt."
 
 #: hggtk\datamine.py:228
 msgid ""
@@ -957,7 +957,7 @@ msgstr "Opret"
 
 #: hggtk\hginit.py:47
 msgid "Create a new repository in destination directory"
-msgstr ""
+msgstr "Operet et nyt depot i destinationsfolderen"
 
 #: hggtk\hginit.py:62
 msgid " Destination :"
@@ -969,7 +969,7 @@ msgstr ""
 
 #: hggtk\hginit.py:81
 msgid "Make repo compatible with Mercurial 1.0"
-msgstr ""
+msgstr "Gør depot kompatibelt med Mercurial 1.0"
 
 #: hggtk\hginit.py:128
 msgid "Destination path is empty"
@@ -981,15 +981,15 @@ msgstr ""
 
 #: hggtk\hginit.py:143
 msgid "Unable to create new repository"
-msgstr ""
+msgstr "Ude af stand til at oprette et nyt depot"
 
 #: hggtk\hginit.py:147 hggtk\hginit.py:152
 msgid "Error when creating repository"
-msgstr ""
+msgstr "Fejl under depotoprettelse"
 
 #: hggtk\hginit.py:170
 msgid "New repository created"
-msgstr ""
+msgstr "Nyt depot oprettet"
 
 #: hggtk\hginit.py:171
 msgid "in directory %s"
@@ -1178,7 +1178,7 @@ msgstr "abort: %s!\n"
 
 #: hggtk\hgtk.py:196 thgutil\hglib.py:305
 msgid "There is no Mercurial repository here (.hg not found)"
-msgstr "Der er intet Mercurial lager her (.hg ikke fundet)"
+msgstr "Der er intet Mercurial depot her (.hg ikke fundet)"
 
 #: hggtk\hgtk.py:206 thgutil\hglib.py:325
 msgid "invalid arguments"
@@ -1405,7 +1405,7 @@ msgstr ""
 
 #: hggtk\hgtk.py:629
 msgid "udpate all repos in current dir"
-msgstr ""
+msgstr "opdater alle depoter i aktuel folder"
 
 #: hggtk\hgtk.py:630
 msgid "hgtk thgstatus [OPTION]"
@@ -1465,7 +1465,7 @@ msgstr "_DataMine"
 
 #: hggtk\history.py:66
 msgid "Search Repository History"
-msgstr ""
+msgstr "Søg depot historie"
 
 #: hggtk\history.py:73 thgutil\menuthg.py:173
 msgid "Synchronize"
@@ -2431,7 +2431,7 @@ msgstr ""
 
 #: hggtk\tagadd.py:53
 msgid "Remove tag from repository"
-msgstr "Fjern mærke fra arkiv"
+msgstr "Fjern mærke fra depot"
 
 #: hggtk\tagadd.py:66
 msgid "Tag:"
