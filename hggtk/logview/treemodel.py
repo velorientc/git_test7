@@ -45,10 +45,12 @@ class TreeModel(gtk.GenericTreeModel):
         self.parents = [x.rev() for x in repo.parents()]
         self.heads = [repo[x].rev() for x in repo.heads()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
+        self.branchtags = repo.branchtags()
 
     def refresh(self):
         repo = self.repo
         oldtags, oldheads, oldparents = self.tagrevs, self.heads, self.parents
+        oldbranches = [repo[n].rev() for n in self.branchtags.items()]
 
         repo.invalidate()
         repo.dirstate.invalidate()
@@ -56,8 +58,10 @@ class TreeModel(gtk.GenericTreeModel):
         self.parents = [x.rev() for x in repo.parents()]
         self.heads = [repo[x].rev() for x in repo.heads()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
-        allrevs = set(oldtags + oldheads + oldparents +
-                      self.parents + self.heads + self.tagrevs)
+        self.branchtags = repo.branchtags()
+        brevs = [repo[n].rev() for n in self.branchtags.items()]
+        allrevs = set(oldtags + oldheads + oldparents + oldbranches +
+                      brevs + self.parents + self.heads + self.tagrevs)
         for rev in allrevs:
             if rev in self.revisions:
                 del self.revisions[rev]
@@ -125,17 +129,11 @@ class TreeModel(gtk.GenericTreeModel):
                 tstr += '<span color="%s" background="%s"> %s </span> ' % \
                         ('black', '#ffffaa', tag)
 
-            # show branch names per hgweb's logic
-            branches = webutil.nodebranchdict(self.repo, ctx)
-            inbranches = webutil.nodeinbranch(self.repo, ctx)
+            branch = ctx.branch()
             bstr = ''
-            branchstr = ''
-            for branch in branches:
-                branchstr += branch['name']
+            if self.branchtags.get(branch) == ctx.node():
                 bstr += '<span color="%s" background="%s"> %s </span> ' % \
-                        ('black', '#aaffaa', branch['name'])
-            for branch in inbranches:
-                branchstr += branch['name']
+                        ('black', '#aaffaa', branch)
 
             if '<' in ctx.user():
                 author = self.author_re.sub('', ctx.user()).strip(' ')
@@ -158,15 +156,15 @@ class TreeModel(gtk.GenericTreeModel):
                     author, date, None, parents, wc_parent, head, taglist,
                     color, str(ctx), utc)
             self.revisions[revid] = revision
-            self.branch_names[revid] = branchstr
+            self.branch_names[revid] = branch
         else:
             revision = self.revisions[revid]
-            branchstr = self.branch_names[revid]
+            branch = self.branch_names[revid]
 
         if column == REVISION:
             return revision
         if column == BRANCHES:
-            return branchstr
+            return branch
         return revision[column]
 
     def on_iter_next(self, rowref):
