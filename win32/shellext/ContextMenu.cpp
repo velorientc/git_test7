@@ -233,8 +233,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     memset(&promoted, 0, sizeof(promoted));
 
     std::string cval;
-    if (GetRegistryConfig("PromotedItems", cval) != 0 && cval == "0")
-        return S_FALSE;
+    GetRegistryConfig("PromotedItems", cval);
 
     size_t found;
     do
