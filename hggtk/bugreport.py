@@ -48,12 +48,12 @@ class BugReport(gdialog.GDialog):
         text += _('** Please report this bug to'
                 ' tortoisehg-discuss@lists.sourceforge.net or'
                 ' http://bitbucket.org/tortoisehg/stable/issues\n')
-        text += _('** Mercurial version (%s).  TortoiseHg version (%s)\n') % (
+        text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
                 hglib.hgversion, version.version())
-        text += _('** Command: %s\n') % (self.opts['cmd'])
-        text += _('** CWD: %s\n') % os.getcwd()
+        text += '** Command: %s\n' % (self.opts['cmd'])
+        text += '** CWD: %s\n' % os.getcwd()
         extlist = [x[0] for x in extensions.extensions()]
-        text += _('** Extensions loaded: %s\n') % ', '.join(extlist)
+        text += '** Extensions loaded: %s\n' % ', '.join(extlist)
         text += self.opts['error']
         text += '\n}}}\n'
         textview.get_buffer().set_text(text)
