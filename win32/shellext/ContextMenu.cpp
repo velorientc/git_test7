@@ -122,15 +122,55 @@ void AddMenuList(UINT idCmd, const std::string& name)
     MenuIdMap[idCmd] = MenuDescMap[name];
 }
 
+void GetCMenuTranslation(
+        const std::string& lang,
+        const std::string& name,
+        std::string& menuText,
+        std::string& helpText)
+{
+    std::string subkey = "Software\\TortoiseHg\\CMenu\\";
+    subkey += lang;
+    subkey += "\\";
+    subkey += name;
+
+    TDEBUG_TRACE("GetCMenuTranslation: " << subkey);
+
+    HKEY hkey = 0;
+    LONG rv = RegOpenKeyExA(
+        HKEY_CURRENT_USER, subkey.c_str(), 0, KEY_READ, &hkey);
+
+    if (rv != ERROR_SUCCESS || hkey == 0)
+        return;
+
+    BYTE Data[MAX_PATH] = "";
+    DWORD cbData = MAX_PATH * sizeof(BYTE);
+
+    rv = RegQueryValueExA(hkey, "menuText", 0, 0, Data, &cbData);
+    if (rv == ERROR_SUCCESS)
+        menuText = reinterpret_cast<const char*>(&Data);
+
+    rv = RegQueryValueExA(hkey, "helpText", 0, 0, Data, &cbData);
+    if (rv == ERROR_SUCCESS)
+        helpText = reinterpret_cast<const char*>(&Data);
+}
+
 void InitMenuMaps()
 {
     if (MenuDescMap.empty())
     {
+        std::string lang;
+        GetRegistryConfig("CMenuLang", lang);
+
         std::size_t sz = sizeof(menuDescList) / sizeof(MenuDescription);
         for (std::size_t i=0; i < sz; i++)
         {
             MenuDescription md = menuDescList[i];
             TDEBUG_TRACE("InitMenuMaps: adding " << md.name);
+
+            // Look for translation of menu and help text
+            if( lang.size() )
+                GetCMenuTranslation(lang, md.name, md.menuText, md.helpText);
+
             MenuDescMap[md.name] = md;
         }
     }
