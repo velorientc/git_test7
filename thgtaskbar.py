@@ -25,6 +25,11 @@ from mercurial import ui
 from thgutil import thread2, paths, shlib
 
 if hasattr(sys, "frozen"):
+    # Insert PATH to binary installer gtk directory
+    from thgutil import paths
+    gtkpath = os.path.join(paths.bin_path, 'gtk')
+    os.environ['PATH'] = os.pathsep.join([gtkpath, os.environ['PATH']])
+    # Give stdout/stderr closed attributes to prevent ui.py errors
     sys.stdout.closed = True
     sys.stderr.closed = True
 
