@@ -13,7 +13,7 @@ from thgutil import hglib, settings
 from hggtk import gtklib
 
 shellcmds = '''about add clone commit datamine init log recovery
-shelve synch status thgstatus userconfig repoconfig guess remove rename
+shelve synch status thgstatus userconf repoconf remove rename
 revert serve update vdiff'''.split()
 
 class TaskBarUI(gtk.Window):
