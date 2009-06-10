@@ -174,7 +174,7 @@ class NativeSaveFileDialogWrapper:
     """Wrap the windows file dialog, or display default gtk dialog if
     that isn't available"""
     def __init__(self, InitialDir = None, Title = _('Save File'),
-                 Filter = {"All files": "*.*"}, FilterIndex = 1, FileName = ''):
+                 Filter = ("All files", "*.*"), FilterIndex = 1, FileName = ''):
         if InitialDir == None:
             InitialDir = os.path.expanduser("~")
         self.InitialDir = InitialDir
@@ -203,9 +203,9 @@ class NativeSaveFileDialogWrapper:
                 File=self.FileName,
                 DefExt=None,
                 Title=hglib.fromutf(self.Title),
-                Filter='',
-                CustomFilter='',
-                FilterIndex=1)
+                Filter= '\0'.join(self.Filter)+'\0',
+                CustomFilter=None,
+                FilterIndex=self.FilterIndex)
             if fname:
                 fname = os.path.abspath(fname)
         except pywintypes.error:
@@ -222,7 +222,7 @@ class NativeSaveFileDialogWrapper:
         file_save.set_default_response(gtk.RESPONSE_OK)
         file_save.set_current_folder(self.InitialDir)
         file_save.set_current_name(self.FileName)
-        for name, pattern in self.Filter.iteritems():
+        for name, pattern in dict(self.Filter).iteritems():
             fi = gtk.FileFilter()
             fi.set_name(name)
             fi.add_pattern(pattern)
