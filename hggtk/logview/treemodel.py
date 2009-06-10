@@ -50,7 +50,7 @@ class TreeModel(gtk.GenericTreeModel):
     def refresh(self):
         repo = self.repo
         oldtags, oldheads, oldparents = self.tagrevs, self.heads, self.parents
-        oldbranches = [repo[n].rev() for n in self.branchtags.items()]
+        oldbranches = [repo[n].rev() for n in self.branchtags.values()]
 
         repo.invalidate()
         repo.dirstate.invalidate()
@@ -59,7 +59,7 @@ class TreeModel(gtk.GenericTreeModel):
         self.heads = [repo[x].rev() for x in repo.heads()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
-        brevs = [repo[n].rev() for n in self.branchtags.items()]
+        brevs = [repo[n].rev() for n in self.branchtags.values()]
         allrevs = set(oldtags + oldheads + oldparents + oldbranches +
                       brevs + self.parents + self.heads + self.tagrevs)
         for rev in allrevs:
