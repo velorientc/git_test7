@@ -858,10 +858,11 @@ class GStatus(gdialog.GDialog):
         for s in patch.diff(self.repo, pctxs[0].node(), None,
                 match=matcher, opts=patch.diffopts(self.ui, self.opts)):
             difftext.extend(s.splitlines(True))
-        difftext.append(_('\n===== Diff to second parent =====\n'))
-        for s in patch.diff(self.repo, pctxs[1].node(), None,
-                match=matcher, opts=patch.diffopts(self.ui, self.opts)):
-            difftext.extend(s.splitlines(True))
+        if len(pctxs) > 1:
+            difftext.append(_('\n===== Diff to second parent =====\n'))
+            for s in patch.diff(self.repo, pctxs[1].node(), None,
+                    match=matcher, opts=patch.diffopts(self.ui, self.opts)):
+                difftext.extend(s.splitlines(True))
 
         buf = gtk.TextBuffer()
         buf.create_tag('removed', foreground='#900000')
