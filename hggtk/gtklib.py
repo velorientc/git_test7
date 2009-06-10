@@ -233,3 +233,65 @@ class NativeSaveFileDialogWrapper:
             result = False
         file_save.destroy()
         return result
+
+class NativeFolderSelectDialog:
+    """Wrap the windows folder dialog, or display default gtk dialog if
+    that isn't available"""
+    def __init__(self, initial = None, title = _('Select Folder')):
+        self.initial = initial or os.getcwd()
+        self.title = title
+
+    def run(self):
+        """run the file dialog, either return a file name, or False if
+        the user aborted the dialog"""
+        try:
+            import win32com, win32gui, pywintypes
+            return self.runWindows()
+        except ImportError, e:
+            print e
+            return self.runCompatible()
+
+    def runWindows(self):
+        from win32com.shell import shell, shellcon
+        import win32gui, pywintypes
+
+        def BrowseCallbackProc(hwnd, msg, lp, data):
+            if msg== shellcon.BFFM_INITIALIZED:
+                win32gui.SendMessage(hwnd, shellcon.BFFM_SETSELECTION, 1, data)
+            elif msg == shellcon.BFFM_SELCHANGED:
+                # Set the status text of the
+                # For this message, 'lp' is the address of the PIDL.
+                pidl = shell.AddressAsPIDL(lp)
+                try:
+                    path = shell.SHGetPathFromIDList(pidl)
+                    win32gui.SendMessage(hwnd, shellcon.BFFM_SETSTATUSTEXT, 0, path)
+                except shell.error:
+                    # No path for this PIDL
+                    pass
+
+        fname = None
+        try: 
+            flags = shellcon.BIF_EDITBOX | 0x40  #shellcon.BIF_NEWDIALOGSTYLE
+            pidl, _, _ = shell.SHBrowseForFolder(0,
+                               None,
+                               self.title,
+                               flags,
+                               BrowseCallbackProc, # callback function
+                               self.initial)       # 'data' param for the callback
+            if pidl:
+                fname = shell.SHGetPathFromIDList(pidl)
+        except (pywintypes.error, pywintypes.com_error):
+            pass
+        return fname
+
+    def runCompatible(self):
+        dialog = gtk.FileChooserDialog(title=None,
+                action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
+                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        dialog.set_default_response(gtk.RESPONSE_OK)
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            return dialog.get_filename()
+        dialog.destroy()
+        return None
