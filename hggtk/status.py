@@ -431,14 +431,14 @@ class GStatus(gdialog.GDialog):
         self._show_checks = {}
         row, col = 0, 0
         # Tuple: (ctype, translated label)
-        checks = (('modified', _('modified')),
-                  ('added', _('added')),
-                  ('removed', _('removed')))
+        checks = (('modified', _('M: modified')),
+                  ('added',    _('A: added')),
+                  ('removed',  _('R: removed')))
         if self.count_revs() <= 1:
-            checks += (('deleted', _('deleted')),
-                       ('unknown', _('unknown')),
-                       ('clean', _('clean')),
-                       ('ignored', _('ignored')))
+            checks += (('deleted', _('!: deleted')),
+                       ('unknown', _('?: unknown')),
+                       ('clean',   _('C: clean')),
+                       ('ignored', _('I: ignored')))
 
         for ctuple in checks:
             check = gtk.CheckButton(ctuple[1])
