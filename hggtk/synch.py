@@ -10,6 +10,7 @@ import gobject
 import pango
 import Queue
 import os
+import sys
 import urllib
 
 from mercurial import hg, ui, extensions, url
@@ -33,9 +34,14 @@ class SynchDialog(gtk.Window):
         self.notify_func = None
         self.last_drop_time = None
 
+        self.saved_stdout = sys.stdout
+        self.saved_stderr = sys.stderr
+        # Pipe stderr, stdout to self.write
+        sys.stdout = self
+        sys.stderr = self
+
         # persistent app data
         self._settings = settings.Settings('synch')
-
         self.set_default_size(655, 552)
 
         self.paths = self.get_paths()
@@ -378,6 +384,8 @@ class SynchDialog(gtk.Window):
         else:
             self.update_settings()
             self._settings.write()
+            sys.stdout = self.saved_stdout
+            sys.stderr = self.saved_stderr
             return False
 
     def delete(self, widget, event):
@@ -560,6 +568,9 @@ class SynchDialog(gtk.Window):
 
         # update drop-down list
         self.fill_path_combo()
+
+    def flush(self, *args):
+        pass
 
     def write(self, msg, append=True):
         msg = hglib.toutf(msg)
