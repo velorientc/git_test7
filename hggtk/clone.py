@@ -173,27 +173,19 @@ class CloneDialog(gtk.Window):
 
     def dest_browse_clicked(self, button):
         'select folder as clone destination'
-        dialog = gtk.FileChooserDialog(title=None,
-                action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
-        response = dialog.run()
-        if response == gtk.RESPONSE_OK:
-            self.destentry.set_text(dialog.get_filename())
-        dialog.destroy()
+        response = gtklib.NativeFolderSelectDialog(
+                          initial=self.destentry.get_text(),
+                          title=_('Select Destination Folder')).run()
+        if response:
+            self.destentry.set_text(response)
 
     def source_browse_clicked(self, button):
         'select source folder to clone'
-        dialog = gtk.FileChooserDialog(title=None,
-                action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
-        response = dialog.run()
-        if response == gtk.RESPONSE_OK:
-            self.srcentry.set_text(dialog.get_filename())
-        dialog.destroy()
+        response = gtklib.NativeFolderSelectDialog(
+                          initial=self.destentry.get_text(),
+                          title=_('Select Source Folder')).run()
+        if response:
+            self.destentry.set_text(response)
 
     def add_src_to_recent(self, src):
         if os.path.exists(src):
