@@ -194,6 +194,8 @@ class NativeSaveFileDialogWrapper:
 
     def runWindows(self):
         import win32gui, win32con, pywintypes
+        cwd = os.getcwd()
+        fname = None
         try:
             fname, customfilter, flags=win32gui.GetSaveFileNameW(
                 InitialDir=self.InitialDir,
@@ -205,10 +207,11 @@ class NativeSaveFileDialogWrapper:
                 CustomFilter='',
                 FilterIndex=1)
             if fname:
-                return fname
+                fname = os.path.abspath(fname)
         except pywintypes.error:
             pass
-        return False
+        os.chdir(cwd)
+        return fname
 
     def runCompatible(self):
         file_save = gtk.FileChooserDialog(self.Title, None,
