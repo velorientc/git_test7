@@ -272,7 +272,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     bool promoted[ sz ];
     memset(&promoted, 0, sizeof(promoted));
 
-    std::string cval;
+    std::string cval = "commit"; // default value if key not found
     GetRegistryConfig("PromotedItems", cval);
 
     size_t found;
