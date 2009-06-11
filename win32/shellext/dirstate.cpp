@@ -18,13 +18,14 @@
 #include "stdafx.h"
 
 #include "dirstate.h"
+#include "TortoiseUtils.h"
 
 
 std::auto_ptr<Dirstate> Dirstate::read(const std::string& path, bool& unset)
 {
     unset = false;
 
-    FILE *f = fopen(path.c_str(), "rb");
+    FILE *f = fopenReadRenameAllowed(path.c_str());
     if (!f)
     {
         TDEBUG_TRACE("Dirstate::read: can't open " << path);

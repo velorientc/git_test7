@@ -18,6 +18,7 @@
 
 #include "DirectoryStatus.h"
 #include "Thgstatus.h"
+#include "TortoiseUtils.h"
 
 
 char DirectoryStatus::status(const std::string& relpath_) const
@@ -61,7 +62,7 @@ int DirectoryStatus::read(const std::string& hgroot, const std::string& cwd)
 
     std::string p = hgroot + "\\.hg\\thgstatus";
 
-    FILE *f = fopen(p.c_str(), "rb");
+    FILE *f = fopenReadRenameAllowed(p.c_str());
     if (!f)
     {
         TDEBUG_TRACE("DirectoryStatus::read: can't open '" << p << "'");

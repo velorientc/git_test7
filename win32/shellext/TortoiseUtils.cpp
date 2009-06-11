@@ -4,6 +4,10 @@
 #include "errno.h"
 #include <assert.h>
 
+#include <io.h>
+#include "FCNTL.H"
+
+
 int WideCharToLocal(LPTSTR pLocal, LPWSTR pWide, DWORD dwChars)
 {
 	*pLocal = 0;
@@ -240,5 +244,38 @@ std::string GetHgRepoRoot(const std::string& path)
 bool IsHgRepo(const std::string& path)
 {
     return !GetHgRepoRoot(path).empty();
+}
+
+
+// open a file for reading, allowing renames and deletes by other
+// processes while we have it open
+FILE* fopenReadRenameAllowed(const char* path)
+{
+    HANDLE fh = ::CreateFileA(
+      path, GENERIC_READ,
+      FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
+      0, OPEN_EXISTING, 0, 0
+    );
+
+    if (fh == INVALID_HANDLE_VALUE)
+        return 0;
+
+    // get C runtime file descriptor from file handle
+    int fd = ::_open_osfhandle((intptr_t)fh, _O_RDONLY);
+    if (fd == -1)
+    {
+        TDEBUG_TRACE("fopenReadRenameAllowed: _open_osfhandle failed");
+        return 0;
+    }
+
+    // get C runtime FILE from file descriptor
+    FILE* f = ::_fdopen(fd, "r");
+    if (f == 0)
+    {
+        TDEBUG_TRACE("fopenReadRenameAllowed: _fdopen failed");
+        return 0;
+    }
+
+    return f;
 }
 

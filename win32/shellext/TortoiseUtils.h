@@ -38,5 +38,6 @@ HICON GetTortoiseIcon(const std::string & iconname);
 std::string GetHgRepoRoot(const std::string& path);
 bool IsHgRepo(const std::string& path);
 int GetRegistryConfig(const std::string& name, std::string& res);
+FILE* fopenReadRenameAllowed(const char* path);
 
 #endif
