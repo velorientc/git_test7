@@ -1,4 +1,4 @@
-# Danish translation for tortoisehg
+﻿# Danish translation for tortoisehg
 # Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
 # This file is distributed under the same license as the tortoisehg package.
 # Peer sommerlund <peer.sommerlund@gmail.com>, 2009.
@@ -1265,7 +1265,7 @@ msgstr "TortoiseHg Dialoger (version %s), Mercurial (version %s)\n"
 
 #: hggtk\hgtk.py:583
 msgid "repository root directory or symbolic path name"
-msgstr ""
+msgstr "depotrodfolder eller symbolsk stinavn"
 
 #: hggtk\hgtk.py:584
 msgid "enable additional output"
@@ -1675,7 +1675,7 @@ msgstr ""
 
 #: hggtk\logfilter.py:82
 msgid "Search repository changelog with criteria"
-msgstr ""
+msgstr "Søg i depot-ændringslog med kriterier"
 
 #: hggtk\logfilter.py:94
 msgid "File(s):"
@@ -1793,7 +1793,7 @@ msgstr ""
 
 #: hggtk\recovery.py:54
 msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
-msgstr ""
+msgstr "Tilbagefør (fortryd) sidste transaktion til depot (pull, commit, osv)"
 
 #: hggtk\recovery.py:58
 msgid "Recover"
@@ -1809,55 +1809,55 @@ msgstr ""
 
 #: hggtk\recovery.py:65
 msgid "Validate repository consistency"
-msgstr ""
+msgstr "Kontroller konsistens af depot"
 
 #: hggtk\recovery.py:99 hggtk\synch.py:375
 msgid "Cannot close now"
-msgstr ""
+msgstr "Kan ikke lukke nu"
 
 #: hggtk\recovery.py:100 hggtk\synch.py:376
 msgid "command is running"
-msgstr ""
+msgstr "kommando kører"
 
 #: hggtk\recovery.py:119
 msgid "Confirm clean repository"
-msgstr ""
+msgstr "Bekræft tøm depot"
 
 #: hggtk\recovery.py:126
 msgid "Unable to find repo at %s\n"
-msgstr ""
+msgstr "Kan ikke finde depot på %s\n"
 
 #: hggtk\recovery.py:137
 msgid "Confirm rollback repository"
-msgstr ""
+msgstr "Bekræft tilbageførsel af depot"
 
 #: hggtk\recovery.py:159 hggtk\synch.py:513
 msgid "Cannot run now"
-msgstr ""
+msgstr "Kan ikke køre nu"
 
 #: hggtk\recovery.py:160 hggtk\synch.py:514
 msgid "Please try again after the previous command is completed"
-msgstr ""
+msgstr "Prøv igen efter den sidste kommando er færdig"
 
 #: hggtk\recovery.py:222 hggtk\synch.py:604
 msgid "[command interrupted]"
-msgstr ""
+msgstr "[kommando afbrudt]"
 
 #: hggtk\rename.py:63 hggtk\rename.py:70
 msgid "rename error"
-msgstr ""
+msgstr "fejl under omdøbning"
 
 #: hggtk\serve.py:57
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #: hggtk\serve.py:59
 msgid "Start server"
-msgstr ""
+msgstr "Start server"
 
 #: hggtk\serve.py:63
 msgid "Stop server"
-msgstr ""
+msgstr "Stop server"
 
 #: hggtk\serve.py:65
 msgid "Browse"
@@ -1865,19 +1865,19 @@ msgstr ""
 
 #: hggtk\serve.py:67
 msgid "Launch browser to view repository"
-msgstr ""
+msgstr "Start browser for at se depot"
 
 #: hggtk\serve.py:69 hggtk\synch.py:86
 msgid "Configure"
-msgstr ""
+msgstr "Konfigurer"
 
 #: hggtk\serve.py:71
 msgid "Configure web settings"
-msgstr ""
+msgstr "Konfigurer web instillinger"
 
 #: hggtk\serve.py:90
 msgid "HTTP Port:"
-msgstr ""
+msgstr "HTTP Port:"
 
 #: hggtk\serve.py:119
 msgid "Serve %s - %s"
@@ -1889,13 +1889,15 @@ msgstr ""
 
 #: hggtk\serve.py:153
 msgid "Confirm Really Exit?"
-msgstr ""
+msgstr "Bekræft exit?"
 
 #: hggtk\serve.py:154
 msgid ""
 "Server process is still running\n"
 "Exiting will stop the server."
 msgstr ""
+"Serverproces kører stadig\n"
+"Exit vil stoppe serveren."
 
 #: hggtk\serve.py:217
 msgid "Abort: %s\n"
@@ -1903,11 +1905,11 @@ msgstr ""
 
 #: hggtk\serve.py:225
 msgid "Invalid port 2048..65535"
-msgstr ""
+msgstr "Ugyldig port 2048..65535"
 
 #: hggtk\serve.py:226
 msgid "Defaulting to "
-msgstr ""
+msgstr "Falder tilbage til "
 
 #: hggtk\serve.py:306
 msgid "cannot start server: "
@@ -1919,19 +1921,19 @@ msgstr "lytter på http://%s%s/%s (%s:%d)\n"
 
 #: hggtk\serve.py:342
 msgid "name of access log file to write to"
-msgstr ""
+msgstr "navn på adgangslogfilen der skrives til"
 
 #: hggtk\serve.py:343
 msgid "run server in background"
-msgstr ""
+msgstr "kører serveren i baggrunden"
 
 #: hggtk\serve.py:344
 msgid "used internally by daemon mode"
-msgstr ""
+msgstr "brugt internt i daemon mode"
 
 #: hggtk\serve.py:345
 msgid "name of error log file to write to"
-msgstr ""
+msgstr "navn på fejlllog fil der skrives til"
 
 #: hggtk\serve.py:346
 msgid "port to use (default: 8000)"
@@ -2240,7 +2242,7 @@ msgstr ""
 
 #: hggtk\status.py:1212
 msgid "Cannot move outside repo!"
-msgstr ""
+msgstr "Kan ikke flytte udenfor depot!"
 
 #: hggtk\status.py:1219
 msgid ""
@@ -2248,14 +2250,17 @@ msgid ""
 "\n"
 "Note: only clean files can be moved."
 msgstr ""
+"Ingen flytbare filer valgt\n"
+"\n"
+"Bemærk: Kun rene filer kan flyttes."
 
 #: hggtk\status.py:1227
 msgid "Confirm Delete Unrevisioned"
-msgstr ""
+msgstr "Bekræft slet ikke-versioneret"
 
 #: hggtk\status.py:1228
 msgid "Delete the following unrevisioned files?"
-msgstr ""
+msgstr "Slet de følgende ikke-versionerede filer?"
 
 #: hggtk\status.py:1241
 msgid "Delete Errors"
@@ -2271,39 +2276,39 @@ msgstr ""
 
 #: hggtk\synch.py:59
 msgid "Display changes that can be pulled from selected repository"
-msgstr ""
+msgstr "Vis ændringer som kan trækkes ind fra valgte depot"
 
 #: hggtk\synch.py:62
 msgid "   Pull   "
-msgstr ""
+msgstr "   Træk   "
 
 #: hggtk\synch.py:64
 msgid "Pull changes from selected repository"
-msgstr ""
+msgstr "Træk ændringer ind fra valgte depot"
 
 #: hggtk\synch.py:68
 msgid "Outgoing"
-msgstr ""
+msgstr "Udgående"
 
 #: hggtk\synch.py:70
 msgid "Display local changes that will be  pushed to selected repository"
-msgstr ""
+msgstr "Vis lokale ændringer som bliver skubbet til valgte depot"
 
 #: hggtk\synch.py:73
 msgid "Push"
-msgstr ""
+msgstr "Skub"
 
 #: hggtk\synch.py:75
 msgid "Push local changes to selected repository"
-msgstr ""
+msgstr "Skub lokale ændringer til valgte depot"
 
 #: hggtk\synch.py:78 hggtk\thgconfig.py:456
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: hggtk\synch.py:80
 msgid "Email local outgoing changes to one or more recipients"
-msgstr ""
+msgstr "Email lokale ændringer til en eller flere modtagere"
 
 #: hggtk\synch.py:88
 msgid "Configure peer repository paths"
