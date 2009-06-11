@@ -186,10 +186,11 @@ class ChangeSet(gdialog.GDialog):
         eob = buf.get_end_iter()
         offset = eob.get_offset()
 
-        fctx = self.repo[rev].filectx(wfile)
-        if not fctx:
-            return
-        if fctx.size() > getmaxdiffsize(self.ui):
+        try:
+            fctx = self.repo[rev].filectx(wfile)
+        except LookupError:
+            fctx = None
+        if fctx and fctx.size() > getmaxdiffsize(self.ui):
             lines = ['diff',
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
