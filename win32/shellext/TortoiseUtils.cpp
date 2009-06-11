@@ -265,6 +265,7 @@ FILE* fopenReadRenameAllowed(const char* path)
     if (fd == -1)
     {
         TDEBUG_TRACE("fopenReadRenameAllowed: _open_osfhandle failed");
+        ::CloseHandle(fh);
         return 0;
     }
 
@@ -273,6 +274,7 @@ FILE* fopenReadRenameAllowed(const char* path)
     if (f == 0)
     {
         TDEBUG_TRACE("fopenReadRenameAllowed: _fdopen failed");
+        ::_close(fd);
         return 0;
     }
 
