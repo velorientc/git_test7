@@ -242,8 +242,8 @@ def update_batch(batch):
                 shlib.update_thgstatus(_ui, r, wait=False)
                 shlib.shell_notify([r])
                 logger.msg('Updated ' + r)
-            except IOError:
-                print "IOError on updating %s (check permissions)" % r
+            except (IOError, OSError):
+                print "IOError or OSError on updating %s (check permissions)" % r
                 logger.msg('Failed updating %s (check permissions)' % r)
                 failedroots.add(r)
         notifypaths -= failedroots
