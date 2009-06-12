@@ -14,7 +14,7 @@ typedef struct {
 } MenuDescription;
 
 MenuDescription menuDescList[] = { 
-    {"commit",      "HG Commit...",
+    {"commit",      "Commit...",
                     "Commit changes in repository",
                     "menucommit.ico", 0},
     {"init",        "Create Repository Here",
@@ -230,7 +230,7 @@ void InsertSubMenuItemWithIcon(HMENU hMenu, HMENU hSubMenu, UINT indexMenu, UINT
 }
 
 void InsertMenuItemByName(HMENU hMenu, const std::string& name, UINT indexMenu,
-        UINT idCmd, UINT idCmdFirst)
+        UINT idCmd, UINT idCmdFirst, const std::string& prefix)
 {
     TDEBUG_TRACE("InsertMenuItemByName: name = " << name);
     MenuDescriptionMap::iterator iter = MenuDescMap.find(name);
@@ -242,7 +242,7 @@ void InsertMenuItemByName(HMENU hMenu, const std::string& name, UINT indexMenu,
 
     MenuDescription md = iter->second;
     AddMenuList(idCmd - idCmdFirst, name);
-    InsertMenuItemWithIcon(hMenu, indexMenu, idCmd, md.menuText, md.iconName);
+    InsertMenuItemWithIcon(hMenu, indexMenu, idCmd, prefix + md.menuText, md.iconName);
 }
 
 //	IContextMenu
@@ -335,7 +335,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     {
         UINT idx = (UINT) *walk;
         if( promoted[idx] )
-            InsertMenuItemByName(hMenu, menuDescList[idx].name, indexMenu++, idCmd++, idCmdFirst);
+            InsertMenuItemByName(hMenu, menuDescList[idx].name, indexMenu++, idCmd++, idCmdFirst, "HG ");
     }
 
     HMENU hSubMenu = CreatePopupMenu();
@@ -350,7 +350,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
             {
                 UINT idx = (UINT) *walk;
                 if( !promoted[idx] )
-                    InsertMenuItemByName(hSubMenu, menuDescList[idx].name, indexSubMenu++, idCmd++, idCmdFirst);
+                    InsertMenuItemByName(hSubMenu, menuDescList[idx].name, indexSubMenu++, idCmd++, idCmdFirst, "");
             }
         }
     }
