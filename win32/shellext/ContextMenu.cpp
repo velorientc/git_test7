@@ -342,15 +342,25 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     if (hSubMenu)
     {
         UINT indexSubMenu = 0;
+        bool isSeparator = true ;
         for( walk = entries ; *walk != EndOfList ; walk++ )
         {
-            if( *walk == Separator )
-                InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
+            if( *walk == Separator)
+            {
+                if (!isSeparator)
+                {
+                    InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
+                    isSeparator = true ;
+                }
+            }
             else
             {
                 UINT idx = (UINT) *walk;
                 if( !promoted[idx] )
+                {
                     InsertMenuItemByName(hSubMenu, menuDescList[idx].name, indexSubMenu++, idCmd++, idCmdFirst, "");
+                    isSeparator = false ;
+                }
             }
         }
     }
