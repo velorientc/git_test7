@@ -363,6 +363,8 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
                 }
             }
         }
+        if (isSeparator && indexSubMenu>0)
+            RemoveMenu(hSubMenu, indexSubMenu-1, MF_BYPOSITION) ;
     }
 
     TDEBUG_TRACE("  CShellExt::QueryContextMenu: adding main THG menu");
