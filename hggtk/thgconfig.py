@@ -280,18 +280,12 @@ class PathEditDialog(gtk.Dialog):
 
     def sethandlers(self, enable=True):
         for n, (e, l, h) in self.entries.iteritems():
-            if n == 'URL':
-                if enable:
-                    self.entries[n][2] = e.connect('changed', self.changedurl)
-                else:
-                    if e.handler_is_connected(h):
-                        e.disconnect(h)
+            if enable:
+                handler = self.changedurl if n == 'URL' else self.changed
+                self.entries[n][2] = e.connect('changed', handler)
             else:
-                if enable:
-                    self.entries[n][2] = e.connect('changed', self.changed)
-                else:
-                    if e.handler_is_connected(h):
-                        e.disconnect(h)
+                if e.handler_is_connected(h):
+                    e.disconnect(h)
 
     def urlparse(self, path):
         if path.startswith('ssh://'):
