@@ -154,7 +154,7 @@ class CloneDialog(gtk.Window):
         hbbox.set_layout(gtk.BUTTONBOX_END)
         vbox.pack_start(hbbox, False, False, 2)
 
-        close = gtk.Button(_('Close'))
+        close = gtk.Button(_('Cancel'))
         close.connect('clicked', lambda x: self.destroy())
         key, modifier = gtk.accelerator_parse('Escape')
         close.add_accelerator('clicked', accelgroup, key, 0,
