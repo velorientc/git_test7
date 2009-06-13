@@ -112,6 +112,7 @@ class GShelve(GStatus):
     def reload_status(self):
         if not self.ready: return False
         success = GStatus.reload_status(self)
+        self.activate_shelve_buttons(True)
         return success
 
     ### End of overridable methods ###
@@ -121,7 +122,7 @@ class GShelve(GStatus):
 
     def activate_shelve_buttons(self, status):
         if status:
-            self.shelve_btn.set_sensitive(True)
+            self.shelve_btn.set_sensitive(len(self.filemodel) > 0)
             self.unshelve_btn.set_sensitive(self.has_shelve_file())
         else:
             self.shelve_btn.set_sensitive(False)
