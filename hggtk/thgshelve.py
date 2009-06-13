@@ -128,6 +128,11 @@ class GShelve(GStatus):
             self.unshelve_btn.set_sensitive(False)
 
     def shelve_selected(self, file=None):
+        if len(self.filemodel) < 1:
+            gdialog.Prompt(_('Shelve'),
+                    _('No changes to shelve'), self).run()
+            return
+
         wfiles = file and [file] or self.relevant_files('MAR')
         if not wfiles:
             gdialog.Prompt(_('Shelve'),
