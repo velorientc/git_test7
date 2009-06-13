@@ -300,9 +300,9 @@ class SynchDialog(gtk.Window):
             self.viewpulled.show()
 
         wc = repo[None]
-        branchhead = repo.branchtags()[wc.branch()]
+        branchhead = repo.branchtags().get(wc.branch())
         parents = repo.parents()
-        if len(parents) > 1 or parents[0].node() == branchhead:
+        if len(parents) > 1 or parents[0].node() == branchhead or not branchhead:
             self.updatetip.hide()
         else:
             self.buttonhbox.show()
