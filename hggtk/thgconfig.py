@@ -284,12 +284,14 @@ class PathEditDialog(gtk.Dialog):
                 if enable:
                     self.entries[n][2] = e.connect('changed', self.changedurl)
                 else:
-                    e.disconnect(h)
+                    if e.handler_is_connected(h):
+                        e.disconnect(h)
             else:
                 if enable:
                     self.entries[n][2] = e.connect('changed', self.changed)
                 else:
-                    e.disconnect(h)
+                    if e.handler_is_connected(h):
+                        e.disconnect(h)
 
     def urlparse(self, path):
         if path.startswith('ssh://'):
