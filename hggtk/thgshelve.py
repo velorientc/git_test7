@@ -156,7 +156,7 @@ class GShelve(GStatus):
         def filter_patch(ui, chunks):
             accepted = []
             for chunk in chunks:
-                file = util.pconvert(chunk.filename())
+                file = util.localpath(chunk.filename())
                 if file not in wfiles:
                     # file was not selected for inclusion
                     continue
