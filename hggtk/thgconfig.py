@@ -470,7 +470,7 @@ class ConfigDialog(gtk.Dialog):
         self.log_frame = self.add_page(notebook, _('Changelog'))
         self.fill_frame(self.log_frame, _log_info)
 
-        self.paths_frame = self.add_page(notebook, _('Synch'))
+        self.paths_frame = self.add_page(notebook, _('Sync'))
         vbox = self.fill_frame(self.paths_frame, _paths_info)
         self.fill_path_frame(vbox)
 
