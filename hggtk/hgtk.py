@@ -552,7 +552,7 @@ def version(ui, **opts):
     """output version and copyright information"""
     ui.write(_('TortoiseHg Dialogs (version %s), '
                'Mercurial (version %s)\n') %
-               (thgversion.version(), hglib.hgversion))
+               (hglib.fromutf(thgversion.version()), hglib.hgversion))
     if not ui.quiet:
         ui.write(shortlicense)
 
