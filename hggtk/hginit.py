@@ -41,21 +41,20 @@ class InitDialog(gtk.Window):
         vbox = gtk.VBox()
         self.add(vbox)
 
-        # clone source
+        # init destination
         srcbox = gtk.HBox()
-        lbl = gtk.Label(_(' Destination :'))
-        lbl.set_property('width-chars', 12)
-        lbl.set_alignment(0, 0.5)
+        lbl = gtk.Label(_('Destination:'))
+        srcbox.pack_start(lbl, False, False, 2)
+
         self._dest_input = gtk.Entry()
         self._dest_input.set_text(hglib.toutf(self._dest_path))
+        srcbox.pack_start(self._dest_input, True, True)
 
         self._btn_dest_browse = gtk.Button("...")
         self._btn_dest_browse.connect('clicked', self._btn_dest_clicked)
-        srcbox.pack_start(lbl, False, False)
-        srcbox.pack_start(self._dest_input, True, True)
         srcbox.pack_end(self._btn_dest_browse, False, False, 5)
-        vbox.pack_start(srcbox, False, False, 2)
 
+        vbox.pack_start(srcbox, False, False, 2)
         self._dest_input.grab_focus()
         self._dest_input.set_position(-1)
 
