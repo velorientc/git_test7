@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "POT-Creation-Date: 2009-06-05 14:45+0000\n"
-"PO-Revision-Date: 2009-06-07 10:07+0100\n"
+"PO-Revision-Date: 2009-06-14 07:20+0100\n"
 "Last-Translator: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: hggtk\about.py:52
 msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr ""
+msgstr "Adskillige ikoner stammer fra TortoiseSVN projektet"
 
 #: hggtk\backout.py:24
 msgid "Backout changeset - "
@@ -27,7 +27,7 @@ msgstr "Omgør ændring - "
 
 #: hggtk\backout.py:37
 msgid "Changeset Description"
-msgstr ""
+msgstr "Ændringsbeskrivelse"
 
 #: hggtk\backout.py:50
 msgid "Backed out changeset: "
@@ -72,15 +72,15 @@ msgstr "** Mercurial version (%s).  TortoiseHg version (%s)\n"
 
 #: hggtk\bugreport.py:53
 msgid "** Command: %s\n"
-msgstr ""
+msgstr "** Kommando: %s\n"
 
 #: hggtk\bugreport.py:54
 msgid "** CWD: %s\n"
-msgstr ""
+msgstr "** Arbejdskatalog: %s\n"
 
 #: hggtk\bugreport.py:56
 msgid "** Extensions loaded: %s\n"
-msgstr ""
+msgstr "** Mercurial udviddelser: %s\n"
 
 #: hggtk\changeset.py:39
 msgid "_Other parent"
@@ -88,7 +88,7 @@ msgstr ""
 
 #: hggtk\changeset.py:40
 msgid "diff other parent"
-msgstr ""
+msgstr "forskel til anden forælder"
 
 #: hggtk\changeset.py:104
 msgid "[All Files]"
@@ -96,11 +96,11 @@ msgstr "[Alle Filer]"
 
 #: hggtk\changeset.py:145
 msgid "changeset:"
-msgstr ""
+msgstr "ændring:"
 
 #: hggtk\changeset.py:147
 msgid "branch:"
-msgstr ""
+msgstr "gren:"
 
 #: hggtk\changeset.py:148
 msgid "user/date:"
@@ -108,11 +108,11 @@ msgstr "bruger/dato:"
 
 #: hggtk\changeset.py:156
 msgid "parent:"
-msgstr ""
+msgstr "forælder:"
 
 #: hggtk\changeset.py:169
 msgid "child:"
-msgstr ""
+msgstr "barn:"
 
 #: hggtk\changeset.py:175
 msgid "tags:"
@@ -120,7 +120,7 @@ msgstr "mærker:"
 
 #: hggtk\changeset.py:194
 msgid " %s is larger than the specified max diff size"
-msgstr ""
+msgstr " %s er større end den specificerede max diff size"
 
 #: hggtk\changeset.py:289
 msgid "_visual diff"
@@ -200,7 +200,7 @@ msgstr "undlad at opdatere det nye arbejdskatalog"
 
 #: hggtk\clone.py:127
 msgid "use pull protocol to copy metadata"
-msgstr ""
+msgstr "brug træk-protokol til at kopiere metadata"
 
 #: hggtk\clone.py:128
 msgid "use uncompressed transfer"
@@ -212,11 +212,11 @@ msgstr "brug proxy server"
 
 #: hggtk\clone.py:142
 msgid "Remote Cmd:"
-msgstr ""
+msgstr "Fjernkommando:"
 
 #: hggtk\clone.py:164
 msgid "Clone"
-msgstr ""
+msgstr "Klon"
 
 #: hggtk\clone.py:240
 msgid "Source path is empty"
@@ -236,11 +236,11 @@ msgstr "Vælg et andet mål"
 
 #: hggtk\clone.py:292
 msgid "Clone aborted"
-msgstr ""
+msgstr "Klon aborteret"
 
 #: hggtk\clone.py:295
 msgid "Clone error"
-msgstr ""
+msgstr "Fejl under kloning"
 
 #: hggtk\commit.py:32
 msgid "Branch Operations"
@@ -248,7 +248,7 @@ msgstr ""
 
 #: hggtk\commit.py:36
 msgid "Changes take effect on next commit"
-msgstr ""
+msgstr "Ændringer vil være effektive fra næste integration"
 
 #: hggtk\commit.py:37
 msgid "No branch changes"
@@ -273,11 +273,11 @@ msgstr "fortryd sidste integration"
 #: hggtk\commit.py:155 hggtk\commit.py:363 hggtk\commit.py:372
 #: hggtk\commit.py:380 hggtk\commit.py:381
 msgid "_Commit"
-msgstr ""
+msgstr "_Integrer"
 
 #: hggtk\commit.py:156 hggtk\commit.py:382
 msgid "commit"
-msgstr ""
+msgstr "integrér"
 
 #: hggtk\commit.py:168
 msgid "Confirm Discard Message"
@@ -294,7 +294,7 @@ msgstr "Seneste integrationsbeskedder..."
 #: hggtk\commit.py:268 hggtk\commit.py:269 hggtk\commit.py:270
 #: hggtk\commit.py:273
 msgid "_commit"
-msgstr ""
+msgstr "_integrér"
 
 #: hggtk\commit.py:291
 msgid "Confirm Exit"
@@ -351,7 +351,7 @@ msgstr "Intet integreret"
 
 #: hggtk\commit.py:406
 msgid "No committable files selected"
-msgstr ""
+msgstr "Ingen integrerbare filer valgt"
 
 #: hggtk\commit.py:424 hggtk\commit.py:473 hggtk\merge.py:83
 #: hggtk\thgconfig.py:440
@@ -368,7 +368,7 @@ msgstr ""
 
 #: hggtk\commit.py:513
 msgid "Confirm Undo commit"
-msgstr ""
+msgstr "Bekræft fortryd integration"
 
 #: hggtk\commit.py:514
 msgid "Undo last commit"
@@ -410,11 +410,11 @@ msgstr "Fejl"
 
 #: hggtk\commit.py:562
 msgid "Message format configuration error"
-msgstr ""
+msgstr "Fejl i konfiguration af beskedformat"
 
 #: hggtk\commit.py:571 hggtk\commit.py:579 hggtk\commit.py:591
 msgid "Confirm Commit"
-msgstr ""
+msgstr "Bekræft integration"
 
 #: hggtk\commit.py:572
 msgid ""
@@ -422,6 +422,9 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"Opsummeringsliniens længde %i er større end %i.\n"
+"\n"
+"Ignorer formateringspolitik og fortsæt integration?"
 
 #: hggtk\commit.py:580
 msgid ""
@@ -429,6 +432,9 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"Opsummeringslinien er ikke fulgt af en tom linie.\n"
+"\n"
+"Ignorer formateringspolitik og fortsæt integration?"
 
 #: hggtk\commit.py:592
 msgid ""
@@ -436,6 +442,9 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"De følgende linier er over %i-tegnsgrænsen: %s.\n"
+"\n"
+"Ignorer formateringspolitik og fortsæt integration?"
 
 #: hggtk\commit.py:606
 msgid "Commit: Invalid username"
@@ -453,21 +462,23 @@ msgstr ""
 
 #: hggtk\commit.py:629
 msgid "Confirm Override Branch"
-msgstr ""
+msgstr "Bekræft dobbelt gren"
 
 #: hggtk\commit.py:630
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
 msgstr ""
+"Der findes allerede en gren ved navn \"%s\",\n"
+"tilføj nyt gren-hoved?"
 
 #: hggtk\commit.py:635
 msgid "Confirm New Branch"
-msgstr ""
+msgstr "Bekræft ny gren"
 
 #: hggtk\commit.py:636
 msgid "Create new named branch \"%s\"?"
-msgstr ""
+msgstr "Opret en ny gren ved navn \"%s\"?"
 
 #: hggtk\commit.py:706
 msgid "Paste _Filenames"
@@ -475,20 +486,20 @@ msgstr "Indsæt _Filnavne"
 
 #: hggtk\commit.py:707
 msgid "App_ly Format"
-msgstr ""
+msgstr "_Anvend Format"
 
 #: hggtk\commit.py:708
 msgid "C_onfigure Format"
-msgstr ""
+msgstr "_Konfigurer Format"
 
 #: hggtk\commit.py:734 hggtk\hgemail.py:307 hggtk\hgemail.py:312
 #: hggtk\hgemail.py:321
 msgid "Info required"
-msgstr ""
+msgstr "Info påkrævet"
 
 #: hggtk\commit.py:735
 msgid "Message format needs to be configured"
-msgstr ""
+msgstr "Beskedformat skal konfigureres"
 
 #: hggtk\commit.py:747 hggtk\commit.py:752
 msgid "Warning"
@@ -2592,6 +2603,9 @@ msgid ""
 "changelog, status, and commit windows. A value of zero implies no limit.  "
 "Default: 1024 (1MB)"
 msgstr ""
+"Den maksimale størrelse (i KB) hvor TortoiseHg viser ændringer i "
+"changelog-, status- og integrér-vinduerne. En værdi på betyder ingen grænse.  "
+"Default: 1024 (1MB)"
 
 #: hggtk\thgconfig.py:53
 msgid "Bottom Diffs"
@@ -2605,7 +2619,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:63
 msgid "Username"
-msgstr ""
+msgstr "Brugernavn"
 
 #: hggtk\thgconfig.py:64
 msgid "Name associated with commits"
@@ -2620,10 +2634,12 @@ msgid ""
 "Select commit tool launched by TortoiseHg. (Qct is no longer distributed as "
 "part of TortoiseHG.) Default: None (use the builtin tool)"
 msgstr ""
+"Vælg integrationsværktøj for TortoiseHg. (Qct bliver ikke længere distribueret "
+"som del af TortoiseHG.) Default: Ingen (brug det indbyggede værktøj)"
 
 #: hggtk\thgconfig.py:69
 msgid "Summary Line Length"
-msgstr ""
+msgstr "Længde af opsummeringslinie"
 
 #: hggtk\thgconfig.py:70
 msgid ""
@@ -2631,10 +2647,13 @@ msgid ""
 "issue a warning if the summary line is too long or not separated by a blank "
 "line. Default: 0 (unenforced)"
 msgstr ""
+"Maximal længde af opsummeringslinien i integrationsbeskeden. Hvis sat vil "
+"TortoiseHg advare hvis opsumeringslinien bliver for lang eller ikke fulgt af "
+"en tom linie. Default: 0 (deaktiveret)"
 
 #: hggtk\thgconfig.py:74
 msgid "Message Line Length"
-msgstr ""
+msgstr "Linielængde for integrationsbesked"
 
 #: hggtk\thgconfig.py:75
 msgid ""
@@ -2642,10 +2661,13 @@ msgid ""
 "to format the message and a warning will be issued if any lines are too long "
 "at commit.  Default: 0 (unenforced)"
 msgstr ""
+"Linieombrydningspunk for integrationsbeskeden. Hvis sat kan popupmenuen bruges "
+"til at formatere beskeden og en advarsel vises hvis nogen linier er for lange på "
+"integrationstidspunktet.  Default: 0 (deaktiveret)"
 
 #: hggtk\thgconfig.py:82
 msgid "Author Coloring"
-msgstr ""
+msgstr "Forfatterfarver"
 
 #: hggtk\thgconfig.py:83
 msgid ""
@@ -2653,6 +2675,9 @@ msgid ""
 "green for merge, red for non-trivial parents, black for normal. Default: "
 "False"
 msgstr ""
+"Farvelæg ændringer ud fra forfatternavn. Hvis ikke aktiveret vil ændringer blive "
+"farvet grøn for flet, rød for ikke-trivielle forældre og sort for normal. Default: "
+"Falsk"
 
 #: hggtk\thgconfig.py:87
 msgid "Long Summary"
@@ -2697,7 +2722,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:108
 msgid "Name"
-msgstr ""
+msgstr "Navn"
 
 #: hggtk\thgconfig.py:109
 msgid ""
@@ -2707,23 +2732,23 @@ msgstr ""
 
 #: hggtk\thgconfig.py:111 hggtk\thgconfig.py:782 hggtk\thgconfig.py:868
 msgid "Description"
-msgstr ""
+msgstr "Beskrivelse"
 
 #: hggtk\thgconfig.py:112
 msgid "Textual description of the repository's purpose or contents."
-msgstr ""
+msgstr "Tekstuel beskrivelse af depotets anvendelse eller indhold."
 
 #: hggtk\thgconfig.py:114
 msgid "Contact"
-msgstr ""
+msgstr "Kontakt"
 
 #: hggtk\thgconfig.py:115
 msgid "Name or email address of the person in charge of the repository."
-msgstr ""
+msgstr "Navn eller email på den ansvarlige for depotet."
 
 #: hggtk\thgconfig.py:117
 msgid "Style"
-msgstr ""
+msgstr "Stil"
 
 #: hggtk\thgconfig.py:119
 msgid "Which template map style to use"
@@ -3331,27 +3356,27 @@ msgstr ""
 
 #: thgutil\menuthg.py:223
 msgid "HG Commit..."
-msgstr ""
+msgstr "HG Integrér..."
 
 #: thgutil\menuthg.py:224
 msgid "Commit changes in repository"
-msgstr ""
+msgstr "Integrér ændringer i depot"
 
 #: thgutil\menuthg.py:228
 msgid "Edit Ignore Filter"
-msgstr ""
+msgstr "Rediger generelt ignorerfilter"
 
 #: thgutil\menuthg.py:229
 msgid "Edit repository ignore filter"
-msgstr ""
+msgstr "Rediger depotets ignorerfilter"
 
 #: thgutil\menuthg.py:233
 msgid "View File Status"
-msgstr ""
+msgstr "Vis filstatus"
 
 #: thgutil\menuthg.py:234
 msgid "Repository status"
-msgstr ""
+msgstr "Depotstatus"
 
 #: thgutil\menuthg.py:238
 msgid "Shelve Changes"
@@ -3399,7 +3424,7 @@ msgstr ""
 
 #: thgutil\menuthg.py:264
 msgid "Remove selected files on the next commit"
-msgstr ""
+msgstr "Fjern valgte filer ved næste integration"
 
 #: thgutil\menuthg.py:267
 msgid "Revert Changes"
