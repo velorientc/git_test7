@@ -67,32 +67,35 @@ class GLog(gdialog.GDialog):
                 gtk.SeparatorToolItem()
              ] + self.changeview.get_tbbuttons()
         if not self.opts.get('from-synch'):
-            tbar += [
-                gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_NETWORK,
+            self.synctb = self.make_toolbutton(gtk.STOCK_NETWORK,
                                  _('Synchronize'),
                                  self.synch_clicked,
-                                 tip=_('Launch synchronize tool')),
-                    ]
+                                 tip=_('Launch synchronize tool'))
+            tbar += [gtk.SeparatorToolItem(), self.synctb]
         return tbar
 
     def synch_clicked(self, toolbutton, data):
+        def sync_closed(dialog):
+            self.synctb.set_sensitive(True)
+
+        def synch_callback(parents):
+            self.repo.invalidate()
+            newparents = [x.node() for x in self.repo.parents()]
+            if len(self.repo) != self.origtip:
+                if self.newbutton.get_active():
+                    self.reload_log()
+                else:
+                    self.newbutton.set_active(True)
+            elif not parents == newparents:
+                self.refresh_model()
+
         from hggtk import synch
         parents = [x.node() for x in self.repo.parents()]
         dlg = synch.SynchDialog([], False, True)
-        dlg.set_notify_func(self.synch_complete, parents)
+        dlg.set_notify_func(synch_callback, parents)
+        dlg.connect('destroy', sync_closed)
         dlg.show_all()
-
-    def synch_complete(self, parents):
-        self.repo.invalidate()
-        newparents = [x.node() for x in self.repo.parents()]
-        if len(self.repo) != self.origtip:
-            if self.newbutton.get_active():
-                self.reload_log()
-            else:
-                self.newbutton.set_active(True)
-        elif not parents == newparents:
-            self.refresh_model()
+        self.synctb.set_sensitive(False)
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
