@@ -83,10 +83,19 @@ class InitDialog(gtk.Window):
 
         close = gtk.Button(_('Close'))
         close.connect('clicked', lambda x: self.destroy())
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        key, modifier = gtk.accelerator_parse('Escape')
+        close.add_accelerator('clicked', accelgroup, key, 0,
+                gtk.ACCEL_VISIBLE)
         hbbox.add(close)
 
         create = gtk.Button(_('Create'))
         create.connect('clicked', self._btn_init_clicked)
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'Return')
+        create.add_accelerator('clicked', accelgroup, key, modifier,
+                gtk.ACCEL_VISIBLE)
         hbbox.add(create)
 
     def _btn_dest_clicked(self, button):
