@@ -17,6 +17,7 @@ import win32event
 import win32file
 import winerror
 import pywintypes
+import win32security
 
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
@@ -420,7 +421,17 @@ class PipeServer:
         # Clean up when we exit
         self.SvcStop()
 
+MUTEXNAME = 'thgtaskbar'
+
 def main():
+    sa = win32security.SECURITY_ATTRIBUTES() 
+    sa.SetSecurityDescriptorDacl (1, None, 0) # allow full access
+    mutex1 = win32event.CreateMutex(sa, 1, MUTEXNAME)
+    if GetLastError() == winerror.ERROR_ALREADY_EXISTS:
+        print "another instance is already running"
+        return
+    # see http://www.jrsoftware.org/iskb.php?mutexsessions
+    mutex2 = win32event.CreateMutex(sa, 1, 'Global\\' + MUTEXNAME)
     w=MainWindow()
     PumpMessages()
 
