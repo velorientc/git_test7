@@ -134,11 +134,11 @@ class InitDialog(gtk.Window):
             hg.repository(u, dest, create=1)
         except hglib.RepoError, inst:
             dialog.error_dialog(self, _('Unable to create new repository'),
-                    str(inst))
+                    hglib.toutf(str(inst)))
             return False
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error when creating repository'),
-                    str(inst))
+                    hglib.toutf(str(inst)))
             return False
         except:
             import traceback
