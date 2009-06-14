@@ -36,6 +36,7 @@ class InitDialog(gtk.Window):
 
     def _create(self):
         self.set_default_size(350, 130)
+        self.set_title(_('Create a new repository'))
 
         vbox = gtk.VBox()
         self.add(vbox)
