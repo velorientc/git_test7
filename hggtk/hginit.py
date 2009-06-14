@@ -33,29 +33,12 @@ class InitDialog(gtk.Window):
         # build dialog
         self._create()
 
+
     def _create(self):
-        self.set_default_size(350, 150)
+        self.set_default_size(350, 130)
 
-        # add toolbar with tooltips
-        self.tbar = gtk.Toolbar()
-        self.tips = gtk.Tooltips()
-
-        self._btn_init = self._toolbutton(
-                gtk.STOCK_NEW,
-                _('Create'),
-                self._btn_init_clicked,
-                tip=_('Create a new repository in destination directory'))
-        tbuttons = [
-                self._btn_init,
-            ]
-        for btn in tbuttons:
-            self.tbar.insert(btn, -1)
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
         vbox = gtk.VBox()
         self.add(vbox)
-        vbox.pack_start(self.tbar, False, False, 2)
 
         # clone source
         srcbox = gtk.HBox()
@@ -64,7 +47,6 @@ class InitDialog(gtk.Window):
         lbl.set_alignment(0, 0.5)
         self._dest_input = gtk.Entry()
         self._dest_input.set_text(hglib.toutf(self._dest_path))
-        self._dest_input.set_position(-1)
 
         self._btn_dest_browse = gtk.Button("...")
         self._btn_dest_browse.connect('clicked', self._btn_dest_clicked)
@@ -72,6 +54,9 @@ class InitDialog(gtk.Window):
         srcbox.pack_start(self._dest_input, True, True)
         srcbox.pack_end(self._btn_dest_browse, False, False, 5)
         vbox.pack_start(srcbox, False, False, 2)
+
+        self._dest_input.grab_focus()
+        self._dest_input.set_position(-1)
 
         # options
         option_box = gtk.VBox()
@@ -91,19 +76,18 @@ class InitDialog(gtk.Window):
         except:
             pass
 
-    def _toolbutton(self, stock, label, handler,
-                    menu=None, userdata=None, tip=None):
-        if menu:
-            tbutton = gtk.MenuToolButton(stock)
-            tbutton.set_menu(menu)
-        else:
-            tbutton = gtk.ToolButton(stock)
+        # buttons at bottom
+        hbbox = gtk.HButtonBox()
+        hbbox.set_layout(gtk.BUTTONBOX_END)
+        vbox.pack_start(hbbox, False, False, 2)
 
-        tbutton.set_label(label)
-        if tip:
-            tbutton.set_tooltip(self.tips, tip)
-        tbutton.connect('clicked', handler, userdata)
-        return tbutton
+        close = gtk.Button(_('Close'))
+        close.connect('clicked', lambda x: self.destroy())
+        hbbox.add(close)
+
+        create = gtk.Button(_('Create'))
+        create.connect('clicked', self._btn_init_clicked)
+        hbbox.add(create)
 
     def _btn_dest_clicked(self, button):
         """ select source folder to clone """
