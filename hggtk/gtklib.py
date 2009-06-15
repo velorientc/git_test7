@@ -278,7 +278,7 @@ class NativeFolderSelectDialog:
                                BrowseCallbackProc, # callback function
                                self.initial)       # 'data' param for the callback
             if pidl:
-                fname = shell.SHGetPathFromIDList(pidl)
+                fname = hglib.toutf(shell.SHGetPathFromIDList(pidl))
         except (pywintypes.error, pywintypes.com_error):
             pass
         return fname
