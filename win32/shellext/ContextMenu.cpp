@@ -149,6 +149,7 @@ void GetCMenuTranslation(
     if (rv == ERROR_SUCCESS)
         menuText = reinterpret_cast<const char*>(&Data);
 
+    cbData = MAX_PATH * sizeof(BYTE);
     rv = RegQueryValueExA(hkey, "helpText", 0, 0, Data, &cbData);
     if (rv == ERROR_SUCCESS)
         helpText = reinterpret_cast<const char*>(&Data);
