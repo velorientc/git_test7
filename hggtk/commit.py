@@ -522,7 +522,9 @@ class GCommit(GStatus):
             return
 
         try:
+            self.repo.ui.quiet = True
             self.repo.rollback()
+            self.repo.ui.quiet = False
             self.last_commit_id = None
             self.reload_status()
         except:
