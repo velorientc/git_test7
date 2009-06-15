@@ -414,7 +414,7 @@ CShellExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved,
 	*pszName = 0;
 	char *psz;
 
-    TDEBUG_TRACE("CShellExt::GetCommandString: idCmd = " << idCmd);
+    TDEBUG_TRACE("CShellExt::GetCommandString: idCmd = " << idCmd << ", uFlags = " << uFlags);
     MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter != MenuIdMap.end())
     {
@@ -427,7 +427,14 @@ CShellExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved,
         psz = "";
     }
 
-	wcscpy((wchar_t*)pszName, _WCSTR(psz));
+    if (uFlags & GCS_UNICODE)
+    {
+        wcscpy_s((wchar_t*)pszName, cchMax, _WCSTR(psz));
+    }
+    else
+    {
+        strcpy_s((char*)pszName, cchMax, psz);
+    }
     return NOERROR;
 }
 
