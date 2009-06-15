@@ -1036,6 +1036,7 @@ class GStatus(gdialog.GDialog):
             fr[FM_PARTIAL_SELECTED] = partial
         if fr[FM_CHECKED] != newvalue:
             fr[FM_CHECKED] = newvalue
+            chunks[0].active = newvalue
             self.update_check_count()
         self.update_diff_header(dmodel, wfile, newvalue)
 
