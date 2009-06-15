@@ -429,11 +429,11 @@ CShellExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved,
 
     if (uFlags & GCS_UNICODE)
     {
-        wcscpy_s((wchar_t*)pszName, cchMax, _WCSTR(psz));
+        wcscpy((wchar_t*)pszName, _WCSTR(psz));
     }
     else
     {
-        strcpy_s((char*)pszName, cchMax, psz);
+        strcpy((char*)pszName, psz);
     }
     return NOERROR;
 }
