@@ -421,17 +421,19 @@ class PipeServer:
         # Clean up when we exit
         self.SvcStop()
 
-MUTEXNAME = 'thgtaskbar'
+INSTALLMUTEXNAME = 'thgtaskbar'
+RUNMUTEXNAME = 'thgtaskbar-' + GetUserName()
 
 def main():
     sa = win32security.SECURITY_ATTRIBUTES() 
-    sa.SetSecurityDescriptorDacl (1, None, 0) # allow full access
-    mutex1 = win32event.CreateMutex(sa, 1, MUTEXNAME)
+    sa.SetSecurityDescriptorDacl(1, None, 0) # allow full access
+    runmutex = win32event.CreateMutex(sa, 1, RUNMUTEXNAME)
     if GetLastError() == winerror.ERROR_ALREADY_EXISTS:
         print "another instance is already running"
         return
     # see http://www.jrsoftware.org/iskb.php?mutexsessions
-    mutex2 = win32event.CreateMutex(sa, 1, 'Global\\' + MUTEXNAME)
+    installmutex1 = win32event.CreateMutex(sa, 1, INSTALLMUTEXNAME)
+    installmutex2 = win32event.CreateMutex(sa, 1, 'Global\\' + INSTALLMUTEXNAME)
     w=MainWindow()
     PumpMessages()
 
