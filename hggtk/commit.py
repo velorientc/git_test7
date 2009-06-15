@@ -13,6 +13,7 @@ import gobject
 import pango
 import tempfile
 import cStringIO
+import time
 
 from mercurial import ui, hg, util, patch
 
@@ -527,6 +528,8 @@ class GCommit(GStatus):
             self.repo.ui.quiet = False
             self.last_commit_id = None
             self.reload_status()
+            time.sleep(0.5)     # give fs some time to pick up changes
+            shlib.shell_notify([os.getcwd()])
         except:
             gdialog.Prompt(_('Undo commit'),
                     _('Errors during rollback!'), self).run()
