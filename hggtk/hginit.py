@@ -100,17 +100,12 @@ class InitDialog(gtk.Window):
 
     def _btn_dest_clicked(self, button):
         """ select source folder to clone """
-        dlg = gtk.FileChooserDialog(title=None,
-                action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-        dlg.set_default_response(gtk.RESPONSE_OK)
-        dlg.set_current_folder(self.cwd)
-        response = dlg.run()
-        if response == gtk.RESPONSE_OK:
-            self._dest_input.set_text(dlg.get_filename())
+        response = gtklib.NativeFolderSelectDialog(
+                          initial=self.cwd,
+                          title='Select Destination Folder').run()
+        if response:
+            self._dest_input.set_text(response)
             self._dest_input.set_position(-1)
-        dlg.destroy()
 
     def _btn_init_clicked(self, toolbutton, data=None):
         # gather input data
