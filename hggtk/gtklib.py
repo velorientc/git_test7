@@ -248,7 +248,6 @@ class NativeFolderSelectDialog:
             import win32com, win32gui, pywintypes
             return self.runWindows()
         except ImportError, e:
-            print e
             return self.runCompatible()
 
     def runWindows(self):
