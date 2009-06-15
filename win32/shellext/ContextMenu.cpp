@@ -310,6 +310,12 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     {
         cwd = myFolder;
     }
+    else if (myFiles.size() == 1 && IsDirectory(myFiles[0]))
+    {
+        myFolder = myFiles[0];
+        cwd = myFolder;
+        myFiles.clear();
+    }
     else if (!myFiles.empty())
     {
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
@@ -501,6 +507,12 @@ void CShellExt::DoHgtk(const std::string &cmd)
     {
         cwd = myFolder;
     }
+    else if (myFiles.size() == 1 && IsDirectory(myFiles[0]))
+    {
+        // Treat single selected directory as if cmenu were opened
+        // within that directory without files selected
+        cwd = myFiles[0];
+    }
     else if (!myFiles.empty())
     {
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
@@ -518,7 +530,7 @@ void CShellExt::DoHgtk(const std::string &cmd)
         for (std::vector<std::string>::size_type i=0; i<myFiles.size(); i++)
         {
             DWORD dwWritten;
-            TDEBUG_TRACE("DoHgtk: temp file adding " <<  myFiles[i]);
+            TDEBUG_TRACE("DoHgtk: temp file adding " << myFiles[i]);
             WriteFile(tempfileHandle, myFiles[i].c_str(), 
                     static_cast<DWORD>(myFiles[i].size()), &dwWritten, 0);
             WriteFile(tempfileHandle, "\n", 1, &dwWritten, 0);
