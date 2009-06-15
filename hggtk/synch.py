@@ -344,16 +344,11 @@ class SynchDialog(gtk.Window):
 
     def btn_remotepath_clicked(self, button):
         """ select source folder to clone """
-        dlg = gtk.FileChooserDialog(title=_('Select Repository'),
-                action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-        dlg.set_default_response(gtk.RESPONSE_OK)
-        dlg.set_current_folder(self.root)
-        response = dlg.run()
-        if response == gtk.RESPONSE_OK:
-            self.pathtext.set_text(dlg.get_filename())
-        dlg.destroy()
+        response = gtklib.NativeFolderSelectDialog(
+                          initial=self.root,
+                          title=_('Select Repository')).run()
+        if response:
+            self.pathtext.set_text(response)
 
     def btn_bundlepath_clicked(self, button):
         """ select bundle to read from """
