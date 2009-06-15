@@ -773,21 +773,14 @@ class GStatus(gdialog.GDialog):
     def copy_file(self, stat, wfile):
         wfile = self.repo.wjoin(wfile)
         fdir, fname = os.path.split(wfile)
-        dlg = gtk.FileChooserDialog(parent=self,
-                title=_('Copy file to'),
-                action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                         gtk.STOCK_COPY,gtk.RESPONSE_OK))
-        dlg.set_default_response(gtk.RESPONSE_OK)
-        dlg.set_current_folder(fdir)
-        dlg.set_current_name(fname)
-        response = dlg.run()
-        newfile=wfile
-        if response == gtk.RESPONSE_OK:
-            newfile = dlg.get_filename()
-        dlg.destroy()
-        if newfile != wfile:
-            self.hg_copy([wfile, newfile])
+        response = gtklib.NativeSaveFileDialogWrapper(
+                Title=_('Copy file to'),
+                InitialDir=fdir,
+                FileName=fname).run()
+        if not response:
+            return
+        if reponse != wfile:
+            self.hg_copy([wfile, reponse])
         return True
 
 
@@ -1189,17 +1182,11 @@ class GStatus(gdialog.GDialog):
         move_list = self.relevant_files('C')
         if move_list:
             # get destination directory to files into
-            dlg = gtk.FileChooserDialog(title=_('Move files to diretory...'),
-                    parent=self,
-                    action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                    buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                             gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-            dlg.set_default_response(gtk.RESPONSE_OK)
-            dlg.set_current_folder(self.repo.root)
-            response = dlg.run()
-            destdir = dlg.get_filename()
-            dlg.destroy()
-            if response != gtk.RESPONSE_OK:
+            dlg = gtklib.NativeFolderSelectDialog(
+                    title=_('Move files to directory...'),
+                    initial=self.repo.root)
+            destdir = dlg.run()
+            if not destdir:
                 return True
 
             # verify directory
