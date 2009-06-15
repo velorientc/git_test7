@@ -290,7 +290,8 @@ class NativeFolderSelectDialog:
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
         dialog.set_default_response(gtk.RESPONSE_OK)
         response = dialog.run()
-        if response == gtk.RESPONSE_OK:
-            return dialog.get_filename()
+        fname = dialog.get_filename()
         dialog.destroy()
+        if response == gtk.RESPONSE_OK:
+            return fname
         return None
