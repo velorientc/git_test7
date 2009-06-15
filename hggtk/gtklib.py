@@ -273,7 +273,7 @@ class NativeFolderSelectDialog:
             flags = shellcon.BIF_EDITBOX | 0x40  #shellcon.BIF_NEWDIALOGSTYLE
             pidl, _, _ = shell.SHBrowseForFolder(0,
                                None,
-                               self.title,
+                               hglib.fromutf(self.title),
                                flags,
                                BrowseCallbackProc, # callback function
                                self.initial)       # 'data' param for the callback
