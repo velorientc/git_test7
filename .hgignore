@@ -16,3 +16,9 @@ MANIFEST
 *.dll
 *.exe
 win32/shellext/hgtk.cmd
+*.obj
+*.exp
+*.lib
+*.idb
+*.pdb
+*.manifest
