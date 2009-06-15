@@ -185,7 +185,7 @@ class CloneDialog(gtk.Window):
                           initial=self.destentry.get_text(),
                           title=_('Select Source Folder')).run()
         if response:
-            self.destentry.set_text(response)
+            self.srcentry.set_text(response)
 
     def add_src_to_recent(self, src):
         if os.path.exists(src):
