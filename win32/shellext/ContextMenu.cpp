@@ -293,7 +293,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
             cval = cval.substr(found+1);
         }
 
-        for( UINT i = 0 ; i < sz ; i++ )
+        for( UINT i = 0; i < sz; i++ )
         {
             if( !key.compare(menuDescList[i].name) )
             {
@@ -332,7 +332,7 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 
     menuDescListEntries *walk;
-    for( walk = entries ; *walk != EndOfList ; walk++ )
+    for( walk = entries; *walk != EndOfList; walk++ )
     {
         UINT idx = (UINT) *walk;
         if( promoted[idx] )
@@ -343,15 +343,15 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
     if (hSubMenu)
     {
         UINT indexSubMenu = 0;
-        bool isSeparator = true ;
-        for( walk = entries ; *walk != EndOfList ; walk++ )
+        bool isSeparator = true;
+        for( walk = entries; *walk != EndOfList; walk++ )
         {
             if( *walk == Separator)
             {
                 if (!isSeparator)
                 {
                     InsertMenu(hSubMenu, indexSubMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
-                    isSeparator = true ;
+                    isSeparator = true;
                 }
             }
             else
@@ -360,12 +360,12 @@ CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst,
                 if( !promoted[idx] )
                 {
                     InsertMenuItemByName(hSubMenu, menuDescList[idx].name, indexSubMenu++, idCmd++, idCmdFirst, "");
-                    isSeparator = false ;
+                    isSeparator = false;
                 }
             }
         }
         if (isSeparator && indexSubMenu>0)
-            RemoveMenu(hSubMenu, indexSubMenu-1, MF_BYPOSITION) ;
+            RemoveMenu(hSubMenu, indexSubMenu-1, MF_BYPOSITION);
     }
 
     TDEBUG_TRACE("  CShellExt::QueryContextMenu: adding main THG menu");
