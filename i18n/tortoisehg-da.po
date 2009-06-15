@@ -1,4 +1,4 @@
-﻿# Danish translation for tortoisehg
+# Danish translation for tortoisehg
 # Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
 # This file is distributed under the same license as the tortoisehg package.
 # Peer sommerlund <peer.sommerlund@gmail.com>, 2009.
@@ -2553,7 +2553,7 @@ msgstr "Mærke \"%s\" er blevet fjernet"
 
 #: hggtk\tagadd.py:227
 msgid "a tag named \"%s\" already exists"
-msgstr "Der findes allerede et mærke med navnet "\%s\""
+msgstr "Der findes allerede et mærke med navnet \"%s\""
 
 #: hggtk\tagadd.py:233
 msgid "Added tag %s for changeset %s"
