@@ -174,7 +174,8 @@ class NativeSaveFileDialogWrapper:
     """Wrap the windows file dialog, or display default gtk dialog if
     that isn't available"""
     def __init__(self, InitialDir = None, Title = _('Save File'),
-                 Filter = (_("All files"), "*.*"), FilterIndex = 1, FileName = ''):
+                 Filter = (_("All files"), "*.*"), FilterIndex = 1,
+                 FileName = '', Open=False):
         if InitialDir == None:
             InitialDir = os.path.expanduser("~")
         self.InitialDir = InitialDir
@@ -182,6 +183,7 @@ class NativeSaveFileDialogWrapper:
         self.Title = Title
         self.Filter = Filter
         self.FilterIndex = FilterIndex
+        self.Open = Open
 
     def run(self):
         """run the file dialog, either return a file name, or False if
@@ -197,15 +199,26 @@ class NativeSaveFileDialogWrapper:
         cwd = os.getcwd()
         fname = None
         try:
-            fname, customfilter, flags=win32gui.GetSaveFileNameW(
-                InitialDir=self.InitialDir,
-                Flags=win32con.OFN_EXPLORER,
-                File=self.FileName,
-                DefExt=None,
-                Title=hglib.fromutf(self.Title),
-                Filter= hglib.fromutf('\0'.join(self.Filter)+'\0'),
-                CustomFilter=None,
-                FilterIndex=self.FilterIndex)
+            if self.Open:
+                fname, customfilter, flags=win32gui.GetOpenFileNameW(
+                    InitialDir=self.InitialDir,
+                    Flags=win32con.OFN_EXPLORER,
+                    File=self.FileName,
+                    DefExt=None,
+                    Title=hglib.fromutf(self.Title),
+                    Filter= hglib.fromutf('\0'.join(self.Filter)+'\0'),
+                    CustomFilter=None,
+                    FilterIndex=self.FilterIndex)
+            else:
+                fname, customfilter, flags=win32gui.GetSaveFileNameW(
+                    InitialDir=self.InitialDir,
+                    Flags=win32con.OFN_EXPLORER,
+                    File=self.FileName,
+                    DefExt=None,
+                    Title=hglib.fromutf(self.Title),
+                    Filter= hglib.fromutf('\0'.join(self.Filter)+'\0'),
+                    CustomFilter=None,
+                    FilterIndex=self.FilterIndex)
             if fname:
                 fname = os.path.abspath(fname)
         except pywintypes.error:
@@ -214,8 +227,11 @@ class NativeSaveFileDialogWrapper:
         return fname
 
     def runCompatible(self):
-        file_save = gtk.FileChooserDialog(self.Title, None,
-                gtk.FILE_CHOOSER_ACTION_SAVE,
+        if self.Open:
+            action = gtk.FILE_CHOOSER_ACTION_OPEN
+        else:
+            action = gtk.FILE_CHOOSER_ACTION_SAVE
+        file_save = gtk.FileChooserDialog(self.Title, None, action,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                  gtk.STOCK_SAVE, gtk.RESPONSE_OK))
         file_save.set_do_overwrite_confirmation(True)
