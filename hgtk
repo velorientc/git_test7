@@ -29,7 +29,7 @@ def portable_fork():
 
 nofork = 'version help' # simple interactive commands should not fork
 for i, arg in enumerate(sys.argv):
-    if 'hgtk' in arg and len(sys.argv) >= i:
+    if 'hgtk' in arg and len(sys.argv) > i+1:
         cmd = sys.argv[i+1]
         break
 else:
