@@ -25,6 +25,7 @@ DefaultGroupName=TortoiseHg
 PrivilegesRequired=poweruser
 ;AlwaysRestart=yes
 SetupLogging=yes
+ArchitecturesInstallIn64BitMode = x64
 
 [Files]
 Source: THgShell.dll; DestDir: {app}; Flags: ignoreversion
