@@ -17,8 +17,7 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         Thgstatus.o \
         QueryDirstate.o
 
-BASE_LDFLAGS=-lole32 -lkernel32 -luser32 -lgdi32 -lshlwapi -lwininet \
-             -lwinmm -luuid
+BASE_LDFLAGS=-lole32 -lshlwapi -luuid
 
 DEFFILE=ShellExt.def
 
