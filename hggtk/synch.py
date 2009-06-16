@@ -355,8 +355,8 @@ class SynchDialog(gtk.Window):
         response = gtklib.NativeSaveFileDialogWrapper(
                 InitialDir=self.root,
                 Title=_('Select Bundle'),
-                Filter=(_('Bundle (*.hg)'), '*.hg',
-                        _('Bundle (*)'), '*.*'),
+                Filter=((_('Bundle (*.hg)'), '*.hg'),
+                        (_('Bundle (*)'), '*.*')),
                 Open=True).run()
         if response:
             self.pathtext.set_text(response)
