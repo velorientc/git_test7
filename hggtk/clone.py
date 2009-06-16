@@ -11,7 +11,7 @@ import traceback
 
 from mercurial import ui, util
 from thgutil.i18n import _
-from thgutil import shlib, settings
+from thgutil import hglib, shlib, settings
 from hggtk import gdialog, gtklib, hgcmd
 
 class CloneDialog(gtk.Window):
@@ -29,7 +29,7 @@ class CloneDialog(gtk.Window):
         self.recentsrc = self.clonesettings.mrul('src_paths')
         self.recentdest = self.clonesettings.mrul('dest_paths')
 
-        srcpath = os.getcwd()
+        srcpath = hglib.toutf(os.getcwd())
         destpath = srcpath
         if len(repos) > 1:
             srcpath = repos[0]
