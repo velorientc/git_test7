@@ -215,6 +215,7 @@ class FileSelectionDialog(gtk.Dialog):
         self.launch(*model[paths[0]])
 
     def launch(self, st, fname):
+        fname = hglib.fromutf(fname)
         dir1, dir2, dir2root, tmproot = self.dirs
         if st == 'A':
             dir1 = os.devnull
