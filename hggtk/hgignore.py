@@ -167,12 +167,16 @@ class HgIgnoreDialog(gtk.Window):
 
     def add_glob(self, widget, glob_entry):
         newglob = hglib.fromutf(glob_entry.get_text())
+        if newglob == '':
+            return
         self.ignorelines.append('glob:' + newglob)
         self.write_ignore_lines()
         self.refresh()
 
     def add_regexp(self, widget, regexp_entry):
         newregexp = hglib.fromutf(regexp_entry.get_text())
+        if newregexp == '':
+            return
         self.ignorelines.append('regexp:' + newregexp)
         self.write_ignore_lines()
         self.refresh()
