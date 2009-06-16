@@ -92,15 +92,15 @@ class BackoutDialog(gtk.Window):
         summary = ctx.description().replace('\0', '')
         summary = summary.split('\n')[0]
         escape = gobject.markup_escape_text
-        desc =  '<b>rev</b>\t\t: %s\n' % escape(revstr)
-        desc += '<b>summary</b>\t: %s\n' % escape(summary[:80])
-        desc += '<b>user</b>\t\t: %s\n' % escape(ctx.user())
-        desc += '<b>date</b>\t\t: %s\n' % escape(hglib.displaytime(ctx.date()))
+        desc =  '<b>' + _('rev') + '</b>\t\t: %s\n' % escape(revstr)
+        desc += '<b>' + _('summary') + '</b>\t: %s\n' % escape(summary[:80])
+        desc += '<b>' + _('user') + '</b>\t\t: %s\n' % escape(ctx.user())
+        desc += '<b>' + _('date') + '</b>\t\t: %s\n' % escape(hglib.displaytime(ctx.date()))
         node = repo.lookup(revid)
         tags = repo.nodetags(node)
-        desc += '<b>branch</b>\t: ' + escape(ctx.branch())
+        desc += '<b>' + _('branch') + '</b>\t: ' + escape(ctx.branch())
         if tags:
-            desc += '\n<b>tags</b>\t\t: ' + escape(', '.join(tags))
+            desc += '\n<b>' + _('tags') + '</b>\t\t: ' + escape(', '.join(tags))
         return hglib.toutf(desc)
 
     def set_notify_func(self, func, *args):
