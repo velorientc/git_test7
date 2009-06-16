@@ -117,9 +117,9 @@ class ServeDialog(gtk.Window):
                 os.path.basename(self._root)
         if self._webdirconf:
             self.set_title(_('Serve %s - %s') %
-                    (self._webdirconf, self.webname))
+                    (hglib.toutf(self._webdirconf), hglib.toutf(self.webname)))
         else:
-            self.set_title(_('Serve - ') + self.webname)
+            self.set_title(_('Serve - ') + hglib.toutf(self.webname))
 
     def _toolbutton(self, stock, label, handler, menu=None,
             userdata=None, tip=None):
