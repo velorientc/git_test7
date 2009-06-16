@@ -69,7 +69,7 @@ class HgIgnoreDialog(gtk.Window):
         if len(ignorefiles) > 1:
             combo = gtk.combo_box_new_text()
             for f in ignorefiles:
-                combo.append_text(f)
+                combo.append_text(hglib.toutf(f))
             combo.set_active(0)
             combo.connect('changed', self.fileselect)
             mainvbox.pack_start(combo, False, False, 4)
@@ -137,7 +137,7 @@ class HgIgnoreDialog(gtk.Window):
 
     def fileselect(self, combo):
         'select another ignore file'
-        self.ignorefile = combo.get_active_text()
+        self.ignorefile = hglib.fromutf(combo.get_active_text())
         self.refresh()
 
     def unknown_search(self, model, column, key, iter):
