@@ -504,7 +504,7 @@ class ConfigDialog(gtk.Dialog):
             repo = hg.repository(ui.ui(), self.root)
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.set_title(_('TortoiseHg Configure Repository - ') + name)
+            self.set_title(_('TortoiseHg Configure Repository - ') + hglib.toutf(name))
             gtklib.set_tortoise_icon(self, 'settings_repo.ico')
         else:
             self.rcpath = util.user_rcpath()
