@@ -21,7 +21,7 @@ LIBS    = User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib
 DEFFILE = ShellExt.def
 
 
-CPPFLAGS         = /nologo /Ox /W2 /EHsc /MD /DAPPMAIN
+CPPFLAGS         = /nologo /Ox /W2 /EHsc /MD /DAPPMAIN /DTHG_DEBUG
 BASE_LDFLAGS     = /nologo /INCREMENTAL:NO /MANIFEST $(LIBS)
 LDFLAGS_THGSHELL = $(BASE_LDFLAGS) /DLL /DEF:$(DEFFILE)
 LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
