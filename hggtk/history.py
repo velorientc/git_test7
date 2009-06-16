@@ -387,8 +387,8 @@ class GLog(gdialog.GDialog):
 
     def tree_context_menu(self):
         m = gtk.Menu()
-        m.append(create_menu(_('di_splay'), self.show_status))
         m.append(create_menu(_('visualize change'), self.vdiff_change))
+        m.append(create_menu(_('di_splay change'), self.show_status))
         m.append(create_menu(_('diff to local'), self.vdiff_local))
         m.append(create_menu(_('_update'), self.checkout))
         self.cmenu_merge = create_menu(_('_merge with'), self.merge)
