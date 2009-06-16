@@ -30,7 +30,7 @@ typedef char wxChar;
 
 #define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
-#ifdef _DEBUG
+#ifdef THG_DEBUG
     #include <sstream>
 
     // TDEBUG_TRACE() prints debugging messages to Windows' debugger display.

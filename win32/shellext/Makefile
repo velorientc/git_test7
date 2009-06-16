@@ -31,7 +31,7 @@ LDFLAGS_DIRSTATE=$(BASE_LDFLAGS) \
 
 # set DEBUG env var to 1 to enable debug trace
 ifeq ($(DEBUG),1)
-CXXFLAGS+=-D_DEBUG
+CXXFLAGS+=-DTHG_DEBUG
 endif
 
 all: THgShell.dll dirstate.exe
