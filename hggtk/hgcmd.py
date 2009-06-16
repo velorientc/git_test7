@@ -28,7 +28,7 @@ class CmdDialog(gtk.Dialog):
 
         gtklib.set_tortoise_icon(self, 'hg.ico')
         gtklib.set_tortoise_keys(self)
-        self.cmdline = cmdline
+        self.cmdline = [hglib.fromutf(item) for item in cmdline]
         self.returncode = None
         self.hgthread = None
 
