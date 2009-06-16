@@ -352,24 +352,14 @@ class SynchDialog(gtk.Window):
 
     def btn_bundlepath_clicked(self, button):
         """ select bundle to read from """
-        dlg = gtk.FileChooserDialog(title=_('Select Bundle'),
-                action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                         gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-        dlg.set_default_response(gtk.RESPONSE_OK)
-        dlg.set_current_folder(self.root)
-        filefilter = gtk.FileFilter()
-        filefilter.set_name(_('Bundle (*.hg)'))
-        filefilter.add_pattern("*.hg")
-        dlg.add_filter(filefilter)
-        filefilter = gtk.FileFilter()
-        filefilter.set_name(_('Bundle (*)'))
-        filefilter.add_pattern("*")
-        dlg.add_filter(filefilter)
-        response = dlg.run()
-        if response == gtk.RESPONSE_OK:
-            self.pathtext.set_text(dlg.get_filename())
-        dlg.destroy()
+        response = gtklib.NativeSaveFileDialogWrapper(
+                InitialDir=self.root,
+                Title=_('Select Bundle'),
+                Filter=(_('Bundle (*.hg)'), '*.hg',
+                        _('Bundle (*)'), '*.*'),
+                Open=True).run()
+        if response:
+            self.pathtext.set_text(response)
 
     def should_live(self):
         if self.cmd_running():
