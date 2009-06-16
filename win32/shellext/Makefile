@@ -38,7 +38,7 @@ endif
 all: THgShell.dll dirstate.exe
 
 THgShell.dll: $(OBJECTS_THGSGELL)
-	g++ -o $@ $(OBJECTS_THGSGELL) $(LDFLAGS_THGSGELL)
+	g++ -o $@ $(OBJECTS_THGSGELL) -s $(LDFLAGS_THGSGELL)
 
 dirstate.exe: dirstate.cpp dirstate.h $(OBJECTS_DIRSTATE)
 	g++ -o $@ $(CXXFLAGS) -DAPPMAIN $< $(OBJECTS_DIRSTATE) $(LDFLAGS_DIRSTATE)
