@@ -24,7 +24,7 @@ class HgIgnoreDialog(gtk.Window):
         gtklib.set_tortoise_keys(self)
 
         self.root = paths.find_root()
-        self.set_title(_('Ignore filter for ') + os.path.basename(self.root))
+        self.set_title(_('Ignore filter for ') + hglib.toutf(os.path.basename(self.root)))
         self.set_default_size(630, 400)
         self.notify_func = None
 
