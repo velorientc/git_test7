@@ -429,7 +429,7 @@ class ConfigDialog(gtk.Dialog):
         combo = gtk.combo_box_new_text()
         combo.append_text(_('User global settings'))
         if repo:
-            combo.append_text(_('%s repository settings') % name)
+            combo.append_text(_('%s repository settings') % hglib.toutf(name))
         combo.connect('changed', self.fileselect)
 
         hbox = gtk.HBox()
