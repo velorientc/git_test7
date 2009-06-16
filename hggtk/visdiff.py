@@ -193,11 +193,11 @@ class FileSelectionDialog(gtk.Dialog):
         self.dirs = (dir1, dir2, dir2root, tmproot)
 
         for m in modified:
-            model.append(['M', m])
+            model.append(['M', hglib.toutf(m)])
         for a in added:
-            model.append(['A', a])
+            model.append(['A', hglib.toutf(a)])
         for r in removed:
-            model.append(['R', r])
+            model.append(['R', hglib.toutf(r)])
         if len(model) == 1 and self.singlecheck.get_active():
             self.launch(*model[0])
 
