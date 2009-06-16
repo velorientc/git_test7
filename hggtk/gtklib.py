@@ -201,8 +201,7 @@ class NativeSaveFileDialogWrapper:
         try:
             f = ''
             for name, mask in self.Filter:
-                '\0'.join(f, name, mask)
-            f.append('\0')
+                f += '\0'.join([name, mask,''])
             opts = dict(InitialDir=self.InitialDir,
                     Flags=win32con.OFN_EXPLORER,
                     File=self.FileName,
