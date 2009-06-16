@@ -48,7 +48,7 @@ class SynchDialog(gtk.Window):
         self.origchangecount = len(self.repo)
 
         name = self.repo.ui.config('web', 'name') or os.path.basename(self.root)
-        self.set_title(_('TortoiseHg Synchronize - ') + name)
+        self.set_title(_('TortoiseHg Synchronize - ') + hglib.toutf(name))
 
         self.connect('delete-event', self.delete)
 
