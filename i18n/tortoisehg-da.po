@@ -241,7 +241,7 @@ msgstr "Fejl under kloning"
 
 #: hggtk\commit.py:32
 msgid "Branch Operations"
-msgstr ""
+msgstr "Grenoperationer"
 
 #: hggtk\commit.py:36
 msgid "Changes take effect on next commit"
@@ -249,15 +249,15 @@ msgstr "Ændringer vil være effektive fra næste integration"
 
 #: hggtk\commit.py:37
 msgid "No branch changes"
-msgstr ""
+msgstr "Ingen ændringer af gren"
 
 #: hggtk\commit.py:39
 msgid "Open a new named branch"
-msgstr ""
+msgstr "Åben en ny navngivet gren"
 
 #: hggtk\commit.py:41
 msgid "Close current named branch"
-msgstr ""
+msgstr "Luk nuværende navngivne gren"
 
 #: hggtk\commit.py:153
 msgid "_Undo"
@@ -278,7 +278,7 @@ msgstr "integrér"
 
 #: hggtk\commit.py:168
 msgid "Confirm Discard Message"
-msgstr ""
+msgstr "Bekræft kasser besked"
 
 #: hggtk\commit.py:169
 msgid "Discard current commit message?"
@@ -295,7 +295,7 @@ msgstr "_integrér"
 
 #: hggtk\commit.py:291
 msgid "Confirm Exit"
-msgstr ""
+msgstr "Bekræft exit"
 
 #: hggtk\commit.py:292
 msgid "Save commit message at exit?"
@@ -303,15 +303,15 @@ msgstr "Gem integrationsbesked ved afslutning?"
 
 #: hggtk\commit.py:319
 msgid "new branch: "
-msgstr ""
+msgstr "ny gren: "
 
 #: hggtk\commit.py:321
 msgid "close branch: "
-msgstr ""
+msgstr "luk gren: "
 
 #: hggtk\commit.py:323
 msgid "branch: "
-msgstr ""
+msgstr "gren: "
 
 #: hggtk\commit.py:333 hggtk\status.py:204
 msgid "Re_vert"
@@ -361,7 +361,7 @@ msgstr ""
 
 #: hggtk\commit.py:473
 msgid "Unable to apply patch"
-msgstr ""
+msgstr "Kan ikke anvende lap"
 
 #: hggtk\commit.py:511
 msgid "Confirm Undo commit"
@@ -387,7 +387,7 @@ msgstr ""
 
 #: hggtk\commit.py:530
 msgid "Errors during rollback!"
-msgstr ""
+msgstr "Fejl under tilbageføring!"
 
 #: hggtk\commit.py:537
 msgid "Confirm Add/Remove"
@@ -806,7 +806,7 @@ msgstr ""
 
 #: hggtk\hgemail.py:60
 msgid "Email Mercurial Patches"
-msgstr ""
+msgstr "E-post mercurial lapper"
 
 #: hggtk\hgemail.py:64
 msgid "Envelope"
@@ -838,7 +838,7 @@ msgstr ""
 
 #: hggtk\hgemail.py:121
 msgid "Send changesets as HG patches"
-msgstr ""
+msgstr "Send ændringer som HG lapper"
 
 #: hggtk\hgemail.py:124
 msgid ""
@@ -846,10 +846,13 @@ msgid ""
 "programs.  They include a header which contains the most important changeset "
 "metadata."
 msgstr ""
+"HG lapper (som genereret af 'export' kommandoen) er kompatible med de fleste "
+"lap-programmer. De inkluderer en indledning som indeholder metadata for de "
+"vigtigste ændringer."
 
 #: hggtk\hgemail.py:129
 msgid "Use extended (git) patch format"
-msgstr ""
+msgstr "Brug udviddet (git) lap-format"
 
 #: hggtk\hgemail.py:132
 msgid ""
@@ -857,10 +860,13 @@ msgid ""
 "recipients may not be able to use them if they are not using git or "
 "Mercurial."
 msgstr ""
+"Git lapper kan indeholde binære filer, kopiering og ændring af rettigheder, "
+"men modtagerne kan måske ikke bruge dem hvis de ikke anvender Git eller "
+"Mercurial."
 
 #: hggtk\hgemail.py:137
 msgid "Plain, do not prepend HG header"
-msgstr ""
+msgstr "Simpel, undlad en HG indledning"
 
 #: hggtk\hgemail.py:140
 msgid ""
@@ -868,10 +874,13 @@ msgid ""
 "useful if recipient is not using Mercurial (and does not like to see the "
 "headers)."
 msgstr ""
+"At fjerne Mercurial indledningen fjerner brugernavn og forælder information. "
+"Kun brugbart hvis modtageren ikke anvender Mercurial og ikke kan lide at se "
+"indledningen."
 
 #: hggtk\hgemail.py:145
 msgid "Send single binary bundle, not patches"
-msgstr ""
+msgstr "Send samlet binært bundt, ingen lapper"
 
 #: hggtk\hgemail.py:148
 msgid ""
@@ -879,42 +888,44 @@ msgid ""
 "from them. This is the safest way to send changes to recipient Mercurial "
 "users."
 msgstr ""
+"Bundter store komplette ændringer i binær form. Upstream brugere kan trække "
+"fra dem. Dette er den sikreste måde at sende ændringer til Mercurial brugere."
 
 #: hggtk\hgemail.py:155
 msgid "attach"
-msgstr ""
+msgstr "vedhæft"
 
 #: hggtk\hgemail.py:157
 msgid "send patches as attachments"
-msgstr ""
+msgstr "send lapper som vedhæftede filer"
 
 #: hggtk\hgemail.py:158
 msgid "inline"
-msgstr ""
+msgstr "integreret"
 
 #: hggtk\hgemail.py:160
 msgid "send patches as inline attachments"
-msgstr ""
+msgstr "send lapper som integreret tekst"
 
 #: hggtk\hgemail.py:161
 msgid "diffstat"
-msgstr ""
+msgstr "diffstat"
 
 #: hggtk\hgemail.py:163
 msgid "add diffstat output to messages"
-msgstr ""
+msgstr "tilføj diffstat resultat til beskeder"
 
 #: hggtk\hgemail.py:172
 msgid "Subject:"
-msgstr ""
+msgstr "Emne:"
 
 #: hggtk\hgemail.py:184
 msgid "Patch Series (Bundle) Description"
-msgstr ""
+msgstr "Beskrivelse af lap-serie (bundt)"
 
 #: hggtk\hgemail.py:236
 msgid "The description field is unused when sending a single patch."
-msgstr ""
+msgstr "Beskrivelsesfeltet bruges ikke hvis man kun sender 1 lap."
 
 #: hggtk\hgemail.py:239
 msgid ""
@@ -922,18 +933,21 @@ msgid ""
 "N] subject.  It should describe the effects of the entire patch series.  "
 "When emailing a bundle, these fields make up the message subject and body."
 msgstr ""
+"Beskrivelsen af lap-serien sendes i det initielle opsummerings e-brev med "
+"[PATCH 0 of N] emnet. Den bør beskrive effekten af den samlede lap-serie. "
+"Når man sender et bundt udgør disse felter e-brev emne og tekst."
 
 #: hggtk\hgemail.py:308
 msgid "You must specify a recipient"
-msgstr ""
+msgstr "Du skal angive en modtager"
 
 #: hggtk\hgemail.py:313
 msgid "You must specify a sender address"
-msgstr ""
+msgstr "Du skal angive en afsenderadresse"
 
 #: hggtk\hgemail.py:322
 msgid "You must configure SMTP"
-msgstr ""
+msgstr "Du skal konfigurere SMTP"
 
 #: hggtk\hgignore.py:27
 msgid "Ignore filter for "
@@ -941,11 +955,11 @@ msgstr "Ignorer filter for "
 
 #: hggtk\hgignore.py:34
 msgid "Glob:"
-msgstr ""
+msgstr "Glob:"
 
 #: hggtk\hgignore.py:40 hggtk\hgignore.py:55 hggtk\tagadd.py:47
 msgid "Add"
-msgstr ""
+msgstr "Tilføj"
 
 #: hggtk\hgignore.py:79
 msgid "Filters"
@@ -957,7 +971,7 @@ msgstr "Mønstre"
 
 #: hggtk\hgignore.py:97
 msgid "Remove Selected"
-msgstr ""
+msgstr "Fjern valgte"
 
 #: hggtk\hgignore.py:105
 msgid "Unknown Files"
@@ -973,11 +987,11 @@ msgstr "Operet et nyt depot i destinationsfolderen"
 
 #: hggtk\hginit.py:46
 msgid "Destination:"
-msgstr ""
+msgstr "Destination:"
 
 #: hggtk\hginit.py:64
 msgid "Add special files (.hgignore, ...)"
-msgstr ""
+msgstr "Tilføj specielle filer (.hgignore, ...)"
 
 #: hggtk\hginit.py:66
 msgid "Make repo compatible with Mercurial 1.0"
@@ -1074,7 +1088,7 @@ msgstr ""
 
 #: hggtk\hgshelve.py:502
 msgid "applying patch\n"
-msgstr "tilføjer rettelse\n"
+msgstr "tilføjer lap\n"
 
 #: hggtk\hgshelve.py:509
 msgid "saving patch to shelve\n"
@@ -1198,11 +1212,11 @@ msgstr "Der er intet Mercurial depot her (.hg ikke fundet)"
 
 #: hggtk\hgtk.py:206 thgutil\hglib.py:325
 msgid "invalid arguments"
-msgstr ""
+msgstr "ugyldige parametre"
 
 #: hggtk\hgtk.py:291
 msgid "rename takes one or two path arguments"
-msgstr ""
+msgstr "rename skal have et eller to argumenter"
 
 #: hggtk\hgtk.py:383
 msgid "global options:"
@@ -1509,7 +1523,7 @@ msgstr "Vis UTC dato"
 
 #: hggtk\history.py:190
 msgid "Show Branch"
-msgstr ""
+msgstr "Vis gren"
 
 #: hggtk\history.py:202
 msgid "Show All Revisions"
@@ -1549,39 +1563,39 @@ msgstr ""
 
 #: hggtk\history.py:390
 msgid "di_splay"
-msgstr ""
+msgstr "_vis"
 
 #: hggtk\history.py:391
 msgid "visualize change"
-msgstr ""
+msgstr "visualiser ændringer"
 
 #: hggtk\history.py:392
 msgid "diff to local"
-msgstr ""
+msgstr "forskel til lokal"
 
 #: hggtk\history.py:393
 msgid "_update"
-msgstr ""
+msgstr "_opdater"
 
 #: hggtk\history.py:394 hggtk\history.py:425
 msgid "_merge with"
-msgstr ""
+msgstr "_flet med"
 
 #: hggtk\history.py:396
 msgid "_copy hash"
-msgstr ""
+msgstr "_kopier hash"
 
 #: hggtk\history.py:397
-msgid "_export patch"
-msgstr ""
+msgid "export patch"
+msgstr "_eksporter lap"
 
 #: hggtk\history.py:398
 msgid "e_mail patch"
-msgstr ""
+msgstr "e-_post lap"
 
 #: hggtk\history.py:399
 msgid "_bundle rev:tip"
-msgstr ""
+msgstr "_bundt rev:top"
 
 #: hggtk\history.py:400
 msgid "add/remove _tag"
@@ -1589,16 +1603,16 @@ msgstr "tilføj/fjern _mærke"
 
 #: hggtk\history.py:401
 msgid "backout revision"
-msgstr ""
+msgstr "omgør revision"
 
 #: hggtk\history.py:402 hggtk\status.py:105 hggtk\status.py:110
 #: hggtk\status.py:129 hggtk\status.py:136 hggtk\status.py:144
 msgid "_revert"
-msgstr ""
+msgstr "_tilbagefør"
 
 #: hggtk\history.py:407
 msgid "strip revision"
-msgstr ""
+msgstr "fjern revision"
 
 #: hggtk\history.py:418
 msgid "_diff with selected"
@@ -1648,7 +1662,7 @@ msgstr ""
 
 #: hggtk\history.py:660 hggtk\status.py:1051
 msgid "Save patch to"
-msgstr ""
+msgstr "Gem lap som"
 
 #: hggtk\history.py:667 hggtk\thgconfig.py:366 hggtk\thgconfig.py:668
 msgid "Confirm Overwrite"
@@ -1671,11 +1685,11 @@ msgstr ""
 
 #: hggtk\logfilter.py:46 hggtk\logview\treeview.py:398
 msgid "Branch"
-msgstr ""
+msgstr "Gren"
 
 #: hggtk\logfilter.py:53
 msgid "View revision graph of named branch"
-msgstr ""
+msgstr "Vis revisionsgraf af navngivet gren"
 
 #: hggtk\logfilter.py:60
 msgid "Rev Range"
@@ -1789,19 +1803,19 @@ msgstr ""
 
 #: hggtk\merge.py:106
 msgid "user"
-msgstr ""
+msgstr "bruger"
 
 #: hggtk\merge.py:107
 msgid "date"
-msgstr ""
+msgstr "dato"
 
 #: hggtk\merge.py:111
 msgid "branch"
-msgstr ""
+msgstr "gren"
 
 #: hggtk\merge.py:113
 msgid "tags"
-msgstr ""
+msgstr "mærker"
 
 #: hggtk\merge.py:116
 msgid "Not a head revision!"
@@ -1809,7 +1823,7 @@ msgstr ""
 
 #: hggtk\merge.py:154
 msgid "Confirm undo merge"
-msgstr ""
+msgstr "Bekræft fortryd flet"
 
 #: hggtk\merge.py:155
 msgid "Clean checkout of original revision?"
@@ -1833,7 +1847,7 @@ msgstr ""
 
 #: hggtk\recovery.py:52
 msgid "Rollback"
-msgstr ""
+msgstr "Tilbagefør"
 
 #: hggtk\recovery.py:54
 msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
@@ -1881,7 +1895,7 @@ msgstr "Bekræft tilbageførsel af depot"
 
 #: hggtk\recovery.py:138
 msgid "Rollback repository '%s' ?"
-msgstr ""
+msgstr "Tilbagefør depot '%s' ?"
 
 #: hggtk\recovery.py:159 hggtk\synch.py:521
 msgid "Cannot run now"
@@ -2428,7 +2442,7 @@ msgstr ""
 
 #: hggtk\synch.py:217
 msgid "Show Patches"
-msgstr ""
+msgstr "Vis lapper"
 
 #: hggtk\synch.py:218
 msgid "Show Newest First"
@@ -2444,7 +2458,7 @@ msgstr ""
 
 #: hggtk\synch.py:244
 msgid "Update to branch tip"
-msgstr ""
+msgstr "Opdater til top af gren"
 
 #: hggtk\synch.py:339
 msgid "unknown sort key '%s'"
@@ -3286,7 +3300,7 @@ msgstr ""
 
 #: hggtk\update.py:18
 msgid "= Current Branch Tip ="
-msgstr ""
+msgstr "= Nuværende gren top ="
 
 #: hggtk\update.py:37
 msgid "Update - %s"
@@ -3557,7 +3571,7 @@ msgid "unknown"
 msgstr ""
 
 #~ msgid "patch failed to apply"
-#~ msgstr "rettelse kunne ikke tilføjes"
+#~ msgstr "lap kunne ikke tilføjes"
 
 #~ msgid "Backout selected changeset"
 #~ msgstr "Omgør valgte ændring"
