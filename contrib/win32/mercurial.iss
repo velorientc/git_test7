@@ -34,6 +34,7 @@ DefaultGroupName=TortoiseHg
 PrivilegesRequired=poweruser
 AlwaysRestart=yes
 SetupLogging=yes
+ArchitecturesInstallIn64BitMode=x64
 
 [Files]
 Source: contrib\mercurial.el; DestDir: {app}/contrib
@@ -49,7 +50,6 @@ Source: ..\contrib\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace un
 Source: ..\contrib\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: win32\shellext\THgShell.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\library.zip; DestDir: {app}
 Source: doc\*.html; DestDir: {app}\docs
@@ -61,6 +61,9 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: CONTRIBUTORS; DestDir: {app}; DestName: Contributors.txt
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: ..\icons\hgicon.ico; DestDir: {app}
+
+Source: win32\shellext\THgShell.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: win32\shellext\ThgShell64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
 
 [INI]
 Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http://www.selenic.com/mercurial/
@@ -74,7 +77,8 @@ Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
-Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.4.11886-win32.msi"" /qn /norestart ALLUSERS=1"; StatusMsg: Installing TortoiseOverlays.dll ...
+Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Check: not Is64BitInstallMode; StatusMsg: Installing TortoiseOverlays.dll ...
+Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-x64.msi"" /qn /norestart ALLUSERS=1"; Check: Is64BitInstallMode; StatusMsg: Installing TortoiseOverlays.dll ...
 
 [UninstallRun]
 Filename: {app}\add_path.exe; Parameters: /del {app}
