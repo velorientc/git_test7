@@ -28,7 +28,9 @@ _tortoise_info = (
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
         ' on your system or use its internal merge tool that leaves conflict'
-        ' markers in place.  Chose internal:merge to force conflict markers.')),
+        ' markers in place.  Chose internal:merge to force conflict markers,'
+        ' internal:prompt to always select local or other, or internal:dump'
+        ' to leave files in the working directory for manual merging')),
     (_('Visual Diff Command'), 'tortoisehg.vdiff', [],
         _('Specify visual diff tool; must be an extdiff command')),
     (_('Skip Diff Window'), 'tortoisehg.vdiffnowin', ['False', 'True'],
@@ -849,6 +851,8 @@ class ConfigDialog(gtk.Dialog):
                             if filemerge._findtool(self.ui, t):
                                 values.append(t)
                         values.append('internal:merge')
+                        values.append('internal:prompt')
+                        values.append('internal:dump')
                     except ImportError:
                         pass
 
