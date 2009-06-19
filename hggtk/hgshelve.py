@@ -501,7 +501,7 @@ def shelve(ui, repo, *pats, **opts):
                 if dopatch:
                     ui.debug(_('applying patch\n'))
                     ui.debug(fp.getvalue())
-                    patch.internalpatch(fp, ui, 1, repo.root)
+                    patch.internalpatch(fp, ui, 1, repo.root, eolmode=None)
                 del fp
 
                 # 3c. apply filtered patch to clean repo (shelve)
