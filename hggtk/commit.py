@@ -412,7 +412,7 @@ class GCommit(GStatus):
 
     def commit_selected(self, files):
         # 1a. get list of chunks not rejected
-        repo, ui = self.repo, self.ui
+        repo, ui = self.repo, self.repo.ui
 
         # 2. backup changed files, so we can restore them in the end
         backups = {}
@@ -463,7 +463,8 @@ class GCommit(GStatus):
             if dopatch:
                 try:
                     pfiles = {}
-                    patch.internalpatch(fp, ui, 1, repo.root, files=pfiles)
+                    patch.internalpatch(fp, ui, 1, repo.root, files=pfiles,
+                                        eolmode=None)
                     patch.updatedir(ui, repo, pfiles)
                 except patch.PatchError, err:
                     s = str(err)
