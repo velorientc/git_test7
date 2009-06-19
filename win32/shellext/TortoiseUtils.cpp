@@ -111,11 +111,15 @@ int GetRegistryConfig(const std::string& name, std::string& res)
     rv = RegQueryValueExA(
         hkey, name.c_str(), 0, 0, Data, &cbData);
 
-    if (rv != ERROR_SUCCESS)
-        return 0;
+    int ret = 0;
+    if (rv == ERROR_SUCCESS)
+    {
+        res = reinterpret_cast<const char*>(&Data);
+        ret = 1;
+    }
 
-    res = reinterpret_cast<const char*>(&Data);
-    return 1;
+    RegCloseKey(hkey);
+    return ret;
 }
 
 
