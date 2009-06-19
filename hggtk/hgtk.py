@@ -583,6 +583,7 @@ globalopts = [
     ('v', 'verbose', None, _('enable additional output')),
     ('h', 'help', None, _('display help and exit')),
     ('', 'debugger', None, _('start debugger')),
+    ('', 'nofork', None, _('do not fork GUI process')),
     ('l', 'listfile', '', _('read file list from file')),
 ]
 

@@ -27,15 +27,15 @@ def portable_fork():
         if os.fork():
             sys.exit(0)
 
-nofork = 'version help' # simple interactive commands should not fork
-for i, arg in enumerate(sys.argv):
-    if 'hgtk' in arg and len(sys.argv) > i+1:
-        cmd = sys.argv[i+1]
-        break
-else:
-    cmd = None
-if cmd not in nofork.split() and 'HGTK_NOFORK' not in os.environ:
-    portable_fork()
+if '--nofork' not in sys.argv and 'HGTK_NOFORK' not in os.environ:
+    for i, arg in enumerate(sys.argv):
+        if 'hgtk' in arg and len(sys.argv) > i+1:
+            cmd = sys.argv[i+1]
+            break
+    else:
+        cmd = None
+    if cmd not in ('version', 'help'):
+        portable_fork()
 
 if hasattr(sys, "frozen"):
     # Prepend C:\Program Files\TortoiseHg\gtk (equiv) to the path
