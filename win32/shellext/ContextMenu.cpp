@@ -557,7 +557,7 @@ void CShellExt::DoHgtk(const std::string &cmd)
     else
         FindClose(hfind);
 
-    hgcmd = Quote(hgcmd) + " " + cmd;
+    hgcmd = Quote(hgcmd) + " --nofork " + cmd;
 
     std::string cwd;
     if (!myFolder.empty())
