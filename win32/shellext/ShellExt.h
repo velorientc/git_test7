@@ -29,6 +29,8 @@ class CDllRegSxClassFactory : public IClassFactory
         ~CDllRegSxClassFactory();
 
     public:
+        static LPCRITICAL_SECTION GetCriticalSection();
+
         STDMETHODIMP			QueryInterface(REFIID, LPVOID FAR *);
         STDMETHODIMP_(ULONG)	AddRef();
         STDMETHODIMP_(ULONG)	Release();
@@ -60,6 +62,8 @@ class CShellExt :
         void                    CShellExt::DoHgtk(const std::string &);
 		
     public:
+        static LPCRITICAL_SECTION GetCriticalSection();
+
         CShellExt(TortoiseOLEClass);
         ~CShellExt();
 
@@ -85,5 +89,23 @@ class CShellExt :
     };
 
 typedef CShellExt *LPCSHELLEXT;
+
+
+class ThgCriticalSection
+{
+    LPCRITICAL_SECTION cs_;
+
+public:
+    ThgCriticalSection(LPCRITICAL_SECTION cs): cs_(cs)
+    {
+        ::EnterCriticalSection(cs_);
+    }
+
+    ~ThgCriticalSection()
+    {
+        ::LeaveCriticalSection(cs_);
+    }
+};
+
 
 #endif // _SHELL_EXT_H_

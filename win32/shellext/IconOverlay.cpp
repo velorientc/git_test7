@@ -42,6 +42,8 @@ STDMETHODIMP CShellExt::GetPriority(int *pPriority)
 
 STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 {
+    ThgCriticalSection cs(GetCriticalSection());
+
     std::string cval;
     if (GetRegistryConfig("EnableOverlays", cval) != 0 && cval == "0")
         return S_FALSE;

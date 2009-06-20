@@ -21,6 +21,9 @@ HINSTANCE g_hmodThisDll = NULL;
 
 HMENU	hSubMenu		= 0;
 
+CRITICAL_SECTION g_critical_section;
+
+
 typedef struct
 {
    HKEY  hRootKey;
@@ -36,14 +39,20 @@ extern "C"
 int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
     TDEBUG_TRACE("DllMain");
-    
+
     if (dwReason == DLL_PROCESS_ATTACH)
 	{
+        TDEBUG_TRACE("DllMain: DLL_PROCESS_ATTACH");
         g_hmodThisDll = hInstance;
+        ::InitializeCriticalSection(&g_critical_section);
 		_LoadResources();
 	}
 	else if (dwReason == DLL_PROCESS_DETACH)
+    {
+        TDEBUG_TRACE("DllMain: DLL_PROCESS_ATTACH");
+        ::DeleteCriticalSection(&g_critical_section);
 		_UnloadResources();
+    }
 
     return 1;
 }
@@ -99,8 +108,15 @@ VOID _UnloadResources(VOID)
 		DestroyMenu(hSubMenu);
 }
 
+
+LPCRITICAL_SECTION CDllRegSxClassFactory::GetCriticalSection()
+{
+    return &g_critical_section;
+}
+
 CDllRegSxClassFactory::CDllRegSxClassFactory(TortoiseOLEClass classToMake)
 {
+    ThgCriticalSection cs(GetCriticalSection());
     m_cRef = 0L;
     g_cRefThisDll++;	
     myclassToMake = classToMake;
@@ -108,6 +124,7 @@ CDllRegSxClassFactory::CDllRegSxClassFactory(TortoiseOLEClass classToMake)
 																
 CDllRegSxClassFactory::~CDllRegSxClassFactory()				
 {
+    ThgCriticalSection cs(GetCriticalSection());
     g_cRefThisDll--;
 }
 
@@ -130,12 +147,14 @@ CDllRegSxClassFactory::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 STDMETHODIMP_(ULONG) 
 CDllRegSxClassFactory::AddRef()
 {
+    ThgCriticalSection cs(GetCriticalSection());
     return ++m_cRef;
 }
 
 STDMETHODIMP_(ULONG) 
 CDllRegSxClassFactory::Release()
 {
+    ThgCriticalSection cs(GetCriticalSection());
     if (--m_cRef)
         return m_cRef;
 
@@ -167,6 +186,8 @@ CDllRegSxClassFactory::LockServer(BOOL fLock)
 CShellExt::CShellExt(TortoiseOLEClass tortoiseClass)
 	: m_ppszFileUserClickedOn(0)
 {
+    ThgCriticalSection cs(GetCriticalSection());
+
     myTortoiseClass = tortoiseClass;
     m_cRef = 0L;
     m_pDataObj = NULL;
@@ -176,10 +197,17 @@ CShellExt::CShellExt(TortoiseOLEClass tortoiseClass)
 
 CShellExt::~CShellExt()
 {
+    ThgCriticalSection cs(GetCriticalSection());
+
     if (m_pDataObj)
         m_pDataObj->Release();
 
     g_cRefThisDll--;
+}
+
+LPCRITICAL_SECTION CShellExt::GetCriticalSection()
+{
+    return &g_critical_section;
 }
 
 STDMETHODIMP 
@@ -228,12 +256,15 @@ CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 STDMETHODIMP_(ULONG) 
 CShellExt::AddRef()
 {
+    ThgCriticalSection cs(GetCriticalSection());
     return ++m_cRef;
 }
 
 STDMETHODIMP_(ULONG) 
 CShellExt::Release()
 {
+    ThgCriticalSection cs(GetCriticalSection());
+
     if(--m_cRef)
         return m_cRef;
 
