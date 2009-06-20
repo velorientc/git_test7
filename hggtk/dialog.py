@@ -14,32 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import pygtk
-pygtk.require("2.0")
 import gtk
-from gtklib import MessageDialog
-
-
-def about():
-    raise "About dialog currently under construction"
-    
-def _message_dialog(parent, type, primary, secondary, buttons=gtk.BUTTONS_OK,
-                    title="TortoiseHg"):
-    """ Display a given type of MessageDialog with the given message.
-    
-    :param type: message dialog type
-    
-    :param message: the message you want to display.
-    """
-    dialog = MessageDialog(parent, flags=gtk.DIALOG_MODAL, type=type,
-                               buttons=buttons)
-    dialog.set_title(title)
-    dialog.set_markup('<big><b>' + primary + '</b></big>')
-    dialog.format_secondary_text(secondary)
-    dialog.set_position(gtk.WIN_POS_MOUSE)
-    response = dialog.run()
-    dialog.destroy()
-    return response
+from thgutil.i18n import _
+from hggtk import gtklib
 
 def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
     """ Allow a user to enter a text string (username/password)
@@ -53,7 +30,7 @@ def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
             gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
     dialog = gtk.Dialog(parent=parent, flags=gtk.DIALOG_MODAL,
             buttons=buttons)
-    dialog.set_title('TortoiseHg Prompt')
+    dialog.set_title(_('TortoiseHg Prompt'))
     entry = gtk.Entry()
     entry.set_text(default or '')
     entry.set_visibility(visible)
@@ -77,6 +54,26 @@ def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
         dialog.destroy()
         return text
 
+# TODO: Deprecate and remove these
+
+def _message_dialog(parent, type, primary, secondary, buttons=gtk.BUTTONS_OK,
+                    title="TortoiseHg"):
+    """ Display a given type of MessageDialog with the given message.
+
+    :param type: message dialog type
+
+    :param message: the message you want to display.
+    """
+    dialog = gtklib.MessageDialog(parent, flags=gtk.DIALOG_MODAL, type=type,
+                               buttons=buttons)
+    dialog.set_title(title)
+    dialog.set_markup('<big><b>' + primary + '</b></big>')
+    dialog.format_secondary_text(secondary)
+    dialog.set_position(gtk.WIN_POS_MOUSE)
+    response = dialog.run()
+    dialog.destroy()
+    return response
+
 def error_dialog(parent, primary, secondary):
     """ Display an error dialog with the given message. """
     return _message_dialog(parent, gtk.MESSAGE_ERROR, primary, secondary)
@@ -88,8 +85,3 @@ def info_dialog(parent, primary, secondary):
 def warning_dialog(parent, primary, secondary):
     """ Display a warning dialog with the given message. """
     return _message_dialog(parent, gtk.MESSAGE_WARNING, primary, secondary)
-
-def question_dialog(parent, primary, secondary):
-    """ Display a dialog with the given question. """
-    return _message_dialog(parent, gtk.MESSAGE_QUESTION, primary, secondary,
-            gtk.BUTTONS_YES_NO)

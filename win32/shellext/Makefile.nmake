@@ -1,0 +1,41 @@
+
+OBJECTS_DIRSTATE = TortoiseUtils.obj \
+        Direntry.obj \
+        Directory.obj \
+        Winstat.obj
+
+OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
+        ContextMenu.obj \
+        IconOverlay.obj \
+        ShellExt.obj \
+        ShellUtils2.obj \
+        StringUtils.obj \
+        dirstate.obj \
+        Winstat64.obj \
+        Dirstatecache.obj \
+        DirectoryStatus.obj \
+        Thgstatus.obj \
+        QueryDirstate.obj
+
+LIBS    = User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib
+DEFFILE = ShellExt.def
+
+
+CPPFLAGS         = /nologo /Ox /W2 /EHsc /MD /DAPPMAIN /DTHG_DEBUG
+BASE_LDFLAGS     = /nologo /INCREMENTAL:NO /MANIFEST $(LIBS)
+LDFLAGS_THGSHELL = $(BASE_LDFLAGS) /DLL /DEF:$(DEFFILE)
+LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
+
+
+all: THgShell.dll dirstate.exe
+
+clean:
+    del *.obj *.dll *.exe *.lib *.exp *.manifest
+
+THgShell.dll: $(OBJECTS_THGSGELL)
+    link /OUT:$@ $(LDFLAGS_THGSHELL) $**
+    mt -nologo -manifest $@.manifest -outputresource:"$@;#2"
+
+dirstate.exe: dirstate.obj $(OBJECTS_DIRSTATE)
+    link /OUT:$@ $(LDFLAGS_DIRSTATE) $**
+    mt -nologo -manifest $@.manifest -outputresource:"$@;#1"

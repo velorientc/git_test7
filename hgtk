@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+#
+# front-end script for TortoiseHg dialogs
+#
+# Copyright (C) 2008-9 Steve Borho <steve@borho.org>
+# Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
+#
+
+import os
+import sys
+
+def portable_fork():
+    # Spawn background process and exit
+    if sys.platform[:3] == 'win':
+        if 'THG_HGTK_SPAWN' not in os.environ:
+            if hasattr(sys, "frozen"):
+                args = sys.argv
+            else:
+                args = [sys.executable] + sys.argv
+            args = ['"%s"' % arg for arg in args]
+            env = os.environ.copy()
+            env['THG_HGTK_SPAWN'] = '1'
+            os.spawnve(os.P_NOWAIT, sys.executable, args, env)
+            sys.exit(0)
+    else:
+        assert hasattr(os, 'fork')
+        if os.fork():
+            sys.exit(0)
+
+if '--nofork' not in sys.argv and 'HGTK_NOFORK' not in os.environ:
+    for i, arg in enumerate(sys.argv):
+        if 'hgtk' in arg and len(sys.argv) > i+1:
+            cmd = sys.argv[i+1]
+            break
+    else:
+        cmd = None
+    if cmd not in ('version', 'help'):
+        portable_fork()
+
+if hasattr(sys, "frozen"):
+    # Prepend C:\Program Files\TortoiseHg\gtk (equiv) to the path
+    from thgutil import paths
+    gtkpath = os.path.join(paths.bin_path, 'gtk')
+    os.environ['PATH'] = os.pathsep.join([gtkpath, os.environ['PATH']])
+else:
+    # if hgtk is a symlink, insert symlink target directory in sys.path
+    thgpath = os.path.dirname(os.path.realpath(__file__))
+    testpath = os.path.join(thgpath, 'thgutil')
+    if os.path.isdir(testpath) and thgpath not in sys.path:
+        sys.path.insert(0, thgpath)
+
+
+import pygtk
+pygtk.require('2.0')
+import gtk
+
+from mercurial import demandimport;
+demandimport.ignore.append('win32com.shell')
+demandimport.enable()
+import cStringIO
+
+try:
+    import hggtk.hgtk
+except ImportError:
+    sys.stderr.write("abort: couldn't find hggtk libraries in [%s]\n" %
+                     ';'.join(sys.path))
+    sys.stderr.write("(check your install and PYTHONPATH)\n")
+    sys.exit(-1)
+
+if 'THGDEBUG' in os.environ:
+    sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
+else:
+    sys.stderr = cStringIO.StringIO()
+    ret = hggtk.hgtk.dispatch(sys.argv[1:])
+    sys.stderr.seek(0)
+    for l in sys.stderr.readlines():
+        if l.startswith('Traceback') or l.startswith('TypeError'):
+            from hggtk.bugreport import run
+            from hggtk.hgtk import gtkrun
+            from mercurial import ui
+            sys.stderr.seek(0)
+            error = 'Recoverable runtime error (stderr):\n' + sys.stderr.read()
+            opts = {}
+            opts['cmd'] = ' '.join(sys.argv[1:])
+            opts['error'] = error
+            gtkrun(run(ui.ui(), **opts))
+            break
+    sys.exit(ret)

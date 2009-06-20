@@ -5,117 +5,117 @@
 # Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
 #
 
-import os
 import gtk
+import gobject
 import pango
-from dialog import *
-from hgcmd import CmdDialog
-import histselect
+
+from mercurial import hg, ui
+from thgutil.i18n import _
+from thgutil import hglib, paths
+from hggtk import gtklib, hgcmd
 
 class BackoutDialog(gtk.Window):
     """ Backout effect of a changeset """
-    def __init__(self, root='', rev=''):
+    def __init__(self, rev=None):
         """ Initialize the Dialog """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtklib.set_tortoise_keys(self)
 
-        self.root = root
-        self.set_title('Backout changeset - ' + rev)
+        self.set_title(_('Backout changeset - ') + rev)
         self.set_default_size(600, 400)
         self.notify_func = None
-        
-        self.tbar = gtk.Toolbar()
-        self.tips = gtk.Tooltips()
 
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
+        try:
+            repo = hg.repository(ui.ui(), path=paths.find_root())
+        except hglib.RepoError:
+            gobject.idle_add(self.destroy)
+            return
 
-        tbuttons = [
-                self._toolbutton(gtk.STOCK_GO_BACK, 'Backout',
-                                 self._backout_clicked,
-                                 'Backout selected changeset')
-            ]
-        for btn in tbuttons:
-            self.tbar.insert(btn, -1)
         vbox = gtk.VBox()
         self.add(vbox)
-        vbox.pack_start(self.tbar, False, False, 2)
 
-        # From: combo box
-        self.reventry = gtk.Entry()
-        self.reventry.set_text(rev)
-        self.browse = gtk.Button("Browse...")
-        self.browse.connect('clicked', self._btn_rev_clicked)
-
-        hbox = gtk.HBox()
-        hbox.pack_start(gtk.Label('Revision to backout:'), False, False, 4)
-        hbox.pack_start(self.reventry, True, True, 4)
-        hbox.pack_start(self.browse, False, False, 4)
-        vbox.pack_start(hbox, False, False, 4)
+        frame = gtk.Frame(_('Changeset Description'))
+        lbl = gtk.Label()
+        desc = self.revdesc(repo, rev)
+        lbl.set_markup(desc)
+        lbl.set_alignment(0, 0)
+        frame.add(lbl)
+        frame.set_border_width(5)
+        vbox.pack_start(frame, False, False, 2)
 
         self.logview = gtk.TextView(buffer=None)
         self.logview.set_editable(True)
-        self.logview.modify_font(pango.FontDescription("Monospace"))
+        self.logview.modify_font(pango.FontDescription('Monospace'))
         buf = self.logview.get_buffer()
-        buf.set_text('Backed out changeset: ' + rev)
+        buf.set_text(_('Backed out changeset: ') + rev)
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.logview)
         scrolledwindow.set_border_width(4)
-        frame = gtk.Frame('Backout commit message')
+        frame = gtk.Frame(_('Backout commit message'))
         frame.set_border_width(4)
         frame.add(scrolledwindow)
-        self.tips.set_tip(frame, 
-                'Commit message text for new changeset that reverses the'
-                '  effect of the change being backed out.')
+        self.tips = gtk.Tooltips()
+        self.tips.set_tip(frame,
+                _('Commit message text for new changeset that reverses the'
+                '  effect of the change being backed out.'))
         vbox.pack_start(frame, True, True, 4)
+
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+
+        hbbox = gtk.HButtonBox()
+        hbbox.set_layout(gtk.BUTTONBOX_END)
+        vbox.pack_start(hbbox, False, False, 2)
+
+        close = gtk.Button(_('Close'))
+        close.connect('clicked', lambda x: self.destroy())
+        key, modifier = gtk.accelerator_parse('Escape')
+        close.add_accelerator('clicked', accelgroup, key, 0,
+                gtk.ACCEL_VISIBLE)
+        hbbox.add(close)
+
+        backout = gtk.Button(_('Backout'))
+        key, modifier = gtk.accelerator_parse(mod+'Return')
+        backout.add_accelerator('clicked', accelgroup, key, modifier,
+                gtk.ACCEL_VISIBLE)
+        hbbox.add(backout)
+        backout.grab_focus()
+
+        backout.connect('clicked', self.backout, buf, rev)
+
+    def revdesc(self, repo, revid):
+        ctx = repo[revid]
+        revstr = str(ctx.rev())
+        summary = ctx.description().replace('\0', '')
+        summary = summary.split('\n')[0]
+        escape = gobject.markup_escape_text
+        desc =  '<b>' + _('rev') + '</b>\t\t: %s\n' % escape(revstr)
+        desc += '<b>' + _('summary') + '</b>\t: %s\n' % escape(summary[:80])
+        desc += '<b>' + _('user') + '</b>\t\t: %s\n' % escape(ctx.user())
+        desc += '<b>' + _('date') + '</b>\t\t: %s\n' % escape(hglib.displaytime(ctx.date()))
+        node = repo.lookup(revid)
+        tags = repo.nodetags(node)
+        desc += '<b>' + _('branch') + '</b>\t: ' + escape(ctx.branch())
+        if tags:
+            desc += '\n<b>' + _('tags') + '</b>\t\t: ' + escape(', '.join(tags))
+        return hglib.toutf(desc)
 
     def set_notify_func(self, func, *args):
         self.notify_func = func
         self.notify_args = args
 
-    def _btn_rev_clicked(self, button):
-        """ select revision from history dialog """
-        rev = histselect.select(self.root)
-        if rev is not None:
-            self.reventry.set_text(rev)
-            buf = self.logview.get_buffer()
-            buf.set_text('Backed out changeset: ' + rev)
-
-    def _toolbutton(self, stock, label, handler, tip):
-        tbutton = gtk.ToolButton(stock)
-        tbutton.set_label(label)
-        tbutton.set_tooltip(self.tips, tip)
-        tbutton.connect('clicked', handler)
-        return tbutton
-        
-    def _backout_clicked(self, button):
-        buf = self.logview.get_buffer()
+    def backout(self, button, buf, revstr):
         start, end = buf.get_bounds()
-        cmdline = ['hg', 'backout', '--rev', self.reventry.get_text(),
-            '--message', buf.get_text(start, end)]
-        dlg = CmdDialog(cmdline)
+        msg = buf.get_text(start, end)
+        cmdline = ['hg', 'backout', '--rev', revstr, '--message', msg]
+        dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
         dlg.hide()
-        if self.notify_func:
-            self.notify_func(self.notify_args)
-
-def run(root='', **opts):
-    # This dialog is intended to be launched by the changelog browser
-    # It's not expected to be used from hgproc or the command line.  I
-    # leave this path in place for testing purposes.
-    dialog = BackoutDialog(root, 'tip')
-    dialog.show_all()
-    dialog.connect('destroy', gtk.main_quit)
-    gtk.gdk.threads_init()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-if __name__ == "__main__":
-    import sys
-    opts = {}
-    opts['root'] = len(sys.argv) > 1 and sys.argv[1] or os.getcwd()
-    run(**opts)
+        if dlg.returncode == 0:
+            if self.notify_func:
+                self.notify_func(self.notify_args)
+            self.destroy()
