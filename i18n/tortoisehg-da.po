@@ -357,7 +357,7 @@ msgstr "Integrér"
 
 #: hggtk\commit.py:424
 msgid "Unable to create "
-msgstr ""
+msgstr "Kan ikke oprette "
 
 #: hggtk\commit.py:473
 msgid "Unable to apply patch"
@@ -391,11 +391,11 @@ msgstr "Fejl under tilbageføring!"
 
 #: hggtk\commit.py:537
 msgid "Confirm Add/Remove"
-msgstr ""
+msgstr "Bekræft tilføj/fjern"
 
 #: hggtk\commit.py:538
 msgid "Add/Remove the following files?"
-msgstr ""
+msgstr "Tilføj/fjern de følgende filer?"
 
 #: hggtk\commit.py:551 hggtk\tagadd.py:174
 msgid "Please enter commit message"
@@ -419,7 +419,7 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
-"Opsummeringsliniens længde %i er større end %i.\n"
+"Uddragsliniens længde %i er større end %i.\n"
 "\n"
 "Ignorer formateringspolitik og fortsæt integration?"
 
@@ -429,7 +429,7 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
-"Opsummeringslinien er ikke fulgt af en tom linie.\n"
+"Uddragslinien er ikke fulgt af en tom linie.\n"
 "\n"
 "Ignorer formateringspolitik og fortsæt integration?"
 
@@ -504,15 +504,15 @@ msgstr "Advarsel"
 
 #: hggtk\commit.py:746
 msgid "The summary line length of %i is greater than %i"
-msgstr ""
+msgstr "Uddragsliniens længde %i er større end %i"
 
 #: hggtk\commit.py:751
 msgid "The summary line is not followed by a blank line"
-msgstr ""
+msgstr "Uddragslinien bliver ikke fulgt af en tom linie"
 
 #: hggtk\datamine.py:35
 msgid "DataMining"
-msgstr ""
+msgstr "DataMining"
 
 #: hggtk\datamine.py:44 hggtk\hgcmd.py:37 hggtk\recovery.py:43
 #: hggtk\serve.py:61 hggtk\synch.py:59
@@ -521,7 +521,7 @@ msgstr "Stop"
 
 #: hggtk\datamine.py:46
 msgid "Stop operation on current tab"
-msgstr ""
+msgstr "Stop aktivitet på aktuelt faneblad"
 
 #: hggtk\datamine.py:48
 msgid "New Search"
@@ -529,7 +529,7 @@ msgstr "Ny søgning"
 
 #: hggtk\datamine.py:50
 msgid "Open new search tab"
-msgstr ""
+msgstr "Åben nyt faneblad til søgning"
 
 #: hggtk\datamine.py:61 hggtk\thgconfig.py:943
 msgid "Invalid path"
@@ -537,7 +537,7 @@ msgstr "Ugyldig sti"
 
 #: hggtk\datamine.py:62
 msgid "Cannot annotate directory: %s"
-msgstr ""
+msgstr "Kan ikke annotere katalog: %s"
 
 #: hggtk\datamine.py:104
 msgid "Filename"
@@ -550,15 +550,15 @@ msgstr "Bruger"
 
 #: hggtk\datamine.py:115 hggtk\datamine.py:124
 msgid "di_splay change"
-msgstr ""
+msgstr "_vis ændring"
 
 #: hggtk\datamine.py:123
 msgid "_zoom to change"
-msgstr ""
+msgstr "_zoom til ændring"
 
 #: hggtk\datamine.py:125
 msgid "_annotate parent"
-msgstr ""
+msgstr "_annoter forælder"
 
 #: hggtk\datamine.py:215
 msgid "Search"
@@ -566,15 +566,15 @@ msgstr "Søg"
 
 #: hggtk\datamine.py:216 hggtk\hgignore.py:49
 msgid "Regexp:"
-msgstr ""
+msgstr "Reg. udtryk:"
 
 #: hggtk\datamine.py:218
 msgid "Includes:"
-msgstr ""
+msgstr "Inkluderer:"
 
 #: hggtk\datamine.py:220
 msgid "Excludes:"
-msgstr ""
+msgstr "Ekskluderer:"
 
 #: hggtk\datamine.py:223
 msgid "Start this search"
@@ -582,7 +582,7 @@ msgstr "Start søgning"
 
 #: hggtk\datamine.py:224
 msgid "Regular expression search pattern"
-msgstr ""
+msgstr "Regulært udtryk"
 
 #: hggtk\datamine.py:225
 msgid ""
@@ -595,14 +595,16 @@ msgid ""
 "Comma separated list of exclusion patterns.  Exclusion patterns are applied "
 "after inclusion patterns."
 msgstr ""
+"Kommesepareret liste af ekskluderingsmønstre. Disse bliver anvendt efter "
+"inkluderingsmønstrene."
 
 #: hggtk\datamine.py:234
 msgid "Follow copies and renames"
-msgstr ""
+msgstr "Følg kopiering og omdøbning"
 
 #: hggtk\datamine.py:235
 msgid "Ignore case"
-msgstr ""
+msgstr "Ignorer versal"
 
 #: hggtk\datamine.py:236
 msgid "Show line numbers"
@@ -610,7 +612,7 @@ msgstr "Vis linienumre"
 
 #: hggtk\datamine.py:237
 msgid "Show all matching revisions"
-msgstr ""
+msgstr "Vis alle matchende revisioner"
 
 #: hggtk\datamine.py:265 hggtk\datamine.py:522 hggtk\logview\treeview.py:372
 msgid "Rev"
@@ -622,83 +624,83 @@ msgstr "Fil"
 
 #: hggtk\datamine.py:267
 msgid "Matches"
-msgstr ""
+msgstr "Match"
 
 #: hggtk\datamine.py:289
 msgid "Search %d"
-msgstr ""
+msgstr "Søgning %d"
 
 #: hggtk\datamine.py:331
 msgid "No regular expression given"
-msgstr ""
+msgstr "Regulært udtryk mangler"
 
 #: hggtk\datamine.py:332
 msgid "You must provide a search expression"
-msgstr ""
+msgstr "Du skal angive et søgeudtryk"
 
 #: hggtk\datamine.py:360
 msgid "Search \"%s\""
-msgstr ""
+msgstr "Søg \"%s\""
 
 #: hggtk\datamine.py:472
 msgid "File is unrevisioned"
-msgstr ""
+msgstr "Fil er ikke kontrolleret"
 
 #: hggtk\datamine.py:473
 msgid "Unable to annotate "
-msgstr ""
+msgstr "Kan ikke annotere "
 
 #: hggtk\datamine.py:493
 msgid "Follow"
-msgstr ""
+msgstr "Følg"
 
 #: hggtk\datamine.py:521
 msgid "Line"
-msgstr ""
+msgstr "Linie"
 
 #: hggtk\datamine.py:525 hggtk\guess.py:100
 msgid "Source"
-msgstr ""
+msgstr "Kilde"
 
 #: hggtk\datamine.py:617
 msgid "Follow Rename:"
-msgstr ""
+msgstr "Følg omdøbninger:"
 
 #: hggtk\dialog.py:33
 msgid "TortoiseHg Prompt"
-msgstr ""
+msgstr "TortoiseHg prompt"
 
 #: hggtk\gdialog.py:377
 msgid " Aborted"
-msgstr ""
+msgstr " Afbrudt"
 
 #: hggtk\gdialog.py:388
 msgid " Messages and Errors"
-msgstr ""
+msgstr " Meddelelser og fejl"
 
 #: hggtk\gdialog.py:399
 msgid "No visual diff configured"
-msgstr ""
+msgstr "Ingen visuel sammenligning konfigureret"
 
 #: hggtk\gdialog.py:400
 msgid "Please select a visual diff application."
-msgstr ""
+msgstr "Vælg et visuet sammenligningsprogram."
 
 #: hggtk\gdialog.py:459
 msgid "making snapshot of %d files from rev %s\n"
-msgstr ""
+msgstr "laver øjebliksbillede af %d filer fra rev %s\n"
 
 #: hggtk\gdialog.py:492
 msgid "edit failed"
-msgstr ""
+msgstr "redigering fejlede"
 
 #: hggtk\gdialog.py:500 hggtk\thgconfig.py:541
 msgid "No visual editor configured"
-msgstr ""
+msgstr "Ingen visuel editor konfigureret"
 
 #: hggtk\gdialog.py:501 hggtk\thgconfig.py:542
 msgid "Please configure a visual editor."
-msgstr ""
+msgstr "Vælg en visuel editor."
 
 #: hggtk\gtklib.py:88
 msgid "Running"
@@ -1755,7 +1757,7 @@ msgstr ""
 
 #: hggtk\logview\treeview.py:411
 msgid "Summary"
-msgstr ""
+msgstr "Uddrag"
 
 #: hggtk\logview\treeview.py:436
 msgid "Local Date"
@@ -1799,7 +1801,7 @@ msgstr ""
 
 #: hggtk\merge.py:105
 msgid "summary"
-msgstr ""
+msgstr "uddrag"
 
 #: hggtk\merge.py:106
 msgid "user"
@@ -2750,7 +2752,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:65
 msgid "Summary Line Length"
-msgstr "Længde af opsummeringslinie"
+msgstr "Længde af uddragslinie"
 
 #: hggtk\thgconfig.py:66
 msgid ""
@@ -2758,8 +2760,8 @@ msgid ""
 "issue a warning if the summary line is too long or not separated by a blank "
 "line. Default: 0 (unenforced)"
 msgstr ""
-"Maximal længde af opsummeringslinien i integrationsbeskeden. Hvis sat vil "
-"TortoiseHg advare hvis opsumeringslinien bliver for lang eller ikke fulgt af "
+"Maximal længde af uddragslinien i integrationsbeskeden. Hvis sat vil "
+"TortoiseHg advare hvis uddragslinien bliver for lang eller ikke fulgt af "
 "en tom linie. Default: 0 (deaktiveret)"
 
 #: hggtk\thgconfig.py:70
@@ -2792,13 +2794,15 @@ msgstr ""
 
 #: hggtk\thgconfig.py:83
 msgid "Long Summary"
-msgstr ""
+msgstr "Langt uddrag"
 
 #: hggtk\thgconfig.py:84
 msgid ""
 "If true, concatenate multiple lines of changeset summary until they reach 80 "
 "characters. Default: False"
 msgstr ""
+"Hvis sand bliver uddraget sammensat af de første 80 tegn af "
+"integrationsbeskeden. Default: Falsk"
 
 #: hggtk\thgconfig.py:87
 msgid "Log Batch Size"
