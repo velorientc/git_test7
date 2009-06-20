@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-06-15 05:36+0000\n"
-"PO-Revision-Date: 2009-03-10 16:37+0000\n"
+"POT-Creation-Date: 2009-06-15 11:54+0000\n"
+"PO-Revision-Date: 2009-06-18 15:20+0000\n"
 "Last-Translator: willie <willie.tw@gmail.com>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-15 10:44+0000\n"
+"X-Launchpad-Export-Date: 2009-06-19 05:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\gdialog.py:492
@@ -27,23 +27,23 @@ msgstr "網頁伺服器"
 
 #: hggtk\about.py:52
 msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr ""
+msgstr "一些圖示是由 TortoiseSVN 計劃所提供"
 
 #: hggtk\backout.py:24
 msgid "Backout changeset - "
-msgstr ""
+msgstr "Backout changeset "
 
 #: hggtk\backout.py:37
 msgid "Changeset Description"
-msgstr ""
+msgstr "Changeset 說明"
 
 #: hggtk\backout.py:50
 msgid "Backed out changeset: "
-msgstr ""
+msgstr "已 backout changeset: "
 
 #: hggtk\backout.py:56
 msgid "Backout commit message"
-msgstr ""
+msgstr "Backout commit message"
 
 #: hggtk\backout.py:61
 msgid ""
@@ -55,61 +55,63 @@ msgstr ""
 #: hggtk\hginit.py:84 hggtk\merge.py:72 hggtk\taskbarui.py:32
 #: hggtk\update.py:70
 msgid "Close"
-msgstr ""
+msgstr "關閉"
 
 #: hggtk\backout.py:80
 msgid "Backout"
-msgstr ""
+msgstr "Backout"
 
 #: hggtk\bugreport.py:23
 msgid "TortoiseHg Bug Report"
-msgstr ""
+msgstr "回報 TortoiseHg 的問題"
 
 #: hggtk\bugreport.py:48
 msgid ""
 "** Please report this bug to tortoisehg-discuss@lists.sourceforge.net or "
 "http://bitbucket.org/tortoisehg/stable/issues\n"
 msgstr ""
+"** 請回報此問題至 tortoisehg-discuss@lists.sourceforge.net 或是 "
+"http://bitbucket.org/tortoisehg/stable/issues\n"
 
 #: hggtk\changeset.py:39
 msgid "_Other parent"
-msgstr ""
+msgstr "其他的 parent(_O)"
 
 #: hggtk\changeset.py:40
 msgid "diff other parent"
-msgstr ""
+msgstr "與其他的 parent 比對差異"
 
 #: hggtk\changeset.py:104
 msgid "[All Files]"
-msgstr ""
+msgstr "[全部的檔案]"
 
 #: hggtk\changeset.py:145
 msgid "changeset:"
-msgstr ""
+msgstr "changeset:"
 
 #: hggtk\changeset.py:147
 msgid "branch:"
-msgstr ""
+msgstr "branch:"
 
 #: hggtk\changeset.py:148
 msgid "user/date:"
-msgstr ""
+msgstr "使用者/日期:"
 
 #: hggtk\changeset.py:156
 msgid "parent:"
-msgstr ""
+msgstr "parent:"
 
 #: hggtk\changeset.py:169
 msgid "child:"
-msgstr ""
+msgstr "child:"
 
 #: hggtk\changeset.py:175
 msgid "tags:"
-msgstr ""
+msgstr "tags:"
 
 #: hggtk\changeset.py:195
 msgid " %s is larger than the specified max diff size"
-msgstr ""
+msgstr " %s 大於指定的 diff 大小上限"
 
 #: hggtk\changeset.py:290
 msgid "_visual diff"
@@ -129,7 +131,7 @@ msgstr ""
 
 #: hggtk\changeset.py:295 hggtk\datamine.py:117
 msgid "_file history"
-msgstr ""
+msgstr "檔案歷史(_f)"
 
 #: hggtk\changeset.py:296 hggtk\datamine.py:116
 msgid "_annotate file"
@@ -137,23 +139,23 @@ msgstr ""
 
 #: hggtk\changeset.py:298
 msgid "_revert file contents"
-msgstr ""
+msgstr "回復檔案內容(_r)"
 
 #: hggtk\changeset.py:356
 msgid "Stat"
-msgstr ""
+msgstr "狀態"
 
 #: hggtk\changeset.py:358 hggtk\hgignore.py:109
 msgid "Files"
-msgstr ""
+msgstr "檔案"
 
 #: hggtk\changeset.py:480
 msgid "Save file to"
-msgstr ""
+msgstr "儲存檔案至"
 
 #: hggtk\changeset.py:545
 msgid "Confirm revert file to old revision"
-msgstr ""
+msgstr "確認回復檔案至舊的 revision"
 
 #: hggtk\changeset.py:546
 msgid "Revert %s to contents at revision %d?"
@@ -169,87 +171,87 @@ msgstr ""
 
 #: hggtk\clone.py:47
 msgid "Source Path:"
-msgstr ""
+msgstr "來源端路徑"
 
 #: hggtk\clone.py:65 hggtk\clone.py:101
 msgid "Browse..."
-msgstr ""
+msgstr "瀏覽..."
 
 #: hggtk\clone.py:84
 msgid "Destination Path:"
-msgstr ""
+msgstr "目的端路徑"
 
 #: hggtk\clone.py:116
 msgid "Clone To Revision:"
-msgstr ""
+msgstr "Clone 至 Revision:"
 
 #: hggtk\clone.py:127
 msgid "do not update the new working directory"
-msgstr ""
+msgstr "不要更新新的 working directory"
 
 #: hggtk\clone.py:128
 msgid "use pull protocol to copy metadata"
-msgstr ""
+msgstr "使用 pull 通訊協定來複製 metadata"
 
 #: hggtk\clone.py:129
 msgid "use uncompressed transfer"
-msgstr ""
+msgstr "使用不壓縮傳送"
 
 #: hggtk\clone.py:130 hggtk\synch.py:148
 msgid "use proxy server"
-msgstr ""
+msgstr "使用代理伺服器"
 
 #: hggtk\clone.py:143
 msgid "Remote Cmd:"
-msgstr ""
+msgstr "遠端命令:"
 
 #: hggtk\clone.py:157 hggtk\thgshelve.py:151
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: hggtk\clone.py:165
 msgid "Clone"
-msgstr ""
+msgstr "Clone"
 
 #: hggtk\clone.py:178
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "選擇目的端資料夾"
 
 #: hggtk\clone.py:186
 msgid "Select Source Folder"
-msgstr ""
+msgstr "選擇來源端資料夾"
 
 #: hggtk\clone.py:232
 msgid "Source path is empty"
-msgstr ""
+msgstr "來源端路徑是空的"
 
 #: hggtk\clone.py:233
 msgid "Please enter a valid source path"
-msgstr ""
+msgstr "請輸入有效的來源端路徑"
 
 #: hggtk\clone.py:238
 msgid "Source and dest are the same"
-msgstr ""
+msgstr "來源端與目的端是相同的"
 
 #: hggtk\clone.py:239
 msgid "Please specify a different destination"
-msgstr ""
+msgstr "請指定不同的目的端"
 
 #: hggtk\clone.py:284
 msgid "Clone aborted"
-msgstr ""
+msgstr "Clone 已中止"
 
 #: hggtk\clone.py:287
 msgid "Clone error"
-msgstr ""
+msgstr "Clone 錯誤"
 
 #: hggtk\commit.py:32
 msgid "Branch Operations"
-msgstr ""
+msgstr "Branch 操作"
 
 #: hggtk\commit.py:36
 msgid "Changes take effect on next commit"
-msgstr ""
+msgstr "變更將於下次 commit 時發生效用"
 
 #: hggtk\commit.py:37
 msgid "No branch changes"
@@ -261,7 +263,7 @@ msgstr ""
 
 #: hggtk\commit.py:41
 msgid "Close current named branch"
-msgstr ""
+msgstr "關閉目前的 named branch"
 
 #: hggtk\commit.py:153
 msgid "_Undo"
@@ -269,7 +271,7 @@ msgstr ""
 
 #: hggtk\commit.py:154
 msgid "undo recent commit"
-msgstr ""
+msgstr "復原最近的 commit"
 
 #: hggtk\commit.py:155 hggtk\commit.py:363 hggtk\commit.py:372
 #: hggtk\commit.py:380 hggtk\commit.py:381
@@ -278,19 +280,19 @@ msgstr ""
 
 #: hggtk\commit.py:156 hggtk\commit.py:382
 msgid "commit"
-msgstr ""
+msgstr "commit"
 
 #: hggtk\commit.py:168
 msgid "Confirm Discard Message"
-msgstr ""
+msgstr "確認丟棄 Message"
 
 #: hggtk\commit.py:169
 msgid "Discard current commit message?"
-msgstr ""
+msgstr "丟棄目前的 commit message？"
 
 #: hggtk\commit.py:229
 msgid "Recent Commit Messages..."
-msgstr ""
+msgstr "最近的 Commit Messages..."
 
 #: hggtk\commit.py:268 hggtk\commit.py:269 hggtk\commit.py:270
 #: hggtk\commit.py:273
@@ -299,120 +301,120 @@ msgstr ""
 
 #: hggtk\commit.py:291
 msgid "Confirm Exit"
-msgstr ""
+msgstr "確認離開"
 
 #: hggtk\commit.py:292
 msgid "Save commit message at exit?"
-msgstr ""
+msgstr "離開前儲存 commit message?"
 
 #: hggtk\commit.py:319
 msgid "new branch: "
-msgstr ""
+msgstr "新 branch: "
 
 #: hggtk\commit.py:321
 msgid "close branch: "
-msgstr ""
+msgstr "關閉 branch: "
 
 #: hggtk\commit.py:323
 msgid "branch: "
-msgstr ""
+msgstr "branch: "
 
 #: hggtk\commit.py:333 hggtk\status.py:204
 msgid "Re_vert"
-msgstr ""
+msgstr "回復(_v)"
 
 #: hggtk\commit.py:334 hggtk\status.py:206 hggtk\thgconfig.py:742
 msgid "_Add"
-msgstr ""
+msgstr "加入(_A)"
 
 #: hggtk\commit.py:335 hggtk\status.py:211 hggtk\thgconfig.py:752
 msgid "_Remove"
-msgstr ""
+msgstr "移除(_R)"
 
 #: hggtk\commit.py:336 hggtk\status.py:208
 msgid "Move"
-msgstr ""
+msgstr "移動"
 
 #: hggtk\commit.py:347
 msgid "merge"
-msgstr ""
+msgstr "merge"
 
 #: hggtk\commit.py:365 hggtk\commit.py:366 hggtk\commit.py:373
 #: hggtk\commit.py:374
 msgid "QNew"
-msgstr ""
+msgstr "QNew"
 
 #: hggtk\commit.py:369 hggtk\commit.py:370
 msgid "QRefresh"
-msgstr ""
+msgstr "QRefresh"
 
 #: hggtk\commit.py:405 hggtk\commit.py:550
 msgid "Nothing Commited"
-msgstr ""
+msgstr "沒有變更已被 commit"
 
 #: hggtk\commit.py:406
 msgid "No committable files selected"
-msgstr ""
+msgstr "沒有選取任何可被 commit 的檔案"
 
 #: hggtk\commit.py:423 hggtk\commit.py:472 hggtk\merge.py:83
 #: hggtk\thgconfig.py:463
 msgid "Commit"
-msgstr ""
+msgstr "Commit"
 
 #: hggtk\commit.py:424
 msgid "Unable to create "
-msgstr ""
+msgstr "無法建立 "
 
 #: hggtk\commit.py:473
 msgid "Unable to apply patch"
-msgstr ""
+msgstr "無法套用 patch"
 
 #: hggtk\commit.py:511
 msgid "Confirm Undo commit"
-msgstr ""
+msgstr "確認復原 commit"
 
 #: hggtk\commit.py:512
 msgid "Undo last commit"
-msgstr ""
+msgstr "復原最後一次的 commit"
 
 #: hggtk\commit.py:518 hggtk\commit.py:529
 msgid "Undo commit"
-msgstr ""
+msgstr "復原 commit"
 
 #: hggtk\commit.py:519
 msgid ""
 "Unable to undo!\n"
 "\n"
 "Tip revision differs from last commit."
-msgstr ""
+msgstr "無法復原！"
 
 #: hggtk\commit.py:530
 msgid "Errors during rollback!"
-msgstr ""
+msgstr "於 rollback 時發生錯誤！"
 
 #: hggtk\commit.py:537
 msgid "Confirm Add/Remove"
-msgstr ""
+msgstr "確認 Add/Remove"
 
 #: hggtk\commit.py:538
 msgid "Add/Remove the following files?"
-msgstr ""
+msgstr "Add/Remove 下列的檔案？"
 
 #: hggtk\commit.py:551 hggtk\tagadd.py:174
 msgid "Please enter commit message"
-msgstr ""
+msgstr "請輸入 commit message"
 
 #: hggtk\commit.py:559
 msgid "Error"
-msgstr ""
+msgstr "錯誤"
 
 #: hggtk\commit.py:560
 msgid "Message format configuration error"
-msgstr ""
+msgstr "Message 格式設定錯誤"
 
 #: hggtk\commit.py:569 hggtk\commit.py:577 hggtk\commit.py:589
 msgid "Confirm Commit"
-msgstr ""
+msgstr "確認 Commit"
 
 #: hggtk\commit.py:570
 msgid ""
@@ -437,7 +439,7 @@ msgstr ""
 
 #: hggtk\commit.py:604
 msgid "Commit: Invalid username"
-msgstr ""
+msgstr "Commit: 不合法的使用者名稱"
 
 #: hggtk\commit.py:605
 msgid ""
@@ -445,10 +447,13 @@ msgid ""
 "\n"
 "Please configure your username and try again"
 msgstr ""
+"您的使用者名稱還未設定。\n"
+"\n"
+"請設定您的使用者名稱並重試"
 
 #: hggtk\commit.py:627
 msgid "Confirm Override Branch"
-msgstr ""
+msgstr "確認 Override Branch"
 
 #: hggtk\commit.py:628
 msgid ""
@@ -3492,7 +3497,7 @@ msgstr ""
 
 #: thgutil\menuthg.py:299
 msgid "start web server for this repository"
-msgstr ""
+msgstr "為此 repository 啟動網頁伺服器"
 
 #: thgutil\menuthg.py:304
 msgid "Clone a repository here"
@@ -3500,7 +3505,7 @@ msgstr ""
 
 #: thgutil\menuthg.py:316
 msgid "Repository Settings"
-msgstr ""
+msgstr "Repository 設定"
 
 #: thgutil\menuthg.py:317
 msgid "Configure settings local to this repository"
@@ -3508,4 +3513,4 @@ msgstr ""
 
 #: thgutil\shlib.py:26 thgutil\version.py:16
 msgid "unknown"
-msgstr ""
+msgstr "未知"

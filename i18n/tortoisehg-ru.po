@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-06-15 05:36+0000\n"
-"PO-Revision-Date: 2009-06-15 07:09+0000\n"
-"Last-Translator: Novikov Andrey <Unknown>\n"
+"POT-Creation-Date: 2009-06-15 11:54+0000\n"
+"PO-Revision-Date: 2009-06-18 09:03+0000\n"
+"Last-Translator: Alil Adamov <diagiman@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-15 10:44+0000\n"
+"X-Launchpad-Export-Date: 2009-06-19 05:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -27,11 +27,11 @@ msgstr ""
 
 #: hggtk\backout.py:37
 msgid "Changeset Description"
-msgstr ""
+msgstr "Описание Набора изменений"
 
 #: hggtk\backout.py:50
 msgid "Backed out changeset: "
-msgstr ""
+msgstr "Возвращённый набор изменений: "
 
 #: hggtk\backout.py:56
 msgid "Backout commit message"
@@ -72,7 +72,7 @@ msgstr "Другой родитель"
 
 #: hggtk\changeset.py:40
 msgid "diff other parent"
-msgstr "Сравнить с другим родителем"
+msgstr "сравнить с другим родителем"
 
 #: hggtk\changeset.py:104
 msgid "[All Files]"
@@ -80,7 +80,7 @@ msgstr "[Все Файлы]"
 
 #: hggtk\changeset.py:145
 msgid "changeset:"
-msgstr ""
+msgstr "набор изменений:"
 
 #: hggtk\changeset.py:147
 msgid "branch:"
@@ -104,39 +104,39 @@ msgstr "тэги:"
 
 #: hggtk\changeset.py:195
 msgid " %s is larger than the specified max diff size"
-msgstr ""
+msgstr " %s больше, чем указанный максимальный размер файла различий"
 
 #: hggtk\changeset.py:290
 msgid "_visual diff"
-msgstr ""
+msgstr "сравнить визуально"
 
 #: hggtk\changeset.py:291
 msgid "diff to _local"
-msgstr ""
+msgstr "сравнить с локальным"
 
 #: hggtk\changeset.py:292
 msgid "_view at revision"
-msgstr ""
+msgstr "показать для ревизии"
 
 #: hggtk\changeset.py:293
 msgid "_save at revision"
-msgstr ""
+msgstr "сохранить для ревизии"
 
 #: hggtk\changeset.py:295 hggtk\datamine.py:117
 msgid "_file history"
-msgstr "_история файла"
+msgstr "история файла"
 
 #: hggtk\changeset.py:296 hggtk\datamine.py:116
 msgid "_annotate file"
-msgstr "_комментировать файл"
+msgstr "комментировать файл"
 
 #: hggtk\changeset.py:298
 msgid "_revert file contents"
-msgstr "_вернуть содержимое файла"
+msgstr "вернуть содержимое файла"
 
 #: hggtk\changeset.py:356
 msgid "Stat"
-msgstr ""
+msgstr "Статистика"
 
 #: hggtk\changeset.py:358 hggtk\hgignore.py:109
 msgid "Files"
@@ -144,11 +144,11 @@ msgstr "Файлы"
 
 #: hggtk\changeset.py:480
 msgid "Save file to"
-msgstr ""
+msgstr "Сохранить файл в"
 
 #: hggtk\changeset.py:545
 msgid "Confirm revert file to old revision"
-msgstr ""
+msgstr "Подтвердить возвращение файла к старой ревизии"
 
 #: hggtk\changeset.py:546
 msgid "Revert %s to contents at revision %d?"
@@ -156,11 +156,11 @@ msgstr "Вернуть содержимое %s к ревизии %d?"
 
 #: hggtk\changeset.py:558 hggtk\synch.py:649
 msgid "Toggle _Wordwrap"
-msgstr ""
+msgstr "Переносить по словам"
 
 #: hggtk\clone.py:25
 msgid "TortoiseHg Clone"
-msgstr ""
+msgstr "TortoiseHg Клонировать"
 
 #: hggtk\clone.py:47
 msgid "Source Path:"
@@ -176,15 +176,15 @@ msgstr "Путь назначения:"
 
 #: hggtk\clone.py:116
 msgid "Clone To Revision:"
-msgstr "Клонировать до ревизии:"
+msgstr "Клонировать До Ревизии"
 
 #: hggtk\clone.py:127
 msgid "do not update the new working directory"
-msgstr "не обновлять новую рабочую папку"
+msgstr "не обновлять новый рабочий каталог"
 
 #: hggtk\clone.py:128
 msgid "use pull protocol to copy metadata"
-msgstr ""
+msgstr "использовать протокол затягивания для копирования метаданных"
 
 #: hggtk\clone.py:129
 msgid "use uncompressed transfer"
@@ -196,7 +196,7 @@ msgstr "использовать прокси сервер"
 
 #: hggtk\clone.py:143
 msgid "Remote Cmd:"
-msgstr ""
+msgstr "Удалённая команда:"
 
 #: hggtk\clone.py:157 hggtk\thgshelve.py:151
 msgid "Cancel"
@@ -204,7 +204,7 @@ msgstr "Отменить"
 
 #: hggtk\clone.py:165
 msgid "Clone"
-msgstr "Копировать"
+msgstr "Клонировать"
 
 #: hggtk\clone.py:178
 msgid "Select Destination Folder"
@@ -240,27 +240,27 @@ msgstr "Ошибка при клонировании"
 
 #: hggtk\commit.py:32
 msgid "Branch Operations"
-msgstr ""
+msgstr "Действия над Ветками"
 
 #: hggtk\commit.py:36
 msgid "Changes take effect on next commit"
-msgstr ""
+msgstr "Изменения вступят в силу при следующей фиксации"
 
 #: hggtk\commit.py:37
 msgid "No branch changes"
-msgstr ""
+msgstr "Нет изменений ветки"
 
 #: hggtk\commit.py:39
 msgid "Open a new named branch"
-msgstr ""
+msgstr "Открыть новую именованную ветку"
 
 #: hggtk\commit.py:41
 msgid "Close current named branch"
-msgstr ""
+msgstr "Закрыть текущую именованную ветку"
 
 #: hggtk\commit.py:153
 msgid "_Undo"
-msgstr "_Отменить"
+msgstr "Отменить"
 
 #: hggtk\commit.py:154
 msgid "undo recent commit"
@@ -269,28 +269,28 @@ msgstr "отменить последнюю фиксацию"
 #: hggtk\commit.py:155 hggtk\commit.py:363 hggtk\commit.py:372
 #: hggtk\commit.py:380 hggtk\commit.py:381
 msgid "_Commit"
-msgstr "_Фиксация"
+msgstr "Фиксация"
 
 #: hggtk\commit.py:156 hggtk\commit.py:382
 msgid "commit"
-msgstr "закончить"
+msgstr "фиксировать"
 
 #: hggtk\commit.py:168
 msgid "Confirm Discard Message"
-msgstr ""
+msgstr "Подтвердить Отказ от Заметки"
 
 #: hggtk\commit.py:169
 msgid "Discard current commit message?"
-msgstr ""
+msgstr "Отказаться от текущей заметки фиксации?"
 
 #: hggtk\commit.py:229
 msgid "Recent Commit Messages..."
-msgstr "Недавние сообщения фиксации..."
+msgstr "Недавние Заметки Фиксации"
 
 #: hggtk\commit.py:268 hggtk\commit.py:269 hggtk\commit.py:270
 #: hggtk\commit.py:273
 msgid "_commit"
-msgstr ""
+msgstr "фиксация"
 
 #: hggtk\commit.py:291
 msgid "Confirm Exit"
@@ -298,7 +298,7 @@ msgstr "Подвердите выход"
 
 #: hggtk\commit.py:292
 msgid "Save commit message at exit?"
-msgstr "Сохранить сообщение фиксации при выходе?"
+msgstr "Сохранить заметку фиксации при выходе?"
 
 #: hggtk\commit.py:319
 msgid "new branch: "
@@ -306,7 +306,7 @@ msgstr "новая ветка: "
 
 #: hggtk\commit.py:321
 msgid "close branch: "
-msgstr ""
+msgstr "закрыть ветку: "
 
 #: hggtk\commit.py:323
 msgid "branch: "
@@ -314,15 +314,15 @@ msgstr "ветка: "
 
 #: hggtk\commit.py:333 hggtk\status.py:204
 msgid "Re_vert"
-msgstr "_Вернуть"
+msgstr "Вернуть"
 
 #: hggtk\commit.py:334 hggtk\status.py:206 hggtk\thgconfig.py:742
 msgid "_Add"
-msgstr "_Добавить"
+msgstr "Добавить"
 
 #: hggtk\commit.py:335 hggtk\status.py:211 hggtk\thgconfig.py:752
 msgid "_Remove"
-msgstr "_Убрать"
+msgstr "Убрать"
 
 #: hggtk\commit.py:336 hggtk\status.py:208
 msgid "Move"
@@ -335,24 +335,24 @@ msgstr "слияние"
 #: hggtk\commit.py:365 hggtk\commit.py:366 hggtk\commit.py:373
 #: hggtk\commit.py:374
 msgid "QNew"
-msgstr "Быстрое создание нового"
+msgstr "Новая заплатка"
 
 #: hggtk\commit.py:369 hggtk\commit.py:370
 msgid "QRefresh"
-msgstr "Быстрое обновление"
+msgstr "Обновить заплатку"
 
 #: hggtk\commit.py:405 hggtk\commit.py:550
 msgid "Nothing Commited"
-msgstr "ничего не завершено"
+msgstr "Ничего не фиксировано"
 
 #: hggtk\commit.py:406
 msgid "No committable files selected"
-msgstr ""
+msgstr "Нет выбранных файлов для фиксации"
 
 #: hggtk\commit.py:423 hggtk\commit.py:472 hggtk\merge.py:83
 #: hggtk\thgconfig.py:463
 msgid "Commit"
-msgstr "Закончить"
+msgstr "Фиксировать"
 
 #: hggtk\commit.py:424
 msgid "Unable to create "
@@ -360,19 +360,19 @@ msgstr "Невозможно создать "
 
 #: hggtk\commit.py:473
 msgid "Unable to apply patch"
-msgstr ""
+msgstr "Невозможно применить заплатку"
 
 #: hggtk\commit.py:511
 msgid "Confirm Undo commit"
-msgstr ""
+msgstr "Подтвердить Отмену фиксации"
 
 #: hggtk\commit.py:512
 msgid "Undo last commit"
-msgstr ""
+msgstr "Отменить последную фиксацию"
 
 #: hggtk\commit.py:518 hggtk\commit.py:529
 msgid "Undo commit"
-msgstr ""
+msgstr "Отменить фиксацию"
 
 #: hggtk\commit.py:519
 msgid ""
@@ -380,34 +380,37 @@ msgid ""
 "\n"
 "Tip revision differs from last commit."
 msgstr ""
+"Невозможно отменить!\n"
+"\n"
+"Оконечная ревизия отличается от последней фиксации."
 
 #: hggtk\commit.py:530
 msgid "Errors during rollback!"
-msgstr ""
+msgstr "Ошибки при откате!"
 
 #: hggtk\commit.py:537
 msgid "Confirm Add/Remove"
-msgstr ""
+msgstr "Подтвердить Добавление/Удаление"
 
 #: hggtk\commit.py:538
 msgid "Add/Remove the following files?"
-msgstr ""
+msgstr "Добавить/Удалить указанные файлы?"
 
 #: hggtk\commit.py:551 hggtk\tagadd.py:174
 msgid "Please enter commit message"
-msgstr ""
+msgstr "Пожалуйста введите заметку фиксации"
 
 #: hggtk\commit.py:559
 msgid "Error"
-msgstr ""
+msgstr "Ошибка"
 
 #: hggtk\commit.py:560
 msgid "Message format configuration error"
-msgstr ""
+msgstr "Ошибка настройки формата заметки"
 
 #: hggtk\commit.py:569 hggtk\commit.py:577 hggtk\commit.py:589
 msgid "Confirm Commit"
-msgstr ""
+msgstr "Подтвердить Фиксацию"
 
 #: hggtk\commit.py:570
 msgid ""
@@ -415,6 +418,9 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"Длина строки сводки %i больше чем %i.\n"
+"\n"
+"Игнорировать правила форматирования и продолжить фиксацию?"
 
 #: hggtk\commit.py:578
 msgid ""
@@ -422,6 +428,9 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"После строки сводки нет пустой строки.\n"
+"\n"
+"Игнорировать правила форматирования и продолжить фиксацию?"
 
 #: hggtk\commit.py:590
 msgid ""
@@ -429,10 +438,13 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"Следующие строки превышают %i-символьное ограничение: %s.\n"
+"\n"
+"Игнорировать правила форматирования и продолжить фиксацию?"
 
 #: hggtk\commit.py:604
 msgid "Commit: Invalid username"
-msgstr ""
+msgstr "Фиксация: Неправильное имя пользователя"
 
 #: hggtk\commit.py:605
 msgid ""
@@ -440,36 +452,41 @@ msgid ""
 "\n"
 "Please configure your username and try again"
 msgstr ""
+"Вы не указали свое имя пользователя.\n"
+"\n"
+"Пожалуйста укажите имя пользователя и попробуйте снова"
 
 #: hggtk\commit.py:627
 msgid "Confirm Override Branch"
-msgstr ""
+msgstr "Подтвердить Замещение Ветки"
 
 #: hggtk\commit.py:628
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
 msgstr ""
+"Ветка с именем \"%s\" уже существует,\n"
+"заместить?"
 
 #: hggtk\commit.py:633
 msgid "Confirm New Branch"
-msgstr ""
+msgstr "Подтвердить Новую Ветку"
 
 #: hggtk\commit.py:634
 msgid "Create new named branch \"%s\"?"
-msgstr ""
+msgstr "Создать новую именованную ветку \"%s\"?"
 
 #: hggtk\commit.py:704
 msgid "Paste _Filenames"
-msgstr ""
+msgstr "Вставить Имена файлов"
 
 #: hggtk\commit.py:705
 msgid "App_ly Format"
-msgstr ""
+msgstr "Применить Формат"
 
 #: hggtk\commit.py:706
 msgid "C_onfigure Format"
-msgstr ""
+msgstr "Настроить Формат"
 
 #: hggtk\commit.py:732 hggtk\hgemail.py:307 hggtk\hgemail.py:312
 #: hggtk\hgemail.py:321
@@ -478,19 +495,19 @@ msgstr ""
 
 #: hggtk\commit.py:733
 msgid "Message format needs to be configured"
-msgstr ""
+msgstr "Необходимо настроить формат сообщения"
 
 #: hggtk\commit.py:745 hggtk\commit.py:750
 msgid "Warning"
-msgstr ""
+msgstr "Предупреждение"
 
 #: hggtk\commit.py:746
 msgid "The summary line length of %i is greater than %i"
-msgstr ""
+msgstr "Длина строки сводки %i больше чем %i"
 
 #: hggtk\commit.py:751
 msgid "The summary line is not followed by a blank line"
-msgstr ""
+msgstr "После строки сводки нет пустой строки"
 
 #: hggtk\datamine.py:35
 msgid "DataMining"
@@ -499,212 +516,216 @@ msgstr ""
 #: hggtk\datamine.py:44 hggtk\hgcmd.py:37 hggtk\recovery.py:43
 #: hggtk\serve.py:61 hggtk\synch.py:59
 msgid "Stop"
-msgstr ""
+msgstr "Остановить"
 
 #: hggtk\datamine.py:46
 msgid "Stop operation on current tab"
-msgstr ""
+msgstr "Остановить действие на текущей вкладке"
 
 #: hggtk\datamine.py:48
 msgid "New Search"
-msgstr ""
+msgstr "Новый Поиск"
 
 #: hggtk\datamine.py:50
 msgid "Open new search tab"
-msgstr ""
+msgstr "Открыть новую вкладку поиска"
 
 #: hggtk\datamine.py:61 hggtk\thgconfig.py:943
 msgid "Invalid path"
-msgstr ""
+msgstr "Неверный путь"
 
 #: hggtk\datamine.py:62
 msgid "Cannot annotate directory: %s"
-msgstr ""
+msgstr "Невозможно комментировать папку: %s"
 
 #: hggtk\datamine.py:104
 msgid "Filename"
-msgstr ""
+msgstr "Имя файла"
 
 #: hggtk\datamine.py:107 hggtk\datamine.py:524 hggtk\logview\treeview.py:423
 #: hggtk\thgconfig.py:158 hggtk\thgconfig.py:231
 msgid "User"
-msgstr ""
+msgstr "Пользователь"
 
 #: hggtk\datamine.py:115 hggtk\datamine.py:124
 msgid "di_splay change"
-msgstr ""
+msgstr "показать изменение"
 
 #: hggtk\datamine.py:123
 msgid "_zoom to change"
-msgstr ""
+msgstr "раскрыть изменение"
 
 #: hggtk\datamine.py:125
 msgid "_annotate parent"
-msgstr ""
+msgstr "комментировать родителя"
 
 #: hggtk\datamine.py:215
 msgid "Search"
-msgstr ""
+msgstr "Поиск"
 
 #: hggtk\datamine.py:216 hggtk\hgignore.py:49
 msgid "Regexp:"
-msgstr ""
+msgstr "Регулярное выражение:"
 
 #: hggtk\datamine.py:218
 msgid "Includes:"
-msgstr ""
+msgstr "Включает:"
 
 #: hggtk\datamine.py:220
 msgid "Excludes:"
-msgstr ""
+msgstr "Исключает:"
 
 #: hggtk\datamine.py:223
 msgid "Start this search"
-msgstr ""
+msgstr "Начать поиск"
 
 #: hggtk\datamine.py:224
 msgid "Regular expression search pattern"
-msgstr ""
+msgstr "Шаблон поиска по регулярному выражению"
 
 #: hggtk\datamine.py:225
 msgid ""
 "Comma separated list of inclusion patterns.  By default, the entire "
 "repository is searched."
 msgstr ""
+"Список шаблонов включения разделённых запятыми.  По умолчанию, поиск ведётся "
+"по всему хранилищу."
 
 #: hggtk\datamine.py:228
 msgid ""
 "Comma separated list of exclusion patterns.  Exclusion patterns are applied "
 "after inclusion patterns."
 msgstr ""
+"Список шаблонов исключения разделённых запятыми.  Шаблоны исключения "
+"применяются после шаблонов включения."
 
 #: hggtk\datamine.py:234
 msgid "Follow copies and renames"
-msgstr ""
+msgstr "Отслеживать копии и переименования"
 
 #: hggtk\datamine.py:235
 msgid "Ignore case"
-msgstr ""
+msgstr "Игнорировать регистр"
 
 #: hggtk\datamine.py:236
 msgid "Show line numbers"
-msgstr ""
+msgstr "Показать номера строк"
 
 #: hggtk\datamine.py:237
 msgid "Show all matching revisions"
-msgstr ""
+msgstr "Показать все соответсвующие ревизии"
 
 #: hggtk\datamine.py:265 hggtk\datamine.py:522 hggtk\logview\treeview.py:372
 msgid "Rev"
-msgstr ""
+msgstr "Ревизия"
 
 #: hggtk\datamine.py:266 hggtk\datamine.py:523
 msgid "File"
-msgstr ""
+msgstr "Файл"
 
 #: hggtk\datamine.py:267
 msgid "Matches"
-msgstr ""
+msgstr "Соотвествия"
 
 #: hggtk\datamine.py:289
 msgid "Search %d"
-msgstr ""
+msgstr "Поиск %d"
 
 #: hggtk\datamine.py:331
 msgid "No regular expression given"
-msgstr ""
+msgstr "Регулярное выражение не задано"
 
 #: hggtk\datamine.py:332
 msgid "You must provide a search expression"
-msgstr ""
+msgstr "Необходимо указать выражение для поиска"
 
 #: hggtk\datamine.py:360
 msgid "Search \"%s\""
-msgstr ""
+msgstr "Поиск \"%s\""
 
 #: hggtk\datamine.py:472
 msgid "File is unrevisioned"
-msgstr ""
+msgstr "Файла нет в ревизиях"
 
 #: hggtk\datamine.py:473
 msgid "Unable to annotate "
-msgstr ""
+msgstr "Невозможно комментировать "
 
 #: hggtk\datamine.py:493
 msgid "Follow"
-msgstr ""
+msgstr "Отслеживать"
 
 #: hggtk\datamine.py:521
 msgid "Line"
-msgstr ""
+msgstr "Строка"
 
 #: hggtk\datamine.py:525 hggtk\guess.py:100
 msgid "Source"
-msgstr ""
+msgstr "Источник"
 
 #: hggtk\datamine.py:617
 msgid "Follow Rename:"
-msgstr ""
+msgstr "Отслеживать Переименование:"
 
 #: hggtk\dialog.py:33
 msgid "TortoiseHg Prompt"
-msgstr ""
+msgstr "Вывод TortoiseHg"
 
 #: hggtk\gdialog.py:377
 msgid " Aborted"
-msgstr ""
+msgstr " Прервано"
 
 #: hggtk\gdialog.py:388
 msgid " Messages and Errors"
-msgstr ""
+msgstr " Сообщения и Ошибки"
 
 #: hggtk\gdialog.py:399
 msgid "No visual diff configured"
-msgstr ""
+msgstr "Не указан визуализатор различий"
 
 #: hggtk\gdialog.py:400
 msgid "Please select a visual diff application."
-msgstr ""
+msgstr "Пожалуйста выберите приложение для визуализации различий."
 
 #: hggtk\gdialog.py:459
 msgid "making snapshot of %d files from rev %s\n"
-msgstr ""
+msgstr "создается снимок %d файлов для ревизии %s\n"
 
 #: hggtk\gdialog.py:492
 msgid "edit failed"
-msgstr ""
+msgstr "неудача при редактировании"
 
 #: hggtk\gdialog.py:500 hggtk\thgconfig.py:541
 msgid "No visual editor configured"
-msgstr ""
+msgstr "Не указан визуальный редактор"
 
 #: hggtk\gdialog.py:501 hggtk\thgconfig.py:542
 msgid "Please configure a visual editor."
-msgstr ""
+msgstr "Пожалуйста укажите визуальный редактор."
 
 #: hggtk\gtklib.py:88
 msgid "Running"
-msgstr ""
+msgstr "Выполняется"
 
 #: hggtk\gtklib.py:94
 msgid "Done"
-msgstr ""
+msgstr "Выполнено"
 
 #: hggtk\gtklib.py:176
 msgid "Save File"
-msgstr ""
+msgstr "Сохранить Файл"
 
 #: hggtk\gtklib.py:177
 msgid "All files"
-msgstr ""
+msgstr "Все файлы"
 
 #: hggtk\gtklib.py:240
 msgid "Select Folder"
-msgstr ""
+msgstr "Выбор Папки"
 
 #: hggtk\guess.py:48
 msgid "Detect Copies/Renames in "
-msgstr ""
+msgstr "Выявлять Копии/Переименования в "
 
 #: hggtk\guess.py:57
 msgid "Minimum Simularity Percentage"
@@ -712,103 +733,107 @@ msgstr ""
 
 #: hggtk\guess.py:77
 msgid "Find Renames"
-msgstr ""
+msgstr "Найти Переименования"
 
 #: hggtk\guess.py:78
 msgid "Find Copies"
-msgstr ""
+msgstr "Найти Копии"
 
 #: hggtk\guess.py:86
 msgid "Unrevisioned Files"
-msgstr ""
+msgstr "Файлы не входящие в ревизии"
 
 #: hggtk\guess.py:107
 msgid "Dest"
-msgstr ""
+msgstr "Приемник"
 
 #: hggtk\guess.py:125
 msgid "Accept Match"
-msgstr ""
+msgstr "Принять Соотвествие"
 
 #: hggtk\guess.py:131
 msgid "Candidate Matches"
-msgstr ""
+msgstr "Кандидаты на Соотвествие"
 
 #: hggtk\guess.py:142
 msgid "Differences from Source to Dest"
-msgstr ""
+msgstr "Различия между Источником и Приемником"
 
 #: hggtk\guess.py:238
 msgid "finding source of "
-msgstr ""
+msgstr "поиск источника "
 
 #: hggtk\guess.py:350
 msgid ""
 "== %s and %s have identical contents ==\n"
 "\n"
 msgstr ""
+"== %s и %s имеют одинаковое содержимое ==\n"
+"\n"
 
 #: hggtk\hgcmd.py:149
 msgid ""
 "\n"
 "[command interrupted]"
 msgstr ""
+"\n"
+"[команда превана]"
 
 #: hggtk\hgemail.py:37
 msgid "send"
-msgstr ""
+msgstr "отправить"
 
 #: hggtk\hgemail.py:39
 msgid "Send email(s)"
-msgstr ""
+msgstr "Отправить почту"
 
 #: hggtk\hgemail.py:40
 msgid "test"
-msgstr ""
+msgstr "тест"
 
 #: hggtk\hgemail.py:42
 msgid "Show email(s) which would be sent"
-msgstr ""
+msgstr "Показать письма для отправки"
 
 #: hggtk\hgemail.py:44
 msgid "configure"
-msgstr ""
+msgstr "настроить"
 
 #: hggtk\hgemail.py:46
 msgid "Configure email settings"
-msgstr ""
+msgstr "Настройка параметров почты"
 
 #: hggtk\hgemail.py:56
 msgid "Email outgoing changes"
-msgstr ""
+msgstr "Отправить по почте исходящие изменения"
 
 #: hggtk\hgemail.py:58
 msgid "Email revision(s) "
-msgstr ""
+msgstr "Отправить по почте ревизию(и) "
 
 #: hggtk\hgemail.py:60
 msgid "Email Mercurial Patches"
-msgstr ""
+msgstr "Отправить по почте Заплатки Mercurial"
 
 #: hggtk\hgemail.py:64
 msgid "Envelope"
-msgstr ""
+msgstr "Конверт"
 
 #: hggtk\hgemail.py:65 hggtk\taskbarui.py:45
 msgid "Options"
-msgstr ""
+msgstr "Настройки"
 
 #: hggtk\hgemail.py:77
 msgid "To:"
-msgstr ""
+msgstr "Получатель:"
 
 #: hggtk\hgemail.py:88
 msgid "Cc:"
-msgstr ""
+msgstr "Копии:"
 
 #: hggtk\hgemail.py:99
 msgid "From:"
-msgstr ""
+msgstr "От:"
 
 #: hggtk\hgemail.py:108
 msgid "In-Reply-To:"
@@ -820,7 +845,7 @@ msgstr ""
 
 #: hggtk\hgemail.py:121
 msgid "Send changesets as HG patches"
-msgstr ""
+msgstr "Отправить наборы изменений как заплатки HG"
 
 #: hggtk\hgemail.py:124
 msgid ""
@@ -828,10 +853,13 @@ msgid ""
 "programs.  They include a header which contains the most important changeset "
 "metadata."
 msgstr ""
+"Заплатки HG (сгенерированные командой export) совместимы с большинством "
+"программ заплаток. Они включают заголовок, который содержит наиболее важные "
+"метаданные набора изменений."
 
 #: hggtk\hgemail.py:129
 msgid "Use extended (git) patch format"
-msgstr ""
+msgstr "Использовать расшиненный (git) формат заплатки"
 
 #: hggtk\hgemail.py:132
 msgid ""
@@ -839,6 +867,8 @@ msgid ""
 "recipients may not be able to use them if they are not using git or "
 "Mercurial."
 msgstr ""
+"Git заплатки могут описывать двоичные файлы, копии, и изменения прав, но "
+"получатели не смогут использовать их не иначе чем с git или Mercurial."
 
 #: hggtk\hgemail.py:137
 msgid "Plain, do not prepend HG header"
