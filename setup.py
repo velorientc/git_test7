@@ -117,6 +117,9 @@ def setup_posix():
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('icons')]
+    _data_files += [(os.path.join('share/locale', root),
+        [os.path.join(root, file_) for file_ in files])
+        for root, dirs, files in os.walk('locale')]
     _data_files += [('lib/nautilus/extensions-2.0/python',
                      ['contrib/nautilus-thg.py'])]
 
