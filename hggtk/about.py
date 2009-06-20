@@ -62,8 +62,13 @@ class AboutDialog(gtk.AboutDialog):
         thg_icon = paths.get_tortoise_icon('thg_logo.ico')
         try:
             license_file = paths.get_license_path()
-            self.set_license(file(license_file).read())
-        except IOError:
+            if license_file.endswith('.gz'):
+                import gzip
+                lic = gzip.open(license_file, 'rb').read()
+            else:
+                lic = open(license_file, 'rb').read()
+            self.set_license(lic)
+        except (ImportError, IOError):
             license = hgtk.shortlicense.splitlines()[1:]
             self.set_license('\n'.join(license))
 
