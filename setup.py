@@ -123,6 +123,14 @@ def setup_posix():
     _data_files += [('lib/nautilus/extensions-2.0/python',
                      ['contrib/nautilus-thg.py'])]
 
+    # Create a __paths__.py.  Distributions will need to supply their own
+    f = open('thgutil/__paths__.py', "w")
+    f.write('bin_path     = "/usr/bin"\n')
+    f.write('license_path = "/usr/share/doc/tortoisehg/Copying.txt.gz"\n')
+    f.write('locale_path  = "/usr/share/locale"\n')
+    f.write('icon_path    = "/usr/share/pixmaps/tortoisehg/icons"\n')
+    f.close()
+
     return _scripts, _packages, _data_files, _extra
 
 
