@@ -199,7 +199,7 @@ int HgQueryDirstate(
         }
 
         if (filterStatus == 'A' && pds->num_added() == 0) {
-            last = cur;
+            // don't store QueryState
             return 0;
         }
 
