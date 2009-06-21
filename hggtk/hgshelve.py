@@ -501,7 +501,12 @@ def shelve(ui, repo, *pats, **opts):
                 if dopatch:
                     ui.debug(_('applying patch\n'))
                     ui.debug(fp.getvalue())
-                    patch.internalpatch(fp, ui, 1, repo.root, eolmode=None)
+                    if hasattr(patch, 'linereader'):
+                        # Mercurial 1.3
+                        patch.internalpatch(fp, ui, 1, repo.root, eolmode=None)
+                    else:
+                        # Mercurial 1.2
+                        patch.internalpatch(fp, ui, 1, repo.root)
                 del fp
 
                 # 3c. apply filtered patch to clean repo (shelve)
