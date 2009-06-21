@@ -2840,27 +2840,30 @@ msgstr ""
 
 #: hggtk\thgconfig.py:87
 msgid "Log Batch Size"
-msgstr ""
+msgstr "Batchstørrelse for log"
 
 #: hggtk\thgconfig.py:88
 msgid ""
 "The number of revisions to read and display in the changelog viewer in a "
 "single batch. Default: 500"
 msgstr ""
+"Antal revisioner der bliver læst og vist ad gangen. Default: 500"
 
 #: hggtk\thgconfig.py:91
 msgid "Copy Hash"
-msgstr ""
+msgstr "Kopier hash"
 
 #: hggtk\thgconfig.py:92
 msgid ""
 "Allow the changelog viewer to copy the changeset hash of the currently "
 "selected changeset into the clipboard. Default: False"
 msgstr ""
+"Ved visning af ændringslogen bliver hash-nøglen af den valgte ændring "
+"kopieret til udklipsholderen. Default: Falsk"
 
 #: hggtk\thgconfig.py:97
 msgid "After pull operation"
-msgstr ""
+msgstr "Operation efter træk"
 
 #: hggtk\thgconfig.py:99
 msgid ""
@@ -2868,6 +2871,9 @@ msgid ""
 "equates to pull --update, fetch equates to the fetch extension, rebase "
 "equates to pull --rebase.  Default: none"
 msgstr ""
+"En operation som skal udføres umiddelbart efter et velgennemført træk. "
+"'update' svarer til 'pull --update', 'fetch' svarer til "
+"fetch-udviddelsen, 'rebase' svarer til 'pull --rebase'. Default: ingen"
 
 #: hggtk\thgconfig.py:104
 msgid "Name"
@@ -2878,6 +2884,8 @@ msgid ""
 "Repository name to use in the web interface. Default is the working "
 "directory."
 msgstr ""
+"Depotnavn der skal anvendes i web grænsefladen. Default er "
+"arbejdskataloget. "
 
 #: hggtk\thgconfig.py:107 hggtk\thgconfig.py:776
 msgid "Description"
@@ -2901,63 +2909,67 @@ msgstr "Stil"
 
 #: hggtk\thgconfig.py:115
 msgid "Which template map style to use"
-msgstr ""
+msgstr "Hvilke skabelon mapnings-stil skal anvendes"
 
 #: hggtk\thgconfig.py:116
 msgid "Archive Formats"
-msgstr ""
+msgstr "Arkivformater"
 
 #: hggtk\thgconfig.py:117
 msgid "Comma separated list of archive formats allowed for downloading"
-msgstr ""
+msgstr "Kommasepareret liste over arkivformater som kan downloades"
 
 #: hggtk\thgconfig.py:119
 msgid "Port to listen on"
-msgstr ""
+msgstr "Port at lytte på"
 
 #: hggtk\thgconfig.py:119 hggtk\thgconfig.py:229
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: hggtk\thgconfig.py:120
 msgid "Push Requires SSL"
-msgstr ""
+msgstr "Skub kræver SSL"
 
 #: hggtk\thgconfig.py:121
 msgid ""
 "Whether to require that inbound pushes be transported over SSL to prevent "
 "password sniffing."
 msgstr ""
+"Er det obligatorisk at indgående skub-operationer skal anvende SSL for "
+"at forbindre password-aflytning"
 
 #: hggtk\thgconfig.py:123
 msgid "Stripes"
-msgstr ""
+msgstr "Striber"
 
 #: hggtk\thgconfig.py:124
 msgid ""
 "How many lines a \"zebra stripe\" should span in multiline output. Default "
 "is 1; set to 0 to disable."
 msgstr ""
+"Hvor mange linier skal en \"zebrastribe\" være på. Default er 1; sæt til "
+"0 for at deaktivere."
 
 #: hggtk\thgconfig.py:126
 msgid "Max Files"
-msgstr ""
+msgstr "Maks filer"
 
 #: hggtk\thgconfig.py:127
 msgid "Maximum number of files to list per changeset."
-msgstr ""
+msgstr "Maksimum antal filer at vise pr ændring"
 
 #: hggtk\thgconfig.py:128
 msgid "Max Changes"
-msgstr ""
+msgstr "Maks ændringer"
 
 #: hggtk\thgconfig.py:129
 msgid "Maximum number of changes to list on the changelog."
-msgstr ""
+msgstr "Maksimum antal ændringer at vise i ændringsloggen."
 
 #: hggtk\thgconfig.py:130
 msgid "Allow Push"
-msgstr ""
+msgstr "Tillad skub"
 
 #: hggtk\thgconfig.py:131
 msgid ""
@@ -2968,10 +2980,16 @@ msgid ""
 "(separated by whitespace or \",\"). The contents of the allow_push list are "
 "examined after the deny_push list."
 msgstr ""
+"Er det tilladt at skubbe til depotet. Hvis tom eller ikke sat, så er "
+"skub ikke tilladt. Værdien "\*\" betyder at alle kan skubbe, også "
+"anonyme brugere. I alle andre tilfælde skal fjernbrugeren have "
+"givet sig til kende med et navn i denne liste (adskilt af blanktegn "
+"eller \",\"). Indholdet af tillad_skub listen bliver undersøgt efter "
+"forbyd_skub listen."
 
 #: hggtk\thgconfig.py:138
 msgid "Deny Push"
-msgstr ""
+msgstr "Forbyd skub"
 
 #: hggtk\thgconfig.py:139
 msgid ""
@@ -2981,76 +2999,84 @@ msgid ""
 "name present in this list (separated by whitespace or \",\") is also denied. "
 "The contents of the deny_push list are examined before the allow_push list."
 msgstr ""
+"Er det forbudt at skubbe til depotet. Hvis tom eller ikke sat, så er "
+"skub ikke forbudt. Værdien "\*\" betyder at ingen kan skubbe. "
+"I alle andre tilfælde bliver anonyme fjernbrugere afvist, og alle "
+"autoriserede brugerenavne i denne liste (adskilt af blanktegn "
+"eller \",\") bliver også afvist. Indholdet af tillad_skub listen bliver "
+"undersøgt efter forbyd_skub listen."
 
 #: hggtk\thgconfig.py:145
 msgid "Encoding"
-msgstr ""
+msgstr "Indkodning"
 
 #: hggtk\thgconfig.py:146
 msgid "Character encoding name"
-msgstr ""
+msgstr "Navn på indkodning af tegn"
 
 #: hggtk\thgconfig.py:149 hggtk\thgconfig.py:230
 msgid "Host"
-msgstr ""
+msgstr "Vært"
 
 #: hggtk\thgconfig.py:150
 msgid ""
 "Host name and (optional) port of proxy server, for example \"myproxy:8000\""
 msgstr ""
+"Værtsnavn og (valfrigt) port på proxy server, for eksempel \"myproxy:8000\""
 
 #: hggtk\thgconfig.py:152
 msgid "Bypass List"
-msgstr ""
+msgstr "bypass-liste"
 
 #: hggtk\thgconfig.py:153
 msgid ""
 "Optional. Comma-separated list of host names that should bypass the proxy"
 msgstr ""
+"Valgfri. Kommasepareret liste af værtsnavne som skal omgå proxyen"
 
 #: hggtk\thgconfig.py:155 hggtk\thgconfig.py:231
 msgid "Password"
-msgstr ""
+msgstr "adgangskode"
 
 #: hggtk\thgconfig.py:156
 msgid "Optional. Password to authenticate with at the proxy server"
-msgstr ""
+msgstr "Valgfri. Adgangskode overfor proxyserveren"
 
 #: hggtk\thgconfig.py:159
 msgid "Optional. User name to authenticate with at the proxy server"
-msgstr ""
+msgstr "Valgfri. Brugernavn overfor proxyserveren"
 
 #: hggtk\thgconfig.py:163
 msgid "From"
-msgstr ""
+msgstr "Fra"
 
 #: hggtk\thgconfig.py:164
 msgid "Email address to use in the \"From\" header and for the SMTP envelope"
-msgstr ""
+msgstr "E-postadresse for afsender"
 
 #: hggtk\thgconfig.py:165
 msgid "To"
-msgstr ""
+msgstr "Til"
 
 #: hggtk\thgconfig.py:166
 msgid "Comma-separated list of recipient email addresses"
-msgstr ""
+msgstr "Kommasepareret liste over e-post adresser på modtagere"
 
 #: hggtk\thgconfig.py:167
 msgid "Cc"
-msgstr ""
+msgstr "Cc"
 
 #: hggtk\thgconfig.py:168
 msgid "Comma-separated list of carbon copy recipient email addresses"
-msgstr ""
+msgstr "Kommasepareret liste af cc-modtager-adresser"
 
 #: hggtk\thgconfig.py:170
 msgid "Bcc"
-msgstr ""
+msgstr "Bcc"
 
 #: hggtk\thgconfig.py:171
 msgid "Comma-separated list of blind carbon copy recipient email addresses"
-msgstr ""
+msgstr "Kommasepareret liste over blindkopi-modtagere"
 
 #: hggtk\thgconfig.py:173
 msgid "method"
@@ -3065,10 +3091,16 @@ msgid ""
 "\"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send "
 "messages."
 msgstr ""
+"Valgfri. Metode til at sende e-post. Hvis værdien er \"smtp\" (default) "
+"anvendes SMTP (konfigureret nedenfor). Andre værdier tages som navn på et "
+"program der virker som sendmail (det tager et \"-f\" flag for afsender, en "
+"liste af modtagere på kommandolinjen og beskeden via stdin). Normalt vil det "
+"være nok at sætte værdien til \"sendmail\" eller \"/usr/sbin/sendmail\" for "
+"at sende beskeder." 
 
 #: hggtk\thgconfig.py:179
 msgid "Host name of mail server"
-msgstr ""
+msgstr "Værtsnavn for mailserver"
 
 #: hggtk\thgconfig.py:179
 msgid "SMTP Host"
@@ -3080,7 +3112,7 @@ msgstr "SMTP port"
 
 #: hggtk\thgconfig.py:181
 msgid "Port to connect to on mail server. Default: 25"
-msgstr ""
+msgstr "Port til at forbinde til mail server. Default: 25"
 
 #: hggtk\thgconfig.py:183
 msgid "SMTP TLS"
@@ -3088,7 +3120,7 @@ msgstr "SMTP TLS"
 
 #: hggtk\thgconfig.py:184
 msgid "Connect to mail server using TLS. Default: False"
-msgstr ""
+msgstr "Forbind til mail server via TLS. Default: False"
 
 #: hggtk\thgconfig.py:186
 msgid "SMTP Username"
@@ -3096,7 +3128,7 @@ msgstr "SMTP brugernavn"
 
 #: hggtk\thgconfig.py:187
 msgid "Username to authenticate to mail server with"
-msgstr ""
+msgstr "Brugernavn til mailserver"
 
 #: hggtk\thgconfig.py:188
 msgid "SMTP Password"
@@ -3104,7 +3136,7 @@ msgstr "SMTP kodeord"
 
 #: hggtk\thgconfig.py:189
 msgid "Password to authenticate to mail server with"
-msgstr ""
+msgstr "Kodeord til mailserver"
 
 #: hggtk\thgconfig.py:190
 msgid "Local Hostname"
@@ -3114,8 +3146,7 @@ msgstr "Lokalt værtsnavn"
 msgid "Hostname the sender can use to identify itself to the mail server."
 msgstr ""
 "Værtsnavn som afsenderen kan bruge til at identificere sig overfor mail "
-"serveren.Værtsnavn som afsenderen kan bruge til at identificere sig overfor "
-"mail serveren."
+"serveren."
 
 #: hggtk\thgconfig.py:194
 msgid "Git Format"
@@ -3123,119 +3154,119 @@ msgstr "Git format"
 
 #: hggtk\thgconfig.py:195
 msgid "Use git extended diff header format. Default: False"
-msgstr ""
+msgstr "Brug git udviddet diff-header format. Default: Falsk"
 
 #: hggtk\thgconfig.py:197
 msgid "No Dates"
-msgstr ""
+msgstr "Ingen datoer"
 
 #: hggtk\thgconfig.py:198
 msgid "Do not include modification dates in diff headers. Default: False"
-msgstr ""
+msgstr "Inkluder ikke ændringsdato i diff headers. Default: Falsk"
 
 #: hggtk\thgconfig.py:200
 msgid "Show Function"
-msgstr ""
+msgstr "Vis funktion"
 
 #: hggtk\thgconfig.py:201
 msgid "Show which function each change is in. Default: False"
-msgstr ""
+msgstr "Vis hvilken funktion hver ændring tilhører. Default: Falsk"
 
 #: hggtk\thgconfig.py:203
 msgid "Ignore White Space"
-msgstr ""
+msgstr "Ignorer blanktegn"
 
 #: hggtk\thgconfig.py:204
 msgid "Ignore white space when comparing lines. Default: False"
-msgstr ""
+msgstr "Ignorer blanktegn ved sammenligning af linjer. Default: Falsk"
 
 #: hggtk\thgconfig.py:206
 msgid "Ignore WS Amount"
-msgstr ""
+msgstr "Ignorer mængden af blanktegn"
 
 #: hggtk\thgconfig.py:207
 msgid "Ignore changes in the amount of white space. Default: False"
-msgstr ""
+msgstr "Ignorer ændringer i mængden af blanktegn. Default: Falsk"
 
 #: hggtk\thgconfig.py:209
 msgid "Ignore Blank Lines"
-msgstr ""
+msgstr "Ignorer tomme linier"
 
 #: hggtk\thgconfig.py:210
 msgid "Ignore changes whose lines are all blank. Default: False"
-msgstr ""
+msgstr "Ignorer ændringer som kun indeholder tomme linier. Default: Falsk"
 
 #: hggtk\thgconfig.py:223
 msgid "Edit remote repository path"
-msgstr ""
+msgstr "Rediger sti til fjerndepot"
 
 #: hggtk\thgconfig.py:229
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: hggtk\thgconfig.py:230
 msgid "Folder"
-msgstr ""
+msgstr "Folder"
 
 #: hggtk\thgconfig.py:232 hggtk\thgconfig.py:729
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: hggtk\thgconfig.py:367 hggtk\thgconfig.py:669
 msgid "Overwrite existing '%s' path?"
-msgstr ""
+msgstr "Overskriv eksisterende sti '%s'?"
 
 #: hggtk\thgconfig.py:421
 msgid "No repository found"
-msgstr ""
+msgstr "Intet depot fundet"
 
 #: hggtk\thgconfig.py:422
 msgid "no repo at "
-msgstr ""
+msgstr "intet depot på "
 
 #: hggtk\thgconfig.py:430
 msgid "User global settings"
-msgstr ""
+msgstr "Brugerindstillinger"
 
 #: hggtk\thgconfig.py:432
 msgid "%s repository settings"
-msgstr ""
+msgstr "%s depot-indstillinger"
 
 #: hggtk\thgconfig.py:437
 msgid "Edit File"
-msgstr ""
+msgstr "Rediger fil"
 
 #: hggtk\thgconfig.py:466
 msgid "Changelog"
-msgstr ""
+msgstr "Ændringslog"
 
 #: hggtk\thgconfig.py:469
 msgid "Sync"
-msgstr ""
+msgstr "Synk."
 
 #: hggtk\thgconfig.py:473
 msgid "Web"
-msgstr ""
+msgstr "Web"
 
 #: hggtk\thgconfig.py:476
 msgid "Proxy"
-msgstr ""
+msgstr "Proxy"
 
 #: hggtk\thgconfig.py:482
 msgid "Diff"
-msgstr ""
+msgstr "Diff"
 
 #: hggtk\thgconfig.py:495
 msgid "Unapplied changes"
-msgstr ""
+msgstr "Ikke-anvendte ændringer"
 
 #: hggtk\thgconfig.py:496
 msgid "Lose changes and switch files?."
-msgstr ""
+msgstr "Skift filer og mist ændringer?"
 
 #: hggtk\thgconfig.py:507
 msgid "TortoiseHg Configure Repository - "
-msgstr ""
+msgstr "TortoiseHg konfigurer depot - "
 
 #: hggtk\thgconfig.py:511
 msgid "TortoiseHg Configure User-Global Settings"
