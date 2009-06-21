@@ -5,11 +5,6 @@
 #include <windows.h>
 #include <string>
 
-#define _UNUSED_PARAMETER(p)	\
-	{							\
-		(p) = (p);				\
-	}
-
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(a)    (sizeof(a)/sizeof(a[0]))
 #endif
