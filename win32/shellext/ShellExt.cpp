@@ -16,10 +16,10 @@ DEFINE_GUID(CLSID_TortoiseHg4, 0xb456dba4L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x1
 DEFINE_GUID(CLSID_TortoiseHg5, 0xb456dba5L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
 DEFINE_GUID(CLSID_TortoiseHg6, 0xb456dba6L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
 
-UINT      g_cRefThisDll = 0;    
-HINSTANCE g_hmodThisDll = NULL;	
+UINT g_cRefThisDll = 0;
+HINSTANCE g_hmodThisDll = NULL;
 
-HMENU	hSubMenu		= 0;
+HMENU hSubMenu = 0;
 
 CRITICAL_SECTION g_critical_section;
 
@@ -32,8 +32,10 @@ typedef struct
    LPTSTR lpszData;
 } REGSTRUCT, *LPREGSTRUCT;
 
-VOID   _LoadResources();
-VOID   _UnloadResources();
+
+VOID _LoadResources();
+VOID _UnloadResources();
+
 
 extern "C" 
 int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
@@ -41,21 +43,22 @@ int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
     TDEBUG_TRACE("DllMain");
 
     if (dwReason == DLL_PROCESS_ATTACH)
-	{
+    {
         TDEBUG_TRACE("DllMain: DLL_PROCESS_ATTACH");
         g_hmodThisDll = hInstance;
         ::InitializeCriticalSection(&g_critical_section);
-		_LoadResources();
-	}
-	else if (dwReason == DLL_PROCESS_DETACH)
+        _LoadResources();
+    }
+    else if (dwReason == DLL_PROCESS_DETACH)
     {
         TDEBUG_TRACE("DllMain: DLL_PROCESS_ATTACH");
         ::DeleteCriticalSection(&g_critical_section);
-		_UnloadResources();
+        _UnloadResources();
     }
 
     return 1;
 }
+
 
 STDAPI DllCanUnloadNow(void)
 {
@@ -63,49 +66,56 @@ STDAPI DllCanUnloadNow(void)
     return (g_cRefThisDll == 0 ? S_OK : S_FALSE);
 }
 
+
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 {
-	LPWSTR   pwszShellExt;
-	StringFromIID(rclsid, &pwszShellExt);
+    LPWSTR   pwszShellExt;
+    StringFromIID(rclsid, &pwszShellExt);
     TDEBUG_TRACE("DllGetClassObject clsid = " << WideToMultibyte(pwszShellExt));
     *ppvOut = NULL;
 
     if (IsEqualIID(rclsid, CLSID_TortoiseHg0))
     {
-        CDllRegSxClassFactory *pcf = new CDllRegSxClassFactory(TORTOISE_OLE_UNCHANGED);
+        CDllRegSxClassFactory *pcf =
+            new CDllRegSxClassFactory(TORTOISE_OLE_UNCHANGED);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg0");
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg1))
     {
-        CDllRegSxClassFactory *pcf = new CDllRegSxClassFactory(TORTOISE_OLE_ADDED);
+        CDllRegSxClassFactory *pcf =
+            new CDllRegSxClassFactory(TORTOISE_OLE_ADDED);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg1");
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg2))
     {
-        CDllRegSxClassFactory *pcf = new CDllRegSxClassFactory(TORTOISE_OLE_MODIFIED);
+        CDllRegSxClassFactory *pcf =
+            new CDllRegSxClassFactory(TORTOISE_OLE_MODIFIED);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg6))
     {
-        CDllRegSxClassFactory *pcf = new CDllRegSxClassFactory(TORTOISE_OLE_NOTINREPO);
+        CDllRegSxClassFactory *pcf =
+            new CDllRegSxClassFactory(TORTOISE_OLE_NOTINREPO);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
         return pcf->QueryInterface(riid, ppvOut);
     }
-	
+
     return CLASS_E_CLASSNOTAVAILABLE;
 }
+
 
 VOID _LoadResources(VOID)
 {
 }
 
+
 VOID _UnloadResources(VOID)
 {
-	if (hSubMenu)
-		DestroyMenu(hSubMenu);
+    if (hSubMenu)
+        DestroyMenu(hSubMenu);
 }
 
 
@@ -114,45 +124,47 @@ LPCRITICAL_SECTION CDllRegSxClassFactory::GetCriticalSection()
     return &g_critical_section;
 }
 
+
 CDllRegSxClassFactory::CDllRegSxClassFactory(TortoiseOLEClass classToMake)
 {
     ThgCriticalSection cs(GetCriticalSection());
     m_cRef = 0L;
-    g_cRefThisDll++;	
+    g_cRefThisDll++;
     myclassToMake = classToMake;
 }
-																
-CDllRegSxClassFactory::~CDllRegSxClassFactory()				
+
+
+CDllRegSxClassFactory::~CDllRegSxClassFactory()
 {
     ThgCriticalSection cs(GetCriticalSection());
     g_cRefThisDll--;
 }
 
-STDMETHODIMP 
-CDllRegSxClassFactory::QueryInterface(REFIID riid, LPVOID FAR *ppv)
+
+STDMETHODIMP CDllRegSxClassFactory::QueryInterface(
+    REFIID riid, LPVOID FAR* ppv)
 {
     *ppv = NULL;
 
-    if(IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
+    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
     {
-        *ppv = (LPCLASSFACTORY)this;
+        *ppv = (LPCLASSFACTORY) this;
         AddRef();
-
         return NOERROR;
     }
 
     return E_NOINTERFACE;
-}	
+}
 
-STDMETHODIMP_(ULONG) 
-CDllRegSxClassFactory::AddRef()
+
+STDMETHODIMP_(ULONG) CDllRegSxClassFactory::AddRef()
 {
     ThgCriticalSection cs(GetCriticalSection());
     return ++m_cRef;
 }
 
-STDMETHODIMP_(ULONG) 
-CDllRegSxClassFactory::Release()
+
+STDMETHODIMP_(ULONG) CDllRegSxClassFactory::Release()
 {
     ThgCriticalSection cs(GetCriticalSection());
     if (--m_cRef)
@@ -162,29 +174,31 @@ CDllRegSxClassFactory::Release()
     return 0L;
 }
 
-STDMETHODIMP 
-CDllRegSxClassFactory::CreateInstance(LPUNKNOWN pUnkOuter, REFIID riid, LPVOID *ppvObj)
+
+STDMETHODIMP CDllRegSxClassFactory::CreateInstance(
+    LPUNKNOWN pUnkOuter, REFIID riid, LPVOID* ppvObj)
 {
     *ppvObj = NULL;
 
     if (pUnkOuter)
-    	return CLASS_E_NOAGGREGATION;
+        return CLASS_E_NOAGGREGATION;
 
     LPCSHELLEXT pShellExt = new CShellExt(myclassToMake);
     if (NULL == pShellExt)
-    	return E_OUTOFMEMORY;
+        return E_OUTOFMEMORY;
 
     return pShellExt->QueryInterface(riid, ppvObj);
 }
 
-STDMETHODIMP 
-CDllRegSxClassFactory::LockServer(BOOL fLock)
+
+STDMETHODIMP CDllRegSxClassFactory::LockServer(BOOL fLock)
 {
     return NOERROR;
 }
 
+
 CShellExt::CShellExt(TortoiseOLEClass tortoiseClass)
-	: m_ppszFileUserClickedOn(0)
+    : m_ppszFileUserClickedOn(0)
 {
     ThgCriticalSection cs(GetCriticalSection());
 
@@ -194,6 +208,7 @@ CShellExt::CShellExt(TortoiseOLEClass tortoiseClass)
 
     g_cRefThisDll++;
 }
+
 
 CShellExt::~CShellExt()
 {
@@ -205,20 +220,21 @@ CShellExt::~CShellExt()
     g_cRefThisDll--;
 }
 
+
 LPCRITICAL_SECTION CShellExt::GetCriticalSection()
 {
     return &g_critical_section;
 }
 
-STDMETHODIMP 
-CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
+
+STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR* ppv)
 {
     std::string clsname = "UNKNOWN CLSID";
     
     *ppv = NULL;
     if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
     {
-    	*ppv = (LPSHELLEXTINIT)this;
+        *ppv = (LPSHELLEXTINIT)this;
         clsname = "IID_IShellExtInit";
     }
     else if (IsEqualIID(riid, IID_IContextMenu))
@@ -244,24 +260,24 @@ CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 
     TDEBUG_TRACE("CShellExt::QueryInterface: " << clsname);
     
-    if(*ppv)
+    if (*ppv)
     {
         AddRef();
         return NOERROR;
     }
 
-	return E_NOINTERFACE;
+    return E_NOINTERFACE;
 }
 
-STDMETHODIMP_(ULONG) 
-CShellExt::AddRef()
+
+STDMETHODIMP_(ULONG) CShellExt::AddRef()
 {
     ThgCriticalSection cs(GetCriticalSection());
     return ++m_cRef;
 }
 
-STDMETHODIMP_(ULONG) 
-CShellExt::Release()
+
+STDMETHODIMP_(ULONG) CShellExt::Release()
 {
     ThgCriticalSection cs(GetCriticalSection());
 
@@ -272,24 +288,25 @@ CShellExt::Release()
     return 0L;
 }
 
+
 #if 0
-STDMETHODIMP 
-CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
+STDMETHODIMP CShellExt::Initialize(
+    LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
-	if (m_pDataObj)
-    	m_pDataObj->Release();
+    if (m_pDataObj)
+        m_pDataObj->Release();
     if (pDataObj)
     {
-    	m_pDataObj = pDataObj;
-    	pDataObj->AddRef();
+        m_pDataObj = pDataObj;
+        pDataObj->AddRef();
     }
     return NOERROR;
 }
 
 #else
 
-STDMETHODIMP 
-CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
+STDMETHODIMP CShellExt::Initialize(
+    LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
     TCHAR name[MAX_PATH+1];
 
