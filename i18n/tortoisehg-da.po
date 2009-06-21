@@ -1093,7 +1093,7 @@ msgstr "syltet data findes allerede"
 
 #: hggtk\hgshelve.py:468
 msgid "no changes to shelve\n"
-msgstr "ingen ændringer til sylte"
+msgstr "ingen ændringer til sylte\n"
 
 #: hggtk\hgshelve.py:502
 msgid "applying patch\n"
@@ -1109,7 +1109,7 @@ msgstr "gendanner %r som %r\n"
 
 #: hggtk\hgshelve.py:522
 msgid "removing shelve file\n"
-msgstr "fjerner sylte-filer"
+msgstr "fjerner sylte-filer\n"
 
 #: hggtk\hgshelve.py:531
 msgid "removing backup for %r : %r\n"
