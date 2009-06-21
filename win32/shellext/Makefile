@@ -8,7 +8,6 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         ContextMenu.o \
         IconOverlay.o \
         ShellExt.o \
-        ShellUtils2.o \
         StringUtils.o \
         dirstate.o \
         Winstat64.o \
