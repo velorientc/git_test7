@@ -289,22 +289,6 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 }
 
 
-#if 0
-STDMETHODIMP CShellExt::Initialize(
-    LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
-{
-    if (m_pDataObj)
-        m_pDataObj->Release();
-    if (pDataObj)
-    {
-        m_pDataObj = pDataObj;
-        pDataObj->AddRef();
-    }
-    return NOERROR;
-}
-
-#else
-
 STDMETHODIMP CShellExt::Initialize(
     LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
@@ -365,5 +349,3 @@ STDMETHODIMP CShellExt::Initialize(
 
     return NOERROR;
 }
-
-#endif
