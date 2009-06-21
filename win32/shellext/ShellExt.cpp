@@ -319,7 +319,6 @@ STDMETHODIMP CShellExt::Initialize(
 
     if (pDataObj)
     {
-#if 1
         FORMATETC fmt = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
         STGMEDIUM stg = { TYMED_HGLOBAL };
         if (SUCCEEDED(pDataObj->GetData(&fmt, &stg)) && stg.hGlobal)
@@ -354,52 +353,6 @@ STDMETHODIMP CShellExt::Initialize(
         {
             TDEBUG_TRACE("  pDataObj->GetData failed");
         }
-
-#else
-
-        STGMEDIUM medium;
-        FORMATETC fmte = { RegisterClipboardFormat(CFSTR_SHELLIDLIST),
-                NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-        HRESULT hres = pDataObj->GetData(&fmte, &medium);
-
-        if (SUCCEEDED(hres) && medium.hGlobal)
-        {
-            // Enumerate PIDLs which the user has selected
-            CIDA* cida = (CIDA*) GlobalLock(medium.hGlobal);
-            LPCITEMIDLIST parentFolder = GetPIDLFolder(cida);
-            TDEBUG_TRACE("Parent folder: " << GetPathFromIDList(parentFolder));
-            int count = cida->cidl;
-            TDEBUG_TRACE("Selected items: " << count);
-            for (int i = 0; i < count; ++i)
-            {
-                LPCITEMIDLIST child = GetPIDLItem(cida, i);
-                LPITEMIDLIST absolute = AppendPIDL(parentFolder, child);
-                std::string name = GetPathFromIDList(absolute);
-                TDEBUG_TRACE("Processing " << GetPathFromIDList(absolute));
-                if (IsShortcut(absolute))
-                {
-                     TDEBUG_TRACE("IsShortCut " << name);
-                     LPITEMIDLIST target = GetShortcutTarget(absolute);
-                     ItemListFree(absolute);
-                     absolute = target;
-                     name = GetPathFromIDList(target);
-                }
-
-                name = GetPathFromIDList(absolute);
-                TDEBUG_TRACE("myFiles pusing " << name);
-                myFiles.push_back(name);
-
-                ItemListFree(absolute);
-            }
-
-            GlobalUnlock(medium.hGlobal);
-            if (medium.pUnkForRelease)
-            {
-                IUnknown* relInterface = (IUnknown*) medium.pUnkForRelease;
-                relInterface->Release();
-            }
-        }
-#endif
     }
 
     // if a directory background
