@@ -2642,7 +2642,7 @@ msgstr "Proceslinjen"
 
 #: hggtk\taskbarui.py:92
 msgid "Highlight Icon"
-msgstr "Fremhævikon"
+msgstr "Fremhæv ikon"
 
 #: hggtk\taskbarui.py:95
 msgid "Enable/Disable the overlay icons globally"
@@ -2654,11 +2654,11 @@ msgstr "Aktiver overlays kun på lokale diske"
 
 #: hggtk\taskbarui.py:102
 msgid "Highlight the taskbar icon during activity"
-msgstr "Fremhæv proceslinjen"
+msgstr "Fremhæv ikonet på proceslinjen ved aktivitet"
 
 #: hggtk\taskbarui.py:108
 msgid "Event Log"
-msgstr ""
+msgstr "Hændelseslog"
 
 #: hggtk\thgconfig.py:21
 msgid "<unspecified>"
@@ -2666,7 +2666,7 @@ msgstr "<uspecificeret>"
 
 #: hggtk\thgconfig.py:27
 msgid "3-way Merge Tool"
-msgstr ""
+msgstr "3-vejs fletteværktøj"
 
 #: hggtk\thgconfig.py:28
 msgid ""
@@ -2678,15 +2678,15 @@ msgstr ""
 
 #: hggtk\thgconfig.py:32
 msgid "Visual Diff Command"
-msgstr ""
+msgstr "Visuel diff kommando"
 
 #: hggtk\thgconfig.py:33
 msgid "Specify visual diff tool; must be an extdiff command"
-msgstr ""
+msgstr "Specificer visuelt diff-værktøj. Skal være en extdiff kommando"
 
 #: hggtk\thgconfig.py:34
 msgid "Skip Diff Window"
-msgstr ""
+msgstr "Undlad diff-vindue"
 
 #: hggtk\thgconfig.py:35
 msgid ""
@@ -2694,38 +2694,47 @@ msgid ""
 "tool's directory diff feature.  Only enable this feature if you know your "
 "diff tool has a valid extdiff configuration.  Default: False"
 msgstr ""
+"I stedet for at bruge den indbyggede visuelle diff.-dialog så bruges det "
+"brugerspecificerede diff-værktøj til at sammenligne kataloger. Du skal kun "
+"aktivere denne funktion hvis dit diff-værktøj har en gyldig extdiff-"
+"konfiguration. Default: Falsk"
 
 #: hggtk\thgconfig.py:39
 msgid "Visual Editor"
-msgstr ""
+msgstr "Visuel editor"
 
 #: hggtk\thgconfig.py:40
 msgid "Specify the visual editor used to view files, etc"
-msgstr ""
+msgstr "Specificer den visuelle editor der skal bruges til at se filer"
 
 #: hggtk\thgconfig.py:41
 msgid "CLI Editor"
-msgstr ""
+msgstr "CLI editor"
 
 #: hggtk\thgconfig.py:42
 msgid ""
 "The editor to use during a commit and other instances where Mercurial needs "
 "multiline input from the user.  Only used by command line interface commands."
 msgstr ""
+"Den editor der skal bruges ved integration og andre tilfælde hvor Mercurial "
+"har brug for flere liniers input fra brugeren. Bliver kun aktiveret via "
+"kommandolinjen."
 
 #: hggtk\thgconfig.py:45
 msgid "Tab Width"
-msgstr ""
+msgstr "Tab størrelse"
 
 #: hggtk\thgconfig.py:46
 msgid ""
 "Specify the number of spaces that tabs expand to in various TortoiseHG "
 "windows. Default: Not expanded"
 msgstr ""
+"Angiver hvor mange blanktegn et tabuleringstegn svarer til i diverse "
+"TortoiseHg vinduer. Default: Deaktiveret"
 
 #: hggtk\thgconfig.py:49
 msgid "Max Diff Size"
-msgstr ""
+msgstr "Maksimal diff-størrelse"
 
 #: hggtk\thgconfig.py:50
 msgid ""
@@ -2739,13 +2748,15 @@ msgstr ""
 
 #: hggtk\thgconfig.py:53
 msgid "Bottom Diffs"
-msgstr ""
+msgstr "Diff-panel"
 
 #: hggtk\thgconfig.py:54
 msgid ""
 "Show the diff panel below the file list in status, shelve, and commit "
 "dialogs. Default: False (show diffs to right of file list)"
 msgstr ""
+"Viser diff-panelet under fil-listen ved status, sylt og integrér dialogerne. "
+"Default: Falsk (vis diff til højre for fil-listen)"
 
 #: hggtk\thgconfig.py:59
 msgid "Username"
@@ -2753,11 +2764,11 @@ msgstr "Brugernavn"
 
 #: hggtk\thgconfig.py:60
 msgid "Name associated with commits"
-msgstr ""
+msgstr "Navn anvendt ved integrationer"
 
 #: hggtk\thgconfig.py:61
 msgid "External Commit Tool"
-msgstr ""
+msgstr "Eksternt integrationsværktøj"
 
 #: hggtk\thgconfig.py:62
 msgid ""
