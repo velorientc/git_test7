@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "ShellExt.h"
 #include "TortoiseUtils.h"
-#include "ShellUtils.h"
 #include "StringUtils.h"
 #include <olectl.h>
 
