@@ -5,10 +5,6 @@
 #include <windows.h>
 #include <string>
 
-#ifndef ARRAYSIZE
-#define ARRAYSIZE(a)    (sizeof(a)/sizeof(a[0]))
-#endif
-
 extern int  LocalToWideChar(LPWSTR pWide, LPTSTR pLocal, DWORD dwChars);
 extern int  WideCharToLocal(LPTSTR pLocal, LPWSTR pWide, DWORD dwChars);
 
