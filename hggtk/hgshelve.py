@@ -501,7 +501,7 @@ def shelve(ui, repo, *pats, **opts):
                 if dopatch:
                     ui.debug(_('applying patch\n'))
                     ui.debug(fp.getvalue())
-                    if hasattr(patch, 'linereader'):
+                    if patch.patchfile.__bases__:
                         # Mercurial 1.3
                         patch.internalpatch(fp, ui, 1, repo.root, eolmode=None)
                     else:
