@@ -25,21 +25,6 @@
 #include <windows.h>
 
 
-#ifdef _MSC_VER
-        // Fancier GUI Visual C++ asserts
-        #include <crtdbg.h>
-#else
-        // Standard C assert
-        #include <assert.h>
-#ifndef _ASSERT
-        #define _ASSERT assert
-#endif
-#endif
-
-#ifndef ASSERT
-        #define ASSERT _ASSERT
-#endif
-
 // From: http://www.kbcafe.com/articles/cplusplus.tricks.html
 template<class T> void FindAndReplace(T& source, const T& find, const T& replace)
 {
