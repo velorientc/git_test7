@@ -83,13 +83,6 @@ std::wstring MultibyteToWide(const std::string& multibyte, UINT CodePage = CP_AC
 std::string SerializeStringVector(const std::vector<std::string>& vStrings, 
                                   const std::string& sDelimiter);
 
-// Expand environment strings
-std::string ExpandEnvStrings(const std::string& str);
-
-#if wxUSE_UNICODE
-wxString ExpandEnvStrings(const wxString& str);
-#endif
-
 // comparison function object
 class less_nocase 
 {
