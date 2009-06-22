@@ -130,37 +130,6 @@ std::string CutFirstToken(std::string& sList, const std::string& sDelimiter)
 
 
 #ifndef POSTINST
-/*
-wxString Printf(const wxChar* format, ...)
-{
-   va_list args;
-   va_start(args, format);
-   return wxString::FormatV(format, args);
-}
-*/
-
-std::string PrintfA(const char* format, ...)
-{
-    char* buf = 0;
-    std::string res;
-    va_list args;
-    va_start(args, format);
-    int size = 1024;
-    int len = -1;
-    while (len == -1)
-    {
-        delete[] buf;
-
-        buf = new char[size + 1];
-        len = _vsnprintf(buf, size, format, args);
-        buf[size] = '\0';
-        size *= 2;
-    }
-
-    res = buf;
-    delete[] buf;
-    return res;
-}
 
 
 // Convert Unicode string to multibyte string

@@ -79,11 +79,6 @@ std::string Quote(const std::string& str);
 // Cuts the first token off a delimited list
 std::string CutFirstToken(std::string& sList, const std::string sDelimiter);
 
-// Printf returning a std::string
-//wxString Printf(const wxChar* format, ...);
-
-std::string PrintfA(const char* format, ...);
-
 // Convert Unicode string to multibyte string
 std::string WideToMultibyte(const std::wstring& wide, UINT CodePage = CP_ACP);
 
