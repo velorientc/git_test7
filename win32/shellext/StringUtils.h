@@ -23,18 +23,6 @@
 #include <string>
 #include <windows.h>
 
-
-// Remove leading whitespaces from a string
-std::string TrimLeft(const std::string& str);
-
-
-// Remove trailing whitespaces from a string
-std::string TrimRight(const std::string& str);
-
-
-// Remove leading and trailing whitespaces from a string
-std::string Trim(const std::string& str);
-
 // Test if string starts with substr
 bool StartsWith(const std::string& str, const std::string& substr);
 

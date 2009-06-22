@@ -29,40 +29,6 @@ int myisspace(char ch)
 }
 
 
-// Remove leading whitespaces from a string
-std::string TrimLeft(const std::string& str)
-{
-   std::string::const_iterator iter = std::find_if(str.begin(), str.end(),
-                                                   std::not1(std::ptr_fun(myisspace)));
-   if (iter == str.end())
-      iter = str.begin();
-   return std::string(iter, str.end());
-}
-
-// Remove trailing whitespaces from a string
-std::string TrimRight(const std::string& str)
-{
-   std::string::const_reverse_iterator iter = std::find_if(str.rbegin(),
-                                                           str.rend(), std::not1(std::ptr_fun(myisspace)));
-   return std::string(str.begin(), iter.base());
-}
-
-
-
-// Remove leading and trailing whitespaces from a string
-std::string Trim(const std::string& str)
-{
-   std::string::const_iterator begin = std::find_if(str.begin(), str.end(),
-                                                    std::not1(std::ptr_fun(myisspace)));
-   if (begin == str.end())
-      begin = str.begin();
-   std::string::const_reverse_iterator end = std::find_if(str.rbegin(),
-                                                          str.rend(), std::not1(std::ptr_fun(myisspace)));
-   return std::string(begin, end.base());
-}
-
-
-
 // Test if string starts with substr
 bool StartsWith(const std::string& str, const std::string& substr)
 {
