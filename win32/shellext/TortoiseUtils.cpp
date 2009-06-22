@@ -8,24 +8,6 @@
 #include "FCNTL.H"
 
 
-int LocalToWideChar(LPWSTR pWide, LPTSTR pLocal, DWORD dwChars)
-{
-	*pWide = 0;
-
-	#ifdef UNICODE
-	lstrcpyn(pWide, pLocal, dwChars);
-	#else
-	MultiByteToWideChar( CP_ACP, 
-						 0, 
-						 pLocal, 
-						 -1, 
-						 pWide, 
-						 dwChars); 
-	#endif
-
-	return lstrlenW(pWide);
-}
-
 LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars)
 {
 	assert(lpa != NULL);
