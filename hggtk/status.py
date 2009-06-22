@@ -1065,10 +1065,11 @@ class GStatus(gdialog.GDialog):
                     chunk.write(buf)
         buf.seek(0)
         try:
-            fp = open(result, "w")
-            fp.write(buf.read())
-        except OSError:
-            pass
+            try:
+                fp = open(result, "w")
+                fp.write(buf.read())
+            except OSError:
+                pass
         finally:
             fp.close()
 
