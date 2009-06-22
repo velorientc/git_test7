@@ -17,7 +17,7 @@
 
 #include "StringUtils.h"
 
-#include <memory>
+#include <vector>
 
 
 // Quotes a string
@@ -31,36 +31,39 @@ std::string Quote(const std::string& str)
 // Convert Unicode string to multibyte string
 std::string WideToMultibyte(const std::wstring& wide, UINT CodePage)
 {
-    char* narrow = NULL;
     // Determine length of string
     int ret = WideCharToMultiByte(
         CodePage, 0, wide.c_str(), static_cast<int>(wide.length()),
         NULL, 0, NULL, NULL
     );
-    narrow = new char[ret + 1];
-    std::auto_ptr<char> free_narrow(narrow);
+    
+    std::vector<CHAR> narrow(ret + 1);
+
     ret = WideCharToMultiByte(
         CodePage, 0, wide.c_str(), static_cast<int>(wide.length()),
-        narrow, ret, NULL, NULL
+        &narrow[0], ret, NULL, NULL
     );
     narrow[ret] = '\0';
-    return narrow;
+
+    return &narrow[0];
 }
 
 
 // Convert multibyte string to Unicode string 
 std::wstring MultibyteToWide(const std::string& multibyte, UINT CodePage)
 {
-    wchar_t* wide = NULL;
     int ret = MultiByteToWideChar(
         CodePage, 0, multibyte.c_str(), 
         static_cast<int>(multibyte.length()), 0, 0
     );
-    wide = new wchar_t[ret + 1];
-    std::auto_ptr<wchar_t> free_narrow(wide);
+
+    std::vector<wchar_t> wide(ret + 1);
+
     ret = MultiByteToWideChar(
         CodePage, 0, multibyte.c_str(),
-        static_cast<int>(multibyte.length()), wide, ret);
+        static_cast<int>(multibyte.length()), &wide[0], ret
+    );
     wide[ret] = L'\0';
-    return wide;
+
+    return &wide[0];
 }
