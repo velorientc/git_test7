@@ -39,10 +39,6 @@ template<class T> void FindAndReplace(T& source, const T& find, const T& replace
 // Return the length of the longest string in the vector.
 int MaxStringLength(const std::vector<std::string>& stringvec);
 
-void MakeLowerCase(std::string& s);
-
-void MakeUpperCase(std::string& s);
-
 // Remove leading whitespaces from a string
 std::string TrimLeft(const std::string& str);
 

@@ -42,16 +42,6 @@ int MaxStringLength(const std::vector<std::string>& stringvec)
    return max;
 }
 
-void MakeLowerCase(std::string& s)
-{
-   std::transform(s.begin(), s.end(), s.begin(), tolower);
-}
-
-void MakeUpperCase(std::string& s)
-{
-   std::transform(s.begin(), s.end(), s.begin(), toupper);
-}
-
 
 // Remove leading whitespaces from a string
 std::string TrimLeft(const std::string& str)
