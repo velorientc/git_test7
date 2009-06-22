@@ -5,6 +5,8 @@
 #include "Dirstatecache.h"
 #include "Thgstatus.h"
 #include "Winstat.h"
+#include <map>
+
 
 struct MenuDescription
 {

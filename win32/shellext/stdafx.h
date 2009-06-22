@@ -14,7 +14,6 @@
 #include <shlobj.h>
 #include <assert.h>
 #include <string>
-#include <map>
 
 #define ASSERT assert
 
