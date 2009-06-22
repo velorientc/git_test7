@@ -231,7 +231,7 @@ class GStatus(gdialog.GDialog):
         except KeyError:
             pass
         self.mqmode = None
-        if hasattr(self.repo, 'mq') and self.repo.mq.applied:
+        if hasattr(self.repo, 'mq') and self.repo.mq.applied and repo['.'] == repo['qtip']:
             self.mqmode = True
 
 
@@ -551,7 +551,7 @@ class GStatus(gdialog.GDialog):
         repo = self.repo
         hglib.invalidaterepo(repo)
         if hasattr(repo, 'mq'):
-            self.mqmode = repo.mq.applied
+            self.mqmode = repo.mq.applied and repo['.'] == repo['qtip']
             self.set_title(self.get_title())
 
         if self.mqmode and self.mode != 'status':
