@@ -17,6 +17,8 @@
 
 #include "StringUtils.h"
 
+#include <memory>
+
 
 // Quotes a string
 std::string Quote(const std::string& str)
