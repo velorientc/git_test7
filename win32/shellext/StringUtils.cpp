@@ -125,9 +125,6 @@ std::string CutFirstToken(std::string& sList, const std::string& sDelimiter)
 }
 
 
-#ifndef POSTINST
-
-
 // Convert Unicode string to multibyte string
 std::string WideToMultibyte(const std::wstring& wide, UINT CodePage)
 {
@@ -158,7 +155,6 @@ std::wstring MultibyteToWide(const std::string& multibyte, UINT CodePage)
    return wide;
 }
 
-#endif // POSTINST
 
 // Serialize a vector of strings
 std::string SerializeStringVector(const std::vector<std::string>& vStrings, 
