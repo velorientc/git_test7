@@ -19,11 +19,6 @@
 
 #include "StringUtils.h"
 
-#include <algorithm>
-#include <functional>
-#include <sstream>
-#include <ctype.h>
-
 // 8-bit safe variants of <ctype> functions
 
 int myisspace(char ch)
