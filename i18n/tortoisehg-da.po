@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "POT-Creation-Date: 2009-06-15 05:36+0000\n"
-"PO-Revision-Date: 2009-06-21 21:59+0200\n"
+"PO-Revision-Date: 2009-06-22 06:22+0200\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1601,7 +1601,7 @@ msgstr "_kopier hash"
 
 #: hggtk\history.py:397
 msgid "_export patch"
-msgstr ""
+msgstr "_eksporter lap"
 
 #: hggtk\history.py:398
 msgid "e_mail patch"
@@ -1690,6 +1690,9 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"Filen \"%s\" findes allerede!\n"
+"\n"
+"Vil du overskrive den?"
 
 #: hggtk\logfilter.py:27 hggtk\taskbarui.py:31 hggtk\thgconfig.py:450
 msgid "Apply"
@@ -2680,6 +2683,10 @@ msgid ""
 "its internal merge tool that leaves conflict markers in place.  Chose "
 "internal:merge to force conflict markers."
 msgstr ""
+"Grafisk fletteprogram til at løse flette-konflikter. Hvis uspecificeret vil "
+"Mercurial bruge det første anvendelige værktøj den finder på dit system eller "
+"bruge dens eget fletteværktøj som indsætter konfliktmarkører. Vælg "
+"internal:merge for at tvinge konfliktmarkører."
 
 #: hggtk\thgconfig.py:32
 msgid "Visual Diff Command"
@@ -3270,19 +3277,19 @@ msgstr "TortoiseHg konfigurer depot - "
 
 #: hggtk\thgconfig.py:511
 msgid "TortoiseHg Configure User-Global Settings"
-msgstr ""
+msgstr "TortoiseHg konfigurer brugerinstillinger"
 
 #: hggtk\thgconfig.py:555
 msgid "Confirm quit without saving?"
-msgstr ""
+msgstr "Bekræft afslut uden at gemme?"
 
 #: hggtk\thgconfig.py:556
 msgid "Yes to abandon changes, No to continue"
-msgstr ""
+msgstr "Ja for at kassere ændringer, Nej for at fortsætte"
 
 #: hggtk\thgconfig.py:644
 msgid "No Repository Found"
-msgstr ""
+msgstr "Intet depot fundet"
 
 #: hggtk\thgconfig.py:645
 msgid "Path testing cannot work without a repository"
@@ -3380,7 +3387,7 @@ msgstr "Opdater - %s"
 
 #: hggtk\update.py:44
 msgid "Update to:"
-msgstr ""
+msgstr "Opdater til:"
 
 #: hggtk\update.py:64
 msgid "Overwrite local changes (--clean)"
@@ -3396,7 +3403,7 @@ msgstr "Midlertidige filer bliver fjernet når denne dialog lukkes"
 
 #: hggtk\visdiff.py:82
 msgid "Always launch single files"
-msgstr ""
+msgstr "Altid start enlige filer"
 
 #: hggtk\visdiff.py:108
 msgid "No repository"
@@ -3416,7 +3423,7 @@ msgstr "Intet visuelt diff-værktøj"
 
 #: hggtk\visdiff.py:136
 msgid "No visual diff tool has been configured"
-msgstr ""
+msgstr "Der er ikke konfigureret noget visuelt diff-værktøj"
 
 #: hggtk\visdiff.py:155
 msgid "changeset "
@@ -3428,11 +3435,11 @@ msgstr "revision(er) "
 
 #: hggtk\visdiff.py:162
 msgid "working changes"
-msgstr ""
+msgstr "arbejdsændringer"
 
 #: hggtk\visdiff.py:165
 msgid "Visual Diffs - "
-msgstr ""
+msgstr "Visuel diff - "
 
 #: hggtk\visdiff.py:173
 msgid "No file changes"
@@ -3448,23 +3455,23 @@ msgstr "Kunne ikke starte værktøj"
 
 #: hggtk\visdiff.py:242
 msgid "%s : %s"
-msgstr ""
+msgstr "%s : %s"
 
 #: thgutil\hglib.py:261
 msgid "extension '%s' overrides commands: %s\n"
-msgstr ""
+msgstr "udviddelse '%s' overskriver kommandoerne: %s\n"
 
 #: thgutil\hglib.py:301
 msgid "repository '%s' is not local"
-msgstr ""
+msgstr "depot '%s' er ikke lokalt"
 
 #: thgutil\menuthg.py:168 thgutil\menuthg.py:303
 msgid "Create Clone"
-msgstr ""
+msgstr "Lav klon"
 
 #: thgutil\menuthg.py:169
 msgid "Create clone here from source"
-msgstr ""
+msgstr "Lav klon her fra kilden"
 
 #: thgutil\menuthg.py:174
 msgid "Synchronize with dragged repository"
@@ -3612,7 +3619,7 @@ msgstr "Synkroniser med andet depot"
 
 #: thgutil\menuthg.py:295
 msgid "Recovery..."
-msgstr ""
+msgstr "Gendan..."
 
 #: thgutil\menuthg.py:296
 msgid "General repair and recovery of repository"
