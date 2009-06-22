@@ -21,7 +21,6 @@
 #define _STRING_UTILS_H
 
 #include <string>
-#include <vector>
 #include <windows.h>
 
 
