@@ -35,13 +35,6 @@
 #ifndef _ASSERT
         #define _ASSERT assert
 #endif
-
-        // This seems needed by Borland and GCC.
-        // Who else?  What standard is it?
-        #include <errno.h>
-        #ifndef ENOMEM
-                #define ENOMEM 12
-        #endif
 #endif
 
 #ifndef ASSERT
