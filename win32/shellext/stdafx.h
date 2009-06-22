@@ -17,8 +17,6 @@
 
 #define ASSERT assert
 
-#define WindowsVersionIsNT4() (0)
-
 
 #ifdef THG_DEBUG
     #include <sstream>
