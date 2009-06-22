@@ -25,9 +25,6 @@
 #include <windows.h>
 
 
-// Return the length of the longest string in the vector.
-int MaxStringLength(const std::vector<std::string>& stringvec);
-
 // Remove leading whitespaces from a string
 std::string TrimLeft(const std::string& str);
 

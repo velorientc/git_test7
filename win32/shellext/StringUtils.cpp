@@ -28,15 +28,6 @@ int myisspace(char ch)
    return 0;
 }
 
-int MaxStringLength(const std::vector<std::string>& stringvec)
-{
-   unsigned int max = 0;
-   for (std::vector<std::string>::const_iterator it = stringvec.begin(); it != stringvec.end(); ++it)
-      if ((*it).size() > max)
-         max = static_cast<unsigned int>((*it).size());
-   return max;
-}
-
 
 // Remove leading whitespaces from a string
 std::string TrimLeft(const std::string& str)
