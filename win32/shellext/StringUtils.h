@@ -69,27 +69,5 @@ std::wstring MultibyteToWide(const std::string& multibyte, UINT CodePage = CP_AC
 std::string SerializeStringVector(const std::vector<std::string>& vStrings, 
                                   const std::string& sDelimiter);
 
-// comparison function object
-class less_nocase 
-{
-public:
-   bool operator()(const std::string& x, const std::string& y) const
-   {
-      std::string::const_iterator p = x.begin();
-      std::string::const_iterator q = y.begin();
-
-      while (p != x.end() && q != y.end() && toupper(*p) == toupper(*q))
-         ++p, ++q;
-
-      if (p == x.end())         // Reached end of x: Return true if y is longer than x
-         return q != y.end();
-
-      if (q == y.end())         // Reached end of y, but not x, so x is longer than y
-         return false;
-
-      return toupper(*p) < toupper(*q);
-   }
-};
-
 
 #endif
