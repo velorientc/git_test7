@@ -25,17 +25,6 @@
 #include <windows.h>
 
 
-// From: http://www.kbcafe.com/articles/cplusplus.tricks.html
-template<class T> void FindAndReplace(T& source, const T& find, const T& replace)
-{
-   size_t j;
-   for (j = 0; (j = source.find(find, j)) != T::npos;)
-   {
-      source.replace(j, find.length(), replace);
-      j += replace.length();
-   }
-}
-
 // Return the length of the longest string in the vector.
 int MaxStringLength(const std::vector<std::string>& stringvec);
 
