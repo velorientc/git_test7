@@ -19,7 +19,6 @@
 
 #define WindowsVersionIsNT4() (0)
 
-#define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
 #ifdef THG_DEBUG
     #include <sstream>

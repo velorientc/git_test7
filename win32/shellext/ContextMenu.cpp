@@ -270,6 +270,8 @@ void InsertMenuItemByName(
 }
 
 
+#define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
+
 // IContextMenu
 STDMETHODIMP
 CShellExt::QueryContextMenu(
