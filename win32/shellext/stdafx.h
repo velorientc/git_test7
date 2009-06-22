@@ -18,14 +18,6 @@
 
 #define ASSERT assert
 
-typedef std::string wxString;
-typedef char wxChar;
-#ifdef UNICODE
-#define wxT(x) L ## x
-#else // !Unicode
-#define wxT(x) x
-#endif
-
 #define WindowsVersionIsNT4() (0)
 
 #define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
