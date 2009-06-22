@@ -1,5 +1,3 @@
-// TortoiseCVS - a Windows shell extension for easy version control
-
 // Copyright (C) 2002 - Torsten Martinsen
 // <torsten@tiscali.dk> - September 2002
 

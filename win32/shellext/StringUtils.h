@@ -1,5 +1,3 @@
-// TortoiseCVS - a Windows shell extension for easy version control
-
 // Copyright (C) 2002 - Francis Irving
 // <francis@flourish.org> - May 2002
 
