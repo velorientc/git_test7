@@ -69,16 +69,6 @@ std::string WideToMultibyte(const std::wstring& wide, UINT CodePage = CP_ACP);
 // Convert multibyte string to Unicode string 
 std::wstring MultibyteToWide(const std::string& multibyte, UINT CodePage = CP_ACP);
 
-#if wxUSE_UNICODE
-#define wxText(xxx) MultibyteToWide(xxx)
-#define wxTextCStr(xxx) MultibyteToWide(xxx).c_str()
-#define wxAscii(xxx) WideToMultibyte(xxx)
-#else
-#define wxText(xxx) xxx
-#define wxTextCStr(xxx) (xxx).c_str()
-#define wxAscii(xxx) xxx
-#endif
-
 // Serialize a vector of strings
 std::string SerializeStringVector(const std::vector<std::string>& vStrings, 
                                   const std::string& sDelimiter);
