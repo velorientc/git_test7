@@ -139,23 +139,3 @@ std::wstring MultibyteToWide(const std::string& multibyte, UINT CodePage)
    wide[ret] = L'\0';
    return wide;
 }
-
-
-// Serialize a vector of strings
-std::string SerializeStringVector(const std::vector<std::string>& vStrings, 
-                                  const std::string& sDelimiter)
-{
-   std::string sResult;
-   std::vector<std::string>::const_iterator it = vStrings.begin();
-   if (it != vStrings.end())
-   {
-      sResult = *it;
-      it++;
-   }
-   while (it != vStrings.end())
-   {
-      sResult += sDelimiter + *it;
-      it++;
-   }
-   return sResult;
-}
