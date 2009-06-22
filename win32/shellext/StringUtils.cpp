@@ -29,29 +29,36 @@ std::string Quote(const std::string& str)
 // Convert Unicode string to multibyte string
 std::string WideToMultibyte(const std::wstring& wide, UINT CodePage)
 {
-   char* narrow = NULL;
-   // Determine length of string
-   int ret = WideCharToMultiByte(CodePage, 0, wide.c_str(), static_cast<int>(wide.length()), NULL, 
-                                 0, NULL, NULL);
-   narrow = new char[ret + 1];
-   std::auto_ptr<char> free_narrow(narrow);
-   ret = WideCharToMultiByte(CodePage, 0, wide.c_str(), static_cast<int>(wide.length()), narrow, 
-                             ret, NULL, NULL);
-   narrow[ret] = '\0';
-   return narrow;
+    char* narrow = NULL;
+    // Determine length of string
+    int ret = WideCharToMultiByte(
+        CodePage, 0, wide.c_str(), static_cast<int>(wide.length()),
+        NULL, 0, NULL, NULL
+    );
+    narrow = new char[ret + 1];
+    std::auto_ptr<char> free_narrow(narrow);
+    ret = WideCharToMultiByte(
+        CodePage, 0, wide.c_str(), static_cast<int>(wide.length()),
+        narrow, ret, NULL, NULL
+    );
+    narrow[ret] = '\0';
+    return narrow;
 }
 
 
 // Convert multibyte string to Unicode string 
 std::wstring MultibyteToWide(const std::string& multibyte, UINT CodePage)
 {
-   wchar_t* wide = NULL;
-   int ret = MultiByteToWideChar(CodePage, 0, multibyte.c_str(), 
-                                 static_cast<int>(multibyte.length()), 0, 0);
-   wide = new wchar_t[ret + 1];
-   std::auto_ptr<wchar_t> free_narrow(wide);
-   ret = MultiByteToWideChar(CodePage, 0, multibyte.c_str(), static_cast<int>(multibyte.length()),
-                             wide, ret);
-   wide[ret] = L'\0';
-   return wide;
+    wchar_t* wide = NULL;
+    int ret = MultiByteToWideChar(
+        CodePage, 0, multibyte.c_str(), 
+        static_cast<int>(multibyte.length()), 0, 0
+    );
+    wide = new wchar_t[ret + 1];
+    std::auto_ptr<wchar_t> free_narrow(wide);
+    ret = MultiByteToWideChar(
+        CodePage, 0, multibyte.c_str(),
+        static_cast<int>(multibyte.length()), wide, ret);
+    wide[ret] = L'\0';
+    return wide;
 }
