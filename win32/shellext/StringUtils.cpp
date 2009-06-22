@@ -19,15 +19,6 @@
 
 #include "StringUtils.h"
 
-// 8-bit safe variants of <ctype> functions
-
-int myisspace(char ch)
-{
-   if (static_cast<unsigned char>(ch) < 128)
-      return isspace(ch);
-   return 0;
-}
-
 
 // Quotes a string
 std::string Quote(const std::string& str)
