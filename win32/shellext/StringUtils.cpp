@@ -45,28 +45,6 @@ std::string Quote(const std::string& str)
 }
 
 
-
-// Cuts the first token off a delimited list
-std::string CutFirstToken(std::string& sList, const std::string& sDelimiter)
-{
-   std::string::size_type p = sList.find(sDelimiter);
-   std::string sResult;
-
-   if (p == std::string::npos)
-   {
-      sResult = sList;
-      sList = "";
-      return sResult;
-   }
-   else
-   {
-      sResult = sList.substr(0, p);
-      sList = sList.substr(p + sDelimiter.length(), sList.length());
-      return sResult;
-   }
-}
-
-
 // Convert Unicode string to multibyte string
 std::string WideToMultibyte(const std::wstring& wide, UINT CodePage)
 {

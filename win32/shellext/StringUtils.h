@@ -29,9 +29,6 @@ bool StartsWith(const std::string& str, const std::string& substr);
 // Quotes a string
 std::string Quote(const std::string& str);
 
-// Cuts the first token off a delimited list
-std::string CutFirstToken(std::string& sList, const std::string sDelimiter);
-
 // Convert Unicode string to multibyte string
 std::string WideToMultibyte(const std::wstring& wide, UINT CodePage = CP_ACP);
 
