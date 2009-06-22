@@ -25,7 +25,6 @@
 #include <vector>
 #include <map>
 #include <windows.h>
-//#include "FixWinDefs.h"
 
 
 #ifdef _MSC_VER
