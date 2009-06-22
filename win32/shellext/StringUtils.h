@@ -106,10 +106,6 @@ std::string ExpandEnvStrings(const std::string& str);
 wxString ExpandEnvStrings(const wxString& str);
 #endif
 
-// Replace parameters (%something)
-std::string ReplaceParams(const std::string& str, 
-                          const std::map<std::string, std::string> params);
-
 // comparison function object
 class less_nocase 
 {
