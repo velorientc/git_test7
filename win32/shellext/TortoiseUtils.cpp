@@ -1,7 +1,5 @@
 #include "stdafx.h"
-#include "ShellExt.h"
 #include "TortoiseUtils.h"
-#include "errno.h"
 #include <assert.h>
 
 #include <io.h>
