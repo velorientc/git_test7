@@ -21,7 +21,6 @@
 #define _STRING_UTILS_H
 
 #include <string>
-//#include <wx/string.h>
 #include <vector>
 #include <map>
 #include <windows.h>
