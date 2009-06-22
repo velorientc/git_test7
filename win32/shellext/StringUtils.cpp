@@ -29,14 +29,6 @@ int myisspace(char ch)
 }
 
 
-// Test if string starts with substr
-bool StartsWith(const std::string& str, const std::string& substr)
-{
-   return str.substr(0, substr.length()) == substr;
-}
-
-
-
 // Quotes a string
 std::string Quote(const std::string& str)
 {

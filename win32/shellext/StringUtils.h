@@ -23,9 +23,6 @@
 #include <string>
 #include <windows.h>
 
-// Test if string starts with substr
-bool StartsWith(const std::string& str, const std::string& substr);
-
 // Quotes a string
 std::string Quote(const std::string& str);
 
