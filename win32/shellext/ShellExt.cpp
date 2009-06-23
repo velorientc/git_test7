@@ -39,8 +39,6 @@ VOID _UnloadResources();
 extern "C" 
 int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
-    TDEBUG_TRACE("DllMain");
-
     if (dwReason == DLL_PROCESS_ATTACH)
     {
         TDEBUG_TRACE("DllMain: DLL_PROCESS_ATTACH");
