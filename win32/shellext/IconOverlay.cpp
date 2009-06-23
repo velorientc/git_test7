@@ -7,31 +7,17 @@
 #include <shlwapi.h>
 
 
-STDMETHODIMP CShellExt::GetOverlayInfo(LPWSTR pwszIconFile, int cchMax,
-        int *pIndex, DWORD *pdwFlags)
+STDMETHODIMP CShellExt::GetOverlayInfo(
+    LPWSTR pwszIconFile, int cchMax, int *pIndex, DWORD *pdwFlags)
 {
+    TDEBUG_TRACE("CShellExt::GetOverlayInfo: myTortoiseClass = " << myTortoiseClass);
+    // icons are determined by TortoiseOverlays shim
     *pIndex = 0;
-    *pdwFlags = ISIOI_ICONFILE;
-
-    // get installation path
-    std::string dir = GetTHgProgRoot();
-    if (dir.empty())
-    {
-        TDEBUG_TRACE("GetOverlayInfo: THG root is empty");
-        wcsncpy(pwszIconFile, L"", cchMax);
-        return S_OK;
-    }
-    
-    // find icon per overlay type
-    std::wstring dirWide = MultibyteToWide(dir);
-    wcsncpy(pwszIconFile, dirWide.c_str(), cchMax);
-    cchMax -= static_cast<int>(dirWide.size()) + 1;    
-
-    std::string path = WideToMultibyte(pwszIconFile);
-    TDEBUG_TRACE("GetOverlayInfo: icon path = " << path);
-    
+    *pdwFlags = 0;
+    *pwszIconFile = 0;
     return S_OK;
 }
+
 
 STDMETHODIMP CShellExt::GetPriority(int *pPriority)
 {
