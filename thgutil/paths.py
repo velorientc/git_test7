@@ -7,7 +7,7 @@ of the GNU General Public License, incorporated herein by reference.
 """
 
 try:
-    from __paths__ import icon_path, bin_path, license_path, locale_path
+    from config import icon_path, bin_path, license_path, locale_path
 except ImportError:
     icon_path, bin_path, license_path, locale_path = None, None, None, None
 

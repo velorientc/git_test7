@@ -32,7 +32,7 @@ system available in the file manager with a graphical interface.
 %prep
 %setup -q -n tortoisehg-hg
 
-cat > thgutil/__paths__.py << EOT
+cat > thgutil/config.py << EOT
 bin_path     = "%{_bindir}"
 license_path = "%{_docdir}/%{name}-%{version}/COPYING.txt"
 locale_path  = "%{_datadir}/locale"
