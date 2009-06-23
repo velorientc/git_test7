@@ -972,12 +972,12 @@ class ConfigDialog(gtk.Dialog):
             f = open(self.fn, "w")
             f.write(str(self.ini))
             f.close()
+            self._btn_apply.set_sensitive(False)
+            self.dirty = False
         except IOError, e:
             dialog.error_dialog(self, _('Unable to write configuration file'),
                     str(e))
 
-        self._btn_apply.set_sensitive(False)
-        self.dirty = False
         return 0
 
 def run(ui, *pats, **opts):

@@ -230,8 +230,8 @@ class GStatus(gdialog.GDialog):
             self.setting_lastpos = settings['gstatus-lastpos']
         except KeyError:
             pass
-        self.mqmode = None
-        if hasattr(self.repo, 'mq') and self.repo.mq.applied:
+        self.mqmode, repo = None, self.repo
+        if hasattr(repo, 'mq') and repo.mq.applied and repo['.'] == repo['qtip']:
             self.mqmode = True
 
 
@@ -551,7 +551,7 @@ class GStatus(gdialog.GDialog):
         repo = self.repo
         hglib.invalidaterepo(repo)
         if hasattr(repo, 'mq'):
-            self.mqmode = repo.mq.applied
+            self.mqmode = repo.mq.applied and repo['.'] == repo['qtip']
             self.set_title(self.get_title())
 
         if self.mqmode and self.mode != 'status':
@@ -1065,10 +1065,11 @@ class GStatus(gdialog.GDialog):
                     chunk.write(buf)
         buf.seek(0)
         try:
-            fp = open(result, "w")
-            fp.write(buf.read())
-        except OSError:
-            pass
+            try:
+                fp = open(result, "w")
+                fp.write(buf.read())
+            except OSError:
+                pass
         finally:
             fp.close()
 

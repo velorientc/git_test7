@@ -5,22 +5,6 @@
 #include <windows.h>
 #include <string>
 
-#define _UNUSED_PARAMETER(p)	\
-	{							\
-		(p) = (p);				\
-	}
-
-extern CRITICAL_SECTION g_critSectionBreak;
-template <class T> T GET_SAFE( T a ) {EnterCriticalSection(&g_critSectionBreak); T z = a; LeaveCriticalSection(&g_critSectionBreak); return z;}
-template <class T> void SET_SAFE( T & a , T b) {EnterCriticalSection(&g_critSectionBreak); a = b; LeaveCriticalSection(&g_critSectionBreak);}
-
-#ifndef ARRAYSIZE
-#define ARRAYSIZE(a)    (sizeof(a)/sizeof(a[0]))
-#endif
-
-extern int  LocalToWideChar(LPWSTR pWide, LPTSTR pLocal, DWORD dwChars);
-extern int  WideCharToLocal(LPTSTR pLocal, LPWSTR pWide, DWORD dwChars);
-
 #define _MBSTR(wstr) hf_wctomb((LPSTR)alloca(wcslen(wstr) + 1), (wstr),wcslen(wstr) + 1)
 #define _WCSTR(str) hf_mbtowc((LPWSTR)alloca((strlen(str) + 1) * sizeof(WCHAR)),(str),strlen(str) + 1)
 

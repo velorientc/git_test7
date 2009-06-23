@@ -117,19 +117,21 @@ def setup_posix():
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('icons')]
-    _data_files += [(os.path.join('share/locale', root),
+    _data_files += [(os.path.join('share', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('locale')]
     _data_files += [('lib/nautilus/extensions-2.0/python',
                      ['contrib/nautilus-thg.py'])]
 
-    # Create a __paths__.py.  Distributions will need to supply their own
-    f = open('thgutil/__paths__.py', "w")
-    f.write('bin_path     = "/usr/bin"\n')
-    f.write('license_path = "/usr/share/doc/tortoisehg/Copying.txt.gz"\n')
-    f.write('locale_path  = "/usr/share/locale"\n')
-    f.write('icon_path    = "/usr/share/pixmaps/tortoisehg/icons"\n')
-    f.close()
+    # Create a config.py.  Distributions will need to supply their own
+    cfgfile = os.path.join('thgutil', 'config.py')
+    if not os.path.exists(cfgfile):
+        f = open(cfgfile, "w")
+        f.write('bin_path     = "/usr/bin"\n')
+        f.write('license_path = "/usr/share/doc/tortoisehg/Copying.txt.gz"\n')
+        f.write('locale_path  = "/usr/share/locale"\n')
+        f.write('icon_path    = "/usr/share/pixmaps/tortoisehg/icons"\n')
+        f.close()
 
     return _scripts, _packages, _data_files, _extra
 

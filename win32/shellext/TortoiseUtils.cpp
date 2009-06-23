@@ -1,70 +1,32 @@
 #include "stdafx.h"
-#include "ShellExt.h"
 #include "TortoiseUtils.h"
-#include "errno.h"
 #include <assert.h>
 
 #include <io.h>
 #include "FCNTL.H"
 
 
-int WideCharToLocal(LPTSTR pLocal, LPWSTR pWide, DWORD dwChars)
-{
-	*pLocal = 0;
-
-	#ifdef UNICODE
-	lstrcpyn(pLocal, pWide, dwChars);
-	#else
-	WideCharToMultiByte( CP_ACP, 
-						 0, 
-						 pWide, 
-						 -1, 
-						 pLocal, 
-						 dwChars, 
-						 NULL, 
-						 NULL);
-	#endif
-
-	return lstrlen(pLocal);
-}
-
-int LocalToWideChar(LPWSTR pWide, LPTSTR pLocal, DWORD dwChars)
-{
-	*pWide = 0;
-
-	#ifdef UNICODE
-	lstrcpyn(pWide, pLocal, dwChars);
-	#else
-	MultiByteToWideChar( CP_ACP, 
-						 0, 
-						 pLocal, 
-						 -1, 
-						 pWide, 
-						 dwChars); 
-	#endif
-
-	return lstrlenW(pWide);
-}
-
 LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars)
 {
-	assert(lpa != NULL);
-	assert(lpw != NULL);
-	
-	lpw[0] = '\0';
-	MultiByteToWideChar(CP_ACP, 0, lpa, -1, lpw, nChars);
-	return lpw;
+    assert(lpa != NULL);
+    assert(lpw != NULL);
+
+    lpw[0] = '\0';
+    MultiByteToWideChar(CP_ACP, 0, lpa, -1, lpw, nChars);
+    return lpw;
 }
+
 
 LPSTR hf_wctomb(LPSTR lpa, LPCWSTR lpw, int nChars)
 {
-	assert(lpw != NULL);
-	assert(lpa != NULL);
-	
-	lpa[0] = '\0';
-	WideCharToMultiByte(CP_ACP, 0, lpw, -1, lpa, nChars, NULL, NULL);
-	return lpa;
+    assert(lpw != NULL);
+    assert(lpa != NULL);
+
+    lpa[0] = '\0';
+    WideCharToMultiByte(CP_ACP, 0, lpw, -1, lpa, nChars, NULL, NULL);
+    return lpa;
 }
+
 
 std::string GetTHgShellRoot()
 {
@@ -129,33 +91,36 @@ int GetRegistryConfig(const std::string& name, std::string& res)
 //      (see http://www.encocoservices.com/createprocess.html)
 bool LaunchCommand(const std::string& command, const std::string& cwd)
 {
-   TDEBUG_TRACE("LaunchCommand: " << command);
-   TDEBUG_TRACE("LaunchCommand: in " << cwd);
-   PROCESS_INFORMATION processInfo;
-   memset(&processInfo, 0, sizeof(processInfo));
+    TDEBUG_TRACE("LaunchCommand: " << command);
+    TDEBUG_TRACE("LaunchCommand: in " << cwd);
+    PROCESS_INFORMATION processInfo;
+    memset(&processInfo, 0, sizeof(processInfo));
 
-   STARTUPINFOA startupInfo;
-   memset(&startupInfo, 0, sizeof(startupInfo));
+    STARTUPINFOA startupInfo;
+    memset(&startupInfo, 0, sizeof(startupInfo));
 
-   int res = CreateProcessA(NULL,  // No module name, use command line
-                            const_cast<char*>(command.c_str()),
-                            NULL,  // Process handle not inherited
-                            NULL,  // Thread handle not inherited
-                            FALSE,
-                            CREATE_NO_WINDOW,
-                            NULL,  // use parent's environment
-                            const_cast<char*>(cwd.c_str()),
-                            &startupInfo,
-                            &processInfo);
-   if (res == 0)
-   {
-      TDEBUG_TRACE("LaunchCommand: failed to launch");
-      return false;
-   }
+    int res = CreateProcessA(
+        NULL,  // No module name, use command line
+        const_cast<char*>(command.c_str()),
+        NULL,  // Process handle not inherited
+        NULL,  // Thread handle not inherited
+        FALSE,
+        CREATE_NO_WINDOW,
+        NULL,  // use parent's environment
+        const_cast<char*>(cwd.c_str()),
+        &startupInfo,
+        &processInfo
+    );
 
-   CloseHandle(processInfo.hProcess);
-   CloseHandle(processInfo.hThread);
-   return true;
+    if (res == 0)
+    {
+        TDEBUG_TRACE("LaunchCommand: failed to launch");
+        return false;
+    }
+
+    CloseHandle(processInfo.hProcess);
+    CloseHandle(processInfo.hThread);
+    return true;
 }
 
 std::string GetTemporaryFile(LPCTSTR prefix)
@@ -189,6 +154,7 @@ bool IsDirectory(const std::string& filename)
    return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
+
 std::string DirName(const std::string& filename)
 {
     if (filename.empty())
@@ -207,6 +173,7 @@ std::string BaseName(const std::string& filename)
     std::string::size_type pos = filename.find_last_of("\\");
     return filename.substr(pos+1);
 }
+
 
 HICON GetTortoiseIcon(const std::string& iconname)
 {
@@ -229,6 +196,7 @@ HICON GetTortoiseIcon(const std::string& iconname)
     return h;
 }
 
+
 std::string GetHgRepoRoot(const std::string& path)
 {
     std::string p = IsDirectory(path)? path : DirName(path);
@@ -244,6 +212,7 @@ std::string GetHgRepoRoot(const std::string& path)
     }
     return p;
 }
+
 
 bool IsHgRepo(const std::string& path)
 {

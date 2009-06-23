@@ -438,7 +438,7 @@ def shelve(ui, repo, *pats, **opts):
 
     def shelvefunc(ui, repo, message, match, opts):
         # If an MQ patch is applied, consider all qdiff changes
-        if hasattr(repo, 'mq') and repo.mq.applied:
+        if hasattr(repo, 'mq') and repo.mq.applied and repo['.'] == repo['qtip']:
             qtip = repo['.']
             basenode = qtip.parents()[0].node()
         else:
@@ -501,7 +501,12 @@ def shelve(ui, repo, *pats, **opts):
                 if dopatch:
                     ui.debug(_('applying patch\n'))
                     ui.debug(fp.getvalue())
-                    patch.internalpatch(fp, ui, 1, repo.root, eolmode=None)
+                    if patch.patchfile.__bases__:
+                        # Mercurial 1.3
+                        patch.internalpatch(fp, ui, 1, repo.root, eolmode=None)
+                    else:
+                        # Mercurial 1.2
+                        patch.internalpatch(fp, ui, 1, repo.root)
                 del fp
 
                 # 3c. apply filtered patch to clean repo (shelve)

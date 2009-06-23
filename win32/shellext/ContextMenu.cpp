@@ -5,6 +5,8 @@
 #include "Dirstatecache.h"
 #include "Thgstatus.h"
 #include "Winstat.h"
+#include <map>
+
 
 struct MenuDescription
 {
@@ -267,6 +269,8 @@ void InsertMenuItemByName(
         hMenu, indexMenu, idCmd, prefix + md.menuText, md.iconName);
 }
 
+
+#define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
 // IContextMenu
 STDMETHODIMP

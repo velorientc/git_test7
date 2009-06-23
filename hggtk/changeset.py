@@ -112,6 +112,8 @@ class ChangeSet(gdialog.GDialog):
         self.curnodes = (parent, ctx.node())
         if len(self._filelist) > 1:
             self._filesel.select_path((1,))
+        else:
+            self._filesel.select_path((0,))
 
     def filelist_rowchanged(self, sel):
         model, path = sel.get_selected()

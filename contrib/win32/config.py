@@ -1,12 +1,12 @@
 """
-__paths__.py
+config.py
  Copyright (C) 2009 Steve Borho <steve@borho.org>
 
 This software may be used and distributed according to the terms
 of the GNU General Public License, incorporated herein by reference.
 """
 
-# This version of __paths__.py is used in the binary installer
+# This version of config.py is used in the binary installer
 # distributions of TortoiseHg on Windows.  Since we no longer need to
 # worry about Python shell extensions, we can use the path of the
 # current executable to find our package data.

@@ -36,9 +36,10 @@ class SynchDialog(gtk.Window):
 
         self.saved_stdout = sys.stdout
         self.saved_stderr = sys.stderr
-        # Pipe stderr, stdout to self.write
-        sys.stdout = self
-        sys.stderr = self
+        if os.name == 'nt':
+            # Pipe stderr, stdout to self.write
+            sys.stdout = self
+            sys.stderr = self
 
         # persistent app data
         self._settings = settings.Settings('synch')
