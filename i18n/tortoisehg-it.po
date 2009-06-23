@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-06-15 05:36+0000\n"
-"PO-Revision-Date: 2009-06-15 20:50+0000\n"
+"PO-Revision-Date: 2009-06-22 14:35+0000\n"
 "Last-Translator: paolof <gp.fadel@gmail.com>\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-21 17:04+0000\n"
+"X-Launchpad-Export-Date: 2009-06-23 03:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -61,7 +61,7 @@ msgstr "changeset:"
 
 #: hggtk\changeset.py:295 hggtk\datamine.py:117
 msgid "_file history"
-msgstr "_changelog del file"
+msgstr "_log del file"
 
 #: hggtk\changeset.py:296 hggtk\datamine.py:116
 msgid "_annotate file"
@@ -1259,7 +1259,7 @@ msgstr "Filtro di ricerca"
 
 #: hggtk\logfilter.py:82
 msgid "Search repository changelog with criteria"
-msgstr "Cerca nel changelog del repository con i criteri specificati"
+msgstr "Cerca nel log del repository con i criteri specificati"
 
 #: hggtk\logfilter.py:94
 msgid "File(s):"
@@ -1480,7 +1480,7 @@ msgstr "_confronta"
 #: hggtk\status.py:106 hggtk\status.py:111 hggtk\status.py:123
 #: hggtk\status.py:131 hggtk\status.py:137 hggtk\status.py:145
 msgid "l_og"
-msgstr "change_log"
+msgstr "l_og"
 
 #: hggtk\status.py:109 hggtk\status.py:113 hggtk\status.py:119
 #: hggtk\status.py:125 hggtk\status.py:128
@@ -2036,8 +2036,8 @@ msgid ""
 "The number of revisions to read and display in the changelog viewer in a "
 "single batch. Default: 500"
 msgstr ""
-"Il numero di revisioni da leggere e mostrare nella finestra del changelog in "
-"una singola operazione. Default: 500"
+"Il numero di revisioni da leggere e mostrare nella finestra di log in una "
+"singola operazione. Default: 500"
 
 #: hggtk\thgconfig.py:91
 msgid "Copy Hash"
@@ -2048,8 +2048,8 @@ msgid ""
 "Allow the changelog viewer to copy the changeset hash of the currently "
 "selected changeset into the clipboard. Default: False"
 msgstr ""
-"Permette alla finestra del changelog di copiare negli appunti l'hash del "
-"changeset selezionato. Default: Falso"
+"Permette alla finestra di log di copiare negli appunti l'hash del changeset "
+"selezionato. Default: Falso"
 
 #: hggtk\thgconfig.py:99
 msgid ""
@@ -2152,7 +2152,7 @@ msgstr "Numero massimo modifiche"
 
 #: hggtk\thgconfig.py:129
 msgid "Maximum number of changes to list on the changelog."
-msgstr "Numero massimo di modifiche da mostrare nel changelog"
+msgstr "Numero massimo di modifiche da mostrare nel log"
 
 #: hggtk\thgconfig.py:130
 msgid "Allow Push"
@@ -2402,7 +2402,7 @@ msgstr "nessun repository in "
 
 #: hggtk\thgconfig.py:466
 msgid "Changelog"
-msgstr "Changelog"
+msgstr "Log"
 
 #: hggtk\thgconfig.py:473
 msgid "Web"
@@ -2655,7 +2655,7 @@ msgstr "mostra le informazioni del changeset per linee di file"
 
 #: thgutil\menuthg.py:280
 msgid "View Changelog"
-msgstr "Vedi il changelog"
+msgstr "Visualizza il log"
 
 #: thgutil\menuthg.py:281
 msgid "View revision history"
@@ -2924,7 +2924,7 @@ msgstr ""
 
 #: hggtk\commit.py:627
 msgid "Confirm Override Branch"
-msgstr "Sovrascrivere il branch?"
+msgstr "Conferma sovrascrittura branch"
 
 #: hggtk\commit.py:633
 msgid "Confirm New Branch"
@@ -3309,7 +3309,7 @@ msgstr "Web server  - "
 
 #: hggtk\serve.py:153
 msgid "Confirm Really Exit?"
-msgstr "Uscire?"
+msgstr "Conferma uscita"
 
 #: hggtk\serve.py:217
 msgid "Abort: %s\n"
