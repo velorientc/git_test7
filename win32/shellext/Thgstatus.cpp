@@ -47,7 +47,7 @@ int Thgstatus::SendRequest(const std::string& request)
 
     fSuccess = ::CallNamedPipeA(
         pname.c_str(), (void*)request.c_str(), request.size(), 0, 0, &cbRead,
-        200 /* ms */
+        NMPWAIT_NOWAIT
     );
 
     DWORD err = GetLastError();
