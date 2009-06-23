@@ -15,6 +15,8 @@ from thgutil import paths, hglib
 
 from hggtk import hgtk
 
+from gobject import markup_escape_text
+
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)

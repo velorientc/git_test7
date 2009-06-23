@@ -177,7 +177,7 @@ class DataMineDialog(gdialog.GDialog):
         author = util.shortuser(ctx.user())
         summary = ctx.description().replace('\0', '')
         summary = toutf(summary.split('\n')[0])
-        summary = gobject.markup_escape_text(summary)
+        summary = gtklib.markup_escape_text(summary)
         date = displaytime(ctx.date())
         desc = toutf(author+'@'+str(rev)+' '+date+' "') + summary + '"'
         author = toutf(author)

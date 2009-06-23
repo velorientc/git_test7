@@ -13,6 +13,7 @@ import re
 from mercurial import util
 from mercurial.hgweb import webutil
 from thgutil import hglib
+from hggtk import gtklib
 
 # treemodel row enumerated attributes
 LINES = 0
@@ -120,7 +121,7 @@ class TreeModel(gtk.GenericTreeModel):
                 summary = summary[0:80]
             else:
                 summary = summary.split('\n')[0]
-            summary = gobject.markup_escape_text(hglib.toutf(summary))
+            summary = gtklib.markup_escape_text(hglib.toutf(summary))
             node = self.repo.lookup(revid)
             tags = self.repo.nodetags(node)
             taglist = hglib.toutf(', '.join(tags))

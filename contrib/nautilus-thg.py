@@ -45,6 +45,7 @@ def _thg_path():
 _thg_path()
 
 from thgutil import paths, debugthg, hglib, cachethg
+from hggtk import gtklib
 
 if debugthg.debug('N'):
     debugf = debugthg.debugf
@@ -341,7 +342,7 @@ class HgExtension(nautilus.MenuProvider,
         parents = '\n'.join([short(p.node()) for p in ctx.parents()])
         description = ctx.description()
         user = ctx.user()
-        user = gobject.markup_escape_text(user)
+        user = gtklib.markup_escape_text(user)
         tags = ', '.join(ctx.tags())
         branch = ctx.branch()
 
