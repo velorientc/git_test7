@@ -27,7 +27,13 @@ def portable_fork():
         if os.fork():
             sys.exit(0)
 
-if '--nofork' not in sys.argv and 'HGTK_NOFORK' not in os.environ:
+from mercurial import ui
+
+_ui = ui.ui()
+fork = _ui.configbool('tortoisehg', 'hgtkfork', True)
+capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
+
+if fork and '--nofork' not in sys.argv:
     for i, arg in enumerate(sys.argv):
         if 'hgtk' in arg and len(sys.argv) > i+1:
             cmd = sys.argv[i+1]
@@ -67,7 +73,7 @@ except ImportError:
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
-if 'THGDEBUG' in os.environ:
+if not capt or 'THGDEBUG' in os.environ:
     sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
 else:
     sys.stderr = cStringIO.StringIO()
