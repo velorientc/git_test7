@@ -230,8 +230,8 @@ class GStatus(gdialog.GDialog):
             self.setting_lastpos = settings['gstatus-lastpos']
         except KeyError:
             pass
-        self.mqmode = None
-        if hasattr(self.repo, 'mq') and self.repo.mq.applied and repo['.'] == repo['qtip']:
+        self.mqmode, repo = None, self.repo
+        if hasattr(repo, 'mq') and repo.mq.applied and repo['.'] == repo['qtip']:
             self.mqmode = True
 
 
