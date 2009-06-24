@@ -441,7 +441,7 @@ class SynchDialog(gtk.Window):
     def conf_clicked(self, toolbutton, data=None):
         newpath = hglib.fromutf(self.pathtext.get_text()).strip()
         for alias, path in self.paths:
-            if path == newpath:
+            if newpath in (path, url.hidepassword(path)):
                 newpath = None
                 break
         dlg = thgconfig.ConfigDialog(True)
