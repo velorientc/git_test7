@@ -91,7 +91,7 @@ class BackoutDialog(gtk.Window):
         revstr = str(ctx.rev())
         summary = ctx.description().replace('\0', '')
         summary = summary.split('\n')[0]
-        escape = gobject.markup_escape_text
+        escape = gtklib.markup_escape_text
         desc =  '<b>' + _('rev') + '</b>\t\t: %s\n' % escape(revstr)
         desc += '<b>' + _('summary') + '</b>\t: %s\n' % escape(summary[:80])
         desc += '<b>' + _('user') + '</b>\t\t: %s\n' % escape(ctx.user())

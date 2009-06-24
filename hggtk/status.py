@@ -42,7 +42,7 @@ def hunk_markup(text):
     hunk = ""
     lines = text.split('\n')
     for line in lines:
-        line = gobject.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        line = gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
         if line.startswith('---') or line.startswith('+++'):
             hunk += '<span foreground="#000090">%s</span>' % line
         elif line.startswith('-'):
@@ -60,7 +60,7 @@ def hunk_unmarkup(text):
     hunk = ""
     lines = text.split('\n')
     for line in lines:
-        line = gobject.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        line = gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
         hunk += line
     return hunk
 

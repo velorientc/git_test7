@@ -15,6 +15,13 @@ from thgutil import paths, hglib
 
 from hggtk import hgtk
 
+if gtk.gtk_version < (2, 14, 0):
+    # at least on 2.12.12, gtk widgets can be confused by control
+    # char markups (like "&#x1;"), so use cgi.escape instead
+    from cgi import escape as markup_escape_text
+else:
+    from gobject import markup_escape_text
+
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)
