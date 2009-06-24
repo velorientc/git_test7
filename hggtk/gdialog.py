@@ -325,7 +325,13 @@ class GDialog(gtk.Window):
         self.set_default_size(defx, defy)
         if self._setting_wasmax:
             self.maximize()
-        self.move(self._setting_winpos[0], self._setting_winpos[1])
+
+        # Restore position if it is still on screen
+        screen = self.get_screen()
+        w, h = screen.get_width(), screen.get_height()
+        x, y = self._setting_winpos
+        if x >= 0 and x < w and y >= 0 and y < h:
+            self.move(x, y)
 
         vbox = gtk.VBox(False, 0)
         self.add(vbox)
