@@ -238,7 +238,7 @@ class FileSelectionDialog(gtk.Dialog):
                        stderr=subprocess.PIPE,
                        stdout=subprocess.PIPE,
                        stdin=subprocess.PIPE)
-        except Exception, e:
+        except (OSError, EnvironmentError), e:
             gdialog.Prompt(_('Tool launch failure'),
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
 
