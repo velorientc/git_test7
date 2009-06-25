@@ -33,6 +33,7 @@ class SynchDialog(gtk.Window):
         self.fromlog = fromlog
         self.notify_func = None
         self.last_drop_time = None
+        self.lastcmd = []
 
         self.saved_stdout = sys.stdout
         self.saved_stderr = sys.stderr
@@ -294,7 +295,12 @@ class SynchDialog(gtk.Window):
         except hglib.RepoError:
             return
         tip = len(repo)
-        if self.origchangecount == tip or self.fromlog:
+        if ' '.join(self.lastcmd[:2]) == 'pull --rebase':
+            # if last operation was a rebase, do not show 'viewpulled'
+            # and reset our remembered tip changeset
+            self.origchangecount = tip
+            self.viewpulled.hide()
+        elif self.origchangecount == tip or self.fromlog:
             self.viewpulled.hide()
         else:
             self.buttonhbox.show()
@@ -521,10 +527,11 @@ class SynchDialog(gtk.Window):
                 remote_path = path
 
         cmdline = cmd[:]
-        cmdline += ['--verbose', '--repository', self.root]
+        cmdline += ['--verbose']
         if proxy_host and not use_proxy:
             cmdline += ["--config", "http_proxy.host="]
         cmdline += [remote_path]
+        self.lastcmd = cmdline
 
         # show command to be executed
         self.write("", False)
@@ -599,7 +606,7 @@ class SynchDialog(gtk.Window):
             self.stop_button.set_sensitive(False)
             if self.hgthread.return_code() is None:
                 self.write_err(_('[command interrupted]'))
-            if self.notify_func:
+            if self.notify_func and self.lastcmd[0] == 'pull':
                 self.notify_func(self.notify_args)
             return False # Stop polling this function
 
