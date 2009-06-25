@@ -5,6 +5,7 @@ OBJECTS_DIRSTATE = TortoiseUtils.o \
         Winstat.o
 
 OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
+        InitStatus.o \
         ContextMenu.o \
         IconOverlay.o \
         ShellExt.o \

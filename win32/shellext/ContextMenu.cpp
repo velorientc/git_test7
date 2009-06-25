@@ -5,6 +5,7 @@
 #include "Dirstatecache.h"
 #include "Thgstatus.h"
 #include "Winstat.h"
+#include "InitStatus.h"
 #include <map>
 
 
@@ -417,6 +418,7 @@ CShellExt::QueryContextMenu(
 
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 
+    InitStatus::check();
     return ResultFromShort(idCmd - idCmdFirst);
 }
 
@@ -616,8 +618,10 @@ void CShellExt::DoHgtk(const std::string &cmd)
     if (cmd == "thgstatus")
     {
         Thgstatus::remove(cwd);
+        InitStatus::check();
         return;
     }
 
     LaunchCommand(hgcmd, cwd);
+    InitStatus::check();
 }

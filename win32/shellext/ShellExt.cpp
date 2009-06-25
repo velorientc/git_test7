@@ -2,6 +2,7 @@
 #include "ShellExt.h"
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
+#include "InitStatus.h"
 #include <olectl.h>
 
 #define INITGUID
@@ -53,6 +54,9 @@ int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
         _UnloadResources();
     }
 
+    if (g_cRefThisDll > 0)
+        InitStatus::check();
+
     return 1;
 }
 
@@ -76,6 +80,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
         CDllRegSxClassFactory *pcf =
             new CDllRegSxClassFactory(TORTOISE_OLE_UNCHANGED);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg0");
+        ++InitStatus::inst().unchanged_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg1))
@@ -83,6 +88,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
         CDllRegSxClassFactory *pcf =
             new CDllRegSxClassFactory(TORTOISE_OLE_ADDED);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg1");
+        ++InitStatus::inst().added_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg2))
@@ -90,6 +96,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
         CDllRegSxClassFactory *pcf =
             new CDllRegSxClassFactory(TORTOISE_OLE_MODIFIED);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
+        ++InitStatus::inst().modified_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg6))
@@ -97,6 +104,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
         CDllRegSxClassFactory *pcf =
             new CDllRegSxClassFactory(TORTOISE_OLE_NOTINREPO);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
+        ++InitStatus::inst().notinrepo_;
         return pcf->QueryInterface(riid, ppvOut);
     }
 
