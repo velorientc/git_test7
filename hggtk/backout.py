@@ -110,7 +110,7 @@ class BackoutDialog(gtk.Window):
     def backout(self, button, buf, revstr):
         start, end = buf.get_bounds()
         msg = buf.get_text(start, end)
-        cmdline = ['hg', 'backout', '--rev', revstr, '--message', msg]
+        cmdline = ['hg', 'backout', '--rev', revstr, '--message', hglib.fromutf(msg)]
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
