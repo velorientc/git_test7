@@ -286,9 +286,12 @@ def repoconfig(ui, *pats, **opts):
 
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
-    from hggtk.rename import run
     if not pats or len(pats) > 2:
-        raise util.Abort(_('rename takes one or two path arguments'))
+        from hggtk import gdialog
+        gdialog.Prompt(_('Rename error'),
+                       _('rename takes one or two path arguments'), None).run()        
+        return 
+    from hggtk.rename import run
     gtkrun(run(ui, *pats, **opts))
 
 def guess(ui, *pats, **opts):
