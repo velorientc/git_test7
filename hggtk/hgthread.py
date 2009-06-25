@@ -52,26 +52,17 @@ class GtkUi(ui.ui):
     def prompt(self, msg, choices=None, default="y"):
         import re
         if not self.interactive(): return default
-        if isinstance(choices, str):
-            pat = choices
-            choices = None
-        else:
-            pat = None
-        while True:
-            try:
-                # send request to main thread, await response
-                self.dialogq.put( (msg, True, choices, default) )
-                r = self.responseq.get(True)
-                if r is None:
-                    raise EOFError
-                if not r:
-                    return default
-                if not pat or re.match(pat, r):
-                    return r
-                else:
-                    self.write(_('unrecognized response\n'))
-            except EOFError:
-                raise util.Abort(_('response expected'))
+        try:
+            # send request to main thread, await response
+            self.dialogq.put( (msg, True, choices, default) )
+            r = self.responseq.get(True)
+            if r is None:
+                raise EOFError
+            if not r:
+                return default
+            return r
+        except EOFError:
+            raise util.Abort(_('response expected'))
 
     def getpass(self, prompt=None, default=None):
         # send request to main thread, await response
