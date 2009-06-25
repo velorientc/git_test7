@@ -94,10 +94,7 @@ def uiwrite(u, args):
     write args if there are buffers
     returns True if the caller shall handle writing
     '''
-    buffers = getattr(u, '_buffers', None)
-    if buffers == None:
-        buffers = u.buffers
-    if buffers:
+    if u._buffers:
         ui.ui.write(u, *args)
         return False
     return True
@@ -105,9 +102,8 @@ def uiwrite(u, args):
 def invalidaterepo(repo):
     repo.invalidate()
     repo.dirstate.invalidate()
-    if 'mq' in repo.__dict__: #do not create if it did not exist
-        mq = repo.mq
-        mq.invalidate()
+    if 'mq' in repo.__dict__: #do not create if it does not exist
+        repo.mq.invalidate()
 
 def hgcmd_toq(path, q, *args):
     '''
