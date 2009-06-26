@@ -101,19 +101,19 @@ class MergeDialog(gtk.Window):
         summary = ctx.description().replace('\0', '')
         summary = summary.split('\n')[0]
         escape = gtklib.markup_escape_text
-        desc =  '<b>' + _('rev') + '</b>\t\t: %s\n' % escape(revstr)
-        desc += '<b>' + _('summary') + '</b>\t: %s\n' % escape(summary[:80])
-        desc += '<b>' + _('user') + '</b>\t\t: %s\n' % escape(ctx.user())
-        desc += '<b>' + _('date') + '</b>\t\t: %s\n' \
+        desc =  '<b>' + hglib.fromutf(_('rev')) + '</b>\t\t: %s\n' % escape(revstr)
+        desc += '<b>' + hglib.fromutf(_('summary')) + '</b>\t: %s\n' % escape(summary[:80])
+        desc += '<b>' + hglib.fromutf(_('user')) + '</b>\t\t: %s\n' % escape(ctx.user())
+        desc += '<b>' + hglib.fromutf(_('date')) + '</b>\t\t: %s\n' \
                 % escape(hglib.displaytime(ctx.date()))
         node = repo.lookup(revid)
         tags = repo.nodetags(node)
-        desc += '<b>' + _('branch') + '</b>\t: ' + escape(ctx.branch())
+        desc += '<b>' + hglib.fromutf(_('branch')) + '</b>\t: ' + escape(ctx.branch())
         if tags:
-            desc += '\n<b>' + _('tags') + '</b>\t\t: ' \
+            desc += '\n<b>' + hglib.fromutf(_('tags')) + '</b>\t\t: ' \
                     + escape(', '.join(tags))
         if node not in repo.heads():
-            desc += '\n<b>' + _('Not a head revision!') + '</b>'
+            desc += '\n<b>' + hglib.fromutf(_('Not a head revision!')) + '</b>'
         return revstr, hglib.toutf(desc)
 
     def set_notify_func(self, func, *args):
