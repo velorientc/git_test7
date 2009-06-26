@@ -273,9 +273,9 @@ class CloneDialog(gtk.Window):
                 cmdline.append(rev)
 
             cmdline.append('--verbose')
-            cmdline.append(src)
+            cmdline.append(hglib.fromutf(src))
             if dest:
-                cmdline.append(dest)
+                cmdline.append(hglib.fromutf(dest))
 
             dlg = hgcmd.CmdDialog(cmdline)
             dlg.run()
