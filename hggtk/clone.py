@@ -267,7 +267,7 @@ class CloneDialog(gtk.Window):
                     cmdline += ['--config', 'http_proxy.host=']
             if remotecmd:
                 cmdline.append('--remotecmd')
-                cmdline.append(remotecmd)
+                cmdline.append(hglib.fromutf(remotecmd))
             if rev:
                 cmdline.append('--rev')
                 cmdline.append(rev)
