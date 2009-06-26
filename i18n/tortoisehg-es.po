@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-06-23 04:45+0000\n"
-"PO-Revision-Date: 2009-06-23 20:10+0000\n"
-"Last-Translator: jhonnycano <Unknown>\n"
+"POT-Creation-Date: 2009-06-25 05:16+0000\n"
+"PO-Revision-Date: 2009-06-25 23:16+0000\n"
+"Last-Translator: xiscu <Unknown>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-25 04:04+0000\n"
+"X-Launchpad-Export-Date: 2009-06-26 03:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -23,7 +23,7 @@ msgstr "Varios iconos son cortesía del proyecto TortoiseSVN"
 
 #: hggtk\backout.py:24
 msgid "Backout changeset - "
-msgstr "Revertir conjunto de cambios "
+msgstr "Retirar conjunto de cambios "
 
 #: hggtk\backout.py:50
 msgid "Backed out changeset: "
@@ -53,7 +53,7 @@ msgstr "Descripcion del conjunto de cambios"
 
 #: hggtk\backout.py:56
 msgid "Backout commit message"
-msgstr "Mensaje de Confirmación de retiro"
+msgstr ""
 
 #: hggtk\backout.py:61
 msgid ""
@@ -210,7 +210,7 @@ msgstr "no actualizar el nuevo directorio de trabajo"
 
 #: hggtk\clone.py:128
 msgid "use pull protocol to copy metadata"
-msgstr "use protocolo empujar para copiar metadato"
+msgstr "use protocolo extraer para copiar metadato"
 
 #: hggtk\clone.py:129
 msgid "use uncompressed transfer"
@@ -344,7 +344,7 @@ msgstr "Re_vertir"
 
 #: hggtk\commit.py:335 hggtk\status.py:206 hggtk\thgconfig.py:744
 msgid "_Add"
-msgstr "_Agregar"
+msgstr "_Añadir"
 
 #: hggtk\commit.py:336 hggtk\status.py:211 hggtk\thgconfig.py:754
 msgid "_Remove"
@@ -356,7 +356,7 @@ msgstr "Mover"
 
 #: hggtk\commit.py:348
 msgid "merge"
-msgstr "unir"
+msgstr "fusión"
 
 #: hggtk\commit.py:366 hggtk\commit.py:367 hggtk\commit.py:374
 #: hggtk\commit.py:375
@@ -405,7 +405,10 @@ msgid ""
 "Unable to undo!\n"
 "\n"
 "Tip revision differs from last commit."
-msgstr "¡Incapaz de deshacer!"
+msgstr ""
+"¡Incapaz de deshacer!\n"
+"\n"
+"Revisión Tip diffiere desde el último commit."
 
 #: hggtk\commit.py:541
 msgid "Errors during rollback!"
@@ -890,6 +893,9 @@ msgid ""
 "useful if recipient is not using Mercurial (and does not like to see the "
 "headers)."
 msgstr ""
+"Dejando de lado las cabeceras de Mercurial quita el nombre de usuario y la "
+"información sobre los padres. Es sólo útil si el usuario no usa Mercurial "
+"(y/o no le gusta ver las cabeceras)."
 
 #: hggtk\hgemail.py:145
 msgid "Send single binary bundle, not patches"
@@ -901,6 +907,8 @@ msgid ""
 "from them. This is the safest way to send changes to recipient Mercurial "
 "users."
 msgstr ""
+"Los paquetes de conjuntos de cambios se guardan en forma binaria. Es la "
+"forma más segura de enviar cambios a usuarios que usan Mercurial."
 
 #: hggtk\hgemail.py:155
 msgid "attach"
@@ -924,7 +932,7 @@ msgstr "diffstat"
 
 #: hggtk\hgemail.py:163
 msgid "add diffstat output to messages"
-msgstr ""
+msgstr "Añadir resultado de diffstat a los mensages"
 
 #: hggtk\hgemail.py:172
 msgid "Subject:"
@@ -932,7 +940,7 @@ msgstr "Asunto:"
 
 #: hggtk\hgemail.py:184
 msgid "Patch Series (Bundle) Description"
-msgstr ""
+msgstr "Descripción Serie de parche (Paquete)"
 
 #: hggtk\hgemail.py:236
 msgid "The description field is unused when sending a single patch."
@@ -967,7 +975,7 @@ msgstr "Glob:"
 
 #: hggtk\hgignore.py:40 hggtk\hgignore.py:55 hggtk\tagadd.py:47
 msgid "Add"
-msgstr "Agregar"
+msgstr "Añadir"
 
 #: hggtk\hgignore.py:79
 msgid "Filters"
@@ -1049,10 +1057,12 @@ msgstr "este es un archivo binario\n"
 msgid ""
 "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
 msgstr ""
+"total: %d pedazos (%d lineas cambiadas); seleccionados: %d pedazos (%d "
+"lineas cambiadas)"
 
 #: hggtk\hgshelve.py:148
 msgid "%d hunks, %d lines changed\n"
-msgstr ""
+msgstr "%d pedazos, %d lineas cambiadas\n"
 
 #: hggtk\hgshelve.py:294
 msgid "unhandled transition: %s -> %s"
@@ -1068,7 +1078,7 @@ msgstr "Salir de usuario"
 
 #: hggtk\hgshelve.py:350
 msgid "shelve changes to %s?"
-msgstr ""
+msgstr "arrinconar cambios en %s?"
 
 #: hggtk\hgshelve.py:351
 msgid " and "
@@ -1076,7 +1086,7 @@ msgstr " y "
 
 #: hggtk\hgshelve.py:361
 msgid "shelve this change to %r?"
-msgstr ""
+msgstr "arrinconar este cambio en %r?"
 
 #: hggtk\hgshelve.py:400
 msgid "backup %r as %r\n"
@@ -1084,7 +1094,7 @@ msgstr "Respaldo %r como %r\n"
 
 #: hggtk\hgshelve.py:433
 msgid "shelve can only be run interactively"
-msgstr ""
+msgstr "arrinconar revisión sólo se puede ejecutar en modo interactivo"
 
 #: hggtk\hgshelve.py:437
 msgid "shelve data already exists"
@@ -1092,7 +1102,7 @@ msgstr ""
 
 #: hggtk\hgshelve.py:468
 msgid "no changes to shelve\n"
-msgstr ""
+msgstr "sin cambios a arrinconar\n"
 
 #: hggtk\hgshelve.py:502
 msgid "applying patch\n"
@@ -1100,7 +1110,7 @@ msgstr "aplicando parche\n"
 
 #: hggtk\hgshelve.py:514
 msgid "saving patch to shelve\n"
-msgstr ""
+msgstr "salvando revisión a arrinconar\n"
 
 #: hggtk\hgshelve.py:525 hggtk\hgshelve.py:576
 msgid "restoring %r to %r\n"
@@ -1108,7 +1118,7 @@ msgstr "restaurando %r a %r\n"
 
 #: hggtk\hgshelve.py:527
 msgid "removing shelve file\n"
-msgstr ""
+msgstr "quitando fichero\n"
 
 #: hggtk\hgshelve.py:536
 msgid "removing backup for %r : %r\n"
@@ -1116,7 +1126,7 @@ msgstr "eliminando copia para %r : %r\n"
 
 #: hggtk\hgshelve.py:561
 msgid "applying shelved patch\n"
-msgstr ""
+msgstr "aplicando revisión arrinconada\n"
 
 #: hggtk\hgshelve.py:574
 msgid "restoring backup files\n"
@@ -1128,27 +1138,28 @@ msgstr "removiendo archivos de copia\n"
 
 #: hggtk\hgshelve.py:587
 msgid "removing shelved patches\n"
-msgstr ""
+msgstr "quitando revisiones arrinconadas\n"
 
 #: hggtk\hgshelve.py:589
 msgid "unshelve completed\n"
-msgstr ""
+msgstr "desacer arrinconar completado\n"
 
 #: hggtk\hgshelve.py:591
 msgid "nothing to unshelve\n"
-msgstr ""
+msgstr "nada a desacer\n"
 
 #: hggtk\hgshelve.py:597
 msgid "mark new/missing files as added/removed before shelving"
 msgstr ""
+"macar archivos nuevos/ausentes como añadido/eliminado antes de seguir"
 
 #: hggtk\hgshelve.py:599
 msgid "overwrite existing shelve data"
-msgstr ""
+msgstr "sobreescribe datos existentes"
 
 #: hggtk\hgshelve.py:601
 msgid "append to existing shelve data"
-msgstr ""
+msgstr "Anexar a datos existentes"
 
 #: hggtk\hgshelve.py:603
 msgid "hg shelve [OPTION]... [FILE]..."
@@ -1156,15 +1167,15 @@ msgstr "hg shelve [OPCIÓN]... [ARCHIVO]..."
 
 #: hggtk\hgshelve.py:606
 msgid "inspect shelved changes only"
-msgstr ""
+msgstr "inspeccionar sólo cambios arrinconados"
 
 #: hggtk\hgshelve.py:608
 msgid "proceed even if patches do not unshelve cleanly"
-msgstr ""
+msgstr "proceder aunque las revisiones no de dejen desacer limpiamente"
 
 #: hggtk\hgshelve.py:610
 msgid "hg unshelve [OPTION]... [FILE]..."
-msgstr ""
+msgstr "hg unshelve [OPCIÓN]... [ARCHIVO]..."
 
 #: hggtk\hgthread.py:78
 msgid "unrecognized response\n"
@@ -1196,7 +1207,7 @@ msgstr "hgtk %s: %s\n"
 
 #: hggtk\hgtk.py:149
 msgid "hgtk: %s\n"
-msgstr ""
+msgstr "hgtk: %s\n"
 
 #: hggtk\hgtk.py:152
 msgid ""
@@ -1299,7 +1310,7 @@ msgstr ""
 
 #: hggtk\hgtk.py:540
 msgid " (default: %s)"
-msgstr ""
+msgstr " (por defecto: %s)"
 
 #: hggtk\hgtk.py:553
 msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
@@ -1323,7 +1334,7 @@ msgstr "iniciar el depurador"
 
 #: hggtk\hgtk.py:586
 msgid "do not fork GUI process"
-msgstr ""
+msgstr "no paralelizar proceso GUI"
 
 #: hggtk\hgtk.py:587
 msgid "read file list from file"
@@ -1343,7 +1354,7 @@ msgstr "hgtk clone ORIGEN [DESTINO]"
 
 #: hggtk\hgtk.py:595
 msgid "record user as committer"
-msgstr ""
+msgstr "recordar usuario como creador del cambio"
 
 #: hggtk\hgtk.py:596
 msgid "record datecode as commit date"
@@ -1359,7 +1370,7 @@ msgstr "hgtk datamine"
 
 #: hggtk\hgtk.py:599
 msgid "hgtk hgignore [FILE]"
-msgstr ""
+msgstr "hgtk hgignore [ARCHIVO]"
 
 #: hggtk\hgtk.py:600
 msgid "hgtk init [DEST]"
@@ -1435,11 +1446,11 @@ msgstr "hgtk serve [OPCIÓN]..."
 
 #: hggtk\hgtk.py:624
 msgid "wait until the second ticks over"
-msgstr ""
+msgstr "espera hasta que pase un segundo"
 
 #: hggtk\hgtk.py:625
 msgid "notify the shell for path(s) given"
-msgstr ""
+msgstr "notifica la línea de comandos del parche dado"
 
 #: hggtk\hgtk.py:626
 msgid "remove the status cache"
@@ -1459,7 +1470,7 @@ msgstr "hgtk thgstatus [OPCIÓN]"
 
 #: hggtk\hgtk.py:635
 msgid "changeset to view in diff tool"
-msgstr ""
+msgstr "conjunto de cambios a ver en la herramienta de diff"
 
 #: hggtk\hgtk.py:636
 msgid "revisions to view in diff tool"
@@ -1483,7 +1494,7 @@ msgstr "mostrar opciones del comando"
 
 #: hggtk\hgtk.py:643
 msgid "[-o] CMD"
-msgstr ""
+msgstr "[-o] COMANDO"
 
 #: hggtk\hgtk.py:644
 msgid "hgtk help [COMMAND]"
@@ -1507,7 +1518,7 @@ msgstr "Filtrar revisiones a mostrar"
 
 #: hggtk\history.py:64
 msgid "_DataMine"
-msgstr ""
+msgstr "_Recolección_de_datos"
 
 #: hggtk\history.py:66
 msgid "Search Repository History"
@@ -1559,7 +1570,7 @@ msgstr "Mostrar Ancestros de la revisión"
 
 #: hggtk\history.py:219
 msgid "Show Working Parents"
-msgstr ""
+msgstr "Mostrar Parientes"
 
 #: hggtk\history.py:223
 msgid "Show Head Revisions"
@@ -1571,7 +1582,7 @@ msgstr "Mostrar solo las revisiones a fusionar"
 
 #: hggtk\history.py:231
 msgid "Show Non-Merge Revisions"
-msgstr ""
+msgstr "Mostrar revisiones normales"
 
 #: hggtk\history.py:235
 msgid "Custom Filter"
@@ -1603,11 +1614,11 @@ msgstr "_exportar parche"
 
 #: hggtk\history.py:398
 msgid "e_mail patch"
-msgstr ""
+msgstr "parche por correo"
 
 #: hggtk\history.py:399
 msgid "_bundle rev:tip"
-msgstr ""
+msgstr "_paquete rev:tip"
 
 #: hggtk\history.py:400
 msgid "add/remove _tag"
@@ -1615,7 +1626,7 @@ msgstr "añadir/eliminar _tag"
 
 #: hggtk\history.py:401
 msgid "backout revision"
-msgstr ""
+msgstr "Revertir revisión"
 
 #: hggtk\history.py:402 hggtk\status.py:105 hggtk\status.py:110
 #: hggtk\status.py:129 hggtk\status.py:136 hggtk\status.py:144
@@ -1624,23 +1635,23 @@ msgstr "_revertir"
 
 #: hggtk\history.py:407
 msgid "strip revision"
-msgstr ""
+msgstr "quita revisión"
 
 #: hggtk\history.py:418
 msgid "_diff with selected"
-msgstr ""
+msgstr "_diff con selección"
 
 #: hggtk\history.py:419
 msgid "visual diff with selected"
-msgstr ""
+msgstr "diff visual con selección"
 
 #: hggtk\history.py:421
 msgid "email from here to selected"
-msgstr ""
+msgstr "email desde aquí hasta selección"
 
 #: hggtk\history.py:423
 msgid "bundle from here to selected"
-msgstr ""
+msgstr "paquete de cambios de aquí hasta selección"
 
 #: hggtk\history.py:483
 msgid "show next %d revisions"
@@ -1652,7 +1663,7 @@ msgstr "mostrar las revisiones restantes"
 
 #: hggtk\history.py:523
 msgid "Confirm Strip Revision(s)"
-msgstr ""
+msgstr "Confirmar Quitar Revision(es)"
 
 #: hggtk\history.py:524
 msgid "Remove revision %d and all descendants?"
@@ -1672,7 +1683,7 @@ msgstr ""
 
 #: hggtk\history.py:611 hggtk\history.py:691
 msgid "Write bundle to"
-msgstr ""
+msgstr "Guardar conjunto de cambios en"
 
 #: hggtk\history.py:660 hggtk\status.py:1045
 msgid "Save patch to"
@@ -1681,7 +1692,7 @@ msgstr "Guardar parche en"
 #: hggtk\history.py:667 hggtk\history.py:696 hggtk\thgconfig.py:368
 #: hggtk\thgconfig.py:670
 msgid "Confirm Overwrite"
-msgstr ""
+msgstr "Pregunta de confirmación"
 
 #: hggtk\history.py:668 hggtk\history.py:697
 msgid ""
@@ -1699,7 +1710,7 @@ msgstr "Aplicar"
 
 #: hggtk\logfilter.py:31
 msgid "Log Filter - %s"
-msgstr ""
+msgstr "Filtro de log - %s"
 
 #: hggtk\logfilter.py:46 hggtk\logview\treeview.py:398
 msgid "Branch"
@@ -1707,15 +1718,15 @@ msgstr "Rama"
 
 #: hggtk\logfilter.py:53
 msgid "View revision graph of named branch"
-msgstr ""
+msgstr "Ver gráfico de rama nombrada"
 
 #: hggtk\logfilter.py:60
 msgid "Rev Range"
-msgstr ""
+msgstr "Rango de revisiones"
 
 #: hggtk\logfilter.py:70
 msgid "View range of revisions"
-msgstr ""
+msgstr "Ver rango de revisiones"
 
 #: hggtk\logfilter.py:78
 msgid "Search Filter"
@@ -1723,7 +1734,7 @@ msgstr "Filtro de búsqueda"
 
 #: hggtk\logfilter.py:82
 msgid "Search repository changelog with criteria"
-msgstr ""
+msgstr "Criterio de busqueda para el registro de cambios"
 
 #: hggtk\logfilter.py:94
 msgid "File(s):"
@@ -1759,11 +1770,11 @@ msgstr "Mostrar sólo los cambios que coincidan con esta fecha"
 
 #: hggtk\logfilter.py:193
 msgid "Invalid date specification"
-msgstr ""
+msgstr "Especificación de fecha inválida"
 
 #: hggtk\logfilter.py:208
 msgid "Invalid revision range"
-msgstr ""
+msgstr "Rango de revisión inválido"
 
 #: hggtk\logview\treeview.py:357
 msgid "Graph"
@@ -1799,7 +1810,7 @@ msgstr "Uniendo con "
 
 #: hggtk\merge.py:46
 msgid "Merge target (other)"
-msgstr ""
+msgstr "Objectivo de fusión (otro)"
 
 #: hggtk\merge.py:55
 msgid "Current revision (local)"
@@ -1815,11 +1826,11 @@ msgstr "Combinar"
 
 #: hggtk\merge.py:116
 msgid "Not a head revision!"
-msgstr ""
+msgstr "¡ No es una revisión de cabezera !"
 
 #: hggtk\merge.py:154
 msgid "Confirm undo merge"
-msgstr ""
+msgstr "Confirmar deshacer fusión"
 
 #: hggtk\merge.py:155
 msgid "Clean checkout of original revision?"
@@ -1847,7 +1858,7 @@ msgstr ""
 
 #: hggtk\recovery.py:54
 msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
-msgstr ""
+msgstr "Desacer la última transacción al repositorio (pull, commit, etc)"
 
 #: hggtk\recovery.py:58
 msgid "Recover"
@@ -1863,7 +1874,7 @@ msgstr "Verificar"
 
 #: hggtk\recovery.py:65
 msgid "Validate repository consistency"
-msgstr ""
+msgstr "Validar consistencia de repositorio"
 
 #: hggtk\recovery.py:99 hggtk\synch.py:367
 msgid "Cannot close now"
@@ -1871,15 +1882,15 @@ msgstr "No se puede cerrar ahora"
 
 #: hggtk\recovery.py:100 hggtk\synch.py:368
 msgid "command is running"
-msgstr ""
+msgstr "comando activo"
 
 #: hggtk\recovery.py:119
 msgid "Confirm clean repository"
-msgstr ""
+msgstr "Confirme limpiar repositorio"
 
 #: hggtk\recovery.py:120
 msgid "Clean repository '%s' ?"
-msgstr ""
+msgstr "¿ Limpiar repositorio '%s' ?"
 
 #: hggtk\recovery.py:126
 msgid "Unable to find repo at %s\n"
@@ -1887,11 +1898,11 @@ msgstr "No se pudo encontrar repositorios en %s\n"
 
 #: hggtk\recovery.py:137
 msgid "Confirm rollback repository"
-msgstr ""
+msgstr "Confirme desacer la última transacción al repositorio"
 
 #: hggtk\recovery.py:138
 msgid "Rollback repository '%s' ?"
-msgstr ""
+msgstr "¿ Desacer la última transacción al repositorio '%s' ?"
 
 #: hggtk\recovery.py:159 hggtk\synch.py:507
 msgid "Cannot run now"
@@ -1935,7 +1946,7 @@ msgstr "Configurar"
 
 #: hggtk\serve.py:71
 msgid "Configure web settings"
-msgstr ""
+msgstr "Configurar opciones web"
 
 #: hggtk\serve.py:90
 msgid "HTTP Port:"
@@ -1943,11 +1954,11 @@ msgstr "Puerto HTTP:"
 
 #: hggtk\serve.py:119
 msgid "Serve %s - %s"
-msgstr ""
+msgstr "Servicio %s - %s"
 
 #: hggtk\serve.py:122
 msgid "Serve - "
-msgstr ""
+msgstr "Servir - "
 
 #: hggtk\serve.py:153
 msgid "Confirm Really Exit?"
@@ -1957,7 +1968,7 @@ msgstr "¿Estás segurp de querer salir?"
 msgid ""
 "Server process is still running\n"
 "Exiting will stop the server."
-msgstr ""
+msgstr "Proceso de servidor activo"
 
 #: hggtk\serve.py:217
 msgid "Abort: %s\n"
@@ -2108,7 +2119,7 @@ msgstr "marcar como no resuelto"
 
 #: hggtk\status.py:182
 msgid "filtered status"
-msgstr ""
+msgstr "estado filtrado"
 
 #: hggtk\status.py:182
 msgid "status"
@@ -2148,7 +2159,7 @@ msgstr ""
 
 #: hggtk\status.py:321
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: hggtk\status.py:327
 msgid "path"
@@ -2196,7 +2207,7 @@ msgstr "Copiar archivo en"
 
 #: hggtk\status.py:790 hggtk\status.py:1178
 msgid "Nothing Removed"
-msgstr ""
+msgstr "Nada eliminado"
 
 #: hggtk\status.py:791
 msgid "Remove is not enabled when multiple revisions are specified."
@@ -2226,13 +2237,15 @@ msgstr "Nada copiado"
 
 #: hggtk\status.py:846
 msgid "===== Diff to first parent =====\n"
-msgstr ""
+msgstr "===== Diff con primer padre =====\n"
 
 #: hggtk\status.py:855
 msgid ""
 "\n"
 "===== Diff to second parent =====\n"
 msgstr ""
+"\n"
+"===== Diff con segundo padre =====\n"
 
 #: hggtk\status.py:910
 msgid "File is larger than the specified max size.\n"
@@ -2240,7 +2253,7 @@ msgstr "El archivo es más grande que el tamaño máximo especificado.\n"
 
 #: hggtk\status.py:911
 msgid "Hunk selection is disabled for this file.\n"
-msgstr ""
+msgstr "Selección de pedazos deshabilitada para este archivo.\n"
 
 #: hggtk\status.py:1081 hggtk\status.py:1102
 msgid "Nothing Reverted"
@@ -2304,7 +2317,7 @@ msgstr "No hay ningún archivo que se pueda eliminar"
 
 #: hggtk\status.py:1187
 msgid "Move files to directory..."
-msgstr ""
+msgstr "Mover archivos a directorio..."
 
 #: hggtk\status.py:1197
 msgid "Cannot move outside repo!"
@@ -2316,10 +2329,13 @@ msgid ""
 "\n"
 "Note: only clean files can be moved."
 msgstr ""
+"Ningún archivo seleccionado\n"
+"\n"
+"Nota: sólo archivos limpios pueden ser movidos"
 
 #: hggtk\status.py:1212
 msgid "Confirm Delete Unrevisioned"
-msgstr ""
+msgstr "Confirmar Borrado Sin Revisión"
 
 #: hggtk\status.py:1213
 msgid "Delete the following unrevisioned files?"
@@ -2343,11 +2359,11 @@ msgstr ""
 
 #: hggtk\synch.py:69
 msgid "   Pull   "
-msgstr ""
+msgstr "   Extraer   "
 
 #: hggtk\synch.py:71
 msgid "Pull changes from selected repository"
-msgstr ""
+msgstr "Extraer cambios de repositorio seleccionado"
 
 #: hggtk\synch.py:75
 msgid "Outgoing"
@@ -2356,6 +2372,7 @@ msgstr "Saliente"
 #: hggtk\synch.py:77
 msgid "Display local changes that will be  pushed to selected repository"
 msgstr ""
+"Visualizar cambios locales que seran enviados al repositorio seleccionado"
 
 #: hggtk\synch.py:80
 msgid "Push"
@@ -2363,7 +2380,7 @@ msgstr ""
 
 #: hggtk\synch.py:82
 msgid "Push local changes to selected repository"
-msgstr ""
+msgstr "Enviar cambios locales al repositorio seleccionado"
 
 #: hggtk\synch.py:85 hggtk\thgconfig.py:481
 msgid "Email"
@@ -2371,11 +2388,11 @@ msgstr "Email"
 
 #: hggtk\synch.py:87
 msgid "Email local outgoing changes to one or more recipients"
-msgstr ""
+msgstr "Envia correo cambios locales a uno o más receptores"
 
 #: hggtk\synch.py:95
 msgid "Configure peer repository paths"
-msgstr ""
+msgstr "Configura rutas de repositios"
 
 #: hggtk\synch.py:106
 msgid "Repo:"
@@ -2383,11 +2400,11 @@ msgstr "Repositorio:"
 
 #: hggtk\synch.py:111
 msgid "Bundle:"
-msgstr ""
+msgstr "Paquete:"
 
 #: hggtk\synch.py:155
 msgid "Post pull operation"
-msgstr ""
+msgstr "Pospone operación de envio"
 
 #: hggtk\synch.py:157
 msgid "Nothing"
@@ -2403,7 +2420,7 @@ msgstr ""
 
 #: hggtk\synch.py:160
 msgid "Rebase"
-msgstr ""
+msgstr "Remodificar"
 
 #: hggtk\synch.py:168
 msgid "Advanced Options"
@@ -2411,19 +2428,19 @@ msgstr "Opciones avanzadas"
 
 #: hggtk\synch.py:190
 msgid "Force pull or push"
-msgstr ""
+msgstr "Forzar extracción o envio"
 
 #: hggtk\synch.py:191
 msgid "Run even when remote repository is unrelated."
-msgstr ""
+msgstr "Ejecutar aunque el repositorio remoto no esté relacionado"
 
 #: hggtk\synch.py:195
 msgid "Target Revision:"
-msgstr ""
+msgstr "Revisión objetivo:"
 
 #: hggtk\synch.py:199
 msgid "A specific revision up to which you would like to push or pull."
-msgstr ""
+msgstr "Una revisión específica hasta la que desea enviar o extraer."
 
 #: hggtk\synch.py:203
 msgid "Remote Command:"
@@ -2431,7 +2448,7 @@ msgstr "Comando remoto:"
 
 #: hggtk\synch.py:207
 msgid "Name of hg executable on remote machine."
-msgstr ""
+msgstr "Nombre del ejecutable 'hg' en la máquina remota."
 
 #: hggtk\synch.py:215
 msgid "Incoming/Outgoing"
@@ -2447,15 +2464,15 @@ msgstr "Mostrar los más nuevos primero"
 
 #: hggtk\synch.py:220
 msgid "Show No Merges"
-msgstr ""
+msgstr "Muestra revisiones normales"
 
 #: hggtk\synch.py:243
 msgid "View pulled revisions"
-msgstr ""
+msgstr "Mostrar revisiones extraidas"
 
 #: hggtk\synch.py:245
 msgid "Update to branch tip"
-msgstr ""
+msgstr "Actualizar a rama Tip"
 
 #: hggtk\synch.py:340
 msgid "unknown sort key '%s'"
@@ -2467,15 +2484,15 @@ msgstr "Seleccionar repositorio"
 
 #: hggtk\synch.py:358
 msgid "Select Bundle"
-msgstr ""
+msgstr "Seleccionar paquete"
 
 #: hggtk\synch.py:359
 msgid "Bundle (*.hg)"
-msgstr ""
+msgstr "Paquete (*.hg)"
 
 #: hggtk\synch.py:360
 msgid "Bundle (*)"
-msgstr ""
+msgstr "Paquete (*)"
 
 #: hggtk\synch.py:466
 msgid "No repository selected"
@@ -2483,11 +2500,11 @@ msgstr "Ningún repositorio seleccionado"
 
 #: hggtk\synch.py:467
 msgid "Select a peer repository to compare with"
-msgstr ""
+msgstr "Seleccione repositio a comparar"
 
 #: hggtk\tagadd.py:25
 msgid "TortoiseHg Tag - %s"
-msgstr ""
+msgstr "TortoiseHg Tag - %s"
 
 #: hggtk\tagadd.py:49
 msgid "Add tag to selected version"
@@ -2519,15 +2536,15 @@ msgstr "Reemplazar la etiqueta existente"
 
 #: hggtk\tagadd.py:93
 msgid "Use custom commit message"
-msgstr ""
+msgstr "Mensaje de commit personalizado"
 
 #: hggtk\tagadd.py:100
 msgid "Commit message:"
-msgstr ""
+msgstr "Mensaje de commit:"
 
 #: hggtk\tagadd.py:168
 msgid "Tag input is empty"
-msgstr ""
+msgstr "Tag vacio"
 
 #: hggtk\tagadd.py:169
 msgid "Please enter tag name"
@@ -2535,7 +2552,7 @@ msgstr "Introduce un nombre de etiqueta"
 
 #: hggtk\tagadd.py:173
 msgid "Custom commit message is empty"
-msgstr ""
+msgstr "Mensage de commit vacio"
 
 #: hggtk\tagadd.py:181 hggtk\tagadd.py:212
 msgid "Tagging completed"
@@ -2568,7 +2585,7 @@ msgstr "la etiqueta nombrada \"%s\" ya existe"
 
 #: hggtk\tagadd.py:233
 msgid "Added tag %s for changeset %s"
-msgstr ""
+msgstr "Tag %s para conjunto de cambios %s añadido"
 
 #: hggtk\tagadd.py:235
 msgid "Tag '%s' already exist"
@@ -2584,7 +2601,7 @@ msgstr "Eliminada la etiqueta %s"
 
 #: hggtk\taskbarui.py:28
 msgid "TortoiseHg Taskbar"
-msgstr ""
+msgstr "Barra de tareas TortoiseHg"
 
 #: hggtk\taskbarui.py:30 thgutil\menuthg.py:190 thgutil\menuthg.py:322
 msgid "About"
@@ -2592,11 +2609,11 @@ msgstr "Acerca de"
 
 #: hggtk\taskbarui.py:49
 msgid "Overlays"
-msgstr ""
+msgstr "Superposición de iconos"
 
 #: hggtk\taskbarui.py:56
 msgid "Enable overlays"
-msgstr ""
+msgstr "Activar superposición de iconos"
 
 #: hggtk\taskbarui.py:58
 msgid "Local disks only"
@@ -2604,15 +2621,15 @@ msgstr "Sólo discos locales"
 
 #: hggtk\taskbarui.py:61
 msgid "Context Menu"
-msgstr ""
+msgstr "Menú contextual"
 
 #: hggtk\taskbarui.py:67
 msgid "Promote menu items to the top menu"
-msgstr ""
+msgstr "Promover elementos de menú al menú principal"
 
 #: hggtk\taskbarui.py:81
 msgid "Promote menu item \"%s\" to top menu"
-msgstr ""
+msgstr "Promover elemento de menú  %s al menú principal"
 
 #: hggtk\taskbarui.py:85
 msgid "Taskbar"
@@ -2620,11 +2637,11 @@ msgstr "Barra de tareas"
 
 #: hggtk\taskbarui.py:92
 msgid "Highlight Icon"
-msgstr ""
+msgstr "Resaltar Icono"
 
 #: hggtk\taskbarui.py:95
 msgid "Enable/Disable the overlay icons globally"
-msgstr ""
+msgstr "Activar/Desactivar superposición de iconos globalmente"
 
 #: hggtk\taskbarui.py:98
 msgid "Only enable overlays on local disks"
@@ -2766,7 +2783,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:80
 msgid "Author Coloring"
-msgstr ""
+msgstr "Coloración de autor"
 
 #: hggtk\thgconfig.py:81
 msgid ""
@@ -2777,7 +2794,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:85
 msgid "Long Summary"
-msgstr ""
+msgstr "Resumen largo"
 
 #: hggtk\thgconfig.py:86
 msgid ""
@@ -2807,7 +2824,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:99
 msgid "After pull operation"
-msgstr ""
+msgstr "Después de operación de extracción"
 
 #: hggtk\thgconfig.py:101
 msgid ""
@@ -2834,7 +2851,7 @@ msgstr "Descripción"
 
 #: hggtk\thgconfig.py:110
 msgid "Textual description of the repository's purpose or contents."
-msgstr ""
+msgstr "Descripción textual del contenido del repositorio."
 
 #: hggtk\thgconfig.py:112
 msgid "Contact"
@@ -2856,7 +2873,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:118
 msgid "Archive Formats"
-msgstr ""
+msgstr "Formatos de archivo"
 
 #: hggtk\thgconfig.py:119
 msgid "Comma separated list of archive formats allowed for downloading"
@@ -2873,7 +2890,7 @@ msgstr "Puerto"
 
 #: hggtk\thgconfig.py:122
 msgid "Push Requires SSL"
-msgstr ""
+msgstr "Envio Requiere SSL"
 
 #: hggtk\thgconfig.py:123
 msgid ""
@@ -2909,7 +2926,7 @@ msgstr "Máximo número de cambios a listar en el registro de cambios."
 
 #: hggtk\thgconfig.py:132
 msgid "Allow Push"
-msgstr ""
+msgstr "Permitir envio"
 
 #: hggtk\thgconfig.py:133
 msgid ""
@@ -2923,7 +2940,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:140
 msgid "Deny Push"
-msgstr ""
+msgstr "Denegar envio"
 
 #: hggtk\thgconfig.py:141
 msgid ""
@@ -3061,7 +3078,7 @@ msgstr "Contraseña con la que autentificarse en el servidor de email"
 
 #: hggtk\thgconfig.py:192
 msgid "Local Hostname"
-msgstr ""
+msgstr "Nombre de la máquina local"
 
 #: hggtk\thgconfig.py:193
 msgid "Hostname the sender can use to identify itself to the mail server."
@@ -3069,11 +3086,11 @@ msgstr ""
 
 #: hggtk\thgconfig.py:196
 msgid "Git Format"
-msgstr ""
+msgstr "Formato Git"
 
 #: hggtk\thgconfig.py:197
 msgid "Use git extended diff header format. Default: False"
-msgstr ""
+msgstr "Usar formato de cabezera diff extendido Git. Por defecto: Falso"
 
 #: hggtk\thgconfig.py:199
 msgid "No Dates"
@@ -3082,6 +3099,7 @@ msgstr "Sin fechas"
 #: hggtk\thgconfig.py:200
 msgid "Do not include modification dates in diff headers. Default: False"
 msgstr ""
+"No incluir fecha de modificación en cabezeras diff. Por defecto: Falso"
 
 #: hggtk\thgconfig.py:202
 msgid "Show Function"
@@ -3102,7 +3120,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:208
 msgid "Ignore WS Amount"
-msgstr ""
+msgstr "Ignorar cantidad de espacios en blanco"
 
 #: hggtk\thgconfig.py:209
 msgid "Ignore changes in the amount of white space. Default: False"
@@ -3151,7 +3169,7 @@ msgstr "Preferencias de usuario globales"
 
 #: hggtk\thgconfig.py:434
 msgid "%s repository settings"
-msgstr ""
+msgstr "configuraciones de repositorio: %s"
 
 #: hggtk\thgconfig.py:439
 msgid "Edit File"
@@ -3187,11 +3205,11 @@ msgstr "¿Perder los cambios y cambiar archivos?"
 
 #: hggtk\thgconfig.py:509
 msgid "TortoiseHg Configure Repository - "
-msgstr ""
+msgstr "TortoiseHg: Configurar Repositorio - "
 
 #: hggtk\thgconfig.py:513
 msgid "TortoiseHg Configure User-Global Settings"
-msgstr ""
+msgstr "TortoiseHg: Configurar opciones globales de usuario"
 
 #: hggtk\thgconfig.py:557
 msgid "Confirm quit without saving?"
@@ -3256,7 +3274,7 @@ msgstr ""
 
 #: hggtk\thgshelve.py:72
 msgid "set aside selected changes"
-msgstr ""
+msgstr "Ignorar cambios seleccionados"
 
 #: hggtk\thgshelve.py:73
 msgid "Unshelve"
@@ -3264,7 +3282,7 @@ msgstr ""
 
 #: hggtk\thgshelve.py:74
 msgid "restore shelved changes"
-msgstr ""
+msgstr "restaurar cambios arrinconados"
 
 #: hggtk\thgshelve.py:97 hggtk\thgshelve.py:98 hggtk\thgshelve.py:99
 #: hggtk\thgshelve.py:102
@@ -3273,15 +3291,15 @@ msgstr ""
 
 #: hggtk\thgshelve.py:134
 msgid "No changes to shelve"
-msgstr ""
+msgstr "Sin cambios a arrinconar"
 
 #: hggtk\thgshelve.py:140
 msgid "Please select diff chunks to shelve"
-msgstr ""
+msgstr "Por favor seleccione los pedazos a arrinconar"
 
 #: hggtk\thgshelve.py:148
 msgid "<b>Shelve file exists!</b>"
-msgstr ""
+msgstr "<b>Archivo existe!</b>"
 
 #: hggtk\thgshelve.py:149
 msgid "Overwrite"
@@ -3293,7 +3311,7 @@ msgstr "Anexar"
 
 #: hggtk\update.py:18
 msgid "= Current Branch Tip ="
-msgstr ""
+msgstr "= Rama Actual Tip ="
 
 #: hggtk\update.py:37
 msgid "Update - %s"
@@ -3309,7 +3327,7 @@ msgstr "Sobrescribir cambios locales (--clean)"
 
 #: hggtk\visdiff.py:61
 msgid "Visual Diffs"
-msgstr ""
+msgstr "Diff visual"
 
 #: hggtk\visdiff.py:64
 msgid "Temporary files are removed when this dialog is closed"
@@ -3349,11 +3367,11 @@ msgstr "revision(es) "
 
 #: hggtk\visdiff.py:162
 msgid "working changes"
-msgstr ""
+msgstr "cambios en repositorio de trabajo"
 
 #: hggtk\visdiff.py:165
 msgid "Visual Diffs - "
-msgstr ""
+msgstr "Diff visual - "
 
 #: hggtk\visdiff.py:173
 msgid "No file changes"
@@ -3389,7 +3407,7 @@ msgstr "Crear clon acá desde la fuente"
 
 #: thgutil\menuthg.py:174
 msgid "Synchronize with dragged repository"
-msgstr ""
+msgstr "Sincronizar con repositorio"
 
 #: thgutil\menuthg.py:180
 msgid "Clone a Repository"
@@ -3445,7 +3463,7 @@ msgstr "Estado del repositorio"
 
 #: thgutil\menuthg.py:238
 msgid "Shelve Changes"
-msgstr ""
+msgstr "Cambios arrinconados"
 
 #: thgutil\menuthg.py:239
 msgid "Shelve or unshelve repository changes"
@@ -3453,7 +3471,7 @@ msgstr ""
 
 #: thgutil\menuthg.py:245
 msgid "Visual Diff"
-msgstr ""
+msgstr "Diff visual"
 
 #: thgutil\menuthg.py:246
 msgid "View changes using GUI diff tool"
@@ -3461,7 +3479,7 @@ msgstr "Ver cambios con herramienta gráfica diff"
 
 #: thgutil\menuthg.py:250
 msgid "Guess Renames"
-msgstr ""
+msgstr "Adivinar renombramientos"
 
 #: thgutil\menuthg.py:251
 msgid "Detect renames and copies"
@@ -3505,7 +3523,7 @@ msgstr "Anotar archivos"
 
 #: thgutil\menuthg.py:274
 msgid "show changeset information per file line"
-msgstr ""
+msgstr "Muestra información de conjunto de cambios por archivo de línea"
 
 #: thgutil\menuthg.py:280
 msgid "View Changelog"
