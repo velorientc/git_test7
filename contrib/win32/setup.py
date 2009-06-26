@@ -145,18 +145,7 @@ class build_mo(build):
             self.distribution.data_files.append((join('mercurial', modir),
                                              [mofile]))
 
-class build_shellext(build):
-    description = "Build TortoiseHg shell extensions"
-
-    def run(self):
-        cwd = os.getcwd()
-        os.chdir("win32/shellext")
-        os.environ["DEBUG"] = "1"
-        os.system("mingw32-make")
-        os.chdir(cwd)
-
 build.sub_commands.append(('build_mo', None))
-build.sub_commands.append(('build_shellext', None))
 
 Distribution.pure = 0
 Distribution.global_options.append(('pure', None, "use pure (slow) Python "
@@ -186,8 +175,7 @@ class hg_build_py(build_py):
 
 cmdclass = {'install_data': install_package_data,
             'build_mo': build_mo,
-            'build_py': hg_build_py,
-            'build_shellext' : build_shellext}
+            'build_py': hg_build_py}
 
 ext_modules=[
     Extension('mercurial.base85', ['mercurial/base85.c']),
