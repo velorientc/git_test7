@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-06-25 05:16+0000\n"
-"PO-Revision-Date: 2009-06-25 23:16+0000\n"
+"PO-Revision-Date: 2009-06-26 15:48+0000\n"
 "Last-Translator: xiscu <Unknown>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-26 03:48+0000\n"
+"X-Launchpad-Export-Date: 2009-06-27 04:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -53,7 +53,7 @@ msgstr "Descripcion del conjunto de cambios"
 
 #: hggtk\backout.py:56
 msgid "Backout commit message"
-msgstr ""
+msgstr "Retirar mensaje de gravado"
 
 #: hggtk\backout.py:61
 msgid ""
@@ -952,6 +952,10 @@ msgid ""
 "N] subject.  It should describe the effects of the entire patch series.  "
 "When emailing a bundle, these fields make up the message subject and body."
 msgstr ""
+"La descripcion de la serie de parches se envía en el correo de resumen "
+"inicial con el asunto [PARCHE 0 de N]. Debería describir el efecto de toda "
+"la serie de parches. Cuando se envía un paquete (bundle) por correo, estos "
+"campos configuran el asunto y cuerpo del mensaje."
 
 #: hggtk\hgemail.py:308
 msgid "You must specify a recipient"
@@ -1098,7 +1102,7 @@ msgstr "arrinconar revisión sólo se puede ejecutar en modo interactivo"
 
 #: hggtk\hgshelve.py:437
 msgid "shelve data already exists"
-msgstr ""
+msgstr "Datos arrinconados ya existen"
 
 #: hggtk\hgshelve.py:468
 msgid "no changes to shelve\n"
@@ -1358,7 +1362,7 @@ msgstr "recordar usuario como creador del cambio"
 
 #: hggtk\hgtk.py:596
 msgid "record datecode as commit date"
-msgstr ""
+msgstr "Guardar código de fecha como fecha de envio"
 
 #: hggtk\hgtk.py:597
 msgid "hgtk commit [OPTIONS] [FILE]..."
@@ -1594,7 +1598,7 @@ msgstr "mostrar cambio"
 
 #: hggtk\history.py:392
 msgid "diff to local"
-msgstr ""
+msgstr "diff local"
 
 #: hggtk\history.py:393
 msgid "_update"
@@ -1755,6 +1759,8 @@ msgid ""
 "Display only changesets matching these comma separated case insensitive "
 "keywords"
 msgstr ""
+"Mostrar sólo conjuntos de cambios que coinciden con estas palabras separadas "
+"por comas (sin diferenciación entre mayúsculas y minúsculas)"
 
 #: hggtk\logfilter.py:126
 msgid "Help on date formats"
@@ -1834,15 +1840,15 @@ msgstr "Confirmar deshacer fusión"
 
 #: hggtk\merge.py:155
 msgid "Clean checkout of original revision?"
-msgstr ""
+msgstr "¿ Limpiar copia de la revisión original ?"
 
 #: hggtk\recovery.py:37
 msgid "TortoiseHg Recovery - "
-msgstr ""
+msgstr "TortoiseHg: Recuperación - "
 
 #: hggtk\recovery.py:43 hggtk\synch.py:60
 msgid "Stop the hg operation"
-msgstr ""
+msgstr "Parar comando"
 
 #: hggtk\recovery.py:47
 msgid "Clean"
@@ -1850,11 +1856,11 @@ msgstr "Limpio"
 
 #: hggtk\recovery.py:49
 msgid "Clean checkout, undo all changes"
-msgstr ""
+msgstr "Copia limpia, desacer todos los cambios"
 
 #: hggtk\recovery.py:52
 msgid "Rollback"
-msgstr ""
+msgstr "Deshacer"
 
 #: hggtk\recovery.py:54
 msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
@@ -1980,7 +1986,7 @@ msgstr "Puerto inválido 2048..65535"
 
 #: hggtk\serve.py:226
 msgid "Defaulting to "
-msgstr ""
+msgstr "Por defecto: "
 
 #: hggtk\serve.py:306
 msgid "cannot start server: "
@@ -2000,7 +2006,7 @@ msgstr "lanzar el servidor en segundo plano"
 
 #: hggtk\serve.py:344
 msgid "used internally by daemon mode"
-msgstr ""
+msgstr "usado internamente en modo demonio"
 
 #: hggtk\serve.py:345
 msgid "name of error log file to write to"
@@ -2016,15 +2022,17 @@ msgstr "dirección a usar"
 
 #: hggtk\serve.py:348
 msgid "prefix path to serve from (default: server root)"
-msgstr ""
+msgstr "ruta prefijo para servicio. Por defecto: directorio raíz de servidor"
 
 #: hggtk\serve.py:350
 msgid "name to show in web pages (default: working dir)"
-msgstr ""
+msgstr "nombre a mostrar en páginas web (por defecto: directorio de trabajo)"
 
 #: hggtk\serve.py:351
 msgid "name of the webdir config file (serve more than one repo)"
 msgstr ""
+"nombre del archivo de configuración del directorio web (para servir más de "
+"un repositorio)"
 
 #: hggtk\serve.py:353
 msgid "name of file to write process ID to"
@@ -2040,7 +2048,7 @@ msgstr "plantillas web a usar"
 
 #: hggtk\serve.py:356
 msgid "template style to use"
-msgstr ""
+msgstr "plantilla de estilo a usar"
 
 #: hggtk\serve.py:357
 msgid "use IPv6 in addition to IPv4"
@@ -2087,7 +2095,7 @@ msgstr "_añadir"
 
 #: hggtk\status.py:116
 msgid "_guess rename"
-msgstr ""
+msgstr "_adivina renombramiento"
 
 #: hggtk\status.py:117
 msgid "_ignore"
@@ -2155,7 +2163,7 @@ msgstr "eliminar"
 
 #: hggtk\status.py:313
 msgid "st"
-msgstr ""
+msgstr "Estado"
 
 #: hggtk\status.py:321
 msgid "ms"
@@ -2266,6 +2274,7 @@ msgstr "No hay ningún archivo seleccionado que se pueda revertir"
 #: hggtk\status.py:1103
 msgid "Revert not allowed when viewing revision range."
 msgstr ""
+"Operación revertir no permitida mientras se muestra rango de revisión."
 
 #: hggtk\status.py:1118 hggtk\status.py:1135
 msgid "Confirm Revert"
@@ -2277,11 +2286,11 @@ msgstr "¿Revertir archivos a la revisión %s?"
 
 #: hggtk\status.py:1121
 msgid "Which parent to revert to?"
-msgstr ""
+msgstr "¿ A cuál revisión padre desea revertir ?"
 
 #: hggtk\status.py:1122
 msgid "Revert file(s) to local or other parent?"
-msgstr ""
+msgstr "¿ Revertir archivo(s) a local o a otra revisión padre ?"
 
 #: hggtk\status.py:1123
 msgid "&local"
@@ -2339,7 +2348,7 @@ msgstr "Confirmar Borrado Sin Revisión"
 
 #: hggtk\status.py:1213
 msgid "Delete the following unrevisioned files?"
-msgstr ""
+msgstr "¿ Eliminar los siguientes archivos sin revisión ?"
 
 #: hggtk\status.py:1226
 msgid "Delete Errors"
@@ -2347,7 +2356,7 @@ msgstr "Borrar errores"
 
 #: hggtk\synch.py:52
 msgid "TortoiseHg Synchronize - "
-msgstr ""
+msgstr "TortoiseHg: Sincronizar - "
 
 #: hggtk\synch.py:64
 msgid "Incoming"
@@ -2356,6 +2365,7 @@ msgstr "Entrante"
 #: hggtk\synch.py:66
 msgid "Display changes that can be pulled from selected repository"
 msgstr ""
+"Mostrar cambios que pueden ser extraidos del repositorio seleccionado"
 
 #: hggtk\synch.py:69
 msgid "   Pull   "
@@ -2376,7 +2386,7 @@ msgstr ""
 
 #: hggtk\synch.py:80
 msgid "Push"
-msgstr ""
+msgstr "Enviar"
 
 #: hggtk\synch.py:82
 msgid "Push local changes to selected repository"
@@ -2416,7 +2426,7 @@ msgstr "Actualizar"
 
 #: hggtk\synch.py:159
 msgid "Fetch"
-msgstr ""
+msgstr "Traer"
 
 #: hggtk\synch.py:160
 msgid "Rebase"
@@ -2476,7 +2486,7 @@ msgstr "Actualizar a rama Tip"
 
 #: hggtk\synch.py:340
 msgid "unknown sort key '%s'"
-msgstr ""
+msgstr "clave de ordenación '%s' desconocida"
 
 #: hggtk\synch.py:350
 msgid "Select Repository"
@@ -2645,11 +2655,11 @@ msgstr "Activar/Desactivar superposición de iconos globalmente"
 
 #: hggtk\taskbarui.py:98
 msgid "Only enable overlays on local disks"
-msgstr ""
+msgstr "Activar superposición de iconos sólo para discos locales"
 
 #: hggtk\taskbarui.py:102
 msgid "Highlight the taskbar icon during activity"
-msgstr ""
+msgstr "Resaltar el icono de la barra de tareas durante actividad"
 
 #: hggtk\taskbarui.py:108
 msgid "Event Log"
@@ -2661,7 +2671,7 @@ msgstr "<no especificado>"
 
 #: hggtk\thgconfig.py:27
 msgid "3-way Merge Tool"
-msgstr ""
+msgstr "Herramienta de fusión de archivos de 3-vías"
 
 #: hggtk\thgconfig.py:28
 msgid ""
@@ -2672,18 +2682,25 @@ msgid ""
 "local or other, or internal:dump to leave files in the working directory for "
 "manual merging"
 msgstr ""
+"Herramienta gráfica para resolver conflictos de fusión de archivos.\r\n"
+"- Sin especificar: Mercurial usará la primera herramienta disponible en su "
+"sistema o usará una herramienta interna (vea internal).\r\n"
+"- internal merge: fuerza marcadores de conflicto. \r\n"
+"- internal prompt: pide selección entre local y otro\r\n"
+"- internal dump: deja los archivos en el directorio de trabajo para permitir "
+"fusión manual"
 
 #: hggtk\thgconfig.py:34
 msgid "Visual Diff Command"
-msgstr ""
+msgstr "Comando diff visual"
 
 #: hggtk\thgconfig.py:35
 msgid "Specify visual diff tool; must be an extdiff command"
-msgstr ""
+msgstr "Especifique herramienta diff visual; debe ser un comando extdiff"
 
 #: hggtk\thgconfig.py:36
 msgid "Skip Diff Window"
-msgstr ""
+msgstr "Ignorar Ventana Diff"
 
 #: hggtk\thgconfig.py:37
 msgid ""
@@ -2691,6 +2708,9 @@ msgid ""
 "tool's directory diff feature.  Only enable this feature if you know your "
 "diff tool has a valid extdiff configuration.  Default: False"
 msgstr ""
+"Usar herramienta visual diff personal para comparar directorios. Use esta "
+"opción sólo si su herramienta dispone de una configuración diff correcta. "
+"Por defecto: No"
 
 #: hggtk\thgconfig.py:41
 msgid "Visual Editor"
@@ -2698,7 +2718,7 @@ msgstr "Editor visual"
 
 #: hggtk\thgconfig.py:42
 msgid "Specify the visual editor used to view files, etc"
-msgstr ""
+msgstr "Especifique el editor visual usado para mostras archivos, etc ..."
 
 #: hggtk\thgconfig.py:43
 msgid "CLI Editor"
@@ -2709,6 +2729,9 @@ msgid ""
 "The editor to use during a commit and other instances where Mercurial needs "
 "multiline input from the user.  Only used by command line interface commands."
 msgstr ""
+"Editor usado durante un envio y otras instancias donde Mercurial neccesita "
+"entrada multilínea por parte del usuario. Sólo usado por órdenes en la línea "
+"de comandos."
 
 #: hggtk\thgconfig.py:47
 msgid "Tab Width"
@@ -2719,10 +2742,12 @@ msgid ""
 "Specify the number of spaces that tabs expand to in various TortoiseHG "
 "windows. Default: Not expanded"
 msgstr ""
+"Especifique el número de espacios a substituir por tabulador. Por defecto: "
+"Sin substitución."
 
 #: hggtk\thgconfig.py:51
 msgid "Max Diff Size"
-msgstr ""
+msgstr "Tamaño máx. diff"
 
 #: hggtk\thgconfig.py:52
 msgid ""
@@ -2730,16 +2755,20 @@ msgid ""
 "changelog, status, and commit windows. A value of zero implies no limit.  "
 "Default: 1024 (1MB)"
 msgstr ""
+"Tamaño de archivo máx. (en kB) para el cual TortoiseHg mostrará cambios.\r\n"
+"Zero significa sin límite. Por defecto: 1024 kB"
 
 #: hggtk\thgconfig.py:55
 msgid "Bottom Diffs"
-msgstr ""
+msgstr "Diffs en parte inferior"
 
 #: hggtk\thgconfig.py:56
 msgid ""
 "Show the diff panel below the file list in status, shelve, and commit "
 "dialogs. Default: False (show diffs to right of file list)"
 msgstr ""
+"Muestra el panel diff bajo el resto de paneles. Por defecto: No (mostrado en "
+"la parte derecha)"
 
 #: hggtk\thgconfig.py:61
 msgid "Username"
@@ -2747,21 +2776,23 @@ msgstr "Nombre de usuario"
 
 #: hggtk\thgconfig.py:62
 msgid "Name associated with commits"
-msgstr ""
+msgstr "Nombre associado a los envios"
 
 #: hggtk\thgconfig.py:63
 msgid "External Commit Tool"
-msgstr ""
+msgstr "Herramienta de envio externa"
 
 #: hggtk\thgconfig.py:64
 msgid ""
 "Select commit tool launched by TortoiseHg. (Qct is no longer distributed as "
 "part of TortoiseHG.) Default: None (use the builtin tool)"
 msgstr ""
+"Seleccione herramienta de envio (Qct ya no está incluido en TortoiseHG). Por "
+"defecto: No (usar herramienta interna)"
 
 #: hggtk\thgconfig.py:67
 msgid "Summary Line Length"
-msgstr ""
+msgstr "Tamaño de línea del resumen"
 
 #: hggtk\thgconfig.py:68
 msgid ""
@@ -2769,10 +2800,13 @@ msgid ""
 "issue a warning if the summary line is too long or not separated by a blank "
 "line. Default: 0 (unenforced)"
 msgstr ""
+"Tamaño máx. de línea del resumen. Si está activado, TortoiseHG mostrará un "
+"aviso al sobrepasar el límite o si no está separada por un espacio en "
+"blanco. Por defecto: 0 (sin aviso)"
 
 #: hggtk\thgconfig.py:72
 msgid "Message Line Length"
-msgstr ""
+msgstr "Tamaño de línea de mesaje"
 
 #: hggtk\thgconfig.py:73
 msgid ""
@@ -2780,6 +2814,9 @@ msgid ""
 "to format the message and a warning will be issued if any lines are too long "
 "at commit.  Default: 0 (unenforced)"
 msgstr ""
+"Tamaño máx. de línea del mesaje de envio. Si está activado, se puede usar el "
+"menu emergente para formatear el mensaje y se mostrará un aviso al "
+"sobrepasar el límite. Por defecto: 0 (sin aviso)"
 
 #: hggtk\thgconfig.py:80
 msgid "Author Coloring"
@@ -2791,6 +2828,14 @@ msgid ""
 "green for merge, red for non-trivial parents, black for normal. Default: "
 "False"
 msgstr ""
+"Coloración de conjunto de cambios por autor.\r\n"
+"\r\n"
+"Por defecto: No\r\n"
+"\r\n"
+"La coloración por defecto es:\r\n"
+"- Revisiones de fusión: Verde\r\n"
+"- Revisiones padre no triviales: Rojo\r\n"
+"- Revisiones normales: Negro"
 
 #: hggtk\thgconfig.py:85
 msgid "Long Summary"
@@ -2801,16 +2846,22 @@ msgid ""
 "If true, concatenate multiple lines of changeset summary until they reach 80 "
 "characters. Default: False"
 msgstr ""
+"Concatenar múltiples líneas resumen hasta máx. 80 carácteres.\r\n"
+"\r\n"
+"Por defecto: No"
 
 #: hggtk\thgconfig.py:89
 msgid "Log Batch Size"
-msgstr ""
+msgstr "Número de revisiones"
 
 #: hggtk\thgconfig.py:90
 msgid ""
 "The number of revisions to read and display in the changelog viewer in a "
 "single batch. Default: 500"
 msgstr ""
+"Número máx. de revisiones a leer y mostrar.\r\n"
+"\r\n"
+"Por defecto: 500"
 
 #: hggtk\thgconfig.py:93
 msgid "Copy Hash"
@@ -2821,6 +2872,10 @@ msgid ""
 "Allow the changelog viewer to copy the changeset hash of the currently "
 "selected changeset into the clipboard. Default: False"
 msgstr ""
+"Permitir copiar el hash del conjunto de cambios seleccionado al "
+"portapapeles.\r\n"
+"\r\n"
+"Por defecto: No"
 
 #: hggtk\thgconfig.py:99
 msgid "After pull operation"
@@ -2832,6 +2887,13 @@ msgid ""
 "equates to pull --update, fetch equates to the fetch extension, rebase "
 "equates to pull --rebase.  Default: none"
 msgstr ""
+"Operación a ejecutar después de una extracción de cambios correcta:\r\n"
+"\r\n"
+"- \"update\" significa: \"pull --update\"\r\n"
+"- \"fech\" significa la extensión \"fetch\"\r\n"
+"- rebase significa \"pull --rebase\"\r\n"
+"\r\n"
+"Por defecto: Nada"
 
 #: hggtk\thgconfig.py:106
 msgid "Name"
@@ -2869,7 +2931,7 @@ msgstr "Estilo"
 
 #: hggtk\thgconfig.py:117
 msgid "Which template map style to use"
-msgstr ""
+msgstr "Plantilla de estilo a usar"
 
 #: hggtk\thgconfig.py:118
 msgid "Archive Formats"
@@ -2897,16 +2959,21 @@ msgid ""
 "Whether to require that inbound pushes be transported over SSL to prevent "
 "password sniffing."
 msgstr ""
+"Para forzar envios locales sobre SSL y así prevenir robo de palabras clave."
 
 #: hggtk\thgconfig.py:125
 msgid "Stripes"
-msgstr ""
+msgstr "Rayado"
 
 #: hggtk\thgconfig.py:126
 msgid ""
 "How many lines a \"zebra stripe\" should span in multiline output. Default "
 "is 1; set to 0 to disable."
 msgstr ""
+"Número de líneas usadas para generar el patrón rayado (de tipo zebra) al "
+"mostrar información multilínea. \r\n"
+"\r\n"
+"Por defecto: 1 (0 para desactivar)"
 
 #: hggtk\thgconfig.py:128
 msgid "Max Files"
@@ -2937,6 +3004,18 @@ msgid ""
 "(separated by whitespace or \",\"). The contents of the allow_push list are "
 "examined after the deny_push list."
 msgstr ""
+"Permiso de envio de cambios al repositorio (push).\r\n"
+"\r\n"
+"Opciones:\r\n"
+"- campo vacio o sin configurar: envio de cambios no esta permitido\r\n"
+"- \"*\" : envio general esta permitido (incluso usuarios no "
+"autentificados)\r\n"
+"- Lista con nombres de usuario (separados por espacio en blanco o \",\"): el "
+"envio sólo está permitido a usuarios autentificados y presentes en la "
+"lista.\r\n"
+"\r\n"
+"La lista de permiso de envio es examinada después de la lista de denegación "
+"de envio."
 
 #: hggtk\thgconfig.py:140
 msgid "Deny Push"
@@ -2950,6 +3029,18 @@ msgid ""
 "name present in this list (separated by whitespace or \",\") is also denied. "
 "The contents of the deny_push list are examined before the allow_push list."
 msgstr ""
+"Denegación de envio de cambios al repositorio (push).\r\n"
+"\r\n"
+"Opciones:\r\n"
+"- campo vacio o sin configurar: envio de cambios esta permitido (incluso "
+"usuarios no autentificados)\r\n"
+"- \"*\" : envio denegado para todos los usuarios remotos\r\n"
+"- Lista con nombres de usuario (separados por espacio en blanco o \",\"): el "
+"envio no está permitido a usuarios no autentificados y a los usuarios "
+"presentes en la lista.\r\n"
+"\r\n"
+"La lista de denegación de envio es examinada previamente a la lista de "
+"permiso de envio."
 
 #: hggtk\thgconfig.py:147
 msgid "Encoding"
@@ -2957,7 +3048,7 @@ msgstr "Codificación"
 
 #: hggtk\thgconfig.py:148
 msgid "Character encoding name"
-msgstr ""
+msgstr "Código de carácteres"
 
 #: hggtk\thgconfig.py:151 hggtk\thgconfig.py:232
 msgid "Host"
@@ -2967,15 +3058,21 @@ msgstr "Host"
 msgid ""
 "Host name and (optional) port of proxy server, for example \"myproxy:8000\""
 msgstr ""
+"Nombre del servidor proxy (número de puerto opcional). Ejemplo: "
+"\"myproxy:8000\""
 
 #: hggtk\thgconfig.py:154
 msgid "Bypass List"
-msgstr ""
+msgstr "Lista de Bypass"
 
 #: hggtk\thgconfig.py:155
 msgid ""
 "Optional. Comma-separated list of host names that should bypass the proxy"
 msgstr ""
+"Listado separado por comas de los nombres de host a los que se les permite "
+"bypassar el servidor proxy.\r\n"
+"\r\n"
+"Opcional"
 
 #: hggtk\thgconfig.py:157 hggtk\thgconfig.py:233
 msgid "Password"
@@ -2997,6 +3094,7 @@ msgstr "Desde"
 #: hggtk\thgconfig.py:166
 msgid "Email address to use in the \"From\" header and for the SMTP envelope"
 msgstr ""
+"Dirección de correo a usar en el campo \"De\" y en el recipiente o sobre SMTP"
 
 #: hggtk\thgconfig.py:167
 msgid "To"
@@ -3004,7 +3102,7 @@ msgstr "Para"
 
 #: hggtk\thgconfig.py:168
 msgid "Comma-separated list of recipient email addresses"
-msgstr ""
+msgstr "Listado separado por comas de las direcciones de correo"
 
 #: hggtk\thgconfig.py:169
 msgid "Cc"
@@ -3013,6 +3111,7 @@ msgstr "Cc"
 #: hggtk\thgconfig.py:170
 msgid "Comma-separated list of carbon copy recipient email addresses"
 msgstr ""
+"Listado separado por comas de las direcciones de correo (copias carbón)"
 
 #: hggtk\thgconfig.py:172
 msgid "Bcc"
@@ -3020,7 +3119,7 @@ msgstr "Bcc"
 
 #: hggtk\thgconfig.py:173
 msgid "Comma-separated list of blind carbon copy recipient email addresses"
-msgstr ""
+msgstr "Listado separado por comas de las direcciones de correo (Cco)."
 
 #: hggtk\thgconfig.py:175
 msgid "method"
@@ -3035,14 +3134,23 @@ msgid ""
 "\"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send "
 "messages."
 msgstr ""
+"Método usado para enviar mensajes de correo. Opcional.\r\n"
+"\r\n"
+"Por defecto: smtp\r\n"
+"\r\n"
+"Introduzca el nombre del programa que actua como \"sendmail\": (tiene una "
+"opción \"-f\" para especificar quién envia el correo, una lista de "
+"receptores y el mensaje en \"stdin\"). Normalmente sólo es neccesario poner "
+"\"sendmail\" o bien la ruta donde este se encuentra para poder enviar correo "
+"(normalmente en \"/usr/sbin/sendmail\")."
 
 #: hggtk\thgconfig.py:181
 msgid "Host name of mail server"
-msgstr ""
+msgstr "El nombre de host del servidor de correo"
 
 #: hggtk\thgconfig.py:181
 msgid "SMTP Host"
-msgstr ""
+msgstr "Servidor SMTP"
 
 #: hggtk\thgconfig.py:182
 msgid "SMTP Port"
@@ -3050,7 +3158,7 @@ msgstr "Puerto SMTP"
 
 #: hggtk\thgconfig.py:183
 msgid "Port to connect to on mail server. Default: 25"
-msgstr ""
+msgstr "Puerto del servidor de correo. Por defecto: 25"
 
 #: hggtk\thgconfig.py:185
 msgid "SMTP TLS"
@@ -3082,7 +3190,7 @@ msgstr "Nombre de la máquina local"
 
 #: hggtk\thgconfig.py:193
 msgid "Hostname the sender can use to identify itself to the mail server."
-msgstr ""
+msgstr "Nombre usado para identificarse en el servidor de correo."
 
 #: hggtk\thgconfig.py:196
 msgid "Git Format"
@@ -3107,7 +3215,7 @@ msgstr "Mostrar función"
 
 #: hggtk\thgconfig.py:203
 msgid "Show which function each change is in. Default: False"
-msgstr ""
+msgstr "Muestra en que función se ha producido el cambio. Por defecto: No"
 
 #: hggtk\thgconfig.py:205
 msgid "Ignore White Space"
@@ -3225,7 +3333,7 @@ msgstr "Ningún repositorio encontrado"
 
 #: hggtk\thgconfig.py:647
 msgid "Path testing cannot work without a repository"
-msgstr ""
+msgstr "Test de ruta no funciona sin un repositorio"
 
 #: hggtk\thgconfig.py:713
 msgid "Remote repository paths"
@@ -3261,7 +3369,7 @@ msgstr "# Generado por tortoisehg-config\n"
 
 #: hggtk\thgconfig.py:948
 msgid "Skipped saving path with no alias"
-msgstr ""
+msgstr "Guardar ruta sin alias ignorado"
 
 #: hggtk\thgconfig.py:976
 msgid "Unable to write configuration file"
@@ -3270,7 +3378,7 @@ msgstr "No se pudo escribir en el archivo de configuración"
 #: hggtk\thgshelve.py:71 hggtk\thgshelve.py:133 hggtk\thgshelve.py:139
 #: hggtk\thgshelve.py:147
 msgid "Shelve"
-msgstr ""
+msgstr "Arrinconar"
 
 #: hggtk\thgshelve.py:72
 msgid "set aside selected changes"
@@ -3278,7 +3386,7 @@ msgstr "Ignorar cambios seleccionados"
 
 #: hggtk\thgshelve.py:73
 msgid "Unshelve"
-msgstr ""
+msgstr "Desacer Arrinconar"
 
 #: hggtk\thgshelve.py:74
 msgid "restore shelved changes"
@@ -3287,7 +3395,7 @@ msgstr "restaurar cambios arrinconados"
 #: hggtk\thgshelve.py:97 hggtk\thgshelve.py:98 hggtk\thgshelve.py:99
 #: hggtk\thgshelve.py:102
 msgid "_shelve"
-msgstr ""
+msgstr "_arrinconar"
 
 #: hggtk\thgshelve.py:134
 msgid "No changes to shelve"
@@ -3335,7 +3443,7 @@ msgstr "Los archivos temporales se borrarán cuando se cierre esta ventana"
 
 #: hggtk\visdiff.py:82
 msgid "Always launch single files"
-msgstr ""
+msgstr "Lanza siempre ficheros individualmente"
 
 #: hggtk\visdiff.py:108
 msgid "No repository"
@@ -3439,7 +3547,7 @@ msgstr "Acerca de TortoiseHg"
 
 #: thgutil\menuthg.py:223
 msgid "HG Commit..."
-msgstr ""
+msgstr "HG: Envio a repositorio ..."
 
 #: thgutil\menuthg.py:224
 msgid "Commit changes in repository"
@@ -3467,7 +3575,7 @@ msgstr "Cambios arrinconados"
 
 #: thgutil\menuthg.py:239
 msgid "Shelve or unshelve repository changes"
-msgstr ""
+msgstr "Arrinconar o incluir cambios en repositorio"
 
 #: thgutil\menuthg.py:245
 msgid "Visual Diff"

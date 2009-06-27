@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-06-25 05:16+0000\n"
-"PO-Revision-Date: 2009-06-23 06:15+0000\n"
+"PO-Revision-Date: 2009-06-26 13:08+0000\n"
 "Last-Translator: Yuki Kodama <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-26 03:48+0000\n"
+"X-Launchpad-Export-Date: 2009-06-27 04:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -301,7 +301,7 @@ msgstr "ユーザ名"
 
 #: hggtk\datamine.py:115 hggtk\datamine.py:124 hggtk\history.py:391
 msgid "di_splay change"
-msgstr "表示変更(_S)"
+msgstr "変更点の表示(_S)"
 
 #: hggtk\datamine.py:216
 msgid "Search"
@@ -369,7 +369,7 @@ msgstr "該当箇所"
 
 #: hggtk\datamine.py:290
 msgid "Search %d"
-msgstr "検索%s"
+msgstr "検索 %d"
 
 #: hggtk\datamine.py:332
 msgid "No regular expression given"
@@ -381,7 +381,7 @@ msgstr "検索するために正規表現が必要です"
 
 #: hggtk\datamine.py:361
 msgid "Search \"%s\""
-msgstr "検索 \"&s\""
+msgstr "検索 \"%s\""
 
 #: hggtk\datamine.py:473
 msgid "File is unrevisioned"
