@@ -317,8 +317,10 @@ def dispatch(req, cmd, args, hwnd):
         update(args, hwnd)
     elif cmd == 'remove':
         remove(args)
+    elif cmd == 'error':
+        logger.msg("**** Error: %s" % args[0])
     else:
-        logger.msg("Error: unknown request '%s'" % req)
+        logger.msg("**** Error: unknown request '%s'" % req)
 
 class Updater(threading.Thread):
     def __init__(self, hwnd):
