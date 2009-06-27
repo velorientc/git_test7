@@ -17,6 +17,7 @@
 #include "stdafx.h"
 
 #include "InitStatus.h"
+#include "Thgstatus.h"
 
 
 InitStatus& InitStatus::inst()
@@ -51,8 +52,9 @@ std::string InitStatus::check()
     if (missing.empty())
         return "";
 
-    std::string res = "InitStatus: error: uninitialized handlers: ";
-    res += missing;
+    std::string reason = "uninitialized handlers: " + missing;
+    Thgstatus::error(reason);
+    std::string res = "InitStatus: error: " + reason;
     TDEBUG_TRACE("***** " << res);
     return res;
 }
