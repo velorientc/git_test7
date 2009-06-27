@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Alil Adamov <diagiman@gmail.com>\n"
 "POT-Creation-Date: 2009-06-25 05:16+0000\n"
-"PO-Revision-Date: 2009-06-25 12:30+0000\n"
+"PO-Revision-Date: 2009-06-27 05:23+0000\n"
 "Last-Translator: Alil Adamov <diagiman@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-26 03:48+0000\n"
+"X-Launchpad-Export-Date: 2009-06-27 15:40+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -42,7 +42,7 @@ msgid ""
 "Commit message text for new changeset that reverses the  effect of the "
 "change being backed out."
 msgstr ""
-"Текст заметка фиксации для нового набора изменений, который возобнавляет "
+"Текст заметки фиксации для нового набора изменений, который возобновляет "
 "действие восстаналиваемого изменения"
 
 #: hggtk\backout.py:73 hggtk\bugreport.py:43 hggtk\hgcmd.py:41
@@ -274,7 +274,7 @@ msgstr "Изменения вступят в силу при следующей 
 
 #: hggtk\commit.py:38
 msgid "No branch changes"
-msgstr "Без изменений ветки"
+msgstr "Ветка не изменена"
 
 #: hggtk\commit.py:40
 msgid "Open a new named branch"
@@ -320,7 +320,7 @@ msgstr "фиксировать"
 
 #: hggtk\commit.py:292
 msgid "Confirm Exit"
-msgstr "Подвердите выход"
+msgstr "Подтвердите выход"
 
 #: hggtk\commit.py:293
 msgid "Save commit message at exit?"
@@ -394,7 +394,7 @@ msgstr "Подтвердить Отмену фиксации"
 
 #: hggtk\commit.py:519
 msgid "Undo last commit"
-msgstr "Отменить последную фиксацию"
+msgstr "Отменить последнюю фиксацию"
 
 #: hggtk\commit.py:525 hggtk\commit.py:540
 msgid "Undo commit"
@@ -470,7 +470,7 @@ msgstr ""
 
 #: hggtk\commit.py:615
 msgid "Commit: Invalid username"
-msgstr "Фиксация: Неправильное имя пользователя"
+msgstr "Фиксация: Неверное имя пользователя"
 
 #: hggtk\commit.py:616
 msgid ""
@@ -529,7 +529,7 @@ msgstr "Предупреждение"
 
 #: hggtk\commit.py:757
 msgid "The summary line length of %i is greater than %i"
-msgstr "Длина строки сводки %i больше чем %i"
+msgstr "Длина %i строки сводки больше чем %i"
 
 #: hggtk\commit.py:762
 msgid "The summary line is not followed by a blank line"
@@ -562,7 +562,7 @@ msgstr "Неверный путь"
 
 #: hggtk\datamine.py:62
 msgid "Cannot annotate directory: %s"
-msgstr "Невозможно комментировать папку: %s"
+msgstr "Невозможно аннотировать папку: %s"
 
 #: hggtk\datamine.py:104
 msgid "Filename"
@@ -583,7 +583,7 @@ msgstr "раскрыть изменение"
 
 #: hggtk\datamine.py:125
 msgid "_annotate parent"
-msgstr "комментировать родителя"
+msgstr "аннотировать родителя"
 
 #: hggtk\datamine.py:216
 msgid "Search"
@@ -639,7 +639,7 @@ msgstr "Показывать номера строк"
 
 #: hggtk\datamine.py:238
 msgid "Show all matching revisions"
-msgstr "Показывать все соответсвующие ревизии"
+msgstr "Показывать все соответствующие ревизии"
 
 #: hggtk\datamine.py:266 hggtk\datamine.py:523 hggtk\logview\treeview.py:372
 msgid "Rev"
@@ -755,7 +755,7 @@ msgstr "Определение Копий/Переименований в "
 
 #: hggtk\guess.py:57
 msgid "Minimum Simularity Percentage"
-msgstr "Минимальный Процент Симулирования"
+msgstr "Минимальный Процент Похожести"
 
 #: hggtk\guess.py:77
 msgid "Find Renames"
@@ -970,7 +970,7 @@ msgid ""
 msgstr ""
 "Описание ряда заплаток отправляется в начальной сводке, в письме с темой "
 "[PATCH 0 of N].  Оно должно описывать воздействие всего ряда заплаток.  При "
-"отправки пачкой, по этим полям составляются тема и и сам текст сообщения."
+"отправке пачкой, по этим полям составляются тема и и сам текст сообщения."
 
 #: hggtk\hgemail.py:308
 msgid "You must specify a recipient"
@@ -1081,7 +1081,7 @@ msgstr ""
 
 #: hggtk\hgshelve.py:148
 msgid "%d hunks, %d lines changed\n"
-msgstr "%d полос, %d строк изменилось\n"
+msgstr "%d полос(а/ки), %d строк(а/и) изменилось(ась)\n"
 
 #: hggtk\hgshelve.py:294
 msgid "unhandled transition: %s -> %s"
@@ -1190,7 +1190,7 @@ msgstr "рассматривать только отложенные измен�
 
 #: hggtk\hgshelve.py:608
 msgid "proceed even if patches do not unshelve cleanly"
-msgstr "продолжать даже если не всё гладко с применением заплаткок"
+msgstr "продолжать даже если не всё гладко с применением заплаток"
 
 #: hggtk\hgshelve.py:610
 msgid "hg unshelve [OPTION]... [FILE]..."
@@ -1477,11 +1477,11 @@ msgstr "уведомлять оболочку для указанного пут
 
 #: hggtk\hgtk.py:626
 msgid "remove the status cache"
-msgstr "удалить статус кэш"
+msgstr "удалить кэш статуса"
 
 #: hggtk\hgtk.py:627
 msgid "show the contents of the status cache (no update)"
-msgstr "показать содержимое статус кэша (без обновления)"
+msgstr "показать содержимое кэша статуса (без обновления)"
 
 #: hggtk\hgtk.py:629
 msgid "udpate all repos in current dir"
@@ -1617,7 +1617,7 @@ msgstr "визуализировать изменение"
 
 #: hggtk\history.py:392
 msgid "diff to local"
-msgstr "различие по сравнению с локальным"
+msgstr "различия по сравнению с локальным"
 
 #: hggtk\history.py:393
 msgid "_update"
@@ -1757,7 +1757,7 @@ msgstr "Фильтр Поиска"
 
 #: hggtk\logfilter.py:82
 msgid "Search repository changelog with criteria"
-msgstr "Поиск по журналу изменений хранилища с соответствии с требованиями"
+msgstr "Поиск по журналу изменений хранилища в соответствии с требованиями"
 
 #: hggtk\logfilter.py:94
 msgid "File(s):"
@@ -1795,7 +1795,7 @@ msgstr "Показывать только наборы изменений соо
 
 #: hggtk\logfilter.py:193
 msgid "Invalid date specification"
-msgstr "Неправильная дата"
+msgstr "Неверная даты"
 
 #: hggtk\logfilter.py:208
 msgid "Invalid revision range"
@@ -1859,7 +1859,7 @@ msgstr "Подтвердить отмену слияния"
 
 #: hggtk\merge.py:155
 msgid "Clean checkout of original revision?"
-msgstr "Почистить выгрузку первоначальной ревизии?"
+msgstr "Очистить от изменений выгрузку первоначальной ревизии?"
 
 #: hggtk\recovery.py:37
 msgid "TortoiseHg Recovery - "
@@ -1871,11 +1871,11 @@ msgstr "Остановить действие hg"
 
 #: hggtk\recovery.py:47
 msgid "Clean"
-msgstr "Почистить"
+msgstr "Очистить"
 
 #: hggtk\recovery.py:49
 msgid "Clean checkout, undo all changes"
-msgstr "Почистить выгрузку, отменить все изменения"
+msgstr "Очистить выгрузку, отменить все изменения"
 
 #: hggtk\recovery.py:52
 msgid "Rollback"
@@ -1913,11 +1913,11 @@ msgstr "команда выполняется"
 
 #: hggtk\recovery.py:119
 msgid "Confirm clean repository"
-msgstr "Подтвердить почистку хранилища"
+msgstr "Подтвердить очистку хранилища"
 
 #: hggtk\recovery.py:120
 msgid "Clean repository '%s' ?"
-msgstr "Почистить хранилище '%s' ?"
+msgstr "Очистить хранилище от изменений'%s' ?"
 
 #: hggtk\recovery.py:126
 msgid "Unable to find repo at %s\n"
@@ -2191,7 +2191,7 @@ msgstr "ст."
 
 #: hggtk\status.py:321
 msgid "ms"
-msgstr "ст.сл."
+msgstr "сс"
 
 #: hggtk\status.py:327
 msgid "path"
@@ -2215,11 +2215,11 @@ msgstr "!: отсутствующие"
 
 #: hggtk\status.py:439
 msgid "?: unknown"
-msgstr "?: неизвестен"
+msgstr "?: неизвестные"
 
 #: hggtk\status.py:440
 msgid "C: clean"
-msgstr "C: чистые"
+msgstr "C: неизменённые"
 
 #: hggtk\status.py:441
 msgid "I: ignored"
@@ -2311,11 +2311,11 @@ msgstr "Возвратить файл(ы) к локальному или дру�
 
 #: hggtk\status.py:1123
 msgid "&local"
-msgstr "локальный"
+msgstr "&локальный"
 
 #: hggtk\status.py:1123
 msgid "&other"
-msgstr "другой"
+msgstr "&другой"
 
 #: hggtk\status.py:1123 hggtk\status.py:1124
 msgid "l"
@@ -2357,7 +2357,7 @@ msgid ""
 msgstr ""
 "Нет выбранных файлов для перемещения\n"
 "\n"
-"Примечание: только чистые файлы могут быть перемещены."
+"Примечание: только чистые(неизменённые) файлы могут быть перемещены."
 
 #: hggtk\status.py:1212
 msgid "Confirm Delete Unrevisioned"
@@ -3461,7 +3461,7 @@ msgstr "Нет инструмента визуализации различий"
 
 #: hggtk\visdiff.py:136
 msgid "No visual diff tool has been configured"
-msgstr "Инструмент визуализации различий не был укзана"
+msgstr "Инструмент визуализации различий не был укзан"
 
 #: hggtk\visdiff.py:155
 msgid "changeset "
