@@ -9,34 +9,6 @@
 import os
 import sys
 
-def portable_fork():
-    # Spawn background process and exit
-    if sys.platform[:3] == 'win':
-        if 'THG_HGTK_SPAWN' not in os.environ:
-            if hasattr(sys, "frozen"):
-                args = sys.argv
-            else:
-                args = [sys.executable] + sys.argv
-            args = ['"%s"' % arg for arg in args]
-            env = os.environ.copy()
-            env['THG_HGTK_SPAWN'] = '1'
-            os.spawnve(os.P_NOWAIT, sys.executable, args, env)
-            sys.exit(0)
-    else:
-        assert hasattr(os, 'fork')
-        if os.fork():
-            sys.exit(0)
-
-if '--nofork' not in sys.argv and 'HGTK_NOFORK' not in os.environ:
-    for i, arg in enumerate(sys.argv):
-        if 'hgtk' in arg and len(sys.argv) > i+1:
-            cmd = sys.argv[i+1]
-            break
-    else:
-        cmd = None
-    if cmd not in ('version', 'help'):
-        portable_fork()
-
 if hasattr(sys, "frozen"):
     # Prepend C:\Program Files\TortoiseHg\gtk (equiv) to the path
     from thgutil import paths
@@ -70,6 +42,7 @@ except ImportError:
 if 'THGDEBUG' in os.environ:
     sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
 else:
+    import cStringIO
     sys.stderr = cStringIO.StringIO()
     ret = hggtk.hgtk.dispatch(sys.argv[1:])
     sys.stderr.seek(0)
