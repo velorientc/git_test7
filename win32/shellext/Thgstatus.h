@@ -30,6 +30,9 @@ public:
     static int remove(const std::string& path) {
         return SendRequest("remove|" + path);
     }
+    static int error(const std::string& text) {
+        return SendRequest("error|" + text);
+    }
 };
 
 #endif
