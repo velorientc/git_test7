@@ -436,7 +436,14 @@ def help_(ui, name=None, with_version=False):
         if with_version:
             version(ui)
             ui.write('\n')
-        aliases, i = cmdutil.findcmd(name, table)
+
+        try:
+            aliases, i = cmdutil.findcmd(name, table, False)
+        except hglib.AmbiguousCommand, inst:
+            select = lambda c: c.lstrip('^').startswith(inst.args[0])
+            helplist('list of commands:\n\n', select)
+            return
+
         # synopsis
         ui.write("%s\n" % i[2])
 
@@ -496,49 +503,25 @@ def help_(ui, name=None, with_version=False):
             addglobalopts(True)
 
     def helptopic(name):
-        v = None
-        for i in help.helptable:
-            l = i.split('|')
-            if name in l:
-                v = i
-                header = l[-1]
-        if not v:
+        from mercurial import help
+        for names, header, doc in help.helptable:
+            if name in names:
+                break
+        else:
             raise hglib.UnknownCommand(name)
 
         # description
-        doc = help.helptable[v]
         if not doc:
             doc = _("(No help text available)")
-        if callable(doc):
+        if hasattr(doc, '__call__'):
             doc = doc()
 
         ui.write("%s\n" % header)
         ui.write("%s\n" % doc.rstrip())
 
-    def helpext(name):
-        try:
-            mod = extensions.find(name)
-        except KeyError:
-            raise hglib.UnknownCommand(name)
-
-        doc = (mod.__doc__ or _('No help text available')).splitlines(0)
-        ui.write(_('%s extension - %s\n') % (name.split('.')[-1], doc[0]))
-        for d in doc[1:]:
-            ui.write(d, '\n')
-
-        ui.status('\n')
-
-        try:
-            ct = mod.cmdtable
-        except AttributeError:
-            ct = {}
-
-        modcmds = dict.fromkeys([c.split('|', 1)[0] for c in ct])
-        helplist(_('list of commands:\n\n'), modcmds.has_key)
-
     if name and name != 'shortlist':
         i = None
-        for f in (helpcmd, helptopic, helpext):
+        for f in (helpcmd, helptopic):
             try:
                 f(name)
                 i = None
