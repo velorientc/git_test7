@@ -80,9 +80,11 @@ if os.name == 'nt':
             tdelta = float(int(tref)) + 1.0 - tref
             if (tdelta > 0.0):
                 time.sleep(tdelta)
+
         repo = hg.repository(ui, root) # a fresh repo object is needed
         repostate = repo.status() # will update .hg/dirstate as a side effect
         modified, added, removed, deleted = repostate[:4]
+
         dirstatus = {}
         def dirname(f):
             return '/'.join(f.split('/')[:-1])
@@ -92,12 +94,34 @@ if os.name == 'nt':
             dirstatus[dirname(fn)] = 'm'
         for fn in removed + deleted:
             dirstatus[dirname(fn)] = 'r'
-        f = repo.opener('thgstatus', 'wb', atomictemp=True)
-        for dn in sorted(dirstatus):
-            s = dirstatus[dn]
-            f.write(s + dn + '\n')
-            ui.note("%s %s\n" % (s, dn))
-        f.rename()
+
+        update = False
+        f = None
+        try:
+            try:
+                f = repo.opener('thgstatus', 'rb')
+                for dn in sorted(dirstatus):
+                    s = dirstatus[dn]
+                    e = f.readline()
+                    if e == '' or e[0] != s or e[1:-1] != dn:
+                        update = True
+                        break
+                if f.readline() != '':
+                    # extra line in f, needs update
+                    update = True
+            except IOError:
+                update = True
+        finally:
+            if f != None:
+                f.close()
+
+        if update:
+            f = repo.opener('thgstatus', 'wb', atomictemp=True)
+            for dn in sorted(dirstatus):
+                s = dirstatus[dn]
+                f.write(s + dn + '\n')
+                ui.note("%s %s\n" % (s, dn))
+            f.rename()
 
 else:
     def shell_notify(paths):
