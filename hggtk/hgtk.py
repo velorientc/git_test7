@@ -445,7 +445,7 @@ def help_(ui, name=None, with_version=False):
             aliases, i = cmdutil.findcmd(name, table, False)
         except hglib.AmbiguousCommand, inst:
             select = lambda c: c.lstrip('^').startswith(inst.args[0])
-            helplist('list of commands:\n\n', select)
+            helplist(_('list of commands:\n\n'), select)
             return
 
         # synopsis
