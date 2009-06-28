@@ -65,7 +65,7 @@ Source: ..\contrib\vcredist_x86.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1
 Source: ..\contrib\vcredist_x64.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 
 Source: ..\files\THgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: ..\files\ThgShellia64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: ..\files\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
 
 [INI]
 Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http://www.selenic.com/mercurial/
