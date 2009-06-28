@@ -61,6 +61,8 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: CONTRIBUTORS; DestDir: {app}; DestName: Contributors.txt
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: ..\icons\hgicon.ico; DestDir: {app}
+Source: ..\contrib\vcredist_x86.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
+Source: ..\contrib\vcredist_x64.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 
 Source: ..\files\THgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\files\ThgShellia64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
@@ -76,6 +78,8 @@ Name: {group}\Mercurial Command Reference; Filename: {app}\docs\hg.1.html
 Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
+Filename: {tmp}\vcredist_x86.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
+Filename: {tmp}\vcredist_x64.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Check: not Is64BitInstallMode; StatusMsg: Installing TortoiseOverlays.dll ...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-x64.msi"" /qn /norestart ALLUSERS=1"; Check: Is64BitInstallMode; StatusMsg: Installing TortoiseOverlays.dll ...
@@ -94,8 +98,8 @@ Root: HKLM; Subkey: Software\Mercurial; Flags: uninsdeletekey; ValueData: {app}\
 [Code]
 procedure FileExpandString(fn: String);
 var
-	InFile: String;
-	i: Integer;
+    InFile: String;
+    i: Integer;
     InFileLines: TArrayOfString;
 begin
     InFile := ExpandConstant(fn);
@@ -106,18 +110,42 @@ begin
 end;
 
 var IsUpgrade: Boolean;
+var SP1Missing: Boolean;
+
+function ShouldInstallVCPPSP1(): Boolean;
+begin
+    Result := SP1Missing;
+end;
 
 function InitializeSetup(): Boolean;
 var
  ThgSwReg: String;
+ msg: String;
+ CRLF: String;
 begin
+ CRLF := chr(10) + chr(13);
  Result := True;
 
  {abort installation if TortoiseHg 0.7 or earlier is installed}
  if RegQueryStringValue(HKLM, 'Software\TortoiseHg', '', ThgSwReg) then
  begin
-   IsUpgrade := True;
+  IsUpgrade := True;
+  {hgproc was removed after 0.7, so it's a good guess}
+  if (FileExists(ThgSwReg + '\hgproc.exe')) then
+  begin
+    msg := 'TortoiseHg Setup Error:' + CRLF + CRLF +
+      'The version of TortoiseHg installed is too old to upgrade in place.' + CRLF +
+      'You must uninstall it before installing this version.' + CRLF + CRLF +
+      'Please uninstall the existing versions of TortoiseHg and TortoiseOverlays,' + CRLF +
+      'then run the installer again to continue.';
+    MsgBox(msg, mbError, MB_OK);
+    Result := False; {quit and abort installation}
+  end;
  end;
+
+ {Detect whether VC2005-SP1 Redistributable package is installed}
+ if (not(RegValueExists(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v2.0.50727', 'SP'))) then
+    SP1Missing := True;
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean; 
