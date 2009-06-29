@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-06-25 05:16+0000\n"
+"POT-Creation-Date: 2009-06-28 05:54+0000\n"
 "PO-Revision-Date: 2009-06-23 20:55+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-26 03:48+0000\n"
+"X-Launchpad-Export-Date: 2009-06-29 04:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -1299,14 +1299,6 @@ msgstr "opções:\n"
 #: hggtk\hgtk.py:444
 msgid "no commands defined\n"
 msgstr "sem comandos definidos\n"
-
-#: hggtk\hgtk.py:487
-msgid "No help text available"
-msgstr "Sem texto de ajuda disponível"
-
-#: hggtk\hgtk.py:488
-msgid "%s extension - %s\n"
-msgstr "%s extensão - %s\n"
 
 #: hggtk\hgtk.py:500 hggtk\hgtk.py:526
 msgid ""

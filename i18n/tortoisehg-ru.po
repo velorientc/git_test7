@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Alil Adamov <diagiman@gmail.com>\n"
-"POT-Creation-Date: 2009-06-25 05:16+0000\n"
+"POT-Creation-Date: 2009-06-28 05:54+0000\n"
 "PO-Revision-Date: 2009-06-27 05:23+0000\n"
 "Last-Translator: Alil Adamov <diagiman@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-27 15:40+0000\n"
+"X-Launchpad-Export-Date: 2009-06-29 04:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\about.py:52
@@ -1300,14 +1300,6 @@ msgstr "настройки:\n"
 #: hggtk\hgtk.py:444
 msgid "no commands defined\n"
 msgstr "команды не определены\n"
-
-#: hggtk\hgtk.py:487
-msgid "No help text available"
-msgstr "Нет текстовой справки"
-
-#: hggtk\hgtk.py:488
-msgid "%s extension - %s\n"
-msgstr "%s расширение - %s\n"
 
 #: hggtk\hgtk.py:500 hggtk\hgtk.py:526
 msgid ""
