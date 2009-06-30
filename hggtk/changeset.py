@@ -27,7 +27,11 @@ class ChangeSet(gdialog.GDialog):
 
     def get_title(self):
         title = toutf(os.path.basename(self.repo.root)) + ' changeset '
-        title += self.opts['rev'][0]
+        rev = self.opts['rev']
+        if isinstance(rev, str):
+            title += rev
+        else:
+            title += rev[0]
         return title
 
     def get_icon(self):
