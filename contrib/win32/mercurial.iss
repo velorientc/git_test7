@@ -61,8 +61,8 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: CONTRIBUTORS; DestDir: {app}; DestName: Contributors.txt
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: ..\icons\hgicon.ico; DestDir: {app}
-Source: ..\contrib\vcredist_x86.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
-Source: ..\contrib\vcredist_x64.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
+;Source: ..\contrib\vcredist_x86.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
+;Source: ..\contrib\vcredist_x64.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 
 Source: ..\files\THgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\files\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
@@ -78,8 +78,8 @@ Name: {group}\Mercurial Command Reference; Filename: {app}\docs\hg.1.html
 Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
-Filename: {tmp}\vcredist_x86.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
-Filename: {tmp}\vcredist_x64.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
+;Filename: {tmp}\vcredist_x86.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
+;Filename: {tmp}\vcredist_x64.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Check: not Is64BitInstallMode; StatusMsg: Installing TortoiseOverlays.dll ...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-x64.msi"" /qn /norestart ALLUSERS=1"; Check: Is64BitInstallMode; StatusMsg: Installing TortoiseOverlays.dll ...
