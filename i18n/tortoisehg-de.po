@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-06-28 05:54+0000\n"
-"PO-Revision-Date: 2009-06-29 18:59+0000\n"
+"PO-Revision-Date: 2009-06-30 19:53+0000\n"
 "Last-Translator: simohe <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-30 04:36+0000\n"
+"X-Launchpad-Export-Date: 2009-07-01 04:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: hggtk\changeset.py:147
@@ -39,7 +39,7 @@ msgstr "das ist eine binäre Datei\n"
 
 #: hggtk\hgshelve.py:148
 msgid "%d hunks, %d lines changed\n"
-msgstr "%d Brocken, %d Zeilen geändert\n"
+msgstr "%d Blöcke, %d Zeilen geändert\n"
 
 #: hggtk\hgshelve.py:320
 msgid " [Ynsfdaq?] "
@@ -55,19 +55,19 @@ msgstr " und "
 
 #: hggtk\hgshelve.py:361
 msgid "shelve this change to %r?"
-msgstr "Diese Änderung zurückstellen auf: %r ?"
+msgstr "Diese Änderung an %r zwischenlagern?"
 
 #: hggtk\hgshelve.py:433
 msgid "shelve can only be run interactively"
-msgstr "zurückstellen ist nur inter-aktiv möglich"
+msgstr "Zwischenlagern ist nur interaktiv möglich"
 
 #: hggtk\hgshelve.py:437
 msgid "shelve data already exists"
-msgstr "zurückstellungs daten existieren bereits"
+msgstr "Bereits daten zwischengelagert"
 
 #: hggtk\hgshelve.py:468
 msgid "no changes to shelve\n"
-msgstr "keine Änderungen zum Zurückstellen\n"
+msgstr "keine Änderungen zum Zwischenlagern\n"
 
 #: hggtk\hgshelve.py:502
 msgid "applying patch\n"
@@ -169,6 +169,8 @@ msgstr "Repository '%s' ist nicht lokal"
 #: hggtk\about.py:52
 msgid "Several icons are courtesy of the TortoiseSVN project"
 msgstr ""
+"Verschiedene Icons wurden freundlicherweise durch das TortoiseSVN-Projekt "
+"zur Verfügung gestellt."
 
 #: hggtk\backout.py:24
 msgid "Backout changeset - "
@@ -275,7 +277,7 @@ msgstr "Etiketten:"
 
 #: hggtk\changeset.py:197
 msgid " %s is larger than the specified max diff size"
-msgstr ""
+msgstr " %s ist grösser als die maximal konfigurierte Vergleich-Grösse"
 
 #: hggtk\changeset.py:292
 msgid "_visual diff"
@@ -367,7 +369,7 @@ msgstr "Proxyserver verwenden"
 
 #: hggtk\clone.py:143
 msgid "Remote Cmd:"
-msgstr ""
+msgstr "Entfernter Bef.:"
 
 #: hggtk\clone.py:157 hggtk\thgshelve.py:151
 msgid "Cancel"
@@ -415,7 +417,7 @@ msgstr "Zweig-Befehle"
 
 #: hggtk\commit.py:37
 msgid "Changes take effect on next commit"
-msgstr ""
+msgstr "Änderungen werden bei der nächsten Übernahme aktiv"
 
 #: hggtk\commit.py:38
 msgid "No branch changes"
@@ -518,7 +520,7 @@ msgstr "Nichts übernommen"
 
 #: hggtk\commit.py:407
 msgid "No committable files selected"
-msgstr ""
+msgstr "Keine gewählte Datei kann übernommen werden"
 
 #: hggtk\commit.py:424 hggtk\commit.py:479 hggtk\merge.py:83
 #: hggtk\thgconfig.py:465
@@ -752,7 +754,7 @@ msgstr "Starte diese Suche"
 
 #: hggtk\datamine.py:225
 msgid "Regular expression search pattern"
-msgstr ""
+msgstr "Suchmuster (Regulärer Ausdruck)"
 
 #: hggtk\datamine.py:226
 msgid ""
@@ -816,7 +818,7 @@ msgstr "Suche \"%s\""
 
 #: hggtk\datamine.py:473
 msgid "File is unrevisioned"
-msgstr ""
+msgstr "Datei wird nicht verwaltet"
 
 #: hggtk\datamine.py:474
 msgid "Unable to annotate "
@@ -852,11 +854,11 @@ msgstr " Meldungen und Fehler"
 
 #: hggtk\gdialog.py:399
 msgid "No visual diff configured"
-msgstr ""
+msgstr "kein Vergleichswerkzeug konfiguriert"
 
 #: hggtk\gdialog.py:400
 msgid "Please select a visual diff application."
-msgstr ""
+msgstr "Bitte konfigurieren Sie ein visuelles Vergleichswerkzeug"
 
 #: hggtk\gdialog.py:459
 msgid "making snapshot of %d files from rev %s\n"
@@ -984,7 +986,7 @@ msgstr "Sende Mercurial Patches"
 
 #: hggtk\hgemail.py:64
 msgid "Envelope"
-msgstr ""
+msgstr "Umschlag"
 
 #: hggtk\hgemail.py:65 hggtk\taskbarui.py:45
 msgid "Options"
@@ -1064,6 +1066,9 @@ msgid ""
 "from them. This is the safest way to send changes to recipient Mercurial "
 "users."
 msgstr ""
+"Bündeldateien enthalten ganze Änderungssätze in binärem Format. Ein Import "
+"erfolgt mit herunterladen (pull). Dies ist die sicherste Art um Änderungen "
+"an andere Benutzer von Mercurial zu senden."
 
 #: hggtk\hgemail.py:155
 msgid "attach"
@@ -1075,15 +1080,15 @@ msgstr "Patches als Anhang senden"
 
 #: hggtk\hgemail.py:158
 msgid "inline"
-msgstr ""
+msgstr "eingebettet"
 
 #: hggtk\hgemail.py:160
 msgid "send patches as inline attachments"
-msgstr ""
+msgstr "Sende Patches als eingebettete Anhänge"
 
 #: hggtk\hgemail.py:161
 msgid "diffstat"
-msgstr ""
+msgstr "diffstat"
 
 #: hggtk\hgemail.py:163
 msgid "add diffstat output to messages"
@@ -1206,14 +1211,16 @@ msgstr "Unbekannter Inhalt im Patch: %r"
 msgid ""
 "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
 msgstr ""
+"Total: %d Blöcke (%d geänderte Zeilen); gewählt: %d Blöcke (%d geänderte "
+"Zeilen)"
 
 #: hggtk\hgshelve.py:294
 msgid "unhandled transition: %s -> %s"
-msgstr ""
+msgstr "Unbehandelter Übergang: %s -> %s"
 
 #: hggtk\hgshelve.py:350
 msgid "shelve changes to %s?"
-msgstr ""
+msgstr "Änderungen an %s zwischenlagern?"
 
 #: hggtk\hgshelve.py:400
 msgid "backup %r as %r\n"
@@ -1221,7 +1228,7 @@ msgstr "Sicherungskopie von %r als %r\n"
 
 #: hggtk\hgshelve.py:514
 msgid "saving patch to shelve\n"
-msgstr ""
+msgstr "Patch zwichenlagern\n"
 
 #: hggtk\hgshelve.py:525 hggtk\hgshelve.py:576
 msgid "restoring %r to %r\n"
@@ -1229,7 +1236,7 @@ msgstr "Stelle %r als %r wieder her\n"
 
 #: hggtk\hgshelve.py:527
 msgid "removing shelve file\n"
-msgstr ""
+msgstr "Datei zum zwischenlagern entfernen\n"
 
 #: hggtk\hgshelve.py:536
 msgid "removing backup for %r : %r\n"
@@ -1253,15 +1260,17 @@ msgstr "Zurückgestellte Patches entfernen\n"
 
 #: hggtk\hgshelve.py:589
 msgid "unshelve completed\n"
-msgstr ""
+msgstr "entlagern abgeschlossen\n"
 
 #: hggtk\hgshelve.py:591
 msgid "nothing to unshelve\n"
-msgstr ""
+msgstr "nichts zum entlagern\n"
 
 #: hggtk\hgshelve.py:597
 msgid "mark new/missing files as added/removed before shelving"
 msgstr ""
+"Vor dem zwischenlagern neue und fehlende Dateien als hinzugefügt, respektive "
+"entfernt, markieren"
 
 #: hggtk\hgshelve.py:599
 msgid "overwrite existing shelve data"
@@ -1269,7 +1278,7 @@ msgstr "existierende zurückgestellte Daten überschreiben"
 
 #: hggtk\hgshelve.py:601
 msgid "append to existing shelve data"
-msgstr "an existierende zurückgestellte Daten anhängen"
+msgstr "an vorhandene zurückgestellte Daten anhängen"
 
 #: hggtk\hgshelve.py:603
 msgid "hg shelve [OPTION]... [FILE]..."
@@ -1277,11 +1286,11 @@ msgstr "hg shelve [OPTION]... [DATEI]..."
 
 #: hggtk\hgshelve.py:606
 msgid "inspect shelved changes only"
-msgstr "Zurückgestellte Änderungen nur ansehen"
+msgstr "Zwischengelagerte Änderungen nur ansehen"
 
 #: hggtk\hgshelve.py:608
 msgid "proceed even if patches do not unshelve cleanly"
-msgstr ""
+msgstr "Fortfahren auch wenn Patches nicht korrekt entlagert werden konnten"
 
 #: hggtk\hgthread.py:176
 msgid "[command returned code %d]\n"
@@ -1550,7 +1559,7 @@ msgstr "Änderungssatz, der mit dem Vergleichswerkzeug angezeigt wird"
 
 #: hggtk\hgtk.py:636
 msgid "revisions to view in diff tool"
-msgstr ""
+msgstr "Revisionen, die mit dem Vergleichswerkzeug angezeigt werden"
 
 #: hggtk\hgtk.py:637
 msgid "launch visual diff tool"
@@ -1594,7 +1603,7 @@ msgstr "Revisionen zur Anzeige filtern"
 
 #: hggtk\history.py:64
 msgid "_DataMine"
-msgstr ""
+msgstr "_DataMine"
 
 #: hggtk\history.py:66
 msgid "Search Repository History"
@@ -1786,7 +1795,7 @@ msgstr "Anwenden"
 
 #: hggtk\logfilter.py:31
 msgid "Log Filter - %s"
-msgstr ""
+msgstr "Log Filter - %s"
 
 #: hggtk\logfilter.py:46 hggtk\logview\treeview.py:398
 msgid "Branch"
@@ -1810,7 +1819,7 @@ msgstr "Suchfilter"
 
 #: hggtk\logfilter.py:82
 msgid "Search repository changelog with criteria"
-msgstr ""
+msgstr "Historie des Projektverzeichnisses mit Kriterien durchsuchen"
 
 #: hggtk\logfilter.py:94
 msgid "File(s):"
@@ -1857,7 +1866,7 @@ msgstr "Ungültiger Revisionsbereich"
 
 #: hggtk\logview\treeview.py:357
 msgid "Graph"
-msgstr ""
+msgstr "Graph"
 
 #: hggtk\logview\treeview.py:385
 msgid "ID"
@@ -1926,7 +1935,7 @@ msgstr "Vorgang von hg abbrechen"
 
 #: hggtk\recovery.py:47
 msgid "Clean"
-msgstr ""
+msgstr "Bereinigen"
 
 #: hggtk\recovery.py:49
 msgid "Clean checkout, undo all changes"
@@ -1934,11 +1943,11 @@ msgstr "Alle Änderungen verwerfen (bereinigtes aktualisieren)"
 
 #: hggtk\recovery.py:52
 msgid "Rollback"
-msgstr ""
+msgstr "Zurückrollen"
 
 #: hggtk\recovery.py:54
 msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
-msgstr ""
+msgstr "Letzte Übermittlung zum Projektverzeichnis zurückrollen"
 
 #: hggtk\recovery.py:58
 msgid "Recover"
@@ -1954,7 +1963,7 @@ msgstr "Überprüfen"
 
 #: hggtk\recovery.py:65
 msgid "Validate repository consistency"
-msgstr ""
+msgstr "Überprüft das Projektarchiv auf Korrektheit"
 
 #: hggtk\recovery.py:99 hggtk\synch.py:367
 msgid "Cannot close now"
@@ -1978,11 +1987,11 @@ msgstr "Kann bei %s kein Projektarchiv finden\n"
 
 #: hggtk\recovery.py:137
 msgid "Confirm rollback repository"
-msgstr ""
+msgstr "Zurückrollen bestätigen"
 
 #: hggtk\recovery.py:138
 msgid "Rollback repository '%s' ?"
-msgstr ""
+msgstr "Projektverzeichnis '%s' zurückrollen?"
 
 #: hggtk\recovery.py:159 hggtk\synch.py:507
 msgid "Cannot run now"
@@ -2278,7 +2287,7 @@ msgstr "Die Datei ist grösser als die gegebene maximale Grösse.\n"
 
 #: hggtk\status.py:911
 msgid "Hunk selection is disabled for this file.\n"
-msgstr ""
+msgstr "Die Auswahl von Blöcken ist in dieser Datei nicht möglich.\n"
 
 #: hggtk\status.py:1081 hggtk\status.py:1102
 msgid "Nothing Reverted"
@@ -2424,11 +2433,11 @@ msgstr "Konfiguriere die Pfade von anderen Projektarchiven"
 
 #: hggtk\synch.py:106
 msgid "Repo:"
-msgstr ""
+msgstr "Proj.arch.:"
 
 #: hggtk\synch.py:111
 msgid "Bundle:"
-msgstr ""
+msgstr "Bündel:"
 
 #: hggtk\synch.py:155
 msgid "Post pull operation"
@@ -2709,15 +2718,16 @@ msgstr ""
 
 #: hggtk\thgconfig.py:34
 msgid "Visual Diff Command"
-msgstr ""
+msgstr "Befehl zum visuellen Vergleichen"
 
 #: hggtk\thgconfig.py:35
 msgid "Specify visual diff tool; must be an extdiff command"
 msgstr ""
+"Visuelles Vergleichswerkzeug angeben; muss ein Befehl von extiff sein"
 
 #: hggtk\thgconfig.py:36
 msgid "Skip Diff Window"
-msgstr ""
+msgstr "Vergleichsfenster überspringen"
 
 #: hggtk\thgconfig.py:37
 msgid ""
@@ -2725,6 +2735,11 @@ msgid ""
 "tool's directory diff feature.  Only enable this feature if you know your "
 "diff tool has a valid extdiff configuration.  Default: False"
 msgstr ""
+"Überspringe den eingebauten visuellen Vergleichsdialog und benutze direkt "
+"die Möglichkeit des Vergleichswerkzeugs um Verzeichnisse zu vergleichen. "
+"Schalten Sie diese Option nur ein, wenn sie wissen, dass ihr "
+"Vergleichswerkzeug eine gültige Konfiguration für extdiff hat. "
+"Voreinstellung: False"
 
 #: hggtk\thgconfig.py:41
 msgid "Visual Editor"
@@ -2866,7 +2881,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:89
 msgid "Log Batch Size"
-msgstr ""
+msgstr "Log-Stapel-Grösse"
 
 #: hggtk\thgconfig.py:90
 msgid ""
@@ -2883,6 +2898,8 @@ msgid ""
 "Allow the changelog viewer to copy the changeset hash of the currently "
 "selected changeset into the clipboard. Default: False"
 msgstr ""
+"Die Historieanzeige kopiert den Hash vom ausgewählten Änderungssatz in die "
+"Zwischenablage. Voreinstellung: False"
 
 #: hggtk\thgconfig.py:99
 msgid "After pull operation"
@@ -2947,7 +2964,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:121
 msgid "Port to listen on"
-msgstr ""
+msgstr "Port auf dem gehorcht werden soll"
 
 #: hggtk\thgconfig.py:121 hggtk\thgconfig.py:231
 msgid "Port"
@@ -2992,6 +3009,7 @@ msgstr "Maximale Änderungen"
 #: hggtk\thgconfig.py:131
 msgid "Maximum number of changes to list on the changelog."
 msgstr ""
+"Maximale Anzahl Änderungssätze, die in der Historieanzeige angezeigt werden"
 
 #: hggtk\thgconfig.py:132
 msgid "Allow Push"
@@ -3037,7 +3055,7 @@ msgstr "Name des Zeichensatzes"
 
 #: hggtk\thgconfig.py:151 hggtk\thgconfig.py:232
 msgid "Host"
-msgstr ""
+msgstr "Rechner"
 
 #: hggtk\thgconfig.py:152
 msgid ""
@@ -3092,7 +3110,7 @@ msgstr "Kopie"
 
 #: hggtk\thgconfig.py:170
 msgid "Comma-separated list of carbon copy recipient email addresses"
-msgstr ""
+msgstr "Kommagetrennte Liste der Empfänger von Kopien"
 
 #: hggtk\thgconfig.py:172
 msgid "Bcc"
@@ -3100,7 +3118,7 @@ msgstr "Blindkopie"
 
 #: hggtk\thgconfig.py:173
 msgid "Comma-separated list of blind carbon copy recipient email addresses"
-msgstr ""
+msgstr "Kommagetrennte Liste der Empfänger von Blindkopien"
 
 #: hggtk\thgconfig.py:175
 msgid "method"
@@ -3172,6 +3190,8 @@ msgstr "Lokaler Rechnername"
 #: hggtk\thgconfig.py:193
 msgid "Hostname the sender can use to identify itself to the mail server."
 msgstr ""
+"Rechnernamen, den der Computer verwende kann, um sich beim Mailserver zu "
+"identifizieren."
 
 #: hggtk\thgconfig.py:196
 msgid "Git Format"
@@ -3180,6 +3200,8 @@ msgstr "Git-Format"
 #: hggtk\thgconfig.py:197
 msgid "Use git extended diff header format. Default: False"
 msgstr ""
+"Nutze das erweiterte (git) Format in den Kopfdaten von Vergleichen. "
+"Voreinstellung: False"
 
 #: hggtk\thgconfig.py:199
 msgid "No Dates"
@@ -3212,7 +3234,7 @@ msgstr ""
 
 #: hggtk\thgconfig.py:208
 msgid "Ignore WS Amount"
-msgstr ""
+msgstr "ign. Leeränderungen"
 
 #: hggtk\thgconfig.py:209
 msgid "Ignore changes in the amount of white space. Default: False"
@@ -3274,7 +3296,7 @@ msgstr "Änderungsprotokoll"
 
 #: hggtk\thgconfig.py:471
 msgid "Sync"
-msgstr ""
+msgstr "Synch."
 
 #: hggtk\thgconfig.py:475
 msgid "Web"
@@ -3286,7 +3308,7 @@ msgstr "Proxy"
 
 #: hggtk\thgconfig.py:484
 msgid "Diff"
-msgstr ""
+msgstr "Vergleich"
 
 #: hggtk\thgconfig.py:497
 msgid "Unapplied changes"
@@ -3363,7 +3385,7 @@ msgstr "Konnte Konfiguraitonsdatei nicht schreiben"
 #: hggtk\thgshelve.py:71 hggtk\thgshelve.py:133 hggtk\thgshelve.py:139
 #: hggtk\thgshelve.py:147
 msgid "Shelve"
-msgstr ""
+msgstr "Zwischenlagern"
 
 #: hggtk\thgshelve.py:72
 msgid "set aside selected changes"
@@ -3371,28 +3393,28 @@ msgstr "Gewählte Änderungen zur Seite stellen"
 
 #: hggtk\thgshelve.py:73
 msgid "Unshelve"
-msgstr ""
+msgstr "Entlagern"
 
 #: hggtk\thgshelve.py:74
 msgid "restore shelved changes"
-msgstr ""
+msgstr "zwischengelagerte Änderungen wiederherstellen"
 
 #: hggtk\thgshelve.py:97 hggtk\thgshelve.py:98 hggtk\thgshelve.py:99
 #: hggtk\thgshelve.py:102
 msgid "_shelve"
-msgstr ""
+msgstr "_zwischenlagern"
 
 #: hggtk\thgshelve.py:134
 msgid "No changes to shelve"
-msgstr ""
+msgstr "Keine Änderungen zum zwischenlagern"
 
 #: hggtk\thgshelve.py:140
 msgid "Please select diff chunks to shelve"
-msgstr ""
+msgstr "Bitte wählen Sie die Blöcke, die zwischengelagert werden sollen"
 
 #: hggtk\thgshelve.py:148
 msgid "<b>Shelve file exists!</b>"
-msgstr "<b>Shelve-Datei existiert!</b>"
+msgstr "<b>Zwischanlager-Datei (shelve) existiert!>/b>"
 
 #: hggtk\thgshelve.py:149
 msgid "Overwrite"
@@ -3420,7 +3442,7 @@ msgstr "lokale Änderungen überschreiben (--clean)"
 
 #: hggtk\visdiff.py:61
 msgid "Visual Diffs"
-msgstr ""
+msgstr "Visuelle Vergleiche"
 
 #: hggtk\visdiff.py:64
 msgid "Temporary files are removed when this dialog is closed"
@@ -3429,7 +3451,7 @@ msgstr ""
 
 #: hggtk\visdiff.py:82
 msgid "Always launch single files"
-msgstr ""
+msgstr "Einzelne Dateien direkt öffnen"
 
 #: hggtk\visdiff.py:108
 msgid "No repository"
@@ -3441,15 +3463,15 @@ msgstr "kein Projektverzeichnis gefunden"
 
 #: hggtk\visdiff.py:116
 msgid "Select diff tool"
-msgstr ""
+msgstr "Vergleichswerkzeug wählen"
 
 #: hggtk\visdiff.py:135
 msgid "No visual diff tool"
-msgstr ""
+msgstr "kein Vergleichswerkzeug"
 
 #: hggtk\visdiff.py:136
 msgid "No visual diff tool has been configured"
-msgstr ""
+msgstr "Es ist kein visuelles Vergleichswerkzeug konfiguriert"
 
 #: hggtk\visdiff.py:155
 msgid "changeset "
@@ -3461,11 +3483,11 @@ msgstr "Revision(en) "
 
 #: hggtk\visdiff.py:162
 msgid "working changes"
-msgstr ""
+msgstr "aktuelle Ändrungen"
 
 #: hggtk\visdiff.py:165
 msgid "Visual Diffs - "
-msgstr ""
+msgstr "visuelle Vergleiche - "
 
 #: hggtk\visdiff.py:173
 msgid "No file changes"
@@ -3477,15 +3499,15 @@ msgstr "keine Dateiänderungen zum Anzeigen"
 
 #: hggtk\visdiff.py:242
 msgid "Tool launch failure"
-msgstr ""
+msgstr "Werkzeug konnte nicht gestartet werden"
 
 #: hggtk\visdiff.py:243
 msgid "%s : %s"
-msgstr ""
+msgstr "%s : %s"
 
 #: thgutil\menuthg.py:168 thgutil\menuthg.py:303
 msgid "Create Clone"
-msgstr ""
+msgstr "Klon erstellen"
 
 #: thgutil\menuthg.py:169
 msgid "Create clone here from source"
@@ -3549,19 +3571,19 @@ msgstr "Status des Projektarchivs"
 
 #: thgutil\menuthg.py:238
 msgid "Shelve Changes"
-msgstr ""
+msgstr "Änderungen zwischenlagern"
 
 #: thgutil\menuthg.py:239
 msgid "Shelve or unshelve repository changes"
-msgstr ""
+msgstr "Änderungen vom Projektverzeichnis zwischenlagern oder entlagern"
 
 #: thgutil\menuthg.py:245
 msgid "Visual Diff"
-msgstr ""
+msgstr "Vergleichen"
 
 #: thgutil\menuthg.py:246
 msgid "View changes using GUI diff tool"
-msgstr ""
+msgstr "Änderungen mit visuellem Vergleichswerkzeug anzeigen"
 
 #: thgutil\menuthg.py:250
 msgid "Guess Renames"
@@ -3613,7 +3635,7 @@ msgstr "Zeige Informationen vom Änderungssatz für jede Zeile der Datei"
 
 #: thgutil\menuthg.py:280
 msgid "View Changelog"
-msgstr ""
+msgstr "Historie anzeigen"
 
 #: thgutil\menuthg.py:281
 msgid "View revision history"
