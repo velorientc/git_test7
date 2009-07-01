@@ -456,35 +456,59 @@ CShellExt::GetCommandString(
     UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved,
     LPSTR pszName, UINT cchMax)
 {
-    *pszName = 0;
-    char *psz;
+    const char *psz = "";
 
     TDEBUG_TRACE(
         "CShellExt::GetCommandString: idCmd = " << idCmd
         << ", uFlags = " << uFlags
     );
+
     MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter != MenuIdMap.end())
     {
         TDEBUG_TRACE(
             "CShellExt::GetCommandString: name = " << iter->second.name);
-        psz = (char*)iter->second.helpText.c_str();
+        psz = iter->second.helpText.c_str();
     }
     else
     {
         TDEBUG_TRACE(
             "CShellExt::GetCommandString: can't find idCmd " << idCmd);
-        psz = "";
     }
+
+    bool copied = false;
+    size_t size = 0;
 
     if (uFlags & GCS_UNICODE)
     {
-        wcscpy((wchar_t*)pszName, _WCSTR(psz));
+        wchar_t* const dest = reinterpret_cast<wchar_t*>(pszName);
+        *dest = 0;
+        const wchar_t* const src = _WCSTR(psz);
+        size = wcslen(src);
+        if (size < cchMax)
+        {
+            wcscpy(dest, src);
+            copied = true;
+        }
     }
     else
     {
-        strcpy((char*)pszName, psz);
+        *pszName = 0;
+        size = strlen(psz);
+        if (size < cchMax)
+        {
+            strcpy(pszName, psz);
+            copied = true;
+        }
     }
+
+    if (!copied)
+    {
+        TDEBUG_TRACE(
+            "CShellExt::GetCommandString: error: source string length (" 
+                << size << ") exceeds target buffer size (" << cchMax << ")");
+    }
+
     return NOERROR;
 }
 
