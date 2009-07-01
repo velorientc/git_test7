@@ -584,6 +584,11 @@ void CShellExt::DoHgtk(const std::string &cmd)
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
 
         const std::string tempfile = GetTemporaryFile();
+        if (tempfile.empty())
+        {
+            TDEBUG_TRACE("DoHgtk: error: GetTemporaryFile returned empty string");
+            return;
+        }
 
         TDEBUG_TRACE("DoHgtk: temp file = " << tempfile);
         HANDLE tempfileHandle = CreateFileA(
