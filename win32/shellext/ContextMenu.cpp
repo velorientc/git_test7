@@ -595,6 +595,12 @@ void CShellExt::DoHgtk(const std::string &cmd)
             FILE_SHARE_READ, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
         );
 
+        if (tempfileHandle == INVALID_HANDLE_VALUE)
+        {
+            TDEBUG_TRACE("DoHgtk: error: failed to create file " << tempfile);
+            return;
+        }
+
         typedef std::vector<std::string>::size_type ST;
         for (ST i = 0; i < myFiles.size(); i++)
         {
