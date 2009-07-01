@@ -584,15 +584,11 @@ void CShellExt::DoHgtk(const std::string &cmd)
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
 
         const std::string tempfile = GetTemporaryFile();
-        SECURITY_ATTRIBUTES sa;
-        memset(&sa, 0, sizeof(sa));
-        sa.nLength = sizeof(sa);
-        sa.bInheritHandle = TRUE;
 
         TDEBUG_TRACE("DoHgtk: temp file = " << tempfile);
         HANDLE tempfileHandle = CreateFileA(
             tempfile.c_str(), GENERIC_WRITE,
-            FILE_SHARE_READ, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
+            FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
         );
 
         if (tempfileHandle == INVALID_HANDLE_VALUE)
