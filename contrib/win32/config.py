@@ -12,6 +12,7 @@ of the GNU General Public License, incorporated herein by reference.
 # current executable to find our package data.
 
 import os
+import sys
 import win32api, win32process
 
 proc = win32api.GetCurrentProcess()
@@ -25,3 +26,10 @@ bin_path = os.path.dirname(procpath)
 license_path = os.path.join(bin_path, 'COPYING.txt')
 locale_path = os.path.join(bin_path, 'locale')
 icon_path = os.path.join(bin_path, 'icons')
+
+enc = sys.getfilesystemencoding()
+if enc:
+    bin_path = bin_path.encode(enc)
+    license_path = license_path.encode(enc)
+    locale_path = locale_path.encode(enc)
+    icon_path = icon_path.encode(enc)
