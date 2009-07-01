@@ -28,3 +28,4 @@ glob:win32/shellext/Debug/
 glob:win32/shellext/x64
 glob:win32/shellext/shellext.vcproj.*
 glob:win32/shellext/Release/
+glob:.DS_Store
