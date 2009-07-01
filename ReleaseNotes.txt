@@ -9,6 +9,191 @@ version.
 The ReleaseNotes page on the TortosieHg Wiki is usually kept up to date.
 http://bitbucket.org/tortoisehg/wiki/ReleaseNotes
 
+= 0.8 Release July 1, 2009 =
+
+== C++ Shell Extension ==
+
+The Python shell extension has been removed in favor of a pure C++ shell
+extension which directly reads the Mercurial dirstate for overlays, and
+produces hard-coded context menus.  This should fix much of the
+interoperability problems reported in issue #67, and it fixes the
+overlay performance problems we have suffered since version 0.1.
+
+To support fast overlay icons, we have introduced a taskbar application
+(thgtaskbar.exe, programmed in Python) that externalizes the refreshing
+of cache information (new cache file ".hg/thgstatus") into a separate
+server process (started on user logon), controlled by the shell
+extension over a named pipe. thgtaskbar.exe adds a systray icon with an
+options dialog to control settings affecting the shell extension.
+
+== X64 Support ==
+
+The C++ TortoiseHg shell extension works properly in x64 Vista and Win7
+environments.  Release 0.8 does not support having 32bit and 64bit
+extensions installed on the same machine.  We do plan to support this in
+0.9.
+
+== Translations ==
+
+TortoiseHg 0.8 is the first release to include translations. This
+release has translations for 13 locales.  Eight of those are full or
+nearly full translations.
+
+== Linux packages ==
+
+RPM and DEB packages will be made available for download for this
+release.
+
+== Bug fixes and Enhancements in 0.8 ==
+
+* #1  - never ending blinking overlays in Vista
+* #10 - support --close-branch in commit tool
+* #14 - consistent behavior in cmenu operations
+* #16 - overlays on repository root
+* #18 - hunk selection should survive refresh
+* #27 - Config dialog's path editor
+* #28 - merge workflow is clunky
+* #29 - support pull --rebase from synch dialog
+* #31 - consistent Y/N accelerators on question dialogs
+* #32 - consistent behavior of ctrl-w, ctrl-q, and ctrl-d
+* #36 - overlays are very slow
+* #38 - configure separate visual diff tool for single file use
+* #39 - avoid binary diff overhead where possible
+* #44 - consistent behavior in email dialog
+* #47 - bug report dialog for hgtk
+* #48 - Allow Visual Diff whenever unified diff is presented
+* #51 - visual diff should be default file action
+* #52 - add --remotecmd to advanced synch options
+* #53 - improve clone tool work flow
+* #54 - add commit button to merge tool
+* #58 - hide passwords in URLs in the synch tool
+* #59 - configurable context menu
+* #61 - adding a file just by two clicks
+* #64 - remember position and maximize state
+* #66 - file history vdiffs should filter by filename
+* #71 - context menus on Desktop
+* #67 - interoperability with other applications, especially Python apps
+* #82 - win32text breaks record and shelve
+* #96 - improve support for named branches in synch tool
+* #97 - improve branch support and workflow in update dialog
+* #104 - no URL history in synch dialog drop-down
+* #110 - commit option to insert file names into message
+* #111 - ctrl-enter to commit (accept response)
+* #112 - consistent loading of repo .hg/hgrc files
+* #114 - commit/status chokes on large files
+* #116 - fix ever-expanding thgconfig dialog
+* #117 - hgtk version should show hg version info
+* #123 - Changing the file categories selection status changes already selected items
+* #131 - Improve changelog performance with very large changesets
+* #132 - Specify the commiter 
+* #138 - consistent treatment of default paths
+* #140 - slow explorer even when overlays are disabled
+* #141 - show branches in merge tool
+* #145 - add ability to generate functional tarfile distributions
+* #159 - support internal:merge as merge tool option
+* #160 - give useful feedback when no changes are vdiffable
+* #161 - commit takes too long to startup
+* #164 - hide passwords in settings dialog (not in paths)
+* #169 - F5 to refresh
+* #172 - add utc column to changelog
+* #174 - add edit button for mercurial.ini in settings tool
+* #177 - add synch button to log viewer, when not launched from synch
+* #178 - edit user wide hgignore files
+* #180 - clone tool usability improvements
+* #184 - non-editable background color for description text in settings dialog
+* #185 - bold font and ctrl-p accelerator for wc parent in log tool
+* #187 - better dialogs for mercurial prompts (mostly from merging)
+* #188 - load extensions at hgtk startup, fixes some extensions
+* #192 - add 'show revision ancestry' to changelog tool
+* #205 - status is too slow with large files
+* #245 - allow missing files to be marked remove in status/commit tools
+* #246 - serve dialog locked up on address conflicts
+* allow revert to work in merge contexts (revert to either parent, or remerge)
+* allow searching in grep and annotate windows
+* display aliases in synchronize window, allow them to be used as URLs
+* Setup proper search columns in all treeview widgets
+* Catch HTTP errors cleanly in synchronize tool
+* annotate work-flow improvements.  ctrl-d everywhere, zoom to change, etc.
+* zsh completion file for hgtk
+
+== MacOSX support ==
+
+* hgtk works on MacOSX, but requires one to build GTK+
+* Workarounds for multiple window map events
+* Uses apple key for command sequences (%-W, %-Q, %-D)
+
+== Behavior Changes ==
+
+The Ctrl-O accelerator in the commit tool removed, replaced by a
+Ctrl-Enter generic accelerator that is common to many dialogs.
+
+Shell extension configuration removed from Mercurial.ini.  However they
+are editable in the taskbar options dialog and changes made there take
+effect immediately.
+
+There is no supported method in 0.8 for de-registering the shell
+extension without uninstalling THG.  You can globally disable the
+overlays via it's configurable option, but the context menu is always
+present.
+
+Merge and unmerge were removed from the shell context menu.  You must
+use the changelog tool to perform merges.
+
+The changelog tool does not show all file diffs in a changeset right
+away.  It only shows the first file's diffs.  To see all diffs at once,
+the user must click 'All Files' at the top of the file list.
+
+Changelog, commit, status, etc all obey a maximum file size for showing
+diffs (default is 1MB).  Files above this size will not be diffed for
+performance reasons (obviously you can still commit them).  This max
+diff limit is configurable per-repository via the settings dialog.
+
+The default dbl-click action in the Changelog tool is now visual diff.
+In previous releases it was 'Display Change'.
+
+Commit, status, shelve no longer show all diffs at once.  They only show
+diffs for the selected file.  This change was made for performance
+reasons.
+
+The 'show diffs' button was removed from commit, status, shelve.
+
+hgtk forks a separate process for GUI commands, freeing up the CLI.
+HGTK_NOFORK environment variable and the --nofork argument disable the
+forking behavior.  This will be user configurable in 0.9.
+
+== Installer / Source Changes ==
+
+The hgtk script has been moved from contrb/ into the project root.
+
+The hgproc script and batch file have been removed.
+
+The tortoise python package has been removed.
+
+The thgutil package has been added.
+
+The tracelog application has been removed, since THG no longer uses
+win32traceutil.  Dbgview from sysinternals can be used to debug the new
+shell extension.
+
+The forest and qct extensions are no longer bundled.  Forest is being
+replaced by a core Mercurial feature (subrepo) in hg-1.3, and qct has
+not been included in THG since 0.6.  Both extensions can still be used
+with THG 0.8, you must download them and then specify their full path in
+your user Mercurial.ini file.
+
+We no longer bundle extra GTK themes.  We only ship MS-Windows since it
+now works correctly on all the platforms we're interested in.
+
+We no longer bundle msvcp71.dll and msvcr.dll
+
+We no longer bundle Putty.exe and Puttygen.exe, but Pageant is still
+included.
+
+We now bundle win32 and x64 versions of TortoiseOverlays.
+
+
+= Release 0.7 March 1, 2009 =
+
 Bug fixes since 0.7:
 
 * thgutil: UNC paths should be filtered by 'localdisks' config
