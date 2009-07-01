@@ -584,16 +584,23 @@ void CShellExt::DoHgtk(const std::string &cmd)
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
 
         const std::string tempfile = GetTemporaryFile();
-        SECURITY_ATTRIBUTES sa;
-        memset(&sa, 0, sizeof(sa));
-        sa.nLength = sizeof(sa);
-        sa.bInheritHandle = TRUE;
+        if (tempfile.empty())
+        {
+            TDEBUG_TRACE("DoHgtk: error: GetTemporaryFile returned empty string");
+            return;
+        }
 
         TDEBUG_TRACE("DoHgtk: temp file = " << tempfile);
         HANDLE tempfileHandle = CreateFileA(
             tempfile.c_str(), GENERIC_WRITE,
-            FILE_SHARE_READ, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
+            FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
         );
+
+        if (tempfileHandle == INVALID_HANDLE_VALUE)
+        {
+            TDEBUG_TRACE("DoHgtk: error: failed to create file " << tempfile);
+            return;
+        }
 
         typedef std::vector<std::string>::size_type ST;
         for (ST i = 0; i < myFiles.size(); i++)
