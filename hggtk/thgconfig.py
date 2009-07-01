@@ -784,6 +784,7 @@ class ConfigDialog(gtk.Dialog):
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(desctext)
+        scrolledwindow.set_border_width(4)
         descframe.add(scrolledwindow)
 
         vbox = gtk.VBox()
