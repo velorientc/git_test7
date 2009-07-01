@@ -197,7 +197,7 @@ class ChangeSet(gdialog.GDialog):
         except LookupError:
             fctx = None
         if fctx and fctx.size() > getmaxdiffsize(self.ui):
-            lines = ['diff',
+            lines = ['diff', '', '',
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
             lines = []
