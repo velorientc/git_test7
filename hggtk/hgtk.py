@@ -269,14 +269,6 @@ def clone(ui, *pats, **opts):
 
 def commit(ui, *pats, **opts):
     """commit tool"""
-    ct = ui.config('tortoisehg', 'extcommit', None)
-    if ct == 'qct':
-        from mercurial import dispatch as _dispatch
-        try:
-            _dispatch.dispatch(ct, *pats, **opts)
-        except SystemExit:
-            pass
-        return
     portable_fork(ui)
     # move cwd to repo root if repo is merged, so we can show
     # all the changed files

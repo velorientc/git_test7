@@ -66,10 +66,6 @@ _tortoise_info = (
 _commit_info = (
     (_('Username'), 'ui.username', [],
         _('Name associated with commits')),
-    (_('External Commit Tool'), 'tortoisehg.extcommit', ['None', 'qct'],
-        _('Select commit tool launched by TortoiseHg. (Qct is no longer'
-        ' distributed as part of TortoiseHG.)'
-        ' Default: None (use the builtin tool)')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', ['0', '70'],
        _('Maximum length of the commit message summary line.'
          ' If set, TortoiseHG will issue a warning if the'
