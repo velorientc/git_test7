@@ -9,10 +9,10 @@ Summary:	Mercurial GUI command line tool hgtk
 Group:		Development/Tools
 License:	GPLv2
 URL:		http://bitbucket.org/tortoisehg/stable/wiki/
-Source0:	tortoisehg-hg.tgz
+Source0:	tortoisehg-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	python
-Requires:	python >= 2.4, mercurial >= 1.1.2, gnome-python2-gconf
+Requires:	python >= 2.4, mercurial >= 1.3, gnome-python2-gconf
 Requires:	gnome-python2-gtksourceview, pycairo, pygobject2, pygtk2 >= 2.10
 
 %description
@@ -30,7 +30,10 @@ which makes the Mercurial distributed revision control
 system available in the file manager with a graphical interface. 
 
 %prep
-%setup -q -n tortoisehg-hg
+%setup -q -n tortoisehg-%{version}
+
+# Fix for nautilus python extensions in lib64 on x86_64
+sed -i "s,lib/nautilus,%{_lib}/nautilus,g" setup.py
 
 cat > thgutil/config.py << EOT
 bin_path     = "%{_bindir}"
