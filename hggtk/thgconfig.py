@@ -647,7 +647,7 @@ class ConfigDialog(gtk.Dialog):
                     _('Path testing cannot work without a repository'))
             return
         model, path = selection.get_selected()
-        testpath = hglib.fromutf(model[path][1])
+        testpath = hglib.fromutf(model[path][2])
         if not testpath:
             return
         if testpath[0] == '~':
