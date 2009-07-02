@@ -379,7 +379,7 @@ class GDialog(gtk.Window):
             self.ui.pushbuffer()
             try:
                 command()
-            except util.Abort, inst:
+            except (util.Abort, IOError, OSError), inst:
                 Prompt(title + _(' Aborted'), str(inst), self).run()
                 return False, ''
         finally:
