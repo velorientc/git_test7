@@ -379,7 +379,7 @@ def serve(ui, *pats, **opts):
     gtkrun(run(ui, *pats, **opts))
 
 def status(ui, *pats, **opts):
-    """file status viewer"""
+    """file status & diff viewer"""
     portable_fork(ui)
     from hggtk.status import run
     gtkrun(run(ui, *pats, **opts))
@@ -631,7 +631,7 @@ table = {
     "^recovery|rollback|verify": (recovery, [], _('hgtk recovery')),
     "^shelve|unshelve": (shelve, [], _('hgtk shelve')),
     "^synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
-    "^status|st": (status,
+    "^status|st|diff": (status,
         [('r', 'rev', [], _('revisions to compare'))],
         _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
