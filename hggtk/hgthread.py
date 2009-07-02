@@ -23,14 +23,8 @@ class GtkUi(ui.ui):
     main thread to pickup.
     '''
     def __init__(self, src=None, outputq=None, errorq=None, dialogq=None,
-            responseq=None, parentui=None):
-        if parentui:
-            # Mercurial 1.2
-            super(GtkUi, self).__init__(parentui=parentui)
-            src = parentui
-        else:
-            # Mercurial 1.3
-            super(GtkUi, self).__init__(src)
+            responseq=None):
+        super(GtkUi, self).__init__(src)
         if src:
             self.outputq = src.outputq
             self.errorq = src.errorq
@@ -57,27 +51,18 @@ class GtkUi(ui.ui):
 
     def prompt(self, msg, choices=None, default="y"):
         import re
-        if not hglib.calliffunc(self.interactive): return default
-        if isinstance(choices, str):
-            pat = choices
-            choices = None
-        else:
-            pat = None
-        while True:
-            try:
-                # send request to main thread, await response
-                self.dialogq.put( (msg, True, choices, default) )
-                r = self.responseq.get(True)
-                if r is None:
-                    raise EOFError
-                if not r:
-                    return default
-                if not pat or re.match(pat, r):
-                    return r
-                else:
-                    self.write(_('unrecognized response\n'))
-            except EOFError:
-                raise util.Abort(_('response expected'))
+        if not self.interactive(): return default
+        try:
+            # send request to main thread, await response
+            self.dialogq.put( (msg, True, choices, default) )
+            r = self.responseq.get(True)
+            if r is None:
+                raise EOFError
+            if not r:
+                return default
+            return r
+        except EOFError:
+            raise util.Abort(_('response expected'))
 
     def getpass(self, prompt=None, default=None):
         # send request to main thread, await response
@@ -154,24 +139,7 @@ class HgThread(thread2.Thread):
 
     def run(self):
         try:
-            ret = None
-            if hasattr(self.ui, 'copy'):
-                # Mercurial 1.3
-                ret = hglib.dispatch._dispatch(self.ui, self.args)
-            else:
-                # Mercurial 1.2
-                # Some commands create repositories, and thus must create
-                # new ui() instances.  For those, we monkey-patch ui.ui()
-                # as briefly as possible.
-                origui = None
-                if self.args[0] in ('clone', 'init'):
-                    origui = ui.ui
-                    ui.ui = GtkUi
-                try:
-                    ret = hglib.thgdispatch(self.ui, None, self.args)
-                finally:
-                    if origui:
-                        ui.ui = origui
+            ret = hglib.dispatch._dispatch(self.ui, self.args)
             if ret:
                 self.ui.write(_('[command returned code %d]\n') % int(ret))
             else:
@@ -181,7 +149,5 @@ class HgThread(thread2.Thread):
                 self.postfunc(ret)
         except (hglib.RepoError, urllib2.HTTPError, util.Abort), e:
             self.ui.write_err(str(e) + '\n')
-        except Exception, e:
-            self.ui.write_err(str(e) + '\n')
-        except hglib.WinIOError, e:
+        except (Exception, OSError, IOError), e:
             self.ui.write_err(str(e) + '\n')

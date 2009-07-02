@@ -55,15 +55,17 @@ _tortoise_info = (
     (_('Bottom Diffs'), 'gtools.diffbottom', ['False', 'True'],
         _('Show the diff panel below the file list in status, shelve, and'
         ' commit dialogs.'
-        ' Default: False (show diffs to right of file list)')))
+        ' Default: False (show diffs to right of file list)')),
+    (_('Capture Stderr'), 'tortoisehg.stderrcapt', ['True', 'False'],
+        _('Redirect stderr to a buffer which is parsed at the end of'
+        ' the process for runtime errors. Default: True')),
+    (_('Fork hgtk'), 'tortoisehg.hgtkfork', ['True', 'False'],
+        _('When running hgtk from the command line, fork a background'
+        ' process to run graphical dialogs.  Default: True')))
 
 _commit_info = (
     (_('Username'), 'ui.username', [],
         _('Name associated with commits')),
-    (_('External Commit Tool'), 'tortoisehg.extcommit', ['None', 'qct'],
-        _('Select commit tool launched by TortoiseHg. (Qct is no longer'
-        ' distributed as part of TortoiseHG.)'
-        ' Default: None (use the builtin tool)')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', ['0', '70'],
        _('Maximum length of the commit message summary line.'
          ' If set, TortoiseHG will issue a warning if the'
