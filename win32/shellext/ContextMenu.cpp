@@ -64,7 +64,7 @@ MenuDescription menuDescList[] =
                     "general.ico", 0},
     {"thgstatus",   "Update Icons",
                     "Update icons for this repository",
-                    "menumerge.ico", 0},
+                    "refresh_overlays.ico", 0},
     {"userconf",    "Global Settings",
                     "Configure user wide settings",
                     "settings_user.ico", 0},
