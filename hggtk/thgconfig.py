@@ -422,7 +422,7 @@ class ConfigDialog(gtk.Dialog):
             if configrepo:
                 dialog.error_dialog(self, _('No repository found'),
                              _('no repo at ') + root)
-                self.response(gtk.RESPONSE_CANCEL)
+                self.response(None, gtk.RESPONSE_CANCEL)
 
         # Catch close events
         self.connect('response', self.should_live)
