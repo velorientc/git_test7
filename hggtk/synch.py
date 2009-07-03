@@ -453,7 +453,7 @@ class SynchDialog(gtk.Window):
         dlg = thgconfig.ConfigDialog(True)
         dlg.show_all()
         if newpath:
-            dlg.new_path(newpath)
+            dlg.new_path(newpath, 'default')
         else:
             dlg.focus_field('tortoisehg.postpull')
         dlg.run()

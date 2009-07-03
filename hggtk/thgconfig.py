@@ -571,14 +571,15 @@ class ConfigDialog(gtk.Dialog):
                     widgets[w].grab_focus()
                     return
 
-    def new_path(self, newpath):
+    def new_path(self, newpath, alias='new'):
         '''Add a new path to [paths], give default name, focus'''
         i = self.pathdata.insert_before(None, None)
         safepath = url.hidepassword(newpath)
-        alias, num = 'new', 0
-        while len([row for row in self.pathdata if row[0] == alias]) > 0:
-            num += 1
-            alias = 'new_%d' % num
+        if alias in [row[0] for row in self.pathdata]:
+            num = 0
+            while len([row for row in self.pathdata if row[0] == alias]) > 0:
+                num += 1
+                alias = 'new_%d' % num
         self.pathdata.set_value(i, 0, alias)
         self.pathdata.set_value(i, 1, '%s' % hglib.toutf(safepath))
         self.pathdata.set_value(i, 2, '%s' % hglib.toutf(newpath))
