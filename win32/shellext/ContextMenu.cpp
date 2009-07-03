@@ -152,16 +152,18 @@ void GetCMenuTranslation(
     LONG rv = RegOpenKeyExA(
         HKEY_CURRENT_USER, subkey.c_str(), 0, KEY_READ, &hkey);
 
-    if (rv != ERROR_SUCCESS || !hkey)
+    if (rv == ERROR_SUCCESS && hkey)
+    {
+        GetRegSZValue(hkey, "menuText", menuText);
+        GetRegSZValue(hkey, "helpText", helpText);
+    }
+    else
     {
         TDEBUG_TRACE("GetCMenuTranslation: RegOpenKeyExA(" << subkey << ") failed");
-        return;
     }
 
-    GetRegSZValue(hkey, "menuText", menuText);
-    GetRegSZValue(hkey, "helpText", helpText);
-
-    RegCloseKey(hkey);
+    if (hkey)
+        RegCloseKey(hkey);
 }
 
 
