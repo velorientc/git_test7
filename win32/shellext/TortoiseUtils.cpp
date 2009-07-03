@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "TortoiseUtils.h"
+
+#include <vector>
 #include <assert.h>
 
 #include <io.h>
@@ -252,5 +254,28 @@ FILE* fopenReadRenameAllowed(const char* path)
     }
 
     return f;
+}
+
+
+// read string value from registry
+int GetRegSZValue(HKEY hkey, const char* name, std::string& res)
+{
+    res = "";
+
+    if (!hkey)
+        return 0;
+
+    std::vector<BYTE> Data(300);
+    DWORD cbData = Data.size();
+
+    LONG rv = ::RegQueryValueExA(hkey, name, 0, 0, &Data[0], &cbData);
+
+    if (rv == ERROR_SUCCESS)
+    {
+        res = reinterpret_cast<char*>(&Data[0]);
+        return 1;
+    }
+
+    return 0;
 }
 

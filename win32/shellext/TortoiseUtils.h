@@ -23,5 +23,6 @@ std::string GetHgRepoRoot(const std::string& path);
 bool IsHgRepo(const std::string& path);
 int GetRegistryConfig(const std::string& name, std::string& res);
 FILE* fopenReadRenameAllowed(const char* path);
+int GetRegSZValue(HKEY hkey, const char* name, std::string& res);
 
 #endif
