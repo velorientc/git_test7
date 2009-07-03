@@ -179,7 +179,9 @@ class HgThread(thread2.Thread):
             self.ret = ret or 0
             if self.postfunc:
                 self.postfunc(ret)
-        except (hglib.RepoError, urllib2.HTTPError, util.Abort), e:
+        except util.Abort, e:
+            self.ui.write_err(_('abort: ') + str(e) + '\n')
+        except (hglib.RepoError, urllib2.HTTPError), e:
             self.ui.write_err(str(e) + '\n')
         except Exception, e:
             self.ui.write_err(str(e) + '\n')
