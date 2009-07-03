@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # front-end script for TortoiseHg dialogs
 #
 # Copyright (C) 2008-9 Steve Borho <steve@borho.org>
