@@ -273,7 +273,8 @@ class HgExtension(nautilus.MenuProvider,
             return
         root = os.path.commonprefix(files)
         root = paths.find_root(root)
-        self.invalidate(files, root)
+        if root:
+            self.invalidate(files, root)
 
     def invalidate(self, paths, root = ''):
         started = bool(self.inv_dirs)
