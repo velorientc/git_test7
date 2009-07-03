@@ -152,23 +152,16 @@ void GetCMenuTranslation(
     LONG rv = RegOpenKeyExA(
         HKEY_CURRENT_USER, subkey.c_str(), 0, KEY_READ, &hkey);
 
-    if (rv == ERROR_SUCCESS && hkey)
+    if (rv != ERROR_SUCCESS || !hkey)
     {
-        BYTE Data[MAX_PATH] = "";
-        DWORD cbData = MAX_PATH * sizeof(BYTE);
-
-        rv = RegQueryValueExA(hkey, "menuText", 0, 0, Data, &cbData);
-        if (rv == ERROR_SUCCESS)
-            menuText = reinterpret_cast<const char*>(&Data);
-
-        cbData = MAX_PATH * sizeof(BYTE);
-        rv = RegQueryValueExA(hkey, "helpText", 0, 0, Data, &cbData);
-        if (rv == ERROR_SUCCESS)
-            helpText = reinterpret_cast<const char*>(&Data);
+        TDEBUG_TRACE("GetCMenuTranslation: RegOpenKeyExA(" << subkey << ") failed");
+        return;
     }
 
-    if (hkey)
-        RegCloseKey(hkey);
+    GetRegSZValue(hkey, "menuText", menuText);
+    GetRegSZValue(hkey, "helpText", helpText);
+
+    RegCloseKey(hkey);
 }
 
 
