@@ -453,26 +453,29 @@ CShellExt::GetCommandString(
 {
     const char *psz = "";
 
-    TDEBUG_TRACE(
-        "CShellExt::GetCommandString: idCmd = " << idCmd
-        << ", uFlags = " << uFlags
-    );
-
     MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter != MenuIdMap.end())
     {
         TDEBUG_TRACE(
-            "CShellExt::GetCommandString: name = " << iter->second.name);
+            "CShellExt::GetCommandString: idCmd = " << idCmd
+            << ", uFlags = " << uFlags 
+            << ", name = " << iter->second.name
+            << ", helpText = " << iter->second.helpText
+        );
         psz = iter->second.helpText.c_str();
     }
     else
     {
         TDEBUG_TRACE(
-            "CShellExt::GetCommandString: can't find idCmd " << idCmd);
+            "CShellExt::GetCommandString: idCmd = " << idCmd
+            << ", uFlags = " << uFlags << " -> not found");
     }
 
     if (cchMax < 1)
+    {
+        TDEBUG_TRACE("CShellExt::GetCommandString: cchMax = " << cchMax);
         return NOERROR;
+    }
 
     size_t size = 0;
 
