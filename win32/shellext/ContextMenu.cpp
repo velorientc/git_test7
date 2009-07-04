@@ -453,55 +453,55 @@ CShellExt::GetCommandString(
 {
     const char *psz = "";
 
-    TDEBUG_TRACE(
-        "CShellExt::GetCommandString: idCmd = " << idCmd
-        << ", uFlags = " << uFlags
-    );
-
     MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter != MenuIdMap.end())
     {
         TDEBUG_TRACE(
-            "CShellExt::GetCommandString: name = " << iter->second.name);
+            "CShellExt::GetCommandString: idCmd = " << idCmd
+            << ", uFlags = " << uFlags 
+            << ", name = " << iter->second.name
+            << ", helpText = " << iter->second.helpText
+        );
         psz = iter->second.helpText.c_str();
     }
     else
     {
         TDEBUG_TRACE(
-            "CShellExt::GetCommandString: can't find idCmd " << idCmd);
+            "CShellExt::GetCommandString: idCmd = " << idCmd
+            << ", uFlags = " << uFlags << " -> not found");
     }
 
-    bool copied = false;
+    if (cchMax < 1)
+    {
+        TDEBUG_TRACE("CShellExt::GetCommandString: cchMax = " << cchMax);
+        return NOERROR;
+    }
+
     size_t size = 0;
 
     if (uFlags & GCS_UNICODE)
     {
         wchar_t* const dest = reinterpret_cast<wchar_t*>(pszName);
-        *dest = 0;
         const wchar_t* const src = _WCSTR(psz);
+
+        wcsncpy(dest, src, cchMax-1);
+        *(dest + cchMax-1) = 0;
+
         size = wcslen(src);
-        if (size < cchMax)
-        {
-            wcscpy(dest, src);
-            copied = true;
-        }
     }
     else
     {
-        *pszName = 0;
+        strncpy(pszName, psz, cchMax-1);
+        *(pszName + cchMax-1) = 0;
+
         size = strlen(psz);
-        if (size < cchMax)
-        {
-            strcpy(pszName, psz);
-            copied = true;
-        }
     }
 
-    if (!copied)
+    if (size > cchMax-1)
     {
         TDEBUG_TRACE(
-            "CShellExt::GetCommandString: error: source string length (" 
-                << size << ") exceeds target buffer size (" << cchMax << ")");
+            "CShellExt::GetCommandString: string was truncated: size = "
+                << size << ", cchMax = " << cchMax);
     }
 
     return NOERROR;
