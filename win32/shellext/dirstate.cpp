@@ -42,11 +42,7 @@ std::auto_ptr<Dirstate> Dirstate::read(const std::string& path, bool& unset)
     while (e.read(f, relpath))
     {
         if (e.unset())
-        {
             unset = true;
-            fclose(f);
-            return std::auto_ptr<Dirstate>(0);
-        }
 
         if (e.state == 'a')
             ++pd->num_added_;
