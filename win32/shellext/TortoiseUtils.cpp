@@ -187,7 +187,6 @@ HICON GetTortoiseIcon(const std::string& iconname)
     }
 
     std::string iconpath = thgdir + "\\icons\\" + iconname;
-    TDEBUG_TRACE("    GetTortoiseIcon: loading " + iconpath);
     HICON h = (HICON) LoadImageA(0, iconpath.c_str(), IMAGE_ICON,
             16, 16, LR_LOADFROMFILE);
     if (!h)
