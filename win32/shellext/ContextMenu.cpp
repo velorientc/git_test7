@@ -520,7 +520,6 @@ STDMETHODIMP
 CShellExt::HandleMenuMsg2(
     UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-    TDEBUG_ENTER("CShellExt::HandleMenuMsg2");
     // A great tutorial on owner drawn menus in shell extension can be found
     // here: http://www.codeproject.com/shell/shellextguide7.asp
 
