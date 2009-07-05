@@ -272,7 +272,7 @@ def commit(ui, *pats, **opts):
     if ct == 'qct':
         from mercurial import dispatch as _dispatch
         try:
-            _dispatch.dispatch(ct, *pats, **opts)
+            _dispatch.dispatch([ct], *pats)
         except SystemExit:
             pass
         return
