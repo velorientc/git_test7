@@ -17,7 +17,12 @@ from hggtk import gtklib, hgthread
 
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, progressbar=True, width=520, height=400):
-        title = 'hg ' + ' '.join(cmdline[1:])
+        if progressbar:
+            title = 'hg ' + ' '.join(cmdline[1:])
+        else:
+            # use short title if progressbar is not in use.  The
+            # calling code may not want to show the complete command
+            title = 'hg ' + ' '.join(cmdline[1:2])
         if len(title) > 80:
             title = title[:80] + '...'
         title = hglib.toutf(title.replace('\n', ' '))
