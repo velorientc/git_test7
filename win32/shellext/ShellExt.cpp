@@ -233,37 +233,28 @@ LPCRITICAL_SECTION CShellExt::GetCriticalSection()
 
 
 STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR* ppv)
-{
-    std::string clsname = "UNKNOWN CLSID";
-    
+{    
     *ppv = NULL;
     if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
     {
-        *ppv = (LPSHELLEXTINIT)this;
-        clsname = "IID_IShellExtInit";
+        *ppv = (LPSHELLEXTINIT) this;
     }
     else if (IsEqualIID(riid, IID_IContextMenu))
     {
-        *ppv = (LPCONTEXTMENU)this;
-        clsname = "IID_IContextMenu";
+        *ppv = (LPCONTEXTMENU) this;
     }
     else if (IsEqualIID(riid, IID_IContextMenu2))
     {
-        *ppv = (IContextMenu2 *) this;
-        clsname = "IID_IContextMenu2";
+        *ppv = (IContextMenu2*) this;
     }
     else if (IsEqualIID(riid, IID_IContextMenu3))
     {
-        *ppv = (IContextMenu3 *) this;
-        clsname = "IID_IContextMenu3";
+        *ppv = (IContextMenu3*) this;
     }
     else if (IsEqualIID(riid, IID_IShellIconOverlayIdentifier))
     {
-        *ppv = (IShellIconOverlayIdentifier *) this;
-        clsname = "IID_IShellIconOverlayIdentifier";
+        *ppv = (IShellIconOverlayIdentifier*) this;
     }
-
-    TDEBUG_TRACE("CShellExt::QueryInterface: " << clsname);
     
     if (*ppv)
     {
