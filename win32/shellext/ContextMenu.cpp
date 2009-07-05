@@ -18,6 +18,9 @@ struct MenuDescription
     UINT idCmd;
 };
 
+// According to http://msdn.microsoft.com/en-us/library/bb776094%28VS.85%29.aspx
+// the help texts for the commands should be reasonably short (under 40 characters)
+
 MenuDescription menuDescList[] =
 {
     {"commit",      "Commit...",
@@ -450,30 +453,73 @@ CShellExt::GetCommandString(
     UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved,
     LPSTR pszName, UINT cchMax)
 {
+    // see http://msdn.microsoft.com/en-us/library/bb776094%28VS.85%29.aspx
+
+    HRESULT res = S_FALSE;
+
     const char *psz = "";
 
-    MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
-    if (iter != MenuIdMap.end())
+    std::string sflags = "?";
+    switch (uFlags)
     {
-        TDEBUG_TRACE(
-            "CShellExt::GetCommandString: idCmd = " << idCmd
-            << ", uFlags = " << uFlags 
-            << ", name = " << iter->second.name
-            << ", helpText = " << iter->second.helpText
-        );
-        psz = iter->second.helpText.c_str();
+    case GCS_HELPTEXTW:
+        sflags = "GCS_HELPTEXTW"; break;
+    case GCS_HELPTEXTA:
+        sflags = "GCS_HELPTEXTA"; break;
+    case GCS_VALIDATEW:
+        sflags = "GCS_VALIDATEW"; break;
+    case GCS_VALIDATEA:
+        sflags = "GCS_VALIDATEA"; break;
+    case GCS_VERBW:
+        sflags = "GCS_VERBW"; break;
+    case GCS_VERBA:
+        sflags = "GCS_VERBA"; break;
+    }
+
+    TDEBUG_TRACE(
+        "CShellExt::GetCommandString: idCmd = " << idCmd 
+        << ", uFlags = " << uFlags << " (" << sflags << ")");
+
+    MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
+    if (iter == MenuIdMap.end())
+    {
+        TDEBUG_TRACE("CShellExt::GetCommandString: idCmd not found");
     }
     else
     {
         TDEBUG_TRACE(
-            "CShellExt::GetCommandString: idCmd = " << idCmd
-            << ", uFlags = " << uFlags << " -> not found");
+            "CShellExt::GetCommandString: name = \"" << iter->second.name << "\"");
+
+        if (uFlags == GCS_HELPTEXTW || uFlags == GCS_HELPTEXTA)
+        {
+            psz = iter->second.helpText.c_str();
+            res = S_OK;
+            
+            size_t size = iter->second.helpText.size();
+            if (size >= 40)
+            {
+                TDEBUG_TRACE(
+                    "CShellExt::GetCommandString: warning:" 
+                    << " length of help text is " << size
+                    << ", which is not reasonably short (<40)");
+            }
+        }
+        else if (uFlags == GCS_VERBW || uFlags == GCS_VERBA)
+        {
+            psz = iter->second.name.c_str();
+            res = S_OK;
+        }
+        else if (uFlags == GCS_VALIDATEW || uFlags == GCS_VALIDATEA)
+        {
+            res = S_OK;
+        }
     }
 
     if (cchMax < 1)
     {
-        TDEBUG_TRACE("CShellExt::GetCommandString: cchMax = " << cchMax);
-        return NOERROR;
+        TDEBUG_TRACE("CShellExt::GetCommandString: cchMax = " 
+            << cchMax << " (is <1)");
+        return res;
     }
 
     size_t size = 0;
@@ -496,6 +542,9 @@ CShellExt::GetCommandString(
         size = strlen(psz);
     }
 
+    TDEBUG_TRACE("CShellExt::GetCommandString: res = " << res 
+        << ", pszName = \"" << psz << "\"");
+
     if (size > cchMax-1)
     {
         TDEBUG_TRACE(
@@ -503,7 +552,7 @@ CShellExt::GetCommandString(
                 << size << ", cchMax = " << cchMax);
     }
 
-    return NOERROR;
+    return res;
 }
 
 
