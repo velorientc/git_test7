@@ -43,16 +43,17 @@ if 'THGDEBUG' in os.environ:
     sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
 else:
     import cStringIO
-    sys.stderr = cStringIO.StringIO()
+    mystderr = cStringIO.StringIO()
+    sys.stderr = mystderr
     ret = hggtk.hgtk.dispatch(sys.argv[1:])
-    sys.stderr.seek(0)
-    for l in sys.stderr.readlines():
+    mystderr.seek(0)
+    for l in mystderr.readlines():
         if l.startswith('Traceback') or l.startswith('TypeError'):
             from hggtk.bugreport import run
             from hggtk.hgtk import gtkrun
             from mercurial import ui
-            sys.stderr.seek(0)
-            error = 'Recoverable runtime error (stderr):\n' + sys.stderr.read()
+            mystderr.seek(0)
+            error = 'Recoverable runtime error (stderr):\n' + mystderr.read()
             opts = {}
             opts['cmd'] = ' '.join(sys.argv[1:])
             opts['error'] = error
