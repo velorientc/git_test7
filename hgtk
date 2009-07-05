@@ -26,9 +26,10 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
-from mercurial import demandimport;
+from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
+from mercurial import ui
 import cStringIO
 
 try:
@@ -39,10 +40,12 @@ except ImportError:
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
-if 'THGDEBUG' in os.environ:
+_ui = ui.ui()
+capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
+
+if not capt or 'THGDEBUG' in os.environ:
     sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
 else:
-    import cStringIO
     mystderr = cStringIO.StringIO()
     sys.stderr = mystderr
     ret = hggtk.hgtk.dispatch(sys.argv[1:])
@@ -51,12 +54,11 @@ else:
         if l.startswith('Traceback') or l.startswith('TypeError'):
             from hggtk.bugreport import run
             from hggtk.hgtk import gtkrun
-            from mercurial import ui
             mystderr.seek(0)
             error = 'Recoverable runtime error (stderr):\n' + mystderr.read()
             opts = {}
             opts['cmd'] = ' '.join(sys.argv[1:])
             opts['error'] = error
-            gtkrun(run(ui.ui(), **opts))
+            gtkrun(run(_ui, **opts))
             break
     sys.exit(ret)
