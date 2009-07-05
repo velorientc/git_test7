@@ -115,15 +115,9 @@ Dirstate* Dirstatecache::get(
 
     if (unset)
     {
-        TDEBUG_TRACE("Dirstatecache::get: ignored (unset entries)");
-        if (!iter->unset)
-        {
-            Thgstatus::update(cwd);
-            iter->unset = true;
-        }
-        return iter->dstate;
+        TDEBUG_TRACE("Dirstatecache::get: has unset entries");
     }
-    iter->unset = false;
+    iter->unset = unset;
 
     delete iter->dstate;
     iter->dstate = ds.release();
