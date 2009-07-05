@@ -251,7 +251,6 @@ void InsertMenuItemByName(
     HMENU hMenu, const std::string& name, UINT indexMenu,
     UINT idCmd, UINT idCmdFirst, const std::string& prefix)
 {
-    TDEBUG_TRACE("InsertMenuItemByName: name = " << name);
     MenuDescriptionMap::iterator iter = MenuDescMap.find(name);
     if (iter == MenuDescMap.end())
     {
