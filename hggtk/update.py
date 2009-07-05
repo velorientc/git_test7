@@ -44,8 +44,8 @@ class UpdateDialog(gtk.Window):
         lbl = gtk.Label(_('Update to:'))
         hbox.pack_start(lbl, False, False, 2)
 
-        # revisions combo box
-        combo = gtk.combo_box_new_text()
+        # revisions editable combo box
+        combo = gtk.combo_box_entry_new_text()
         hbox.pack_start(combo, True, True, 2)
         vbox.pack_start(hbox, False, False, 10)
         if rev != None:
