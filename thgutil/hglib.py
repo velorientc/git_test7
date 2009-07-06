@@ -22,7 +22,15 @@ from mercurial import dispatch, encoding, util
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
-hgversion = util.version()
+
+try:
+    # post 1.1.2
+    from mercurial import util
+    hgversion = util.version()
+except AttributeError:
+    # <= 1.1.2
+    from mercurial import version
+    hgversion = version.get_version()
 
 def toutf(s):
     """
