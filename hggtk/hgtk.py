@@ -186,6 +186,10 @@ def runcommand(ui, args):
     elif not cmd:
         return help_(ui, 'shortlist')
 
+    if options['repository']:
+        path = ui.expandpath(options['repository'])
+        cmdoptions['repository'] = path
+        os.chdir(path)
     path = paths.find_root(os.getcwd())
     if path:
         try:
@@ -195,9 +199,6 @@ def runcommand(ui, args):
             pass
     else:
         lui = ui
-    if options['repository']:
-        path = lui.expandpath(options['repository'])
-        cmdoptions['repository'] = path
 
     _loaded = {}
     extensions.loadall(ui)
