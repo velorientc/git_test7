@@ -155,6 +155,11 @@ def _parse(ui, args):
 def _runcatch(ui, args):
     try:
         try:
+            checkhgversion(hglib.hgversion)
+        except util.Abort, inst:
+            ui.status(_("abort: %s!\n") % inst)
+            return 0
+        try:
             return runcommand(ui, args)
         finally:
             ui.flush()
@@ -214,7 +219,6 @@ def runcommand(ui, args):
         raise hglib.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
 
-    checkhgversion(hglib.hgversion)
     try:
         return func(ui, *args, **cmdoptions)
     except TypeError, inst:
