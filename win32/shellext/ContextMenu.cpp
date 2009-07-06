@@ -478,7 +478,9 @@ CShellExt::GetCommandString(
 
     TDEBUG_TRACE(
         "CShellExt::GetCommandString: idCmd = " << idCmd 
-        << ", uFlags = " << uFlags << " (" << sflags << ")");
+        << ", uFlags = " << uFlags << " (" << sflags << ")"
+        << ", cchMax = " << cchMax
+    );
 
     MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter == MenuIdMap.end())
