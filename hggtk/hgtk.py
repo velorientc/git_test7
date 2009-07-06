@@ -573,7 +573,7 @@ def checkhgversion(v):
     # this is a series of hacks, but Mercurial's versioning scheme
     # doesn't lend itself to a "correct" solution.  This will at least
     # catch people who have old Mercurial packages.
-    reqver = ['1', '2']
+    reqver = ['1', '3']
     if not v or v == 'unknown' or len(v) == 12:
         # can't make any intelligent decisions about unknown or hashes
         return
