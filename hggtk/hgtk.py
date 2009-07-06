@@ -214,6 +214,7 @@ def runcommand(ui, args):
         raise hglib.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
 
+    checkhgversion(hglib.hgversion)
     try:
         return func(ui, *args, **cmdoptions)
     except TypeError, inst:
@@ -568,6 +569,26 @@ def help_(ui, name=None, with_version=False):
                 ui.write(" %-*s  %s\n" % (opts_len, first, second))
             else:
                 ui.write("%s\n" % first)
+
+def checkhgversion(v):
+    """range check the Mercurial version"""
+    # this is a series of hacks, but Mercurial's versioning scheme
+    # doesn't lend itself to a "correct" solution.  This will at least
+    # catch people who have old Mercurial packages.
+    reqver = ['1', '2']
+    if not v or v == 'unknown' or len(v) == 12:
+        # can't make any intelligent decisions about unknown or hashes
+        return
+    vers = v.split('.')[:2]
+    if vers == reqver:
+        return
+    nextver = list(reqver)
+    nextver[1] = chr(ord(reqver[1])+1)
+    if vers == nextver:
+        return
+    raise util.Abort(_('This version of TortoiseHg requires Mercurial '
+                       'version %s.n to %s.n') % ('.'.join(reqver),
+                           '.'.join(nextver)))
 
 def version(ui, **opts):
     """output version and copyright information"""
