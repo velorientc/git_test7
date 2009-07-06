@@ -201,11 +201,22 @@ class FileSelectionDialog(gtk.Dialog):
         if len(model) == 1 and self.singlecheck.get_active():
             self.launch(*model[0])
 
-    def delete_tmproot(self, _, tmproot):
+    def delete_tmproot(self, window, tmproot):
         vsettings = settings.Settings('visdiff')
         vsettings.set_value('launchsingle', self.singlecheck.get_active())
         vsettings.write()
-        shutil.rmtree(tmproot)
+        while True:
+            try:
+                shutil.rmtree(tmproot)
+                return
+            except (IOError, OSError), e:
+                resp = gdialog.CustomPrompt(_('Unable to delete temp files'),
+                    _('Close diff tools and try again, or quit to leak files?'),
+                    self, (_('Try &Again'), _('&Quit')), _('q')).run()
+                if resp == ord(_('a')):
+                    continue
+                else:
+                    return
 
     def rowactivated(self, tree, path, column):
         selection = tree.get_selection()
