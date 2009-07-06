@@ -121,7 +121,14 @@ class GDialog(gtk.Window):
         self.cwd = cwd or os.getcwd()
         self.ui = ui
         self.ui.setconfig('ui', 'interactive', 'off')
-        self.repo = repo or hg.repository(ui, path=paths.find_root())
+        if repo:
+            self.repo = repo
+        else:
+            root = paths.find_root()
+            if root:
+                self.repo = hg.repository(ui, path=root)
+            else:
+                self.repo = None
         self.pats = pats
         self.opts = opts
         self.tmproot = None
