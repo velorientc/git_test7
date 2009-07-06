@@ -10,7 +10,7 @@ dialog.  Other portions stolen from graphlog extension.
 import gtk
 import gobject
 import re
-from mercurial import util
+from mercurial import util, templatefilters
 from mercurial.hgweb import webutil
 from thgutil import hglib
 from hggtk import gtklib
@@ -41,7 +41,6 @@ class TreeModel(gtk.GenericTreeModel):
         self.branch_names = {}
         self.repo = repo
         self.line_graph_data = graphdata
-        self.author_re = re.compile('<.*@.*>', 0)
         self.color_func = color_func
         self.parents = [x.rev() for x in repo.parents()]
         self.heads = [repo[x].rev() for x in repo.heads()]
@@ -136,11 +135,9 @@ class TreeModel(gtk.GenericTreeModel):
                 bstr += '<span color="%s" background="%s"> %s </span> ' % \
                         ('black', '#aaffaa', branch)
 
-            if '<' in ctx.user():
-                author = self.author_re.sub('', ctx.user()).strip(' ')
-            else:
+            author = templatefilters.person(ctx.user())
+            if not author:
                 author = util.shortuser(ctx.user())
-
             author = hglib.toutf(author)
             date = hglib.displaytime(ctx.date())
             utc = hglib.utctime(ctx.date())
