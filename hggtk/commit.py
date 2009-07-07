@@ -637,12 +637,12 @@ class GCommit(GStatus):
                 if newbranch not in [p.branch() for p in self.repo.parents()]:
                     response = gdialog.Confirm(_('Confirm Override Branch'),
                             [], self, _('A branch named "%s" already exists,\n'
-                        'override?') % newbranch).run()
+                        'override?') % self.nextbranch).run()
                 else:
                     response = gtk.RESPONSE_YES
             else:
                 response = gdialog.Confirm(_('Confirm New Branch'), [], self,
-                        _('Create new named branch "%s"?') % newbranch).run()
+                        _('Create new named branch "%s"?') % self.nextbranch).run()
             if response == gtk.RESPONSE_YES:
                 self.repo.dirstate.setbranch(newbranch)
             elif response != gtk.RESPONSE_NO:
