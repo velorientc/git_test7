@@ -109,7 +109,10 @@ class TreeModel(gtk.GenericTreeModel):
             return []
 
         if revid not in self.revisions:
-            ctx = self.repo[revid]
+            try:
+                ctx = self.repo[revid]
+            except IndexError:
+                return None
 
             summary = ctx.description().replace('\0', '')
             if self.repo.ui.configbool('tortoisehg', 'longsummary'):

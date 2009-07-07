@@ -315,6 +315,7 @@ class TreeView(gtk.ScrolledWindow):
                     self.pbar.begin()
                 gobject.idle_add(self.populate, self.get_revision())
             else:
+                self.treeview.set_model(None)
                 self.pbar.set_status_text('Repository is empty')
 
     def set_author_color(self):

@@ -531,6 +531,8 @@ class GLog(gdialog.GDialog):
         dlg.hide()
         self.repo.invalidate()
         self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
 
     def backout_rev(self, menuitem):
         rev = self.currow[treemodel.REVID]
