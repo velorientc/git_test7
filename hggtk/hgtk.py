@@ -66,6 +66,8 @@ def dispatch(args):
 def portable_fork():
     if 'THG_HGTK_SPAWN' in os.environ or '--nofork' in sys.argv:
         return
+    if '--repository' in sys.argv or '-R' in sys.argv:
+        return
     # Spawn background process and exit
     if hasattr(sys, "frozen"):
         args = sys.argv
