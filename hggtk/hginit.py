@@ -112,7 +112,7 @@ class InitDialog(gtk.Window):
             self._dest_input.set_text(response)
             self._dest_input.set_position(-1)
 
-    def _btn_init_clicked(self, toolbutton, data=None):
+    def _btn_init_clicked(self, button, data=None):
         # gather input data
         dest = hglib.fromutf(self._dest_input.get_text())
 
