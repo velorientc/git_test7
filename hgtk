@@ -59,6 +59,7 @@ else:
             opts = {}
             opts['cmd'] = ' '.join(sys.argv[1:])
             opts['error'] = error
-            gtkrun(run(_ui, **opts))
+            opts['nofork'] = True
+            gtkrun(run, _ui, **opts)
             break
     sys.exit(ret)
