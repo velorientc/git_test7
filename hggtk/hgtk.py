@@ -124,11 +124,16 @@ def _parse(ui, args):
         raise hglib.ParseError(None, inst)
 
     if args:
-        cmd, args = args[0], args[1:]
-        aliases, i = cmdutil.findcmd(cmd, table, ui.config("ui", "strict"))
+        alias, args = args[0], args[1:]
+        aliases, i = cmdutil.findcmd(alias, table, ui.config("ui", "strict"))
+        for a in aliases:
+            if a.startswith(alias):
+                alias = a
+                break
         cmd = aliases[0]
         c = list(i[1])
     else:
+        alias = None
         cmd = None
         c = []
 
@@ -152,7 +157,7 @@ def _parse(ui, args):
         del options['listfile']
         args += get_list_from_file(listfile)
 
-    return (cmd, cmd and i[0] or None, args, options, cmdoptions)
+    return (cmd, cmd and i[0] or None, args, options, cmdoptions, alias)
 
 def _runcatch(ui, args):
     try:
@@ -185,7 +190,8 @@ def _runcatch(ui, args):
 
 def runcommand(ui, args):
     fullargs = args
-    cmd, func, args, options, cmdoptions = _parse(ui, args)
+    cmd, func, args, options, cmdoptions, alias = _parse(ui, args)
+    cmdoptions['alias'] = alias
     ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
 
     if options['help']:
@@ -392,8 +398,8 @@ def synch(ui, *pats, **opts):
     """repository synchronization tool"""
     portable_fork()
     from hggtk.synch import run
-    cmd = sys.argv[1]
-    if 'push'.startswith(cmd) or 'outgoing'.startswith(cmd):
+    cmd = opts['alias']
+    if cmd in ('push', 'outgoing', 'email'):
         opts['pushmode'] = True
     else:
         opts['pushmode'] = False
