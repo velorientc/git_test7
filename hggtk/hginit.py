@@ -98,6 +98,11 @@ class InitDialog(gtk.Window):
                 gtk.ACCEL_VISIBLE)
         hbbox.add(create)
 
+        self._dest_input.connect('activate', self._entry_dest_activated, create)
+
+    def _entry_dest_activated(self, entry, button):
+        self._btn_init_clicked(button)
+
     def _btn_dest_clicked(self, button):
         """ select source folder to clone """
         response = gtklib.NativeFolderSelectDialog(
