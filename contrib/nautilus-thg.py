@@ -107,7 +107,8 @@ class HgExtension(nautilus.MenuProvider,
         Returns hg.repo
         '''
         p = paths.find_root(path)
-
+        if not p:
+            return None
         try:
             return hg.repository(ui.ui(), path=p)
         except hglib.RepoError:

@@ -599,8 +599,8 @@ def checkhgversion(v):
     if vers == nextver:
         return
     raise util.Abort(_('This version of TortoiseHg requires Mercurial '
-                       'version %s.n to %s.n') % ('.'.join(reqver),
-                           '.'.join(nextver)))
+                       'version %s.n to %s.n, but finds %s') % ('.'.join(reqver),
+                           '.'.join(nextver), v))
 
 def version(ui, **opts):
     """output version and copyright information"""
