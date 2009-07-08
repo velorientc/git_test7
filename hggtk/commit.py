@@ -27,7 +27,8 @@ from hggtk import gtklib, thgconfig, gdialog, hgcmd
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
-                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                              gtk.STOCK_OK, gtk.RESPONSE_OK))
         gtklib.set_tortoise_keys(self)
         self.connect('response', self.response)
         self.set_title(_('Branch Operations'))
@@ -57,9 +58,11 @@ class BranchOperationDialog(gtk.Dialog):
 
         self.newbranchradio.set_active(True)
         if branch:
+            self.newbranch = branch
             self.branchentry.set_text(branch)
             self.newbranchradio.set_active(True)
         elif close:
+            self.closebranch = close
             self.closebranchradio.set_active(True)
         else:
             nochanges.set_active(True)
@@ -69,13 +72,14 @@ class BranchOperationDialog(gtk.Dialog):
         self.branchentry.set_sensitive(radio.get_active())
 
     def response(self, widget, response_id):
-        if response_id != gtk.RESPONSE_CLOSE:
-            self.destroy()
-            return
-        if self.newbranchradio.get_active():
-            self.newbranch = self.branchentry.get_text()
-        elif self.closebranchradio.get_active():
-            self.closebranch = True
+        if response_id == gtk.RESPONSE_OK:
+            if self.newbranchradio.get_active():
+                self.newbranch = self.branchentry.get_text()
+            elif self.closebranchradio.get_active():
+                self.closebranch = True
+            else:
+                self.newbranch = None
+                self.closebranch = False
         self.destroy()
 
 
