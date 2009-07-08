@@ -42,6 +42,7 @@ class BranchOperationDialog(gtk.Dialog):
         self.closebranchradio = gtk.RadioButton(nochanges,
                 _('Close current named branch'))
         self.branchentry = gtk.Entry()
+        self.branchentry.connect('activate', self.activated)
 
         hbox = gtk.HBox()
         hbox.pack_start(self.newbranchradio, False, False, 2)
@@ -70,6 +71,9 @@ class BranchOperationDialog(gtk.Dialog):
 
     def nbtoggle(self, radio):
         self.branchentry.set_sensitive(radio.get_active())
+
+    def activated(self, entry):
+        self.response(self, response_id=gtk.RESPONSE_OK)
 
     def response(self, widget, response_id):
         if response_id == gtk.RESPONSE_OK:
