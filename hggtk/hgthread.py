@@ -50,7 +50,6 @@ class GtkUi(ui.ui):
         pass
 
     def prompt(self, msg, choices=None, default="y"):
-        import re
         if not self.interactive(): return default
         try:
             # send request to main thread, await response
@@ -60,6 +59,22 @@ class GtkUi(ui.ui):
                 raise EOFError
             if not r:
                 return default
+            if choices:
+                # return char for Mercurial 1.3
+                choice = choices[r]
+                return choice[choice.index("&")+1].lower()
+            return r
+        except EOFError:
+            raise util.Abort(_('response expected'))
+
+    def promptchoice(self, msg, choices, default=0):
+        if not self.interactive(): return default
+        try:
+            # send request to main thread, await response
+            self.dialogq.put( (msg, True, choices, default) )
+            r = self.responseq.get(True)
+            if r is None:
+                raise EOFError
             return r
         except EOFError:
             raise util.Abort(_('response expected'))
@@ -127,7 +142,7 @@ class HgThread(thread2.Thread):
         if response_id == gtk.RESPONSE_DELETE_EVENT:
             self.responseq.put(None)
         else:
-            self.responseq.put(chr(response_id))
+            self.responseq.put(response_id)
 
     def dialog_response(self, dialog, response_id):
         if response_id == gtk.RESPONSE_OK:
