@@ -429,7 +429,7 @@ def shelve(ui, repo, *pats, **opts):
 
     ? - display help'''
 
-    if not hglib.calliffunc(ui.interactive):
+    if not ui.interactive():
         raise util.Abort(_('shelve can only be run interactively'))
 
     forced = opts['force'] or opts['append']
@@ -501,12 +501,7 @@ def shelve(ui, repo, *pats, **opts):
                 if dopatch:
                     ui.debug(_('applying patch\n'))
                     ui.debug(fp.getvalue())
-                    if patch.patchfile.__bases__:
-                        # Mercurial 1.3
-                        patch.internalpatch(fp, ui, 1, repo.root, eolmode=None)
-                    else:
-                        # Mercurial 1.2
-                        patch.internalpatch(fp, ui, 1, repo.root)
+                    patch.internalpatch(fp, ui, 1, repo.root, eolmode=None)
                 del fp
 
                 # 3c. apply filtered patch to clean repo (shelve)

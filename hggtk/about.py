@@ -53,10 +53,10 @@ class AboutDialog(gtk.AboutDialog):
 
         self.set_website("http://bitbucket.org/tortoisehg/stable/")
         self.set_name("TortoiseHg")
-        self.set_version("(version %s)" % version.version())
+        self.set_version(_("(version %s)") % version.version())
         if hasattr(self, 'set_wrap_license'):
             self.set_wrap_license(True)
-        self.set_copyright("Copyright 2009 TK Soh and others")
+        self.set_copyright(_("Copyright 2009 TK Soh and others"))
 
         thg_logo = paths.get_tortoise_icon('thg_logo_92x50.png')
         thg_icon = paths.get_tortoise_icon('thg_logo.ico')
@@ -72,7 +72,7 @@ class AboutDialog(gtk.AboutDialog):
             license = hgtk.shortlicense.splitlines()[1:]
             self.set_license('\n'.join(license))
 
-        self.set_comments("with " + lib_versions + "\n\n" + comment)
+        self.set_comments(_("with %s") % lib_versions + "\n\n" + comment)
         self.set_logo(gtk.gdk.pixbuf_new_from_file(thg_logo))
         self.set_icon_from_file(thg_icon)
         self.connect('response', self.response)
