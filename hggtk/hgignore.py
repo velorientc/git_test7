@@ -7,6 +7,7 @@
 import os
 import gtk
 import gobject
+import re
 
 from mercurial import hg, ui, match, util
 
@@ -186,14 +187,14 @@ class HgIgnoreDialog(gtk.Window):
         newregexp = hglib.fromutf(regexp_entry.get_text())
         if newregexp == '':
             return
-        newregexp = 're:' + newregexp
         try:
-            match.match(self.root, '', [], [newregexp])
-        except util.Abort, inst:
+            match.match(self.root, '', [], ['relre:' + newregexp])
+            re.compile(newregexp)
+        except (util.Abort, re.error), inst:
             gdialog.Prompt(_('Invalid regexp expression'), str(inst),
                            self).run()
             return
-        self.ignorelines.append(newregexp)
+        self.ignorelines.append('relre:' + newregexp)
         self.write_ignore_lines()
         regexp_entry.set_text('')
         self.refresh()
