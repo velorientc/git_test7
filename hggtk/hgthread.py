@@ -125,7 +125,7 @@ class HgThread(thread2.Thread):
     def prompt_response(self, dialog, response_id):
         dialog.destroy()
         if response_id == gtk.RESPONSE_DELETE_EVENT:
-            raise util.Abort('No response')
+            self.responseq.put(None)
         else:
             self.responseq.put(chr(response_id))
 

@@ -214,7 +214,7 @@ class ChangeSet(gdialog.GDialog):
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
             lines = []
-            matcher = cmdutil.match(self.repo, [wfile])
+            matcher = cmdutil.matchfiles(self.repo, [wfile])
             opts = mdiff.diffopts(git=True, nodates=True)
             for s in patch.diff(self.repo, n1, n2, match=matcher, opts=opts):
                     lines.extend(s.splitlines())

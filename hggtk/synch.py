@@ -11,6 +11,7 @@ import pango
 import Queue
 import os
 import sys
+import threading
 import urllib
 
 from mercurial import hg, ui, extensions, url
@@ -35,12 +36,11 @@ class SynchDialog(gtk.Window):
         self.last_drop_time = None
         self.lastcmd = []
 
-        self.saved_stdout = sys.stdout
-        self.saved_stderr = sys.stderr
-        if os.name == 'nt':
-            # Pipe stderr, stdout to self.write
-            sys.stdout = self
-            sys.stderr = self
+        # Replace stdout file descriptor with our own pipe
+        self.oldstdout = os.dup(sys.__stdout__.fileno())
+        self.stdoutq = Queue.Queue()
+        self.readfd, writefd = os.pipe()
+        os.dup2(writefd, sys.__stdout__.fileno())
 
         # persistent app data
         self._settings = settings.Settings('synch')
@@ -254,7 +254,20 @@ class SynchDialog(gtk.Window):
 
         self.load_settings()
         self.update_pull_setting()
-        gobject.idle_add(self.update_buttons)
+        gobject.idle_add(self.finalize_startup)
+
+    def finalize_startup(self, *args):
+        self.update_buttons()
+        def pollstdout(*args):
+            while True:
+                # blocking read of stdout pipe
+                o = os.read(self.readfd, 1024)
+                if o:
+                    self.stdoutq.put(o)
+                else:
+                    break
+        thread = threading.Thread(target=pollstdout, args=[])
+        thread.start()
 
     def update_pull_setting(self):
         ppull = self.repo.ui.config('tortoisehg', 'postpull', 'None')
@@ -287,7 +300,7 @@ class SynchDialog(gtk.Window):
         elif not os.path.isdir(path) and path.endswith('.hg'):
             self.pathtext.set_text(hglib.toutf(path))
 
-    def update_buttons(self, *args):
+    def update_buttons(self):
         self.buttonhbox.hide()
         try:
             # open a new repo, rebase can confuse cached repo
@@ -376,8 +389,8 @@ class SynchDialog(gtk.Window):
         else:
             self.update_settings()
             self._settings.write()
-            sys.stdout = self.saved_stdout
-            sys.stderr = self.saved_stderr
+            os.dup2(self.oldstdout, sys.__stdout__.fileno())
+            os.close(self.oldstdout)
             return False
 
     def delete(self, widget, event):
@@ -593,6 +606,12 @@ class SynchDialog(gtk.Window):
         while self.hgthread.geterrqueue().qsize():
             try:
                 msg = self.hgthread.geterrqueue().get(0)
+                self.write_err(msg)
+            except Queue.Empty:
+                pass
+        while self.stdoutq.qsize():
+            try:
+                msg = self.stdoutq.get(0)
                 self.write_err(msg)
             except Queue.Empty:
                 pass
