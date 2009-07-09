@@ -779,8 +779,8 @@ class GStatus(gdialog.GDialog):
                 FileName=fname).run()
         if not response:
             return
-        if reponse != wfile:
-            self.hg_copy([wfile, reponse])
+        if response != wfile:
+            self.hg_copy([wfile, response])
         return True
 
 
