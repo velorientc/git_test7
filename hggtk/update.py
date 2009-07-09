@@ -86,6 +86,12 @@ class UpdateDialog(gtk.Window):
         hbbox.add(update)
         update.grab_focus()
 
+        entry = combo.child
+        entry.connect('activate', self.entry_activated, update, combo, repo)
+
+    def entry_activated(self, entry, button, combo, repo):
+        self.update(button, combo, repo)
+
     def update(self, button, combo, repo):
         overwrite = self.overwrite.get_active()
         rev = combo.get_active_text()
