@@ -186,6 +186,7 @@ class TaskBarUI(gtk.Window):
 
         self.ovenable.set_active(overlayenable)
         self.lclonly.set_active(localdisks)
+        self.lclonly.set_sensitive(overlayenable)
         self.hgighlight_taskbaricon.set_active(hgighlight_taskbaricon)
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         for cmd, check in self.cmptoggles.iteritems():
