@@ -8,12 +8,12 @@ import os
 import gtk
 import gobject
 
-from mercurial import hg, ui, match
+from mercurial import hg, ui, match, util
 
 from thgutil.i18n import _
 from thgutil import shlib, hglib, paths
 
-from hggtk import gtklib
+from hggtk import gtklib, gdialog
 
 class HgIgnoreDialog(gtk.Window):
     'Edit a reposiory .hgignore file'
@@ -24,7 +24,8 @@ class HgIgnoreDialog(gtk.Window):
         gtklib.set_tortoise_keys(self)
 
         self.root = paths.find_root()
-        self.set_title(_('Ignore filter for ') + hglib.toutf(os.path.basename(self.root)))
+        base = os.path.basename(self.root)
+        self.set_title(_('Ignore filter for ') + hglib.toutf(base))
         self.set_default_size(630, 400)
         self.notify_func = None
 
@@ -169,16 +170,32 @@ class HgIgnoreDialog(gtk.Window):
         newglob = hglib.fromutf(glob_entry.get_text())
         if newglob == '':
             return
-        self.ignorelines.append('glob:' + newglob)
+        newglob = 'glob:' + newglob
+        try:
+            match.match(self.root, '', [], [newglob])
+        except util.Abort, inst:
+            gdialog.Prompt(_('Invalid glob expression'), str(inst),
+                           self).run()
+            return
+        self.ignorelines.append(newglob)
         self.write_ignore_lines()
+        glob_entry.set_text('')
         self.refresh()
 
     def add_regexp(self, widget, regexp_entry):
         newregexp = hglib.fromutf(regexp_entry.get_text())
         if newregexp == '':
             return
-        self.ignorelines.append('regexp:' + newregexp)
+        newregexp = 're:' + newregexp
+        try:
+            match.match(self.root, '', [], [newregexp])
+        except util.Abort, inst:
+            gdialog.Prompt(_('Invalid regexp expression'), str(inst),
+                           self).run()
+            return
+        self.ignorelines.append(newregexp)
         self.write_ignore_lines()
+        regexp_entry.set_text('')
         self.refresh()
 
     def thgrefresh(self, window):
