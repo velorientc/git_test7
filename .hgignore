@@ -4,7 +4,6 @@ syntax: glob
 *.rej
 *.pyc
 thgutil/__version__.py
-thgutil/__paths__.py
 build/
 dist/
 Output/
