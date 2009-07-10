@@ -355,7 +355,14 @@ class DataMineDialog(gdialog.GDialog):
         for x in excs:
             if x: args.extend(['-X', x])
         args.append(retext)
-        thread = thread2.Thread(target=hgcmd_toq, args=args)
+
+        def threadfunc(path, q, *args):
+            try:
+                hgcmd_toq(path, q, *args)
+            except util.Abort, e:
+                self.stbar.set_status_text(_('Abort: %s') % str(e))
+
+        thread = thread2.Thread(target=threadfunc, args=args)
         thread.start()
         frame._mythread = thread
         self.stop_button.set_sensitive(True)
