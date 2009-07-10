@@ -137,6 +137,7 @@ class MergeDialog(gtk.Window):
 
     def commit(self, button):
         dlg = commit.run(ui.ui())
+        dlg.set_transient_for(self)
         dlg.set_modal(True)
         dlg.set_notify_func(self.commit_notify, dlg)
         dlg.display()
