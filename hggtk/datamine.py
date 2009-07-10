@@ -9,6 +9,7 @@ import os
 import pango
 import Queue
 import threading
+import re
 
 from mercurial import util
 
@@ -331,6 +332,13 @@ class DataMineDialog(gdialog.GDialog):
         if not retext:
             gdialog.Prompt(_('No regular expression given'),
                    _('You must provide a search expression'), self).run()
+            regexp.grab_focus()
+            return
+        try:
+            re.compile(retext)
+        except re.error, e:
+            gdialog.Prompt(_('Invalid regular expression'), 
+                    _('Error: %s') % str(e), self).run()
             regexp.grab_focus()
             return
 
