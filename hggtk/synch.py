@@ -625,7 +625,13 @@ class SynchDialog(gtk.Window):
             self.stop_button.set_sensitive(False)
             if self.hgthread.return_code() is None:
                 self.write_err(_('[command interrupted]'))
-            if self.notify_func and self.lastcmd[0] == 'pull':
+            if not self.notify_func or self.lastcmd[0] != 'pull':
+                return False
+            if ' '.join(self.lastcmd[:2]) == 'pull --rebase':
+                # disable notification; rebase can be poisonous
+                self.notify_func = None
+                self.notify_args = None
+            else:
                 self.notify_func(self.notify_args)
             return False # Stop polling this function
 
