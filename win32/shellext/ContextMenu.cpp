@@ -83,6 +83,12 @@ MenuDescription menuDescList[] =
     {"vdiff",       "Visual Diff",
                     "View changes using GUI diff tool",
                     "TortoiseMerge.ico", 0},
+    {"hgignore",    "Edit Ignore Filter",
+                    "Edit repository ignore filter",
+                    "ignore.ico", 0},
+    {"guess",       "Guess Renames",
+                    "Detect renames and copies",
+                    "detect_rename.ico", 0},
 
     /* Add new items here */
 
@@ -95,7 +101,7 @@ enum menuDescListEntries
 {
     Commit, Init, Clone, Status, Shelve, Add, Revert, Remove, Rename,
     Log, Synch, Serve, Update, Recover, Thgstatus, Userconf, Repoconf,
-    About, Datamine, VDiff,
+    About, Datamine, VDiff, Ignore, Guess,
     /* Add new items here */
     Separator, EndOfList
 };
@@ -103,9 +109,9 @@ enum menuDescListEntries
 menuDescListEntries RepoNoFilesMenu[] =
 {
     Commit, Status, Shelve, VDiff, Separator,
-    Log, Separator,
-    Update, Separator,
-    Synch, Clone, Recover, Serve, Thgstatus, Separator,
+    Log, Update, Datamine, Thgstatus, Separator,
+    Synch, Serve, Clone, Init, Separator,
+    Ignore, Guess, Recover, Separator,
     Repoconf, Userconf, Separator,
     About, EndOfList
 };
