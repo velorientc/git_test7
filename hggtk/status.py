@@ -87,10 +87,12 @@ class GStatus(gdialog.GDialog):
         self.filechunks = {}
 
     def auto_check(self):
-        if self.pats or self.opts.get('check'):
+        # Only auto-check files once, and only if a pattern was given.
+        if self.pats and self.opts.get('check'):
             for entry in self.filemodel:
                 entry[FM_CHECKED] = True
             self.update_check_count()
+            self.opts['check'] = False
 
     def get_menu_info(self):
         """Returns menu info in this order:
