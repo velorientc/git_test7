@@ -308,6 +308,7 @@ class DataMineDialog(gdialog.GDialog):
         objs = (includes, excludes, follow)
         includes.connect('changed', self.update_following_possible, objs)
         excludes.connect('changed', self.update_following_possible, objs)
+        self.update_following_possible(includes, objs)
 
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
