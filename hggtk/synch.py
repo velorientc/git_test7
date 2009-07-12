@@ -572,9 +572,6 @@ class SynchDialog(gtk.Window):
         self._settings.mrul('src_paths').add(src)
         self._settings.write()
 
-        # update drop-down list
-        self.fill_path_combo()
-
     def flush(self, *args):
         pass
 
