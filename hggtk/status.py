@@ -1122,10 +1122,10 @@ class GStatus(gdialog.GDialog):
         elif self.merging:
             resp = gdialog.CustomPrompt(_('Which parent to revert to?'),
                     _('Revert file(s) to local or other parent?'),
-                    self, (_('&local'), _('&other')), _('l')).run()
-            if resp == ord(_('l')):
+                    self, (_('&local'), _('&other')), 0).run()
+            if resp == 0:
                 revertopts['rev'] = self.repo[None].p1().rev()
-            elif resp == ord(_('o')):
+            elif resp == 1:
                 revertopts['rev'] = self.repo[None].p2().rev()
             else:
                 return
