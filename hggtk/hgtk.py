@@ -611,6 +611,11 @@ def debugcomplete(ui, cmd='', **opts):
         cmdlist = [' '.join(c[0]) for c in cmdlist.values()]
     ui.write("%s\n" % "\n".join(sorted(cmdlist)))
 
+def archive(ui, *pats, **opts):
+    """create an unversioned archive of a repository revision"""
+    from hggtk.archive import run
+    gtkrun(run, ui, *pats, **opts)
+
 globalopts = [
     ('R', 'repository', '',
      _('repository root directory or symbolic path name')),
@@ -676,4 +681,7 @@ table = {
          [('o', 'options', None, _('show the command options'))],
          _('[-o] CMD')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
+    "^archive": (archive,
+        [('r', 'rev', '', _('revision to update'))],
+        ('hgtk archive')),
 }
