@@ -276,11 +276,19 @@ class PathEditDialog(gtk.Dialog):
         self.sethandlers()
 
         self.lastproto = None
-        self.protcombo.connect('changed', self.changed)
         self.update_sensitive()
         self.show_all()
 
     def sethandlers(self, enable=True):
+        # protocol combobox
+        if enable:
+            self.pcombo_hid = self.protcombo.connect('changed', self.changed)
+        else:
+            h = self.pcombo_hid
+            if h and self.protcombo.handler_is_connected(h):
+                self.protcombo.disconnect(h)
+
+        # other entries
         for n, (e, l, h) in self.entries.iteritems():
             if enable:
                 handler = self.changedurl if n == 'URL' else self.changed
@@ -316,7 +324,10 @@ class PathEditDialog(gtk.Dialog):
         user, host, port, folder, pw, scheme = self.urlparse(path)
 
         self.entries['Alias'][0].set_text(alias)
-        self.entries['URL'][0].set_text(url.hidepassword(path))
+        if scheme == 'local':
+            self.entries['URL'][0].set_text(path)
+        else:
+            self.entries['URL'][0].set_text(url.hidepassword(path))
         self.entries['User'][0].set_text(user or '')
         self.entries['Host'][0].set_text(host or '')
         self.entries['Port'][0].set_text(port or '')
