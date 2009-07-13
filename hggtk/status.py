@@ -846,10 +846,9 @@ class GStatus(gdialog.GDialog):
             return
         wfile = self.filemodel[paths[0]][FM_PATH]
         difftext = [_('===== Diff to first parent =====\n')]
-        wfiles = [self.repo.wjoin(wfile)]
         wctx = self.repo[None]
         pctxs = wctx.parents()
-        matcher = cmdutil.match(self.repo, wfiles, self.opts)
+        matcher = cmdutil.matchfiles(self.repo, [wfile])
         for s in patch.diff(self.repo, pctxs[0].node(), None,
                 match=matcher, opts=patch.diffopts(self.ui, self.opts)):
             difftext.extend(s.splitlines(True))
@@ -916,8 +915,7 @@ class GStatus(gdialog.GDialog):
             difftext.writelines(lines)
             difftext.seek(0)
         else:
-            wfiles = [self.repo.wjoin(wfile)]
-            matcher = cmdutil.match(self.repo, wfiles, self.opts)
+            matcher = cmdutil.matchfiles(self.repo, [wfile])
             diffopts = mdiff.diffopts(git=True, nodates=True)
             for s in patch.diff(self.repo, self._node1, self._node2,
                     match=matcher, opts=diffopts):
