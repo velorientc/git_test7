@@ -89,6 +89,9 @@ MenuDescription menuDescList[] =
     {"guess",       "Guess Renames",
                     "Detect renames and copies",
                     "detect_rename.ico", 0},
+    {"grep",        "Search History",
+                    "Search file revisions for patterns",
+                    "menurepobrowse.ico", 0},
 
     /* Add new items here */
 
@@ -101,7 +104,7 @@ enum menuDescListEntries
 {
     Commit, Init, Clone, Status, Shelve, Add, Revert, Remove, Rename,
     Log, Synch, Serve, Update, Recover, Thgstatus, Userconf, Repoconf,
-    About, Datamine, VDiff, Ignore, Guess,
+    About, Datamine, VDiff, Ignore, Guess, Grep,
     /* Add new items here */
     Separator, EndOfList
 };
@@ -109,7 +112,7 @@ enum menuDescListEntries
 menuDescListEntries RepoNoFilesMenu[] =
 {
     Commit, Status, Shelve, VDiff, Separator,
-    Log, Update, Datamine, Thgstatus, Separator,
+    Log, Update, Grep, Thgstatus, Separator,
     Synch, Serve, Clone, Init, Separator,
     Ignore, Guess, Recover, Separator,
     Repoconf, Userconf, Separator,
