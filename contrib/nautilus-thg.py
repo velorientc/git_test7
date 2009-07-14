@@ -14,6 +14,7 @@ import gobject
 import nautilus
 import gnomevfs
 import os
+import sys
 
 try:
     from mercurial import demandimport
@@ -26,7 +27,6 @@ except ImportError:
 demandimport.enable()
 
 import subprocess
-import sys
 import urllib
 
 from mercurial import hg, ui, match, util
