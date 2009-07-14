@@ -1,7 +1,7 @@
 #
 # archive.py - TortoiseHg's dialog for archiving a repo revision
 #
-# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright (C) 2009 Emmanuel Rosa <goaway1000@gmail.com>
 #
 
 import os
