@@ -199,7 +199,7 @@ class ArchiveDialog(gtk.Window):
 
         cmdline.append('-t')
         cmdline.append(self.get_selected_archive_type()['type'])
-        cmdline.append(self.destentry.get_text())
+        cmdline.append(hglib.fromutf(self.destentry.get_text()))
 
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
