@@ -54,8 +54,7 @@ else:
         if l.startswith('Traceback') or l.startswith('TypeError'):
             from hggtk.bugreport import run
             from hggtk.hgtk import gtkrun
-            mystderr.seek(0)
-            error = 'Recoverable runtime error (stderr):\n' + mystderr.read()
+            error = 'Recoverable runtime error (stderr):\n'+mystderr.getvalue()
             opts = {}
             opts['cmd'] = ' '.join(sys.argv[1:])
             opts['error'] = error
