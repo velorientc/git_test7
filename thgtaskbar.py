@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import threading
+import cStringIO
 import Queue
 
 from win32api import *
@@ -22,7 +23,7 @@ import win32security
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
-from mercurial import ui
+from mercurial import ui, error
 from thgutil import thread2, paths, shlib
 
 if hasattr(sys, "frozen"):
@@ -59,7 +60,7 @@ def SetIcon(hwnd, name, add=False):
         action = NIM_ADD
     try:
         Shell_NotifyIcon(action, nid)
-    except error:
+    except e:
         # This is common when windows is starting, and this code is hit
         # before the taskbar has been created.
         print "Failed to add the taskbar icon - is explorer running?"
@@ -238,20 +239,32 @@ def update_batch(batch):
     if roots:
         _ui = ui.ui();
         failedroots = set()
-        for r in sorted(roots):
-            try:
-                shlib.update_thgstatus(_ui, r, wait=False)
-                shlib.shell_notify([r])
-                logger.msg('Updated ' + r)
-            except (IOError, OSError):
-                print "IOError or OSError on updating %s (check permissions)" % r
-                logger.msg('Failed updating %s (check permissions)' % r)
-                failedroots.add(r)
-        notifypaths -= failedroots
-        if notifypaths:
-            time.sleep(2)
-            shlib.shell_notify(list(notifypaths))
-            logger.msg('Shell notified')
+        errorstream = cStringIO.StringIO()
+        _stderr = sys.stderr
+        sys.stderr = errorstream
+        try:
+            for r in sorted(roots):
+                try:
+                    shlib.update_thgstatus(_ui, r, wait=False)
+                    shlib.shell_notify([r])
+                    logger.msg('Updated ' + r)
+                except (IOError, OSError):
+                    print "IOError or OSError on updating %s (check permissions)" % r
+                    logger.msg('Failed updating %s (check permissions)' % r)
+                    failedroots.add(r)
+                except (error.Abort, error.ConfigError, error.RepoError), e:
+                    logger.msg('Failed updating %s (%s)' % (r, str(e)))
+                    failedroots.add(r)
+            notifypaths -= failedroots
+            if notifypaths:
+                time.sleep(2)
+                shlib.shell_notify(list(notifypaths))
+                logger.msg('Shell notified')
+            errmsg = errorstream.getvalue()
+            if errmsg:
+                logger.msg('stderr: %s' % errmsg)
+        finally:
+            sys.stderr = _stderr
 
 requests = Queue.Queue(0)
 
