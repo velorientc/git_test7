@@ -44,7 +44,7 @@ class BugReport(gdialog.GDialog):
         close.connect('clicked', gtk.main_quit)
         hbbox.add(close)
 
-        text = '\n{{{\n' # Wrap in Bitbucket wiki preformat markers
+        text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
         text += _('** Please report this bug to'
                 ' tortoisehg-discuss@lists.sourceforge.net or'
                 ' http://bitbucket.org/tortoisehg/stable/issues\n')
@@ -55,7 +55,7 @@ class BugReport(gdialog.GDialog):
         extlist = [x[0] for x in extensions.extensions()]
         text += '** Extensions loaded: %s\n' % ', '.join(extlist)
         text += self.opts['error']
-        text += '\n}}}\n'
+        text += '\n}}}'
         textview.get_buffer().set_text(text)
         return vbox
 
