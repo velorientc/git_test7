@@ -175,6 +175,13 @@ int HgQueryDirstate(
             relpath[i] = '/';
     }
 
+    DirectoryStatus* pdirsta = DirectoryStatus::get(cur.hgroot, cur.basedir);
+    if (pdirsta && pdirsta->noicons())
+    {
+        last = cur;
+        return 0;
+    }
+
     if (cur.isdir)
     {
         if (!relpath.empty())
@@ -187,8 +194,7 @@ int HgQueryDirstate(
             }
         }
 
-        DirectoryStatus* pds = DirectoryStatus::get(cur.hgroot, cur.basedir);
-        outStatus = (pds ? pds->status(relpath) : '?');
+        outStatus = (pdirsta ? pdirsta->status(relpath) : '?');
     }
     else
     {
