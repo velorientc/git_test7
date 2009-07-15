@@ -156,11 +156,11 @@ _proxy_info = (
     (_('Bypass List'), 'http_proxy.no', [],
         _('Optional. Comma-separated list of host names that'
         ' should bypass the proxy')),
-    (_('Password'), 'http_proxy.passwd', [],
-        _('Optional. Password to authenticate with at the'
-        ' proxy server')),
     (_('User'), 'http_proxy.user', [],
         _('Optional. User name to authenticate with at the'
+        ' proxy server')),
+    (_('Password'), 'http_proxy.passwd', [],
+        _('Optional. Password to authenticate with at the'
         ' proxy server')))
 
 _email_info = (
