@@ -317,9 +317,15 @@ def remove(args):
     roots, notifypaths = getrepos([path])
     if roots:
         for r in sorted(roots):
+            tfn = os.path.join(r, '.hg', 'thgstatus')
             try:
-                os.remove(os.path.join(r, '.hg', 'thgstatus'))
-            except OSError:
+                f = open(tfn, 'rb')
+                e = f.readline()
+                f.close()
+                if not e.startswith('@@noicons'):
+                    os.remove(tfn)
+            except (IOError, OSError):
+                print "IOError or OSError while trying to remove %s" % tfn
                 pass
         if notifypaths:
             shlib.shell_notify(list(notifypaths))
