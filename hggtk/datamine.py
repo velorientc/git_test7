@@ -221,7 +221,7 @@ class DataMineDialog(gdialog.GDialog):
         search_hbox.pack_start(includes, True, True, 4)
         search_hbox.pack_start(gtk.Label(_('Excludes:')), False, False, 4)
         search_hbox.pack_start(excludes, True, True, 4)
-        search_hbox.pack_start(search, False, False)
+        search_hbox.pack_start(search, False, False, 4)
         self.tooltips.set_tip(search, _('Start this search'))
         self.tooltips.set_tip(regexp, _('Regular expression search pattern'))
         self.tooltips.set_tip(includes, _('Comma separated list of'
