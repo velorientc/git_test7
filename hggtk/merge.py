@@ -74,26 +74,27 @@ class MergeDialog(gtk.Window):
         key, modifier = gtk.accelerator_parse('Escape')
         close.add_accelerator('clicked', accelgroup, key, 0,
                 gtk.ACCEL_VISIBLE)
-        hbbox.add(close)
 
         undo = gtk.Button(_('Undo'))
-        hbbox.add(undo)
         undo.set_sensitive(False)
 
         commit = gtk.Button(_('Commit'))
-        hbbox.add(commit)
         commit.set_sensitive(False)
 
         merge = gtk.Button(_('Merge'))
         key, modifier = gtk.accelerator_parse(mod+'Return')
         merge.add_accelerator('clicked', accelgroup, key, modifier,
                 gtk.ACCEL_VISIBLE)
-        hbbox.add(merge)
-        merge.grab_focus()
 
+        hbbox.add(merge)
+        hbbox.add(commit)
+        hbbox.add(undo)
+        hbbox.add(close)
+
+        commit.connect('clicked', self.commit)
         undo.connect('clicked', self.undo, local, merge, commit)
         merge.connect('clicked', self.merge, other, commit, undo)
-        commit.connect('clicked', self.commit)
+        merge.grab_focus()
 
     def revdesc(self, repo, revid):
         ctx = repo[revid]
