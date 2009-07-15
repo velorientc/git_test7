@@ -59,6 +59,7 @@ char DirectoryStatus::status(const std::string& relpath_) const
 int DirectoryStatus::read(const std::string& hgroot, const std::string& cwd)
 {
     v_.clear();
+    noicons_ = false;
 
     std::string p = hgroot + "\\.hg\\thgstatus";
 
@@ -71,37 +72,65 @@ int DirectoryStatus::read(const std::string& hgroot, const std::string& cwd)
         return 0;
     }
 
-    char state;
-    std::vector<char> path(MAX_PATH);
-
     DirectoryStatus::E e;
 
-    while (fread(&state, sizeof(state), 1, f) == 1)
-    {
-        e.status_ = state;
+    int res = 1;
+    const std::string noicons = "@@noicons";
 
-        path.clear();
+    std::vector<char> vline(200);
+
+    for (;;)
+    {
+        vline.clear();
         char t;
-        while (fread(&t, sizeof(t), 1, f) == 1 && t != '\n')
+
+        for (;;)
         {
-            path.push_back(t);
-            if (path.size() > 1000)
-                return 0;
+            if (fread(&t, sizeof(t), 1, f) != 1)
+                goto close;
+            if (t == '\n')
+                break;
+            vline.push_back(t);
+            if (vline.size() > 1000)
+            {
+                res = 0;
+                goto close;
+            }
+        }
+        vline.push_back(0);
+
+        std::string line = &vline[0];
+
+        if (line.substr(0, noicons.size()) == noicons)
+        {
+            noicons_ = true;
+            goto close;
+        }
+
+        if (line.empty())
+            goto close;
+
+        e.status_ = line[0];
+
+        std::string path;
+        if (line.size() > 1)
+        {
+            path = line.c_str() + 1;
         }
         path.push_back('/');
-        path.push_back(0);
 
-        e.path_ = &path[0];
+        e.path_ = path;
 
         v_.push_back(e);
     }
 
+close:
     fclose(f);
 
     TDEBUG_TRACE("DirectoryStatus::read(" << hgroot << "): done. "
-        << v_.size() << " entries read");
+        << v_.size() << " entries read. noicons_ = " << noicons_ );
 
-    return 1;
+    return res;
 }
 
 

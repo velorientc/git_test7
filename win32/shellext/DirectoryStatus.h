@@ -30,11 +30,15 @@ class DirectoryStatus
 
     typedef std::vector<E> V;
     V v_;
+    bool noicons_;
 
 public:
+    DirectoryStatus(): noicons_(false) {}
+
     static DirectoryStatus* get(
         const std::string& hgroot, const std::string& cwd);
     char status(const std::string& relpath) const;
+    bool noicons() const { return noicons_; }
 
 private:
     int read(const std::string& hgroot, const std::string& cwd);
