@@ -103,6 +103,8 @@ if os.name == 'nt':
                 for dn in sorted(dirstatus):
                     s = dirstatus[dn]
                     e = f.readline()
+                    if e.startswith('@@noicons'):
+                        break
                     if e == '' or e[0] != s or e[1:-1] != dn:
                         update = True
                         break
