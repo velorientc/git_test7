@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <assert.h>
+#include <map>
 
 #include <io.h>
 #include "FCNTL.H"
@@ -177,23 +178,46 @@ std::string BaseName(const std::string& filename)
 }
 
 
+// not reentrant
 HICON GetTortoiseIcon(const std::string& iconname)
 {
+    typedef std::map<std::string, HICON> IconCacheT;
+    static IconCacheT iconcache_;
+
     std::string thgdir = GetTHgProgRoot();
     if (thgdir.empty())
     {
         TDEBUG_TRACE("GetTortoiseIcon: THG root is empty");
-        return NULL;
+        return 0;
     }
 
-    std::string iconpath = thgdir + "\\icons\\" + iconname;
+    const std::string iconpath = thgdir + "\\icons\\" + iconname;
+
+    IconCacheT::const_iterator i = iconcache_.find(iconpath);
+    if (i != iconcache_.end())
+        return i->second;
+
+    if (iconcache_.size() > 200)
+    {
+        TDEBUG_TRACE("**** GetTortoiseIcon: error: too many icons in cache");
+        return 0;
+    }
+
     HICON h = (HICON) LoadImageA(0, iconpath.c_str(), IMAGE_ICON,
             16, 16, LR_LOADFROMFILE);
     if (!h)
     {
-        TDEBUG_TRACE("    GetTortoiseIcon: can't find " + iconpath);            
+        TDEBUG_TRACE("GetTortoiseIcon: can't find " + iconpath);
+        return 0;
     }
-    
+
+    iconcache_[iconpath] = h;
+
+    TDEBUG_TRACE(
+        "GetTortoiseIcon: added '" << iconpath << "' to iconcache_"
+        " (" << iconcache_.size() << " icons in cache)"
+    );
+
     return h;
 }
 
