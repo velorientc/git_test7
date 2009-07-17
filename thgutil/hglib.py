@@ -165,6 +165,8 @@ def hgcmd_toq(path, q, *args):
     u = Qui()
     if hasattr(ui.ui, 'copy'):
         # Mercurial 1.3
+        for k, v in u.configitems('defaults'):
+            u.setconfig('defaults', k, '')
         return dispatch._dispatch(u, list(args))
     else:
         return thgdispatch(u, path, list(args))

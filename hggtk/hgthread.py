@@ -157,6 +157,8 @@ class HgThread(thread2.Thread):
             ret = None
             if hasattr(self.ui, 'copy'):
                 # Mercurial 1.3
+                for k, v in self.ui.configitems('defaults'):
+                    self.ui.setconfig('defaults', k, '')
                 ret = hglib.dispatch._dispatch(self.ui, self.args)
             else:
                 # Mercurial 1.2
