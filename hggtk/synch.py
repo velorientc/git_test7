@@ -565,15 +565,9 @@ class SynchDialog(gtk.Window):
             return False
 
     def add_src_to_recent(self, src):
-        if os.path.exists(src):
-            src = os.path.abspath(src)
-
-        # save src path to recent list in history (read by clone tool)
+        # add src path to recent list in history (read by clone tool)
         self._settings.mrul('src_paths').add(src)
         self._settings.write()
-
-        # update drop-down list
-        self.fill_path_combo()
 
     def flush(self, *args):
         pass
