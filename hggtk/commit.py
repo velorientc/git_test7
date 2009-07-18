@@ -353,10 +353,11 @@ class GCommit(GStatus):
                     entry[FM_CHECKED] = True
             self.update_check_count()
 
-            # pre-fill commit message
+            # pre-fill commit message, if not modified
             buf = self.text.get_buffer()
-            buf.set_text(_('merge'))
-            buf.set_modified(False)
+            if not buf.get_modified():
+                buf.set_text(_('merge'))
+                buf.set_modified(False)
 
 
     def check_patch_queue(self):
