@@ -148,6 +148,25 @@ def invalidaterepo(repo):
             repo.mq = mqclass(mq.ui, mq.basepath, mq.path)
 
 
+def canonpaths(list):
+    'Get canonical paths (relative to root) for list of files'
+    canonpats = []
+    cwd = os.getcwd()
+    root = paths.find_root(cwd)
+    for f in list:
+        try:
+            canonpats.append(util.canonpath(root, cwd, f))
+        except util.Abort:
+            # Attempt to resolve case folding conflicts.
+            fu = f.upper()
+            cwdu = cwd.upper()
+            if fu.startswith(cwdu):
+                canonpats.append(util.canonpath(root, cwd, f[len(cwd+os.sep):]))
+            else:
+                # May already be canonical
+                canonpats.append(f)
+    return canonpats
+
 def hgcmd_toq(path, q, *args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue

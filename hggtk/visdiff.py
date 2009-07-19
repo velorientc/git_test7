@@ -276,8 +276,4 @@ def readtools(ui):
     return tools
 
 def run(ui, *pats, **opts):
-    root = paths.find_root()
-    canonpats = []
-    for f in pats:
-        canonpats.append(util.canonpath(root, os.getcwd(), f))
-    return FileSelectionDialog(canonpats, opts)
+    return FileSelectionDialog(hglib.canonpaths(pats), opts)
