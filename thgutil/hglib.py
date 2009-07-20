@@ -1,10 +1,9 @@
-"""
-hglib.py
- Copyright (C) 2007 Steve Borho <steve@borho.org>
-
-This software may be used and distributed according to the terms
-of the GNU General Public License, incorporated herein by reference.
-"""
+# hglib.py - Mercurial API wrappers for TortoiseHg
+#
+# Copyright 2007 Steve Borho <steve@borho.org>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 import sys

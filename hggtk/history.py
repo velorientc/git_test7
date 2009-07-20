@@ -1,9 +1,10 @@
-#
 # history.py - Changelog dialog for TortoiseHg
 #
 # Copyright 2007 Brad Schick, brad at gmail . com
-# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright 2008 Steve Borho <steve@borho.org>
 #
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 import gtk

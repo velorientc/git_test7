@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+# hgtk.py - front-end script for TortoiseHg dialogs
 #
-# front-end script for TortoiseHg dialogs
+# Copyright 2008 Steve Borho <steve@borho.org>
+# Copyright 2008 TK Soh <teekaysoh@gmail.com>
 #
-# Copyright (C) 2008-9 Steve Borho <steve@borho.org>
-# Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 shortlicense = '''
 Copyright (C) 2009 Steve Borho <steve@borho.org>.

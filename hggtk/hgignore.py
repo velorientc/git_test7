@@ -1,8 +1,9 @@
-#
 # hgignore.py - TortoiseHg's dialog for editing .hgignore
 #
-# Copyright (C) 2008-2009 Steve Borho <steve@borho.org>
+# Copyright 2008 Steve Borho <steve@borho.org>
 #
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 import gtk

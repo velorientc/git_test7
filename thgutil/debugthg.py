@@ -1,3 +1,10 @@
+# debugthg.py - debugging library for TortoiseHg shell extensions
+#
+# Copyright 2008 Steve Borho <steve@borho.org>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
+
 debugging = ''
 try:
     import _winreg

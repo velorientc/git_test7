@@ -1,8 +1,9 @@
-#
 # bugreport.py - Bug report dialog for TortoiseHg
 #
-# Copyright (C) 2009 Steve Borho <steve@borho.org>
+# Copyright 2009 Steve Borho <steve@borho.org>
 #
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 import gtk

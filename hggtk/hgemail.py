@@ -1,9 +1,10 @@
-#
 # hgemail.py - TortoiseHg's dialog for sending patches via email
 #
-# Copyright (C) 2007 Steve Borho <steve@borho.org>
-# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright 2007 Steve Borho <steve@borho.org>
 #
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 import sys

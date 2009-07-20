@@ -1,6 +1,9 @@
 # Interuptible threads
 #
 # http://sebulba.wikispaces.com/recipe+thread2
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import threading
 import inspect

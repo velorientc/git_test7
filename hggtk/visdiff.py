@@ -1,11 +1,9 @@
 # visdiff.py - launch external visual diff tools
 #
-# Copyright 2009 Steve Borho
+# Copyright 2009 Steve Borho <steve@borho.org>
 #
-# Based on extdiff extension for Mercurial
-#
-# This software may be used and distributed according to the terms
-# of the GNU General Public License, incorporated herein by reference.
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import gtk
 import gobject

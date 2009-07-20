@@ -1,7 +1,9 @@
+# datamine.py - Data Mining dialog for TortoiseHg
 #
-# Data Mining dialog for TortoiseHg and Mercurial
+# Copyright 2008 Steve Borho <steve@borho.org>
 #
-# Copyright (C) 2008 Steve Borho <steve@borho.org>
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import gtk
 import gobject

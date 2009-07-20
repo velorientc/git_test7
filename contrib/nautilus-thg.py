@@ -1,13 +1,9 @@
 # TortoiseHg plugin for Nautilus
 #
-# Copyright (C) 2007-9 Steve Borho
+# Copyright 2007 Steve Borho
 #
-# Stolen mercilessly from nautilus-bzr, thanks guys
-# Copyright (C) 2006 Jeff Bailey
-# Copyright (C) 2006 Wouter van Heyst
-# Copyright (C) 2006 Jelmer Vernooij
-#
-# Published under the GNU GPL
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import gtk
 import gobject

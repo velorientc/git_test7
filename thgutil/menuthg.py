@@ -1,7 +1,9 @@
-# Published under the GNU GPL, v2 or later.
-# Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
-# Copyright (C) 2007 Henry Ludemann <misc@hl.id.au>
-# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+# menuthg.py - TortoiseHg shell extension menu
+#
+# Copyright 2009 Steve Borho <steve@borho.org>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 

@@ -1,9 +1,10 @@
+# recovery.py - Repository recovery dialog for TortoiseHg
 #
-# Repository recovery dialog for TortoiseHg
+# Copyright 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright 2007 Steve Borho <steve@borho.org>
 #
-# Copyright (C) 2007 Steve Borho <steve@borho.org>
-# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
-#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import gtk
 import gobject

@@ -1,8 +1,9 @@
-#
 # thgstatus.py - update TortoiseHg status cache
 #
-# Copyright (C) 2009 Adrian Buehlmann
+# Copyright 2009 Adrian Buehlmann
 #
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 '''update TortoiseHg status cache'''
 

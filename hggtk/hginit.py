@@ -1,8 +1,9 @@
+# hginit.py - TortoiseHg dialog to initialize a repo
 #
-# TortoiseHg dialog to initialize a repo
+# Copyright 2008 Steve Borho <steve@borho.org>
 #
-# Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
-#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 import gtk

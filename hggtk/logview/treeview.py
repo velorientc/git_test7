@@ -1,3 +1,10 @@
+# treeview.py - changelog viewer implementation
+#
+# Copyright 2008 Steve Borho <steve@borho.org>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
+
 ''' Mercurial revision DAG visualization library
 
   Implements a gtk.TreeModel which visualizes a Mercurial repository

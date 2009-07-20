@@ -1,9 +1,9 @@
-#_
-# Configuration dialog for TortoiseHg and Mercurial
+# thgconfig.py - Configuration dialog for TortoiseHg and Mercurial
 #
-# Copyright (C) 2008-9 Steve Borho <steve@borho.org>
-# Copyright (C) 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright 2007 Steve Borho <steve@borho.org>
 #
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import gtk
 import os
