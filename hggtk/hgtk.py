@@ -309,8 +309,9 @@ def shelve(ui, *pats, **opts):
 
 def userconfig(ui, *pats, **opts):
     """user configuration editor"""
-    portable_fork()
+    # Import thgconfig first, to check for iniparse
     from hggtk.thgconfig import run
+    portable_fork()
     opts['repomode'] = False
     gtkrun(run(ui, *pats, **opts))
 

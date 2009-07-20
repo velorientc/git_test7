@@ -7,6 +7,7 @@
 
 import gtk
 import os
+import sys
 import re
 import urlparse
 import threading
@@ -14,9 +15,19 @@ import threading
 from mercurial import hg, ui, util, url, filemerge
 
 from thgutil.i18n import _
-from thgutil import hglib, settings, paths, iniparse
+from thgutil import hglib, settings, paths
 
 from hggtk import dialog, gdialog, gtklib, hgcmd
+
+try:
+    from mercurial import demandimport
+    demandimport.disable()
+    import iniparse
+    demandimport.enable()
+except ImportError:
+    print 'The iniparse python package is required by this tool.  Download from'
+    print 'http://code.google.com/p/iniparse/'
+    sys.exit(0)
 
 _unspecstr = _('<unspecified>')
 _unspeclocalstr = hglib.fromutf(_unspecstr)

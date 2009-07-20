@@ -58,7 +58,7 @@ def setup_windows():
     # Specific definitios for Windows NT-alike installations
     _scripts = []
     _data_files = []
-    _packages = ['hggtk', 'hggtk.logview', 'thgutil', 'thgutil.iniparse']
+    _packages = ['hggtk', 'hggtk.logview', 'thgutil']
     extra = {}
     hgextmods = []
 
@@ -113,7 +113,7 @@ def setup_posix():
     # Specific definitios for Posix installations
     _extra = {}
     _scripts = ['hgtk']
-    _packages = ['hggtk', 'hggtk.logview', 'thgutil', 'thgutil.iniparse']
+    _packages = ['hggtk', 'hggtk.logview', 'thgutil']
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('icons')]

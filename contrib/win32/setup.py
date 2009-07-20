@@ -187,7 +187,7 @@ ext_modules=[
 
 packages = ['mercurial', 'mercurial.hgweb', 'hgext', 'hgext.convert',
             'hgext.highlight', 'hgext.zeroconf', 'hggtk',
-            'hggtk.logview', 'thgutil', 'thgutil.iniparse']
+            'hggtk.logview', 'thgutil', 'iniparse']
 
 try:
     import msvcrt
