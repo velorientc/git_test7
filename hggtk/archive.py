@@ -1,8 +1,9 @@
-#
 # archive.py - TortoiseHg's dialog for archiving a repo revision
 #
-# Copyright (C) 2009 Emmanuel Rosa <goaway1000@gmail.com>
+# Copyright 2009 Emmanuel Rosa <goaway1000@gmail.com>
 #
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 import gtk
