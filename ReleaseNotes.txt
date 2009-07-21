@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
                     Release Notes for TortoiseHg
 
 This file contains last minute notes to users about the releases, which may not
@@ -355,7 +357,7 @@ Bug fixes in 0.5:
   * [ 2103749 ] Changelog viewer doesn't refresh after making local tag
   
   * nautilus: fix error when there is no repo in the current directory
-    (by Germ·n PÛo-CaamaÒo)
+    (by Germ√°n P√≥o-Caama√±o)
 
 
 New features and improvement in 0.4.1:
