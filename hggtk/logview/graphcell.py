@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 """Cell renderer for directed graph.
 
 This module contains the implementation of a custom GtkCellRenderer that
@@ -10,7 +9,7 @@ we cheat and draw over the bits of the TreeViewColumn that are supposed to
 just be for the background.
 """
 
-__copyright__ = "Copyright © 2005 Canonical Ltd."
+__copyright__ = "Copyright 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 import math
