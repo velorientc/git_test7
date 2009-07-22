@@ -27,23 +27,23 @@ Keyboard Accelerators
 
 We define a few keyboard accelerators that all of the TortoiseHg tools support.
 		
-*CTRL-Q*
+:kbd:`CTRL-Q`
 	quit the application, including all open windows
 
-*CTRL-W*
-	close the current window (same as *CTRL-Q* if only one window is open)
+:kbd:`CTRL-W`
+	close the current window (same as :kbd:`CTRL-Q` if only one window is open)
 
-*CTRL-D*
+:kbd:`CTRL-D`
 	visual diff of currently selected file or changeset					
 
-*CTRL-ENTER*
+:kbd:`CTRL-ENTER`
 	activation					
 
-*F5*
+:kbd:`F5`
 	refresh					
 
 On `Mac OS X`_, the apple (command) key is used as the modifier instead
-of *CTRL*. However some keyboard accelerators are internal to GTK+ so
+of *:kbd:`CTRL`. However some keyboard accelerators are internal to GTK+ so
 you must use the control key to access cut-paste functionality, for
 instance.
 
@@ -61,7 +61,7 @@ Visual Diffs
 
 If you prefer the previous (<=0.7) behavior of directly launching your
 visual diff tool, then you can recover that behavior via the user
-settings dialog and *TortoiseHg->Skip Diff Window*.
+settings dialog and :guilabel:`TortoiseHg->Skip Diff Window`.
 
 Treeview searches
 -----------------
@@ -78,7 +78,7 @@ with the text you have typed and the treeview will immediately jump to
 the first row that matches the text you have entered thus far.  As you
 enter more keys, it refines it's search.
 
-* *CTRL-F* will bring up the search window explicitly
-* *CTRL-G* will advance the search to the next match,
-* *SHIFT-CTRL-G* goes backwards
+* :kbd:`CTRL-F` will bring up the search window explicitly
+* :kbd:`CTRL-G` will advance the search to the next match,
+* :kbd:`SHIFT-CTRL-G` goes backwards
 * The mouse scroll wheel will advance forwards and backwards through matching lines 
