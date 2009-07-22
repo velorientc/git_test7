@@ -43,7 +43,7 @@ We define a few keyboard accelerators that all of the TortoiseHg tools support.
 	refresh					
 
 On `Mac OS X`_, the apple (command) key is used as the modifier instead
-of *:kbd:`CTRL`. However some keyboard accelerators are internal to GTK+ so
+of :kbd:`CTRL`. However some keyboard accelerators are internal to GTK+ so
 you must use the control key to access cut-paste functionality, for
 instance.
 
