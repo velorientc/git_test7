@@ -502,7 +502,7 @@ class GDialog(gtk.Window):
             file_path = os.path.join(pathroot, file)
             util.system("%s \"%s\"" % (editor, file_path),
                         environ={'HGUSER': self.ui.username()},
-                        onerr=util.Abort, errprefix=_('edit failed'))
+                        onerr=self.ui, errprefix=_('edit failed'))
 
         editor = (self.ui.config('tortoisehg', 'editor') or
                 self.ui.config('gtools', 'editor') or
