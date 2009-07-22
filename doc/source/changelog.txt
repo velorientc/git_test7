@@ -12,15 +12,15 @@ TortoiseHg Changelog Viewer
 	
 The toolbar buttons from left to right:
 
-*Refresh*
+:guilabel:`Refresh`
 	Reload the revision history (if you commit in another window, etc)
-*Filter*
+:guilabel:`Filter`
 	Open revision filter dialog, also has drop-down for common filters
-*Datamine*
+:guilabel:`Datamine`
 	Open datamine application for history searches and file annotations
-*Other Parent*
+:guilabel:`Other Parent`
 	Only active when viewing merge changesets, toggles parents
-*Synchronize*
+:guilabel:`Synchronize`
 	Communicate changes with other repositories
 
 The changelog tool is primarily used to visualize the revision history
@@ -43,11 +43,11 @@ cases from breaking the viewer.
 On the right of the revision graph are three buttons. From top to bottom
 these are:
 
-*column toggles*
+:guilabel:`column toggles`
 	toggle the display of columns in the graph
-*next-N revisions*
+:guilabel:`next-N revisions`
 	load the next N revisions into the graph
-*all revisions*
+:guilabel:`all revisions`
 	load all remaining revisions into the graph
 
 Revision Context Menus
@@ -56,53 +56,54 @@ Revision Context Menus
 Right-clicking on a revision in the (top) graph pane will bring up the
 revision context menu.
 
-*visualize change*
+:guilabel:`visualize change`
 	open this change in your visual diff tool
-*display change*
+:guilabel:`display change`
 	open this changeset in the changeset browser (more below)
-*diff to local*
+:guilabel:`diff to local`
 	display changes (visual diff) between this revision and your current working directory
-*update*
+:guilabel:`update`
 	update your working directory to this revision [1]
-*merge with*
+:guilabel:`merge with`
 	merge with this revision [2]
-*copy hash*
+:guilabel:`copy hash`
 	copy current revision's full hash to the clipboard
-*export patch*
+:guilabel:`export patch`
 	generate a patch file of this revision's changes
-*email patch*
+:guilabel:`email patch`
 	send this revision's changes to email recipient [3]
-*bundle rev:tip*
+:guilabel:`bundle rev:tip`
 	create a bundle with all revs from selected to tip
-*add/remove tag*
+:guilabel:`add/remove tag`
 	opens the TortoiseHg tag dialog with this revision selected
-*backout*
+:guilabel:`backout`
 	create a backout changeset for selected revision
-*revert*
+:guilabel:`revert`
 	revert working copy to this revision's contents, without updating working
 	directory parent revision. Use with care.
-*strip*
+:guilabel:`strip`
 	Remove the selected revision and all of it's descendants from the repository [4]
 
 
-If you right-click on a row other than the one that was currently selected, you get a different context menu. This one is for visualizing diffs between two arbitrary revisions.
+If you right-click on a row other than the one that was currently selected, you get a different context menu.
+This one is for visualizing diffs between two arbitrary revisions.
 
-*diff with selected*
+:guilabel:`diff with selected`
 	 Description
-*visual diff with selected* [5]
+:guilabel:`visual diff with selected` [5]
 	 Description
-*email from here to selected*
+:guilabel:`email from here to selected`
 	 Description
-*bundle from here to selected*
+:guilabel:`bundle from here to selected`
 	 Description
-*merge with selected* [6]
+:guilabel:`merge with selected` [6]
 	 Description
 						 
 1) Opens the TortoiseHg update/checkout dialog with this revision selected.
 2) Opens the TortoiseHg merge dialog with this revision selected.
 3) Opens the TortoiseHg email dialog with this revision selected.
 4) The strip command will store the stripped revisions in a bundle file that can later be reapplied. See also_
-5) *Settings->Global->TortoiseHg->Visual Diff Command*
+5) :menuselection:`Settings --> Global --> TortoiseHg --> Visual Diff Command`
 6) Only sensitive if the selected revision is your current working directory parent
 
 .. _also: http://www.selenic.com/mercurial/wiki/index.cgi/EditingHistory
@@ -114,21 +115,22 @@ File List Context Menus
 Right-clicking on filenames in the file list (bottom left) pane will bring up a context menu for
 the selected file:
 
-*visual diff*
+:guilabel:`visual diff`
 	 Open this revision of the file in your visual editor[1]
-*diff to local*
+:guilabel:`diff to local`
 	 Visualize differences between this revision and your checked out version
-*save at revision*
+:guilabel:`save at revision`
 	 Write this revision of the file to specified location
-*file history*
+:guilabel:`file history`
 	 Show revisions that modified this file [2]
-*annotate file*
+:guilabel:`annotate file`
 	 Open this file in the datamine app, annotated at this revision
-*revert file contents*
+:guilabel:`revert file contents`
 	 Checkout this specific revision of this file  [3]
 						 
-1) Settings->Global->TortoiseHg->Visual Editor
-2) Does not show revisions where a file was deleted, as this is only a manifest change, it does not modify the file's history.
+1) :menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
+2) Does not show revisions where a file was deleted, as this is only a manifest change,
+   it does not modify the file's history.
 3) The new contents will appear as local changes and must be committed.
 
 
@@ -143,13 +145,13 @@ pane on the right with the changes to each file.
 In release 0.7 of TortoiseHg, the 'diff change with' changeset browser
 now supports change selection.  You can select files and hunks that you
 wish to extract from the changeset(s) you are browsing and write them to
-a patch file using the *Save as* toolbar button.  This is a very
+a patch file using the :guilabel:`Save as` toolbar button.  This is a very
 efficient way to cherry pick changes made to a repository.
 Unfortunately, TortoiseHg still does not have a dialog for importing
 changes into a repository, so this must be done on the command line with
-the ``hg import`` command.
+the :command:`hg import` command.
 
-This changeset browser also supports the *CTRL-C* keyboard accelerator to copy
+This changeset browser also supports the :kbd:`CTRL-C` keyboard accelerator to copy
 hightlighted diff hunks	to the clipboard.
 
 Configurables
@@ -158,25 +160,26 @@ Configurables
 The changelog browser has a few configurable options that can be set in
 the TortoiseHg Settings dialog on the Changelog tab.
 
-*Author coloring*
+:guilabel:`Author coloring`
 	If true, each author's changeset will be given a unique color
-*Long Summary*
+:guilabel:`Long Summary`
 	Concatenate commit message lines until 80 chars are reached
-*Graph batch limit*
+:guilabel:`Graph batch limit`
 	Number of revisions to read in each batch load
-*Copy Hash*
+:guilabel:`Copy Hash`
 	Copy a revision's changeset id hash to the clipboard when selected
 						
-The exact colors given to particular users can be configured by adding lines like these to your ``Mercurial.ini`` file: ::
+The exact colors given to particular users can be configured by adding lines like these to
+your :file:`Mercurial.ini` file: ::
 
 	[tortoisehg]
 	authorcolor.USERNAME = color
 
 The changelog browser also respects the following settings on the TortoiseHg tab:
 
-*Tab Width*
+:guilabel:`Tab Width`
 	Number of spaces to expand tabs in diffs
-*Max Diff Size*
+:guilabel:`Max Diff Size`
 	Maximum size of file to be diffed
-*Bottom Diffs*
+:guilabel:`Bottom Diffs`
 	Show diffs below file list
