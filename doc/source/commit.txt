@@ -263,44 +263,7 @@ Configurables
 	Toggles diff pane from left to below file list
 :menuselection:`TortoiseHg --> Max Diff Size`
 	 Configures the diff size limit
-	 
-Changes from 0.6 to 0.7
------------------------
-		
-Large changes were made to the commit tool in the 0.7 release. The
-previous default tool, Qct, was unbundled and TortoiseHg's native commit
-tool was promoted to the top spot. See the FAQ_ for	instructions on
-recovering Qct, if you must, but we suggest you first read the rest of
-this page to understand how the native tool now measures up.		
-
-.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
-
-
-The default layout of the native commit tool is different than Qct. The
-file list is on the left side of the diff panel. This layout is actually
-configurable if you prefer the Qct layout, simply set the
-:menuselection:`Commit --> Bottom Diffs` configuration item to :guilabel:`True`
-in the TortoiseHg settings dialog. This change will take affect the next time
-you start the commit tool.
-
-Also different in the native commit tool is that all the diffs in the
-working directory are shown in the diff panel at startup. Selecting
-files in the file list will zoom to that file's diffs in the diff panel.
-In Qct, selecting a file would refresh the diff pane with just that
-file's diffs (which was also the behavior of the native tool before
-0.7). The new behavior gives a better view of what the changeset being
-committed will look like (it matches more closely to the changelog
-view).
-
-New in the native commit tool in 0.7 is the auto-checking of
-*M* odified, *A* dded, and *R* emoved files at startup as these are
-all change types that are automatically included in any :command:`hg commit`
-command with no arguments. Similarly, unknown *?* files are shown by
-default at startup since that is standard behaviour for the :command:`hg status`
-command. Qct was already doing both of these things, so this
-will come as no surprise to Qct users.
-
-
+ 
 Changes from 0.7 to 0.8
 -----------------------
 
@@ -326,5 +289,42 @@ Changes from 0.7 to 0.8
   downloaded separately if you wish to use Qct.
 
 
-External tool configuration is deprecated and will be removed in 0.9
+Changes from 0.6 to 0.7
+-----------------------
+		
+Large changes were made to the commit tool in the 0.7 release. The
+previous default tool, Qct, was unbundled and TortoiseHg's native commit
+tool was promoted to the top spot. See the FAQ_ for	instructions on
+recovering Qct, if you must, but we suggest you first read the rest of
+this page to understand how the native tool now measures up.		
 
+.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
+
+The default layout of the native commit tool is different than Qct. The
+file list is on the left side of the diff panel. This layout is actually
+configurable if you prefer the Qct layout, simply set the
+:menuselection:`Commit --> Bottom Diffs` configuration item to :guilabel:`True`
+in the TortoiseHg settings dialog. This change will take affect the next time
+you start the commit tool.
+
+Also different in the native commit tool is that all the diffs in the
+working directory are shown in the diff panel at startup. Selecting
+files in the file list will zoom to that file's diffs in the diff panel.
+In Qct, selecting a file would refresh the diff pane with just that
+file's diffs (which was also the behavior of the native tool before
+0.7). The new behavior gives a better view of what the changeset being
+committed will look like (it matches more closely to the changelog
+view).
+
+New in the native commit tool in 0.7 is the auto-checking of
+*M* odified, *A* dded, and *R* emoved files at startup as these are
+all change types that are automatically included in any :command:`hg commit`
+command with no arguments. Similarly, unknown *?* files are shown by
+default at startup since that is standard behaviour for the :command:`hg status`
+command. Qct was already doing both of these things, so this
+will come as no surprise to Qct users.
+
+Deprecated
+----------
+
+External tool configuration is deprecated and will be removed in 0.9
