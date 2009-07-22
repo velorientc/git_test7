@@ -59,7 +59,7 @@ Visual Diffs
 
 If you prefer the previous (<=0.7) behavior of directly launching your
 visual diff tool, then you can recover that behavior via the user
-settings dialog and :guilabel:`TortoiseHg->Skip Diff Window`.
+settings dialog and :menuselection:`TortoiseHg --> Skip Diff Window`.
 
 Treeview searches
 -----------------
