@@ -53,10 +53,10 @@ when you have an http proxy configured.
 All operations which require authentication will pop up dialog boxes to
 get the required information from the user.  TortoiseHg uses the
 TortoisePlink tool (borrowed from the TortoiseSVN distribution) to
-handle *ssh:* connections and authentication.  See the FAQ1_ for help if
+handle *ssh:* connections and authentication.  See the FAQ_ for help if
 you have trouble connecting to ssh servers.
 
-.. _FAQ1: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
+.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
 
 Under the :guilabel:`Advanced Options` fold-up panel are a number of configurables
 that are valid for most push/pull operations.
