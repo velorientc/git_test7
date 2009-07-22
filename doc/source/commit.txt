@@ -2,6 +2,10 @@
 TortoiseHg Commit Tool
 ======================
 
+.. module:: commit.dialog
+   :synopsis: Dialog used to perform commit
+
+
 This page describes the 0.8 version of commit
 
 **The win32text extension can cause trouble with hunk selection.  This

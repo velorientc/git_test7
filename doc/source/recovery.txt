@@ -2,6 +2,9 @@
 TortoiseHg Recovery
 ===================
 
+.. module:: recovery.dialog
+   :synopsis: Dialog used to perform recovery operations
+
 This page describes the 0.7 version of recovery, though very little was
 changed in 0.8
 

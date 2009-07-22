@@ -2,6 +2,9 @@
 TortoiseHg Changelog Viewer
 ===========================
 
+.. module:: changelog.dialog
+   :synopsis: Dialog used to view log
+
 .. figure:: figures/log.png
    :alt: Changelog
 

@@ -2,6 +2,9 @@
 TortoiseHg Settings
 ===================
 
+.. module:: settings.dialog
+   :synopsis: Dialog used to set preferences
+
 This page describes the 0.7 version of settings
 	
 The Settings dialog is used to configure both TortoiseHg and the

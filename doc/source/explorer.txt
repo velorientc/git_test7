@@ -2,6 +2,9 @@
 Windows Explorer Integration
 ============================
 
+.. module:: explorer
+   :synopsis: Windows explorer integration
+
 Overlay Icons
 -------------
 TortoiseHg provides visual representation of the file status via overlay

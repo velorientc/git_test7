@@ -2,6 +2,9 @@
 TortoiseHg Serve
 ================
 
+.. module:: serve.dialog
+   :synopsis: Dialog used to start/stop the web server
+
 The serve tool is a wrapper for Mercurial's built-in web server. Once
 launched, any computer can attach to the http port and browse your
 repository(ies) or perform clone, pull, or even push operations (if you
