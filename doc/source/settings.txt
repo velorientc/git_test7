@@ -14,20 +14,20 @@ essentially the same thing.
 
 Mercurial on Windows has a three-tier configuration system.
 
-1) A site-wide configuration file in ``C:\Program Files\TortoiseHg\Mercurial.ini`` This file is read first and thus has the lowest priority.
-2) A per-user configuration file in ``C:\Documents and Settings\username\Mercurial.ini`` This file is read second and thus can override settings in the site-wide configuration file.
-3) A per-repository configuration file in ``repo-root\.hg\hgrc`` This file is read last and can override site-wide and user global settings.
+1) A site-wide configuration file in :file:`C:\Program Files\TortoiseHg\Mercurial.ini` This file is read first and thus has the lowest priority.
+2) A per-user configuration file in :file:`C:\Documents and Settings\username\Mercurial.ini` This file is read second and thus can override settings in the site-wide configuration file.
+3) A per-repository configuration file in :file:`repo-root\.hg\hgrc` This file is read last and can override site-wide and user global settings.
 
 The site-wide file can be overwritten on upgrades so it is recommended
 that you do not make changes to this file.  Instead, you should make
-changes to your user ``Mercurial.ini`` and/or the repository hgrc file.
+changes to your user :file:`Mercurial.ini` and/or the repository :file:`hgrc` file.
 The TortoiseHg Settings dialog enforces this suggestion by only
 operating in two modes:
 
 Global
-	edits your user ``Mercurial.ini`` file
+	edits your user :file:`Mercurial.ini` file
 Repository
-	edits a repository ``.hg/hgrc`` file
+	edits a repository :file:`.hg/hgrc` file
 					
 Most TortoiseHg users will want to store all configurables in their
 global user settings, and only use the repository hgrc to store paths
@@ -44,17 +44,17 @@ The Settings tool is a tabbed application.
 
    Settings dialog
 
-Each tab corresponds roughly to a section of your ``Mercurial.ini``
+Each tab corresponds roughly to a section of your :file:`Mercurial.ini`
 file, though there is a certain amount of overlap. Some sections were
 split across multiple tabs for clarity.
 
-Every tab except of the *Paths* tab has the same format, a list of
+Every tab except of the :guilabel:`Paths` tab has the same format, a list of
 configurable options with a drop-down combo box with possible values and
 a history of options you have used for that setting. The configurable
 name (label) has a tooltip which describes in more detail what you are
 configuring and its default value.
 
-The *Paths* tab is where you can store URLs (paths) to related
+The :guilabel:`Paths` tab is where you can store URLs (paths) to related
 repositories. It is rare to store paths in the site-wide or user
 configuration files, most of the time you will only store these in a
 repository configuration file. Mercurial has two special path names that
@@ -66,5 +66,5 @@ default-push
 	the default push target when using the command line
 
 Please consult the Mercurial wiki for more detailed information about
-these configurables (except for the first three tabs: *TortoiseHg*,
-*Commit*, *Changelog*, which are specifically for TortoiseHg).
+these configurables (except for the first three tabs: :guilabel:`TortoiseHg`,
+:guilabel:`Commit`, :guilabel:`Changelog`, which are specifically for TortoiseHg).
