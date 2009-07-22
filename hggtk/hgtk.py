@@ -212,7 +212,7 @@ def runcommand(ui, args):
     path = paths.find_root(os.getcwd())
     if path:
         try:
-            lui = hasattr(_ui, 'copy') and _ui.copy() or _ui.ui(ui)
+            lui = ui.copy()
             lui.readconfig(os.path.join(path, ".hg", "hgrc"))
         except IOError:
             pass
