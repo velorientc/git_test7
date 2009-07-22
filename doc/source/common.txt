@@ -1,0 +1,81 @@
+===============
+Common Features
+===============
+
+These features are commonly available in many TortoiseHg tools, so we
+document them here just once.
+
+Geometry Restore
+================
+
+Our primary applications like commit, changelog, and datamine, will
+restore their geometry and position from the last time they were run.
+This includes maximization.
+
+If the state to be restored does not fit within your current screen
+dimensions, the application will revert to factory default dimensions.
+
+The TortoiseHg dialogs which are more transitory in nature (clone, init,
+synch, update, merge) simply allow the window manager to place them
+where it wishes.
+
+Keyboard Accelerators
+---------------------
+
+We define a few keyboard accelerators that all of the TortoiseHg tools support.
+		
+*CTRL-Q*
+	quit the application, including all open windows
+
+*CTRL-W*
+	close the current window (same as *CTRL-Q* if only one window is open)
+
+*CTRL-D*
+	visual diff of currently selected file or changeset					
+
+*CTRL-ENTER*
+	activation					
+
+*F5*
+	refresh					
+
+On `Mac OS X`_, the apple (command) key is used as the modifier instead
+of *CTRL*. However some keyboard accelerators are internal to GTK+ so
+you must use the control key to access cut-paste functionality, for
+instance.
+
+.. _`Mac OS X`: http://bitbucket.org/tortoisehg/stable/wiki/MacOSX
+
+Visual Diffs
+------------
+
+0.8 introduced a visual diff dialog that solves four usability issues:
+
+1) The ability to select visual diff tools for individual files
+2) Allows you to use visual diff tools that fork backround processes
+3) Allows you to use visual diff tools that do not support directory diffs
+4) Provides feedback when no files were modified 
+
+If you prefer the previous (<=0.7) behavior of directly launching your
+visual diff tool, then you can recover that behavior via the user
+settings dialog and *TortoiseHg->Skip Diff Window*.
+
+Treeview searches
+-----------------
+
+Many TortoiseHg dialogs use treeviews to present lists of data to the
+user. The file lists in the status, commit, shelve, and changelog tools
+are treeviews. The changelog graph pane is a treeview. And even the
+annotate pane in the datamine tool is a treeview.
+
+Most of the TortoiseHg treeviews (as of release 0.8) are configured for
+live searches. You simply ensure that the treeview has focus (by
+clicking on a row), then begin typing. A small entry window will appear
+with the text you have typed and the treeview will immediately jump to
+the first row that matches the text you have entered thus far.  As you
+enter more keys, it refines it's search.
+
+* *CTRL-F* will bring up the search window explicitly
+* *CTRL-G* will advance the search to the next match,
+* *SHIFT-CTRL-G* goes backwards
+* The mouse scroll wheel will advance forwards and backwards through matching lines 

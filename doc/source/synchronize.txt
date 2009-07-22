@@ -1,0 +1,108 @@
+======================
+TortoiseHg Synchronize
+======================
+
+This page describes the 0.7 version of synchronize
+	
+The synchronize tool is used to transmit changesets between repositories
+and to email recipients.
+
+
+.. figure:: figures/synchronize.png
+   :alt: Synchronize dialog
+
+   Synchronize dialog
+
+*Incoming*
+	show changesets that would be pulled from target repository
+*Pull*
+	pull incoming changesets from target repository [1]
+*Outgoing*
+	show changesets that would be pushed to target repository
+*Push*
+	push outgoing changesets to target repository
+*Email*
+	send outgoing changesets (to target repository) as email
+*Stop*
+	stop current operation
+*Configure*
+	Configure repository paths (aliases)
+					
+1) The *Pull* toolbutton has a drop-down menu with extra options that
+are only applicable to pull operations:  *Update after Pull*, and *Use
+fetch*. See the fetch extension documentation for it's behavior.
+
+The *Repo:* button will open a directory finder to locate another
+repository on your local computer to synchronize with. Similarly, the
+*Bundle* button will open a file finder to locate a Mercurial bundle
+(``.hg``) file to pull changes from.
+
+The text entry/combo box is where you enter or select paths of target
+repositories. The synchronize tool will seed the drop-down list with
+path aliases configured for this repository, and with the most 10 recent
+paths used with any repository. There will be a dashed separator between
+the configured paths and the history.
+
+The *use proxy* button is a quick way to disable your proxy
+configuration for just a few operations. The button is only sensitive
+when you have an http proxy configured.
+
+All operations which require authentication will pop up dialog boxes to
+get the required information from the user.  TortoiseHg uses the
+TortoisePlink tool (borrowed from the TortoiseSVN distribution) to
+handle *ssh:* connections and authentication.  See the FAQ1_ for help if
+you have trouble connecting to ssh servers.
+
+.. _FAQ1: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
+
+Under the *Advanced Options* fold-up panel are a number of configurables
+that are valid for most push/pull operations.
+		
+*Specify target revision for transmission*
+	to avoid sending all revisions
+*Force pull or push*
+	override warnings about multiple heads or unrelated repositories
+*Show patches*
+	show diffs in incoming and outging changes
+*Show Newest First*
+	reverse order that changesets are listed
+*Show No Merges*
+	filter out merge changesets from output (does not affect push/pull)
+
+
+After Pull
+----------
+
+After changesets are pulled into your repository, two buttons may appear
+at the bottom of the dialog:
+
+*View pulled changesets*
+	Open the changelog viewer and inspect pulled changesets
+*Update to tip*
+	Update your working directory to the new tip
+
+Either button may be hidden if it is not applicable.
+
+Email
+-----
+
+The email dialog can be launched from two TortoiseHg tools.
+
+1) The changelog tool, in which case the user intends to email a single
+revision
+
+2) The synchronize tool, in which case the user intends to email all
+outgoing changes to the current target repository (it's good practice to
+check the outgoing changes before launching the email dialog).
+
+.. figure:: figures//email.png
+   :alt: Email dialog
+
+   Email dialog
+   
+The *Send* button is obvious, and the *Configure* dialog predictably
+opens the TortoiseHg Settings dialog to the email tab where you can
+configure your SMTP settings and set default To: and From: addresses.
+
+Please consult the Mercurial documentation for the differences between
+plain patches, HG patches, Git patches, and bundles.

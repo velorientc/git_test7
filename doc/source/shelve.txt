@@ -1,0 +1,120 @@
+======================
+TortoiseHg Shelve Tool
+======================
+
+**The win32text extension can cause trouble with hunk selection.  This
+has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
+proper configuration. See issue #82.**
+	
+.. figure:: figures/shelve.png
+   :alt: Shelve dialog
+
+   Shelve dialog
+
+Visually it is very similar to the status dialog in 0.6 and the commit
+tool in 0.7.  The purpose of this dialog is to allow the user to
+*shelve* selected changes from the working directory, store them in a
+special patch file in the repository, and then *unshelve* them back at a
+later time.
+		
+Walking across the toolbar, the buttons perform the following tasks:
+
+*Refresh*
+    Reload the state of the working directory. It retains file check and
+    selection state across refresh, but not hunks.
+*Shelve*
+	Shelve selected diffs in checked files.
+*Unshelve*
+	Replace the shelved changes back into the working directory.
+*Revert*
+	Revert checked files to last revisioned state.
+*Add*
+	Add checked files that were in unknown *?* state.
+	These files will then be versioned as soon as they are committed.
+*Move*
+	Move checked files to specified target directory.
+	This move is done with Mercurial's full knowledge.
+*Remove*
+    Delete checked unversioned files and/or remove (mark as deleted) any
+    versioned files.
+*Show Diff*
+    This is a toggle button that shows and hides the entire diff panel.
+    Hiding the diff panel can sometimes be useful in large repositories.
+						
+Below the file list are checkboxes that toggle the inclusion of the
+various classes of files {modified, added, removed, deleted, unknown,
+clean, ignored}.
+	
+Shelving Changes
+----------------
+
+
+Just like the commit tool, this dialog uses TortoiseHg's integrated hunk
+selection code to allow the user to select the files and change hunks to
+move to the shelf.  When you press the shelve button, the selected
+changes are removed from the working directory and placed in a patch
+file. If the shelf already had changes in it, you will be asked whether
+to replace those changes or to merge these new changes into it.  When
+the shelf has changes, the unshelve button will be active.
+			
+When the unshelve button is pressed, the shelved changes are reapplied
+to the working directory.
+			
+How is this different than record/commit?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Shelved changes are physically removed from the working directory until
+you unshelve them.  This means you can build your project and run tests
+on it while the shelved changes are gone.  This is safer than selecting
+changes at build time since you can test whether the change being
+committed is valid.
+
+Shelving changes is also useful for removing partially completed work to
+make sure it doesn't interfere with the debugging of other changes you
+are making.
+
+Caveat: the shelved changes are stored in a patch that is based on the
+current working directory contents. There's no guarantee that the patch
+can be cleanly reapplied later if the shelved changes conflict with
+changes made to your code after the shelving.
+
+How is this different than MQ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A shelf is, in effect, a single unnamed MQ patch that is never converted
+into a changeset.  The shelve tool can be useful when you are
+maintaining a patch queue, since it can hold changes from one patch and
+re-apply them to another patch (or an entirely new patch).
+
+How is this different than attic?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The attic extension is a super-set of the shelve feature. In particular,
+attic allows you to have several named *shelves* which can be saved and
+restored independently.  TortoiseHg doesn't support the attic extension
+in 0.7, but will probably support attic like features in future
+releases.
+
+Keyboard navigation
+-------------------
+
+*CTRL-Q*
+	will close the top dialog window
+*CTRL-C*
+    in the diff panel will copy the currently highlighted (not selected,
+    but highlighted) diff hunks to the clipboard. These can be pasted
+    into a text buffer to generate any arbitrary patch based from the
+    changes in your working directory.
+			
+Note that the code in the shelve tool that copies the hunks to the
+clipboard is smart about diff headers. If your highlighted list includes
+a hunk from a file but not it's file diff header, the diff header will
+be added to the clipboard in the appropriate location in the stream to
+make the clipboard contents always be a valid patch.
+
+
+Configurables
+-------------
+
+* *TortoiseHg->Bottom Diffs*
+* *TortoiseHg->Tab Width*

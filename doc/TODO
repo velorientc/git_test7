@@ -1,0 +1,6 @@
+Needs an Intro page explaining TortoiseHg and it's ports.  Include links
+Changelog needs much more detail
+Commit needs more detail, including ignore and guess dialogs
+Add links to BB wiki and Mercurial wiki
+Describe path editing and [auth] hgrc section
+Need a page explaining merges and merge undo

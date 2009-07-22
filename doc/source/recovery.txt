@@ -1,0 +1,29 @@
+===================
+TortoiseHg Recovery
+===================
+
+This page describes the 0.7 version of recovery, though very little was
+changed in 0.8
+
+.. figure:: figures/recover.png
+   :alt: Recovery dialog
+
+The buttons all equate to a single Mercurial command (save stop, obviously)
+
+*clean*
+    ``hg update --clean`` - performs a clean checkout of the existing
+    working directory parent revision.  Undoes a partially completed
+    merge.
+
+*rollback*
+    ``hg rollback`` - undo operation for most recent repository
+    transaction.  Can undo a commit or pull.
+
+*recover*
+    ``hg recover`` - recover from a badly aborted operation.  Rarely
+    necessary, Mercurial will tell you if it needs to be performed.
+
+*verify*
+    ``hg verify`` - perform a consistency check of the contents of your
+    repository
+

@@ -1,0 +1,65 @@
+============================
+Windows Explorer Integration
+============================
+
+Overlay Icons
+-------------
+TortoiseHg provides visual representation of the file status via overlay
+icons in the MS-Explorer windows. This is similar to those that found on
+other Tortoise client, such as TortoiseCVS and TortoiseSVN.
+
+Beginning from TortoiseHg version 0.5, the overlay icons are shared with
+TortoiseSVN (version 1.5.x or later) via the support of TortoiseOverlays
+(another project created by TortoiseSVN team).
+
+.. figure:: figures/overlayicons.png
+   :alt: Overlay icons
+
+   Overlay icons in Icons view (this image shows release 0.7 overlays)
+
+In release 0.8, we added an *Update Icons* context menu option which
+forces TortoiseHg to refresh the icons in the currently browsed
+repository or directory of repositories. The taskbar icon will turn
+green and the directory icons will turn into question marks while this
+refresh is in progress.
+		
+Performance Issues
+------------------
+When the repository being viewed contains a large number of folders or
+files, the overlay icons may appear case a perceivable delay in
+displaying/refreshing the windows explorer. In most cases, the delay is
+more prominent when the first time the repositories are viewed.
+Subsequently the caching of the file system usually helps to reduce the
+delay rather significantly.
+			
+The delay may also be felt on repositories located on network drives or
+other slower media.
+
+In 0.8, the new C++ shell extension is an order of magnitude faster than
+the Python extension used in previous releases, but we still make the
+overlays configurable via the taskbar menu.  Simply click on the
+Mercurial (droplet) icon in the system tray and select *Options*.  In
+the options dialog you can disable overlays globally, or enable them for
+local disks only.
+
+Context Menus
+-------------
+
+The TortoiseHg commands (GUI window & dialogs) may be accessed via the
+context menu of Explorer windows. The TortoiseHg context menu is 
+context sensitive, which varies according to the folder being viewed.
+
+.. figure:: figures/contextmenu.png
+   :alt: Context menu
+
+   Context menu for a folder under Mercurial revision control (version 0.7)
+
+Currently TortoiseHg provides only the most regularly used Mercurial
+commands, hence the less frequently used, or newly add, Mercurial
+commands may still need be accessed on the CLI (command line interface)
+through the ``cmd.exe`` windows.
+	
+In 0.8, the new C++ shell extension makes the context menu somewhat
+configurable via the taskbar menu. Simply click on the Mercurial
+(droplet) icon in the system tray and select *Options*.  In the options
+dialog you can promote individual menu options to the top menu.
