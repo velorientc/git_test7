@@ -114,6 +114,8 @@ def invalidaterepo(repo):
 
 def canonpaths(list):
     'Get canonical paths (relative to root) for list of files'
+    # This is a horrible hack.  Please remove this when HG acquires a
+    # decent case-folding solution.
     canonpats = []
     cwd = os.getcwd()
     root = paths.find_root(cwd)
