@@ -29,39 +29,39 @@ Features
 
 Walking across the toolbar, the buttons perform the following tasks:
 
-*Refresh*
+:guilabel:`Refresh`
     Reload the state of the working directory. It tries to retain file
     check and selection state across refresh, but not hunks.
-*Commit*
+:guilabel:`Commit`
 	Commit selected diffs in checked files.
-*Undo*
+:guilabel:`Undo`
     Undo (rollback) last immediate commit. Your commit message will be
     available in the message history, so you can re-do the commit after
     fixing whatever problem you noticed.
-*Revert*
+:guilabel:`Revert`
 	Revert checked files to last revisioned state.
-*Add*
+:guilabel:`Add`
     Add checked files that were in unknown '?' state. These files will
     then be versioned as soon as they are committed.
-*Move*
+:guilabel:`Move`
     Move checked files to specified target directory. This move is done
     with Mercurial's full knowledge.
-*Remove*
+:guilabel:`Remove`
     Delete checked unversioned files and/or remove (mark as deleted) any
     versioned files.
 
 Below the toolbar are two other useful widgets:
 
-*Branch name*
+:guilabel:`Branch name`
     Shows the current branch name of the working directory. Normally
     this is informational only, but you can create (open) a new branch
     by changing this name before making a commit. Do not use this
     feature unless you understand Mercurial's named branches.
-*Recent Commit Messages*
+:guilabel:`Recent Commit Messages`
     A drop-down list of the 10 most recent commit messages. The behavior
     of this drop-down has been tweaked in 0.7, and should behave
     naturally.
-*Patch name*
+:guilabel:`Patch name`
     If you have enabled the MQ extension, there will also be a text
     entry for a new patch name.  Entering a name here will switch the
     commit tool into 'QNew' mode where the working directory changes
@@ -141,18 +141,18 @@ This longer answer is only interesting when something goes wrong, which
 on Windows unfortunately has a probability greater than 0. If some
 program (virus checker, compiler) locks your file in the middle of this
 process you may see an error about a failed patch.  These errors are
-recoverable, simply delete any new .rej files and try the commit again.
+recoverable, simply delete any new :file:`.rej` files and try the commit again.
 
 
 
 Keyboard navigation
 -------------------
 		
-*CTRL-ENTER*
+:kbd:`CTRL-ENTER`
 	will trigger the commit
-*CTRL-W*
+:kbd:`CTRL-W`
 	will close the top dialog window
-*CTRL-C*
+:kbd:`CTRL-C`
     In the diff panel will copy the currently highlighted (not selected,
     but highlighted) diff hunks to the clipboard. These can be pasted
     into a text buffer to generate any arbitrary patch based from the
@@ -170,8 +170,8 @@ File Context Menus
 
 By right clicking on files in the file list, you will get a context menu
 of commands that are applicable to the selected file. If you configure a
-visual editor in *Settings->Global->TortoiseHg->Visual Editor* there
-will be an option to open the file in your editor.  For unknown	**?**
+visual editor in :menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
+there will be an option to open the file in your editor.  For unknown **?**
 files, the context menu will allow you to detect renames (if you think
 the unknown file was a copy or rename of a revisioned file) or configure
 the repository's ignore filter (if the file should never be revisioned
@@ -210,8 +210,8 @@ Commit Message Format
 If your project has guidelines for commit message format, you can
 configure those in the settings tool.  Once configured, the commit tool
 will inform you if you try to commit with a non-conforming message.
-There is also an *apply format* context menu option available on the
-commit message pane that will try to enforce your policy.
+There is also an :guilabel:`apply format` context menu option available
+on the commit message pane that will try to enforce your policy.
 	
 MQ patches
 ----------
@@ -228,37 +228,37 @@ The commit tool will present the entire contents of the top patch
 including any changes that are in your working directory (un-refreshed
 changes). This is essentially what the qdiff command would show you.
 There is, in fact, no way to get just the working copy diffs beyond
-running ``hg diff`` on the command line. The reason the dialog operates
-in this mode is that it allow you to use the integrated change selection
-features to move changes into or out of the top patch. You can move
-entire files or single changes in or out of the patch.
+running :command:`hg diff` on the command line. The reason the dialog
+operates in this mode is that it allow you to use the integrated change
+selection features to move changes into or out of the top patch. You can
+move entire files or single changes in or out of the patch.
 
-The *commit* button, which has been renamed *qrefresh* in this context,
-it will refresh the top patch with just the changes you have selected
-(including the patch description). This may be a bit confusing at first
+The :guilabel:`commit` button, which has been renamed :guilabel:`qrefresh`
+in this context, it will refresh the top patch with just the changes you
+have selected (including the patch description). This may be a bit confusing at first
 because the changes you leave out of the patch are still going to be in
 the working directory after the refresh, so it will look like nothing
 has changed.
 
 So, in summary, using MQ with TortoiseHg is still almost entirely a
-command line operation, but you can use ``hgtk ci`` to refresh your
+command line operation, but you can use :command:`hgtk ci` to refresh your
 patches and take advantage of our excellent change selection support.
 	
 	
 Configurables
 -------------
 
-*Commit->Username*
+:menuselection:`Commit --> Username`
 	Sets username associated with your commits
-*Commit->External Tool*
+:menuselection:`Commit --> External Tool`
 	Allows you to select Qct as the your commit tool
-*Commit->Summary Line Length*
+:menuselection:`Commit --> Summary Line Length`
 	Configures a 'policy' limit for summary lines
-*Commit->Message Line Length*
+:menuselection:`Commit --> Message Line Length`
 	Configures a 'policy' limit for message lines
-*Commit->Bottom Diffs*
+:menuselection:`Commit --> Bottom Diffs`
 	Toggles diff pane from left to below file list
-*TortoiseHg->Max Diff Size*
+:menuselection:`TortoiseHg --> Max Diff Size`
 	 Configures the diff size limit
 	 
 Changes from 0.6 to 0.7
@@ -276,9 +276,9 @@ this page to understand how the native tool now measures up.
 The default layout of the native commit tool is different than Qct. The
 file list is on the left side of the diff panel. This layout is actually
 configurable if you prefer the Qct layout, simply set the
-*Commit->Bottom Diffs* configuration item to ``True`` in the TortoiseHg
-settings dialog. This change will take affect the next time you start
-the commit tool.
+:menuselection:`Commit --> Bottom Diffs` configuration item to :guilabel:`True`
+in the TortoiseHg settings dialog. This change will take affect the next time
+you start the commit tool.
 
 Also different in the native commit tool is that all the diffs in the
 working directory are shown in the diff panel at startup. Selecting
@@ -291,35 +291,35 @@ view).
 
 New in the native commit tool in 0.7 is the auto-checking of
 **M**odified, **A**dded, and **R**emoved files at startup as these are
-all change types that are automatically included in any ``hg commit``
+all change types that are automatically included in any :command:`hg commit`
 command with no arguments. Similarly, unknown **?** files are shown by
-default at startup since that is standard behaviour for the ``hg
-status`` command. Qct was already doing both of these things, so this
+default at startup since that is standard behaviour for the :command:`hg status`
+command. Qct was already doing both of these things, so this
 will come as no surprise to Qct users.
 
 
 Changes from 0.7 to 0.8
 -----------------------
 
-* The *Show Diff* button has been removed. Diffs are always shown.
+* The :guilabel:`Show Diff` button has been removed. Diffs are always shown.
 * The commit tool no longer shows all diffs at startup. Only the first
   currently selected file is shown.
 * Added support for closing a named branch
 * The commit tool is now launchable from the merge dialog
 * The message pane context menu now has options for inserting selected
   filenames, and configuring/applying a layout format.
-* *Ctrl-O* keyboard accelerator for triggering commit has been replaced with 
-  *CTRL-Enter* accelerator which is common to many THG dialogs
+* :guilabel:`Ctrl-O` keyboard accelerator for triggering commit has been replaced with 
+  :guilabel:`CTRL-Enter` accelerator which is common to many THG dialogs
 * Support for two-parent state (merging) has been improved, especially
   the file context menus.
 * There is now a limit on the size of files that will be diffed by the commit
   and changelog tools. Files above this size will simply show a message
   indicating why the file was not diffed.  This limit (default: 1MB) is
   configurable (per-repository if necessary) via the settings dialog
-  TortoiseHg->Max Diff Size.
-* You can specify the commiter and date via the command line: see ``hgtk
-  commit -h`` for details
-* The ``qct.py`` extension file is no longer bundled. It must be
+  :menuselection:`TortoiseHg --> Max Diff Size`.
+* You can specify the commiter and date via the command line: see
+  :command:`hgtk commit -h` for details
+* The :file:`qct.py` extension file is no longer bundled. It must be
   downloaded separately if you wish to use Qct.
 
 

@@ -20,8 +20,8 @@ TortoiseSVN (version 1.5.x or later) via the support of TortoiseOverlays
 
    Overlay icons in Icons view (this image shows release 0.7 overlays)
 
-In release 0.8, we added an *Update Icons* context menu option which
-forces TortoiseHg to refresh the icons in the currently browsed
+In release 0.8, we added an :guilabel:`Update Icons` context menu option
+which forces TortoiseHg to refresh the icons in the currently browsed
 repository or directory of repositories. The taskbar icon will turn
 green and the directory icons will turn into question marks while this
 refresh is in progress.
@@ -41,8 +41,8 @@ other slower media.
 In 0.8, the new C++ shell extension is an order of magnitude faster than
 the Python extension used in previous releases, but we still make the
 overlays configurable via the taskbar menu.  Simply click on the
-Mercurial (droplet) icon in the system tray and select *Options*.  In
-the options dialog you can disable overlays globally, or enable them for
+Mercurial (droplet) icon in the system tray and select :guilabel:`Options`.
+In the options dialog you can disable overlays globally, or enable them for
 local disks only.
 
 Context Menus
@@ -60,9 +60,10 @@ context sensitive, which varies according to the folder being viewed.
 Currently TortoiseHg provides only the most regularly used Mercurial
 commands, hence the less frequently used, or newly add, Mercurial
 commands may still need be accessed on the CLI (command line interface)
-through the ``cmd.exe`` windows.
+through the :file:`cmd.exe` windows.
 	
 In 0.8, the new C++ shell extension makes the context menu somewhat
 configurable via the taskbar menu. Simply click on the Mercurial
-(droplet) icon in the system tray and select *Options*.  In the options
-dialog you can promote individual menu options to the top menu.
+(droplet) icon in the system tray and select :guilabel:`Options`.
+In the options dialog you can promote individual menu options to
+the top menu.
