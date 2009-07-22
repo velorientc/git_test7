@@ -14,9 +14,13 @@ essentially the same thing.
 
 Mercurial on Windows has a three-tier configuration system.
 
-1) A site-wide configuration file in :file:`C:\Program Files\TortoiseHg\Mercurial.ini` This file is read first and thus has the lowest priority.
-2) A per-user configuration file in :file:`C:\Documents and Settings\username\Mercurial.ini` This file is read second and thus can override settings in the site-wide configuration file.
-3) A per-repository configuration file in :file:`repo-root\.hg\hgrc` This file is read last and can override site-wide and user global settings.
+1) A site-wide configuration file in :file:`C:\\Program Files\\TortoiseHg\\Mercurial.ini`
+   This file is read first and thus has the lowest priority.
+2) A per-user configuration file in :file:`C:\\Documents and Settings\\username\\Mercurial.ini`
+   This file is read second and thus can override settings in the
+   site-wide configuration file.
+3) A per-repository configuration file in :file:`repo-root\\.hg\\hgrc` This
+   file is read last and can override site-wide and user global settings.
 
 The site-wide file can be overwritten on upgrades so it is recommended
 that you do not make changes to this file.  Instead, you should make
