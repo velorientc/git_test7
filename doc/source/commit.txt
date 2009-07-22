@@ -293,9 +293,9 @@ committed will look like (it matches more closely to the changelog
 view).
 
 New in the native commit tool in 0.7 is the auto-checking of
-**M**odified, **A**dded, and **R**emoved files at startup as these are
+*M* odified, *A* dded, and *R* emoved files at startup as these are
 all change types that are automatically included in any :command:`hg commit`
-command with no arguments. Similarly, unknown **?** files are shown by
+command with no arguments. Similarly, unknown *?* files are shown by
 default at startup since that is standard behaviour for the :command:`hg status`
 command. Qct was already doing both of these things, so this
 will come as no surprise to Qct users.
