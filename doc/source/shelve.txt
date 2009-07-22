@@ -22,25 +22,25 @@ later time.
 		
 Walking across the toolbar, the buttons perform the following tasks:
 
-*Refresh*
+:guilabel:`Refresh`
     Reload the state of the working directory. It retains file check and
     selection state across refresh, but not hunks.
-*Shelve*
+:guilabel:`Shelve` 
 	Shelve selected diffs in checked files.
-*Unshelve*
+:guilabel:`Unshelve`
 	Replace the shelved changes back into the working directory.
-*Revert*
+:guilabel:`Revert`
 	Revert checked files to last revisioned state.
-*Add*
+:guilabel:`Add`
 	Add checked files that were in unknown *?* state.
 	These files will then be versioned as soon as they are committed.
-*Move*
+:guilabel:`Move`
 	Move checked files to specified target directory.
 	This move is done with Mercurial's full knowledge.
-*Remove*
+:guilabel:`Remove`
     Delete checked unversioned files and/or remove (mark as deleted) any
     versioned files.
-*Show Diff*
+:guilabel:`Show Diff`
     This is a toggle button that shows and hides the entire diff panel.
     Hiding the diff panel can sometimes be useful in large repositories.
 						
@@ -101,9 +101,9 @@ releases.
 Keyboard navigation
 -------------------
 
-*CTRL-Q*
+:guilabel:`CTRL-Q`
 	will close the top dialog window
-*CTRL-C*
+:guilabel:`CTRL-C`
     in the diff panel will copy the currently highlighted (not selected,
     but highlighted) diff hunks to the clipboard. These can be pasted
     into a text buffer to generate any arbitrary patch based from the
@@ -119,5 +119,5 @@ make the clipboard contents always be a valid patch.
 Configurables
 -------------
 
-* *TortoiseHg->Bottom Diffs*
-* *TortoiseHg->Tab Width*
+* :menuselection:`TortoiseHg --> Bottom Diffs`
+* :menuselection:`TortoiseHg --> Tab Width`
