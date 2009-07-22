@@ -13,25 +13,25 @@ configure your server to allow it).
 .. figure:: figures/serve.png
    :alt: Web server dialog
 
-*Start*
+:guilabel:`Start`
 	start the web server
 
-*Stop*
+:guilabel:`Stop`
 	stop the web server
 
-*Browse*
+:guilabel:`Browse`
 	open your default browser at the built-in web server
 
-*Configure*
+:guilabel:`Configure`
 	Configure repository web style, description, and access policies
 
-When the settings dialog is launched via the *Configure* button, it is
+When the settings dialog is launched via the :guilabel:`Configure` button, it is
 run in the context of the current repository.  Please visit the
 Mercurial wiki for detailed descriptions of what the various web
 configurations are for.
 
 If you wish to serve a many repositories with a single web server
-instance, you can create an ``hgwebdir.conf`` text file with the
+instance, you can create an :file:`hgwebdir.conf` text file with the
 following contents: ::
 
 	[paths]
@@ -42,7 +42,7 @@ of the web server and the second path describes here the repositories
 can be found on your computer.  Multiple entries are possible.
 
 To use this file you must launch the TortoiseHg serve dialog from the
-command line via: ``hgtk serve --webdir-conf=hgwebdir.conf``.  In a
+command line via: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.  In a
 future release of TortoiseHg, we hope to make this launchable from the
 shell context menu.
 	
