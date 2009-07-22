@@ -5,9 +5,10 @@ TortoiseHg Shelve Tool
 .. module:: commit.dialog
    :synopsis: Dialog used to perform shelve/unshelve operations
 
-**The win32text extension can cause trouble with hunk selection.  This
-has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
-proper configuration. See issue #82.**
+.. warning::
+   The win32text extension can cause trouble with hunk selection.  This
+   has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
+   proper configuration. See `issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
 	
 .. figure:: figures/shelve.png
    :alt: Shelve dialog
