@@ -80,3 +80,18 @@ enter more keys, it refines it's search.
 * :kbd:`CTRL-G` will advance the search to the next match,
 * :kbd:`SHIFT-CTRL-G` goes backwards
 * The mouse scroll wheel will advance forwards and backwards through matching lines 
+
+HG command dialog
+=================
+
+Many TortoiseHg tools use the *hgcmd* dialog to run Mercurial commands
+that could potentially be interactive.  In release 0.8, this dialog was
+changed to draw all error messages in a dark red color to give it more
+contrast with normal output messages.
+
+The window also properly focuses its :guilabel:`close` button when the
+command has completed, so a simple :kbd:`Enter` is that that is required
+to close the window.
+
+*hgcmd* also responds appropriately to the global :kbd:`CTRL-W` and
+more drastic :kbd:`CTRL-Q` accelerators.
