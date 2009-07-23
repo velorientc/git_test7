@@ -1,0 +1,8 @@
+=======================
+TortoiseHg Introduction
+=======================
+
+.. module:: introduction
+   :synopsis: Introduce TortoiseHg and its various parts
+
+TortoiseHg is...
