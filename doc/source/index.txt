@@ -23,7 +23,8 @@ Contents:
    serve
    settings
    recovery
-
+   faq
+   
 Indices and tables
 ==================
 
