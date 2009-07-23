@@ -290,11 +290,9 @@ Changes since 0.6
 		
 Large changes were made to the commit tool in the 0.7 release. The
 previous default tool, Qct, was unbundled and TortoiseHg's native commit
-tool was promoted to the top spot. See the FAQ_ for	instructions on
-recovering Qct, if you must, but we suggest you first read the rest of
-this page to understand how the native tool now measures up.		
-
-.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
+tool was promoted to the top spot. See the `FAQ <http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq>`_ 
+for	instructions on recovering Qct, if you must, but we suggest you first
+read the rest of this page to understand how the native tool now measures up.		
 
 The default layout of the native commit tool is different than Qct. The
 file list is on the left side of the diff panel. This layout is actually
