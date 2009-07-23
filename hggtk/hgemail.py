@@ -345,8 +345,6 @@ class EmailDialog(gtk.Window):
             cmdline.insert(2, '--test')
         if subjtext:
             cmdline += ['--subject', subjtext]
-            if self._intro:
-                cmdline += ['--intro']
         if self._bundle.get_active():
             cmdline += ['--bundle']
             if '--outgoing' in self.revargs:
@@ -361,6 +359,8 @@ class EmailDialog(gtk.Window):
         start = self.descbuffer.get_start_iter()
         end = self.descbuffer.get_end_iter()
         desc = self.descbuffer.get_text(start, end)
+        if desc and self._intro:
+            cmdline += ['--intro']
         try:
             fd, tmpfile = tempfile.mkstemp(prefix="thg_emaildesc_")
             os.write(fd, desc)
