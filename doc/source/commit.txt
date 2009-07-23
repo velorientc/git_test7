@@ -5,10 +5,6 @@ TortoiseHg Commit Tool
 .. module:: commit.dialog
    :synopsis: Dialog used to perform commit
 
-.. note::
-
-   This page describes the 0.8 version of commit
-
 .. warning::   
    The win32text extension can cause trouble with hunk selection.  This
    has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
@@ -153,8 +149,6 @@ Keyboard navigation
 		
 :kbd:`CTRL-ENTER`
 	will trigger the commit
-:kbd:`CTRL-W`
-	will close the top dialog window
 :kbd:`CTRL-C`
     In the diff panel will copy the currently highlighted (not selected,
     but highlighted) diff hunks to the clipboard. These can be pasted
@@ -254,7 +248,7 @@ Configurables
 :menuselection:`Commit --> Username`
 	Sets username associated with your commits
 :menuselection:`Commit --> External Tool`
-	Allows you to select Qct as the your commit tool
+	Allows you to select Qct as the your commit tool [DEPRECATED]
 :menuselection:`Commit --> Summary Line Length`
 	Configures a 'policy' limit for summary lines
 :menuselection:`Commit --> Message Line Length`
@@ -263,6 +257,8 @@ Configurables
 	Toggles diff pane from left to below file list
 :menuselection:`TortoiseHg --> Max Diff Size`
 	 Configures the diff size limit
+
+External tool configuration is deprecated and will be removed in 0.9
  
 Changes from 0.7 to 0.8
 -----------------------
@@ -324,7 +320,3 @@ default at startup since that is standard behaviour for the :command:`hg status`
 command. Qct was already doing both of these things, so this
 will come as no surprise to Qct users.
 
-Deprecated
-----------
-
-External tool configuration is deprecated and will be removed in 0.9
