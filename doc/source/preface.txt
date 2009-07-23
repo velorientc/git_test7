@@ -16,7 +16,7 @@ Reading guide
 This Preface explains a little about the TortoiseHG project, the community of people who work on it,
 and the licensing conditions for using it and distributing it.
 
-The Chapter 1, Introduction explains what TortoiseHG is, what it does, where it comes from and the
+The :doc:`intro`, explains what TortoiseHG is, what it does, where it comes from and the
 basics for installing it on your PC.
 
 The Chapter 2 and others. TODO when the structure of the manual is enough stable.
