@@ -484,10 +484,9 @@ class ChangeSet(gdialog.GDialog):
         wfile = util.localpath(self.curfile)
         wfile, ext = os.path.splitext(os.path.basename(wfile))
         filename = "%s@%d%s" % (wfile, self.currev, ext)
-        fd = gtklib.NativeSaveFileDialogWrapper(Title=_("Save file to"),
-                                         InitialDir=self.cwd,
-                                         FileName=filename)
-        result = fd.run()
+        result = gtklib.NativeSaveFileDialogWrapper(Title=_("Save file to"),
+                                             InitialDir=self.cwd,
+                                             FileName=filename).run()
         if result:
             q = Queue.Queue()
             cpath = util.canonpath(self.repo.root, self.cwd, self.curfile)
