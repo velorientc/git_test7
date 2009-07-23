@@ -8,7 +8,13 @@ Preface
 Audience
 ========
 
-TODO
+This book is written for computer literate folk who want to use Mercurial to manage their data, but are
+uncomfortable using the command line client to do so. Since TortoiseHG is a windows shell extension
+it's assumed that the user is familiar with the windows explorer and knows how to use it.
+TortoiseHG comes with a simple python application, hgtk, which allows you to launch the TortoiseHg dialogs
+on any platform that supports Mercurial, and PyGtk. This is the easiest way to start using TortoiseHg on Linux
+and Mac OS X.
+
 
 Reading guide
 =============
