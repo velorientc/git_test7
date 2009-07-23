@@ -361,6 +361,7 @@ class EmailDialog(gtk.Window):
         desc = self.descbuffer.get_text(start, end)
         if desc and self._intro:
             cmdline += ['--intro']
+        tmpfile = None
         try:
             fd, tmpfile = tempfile.mkstemp(prefix="thg_emaildesc_")
             os.write(fd, desc)
@@ -375,4 +376,6 @@ class EmailDialog(gtk.Window):
         finally:
             if oldpager:
                 os.environ['PAGER'] = oldpager
-            os.unlink(tmpfile)
+            if tmpfile:
+                os.unlink(tmpfile)
+
