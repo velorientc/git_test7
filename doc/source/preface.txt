@@ -1,0 +1,60 @@
+=======
+Preface
+=======
+
+.. module:: preface
+   :synopsis: About this manual
+
+Audience
+========
+
+TODO
+
+Reading guide
+=============
+
+TODO
+
+TortoiseHG is free!
+===================
+
+TODO
+
+Community
+=========
+
+TODO
+
+Acknowledgement
+===============
+
+TODO
+
+Conventions used in this manual
+===============================
+
+The following typographical conventions are used in this manual:
+
+:kbd:`CTRL-A`
+    Indicates a key, or combination of keys, to press.
+	
+:guilabel:`Commit`
+    Indicates a label, button or anything that appears in user interfaces.
+	
+:menuselection:`TortoiseHG... --> About`
+    Indicates a menu choice, or a combination of menu choice, tab selection and GUI label.
+    For example :menuselection:`TortoiseHG... --> Global settings --> Commit --> User name`
+    means do something in :guilabel:`User name` label under :guilabel:`Commit` tab selectable from the
+    menu choice :menuselection:`TortoiseHG... --> Global settings`.
+
+:file:`.hg/hgrc`
+    Indicates a filename or directory name.
+
+:command:`hgtk log`
+    Indicates a command to digit in command window.
+
+.. note::
+    This is a note.
+
+.. warning::
+    An important note. Pay attention.
