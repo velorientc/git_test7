@@ -660,11 +660,9 @@ class GLog(gdialog.GDialog):
     def export_patch(self, menuitem):
         rev = self.currow[treemodel.REVID]
         filename = "%s_rev%s.patch" % (os.path.basename(self.repo.root), rev)
-        fd = gtklib.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
-                                         InitialDir=self.repo.root,
-                                         FileName=filename)
-        result = fd.run()
-
+        result = gtklib.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
+                                             InitialDir=self.repo.root,
+                                             FileName=filename).run()
         if result:
             if os.path.exists(result):
                 res = gdialog.Confirm(_('Confirm Overwrite'), [], self,
