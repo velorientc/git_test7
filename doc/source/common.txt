@@ -23,7 +23,7 @@ synch, update, merge) simply allow the window manager to place them
 where it wishes.
 
 Keyboard Accelerators
----------------------
+=====================
 
 We define a few keyboard accelerators that all of the TortoiseHg tools support.
 		
@@ -48,7 +48,7 @@ keyboard accelerators are internal to GTK+ so you must use the control key to
 access cut-paste functionality, for instance.
 
 Visual Diffs
-------------
+============
 
 0.8 introduced a visual diff dialog that solves four usability issues:
 
@@ -62,7 +62,7 @@ visual diff tool, then you can recover that behavior via the user
 settings dialog and :menuselection:`TortoiseHg --> Skip Diff Window`.
 
 Treeview searches
------------------
+=================
 
 Many TortoiseHg dialogs use treeviews to present lists of data to the
 user. The file lists in the status, commit, shelve, and changelog tools
