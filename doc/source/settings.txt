@@ -17,9 +17,11 @@ essentially the same thing.
 
 Mercurial on Windows has a three-tier configuration system.
 
-1) A site-wide configuration file in :file:`C:\\Program Files\\TortoiseHg\\Mercurial.ini`
+1) A site-wide configuration file in
+   :file:`C:\\Program Files\\TortoiseHg\\Mercurial.ini`
    This file is read first and thus has the lowest priority.
-2) A per-user configuration file in :file:`C:\\Documents and Settings\\username\\Mercurial.ini`
+2) A per-user configuration file in
+   :file:`C:\\Documents and Settings\\username\\Mercurial.ini`
    This file is read second and thus can override settings in the
    site-wide configuration file.
 3) A per-repository configuration file in :file:`repo-root\\.hg\\hgrc` This
@@ -27,14 +29,17 @@ Mercurial on Windows has a three-tier configuration system.
 
 The site-wide file can be overwritten on upgrades so it is recommended
 that you do not make changes to this file.  Instead, you should make
-changes to your user :file:`Mercurial.ini` and/or the repository :file:`hgrc` file.
-The TortoiseHg Settings dialog enforces this suggestion by only
-operating in two modes:
+changes to your user :file:`Mercurial.ini` and/or the repository
+:file:`hgrc` file.  The TortoiseHg Settings dialog enforces this
+suggestion by only operating in two modes:
 
 Global
 	edits your user :file:`Mercurial.ini` file
 Repository
 	edits a repository :file:`.hg/hgrc` file
+
+In TortoiseHg 0.8, you may toggle between the two modes using the combo
+box at the top of the dialog.
 					
 Most TortoiseHg users will want to store all configurables in their
 global user settings, and only use the repository hgrc to store paths
@@ -43,6 +48,9 @@ override many configurables per-repository (a common example is to
 configure a different username for use in a repository).  Also note that
 the user and repository configuration files may not exist until you run
 the Settings dialog for the first time.
+
+Tabs
+====
 
 The Settings tool is a tabbed application.
 
@@ -68,5 +76,7 @@ default-push
 	the default push target when using the command line
 
 Please consult the Mercurial wiki for more detailed information about
-these configurables (except for the first three tabs: :guilabel:`TortoiseHg`,
-:guilabel:`Commit`, :guilabel:`Changelog`, which are specifically for TortoiseHg).
+these configurables (except for the first three tabs:
+:guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
+are specifically for TortoiseHg).
+

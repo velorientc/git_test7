@@ -102,20 +102,17 @@ releases.
 Keyboard navigation
 -------------------
 
-:guilabel:`CTRL-Q`
-	will close the top dialog window
 :guilabel:`CTRL-C`
     in the diff panel will copy the currently highlighted (not selected,
     but highlighted) diff hunks to the clipboard. These can be pasted
     into a text buffer to generate any arbitrary patch based from the
     changes in your working directory.
 			
-Note that the code in the shelve tool that copies the hunks to the
-clipboard is smart about diff headers. If your highlighted list includes
-a hunk from a file but not it's file diff header, the diff header will
-be added to the clipboard in the appropriate location in the stream to
-make the clipboard contents always be a valid patch.
-
+The code which copies the hunks to the clipboard is intelligent about
+diff headers. If your highlighted list includes a hunk from a file but
+not it's file diff header, the diff header will be added to the
+clipboard in the appropriate location in the stream to make the
+clipboard contents always be a valid patch.
 
 Configurables
 -------------

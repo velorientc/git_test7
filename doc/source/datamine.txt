@@ -7,7 +7,7 @@ TortoiseHg Datamine
 
 The datamine application is used to inspect the revision history of your
 repository.  It is a tabbed application that supports two tab types,
-shown below.  
+*Search* and *Annotate*.
 
 
 Search Tabs
