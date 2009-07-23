@@ -5,8 +5,11 @@ TortoiseHg Settings
 .. module:: settings.dialog
    :synopsis: Dialog used to set preferences
 
-This page describes the 0.7 version of settings
-	
+.. figure:: figures/settings.png
+   :alt: Settings dialog
+
+   Settings dialog
+
 The Settings dialog is used to configure both TortoiseHg and the
 underlying Mercurial DVCS.  Since TortoiseHg uses Mercurial's underlying
 configuration system to store and retrieve its settings, these are
@@ -42,11 +45,6 @@ the user and repository configuration files may not exist until you run
 the Settings dialog for the first time.
 
 The Settings tool is a tabbed application.
-
-.. figure:: figures/settings.png
-   :alt: Settings dialog
-
-   Settings dialog
 
 Each tab corresponds roughly to a section of your :file:`Mercurial.ini`
 file, though there is a certain amount of overlap. Some sections were

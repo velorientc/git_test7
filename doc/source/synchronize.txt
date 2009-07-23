@@ -5,12 +5,6 @@ TortoiseHg Synchronize
 .. module:: synchronize.dialog
    :synopsis: Dialog used to perform synchronization operations
 
-This page describes the 0.7 version of synchronize
-	
-The synchronize tool is used to transmit changesets between repositories
-and to email recipients.
-
-
 .. figure:: figures/synchronize.png
    :alt: Synchronize dialog
 

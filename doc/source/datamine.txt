@@ -5,8 +5,6 @@ TortoiseHg Datamine
 .. module:: datamine.dialog
    :synopsis: Dialog used to search in the history
 
-This page describes the 0.7 version of datamine
-
 The datamine application is used to inspect the revision history of your
 repository.  It is a tabbed application that supports two tab types,
 shown below.  
