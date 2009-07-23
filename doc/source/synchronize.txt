@@ -109,3 +109,13 @@ configure your SMTP settings and set default :guilabel:`To:` and :guilabel:`From
 
 Please consult the Mercurial documentation for the differences between
 plain patches, HG patches, Git patches, and bundles.
+
+Changes since 0.7
+-----------------
+
+* Path drop-down list no longer includes most-recently-used paths.  It
+  only includes configured repository paths.
+* Email dialog now has buttons for configuring in-reply-to tags and the
+  attachment types.
+* Email dialog now sends an intro message only when one has been
+  entered, regardless of patch count.

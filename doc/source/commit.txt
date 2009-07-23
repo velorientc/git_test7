@@ -260,8 +260,8 @@ Configurables
 
 External tool configuration is deprecated and will be removed in 0.9
  
-Changes from 0.7 to 0.8
------------------------
+Changes since 0.7
+-----------------
 
 * The :guilabel:`Show Diff` button has been removed. Diffs are always shown.
 * The commit tool no longer shows all diffs at startup. Only the first
@@ -285,8 +285,8 @@ Changes from 0.7 to 0.8
   downloaded separately if you wish to use Qct.
 
 
-Changes from 0.6 to 0.7
------------------------
+Changes since 0.6
+-----------------
 		
 Large changes were made to the commit tool in the 0.7 release. The
 previous default tool, Qct, was unbundled and TortoiseHg's native commit

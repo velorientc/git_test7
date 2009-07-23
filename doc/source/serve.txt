@@ -46,7 +46,7 @@ command line via: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.  In a
 future release of TortoiseHg, we hope to make this launchable from the
 shell context menu.
 	
-Changes in 0.8
---------------
+Changes since 0.7
+-----------------
 * Improved error handling
 * i18n fixes
