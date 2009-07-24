@@ -20,6 +20,10 @@ You do this by adjusting the global settings of TortoiseHG. Try right-clicking y
 
 
 From there you should be able to find what TortoiseHG thinks your name is, and correct it.
+
+.. note::
+	If you forget to set your name TortoiseHG ask you it at the first *commit*, when the name is required.
+	
 Create the repository on your local machine by using the :guilabel:`Create Repository Here` selection above.
 Mercurial places a subdirectory in your folder called :file:`.hg`. This is where it keeps all its versioning
 information. It is called the *repository*, and the directory containing the repository is called the
