@@ -227,7 +227,7 @@ TortoiseHg FAQ
 
 	TortoiseHg includes an entire Python distribution bundled up as
 	DLLs. The standard library modules are all in the
-	:file:`library.zip` file in :file:`C:\Program Files\TortoiseHg`.
+	:file:`library.zip` file in :file:`C:\\Program Files\\TortoiseHg`.
 
 	If you try to use an extension that imports a non-standard Python
 	module, you will find that the extension will fail to load because
