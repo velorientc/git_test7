@@ -52,7 +52,7 @@ Acknowledgement
 ===============
 
 Thanks to the many people who contribute to the TortoiseHg project.  It
-take a community of developers, translators, and users to build a
+takes a community of developers, translators, and users to build a
 truly useful tool.  Especially users who care enough to report bugs and
 file feature requests.
 
