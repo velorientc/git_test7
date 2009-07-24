@@ -80,4 +80,4 @@ these configurables (except for the first three tabs:
 :guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
 are specifically for TortoiseHg).
 
-.. vim: noet tw=4
+.. vim: noet ts=4

@@ -68,4 +68,4 @@ configurable via the taskbar menu. Simply click on the Mercurial
 In the options dialog you can promote individual menu options to
 the top menu.
 
-.. vim: noet tw=4
+.. vim: noet ts=4

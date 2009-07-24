@@ -261,4 +261,4 @@ TortoiseHg FAQ
 	You can find :file:`gtkrc` file in your TortoiseHg install directory:
 	i.e. :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
 
-.. vim: noet tw=4
+.. vim: noet ts=4

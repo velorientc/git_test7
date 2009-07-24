@@ -143,4 +143,4 @@ Changes since 0.7
 * Email dialog now sends an intro message only when one has been
   entered, regardless of patch count.
 
-.. vim: noet tw=4
+.. vim: noet ts=4

@@ -103,4 +103,4 @@ for other tools:
 :menuselection:`TortoiseHg --> Tab width`
 	Number of spaces to expand tabs in diffs and annotate output
 
-.. vim: noet tw=4
+.. vim: noet ts=4

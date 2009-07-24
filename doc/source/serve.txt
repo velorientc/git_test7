@@ -51,4 +51,4 @@ Changes since 0.7
 * Improved error handling
 * i18n fixes
 
-.. vim: noet tw=4
+.. vim: noet ts=4

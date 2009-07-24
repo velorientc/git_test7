@@ -32,4 +32,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. vim: noet tw=4
+.. vim: noet ts=4

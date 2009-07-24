@@ -25,4 +25,4 @@ TortoiseHg is primarily written in Python and PyGtk (the Windows shell
 extension being a noticeable exception).  The hgtk script can be used
 on any platform that supports PyGtk, including Mac OS X.
 
-.. vim: noet tw=4
+.. vim: noet ts=4

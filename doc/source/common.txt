@@ -107,4 +107,4 @@ to close the window.
 *hgcmd* also responds appropriately to the global :kbd:`CTRL-W` and
 more drastic :kbd:`CTRL-Q` accelerators.
 
-.. vim: noet tw=4
+.. vim: noet ts=4
