@@ -28,6 +28,8 @@ using it and distributing it.
 The :doc:`intro`, explains what TortoiseHG is, what it does, where it
 comes from and the basics for installing it on your PC.
 
+The :doc:`quick`, is a quick tutorial on how to start with TortoiseHG.
+
 The remaining chapters describe the tools that are part of TortoiseHg.
 
 TortoiseHG is free!
