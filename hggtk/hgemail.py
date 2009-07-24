@@ -224,24 +224,12 @@ class EmailDialog(gtk.Window):
             self._ccbox.child.set_text(hglib.fromutf(repo.ui.config('email', 'cc', '')))
             self._frombox.child.set_text(hglib.fromutf(repo.ui.config('email', 'from', '')))
             self._subjbox.child.set_text(hglib.fromutf(repo.ui.config('email', 'subject', '')))
-            self._intro = False
-            self._in_reply_to = False
-            for arg in extensions.find('patchbomb').cmdtable['email'][1]:
-                if arg[1] == 'intro':
-                    self._intro = True
-                elif arg[1] == 'in-reply-to':
-                    self._in_reply_to = True
-            if self._intro:
-                addtip = ''
-            else:
-                addtip = ' ' + _('The description field is unused '
-                               'when sending a single patch.')
             self.tooltips.set_tip(self._eventbox,
                     _('Patch series description is sent in initial summary'
                     ' email with [PATCH 0 of N] subject.  It should describe'
                     ' the effects of the entire patch series.  When emailing'
                     ' a bundle, these fields make up the message subject and body.')
-                    + addtip)
+                    )
         fill_history(history, self._tolist, 'email.to')
         fill_history(history, self._cclist, 'email.cc')
         fill_history(history, self._fromlist, 'email.from')
@@ -354,12 +342,12 @@ class EmailDialog(gtk.Window):
         if self._inline.get_active():   cmdline += ['--inline']
         if self._attach.get_active():   cmdline += ['--attach']
         if self._diffstat.get_active(): cmdline += ['--diffstat']
-        if inreplyto and self._in_reply_to:
+        if inreplyto:
             cmdline += ['--in-reply-to', inreplyto]
         start = self.descbuffer.get_start_iter()
         end = self.descbuffer.get_end_iter()
         desc = self.descbuffer.get_text(start, end)
-        if desc and self._intro:
+        if desc:
             cmdline += ['--intro']
         tmpfile = None
         try:
