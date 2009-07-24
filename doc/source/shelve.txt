@@ -64,7 +64,7 @@ the shelf has changes, the unshelve button will be active.
 When the unshelve button is pressed, the shelved changes are reapplied
 to the working directory.
 			
-How is this different than record/commit?
+How is this different from record/commit?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Shelved changes are physically removed from the working directory until
@@ -82,7 +82,7 @@ current working directory contents. There's no guarantee that the patch
 can be cleanly reapplied later if the shelved changes conflict with
 changes made to your code after the shelving.
 
-How is this different than MQ?
+How is this different from MQ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A shelf is, in effect, a single unnamed MQ patch that is never converted
@@ -90,7 +90,7 @@ into a changeset.  The shelve tool can be useful when you are
 maintaining a patch queue, since it can hold changes from one patch and
 re-apply them to another patch (or an entirely new patch).
 
-How is this different than attic?
+How is this different from attic?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The attic extension is a super-set of the shelve feature. In particular,

@@ -30,8 +30,8 @@ This includes maximization status.
 If the state to be restored does not fit within your current screen
 dimensions, the application will revert to factory default dimensions.
 
-The TortoiseHg dialogs which are more transitory in nature simply allow
-the window manager to place them where it wishes.
+The TortoiseHg dialogs which are more transitory in nature allow the
+window manager to place them where it wishes.
 
 Keyboard Accelerators
 =====================

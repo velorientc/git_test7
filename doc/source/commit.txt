@@ -134,13 +134,13 @@ the working copy).
 
 For files which are not partially selected, the commit operation avoids
 the entire *backup, revert, patch, commit, recover* round trip and
-simply commits those files in place.
+commits those files in place.
 
 This longer answer is only interesting when something goes wrong, which
 on Windows unfortunately has a probability greater than 0. If some
 program (virus checker, compiler) locks your file in the middle of this
 process you may see an error about a failed patch.  These errors are
-recoverable, simply delete any new :file:`.rej` files and try the commit again.
+recoverable.  Delete any new :file:`.rej` files and try the commit again.
 
 
 
@@ -275,7 +275,7 @@ Changes since 0.7
 * Support for two-parent state (merging) has been improved, especially
   the file context menus.
 * There is now a limit on the size of files that will be diffed by the commit
-  and changelog tools. Files above this size will simply show a message
+  and changelog tools. Files above this size will only show a message
   indicating why the file was not diffed.  This limit (default: 1MB) is
   configurable (per-repository if necessary) via the settings dialog
   :menuselection:`TortoiseHg --> Max Diff Size`.
@@ -295,11 +295,10 @@ for	instructions on recovering Qct, if you must, but we suggest you first
 read the rest of this page to understand how the native tool now measures up.		
 
 The default layout of the native commit tool is different than Qct. The
-file list is on the left side of the diff panel. This layout is actually
-configurable if you prefer the Qct layout, simply set the
-:menuselection:`Commit --> Bottom Diffs` configuration item to :guilabel:`True`
-in the TortoiseHg settings dialog. This change will take affect the next time
-you start the commit tool.
+file list is on the left side of the diff panel.  If you prefer the Qct
+layout, set the :menuselection:`Commit --> Bottom Diffs` configuration
+item to :guilabel:`True` in the TortoiseHg settings dialog. This change
+will take affect the next time you start the commit tool.
 
 Also different in the native commit tool is that all the diffs in the
 working directory are shown in the diff panel at startup. Selecting
