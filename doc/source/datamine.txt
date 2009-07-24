@@ -3,7 +3,7 @@ TortoiseHg Datamine
 ===================
 
 .. module:: datamine.dialog
-   :synopsis: Dialog used to search in the history
+	:synopsis: Dialog used to search in the history
 
 The datamine application is used to inspect the revision history of your
 repository.  It is a tabbed application that supports two tab types,
@@ -29,11 +29,11 @@ The text entry fields have these purposes:
 	a comma separated list of paths to include in your search. If no
 	paths are given, the search is assumed to be repository wide. In
 	other words, specifying an include path actually narrows the search
- 	criteria.
+	criteria.
 *excludes*
 	a comma separated list of paths to exclude from your search.
 	Exclusion patterns are applied after inclusion patterns.
-	
+
 The toggle buttons below the entry fields are for:
 
 :guilabel:`Follow copies and renames`
@@ -46,13 +46,14 @@ The toggle buttons below the entry fields are for:
 	Show every instance where the search criteria matches in a file, not
 	just the most recent revision.  It shows +/- to indicate whether the
 	change adds or removes your search text.
-		
-		
+
+
 Search tabs are named after the search string most recently used to
-start a search.  The :guilabel:`New Search` toolbar button will obviously open a
-new search tab while the :guilabel:`Stop` button will terminate an ongoing search
-(the :guilabel:`Stop` button is only sensitive when a search is in progress).
-		
+start a search.  The :guilabel:`New Search` toolbar button will
+obviously open a new search tab while the :guilabel:`Stop` button will
+terminate an ongoing search (the :guilabel:`Stop` button is only
+sensitive when a search is in progress).
+
 Matches
 -------
 
@@ -66,14 +67,14 @@ will bring up a context menu with these features:
 	open an annotation tab for this file at this revision
 :guilabel:`file history`
 	open a changelog window with this file's revision history
-		
+
 Annotate Tabs
 -------------
 
 .. figure:: figures/annotate.png
-   :alt: Annotate tabs
+	:alt: Annotate tabs
 
-   Annotate tabs
+	Annotate tabs
 
 
 The revision graph has a simple context menu for opening the entire
@@ -97,7 +98,7 @@ Configurables
 
 The annotate tabs support the following configurations defined primarily
 for other tools:
-				
+
 :menuselection:`Changelog --> Author Coloring`
 	Give each author a separate color in the changelog graph
 :menuselection:`TortoiseHg --> Tab width`

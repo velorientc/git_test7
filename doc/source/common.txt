@@ -3,7 +3,7 @@ Common Features
 ===============
 
 .. module:: common.dialog
-   :synopsis: Common features to all the dialog
+	:synopsis: Common features to all the dialog
 
 These features are common to many TortoiseHg tools, so we document them
 here just once.
@@ -37,7 +37,7 @@ Keyboard Accelerators
 =====================
 
 We define a few keyboard accelerators that all of the TortoiseHg tools support.
-		
+
 :kbd:`CTRL-Q`
 	quit the application, including all open windows
 
@@ -45,13 +45,13 @@ We define a few keyboard accelerators that all of the TortoiseHg tools support.
 	close the current window (same as :kbd:`CTRL-Q` if only one window is open)
 
 :kbd:`CTRL-D`
-	visual diff of currently selected file or changeset					
+	visual diff of currently selected file or changeset	
 
 :kbd:`CTRL-ENTER`
-	activation					
+	activation
 
 :kbd:`F5`
-	refresh					
+	refresh
 
 On `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_, the apple
 (command) key is used as the modifier instead of :kbd:`CTRL`. However some

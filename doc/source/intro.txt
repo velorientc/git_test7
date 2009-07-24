@@ -3,23 +3,23 @@ TortoiseHg Introduction
 =======================
 
 .. module:: introduction
-   :synopsis: Introduce TortoiseHg and its various parts
+	:synopsis: Introduce TortoiseHg and its various parts
 
 TortoiseHg is a set of graphical tools and a shell extension for the
 `Mercurial <http://www.selenic.com/mercurial>`_ distributed revision control
 system.
 
 On Windows,
-    TortoiseHg consists of a shell extension, which provides overlay
-    icons and context menus in your file explorer, and a command line
-    program named hgtk.exe which can launch the TortoiseHg tools.
-    Binary packages of TortoiseHg for Windows come with Mercurial and a
-    merge tool and are thus completely ready for use "Out of the Box".
+	TortoiseHg consists of a shell extension, which provides overlay
+	icons and context menus in your file explorer, and a command line
+	program named hgtk.exe which can launch the TortoiseHg tools.
+	Binary packages of TortoiseHg for Windows come with Mercurial and a
+	merge tool and are thus completely ready for use "Out of the Box".
 
 On Linux,
-    TortoiseHg consists of a command line hgtk script, and a Nautilus
-    extension which provides overlays and context menus in your file
-    explorer.
+	TortoiseHg consists of a command line hgtk script, and a Nautilus
+	extension which provides overlays and context menus in your file
+	explorer.
 
 TortoiseHg is primarily written in Python and PyGtk (the Windows shell
 extension being a noticeable exception).  The hgtk script can be used

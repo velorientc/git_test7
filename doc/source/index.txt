@@ -9,21 +9,21 @@ Welcome to TortoiseHG's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+	:maxdepth: 2
    
-   preface
-   intro
-   common
-   explorer
-   commit
-   shelve
-   changelog
-   datamine
-   synchronize
-   serve
-   settings
-   recovery
-   faq
+	preface
+	intro
+	common
+	explorer
+	commit
+	shelve
+	changelog
+	datamine
+	synchronize
+	serve
+	settings
+	recovery
+	faq
    
 Indices and tables
 ==================

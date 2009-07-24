@@ -44,7 +44,7 @@ TortoiseHg FAQ
 	We recommend that you try the commit tool that comes with TortoiseHg
 	before running back to Qct, but here are the instructions should you
 	decide to stick with ole' reliable:
-	
+
 	1. Download and install Qct-1.7-standalone-win32.exe from
 	   http://qct.sourceforge.net
 	2. Add (or merge) the following into your :file:`Mercurial.ini` ::

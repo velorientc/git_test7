@@ -3,28 +3,28 @@ TortoiseHg Recovery
 ===================
 
 .. module:: recovery.dialog
-   :synopsis: Dialog used to perform recovery operations
+	:synopsis: Dialog used to perform recovery operations
 
 .. figure:: figures/recover.png
-   :alt: Recovery dialog
+	:alt: Recovery dialog
 
 The buttons all equate to a single Mercurial command (save stop, obviously)
 
 :guilabel:`clean`
-    :command:`hg update --clean` - performs a clean checkout of the existing
-    working directory parent revision.  Undoes a partially completed
-    merge.
+	:command:`hg update --clean` - performs a clean checkout of the existing
+	working directory parent revision.  Undoes a partially completed
+	merge.
 
 :guilabel:`rollback`
-    :command:`hg rollback` - undo operation for most recent repository
-    transaction.  Can undo a commit or pull.
+	:command:`hg rollback` - undo operation for most recent repository
+	transaction.  Can undo a commit or pull.
 
 :guilabel:`recover`
-    :command:`hg recover` - recover from a badly aborted operation.  Rarely
-    necessary, Mercurial will tell you if it needs to be performed.
+	:command:`hg recover` - recover from a badly aborted operation.  Rarely
+	necessary, Mercurial will tell you if it needs to be performed.
 
 :guilabel:`verify`
-    :command:`hg verify` - perform a consistency check of the contents of your
-    repository
+	:command:`hg verify` - perform a consistency check of the contents of your
+	repository
 
 .. vim: noet ts=4

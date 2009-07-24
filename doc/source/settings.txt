@@ -3,12 +3,12 @@ TortoiseHg Settings
 ===================
 
 .. module:: settings.dialog
-   :synopsis: Dialog used to set preferences
+	:synopsis: Dialog used to set preferences
 
 .. figure:: figures/settings.png
-   :alt: Settings dialog
+	:alt: Settings dialog
 
-   Settings dialog
+	Settings dialog
 
 The Settings dialog is used to configure both TortoiseHg and the
 underlying Mercurial DVCS.  Since TortoiseHg uses Mercurial's underlying
@@ -40,7 +40,7 @@ Repository
 
 In TortoiseHg 0.8, you may toggle between the two modes using the combo
 box at the top of the dialog.
-					
+
 Most TortoiseHg users will want to store all configurables in their
 global user settings, and only use the repository hgrc to store paths
 (remote repository aliases) and web settings, though it is possible to
@@ -69,7 +69,7 @@ repositories. It is rare to store paths in the site-wide or user
 configuration files, most of the time you will only store these in a
 repository configuration file. Mercurial has two special path names that
 can be used as default targets for some operations.
-		
+
 default
 	the default URL to pull from, usually clone source
 default-push

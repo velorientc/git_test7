@@ -3,13 +3,13 @@ TortoiseHg Changelog Viewer
 ===========================
 
 .. module:: changelog.dialog
-   :synopsis: Dialog used to view log
+	:synopsis: Dialog used to view log
 
 .. figure:: figures/log.png
-   :alt: Changelog
+	:alt: Changelog
 
-   Changelog viewer dialog
-	
+	Changelog viewer dialog
+
 The toolbar buttons from left to right:
 
 :guilabel:`Refresh`
@@ -61,8 +61,8 @@ revision context menu.
 :guilabel:`display change`
 	open this changeset in the changeset browser (more below)
 :guilabel:`diff to local`
-    display changes (visual diff) between this revision and your current
-    working directory
+	display changes (visual diff) between this revision and your current
+	working directory
 :guilabel:`update`
 	update your working directory to this revision [1]
 :guilabel:`merge with`
@@ -83,7 +83,8 @@ revision context menu.
 	revert working copy to this revision's contents, without updating working
 	directory parent revision. Use with care.
 :guilabel:`strip`
-	Remove the selected revision and all of it's descendants from the repository [4]
+	Remove the selected revision and all of it's descendants from the
+	repository [4]
 
 
 If you right-click on a row other than the one that was currently selected, you get a different context menu.
@@ -99,7 +100,7 @@ This one is for visualizing diffs between two arbitrary revisions.
 	 Description
 :guilabel:`merge with selected` [6]
 	 Description
-						 
+ 
 1) Opens the TortoiseHg update/checkout dialog with this revision selected.
 2) Opens the TortoiseHg merge dialog with this revision selected.
 3) Opens the TortoiseHg email dialog with this revision selected.
@@ -130,7 +131,7 @@ bring up a context menu for the selected file:
 	 Open this file in the datamine app, annotated at this revision
 :guilabel:`revert file contents`
 	 Checkout this specific revision of this file  [3]
-						 
+ 
 1) :menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
 2) Does not show revisions where a file was deleted, as this is only a
    manifest change, it does not modify the file's history.
@@ -155,7 +156,7 @@ changes into a repository, so this must be done on the command line with
 the :command:`hg import` command.
 
 This changeset browser also supports the :kbd:`CTRL-C` keyboard
-accelerator to copy hightlighted diff hunks	to the clipboard.
+accelerator to copy hightlighted diff hunks to the clipboard.
 
 Configurables
 -------------
@@ -171,7 +172,7 @@ the TortoiseHg Settings dialog on the Changelog tab.
 	Number of revisions to read in each batch load
 :guilabel:`Copy Hash`
 	Copy a revision's changeset id hash to the clipboard when selected
-						
+
 The exact colors given to particular users can be configured by adding
 lines like these to your :file:`Mercurial.ini` file: ::
 

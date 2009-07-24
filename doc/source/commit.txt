@@ -3,25 +3,25 @@ TortoiseHg Commit Tool
 ======================
 
 .. module:: commit.dialog
-   :synopsis: Dialog used to perform commit
+	:synopsis: Dialog used to perform commit
 
 .. warning::   
-   The win32text extension can cause trouble with hunk selection.  This
-   has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
-   proper configuration. See `issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
+	The win32text extension can cause trouble with hunk selection.  This
+	has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
+	proper configuration. See
+	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
    
-	
 The commit tool is an important part of TortoiseHG.  It is, in fact, the
 only component that is launchable from the first level of the context
 menu.  This is mainly because it is the most heavily used tool. Not only
 can you commit your changes, but you can examine the state of your
 working directory and perform most routine maintenance tasks (add new
 files, record renames, manage the repository ignore filter, etc).
-		
-.. figure:: figures/commit.png
-   :alt: Commit dialog
 
-   Commit dialog
+.. figure:: figures/commit.png
+	:alt: Commit dialog
+
+	Commit dialog
 
 Features
 --------
@@ -29,47 +29,47 @@ Features
 Walking across the toolbar, the buttons perform the following tasks:
 
 :guilabel:`Refresh`
-    Reload the state of the working directory. It tries to retain file
-    check and selection state across refresh, but not hunks.
+	Reload the state of the working directory. It tries to retain file
+	check and selection state across refresh, but not hunks.
 :guilabel:`Commit`
 	Commit selected diffs in checked files.
 :guilabel:`Undo`
-    Undo (rollback) last immediate commit. Your commit message will be
-    available in the message history, so you can re-do the commit after
-    fixing whatever problem you noticed.
+	Undo (rollback) last immediate commit. Your commit message will be
+	available in the message history, so you can re-do the commit after
+	fixing whatever problem you noticed.
 :guilabel:`Revert`
 	Revert checked files to last revisioned state.
 :guilabel:`Add`
-    Add checked files that were in unknown '?' state. These files will
-    then be versioned as soon as they are committed.
+	Add checked files that were in unknown '?' state. These files will
+	then be versioned as soon as they are committed.
 :guilabel:`Move`
-    Move checked files to specified target directory. This move is done
-    with Mercurial's full knowledge.
+	Move checked files to specified target directory. This move is done
+	with Mercurial's full knowledge.
 :guilabel:`Remove`
-    Delete checked unversioned files and/or remove (mark as deleted) any
-    versioned files.
+	Delete checked unversioned files and/or remove (mark as deleted) any
+	versioned files.
 
 Below the toolbar are two other useful widgets:
 
 :guilabel:`Branch name`
-    Shows the current branch name of the working directory. Normally
-    this is informational only, but you can create (open) a new branch
-    by changing this name before making a commit. Do not use this
-    feature unless you understand Mercurial's named branches.
+	Shows the current branch name of the working directory. Normally
+	this is informational only, but you can create (open) a new branch
+	by changing this name before making a commit. Do not use this
+	feature unless you understand Mercurial's named branches.
 :guilabel:`Recent Commit Messages`
-    A drop-down list of the 10 most recent commit messages. The behavior
-    of this drop-down has been tweaked in 0.7, and should behave
-    naturally.
+	A drop-down list of the 10 most recent commit messages. The behavior
+	of this drop-down has been tweaked in 0.7, and should behave
+	naturally.
 :guilabel:`Patch name`
-    If you have enabled the MQ extension, there will also be a text
-    entry for a new patch name.  Entering a name here will switch the
-    commit tool into 'QNew' mode where the working directory changes
-    will be applied to a new patch.
-							
+	If you have enabled the MQ extension, there will also be a text
+	entry for a new patch name.  Entering a name here will switch the
+	commit tool into 'QNew' mode where the working directory changes
+	will be applied to a new patch.
+
 Below the file list are checkboxes that toggle the inclusion of the
 various classes of files {modified, added, removed, deleted, unknown,
 clean, ignored}.
-		
+
 Removed means a revisioned file has been marked as removed. Deleted
 means a revisioned file is missing but Mercurial has not been told to
 quit tracking that file. For instance, if you rename a revisioned file
@@ -79,7 +79,7 @@ filename you can bring up the rename guessing dialog which can discover
 the rename by comparing file contents and mark the old file as removed
 and the new file as added while recording the whole operation as a
 rename.
-	
+
 Change Selection (record)
 -------------------------
 
@@ -90,17 +90,17 @@ means that all of the changes you make to versioned files can be
 individually selected to be included in the commit or left out of the
 commit (but left in the working directory).  Fans of darcs or
 Mercurial's record extension will recognize this immediately.
-			
+
 When is this necessary?
 ~~~~~~~~~~~~~~~~~~~~~~~
-		
+
 Most often, it is when you have made more than a single coherent change
 to your source code and you would like to commit your changes piecemeal.
 This can often be accomplished by filtering the list of files in each
 commit, but there will be times when your changes intermingle in the
 same set of files and that's when this change selection feature becomes
 indespensable.
-		
+
 How does it work?
 ~~~~~~~~~~~~~~~~~
 
@@ -112,7 +112,7 @@ background is turned gray.  At the same time, the file's diff header is
 updated to show the current selection state, the selected hunk count and
 changed lines will be updated. Toggle the hunk a second time to reselect
 it for inclusion in your commit.
-			
+
 When a file is partially selected for commit, it's icon is changed from
 a checkbox to a radio button. At a glance at the file list, you should
 be able to find which files are entirely included in the commit,
@@ -146,14 +146,14 @@ recoverable.  Delete any new :file:`.rej` files and try the commit again.
 
 Keyboard navigation
 -------------------
-		
+
 :kbd:`CTRL-ENTER`
 	will trigger the commit
 :kbd:`CTRL-C`
-    In the diff panel will copy the currently highlighted (not selected,
-    but highlighted) diff hunks to the clipboard. These can be pasted
-    into a text buffer to generate any arbitrary patch based from the
-    changes in your working directory.						
+	In the diff panel will copy the currently highlighted (not selected,
+	but highlighted) diff hunks to the clipboard. These can be pasted
+	into a text buffer to generate any arbitrary patch based from the
+	changes in your working directory.
 
 The code which copies the hunks to the clipboard is intelligent about
 diff headers. If your highlighted list includes a hunk from a file but
@@ -167,7 +167,8 @@ File Context Menus
 
 By right clicking on files in the file list, you will get a context menu
 of commands that are applicable to the selected file. If you configure a
-visual editor in :menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
+visual editor in
+:menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
 there will be an option to open the file in your editor.  For unknown **?**
 files, the context menu will allow you to detect renames (if you think
 the unknown file was a copy or rename of a revisioned file) or configure
@@ -199,8 +200,8 @@ unresolved *U* merge states.
 
 For your reference, *local* is the revision you had checked out when you
 started the merge and *other* is the revision you merged with.
-	
-	
+
+
 Commit Message Format
 ---------------------
 
@@ -209,7 +210,7 @@ configure those in the settings tool.  Once configured, the commit tool
 will inform you if you try to commit with a non-conforming message.
 There is also an :guilabel:`apply format` context menu option available
 on the commit message pane that will try to enforce your policy.
-	
+
 MQ patches
 ----------
 
@@ -240,8 +241,8 @@ has changed.
 So, in summary, using MQ with TortoiseHg is still almost entirely a
 command line operation, but you can use :command:`hgtk ci` to refresh your
 patches and take advantage of our excellent change selection support.
-	
-	
+
+
 Configurables
 -------------
 
@@ -256,7 +257,7 @@ Configurables
 :menuselection:`Commit --> Bottom Diffs`
 	Toggles diff pane from left to below file list
 :menuselection:`TortoiseHg --> Max Diff Size`
-	 Configures the diff size limit
+	Configures the diff size limit
 
 External tool configuration is deprecated and will be removed in 0.9
  
@@ -270,8 +271,9 @@ Changes since 0.7
 * The commit tool is now launchable from the merge dialog
 * The message pane context menu now has options for inserting selected
   filenames, and configuring/applying a layout format.
-* :guilabel:`Ctrl-O` keyboard accelerator for triggering commit has been replaced with 
-  :guilabel:`CTRL-Enter` accelerator which is common to many THG dialogs
+* :guilabel:`Ctrl-O` keyboard accelerator for triggering commit has been
+  replaced with :guilabel:`CTRL-Enter` accelerator which is common to
+  many THG dialogs
 * Support for two-parent state (merging) has been improved, especially
   the file context menus.
 * There is now a limit on the size of files that will be diffed by the commit
@@ -287,12 +289,12 @@ Changes since 0.7
 
 Changes since 0.6
 -----------------
-		
+
 Large changes were made to the commit tool in the 0.7 release. The
 previous default tool, Qct, was unbundled and TortoiseHg's native commit
 tool was promoted to the top spot. See the `FAQ <http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq>`_ 
-for	instructions on recovering Qct, if you must, but we suggest you first
-read the rest of this page to understand how the native tool now measures up.		
+for instructions on recovering Qct, if you must, but we suggest you first
+read the rest of this page to understand how the native tool now measures up.
 
 The default layout of the native commit tool is different than Qct. The
 file list is on the left side of the diff panel.  If you prefer the Qct

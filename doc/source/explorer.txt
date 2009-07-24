@@ -3,7 +3,7 @@ Windows Explorer Integration
 ============================
 
 .. module:: explorer
-   :synopsis: Windows explorer integration
+	:synopsis: Windows explorer integration
 
 Overlay Icons
 -------------
@@ -16,16 +16,16 @@ TortoiseSVN (version 1.5.x or later) via the support of TortoiseOverlays
 (another project created by TortoiseSVN team).
 
 .. figure:: figures/overlayicons.png
-   :alt: Overlay icons
+	:alt: Overlay icons
 
-   Overlay icons in Icons view (this image shows release 0.7 overlays)
+	Overlay icons in Icons view (this image shows release 0.7 overlays)
 
 In release 0.8, we added an :guilabel:`Update Icons` context menu option
 which forces TortoiseHg to refresh the icons in the currently browsed
 repository or directory of repositories. The taskbar icon will turn
 green and the directory icons will turn into question marks while this
 refresh is in progress.
-		
+
 Performance Issues
 ------------------
 When the repository being viewed contains a large number of folders or
@@ -34,7 +34,7 @@ displaying/refreshing the windows explorer. In most cases, the delay is
 more prominent when the first time the repositories are viewed.
 Subsequently the caching of the file system usually helps to reduce the
 delay rather significantly.
-			
+
 The delay may also be felt on repositories located on network drives or
 other slower media.
 
@@ -53,15 +53,15 @@ context menu of Explorer windows. The TortoiseHg context menu is
 context sensitive, which varies according to the folder being viewed.
 
 .. figure:: figures/contextmenu.png
-   :alt: Context menu
+	:alt: Context menu
 
-   Context menu for a folder under Mercurial revision control (version 0.7)
+	Context menu for a folder under Mercurial revision control (version 0.7)
 
 Currently TortoiseHg provides only the most regularly used Mercurial
 commands, hence the less frequently used, or newly add, Mercurial
 commands may still need be accessed on the CLI (command line interface)
 through the :file:`cmd.exe` windows.
-	
+
 In 0.8, the new C++ shell extension makes the context menu somewhat
 configurable via the taskbar menu. Simply click on the Mercurial
 (droplet) icon in the system tray and select :guilabel:`Options`.
