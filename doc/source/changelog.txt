@@ -105,12 +105,12 @@ This one is for visualizing diffs between two arbitrary revisions.
 .. [#rcm2] Opens the TortoiseHg merge dialog with this revision selected.
 .. [#rcm3] Opens the TortoiseHg email dialog with this revision selected.
 .. [#rcm4] The strip command will store the stripped revisions in a bundle file
-		   that can later be reapplied. See also_
+		   that can later be reapplied.
+		   See `also <http://www.selenic.com/mercurial/wiki/index.cgi/EditingHistory>`_.
 .. [#rcm5] :menuselection:`Settings --> Global --> TortoiseHg --> Visual Diff Command`
 .. [#rcm6] Only sensitive if the selected revision is your current working
 		   directory parent
 
-.. _also: http://www.selenic.com/mercurial/wiki/index.cgi/EditingHistory
 
 
 File List Context Menus
