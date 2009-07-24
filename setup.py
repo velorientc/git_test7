@@ -125,7 +125,7 @@ def setup_posix():
 
     # Create a config.py.  Distributions will need to supply their own
     cfgfile = os.path.join('thgutil', 'config.py')
-    if not os.path.exists(cfgfile):
+    if not os.path.exists(cfgfile) and not os.path.exists('.hg/requires'):
         f = open(cfgfile, "w")
         f.write('bin_path     = "/usr/bin"\n')
         f.write('license_path = "/usr/share/doc/tortoisehg/Copying.txt.gz"\n')
