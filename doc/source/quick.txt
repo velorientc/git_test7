@@ -13,7 +13,7 @@ To get started, suppose you volunteer to create the first version. There are
 `ways of importing already existing repositories <http://www.selenic.com/mercurial/wiki/index.cgi/RepositoryConversion>`_,
 but lets assume we're starting from scratch. First you need to make sure that you are correctly identified in TortoiseHG.
 You do this by adjusting the global settings of TortoiseHG. Try right-clicking your source folder and following
-:menuselection:`TortoiseHG --> Settings --> Global`
+:menuselection:`TortoiseHG --> Global Settings`
 
 .. figure:: figures/contextmenu.png
 	:alt: Context Menu
