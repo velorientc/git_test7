@@ -5,22 +5,33 @@ Common Features
 .. module:: common.dialog
    :synopsis: Common features to all the dialog
 
-These features are commonly available in many TortoiseHg tools, so we
-document them here just once.
+These features are common to many TortoiseHg tools, so we document them
+here just once.
+
+Translations
+============
+
+The TortoiseHg tools use Python's
+`gettext <http://docs.python.org/library/gettext.html>`_ library to
+localize their text.  To get localized dialogs, it is recommended that
+you set the LANGUAGE environment variable to your locale of choice.
+
+The Windows shell extension context menus get their translations from
+the Windows registry.  Translations for many locales are available from
+the TortoiseHG `wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_.
 
 Geometry Restore
 ================
 
-Our primary applications like commit, changelog, and datamine, will
+Our primary applications like commit, changelog, and datamine will
 restore their geometry and position from the last time they were run.
-This includes maximization.
+This includes maximization status.
 
 If the state to be restored does not fit within your current screen
 dimensions, the application will revert to factory default dimensions.
 
-The TortoiseHg dialogs which are more transitory in nature (clone, init,
-synch, update, merge) simply allow the window manager to place them
-where it wishes.
+The TortoiseHg dialogs which are more transitory in nature simply allow
+the window manager to place them where it wishes.
 
 Keyboard Accelerators
 =====================
@@ -58,8 +69,8 @@ Visual Diffs
 4) Provides feedback when no files were modified 
 
 If you prefer the previous (<=0.7) behavior of directly launching your
-visual diff tool, then you can recover that behavior via the user
-settings dialog and :menuselection:`TortoiseHg --> Skip Diff Window`.
+visual diff tool, you can recover that behavior via the user settings
+dialog and :menuselection:`TortoiseHg --> Skip Diff Window`.
 
 Treeview searches
 =================
@@ -70,24 +81,24 @@ are treeviews. The changelog graph pane is a treeview. And even the
 annotate pane in the datamine tool is a treeview.
 
 Most of the TortoiseHg treeviews (as of release 0.8) are configured for
-live searches. You simply ensure that the treeview has focus (by
-clicking on a row), then begin typing. A small entry window will appear
-with the text you have typed and the treeview will immediately jump to
-the first row that matches the text you have entered thus far.  As you
-enter more keys, it refines it's search.
+live searches. Ensure that the treeview has focus (by clicking on a
+row), and begin typing a search phrase. A small entry window will appear
+containing the text you have typed, and the treeview will immediately
+jump to the first row that matches the text you have entered thus far.
+As you enter more characters, the search is refined.
 
-* :kbd:`CTRL-F` will bring up the search window explicitly
-* :kbd:`CTRL-G` will advance the search to the next match,
-* :kbd:`SHIFT-CTRL-G` goes backwards
+* :kbd:`CTRL-F` opens the search window explicitly
+* :kbd:`CTRL-G` advances the search to the next match
+* :kbd:`SHIFT-CTRL-G` searches backwards
 * The mouse scroll wheel will advance forwards and backwards through matching lines 
 
 HG command dialog
 =================
 
-Many TortoiseHg tools use the *hgcmd* dialog to run Mercurial commands
-that could potentially be interactive.  In release 0.8, this dialog was
-changed to draw all error messages in a dark red color to give it more
-contrast with normal output messages.
+Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
+commands that could potentially be interactive.  In release 0.8, this
+dialog was changed to draw all error messages in a dark red color to
+give it more contrast with normal output messages.
 
 The window also properly focuses its :guilabel:`close` button when the
 command has completed, so a simple :kbd:`Enter` is that that is required
