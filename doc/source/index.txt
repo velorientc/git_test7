@@ -13,6 +13,7 @@ Contents:
    
 	preface
 	intro
+	quick
 	common
 	explorer
 	commit
