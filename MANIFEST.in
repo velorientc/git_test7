@@ -3,3 +3,4 @@ include contrib/_hgtk
 include contrib/nautilus-thg.py
 include COPYING.txt ReleaseNotes.txt
 recursive-include i18n *.po
+recursive-include doc *
