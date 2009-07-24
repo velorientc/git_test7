@@ -27,7 +27,7 @@ From there you should be able to find what TortoiseHG thinks your name is, and c
 Create the repository on your local machine by using the :guilabel:`Create Repository Here` selection above.
 Mercurial places a subdirectory in your folder called :file:`.hg`. This is where it keeps all its versioning
 information. It is called the *repository*, and the directory containing the repository is called the
-*working directory*. You never specify the :file`.hg` directory. It is mentioned here just so you'll better
+*working directory*. You never specify the :file:`.hg` directory. It is mentioned here just so you'll better
 understand how Mercurial is working.
 
 Add the files contained in the folder by following the menu :menuselection:`TortoiseHG --> Add Files`.
