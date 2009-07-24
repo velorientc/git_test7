@@ -142,3 +142,5 @@ Changes since 0.7
   attachment types.
 * Email dialog now sends an intro message only when one has been
   entered, regardless of patch count.
+
+.. vim: noet tw=4

@@ -119,3 +119,5 @@ Configurables
 
 * :menuselection:`TortoiseHg --> Bottom Diffs`
 * :menuselection:`TortoiseHg --> Tab Width`
+
+.. vim: noet tw=4

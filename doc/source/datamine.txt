@@ -102,3 +102,5 @@ for other tools:
 	Give each author a separate color in the changelog graph
 :menuselection:`TortoiseHg --> Tab width`
 	Number of spaces to expand tabs in diffs and annotate output
+
+.. vim: noet tw=4

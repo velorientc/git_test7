@@ -187,3 +187,5 @@ TortoiseHg tab:
 	Maximum size of file to be diffed
 :guilabel:`Bottom Diffs`
 	Show diffs below file list
+
+.. vim: noet tw=4

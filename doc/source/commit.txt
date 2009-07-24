@@ -317,3 +317,4 @@ default at startup since that is standard behaviour for the :command:`hg status`
 command. Qct was already doing both of these things, so this
 will come as no surprise to Qct users.
 
+.. vim: noet tw=4

@@ -27,3 +27,4 @@ The buttons all equate to a single Mercurial command (save stop, obviously)
     :command:`hg verify` - perform a consistency check of the contents of your
     repository
 
+.. vim: noet tw=4

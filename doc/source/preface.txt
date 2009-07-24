@@ -86,3 +86,5 @@ The following typographical conventions are used in this manual:
 
 .. warning::
     An important note. Pay attention.
+
+.. vim: noet tw=4

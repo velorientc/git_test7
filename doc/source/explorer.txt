@@ -67,3 +67,5 @@ configurable via the taskbar menu. Simply click on the Mercurial
 (droplet) icon in the system tray and select :guilabel:`Options`.
 In the options dialog you can promote individual menu options to
 the top menu.
+
+.. vim: noet tw=4
