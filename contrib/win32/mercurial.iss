@@ -53,6 +53,8 @@ Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsres
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\library.zip; DestDir: {app}
 Source: doc\*.html; DestDir: {app}\docs
+Source: doc\*.pdf; DestDir: {app}\docs
+Source: doc\*.chm; DestDir: {app}\docs
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
@@ -61,8 +63,7 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: CONTRIBUTORS; DestDir: {app}; DestName: Contributors.txt
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: ..\icons\hgicon.ico; DestDir: {app}
-;Source: ..\contrib\vcredist_x86.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
-;Source: ..\contrib\vcredist_x64.exe; DestDir: {tmp}; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
+Source: ..\files\hgbook.pdf; DestDir: {app}/docs
 
 Source: ..\files\THgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\files\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
@@ -72,9 +73,13 @@ Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http
 Filename: {app}\TortoiseHg.url; Section: InternetShortcut; Key: URL; String: http://bitbucket.org/tortoisehg/stable/
 
 [Icons]
+Name: {group}\TortoiseHg Book (chm); Filename: {app}\docs\TortoiseHg.chm
+Name: {group}\TortoiseHg Book (pdf); Filename: {app}\docs\TortoiseHg.pdf
 Name: {group}\TortoiseHg Web Site; Filename: {app}\TortoiseHg.url
-Name: {group}\Mercurial Web Site; Filename: {app}\Mercurial.url
+Name: {group}\Mercurial Book; Filename: {app}\docs\hgbook.pdf
 Name: {group}\Mercurial Command Reference; Filename: {app}\docs\hg.1.html
+Name: {group}\Mercurial Config Reference; Filename: {app}\docs\hgrc.5.html
+Name: {group}\Mercurial Web Site; Filename: {app}\Mercurial.url
 Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
