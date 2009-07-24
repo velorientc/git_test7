@@ -5,6 +5,9 @@ TortoiseHg Introduction
 .. module:: introduction
 	:synopsis: Introduce TortoiseHg and its various parts
 
+What is TortoiseHG?
+===================
+	
 TortoiseHg is a set of graphical tools and a shell extension for the
 `Mercurial <http://www.selenic.com/mercurial>`_ distributed revision control
 system.
@@ -24,5 +27,61 @@ On Linux,
 TortoiseHg is primarily written in Python and PyGtk (the Windows shell
 extension being a noticeable exception).  The hgtk script can be used
 on any platform that supports PyGtk, including Mac OS X.
+
+
+Installing TortoiseHG
+=====================
+
+On Windows
+----------
+
+TortoiseHG comes with an easy to use installer. Double click on the installer
+file and follow the instructions. The installer will take care of the rest.
+
+After the installation a reboot is necessary.
+
+.. note::
+	If you have an old version (less than 0.8) already installed the installer
+	stops and ask you to remove the previous version of TortoiseHG and
+	TortoiseOverlays (this must be removed from control panel).
+	
+	If you have a 0.8 version, or later, already installed you have to exit
+	from THGTaskBar before procede with the installation.
+	
+
+Language settings
+~~~~~~~~~~~~~~~~~
+
+The TortoiseHG user interface has been translated into many languages. You don't
+need to download any language pack. All the available languages are shipped with
+the installer. Look at :file:`C:\\Program Files\\TortoiseHG\\locale` for the
+available languages. To enable a language just set the environment variable
+``LANG`` to the desidered language, e.g. for italian ``SET LANG=it``.
+
+.. note::
+	If, after the language setting, the standard GUI element like :guilabel:`OK`,
+	:guilabel:`Apply` etc. still appear in english, it means that TortoiseHGSetup
+	doesn't ship the translated component of GTK+. This is probably due to a
+	not completed translation of TortoiseHG at the moment of release it.
+	
+The shell extension (read explorer context menu) has a different approach. The
+translated strings are read from the registry regardless the ``LANG``
+environment variable.
+Actually no registry setting files are shipped with TortoiseHG. You have to
+download from http://bitbucket.org/tortoisehg/stable/src/tip/win32/, once
+the desidered file is downloaded just double click on it (rename in .reg
+if the extension is .txt) and confirm all the requests. It takes effect at 
+the next reboot. 
+
+
+On Linux
+--------
+
+TODO
+	
+On Mac
+------
+
+TODO
 
 .. vim: noet ts=4
