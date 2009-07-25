@@ -104,4 +104,21 @@ for other tools:
 :menuselection:`TortoiseHg --> Tab width`
 	Number of spaces to expand tabs in diffs and annotate output
 
+From command line
+-----------------
+
+The datamine tool can be started from command line ::
+
+	hgtk datamina
+
+or ::
+
+	hgtk annotate
+
+or ::
+
+	hgtk blame
+	
+The syntax is simple, no options or parameters are needed, except the global options.
+
 .. vim: noet ts=4
