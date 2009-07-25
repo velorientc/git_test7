@@ -11,8 +11,8 @@ License:	GPLv2
 URL:		http://bitbucket.org/tortoisehg/stable/wiki/
 Source0:	tortoisehg-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	python
-Requires:	python >= 2.4, mercurial >= 1.3, gnome-python2-gconf
+BuildRequires:	python, python-devel, gettext
+Requires:	python >= 2.4, python-iniparse, mercurial >= 1.3, gnome-python2-gconf
 Requires:	gnome-python2-gtksourceview, pycairo, pygobject2, pygtk2 >= 2.10
 
 %description
@@ -22,7 +22,7 @@ graphical user interface to the Mercurial distributed revision control system.
 %package	nautilus
 Summary:	Mercurial GUI plugin to Nautilus file manager 
 Group:		Development/Tools
-Requires:	%{name} nautilus-python
+Requires:	%{name} = %{version}-%{release}, nautilus-python
 
 %description	nautilus
 This package contains the TortoiseHg Gnome/Nautilus extension,
@@ -30,7 +30,7 @@ which makes the Mercurial distributed revision control
 system available in the file manager with a graphical interface. 
 
 %prep
-%setup -q -n tortoisehg-%{version}
+%setup -q
 
 # Fix for nautilus python extensions in lib64 on x86_64
 sed -i "s,lib/nautilus,%{_lib}/nautilus,g" setup.py
