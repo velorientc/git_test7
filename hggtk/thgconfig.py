@@ -952,7 +952,10 @@ class ConfigDialog(gtk.Dialog):
                 pass
             return
         if section not in list(self.ini):
-            self.ini.new_namespace(section)
+            if hasattr(self.ini, '_new_namespace'):
+                self.ini._new_namespace(section)
+            else:
+                self.ini.new_namespace(section)
         self.ini[section][key] = newvalue
         if not keephistory:
             return
@@ -979,8 +982,6 @@ class ConfigDialog(gtk.Dialog):
                 cpath = '.'.join(['paths', name])
                 self.record_new_value(cpath, path, False)
                 refreshlist.append(name)
-            if 'paths' not in list(self.ini):
-                self.ini.new_namespace('paths')
             for name in list(self.ini.paths):
                 if name not in refreshlist:
                     del self.ini['paths'][name]
