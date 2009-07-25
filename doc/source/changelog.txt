@@ -189,4 +189,25 @@ TortoiseHg tab:
 :guilabel:`Bottom Diffs`
 	Show diffs below file list
 
+	
+From command line
+-----------------
+
+The changelog viewer can be started from command line ::
+
+	hgtk log
+
+or ::
+
+	hgtk history
+
+The syntax is ::
+
+	hgtk log [OPTIONS]
+
+Valid [OPTIONS] are:
+
+``-l``, ``--limit``
+	Specify the limit number of changes displayed.
+	
 .. vim: noet ts=4
