@@ -260,6 +260,39 @@ Configurables
 	Configures the diff size limit
 
 External tool configuration is deprecated and will be removed in 0.9
+
+From command line
+-----------------
+
+The commit tool can be started from command line ::
+
+	hgtk commit
+
+or ::
+
+	hgtk ci
+
+The syntax is ::
+
+	hgtk commit [OPTIONS] [FILES]
+
+where [FILES] is one or more file that must be commited, if no files are
+specified TortoiseHG commits all the modified files, and valid [OPTIONS] are:
+
+``-d``, ``--date``
+	Use the specified date as commit date, if not specified the current date
+	and time is used. For a quick help on the format of date type::
+	
+		hgtk help dates
+		
+	or ::
+	
+		hg help dates
+
+``-u``, ``--user``
+	Use the specified user name as author of the commit, if not specified the
+	user set in repository or global settings is used.
+	
  
 Changes since 0.7
 -----------------
