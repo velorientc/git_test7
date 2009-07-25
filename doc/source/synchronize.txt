@@ -160,7 +160,12 @@ or ::
 
 	hgtk email
 	
-The syntax is simple, no options or parameters are needed, except the global options.
+The syntax is simple, no options or parameters are needed, except the
+global options.  If the synchronize tool is started via push, outgoing,
+or email command aliases, it will automatically select the
+*default-push* URL if.  For all other aliases the tool selects the
+*default* URL.  If the selected URL is not found, it will use the first
+path it finds.
 
 Changes since 0.7
 -----------------
