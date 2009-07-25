@@ -2,7 +2,7 @@
 TortoiseHg Shelve Tool
 ======================
 
-.. module:: commit.dialog
+.. module:: shelve.dialog
 	:synopsis: Dialog used to perform shelve/unshelve operations
 
 .. warning::
