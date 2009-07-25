@@ -80,4 +80,19 @@ these configurables (except for the first three tabs:
 :guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
 are specifically for TortoiseHg).
 
+From command line
+-----------------
+
+The setting dialog can be started from command line ::
+
+	hgtk repoconfig
+
+for the repository settings or ::
+
+	hgtk userconfig
+
+for the user configuration.
+
+The syntax is simple, no options or parameters are needed, except the global options.
+
 .. vim: noet ts=4
