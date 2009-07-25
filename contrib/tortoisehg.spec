@@ -11,7 +11,7 @@ License:	GPLv2
 URL:		http://bitbucket.org/tortoisehg/stable/wiki/
 Source0:	tortoisehg-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	python, python-devel, gettext
+BuildRequires:	python, python-devel, gettext, python-sphinx
 Requires:	python >= 2.4, python-iniparse, mercurial >= 1.3, gnome-python2-gconf
 Requires:	gnome-python2-gtksourceview, pycairo, pygobject2, pygtk2 >= 2.10
 
@@ -45,6 +45,9 @@ EOT
 %build
 %{__python} setup.py build
 
+cd doc
+make html
+
 %install
 rm -rf $RPM_BUILD_ROOT
 
@@ -57,7 +60,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc COPYING.txt ReleaseNotes.txt
+%doc COPYING.txt ReleaseNotes.txt doc/build/html/
 %{_bindir}/hgtk
 %{python_sitelib}/hggtk/
 %{python_sitelib}/thgutil/
