@@ -109,7 +109,7 @@ From command line
 
 The datamine tool can be started from command line ::
 
-	hgtk datamina
+	hgtk datamine
 
 or ::
 
