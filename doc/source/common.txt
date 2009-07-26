@@ -8,18 +8,6 @@ Common Features
 These features are common to many TortoiseHg tools, so we document them
 here just once.
 
-Translations
-============
-
-The TortoiseHg tools use Python's
-`gettext <http://docs.python.org/library/gettext.html>`_ library to
-localize their text.  To get localized dialogs, it is recommended that
-you set the LANGUAGE environment variable to your locale of choice.
-
-The Windows shell extension context menus get their translations from
-the Windows registry.  Translations for many locales are available from
-the TortoiseHG `wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_.
-
 Geometry Restore
 ================
 
@@ -90,21 +78,22 @@ As you enter more characters, the search is refined.
 * :kbd:`CTRL-F` opens the search window explicitly
 * :kbd:`CTRL-G` advances the search to the next match
 * :kbd:`SHIFT-CTRL-G` searches backwards
-* The mouse scroll wheel will advance forwards and backwards through matching lines 
+* The mouse scroll wheel will advance forwards and backwards through
+  matching lines 
 
 HG command dialog
 =================
 
 Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
-commands that could potentially be interactive.  In release 0.8, this
+commands that could potentially be interactive.  In release 0.8, the
 dialog was changed to draw all error messages in a dark red color to
-give it more contrast with normal output messages.
+give them more contrast from normal output messages.
 
-The window also properly focuses its :guilabel:`close` button when the
-command has completed, so a simple :kbd:`Enter` is that that is required
-to close the window.
+The dialog focuses its :guilabel:`close` button when the command has
+completed, so a simple :kbd:`Enter` is all that is required to close
+the window.
 
 *hgcmd* also responds appropriately to the global :kbd:`CTRL-W` and
-more drastic :kbd:`CTRL-Q` accelerators.
+:kbd:`CTRL-Q` keyboard accelerators.
 
 .. vim: noet ts=4
