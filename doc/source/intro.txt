@@ -25,8 +25,9 @@ On Linux,
 	explorer.
 
 TortoiseHg is primarily written in Python and PyGtk (the Windows shell
-extension being a noticeable exception).  The hgtk script can be used
-on any platform that supports PyGtk, including Mac OS X.
+extension being a noticeable exception).  The hgtk script and TortoiseHg
+dialogs can be used on any platform that supports PyGtk, including Mac
+OS X.
 
 
 Installing TortoiseHG
@@ -38,50 +39,64 @@ On Windows
 TortoiseHG comes with an easy to use installer. Double click on the installer
 file and follow the instructions. The installer will take care of the rest.
 
-After the installation a reboot is necessary.
+After installation a reboot is necessary.
 
 .. note::
-	If you have an old version (less than 0.8) already installed the installer
-	stops and ask you to remove the previous version of TortoiseHG and
-	TortoiseOverlays (this must be removed from control panel).
-	
-	If you have a 0.8 version, or later, already installed you have to exit
-	from THGTaskBar before procede with the installation.
+	If you have an older (less than 0.8) version already installed, the
+	installer will ask that you to remove the previous version of
+	TortoiseHG, which must be removed from control panel.  Removing
+	TortoiseOverlays is also recommended, if no other apps are using
+	them, but not strictly required.
+
+	If you have 0.8 or later already installed, you must close all
+	instances of the ThgTaskBar application before installation can
+	procede.
 	
 
 Language settings
 ~~~~~~~~~~~~~~~~~
 
-The TortoiseHG user interface has been translated into many languages. You don't
-need to download any language pack. All the available languages are shipped with
-the installer. Look at :file:`C:\\Program Files\\TortoiseHG\\locale` for the
-available languages. To enable a language just set the environment variable
+The TortoiseHG user interface has been translated into many languages.
+You don't need to download a language pack. All the available languages
+are shipped with the installer. Look in
+:file:`C:\\Program Files\\TortoiseHG\\locale` for the available
+languages. To enable a language just set the environment variable
 ``LANG`` to the desidered language, e.g. for italian ``SET LANG=it``.
 
 .. note::
-	If, after the language setting, the standard GUI element like :guilabel:`OK`,
-	:guilabel:`Apply` etc. still appear in english, it means that TortoiseHGSetup
-	doesn't ship the translated component of GTK+. This is probably due to a
-	not completed translation of TortoiseHG at the moment of release it.
-	
-The shell extension (read explorer context menu) has a different approach. The
-translated strings are read from the registry regardless the ``LANG``
-environment variable.
-Actually no registry setting files are shipped with TortoiseHG. You have to
-download from http://bitbucket.org/tortoisehg/stable/src/tip/win32/, once
-the desidered file is downloaded just double click on it (rename in .reg
-if the extension is .txt) and confirm all the requests. It takes effect at 
-the next reboot. 
+	After setting LANG, if the standard GUI elements like :guilabel:`OK`,
+	:guilabel:`Apply` etc. still appear in English, it means that the
+	TortoiseHG installer did not include the translation component of GTK+
+	for your locale.  This was probably due to an incomplete translation
+	of TortoiseHG at the moment of release it.
 
+The Windows shell extension context menus get their translations from
+the Windows registry.  Translations for many locales are available from
+the TortoiseHG `wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_.
+Once the desidered file is downloaded (rename it to .reg if the
+extension is .txt), double-click on it and confirm all the requests.
 
-On Linux
---------
+On Linux and Mac
+----------------
 
-TODO
-	
-On Mac
-------
+RPM packages for Fedora are available on the
+`Download <http://bitbucket.org/tortoisehg/stable/downloads/>`_
+page of the wiki.
 
-TODO
+Deb packages for Ubuntu can be found at
+`this <https://launchpad.net/~maxb/+archive/ppa>`_ or
+`that <https://launchpad.net/~tortoisehg-ppa>`_ location.
+
+For MacOSX, no packages are available but you can run hgtk and all the
+dialogs via the source install method.
+`MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
+
+Language settings
+~~~~~~~~~~~~~~~~~
+
+The TortoiseHg tools use Python's
+`gettext <http://docs.python.org/library/gettext.html>`_ library to
+localize their text.  To get localized dialogs, it is recommended that
+you set the LANGUAGE environment variable to your locale of choice.
 
 .. vim: noet ts=4
