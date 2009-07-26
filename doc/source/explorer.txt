@@ -26,6 +26,13 @@ repository or directory of repositories. The taskbar icon will turn
 green and the directory icons will turn into question marks while this
 refresh is in progress.
 
+Release 0.8.1 introduced the ability to selectively disable overlay
+icons in specific repositories.  This can be done be editing the
+:file:`.hg\\thgstatus` file inside the repository and replacing it's
+contents with a single line containing::
+
+	@@noicons
+
 Performance Issues
 ------------------
 When the repository being viewed contains a large number of folders or
