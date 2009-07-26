@@ -11,37 +11,46 @@ The following describes just one of those ways: a single central repository.
 
 To get started, suppose you volunteer to create the first version. There are 
 `ways of importing already existing repositories <http://www.selenic.com/mercurial/wiki/index.cgi/RepositoryConversion>`_,
-but lets assume we're starting from scratch. First you need to make sure that you are correctly identified in TortoiseHG.
-You do this by adjusting the global settings of TortoiseHG. Try right-clicking your source folder and following
+but lets assume we're starting from scratch. First you need to make sure
+that you are correctly identified in TortoiseHG.  You do this by
+adjusting the global settings of TortoiseHG. Try right-clicking your
+source folder and following
 :menuselection:`TortoiseHG --> Global Settings`
 
 .. figure:: figures/contextmenu.png
 	:alt: Context Menu
 
-
-From there you should be able to find what TortoiseHG thinks your name is, and correct it.
+From there you should be able to find what TortoiseHG thinks your name
+is, and correct it.
 
 .. note::
-	If you forget to set your name TortoiseHG ask you it at the first *commit*, when the name is required.
-	
-Create the repository on your local machine by using the :guilabel:`Create Repository Here` selection above.
-Mercurial places a subdirectory in your folder called :file:`.hg`. This is where it keeps all its versioning
-information. It is called the *repository*, and the directory containing the repository is called the
-*working directory*. You never specify the :file:`.hg` directory. It is mentioned here just so you'll better
-understand how Mercurial is working.
+	If you forget to set your name TortoiseHG will ask you for it at the
+	first *commit*, when the name is first required.
 
-Add the files contained in the folder by following the menu :menuselection:`TortoiseHG --> Add Files`.
+Create the repository on your local machine by using the
+:guilabel:`Create Repository Here` selection above.  Mercurial places a
+subdirectory in your folder called :file:`.hg`. This is where it keeps
+all its versioning information. It is called the *repository*, and the
+directory containing the repository is called the *working directory*.
+You never specify the :file:`.hg` directory. It is mentioned here just
+so you'll better understand how Mercurial is working.
+
+Add the files contained in the folder by following the menu
+:menuselection:`TortoiseHG --> Add Files`.
 
 .. {{images/image008.gif}}
 
-Commit to your local repository by right-clicking anywhere in the folder, or on the folder itself,
-and then selecting :guilabel:`HG Commit ...`.
+Commit to your local repository by right-clicking anywhere in the
+folder, or on the folder itself, and then selecting
+:guilabel:`HG Commit ...`.
 
 .. {{images/image001.png}}
 
-Now you are ready to share your work. You do this by making a copy of your repository in a public place
-that everyone in your group can access. Mercurial calls this *cloning your repository*. Clone your repository
-to a common area, such as a shared drive or web site, which will be the merge point for the team.
+Now you are ready to share your work. You do this by making a copy of
+your repository in a public place that everyone in your group can
+access. Mercurial calls this *cloning your repository*. Clone your
+repository to a common area, such as a shared drive or web site, which
+will be the merge point for the team.
 
 .. {{images/image003.gif}}
 
@@ -50,43 +59,48 @@ Other team members will then work from this clone.
 Fetching from the group repository
 ==================================
 
-You want to start collaborating with your team. They tell you something like *fetch the repository from x*.
-What does it mean? It means that you want to make a copy of the repository saved at x on your local machine.
-Mercurial calls this cloning and has a special interface for it. Right click in the directory where you want your copy
+You want to start collaborating with your team. They tell you something
+like *fetch the repository from x*.  What does it mean? It means that
+you want to make a copy of the repository saved at x on your local
+machine.  Mercurial calls this cloning and has a special interface for
+it. Right click in the directory where you want your copy
 
 .. {{images/Clone.gif}}
 
 Working with your repository
 ============================
 
-Suppose you've introduced some changes. It is easy to see that there are a couple of directories with changes pending.
-You can traverse the directories to find specific changes and commit them from Explorer. A quicker way is to use the
-commit tool:
+Suppose you've introduced some changes. It is easy to see that there are
+a couple of directories with changes pending.  You can traverse the
+directories to find specific changes and commit them from Explorer. A
+quicker way is to use the commit tool:
 
 .. {{images/image001.png}}
 
-The commit tool gives you a way to see differences or you can use your visual difference tool (kdiff). You may commit
-many times before synchronizing with the group repository.
+The commit tool gives you a way to see differences or you can use your
+visual difference tool (kdiff). You may commit many times before
+synchronizing with the group repository.
 
 .. figure:: figures/commit.png
-   :alt: Commit dialog
+	:alt: Commit dialog
 
 When you're ready to publish your changes, you
 
 1. commit your changes to your local repository, if you haven't already.
 2. pull changes from the group repository into your repository
-3. commit the merge to your local repository
+3. merge and commit into your local repository
 4. make sure your work still builds and passes your extensive test suite
 5. push your changes to the group repository.
 
-Which may sound complicated, but it is just pushing the buttons on the synchronize tool.
+Which may sound complicated, but it is just pushing the buttons on the
+synchronize tool.
 
 .. {{images/image005.gif}}
 
 Which makes the synchronize tool come up:
 
 .. figure:: figures/synchronize.png
-   :alt: Synchronize dialog
+	:alt: Synchronize dialog
 
 
 :guilabel:`Incoming`
@@ -98,4 +112,7 @@ Which makes the synchronize tool come up:
 :guilabel:`Push`
 	make my changes the current changeset (tip) in the group repository.
 
-Mercurial makes collaboration easy, fast, and productive. Learn more at http://www.selenic.com/mercurial/wiki/
+Mercurial makes collaboration easy, fast, and productive.
+Learn more at http://www.selenic.com/mercurial/wiki/
+
+.. vim: noet ts=4
