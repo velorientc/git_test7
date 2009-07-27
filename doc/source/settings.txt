@@ -347,11 +347,11 @@ The setting dialog can be started from command line ::
 
 	hgtk repoconfig
 
-for the repository settings or ::
+for the repository settings (:file:`.hg/hgrc` file) or ::
 
 	hgtk userconfig
 
-for the user configuration.
+for the user configuration (:file:`Mercurial.ini` file).
 
 The syntax is simple, no options or parameters are needed, except the global options.
 
