@@ -244,17 +244,22 @@ Proxy
 -----
 	
 :guilabel:`Host:`
-	TODO
+	Host name and (optional) port of proxy server, for
+	example "myproxy:8000".
 	
 :guilabel:`Bypass List:`
-	TODO
+	Optional. Comma-separated list of host names that
+	should bypass the proxy.
 
 :guilabel:`Password:`
-	TODO
+	Optional. Password to authenticate with at the
+	proxy server.
 
 :guilabel:`User:`
-	TODO
-
+	Optional. User name to authenticate with at the
+	proxy server.
+	
+	
 Email
 -----
 
