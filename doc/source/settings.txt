@@ -264,38 +264,47 @@ Email
 -----
 
 :guilabel:`From:`
-	TODO
+	Email address to use in the "From" header and for the SMTP envelope.
 
 :guilabel:`To:`
-	TODO
+	Comma-separated list of recipient email addresses.
 
 :guilabel:`Cc:`
-	TODO
+	Comma-separated list of carbon copy recipient email
+	addresses.
 
 :guilabel:`Bcc:`
-	TODO
+	Comma-separated list of blind carbon copy recipient
+	email addresses.
 
 :guilabel:`method:`
-	TODO
+	Optional. Method to use to send email messages. If value is "smtp" (default),
+	use SMTP (configured below).  Otherwise, use as name of program to run that
+	acts like sendmail (takes "-f" option for sender, list of recipients on
+	command line, message on stdin). Normally, setting this to "sendmail" or
+	"/usr/sbin/sendmail" is enough to use sendmail to send messages.
 
 :guilabel:`SMTP Host:`
-	TODO
+	Host name of mail server.
 
 :guilabel:`SMTP Port:`
-	TODO
+	Port to connect to on mail server.
+	Default: 25.
 
 :guilabel:`SMTP TLS:`
-	TODO
+	Connect to mail server using TLS.
+	Default: False.
 
 :guilabel:`SMTP Username:`
-	TODO
+	Username to authenticate to mail server with.
 
 :guilabel:`SMTP Password:`
-	TODO
+	Password to authenticate to mail server with.
 
 :guilabel:`Local Hostname:`
-	TODO
+	Hostname the sender can use to identify itself to the mail server.
 
+	
 Diff
 ----
 
