@@ -93,6 +93,18 @@ By right-clicking on the annotate pane's column headers (Line, Rev,
 Source) you can bring up a menu for showing two optional columns:
 :guilabel:`filename` and :guilabel:`user`.
 
+Following Renames
+~~~~~~~~~~~~~~~~~
+
+The annotation data will automatically follow lines of code back through
+copies and renames to find the initial changeset that introduced that
+line.  The graph log pane will not follow renames or copies
+automtaically.  Instead, when you click on a changeset in the revision
+graph that involved a rename or copy event, a button will appear that
+will allow you to follow the history graph back through the rename.
+Clicking on the button will open a new tab with the older filename
+annotated at the same changeset.
+
 Configurables
 ~~~~~~~~~~~~~
 
