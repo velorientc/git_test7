@@ -84,25 +84,43 @@ TortoiseHg
 ----------
 
 :guilabel:`3-way Merge Tool:`
-	TODO
-	
+	Graphical merge program for resolving merge conflicts.  If left
+	unspecified, Mercurial will use the first applicable tool it finds
+	on your system or use its internal merge tool that leaves conflict
+	markers in place.  Chose internal:merge to force conflict markers,
+	internal:prompt to always select local or other, or internal:dump
+	to leave files in the working directory for manual merging.
+
 :guilabel:`Visual Diff Command:`
-	TODO
+	Specify visual diff tool; must be an extdiff command.
 
 :guilabel:`Skip Diff Window:`
-	TODO
+	Bypass the builtin visual diff dialog and directly use your
+	visual diff tool's directory diff feature.  Only enable this
+	feature if you know your diff tool has a valid extdiff
+	configuration.  Default: False.
 
 :guilabel:`Visual Editor:`
-	TODO
+	Specify the visual editor used to view files, etc.
 
+:guilabel:`CLI Editor:`
+	The editor to use during a commit and other
+	instances where Mercurial needs multiline input from
+	the user.  Only used by command line interface commands.
+		
 :guilabel:`Tab Width:`
-	TODO
+	Specify the number of spaces that tabs expand to in various.
+	TortoiseHg windows. Default: Not expanded.
 
 :guilabel:`Max Diff Size:`
-	TODO
+	The maximum size file (in KB) that TortoiseHg will
+	show changes for in the changelog, status, and commit windows.
+	A value of zero implies no limit.  Default: 1024 (1MB).
 
 :guilabel:`Bottom Diffs:`
-	TODO
+	Show the diff panel below the file list in status, shelve, and
+	commit dialogs.
+	Default: False (show diffs to right of file list).
 	
 Commit
 ------
