@@ -254,7 +254,7 @@ Configurables
 	Configures a 'policy' limit for summary lines
 :menuselection:`Commit --> Message Line Length`
 	Configures a 'policy' limit for message lines
-:menuselection:`Commit --> Bottom Diffs`
+:menuselection:`TortoiseHg --> Bottom Diffs`
 	Toggles diff pane from left to below file list
 :menuselection:`TortoiseHg --> Max Diff Size`
 	Configures the diff size limit
