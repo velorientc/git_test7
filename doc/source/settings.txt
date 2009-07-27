@@ -80,6 +80,185 @@ these configurables (except for the first three tabs:
 :guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
 are specifically for TortoiseHg).
 
+TortoiseHg
+----------
+
+:guilabel:`3-way Merge Tool:`
+	TODO
+	
+:guilabel:`Visual Diff Command:`
+	TODO
+
+:guilabel:`Skip Diff Window:`
+	TODO
+
+:guilabel:`Visual Editor:`
+	TODO
+
+:guilabel:`Tab Width:`
+	TODO
+
+:guilabel:`Max Diff Size:`
+	TODO
+
+:guilabel:`Bottom Diffs:`
+	TODO
+	
+Commit
+------
+
+:guilabel:`Username:`
+	TODO
+
+:guilabel:`External Commit Tool:`
+	TODO
+
+:guilabel:`Summary Line Length:`
+	TODO
+
+:guilabel:`Message Line Length:`
+	TODO
+	
+Changelog
+---------
+
+:guilabel:`Author Coloring:`
+	TODO
+
+:guilabel:`Long Summary:`
+	TODO
+
+:guilabel:`Log Batch Size:`
+	TODO
+
+:guilabel:`Copy Hash:`
+	TODO
+
+Sync
+----	
+
+:guilabel:`After pull operation:`
+	TODO
+
+:guilabel:`Remote repository paths`
+	TODO
+
+Web
+---
+	
+:guilabel:`Name:`
+	TODO
+
+:guilabel:`Description:`
+	TODO
+
+:guilabel:`Contact:`
+	TODO
+
+:guilabel:`Style:`
+	TODO
+
+:guilabel:`Archive Formats:`
+	TODO
+
+:guilabel:`Port:`
+	TODO
+
+:guilabel:`Push Requires SSL:`
+	TODO
+
+:guilabel:`Stripes:`
+	TODO
+
+:guilabel:`Max Files:`
+	TODO
+
+:guilabel:`Max Changes:`
+	TODO
+
+:guilabel:`Allow Push:`
+	TODO
+
+:guilabel:`Deny Push:`
+	TODO
+
+:guilabel:`Encoding:`
+	TODO
+
+Proxy
+-----
+	
+:guilabel:`Host:`
+	TODO
+	
+:guilabel:`Bypass List:`
+	TODO
+
+:guilabel:`Password:`
+	TODO
+
+:guilabel:`User:`
+	TODO
+
+Email
+-----
+
+:guilabel:`From:`
+	TODO
+
+:guilabel:`To:`
+	TODO
+
+:guilabel:`Cc:`
+	TODO
+
+:guilabel:`Bcc:`
+	TODO
+
+:guilabel:`method:`
+	TODO
+
+:guilabel:`SMTP Host:`
+	TODO
+
+:guilabel:`SMTP Port:`
+	TODO
+
+:guilabel:`SMTP TLS:`
+	TODO
+
+:guilabel:`SMTP Username:`
+	TODO
+
+:guilabel:`SMTP Password:`
+	TODO
+
+:guilabel:`Local Hostname:`
+	TODO
+
+Diff
+----
+
+:guilabel:`Git Format:`
+	TODO
+
+:guilabel:`No Dates:`
+	TODO
+
+:guilabel:`Show Function:`
+	TODO
+	
+:guilabel:`Ignore White Space:`
+	TODO
+
+:guilabel:`Ignore WS Amount:`
+	TODO
+
+:guilabel:`Ignore Blank Lines:`
+	TODO
+
+	
+	
 From command line
 -----------------
 
