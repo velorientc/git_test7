@@ -179,7 +179,11 @@ Sync
 	extension, rebase equates to pull --rebase.  Default: none.
 
 :guilabel:`Remote repository paths`
-	TODO
+	In this pane you can configure aliases for repositories that you
+	frequently synchronize with.  Mercurial will add a *default* alias
+	to the clone source automatically.  All configured path aliases will
+	be listed in the Synchronize tool path drop-down box, and they can
+	be used as short-cuts on the command line.
 
 Web
 ---
