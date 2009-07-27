@@ -32,6 +32,9 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in build/html."
 
+zip: html
+	(cd build ; zip TortoiseHg.html.zip -r html)
+
 pickle:
 	mkdir -p build/pickle build/doctrees
 	$(SPHINXBUILD) -b pickle $(ALLSPHINXOPTS) build/pickle
