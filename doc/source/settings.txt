@@ -82,6 +82,9 @@ these configurables (except for the first three tabs:
 :guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
 are specifically for TortoiseHg).
 
+.. module:: TortoiseHg.settings
+	:synopsis: Dialog used to set general TortoiseHg preferences
+
 TortoiseHg
 ----------
 
@@ -124,6 +127,9 @@ TortoiseHg
 	commit dialogs.
 	Default: False (show diffs to right of file list).
 	
+.. module:: commit.settings
+	:synopsis: Dialog used to set commit specific preferences
+
 Commit
 ------
 
@@ -148,6 +154,9 @@ Commit
 	if any lines are too long at commit.
 	Default: 0 (unenforced).
 	
+.. module:: changelog.settings
+	:synopsis: Dialog used to set changelog specific preferences
+
 Changelog
 ---------
 
@@ -172,6 +181,9 @@ Changelog
 	of the currently selected changeset into the clipboard.
 	Default: False.
 
+.. module:: synchronize.settings
+	:synopsis: Dialog used to set synchronize specific preferences
+
 Sync
 ----	
 
@@ -187,6 +199,9 @@ Sync
 	to the clone source automatically.  All configured path aliases will
 	be listed in the Synchronize tool path drop-down box, and they can
 	be used as short-cuts on the command line.
+
+.. module:: web.settings
+	:synopsis: Dialog used to set web server specific preferences
 
 Web
 ---
@@ -247,6 +262,9 @@ Web
 :guilabel:`Encoding:`
 	Character encoding name.
 	
+.. module:: proxy.settings
+	:synopsis: Dialog used to set proxy specific preferences
+
 Proxy
 -----
 	
@@ -267,6 +285,9 @@ Proxy
 	proxy server.
 	
 	
+.. module:: email.settings
+	:synopsis: Dialog used to set email specific preferences
+
 Email
 -----
 
@@ -312,6 +333,9 @@ Email
 	Hostname the sender can use to identify itself to the mail server.
 
 	
+.. module:: diff.settings
+	:synopsis: Dialog used to set diff specific preferences
+
 Diff
 ----
 
