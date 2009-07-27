@@ -26,23 +26,23 @@ Keyboard Accelerators
 
 We define a few keyboard accelerators that all of the TortoiseHg tools support.
 
-:kbd:`CTRL-Q`
+:kbd:`Ctrl-Q`
 	quit the application, including all open windows
 
-:kbd:`CTRL-W`
-	close the current window (same as :kbd:`CTRL-Q` if only one window is open)
+:kbd:`Ctrl-W`
+	close the current window (same as :kbd:`Ctrl-Q` if only one window is open)
 
-:kbd:`CTRL-D`
+:kbd:`Ctrl-D`
 	visual diff of currently selected file or changeset	
 
-:kbd:`CTRL-ENTER`
+:kbd:`Ctrl-Enter`
 	activation
 
 :kbd:`F5`
 	refresh
 
 On `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_, the apple
-(command) key is used as the modifier instead of :kbd:`CTRL`. However some
+(command) key is used as the modifier instead of :kbd:`Ctrl`. However some
 keyboard accelerators are internal to GTK+ so you must use the control key to
 access cut-paste functionality, for instance.
 
@@ -75,9 +75,9 @@ containing the text you have typed, and the treeview will immediately
 jump to the first row that matches the text you have entered thus far.
 As you enter more characters, the search is refined.
 
-* :kbd:`CTRL-F` opens the search window explicitly
-* :kbd:`CTRL-G` advances the search to the next match
-* :kbd:`SHIFT-CTRL-G` searches backwards
+* :kbd:`Ctrl-F` opens the search window explicitly
+* :kbd:`Ctrl-G` advances the search to the next match
+* :kbd:`Shift-Ctrl-G` searches backwards
 * The mouse scroll wheel will advance forwards and backwards through
   matching lines 
 
@@ -93,7 +93,7 @@ The dialog focuses its :guilabel:`close` button when the command has
 completed, so a simple :kbd:`Enter` is all that is required to close
 the window.
 
-*hgcmd* also responds appropriately to the global :kbd:`CTRL-W` and
-:kbd:`CTRL-Q` keyboard accelerators.
+*hgcmd* also responds appropriately to the global :kbd:`Ctrl-W` and
+:kbd:`Ctrl-Q` keyboard accelerators.
 
 .. vim: noet ts=4

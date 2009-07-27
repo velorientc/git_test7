@@ -103,7 +103,7 @@ releases.
 Keyboard navigation
 -------------------
 
-:guilabel:`CTRL-C`
+:guilabel:`Ctrl-C`
     in the diff panel will copy the currently highlighted (not selected,
     but highlighted) diff hunks to the clipboard. These can be pasted
     into a text buffer to generate any arbitrary patch based from the

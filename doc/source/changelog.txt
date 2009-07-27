@@ -155,7 +155,7 @@ Unfortunately, TortoiseHg still does not have a dialog for importing
 changes into a repository, so this must be done on the command line with
 the :command:`hg import` command.
 
-This changeset browser also supports the :kbd:`CTRL-C` keyboard
+This changeset browser also supports the :kbd:`Ctrl-C` keyboard
 accelerator to copy hightlighted diff hunks to the clipboard.
 
 Configurables

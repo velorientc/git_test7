@@ -147,9 +147,9 @@ recoverable.  Delete any new :file:`.rej` files and try the commit again.
 Keyboard navigation
 -------------------
 
-:kbd:`CTRL-ENTER`
+:kbd:`Ctrl-Enter`
 	will trigger the commit
-:kbd:`CTRL-C`
+:kbd:`Ctrl-C`
 	In the diff panel will copy the currently highlighted (not selected,
 	but highlighted) diff hunks to the clipboard. These can be pasted
 	into a text buffer to generate any arbitrary patch based from the
@@ -305,7 +305,7 @@ Changes since 0.7
 * The message pane context menu now has options for inserting selected
   filenames, and configuring/applying a layout format.
 * :guilabel:`Ctrl-O` keyboard accelerator for triggering commit has been
-  replaced with :guilabel:`CTRL-Enter` accelerator which is common to
+  replaced with :guilabel:`Ctrl-Enter` accelerator which is common to
   many THG dialogs
 * Support for two-parent state (merging) has been improved, especially
   the file context menus.

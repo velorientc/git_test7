@@ -59,7 +59,7 @@ Conventions used in this manual
 
 The following typographical conventions are used in this manual:
 
-:kbd:`CTRL-A`
+:kbd:`Ctrl-A`
 	Indicates a key, or combination of keys, to press.
 
 :guilabel:`Commit`
