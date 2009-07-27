@@ -14,6 +14,9 @@ line client to do so. Since TortoiseHg is a windows shell extension it's
 assumed that the user is familiar with the windows explorer and knows
 how to use it.
 
+You can find the most up to date version of this documentation at our
+`web <http://bitbucket.org/tortoisehg/stable/downloads>`_ site.
+
 Reading guide
 =============
 
