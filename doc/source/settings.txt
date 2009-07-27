@@ -89,8 +89,8 @@ TortoiseHg
 	Graphical merge program for resolving merge conflicts.  If left
 	unspecified, Mercurial will use the first applicable tool it finds
 	on your system or use its internal merge tool that leaves conflict
-	markers in place.  Chose internal:merge to force conflict markers,
-	internal:prompt to always select local or other, or internal:dump
+	markers in place.  Chose :guilabel:`internal:merge` to force conflict markers,
+	:guilabel:`internal:prompt` to always select local or other, or :guilabel:`internal:dump`
 	to leave files in the working directory for manual merging.
 
 :guilabel:`Visual Diff Command:`
@@ -177,8 +177,9 @@ Sync
 
 :guilabel:`After pull operation:`
 	Operation which is performed directly after a successful pull.
-	update equates to pull --update, fetch equates to the fetch
-	extension, rebase equates to pull --rebase.  Default: none.
+	:guilabel:`update` equates to :command:`pull --update`, :guilabel:`fetch`
+	equates to the fetch extension, :guilabel:`rebase` equates to
+	:command:`pull --rebase`.  Default: none.
 
 :guilabel:`Remote repository paths`
 	In this pane you can configure aliases for repositories that you
@@ -251,7 +252,7 @@ Proxy
 	
 :guilabel:`Host:`
 	Host name and (optional) port of proxy server, for
-	example "myproxy:8000".
+	example ``myproxy:8000``.
 	
 :guilabel:`Bypass List:`
 	Optional. Comma-separated list of host names that
@@ -286,9 +287,9 @@ Email
 :guilabel:`method:`
 	Optional. Method to use to send email messages. If value is "smtp" (default),
 	use SMTP (configured below).  Otherwise, use as name of program to run that
-	acts like sendmail (takes "-f" option for sender, list of recipients on
-	command line, message on stdin). Normally, setting this to "sendmail" or
-	"/usr/sbin/sendmail" is enough to use sendmail to send messages.
+	acts like sendmail (takes :command:`-f` option for sender, list of recipients on
+	command line, message on stdin). Normally, setting this to ``sendmail`` or
+	``/usr/sbin/sendmail`` is enough to use sendmail to send messages.
 
 :guilabel:`SMTP Host:`
 	Host name of mail server.
