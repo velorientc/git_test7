@@ -47,7 +47,7 @@ Mailing Lists:
 * `Users <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_
 * `Developers <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_
 
-And our `wiki <http://bitbucket.org/tortoisehg/stable>`_ on BitBucket.
+And our `wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ on BitBucket.
 
 Acknowledgement
 ===============

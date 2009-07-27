@@ -11,7 +11,7 @@ TortoiseHg FAQ
 
 *What comes included in the TortoiseHg binary installer for Windows?*
 
-	`Mercurial <http://www.selenic.com/mercurial/wiki/index.cgi>`_,
+	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
 	and and one bonus extension: hgfold.
@@ -217,7 +217,7 @@ TortoiseHg FAQ
 
 	You must install svn-win32-1.6 command line tools, then add them to
 	your path. Then you must enable the
-	`convert <http://www.selenic.com/mercurial/wiki/index.cgi/ConvertExtension>`_
+	`convert <http://mercurial.selenic.com/wiki/ConvertExtension>`_
 	extension. At this point, you should be able to use the
 	:command:`hg convert` command to do the conversion. Please direct
 	problems/questions about the convert extension to the Mercurial

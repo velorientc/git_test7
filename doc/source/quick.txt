@@ -6,11 +6,11 @@ A quick tour for the impatient
 	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
 
 One of the great things about Mercurial is that there are lots of different
-`Collaboration Models <http://hgbook.red-bean.com/hgbookch6.html#x10-1110006.2>`_.
+`Collaboration Models <http://hgbook.red-bean.com/read/file-names-and-pattern-matching.html>`_.
 The following describes just one of those ways: a single central repository.
 
 To get started, suppose you volunteer to create the first version. There are 
-`ways of importing already existing repositories <http://www.selenic.com/mercurial/wiki/index.cgi/RepositoryConversion>`_,
+`ways of importing already existing repositories <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
 but lets assume we're starting from scratch. First you need to make sure
 that you are correctly identified in TortoiseHg.  You do this by
 adjusting the global settings of TortoiseHg. Try right-clicking your
@@ -113,6 +113,6 @@ Which makes the synchronize tool come up:
 	make my changes the current changeset (tip) in the group repository.
 
 Mercurial makes collaboration easy, fast, and productive.
-Learn more at http://www.selenic.com/mercurial/wiki/
+Learn more at Mercurial's `wiki <http://mercurial.selenic.com/wiki/>`_.
 
 .. vim: noet ts=4

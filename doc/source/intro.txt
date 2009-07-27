@@ -9,7 +9,7 @@ What is TortoiseHg?
 ===================
 	
 TortoiseHg is a set of graphical tools and a shell extension for the
-`Mercurial <http://www.selenic.com/mercurial>`_ distributed revision control
+`Mercurial <http://mercurial.selenic.com/wiki/>`_ distributed revision control
 system.
 
 On Windows,
