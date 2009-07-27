@@ -3,13 +3,13 @@ TortoiseHg Changelog Viewer
 ===========================
 
 .. module:: changelog.dialog
-   :synopsis: Dialog used to view log
+	:synopsis: Dialog used to view log
 
 .. figure:: figures/log.png
-   :alt: Changelog
+	:alt: Changelog
 
-   Changelog viewer dialog
-	
+	Changelog viewer dialog
+
 The toolbar buttons from left to right:
 
 :guilabel:`Refresh`
@@ -61,18 +61,18 @@ revision context menu.
 :guilabel:`display change`
 	open this changeset in the changeset browser (more below)
 :guilabel:`diff to local`
-    display changes (visual diff) between this revision and your current
-    working directory
+	display changes (visual diff) between this revision and your current
+	working directory
 :guilabel:`update`
-	update your working directory to this revision [1]
+	update your working directory to this revision [#rcm1]_
 :guilabel:`merge with`
-	merge with this revision [2]
+	merge with this revision [#rcm2]_
 :guilabel:`copy hash`
 	copy current revision's full hash to the clipboard
 :guilabel:`export patch`
 	generate a patch file of this revision's changes
 :guilabel:`email patch`
-	send this revision's changes to email recipient [3]
+	send this revision's changes to email recipient [#rcm3]_
 :guilabel:`bundle rev:tip`
 	create a bundle with all revs from selected to tip
 :guilabel:`add/remove tag`
@@ -83,7 +83,8 @@ revision context menu.
 	revert working copy to this revision's contents, without updating working
 	directory parent revision. Use with care.
 :guilabel:`strip`
-	Remove the selected revision and all of it's descendants from the repository [4]
+	Remove the selected revision and all of it's descendants from the
+	repository [#rcm4]_
 
 
 If you right-click on a row other than the one that was currently selected, you get a different context menu.
@@ -91,25 +92,25 @@ This one is for visualizing diffs between two arbitrary revisions.
 
 :guilabel:`diff with selected`
 	 Description
-:guilabel:`visual diff with selected` [5]
+:guilabel:`visual diff with selected` [#rcm5]_
 	 Description
 :guilabel:`email from here to selected`
 	 Description
 :guilabel:`bundle from here to selected`
 	 Description
-:guilabel:`merge with selected` [6]
+:guilabel:`merge with selected` [#rcm6]_
 	 Description
-						 
-1) Opens the TortoiseHg update/checkout dialog with this revision selected.
-2) Opens the TortoiseHg merge dialog with this revision selected.
-3) Opens the TortoiseHg email dialog with this revision selected.
-4) The strip command will store the stripped revisions in a bundle file
-   that can later be reapplied. See also_
-5) :menuselection:`Settings --> Global --> TortoiseHg --> Visual Diff Command`
-6) Only sensitive if the selected revision is your current working
-   directory parent
+ 
+.. [#rcm1] Opens the TortoiseHg update/checkout dialog with this revision selected.
+.. [#rcm2] Opens the TortoiseHg merge dialog with this revision selected.
+.. [#rcm3] Opens the TortoiseHg email dialog with this revision selected.
+.. [#rcm4] The strip command will store the stripped revisions in a bundle file
+		   that can later be reapplied.
+		   See `also <http://mercurial.selenic.com/wiki/EditingHistory>`_.
+.. [#rcm5] :menuselection:`Settings --> Global --> TortoiseHg --> Visual Diff Command`
+.. [#rcm6] Only sensitive if the selected revision is your current working
+		   directory parent
 
-.. _also: http://www.selenic.com/mercurial/wiki/index.cgi/EditingHistory
 
 
 File List Context Menus
@@ -119,22 +120,22 @@ Right-clicking on filenames in the file list (bottom left) pane will
 bring up a context menu for the selected file:
 
 :guilabel:`visual diff`
-	 Open this revision of the file in your visual editor[1]
+	 Open this revision of the file in your visual editor [#flcm1]_
 :guilabel:`diff to local`
 	 Visualize differences between this revision and your checked out version
 :guilabel:`save at revision`
 	 Write this revision of the file to specified location
 :guilabel:`file history`
-	 Show revisions that modified this file [2]
+	 Show revisions that modified this file [#flcm2]_
 :guilabel:`annotate file`
 	 Open this file in the datamine app, annotated at this revision
 :guilabel:`revert file contents`
-	 Checkout this specific revision of this file  [3]
-						 
-1) :menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
-2) Does not show revisions where a file was deleted, as this is only a
-   manifest change, it does not modify the file's history.
-3) The new contents will appear as local changes and must be committed.
+	 Checkout this specific revision of this file  [#flcm3]_
+ 
+.. [#flcm1] :menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
+.. [#flcm2] Does not show revisions where a file was deleted, as this is only a
+		    manifest change, it does not modify the file's history.
+.. [#flcm3] The new contents will appear as local changes and must be committed.
 
 
 Changeset browser
@@ -154,8 +155,8 @@ Unfortunately, TortoiseHg still does not have a dialog for importing
 changes into a repository, so this must be done on the command line with
 the :command:`hg import` command.
 
-This changeset browser also supports the :kbd:`CTRL-C` keyboard
-accelerator to copy hightlighted diff hunks	to the clipboard.
+This changeset browser also supports the :kbd:`Ctrl-C` keyboard
+accelerator to copy hightlighted diff hunks to the clipboard.
 
 Configurables
 -------------
@@ -171,7 +172,7 @@ the TortoiseHg Settings dialog on the Changelog tab.
 	Number of revisions to read in each batch load
 :guilabel:`Copy Hash`
 	Copy a revision's changeset id hash to the clipboard when selected
-						
+
 The exact colors given to particular users can be configured by adding
 lines like these to your :file:`Mercurial.ini` file: ::
 
@@ -187,3 +188,26 @@ TortoiseHg tab:
 	Maximum size of file to be diffed
 :guilabel:`Bottom Diffs`
 	Show diffs below file list
+
+	
+From command line
+-----------------
+
+The changelog viewer can be started from command line ::
+
+	hgtk log
+
+or ::
+
+	hgtk history
+
+The syntax is ::
+
+	hgtk log [OPTIONS]
+
+Valid [OPTIONS] are:
+
+``-l``, ``--limit``
+	Specify the limit number of changes displayed.
+	
+.. vim: noet ts=4

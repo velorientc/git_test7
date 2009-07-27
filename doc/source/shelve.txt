@@ -2,30 +2,31 @@
 TortoiseHg Shelve Tool
 ======================
 
-.. module:: commit.dialog
-   :synopsis: Dialog used to perform shelve/unshelve operations
+.. module:: shelve.dialog
+	:synopsis: Dialog used to perform shelve/unshelve operations
 
 .. warning::
-   The win32text extension can cause trouble with hunk selection.  This
-   has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
-   proper configuration. See `issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
-	
-.. figure:: figures/shelve.png
-   :alt: Shelve dialog
+	The win32text extension can cause trouble with hunk selection.  This
+	has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
+	proper configuration. See
+	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
 
-   Shelve dialog
+.. figure:: figures/shelve.png
+	:alt: Shelve dialog
+
+	Shelve dialog
 
 Visually it is very similar to the status dialog in 0.6 and the commit
 tool in 0.7.  The purpose of this dialog is to allow the user to
 *shelve* selected changes from the working directory, store them in a
 special patch file in the repository, and then *unshelve* them back at a
 later time.
-		
+
 Walking across the toolbar, the buttons perform the following tasks:
 
 :guilabel:`Refresh`
-    Reload the state of the working directory. It retains file check and
-    selection state across refresh, but not hunks.
+	Reload the state of the working directory. It retains file check and
+	selection state across refresh, but not hunks.
 :guilabel:`Shelve` 
 	Shelve selected diffs in checked files.
 :guilabel:`Unshelve`
@@ -39,16 +40,16 @@ Walking across the toolbar, the buttons perform the following tasks:
 	Move checked files to specified target directory.
 	This move is done with Mercurial's full knowledge.
 :guilabel:`Remove`
-    Delete checked unversioned files and/or remove (mark as deleted) any
-    versioned files.
+	Delete checked unversioned files and/or remove (mark as deleted) any
+	versioned files.
 :guilabel:`Show Diff`
-    This is a toggle button that shows and hides the entire diff panel.
-    Hiding the diff panel can sometimes be useful in large repositories.
-						
+	This is a toggle button that shows and hides the entire diff panel.
+	Hiding the diff panel can sometimes be useful in large repositories.
+
 Below the file list are checkboxes that toggle the inclusion of the
 various classes of files {modified, added, removed, deleted, unknown,
 clean, ignored}.
-	
+
 Shelving Changes
 ----------------
 
@@ -60,10 +61,10 @@ changes are removed from the working directory and placed in a patch
 file. If the shelf already had changes in it, you will be asked whether
 to replace those changes or to merge these new changes into it.  When
 the shelf has changes, the unshelve button will be active.
-			
+
 When the unshelve button is pressed, the shelved changes are reapplied
 to the working directory.
-			
+
 How is this different from record/commit?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -102,12 +103,12 @@ releases.
 Keyboard navigation
 -------------------
 
-:guilabel:`CTRL-C`
+:guilabel:`Ctrl-C`
     in the diff panel will copy the currently highlighted (not selected,
     but highlighted) diff hunks to the clipboard. These can be pasted
     into a text buffer to generate any arbitrary patch based from the
     changes in your working directory.
-			
+
 The code which copies the hunks to the clipboard is intelligent about
 diff headers. If your highlighted list includes a hunk from a file but
 not it's file diff header, the diff header will be added to the
@@ -119,3 +120,19 @@ Configurables
 
 * :menuselection:`TortoiseHg --> Bottom Diffs`
 * :menuselection:`TortoiseHg --> Tab Width`
+
+From command line
+-----------------
+
+The shelve tool can be started from command line ::
+
+	hgtk shelve
+
+or ::
+
+	hgtk unshelve
+
+The syntax is simple, no options or parameters are needed, except the global options.
+
+
+.. vim: noet ts=4

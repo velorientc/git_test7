@@ -3,22 +3,10 @@ Common Features
 ===============
 
 .. module:: common.dialog
-   :synopsis: Common features to all the dialog
+	:synopsis: Common features to all the dialog
 
 These features are common to many TortoiseHg tools, so we document them
 here just once.
-
-Translations
-============
-
-The TortoiseHg tools use Python's
-`gettext <http://docs.python.org/library/gettext.html>`_ library to
-localize their text.  To get localized dialogs, it is recommended that
-you set the LANGUAGE environment variable to your locale of choice.
-
-The Windows shell extension context menus get their translations from
-the Windows registry.  Translations for many locales are available from
-the TortoiseHG `wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_.
 
 Geometry Restore
 ================
@@ -37,24 +25,24 @@ Keyboard Accelerators
 =====================
 
 We define a few keyboard accelerators that all of the TortoiseHg tools support.
-		
-:kbd:`CTRL-Q`
+
+:kbd:`Ctrl-Q`
 	quit the application, including all open windows
 
-:kbd:`CTRL-W`
-	close the current window (same as :kbd:`CTRL-Q` if only one window is open)
+:kbd:`Ctrl-W`
+	close the current window (same as :kbd:`Ctrl-Q` if only one window is open)
 
-:kbd:`CTRL-D`
-	visual diff of currently selected file or changeset					
+:kbd:`Ctrl-D`
+	visual diff of currently selected file or changeset	
 
-:kbd:`CTRL-ENTER`
-	activation					
+:kbd:`Ctrl-Enter`
+	activation
 
 :kbd:`F5`
-	refresh					
+	refresh
 
 On `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_, the apple
-(command) key is used as the modifier instead of :kbd:`CTRL`. However some
+(command) key is used as the modifier instead of :kbd:`Ctrl`. However some
 keyboard accelerators are internal to GTK+ so you must use the control key to
 access cut-paste functionality, for instance.
 
@@ -87,22 +75,25 @@ containing the text you have typed, and the treeview will immediately
 jump to the first row that matches the text you have entered thus far.
 As you enter more characters, the search is refined.
 
-* :kbd:`CTRL-F` opens the search window explicitly
-* :kbd:`CTRL-G` advances the search to the next match
-* :kbd:`SHIFT-CTRL-G` searches backwards
-* The mouse scroll wheel will advance forwards and backwards through matching lines 
+* :kbd:`Ctrl-F` opens the search window explicitly
+* :kbd:`Ctrl-G` advances the search to the next match
+* :kbd:`Shift-Ctrl-G` searches backwards
+* The mouse scroll wheel will advance forwards and backwards through
+  matching lines 
 
 HG command dialog
 =================
 
 Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
-commands that could potentially be interactive.  In release 0.8, this
+commands that could potentially be interactive.  In release 0.8, the
 dialog was changed to draw all error messages in a dark red color to
-give it more contrast with normal output messages.
+give them more contrast from normal output messages.
 
-The window also properly focuses its :guilabel:`close` button when the
-command has completed, so a simple :kbd:`Enter` is that that is required
-to close the window.
+The dialog focuses its :guilabel:`close` button when the command has
+completed, so a simple :kbd:`Enter` is all that is required to close
+the window.
 
-*hgcmd* also responds appropriately to the global :kbd:`CTRL-W` and
-more drastic :kbd:`CTRL-Q` accelerators.
+*hgcmd* also responds appropriately to the global :kbd:`Ctrl-W` and
+:kbd:`Ctrl-Q` keyboard accelerators.
+
+.. vim: noet ts=4

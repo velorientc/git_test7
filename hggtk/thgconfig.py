@@ -805,7 +805,7 @@ class ConfigDialog(gtk.Dialog):
         widgets = []
 
         descframe = gtk.Frame(_('Description'))
-        descframe.set_border_width(10)
+        descframe.set_border_width(4)
         desctext = gtk.TextView()
         desctext.set_wrap_mode(gtk.WRAP_WORD)
         desctext.set_editable(False)
@@ -820,7 +820,7 @@ class ConfigDialog(gtk.Dialog):
         table = gtk.Table(len(info), 2, False)
         vbox.pack_start(table, False, False, 2)
         if info != _paths_info:
-            vbox.pack_start(gtk.Label(), True, True, 2)
+            vbox.pack_start(gtk.Label(), True, True, 0)
         vbox.pack_start(descframe, False, False, 2)
         frame.add(vbox)
 
@@ -841,8 +841,8 @@ class ConfigDialog(gtk.Dialog):
             eventbox = gtk.EventBox()
             eventbox.set_visible_window(False)
             eventbox.add(lbl)
-            table.attach(eventbox, 0, 1, row, row+1, gtk.FILL, 0, 4, 3)
-            table.attach(combo, 1, 2, row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
+            table.attach(eventbox, 0, 1, row, row+1, gtk.FILL, 0, 4, 2)
+            table.attach(combo, 1, 2, row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
             self.tooltips.set_tip(eventbox, tooltip)
 
         self.pages.append((vbox, info, widgets))
@@ -915,7 +915,7 @@ class ConfigDialog(gtk.Dialog):
 
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
-        frame.set_border_width(10)
+        frame.set_border_width(4)
         frame.show()
 
         label = gtk.Label(tab)
@@ -954,7 +954,10 @@ class ConfigDialog(gtk.Dialog):
                 pass
             return
         if section not in list(self.ini):
-            self.ini.new_namespace(section)
+            if hasattr(self.ini, '_new_namespace'):
+                self.ini._new_namespace(section)
+            else:
+                self.ini.new_namespace(section)
         self.ini[section][key] = newvalue
         if not keephistory:
             return
@@ -981,8 +984,6 @@ class ConfigDialog(gtk.Dialog):
                 cpath = '.'.join(['paths', name])
                 self.record_new_value(cpath, path, False)
                 refreshlist.append(name)
-            if 'paths' not in list(self.ini):
-                self.ini.new_namespace('paths')
             for name in list(self.ini.paths):
                 if name not in refreshlist:
                     del self.ini['paths'][name]

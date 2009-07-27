@@ -4,202 +4,261 @@ TortoiseHg FAQ
 
 
 *What is TortoiseHg?*
-    A Windows shell extension for the Mercurial revision control system, similar to the Tortoise
-    clients for Subversion and CVS. It also includes an hgtk application for command line
-    use on many platforms.
+
+	A Windows shell extension for the Mercurial revision control system,
+	similar to the Tortoise clients for Subversion and CVS. It also
+	includes an hgtk application for command line use on many platforms.
 
 *What comes included in the TortoiseHg binary installer for Windows?*
-    `Mercurial <http://www.selenic.com/mercurial/wiki/index.cgi>`_, `kdiff3 <http://kdiff3.sourceforge.net/>`_,
-    `TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_ and and one bonus extension: hgfold.
+
+	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
+	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
+	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
+	and and one bonus extension: hgfold.
 
 *How can I get translations for the Explorer context menu?*
-    See the `Download <http://bitbucket.org/tortoisehg/stable/wiki/install>`_ wiki page
+
+	See the `Download <http://bitbucket.org/tortoisehg/stable/wiki/install>`_
+	wiki page
 
 *How do I do merges and arbitrary version checkouts in 0.8?*
-    Merges and updates intended to be done from within the Changelog tool (:guilabel:`View Changelog` menu option)
-    in 0.8.
+
+	Merges and updates intended to be done from within the Changelog
+	tool (:guilabel:`View Changelog` menu option) in 0.8.
 
 *How do I fix* ``failed to import extension hgext.hgconfig...`` *warnings?*
-    Upgrading to release 0.7.2 or later should fix these warnings, but there are further complications on Vista.
-    See `issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_.
+
+	Upgrading to release 0.7.2 or later should fix these warnings, but
+	there are further complications on Vista.  See
+	`issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_.
 
 *Why can't I connect to an ssh server (TortoisePlink.exe* ``...cannot execute specified...`` *error message)?*
-    Release 0.7.2 and later include a version of TortoisePlink that does not have extra library
-    dependencies, so upgrading will probably fix this problem. See also `ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
 
-*How can I use Qct with TortoiseHG, after version 0.7?*
-    We recommend that you try the commit tool that comes with TortoiseHg before running back to Qct, but here
-    are the instructions should you decide to stick with ole' reliable:
-	
-    1. Download and install Qct-1.7-standalone-win32.exe from http://qct.sourceforge.net
-    2. Add (or merge) the following into your :file:`Mercurial.ini` ::
+	Release 0.7.2 and later include a version of TortoisePlink that does
+	not have extra library dependencies, so upgrading will probably fix
+	this problem. See also
+	`ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
 
-        [extensions]
-        qct = C:\path\to\qct.py
+*How can I use Qct with TortoiseHg, after version 0.7?*
 
-        [tortoisehg]
-        extcommit = qct
+	We recommend that you try the commit tool that comes with TortoiseHg
+	before running back to Qct, but here are the instructions should you
+	decide to stick with ole' reliable:
 
-        [qct]
-        path = "C:\Program Files\qct\qct.exe"
+	1. Download and install Qct-1.7-standalone-win32.exe from
+	   http://qct.sourceforge.net
+	2. Add (or merge) the following into your :file:`Mercurial.ini` ::
 
-    Now the :guilabel:`HG Commit` menu option should launch Qct, and :command:`hg qct` should work from the command
-	line and hgtk ci should also launch Qct.
+		[extensions]
+		qct = C:\path\to\qct.py
 
-    In 0.9, hgtk ci will no longer launch Qct.  We will drop support for any external commit tools.
+		[tortoisehg]
+		extcommit = qct
+
+		[qct]
+		path = "C:\Program Files\qct\qct.exe"
+
+	Now the :guilabel:`HG Commit` menu option should launch Qct, and
+	:command:`hg qct` should work from the command line and hgtk ci
+	should also launch Qct.
+
+	In 0.9, hgtk ci will no longer launch Qct.  We will drop support for
+	any external commit tools.
 
 *How can I use hgk (hg view) with TortoiseHg?*
-    Download `tclkit <http://www.equi4.com/tclkit>`_ and place it in your TortoiseHg directory.
-    Download the `hgk <http://www.selenic.com/repo/hg/raw-file/tip/contrib/hgk>`_ script from the Mercurial
-    repository and place it in your :file:`TortoiseHg\contrib` directory. Create an :file:`hgk.cmd` file and
-    place it in :file:`TortoiseHg\\scripts`. This file should contain::
-	
-        @set HG=C:\Program Files\TortoiseHg\hg.exe
-        @"C:\Program Files\TortoiseHg\tclkit-win32.exe" "C:\Program Files\TortoiseHg\contrib\hgk" %*
-    
-	Then enable hgk in your :file:`Mercurial.ini` file::
 
-        [extensions]
-        hgk =
+	Download `tclkit <http://www.equi4.com/tclkit>`_ and place it in
+	your TortoiseHg directory.  Download the
+	`hgk <http://www.selenic.com/repo/hg/raw-file/tip/contrib/hgk>`_ script
+	from the Mercurial repository and place it in your
+	:file:`TortoiseHg\\contrib` directory. Create an :file:`hgk.cmd` file
+	and place it in :file:`TortoiseHg\\scripts`. This file should
+	contain ::
 
-        [hgk]
-        path=C:\Program Files\TortoiseHg\scripts\hgk.cmd
-        vdiff=vdiff
+		@set HG=C:\Program Files\TortoiseHg\hg.exe
+		@"C:\Program Files\TortoiseHg\tclkit-win32.exe" "C:\Program Files\TortoiseHg\contrib\hgk" %*
+ 
+	Then enable hgk in your :file:`Mercurial.ini`
+	file::
 
-    This allows you launch :command:`hg view` from the command line.
+		[extensions]
+		hgk =
+
+		[hgk]
+		path=C:\Program Files\TortoiseHg\scripts\hgk.cmd
+		vdiff=vdiff
+
+	This allows you launch :command:`hg view` from the command line.
 
 *How can I use WinMerge as my visual diff tool?*
-    Add these lines to your personal :file:`Mercurial.ini` file ::
 
-        [extdiff]
-        cmd.winmerge = C:\Program Files\WinMerge\WinMerge.exe
-        opts.winmerge = /e /x /ub /wl
+	Add these lines to your personal :file:`Mercurial.ini` file ::
 
-    Now run the :guilabel:`Global Settings` tool. On the :guilabel:`TortoiseHg` tab, you should see
-	:guilabel:`winmerge` available in the drop-down list for :guilabel:`Visual Diff Command`.
+		[extdiff]
+		cmd.winmerge = C:\Program Files\WinMerge\WinMerge.exe
+		opts.winmerge = /e /x /ub /wl
+
+	Now run the :guilabel:`Global Settings` tool. On the
+	:guilabel:`TortoiseHg` tab, you should see :guilabel:`winmerge`
+	available in the drop-down list for :guilabel:`Visual Diff Command`.
 	Select :guilabel:`winmerge`, apply, then close.
 
-    This same approach can be used to add nearly any visual diff tool, but be aware that your diff tool must
-    be able to support directory diffs if it is to be used by TortoiseHg, unless you are using release 0.8 or
-    later.
+	This same approach can be used to add nearly any visual diff tool,
+	but be aware that your diff tool must be able to support directory
+	diffs if it is to be used by TortoiseHg, unless you are using
+	release 0.8 or later.
 
 *How can I use Araxis Merge as my visual diff tool?*
-    Add these lines to your personal :file:`Mercurial.ini` file ::
 
-        [extdiff]
-        cmd.adiff=C:\Program Files\Araxis\Araxis Merge v6.5\compare.exe
-        opts.adiff=/wait
+	Add these lines to your personal :file:`Mercurial.ini` file ::
 
-    Now run the :guilabel:`Global Settings` tool. On the :guilabel:`TortoiseHg` tab, you should see
-    :guilabel:`adiff` available in the drop-down list for :guilabel:`Visual Diff Command`.
-    Select :guilabel:`adiff`, apply, then close.
+		[extdiff]
+		cmd.adiff=C:\Program Files\Araxis\Araxis Merge v6.5\compare.exe
+		opts.adiff=/wait
+
+	Now run the :guilabel:`Global Settings` tool. On the
+	:guilabel:`TortoiseHg` tab, you should see :guilabel:`adiff`
+	available in the drop-down list for :guilabel:`Visual Diff Command`.
+	Select :guilabel:`adiff`, apply, then close.
 
 *Does TortoiseHg work on Vista?*
-    TortoiseHg 0.8 works well on x86 and x64 versions of Vista and Windows 7.
+
+	TortoiseHg 0.8.n works well on x86 and x64 versions of Vista and Windows 7.
 
 *How can I get the context menus working on 64-bit Vista?*
-    Upgrade to TortoiseHg 0.8
+
+	Upgrade to TortoiseHg 0.8.n
 
 *I'm a CLI user, how do I disable the shell extensions (overlay icons and context menus)?*
-    If you have TortoiseHg 0.8 or later, you can disable overlays via the taskbar options menu.
-    The only way to disable the context menu is to rename :file:`ThgShell.dll` in your install directory
-    and then restart explorer (this completely disables the shell extension).
 
-    If you have an older TortoiseHg release, run this command with appropriate permissions:
-    :command:`regsvr32 /u "C:\\Program Files\\TortoiseHg\\tortoisehg.dll`
-    Run that command without the :command:`/u` argument to re-enable the extensions. Both operations take effect
-    after the next reboot.
+	If you have TortoiseHg 0.8 or later, you can disable overlays via
+	the taskbar options menu.  The only way to disable the context menu
+	is to rename :file:`ThgShell.dll` in your install directory and then
+	restart explorer (this completely disables the shell extension).
+
+	If you have an older TortoiseHg release, run this command with
+	appropriate permissions: 
+	:command:`regsvr32 /u "C:\\Program Files\\TortoiseHg\\tortoisehg.dll`
+	Run that command without the :command:`/u` argument to re-enable the
+	extensions. Both operations take effect after the next reboot.
 
 *How is TortoiseHg configured?*
-    TortoiseHg gets configuration settings from two systems.
 
-    1. The Mercurial configuration system, which is three-tiered
-        1. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
-        2. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
-        3. Per-Repository :file:`Mercurial.ini` in :file:`{repo-root}\.hg\hgrc`
-    2. :file:`%APPDATA%\Tortoisehg` settings for application state (window positions, etc)
+	TortoiseHg gets configuration settings from two systems.
 
-    These are configurables that are stored the Mercurial configuration system. ::
+	1. The Mercurial configuration system, which is three-tiered
+		1. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
+		2. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
+		3. Per-Repository :file:`Mercurial.ini` in :file:`{repo-root}\.hg\hgrc`
+	2. :file:`%APPDATA%\\Tortoisehg` settings for application state
+	   (window positions, etc)
+
+	These are configurables that are stored the Mercurial configuration
+	system. ::
 	
-        [tortoisehg]
-        extcommit = None
-        vdiff = vdiff
-        editor = gvim
-        tabwidth = 4
-        longsummary = True
-        copyhash = False
-        graphlimit = 500
-        authorcolor = True
-        authorcolor.steve = blue
+		[tortoisehg]
+		extcommit = None
+		vdiff = vdiff
+		editor = gvim
+		tabwidth = 4
+		longsummary = True
+		copyhash = False
+		graphlimit = 500
+		authorcolor = True
+		authorcolor.steve = blue
 
-    See also :doc:`settings`, and `issue #50 <http://bitbucket.org/tortoisehg/stable/issue/50/>`_.
+	See also :doc:`settings`, and
+	`issue #50 <http://bitbucket.org/tortoisehg/stable/issue/50/>`_.
 
 *Is it possible to change fonts?*
-    In some cases, yes. The gtools based dialogs (commit, status, shelve) allow some font configuration. ::
 
-        [gtools]
-        # font used in changeset viewer and commit log text
-        fontcomment = courier 10
-        # font used for diffs in status and commit tools
-        fontdiff = courier 10
-        # font used in file lists in status and commit tools
-        fontlist = courier 9
+	In some cases, yes. The gtools based dialogs (commit, status,
+	shelve) allow some font configuration. ::
 
-        # make the integrated diff window appear at the bottom or side
-        # (applies to commit and status dialogs)
-        diffbottom = False
+		[gtools]
+		# font used in changeset viewer and commit log text
+		fontcomment = courier 10
+		# font used for diffs in status and commit tools
+		fontdiff = courier 10
+		# font used in file lists in status and commit tools
+		fontlist = courier 9
+
+		# make the integrated diff window appear at the bottom or side
+		# (applies to commit and status dialogs)
+		diffbottom = False
 
 *How do I switch GTK themes?*
-     In 0.7, the theme was selectable at install time.  For other releases, (and after install on 0.7) you can
-	 still do this manually
 
-        * cd :file:`C:\\Program Files\\TortoiseHg\\share\\themes` (>=0.8, this is :file:`gtk\\share\\themes`)
-        * look at the themes in this directory, remember their names or keep this folder open.
-        * :command:`cd ..\\..\\etc\\gtk-2.0`
-        * edit :file:`gtkrc` and change the name of the theme you wish to use
-        * Vista may try to prevent you from editing the file directly. I work around this by copying to your desktop,
-          editing it there, then copying it back (and answering all the security dialogs)
-        * Changes immediately take affect on all newly launched applications
+	In 0.7, the theme was selectable at install time.  For other
+	releases, (and after install on 0.7) you can still do this manually
 
-    You also should be able to download new themes and copy them into the :file:`share\\themes` directory and
-    then enable them in your :file:`gtkrc`.
+		* cd :file:`C:\\Program Files\\TortoiseHg\\share\\themes`
+		  (>=0.8, this is :file:`gtk\\share\\themes`)
+		* look at the themes in this directory, remember their names or
+		  keep this folder open.
+		* :command:`cd ..\\..\\etc\\gtk-2.0`
+		* edit :file:`gtkrc` and change the name of the theme you wish to use
+		* Vista may try to prevent you from editing the file directly. I work
+		  around this by copying to your desktop, editing it there, then
+		  copying it back (and answering all the security dialogs)
+		* Changes immediately take affect on all newly launched applications
+
+	You also should be able to download new themes and copy them into
+	the :file:`share\\themes` directory and then enable them in your
+	:file:`gtkrc`.
 
 *After uninstalling, it left a bunch of DLL and PYD files behind.*
-    Reboot, like the uninstaller told you to :-) The uninstaller marked those files for removal at the next boot
-	since most of them could not be removed while your system was running.
+
+	Reboot, like the uninstaller told you to :-) The uninstaller marked
+	those files for removal at the next boot since most of them could
+	not be removed while your system was running.
 
 *How can I convert a subversion repository to Mercurial?*
-    You must install svn-win32-1.6 command line tools, then add them to your path. Then you must enable the
-    `convert <http://www.selenic.com/mercurial/wiki/index.cgi/ConvertExtension>`_ extension. At this point,
-    you should be able to use the :command:`hg convert` command to do the conversion. Please direct
-    problems/questions about the convert extension to the Mercurial mailing list or #mercurial on irc.freenode.net.
+
+	You must install svn-win32-1.6 command line tools, then add them to
+	your path. Then you must enable the
+	`convert <http://mercurial.selenic.com/wiki/ConvertExtension>`_
+	extension. At this point, you should be able to use the
+	:command:`hg convert` command to do the conversion. Please direct
+	problems/questions about the convert extension to the Mercurial
+	mailing list or #mercurial on irc.freenode.net.
 
 *Where do TortoiseHg extensions look for external Python modules on Windows?*
-    TortoiseHg includes an entire Python distribution bundled up as DLLs. The standard library modules are all
-    in the :file:`library.zip` file in :file:`C:\Program Files\TortoiseHg`.
 
-    If you try to use an extension that imports a non-standard Python module, you will find that the extension
-    will fail to load because it can't find the module. For example the ReviewBoard extension imports the
-    simplejson module, which is not part of the standard Python distribution.
+	TortoiseHg includes an entire Python distribution bundled up as
+	DLLs. The standard library modules are all in the
+	:file:`library.zip` file in :file:`C:\\Program Files\\TortoiseHg`.
 
-    In order to make it work you need to add a couple of lines to the top of the extension's .py file, before
-    the line that imports the foreign module::
+	If you try to use an extension that imports a non-standard Python
+	module, you will find that the extension will fail to load because
+	it can't find the module. For example the ReviewBoard extension
+	imports the simplejson module, which is not part of the standard
+	Python distribution.
 
-        import sys
-        sys.path.append('C:\\path\\to\\module')
+	In order to make it work you need to add a couple of lines to the
+	top of the extension's .py file, before the line that imports the
+	foreign module::
 
-    Note that this will not work for modules distributed as .egg files; the supplied path must contain the
-	module's .py or .pyc files.
+		import sys
+		sys.path.append(r'C:\path\to\module')
+
+	Note that this will not work for modules distributed as .egg files;
+	the supplied path must contain the module's .py or .pyc files.
 
 *How do I fix odd characters in dialog?*
-    In 0.8, we no longer distribute multiple themes and switched default theme to MS-Windows.
-    As a result, it might causes an issue related default font of MS-Windows theme in some environments.
-    In order to fix this issue, add following setting to TortoiseHg's :file:`gtkrc` file::
 
-        style "msw-default"
-        {
-        font_name = "MS UI Gothic 9"
-        }
+	In 0.8, we no longer distribute multiple themes and switched default
+	theme to MS-Windows.  As a result, it might causes an issue related
+	default font of MS-Windows theme in some environments.  In order to
+	fix this issue, add following setting to TortoiseHg's :file:`gtkrc`
+	file::
 
-    You can find :file:`gtkrc` file in your TortoiseHg install directory:
-    i.e. :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
+		style "msw-default"
+		{
+		font_name = "MS UI Gothic 9"
+		}
+
+	You can find :file:`gtkrc` file in your TortoiseHg install directory:
+	i.e. :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
+
+.. vim: noet ts=4

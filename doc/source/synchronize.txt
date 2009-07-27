@@ -3,12 +3,12 @@ TortoiseHg Synchronize
 ======================
 
 .. module:: synchronize.dialog
-   :synopsis: Dialog used to perform synchronization operations
+	:synopsis: Dialog used to perform synchronization operations
 
 .. figure:: figures/synchronize.png
-   :alt: Synchronize dialog
+	:alt: Synchronize dialog
 
-   Synchronize dialog
+	Synchronize dialog
 
 The synchronize tool is used to transmit changesets between repositories
 or optionally to email recipients.
@@ -31,9 +31,9 @@ or optionally to email recipients.
 Below the toolbar are two buttons and a text entry:
 
 :guilabel:`Repo:`
-    browse for a local repository to synchronize with
+	browse for a local repository to synchronize with
 :guilabel:`Bundle:`
-    browse for a local bundle file to pull from
+	browse for a local bundle file to pull from
 
 The text entry/combo box is where you enter or select paths of target
 repositories. The synchronize tool will seed the drop-down list with
@@ -46,22 +46,22 @@ default behavior for your user account and override that selection on a
 per-repository basis.
 
 :guilabel:`Nothing`
-    No operations are performed after a pull.  You will be allowed to
-    view the pulled changesets in the log viewer, and you will have the
-    option to update to the new tip if applicable.
+	No operations are performed after a pull.  You will be allowed to
+	view the pulled changesets in the log viewer, and you will have the
+	option to update to the new tip if applicable.
 :guilabel:`Update`
-    Automatically update to the new branch tip if, and only if, new
-    revisions were pulled into the local repository.  This could trigger
-    a merge if the pulled changes conflict with local uncommitted
-    changes.
+	Automatically update to the new branch tip if, and only if, new
+	revisions were pulled into the local repository.  This could trigger
+	a merge if the pulled changes conflict with local uncommitted
+	changes.
 :guilabel:`Fetch`
-    Equivalent to hg fetch.  See the fetch extension documentation for
-    it's behavior.
+	Equivalent to hg fetch.  See the fetch extension documentation for
+	it's behavior.
 :guilabel:`Rebase`
-    Equivalent to pull --rebase.  See the rebase extension documentation
-    for it's behavior.  Rebase operations disable connections to any
-    changelog tools, since it is very destructive to any app which is
-    holding a repository object.
+	Equivalent to pull --rebase.  See the rebase extension documentation
+	for it's behavior.  Rebase operations disable connections to any
+	changelog tools, since it is very destructive to any app which is
+	holding a repository object.
 
 The :guilabel:`use proxy` button is a quick way to disable your proxy
 configuration for individual operations. The button is only sensitive
@@ -109,9 +109,9 @@ Email
 -----
 
 .. figure:: figures//email.png
-   :alt: Email dialog
+	:alt: Email dialog
 
-   Email dialog
+	Email dialog
  
 The email dialog can be launched from two TortoiseHg tools.
 
@@ -133,6 +133,40 @@ threaded in mailing lists.
 Please consult the Mercurial documentation for the differences between
 plain patches, HG patches, Git patches, and bundles.
 
+From command line
+-----------------
+
+The synchronize tool can be started from command line ::
+
+	hgtk synch
+
+or ::
+
+	hgtk pull
+
+or ::
+
+	hgtk push
+
+or ::
+
+	hgtk incoming
+
+or ::
+
+	hgtk outcoming
+
+or ::
+
+	hgtk email
+	
+The syntax is simple, no options or parameters are needed, except the
+global options.  If the synchronize tool is started via push, outgoing,
+or email command aliases, it will automatically select the
+*default-push* URL if.  For all other aliases the tool selects the
+*default* URL.  If the selected URL is not found, it will use the first
+path it finds.
+
 Changes since 0.7
 -----------------
 
@@ -142,3 +176,5 @@ Changes since 0.7
   attachment types.
 * Email dialog now sends an intro message only when one has been
   entered, regardless of patch count.
+
+.. vim: noet ts=4

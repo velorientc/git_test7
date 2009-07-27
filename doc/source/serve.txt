@@ -3,15 +3,15 @@ TortoiseHg Serve
 ================
 
 .. module:: serve.dialog
-   :synopsis: Dialog used to start/stop the web server
+	:synopsis: Dialog used to start/stop the web server
+
+.. figure:: figures/serve.png
+	:alt: Web server dialog
 
 The serve tool is a wrapper for Mercurial's built-in web server. Once
 launched, any computer can attach to the http port and browse your
 repository(ies) or perform clone, pull, or even push operations (if you
-configure your server to allow it).		
-
-.. figure:: figures/serve.png
-   :alt: Web server dialog
+configure your server to allow it).
 
 :guilabel:`Start`
 	start the web server
@@ -45,8 +45,28 @@ To use this file you must launch the TortoiseHg serve dialog from the
 command line via: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.  In a
 future release of TortoiseHg, we hope to make this launchable from the
 shell context menu.
-	
+
+From command line
+-----------------
+
+The server tool can be started from command line ::
+
+	hgtk serve
+
+
+The syntax is ::
+
+	hgtk serve [OPTIONS]
+
+The valid [OPTIONS] are:
+
+``--webdir-conf``
+	It specifies the name of the webdir config file. See above for details.
+
+
 Changes since 0.7
 -----------------
 * Improved error handling
 * i18n fixes
+
+.. vim: noet ts=4
