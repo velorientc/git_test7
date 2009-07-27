@@ -185,44 +185,61 @@ Web
 ---
 	
 :guilabel:`Name:`
-	TODO
+	Repository name to use in the web interface.
+	Default is the working directory.
 
 :guilabel:`Description:`
-	TODO
+	Textual description of the repository's purpose or
+	contents.
 
 :guilabel:`Contact:`
-	TODO
+	Name or email address of the person in charge of the
+	repository.
 
 :guilabel:`Style:`
-	TODO
+	Which template map style to use.
 
 :guilabel:`Archive Formats:`
-	TODO
+	Comma separated list of archive formats allowed for
+	downloading.
 
 :guilabel:`Port:`
-	TODO
+	Port to listen on.
 
 :guilabel:`Push Requires SSL:`
-	TODO
+	Whether to require that inbound pushes be transported
+	over SSL to prevent password sniffing.
 
 :guilabel:`Stripes:`
-	TODO
+	How many lines a "zebra stripe" should span in multiline output.
+	Default is 1; set to 0 to disable.
 
 :guilabel:`Max Files:`
-	TODO
+	Maximum number of files to list per changeset.
 
 :guilabel:`Max Changes:`
-	TODO
+	Maximum number of changes to list on the changelog.
 
 :guilabel:`Allow Push:`
-	TODO
+	Whether to allow pushing to the repository. If empty or not
+	set, push is not allowed. If the special value "*", any remote
+	user can push, including unauthenticated users. Otherwise, the
+	remote user must have been authenticated, and the authenticated
+	user name must be present in this list (separated by whitespace
+	or ","). The contents of the allow_push list are examined after
+	the deny_push list.
 
 :guilabel:`Deny Push:`
-	TODO
+	Whether to deny pushing to the repository. If empty or not set,
+	push is not denied. If the special value "*", all remote users
+	are denied push. Otherwise, unauthenticated users are all
+	denied, and any authenticated user name present in this list
+	(separated by whitespace or ",") is also denied. The contents
+	of the deny_push list are examined before the allow_push list.
 
 :guilabel:`Encoding:`
-	TODO
-
+	Character encoding name.
+	
 Proxy
 -----
 	
