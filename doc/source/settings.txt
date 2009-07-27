@@ -309,23 +309,28 @@ Diff
 ----
 
 :guilabel:`Git Format:`
-	TODO
+	Use git extended diff header format.
+	Default: False.
 
 :guilabel:`No Dates:`
-	TODO
+	Do not include modification dates in diff headers.
+	Default: False.
 
 :guilabel:`Show Function:`
-	TODO
+	Show which function each change is in.
+	Default: False.
 	
 :guilabel:`Ignore White Space:`
-	TODO
+	Ignore white space when comparing lines.
+	Default: False.
 
 :guilabel:`Ignore WS Amount:`
-	TODO
+	Ignore changes in the amount of white space.
+	Default: False.
 
 :guilabel:`Ignore Blank Lines:`
-	TODO
-
+	Ignore changes whose lines are all blank.
+	Default: False.
 	
 	
 From command line
