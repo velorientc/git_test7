@@ -109,7 +109,7 @@ TortoiseHg
 	the user.  Only used by command line interface commands.
 		
 :guilabel:`Tab Width:`
-	Specify the number of spaces that tabs expand to in various.
+	Specify the number of spaces that tabs expand to in various
 	TortoiseHg windows. Default: Not expanded.
 
 :guilabel:`Max Diff Size:`
