@@ -231,7 +231,7 @@ operates in this mode is that it allow you to use the integrated change
 selection features to move changes into or out of the top patch. You can
 move entire files or single changes in or out of the patch.
 
-The :guilabel:`Commit` button, which has been renamed :guilabel:`qrefresh`
+The :guilabel:`Commit` button, which has been renamed :guilabel:`QRefresh`
 in this context, it will refresh the top patch with just the changes you
 have selected (including the patch description). This may be a bit confusing at first
 because the changes you leave out of the patch are still going to be in
