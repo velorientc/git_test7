@@ -126,37 +126,57 @@ Commit
 ------
 
 :guilabel:`Username:`
-	TODO
+	Name associated with commits.
 
 :guilabel:`External Commit Tool:`
-	TODO
+	Select commit tool launched by TortoiseHg. (Qct is no longer
+	distributed as part of TortoiseHg).
+	Default: None (use the builtin tool). [DEPRECATED]
 
 :guilabel:`Summary Line Length:`
-	TODO
+	Maximum length of the commit message summary line.
+	If set, TortoiseHg will issue a warning if the
+	summary line is too long or not separated by a
+	blank line. Default: 0 (unenforced).
 
 :guilabel:`Message Line Length:`
-	TODO
+	Word wrap length of the commit message.  If
+	set, the popup menu can be used to format
+	the message and a warning will be issued
+	if any lines are too long at commit.
+	Default: 0 (unenforced).
 	
 Changelog
 ---------
 
 :guilabel:`Author Coloring:`
-	TODO
+	Color changesets by author name.  If not enabled,
+	the changes are colored green for merge, red for
+	non-trivial parents, black for normal.
+	Default: False.
 
 :guilabel:`Long Summary:`
-	TODO
+	If true, concatenate multiple lines of changeset summary
+	until they reach 80 characters.
+	Default: False.
 
 :guilabel:`Log Batch Size:`
-	TODO
+	The number of revisions to read and display in the
+	changelog viewer in a single batch.
+	Default: 500.
 
 :guilabel:`Copy Hash:`
-	TODO
+	Allow the changelog viewer to copy the changeset hash
+	of the currently selected changeset into the clipboard.
+	Default: False.
 
 Sync
 ----	
 
 :guilabel:`After pull operation:`
-	TODO
+	Operation which is performed directly after a successful pull.
+	update equates to pull --update, fetch equates to the fetch
+	extension, rebase equates to pull --rebase.  Default: none.
 
 :guilabel:`Remote repository paths`
 	TODO
