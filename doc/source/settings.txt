@@ -334,7 +334,7 @@ Diff
 	
 	
 From command line
------------------
+=================
 
 The setting dialog can be started from command line ::
 
