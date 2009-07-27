@@ -10,25 +10,25 @@ Audience
 
 This book is written for computer literate folk who want to use
 Mercurial to manage their data, but are uncomfortable using the command
-line client to do so. Since TortoiseHG is a windows shell extension it's
+line client to do so. Since TortoiseHg is a windows shell extension it's
 assumed that the user is familiar with the windows explorer and knows
 how to use it.
 
 Reading guide
 =============
 
-This Preface explains a little about the TortoiseHG project, the
+This Preface explains a little about the TortoiseHg project, the
 community of people who work on it, and the licensing conditions for
 using it and distributing it.
 
-The :doc:`intro`, explains what TortoiseHG is, what it does, where it
+The :doc:`intro`, explains what TortoiseHg is, what it does, where it
 comes from and the basics for installing it on your PC.
 
-The :doc:`quick`, is a quick tutorial on how to start with TortoiseHG.
+The :doc:`quick`, is a quick tutorial on how to start with TortoiseHg.
 
 The remaining chapters describe the tools that are part of TortoiseHg.
 
-TortoiseHG is free!
+TortoiseHg is free!
 ===================
 
 TortoiseHg is released under 
@@ -65,13 +65,13 @@ The following typographical conventions are used in this manual:
 :guilabel:`Commit`
 	Indicates a label, button or anything that appears in user interfaces.
 
-:menuselection:`TortoiseHG... --> About`
+:menuselection:`TortoiseHg... --> About`
 	Indicates a menu choice, or a combination of menu choice, tab
 	selection and GUI label.  For example
-	:menuselection:`TortoiseHG...  --> Global settings --> Commit --> User name`
+	:menuselection:`TortoiseHg...  --> Global settings --> Commit --> User name`
 	means do something in :guilabel:`User name` label under
 	:guilabel:`Commit` tab selectable from the menu choice
-	:menuselection:`TortoiseHG... --> Global settings`.
+	:menuselection:`TortoiseHg... --> Global settings`.
 
 :file:`.hg/hgrc`
 	Indicates a filename or directory name.

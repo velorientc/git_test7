@@ -11,7 +11,7 @@ TortoiseHg Commit Tool
 	proper configuration. See
 	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
    
-The commit tool is an important part of TortoiseHG.  It is, in fact, the
+The commit tool is an important part of TortoiseHg.  It is, in fact, the
 only component that is launchable from the first level of the context
 menu.  This is mainly because it is the most heavily used tool. Not only
 can you commit your changes, but you can examine the state of your
@@ -277,7 +277,7 @@ The syntax is ::
 	hgtk commit [OPTIONS] [FILES]
 
 where [FILES] is one or more file that must be commited, if no files are
-specified TortoiseHG commits all the modified files, and valid [OPTIONS] are:
+specified TortoiseHg commits all the modified files, and valid [OPTIONS] are:
 
 ``-d``, ``--date``
 	Use the specified date as commit date, if not specified the current date

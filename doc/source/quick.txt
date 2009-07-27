@@ -3,7 +3,7 @@ A quick tour for the impatient
 ==============================
 
 .. module:: tour
-	:synopsis: A Gentle Introduction to Using TortoiseHG on Windows
+	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
 
 One of the great things about Mercurial is that there are lots of different
 `Collaboration Models <http://hgbook.red-bean.com/hgbookch6.html#x10-1110006.2>`_.
@@ -12,19 +12,19 @@ The following describes just one of those ways: a single central repository.
 To get started, suppose you volunteer to create the first version. There are 
 `ways of importing already existing repositories <http://www.selenic.com/mercurial/wiki/index.cgi/RepositoryConversion>`_,
 but lets assume we're starting from scratch. First you need to make sure
-that you are correctly identified in TortoiseHG.  You do this by
-adjusting the global settings of TortoiseHG. Try right-clicking your
+that you are correctly identified in TortoiseHg.  You do this by
+adjusting the global settings of TortoiseHg. Try right-clicking your
 source folder and following
-:menuselection:`TortoiseHG --> Global Settings`
+:menuselection:`TortoiseHg --> Global Settings`
 
 .. figure:: figures/contextmenu.png
 	:alt: Context Menu
 
-From there you should be able to find what TortoiseHG thinks your name
+From there you should be able to find what TortoiseHg thinks your name
 is, and correct it.
 
 .. note::
-	If you forget to set your name TortoiseHG will ask you for it at the
+	If you forget to set your name TortoiseHg will ask you for it at the
 	first *commit*, when the name is first required.
 
 Create the repository on your local machine by using the
@@ -36,7 +36,7 @@ You never specify the :file:`.hg` directory. It is mentioned here just
 so you'll better understand how Mercurial is working.
 
 Add the files contained in the folder by following the menu
-:menuselection:`TortoiseHG --> Add Files`.
+:menuselection:`TortoiseHg --> Add Files`.
 
 .. {{images/image008.gif}}
 

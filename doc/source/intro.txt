@@ -5,7 +5,7 @@ TortoiseHg Introduction
 .. module:: introduction
 	:synopsis: Introduce TortoiseHg and its various parts
 
-What is TortoiseHG?
+What is TortoiseHg?
 ===================
 	
 TortoiseHg is a set of graphical tools and a shell extension for the
@@ -30,13 +30,13 @@ dialogs can be used on any platform that supports PyGtk, including Mac
 OS X.
 
 
-Installing TortoiseHG
+Installing TortoiseHg
 =====================
 
 On Windows
 ----------
 
-TortoiseHG comes with an easy to use installer. Double click on the installer
+TortoiseHg comes with an easy to use installer. Double click on the installer
 file and follow the instructions. The installer will take care of the rest.
 
 After installation a reboot is necessary.
@@ -44,7 +44,7 @@ After installation a reboot is necessary.
 .. note::
 	If you have an older (less than 0.8) version already installed, the
 	installer will ask that you to remove the previous version of
-	TortoiseHG, which must be removed from control panel.  Removing
+	TortoiseHg, which must be removed from control panel.  Removing
 	TortoiseOverlays is also recommended, if no other apps are using
 	them, but not strictly required.
 
@@ -56,23 +56,23 @@ After installation a reboot is necessary.
 Language settings
 ~~~~~~~~~~~~~~~~~
 
-The TortoiseHG user interface has been translated into many languages.
+The TortoiseHg user interface has been translated into many languages.
 You don't need to download a language pack. All the available languages
 are shipped with the installer. Look in
-:file:`C:\\Program Files\\TortoiseHG\\locale` for the available
+:file:`C:\\Program Files\\TortoiseHg\\locale` for the available
 languages. To enable a language just set the environment variable
 ``LANG`` to the desidered language, e.g. for italian ``SET LANG=it``.
 
 .. note::
 	After setting LANG, if the standard GUI elements like :guilabel:`OK`,
 	:guilabel:`Apply` etc. still appear in English, it means that the
-	TortoiseHG installer did not include the translation component of GTK+
+	TortoiseHg installer did not include the translation component of GTK+
 	for your locale.  This was probably due to an incomplete translation
-	of TortoiseHG at the moment of release it.
+	of TortoiseHg at the moment of release it.
 
 The Windows shell extension context menus get their translations from
 the Windows registry.  Translations for many locales are available from
-the TortoiseHG `wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_.
+the TortoiseHg `wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_.
 Once the desidered file is downloaded (rename it to .reg if the
 extension is .txt), double-click on it and confirm all the requests.
 

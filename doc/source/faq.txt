@@ -39,7 +39,7 @@ TortoiseHg FAQ
 	this problem. See also
 	`ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
 
-*How can I use Qct with TortoiseHG, after version 0.7?*
+*How can I use Qct with TortoiseHg, after version 0.7?*
 
 	We recommend that you try the commit tool that comes with TortoiseHg
 	before running back to Qct, but here are the instructions should you
