@@ -66,17 +66,6 @@ configuring and its default value.  The description of the currently
 focused configurable is also shown in a text box at the bottom of the
 dialog.
 
-The :guilabel:`Sync` tab is where you can store URLs (paths) to related
-repositories. It is rare to store paths in the site-wide or user
-configuration files, most of the time you will only store these in a
-repository configuration file. Mercurial has two special path names that
-can be used as default targets for some operations.
-
-default
-	the default URL to pull from, usually clone source
-default-push
-	the default push target when using the command line
-
 Please consult the Mercurial wiki for more detailed information about
 these configurables (except for the first three tabs:
 :guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
@@ -186,6 +175,17 @@ Changelog
 
 Sync
 ----	
+
+The :guilabel:`Sync` tab is where you can store URLs (paths) to related
+repositories. It is rare to store paths in the site-wide or user
+configuration files, most of the time you will only store these in a
+repository configuration file. Mercurial has two special path names that
+can be used as default targets for some operations.
+
+default
+	the default URL to pull from, usually clone source
+default-push
+	the default push target when using the command line
 
 :guilabel:`After pull operation:`
 	Operation which is performed directly after a successful pull.
