@@ -128,7 +128,7 @@ _web_info = (
         ' Default is 1; set to 0 to disable.')),
     (_('Max Files'), 'web.maxfiles', ['10'],
         _('Maximum number of files to list per changeset.')),
-    (_('Max Changes'), 'web.maxfiles', ['10'],
+    (_('Max Changes'), 'web.maxchanges', ['10'],
         _('Maximum number of changes to list on the changelog.')),
     (_('Allow Push'), 'web.allow_push', ['*'],
         _('Whether to allow pushing to the repository. If empty or not'
