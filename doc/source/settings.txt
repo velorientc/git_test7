@@ -58,7 +58,7 @@ Each tab corresponds roughly to a section of your :file:`Mercurial.ini`
 file, though there is a certain amount of overlap. Some sections were
 split across multiple tabs for clarity.
 
-Every tab but :guilabel:`Paths` has the same format, a list of
+Every tab but :guilabel:`Sync` has the same format, a list of
 configurable options with a drop-down combo box with possible values and
 a history of options you have used for that setting. The configurable
 name (label) has a tooltip which describes in more detail what you are
@@ -66,21 +66,13 @@ configuring and its default value.  The description of the currently
 focused configurable is also shown in a text box at the bottom of the
 dialog.
 
-The :guilabel:`Paths` tab is where you can store URLs (paths) to related
-repositories. It is rare to store paths in the site-wide or user
-configuration files, most of the time you will only store these in a
-repository configuration file. Mercurial has two special path names that
-can be used as default targets for some operations.
-
-default
-	the default URL to pull from, usually clone source
-default-push
-	the default push target when using the command line
-
 Please consult the Mercurial wiki for more detailed information about
 these configurables (except for the first three tabs:
 :guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
 are specifically for TortoiseHg).
+
+.. module:: TortoiseHg.settings
+	:synopsis: Dialog used to set general TortoiseHg preferences
 
 TortoiseHg
 ----------
@@ -89,8 +81,8 @@ TortoiseHg
 	Graphical merge program for resolving merge conflicts.  If left
 	unspecified, Mercurial will use the first applicable tool it finds
 	on your system or use its internal merge tool that leaves conflict
-	markers in place.  Chose internal:merge to force conflict markers,
-	internal:prompt to always select local or other, or internal:dump
+	markers in place.  Chose :guilabel:`internal:merge` to force conflict markers,
+	:guilabel:`internal:prompt` to always select local or other, or :guilabel:`internal:dump`
 	to leave files in the working directory for manual merging.
 
 :guilabel:`Visual Diff Command:`
@@ -124,6 +116,9 @@ TortoiseHg
 	commit dialogs.
 	Default: False (show diffs to right of file list).
 	
+.. module:: commit.settings
+	:synopsis: Dialog used to set commit specific preferences
+
 Commit
 ------
 
@@ -148,6 +143,9 @@ Commit
 	if any lines are too long at commit.
 	Default: 0 (unenforced).
 	
+.. module:: changelog.settings
+	:synopsis: Dialog used to set changelog specific preferences
+
 Changelog
 ---------
 
@@ -172,13 +170,26 @@ Changelog
 	of the currently selected changeset into the clipboard.
 	Default: False.
 
+.. module:: synchronize.settings
+	:synopsis: Dialog used to set synchronize specific preferences
+
 Sync
 ----	
 
+The :guilabel:`Sync` tab is where you can store URLs (paths) to related
+repositories. It is rare to store paths in the site-wide or user
+configuration files, most of the time you will only store these in a
+repository configuration file. Mercurial has two special path names that
+can be used as default targets for some operations.
+
+* *default*	- the default URL to pull from, usually clone source
+* *default-push* - the default push target when using the command line
+
 :guilabel:`After pull operation:`
 	Operation which is performed directly after a successful pull.
-	update equates to pull --update, fetch equates to the fetch
-	extension, rebase equates to pull --rebase.  Default: none.
+	:guilabel:`update` equates to :command:`pull --update`, :guilabel:`fetch`
+	equates to the fetch extension, :guilabel:`rebase` equates to
+	:command:`pull --rebase`.  Default: none.
 
 :guilabel:`Remote repository paths`
 	In this pane you can configure aliases for repositories that you
@@ -186,6 +197,9 @@ Sync
 	to the clone source automatically.  All configured path aliases will
 	be listed in the Synchronize tool path drop-down box, and they can
 	be used as short-cuts on the command line.
+
+.. module:: web.settings
+	:synopsis: Dialog used to set web server specific preferences
 
 Web
 ---
@@ -246,12 +260,15 @@ Web
 :guilabel:`Encoding:`
 	Character encoding name.
 	
+.. module:: proxy.settings
+	:synopsis: Dialog used to set proxy specific preferences
+
 Proxy
 -----
 	
 :guilabel:`Host:`
 	Host name and (optional) port of proxy server, for
-	example "myproxy:8000".
+	example ``myproxy:8000``.
 	
 :guilabel:`Bypass List:`
 	Optional. Comma-separated list of host names that
@@ -266,6 +283,9 @@ Proxy
 	proxy server.
 	
 	
+.. module:: email.settings
+	:synopsis: Dialog used to set email specific preferences
+
 Email
 -----
 
@@ -286,9 +306,9 @@ Email
 :guilabel:`method:`
 	Optional. Method to use to send email messages. If value is "smtp" (default),
 	use SMTP (configured below).  Otherwise, use as name of program to run that
-	acts like sendmail (takes "-f" option for sender, list of recipients on
-	command line, message on stdin). Normally, setting this to "sendmail" or
-	"/usr/sbin/sendmail" is enough to use sendmail to send messages.
+	acts like sendmail (takes :command:`-f` option for sender, list of recipients on
+	command line, message on stdin). Normally, setting this to ``sendmail`` or
+	``/usr/sbin/sendmail`` is enough to use sendmail to send messages.
 
 :guilabel:`SMTP Host:`
 	Host name of mail server.
@@ -311,6 +331,9 @@ Email
 	Hostname the sender can use to identify itself to the mail server.
 
 	
+.. module:: diff.settings
+	:synopsis: Dialog used to set diff specific preferences
+
 Diff
 ----
 
@@ -346,11 +369,11 @@ The setting dialog can be started from command line ::
 
 	hgtk repoconfig
 
-for the repository settings or ::
+for the repository settings (:file:`.hg/hgrc` file) or ::
 
 	hgtk userconfig
 
-for the user configuration.
+for the user configuration (:file:`Mercurial.ini` file).
 
 The syntax is simple, no options or parameters are needed, except the global options.
 

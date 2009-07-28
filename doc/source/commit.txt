@@ -252,12 +252,13 @@ message history drop-down box.  If you enter a filename in this entry
 the commit tool will switch out of *commit* or *qrefresh* mode into
 *qnew* mode.  In *qnew* mode, the commit tool shows only working
 directory modifications (the changes that would typically get added to a
-new patch by :command:`hg qnew -f`).  The commit button will change into
-a Qnew button as well, to make the mode switch more obvious.
+new patch by :command:`hg qnew -f`).  The :guilabel:`Commit` button will
+change into a :guilabel:`QNew` button as well, to make the mode switch
+more obvious.
 
-When the Qnew button is pressed, the selected change hunks are written
+When the :guilabel:`QNew` button is pressed, the selected change hunks are written
 into a new patch (given the filename you specified), and the dialog is
-refreshed.  At refresh, the commit tool will obviously swith to
+refreshed.  At refresh, the commit tool will obviously switch to
 *qrefresh* mode since there will now be at least one applied patch.
 
 You may give the new patch a commit message at the initial *qnew* event,

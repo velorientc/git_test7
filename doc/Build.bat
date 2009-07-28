@@ -63,6 +63,12 @@ if "%1" == "pdf" (
 	pushd .
 	cd %OUTPUTDIR%\pdf
 	%PDFLATEX% TortoiseHG.tex
+	%PDFLATEX% TortoiseHG.tex
+	%PDFLATEX% TortoiseHG.tex
+	makeindex -s python.ist TortoiseHG.idx
+	makeindex -s python.ist modTortoiseHG.idx
+	%PDFLATEX% TortoiseHG.tex
+	%PDFLATEX% TortoiseHG.tex
 	popd
 	echo.
 	echo.Build finished; the PDF file is in %OUTPUTDIR%/pdf.
