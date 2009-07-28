@@ -58,7 +58,7 @@ Each tab corresponds roughly to a section of your :file:`Mercurial.ini`
 file, though there is a certain amount of overlap. Some sections were
 split across multiple tabs for clarity.
 
-Every tab but :guilabel:`Paths` has the same format, a list of
+Every tab but :guilabel:`Sync` has the same format, a list of
 configurable options with a drop-down combo box with possible values and
 a history of options you have used for that setting. The configurable
 name (label) has a tooltip which describes in more detail what you are
@@ -66,7 +66,7 @@ configuring and its default value.  The description of the currently
 focused configurable is also shown in a text box at the bottom of the
 dialog.
 
-The :guilabel:`Paths` tab is where you can store URLs (paths) to related
+The :guilabel:`Sync` tab is where you can store URLs (paths) to related
 repositories. It is rare to store paths in the site-wide or user
 configuration files, most of the time you will only store these in a
 repository configuration file. Mercurial has two special path names that
