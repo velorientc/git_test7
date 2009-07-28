@@ -242,6 +242,33 @@ So, in summary, using MQ with TortoiseHg is still almost entirely a
 command line operation, but you can use :command:`hgtk ci` to refresh your
 patches and take advantage of our excellent change selection support.
 
+QNew Mode
+---------
+
+Newly added in 0.8, the commit tool can be used to create a new patch
+for your patch queue.  If you have the MQ extension enabled, a text
+entry will be inserted between the branch maintenance button and the
+message history drop-down box.  If you enter a filename in this entry
+the commit tool will switch out of *commit* or *qrefresh* mode into
+*qnew* mode.  In *qnew* mode, the commit tool shows only working
+directory modifications (the changes that would typically get added to a
+new patch by :command:`hg qnew -f`).  The commit button will change into
+a Qnew button as well, to make the mode switch more obvious.
+
+When the Qnew button is pressed, the selected change hunks are written
+into a new patch (given the filename you specified), and the dialog is
+refreshed.  At refresh, the commit tool will obviously swith to
+*qrefresh* mode since there will now be at least one applied patch.
+
+You may give the new patch a commit message at the initial *qnew* event,
+or you can do it now by using the *qrefresh* feature.
+
+If you left change hunks out of the new patch, they will appear to be in
+the new patch anyway because of the way *qrefresh* mode shows the sum of
+both the top patch and the working directory changes.  If you enter a
+new patch name again, and switch the commit tool into *qnew* mode again,
+you will see the changes that you left in the working directory.
+
 
 Configurables
 -------------
