@@ -370,6 +370,11 @@ def revert(ui, *pats, **opts):
     from hggtk.status import run
     gtkrun(run, ui, *pats, **opts)
 
+def forget(ui, *pats, **opts):
+    """file status viewer in forget mode"""
+    from hggtk.status import run
+    gtkrun(run, ui, *pats, **opts)
+
 def serve(ui, *pats, **opts):
     """web server"""
     from hggtk.serve import run
@@ -658,6 +663,7 @@ table = {
     "^remove|rm": (revert, [], _('hgtk remove [FILE]...')),
     "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
     "^revert": (revert, [], _('hgtk revert [FILE]...')),
+    "^forget": (forget, [], _('hgtk forget [FILE]...')),
     "^serve":
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
