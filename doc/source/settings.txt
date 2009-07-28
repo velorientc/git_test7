@@ -182,10 +182,8 @@ configuration files, most of the time you will only store these in a
 repository configuration file. Mercurial has two special path names that
 can be used as default targets for some operations.
 
-default
-	the default URL to pull from, usually clone source
-default-push
-	the default push target when using the command line
+* *default*	- the default URL to pull from, usually clone source
+* *default-push* - the default push target when using the command line
 
 :guilabel:`After pull operation:`
 	Operation which is performed directly after a successful pull.
