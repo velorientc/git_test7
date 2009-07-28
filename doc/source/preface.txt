@@ -82,6 +82,9 @@ The following typographical conventions are used in this manual:
 :command:`hgtk log`
 	Indicates a command to enter into command window.
 
+``myproxy:8000``
+	Indicates a text to enter into a text input field in the GUI.
+	
 .. note::
 	This is a note.
 
