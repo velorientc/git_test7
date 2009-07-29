@@ -47,7 +47,7 @@ future release of TortoiseHg, we hope to make this launchable from the
 shell context menu.
 
 From command line
------------------
+=================
 
 The server tool can be started from command line ::
 
@@ -65,7 +65,8 @@ The valid [OPTIONS] are:
 
 
 Changes since 0.7
------------------
+=================
+
 * Improved error handling
 * i18n fixes
 

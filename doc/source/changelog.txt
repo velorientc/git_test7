@@ -32,7 +32,7 @@ are the obvious features that a revision history browser provides.
 This changelog browser offers much more.
 
 Revision Graph Details
-----------------------
+======================
 
 The graph column shows the child-parent relationships between revisions
 in your repository history.  This column auto-sizes for as many lines of
@@ -51,7 +51,7 @@ these are:
 	load all remaining revisions into the graph
 
 Revision Context Menus
-----------------------
+======================
 
 Right-clicking on a revision in the (top) graph pane will bring up the
 revision context menu.
@@ -114,7 +114,7 @@ This one is for visualizing diffs between two arbitrary revisions.
 
 
 File List Context Menus
------------------------
+=======================
 
 Right-clicking on filenames in the file list (bottom left) pane will
 bring up a context menu for the selected file:
@@ -139,7 +139,8 @@ bring up a context menu for the selected file:
 
 
 Changeset browser
------------------
+=================
+
 The changelog and datamine tools can open the changeset browser to view
 a single revision or the combined effect of a range of revisions. The
 changeset browser is very similar to the commit and shelve tools. It has
@@ -159,7 +160,7 @@ This changeset browser also supports the :kbd:`Ctrl-C` keyboard
 accelerator to copy hightlighted diff hunks to the clipboard.
 
 Configurables
--------------
+=============
 
 The changelog browser has a few configurable options that can be set in
 the TortoiseHg Settings dialog on the Changelog tab.
@@ -191,7 +192,7 @@ TortoiseHg tab:
 
 	
 From command line
------------------
+=================
 
 The changelog viewer can be started from command line ::
 
