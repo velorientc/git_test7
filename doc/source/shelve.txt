@@ -1,6 +1,6 @@
-======================
+**********************
 TortoiseHg Shelve Tool
-======================
+**********************
 
 .. module:: shelve.dialog
 	:synopsis: Dialog used to perform shelve/unshelve operations

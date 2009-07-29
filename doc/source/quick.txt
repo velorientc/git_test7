@@ -1,6 +1,6 @@
-==============================
+******************************
 A quick tour for the impatient
-==============================
+******************************
 
 .. module:: tour
 	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows

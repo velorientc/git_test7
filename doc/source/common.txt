@@ -1,6 +1,6 @@
-===============
+***************
 Common Features
-===============
+***************
 
 .. module:: common.dialog
 	:synopsis: Common features to all the dialog

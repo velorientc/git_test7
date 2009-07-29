@@ -1,6 +1,6 @@
-================
+****************
 TortoiseHg Serve
-================
+****************
 
 .. module:: serve.dialog
 	:synopsis: Dialog used to start/stop the web server

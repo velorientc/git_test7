@@ -1,6 +1,6 @@
-============================
+****************************
 Windows Explorer Integration
-============================
+****************************
 
 .. module:: explorer
 	:synopsis: Windows explorer integration

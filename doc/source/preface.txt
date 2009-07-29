@@ -1,6 +1,6 @@
-=======
+*******
 Preface
-=======
+*******
 
 .. module:: preface
 	:synopsis: About this manual

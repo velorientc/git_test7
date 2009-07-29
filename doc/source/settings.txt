@@ -1,6 +1,6 @@
-===================
+*******************
 TortoiseHg Settings
-===================
+*******************
 
 .. module:: settings.dialog
 	:synopsis: Dialog used to set preferences
