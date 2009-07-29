@@ -27,6 +27,19 @@ is, and correct it.
 	If you forget to set your name TortoiseHg will ask you for it at the
 	first *commit*, when the name is first required.
 
+.. note::
+	There is no written rule on how to write the user name, and you can 
+	set any text, but it is	commonly used the following convention::
+	
+		name <email>
+		
+	for example ::
+	
+		Donald Duck <donaldduck@example.net>
+	
+	TortoiseHg only strips the email address in changelog viewer, while
+	the built-in web server obfuscates email addresses to prevent spams.
+	
 Create the repository on your local machine by using the
 :guilabel:`Create Repository Here` selection above.  Mercurial places a
 subdirectory in your folder called :file:`.hg`. This is where it keeps
