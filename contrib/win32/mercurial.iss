@@ -73,6 +73,7 @@ Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http
 Filename: {app}\TortoiseHg.url; Section: InternetShortcut; Key: URL; String: http://bitbucket.org/tortoisehg/stable/
 
 [Icons]
+Name: {group}\Start Taskbar App; Filename: {app}\thgtaskbar.exe
 Name: {group}\TortoiseHg Book (chm); Filename: {app}\docs\TortoiseHg.chm
 Name: {group}\TortoiseHg Book (pdf); Filename: {app}\docs\TortoiseHg.pdf
 Name: {group}\TortoiseHg Web Site; Filename: {app}\TortoiseHg.url
