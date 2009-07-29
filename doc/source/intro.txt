@@ -54,7 +54,7 @@ After installation a reboot is necessary.
 	
 
 Language settings
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 
 The TortoiseHg user interface has been translated into many languages.
 You don't need to download a language pack. All the available languages
@@ -92,7 +92,7 @@ dialogs via the source install method.
 `MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
 
 Language settings
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 
 The TortoiseHg tools use Python's
 `gettext <http://docs.python.org/library/gettext.html>`_ library to
