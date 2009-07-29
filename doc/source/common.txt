@@ -52,7 +52,7 @@ Visual Diffs
 0.8 introduced a visual diff dialog that solves four usability issues:
 
 1) The ability to select visual diff tools for individual files
-2) Allows you to use visual diff tools that fork backround processes
+2) Allows you to use visual diff tools that fork background processes
 3) Allows you to use visual diff tools that do not support directory diffs
 4) Provides feedback when no files were modified 
 
@@ -89,7 +89,7 @@ commands that could potentially be interactive.  In release 0.8, the
 dialog was changed to draw all error messages in a dark red color to
 give them more contrast from normal output messages.
 
-The dialog focuses its :guilabel:`close` button when the command has
+The dialog focuses its :guilabel:`Close` button when the command has
 completed, so a simple :kbd:`Enter` is all that is required to close
 the window.
 
