@@ -219,7 +219,8 @@ class TreeView(gtk.ScrolledWindow):
         if width > 500:
             width = 500
         self.graph_column.set_fixed_width(width)
-        self.graph_column.set_max_width(width)
+        # Allow the user to set size as they like
+        #self.graph_column.set_max_width(500)
         self.graph_column.set_visible(self.show_graph)
 
         if stopped:

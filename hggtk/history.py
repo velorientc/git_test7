@@ -21,7 +21,7 @@ from hggtk.logview import treemodel
 from hggtk.logview.treeview import TreeView as LogTreeView
 
 from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter
-from hggtk import backout, status, hgemail, tagadd, update, merge
+from hggtk import backout, status, hgemail, tagadd, update, merge, archive
 from hggtk import changeset
 
 def create_menu(label, callback):
@@ -401,6 +401,7 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('add/remove _tag'), self.add_tag))
         m.append(create_menu(_('backout revision'), self.backout_rev))
         m.append(create_menu(_('_revert'), self.revert))
+        m.append(create_menu(_('_archive'), self.archive))
 
         # need mq extension for strip command
         extensions.loadall(self.ui)
@@ -753,6 +754,15 @@ class GLog(gdialog.GDialog):
             self.reload_log()
         elif not oldparents == newparents:
             self.refresh_model()
+
+    def archive(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        parents = [x.node() for x in self.repo.parents()]
+        dialog = archive.ArchiveDialog(rev)
+        dialog.set_transient_for(self)
+        dialog.show_all()
+        dialog.present()
+        dialog.set_transient_for(None)
 
     def selection_changed(self, treeview):
         self.currow = self.graphview.get_revision()
