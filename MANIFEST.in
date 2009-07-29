@@ -1,4 +1,4 @@
-recursive-include icons *.png *.ico *.svg
+recursive-include icons *.png *.ico *.svg *.txt
 include contrib/_hgtk
 include contrib/nautilus-thg.py
 include COPYING.txt ReleaseNotes.txt
