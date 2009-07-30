@@ -11,11 +11,14 @@ The following describes just one of those ways: a single central repository.
 
 To get started, suppose you volunteer to create the first version. There are 
 `ways of importing already existing repositories <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
-but lets assume we're starting from scratch. First you need to make sure
-that you are correctly identified in TortoiseHg.  You do this by
-adjusting the global settings of TortoiseHg. Try right-clicking your
-source folder and following
-:menuselection:`TortoiseHg --> Global Settings`
+but lets assume we're starting from scratch.
+
+Configuring TortoiseHg
+======================
+
+First you need to make sure that you are correctly identified in TortoiseHg.
+You do this by adjusting the global settings of TortoiseHg. Try right-clicking your
+source folder and following :menuselection:`TortoiseHg --> Global Settings`
 
 .. figure:: figures/contextmenu.png
 	:alt: Context Menu
@@ -39,6 +42,9 @@ is, and correct it.
 	
 	TortoiseHg only strips the email address in changelog viewer, while
 	the built-in web server obfuscates email addresses to prevent spams.
+
+Initialize the repository
+=========================
 	
 Create the repository on your local machine by using the
 :guilabel:`Create Repository Here` selection above, or, within the folder,
@@ -56,6 +62,9 @@ all its versioning information. It is called the *repository*, and the
 directory containing the repository is called the *working directory*.
 You never specify the :file:`.hg` directory. It is mentioned here just
 so you'll better understand how Mercurial is working.
+
+Add files
+=========
 
 Now it's time to say to Mercurial which files must be tracked and which
 files must be ignored. There are a lot of way to do this:
@@ -86,6 +95,8 @@ files must be ignored. There are a lot of way to do this:
 	It is not a good pratice to have a lot of *unknown* files. Keep the
 	:file:`.hgignore` file updated.
 
+Commit
+======
    
 Commit to your local repository by right-clicking anywhere in the
 folder, or on the folder itself, and then selecting
