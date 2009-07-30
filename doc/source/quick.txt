@@ -108,13 +108,23 @@ Select the files you want to commit, write a message and then press
 
 .. {{images/image001.png}}
 
+Share the repository
+====================
+
 Now you are ready to share your work. You do this by making a copy of
 your repository in a public place that everyone in your group can
 access. Mercurial calls this *cloning your repository*. Clone your
 repository to a common area, such as a shared drive or web site, which
-will be the merge point for the team.
+will be the merge point for the team. From the shared drive select
+:menuselection:`TortoiseHg --> Clone a Repository`, or
+:command:`hgtk clone` from command line.
 
 .. {{images/image003.gif}}
+
+When you create a clone for *central repository* purpose where is no
+reason to have here an updated working directory. Check
+:guilabel:`do not update the new working directory` in order to have
+an empty working directory.
 
 Other team members will then work from this clone.
 
