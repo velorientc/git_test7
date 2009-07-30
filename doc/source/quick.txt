@@ -92,7 +92,7 @@ files must be ignored. There are a lot of way to do this:
 	tracked by Mercurial. Remember to add it.
 
 .. note::
-	It is not a good pratice to have a lot of *unknown* files. Keep the
+	It is not a good practice to have a lot of *unknown* files. Keep the
 	:file:`.hgignore` file updated.
 
 Commit
