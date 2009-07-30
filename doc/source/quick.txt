@@ -78,7 +78,15 @@ files must be ignored. There are a lot of way to do this:
    and then press or write a *Glob* or *Regular expression* filter and then press 
    :guilabel:`Add`. 
    
+.. warning::
+	The :file:`.hgignore` file, which contains the list of file to ignore, must be
+	tracked by Mercurial. Remember to add it.
 
+.. note::
+	It is not a good pratice to have a lot of *unknown* files. Keep the
+	:file:`.hgignore` file updated.
+
+   
 Commit to your local repository by right-clicking anywhere in the
 folder, or on the folder itself, and then selecting
 :guilabel:`HG Commit ...`.
