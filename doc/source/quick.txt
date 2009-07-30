@@ -100,7 +100,11 @@ Commit
    
 Commit to your local repository by right-clicking anywhere in the
 folder, or on the folder itself, and then selecting
-:guilabel:`HG Commit ...`.
+:guilabel:`HG Commit ...`, or from command line type :command:`hgtk commit`.
+Select the files you want to commit, write a message and then press
+:guilabel:`Commit`. If, after the commit, you realize that something was wrong
+(the message or the selected files) you can cancel the last commit using the
+:guilabel:`Undo` button. 
 
 .. {{images/image001.png}}
 
