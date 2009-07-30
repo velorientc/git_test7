@@ -57,10 +57,27 @@ directory containing the repository is called the *working directory*.
 You never specify the :file:`.hg` directory. It is mentioned here just
 so you'll better understand how Mercurial is working.
 
-Add the files contained in the folder by following the menu
-:menuselection:`TortoiseHg --> Add Files`.
+Now it's time to say to Mercurial which files must be tracked and which
+files must be ignored. There are a lot of way to do this:
 
-.. {{images/image008.gif}}
+1. To add files, select them in explorer and then select :menuselection:`TortoiseHg --> Add Files`
+   in the context menu. In this way the adding action happens immediately and no
+   TortoiseHg dialogs appear, you can see the overlay icons changed.
+   
+2. Open the status dialog: :menuselection:`TortoiseHg --> View File Status` or
+   from command line :command:`hgtk status`. Check the files you want to add and
+   then press the :guilabel:`Add` button. In this dialog you can open the
+   ignore filter dialog from the context menu :guilabel:`ignore` over a unknown file.
+   
+3. Skip this step and wait the next commit. The commit tool is very similar to the
+   status dialog and you can do the same things. In this dialog you can, also, add a
+   file by just check it and commit.
+   
+4. To ignore files, open the ignore filter dialog: :menuselection:`TortoiseHg --> Edit Ignore Filter`
+   or from command line :command:`hgtk hgignore`. Choose the file from the list
+   and then press or write a *Glob* or *Regular expression* filter and then press 
+   :guilabel:`Add`. 
+   
 
 Commit to your local repository by right-clicking anywhere in the
 folder, or on the folder itself, and then selecting
