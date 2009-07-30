@@ -135,9 +135,16 @@ You want to start collaborating with your team. They tell you something
 like *fetch the repository from x*.  What does it mean? It means that
 you want to make a copy of the repository saved at x on your local
 machine.  Mercurial calls this cloning and has a special interface for
-it. Right click in the directory where you want your copy
+it. Right click in the directory where you want your copy and select
+:menuselection:`TortoiseHg --> Clone a Repository`, or
+:command:`hgtk clone` from command line (exactly as share the repository).
 
 .. {{images/Clone.gif}}
+
+This time you want to update the working directory because you want to
+work on the project, uncheck :guilabel:`do not update the new working directory`
+so Mercurial update the working directory with the *tip* revision.
+
 
 Working with your repository
 ============================
