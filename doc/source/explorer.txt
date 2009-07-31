@@ -1,12 +1,11 @@
-============================
 Windows Explorer Integration
-============================
+----------------------------
 
 .. module:: explorer
 	:synopsis: Windows explorer integration
 
 Overlay Icons
-=============
+-------------
 
 TortoiseHg provides visual representation of the file status via overlay
 icons in the MS-Explorer windows. This is similar to those that found on
@@ -35,7 +34,7 @@ contents with a single line containing::
 	@@noicons
 
 Performance Issues
-==================
+------------------
 
 When the repository being viewed contains a large number of folders or
 files, the overlay icons may appear case a perceivable delay in
@@ -55,7 +54,7 @@ In the options dialog you can disable overlays globally, or enable them for
 local disks only.
 
 Context Menus
-=============
+-------------
 
 The TortoiseHg commands (GUI window & dialogs) may be accessed via the
 context menu of Explorer windows. The TortoiseHg context menu is 

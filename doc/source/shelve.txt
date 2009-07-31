@@ -1,4 +1,3 @@
-======================
 TortoiseHg Shelve Tool
 ======================
 
@@ -51,7 +50,7 @@ various classes of files {modified, added, removed, deleted, unknown,
 clean, ignored}.
 
 Shelving Changes
-================
+----------------
 
 
 Just like the commit tool, this dialog uses TortoiseHg's integrated hunk
@@ -66,7 +65,7 @@ When the unshelve button is pressed, the shelved changes are reapplied
 to the working directory.
 
 How is this different from record/commit?
------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Shelved changes are physically removed from the working directory until
 you unshelve them.  This means you can build your project and run tests
@@ -84,7 +83,7 @@ can be cleanly reapplied later if the shelved changes conflict with
 changes made to your code after the shelving.
 
 How is this different from MQ?
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A shelf is, in effect, a single unnamed MQ patch that is never converted
 into a changeset.  The shelve tool can be useful when you are
@@ -92,7 +91,7 @@ maintaining a patch queue, since it can hold changes from one patch and
 re-apply them to another patch (or an entirely new patch).
 
 How is this different from attic?
----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The attic extension is a super-set of the shelve feature. In particular,
 attic allows you to have several named *shelves* which can be saved and
@@ -101,7 +100,7 @@ in 0.7, but will probably support attic like features in future
 releases.
 
 Keyboard navigation
-===================
+-------------------
 
 :guilabel:`Ctrl-C`
     in the diff panel will copy the currently highlighted (not selected,
@@ -116,13 +115,13 @@ clipboard in the appropriate location in the stream to make the
 clipboard contents always be a valid patch.
 
 Configurables
-=============
+-------------
 
 * :menuselection:`TortoiseHg --> Bottom Diffs`
 * :menuselection:`TortoiseHg --> Tab Width`
 
 From command line
-=================
+-----------------
 
 The shelve tool can be started from command line ::
 

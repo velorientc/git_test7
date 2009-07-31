@@ -1,4 +1,3 @@
-======================
 TortoiseHg Synchronize
 ======================
 
@@ -96,7 +95,7 @@ configurables that are valid for most push/pull operations.
 
 
 After Pull
-==========
+----------
 
 After changesets are pulled into your repository, two buttons may appear
 at the bottom of the dialog:
@@ -109,7 +108,7 @@ at the bottom of the dialog:
 Either button may be hidden if it is not applicable.
 
 Email
-=====
+-----
 
 .. figure:: figures//email.png
 	:alt: Email dialog
@@ -137,7 +136,7 @@ Please consult the Mercurial documentation for the differences between
 plain patches, HG patches, Git patches, and bundles.
 
 From command line
-=================
+-----------------
 
 The synchronize tool can be started from command line ::
 
@@ -171,7 +170,7 @@ or email command aliases, it will automatically select the
 path it finds.
 
 Changes since 0.7
-=================
+-----------------
 
 * Path drop-down list no longer includes most-recently-used paths.  It
   only includes configured repository paths.
