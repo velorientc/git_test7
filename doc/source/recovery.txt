@@ -1,6 +1,6 @@
-*******************
+===================
 TortoiseHg Recovery
-*******************
+===================
 
 .. module:: recovery.dialog
 	:synopsis: Dialog used to perform recovery operations

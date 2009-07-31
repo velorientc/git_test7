@@ -1,0 +1,15 @@
+***********************
+TortoiseHg in daily use
+***********************
+
+.. include:: common.txt
+.. include:: explorer.txt
+.. include:: commit.txt
+.. include:: shelve.txt
+.. include:: changelog.txt
+.. include:: datamine.txt
+.. include:: synchronize.txt
+.. include:: serve.txt
+.. include:: recovery.txt
+
+.. vim: noet ts=4

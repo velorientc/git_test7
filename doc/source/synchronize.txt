@@ -1,6 +1,6 @@
-**********************
+======================
 TortoiseHg Synchronize
-**********************
+======================
 
 .. module:: synchronize.dialog
 	:synopsis: Dialog used to perform synchronization operations
