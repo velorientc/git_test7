@@ -140,7 +140,8 @@ it. Right click in the directory where you want your copy and select
 :menuselection:`TortoiseHg --> Clone a Repository`, or
 :command:`hgtk clone` from command line (exactly as share the repository).
 
-.. {{images/Clone.gif}}
+.. figure:: figures/clone.png
+	:alt: Clone dialog
 
 This time you want to update the working directory because you want to
 work on the project, uncheck :guilabel:`do not update the new working directory`
