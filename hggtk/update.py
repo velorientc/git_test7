@@ -50,7 +50,7 @@ class UpdateDialog(gtk.Window):
         combo = gtk.combo_box_entry_new_text()
         hbox.pack_start(combo, True, True, 2)
         vbox.pack_start(hbox, False, False, 10)
-        if rev:
+        if rev != None:
             combo.append_text(str(rev))
         else:
             combo.append_text(_branch_tip_)
