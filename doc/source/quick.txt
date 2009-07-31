@@ -192,16 +192,6 @@ Which makes the synchronize tool come up:
 .. figure:: figures/synchronize.png
 	:alt: Synchronize dialog
 
-
-:guilabel:`Incoming`
-	show me what changes in the group repository that are not in my repository
-:guilabel:`Pull`
-	bring them on over and start merging
-:guilabel:`Outgoing`
-	show me what is different in my repository compared to the group repository.
-:guilabel:`Push`
-	make my changes the current changeset (tip) in the group repository.
-
 Mercurial makes collaboration easy, fast, and productive.
 Learn more at Mercurial's `wiki <http://mercurial.selenic.com/wiki/>`_.
 
