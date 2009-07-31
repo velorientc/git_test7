@@ -106,7 +106,8 @@ Select the files you want to commit, write a message and then press
 (the message or the selected files) you can cancel the last commit using the
 :guilabel:`Undo` button. 
 
-.. {{images/image001.png}}
+.. figure:: figures/commit.png
+	:alt: Commit dialog
 
 Share the repository
 ====================
@@ -162,16 +163,24 @@ The commit tool gives you a way to see differences or you can use your
 visual difference tool (kdiff). You may commit many times before
 synchronizing with the group repository.
 
-.. figure:: figures/commit.png
-	:alt: Commit dialog
 
 When you're ready to publish your changes, you
 
-1. commit your changes to your local repository, if you haven't already.
-2. pull changes from the group repository into your repository
-3. merge and commit into your local repository
-4. make sure your work still builds and passes your extensive test suite
-5. push your changes to the group repository.
+1. commit your changes to your local repository, if you haven't already
+   (see above).
+2. pull changes from the group repository into your repository,
+   :menuselection:`TortoiseHg --> Synchronize` or
+   :command:`hgtk synch`, choose the source path to group repository
+   and then :guilabel:`Pull`.
+3. if some changesets are pulled, merge then and commit into your local
+   repository. From the changelog viewer (:menuselection:`TortoiseHg --> View Changelog`
+   or :command:`hgtk log`) open the context menu over the changeset which
+   you want to merge with and select :guilabel:`merge with`. Finally, in the
+   merge dialog, press :guilabel:`Merge` and then :guilabel:`Commit`.
+4. make sure your work still builds and passes your extensive test suite.
+5. push your changes to the group repository, :menuselection:`TortoiseHg --> Synchronize`
+   or :command:`hgtk synch`, choose the source path to group repository
+   and then :guilabel:`Push`.
 
 Which may sound complicated, but it is just pushing the buttons on the
 synchronize tool.
