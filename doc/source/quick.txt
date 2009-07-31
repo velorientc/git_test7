@@ -6,7 +6,7 @@ A quick tour for the impatient
 	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
 
 One of the great things about Mercurial is that there are lots of different
-`Collaboration Models <http://hgbook.red-bean.com/read/file-names-and-pattern-matching.html>`_.
+`Collaboration Models <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
 The following describes just one of those ways: a single central repository.
 
 To get started, suppose you volunteer to create the first version. There are 
