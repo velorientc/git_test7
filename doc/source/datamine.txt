@@ -1,6 +1,5 @@
-*******************
 TortoiseHg Datamine
-*******************
+===================
 
 .. module:: datamine.dialog
 	:synopsis: Dialog used to search in the history
@@ -11,7 +10,7 @@ repository.  It is a tabbed application that supports two tab types,
 
 
 Search Tabs
-===========
+-----------
 
 .. figure:: figures/search.png
    :alt: Search dialog
@@ -55,7 +54,7 @@ terminate an ongoing search (the :guilabel:`Stop` button is only
 sensitive when a search is in progress).
 
 Matches
-=======
+-------
 
 Each match will be a link to a changeset and will have a descriptive
 tooltip (author, date/time, summary).  Right clicking on a matched line
@@ -69,7 +68,7 @@ will bring up a context menu with these features:
 	open a changelog window with this file's revision history
 
 Annotate Tabs
-=============
+-------------
 
 .. figure:: figures/annotate.png
 	:alt: Annotate tabs
@@ -94,7 +93,7 @@ Source) you can bring up a menu for showing two optional columns:
 :guilabel:`filename` and :guilabel:`user`.
 
 Following Renames
------------------
+^^^^^^^^^^^^^^^^^
 
 The annotation data will automatically follow lines of code back through
 copies and renames to find the initial changeset that introduced that
@@ -106,7 +105,7 @@ Clicking on the button will open a new tab with the older filename
 annotated at the same changeset.
 
 Configurables
--------------
+^^^^^^^^^^^^^
 
 The annotate tabs support the following configurations defined primarily
 for other tools:
@@ -117,7 +116,7 @@ for other tools:
 	Number of spaces to expand tabs in diffs and annotate output
 
 From command line
-=================
+-----------------
 
 The datamine tool can be started from command line ::
 

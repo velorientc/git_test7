@@ -1,0 +1,18 @@
+***********************
+TortoiseHg in daily use
+***********************
+
+.. toctree::
+	:maxdepth: 3
+	
+	common
+	explorer
+	commit
+	shelve
+	changelog
+	datamine
+	synchronize
+	serve
+	recovery
+
+.. vim: noet ts=4

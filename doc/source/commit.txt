@@ -1,6 +1,5 @@
-**********************
 TortoiseHg Commit Tool
-**********************
+======================
 
 .. module:: commit.dialog
 	:synopsis: Dialog used to perform commit
@@ -24,7 +23,7 @@ files, record renames, manage the repository ignore filter, etc).
 	Commit dialog
 
 Features
-========
+--------
 
 Walking across the toolbar, the buttons perform the following tasks:
 
@@ -81,7 +80,7 @@ and the new file as added while recording the whole operation as a
 rename.
 
 Change Selection (record)
-=========================
+-------------------------
 
 So what does that mean when it says the commit button will commit the
 selected diffs in checked files? Simple, the native TortoiseHg commit
@@ -92,7 +91,7 @@ commit (but left in the working directory).  Fans of darcs or
 Mercurial's record extension will recognize this immediately.
 
 When is this necessary?
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Most often, it is when you have made more than a single coherent change
 to your source code and you would like to commit your changes piecemeal.
@@ -102,7 +101,7 @@ same set of files and that's when this change selection feature becomes
 indespensable.
 
 How does it work?
------------------
+^^^^^^^^^^^^^^^^^
 
 By double-clicking on individual change hunks in the diff panel.
 *Technically, any action which activates a change hunk row will toggle
@@ -119,7 +118,7 @@ be able to find which files are entirely included in the commit,
 partially included, or excluded entirely.
 
 What happens at commit time?
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The short answer is that the selected files and hunks are committed to
 the repository and the unselected changes are left in your working
@@ -145,7 +144,7 @@ recoverable.  Delete any new :file:`.rej` files and try the commit again.
 
 
 Keyboard navigation
-===================
+-------------------
 
 :kbd:`Ctrl-Enter`
 	will trigger the commit
@@ -163,7 +162,7 @@ clipboard contents always be a valid patch.
 
 
 File Context Menus
-==================
+------------------
 
 By right clicking on files in the file list, you will get a context menu
 of commands that are applicable to the selected file. If you configure a
@@ -177,7 +176,7 @@ and you want Mercurial to ignore it).
 
 
 Merges
-======
+------
 
 The commit tool has a special mode when it is opened in a repository
 that is in a merged state (technically, this means the current working
@@ -203,7 +202,7 @@ started the merge and *other* is the revision you merged with.
 
 
 Commit Message Format
-=====================
+---------------------
 
 If your project has guidelines for commit message format, you can
 configure those in the settings tool.  Once configured, the commit tool
@@ -212,7 +211,7 @@ There is also an :guilabel:`apply format` context menu option available
 on the commit message pane that will try to enforce your policy.
 
 MQ patches
-==========
+----------
 
 Many advanced Mercurial users use the MQ extension to manage a patch
 queue. TortoiseHg does not offer much in the way of support for MQ, but
@@ -243,7 +242,7 @@ command line operation, but you can use :command:`hgtk ci` to refresh your
 patches and take advantage of our excellent change selection support.
 
 QNew Mode
-=========
+---------
 
 Newly added in 0.8, the commit tool can be used to create a new patch
 for your patch queue.  If you have the MQ extension enabled, a text
@@ -272,7 +271,7 @@ you will see the changes that you left in the working directory.
 
 
 Configurables
-=============
+-------------
 
 :menuselection:`Commit --> Username`
 	Sets username associated with your commits
@@ -290,7 +289,7 @@ Configurables
 External tool configuration is deprecated and will be removed in 0.9
 
 From command line
-=================
+-----------------
 
 The commit tool can be started from command line ::
 
@@ -323,7 +322,7 @@ specified TortoiseHg commits all the modified files, and valid [OPTIONS] are:
 	
  
 Changes since 0.7
-=================
+-----------------
 
 * The :guilabel:`Show Diff` button has been removed. Diffs are always shown.
 * The commit tool no longer shows all diffs at startup. Only the first
@@ -349,7 +348,7 @@ Changes since 0.7
 
 
 Changes since 0.6
-=================
+-----------------
 
 Large changes were made to the commit tool in the 0.7 release. The
 previous default tool, Qct, was unbundled and TortoiseHg's native commit
