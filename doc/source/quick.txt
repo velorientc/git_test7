@@ -6,7 +6,7 @@ A quick tour for the impatient
 	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
 
 One of the great things about Mercurial is that there are lots of different
-`Collaboration Models <http://hgbook.red-bean.com/read/file-names-and-pattern-matching.html>`_.
+`Collaboration Models <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
 The following describes just one of those ways: a single central repository.
 
 To get started, suppose you volunteer to create the first version. There are 
@@ -56,12 +56,17 @@ type :command:`hgtk init`.
 We suggest to keep checked :guilabel:`Add special files (.hgignore, ...)`
 and do not check :guilabel:`Make repo compatible with Mercurial 1.0`
 (unless you have a strong reason to do this).
+
 After pressing :guilabel:`Create` Mercurial places a
 subdirectory in your folder called :file:`.hg`. This is where it keeps
 all its versioning information. It is called the *repository*, and the
 directory containing the repository is called the *working directory*.
 You never specify the :file:`.hg` directory. It is mentioned here just
 so you'll better understand how Mercurial is working.
+
+.. warning::
+	Never touch the files in :file:`.hg` directory, otherwise a repository
+	corruption can happen.
 
 Add files
 =========
@@ -106,7 +111,8 @@ Select the files you want to commit, write a message and then press
 (the message or the selected files) you can cancel the last commit using the
 :guilabel:`Undo` button. 
 
-.. {{images/image001.png}}
+.. figure:: figures/commit.png
+	:alt: Commit dialog
 
 Share the repository
 ====================
@@ -119,7 +125,8 @@ will be the merge point for the team. From the shared drive select
 :menuselection:`TortoiseHg --> Clone a Repository`, or
 :command:`hgtk clone` from command line.
 
-.. {{images/image003.gif}}
+.. figure:: figures/share.png
+	:alt: Clone dialog
 
 When you create a clone for *central repository* purpose there is no
 reason to have here an updated working directory. Check
@@ -139,7 +146,8 @@ it. Right click in the directory where you want your copy and select
 :menuselection:`TortoiseHg --> Clone a Repository`, or
 :command:`hgtk clone` from command line (exactly as share the repository).
 
-.. {{images/Clone.gif}}
+.. figure:: figures/clone.png
+	:alt: Clone dialog
 
 This time you want to update the working directory because you want to
 work on the project, uncheck :guilabel:`do not update the new working directory`
@@ -160,16 +168,24 @@ The commit tool gives you a way to see differences or you can use your
 visual difference tool (kdiff). You may commit many times before
 synchronizing with the group repository.
 
-.. figure:: figures/commit.png
-	:alt: Commit dialog
 
 When you're ready to publish your changes, you
 
-1. commit your changes to your local repository, if you haven't already.
-2. pull changes from the group repository into your repository
-3. merge and commit into your local repository
-4. make sure your work still builds and passes your extensive test suite
-5. push your changes to the group repository.
+1. commit your changes to your local repository, if you haven't already
+   (see above).
+2. pull changes from the group repository into your repository,
+   :menuselection:`TortoiseHg --> Synchronize` or
+   :command:`hgtk synch`, choose the source path to group repository
+   and then :guilabel:`Pull`.
+3. if some changesets are pulled, merge then and commit into your local
+   repository. From the changelog viewer (:menuselection:`TortoiseHg --> View Changelog`
+   or :command:`hgtk log`) open the context menu over the changeset which
+   you want to merge with and select :guilabel:`merge with`. Finally, in the
+   merge dialog, press :guilabel:`Merge` and then :guilabel:`Commit`.
+4. make sure your work still builds and passes your extensive test suite.
+5. push your changes to the group repository, :menuselection:`TortoiseHg --> Synchronize`
+   or :command:`hgtk synch`, choose the source path to group repository
+   and then :guilabel:`Push`.
 
 Which may sound complicated, but it is just pushing the buttons on the
 synchronize tool.
@@ -180,16 +196,6 @@ Which makes the synchronize tool come up:
 
 .. figure:: figures/synchronize.png
 	:alt: Synchronize dialog
-
-
-:guilabel:`Incoming`
-	show me what changes in the group repository that are not in my repository
-:guilabel:`Pull`
-	bring them on over and start merging
-:guilabel:`Outgoing`
-	show me what is different in my repository compared to the group repository.
-:guilabel:`Push`
-	make my changes the current changeset (tip) in the group repository.
 
 Mercurial makes collaboration easy, fast, and productive.
 Learn more at Mercurial's `wiki <http://mercurial.selenic.com/wiki/>`_.

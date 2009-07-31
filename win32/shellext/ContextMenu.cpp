@@ -517,7 +517,12 @@ CShellExt::GetCommandString(
         }
         else if (uFlags == GCS_VERBW || uFlags == GCS_VERBA)
         {
+#if 0
             psz = iter->second.name.c_str();
+#else
+            // bugfix: don't provide verbs ("rename" conflicted with rename of explorer)
+            psz = "";
+#endif
             res = S_OK;
         }
         else if (uFlags == GCS_VALIDATEW || uFlags == GCS_VALIDATEA)

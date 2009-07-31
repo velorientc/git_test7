@@ -14,13 +14,16 @@ The synchronize tool is used to transmit changesets between repositories
 or optionally to email recipients.
 
 :guilabel:`Incoming`
-	show changesets that would be pulled from target repository
+	show changesets that would be pulled from target repository, the changes
+	in the target repository that are not in local repository
 :guilabel:`Pull`
 	pull incoming changesets from target repository
 :guilabel:`Outgoing`
-	show changesets that would be pushed to target repository
+	show changesets that would be pushed to target repository, the changes
+	in the local repository that are not in target repository
 :guilabel:`Push`
-	push outgoing changesets to target repository
+	push outgoing changesets to target repository, make the local *tip*
+	the new *tip* in the target repository
 :guilabel:`Email`
 	send outgoing changesets (to target repository) as email
 :guilabel:`Stop`
