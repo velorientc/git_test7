@@ -121,7 +121,7 @@ will be the merge point for the team. From the shared drive select
 
 .. {{images/image003.gif}}
 
-When you create a clone for *central repository* purpose where is no
+When you create a clone for *central repository* purpose there is no
 reason to have here an updated working directory. Check
 :guilabel:`do not update the new working directory` in order to have
 an empty working directory.
