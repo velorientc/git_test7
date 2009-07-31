@@ -119,7 +119,8 @@ will be the merge point for the team. From the shared drive select
 :menuselection:`TortoiseHg --> Clone a Repository`, or
 :command:`hgtk clone` from command line.
 
-.. {{images/image003.gif}}
+.. figure:: figures/share.png
+	:alt: Clone dialog
 
 When you create a clone for *central repository* purpose there is no
 reason to have here an updated working directory. Check
