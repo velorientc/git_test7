@@ -658,7 +658,7 @@ table = {
         [('l', 'limit', '', _('limit number of changes displayed'))],
         _('hgtk log [OPTIONS] [FILE]')),
     "^merge": (merge, 
-        [('r', 'rev', '', _('revision to update'))],
+        [('r', 'rev', None, _('revision to merge with'))],
         _('hgtk merge')),
     "^recovery|rollback|verify": (recovery, [], _('hgtk recovery')),
     "^shelve|unshelve": (shelve, [], _('hgtk shelve')),
