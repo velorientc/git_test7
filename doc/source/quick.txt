@@ -56,12 +56,17 @@ type :command:`hgtk init`.
 We suggest to keep checked :guilabel:`Add special files (.hgignore, ...)`
 and do not check :guilabel:`Make repo compatible with Mercurial 1.0`
 (unless you have a strong reason to do this).
+
 After pressing :guilabel:`Create` Mercurial places a
 subdirectory in your folder called :file:`.hg`. This is where it keeps
 all its versioning information. It is called the *repository*, and the
 directory containing the repository is called the *working directory*.
 You never specify the :file:`.hg` directory. It is mentioned here just
 so you'll better understand how Mercurial is working.
+
+.. warning::
+	Never touch the files in :file:`.hg` directory, otherwise a repository
+	corruption can happen.
 
 Add files
 =========
