@@ -9,6 +9,7 @@ TortoiseHg in daily use
 	explorer
 	start
 	init
+	clone
 	commit
 	shelve
 	changelog

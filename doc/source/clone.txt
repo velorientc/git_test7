@@ -1,0 +1,11 @@
+Clone a repository
+=======================
+
+.. module:: clone.dialog
+	:synopsis: Dialog used to clone a repository
+
+To clone a repository you have to run the clone dialog.
+From the explorer context menu select :guilabel:`Clone a repository`
+or type :command:`hgtk clone`. 
+
+.. TODO
