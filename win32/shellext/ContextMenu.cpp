@@ -355,7 +355,7 @@ CShellExt::QueryContextMenu(
         // check if target directory is a Mercurial repository
         std::string root = GetHgRepoRoot(cwd);
         isHgrepo = !root.empty();
-        if (cwd == root && myFiles.size() == 1)
+        if (myFiles.size() == 1 && root == myFiles[0])
         {
             fileMenu = false;
             myFolder = cwd;
