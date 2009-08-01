@@ -60,7 +60,7 @@ def SetIcon(hwnd, name, add=False):
         action = NIM_ADD
     try:
         Shell_NotifyIcon(action, nid)
-    except e:
+    except:
         # This is common when windows is starting, and this code is hit
         # before the taskbar has been created.
         print "Failed to add the taskbar icon - is explorer running?"
