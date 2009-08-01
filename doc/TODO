@@ -1,6 +1,11 @@
-Needs an Intro page explaining TortoiseHg and it's ports.  Include links
+Update context menu screenshot
 Changelog needs much more detail
-Commit needs more detail, including ignore and guess dialogs
+Commit needs more detail
 Add links to BB wiki and Mercurial wiki
 Describe path editing and [auth] hgrc section
 Need a page explaining merges and merge undo
+debugging hgtk on Windows and Linux
+debugging shell extension on Windows and Linux
+nautilus cmenu configuration
+hgignore dialog (including screenshot)
+guess renames dialog (including screenshot)
