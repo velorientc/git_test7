@@ -2,10 +2,14 @@
 
 set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
 set PDFLATEX=PdfLatex
-set OUTPUTDIR=build
 set SPHINXBUILD=sphinx-build
-set ALLSPHINXOPTS=-d %OUTPUTDIR%/doctrees %SPHINXOPTS% source
-if NOT "%PAPER%" == "" (
+set OUTPUTDIRSUFFIX=
+if not "%2" == "" (
+	set OUTPUTDIRSUFFIX=-%2
+)
+set OUTPUTDIR=build%OUTPUTDIRSUFFIX%
+set ALLSPHINXOPTS=-d %OUTPUTDIR%/doctrees %SPHINXOPTS% source%OUTPUTDIRSUFFIX%
+if not "%PAPER%" == "" (
 	set ALLSPHINXOPTS=-D latex_paper_size=%PAPER% %ALLSPHINXOPTS%
 )
 
@@ -19,6 +23,10 @@ if "%1" == "help" (
 	echo.  chm       to make CHM file
 	echo.  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter
 	echo.  pdf       to make PDF file, you can set PAPER=a4 or PAPER=letter
+	echo.
+	echo.and where ^<lang^> is one of
+	echo.  en  to make target in English
+	echo.  ja  to make target in Japanese
 	goto end
 )
 
