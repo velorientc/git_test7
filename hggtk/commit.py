@@ -346,6 +346,7 @@ class GCommit(GStatus):
         self.get_toolbutton(_('_Add')).set_sensitive(not self.merging)
         self.get_toolbutton(_('_Remove')).set_sensitive(not self.merging)
         self.get_toolbutton(_('Move')).set_sensitive(not self.merging)
+        self.get_toolbutton(_('_Forget')).set_sensitive(not self.merging)
 
         if self.merging:
             # select all changes if repo is merged
@@ -475,13 +476,8 @@ class GCommit(GStatus):
             if dopatch:
                 try:
                     pfiles = {}
-                    if patch.patchfile.__bases__:
-                        # Mercurial 1.3
-                        patch.internalpatch(fp, ui, 1, repo.root, files=pfiles,
+                    patch.internalpatch(fp, ui, 1, repo.root, files=pfiles,
                                         eolmode=None)
-                    else:
-                        # Mercurial 1.2
-                        patch.internalpatch(fp, ui, 1, repo.root, files=pfiles)
                     patch.updatedir(ui, repo, pfiles)
                 except patch.PatchError, err:
                     s = str(err)
