@@ -13,7 +13,7 @@ if "%1" == "" goto help
 
 if "%1" == "help" (
 	:help
-	echo.Please use `make ^<target^>` where ^<target^> is one of
+	echo.Please use `Build.bat ^<target^> [^<lang^>]` where ^<target^> is one of
 	echo.  html      to make standalone HTML files
 	echo.  htmlhelp  to make HTML files and a HTML help project
 	echo.  chm       to make CHM file
