@@ -343,7 +343,8 @@ class GLog(gdialog.GDialog):
     def _branch_color(self, button, property):
         active = button.get_active()
         self.graphview.set_property(property, active)
-        self.reload_log()
+        if hasattr(self, 'nextbutton'):
+            self.reload_log()
 
     def reload_log(self, **filteropts):
         'Send refresh event to treeview object'
