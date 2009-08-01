@@ -194,6 +194,12 @@ class GLog(gdialog.GDialog):
         button.set_active(self.showcol.get('branch', False))
         button.set_draw_as_radio(True)
         menu.append(button)
+        button = gtk.CheckMenuItem(_('Color by Branch'))
+        button.connect('toggled', self._branch_color,
+                'branch-color')
+        button.set_active(self.branch_color)
+        button.set_draw_as_radio(True)
+        menu.append(button)
         menu.show_all()
         return menu
 
@@ -291,6 +297,7 @@ class GLog(gdialog.GDialog):
         settings = gdialog.GDialog.save_settings(self)
         settings['glog-vpane'] = self.vpaned.get_position()
         settings['glog-hpane'] = self.hpaned.get_position()
+        settings['branch-color'] = self.graphview.get_property('branch-color')
         for col in ('rev', 'date', 'id', 'branch', 'utc'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
@@ -321,6 +328,7 @@ class GLog(gdialog.GDialog):
         try:
             self.setting_vpos = settings['glog-vpane']
             self.setting_hpos = settings['glog-hpane']
+            self.branch_color = settings.get('branch-color', False)
             for col in ('rev', 'date', 'id', 'branch', 'utc'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
@@ -331,6 +339,11 @@ class GLog(gdialog.GDialog):
         'Refresh data in the history model, without reloading graph'
         if self.graphview.model:
             self.graphview.model.refresh()
+
+    def _branch_color(self, button, property):
+        active = button.get_active()
+        self.graphview.set_property(property, active)
+        self.reload_log()
 
     def reload_log(self, **filteropts):
         'Send refresh event to treeview object'
