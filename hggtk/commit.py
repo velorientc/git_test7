@@ -702,6 +702,7 @@ class GCommit(GStatus):
                 self.qnew = False
             elif self.qheader is None:
                 self.text.set_buffer(gtk.TextBuffer())
+                self.msg_cbbox.set_active(-1)
                 self.last_commit_id = self.get_tip_rev(True)
             if self.notify_func:
                 self.notify_func(self.notify_args)
