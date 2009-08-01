@@ -1,0 +1,64 @@
+Serve
+=====
+
+.. module:: serve.dialog
+	:synopsis: Dialog used to start/stop the web server
+
+.. figure:: figures/serve.png
+	:alt: Web server dialog
+
+The serve tool is a wrapper for Mercurial's built-in web server. Once
+launched, any computer can attach to the http port and browse your
+repository(ies) or perform clone, pull, or even push operations (if you
+configure your server to allow it).
+
+Toolbar buttons:
+
+	:guilabel:`Start`
+		start the web server
+	:guilabel:`Stop`
+		stop the web server
+	:guilabel:`Browse`
+		open your default browser at the built-in web server
+	:guilabel:`Configure`
+		Configure repository web style, description, and access policies
+
+When the settings dialog is launched via the :guilabel:`Configure`
+button, it is run in the context of the current repository.  Please
+visit the Mercurial wiki for detailed descriptions of the various
+web configurations.
+
+Multiple Repositories
+---------------------
+
+If you wish to serve a many repositories with a single web server
+instance, you can create an :file:`hgwebdir.conf` text file with the
+following contents: ::
+
+	[paths]
+	/ = /path/to/repositories/*
+
+The first path '/' is where the repositories will appear in the context
+of the web server and the second path describes here the repositories
+can be found on your computer.  Multiple entries are possible.
+
+To use this file you must launch the TortoiseHg serve dialog from the
+command line via: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.
+
+
+From command line
+-----------------
+
+The server tool can be started from command line ::
+
+	hgtk serve [OPTION]...
+
+	web server
+
+	options:
+
+		--webdir-conf  name of the webdir config file
+
+	use "hgtk -v help serve" to show global options
+
+.. vim: noet ts=4

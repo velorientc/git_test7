@@ -1,0 +1,134 @@
+Common Features
+===============
+
+.. module:: common.dialog
+	:synopsis: Common features to all the dialog
+
+These features are common to many TortoiseHg tools, so we document them
+here just once.
+
+Geometry Restore
+----------------
+
+Our primary applications like commit, changelog, and datamine will
+restore their geometry and position from the last time they were run.
+This includes maximization status.
+
+If the state to be restored does not fit within your current screen
+dimensions, the application will revert to factory default dimensions.
+
+Dialogs which have fixed geometry or are transitory allow the window
+manager to place them where it wishes.
+
+Keyboard Accelerators
+---------------------
+
+We define a few keyboard accelerators that all of the TortoiseHg tools support.
+
+:kbd:`Ctrl-Q`
+	quit the application, including all open windows
+
+:kbd:`Ctrl-W`
+	close the current window (same as :kbd:`Ctrl-Q` if only one window is open)
+
+:kbd:`Ctrl-D`
+	visual diff of currently selected file or changeset	
+
+:kbd:`Ctrl-Enter`
+	activation
+
+:kbd:`F5`
+	refresh
+
+On `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_, the apple
+(command) key is used as the modifier instead of :kbd:`Ctrl`. However some
+keyboard accelerators are internal to GTK+ so you must use the control key to
+access cut-paste functionality, for instance.
+
+Visual Diffs
+------------
+
+.. figure:: figures/visual-diff.jpg
+	:alt: Visual Diff Window 
+
+TortoiseHg 0.8 introduced a visual diff dialog that solves four
+usability issues:
+
+1) Allows you to select a visual diff tool for each individual file
+2) Allows you to use visual diff tools that fork background processes
+3) Allows you to use visual diff tools that do not support directory diffs
+4) Provides feedback when no files were modified 
+
+Providing visual diffs requires TortoiseHg to generate temporary files
+which contain older versions of data.  Those temporary files are deleted
+when the visual diff dialog is closed.
+
+If you would like to bypass this visual diff window and directly launch
+your visual diff tool open the global settings dialog and set
+:menuselection:`TortoiseHg --> Skip Diff Window` to true.
+
+.. note::
+	The `Skip Diff Window` configurable does not change the behavior of
+	visual diffs launched by the shell context menu.  The visual diff
+	window is always shown.
+
+.. warning::
+	When you bypass the visual diff window, your visual diff tool must
+	be able to handle directory diffs and it must not fork a background
+	process.  Caveat emptor.
+
+Configuring a visual diff application for use in TortoiseHg is a two
+step process.  First you must configure your application as an
+`Extdiff <http://mercurial.selenic.com/wiki/ExtdiffExtension>`_
+command in your user :file:`Mercurial.ini`::
+
+	[extdiff]
+	myapp = C:\Path\to\tool.exe
+
+Then you can select `myapp` from the list of available extdiff
+commands in :menuselection:`TortoiseHg --> Visual Diff Command`.
+See the :doc:`faq` for some configuration examples.
+
+When more than one `Extdiff` command is configured, the visual diff
+window will allow you to select the command to use as you open each
+file.
+
+
+Treeview searches
+-----------------
+
+Many TortoiseHg dialogs use treeviews to present lists of data to the
+user. The file lists in the status, commit, shelve, and changelog tools
+are treeviews. The changelog graph pane is a treeview. And even the
+annotate pane in the datamine tool is a treeview.
+
+Most of the TortoiseHg treeviews (as of release 0.8) are configured for
+live searches. Ensure that the treeview has focus (by clicking on a
+row), and begin typing a search phrase. A small entry window will appear
+containing the text you have typed, and the treeview will immediately
+jump to the first row that matches the text you have entered thus far.
+As you enter more characters, the search is refined.
+
+* :kbd:`Ctrl-F` opens the search window explicitly
+* :kbd:`Ctrl-G` advances the search to the next match
+* :kbd:`Shift-Ctrl-G` searches backwards
+* The mouse scroll wheel will advance forwards and backwards through
+  matching lines 
+
+HG command dialog
+-----------------
+
+Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
+commands that could potentially be interactive.  
+
+.. figure:: figures/hgcmd.jpg
+	:alt: Mercurial command dialog
+
+.. note::
+	Error messages are given a dark red color for contrast
+
+When the Mercurial command has completed, the dialog gives focus to its
+:guilabel:`Close` button.  So pressing :kbd:`Enter` is all that is
+required to close the window.
+
+.. vim: noet ts=4

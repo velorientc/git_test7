@@ -1,0 +1,169 @@
+Synchronize
+===========
+
+.. module:: synchronize.dialog
+	:synopsis: Dialog used to perform synchronization operations
+
+.. figure:: figures/synchronize.png
+	:alt: Synchronize dialog
+
+	Synchronize dialog
+
+The synchronize tool is used to transmit changesets between repositories
+or to email recipients.
+
+	:guilabel:`Incoming`
+		show changesets that would be pulled from target repository, the
+		changes in the target repository that are not in local repository
+	:guilabel:`Pull`
+		pull incoming changesets from target repository
+	:guilabel:`Outgoing`
+		show changesets that would be pushed to target repository, the
+		changes in the local repository that are not in target
+		repository
+	:guilabel:`Push`
+		push outgoing changesets to target repository, make the local
+		*tip* the new *tip* in the target repository
+	:guilabel:`Email`
+		send outgoing changesets (to target repository) as email
+	:guilabel:`Stop`
+		stop current operation
+	:guilabel:`Configure`
+		configure repository paths (aliases)
+
+Below the toolbar are two buttons and a text entry:
+
+	:guilabel:`Repo:`
+		browse for a local repository to synchronize with
+	:guilabel:`Bundle:`
+		browse for a local bundle file to pull from
+
+The text entry/combo box is where you enter or select paths of target
+repositories. The synchronize tool will seed the drop-down list with
+path aliases configured for this repository.
+
+The :guilabel:`Post Pull Operation` frame contains radio buttons for
+selecting the operation which is performed after a pull.  This behavior
+is configurable via the :guilabel:`Configure` button.  You can select a
+default behavior for your user account and override that selection on a
+per-repository basis.
+
+	:guilabel:`Nothing`
+		No operations are performed after a pull.  You will be allowed to
+		view the pulled changesets in the log viewer, and you will have the
+		option to update to the new tip if applicable.
+	:guilabel:`Update`
+		Automatically update to the new branch tip if, and only if, new
+		revisions were pulled into the local repository.  This could trigger
+		a merge if the pulled changes conflict with local uncommitted
+		changes.
+	:guilabel:`Fetch`
+		Equivalent to hg fetch.  See the fetch extension documentation for
+		it's behavior.
+	:guilabel:`Rebase`
+		Equivalent to pull --rebase.  See the rebase extension documentation
+		for it's behavior.  Rebase operations disable connections to any
+		changelog tools, since it is very destructive to any app which is
+		holding a repository object.
+
+The :guilabel:`use proxy` button is a quick way to disable your proxy
+configuration for individual operations. The button is only sensitive
+when an http proxy is configured.
+
+All operations which require authentication will pop up dialog boxes to
+get the required information from the user.  TortoiseHg uses the
+TortoisePlink tool (borrowed from the TortoiseSVN distribution) to
+handle *ssh:* connections and authentication.  See the FAQ_ for help if
+you have trouble connecting to ssh servers.
+
+.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
+
+Under the :guilabel:`Advanced Options` fold-up panel are a number of
+configurables that are valid for most push/pull operations.
+
+	:guilabel:`Force pull or push`
+		override warnings about multiple heads or unrelated repositories
+	:guilabel:`Target Revision`
+		to avoid sending all revisions
+	:guilabel:`Remote Command`
+		provides -e argument
+	:guilabel:`Show patches`
+		show diffs in incoming and outging changes
+	:guilabel:`Show Newest First`
+		reverse order that changesets are listed
+	:guilabel:`Show No Merges`
+		filter out merge changesets from output (does not affect push/pull)
+
+
+After Pull
+----------
+
+After changesets are pulled into your repository, two buttons may appear
+at the bottom of the dialog:
+
+	:guilabel:`View pulled changesets`
+		Open the changelog viewer and inspect pulled changesets
+	:guilabel:`Update to tip`
+		Update your working directory to the new tip
+
+Either button may be hidden if it is not applicable.
+
+Email
+-----
+
+.. figure:: figures//email.png
+	:alt: Email dialog
+
+	Email dialog
+ 
+The email dialog can be launched from two TortoiseHg tools.
+
+1) The changelog tool, in which case the user intends to email a single
+   revision or a range of revisions.
+
+2) The synchronize tool, in which case the user intends to email all
+   outgoing changes to the current target repository (it's good practice to
+   check the outgoing changes before launching the email dialog).
+
+The :guilabel:`Send` button is obvious, and the :guilabel:`Configure`
+dialog predictably opens the TortoiseHg Settings dialog to the email tab
+where you can configure your SMTP settings and set default
+:guilabel:`To:` and :guilabel:`From:` addresses.
+
+:guilabel:`In-Reply-To:` is used to make your patches properly threaded
+in mailing lists.
+
+Please consult the Mercurial documentation for the differences between
+plain patches, HG patches, Git patches, and bundles.
+
+From command line
+-----------------
+
+The synchronize tool can be started from command line ::
+
+	hgtk synch
+
+	aliases: pull, push, incoming, outgoing, email
+
+	repository synchronization tool
+
+	use "hgtk -v help synch" to show global options
+
+The syntax is simple, no options or parameters are needed, except the
+global options.  If the synchronize tool is started via push, outgoing,
+or email command aliases, it will automatically select the
+*default-push* URL if.  For all other aliases the tool selects the
+*default* URL.  If the selected URL is not found, it will use the first
+path it finds.
+
+Changes since 0.7
+-----------------
+
+* Path drop-down list no longer includes most-recently-used paths.  It
+  only includes configured repository paths.
+* Email dialog now has buttons for configuring in-reply-to tags and the
+  attachment types.
+* Email dialog now sends an intro message only when one has been
+  entered, regardless of patch count.
+
+.. vim: noet ts=4
