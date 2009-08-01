@@ -7,6 +7,7 @@ TortoiseHg in daily use
 	
 	common
 	explorer
+	start
 	commit
 	shelve
 	changelog
