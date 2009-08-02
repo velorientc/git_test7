@@ -5,7 +5,7 @@ Clone a repository
 	:synopsis: Dialog used to clone a repository
 
 To clone a repository you have to run the clone dialog.
-From the explorer context menu select :guilabel:`Clone a repository`
+From the explorer context menu select :menuselection:`TortoiseHg... --> Clone a repository`
 or type :command:`hgtk clone`. 
 
 .. TODO
