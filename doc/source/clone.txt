@@ -8,4 +8,35 @@ To clone a repository you have to run the clone dialog.
 From the explorer context menu select :menuselection:`TortoiseHg... --> Clone a repository`
 or type :command:`hgtk clone`. 
 
+.. figure:: figures/clone.png
+	:alt: Clone dialog
+	
+:guilabel:`Source Path`
+	TODO
+:guilabel:`Destination Path`
+	TODO
+:guilabel:`Clone To Revision`
+	TODO
+:guilabel:`do not update the new working directory`
+	TODO
+:guilabel:`use pull protocol to copy metadata`
+	TODO
+:guilabel:`use uncompressed transfer`
+	TODO
+:guilabel:`use proxy server`
+	TODO
+:guilabel:`Remote Cmd`
+	TODO
+
+From command line
+-----------------
+
+TODO	
+	
+	
+	
+	
+	
+
+
 .. TODO
