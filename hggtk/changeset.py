@@ -146,7 +146,7 @@ class ChangeSet(gdialog.GDialog):
 
         eob = buf.get_end_iter()
         date = displaytime(ctx.date())
-        change = str(rev) + ' : ' + str(ctx)
+        change = str(rev) + ' (' + str(ctx) + ')'
         tags = ' '.join(ctx.tags())
 
         title_line(_('changeset:'), change, 'changeset')
@@ -284,7 +284,7 @@ class ChangeSet(gdialog.GDialog):
         text = self.get_link_text(tag, widget, liter)
         if not text:
             return
-        linkrev = long(text.split(':')[0])
+        linkrev = long(text.split(' ')[0])
         if self.graphview:
             self.graphview.set_revision_id(linkrev)
             self.graphview.scroll_to_revision(linkrev)
