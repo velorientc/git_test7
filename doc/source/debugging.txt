@@ -1,0 +1,36 @@
+TortoiseHg Debugging 
+====================
+
+.. module:: debugging
+	:synopsis: Debug problems in shell extension or dialogs
+
+Debugging hgtk
+--------------
+
+TODO
+
+Windows
+~~~~~~~
+
+TODO
+
+Linux/MacOSX
+~~~~~~~~~~~~
+
+TODO
+
+
+Debugging Shell Extension
+-------------------------
+
+TODO
+
+Windows
+~~~~~~~
+
+TODO
+
+Nautilus
+~~~~~~~~
+
+TODO

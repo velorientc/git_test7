@@ -19,6 +19,7 @@ Contents:
 	settings
 	recovery
 	faq
+	debugging
    
 Indices and tables
 ==================
