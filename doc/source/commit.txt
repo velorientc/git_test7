@@ -195,13 +195,15 @@ File Context Menus
 
 By right clicking on files in the file list, you will get a context menu
 of commands that are applicable to the selected file. If you configure a
-visual editor in
-:menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
-there will be an option to open the file in your editor.  For unknown **?**
-files, the context menu will allow you to detect renames (if you think
-the unknown file was a copy or rename of a revisioned file) or configure
-the repository's ignore filter (if the file should never be revisioned
-and you want Mercurial to ignore it).
+visual editor (in
+:menuselection:`Global Settings --> TortoiseHg --> Visual Editor`)
+there will be a menu option to open the file in your editor.
+
+For unknown **?** files, the context menu will allow you to detect
+renames (if you think the unknown file is a copy or rename of a
+revisioned file) or to configure the repository's ignore filter (if the
+unknown file should never be revisioned and you want Mercurial to ignore
+it).
 
 
 Merges
@@ -211,8 +213,8 @@ The commit tool has a special mode when it is opened in a repository
 that is in a merged state (technically, this means the current working
 directory has two parent revisions). The file list has no checkboxes and
 the diff pane does not allow selections. The commit 'manifest' is
-essentially immutable, you must commit the entire working directory
-after a merge.
+essentially immutable, since you must commit the entire working
+directory after a merge.
 
 The merge state *ms* column is especially useful in this mode.  Files
 that are marked with *R* are files where Mercurial and/or the user have
@@ -228,6 +230,15 @@ unresolved *U* merge states.
 
 For your reference, *local* is the revision you had checked out when you
 started the merge and *other* is the revision you merged with.
+
+To undo a failed merge attempt, you must tell Mercurial to remove the
+second parent from your working directory.  This usually means
+performing a clean update of the first parent.  The merge tool has an
+:guilabel:`Undo` button which does exactly that.  The recovery tool also
+has a :guilabel:`Clean` button that does the same thing.
+
+Once you have your working directory back at one parent revision, you
+may start the merge process again.
 
 
 Commit Message Format
@@ -261,10 +272,10 @@ move entire files or single changes in or out of the patch.
 
 The :guilabel:`Commit` button, which has been renamed :guilabel:`QRefresh`
 in this context, it will refresh the top patch with just the changes you
-have selected (including the patch description). This may be a bit confusing at first
-because the changes you leave out of the patch are still going to be in
-the working directory after the refresh, so it will look like nothing
-has changed.
+have selected (including the patch description). This may be a bit
+confusing at first because the changes you leave out of the patch are
+still going to be in the working directory after the refresh, so it will
+look like nothing has changed.
 
 So, in summary, using MQ with TortoiseHg is still almost entirely a
 command line operation, but you can use :command:`hgtk ci` to refresh your
@@ -284,10 +295,10 @@ new patch by :command:`hg qnew -f`).  The :guilabel:`Commit` button will
 change into a :guilabel:`QNew` button as well, to make the mode switch
 more obvious.
 
-When the :guilabel:`QNew` button is pressed, the selected change hunks are written
-into a new patch (given the filename you specified), and the dialog is
-refreshed.  At refresh, the commit tool will obviously switch to
-*qrefresh* mode since there will now be at least one applied patch.
+When the :guilabel:`QNew` button is pressed, the selected change hunks
+are written into a new patch (given the filename you specified), and the
+dialog is refreshed.  At refresh, the commit tool will obviously switch
+to *qrefresh* mode since there will now be at least one applied patch.
 
 You may give the new patch a commit message at the initial *qnew* event,
 or you can do it now by using the *qrefresh* feature.
