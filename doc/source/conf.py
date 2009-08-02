@@ -184,7 +184,7 @@ latex_logo = 'figures/thg_logo_pdf.png'
 #latex_preamble = ''
 
 # Documents to append as an appendix to all manuals.
-latex_appendices = ['faq']
+#latex_appendices = ['faq']
 
 # If false, no module index is generated.
 #latex_use_modindex = True
