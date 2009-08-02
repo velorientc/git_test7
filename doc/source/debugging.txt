@@ -18,6 +18,10 @@ If you have a bit of Python knowledge, you can also use::
 
     hgtk --debugger <command>
 
+To disable the forking behavior of hgtk, you can either set an
+environment variable **THG_HGTK_SPAWN**, or add the command line
+parameter '--nofork'.
+
 
 Windows
 ~~~~~~~
