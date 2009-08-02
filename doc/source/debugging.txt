@@ -1,0 +1,91 @@
+TortoiseHg Debugging 
+====================
+
+.. module:: debugging
+	:synopsis: Debug problems in shell extension or dialogs
+
+Debugging Dialogs
+-----------------
+
+Stderr is being captured to a buffer that is being inspected at program
+exit.  If any serious errors (tracebacks, etc) are found in the stderr
+buffer the entire contents are sent to the bug report tool so the user
+can (should) report a bug.  If you suspect there are errors that are not
+being reported, you can set the environment variable **THGDEBUG** to any
+value to disable the stderr buffering.
+
+If you have a bit of Python knowledge, you can also use::
+
+    hgtk --debugger <command>
+
+To disable the forking behavior of hgtk, you can either set an
+environment variable **THG_HGTK_SPAWN**, or add the command line
+parameter '--nofork'.
+
+
+Windows
+~~~~~~~
+
+To debug the changelog viewer, for instance, enter these commands
+into a :command:`cmd.exe` window, while inside the repository::
+
+    set THGDEBUG=1
+    hgtk log
+
+Linux/MacOSX
+~~~~~~~~~~~~
+
+To debug the changelog viewer, for instance, enter these commands
+into your shell window, while inside the repository::
+    
+    export THGDEBUG=1
+    hgtk log
+
+
+
+Debugging Shell Extension
+-------------------------
+
+The debugging mechanisms depend on your platform.
+
+Windows
+~~~~~~~
+
+See also http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx
+for some info bits about Running and Testing Shell Extensions on Windows
+
+The :command:`DbgView` tool from the SysInternals suite will capture
+debug messages from the shell extension.
+
+The :command:`ThgTaskbar` application's options dialog has an error
+logging tab.  If you have this dialog open while you are browsing
+folders, you will get info and error level messages from the icon
+overlay refresh process.
+
+Nautilus
+~~~~~~~~
+
+Debugging is done via the environment variable DEBUG_THG
+
+* to test in a separate process::
+
+    DEBUG_THG=Ne TMPDIR=/tmp/anydir/ --no-desktop nautilus [path]
+
+* to test in the main instance:: 
+
+    nautilus -q
+    DEBUG_THG=NOe nautilus
+
+* permanent debugging, set DEBUG_THG in a file which is read on session
+  start (~/.profile, ~/.xprofile)
+
+Upper case characters in DEBUG_THG specify modules.  Only *O* and *N*
+for *OverlayCache* and *Nautilus*, respecively, are supported module
+names.  Lower case characters imply parts. Only *e* is supported,
+implying *error* messages.
+
+To restart nautilus, chose either
+
+1) killall nautilus (the session restarts nautilus automatically, stdin and stdout go to ~/.xsession-errors)
+
+2) nautilus -q; nautilus (stdin and stdout are on the console)

@@ -518,9 +518,8 @@ class ChangeSet(gdialog.GDialog):
                 os.remove(result)
 
             q = Queue.Queue()
-            cpath = util.canonpath(self.repo.root, self.cwd, self.curfile)
             hgcmd_toq(self.repo.root, q, 'cat', '--rev',
-                str(self.currev), '--output', fromutf(result), cpath)
+                str(self.currev), '--output', fromutf(result), self.curfile)
 
     def diff_to_local(self, menuitem):
         if not self.curfile:

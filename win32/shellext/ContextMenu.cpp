@@ -337,33 +337,39 @@ CShellExt::QueryContextMenu(
     }
     while (found != std::string::npos);
 
-    // check if target directory is a Mercurial repository
+    // Select menu to show
+    bool fileMenu = myFiles.size() > 0;
+    bool isHgrepo = false;
     std::string cwd;
     if (!myFolder.empty())
     {
         cwd = myFolder;
     }
-    else if (myFiles.size() == 1 && IsDirectory(myFiles[0]))
-    {
-        myFolder = myFiles[0];
-        cwd = myFolder;
-        myFiles.clear();
-    }
     else if (!myFiles.empty())
     {
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
     }
-    bool isHgrepo = false;
+
     if (!cwd.empty())
-        isHgrepo = IsHgRepo(cwd);
+    {
+        // check if target directory is a Mercurial repository
+        std::string root = GetHgRepoRoot(cwd);
+        isHgrepo = !root.empty();
+        if (myFiles.size() == 1 && root == myFiles[0])
+        {
+            fileMenu = false;
+            myFolder = cwd;
+            myFiles.clear();
+        }
+    }
 
     /* We have three menu types: files-selected, no-files-selected, no-repo */
     menuDescListEntries *entries;
     if (isHgrepo)
-        if (myFiles.empty())
-            entries = RepoNoFilesMenu;
-        else
+        if (fileMenu)
             entries = RepoFilesMenu;
+        else
+            entries = RepoNoFilesMenu;
     else
         entries = NoRepoMenu;
 
@@ -655,16 +661,19 @@ void CShellExt::DoHgtk(const std::string &cmd)
     {
         cwd = myFolder;
     }
-    else if (myFiles.size() == 1 && IsDirectory(myFiles[0]))
-    {
-        // Treat single selected directory as if cmenu were opened
-        // within that directory without files selected
-        cwd = myFiles[0];
-    }
     else if (!myFiles.empty())
     {
-        cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
+        cwd = IsDirectory(myFiles[0]) ? myFiles[0] : DirName(myFiles[0]);
+    }
+    else
+    {
+        TDEBUG_TRACE("DoHgtk: can't get cwd");
+        return;
+    }
 
+
+    if (!myFiles.empty())
+    {
         const std::string tempfile = GetTemporaryFile();
         if (tempfile.empty())
         {
@@ -697,11 +706,6 @@ void CShellExt::DoHgtk(const std::string &cmd)
         }
         CloseHandle(tempfileHandle);
         hgcmd += " --listfile " + Quote(tempfile);
-    }
-    else
-    {
-        TDEBUG_TRACE("DoHgtk: can't get cwd");
-        return;
     }
 
     if (cmd == "thgstatus")

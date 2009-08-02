@@ -25,10 +25,13 @@ The toolbar buttons from left to right:
 The changelog tool is primarily used to visualize the revision history
 of your repository. It presents a graph of the revision history, showing
 the parent/child relationship of each change. At each revision you can
-view the files that it modified and the contents of those changes. These
-are the obvious features that a revision history browser provides.
+view the files that were modified and the contents of those changes.
+These are the features that nearly all revision history browsers provide.
 
-This changelog browser offers much more.
+The TortoiseHg changelog browser offers much more.  Since it is our best
+tool for viewing and selecting changesets, we use it to perform nearly
+all our tasks that involve changeset manipulation.
+
 
 Revision Graph Details
 ----------------------
@@ -48,6 +51,9 @@ these are:
 	load the next N revisions into the graph
 :guilabel:`all revisions`
 	load all remaining revisions into the graph
+
+The column visibility toggles are sticky settings.
+
 
 Revision Context Menus
 ----------------------
@@ -86,8 +92,9 @@ revision context menu.
 	repository [#rcm4]_
 
 
-If you right-click on a row other than the one that was currently selected, you get a different context menu.
-This one is for visualizing diffs between two arbitrary revisions.
+If you right-click on a row other than the one that was currently
+selected, you get a different context menu.  This context menu has
+commands that deal with arbitrary revision ranges.
 
 :guilabel:`diff with selected`
 	 Description
@@ -106,7 +113,7 @@ This one is for visualizing diffs between two arbitrary revisions.
 .. [#rcm4] The strip command will store the stripped revisions in a bundle file
 		   that can later be reapplied.
 		   See `also <http://mercurial.selenic.com/wiki/EditingHistory>`_.
-.. [#rcm5] :menuselection:`Settings --> Global --> TortoiseHg --> Visual Diff Command`
+.. [#rcm5] :menuselection:`Global Settings --> TortoiseHg --> Visual Diff Command`
 .. [#rcm6] Only sensitive if the selected revision is your current working
 		   directory parent
 
@@ -131,14 +138,20 @@ bring up a context menu for the selected file:
 :guilabel:`revert file contents`
 	 Checkout this specific revision of this file  [#flcm3]_
  
-.. [#flcm1] :menuselection:`Settings --> Global --> TortoiseHg --> Visual Editor`
+.. [#flcm1] :menuselection:`Global Settings --> TortoiseHg --> Visual Editor`
 .. [#flcm2] Does not show revisions where a file was deleted, as this is only a
-		    manifest change, it does not modify the file's history.
+            manifest change, it does not modify the file's history.
 .. [#flcm3] The new contents will appear as local changes and must be committed.
 
 
 Changeset browser
 -----------------
+
+The changeset browser will only show a single file's diffs at a time, as
+a performance optimization.  If you would like to see all of the file
+diffs at once, click on the :guilabel:`[All Files]` row.  The changeset
+browser will also skip displaying diffs for files which are above a
+maximum limit. See :menuselection:`Global Settings --> TortoiseHg --> Max Diff Size`
 
 The changelog and datamine tools can open the changeset browser to view
 a single revision or the combined effect of a range of revisions. The
@@ -147,16 +160,17 @@ a file list on the left of all files that have been changed, and a diff
 pane on the right with the changes to each file.
 
 In release 0.7 of TortoiseHg, the 'diff change with' changeset browser
-now supports change selection.  You can select files and hunks that you
-wish to extract from the changeset(s) you are browsing and write them to
-a patch file using the :guilabel:`Save as` toolbar button.  This is a very
-efficient way to cherry pick changes made to a repository.
+acquired the same change selection feature as the commit tool.  You can
+select files and hunks that you wish to extract from the changeset(s)
+you are browsing and write them to a patch file using the
+:guilabel:`Save as` toolbar button.  This is a very efficient way to
+cherry pick changes from a repository.  This changeset browser also
+supports the :kbd:`Ctrl-C` keyboard accelerator to copy hightlighted
+diff hunks to the clipboard.
+
 Unfortunately, TortoiseHg still does not have a dialog for importing
 changes into a repository, so this must be done on the command line with
 the :command:`hg import` command.
-
-This changeset browser also supports the :kbd:`Ctrl-C` keyboard
-accelerator to copy hightlighted diff hunks to the clipboard.
 
 Configurables
 -------------
@@ -189,7 +203,7 @@ TortoiseHg tab:
 :guilabel:`Bottom Diffs`
 	Show diffs below file list
 
-	
+
 From command line
 -----------------
 
@@ -203,11 +217,11 @@ or ::
 
 The syntax is ::
 
-	hgtk log [OPTIONS]
+	hgtk log [OPTIONS] [FILES]
 
 Valid [OPTIONS] are:
 
 ``-l``, ``--limit``
 	Specify the limit number of changes displayed.
-	
+
 .. vim: noet ts=4

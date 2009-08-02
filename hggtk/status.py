@@ -1127,7 +1127,8 @@ class GStatus(gdialog.GDialog):
             dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
                     _('Revert files to revision %s?') % revertopts['rev'])
         elif self.merging:
-            resp = gdialog.CustomPrompt(_('Which parent to revert to?'),
+            resp = gdialog.CustomPrompt(
+                    _('Uncommited merge - please select a parent revision'),
                     _('Revert file(s) to local or other parent?'),
                     self, (_('&local'), _('&other')), 0).run()
             if resp == 0:
