@@ -165,7 +165,9 @@ class ChangeSet(gdialog.GDialog):
                 summary = toutf(summary)
             except:
                 summary = ""
-            change = str(pctx.rev()) + ' : ' + str(pctx)
+            change = str(pctx.rev()) + ' (' + str(pctx) + ')'
+            if pctx.branch() != ctx.branch():
+                change += ' [' + toutf(pctx.branch()) + ']'
             title = _('parent:')
             title += ' ' * (12 - len(title))
 
@@ -185,7 +187,9 @@ class ChangeSet(gdialog.GDialog):
                 summary = toutf(summary)
             except:
                 summary = ""
-            change = str(cctx.rev()) + ' : ' + str(cctx)
+            change = str(cctx.rev()) + ' (' + str(cctx) + ')'
+            if cctx.branch() != ctx.branch():
+                change += ' [' + toutf(cctx.branch()) + ']'
             title = _('child:')
             title += ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title, 'parent')
