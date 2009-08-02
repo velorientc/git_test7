@@ -16,6 +16,5 @@ TortoiseHg in daily use
 	datamine
 	synchronize
 	serve
-	recovery
 
 .. vim: noet ts=4

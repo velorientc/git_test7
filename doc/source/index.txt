@@ -17,6 +17,7 @@ Contents:
 	quick
 	daily
 	settings
+	recovery
 	faq
    
 Indices and tables
