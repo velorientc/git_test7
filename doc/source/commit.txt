@@ -1,5 +1,5 @@
-TortoiseHg Commit Tool
-======================
+Commit
+======
 
 .. module:: commit.dialog
 	:synopsis: Dialog used to perform commit

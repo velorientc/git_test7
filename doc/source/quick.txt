@@ -5,9 +5,12 @@ A quick tour for the impatient
 .. module:: tour
 	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
 
-One of the great things about Mercurial is that there are lots of different
+Mercurial supports many different
 `collaboration models <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
-The following describes just one of those models: a single central repository.
+This chapter describes just one of those models: a single central repository.
+The central repository model does not scale as well as other models, but
+it is the most familiar to those coming from other revision tools and
+thus is the most common approach people start with.
 
 To get started, suppose you volunteer to create the central repository.
 There are ways to `convert <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
