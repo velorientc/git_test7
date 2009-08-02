@@ -6,7 +6,7 @@ Create a new repository
 
 To create a new repository into an existing directory (project) you
 have to run the init dialog. From the explorer context menu select
-:guilabel:`Create Repository Here` over the directory, or, within
+:menuselection:`TortoiseHg... --> Create Repository Here` over the directory, or, within
 the folder, type :command:`hgtk init`. 
 
 .. figure:: figures/init.png
