@@ -65,11 +65,26 @@ Below the toolbar are two other useful widgets:
 	commit tool into 'QNew' mode where the working directory changes
 	will be applied to a new patch.
 
-Below the file list are checkboxes that toggle the inclusion of the
-various classes of files {modified, added, removed, deleted, unknown,
-clean, ignored}.
 
-Removed means a revisioned file has been marked as removed. Deleted
+The file list has four columns:
+
+1) A checkbox that indicates whether the file is selected for an
+   operation.  The toolbar buttons only operate on checked files.
+   "Partially" selected files have a special check state.  This column
+   header is checkable, it will toggle the file selection states.
+2) The :guilabel:`st` column holds the status of the file, defined by
+   Mercurial's status command, one of 'MARD?IC'.
+3) The :guilabel:`ms` column holds the merge state of the file, defined
+   by Mercurial's resolve command, one of ' RU'.  See the merge section
+   below.
+4) The canonical path of the file (relative to the repository root)
+
+Below the file list are checkboxes that toggle the display of the
+various classes of files {modified, added, removed, deleted, unknown,
+clean, ignored}.  These check boxes will be disabled if the commit tool
+was given a specific set of files and/or directories.
+
+*Removed* means a revisioned file has been marked as removed. *Deleted*
 means a revisioned file is missing but Mercurial has not been told to
 quit tracking that file. For instance, if you rename a revisioned file
 in the explorer, the original filename will show up as deleted and the
@@ -79,10 +94,24 @@ the rename by comparing file contents and mark the old file as removed
 and the new file as added while recording the whole operation as a
 rename.
 
+*Unknown* files are not tracked by Mercurial, but they also do not match
+any ignore filters you have configured.  Unknown files are shown by
+default because they are usually files that need to be added to revision
+control.  It is recommended that you keep your ignore filters up to date
+to ensure that is the case.  The context menu of unknown files has an
+option open the ignore pattern tool.
+
+*Clean* files are tracked files that have not been modified, while
+*Ignored* files are untracked files that match a configured ignore
+pattern.  Neither of those file types are shown by default, unless a the
+user includes such a file in a selection (explorer) or provides the file
+on the command line.
+
+
 Change Selection (record)
 -------------------------
 
-So what does that mean when it says the commit button will commit the
+So what does it mean when we say the commit button will commit the
 selected diffs in checked files? Simple, the native TortoiseHg commit
 tool supports change selection instrinsically in the diff browser. This
 means that all of the changes you make to versioned files can be
