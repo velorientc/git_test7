@@ -513,10 +513,8 @@ class ConfigDialog(gtk.Dialog):
                 return
 
         try:
-            from mercurial import demandimport
-            demandimport.disable()
             import iniparse
-            demandimport.enable()
+            iniparse.INIConfig
         except ImportError:
             dialog.error_dialog(self, _('Iniparse package not found'),
                          _('Please install iniparse package') + '\n' +
