@@ -2,7 +2,7 @@ Datamine
 ========
 
 .. module:: datamine.dialog
-	:synopsis: Dialog used to search in the history
+	:synopsis: Dialog used to search repository history
 
 The datamine application is used to inspect the revision history of your
 repository.  It is a tabbed application that supports two tab types,
@@ -15,7 +15,7 @@ Search Tabs
 .. figure:: figures/search.png
 	:alt: Search dialog
 
-   Search dialog
+	Search dialog
 
 The search tab is used to search (*grep*) through your entire revision
 history for keywords, variable names, functions, etc... 

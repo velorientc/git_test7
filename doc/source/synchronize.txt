@@ -1,5 +1,5 @@
-TortoiseHg Synchronize
-======================
+Synchronize
+===========
 
 .. module:: synchronize.dialog
 	:synopsis: Dialog used to perform synchronization operations
@@ -10,32 +10,33 @@ TortoiseHg Synchronize
 	Synchronize dialog
 
 The synchronize tool is used to transmit changesets between repositories
-or optionally to email recipients.
+or to email recipients.
 
-:guilabel:`Incoming`
-	show changesets that would be pulled from target repository, the changes
-	in the target repository that are not in local repository
-:guilabel:`Pull`
-	pull incoming changesets from target repository
-:guilabel:`Outgoing`
-	show changesets that would be pushed to target repository, the changes
-	in the local repository that are not in target repository
-:guilabel:`Push`
-	push outgoing changesets to target repository, make the local *tip*
-	the new *tip* in the target repository
-:guilabel:`Email`
-	send outgoing changesets (to target repository) as email
-:guilabel:`Stop`
-	stop current operation
-:guilabel:`Configure`
-	configure repository paths (aliases)
+	:guilabel:`Incoming`
+		show changesets that would be pulled from target repository, the
+		changes in the target repository that are not in local repository
+	:guilabel:`Pull`
+		pull incoming changesets from target repository
+	:guilabel:`Outgoing`
+		show changesets that would be pushed to target repository, the
+		changes in the local repository that are not in target
+		repository
+	:guilabel:`Push`
+		push outgoing changesets to target repository, make the local
+		*tip* the new *tip* in the target repository
+	:guilabel:`Email`
+		send outgoing changesets (to target repository) as email
+	:guilabel:`Stop`
+		stop current operation
+	:guilabel:`Configure`
+		configure repository paths (aliases)
 
 Below the toolbar are two buttons and a text entry:
 
-:guilabel:`Repo:`
-	browse for a local repository to synchronize with
-:guilabel:`Bundle:`
-	browse for a local bundle file to pull from
+	:guilabel:`Repo:`
+		browse for a local repository to synchronize with
+	:guilabel:`Bundle:`
+		browse for a local bundle file to pull from
 
 The text entry/combo box is where you enter or select paths of target
 repositories. The synchronize tool will seed the drop-down list with
@@ -47,23 +48,23 @@ is configurable via the :guilabel:`Configure` button.  You can select a
 default behavior for your user account and override that selection on a
 per-repository basis.
 
-:guilabel:`Nothing`
-	No operations are performed after a pull.  You will be allowed to
-	view the pulled changesets in the log viewer, and you will have the
-	option to update to the new tip if applicable.
-:guilabel:`Update`
-	Automatically update to the new branch tip if, and only if, new
-	revisions were pulled into the local repository.  This could trigger
-	a merge if the pulled changes conflict with local uncommitted
-	changes.
-:guilabel:`Fetch`
-	Equivalent to hg fetch.  See the fetch extension documentation for
-	it's behavior.
-:guilabel:`Rebase`
-	Equivalent to pull --rebase.  See the rebase extension documentation
-	for it's behavior.  Rebase operations disable connections to any
-	changelog tools, since it is very destructive to any app which is
-	holding a repository object.
+	:guilabel:`Nothing`
+		No operations are performed after a pull.  You will be allowed to
+		view the pulled changesets in the log viewer, and you will have the
+		option to update to the new tip if applicable.
+	:guilabel:`Update`
+		Automatically update to the new branch tip if, and only if, new
+		revisions were pulled into the local repository.  This could trigger
+		a merge if the pulled changes conflict with local uncommitted
+		changes.
+	:guilabel:`Fetch`
+		Equivalent to hg fetch.  See the fetch extension documentation for
+		it's behavior.
+	:guilabel:`Rebase`
+		Equivalent to pull --rebase.  See the rebase extension documentation
+		for it's behavior.  Rebase operations disable connections to any
+		changelog tools, since it is very destructive to any app which is
+		holding a repository object.
 
 The :guilabel:`use proxy` button is a quick way to disable your proxy
 configuration for individual operations. The button is only sensitive
@@ -80,18 +81,18 @@ you have trouble connecting to ssh servers.
 Under the :guilabel:`Advanced Options` fold-up panel are a number of
 configurables that are valid for most push/pull operations.
 
-:guilabel:`Force pull or push`
-	override warnings about multiple heads or unrelated repositories
-:guilabel:`Target Revision`
-	to avoid sending all revisions
-:guilabel:`Remote Command`
-	provides -e argument
-:guilabel:`Show patches`
-	show diffs in incoming and outging changes
-:guilabel:`Show Newest First`
-	reverse order that changesets are listed
-:guilabel:`Show No Merges`
-	filter out merge changesets from output (does not affect push/pull)
+	:guilabel:`Force pull or push`
+		override warnings about multiple heads or unrelated repositories
+	:guilabel:`Target Revision`
+		to avoid sending all revisions
+	:guilabel:`Remote Command`
+		provides -e argument
+	:guilabel:`Show patches`
+		show diffs in incoming and outging changes
+	:guilabel:`Show Newest First`
+		reverse order that changesets are listed
+	:guilabel:`Show No Merges`
+		filter out merge changesets from output (does not affect push/pull)
 
 
 After Pull
@@ -100,10 +101,10 @@ After Pull
 After changesets are pulled into your repository, two buttons may appear
 at the bottom of the dialog:
 
-:guilabel:`View pulled changesets`
-	Open the changelog viewer and inspect pulled changesets
-:guilabel:`Update to tip`
-	Update your working directory to the new tip
+	:guilabel:`View pulled changesets`
+		Open the changelog viewer and inspect pulled changesets
+	:guilabel:`Update to tip`
+		Update your working directory to the new tip
 
 Either button may be hidden if it is not applicable.
 
@@ -129,8 +130,8 @@ dialog predictably opens the TortoiseHg Settings dialog to the email tab
 where you can configure your SMTP settings and set default
 :guilabel:`To:` and :guilabel:`From:` addresses.
 
-:guilabel:`In-Reply-To:` can be used to get your patches properly
-threaded in mailing lists.
+:guilabel:`In-Reply-To:` is used to make your patches properly threaded
+in mailing lists.
 
 Please consult the Mercurial documentation for the differences between
 plain patches, HG patches, Git patches, and bundles.
@@ -142,26 +143,12 @@ The synchronize tool can be started from command line ::
 
 	hgtk synch
 
-or ::
+	aliases: pull, push, incoming, outgoing, email
 
-	hgtk pull
+	repository synchronization tool
 
-or ::
+	use "hgtk -v help synch" to show global options
 
-	hgtk push
-
-or ::
-
-	hgtk incoming
-
-or ::
-
-	hgtk outcoming
-
-or ::
-
-	hgtk email
-	
 The syntax is simple, no options or parameters are needed, except the
 global options.  If the synchronize tool is started via push, outgoing,
 or email command aliases, it will automatically select the
