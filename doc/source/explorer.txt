@@ -33,6 +33,11 @@ Mercurial (droplet) icon in the system tray and select
 :guilabel:`Options`.  In the options dialog you can disable overlays
 globally, or enable them for local disks only.
 
+.. figure:: figures/taskbarui.jpg
+	:alt: Taskbar options dialog
+
+	Taskbar Options Dialog
+
 Release 0.8.1 introduced the ability to selectively disable overlay
 icons in specific repositories.  This can be done be editing the
 :file:`.hg\\thgstatus` file inside the repository and replacing it's
@@ -46,12 +51,19 @@ Context Menus
 The TortoiseHg commands (GUI window & dialogs) may be accessed via the
 context menu of Explorer windows. The TortoiseHg context menu is 
 context sensitive and which varies according to the current folder and
-file selection.
+file selection.  Here is the context menu for a revisioned folder:
 
-.. figure:: figures/contextmenu.png
+.. figure:: figures/cmenu-nofiles.jpg
 	:alt: Context menu
 
-	Context menu for a folder under Mercurial revision control (version 0.7)
+	Context menu for a folder under Mercurial revision control
+
+And here is the context menu for selected files or folders:
+
+.. figure:: figures/cmenu-files.jpg
+	:alt: Context menu
+
+	Context menu for file or folder selection
 
 TortoiseHg provides dialogs for the most regularly used Mercurial
 commands.  Less frequently used, and newly added, Mercurial commands
@@ -62,6 +74,12 @@ The context menus are configurable via the taskbar menu. Simply click on
 the Mercurial (droplet) icon in the system tray and select
 :guilabel:`Options`.  In the options dialog you can promote individual
 menu options to the top menu.
+
+This is the file rename/move dialog:
+
+.. figure:: figures/rename.jpg
+	:alt: Rename file dialog 
+
 
 Nautilus
 --------

@@ -48,7 +48,11 @@ access cut-paste functionality, for instance.
 Visual Diffs
 ------------
 
-0.8 introduced a visual diff dialog that solves four usability issues:
+.. figure:: figures/visual-diff.jpg
+	:alt: Visual Diff Window 
+
+TortoiseHg 0.8 introduced a visual diff dialog that solves four
+usability issues:
 
 1) Allows you to select a visual diff tool for each individual file
 2) Allows you to use visual diff tools that fork background processes
@@ -116,6 +120,9 @@ HG command dialog
 
 Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
 commands that could potentially be interactive.  
+
+.. figure:: figures/hgcmd.jpg
+	:alt: Mercurial command dialog
 
 .. note::
 	Error messages are given a dark red color for contrast
