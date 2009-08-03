@@ -1055,9 +1055,12 @@ class GStatus(gdialog.GDialog):
             if not row[FM_CHECKED]:
                 continue
             wfile = row[FM_PATH]
-            if wfile not in self.filechunks:
-                continue
-            chunks = self.filechunks[wfile]
+            if wfile in self.filechunks:
+                chunks = self.filechunks[wfile]
+            else:
+                chunks = self.read_file_chunks(wfile)
+                for c in chunks:
+                    c.active = True
             for i, chunk in enumerate(chunks):
                 if i == 0:
                     chunk.write(buf)

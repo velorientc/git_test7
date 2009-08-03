@@ -11,20 +11,32 @@ TortoiseHg provides visual representation of the file status via overlay
 icons in the MS-Explorer windows. This is similar to those that found on
 other Tortoise client, such as TortoiseCVS and TortoiseSVN.
 
-Beginning from TortoiseHg version 0.5, the overlay icons are shared with
-TortoiseSVN (version 1.5.x or later) via the support of TortoiseOverlays
+TortoiseHg shares the overlay icons with TortoiseSVN (version 1.5.x or
+later) and the other "Tortoise" projects via the use of TortoiseOverlays
 (another project created by TortoiseSVN team).
 
 .. figure:: figures/overlayicons.png
 	:alt: Overlay icons
 
-	Overlay icons in Icons view (this image shows release 0.7 overlays)
+	Overlay icons in Icons view (XP)
 
-In release 0.8, we added an :guilabel:`Update Icons` context menu option
-which forces TortoiseHg to refresh the icons in the currently browsed
-repository or directory of repositories. The taskbar icon will turn
-green and the directory icons will turn into question marks while this
-refresh is in progress.
+The context menu has an :guilabel:`Update Icons` option which forces
+TortoiseHg to refresh the icons in the currently browsed repository or
+directory of repositories. The taskbar icon will turn green and the
+directory icons will turn into question marks while this refresh is in
+progress.
+
+The new C++ shell extension is an order of magnitude faster than the
+Python extension used in previous releases, but we still make the
+overlays configurable via the taskbar menu.  Simply click on the
+Mercurial (droplet) icon in the system tray and select
+:guilabel:`Options`.  In the options dialog you can disable overlays
+globally, or enable them for local disks only.
+
+.. figure:: figures/taskbarui.jpg
+	:alt: Taskbar options dialog
+
+	Taskbar Options Dialog
 
 Release 0.8.1 introduced the ability to selectively disable overlay
 icons in specific repositories.  This can be done be editing the
@@ -33,47 +45,60 @@ contents with a single line containing::
 
 	@@noicons
 
-Performance Issues
-------------------
-
-When the repository being viewed contains a large number of folders or
-files, the overlay icons may appear case a perceivable delay in
-displaying/refreshing the windows explorer. In most cases, the delay is
-more prominent when the first time the repositories are viewed.
-Subsequently the caching of the file system usually helps to reduce the
-delay rather significantly.
-
-The delay may also be felt on repositories located on network drives or
-other slower media.
-
-In 0.8, the new C++ shell extension is an order of magnitude faster than
-the Python extension used in previous releases, but we still make the
-overlays configurable via the taskbar menu.  Simply click on the
-Mercurial (droplet) icon in the system tray and select :guilabel:`Options`.
-In the options dialog you can disable overlays globally, or enable them for
-local disks only.
-
 Context Menus
 -------------
 
 The TortoiseHg commands (GUI window & dialogs) may be accessed via the
 context menu of Explorer windows. The TortoiseHg context menu is 
-context sensitive, which varies according to the folder being viewed.
+context sensitive and which varies according to the current folder and
+file selection.  Here is the context menu for a revisioned folder:
 
-.. figure:: figures/contextmenu.png
+.. figure:: figures/cmenu-nofiles.jpg
 	:alt: Context menu
 
-	Context menu for a folder under Mercurial revision control (version 0.7)
+	Context menu for a folder under Mercurial revision control
 
-Currently TortoiseHg provides only the most regularly used Mercurial
-commands, hence the less frequently used, or newly add, Mercurial
-commands may still need be accessed on the CLI (command line interface)
-through the :file:`cmd.exe` windows.
+And here is the context menu for selected files or folders:
 
-In 0.8, the new C++ shell extension makes the context menu somewhat
-configurable via the taskbar menu. Simply click on the Mercurial
-(droplet) icon in the system tray and select :guilabel:`Options`.
-In the options dialog you can promote individual menu options to
-the top menu.
+.. figure:: figures/cmenu-files.jpg
+	:alt: Context menu
+
+	Context menu for file or folder selection
+
+TortoiseHg provides dialogs for the most regularly used Mercurial
+commands.  Less frequently used, and newly added, Mercurial commands
+must need be accessed on the CLI (command line interface) through the
+:file:`cmd.exe` windows.
+
+The context menus are configurable via the taskbar menu. Simply click on
+the Mercurial (droplet) icon in the system tray and select
+:guilabel:`Options`.  In the options dialog you can promote individual
+menu options to the top menu.
+
+This is the file rename/move dialog:
+
+.. figure:: figures/rename.jpg
+	:alt: Rename file dialog 
+
+
+Nautilus
+--------
+
+TortoiseHg also provides shell integration with the GNOME desktop via a
+nautilus-python plugin.  If you have installed TortoiseHg from a
+distribution package, the odds are that this extension is already
+configured.  If not, please consult our Wiki for instructions on how to
+enable this feature.
+
+While the nautilus extension does not have it's own GUI for managing the
+overlays and context menus, it does support command promotion into the
+top menu.  It requires you to edit your :file:`~/.hgrc` file and add
+lines like these::
+
+	[tortoisehg]
+	promoteditems = commit, log, synch
+
+.. figure:: figures/nautilus.png
+	:alt: Nautilus screenshot
 
 .. vim: noet ts=4

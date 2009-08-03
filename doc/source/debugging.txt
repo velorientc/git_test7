@@ -1,11 +1,11 @@
-TortoiseHg Debugging 
-====================
+Debugging 
+=========
 
 .. module:: debugging
 	:synopsis: Debug problems in shell extension or dialogs
 
-Debugging Dialogs
------------------
+Dialogs
+-------
 
 Stderr is being captured to a buffer that is being inspected at program
 exit.  If any serious errors (tracebacks, etc) are found in the stderr
@@ -43,8 +43,8 @@ into your shell window, while inside the repository::
 
 
 
-Debugging Shell Extension
--------------------------
+Shell Extension
+---------------
 
 The debugging mechanisms depend on your platform.
 

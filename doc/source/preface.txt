@@ -10,8 +10,8 @@ Audience
 
 This book is written for computer literate folk who want to use
 Mercurial to manage their data, but are uncomfortable using the command
-line client to do so. Since TortoiseHg is a windows shell extension it's
-assumed that the user is familiar with the windows explorer and knows
+line client to do so. Since TortoiseHg is a Windows shell extension it's
+assumed that the user is familiar with the Windows explorer and knows
 how to use it.
 
 You can find the most up to date version of this documentation at our
@@ -24,12 +24,16 @@ This Preface explains a little about the TortoiseHg project, the
 community of people who work on it, and the licensing conditions for
 using it and distributing it.
 
-The :doc:`intro`, explains what TortoiseHg is, what it does, where it
+The :doc:`intro` explains what TortoiseHg is, what it does, where it
 comes from and the basics for installing it on your PC.
 
-The :doc:`quick`, is a quick tutorial on how to start with TortoiseHg.
+:doc:`quick` is a quick tutorial on how to start with TortoiseHg.
 
-The remaining chapters describe the tools that are part of TortoiseHg.
+:doc:`faq` has a list of common questions and their answers.
+
+:doc:`debugging` describes how to debug any problems that you find.
+
+The remaining chapters describe the components that make up TortoiseHg.
 
 TortoiseHg is free!
 ===================
@@ -46,6 +50,7 @@ Mailing Lists:
 
 * `Users <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_
 * `Developers <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_
+* `Issues <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_
 
 And our `wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ on BitBucket.
 

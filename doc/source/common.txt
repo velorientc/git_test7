@@ -17,8 +17,8 @@ This includes maximization status.
 If the state to be restored does not fit within your current screen
 dimensions, the application will revert to factory default dimensions.
 
-The TortoiseHg dialogs which are more transitory in nature allow the
-window manager to place them where it wishes.
+Dialogs which have fixed geometry or are transitory allow the window
+manager to place them where it wishes.
 
 Keyboard Accelerators
 ---------------------
@@ -48,16 +48,51 @@ access cut-paste functionality, for instance.
 Visual Diffs
 ------------
 
-0.8 introduced a visual diff dialog that solves four usability issues:
+.. figure:: figures/visual-diff.jpg
+	:alt: Visual Diff Window 
 
-1) The ability to select visual diff tools for individual files
+TortoiseHg 0.8 introduced a visual diff dialog that solves four
+usability issues:
+
+1) Allows you to select a visual diff tool for each individual file
 2) Allows you to use visual diff tools that fork background processes
 3) Allows you to use visual diff tools that do not support directory diffs
 4) Provides feedback when no files were modified 
 
-If you prefer the previous (<=0.7) behavior of directly launching your
-visual diff tool, you can recover that behavior via the user settings
-dialog and :menuselection:`TortoiseHg --> Skip Diff Window`.
+Providing visual diffs requires TortoiseHg to generate temporary files
+which contain older versions of data.  Those temporary files are deleted
+when the visual diff dialog is closed.
+
+If you would like to bypass this visual diff window and directly launch
+your visual diff tool open the global settings dialog and set
+:menuselection:`TortoiseHg --> Skip Diff Window` to true.
+
+.. note::
+	The `Skip Diff Window` configurable does not change the behavior of
+	visual diffs launched by the shell context menu.  The visual diff
+	window is always shown.
+
+.. warning::
+	When you bypass the visual diff window, your visual diff tool must
+	be able to handle directory diffs and it must not fork a background
+	process.  Caveat emptor.
+
+Configuring a visual diff application for use in TortoiseHg is a two
+step process.  First you must configure your application as an
+`Extdiff <http://mercurial.selenic.com/wiki/ExtdiffExtension>`_
+command in your user :file:`Mercurial.ini`::
+
+	[extdiff]
+	myapp = C:\Path\to\tool.exe
+
+Then you can select `myapp` from the list of available extdiff
+commands in :menuselection:`TortoiseHg --> Visual Diff Command`.
+See the :doc:`faq` for some configuration examples.
+
+When more than one `Extdiff` command is configured, the visual diff
+window will allow you to select the command to use as you open each
+file.
+
 
 Treeview searches
 -----------------
@@ -84,15 +119,16 @@ HG command dialog
 -----------------
 
 Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
-commands that could potentially be interactive.  In release 0.8, the
-dialog was changed to draw all error messages in a dark red color to
-give them more contrast from normal output messages.
+commands that could potentially be interactive.  
 
-The dialog focuses its :guilabel:`Close` button when the command has
-completed, so a simple :kbd:`Enter` is all that is required to close
-the window.
+.. figure:: figures/hgcmd.jpg
+	:alt: Mercurial command dialog
 
-*hgcmd* also responds appropriately to the global :kbd:`Ctrl-W` and
-:kbd:`Ctrl-Q` keyboard accelerators.
+.. note::
+	Error messages are given a dark red color for contrast
+
+When the Mercurial command has completed, the dialog gives focus to its
+:guilabel:`Close` button.  So pressing :kbd:`Enter` is all that is
+required to close the window.
 
 .. vim: noet ts=4

@@ -1,6 +1,6 @@
-***********************
-TortoiseHg Introduction
-***********************
+************
+Introduction
+************
 
 .. module:: introduction
 	:synopsis: Introduce TortoiseHg and its various parts
@@ -42,15 +42,16 @@ file and follow the instructions. The installer will take care of the rest.
 After installation a reboot is necessary.
 
 .. note::
-	If you have an older (less than 0.8) version already installed, the
-	installer will ask that you to remove the previous version of
-	TortoiseHg, which must be removed from control panel.  Removing
-	TortoiseOverlays is also recommended, if no other apps are using
-	them, but not strictly required.
+	If you have an older (<0.8) version already installed, the installer
+	will ask that you to remove the previous version of TortoiseHg.  The
+	uninstall can be done from the control panel or the start menu.  If
+	no other applications are using TortoiseOverlays, it is recommended,
+	but not strictly required, to uninstall them when you upgrade an
+	earlier release.
 
 	If you have 0.8 or later already installed, you must close all
 	instances of the ThgTaskBar application before installation can
-	procede.
+	proceed.
 	
 
 Language settings
@@ -61,14 +62,15 @@ You don't need to download a language pack. All the available languages
 are shipped with the installer. Look in
 :file:`C:\\Program Files\\TortoiseHg\\locale` for the available
 languages. To enable a language just set the environment variable
-``LANG`` to the desidered language, e.g. for italian ``SET LANG=it``.
+``LANGUAGE`` to the desidered language, e.g. for italian
+``set LANGUAGE=it``.
 
 .. note::
-	After setting LANG, if the standard GUI elements like :guilabel:`OK`,
-	:guilabel:`Apply` etc. still appear in English, it means that the
-	TortoiseHg installer did not include the translation component of GTK+
-	for your locale.  This was probably due to an incomplete translation
-	of TortoiseHg at the moment of release it.
+	After setting LANGUAGE, if the standard GUI elements like
+	:guilabel:`OK` and :guilabel:`Apply` still appear in English, it
+	means the TortoiseHg installer did not include a translation of GTK+
+	for your locale.  This means the translation of TortoiseHg for your
+	locale was incomplete at release time.
 
 The Windows shell extension context menus get their translations from
 the Windows registry.  Translations for many locales are available from
@@ -88,7 +90,7 @@ Deb packages for Ubuntu can be found at
 `that <https://launchpad.net/~tortoisehg-ppa>`_ location.
 
 For MacOSX, no packages are available but you can run hgtk and all the
-dialogs via the source install method.
+dialogs via the source install method. For details, see
 `MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
 
 Language settings

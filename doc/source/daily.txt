@@ -16,5 +16,7 @@ TortoiseHg in daily use
 	datamine
 	synchronize
 	serve
+	guess
+	ignore
 
 .. vim: noet ts=4

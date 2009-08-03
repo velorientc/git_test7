@@ -1,6 +1,6 @@
-**************
-TortoiseHg FAQ
-**************
+**************************
+Frequently Asked Questions
+**************************
 
 
 *What is TortoiseHg?*

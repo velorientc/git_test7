@@ -1,5 +1,5 @@
-TortoiseHg Serve
-================
+Serve
+=====
 
 .. module:: serve.dialog
 	:synopsis: Dialog used to start/stop the web server
@@ -12,22 +12,24 @@ launched, any computer can attach to the http port and browse your
 repository(ies) or perform clone, pull, or even push operations (if you
 configure your server to allow it).
 
-:guilabel:`Start`
-	start the web server
+Toolbar buttons:
 
-:guilabel:`Stop`
-	stop the web server
+	:guilabel:`Start`
+		start the web server
+	:guilabel:`Stop`
+		stop the web server
+	:guilabel:`Browse`
+		open your default browser at the built-in web server
+	:guilabel:`Configure`
+		Configure repository web style, description, and access policies
 
-:guilabel:`Browse`
-	open your default browser at the built-in web server
+When the settings dialog is launched via the :guilabel:`Configure`
+button, it is run in the context of the current repository.  Please
+visit the Mercurial wiki for detailed descriptions of the various
+web configurations.
 
-:guilabel:`Configure`
-	Configure repository web style, description, and access policies
-
-When the settings dialog is launched via the :guilabel:`Configure` button, it is
-run in the context of the current repository.  Please visit the
-Mercurial wiki for detailed descriptions of what the various web
-configurations are for.
+Multiple Repositories
+---------------------
 
 If you wish to serve a many repositories with a single web server
 instance, you can create an :file:`hgwebdir.conf` text file with the
@@ -41,32 +43,22 @@ of the web server and the second path describes here the repositories
 can be found on your computer.  Multiple entries are possible.
 
 To use this file you must launch the TortoiseHg serve dialog from the
-command line via: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.  In a
-future release of TortoiseHg, we hope to make this launchable from the
-shell context menu.
+command line via: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.
+
 
 From command line
 -----------------
 
 The server tool can be started from command line ::
 
-	hgtk serve
+	hgtk serve [OPTION]...
 
+	web server
 
-The syntax is ::
+	options:
 
-	hgtk serve [OPTIONS]
+		--webdir-conf  name of the webdir config file
 
-The valid [OPTIONS] are:
-
-``--webdir-conf``
-	It specifies the name of the webdir config file. See above for details.
-
-
-Changes since 0.7
------------------
-
-* Improved error handling
-* i18n fixes
+	use "hgtk -v help serve" to show global options
 
 .. vim: noet ts=4

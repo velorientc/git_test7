@@ -1,5 +1,6 @@
-TortoiseHg Recovery
-===================
+********
+Recovery
+********
 
 .. module:: recovery.dialog
 	:synopsis: Dialog used to perform recovery operations
@@ -7,7 +8,7 @@ TortoiseHg Recovery
 .. figure:: figures/recover.png
 	:alt: Recovery dialog
 
-The buttons all equate to a single Mercurial command (save stop, obviously)
+The toolbar buttons equate to a Mercurial command
 
 :guilabel:`clean`
 	:command:`hg update --clean` - performs a clean checkout of the
