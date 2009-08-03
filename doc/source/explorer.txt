@@ -98,5 +98,7 @@ lines like these::
 	[tortoisehg]
 	promoteditems = commit, log, synch
 
+.. figure:: figures/nautilus.png
+	:alt: Nautilus screenshot
 
 .. vim: noet ts=4
