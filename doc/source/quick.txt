@@ -29,7 +29,7 @@ TortoiseHg.  You do this by adjusting the global settings of TortoiseHg.
 Right click in your source folder and select
 :menuselection:`TortoiseHg --> Global Settings`
 
-.. figure:: figures/contextmenu.png
+.. figure:: figures/cmenu-nofiles.jpg
 	:alt: Context Menu
 
 You must then select the :guilabel:`Commit` tab and enter a name in the
