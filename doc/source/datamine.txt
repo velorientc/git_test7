@@ -1,5 +1,5 @@
-TortoiseHg Datamine
-===================
+Datamine
+========
 
 .. module:: datamine.dialog
 	:synopsis: Dialog used to search in the history
@@ -13,7 +13,7 @@ Search Tabs
 -----------
 
 .. figure:: figures/search.png
-   :alt: Search dialog
+	:alt: Search dialog
 
    Search dialog
 
@@ -22,30 +22,29 @@ history for keywords, variable names, functions, etc...
 
 The text entry fields have these purposes:
 
-*regexp*
-	this is where you enter your regular expression search criteria.
-*includes*
-	a comma separated list of paths to include in your search. If no
-	paths are given, the search is assumed to be repository wide. In
-	other words, specifying an include path actually narrows the search
-	criteria.
-*excludes*
-	a comma separated list of paths to exclude from your search.
-	Exclusion patterns are applied after inclusion patterns.
+	:guilabel:`regexp`
+		Regular expression search criteria.
+	:guilabel:`includes`
+		Comma separated list of paths to include in your search. If no
+		paths are given, the search is assumed to be repository wide. In
+		other words, specifying an include path actually narrows the
+		search criteria.
+	:guilabel:`excludes`
+		Comma separated list of paths to exclude from your search.
+		Exclusion patterns are applied after inclusion patterns.
 
 The toggle buttons below the entry fields are for:
 
-:guilabel:`Follow copies and renames`
-	follow searches through copies and renames out of inclusion filters
-:guilabel:`Ignore case`
-	Perform the search without case considerations
-:guilabel:`Show line numbers`
-	Show line numbers at the front of the matching lines
-:guilabel:`Show all matching revisions`
-	Show every instance where the search criteria matches in a file, not
-	just the most recent revision.  It shows +/- to indicate whether the
-	change adds or removes your search text.
-
+	:guilabel:`Follow copies and renames`
+		follow searches through copies and renames out of inclusion filters
+	:guilabel:`Ignore case`
+		Perform the search without case considerations
+	:guilabel:`Show line numbers`
+		Show line numbers at the front of the matching lines
+	:guilabel:`Show all matching revisions`
+		Show every instance where the search criteria matches in a file,
+		not just the most recent revision.  It shows +/- to indicate
+		whether the change adds or removes your search text.
 
 Search tabs are named after the search string most recently used to
 start a search.  The :guilabel:`New Search` toolbar button will
@@ -54,18 +53,19 @@ terminate an ongoing search (the :guilabel:`Stop` button is only
 sensitive when a search is in progress).
 
 Matches
--------
+^^^^^^^
 
 Each match will be a link to a changeset and will have a descriptive
 tooltip (author, date/time, summary).  Right clicking on a matched line
 will bring up a context menu with these features:
 
-:guilabel:`display change`
-	open a changeset window with this changeset, to see the full context
-:guilabel:`annotate file`
-	open an annotation tab for this file at this revision
-:guilabel:`file history`
-	open a changelog window with this file's revision history
+	:guilabel:`display change`
+		open a changeset window with this changeset, to see the full context
+	:guilabel:`annotate file`
+		open an annotation tab for this file at this revision
+	:guilabel:`file history`
+		open a changelog window with this file's revision history
+
 
 Annotate Tabs
 -------------
@@ -82,11 +82,12 @@ graph updates the file annotation to that revision.
 
 In the bottom pane is the actual annotation. Each line in the annotation
 is also a link to the changeset which provided that line. Activating a
-row will open that changeset in the changeset browser.
+row will zoom the changelog (top pane) to the changeset that introduced
+that line and change focus to the top pane.
 
-The color scheme in the annotation pane is two tier. Authors are
-determined by hue, and age is determined by saturation. The older a
-change is, the lighter the color becomes.
+The color scheme in the annotation pane is two dimensional. Authors
+determine hue, and age determines saturation. The older a change, the
+lighter the color.
 
 By right-clicking on the annotate pane's column headers (Line, Rev,
 Source) you can bring up a menu for showing two optional columns:
@@ -96,7 +97,7 @@ Following Renames
 ^^^^^^^^^^^^^^^^^
 
 The annotation data will automatically follow lines of code back through
-copies and renames to find the initial changeset that introduced that
+copies and renames to find the initial changeset that introduced the
 line.  The graph log pane will not follow renames or copies
 automtaically.  Instead, when you click on a changeset in the revision
 graph that involved a rename or copy event, a button will appear that
@@ -112,6 +113,9 @@ for other tools:
 
 :menuselection:`Changelog --> Author Coloring`
 	Give each author a separate color in the changelog graph
+:menuselection:`Changelog --> Long Summary`
+	Concatenates lines of commit message together to reach an 80
+	character summary.
 :menuselection:`TortoiseHg --> Tab width`
 	Number of spaces to expand tabs in diffs and annotate output
 
@@ -122,14 +126,10 @@ The datamine tool can be started from command line ::
 
 	hgtk datamine
 
-or ::
+	aliases: annotate, blame
 
-	hgtk annotate
+	repository search and annotate tool
 
-or ::
-
-	hgtk blame
-	
-The syntax is simple, no options or parameters are needed, except the global options.
+	use "hgtk -v help datamine" to show global options
 
 .. vim: noet ts=4
