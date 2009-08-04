@@ -1,4 +1,9 @@
 # hgversion.py - Version information for Mercurial
+#
+# Copyright 2009 Steve Borho <steve@borho.org>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 try:
     # post 1.1.2
