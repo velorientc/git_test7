@@ -29,7 +29,8 @@ import gtk
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
-from mercurial import ui
+from mercurial import ui, util
+from thgutil.hgversion import hgversion, checkhgversion
 import cStringIO
 import traceback
 
@@ -43,6 +44,11 @@ except ImportError:
 
 _ui = ui.ui()
 capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
+
+err = checkhgversion(hgversion)
+if err:
+    _ui.warn('abort: %s\n' % err)
+    sys.exit(1)
 
 if not capt or 'THGDEBUG' in os.environ:
     sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))

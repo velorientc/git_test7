@@ -166,11 +166,6 @@ def _parse(ui, args):
 def _runcatch(ui, args):
     try:
         try:
-            checkhgversion(hglib.hgversion)
-        except util.Abort, inst:
-            ui.status(_("abort: %s!\n") % inst)
-            return 0
-        try:
             return runcommand(ui, args)
         finally:
             ui.flush()
@@ -569,26 +564,6 @@ def help_(ui, name=None, with_version=False):
                 ui.write(" %-*s  %s\n" % (opts_len, first, second))
             else:
                 ui.write("%s\n" % first)
-
-def checkhgversion(v):
-    """range check the Mercurial version"""
-    # this is a series of hacks, but Mercurial's versioning scheme
-    # doesn't lend itself to a "correct" solution.  This will at least
-    # catch people who have old Mercurial packages.
-    reqver = ['1', '3']
-    if not v or v == 'unknown' or len(v) >= 12:
-        # can't make any intelligent decisions about unknown or hashes
-        return
-    vers = v.split('.')[:2]
-    if vers == reqver or len(vers) < 2:
-        return
-    nextver = list(reqver)
-    nextver[1] = chr(ord(reqver[1])+1)
-    if vers == nextver:
-        return
-    raise util.Abort(_('This version of TortoiseHg requires Mercurial '
-                       'version %s.n to %s.n, but finds %s') %
-                       ('.'.join(reqver), '.'.join(nextver), v))
 
 def version(ui, **opts):
     """output version and copyright information"""
