@@ -31,6 +31,7 @@ demandimport.ignore.append('win32com.shell')
 demandimport.enable()
 from mercurial import ui
 import cStringIO
+import traceback
 
 try:
     import hggtk.hgtk
@@ -47,18 +48,24 @@ if not capt or 'THGDEBUG' in os.environ:
     sys.exit(hggtk.hgtk.dispatch(sys.argv[1:]))
 else:
     mystderr = cStringIO.StringIO()
+    origstderr = sys.stderr
     sys.stderr = mystderr
-    ret = hggtk.hgtk.dispatch(sys.argv[1:])
-    mystderr.seek(0)
-    for l in mystderr.readlines():
-        if l.startswith('Traceback') or l.startswith('TypeError'):
-            from hggtk.bugreport import run
-            from hggtk.hgtk import gtkrun
-            error = 'Recoverable runtime error (stderr):\n'+mystderr.getvalue()
-            opts = {}
-            opts['cmd'] = ' '.join(sys.argv[1:])
-            opts['error'] = error
-            opts['nofork'] = True
-            gtkrun(run, _ui, **opts)
-            break
-    sys.exit(ret)
+    try:
+        ret = hggtk.hgtk.dispatch(sys.argv[1:])
+        mystderr.seek(0)
+        for l in mystderr.readlines():
+            if l.startswith('Traceback') or l.startswith('TypeError'):
+                from hggtk.bugreport import run
+                from hggtk.hgtk import gtkrun
+                error = 'Recoverable runtime error (stderr):\n'+mystderr.getvalue()
+                opts = {}
+                opts['cmd'] = ' '.join(sys.argv[1:])
+                opts['error'] = error
+                opts['nofork'] = True
+                gtkrun(run, _ui, **opts)
+                break
+        sys.exit(ret)
+    except:
+        if sys.exc_info()[0] not in [SystemExit, KeyboardInterrupt]:
+            sys.stderr = origstderr
+            traceback.print_exc()
