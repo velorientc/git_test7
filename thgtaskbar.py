@@ -60,7 +60,7 @@ def SetIcon(hwnd, name, add=False):
         action = NIM_ADD
     try:
         Shell_NotifyIcon(action, nid)
-    except:
+    except pywintypes.error:
         # This is common when windows is starting, and this code is hit
         # before the taskbar has been created.
         print "Failed to add the taskbar icon - is explorer running?"
@@ -115,9 +115,12 @@ class MainWindow:
             AppendMenu(menu, win32con.MF_STRING, EXIT_CMD, 'Exit' )
             pos = GetCursorPos()
             # See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/menus_0hdi.asp
-            SetForegroundWindow(self.hwnd)
-            TrackPopupMenu(menu, win32con.TPM_LEFTALIGN, pos[0], pos[1], 0, self.hwnd, None)
-            PostMessage(self.hwnd, win32con.WM_NULL, 0, 0)
+            try:
+                SetForegroundWindow(self.hwnd)
+                TrackPopupMenu(menu, win32con.TPM_LEFTALIGN, pos[0], pos[1], 0, self.hwnd, None)
+                PostMessage(self.hwnd, win32con.WM_NULL, 0, 0)
+            except pywintypes.error:
+                pass
         return 1
 
     def OnCommand(self, hwnd, msg, wparam, lparam):
