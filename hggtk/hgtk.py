@@ -651,7 +651,7 @@ table = {
         [('u', 'user', '', _('record user as committer')),
          ('d', 'date', '', _('record datecode as commit date'))],
         _('hgtk commit [OPTIONS] [FILE]...')),
-    "^datamine|annotate|blame": (datamine, [], _('hgtk datamine')),
+    "^datamine|annotate|blame|grep": (datamine, [], _('hgtk datamine')),
     "^hgignore|ignore|filter": (hgignore, [], _('hgtk hgignore [FILE]')),
     "^init": (hginit, [], _('hgtk init [DEST]')),
     "^log|history": (log,
