@@ -325,6 +325,7 @@ class GLog(gdialog.GDialog):
         gdialog.GDialog.load_settings(self, settings)
         self.setting_vpos = -1
         self.setting_hpos = -1
+        self.branch_color = False
         self.showcol = {}
         try:
             self.setting_vpos = settings['glog-vpane']
