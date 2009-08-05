@@ -272,14 +272,15 @@ class GLog(gdialog.GDialog):
         elif 'revrange' in self.opts:
             self.custombutton.set_active(True)
             self.graphview.refresh(True, None, self.opts)
-        elif self.pats == [self.repo.root] or self.pats == ['']:
+        elif not self.pats:
+            self.reload_log()
+        elif len(self.pats) == 1 and \
+                self.pats[0] in (self.repo.root, self.repo.root+os.sep, ''):
             self.pats = []
             self.reload_log()
-        elif self.pats:
+        else:
             self.custombutton.set_active(True)
             self.reload_log(pats = self.pats)
-        else:
-            self.reload_log()
 
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
