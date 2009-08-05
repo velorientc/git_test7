@@ -366,7 +366,11 @@ class GLog(gdialog.GDialog):
                 self.graphview.refresh(True, branch, self.opts)
             else:
                 self.pats = filteropts.get('pats', [])
-                self.graphview.refresh(False, self.pats, self.opts)
+                if len(self.pats) == 1 and not os.path.isdir(self.pats[0]):
+                    self.opts['filehist'] = self.pats[0]
+                    self.graphview.refresh(True, self.pats, self.opts)
+                else:
+                    self.graphview.refresh(False, self.pats, self.opts)
         elif self.filter == 'all':
             self.graphview.refresh(True, None, self.opts)
         elif self.filter == 'new':
