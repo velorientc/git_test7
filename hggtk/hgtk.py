@@ -96,7 +96,9 @@ def get_list_from_file(filename):
 
     # Convert absolute file paths to repo/cwd canonical
     cwd = os.getcwd()
-    root = paths.find_root()
+    root = paths.find_root(cwd)
+    if not root:
+        return lines
     if cwd == root:
         cwd_rel = ''
     else:
