@@ -640,20 +640,21 @@ class GCommit(GStatus):
         cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
 
         if self.nextbranch:
+            # response: 0=Yes, 1=No, 2=Cancel
             newbranch = hglib.fromutf(self.nextbranch)
             if newbranch in self.repo.branchtags():
                 if newbranch not in [p.branch() for p in self.repo.parents()]:
-                    response = gdialog.Confirm(_('Confirm Override Branch'),
-                            [], self, _('A branch named "%s" already exists,\n'
-                        'override?') % self.nextbranch).run()
-                else:
-                    response = gtk.RESPONSE_YES
+                    response = gdialog.CustomPrompt(_('Confirm Override Branch'),
+                        _('A branch named "%s" already exists,\n'
+                        'override?') % self.nextbranch, self,
+                        (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
             else:
-                response = gdialog.Confirm(_('Confirm New Branch'), [], self,
-                        _('Create new named branch "%s"?') % self.nextbranch).run()
-            if response == gtk.RESPONSE_YES:
+                response = gdialog.CustomPrompt(_('Confirm New Branch'),
+                    _('Create new named branch "%s"?') % self.nextbranch,
+                    self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+            if response == 0:
                 self.repo.dirstate.setbranch(newbranch)
-            elif response != gtk.RESPONSE_NO:
+            elif response == 2:
                 return
         elif self.closebranch:
             cmdline.append('--close-branch')
