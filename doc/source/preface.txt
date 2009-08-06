@@ -48,9 +48,9 @@ Community
 
 Mailing Lists:
 
-* `Users <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_
-* `Developers <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_
-* `Issues <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_
+* `Users <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - Announcements, user Q&A, and feature discussions.
+* `Developers <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - Patches, bug reports, development discussions.
+* `Issues <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Notifications from the issue tracker.
 
 And our `wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ on BitBucket.
 
