@@ -22,6 +22,6 @@ def agettext(message):
     try:
         u = _(message)
         return hglib.fromutf(u)
-    except LookupError:
+    except (LookupError, UnicodeEncodeError):
         return message
 
