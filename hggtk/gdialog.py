@@ -51,7 +51,7 @@ class CustomPrompt(gtk.MessageDialog):
     '''
     # ret = CustomPrompt('Title', 'Message', self, ('&Yes', 'N&o'), 1).run()
     # ret will be (gtk.RESPONSE_DELETE_EVENT, 0 (for yes), or 1 (for no)
-    def __init__(self, title, message, parent, choices, default=None):
+    def __init__(self, title, message, parent, choices, default=None, esc=None):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION)
         self.set_title(hglib.toutf(title))
@@ -65,9 +65,12 @@ class CustomPrompt(gtk.MessageDialog):
                     gtk.ACCEL_VISIBLE)
         if default:
             self.set_default_response(default)
+        self.esc = esc
 
     def run(self):
         response = gtklib.MessageDialog.run(self)
+        if response == gtk.RESPONSE_DELETE_EVENT and self.esc != None:
+            response = self.esc
         self.destroy()
         return response
 
