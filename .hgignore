@@ -5,6 +5,7 @@ syntax: glob
 *.pyc
 thgutil/__version__.py
 build/
+build-ja/
 dist/
 Output/
 .*.swp
