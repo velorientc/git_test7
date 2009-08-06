@@ -80,6 +80,8 @@ This is the file rename/move dialog:
 .. figure:: figures/rename.jpg
 	:alt: Rename file dialog 
 
+	File rename (or move) dialog
+
 
 Nautilus
 --------
@@ -100,5 +102,7 @@ lines like these::
 
 .. figure:: figures/nautilus.png
 	:alt: Nautilus screenshot
+
+	GNOME/Nautilus screenshot
 
 .. vim: noet ts=4

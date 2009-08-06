@@ -51,6 +51,8 @@ Visual Diffs
 .. figure:: figures/visual-diff.jpg
 	:alt: Visual Diff Window 
 
+	Visual Diff Window
+
 TortoiseHg 0.8 introduced a visual diff dialog that solves four
 usability issues:
 
@@ -123,6 +125,8 @@ commands that could potentially be interactive.
 
 .. figure:: figures/hgcmd.jpg
 	:alt: Mercurial command dialog
+
+	Interactive Mercurial Command Dialog
 
 .. note::
 	Error messages are given a dark red color for contrast
