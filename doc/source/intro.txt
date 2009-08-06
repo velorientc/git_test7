@@ -22,7 +22,9 @@ On Windows,
 On Linux,
 	TortoiseHg consists of a command line hgtk script, and a Nautilus
 	extension which provides overlays and context menus in your file
-	explorer.
+	explorer.  You must have Mercurial installed separately in order to
+	run TortoiseHg on Linux.  TortoiseHg binary packages list Mercurial
+	as a dependency, so it is usually installed for you automatically.
 
 TortoiseHg is primarily written in Python and PyGtk (the Windows shell
 extension being a noticeable exception).  The hgtk script and TortoiseHg
