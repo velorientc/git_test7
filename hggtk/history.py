@@ -20,7 +20,7 @@ from thgutil import hglib, paths
 from hggtk.logview import treemodel
 from hggtk.logview.treeview import TreeView as LogTreeView
 
-from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter
+from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter, gorev
 from hggtk import backout, status, hgemail, tagadd, update, merge, archive
 from hggtk import changeset
 
@@ -65,7 +65,12 @@ class GLog(gdialog.GDialog):
                     _('_DataMine'),
                     self.datamine_clicked,
                     tip=_('Search Repository History')),
-                gtk.SeparatorToolItem()
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_JUMP_TO,
+                    _('Select Revision'),
+                    self.goto_clicked,
+                    tip=_('Select revision')),
+                gtk.SeparatorToolItem(),
              ] + self.changeview.get_tbbuttons()
         if not self.opts.get('from-synch'):
             self.synctb = self.make_toolbutton(gtk.STOCK_NETWORK,
@@ -452,6 +457,7 @@ class GLog(gdialog.GDialog):
 
     def get_body(self):
         self.filter_dialog = None
+        self.gorev_dialog = None
         self._menu = self.tree_context_menu()
         self._menu2 = self.tree_diff_context_menu()
 
@@ -539,6 +545,37 @@ class GLog(gdialog.GDialog):
         'ctrl-p handler'
         parent = self.repo['.'].rev()
         self.graphview.set_revision_id(parent)
+
+    def goto_clicked(self, toolbutton, data=None):
+        if self.gorev_dialog:
+            self.gorev_dialog.show()
+            self.gorev_dialog.present()
+        else:
+            self.show_goto_dialog()
+
+    def show_goto_dialog(self):
+        'Launch a modeless goto revision dialog'
+        def goto_rev_(rev):
+            self.goto_rev(rev)
+
+        def close_filter_dialog(dialog, response_id):
+            dialog.hide()
+
+        def delete_event(dialog, event, data=None):
+            # return True to prevent the dialog from being destroyed
+            return True
+
+        dlg = gorev.GotoRevDialog(goto_rev_)
+        dlg.connect('response', close_filter_dialog)
+        dlg.connect('delete-event', delete_event)
+        dlg.set_modal(False)
+        dlg.show()
+
+        self.gorev_dialog = dlg
+
+    def goto_rev(self, revision):
+        rid = self.repo[revision].rev()
+        self.graphview.set_revision_id(rid, load=True)
 
     def strip_rev(self, menuitem):
         rev = self.currow[treemodel.REVID]
