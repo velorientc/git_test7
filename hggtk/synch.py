@@ -147,51 +147,46 @@ class SynchDialog(gtk.Window):
                 [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
         self.connect('drag_data_received', self._drag_receive)
 
-        # create checkbox to disable proxy
-        self.use_proxy = gtk.CheckButton(_('use proxy server'))
-        if ui.ui().config('http_proxy', 'host', ''):
-            self.use_proxy.set_active(True)
-        else:
-            self.use_proxy.set_sensitive(False)
+        # group for 'Post pull operation'
+        ppullhbox = gtk.HBox()
+        self.ppulldata = [('none', _('Nothing')), ('update', _('Update')),
+                ('fetch', _('Fetch')), ('rebase', _('Rebase'))]
+        self.ppullcombo = combo = gtk.combo_box_new_text()
+        for (index, (name, label)) in enumerate(self.ppulldata):
+            combo.insert_text(index, label)
+        ppullhbox.pack_start(gtk.Label(_('Post Pull: ')), False, False, 2)
+        ppullhbox.pack_start(self.ppullcombo, True, True)
 
-        # groupbox for 'Post pull operation'
-        frame = gtk.Frame(_('Post pull operation'))
-        ppvbox = gtk.VBox()
-        self.nothingradio = gtk.RadioButton(None, _('Nothing'))
-        self.updateradio = gtk.RadioButton(self.nothingradio, _('Update'))
-        self.fetchradio = gtk.RadioButton(self.nothingradio, _('Fetch'))
-        self.rebaseradio = gtk.RadioButton(self.nothingradio, _('Rebase'))
-        ppvbox.pack_start(self.nothingradio, True, True, 2)
-        ppvbox.pack_start(self.updateradio, True, True, 2)
-        ppvbox.pack_start(self.fetchradio, True, True, 2)
-        ppvbox.pack_start(self.rebaseradio, True, True, 2)
-        frame.add(ppvbox)
-        frame.set_border_width(2)
-
-        # expandable group for 'Advanced options'
+        # Advanced options
         self.expander = expander = gtk.Expander(_('Advanced Options'))
         expander.set_expanded(False)
         expander.connect_after('activate', self.expanded)
         hbox = gtk.HBox()
         expander.add(hbox)
 
-        leftvbox = gtk.VBox()
-        leftvbox.pack_start(frame, False, False, 2)
-        leftvbox.pack_start(self.use_proxy, False, False, 3)
+        fixedhbox = gtk.HBox()
+        fixedhbox.pack_start(targethbox, True, True, 2)
+        fixedhbox.pack_start(ppullhbox, False, False, 2)
 
-        rightvbox = gtk.VBox()
-        rightvbox.pack_start(targethbox, False, False, 2)
-        rightvbox.pack_start(expander, True, True, 2)
+        topvbox = gtk.VBox()
+        topvbox.pack_start(fixedhbox, True, True, 2)
+        topvbox.pack_start(expander, False, False, 2)
+        vbox.pack_start(topvbox, False, False, 2)
 
-        tophbox = gtk.HBox()
-        tophbox.pack_start(rightvbox, True, True, 2)
-        tophbox.pack_start(leftvbox, False, False, 2)
-        vbox.pack_start(tophbox, False, False, 2)
+        # checkbox options
+        chkopthbox = gtk.HBox()
+        self.force = gtk.CheckButton(_('Force pull or push'))
+        self.use_proxy = gtk.CheckButton(_('use proxy server'))
+        if ui.ui().config('http_proxy', 'host', ''):
+            self.use_proxy.set_active(True)
+        else:
+            self.use_proxy.set_sensitive(False)
+        chkopthbox.pack_start(self.force, False, False, 4)
+        chkopthbox.pack_start(self.use_proxy, False, False, 4)
 
-        revvbox = gtk.VBox()
+        # other options
         self.reventry = gtk.Entry()
         self.cmdentry = gtk.Entry()
-        self.force = gtk.CheckButton(_('Force pull or push'))
         self.tips.set_tip(self.force, _('Run even when remote repository'
                 ' is unrelated.'))
 
@@ -211,9 +206,10 @@ class SynchDialog(gtk.Window):
         self.tips.set_tip(cmdeventbox, _('Name of hg executable on remote'
                 ' machine.'))
 
-        revvbox.pack_start(self.force, False, False, 8)
-        revvbox.pack_start(reveventbox, True, True, 2)
-        revvbox.pack_start(cmdeventbox, True, True, 2)
+        revvbox = gtk.VBox()
+        revvbox.pack_start(chkopthbox, False, False, 8)
+        revvbox.pack_start(reveventbox, False, False, 4)
+        revvbox.pack_start(cmdeventbox, False, False, 4)
         hbox.pack_start(revvbox, True, True, 4)
 
         # groupbox for 'Incoming/Outgoing'
@@ -274,14 +270,15 @@ class SynchDialog(gtk.Window):
         thread.start()
 
     def update_pull_setting(self):
-        ppull = self.repo.ui.config('tortoisehg', 'postpull', 'None')
-        self.nothingradio.set_active(True)
-        if ppull == 'update':
-            self.updateradio.set_active(True)
-        elif ppull == 'fetch':
-            self.fetchradio.set_active(True)
-        elif ppull == 'rebase':
-            self.rebaseradio.set_active(True)
+        ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
+        for (index, (name, label)) in enumerate(self.ppulldata):
+            if ppull == name:
+                pos = index
+                break;
+        else:
+            pos = [index for (index, (name, label))
+                    in enumerate(self.ppulldata) if name == 'none'][0]
+        self.ppullcombo.set_active(pos)
 
     def fill_path_combo(self):
         self.pathlist.clear()
@@ -435,8 +432,10 @@ class SynchDialog(gtk.Window):
         return opts
 
     def pull_clicked(self, toolbutton, data=None):
+        sel = self.ppullcombo.get_active_text()
+        ppull = [name for (name, label) in self.ppulldata if sel == label][0]
         aopts = self.get_advanced_options()
-        if self.fetchradio.get_active():
+        if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extensions explicitly
             extensions.load(self.ui, 'fetch', None)
@@ -444,9 +443,9 @@ class SynchDialog(gtk.Window):
             cmd = ['pull']
             cmd += aopts.get('force', [])
             cmd += aopts.get('remotecmd', [])
-            if self.updateradio.get_active():
+            if ppull == 'update':
                 cmd.append('--update')
-            elif self.rebaseradio.get_active():
+            elif ppull == 'rebase':
                 cmd.append('--rebase')
             # load the rebase extensions explicitly
             extensions.load(self.ui, 'rebase', None)
