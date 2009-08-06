@@ -80,7 +80,7 @@ Debugging is done via the environment variable DEBUG_THG
   start (~/.profile, ~/.xprofile)
 
 Upper case characters in DEBUG_THG specify modules.  Only *O* and *N*
-for *OverlayCache* and *Nautilus*, respecively, are supported module
+for *OverlayCache* and *Nautilus*, respectively, are supported module
 names.  Lower case characters imply parts. Only *e* is supported,
 implying *error* messages.
 
