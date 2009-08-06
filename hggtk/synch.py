@@ -99,12 +99,16 @@ class SynchDialog(gtk.Window):
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
+
+        # Base box
         basevbox = gtk.VBox()
         self.add(basevbox)
         basevbox.pack_start(self.tbar, False, False, 2)
 
-        # sync target selection buttons
+        # Sync Target Path
         targethbox = gtk.HBox()
+
+        ## target selection buttons
         lbl = gtk.Button(_('Repo:'))
         lbl.unset_flags(gtk.CAN_FOCUS)
         lbl.connect('clicked', self.btn_remotepath_clicked)
@@ -115,7 +119,7 @@ class SynchDialog(gtk.Window):
         lbl.connect('clicked', self.btn_bundlepath_clicked)
         targethbox.pack_start(lbl, False, False)
 
-        # target path combobox
+        ## target path combobox
         self.pathlist = gtk.ListStore(str, str)
         self.pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self.pathtext = self.pathbox.get_child()
@@ -142,12 +146,7 @@ class SynchDialog(gtk.Window):
         elif defrow is not None:
             self.pathbox.set_active(defrow)
 
-        # support dropping of repos or bundle files
-        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
-                [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
-        self.connect('drag_data_received', self._drag_receive)
-
-        # group for 'Post pull operation'
+        # Post Pull Operation
         ppullhbox = gtk.HBox()
         self.ppulldata = [('none', _('Nothing')), ('update', _('Update')),
                 ('fetch', _('Fetch')), ('rebase', _('Rebase'))]
@@ -157,25 +156,23 @@ class SynchDialog(gtk.Window):
         ppullhbox.pack_start(gtk.Label(_('Post Pull: ')), False, False, 2)
         ppullhbox.pack_start(self.ppullcombo, True, True)
 
-        # Advanced options
-        self.expander = expander = gtk.Expander(_('Advanced Options'))
-        expander.set_expanded(False)
-        expander.connect_after('activate', self.expanded)
-        opthbox = gtk.HBox()
-        expander.add(opthbox)
-
+        # Fixed options box (non-foldable)
         fixedhbox = gtk.HBox()
         fixedhbox.pack_start(targethbox, True, True, 2)
         fixedhbox.pack_start(ppullhbox, False, False, 2)
 
-        topvbox = gtk.VBox()
-        topvbox.pack_start(fixedhbox, True, True, 2)
-        topvbox.pack_start(expander, False, False, 2)
-        basevbox.pack_start(topvbox, False, False, 2)
+        # Advanced options (foldable)
+        opthbox = gtk.HBox()
+        self.expander = expander = gtk.Expander(_('Advanced Options'))
+        expander.set_expanded(False)
+        expander.connect_after('activate', self.expanded)
+        expander.add(opthbox)
 
-        # checkbox options
+        ## checkbox options
         chkopthbox = gtk.HBox()
         self.force = gtk.CheckButton(_('Force pull or push'))
+        self.tips.set_tip(self.force, _('Run even when remote repository'
+                ' is unrelated.'))
         self.use_proxy = gtk.CheckButton(_('use proxy server'))
         if ui.ui().config('http_proxy', 'host', ''):
             self.use_proxy.set_active(True)
@@ -184,13 +181,9 @@ class SynchDialog(gtk.Window):
         chkopthbox.pack_start(self.force, False, False, 4)
         chkopthbox.pack_start(self.use_proxy, False, False, 4)
 
-        # other options
-        self.reventry = gtk.Entry()
-        self.cmdentry = gtk.Entry()
-        self.tips.set_tip(self.force, _('Run even when remote repository'
-                ' is unrelated.'))
-
+        ## target revision option
         revhbox = gtk.HBox()
+        self.reventry = gtk.Entry()
         revhbox.pack_start(gtk.Label(_('Target Revision:')), False, False, 2)
         revhbox.pack_start(self.reventry, True, True, 2)
         reveventbox = gtk.EventBox()
@@ -198,7 +191,9 @@ class SynchDialog(gtk.Window):
         self.tips.set_tip(reveventbox, _('A specific revision up to which you'
                 ' would like to push or pull.'))
 
+        ## remote command option
         cmdhbox = gtk.HBox()
+        self.cmdentry = gtk.Entry()
         cmdhbox.pack_start(gtk.Label(_('Remote Command:')), False, False, 2)
         cmdhbox.pack_start(self.cmdentry, True, True, 2)
         cmdeventbox = gtk.EventBox()
@@ -212,7 +207,7 @@ class SynchDialog(gtk.Window):
         revvbox.pack_start(cmdeventbox, False, False, 4)
         opthbox.pack_start(revvbox, True, True, 4)
 
-        # groupbox for 'Incoming/Outgoing'
+        ## incoming/outgoing options
         frame = gtk.Frame(_('Incoming/Outgoing'))
         opthbox.pack_start(frame, False, False, 2)
 
@@ -225,6 +220,12 @@ class SynchDialog(gtk.Window):
         iovbox.pack_start(self.newestfirst, False, False, 2)
         iovbox.pack_start(self.nomerge, False, False, 2)
         frame.add(iovbox)
+
+        # Main option box
+        topvbox = gtk.VBox()
+        topvbox.pack_start(fixedhbox, True, True, 2)
+        topvbox.pack_start(expander, False, False, 2)
+        basevbox.pack_start(topvbox, False, False, 2)
 
         # hg output window
         scrolledwindow = gtk.ScrolledWindow()
@@ -249,9 +250,16 @@ class SynchDialog(gtk.Window):
         self.buttonhbox.pack_start(self.updatetip, False, False, 2)
         basevbox.pack_start(self.buttonhbox, False, False, 2)
 
+        # statusbar
         self.stbar = gtklib.StatusBar()
         basevbox.pack_start(self.stbar, False, False, 2)
 
+        # support dropping of repos or bundle files
+        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
+                [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
+        self.connect('drag_data_received', self._drag_receive)
+
+        # prepare to show
         self.load_settings()
         self.update_pull_setting()
         gobject.idle_add(self.finalize_startup)
