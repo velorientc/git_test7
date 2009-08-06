@@ -1120,31 +1120,46 @@ class GStatus(gdialog.GDialog):
         def dohgrevert():
             commands.revert(self.ui, self.repo, *wfiles, **revertopts)
 
+        def filelist(files):
+            text = ''
+            for i, f in enumerate(files):
+                text += '   ' + f + '\n'
+                if i == 9:
+                    text += '   ...\n'
+                    break
+            return text
+
+        # response: 0=Yes, 1=No backup, 2=Cancel
         if self.count_revs() == 1:
             # rev options needs extra tweaking since is not an array for
             # revert command
             revertopts['rev'] = revertopts['rev'][0]
-            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
-                    _('Revert files to revision %s?') % revertopts['rev'])
+            response = gdialog.CustomPrompt(_('Confirm Revert'),
+                    _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
+                    filelist(files)), self, (_('&Yes'), _('&No backup'), _('&Cancel')),
+                    2, 2).run()
         elif self.merging:
-            resp = gdialog.CustomPrompt(
+            res = gdialog.CustomPrompt(
                     _('Uncommited merge - please select a parent revision'),
                     _('Revert file(s) to local or other parent?'),
                     self, (_('&local'), _('&other')), 0).run()
-            if resp == 0:
+            if res == 0:
                 revertopts['rev'] = self.repo[None].p1().rev()
-            elif resp == 1:
+            elif res == 1:
                 revertopts['rev'] = self.repo[None].p2().rev()
             else:
                 return
-            dlg = None
+            response = None
         else:
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
             revertopts['rev'] = ''
-            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
-                    _('Revert the following files?'))
-        if not dlg or dlg.run() == gtk.RESPONSE_YES:
+            response = gdialog.CustomPrompt(_('Confirm Revert'),
+                    _('Revert the following files?\n\n%s') % filelist(files), self,
+                    (_('&Yes'), _('&No backup'), _('&Cancel')), 2, 2).run()
+        if response in (None, 0, 1):
+            if response == 1:
+                revertopts['no_backup'] = True
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
                 shlib.shell_notify(wfiles)
