@@ -81,7 +81,7 @@ mentioned here just so you better understand how Mercurial works.
 
 .. warning::
 	It is dangerous to manually edit the files in :file:`.hg` directory,
-	repository corruption can happen.  :file:`.hg/hgrc` is perhaps the
+	repository corruption can occur.  :file:`.hg/hgrc` is perhaps the
 	only exception to this rule.
 
 Add files
@@ -122,8 +122,8 @@ files must be ignored. There are a lot of way to do this:
 .. note::
 	It is good practice to not have many *unknown* files in your working
 	directory, as it makes it too easy to forget to add vital new files.
-	So it is recommended that your keep the :file:`.hgignore`
-	file updated.
+	So it is recommended that you keep your :file:`.hgignore`
+	file up to date.
 
 
 Commit
