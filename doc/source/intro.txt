@@ -51,6 +51,7 @@ After installation a reboot is necessary.
 	but not strictly required, to uninstall them when you upgrade an
 	earlier release.
 
+.. note::
 	If you have 0.8 or later already installed, you must close all
 	instances of the ThgTaskBar application before installation can
 	proceed.
