@@ -103,7 +103,7 @@ class SynchDialog(gtk.Window):
         self.add(vbox)
         vbox.pack_start(self.tbar, False, False, 2)
 
-        # sync target info
+        # sync target selection buttons
         targethbox = gtk.HBox()
         lbl = gtk.Button(_('Repo:'))
         lbl.unset_flags(gtk.CAN_FOCUS)
@@ -115,7 +115,7 @@ class SynchDialog(gtk.Window):
         lbl.connect('clicked', self.btn_bundlepath_clicked)
         targethbox.pack_start(lbl, False, False)
 
-        # revisions combo box
+        # target path combobox
         self.pathlist = gtk.ListStore(str, str)
         self.pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self.pathtext = self.pathbox.get_child()
@@ -154,6 +154,7 @@ class SynchDialog(gtk.Window):
         else:
             self.use_proxy.set_sensitive(False)
 
+        # groupbox for 'Post pull operation'
         frame = gtk.Frame(_('Post pull operation'))
         ppvbox = gtk.VBox()
         self.nothingradio = gtk.RadioButton(None, _('Nothing'))
@@ -167,6 +168,7 @@ class SynchDialog(gtk.Window):
         frame.add(ppvbox)
         frame.set_border_width(2)
 
+        # expandable group for 'Advanced options'
         self.expander = expander = gtk.Expander(_('Advanced Options'))
         expander.set_expanded(False)
         expander.connect_after('activate', self.expanded)
@@ -214,6 +216,7 @@ class SynchDialog(gtk.Window):
         revvbox.pack_start(cmdeventbox, True, True, 2)
         hbox.pack_start(revvbox, True, True, 4)
 
+        # groupbox for 'Incoming/Outgoing'
         frame = gtk.Frame(_('Incoming/Outgoing'))
         hbox.pack_start(frame, False, False, 2)
 
