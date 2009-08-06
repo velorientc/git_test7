@@ -300,14 +300,15 @@ class GCommit(GStatus):
         live = False
         buf = self.text.get_buffer()
         if buf.get_char_count() > 10 and buf.get_modified():
-            dialog = gdialog.Confirm(_('Confirm Exit'), [], self,
-                    _('Save commit message at exit?'))
-            res = dialog.run()
-            if res == gtk.RESPONSE_YES:
+            # response: 0=Yes, 1=No, 2=Cancel
+            response = gdialog.CustomPrompt(_('Confirm Exit'),
+                _('Save commit message at exit?'), self,
+                (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+            if response == 0:
                 begin, end = buf.get_bounds()
                 self.update_recent_messages(buf.get_text(begin, end))
                 buf.set_modified(False)
-            elif res != gtk.RESPONSE_NO:
+            elif response == 2:
                 live = True
         if not live:
             self._destroying(widget)
