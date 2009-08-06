@@ -99,9 +99,9 @@ class SynchDialog(gtk.Window):
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        vbox = gtk.VBox()
-        self.add(vbox)
-        vbox.pack_start(self.tbar, False, False, 2)
+        basevbox = gtk.VBox()
+        self.add(basevbox)
+        basevbox.pack_start(self.tbar, False, False, 2)
 
         # sync target selection buttons
         targethbox = gtk.HBox()
@@ -161,8 +161,8 @@ class SynchDialog(gtk.Window):
         self.expander = expander = gtk.Expander(_('Advanced Options'))
         expander.set_expanded(False)
         expander.connect_after('activate', self.expanded)
-        hbox = gtk.HBox()
-        expander.add(hbox)
+        opthbox = gtk.HBox()
+        expander.add(opthbox)
 
         fixedhbox = gtk.HBox()
         fixedhbox.pack_start(targethbox, True, True, 2)
@@ -171,7 +171,7 @@ class SynchDialog(gtk.Window):
         topvbox = gtk.VBox()
         topvbox.pack_start(fixedhbox, True, True, 2)
         topvbox.pack_start(expander, False, False, 2)
-        vbox.pack_start(topvbox, False, False, 2)
+        basevbox.pack_start(topvbox, False, False, 2)
 
         # checkbox options
         chkopthbox = gtk.HBox()
@@ -210,11 +210,11 @@ class SynchDialog(gtk.Window):
         revvbox.pack_start(chkopthbox, False, False, 8)
         revvbox.pack_start(reveventbox, False, False, 4)
         revvbox.pack_start(cmdeventbox, False, False, 4)
-        hbox.pack_start(revvbox, True, True, 4)
+        opthbox.pack_start(revvbox, True, True, 4)
 
         # groupbox for 'Incoming/Outgoing'
         frame = gtk.Frame(_('Incoming/Outgoing'))
-        hbox.pack_start(frame, False, False, 2)
+        opthbox.pack_start(frame, False, False, 2)
 
         self.showpatch = gtk.CheckButton(_('Show Patches'))
         self.newestfirst = gtk.CheckButton(_('Show Newest First'))
@@ -238,7 +238,7 @@ class SynchDialog(gtk.Window):
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
                                    foreground='#900000')
-        vbox.pack_start(scrolledwindow, True, True)
+        basevbox.pack_start(scrolledwindow, True, True)
 
         self.buttonhbox = gtk.HBox()
         self.viewpulled = gtk.Button(_('View pulled revisions'))
@@ -247,10 +247,10 @@ class SynchDialog(gtk.Window):
         self.updatetip.connect('clicked', self._update_to_tip)
         self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
         self.buttonhbox.pack_start(self.updatetip, False, False, 2)
-        vbox.pack_start(self.buttonhbox, False, False, 2)
+        basevbox.pack_start(self.buttonhbox, False, False, 2)
 
         self.stbar = gtklib.StatusBar()
-        vbox.pack_start(self.stbar, False, False, 2)
+        basevbox.pack_start(self.stbar, False, False, 2)
 
         self.load_settings()
         self.update_pull_setting()
