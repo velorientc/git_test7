@@ -558,7 +558,7 @@ class GLog(gdialog.GDialog):
         def goto_rev_(rev):
             self.goto_rev(rev)
 
-        def close_filter_dialog(dialog, response_id):
+        def response_(dialog, response_id):
             dialog.hide()
 
         def delete_event(dialog, event, data=None):
@@ -566,7 +566,7 @@ class GLog(gdialog.GDialog):
             return True
 
         dlg = gorev.GotoRevDialog(goto_rev_)
-        dlg.connect('response', close_filter_dialog)
+        dlg.connect('response', response_)
         dlg.connect('delete-event', delete_event)
         dlg.set_modal(False)
         dlg.show()
