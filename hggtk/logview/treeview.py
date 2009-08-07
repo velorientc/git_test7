@@ -84,12 +84,20 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show branch',
                                  False,
                                  gobject.PARAM_READWRITE),
+        'branch-color': (gobject.TYPE_BOOLEAN,
+                                 'Branch color',
+                                 'Color by branch',
+                                 False,
+                                 gobject.PARAM_READWRITE)
     }
 
     __gsignals__ = {
         'revisions-loaded': (gobject.SIGNAL_RUN_FIRST, 
                              gobject.TYPE_NONE,
                              ()),
+        'batch-loaded': (gobject.SIGNAL_RUN_FIRST, 
+                         gobject.TYPE_NONE,
+                         ()),
         'revision-selected': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
                               ())
@@ -111,6 +119,7 @@ class TreeView(gtk.ScrolledWindow):
         self.construct_treeview()
         self.pbar = pbar
         self.origtip = None
+        self.branch_color = False
 
     def set_repo(self, repo, pbar=None):
         self.repo = repo
@@ -160,7 +169,7 @@ class TreeView(gtk.ScrolledWindow):
                 start = len(self.repo.changelog) - 1
             noheads = opts.get('noheads', False)
             self.grapher = revision_grapher(self.repo, start, end, pats,
-                    noheads)
+                    noheads, self.branch_color)
         elif opts.get('revs', None):
             self.grapher = dumb_log_generator(self.repo, opts['revs'])
         else:
@@ -219,9 +228,11 @@ class TreeView(gtk.ScrolledWindow):
         if width > 500:
             width = 500
         self.graph_column.set_fixed_width(width)
-        self.graph_column.set_max_width(width)
+        # Allow the user to set size as they like
+        #self.graph_column.set_max_width(500)
         self.graph_column.set_visible(self.show_graph)
 
+        self.emit('batch-loaded')
         if stopped:
             self.emit('revisions-loaded')
         if revision is not None:
@@ -239,6 +250,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.rev_column.get_visible()
         elif property.name == 'branch-column-visible':
             return self.branch_column.get_visible()
+        elif property.name == 'branch-color':
+            return self.branch_color
         elif property.name == 'utc-column-visible':
             return self.utc_column.get_visible()
         elif property.name == 'repo':
@@ -261,6 +274,8 @@ class TreeView(gtk.ScrolledWindow):
             self.rev_column.set_visible(value)
         elif property.name == 'branch-column-visible':
             self.branch_column.set_visible(value)
+        elif property.name == 'branch-color':
+            self.branch_color = value
         elif property.name == 'utc-column-visible':
             self.utc_column.set_visible(value)
         elif property.name == 'repo':
@@ -296,7 +311,7 @@ class TreeView(gtk.ScrolledWindow):
             row = self.index[revid]
             self.treeview.scroll_to_cell(row, use_align=True, row_align=0.5)
 
-    def set_revision_id(self, revid):
+    def set_revision_id(self, revid, load=False):
         """Change the currently selected revision.
 
         :param revid: Revision id of revision to display.
@@ -305,6 +320,20 @@ class TreeView(gtk.ScrolledWindow):
             row = self.index[revid]
             self.treeview.set_cursor(row)
             self.treeview.grab_focus()
+        elif load:
+            handler = None
+
+            def loaded(dummy):
+                if revid in self.index:
+                    if handler is not None:
+                        self.disconnect(handler)
+                    self.set_revision_id(revid)
+                    self.scroll_to_revision(revid)
+                else:
+                    self.next_revision_batch(self.batchsize)
+
+            handler = self.connect('batch-loaded', loaded)
+            self.next_revision_batch(self.batchsize)
 
     def get_parents(self):
         """Return the parents of the currently selected revision.

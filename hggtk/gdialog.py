@@ -47,27 +47,30 @@ class Prompt(SimpleMessage):
 class CustomPrompt(gtk.MessageDialog):
     ''' Custom prompt dialog.  Provide a list of choices with ampersands
     to delineate response given for each choice (and keyboard
-    accelerator).  Default must be one of the choice responses.
+    accelerator). Default must be the index of one of the choice responses.
     '''
-    # ret = CustomPrompt('Title', 'Message', self, ('&Yes', 'N&o'), 'o').run()
-    # ret will be (gtk.RESPONSE_DELETE_EVENT, ord('y'), or ord('o'))
-    def __init__(self, title, message, parent, choices, default=None):
+    # ret = CustomPrompt('Title', 'Message', self, ('&Yes', 'N&o'), 1).run()
+    # ret will be (gtk.RESPONSE_DELETE_EVENT, 0 (for yes), or 1 (for no)
+    def __init__(self, title, message, parent, choices, default=None, esc=None):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION)
         self.set_title(hglib.toutf(title))
         self.format_secondary_markup('<b>' + hglib.toutf(message) + '</b>')
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
-        for s in choices:
+        for i, s in enumerate(choices):
             char = s[s.index('&')+1].lower()
-            button = self.add_button(s.replace('&', '_'), ord(char))
+            button = self.add_button(s.replace('&', '_'), i)
             button.add_accelerator('clicked', accel_group, ord(char), 0,
                     gtk.ACCEL_VISIBLE)
         if default:
-            self.set_default_response(ord(default))
+            self.set_default_response(default)
+        self.esc = esc
 
     def run(self):
         response = gtklib.MessageDialog.run(self)
+        if response == gtk.RESPONSE_DELETE_EVENT and self.esc != None:
+            response = self.esc
         self.destroy()
         return response
 

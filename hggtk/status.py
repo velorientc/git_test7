@@ -3,6 +3,7 @@
 # Copyright 2007 Brad Schick, brad at gmail . com
 # Copyright 2007 TK Soh <teekaysoh@gmail.com>
 # Copyright 2008 Steve Borho <steve@borho.org>
+# Copyright 2008 Emmanuel Rosa <goaway1000@gmail.com>
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
@@ -105,7 +106,8 @@ class GStatus(gdialog.GDialog):
                     (_('edit'), self._view_file),
                     (_('view other'), self.view_left_file),
                     (_('_revert'), self.revert_file),
-                    (_('l_og'), self.log_file)),
+                    (_('l_og'), self.log_file),
+                    (_('_forget'), self.forget_file)),
                 # addrem
                 ((_('_difference'), self._diff_file),
                     (_('_view'), self._view_file),
@@ -122,7 +124,8 @@ class GStatus(gdialog.GDialog):
                     (_('re_move'), self.remove_file),
                     (_('re_name'), self.rename_file),
                     (_('_copy'), self.copy_file),
-                    (_('l_og'), self.log_file)),
+                    (_('l_og'), self.log_file),
+                    (_('_forget'), self.forget_file)),
                 # ignored
                 ((_('_view'), self._view_file),
                     (_('_delete'), self.delete_file)),
@@ -212,6 +215,9 @@ class GStatus(gdialog.GDialog):
                         tip=_('move selected files to other directory')),
                     self.make_toolbutton(gtk.STOCK_DELETE, _('_Remove'),
                         self.remove_clicked, tip=_('remove')),
+                    self.make_toolbutton(gtk.STOCK_CLEAR, _('_Forget'),
+                        self.forget_clicked, 
+                        tip=_('forget file(s) on next commit')),
                     gtk.SeparatorToolItem()]
         return tbuttons
 
@@ -1098,6 +1104,9 @@ class GStatus(gdialog.GDialog):
         dlg.display()
         return True
 
+    def forget_file(self, stat, wfile):
+       self.hg_forget([wfile])
+       return True
 
     def hg_revert(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
@@ -1114,35 +1123,55 @@ class GStatus(gdialog.GDialog):
         def dohgrevert():
             commands.revert(self.ui, self.repo, *wfiles, **revertopts)
 
+        def filelist(files):
+            text = ''
+            for i, f in enumerate(files):
+                text += '   ' + f + '\n'
+                if i == 9:
+                    text += '   ...\n'
+                    break
+            return text
+
+        # response: 0=Yes, 1=No backup, 2=Cancel
         if self.count_revs() == 1:
             # rev options needs extra tweaking since is not an array for
             # revert command
             revertopts['rev'] = revertopts['rev'][0]
-            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
-                    _('Revert files to revision %s?') % revertopts['rev'])
+            response = gdialog.CustomPrompt(_('Confirm Revert'),
+                    _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
+                    filelist(files)), self, (_('&Yes'), _('&No backup'), _('&Cancel')),
+                    2, 2).run()
         elif self.merging:
-            resp = gdialog.CustomPrompt(
+            res = gdialog.CustomPrompt(
                     _('Uncommited merge - please select a parent revision'),
                     _('Revert file(s) to local or other parent?'),
-                    self, (_('&local'), _('&other')), _('l')).run()
-            if resp == ord(_('l')):
+                    self, (_('&local'), _('&other')), 0).run()
+            if res == 0:
                 revertopts['rev'] = self.repo[None].p1().rev()
-            elif resp == ord(_('o')):
+            elif res == 1:
                 revertopts['rev'] = self.repo[None].p2().rev()
             else:
                 return
-            dlg = None
+            response = None
         else:
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
             revertopts['rev'] = ''
-            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
-                    _('Revert the following files?'))
-        if not dlg or dlg.run() == gtk.RESPONSE_YES:
+            response = gdialog.CustomPrompt(_('Confirm Revert'),
+                    _('Revert the following files?\n\n%s') % filelist(files), self,
+                    (_('&Yes'), _('&No backup'), _('&Cancel')), 2, 2).run()
+        if response in (None, 0, 1):
+            if response == 1:
+                revertopts['no_backup'] = True
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
                 shlib.shell_notify(wfiles)
                 self.reload_status()
+
+    def hg_forget(self, files):
+        wfiles = [self.repo.wjoin(x) for x in files]
+        commands.forget(self.ui, self.repo, *wfiles)
+        self.reload_status()
 
     def add_clicked(self, toolbutton, data=None):
         add_list = self.relevant_files('?I')
@@ -1208,6 +1237,14 @@ class GStatus(gdialog.GDialog):
             gdialog.Prompt(_('Nothing Moved'), _('No movable files selected\n\n'
                     'Note: only clean files can be moved.'), self).run()
         return True
+
+    def forget_clicked(self, toolbutton, data=None):
+        forget_list = self.relevant_files('CM')
+        if len(forget_list) > 0:
+            self.hg_forget(forget_list)
+        else:
+            gdialog.Prompt(_('Nothing Forgotten'),
+                   _('No clean files selected'), self).run()
 
     def delete_file(self, stat, wfile):
         self.delete_files([wfile])

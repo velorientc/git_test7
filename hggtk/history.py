@@ -20,8 +20,8 @@ from thgutil import hglib, paths
 from hggtk.logview import treemodel
 from hggtk.logview.treeview import TreeView as LogTreeView
 
-from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter
-from hggtk import backout, status, hgemail, tagadd, update, merge
+from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter, gorev
+from hggtk import backout, status, hgemail, tagadd, update, merge, archive
 from hggtk import changeset
 
 def create_menu(label, callback):
@@ -65,7 +65,12 @@ class GLog(gdialog.GDialog):
                     _('_DataMine'),
                     self.datamine_clicked,
                     tip=_('Search Repository History')),
-                gtk.SeparatorToolItem()
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_JUMP_TO,
+                    _('Select Revision'),
+                    self.goto_clicked,
+                    tip=_('Select revision')),
+                gtk.SeparatorToolItem(),
              ] + self.changeview.get_tbbuttons()
         if not self.opts.get('from-synch'):
             self.synctb = self.make_toolbutton(gtk.STOCK_NETWORK,
@@ -194,6 +199,12 @@ class GLog(gdialog.GDialog):
         button.set_active(self.showcol.get('branch', False))
         button.set_draw_as_radio(True)
         menu.append(button)
+        button = gtk.CheckMenuItem(_('Color by Branch'))
+        button.connect('toggled', self._branch_color,
+                'branch-color')
+        button.set_active(self.branch_color)
+        button.set_draw_as_radio(True)
+        menu.append(button)
         menu.show_all()
         return menu
 
@@ -266,14 +277,15 @@ class GLog(gdialog.GDialog):
         elif 'revrange' in self.opts:
             self.custombutton.set_active(True)
             self.graphview.refresh(True, None, self.opts)
-        elif self.pats == [self.repo.root] or self.pats == ['']:
+        elif not self.pats:
+            self.reload_log()
+        elif len(self.pats) == 1 and \
+                self.pats[0] in (self.repo.root, self.repo.root+os.sep, ''):
             self.pats = []
             self.reload_log()
-        elif self.pats:
+        else:
             self.custombutton.set_active(True)
             self.reload_log(pats = self.pats)
-        else:
-            self.reload_log()
 
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
@@ -291,6 +303,7 @@ class GLog(gdialog.GDialog):
         settings = gdialog.GDialog.save_settings(self)
         settings['glog-vpane'] = self.vpaned.get_position()
         settings['glog-hpane'] = self.hpaned.get_position()
+        settings['branch-color'] = self.graphview.get_property('branch-color')
         for col in ('rev', 'date', 'id', 'branch', 'utc'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
@@ -317,10 +330,12 @@ class GLog(gdialog.GDialog):
         gdialog.GDialog.load_settings(self, settings)
         self.setting_vpos = -1
         self.setting_hpos = -1
+        self.branch_color = False
         self.showcol = {}
         try:
             self.setting_vpos = settings['glog-vpane']
             self.setting_hpos = settings['glog-hpane']
+            self.branch_color = settings.get('branch-color', False)
             for col in ('rev', 'date', 'id', 'branch', 'utc'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
@@ -331,6 +346,12 @@ class GLog(gdialog.GDialog):
         'Refresh data in the history model, without reloading graph'
         if self.graphview.model:
             self.graphview.model.refresh()
+
+    def _branch_color(self, button, property):
+        active = button.get_active()
+        self.graphview.set_property(property, active)
+        if hasattr(self, 'nextbutton'):
+            self.reload_log()
 
     def reload_log(self, **filteropts):
         'Send refresh event to treeview object'
@@ -351,7 +372,11 @@ class GLog(gdialog.GDialog):
                 self.graphview.refresh(True, branch, self.opts)
             else:
                 self.pats = filteropts.get('pats', [])
-                self.graphview.refresh(False, self.pats, self.opts)
+                if len(self.pats) == 1 and not os.path.isdir(self.pats[0]):
+                    self.opts['filehist'] = self.pats[0]
+                    self.graphview.refresh(True, self.pats, self.opts)
+                else:
+                    self.graphview.refresh(False, self.pats, self.opts)
         elif self.filter == 'all':
             self.graphview.refresh(True, None, self.opts)
         elif self.filter == 'new':
@@ -401,6 +426,7 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('add/remove _tag'), self.add_tag))
         m.append(create_menu(_('backout revision'), self.backout_rev))
         m.append(create_menu(_('_revert'), self.revert))
+        m.append(create_menu(_('_archive'), self.archive))
 
         # need mq extension for strip command
         extensions.loadall(self.ui)
@@ -431,6 +457,7 @@ class GLog(gdialog.GDialog):
 
     def get_body(self):
         self.filter_dialog = None
+        self.gorev_dialog = None
         self._menu = self.tree_context_menu()
         self._menu2 = self.tree_diff_context_menu()
 
@@ -518,6 +545,37 @@ class GLog(gdialog.GDialog):
         'ctrl-p handler'
         parent = self.repo['.'].rev()
         self.graphview.set_revision_id(parent)
+
+    def goto_clicked(self, toolbutton, data=None):
+        if self.gorev_dialog:
+            self.gorev_dialog.show()
+            self.gorev_dialog.present()
+        else:
+            self.show_goto_dialog()
+
+    def show_goto_dialog(self):
+        'Launch a modeless goto revision dialog'
+        def goto_rev_(rev):
+            self.goto_rev(rev)
+
+        def close_filter_dialog(dialog, response_id):
+            dialog.hide()
+
+        def delete_event(dialog, event, data=None):
+            # return True to prevent the dialog from being destroyed
+            return True
+
+        dlg = gorev.GotoRevDialog(goto_rev_)
+        dlg.connect('response', close_filter_dialog)
+        dlg.connect('delete-event', delete_event)
+        dlg.set_modal(False)
+        dlg.show()
+
+        self.gorev_dialog = dlg
+
+    def goto_rev(self, revision):
+        rid = self.repo[revision].rev()
+        self.graphview.set_revision_id(rid, load=True)
 
     def strip_rev(self, menuitem):
         rev = self.currow[treemodel.REVID]
@@ -753,6 +811,15 @@ class GLog(gdialog.GDialog):
             self.reload_log()
         elif not oldparents == newparents:
             self.refresh_model()
+
+    def archive(self, menuitem):
+        rev = self.currow[treemodel.REVID]
+        parents = [x.node() for x in self.repo.parents()]
+        dialog = archive.ArchiveDialog(rev)
+        dialog.set_transient_for(self)
+        dialog.show_all()
+        dialog.present()
+        dialog.set_transient_for(None)
 
     def selection_changed(self, treeview):
         self.currow = self.graphview.get_revision()

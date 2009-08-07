@@ -57,17 +57,20 @@ def dispatch(args):
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = error
+        opts['nofork'] = True
         if gtkmainalive:
             dlg = run(u, **opts)
             dlg.display()
             dlg.show_all()
         else:
-            gtkrun(run(u, **opts))
+            gtkrun(run, u, **opts)
 
-def portable_fork():
-    if 'THG_HGTK_SPAWN' in os.environ or '--nofork' in sys.argv:
+def portable_fork(ui, opts):
+    if 'THG_HGTK_SPAWN' in os.environ:
         return
-    if '--repository' in sys.argv or '-R' in sys.argv:
+    if opts.get('nofork') or opts.get('repository'):
+        return
+    if not ui.configbool('tortoisehg', 'hgtkfork', True):
         return
     # Spawn background process and exit
     if hasattr(sys, "frozen"):
@@ -165,11 +168,6 @@ def _parse(ui, args):
 def _runcatch(ui, args):
     try:
         try:
-            checkhgversion(hglib.hgversion)
-        except util.Abort, inst:
-            ui.status(_("abort: %s!\n") % inst)
-            return 0
-        try:
             return runcommand(ui, args)
         finally:
             ui.flush()
@@ -206,10 +204,12 @@ def runcommand(ui, args):
         path = ui.expandpath(options['repository'])
         cmdoptions['repository'] = path
         os.chdir(path)
+    if options['nofork']:
+        cmdoptions['nofork'] = True
     path = paths.find_root(os.getcwd())
     if path:
         try:
-            lui = hasattr(_ui, 'copy') and _ui.copy() or _ui.ui(ui)
+            lui = ui.copy()
             lui.readconfig(os.path.join(path, ".hg", "hgrc"))
         except IOError:
             pass
@@ -245,7 +245,9 @@ def thgexit(win):
         if mainwindow.should_live(): return
     mainwindow.destroy()
 
-def gtkrun(win):
+def gtkrun(dlgfunc, ui, *args, **opts):
+    portable_fork(ui, opts)
+    win = dlgfunc(ui, *args, **opts)
     global mainwindow, gtkmainalive
     mainwindow = win
     if hasattr(win, 'display'):
@@ -264,7 +266,7 @@ def gtkrun(win):
 def about(ui, *pats, **opts):
     """about TortoiseHg"""
     from hggtk.about import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def add(ui, *pats, **opts):
     """add files"""
@@ -279,21 +281,11 @@ def thgstatus(ui, *pats, **opts):
 
 def clone(ui, *pats, **opts):
     """clone tool"""
-    portable_fork()
     from hggtk.clone import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def commit(ui, *pats, **opts):
     """commit tool"""
-    ct = ui.config('tortoisehg', 'extcommit', None)
-    if ct == 'qct':
-        from mercurial import dispatch as _dispatch
-        try:
-            _dispatch.dispatch([ct], *pats)
-        except SystemExit:
-            pass
-        return
-    portable_fork()
     # move cwd to repo root if repo is merged, so we can show
     # all the changed files
     repo = hg.repository(ui, path=paths.find_root())
@@ -301,125 +293,114 @@ def commit(ui, *pats, **opts):
         os.chdir(repo.root)
         pats = []
     from hggtk.commit import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def shelve(ui, *pats, **opts):
     """shelve/unshelve tool"""
-    portable_fork()
     from hggtk.thgshelve import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def userconfig(ui, *pats, **opts):
     """user configuration editor"""
-    # Import thgconfig first, to check for iniparse
     from hggtk.thgconfig import run
-    portable_fork()
     opts['repomode'] = False
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def repoconfig(ui, *pats, **opts):
     """repository configuration editor"""
-    portable_fork()
     from hggtk.thgconfig import run
     opts['repomode'] = True
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
-    portable_fork()
-    from hggtk.rename import run
     if not pats or len(pats) > 2:
-        raise util.Abort(_('rename takes one or two path arguments'))
-    gtkrun(run(ui, *pats, **opts))
+        from hggtk import gdialog
+        gdialog.Prompt(_('Rename error'),
+                       _('rename takes one or two path arguments'), None).run()        
+        return 
+    from hggtk.rename import run
+    gtkrun(run, ui, *pats, **opts)
 
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
-    portable_fork()
     from hggtk.guess import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def datamine(ui, *pats, **opts):
     """repository search and annotate tool"""
-    portable_fork()
     from hggtk.datamine import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def hgignore(ui, *pats, **opts):
     """ignore filter editor"""
-    portable_fork()
     from hggtk.hgignore import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def hginit(ui, *pats, **opts):
     """repository initialization tool"""
-    portable_fork()
     from hggtk.hginit import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def log(ui, *pats, **opts):
     """changelog viewer"""
-    portable_fork()
     from hggtk.history import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def merge(ui, *pats, **opts):
     """merge tool"""
-    portable_fork()
     from hggtk.merge import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def recovery(ui, *pats, **opts):
     """recover, rollback & verify"""
-    portable_fork()
     from hggtk.recovery import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def remove(ui, *pats, **opts):
     """file status viewer in remove mode"""
-    portable_fork()
     from hggtk.status import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def revert(ui, *pats, **opts):
     """file status viewer in revert mode"""
-    portable_fork()
     from hggtk.status import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
+
+def forget(ui, *pats, **opts):
+    """file status viewer in forget mode"""
+    from hggtk.status import run
+    gtkrun(run, ui, *pats, **opts)
 
 def serve(ui, *pats, **opts):
     """web server"""
-    portable_fork()
     from hggtk.serve import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def status(ui, *pats, **opts):
-    """file status viewer"""
-    portable_fork()
+    """file status & diff viewer"""
     from hggtk.status import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def synch(ui, *pats, **opts):
     """repository synchronization tool"""
-    portable_fork()
     from hggtk.synch import run
     cmd = opts['alias']
     if cmd in ('push', 'outgoing', 'email'):
         opts['pushmode'] = True
     else:
         opts['pushmode'] = False
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def update(ui, *pats, **opts):
     """update/checkout tool"""
-    portable_fork()
     from hggtk.update import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
-    portable_fork()
     from hggtk.visdiff import run
-    gtkrun(run(ui, *pats, **opts))
+    gtkrun(run, ui, *pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, alias=None):
@@ -459,7 +440,7 @@ def help_(ui, name=None, with_version=False, alias=None):
             aliases, i = cmdutil.findcmd(name, table, False)
         except hglib.AmbiguousCommand, inst:
             select = lambda c: c.lstrip('^').startswith(inst.args[0])
-            helplist('list of commands:\n\n', select)
+            helplist(_('list of commands:\n\n'), select)
             return
 
         # synopsis
@@ -586,26 +567,6 @@ def help_(ui, name=None, with_version=False, alias=None):
             else:
                 ui.write("%s\n" % first)
 
-def checkhgversion(v):
-    """range check the Mercurial version"""
-    # this is a series of hacks, but Mercurial's versioning scheme
-    # doesn't lend itself to a "correct" solution.  This will at least
-    # catch people who have old Mercurial packages.
-    reqver = ['1', '2']
-    if not v or v == 'unknown' or len(v) >= 12:
-        # can't make any intelligent decisions about unknown or hashes
-        return
-    vers = v.split('.')[:2]
-    if vers == reqver or len(vers) < 2:
-        return
-    nextver = list(reqver)
-    nextver[1] = chr(ord(reqver[1])+1)
-    if vers == nextver:
-        return
-    raise util.Abort(_('This version of TortoiseHg requires Mercurial '
-                       'version %s.n to %s.n, but finds %s') % ('.'.join(reqver),
-                           '.'.join(nextver), v))
-
 def version(ui, **opts):
     """output version and copyright information"""
     ui.write(_('TortoiseHg Dialogs (version %s), '
@@ -634,6 +595,11 @@ def debugcomplete(ui, cmd='', **opts):
     if ui.verbose:
         cmdlist = [' '.join(c[0]) for c in cmdlist.values()]
     ui.write("%s\n" % "\n".join(sorted(cmdlist)))
+
+def archive(ui, *pats, **opts):
+    """create an unversioned archive of a repository revision"""
+    from hggtk.archive import run
+    gtkrun(run, ui, *pats, **opts)
 
 globalopts = [
     ('R', 'repository', '',
@@ -665,7 +631,7 @@ table = {
     "^recovery|rollback|verify": (recovery, [], _('hgtk recovery')),
     "^shelve|unshelve": (shelve, [], _('hgtk shelve')),
     "^synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
-    "^status|st": (status,
+    "^status|st|diff": (status,
         [('r', 'rev', [], _('revisions to compare'))],
         _('hgtk status [FILE]...')),
     "^userconfig": (userconfig, [], _('hgtk userconfig')),
@@ -674,6 +640,7 @@ table = {
     "^remove|rm": (revert, [], _('hgtk remove [FILE]...')),
     "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
     "^revert": (revert, [], _('hgtk revert [FILE]...')),
+    "^forget": (forget, [], _('hgtk forget [FILE]...')),
     "^serve":
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
@@ -700,4 +667,7 @@ table = {
          [('o', 'options', None, _('show the command options'))],
          _('[-o] CMD')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
+    "^archive": (archive,
+        [('r', 'rev', '', _('revision to update'))],
+        ('hgtk archive')),
 }

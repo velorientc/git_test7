@@ -300,14 +300,15 @@ class GCommit(GStatus):
         live = False
         buf = self.text.get_buffer()
         if buf.get_char_count() > 10 and buf.get_modified():
-            dialog = gdialog.Confirm(_('Confirm Exit'), [], self,
-                    _('Save commit message at exit?'))
-            res = dialog.run()
-            if res == gtk.RESPONSE_YES:
+            # response: 0=Yes, 1=No, 2=Cancel
+            response = gdialog.CustomPrompt(_('Confirm Exit'),
+                _('Save commit message at exit?'), self,
+                (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+            if response == 0:
                 begin, end = buf.get_bounds()
                 self.update_recent_messages(buf.get_text(begin, end))
                 buf.set_modified(False)
-            elif res != gtk.RESPONSE_NO:
+            elif response == 2:
                 live = True
         if not live:
             self._destroying(widget)
@@ -346,6 +347,7 @@ class GCommit(GStatus):
         self.get_toolbutton(_('_Add')).set_sensitive(not self.merging)
         self.get_toolbutton(_('_Remove')).set_sensitive(not self.merging)
         self.get_toolbutton(_('Move')).set_sensitive(not self.merging)
+        self.get_toolbutton(_('_Forget')).set_sensitive(not self.merging)
 
         if self.merging:
             # select all changes if repo is merged
@@ -475,13 +477,8 @@ class GCommit(GStatus):
             if dopatch:
                 try:
                     pfiles = {}
-                    if patch.patchfile.__bases__:
-                        # Mercurial 1.3
-                        patch.internalpatch(fp, ui, 1, repo.root, files=pfiles,
+                    patch.internalpatch(fp, ui, 1, repo.root, files=pfiles,
                                         eolmode=None)
-                    else:
-                        # Mercurial 1.2
-                        patch.internalpatch(fp, ui, 1, repo.root, files=pfiles)
                     patch.updatedir(ui, repo, pfiles)
                 except patch.PatchError, err:
                     s = str(err)
@@ -644,20 +641,21 @@ class GCommit(GStatus):
         cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
 
         if self.nextbranch:
+            # response: 0=Yes, 1=No, 2=Cancel
             newbranch = hglib.fromutf(self.nextbranch)
             if newbranch in self.repo.branchtags():
                 if newbranch not in [p.branch() for p in self.repo.parents()]:
-                    response = gdialog.Confirm(_('Confirm Override Branch'),
-                            [], self, _('A branch named "%s" already exists,\n'
-                        'override?') % self.nextbranch).run()
-                else:
-                    response = gtk.RESPONSE_YES
+                    response = gdialog.CustomPrompt(_('Confirm Override Branch'),
+                        _('A branch named "%s" already exists,\n'
+                        'override?') % self.nextbranch, self,
+                        (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
             else:
-                response = gdialog.Confirm(_('Confirm New Branch'), [], self,
-                        _('Create new named branch "%s"?') % self.nextbranch).run()
-            if response == gtk.RESPONSE_YES:
+                response = gdialog.CustomPrompt(_('Confirm New Branch'),
+                    _('Create new named branch "%s"?') % self.nextbranch,
+                    self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+            if response == 0:
                 self.repo.dirstate.setbranch(newbranch)
-            elif response != gtk.RESPONSE_NO:
+            elif response == 2:
                 return
         elif self.closebranch:
             cmdline.append('--close-branch')

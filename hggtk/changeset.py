@@ -146,25 +146,40 @@ class ChangeSet(gdialog.GDialog):
 
         eob = buf.get_end_iter()
         date = displaytime(ctx.date())
-        change = str(rev) + ' : ' + str(ctx)
+        change = str(rev) + ' (' + str(ctx) + ')'
         tags = ' '.join(ctx.tags())
 
         title_line(_('changeset:'), change, 'changeset')
         if ctx.branch() != 'default':
             title_line(_('branch:'), ctx.branch(), 'greybg')
         title_line(_('user/date:'), ctx.user() + '\t' + date, 'changeset')
+        
+        if len(ctx.parents()) == 2 and self.parent_toggle.get_active():
+            parentindex = 1 
+        else:
+            parentindex = 0 
+            
         for pctx in ctx.parents():
             try:
                 summary = pctx.description().splitlines()[0]
                 summary = toutf(summary)
             except:
                 summary = ""
-            change = str(pctx.rev()) + ' : ' + str(pctx)
+            change = str(pctx.rev()) + ' (' + str(pctx) + ')'
+            if pctx.branch() != ctx.branch():
+                change += ' [' + toutf(pctx.branch()) + ']'
             title = _('parent:')
             title += ' ' * (12 - len(title))
-            buf.insert_with_tags_by_name(eob, title, 'parent')
-            buf.insert_with_tags_by_name(eob, change, 'link')
-            buf.insert_with_tags_by_name(eob, ' ' + summary, 'parent')
+
+            if len(ctx.parents()) == 2 and pctx == ctx.parents()[parentindex]:
+                buf.insert_with_tags_by_name(eob, title, 'parenthl')
+                buf.insert_with_tags_by_name(eob, change, 'linkhl')
+                buf.insert_with_tags_by_name(eob, ' ' + summary, 'parenthl')
+            else:
+                buf.insert_with_tags_by_name(eob, title, 'parent')
+                buf.insert_with_tags_by_name(eob, change, 'link')
+                buf.insert_with_tags_by_name(eob, ' ' + summary, 'parent')
+            
             buf.insert(eob, "\n")
         for cctx in ctx.children():
             try:
@@ -172,7 +187,9 @@ class ChangeSet(gdialog.GDialog):
                 summary = toutf(summary)
             except:
                 summary = ""
-            change = str(cctx.rev()) + ' : ' + str(cctx)
+            change = str(cctx.rev()) + ' (' + str(cctx) + ')'
+            if cctx.branch() != ctx.branch():
+                change += ' [' + toutf(cctx.branch()) + ']'
             title = _('child:')
             title += ' ' * (12 - len(title))
             buf.insert_with_tags_by_name(eob, title, 'parent')
@@ -267,7 +284,7 @@ class ChangeSet(gdialog.GDialog):
         text = self.get_link_text(tag, widget, liter)
         if not text:
             return
-        linkrev = long(text.split(':')[0])
+        linkrev = long(text.split(' ')[0])
         if self.graphview:
             self.graphview.set_revision_id(linkrev)
             self.graphview.scroll_to_revision(linkrev)
@@ -423,6 +440,9 @@ class ChangeSet(gdialog.GDialog):
                 paragraph_background='#F0F0F0'))
         tag_table.add(make_texttag('parent', foreground='#000090',
                 paragraph_background='#F0F0F0'))
+        tag_table.add(make_texttag('parenthl', foreground='#000090',
+                paragraph_background='#F0F0F0',
+                weight=pango.WEIGHT_BOLD ))
 
         tag_table.add( make_texttag( 'mono', family='Monospace' ))
         tag_table.add( make_texttag( 'blue', foreground='blue' ))
@@ -435,8 +455,13 @@ class ChangeSet(gdialog.GDialog):
         tag_table.add( make_texttag( 'yellowbg', background='yellow' ))
         link_tag = make_texttag( 'link', foreground='blue',
                                  underline=pango.UNDERLINE_SINGLE )
+        linkhl_tag = make_texttag( 'linkhl', foreground='blue',
+                                 underline=pango.UNDERLINE_SINGLE,
+                                weight=pango.WEIGHT_BOLD )
         link_tag.connect('event', self.link_event )
+        linkhl_tag.connect('event', self.link_event )
         tag_table.add( link_tag )
+        tag_table.add( linkhl_tag )
 
     def file_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
