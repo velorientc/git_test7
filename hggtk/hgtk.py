@@ -226,6 +226,9 @@ def runcommand(ui, args):
             extsetup()
         _loaded[name] = 1
 
+    if options['quiet']:
+        ui.quiet = True
+
     if cmd not in nonrepo_commands.split() and not path:
         raise hglib.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
@@ -605,6 +608,7 @@ globalopts = [
     ('R', 'repository', '',
      _('repository root directory or symbolic path name')),
     ('v', 'verbose', None, _('enable additional output')),
+    ('q', 'quiet', None, _('suppress output')),
     ('h', 'help', None, _('display help and exit')),
     ('', 'debugger', None, _('start debugger')),
     ('', 'nofork', None, _('do not fork GUI process')),
