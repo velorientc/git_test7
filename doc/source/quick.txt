@@ -32,6 +32,8 @@ Right click in your source folder and select
 .. figure:: figures/cmenu-nofiles.jpg
 	:alt: Context Menu
 
+	Context menu with no files selected
+
 You must then select the :guilabel:`Commit` tab and enter a name in the
 :guilabel:`Username` field.
 
@@ -65,6 +67,8 @@ this in once in the root folder of your project.
 
 .. figure:: figures/init.png
 	:alt: Init dialog
+
+	Repository Init Dialog
 
 We suggest you keep :guilabel:`Add special files (.hgignore, ...)`
 checked, and do not check
@@ -146,6 +150,7 @@ from scratch.
 .. figure:: figures/commit.png
 	:alt: Commit dialog
 
+	Commit Tool
 
 Share the repository
 ====================
@@ -160,6 +165,8 @@ will be the merge point for the team. From the shared drive select
 
 .. figure:: figures/share.png
 	:alt: Clone dialog
+
+	Clone Dialog
 
 When you create a clone for the purposes of generating a *central
 repository* there is no reason for that clone to have a working
@@ -185,6 +192,8 @@ for it. Right click in the directory where you want your copy and select
 
 .. figure:: figures/clone.png
 	:alt: Clone dialog
+
+	Clone Dialog
 
 This time you do want to update the working directory because you want
 to work on the project, uncheck
@@ -236,6 +245,8 @@ buttons in the synchronize tool.
 
 .. figure:: figures/synchronize.png
 	:alt: Synchronize dialog
+
+	Synchronize Dialog
 
 Mercurial makes collaboration easy, fast, and productive.
 Learn more at Mercurial's `wiki <http://mercurial.selenic.com/wiki/>`_.

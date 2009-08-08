@@ -7,6 +7,8 @@ Rename Guessing
 .. figure:: figures/guess.jpg
 	:alt: Rename guessing dialog
 
+	Rename Guessing Dialog
+
 This dialog is used to find renames, moves, and/or copies that were done
 without Mercurial's knowledge.  The dialog can be launched from the
 shell context menu, or from the status or commit tools via the context

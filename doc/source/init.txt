@@ -12,6 +12,8 @@ the folder, type :command:`hgtk init`.
 .. figure:: figures/init.png
 	:alt: Init dialog
 
+	Repository Init Dialog
+
 :guilabel:`Destination`
 	Is the directory where the repository will be created. It is
 	always filled with the current directory, so if you launch the
@@ -26,11 +28,11 @@ the folder, type :command:`hgtk init`.
 
 Creating a new repository means create a subdirectory called :file:`.hg`.
 In this subdirectory Mercurial keeps all versioning information.
-	
+
 .. warning::
 	Never touch the files in :file:`.hg` directory, otherwise a repository
 	corruption can happen.
-	
+
 From command line
 -----------------
 

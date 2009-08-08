@@ -29,11 +29,17 @@ comes from and the basics for installing it on your PC.
 
 :doc:`quick` is a quick tutorial on how to start with TortoiseHg.
 
+:doc:`daily` is the main chapter, it describes the frequently used
+components of TortoiseHg.
+
+:doc:`settings` describes how to configure TortoiseHg.
+
+:doc:`recovery` describes the the recovery operations to do on
+a project.
+
 :doc:`faq` has a list of common questions and their answers.
 
 :doc:`debugging` describes how to debug any problems that you find.
-
-The remaining chapters describe the components that make up TortoiseHg.
 
 TortoiseHg is free!
 ===================

@@ -128,6 +128,8 @@ Revision Filter Dialog
 .. figure:: figures/logfilter.jpg
 	:alt: Revision filter dialog
 
+	Log Filtering Dialog
+
 File Context Menus
 ------------------
 
