@@ -1,107 +1,110 @@
-************
-Introduction
-************
+****
+導入
+****
 
 .. module:: introduction
 	:synopsis: Introduce TortoiseHg and its various parts
 
-What is TortoiseHg?
-===================
-	
-TortoiseHg is a set of graphical tools and a shell extension for the
-`Mercurial <http://mercurial.selenic.com/wiki/>`_ distributed revision control
-system.
+TortoiseHg とは何か?
+====================
 
-On Windows,
-	TortoiseHg consists of a shell extension, which provides overlay
-	icons and context menus in your file explorer, and a command line
-	program named :file:`hgtk.exe` which can launch the TortoiseHg tools.
-	Binary packages of TortoiseHg for Windows come with Mercurial and a
-	merge tool and are thus completely ready for use "Out of the Box".
+TortoiseHg は `Mercurial <http://mercurial.selenic.com/wiki/>`_
+分散構成管理のための GUI ツールと Windows エクスプローラに統合するための
+シェル拡張のパッケージです。
 
-On Linux,
-	TortoiseHg consists of a command line hgtk script, and a Nautilus
-	extension which provides overlays and context menus in your file
-	explorer.  You must have Mercurial installed separately in order to
-	run TortoiseHg on Linux.  TortoiseHg binary packages list Mercurial
-	as a dependency, so it is usually installed for you automatically.
+Windows では,
+	TortoiseHg はエクスプローラにアイコンオーバーレイおよび
+	右クリックメニューを提供するシェル拡張と、TortoiseHg の各種ダイアログを
+	起動するためのコマンドラインツール :file:`hgtk.exe` から構成されます。
+	Windows 用インストーラには Mercurial やマージツール、それ以外に必要なもの
+	全てを含んでおり、これをインストールするだけすぐ使えるようになっています。
 
-TortoiseHg is primarily written in Python and PyGtk (the Windows shell
-extension being a noticeable exception).  The hgtk script and TortoiseHg
-dialogs can be used on any platform that supports PyGtk, including Mac
-OS X.
+Linux では,
+	TortoiseHg はコマンドラインから利用する :file:`hgtk` スクリプトと
+	ご使用のファイルマネージャにアイコンオーバーレイと右クリックメニューを
+	提供する Nautilus 拡張機能から構成されます。TortoiseHg を Linux で
+	利用するには別途 Mercurial をインストールする必要がありますが、
+	通常は TortoiseHg バイナリパッケージが Mercurial を依存ソフトウェアとして
+	リストアップするため、自動的にインストールされます。
 
+TortoiseHg は (Windows のシェル拡張を除いて) 主に Python と PyGTK で
+書かれています。 :file:`hgtk` スクリプトと TortoiseHg の各種ダイアログは
+(例えば Mac OS など) PyGTK に対応した環境であればどこでも使うことができます。
 
-Installing TortoiseHg
-=====================
+TortoiseHg のインストール
+=========================
 
-On Windows
-----------
+Windows の場合
+--------------
 
-TortoiseHg comes with an easy to use installer. Double click on the installer
-file and follow the instructions. The installer will take care of the rest.
+TortoiseHg には簡単にセットアップできるようにインストーラが用意されています。
+ダウンロードしたインストーラをダブルクリックして起動し、後はインストーラが示す
+の手順に従って完了させてください。面倒な作業はインストーラがやってくれます。
 
-After installation a reboot is necessary.
-
-.. note::
-	If you have an older (<0.8) version already installed, the installer
-	will ask that you to remove the previous version of TortoiseHg.  The
-	uninstall can be done from the control panel or the start menu.  If
-	no other applications are using TortoiseOverlays, it is recommended,
-	but not strictly required, to uninstall them when you upgrade an
-	earlier release.
+インストール後の再起動は必須なので注意してください。
 
 .. note::
-	If you have 0.8 or later already installed, you must close all
-	instances of the ThgTaskBar application before installation can
-	proceed.
-	
-
-Language settings
-^^^^^^^^^^^^^^^^^
-
-The TortoiseHg user interface has been translated into many languages.
-You don't need to download a language pack. All the available languages
-are shipped with the installer. Look in
-:file:`C:\\Program Files\\TortoiseHg\\locale` for the available
-languages. To enable a language just set the environment variable
-``LANGUAGE`` to the desidered language, e.g. for italian
-``set LANGUAGE=it``.
+	バージョン 0.8 より古い TortoiseHg がインストールされている場合、
+	インストーラは最初に古いバージョンをアンインストールするよう促します。
+	アンインストールは通常のソフトウェアと同様に、スタートメニューから
+	コントロールパネルを開き、その中の「プログラムの追加と削除」から可能です。
+	必須ではありませんが、もし TortoiseOverlays を利用するプログラムが他に
+	ないのであれば、こちらもアンインストールしておくことをお奨めします。
+	それにより最新の TortoiseOverlays がインストールされます。
 
 .. note::
-	After setting LANGUAGE, if the standard GUI elements like
-	:guilabel:`OK` and :guilabel:`Apply` still appear in English, it
-	means the TortoiseHg installer did not include a translation of GTK+
-	for your locale.  This means the translation of TortoiseHg for your
-	locale was incomplete at release time.
+	バージョン 0.8 以降の TortoiseHg がインストールされている場合、
+	インストーラを起動する前に全ての ThgTaskBar アプリケーション
+	(:file:`thgtaskbar.exe`) を終了しておく必要があります。タスクトレイの
+	通知領域に表示されている Mercurial のアイコンを右クリックしてメニューを
+	開き、 :guilabel:`Exit` をクリックすれば終了できます。
 
-The Windows shell extension context menus get their translations from
-the Windows registry.  Translations for many locales are available from
-the TortoiseHg `wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_.
-Once the desidered file is downloaded (rename it to :file:`.reg` if the
-extension is :file:`.txt`), double-click on it and confirm all the requests.
+言語設定
+^^^^^^^^
 
-On Linux and Mac
-----------------
+TortoiseHg のユーザインターフェイスは様々な言語に翻訳されています。
+利用可能な全ての言語はインストーラに含まれているため、別途言語パックを
+ダウンロードする必要はありません。
+:file:`C:\\Program Files\\TortoiseHg\\locale` で利用可能な言語が見られます。
+言語を有効にするには環境変数 ``LANGUAGE`` に好きな言語コードを設定するだけです。
+例えばイタリア語であれば ``set LANGUAGE=it`` を設定してください。
 
-RPM packages for Fedora are available on the
-`Download <http://bitbucket.org/tortoisehg/stable/downloads/>`_
-page of the wiki.
+.. note::
+	``LANGUAGE`` を設定しても :guilabel:`OK` や :guilabel:`Apply` というように
+	GTK+ 標準のダイアログボタンのラベルが英語のままになっている場合、TortoiseHg
+	のインストーラがその言語の GTK+ 翻訳ファイルを含んでいないことを意味します。
+	これはリリース時にご利用の言語の TortoiseHg 翻訳が完了していなかったためです。
 
-Deb packages for Ubuntu can be found at
-`this <https://launchpad.net/~maxb/+archive/ppa>`_ or
-`that <https://launchpad.net/~tortoisehg-ppa>`_ location.
+Windows シェル拡張の右クリックメニューはその翻訳を Windows レジストリから
+取得します。すでに多くの言語向けの翻訳が利用可能になっており、それらは
+TortoiseHg `Wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_ から
+確認できます。レジストリファイルをダウンロードしたらダブルクリックして
+登録してください。もしダウンロードしたファイルの拡張子が :file:`.txt`
+になっていたら :file:`.reg` に変更しておく必要があります。
 
-For MacOSX, no packages are available but you can run hgtk and all the
-dialogs via the source install method. For details, see
-`MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
+Linux または Max OS の場合
+--------------------------
 
-Language settings
-^^^^^^^^^^^^^^^^^
+Fedora 向けの RPM パッケージは
+`ダウンロード <http://bitbucket.org/tortoisehg/stable/downloads/>`_ ページに
+用意されています。
 
-The TortoiseHg tools use Python's
-`gettext <http://docs.python.org/library/gettext.html>`_ library to
-localize their text.  To get localized dialogs, it is recommended that
-you set the LANGUAGE environment variable to your locale of choice.
+Ubuntu 向けの Deb パッケージは
+`ここ <https://launchpad.net/~maxb/+archive/ppa>`_ 、もしくは
+`こちら <https://launchpad.net/~tortoisehg-ppa>`_ から入手できます。
+
+Max OS X 向けのパッケージは用意されていませんが、ソースコードから
+インストールすることで hgtk スクリプトを含む全ての TortoiseHg ダイアログが
+利用可能になります。詳しくは
+`MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_
+をご覧ください。
+
+言語設定
+^^^^^^^^
+
+TortoiseHg はローカライズに
+`gettext <http://docs.python.org/library/gettext.html>`_ ライブラリの
+Python バインディングを利用しています。ダイアログをローカライズするには
+環境変数 ``LANGUAGE`` を使用したい言語に設定するのが簡単です。
 
 .. vim: noet ts=4
