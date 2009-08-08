@@ -286,8 +286,7 @@ class ChangeSet(gdialog.GDialog):
             return
         linkrev = long(text.split(' ')[0])
         if self.graphview:
-            self.graphview.set_revision_id(linkrev)
-            self.graphview.scroll_to_revision(linkrev)
+            self.graphview.set_revision_id(linkrev, load=True)
         else:
             self.load_details(linkrev)
 
