@@ -8,6 +8,8 @@ Recovery
 .. figure:: figures/recover.png
 	:alt: Recovery dialog
 
+	Recovery Dialog
+
 The toolbar buttons equate to a Mercurial command
 
 :guilabel:`clean`

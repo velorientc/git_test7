@@ -13,6 +13,8 @@ unknown file.
 .. figure:: figures/ignore.jpg
 	:alt: Ignore filter dialog
 
+	Ignore Filter Dialog
+
 From command line
 -----------------
 
