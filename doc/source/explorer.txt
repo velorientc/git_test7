@@ -39,7 +39,7 @@ globally, or enable them for local disks only.
 	Taskbar Options Dialog
 
 Release 0.8.1 introduced the ability to selectively disable overlay
-icons in specific repositories.  This can be done be editing the
+icons in specific repositories.  This can be done by editing the
 :file:`.hg\\thgstatus` file inside the repository and replacing it's
 contents with a single line containing::
 
