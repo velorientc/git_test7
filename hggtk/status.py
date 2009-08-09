@@ -150,18 +150,24 @@ class GStatus(gdialog.GDialog):
                         self.save_clicked, tip=_('Save selected changes'))]
         else:
             tbuttons += [
+                    self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, _('Visual'),
+                        self.revert_clicked,
+                        tip=_('Visual diff checked files')),
                     self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, _('Re_vert'),
-                        self.revert_clicked, tip=_('revert')),
+                        self.revert_clicked,
+                        tip=_('Revert checked files')),
                     self.make_toolbutton(gtk.STOCK_ADD, _('_Add'),
-                        self.add_clicked, tip=_('add')),
+                        self.add_clicked,
+                        tip=_('Add checked files')),
                     self.make_toolbutton(gtk.STOCK_JUMP_TO, _('Move'),
                         self.move_clicked,
-                        tip=_('move selected files to other directory')),
+                        tip=_('Move checked files to other directory')),
                     self.make_toolbutton(gtk.STOCK_DELETE, _('_Remove'),
-                        self.remove_clicked, tip=_('remove')),
+                        self.remove_clicked,
+                        tip=_('Remove or delete checked files')),
                     self.make_toolbutton(gtk.STOCK_CLEAR, _('_Forget'),
                         self.forget_clicked, 
-                        tip=_('forget file(s) on next commit')),
+                        tip=_('Forget checked file(s) on next commit')),
                     gtk.SeparatorToolItem()]
         tbuttons += [self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
             self.refresh_clicked, tip=_('refresh')), gtk.SeparatorToolItem()]
