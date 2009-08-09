@@ -53,7 +53,6 @@ class GLog(gdialog.GDialog):
                 self.make_toolbutton(gtk.STOCK_INDEX,
                     _('_Filter'),
                     self.filter_clicked,
-                    menu=self.filter_menu(),
                     tip=_('Filter revisions for display')),
                 gtk.SeparatorToolItem(),
                 self.make_toolbutton(gtk.STOCK_FIND,
@@ -208,49 +207,6 @@ class GLog(gdialog.GDialog):
         menu.show_all()
         return menu
 
-    def filter_menu(self):
-        menu = gtk.Menu()
-
-        button = gtk.RadioMenuItem(None, _('Show All Revisions'))
-        button.set_active(True)
-        button.connect('toggled', self.filter_selected, 'all')
-        menu.append(button)
-
-        self.newbutton = gtk.RadioMenuItem(button, _('Show New Revisions'))
-        self.newbutton.connect('toggled', self.filter_selected, 'new')
-        menu.append(self.newbutton)
-
-        button = gtk.RadioMenuItem(button, _('Show Tagged Revisions'))
-        button.connect('toggled', self.filter_selected, 'tagged')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Revision Ancestry'))
-        button.connect('toggled', self.filter_selected, 'ancestry')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Working Parents'))
-        button.connect('toggled', self.filter_selected, 'parents')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Head Revisions'))
-        button.connect('toggled', self.filter_selected, 'heads')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Only Merge Revisions'))
-        button.connect('toggled', self.filter_selected, 'only_merges')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Non-Merge Revisions'))
-        button.connect('toggled', self.filter_selected, 'no_merges')
-        menu.append(button)
-
-        self.custombutton = gtk.RadioMenuItem(button, _('Custom Filter'))
-        self.custombutton.set_sensitive(False)
-        menu.append(self.custombutton)
-
-        menu.show_all()
-        return menu
-
     def open_with_file(self, file):
         'Call this before display() to open with file history'
         self.opts['filehist'] = file
@@ -385,9 +341,6 @@ class GLog(gdialog.GDialog):
         elif self.filter == 'only_merges':
             self.opts['only_merges'] = True
             self.graphview.refresh(False, [], self.opts)
-        elif self.filter == 'no_merges':
-            self.opts['no_merges'] = True
-            self.graphview.refresh(False, [], self.opts)
         elif self.filter == 'ancestry':
             if not self.currow:
                 return
@@ -490,9 +443,47 @@ class GLog(gdialog.GDialog):
         self.tree.connect('thg-parent', self.thgparent)
         self.connect('thg-refresh', self.thgrefresh)
 
-        hbox = gtk.HBox()
-        hbox.pack_start(self.graphview, True, True, 0)
-        vbox = gtk.VBox()
+        filterbox = gtk.HBox()
+
+        branchcombo = gtk.combo_box_new_text()
+        for name in self.repo.branchtags().keys():
+            branchcombo.append_text(name)
+        branchcombo.connect('changed', self.select_branch)
+        filterbox.pack_start(branchcombo, False)
+
+        all = gtk.RadioButton(None, _('all'))
+        all.set_active(True)
+        all.connect('toggled', self.filter_selected, 'all')
+        filterbox.pack_start(all, False)
+
+        self.newbutton = gtk.RadioButton(all, _('new'))
+        self.newbutton.connect('toggled', self.filter_selected, 'new')
+        filterbox.pack_start(self.newbutton, False)
+
+        tagged = gtk.RadioButton(all, _('tagged'))
+        tagged.connect('toggled', self.filter_selected, 'tagged')
+        filterbox.pack_start(tagged, False)
+
+        ancestry = gtk.RadioButton(all, _('ancestry'))
+        ancestry.connect('toggled', self.filter_selected, 'ancestry')
+        filterbox.pack_start(ancestry, False)
+
+        parents = gtk.RadioButton(all, _('parents'))
+        parents.connect('toggled', self.filter_selected, 'parents')
+        filterbox.pack_start(parents, False)
+
+        heads = gtk.RadioButton(all, _('heads'))
+        heads.connect('toggled', self.filter_selected, 'heads')
+        filterbox.pack_start(heads, False)
+
+        merges = gtk.RadioButton(all, _('merges'))
+        merges.connect('toggled', self.filter_selected, 'only_merges')
+        filterbox.pack_start(merges, False)
+
+        self.custombutton = gtk.RadioButton(all, _('custom'))
+        self.custombutton.set_sensitive(False)
+        filterbox.pack_start(self.custombutton, False)
+
         self.colmenu = gtk.MenuToolButton('')
         self.colmenu.set_menu(self.view_menu())
         # A MenuToolButton has two parts; a Button and a ToggleButton
@@ -500,22 +491,26 @@ class GLog(gdialog.GDialog):
         b = self.colmenu.child.get_children()[0]
         b.unmap()
         b.set_sensitive(False)
+
         self.nextbutton = gtk.ToolButton(gtk.STOCK_GO_DOWN)
         self.nextbutton.connect('clicked', self.more_clicked)
         self.allbutton = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
         self.allbutton.connect('clicked', self.load_all_clicked)
-        vbox.pack_start(self.colmenu, False, False)
-        vbox.pack_start(gtk.Label(''), True, True) # expanding blank label
-        vbox.pack_start(self.nextbutton, False, False)
-        vbox.pack_start(self.allbutton, False, False)
+        filterbox.pack_start(gtk.Label(''), True, True) # expanding blank label
+        filterbox.pack_start(self.colmenu, False, False)
+        filterbox.pack_start(self.nextbutton, False, False)
+        filterbox.pack_start(self.allbutton, False, False)
 
         self.nextbutton.set_tooltip(self.tooltips,
                 _('show next %d revisions') % self.limit)
         self.allbutton.set_tooltip(self.tooltips,
                 _('show all remaining revisions'))
 
-        hbox.pack_start(vbox, False, False, 0)
-        treeframe.add(hbox)
+        vbox = gtk.VBox()
+        vbox.pack_start(filterbox, False, False, 0)
+        vbox.pack_start(self.graphview, True, True, 0)
+
+        treeframe.add(vbox)
         treeframe.show_all()
 
         # Add ChangeSet instance to bottom half of vpane
@@ -554,6 +549,12 @@ class GLog(gdialog.GDialog):
             self.gorev_dialog.present()
         else:
             self.show_goto_dialog()
+
+    def select_branch(self, combo):
+        row = combo.get_active()
+        if row >= 0:
+            self.custombutton.set_active(True)
+            self.reload_log(branch=combo.get_model()[row][0])
 
     def show_goto_dialog(self):
         'Launch a modeless goto revision dialog'
