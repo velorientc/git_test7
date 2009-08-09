@@ -418,6 +418,13 @@ class GStatus(gdialog.GDialog):
         if self.selcb:
             self.selcb.set_active(file_count and file_count == check_count)
 
+        sensitive = check_count and not self.merging
+        self.get_toolbutton(_('Re_vert')).set_sensitive(sensitive)
+        self.get_toolbutton(_('_Add')).set_sensitive(sensitive)
+        self.get_toolbutton(_('_Remove')).set_sensitive(sensitive)
+        self.get_toolbutton(_('Move')).set_sensitive(sensitive)
+        self.get_toolbutton(_('_Forget')).set_sensitive(sensitive)
+
     def prepare_display(self):
         gobject.idle_add(self.realize_status_settings)
 

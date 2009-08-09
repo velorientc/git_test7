@@ -338,12 +338,6 @@ class GCommit(GStatus):
 
 
     def check_merge(self):
-        self.get_toolbutton(_('Re_vert')).set_sensitive(not self.merging)
-        self.get_toolbutton(_('_Add')).set_sensitive(not self.merging)
-        self.get_toolbutton(_('_Remove')).set_sensitive(not self.merging)
-        self.get_toolbutton(_('Move')).set_sensitive(not self.merging)
-        self.get_toolbutton(_('_Forget')).set_sensitive(not self.merging)
-
         if self.merging:
             # select all changes if repo is merged
             for entry in self.filemodel:
