@@ -37,7 +37,7 @@ def changesetinfo(repo, revid, head=False):
             table.attach(value, 1, 2, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 1)
 
     # prepare data to display
-    table = gtk.Table(0, 2)
+    table = gtk.Table(1, 2)
     ctx = repo[revid]
     revstr = str(ctx.rev())
     summary = ctx.description().replace('\0', '').split('\n')[0]
