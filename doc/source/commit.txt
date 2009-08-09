@@ -241,19 +241,29 @@ may start the merge process again.
 Commit Message Pane
 -------------------
 
-If your project has guidelines for commit message format, you can
-configure those in the settings tool.  The commit tool will enforce this
-policy at commit time, and also has the ability to apply the policy to
-the current message.
-
-The commit message pane has special context menu options:
+The commit message pane has these special context menu options:
 
 	:guilabel:`Paste Filenames`:
-		Pastes checked filenames into the commit message at the cursor.
+		Paste checked filenames into the commit message at the cursor.
 	:guilabel:`Apply Format`:
 		Apply configured message wrap policy to current message.
 	:guilabel:`Configure Format`:
 		Opens the settings dialog to the :guilabel:`Commit` tab.
+
+If your project has guidelines for the format of commit messages, you
+can configure them in the settings tool.  The commit tool will enforce
+your policy at commit time, and you can ask the tool to apply the format
+to the current message.  The :guilabel:`Commit` tab of the settings tool
+has these two configurables for commit message policy:
+
+	:guilabel:`Summary Line Length`:
+		Maximum length of the commit message summary line.  If set,
+		TortoiseHG will issue a warning if the summary line is too long
+		or not separated by a blank line. Default: 0 (unenforced)
+	:guilabel:`Message Line Length`:
+		Word wrap length of the commit message.  If set, the popup menu
+		can be used to format the message and a warning will be issued
+		if any lines are too long at commit.  Default: 0 (unenforced)
 
 MQ patches
 ----------
