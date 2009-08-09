@@ -550,7 +550,7 @@ class ChangeSet(gdialog.GDialog):
             parent = parents[0]
         pair = '%u:%u' % (parent, rev)
         self._node1, self._node2 = cmdutil.revpair(self.repo, [pair])
-        self._view_file('M', self.curfile, force_left=False)
+        self._view_files([self.curfile], False)
 
     def ann_file(self, menuitem):
         'User selected annotate file from the file list context menu'

@@ -447,7 +447,7 @@ class GDialog(gtk.Window):
     def _diff_file(self, stat, file):
         self._do_diff(file and [file] or [], self.opts)
 
-    def _view_file(self, stat, file, force_left=False):
+    def _view_files(self, files, otherparent):
         from hggtk import thgconfig
         def cleanup():
             shutil.rmtree(self.tmproot)
@@ -492,18 +492,20 @@ class GDialog(gtk.Window):
             pathroot = self.repo.root
             copynode = None
             # if we aren't looking at the wc, copy the node...
-            if stat in 'R!' or force_left:
+            if otherparent:
                 copynode = self._node1
             elif self._node2:
                 copynode = self._node2
 
             if copynode:
-                copydir = snapshot_node(self.ui, self.repo,
-                        [util.pconvert(file)], copynode, self.tmproot)
+                pf = [util.pconvert(f) for f in files]
+                copydir = snapshot_node(self.ui, self.repo, pf,
+                        copynode, self.tmproot)
                 pathroot = os.path.join(self.tmproot, copydir)
 
-            file_path = os.path.join(pathroot, file)
-            util.system("%s \"%s\"" % (editor, file_path),
+            paths = ['"'+os.path.join(pathroot, f)+'"' for f in files]
+            command = editor + ' ' + ' '.join(paths)
+            util.system(command,
                         environ={'HGUSER': self.ui.username()},
                         onerr=self.ui, errprefix=_('edit failed'))
 
@@ -524,8 +526,8 @@ class GDialog(gtk.Window):
             self._parse_config()
             return
 
-        file = util.localpath(file)
-        thread = threading.Thread(target=doedit, name='edit:'+file)
+        lfile = util.localpath(files[0])
+        thread = threading.Thread(target=doedit, name='edit:'+lfile)
         thread.setDaemon(True)
         thread.start()
 

@@ -271,22 +271,17 @@ class GCommit(GStatus):
     def thgaccept(self, window):
         self.commit_clicked(None)
 
-    def get_menu_info(self):
-        """Returns menu info in this order: merge, addrem, unknown,
-        clean, ignored, deleted
-        """
-        merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
-                = GStatus.get_menu_info(self)
-        return (merge + ((_('_commit'), self.commit_file),),
-                addrem + ((_('_commit'), self.commit_file),),
-                unknown + ((_('_commit'), self.commit_file),),
-                clean,
-                ignored,
-                deleted + ((_('_commit'), self.commit_file),),
-                unresolved,
-                resolved,
-               )
-
+    def get_custom_menus(self):
+        def commit(menuitem, files):
+            if self.ready_message():
+                self.hg_commit(files)
+                self.reload_status()
+                abs = [self.repo.wjoin(file) for file in files]
+                shlib.shell_notify(abs)
+        if self.merging:
+            return ()
+        else:
+            return [(_('_commit'), commit, 'MAR'),]
 
     def delete(self, window, event):
         if not self.should_live():
@@ -403,15 +398,15 @@ class GCommit(GStatus):
 
         commitable = 'MAR'
         if self.merging:
-            commit_list = self.relevant_files(commitable)
+            commit_list = self.relevant_checked_files(commitable)
             # merges must be committed without specifying file list.
             self.hg_commit([])
         else:
-            addremove_list = self.relevant_files('?!')
+            addremove_list = self.relevant_checked_files('?!')
             if len(addremove_list) and self.should_addremove(addremove_list):
                 commitable += '?!'
 
-            commit_list = self.relevant_files(commitable)
+            commit_list = self.relevant_checked_files(commitable)
             if len(commit_list) > 0:
                 self.commit_selected(commit_list)
             elif len(self.filemodel) == 0 and self.qnew:
@@ -512,15 +507,6 @@ class GCommit(GStatus):
                 os.rmdir(backupdir)
             except OSError:
                 pass
-
-
-    def commit_file(self, stat, file):
-        if self.ready_message():
-            if stat not in '?!' or self.should_addremove([file]):
-                self.hg_commit([file])
-                self.reload_status()
-                shlib.shell_notify([self.repo.wjoin(file)])
-        return True
 
 
     def undo_clicked(self, toolbutton, data=None):
