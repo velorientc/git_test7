@@ -1,94 +1,94 @@
-Windows Explorer Integration
-============================
+Windows エクスプローラ統合
+==========================
 
 .. module:: explorer
 	:synopsis: Windows explorer integration
 
-Overlay Icons
--------------
+アイコンオーバーレイ
+--------------------
 
-TortoiseHg provides visual representation of the file status via overlay
-icons in the MS-Explorer windows. This is similar to those that found on
-other Tortoise client, such as TortoiseCVS and TortoiseSVN.
+TortoiseHg は Windows エクスプローラのアイコンオーバーレイを通じてファイル状態の
+視覚的に表示します。これは TortoiseCVS や TortoiseSVN といった他の Tortoise
+クライアントのそれと似た機能です。
 
-TortoiseHg shares the overlay icons with TortoiseSVN (version 1.5.x or
-later) and the other "Tortoise" projects via the use of TortoiseOverlays
-(another project created by TortoiseSVN team).
+TortoiseHg は TortoiseOverlays (TortoiseSVN チームによるプロジェクト)
+を利用することでアイコンオーバーレイを TortoiseSVN (バージョン 1.5 系以降)
+や他の "Tortoise" プロジェクトと共有します。
 
 .. figure:: figures/overlayicons.png
-	:alt: Overlay icons
+	:alt: アイコンオーバーレイ
 
-	Overlay icons in Icons view (XP)
+	:menuselection:`表示 --> アイコン` で表示したアイコンオーバーレイ (Windows XP)
 
-The context menu has an :guilabel:`Update Icons` option which forces
-TortoiseHg to refresh the icons in the currently browsed repository or
-directory of repositories. The taskbar icon will turn green and the
-directory icons will turn into question marks while this refresh is in
-progress.
+右クリックメニューには :guilabel:`アイコンの更新` メニューが用意されており、
+強制的に現在表示しているリポジトリまたはディレクトリのアイコンを最新の状態に
+更新できます。更新中はタスクバーアイコンが緑色になり、ディレクトリのアイコンオーバーレイは
+「？」マークが表示されます。
 
-The new C++ shell extension is an order of magnitude faster than the
-Python extension used in previous releases, but we still make the
-overlays configurable via the taskbar menu.  Simply click on the
-Mercurial (droplet) icon in the system tray and select
-:guilabel:`Options`.  In the options dialog you can disable overlays
-globally, or enable them for local disks only.
+新しい C++ によるシェル拡張は従来の Python による実装よりも1桁実行速度が
+速くなりましたが、タスクバーアイコンのメニューからアイコンオーバーレイの
+設定が可能です。システムトレイにある Mercurial のアイコン (銀色の水滴)
+をクリックして :guilabel:`Options` を選択してください。
+表示された設定ダイアログでアイコンオーバーレイを無効にしたり、ローカルディスクのみ
+有効にすることができます。
 
 .. figure:: figures/taskbarui.jpg
-	:alt: Taskbar options dialog
+	:alt: タスクバー設定ダイアログ
 
-	Taskbar Options Dialog
+	タスクバー設定ダイアログ
 
-Release 0.8.1 introduced the ability to selectively disable overlay
-icons in specific repositories.  This can be done be editing the
-:file:`.hg\\thgstatus` file inside the repository and replacing it's
-contents with a single line containing::
+バージョン 0.8.1 では特定のリポジトリのみアイコンオーバーレイを無効にすることが
+可能になりました。リポジトリの :file:`.hg\\thgstatus` ファイルを開いて中身を::
 
 	@@noicons
 
-Context Menus
--------------
+の1行のみに置き換えることで無効にできます。
 
-The TortoiseHg commands (GUI window & dialogs) may be accessed via the
-context menu of Explorer windows. The TortoiseHg context menu is 
-context sensitive and which varies according to the current folder and
-file selection.  Here is the context menu for a revisioned folder:
+
+右クリックメニュー
+------------------
+
+TortoiseHg コマンド (GUI ウィンドウとダイアログ) はエクスプローラの
+右クリックメニューから起動します。TortoiseHg の右クリックメニューはコンテキスト、
+つまりどのようなディレクトリやファイルを選択しているかといった状況に応じて
+変化します。例えば次のスクリーンショットは Mercurial 管理下にあるディレクトリの
+右クリックメニューです：
 
 .. figure:: figures/cmenu-nofiles.jpg
-	:alt: Context menu
+	:alt: 右クリックメニュー
 
-	Context menu for a folder under Mercurial revision control
+	Mercurial 管理下にあるディレクトリの右クリックメニュー
 
-And here is the context menu for selected files or folders:
+そしてこれはファイルまたはディレクトリを選択した状態で開いた右クリックメニューです：
 
 .. figure:: figures/cmenu-files.jpg
-	:alt: Context menu
+	:alt: 右クリックメニュー
 
-	Context menu for file or folder selection
+	ファイルまたはディレクトリを選択した状態で開いた右クリックメニュー
 
-TortoiseHg provides dialogs for the most regularly used Mercurial
-commands.  Less frequently used, and newly added, Mercurial commands
-must need be accessed on the CLI (command line interface) through the
-:file:`cmd.exe` windows.
+TortoiseHg は普段よく使う Mercurial コマンドに対応したダイアログを提供します。
+滅多に使わないコマンドや、比較的最近追加されたコマンドについては :file:`cmd.exe`
+など、コマンドライン (CLI) からアクセスする必要があります。
 
-The context menus are configurable via the taskbar menu. Simply click on
-the Mercurial (droplet) icon in the system tray and select
-:guilabel:`Options`.  In the options dialog you can promote individual
-menu options to the top menu.
+右クリックメニューはタスクバー設定ダイアログから設定可能です。システムトレイにある 
+Mercurial のアイコン (銀色の水滴) をクリックして :guilabel:`Options` を
+選択してください。表示された設定ダイアログで各コマンドを個別にトップレベルの
+メニューとして表示できます。
 
-This is the file rename/move dialog:
+これは名前変更・移動ダイアログです：
 
 .. figure:: figures/rename.jpg
-	:alt: Rename file dialog 
+	:alt: 名前変更ダイアログ
 
 
 Nautilus
 --------
 
-TortoiseHg also provides shell integration with the GNOME desktop via a
-nautilus-python plugin.  If you have installed TortoiseHg from a
-distribution package, the odds are that this extension is already
-configured.  If not, please consult our Wiki for instructions on how to
-enable this feature.
+TortoiseHg は nautilus-python プラグインを利用して GNOME デスクトップ環境の
+シェルとの統合も提供しています。頒布パッケージから TortoiseHg をインストールした
+場合はこの拡張機能も既に設定済みです。そうでない場合は Wiki を参考にしてください。
+
+.. NEEDFORTRANSLATION
 
 While the nautilus extension does not have it's own GUI for managing the
 overlays and context menus, it does support command promotion into the
@@ -99,6 +99,6 @@ lines like these::
 	promoteditems = commit, log, synch
 
 .. figure:: figures/nautilus.png
-	:alt: Nautilus screenshot
+	:alt: Nautilus スクリーンショット
 
 .. vim: noet ts=4
