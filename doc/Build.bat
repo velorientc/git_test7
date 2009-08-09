@@ -7,6 +7,9 @@ set OUTPUTDIRSUFFIX=
 if not "%2" == "" (
 	set OUTPUTDIRSUFFIX=-%2
 )
+if "%2" == "en" (
+	set OUTPUTDIRSUFFIX=
+)
 set OUTPUTDIR=build%OUTPUTDIRSUFFIX%
 set ALLSPHINXOPTS=-d %OUTPUTDIR%/doctrees %SPHINXOPTS% source%OUTPUTDIRSUFFIX%
 if not "%PAPER%" == "" (
@@ -25,7 +28,7 @@ if "%1" == "help" (
 	echo.  pdf       to make PDF file, you can set PAPER=a4 or PAPER=letter
 	echo.
 	echo.and where ^<lang^> is one of
-	echo.  en  to make target in English
+	echo.  en  to make target in English ^(default^)
 	echo.  ja  to make target in Japanese
 	goto end
 )
