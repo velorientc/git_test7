@@ -50,11 +50,6 @@ class GLog(gdialog.GDialog):
 
     def get_tbbuttons(self):
         tbar = [
-                self.make_toolbutton(gtk.STOCK_REFRESH,
-                    _('Re_fresh'),
-                    self.refresh_clicked,
-                    tip=_('Reload revision history')),
-                gtk.SeparatorToolItem(),
                 self.make_toolbutton(gtk.STOCK_INDEX,
                     _('_Filter'),
                     self.filter_clicked,
@@ -70,6 +65,11 @@ class GLog(gdialog.GDialog):
                     _('Select Revision'),
                     self.goto_clicked,
                     tip=_('Select revision')),
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_REFRESH,
+                    _('Re_fresh'),
+                    self.refresh_clicked,
+                    tip=_('Reload revision history')),
                 gtk.SeparatorToolItem(),
              ] + self.changeview.get_tbbuttons()
         if not self.opts.get('from-synch'):

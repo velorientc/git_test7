@@ -161,13 +161,13 @@ class GCommit(GStatus):
 
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
-        tbbuttons.insert(2, gtk.SeparatorToolItem())
+        tbbuttons.insert(0, gtk.SeparatorToolItem())
         self.undo_button = self.make_toolbutton(gtk.STOCK_UNDO, _('_Undo'),
             self.undo_clicked, tip=_('undo recent commit'))
         self.commit_button = self.make_toolbutton(gtk.STOCK_OK, _('_Commit'),
             self.commit_clicked, tip=_('commit'))
-        tbbuttons.insert(2, self.undo_button)
-        tbbuttons.insert(2, self.commit_button)
+        tbbuttons.insert(0, self.undo_button)
+        tbbuttons.insert(0, self.commit_button)
         return tbbuttons
 
 

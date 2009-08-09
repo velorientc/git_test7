@@ -142,9 +142,7 @@ class GStatus(gdialog.GDialog):
 
 
     def get_tbbuttons(self):
-        tbuttons = [self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
-            self.refresh_clicked, tip=_('refresh')),
-                     gtk.SeparatorToolItem()]
+        tbuttons = []
 
         if self.count_revs() == 2:
             tbuttons += [
@@ -165,6 +163,8 @@ class GStatus(gdialog.GDialog):
                         self.forget_clicked, 
                         tip=_('forget file(s) on next commit')),
                     gtk.SeparatorToolItem()]
+        tbuttons += [self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
+            self.refresh_clicked, tip=_('refresh')), gtk.SeparatorToolItem()]
         return tbuttons
 
 

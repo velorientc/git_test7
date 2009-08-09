@@ -68,13 +68,13 @@ class GShelve(GStatus):
 
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
-        tbbuttons.insert(2, gtk.SeparatorToolItem())
+        tbbuttons.insert(0, gtk.SeparatorToolItem())
         self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, _('Shelve'),
                 self.shelve_clicked, tip=_('set aside selected changes'))
         self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, _('Unshelve'),
                 self.unshelve_clicked, tip=_('restore shelved changes'))
-        tbbuttons.insert(2, self.unshelve_btn)
-        tbbuttons.insert(2, self.shelve_btn)
+        tbbuttons.insert(0, self.unshelve_btn)
+        tbbuttons.insert(0, self.shelve_btn)
         return tbbuttons
 
     def get_body(self):
