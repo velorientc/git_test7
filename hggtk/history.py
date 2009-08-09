@@ -424,7 +424,9 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('e_mail patch'), self.email_patch))
         m.append(create_menu(_('_bundle rev:tip'), self.bundle_rev_to_tip))
         m.append(create_menu(_('add/remove _tag'), self.add_tag))
-        m.append(create_menu(_('backout revision'), self.backout_rev))
+        self.cmenu_backout = create_menu(_('backout revision'),
+                                         self.backout_rev)
+        m.append(self.cmenu_backout)
         m.append(create_menu(_('_revert'), self.revert))
         m.append(create_menu(_('_archive'), self.archive))
 
@@ -867,6 +869,11 @@ class GLog(gdialog.GDialog):
         parents = [x.rev() for x in self.repo.parents()]
         can_merge = selrev not in parents and len(parents) < 2
         self.cmenu_merge.set_sensitive(can_merge)
+
+        op1, op2 = self.repo.dirstate.parents()
+        node = self.repo[selrev].node()
+        a = self.repo.changelog.ancestor(op1, node)
+        self.cmenu_backout.set_sensitive(a == node)
 
         # display the context menu
         self._menu.popup(None, None, None, button, time)
