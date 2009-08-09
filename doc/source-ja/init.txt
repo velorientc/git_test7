@@ -1,47 +1,49 @@
-Create a new repository
-=======================
+新しいリポジトリを作成する
+==========================
 
 .. module:: init.dialog
 	:synopsis: Dialog used to create a repository
 
-To create a new repository into an existing directory (project) you
-have to run the init dialog. From the explorer context menu select
-:menuselection:`TortoiseHg... --> Create Repository Here` over the directory, or, within
-the folder, type :command:`hgtk init`. 
+既存のディレクトリ (プロジェクト) に新しくリポジトリを作成するには、
+リポジトリ初期化ダイアログを開きます。エクスプローラで、プロジェクトの
+ルートディレクトリ内またはディレクトリそのものの右クリックメニューから
+:menuselection:`TortoiseHg... --> ここにリポジトリを作成` を選択するか、
+コマンドラインから :command:`hgtk init` を実行してください。
 
 .. figure:: figures/init.png
-	:alt: Init dialog
+	:alt: リポジトリ初期化ダイアログ
 
-:guilabel:`Destination`
-	Is the directory where the repository will be created. It is
-	always filled with the current directory, so if you launch the
-	dialog from the right directory there is no reason to change it.
-:guilabel:`Add special files (.hgignore, ...)`
-	If selected TortoiseHg creates an empty :file:`.hgignore` file
-	in the working directory.
-:guilabel:`Make repo compatible with Mercurial 1.0`
-	If selected TortoiseHg creates an old type Mercurial repository.
-	Do not check unless you have a strong reason to do, and you know
-	what you are doing.
+:guilabel:`作成先`
+	リポジトリを作成するディレクトリを指定してください。カレントディレクトリが
+	初期ディレクトリとして指定されるため、作成したいディレクトリから起動すれば
+	特に変更する必要はありません。
+:guilabel:`特殊ファイルを追加する (.hgignoreなど)`
+	これにチェックを入れると TortoiseHg は空の :file:`.hgignore` ファイルを
+	作業ディレクトリに作成します。
+:guilabel:`Mercurial 1.0 互換のリポジトリを作成`
+	これにチェックを入れると TortoiseHg は古い形式の Mercurial リポジトリを
+	作成します。自分が何をしているのか十分に理解していて、どうしてもそうしなければ
+	ならない場合のみチェックを入れてください。
 
-Creating a new repository means create a subdirectory called :file:`.hg`.
-In this subdirectory Mercurial keeps all versioning information.
-	
+リポジトリの新規作成は :file:`.hg` ディレクトリの作成を意味し、
+このディレクトリで Mercurial は全てのバージョン情報を保持しています。
+
 .. warning::
-	Never touch the files in :file:`.hg` directory, otherwise a repository
-	corruption can happen.
-	
-From command line
------------------
+	:file:`.hg` ディレクトリ内のファイルには一切触れないでください。
+	リポジトリの破損を招きます。
 
-The init tool can be started from command line ::
+
+コマンドラインからの実行
+------------------------
+
+リポジトリ初期化ツールはコマンドラインから起動することもできます::
 
 	hgtk init
 
-The syntax is ::
+コマンドの構文は ::
 
 	hgtk init [DEST]
 
-where [DEST] is the path to destination folder.
+となっており、[DEST] には作成先のディレクトリを指定します。
 
 .. vim: noet ts=4
