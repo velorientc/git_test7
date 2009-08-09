@@ -150,8 +150,8 @@ class GStatus(gdialog.GDialog):
                         self.save_clicked, tip=_('Save selected changes'))]
         else:
             tbuttons += [
-                    self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, _('Visual'),
-                        self.revert_clicked,
+                    self.make_toolbutton(gtk.STOCK_JUSTIFY_FILL, _('_Diff'),
+                        self.diff_clicked,
                         tip=_('Visual diff checked files')),
                     self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, _('Re_vert'),
                         self.revert_clicked,
@@ -425,6 +425,7 @@ class GStatus(gdialog.GDialog):
             self.selcb.set_active(file_count and file_count == check_count)
 
         sensitive = check_count and not self.merging
+        self.get_toolbutton(_('_Diff')).set_sensitive(sensitive)
         self.get_toolbutton(_('Re_vert')).set_sensitive(sensitive)
         self.get_toolbutton(_('_Add')).set_sensitive(sensitive)
         self.get_toolbutton(_('_Remove')).set_sensitive(sensitive)
@@ -991,6 +992,15 @@ class GStatus(gdialog.GDialog):
                 pass
         finally:
             fp.close()
+
+    def diff_clicked(self, toolbutton, data=None):
+        diff_list = self.relevant_checked_files('MAR!')
+        if len(diff_list) > 0:
+            self._do_diff(diff_list, self.opts)
+        else:
+            gdialog.Prompt(_('Nothing Diffed'),
+                   _('No diffable files selected'), self).run()
+        return True
 
     def revert_clicked(self, toolbutton, data=None):
         revert_list = self.relevant_checked_files('MAR!')
