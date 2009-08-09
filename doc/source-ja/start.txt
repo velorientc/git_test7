@@ -1,40 +1,46 @@
-Start on a project
-==================
+構成管理を始める
+================
 
-There are many ways to start with Mercurial/TortoiseHg on a project.
+プロジェクトで Mercurial または TortoiseHg を使って構成管理を始める方法は
+いろいろあります。
 
-1. The project already exists and is unrevisioned. You have to *create*
-   a new repository.
-2. You want to hack on a project already revisioned with Mercurial. You
-   have to *clone* a repository.
-3. The project already exists and is revisioned under a different
-   SCM. You have to *convert* the repository.
+1.	プロジェクトが既にあってまだ構成管理されていないのであれば、
+	新しいリポジトリを *作成* してください。
+2.	既に Mercurial で管理されたプロジェクトを変更したいのであれば、
+	そのリポジトリを *複製* してください。
+3.	プロジェクトが既にあって、かつ、他の構成管理システムで管理されている場合は
+	そのリポジトリを *変換* してください。
 
 .. note::
-	Other cases, like *an existing project under a different SCM, you
-	want to keep this SCM but use Mercurial as client*,	are out of the
-	scope of this manual, and TortoiseHg can not help you in any way.
-   
-In the first two cases TortoiseHg can help you with a specific tool, see
-the next two sections.
+	*既にプロジェクトが他の構成管理システムで管理されているが、そのリポジトリを
+	保ったまま Mercurial のコマンドでアクセスしたい* のようなケースは
+	このマニュアルで扱う範疇を越えており、そもそもそういった目的に対して TortoiseHg
+	はあまり役に立ちません。
 
-Convert a project
------------------
+最初の2つのケースは TortoiseHg のツールやダイアログが役に立つため、
+これ以降の節をご覧ください。
 
-TortoiseHg has not a specific tool to do the conversion, but after the
-conversion done with Mercurial you can use TortoiseHg as usually in
-this converted project.
 
-How to do the conversion is not in the scope of this manual, please
-refer to http://mercurial.selenic.com/wiki/RepositoryConversion for
-more details.
+プロジェクトの変換
+------------------
 
-Normally a conversion is done by enabling the *convert* extension and,
-from the parent directory of the checked-out project type::
+TortoiseHg にはリポジトリを変換するためのツールはありませんが、
+Mercurial のリポジトリに変換しさえすれば TortoiseHg を利用できます。
+
+どのように変換するのかについてはこのマニュアルの範囲を越えるため、
+より詳細な説明については
+http://mercurial.selenic.com/wiki/RepositoryConversion
+を参照してください。
+
+.. NEEDFORREVIEW
+
+通常、 *convert* 拡張機能を有効にして親ディレクトリから::
 
 	hg convert myproject
-	
-After the conversion you have a sibling directory of :file:`myproject`
-called :file:`myproject-hg`. Start to play on it.
+
+を実行すれば完了します。
+
+変換が完了すると元のディレクトリ (:file:`myproject`) と同じ階層に
+:file:`myproject-hg` というディレクトリが作成されます。
 
 .. vim: noet ts=4
