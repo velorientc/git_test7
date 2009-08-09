@@ -275,23 +275,23 @@ class GStatus(gdialog.GDialog):
 
         diff_frame = gtk.Frame()
         diff_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        self.diff_notebook = gtk.Notebook()
+        self.diff_notebook.set_tab_pos(gtk.POS_BOTTOM)
 
         self.difffont = pango.FontDescription(self.fontlist)
-        if self.merging:
-            # display merge diffs in simple text view
-            self.clipboard = None
-            self.merge_diff_text = gtk.TextView()
-            self.merge_diff_text.set_wrap_mode(gtk.WRAP_NONE)
-            self.merge_diff_text.set_editable(False)
-            self.merge_diff_text.modify_font(self.difffont)
-            sel = self.filetree.get_selection()
-            sel.set_mode(gtk.SELECTION_SINGLE)
-            self.treeselid = sel.connect('changed', self.merge_sel_changed)
-            scroller.add(self.merge_diff_text)
-            diff_frame.add(scroller)
-        else:
+
+        self.clipboard = None
+        self.diff_text = gtk.TextView()
+        self.diff_text.set_wrap_mode(gtk.WRAP_NONE)
+        self.diff_text.set_editable(False)
+        self.diff_text.modify_font(self.difffont)
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.add(self.diff_text)
+        self.diff_notebook.append_page(scroller, gtk.Label(_('Text Diff')))
+
+        if not self.merging:
             # use treeview to show selectable diff hunks
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
             self.clipboard = gtk.Clipboard(selection=sel)
@@ -339,13 +339,13 @@ class GStatus(gdialog.GDialog):
             diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
             diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
             difftree.append_column(diffcol)
+            scroller = gtk.ScrolledWindow()
+            scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             scroller.add(difftree)
-            diff_frame.add(scroller)
+            self.diff_notebook.append_page(
+                scroller, gtk.Label(_('Hunk Selection')))
 
-            sel = self.filetree.get_selection()
-            sel.set_mode(gtk.SELECTION_MULTIPLE)
-            self.treeselid = sel.connect('changed',
-                    self.tree_sel_changed, difftree)
+        diff_frame.add(self.diff_notebook)
 
         if self.diffbottom:
             self.diffpane = gtk.VPaned()
@@ -355,6 +355,17 @@ class GStatus(gdialog.GDialog):
         self.diffpane.pack1(tree_frame, True, False)
         self.diffpane.pack2(diff_frame, True, True)
         self.filetree.set_headers_clickable(True)
+
+        sel = self.filetree.get_selection()
+        if self.merging:
+            sel.set_mode(gtk.SELECTION_SINGLE)
+            self.treeselid = sel.connect(
+                'changed', self.difftext_sel_changed)
+        else:
+            sel.set_mode(gtk.SELECTION_MULTIPLE)
+            self.treeselid = sel.connect(
+                'changed', self.tree_sel_changed, difftree)
+
         return self.diffpane
 
 
@@ -562,9 +573,8 @@ class GStatus(gdialog.GDialog):
             selection.select_path((firstrow or 0,))
         else:
             # clear diff pane if no files
-            if self.merging:
-                self.merge_diff_text.set_buffer(gtk.TextBuffer())
-            else:
+            self.diff_text.set_buffer(gtk.TextBuffer())
+            if not self.merging:
                 self.diffmodel.clear()
 
         self.filetree.show()
@@ -755,14 +765,15 @@ class GStatus(gdialog.GDialog):
         if success:
             self.reload_status()
 
-    def merge_sel_changed(self, selection):
-        'Selected row in file tree activated changed (merge mode)'
-        # Update the diff text with merge diff to both parents
+    def difftext_sel_changed(self, selection):
+        'Selected row in file tree changed, update text diff'
         model, paths = selection.get_selected_rows()
         if not paths:
             return
         wfile = self.filemodel[paths[0]][FM_PATH]
-        difftext = [_('===== Diff to first parent =====\n')]
+        difftext = []
+        if self.merging:
+            difftext = [_('===== Diff to first parent =====\n')]
         wctx = self.repo[None]
         pctxs = wctx.parents()
         matcher = cmdutil.matchfiles(self.repo, [wfile])
@@ -797,11 +808,12 @@ class GStatus(gdialog.GDialog):
             else:
                 line = hglib.diffexpand(line)
                 buf.insert(bufiter, line)
-        self.merge_diff_text.set_buffer(buf)
+        self.diff_text.set_buffer(buf)
 
 
     def tree_sel_changed(self, selection, tree):
         'Selected row in file tree activated changed'
+        self.difftext_sel_changed(selection)
         # Read this file's diffs into diff model
         model, paths = selection.get_selected_rows()
         if not paths:
