@@ -80,11 +80,14 @@ class GLog(gdialog.GDialog):
                                  tip=_('Launch synchronize tool'))
             tbar += [gtk.SeparatorToolItem(), self.synctb]
 
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
         self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
             _('Load more'), self.more_clicked, tip=_('load more revisions'))
         self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
             _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
-        tbar += [gtk.SeparatorToolItem(), self.nextbutton, self.allbutton]
+        tbar += [sep, self.nextbutton, self.allbutton]
 
         return tbar
 
