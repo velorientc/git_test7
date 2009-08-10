@@ -168,9 +168,11 @@ class GStatus(gdialog.GDialog):
                     self.make_toolbutton(gtk.STOCK_CLEAR, _('_Forget'),
                         self.forget_clicked, 
                         tip=_('Forget checked file(s) on next commit')),
+                    gtk.SeparatorToolItem(),
+                    self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
+                        self.refresh_clicked,
+                        tip=_('refresh')),
                     gtk.SeparatorToolItem()]
-        tbuttons += [self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
-            self.refresh_clicked, tip=_('refresh')), gtk.SeparatorToolItem()]
         return tbuttons
 
 
@@ -434,7 +436,8 @@ class GStatus(gdialog.GDialog):
                               file_count))
         if self.selcb:
             self.selcb.set_active(file_count and file_count == check_count)
-
+        if self.count_revs() == 2:
+            return
         sensitive = check_count and not self.merging
         self.get_toolbutton(_('_Diff')).set_sensitive(sensitive)
         self.get_toolbutton(_('Re_vert')).set_sensitive(sensitive)
