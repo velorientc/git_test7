@@ -53,8 +53,9 @@ After installation a reboot is necessary.
 
 .. note::
 	If you have 0.8 or later already installed, you must close all
-	instances of the ThgTaskBar application before installation can
-	proceed.
+	instances of the ThgTaskBar application (:file:`thgtaskbar.exe`) before
+	installation can proceed. To close it, choose menu :guilabel:`Exit` from
+	the context menu of Mercurial notification icon on the taskbar tray.
 	
 
 Language settings

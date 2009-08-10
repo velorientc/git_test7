@@ -1,134 +1,136 @@
-Common Features
-===============
+共通の機能
+==========
 
 .. module:: common.dialog
 	:synopsis: Common features to all the dialog
 
-These features are common to many TortoiseHg tools, so we document them
-here just once.
+これらの機能は多くの TortoiseHg ダイアログに共通しているため、
+ここにまとめておきます。
 
-Geometry Restore
-----------------
 
-Our primary applications like commit, changelog, and datamine will
-restore their geometry and position from the last time they were run.
-This includes maximization status.
+ウィンドウ位置・サイズなどの復元
+--------------------------------
 
-If the state to be restored does not fit within your current screen
-dimensions, the application will revert to factory default dimensions.
+コミット、チェンジログ、リポジトリ検索といった TortoiseHg の主要ダイアログは最後に
+起動したときの位置やサイズが復元されます。
+これにはウィンドウが最大化されていたかどうかも含まれます。
 
-Dialogs which have fixed geometry or are transitory allow the window
-manager to place them where it wishes.
+復元された位置やサイズが現在のディスプレイのサイズに合わない場合はデフォルトの
+ダイアログ状態に戻されます。
 
-Keyboard Accelerators
----------------------
+サイズ固定のダイアログや一時的に表示されるダイアログは好みの位置に
+置くことができます。
 
-We define a few keyboard accelerators that all of the TortoiseHg tools support.
+
+キーボードショートカット
+------------------------
+
+全ての TortoiseHg ダイアログで使用可能なキーボードショートカットが
+いくつか定義されています。
 
 :kbd:`Ctrl-Q`
-	quit the application, including all open windows
+	開いているウィンドウ全てを閉じてアプリケーションを終了します
 
 :kbd:`Ctrl-W`
-	close the current window (same as :kbd:`Ctrl-Q` if only one window is open)
+	現在のウィンドウを閉じます (開いているウィンドウが1つだけの場合は
+	:kbd:`Ctrl-Q` と同じ動作)
 
 :kbd:`Ctrl-D`
-	visual diff of currently selected file or changeset	
+	現在選択されているファイルまたはチェンジセットの差分を表示します
 
 :kbd:`Ctrl-Enter`
-	activation
+	アクティベーションします
 
 :kbd:`F5`
-	refresh
+	最新の状態に更新します
 
-On `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_, the apple
-(command) key is used as the modifier instead of :kbd:`Ctrl`. However some
-keyboard accelerators are internal to GTK+ so you must use the control key to
-access cut-paste functionality, for instance.
+`Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_ では
+アップル (Command) キーを :kbd:`Ctrl` キーモディファイアの代わりに使用します。
+ただしコピー＆ペーストなど一部の機能については GTK+ 標準のキーボードショートカットが
+使用されるため、 :kbd:`Ctrl` キーを使わなければならない場合もあります。
 
-Visual Diffs
-------------
+
+差分表示
+--------
 
 .. figure:: figures/visual-diff.jpg
-	:alt: Visual Diff Window 
+	:alt: 差分表示ウィンドウ
 
-TortoiseHg 0.8 introduced a visual diff dialog that solves four
-usability issues:
+TortoiseHg 0.8 では差分表示ダイアログにおける4つのユーザビリティ上の
+問題が解決されました：
 
-1) Allows you to select a visual diff tool for each individual file
-2) Allows you to use visual diff tools that fork background processes
-3) Allows you to use visual diff tools that do not support directory diffs
-4) Provides feedback when no files were modified 
+1) ファイルごとに差分表示ツールを選択することが可能
+2) 差分表示ツールを別プロセスとして起動可能
+3) ディレクトリ差分機能を持たない差分表示ツールでも利用可能
+4) 変更されたファイルがない場合、その旨を表示
 
-Providing visual diffs requires TortoiseHg to generate temporary files
-which contain older versions of data.  Those temporary files are deleted
-when the visual diff dialog is closed.
+差分表示のために TortoiseHg は過去のリビジョンデータを含む一時ファイルを生成します。
+それらの一時ファイルは差分表示ダイアログを閉じたときに削除されます。
 
-If you would like to bypass this visual diff window and directly launch
-your visual diff tool open the global settings dialog and set
-:menuselection:`TortoiseHg --> Skip Diff Window` to true.
+差分表示ウィンドウを飛ばして直接、差分表示ツールを起動したい場合は
+:menuselection:`TortoiseHg --> 差分表示をスキップ` を `True` に
+設定してください。
 
 .. note::
-	The `Skip Diff Window` configurable does not change the behavior of
-	visual diffs launched by the shell context menu.  The visual diff
-	window is always shown.
+	`差分表示をスキップ` の設定を変更してもエクスプローラの右クリックメニューから
+	起動する差分表示の動作を変えることはできません。差分表示ウィンドウは常に
+	表示されます。
+
+.. NEEDFORREVIEW
 
 .. warning::
-	When you bypass the visual diff window, your visual diff tool must
-	be able to handle directory diffs and it must not fork a background
-	process.  Caveat emptor.
+	差分表示ウィンドウの表示を飛ばす場合、使用する差分表示ツールはディレクトリ差分機能に
+	対応している必要があり、別プロセスとして起動されません。自己責任で使用してください。
 
-Configuring a visual diff application for use in TortoiseHg is a two
-step process.  First you must configure your application as an
-`Extdiff <http://mercurial.selenic.com/wiki/ExtdiffExtension>`_
-command in your user :file:`Mercurial.ini`::
+TortoiseHg で差分表示アプリケーションを使用するには2つの手順を踏む必要があります。
+まず最初に使用したいアプリケーションを
+`Extdiff <http://mercurial.selenic.com/wiki/ExtdiffExtension>`_ コマンドとして
+:file:`Mercurial.ini` に設定します： ::
 
 	[extdiff]
 	myapp = C:\Path\to\tool.exe
 
-Then you can select `myapp` from the list of available extdiff
-commands in :menuselection:`TortoiseHg --> Visual Diff Command`.
-See the :doc:`faq` for some configuration examples.
+設定すると利用可能な `Extdiff` コマンドとして
+:menuselection:`TortoiseHg --> 差分表示コマンド` に
+`myapp` が表示されるのでそれを選択してください。 :doc:`faq` で
+いくつか設定例を見ることができます。
 
-When more than one `Extdiff` command is configured, the visual diff
-window will allow you to select the command to use as you open each
-file.
+複数の `Extdiff` コマンドが設定されている場合、差分表示ウィンドウでどのコマンドを
+使用するかファイルごとに選択可能です。
 
 
-Treeview searches
------------------
+ツリービュー内検索
+------------------
 
-Many TortoiseHg dialogs use treeviews to present lists of data to the
-user. The file lists in the status, commit, shelve, and changelog tools
-are treeviews. The changelog graph pane is a treeview. And even the
-annotate pane in the datamine tool is a treeview.
+ステータス、コミット、シェルフ、チェンジログツールのファイル一覧、
+チェンジログビューアのグラフ表示パネル、リポジトリ検索ツールのコメントパネルなど
+多くの TortoiseHg ダイアログでツリービューを利用しています。
 
-Most of the TortoiseHg treeviews (as of release 0.8) are configured for
-live searches. Ensure that the treeview has focus (by clicking on a
-row), and begin typing a search phrase. A small entry window will appear
-containing the text you have typed, and the treeview will immediately
-jump to the first row that matches the text you have entered thus far.
-As you enter more characters, the search is refined.
+多くの TortoiseHg 0.8 以降のツリービューではインクリメンタル検索が可能です。
+どれか行を1つ選択するなどして、ツリービューがフォーカスされている状態で
+検索キーワードの入力を始めてください。入力した検索キーワードを含む小さな
+テキスボックスが表示されて、ツリービューは最初にマッチした行にジャンプします。
+さらに入力を続けると検索結果が絞られます。
 
-* :kbd:`Ctrl-F` opens the search window explicitly
-* :kbd:`Ctrl-G` advances the search to the next match
-* :kbd:`Shift-Ctrl-G` searches backwards
-* The mouse scroll wheel will advance forwards and backwards through
-  matching lines 
+* :kbd:`Ctrl-F` は明示的に検索テキストボックスを開きます
+* :kbd:`Ctrl-G` 次にマッチした行に移動します
+* :kbd:`Shift-Ctrl-G` 前にマッチした行に移動します
+* マウスのホイールを回転させると前後のマッチ行に移動します
 
-HG command dialog
------------------
+HG コマンドダイアログ
+---------------------
 
-Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
-commands that could potentially be interactive.  
+TortoiseHg ダイアログの多くは Mercurial のコマンド実行の状況をリアルタイムに
+表示するため *hgcmd* を使用しています。
 
 .. figure:: figures/hgcmd.jpg
-	:alt: Mercurial command dialog
+	:alt: Mercurial コマンドダイアログ
 
 .. note::
-	Error messages are given a dark red color for contrast
+	エラーメッセージは目立つように赤い文字として表示されます
 
-When the Mercurial command has completed, the dialog gives focus to its
-:guilabel:`Close` button.  So pressing :kbd:`Enter` is all that is
-required to close the window.
+Mercurial コマンドの実行が終了したとき、ダイアログは :guilabel:`閉じる` ボタンに
+フォーカスを移動させます。そのため :kbd:`Enter` キーを押すだけでウィンドウを
+閉じることができます。
 
 .. vim: noet ts=4

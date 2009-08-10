@@ -1,52 +1,54 @@
-Rename Guessing
-===============
+名前変更の推定
+==============
 
 .. module:: guess.dialog
 	:synopsis: Dialog used to detect copies and/or renames
 
 .. figure:: figures/guess.jpg
-	:alt: Rename guessing dialog
+	:alt: 名前変更推定ダイアログ
 
-This dialog is used to find renames, moves, and/or copies that were done
-without Mercurial's knowledge.  The dialog can be launched from the
-shell context menu, or from the status or commit tools via the context
-menu of an unknown file.
+このダイアログはファイルの名前変更、移動およびコピーを Mercurial からの情報を
+使わずに検索するのに使います。エクスプローラの右クリックメニューや、
+ステータス・コミットツールのファイル一覧に表示された不明ファイルの
+右クリックメニューから起動できます。
 
-Follow these steps:
+基本的な使い方は以下になります：
 
-1) select one or more of the :guilabel:`Unrevisioned Files`
-2) slide the simularity bar to the percentage match you desire
-3) press either :guilabel:`Find Renames` or :guilabel:`Find Copies`.
-4) select candidate matches and accept good matches
-5) repeat until all unrevisioned files are matched
+1) :guilabel:`コミットされていないファイル` から1つまたは複数のファイルを選択する
+2) 相似度のパーセンテージをスライダを使って設定する
+3) :guilabel:`名前変更の検索` または :guilabel:`コピーの検索` ボタンを押す
+4) 右側の推定結果から適切な項目を選択して :guilabel:`推定結果を確定する` ボタンを押します
+5) 全ての未コミットファイルが解決するまで以上を繰り返します
 
-Find Renames
+
+名前変更の検索
+--------------
+
+この機能はリポジトリから見あたらないファイル (管理されているファイルだったけど今は無い)
+を検索します。見あたらないファイルごとにリポジトリで管理されているファイルの
+最新リビジョンと比較し、 :guilabel:`相似度のしきい値` の設定を上回るファイルを
+:guilabel:`推定結果` の一覧にそのペアを追加します。
+
+
+コピーの検索
 ------------
 
-This feature will search the repository for missing files (files which
-were revisioned but are now gone).  For each missing file, it compares
-the last revisioned data against the unrevisioned file and if the
-percentage of matching lines is above the
-:guilabel:`Minimum Simularity Percentage`, it adds the pair to the
-:guilabel:`Candidate Matches`.
+この機能は見あたらないファイルごとにリポジトリで管理されているファイルと完全に一致する
+ファイルを探し出します。
 
-Find Copies
------------
 
-This feature will check every revisioned file in the repository to see
-if it exactly matches the unrevisioned file.
+推定結果
+--------
 
-Candidate Matches
------------------
+この一覧に表示された項目を選択すると、その差分が下のパネルに表示されます。
+:guilabel:`推定結果を確定する` ボタンを押すと Mercurial に名前変更、または
+コピーとして記録されます。
 
-When you select a match in this list, the differences between the two
-files are shown in the bottom pane.  Pressing :guilabel:`Accept Match`
-will record the rename or copy event with Mercurial.
 
-From command line
------------------
+コマンドラインからの実行
+------------------------
 
-The guess tool can be started from command line::
+推定ツールはコマンドラインから起動することもできます： ::
 
 	hgtk guess
 

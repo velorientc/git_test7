@@ -1,243 +1,246 @@
-******************************
-A quick tour for the impatient
-******************************
+******************************************
+せっかちな人のためのクイックチュートリアル
+******************************************
 
 .. module:: tour
 	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
 
-Mercurial supports many different
-`collaboration models <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
-This chapter describes just one of those models: a single central repository.
-The central repository model does not scale as well as other models, but
-it is the most familiar to those coming from other revision tools and
-thus is the most common approach people start with.
+Mercurial はいくつもの異なる
+`コラボレーションモデル <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_
+に対応しています。本節ではその中の1つである中央リポジトリ型について説明します。
+中央リポジトリ型は他のモデルにようにスケールしませんが、誰もが最初に
+試すアプローチですし、他のバージョン管理ツールなどでもよく知られています。
 
-To get started, suppose you volunteer to create the central repository.
-There are ways to `convert <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
-non-Mercurial repositories into Mercurial repositories, but for this
-example lets assume we're starting from scratch.
+さて、始めるにあたって中央リポジトリを作成したいと思います。
+既存の Mercurial 以外のリポジトリを
+`変換 <http://mercurial.selenic.com/wiki/RepositoryConversion>`_ する方法も
+ありますが、ここでは空っぽの新しいリポジトリから始めます。
 
-The rest of this tutorial assumes you already have TortoiseHg properly
-installed, and you have your project folder open in your file browser.
+これ以降、既に TortoiseHg が正しくインストールされており、エクスプローラなどで
+プロジェクトのディレクトリが開かれているものとして話を進めていきます。
 
 
-Configuring TortoiseHg
-======================
+TortoiseHg の設定
+=================
 
-First you need to make sure that you are correctly identified in
-TortoiseHg.  You do this by adjusting the global settings of TortoiseHg.
-Right click in your source folder and select
-:menuselection:`TortoiseHg --> Global Settings`
+まず最初に TortoiseHg にあなたが誰なのかを教えなければなりません。
+TortoiseHg のグローバル設定から設定できます。プロジェクトディレクトリを
+右クリックして :menuselection:`TortoiseHg --> グローバル設定` を選択します。
 
 .. figure:: figures/cmenu-nofiles.jpg
 	:alt: Context Menu
 
-You must then select the :guilabel:`Commit` tab and enter a name in the
-:guilabel:`Username` field.
+そして :guilabel:`コミット` タブに切り替えて、 :guilabel:`ユーザ名` の
+テキストボックスに名前を入力してください。
 
 .. note::
-	If you forget to configure your username TortoiseHg will ask you to
-	enter one when you *commit*, the only time the name is actually
-	required.
+	ユーザ名の設定をし忘れた場合、TortoiseHg は必要に応じてコミット時にユーザ名の
+	入力を促します。
 
 .. note::
-	There are no hard rules on how to format your user name, the field
-	is free form, but the following convention is commonly used::
+	ユーザ名として設定する名前の形式に厳密なルールがあるわけではありませんが、
+	多くの人が次のような形式を採用しています：
 	
-		FullName <email>
-		
-	for example ::
+		氏名 <電子メールアドレス>
 	
-		Donald Duck <donaldduck@example.net>
+	例えば：
 	
-	The email address is stripped when viewing history in the changelog
-	viewer, and the built-in web server obfuscates email addresses to
-	prevent SPAM.
+		Taro Yamada <taroyamada@example.net>
+	
+	電子メールアドレスはチェンジログビューアで履歴を表示する際には削除され、
+	Mercurial 内蔵のウェブサーバを利用した場合はスパム対策のためメールアドレス
+	の一部のみ表示されます。
 
 
-Initialize the repository
-=========================
+リポジトリの初期化
+==================
 
-Create the initial repository on your local machine by using the
-:guilabel:`Create Repository Here` shell menu option, or in a command
-shell within the folder, type :command:`hgtk init`.  You only need to do
-this in once in the root folder of your project.
+右クリックメニューの :guilabel:`ここにリポジトリを作成` を選択するか、
+コマンドラインから :command:`hgtk init` を実行して最初のリポジトリを
+ローカルディスク上に作成してみましょう。
+この作業はプロジェクトディレクトリのルートで一度だけ行ってください。
 
 .. figure:: figures/init.png
-	:alt: Init dialog
+	:alt: リポジトリ初期化ダイアログ
 
-We suggest you keep :guilabel:`Add special files (.hgignore, ...)`
-checked, and do not check
-:guilabel:`Make repo compatible with Mercurial 1.0`
-unless you have a strong reason to do so.
+特に理由がなければ
+:guilabel:`特殊ファイルを追加する (.hgignoreなど)` にチェックを入れ、
+:guilabel:`Mercurial 1.0 互換のリポジトリを作成` のチェックは外した状態で
+リポジトリを作成すると良いでしょう。
 
-After pressing :guilabel:`Create`, Mercurial creates a subdirectory in
-your project folder named :file:`.hg`. This is where Mercurial keeps all
-its version data.  It is called the *repository* or *store*, while the
-directory containing the source files is called the *working directory*.
-You never need to specify the :file:`.hg` directory when running
-commands, you only need to specify the working directory root.  It is
-mentioned here just so you better understand how Mercurial works.
+:guilabel:`作成` ボタンを押すと Mercurial はプロジェクトディレクトリに
+:file:`.hg` という名前のディレクトリを作成します。
+ここには Mercurial の全てのバージョン情報が保管され、一般に *リポジトリ*
+と呼ばれています。一方、実際のソースファイルなどが含まれているディレクトリを
+*作業ディレクトリ* と呼びます。コマンドを実行するときこの :file:`.hg`
+ディレクトリを指定する必要はなく、作業ディレクトリのルートを指定するだけで
+大丈夫です。これは Mercurial がどのように動いているのかを理解するために
+覚えておくと良いかもしれません。
 
 .. warning::
-	It is dangerous to manually edit the files in :file:`.hg` directory,
-	repository corruption can occur.  :file:`.hg/hgrc` is perhaps the
-	only exception to this rule.
+	:file:`.hg` を直接編集することはリポジトリの破損を引き起こすため危険です。
+	ただし :file:`.hg/hgrc` のみ例外的に編集が認められています。
 
-Add files
-=========
 
-Now it's time to tell Mercurial which files must be tracked and which
-files must be ignored. There are a lot of way to do this:
+ファイルの追加
+==============
 
-1. To add files, select them in explorer and then right click and select
-   :menuselection:`TortoiseHg --> Add Files` in the context menu. In
-   this way the adding action happens immediately and no TortoiseHg
-   dialogs appear, but you will see the overlay icons change to indicate
-   added files.
-   
-2. Or open the status tool (:menuselection:`TortoiseHg --> View File Status`
-   or :command:`hgtk status` from the command line). Check the files you
-   want to add and then press the :guilabel:`Add` button. From the
-   status tool you can launch the ignore filter tool from the context
-   menu of a unknown file (the menu option is named :guilabel:`ignore`)
-   
-3. Or skip adding new files as a separate step and have the commit tool
-   add them implicitly.  The commit tool is very similar to the status
-   tool and allows you to do all of the same tasks. In this tool you
-   can add and commit an untracked file by just checking the file and
-   pressing :guilabel:`Commit`.
-   
-4. To ignore files, open the ignore filter dialog:
-   :menuselection:`TortoiseHg --> Edit Ignore Filter`
-   or from command line :command:`hgtk hgignore`. Choose a file from
-   the list or manually type in a *Glob* or *Regular expression*
-   filter and then press :guilabel:`Add`. Changes to the ignore filter
-   take effect immediately.
-   
-.. note::
-	The :file:`.hgignore` file, contained in the working directory root,
-	is typically tracked (checked in).
+いよいよ Mercurial にどのファイルを管理下に置き、どのファイルを無視すべき
+なのかを指定します。これにはいくつものやり方があります：
+
+1.	エクスプローラで追加したいファイルを右クリックしてメニューを開いて
+	:menuselection:`TortoiseHg --> 追加` を選択します。
+	この操作はすぐに実行され、TortoiseHg のダイアログは表示されませんが、
+	エクスプローラでそのファイルのアイコンオーバーレイが追加されたことを示す
+	アイコンに変わったことを確認できます。
+
+2.	もしくは、ステータスツール (:menuselection:`TortoiseHg --> 変更点の確認`
+	またはコマンドラインから :command:`hgtk status`) を開いて追加したいファイルの
+	チェックボックスにチェックを入れ、 :guilabel:`追加` ボタンを押します。
+	ステータスツールでは、不明なファイルの右クリックメニュー (:guilabel:`無視`)
+	から無視フィルタツールを開くこともできます。
+
+3.	または、ファイルの追加を独立した作業として行わず、コミットツールで済ます
+	ことも可能です。コミットツールはステータスツールと非常に似ており、
+	ステータスツールで可能な操作は全てコミットツールでも行えます。
+	このツールではファイルにチェックを入れて :guilabel:`コミット` ボタンを押す
+	ことで、まだ Mercurial 管理下に置かれていないファイルの追加およびコミット
+	することができます。
+
+4.	無視ファイルを指定するために無視フィルタダイアログを開きます：
+	右クリックメニューから :menuselection:`TortoiseHg --> 無視フィルタの編集`
+	を選択するか、コマンドラインから :command:`hgtk hgignore` を実行します。
+	一覧からファイルを選択するか直接 *Glob* または *正規表現* を入力して
+	:guilabel:`追加` ボタンを押してください。ここでの変更は即座に反映されます。
 
 .. note::
-	It is good practice to not have many *unknown* files in your working
-	directory, as it makes it too easy to forget to add vital new files.
-	So it is recommended that you keep your :file:`.hgignore`
-	file up to date.
-
-
-Commit
-======
-   
-Commit your local repository by right-clicking anywhere in the folder,
-or on the folder itself, and then selecting
-:guilabel:`HG Commit ...`, or from command line type :command:`hgtk commit`.
-Write a commit message, select the files you wish to commit, then press
-:guilabel:`Commit`. If, after the commit, you realize that something was wrong
-with the message or the selected files, you can cancel the last commit
-using the :guilabel:`Undo` button.  Your previous commit message will be
-in the message history drop-down, so you do not have to type it in again
-from scratch.
+	:file:`.hgignore` ファイルは作業ディレクトリのルートに含まれており、
+	通常は Mercurial のバージョン管理下に置かれています。
 
 .. note::
-	You lose the ability to easily undo the last commit when you close
-	the commit tool.
+	作業ディレクトリにたくさんの *不明* ファイルを放置したままにしないというのは、
+	バージョン管理下に置くべきファイルの追加し忘れを未然に防ぐという意味で
+	よい習慣と言えます。そのため :file:`.hgignore` ファイルを極力最新の状態に
+	保つよう努めてください。
+
+
+コミット
+========
+
+プロジェクトディレクトリを右クリックして :guilabel:`HG コミット ...` を
+選択するか、コマンドラインから :command:`hgtk commit` を実行して変更点を
+ローカルリポジトリにコミットします。コミットメッセージを記述し、
+コミットしたいファイルにチェックを入れてから :guilabel:`コミット` ボタンを
+押します。コミット後にコミットメッセージの内容やコミットしたファイルの間違いに
+気付いた場合は :guilabel:`取り消し` ボタンで直前のコミットを取り消すことが
+できます。入力したコミットメッセージはメッセージ履歴のドロップダウンリストに
+残るため、同じメッセージを再度入力し直す必要はありません。
+
+.. note::
+	コミットツールを閉じてしまうと直前のコミットを :guilabel:`取り消し` ボタンで
+	取り消すことは出来なくなります。
 
 .. figure:: figures/commit.png
-	:alt: Commit dialog
+	:alt: コミットツール
 
 
-Share the repository
-====================
+リポジトリの共有
+================
 
-Now you are ready to share your work. You do this by making a copy of
-your repository in a public place that everyone in your group can
-access. Mercurial calls this *cloning your repository*. To clone your
-repository to a common area, such as a shared drive or web site which
-will be the merge point for the team. From the shared drive select
-:menuselection:`TortoiseHg --> Clone a Repository`, or
-:command:`hgtk clone` from command line.
+これであなたの成果を共有するための準備が整いました。あとはこのリポジトリを
+他のメンバからも参照できる共用スペースにコピーするだけでOKです。
+Mercurial ではこれを *リポジトリの複製 (cloning your repository)* と
+呼んでいます。リポジトリを共用スペース、例えば共有ドライブ、またウェブサイト
+などに複製すれば、それが開発チームのマージポイントになるでしょう。
+エクスプローラで共有ドライブに置いたリポジトリを開き、そのディレクトリの
+右クリックメニューから :menuselection:`TortoiseHg --> リポジトリのクローン`
+を選ぶか、コマンドラインから :command:`hgtk clone` を実行します。
 
 .. figure:: figures/share.png
-	:alt: Clone dialog
+	:alt: 複製ツール
 
-When you create a clone for the purposes of generating a *central
-repository* there is no reason for that clone to have a working
-directory. Checking
-:guilabel:`do not update the new working directory` will prevent
-Mercurial from checking out a working copy of the repository in the
-central repository clone.  It will only have the :file:`.hg` directory,
-which stores the entire revision history of the project.
+チームでコードを共有するための *中央リポジトリ* に、あなたが持っている
+ローカルのリポジトリのような作業ディレクトリは必要ありません。
+つまり、純粋にリポジトリだけあれば十分と言えます。このような場合、
+:guilabel:`クローン後に作業ディレクトリを HEAD に更新しない`
+にチェックを入れることで Mercurial は中央リポジトリの複製から
+作業コピーをチェックアウトしません。その結果、プロジェクトのリビジョン履歴の
+全てが格納されている :file:`.hg` のみとなります。
 
-Other team members can then work from this clone.
+他のチームメンバはこの中央リポジトリから複製することで作業できます。
 
 
-Fetching from the group repository
-==================================
+共有リポジトリからの取得
+========================
 
-You want to start collaborating with your team.  They tell you something
-like *fetch the repository from x*.  What does that mean? It means that
-you want to make a copy of the repository located at x on your local
-machine.  Mercurial calls this cloning and TortiseHg has a dialog
-for it. Right click in the directory where you want your copy and select
-:menuselection:`TortoiseHg --> Clone a Repository`, or
-:command:`hgtk clone` from command line.
+今あなたがあるチームと共同作業を始めたいとします。彼らは
+*X からリポジトリを取得してくれ* と言っていますが、どういう意味なのでしょうか？
+これは、X という場所に置かれているリポジトリをローカルに複製してくれ、
+という意味になります。Mercurial ではこれを複製 (cloning) と呼び、
+TortoiseHg には専用のダイアログが用意されています。
+複製を作成したいディレクトリで右クリックメニューを開いて
+:menuselection:`TortoiseHg --> リポジトリのクローン` を選択するか
+コマンドラインから :command:`hgtk clone` を実行してください。
 
 .. figure:: figures/clone.png
 	:alt: Clone dialog
 
-This time you do want to update the working directory because you want
-to work on the project, uncheck
-:guilabel:`do not update the new working directory` so Mercurial updates
-the working directory with the *tip* revision in your new clone.
+今回はこれから複製するリポジトリの作業ディレクトリでプロジェクトの作業を
+するため、 :guilabel:`クローン後に作業ディレクトリを HEAD に更新しない`
+のチェックは外してください。これで Mercurial は作業ディレクトリを
+*tip* リビジョンに更新します。
 
 
-Working with your repository
-============================
+リポジトリを使ったワークフロー
+==============================
 
-Suppose you've introduced some changes. It is easy to see that there are
-a couple of directories with changes pending.  You can traverse the
-directories to find specific changes and commit them from Explorer. A
-quicker way is to use the commit tool:
+作業ディレクトリでいくつかの変更を加えたとします。エクスプローラでいくつかの
+変更が保留中であることをアイコンオーバーレイの変化から簡単に確認できます。
+より詳細な変更点の確認やそれらのコミットはエクスプローラから行うことができます。
+手っ取り早い方法はコミットツールを使うことです：
 
 .. {{images/image001.png}}
 
-The commit tool gives you a way to see differences or you can use your
-visual difference tool (kdiff). Mercurial allows you to commit many
-changes before you decide to synchronize (share changes) with the group
-repository.
+.. NEEDFORTRANSLATION
 
+コミットツールは変更の差分を表示してくれます。もしくは普段使用している GUI の
+差分表示ツール (kdiff など) を使用することもできます。
+Mercurial allows you to commit many changes before you decide to
+synchronize (share changes) with the group repository.
 
-When you're ready to publish your changes, you
+変更を共有リポジトリに公開する準備が整ったら、
 
-1. Commit your changes to your local repository, if you haven't already
-   (see above).
-2. Pull changes from the group repository into your repository,
-   :menuselection:`TortoiseHg --> Synchronize` or
-   :command:`hgtk synch`, choose the path to the group repository
-   and then :guilabel:`Pull`.
-3. If some changesets were pulled, merge those changes with your local
-   changes and then commit the merge into your local repository. From
-   the changelog viewer (:menuselection:`TortoiseHg --> View Changelog`
-   or :command:`hgtk log`) open the context menu over the changeset
-   which you want to merge and select :guilabel:`merge with`.
-   Finally, in the merge dialog, press :guilabel:`Merge` and then
-   :guilabel:`Commit`.
-4. Ensure your merged work still builds and passes your extensive test suite.
-5. Push your changes to the group repository,
-   :menuselection:`TortoiseHg --> Synchronize` or :command:`hgtk synch`,
-   choose the path to group repository and then :guilabel:`Push`.
+1.	まだ変更をローカルリポジトリにコミットしていないのであれば、
+	先にそれを済ませます (前述)。
+2.	共有リポジトリから変更をローカルリポジトリにプル (pull) します：
+	右クリックメニューから :menuselection:`TortoiseHg --> 同期ツール` または
+	コマンドラインから :command:`hgtk synch` を実行し、共有リポジトリの場所を
+	選択してからツールバーの :guilabel:`プル` ボタンを押します。
+3.	いくつかのチェンジセットがプルされた場合、それらの変更とローカルでの変更を
+	マージして、マージ結果をローカルリポジトリにコミットしてください。
+	チェンジログビューアから (:menuselection:`TortoiseHg --> ログの表示`
+	または :command:`hgtk log`) マージしたいリビジョンの右クリックメニューを
+	開いて :guilabel:`マージ` を選択します。マージダイアログが表示されるので、
+	:guilabel:`マージ` ボタンを押してマージを実行し、 :guilabel:`コミット`
+	してください。
+4.	マージが正しく行われたかどうかテストなどで検証してください。
+5.	変更を共有リポジトリにプッシュ (push) するために、
+	:menuselection:`TortoiseHg --> 同期ツール` または :command:`hgtk synch`
+	で同期ダイアログを開き、共有リポジトリの場所を選択してから
+	:guilabel:`プッシュ` ボタンを押します。
 
-Which may sound complicated, but most of the time it is just pushing the
-buttons in the synchronize tool.
+文章にすると複雑に見えますが、実際には同期ツールのボタンを押すだけです。
+
+.. NEEDFORTRANSLATION
 
 .. note::
 	Merges can be safely restarted if necessary.
 
 .. figure:: figures/synchronize.png
-	:alt: Synchronize dialog
+	:alt: 同期ツール
 
-Mercurial makes collaboration easy, fast, and productive.
-Learn more at Mercurial's `wiki <http://mercurial.selenic.com/wiki/>`_.
+Mercurial は共同作業を簡単に、素早く、効率的にします。
+詳しくは Mercurial の `wiki <http://mercurial.selenic.com/wiki/>`_
+をご覧ください。
 
 .. vim: noet ts=4

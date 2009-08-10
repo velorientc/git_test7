@@ -1,99 +1,97 @@
-*******
-Preface
-*******
+********
+はじめに
+********
 
 .. module:: preface
 	:synopsis: About this manual
 
-Audience
+対象読者
 ========
 
-This book is written for computer literate folk who want to use
-Mercurial to manage their data, but are uncomfortable using the command
-line client to do so. Since TortoiseHg is a Windows shell extension it's
-assumed that the user is familiar with the Windows explorer and knows
-how to use it.
+本書は Mercurial を利用してファイルやデータを管理したいが、コマンドラインから
+操作するのはやや不便だと感じる、ある程度コンピュータに慣れ親しんだ方のために
+書かれました。TortoiseHg は Windows のシェル拡張として提供されるため、
+ユーザは普段使っている Windows エクスプローラから利用することができます。
 
-You can find the most up to date version of this documentation at our
-`web <http://bitbucket.org/tortoisehg/stable/downloads>`_ site.
+本書の最新版は `公式サイト <http://bitbucket.org/tortoisehg/stable/downloads>`_
+からダウンロード可能です。
 
-Reading guide
-=============
+本書の読み方
+============
 
-This Preface explains a little about the TortoiseHg project, the
-community of people who work on it, and the licensing conditions for
-using it and distributing it.
+この章では本書の構成、開発や議論の中心となっているコミュニティ、利用および
+再配布のソフトウェアライセンスなど、TortoiseHg プロジェクトについて少し説明を
+しておきます。
 
-The :doc:`intro` explains what TortoiseHg is, what it does, where it
-comes from and the basics for installing it on your PC.
+:doc:`intro` では TortoiseHg とは何か、何ができるのか、どこからインストール
+すればいいのかなど、基本的な事柄について解説します。
 
-:doc:`quick` is a quick tutorial on how to start with TortoiseHg.
+:doc:`quick` は TortoiseHg に初めて触れる人のためのクイックチュートリアルです。
 
-:doc:`faq` has a list of common questions and their answers.
+:doc:`faq` にはよくある質問がまとめてあります。
 
-:doc:`debugging` describes how to debug any problems that you find.
+:doc:`debugging` は TortoiseHg のバグを見つけたときにどうやってデバッグを
+すればいいのかについて書かれています。
 
-The remaining chapters describe the components that make up TortoiseHg.
+その他の章は TortoiseHg を構成する各種ダイアログ・コンポーネントについて
+記述されています。
 
-TortoiseHg is free!
-===================
+ライセンス
+==========
 
-TortoiseHg is released under 
-`GPLv2 <http://www.gnu.org/licenses/gpl-2.0.html>`_.  You are free to
-install it on as many computers as you like, and to redistribute it
-according to the GPLv2 license.
+TortoiseHg は `GPLv2 <http://www.gnu.org/licenses/gpl-2.0.html>`_ の下で
+リリースされています。好きなコンピュータに好きなだけインストールすることが
+できますし、GPLv2 ライセンスに従う限り再配布も可能です。
 
-Community
-=========
+コミュニティ
+============
 
-Mailing Lists:
+メーリングリスト:
 
-* `Users <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - Announcements, user Q&A, and feature discussions.
-* `Developers <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - Patches, bug reports, development discussions.
-* `Issues <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Notifications from the issue tracker.
+* `利用者 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - アナウンス、使い方などの質問、機能の議論など。
+* `開発者 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - パッチ投稿、バグ報告、開発関連の議論など。
+* `バグ通知 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - バグ管理システムからの通知。
 
-And our `wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ on BitBucket.
+Bitbucket には`公式 Wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ もあります。
 
-Acknowledgement
-===============
+謝辞
+====
 
-Thanks to the many people who contribute to the TortoiseHg project.  It
-takes a community of developers, translators, and users to build a
-truly useful tool.  Especially users who care enough to report bugs and
-file feature requests.
+TortoiseHg プロジェクトに貢献し、本当に便利なツールを作り上げた全ての開発者、
+翻訳者、利用者コミュニティ、そして特に貴重なバグレポートおよび機能要望に
+協力していただいた利用者に感謝の意を表します。
 
-Conventions used in this manual
-===============================
+表記規則
+========
 
-The following typographical conventions are used in this manual:
+本マニュアルでは以下の表記規則に従っています:
 
 :kbd:`Ctrl-A`
-	Indicates a key, or combination of keys, to press.
+	押すべきキーボードのキーまたはキーの組み合せを示しています。
 
-:guilabel:`Commit`
-	Indicates a label, button or anything that appears in user interfaces.
+:guilabel:`コミット`
+	ラベル、ボタンなど GUI に表示される文字列を示しています。
 
 :menuselection:`TortoiseHg... --> About`
-	Indicates a menu choice, or a combination of menu choice, tab
-	selection and GUI label.  For example
-	:menuselection:`TortoiseHg...  --> Global settings --> Commit --> User name`
-	means do something in :guilabel:`User name` label under
-	:guilabel:`Commit` tab selectable from the menu choice
-	:menuselection:`TortoiseHg... --> Global settings`.
+	メニュー選択およびその組み合せ、またタブ選択、GUI のラベルを示します。例えば
+	:menuselection:`TortoiseHg... --> グローバル設定 --> コミット --> ユーザ名`
+	は メニューから :menuselection:`TortoiseHg... --> グローバル設定` とたどり、
+	開いたダイアログの :guilabel:`コミット` というタブに切り替えて、その中にある
+	:guilabel:`ユーザ名` というラベルの付いた場所で何かをする、という意味になります。
 
 :file:`.hg/hgrc`
-	Indicates a filename or directory name.
+	ファイル名やディレクトリ名を示します。
 
 :command:`hgtk log`
-	Indicates a command to enter into command window.
+	コマンドプロンプトなどへの入力を示します。
 
 ``myproxy:8000``
-	Indicates a text to enter into a text input field in the GUI.
-	
+	GUI のテキストボックスへの入力を示します。
+
 .. note::
-	This is a note.
+	注釈です。
 
 .. warning::
-	An important note. Pay attention.
+	重要な注釈です。注意してください。
 
 .. vim: noet ts=4

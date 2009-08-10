@@ -1,22 +1,23 @@
-Ignore Filter
-=============
+無視フィルタ
+============
 
 .. module:: ignore.dialog
 	:synopsis: Dialog used to maintain the ignore filter
 
-The ignore dialog is used to maintain your Mercurial repository's ignore
-filter, which can be found in an :file:`.hgignore` file in the
-repository root.  The dialog can be launched from the shell context
-menu, or from the status or commit tools via the context menu of an
-unknown file.
+無視フィルタダイアログはリポジトリのルートにある :file:`.hgignore` ファイルの
+ような Mercurial の無視ファイルフィルタの編集に使われます。
+エクスプローラの右クリックメニューや、ステータス・コミットツールのファイル一覧に
+表示された不明ファイルの右クリックメニューから起動できます。
 
 .. figure:: figures/ignore.jpg
-	:alt: Ignore filter dialog
+	:alt: 無視フィルタダイアログ
 
-From command line
------------------
+コマンドラインからの実行
+------------------------
 
-The ignore tool can be started from command line::
+.. NEEDFORIMPROVE
+
+無視フィルタツールはコマンドラインから起動することもできます： ::
 
 	hgtk hgignore [FILE]
 
