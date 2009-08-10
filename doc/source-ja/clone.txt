@@ -1,52 +1,55 @@
-Clone a repository
-=======================
+リポジトリの複製
+================
 
 .. module:: clone.dialog
 	:synopsis: Dialog used to clone a repository
 
-To clone a repository you have to run the clone dialog.
-From the explorer context menu select :menuselection:`TortoiseHg... --> Clone a repository`
-or type :command:`hgtk clone`. 
+リポジトリの複製には複製ダイアログを使います。
+エクスプローラで右クリックメニューを開いて
+:menuselection:`TortoiseHg... --> リポジトリのクローン` を選択するか、
+コマンドラインから :command:`hgtk clone` を実行してください。
 
 .. figure:: figures/clone.png
-	:alt: Clone dialog
-	
-:guilabel:`Source Path`
-	It is the path (or URL) of the repository that will be cloned. Use the :guilabel:`Browse...` to
-	choose a local folder.
-:guilabel:`Destination Path`
-	It is the path of destination directory, a folder with the same name of source repository will
-	be created within this directory.
-:guilabel:`Clone To Revision`
-	You can limit the clone up to this revision. Even the tags created after this revision will not be
-	imported.
-:guilabel:`do not update the new working directory`
-	If checked, after the clone the working directory will be empty. It is useful when you have to clone
-	a repository with the purpose of central repository, or backup, where you have only, in the future,
-	to *push* and *pull*.
-:guilabel:`use pull protocol to copy metadata`
-	When the source and destination are on the same filesystem, Mercurial tries to use hardlinks. Some
-	filesystems, such as AFS implement hardlink incorrectly, but do not report errors. Use this option
-	to avoid hardlinks.
-:guilabel:`use uncompressed transfer`
-	To use uncompressed transfer (fast over LAN).
-:guilabel:`use proxy server`
-	To use the proxy server configured in :menuselection:`TortoiseHg... --> Global Settings --> Proxy`.
-	This is enabled only if a proxy is configured.
-:guilabel:`Remote Cmd`
-	Specify a Mercurial command to run  on the remote side.
+	:alt: 複製ダイアログ
 
-From command line
------------------
 
-The clone tool can be started from command line ::
+:guilabel:`クローン元`
+	複製したいリポジトリのパス (または URL) を指定してください。
+	:guilabel:`選択...` ボタンを使えばローカルのディレクトリを選択できます。
+:guilabel:`クローン先`
+	複製先のディレクトリを指定してください。このディレクトリにクローン元と同じ名前の
+	ディレクトリが作成されます。
+:guilabel:`リビジョン指定`
+	ここで指定したリビジョンまで複製するよう制限できます。
+	指定したリビジョン以降のタグであればインポートされます。
+:guilabel:`クローン後に作業ディレクトリを HEAD に更新しない`
+	チェックを入れた場合、複製が完了しても作業ディレクトリが空のままになります。
+	これは共有リポジトリやバックアップなど、プルまたはプッシュしかしないような
+	リポジトリの複製に便利です。
+:guilabel:`メタデータのコピーに Pull を使用する`
+	クローン元とクローン先が同一ファイルシステムのとき、Mercurial はハードリンクの使用を試みますが、
+	AFS など一部の不完全なハードリンク実装を持つファイルシステムではエラー報告が出ません。
+	このオプションを使用すればハードリンクの使用しないように明示的に指定できます。
+:guilabel:`無圧縮で転送する`
+	無圧縮のデータ転送を使用します。有線 LAN ネットワークではその方が速い場合があります。
+:guilabel:`プロキシサーバを使用する`
+	:menuselection:`TortoiseHg... --> グローバル設定 --> プロキシ` で設定したプロキシサーバを使用します。
+	このオプションはプロキシサーバが設定されているときのみ有効になります。
+:guilabel:`リモートコマンド`
+	クローン元のリポジトリで実行する Mercurial コマンドを指定します。
+
+
+コマンドラインからの実行
+------------------------
+
+複製ツールはコマンドラインから起動することもできます ::
 
 	hgtk clone
 
-The syntax is ::
+コマンドの構文は ::
 
 	hgtk clone [SOURCE] [DEST]
 
-where [SOURCE] and [DEST] are, the paths of source repository and destination folder.
+[SOURCE] と [DEST] は、それぞれクローン元リポジトリのパスとクローン先のディレクトリです。
 
 .. vim: noet ts=4
