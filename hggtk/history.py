@@ -78,6 +78,13 @@ class GLog(gdialog.GDialog):
                                  self.synch_clicked,
                                  tip=_('Launch synchronize tool'))
             tbar += [gtk.SeparatorToolItem(), self.synctb]
+
+        self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
+            _('Load more'), self.more_clicked, tip=_('load more revisions'))
+        self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
+            _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
+        tbar += [gtk.SeparatorToolItem(), self.nextbutton, self.allbutton]
+
         return tbar
 
     def synch_clicked(self, toolbutton, data):
@@ -107,10 +114,10 @@ class GLog(gdialog.GDialog):
         active = button.get_active()
         self.graphview.set_property(property, active)
 
-    def more_clicked(self, button):
+    def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
 
-    def load_all_clicked(self, button):
+    def load_all_clicked(self, button, data=None):
         self.graphview.load_all_revisions()
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
@@ -490,19 +497,8 @@ class GLog(gdialog.GDialog):
         b.unmap()
         b.set_sensitive(False)
 
-        self.nextbutton = gtk.ToolButton(gtk.STOCK_GO_DOWN)
-        self.nextbutton.connect('clicked', self.more_clicked)
-        self.allbutton = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
-        self.allbutton.connect('clicked', self.load_all_clicked)
         filterbox.pack_start(gtk.Label(''), True, True) # expanding blank label
         filterbox.pack_start(self.colmenu, False, False)
-        filterbox.pack_start(self.nextbutton, False, False)
-        filterbox.pack_start(self.allbutton, False, False)
-
-        self.nextbutton.set_tooltip(self.tooltips,
-                _('show next %d revisions') % self.limit)
-        self.allbutton.set_tooltip(self.tooltips,
-                _('show all remaining revisions'))
 
         vbox = gtk.VBox()
         vbox.pack_start(filterbox, False, False, 0)
