@@ -1,77 +1,81 @@
-Debugging 
-=========
+TortoiseHg のデバッグ
+=====================
 
 .. module:: debugging
 	:synopsis: Debug problems in shell extension or dialogs
 
-Dialogs
--------
 
-Stderr is being captured to a buffer that is being inspected at program
-exit.  If any serious errors (tracebacks, etc) are found in the stderr
-buffer the entire contents are sent to the bug report tool so the user
-can (should) report a bug.  If you suspect there are errors that are not
-being reported, you can set the environment variable **THGDEBUG** to any
-value to disable the stderr buffering.
+ダイアログ
+----------
 
-If you have a bit of Python knowledge, you can also use::
+標準エラー出力はプログラムの終了時点でバッファに補足されます。
+何らかの深刻なエラーが標準エラー出力で見つかった場合、ユーザがバグを報告できるように
+その全ての内容がバグレポートツールに送信されます。
+出力されていないエラーがあるかもしれない場合は環境変数 **THGDEBUG** を設定して
+標準エラー出力のバッファリングを無効化してください。
+
+多少 Python の経験があれば： ::
 
     hgtk --debugger <command>
 
-To disable the forking behavior of hgtk, you can either set an
-environment variable **THG_HGTK_SPAWN**, or add the command line
-parameter '--nofork'.
+を使うこともできます。
+
+hgtk によるダイアログ用の別プロセス生成を無効にするには環境変数 **THG_HGTK_SPAWN**
+を設定するか、コマンドラインから '--nofork' オプションを使って起動してください。
 
 
 Windows
 ~~~~~~~
 
-To debug the changelog viewer, for instance, enter these commands
-into a :command:`cmd.exe` window, while inside the repository::
+例えばチェンジログビューアをデバッグする場合、コマンドプロンプト (:command:`cmd.exe`)
+を起動してリポジトリに移動し、次のコマンドを実行してください： ::
 
-    set THGDEBUG=1
-    hgtk log
-
-Linux/MacOSX
-~~~~~~~~~~~~
-
-To debug the changelog viewer, for instance, enter these commands
-into your shell window, while inside the repository::
-    
-    export THGDEBUG=1
-    hgtk log
+	set THGDEBUG=1
+	hgtk log
 
 
+Linux または MacOSX
+~~~~~~~~~~~~~~~~~~~
 
-Shell Extension
----------------
+例えばチェンジログビューアをデバッグする場合、ターミナルでリポジトリに移動し、
+次のコマンドを実行してください： ::
 
-The debugging mechanisms depend on your platform.
+	export THGDEBUG=1
+	hgtk log
 
-Windows
-~~~~~~~
 
-See also http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx
-for some info bits about Running and Testing Shell Extensions on Windows
+シェル拡張
+----------
 
-The :command:`DbgView` tool from the SysInternals suite will capture
-debug messages from the shell extension.
+デバッグ方法はプラットフォームに依存します。
 
-The :command:`ThgTaskbar` application's options dialog has an error
-logging tab.  If you have this dialog open while you are browsing
-folders, you will get info and error level messages from the icon
-overlay refresh process.
 
-Nautilus
-~~~~~~~~
+Windows エクスプローラ
+~~~~~~~~~~~~~~~~~~~~~~
 
-Debugging is done via the environment variable DEBUG_THG
+http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx に
+Windows シェル拡張を実行・デバッグするための情報が掲載されています。
 
-* to test in a separate process::
+SysInternals による :command:`DbgView` ツールはシェル拡張からのデバッッグ情報を
+補足することができます。
+
+:command:`ThgTaskbar` アプリケーションの設定ダイアログにはエラーログが表示される
+タブがあります。このダイアログを開いた状態でエクスプローラを使ってリポジトリを
+閲覧すると各種デバッグメッセージを取得することができます。
+
+
+.. NEEDFORTRANSLATION
+
+Nautilus ファイルマネージャ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+環境変数 DEBUG_THG を設定して、
+
+* 個別のプロセスをテストします： ::
 
     DEBUG_THG=Ne TMPDIR=/tmp/anydir/ --no-desktop nautilus [path]
 
-* to test in the main instance:: 
+* メインインスタンスをテストします： ::
 
     nautilus -q
     DEBUG_THG=NOe nautilus
