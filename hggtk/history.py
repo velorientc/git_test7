@@ -37,6 +37,7 @@ class GLog(gdialog.GDialog):
         self.filter = 'all'
         self.currow = None
         self.curfile = None
+        self.origtip = len(self.repo)
 
     def get_title(self):
         return hglib.toutf(os.path.basename(self.repo.root)) + ' log'
@@ -217,10 +218,7 @@ class GLog(gdialog.GDialog):
         self.opts['revs'] = None
         os.chdir(self.repo.root)  # for paths relative to repo root
 
-        origtip = len(self.repo)
-        self.graphview.set_property('original-tip-revision', origtip)
-        self.origtip = origtip
-
+        self.graphview.set_property('original-tip-revision', self.origtip)
         if 'orig-tip' in self.opts:
             origtip = self.opts['orig-tip']
             if origtip != len(self.repo):
