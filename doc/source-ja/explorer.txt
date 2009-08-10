@@ -38,7 +38,7 @@ TortoiseHg は TortoiseOverlays (TortoiseSVN チームによるプロジェク�
 	タスクバー設定ダイアログ
 
 バージョン 0.8.1 では特定のリポジトリのみアイコンオーバーレイを無効にすることが
-可能になりました。リポジトリの :file:`.hg\\thgstatus` ファイルを開いて中身を::
+可能になりました。リポジトリの :file:`.hg\\thgstatus` ファイルを開いて中身を： ::
 
 	@@noicons
 

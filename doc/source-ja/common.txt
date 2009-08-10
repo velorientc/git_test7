@@ -85,7 +85,7 @@ TortoiseHg 0.8 では差分表示ダイアログにおける4つのユーザビ�
 TortoiseHg で差分表示アプリケーションを使用するには2つの手順を踏む必要があります。
 まず最初に使用したいアプリケーションを
 `Extdiff <http://mercurial.selenic.com/wiki/ExtdiffExtension>`_ コマンドとして
-:file:`Mercurial.ini` に設定します::
+:file:`Mercurial.ini` に設定します： ::
 
 	[extdiff]
 	myapp = C:\Path\to\tool.exe
