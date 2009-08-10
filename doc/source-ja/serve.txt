@@ -1,55 +1,55 @@
-Serve
-=====
+サーバ
+======
 
 .. module:: serve.dialog
 	:synopsis: Dialog used to start/stop the web server
 
 .. figure:: figures/serve.png
-	:alt: Web server dialog
+	:alt: ウェブサーバダイアログ
 
-The serve tool is a wrapper for Mercurial's built-in web server. Once
-launched, any computer can attach to the http port and browse your
-repository(ies) or perform clone, pull, or even push operations (if you
-configure your server to allow it).
+サーバツールは Mercurial 内蔵のウェブサーバのラッパーです。
+起動すればどんなコンピュータでも HTTP ポートでサービスを開始し、
+リポジトリの閲覧や、複製、プルだけでなく、サーバ設定を変更して許可することで
+プッシュも可能です。
 
-Toolbar buttons:
+ツールバーボタン： ::
 
-	:guilabel:`Start`
-		start the web server
-	:guilabel:`Stop`
-		stop the web server
-	:guilabel:`Browse`
-		open your default browser at the built-in web server
-	:guilabel:`Configure`
-		Configure repository web style, description, and access policies
+	:guilabel:`開始`
+		ウェブサーバを開始します
+	:guilabel:`中止`
+		ウェブサーバを停止します
+	:guilabel:`ブラウザで開く`
+		既定のブラウザを起動してリポジトリを表示します
+	:guilabel:`設定`
+		リポジトリのテーマ、説明、アクセスポリシーの設定をします
 
-When the settings dialog is launched via the :guilabel:`Configure`
-button, it is run in the context of the current repository.  Please
-visit the Mercurial wiki for detailed descriptions of the various
-web configurations.
+:guilabel:`設定` ボタンを押すとそのリポジトリの設定ダイアログが開きます。
+サーバ設定の詳細については Mercurial の Wiki を参照してください。
 
-Multiple Repositories
----------------------
 
-If you wish to serve a many repositories with a single web server
-instance, you can create an :file:`hgwebdir.conf` text file with the
-following contents: ::
+複数のリポジトリ
+----------------
+
+1つのウェブサーバプロセスで複数のリポジトリを運用したい場合は :file:`hgwebdir.conf`
+という名前のテキストファイルを作成し、そのファイルに次のような設定を記述してください： ::
 
 	[paths]
 	/ = /path/to/repositories/*
 
-The first path '/' is where the repositories will appear in the context
-of the web server and the second path describes here the repositories
-can be found on your computer.  Multiple entries are possible.
+左辺の '/' はウェブサーバにアクセスするときのパスで、
+右辺の '/path/to/repositories/*' はローカルリポジトリのディレクトリパスです。
+ここに複数の項目を記述することができます。
 
-To use this file you must launch the TortoiseHg serve dialog from the
-command line via: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.
+この設定ファイルを使用するためにウェブサーバダイアログを右クリックメニューから
+ではなく、コマンドラインから
+:command:`hgtk serve --webdir-conf=hgwebdir.conf`
+を実行して起動してください。
 
 
-From command line
------------------
+コマンドラインからの実行
+------------------------
 
-The server tool can be started from command line ::
+サーバツールはコマンドラインから起動することもできます： ::
 
 	hgtk serve [OPTION]...
 
