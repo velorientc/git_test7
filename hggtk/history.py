@@ -38,6 +38,7 @@ class GLog(gdialog.GDialog):
         self.currow = None
         self.curfile = None
         self.origtip = len(self.repo)
+        self.ready = False
 
     def get_title(self):
         return hglib.toutf(os.path.basename(self.repo.root)) + ' log'
@@ -113,6 +114,8 @@ class GLog(gdialog.GDialog):
     def toggle_view_column(self, button, property):
         active = button.get_active()
         self.graphview.set_property(property, active)
+        if property in ('branch-color') and self.ready:
+            self.reload_log()
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
@@ -207,7 +210,7 @@ class GLog(gdialog.GDialog):
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Color by Branch'))
-        button.connect('toggled', self._branch_color,
+        button.connect('toggled', self.toggle_view_column,
                 'branch-color')
         button.set_active(self.branch_color)
         button.set_draw_as_radio(True)
@@ -221,6 +224,7 @@ class GLog(gdialog.GDialog):
 
     def prepare_display(self):
         'Called at end of display() method'
+        self.ready = True
         self.opts['rev'] = [] # This option is dangerous - used directly by hg
         self.opts['revs'] = None
         os.chdir(self.repo.root)  # for paths relative to repo root
@@ -307,12 +311,6 @@ class GLog(gdialog.GDialog):
         'Refresh data in the history model, without reloading graph'
         if self.graphview.model:
             self.graphview.model.refresh()
-
-    def _branch_color(self, button, property):
-        active = button.get_active()
-        self.graphview.set_property(property, active)
-        if hasattr(self, 'nextbutton'):
-            self.reload_log()
 
     def reload_log(self, **filteropts):
         'Send refresh event to treeview object'
@@ -489,16 +487,16 @@ class GLog(gdialog.GDialog):
         self.custombutton.set_sensitive(False)
         filterbox.pack_start(self.custombutton, False)
 
-        self.colmenu = gtk.MenuToolButton('')
-        self.colmenu.set_menu(self.view_menu())
+        colmenu = gtk.MenuToolButton('')
+        colmenu.set_menu(self.view_menu())
         # A MenuToolButton has two parts; a Button and a ToggleButton
         # we want to see the togglebutton, but not the button
-        b = self.colmenu.child.get_children()[0]
+        b = colmenu.child.get_children()[0]
         b.unmap()
         b.set_sensitive(False)
 
         filterbox.pack_start(gtk.Label(''), True, True) # expanding blank label
-        filterbox.pack_start(self.colmenu, False, False)
+        filterbox.pack_start(colmenu, False, False)
 
         vbox = gtk.VBox()
         vbox.pack_start(filterbox, False, False, 0)
