@@ -24,6 +24,7 @@ from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
 from mercurial import ui, error
+from thgutil.i18n import agettext as _
 from thgutil import thread2, paths, shlib
 
 if hasattr(sys, "frozen"):
@@ -35,7 +36,7 @@ if hasattr(sys, "frozen"):
     sys.stdout.closed = True
     sys.stderr.closed = True
 
-APP_TITLE = "TortoiseHg RPC server"
+APP_TITLE = _('TortoiseHg RPC server')
 
 SHOWLOG_CMD = 1023
 EXIT_CMD = 1025
@@ -110,9 +111,9 @@ class MainWindow:
     def OnTaskbarNotify(self, hwnd, msg, wparam, lparam):
         if lparam==win32con.WM_RBUTTONUP or lparam==win32con.WM_LBUTTONUP:
             menu = CreatePopupMenu()
-            AppendMenu(menu, win32con.MF_STRING, SHOWLOG_CMD, 'Options...')
+            AppendMenu(menu, win32con.MF_STRING, SHOWLOG_CMD, _('Options...'))
             AppendMenu(menu, win32con.MF_SEPARATOR, 0, '')
-            AppendMenu(menu, win32con.MF_STRING, EXIT_CMD, 'Exit' )
+            AppendMenu(menu, win32con.MF_STRING, EXIT_CMD, _('Exit'))
             pos = GetCursorPos()
             # See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/menus_0hdi.asp
             try:
