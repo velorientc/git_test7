@@ -256,7 +256,7 @@ class PathEditDialog(gtk.Dialog):
         self.entries['Password'][0].set_visibility(False)
 
         def createtable(cols=2):
-            newtable = gtk.Table(0, cols)
+            newtable = gtk.Table(1, cols)
             def addrow(header, cell):
                 row = newtable.get_property('n-rows')
                 newtable.set_property('n-rows', row + 1)
