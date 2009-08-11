@@ -236,48 +236,73 @@ class PathEditDialog(gtk.Dialog):
                      ('User', _('User')), ('Password', _('Password')),
                      ('Alias', _('Alias'))):
             entry = gtk.Entry()
+            entry.set_alignment(0)
             label = gtk.Label(name[1])
+            label.set_alignment(1, 0.5)
             self.entries[name[0]] = [entry, label, None]
 
-        self.entries['URL'][0].set_width_chars(50)
+        # individual settings
+        self.entries['Alias'][0].set_width_chars(18)
+        self.entries['URL'][0].set_width_chars(60)
+        self.entries['Port'][0].set_width_chars(8)
         self.entries['Password'][0].set_visibility(False)
 
+        # table for main entries
+        toptable = gtk.Table(2, 2)
+        self.vbox.pack_start(toptable, False, False, 2)
+
+        ## alias
+        toptable.attach(self.entries['Alias'][1], 0, 1, 0, 1, gtk.FILL, 0, 4, 2)
         hbox = gtk.HBox()
-        hbox.pack_start(self.entries['Alias'][1], False, False, 2)
-        hbox.pack_start(self.entries['Alias'][0], False, False, 2)
-        hbox.pack_start(self.entries['URL'][1], False, False, 2)
-        hbox.pack_start(self.entries['URL'][0], True, True, 2)
-        self.vbox.pack_start(hbox, False, False, 2)
+        hbox.pack_start(self.entries['Alias'][0], False, False)
+        hbox.pack_start(gtk.Label(''))
+        toptable.attach(hbox, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
 
-        frame = gtk.Frame()
-        self.vbox.pack_start(frame, False, False, 2)
-        vbox = gtk.VBox()
-        vbox.set_border_width(10)
-        frame.add(vbox)
-        frame.set_border_width(10)
+        ## final URL
+        toptable.attach(self.entries['URL'][1], 0, 1, 1, 2, gtk.FILL, 0, 4, 2)
+        toptable.attach(self.entries['URL'][0], 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, 0, 4, 2)
 
+        self.vbox.pack_start(gtk.HSeparator(), False, False, 2)
+
+        # table for separated entries
+        entrytable = gtk.Table(5, 2)
+        self.vbox.pack_start(entrytable, False, False, 2)
+
+        ## path type
+        typelabel = gtk.Label(_('Type'))
+        typelabel.set_alignment(1, 0.5)
+        entrytable.attach(typelabel, 0, 1, 0, 1, gtk.FILL, 0, 4, 2)
         self.protcombo = gtk.combo_box_new_text()
         for p in self._protocols:
             self.protcombo.append_text(p)
-        vbox.pack_start(self.protcombo, False, False, 10)
-
         hbox = gtk.HBox()
-        hbox.pack_start(self.entries['Host'][1], False, False, 2)
+        hbox.pack_start(self.protcombo, False, False)
+        hbox.pack_start(gtk.Label(''))
+        entrytable.attach(hbox, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
+
+        ## host & port
+        entrytable.attach(self.entries['Host'][1], 0, 1, 1, 2, gtk.FILL, 0, 4, 2)
+        hbox = gtk.HBox()
         hbox.pack_start(self.entries['Host'][0], True, True, 2)
         hbox.pack_start(self.entries['Port'][1], False, False, 2)
         hbox.pack_start(self.entries['Port'][0], False, False, 2)
-        vbox.pack_start(hbox, False, False, 2)
+        entrytable.attach(hbox, 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, 0, 2, 2)
 
-        for n in ('Folder', 'User', 'Password'):
-            hbox = gtk.HBox()
-            hbox.pack_start(self.entries[n][1], False, False, 2)
-            hbox.pack_start(self.entries[n][0], True, True, 2)
-            vbox.pack_start(hbox, False, False, 2)
+        ## folder
+        entrytable.attach(self.entries['Folder'][1], 0, 1, 2, 3, gtk.FILL, 0, 4, 2)
+        entrytable.attach(self.entries['Folder'][0], 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, 0, 4, 2)
 
+        ## username & password
+        entrytable.attach(self.entries['User'][1], 0, 1, 3, 4, gtk.FILL, 0, 4, 2)
+        hbox = gtk.HBox()
+        hbox.pack_start(self.entries['User'][0], False, False, 2)
+        hbox.pack_start(self.entries['Password'][1], False, False, 2)
+        hbox.pack_start(self.entries['Password'][0], False, False, 2)
+        entrytable.attach(hbox, 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, 0, 2, 2)
+
+        # setup
         self.setentries(path, alias)
-
         self.sethandlers()
-
         self.lastproto = None
         self.update_sensitive()
         self.show_all()
