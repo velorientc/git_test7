@@ -282,11 +282,11 @@ class PathEditDialog(gtk.Dialog):
         typelabel = gtk.Label(_('Type'))
         typelabel.set_alignment(1, 0.5)
         entrytable.attach(typelabel, 0, 1, 0, 1, gtk.FILL, 0, 4, 2)
-        self.protcombo = gtk.combo_box_new_text()
+        self.protocolcombo = gtk.combo_box_new_text()
         for name, label in self._protocols:
-            self.protcombo.append_text(label)
+            self.protocolcombo.append_text(label)
         hbox = gtk.HBox()
-        hbox.pack_start(self.protcombo, False, False)
+        hbox.pack_start(self.protocolcombo, False, False)
         hbox.pack_start(gtk.Label(''))
         entrytable.attach(hbox, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
 
@@ -333,11 +333,11 @@ class PathEditDialog(gtk.Dialog):
     def sethandlers(self, enable=True):
         # protocol combobox
         if enable:
-            self.pcombo_hid = self.protcombo.connect('changed', self.changed)
+            self.pcombo_hid = self.protocolcombo.connect('changed', self.changed)
         else:
             h = self.pcombo_hid
-            if h and self.protcombo.handler_is_connected(h):
-                self.protcombo.disconnect(h)
+            if h and self.protocolcombo.handler_is_connected(h):
+                self.protocolcombo.disconnect(h)
 
         # other entries
         for n, (e, l, h) in self.entries.iteritems():
@@ -385,10 +385,10 @@ class PathEditDialog(gtk.Dialog):
         self.entries['Folder'][0].set_text(folder or '')
         self.entries['Password'][0].set_text(pw or '')
 
-        self.protcombo.set_active(self.protocolindex(scheme) or 0)
+        self.protocolcombo.set_active(self.protocolindex(scheme) or 0)
 
     def update_sensitive(self):
-        proto = self.protocolname(self.protcombo.get_active_text())
+        proto = self.protocolname(self.protocolcombo.get_active_text())
         if proto == self.lastproto:
             return
         self.lastproto = proto
@@ -417,7 +417,7 @@ class PathEditDialog(gtk.Dialog):
         self.settings.write()
 
     def browse_clicked(self, button):
-        if self.protocolname(self.protcombo.get_active_text()) == 'local':
+        if self.protocolname(self.protocolcombo.get_active_text()) == 'local':
             initial = self.entries['URL'][0].get_text()
         else:
             initial = None
@@ -460,7 +460,7 @@ class PathEditDialog(gtk.Dialog):
             self.response(widget, gtk.RESPONSE_OK)
 
     def buildurl(self):
-        proto = self.protocolname(self.protcombo.get_active_text())
+        proto = self.protocolname(self.protocolcombo.get_active_text())
         host = self.entries['Host'][0].get_text()
         port = self.entries['Port'][0].get_text()
         folder = self.entries['Folder'][0].get_text()
