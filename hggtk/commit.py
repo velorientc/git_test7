@@ -26,16 +26,27 @@ from hggtk.status import DM_REJECTED, DM_CHUNK_ID
 from hggtk import gtklib, thgconfig, gdialog, hgcmd
 
 class BranchOperationDialog(gtk.Dialog):
-    def __init__(self, branch, close):
+    def __init__(self, branch, close, mergebranches):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                           buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                               gtk.STOCK_OK, gtk.RESPONSE_OK))
         gtklib.set_tortoise_keys(self)
-        self.connect('response', self.response)
         self.set_title(_('Branch Operations'))
         self.newbranch = None
         self.closebranch = False
 
+        if mergebranches:
+            lbl = gtk.Label(_('Select branch of merge commit'))
+            branchcombo = gtk.combo_box_new_text()
+            for name in mergebranches:
+                branchcombo.append_text(name)
+            self.vbox.pack_start(lbl, True, True, 2)
+            self.vbox.pack_start(branchcombo, True, True, 2)
+            self.connect('response', self.merge_response, branchcombo)
+            self.show_all()
+            return
+
+        self.connect('response', self.response)
         lbl = gtk.Label(_('Changes take effect on next commit'))
         nochanges = gtk.RadioButton(None, _('No branch changes'))
         self.newbranchradio = gtk.RadioButton(nochanges,
@@ -87,6 +98,12 @@ class BranchOperationDialog(gtk.Dialog):
             else:
                 self.newbranch = None
                 self.closebranch = False
+        self.destroy()
+
+    def merge_response(self, widget, response_id, combo):
+        self.closebranch = False
+        if response_id == gtk.RESPONSE_OK:
+            self.newbranch = combo.get_model()[combo.get_active()][0]
         self.destroy()
 
 
@@ -202,7 +219,11 @@ class GCommit(GStatus):
             liststore.append([sumline, msg])
 
     def branch_clicked(self, button):
-        dialog = BranchOperationDialog(self.nextbranch, self.closebranch)
+        if self.merging:
+            mb = [p.branch() for p in self.repo.parents()]
+        else:
+            mb = None
+        dialog = BranchOperationDialog(self.nextbranch, self.closebranch, mb)
         dialog.run()
         self.nextbranch = None
         self.closebranch = False
@@ -222,6 +243,10 @@ class GCommit(GStatus):
         self.branchbutton = gtk.Button()
         self.branchbutton.connect('clicked', self.branch_clicked)
         mbox.pack_start(self.branchbutton, False, False, 2)
+        if self.merging:
+            branches = [p.branch() for p in self.repo.parents()]
+            if branches[0] == branches[1]:
+                self.branchbutton.set_sensitive(False)
 
         if hasattr(self.repo, 'mq'):
             label = gtk.Label('QNew: ')
