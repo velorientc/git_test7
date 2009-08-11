@@ -419,8 +419,15 @@ class GLog(gdialog.GDialog):
         self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
         m.append(self.cmenu_merge2)
         
-        # need rebase extension for rebase command
+        # Load extension support for commands which need it
         extensions.loadall(self.ui)
+
+        # need transplant extension for transplant command
+        extensions.load(self.ui, 'transplant', None)
+        m.append(create_menu(_('transplant revision range to local'),
+                 self.transplant_revs))
+
+        # need rebase extension for rebase command
         extensions.load(self.ui, 'rebase', None)
         m.append(create_menu(_('rebase on top of selected'),
                  self.rebase_selected))
@@ -700,6 +707,20 @@ class GLog(gdialog.GDialog):
             return
         cmdline = ['hg', 'rebase', '--source', str(revs[0]),
                    '--dest', str(revs[1])]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
+
+    def transplant_revs(self, menuitem):
+        """Transplant revision range on top of current revision."""
+        revs = list(self.revs)
+        revs.sort()
+        cmdline = ['hg', 'transplant', '%s:%s' % (str(revs[0]), str(revs[1]))]
         dialog = hgcmd.CmdDialog(cmdline)
         dialog.show_all()
         dialog.run()
