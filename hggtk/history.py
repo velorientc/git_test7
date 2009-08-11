@@ -389,8 +389,14 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_revert'), self.revert))
         m.append(create_menu(_('_archive'), self.archive))
 
-        # need mq extension for strip command
+        # Load extension support for commands which need it
         extensions.loadall(self.ui)
+
+        # need transplant extension for transplant command
+        extensions.load(self.ui, 'transplant', None)
+        m.append(create_menu(_('transp_lant to local'), self.transplant_rev))
+        
+        # need mq extension for strip command
         extensions.load(self.ui, 'mq', None)
         m.append(create_menu(_('strip revision'), self.strip_rev))
 
@@ -843,6 +849,19 @@ class GLog(gdialog.GDialog):
         dialog.show_all()
         dialog.present()
         dialog.set_transient_for(None)
+
+    def transplant_rev(self, menuitem):
+        """Transplant selection on top of current revision."""
+        rev = self.currow[treemodel.REVID]
+        cmdline = ['hg', 'transplant', str(rev)]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
 
     def selection_changed(self, treeview):
         self.currow = self.graphview.get_revision()
