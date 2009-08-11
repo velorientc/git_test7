@@ -243,7 +243,10 @@ class PathEditDialog(gtk.Dialog):
             label.set_alignment(1, 0.5)
             self.entries[name[0]] = [entry, label, None]
 
-        # individual settings
+        # persistent settings
+        self.settings = settings.Settings('pathedit')
+
+        # configure individual widgets
         self.entries['Alias'][0].set_width_chars(18)
         self.entries['URL'][0].set_width_chars(60)
         self.entries['Port'][0].set_width_chars(8)
@@ -264,7 +267,7 @@ class PathEditDialog(gtk.Dialog):
         toptable.attach(self.entries['URL'][1], 0, 1, 1, 2, gtk.FILL, 0, 4, 2)
         toptable.attach(self.entries['URL'][0], 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, 0, 4, 2)
 
-        expander = gtk.Expander(_('URL Details'))
+        self.expander = expander = gtk.Expander(_('URL Details'))
         self.vbox.pack_start(expander, True, True, 2)
 
         # table for separated entries
@@ -303,7 +306,8 @@ class PathEditDialog(gtk.Dialog):
         hbox.pack_start(self.entries['Password'][0], False, False, 2)
         entrytable.attach(hbox, 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, 0, 2, 2)
 
-        # setup
+        # prepare to show
+        self.load_settings()
         self.setentries(path, alias)
         self.sethandlers()
         self.lastproto = None
@@ -388,6 +392,15 @@ class PathEditDialog(gtk.Dialog):
                 self.entries[n][0].set_sensitive(True)
                 self.entries[n][1].set_sensitive(True)
 
+    def load_settings(self):
+        expanded = self.settings.get_value('expanded', False, True)
+        self.expander.set_property('expanded', expanded)
+
+    def store_settings(self):
+        expanded = self.expander.get_property('expanded')
+        self.settings.set_value('expanded', expanded)
+        self.settings.write()
+
     def changed(self, combo):
         newurl = self.buildurl()
         self.sethandlers(False)
@@ -403,6 +416,7 @@ class PathEditDialog(gtk.Dialog):
 
     def response(self, widget, response_id):
         if response_id != gtk.RESPONSE_OK:
+            self.store_settings()
             self.destroy()
             return
         newalias = self.entries['Alias'][0].get_text()
@@ -413,6 +427,7 @@ class PathEditDialog(gtk.Dialog):
                 return
         self.newpath = self.buildurl()
         self.newalias = newalias
+        self.store_settings()
         self.destroy()
 
     def key_press(self, widget, event):
