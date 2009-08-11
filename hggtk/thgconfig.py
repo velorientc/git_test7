@@ -226,6 +226,8 @@ class PathEditDialog(gtk.Dialog):
         self.connect('response', self.response)
         self.connect('key-press-event', self.key_press)
         self.set_title(_('Edit remote repository path'))
+        self.set_has_separator(False)
+        self.set_resizable(False)
         self.newpath, self.newalias = None, None
         self.list = list
 
@@ -262,11 +264,12 @@ class PathEditDialog(gtk.Dialog):
         toptable.attach(self.entries['URL'][1], 0, 1, 1, 2, gtk.FILL, 0, 4, 2)
         toptable.attach(self.entries['URL'][0], 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, 0, 4, 2)
 
-        self.vbox.pack_start(gtk.HSeparator(), False, False, 2)
+        expander = gtk.Expander(_('URL Details'))
+        self.vbox.pack_start(expander, True, True, 2)
 
         # table for separated entries
         entrytable = gtk.Table(5, 2)
-        self.vbox.pack_start(entrytable, False, False, 2)
+        expander.add(entrytable)
 
         ## path type
         typelabel = gtk.Label(_('Type'))
