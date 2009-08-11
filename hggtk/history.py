@@ -412,6 +412,13 @@ class GLog(gdialog.GDialog):
                  self.bundle_revs))
         self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
         m.append(self.cmenu_merge2)
+        
+        # need rebase extension for rebase command
+        extensions.loadall(self.ui)
+        extensions.load(self.ui, 'rebase', None)
+        m.append(create_menu(_('rebase on top of selected'),
+                 self.rebase_selected))
+        
         m.connect_after('selection-done', self.restore_original_selection)
         m.show_all()
         return m
@@ -677,6 +684,24 @@ class GLog(gdialog.GDialog):
             dlg.show_all()
             dlg.run()
             dlg.hide()
+
+    def rebase_selected(self, menuitem):
+        """Rebase revision on top of selection (1st on top of 2nd).""" 
+        revs = list(self.revs)
+        res = gdialog.Confirm(_('Confirm Rebase Revision'), [], self,
+            _('Rebase revision %d on top of %d?') % (revs[0], revs[1])).run()
+        if res != gtk.RESPONSE_YES:
+            return
+        cmdline = ['hg', 'rebase', '--source', str(revs[0]),
+                   '--dest', str(revs[1])]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
 
     def add_tag(self, menuitem):
         # save tag info for detecting new tags added
