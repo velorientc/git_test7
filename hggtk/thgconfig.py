@@ -256,11 +256,14 @@ class PathEditDialog(gtk.Dialog):
         toptable = gtk.Table(2, 2)
         self.vbox.pack_start(toptable, False, False, 2)
 
-        ## alias
+        ## alias (and 'Browse...' button)
         toptable.attach(self.entries['Alias'][1], 0, 1, 0, 1, gtk.FILL, 0, 4, 2)
         hbox = gtk.HBox()
         hbox.pack_start(self.entries['Alias'][0], False, False)
         hbox.pack_start(gtk.Label(''))
+        browse = gtk.Button(_('Browse...'))
+        browse.connect('clicked', self.browse_clicked)
+        hbox.pack_start(browse, False, False)
         toptable.attach(hbox, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
 
         ## final URL
@@ -400,6 +403,16 @@ class PathEditDialog(gtk.Dialog):
         expanded = self.expander.get_property('expanded')
         self.settings.set_value('expanded', expanded)
         self.settings.write()
+
+    def browse_clicked(self, button):
+        if self.protcombo.get_active_text() == 'local':
+            initial = self.entries['URL'][0].get_text()
+        else:
+            initial = None
+        path = gtklib.NativeFolderSelectDialog(initial=initial,
+                          title=_('Select Local Folder')).run()
+        if path:
+            self.entries['URL'][0].set_text(path)
 
     def changed(self, combo):
         newurl = self.buildurl()
