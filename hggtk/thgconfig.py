@@ -633,6 +633,7 @@ class ConfigDialog(gtk.Dialog):
         model, path = selection.get_selected()
         dialog = PathEditDialog(model[path][2], model[path][0],
                 [p[0] for p in self.pathdata if p[0] != model[path][0]])
+        dialog.set_transient_for(self)
         dialog.run()
         if dialog.newpath:
             if model[path][0] != dialog.newalias:
