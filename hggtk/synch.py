@@ -332,7 +332,7 @@ class SynchDialog(gtk.Window):
 
     def _view_pulled_changes(self, button):
         opts = {'orig-tip' : self.origchangecount, 'from-synch' : True}
-        dlg = history.GLog(self.ui, None, None, [], opts)
+        dlg = history.run(self.ui, **opts)
         dlg.display()
 
     def _update_to_tip(self, button):

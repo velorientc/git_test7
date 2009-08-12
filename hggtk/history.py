@@ -254,7 +254,7 @@ class GLog(gdialog.GDialog):
         self.graphview.set_property('original-tip-revision', origtip)
         self.origtip = origtip
 
-        if 'orig-tip' in self.opts:
+        if self.opts.get('orig-tip') is not None:
             origtip = self.opts['orig-tip']
             if origtip != len(self.repo):
                 self.origtip = origtip
@@ -823,12 +823,13 @@ class GLog(gdialog.GDialog):
         return True
 
 def run(ui, *pats, **opts):
-    limit = opts.get('limit')
     cmdoptions = {
         'follow':False, 'follow-first':False, 'copies':False, 'keyword':[],
-        'limit':limit, 'rev':[], 'removed':False, 'no_merges':False,
+        'limit':0, 'rev':[], 'removed':False, 'no_merges':False,
         'date':None, 'only_merges':None, 'prune':[], 'git':False,
-        'verbose':False, 'include':[], 'exclude':[]
+        'verbose':False, 'include':[], 'exclude':[], 'from-synch':False,
+        'orig-tip':None
     }
+    cmdoptions.update(opts)
     pats = hglib.canonpaths(pats)
     return GLog(ui, None, None, pats, cmdoptions)
