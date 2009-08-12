@@ -47,7 +47,8 @@ class Dirstatecache
     static std::list<E>& cache();
 
 public:
-    static Dirstate* get(const std::string& hgroot, const std::string& cwd);
+    static Dirstate* get(
+        const std::string& hgroot, const std::string& cwd, bool& unset);
     static void invalidate(const std::string& hgroot);
 };
 

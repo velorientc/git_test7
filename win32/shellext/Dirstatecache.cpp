@@ -31,8 +31,10 @@ std::list<Dirstatecache::E>& Dirstatecache::cache()
 
 
 Dirstate* Dirstatecache::get(
-    const std::string& hgroot, const std::string& cwd)
+    const std::string& hgroot, const std::string& cwd, bool& unset)
 {
+    unset = false;
+
     typedef std::list<E>::iterator Iter;
 
     Iter iter = cache().begin();
@@ -92,6 +94,8 @@ Dirstate* Dirstatecache::get(
 
     if (iter->dstate) 
     {
+        unset = iter->unset;
+        
         if (!new_stat)
             return iter->dstate;
 
@@ -108,15 +112,27 @@ Dirstate* Dirstatecache::get(
         TDEBUG_TRACE("Dirstatecache::get: reading " << hgroot);
     }
 
-    bool unset = false;
+    unset = false;
     unsigned tc0 = GetTickCount();
     std::auto_ptr<Dirstate> ds = Dirstate::read(path, unset);
     unsigned tc1 = GetTickCount();
 
+    bool request_thgstatus_update = true;
+
     if (unset)
     {
-        TDEBUG_TRACE("Dirstatecache::get: has unset entries");
+        if (iter->unset)
+        {
+            TDEBUG_TRACE(
+                "Dirstatecache::get: **** old and new have unset entries");
+            request_thgstatus_update = false;
+        }
+        else
+        {
+            TDEBUG_TRACE("Dirstatecache::get: new has unset entries");
+        }
     }
+
     iter->unset = unset;
 
     delete iter->dstate;
@@ -129,7 +145,15 @@ Dirstate* Dirstatecache::get(
     iter->dstate_mtime = stat.mtime;
     iter->dstate_size = stat.size;
 
-    Thgstatus::update(cwd);
+    if (request_thgstatus_update)
+    {
+        TDEBUG_TRACE("Dirstatecache::get: calling Thgstatus::update");
+        Thgstatus::update(cwd);
+    }
+    else
+    {
+        TDEBUG_TRACE("Dirstatecache::get: omitting Thgstatus::update");
+    }
 
     return iter->dstate;
 }

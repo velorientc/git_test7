@@ -182,11 +182,13 @@ int HgQueryDirstate(
         return 0;
     }
 
+    bool unset = false;
+
     if (cur.isdir)
     {
         if (!relpath.empty())
         {
-            Dirstate* pds2 = Dirstatecache::get(cur.hgroot, cur.basedir);
+            Dirstate* pds2 = Dirstatecache::get(cur.hgroot, cur.basedir, unset);
             if (pds2 && !pds2->root().getdir(relpath))
             {
                 last = cur;
@@ -198,7 +200,7 @@ int HgQueryDirstate(
     }
     else
     {
-        Dirstate* pds = Dirstatecache::get(cur.hgroot, cur.basedir);
+        Dirstate* pds = Dirstatecache::get(cur.hgroot, cur.basedir, unset);
         if (!pds)
         {
             TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 
@@ -245,7 +247,17 @@ int HgQueryDirstate(
 
                     if (basedir_status != 'M')
                     {
-                        Thgstatus::update(cur.hgroot);
+                        if (unset)
+                        {
+                            TDEBUG_TRACE(
+                                "HgQueryDirstate: omitting Thgstatus::update");
+                        }
+                        else
+                        {
+                            TDEBUG_TRACE(
+                                "HgQueryDirstate: calling Thgstatus::update");
+                            Thgstatus::update(cur.hgroot);
+                        }
                     }
                 }
             }
