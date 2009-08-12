@@ -139,7 +139,7 @@ class TreeView(gtk.ScrolledWindow):
             self.grapher = None
             return
 
-        if 'filehist' in opts:
+        if opts.get('filehist') is not None:
             self.grapher = filelog_grapher(self.repo, opts['filehist'])
         elif graphcol:
             end = 0

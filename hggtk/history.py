@@ -240,10 +240,6 @@ class GLog(gdialog.GDialog):
         menu.show_all()
         return menu
 
-    def open_with_file(self, file):
-        'Call this before display() to open with file history'
-        self.opts['filehist'] = file
-
     def prepare_display(self):
         'Called at end of display() method'
         self.opts['rev'] = [] # This option is dangerous - used directly by hg
@@ -260,7 +256,7 @@ class GLog(gdialog.GDialog):
                 self.origtip = origtip
                 self.graphview.set_property('original-tip-revision', origtip)
                 self.newbutton.set_active(True)
-        elif 'filehist' in self.opts:
+        elif self.opts.get('filehist') is not None:
             self.custombutton.set_active(True)
             self.reload_log(pats = [self.opts['filehist']])
         elif 'revrange' in self.opts:
@@ -828,7 +824,7 @@ def run(ui, *pats, **opts):
         'limit':0, 'rev':[], 'removed':False, 'no_merges':False,
         'date':None, 'only_merges':None, 'prune':[], 'git':False,
         'verbose':False, 'include':[], 'exclude':[], 'from-synch':False,
-        'orig-tip':None
+        'orig-tip':None, 'filehist':None
     }
     cmdoptions.update(opts)
     pats = hglib.canonpaths(pats)

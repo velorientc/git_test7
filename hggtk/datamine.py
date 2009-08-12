@@ -151,8 +151,7 @@ class DataMineDialog(gdialog.GDialog):
 
     def cmenu_file_log(self, menuitem):
         from hggtk import history
-        dlg = history.GLog(self.ui, self.repo, self.cwd, [self.repo.root], {})
-        dlg.open_with_file(self.curpath)
+        dlg = history.run(self.ui, filehist=self.curpath)
         dlg.display()
 
     def grep_button_release(self, widget, event):

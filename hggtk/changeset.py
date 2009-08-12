@@ -545,12 +545,10 @@ class ChangeSet(gdialog.GDialog):
             self.glog_parent.custombutton.set_active(True)
             self.glog_parent.reload_log(**opts)
         else:
-            # Else launch our own GLog instance
+            # Else launch our own glog instance
             from hggtk import history
-            dialog = history.GLog(self.ui, self.repo, self.cwd,
-                                  [self.repo.root], {})
-            dialog.open_with_file(self.curfile)
-            dialog.display()
+            dlg = history.run(self.ui, filehist=self.curfile)
+            dlg.display()
 
     def revert_file(self, menuitem):
         'User selected file revert from the file list context menu'
