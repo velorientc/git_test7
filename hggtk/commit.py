@@ -40,6 +40,7 @@ class BranchOperationDialog(gtk.Dialog):
             branchcombo = gtk.combo_box_new_text()
             for name in mergebranches:
                 branchcombo.append_text(name)
+            branchcombo.set_active(0)
             self.vbox.pack_start(lbl, True, True, 2)
             self.vbox.pack_start(branchcombo, True, True, 2)
             self.connect('response', self.merge_response, branchcombo)
@@ -103,7 +104,9 @@ class BranchOperationDialog(gtk.Dialog):
     def merge_response(self, widget, response_id, combo):
         self.closebranch = False
         if response_id == gtk.RESPONSE_OK:
-            self.newbranch = combo.get_model()[combo.get_active()][0]
+            row = combo.get_active()
+            if row == 1:
+                self.newbranch = combo.get_model()[row][0]
         self.destroy()
 
 
@@ -649,7 +652,9 @@ class GCommit(GStatus):
             # response: 0=Yes, 1=No, 2=Cancel
             newbranch = hglib.fromutf(self.nextbranch)
             if newbranch in self.repo.branchtags():
-                if newbranch not in [p.branch() for p in self.repo.parents()]:
+                if newbranch in [p.branch() for p in self.repo.parents()]:
+                    response = 0
+                else:
                     response = gdialog.CustomPrompt(_('Confirm Override Branch'),
                         _('A branch named "%s" already exists,\n'
                         'override?') % self.nextbranch, self,
