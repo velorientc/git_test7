@@ -1094,7 +1094,7 @@ class GStatus(gdialog.GDialog):
     def log_file(self, stat, wfile):
         # Might want to include 'rev' here... trying without
         from hggtk import history
-        dlg = history.run(self.ui, wfile, **self.opts)
+        dlg = history.run(self.ui, filehist=wfile)
         dlg.display()
         return True
 
