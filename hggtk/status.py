@@ -845,10 +845,11 @@ class GStatus(gdialog.GDialog):
         if not paths:
             return
         wfile = self.filemodel[paths[0]][FM_PATH]
+        pfile = util.pconvert(wfile)
         difftext = [_('===== Diff to first parent =====\n')]
         wctx = self.repo[None]
         pctxs = wctx.parents()
-        matcher = cmdutil.matchfiles(self.repo, [wfile])
+        matcher = cmdutil.matchfiles(self.repo, [pfile])
         for s in patch.diff(self.repo, pctxs[0].node(), None,
                 match=matcher, opts=patch.diffopts(self.ui, self.opts)):
             difftext.extend(s.splitlines(True))
@@ -902,7 +903,8 @@ class GStatus(gdialog.GDialog):
         difftext = cStringIO.StringIO()
         ctx = self.repo[self._node1]
         try:
-            fctx = ctx.filectx(wfile)
+            pfile = util.pconvert(wfile)
+            fctx = ctx.filectx(pfile)
         except hglib.LookupError:
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.ui):
@@ -915,7 +917,7 @@ class GStatus(gdialog.GDialog):
             difftext.writelines(lines)
             difftext.seek(0)
         else:
-            matcher = cmdutil.matchfiles(self.repo, [wfile])
+            matcher = cmdutil.matchfiles(self.repo, [pfile])
             diffopts = mdiff.diffopts(git=True, nodates=True)
             for s in patch.diff(self.repo, self._node1, self._node2,
                     match=matcher, opts=diffopts):
