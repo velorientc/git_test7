@@ -340,6 +340,7 @@ class GLog(gdialog.GDialog):
                 else:
                     self.graphview.refresh(False, self.pats, self.opts)
         elif self.filter == 'all':
+            self.branchcombo.set_active(-1)
             self.graphview.refresh(True, None, self.opts)
         elif self.filter == 'new':
             self.opts['revrange'] = [len(self.repo)-1, self.origtip]
@@ -476,6 +477,7 @@ class GLog(gdialog.GDialog):
             branchcombo.append_text(name)
         branchcombo.connect('changed', self.select_branch)
         filterbox.pack_start(branchcombo, False)
+        self.branchcombo = branchcombo
 
         all = gtk.RadioButton(None, _('all'))
         all.set_active(True)
