@@ -15,7 +15,7 @@ from mercurial import hg, ui
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-from hggtk import gtklib, commit, gdialog, hgcmd
+from hggtk import changesetinfo, gtklib, commit, gdialog, hgcmd
 
 class MergeDialog(gtk.Window):
     """ Dialog to merge revisions of a Mercurial repo """
@@ -46,20 +46,14 @@ class MergeDialog(gtk.Window):
         self.add(vbox)
 
         frame = gtk.Frame(_('Merge target (other)'))
-        lbl = gtk.Label()
-        other, desc = self.revdesc(repo, rev)
-        lbl.set_markup(desc)
-        lbl.set_alignment(0, 0)
-        frame.add(lbl)
+        other, desc = changesetinfo.changesetinfo(repo, rev, True)
+        frame.add(desc)
         frame.set_border_width(5)
         vbox.pack_start(frame, False, False, 2)
 
         frame = gtk.Frame(_('Current revision (local)'))
-        lbl = gtk.Label()
-        local, desc = self.revdesc(repo, '.')
-        lbl.set_markup(desc)
-        lbl.set_alignment(0, 0)
-        frame.add(lbl)
+        local, desc = changesetinfo.changesetinfo(repo, '.', True)
+        frame.add(desc)
         frame.set_border_width(5)
         vbox.pack_start(frame, False, False, 2)
 
@@ -97,27 +91,6 @@ class MergeDialog(gtk.Window):
         undo.connect('clicked', self.undo, local, merge, commit)
         merge.connect('clicked', self.merge, other, commit, undo)
         merge.grab_focus()
-
-    def revdesc(self, repo, revid):
-        ctx = repo[revid]
-        revstr = str(ctx.rev())
-        summary = ctx.description().replace('\0', '')
-        summary = summary.split('\n')[0]
-        escape = gtklib.markup_escape_text
-        desc =  '<b>' + hglib.fromutf(_('rev')) + '</b>\t\t: %s\n' % escape(revstr)
-        desc += '<b>' + hglib.fromutf(_('summary')) + '</b>\t: %s\n' % escape(summary[:80])
-        desc += '<b>' + hglib.fromutf(_('user')) + '</b>\t\t: %s\n' % escape(ctx.user())
-        desc += '<b>' + hglib.fromutf(_('date')) + '</b>\t\t: %s\n' \
-                % escape(hglib.displaytime(ctx.date()))
-        node = repo.lookup(revid)
-        tags = repo.nodetags(node)
-        desc += '<b>' + hglib.fromutf(_('branch')) + '</b>\t: ' + escape(ctx.branch())
-        if tags:
-            desc += '\n<b>' + hglib.fromutf(_('tags')) + '</b>\t\t: ' \
-                    + escape(', '.join(tags))
-        if node not in repo.heads():
-            desc += '\n<b>' + hglib.fromutf(_('Not a head revision!')) + '</b>'
-        return revstr, hglib.toutf(desc)
 
     def set_notify_func(self, func, *args):
         self.notify_func = func

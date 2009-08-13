@@ -210,8 +210,8 @@ class FileSelectionDialog(gtk.Dialog):
             except (IOError, OSError), e:
                 resp = gdialog.CustomPrompt(_('Unable to delete temp files'),
                     _('Close diff tools and try again, or quit to leak files?'),
-                    self, (_('Try &Again'), _('&Quit')), _('q')).run()
-                if resp == ord(_('a')):
+                    self, (_('Try &Again'), _('&Quit')), 1).run()
+                if resp == 0:
                     continue
                 else:
                     return
@@ -247,7 +247,7 @@ class FileSelectionDialog(gtk.Dialog):
                        stderr=subprocess.PIPE,
                        stdout=subprocess.PIPE,
                        stdin=subprocess.PIPE)
-        except Exception, e:
+        except (OSError, EnvironmentError), e:
             gdialog.Prompt(_('Tool launch failure'),
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
 
