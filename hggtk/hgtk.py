@@ -418,8 +418,13 @@ def update(ui, *pats, **opts):
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
     portable_fork()
-    from hggtk.visdiff import run
-    gtkrun(run(ui, *pats, **opts))
+    from hggtk.visdiff import run, rawextdiff
+    if opts.get('raw'):
+        rawextdiff(ui, *pats, **opts)
+        return
+    dlg = run(ui, *pats, **opts)
+    if dlg:
+        gtkrun(dlg)
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, alias=None):
@@ -691,7 +696,8 @@ table = {
         ('hgtk update')),
     "^vdiff": (vdiff,
         [('c', 'change', '', _('changeset to view in diff tool')),
-         ('r', 'rev', [], _('revisions to view in diff tool'))],
+         ('r', 'rev', [], _('revisions to view in diff tool')),
+         ('', 'raw', None, _('directly use raw extdiff command'))],
             _('launch visual diff tool')),
     "^version": (version,
         [('v', 'verbose', None, _('print license'))],

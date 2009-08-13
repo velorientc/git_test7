@@ -16,7 +16,6 @@ import gtk
 import atexit
 
 from mercurial import cmdutil, util, ui, hg, commands
-from hgext import extdiff
 
 from thgutil.i18n import _
 from thgutil import settings, hglib, paths
@@ -403,43 +402,16 @@ class GDialog(gtk.Window):
 
         return True, textout
 
-    def _do_diff(self, patterns, options, modal=False):
-        from hggtk import visdiff, thgconfig
-        if self.ui.configbool('tortoisehg', 'vdiffnowin'):
-            tools = visdiff.readtools(self.ui)
-            preferred = self.ui.config('tortoisehg', 'vdiff', 'vdiff')
-            if not preferred or preferred not in tools:
-                Prompt(_('No visual diff configured'),
-                       _('Please select a visual diff application.'), self).run()
-                dlg = thgconfig.ConfigDialog(self.repo.root, False)
-                dlg.show_all()
-                dlg.focus_field('tortoisehg.vdiff')
-                dlg.run()
-                dlg.hide()
-                self.ui = ui.ui()
-                self._parse_config()
-                return
-
-            file = len(patterns) == 1 and patterns[0] or ''
-            diffcmd, diffopts = tools[preferred]
-            opts = {'change': options.get('change')}
-            if not opts['change']:
-                opts['rev'] = options.get('rev')
-
-            def dodiff():
-                extdiff.dodiff(self.ui, self.repo, diffcmd, diffopts,
-                               [self.repo.wjoin(file)], opts)
-
-            thread = threading.Thread(target=dodiff, name='diff:' + file)
-            thread.setDaemon(True)
-            thread.start()
-
-        else:
-            dialog = visdiff.FileSelectionDialog(patterns, options)
-            dialog.show_all()
-            if modal:
-                dialog.run()
-                dialog.hide()
+    def _do_diff(self, canonpats, options, modal=False):
+        from hggtk import visdiff
+        options['canonpats'] = canonpats
+        dialog = visdiff.run(self.ui, **options)
+        if not dialog:
+            return
+        dialog.show_all()
+        if modal:
+            dialog.run()
+            dialog.hide()
 
     def _diff_file(self, stat, file):
         self._do_diff(file and [file] or [], self.opts)

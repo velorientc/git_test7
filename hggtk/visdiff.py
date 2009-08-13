@@ -273,5 +273,58 @@ def readtools(ui):
             tools[cmd] = [path, diffopts]
     return tools
 
+def rawextdiff(ui, *pats, **opts):
+    'launch raw extdiff command, block until finish'
+    from hgext import extdiff
+    try:
+        repo = hg.repository(ui, path=paths.find_root())
+    except hglib.RepoError:
+        # hgtk should catch this earlier
+        ui.warn(_('No repository found here') + '\n')
+        return
+    tools = readtools(ui)
+    preferred = ui.config('tortoisehg', 'vdiff', 'vdiff')
+    try:
+        diffcmd, diffopts = tools[preferred]
+    except KeyError:
+        ui.warn(_('Extdiff command not recognized\n'))
+        return
+    pats = hglib.canonpaths(pats)
+    ret = extdiff.dodiff(ui, repo, diffcmd, diffopts, pats, opts)
+    if ret == 0:
+        gdialog.Prompt(_('No file changes'),
+                      _('There are no file changes to view'), None).run()
+
 def run(ui, *pats, **opts):
-    return FileSelectionDialog(hglib.canonpaths(pats), opts)
+    if ui.configbool('tortoisehg', 'vdiffnowin'):
+        import sys
+        # Spawn background process and exit
+        if hasattr(sys, "frozen"):
+            args = [sys.argv[0]]
+        else:
+            args = [sys.executable] + [sys.argv[0]]
+        args.extend(['vdiff', '--nofork', '--raw'])
+        revs = opts.get('rev', [])
+        change = opts.get('change')
+        if change:
+            args.extend(['--change', str(change)])
+        if len(revs) == 1:
+            args.extend(['--change', str(revs[0])])
+        else:
+            for r in revs:
+                args.extend(['--rev', str(r)])
+        args.extend(pats)
+        args.extend(opts.get('canonpats', []))
+        if os.name == 'nt':
+            args = ['"%s"' % arg for arg in args]
+        oldcwd = os.getcwd()
+        root = paths.find_root()
+        os.chdir(root)
+        os.spawnv(os.P_NOWAIT, sys.executable, args)
+        os.chdir(oldcwd)
+        return None
+    else:
+        pats = hglib.canonpaths(pats)
+        if opts.get('canonpats'):
+            pats = list(pats) + opts['canonpats']
+        return FileSelectionDialog(pats, opts)
