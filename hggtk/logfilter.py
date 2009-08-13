@@ -197,19 +197,20 @@ class FilterDialog(gtk.Dialog):
                     self.dateentry.grab_focus()
                     return
         elif self.revradio.get_active():
-            rev0 = self.rev0Entry.get_text()
-            rev1 = self.rev1Entry.get_text()
+            rev0 = self.rev0Entry.get_text().strip()
+            rev1 = self.rev1Entry.get_text().strip()
             if not rev1:
                 rev1 = rev0
-            try:
-                rrange = cmdutil.revrange(self.repo, [rev0, rev1])
-                rrange.sort()
-                rrange.reverse()
-                opts['revrange'] = rrange
-            except Exception, e:
-                gdialog.Prompt(_('Invalid revision range'), str(e), self).run()
-                self.rev0Entry.grab_focus()
-                return
+            if rev0:
+                try:
+                    rrange = cmdutil.revrange(self.repo, [rev0, rev1])
+                    rrange.sort()
+                    rrange.reverse()
+                    opts['revrange'] = rrange
+                except Exception, e:
+                    gdialog.Prompt(_('Invalid revision range'), str(e), self).run()
+                    self.rev0Entry.grab_focus()
+                    return
         elif self.branchradio.get_active():
             branch = self.branchbox.child.get_text()
             if branch:
