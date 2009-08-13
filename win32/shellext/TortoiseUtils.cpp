@@ -8,6 +8,8 @@
 #include <io.h>
 #include "FCNTL.H"
 
+#include "shlwapi.h"
+
 
 LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars)
 {
@@ -150,11 +152,7 @@ std::string GetTemporaryFile(LPCTSTR prefix)
 
 bool IsDirectory(const std::string& filename)
 {
-   DWORD attributes = GetFileAttributesA(filename.c_str());
-   if (attributes == INVALID_FILE_ATTRIBUTES)
-      return false;
-
-   return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+   return ::PathIsDirectory(filename.c_str()) != 0;
 }
 
 
