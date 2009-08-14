@@ -581,12 +581,8 @@ class GLog(gdialog.GDialog):
         return True
 
     def vdiff_selected(self, menuitem):
-        rev0, rev1 = self.revs
-        self.opts['rev'] = ["%s:%s" % (rev0, rev1)]
-        if len(self.pats) == 1:
-            self._diff_file(None, self.pats[0])
-        else:
-            self._diff_file(None, None)
+        strrevs = [str(r) for r in self.revs]
+        self._do_diff(self.pats, {'rev' : strrevs})
 
     def email_revs(self, menuitem):
         revs = list(self.revs)

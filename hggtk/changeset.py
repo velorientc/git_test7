@@ -473,7 +473,7 @@ class ChangeSet(gdialog.GDialog):
             return False
         if not self.curfile:
             return False
-        self._diff_file('M', self.curfile)
+        self._do_diff([self.curfile], {'change' : self.currev})
 
     def file_row_act(self, tree, path, column) :
         'Default action is the first entry in the context menu'
@@ -503,16 +503,13 @@ class ChangeSet(gdialog.GDialog):
     def diff_to_local(self, menuitem):
         if not self.curfile:
             return
-        self.opts['rev'] = [str(self.currev)]
-        self._diff_file('M', self.curfile)
+        self._do_diff([self.curfile], {'rev' : str(self.currev)})
 
     def diff_file_rev(self, menuitem):
         'User selected visual diff file from the file list context menu'
         if not self.curfile:
             return
-        self.opts['change'] = str(self.currev)
-        self._diff_file('M', self.curfile)
-        del self.opts['change']
+        self._do_diff([self.curfile], {'change' : str(self.currev)})
 
     def view_file_rev(self, menuitem):
         'User selected view file revision from the file list context menu'
