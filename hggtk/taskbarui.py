@@ -122,22 +122,31 @@ class TaskBarUI(gtk.Window):
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
 
-        hbbox = gtk.HButtonBox()
-        hbbox.set_layout(gtk.BUTTONBOX_END)
-        vbox.pack_start(hbbox, False, False, 2)
+        bbox = gtk.HBox()
+        vbox.pack_start(bbox, False, False, 2)
+
+        lefthbbox = gtk.HButtonBox()
+        lefthbbox.set_layout(gtk.BUTTONBOX_START)
+        bbox.pack_start(lefthbbox, False, False)
 
         about.connect('clicked', self.about)
-        hbbox.pack_end(about, True, True, 0)
+        lefthbbox.pack_start(about, False, False)
+
+        bbox.pack_start(gtk.Label(''), True, True)
+
+        righthbbox = gtk.HButtonBox()
+        righthbbox.set_layout(gtk.BUTTONBOX_END)
+        bbox.pack_start(righthbbox, False, False)
 
         apply.connect('clicked', self.applyclicked)
         apply.set_sensitive(False)
-        hbbox.add(apply)
+        righthbbox.pack_start(apply, False, False)
 
         close.connect('clicked', lambda x: self.destroy())
         key, modifier = gtk.accelerator_parse('Escape')
         close.add_accelerator('clicked', accelgroup, key, 0,
                 gtk.ACCEL_VISIBLE)
-        hbbox.add(close)
+        righthbbox.pack_start(close, False, False)
 
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
