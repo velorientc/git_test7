@@ -1245,7 +1245,7 @@ class GStatus(gdialog.GDialog):
             self.hg_remove(files)
         def log(menuitem, files):
             from hggtk import history
-            dlg = history.GLog(self.ui, self.repo, self.cwd, files, self.opts)
+            dlg = history.run(self.ui, canonpats=files)
             dlg.display()
         def forget(menuitem, files):
             self.hg_forget(files)

@@ -957,8 +957,8 @@ def run(ui, *pats, **opts):
         'limit':0, 'rev':[], 'removed':False, 'no_merges':False,
         'date':None, 'only_merges':None, 'prune':[], 'git':False,
         'verbose':False, 'include':[], 'exclude':[], 'from-synch':False,
-        'orig-tip':None, 'filehist':None
+        'orig-tip':None, 'filehist':None, 'canonpats':[]
     }
     cmdoptions.update(opts)
-    pats = hglib.canonpaths(pats)
+    pats = hglib.canonpaths(pats) + cmdoptions['canonpats']
     return GLog(ui, None, None, pats, cmdoptions)
