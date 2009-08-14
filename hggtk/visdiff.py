@@ -318,10 +318,12 @@ def run(ui, *pats, **opts):
         if os.name == 'nt':
             args = ['"%s"' % arg for arg in args]
         oldcwd = os.getcwd()
-        root = paths.find_root()
-        os.chdir(root)
-        os.spawnv(os.P_NOWAIT, sys.executable, args)
-        os.chdir(oldcwd)
+        root = paths.find_root(oldcwd)
+        try:
+            os.chdir(root)
+            os.spawnv(os.P_NOWAIT, sys.executable, args)
+        finally:
+            os.chdir(oldcwd)
         return None
     else:
         pats = hglib.canonpaths(pats)
