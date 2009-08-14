@@ -151,6 +151,7 @@ class TaskBarUI(gtk.Window):
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
         frame.set_border_width(5)
+        frame.set_shadow_type(gtk.SHADOW_NONE)
         frame.show()
         label = gtk.Label(tab)
         notebook.append_page(frame, label)
