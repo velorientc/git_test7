@@ -68,13 +68,13 @@ class GShelve(GStatus):
 
     def get_tbbuttons(self):
         tbbuttons = GStatus.get_tbbuttons(self)
-        tbbuttons.insert(2, gtk.SeparatorToolItem())
+        tbbuttons.insert(0, gtk.SeparatorToolItem())
         self.shelve_btn = self.make_toolbutton(gtk.STOCK_FILE, _('Shelve'),
                 self.shelve_clicked, tip=_('set aside selected changes'))
         self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, _('Unshelve'),
                 self.unshelve_clicked, tip=_('restore shelved changes'))
-        tbbuttons.insert(2, self.unshelve_btn)
-        tbbuttons.insert(2, self.shelve_btn)
+        tbbuttons.insert(0, self.unshelve_btn)
+        tbbuttons.insert(0, self.shelve_btn)
         return tbbuttons
 
     def get_body(self):
@@ -87,23 +87,14 @@ class GShelve(GStatus):
         self.activate_shelve_buttons(True)
         return self.vpaned
 
-
-    def get_menu_info(self):
-        """
-        Returns menu info in this order:
-            merge, addrem, unknown, clean, ignored, deleted
-        """
-        merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
-                = GStatus.get_menu_info(self)
-        return (merge + ((_('_shelve'), self.shelve_file),),
-                addrem + ((_('_shelve'), self.shelve_file),),
-                unknown + ((_('_shelve'), self.shelve_file),),
-                clean,
-                ignored,
-                deleted + ((_('_shelve'), self.shelve_file),),
-                unresolved,
-                resolved,
-               )
+    def get_custom_menus(self):
+        def shelve(menuitem, files):
+            self.shelve_selected(files)
+            self.activate_shelve_buttons(True)
+        if self.merging:
+            return []
+        else:
+            return (_('_shelve'), commit, 'MAR')
 
 
     def should_live(self, widget=None, event=None):
@@ -129,13 +120,13 @@ class GShelve(GStatus):
             self.shelve_btn.set_sensitive(False)
             self.unshelve_btn.set_sensitive(False)
 
-    def shelve_selected(self, file=None):
+    def shelve_selected(self, files=[]):
         if len(self.filemodel) < 1:
             gdialog.Prompt(_('Shelve'),
                     _('No changes to shelve'), self).run()
             return
 
-        wfiles = file and [file] or self.relevant_files('MAR')
+        wfiles = files or self.relevant_checked_files('MAR')
         if not wfiles:
             gdialog.Prompt(_('Shelve'),
                     _('Please select diff chunks to shelve'), self).run()
@@ -210,11 +201,6 @@ class GShelve(GStatus):
     def unshelve_clicked(self, toolbutton, data=None):
         self.unshelve()
         self.activate_shelve_buttons(True)
-
-    def shelve_file(self, stat, file):
-        self.shelve_selected(file)
-        self.activate_shelve_buttons(True)
-        return True
 
 def run(_ui, *pats, **opts):
     cmdoptions = {
