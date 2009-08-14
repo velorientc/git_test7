@@ -165,7 +165,7 @@ class DataMineDialog(gdialog.GDialog):
         return True
 
     def grep_thgdiff(self, treeview):
-        self._do_diff([], {'change' : self.currev}, modal=True)
+        self._do_diff([], {'change' : self.currev})
 
     def grep_row_act(self, tree, path, column):
         'Default action is the first entry in the context menu'
@@ -615,7 +615,7 @@ class DataMineDialog(gdialog.GDialog):
         return True
 
     def annotate_thgdiff(self, treeview):
-        self._do_diff([], {'change' : self.currev}, modal=True)
+        self._do_diff([], {'change' : self.currev})
 
     def toggle_annatate_columns(self, button, treeview, col):
         b = button.get_active()

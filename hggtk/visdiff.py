@@ -308,20 +308,19 @@ def run(ui, *pats, **opts):
         change = opts.get('change')
         if change:
             args.extend(['--change', str(change)])
-        if len(revs) == 1:
-            args.extend(['--change', str(revs[0])])
-        else:
-            for r in revs:
-                args.extend(['--rev', str(r)])
+        for r in revs:
+            args.extend(['--rev', str(r)])
         args.extend(pats)
         args.extend(opts.get('canonpats', []))
         if os.name == 'nt':
             args = ['"%s"' % arg for arg in args]
         oldcwd = os.getcwd()
-        root = paths.find_root()
-        os.chdir(root)
-        os.spawnv(os.P_NOWAIT, sys.executable, args)
-        os.chdir(oldcwd)
+        root = paths.find_root(oldcwd)
+        try:
+            os.chdir(root)
+            os.spawnv(os.P_NOWAIT, sys.executable, args)
+        finally:
+            os.chdir(oldcwd)
         return None
     else:
         pats = hglib.canonpaths(pats)

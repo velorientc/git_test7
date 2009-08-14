@@ -405,16 +405,15 @@ class GDialog(gtk.Window):
 
         return True, textout
 
-    def _do_diff(self, canonpats, options, modal=False):
+    def _do_diff(self, canonpats, options):
         from hggtk import visdiff
         options['canonpats'] = canonpats
         dialog = visdiff.run(self.ui, **options)
         if not dialog:
             return
         dialog.show_all()
-        if modal:
-            dialog.run()
-            dialog.hide()
+        dialog.run()
+        dialog.hide()
 
     def _diff_file(self, stat, file):
         self._do_diff(file and [file] or [], self.opts)
