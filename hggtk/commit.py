@@ -188,6 +188,12 @@ class GCommit(GStatus):
             self.commit_clicked, tip=_('commit'))
         tbbuttons.insert(0, self.undo_button)
         tbbuttons.insert(0, self.commit_button)
+
+        self.changelog_button = self.make_toolbutton(gtk.STOCK_INDEX, _('Changelog'),
+            self.changelog_clicked, tip=_('view changelog'))
+        tbbuttons.append(self.changelog_button)
+        tbbuttons.append(gtk.SeparatorToolItem())
+
         return tbbuttons
 
 
@@ -556,6 +562,13 @@ class GCommit(GStatus):
         except:
             gdialog.Prompt(_('Undo commit'),
                     _('Errors during rollback!'), self).run()
+
+
+    def changelog_clicked(self, toolbutton, data=None):
+        from hggtk import history
+        dlg = history.run(self.ui)
+        dlg.display()
+        return True
 
 
     def should_addremove(self, files):
