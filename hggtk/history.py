@@ -329,9 +329,11 @@ class GLog(gdialog.GDialog):
         if self.filter == 'branch':
             branch = opts.get('branch', None)
             self.graphview.refresh(True, branch, opts)
+            self.set_title(_('%s branch %s') % (self.get_title(), branch))
         else:
             self.branchcombo.set_active(-1)
         if self.filter == 'custom':
+            self.set_title(self.get_title() + _(' custom filter'))
             pats = opts.get('pats', [])
             if len(pats) == 1 and not os.path.isdir(pats[0]):
                 opts['filehist'] = pats[0]
@@ -339,21 +341,26 @@ class GLog(gdialog.GDialog):
             else:
                 self.graphview.refresh(False, pats, opts)
         elif self.filter == 'all':
+            self.set_title(self.get_title())
             self.graphview.refresh(True, None, opts)
         elif self.filter == 'new':
+            self.set_title(self.get_title() + _(' new revisions'))
             assert len(self.repo) > self.origtip
             opts['revrange'] = [len(self.repo)-1, self.origtip]
             self.graphview.refresh(True, None, opts)
         elif self.filter == 'only_merges':
+            self.set_title(self.get_title() + _(' only merges'))
             opts['only_merges'] = True
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'ancestry':
             if not self.currow:
                 return
+            self.set_title(self.get_title() + _(' revision ancestry'))
             range = [self.currow[treemodel.REVID], 0]
             opts = {'noheads': True, 'revrange': range}
             self.graphview.refresh(True, None, opts)
         elif self.filter == 'tagged':
+            self.set_title(self.get_title() + _(' tagged revisions'))
             tagged = []
             for t, r in self.repo.tagslist():
                 hr = self.repo[r].rev()
@@ -362,10 +369,12 @@ class GLog(gdialog.GDialog):
             opts['revs'] = tagged
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'parents':
+            self.set_title(self.get_title() + _(' working parents'))
             repo_parents = [x.rev() for x in self.repo.parents()]
             opts['revs'] = [str(x) for x in repo_parents]
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'heads':
+            self.set_title(self.get_title() + _(' heads'))
             heads = [self.repo[x].rev() for x in self.repo.heads()]
             opts['revs'] = [str(x) for x in heads]
             self.graphview.refresh(False, [], opts)
