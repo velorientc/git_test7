@@ -181,8 +181,11 @@ class GLog(gdialog.GDialog):
     def filter_selected(self, widget, type):
         if not widget.get_active():
             return
-        self.filter = type
-        self.reload_log()
+        if type == 'branch':
+            self.select_branch(self.branchcombo)
+        else:
+            self.filter = type
+            self.reload_log()
 
     def view_menu(self):
         menu = gtk.Menu()
@@ -334,9 +337,7 @@ class GLog(gdialog.GDialog):
             branch = opts.get('branch', None)
             self.graphview.refresh(True, branch, opts)
             self.set_title(_('%s branch %s') % (self.get_title(), branch))
-        else:
-            self.branchcombo.set_active(-1)
-        if self.filter == 'custom':
+        elif self.filter == 'custom':
             self.set_title(self.get_title() + _(' custom filter'))
             pats = opts.get('pats', [])
             if len(pats) == 1 and not os.path.isdir(pats[0]):
@@ -483,13 +484,6 @@ class GLog(gdialog.GDialog):
 
         filterbox = gtk.HBox()
 
-        branchcombo = gtk.combo_box_new_text()
-        for name in self.repo.branchtags().keys():
-            branchcombo.append_text(name)
-        branchcombo.connect('changed', self.select_branch)
-        filterbox.pack_start(branchcombo, False)
-        self.branchcombo = branchcombo
-
         all = gtk.RadioButton(None, _('all'))
         all.set_active(True)
         all.connect('toggled', self.filter_selected, 'all')
@@ -518,6 +512,19 @@ class GLog(gdialog.GDialog):
         merges = gtk.RadioButton(all, _('merges'))
         merges.connect('toggled', self.filter_selected, 'only_merges')
         filterbox.pack_start(merges, False)
+
+        branches = gtk.RadioButton(all, _('branch'))
+        branches.connect('toggled', self.filter_selected, 'branch')
+        branches.set_sensitive(False)
+        self.branchbutton = branches
+        filterbox.pack_start(branches, False)
+
+        branchcombo = gtk.combo_box_new_text()
+        for name in self.repo.branchtags().keys():
+            branchcombo.append_text(name)
+        branchcombo.connect('changed', self.select_branch)
+        filterbox.pack_start(branchcombo, False)
+        self.branchcombo = branchcombo
 
         self.custombutton = gtk.RadioButton(all, _('custom'))
         self.custombutton.set_sensitive(False)
@@ -598,8 +605,11 @@ class GLog(gdialog.GDialog):
         row = combo.get_active()
         if row >= 0:
             self.filter = 'branch'
-            self.custombutton.set_active(True)
+            self.branchbutton.set_active(True)
+            self.branchbutton.set_sensitive(True)
             self.reload_log(branch=combo.get_model()[row][0])
+        else:
+            self.branchbutton.set_sensitive(False)
 
     def show_goto_dialog(self):
         'Launch a modeless goto revision dialog'
