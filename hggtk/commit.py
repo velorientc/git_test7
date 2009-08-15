@@ -307,7 +307,7 @@ class GCommit(GStatus):
 
     def get_custom_menus(self):
         def commit(menuitem, files):
-            if self.ready_message():
+            if self.ready_message() and self.isuptodate():
                 self.hg_commit(files)
                 self.reload_status()
                 abs = [self.repo.wjoin(file) for file in files]
@@ -421,7 +421,7 @@ class GCommit(GStatus):
         self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
 
     def commit_clicked(self, toolbutton, data=None):
-        if not self.ready_message():
+        if not (self.ready_message() or self.isupdodate()):
             return
 
         commitable = 'MAR'

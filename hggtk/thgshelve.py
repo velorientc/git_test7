@@ -195,10 +195,14 @@ class GShelve(GStatus):
             pass
 
     def shelve_clicked(self, toolbutton, data=None):
+        if not self.isuptodate():
+            return
         self.shelve_selected()
         self.activate_shelve_buttons(True)
 
     def unshelve_clicked(self, toolbutton, data=None):
+        if not self.isuptodate():
+            return
         self.unshelve()
         self.activate_shelve_buttons(True)
 

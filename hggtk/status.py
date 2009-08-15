@@ -1338,6 +1338,21 @@ class GStatus(gdialog.GDialog):
         self._do_diff(files, self.opts)
         return True
 
+    def isuptodate(self):
+        oldparents = self.repo.dirstate.parents()
+        self.repo.dirstate.invalidate()
+        if oldparents == self.repo.dirstate.parents():
+            return True
+        response = gdialog.CustomPrompt(_('not up to date'),
+                    _('The parents have changed since the last refresh.\n'
+                      'Continue anyway?'),
+                    self, (_('&Yes'), _('&Refresh'), _('&Cancel')), 1, 2).run()
+        if response == 0: # Yes
+            return True
+        if response == 1:
+            self.reload_status()
+        return False
+
 def run(ui, *pats, **opts):
     showclean = pats and True or False
     rev = opts.get('rev', [])
