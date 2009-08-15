@@ -229,32 +229,29 @@ class GLog(gdialog.GDialog):
     def prepare_display(self):
         'Called at end of display() method'
         self.ready = True
-        self.opts['rev'] = [] # This option is dangerous - used directly by hg
-        self.opts['revs'] = None
-        os.chdir(self.repo.root)  # for paths relative to repo root
+        root = self.repo.root
+        os.chdir(root)  # for paths relative to repo root
 
-        self.graphview.set_property('original-tip-revision', self.origtip)
         if self.opts.get('orig-tip') is not None:
             origtip = self.opts['orig-tip']
             if origtip != len(self.repo):
                 self.origtip = origtip
-                self.graphview.set_property('original-tip-revision', origtip)
-                self.newbutton.set_active(True)
-        elif self.opts.get('filehist') is not None:
-            self.custombutton.set_active(True)
-            self.reload_log(pats = [self.opts['filehist']])
-        elif 'revrange' in self.opts:
-            self.custombutton.set_active(True)
-            self.graphview.refresh(True, None, self.opts)
-        elif not self.pats:
-            self.reload_log()
-        elif len(self.pats) == 1 and \
-                self.pats[0] in (self.repo.root, self.repo.root+os.sep, ''):
+        self.graphview.set_property('original-tip-revision', self.origtip)
+
+        # ignore file patterns that imply repo root
+        if len(self.pats) == 1 and self.pats[0] in (root, root+os.sep, ''):
             self.pats = []
-            self.reload_log()
-        else:
+
+        opts = self.opts
+        if self.opts.get('filehist'):
             self.custombutton.set_active(True)
-            self.reload_log(pats = self.pats)
+            self.filter = 'custom'
+            opts['pats'] = [opts['filehist']]
+        elif self.pats:
+            self.custombutton.set_active(True)
+            self.filter = 'custom'
+            opts['pats'] = self.pats
+        self.reload_log(**opts)
 
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
@@ -280,11 +277,14 @@ class GLog(gdialog.GDialog):
 
     def load_settings(self, settings):
         'Called at beginning of display() method'
+
+        # This stuff is here in load_settings in order to have access to
+        # self.changeview when building the toolbar.  TODO: clean this up
         self.stbar = gtklib.StatusBar()
         self.limit = self.get_graphlimit(None)
 
         # Allocate TreeView instance to use internally
-        if 'limit' in self.opts:
+        if self.opts['limit']:
             firstlimit = self.get_graphlimit(self.opts['limit'])
             self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
         else:
