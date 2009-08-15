@@ -89,44 +89,41 @@ TortoiseHg は *ssh:* 接続とその認証のために TortoisePlink ツール 
 プルした後
 ----------
 
-After changesets are pulled into your repository, two buttons may appear
-at the bottom of the dialog:
+チェンジセットがローカルのリポジトリにプルされた後、ダイアログの下部に2つのボタンが表示されます：
 
-	:guilabel:`View pulled changesets`
-		Open the changelog viewer and inspect pulled changesets
-	:guilabel:`Update to tip`
-		Update your working directory to the new tip
+	:guilabel:`プルされたチェンジセットを表示`
+		チェンジログビューアを開いてプルされたチェンジセットを確認します
+	:guilabel:`tipリビジョンに更新`
+		作業ディレクトリを新しい tip リビジョンに更新します
 
-Either button may be hidden if it is not applicable.
+どちらのボタンもその操作が有効なときのみ表示されます。
 
 
 メール送信
 ----------
 
 .. figure:: figures//email.png
-	:alt: Email dialog
+	:alt: メールダイアログ
 
-	Email dialog
- 
-The email dialog can be launched from two TortoiseHg tools.
+	メールダイアログ
 
-1) The changelog tool, in which case the user intends to email a single
-   revision or a range of revisions.
+メールダイアログは2つの TortoiseHg ツールから起動できます。
 
-2) The synchronize tool, in which case the user intends to email all
-   outgoing changes to the current target repository (it's good practice to
-   check the outgoing changes before launching the email dialog).
+1)	チェンジログビューア： 単一または複数リビジョンをメールで送信したい場合。
 
-The :guilabel:`Send` button is obvious, and the :guilabel:`Configure`
-dialog predictably opens the TortoiseHg Settings dialog to the email tab
-where you can configure your SMTP settings and set default
-:guilabel:`To:` and :guilabel:`From:` addresses.
+2)	同期ツール： 指定したリポジトリに送信可能な全てのチェンジセットをメールで送信したい場合
+	(メールダイアログを起動する前に :guilabel:`送信` ボタンでどのチェンジセットが送信対象に
+	なるのかを確認するのはよい習慣です)。
 
-:guilabel:`In-Reply-To:` is used to make your patches properly threaded
-in mailing lists.
+:guilabel:`送信` ボタンはそのままで、 :guilabel:`設定` ボタンを押すと TortoiseHg
+の設定ダイアログにあるメール送信タブを開きます。そこでは SMTP 設定や :guilabel:`To:`
+アドレスと :guilabel:`From:` アドレスのデフォルトを指定することができます。
 
-Please consult the Mercurial documentation for the differences between
-plain patches, HG patches, Git patches, and bundles.
+:guilabel:`In-Reply-To:` は送信するパッチがメーリングリストで確実にスレッド
+として認識されるために使われます。
+
+プレーンパッチ、Mercurial パッチ、GIT パッチ、バンドルの違いについては
+Mercurial のマニュアルを参照してください。
 
 
 コマンドラインからの実行
@@ -142,21 +139,21 @@ plain patches, HG patches, Git patches, and bundles.
 
 	use "hgtk -v help synch" to show global options
 
-The syntax is simple, no options or parameters are needed, except the
-global options.  If the synchronize tool is started via push, outgoing,
-or email command aliases, it will automatically select the
-*default-push* URL if.  For all other aliases the tool selects the
-*default* URL.  If the selected URL is not found, it will use the first
-path it finds.
+.. NEEDFORTRANSLATION
+
+コマンド構文はグローバルオプションを除けばオプションや引数を必要としないため
+シンプルになっています。 :command:`push` 、 :command:`outgoing` 、 :command:`email`
+のエイリアスで同期ツールを起動した場合、自動的に *default-push* URL が選択されます。
+それ以外のエイリアスの場合は *default* URL が選択されます。
+If the selected URL is not found, it will use the first path it finds.
 
 0.7 からの変更点
 ----------------
 
-* Path drop-down list no longer includes most-recently-used paths.  It
-  only includes configured repository paths.
-* Email dialog now has buttons for configuring in-reply-to tags and the
-  attachment types.
-* Email dialog now sends an intro message only when one has been
-  entered, regardless of patch count.
+* リポジトリパスのドロップダウンリストに最近使用したパスを含めない。
+  表示されるのはリポジトリで設定されたパスのみ。
+* メールダイアログに :guilabel:`In-Reply-To` タグと添付ファイル形式の
+  設定項目を追加。
+* メールダイアログはパッチ数に関わらず説明メールを送信するようになった。
 
 .. vim: noet ts=4
