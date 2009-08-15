@@ -1,128 +1,122 @@
-Datamine
-========
+リポジトリ検索
+==============
 
 .. module:: datamine.dialog
 	:synopsis: Dialog used to search repository history
 
-The datamine application is used to inspect the revision history of your
-repository.  It is a tabbed application that supports two tab types,
-*Search* and *Annotate*.
+リポジトリ検索ツールはリポジトリのリビジョン履歴を調べるのに使うことができます。
+*検索* と *コメント* の2種類のタブを持つアプリケーションです。
 
 
-Search Tabs
------------
+検索タブ
+--------
 
 .. figure:: figures/search.png
-	:alt: Search dialog
+	:alt: 検索タブ
 
-	Search dialog
+	検索タブ
 
-The search tab is used to search (*grep*) through your entire revision
-history for keywords, variable names, functions, etc... 
+検索タブは全てのリビジョン履歴からキーワード、変数名、関数名などで検索 (grep) できます。
 
-The text entry fields have these purposes:
+各テキストボックスは以下の意味があります：
 
-	:guilabel:`regexp`
-		Regular expression search criteria.
-	:guilabel:`includes`
-		Comma separated list of paths to include in your search. If no
-		paths are given, the search is assumed to be repository wide. In
-		other words, specifying an include path actually narrows the
-		search criteria.
-	:guilabel:`excludes`
-		Comma separated list of paths to exclude from your search.
-		Exclusion patterns are applied after inclusion patterns.
+	:guilabel:`正規表現`
+		正規表現検索に使用する条件。
+	:guilabel:`次を含む`
+		検索対象に含めるパスをカンマ区切りで指定。指定されていない場合は、
+		リポジトリ全体が対象となります。つまりパスを指定して初めて検索対象が
+		絞り込まれます。
+	:guilabel:`次を含まない`
+		検索対象から外すパスをカンマ区切りで指定。
+		この条件より先に :guilabel:`次を含む` の条件が適用されます。
 
-The toggle buttons below the entry fields are for:
+テキストボックスの下のチェックボックスは以下のようになります：
 
-	:guilabel:`Follow copies and renames`
-		follow searches through copies and renames out of inclusion filters
-	:guilabel:`Ignore case`
-		Perform the search without case considerations
-	:guilabel:`Show line numbers`
-		Show line numbers at the front of the matching lines
-	:guilabel:`Show all matching revisions`
-		Show every instance where the search criteria matches in a file,
-		not just the most recent revision.  It shows +/- to indicate
-		whether the change adds or removes your search text.
+	:guilabel:`コピーと名前変更を追跡`
+		:guilabel:`次を含む` の条件が指定されていないとき、コピーまたは名前変更を考慮して検索します
+	:guilabel:`大文字小文字を区別しない`
+		アルファベットの大文字小文字を区別せず検索を実行します
+	:guilabel:`行番号の表示`
+		検索結果に該当個所の行番号を表示します
+	:guilabel:`該当リビジョンを全て表示`
+		検索条件にマッチした直近のリビジョンだけでなく、全てのリビジョンを表示します。
+		該当行が追加されたのか削除されたのかを示す +/- 記号が表示されます。
 
-Search tabs are named after the search string most recently used to
-start a search.  The :guilabel:`New Search` toolbar button will
-obviously open a new search tab while the :guilabel:`Stop` button will
-terminate an ongoing search (the :guilabel:`Stop` button is only
-sensitive when a search is in progress).
-
-Matches
-^^^^^^^
-
-Each match will be a link to a changeset and will have a descriptive
-tooltip (author, date/time, summary).  Right clicking on a matched line
-will bring up a context menu with these features:
-
-	:guilabel:`display change`
-		open a changeset window with this changeset, to see the full context
-	:guilabel:`annotate file`
-		open an annotation tab for this file at this revision
-	:guilabel:`file history`
-		open a changelog window with this file's revision history
+検索タブは検索を開始するとそのキーワードにタブ名が変更されます。
+ツールバーの :guilabel:`中止` ボタンを押せば処理中の検索が停止しますが
+(:guilabel:`中止` ボタンは検索中にのみ押せる状態になります)、
+:guilabel:`新規検索` ボタンを押せば新しい検索タブを開くことができます。
 
 
-Annotate Tabs
--------------
+検索結果
+^^^^^^^^
+
+検索結果は該当チェンジセットへのリンクとなり、マウスカーソルを乗せることでツールチップ
+(コミッタ、日時、コミットログ) が表示されます。検索結果の各行で右クリックをすると
+次の機能を持つ右クリックメニューが表示されます：
+
+	:guilabel:`変更点の表示`
+		このチェンジセットをチェンジセットダイアログで開き、全ての変更点を確認します
+	:guilabel:`コメントする`
+		このリビジョンのファイルをコメントタブで開きます
+	:guilabel:`履歴の表示`
+		チェンジログビューアでこのファイルのリビジョン履歴を表示します
+
+
+コメントタブ
+------------
 
 .. figure:: figures/annotate.png
-	:alt: Annotate tabs
+	:alt: コメントタブ
 
-	Annotate tabs
+	コメントタブ
 
 
-The revision graph has a simple context menu for opening the entire
-changeset in the changeset browser. Activating a row in the revision
-graph updates the file annotation to that revision.
+リビジョングラフパネル (上半分) にはそのチェンジセットにおける変更全体を
+チェンジセットダイアログで表示するための右クリックメニューが用意されています。
+リビジョングラフパネルのリビジョンをダブルクリックすると下半分のパネルに
+ファイルのコメント情報が更新されます。
 
-In the bottom pane is the actual annotation. Each line in the annotation
-is also a link to the changeset which provided that line. Activating a
-row will zoom the changelog (top pane) to the changeset that introduced
-that line and change focus to the top pane.
+コメントパネル (下半分) は現在のコメント情報です。パネル内の各行も同様にチェンジセットへの
+リンクになっています。行をダブルクリックすると上半分のパネルが更新され、
+その行が追加または変更されたチェンジセットが表示され、フォーカスが移動します。
 
-The color scheme in the annotation pane is two dimensional. Authors
-determine hue, and age determines saturation. The older a change, the
-lighter the color.
+コメントパネル内の各行は2つの指標に基いて色分けされており、コミッタが色相 (色の違い)、
+最後の変更からの経過時間が彩度になっています。つまり、古い変更になるほど
+色が薄くなるわけです。
 
-By right-clicking on the annotate pane's column headers (Line, Rev,
-Source) you can bring up a menu for showing two optional columns:
-:guilabel:`filename` and :guilabel:`user`.
+コメントパネルの列ヘッダ部分 (行、リビジョン、ソース) で右クリックすると表示される
+右クリックメニューからデフォルトでは表示されていない :guilabel:`ファイル名` と
+:guilabel:`ユーザ` 列を表示できます。
 
-Following Renames
-^^^^^^^^^^^^^^^^^
 
-The annotation data will automatically follow lines of code back through
-copies and renames to find the initial changeset that introduced the
-line.  The graph log pane will not follow renames or copies
-automtaically.  Instead, when you click on a changeset in the revision
-graph that involved a rename or copy event, a button will appear that
-will allow you to follow the history graph back through the rename.
-Clicking on the button will open a new tab with the older filename
-annotated at the same changeset.
+名前変更の追跡
+^^^^^^^^^^^^^^
 
-Configurables
-^^^^^^^^^^^^^
+コメント情報のデータはコードの各行が作成された初期チェンジセットを探し出すために
+自動的にコピーや名前変更の履歴をさかのぼって収集されます。一方で、リビジョングラフは
+自動的に名前変更やコピーをたどりません。その代わり、リビジョン一覧の名前変更またはコピーを
+含むチェンジセット行をクリックすると、その履歴をたどったグラフを表示するためのボタンが
+表示されます。そのボタンを押すと同じチェンジセットの古いファイル名でコメントタブが開きます。
 
-The annotate tabs support the following configurations defined primarily
-for other tools:
 
-:menuselection:`Changelog --> Author Coloring`
-	Give each author a separate color in the changelog graph
-:menuselection:`Changelog --> Long Summary`
-	Concatenates lines of commit message together to reach an 80
-	character summary.
-:menuselection:`TortoiseHg --> Tab width`
-	Number of spaces to expand tabs in diffs and annotate output
+オプション設定
+^^^^^^^^^^^^^^
 
-From command line
------------------
+コメントタブは以下の他のツールの設定項目を使用しています：
 
-The datamine tool can be started from command line ::
+:menuselection:`チェンジログ --> コミッタの色分け`
+	チェンジセットをコミッタごとに色分けします
+:menuselection:`チェンジログ --> 改行を無視してログを表示`
+	コミットメッセージの改行を無視して、最大80文字まで表示します
+:menuselection:`TortoiseHg --> タブ文字の幅`
+	コメント情報の表示でタブ文字1つあたりいくつの空白に展開するかを指定します
+
+
+コマンドラインからの実行
+------------------------
+
+リポジトリ検索ツールはコマンドラインから起動することもできます： ::
 
 	hgtk datamine
 
