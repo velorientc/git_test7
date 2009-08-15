@@ -12,7 +12,7 @@ import gobject
 import pango
 import StringIO
 
-from mercurial import ui, hg, commands, extensions, util
+from mercurial import ui, hg, cmdutil, commands, extensions, util
 
 from thgutil.i18n import _
 from thgutil import hglib, paths
@@ -39,6 +39,7 @@ class GLog(gdialog.GDialog):
         self.curfile = None
         self.origtip = len(self.repo)
         self.ready = False
+        os.chdir(self.repo.root)
 
     def get_title(self):
         return hglib.toutf(os.path.basename(self.repo.root)) + ' log'
@@ -52,11 +53,6 @@ class GLog(gdialog.GDialog):
 
     def get_tbbuttons(self):
         tbar = [
-                self.make_toolbutton(gtk.STOCK_INDEX,
-                    _('_Filter'),
-                    self.filter_clicked,
-                    tip=_('Filter revisions for display')),
-                gtk.SeparatorToolItem(),
                 self.make_toolbutton(gtk.STOCK_FIND,
                     _('_DataMine'),
                     self.datamine_clicked,
@@ -141,43 +137,52 @@ class GLog(gdialog.GDialog):
         dlg = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dlg.display()
 
-    def filter_clicked(self, toolbutton, data=None):
-        if self.filter_dialog:
-            self.filter_dialog.show()
-            self.filter_dialog.present()
+    def filter_help_pressed(self, button, combo):
+        mode = combo.get_active()
+        if mode == 0: # Rev Range
+            pass
+        elif mode == 1: # File Patterns
+            pass
+        elif mode == 2: # Keywords
+            pass
+        elif mode == 3: # Date
+            pass
+
+    def filter_entry_activated(self, entry, combo):
+        'User pressed enter in the filter entry'
+        opts = {}
+        mode = combo.get_active()
+        text = entry.get_text()
+        if mode == 0: # Rev Range
+            try:
+                opts['revs'] = cmdutil.revrange(self.repo, [text])
+            except Exception, e:
+                gdialog.Prompt(_('Invalid revision range'), str(e), self).run()
+                return
+        elif mode == 1: # File Patterns
+            opts['pats'] = [w.strip() for w in text.split(',')]
+        elif mode == 2: # Keywords
+            opts['keyword'] = [w.strip() for w in text.split(',')]
+        elif mode == 3: # Date
+            try:
+                # return of matchdate not used, just sanity checking
+                util.matchdate(text)
+                opts['date'] = text
+            except (ValueError, util.Abort), e:
+                gdialog.Prompt(_('Invalid date specification'),
+                               str(e), self).run()
+                return
         else:
-            self.show_filter_dialog()
+            return
+        self.custombutton.set_active(True)
+        self.filter = 'custom'
+        self.reload_log(**opts)
 
-    def show_filter_dialog(self):
-        'Launch a modeless filter dialog'
-        def do_reload(opts):
-            self.custombutton.set_active(True)
-            self.reload_log(**opts)
-
-        def close_filter_dialog(dialog, response_id):
-            dialog.hide()
-
-        def delete_event(dialog, event, data=None):
-            # return True to prevent the dialog from being destroyed
-            return True
-
-        revs = []
-        if self.currow is not None:
-            revs.append(self.currow[treemodel.REVID])
-
-        dlg = logfilter.FilterDialog(self.repo.root, revs, self.pats,
-                filterfunc=do_reload)
-        dlg.connect('response', close_filter_dialog)
-        dlg.connect('delete-event', delete_event)
-        dlg.set_modal(False)
-        dlg.show()
-
-        self.filter_dialog = dlg
-
-    def filter_selected(self, widget, data=None):
-        if widget.get_active():
-            self.filter = data
-            self.reload_log()
+    def filter_selected(self, widget, type):
+        if not widget.get_active():
+            return
+        self.filter = type
+        self.reload_log()
 
     def view_menu(self):
         menu = gtk.Menu()
@@ -311,61 +316,59 @@ class GLog(gdialog.GDialog):
         if self.graphview.model:
             self.graphview.model.refresh()
 
-    def reload_log(self, **filteropts):
+    def reload_log(self, **kwopts):
         'Send refresh event to treeview object'
-        os.chdir(self.repo.root)  # for paths relative to repo root
+        opts = {'date': None, 'no_merges':False, 'only_merges':False,
+                'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
+                'revrange':[], 'rev':[], 'noheads':False }
+        opts.update(kwopts)
+
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
         self.newbutton.set_sensitive(self.origtip != len(self.repo))
-        self.opts['rev'] = []
-        self.opts['revs'] = None
-        self.opts['no_merges'] = False
-        self.opts['only_merges'] = False
-        self.opts['revrange'] = filteropts.get('revrange', None)
-        self.opts['date'] = filteropts.get('date', None)
-        self.opts['keyword'] = filteropts.get('keyword', [])
-        if filteropts:
-            if 'revrange' in filteropts or 'branch' in filteropts:
-                branch = filteropts.get('branch', None)
-                self.graphview.refresh(True, branch, self.opts)
-            else:
-                self.pats = filteropts.get('pats', [])
-                if len(self.pats) == 1 and not os.path.isdir(self.pats[0]):
-                    self.opts['filehist'] = self.pats[0]
-                    self.graphview.refresh(True, self.pats, self.opts)
-                else:
-                    self.graphview.refresh(False, self.pats, self.opts)
-        elif self.filter == 'all':
+        if self.filter == 'branch':
+            branch = opts.get('branch', None)
+            self.graphview.refresh(True, branch, opts)
+        else:
             self.branchcombo.set_active(-1)
-            self.graphview.refresh(True, None, self.opts)
+        if self.filter == 'custom':
+            pats = opts.get('pats', [])
+            if len(pats) == 1 and not os.path.isdir(pats[0]):
+                opts['filehist'] = pats[0]
+                self.graphview.refresh(True, pats, opts)
+            else:
+                self.graphview.refresh(False, pats, opts)
+        elif self.filter == 'all':
+            self.graphview.refresh(True, None, opts)
         elif self.filter == 'new':
-            self.opts['revrange'] = [len(self.repo)-1, self.origtip]
-            self.graphview.refresh(True, None, self.opts)
+            assert len(self.repo) > self.origtip
+            opts['revrange'] = [len(self.repo)-1, self.origtip]
+            self.graphview.refresh(True, None, opts)
         elif self.filter == 'only_merges':
-            self.opts['only_merges'] = True
-            self.graphview.refresh(False, [], self.opts)
+            opts['only_merges'] = True
+            self.graphview.refresh(False, [], opts)
         elif self.filter == 'ancestry':
             if not self.currow:
                 return
             range = [self.currow[treemodel.REVID], 0]
-            sopts = {'noheads': True, 'revrange': range}
-            self.graphview.refresh(True, None, sopts)
+            opts = {'noheads': True, 'revrange': range}
+            self.graphview.refresh(True, None, opts)
         elif self.filter == 'tagged':
             tagged = []
             for t, r in self.repo.tagslist():
                 hr = self.repo[r].rev()
                 if hr not in tagged:
                     tagged.insert(0, hr)
-            self.opts['revs'] = tagged
-            self.graphview.refresh(False, [], self.opts)
+            opts['revs'] = tagged
+            self.graphview.refresh(False, [], opts)
         elif self.filter == 'parents':
             repo_parents = [x.rev() for x in self.repo.parents()]
-            self.opts['revs'] = [str(x) for x in repo_parents]
-            self.graphview.refresh(False, [], self.opts)
+            opts['revs'] = [str(x) for x in repo_parents]
+            self.graphview.refresh(False, [], opts)
         elif self.filter == 'heads':
             heads = [self.repo[x].rev() for x in self.repo.heads()]
-            self.opts['revs'] = [str(x) for x in heads]
-            self.graphview.refresh(False, [], self.opts)
+            opts['revs'] = [str(x) for x in heads]
+            self.graphview.refresh(False, [], opts)
 
     def tree_context_menu(self):
         m = gtk.Menu()
@@ -434,7 +437,6 @@ class GLog(gdialog.GDialog):
         return m
 
     def get_body(self):
-        self.filter_dialog = None
         self.gorev_dialog = None
         self._menu = self.tree_context_menu()
         self._menu2 = self.tree_diff_context_menu()
@@ -508,6 +510,22 @@ class GLog(gdialog.GDialog):
         self.custombutton.set_sensitive(False)
         filterbox.pack_start(self.custombutton, False)
 
+        filtercombo = gtk.combo_box_new_text()
+        for f in (_('Rev Range'), _('File Patterns'),
+                  _('Keywords'), _('Date')):
+            filtercombo.append_text(f)
+        filtercombo.set_active(1)
+        filterbox.pack_start(filtercombo, False)
+
+        helpbutton = gtk.Button("?")
+        helpbutton.set_relief(gtk.RELIEF_NONE)
+        helpbutton.connect('pressed', self.filter_help_pressed, filtercombo)
+        filterbox.pack_start(helpbutton, False)
+
+        entry = gtk.Entry()
+        entry.connect('activate', self.filter_entry_activated, filtercombo)
+        filterbox.pack_start(entry, False)
+
         colmenu = gtk.MenuToolButton('')
         colmenu.set_menu(self.view_menu())
         # A MenuToolButton has two parts; a Button and a ToggleButton
@@ -566,6 +584,7 @@ class GLog(gdialog.GDialog):
     def select_branch(self, combo):
         row = combo.get_active()
         if row >= 0:
+            self.filter = 'branch'
             self.custombutton.set_active(True)
             self.reload_log(branch=combo.get_model()[row][0])
 

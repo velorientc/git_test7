@@ -159,7 +159,7 @@ class TreeView(gtk.ScrolledWindow):
                     start = self.repo.changelog.rev(node)
                 else:
                     start = len(self.repo.changelog) - 1
-            elif opts['revrange']:
+            elif opts.get('revrange'):
                 if len(opts['revrange']) >= 2:
                     start, end = opts['revrange']
                 else:
