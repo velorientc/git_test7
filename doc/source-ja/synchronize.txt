@@ -44,10 +44,8 @@
 グローバル設定を上書きすることでリポジトリごとにデフォルトの動作を設定できます。
 
 	:guilabel:`なし`
-		プル後に何もしません。
-		No operations are performed after a pull.  You will be allowed to
-		view the pulled changesets in the log viewer, and you will have the
-		option to update to the new tip if applicable.
+		プル後に何もしません。下のログパネルでプルされたチェンジセットを確認できます。
+		*tip* リビジョンに更新するためのボタンが表示されることもあります。
 	:guilabel:`更新`
 		ローカルリポジトリに新しいリビジョンがプルされた場合に自動的にブランチの *tip*
 		リビジョンに更新します。これによってプルした変更とローカルのまだコミットされていない
