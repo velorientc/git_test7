@@ -1,101 +1,94 @@
-Synchronize
-===========
+同期ツール
+==========
 
 .. module:: synchronize.dialog
 	:synopsis: Dialog used to perform synchronization operations
 
 .. figure:: figures/synchronize.png
-	:alt: Synchronize dialog
+	:alt: 同期ダイアログ
 
-	Synchronize dialog
+	同期ダイアログ
 
-The synchronize tool is used to transmit changesets between repositories
-or to email recipients.
+同期ツールはリポジトリ間でチェンジセットを転送したり、メールを送信するのに使います。
 
-	:guilabel:`Incoming`
-		show changesets that would be pulled from target repository, the
-		changes in the target repository that are not in local repository
-	:guilabel:`Pull`
-		pull incoming changesets from target repository
-	:guilabel:`Outgoing`
-		show changesets that would be pushed to target repository, the
-		changes in the local repository that are not in target
-		repository
-	:guilabel:`Push`
-		push outgoing changesets to target repository, make the local
-		*tip* the new *tip* in the target repository
-	:guilabel:`Email`
-		send outgoing changesets (to target repository) as email
-	:guilabel:`Stop`
-		stop current operation
-	:guilabel:`Configure`
-		configure repository paths (aliases)
+	:guilabel:`受信`
+		指定したリポジトリからプルされるチェンジセットを表示します。
+		それらはローカルのリポジトリにはなく、指定したリポジトリにあるチェンジセットです。
+	:guilabel:`プル`
+		チェンジセットを指定したリポジトリからプルします
+	:guilabel:`送信`
+		指定したリポジトリにプッシュするチェンジセットを表示します。
+		それらはローカルにあって、指定したリポジトリにはないチェンジセットです。
+	:guilabel:`プッシュ`
+		チェンジセットを指定したリポジトリにプッシュします。その結果、
+		ローカルにおける *tip* リビジョンが指定したリポジトリの新しい *tip* リビジョンになります。
+	:guilabel:`メール送信`
+		指定したリポジトリへのチェンジセットをメールとして送信します
+	:guilabel:`中止`
+		現在の操作を中止します
+	:guilabel:`設定`
+		リポジトリパス (とそのエイリアス) の設定ダイアログを開きます
 
-Below the toolbar are two buttons and a text entry:
+ツールバーの下のボタンはそれぞれ：
 
-	:guilabel:`Repo:`
-		browse for a local repository to synchronize with
-	:guilabel:`Bundle:`
-		browse for a local bundle file to pull from
+	:guilabel:`リポジトリ:`
+		同期に使用するローカルリポジトリを指定します
+	:guilabel:`バンドル:`
+		プルの対象となるローカルのバンドルファイルを指定します
 
-The text entry/combo box is where you enter or select paths of target
-repositories. The synchronize tool will seed the drop-down list with
-path aliases configured for this repository.
+その隣のコンボボックスには同期の対象となるリポジトリのパスを入力または選択します。
+ドロップダウンリストにはこのリポジトリに設定されているパスのエイリアスが表示されます。
 
-The :guilabel:`Post Pull Operation` frame contains radio buttons for
-selecting the operation which is performed after a pull.  This behavior
-is configurable via the :guilabel:`Configure` button.  You can select a
-default behavior for your user account and override that selection on a
-per-repository basis.
+:guilabel:`プル後の処理` のフレームにはプル操作が完了した後に実行する処理を選択する
+ラジオボタンがあります。この動作はツールバーの :guilabel:`設定` ボタンから変更可能です。
+グローバル設定を上書きすることでリポジトリごとにデフォルトの動作を設定できます。
 
-	:guilabel:`Nothing`
+	:guilabel:`なし`
+		プル後に何もしません。
 		No operations are performed after a pull.  You will be allowed to
 		view the pulled changesets in the log viewer, and you will have the
 		option to update to the new tip if applicable.
-	:guilabel:`Update`
-		Automatically update to the new branch tip if, and only if, new
-		revisions were pulled into the local repository.  This could trigger
-		a merge if the pulled changes conflict with local uncommitted
-		changes.
-	:guilabel:`Fetch`
-		Equivalent to hg fetch.  See the fetch extension documentation for
-		it's behavior.
-	:guilabel:`Rebase`
-		Equivalent to pull --rebase.  See the rebase extension documentation
-		for it's behavior.  Rebase operations disable connections to any
-		changelog tools, since it is very destructive to any app which is
-		holding a repository object.
+	:guilabel:`更新`
+		ローカルリポジトリに新しいリビジョンがプルされた場合に自動的にブランチの *tip*
+		リビジョンに更新します。これによってプルした変更とローカルのまだコミットされていない
+		変更が衝突した場合にマージが発生する可能性があります。
+	:guilabel:`取得`
+		:command:`hg fetch` と同じ操作になります。動作の詳細については fetch 拡張機能の
+		ヘルプを参照してください。
+	:guilabel:`リベース`
+		:command:`hg pull --rebase` と同じ操作になります。動作の詳細については
+		rebase 拡張機能のヘルプを参照してください。
+		リベース操作はリポジトリオブジェクトを保有するツールへの破壊的な操作となるため、
+		チェンジログビューアとの連携動作を無効にします。
 
-The :guilabel:`use proxy` button is a quick way to disable your proxy
-configuration for individual operations. The button is only sensitive
-when an http proxy is configured.
+:guilabel:`プロキシサーバを使用する` チェックボックスは同期操作ごとに
+プロキシサーバの設定を無効化するのに便利です。
+このボタンはプロキシ設定がされている場合にのみ有効になります。
 
-All operations which require authentication will pop up dialog boxes to
-get the required information from the user.  TortoiseHg uses the
-TortoisePlink tool (borrowed from the TortoiseSVN distribution) to
-handle *ssh:* connections and authentication.  See the FAQ_ for help if
-you have trouble connecting to ssh servers.
+全ての同期操作はユーザからの入力を促すダイアログによる認証を必要とします。
+TortoiseHg は *ssh:* 接続とその認証のために TortoisePlink ツール (TortoiseSVN からの提供)
+を使用します。SSH サーバへの接続に問題がある場合は FAQ_ を参考にしてみてください。
 
 .. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
 
-Under the :guilabel:`Advanced Options` fold-up panel are a number of
-configurables that are valid for most push/pull operations.
+折り畳める :guilabel:`詳細設定` パネルにはプル・プッシュ操作に関連した設定が
+いくつか用意されています：
 
-	:guilabel:`Force pull or push`
-		override warnings about multiple heads or unrelated repositories
-	:guilabel:`Target Revision`
-		to avoid sending all revisions
-	:guilabel:`Remote Command`
-		provides -e argument
-	:guilabel:`Show patches`
-		show diffs in incoming and outging changes
-	:guilabel:`Show Newest First`
-		reverse order that changesets are listed
-	:guilabel:`Show No Merges`
-		filter out merge changesets from output (does not affect push/pull)
+	:guilabel:`強制的にプッシュ/プルする`
+		無関係なリポジトリまたは複数のヘッドがあるなどの警告を無視して実行します
+	:guilabel:`対象リビジョン`
+		全てのリビジョンを送らないようにします
+	:guilabel:`リモートコマンド`
+		-e オプションを使います
+	:guilabel:`パッチの表示`
+		チェンジセット送受信時の差分を表示します
+	:guilabel:`最新のものを最初に表示`
+		チェンジセットを逆順に表示します
+	:guilabel:`マージリビジョン以外を表示`
+		結果表示からマージリビジョンを除外します (プッシュ・プル操作に影響はありません)
 
 
-After Pull
+プルした後
 ----------
 
 After changesets are pulled into your repository, two buttons may appear
@@ -108,8 +101,9 @@ at the bottom of the dialog:
 
 Either button may be hidden if it is not applicable.
 
-Email
------
+
+メール送信
+----------
 
 .. figure:: figures//email.png
 	:alt: Email dialog
@@ -136,10 +130,11 @@ in mailing lists.
 Please consult the Mercurial documentation for the differences between
 plain patches, HG patches, Git patches, and bundles.
 
-From command line
------------------
 
-The synchronize tool can be started from command line ::
+コマンドラインからの実行
+------------------------
+
+同期ツールはコマンドラインから起動することもできます： ::
 
 	hgtk synch
 
@@ -156,8 +151,8 @@ or email command aliases, it will automatically select the
 *default* URL.  If the selected URL is not found, it will use the first
 path it finds.
 
-Changes since 0.7
------------------
+0.7 からの変更点
+----------------
 
 * Path drop-down list no longer includes most-recently-used paths.  It
   only includes configured repository paths.
