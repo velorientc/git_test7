@@ -39,6 +39,7 @@ class GLog(gdialog.GDialog):
         self.curfile = None
         self.origtip = len(self.repo)
         self.ready = False
+        self.filterbox = None
         os.chdir(self.repo.root)
 
     def get_title(self):
@@ -116,6 +117,11 @@ class GLog(gdialog.GDialog):
         self.graphview.set_property(property, active)
         if property in ('branch-color') and self.ready:
             self.reload_log()
+
+    def toggle_show_filterbar(self, button, property):
+        self.show_filterbar = button.get_active()
+        if self.filterbox is not None:
+            self.filterbox.set_property('visible', self.show_filterbar)
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
@@ -227,6 +233,13 @@ class GLog(gdialog.GDialog):
         button.set_active(self.branch_color)
         button.set_draw_as_radio(True)
         menu.append(button)
+        button = gtk.CheckMenuItem(_('Show Filterbar'))
+        button.connect('toggled', self.toggle_show_filterbar,
+                'show-filterbar')
+        button.set_active(self.show_filterbar)
+        button.set_draw_as_radio(True)
+        menu.append(button)
+
         menu.show_all()
         return menu
 
@@ -261,6 +274,9 @@ class GLog(gdialog.GDialog):
             opts['pats'] = self.pats
         self.reload_log(**opts)
 
+        self.filterbox.set_property('visible', self.show_filterbar)
+        self.filterbox.set_no_show_all(True)
+
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
         l = 0
@@ -278,6 +294,7 @@ class GLog(gdialog.GDialog):
         settings['glog-vpane'] = self.vpaned.get_position()
         settings['glog-hpane'] = self.hpaned.get_position()
         settings['branch-color'] = self.graphview.get_property('branch-color')
+        settings['show-filterbar'] = self.show_filterbar
         for col in ('rev', 'date', 'id', 'branch', 'utc'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
@@ -308,11 +325,13 @@ class GLog(gdialog.GDialog):
         self.setting_vpos = -1
         self.setting_hpos = -1
         self.branch_color = False
+        self.show_filterbar = True
         self.showcol = {}
         try:
             self.setting_vpos = settings['glog-vpane']
             self.setting_hpos = settings['glog-hpane']
             self.branch_color = settings.get('branch-color', False)
+            self.show_filterbar = settings.get('show-filterbar', True)
             for col in ('rev', 'date', 'id', 'branch', 'utc'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
@@ -483,7 +502,8 @@ class GLog(gdialog.GDialog):
         self.tree.connect('thg-parent', self.thgparent)
         self.connect('thg-refresh', self.thgrefresh)
 
-        filterbox = gtk.HBox()
+        self.filterbox = gtk.HBox()
+        filterbox = self.filterbox
 
         all = gtk.RadioButton(None, _('all'))
         all.set_active(True)
