@@ -82,7 +82,8 @@ class GLog(gdialog.GDialog):
         self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
             _('Load more'), self.more_clicked, tip=_('load more revisions'))
         self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
-            _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
+            _('Load all'), self.load_all_clicked, menu=self.view_menu(),
+            tip=_('load all revisions'))
         tbar += [sep, self.nextbutton, self.allbutton]
 
         return tbar
@@ -547,15 +548,6 @@ class GLog(gdialog.GDialog):
         entry.connect('activate', self.filter_entry_activated, filtercombo)
         self.filterentry = entry
         filterbox.pack_start(entry, True)
-
-        colmenu = gtk.MenuToolButton('')
-        colmenu.set_menu(self.view_menu())
-        # A MenuToolButton has two parts; a Button and a ToggleButton
-        # we want to see the togglebutton, but not the button
-        b = colmenu.child.get_children()[0]
-        b.unmap()
-        b.set_sensitive(False)
-        filterbox.pack_start(colmenu, False, False)
 
         vbox = gtk.VBox()
         vbox.pack_start(filterbox, False, False, 0)
