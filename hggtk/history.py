@@ -243,13 +243,17 @@ class GLog(gdialog.GDialog):
             self.pats = []
 
         opts = self.opts
-        if self.opts.get('filehist'):
+        if opts['filehist']:
             self.custombutton.set_active(True)
             self.filter = 'custom'
+            self.filtercombo.set_active(1)
+            self.filterentry.set_text(opts['filehist'])
             opts['pats'] = [opts['filehist']]
         elif self.pats:
             self.custombutton.set_active(True)
             self.filter = 'custom'
+            self.filtercombo.set_active(1)
+            self.filterentry.set_text(', '.join(self.pats))
             opts['pats'] = self.pats
         self.reload_log(**opts)
 
@@ -524,6 +528,7 @@ class GLog(gdialog.GDialog):
                   _('Keywords'), _('Date')):
             filtercombo.append_text(f)
         filtercombo.set_active(1)
+        self.filtercombo = filtercombo
         filterbox.pack_start(filtercombo, False)
 
         helpbutton = gtk.Button("?")
@@ -533,7 +538,8 @@ class GLog(gdialog.GDialog):
 
         entry = gtk.Entry()
         entry.connect('activate', self.filter_entry_activated, filtercombo)
-        filterbox.pack_start(entry, False)
+        self.filterentry = entry
+        filterbox.pack_start(entry, True)
 
         colmenu = gtk.MenuToolButton('')
         colmenu.set_menu(self.view_menu())
@@ -542,8 +548,6 @@ class GLog(gdialog.GDialog):
         b = colmenu.child.get_children()[0]
         b.unmap()
         b.set_sensitive(False)
-
-        filterbox.pack_start(gtk.Label(''), True, True) # expanding blank label
         filterbox.pack_start(colmenu, False, False)
 
         vbox = gtk.VBox()
