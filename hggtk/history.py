@@ -83,10 +83,17 @@ class GLog(gdialog.GDialog):
         self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
             _('Load more'), self.more_clicked, tip=_('load more revisions'))
         self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
-            _('Load all'), self.load_all_clicked, menu=self.view_menu(),
-            tip=_('load all revisions'))
-        tbar += [sep, self.nextbutton, self.allbutton]
+            _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
 
+        vmenu = gtk.MenuToolButton('')
+        vmenu.set_menu(self.view_menu())
+        # A MenuToolButton has two parts; a Button and a ToggleButton
+        # we want to see the togglebutton, but not the button
+        b = vmenu.child.get_children()[0]
+        b.unmap()
+        b.set_sensitive(False)
+
+        tbar += [sep, self.nextbutton, self.allbutton, vmenu]
         return tbar
 
     def synch_clicked(self, toolbutton, data):
