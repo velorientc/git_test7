@@ -21,6 +21,7 @@ from thgutil.i18n import _
 from thgutil import hglib, settings, paths
 
 from hggtk import dialog, gtklib, hgthread, history, thgconfig, hgemail
+from hggtk import thgshelve
 
 class SynchDialog(gtk.Window):
     def __init__(self, repos=[], pushmode=False, fromlog=False):
@@ -88,6 +89,10 @@ class SynchDialog(gtk.Window):
                                  self.email_clicked,
                                  tip=_('Email local outgoing changes to'
                                  ' one or more recipients')),
+                self.toolbutton(gtk.STOCK_UNDO,
+                                 _('Shelve'),
+                                 self.shelve_clicked,
+                                 tip=_('Shelve uncommited changes')),
                 gtk.SeparatorToolItem(),
                 self.stop_button,
                 gtk.SeparatorToolItem(),
@@ -504,6 +509,10 @@ class SynchDialog(gtk.Window):
         dlg.show_all()
         dlg.present()
         dlg.set_transient_for(None)
+
+    def shelve_clicked(self, toolbutton, data=None):
+        dlg = thgshelve.run(self.ui)
+        dlg.display()
 
     def incoming_clicked(self, toolbutton, data=None):
         aopts = self.get_advanced_options()
