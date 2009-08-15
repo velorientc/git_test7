@@ -3,6 +3,7 @@
 # Copyright 2007 Brad Schick, brad at gmail . com
 # Copyright 2007 TK Soh <teekaysoh@gmail.com>
 # Copyright 2008 Steve Borho <steve@borho.org>
+# Copyright 2008 Emmanuel Rosa <goaway1000@gmail.com>
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
@@ -74,7 +75,6 @@ class GStatus(gdialog.GDialog):
     point GCommit is really the only intended subclass.
 
         auto_check(self)
-        get_menu_info(self)
     """
 
     ### Following methods are meant to be overridden by subclasses ###
@@ -94,59 +94,8 @@ class GStatus(gdialog.GDialog):
             self.update_check_count()
             self.opts['check'] = False
 
-    def get_menu_info(self):
-        """Returns menu info in this order:
-            merge, addrem, unknown, clean, ignored, deleted,
-            unresolved, resolved
-        """
-        return (
-                # merge
-                ((_('_difference'), self._diff_file),
-                    (_('edit'), self._view_file),
-                    (_('view other'), self.view_left_file),
-                    (_('_revert'), self.revert_file),
-                    (_('l_og'), self.log_file)),
-                # addrem
-                ((_('_difference'), self._diff_file),
-                    (_('_view'), self._view_file),
-                    (_('_revert'), self.revert_file),
-                    (_('l_og'), self.log_file)),
-                # unknown
-                ((_('_view'), self._view_file),
-                    (_('_delete'), self.delete_file),
-                    (_('_add'), self.add_file),
-                    (_('_guess rename'), self.guess_rename),
-                    (_('_ignore'), self.ignore_file)),
-                # clean
-                ((_('_view'), self._view_file),
-                    (_('re_move'), self.remove_file),
-                    (_('re_name'), self.rename_file),
-                    (_('_copy'), self.copy_file),
-                    (_('l_og'), self.log_file)),
-                # ignored
-                ((_('_view'), self._view_file),
-                    (_('_delete'), self.delete_file)),
-                # deleted
-                ((_('_view'), self._view_file),
-                    (_('_revert'), self.revert_file),
-                    (_('re_move'), self.remove_file),
-                    (_('l_og'), self.log_file)),
-                # unresolved
-                ((_('_difference'), self._diff_file),
-                    (_('edit'), self._view_file),
-                    (_('view other'), self.view_left_file),
-                    (_('_revert'), self.revert_file),
-                    (_('l_og'), self.log_file),
-                    (_('resolve'), self.do_resolve),
-                    (_('mark resolved'), self.mark_resolved)),
-                # resolved
-                ((_('_difference'), self._diff_file),
-                    (_('edit'), self._view_file),
-                    (_('view other'), self.view_left_file),
-                    (_('_revert'), self.revert_file),
-                    (_('l_og'), self.log_file),
-                    (_('mark unresolved'), self.unmark_resolved)),
-                )
+    def get_custom_menus(self):
+        return []
 
     ### End of overridable methods ###
 
@@ -193,9 +142,7 @@ class GStatus(gdialog.GDialog):
 
 
     def get_tbbuttons(self):
-        tbuttons = [self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
-            self.refresh_clicked, tip=_('refresh')),
-                     gtk.SeparatorToolItem()]
+        tbuttons = []
 
         if self.count_revs() == 2:
             tbuttons += [
@@ -203,15 +150,28 @@ class GStatus(gdialog.GDialog):
                         self.save_clicked, tip=_('Save selected changes'))]
         else:
             tbuttons += [
+                    self.make_toolbutton(gtk.STOCK_JUSTIFY_FILL, _('_Diff'),
+                        self.diff_clicked,
+                        tip=_('Visual diff checked files')),
                     self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, _('Re_vert'),
-                        self.revert_clicked, tip=_('revert')),
+                        self.revert_clicked,
+                        tip=_('Revert checked files')),
                     self.make_toolbutton(gtk.STOCK_ADD, _('_Add'),
-                        self.add_clicked, tip=_('add')),
+                        self.add_clicked,
+                        tip=_('Add checked files')),
                     self.make_toolbutton(gtk.STOCK_JUMP_TO, _('Move'),
                         self.move_clicked,
-                        tip=_('move selected files to other directory')),
+                        tip=_('Move checked files to other directory')),
                     self.make_toolbutton(gtk.STOCK_DELETE, _('_Remove'),
-                        self.remove_clicked, tip=_('remove')),
+                        self.remove_clicked,
+                        tip=_('Remove or delete checked files')),
+                    self.make_toolbutton(gtk.STOCK_CLEAR, _('_Forget'),
+                        self.forget_clicked, 
+                        tip=_('Forget checked file(s) on next commit')),
+                    gtk.SeparatorToolItem(),
+                    self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
+                        self.refresh_clicked,
+                        tip=_('refresh')),
                     gtk.SeparatorToolItem()]
         return tbuttons
 
@@ -240,31 +200,6 @@ class GStatus(gdialog.GDialog):
     def get_body(self):
         self.merging = len(self.repo.parents()) == 2
 
-        # TODO: should generate menus dynamically during right-click, currently
-        # there can be entires that are not always supported or relavant.
-        merge, addrem, unknown, clean, ignored, deleted, unresolved, resolved \
-                = self.get_menu_info()
-        merge_menu = self.make_menu(merge)
-        addrem_menu = self.make_menu(addrem)
-        unknown_menu = self.make_menu(unknown)
-        clean_menu = self.make_menu(clean)
-        ignored_menu = self.make_menu(ignored)
-        deleted_menu = self.make_menu(deleted)
-        resolved_menu = self.make_menu(resolved)
-        unresolved_menu = self.make_menu(unresolved)
-
-        # Dictionary with a key of file-stat and values containing context-menus
-        self._menus = {}
-        self._menus['M'] = merge_menu
-        self._menus['A'] = addrem_menu
-        self._menus['R'] = addrem_menu
-        self._menus['?'] = unknown_menu
-        self._menus['C'] = clean_menu
-        self._menus['I'] = ignored_menu
-        self._menus['!'] = deleted_menu
-        self._menus['MR'] = resolved_menu
-        self._menus['MU'] = unresolved_menu
-
         # model stores the file list.
         fm = gtk.ListStore(bool, str, str, str, str, bool)
         fm.set_sort_func(1001, self.sort_by_stat)
@@ -272,9 +207,8 @@ class GStatus(gdialog.GDialog):
         self.filemodel = fm
 
         self.filetree = gtk.TreeView(self.filemodel)
-        self.filetree.connect('button-press-event', self.tree_button_press)
-        self.filetree.connect('button-release-event', self.tree_button_release)
         self.filetree.connect('popup-menu', self.tree_popup_menu)
+        self.filetree.connect('button-release-event', self.tree_button_release)
         self.filetree.connect('row-activated', self.tree_row_act)
         self.filetree.connect('key-press-event', self.tree_key_press)
         self.filetree.set_reorderable(False)
@@ -343,23 +277,23 @@ class GStatus(gdialog.GDialog):
 
         diff_frame = gtk.Frame()
         diff_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        self.diff_notebook = gtk.Notebook()
+        self.diff_notebook.set_tab_pos(gtk.POS_BOTTOM)
 
         self.difffont = pango.FontDescription(self.fontlist)
-        if self.merging:
-            # display merge diffs in simple text view
-            self.clipboard = None
-            self.merge_diff_text = gtk.TextView()
-            self.merge_diff_text.set_wrap_mode(gtk.WRAP_NONE)
-            self.merge_diff_text.set_editable(False)
-            self.merge_diff_text.modify_font(self.difffont)
-            sel = self.filetree.get_selection()
-            sel.set_mode(gtk.SELECTION_SINGLE)
-            self.treeselid = sel.connect('changed', self.merge_sel_changed)
-            scroller.add(self.merge_diff_text)
-            diff_frame.add(scroller)
-        else:
+
+        self.clipboard = None
+        self.diff_text = gtk.TextView()
+        self.diff_text.set_wrap_mode(gtk.WRAP_NONE)
+        self.diff_text.set_editable(False)
+        self.diff_text.modify_font(self.difffont)
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.add(self.diff_text)
+        self.diff_notebook.append_page(scroller, gtk.Label(_('Text Diff')))
+
+        if not self.merging:
             # use treeview to show selectable diff hunks
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
             self.clipboard = gtk.Clipboard(selection=sel)
@@ -407,13 +341,13 @@ class GStatus(gdialog.GDialog):
             diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
             diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
             difftree.append_column(diffcol)
+            scroller = gtk.ScrolledWindow()
+            scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             scroller.add(difftree)
-            diff_frame.add(scroller)
+            self.diff_notebook.append_page(
+                scroller, gtk.Label(_('Hunk Selection')))
 
-            sel = self.filetree.get_selection()
-            sel.set_mode(gtk.SELECTION_MULTIPLE)
-            self.treeselid = sel.connect('changed',
-                    self.tree_sel_changed, difftree)
+        diff_frame.add(self.diff_notebook)
 
         if self.diffbottom:
             self.diffpane = gtk.VPaned()
@@ -423,6 +357,17 @@ class GStatus(gdialog.GDialog):
         self.diffpane.pack1(tree_frame, True, False)
         self.diffpane.pack2(diff_frame, True, True)
         self.filetree.set_headers_clickable(True)
+
+        sel = self.filetree.get_selection()
+        if self.merging:
+            sel.set_mode(gtk.SELECTION_SINGLE)
+            self.treeselid = sel.connect(
+                'changed', self.difftext_sel_changed)
+        else:
+            sel.set_mode(gtk.SELECTION_MULTIPLE)
+            self.treeselid = sel.connect(
+                'changed', self.tree_sel_changed, difftree)
+
         return self.diffpane
 
 
@@ -491,6 +436,15 @@ class GStatus(gdialog.GDialog):
                               file_count))
         if self.selcb:
             self.selcb.set_active(file_count and file_count == check_count)
+        if self.count_revs() == 2:
+            return
+        sensitive = check_count and not self.merging
+        self.get_toolbutton(_('_Diff')).set_sensitive(sensitive)
+        self.get_toolbutton(_('Re_vert')).set_sensitive(sensitive)
+        self.get_toolbutton(_('_Add')).set_sensitive(sensitive)
+        self.get_toolbutton(_('_Remove')).set_sensitive(sensitive)
+        self.get_toolbutton(_('Move')).set_sensitive(sensitive)
+        self.get_toolbutton(_('_Forget')).set_sensitive(sensitive)
 
     def prepare_display(self):
         gobject.idle_add(self.realize_status_settings)
@@ -511,8 +465,8 @@ class GStatus(gdialog.GDialog):
     def thgdiff(self, treeview):
         selection = treeview.get_selection()
         model, tpaths = selection.get_selected_rows()
-        row = model[tpaths[0]]
-        self._diff_file(row[FM_STATUS], row[FM_PATH])
+        files = [model[p][FM_PATH] for p in tpaths]
+        self._do_diff(files, self.opts)
 
     def thgrefresh(self, window):
         self.reload_status()
@@ -622,9 +576,8 @@ class GStatus(gdialog.GDialog):
             selection.select_path((firstrow or 0,))
         else:
             # clear diff pane if no files
-            if self.merging:
-                self.merge_diff_text.set_buffer(gtk.TextBuffer())
-            else:
+            self.diff_text.set_buffer(gtk.TextBuffer())
+            if not self.merging:
                 self.diffmodel.clear()
 
         self.filetree.show()
@@ -639,21 +592,6 @@ class GStatus(gdialog.GDialog):
         if not self.ready: return False
         self.do_reload_status()
         self.update_check_count()
-
-
-    def make_menu(self, entries):
-        menu = gtk.Menu()
-        for entry in entries:
-            menu.append(self.make_menuitem(entry[0], entry[1]))
-        menu.show_all()
-        return menu
-
-
-    def make_menuitem(self, label, handler):
-        menuitem = gtk.MenuItem(label, True)
-        menuitem.connect('activate', self.context_menu_act, handler)
-        menuitem.set_border_width(1)
-        return menuitem
 
 
     def select_toggle(self, cellrenderer, path):
@@ -714,6 +652,7 @@ class GStatus(gdialog.GDialog):
             newtext = "<span foreground='#888888'>" + newtext + "</span>"
         dmodel[hc][DM_DISP_TEXT] = newtext
 
+
     def show_toggle(self, check, toggletype):
         self.opts[toggletype] = check.get_active()
         self.reload_status()
@@ -753,15 +692,6 @@ class GStatus(gdialog.GDialog):
             text_renderer.set_property('foreground', 'black')
         else:
             text_renderer.set_property('foreground', 'black')
-
-
-    def view_left_file(self, stat, wfile):
-        return self._view_file(stat, wfile, True)
-
-
-    def remove_file(self, stat, wfile):
-        self.hg_remove([wfile])
-        return True
 
 
     def rename_file(self, stat, wfile):
@@ -838,15 +768,16 @@ class GStatus(gdialog.GDialog):
         if success:
             self.reload_status()
 
-    def merge_sel_changed(self, selection):
-        'Selected row in file tree activated changed (merge mode)'
-        # Update the diff text with merge diff to both parents
+    def difftext_sel_changed(self, selection):
+        'Selected row in file tree changed, update text diff'
         model, paths = selection.get_selected_rows()
         if not paths:
             return
         wfile = self.filemodel[paths[0]][FM_PATH]
         pfile = util.pconvert(wfile)
-        difftext = [_('===== Diff to first parent =====\n')]
+        difftext = []
+        if self.merging:
+            difftext = [_('===== Diff to first parent =====\n')]
         wctx = self.repo[None]
         pctxs = wctx.parents()
         matcher = cmdutil.matchfiles(self.repo, [pfile])
@@ -881,11 +812,12 @@ class GStatus(gdialog.GDialog):
             else:
                 line = hglib.diffexpand(line)
                 buf.insert(bufiter, line)
-        self.merge_diff_text.set_buffer(buf)
+        self.diff_text.set_buffer(buf)
 
 
     def tree_sel_changed(self, selection, tree):
         'Selected row in file tree activated changed'
+        self.difftext_sel_changed(selection)
         # Read this file's diffs into diff model
         model, paths = selection.get_selected_rows()
         if not paths:
@@ -1078,26 +1010,22 @@ class GStatus(gdialog.GDialog):
         finally:
             fp.close()
 
+    def diff_clicked(self, toolbutton, data=None):
+        diff_list = self.relevant_checked_files('MAR!')
+        if len(diff_list) > 0:
+            self._do_diff(diff_list, self.opts)
+        else:
+            gdialog.Prompt(_('Nothing Diffed'),
+                   _('No diffable files selected'), self).run()
+        return True
+
     def revert_clicked(self, toolbutton, data=None):
-        revert_list = self.relevant_files('MAR!')
+        revert_list = self.relevant_checked_files('MAR!')
         if len(revert_list) > 0:
             self.hg_revert(revert_list)
         else:
             gdialog.Prompt(_('Nothing Reverted'),
                    _('No revertable files selected'), self).run()
-        return True
-
-
-    def revert_file(self, stat, wfile):
-        self.hg_revert([wfile])
-        return True
-
-
-    def log_file(self, stat, wfile):
-        # Might want to include 'rev' here... trying without
-        from hggtk import history
-        dlg = history.run(self.ui, filehist=wfile)
-        dlg.display()
         return True
 
 
@@ -1116,50 +1044,64 @@ class GStatus(gdialog.GDialog):
         def dohgrevert():
             commands.revert(self.ui, self.repo, *wfiles, **revertopts)
 
+        def filelist(files):
+            text = ''
+            for i, f in enumerate(files):
+                text += '   ' + f + '\n'
+                if i == 9:
+                    text += '   ...\n'
+                    break
+            return text
+
+        # response: 0=Yes, 1=No backup, 2=Cancel
         if self.count_revs() == 1:
             # rev options needs extra tweaking since is not an array for
             # revert command
             revertopts['rev'] = revertopts['rev'][0]
-            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
-                    _('Revert files to revision %s?') % revertopts['rev'])
+            response = gdialog.CustomPrompt(_('Confirm Revert'),
+                    _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
+                    filelist(files)), self, (_('&Yes'), _('&No backup'), _('&Cancel')),
+                    2, 2).run()
         elif self.merging:
-            resp = gdialog.CustomPrompt(
+            res = gdialog.CustomPrompt(
                     _('Uncommited merge - please select a parent revision'),
                     _('Revert file(s) to local or other parent?'),
-                    self, (_('&local'), _('&other')), _('l')).run()
-            if resp == ord(_('l')):
+                    self, (_('&local'), _('&other')), 0).run()
+            if res == 0:
                 revertopts['rev'] = self.repo[None].p1().rev()
-            elif resp == ord(_('o')):
+            elif res == 1:
                 revertopts['rev'] = self.repo[None].p2().rev()
             else:
                 return
-            dlg = None
+            response = None
         else:
             # rev options needs extra tweaking since it must be an empty
             # string when unspecified for revert command
             revertopts['rev'] = ''
-            dlg = gdialog.Confirm(_('Confirm Revert'), files, self,
-                    _('Revert the following files?'))
-        if not dlg or dlg.run() == gtk.RESPONSE_YES:
+            response = gdialog.CustomPrompt(_('Confirm Revert'),
+                    _('Revert the following files?\n\n%s') % filelist(files), self,
+                    (_('&Yes'), _('&No backup'), _('&Cancel')), 2, 2).run()
+        if response in (None, 0, 1):
+            if response == 1:
+                revertopts['no_backup'] = True
             success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
             if success:
                 shlib.shell_notify(wfiles)
                 self.reload_status()
 
+    def hg_forget(self, files):
+        wfiles = [self.repo.wjoin(x) for x in files]
+        commands.forget(self.ui, self.repo, *wfiles)
+        self.reload_status()
+
     def add_clicked(self, toolbutton, data=None):
-        add_list = self.relevant_files('?I')
+        add_list = self.relevant_checked_files('?I')
         if len(add_list) > 0:
             self.hg_add(add_list)
         else:
             gdialog.Prompt(_('Nothing Added'),
                    _('No addable files selected'), self).run()
         return True
-
-
-    def add_file(self, stat, wfile):
-        self.hg_add([wfile])
-        return True
-
 
     def hg_add(self, files):
         wfiles = [self.repo.wjoin(x) for x in files]
@@ -1174,8 +1116,8 @@ class GStatus(gdialog.GDialog):
             self.reload_status()
 
     def remove_clicked(self, toolbutton, data=None):
-        remove_list = self.relevant_files('C!')
-        delete_list = self.relevant_files('?I')
+        remove_list = self.relevant_checked_files('C!')
+        delete_list = self.relevant_checked_files('?I')
         if len(remove_list) > 0:
             self.hg_remove(remove_list)
         if len(delete_list) > 0:
@@ -1186,7 +1128,7 @@ class GStatus(gdialog.GDialog):
         return True
 
     def move_clicked(self, toolbutton, data=None):
-        move_list = self.relevant_files('C')
+        move_list = self.relevant_checked_files('C')
         if move_list:
             # get destination directory to files into
             dlg = gtklib.NativeFolderSelectDialog(
@@ -1211,8 +1153,13 @@ class GStatus(gdialog.GDialog):
                     'Note: only clean files can be moved.'), self).run()
         return True
 
-    def delete_file(self, stat, wfile):
-        self.delete_files([wfile])
+    def forget_clicked(self, toolbutton, data=None):
+        forget_list = self.relevant_checked_files('CM')
+        if len(forget_list) > 0:
+            self.hg_forget(forget_list)
+        else:
+            gdialog.Prompt(_('Nothing Forgotten'),
+                   _('No clean files selected'), self).run()
 
     def delete_files(self, files):
         dlg = gdialog.Confirm(_('Confirm Delete Unrevisioned'), files, self,
@@ -1234,111 +1181,140 @@ class GStatus(gdialog.GDialog):
             self.reload_status()
         return True
 
-    def guess_rename(self, stat, wfile):
-        dlg = guess.DetectRenameDialog()
-        dlg.show_all()
-        dlg.set_notify_func(self.ignoremask_updated)
-
-    def ignore_file(self, stat, wfile):
-        dlg = hgignore.HgIgnoreDialog(self.repo.root, util.pconvert(wfile))
-        dlg.show_all()
-        dlg.set_notify_func(self.ignoremask_updated)
-        return True
-
     def ignoremask_updated(self):
         '''User has changed the ignore mask in hgignore dialog'''
         self.reload_status()
 
-    def mark_resolved(self, stat, wfile):
-        ms = merge_.mergestate(self.repo)
-        ms.mark(util.pconvert(wfile), "r")
-        self.reload_status()
-
-
-    def unmark_resolved(self, stat, wfile):
-        ms = merge_.mergestate(self.repo)
-        ms.mark(util.pconvert(wfile), "u")
-        self.reload_status()
-
-
-    def do_resolve(self, stat, wfile):
-        ms = merge_.mergestate(self.repo)
-        wctx = self.repo[None]
-        mctx = wctx.parents()[-1]
-        ms.resolve(util.pconvert(wfile), wctx, mctx)
-        self.reload_status()
-
+    def relevant_checked_files(self, stats):
+        return [item[FM_PATH] for item in self.filemodel \
+                if item[FM_CHECKED] and item[FM_STATUS] in stats]
 
     def sel_clicked(self, state):
-        self.select_files(state)
-        return True
-
-
-    def select_files(self, state, ctype=None):
+        'selection header checkbox clicked'
         for entry in self.filemodel:
-            if ctype and not entry[FM_STATUS] in ctype:
-                continue
             if entry[FM_CHECKED] != state:
                 entry[FM_CHECKED] = state
                 self.update_chunk_state(entry)
         self.update_check_count()
 
-
-    def relevant_files(self, stats):
-        return [item[FM_PATH] for item in self.filemodel \
-                if item[FM_CHECKED] and item[FM_STATUS] in stats]
-
-
-    def context_menu_act(self, menuitem, handler):
-        selection = self.filetree.get_selection()
-        assert(selection.count_selected_rows() == 1)
-
-        model, tpaths = selection.get_selected_rows()
-        path = tpaths[0]
-        handler(model[path][FM_STATUS], model[path][FM_PATH])
-        return True
-
-
-    def tree_button_press(self, widget, event):
-        # Set the flag to ignore the next activation when the
-        # shift/control keys are pressed. This avoids activations with
-        # multiple rows selected.
-        if event.type == gtk.gdk._2BUTTON_PRESS and  \
-          (event.state & (gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK)):
-            self._ignore_next_act = True
-        else:
-            self._ignore_next_act = False
-        return False
-
-
-    def tree_button_release(self, widget, event):
+    def tree_button_release(self, treeview, event):
         if event.button != 3:
             return False
-        if not (event.state & (gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK)):
-            self.tree_popup_menu(widget, event.button, event.time)
-        return False
+        self.tree_popup_menu(treeview)
+        return True
 
-    def get_file_context_menu(self, rowdata):
-        st = rowdata[FM_STATUS]
-        ms = rowdata[FM_MERGE_STATUS]
-        if ms:
-            menu = self._menus['M' + ms]
-        else:
-            menu = self._menus[st]
-        return menu
+    def tree_popup_menu(self, treeview):
+        model, tpaths = treeview.get_selection().get_selected_rows()
+        types = {'M':[], 'A':[], 'R':[], '!':[], 'I':[], '?':[], 'C':[],
+                 'r':[], 'u':[]}
+        all = []
+        for p in tpaths:
+            row = model[p]
+            file = row[FM_PATH]
+            ms = row[FM_MERGE_STATUS]
+            if ms == 'R':
+                types['r'].append(file)
+            elif ms == 'U':
+                types['u'].append(file)
+            else:
+                types[row[FM_STATUS]].append(file)
+            all.append(file)
 
-    def tree_popup_menu(self, widget, button=0, time=0):
-        selection = self.filetree.get_selection()
-        if selection.count_selected_rows() != 1:
-            return False
+        def make(label, handler, stats):
+            files = []
+            for t in stats:
+                files.extend(types[t])
+            if not files:
+                return
+            item = gtk.MenuItem(label, True)
+            item.connect('activate', handler, files)
+            item.set_border_width(1)
+            menu.append(item)
 
-        model, tpaths = selection.get_selected_rows()
-        menu = self.get_file_context_menu(model[tpaths[0]])
-        menu.popup(None, None, None, button, time)
+        def vdiff(menuitem, files):
+            self._do_diff(files, self.opts)
+        def viewmissing(menuitem, files):
+            self._view_files(files, True)
+        def edit(menuitem, files):
+            self._view_files(files, False)
+        def other(menuitem, files):
+            self._view_files(files, True)
+        def revert(menuitem, files):
+            self.hg_revert(files)
+        def remove(menuitem, files):
+            self.hg_remove(files)
+        def log(menuitem, files):
+            from hggtk import history
+            dlg = history.run(self.ui, canonpats=files)
+            dlg.display()
+        def forget(menuitem, files):
+            self.hg_forget(files)
+        def add(menuitem, files):
+            self.hg_add(files)
+        def delete(menuitem, files):
+            self.delete_files(files)
+        def unmark(menuitem, files):
+            ms = merge_.mergestate(self.repo)
+            for wfile in files:
+                ms.mark(util.pconvert(wfile), "u")
+            self.reload_status()
+        def mark(menuitem, files):
+            ms = merge_.mergestate(self.repo)
+            for wfile in files:
+                ms.mark(util.pconvert(wfile), "r")
+            self.reload_status()
+        def resolve(self, stat, wfile):
+            wctx = self.repo[None]
+            mctx = wctx.parents()[-1]
+            for wfile in files:
+                ms = merge_.mergestate(self.repo)
+                ms.resolve(util.pconvert(wfile), wctx, mctx)
+            self.reload_status()
+        def rename(menuitem, files):
+            self.rename_file(files[0])
+        def copy(menuitem, files):
+            self.copy_file(files[0])
+        def guess(menuitem, files):
+            dlg = guess.DetectRenameDialog()
+            dlg.show_all()
+            dlg.set_notify_func(self.ignoremask_updated)
+        def ignore(menuitem, files):
+            wfile = util.pconvert(files[0])
+            dlg = hgignore.HgIgnoreDialog(self.repo.root, w)
+            dlg.show_all()
+            dlg.set_notify_func(self.ignoremask_updated)
+
+        menu = gtk.Menu()
+        make(_('_visual diff'), vdiff, 'MAR!ru')
+        make(_('edit'), edit, 'MACI?ru')
+        make(_('view missing'), viewmissing, 'R!')
+        if self.merging:
+            make(_('view other'), other, 'MAru')
+        make(_('_revert'), revert, 'MAR!ru')
+        make(_('l_og'), log, 'MARC!ru')
+        make(_('_forget'), forget, 'MARC!ru')
+        make(_('_add'), add, 'I?')
+        make(_('_guess rename'), guess, '?')
+        make(_('_ignore'), ignore, '?')
+        make(_('remove versioned'), remove, 'C')
+        make(_('_delete unversioned'), delete, '?I')
+        if len(all) == 1:
+            make(_('_copy'), copy, 'MC')
+            make(_('rename'), rename, 'MC')
+        make(_('restart merge'), resolve, 'r')
+        make(_('mark unresolved'), mark, 'r')
+        make(_('mark resolved'), mark, 'u')
+
+        for label, func, stats in self.get_custom_menus():
+            make(label, func, stats)
+
+        menu.show_all()
+        menu.popup(None, None, None, 0, 0)
         return True
 
 
     def tree_key_press(self, tree, event):
+        'Make spacebar toggle selected rows'
         if event.keyval == 32:
             def toggler(model, path, bufiter):
                 model[path][FM_CHECKED] = not model[path][FM_CHECKED]
@@ -1352,22 +1328,30 @@ class GStatus(gdialog.GDialog):
 
 
     def tree_row_act(self, tree, path, column):
-        """Default action is the first entry in the context menu
-        """
-        # Ignore activations (like double click) on the first column,
-        # and ignore all actions if the flag is set
-        if column.get_sort_column_id() == 0 or self._ignore_next_act:
-            self._ignore_next_act = False
+        'Activation (return) triggers visual diff of selected rows'
+        # Ignore activations (like double click) on the first column
+        if column.get_sort_column_id() == 0:
             return True
 
-        selection = self.filetree.get_selection()
-        if selection.count_selected_rows() != 1:
-            return False
-
-        model, tpaths = selection.get_selected_rows()
-        menu = self.get_file_context_menu(model[tpaths[0]])
-        menu.get_children()[0].activate()
+        model, tpaths = self.filetree.get_selection().get_selected_rows()
+        files = [model[p][FM_PATH] for p in tpaths]
+        self._do_diff(files, self.opts)
         return True
+
+    def isuptodate(self):
+        oldparents = self.repo.dirstate.parents()
+        self.repo.dirstate.invalidate()
+        if oldparents == self.repo.dirstate.parents():
+            return True
+        response = gdialog.CustomPrompt(_('not up to date'),
+                    _('The parents have changed since the last refresh.\n'
+                      'Continue anyway?'),
+                    self, (_('&Yes'), _('&Refresh'), _('&Cancel')), 1, 2).run()
+        if response == 0: # Yes
+            return True
+        if response == 1:
+            self.reload_status()
+        return False
 
 def run(ui, *pats, **opts):
     showclean = pats and True or False

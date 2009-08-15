@@ -21,6 +21,7 @@ from thgutil.i18n import _
 from thgutil import hglib, settings, paths
 
 from hggtk import dialog, gtklib, hgthread, history, thgconfig, hgemail
+from hggtk import thgshelve
 
 class SynchDialog(gtk.Window):
     def __init__(self, repos=[], pushmode=False, fromlog=False):
@@ -88,6 +89,10 @@ class SynchDialog(gtk.Window):
                                  self.email_clicked,
                                  tip=_('Email local outgoing changes to'
                                  ' one or more recipients')),
+                self.toolbutton(gtk.STOCK_UNDO,
+                                 _('Shelve'),
+                                 self.shelve_clicked,
+                                 tip=_('Shelve uncommited changes')),
                 gtk.SeparatorToolItem(),
                 self.stop_button,
                 gtk.SeparatorToolItem(),
@@ -99,12 +104,16 @@ class SynchDialog(gtk.Window):
             ]
         for btn in tbuttons:
             self.tbar.insert(btn, -1)
-        vbox = gtk.VBox()
-        self.add(vbox)
-        vbox.pack_start(self.tbar, False, False, 2)
 
-        # sync target info
+        # Base box
+        basevbox = gtk.VBox()
+        self.add(basevbox)
+        basevbox.pack_start(self.tbar, False, False, 2)
+
+        # Sync Target Path
         targethbox = gtk.HBox()
+
+        ## target selection buttons
         lbl = gtk.Button(_('Repo:'))
         lbl.unset_flags(gtk.CAN_FOCUS)
         lbl.connect('clicked', self.btn_remotepath_clicked)
@@ -115,7 +124,7 @@ class SynchDialog(gtk.Window):
         lbl.connect('clicked', self.btn_bundlepath_clicked)
         targethbox.pack_start(lbl, False, False)
 
-        # revisions combo box
+        ## target path combobox
         self.pathlist = gtk.ListStore(str, str)
         self.pathbox = gtk.ComboBoxEntry(self.pathlist, 0)
         self.pathtext = self.pathbox.get_child()
@@ -142,58 +151,44 @@ class SynchDialog(gtk.Window):
         elif defrow is not None:
             self.pathbox.set_active(defrow)
 
-        # support dropping of repos or bundle files
-        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
-                [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
-        self.connect('drag_data_received', self._drag_receive)
+        # Post Pull Operation
+        ppullhbox = gtk.HBox()
+        self.ppulldata = [('none', _('Nothing')), ('update', _('Update')),
+                ('fetch', _('Fetch')), ('rebase', _('Rebase'))]
+        self.ppullcombo = combo = gtk.combo_box_new_text()
+        for (index, (name, label)) in enumerate(self.ppulldata):
+            combo.insert_text(index, label)
+        ppullhbox.pack_start(gtk.Label(_('Post Pull: ')), False, False, 2)
+        ppullhbox.pack_start(self.ppullcombo, True, True)
 
-        # create checkbox to disable proxy
+        # Fixed options box (non-foldable)
+        fixedhbox = gtk.HBox()
+        fixedhbox.pack_start(targethbox, True, True, 2)
+        fixedhbox.pack_start(ppullhbox, False, False, 2)
+
+        # Advanced options (foldable)
+        opthbox = gtk.HBox()
+        self.expander = expander = gtk.Expander(_('Advanced Options'))
+        expander.set_expanded(False)
+        expander.connect_after('activate', self.expanded)
+        expander.add(opthbox)
+
+        ## checkbox options
+        chkopthbox = gtk.HBox()
+        self.force = gtk.CheckButton(_('Force pull or push'))
+        self.tips.set_tip(self.force, _('Run even when remote repository'
+                ' is unrelated.'))
         self.use_proxy = gtk.CheckButton(_('use proxy server'))
         if ui.ui().config('http_proxy', 'host', ''):
             self.use_proxy.set_active(True)
         else:
             self.use_proxy.set_sensitive(False)
+        chkopthbox.pack_start(self.force, False, False, 4)
+        chkopthbox.pack_start(self.use_proxy, False, False, 4)
 
-        frame = gtk.Frame(_('Post pull operation'))
-        ppvbox = gtk.VBox()
-        self.nothingradio = gtk.RadioButton(None, _('Nothing'))
-        self.updateradio = gtk.RadioButton(self.nothingradio, _('Update'))
-        self.fetchradio = gtk.RadioButton(self.nothingradio, _('Fetch'))
-        self.rebaseradio = gtk.RadioButton(self.nothingradio, _('Rebase'))
-        ppvbox.pack_start(self.nothingradio, True, True, 2)
-        ppvbox.pack_start(self.updateradio, True, True, 2)
-        ppvbox.pack_start(self.fetchradio, True, True, 2)
-        ppvbox.pack_start(self.rebaseradio, True, True, 2)
-        frame.add(ppvbox)
-        frame.set_border_width(2)
-
-        self.expander = expander = gtk.Expander(_('Advanced Options'))
-        expander.set_expanded(False)
-        expander.connect_after('activate', self.expanded)
-        hbox = gtk.HBox()
-        expander.add(hbox)
-
-        leftvbox = gtk.VBox()
-        leftvbox.pack_start(frame, False, False, 2)
-        leftvbox.pack_start(self.use_proxy, False, False, 3)
-
-        rightvbox = gtk.VBox()
-        rightvbox.pack_start(targethbox, False, False, 2)
-        rightvbox.pack_start(expander, True, True, 2)
-
-        tophbox = gtk.HBox()
-        tophbox.pack_start(rightvbox, True, True, 2)
-        tophbox.pack_start(leftvbox, False, False, 2)
-        vbox.pack_start(tophbox, False, False, 2)
-
-        revvbox = gtk.VBox()
-        self.reventry = gtk.Entry()
-        self.cmdentry = gtk.Entry()
-        self.force = gtk.CheckButton(_('Force pull or push'))
-        self.tips.set_tip(self.force, _('Run even when remote repository'
-                ' is unrelated.'))
-
+        ## target revision option
         revhbox = gtk.HBox()
+        self.reventry = gtk.Entry()
         revhbox.pack_start(gtk.Label(_('Target Revision:')), False, False, 2)
         revhbox.pack_start(self.reventry, True, True, 2)
         reveventbox = gtk.EventBox()
@@ -201,7 +196,9 @@ class SynchDialog(gtk.Window):
         self.tips.set_tip(reveventbox, _('A specific revision up to which you'
                 ' would like to push or pull.'))
 
+        ## remote command option
         cmdhbox = gtk.HBox()
+        self.cmdentry = gtk.Entry()
         cmdhbox.pack_start(gtk.Label(_('Remote Command:')), False, False, 2)
         cmdhbox.pack_start(self.cmdentry, True, True, 2)
         cmdeventbox = gtk.EventBox()
@@ -209,13 +206,15 @@ class SynchDialog(gtk.Window):
         self.tips.set_tip(cmdeventbox, _('Name of hg executable on remote'
                 ' machine.'))
 
-        revvbox.pack_start(self.force, False, False, 8)
-        revvbox.pack_start(reveventbox, True, True, 2)
-        revvbox.pack_start(cmdeventbox, True, True, 2)
-        hbox.pack_start(revvbox, True, True, 4)
+        revvbox = gtk.VBox()
+        revvbox.pack_start(chkopthbox, False, False, 8)
+        revvbox.pack_start(reveventbox, False, False, 4)
+        revvbox.pack_start(cmdeventbox, False, False, 4)
+        opthbox.pack_start(revvbox, True, True, 4)
 
+        ## incoming/outgoing options
         frame = gtk.Frame(_('Incoming/Outgoing'))
-        hbox.pack_start(frame, False, False, 2)
+        opthbox.pack_start(frame, False, False, 2)
 
         self.showpatch = gtk.CheckButton(_('Show Patches'))
         self.newestfirst = gtk.CheckButton(_('Show Newest First'))
@@ -226,6 +225,12 @@ class SynchDialog(gtk.Window):
         iovbox.pack_start(self.newestfirst, False, False, 2)
         iovbox.pack_start(self.nomerge, False, False, 2)
         frame.add(iovbox)
+
+        # Main option box
+        topvbox = gtk.VBox()
+        topvbox.pack_start(fixedhbox, True, True, 2)
+        topvbox.pack_start(expander, False, False, 2)
+        basevbox.pack_start(topvbox, False, False, 2)
 
         # hg output window
         scrolledwindow = gtk.ScrolledWindow()
@@ -239,7 +244,7 @@ class SynchDialog(gtk.Window):
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
                                    foreground='#900000')
-        vbox.pack_start(scrolledwindow, True, True)
+        basevbox.pack_start(scrolledwindow, True, True)
 
         self.buttonhbox = gtk.HBox()
         self.viewpulled = gtk.Button(_('View pulled revisions'))
@@ -248,11 +253,18 @@ class SynchDialog(gtk.Window):
         self.updatetip.connect('clicked', self._update_to_tip)
         self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
         self.buttonhbox.pack_start(self.updatetip, False, False, 2)
-        vbox.pack_start(self.buttonhbox, False, False, 2)
+        basevbox.pack_start(self.buttonhbox, False, False, 2)
 
+        # statusbar
         self.stbar = gtklib.StatusBar()
-        vbox.pack_start(self.stbar, False, False, 2)
+        basevbox.pack_start(self.stbar, False, False, 2)
 
+        # support dropping of repos or bundle files
+        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
+                [("text/uri-list", 0, 1)], gtk.gdk.ACTION_COPY)
+        self.connect('drag_data_received', self._drag_receive)
+
+        # prepare to show
         self.load_settings()
         self.update_pull_setting()
         gobject.idle_add(self.finalize_startup)
@@ -271,14 +283,15 @@ class SynchDialog(gtk.Window):
         thread.start()
 
     def update_pull_setting(self):
-        ppull = self.repo.ui.config('tortoisehg', 'postpull', 'None')
-        self.nothingradio.set_active(True)
-        if ppull == 'update':
-            self.updateradio.set_active(True)
-        elif ppull == 'fetch':
-            self.fetchradio.set_active(True)
-        elif ppull == 'rebase':
-            self.rebaseradio.set_active(True)
+        ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
+        for (index, (name, label)) in enumerate(self.ppulldata):
+            if ppull == name:
+                pos = index
+                break;
+        else:
+            pos = [index for (index, (name, label))
+                    in enumerate(self.ppulldata) if name == 'none'][0]
+        self.ppullcombo.set_active(pos)
 
     def fill_path_combo(self):
         self.pathlist.clear()
@@ -432,8 +445,10 @@ class SynchDialog(gtk.Window):
         return opts
 
     def pull_clicked(self, toolbutton, data=None):
+        sel = self.ppullcombo.get_active_text()
+        ppull = [name for (name, label) in self.ppulldata if sel == label][0]
         aopts = self.get_advanced_options()
-        if self.fetchradio.get_active():
+        if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extensions explicitly
             extensions.load(self.ui, 'fetch', None)
@@ -441,9 +456,9 @@ class SynchDialog(gtk.Window):
             cmd = ['pull']
             cmd += aopts.get('force', [])
             cmd += aopts.get('remotecmd', [])
-            if self.updateradio.get_active():
+            if ppull == 'update':
                 cmd.append('--update')
-            elif self.rebaseradio.get_active():
+            elif ppull == 'rebase':
                 cmd.append('--rebase')
             # load the rebase extensions explicitly
             extensions.load(self.ui, 'rebase', None)
@@ -494,6 +509,10 @@ class SynchDialog(gtk.Window):
         dlg.show_all()
         dlg.present()
         dlg.set_transient_for(None)
+
+    def shelve_clicked(self, toolbutton, data=None):
+        dlg = thgshelve.run(self.ui)
+        dlg.display()
 
     def incoming_clicked(self, toolbutton, data=None):
         aopts = self.get_advanced_options()
@@ -566,15 +585,9 @@ class SynchDialog(gtk.Window):
             return False
 
     def add_src_to_recent(self, src):
-        if os.path.exists(src):
-            src = os.path.abspath(src)
-
-        # save src path to recent list in history (read by clone tool)
+        # add src path to recent list in history (read by clone tool)
         self._settings.mrul('src_paths').add(src)
         self._settings.write()
-
-        # update drop-down list
-        self.fill_path_combo()
 
     def flush(self, *args):
         pass
