@@ -318,3 +318,10 @@ class NativeFolderSelectDialog:
         if response == gtk.RESPONSE_OK:
             return fname
         return None
+
+def addspellcheck(textview):
+    try:
+        import gtkspell
+        gtkspell.Spell(textview)
+    except ImportError:
+        pass
