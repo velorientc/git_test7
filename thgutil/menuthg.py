@@ -116,8 +116,8 @@ class TortoiseMenu(object):
         self.menutext = menutext
         self.helptext = helptext
         self.hgcmd = hgcmd
-        self.state = state
         self.icon = icon
+        self.state = state
 
     def isSubmenu(self):
         return False
@@ -168,8 +168,8 @@ class thg_menu(object):
         self.name = name
         self.sep = [False]
 
-    def add_menu(self, menutext, helptext, hgcmd, icon=None, state=True):
-        global promoted
+    def add_menu(self, hgcmd, icon=None, state=True):
+        global promoted, thgcmenu
         if hgcmd in promoted:
             pos = 0
         else:
@@ -180,12 +180,11 @@ class thg_menu(object):
         if self.sep[pos]:
             self.sep[pos] = False
             self.menus[pos].append(TortoiseMenuSep())
-        self.menus[pos].append(TortoiseMenu(
-                  menutext, helptext, hgcmd, icon, state))
+        self.menus[pos].append(TortoiseMenu(thgcmenu[hgcmd]['label']['str'],
+                thgcmenu[hgcmd]['help']['str'], hgcmd, thgcmenu[hgcmd]['icon'], state))
 
     def add_sep(self):
         self.sep = [True for _s in self.sep]
-
 
     def get(self):
         menu = self.menus[0][:]
@@ -244,30 +243,19 @@ class menuThg:
         drop_repo = open_repo(destfolder)
 
         menu = thg_menu(drag_repo.ui, self.name)
-        menu.add_menu(_("Create Clone"),
-                  _("Create clone here from source"),
-                  'clone', icon="menuclone.ico")
+        menu.add_menu('clone')
 
         if drop_repo:
-            menu.add_menu(_("Synchronize"),
-                     _("Synchronize with dragged repository"),
-                     'synch', icon="menusynch.py")
+            menu.add_menu('dndsynch')
         return menu
 
     def get_norepo_commands(self, cwd, files):
         menu = thg_menu(ui.ui(), self.name)
-        menu.add_menu(_("Clone a Repository"),
-                  _("clone a repository"),
-                  'clone', icon="menuclone.ico")
-        menu.add_menu(_("Create Repository Here"),
-                  _("create a new repository in this directory"),
-                  'init', icon="menucreaterepos.ico")
-        menu.add_menu(_("Global Settings"),
-                  _("Configure user wide settings"),
-                  'userconfig', icon="settings_user.ico")
+        menu.add_menu('clone')
+        menu.add_menu('init')
+        menu.add_menu('userconf')
         menu.add_sep()
-        menu.add_menu(_("About"), _("About TortoiseHg"),
-                  'about', icon="menuabout.ico")
+        menu.add_menu('about')
         menu.add_sep()
         return menu
 
@@ -299,107 +287,58 @@ class menuThg:
 
         menu = thg_menu(repo.ui, self.name)
         if changed or cachethg.UNKNOWN in states or 'qtip' in repo['.'].tags():
-            menu.add_menu(_("HG Commit..."),
-                      _("Commit changes in repository"),
-                      'commit', icon="menucommit.ico")
-
+            menu.add_menu('commit')
         if hashgignore or new and len(states) == 1:
-            menu.add_menu(_("Edit Ignore Filter"),
-                      _("Edit repository ignore filter"),
-                      'hgignore', icon="ignore.ico")
-
+            menu.add_menu('hgignore')
         if changed or cachethg.UNKNOWN in states:
-            menu.add_menu(_("View File Status"),
-                      _("Repository status"),
-                      'status', icon="menushowchanged.ico")
-
+            menu.add_menu('status')
         if modified:
-            menu.add_menu(_("Shelve Changes"),
-                  _("Shelve or unshelve repository changes"),
-                  'shelve', icon="shelve.ico")
+            menu.add_menu('shelve')
 
         # Visual Diff (any extdiff command)
         has_vdiff = repo.ui.config('tortoisehg', 'vdiff', 'vdiff') != ''
         if has_vdiff and modified:
-            menu.add_menu(_("Visual Diff"),
-                      _("View changes using GUI diff tool"),
-                      'vdiff', icon="TortoiseMerge.ico")
+            menu.add_menu('vdiff')
 
         if len(files) == 0 and cachethg.UNKNOWN in states:
-            menu.add_menu(_("Guess Renames"),
-                      _("Detect renames and copies"),
-                      'guess', icon="detect_rename.ico")
+            menu.add_menu('guess')
         elif len(files) == 1 and tracked: # needs ico
-            menu.add_menu(_("Rename File"),
-                      _("Rename file or directory"),
-                      'rename', icon="general.ico")
+            menu.add_menu('rename')
 
         if files and new:
-            menu.add_menu(_("Add Files"),
-                      _("Add files to Hg repository"),
-                      'add', icon="menuadd.ico")
+            menu.add_menu('add')
         if files and tracked:
-            menu.add_menu(_("Remove Files"),
-                      _("Remove selected files on the next commit"),
-                      'remove', icon="menudelete.ico")
+            menu.add_menu('remove')
         if files and changed:
-            menu.add_menu(_("Revert Changes"),
-                      _("Revert selected files"),
-                      'revert', icon="menurevert.ico")
+            menu.add_menu('revert')
 
         # we can only annotate file but not directories
         if onlyfiles and tracked:
-            menu.add_menu(_("Annotate Files"),
-                      _("show changeset information per file line"),
-                      'datamine', icon="menublame.ico")
+            menu.add_menu('datamine')
 
         menu.add_sep()
 
         if tracked:
-            menu.add_menu(_("View Changelog"),
-                  _("View revision history"),
-                  'history', icon="menulog.ico")
+            menu.add_menu('log')
 
         if len(files) == 0:
             menu.add_sep()
-            menu.add_menu(_("Search History"),
-                      _("Search revisions of files for a text pattern"),
-                      'datamine', icon="menurepobrowse.ico")
-
+            menu.add_menu('grep')
             menu.add_sep()
-
-            menu.add_menu(_("Synchronize..."),
-                      _("Synchronize with remote repository"),
-                      'synch', icon="menusynch.ico")
-            menu.add_menu(_("Recovery..."),
-                      _("General repair and recovery of repository"),
-                      'recovery', icon="general.ico")
-            menu.add_menu(_("Web Server"),
-                      _("start web server for this repository"),
-                      'serve', icon="proxy.ico")
-
+            menu.add_menu('synch')
+            menu.add_menu('recover')
+            menu.add_menu('serve')
             menu.add_sep()
-            menu.add_menu(_("Create Clone"),
-                      _("Clone a repository here"),
-                      'clone', icon="menuclone.ico")
+            menu.add_menu('clone')
             if repo.root != cwd:
-                menu.add_menu(_("Create Repository Here"),
-                      _("create a new repository in this directory"),
-                      'init', icon="menucreaterepos.ico")
-
-            # config settings menu
+                menu.add_menu('init')
             menu.add_sep()
-            menu.add_menu(_("Global Settings"),
-                      _("Configure user wide settings"),
-                      'userconfig', icon="settings_user.ico")
-            menu.add_menu(_("Repository Settings"),
-                      _("Configure settings local to this repository"),
-                      'repoconfig', icon="settings_repo.ico")
+            menu.add_menu('userconf')
+            menu.add_menu('repoconf')
 
         # add common menu items
         menu.add_sep()
-        menu.add_menu(_("About"), _("About TortoiseHg"),
-                  'about', icon="menuabout.ico")
+        menu.add_menu('about')
 
         menu.add_sep()
         return menu
