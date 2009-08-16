@@ -421,7 +421,7 @@ class GCommit(GStatus):
         self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
 
     def commit_clicked(self, toolbutton, data=None):
-        if not (self.ready_message() or self.isupdodate()):
+        if not (self.ready_message() or self.isuptodate()):
             return
 
         commitable = 'MAR'
