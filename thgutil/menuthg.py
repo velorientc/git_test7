@@ -9,7 +9,7 @@ import os
 
 from mercurial import hg, ui, node
 
-from i18n import _
+from i18n import _ as gettext
 import cachethg
 import paths
 import hglib
@@ -32,6 +32,83 @@ except ImportError:
     for item in pl.split(','):
         item = item.strip()
         if item: promoted.append(str(item))
+
+def _(msgid):
+    return {'id': msgid, 'str': gettext(msgid)}
+
+thgcmenu = {
+    'commit':     { 'label': _('Commit...'),
+                    'help':  _('Commit changes in repository'),
+                    'icon':  'menucommit.ico'},
+    'init':       { 'label': _('Create Repository Here'),
+                    'help':  _('Create a new repository'),
+                    'icon':  'menucreaterepos.ico'},
+    'clone':      { 'label': _('Clone a Repository'),
+                    'help':  _('Create clone here from source'),
+                    'icon': 'menuclone.ico'},
+    'status':     { 'label': _('View File Status'),
+                    'help':  _('Repository status & changes'),
+                    'icon':  'menushowchanged.ico'},
+    'shelve':     { 'label': _('Shelve Changes'),
+                    'help':  _('Shelve or unshelve file changes'),
+                    'icon':  'shelve.ico'},
+    'add':        { 'label': _('Add Files'),
+                    'help':  _('Add files to version control'),
+                    'icon':  'menuadd.ico'},
+    'revert':     { 'label': _('Revert Files'),
+                    'help':  _('Revert file changes'),
+                    'icon':  'menurevert.ico'},
+    'remove':     { 'label': _('Remove Files'),
+                    'help':  _('Remove files from version control'),
+                    'icon':  'menudelete.ico'},
+    'rename':     { 'label': _('Rename File'),
+                    'help':  _('Rename file or directory'),
+                    'icon':  'general.ico'},
+    'log':        { 'label': _('View Changelog'),
+                    'help':  _('View change history in repository'),
+                    'icon':  'menulog.ico'},
+    'synch':      { 'label': _('Synchronize'),
+                    'help':  _('Synchronize with remote repository'),
+                    'icon':  'menusynch.ico'},
+    'serve':      { 'label': _('Web Server'),
+                    'help':  _('Start web server for this repository'),
+                    'icon':  'proxy.ico'},
+    'update':     { 'label': _('Update To Revision'),
+                    'help':  _('Update working directory'),
+                    'icon':  'menucheckout.ico'},
+    'recover':    { 'label': _('Recovery...'),
+                    'help':  _('Repair and recovery of repository'),
+                    'icon':  'general.ico'},
+    'thgstatus':  { 'label': _('Update Icons'),
+                    'help':  _('Update icons for this repository'),
+                    'icon':  'refresh_overlays.ico'},
+    'userconf':   { 'label': _('Global Settings'),
+                    'help':  _('Configure user wide settings'),
+                    'icon':  'settings_user.ico'},
+    'repoconf':   { 'label': _('Repository Settings'),
+                    'help':  _('Configure repository settings'),
+                    'icon':  'settings_repo.ico'},
+    'about':      { 'label': _('About...'),
+                    'help':  _('Show About Dialog'),
+                    'icon':  'menuabout.ico'},
+    'datamine':   { 'label': _('Annotate Files'),
+                    'help':  _('Changeset information per file line'),
+                    'icon':  'menublame.ico'},
+    'vdiff':      { 'label': _('Visual Diff'),
+                    'help':  _('View changes using GUI diff tool'),
+                    'icon':  'TortoiseMerge.ico'},
+    'hgignore':   { 'label': _('Edit Ignore Filter'),
+                    'help':  _('Edit repository ignore filter'),
+                    'icon':  'ignore.ico'},
+    'guess':      { 'label': _('Guess Renames'),
+                    'help':  _('Detect renames and copies'),
+                    'icon':  'detect_rename.ico'},
+    'grep':       { 'label': _('Search History'),
+                    'help':  _('Search file revisions for patterns'),
+                    'icon':  'menurepobrowse.ico'},
+    'dndsynch':   { 'label': _('Synchronize'),
+                    'help':  _('Synchronize with dragged repository'),
+                    'icon':  'menusynch.ico'}}
 
 class TortoiseMenu(object):
 
