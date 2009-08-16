@@ -515,11 +515,13 @@ class ConfigDialog(gtk.Dialog):
         try:
             import iniparse
             iniparse.INIConfig
+            self.readonly = False
         except ImportError:
             dialog.error_dialog(self, _('Iniparse package not found'),
                          _('Please install iniparse package') + '\n' +
                          _('Settings are only shown, no changing is possible'))
             print 'Please install http://code.google.com/p/iniparse/'
+            self.readonly = True
 
         # Catch close events
         self.connect('response', self.should_live)
@@ -691,7 +693,7 @@ class ConfigDialog(gtk.Dialog):
 
     def dirty_event(self, *args):
         if not self.dirty:
-            self._btn_apply.set_sensitive(not hasattr(self.ini, '_readonly'))
+            self._btn_apply.set_sensitive(not self.readonly)
             self.dirty = True
 
     def _add_path(self, *args):
@@ -1019,7 +1021,6 @@ class ConfigDialog(gtk.Dialog):
             from mercurial import config
             cfg = config.config()
             cfg.read(fn)
-            cfg._readonly = True
             return cfg
 
     def record_new_value(self, cpath, newvalue, keephistory=True):
@@ -1046,7 +1047,7 @@ class ConfigDialog(gtk.Dialog):
         self.history.mrul(cpath).add(newvalue)
 
     def _apply_clicked(self, *args):
-        if hasattr(self.ini, '_readonly'):
+        if self.readonly:
             #dialog? Read only access, please install ...
             return
         # Reload history, since it may have been modified externally
