@@ -69,31 +69,14 @@ class GLog(gdialog.GDialog):
                     self.refresh_clicked,
                     tip=_('Reload revision history')),
                 gtk.SeparatorToolItem(),
-             ] + self.changeview.get_tbbuttons()
+             ]
         if not self.opts.get('from-synch'):
             self.synctb = self.make_toolbutton(gtk.STOCK_NETWORK,
                                  _('Synchronize'),
                                  self.synch_clicked,
                                  tip=_('Launch synchronize tool'))
-            tbar += [gtk.SeparatorToolItem(), self.synctb]
+            tbar += [self.synctb, gtk.SeparatorToolItem() ]
 
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
-            _('Load more'), self.more_clicked, tip=_('load more revisions'))
-        self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
-            _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
-
-        vmenu = gtk.MenuToolButton('')
-        vmenu.set_menu(self.view_menu())
-        # A MenuToolButton has two parts; a Button and a ToggleButton
-        # we want to see the togglebutton, but not the button
-        b = vmenu.child.get_children()[0]
-        b.unmap()
-        b.set_sensitive(False)
-
-        tbar += [sep, self.nextbutton, self.allbutton, vmenu]
         return tbar
 
     def synch_clicked(self, toolbutton, data):
@@ -309,25 +292,6 @@ class GLog(gdialog.GDialog):
 
     def load_settings(self, settings):
         'Called at beginning of display() method'
-
-        # This stuff is here in load_settings in order to have access to
-        # self.changeview when building the toolbar.  TODO: clean this up
-        self.stbar = gtklib.StatusBar()
-        self.limit = self.get_graphlimit(None)
-
-        # Allocate TreeView instance to use internally
-        if self.opts['limit']:
-            firstlimit = self.get_graphlimit(self.opts['limit'])
-            self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
-        else:
-            self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
-
-        # Allocate ChangeSet instance to use internally
-        self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
-                self.opts, self.stbar)
-        self.changeview.display(False)
-        self.changeview.glog_parent = self
-
         gdialog.GDialog.load_settings(self, settings)
         self.setting_vpos = -1
         self.setting_hpos = -1
@@ -481,6 +445,43 @@ class GLog(gdialog.GDialog):
         self.gorev_dialog = None
         self._menu = self.tree_context_menu()
         self._menu2 = self.tree_diff_context_menu()
+        self.stbar = gtklib.StatusBar()
+        self.limit = self.get_graphlimit(None)
+
+        # Allocate TreeView instance to use internally
+        if self.opts['limit']:
+            firstlimit = self.get_graphlimit(self.opts['limit'])
+            self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
+        else:
+            self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
+
+        # Allocate ChangeSet instance to use internally
+        self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
+                self.opts, self.stbar)
+        self.changeview.display(False)
+        self.changeview.glog_parent = self
+
+        # Add extra toolbar buttons
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
+            _('Load more'), self.more_clicked, tip=_('load more revisions'))
+        self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
+            _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
+
+        vmenu = gtk.MenuToolButton('')
+        vmenu.set_menu(self.view_menu())
+        # A MenuToolButton has two parts; a Button and a ToggleButton
+        # we want to see the togglebutton, but not the button
+        b = vmenu.child.get_children()[0]
+        b.unmap()
+        b.set_sensitive(False)
+
+        tbar = self.changeview.get_tbbuttons()
+        tbar += [sep, self.nextbutton, self.allbutton, vmenu]
+        for tbutton in tbar:
+            self.toolbar.insert(tbutton, -1)
 
         treeframe = gtk.Frame()
         treeframe.set_shadow_type(gtk.SHADOW_ETCHED_IN)
