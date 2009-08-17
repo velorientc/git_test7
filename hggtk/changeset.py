@@ -564,6 +564,7 @@ class ChangeSet(gdialog.GDialog):
             # send this event to the main app
             opts = {'pats' : [self.curfile]}
             self.glog_parent.custombutton.set_active(True)
+            self.glog_parent.filter = 'custom'
             self.glog_parent.reload_log(**opts)
         else:
             # Else launch our own glog instance
