@@ -1263,7 +1263,7 @@ class GStatus(gdialog.GDialog):
             for wfile in files:
                 ms.mark(util.pconvert(wfile), "r")
             self.reload_status()
-        def resolve(self, stat, wfile):
+        def resolve(stat, files):
             wctx = self.repo[None]
             mctx = wctx.parents()[-1]
             for wfile in files:
@@ -1301,8 +1301,8 @@ class GStatus(gdialog.GDialog):
         if len(all) == 1:
             make(_('_copy'), copy, 'MC')
             make(_('rename'), rename, 'MC')
-        make(_('restart merge'), resolve, 'r')
-        make(_('mark unresolved'), mark, 'r')
+        make(_('restart merge'), resolve, 'u')
+        make(_('mark unresolved'), unmark, 'r')
         make(_('mark resolved'), mark, 'u')
 
         for label, func, stats in self.get_custom_menus():
