@@ -319,10 +319,13 @@ class NativeFolderSelectDialog:
             return fname
         return None
 
-def addspellcheck(textview):
+def addspellcheck(textview, ui=None):
+    lang = None
+    if ui:
+        lang = ui.config('tortoisehg', 'spellcheck', None)
     try:
         import gtkspell
-        gtkspell.Spell(textview)
+        gtkspell.Spell(textview, lang)
     except ImportError:
         pass
     else:
@@ -364,3 +367,11 @@ def addspellcheck(textview):
                 menu.append(item)
             item.show()
         textview.connect('populate-popup', langmenu)
+
+def hasspellcheck():
+    try:
+        import gtkspell
+        gtkspell.Spell
+        return True
+    except ImportError:
+        return False

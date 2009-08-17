@@ -292,7 +292,7 @@ class GCommit(GStatus):
         self.text.connect('populate-popup', self.msg_add_to_popup)
         self.text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.text)
-        gtklib.addspellcheck(self.text)
+        gtklib.addspellcheck(self.text, self.repo.ui)
 
         self.vpaned = gtk.VPaned()
         self.vpaned.add1(vbox)

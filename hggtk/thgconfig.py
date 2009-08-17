@@ -557,9 +557,18 @@ class ConfigDialog(gtk.Dialog):
         self.tooltips = gtk.Tooltips()
         self.history = settings.Settings('thgconfig')
 
+        # add spell ckeck entry if spell check is supported
+        tortoise_info = _tortoise_info
+        if gtklib.hasspellcheck():
+            tortoise_info += ((
+                _('Spell Check Language'), 'tortoisehg.spellcheck', [],
+                _('Default language for spell check. '
+                  'System language is used if not specified. '
+                  'Examples: en, en_GB, en_US')),)
+
         # create pages for each section of configuration file
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
-        self.fill_frame(self.tortoise_frame, _tortoise_info)
+        self.fill_frame(self.tortoise_frame, tortoise_info)
 
         self.commit_frame = self.add_page(notebook, _('Commit'))
         self.fill_frame(self.commit_frame, _commit_info)

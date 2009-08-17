@@ -178,7 +178,6 @@ class EmailDialog(gtk.Window):
         self.descview.set_editable(True)
         self.descview.modify_font(pango.FontDescription('Monospace'))
         self.descbuffer = self.descview.get_buffer()
-        gtklib.addspellcheck(self.descview)
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -231,6 +230,7 @@ class EmailDialog(gtk.Window):
                     ' the effects of the entire patch series.  When emailing'
                     ' a bundle, these fields make up the message subject and body.')
                     )
+            gtklib.addspellcheck(self.descview, self.repo.ui)
         fill_history(history, self._tolist, 'email.to')
         fill_history(history, self._cclist, 'email.cc')
         fill_history(history, self._fromlist, 'email.from')
