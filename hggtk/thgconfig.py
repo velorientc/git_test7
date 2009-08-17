@@ -299,8 +299,8 @@ class PathEditDialog(gtk.Dialog):
                     e.disconnect(h)
 
     def urlparse(self, path):
-        if path.startswith('ssh://'):
-            m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
+        m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
+        if m:
             user = m.group(2)
             host = m.group(3)
             port = m.group(5)
