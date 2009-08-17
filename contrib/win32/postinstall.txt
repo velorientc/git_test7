@@ -1,0 +1,10 @@
+Welcome to Mercurial for Windows!
+---------------------------------
+
+For configuration and usage directions, please read the ReadMe.html
+file that comes with this package.
+
+Check the TortoiseHg and Mercurial release notes at:
+
+ http://bitbucket.org/tortoisehg/stable/wiki/ReleaseNotes
+ http://mercurial.selenic.com/wiki/WhatsNew
