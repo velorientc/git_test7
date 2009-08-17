@@ -178,7 +178,7 @@ class SynchDialog(gtk.Window):
         self.force = gtk.CheckButton(_('Force pull or push'))
         self.tips.set_tip(self.force, _('Run even when remote repository'
                 ' is unrelated.'))
-        self.use_proxy = gtk.CheckButton(_('use proxy server'))
+        self.use_proxy = gtk.CheckButton(_('Use proxy server'))
         if ui.ui().config('http_proxy', 'host', ''):
             self.use_proxy.set_active(True)
         else:
@@ -189,7 +189,7 @@ class SynchDialog(gtk.Window):
         ## target revision option
         revhbox = gtk.HBox()
         self.reventry = gtk.Entry()
-        revhbox.pack_start(gtk.Label(_('Target Revision:')), False, False, 2)
+        revhbox.pack_start(gtk.Label(_('Target revision:')), False, False, 2)
         revhbox.pack_start(self.reventry, True, True, 2)
         reveventbox = gtk.EventBox()
         reveventbox.add(revhbox)
@@ -199,7 +199,7 @@ class SynchDialog(gtk.Window):
         ## remote command option
         cmdhbox = gtk.HBox()
         self.cmdentry = gtk.Entry()
-        cmdhbox.pack_start(gtk.Label(_('Remote Command:')), False, False, 2)
+        cmdhbox.pack_start(gtk.Label(_('Remote command:')), False, False, 2)
         cmdhbox.pack_start(self.cmdentry, True, True, 2)
         cmdeventbox = gtk.EventBox()
         cmdeventbox.add(cmdhbox)
@@ -216,9 +216,9 @@ class SynchDialog(gtk.Window):
         frame = gtk.Frame(_('Incoming/Outgoing'))
         opthbox.pack_start(frame, False, False, 2)
 
-        self.showpatch = gtk.CheckButton(_('Show Patches'))
-        self.newestfirst = gtk.CheckButton(_('Show Newest First'))
-        self.nomerge = gtk.CheckButton(_('Show No Merges'))
+        self.showpatch = gtk.CheckButton(_('Show patches'))
+        self.newestfirst = gtk.CheckButton(_('Show newest first'))
+        self.nomerge = gtk.CheckButton(_('Show no merges'))
 
         iovbox = gtk.VBox()
         iovbox.pack_start(self.showpatch, False, False, 2)

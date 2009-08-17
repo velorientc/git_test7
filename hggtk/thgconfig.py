@@ -25,7 +25,7 @@ _unspeclocalstr = hglib.fromutf(_unspecstr)
 _pwfields = ('http_proxy.passwd', 'smtp.password')
 
 _tortoise_info = (
-    (_('3-way Merge Tool'), 'ui.merge', [],
+    (_('Three-way Merge Tool'), 'ui.merge', [],
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
         ' on your system or use its internal merge tool that leaves conflict'

@@ -272,7 +272,7 @@ class GCommit(GStatus):
         cell = gtk.CellRendererText()
         self.msg_cbbox.pack_start(cell, True)
         self.msg_cbbox.add_attribute(cell, 'text', 0)
-        liststore.append([_('Recent Commit Messages...'), ''])
+        liststore.append([_('Recent commit messages...'), ''])
         self.msg_cbbox.set_active(0)
         self.popupid = self.msg_cbbox.connect('notify::popup-shown',
                                               self.first_msg_popdown)
@@ -539,14 +539,14 @@ class GCommit(GStatus):
 
 
     def undo_clicked(self, toolbutton, data=None):
-        response = gdialog.Confirm(_('Confirm Undo commit'),
+        response = gdialog.Confirm(_('Confirm Undo Commit'),
                 [], self, _('Undo last commit')).run()
         if response != gtk.RESPONSE_YES:
             return
 
         tip = self.get_tip_rev(True)
         if not tip == self.last_commit_id:
-            gdialog.Prompt(_('Undo commit'),
+            gdialog.Prompt(_('Undo Commit'),
                     _('Unable to undo!\n\n'
                     'Tip revision differs from last commit.'),
                     self).run()
@@ -561,7 +561,7 @@ class GCommit(GStatus):
             time.sleep(0.5)     # give fs some time to pick up changes
             shlib.shell_notify([os.getcwd()])
         except:
-            gdialog.Prompt(_('Undo commit'),
+            gdialog.Prompt(_('Undo Commit'),
                     _('Errors during rollback!'), self).run()
 
 
@@ -775,7 +775,7 @@ class GCommit(GStatus):
             sumlen = 0
             maxlen = 0
         if not (sumlen or maxlen):
-            gdialog.Prompt(_('Info required'),
+            gdialog.Prompt(_('Info Required'),
                    _('Message format needs to be configured'),
                    self).run()
             self.msg_config(None)

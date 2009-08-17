@@ -126,10 +126,10 @@ class CloneDialog(gtk.Window):
 
         # options
         option_box = gtk.VBox()
-        self.optupdate = gtk.CheckButton(_('do not update the new working directory'))
-        self.optpull = gtk.CheckButton(_('use pull protocol to copy metadata'))
-        self.optuncomp = gtk.CheckButton(_('use uncompressed transfer'))
-        self.optproxy = gtk.CheckButton(_('use proxy server'))
+        self.optupdate = gtk.CheckButton(_('Do not update the new working directory'))
+        self.optpull = gtk.CheckButton(_('Use pull protocol to copy metadata'))
+        self.optuncomp = gtk.CheckButton(_('Use uncompressed transfer'))
+        self.optproxy = gtk.CheckButton(_('Use proxy server'))
         option_box.pack_start(self.optupdate, False, False)
         option_box.pack_start(self.optpull, False, False)
         option_box.pack_start(self.optuncomp, False, False)
@@ -142,7 +142,7 @@ class CloneDialog(gtk.Window):
             self.optproxy.set_sensitive(False)
 
         # remote cmd
-        lbl = gtk.Label(_('Remote Cmd:'))
+        lbl = gtk.Label(_('Remote command:'))
         lbl.set_alignment(0, 0.5)
         self.remotecmdentry = gtk.Entry()
         vbox.pack_start(self.remotecmdentry, False, False, 1)
