@@ -46,7 +46,7 @@ class CloneDialog(gtk.Window):
 
         # clone source
         srcbox = gtk.HBox()
-        lbl = gtk.Label(_('Source Path:'))
+        lbl = gtk.Label(_('Source path:'))
         lbl.set_property('width-chars', ewidth)
         lbl.set_alignment(0, 0.5)
 
@@ -83,7 +83,7 @@ class CloneDialog(gtk.Window):
 
         # clone destination
         destbox = gtk.HBox()
-        lbl = gtk.Label(_('Destination Path:'))
+        lbl = gtk.Label(_('Destination path:'))
         lbl.set_property('width-chars', ewidth)
         lbl.set_alignment(0, 0.5)
         self.destlist = gtk.ListStore(str)
@@ -115,7 +115,7 @@ class CloneDialog(gtk.Window):
 
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label(_('Clone To Revision:'))
+        lbl = gtk.Label(_('Clone to revision:'))
         lbl.set_property('width-chars', ewidth)
         lbl.set_alignment(0, 0.5)
         self.reventry = gtk.Entry()
