@@ -198,7 +198,8 @@ class GStatus(gdialog.GDialog):
 
 
     def get_body(self):
-        self.merging = len(self.repo.parents()) == 2
+        self.merging = (self.count_revs() < 2
+            and len(self.repo.parents()) == 2)
 
         # model stores the file list.
         fm = gtk.ListStore(bool, str, str, str, str, bool)
@@ -778,13 +779,12 @@ class GStatus(gdialog.GDialog):
         difftext = []
         if self.merging:
             difftext = [_('===== Diff to first parent =====\n')]
-        wctx = self.repo[None]
-        pctxs = wctx.parents()
         matcher = cmdutil.matchfiles(self.repo, [pfile])
-        for s in patch.diff(self.repo, pctxs[0].node(), None,
+        for s in patch.diff(self.repo, self._node1, self._node2,
                 match=matcher, opts=patch.diffopts(self.ui, self.opts)):
             difftext.extend(s.splitlines(True))
-        if len(pctxs) > 1:
+        if self.merging:
+            pctxs = self.repo[None].parents()
             difftext.append(_('\n===== Diff to second parent =====\n'))
             for s in patch.diff(self.repo, pctxs[1].node(), None,
                     match=matcher, opts=patch.diffopts(self.ui, self.opts)):
