@@ -68,7 +68,6 @@ def setup_windows():
             raise
 
     if 'py2exe' in sys.argv:
-        # FIXME: quick hack to include installed hg extensions in py2exe binary
         import hgext
         hgextdir = os.path.dirname(hgext.__file__)
         hgextmods = set(["hgext." + os.path.splitext(f)[0]
@@ -90,18 +89,11 @@ def setup_windows():
        "py2exe" : {
            # This is one way to ensure that hgtk can find its icons when
            # running in a py2exe environment. It also makes debugging easier.
-           "skip_archive" : 1,
+           "skip_archive" : 0,
 
            # Don't pull in all this MFC stuff used by the makepy UI.
            "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list",
-
-           # add library files to support PyGtk-based dialogs/windows
-           # Note:
-           #    after py2exe build, copy GTK's etc and lib directories into
-           #    the dist directory created by py2exe.
-           #    also needed is the GTK's share/themes (as dist/share/themes), 
-           #    for dialogs to display in MS-Windows XP theme.
-           "includes" : includes + list(hgextmods),
+           "includes" : includes,
            "optimize" : 1
        }
     }
