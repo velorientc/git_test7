@@ -325,3 +325,42 @@ def addspellcheck(textview):
         gtkspell.Spell(textview)
     except ImportError:
         pass
+    else:
+        def selectlang(senderitem):
+            from hggtk import dialog
+            spell = gtkspell.get_from_text_view(textview)
+            lang = ''
+            while True:
+                msg = _('Select language for spell checking.\n\n'
+                        'Empty is for the default language.\n'
+                        'When all text is highlited, the dictionary\n'
+                        'is probably not installed.\n\n'
+                        'examples: en, en_GB, en_US')
+                if lang:
+                    msg = _('Lang "%s" can not be set.\n') % lang + msg
+                lang = dialog.entry_dialog(None, msg)
+                if lang is None: # cancel
+                    return
+                lang = lang.strip()
+                if not lang:
+                    lang = None # set default language from $LANG
+                try:
+                    spell.set_language(lang)
+                    return
+                except Exception, e:
+                    pass
+        def langmenu(textview, menu):
+            item = gtk.MenuItem(_('Spell Check Language'))
+            item.connect('activate', selectlang)
+            menuitems = menu.get_children()[:2]
+            x = menuitems[0].get_submenu()
+            if len(menuitems) >= 2 and menuitems[1].get_child() is None and menuitems[0].get_submenu():
+                # the spellcheck language menu seems to be at the top
+                menu.insert(item, 1)
+            else:
+                sep = gtk.SeparatorMenuItem()
+                sep.show()
+                menu.append(sep)
+                menu.append(item)
+            item.show()
+        textview.connect('populate-popup', langmenu)
