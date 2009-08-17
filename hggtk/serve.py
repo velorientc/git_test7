@@ -292,8 +292,7 @@ def thg_serve(ui, repo, **opts):
             self.stopped = True
             util.set_signal_handler()
             try:
-                baseui = (getattr(repo, 'baseui', None) or
-                          getattr(ui, 'parentui', None) or ui)
+                baseui = repo and repo.baseui or ui
                 repoui = repo and repo.ui != baseui and repo.ui or None
                 optlist = ("name templates style address port prefix ipv6"
                            " accesslog errorlog webdir_conf certificate")
