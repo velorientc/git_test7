@@ -355,8 +355,8 @@ class GStatus(gdialog.GDialog):
         else:
             self.diffpane = gtk.HPaned()
 
-        self.diffpane.pack1(tree_frame, True, False)
-        self.diffpane.pack2(diff_frame, True, True)
+        self.diffpane.pack1(tree_frame, shrink=False)
+        self.diffpane.pack2(diff_frame, shrink=False)
         self.filetree.set_headers_clickable(True)
 
         sel = self.filetree.get_selection()
