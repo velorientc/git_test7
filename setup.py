@@ -97,6 +97,14 @@ def setup_windows():
            "optimize" : 1
        }
     }
+    extra['console'] = [
+            {'script':'../build-hg/hg', 'icon_resources':[(0,'icons/hg.ico')]},
+            {'script':'hgtk', 'icon_resources':[(0,'icons/thg_logo.ico')]}
+            ]
+    extra['windows'] = [
+            {'script':'thgtaskbar.py',
+             'icon_resources':[(0,'icons/thg_logo.ico')]}
+            ]
 
     return _scripts, _packages, _data_files, extra
 
