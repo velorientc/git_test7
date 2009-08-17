@@ -1230,6 +1230,7 @@ class GStatus(gdialog.GDialog):
             item.connect('activate', handler, files)
             item.set_border_width(1)
             menu.append(item)
+            return files
 
         def vdiff(menuitem, files):
             self._do_diff(files, self.opts)
@@ -1270,6 +1271,16 @@ class GStatus(gdialog.GDialog):
                 ms = merge_.mergestate(self.repo)
                 ms.resolve(util.pconvert(wfile), wctx, mctx)
             self.reload_status()
+        def resolve_with(stat, tool, files):
+            if tool:
+                oldmergeenv = os.environ.get('HGMERGE')
+                os.environ['HGMERGE'] = tool
+            resolve(stat, files)
+            if tool:
+                if oldmergeenv:
+                    os.environ['HGMERGE'] = oldmergeenv
+                else:
+                    del os.environ['HGMERGE']
         def rename(menuitem, files):
             self.rename_file(files[0])
         def copy(menuitem, files):
@@ -1301,9 +1312,19 @@ class GStatus(gdialog.GDialog):
         if len(all) == 1:
             make(_('_copy'), copy, 'MC')
             make(_('rename'), rename, 'MC')
-        make(_('restart merge'), resolve, 'u')
+        f = make(_('restart merge'), resolve, 'u')
         make(_('mark unresolved'), unmark, 'r')
         make(_('mark resolved'), mark, 'u')
+        if f:
+            rmenu = gtk.Menu()
+            for tool in hglib.mergetools(self.ui):
+                item = gtk.MenuItem(tool, True)
+                item.connect('activate', resolve_with, tool, f)
+                item.set_border_width(1)
+                rmenu.append(item)
+            item = gtk.MenuItem(_('restart merge with'), True)
+            item.set_submenu(rmenu)
+            menu.append(item)
 
         for label, func, stats in self.get_custom_menus():
             make(label, func, stats)
