@@ -28,7 +28,7 @@ class InitDialog(gtk.Dialog):
 
         # add create button
         createbutton = gtk.Button(_('Create'))
-        createbutton.connect('clicked', self.create_clicked)
+        createbutton.connect('clicked', lambda b: self.init())
         self.action_area.pack_end(createbutton)
 
         self.cwd = os.getcwd()
@@ -60,7 +60,7 @@ class InitDialog(gtk.Dialog):
         self.destentry.set_text(hglib.toutf(self.dest_path))
         self.destentry.grab_focus()
         self.destentry.set_position(-1)
-        self.destentry.connect('activate', self.dest_activated, createbutton)
+        self.destentry.connect('activate', lambda b: self.init())
         destbox.pack_start(self.destentry, True, True, 2)
 
         destbrowse = gtk.Button(_('Browse...'))
@@ -85,9 +85,6 @@ class InitDialog(gtk.Dialog):
         except:
             pass
 
-    def dest_activated(self, entry, button):
-        self.create_clicked(button)
-
     def dest_clicked(self, button):
         """ select destination folder to clone """
         response = gtklib.NativeFolderSelectDialog(
@@ -97,7 +94,7 @@ class InitDialog(gtk.Dialog):
             self.destentry.set_text(response)
             self.destentry.set_position(-1)
 
-    def create_clicked(self, button, data=None):
+    def init(self):
         # gather input data
         dest = hglib.fromutf(self.destentry.get_text())
 
