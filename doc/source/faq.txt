@@ -18,7 +18,7 @@ Frequently Asked Questions
 
 *How can I get translations for the Explorer context menu?*
 
-	See the `Download <http://bitbucket.org/tortoisehg/stable/wiki/install>`_
+	See the `Download <http://bitbucket.org/tortoisehg/stable/wiki/download>`_
 	wiki page
 
 *How do I do merges and arbitrary version checkouts in 0.8?*
