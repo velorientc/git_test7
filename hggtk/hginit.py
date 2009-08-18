@@ -28,13 +28,13 @@ class InitDialog(gtk.Dialog):
 
         # add create button
         createbutton = gtk.Button(_('Create'))
-        createbutton.connect('clicked', self._btn_init_clicked)
+        createbutton.connect('clicked', self.create_clicked)
         self.action_area.pack_end(createbutton)
 
         self.cwd = os.getcwd()
 
         # preconditioning info
-        self._dest_path = os.path.abspath(repos and repos[0] or self.cwd)
+        self.dest_path = os.path.abspath(repos and repos[0] or self.cwd)
 
         # copy from 'thgconfig.py'
         table = gtk.Table(1, 2)
@@ -53,66 +53,66 @@ class InitDialog(gtk.Dialog):
         # init destination
         lbl = gtk.Label(_('Destination:'))
 
-        srcbox = gtk.HBox()
-        self._dest_input = gtk.Entry()
-        self._dest_input.set_size_request(260, -1)
-        self._dest_input.size_request()
-        self._dest_input.set_text(hglib.toutf(self._dest_path))
-        self._dest_input.grab_focus()
-        self._dest_input.set_position(-1)
-        self._dest_input.connect('activate', self._entry_dest_activated, createbutton)
-        srcbox.pack_start(self._dest_input, True, True, 2)
+        destbox = gtk.HBox()
+        self.destentry = gtk.Entry()
+        self.destentry.set_size_request(260, -1)
+        self.destentry.size_request()
+        self.destentry.set_text(hglib.toutf(self.dest_path))
+        self.destentry.grab_focus()
+        self.destentry.set_position(-1)
+        self.destentry.connect('activate', self.dest_activated, createbutton)
+        destbox.pack_start(self.destentry, True, True, 2)
 
-        self._btn_dest_browse = gtk.Button(_('Browse...'))
-        self._btn_dest_browse.connect('clicked', self._btn_dest_clicked)
-        srcbox.pack_start(self._btn_dest_browse, False, False, 2)
+        destbrowse = gtk.Button(_('Browse...'))
+        destbrowse.connect('clicked', self.dest_clicked)
+        destbox.pack_start(destbrowse, False, False, 2)
 
-        addrow(lbl, srcbox)
+        addrow(lbl, destbox)
 
         # options
-        self._opt_specialfiles = gtk.CheckButton(
+        self.optspfiles = gtk.CheckButton(
                 _('Add special files (.hgignore, ...)'))
-        self._opt_oldrepoformat = gtk.CheckButton(
+        self.optoldrepo = gtk.CheckButton(
                 _('Make repo compatible with Mercurial 1.0'))
-        addrow(self._opt_specialfiles)
-        addrow(self._opt_oldrepoformat)
+        addrow(self.optspfiles)
+        addrow(self.optoldrepo)
 
         # set option states
-        self._opt_specialfiles.set_active(True)
+        self.optspfiles.set_active(True)
         try:
             usefncache = ui.ui().configbool('format', 'usefncache', True)
-            self._opt_oldrepoformat.set_active(not usefncache)
+            self.optoldrepo.set_active(not usefncache)
         except:
             pass
 
-    def _entry_dest_activated(self, entry, button):
-        self._btn_init_clicked(button)
+    def dest_activated(self, entry, button):
+        self.create_clicked(button)
 
-    def _btn_dest_clicked(self, button):
-        """ select source folder to clone """
+    def dest_clicked(self, button):
+        """ select destination folder to clone """
         response = gtklib.NativeFolderSelectDialog(
                           initial=self.cwd,
                           title='Select Destination Folder').run()
         if response:
-            self._dest_input.set_text(response)
-            self._dest_input.set_position(-1)
+            self.destentry.set_text(response)
+            self.destentry.set_position(-1)
 
-    def _btn_init_clicked(self, button, data=None):
+    def create_clicked(self, button, data=None):
         # gather input data
-        dest = hglib.fromutf(self._dest_input.get_text())
+        dest = hglib.fromutf(self.destentry.get_text())
 
         # verify input
         if dest == "":
             dialog.error_dialog(self, _('Destination path is empty'),
                     _('Please enter the directory path'))
-            self._dest_input.grab_focus()
+            self.destentry.grab_focus()
             return False
 
         # start
         u = ui.ui()
 
         # fncache is the new default repo format in Mercurial 1.1
-        if self._opt_oldrepoformat.get_active():
+        if self.optoldrepo.get_active():
             u.setconfig('format', 'usefncache', 'False')
 
         try:
@@ -134,7 +134,7 @@ class InitDialog(gtk.Dialog):
         # create the .hg* file, mainly to workaround
         # Explorer's problem in creating files with name
         # begins with a dot.
-        if self._opt_specialfiles.get_active():
+        if self.optspfiles.get_active():
             hgignore = os.path.join(dest, '.hgignore')
             if not os.path.exists(hgignore):
                 try:
