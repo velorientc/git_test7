@@ -49,6 +49,7 @@ Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
 Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n; Flags:
+Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags:
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
@@ -59,9 +60,8 @@ Source: contrib\refreshicons.cmd; DestDir: {app}/contrib
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\library.zip; DestDir: {app}
-Source: doc\*.html; DestDir: {app}\docs; Flags: external skipifsourcedoesntexist
-Source: doc\*.pdf; DestDir: {app}\docs; Flags: external skipifsourcedoesntexist
-Source: doc\*.chm; DestDir: {app}\docs; Flags: external skipifsourcedoesntexist
+Source: doc\build\pdf\*.pdf; DestDir: {app}\docs; Flags: external skipifsourcedoesntexist
+Source: doc\build\chm\*.chm; DestDir: {app}\docs; Flags: external skipifsourcedoesntexist
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
