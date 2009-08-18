@@ -23,7 +23,7 @@ class CloneDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'menuclone.ico')
         gtklib.set_tortoise_keys(self)
-        self.set_default_size(520, 180)
+        self.set_resizable(False)
         self.set_title(_('TortoiseHg Clone'))
 
         self.ui = ui.ui()
@@ -39,39 +39,70 @@ class CloneDialog(gtk.Window):
         elif len(repos):
             srcpath = repos[0]
 
-        ewidth = 20
+        mainvbox = gtk.VBox()
+        self.add(mainvbox)
 
-        vbox = gtk.VBox()
-        self.add(vbox)
+        # copy from 'thgconfig.py'
+        def createtable(cols=2):
+            newtable = gtk.Table(1, cols)
+            def addrow(*widgets):
+                row = newtable.get_property('n-rows')
+                newtable.set_property('n-rows', row + 1)
+                def getwidget(obj):
+                    if obj == None:
+                        return gtk.Label('')
+                    elif isinstance(obj, (int, long)):
+                        widget = gtk.Label('')
+                        widget.set_width_chars(obj)
+                        return widget
+                    return obj
+                if len(widgets) == 1:
+                    col = newtable.get_property('n-columns')
+                    widget = getwidget(widgets[0])
+                    newtable.attach(widget, 0, col, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
+                else:
+                    for col, widget in enumerate(widgets):
+                        widget = getwidget(widget)
+                        flag = gtk.FILL if col == 0 else gtk.FILL|gtk.EXPAND
+                        newtable.attach(widget, col, col + 1, row, row + 1, flag, 0, 4, 2)
+            return newtable, addrow
 
-        # clone source
-        srcbox = gtk.HBox()
+        # layout table for fixed options
+        table, addrow = createtable()
+        mainvbox.pack_start(table, True, True, 2)
+        def setcombosize(combo):
+            combo.set_size_request(300, -1)
+            combo.size_request()
+
+        ## clone source label
         lbl = gtk.Label(_('Source path:'))
-        lbl.set_property('width-chars', ewidth)
-        lbl.set_alignment(0, 0.5)
+        lbl.set_alignment(1, 0.5)
 
-        # create drop-down list for source paths
+        ## comboentry for source paths
+        srcbox = gtk.HBox()
         self.srclist = gtk.ListStore(str)
         srccombo = gtk.ComboBoxEntry(self.srclist, 0)
+        setcombosize(srccombo)
         self.srcentry = srccombo.get_child()
         self.srcentry.set_text(srcpath)
         self.srcentry.set_position(-1)
+        srcbox.pack_start(srccombo)
 
-        # replace the drop-down widget so we can modify it's properties
+        ## replace the drop-down widget so we can modify it's properties
         srccombo.clear()
         cell = gtk.CellRendererText()
         cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
         srccombo.pack_start(cell)
         srccombo.add_attribute(cell, 'text', 0)
 
+        ## source browse button
         srcbrowse = gtk.Button(_('Browse...'))
         srcbrowse.connect('clicked', self.source_browse_clicked)
-        srcbox.pack_start(lbl, False, False)
-        srcbox.pack_start(srccombo, True, True)
-        srcbox.pack_end(srcbrowse, False, False, 5)
-        vbox.pack_start(srcbox, False, False, 2)
+        srcbox.pack_start(srcbrowse, False, False, 4)
 
-        # add pre-defined src paths to pull-down list
+        addrow(lbl, srcbox)
+
+        ## add pre-defined src paths to pull-down list
         sync_src = settings.Settings('synch').mrul('src_paths')
         sympaths = [x[1] for x in self.ui.configitems('paths')]
         recent = [x for x in self.recentsrc]
@@ -81,80 +112,92 @@ class CloneDialog(gtk.Window):
         for p in paths:
             self.srclist.append([p])
 
-        # clone destination
+        ## clone destination
         destbox = gtk.HBox()
         lbl = gtk.Label(_('Destination path:'))
-        lbl.set_property('width-chars', ewidth)
-        lbl.set_alignment(0, 0.5)
+        lbl.set_alignment(1, 0.5)
+
+        ## comboentry for destination paths
         self.destlist = gtk.ListStore(str)
         destcombo = gtk.ComboBoxEntry(self.destlist, 0)
+        setcombosize(destcombo)
         self.destentry = destcombo.get_child()
         self.destentry.set_text(destpath)
         self.destentry.set_position(-1)
         self.destentry.connect('activate', self.clone_clicked)
+        destbox.pack_start(destcombo)
 
-        # replace the drop-down widget so we can modify it's properties
+        ## replace the drop-down widget so we can modify it's properties
         destcombo.clear()
         cell = gtk.CellRendererText()
         cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
         destcombo.pack_start(cell)
         destcombo.add_attribute(cell, 'text', 0)
 
-        srcbrowse = gtk.Button(_('Browse...'))
-        srcbrowse.connect('clicked', self.dest_browse_clicked)
-        destbox.pack_start(lbl, False, False)
-        destbox.pack_start(destcombo, True, True)
-        destbox.pack_end(srcbrowse, False, False, 5)
-        vbox.pack_start(destbox, False, False, 2)
+        ## source browse button
+        destbrowse = gtk.Button(_('Browse...'))
+        destbrowse.connect('clicked', self.dest_browse_clicked)
+        destbox.pack_end(destbrowse, False, False, 4)
 
-        # add most-recent dest paths to pull-down list
+        addrow(lbl, destbox)
+
+        ## add most-recent dest paths to pull-down list
         paths = list(self.recentdest)
         paths.sort()
         for p in paths:
             self.destlist.append([p])
 
-        # revision input
-        revbox = gtk.HBox()
-        lbl = gtk.Label(_('Clone to revision:'))
-        lbl.set_property('width-chars', ewidth)
-        lbl.set_alignment(0, 0.5)
-        self.reventry = gtk.Entry()
-        self.reventry.set_text("")
-        revbox.pack_start(lbl, False, False)
-        revbox.pack_start(self.reventry, False, False)
-        vbox.pack_start(revbox, False, False, 2)
+        # expander for advanced options
+        self.expander = expander = gtk.Expander(_('Advanced options'))
+        mainvbox.pack_start(expander, True, True, 2)
 
-        # options
-        option_box = gtk.VBox()
+        # layout table for advanced options
+        table, addrow = createtable()
+        expander.add(table)
+
+        ## revision option
+        hbox = gtk.HBox()
+        self.reventry = gtk.Entry()
+        self.reventry.set_sensitive(False)
+        self.optrev = gtk.CheckButton(_('Clone to revision:'))
+        self.optrev.connect('toggled', self.checkbutton_toggled, self.reventry)
+        hbox.pack_start(self.optrev, False, False)
+        hbox.pack_start(self.reventry, False, False, 4)
+        addrow(hbox)
+
+        ## options
         self.optupdate = gtk.CheckButton(_('Do not update the new working directory'))
         self.optpull = gtk.CheckButton(_('Use pull protocol to copy metadata'))
         self.optuncomp = gtk.CheckButton(_('Use uncompressed transfer'))
-        self.optproxy = gtk.CheckButton(_('Use proxy server'))
-        option_box.pack_start(self.optupdate, False, False)
-        option_box.pack_start(self.optpull, False, False)
-        option_box.pack_start(self.optuncomp, False, False)
-        option_box.pack_start(self.optproxy, False, False)
-        vbox.pack_start(option_box, False, False, 15)
+        addrow(self.optupdate)
+        addrow(self.optpull)
+        addrow(self.optuncomp)
 
+        ## proxy options
+        self.optproxy = gtk.CheckButton(_('Use proxy server'))
+        addrow(self.optproxy)
         if self.ui.config('http_proxy', 'host'):
             self.optproxy.set_active(True)
         else:
             self.optproxy.set_sensitive(False)
 
-        # remote cmd
-        lbl = gtk.Label(_('Remote command:'))
-        lbl.set_alignment(0, 0.5)
+        ## remote cmd option
         self.remotecmdentry = gtk.Entry()
-        vbox.pack_start(self.remotecmdentry, False, False, 1)
-        vbox.pack_start(lbl, False, False, 1)
+        self.remotecmdentry.set_sensitive(False)
+        self.optremote = gtk.CheckButton(_('Remote command:'))
+        self.optremote.connect('toggled', self.checkbutton_toggled, self.remotecmdentry)
+        addrow(self.optremote)
+        addrow(self.remotecmdentry)
 
+        ## keyboard accelerators
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
         mod = gtklib.get_thg_modifier()
 
+        ## bottom buttons
         hbbox = gtk.HButtonBox()
         hbbox.set_layout(gtk.BUTTONBOX_END)
-        vbox.pack_start(hbbox, False, False, 2)
+        mainvbox.pack_start(hbbox, False, False, 2)
 
         close = gtk.Button(_('Cancel'))
         close.connect('clicked', lambda x: self.destroy())
@@ -171,6 +214,7 @@ class CloneDialog(gtk.Window):
         clone.connect('clicked', self.clone_clicked)
         hbbox.add(clone)
 
+        # give focus to dest combo
         destcombo.grab_focus()
 
     def dest_browse_clicked(self, button):
@@ -188,6 +232,12 @@ class CloneDialog(gtk.Window):
                           title=_('Select Source Folder')).run()
         if response:
             self.srcentry.set_text(response)
+
+    def checkbutton_toggled(self, checkbutton, entry):
+        state = checkbutton.get_active()
+        entry.set_sensitive(state)
+        if state:
+            entry.grab_focus()
 
     def add_src_to_recent(self, src):
         if os.path.exists(src):
