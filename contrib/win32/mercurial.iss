@@ -60,8 +60,8 @@ Source: contrib\refreshicons.cmd; DestDir: {app}/contrib
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: dist\library.zip; DestDir: {app}
-Source: doc\build\pdf\*.pdf; DestDir: {app}\docs; Flags: external skipifsourcedoesntexist
-Source: doc\build\chm\*.chm; DestDir: {app}\docs; Flags: external skipifsourcedoesntexist
+Source: doc\build\pdf\*.pdf; DestDir: {app}/docs; Flags:
+Source: doc\build\chm\*.chm; DestDir: {app}/docs; Flags:
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
