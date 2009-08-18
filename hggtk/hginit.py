@@ -63,7 +63,7 @@ class InitDialog(gtk.Dialog):
         self._dest_input.connect('activate', self._entry_dest_activated, createbutton)
         srcbox.pack_start(self._dest_input, True, True, 2)
 
-        self._btn_dest_browse = gtk.Button("...")
+        self._btn_dest_browse = gtk.Button(_('Browse...'))
         self._btn_dest_browse.connect('clicked', self._btn_dest_clicked)
         srcbox.pack_start(self._btn_dest_browse, False, False, 2)
 
