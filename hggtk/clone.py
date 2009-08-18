@@ -26,6 +26,7 @@ class CloneDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
+        self.connect('response', self.dialog_response)
 
         # add clone button
         clonebutton = gtk.Button(_('Clone'))
@@ -33,6 +34,8 @@ class CloneDialog(gtk.Dialog):
         self.action_area.pack_end(clonebutton)
 
         self.ui = ui.ui()
+
+        # persistent settings
         self.clonesettings = settings.Settings('clone')
         self.recentsrc = self.clonesettings.mrul('src_paths')
         self.recentdest = self.clonesettings.mrul('dest_paths')
@@ -192,8 +195,21 @@ class CloneDialog(gtk.Dialog):
         addrow(self.optremote)
         addrow(self.remotecmdentry)
 
-        # give focus to dest combo
+        # prepare to show
+        self.load_settings()
         destcombo.grab_focus()
+
+    def load_settings(self):
+        expanded = self.clonesettings.get_value('expanded', False, True)
+        self.expander.set_property('expanded', expanded)
+
+    def store_settings(self):
+        expanded = self.expander.get_property('expanded')
+        self.clonesettings.set_value('expanded', expanded)
+        self.clonesettings.write()
+
+    def dialog_response(self, dialog, response_id):
+        self.store_settings()
 
     def dest_browse_clicked(self, button):
         'select folder as clone destination'
