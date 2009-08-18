@@ -30,7 +30,7 @@ class CloneDialog(gtk.Dialog):
 
         # add clone button
         clonebutton = gtk.Button(_('Clone'))
-        clonebutton.connect('clicked', self.clone_clicked)
+        clonebutton.connect('clicked', lambda b: self.clone())
         self.action_area.pack_end(clonebutton)
 
         self.ui = ui.ui()
@@ -118,19 +118,19 @@ class CloneDialog(gtk.Dialog):
         for p in paths:
             self.srclist.append([p])
 
-        ## clone destination
-        destbox = gtk.HBox()
+        ## clone dest label
         lbl = gtk.Label(_('Destination path:'))
         lbl.set_alignment(1, 0.5)
 
         ## comboentry for destination paths
+        destbox = gtk.HBox()
         self.destlist = gtk.ListStore(str)
         destcombo = gtk.ComboBoxEntry(self.destlist, 0)
         setcombosize(destcombo)
         self.destentry = destcombo.get_child()
         self.destentry.set_text(destpath)
         self.destentry.set_position(-1)
-        self.destentry.connect('activate', self.clone_clicked)
+        self.destentry.connect('activate', lambda b: self.clone())
         destbox.pack_start(destcombo)
 
         ## replace the drop-down widget so we can modify it's properties
@@ -266,7 +266,7 @@ class CloneDialog(gtk.Dialog):
         for p in paths:
             self.destlist.append([p])
 
-    def clone_clicked(self, toolbutton, data=None):
+    def clone(self):
         # gather input data
         src = self.srcentry.get_text()
         dest = self.destentry.get_text() or os.path.basename(src)
