@@ -16,15 +16,21 @@ from thgutil.i18n import _
 from thgutil import hglib, shlib, settings
 from hggtk import gdialog, gtklib, hgcmd
 
-class CloneDialog(gtk.Window):
+class CloneDialog(gtk.Dialog):
     """ Dialog to clone a Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtk.Dialog.__init__(self, title=_('TortoiseHg Clone'),
+                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         gtklib.set_tortoise_icon(self, 'menuclone.ico')
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
-        self.set_title(_('TortoiseHg Clone'))
+        self.set_has_separator(False)
+
+        # add clone button
+        clonebutton = gtk.Button(_('Clone'))
+        clonebutton.connect('clicked', self.clone_clicked)
+        self.action_area.pack_end(clonebutton)
 
         self.ui = ui.ui()
         self.clonesettings = settings.Settings('clone')
@@ -38,9 +44,6 @@ class CloneDialog(gtk.Window):
             destpath = repos[1]
         elif len(repos):
             srcpath = repos[0]
-
-        mainvbox = gtk.VBox()
-        self.add(mainvbox)
 
         # copy from 'thgconfig.py'
         def createtable(cols=2):
@@ -69,7 +72,7 @@ class CloneDialog(gtk.Window):
 
         # layout table for fixed options
         table, addrow = createtable()
-        mainvbox.pack_start(table, True, True, 2)
+        self.vbox.pack_start(table, True, True, 2)
         def setcombosize(combo):
             combo.set_size_request(300, -1)
             combo.size_request()
@@ -149,7 +152,7 @@ class CloneDialog(gtk.Window):
 
         # expander for advanced options
         self.expander = expander = gtk.Expander(_('Advanced options'))
-        mainvbox.pack_start(expander, True, True, 2)
+        self.vbox.pack_start(expander, True, True, 2)
 
         # layout table for advanced options
         table, addrow = createtable()
@@ -188,31 +191,6 @@ class CloneDialog(gtk.Window):
         self.optremote.connect('toggled', self.checkbutton_toggled, self.remotecmdentry)
         addrow(self.optremote)
         addrow(self.remotecmdentry)
-
-        ## keyboard accelerators
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        mod = gtklib.get_thg_modifier()
-
-        ## bottom buttons
-        hbbox = gtk.HButtonBox()
-        hbbox.set_layout(gtk.BUTTONBOX_END)
-        mainvbox.pack_start(hbbox, False, False, 2)
-
-        close = gtk.Button(_('Cancel'))
-        close.connect('clicked', lambda x: self.destroy())
-        key, modifier = gtk.accelerator_parse('Escape')
-        close.add_accelerator('clicked', accelgroup, key, 0,
-                gtk.ACCEL_VISIBLE)
-        self.close_button = close
-        hbbox.add(close)
-
-        clone = gtk.Button(_('Clone'))
-        key, modifier = gtk.accelerator_parse(mod+'Return')
-        clone.add_accelerator('clicked', accelgroup, key, modifier,
-                gtk.ACCEL_VISIBLE)
-        clone.connect('clicked', self.clone_clicked)
-        hbbox.add(clone)
 
         # give focus to dest combo
         destcombo.grab_focus()
@@ -342,7 +320,8 @@ class CloneDialog(gtk.Window):
 
         self.add_src_to_recent(src)
         self.add_dest_to_recent(dest)
-        self.close_button.grab_focus()
+        cancel = [b for b in self.action_area if b.get_label() == 'gtk-cancel'][0]
+        cancel.grab_focus()
 
         if dlg.return_code() == 0:
             shlib.shell_notify([dest])
