@@ -153,7 +153,7 @@ html_static_path = ['.static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'TortoiseHgdoc'
+htmlhelp_basename = 'TortoiseHg'
 
 
 # Options for LaTeX output
