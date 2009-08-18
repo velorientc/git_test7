@@ -294,11 +294,43 @@ class GCommit(GStatus):
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
 
+        self.parents_frame = gtk.Frame(_('Parent'))
+        parents_vbox = gtk.VBox(spacing=2)
+        self.parents_frame.add(parents_vbox)
+        def plabel():
+            w = gtk.Label()
+            w.set_selectable(True)
+            hb = gtk.HBox()
+            hb.pack_start(w, False, False, 4)
+            parents_vbox.pack_start(hb, False, False)
+            return w
+        self.parent1_label = plabel()
+        self.parent2_label = plabel()
+        vbox.pack_start(self.parents_frame, False, False)
+
         self.vpaned = gtk.VPaned()
-        self.vpaned.add1(vbox)
-        self.vpaned.add2(status_body)
+        self.vpaned.pack1(vbox, shrink=False)
+        self.vpaned.pack2(status_body, shrink=False)
         gobject.idle_add(self.realize_settings)
         return self.vpaned
+
+    def update_parent_labels(self):
+        def setlabel(label, ctx):
+            s = str(ctx.rev()) + ' (' + str(ctx) + ') '
+            s += hglib.toutf(ctx.description().split('\n')[0])
+            label.set_markup('<span face="monospace">%s</span>' % s)
+
+        if self.mqmode:
+            ctxs = self.repo['.'].parents()
+        else:
+            ctxs = self.repo[None].parents()
+        setlabel(self.parent1_label, ctxs[0])
+        if len(ctxs) == 2:
+            setlabel(self.parent2_label, ctxs[1])
+            self.parent2_label.show()
+            self.parents_frame.set_label(_('Parents'))
+        else: 
+            self.parent2_label.hide()
 
     def realize_settings(self):
         self.vpaned.set_position(self._setting_vpos)
@@ -352,6 +384,7 @@ class GCommit(GStatus):
         self.check_patch_queue()
         self.check_undo()
         self.refresh_branchop()
+        self.update_parent_labels()
         return success
 
 
