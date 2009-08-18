@@ -92,7 +92,7 @@ class InitDialog(gtk.Dialog):
         """ select destination folder to clone """
         response = gtklib.NativeFolderSelectDialog(
                           initial=self.cwd,
-                          title='Select Destination Folder').run()
+                          title=_('Select Destination Folder')).run()
         if response:
             self.destentry.set_text(response)
             self.destentry.set_position(-1)
