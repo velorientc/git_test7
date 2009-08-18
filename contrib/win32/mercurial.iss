@@ -8,7 +8,7 @@
 [Setup]
 AppCopyright=Copyright 2005-2009 Matt Mackall and others
 AppName=TortoiseHg
-AppVerName=TortoiseHg {#Version}
+AppVerName=TortoiseHg {#VERSION}
 InfoAfterFile=contrib/win32/postinstall.txt
 LicenseFile=COPYING.txt
 ShowLanguageDialog=yes
@@ -19,7 +19,7 @@ AppUpdatesURL=http://bitbucket.org/tortoisehg/stable/
 AppID=TortoiseHg
 AppContact=Steve Borho <steve@borho.org>
 AppMutex=thgtaskbar,Global\thgtaskbar
-OutputBaseFilename=TortoiseHg-{#Version}
+OutputBaseFilename=TortoiseHg-{#VERSION}
 DefaultDirName={pf}\TortoiseHg
 SourceDir=..\..
 VersionInfoDescription=Mercurial distributed SCM
