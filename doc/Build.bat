@@ -1,6 +1,8 @@
 @echo off
 
-set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
+if "%hhc_compiler" equ "" (
+    set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
+)
 set PDFLATEX=PdfLatex
 set SPHINXBUILD=sphinx-build
 set OUTPUTDIRSUFFIX=
@@ -56,7 +58,7 @@ if "%1" == "htmlhelp" (
 
 if "%1" == "chm" (
 	%SPHINXBUILD% -b htmlhelp %ALLSPHINXOPTS% %OUTPUTDIR%/chm
-	%hhc_compiler% %OUTPUTDIR%/chm/TortoiseHGdoc.hhp
+	%hhc_compiler% %OUTPUTDIR%/chm/TortoiseHG.hhp
 	echo.
 	echo.Build finished. The CHM file is in %OUTPUTDIR%/chm.
 	goto end
