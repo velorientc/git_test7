@@ -450,7 +450,7 @@ class DataMineDialog(gdialog.GDialog):
         num = self.notebook.page_num(widget)
         if num != -1:
             self.notebook.remove_page(num)
-            if self.notebook.get_n_pages() <= 1:
+            if self.notebook.get_n_pages() < 1:
                 self.newpagecount = 1
                 self.add_search_page()
 
