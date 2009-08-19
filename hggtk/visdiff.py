@@ -290,7 +290,11 @@ def rawextdiff(ui, *pats, **opts):
         ui.warn(_('Extdiff command not recognized\n'))
         return
     pats = hglib.canonpaths(pats)
-    ret = extdiff.dodiff(ui, repo, diffcmd, diffopts, pats, opts)
+    try:
+        ret = extdiff.dodiff(ui, repo, diffcmd, diffopts, pats, opts)
+    except OSError, e:
+        ui.warn(str(e) + '\n')
+        return
     if ret == 0:
         gdialog.Prompt(_('No file changes'),
                       _('There are no file changes to view'), None).run()
