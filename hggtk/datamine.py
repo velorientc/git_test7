@@ -82,6 +82,7 @@ class DataMineDialog(gdialog.GDialog):
         self.grep_cmenu = self.grep_context_menu()
         self.changedesc = {}
         self.newpagecount = 1
+        self.currev = None
         vbox = gtk.VBox()
         notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
@@ -176,7 +177,8 @@ class DataMineDialog(gdialog.GDialog):
         return True
 
     def grep_thgdiff(self, treeview):
-        self._do_diff([], {'change' : self.currev})
+        if self.currev:
+            self._do_diff([], {'change' : self.currev})
 
     def grep_row_act(self, tree, path, column):
         'Default action is the first entry in the context menu'
