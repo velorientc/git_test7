@@ -36,8 +36,9 @@ for sig in ('copy-clipboard', 'thg-diff', 'thg-parent'):
 for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept'):
     gobject.signal_new(sig, gtk.Window,
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
-gobject.signal_new('thg-close', gtk.Notebook,
-    gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
+for sig in ('thg-close', 'thg-new'):
+    gobject.signal_new(sig, gtk.Notebook,
+        gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 
 gtkmainalive = False
 def dispatch(args):

@@ -99,6 +99,10 @@ class DataMineDialog(gdialog.GDialog):
         notebook.add_accelerator('thg-close', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         notebook.connect('thg-close', self.close_notebook)
+        key, modifier = gtk.accelerator_parse(mod+'n')
+        notebook.add_accelerator('thg-new', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        notebook.connect('thg-new', self.new_notebook)
 
         self.stbar = gtklib.StatusBar()
         self.stbar.sttext.set_property('use-markup', True)
@@ -217,6 +221,9 @@ class DataMineDialog(gdialog.GDialog):
             gtklib.thgexit(self)
         else:
             self.close_current_page()
+
+    def new_notebook(self, notebook):
+        self.add_search_page()
 
     def add_search_page(self):
         frame = gtk.Frame()
