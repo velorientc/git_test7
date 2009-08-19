@@ -1,8 +1,3 @@
-Update context menu screenshot
-Add links to BB wiki and Mercurial wiki
 Describe path editing and [auth] hgrc section
 Need a page explaining merges and merge undo (tie together various parts)
-nautilus cmenu configuration
-hgignore dialog (including screenshot)
-guess renames dialog (including screenshot)
 Describe how to use hgfold to correct case-folding conflicts
