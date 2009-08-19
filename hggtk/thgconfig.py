@@ -449,7 +449,13 @@ class PathEditDialog(gtk.Dialog):
             self.store_settings()
             self.destroy()
             return
-        newalias = self.entries['Alias'][0].get_text()
+        aliasinput = self.entries['Alias'][0]
+        newalias = aliasinput.get_text()
+        if newalias == '':
+            ret = dialog.error_dialog(self, _('Alias name is empry'),
+                    _('Please enter alias name'))
+            aliasinput.grab_focus()
+            return
         if newalias in self.list:
             ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
                    _("Overwrite existing '%s' path?") % newalias).run()
