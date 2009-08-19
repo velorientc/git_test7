@@ -414,6 +414,8 @@ class GCommit(GStatus):
                 self.commit_selected(commit_list)
             elif len(self.filemodel) == 0 and self.qnew:
                 self.commit_selected([])
+            elif self.closebranch:
+                self.commit_selected([])
             else:
                 gdialog.Prompt(_('Nothing Commited'),
                        _('No committable files selected'), self).run()
