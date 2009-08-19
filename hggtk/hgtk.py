@@ -49,6 +49,8 @@ def dispatch(args):
         return _runcatch(u, args)
     except SystemExit:
         pass
+    except KeyboardInterrupt:
+        print _('\nCaught keyboard interrupt, aborting.\n')
     except:
         from hggtk.bugreport import run
         if '--debugger' in args:
