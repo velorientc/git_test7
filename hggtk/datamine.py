@@ -92,6 +92,14 @@ class DataMineDialog(gdialog.GDialog):
         self.notebook = notebook
         vbox.pack_start(self.notebook, True, True, 2)
 
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'w')
+        notebook.add_accelerator('thg-close', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        notebook.connect('thg-close', self.close_notebook)
+
         self.stbar = gtklib.StatusBar()
         self.stbar.sttext.set_property('use-markup', True)
         vbox.pack_start(self.stbar, False, False, 2)
@@ -203,6 +211,12 @@ class DataMineDialog(gdialog.GDialog):
         button.add(iconBox)
         iconBox.show()
         return button
+
+    def close_notebook(self, notebook):
+        if notebook.get_n_pages() <= 1:
+            gtklib.thgexit(self)
+        else:
+            self.close_current_page()
 
     def add_search_page(self):
         frame = gtk.Frame()
@@ -423,7 +437,7 @@ class DataMineDialog(gdialog.GDialog):
             self.curpath = fromutf(model[paths][self.COL_PATH])
             self.stbar.set_status_text(toutf(model[paths][self.COL_TOOLTIP]))
 
-    def close_current_page(self, window):
+    def close_current_page(self, window=None):
         num = self.notebook.get_current_page()
         if num != -1 and self.notebook.get_n_pages():
             self.notebook.remove_page(num)
