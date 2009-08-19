@@ -315,22 +315,40 @@ class GCommit(GStatus):
         return self.vpaned
 
     def update_parent_labels(self):
-        def setlabel(label, ctx):
-            s = str(ctx.rev()) + ' (' + str(ctx) + ') '
-            s += hglib.toutf(ctx.description().split('\n')[0])
-            label.set_markup('<span face="monospace">%s</span>' % s)
+        def setlabel(label, ctx, ishead):
+            revision = str(ctx.rev())
+            hash = str(ctx)
+            summary = hglib.toutf(ctx.description().split('\n')[0])
+            face = 'monospace'
+            size = '9000'
+            format = '<span face="%s" size="%s">%s (%s) </span>'
+            t = format % (face, size, revision, hash)
+            if not ishead and not self.mqmode:
+                format = '<b>[%s]</b>  '
+                t += format % _('not at head revision')
+            format = '<span face="%s" size="%s">%s</span>'
+            t += format % (face, size, summary)
+            label.set_markup(t)
+
+        def ishead(ctx): return len(ctx.children()) == 0
 
         if self.mqmode:
             ctxs = self.repo['.'].parents()
         else:
             ctxs = self.repo[None].parents()
-        setlabel(self.parent1_label, ctxs[0])
-        if len(ctxs) == 2:
-            setlabel(self.parent2_label, ctxs[1])
+
+        ishead0 = ishead(ctxs[0])
+        setlabel(self.parent1_label, ctxs[0], ishead0)
+
+        merge = len(ctxs) == 2
+        if not merge:
+            self.parent2_label.hide()
+        else:
+            ishead1 = ishead(ctxs[1])
+            setlabel(self.parent2_label, ctxs[1], ishead1)
+
             self.parent2_label.show()
             self.parents_frame.set_label(_('Parents'))
-        else: 
-            self.parent2_label.hide()
 
     def realize_settings(self):
         self.vpaned.set_position(self._setting_vpos)
