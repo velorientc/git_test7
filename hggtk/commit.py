@@ -357,7 +357,7 @@ class GCommit(GStatus):
             # pre-fill commit message, if not modified
             buf = self.text.get_buffer()
             if not buf.get_modified():
-                buf.set_text(_('merge'))
+                buf.set_text(_('Merge '))
                 buf.set_modified(False)
 
 
