@@ -558,16 +558,21 @@ class GCommit(GStatus):
     def should_addremove(self, files):
         if self.test_opt('addremove'):
             return True
-        else:
-            response = gdialog.Confirm(_('Confirm Add/Remove'),
-                    files, self,_('Add/Remove the following files?')).run()
-            if response == gtk.RESPONSE_YES:
-                # This will stay set for further commits (meaning no
-                # more prompts). Problem?
-                self.opts['addremove'] = True
-                return True
-        return False
-
+        response = gdialog.Confirm(_('Confirm Add/Remove'),
+                files, self,_('Add/Remove the following files?')).run()
+        if response != gtk.RESPONSE_YES:
+            return False
+        # This will stay set for further commits (meaning no more
+        # prompts). Problem?
+        self.opts['addremove'] = True
+        if self.qnew or self.qheader is not None:
+            cmdline = ['hg', 'addremove', '--verbose']
+            cmdline += [self.repo.wjoin(x) for x in files]
+            dialog = hgcmd.CmdDialog(cmdline, True)
+            dialog.set_transient_for(self)
+            dialog.run()
+            dialog.hide()
+        return True
 
     def ready_message(self):
         buf = self.text.get_buffer()
@@ -672,7 +677,7 @@ class GCommit(GStatus):
             cmdline.append('--force')
         elif self.qheader is not None:
             cmdline[1] = 'qrefresh'
-        if self.opts['addremove']:
+        elif self.opts['addremove']:
             cmdline += ['--addremove']
         if self.opts['user']:
             cmdline.extend(['--user', self.opts['user']])
