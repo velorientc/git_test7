@@ -350,6 +350,28 @@ class GCommit(GStatus):
             self.parent2_label.show()
             self.parents_frame.set_label(_('Parents'))
 
+        if self.mqmode:
+            return
+
+        # add "{+|-}1 head" to label of commit button
+        b = self.commit_button
+        ph = _('_Commit (+1 head)')
+        mh = _('_Commit (-1 head)')
+        if not merge:
+            if not ishead0:
+                b.set_label(ph)
+                b.set_tooltip(self.tooltips, 
+                    _('parent is not a head, commit to add a new head'))
+        else:
+            if ishead0 and ishead1:
+                b.set_label(mh)
+                b.set_tooltip(self.tooltips, 
+                    _('commit to merge one head'))
+            elif not ishead0 and not ishead1:
+                b.set_label(ph)
+                b.set_tooltip(self.tooltips, 
+                    _('no parent is a head, commit to add a new head'))
+
     def realize_settings(self):
         self.vpaned.set_position(self._setting_vpos)
 
