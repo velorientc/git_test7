@@ -92,6 +92,18 @@ class DataMineDialog(gdialog.GDialog):
         self.notebook = notebook
         vbox.pack_start(self.notebook, True, True, 2)
 
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'w')
+        notebook.add_accelerator('thg-close', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        notebook.connect('thg-close', self.close_notebook)
+        key, modifier = gtk.accelerator_parse(mod+'n')
+        notebook.add_accelerator('thg-new', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        notebook.connect('thg-new', self.new_notebook)
+
         self.stbar = gtklib.StatusBar()
         self.stbar.sttext.set_property('use-markup', True)
         vbox.pack_start(self.stbar, False, False, 2)
@@ -204,6 +216,15 @@ class DataMineDialog(gdialog.GDialog):
         iconBox.show()
         return button
 
+    def close_notebook(self, notebook):
+        if notebook.get_n_pages() <= 1:
+            gtklib.thgexit(self)
+        else:
+            self.close_current_page()
+
+    def new_notebook(self, notebook):
+        self.add_search_page()
+
     def add_search_page(self):
         frame = gtk.Frame()
         frame.set_border_width(10)
@@ -222,7 +243,7 @@ class DataMineDialog(gdialog.GDialog):
         search_hbox.pack_start(includes, True, True, 4)
         search_hbox.pack_start(gtk.Label(_('Excludes:')), False, False, 4)
         search_hbox.pack_start(excludes, True, True, 4)
-        search_hbox.pack_start(search, False, False)
+        search_hbox.pack_start(search, False, False, 4)
         self.tooltips.set_tip(search, _('Start this search'))
         self.tooltips.set_tip(regexp, _('Regular expression search pattern'))
         self.tooltips.set_tip(includes, _('Comma separated list of'
@@ -423,7 +444,7 @@ class DataMineDialog(gdialog.GDialog):
             self.curpath = fromutf(model[paths][self.COL_PATH])
             self.stbar.set_status_text(toutf(model[paths][self.COL_TOOLTIP]))
 
-    def close_current_page(self, window):
+    def close_current_page(self, window=None):
         num = self.notebook.get_current_page()
         if num != -1 and self.notebook.get_n_pages():
             self.notebook.remove_page(num)
@@ -448,8 +469,11 @@ class DataMineDialog(gdialog.GDialog):
     def close_page(self, button, widget):
         '''Close page button has been pressed'''
         num = self.notebook.page_num(widget)
-        if num != -1 and self.notebook.get_n_pages() > 1:
+        if num != -1:
             self.notebook.remove_page(num)
+            if self.notebook.get_n_pages() < 1:
+                self.newpagecount = 1
+                self.add_search_page()
 
     def add_header_context_menu(self, col, menu):
         lb = gtk.Label(col.get_title())

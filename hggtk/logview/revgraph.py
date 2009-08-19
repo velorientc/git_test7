@@ -9,12 +9,24 @@ __copyright__ = "Copyright 2007 Joel Rosdahl, 2008 Steve Borho"
 __author__    = "Joel Rosdahl <joel@rosdahl.net>, Steve Borho <steve@borho.org>"
 
 from mercurial.node import nullrev
-from mercurial import cmdutil, util, ui
+from mercurial import cmdutil, util
 
 def __get_parents(repo, rev):
     return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
 
-def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False):
+def _color_of(repo, rev, nextcolor, preferredcolor, branch_color=False):
+    if not branch_color:
+        if preferredcolor[0]:
+            rv = preferredcolor[0]
+            preferredcolor[0] = None
+        else:
+            rv = nextcolor[0]
+            nextcolor[0] = nextcolor[0] + 1
+        return rv
+    else:
+        return sum([ord(c) for c in repo[rev].branch()])
+
+def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, branch_color=False):
     """incremental revision grapher
 
     This generator function walks through the revision history from
@@ -33,7 +45,7 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False):
     curr_rev = start_rev
     revs = []
     rev_color = {}
-    nextcolor = 0
+    nextcolor = [0]
     while curr_rev >= stop_rev:
         # Compute revs and next_revs.
         if curr_rev not in revs:
@@ -47,30 +59,29 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False):
                     continue
             # New head.
             revs.append(curr_rev)
-            rev_color[curr_rev] = curcolor = nextcolor ; nextcolor += 1
+            rev_color[curr_rev] = _color_of(repo, curr_rev, nextcolor, [None], branch_color)
             r = __get_parents(repo, curr_rev)
             while r:
                 r0 = r[0]
                 if r0 < stop_rev: break
                 if r0 in rev_color: break
-                rev_color[r0] = curcolor
+                if not branch_color:
+                    rev_color[r0] = rev_color[curr_rev]
+                else:
+                    rev_color[r0] = _color_of(repo, r0, None, None, True)
                 r = __get_parents(repo, r0)
-        curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
 
         # Add parents to next_revs.
         parents = __get_parents(repo, curr_rev)
         parents_to_add = []
-        preferred_color = curcolor
+        preferred_color = [rev_color[curr_rev]]
         for parent in parents:
             if parent not in next_revs:
                 parents_to_add.append(parent)
                 if parent not in rev_color:
-                    if preferred_color:
-                        rev_color[parent] = preferred_color; preferred_color = None
-                    else:
-                        rev_color[parent] = nextcolor ; nextcolor += 1
+                    rev_color[parent] = _color_of(repo, parent, nextcolor, preferred_color, branch_color)
         next_revs[rev_index:rev_index + 1] = parents_to_add
 
         lines = []
@@ -83,7 +94,7 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False):
                     color = rev_color[parent]
                     lines.append( (i, next_revs.index(parent), color) )
 
-        yield (curr_rev, (rev_index, curcolor), lines, parents)
+        yield (curr_rev, (rev_index, rev_color[curr_rev]), lines, parents)
         revs = next_revs
         curr_rev -= 1
 
