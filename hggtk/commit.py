@@ -526,6 +526,8 @@ class GCommit(GStatus):
                 self.commit_selected(commit_list)
             elif len(self.filemodel) == 0 and self.qnew:
                 self.commit_selected([])
+            elif self.qheader is not None:
+                self.commit_selected([])
             elif self.closebranch:
                 self.commit_selected([])
             else:
