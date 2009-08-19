@@ -341,6 +341,7 @@ class CloneDialog(gtk.Dialog):
 
         if dlg.return_code() == 0:
             shlib.shell_notify([dest])
+            self.response(gtk.RESPONSE_OK)
 
 def run(_ui, *pats, **opts):
     return CloneDialog(pats)
