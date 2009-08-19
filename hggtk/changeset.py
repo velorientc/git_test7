@@ -516,7 +516,10 @@ class ChangeSet(gdialog.GDialog):
     def save_file_rev(self, menuitem):
         wfile = util.localpath(self.curfile)
         wfile, ext = os.path.splitext(os.path.basename(wfile))
-        filename = "%s@%d%s" % (wfile, self.currev, ext)
+        if wfile:
+            filename = "%s@%d%s" % (wfile, self.currev, ext)
+        else:
+            filename = "%s@%d" % (ext, self.currev)
         result = gtklib.NativeSaveFileDialogWrapper(Title=_("Save file to"),
                                              InitialDir=self.cwd,
                                              FileName=filename).run()
