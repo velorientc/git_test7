@@ -69,7 +69,7 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
 Source: ..\misc\hgbook.pdf; DestDir: {app}/docs
-Source: ..\misc\THgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\misc\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
 
 [INI]
