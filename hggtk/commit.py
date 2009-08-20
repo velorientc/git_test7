@@ -335,8 +335,12 @@ class GCommit(GStatus):
                 format = '<span color="%s" background="%s"> %s </span> '
                 t += format % ('black', '#aaffaa', branch)
 
-            format = '<span face="%s" size="%s">%s</span>'
-            t += format % (face, size, summary)
+            tags = self.repo.nodetags(ctx.node())
+            format = '<span color="%s" background="%s"> %s </span> '
+            for tag in tags:
+                t += format % ('black', '#ffffaa', tag)
+
+            t += summary
             label.set_markup(t)
 
         def ishead(ctx): return len(ctx.children()) == 0
