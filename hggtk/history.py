@@ -324,6 +324,8 @@ class GLog(gdialog.GDialog):
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
         self.newbutton.set_sensitive(self.origtip != len(self.repo))
+        pats = opts.get('pats', [])
+        self.changeview.pats = pats
 
         def ftitle(filtername):
             t = self.get_title()
@@ -337,8 +339,6 @@ class GLog(gdialog.GDialog):
             ftitle(_('%s branch') % branch)
         elif self.filter == 'custom':
             ftitle(_('custom filter'))
-            pats = opts.get('pats', [])
-            self.changeview.pats = pats
             if len(pats) == 1 and not os.path.isdir(pats[0]):
                 opts['filehist'] = pats[0]
                 self.graphview.refresh(True, pats, opts)
@@ -358,6 +358,7 @@ class GLog(gdialog.GDialog):
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'ancestry':
             if not self.currow:
+                # TODO: button should not be sensitive
                 return
             ftitle(_('revision ancestry'))
             range = [self.currow[treemodel.REVID], 0]
