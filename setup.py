@@ -98,7 +98,7 @@ def setup_windows():
        }
     }
     extra['console'] = [
-            {'script':'../build-hg/hg', 'icon_resources':[(0,'icons/hg.ico')]},
+            {'script':'contrib/hg', 'icon_resources':[(0,'icons/hg.ico')]},
             {'script':'hgtk', 'icon_resources':[(0,'icons/thg_logo.ico')]}
             ]
     extra['windows'] = [
