@@ -321,9 +321,14 @@ class GLog(gdialog.GDialog):
                 'revrange':[], 'rev':[], 'noheads':False }
         opts.update(kwopts)
 
+        # handle strips, rebases, etc
+        if len(self.repo) < self.origtip:
+            self.origtip = len(self.repo)
+
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
         self.newbutton.set_sensitive(self.origtip != len(self.repo))
+        self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
 
@@ -357,9 +362,6 @@ class GLog(gdialog.GDialog):
             opts['only_merges'] = True
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'ancestry':
-            if not self.currow:
-                # TODO: button should not be sensitive
-                return
             ftitle(_('revision ancestry'))
             range = [self.currow[treemodel.REVID], 0]
             opts = {'noheads': True, 'revrange': range}
@@ -538,6 +540,7 @@ class GLog(gdialog.GDialog):
         ancestry = gtk.RadioButton(all, _('ancestry'))
         ancestry.connect('toggled', self.filter_selected, 'ancestry')
         filterbox.pack_start(ancestry, False)
+        self.ancestrybutton = ancestry
 
         parents = gtk.RadioButton(all, _('parents'))
         parents.connect('toggled', self.filter_selected, 'parents')
@@ -951,6 +954,7 @@ class GLog(gdialog.GDialog):
 
     def selection_changed(self, treeview):
         self.currow = self.graphview.get_revision()
+        self.ancestrybutton.set_sensitive(True)
         rev = self.currow[treemodel.REVID]
         if rev != self.last_rev:
             self.last_rev = rev
