@@ -144,8 +144,7 @@ class InitDialog(gtk.Dialog):
         dialog.info_dialog(self, _('New repository created'),
                 _('in directory %s') % hglib.toutf(os.path.abspath(dest)))
 
-        close = [b for b in self.action_area if b.get_label() == 'gtk-close'][0]
-        close.grab_focus()
+        self.response(gtk.RESPONSE_OK)
 
 def run(ui, *pats, **opts):
     return InitDialog(pats)
