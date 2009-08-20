@@ -315,17 +315,26 @@ class GCommit(GStatus):
         return self.vpaned
 
     def update_parent_labels(self):
+        
         def setlabel(label, ctx, ishead):
             revision = str(ctx.rev())
             hash = str(ctx)
             summary = hglib.toutf(ctx.description().split('\n')[0])
             face = 'monospace'
             size = '9000'
+
             format = '<span face="%s" size="%s">%s (%s) </span>'
             t = format % (face, size, revision, hash)
+
             if not ishead and not self.mqmode:
                 format = '<b>[%s]</b>  '
                 t += format % _('not at head revision')
+
+            branch = ctx.branch()
+            if branch != 'default':
+                format = '<span color="%s" background="%s"> %s </span> '
+                t += format % ('black', '#aaffaa', branch)
+
             format = '<span face="%s" size="%s">%s</span>'
             t += format % (face, size, summary)
             label.set_markup(t)
