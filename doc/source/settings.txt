@@ -101,7 +101,7 @@ TortoiseHg
 	The editor to use during a commit and other
 	instances where Mercurial needs multiline input from
 	the user.  Only used by command line interface commands.
-		
+
 :guilabel:`Tab Width:`
 	Specify the number of spaces that tabs expand to in various
 	TortoiseHg windows. Default: Not expanded.
@@ -142,7 +142,8 @@ Commit
 	the message and a warning will be issued
 	if any lines are too long at commit.
 	Default: 0 (unenforced).
-	
+
+
 .. module:: changelog.settings
 	:synopsis: Dialog used to set changelog specific preferences
 
@@ -174,7 +175,7 @@ Changelog
 	:synopsis: Dialog used to set synchronize specific preferences
 
 Sync
-----	
+----
 
 The :guilabel:`Sync` tab is where you can store URLs (paths) to related
 repositories. It is rare to store paths in the site-wide or user
@@ -198,12 +199,13 @@ can be used as default targets for some operations.
 	be listed in the Synchronize tool path drop-down box, and they can
 	be used as short-cuts on the command line.
 
+
 .. module:: web.settings
 	:synopsis: Dialog used to set web server specific preferences
 
 Web
 ---
-	
+
 :guilabel:`Name:`
 	Repository name to use in the web interface.
 	Default is the working directory.
@@ -259,17 +261,18 @@ Web
 
 :guilabel:`Encoding:`
 	Character encoding name.
-	
+
+
 .. module:: proxy.settings
 	:synopsis: Dialog used to set proxy specific preferences
 
 Proxy
 -----
-	
+
 :guilabel:`Host:`
 	Host name and (optional) port of proxy server, for
 	example ``myproxy:8000``.
-	
+
 :guilabel:`Bypass List:`
 	Optional. Comma-separated list of host names that
 	should bypass the proxy.
@@ -330,7 +333,7 @@ Email
 :guilabel:`Local Hostname:`
 	Hostname the sender can use to identify itself to the mail server.
 
-	
+
 .. module:: diff.settings
 	:synopsis: Dialog used to set diff specific preferences
 
@@ -348,7 +351,7 @@ Diff
 :guilabel:`Show Function:`
 	Show which function each change is in.
 	Default: False.
-	
+
 :guilabel:`Ignore White Space:`
 	Ignore white space when comparing lines.
 	Default: False.
