@@ -274,15 +274,15 @@ Proxy
 	Optional. Comma-separated list of host names that
 	should bypass the proxy.
 
+:guilabel:`User:`
+	Optional. User name to authenticate with at the
+	proxy server.
+
 :guilabel:`Password:`
 	Optional. Password to authenticate with at the
 	proxy server.
 
-:guilabel:`User:`
-	Optional. User name to authenticate with at the
-	proxy server.
-	
-	
+
 .. module:: email.settings
 	:synopsis: Dialog used to set email specific preferences
 
