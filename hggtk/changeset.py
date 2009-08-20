@@ -108,14 +108,23 @@ class ChangeSet(gdialog.GDialog):
         self._filelist.clear()
         self._filelist.append(('*', _('[All Files]'), ''))
         modified, added, removed = self.repo.status(parent, ctx.node())[:3]
+        selrow = None
         for f in modified:
+            if f in self.pats:
+                selrow = len(self._filelist)
             self._filelist.append(('M', toutf(f), f))
         for f in added:
+            if f in self.pats:
+                selrow = len(self._filelist)
             self._filelist.append(('A', toutf(f), f))
         for f in removed:
+            if f in self.pats:
+                selrow = len(self._filelist)
             self._filelist.append(('R', toutf(f), f))
         self.curnodes = (parent, ctx.node())
-        if len(self._filelist) > 1:
+        if selrow is not None:
+            self._filesel.select_path((selrow,))
+        elif len(self._filelist) > 1:
             self._filesel.select_path((1,))
         else:
             self._filesel.select_path((0,))

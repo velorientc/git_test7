@@ -338,6 +338,7 @@ class GLog(gdialog.GDialog):
         elif self.filter == 'custom':
             ftitle(_('custom filter'))
             pats = opts.get('pats', [])
+            self.changeview.pats = pats
             if len(pats) == 1 and not os.path.isdir(pats[0]):
                 opts['filehist'] = pats[0]
                 self.graphview.refresh(True, pats, opts)
