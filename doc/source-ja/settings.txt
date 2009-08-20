@@ -1,75 +1,75 @@
-********
-Settings
-********
+**************
+設定ダイアログ
+**************
 
 .. module:: settings.dialog
 	:synopsis: Dialog used to set preferences
 
 .. figure:: figures/settings.png
-	:alt: Settings dialog
+	:alt: 設定ダイアログ
 
-	Settings dialog
+	設定ダイアログ
 
-The Settings dialog is used to configure both TortoiseHg and the
-underlying Mercurial DVCS.  Since TortoiseHg uses Mercurial's underlying
-configuration system to store and retrieve its settings, these are
-essentially the same thing.
+設定ダイアログでは TortoiseHg と Mercurial 本体の両方の設定ができます。
+TortoiseHg は Mercurial の設定システムを利用して設定情報を保存・取得しているため、
+本質的に同じになります。
 
-Mercurial on Windows has a three-tier configuration system.
+Windows の Mercurial には3つの設定ファイルがあります。
 
-1) A site-wide configuration file in
-   :file:`C:\\Program Files\\TortoiseHg\\Mercurial.ini`
-   This file is read first and thus has the lowest priority.
-2) A per-user configuration file in
-   :file:`C:\\Documents and Settings\\username\\Mercurial.ini`
-   This file is read second and thus can override settings in the
-   site-wide configuration file.
-3) A per-repository configuration file in :file:`repo-root\\.hg\\hgrc` This
-   file is read last and can override site-wide and user global settings.
+1)	グローバル設定ファイル：
+	:file:`C:\\Program Files\\TortoiseHg\\Mercurial.ini`
+	このファイルは最初に読み込まれるため、最も優先順位が低くなります。
+2)	ユーザ設定ファイル：
+	:file:`C:\\Documents and Settings\\ユーザ名\\Mercurial.ini`
+	このファイルは2番目に読み込まれるため、前述のグローバル設定ファイルを
+	上書きできます。
+3)	リポジトリ設定ファイル：
+	:file:`リポジトリのルート\\.hg\\hgrc`
+	このファイルは最後に読み込まれるため、グローバルおよびユーザ設定ファイルを
+	上書きできます。
 
-The site-wide file can be overwritten on upgrades so it is recommended
-that you do not make changes to this file.  Instead, you should make
-changes to your user :file:`Mercurial.ini` and/or the repository
-:file:`hgrc` file.  The TortoiseHg Settings dialog enforces this
-suggestion by only operating in two modes:
+グローバル設定ファイルは TortoiseHg のアップグレード時に上書きされる可能性があるため、
+このファイルを編集することはお勧めできません。その代わり、ホームディレクトリにある
+ユーザ設定ファイル :file:`Mercurial.ini` または :file:`hgrc` ファイルを変更した
+方が良いでしょう。TortoiseHg 設定ダイアログもこれに従い、次の2つのファイルにのみ
+変更を行います：
 
 Global
-	edits your user :file:`Mercurial.ini` file
+	ユーザ設定ファイル :file:`Mercurial.ini` または :file:`hgrc` を編集します
 Repository
-	edits a repository :file:`.hg/hgrc` file
+	リポジトリ設定ファイル :file:`.hg/hgrc` を編集します
 
-In TortoiseHg 0.8, you may toggle between the two modes using the combo
-box at the top of the dialog.
+TortoiseHg バージョン 0.8 からはこの2つのファイルをダイアログ上部のコンボボックスから
+切り替えることができます。
 
-Most TortoiseHg users will want to store all configurables in their
-global user settings, and only use the repository hgrc to store paths
-(remote repository aliases) and web settings, though it is possible to
-override many configurables per-repository (a common example is to
-configure a different username for use in a repository).  Also note that
-the user and repository configuration files may not exist until you run
-the Settings dialog for the first time.
+リポジトリ設定ファイルは他の設定ファイルより優先されるためどんな設定でも記述できますが、
+多くの TortoiseHg ユーザは全ての設定をユーザ設定ファイルにまとめて保存しておき、
+リポジトリ設定ファイルにはリポジトリパスのエイリアスや、ウェブサーバ設定など
+のみ保存するでしょう。共通にすることの多いユーザ名であっても、リポジトリごとに異なる
+ユーザ名を設定可能です。ユーザおよびリポジトリ設定ファイルは自分で作成するか、
+初めて設定ダイアログを開くまで存在しませんので注意してください。
 
-Tabs
+
+タブ
 ====
 
-The Settings tool is a tabbed application.
+設定ツールはタブ型のアプリケーションです。
 
-Each tab corresponds roughly to a section of your :file:`Mercurial.ini`
-file, though there is a certain amount of overlap. Some sections were
-split across multiple tabs for clarity.
+各タブは大まかに :file:`Mercurial.ini` ファイルの各セクションに相当しているため、
+ある程度重複した項目もあります。
 
-Every tab but :guilabel:`Sync` has the same format, a list of
-configurable options with a drop-down combo box with possible values and
-a history of options you have used for that setting. The configurable
-name (label) has a tooltip which describes in more detail what you are
-configuring and its default value.  The description of the currently
-focused configurable is also shown in a text box at the bottom of the
-dialog.
+:guilabel:`同期` タブを除けば全てのタブは同じ GUI レイアウトになっており、
+設定項目がドロップダウンコンボボックスと共に一覧になっています。
+コンボボックスには設定可能な値の他、ユーザが過去に入力した値の履歴も含みます。
+設定項目のラベルにはツールチップが設定してあるため、マウスカーソルを乗せると
+その項目の詳しい説明を見ることができます。コンボボックスをクリックするなどして
+アクティブにしても、ダイアログ下部の説明表示用のフレームに同じ説明が表示されます。
 
-Please consult the Mercurial wiki for more detailed information about
-these configurables (except for the first three tabs:
-:guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
-are specifically for TortoiseHg).
+設定項目についてのより詳細な情報については Mercurial の公式 Wiki を参照してください。
+ただし、最初の3つのタブ (:guilabel:`TortoiseHg`, :guilabel:`コミット`,
+:guilabel:`チェンジログ`) については TortoiseHg 固有の設定になるため、
+Mercurial の Wiki には該当する情報がありません。
+
 
 .. module:: TortoiseHg.settings
 	:synopsis: Dialog used to set general TortoiseHg preferences
@@ -77,305 +77,274 @@ are specifically for TortoiseHg).
 TortoiseHg
 ----------
 
-:guilabel:`3-way Merge Tool:`
-	Graphical merge program for resolving merge conflicts.  If left
-	unspecified, Mercurial will use the first applicable tool it finds
-	on your system or use its internal merge tool that leaves conflict
-	markers in place.  Chose :guilabel:`internal:merge` to force conflict markers,
-	:guilabel:`internal:prompt` to always select local or other, or :guilabel:`internal:dump`
-	to leave files in the working directory for manual merging.
+:guilabel:`3-way マージツール:`
+	マージ時の衝突を解決するGUI のマージプログラム。指定されなかった場合、Mercurial は
+	システムで最初に見つかった内蔵マージツールを衝突マーカを取り除くために使用します。
+	強制的に衝突マーカを表示するには :guilabel:`internal:merge` を指定し、
+	常に local か other を選択できるようにするには :guilabel:`internal:prompt` を
+	指定し、手作業でマージするために作業ディレクトリにファイルを書き出しておくには
+	:guilabel:`internal:dump` を指定してください。
 
-:guilabel:`Visual Diff Command:`
-	Specify visual diff tool; must be an extdiff command.
+:guilabel:`GUI 差分表示コマンド:`
+	GUI の差分表示ツール。extdiff コマンドをして登録されている必要があります。
 
-:guilabel:`Skip Diff Window:`
-	Bypass the builtin visual diff dialog and directly use your
-	visual diff tool's directory diff feature.  Only enable this
-	feature if you know your diff tool has a valid extdiff
-	configuration.  Default: False.
+:guilabel:`差分表示をスキップ:`
+	TortoiseHg の GUI 差分表示ダイアログを表示せず、設定されている GUI
+	差分表示ツールのディレクトリ比較機能を使います。この機能は GUI 差分表示ツールが
+	正しい extdiff 設定を持っている場合のみ有効にしてください。デフォルト：False。
 
-:guilabel:`Visual Editor:`
-	Specify the visual editor used to view files, etc.
+:guilabel:`GUI エディタ:`
+	ファイルを表示するための GUI エディタを指定します。
 
-:guilabel:`CLI Editor:`
-	The editor to use during a commit and other
-	instances where Mercurial needs multiline input from
-	the user.  Only used by command line interface commands.
+:guilabel:`コマンドラインエディタ:`
+	コミット時や Mercurial がユーザから複数行のテキスト入力を必要としている場合に
+	使用するエディタです。CLI コマンドにのみ使用されます。
 		
-:guilabel:`Tab Width:`
-	Specify the number of spaces that tabs expand to in various
-	TortoiseHg windows. Default: Not expanded.
+:guilabel:`タブ文字の幅:`
+	TorroiseHg の各種ダイアログにおいてテキスト中のタブ文字をいくつの空白文字に
+	展開するかを指定してください。デフォルト：タブ文字を展開しない。
 
-:guilabel:`Max Diff Size:`
-	The maximum size file (in KB) that TortoiseHg will
-	show changes for in the changelog, status, and commit windows.
-	A value of zero implies no limit.  Default: 1024 (1MB).
+:guilabel:`最大差分サイズ:`
+	チェンジログ・ステータス・コミットダイアログで表示する最大ファイルサイズを
+	KB 単位で指定してください。0の場合は無制限となります。デフォルト：1024。
 
-:guilabel:`Bottom Diffs:`
-	Show the diff panel below the file list in status, shelve, and
-	commit dialogs.
-	Default: False (show diffs to right of file list).
-	
+:guilabel:`差分を画面下部に表示:`
+	差分表示パネルをステータス・シェルフ・コミットダイアログのファイル一覧の下に配置します。
+	デフォルト：False (ファイル一覧の右側に表示)。
+
+
 .. module:: commit.settings
 	:synopsis: Dialog used to set commit specific preferences
 
-Commit
-------
+コミット
+--------
 
-:guilabel:`Username:`
-	Name associated with commits.
+:guilabel:`ユーザ名:`
+	コミット時に使用する名前。
 
-:guilabel:`External Commit Tool:`
-	Select commit tool launched by TortoiseHg. (Qct is no longer
-	distributed as part of TortoiseHg).
-	Default: None (use the builtin tool). [DEPRECATED]
+:guilabel:`外部コミットツール:`
+	TortoiseHg から起動するコミットツール。現在、Qct は同梱されていません。
+	デフォルト：なし (TortoiseHg のコミットツールを起動)。 [DEPRECATED]
 
-:guilabel:`Summary Line Length:`
-	Maximum length of the commit message summary line.
-	If set, TortoiseHg will issue a warning if the
-	summary line is too long or not separated by a
-	blank line. Default: 0 (unenforced).
+:guilabel:`要約行最大文字数:`
+	コミットログ最初の行 (要約行) の最大文字数。これが設定された場合、
+	要約行が長すぎる、もしくは要約行とそれ以降のログが空行で区切られていないときに
+	警告が表示されます。デフォルト：0 (制限しません)。
 
-:guilabel:`Message Line Length:`
-	Word wrap length of the commit message.  If
-	set, the popup menu can be used to format
-	the message and a warning will be issued
-	if any lines are too long at commit.
-	Default: 0 (unenforced).
-	
+:guilabel:`コミットログ折り返し文字数:`
+	コミットログの折り返し文字数。これが設定された場合、コミットログ中の1行でも
+	設定文字数を上回っていると警告が表示され、その文字数で強制的に折り返すための
+	ポップアップメニューが表示されます。デフォルト：0 (制限しません)。
+
+
 .. module:: changelog.settings
 	:synopsis: Dialog used to set changelog specific preferences
 
-Changelog
----------
+チェンジログ
+------------
 
-:guilabel:`Author Coloring:`
-	Color changesets by author name.  If not enabled,
-	the changes are colored green for merge, red for
-	non-trivial parents, black for normal.
-	Default: False.
+:guilabel:`コミッタで色分け:`
+	コミッタ名でチェンジセットを色分けします。このオプションが無効の場合、
+	マージリビジョンは緑、親リビジョンが離れているリビジョンは赤、
+	それ以外の通常のリビジョンは黒に色分けされます。デフォルト：False。
 
-:guilabel:`Long Summary:`
-	If true, concatenate multiple lines of changeset summary
-	until they reach 80 characters.
-	Default: False.
+:guilabel:`長めの要約行:`
+	この設定が有効の場合、最大80文字になるまでコミットログの改行を無視して
+	1行として表示します。デフォルト：False。
 
-:guilabel:`Log Batch Size:`
-	The number of revisions to read and display in the
-	changelog viewer in a single batch.
-	Default: 500.
+:guilabel:`リビジョン処理件数:`
+	1度の処理で読み込みおよび表示するリビジョンの件数。デフォルト：500。
 
-:guilabel:`Copy Hash:`
-	Allow the changelog viewer to copy the changeset hash
-	of the currently selected changeset into the clipboard.
-	Default: False.
+:guilabel:`ハッシュ値のコピー:`
+	チェンジログビューアでそのとき選択しているチェンジセットのチェンジセット ID
+	をクリップボードにコピーできるようにします。デフォルト：False。
+
 
 .. module:: synchronize.settings
 	:synopsis: Dialog used to set synchronize specific preferences
 
-Sync
-----	
+同期
+----
 
-The :guilabel:`Sync` tab is where you can store URLs (paths) to related
-repositories. It is rare to store paths in the site-wide or user
-configuration files, most of the time you will only store these in a
-repository configuration file. Mercurial has two special path names that
-can be used as default targets for some operations.
+:guilabel:`同期` タブではリポジトリに関連するパス (URL やディレクトリパス) を
+保存することができます。これらのパスをグローバル設定やユーザ設定ファイルに保存する
+ことはあまりなく、多くの場合リポジトリ設定ファイルにのみ保存します。Mercurial には
+2つの特別なパス名 (エイリアス) があり、それらはいくつかの Mercurial コマンドで
+デフォルトのパスとして使用されます。
 
-* *default*	- the default URL to pull from, usually clone source
-* *default-push* - the default push target when using the command line
+* *default*		- プル元のデフォルトのパス。普通はクローンしたときのパス。
+* *default-push*	- コマンドラインを使用したときのデフォルトのプッシュ先のパス。
 
-:guilabel:`After pull operation:`
-	Operation which is performed directly after a successful pull.
-	:guilabel:`update` equates to :command:`pull --update`, :guilabel:`fetch`
-	equates to the fetch extension, :guilabel:`rebase` equates to
-	:command:`pull --rebase`.  Default: none.
+:guilabel:`プル後の処理:`
+	プル操作が正常に完了するとそのまま続けて実行されます。
+	:guilabel:`update` はコマンドラインの :command:`pull --update`、
+	:guilabel:`fetch` は fetch 拡張機能、 :guilabel:`rebase` は
+	:command:`pull --rebase` と同等の操作です。デフォルト：なし。
 
-:guilabel:`Remote repository paths`
-	In this pane you can configure aliases for repositories that you
-	frequently synchronize with.  Mercurial will add a *default* alias
-	to the clone source automatically.  All configured path aliases will
-	be listed in the Synchronize tool path drop-down box, and they can
-	be used as short-cuts on the command line.
+:guilabel:`リモートリポジトリパス`
+	このパネルでは頻繁に利用するリポジトリのパスとそのエイリアスを設定できます。
+	クローンを実行すると Mercurial は自動的にそのリポジトリを *default* という
+	エイリアスで登録します。ここで設定したパスは全て同期ツールのコンボボックスに
+	表示され、コマンドラインから使用する場合でもショートカットとして利用できます。
+
 
 .. module:: web.settings
 	:synopsis: Dialog used to set web server specific preferences
 
-Web
----
-	
-:guilabel:`Name:`
-	Repository name to use in the web interface.
-	Default is the working directory.
+サーバ
+------
 
-:guilabel:`Description:`
-	Textual description of the repository's purpose or
-	contents.
+:guilabel:`リポジトリ名:`
+	ウェブブラウザを使ったリポジトリ表示で使用する名前。
+	デフォルト：作業ディレクトリ名。
 
-:guilabel:`Contact:`
-	Name or email address of the person in charge of the
-	repository.
+:guilabel:`説明:`
+	リポジトリの目的または内容に関する説明文。
 
-:guilabel:`Style:`
-	Which template map style to use.
+:guilabel:`連絡先:`
+	このリポジトリの管理者の名前またはメールアドレス。
 
-:guilabel:`Archive Formats:`
-	Comma separated list of archive formats allowed for
-	downloading.
+:guilabel:`テーマ:`
+	使用するテンプレート名。
 
-:guilabel:`Port:`
-	Port to listen on.
+:guilabel:`アーカイブ形式:`
+	ダウンロード可能にするアーカイブ形式をカンマ区切りで指定。
 
-:guilabel:`Push Requires SSL:`
-	Whether to require that inbound pushes be transported
-	over SSL to prevent password sniffing.
+:guilabel:`ポート番号:`
+	サーバの待ち受けポート番号。
 
-:guilabel:`Stripes:`
-	How many lines a "zebra stripe" should span in multiline output.
-	Default is 1; set to 0 to disable.
+:guilabel:`SSL プッシュ:`
+	パスワード傍受などを防ぐため、プッシュ操作に SSL 通信の使用を必須と
+	するかどうか。
 
-:guilabel:`Max Files:`
-	Maximum number of files to list per changeset.
+:guilabel:`ストライプ:`
+	複数行を出力するとき、何行ごとに色を変えるか。
+	デフォルト：1 (0でストライプ無効)。
 
-:guilabel:`Max Changes:`
-	Maximum number of changes to list on the changelog.
+:guilabel:`最大ファイル表示件数:`
+	チェンジセットごとに表示するファイルの最大件数。
 
-:guilabel:`Allow Push:`
-	Whether to allow pushing to the repository. If empty or not
-	set, push is not allowed. If the special value "*", any remote
-	user can push, including unauthenticated users. Otherwise, the
-	remote user must have been authenticated, and the authenticated
-	user name must be present in this list (separated by whitespace
-	or ","). The contents of the allow_push list are examined after
-	the deny_push list.
+:guilabel:`最大チェンジセット表示件数:`
+	チェンジログ一覧に表示するチェンジセットの最大件数。
 
-:guilabel:`Deny Push:`
-	Whether to deny pushing to the repository. If empty or not set,
-	push is not denied. If the special value "*", all remote users
-	are denied push. Otherwise, unauthenticated users are all
-	denied, and any authenticated user name present in this list
-	(separated by whitespace or ",") is also denied. The contents
-	of the deny_push list are examined before the allow_push list.
+:guilabel:`プッシュ許可リスト:`
+	リポジトリへのプッシュを許可するかどうか。空欄または未設定の場合、プッシュは許可されません。
+	特別な設定値 "*" の場合は認証されてないユーザも含め、誰でもプッシュ可能になります。
+	特定のユーザのみ許可したい場合はユーザ名をカンマ区切り (空白文字でも可) で指定してください。
+	それによってユーザ認証が必要になります。ここで指定した許可ユーザ一覧は拒否ユーザ一覧の
+	後に適用されます。
 
-:guilabel:`Encoding:`
-	Character encoding name.
-	
+:guilabel:`プッシュ拒否リスト:`
+
+	リポジトリへのプッシュを拒否するかどうか。空欄または未設定の場合、プッシュは拒否されません。
+	特別な設定値 "*" の場合は全てのユーザがプッシュを拒否されます。特定のユーザのみ拒否したい場合は
+	ユーザ名をカンマ区切り (空白文字でも可) で指定してください。ここで指定した拒否ユーザ一覧は
+	許可ユーザ一覧の前に適用されます。
+
+:guilabel:`文字エンコーディング:`
+	文字エンコーディング名。
+
+
 .. module:: proxy.settings
 	:synopsis: Dialog used to set proxy specific preferences
 
-Proxy
------
-	
-:guilabel:`Host:`
-	Host name and (optional) port of proxy server, for
-	example ``myproxy:8000``.
-	
-:guilabel:`Bypass List:`
-	Optional. Comma-separated list of host names that
-	should bypass the proxy.
+プロキシ
+--------
 
-:guilabel:`Password:`
-	Optional. Password to authenticate with at the
-	proxy server.
+:guilabel:`ホスト名:`
+	プロキシサーバのホスト名とポート番号。例えば ``myproxy:8000`` など。
 
-:guilabel:`User:`
-	Optional. User name to authenticate with at the
-	proxy server.
-	
-	
+:guilabel:`除外ホスト:`
+	必要であればプロキシサーバを経由しないホスト名をカンマ区切りで指定。
+
+:guilabel:`ユーザ名:`
+	必要であればプロキシサーバ認証用のユーザ名を指定。
+
+:guilabel:`パスワード:`
+	必要であればプロキシサーバ認証用のパスワードを指定。
+
+
 .. module:: email.settings
 	:synopsis: Dialog used to set email specific preferences
 
-Email
------
+メール送信
+----------
 
-:guilabel:`From:`
-	Email address to use in the "From" header and for the SMTP envelope.
+:guilabel:`送信者:`
+	SMTP の "From" ヘッダに使用する送信元メールアドレス。
 
-:guilabel:`To:`
-	Comma-separated list of recipient email addresses.
+:guilabel:`受取人:`
+	送信先のメールアドレスをカンマ区切りで指定。
 
 :guilabel:`Cc:`
-	Comma-separated list of carbon copy recipient email
-	addresses.
+	CC のメールアドレスをカンマ区切りで指定。
 
 :guilabel:`Bcc:`
-	Comma-separated list of blind carbon copy recipient
-	email addresses.
+	BCC のメールアドレスをカンマ区切りで指定。
 
-:guilabel:`method:`
-	Optional. Method to use to send email messages. If value is "smtp" (default),
-	use SMTP (configured below).  Otherwise, use as name of program to run that
-	acts like sendmail (takes :command:`-f` option for sender, list of recipients on
-	command line, message on stdin). Normally, setting this to ``sendmail`` or
-	``/usr/sbin/sendmail`` is enough to use sendmail to send messages.
+:guilabel:`メール送信手段:`
+	必要ならメールを送信する手段を指定。デフォルトの "smtp" は SMTP (以下の項目で設定可能)
+	を用いてメールを送信します。もしくは sendmail (-f オプションで送信者、引数として受取人一覧、
+	メール本文は標準入力) のようなメール送信プログラムを直接指定することもできます。
+	通常は ``sendmail`` または ``/usr/sbin/sendmail`` と指定するだけで送信できます。
 
-:guilabel:`SMTP Host:`
-	Host name of mail server.
+:guilabel:`SMTP ホスト名:`
+	メールサーバのホスト名。
 
-:guilabel:`SMTP Port:`
-	Port to connect to on mail server.
-	Default: 25.
+:guilabel:`SMTP ポート番号:`
+	メールサーバへの接続ポート番号。デフォルト：25。
 
-:guilabel:`SMTP TLS:`
-	Connect to mail server using TLS.
-	Default: False.
+:guilabel:`SMTP TLS 設定:`
+	TLS を使用してメールサーバに接続します。デフォルト：False。
 
-:guilabel:`SMTP Username:`
-	Username to authenticate to mail server with.
+:guilabel:`SMTP ユーザ名:`
+	メールサーバ認証用のユーザ名。
 
-:guilabel:`SMTP Password:`
-	Password to authenticate to mail server with.
+:guilabel:`SMTP パスワード:`
+	メールサーバ認証用のパスワード。
 
-:guilabel:`Local Hostname:`
-	Hostname the sender can use to identify itself to the mail server.
+:guilabel:`ローカルホスト名:`
+	送信者自身をメールサーバに識別させるためのホスト名。
 
-	
+
 .. module:: diff.settings
 	:synopsis: Dialog used to set diff specific preferences
 
-Diff
+差分
 ----
 
-:guilabel:`Git Format:`
-	Use git extended diff header format.
-	Default: False.
+:guilabel:`Git 拡張形式:`
+	GIT の拡張差分ヘッダ形式を使用します。デフォルト：False。
 
-:guilabel:`No Dates:`
-	Do not include modification dates in diff headers.
-	Default: False.
+:guilabel:`日付を非表示:`
+	差分ヘッダに日付情報を付加しないようにします。デフォルト：False。
 
-:guilabel:`Show Function:`
-	Show which function each change is in.
-	Default: False.
+:guilabel:`関数名の表示:`
+	どの関数が変更されたのかを表示。デフォルト：False。
 	
-:guilabel:`Ignore White Space:`
-	Ignore white space when comparing lines.
-	Default: False.
+:guilabel:`空白文字の無視:`
+	行比較の際に空白文字の有無を無視します。デフォルト：False。
 
-:guilabel:`Ignore WS Amount:`
-	Ignore changes in the amount of white space.
-	Default: False.
+:guilabel:`空白文字の数の違いを無視:`
+	空白文字の数の違いを無視します。デフォルト：False。
 
-:guilabel:`Ignore Blank Lines:`
-	Ignore changes whose lines are all blank.
-	Default: False.
+:guilabel:`空行を無視:`
+	比較時に空行の有無を無視します。デフォルト：False。
 
 
-From command line
-=================
+コマンドラインからの実行
+========================
 
-The setting dialog can be started from command line ::
+設定ダイアログはコマンドラインから起動することもできます。
+リポジトリ設定 (:file:`.hg/hgrc` file) の場合は： ::
 
 	hgtk repoconfig
 
-for the repository settings (:file:`.hg/hgrc` file) or ::
+ユーザ設定 (:file:`Mercurial.ini` file) の場合は： ::
 
 	hgtk userconfig
 
-for the user configuration (:file:`Mercurial.ini` file).
-
-The syntax is simple, no options or parameters are needed, except the global
-options.
+コマンド構文はこのようにシンプルでグローバル設定を除けばコマンドラインオプションを
+指定する必要ありません。
 
 .. vim: noet ts=4
