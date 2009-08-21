@@ -58,12 +58,14 @@ else:
     sys.stderr = mystderr
     try:
         ret = hggtk.hgtk.dispatch(sys.argv[1:])
+        sys.stderr = origstderr
         mystderr.seek(0)
         for l in mystderr.readlines():
             if l.startswith('Traceback') or l.startswith('TypeError'):
                 from hggtk.bugreport import run
                 from hggtk.hgtk import gtkrun
-                error = 'Recoverable runtime error (stderr):\n'+mystderr.getvalue()
+                error = 'Recoverable runtime error (stderr):\n'
+                error += mystderr.getvalue()
                 opts = {}
                 opts['cmd'] = ' '.join(sys.argv[1:])
                 opts['error'] = error
@@ -75,3 +77,5 @@ else:
         if sys.exc_info()[0] not in [SystemExit, KeyboardInterrupt]:
             sys.stderr = origstderr
             traceback.print_exc()
+        else:
+            raise SystemExit(ret)
