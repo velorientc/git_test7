@@ -297,8 +297,35 @@ int GetRegSZValue(HKEY hkey, const char* name, std::string& res)
         return 1;
     }
 
+    TDEBUG_TRACE("GetRegSZValue(" << name << ") failed");
+
     return 0;
 }
+
+// read string value from registry, wide version
+int GetRegSZValueW(HKEY hkey, const wchar_t* name, std::wstring& res)
+{
+    res = L"";
+
+    if (!hkey)
+        return 0;
+
+    std::vector<BYTE> Data(600);
+    DWORD cbData = Data.size();
+
+    LONG rv = ::RegQueryValueExW(hkey, name, 0, 0, &Data[0], &cbData);
+
+    if (rv == ERROR_SUCCESS)
+    {
+        res = reinterpret_cast<wchar_t*>(&Data[0]);
+        return 1;
+    }
+
+    TDEBUG_TRACEW(L"GetRegSZValueW(\"" << name << L"\") failed");
+
+    return 0;
+}
+
 
 // true if a starts with b
 bool StartsWith(const std::string& a, const std::string& b)

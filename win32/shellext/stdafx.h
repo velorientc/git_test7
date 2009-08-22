@@ -28,7 +28,13 @@
                                std::stringstream _the_msg;                  \
                                _the_msg << "[THG] " << s;                   \
                                std::string _the_str = _the_msg.str();       \
-                               OutputDebugString(_the_str.c_str());         \
+                               OutputDebugStringA(_the_str.c_str());         \
+                            } while (0)
+    #define TDEBUG_TRACEW(s) do {                                            \
+                               std::basic_stringstream<wchar_t> _the_msg;    \
+                               _the_msg << L"[THG] " << s;                   \
+                               std::wstring _the_str = _the_msg.str();       \
+                               OutputDebugStringW(_the_str.c_str());         \
                             } while (0)
     #define TDEBUG_ENTER TDEBUG_TRACE
 #else
