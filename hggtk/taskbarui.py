@@ -187,7 +187,7 @@ class TaskBarUI(gtk.Window):
         righthbbox.set_layout(gtk.BUTTONBOX_END)
         bbox.pack_start(righthbbox, False, False)
 
-        self.apply.connect('clicked', self.applyclicked)
+        self.apply.connect('clicked', self.apply_clicked)
         self.apply.set_sensitive(False)
         righthbbox.pack_start(self.apply, False, False)
 
@@ -305,7 +305,7 @@ class TaskBarUI(gtk.Window):
     def top_clicked(self, button):
         self.move_to_other(self.submlist)
 
-    def applyclicked(self, button):
+    def apply_clicked(self, button):
         self.store_shell_configs()
         button.set_sensitive(False)
 
