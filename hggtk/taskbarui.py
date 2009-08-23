@@ -10,7 +10,7 @@ import gtk
 import gobject
 
 from thgutil.i18n import _
-from thgutil import hglib, settings
+from thgutil import hglib, settings, menuthg
 from hggtk import gtklib
 
 shellcmds = '''about add clone commit datamine init log recovery
@@ -82,7 +82,9 @@ class TaskBarUI(gtk.Window):
         label.set_alignment(0, 0.5)
         setcell(label, 0, 0)
 
-        self.submmodel = model = gtk.ListStore(gobject.TYPE_STRING)
+        # model: [0]hgcmd, [1]translated menu label
+        self.submmodel = model = gtk.ListStore(gobject.TYPE_STRING,
+                gobject.TYPE_STRING)
         self.submlist = list = gtk.TreeView(model)
         list.set_size_request(-1, 180)
         list.set_headers_visible(False)
@@ -90,7 +92,7 @@ class TaskBarUI(gtk.Window):
         list.append_column(column)
         cell = gtk.CellRendererText()
         column.pack_start(cell, True)
-        column.add_attribute(cell, 'text', 0)
+        column.add_attribute(cell, 'text', 1)
         setcell(withframe(list), 1, 0)
 
         # Top menus pane
@@ -98,7 +100,9 @@ class TaskBarUI(gtk.Window):
         label.set_alignment(0, 0.5)
         setcell(label, 0, 2)
 
-        self.topmmodel = model = gtk.ListStore(gobject.TYPE_STRING)
+        # model: [0]hgcmd, [1]translated menu label
+        self.topmmodel = model = gtk.ListStore(gobject.TYPE_STRING,
+                gobject.TYPE_STRING)
         self.topmlist = list = gtk.TreeView(model)
         list.set_size_request(-1, 180)
         list.set_headers_visible(False)
@@ -106,7 +110,7 @@ class TaskBarUI(gtk.Window):
         list.append_column(column)
         cell = gtk.CellRendererText()
         column.pack_start(cell, True)
-        column.add_attribute(cell, 'text', 0)
+        column.add_attribute(cell, 'text', 1)
         setcell(withframe(list), 1, 2)
 
         # move buttons
@@ -246,13 +250,14 @@ class TaskBarUI(gtk.Window):
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         self.submmodel.clear()
         self.topmmodel.clear()
-        for cmd in shellcmds:
+        for cmd, info in menuthg.thgcmenu.items():
+            label = info['label']['str']
             if cmd in promoted:
-                self.topmmodel.append((cmd,))
+                self.topmmodel.append((cmd, label))
             else:
-                self.submmodel.append((cmd,))
-        self.submmodel.set_sort_column_id(0, gtk.SORT_ASCENDING)
-        self.topmmodel.set_sort_column_id(0, gtk.SORT_ASCENDING)
+                self.submmodel.append((cmd, label))
+        self.submmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
+        self.topmmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
 
     def store_shell_configs(self):
         overlayenable = self.ovenable.get_active() and '1' or '0'
@@ -273,19 +278,19 @@ class TaskBarUI(gtk.Window):
     def sub_clicked(self, button, apply):
         model, paths = self.topmlist.get_selection().get_selected_rows()
         for path in paths:
-            menu = model[path][0]
+            cmd, label = model[path]
             model.remove(model.get_iter(path))
-            self.submmodel.append((menu,))
-        self.submmodel.set_sort_column_id(0, gtk.SORT_ASCENDING)
+            self.submmodel.append((cmd, label))
+        self.submmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
         apply.set_sensitive(True)
 
     def top_clicked(self, button, apply):
         model, paths = self.submlist.get_selection().get_selected_rows()
         for path in paths:
-            menu = model[path][0]
+            cmd, label = model[path]
             model.remove(model.get_iter(path))
-            self.topmmodel.append((menu,))
-        self.topmmodel.set_sort_column_id(0, gtk.SORT_ASCENDING)
+            self.topmmodel.append((cmd, label))
+        self.topmmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
         apply.set_sensitive(True)
 
     def applyclicked(self, button):
