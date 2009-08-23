@@ -211,6 +211,12 @@ class GLog(gdialog.GDialog):
         button.set_active(self.showcol.get('utc', False))
         button.set_draw_as_radio(True)
         menu.append(button)
+        button = gtk.CheckMenuItem(_('Show Age'))
+        button.connect('toggled', self.toggle_view_column,
+                'age-column-visible')
+        button.set_active(self.showcol.get('age', False))
+        button.set_draw_as_radio(True)
+        menu.append(button)
         button = gtk.CheckMenuItem(_('Show Branch'))
         button.connect('toggled', self.toggle_view_column,
                 'branch-column-visible')
@@ -285,7 +291,7 @@ class GLog(gdialog.GDialog):
         settings['glog-hpane'] = self.hpaned.get_position()
         settings['branch-color'] = self.graphview.get_property('branch-color')
         settings['show-filterbar'] = self.show_filterbar
-        for col in ('rev', 'date', 'id', 'branch', 'utc'):
+        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
         return settings
@@ -303,7 +309,7 @@ class GLog(gdialog.GDialog):
             self.setting_hpos = settings['glog-hpane']
             self.branch_color = settings.get('branch-color', False)
             self.show_filterbar = settings.get('show-filterbar', True)
-            for col in ('rev', 'date', 'id', 'branch', 'utc'):
+            for col in ('rev', 'date', 'id', 'branch', 'utc', 'age'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
         except KeyError:

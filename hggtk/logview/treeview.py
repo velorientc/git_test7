@@ -68,6 +68,11 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show UTC/GMT date column',
                                  False,
                                  gobject.PARAM_READWRITE),
+        'age-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Age',
+                                 'Show age column',
+                                 False,
+                                 gobject.PARAM_READWRITE),
         'rev-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Rev',
                                  'Show revision number column',
@@ -254,6 +259,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.branch_color
         elif property.name == 'utc-column-visible':
             return self.utc_column.get_visible()
+        elif property.name == 'age-column-visible':
+            return self.age_column.get_visible()
         elif property.name == 'repo':
             return self.repo
         elif property.name == 'limit':
@@ -278,6 +285,8 @@ class TreeView(gtk.ScrolledWindow):
             self.branch_color = value
         elif property.name == 'utc-column-visible':
             self.utc_column.set_visible(value)
+        elif property.name == 'age-column-visible':
+            self.age_column.set_visible(value)
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'limit':
@@ -492,6 +501,19 @@ class TreeView(gtk.ScrolledWindow):
         self.utc_column.add_attribute(cell, "text", treemodel.UTC)
         self.utc_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.treeview.append_column(self.utc_column)
+
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 10)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        self.age_column = gtk.TreeViewColumn(_('Age'))
+        self.age_column.set_visible(False)
+        self.age_column.set_resizable(True)
+        self.age_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.age_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.age_column.pack_start(cell, expand=True)
+        self.age_column.add_attribute(cell, "text", treemodel.AGE)
+        self.age_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        self.treeview.append_column(self.age_column)
 
     def text_color_orig(self, parents, rev, author):
         if self.origtip is not None and int(rev) >= self.origtip:
