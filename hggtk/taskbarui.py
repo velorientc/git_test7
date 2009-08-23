@@ -29,7 +29,7 @@ class TaskBarUI(gtk.Window):
         self.set_title(_('TortoiseHg Taskbar'))
 
         about = gtk.Button(_('About'))
-        apply = gtk.Button(_('Apply'))
+        self.apply = gtk.Button(_('Apply'))
         close = gtk.Button(_('Close'))
 
         vbox = gtk.VBox()
@@ -88,7 +88,7 @@ class TaskBarUI(gtk.Window):
         self.submlist = list = gtk.TreeView(model)
         list.set_size_request(-1, 180)
         list.set_headers_visible(False)
-        list.connect('row-activated', self.row_activated, apply)
+        list.connect('row-activated', self.row_activated)
         column = gtk.TreeViewColumn()
         list.append_column(column)
         cell = gtk.CellRendererText()
@@ -107,7 +107,7 @@ class TaskBarUI(gtk.Window):
         self.topmlist = list = gtk.TreeView(model)
         list.set_size_request(-1, 180)
         list.set_headers_visible(False)
-        list.connect('row-activated', self.row_activated, apply)
+        list.connect('row-activated', self.row_activated)
         column = gtk.TreeViewColumn()
         list.append_column(column)
         cell = gtk.CellRendererText()
@@ -120,10 +120,10 @@ class TaskBarUI(gtk.Window):
         setcell(mbbox, 1, 1)
 
         topbutton = gtk.Button(_('Top ->'))
-        topbutton.connect('clicked', self.top_clicked, apply)
+        topbutton.connect('clicked', self.top_clicked)
         mbbox.add(topbutton)
         subbutton = gtk.Button(_('<- Sub'))
-        subbutton.connect('clicked', self.sub_clicked, apply)
+        subbutton.connect('clicked', self.sub_clicked)
         mbbox.add(subbutton)
 
         ## Taskbar group
@@ -142,14 +142,14 @@ class TaskBarUI(gtk.Window):
 
         tooltip = _('Enable/Disable the overlay icons globally')
         tips.set_tip(self.ovenable, tooltip)
-        self.ovenable.connect('toggled', self.ovenable_toggled, apply)
+        self.ovenable.connect('toggled', self.ovenable_toggled)
         tooltip = _('Only enable overlays on local disks')
         tips.set_tip(self.lclonly, tooltip)
-        self.lclonly.connect('toggled', lambda x: apply.set_sensitive(True))
+        self.lclonly.connect('toggled', lambda x: self.apply.set_sensitive(True))
 
         tooltip = _('Highlight the taskbar icon during activity')
         tips.set_tip(self.hgighlight_taskbaricon, tooltip)
-        self.hgighlight_taskbaricon.connect('toggled', lambda x: apply.set_sensitive(True))
+        self.hgighlight_taskbaricon.connect('toggled', lambda x: self.apply.set_sensitive(True))
 
         self.load_shell_configs()
 
@@ -187,9 +187,9 @@ class TaskBarUI(gtk.Window):
         righthbbox.set_layout(gtk.BUTTONBOX_END)
         bbox.pack_start(righthbbox, False, False)
 
-        apply.connect('clicked', self.applyclicked)
-        apply.set_sensitive(False)
-        righthbbox.pack_start(apply, False, False)
+        self.apply.connect('clicked', self.applyclicked)
+        self.apply.set_sensitive(False)
+        righthbbox.pack_start(self.apply, False, False)
 
         close.connect('clicked', lambda x: self.destroy())
         key, modifier = gtk.accelerator_parse('Escape')
@@ -278,40 +278,37 @@ class TaskBarUI(gtk.Window):
         except ImportError:
             pass
 
-    def row_activated(self, list, path, column, apply):
-        if list == self.submlist:
-            other = self.topmlist.get_model()
+    def move_to_other(self, list, paths=None):
+        if paths == None:
+            model, paths = list.get_selection().get_selected_rows()
         else:
-            other = self.submlist.get_model()
-        model = list.get_model()
-        cmd, label = model[path]
-        model.remove(model.get_iter(path))
-        other.append((cmd, label))
-        other.set_sort_column_id(1, gtk.SORT_ASCENDING)
-        apply.set_sensitive(True)
-
-    def sub_clicked(self, button, apply):
-        model, paths = self.topmlist.get_selection().get_selected_rows()
+            model = list.get_model()
+        if list == self.submlist:
+            otherlist = self.topmlist
+            othermodel = self.topmmodel
+        else:
+            otherlist = self.submlist
+            othermodel = self.submmodel
         for path in paths:
             cmd, label = model[path]
             model.remove(model.get_iter(path))
-            self.submmodel.append((cmd, label))
-        self.submmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
-        apply.set_sensitive(True)
+            othermodel.append((cmd, label))
+        othermodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
+        self.apply.set_sensitive(True)
 
-    def top_clicked(self, button, apply):
-        model, paths = self.submlist.get_selection().get_selected_rows()
-        for path in paths:
-            cmd, label = model[path]
-            model.remove(model.get_iter(path))
-            self.topmmodel.append((cmd, label))
-        self.topmmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
-        apply.set_sensitive(True)
+    def row_activated(self, list, path, column):
+        self.move_to_other(list, (path,))
+
+    def sub_clicked(self, button):
+        self.move_to_other(self.topmlist)
+
+    def top_clicked(self, button):
+        self.move_to_other(self.submlist)
 
     def applyclicked(self, button):
         self.store_shell_configs()
         button.set_sensitive(False)
 
-    def ovenable_toggled(self, check, apply):
+    def ovenable_toggled(self, check):
         self.lclonly.set_sensitive(check.get_active())
-        apply.set_sensitive(True)
+        self.apply.set_sensitive(True)
