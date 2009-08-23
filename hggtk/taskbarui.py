@@ -65,10 +65,6 @@ class TaskBarUI(gtk.Window):
         cmframe = gtk.Frame(_('Context Menu'))
         cmframe.set_border_width(2)
         settingsvbox.pack_start(cmframe, False, False, 2)
-        cmcvbox = gtk.VBox()
-
-        lbl = gtk.Label(_('Promote menu items to the top menu'))
-        cmcvbox.pack_start(lbl, False, False, 2)
 
         table = gtk.Table(2, 3)
         cmframe.add(table)
@@ -126,19 +122,6 @@ class TaskBarUI(gtk.Window):
 
         # Tooltips
         tips = gtk.Tooltips()
-        rows = (len(shellcmds) + 2) / 3
-        table = gtk.Table(rows, 3, False)
-        cmcvbox.pack_start(table, False, False, 2)
-        self.cmptoggles = {}
-        for i, cmd in enumerate(shellcmds):
-            row, col = divmod(i, 3)
-            check = gtk.CheckButton(cmd)
-            table.attach(check, col, col+1,
-                         row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
-            self.cmptoggles[cmd] = check
-            tooltip = _('Promote menu item "%s" to top menu') % cmd
-            tips.set_tip(check, tooltip)
-            check.connect('toggled', lambda x: apply.set_sensitive(True))
 
         ## Taskbar group
         taskbarframe = gtk.Frame(_('Taskbar'))
