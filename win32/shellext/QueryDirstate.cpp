@@ -45,29 +45,53 @@ public:
 
 bool hasHgDir(const std::string& path)
 {
-    return PathIsDirectory((path + "\\.hg").c_str()) != 0;
+    bool res = false;
+    
+    if (path.empty() || path == "\\" || PathIsRoot(path.c_str()))
+    {
+        TDEBUG_TRACE(
+            "hasHgDir(\"" << path << "\") -> " << res
+        );
+        return res;
+    }
+
+    const std::string p = path + "\\.hg";
+    res = PathIsDirectory(p.c_str()) != 0;
+    TDEBUG_TRACE(
+        "hasHgDir: PathIsDirectory(\"" << p << "\") -> " << res
+    );
+    return res;
 }
 
 
 int findHgRoot(QueryState& cur, QueryState& last, bool outdated)
 {
-    if (cur.isdir)
+    if (!PathIsNetworkPath(cur.path.c_str()))
     {
-        std::string p = cur.path;
-        p.push_back('\\');
-        if (p.find(".hg\\") != std::string::npos) 
-        {
-            //TDEBUG_TRACE("findHgRoot: skipping '" << cur.path << "'");
-            last = cur;
-            return 0;
-        }
-    }
+        cur.isdir = PathIsDirectory(cur.path.c_str());
+        TDEBUG_TRACE(
+            "findHgRoot: PathIsDirectory(\"" << cur.path 
+            << "\") -> " << cur.isdir
+        );
 
-    if (cur.isdir && hasHgDir(cur.path))
-    {
-        cur.hgroot = cur.path;
-        TDEBUG_TRACE("findHgRoot(" << cur.path << "): hgroot = cur.path");
-        return 1;
+        if (cur.isdir)
+        {
+            std::string p = cur.path;
+            p.push_back('\\');
+            if (p.find(".hg\\") != std::string::npos) 
+            {
+                //TDEBUG_TRACE("findHgRoot: skipping '" << cur.path << "'");
+                last = cur;
+                return 0;
+            }
+        }
+
+        if (cur.isdir && hasHgDir(cur.path))
+        {
+            cur.hgroot = cur.path;
+            TDEBUG_TRACE("findHgRoot(" << cur.path << "): hgroot = cur.path");
+            return 1;
+        }
     }
 
     cur.basedir = DirName(cur.path);
@@ -150,8 +174,6 @@ int HgQueryDirstate(
         return 0;
     }
 
-    cur.isdir = PathIsDirectory(cur.path.c_str());
-
     if (findHgRoot(cur, last, outdated) == 0)
         return 0;
 
@@ -184,81 +206,76 @@ int HgQueryDirstate(
 
     bool unset = false;
 
+    Dirstate* pds = Dirstatecache::get(cur.hgroot, cur.basedir, unset);
+    if (!pds)
+    {
+        TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 
+            << cur.hgroot << ") returns no Dirstate");
+        last = cur;
+        return 0;
+    }
+
+    Winstat stat;
+    if (0 != stat.lstat(path.c_str())) 
+    {
+        TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") failed");
+        last = cur;
+        return 0;
+    }
+    cur.isdir = stat.isdir;
+    TDEBUG_TRACE(
+        "HgQueryDirstate: stat.lstat(\"" << cur.path 
+        << "\") -> stat.isdir is " << stat.isdir
+    );
+
     if (cur.isdir)
     {
-        if (!relpath.empty())
+        if (!relpath.empty() && !pds->root().getdir(relpath))
         {
-            Dirstate* pds2 = Dirstatecache::get(cur.hgroot, cur.basedir, unset);
-            if (pds2 && !pds2->root().getdir(relpath))
-            {
-                last = cur;
-                return 0;  // unknown dir -> no icon
-            }
+            last = cur;
+            return 0;  // unknown dir -> no icon
         }
 
         outStatus = (pdirsta ? pdirsta->status(relpath) : '?');
+        cur.status = outStatus;
+        cur.tickcount = GetTickCount();
+        last = cur;
+        return 1;
     }
-    else
+
+    const Direntry* const e = pds->root().get(relpath);
+    if (!e) 
     {
-        Dirstate* pds = Dirstatecache::get(cur.hgroot, cur.basedir, unset);
-        if (!pds)
+        last = cur;
+        return 0;
+    }
+
+    outStatus = e->status(stat);
+
+    if (outStatus == 'M' && pdirsta)
+    {
+        std::string relbase;
+        if (get_relpath(cur.hgroot, cur.basedir, relbase))
         {
-            TDEBUG_TRACE("HgQueryDirstate: Dirstatecache::get(" 
-                << cur.hgroot << ") returns no Dirstate");
-            last = cur;
-            return 0;
-        }
+            TDEBUG_TRACE("HgQueryDirstate: relbase = '" 
+                << relbase << "'");
 
-        if (filterStatus == 'A' && pds->num_added() == 0) {
-            // don't store QueryState
-            return 0;
-        }
+            char basedir_status = pdirsta->status(relbase);
+            TDEBUG_TRACE("HgQueryDirstate: basedir_status = " 
+                << basedir_status);
 
-        const Direntry* e = pds->root().get(relpath);
-        if (!e) {
-            last = cur;
-            return 0;
-        }
-
-        Winstat stat;
-        if (0 != stat.lstat(path.c_str())) {
-            TDEBUG_TRACE("HgQueryDirstate: lstat(" << path << ") failed");
-            last = cur;
-            return 0;
-        }
-
-        outStatus = e->status(stat);
-
-        if (outStatus == 'M')
-        {
-            DirectoryStatus* dirsst = 
-                DirectoryStatus::get(cur.hgroot, cur.basedir);
-            if (dirsst)
+            if (basedir_status != 'M')
             {
-                std::string relbase;
-                if (get_relpath(cur.hgroot, cur.basedir, relbase))
+                if (unset)
                 {
-                    TDEBUG_TRACE("HgQueryDirstate: relbase = '" 
-                        << relbase << "'");
-
-                    char basedir_status = dirsst->status(relbase);
-                    TDEBUG_TRACE("HgQueryDirstate: basedir_status = " 
-                        << basedir_status);
-
-                    if (basedir_status != 'M')
-                    {
-                        if (unset)
-                        {
-                            TDEBUG_TRACE(
-                                "HgQueryDirstate: omitting Thgstatus::update");
-                        }
-                        else
-                        {
-                            TDEBUG_TRACE(
-                                "HgQueryDirstate: calling Thgstatus::update");
-                            Thgstatus::update(cur.hgroot);
-                        }
-                    }
+                    TDEBUG_TRACE(
+                        "HgQueryDirstate: omitting Thgstatus::update");
+                }
+                else
+                {
+                    TDEBUG_TRACE(
+                        "HgQueryDirstate: calling Thgstatus::update");
+                    Thgstatus::update(cur.hgroot);
                 }
             }
         }
