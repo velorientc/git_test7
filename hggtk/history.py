@@ -123,7 +123,7 @@ class GLog(gdialog.GDialog):
 
     def revisions_loaded(self, graphview):
         'Treeview reports log generator has exited'
-        if not self.graphview.graphdata:
+        if not len(self.graphview.treeview.get_model()):
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
             self.last_rev = None

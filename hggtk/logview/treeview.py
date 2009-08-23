@@ -7,8 +7,7 @@
 
 ''' Mercurial revision DAG visualization library
 
-  Implements a gtk.TreeModel which visualizes a Mercurial repository
-  revision history.
+  Implements a gtk.TreeView
 
 Portions of this code stolen mercilessly from bzr-gtk visualization
 dialog.  Other portions stolen from graphlog extension.
@@ -49,14 +48,8 @@ class TreeView(gtk.ScrolledWindow):
 
         'revision': (gobject.TYPE_PYOBJECT,
                      'Revision',
-                     'The currently selected revision',
+                     'The number of the selected revision',
                      gobject.PARAM_READWRITE),
-
-        'revision-number': (gobject.TYPE_STRING,
-                            'Revision number',
-                            'The number of the selected revision',
-                            '',
-                            gobject.PARAM_READABLE),
 
         'date-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Date',
@@ -116,10 +109,11 @@ class TreeView(gtk.ScrolledWindow):
         self.batchsize = limit
         self.repo = repo
         self.currev = None
-        self.construct_treeview()
         self.pbar = pbar
         self.origtip = None
         self.branch_color = False
+        self.cache = None
+        self.construct_treeview()
 
     def set_repo(self, repo, pbar=None):
         self.repo = repo
@@ -175,11 +169,12 @@ class TreeView(gtk.ScrolledWindow):
         else:
             self.grapher = filtered_log_generator(self.repo, pats, opts)
         self.show_graph = graphcol
-        self.graphdata = []
         self.index = {}
         self.max_cols = 1
-        self.model = None
         self.limit = self.batchsize
+        self.treeview.get_model().clear()
+        self.cache = treemodel.ChangeLogCache(self.repo, self.color_func)
+        self.currev = None
 
     def populate(self, revision=None):
         """Fill the treeview with contents.
@@ -189,17 +184,15 @@ class TreeView(gtk.ScrolledWindow):
             stopped = True
             return False
 
+        model = self.treeview.get_model()
         try:
             for x in xrange(0, 50):
                 (rev, node, lines, parents) = self.grapher.next()
                 self.max_cols = max(self.max_cols, len(lines))
-                self.index[rev] = len(self.graphdata)
-                self.graphdata.append( (rev, node, lines, parents) )
-                if self.model:
-                    rowref = self.model.get_iter(len(self.graphdata)-1)
-                    path = self.model.get_path(rowref) 
-                    self.model.row_inserted(path, rowref) 
-                if self.limit and len(self.graphdata) >= self.limit:
+                self.index[rev] = len(model)
+                row = self.cache.create_row(rev, node, lines)
+                model.append(row)
+                if self.limit and len(model) >= self.limit:
                     break
         except StopIteration:
             stopped = True
@@ -208,20 +201,14 @@ class TreeView(gtk.ScrolledWindow):
             pass
         elif self.limit is None:
             return True
-        elif len(self.graphdata) < self.limit:
+        elif len(model) < self.limit:
             return True
 
-        if not len(self.graphdata):
-            self.treeview.set_model(None)
+        if not len(model):
             if self.pbar is not None:
                 self.pbar.end()
             self.emit('revisions-loaded')
             return False
-
-        if not self.model:
-            self.model = treemodel.TreeModel(self.repo, self.graphdata,
-                    self.color_func)
-            self.treeview.set_model(self.model)
 
         self.graph_cell.columns_len = self.max_cols
         width = self.graph_cell.get_size(self.treeview)[2]
@@ -349,7 +336,7 @@ class TreeView(gtk.ScrolledWindow):
                 self.create_log_generator(graphcol, pats, opts)
                 if self.pbar is not None:
                     self.pbar.begin()
-                gobject.idle_add(self.populate, self.get_revision())
+                gobject.idle_add(self.populate, self.currev)
             else:
                 self.treeview.set_model(None)
                 self.pbar.set_status_text('Repository is empty')
@@ -372,7 +359,21 @@ class TreeView(gtk.ScrolledWindow):
                 self.color_func = self.text_color_orig
 
     def construct_treeview(self):
-        self.treeview = gtk.TreeView()
+        model = gtk.ListStore(
+                    gobject.TYPE_PYOBJECT,  # LINES
+                    gobject.TYPE_PYOBJECT,  # NODE
+                    gobject.TYPE_STRING,    # REVID
+                    gobject.TYPE_PYOBJECT,  # LAST_LINES
+                    gobject.TYPE_STRING,    # MESSAGE
+                    gobject.TYPE_STRING,    # COMMITER
+                    gobject.TYPE_STRING,    # TIMESTAMP
+                    gobject.TYPE_BOOLEAN,   # WCPARENT
+                    gobject.TYPE_STRING,    # TAGS
+                    gobject.TYPE_STRING,    # FGCOLOR
+                    gobject.TYPE_STRING,    # HEXID
+                    gobject.TYPE_STRING,    # UTC
+                    gobject.TYPE_STRING)    # BRANCH
+        self.treeview = gtk.TreeView(model)
         self.treeview.set_rules_hint(True)
         self.treeview.set_reorderable(False)
         self.treeview.set_enable_search(True)
@@ -439,7 +440,7 @@ class TreeView(gtk.ScrolledWindow):
         self.branch_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.branch_column.pack_start(cell, expand=True)
         self.branch_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.branch_column.add_attribute(cell, "markup", treemodel.BRANCHES)
+        self.branch_column.add_attribute(cell, "markup", treemodel.BRANCH)
         self.treeview.append_column(self.branch_column)
         cell = gtk.CellRendererText()
 
@@ -496,17 +497,7 @@ class TreeView(gtk.ScrolledWindow):
     def text_color_orig(self, parents, rev, author):
         if self.origtip is not None and int(rev) >= self.origtip:
             return 'darkgreen'
-        if len(parents) == 2:
-            # mark merge changesets blue
-            return 'blue'
-        elif len(parents) == 1:
-            # detect non-trivial parent
-            if long(rev) != parents[0]+1:
-                return '#900000'
-            else:
-                return 'black'
-        else:
-            return 'black'
+        return 'black'
 
     colors = '''black blue deeppink mediumorchid blue burlywood4 goldenrod
      slateblue red2 navy dimgrey'''.split()
@@ -525,9 +516,9 @@ class TreeView(gtk.ScrolledWindow):
 
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
+        model = treeview.get_model()
         (path, focus) = treeview.get_cursor()
-        if path is not None and self.model is not None:
-            iter = self.model.get_iter(path)
-            self.currev = self.model.get_value(iter, treemodel.REVISION)
+        if path is not None:
+            iter = model.get_iter(path)
+            self.currev = model[iter]
             self.emit('revision-selected')
-
