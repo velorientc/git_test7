@@ -88,6 +88,7 @@ class TaskBarUI(gtk.Window):
         self.submlist = list = gtk.TreeView(model)
         list.set_size_request(-1, 180)
         list.set_headers_visible(False)
+        list.connect('row-activated', self.row_activated, apply)
         column = gtk.TreeViewColumn()
         list.append_column(column)
         cell = gtk.CellRendererText()
@@ -106,6 +107,7 @@ class TaskBarUI(gtk.Window):
         self.topmlist = list = gtk.TreeView(model)
         list.set_size_request(-1, 180)
         list.set_headers_visible(False)
+        list.connect('row-activated', self.row_activated, apply)
         column = gtk.TreeViewColumn()
         list.append_column(column)
         cell = gtk.CellRendererText()
@@ -124,9 +126,6 @@ class TaskBarUI(gtk.Window):
         subbutton.connect('clicked', self.sub_clicked, apply)
         mbbox.add(subbutton)
 
-        # Tooltips
-        tips = gtk.Tooltips()
-
         ## Taskbar group
         taskbarframe = gtk.Frame(_('Taskbar'))
         taskbarframe.set_border_width(2)
@@ -137,6 +136,9 @@ class TaskBarUI(gtk.Window):
         taskbarbox.pack_start(hbox, False, False, 2)
         self.hgighlight_taskbaricon = gtk.CheckButton(_('Highlight Icon'))
         hbox.pack_start(self.hgighlight_taskbaricon, False, False, 2)        
+
+        # Tooltips
+        tips = gtk.Tooltips()
 
         tooltip = _('Enable/Disable the overlay icons globally')
         tips.set_tip(self.ovenable, tooltip)
@@ -275,6 +277,19 @@ class TaskBarUI(gtk.Window):
             SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
         except ImportError:
             pass
+
+    def row_activated(self, list, path, column, apply):
+        if list == self.submlist:
+            other = self.topmlist.get_model()
+        else:
+            other = self.submlist.get_model()
+        model = list.get_model()
+        cmd, label = model[path]
+        model.remove(model.get_iter(path))
+        other.append((cmd, label))
+        other.set_sort_column_id(1, gtk.SORT_ASCENDING)
+        apply.set_sensitive(True)
+
     def sub_clicked(self, button, apply):
         model, paths = self.topmlist.get_selection().get_selected_rows()
         for path in paths:
