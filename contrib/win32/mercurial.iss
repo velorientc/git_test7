@@ -18,7 +18,6 @@ AppSupportURL=http://bitbucket.org/tortoisehg/stable/
 AppUpdatesURL=http://bitbucket.org/tortoisehg/stable/
 AppID=TortoiseHg
 AppContact=Steve Borho <steve@borho.org>
-AppMutex=thgtaskbar,Global\thgtaskbar
 OutputBaseFilename=TortoiseHg-{#VERSION}
 DefaultDirName={pf}\TortoiseHg
 SourceDir=..\..
@@ -106,6 +105,9 @@ Root: HKLM; Subkey: Software\TortoiseHg; Flags: uninsdeletekey; ValueData: {app}
 Root: HKLM; Subkey: Software\Mercurial; Flags: uninsdeletekey; ValueData: {app}\Mercurial.ini
 
 [Code]
+const
+  wm_Close = $0010;
+
 procedure FileExpandString(fn: String);
 var
     InFile: String;
@@ -133,7 +135,7 @@ var
  msg: String;
  CRLF: String;
 begin
- CRLF := chr(10) + chr(13);
+ CRLF := Chr(10) + Chr(13);
  Result := True;
 
  {abort installation if TortoiseHg 0.7 or earlier is installed}
@@ -168,5 +170,25 @@ begin
       Result := False; 
   end; 
 end; 
+
+function PrepareToInstall: String;
+var
+  TaskbarWindow: HWND;
+  TaskbarMutex: String;
+begin
+  { Shut down the system tray if it is running }
+  TaskbarMutex := 'thgtaskbar,Global\thgtaskbar';
+  if CheckForMutexes(TaskbarMutex) then
+  begin
+    Result := 'The installer was unable to shut down TortoiseHg, and will now close.';
+    TaskbarWindow := FindWindowByWindowName('TortoiseHg RPC server');
+    if TaskbarWindow <> 0 then
+    begin
+      SendMessage(TaskbarWindow, wm_Close, 0, 0);
+      if not CheckForMutexes(TaskbarMutex) then
+        Result := '';
+    end;
+  end else Result := '';
+end;  
 
 #include "registry.iss"
