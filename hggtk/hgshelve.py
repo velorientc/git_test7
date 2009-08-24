@@ -41,7 +41,7 @@ def internalpatch(patchobj, ui, strip, cwd, reverse=False, files={}):
         os.chdir(cwd)
     try:
         ret = patch.applydiff(ui, fp, files, strip=strip,
-                              reverse=reverse)
+                              reverse=reverse, eol=ui.config('patch', 'eol'))
     finally:
         if cwd:
             os.chdir(curdir)
