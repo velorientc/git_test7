@@ -384,7 +384,8 @@ class GStatus(gdialog.GDialog):
             difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             difftree.set_headers_visible(False)
             difftree.set_enable_search(False)
-            difftree.set_property('enable-grid-lines', True)
+            if getattr(difftree, 'enable-grid-lines', None) is not None:
+                difftree.set_property('enable-grid-lines', True)
             difftree.connect('row-activated', self.diff_tree_row_act)
 
             cell = gtk.CellRendererText()
@@ -511,8 +512,9 @@ class GStatus(gdialog.GDialog):
     def thgdiff(self, treeview):
         selection = treeview.get_selection()
         model, tpaths = selection.get_selected_rows()
-        row = model[tpaths[0]]
-        self._diff_file(row[FM_STATUS], row[FM_PATH])
+        if tpaths:
+            row = model[tpaths[0]]
+            self._diff_file(row[FM_STATUS], row[FM_PATH])
 
     def thgrefresh(self, window):
         self.reload_status()
@@ -585,6 +587,7 @@ class GStatus(gdialog.GDialog):
         # List of the currently checked and selected files to pass on to
         # the new data
         model, tpaths = selection.get_selected_rows()
+        model = self.filemodel
         reselect = [model[path][FM_PATH] for path in tpaths]
         waschecked = {}
         for row in model:
@@ -1294,8 +1297,9 @@ class GStatus(gdialog.GDialog):
         assert(selection.count_selected_rows() == 1)
 
         model, tpaths = selection.get_selected_rows()
-        path = tpaths[0]
-        handler(model[path][FM_STATUS], model[path][FM_PATH])
+        if tpaths:
+            path = tpaths[0]
+            handler(model[path][FM_STATUS], model[path][FM_PATH])
         return True
 
 
@@ -1333,8 +1337,9 @@ class GStatus(gdialog.GDialog):
             return False
 
         model, tpaths = selection.get_selected_rows()
-        menu = self.get_file_context_menu(model[tpaths[0]])
-        menu.popup(None, None, None, button, time)
+        if tpaths:
+            menu = self.get_file_context_menu(model[tpaths[0]])
+            menu.popup(None, None, None, button, time)
         return True
 
 
@@ -1365,8 +1370,9 @@ class GStatus(gdialog.GDialog):
             return False
 
         model, tpaths = selection.get_selected_rows()
-        menu = self.get_file_context_menu(model[tpaths[0]])
-        menu.get_children()[0].activate()
+        if tpaths:
+            menu = self.get_file_context_menu(model[tpaths[0]])
+            menu.get_children()[0].activate()
         return True
 
 def run(ui, *pats, **opts):
