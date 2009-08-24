@@ -73,7 +73,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ascent = pango.PIXELS(metrics.get_ascent())
             descent = pango.PIXELS(metrics.get_descent())
 
-            self._box_size = ascent + descent + 6
+            self._box_size = ascent + descent
             return self._box_size
 
     def set_colour(self, ctx, colour, bg, fg):
