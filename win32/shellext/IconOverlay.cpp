@@ -45,7 +45,7 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
        filterStatus = 'A';
 
     char status = 0;
-    if (!HgQueryDirstate(path, filterStatus, status))
+    if (!HgQueryDirstate(myTortoiseClass, path, filterStatus, status))
         return S_FALSE;
 
     if (status == myTortoiseClass)

@@ -4,6 +4,10 @@
 #include <string>
 
 int HgQueryDirstate(
-    const std::string& path, const char& filterStatus, char& outStatus);
+    const char myClass,
+    const std::string& path,
+    const char& filterStatus, 
+    char& outStatus
+);
 
 #endif
