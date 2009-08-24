@@ -319,7 +319,8 @@ class GStatus(gdialog.GDialog):
             difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
             difftree.set_headers_visible(False)
             difftree.set_enable_search(False)
-            difftree.set_property('enable-grid-lines', True)
+            if getattr(difftree, 'enable-grid-lines', None) is not None:
+                difftree.set_property('enable-grid-lines', True)
             difftree.connect('row-activated', self.diff_tree_row_act)
 
             cell = gtk.CellRendererText()
@@ -540,6 +541,7 @@ class GStatus(gdialog.GDialog):
         # List of the currently checked and selected files to pass on to
         # the new data
         model, tpaths = selection.get_selected_rows()
+        model = self.filemodel
         reselect = [model[path][FM_PATH] for path in tpaths]
         waschecked = {}
         for row in model:
