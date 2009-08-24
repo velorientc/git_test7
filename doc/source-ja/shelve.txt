@@ -1,156 +1,148 @@
-Shelve
-======
+シェルフ
+========
 
 .. module:: shelve.dialog
 	:synopsis: Dialog used to perform shelve/unshelve operations
 
 .. warning::
-	The win32text extension can cause trouble with hunk selection.  This
-	has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
-	proper configuration. See
-	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
+	win32text 拡張機能はハンク選択で問題を引き起こす可能性があります。この問題は
+	Mercurial 1.3 と TortoiseHg 0.8 において解決されましたが、適切な設定が
+	必要です。詳しくは
+	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_
+	をご覧ください。
 
-The purpose of this dialog is to allow the user to *shelve* selected changes
-from the working directory, store them in a special patch file within the
-repository, and then *unshelve* them back at a later time.
+このダイアログは作業ディレクトリにおける変更点のうち、必要な部分のみを選択して *シェルフ*
+(一時的に別の場所に保管しておく) するために使います。シェルフした変更点は特別なパッチとして
+リポジトリに格納され、いつでもその変更点を作業ディレクトリに戻すことができます。
 
 .. figure:: figures/shelve.png
-	:alt: Shelve dialog
+	:alt: シェルフダイアログ
 
-	Shelve dialog
+	シェルフダイアログ
 
-Walking across the toolbar buttons:
+ツールバーボタンを左から順に見ていきます：
 
-	:guilabel:`Refresh`
-		Reload the state of the working directory. It tries to retain
-		check and selection state across refresh.
-	:guilabel:`Shelve` 
-		Shelve selected diffs in checked files.
-	:guilabel:`Unshelve`
-		Replace the shelved changes back into the working directory.
-	:guilabel:`Revert`
-		Revert checked files to last revisioned state.  If merging, it
-		allows you to select the revert parent.
-	:guilabel:`Add`
-		Add checked files that were in unknown '?' or ignored 'I' state.
-	:guilabel:`Move`
-		Move checked files to specified target directory in versioned
-		manner.
-	:guilabel:`Remove`
-		Delete checked unversioned files and/or remove (mark as deleted) any
-		versioned files.
+	:guilabel:`再読み込み`
+		作業ディレクトリの状態を再読み込みします。
+		再読み込み後もチェックボックスの選択状態は保たれます。
+	:guilabel:`シェルフ` 
+		チェックされたファイルの選択されたハンクをシェルフします。
+	:guilabel:`シェルフから戻す`
+		シェルフされた変更点を作業ディレクトリに戻します。
+	:guilabel:`元に戻す`
+		チェックされているファイルを変更を加える前の状態に戻します。
+		その変更がマージの場合はどちらの親リビジョンに戻すか選択できます。
+	:guilabel:`追加`
+		チェックされている不明ファイル '?' または無視ファイル 'I' を追加します。
+	:guilabel:`移動`
+		チェックされているファイルを指定されたディレクトリに移動します。
+	:guilabel:`削除`
+		チェックされているファイルを削除します。
 
-The file list has four columns:
+ファイル一覧には4つの列があります：
 
-	1) A checkbox that indicates whether the file is selected for an
-	   operation.  The toolbar buttons only operate on checked files.
-	   "Partially" selected files have a special check state.  This
-	   column header is checkable, it will toggle the file selection
-	   states.
-	2) The :guilabel:`st` column holds the status of the file, defined
-	   by Mercurial's status command, one of 'MARD?IC'.
-	3) The :guilabel:`ms` column holds the merge state of the file,
-	   defined by Mercurial's resolve command, one of ' RU'.
-	4) The canonical path of the file (relative to the repository root)
+	1)	各種操作のためにそのファイルが選択されているかどうかを示すチェックボックス。
+		ツールバーボタンによる操作はチェックされているファイルにのみ行なわれます。
+		部分選択状態のファイルについては特殊なチェック状態となります。
+		この列のヘッダを使えば全てのファイルをチェックしたりチェックを外したりできます。
+	2)	:guilabel:`状態` 列には Mercurial の status コマンドで使用されている
+		ファイル状態を示す 'MARD?IC' のうちの1つが表示されます。
+	3)	:guilabel:`マージ` 列はそのファイルのマージ状態を示しており、Mercurial の
+		resolve コマンドで使用されている ' RU' のうちどれか1つが表示されます。
+	4)	リポジトリルートを基準としたファイルパスが表示されます。
 
-Below the file list are checkboxes that toggle the display of the
-various classes of files {modified, added, removed, deleted, unknown,
-clean, ignored}.  These check boxes will be disabled if the commit tool
-was given a specific set of files and/or directories.
+ファイル一覧の下に並んだチェックボックスは {変更, 追加, 削除, 削除, 不明, クリーン, 無視}
+のファイル状態ごとにファイル一覧に表示するかどうかを設定できます。
+このチェックボックスはコミットツールからファイルまたはディレクトリを指定された場合には
+無効になります。
 
 
-Shelving Changes
-----------------
+変更点をシェルフする
+--------------------
 
-Just like the commit tool, this dialog uses TortoiseHg's integrated hunk
-selection code to allow the user to select the files and change hunks to
-move to the shelf.  When you press the shelve button, the selected
-changes are removed from the working directory and placed in a patch
-file. If the shelf already had changes in it, you will be asked whether
-to replace those changes or to merge these new changes into it.  When
-the shelf has changes, the unshelve button will be active.
+このダイアログはコミットツールのように TortoiseHg のハンク選択機能を採用しており、
+シェルフに移動したいファイルおよび変更点をユーザが選択できます。シェルフボタンを
+押すと、選択された変更点が作業ディレクトリから削除され、パッチファイルとして保存されます。
+既にシェルフされた変更点が存在する場合はその変更点と置き換えるか、もしくは新しい変更点を
+それにマージするか尋ねられます。シェルフに変更点があるときのみシェルフから戻すボタンが
+有効になります。
 
 
-Unshelving Changes
-------------------
+シェルフした変更点を戻す
+------------------------
 
-When the unshelve button is pressed, the shelved changes are reapplied
-to the working directory.
+シェルフから戻すボタンが押されると、シェルフした変更点が作業ディレクトリに再適用されます。
 
 .. note::
-	The unshelved changes will appear as working directory modifications
-	when the shelve tool refreshes it's view of the repository.
+	シェルフから戻した後、シェルフツールを再読み込みすると、シェルフから戻された変更点は
+	作業ディレクトリへの変更として表示されます。
 
-How is this different from record/commit?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+record/commit とはどう違うのか？
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Shelved changes are physically removed from the working directory until
-you unshelve them.  This means you can build your project and run tests
-on it while the shelved changes are gone.  This is safer than selecting
-changes at build time since you can test whether the change being
-committed is valid.
+シェルフされた変更点はそれが戻されるまで実際に作業ディレクトリから取り除かれます。
+これはシェルフされている状態でもプロジェクトをビルドしたり、テストを実行したり
+できることを意味しています。コミットされた変更点が有効かどうか試すことができるので、
+ビルド時に変更点を選択するより安全と言えます。
 
-Shelving changes is also useful for removing partially completed work to
-make sure it doesn't interfere with the debugging of other changes you
-are making.
+変更点をシェルフすることは完成した作業結果からデバッグ用コードを取り除くこどで動作に
+影響がないか確かめるのに便利です。
 
-Caveat: the shelved changes are stored in a patch that is based on the
-current working directory contents. There's no guarantee that the patch
-can be cleanly reapplied later if the shelved changes conflict with
-changes made to your code after the shelving.
+注意：シェルフされた変更点は作業ディレクトリの内容を基準としたパッチに保管されます。
+そのためもしシェルフ後の変更と衝突を起こした場合、そのパッチがキレイに再適用できる
+という保証はありません。
 
-How is this different from MQ?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+MQ とはどう違うのか？
+^^^^^^^^^^^^^^^^^^^^^
 
-The shelf can be considered a single unnamed MQ patch that is never
-converted into a changeset.
+シェルフはチェンジセットに変換されない単一の無名 MQ パッチと見なすことができます。
 
-The shelve tool can be useful when maintaining a patch queue.
-The shelf can take changes from one patch and re-apply them to another
-patch (or an entirely new patch).
+しかしシェルフツールは MQ でパッチを管理していても便利に使えます。
+シェルフは MQ のパッチから変更点の一部を取得し、それらを別の MQ パッチ
+(または完全に新しいパッチ) に再適用できます。
 
-For example:
-	1) Push to a patch you would like to split up
-	2) Open the shelve tool, the top patch changes will be selectable
-	3) Unselect change hunks you want to leave in the patch, then press
-	   :guilabel:`Shelve`
-	4) Refresh top patch using :command:`hg qrefresh`, or use commit tool
-	5) Push or pop to the patch you want to apply shelved patches
-	6) Open the shelve tool and press :guilabel:`Unshelve`
-	7) Refresh top patch (repeat step 4)
+例えば：
+	1)	分割したいパッチに変更をプッシュする
+	2)	シェルフツールを開く (最上位のパッチがハンク選択可能になる)
+	3)	そのパッチに残したいハンクの選択を解除して、 :guilabel:`シェルフ` ボタンを押す
+	4)	コマンドラインから :command:`hg qrefresh` するかコミットツールの
+		:guilabel:`QRefresh` ボタンで最上位のパッチを更新する
+	5)	:command:`qpush` または :command:`qpop` してシェルフした変更を適用したい
+		パッチに移動する
+	6)	シェルフツールを開いて :guilabel:`シェルフから戻す` ボタンを押す
+	7)	最上位のパッチを更新する (手順4に戻る)
 
-How is this different from attic?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+attic 拡張機能とはどう違うのか？
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The attic extension is a super-set of the shelve feature. In particular,
-attic allows you to have several named *shelves* which can be saved and
-restored independently.
+attic 拡張機能はシェルフ機能の上位版です。具体的には attic は独立した複数の名前付き
+*シェルフ* を保持することができます。
 
 
-Keyboard navigation
--------------------
+キーボードショートカット
+------------------------
 
 :guilabel:`Ctrl-C`
-    in the diff panel will copy the currently highlighted (not selected,
-    but highlighted) diff hunks to the clipboard. These can be pasted
-    into a text buffer to generate any arbitrary patch based from the
-    changes in your working directory.
+	差分表示パネルで現在ハイライト (選択ではない) されているハンクをクリップボードに
+	コピーします。コピーしたハンクをテキストエディタに貼り付ければ、作業ディレクトリに
+	おける変更点から任意のパッチを作り出すのに使えます。
 
-The code which copies the hunks to the clipboard is intelligent about
-diff headers.  The clipboard contents will always be a valid patch.
+クリップボードにコピーされたハンクは差分ヘッダが付加されるため、クリップボードの内容は
+常に有効なパッチとして利用できます。
 
 
-Configurables
--------------
+オプション設定
+--------------
 
-* :menuselection:`TortoiseHg --> Bottom Diffs`
-* :menuselection:`TortoiseHg --> Tab Width`
-* :menuselection:`TortoiseHg --> Max Diff Size`
+* :menuselection:`TortoiseHg --> 差分を画面下部に表示`
+* :menuselection:`TortoiseHg --> タブ文字の幅`
+* :menuselection:`TortoiseHg --> 最大差分サイズ`
 
-From command line
------------------
 
-The shelve tool can be started from command line::
+コマンドラインからの実行
+------------------------
+
+シェルフツールはコマンドラインから起動することもできます： ::
 
 	hgtk shelve
 
