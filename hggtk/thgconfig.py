@@ -347,7 +347,7 @@ class PathEditDialog(gtk.Dialog):
         # other entries
         for n, (e, l, h) in self.entries.iteritems():
             if enable:
-                handler = self.changedurl if n == 'URL' else self.changed
+                handler = (n == 'URL' and self.changedurl or self.changed)
                 self.entries[n][2] = e.connect('changed', handler)
             else:
                 if e.handler_is_connected(h):
