@@ -452,7 +452,7 @@ class PathEditDialog(gtk.Dialog):
         aliasinput = self.entries['Alias'][0]
         newalias = aliasinput.get_text()
         if newalias == '':
-            ret = dialog.error_dialog(self, _('Alias name is empry'),
+            ret = dialog.error_dialog(self, _('Alias name is empty'),
                     _('Please enter alias name'))
             aliasinput.grab_focus()
             return
