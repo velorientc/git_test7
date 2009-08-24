@@ -41,20 +41,14 @@ STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
         return S_FALSE;
 
     char filterStatus = 0;
-    if (myTortoiseClass == TORTOISE_OLE_ADDED)
+    if (myTortoiseClass == 'A')
        filterStatus = 'A';
-    
+
     char status = 0;
     if (!HgQueryDirstate(path, filterStatus, status))
         return S_FALSE;
 
-    if (myTortoiseClass == TORTOISE_OLE_ADDED && status == 'A')
-        return S_OK;
-    else if (myTortoiseClass == TORTOISE_OLE_MODIFIED && status == 'M')
-        return S_OK;
-    else if (myTortoiseClass == TORTOISE_OLE_UNCHANGED && status == 'C')
-        return S_OK;
-    else if (myTortoiseClass == TORTOISE_OLE_NOTINREPO && status == '?')
+    if (status == myTortoiseClass)
         return S_OK;
 
     return S_FALSE;

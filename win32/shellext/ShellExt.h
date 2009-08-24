@@ -5,25 +5,14 @@
 #include <string>
 
 
-enum TortoiseOLEClass
-{
-   TORTOISE_OLE_INVALID,
-   TORTOISE_OLE_ADDED,
-   TORTOISE_OLE_MODIFIED,
-   TORTOISE_OLE_UNCHANGED,
-   TORTOISE_OLE_IGNORED,
-   TORTOISE_OLE_NOTINREPO,
-};
-
-
 class CDllRegSxClassFactory: public IClassFactory
 {
     protected:
         ULONG m_cRef;
-        TortoiseOLEClass myclassToMake;
+        const char myclassToMake;
 
     public:
-        CDllRegSxClassFactory(TortoiseOLEClass);
+        explicit CDllRegSxClassFactory(char classToMake);
         ~CDllRegSxClassFactory();
 
         static LPCRITICAL_SECTION GetCriticalSection();
@@ -42,7 +31,7 @@ typedef CDllRegSxClassFactory* LPCSHELLEXTCLASSFACTORY;
 class CShellExt: 
     public IContextMenu3, IShellIconOverlayIdentifier, IShellExtInit
 {
-    TortoiseOLEClass myTortoiseClass;
+    const char myTortoiseClass;
     
     protected:
         ULONG m_cRef;
@@ -57,7 +46,7 @@ class CShellExt:
     public:
         static LPCRITICAL_SECTION GetCriticalSection();
 
-        CShellExt(TortoiseOLEClass);
+        explicit CShellExt(char Class);
         ~CShellExt();
 
         // IUnknown

@@ -78,7 +78,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     if (IsEqualIID(rclsid, CLSID_TortoiseHg0))
     {
         CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory(TORTOISE_OLE_UNCHANGED);
+            new CDllRegSxClassFactory('C');  // clean
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg0");
         ++InitStatus::inst().unchanged_;
         return pcf->QueryInterface(riid, ppvOut);
@@ -86,7 +86,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg1))
     {
         CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory(TORTOISE_OLE_ADDED);
+            new CDllRegSxClassFactory('A');  // added
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg1");
         ++InitStatus::inst().added_;
         return pcf->QueryInterface(riid, ppvOut);
@@ -94,7 +94,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg2))
     {
         CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory(TORTOISE_OLE_MODIFIED);
+            new CDllRegSxClassFactory('M');   // modified
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
         ++InitStatus::inst().modified_;
         return pcf->QueryInterface(riid, ppvOut);
@@ -102,7 +102,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg6))
     {
         CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory(TORTOISE_OLE_NOTINREPO);
+            new CDllRegSxClassFactory('?');   // not in repo
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
         ++InitStatus::inst().notinrepo_;
         return pcf->QueryInterface(riid, ppvOut);
@@ -130,12 +130,12 @@ LPCRITICAL_SECTION CDllRegSxClassFactory::GetCriticalSection()
 }
 
 
-CDllRegSxClassFactory::CDllRegSxClassFactory(TortoiseOLEClass classToMake)
+CDllRegSxClassFactory::CDllRegSxClassFactory(char classToMake) :
+    myclassToMake(classToMake)
 {
     ThgCriticalSection cs(GetCriticalSection());
     m_cRef = 0L;
     g_cRefThisDll++;
-    myclassToMake = classToMake;
 }
 
 
@@ -202,12 +202,12 @@ STDMETHODIMP CDllRegSxClassFactory::LockServer(BOOL fLock)
 }
 
 
-CShellExt::CShellExt(TortoiseOLEClass tortoiseClass)
-    : m_ppszFileUserClickedOn(0)
+CShellExt::CShellExt(char tortoiseClass) :
+    myTortoiseClass(tortoiseClass), 
+    m_ppszFileUserClickedOn(0)
 {
     ThgCriticalSection cs(GetCriticalSection());
 
-    myTortoiseClass = tortoiseClass;
     m_cRef = 0L;
     m_pDataObj = NULL;
 
