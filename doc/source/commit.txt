@@ -113,7 +113,7 @@ Change Selection
 
 So what does it mean when we say the commit button will commit the
 selected diffs in checked files? Simple, the native TortoiseHg commit
-tool supports change selection instrinsically in the diff browser. This
+tool supports change selection intrinsically in the diff browser. This
 means that all of the changes you make to versioned files can be
 individually selected to be included in the commit or left out of the
 commit (but left in the working directory).  Fans of darcs or
@@ -126,7 +126,7 @@ When you have more than a single coherent change in your source code and
 you would like to commit your changes piecemeal.  This can often be
 accomplished by filtering the list of files in each commit, but there
 will be times when your changes intermingle in the same set of files and
-that is when this change selection feature becomes indespensable.
+that is when this change selection feature becomes indispensable.
 
 How does it work?
 ^^^^^^^^^^^^^^^^^
@@ -258,7 +258,7 @@ has these two configurables for commit message policy:
 
 	:guilabel:`Summary Line Length`:
 		Maximum length of the commit message summary line.  If set,
-		TortoiseHG will issue a warning if the summary line is too long
+		TortoiseHg will issue a warning if the summary line is too long
 		or not separated by a blank line. Default: 0 (unenforced)
 	:guilabel:`Message Line Length`:
 		Word wrap length of the commit message.  If set, the popup menu
@@ -378,7 +378,7 @@ Changes since 0.7
   filenames, and configuring/applying a layout format.
 * :guilabel:`Ctrl-O` keyboard accelerator for triggering commit has been
   replaced with :guilabel:`Ctrl-Enter` accelerator which is common to
-  many THG dialogs
+  many TortoiseHg dialogs
 * Support for two-parent state (merging) has been improved, especially
   the file context menus.
 * There is now a limit on the size of files that will be diffed by the commit
@@ -386,7 +386,7 @@ Changes since 0.7
   indicating why the file was not diffed.  This limit (default: 1MB) is
   configurable (per-repository if necessary) via the settings dialog
   :menuselection:`TortoiseHg --> Max Diff Size`.
-* You can specify the commiter and date via the command line: see
+* You can specify the committer and date via the command line: see
   :command:`hgtk commit -h` for details
 * The :file:`qct.py` extension file is no longer bundled. It must be
   downloaded separately if you wish to use Qct.
