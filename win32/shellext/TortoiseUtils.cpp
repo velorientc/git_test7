@@ -300,3 +300,21 @@ int GetRegSZValue(HKEY hkey, const char* name, std::string& res)
     return 0;
 }
 
+// true if a starts with b
+bool StartsWith(const std::string& a, const std::string& b)
+{
+    if (a.empty() || b.empty())
+        return false;
+
+    if (b.size() > a.size())
+        return false;
+
+    for (std::string::size_type i = 0; i < b.size(); ++i)
+    {
+        if (a[i] != b[i])
+            return false;
+    }
+
+    return true;
+}
+

@@ -24,5 +24,6 @@ bool IsHgRepo(const std::string& path);
 int GetRegistryConfig(const std::string& name, std::string& res);
 FILE* fopenReadRenameAllowed(const char* path);
 int GetRegSZValue(HKEY hkey, const char* name, std::string& res);
+bool StartsWith(const std::string& a, const std::string& b);
 
 #endif
