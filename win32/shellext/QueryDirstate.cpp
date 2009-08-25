@@ -78,7 +78,7 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
 
     if (!outdated && !last.hgroot.empty() 
         && cur.path.size() >= last.hgroot.size()
-        && cur.path.find(last.hgroot + "\\") == 0)
+        && StartsWith(cur.path, last.hgroot + "\\"))
     {
         cur.hgroot = last.hgroot;
         return 1;
