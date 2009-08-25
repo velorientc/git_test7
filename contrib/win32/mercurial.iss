@@ -52,8 +52,8 @@ Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags:
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
-Source: ..\contrib\*.exe; DestDir: {app}; Flags: external skipifsourcedoesntexist
-Source: ..\contrib\*.dll; DestDir: {app}; Flags: external skipifsourcedoesntexist
+Source: ..\contrib\*.exe; DestDir: {app}; Flags:
+Source: ..\contrib\*.dll; DestDir: {app}; Flags:
 Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
 Source: contrib\refreshicons.cmd; DestDir: {app}/contrib
 Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
