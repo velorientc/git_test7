@@ -65,23 +65,23 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
 {
     std::string dp = "["; dp += cls; dp += "] findHgRoot"; 
 
+    {
+        std::string p = cur.path;
+        p.push_back('\\');
+        if (p.find("\\.hg\\") != std::string::npos) 
+        {
+            // ignore files and dirs named '.hg'
+            last = cur;
+            return 0;
+        }
+    }
+
     if (!PathIsNetworkPath(cur.path.c_str()))
     {
         cur.isdir = PathIsDirectory(cur.path.c_str());
         TDEBUG_TRACE(
             dp << ": PathIsDirectory(\"" << cur.path << "\") -> " << cur.isdir
         );
-
-        if (cur.isdir)
-        {
-            std::string p = cur.path;
-            p.push_back('\\');
-            if (p.find(".hg\\") != std::string::npos) 
-            {
-                last = cur;
-                return 0;
-            }
-        }
 
         if (cur.isdir && hasHgDir(cls, cur.path))
         {
