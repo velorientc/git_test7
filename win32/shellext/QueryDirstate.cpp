@@ -76,19 +76,11 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
         }
     }
 
-    if (!PathIsNetworkPath(cur.path.c_str()))
+    if (!PathIsNetworkPath(cur.path.c_str()) && hasHgDir(cls, cur.path))
     {
-        cur.isdir = PathIsDirectory(cur.path.c_str());
-        TDEBUG_TRACE(
-            dp << ": PathIsDirectory(\"" << cur.path << "\") -> " << cur.isdir
-        );
-
-        if (cur.isdir && hasHgDir(cls, cur.path))
-        {
-            cur.hgroot = cur.path;
-            TDEBUG_TRACE(dp << "(" << cur.path << "): hgroot = cur.path");
-            return 1;
-        }
+        cur.hgroot = cur.path;
+        TDEBUG_TRACE(dp << "(" << cur.path << "): hgroot = cur.path");
+        return 1;
     }
 
     cur.basedir = DirName(cur.path);
