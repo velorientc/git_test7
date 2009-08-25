@@ -176,13 +176,11 @@ class DataMineDialog(gdialog.GDialog):
         if rev in self.changedesc:
             return self.changedesc[rev]
         ctx = self.repo[rev]
-        author = util.shortuser(ctx.user())
-        summary = ctx.description().replace('\0', '')
-        summary = hglib.toutf(summary.split('\n')[0])
-        summary = gtklib.markup_escape_text(summary)
-        date = hglib.displaytime(ctx.date())
-        desc = hglib.toutf(author+'@'+str(rev)+' '+date+' "') + summary + '"'
-        author = hglib.toutf(author)
+        author = hglib.toutf(util.shortuser(ctx.user()))
+        date = hglib.toutf(hglib.displaytime(ctx.date()))
+        summary = gtklib.markup_escape_text(hglib.toutf(hglib.tounicode(
+                ctx.description()).replace(u'\0', '').splitlines()[0]))
+        desc = '%s@%s %s "%s"' % (author, rev, date, summary)
         self.changedesc[rev] = (desc, author)
         return (desc, author)
 
