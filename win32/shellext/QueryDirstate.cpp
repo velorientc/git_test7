@@ -207,6 +207,15 @@ int HgQueryDirstate(
         return 0;
     }
 
+    if (relpath.empty())
+    {
+        outStatus = (pdirsta ? pdirsta->status(relpath) : '?');
+        cur.status = outStatus;
+        cur.tickcount = ::GetTickCount();
+        last = cur;
+        return 1;
+    }
+
     bool unset = false;
 
     Dirstate* pds = Dirstatecache::get(cur.hgroot, cur.basedir, unset);
