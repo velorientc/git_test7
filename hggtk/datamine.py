@@ -16,7 +16,7 @@ import re
 from mercurial import util
 
 from thgutil.i18n import _
-from thgutil.hglib import *
+from thgutil import hglib
 from thgutil import thread2
 
 from hggtk.logview import treemodel
@@ -35,7 +35,7 @@ class DataMineDialog(gdialog.GDialog):
     COL_LINENUM = 6
 
     def get_title(self):
-        return _('DataMining') + ' - ' + toutf(os.path.basename(self.repo.root))
+        return _('DataMining') + ' - ' + hglib.toutf(os.path.basename(self.repo.root))
 
     def get_icon(self):
         return 'menurepobrowse.ico'
@@ -76,7 +76,7 @@ class DataMineDialog(gdialog.GDialog):
     def load_settings(self, settings):
         gdialog.GDialog.load_settings(self, settings)
         self.connect('thg-close', self.close_current_page)
-        self.tabwidth = gettabwidth(self.ui)
+        self.tabwidth = hglib.gettabwidth(self.ui)
 
     def get_body(self):
         """ Initialize the Dialog. """
@@ -178,11 +178,11 @@ class DataMineDialog(gdialog.GDialog):
         ctx = self.repo[rev]
         author = util.shortuser(ctx.user())
         summary = ctx.description().replace('\0', '')
-        summary = toutf(summary.split('\n')[0])
+        summary = hglib.toutf(summary.split('\n')[0])
         summary = gtklib.markup_escape_text(summary)
-        date = displaytime(ctx.date())
-        desc = toutf(author+'@'+str(rev)+' '+date+' "') + summary + '"'
-        author = toutf(author)
+        date = hglib.displaytime(ctx.date())
+        desc = hglib.toutf(author+'@'+str(rev)+' '+date+' "') + summary + '"'
+        author = hglib.toutf(author)
         self.changedesc[rev] = (desc, author)
         return (desc, author)
 
@@ -360,7 +360,7 @@ class DataMineDialog(gdialog.GDialog):
 
         def threadfunc(path, q, *args):
             try:
-                hgcmd_toq(path, q, *args)
+                hglib.hgcmd_toq(path, q, *args)
             except util.Abort, e:
                 self.stbar.set_status_text(_('Abort: %s') % str(e))
 
@@ -399,7 +399,7 @@ class DataMineDialog(gdialog.GDialog):
             tip, user = self.get_rev_desc(long(revid))
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, toutf(text[:512]), tip, toutf(path)))
+            model.append((revid, hglib.toutf(text[:512]), tip, hglib.toutf(path)))
         if thread.isAlive():
             return True
         else:
@@ -420,8 +420,8 @@ class DataMineDialog(gdialog.GDialog):
         if path is not None and model is not None:
             paths = model.get_iter(path)
             self.currev = model[paths][self.COL_REVID]
-            self.curpath = fromutf(model[paths][self.COL_PATH])
-            self.stbar.set_status_text(toutf(model[paths][self.COL_TOOLTIP]))
+            self.curpath = hglib.fromutf(model[paths][self.COL_PATH])
+            self.stbar.set_status_text(hglib.toutf(model[paths][self.COL_TOOLTIP]))
 
     def close_current_page(self, window):
         num = self.notebook.get_current_page()
@@ -573,14 +573,14 @@ class DataMineDialog(gdialog.GDialog):
         frame.show_all()
 
         hbox = gtk.HBox()
-        lbl = gtk.Label(toutf(os.path.basename(path) + '@' + revid))
+        lbl = gtk.Label(hglib.toutf(os.path.basename(path) + '@' + revid))
         close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
         hbox.pack_start(lbl, True, True, 2)
         hbox.pack_start(close, False, False)
         hbox.show_all()
         num = self.notebook.append_page_menu(frame,
-                hbox, gtk.Label(toutf(path + '@' + revid)))
+                hbox, gtk.Label(hglib.toutf(path + '@' + revid)))
 
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(frame, True)
@@ -629,7 +629,7 @@ class DataMineDialog(gdialog.GDialog):
             (rpath, node) = info
             fl = self.repo.file(rpath)
             frev = fl.linkrev(fl.rev(node))
-            button.set_label(toutf('%s@%s' % (rpath, frev)))
+            button.set_label(hglib.toutf('%s@%s' % (rpath, frev)))
             button.show()
             button.set_sensitive(True)
             label.set_text(_('Follow Rename:'))
@@ -668,7 +668,7 @@ class DataMineDialog(gdialog.GDialog):
         q = Queue.Queue()
         args = [self.repo.root, q, 'annotate', '--follow', '--number',
                 '--rev', str(rev), 'path:'+path]
-        thread = thread2.Thread(target=hgcmd_toq, args=args)
+        thread = thread2.Thread(target=hglib.hgcmd_toq, args=args)
         thread.start()
         frame._mythread = thread
         self.stop_button.set_sensitive(True)
@@ -685,10 +685,10 @@ class DataMineDialog(gdialog.GDialog):
         model, rows = treeview.get_selection().get_selected_rows()
         model.clear()
         self.stbar.begin()
-        self.stbar.set_status_text(toutf('hg ' + ' '.join(args[2:])))
+        self.stbar.set_status_text(hglib.toutf('hg ' + ' '.join(args[2:])))
 
         hbox = gtk.HBox()
-        lbl = gtk.Label(toutf(os.path.basename(path) + '@' + str(rev)))
+        lbl = gtk.Label(hglib.toutf(os.path.basename(path) + '@' + str(rev)))
         close = self.create_tab_close_button()
         close.connect('clicked', self.close_page, frame)
         hbox.pack_start(lbl, True, True, 2)
@@ -717,7 +717,7 @@ class DataMineDialog(gdialog.GDialog):
             color = colormap.get_color(ctx, curdate)
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, toutf(text[:512]), tip, toutf(path.strip()),
+            model.append((revid, hglib.toutf(text[:512]), tip, hglib.toutf(path.strip()),
                     color, user, len(model)+1))
         if thread.isAlive():
             return True
