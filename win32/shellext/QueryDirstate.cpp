@@ -54,9 +54,11 @@ bool hasHgDir(char cls, const std::string& path)
 
     const std::string p = path + "\\.hg";
     res = ::PathIsDirectory(p.c_str()) != 0;
+#if 0
     TDEBUG_TRACE(
         "[" << cls << "] hasHgDir: PathIsDirectory(\"" << p << "\") -> " << res
     );
+#endif
     return res;
 }
 
@@ -237,10 +239,12 @@ int HgQueryDirstate(
         return 0;
     }
     cur.isdir = stat.isdir;
+#if 0
     TDEBUG_TRACE(
         dp << "stat.lstat(\"" << cur.path << "\") "
         << "-> stat.isdir is " << stat.isdir
     );
+#endif
 
     if (cur.isdir)
     {
