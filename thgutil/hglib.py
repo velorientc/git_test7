@@ -51,24 +51,35 @@ except:
     class WinIOError(Exception):
         'WinIOError stub'
 
-def toutf(s):
+def tounicode(s):
     """
-    Convert a string to UTF-8 encoding
+    Convert the encoding of string from MBCS to Unicode.
 
-    Based on mercurial.util.tolocal()
+    Based on mercurial.util.tolocal().
+    Return 'unicode' type string.
     """
+    if isinstance(s, unicode):
+        return s
     for e in ('utf-8', _encoding):
         try:
-            return s.decode(e, 'strict').encode('utf-8')
+            return s.decode(e, 'strict')
         except UnicodeDecodeError:
             pass
-    return s.decode(_fallbackencoding, 'replace').encode('utf-8')
+    return s.decode(_fallbackencoding, 'replace')
+
+def toutf(s):
+    """
+    Convert the encoding of string from MBCS to UTF-8.
+
+    Return 'str' type string.
+    """
+    return tounicode(s).encode('utf-8')
 
 def fromutf(s):
     """
-    Convert UTF-8 encoded string to local.
+    Convert the encoding of string from UTF-8 to MBCS
 
-    It's primarily used on strings converted to UTF-8 by toutf().
+    Return 'str' type string.
     """
     try:
         return s.decode('utf-8').encode(_encoding)

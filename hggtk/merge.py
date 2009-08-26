@@ -101,11 +101,11 @@ class MergeDialog(gtk.Window):
     def revdesc(self, repo, revid):
         ctx = repo[revid]
         revstr = str(ctx.rev())
-        summary = ctx.description().replace('\0', '')
-        summary = summary.split('\n')[0]
+        summary = hglib.toutf(hglib.tounicode(ctx.description()) \
+                .replace(u'\0', '').splitlines()[0][:80])
         escape = gtklib.markup_escape_text
         desc =  '<b>' + hglib.fromutf(_('rev')) + '</b>\t\t: %s\n' % escape(revstr)
-        desc += '<b>' + hglib.fromutf(_('summary')) + '</b>\t: %s\n' % escape(summary[:80])
+        desc += '<b>' + hglib.fromutf(_('summary')) + '</b>\t: %s\n' % escape(summary)
         desc += '<b>' + hglib.fromutf(_('user')) + '</b>\t\t: %s\n' % escape(ctx.user())
         desc += '<b>' + hglib.fromutf(_('date')) + '</b>\t\t: %s\n' \
                 % escape(hglib.displaytime(ctx.date()))

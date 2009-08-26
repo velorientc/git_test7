@@ -121,15 +121,17 @@ class TreeModel(gtk.GenericTreeModel):
             except IndexError:
                 return None
 
-            summary = ctx.description().replace('\0', '')
+            # convert to Unicode for valid string operations
+            summary = hglib.tounicode(ctx.description()).replace(u'\0', '')
             if self.repo.ui.configbool('tortoisehg', 'longsummary'):
-                lines = summary.split('\n')
+                limit = 80
+                lines = summary.splitlines()
                 summary = lines.pop(0)
-                while len(summary) < 80 and lines:
-                    summary += '  ' + lines.pop(0)
-                summary = summary[0:80]
+                while len(summary) < limit and lines:
+                    summary += u'  ' + lines.pop(0)
+                summary = summary[0:limit]
             else:
-                summary = summary.split('\n')[0]
+                summary = summary.splitlines()[0]
             summary = gtklib.markup_escape_text(hglib.toutf(summary))
             node = self.repo.lookup(revid)
             tags = self.repo.nodetags(node)
