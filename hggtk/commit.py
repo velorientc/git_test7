@@ -224,7 +224,7 @@ class GCommit(GStatus):
         liststore = self.msg_cbbox.get_model()
         liststore.clear()
         for msg in self._mru_messages:
-            sumline = msg.split("\n")[0]
+            sumline = hglib.toutf(hglib.tounicode(msg).splitlines()[0])
             liststore.append([sumline, msg])
 
     def branch_clicked(self, button):

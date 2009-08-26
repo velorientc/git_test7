@@ -41,9 +41,10 @@ DM_FONT      = 5
 def hunk_markup(text):
     'Format a diff hunk for display in a TreeView row with markup'
     hunk = ""
-    lines = text.split('\n')
+    lines = text.splitlines()
     for line in lines:
-        line = gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        line = gtklib.markup_escape_text(hglib.toutf(
+                    hglib.tounicode(line)[:512])) + '\n'
         if line.startswith('---') or line.startswith('+++'):
             hunk += '<span foreground="#000090">%s</span>' % line
         elif line.startswith('-'):
@@ -59,10 +60,10 @@ def hunk_markup(text):
 def hunk_unmarkup(text):
     'Format a diff hunk for display in a TreeView row without markup'
     hunk = ""
-    lines = text.split('\n')
+    lines = text.splitlines()
     for line in lines:
-        line = gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
-        hunk += line
+        hunk += gtklib.markup_escape_text(hglib.toutf(
+                    hglib.tounicode(line)[:512])) + '\n'
     return hunk
 
 class GStatus(gdialog.GDialog):
