@@ -698,7 +698,7 @@ class GStatus(gdialog.GDialog):
             text_renderer.set_property('foreground', 'black')
 
 
-    def rename_file(self, stat, wfile):
+    def rename_file(self, wfile):
         fdir, fname = os.path.split(wfile)
         newfile = dialog.entry_dialog(self, _('Rename file to:'), True, fname)
         if newfile and newfile != fname:
@@ -706,7 +706,7 @@ class GStatus(gdialog.GDialog):
         return True
 
 
-    def copy_file(self, stat, wfile):
+    def copy_file(self, wfile):
         wfile = self.repo.wjoin(wfile)
         fdir, fname = os.path.split(wfile)
         response = gtklib.NativeSaveFileDialogWrapper(
