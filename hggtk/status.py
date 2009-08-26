@@ -1047,28 +1047,16 @@ class GStatus(gdialog.GDialog):
             commands.revert(self.ui, self.repo, *wfiles, **revertopts)
 
         def filelist(files):
-            text = ''
-            for i, f in enumerate(files):
-                text += '   ' + f + '\n'
-                if i == 9:
-                    text += '   ...\n'
-                    break
+            text = '\n'.join(files[:5])
+            if len(files) > 5:
+                text += '  ...\n'
             return text
 
-        # response: 0=Yes, 1=No backup, 2=Cancel
-        if self.count_revs() == 1:
-            # rev options needs extra tweaking since is not an array for
-            # revert command
-            revertopts['rev'] = revertopts['rev'][0]
-            response = gdialog.CustomPrompt(_('Confirm Revert'),
-                    _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
-                    filelist(files)), self, (_('&Yes'), _('&No backup'), _('&Cancel')),
-                    2, 2).run()
-        elif self.merging:
+        if self.merging:
             res = gdialog.CustomPrompt(
                     _('Uncommited merge - please select a parent revision'),
                     _('Revert file(s) to local or other parent?'),
-                    self, (_('&local'), _('&other')), 0).run()
+                    self, (_('&Local'), _('&Other'), _('&Cancel')), 2).run()
             if res == 0:
                 revertopts['rev'] = self.repo[None].p1().rev()
             elif res == 1:
@@ -1077,12 +1065,17 @@ class GStatus(gdialog.GDialog):
                 return
             response = None
         else:
-            # rev options needs extra tweaking since it must be an empty
-            # string when unspecified for revert command
-            revertopts['rev'] = ''
+            # response: 0=Yes, 1=Yes,no backup, 2=Cancel
+            revs = revertopts['rev']
+            if revs and type(revs) == list:
+                revertopts['rev'] = revs[0]
+            else:
+                revertopts['rev'] = str(self.repo['.'].rev())
             response = gdialog.CustomPrompt(_('Confirm Revert'),
-                    _('Revert the following files?\n\n%s') % filelist(files), self,
-                    (_('&Yes'), _('&No backup'), _('&Cancel')), 2, 2).run()
+                    _('Revert file(s) to revision %s?\n\n%s') % (revertopts['rev'],
+                    filelist(files)), self, (_('&Yes (backup changes)'),
+                                             _('Yes (&discard changes)'),
+                                             _('&Cancel')), 2, 2).run()
         if response in (None, 0, 1):
             if response == 1:
                 revertopts['no_backup'] = True
