@@ -828,8 +828,18 @@ class GLog(gdialog.GDialog):
 
     def show_status(self, menuitem):
         rev = self.currow[treemodel.REVID]
-        statopts = {'rev' : [str(rev)] }
-        dialog = changeset.ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
+        statopts = self.merge_opts(commands.table['^status|st'][1],
+                ('include', 'exclude', 'git'))
+        if self.changeview.parent_toggle.get_active():
+            parent = self.repo[rev].parents()[1].rev()
+        else:
+            parent = self.repo[rev].parents()[0].rev()
+        statopts['rev'] = [str(parent), str(rev)]
+        statopts['modified'] = True
+        statopts['added'] = True
+        statopts['removed'] = True
+        dialog = status.GStatus(self.ui, self.repo, self.cwd, self.pats,
+                         statopts)
         dialog.display()
 
     def copy_hash(self, menuitem):
