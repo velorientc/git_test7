@@ -212,11 +212,6 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
             return False
 
-        if not self.model:
-            self.model = treemodel.TreeModel(self.repo, self.graphdata,
-                    self.color_func)
-            self.treeview.set_model(self.model)
-
         self.graph_cell.columns_len = self.max_cols
         width = self.graph_cell.get_size(self.treeview)[2]
         if width > 500:
@@ -225,6 +220,11 @@ class TreeView(gtk.ScrolledWindow):
         # Allow the user to set size as they like
         #self.graph_column.set_max_width(500)
         self.graph_column.set_visible(self.show_graph)
+
+        if not self.model:
+            self.model = treemodel.TreeModel(self.repo, self.graphdata,
+                    self.color_func)
+            self.treeview.set_model(self.model)
 
         self.emit('batch-loaded')
         if stopped:
