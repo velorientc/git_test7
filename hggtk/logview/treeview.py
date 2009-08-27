@@ -176,8 +176,7 @@ class TreeView(gtk.ScrolledWindow):
         self.limit = self.batchsize
 
     def populate(self, revision=None):
-        """Fill the treeview with contents.
-        """
+        'Fill the treeview with contents'
         stopped = False
         if self.repo is None:
             stopped = True
@@ -230,7 +229,7 @@ class TreeView(gtk.ScrolledWindow):
         if stopped:
             self.emit('revisions-loaded')
         if revision is not None:
-            self.set_revision_id(revision[treemodel.REVID])
+            self.set_revision_id(int(revision[treemodel.REVID]))
         if self.pbar is not None:
             self.pbar.end()
         return False

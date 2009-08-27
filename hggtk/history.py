@@ -126,7 +126,6 @@ class GLog(gdialog.GDialog):
         if not self.graphview.graphdata:
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
-            self.last_rev = None
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
@@ -337,6 +336,7 @@ class GLog(gdialog.GDialog):
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
+        self.last_rev = None
 
         def ftitle(filtername):
             t = self.get_title()
@@ -570,6 +570,7 @@ class GLog(gdialog.GDialog):
         for name in self.repo.branchtags().keys():
             branchcombo.append_text(name)
         branchcombo.connect('changed', self.select_branch)
+        self.lastbranchrow = None
         filterbox.pack_start(branchcombo, False)
         self.branchcombo = branchcombo
 
@@ -641,12 +642,14 @@ class GLog(gdialog.GDialog):
 
     def select_branch(self, combo):
         row = combo.get_active()
-        if row >= 0:
+        if row >= 0 and row != self.lastbranchrow:
             self.filter = 'branch'
+            self.lastbranchrow = row
             self.branchbutton.set_active(True)
             self.branchbutton.set_sensitive(True)
             self.reload_log(branch=combo.get_model()[row][0])
         else:
+            self.lastbranchrow = None
             self.branchbutton.set_sensitive(False)
 
     def show_goto_dialog(self):

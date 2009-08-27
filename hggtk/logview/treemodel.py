@@ -98,7 +98,7 @@ class TreeModel(gtk.GenericTreeModel):
     def on_get_value(self, rowref, column):
         (revid, graphnode, lines, parents) = self.graphdata[rowref]
 
-        if column == REVID: return revid
+        if column == REVID: return str(revid)
         if column == GRAPHNODE: return graphnode
         if column == LINES: return lines
         if column == LAST_LINES:
