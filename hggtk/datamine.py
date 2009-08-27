@@ -645,8 +645,11 @@ class DataMineDialog(gdialog.GDialog):
         rev = row[treemodel.REVID]
         self.currev = str(rev)
         ctx = self.repo[rev]
-        filectx = ctx.filectx(path)
-        info = filectx.renamed()
+        try:
+            filectx = ctx.filectx(path)
+            info = filectx.renamed()
+        except LookupError:
+            info = None
         if info:
             (rpath, node) = info
             fl = self.repo.file(rpath)
