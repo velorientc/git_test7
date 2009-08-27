@@ -52,12 +52,6 @@ class TreeView(gtk.ScrolledWindow):
                      'The currently selected revision',
                      gobject.PARAM_READWRITE),
 
-        'revision-number': (gobject.TYPE_STRING,
-                            'Revision number',
-                            'The number of the selected revision',
-                            '',
-                            gobject.PARAM_READABLE),
-
         'date-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Date',
                                  'Show date column',
