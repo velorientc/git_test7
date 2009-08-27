@@ -131,14 +131,11 @@ class TreeView(gtk.ScrolledWindow):
         Case insensitive
         """
         key = key.lower()
-
-        node = hex(model.get_value(iter, treemodel.REVISION)[treemodel.NODE])
-        if node.startswith(key):
+        row = model[iter]
+        if row[treemodel.HEXID].startswith(key):
             return False
-
-        for col in (treemodel.REVID, treemodel.TAGS, treemodel.COMMITER,
-                treemodel.MESSAGE):
-            if key in model.get_value(iter, col).lower():
+        for col in (treemodel.REVID, treemodel.COMMITER, treemodel.MESSAGE):
+            if key in row[col].lower():
                 return False
         return True
 
