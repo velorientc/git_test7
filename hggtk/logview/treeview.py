@@ -17,6 +17,7 @@ dialog.  Other portions stolen from graphlog extension.
 import gtk
 import gobject
 import pango
+import os
 import re
 import time
 
@@ -183,7 +184,11 @@ class TreeView(gtk.ScrolledWindow):
             stopped = True
             return False
 
-        startsec = time.time()
+        if os.name == "nt":
+            timer = time.clock
+        else:
+            timer = time.time
+        startsec = timer()
         try:
             while (not self.limit) or len(self.graphdata) < self.limit:
                 (rev, node, lines, parents) = self.grapher.next()
@@ -194,7 +199,7 @@ class TreeView(gtk.ScrolledWindow):
                     rowref = self.model.get_iter(len(self.graphdata)-1)
                     path = self.model.get_path(rowref) 
                     self.model.row_inserted(path, rowref) 
-                cursec = time.time()
+                cursec = timer()
                 if cursec < startsec or cursec > startsec + 0.1:
                     break
         except StopIteration:
