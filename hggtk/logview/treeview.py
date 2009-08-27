@@ -333,13 +333,6 @@ class TreeView(gtk.ScrolledWindow):
             handler = self.connect('batch-loaded', loaded)
             self.next_revision_batch(self.batchsize)
 
-    def get_parents(self):
-        """Return the parents of the currently selected revision.
-
-        :return: list of revision ids.
-        """
-        return self.get_property('parents')
-        
     def refresh(self, graphcol, pats, opts):
         if self.repo is not None:
             hglib.invalidaterepo(self.repo)
