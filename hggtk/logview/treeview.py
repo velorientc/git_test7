@@ -396,7 +396,7 @@ class TreeView(gtk.ScrolledWindow):
         self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.graph_column.pack_start(self.graph_cell, expand=False)
         self.graph_column.add_attribute(self.graph_cell,
-                "node", treemodel.NODE)
+                "node", treemodel.GRAPHNODE)
         self.graph_column.add_attribute(self.graph_cell,
                 "in-lines", treemodel.LAST_LINES)
         self.graph_column.add_attribute(self.graph_cell,
@@ -541,6 +541,6 @@ class TreeView(gtk.ScrolledWindow):
         (path, focus) = treeview.get_cursor()
         if path is not None and self.model is not None:
             iter = self.model.get_iter(path)
-            self.currev = self.model.get_value(iter, treemodel.REVISION)
+            self.currev = self.model[iter]
             self.emit('revision-selected')
 
