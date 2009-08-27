@@ -19,8 +19,6 @@ import gobject
 import pango
 import re
 
-from mercurial.node import hex
-
 from thgutil.i18n import _
 from thgutil import hglib
 
