@@ -18,6 +18,7 @@ import gtk
 import gobject
 import pango
 import re
+import time
 
 from thgutil.i18n import _
 from thgutil import hglib
@@ -182,8 +183,9 @@ class TreeView(gtk.ScrolledWindow):
             stopped = True
             return False
 
+        startsec = time.time()
         try:
-            for x in xrange(0, 50):
+            while (not self.limit) or len(self.graphdata) < self.limit:
                 (rev, node, lines, parents) = self.grapher.next()
                 self.max_cols = max(self.max_cols, len(lines))
                 self.index[rev] = len(self.graphdata)
@@ -192,7 +194,8 @@ class TreeView(gtk.ScrolledWindow):
                     rowref = self.model.get_iter(len(self.graphdata)-1)
                     path = self.model.get_path(rowref) 
                     self.model.row_inserted(path, rowref) 
-                if self.limit and len(self.graphdata) >= self.limit:
+                cursec = time.time()
+                if cursec < startsec or cursec > startsec + 0.1:
                     break
         except StopIteration:
             stopped = True
