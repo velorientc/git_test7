@@ -10,7 +10,7 @@ import gtk
 import gobject
 
 from thgutil.i18n import _
-from thgutil import hglib, settings
+from thgutil import hglib, settings, menuthg
 from hggtk import gtklib
 
 shellcmds = '''about add clone commit datamine init log recovery
@@ -29,7 +29,7 @@ class TaskBarUI(gtk.Window):
         self.set_title(_('TortoiseHg Taskbar'))
 
         about = gtk.Button(_('About'))
-        apply = gtk.Button(_('Apply'))
+        self.apply = gtk.Button(_('Apply'))
         close = gtk.Button(_('Close'))
 
         vbox = gtk.VBox()
@@ -43,10 +43,12 @@ class TaskBarUI(gtk.Window):
         self.show_tabs = True
         self.show_border = True
 
+        # Options page
         settingsframe = self.add_page(notebook, _('Options'))
         settingsvbox = gtk.VBox()
         settingsframe.add(settingsvbox)
 
+        ## Overlays group
         ovframe = gtk.Frame(_('Overlays'))
         ovframe.set_border_width(2)
         settingsvbox.pack_start(ovframe, False, False, 2)
@@ -59,30 +61,72 @@ class TaskBarUI(gtk.Window):
         self.lclonly = gtk.CheckButton(_('Local disks only'))
         hbox.pack_start(self.lclonly, False, False, 2)
 
+        ## Context Menu group
         cmframe = gtk.Frame(_('Context Menu'))
         cmframe.set_border_width(2)
         settingsvbox.pack_start(cmframe, False, False, 2)
-        cmcvbox = gtk.VBox()
-        cmframe.add(cmcvbox)
 
-        lbl = gtk.Label(_('Promote menu items to the top menu'))
-        cmcvbox.pack_start(lbl, False, False, 2)
+        table = gtk.Table(2, 3)
+        cmframe.add(table)
+        def setcell(child, row, col):
+            table.attach(child, col, col + 1, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
+        def withframe(widget):
+            scroll = gtk.ScrolledWindow()
+            scroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_ALWAYS)
+            scroll.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+            scroll.add(widget)
+            return scroll
 
-        tips = gtk.Tooltips()
-        rows = (len(shellcmds) + 2) / 3
-        table = gtk.Table(rows, 3, False)
-        cmcvbox.pack_start(table, False, False, 2)
-        self.cmptoggles = {}
-        for i, cmd in enumerate(shellcmds):
-            row, col = divmod(i, 3)
-            check = gtk.CheckButton(cmd)
-            table.attach(check, col, col+1,
-                         row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 3)
-            self.cmptoggles[cmd] = check
-            tooltip = _('Promote menu item "%s" to top menu') % cmd
-            tips.set_tip(check, tooltip)
-            check.connect('toggled', lambda x: apply.set_sensitive(True))
+        # Sub menus pane
+        label = gtk.Label(_('Sub menu items:'))
+        label.set_alignment(0, 0.5)
+        setcell(label, 0, 0)
 
+        # model: [0]hgcmd, [1]translated menu label
+        self.submmodel = model = gtk.ListStore(gobject.TYPE_STRING,
+                gobject.TYPE_STRING)
+        self.submlist = list = gtk.TreeView(model)
+        list.set_size_request(-1, 180)
+        list.set_headers_visible(False)
+        list.connect('row-activated', self.row_activated)
+        column = gtk.TreeViewColumn()
+        list.append_column(column)
+        cell = gtk.CellRendererText()
+        column.pack_start(cell, True)
+        column.add_attribute(cell, 'text', 1)
+        setcell(withframe(list), 1, 0)
+
+        # Top menus pane
+        label = gtk.Label(_('Top menu items:'))
+        label.set_alignment(0, 0.5)
+        setcell(label, 0, 2)
+
+        # model: [0]hgcmd, [1]translated menu label
+        self.topmmodel = model = gtk.ListStore(gobject.TYPE_STRING,
+                gobject.TYPE_STRING)
+        self.topmlist = list = gtk.TreeView(model)
+        list.set_size_request(-1, 180)
+        list.set_headers_visible(False)
+        list.connect('row-activated', self.row_activated)
+        column = gtk.TreeViewColumn()
+        list.append_column(column)
+        cell = gtk.CellRendererText()
+        column.pack_start(cell, True)
+        column.add_attribute(cell, 'text', 1)
+        setcell(withframe(list), 1, 2)
+
+        # move buttons
+        mbbox = gtk.VBox()
+        setcell(mbbox, 1, 1)
+
+        topbutton = gtk.Button(_('Top ->'))
+        topbutton.connect('clicked', self.top_clicked)
+        mbbox.add(topbutton)
+        subbutton = gtk.Button(_('<- Sub'))
+        subbutton.connect('clicked', self.sub_clicked)
+        mbbox.add(subbutton)
+
+        ## Taskbar group
         taskbarframe = gtk.Frame(_('Taskbar'))
         taskbarframe.set_border_width(2)
         settingsvbox.pack_start(taskbarframe, False, False, 2)
@@ -93,19 +137,23 @@ class TaskBarUI(gtk.Window):
         self.hgighlight_taskbaricon = gtk.CheckButton(_('Highlight Icon'))
         hbox.pack_start(self.hgighlight_taskbaricon, False, False, 2)        
 
+        # Tooltips
+        tips = gtk.Tooltips()
+
         tooltip = _('Enable/Disable the overlay icons globally')
         tips.set_tip(self.ovenable, tooltip)
-        self.ovenable.connect('toggled', self.ovenable_toggled, apply)
+        self.ovenable.connect('toggled', self.ovenable_toggled)
         tooltip = _('Only enable overlays on local disks')
         tips.set_tip(self.lclonly, tooltip)
-        self.lclonly.connect('toggled', lambda x: apply.set_sensitive(True))
+        self.lclonly.connect('toggled', lambda x: self.apply.set_sensitive(True))
 
         tooltip = _('Highlight the taskbar icon during activity')
         tips.set_tip(self.hgighlight_taskbaricon, tooltip)
-        self.hgighlight_taskbaricon.connect('toggled', lambda x: apply.set_sensitive(True))
+        self.hgighlight_taskbaricon.connect('toggled', lambda x: self.apply.set_sensitive(True))
 
         self.load_shell_configs()
 
+        # Event log page
         frame = self.add_page(notebook, _('Event Log'))
         frame.set_border_width(2)
 
@@ -122,26 +170,37 @@ class TaskBarUI(gtk.Window):
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
 
-        hbbox = gtk.HButtonBox()
-        hbbox.set_layout(gtk.BUTTONBOX_END)
-        vbox.pack_start(hbbox, False, False, 2)
+        # Bottom buttons
+        bbox = gtk.HBox()
+        vbox.pack_start(bbox, False, False, 2)
+
+        lefthbbox = gtk.HButtonBox()
+        lefthbbox.set_layout(gtk.BUTTONBOX_START)
+        bbox.pack_start(lefthbbox, False, False)
 
         about.connect('clicked', self.about)
-        hbbox.pack_end(about, True, True, 0)
+        lefthbbox.pack_start(about, False, False)
 
-        apply.connect('clicked', self.applyclicked)
-        apply.set_sensitive(False)
-        hbbox.add(apply)
+        bbox.pack_start(gtk.Label(''), True, True)
+
+        righthbbox = gtk.HButtonBox()
+        righthbbox.set_layout(gtk.BUTTONBOX_END)
+        bbox.pack_start(righthbbox, False, False)
+
+        self.apply.connect('clicked', self.apply_clicked)
+        self.apply.set_sensitive(False)
+        righthbbox.pack_start(self.apply, False, False)
 
         close.connect('clicked', lambda x: self.destroy())
         key, modifier = gtk.accelerator_parse('Escape')
         close.add_accelerator('clicked', accelgroup, key, 0,
                 gtk.ACCEL_VISIBLE)
-        hbbox.add(close)
+        righthbbox.pack_start(close, False, False)
 
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
         frame.set_border_width(5)
+        frame.set_shadow_type(gtk.SHADOW_NONE)
         frame.show()
         label = gtk.Label(tab)
         notebook.append_page(frame, label)
@@ -189,18 +248,26 @@ class TaskBarUI(gtk.Window):
         self.lclonly.set_active(localdisks)
         self.lclonly.set_sensitive(overlayenable)
         self.hgighlight_taskbaricon.set_active(hgighlight_taskbaricon)
-        promoted = [pi.strip() for pi in promoteditems.split(',')]
-        for cmd, check in self.cmptoggles.iteritems():
-            check.set_active(cmd in promoted)
 
-    def applyclicked(self, button):
+        promoted = [pi.strip() for pi in promoteditems.split(',')]
+        self.submmodel.clear()
+        self.topmmodel.clear()
+        for cmd, info in menuthg.thgcmenu.items():
+            label = info['label']['str']
+            if cmd in promoted:
+                self.topmmodel.append((cmd, label))
+            else:
+                self.submmodel.append((cmd, label))
+        self.submmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
+        self.topmmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
+
+    def store_shell_configs(self):
         overlayenable = self.ovenable.get_active() and '1' or '0'
         localdisks = self.lclonly.get_active() and '1' or '0'
         hgighlight_taskbaricon = self.hgighlight_taskbaricon.get_active() and '1' or '0'
         promoted = []
-        for cmd, check in self.cmptoggles.iteritems():
-            if check.get_active():
-                promoted.append(cmd)
+        for row in self.topmmodel:
+            promoted.append(row[0])
         try:
             from _winreg import HKEY_CURRENT_USER, CreateKey, SetValueEx, REG_SZ
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
@@ -210,8 +277,38 @@ class TaskBarUI(gtk.Window):
             SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
         except ImportError:
             pass
+
+    def move_to_other(self, list, paths=None):
+        if paths == None:
+            model, paths = list.get_selection().get_selected_rows()
+        else:
+            model = list.get_model()
+        if list == self.submlist:
+            otherlist = self.topmlist
+            othermodel = self.topmmodel
+        else:
+            otherlist = self.submlist
+            othermodel = self.submmodel
+        for path in paths:
+            cmd, label = model[path]
+            model.remove(model.get_iter(path))
+            othermodel.append((cmd, label))
+        othermodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
+        self.apply.set_sensitive(True)
+
+    def row_activated(self, list, path, column):
+        self.move_to_other(list, (path,))
+
+    def sub_clicked(self, button):
+        self.move_to_other(self.topmlist)
+
+    def top_clicked(self, button):
+        self.move_to_other(self.submlist)
+
+    def apply_clicked(self, button):
+        self.store_shell_configs()
         button.set_sensitive(False)
 
-    def ovenable_toggled(self, check, apply):
+    def ovenable_toggled(self, check):
         self.lclonly.set_sensitive(check.get_active())
-        apply.set_sensitive(True)
+        self.apply.set_sensitive(True)
