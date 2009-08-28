@@ -138,9 +138,16 @@ class TagAddDialog(gtk.Dialog):
         expanded = self.settings.get_value('expanded', False, True)
         self.expander.set_property('expanded', expanded)
 
+        checked = self.settings.get_value('english', False, True)
+        self._eng_msg.set_active(checked)
+
     def store_settings(self):
         expanded = self.expander.get_property('expanded')
         self.settings.set_value('expanded', expanded)
+
+        checked = self._eng_msg.get_active()
+        self.settings.set_value('english', checked)
+
         self.settings.write()
 
     def msg_toggled(self, checkbutton):
