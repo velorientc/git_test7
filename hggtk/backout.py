@@ -38,7 +38,7 @@ class BackoutDialog(gtk.Window):
         self.add(vbox)
 
         frame = gtk.Frame(_('Changeset Description'))
-        rev, desc = changesetinfo.changesetinfo(repo, rev)
+        revid, desc = changesetinfo.changesetinfo(repo, rev)
         frame.add(desc)
         frame.set_border_width(5)
         vbox.pack_start(frame, False, False, 2)
