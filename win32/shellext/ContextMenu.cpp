@@ -12,8 +12,8 @@
 struct MenuDescription
 {
     std::string name;
-    std::string menuText;
-    std::string helpText;
+    std::wstring menuText;
+    std::wstring helpText;
     std::string iconName;
     UINT idCmd;
 };
@@ -23,80 +23,80 @@ struct MenuDescription
 
 MenuDescription menuDescList[] =
 {
-    {"commit",      "Commit...",
-                    "Commit changes in repository",
+    {"commit",      L"Commit...",
+                    L"Commit changes in repository",
                     "menucommit.ico", 0},
-    {"init",        "Create Repository Here",
-                    "Create a new repository",
+    {"init",        L"Create Repository Here",
+                    L"Create a new repository",
                     "menucreaterepos.ico", 0},
-    {"clone",       "Clone a Repository",
-                    "Create clone here from source",
+    {"clone",       L"Clone a Repository",
+                    L"Create clone here from source",
                     "menuclone.ico", 0},
-    {"status",      "View File Status",
-                    "Repository status & changes",
+    {"status",      L"View File Status",
+                    L"Repository status & changes",
                     "menushowchanged.ico", 0},
-    {"shelve",      "Shelve Changes",
-                    "Shelve or unshelve file changes",
+    {"shelve",      L"Shelve Changes",
+                    L"Shelve or unshelve file changes",
                     "shelve.ico", 0},
-    {"add",         "Add Files",
-                    "Add files to version control",
+    {"add",         L"Add Files",
+                    L"Add files to version control",
                     "menuadd.ico", 0},
-    {"revert",      "Revert Files",
-                    "Revert file changes",
+    {"revert",      L"Revert Files",
+                    L"Revert file changes",
                     "menurevert.ico", 0},
-    {"remove",      "Remove Files",
-                    "Remove files from version control",
+    {"remove",      L"Remove Files",
+                    L"Remove files from version control",
                     "menudelete.ico", 0},
-    {"rename",      "Rename File",
-                    "Rename file or directory",
+    {"rename",      L"Rename File",
+                    L"Rename file or directory",
                     "general.ico", 0},
-    {"log",         "View Changelog",
-                    "View change history in repository",
+    {"log",         L"View Changelog",
+                    L"View change history in repository",
                     "menulog.ico", 0},
-    {"synch",       "Synchronize",
-                    "Synchronize with remote repository",
+    {"synch",       L"Synchronize",
+                    L"Synchronize with remote repository",
                     "menusynch.ico", 0},
-    {"serve",       "Web Server",
-                    "Start web server for this repository",
+    {"serve",       L"Web Server",
+                    L"Start web server for this repository",
                     "proxy.ico", 0},
-    {"update",      "Update To Revision",
-                    "Update working directory",
+    {"update",      L"Update To Revision",
+                    L"Update working directory",
                     "menucheckout.ico", 0},
-    {"recover",     "Recovery...",
-                    "Repair and recovery of repository",
+    {"recover",     L"Recovery...",
+                    L"Repair and recovery of repository",
                     "general.ico", 0},
-    {"thgstatus",   "Update Icons",
-                    "Update icons for this repository",
+    {"thgstatus",   L"Update Icons",
+                    L"Update icons for this repository",
                     "refresh_overlays.ico", 0},
-    {"userconf",    "Global Settings",
-                    "Configure user wide settings",
+    {"userconf",    L"Global Settings",
+                    L"Configure user wide settings",
                     "settings_user.ico", 0},
-    {"repoconf",    "Repository Settings",
-                    "Configure repository settings",
+    {"repoconf",    L"Repository Settings",
+                    L"Configure repository settings",
                     "settings_repo.ico", 0},
-    {"about",       "About...",
-                    "Show About Dialog",
+    {"about",       L"About...",
+                    L"Show About Dialog",
                     "menuabout.ico", 0},
-    {"datamine",    "Annotate Files",
-                    "Changeset information per file line",
+    {"datamine",    L"Annotate Files",
+                    L"Changeset information per file line",
                     "menublame.ico", 0},
-    {"vdiff",       "Visual Diff",
-                    "View changes using GUI diff tool",
+    {"vdiff",       L"Visual Diff",
+                    L"View changes using GUI diff tool",
                     "TortoiseMerge.ico", 0},
-    {"hgignore",    "Edit Ignore Filter",
-                    "Edit repository ignore filter",
+    {"hgignore",    L"Edit Ignore Filter",
+                    L"Edit repository ignore filter",
                     "ignore.ico", 0},
-    {"guess",       "Guess Renames",
-                    "Detect renames and copies",
+    {"guess",       L"Guess Renames",
+                    L"Detect renames and copies",
                     "detect_rename.ico", 0},
-    {"grep",        "Search History",
-                    "Search file revisions for patterns",
+    {"grep",        L"Search History",
+                    L"Search file revisions for patterns",
                     "menurepobrowse.ico", 0},
 
     /* Add new items here */
 
     // template
-    {"", "", "", ".ico", 0},
+    {"", L"", L"", ".ico", 0},
 };
 
 /* These enumerations must match the order of menuDescList */
@@ -149,29 +149,32 @@ void AddMenuList(UINT idCmd, const std::string& name)
 void GetCMenuTranslation(
     const std::string& lang,
     const std::string& name,
-    std::string& menuText,
-    std::string& helpText
+    std::wstring& menuText,
+    std::wstring& helpText
 )
 {
-    std::string subkey = "Software\\TortoiseHg\\CMenu\\";
-    subkey += lang;
-    subkey += "\\";
-    subkey += name;
+    std::wstring subkey = L"Software\\TortoiseHg\\CMenu\\";
+    subkey += _WCSTR(lang.c_str());
+    subkey += L"\\";
+    subkey += _WCSTR(name.c_str());
 
-    TDEBUG_TRACE("GetCMenuTranslation: " << subkey);
+    TDEBUG_TRACEW(L"GetCMenuTranslation: " << subkey);
 
     HKEY hkey = 0;
-    LONG rv = RegOpenKeyExA(
+    LONG rv = RegOpenKeyExW(
         HKEY_CURRENT_USER, subkey.c_str(), 0, KEY_READ, &hkey);
 
     if (rv == ERROR_SUCCESS && hkey)
     {
-        GetRegSZValue(hkey, "menuText", menuText);
-        GetRegSZValue(hkey, "helpText", helpText);
+        GetRegSZValueW(hkey, L"menuText", menuText);
+        GetRegSZValueW(hkey, L"helpText", helpText);
     }
     else
     {
-        TDEBUG_TRACE("GetCMenuTranslation: RegOpenKeyExA(" << subkey << ") failed");
+        TDEBUG_TRACEW(
+            L"GetCMenuTranslation: RegOpenKeyExW(\"" 
+            << subkey << "\") failed"
+        );
     }
 
     if (hkey)
@@ -193,7 +196,7 @@ void InitMenuMaps()
             TDEBUG_TRACE("InitMenuMaps: adding " << md.name);
 
             // Look for translation of menu and help text
-            if( lang.size() )
+            if (lang.size())
                 GetCMenuTranslation(lang, md.name, md.menuText, md.helpText);
 
             MenuDescMap[md.name] = md;
@@ -204,13 +207,14 @@ void InitMenuMaps()
 }
 
 
-void InsertMenuItemWithIcon(
+void InsertMenuItemWithIcon1(
     HMENU hMenu, UINT indexMenu, UINT idCmd,
-    const std::string& menuText, const std::string& iconName)
+    const std::wstring& menuText, const std::string& iconName)
 {
-    MENUITEMINFO mi;
+    MENUITEMINFOW mi;
+    memset(&mi, 0, sizeof(mi));
     mi.cbSize = sizeof(mi);
-    mi.dwTypeData = const_cast<char*>(menuText.c_str());
+    mi.dwTypeData = const_cast<wchar_t*>(menuText.c_str());
     mi.cch = static_cast<UINT>(menuText.length());
     mi.wID = idCmd;
     mi.fType = MFT_STRING;
@@ -224,22 +228,26 @@ void InsertMenuItemWithIcon(
     }
     else
     {
-        TDEBUG_TRACE("    InsertMenuItemWithIcon: can't find " + iconName);
+        TDEBUG_TRACE("    InsertMenuItemWithIcon1: can't find " + iconName);
         mi.fMask = MIIM_TYPE | MIIM_ID;
     }
-    InsertMenuItem(hMenu, indexMenu, TRUE, &mi);
+    InsertMenuItemW(hMenu, indexMenu, TRUE, &mi);
+
+    TDEBUG_TRACEW(
+        L"InsertMenuItemWithIcon1(\"" << menuText << L"\") finished");
 }
 
 
-void InsertSubMenuItemWithIcon(
+void InsertSubMenuItemWithIcon2(
     HMENU hMenu, HMENU hSubMenu, UINT indexMenu, UINT idCmd,
-    const std::string& menuText, const std::string& iconName)
+    const std::wstring& menuText, const std::string& iconName)
 {
-    MENUITEMINFO mi;
+    MENUITEMINFOW mi;
+    memset(&mi, 0, sizeof(mi));
     mi.cbSize = sizeof(mi);
     mi.fMask = MIIM_SUBMENU | MIIM_STRING | MIIM_ID;
     mi.fType = MFT_STRING;
-    mi.dwTypeData = const_cast<char*>(menuText.c_str());
+    mi.dwTypeData = const_cast<wchar_t*>(menuText.c_str());
     mi.cch = static_cast<UINT>(menuText.length());
     mi.wID = idCmd;
     mi.hSubMenu = hSubMenu;
@@ -253,15 +261,18 @@ void InsertSubMenuItemWithIcon(
     }
     else
     {
-        TDEBUG_TRACE("    InsertSubMenuItemWithIcon: can't find " + iconName);
+        TDEBUG_TRACE("    InsertSubMenuItemWithIcon2: can't find " + iconName);
     }
-    InsertMenuItem(hMenu, indexMenu, TRUE, &mi);
+    InsertMenuItemW(hMenu, indexMenu, TRUE, &mi);
+
+    TDEBUG_TRACEW(
+        L"InsertMenuItemWithIcon2(\"" << menuText << L"\") finished");
 }
 
 
 void InsertMenuItemByName(
     HMENU hMenu, const std::string& name, UINT indexMenu,
-    UINT idCmd, UINT idCmdFirst, const std::string& prefix)
+    UINT idCmd, UINT idCmdFirst, const std::wstring& prefix)
 {
     MenuDescriptionMap::iterator iter = MenuDescMap.find(name);
     if (iter == MenuDescMap.end())
@@ -272,7 +283,7 @@ void InsertMenuItemByName(
 
     MenuDescription md = iter->second;
     AddMenuList(idCmd - idCmdFirst, name);
-    InsertMenuItemWithIcon(
+    InsertMenuItemWithIcon1(
         hMenu, indexMenu, idCmd, prefix + md.menuText, md.iconName);
 }
 
@@ -384,7 +395,7 @@ CShellExt::QueryContextMenu(
         {
             InsertMenuItemByName(
                 hMenu, menuDescList[idx].name, indexMenu++,
-                idCmd++, idCmdFirst, "HG "
+                idCmd++, idCmdFirst, L"HG "
             );
         }
     }
@@ -414,7 +425,7 @@ CShellExt::QueryContextMenu(
                 {
                     InsertMenuItemByName(
                         hSubMenu, menuDescList[idx].name,
-                        indexSubMenu++, idCmd++, idCmdFirst, ""
+                        indexSubMenu++, idCmd++, idCmdFirst, L""
                     );
                     isSeparator = false;
                 }
@@ -425,8 +436,8 @@ CShellExt::QueryContextMenu(
     }
 
     TDEBUG_TRACE("  CShellExt::QueryContextMenu: adding main THG menu");
-    InsertSubMenuItemWithIcon(hMenu, hSubMenu, indexMenu++, idCmd++,
-            "TortoiseHG...", "hg.ico");
+    InsertSubMenuItemWithIcon2(hMenu, hSubMenu, indexMenu++, idCmd++,
+            L"TortoiseHG...", "hg.ico");
 
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 
@@ -472,7 +483,8 @@ CShellExt::GetCommandString(
 
     HRESULT res = S_FALSE;
 
-    const char *psz = "";
+    const char* psz = "";
+    const wchar_t* pszw = 0;
 
     std::string sflags = "?";
     switch (uFlags)
@@ -507,9 +519,9 @@ CShellExt::GetCommandString(
         TDEBUG_TRACE(
             "CShellExt::GetCommandString: name = \"" << iter->second.name << "\"");
 
-        if (uFlags == GCS_HELPTEXTW || uFlags == GCS_HELPTEXTA)
+        if (uFlags == GCS_HELPTEXTW)
         {
-            psz = iter->second.helpText.c_str();
+            pszw = iter->second.helpText.c_str();
             res = S_OK;
             
             size_t size = iter->second.helpText.size();
@@ -520,6 +532,12 @@ CShellExt::GetCommandString(
                     << " length of help text is " << size
                     << ", which is not reasonably short (<40)");
             }
+        }
+        else if (uFlags == GCS_HELPTEXTA)
+        {
+            // we don't provide ansi help texts
+            psz = "";
+            res = S_OK;
         }
         else if (uFlags == GCS_VERBW || uFlags == GCS_VERBA)
         {
@@ -549,12 +567,15 @@ CShellExt::GetCommandString(
     if (uFlags & GCS_UNICODE)
     {
         wchar_t* const dest = reinterpret_cast<wchar_t*>(pszName);
-        const wchar_t* const src = _WCSTR(psz);
+        const wchar_t* const src = pszw ? pszw : _WCSTR(psz);
 
         wcsncpy(dest, src, cchMax-1);
         *(dest + cchMax-1) = 0;
 
         size = wcslen(src);
+
+        TDEBUG_TRACEW(L"CShellExt::GetCommandString: res = " << int(res)
+            << L", pszName (wide) = \"" << dest << L"\"");
     }
     else
     {
@@ -562,10 +583,10 @@ CShellExt::GetCommandString(
         *(pszName + cchMax-1) = 0;
 
         size = strlen(psz);
-    }
 
-    TDEBUG_TRACE("CShellExt::GetCommandString: res = " << res 
-        << ", pszName = \"" << psz << "\"");
+        TDEBUG_TRACE("CShellExt::GetCommandString: res = " << int(res)
+            << ", pszName = \"" << psz << "\"");
+    }
 
     if (size > cchMax-1)
     {
