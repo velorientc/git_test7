@@ -24,6 +24,7 @@ class TagAddDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, title=_('TortoiseHg Tag - %s') % (root or os.getcwd()),
                           buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         gtklib.set_tortoise_keys(self)
+        self.set_resizable(False)
         self.set_has_separator(False)
 
         # add Add button
@@ -44,53 +45,65 @@ class TagAddDialog(gtk.Dialog):
         except hglib.RepoError:
             pass
 
-        # build dialog
-        self._create(tag, rev)
+        # copy from 'clone.py'
+        def createtable(cols=2):
+            newtable = gtk.Table(1, cols)
+            def addrow(*widgets):
+                row = newtable.get_property('n-rows')
+                newtable.set_property('n-rows', row + 1)
+                if len(widgets) == 1:
+                    col = newtable.get_property('n-columns')
+                    newtable.attach(widgets[0], 0, col, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
+                else:
+                    for col, widget in enumerate(widgets):
+                        flag = gtk.FILL if col == 0 else gtk.FILL|gtk.EXPAND
+                        newtable.attach(widget, col, col + 1, row, row + 1, flag, 0, 4, 2)
+            return newtable, addrow
 
-    def _create(self, tag, rev):
-        self.set_default_size(350, 180)
+        # top layout table
+        table, addrow = createtable()
+        self.vbox.pack_start(table, True, True, 2)
 
-        # tag name input
-        tagbox = gtk.HBox()
+        ## tag name input
         lbl = gtk.Label(_('Tag:'))
-        lbl.set_property('width-chars', 10)
-        lbl.set_alignment(0, 0.5)
+        lbl.set_alignment(1, 0.5)
         self._tagslist = gtk.ListStore(str)
         self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
         self._tag_input = self._taglistbox.get_child()
         self._tag_input.connect('activate', self._taginput_activated)
         self._tag_input.set_text(tag)
-        tagbox.pack_start(lbl, False, False)
-        tagbox.pack_start(self._taglistbox, True, True)
-        self.vbox.pack_start(tagbox, True, True, 2)
+        addrow(lbl, self._taglistbox)
 
-        # revision input
-        revbox = gtk.HBox()
+        ## revision input
         lbl = gtk.Label(_('Revision:'))
-        lbl.set_property('width-chars', 10)
-        lbl.set_alignment(0, 0.5)
+        lbl.set_alignment(1, 0.5)
+        hbox = gtk.HBox()
         self._rev_input = gtk.Entry()
+        self._rev_input.set_width_chars(12)
         self._rev_input.set_text(rev)
-        revbox.pack_start(lbl, False, False)
-        revbox.pack_start(self._rev_input, False, False)
-        self.vbox.pack_start(revbox, False, False, 2)
+        hbox.pack_start(self._rev_input, False, False)
+        hbox.pack_start(gtk.Label(''))
+        addrow(lbl, hbox)
+        
+        # advanced options expander
+        self.expander = expander = gtk.Expander(_('Advanced options'))
+        self.vbox.pack_start(expander, True, True, 2)
 
-        # tag options
-        option_box = gtk.VBox()
+        # advanced options layout table
+        table, addrow = createtable()
+        expander.add(table)
+
+        ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
         self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
-        self._use_msg = gtk.CheckButton(_('Use custom commit message'))
-        option_box.pack_start(self._local_tag, False, False)
-        option_box.pack_start(self._replace_tag, False, False)
-        option_box.pack_start(self._use_msg, False, False)
-        self.vbox.pack_start(option_box, False, False, 15)
+        self._use_msg = gtk.CheckButton(_('Use custom commit message:'))
+        addrow(self._local_tag)
+        addrow(self._replace_tag)
+        addrow(self._use_msg)
 
-        # commit message
-        lbl = gtk.Label(_('Commit message:'))
-        lbl.set_alignment(0, 0.5)
+        ## custom commit message input
         self._commit_message = gtk.Entry()
-        self.vbox.pack_end(self._commit_message, False, False, 1)
-        self.vbox.pack_end(lbl, False, False, 1)
+        addrow(self._commit_message)
 
         # focus on tag input
         self._taglistbox.grab_focus()
