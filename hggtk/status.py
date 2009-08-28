@@ -1286,7 +1286,7 @@ class GStatus(gdialog.GDialog):
             dlg.set_notify_func(self.ignoremask_updated)
         def ignore(menuitem, files):
             wfile = util.pconvert(files[0])
-            dlg = hgignore.HgIgnoreDialog(self.repo.root, w)
+            dlg = hgignore.HgIgnoreDialog(self.repo.root, wfile)
             dlg.show_all()
             dlg.set_notify_func(self.ignoremask_updated)
 
