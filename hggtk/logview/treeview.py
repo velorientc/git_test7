@@ -17,9 +17,9 @@ dialog.  Other portions stolen from graphlog extension.
 import gtk
 import gobject
 import pango
+import os
 import re
-
-from mercurial.node import hex
+import time
 
 from thgutil.i18n import _
 from thgutil import hglib
@@ -52,12 +52,6 @@ class TreeView(gtk.ScrolledWindow):
                      'The currently selected revision',
                      gobject.PARAM_READWRITE),
 
-        'revision-number': (gobject.TYPE_STRING,
-                            'Revision number',
-                            'The number of the selected revision',
-                            '',
-                            gobject.PARAM_READABLE),
-
         'date-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Date',
                                  'Show date column',
@@ -66,6 +60,11 @@ class TreeView(gtk.ScrolledWindow):
         'utc-column-visible': (gobject.TYPE_BOOLEAN,
                                  'UTC',
                                  'Show UTC/GMT date column',
+                                 False,
+                                 gobject.PARAM_READWRITE),
+        'age-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Age',
+                                 'Show age column',
                                  False,
                                  gobject.PARAM_READWRITE),
         'rev-column-visible': (gobject.TYPE_BOOLEAN,
@@ -84,12 +83,20 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show branch',
                                  False,
                                  gobject.PARAM_READWRITE),
+        'branch-color': (gobject.TYPE_BOOLEAN,
+                                 'Branch color',
+                                 'Color by branch',
+                                 False,
+                                 gobject.PARAM_READWRITE)
     }
 
     __gsignals__ = {
         'revisions-loaded': (gobject.SIGNAL_RUN_FIRST, 
                              gobject.TYPE_NONE,
                              ()),
+        'batch-loaded': (gobject.SIGNAL_RUN_FIRST, 
+                         gobject.TYPE_NONE,
+                         ()),
         'revision-selected': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
                               ())
@@ -111,6 +118,7 @@ class TreeView(gtk.ScrolledWindow):
         self.construct_treeview()
         self.pbar = pbar
         self.origtip = None
+        self.branch_color = False
 
     def set_repo(self, repo, pbar=None):
         self.repo = repo
@@ -123,14 +131,11 @@ class TreeView(gtk.ScrolledWindow):
         Case insensitive
         """
         key = key.lower()
-
-        node = hex(model.get_value(iter, treemodel.REVISION)[treemodel.NODE])
-        if node.startswith(key):
+        row = model[iter]
+        if row[treemodel.HEXID].startswith(key):
             return False
-
-        for col in (treemodel.REVID, treemodel.TAGS, treemodel.COMMITER,
-                treemodel.MESSAGE):
-            if key in model.get_value(iter, col).lower():
+        for col in (treemodel.REVID, treemodel.COMMITER, treemodel.MESSAGE):
+            if key in row[col].lower():
                 return False
         return True
 
@@ -150,7 +155,7 @@ class TreeView(gtk.ScrolledWindow):
                     start = self.repo.changelog.rev(node)
                 else:
                     start = len(self.repo.changelog) - 1
-            elif opts['revrange']:
+            elif opts.get('revrange'):
                 if len(opts['revrange']) >= 2:
                     start, end = opts['revrange']
                 else:
@@ -160,7 +165,7 @@ class TreeView(gtk.ScrolledWindow):
                 start = len(self.repo.changelog) - 1
             noheads = opts.get('noheads', False)
             self.grapher = revision_grapher(self.repo, start, end, pats,
-                    noheads)
+                    noheads, self.branch_color)
         elif opts.get('revs', None):
             self.grapher = dumb_log_generator(self.repo, opts['revs'])
         else:
@@ -173,15 +178,19 @@ class TreeView(gtk.ScrolledWindow):
         self.limit = self.batchsize
 
     def populate(self, revision=None):
-        """Fill the treeview with contents.
-        """
+        'Fill the treeview with contents'
         stopped = False
         if self.repo is None:
             stopped = True
             return False
 
+        if os.name == "nt":
+            timer = time.clock
+        else:
+            timer = time.time
+        startsec = timer()
         try:
-            for x in xrange(0, 50):
+            while (not self.limit) or len(self.graphdata) < self.limit:
                 (rev, node, lines, parents) = self.grapher.next()
                 self.max_cols = max(self.max_cols, len(lines))
                 self.index[rev] = len(self.graphdata)
@@ -190,7 +199,8 @@ class TreeView(gtk.ScrolledWindow):
                     rowref = self.model.get_iter(len(self.graphdata)-1)
                     path = self.model.get_path(rowref) 
                     self.model.row_inserted(path, rowref) 
-                if self.limit and len(self.graphdata) >= self.limit:
+                cursec = timer()
+                if cursec < startsec or cursec > startsec + 0.1:
                     break
         except StopIteration:
             stopped = True
@@ -209,23 +219,25 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
             return False
 
-        if not self.model:
-            self.model = treemodel.TreeModel(self.repo, self.graphdata,
-                    self.color_func)
-            self.treeview.set_model(self.model)
-
         self.graph_cell.columns_len = self.max_cols
         width = self.graph_cell.get_size(self.treeview)[2]
         if width > 500:
             width = 500
         self.graph_column.set_fixed_width(width)
-        self.graph_column.set_max_width(width)
+        # Allow the user to set size as they like
+        #self.graph_column.set_max_width(500)
         self.graph_column.set_visible(self.show_graph)
 
+        if not self.model:
+            self.model = treemodel.TreeModel(self.repo, self.graphdata,
+                    self.color_func)
+            self.treeview.set_model(self.model)
+
+        self.emit('batch-loaded')
         if stopped:
             self.emit('revisions-loaded')
         if revision is not None:
-            self.set_revision_id(revision[treemodel.REVID])
+            self.set_revision_id(int(revision[treemodel.REVID]))
         if self.pbar is not None:
             self.pbar.end()
         return False
@@ -239,8 +251,12 @@ class TreeView(gtk.ScrolledWindow):
             return self.rev_column.get_visible()
         elif property.name == 'branch-column-visible':
             return self.branch_column.get_visible()
+        elif property.name == 'branch-color':
+            return self.branch_color
         elif property.name == 'utc-column-visible':
             return self.utc_column.get_visible()
+        elif property.name == 'age-column-visible':
+            return self.age_column.get_visible()
         elif property.name == 'repo':
             return self.repo
         elif property.name == 'limit':
@@ -261,8 +277,12 @@ class TreeView(gtk.ScrolledWindow):
             self.rev_column.set_visible(value)
         elif property.name == 'branch-column-visible':
             self.branch_column.set_visible(value)
+        elif property.name == 'branch-color':
+            self.branch_color = value
         elif property.name == 'utc-column-visible':
             self.utc_column.set_visible(value)
+        elif property.name == 'age-column-visible':
+            self.age_column.set_visible(value)
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'limit':
@@ -296,7 +316,7 @@ class TreeView(gtk.ScrolledWindow):
             row = self.index[revid]
             self.treeview.scroll_to_cell(row, use_align=True, row_align=0.5)
 
-    def set_revision_id(self, revid):
+    def set_revision_id(self, revid, load=False):
         """Change the currently selected revision.
 
         :param revid: Revision id of revision to display.
@@ -305,14 +325,21 @@ class TreeView(gtk.ScrolledWindow):
             row = self.index[revid]
             self.treeview.set_cursor(row)
             self.treeview.grab_focus()
+        elif load:
+            handler = None
 
-    def get_parents(self):
-        """Return the parents of the currently selected revision.
+            def loaded(dummy):
+                if revid in self.index:
+                    if handler is not None:
+                        self.disconnect(handler)
+                    self.set_revision_id(revid)
+                    self.scroll_to_revision(revid)
+                else:
+                    self.next_revision_batch(self.batchsize)
 
-        :return: list of revision ids.
-        """
-        return self.get_property('parents')
-        
+            handler = self.connect('batch-loaded', loaded)
+            self.next_revision_batch(self.batchsize)
+
     def refresh(self, graphcol, pats, opts):
         if self.repo is not None:
             hglib.invalidaterepo(self.repo)
@@ -367,7 +394,7 @@ class TreeView(gtk.ScrolledWindow):
         self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.graph_column.pack_start(self.graph_cell, expand=False)
         self.graph_column.add_attribute(self.graph_cell,
-                "node", treemodel.NODE)
+                "node", treemodel.GRAPHNODE)
         self.graph_column.add_attribute(self.graph_cell,
                 "in-lines", treemodel.LAST_LINES)
         self.graph_column.add_attribute(self.graph_cell,
@@ -464,6 +491,19 @@ class TreeView(gtk.ScrolledWindow):
         self.utc_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.treeview.append_column(self.utc_column)
 
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 10)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        self.age_column = gtk.TreeViewColumn(_('Age'))
+        self.age_column.set_visible(False)
+        self.age_column.set_resizable(True)
+        self.age_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.age_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.age_column.pack_start(cell, expand=True)
+        self.age_column.add_attribute(cell, "text", treemodel.AGE)
+        self.age_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        self.treeview.append_column(self.age_column)
+
     def text_color_orig(self, parents, rev, author):
         if self.origtip is not None and int(rev) >= self.origtip:
             return 'darkgreen'
@@ -499,6 +539,6 @@ class TreeView(gtk.ScrolledWindow):
         (path, focus) = treeview.get_cursor()
         if path is not None and self.model is not None:
             iter = self.model.get_iter(path)
-            self.currev = self.model.get_value(iter, treemodel.REVISION)
+            self.currev = self.model[iter]
             self.emit('revision-selected')
 
