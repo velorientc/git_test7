@@ -438,6 +438,8 @@ class GLog(gdialog.GDialog):
                  self.email_revs))
         m.append(create_menu(_('bundle from here to selected'),
                  self.bundle_revs))
+        m.append(create_menu(_('import as MQ patches from here to selected'),
+                 self.mqimport_revs))
         self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
         m.append(self.cmenu_merge2)
         
@@ -773,6 +775,21 @@ class GLog(gdialog.GDialog):
             dlg.show_all()
             dlg.run()
             dlg.hide()
+
+    def mqimport_revs(self, menuitem):
+        """Import revision range as MQ patches."""
+        revs = list(self.revs)
+        revs.sort()
+        revrange = '%s:%s' % (str(revs[0]), str(revs[1]))
+        cmdline = ['hg', 'qimport', '--rev', revrange]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
 
     def rebase_selected(self, menuitem):
         """Rebase revision on top of selection (1st on top of 2nd).""" 
