@@ -13,7 +13,7 @@ import traceback
 from mercurial import hg, ui, util
 
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, settings
 
 from hggtk import dialog, gtklib
 
@@ -26,6 +26,7 @@ class TagAddDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
+        self.connect('response', self.dialog_response)
 
         # add Add button
         addbutton = gtk.Button(_('Add'))
@@ -36,6 +37,9 @@ class TagAddDialog(gtk.Dialog):
         removebutton = gtk.Button(_('Remove'))
         removebutton.connect('clicked', lambda b: self._do_rm_tag())
         self.action_area.pack_end(removebutton)
+
+        # persistent settings
+        self.settings = settings.Settings('tagadd')
 
         self.root = root
         self.repo = None
@@ -86,12 +90,12 @@ class TagAddDialog(gtk.Dialog):
         addrow(lbl, hbox)
         
         # advanced options expander
-        self.expander = expander = gtk.Expander(_('Advanced options'))
-        self.vbox.pack_start(expander, True, True, 2)
+        self.expander = gtk.Expander(_('Advanced options'))
+        self.vbox.pack_start(self.expander, True, True, 2)
 
         # advanced options layout table
         table, addrow = createtable()
-        expander.add(table)
+        self.expander.add(table)
 
         ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
@@ -105,11 +109,10 @@ class TagAddDialog(gtk.Dialog):
         self._commit_message = gtk.Entry()
         addrow(self._commit_message)
 
-        # focus on tag input
-        self._taglistbox.grab_focus()
-
         # prepare to show
+        self.load_settings()
         self._refresh()
+        self._taglistbox.grab_focus()
 
     def _refresh(self):
         """ update display on dialog with recent repo data """
@@ -124,6 +127,18 @@ class TagAddDialog(gtk.Dialog):
             if tagname == "tip":
                 continue
             self._tagslist.append([tagname])
+
+    def load_settings(self):
+        expanded = self.settings.get_value('expanded', False, True)
+        self.expander.set_property('expanded', expanded)
+
+    def store_settings(self):
+        expanded = self.expander.get_property('expanded')
+        self.settings.set_value('expanded', expanded)
+        self.settings.write()
+
+    def dialog_response(self, dialog, response_id):
+        self.store_settings()
 
     def _taginput_activated(self, taginput):
         self._do_add_tag()
