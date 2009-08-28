@@ -369,7 +369,7 @@ class GLog(gdialog.GDialog):
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'ancestry':
             ftitle(_('revision ancestry'))
-            range = [self.currow[treemodel.REVID], 0]
+            range = [int(self.currow[treemodel.REVID]), 0]
             opts = {'noheads': True, 'revrange': range}
             self.graphview.refresh(True, None, opts)
         elif self.filter == 'tagged':
@@ -677,7 +677,7 @@ class GLog(gdialog.GDialog):
         self.graphview.set_revision_id(rid, load=True)
 
     def strip_rev(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = int(self.currow[treemodel.REVID])
         res = gdialog.Confirm(_('Confirm Strip Revision(s)'), [], self,
                 _('Remove revision %d and all descendants?') % rev).run()
         if res != gtk.RESPONSE_YES:
@@ -693,10 +693,9 @@ class GLog(gdialog.GDialog):
         self.changeview._filelist.clear()
 
     def backout_rev(self, menuitem):
-        rev = self.currow[treemodel.REVID]
-        rev = str(self.repo[rev])
+        hash = self.currow[treemodel.HEXID]
         parents = [x.node() for x in self.repo.parents()]
-        dlg = backout.BackoutDialog(rev)
+        dlg = backout.BackoutDialog(hash)
         dlg.set_transient_for(self)
         dlg.show_all()
         dlg.set_notify_func(self.checkout_completed, parents)
@@ -704,7 +703,7 @@ class GLog(gdialog.GDialog):
         dlg.set_transient_for(None)
 
     def revert(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = int(self.currow[treemodel.REVID])
         res = gdialog.Confirm(_('Confirm Revert Revision(s)'), [], self,
                 _('Revert all files to revision %d?\nThis will overwrite your '
                   'local changes') % rev).run()
@@ -846,11 +845,10 @@ class GLog(gdialog.GDialog):
         dialog.display()
 
     def copy_hash(self, menuitem):
-        rev = self.currow[treemodel.REVID]
-        node = str(self.repo[rev])
+        hash = self.currow[treemodel.HEXID]
         sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
         clipboard = gtk.Clipboard(selection=sel)
-        clipboard.set_text(node)
+        clipboard.set_text(hash)
 
     def export_patch(self, menuitem):
         rev = self.currow[treemodel.REVID]
@@ -1012,7 +1010,7 @@ class GLog(gdialog.GDialog):
         return False
 
     def tree_popup_menu(self, treeview, button=0, time=0) :
-        selrev = self.currow[treemodel.REVID]
+        selrev = int(self.currow[treemodel.REVID])
 
         # disable/enable menus as required
         parents = [x.rev() for x in self.repo.parents()]
