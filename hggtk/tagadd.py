@@ -13,9 +13,11 @@ import traceback
 from mercurial import hg, ui, util
 
 from thgutil.i18n import _
-from thgutil import hglib, settings
+from thgutil import hglib, settings, i18n
 
 from hggtk import dialog, gtklib
+
+keep = i18n.keepgettext()
 
 class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
@@ -100,8 +102,10 @@ class TagAddDialog(gtk.Dialog):
         ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
         self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
+        self._eng_msg = gtk.CheckButton(_('Use English commit message'))
         addrow(self._local_tag)
         addrow(self._replace_tag)
+        addrow(self._eng_msg)
 
         ## custom commit message
         self._use_msg = gtk.CheckButton(_('Use custom commit message:'))
@@ -157,6 +161,7 @@ class TagAddDialog(gtk.Dialog):
         name = self._tag_input.get_text()
         rev = self._rev_input.get_text()
         force = self._replace_tag.get_active()
+        eng_msg = self._eng_msg.get_active()
         use_msg = self._use_msg.get_active()
         message = self._commit_message.get_text()
 
@@ -174,7 +179,8 @@ class TagAddDialog(gtk.Dialog):
 
         # add tag to repo
         try:
-            self._add_hg_tag(name, rev, message, is_local, force=force)
+            self._add_hg_tag(name, rev, message, is_local, force=force,
+                            english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been added') % name)
             self._refresh()
@@ -190,6 +196,7 @@ class TagAddDialog(gtk.Dialog):
         # gather input data
         is_local = self._local_tag.get_active()
         name = self._tag_input.get_text()
+        eng_msg = self._eng_msg.get_active()
         use_msg = self._use_msg.get_active()
 
         # verify input
@@ -205,7 +212,7 @@ class TagAddDialog(gtk.Dialog):
             message = ''
 
         try:
-            self._rm_hg_tag(name, message, is_local)
+            self._rm_hg_tag(name, message, is_local, english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been removed') % name)
             self._refresh()
@@ -219,7 +226,7 @@ class TagAddDialog(gtk.Dialog):
 
 
     def _add_hg_tag(self, name, revision, message, local, user=None,
-                    date=None, force=False):
+                    date=None, force=False, english=False):
         if name in self.repo.tags() and not force:
             raise util.Abort(_('a tag named "%s" already exists') % name)
 
@@ -227,17 +234,21 @@ class TagAddDialog(gtk.Dialog):
         r = ctx.node()
 
         if not message:
-            message = _('Added tag %s for changeset %s') % (name, str(ctx))
+            msgset = keep._('Added tag %s for changeset %s')
+            message = (english and msgset['id'] or msgset['str']) \
+                        % (name, str(ctx))
         if name in self.repo.tags() and not force:
             raise util.Abort(_("Tag '%s' already exist") % name)
 
         self.repo.tag(name, r, hglib.fromutf(message), local, user, date)
 
-    def _rm_hg_tag(self, name, message, local, user=None, date=None):
+    def _rm_hg_tag(self, name, message, local, user=None, date=None,
+                    english=False):
         if not name in self.repo.tags():
             raise util.Abort(_("Tag '%s' does not exist") % name)
 
         if not message:
-            message = _('Removed tag %s') % name
+            msgset = keep._('Removed tag %s')
+            message = (english and msgset['id'] or msgset['str']) % name
         r = self.repo[-1].node()
         self.repo.tag(name, r, message, local, user, date)
