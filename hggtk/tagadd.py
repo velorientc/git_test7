@@ -17,15 +17,24 @@ from thgutil import hglib
 
 from hggtk import dialog, gtklib
 
-class TagAddDialog(gtk.Window):
+class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, root='', tag='', rev=''):
         """ Initialize the Dialog """
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtk.Dialog.__init__(self, title=_('TortoiseHg Tag - %s') % (root or os.getcwd()),
+                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         gtklib.set_tortoise_keys(self)
+        self.set_has_separator(False)
 
-        title = _('TortoiseHg Tag - %s') % (root or os.getcwd())
-        self.set_title(title)
+        # add Add button
+        addbutton = gtk.Button(_('Add'))
+        addbutton.connect('clicked', lambda b: self._do_add_tag())
+        self.action_area.pack_end(addbutton)
+
+        # add Remove button
+        removebutton = gtk.Button(_('Remove'))
+        removebutton.connect('clicked', lambda b: self._do_rm_tag())
+        self.action_area.pack_end(removebutton)
 
         self.root = root
         self.repo = None
@@ -41,28 +50,6 @@ class TagAddDialog(gtk.Window):
     def _create(self, tag, rev):
         self.set_default_size(350, 180)
 
-        # add toolbar with tooltips
-        self.tbar = gtk.Toolbar()
-        self.tips = gtk.Tooltips()
-
-        self._btn_addtag = self._toolbutton(
-                gtk.STOCK_ADD, _('Add'),
-                self._btn_addtag_clicked,
-                tip=_('Add tag to selected version'))
-        self._btn_rmtag = self._toolbutton(
-                gtk.STOCK_DELETE, _('Remove'),
-                self._btn_rmtag_clicked,
-                tip=_('Remove tag from repository'))
-        tbuttons = [
-                self._btn_addtag,
-                self._btn_rmtag
-            ]
-        for btn in tbuttons:
-            self.tbar.insert(btn, -1)
-        vbox = gtk.VBox()
-        self.add(vbox)
-        vbox.pack_start(self.tbar, False, False, 2)
-
         # tag name input
         tagbox = gtk.HBox()
         lbl = gtk.Label(_('Tag:'))
@@ -75,7 +62,7 @@ class TagAddDialog(gtk.Window):
         self._tag_input.set_text(tag)
         tagbox.pack_start(lbl, False, False)
         tagbox.pack_start(self._taglistbox, True, True)
-        vbox.pack_start(tagbox, True, True, 2)
+        self.vbox.pack_start(tagbox, True, True, 2)
 
         # revision input
         revbox = gtk.HBox()
@@ -86,7 +73,7 @@ class TagAddDialog(gtk.Window):
         self._rev_input.set_text(rev)
         revbox.pack_start(lbl, False, False)
         revbox.pack_start(self._rev_input, False, False)
-        vbox.pack_start(revbox, False, False, 2)
+        self.vbox.pack_start(revbox, False, False, 2)
 
         # tag options
         option_box = gtk.VBox()
@@ -96,35 +83,20 @@ class TagAddDialog(gtk.Window):
         option_box.pack_start(self._local_tag, False, False)
         option_box.pack_start(self._replace_tag, False, False)
         option_box.pack_start(self._use_msg, False, False)
-        vbox.pack_start(option_box, False, False, 15)
+        self.vbox.pack_start(option_box, False, False, 15)
 
         # commit message
         lbl = gtk.Label(_('Commit message:'))
         lbl.set_alignment(0, 0.5)
         self._commit_message = gtk.Entry()
-        vbox.pack_end(self._commit_message, False, False, 1)
-        vbox.pack_end(lbl, False, False, 1)
+        self.vbox.pack_end(self._commit_message, False, False, 1)
+        self.vbox.pack_end(lbl, False, False, 1)
 
         # focus on tag input
         self._taglistbox.grab_focus()
 
-        # show them all
+        # prepare to show
         self._refresh()
-        vbox.show_all()
-
-    def _toolbutton(self, stock, label, handler,
-                    menu=None, userdata=None, tip=None):
-        if menu:
-            tbutton = gtk.MenuToolButton(stock)
-            tbutton.set_menu(menu)
-        else:
-            tbutton = gtk.ToolButton(stock)
-
-        tbutton.set_label(label)
-        if tip:
-            tbutton.set_tooltip(self.tips, tip)
-        tbutton.connect('clicked', handler, userdata)
-        return tbutton
 
     def _refresh(self):
         """ update display on dialog with recent repo data """
@@ -142,19 +114,6 @@ class TagAddDialog(gtk.Window):
 
     def _taginput_activated(self, taginput):
         self._do_add_tag()
-
-    def _btn_tag_clicked(self, button):
-        """ select tag from tags dialog """
-        import tags
-        tag = tags.select(self.root)
-        if tag is not None:
-            self._tag_input.set_text(tag)
-
-    def _btn_addtag_clicked(self, button, data=None):
-        self._do_add_tag()
-
-    def _btn_rmtag_clicked(self, button, data=None):
-        self._do_rm_tag()
 
     def _do_add_tag(self):
         # gather input data
