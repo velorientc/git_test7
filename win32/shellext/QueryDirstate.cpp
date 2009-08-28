@@ -43,22 +43,32 @@ public:
 };
 
 
-bool hasHgDir(char cls, const std::string& path)
+bool hasHgDir(char cls, const std::string& path, unsigned& ticks)
 {
     bool res = false;
-    
+
     if (path.empty() || path == "\\" || ::PathIsRoot(path.c_str()))
     {
         return res;
     }
 
     const std::string p = path + "\\.hg";
+
+    unsigned tc0 = ::GetTickCount();
     res = ::PathIsDirectory(p.c_str()) != 0;
-#if 0
-    TDEBUG_TRACE(
-        "[" << cls << "] hasHgDir: PathIsDirectory(\"" << p << "\") -> " << res
-    );
-#endif
+    unsigned tc1 = ::GetTickCount();
+
+    ticks = tc1 - tc0;
+
+    if (ticks > 5 /* ms */)
+    {
+        // trace slower PathIsDirectory calls (untypical on local discs)
+        TDEBUG_TRACE(
+            "[" << cls << "] hasHgDir: PathIsDirectory(\"" << p << "\")" << 
+            " -> " << res << ", in " << ticks << " ticks"
+        );
+    }
+
     return res;
 }
 
@@ -86,11 +96,30 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
         return 1;
     }
 
-    if (!PathIsNetworkPath(cur.path.c_str()) && hasHgDir(cls, cur.path))
+    unsigned ticks = 0;
+    bool file_access_is_unacceptably_slow = false;
+
+    if (!PathIsNetworkPath(cur.path.c_str()))
     {
-        cur.hgroot = cur.path;
-        TDEBUG_TRACE(dp << "(" << cur.path << "): hgroot = cur.path");
-        return 1;
+        // checking if we have a repo root, visible from its parent dir
+
+        const bool has_hg = hasHgDir(cls, cur.path, ticks);
+
+        // we require a higher speed for showing overlays on repo roots,
+        // since we will do considerably more file accesses compared
+        // to showing icons just *inside* repos
+        if (ticks > 50 /* ms */)
+        {
+            file_access_is_unacceptably_slow = true;
+            goto exit;
+        }
+
+        if (has_hg)
+        {
+            cur.hgroot = cur.path;
+            TDEBUG_TRACE(dp << "(" << cur.path << "): hgroot = cur.path");
+            return 1;
+        }
     }
 
     cur.basedir = DirName(cur.path);
@@ -103,7 +132,17 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
 
     for (std::string p = cur.basedir;;)
     {
-        if (hasHgDir(cls, p)) {
+        bool has_hg = hasHgDir(cls, p, ticks);
+        if (ticks > 300 /* ms */)
+        {
+            const std::string reason = "ignoring slow \"" + p + "\"";
+            Thgstatus::error(reason);
+            file_access_is_unacceptably_slow = true;
+            goto exit;
+        }
+
+        if (has_hg) 
+        {
             cur.hgroot = p;
             TDEBUG_TRACE(
                 dp << "(" << cur.path << "): hgroot = '" << cur.hgroot
@@ -117,7 +156,17 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
         p.swap(p2);
     }
 
-    TDEBUG_TRACE(dp << "(" << cur.path << "): NO repo found");
+exit:
+    if (file_access_is_unacceptably_slow)
+    {
+        TDEBUG_TRACE(
+            "******" << dp << "(" << cur.path << "): ignored, " 
+            << "call took too long (" << ticks << " ticks)");
+    }
+    else
+    {
+        TDEBUG_TRACE(dp << "(" << cur.path << "): NO repo found");
+    }
     last = cur;
     return 0;
 }
