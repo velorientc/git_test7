@@ -100,13 +100,15 @@ class TagAddDialog(gtk.Dialog):
         ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
         self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
-        self._use_msg = gtk.CheckButton(_('Use custom commit message:'))
         addrow(self._local_tag)
         addrow(self._replace_tag)
-        addrow(self._use_msg)
 
-        ## custom commit message input
+        ## custom commit message
+        self._use_msg = gtk.CheckButton(_('Use custom commit message:'))
+        self._use_msg.connect('toggled', self.msg_toggled)
+        addrow(self._use_msg)
         self._commit_message = gtk.Entry()
+        self._commit_message.set_sensitive(False)
         addrow(self._commit_message)
 
         # prepare to show
@@ -136,6 +138,12 @@ class TagAddDialog(gtk.Dialog):
         expanded = self.expander.get_property('expanded')
         self.settings.set_value('expanded', expanded)
         self.settings.write()
+
+    def msg_toggled(self, checkbutton):
+        state = checkbutton.get_active()
+        self._commit_message.set_sensitive(state)
+        if state:
+            self._commit_message.grab_focus()
 
     def dialog_response(self, dialog, response_id):
         self.store_settings()
