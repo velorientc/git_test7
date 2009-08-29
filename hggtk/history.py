@@ -17,7 +17,6 @@ from mercurial import ui, hg, cmdutil, commands, extensions, util
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-from hggtk.logview import treemodel
 from hggtk.logview.treeview import TreeView as LogTreeView
 
 from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter, gorev
@@ -33,10 +32,9 @@ def create_menu(label, callback):
 class GLog(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
     def init(self):
-        self.last_rev = None
         self.filter = 'all'
-        self.currow = None
-        self.curfile = None
+        self.lastrevid = None
+        self.currevid = None
         self.origtip = len(self.repo)
         self.ready = False
         self.filterbox = None
@@ -121,9 +119,21 @@ class GLog(gdialog.GDialog):
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
+    def selection_changed(self, graphview):
+        'Graphview reports a new row selected'
+        treeview = graphview.treeview
+        (model, paths) = treeview.get_selection().get_selected_rows()
+        self.currevid = graphview.get_revid_at_path(paths[0])
+        self.ancestrybutton.set_sensitive(True)
+        if self.currevid != self.lastrevid:
+            self.lastrevid = self.currevid
+            self.changeview.opts['rev'] = [str(self.currevid)]
+            self.changeview.load_details(self.currevid)
+        return False
+
     def revisions_loaded(self, graphview):
-        'Treeview reports log generator has exited'
-        if not self.graphview.graphdata:
+        'Graphview reports log generator has exited'
+        if not graphview.graphdata:
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
         self.nextbutton.set_sensitive(False)
@@ -336,7 +346,7 @@ class GLog(gdialog.GDialog):
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
-        self.last_rev = None
+        self.lastrevid = None
 
         def ftitle(filtername):
             t = self.get_title()
@@ -369,7 +379,7 @@ class GLog(gdialog.GDialog):
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'ancestry':
             ftitle(_('revision ancestry'))
-            range = [int(self.currow[treemodel.REVID]), 0]
+            range = [self.currevid, 0]
             opts = {'noheads': True, 'revrange': range}
             self.graphview.refresh(True, None, opts)
         elif self.filter == 'tagged':
@@ -427,7 +437,7 @@ class GLog(gdialog.GDialog):
 
     def restore_original_selection(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-        self.tree.get_selection().select_path(self.orig_sel)
+        self.tree.get_selection().select_path(self.origsel)
 
     def tree_diff_context_menu(self):
         m = gtk.Menu()
@@ -681,7 +691,7 @@ class GLog(gdialog.GDialog):
         self.graphview.set_revision_id(rid, load=True)
 
     def strip_rev(self, menuitem):
-        rev = int(self.currow[treemodel.REVID])
+        rev = self.currevid
         res = gdialog.Confirm(_('Confirm Strip Revision(s)'), [], self,
                 _('Remove revision %d and all descendants?') % rev).run()
         if res != gtk.RESPONSE_YES:
@@ -697,7 +707,7 @@ class GLog(gdialog.GDialog):
         self.changeview._filelist.clear()
 
     def backout_rev(self, menuitem):
-        hash = self.currow[treemodel.HEXID]
+        hash = str(self.repo[self.currevid])
         parents = [x.node() for x in self.repo.parents()]
         dlg = backout.BackoutDialog(hash)
         dlg.set_transient_for(self)
@@ -707,32 +717,26 @@ class GLog(gdialog.GDialog):
         dlg.set_transient_for(None)
 
     def revert(self, menuitem):
-        rev = int(self.currow[treemodel.REVID])
-        res = gdialog.Confirm(_('Confirm Revert Revision(s)'), [], self,
+        rev = self.currevid
+        res = gdialog.Confirm(_('Confirm Revert All Files'), [], self,
                 _('Revert all files to revision %d?\nThis will overwrite your '
                   'local changes') % rev).run()
-
         if res != gtk.RESPONSE_YES:
             return
-
         cmdline = ['hg', 'revert', '--verbose', '--all', '--rev', str(rev)]
-
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
         dlg.hide()
 
     def vdiff_change(self, menuitem, pats=[]):
-        rev = self.currow[treemodel.REVID]
-        self._do_diff(pats, {'change' : rev})
+        self._do_diff(pats, {'change' : str(self.currevid)})
 
     def vdiff_local(self, menuitem, pats=[]):
-        rev = self.currow[treemodel.REVID]
-        opts = {'rev' : ["%s" % rev]}
-        self._do_diff(pats, opts)
+        self._do_diff(pats, {'rev' : [str(self.currevid)]})
 
     def diff_revs(self, menuitem):
-        rev0, rev1 = self.revs
+        rev0, rev1 = self.revrange
         statopts = self.merge_opts(commands.table['^status|st'][1],
                 ('include', 'exclude', 'git'))
         statopts['rev'] = ['%u:%u' % (rev0, rev1)]
@@ -745,13 +749,13 @@ class GLog(gdialog.GDialog):
         return True
 
     def vdiff_selected(self, menuitem):
-        strrevs = [str(r) for r in self.revs]
+        strrevs = [str(r) for r in self.revrange]
         self._do_diff(self.pats, {'rev' : strrevs})
 
     def email_revs(self, menuitem):
-        revs = list(self.revs)
-        revs.sort()
-        opts = ['--rev', str(revs[0]) + ':' + str(revs[1])]
+        revrange = list(self.revrange)
+        revrange.sort()
+        opts = ['--rev', str(revrange[0]) + ':' + str(revrange[1])]
         dlg = hgemail.EmailDialog(self.repo.root, opts)
         dlg.set_transient_for(self)
         dlg.show_all()
@@ -759,20 +763,20 @@ class GLog(gdialog.GDialog):
         dlg.set_transient_for(None)
 
     def bundle_revs(self, menuitem):
-        revs = list(self.revs)
-        revs.sort()
-        parent = self.repo[revs[0]].parents()[0].rev()
+        revrange = list(self.revrange)
+        revrange.sort()
+        parent = self.repo[revrange[0]].parents()[0].rev()
         # Special case for revision 0's parent.
         if parent == -1: parent = 'null'
 
         filename = "%s_rev%d_to_rev%s.hg" % (os.path.basename(self.repo.root),
-                   revs[0], revs[1])
+                   revrange[0], revrange[1])
         result = gtklib.NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
                                          InitialDir=self.repo.root,
                                          FileName=filename).run()
         if result:
             cmdline = ['hg', 'bundle', '--base', str(parent),
-                      '--rev', str(revs[1]), result]
+                      '--rev', str(revrange[1]), result]
             dlg = hgcmd.CmdDialog(cmdline)
             dlg.show_all()
             dlg.run()
@@ -780,9 +784,9 @@ class GLog(gdialog.GDialog):
 
     def mqimport_revs(self, menuitem):
         """Import revision range as MQ patches."""
-        revs = list(self.revs)
-        revs.sort()
-        revrange = '%s:%s' % (str(revs[0]), str(revs[1]))
+        revrange = list(self.revrange)
+        revrange.sort()
+        revrange = '%s:%s' % (str(revrange[0]), str(revrange[1]))
         cmdline = ['hg', 'qimport', '--rev', revrange]
         dialog = hgcmd.CmdDialog(cmdline)
         dialog.show_all()
@@ -795,9 +799,9 @@ class GLog(gdialog.GDialog):
 
     def mqfinish_revs(self, menuitem):
         """Finish revision range as MQ patches."""
-        revs = list(self.revs)
-        revs.sort()
-        revrange = '%s:%s' % (str(revs[0]), str(revs[1]))
+        revrange = list(self.revrange)
+        revrange.sort()
+        revrange = '%s:%s' % (str(revrange[0]), str(revrange[1]))
         cmdline = ['hg', 'qfinish', revrange]
         dialog = hgcmd.CmdDialog(cmdline)
         dialog.show_all()
@@ -810,7 +814,7 @@ class GLog(gdialog.GDialog):
 
     def rebase_selected(self, menuitem):
         """Rebase revision on top of selection (1st on top of 2nd).""" 
-        revs = list(self.revs)
+        revs = self.revrange
         res = gdialog.Confirm(_('Confirm Rebase Revision'), [], self,
             _('Rebase revision %d on top of %d?') % (revs[0], revs[1])).run()
         if res != gtk.RESPONSE_YES:
@@ -828,9 +832,9 @@ class GLog(gdialog.GDialog):
 
     def transplant_revs(self, menuitem):
         """Transplant revision range on top of current revision."""
-        revs = list(self.revs)
+        revs = list(self.revrange)
         revs.sort()
-        cmdline = ['hg', 'transplant', '%s:%s' % (str(revs[0]), str(revs[1]))]
+        cmdline = ['hg', 'transplant', '%d:%d' % (revs[0], revs[1])]
         dialog = hgcmd.CmdDialog(cmdline)
         dialog.show_all()
         dialog.run()
@@ -844,7 +848,7 @@ class GLog(gdialog.GDialog):
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
         oldlen = len(self.repo)
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
 
         def refresh(*args):
             self.repo.invalidate()
@@ -863,7 +867,7 @@ class GLog(gdialog.GDialog):
         dialog.set_transient_for(None)
 
     def show_status(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         statopts = self.merge_opts(commands.table['^status|st'][1],
                 ('include', 'exclude', 'git'))
         if self.changeview.parent_toggle.get_active():
@@ -879,13 +883,13 @@ class GLog(gdialog.GDialog):
         dialog.display()
 
     def copy_hash(self, menuitem):
-        hash = self.currow[treemodel.HEXID]
+        hash = str(self.repo[self.currevid])
         sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
         clipboard = gtk.Clipboard(selection=sel)
         clipboard.set_text(hash)
 
     def export_patch(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         filename = "%s_rev%s.patch" % (os.path.basename(self.repo.root), rev)
         result = gtklib.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
                                              InitialDir=self.repo.root,
@@ -909,7 +913,7 @@ class GLog(gdialog.GDialog):
 
     def bundle_rev_to_tip(self, menuitem):
         try:
-            rev = int(self.currow[treemodel.REVID])
+            rev = self.currevid
             parent = self.repo[rev].parents()[0].rev()
             # Special case for revision 0's parent.
             if parent == -1: parent = 'null'
@@ -935,7 +939,7 @@ class GLog(gdialog.GDialog):
             dlg.hide()
 
     def email_patch(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         dlg = hgemail.EmailDialog(self.repo.root, ['--rev', str(rev)])
         dlg.set_transient_for(self)
         dlg.show_all()
@@ -943,7 +947,7 @@ class GLog(gdialog.GDialog):
         dlg.set_transient_for(None)
 
     def checkout(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
         dialog = update.UpdateDialog(rev)
         dialog.set_transient_for(self)
@@ -960,10 +964,10 @@ class GLog(gdialog.GDialog):
             self.refresh_model()
 
     def merge(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
         if rev == self.repo.parents()[0].rev():
-            rev = self.revs[1]
+            rev = self.revrange[1]
         dialog = merge.MergeDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
@@ -982,7 +986,7 @@ class GLog(gdialog.GDialog):
             self.refresh_model()
 
     def archive(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
         dialog = archive.ArchiveDialog(rev)
         dialog.set_transient_for(self)
@@ -992,7 +996,7 @@ class GLog(gdialog.GDialog):
 
     def transplant_rev(self, menuitem):
         """Transplant selection on top of current revision."""
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         cmdline = ['hg', 'transplant', str(rev)]
         dialog = hgcmd.CmdDialog(cmdline)
         dialog.show_all()
@@ -1002,16 +1006,6 @@ class GLog(gdialog.GDialog):
         self.reload_log()
         self.changeview._buffer.set_text('')
         self.changeview._filelist.clear()
-
-    def selection_changed(self, treeview):
-        self.currow = self.graphview.get_revision()
-        self.ancestrybutton.set_sensitive(True)
-        rev = self.currow[treemodel.REVID]
-        if rev != self.last_rev:
-            self.last_rev = rev
-            self.changeview.opts['rev'] = [str(rev)]
-            self.changeview.load_details(rev)
-        return False
 
     def thgrefresh(self, window):
         self.reload_log()
@@ -1036,23 +1030,22 @@ class GLog(gdialog.GDialog):
             else:
                 tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
                 tree.get_selection().select_path(crow)
-                self.orig_sel = srow
-                self.revs = (int(model[srow][treemodel.REVID]),
-                        int(model[crow][treemodel.REVID]))
+                self.origsel = srow
+                rev0 = self.graphview.get_revid_at_path(srow)
+                rev1 = self.graphview.get_revid_at_path(crow)
+                self.revrange = (rev0, rev1)
                 self.tree_popup_menu_diff(tree, event.button, event.time)
             return True
         return False
 
     def tree_popup_menu(self, treeview, button=0, time=0) :
-        selrev = int(self.currow[treemodel.REVID])
-
         # disable/enable menus as required
         parents = [x.rev() for x in self.repo.parents()]
-        can_merge = selrev not in parents and len(parents) < 2
+        can_merge = self.currevid not in parents and len(parents) < 2
         self.cmenu_merge.set_sensitive(can_merge)
 
         op1, op2 = self.repo.dirstate.parents()
-        node = self.repo[selrev].node()
+        node = self.repo[self.currevid].node()
         a = self.repo.changelog.ancestor(op1, node)
         self.cmenu_backout.set_sensitive(a == node)
 
@@ -1061,11 +1054,9 @@ class GLog(gdialog.GDialog):
         return True
 
     def tree_popup_menu_diff(self, treeview, button=0, time=0):
-        selrev = self.revs[0]
-
         # disable/enable menus as required
         parents = [x.rev() for x in self.repo.parents()]
-        can_merge = selrev in parents and len(parents) < 2
+        can_merge = self.currevid in parents and len(parents) < 2
         self.cmenu_merge2.set_sensitive(can_merge)
 
         # display the context menu

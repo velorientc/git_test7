@@ -19,7 +19,6 @@ from thgutil.i18n import _
 from thgutil import hglib
 from thgutil import thread2
 
-from hggtk.logview import treemodel
 from hggtk.logview.colormap import AnnotateColorMap, AnnotateColorSaturation
 from hggtk.logview.treeview import TreeView as LogTreeView
 
@@ -641,10 +640,11 @@ class DataMineDialog(gdialog.GDialog):
         treeview.get_column(col).set_visible(b)
 
     def log_selection_changed(self, graphview, path, label, button):
-        row = graphview.get_revision()
-        rev = row[treemodel.REVID]
-        self.currev = str(rev)
-        ctx = self.repo[rev]
+        treeview = graphview.treeview
+        (model, paths) = treeview.get_selection().get_selected_rows()
+        revid = graphview.get_revid_at_path(paths[0])
+        self.currev = str(revid)
+        ctx = self.repo[revid]
         try:
             filectx = ctx.filectx(path)
             info = filectx.renamed()
@@ -668,9 +668,8 @@ class DataMineDialog(gdialog.GDialog):
         self.add_annotate_page(path, rev)
 
     def log_activate(self, treeview, path, column, objs):
-        model = treeview.get_model()
-        logiter = model.get_iter(path)
-        rev = model.get_value(logiter, treemodel.REVID)
+        (frame, treeview, file, graphview) = objs
+        rev = graphview.get_revid_at_path(path)
         self.trigger_annotate(rev, objs)
 
     def revisions_loaded(self, graphview, rev):

@@ -75,17 +75,17 @@ class TreeModel(gtk.GenericTreeModel):
     def on_get_column_type(self, index):
         if index == GRAPHNODE: return gobject.TYPE_PYOBJECT
         if index == LINES: return gobject.TYPE_PYOBJECT
-        if index == REVID: return gobject.TYPE_STRING
+        if index == REVID: return int
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
-        if index == MESSAGE: return gobject.TYPE_STRING
-        if index == COMMITER: return gobject.TYPE_STRING
-        if index == TIMESTAMP: return gobject.TYPE_STRING
-        if index == TAGS: return gobject.TYPE_STRING
-        if index == FGCOLOR: return gobject.TYPE_STRING
-        if index == HEXID: return gobject.TYPE_STRING
-        if index == BRANCHES: return gobject.TYPE_STRING
-        if index == UTC: return gobject.TYPE_STRING
-        if index == AGE: return gobject.TYPE_STRING
+        if index == MESSAGE: return str
+        if index == COMMITER: return str
+        if index == TIMESTAMP: return str
+        if index == TAGS: return str
+        if index == FGCOLOR: return str
+        if index == HEXID: return str
+        if index == BRANCHES: return str
+        if index == UTC: return str
+        if index == AGE: return str
 
     def on_get_iter(self, path):
         return path[0]
@@ -96,7 +96,7 @@ class TreeModel(gtk.GenericTreeModel):
     def on_get_value(self, rowref, column):
         (revid, graphnode, lines, parents) = self.graphdata[rowref]
 
-        if column == REVID: return str(revid)
+        if column == REVID: return revid
         if column == GRAPHNODE: return graphnode
         if column == LINES: return lines
         if column == LAST_LINES:

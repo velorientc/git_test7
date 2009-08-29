@@ -47,11 +47,6 @@ class TreeView(gtk.ScrolledWindow):
                    'Revisions above this number will be drawn green',
                    gobject.PARAM_READWRITE),
 
-        'revision': (gobject.TYPE_PYOBJECT,
-                     'Revision',
-                     'The currently selected revision',
-                     gobject.PARAM_READWRITE),
-
         'date-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Date',
                                  'Show date column',
@@ -114,7 +109,7 @@ class TreeView(gtk.ScrolledWindow):
 
         self.batchsize = limit
         self.repo = repo
-        self.currev = None
+        self.currevid = None
         self.construct_treeview()
         self.pbar = pbar
         self.origtip = None
@@ -177,7 +172,7 @@ class TreeView(gtk.ScrolledWindow):
         self.model = None
         self.limit = self.batchsize
 
-    def populate(self, revision=None):
+    def populate(self, revid=None):
         'Fill the treeview with contents'
         stopped = False
         if self.repo is None:
@@ -236,8 +231,8 @@ class TreeView(gtk.ScrolledWindow):
         self.emit('batch-loaded')
         if stopped:
             self.emit('revisions-loaded')
-        if revision is not None:
-            self.set_revision_id(int(revision[treemodel.REVID]))
+        if revid is not None:
+            self.set_revision_id(revid)
         if self.pbar is not None:
             self.pbar.end()
         return False
@@ -261,8 +256,6 @@ class TreeView(gtk.ScrolledWindow):
             return self.repo
         elif property.name == 'limit':
             return self.limit
-        elif property.name == 'revision':
-            return self.currev
         elif property.name == 'original-tip-revision':
             return self.origtip
         else:
@@ -287,12 +280,13 @@ class TreeView(gtk.ScrolledWindow):
             self.repo = value
         elif property.name == 'limit':
             self.batchsize = value
-        elif property.name == 'revision':
-            self.set_revision_id(value)
         elif property.name == 'original-tip-revision':
             self.origtip = value
         else:
             raise AttributeError, 'unknown property %s' % property.name
+
+    def get_revid_at_path(self, path):
+        return self.model[path][treemodel.REVID]
 
     def next_revision_batch(self, size):
         self.batchsize = size
@@ -306,10 +300,6 @@ class TreeView(gtk.ScrolledWindow):
         if self.pbar is not None:
             self.pbar.begin()
         gobject.idle_add(self.populate)
-
-    def get_revision(self):
-        """Return revision id of currently selected revision, or None."""
-        return self.get_property('revision')
 
     def scroll_to_revision(self, revid):
         if revid in self.index:
@@ -347,7 +337,7 @@ class TreeView(gtk.ScrolledWindow):
                 self.create_log_generator(graphcol, pats, opts)
                 if self.pbar is not None:
                     self.pbar.begin()
-                gobject.idle_add(self.populate, self.get_revision())
+                gobject.idle_add(self.populate, self.currevid)
             else:
                 self.treeview.set_model(None)
                 self.pbar.set_status_text('Repository is empty')
@@ -537,8 +527,7 @@ class TreeView(gtk.ScrolledWindow):
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
         (path, focus) = treeview.get_cursor()
-        if path is not None and self.model is not None:
-            iter = self.model.get_iter(path)
-            self.currev = self.model[iter]
+        if path:
+            self.currevid = self.model[path][treemodel.REVID]
             self.emit('revision-selected')
 
