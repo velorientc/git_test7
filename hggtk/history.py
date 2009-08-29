@@ -338,7 +338,7 @@ class GLog(gdialog.GDialog):
         'Send refresh event to treeview object'
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
-                'revrange':[], 'rev':[], 'noheads':False }
+                'revrange':[], 'revlist':[], 'noheads':False }
         opts.update(kwopts)
 
         # handle strips, rebases, etc

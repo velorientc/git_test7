@@ -520,10 +520,15 @@ class DataMineDialog(gdialog.GDialog):
         frame.set_border_width(10)
         vbox = gtk.VBox()
 
+        graphopts = { 'date': None, 'no_merges':False, 'only_merges':False,
+                'keyword':[], 'branch':None, 'pats':[], 'revrange':[],
+                'revlist':[], 'noheads':False, 'orig-tip':len(self.repo) }
+        graphopts['filehist'] = path
+
         # File log revision graph
         graphview = LogTreeView(self.repo, 5000, self.stbar)
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
-        graphview.refresh(True, None, {'filehist':path, 'filerev':rev})
+        graphview.refresh(True, None, graphopts)
         graphview.set_property('rev-column-visible', True)
         graphview.set_property('date-column-visible', True)
 
