@@ -72,10 +72,14 @@ class TreeView(gtk.ScrolledWindow):
                                  'Show revision ID column',
                                  False,
                                  gobject.PARAM_READWRITE),
-
         'branch-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Branch',
                                  'Show branch',
+                                 False,
+                                 gobject.PARAM_READWRITE),
+        'tag-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Tags',
+                                 'Show tag column',
                                  False,
                                  gobject.PARAM_READWRITE),
         'branch-color': (gobject.TYPE_BOOLEAN,
@@ -252,6 +256,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.utc_column.get_visible()
         elif property.name == 'age-column-visible':
             return self.age_column.get_visible()
+        elif property.name == 'tag-column-visible':
+            return self.tag_column.get_visible()
         elif property.name == 'repo':
             return self.repo
         elif property.name == 'limit':
@@ -274,6 +280,8 @@ class TreeView(gtk.ScrolledWindow):
             self.utc_column.set_visible(value)
         elif property.name == 'age-column-visible':
             self.age_column.set_visible(value)
+        elif property.name == 'tag-column-visible':
+            self.tag_column.set_visible(value)
         elif property.name == 'repo':
             self.repo = value
         elif property.name == 'limit':
@@ -490,6 +498,19 @@ class TreeView(gtk.ScrolledWindow):
         self.age_column.add_attribute(cell, "text", treemodel.AGE)
         self.age_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.treeview.append_column(self.age_column)
+
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 10)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        self.tag_column = gtk.TreeViewColumn(_('Tags'))
+        self.tag_column.set_visible(False)
+        self.tag_column.set_resizable(True)
+        self.tag_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.tag_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.tag_column.pack_start(cell, expand=True)
+        self.tag_column.add_attribute(cell, "text", treemodel.TAGS)
+        self.tag_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        self.treeview.append_column(self.tag_column)
 
     def text_color_orig(self, parents, rev, author):
         if int(rev) >= self.origtip:

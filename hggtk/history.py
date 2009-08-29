@@ -208,6 +208,12 @@ class GLog(gdialog.GDialog):
         button.set_active(self.showcol.get('id', False))
         button.set_draw_as_radio(True)
         menu.append(button)
+        button = gtk.CheckMenuItem(_('Show Tags'))
+        button.connect('toggled', self.toggle_view_column,
+                'tag-column-visible')
+        button.set_active(self.showcol.get('tag', False))
+        button.set_draw_as_radio(True)
+        menu.append(button)
         button = gtk.CheckMenuItem(_('Show Local Date'))
         button.connect('toggled', self.toggle_view_column,
                 'date-column-visible')
@@ -314,7 +320,7 @@ class GLog(gdialog.GDialog):
             self.setting_hpos = settings['glog-hpane']
             self.branch_color = settings.get('branch-color', False)
             self.show_filterbar = settings.get('show-filterbar', True)
-            for col in ('rev', 'date', 'id', 'branch', 'utc', 'age'):
+            for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
         except KeyError:
