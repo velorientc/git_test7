@@ -25,7 +25,7 @@ class TagAddDialog(gtk.Dialog):
         """ Initialize the Dialog """
         root = hglib.toutf(os.path.basename(repo.root))
         gtk.Dialog.__init__(self, title=_('TortoiseHg Tag - %s') % root,
-                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
@@ -153,6 +153,9 @@ class TagAddDialog(gtk.Dialog):
 
     def dialog_response(self, dialog, response_id):
         self.store_settings()
+        if response_id == gtk.RESPONSE_CLOSE \
+                or response_id == gtk.RESPONSE_DELETE_EVENT:
+            self.destroy()
 
     def _taginput_activated(self, taginput):
         self._do_add_tag()
