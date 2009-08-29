@@ -13,9 +13,11 @@ import pango
 from mercurial import hg, ui
 
 from thgutil.i18n import _
-from thgutil import hglib, paths
+from thgutil import hglib, paths, i18n
 
-from hggtk import changesetinfo, gtklib, hgcmd
+from hggtk import changesetinfo, gtklib, hgcmd, gdialog
+
+keep = i18n.keepgettext()
 
 class BackoutDialog(gtk.Dialog):
     """ Backout effect of a changeset """
@@ -40,31 +42,48 @@ class BackoutDialog(gtk.Dialog):
             gobject.idle_add(self.destroy)
             return
 
-        # build UI
+        # message
+        self.msgset = keep._('Backed out changeset: ')
+        self.msgset['id'] += rev
+        self.msgset['str'] += rev
+
+        # changeset info
         frame = gtk.Frame(_('Changeset Description'))
+        frame.set_border_width(4)
         revid, desc = changesetinfo.changesetinfo(repo, rev)
         frame.add(desc)
-        frame.set_border_width(5)
         self.vbox.pack_start(frame, False, False, 2)
 
+        # backout commit message
+        frame = gtk.Frame(_('Backout commit message'))
+        frame.set_border_width(4)
+        msgvbox = gtk.VBox()
+        msgvbox.set_border_width(4)
+        frame.add(msgvbox)
+        self.vbox.pack_start(frame, True, True, 2)
+
+        ## message text area
         self.logview = gtk.TextView(buffer=None)
         self.logview.set_editable(True)
         self.logview.modify_font(pango.FontDescription('Monospace'))
         self.buf = self.logview.get_buffer()
-        self.buf.set_text(_('Backed out changeset: ') + rev)
+        self.buf.set_text(self.msgset['str'])
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.logview)
-        scrolledwindow.set_border_width(4)
-        frame = gtk.Frame(_('Backout commit message'))
-        frame.set_border_width(4)
-        frame.add(scrolledwindow)
+        msgvbox.pack_start(scrolledwindow)
+
+        ## tooltips
         self.tips = gtk.Tooltips()
         self.tips.set_tip(frame,
                 _('Commit message text for new changeset that reverses the'
                 '  effect of the change being backed out.'))
-        self.vbox.pack_start(frame, True, True, 4)
+
+        ## use English backout message option
+        self.eng_msg = gtk.CheckButton(_('Use English backout message'))
+        self.eng_msg.connect('toggled', self.eng_msg_toggled)
+        msgvbox.pack_start(self.eng_msg, False, False)
 
         # prepare to show
         backoutbutton.grab_focus()
@@ -73,6 +92,22 @@ class BackoutDialog(gtk.Dialog):
         if response_id == gtk.RESPONSE_CLOSE \
                 or response_id == gtk.RESPONSE_DELETE_EVENT:
             self.destroy()
+
+    def eng_msg_toggled(self, checkbutton):
+        start, end = self.buf.get_bounds()
+        msg = self.buf.get_text(start, end)
+        state = checkbutton.get_active()
+        origmsg = (state and self.msgset['str'] or self.msgset['id'])
+        if msg != origmsg:
+            res = gdialog.Confirm(_('Confirm Discard Message'),
+                    [], self, _('Discard current backout message?')).run()
+            if res != gtk.RESPONSE_YES:
+                checkbutton.handler_block_by_func(self.eng_msg_toggled)
+                checkbutton.set_active(not state)
+                checkbutton.handler_unblock_by_func(self.eng_msg_toggled)
+                return
+        newmsg = (state and self.msgset['id'] or self.msgset['str'])
+        self.buf.set_text(newmsg)
 
     def backout(self, button, revstr):
         start, end = self.buf.get_bounds()
