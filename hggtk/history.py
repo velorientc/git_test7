@@ -385,17 +385,17 @@ class GLog(gdialog.GDialog):
                 hr = self.repo[r].rev()
                 if hr not in tagged:
                     tagged.insert(0, hr)
-            opts['revs'] = tagged
+            opts['revlist'] = tagged
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'parents':
             ftitle(_('working parents'))
             repo_parents = [x.rev() for x in self.repo.parents()]
-            opts['revs'] = [str(x) for x in repo_parents]
+            opts['revlist'] = [str(x) for x in repo_parents]
             self.graphview.refresh(False, [], opts)
         elif self.filter == 'heads':
             ftitle(_('heads'))
             heads = [self.repo[x].rev() for x in self.repo.heads()]
-            opts['revs'] = [str(x) for x in heads]
+            opts['revlist'] = [str(x) for x in heads]
             self.graphview.refresh(False, [], opts)
 
     def tree_context_menu(self):
