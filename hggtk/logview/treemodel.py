@@ -16,9 +16,7 @@ dialog.  Other portions stolen from graphlog extension.
 
 import gtk
 import gobject
-import re
 from mercurial import util, templatefilters
-from mercurial.hgweb import webutil
 from thgutil import hglib
 from hggtk import gtklib
 
