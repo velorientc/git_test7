@@ -256,8 +256,6 @@ class TreeView(gtk.ScrolledWindow):
             return self.repo
         elif property.name == 'limit':
             return self.limit
-        elif property.name == 'original-tip-revision':
-            return self.origtip
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -280,8 +278,6 @@ class TreeView(gtk.ScrolledWindow):
             self.repo = value
         elif property.name == 'limit':
             self.batchsize = value
-        elif property.name == 'original-tip-revision':
-            self.origtip = value
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -331,6 +327,7 @@ class TreeView(gtk.ScrolledWindow):
             self.next_revision_batch(self.batchsize)
 
     def refresh(self, graphcol, pats, opts):
+        self.origtip = opts['orig-tip']
         if self.repo is not None:
             hglib.invalidaterepo(self.repo)
             if len(self.repo.changelog) > 0:
@@ -495,7 +492,7 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.age_column)
 
     def text_color_orig(self, parents, rev, author):
-        if self.origtip is not None and int(rev) >= self.origtip:
+        if int(rev) >= self.origtip:
             return 'darkgreen'
         if len(parents) == 2:
             # mark merge changesets blue
@@ -514,7 +511,7 @@ class TreeView(gtk.ScrolledWindow):
     color_cache = {}
 
     def text_color_author(self, parents, rev, author):
-        if self.origtip is not None and int(rev) >= self.origtip:
+        if int(rev) >= self.origtip:
             return 'darkgreen'
         for re, v in self.author_pats:
             if (re.search(author)):

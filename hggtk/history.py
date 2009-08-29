@@ -254,11 +254,7 @@ class GLog(gdialog.GDialog):
         root = self.repo.root
         os.chdir(root)  # for paths relative to repo root
 
-        if self.opts.get('orig-tip') is not None:
-            origtip = self.opts['orig-tip']
-            if origtip != len(self.repo):
-                self.origtip = origtip
-        self.graphview.set_property('original-tip-revision', self.origtip)
+        self.origtip = self.opts['orig-tip'] or len(self.repo)
 
         # ignore file patterns that imply repo root
         if len(self.pats) == 1 and self.pats[0] in (root, root+os.sep, ''):
@@ -337,8 +333,8 @@ class GLog(gdialog.GDialog):
         opts.update(kwopts)
 
         # handle strips, rebases, etc
-        if len(self.repo) < self.origtip:
-            self.origtip = len(self.repo)
+        self.origtip = min(len(self.repo), self.origtip)
+        opts['orig-tip'] = self.origtip
 
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
