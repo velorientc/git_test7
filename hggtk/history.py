@@ -123,6 +123,9 @@ class GLog(gdialog.GDialog):
         'Graphview reports a new row selected'
         treeview = graphview.treeview
         (model, paths) = treeview.get_selection().get_selected_rows()
+        if not paths:
+            self.currevid = None
+            return False
         self.currevid = graphview.get_revid_at_path(paths[0])
         self.ancestrybutton.set_sensitive(True)
         if self.currevid != self.lastrevid:
