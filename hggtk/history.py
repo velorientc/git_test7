@@ -713,12 +713,19 @@ class GLog(gdialog.GDialog):
         self.changeview._filelist.clear()
 
     def backout_rev(self, menuitem):
+        oldlen = len(self.repo)
         hash = str(self.repo[self.currevid])
         parents = [x.node() for x in self.repo.parents()]
+
+        def refresh(*args):
+            self.repo.invalidate()
+            if len(self.repo) != oldlen:
+                self.reload_log()
+
         dlg = backout.BackoutDialog(hash)
         dlg.set_transient_for(self)
+        dlg.connect('destroy', refresh)
         dlg.show_all()
-        dlg.set_notify_func(self.checkout_completed, parents)
         dlg.present()
         dlg.set_transient_for(None)
 

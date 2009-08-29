@@ -34,14 +34,13 @@ class BackoutDialog(gtk.Dialog):
         backoutbutton.connect('clicked', self.backout, rev)
         self.action_area.pack_end(backoutbutton)
 
-        self.notify_func = None
-
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
 
+        # build UI
         frame = gtk.Frame(_('Changeset Description'))
         revid, desc = changesetinfo.changesetinfo(repo, rev)
         frame.add(desc)
@@ -75,10 +74,6 @@ class BackoutDialog(gtk.Dialog):
                 or response_id == gtk.RESPONSE_DELETE_EVENT:
             self.destroy()
 
-    def set_notify_func(self, func, *args):
-        self.notify_func = func
-        self.notify_args = args
-
     def backout(self, button, revstr):
         start, end = self.buf.get_bounds()
         msg = self.buf.get_text(start, end)
@@ -88,6 +83,4 @@ class BackoutDialog(gtk.Dialog):
         dlg.run()
         dlg.hide()
         if dlg.returncode == 0:
-            if self.notify_func:
-                self.notify_func(self.notify_args)
             self.destroy()
