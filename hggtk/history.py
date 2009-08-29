@@ -865,7 +865,7 @@ class GLog(gdialog.GDialog):
                 if newtags != oldtags:
                     self.refresh_model()
 
-        dialog = tagadd.TagAddDialog(self.repo.root, rev=str(rev))
+        dialog = tagadd.TagAddDialog(self.repo, rev=str(rev))
         dialog.set_transient_for(self)
         dialog.connect('destroy', refresh)
         dialog.show_all()

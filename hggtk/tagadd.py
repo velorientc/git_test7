@@ -21,9 +21,10 @@ keep = i18n.keepgettext()
 
 class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, root='', tag='', rev=''):
+    def __init__(self, repo, tag='', rev=''):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self, title=_('TortoiseHg Tag - %s') % (root or os.getcwd()),
+        root = hglib.toutf(os.path.basename(repo.root))
+        gtk.Dialog.__init__(self, title=_('TortoiseHg Tag - %s') % root,
                           buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
@@ -43,13 +44,7 @@ class TagAddDialog(gtk.Dialog):
         # persistent settings
         self.settings = settings.Settings('tagadd')
 
-        self.root = root
-        self.repo = None
-
-        try:
-            self.repo = hg.repository(ui.ui(), path=self.root)
-        except hglib.RepoError:
-            pass
+        self.repo = repo
 
         # copy from 'clone.py'
         def createtable(cols=2):
