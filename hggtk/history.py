@@ -440,6 +440,8 @@ class GLog(gdialog.GDialog):
                  self.bundle_revs))
         m.append(create_menu(_('import as MQ patches from here to selected'),
                  self.mqimport_revs))
+        m.append(create_menu(_('finish MQ patches from here to selected'),
+                 self.mqfinish_revs))
         self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
         m.append(self.cmenu_merge2)
         
@@ -782,6 +784,21 @@ class GLog(gdialog.GDialog):
         revs.sort()
         revrange = '%s:%s' % (str(revs[0]), str(revs[1]))
         cmdline = ['hg', 'qimport', '--rev', revrange]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
+
+    def mqfinish_revs(self, menuitem):
+        """Finish revision range as MQ patches."""
+        revs = list(self.revs)
+        revs.sort()
+        revrange = '%s:%s' % (str(revs[0]), str(revs[1]))
+        cmdline = ['hg', 'qfinish', revrange]
         dialog = hgcmd.CmdDialog(cmdline)
         dialog.show_all()
         dialog.run()
