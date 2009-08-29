@@ -530,6 +530,7 @@ class GLog(gdialog.GDialog):
         self.graphview.connect('revision-selected', self.selection_changed)
         self.graphview.connect('revisions-loaded', self.revisions_loaded)
 
+        self.tree.connect('popup-menu', self.tree_popup_menu)
         self.tree.connect('button-press-event', self.tree_button_press)
         self.tree.connect('row-activated', self.tree_row_act)
 
