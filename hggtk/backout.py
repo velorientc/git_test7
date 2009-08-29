@@ -13,7 +13,7 @@ import pango
 from mercurial import hg, ui
 
 from thgutil.i18n import _
-from thgutil import hglib, paths, i18n
+from thgutil import hglib, paths, i18n, settings
 
 from hggtk import changesetinfo, gtklib, hgcmd, gdialog
 
@@ -35,6 +35,9 @@ class BackoutDialog(gtk.Dialog):
         backoutbutton = gtk.Button(_('Backout'))
         backoutbutton.connect('clicked', self.backout, rev)
         self.action_area.pack_end(backoutbutton)
+
+        # persistent settings
+        self.settings = settings.Settings('backout')
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -86,9 +89,20 @@ class BackoutDialog(gtk.Dialog):
         msgvbox.pack_start(self.eng_msg, False, False)
 
         # prepare to show
+        self.load_settings()
         backoutbutton.grab_focus()
 
+    def load_settings(self):
+        checked = self.settings.get_value('english', False, True)
+        self.eng_msg.set_active(checked)
+
+    def store_settings(self):
+        checked = self.eng_msg.get_active()
+        self.settings.set_value('english', checked)
+        self.settings.write()
+
     def dialog_response(self, dialog, response_id):
+        self.store_settings()
         if response_id == gtk.RESPONSE_CLOSE \
                 or response_id == gtk.RESPONSE_DELETE_EVENT:
             self.destroy()
