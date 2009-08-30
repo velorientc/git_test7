@@ -220,7 +220,7 @@ class GLog(gdialog.GDialog):
         button = gtk.CheckMenuItem(_('Show Local Date'))
         button.connect('toggled', self.toggle_view_column,
                 'date-column-visible')
-        button.set_active(self.showcol.get('date', True))
+        button.set_active(self.showcol.get('date', False))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Show UTC Date'))
@@ -232,7 +232,7 @@ class GLog(gdialog.GDialog):
         button = gtk.CheckMenuItem(_('Show Age'))
         button.connect('toggled', self.toggle_view_column,
                 'age-column-visible')
-        button.set_active(self.showcol.get('age', False))
+        button.set_active(self.showcol.get('age', True))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Show Branch'))
