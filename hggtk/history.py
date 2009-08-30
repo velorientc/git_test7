@@ -305,7 +305,7 @@ class GLog(gdialog.GDialog):
         settings['glog-hpane'] = self.hpaned.get_position()
         settings['branch-color'] = self.graphview.get_property('branch-color')
         settings['show-filterbar'] = self.show_filterbar
-        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age'):
+        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
         return settings
