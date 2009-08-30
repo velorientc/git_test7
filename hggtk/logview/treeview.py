@@ -432,7 +432,7 @@ class TreeView(gtk.ScrolledWindow):
         self.branch_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.branch_column.pack_start(cell, expand=True)
         self.branch_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.branch_column.add_attribute(cell, "markup", treemodel.BRANCHES)
+        self.branch_column.add_attribute(cell, "markup", treemodel.BRANCH)
         self.treeview.append_column(self.branch_column)
         cell = gtk.CellRendererText()
 
@@ -469,7 +469,7 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.date_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.date_column.pack_start(cell, expand=True)
-        self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
+        self.date_column.add_attribute(cell, "text", treemodel.LOCALTIME)
         self.date_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.treeview.append_column(self.date_column)
 

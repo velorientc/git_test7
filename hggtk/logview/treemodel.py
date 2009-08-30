@@ -26,15 +26,16 @@ GRAPHNODE = 1
 REVID = 2
 LAST_LINES = 3
 
-MESSAGE = 5         # These elements are calculated on demand
-COMMITER = 6
-BRANCHES = 7
-TAGS = 8
-FGCOLOR = 9
-HEXID = 10
-TIMESTAMP = 11
-UTC = 12
-AGE = 13
+BRANCH = 4          # calculated on demand, not cached
+HEXID = 5
+LOCALTIME = 6
+UTC = 7
+
+MESSAGE = 8         # calculated on demand, cached
+COMMITER = 9
+TAGS = 10
+FGCOLOR = 11
+AGE = 12
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -70,21 +71,23 @@ class TreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
 
     def on_get_n_columns(self):
-        return 14
+        return 13
 
     def on_get_column_type(self, index):
         if index == GRAPHNODE: return gobject.TYPE_PYOBJECT
         if index == LINES: return gobject.TYPE_PYOBJECT
         if index == REVID: return int
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
+
+        if index == BRANCH: return str
+        if index == HEXID: return str
+        if index == LOCALTIME: return str
+        if index == UTC: return str
+
         if index == MESSAGE: return str
         if index == COMMITER: return str
-        if index == TIMESTAMP: return str
         if index == TAGS: return str
         if index == FGCOLOR: return str
-        if index == HEXID: return str
-        if index == BRANCHES: return str
-        if index == UTC: return str
         if index == AGE: return str
 
     def on_get_iter(self, path):
@@ -103,6 +106,20 @@ class TreeModel(gtk.GenericTreeModel):
             if rowref>0:
                 return self.graphdata[rowref-1][2]
             return []
+
+        if column in (HEXID, BRANCH, LOCALTIME, UTC):
+            try:
+                ctx = self.repo[revid]
+            except IndexError:
+                return None
+            if column == HEXID:
+                return str(ctx)
+            if column == BRANCH:
+                return ctx.branch()
+            if column == LOCALTIME:
+                return hglib.displaytime(ctx.date())
+            if column == UTC:
+                return hglib.utctime(ctx.date())
 
         if revid not in self.revisions:
             try:
@@ -140,8 +157,6 @@ class TreeModel(gtk.GenericTreeModel):
             if not author:
                 author = util.shortuser(ctx.user())
             author = hglib.toutf(author)
-            date = hglib.displaytime(ctx.date())
-            utc = hglib.utctime(ctx.date())
             age = templatefilters.age(ctx.date())
 
             color = self.color_func(parents, revid, author)
@@ -150,8 +165,7 @@ class TreeModel(gtk.GenericTreeModel):
             else:
                 sumstr = bstr + tstr + summary
             
-            revision = (sumstr, author, branch, taglist, color, str(ctx),
-                        date, utc, age)
+            revision = (sumstr, author, taglist, color, age)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
