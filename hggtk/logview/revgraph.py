@@ -145,6 +145,189 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
         curr_rev -= 1
 
 
+class BranchGrapher:
+    """Incremental branch grapher
+
+    This generator function produces a graph that uses loose ends to keep
+    focus on branches. All revisions in the range are shown, but not all edges.
+    The function identifies branches and may use loose ends if an edge links
+    two branches.
+    """
+    
+    def __init__(self, repo, start_rev, stop_rev):
+        assert start_rev >= stop_rev
+        self.repo = repo
+        
+        #
+        #  Iterator content
+        #  Variables that keep track of the iterator
+        #
+        
+        # The current revision to process
+        self.curr_rev = start_rev
+        
+        # Process all revs from start_rev to and including stop_rev
+        self.stop_rev = stop_rev
+
+        # List current branches. For each branch the next rev is listed
+        # The order of branches determine their columns
+        self.curr_branches = [start_rev]
+        
+        # For each branch, tell the next version that will show up
+        self.next_in_branch = {}
+        
+        #
+        #  Graph variables
+        #  These hold information related to the graph. Most are computed lazily.
+        #
+        
+        # Map rev to next rev in branch = first parent of rev. 
+        # The parent of last rev in a branch is undefined, 
+        # even if the revsion has a parent rev.
+        self.parent_of = {}
+        
+        # Map rev to newest rev in branch. This identifies the branch that the rev
+        # is part of
+        self.branch4rev = {}
+        
+        # Last revision in branch
+        self.branch_tail = {}
+        
+        # Map branch-id (head-rev of branch) to color
+        self.color4branch = {}
+        
+        # Next colour used. for branches
+        self.nextcolor = 0
+
+    def _get_parents(self, rev):
+        return [x for x in self.repo.changelog.parentrevs(rev) if x != nullrev]
+        
+    def _covered_rev(self, rev):
+        """True if rev is inside the revision range for the iterator"""
+        return self.stop_rev <= rev
+        
+    def _new_branch(self, branch_head):
+        """Mark all unknown revisions in range that are direct ancestors
+        of branch_head as part of the same branch. Stops when stop_rev
+        is passed or a known revision is found"""
+        assert self._covered_rev(branch_head)
+        assert not branch_head in self.branch4rev
+        self.color4branch[branch_head] = self.nextcolor
+        self.nextcolor += 1
+        self.next_in_branch[branch_head] = branch_head
+        rev = branch_head
+        while not rev in self.branch4rev:
+            # TODO consider lazy evaluation here
+            if not self._covered_rev(rev):
+                # rev is outside visible range, so we don't know tail location
+                self.branch_tail[branch_head] = 0 # Prev revs wasn't tail
+                return
+            self.branch4rev[rev] = branch_head
+            self.branch_tail[branch_head] = rev
+            parents = self._get_parents(rev)
+            if not parents:
+                # All revisions have been exhausted (rev = 0)
+                self.parent_of[rev] = None
+                return
+            self.parent_of[rev] = parents[0]
+            rev = parents[0]
+
+    def _get_rev_branch(self, rev):
+        """Find revision branch or create a new branch"""
+        branch = self.branch4rev.get(rev)
+        if branch is None:
+            branch = rev
+            self._new_branch(branch)
+        assert rev in self.branch4rev
+        assert branch in self.branch_tail
+        return branch
+        
+    def _compute_next_branches(self):
+        """Compute next row of branches"""
+        next_branches = self.curr_branches[:]
+        # Find branch used by current revision
+        curr_branch = self._get_rev_branch(self.curr_rev)
+        self.next_in_branch[curr_branch] = self.parent_of[self.curr_rev]
+        branch_index = self.curr_branches.index(curr_branch)
+        # Insert branches if parents point to new branches
+        new_parents = 0
+        for parent in self._get_parents(self.curr_rev):
+            branch = self._get_rev_branch(parent)
+            if not branch in next_branches:
+                new_parents += 1
+                next_branches.insert(branch_index + new_parents, branch)
+        # Delete branch if last revision
+        if self.curr_rev == self.branch_tail[curr_branch]:
+            del next_branches[branch_index]
+        # Return result
+        return next_branches
+    
+    def _rev_color(self, rev):
+        """Map a revision to a color"""
+        return self.color4branch[self.branch4rev[rev]]
+
+    def _compute_lines(self, parents, next_branches):
+        # Compute lines (from CUR to NEXT branch row)
+        lines = []
+        curr_rev_branch = self.branch4rev[self.curr_rev]
+        for curr_column, branch in enumerate(self.curr_branches):
+            if branch == curr_rev_branch:
+                # Add lines from current branch to parents
+                for par_rev in parents:
+                    par_branch = self._get_rev_branch(par_rev)
+                    color = self.color4branch[par_branch]
+                    next_column = next_branches.index(par_branch)
+                    line_type = type_PLAIN
+                    if par_rev != self.next_in_branch.get(par_branch):
+                        line_type = type_LOOSE_LOW
+                    lines.append( (curr_column, next_column, color, line_type) )
+            else:
+                # Continue unrelated branch
+                color = self.color4branch[branch]
+                next_column = next_branches.index(branch)
+                lines.append( (curr_column, next_column, color, type_PLAIN) )
+        return lines
+        
+    def more(self):
+        return self.curr_rev >= self.stop_rev
+        
+    def next(self):
+        """Perform one iteration of the branch grapher"""
+        
+        # Compute revision (on CUR branch row)
+        rev = self.curr_rev
+        rev_branch = self._get_rev_branch(rev)
+        if rev_branch not in self.curr_branches:
+            # New head
+            self.curr_branches.append(rev_branch)
+        
+        # Compute parents (indicates the branches on NEXT branch row that curr_rev links to)
+        parents = self._get_parents(rev)
+		# BUG: __get_parents is not defined - why?
+        
+        # Compute lines (from CUR to NEXT branch row)
+        next_branches = self._compute_next_branches()
+        lines = self._compute_lines(parents, next_branches)
+        
+        # Compute node info (for CUR branch row)
+        rev_column = self.curr_branches.index(rev_branch)
+        rev_color = self.color4branch[rev_branch]
+        node = (rev_column, rev_color)
+        
+        # Next loop
+        self.curr_branches = next_branches
+        self.curr_rev -= 1
+        
+        # Return result
+        # TODO: Refactor parents field away - it is apparently not used anywhere
+        return (rev, node, lines, parents)
+    
+def branch_grapher(repo, start_rev, stop_rev):
+    grapher = BranchGrapher(repo, start_rev, stop_rev)
+    while grapher.more():
+        yield grapher.next()            
+
+
 def filelog_grapher(repo, path):
     '''
     Graph the ancestry of a single file (log).  Deletions show
