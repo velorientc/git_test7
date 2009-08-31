@@ -806,8 +806,7 @@ class GCommit(GStatus):
         if dialog.return_code() == 0:
             self.closebranch = False
             self.nextbranch = None
-            self.opts['check'] = True  # recheck MAR after commit
-            self.filechunks = {}       # do not keep chunks
+            self.filechunks = {}       # force re-read of chunks
             buf = self.text.get_buffer()
             if buf.get_modified():
                 self.update_recent_messages(self.opts['message'])
