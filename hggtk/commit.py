@@ -787,6 +787,8 @@ class GCommit(GStatus):
             cmdline.append('--force')
         elif self.qheader is not None:
             cmdline[1] = 'qrefresh'
+            if not files:
+                cmdline += ['-X', self.repo.root]
         elif self.opts['addremove']:
             cmdline += ['--addremove']
         if self.opts['user']:
