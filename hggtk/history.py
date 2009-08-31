@@ -586,9 +586,12 @@ class GLog(gdialog.GDialog):
         self.branchbutton = branches
         filterbox.pack_start(branches, False)
 
+        dblist = self.repo.ui.config('tortoisehg', 'deadbranch', '')
+        deadbranches = [ x.strip() for x in dblist.split(',') ]
         branchcombo = gtk.combo_box_new_text()
         for name in self.repo.branchtags().keys():
-            branchcombo.append_text(name)
+            if name not in deadbranches:
+                branchcombo.append_text(name)
         branchcombo.connect('changed', self.select_branch)
         self.lastbranchrow = None
         filterbox.pack_start(branchcombo, False)

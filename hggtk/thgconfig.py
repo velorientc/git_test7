@@ -96,7 +96,12 @@ _log_info = (
     (_('Copy Hash'), 'tortoisehg.copyhash', ['False', 'True'],
         _('Allow the changelog viewer to copy the changeset hash'
         ' of the currently selected changeset into the clipboard.'
-        ' Default: False')))
+        ' DEPRECATED. Default: False')),
+    (_('Dead Branches'), 'tortoisehg.deadbranch', [],
+        _('Comma separated list of branch names that should be ignored'
+        ' when building a list of branch names for a repository.'
+        ' Default: None')),
+        )
 
 _paths_info = (
     (_('After pull operation'), 'tortoisehg.postpull',
