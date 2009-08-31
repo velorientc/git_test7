@@ -35,9 +35,19 @@ WizardSmallImageFile=..\misc\install-wizard-small.bmp
 AllowNoIcons=true
 DefaultGroupName=TortoiseHg
 PrivilegesRequired=poweruser
-AlwaysRestart=yes
+AlwaysRestart=no
 SetupLogging=yes
 ArchitecturesInstallIn64BitMode=x64
+
+[Types]
+Name: "full"; Description: "Full installation"
+Name: "custom"; Description: "Custom installation"; Flags: iscustom
+
+[Components]
+Name: "main"; Description: "Main Files (includes 'hg' and 'hgtk' commands)"; Types: full custom; Flags: fixed
+Name: "help"; Description: "Help Files"; Types: full
+Name: "hgbook"; Description: "The book 'Mercurial: The Definitive Guide' (PDF)"; Types: full
+Name: "shell"; Description: "Shell integration (overlay icons, context menu) [admin required]"; Types: full; Flags: restart; Check: ShellInstallPossible
 
 [Files]
 Source: ..\build-hg\contrib\mercurial.el; DestDir: {app}/contrib
@@ -48,7 +58,7 @@ Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
 Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n; Flags:
-Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags:
+Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ; Components: help
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
@@ -56,33 +66,34 @@ Source: ..\contrib\*.exe; DestDir: {app}; Flags:
 Source: ..\contrib\*.dll; DestDir: {app}; Flags:
 Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
 Source: contrib\refreshicons.cmd; DestDir: {app}/contrib
-Source: dist\*.exe; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: dist\*.exe; Excludes: "thgtaskbar.exe"; DestDir: {app}; Flags: ignoreversion
+Source: dist\thgtaskbar.exe; DestDir: {app}; Flags: ignoreversion; Components: shell
+Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion
 Source: dist\library.zip; DestDir: {app}
-Source: doc\build\pdf\*.pdf; DestDir: {app}/docs; Flags:
-Source: doc\build\chm\*.chm; DestDir: {app}/docs; Flags:
+Source: doc\build\pdf\*.pdf; DestDir: {app}/docs; Flags: ; Components: help
+Source: doc\build\chm\*.chm; DestDir: {app}/docs; Flags: ; Components: help
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
-Source: ..\misc\hgbook.pdf; DestDir: {app}/docs
-Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: ..\misc\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: ..\misc\hgbook.pdf; DestDir: {app}/docs ; Components: hgbook
+Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
+Source: ..\misc\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 
 [INI]
 Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http://www.selenic.com/mercurial/
 Filename: {app}\TortoiseHg.url; Section: InternetShortcut; Key: URL; String: http://bitbucket.org/tortoisehg/stable/
 
 [Icons]
-Name: {group}\Start Taskbar App; Filename: {app}\thgtaskbar.exe
-Name: {group}\TortoiseHg Book (chm); Filename: {app}\docs\TortoiseHg.chm
-Name: {group}\TortoiseHg Book (pdf); Filename: {app}\docs\TortoiseHg.pdf
+Name: {group}\Start Taskbar App; Filename: {app}\thgtaskbar.exe; Components: shell
+Name: {group}\TortoiseHg Book (chm); Filename: {app}\docs\TortoiseHg.chm; Components: help
+Name: {group}\TortoiseHg Book (pdf); Filename: {app}\docs\TortoiseHg.pdf; Components: help
 Name: {group}\TortoiseHg Web Site; Filename: {app}\TortoiseHg.url
-Name: {group}\Mercurial Book; Filename: {app}\docs\hgbook.pdf
-Name: {group}\Mercurial Command Reference; Filename: {app}\docs\hg.1.html
-Name: {group}\Mercurial Config Reference; Filename: {app}\docs\hgrc.5.html
+Name: {group}\Mercurial Book; Filename: {app}\docs\hgbook.pdf; Components: hgbook
+Name: {group}\Mercurial Command Reference; Filename: {app}\docs\hg.1.html; Components: help
+Name: {group}\Mercurial Config Reference; Filename: {app}\docs\hgrc.5.html; Components: help
 Name: {group}\Mercurial Web Site; Filename: {app}\Mercurial.url
 Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
@@ -90,8 +101,8 @@ Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 ;Filename: {tmp}\vcredist_x86.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
 ;Filename: {tmp}\vcredist_x64.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
-Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Check: not Is64BitInstallMode; StatusMsg: Installing TortoiseOverlays.dll ...
-Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-x64.msi"" /qn /norestart ALLUSERS=1"; Check: Is64BitInstallMode; StatusMsg: Installing TortoiseOverlays.dll ...
+Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Check: not Is64BitInstallMode; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
+Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-x64.msi"" /qn /norestart ALLUSERS=1"; Check: Is64BitInstallMode; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
 
 [UninstallRun]
 Filename: {app}\add_path.exe; Parameters: /del {app}
@@ -171,24 +182,48 @@ begin
   end; 
 end; 
 
-function PrepareToInstall: String;
+function TerminateThgTaskbar(): Boolean;
 var
   TaskbarWindow: HWND;
   TaskbarMutex: String;
+  tries: Integer;
 begin
-  { Shut down the system tray if it is running }
+  { Terminate thgtaskbar.exe if it is running. Returns True, if successful }
   TaskbarMutex := 'thgtaskbar,Global\thgtaskbar';
-  if CheckForMutexes(TaskbarMutex) then
-  begin
-    Result := 'The installer was unable to shut down TortoiseHg, and will now close.';
+  tries := 0;
+  while (tries < 4) and CheckForMutexes(TaskbarMutex) do begin
     TaskbarWindow := FindWindowByWindowName('TortoiseHg RPC server');
     if TaskbarWindow <> 0 then
-    begin
       SendMessage(TaskbarWindow, wm_Close, 0, 0);
-      if not CheckForMutexes(TaskbarMutex) then
-        Result := '';
-    end;
-  end else Result := '';
-end;  
+    Sleep(3000 { ms });
+    tries := tries + 1;
+  end;
+  Result := not CheckForMutexes(TaskbarMutex);
+end;
+
+function PrepareToInstall: String;
+begin
+  if TerminateThgTaskbar() then
+    Result := ''
+  else
+    Result := 'The installer failed to shut down thgtaskbar.exe, and will now close.';
+end;
+
+procedure CurUninstallStepChanged(step: TUninstallStep);
+begin
+  if step = usAppMutexCheck then
+    TerminateThgTaskbar();
+end;
+
+function ShellInstallPossible(): Boolean;
+begin
+  if not IsAdminLoggedOn then begin
+    SuppressibleMsgBox(
+      'The shell integration install option (overlay icons, context menu) is unavailable (Administrator required)',
+      mbInformation, MB_OK, 0
+    );
+    Result := False;
+  end else Result := True;
+end;
 
 #include "registry.iss"
