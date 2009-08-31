@@ -3,6 +3,45 @@
 This module contains the code to produce an ordered directed graph of a
 Mercurial repository, such as we display in the tree view at the top of the
 history window.  Original code was from graphlog extension.
+
+The generator functions walks through the revision history and for the
+selected revision emits tuples with the following elements:
+    
+       (curr_rev, node, lines, parents)
+
+  - Current revision.
+  - node; defined as tuple (rev_column, rev_color)
+  - lines; a list of (col, next_col, color) indicating the edges between
+    the current row and the next row
+  - parent revisions of current revision
+  
+The node tuple has the following elements:
+  - rev_column: Column for the node "circle"
+  - rev_color: Color used to render the circle
+      
+The lines tuple has the following elements:
+  - col: Column for the upper end of the line.
+  - nextcol: Column for the lower end of the line.
+  - color: Colour used for line
+    
+The data is used in treeview.populate with the following signature
+    (rev, node, lines, parents) = self.grapher.next()
+and stored in treeview.graphdata
+
+The treeview.model is an instance of treemodel which references 
+treeview.graphdata
+
+treemodel stores it in self.line_graph_data, and extracts it 
+in on_get_value, where it is mapped to several columns.
+    REVID, NODE, LINES, PARENTS, LAST_LINES
+LAST_LINES is a copy of LINES from the previous row
+
+treeview maps columns 
+    treemodel.NODE, treemodel.LAST_LINES, treemodel.LINES
+to CellRendererGraph attributes
+    "node", "in-lines", "out-lines"
+which stores it in varables
+    node, in_lines, out_lines
 """
 
 __copyright__ = "Copyright 2007 Joel Rosdahl, 2008 Steve Borho"
@@ -29,16 +68,15 @@ def _color_of(repo, rev, nextcolor, preferredcolor, branch_color=False):
 def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, branch_color=False):
     """incremental revision grapher
 
-    This generator function walks through the revision history from
-    revision start_rev to revision stop_rev (which must be less than
-    or equal to start_rev) and for each revision emits tuples with the
-    following elements:
-
-      - Current revision.
-      - lines; a list of (col, next_col, color) indicating the edges between
-        the current row and the next row
-      - Column of the current node in the set of ongoing edges.
-      - parent revisions of current revision
+    This grapher generates a full graph where every edge is visible.
+    This means that repeated merges between two branches may make
+    the graph very wide.
+    
+    if branch is set to the name of a branch, only this branch is shown.
+    if noheads is True, other heads than start_rev is hidden. Use this
+    to show ancestors of a revision.
+    if branch_color is True, the branch colour is determined by a hash
+    of the branch tip, and will thus always be the same.
     """
 
     assert start_rev >= stop_rev
