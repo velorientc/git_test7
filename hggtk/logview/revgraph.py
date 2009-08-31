@@ -11,7 +11,7 @@ selected revision emits tuples with the following elements:
 
   - Current revision.
   - node; defined as tuple (rev_column, rev_color)
-  - lines; a list of (col, next_col, color) indicating the edges between
+  - lines; a list of (col, next_col, color, type) indicating the edges between
     the current row and the next row
   - parent revisions of current revision
   
@@ -23,6 +23,10 @@ The lines tuple has the following elements:
   - col: Column for the upper end of the line.
   - nextcol: Column for the lower end of the line.
   - color: Colour used for line
+  - type: 0 for plain line, 1 for loose upper end, 2 for loose lower end
+    loose ends are rendered as dashed lines. They indicate that the
+    edge of the graph does not really end here. This is used to render 
+    a branch view where the focus is on branches instead of revisions.
     
 The data is used in treeview.populate with the following signature
     (rev, node, lines, parents) = self.grapher.next()
@@ -64,6 +68,10 @@ def _color_of(repo, rev, nextcolor, preferredcolor, branch_color=False):
         return rv
     else:
         return sum([ord(c) for c in repo[rev].branch()])
+
+type_PLAIN = 0
+type_LOOSE_LOW = 1
+type_LOOSE_HIGH = 2
 
 def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, branch_color=False):
     """incremental revision grapher
@@ -126,11 +134,11 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color) )
+                lines.append( (i, next_revs.index(rev), color, type_PLAIN) )
             elif rev == curr_rev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color) )
+                    lines.append( (i, next_revs.index(parent), color, type_PLAIN) )
 
         yield (curr_rev, (rev_index, rev_color[curr_rev]), lines, parents)
         revs = next_revs
