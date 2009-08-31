@@ -508,7 +508,7 @@ class GCommit(GStatus):
         self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
 
     def commit_clicked(self, toolbutton, data=None):
-        if not (self.ready_message() or self.isuptodate()):
+        if not self.ready_message() or not self.isuptodate():
             return
 
         commitable = 'MAR'
@@ -697,7 +697,7 @@ class GCommit(GStatus):
                    _('Message format configuration error'),
                    self).run()
             self.msg_config(None)
-            return
+            return False
         
         lines = buf.get_text(buf.get_start_iter(),
                              buf.get_end_iter()).splitlines()
