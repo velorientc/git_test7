@@ -338,7 +338,8 @@ class GLog(gdialog.GDialog):
         'Send refresh event to treeview object'
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
-                'revrange':[], 'revlist':[], 'noheads':False }
+                'revrange':[], 'revlist':[], 'noheads':False,
+                'branch-view':False }
         opts.update(kwopts)
 
         # handle strips, rebases, etc
@@ -372,6 +373,9 @@ class GLog(gdialog.GDialog):
                 self.graphview.refresh(False, pats, opts)
         elif self.filter == 'all':
             ftitle(None)
+            self.graphview.refresh(True, None, opts)
+        elif self.filter == 'branches':
+            opts['branch-view'] = True
             self.graphview.refresh(True, None, opts)
         elif self.filter == 'new':
             ftitle(_('new revisions'))
@@ -554,6 +558,10 @@ class GLog(gdialog.GDialog):
         all.set_active(True)
         all.connect('toggled', self.filter_selected, 'all')
         filterbox.pack_start(all, False)
+
+        all_compact = gtk.RadioButton(all, _('branches'))
+        all_compact.connect('toggled', self.filter_selected, 'branches')
+        filterbox.pack_start(all_compact, False)
 
         self.newbutton = gtk.RadioButton(all, _('new'))
         self.newbutton.connect('toggled', self.filter_selected, 'new')
