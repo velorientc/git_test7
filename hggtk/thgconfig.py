@@ -499,7 +499,7 @@ class PathEditDialog(gtk.Dialog):
         return ret
 
 class ConfigDialog(gtk.Dialog):
-    def __init__(self, configrepo=False, focusfield=None, newpath=None):
+    def __init__(self, configrepo=False):
         """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
