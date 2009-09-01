@@ -273,9 +273,16 @@ class GStatus(gdialog.GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(self.filetree)
 
+        tvbox = gtk.VBox()
+        tvbox.pack_start( scroller, True, True, 0)
+        if self.pats:
+            button = gtk.Button(_('Remove filter, show root'))
+            button.connect('pressed', self.remove_filter)
+            tvbox.pack_start( button, False, False, 2)
+
         tree_frame = gtk.Frame()
         tree_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        tree_frame.add(scroller)
+        tree_frame.add(tvbox)
 
         diff_frame = gtk.Frame()
         diff_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -456,6 +463,11 @@ class GStatus(gdialog.GDialog):
 
     def realize_status_settings(self):
         self.diffpane.set_position(self.setting_pos)
+        self.reload_status()
+
+    def remove_filter(self, button):
+        button.hide()
+        self.pats = []
         self.reload_status()
 
     def search_filelist(self, model, column, key, iter):
