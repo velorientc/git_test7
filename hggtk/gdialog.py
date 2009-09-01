@@ -138,6 +138,11 @@ class GDialog(gtk.Window):
         self.settings = settings.Settings(self.__class__.__name__)
         self.init()
 
+    def refreshui(self):
+        self.ui = ui.ui()
+        if self.repo:
+            self.repo = hg.repository(self.ui, path=self.repo.root)
+
     ### Following methods are meant to be overridden by subclasses ###
 
     def init(self):
