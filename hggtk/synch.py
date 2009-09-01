@@ -151,10 +151,17 @@ class SynchDialog(gtk.Window):
         elif defrow is not None:
             self.pathbox.set_active(defrow)
 
+        extensions.loadall(self.ui)
+        exs = [ name for name, module in extensions.extensions() ]
+
         # Post Pull Operation
         ppullhbox = gtk.HBox()
-        self.ppulldata = [('none', _('Nothing')), ('update', _('Update')),
-                ('fetch', _('Fetch')), ('rebase', _('Rebase'))]
+        self.ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
+        cfg = self.repo.ui.config('tortoisehg.postpull', 'none')
+        if 'fetch' in exs or 'fetch' == cfg:
+            self.ppulldata.append(('fetch', _('Fetch')))
+        if 'rebase' in exs or 'rebase' == cfg:
+            self.ppulldata.append(('rebase', _('Rebase')))
         self.ppullcombo = combo = gtk.combo_box_new_text()
         for (index, (name, label)) in enumerate(self.ppulldata):
             combo.insert_text(index, label)
@@ -450,7 +457,7 @@ class SynchDialog(gtk.Window):
         aopts = self.get_advanced_options()
         if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
-            # load the fetch extensions explicitly
+            # load the fetch extension explicitly
             extensions.load(self.ui, 'fetch', None)
         else:
             cmd = ['pull']
@@ -460,8 +467,8 @@ class SynchDialog(gtk.Window):
                 cmd.append('--update')
             elif ppull == 'rebase':
                 cmd.append('--rebase')
-            # load the rebase extensions explicitly
-            extensions.load(self.ui, 'rebase', None)
+                # load the rebase extension explicitly
+                extensions.load(self.ui, 'rebase', None)
         cmd += aopts.get('rev', [])
         self.exec_cmd(cmd)
 
