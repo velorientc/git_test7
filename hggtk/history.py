@@ -343,7 +343,7 @@ class GLog(gdialog.GDialog):
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
                 'revrange':[], 'revlist':[], 'noheads':False,
-                'branch-view':False }
+                'branch-view':False, 'rev':[] }
         opts.update(kwopts)
 
         # handle strips, rebases, etc
