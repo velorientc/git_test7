@@ -436,14 +436,16 @@ class GLog(gdialog.GDialog):
 
         # Load extension support for commands which need it
         extensions.loadall(self.ui)
+        exs = [ name for name, module in extensions.extensions() ]
 
         # need transplant extension for transplant command
-        extensions.load(self.ui, 'transplant', None)
-        m.append(create_menu(_('transp_lant to local'), self.transplant_rev))
+        if 'transplant' in exs:
+            m.append(create_menu(_('transp_lant to local'),
+                     self.transplant_rev))
         
         # need mq extension for strip command
-        extensions.load(self.ui, 'mq', None)
-        m.append(create_menu(_('strip revision'), self.strip_rev))
+        if 'mq' in exs:
+            m.append(create_menu(_('strip revision'), self.strip_rev))
 
         m.show_all()
         return m
@@ -461,26 +463,30 @@ class GLog(gdialog.GDialog):
                  self.email_revs))
         m.append(create_menu(_('bundle from here to selected'),
                  self.bundle_revs))
-        m.append(create_menu(_('import as MQ patches from here to selected'),
-                 self.mqimport_revs))
-        m.append(create_menu(_('finish MQ patches from here to selected'),
-                 self.mqfinish_revs))
         self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
         m.append(self.cmenu_merge2)
         
         # Load extension support for commands which need it
         extensions.loadall(self.ui)
 
+        exs = [ name for name, module in extensions.extensions() ]
+
         # need transplant extension for transplant command
-        extensions.load(self.ui, 'transplant', None)
-        m.append(create_menu(_('transplant revision range to local'),
-                 self.transplant_revs))
+        if 'transplant' in exs:
+            m.append(create_menu(_('transplant revision range to local'),
+                     self.transplant_revs))
 
         # need rebase extension for rebase command
-        extensions.load(self.ui, 'rebase', None)
-        m.append(create_menu(_('rebase on top of selected'),
-                 self.rebase_selected))
+        if 'rebase' in exs:
+            m.append(create_menu(_('rebase on top of selected'),
+                     self.rebase_selected))
         
+        # need MQ extension for qimport / qfinish commands
+        if 'mq' in exs:
+            m.append(create_menu(_('import as MQ patches from here to selected'),
+                     self.mqimport_revs))
+            m.append(create_menu(_('finish MQ patches from here to selected'),
+                     self.mqfinish_revs))
         m.connect_after('selection-done', self.restore_original_selection)
         m.show_all()
         return m
