@@ -302,7 +302,9 @@ class GStatus(gdialog.GDialog):
         scroller.add(self.diff_text)
         self.diff_notebook.append_page(scroller, gtk.Label(_('Text Diff')))
 
-        if not self.merging:
+        if self.merging:
+            difftree = None
+        else:
             # use treeview to show selectable diff hunks
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
             self.clipboard = gtk.Clipboard(selection=sel)
@@ -357,6 +359,17 @@ class GStatus(gdialog.GDialog):
             self.diff_notebook.append_page(
                 scroller, gtk.Label(_('Hunk Selection')))
 
+            # Add a page for selection preview
+            self.preview_text = gtk.TextView()
+            self.preview_text.set_wrap_mode(gtk.WRAP_NONE)
+            self.preview_text.set_editable(False)
+            self.preview_text.modify_font(self.difffont)
+            scroller = gtk.ScrolledWindow()
+            scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            scroller.add(self.preview_text)
+            self.diff_notebook.append_page(scroller,
+                    gtk.Label(_('Preview Selection')))
+
         diff_frame.add(self.diff_notebook)
 
         if self.diffbottom:
@@ -369,17 +382,16 @@ class GStatus(gdialog.GDialog):
         self.filetree.set_headers_clickable(True)
 
         sel = self.filetree.get_selection()
-        if self.merging:
-            sel.set_mode(gtk.SELECTION_SINGLE)
-            self.treeselid = sel.connect(
-                'changed', self.difftext_sel_changed)
-        else:
-            sel.set_mode(gtk.SELECTION_MULTIPLE)
-            self.treeselid = sel.connect(
-                'changed', self.tree_sel_changed, difftree)
+        sel.set_mode(gtk.SELECTION_MULTIPLE)
+        self.treeselid = sel.connect('changed', self.tree_sel_changed,
+                difftree)
 
+        self.diff_notebook.connect('switch-page', self.page_switched,
+                                   sel, difftree)
         return self.diffpane
 
+    def page_switched(self, notebook, page, page_num, filesel, difftree):
+        self.tree_sel_changed(filesel, difftree, page_num)
 
     def get_extras(self):
         table = gtk.Table(rows=2, columns=3)
@@ -455,6 +467,8 @@ class GStatus(gdialog.GDialog):
         self.get_toolbutton(_('_Remove')).set_sensitive(sensitive)
         self.get_toolbutton(_('Move')).set_sensitive(sensitive)
         self.get_toolbutton(_('_Forget')).set_sensitive(sensitive)
+        if self.diff_notebook.get_current_page() == 2:
+            self.update_selection_preview()
 
     def prepare_display(self):
         gobject.idle_add(self.realize_status_settings)
@@ -784,27 +798,47 @@ class GStatus(gdialog.GDialog):
         if success:
             self.reload_status()
 
-    def difftext_sel_changed(self, selection):
-        'Selected row in file tree changed, update text diff'
+    def tree_sel_changed(self, selection, tree, page_num=None):
+        'Selection changed in file tree'
+        # page_num may be supplied, if called from switch-page event
         model, paths = selection.get_selected_rows()
         if not paths:
             return
-        wfile = self.filemodel[paths[0]][FM_PATH]
-        pfile = util.pconvert(wfile)
-        difftext = []
-        if self.merging:
-            difftext = [_('===== Diff to first parent =====\n')]
-        matcher = cmdutil.matchfiles(self.repo, [pfile])
-        for s in patch.diff(self.repo, self._node1, self._node2,
-                match=matcher, opts=patch.diffopts(self.ui, self.opts)):
-            difftext.extend(s.splitlines(True))
-        if self.merging:
-            pctxs = self.repo[None].parents()
-            difftext.append(_('\n===== Diff to second parent =====\n'))
-            for s in patch.diff(self.repo, pctxs[1].node(), None,
-                    match=matcher, opts=patch.diffopts(self.ui, self.opts)):
-                difftext.extend(s.splitlines(True))
+        row = paths[0]
+        if page_num is None:
+            page_num = self.diff_notebook.get_current_page()
+        if page_num == 0:
+            buf = self.generate_text_diffs(row)
+            self.diff_text.set_buffer(buf)
+        elif page_num == 1:
+            self.update_hunk_model(row, tree)
+        elif page_num == 2:
+            self.update_selection_preview()
 
+    def update_selection_preview(self):
+        'Refresh selected hunk view'
+        buf = cStringIO.StringIO()
+        dmodel = self.diffmodel
+        for row in self.filemodel:
+            if not row[FM_CHECKED]:
+                continue
+            wfile = row[FM_PATH]
+            if wfile in self.filechunks:
+                chunks = self.filechunks[wfile]
+            else:
+                chunks = self.read_file_chunks(wfile)
+                for c in chunks:
+                    c.active = True
+                self.filechunks[wfile] = chunks
+            for i, chunk in enumerate(chunks):
+                if i == 0:
+                    chunk.write(buf)
+                elif chunk.active:
+                    chunk.write(buf)
+        difftext = buf.getvalue().splitlines(True)
+        self.preview_text.set_buffer(self.diff_highlight_buffer(difftext))
+
+    def diff_highlight_buffer(self, difftext):
         buf = gtk.TextBuffer()
         buf.create_tag('removed', foreground='#900000')
         buf.create_tag('added', foreground='#006400')
@@ -827,18 +861,30 @@ class GStatus(gdialog.GDialog):
             else:
                 line = hglib.diffexpand(line)
                 buf.insert(bufiter, line)
-        self.diff_text.set_buffer(buf)
+        return buf
+
+    def generate_text_diffs(self, row):
+        wfile = self.filemodel[row][FM_PATH]
+        pfile = util.pconvert(wfile)
+        difftext = []
+        if self.merging:
+            difftext = [_('===== Diff to first parent =====\n')]
+        matcher = cmdutil.matchfiles(self.repo, [pfile])
+        for s in patch.diff(self.repo, self._node1, self._node2,
+                match=matcher, opts=patch.diffopts(self.ui, self.opts)):
+            difftext.extend(s.splitlines(True))
+        if self.merging:
+            pctxs = self.repo[None].parents()
+            difftext.append(_('\n===== Diff to second parent =====\n'))
+            for s in patch.diff(self.repo, pctxs[1].node(), None,
+                    match=matcher, opts=patch.diffopts(self.ui, self.opts)):
+                difftext.extend(s.splitlines(True))
+        return self.diff_highlight_buffer(difftext)
 
 
-    def tree_sel_changed(self, selection, tree):
-        'Selected row in file tree activated changed'
-        self.difftext_sel_changed(selection)
-        # Read this file's diffs into diff model
-        model, paths = selection.get_selected_rows()
-        if not paths:
-            return
-        wfile = self.filemodel[paths[0]][FM_PATH]
-        # TODO: this could be a for-loop
+    def update_hunk_model(self, row, tree):
+        # Read this file's diffs into hunk selection model
+        wfile = self.filemodel[row][FM_PATH]
         self.filerowstart = {}
         self.diffmodel.clear()
         self.append_diff_hunks(wfile)
