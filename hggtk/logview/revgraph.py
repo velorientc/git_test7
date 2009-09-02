@@ -365,11 +365,12 @@ def filelog_grapher(repo, path):
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color) )
+                lines.append( (i, next_revs.index(rev), color, type_PLAIN) )
             elif rev == filerev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color) )
+                    lines.append( (i, next_revs.index(parent), color,
+                        type_PLAIN) )
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
         yield (fctx.rev(), (index, curcolor), lines, pcrevs)
