@@ -393,7 +393,8 @@ class GLog(gdialog.GDialog):
         elif self.filter == 'ancestry':
             ftitle(_('revision ancestry'))
             range = [self.currevid, 0]
-            opts = {'noheads': True, 'revrange': range}
+            opts['noheads'] = True
+            opts['revrange'] = range
             self.graphview.refresh(True, None, opts)
         elif self.filter == 'tagged':
             ftitle(_('tagged revisions'))
