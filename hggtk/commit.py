@@ -474,7 +474,8 @@ class GCommit(GStatus):
 
 
     def check_patch_queue(self):
-        '''See if an MQ patch is applied, switch to qrefresh mode'''
+        'See if an MQ patch is applied, switch to qrefresh mode'
+        c_btn = self.get_toolbutton(_('_Commit'))
         self.qheader = None
         if self.mqmode:
             self.qheader = self.repo['qtip'].description()
@@ -485,16 +486,14 @@ class GCommit(GStatus):
                 else:
                     buf.set_text(self.qheader)
                 buf.set_modified(False)
-            c_btn = self.get_toolbutton(_('_Commit'))
             if self.qnew:
                 c_btn.set_label(_('QNew'))
-                c_btn.set_tooltip(self.tooltips, _('QNew'))
+                c_btn.set_tooltip(self.tooltips, _('create new MQ patch'))
                 self._hg_call_wrapper('Status', self.do_reload_status)
             else:
                 c_btn.set_label(_('QRefresh'))
-                c_btn.set_tooltip(self.tooltips, _('QRefresh'))
+                c_btn.set_tooltip(self.tooltips, _('refresh top MQ patch'))
         elif self.qnew:
-            c_btn = self.get_toolbutton(_('_Commit'))
             c_btn.set_label(_('QNew'))
             c_btn.set_tooltip(self.tooltips, _('QNew'))
             buf = self.text.get_buffer()
@@ -502,7 +501,6 @@ class GCommit(GStatus):
                 buf.set_text('')
                 buf.set_modified(False)
         else:
-            c_btn = self.get_toolbutton(_('_Commit'))
             c_btn.set_label(_('_Commit'))
             c_btn.set_tooltip(self.tooltips, _('commit'))
         self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
