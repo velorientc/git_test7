@@ -303,7 +303,7 @@ class BranchGrapher:
         
         # Compute parents (indicates the branches on NEXT branch row that curr_rev links to)
         parents = self._get_parents(rev)
-		# BUG: __get_parents is not defined - why?
+        # BUG: __get_parents is not defined - why?
         
         # Compute lines (from CUR to NEXT branch row)
         next_branches = self._compute_next_branches()
