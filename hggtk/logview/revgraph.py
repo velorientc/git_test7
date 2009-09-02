@@ -397,7 +397,8 @@ def filtered_log_generator(repo, pats, opts):
 
     stack = []
     get = util.cachefunc(lambda r: repo.changectx(r).changeset())
-    pats = ['path:'+p for p in pats]
+    if pats != None:
+        pats = ['path:'+p for p in pats]
     changeiter, matchfn = cmdutil.walkchangerevs(repo.ui, repo, pats, get, opts)
     for st, rev, fns in changeiter:
         if st == 'iter':

@@ -110,6 +110,12 @@ class GLog(gdialog.GDialog):
         if property in ('branch-color') and self.ready:
             self.reload_log()
 
+    def toggle_graphcol(self, button):
+        active = button.get_active()
+        if self.graphcol != active:
+            self.graphcol = active
+            self.reload_log()
+
     def toggle_show_filterbar(self, button, property):
         self.show_filterbar = button.get_active()
         if self.filterbox is not None:
@@ -203,6 +209,11 @@ class GLog(gdialog.GDialog):
     def view_menu(self):
         menu = gtk.Menu()
 
+        button = gtk.CheckMenuItem(_('Show Graph'))
+        button.connect('toggled', self.toggle_graphcol)
+        button.set_active(self.graphcol)
+        button.set_draw_as_radio(True)
+        menu.append(button)
         button = gtk.CheckMenuItem(_('Show Rev'))
         button.connect('toggled', self.toggle_view_column,
                 'rev-column-visible')
@@ -309,6 +320,7 @@ class GLog(gdialog.GDialog):
         settings['glog-hpane'] = self.hpaned.get_position()
         settings['branch-color'] = self.graphview.get_property('branch-color')
         settings['show-filterbar'] = self.show_filterbar
+        settings['graphcol'] = self.graphcol
         for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
@@ -321,6 +333,7 @@ class GLog(gdialog.GDialog):
         self.setting_hpos = -1
         self.branch_color = False
         self.show_filterbar = True
+        self.graphcol = True
         self.showcol = {}
         try:
             self.setting_vpos = settings['glog-vpane']
@@ -330,6 +343,7 @@ class GLog(gdialog.GDialog):
             for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
+            self.graphcol = settings['graphcol']
         except KeyError:
             pass
 
@@ -366,26 +380,26 @@ class GLog(gdialog.GDialog):
 
         if self.filter == 'branch':
             branch = opts.get('branch', None)
-            self.graphview.refresh(True, branch, opts)
+            self.graphview.refresh(self.graphcol, branch, opts)
             ftitle(_('%s branch') % branch)
         elif self.filter == 'custom':
             ftitle(_('custom filter'))
             if len(pats) == 1 and not os.path.isdir(pats[0]):
                 opts['filehist'] = pats[0]
-                self.graphview.refresh(True, pats, opts)
+                self.graphview.refresh(self.graphcol, pats, opts)
             else:
                 self.graphview.refresh(False, pats, opts)
         elif self.filter == 'all':
             ftitle(None)
-            self.graphview.refresh(True, None, opts)
+            self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'branches':
             opts['branch-view'] = True
-            self.graphview.refresh(True, None, opts)
+            self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'new':
             ftitle(_('new revisions'))
             assert len(self.repo) > self.origtip
             opts['revrange'] = [len(self.repo)-1, self.origtip]
-            self.graphview.refresh(True, None, opts)
+            self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'only_merges':
             ftitle(_('merges'))
             opts['only_merges'] = True
@@ -395,7 +409,7 @@ class GLog(gdialog.GDialog):
             range = [self.currevid, 0]
             opts['noheads'] = True
             opts['revrange'] = range
-            self.graphview.refresh(True, None, opts)
+            self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'tagged':
             ftitle(_('tagged revisions'))
             tagged = []
