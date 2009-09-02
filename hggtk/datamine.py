@@ -522,15 +522,16 @@ class DataMineDialog(gdialog.GDialog):
 
         graphopts = { 'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'revrange':[],
-                'revlist':[], 'noheads':False, 'orig-tip':len(self.repo) }
+                'revlist':[], 'noheads':False, 'orig-tip':len(self.repo),
+                'branch-view':False, 'rev':[] }
         graphopts['filehist'] = path
 
         # File log revision graph
         graphview = LogTreeView(self.repo, 5000, self.stbar)
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
-        graphview.refresh(True, None, graphopts)
+        graphview.refresh(True, [path], graphopts)
         graphview.set_property('rev-column-visible', True)
-        graphview.set_property('date-column-visible', True)
+        graphview.set_property('age-column-visible', True)
 
         hbox = gtk.HBox()
         followlabel = gtk.Label('')
