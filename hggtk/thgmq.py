@@ -21,6 +21,10 @@ MQ_STATUS  = 1
 MQ_NAME    = 2
 MQ_SUMMARY = 3
 
+# Special patch indices
+INDEX_SEPARATOR = -1
+INDEX_QPARENT   = -2
+
 class MQWidget(gtk.HBox):
 
     __gsignals__ = {
@@ -91,7 +95,7 @@ class MQWidget(gtk.HBox):
         self.pack_start(pane)
 
         ## patch list
-        self.model = gtk.ListStore(int, # patch index, -1 means separator
+        self.model = gtk.ListStore(int, # patch index
                                    str, # patch status
                                    str, # patch name
                                    str) # summary
@@ -129,7 +133,10 @@ class MQWidget(gtk.HBox):
             self.cells[col_idx] = cell
 
         def cell_edited(cell, path, newname):
-            patchname = self.model[path][MQ_NAME]
+            row = self.model[path]
+            if row[MQ_INDEX] < 0:
+                return
+            patchname = row[MQ_NAME]
             if newname != patchname:
                 self.qrename(newname, patch=patchname)
 
@@ -171,11 +178,15 @@ class MQWidget(gtk.HBox):
         # clear model data
         model.clear()
 
-        # build list of patches
+        # insert 'qparent' row
+        top = None
+        if self.qparent_item.get_active():
+            top = model.append((INDEX_QPARENT, None, None, None))
+
+        # add patches
         from hgext import mq
         q = self.repo.mq
         q.parse_series()
-        top = None
         applied = set([p.name for p in q.applied])
         for index, patchname in enumerate(q.series):
             stat = patchname in applied and 'A' or 'U'
@@ -185,7 +196,8 @@ class MQWidget(gtk.HBox):
                 top = iter
 
         # insert separator
-        model.insert_after(top, (-1, '', '', ''))
+        if top:
+            model.insert_after(top, (INDEX_SEPARATOR, None, None, None))
 
         # restore patch selection state
         if len(prevpaths) > 0:
@@ -440,6 +452,12 @@ class MQWidget(gtk.HBox):
     def cell_data_func(self, column, cell, model, iter):
         row = model[iter]
 
+        if row[MQ_INDEX] == INDEX_QPARENT:
+            if column == self.cols[MQ_INDEX]:
+                cell.set_property('text', '')
+            elif column == self.cols[MQ_NAME]:
+                cell.set_property('text', '[qparent]')
+
         stat = row[MQ_STATUS]
         if stat == 'A':
             cell.set_property('foreground', 'blue')
@@ -455,11 +473,11 @@ class MQWidget(gtk.HBox):
             cell.set_property('weight', pango.WEIGHT_NORMAL)
 
     def row_sep_func(self, model, iter, data=None):
-        return model[iter][MQ_INDEX] == -1;
+        return model[iter][MQ_INDEX] == INDEX_SEPARATOR;
 
     def list_popup_menu(self, list, path):
         row = self.model[path]
-        if row[MQ_INDEX] == -1:
+        if row[MQ_INDEX] == INDEX_SEPARATOR:
             return
 
         menu = gtk.Menu()
@@ -474,17 +492,18 @@ class MQWidget(gtk.HBox):
         has_patch = self.has_patch()
         has_applied = self.has_applied()
         is_qtip = self.is_qtip(row[MQ_NAME])
+        is_qparent = row[MQ_INDEX] == INDEX_QPARENT
         is_applied = row[MQ_STATUS] == 'A'
 
         if is_operable and not is_qtip:
             append(_('_goto'), self.goto_activated)
-        if has_patch:
+        if has_patch and not is_qparent:
             append(_('_rename'), self.rename_activated)
-        if has_applied:
+        if has_applied and not is_qparent:
             append(_('_finish applied'), self.finish_activated)
-        if not is_applied:
+        if not is_applied and not is_qparent:
             append(_('_delete'), self.delete_activated)
-            if has_applied:
+            if has_applied and not is_qparent:
                 append(_('f_old'), self.fold_activated)
 
         menu.show_all()
@@ -524,9 +543,21 @@ class MQWidget(gtk.HBox):
         def enable_editable(item):
             self.cells[MQ_NAME].set_property('editable', item.get_active())
         append(_('Enable editable cells'), enable_editable, check=True)
+        def show_qparent(item):
+            self.refresh()
+        self.qparent_item = append(_("Show 'qparent'"),
+                show_qparent, check=True)
 
         menu.show_all()
         return menu
+
+    def qgoto_by_row(self, row):
+        if self.get_qtip_patchname() == row[MQ_NAME]:
+            return
+        if row[MQ_INDEX] == INDEX_QPARENT:
+            self.qpop(all=True)
+        else:
+            self.qgoto(row[MQ_NAME])
 
     ### signal handlers ###
 
@@ -547,7 +578,10 @@ class MQWidget(gtk.HBox):
 
     def list_sel_changed(self, list):
         path, focus = list.get_cursor()
-        patchname = self.model[path][MQ_NAME]
+        row = self.model[path]
+        if row[MQ_INDEX] < 0:
+            return
+        patchname = row[MQ_NAME]
         try:
             ctx = self.repo[patchname]
             self.emit('patch-selected', ctx.rev(), patchname)
@@ -555,9 +589,7 @@ class MQWidget(gtk.HBox):
             pass
 
     def list_row_activated(self, list, path, column):
-        patchname = self.model[path][MQ_NAME]
-        if self.get_qtip_patchname() != patchname:
-            self.qgoto(patchname)
+        self.qgoto_by_row(self.model[path])
 
     def list_size_allocated(self, list, req):
         if self.mqloaded and self.has_applied():
@@ -578,7 +610,7 @@ class MQWidget(gtk.HBox):
     ### context menu signal handlers ###
 
     def goto_activated(self, menuitem, row):
-        self.qgoto(row[MQ_NAME])
+        self.qgoto_by_row(row)
 
     def delete_activated(self, menuitem, row):
         self.qdelete(row[MQ_NAME])
