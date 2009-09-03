@@ -30,7 +30,7 @@ nonrepo_commands = '''userconfig clone debugcomplete init about help
 version thgstatus'''
 
 # Add TortoiseHg signals, hooked to key accelerators in gtklib
-for sig in ('copy-clipboard', 'thg-diff', 'thg-parent'):
+for sig in ('copy-clipboard', 'thg-diff', 'thg-parent', 'thg-rename'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept'):

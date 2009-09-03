@@ -33,7 +33,7 @@ class MQWidget(gtk.HBox):
                             str)) # patch name
     }
 
-    def __init__(self, repo):
+    def __init__(self, repo, accelgroup=None):
         gtk.HBox.__init__(self)
 
         self.repo = repo
@@ -138,6 +138,18 @@ class MQWidget(gtk.HBox):
         addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
         pane.add(self.list)
+
+        # accelerator
+        if accelgroup:
+            key, mod = gtk.accelerator_parse('F2')
+            self.list.add_accelerator('thg-rename', accelgroup,
+                    key, mod, gtk.ACCEL_VISIBLE)
+            def thgrename(list):
+                sel = self.list.get_selection()
+                if sel.count_selected_rows() == 1:
+                    model, paths = sel.get_selected_rows()
+                    self.qrename_ui(model[paths[0]][MQ_NAME])
+            self.list.connect('thg-rename', thgrename)
 
         # prepare to show
         self.refresh()
