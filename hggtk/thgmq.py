@@ -242,6 +242,40 @@ class MQWidget(gtk.HBox):
         self.list.set_cursor_on_cell(path, self.cols[MQ_NAME], None, True)
         return True
 
+    def qfinish(self, applied=False):
+        """
+        [MQ] Execute 'qfinish' command.
+
+        applied: if True, enable '--applied' option. (default: False)
+        """
+        cmdline = ['hg', 'qfinish']
+        if applied:
+            cmdline.append('--applied')
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.repo.mq.invalidate()
+        self.refresh()
+        self.emit('repo-invalidated')
+
+    def qfold(self, patch):
+        """
+        [MQ] Execute 'qdelete' command.
+
+        patch: the patch name or an index to specify the patch.
+        """
+        if not patch:
+            return
+        cmdline = ['hg', 'qfold', patch]
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.repo.mq.invalidate()
+        self.refresh()
+        self.emit('repo-invalidated')
+
     ### internal functions ###
 
     def is_top_patch(self, patchname):
@@ -282,11 +316,11 @@ class MQWidget(gtk.HBox):
 
         if not is_top:
             append(_('_goto'), self.goto_activated)
+        append(_('_rename'), self.rename_activated)
+        append(_('_finish applied'), self.finish_activated)
         if not is_applied:
             append(_('_delete'), self.delete_activated)
-        append(_('_finish'))
-        append(_('_rename'), self.rename_activated)
-        append(_('f_old'))
+            append(_('f_old'), self.fold_activated)
 
         menu.show_all()
         menu.popup(None, None, None, 0, 0)
@@ -350,3 +384,9 @@ class MQWidget(gtk.HBox):
 
     def rename_activated(self, menuitem, row):
         self.qrename_ui(row[MQ_NAME])
+
+    def finish_activated(self, menuitem, row):
+        self.qfinish(applied=True)
+
+    def fold_activated(self, menuitem, row):
+        self.qfold(row[MQ_NAME])
