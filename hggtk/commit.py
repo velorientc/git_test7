@@ -430,16 +430,12 @@ class GCommit(GStatus):
         return live
 
 
-    def reload_status(self):
-        if not self.ready: return False
-        success = GStatus.reload_status(self)
+    def refresh_complete(self):
         self.check_merge()
         self.check_patch_queue()
         self.check_undo()
         self.refresh_branchop()
         self.update_parent_labels()
-        return success
-
 
     ### End of overridable methods ###
 

@@ -13,6 +13,7 @@ import cStringIO
 import gtk
 import gobject
 import pango
+import threading
 
 from mercurial import cmdutil, util, commands, patch, mdiff
 from mercurial import merge as merge_
@@ -473,6 +474,9 @@ class GStatus(gdialog.GDialog):
     def prepare_display(self):
         gobject.idle_add(self.realize_status_settings)
 
+    def refresh_complete(self):
+        pass
+
     ### End of overrides ###
 
     def realize_status_settings(self):
@@ -625,12 +629,23 @@ class GStatus(gdialog.GDialog):
             self.status = status
             self._node1, self._node2, = n1, n2
 
-        self.ready = False
-        get_repo_status()
-        self.refresh_file_tree()
-        self.update_check_count()
-        self.ready = True
+        def status_wait(thread):
+            if thread.isAlive():
+                return True
+            else:
+                self.refresh_file_tree()
+                self.update_check_count()
+                self.refresh_complete()
+                self.ready = True
+                #self.stbar.end()
+                return False
 
+        self.ready = False
+        thread = threading.Thread(target=get_repo_status)
+        thread.setDaemon(True)
+        thread.start()
+        gobject.timeout_add(50, status_wait, thread)
+        return True
 
     def select_toggle(self, cellrenderer, path):
         'User manually toggled file status via checkbox'
