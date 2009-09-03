@@ -27,6 +27,34 @@ INDEX_QPARENT   = -2
 
 class MQWidget(gtk.HBox):
 
+    __gproperties__ = {
+        'index-column-visible': (gobject.TYPE_BOOLEAN,
+                                    'Index',
+                                    'Show index column',
+                                    False,
+                                    gobject.PARAM_READWRITE),
+        'name-column-visible': (gobject.TYPE_BOOLEAN,
+                                    'Name',
+                                    'Show name column',
+                                    False,
+                                    gobject.PARAM_READWRITE),
+        'summary-column-visible': (gobject.TYPE_BOOLEAN,
+                                    'Summary',
+                                    'Show summary column',
+                                    False,
+                                    gobject.PARAM_READWRITE),
+        'editable-cell': (gobject.TYPE_BOOLEAN,
+                            'EditableCell',
+                            'Enable editable cells',
+                            False,
+                            gobject.PARAM_READWRITE),
+        'show-qparent': (gobject.TYPE_BOOLEAN,
+                            'ShowQParent',
+                            "Show 'qparent'",
+                            False,
+                            gobject.PARAM_READWRITE)
+    }
+
     __gsignals__ = {
         'repo-invalidated': (gobject.SIGNAL_RUN_FIRST,
                              gobject.TYPE_NONE,
@@ -127,6 +155,7 @@ class MQWidget(gtk.HBox):
             col.add_attribute(cell, 'text', col_idx)
             col.set_cell_data_func(cell, self.cell_data_func)
             col.set_resizable(resizable)
+            col.set_visible(self.get_property(self.col_to_prop(col_idx)))
             if right:
                 col.set_alignment(1)
                 cell.set_property('xalign', 1)
@@ -188,7 +217,7 @@ class MQWidget(gtk.HBox):
 
         # insert 'qparent' row
         top = None
-        if self.qparent_item.get_active():
+        if self.get_property('show-qparent'):
             top = model.append((INDEX_QPARENT, None, None, None))
 
         # add patches
@@ -494,25 +523,30 @@ class MQWidget(gtk.HBox):
                 item.connect('activate', handler)
             menu.append(item)
             return item
-        def colappend(label, col_idx):
+        def colappend(label, col_idx, active=True):
             def handler(menuitem):
                 col = self.cols[col_idx]
                 col.set_visible(menuitem.get_active())
-            item = append(label, handler, check=True, active=True)
+            propname = self.col_to_prop(col_idx)
+            item = append(label, handler, check=True, active=active)
+            self.vmenu[propname] = item
+
+        self.vmenu = {}
 
         colappend(_('Show index'), MQ_INDEX)
         colappend(_('Show name'), MQ_NAME)
-        colappend(_('Show summary'), MQ_SUMMARY)
+        colappend(_('Show summary'), MQ_SUMMARY, active=False)
 
         append(sep=True)
 
         def enable_editable(item):
             self.cells[MQ_NAME].set_property('editable', item.get_active())
-        append(_('Enable editable cells'), enable_editable, check=True)
-        def show_qparent(item):
-            self.refresh()
-        self.qparent_item = append(_("Show 'qparent'"),
-                show_qparent, check=True)
+        item = append(_('Enable editable cells'), enable_editable,
+                check=True, active=False)
+        self.vmenu['editable-cell'] = item
+        item = append(_("Show 'qparent'"), lambda item: self.refresh(),
+                check=True, active=True)
+        self.vmenu['show-qparent'] = item
 
         menu.show_all()
         return menu
@@ -530,6 +564,27 @@ class MQWidget(gtk.HBox):
         self.refresh()
         if not noemit:
             self.emit('repo-invalidated')
+
+    def do_get_property(self, property):
+        try:
+            return self.vmenu[property.name].get_active()
+        except:
+            raise AttributeError, 'unknown property %s' % property.name
+
+    def do_set_property(self, property, value):
+        try:
+            self.vmenu[property.name].set_active(value)
+        except:
+            raise AttributeError, 'unknown property %s' % property.name
+
+    def col_to_prop(self, col_idx):
+        if col_idx == MQ_INDEX:
+            return 'index-column-visible'
+        elif col_idx == MQ_NAME:
+            return 'name-column-visible'
+        elif col_idx == MQ_SUMMARY:
+            return 'summary-column-visible'
+        return ''
 
     ### signal handlers ###
 
