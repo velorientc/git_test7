@@ -21,7 +21,7 @@ from hggtk.logview.treeview import TreeView as LogTreeView
 
 from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter, gorev
 from hggtk import backout, status, hgemail, tagadd, update, merge, archive
-from hggtk import changeset, thgconfig
+from hggtk import changeset, thgconfig, thgmq
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
@@ -548,9 +548,6 @@ class GLog(gdialog.GDialog):
         for tbutton in tbar:
             self.toolbar.insert(tbutton, -1)
 
-        treeframe = gtk.Frame()
-        treeframe.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-
         # PyGtk 2.6 and below did not automatically register types
         if gobject.pygtk_version < (2, 8, 0):
             gobject.type_register(LogTreeView)
@@ -652,19 +649,28 @@ class GLog(gdialog.GDialog):
         self.filterentry = entry
         filterbox.pack_start(entry, True)
 
+        self.mqpane = thgmq.MQWidget(self.repo)
+
         vbox = gtk.VBox()
         vbox.pack_start(filterbox, False, False, 0)
         vbox.pack_start(self.graphview, True, True, 0)
+        vbox.show_all()
 
-        treeframe.add(vbox)
-        treeframe.show_all()
+        def wrapframe(widget):
+            frame = gtk.Frame()
+            frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+            frame.add(widget)
+            return frame
+        self.mqpaned = gtk.HPaned()
+        self.mqpaned.add1(wrapframe(self.mqpane))
+        self.mqpaned.add2(wrapframe(vbox))
 
         # Add ChangeSet instance to bottom half of vpane
         self.changeview.graphview = self.graphview
         self.hpaned = self.changeview.get_body()
 
         self.vpaned = gtk.VPaned()
-        self.vpaned.pack1(treeframe, True, False)
+        self.vpaned.pack1(self.mqpaned, True, False)
         self.vpaned.pack2(self.hpaned)
         gobject.idle_add(self.realize_settings)
 
