@@ -230,7 +230,7 @@ class CmdWidget(gtk.VBox):
                 self.stop_btn.connect('clicked', self.stop_clicked)
                 progbox.pack_start(self.stop_btn, False, False)
 
-            gobject.idle_add(lambda: self.enable_progressbar(False))
+            gobject.idle_add(lambda: self.set_pbar_visible(False))
 
     ### public functions ###
 
@@ -245,7 +245,7 @@ class CmdWidget(gtk.VBox):
             def is_done():
                 # show progressbar if it's still working
                 if self.hgthread and self.hgthread.isAlive():
-                    self.enable_progressbar()
+                    self.set_pbar_visible()
                 return False
             gobject.timeout_add(500, is_done)
 
@@ -253,7 +253,7 @@ class CmdWidget(gtk.VBox):
         if self.hgthread:
             self.hgthread.terminate()
 
-    def enable_progressbar(self, visible=True):
+    def set_pbar_visible(self, visible=True):
         if hasattr(self, 'progbox'):
             self.progbox.set_property('visible', visible)
 
@@ -303,8 +303,11 @@ class CmdWidget(gtk.VBox):
         self.update_progress()
         if not self.hgthread.isAlive():
             self.stop_btn.set_sensitive(False)
-            self.enable_progressbar(False)
             returncode = self.hgthread.return_code()
+            if returncode == 0:
+                self.set_pbar_visible(False)
+            else:
+                self.set_pbar_visible(True)
             if returncode is None:
                 self.write(_('\n[command interrupted]'))
             self.hgthread = None
