@@ -83,7 +83,8 @@ class GLog(gdialog.GDialog):
                             _('MQ'),
                             self.mq_clicked,
                             tip=_('Toggle MQ panel'),
-                            toggle=True)
+                            toggle=True,
+                            icon='menupatch.ico')
             tbar += [self.mqtb, gtk.SeparatorToolItem()]
         self.settingtb = self.make_toolbutton(gtk.STOCK_PREFERENCES,
                              _('Configure'),

@@ -285,8 +285,8 @@ class GDialog(gtk.Window):
         return cnt
 
 
-    def make_toolbutton(self, stock, label, handler,
-            userdata=None, menu=None, tip=None, toggle=False):
+    def make_toolbutton(self, stock, label, handler, userdata=None,
+                menu=None, tip=None, toggle=False, icon=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
@@ -297,6 +297,12 @@ class GDialog(gtk.Window):
 
         if tip:
             tbutton.set_tooltip(self.tooltips, tip)
+        if icon:
+            path = paths.get_tortoise_icon(icon)
+            if path:
+                image = gtk.Image()
+                image.set_from_file(path)
+                tbutton.set_icon_widget(image)
         tbutton.set_use_underline(True)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
