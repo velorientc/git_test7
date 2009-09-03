@@ -83,6 +83,7 @@ class MQWidget(gtk.HBox):
         self.list.set_row_separator_func(self.row_sep_func)
         self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
+        self.list.connect('row-activated', self.list_row_activated)
 
         cell = gtk.CellRendererText()
         editcell = gtk.CellRendererText()
@@ -316,6 +317,11 @@ class MQWidget(gtk.HBox):
             self.emit('patch-selected', ctx.rev(), patchname)
         except hglib.RepoError:
             pass
+
+    def list_row_activated(self, list, path, column):
+        patchname = self.model[path][MQ_NAME]
+        if self.get_top_patchname() != patchname:
+            self.qgoto(patchname)
 
     def list_cell_edited(self, cell, path, newname, model):
         patchname = model[path][MQ_NAME]
