@@ -421,8 +421,11 @@ class GStatus(gdialog.GDialog):
         self.counter = gtk.Label('')
         self.counter.set_alignment(1.0, 0.0) # right up
 
+        self.stbar = gtklib.StatusBar()
+
         hbox = gtk.HBox()
         hbox.pack_start(table, expand=False)
+        hbox.pack_start(self.stbar, False, False, 2)
         hbox.pack_end(self.counter, expand=True, padding=2)
 
         return hbox
@@ -637,10 +640,11 @@ class GStatus(gdialog.GDialog):
                 self.update_check_count()
                 self.refresh_complete()
                 self.ready = True
-                #self.stbar.end()
+                self.stbar.end()
                 return False
 
         self.ready = False
+        self.stbar.begin()
         thread = threading.Thread(target=get_repo_status)
         thread.setDaemon(True)
         thread.start()
