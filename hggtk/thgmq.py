@@ -330,10 +330,12 @@ class MQWidget(gtk.HBox):
         cell = self.cells[MQ_NAME]
         if not cell.get_property('editable'):
             cell.set_property('editable', True)
-            def canceled(cell):
-                cell.disconnect(hid)
+            def canceled(cell, *arg):
+                cell.disconnect(cancel_id)
+                cell.disconnect(edited_id)
                 cell.set_property('editable', False)
-            hid = cell.connect('editing-canceled', canceled)
+            cancel_id = cell.connect('editing-canceled', canceled)
+            edited_id = cell.connect('edited', canceled)
         # start editing patchname cell
         self.list.set_cursor_on_cell(path, self.cols[MQ_NAME], None, True)
         return True
