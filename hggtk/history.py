@@ -40,6 +40,10 @@ class GLog(gdialog.GDialog):
         self.filterbox = None
         os.chdir(self.repo.root)
 
+        # Load extension support for commands which need it
+        extensions.loadall(self.ui)
+        self.exs = [ name for name, module in extensions.extensions() ]
+
     def get_title(self):
         return hglib.toutf(os.path.basename(self.repo.root)) + ' log'
 
@@ -74,6 +78,13 @@ class GLog(gdialog.GDialog):
                               self.synch_clicked,
                               tip=_('Launch synchronize tool'))
             tbar += [self.synctb, gtk.SeparatorToolItem()]
+        if 'mq' in self.exs:
+            self.mqtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
+                            _('MQ'),
+                            self.mq_clicked,
+                            tip=_('Toggle MQ panel'),
+                            toggle=True)
+            tbar += [self.mqtb, gtk.SeparatorToolItem()]
         self.settingtb = self.make_toolbutton(gtk.STOCK_PREFERENCES,
                              _('Configure'),
                              self.conf_clicked,
@@ -312,6 +323,9 @@ class GLog(gdialog.GDialog):
         self.filterbox.set_property('visible', self.show_filterbar)
         self.filterbox.set_no_show_all(True)
 
+        # enable MQ panel
+        self.enable_mqpanel()
+
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
         l = 0
@@ -361,6 +375,10 @@ class GLog(gdialog.GDialog):
         'Refresh data in the history model, without reloading graph'
         if self.graphview.model:
             self.graphview.model.refresh()
+
+        # refresh MQ widget if exists
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.refresh()
 
     def reload_log(self, **kwopts):
         'Send refresh event to treeview object'
@@ -440,8 +458,9 @@ class GLog(gdialog.GDialog):
             opts['revlist'] = [str(x) for x in heads]
             self.graphview.refresh(False, [], opts)
 
-        # refresh MQ widget
-        self.mqwidget.refresh()
+        # refresh MQ widget if exists
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.refresh()
 
     def tree_context_menu(self):
         m = gtk.Menu()
@@ -462,17 +481,13 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_revert'), self.revert))
         m.append(create_menu(_('_archive'), self.archive))
 
-        # Load extension support for commands which need it
-        extensions.loadall(self.ui)
-        exs = [ name for name, module in extensions.extensions() ]
-
         # need transplant extension for transplant command
-        if 'transplant' in exs:
+        if 'transplant' in self.exs:
             m.append(create_menu(_('transp_lant to local'),
                      self.transplant_rev))
         
         # need mq extension for strip command
-        if 'mq' in exs:
+        if 'mq' in self.exs:
             m.append(create_menu(_('strip revision'), self.strip_rev))
 
         m.show_all()
@@ -494,23 +509,18 @@ class GLog(gdialog.GDialog):
         self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
         m.append(self.cmenu_merge2)
         
-        # Load extension support for commands which need it
-        extensions.loadall(self.ui)
-
-        exs = [ name for name, module in extensions.extensions() ]
-
         # need transplant extension for transplant command
-        if 'transplant' in exs:
+        if 'transplant' in self.exs:
             m.append(create_menu(_('transplant revision range to local'),
                      self.transplant_revs))
 
         # need rebase extension for rebase command
-        if 'rebase' in exs:
+        if 'rebase' in self.exs:
             m.append(create_menu(_('rebase on top of selected'),
                      self.rebase_selected))
         
         # need MQ extension for qimport / qfinish commands
-        if 'mq' in exs:
+        if 'mq' in self.exs:
             m.append(create_menu(_('import as MQ patches from here to selected'),
                      self.mqimport_revs))
             m.append(create_menu(_('finish MQ patches from here to selected'),
@@ -662,30 +672,34 @@ class GLog(gdialog.GDialog):
         self.filterentry = entry
         filterbox.pack_start(entry, True)
 
-        self.mqwidget = thgmq.MQWidget(self.repo)
-        self.mqwidget.connect('patch-selected', self.patch_selected)
-        self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
+        midpane = gtk.VBox()
+        midpane.pack_start(filterbox, False, False, 0)
+        midpane.pack_start(self.graphview, True, True, 0)
+        midpane.show_all()
 
-        vbox = gtk.VBox()
-        vbox.pack_start(filterbox, False, False, 0)
-        vbox.pack_start(self.graphview, True, True, 0)
-        vbox.show_all()
+        if 'mq' in self.exs:
+            # create MQWidget
+            self.mqwidget = thgmq.MQWidget(self.repo)
+            self.mqwidget.connect('patch-selected', self.patch_selected)
+            self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
 
-        def wrapframe(widget):
-            frame = gtk.Frame()
-            frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-            frame.add(widget)
-            return frame
-        self.mqpaned = gtk.HPaned()
-        self.mqpaned.add1(wrapframe(self.mqwidget))
-        self.mqpaned.add2(wrapframe(vbox))
+            def wrapframe(widget):
+                frame = gtk.Frame()
+                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+                frame.add(widget)
+                return frame
+            self.mqpaned = gtk.HPaned()
+            self.mqpaned.add1(wrapframe(self.mqwidget))
+            self.mqpaned.add2(wrapframe(midpane))
+
+            midpane = self.mqpaned
 
         # Add ChangeSet instance to bottom half of vpane
         self.changeview.graphview = self.graphview
         self.hpaned = self.changeview.get_body()
 
         self.vpaned = gtk.VPaned()
-        self.vpaned.pack1(self.mqpaned, True, False)
+        self.vpaned.pack1(midpane, True, False)
         self.vpaned.pack2(self.hpaned)
         gobject.idle_add(self.realize_settings)
 
@@ -1097,6 +1111,26 @@ class GLog(gdialog.GDialog):
     def refresh_clicked(self, toolbutton, data=None):
         self.reload_log()
         return True
+
+    def enable_mqpanel(self, enable=None):
+        if not hasattr(self, 'mqpaned'):
+            return
+        if enable == None:
+            enable = bool('mq' in self.exs and self.repo.mq.applied)
+        self.mqpaned.set_position(enable and -1 or 0)
+
+        # set the state of MQ toolbutton
+        if hasattr(self, 'mqtb'):
+            self.mqtb.handler_block_by_func(self.mq_clicked)
+            self.mqtb.set_active(enable)
+            self.mqtb.handler_unblock_by_func(self.mq_clicked)
+
+    def mq_clicked(self, toolbutton, data=None):
+        active = self.mqtb.get_active()
+        if active:
+            self.enable_mqpanel(True)
+        else:
+            self.enable_mqpanel(False)
 
     def tree_button_press(self, tree, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |

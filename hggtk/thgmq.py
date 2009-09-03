@@ -37,6 +37,7 @@ class MQWidget(gtk.HBox):
         gtk.HBox.__init__(self)
 
         self.repo = repo
+        self.mqloaded = hasattr(repo, 'mq')
 
         # side toolbar
         toolbar = gtk.Toolbar()
@@ -145,6 +146,9 @@ class MQWidget(gtk.HBox):
         Refresh the list of patches.
         This operation will try to keep selection state.
         """
+        if not self.mqloaded:
+            return
+
         # store patch selection state
         sel = self.list.get_selection()
         model, prevpaths = sel.get_selected_rows()
@@ -168,9 +172,6 @@ class MQWidget(gtk.HBox):
         # insert separator
         model.insert_after(top, (-1, '', '', ''))
 
-        # update toolbar buttons
-        self.update_toolbuttons()
-
         # restore patch selection state
         if len(prevpaths) > 0:
             for path in prevpaths:
@@ -178,12 +179,17 @@ class MQWidget(gtk.HBox):
                 if iter:
                     sel.select_iter(iter)
 
+        # update UI sensitives
+        self.update_sensitives()
+
     def qgoto(self, patch):
         """
         [MQ] Execute 'qgoto' command.
 
         patch: the patch name or an index to specify the patch.
         """
+        if not self.is_operable():
+            return
         cmdline = ['hg', 'qgoto', patch]
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
@@ -199,6 +205,8 @@ class MQWidget(gtk.HBox):
 
         all: if True, use '--all' option. (default: False)
         """
+        if not self.is_operable():
+            return
         cmdline = ['hg', 'qpop']
         if all:
             cmdline.append('--all')
@@ -216,6 +224,8 @@ class MQWidget(gtk.HBox):
 
         all: if True, use '--all' option. (default: False)
         """
+        if not self.is_operable():
+            return
         cmdline = ['hg', 'qpush']
         if all:
             cmdline.append('--all')
@@ -233,6 +243,8 @@ class MQWidget(gtk.HBox):
 
         patch: the patch name or an index to specify the patch.
         """
+        if not self.has_patch():
+            return
         cmdline = ['hg', 'qdelete', patch]
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
@@ -250,7 +262,7 @@ class MQWidget(gtk.HBox):
         name: the new patch name for renaming.
         patch: the target patch name or index. (default: 'qtip')
         """
-        if not name:
+        if not name or not self.has_patch():
             return
         cmdline = ['hg', 'qrename', patch, name]
         dlg = hgcmd.CmdDialog(cmdline)
@@ -271,6 +283,9 @@ class MQWidget(gtk.HBox):
 
         patch: the target patch name or index. (default: 'qtip')
         """
+        if not self.mqloaded or \
+               patch == 'qtip' and 'qtip' in self.repo.tags():
+            return False
         target = self.repo.mq.lookup(patch)
         if not target:
             return False
@@ -287,6 +302,8 @@ class MQWidget(gtk.HBox):
 
         applied: if True, enable '--applied' option. (default: False)
         """
+        if not self.has_applied():
+            return
         cmdline = ['hg', 'qfinish']
         if applied:
             cmdline.append('--applied')
@@ -304,7 +321,7 @@ class MQWidget(gtk.HBox):
 
         patch: the patch name or an index to specify the patch.
         """
-        if not patch:
+        if not patch or not self.has_applied():
             return
         cmdline = ['hg', 'qfold', patch]
         dlg = hgcmd.CmdDialog(cmdline)
@@ -317,8 +334,29 @@ class MQWidget(gtk.HBox):
 
     ### internal functions ###
 
+    def has_patch(self):
+        """ return True if MQ has applicable patch """
+        if self.mqloaded:
+            return len(self.repo.mq.series) > 0
+        return False
+
+    def has_applied(self):
+        """ return True if MQ has applied patches """
+        if self.mqloaded:
+            return len(self.repo.mq.applied) > 0
+        return False
+
+    def is_operable(self):
+        """ return True if MQ is operable """
+        if self.mqloaded:
+            repo = self.repo
+            if 'qtip' in self.repo.tags():
+                return repo['.'] == repo['qtip']
+            return len(repo.mq.series) > 0
+        return False
+
     def get_iter_by_patchname(self, name):
-        """ return iter has specified patch name"""
+        """ return iter has specified patch name """
         if name:
             for row in self.model:
                 if row[MQ_NAME] == name:
@@ -326,34 +364,41 @@ class MQWidget(gtk.HBox):
         return None
 
     def get_path_by_patchname(self, name):
+        """ return path has specified patch name """
         return self.model.get_path(self.get_iter_by_patchname(name))
 
-    def get_top_patchname(self):
-        applied = self.repo.mq.applied
-        if len(applied):
-            return applied[-1].name
+    def get_qtip_patchname(self):
+        if self.mqloaded and 'qtip' in self.repo.tags():
+            return self.repo.mq.applied[-1].name
         return None
 
-    def is_top_patch(self, patchname):
-        topname = self.get_top_patchname()
-        if patchname and topname:
-            return patchname == topname
+    def is_qtip(self, patchname):
+        if patchname:
+            return patchname == self.get_qtip_patchname()
         return False
 
-    def get_top_path(self):
-        topname = self.get_top_patchname()
-        if topname:
-            return self.get_path_by_patchname(topname)
-        return None
-
-    def update_toolbuttons(self):
-        q = self.repo.mq
-        in_bottom = len(q.applied) == 0
-        in_top = len(q.unapplied(self.repo)) == 0
-        self.btn['popall'].set_sensitive(not in_bottom)
-        self.btn['pop'].set_sensitive(not in_bottom)
-        self.btn['push'].set_sensitive(not in_top)
-        self.btn['pushall'].set_sensitive(not in_top)
+    def update_sensitives(self):
+        """ Update the sensitives of entire UI """
+        def disable_mqmoves():
+            for name in ('popall', 'pop', 'push', 'pushall'):
+                self.btn[name].set_sensitive(False)
+        if self.mqloaded:
+            self.list.set_sensitive(True)
+            self.btn['menu'].set_sensitive(True)
+            if self.is_operable():
+                q = self.repo.mq
+                in_bottom = len(q.applied) == 0
+                in_top = len(q.unapplied(self.repo)) == 0
+                self.btn['popall'].set_sensitive(not in_bottom)
+                self.btn['pop'].set_sensitive(not in_bottom)
+                self.btn['push'].set_sensitive(not in_top)
+                self.btn['pushall'].set_sensitive(not in_top)
+            else:
+                disable_mqmoves()
+        else:
+            self.list.set_sensitive(False)
+            self.btn['menu'].set_sensitive(False)
+            disable_mqmoves()
 
     def scroll_to_current(self):
         """
@@ -362,9 +407,12 @@ class MQWidget(gtk.HBox):
         """
         if self.list.get_selection().count_selected_rows() > 0:
             return
-        top = self.get_top_path()
-        if top:
-            self.list.scroll_to_cell(top)
+        qtipname = self.get_qtip_patchname()
+        if not qtipname:
+            return
+        path = self.get_path_by_patchname(qtipname)
+        if path:
+            self.list.scroll_to_cell(path)
 
     def cell_data_func(self, column, cell, model, iter):
         row = model[iter]
@@ -378,7 +426,7 @@ class MQWidget(gtk.HBox):
             cell.set_property('foreground', 'black')
 
         patchname = row[MQ_NAME]
-        if self.is_top_patch(patchname):
+        if self.is_qtip(patchname):
             cell.set_property('weight', pango.WEIGHT_BOLD)
         else:
             cell.set_property('weight', pango.WEIGHT_NORMAL)
@@ -399,7 +447,7 @@ class MQWidget(gtk.HBox):
                 item.connect('activate', handler, row)
             menu.append(item)
 
-        is_top = self.is_top_patch(row[MQ_NAME])
+        is_top = self.is_qtip(row[MQ_NAME])
         is_applied = row[MQ_STATUS] == 'A'
 
         if not is_top:
@@ -463,11 +511,12 @@ class MQWidget(gtk.HBox):
 
     def list_row_activated(self, list, path, column):
         patchname = self.model[path][MQ_NAME]
-        if self.get_top_patchname() != patchname:
+        if self.get_qtip_patchname() != patchname:
             self.qgoto(patchname)
 
     def list_size_allocated(self, list, req):
-        self.scroll_to_current()
+        if self.mqloaded and self.has_applied():
+            self.scroll_to_current()
 
     def popall_clicked(self, toolbutton):
         self.qpop(all=True)
@@ -481,7 +530,7 @@ class MQWidget(gtk.HBox):
     def pushall_clicked(self, toolbutton):
         self.qpush(all=True)
 
-    """ context menu signal handlers """
+    ### context menu signal handlers ###
 
     def goto_activated(self, menuitem, row):
         self.qgoto(row[MQ_NAME])

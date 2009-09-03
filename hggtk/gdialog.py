@@ -286,10 +286,12 @@ class GDialog(gtk.Window):
 
 
     def make_toolbutton(self, stock, label, handler,
-            userdata=None, menu=None, tip=None):
+            userdata=None, menu=None, tip=None, toggle=False):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
+        elif toggle:
+            tbutton = gtk.ToggleToolButton(stock)
         else:
             tbutton = gtk.ToolButton(stock)
 
