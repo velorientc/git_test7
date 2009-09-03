@@ -62,13 +62,14 @@ class MQWidget(gtk.HBox):
         self.pack_start(pane)
 
         ## patch list
-        self.model = gtk.ListStore(int, # patch index
+        self.model = gtk.ListStore(int, # patch index, -1 means separator
                                    str, # patch status
                                    str, # patch name
                                    str) # summary
         self.list = gtk.TreeView(self.model)
         self.list.set_size_request(180, -1)
         self.list.size_request()
+        self.list.set_row_separator_func(self.row_sep_func)
         self.list.connect('button-press-event', self.list_pressed)
         cell = gtk.CellRendererText()
 
@@ -100,15 +101,21 @@ class MQWidget(gtk.HBox):
     def refresh(self):
         self.model.clear()
 
+        # build list of patches
         from hgext import mq
         q = self.repo.mq
         q.parse_series()
+        top = None
         applied = set([p.name for p in q.applied])
         for index, patchname in enumerate(q.series):
-            ph = mq.patchheader(q.join(patchname))
-            stat = (patchname in applied and 'A' or 'U')
-            msg = ph.message[0]
-            self.model.append((index, stat, patchname, msg))
+            stat = patchname in applied and 'A' or 'U'
+            msg = mq.patchheader(q.join(patchname)).message[0]
+            iter = self.model.append((index, stat, patchname, msg))
+            if stat == 'A':
+                top = iter
+
+        # insert separator
+        self.model.insert_after(top, (-1, '', '', ''))
 
     def qpop(self, all=False):
         cmdline = ['hg', 'qpop']
@@ -142,6 +149,9 @@ class MQWidget(gtk.HBox):
             cell.set_property('foreground', '#909090')
         else:
             cell.set_property('foreground', 'black')
+
+    def row_sep_func(self, model, iter, data=None):
+        return model[iter][MQ_INDEX] == -1;
 
     """ signal handlers """
 
