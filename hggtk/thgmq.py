@@ -83,25 +83,27 @@ class MQWidget(gtk.HBox):
         self.list.set_row_separator_func(self.row_sep_func)
         self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
+
         cell = gtk.CellRendererText()
+        editcell = gtk.CellRendererText()
+        editcell.set_property('editable', True)
+        editcell.connect('edited', self.list_cell_edited, self.model)
 
-        col = gtk.TreeViewColumn(_('#'), cell)
-        col.add_attribute(cell, 'text', MQ_INDEX)
-        col.set_cell_data_func(cell, self.cell_data_func)
-        col.set_resizable(False)
-        self.list.append_column(col)
+        self.cols = {}
+        self.cells = {}
 
-        col = gtk.TreeViewColumn(_('Name'), cell)
-        col.add_attribute(cell, 'text', MQ_NAME)
-        col.set_cell_data_func(cell, self.cell_data_func)
-        col.set_resizable(False)
-        self.list.append_column(col)
+        def addcol(header, col_idx, cell=cell, resizable=False):
+            col = gtk.TreeViewColumn(header, cell)
+            col.add_attribute(cell, 'text', col_idx)
+            col.set_cell_data_func(cell, self.cell_data_func)
+            col.set_resizable(resizable)
+            self.list.append_column(col)
+            self.cols[col_idx] = col
+            self.cells[col_idx] = cell
 
-        col = gtk.TreeViewColumn(_('Summary'), cell)
-        col.add_attribute(cell, 'text', MQ_SUMMARY)
-        col.set_cell_data_func(cell, self.cell_data_func)
-        col.set_resizable(True)
-        self.list.append_column(col)
+        addcol(_('#'), MQ_INDEX)
+        addcol(_('Name'), MQ_NAME, cell=editcell)
+        addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
         pane.add(self.list)
 
@@ -195,11 +197,59 @@ class MQWidget(gtk.HBox):
         self.repo.mq.invalidate()
         self.refresh()
 
+    def qrename(self, name, patch='qtip'):
+        """
+        [MQ] Execute 'qrename' command.
+        If 'patch' param isn't specified, renaming should be applied
+        'qtip' (current) patch.
+
+        name: the new patch name for renaming.
+        patch: the target patch name or index. (default: 'qtip')
+        """
+        if not name:
+            return
+        cmdline = ['hg', 'qrename', patch, name]
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.repo.mq.invalidate()
+        self.refresh()
+        self.emit('repo-invalidated')
+
+    def qrename_ui(self, patch='qtip'):
+        """
+        Prepare the user interface for renaming the patch.
+        If 'patch' param isn't specified, renaming should be started
+        'qtip' (current) patch.
+
+        Return True if succeed to prepare; otherwise False.
+
+        patch: the target patch name or index. (default: 'qtip')
+        """
+        target = self.repo.mq.lookup(patch)
+        if not target:
+            return False
+
+        for row in self.model:
+            if row[MQ_NAME] == target:
+                path = row.path
+                break
+        else:
+            return False
+
+        self.list.set_cursor_on_cell(path, self.cols[MQ_NAME], None, True)
+        return True
+
     ### internal functions ###
 
     def is_top_patch(self, patchname):
-        applied = [p.name for p in self.repo.mq.applied]
-        return applied[-1] == patchname
+        if patchname:
+            return self.get_top_patchname() == patchname
+        return False
+
+    def get_top_patchname(self):
+        return self.repo.mq.lookup('qtip')
 
     def cell_data_func(self, column, cell, model, iter):
         stat = model[iter][MQ_STATUS]
@@ -226,12 +276,15 @@ class MQWidget(gtk.HBox):
                 item.connect('activate', handler, row)
             menu.append(item)
 
-        if not self.is_top_patch(row[MQ_NAME]):
+        is_top = self.is_top_patch(row[MQ_NAME])
+        is_applied = row[MQ_STATUS] == 'A'
+
+        if not is_top:
             append(_('_goto'), self.goto_activated)
-        if row[MQ_STATUS] == 'U':
+        if not is_applied:
             append(_('_delete'), self.delete_activated)
         append(_('_finish'))
-        append(_('_rename'))
+        append(_('_rename'), self.rename_activated)
         append(_('f_old'))
 
         menu.show_all()
@@ -264,6 +317,11 @@ class MQWidget(gtk.HBox):
         except hglib.RepoError:
             pass
 
+    def list_cell_edited(self, cell, path, newname, model):
+        patchname = model[path][MQ_NAME]
+        if newname != patchname:
+            self.qrename(newname, patch=patchname)
+
     def popall_clicked(self, toolbutton):
         self.qpop(all=True)
 
@@ -283,3 +341,6 @@ class MQWidget(gtk.HBox):
 
     def delete_activated(self, menuitem, row):
         self.qdelete(row[MQ_NAME])
+
+    def rename_activated(self, menuitem, row):
+        self.qrename_ui(row[MQ_NAME])
