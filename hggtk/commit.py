@@ -555,7 +555,7 @@ class GCommit(GStatus):
             allchunks = []
             for f in files:
                 cf = util.pconvert(f)
-                if cf not in self.modified: continue
+                if cf not in self.status[0]: continue
                 if f not in self.filechunks: continue
                 chunks = self.filechunks[f]
                 if len(chunks) < 2: continue

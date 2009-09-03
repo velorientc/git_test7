@@ -526,7 +526,7 @@ class GStatus(gdialog.GDialog):
         fp.seek(0)
         self.clipboard.set_text(fp.read())
 
-    def do_reload_status(self):
+    def refresh_file_tree(self):
         """Clear out the existing ListStore model and reload it from the
         repository status.  Also recheck and reselect files that remain
         in the list.
@@ -535,30 +535,7 @@ class GStatus(gdialog.GDialog):
         if selection is None:
             return
 
-        repo = self.repo
-        hglib.invalidaterepo(repo)
-        if hasattr(repo, 'mq'):
-            self.mqmode = repo.mq.applied and repo['.'] == repo['qtip']
-            self.set_title(self.get_title())
-
-        if self.mqmode and self.mode != 'status':
-            # when a patch is applied, show diffs to parent of top patch
-            qtip = repo['.']
-            n1 = qtip.parents()[0].node()
-            n2 = None
-        else:
-            # node2 is None (the working dir) when 0 or 1 rev is specificed
-            n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
-
-        matcher = cmdutil.match(repo, self.pats, self.opts)
-        status = repo.status(node1=n1, node2=n2, match=matcher,
-                             ignored=self.test_opt('ignored'),
-                             clean=self.test_opt('clean'),
-                             unknown=self.test_opt('unknown'))
-
-        (modified, added, removed, deleted, unknown, ignored, clean) = status
-        self._node1, self._node2, self.modified = n1, n2, modified
-
+        (modified, added, removed, deleted, unknown, ignored, clean) = self.status
         changetypes = (('M', 'modified', modified),
                        ('A', 'added', added),
                        ('R', 'removed', removed),
@@ -577,7 +554,7 @@ class GStatus(gdialog.GDialog):
             waschecked[row[FM_PATH]] = row[FM_CHECKED], row[FM_PARTIAL_SELECTED]
 
         # merge-state of files
-        ms = merge_.mergestate(repo)
+        ms = merge_.mergestate(self.repo)
 
         # Load the new data into the tree's model
         self.filetree.hide()
@@ -622,8 +599,37 @@ class GStatus(gdialog.GDialog):
 
     def reload_status(self):
         if not self.ready: return False
-        self.do_reload_status()
+
+        def get_repo_status():
+            repo = self.repo
+            hglib.invalidaterepo(repo)
+            if hasattr(repo, 'mq'):
+                self.mqmode = repo.mq.applied and repo['.'] == repo['qtip']
+                self.set_title(self.get_title())
+
+            if self.mqmode and self.mode != 'status':
+                # when a patch is applied, show diffs to parent of top patch
+                qtip = repo['.']
+                n1 = qtip.parents()[0].node()
+                n2 = None
+            else:
+                # node2 is None (the working dir) when 0 or 1 rev is specificed
+                n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
+
+            matcher = cmdutil.match(repo, self.pats, self.opts)
+            status = repo.status(node1=n1, node2=n2, match=matcher,
+                                 ignored=self.test_opt('ignored'),
+                                 clean=self.test_opt('clean'),
+                                 unknown=self.test_opt('unknown'))
+
+            self.status = status
+            self._node1, self._node2, = n1, n2
+
+        self.ready = False
+        get_repo_status()
+        self.refresh_file_tree()
         self.update_check_count()
+        self.ready = True
 
 
     def select_toggle(self, cellrenderer, path):
