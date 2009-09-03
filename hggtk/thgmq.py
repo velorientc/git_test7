@@ -43,13 +43,17 @@ class MQWidget(gtk.HBox):
         toolbar.set_orientation(gtk.ORIENTATION_VERTICAL)
         toolbar.set_property('icon-size', gtk.ICON_SIZE_SMALL_TOOLBAR)
 
+        self.btn = {}
+
         popallbtn = gtk.ToolButton(gtk.STOCK_GOTO_TOP)
         popallbtn.connect('clicked', self.popall_clicked)
         toolbar.insert(popallbtn, -1)
+        self.btn['popall'] = popallbtn
 
         popbtn = gtk.ToolButton(gtk.STOCK_GO_UP)
         popbtn.connect('clicked', self.pop_clicked)
         toolbar.insert(popbtn, -1)
+        self.btn['pop'] = popbtn
 
         sep = gtk.SeparatorToolItem()
         sep.set_draw(False)
@@ -59,10 +63,12 @@ class MQWidget(gtk.HBox):
         pushbtn = gtk.ToolButton(gtk.STOCK_GO_DOWN)
         pushbtn.connect('clicked', self.push_clicked)
         toolbar.insert(pushbtn, -1)
+        self.btn['push'] = pushbtn
 
         pushallbtn = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
         pushallbtn.connect('clicked', self.pushall_clicked)
         toolbar.insert(pushallbtn, -1)
+        self.btn['pushall'] = pushallbtn
 
         self.pack_start(toolbar, False, False)
 
@@ -134,6 +140,9 @@ class MQWidget(gtk.HBox):
 
         # insert separator
         self.model.insert_after(top, (-1, '', '', ''))
+
+        # update toolbar buttons
+        self.update_toolbuttons()
 
     def qgoto(self, patch):
         """
@@ -285,6 +294,15 @@ class MQWidget(gtk.HBox):
 
     def get_top_patchname(self):
         return self.repo.mq.lookup('qtip')
+
+    def update_toolbuttons(self):
+        q = self.repo.mq
+        in_bottom = len(q.applied) == 0
+        in_top = len(q.unapplied(self.repo)) == 0
+        self.btn['popall'].set_sensitive(not in_bottom)
+        self.btn['pop'].set_sensitive(not in_bottom)
+        self.btn['push'].set_sensitive(not in_top)
+        self.btn['pushall'].set_sensitive(not in_top)
 
     def cell_data_func(self, column, cell, model, iter):
         stat = model[iter][MQ_STATUS]
