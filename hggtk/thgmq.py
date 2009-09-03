@@ -111,8 +111,8 @@ class MQWidget(gtk.HBox):
                    editable=False, editfunc=None):
             header = (right and '%s ' or ' %s') % header
             cell = gtk.CellRendererText()
-            if editable:
-                cell.set_property('editable', True)
+            if editfunc:
+                cell.set_property('editable', editable)
                 cell.connect('edited', editfunc)
             col = gtk.TreeViewColumn(header, cell)
             col.add_attribute(cell, 'text', col_idx)
@@ -131,7 +131,7 @@ class MQWidget(gtk.HBox):
                 self.qrename(newname, patch=patchname)
 
         addcol(_('#'), MQ_INDEX, right=True)
-        addcol(_('Name'), MQ_NAME, editable=True, editfunc=cell_edited)
+        addcol(_('Name'), MQ_NAME, editfunc=cell_edited)
         addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
         pane.add(self.list)
@@ -292,6 +292,14 @@ class MQWidget(gtk.HBox):
         path = self.get_path_by_patchname(target)
         if not path:
             return False
+        # make the cell editable
+        cell = self.cells[MQ_NAME]
+        if not cell.get_property('editable'):
+            cell.set_property('editable', True)
+            def canceled(cell):
+                cell.disconnect(hid)
+                cell.set_property('editable', False)
+            hid = cell.connect('editing-canceled', canceled)
         # start editing patchname cell
         self.list.set_cursor_on_cell(path, self.cols[MQ_NAME], None, True)
         return True
@@ -470,21 +478,37 @@ class MQWidget(gtk.HBox):
 
     def create_view_menu(self):
         menu = gtk.Menu()
-
-        def append(label, col_idx):
-            item = gtk.CheckMenuItem(label)
-            item.set_active(True)
-            item.set_border_width(1)
-            item.set_draw_as_radio(True)
+        def append(item=None, handler=None, check=False,
+                   active=False, sep=False):
+            if sep:
+                item = gtk.SeparatorMenuItem()
+            else:
+                if isinstance(item, str):
+                    if check:
+                        item = gtk.CheckMenuItem(item)
+                        item.set_active(active)
+                    else:
+                        item = gtk.MenuItem(item)
+                item.set_border_width(1)
+            if handler:
+                item.connect('activate', handler)
+            menu.append(item)
+            return item
+        def colappend(label, col_idx):
             def handler(menuitem):
                 col = self.cols[col_idx]
                 col.set_visible(menuitem.get_active())
-            item.connect('activate', handler)
-            menu.append(item)
+            item = append(label, handler, check=True, active=True)
 
-        append(_('Show index'), MQ_INDEX)
-        append(_('Show name'), MQ_NAME)
-        append(_('Show summary'), MQ_SUMMARY)
+        colappend(_('Show index'), MQ_INDEX)
+        colappend(_('Show name'), MQ_NAME)
+        colappend(_('Show summary'), MQ_SUMMARY)
+
+        append(sep=True)
+
+        def enable_editable(item):
+            self.cells[MQ_NAME].set_property('editable', item.get_active())
+        append(_('Enable editable cells'), enable_editable, check=True)
 
         menu.show_all()
         return menu
