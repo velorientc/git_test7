@@ -181,7 +181,25 @@ class MQWidget(gtk.HBox):
         self.refresh()
         self.emit('repo-invalidated')
 
+    def qdelete(self, patch):
+        """
+        [MQ] Execute 'qdelete' command.
+
+        patch: the patch name or an index to specify the patch.
+        """
+        cmdline = ['hg', 'qdelete', patch]
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.repo.mq.invalidate()
+        self.refresh()
+
     ### internal functions ###
+
+    def is_top_patch(self, patchname):
+        applied = [p.name for p in self.repo.mq.applied]
+        return applied[-1] == patchname
 
     def cell_data_func(self, column, cell, model, iter):
         stat = model[iter][MQ_STATUS]
@@ -208,8 +226,10 @@ class MQWidget(gtk.HBox):
                 item.connect('activate', handler, row)
             menu.append(item)
 
-        append(_('_goto'), self.goto_activated)
-        append(_('_delete'))
+        if not self.is_top_patch(row[MQ_NAME]):
+            append(_('_goto'), self.goto_activated)
+        if row[MQ_STATUS] == 'U':
+            append(_('_delete'), self.delete_activated)
         append(_('_finish'))
         append(_('_rename'))
         append(_('f_old'))
@@ -260,3 +280,6 @@ class MQWidget(gtk.HBox):
 
     def goto_activated(self, menuitem, row):
         self.qgoto(row[MQ_NAME])
+
+    def delete_activated(self, menuitem, row):
+        self.qdelete(row[MQ_NAME])
