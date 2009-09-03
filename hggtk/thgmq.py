@@ -171,9 +171,11 @@ class MQWidget(gtk.HBox):
         if not self.mqloaded:
             return
 
-        # store patch selection state
-        sel = self.list.get_selection()
-        model, prevpaths = sel.get_selected_rows()
+        # store selected patch name
+        selname = None
+        model, paths = self.list.get_selection().get_selected_rows()
+        if len(paths) > 0:
+            selname = model[paths[0]][MQ_NAME]
 
         # clear model data
         model.clear()
@@ -199,12 +201,11 @@ class MQWidget(gtk.HBox):
         if top:
             model.insert_after(top, (INDEX_SEPARATOR, None, None, None))
 
-        # restore patch selection state
-        if len(prevpaths) > 0:
-            for path in prevpaths:
-                iter = self.get_iter_by_patchname(model[path][MQ_NAME])
-                if iter:
-                    sel.select_iter(iter)
+        # restore patch selection
+        if selname:
+            iter = self.get_iter_by_patchname(selname)
+            if iter:
+                self.list.get_selection().select_iter(iter)
 
         # update UI sensitives
         self.update_sensitives()
