@@ -91,6 +91,7 @@ class MQWidget(gtk.HBox):
         self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
         self.list.connect('row-activated', self.list_row_activated)
+        self.list.connect('size-allocate', self.list_size_allocated)
 
         cell = gtk.CellRendererText()
         editcell = gtk.CellRendererText()
@@ -123,8 +124,14 @@ class MQWidget(gtk.HBox):
     def refresh(self):
         """
         Refresh the list of patches.
+        This operation will try to keep selection state.
         """
-        self.model.clear()
+        # store patch selection state
+        sel = self.list.get_selection()
+        model, prevpaths = sel.get_selected_rows()
+
+        # clear model data
+        model.clear()
 
         # build list of patches
         from hgext import mq
@@ -135,15 +142,22 @@ class MQWidget(gtk.HBox):
         for index, patchname in enumerate(q.series):
             stat = patchname in applied and 'A' or 'U'
             msg = mq.patchheader(q.join(patchname)).message[0]
-            iter = self.model.append((index, stat, patchname, msg))
+            iter = model.append((index, stat, patchname, msg))
             if stat == 'A':
                 top = iter
 
         # insert separator
-        self.model.insert_after(top, (-1, '', '', ''))
+        model.insert_after(top, (-1, '', '', ''))
 
         # update toolbar buttons
         self.update_toolbuttons()
+
+        # restore patch selection state
+        if len(prevpaths) > 0:
+            for path in prevpaths:
+                iter = self.get_iter_by_patchname(model[path][MQ_NAME])
+                if iter:
+                    sel.select_iter(iter)
 
     def qgoto(self, patch):
         """
@@ -241,14 +255,10 @@ class MQWidget(gtk.HBox):
         target = self.repo.mq.lookup(patch)
         if not target:
             return False
-
-        for row in self.model:
-            if row[MQ_NAME] == target:
-                path = row.path
-                break
-        else:
+        path = self.get_path_by_patchname(target)
+        if not path:
             return False
-
+        # start editing patchname cell
         self.list.set_cursor_on_cell(path, self.cols[MQ_NAME], None, True)
         return True
 
@@ -288,16 +298,33 @@ class MQWidget(gtk.HBox):
 
     ### internal functions ###
 
+    def get_iter_by_patchname(self, name):
+        """ return iter has specified patch name"""
+        if name:
+            for row in self.model:
+                if row[MQ_NAME] == name:
+                    return row.iter
+        return None
+
+    def get_path_by_patchname(self, name):
+        return self.model.get_path(self.get_iter_by_patchname(name))
+
+    def get_top_patchname(self):
+        applied = self.repo.mq.applied
+        if len(applied):
+            return applied[-1].name
+        return None
+
     def is_top_patch(self, patchname):
         topname = self.get_top_patchname()
         if patchname and topname:
             return patchname == topname
         return False
 
-    def get_top_patchname(self):
-        applied = self.repo.mq.applied
-        if len(applied):
-            return applied[-1].name
+    def get_top_path(self):
+        topname = self.get_top_patchname()
+        if topname:
+            return self.get_path_by_patchname(topname)
         return None
 
     def update_toolbuttons(self):
@@ -308,6 +335,17 @@ class MQWidget(gtk.HBox):
         self.btn['pop'].set_sensitive(not in_bottom)
         self.btn['push'].set_sensitive(not in_top)
         self.btn['pushall'].set_sensitive(not in_top)
+
+    def scroll_to_current(self):
+        """
+        Scroll to current patch in the patch list.
+        If the patch is selected, it will do nothing.
+        """
+        if self.list.get_selection().count_selected_rows() > 0:
+            return
+        top = self.get_top_path()
+        if top:
+            self.list.scroll_to_cell(top)
 
     def cell_data_func(self, column, cell, model, iter):
         row = model[iter]
@@ -392,6 +430,9 @@ class MQWidget(gtk.HBox):
         patchname = model[path][MQ_NAME]
         if newname != patchname:
             self.qrename(newname, patch=patchname)
+
+    def list_size_allocated(self, list, req):
+        self.scroll_to_current()
 
     def popall_clicked(self, toolbutton):
         self.qpop(all=True)
