@@ -227,7 +227,10 @@ class MQWidget(gtk.HBox):
         applied = set([p.name for p in q.applied])
         for index, patchname in enumerate(q.series):
             stat = patchname in applied and 'A' or 'U'
-            msg = mq.patchheader(q.join(patchname)).message[0]
+            try:
+                msg = mq.patchheader(q.join(patchname)).message[0]
+            except IndexError:
+                msg = None
             iter = model.append((index, stat, patchname, msg))
             if stat == 'A':
                 top = iter
