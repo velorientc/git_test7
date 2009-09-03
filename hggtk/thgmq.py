@@ -156,9 +156,9 @@ class MQWidget(gtk.HBox):
     """ signal handlers """
 
     def list_pressed(self, list, event):
+        x, y = int(event.x), int(event.y)
+        path = list.get_path_at_pos(x, y)
         if event.button == 1:
-            x, y = int(event.x), int(event.y)
-            path = list.get_path_at_pos(x, y)
             if not path:
                 # HACK: clear selection after this function calling,
                 # against selection by getting focus
@@ -166,6 +166,26 @@ class MQWidget(gtk.HBox):
                     selection = list.get_selection()
                     selection.unselect_all()
                 gobject.idle_add(unselect)
+        elif event.button == 3:
+            if path:
+                self.list_popup_menu(self.list)
+
+    def list_popup_menu(self, list):
+        menu = gtk.Menu()
+        def append(label):
+            item = gtk.MenuItem(label, True)
+            item.set_border_width(1)
+            menu.append(item)
+
+        append(_('_delete'))
+        append(_('_finish'))
+        append(_('_rename'))
+        append(_('f_old'))
+        append(_('_goto'))
+
+        menu.show_all()
+        menu.popup(None, None, None, 0, 0)
+        return True
 
     def popall_clicked(self, toolbutton):
         self.qpop(all=True)
