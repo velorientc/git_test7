@@ -46,6 +46,16 @@ class MQWidget(gtk.HBox):
 
         self.btn = {}
 
+        menubtn = gtk.MenuToolButton('')
+        menubtn.set_menu(self.create_view_menu())
+        toolbar.insert(menubtn, -1)
+        self.btn['menu'] = menubtn
+        def after_init():
+            arrowbtn = menubtn.child.get_children()[1]
+            arrowbtn.child.set(gtk.ARROW_DOWN, gtk.SHADOW_IN)
+            menubtn.child.get_children()[0].hide()
+        gobject.idle_add(after_init)
+
         popallbtn = gtk.ToolButton(gtk.STOCK_GOTO_TOP)
         popallbtn.connect('clicked', self.popall_clicked)
         toolbar.insert(popallbtn, -1)
@@ -403,6 +413,27 @@ class MQWidget(gtk.HBox):
         menu.show_all()
         menu.popup(None, None, None, 0, 0)
         return True
+
+    def create_view_menu(self):
+        menu = gtk.Menu()
+
+        def append(label, col_idx):
+            item = gtk.CheckMenuItem(label)
+            item.set_active(True)
+            item.set_border_width(1)
+            item.set_draw_as_radio(True)
+            def handler(menuitem):
+                col = self.cols[col_idx]
+                col.set_visible(menuitem.get_active())
+            item.connect('activate', handler)
+            menu.append(item)
+
+        append(_('Show index'), MQ_INDEX)
+        append(_('Show name'), MQ_NAME)
+        append(_('Show summary'), MQ_SUMMARY)
+
+        menu.show_all()
+        return menu
 
     ### signal handlers ###
 
