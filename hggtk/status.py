@@ -482,6 +482,8 @@ class GStatus(gdialog.GDialog):
     def remove_filter(self, button):
         button.hide()
         self.pats = []
+        for name, check in self._show_checks.iteritems():
+            check.set_sensitive(True)
         self.reload_status()
 
     def search_filelist(self, model, column, key, iter):
