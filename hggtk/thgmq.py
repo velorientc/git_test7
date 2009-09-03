@@ -12,7 +12,7 @@ import gobject
 from thgutil.i18n import _
 from thgutil import hglib
 
-from hggtk import gtklib
+from hggtk import gtklib, hgcmd
 
 # MQ patches row enumerations
 MQ_INDEX   = 0
@@ -33,9 +33,11 @@ class MQWidget(gtk.HBox):
         toolbar.set_property('icon-size', gtk.ICON_SIZE_SMALL_TOOLBAR)
 
         popallbtn = gtk.ToolButton(gtk.STOCK_GOTO_TOP)
+        popallbtn.connect('clicked', self.popall_clicked)
         toolbar.insert(popallbtn, -1)
 
         popbtn = gtk.ToolButton(gtk.STOCK_GO_UP)
+        popbtn.connect('clicked', self.pop_clicked)
         toolbar.insert(popbtn, -1)
 
         sep = gtk.SeparatorToolItem()
@@ -44,9 +46,11 @@ class MQWidget(gtk.HBox):
         toolbar.insert(sep, -1)
 
         pushbtn = gtk.ToolButton(gtk.STOCK_GO_DOWN)
+        pushbtn.connect('clicked', self.push_clicked)
         toolbar.insert(pushbtn, -1)
 
         pushallbtn = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
+        pushallbtn.connect('clicked', self.pushall_clicked)
         toolbar.insert(pushallbtn, -1)
 
         self.pack_start(toolbar, False, False)
@@ -91,17 +95,44 @@ class MQWidget(gtk.HBox):
         # prepare to show
         self.refresh()
 
+    """ public functions """
+
     def refresh(self):
         self.model.clear()
 
         from hgext import mq
         q = self.repo.mq
+        q.parse_series()
         applied = set([p.name for p in q.applied])
         for index, patchname in enumerate(q.series):
             ph = mq.patchheader(q.join(patchname))
             stat = (patchname in applied and 'A' or 'U')
             msg = ph.message[0]
             self.model.append((index, stat, patchname, msg))
+
+    def qpop(self, all=False):
+        cmdline = ['hg', 'qpop']
+        if all:
+            cmdline.append('--all')
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.repo.mq.invalidate()
+        self.refresh()
+
+    def qpush(self, all=False):
+        cmdline = ['hg', 'qpush']
+        if all:
+            cmdline.append('--all')
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.repo.mq.invalidate()
+        self.refresh()
+
+    """ internal functions """
 
     def cell_data_func(self, column, cell, model, iter):
         stat = model[iter][MQ_STATUS]
@@ -111,6 +142,8 @@ class MQWidget(gtk.HBox):
             cell.set_property('foreground', '#909090')
         else:
             cell.set_property('foreground', 'black')
+
+    """ signal handlers """
 
     def list_pressed(self, list, event):
         if event.button == 1:
@@ -123,3 +156,15 @@ class MQWidget(gtk.HBox):
                     selection = list.get_selection()
                     selection.unselect_all()
                 gobject.idle_add(unselect)
+
+    def popall_clicked(self, toolbutton):
+        self.qpop(all=True)
+
+    def pop_clicked(self, toolbutton):
+        self.qpop()
+
+    def push_clicked(self, toolbutton):
+        self.qpush()
+
+    def pushall_clicked(self, toolbutton):
+        self.qpush(all=True)
