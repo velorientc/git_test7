@@ -206,6 +206,16 @@ class GLog(gdialog.GDialog):
             self.filter = type
             self.reload_log()
 
+    def patch_selected(self, mqpane, revid, patchname):
+        self.currevid = revid
+        if self.currevid != self.lastrevid:
+            self.lastrevid = self.currevid
+            self.changeview.opts['rev'] = [str(self.currevid)]
+            self.changeview.load_details(self.currevid)
+
+    def repo_invalidated(self, mqpane):
+        self.reload_log()
+
     def view_menu(self):
         menu = gtk.Menu()
 
@@ -430,6 +440,9 @@ class GLog(gdialog.GDialog):
             opts['revlist'] = [str(x) for x in heads]
             self.graphview.refresh(False, [], opts)
 
+        # refresh MQ widget
+        self.mqpane.refresh()
+
     def tree_context_menu(self):
         m = gtk.Menu()
         m.append(create_menu(_('visualize change'), self.vdiff_change))
@@ -650,6 +663,8 @@ class GLog(gdialog.GDialog):
         filterbox.pack_start(entry, True)
 
         self.mqpane = thgmq.MQWidget(self.repo)
+        self.mqpane.connect('patch-selected', self.patch_selected)
+        self.mqpane.connect('repo-invalidated', self.repo_invalidated)
 
         vbox = gtk.VBox()
         vbox.pack_start(filterbox, False, False, 0)

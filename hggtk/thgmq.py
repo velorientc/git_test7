@@ -21,6 +21,17 @@ MQ_NAME    = 2
 MQ_SUMMARY = 3
 
 class MQWidget(gtk.HBox):
+
+    __gsignals__ = {
+        'repo-invalidated': (gobject.SIGNAL_RUN_FIRST,
+                             gobject.TYPE_NONE,
+                             ()),
+        'patch-selected': (gobject.SIGNAL_RUN_FIRST,
+                           gobject.TYPE_NONE,
+                           (int,  # revision number
+                            str)) # patch name
+    }
+
     def __init__(self, repo):
         gtk.HBox.__init__(self)
 
@@ -70,6 +81,7 @@ class MQWidget(gtk.HBox):
         self.list.set_size_request(180, -1)
         self.list.size_request()
         self.list.set_row_separator_func(self.row_sep_func)
+        self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
         cell = gtk.CellRendererText()
 
@@ -127,6 +139,7 @@ class MQWidget(gtk.HBox):
         dlg.hide()
         self.repo.mq.invalidate()
         self.refresh()
+        self.emit('repo-invalidated')
 
     def qpush(self, all=False):
         cmdline = ['hg', 'qpush']
@@ -138,6 +151,7 @@ class MQWidget(gtk.HBox):
         dlg.hide()
         self.repo.mq.invalidate()
         self.refresh()
+        self.emit('repo-invalidated')
 
     """ internal functions """
 
@@ -186,6 +200,15 @@ class MQWidget(gtk.HBox):
         menu.show_all()
         menu.popup(None, None, None, 0, 0)
         return True
+
+    def list_sel_changed(self, list):
+        path, focus = list.get_cursor()
+        patchname = self.model[path][MQ_NAME]
+        try:
+            ctx = self.repo[patchname]
+            self.emit('patch-selected', ctx.rev(), patchname)
+        except hglib.RepoError:
+            pass
 
     def popall_clicked(self, toolbutton):
         self.qpop(all=True)
