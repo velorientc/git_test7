@@ -692,6 +692,7 @@ class GLog(gdialog.GDialog):
             self.mqpaned = gtk.HPaned()
             self.mqpaned.add1(wrapframe(self.mqwidget))
             self.mqpaned.add2(wrapframe(midpane))
+            gobject.idle_add(lambda: self.mqpaned.set_position(180))
 
             midpane = self.mqpaned
 
@@ -1118,7 +1119,7 @@ class GLog(gdialog.GDialog):
             return
         if enable == None:
             enable = bool('mq' in self.exs and self.repo.mq.applied)
-        self.mqpaned.set_position(enable and -1 or 0)
+        self.mqpaned.set_position(enable and 180 or 0)
 
         # set the state of MQ toolbutton
         if hasattr(self, 'mqtb'):

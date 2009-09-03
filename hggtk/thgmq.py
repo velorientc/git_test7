@@ -88,20 +88,22 @@ class MQWidget(gtk.HBox):
 
         self.pack_start(toolbar, False, False)
 
-        # scrolled pane
+        # right box
+        mainbox = gtk.VBox()
+        self.pack_start(mainbox, True, True)
+
+        ## scrolled pane
         pane = gtk.ScrolledWindow()
         pane.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         pane.set_shadow_type(gtk.SHADOW_IN)
-        self.pack_start(pane)
+        mainbox.pack_start(pane)
 
-        ## patch list
+        ### patch list
         self.model = gtk.ListStore(int, # patch index
                                    str, # patch status
                                    str, # patch name
                                    str) # summary
         self.list = gtk.TreeView(self.model)
-        self.list.set_size_request(180, -1)
-        self.list.size_request()
         self.list.set_row_separator_func(self.row_sep_func)
         # To support old PyGTK (<1.12)
         if hasattr(self.list, 'set_tooltip_column'):
@@ -145,6 +147,10 @@ class MQWidget(gtk.HBox):
         addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
         pane.add(self.list)
+
+        ## command widget
+        self.cmd = hgcmd.CmdWidget(textview=False, buttons=True)
+        mainbox.pack_start(self.cmd, False, False)
 
         # accelerator
         if accelgroup:
@@ -219,13 +225,7 @@ class MQWidget(gtk.HBox):
         if not self.is_operable():
             return
         cmdline = ['hg', 'qgoto', patch]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.repo.mq.invalidate()
-        self.refresh()
-        self.emit('repo-invalidated')
+        self.cmd.execute(cmdline, self.cmd_done)
 
     def qpop(self, all=False):
         """
@@ -238,13 +238,7 @@ class MQWidget(gtk.HBox):
         cmdline = ['hg', 'qpop']
         if all:
             cmdline.append('--all')
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.repo.mq.invalidate()
-        self.refresh()
-        self.emit('repo-invalidated')
+        self.cmd.execute(cmdline, self.cmd_done)
 
     def qpush(self, all=False):
         """
@@ -257,13 +251,7 @@ class MQWidget(gtk.HBox):
         cmdline = ['hg', 'qpush']
         if all:
             cmdline.append('--all')
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.repo.mq.invalidate()
-        self.refresh()
-        self.emit('repo-invalidated')
+        self.cmd.execute(cmdline, self.cmd_done)
 
     def qdelete(self, patch):
         """
@@ -274,12 +262,7 @@ class MQWidget(gtk.HBox):
         if not self.has_patch():
             return
         cmdline = ['hg', 'qdelete', patch]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.repo.mq.invalidate()
-        self.refresh()
+        self.cmd.execute(cmdline, self.cmd_done, noemit=True)
 
     def qrename(self, name, patch='qtip'):
         """
@@ -293,13 +276,7 @@ class MQWidget(gtk.HBox):
         if not name or not self.has_patch():
             return
         cmdline = ['hg', 'qrename', patch, name]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.repo.mq.invalidate()
-        self.refresh()
-        self.emit('repo-invalidated')
+        self.cmd.execute(cmdline, self.cmd_done)
 
     def qrename_ui(self, patch='qtip'):
         """
@@ -343,13 +320,7 @@ class MQWidget(gtk.HBox):
         cmdline = ['hg', 'qfinish']
         if applied:
             cmdline.append('--applied')
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.repo.mq.invalidate()
-        self.refresh()
-        self.emit('repo-invalidated')
+        self.cmd.execute(cmdline, self.cmd_done)
 
     def qfold(self, patch):
         """
@@ -360,13 +331,7 @@ class MQWidget(gtk.HBox):
         if not patch or not self.has_applied():
             return
         cmdline = ['hg', 'qfold', patch]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.repo.mq.invalidate()
-        self.refresh()
-        self.emit('repo-invalidated')
+        self.cmd.execute(cmdline, self.cmd_done)
 
     ### internal functions ###
 
@@ -559,6 +524,12 @@ class MQWidget(gtk.HBox):
             self.qpop(all=True)
         else:
             self.qgoto(row[MQ_NAME])
+
+    def cmd_done(self, returncode, noemit=False):
+        self.repo.mq.invalidate()
+        self.refresh()
+        if not noemit:
+            self.emit('repo-invalidated')
 
     ### signal handlers ###
 

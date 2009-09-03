@@ -177,3 +177,154 @@ class CmdDialog(gtk.Dialog):
             return self.hgthread.return_code()
         else:
             return False
+
+class CmdWidget(gtk.VBox):
+
+    def __init__(self, textview=True, progressbar=True, buttons=False):
+        gtk.VBox.__init__(self)
+
+        self.hgthread = None
+
+        # build UI
+        if textview:
+            cmdpane = gtk.ScrolledWindow()
+            cmdpane.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+            cmdpane.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            self.textview = gtk.TextView(buffer=None)
+            self.textview.set_editable(False)
+            self.textview.modify_font(pango.FontDescription('Monospace'))
+            cmdpane.add(self.textview)
+            self.textbuffer = self.textview.get_buffer()
+            self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
+                                       foreground='#900000')
+            self.pack_start(cmdpane)
+
+        if progressbar:
+            self.last_pbar_update = 0
+
+            self.progbox = progbox = gtk.HBox()
+            self.pack_start(progbox)
+
+            if buttons:
+                img = gtk.Image()
+                img.set_from_stock(gtk.STOCK_JUSTIFY_LEFT,
+                                   gtk.ICON_SIZE_SMALL_TOOLBAR)
+                self.popup_btn = gtk.Button()
+                self.popup_btn.set_image(img)
+                self.popup_btn.set_relief(gtk.RELIEF_NONE)
+                self.popup_btn.set_focus_on_click(False)
+                progbox.pack_start(self.popup_btn, False, False)
+
+            self.pbar = gtk.ProgressBar()
+            progbox.pack_start(self.pbar)
+
+            if buttons:
+                img = gtk.Image()
+                img.set_from_stock(gtk.STOCK_STOP,
+                                   gtk.ICON_SIZE_SMALL_TOOLBAR)
+                self.stop_btn = gtk.Button()
+                self.stop_btn.set_image(img)
+                self.stop_btn.set_sensitive(False)
+                self.stop_btn.set_relief(gtk.RELIEF_NONE)
+                self.stop_btn.set_focus_on_click(False)
+                self.stop_btn.connect('clicked', self.stop_clicked)
+                progbox.pack_start(self.stop_btn, False, False)
+
+            gobject.idle_add(lambda: self.enable_progressbar(False))
+
+    ### public functions ###
+
+    def execute(self, cmdline, callback, *args, **kargs):
+        if self.hgthread and self.hgthread.isAlive():
+            return
+        if self.hgthread is None:
+            self.hgthread = hgthread.HgThread(cmdline[1:])
+            self.hgthread.start()
+            self.stop_btn.set_sensitive(True)
+            gobject.timeout_add(10, self.process_queue, callback, args, kargs)
+            def is_done():
+                # show progressbar if it's still working
+                if self.hgthread and self.hgthread.isAlive():
+                    self.enable_progressbar()
+                return False
+            gobject.timeout_add(500, is_done)
+
+    def stop(self):
+        if self.hgthread:
+            self.hgthread.terminate()
+
+    def enable_progressbar(self, visible=True):
+        if hasattr(self, 'progbox'):
+            self.progbox.set_property('visible', visible)
+
+    def enable_buttons(self, popup=True, stop=True):
+        if hasattr(self, 'popup_btn'):
+            self.popup_btn.set_property('visible', popup)
+        if hasattr(self, 'stop_btn'):
+            self.stop_btn.set_property('visible', stop)
+
+    ### internal use functions ###
+
+    def update_progress(self):
+        if not self.pbar:
+            return
+        if not self.hgthread.isAlive():
+            self.pbar.set_fraction(0)
+        else:
+            # pulse the progress bar every ~100ms
+            tm = shlib.get_system_times()[4]
+            if tm - self.last_pbar_update < 0.100:
+                return
+            self.last_pbar_update = tm
+            self.pbar.pulse()
+
+    def process_queue(self, callback, args, kargs):
+        """
+        Handle all the messages currently in the queue (if any).
+        """
+        self.hgthread.process_dialogs()
+
+        if hasattr(self, 'textbuffer'):
+            enditer = self.textbuffer.get_end_iter()
+            while self.hgthread.getqueue().qsize():
+                try:
+                    msg = self.hgthread.getqueue().get(0)
+                    self.textbuffer.insert(enditer, hglib.toutf(msg))
+                    self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
+                except Queue.Empty:
+                    pass
+            while self.hgthread.geterrqueue().qsize():
+                try:
+                    msg = self.hgthread.geterrqueue().get(0)
+                    self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+                    self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
+                except Queue.Empty:
+                    pass
+        self.update_progress()
+        if not self.hgthread.isAlive():
+            self.stop_btn.set_sensitive(False)
+            self.enable_progressbar(False)
+            returncode = self.hgthread.return_code()
+            if returncode is None:
+                self.write(_('\n[command interrupted]'))
+            self.hgthread = None
+            def call_callback():
+                callback(returncode, *args, **kargs)
+            gobject.idle_add(call_callback)
+            return False # Stop polling this function
+        else:
+            return True # Continue polling
+
+    def write(self, msg, append=True):
+        if hasattr(self, 'textbuffer'):
+            msg = hglib.toutf(msg)
+            if append:
+                enditer = self.textbuffer.get_end_iter()
+                self.textbuffer.insert(enditer, msg)
+            else:
+                self.textbuffer.set_text(msg)
+
+    ### signal handlers ###
+
+    def stop_clicked(self, button):
+        self.stop()
