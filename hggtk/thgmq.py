@@ -447,16 +447,22 @@ class MQWidget(gtk.HBox):
                 item.connect('activate', handler, row)
             menu.append(item)
 
-        is_top = self.is_qtip(row[MQ_NAME])
+        is_operable = self.is_operable()
+        has_patch = self.has_patch()
+        has_applied = self.has_applied()
+        is_qtip = self.is_qtip(row[MQ_NAME])
         is_applied = row[MQ_STATUS] == 'A'
 
-        if not is_top:
+        if is_operable and not is_qtip:
             append(_('_goto'), self.goto_activated)
-        append(_('_rename'), self.rename_activated)
-        append(_('_finish applied'), self.finish_activated)
+        if has_patch:
+            append(_('_rename'), self.rename_activated)
+        if has_applied:
+            append(_('_finish applied'), self.finish_activated)
         if not is_applied:
             append(_('_delete'), self.delete_activated)
-            append(_('f_old'), self.fold_activated)
+            if has_applied:
+                append(_('f_old'), self.fold_activated)
 
         menu.show_all()
         menu.popup(None, None, None, 0, 0)
