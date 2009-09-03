@@ -108,9 +108,12 @@ class MQWidget(gtk.HBox):
         # prepare to show
         self.refresh()
 
-    """ public functions """
+    ### public functions ###
 
     def refresh(self):
+        """
+        Refresh the list of patches.
+        """
         self.model.clear()
 
         # build list of patches
@@ -129,7 +132,27 @@ class MQWidget(gtk.HBox):
         # insert separator
         self.model.insert_after(top, (-1, '', '', ''))
 
+    def qgoto(self, patch):
+        """
+        [MQ] Execute 'qgoto' command.
+
+        patch: the patch name or an index to specify the patch.
+        """
+        cmdline = ['hg', 'qgoto', patch]
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.repo.mq.invalidate()
+        self.refresh()
+        self.emit('repo-invalidated')
+
     def qpop(self, all=False):
+        """
+        [MQ] Execute 'qpop' command.
+
+        all: if True, use '--all' option. (default: False)
+        """
         cmdline = ['hg', 'qpop']
         if all:
             cmdline.append('--all')
@@ -142,6 +165,11 @@ class MQWidget(gtk.HBox):
         self.emit('repo-invalidated')
 
     def qpush(self, all=False):
+        """
+        [MQ] Execute 'qpush' command.
+
+        all: if True, use '--all' option. (default: False)
+        """
         cmdline = ['hg', 'qpush']
         if all:
             cmdline.append('--all')
@@ -153,7 +181,7 @@ class MQWidget(gtk.HBox):
         self.refresh()
         self.emit('repo-invalidated')
 
-    """ internal functions """
+    ### internal functions ###
 
     def cell_data_func(self, column, cell, model, iter):
         stat = model[iter][MQ_STATUS]
@@ -167,13 +195,36 @@ class MQWidget(gtk.HBox):
     def row_sep_func(self, model, iter, data=None):
         return model[iter][MQ_INDEX] == -1;
 
-    """ signal handlers """
+    def list_popup_menu(self, list, path):
+        row = self.model[path]
+        if row[MQ_INDEX] == -1:
+            return
+
+        menu = gtk.Menu()
+        def append(label, handler=None):
+            item = gtk.MenuItem(label, True)
+            item.set_border_width(1)
+            if handler:
+                item.connect('activate', handler, row)
+            menu.append(item)
+
+        append(_('_goto'), self.goto_activated)
+        append(_('_delete'))
+        append(_('_finish'))
+        append(_('_rename'))
+        append(_('f_old'))
+
+        menu.show_all()
+        menu.popup(None, None, None, 0, 0)
+        return True
+
+    ### signal handlers ###
 
     def list_pressed(self, list, event):
         x, y = int(event.x), int(event.y)
-        path = list.get_path_at_pos(x, y)
+        pathinfo = list.get_path_at_pos(x, y)
         if event.button == 1:
-            if not path:
+            if not pathinfo:
                 # HACK: clear selection after this function calling,
                 # against selection by getting focus
                 def unselect():
@@ -181,25 +232,8 @@ class MQWidget(gtk.HBox):
                     selection.unselect_all()
                 gobject.idle_add(unselect)
         elif event.button == 3:
-            if path:
-                self.list_popup_menu(self.list)
-
-    def list_popup_menu(self, list):
-        menu = gtk.Menu()
-        def append(label):
-            item = gtk.MenuItem(label, True)
-            item.set_border_width(1)
-            menu.append(item)
-
-        append(_('_delete'))
-        append(_('_finish'))
-        append(_('_rename'))
-        append(_('f_old'))
-        append(_('_goto'))
-
-        menu.show_all()
-        menu.popup(None, None, None, 0, 0)
-        return True
+            if pathinfo:
+                self.list_popup_menu(self.list, pathinfo[0])
 
     def list_sel_changed(self, list):
         path, focus = list.get_cursor()
@@ -221,3 +255,8 @@ class MQWidget(gtk.HBox):
 
     def pushall_clicked(self, toolbutton):
         self.qpush(all=True)
+
+    """ context menu signal handlers """
+
+    def goto_activated(self, menuitem, row):
+        self.qgoto(row[MQ_NAME])
