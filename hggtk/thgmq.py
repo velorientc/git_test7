@@ -8,6 +8,7 @@
 import os
 import gtk
 import gobject
+import pango
 
 from thgutil.i18n import _
 from thgutil import hglib
@@ -288,12 +289,16 @@ class MQWidget(gtk.HBox):
     ### internal functions ###
 
     def is_top_patch(self, patchname):
-        if patchname:
-            return self.get_top_patchname() == patchname
+        topname = self.get_top_patchname()
+        if patchname and topname:
+            return patchname == topname
         return False
 
     def get_top_patchname(self):
-        return self.repo.mq.lookup('qtip')
+        applied = self.repo.mq.applied
+        if len(applied):
+            return applied[-1].name
+        return None
 
     def update_toolbuttons(self):
         q = self.repo.mq
@@ -305,13 +310,21 @@ class MQWidget(gtk.HBox):
         self.btn['pushall'].set_sensitive(not in_top)
 
     def cell_data_func(self, column, cell, model, iter):
-        stat = model[iter][MQ_STATUS]
+        row = model[iter]
+
+        stat = row[MQ_STATUS]
         if stat == 'A':
             cell.set_property('foreground', 'blue')
         elif stat == 'U':
             cell.set_property('foreground', '#909090')
         else:
             cell.set_property('foreground', 'black')
+
+        patchname = row[MQ_NAME]
+        if self.is_top_patch(patchname):
+            cell.set_property('weight', pango.WEIGHT_BOLD)
+        else:
+            cell.set_property('weight', pango.WEIGHT_NORMAL)
 
     def row_sep_func(self, model, iter, data=None):
         return model[iter][MQ_INDEX] == -1;
