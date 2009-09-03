@@ -99,6 +99,9 @@ class MQWidget(gtk.HBox):
         self.list.set_size_request(180, -1)
         self.list.size_request()
         self.list.set_row_separator_func(self.row_sep_func)
+        # To support old PyGTK (<1.12)
+        if hasattr(self.list, 'set_tooltip_column'):
+            self.list.set_tooltip_column(MQ_SUMMARY)
         self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
         self.list.connect('row-activated', self.list_row_activated)
