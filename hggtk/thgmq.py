@@ -93,25 +93,34 @@ class MQWidget(gtk.HBox):
         self.list.connect('row-activated', self.list_row_activated)
         self.list.connect('size-allocate', self.list_size_allocated)
 
-        cell = gtk.CellRendererText()
-        editcell = gtk.CellRendererText()
-        editcell.set_property('editable', True)
-        editcell.connect('edited', self.list_cell_edited, self.model)
-
         self.cols = {}
         self.cells = {}
 
-        def addcol(header, col_idx, cell=cell, resizable=False):
+        def addcol(header, col_idx, right=False, resizable=False,
+                   editable=False, editfunc=None):
+            header = (right and '%s ' or ' %s') % header
+            cell = gtk.CellRendererText()
+            if editable:
+                cell.set_property('editable', True)
+                cell.connect('edited', editfunc)
             col = gtk.TreeViewColumn(header, cell)
             col.add_attribute(cell, 'text', col_idx)
             col.set_cell_data_func(cell, self.cell_data_func)
             col.set_resizable(resizable)
+            if right:
+                col.set_alignment(1)
+                cell.set_property('xalign', 1)
             self.list.append_column(col)
             self.cols[col_idx] = col
             self.cells[col_idx] = cell
 
-        addcol(_('#'), MQ_INDEX)
-        addcol(_('Name'), MQ_NAME, cell=editcell)
+        def cell_edited(cell, path, newname):
+            patchname = self.model[path][MQ_NAME]
+            if newname != patchname:
+                self.qrename(newname, patch=patchname)
+
+        addcol(_('#'), MQ_INDEX, right=True)
+        addcol(_('Name'), MQ_NAME, editable=True, editfunc=cell_edited)
         addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
         pane.add(self.list)
@@ -425,11 +434,6 @@ class MQWidget(gtk.HBox):
         patchname = self.model[path][MQ_NAME]
         if self.get_top_patchname() != patchname:
             self.qgoto(patchname)
-
-    def list_cell_edited(self, cell, path, newname, model):
-        patchname = model[path][MQ_NAME]
-        if newname != patchname:
-            self.qrename(newname, patch=patchname)
 
     def list_size_allocated(self, list, req):
         self.scroll_to_current()
