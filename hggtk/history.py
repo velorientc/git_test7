@@ -206,14 +206,14 @@ class GLog(gdialog.GDialog):
             self.filter = type
             self.reload_log()
 
-    def patch_selected(self, mqpane, revid, patchname):
+    def patch_selected(self, mqwidget, revid, patchname):
         self.currevid = revid
         if self.currevid != self.lastrevid:
             self.lastrevid = self.currevid
             self.changeview.opts['rev'] = [str(self.currevid)]
             self.changeview.load_details(self.currevid)
 
-    def repo_invalidated(self, mqpane):
+    def repo_invalidated(self, mqwidget):
         self.reload_log()
 
     def view_menu(self):
@@ -441,7 +441,7 @@ class GLog(gdialog.GDialog):
             self.graphview.refresh(False, [], opts)
 
         # refresh MQ widget
-        self.mqpane.refresh()
+        self.mqwidget.refresh()
 
     def tree_context_menu(self):
         m = gtk.Menu()
@@ -662,9 +662,9 @@ class GLog(gdialog.GDialog):
         self.filterentry = entry
         filterbox.pack_start(entry, True)
 
-        self.mqpane = thgmq.MQWidget(self.repo)
-        self.mqpane.connect('patch-selected', self.patch_selected)
-        self.mqpane.connect('repo-invalidated', self.repo_invalidated)
+        self.mqwidget = thgmq.MQWidget(self.repo)
+        self.mqwidget.connect('patch-selected', self.patch_selected)
+        self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
 
         vbox = gtk.VBox()
         vbox.pack_start(filterbox, False, False, 0)
@@ -677,7 +677,7 @@ class GLog(gdialog.GDialog):
             frame.add(widget)
             return frame
         self.mqpaned = gtk.HPaned()
-        self.mqpaned.add1(wrapframe(self.mqpane))
+        self.mqpaned.add1(wrapframe(self.mqwidget))
         self.mqpaned.add2(wrapframe(vbox))
 
         # Add ChangeSet instance to bottom half of vpane
