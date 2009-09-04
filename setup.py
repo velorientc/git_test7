@@ -62,7 +62,24 @@ def setup_windows():
     extra = {}
     hgextmods = []
 
-    try: import py2exe
+    # py2exe needs to be installed to work
+    try:
+        import py2exe
+
+        # Help py2exe to find win32com.shell
+        try:
+            import modulefinder
+            import win32com
+            for p in win32com.__path__[1:]: # Take the path to win32comext
+                modulefinder.AddPackagePath("win32com", p)
+            pn = "win32com.shell"
+            __import__(pn)
+            m = sys.modules[pn]
+            for p in m.__path__[1:]:
+                modulefinder.AddPackagePath(pn, p)
+        except ImportError:
+            pass
+
     except ImportError:
         if '--version' not in sys.argv:
             raise
