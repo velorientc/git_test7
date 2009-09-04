@@ -608,12 +608,6 @@ class GStatus(gdialog.GDialog):
         if not self.ready: return False
 
         def get_repo_status():
-            repo = self.repo
-            hglib.invalidaterepo(repo)
-            if hasattr(repo, 'mq'):
-                self.mqmode = repo.mq.applied and repo['.'] == repo['qtip']
-                self.set_title(self.get_title())
-
             if self.mqmode and self.mode != 'status':
                 # when a patch is applied, show diffs to parent of top patch
                 qtip = repo['.']
@@ -642,6 +636,12 @@ class GStatus(gdialog.GDialog):
                 self.ready = True
                 self.stbar.end()
                 return False
+
+        repo = self.repo
+        hglib.invalidaterepo(repo)
+        if hasattr(repo, 'mq'):
+            self.mqmode = repo.mq.applied and repo['.'] == repo['qtip']
+            self.set_title(self.get_title())
 
         self.ready = False
         self.stbar.begin()
