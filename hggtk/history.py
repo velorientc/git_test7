@@ -690,7 +690,6 @@ class GLog(gdialog.GDialog):
             self.mqpaned = gtk.HPaned()
             self.mqpaned.add1(wrapframe(self.mqwidget))
             self.mqpaned.add2(wrapframe(midpane))
-            gobject.idle_add(lambda: self.mqpaned.set_position(180))
 
             midpane = self.mqpaned
 
@@ -1111,11 +1110,7 @@ class GLog(gdialog.GDialog):
             self.mqtb.handler_unblock_by_func(self.mq_clicked)
 
     def mq_clicked(self, toolbutton, data=None):
-        active = self.mqtb.get_active()
-        if active:
-            self.enable_mqpanel(True)
-        else:
-            self.enable_mqpanel(False)
+        self.enable_mqpanel(self.mqtb.get_active())
 
     def tree_button_press(self, tree, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
