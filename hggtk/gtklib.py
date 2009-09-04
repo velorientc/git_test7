@@ -76,14 +76,13 @@ class StatusBar(gtk.HBox):
         gtk.HBox.__init__(self)
         self.pbar = gtk.ProgressBar()
         self.sttext = gtk.Label("")
-        self.sttext.set_ellipsize(pango.ELLIPSIZE_END)
         self.sttext.set_alignment(0, 0.5)
 
         self.pbox = gtk.HBox()
         self.pbox.pack_start(gtk.VSeparator(), False, False)
         self.pbox.pack_start(self.pbar, False, False)
 
-        self.pack_start(self.sttext, padding=1)
+        self.pack_start(self.sttext, padding=4)
         if extra:
             self.pack_end(extra, False, False)
         self.pack_end(self.pbox, False, False, padding=1)

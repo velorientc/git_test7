@@ -423,10 +423,14 @@ class GStatus(gdialog.GDialog):
 
         self.stbar = gtklib.StatusBar()
 
+        rightbox = gtk.VBox()
+        rightbox.pack_start(self.counter)
+        rightbox.pack_start(self.stbar, False, False)
+
         hbox = gtk.HBox()
-        hbox.pack_start(table, expand=False)
-        hbox.pack_start(self.stbar, False, False, 2)
-        hbox.pack_end(self.counter, expand=True, padding=2)
+        hbox.pack_start(table, False, False)
+        hbox.pack_start(gtk.Label(''), True, True, 2)
+        hbox.pack_end(rightbox, False, False, 2)
 
         return hbox
 
