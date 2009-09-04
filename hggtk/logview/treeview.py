@@ -134,7 +134,7 @@ class TreeView(gtk.ScrolledWindow):
         if row[treemodel.HEXID].startswith(key):
             return False
         for col in (treemodel.REVID, treemodel.COMMITER, treemodel.MESSAGE):
-            if key in row[col].lower():
+            if key in str(row[col]).lower():
                 return False
         return True
 
