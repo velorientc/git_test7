@@ -12,17 +12,16 @@ import gobject
 import pango
 import StringIO
 
-from mercurial import ui, hg, commands, extensions, util
+from mercurial import ui, hg, cmdutil, commands, extensions, util
 
 from thgutil.i18n import _
 from thgutil import hglib, paths
 
-from hggtk.logview import treemodel
 from hggtk.logview.treeview import TreeView as LogTreeView
 
-from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter
-from hggtk import backout, status, hgemail, tagadd, update, merge
-from hggtk import changeset
+from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter, gorev
+from hggtk import backout, status, hgemail, tagadd, update, merge, archive
+from hggtk import changeset, thgconfig, thgmq
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
@@ -33,10 +32,17 @@ def create_menu(label, callback):
 class GLog(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
     def init(self):
-        self.last_rev = None
         self.filter = 'all'
-        self.currow = None
-        self.curfile = None
+        self.lastrevid = None
+        self.currevid = None
+        self.origtip = len(self.repo)
+        self.ready = False
+        self.filterbox = None
+        os.chdir(self.repo.root)
+
+        # Load extension support for commands which need it
+        extensions.loadall(self.ui)
+        self.exs = [ name for name, module in extensions.extensions() ]
 
     def get_title(self):
         return hglib.toutf(os.path.basename(self.repo.root)) + ' log'
@@ -50,29 +56,41 @@ class GLog(gdialog.GDialog):
 
     def get_tbbuttons(self):
         tbar = [
+                self.make_toolbutton(gtk.STOCK_FIND,
+                    _('_DataMine'),
+                    self.datamine_clicked,
+                    tip=_('Search Repository History')),
+                gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_JUMP_TO,
+                    _('Select Revision'),
+                    self.goto_clicked,
+                    tip=_('Select revision')),
+                gtk.SeparatorToolItem(),
                 self.make_toolbutton(gtk.STOCK_REFRESH,
                     _('Re_fresh'),
                     self.refresh_clicked,
                     tip=_('Reload revision history')),
                 gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_INDEX,
-                    _('_Filter'),
-                    self.filter_clicked,
-                    menu=self.filter_menu(),
-                    tip=_('Filter revisions for display')),
-                gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_FIND,
-                    _('_DataMine'),
-                    self.datamine_clicked,
-                    tip=_('Search Repository History')),
-                gtk.SeparatorToolItem()
-             ] + self.changeview.get_tbbuttons()
+               ]
         if not self.opts.get('from-synch'):
             self.synctb = self.make_toolbutton(gtk.STOCK_NETWORK,
-                                 _('Synchronize'),
-                                 self.synch_clicked,
-                                 tip=_('Launch synchronize tool'))
-            tbar += [gtk.SeparatorToolItem(), self.synctb]
+                              _('Synchronize'),
+                              self.synch_clicked,
+                              tip=_('Launch synchronize tool'))
+            tbar += [self.synctb, gtk.SeparatorToolItem()]
+        if 'mq' in self.exs:
+            self.mqtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
+                            _('MQ'),
+                            self.mq_clicked,
+                            tip=_('Toggle MQ panel'),
+                            toggle=True,
+                            icon='menupatch.ico')
+            tbar += [self.mqtb, gtk.SeparatorToolItem()]
+        self.settingtb = self.make_toolbutton(gtk.STOCK_PREFERENCES,
+                             _('Configure'),
+                             self.conf_clicked,
+                             tip=_('Configure changelog view'))
+        tbar += [self.settingtb, gtk.SeparatorToolItem()]
         return tbar
 
     def synch_clicked(self, toolbutton, data):
@@ -101,21 +119,48 @@ class GLog(gdialog.GDialog):
     def toggle_view_column(self, button, property):
         active = button.get_active()
         self.graphview.set_property(property, active)
+        if property in ('branch-color') and self.ready:
+            self.reload_log()
 
-    def more_clicked(self, button):
+    def toggle_graphcol(self, button):
+        active = button.get_active()
+        if self.graphcol != active:
+            self.graphcol = active
+            self.reload_log()
+
+    def toggle_show_filterbar(self, button, property):
+        self.show_filterbar = button.get_active()
+        if self.filterbox is not None:
+            self.filterbox.set_property('visible', self.show_filterbar)
+
+    def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
 
-    def load_all_clicked(self, button):
+    def load_all_clicked(self, button, data=None):
         self.graphview.load_all_revisions()
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
+    def selection_changed(self, graphview):
+        'Graphview reports a new row selected'
+        treeview = graphview.treeview
+        (model, paths) = treeview.get_selection().get_selected_rows()
+        if not paths:
+            self.currevid = None
+            return False
+        self.currevid = graphview.get_revid_at_path(paths[0])
+        self.ancestrybutton.set_sensitive(True)
+        if self.currevid != self.lastrevid:
+            self.lastrevid = self.currevid
+            self.changeview.opts['rev'] = [str(self.currevid)]
+            self.changeview.load_details(self.currevid)
+        return False
+
     def revisions_loaded(self, graphview):
-        'Treeview reports log generator has exited'
-        if not self.graphview.graphdata:
+        'Graphview reports log generator has exited'
+        if not graphview.graphdata:
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
-            self.last_rev = None
         self.nextbutton.set_sensitive(False)
         self.allbutton.set_sensitive(False)
 
@@ -123,47 +168,74 @@ class GLog(gdialog.GDialog):
         dlg = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dlg.display()
 
-    def filter_clicked(self, toolbutton, data=None):
-        if self.filter_dialog:
-            self.filter_dialog.show()
-            self.filter_dialog.present()
+    def filter_help_pressed(self, button, combo):
+        mode = combo.get_active()
+        if mode == 0: # Rev Range
+            pass
+        elif mode == 1: # File Patterns
+            pass
+        elif mode == 2: # Keywords
+            pass
+        elif mode == 3: # Date
+            pass
+
+    def filter_entry_activated(self, entry, combo):
+        'User pressed enter in the filter entry'
+        opts = {}
+        mode = combo.get_active()
+        text = entry.get_text()
+        if mode == 0: # Rev Range
+            try:
+                opts['revs'] = cmdutil.revrange(self.repo, [text])
+            except Exception, e:
+                gdialog.Prompt(_('Invalid revision range'), str(e), self).run()
+                return
+        elif mode == 1: # File Patterns
+            opts['pats'] = [w.strip() for w in text.split(',')]
+        elif mode == 2: # Keywords
+            opts['keyword'] = [w.strip() for w in text.split(',')]
+        elif mode == 3: # Date
+            try:
+                # return of matchdate not used, just sanity checking
+                util.matchdate(text)
+                opts['date'] = text
+            except (ValueError, util.Abort), e:
+                gdialog.Prompt(_('Invalid date specification'),
+                               str(e), self).run()
+                return
         else:
-            self.show_filter_dialog()
+            return
+        self.custombutton.set_active(True)
+        self.filter = 'custom'
+        self.reload_log(**opts)
 
-    def show_filter_dialog(self):
-        'Launch a modeless filter dialog'
-        def do_reload(opts):
-            self.custombutton.set_active(True)
-            self.reload_log(**opts)
-
-        def close_filter_dialog(dialog, response_id):
-            dialog.hide()
-
-        def delete_event(dialog, event, data=None):
-            # return True to prevent the dialog from being destroyed
-            return True
-
-        revs = []
-        if self.currow is not None:
-            revs.append(self.currow[treemodel.REVID])
-
-        dlg = logfilter.FilterDialog(self.repo.root, revs, self.pats,
-                filterfunc=do_reload)
-        dlg.connect('response', close_filter_dialog)
-        dlg.connect('delete-event', delete_event)
-        dlg.set_modal(False)
-        dlg.show()
-
-        self.filter_dialog = dlg
-
-    def filter_selected(self, widget, data=None):
-        if widget.get_active():
-            self.filter = data
+    def filter_selected(self, widget, type):
+        if not widget.get_active():
+            return
+        if type == 'branch':
+            self.select_branch(self.branchcombo)
+        else:
+            self.filter = type
             self.reload_log()
+
+    def patch_selected(self, mqwidget, revid, patchname):
+        self.currevid = revid
+        if self.currevid != self.lastrevid:
+            self.lastrevid = self.currevid
+            self.changeview.opts['rev'] = [str(self.currevid)]
+            self.changeview.load_details(self.currevid)
+
+    def repo_invalidated(self, mqwidget):
+        self.reload_log()
 
     def view_menu(self):
         menu = gtk.Menu()
 
+        button = gtk.CheckMenuItem(_('Show Graph'))
+        button.connect('toggled', self.toggle_graphcol)
+        button.set_active(self.graphcol)
+        button.set_draw_as_radio(True)
+        menu.append(button)
         button = gtk.CheckMenuItem(_('Show Rev'))
         button.connect('toggled', self.toggle_view_column,
                 'rev-column-visible')
@@ -176,10 +248,16 @@ class GLog(gdialog.GDialog):
         button.set_active(self.showcol.get('id', False))
         button.set_draw_as_radio(True)
         menu.append(button)
+        button = gtk.CheckMenuItem(_('Show Tags'))
+        button.connect('toggled', self.toggle_view_column,
+                'tag-column-visible')
+        button.set_active(self.showcol.get('tag', False))
+        button.set_draw_as_radio(True)
+        menu.append(button)
         button = gtk.CheckMenuItem(_('Show Local Date'))
         button.connect('toggled', self.toggle_view_column,
                 'date-column-visible')
-        button.set_active(self.showcol.get('date', True))
+        button.set_active(self.showcol.get('date', False))
         button.set_draw_as_radio(True)
         menu.append(button)
         button = gtk.CheckMenuItem(_('Show UTC Date'))
@@ -188,88 +266,66 @@ class GLog(gdialog.GDialog):
         button.set_active(self.showcol.get('utc', False))
         button.set_draw_as_radio(True)
         menu.append(button)
+        button = gtk.CheckMenuItem(_('Show Age'))
+        button.connect('toggled', self.toggle_view_column,
+                'age-column-visible')
+        button.set_active(self.showcol.get('age', True))
+        button.set_draw_as_radio(True)
+        menu.append(button)
         button = gtk.CheckMenuItem(_('Show Branch'))
         button.connect('toggled', self.toggle_view_column,
                 'branch-column-visible')
         button.set_active(self.showcol.get('branch', False))
         button.set_draw_as_radio(True)
         menu.append(button)
-        menu.show_all()
-        return menu
-
-    def filter_menu(self):
-        menu = gtk.Menu()
-
-        button = gtk.RadioMenuItem(None, _('Show All Revisions'))
-        button.set_active(True)
-        button.connect('toggled', self.filter_selected, 'all')
+        button = gtk.CheckMenuItem(_('Color by Branch'))
+        button.connect('toggled', self.toggle_view_column,
+                'branch-color')
+        button.set_active(self.branch_color)
+        button.set_draw_as_radio(True)
         menu.append(button)
-
-        self.newbutton = gtk.RadioMenuItem(button, _('Show New Revisions'))
-        self.newbutton.connect('toggled', self.filter_selected, 'new')
-        menu.append(self.newbutton)
-
-        button = gtk.RadioMenuItem(button, _('Show Tagged Revisions'))
-        button.connect('toggled', self.filter_selected, 'tagged')
+        button = gtk.CheckMenuItem(_('Show Filterbar'))
+        button.connect('toggled', self.toggle_show_filterbar,
+                'show-filterbar')
+        button.set_active(self.show_filterbar)
+        button.set_draw_as_radio(True)
         menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Revision Ancestry'))
-        button.connect('toggled', self.filter_selected, 'ancestry')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Working Parents'))
-        button.connect('toggled', self.filter_selected, 'parents')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Head Revisions'))
-        button.connect('toggled', self.filter_selected, 'heads')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Only Merge Revisions'))
-        button.connect('toggled', self.filter_selected, 'only_merges')
-        menu.append(button)
-
-        button = gtk.RadioMenuItem(button, _('Show Non-Merge Revisions'))
-        button.connect('toggled', self.filter_selected, 'no_merges')
-        menu.append(button)
-
-        self.custombutton = gtk.RadioMenuItem(button, _('Custom Filter'))
-        self.custombutton.set_sensitive(False)
-        menu.append(self.custombutton)
 
         menu.show_all()
         return menu
 
     def prepare_display(self):
         'Called at end of display() method'
-        self.opts['rev'] = [] # This option is dangerous - used directly by hg
-        self.opts['revs'] = None
-        os.chdir(self.repo.root)  # for paths relative to repo root
+        self.ready = True
+        root = self.repo.root
+        os.chdir(root)  # for paths relative to repo root
 
-        origtip = len(self.repo)
-        self.graphview.set_property('original-tip-revision', origtip)
-        self.origtip = origtip
+        self.origtip = self.opts['orig-tip'] or len(self.repo)
 
-        if self.opts.get('orig-tip') is not None:
-            origtip = self.opts['orig-tip']
-            if origtip != len(self.repo):
-                self.origtip = origtip
-                self.graphview.set_property('original-tip-revision', origtip)
-                self.newbutton.set_active(True)
-        elif self.opts.get('filehist') is not None:
-            self.custombutton.set_active(True)
-            self.reload_log(pats = [self.opts['filehist']])
-        elif 'revrange' in self.opts:
-            self.custombutton.set_active(True)
-            self.graphview.refresh(True, None, self.opts)
-        elif self.pats == [self.repo.root] or self.pats == ['']:
+        # ignore file patterns that imply repo root
+        if len(self.pats) == 1 and self.pats[0] in (root, root+os.sep, ''):
             self.pats = []
-            self.reload_log()
+
+        opts = self.opts
+        if opts['filehist']:
+            self.custombutton.set_active(True)
+            self.filter = 'custom'
+            self.filtercombo.set_active(1)
+            self.filterentry.set_text(opts['filehist'])
+            opts['pats'] = [opts['filehist']]
         elif self.pats:
             self.custombutton.set_active(True)
-            self.reload_log(pats = self.pats)
-        else:
-            self.reload_log()
+            self.filter = 'custom'
+            self.filtercombo.set_active(1)
+            self.filterentry.set_text(', '.join(self.pats))
+            opts['pats'] = self.pats
+        self.reload_log(**opts)
+
+        self.filterbox.set_property('visible', self.show_filterbar)
+        self.filterbox.set_no_show_all(True)
+
+        # enable MQ panel
+        self.enable_mqpanel()
 
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
@@ -287,39 +343,32 @@ class GLog(gdialog.GDialog):
         settings = gdialog.GDialog.save_settings(self)
         settings['glog-vpane'] = self.vpaned.get_position()
         settings['glog-hpane'] = self.hpaned.get_position()
-        for col in ('rev', 'date', 'id', 'branch', 'utc'):
+        settings['branch-color'] = self.graphview.get_property('branch-color')
+        settings['show-filterbar'] = self.show_filterbar
+        settings['graphcol'] = self.graphcol
+        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
         return settings
 
     def load_settings(self, settings):
         'Called at beginning of display() method'
-        self.stbar = gtklib.StatusBar()
-        self.limit = self.get_graphlimit(None)
-
-        # Allocate TreeView instance to use internally
-        if 'limit' in self.opts:
-            firstlimit = self.get_graphlimit(self.opts['limit'])
-            self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
-        else:
-            self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
-
-        # Allocate ChangeSet instance to use internally
-        self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
-                self.opts, self.stbar)
-        self.changeview.display(False)
-        self.changeview.glog_parent = self
-
         gdialog.GDialog.load_settings(self, settings)
         self.setting_vpos = -1
         self.setting_hpos = -1
+        self.branch_color = False
+        self.show_filterbar = True
+        self.graphcol = True
         self.showcol = {}
         try:
             self.setting_vpos = settings['glog-vpane']
             self.setting_hpos = settings['glog-hpane']
-            for col in ('rev', 'date', 'id', 'branch', 'utc'):
+            self.branch_color = settings.get('branch-color', False)
+            self.show_filterbar = settings.get('show-filterbar', True)
+            for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
+            self.graphcol = settings['graphcol']
         except KeyError:
             pass
 
@@ -328,59 +377,91 @@ class GLog(gdialog.GDialog):
         if self.graphview.model:
             self.graphview.model.refresh()
 
-    def reload_log(self, **filteropts):
+        # refresh MQ widget if exists
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.refresh()
+
+    def reload_log(self, **kwopts):
         'Send refresh event to treeview object'
-        os.chdir(self.repo.root)  # for paths relative to repo root
+        opts = {'date': None, 'no_merges':False, 'only_merges':False,
+                'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
+                'revrange':[], 'revlist':[], 'noheads':False,
+                'branch-view':False, 'rev':[] }
+        opts.update(kwopts)
+
+        # handle strips, rebases, etc
+        self.origtip = min(len(self.repo), self.origtip)
+        opts['orig-tip'] = self.origtip
+
         self.nextbutton.set_sensitive(True)
         self.allbutton.set_sensitive(True)
         self.newbutton.set_sensitive(self.origtip != len(self.repo))
-        self.opts['rev'] = []
-        self.opts['revs'] = None
-        self.opts['no_merges'] = False
-        self.opts['only_merges'] = False
-        self.opts['revrange'] = filteropts.get('revrange', None)
-        self.opts['date'] = filteropts.get('date', None)
-        self.opts['keyword'] = filteropts.get('keyword', [])
-        if filteropts:
-            if 'revrange' in filteropts or 'branch' in filteropts:
-                branch = filteropts.get('branch', None)
-                self.graphview.refresh(True, branch, self.opts)
+        self.ancestrybutton.set_sensitive(False)
+        pats = opts.get('pats', [])
+        self.changeview.pats = pats
+        self.lastrevid = None
+
+        def ftitle(filtername):
+            t = self.get_title()
+            if filtername is not None:
+                t = t + ' - ' + filtername
+            self.set_title(t)
+
+        if self.filter == 'branch':
+            branch = opts.get('branch', None)
+            self.graphview.refresh(self.graphcol, branch, opts)
+            ftitle(_('%s branch') % branch)
+        elif self.filter == 'custom':
+            ftitle(_('custom filter'))
+            if len(pats) == 1 and not os.path.isdir(pats[0]):
+                opts['filehist'] = pats[0]
+                self.graphview.refresh(self.graphcol, pats, opts)
             else:
-                self.pats = filteropts.get('pats', [])
-                self.graphview.refresh(False, self.pats, self.opts)
+                self.graphview.refresh(False, pats, opts)
         elif self.filter == 'all':
-            self.graphview.refresh(True, None, self.opts)
+            ftitle(None)
+            self.graphview.refresh(self.graphcol, None, opts)
+        elif self.filter == 'branches':
+            opts['branch-view'] = True
+            self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'new':
-            self.opts['revrange'] = [len(self.repo)-1, self.origtip]
-            self.graphview.refresh(True, None, self.opts)
+            ftitle(_('new revisions'))
+            assert len(self.repo) > self.origtip
+            opts['revrange'] = [len(self.repo)-1, self.origtip]
+            self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'only_merges':
-            self.opts['only_merges'] = True
-            self.graphview.refresh(False, [], self.opts)
-        elif self.filter == 'no_merges':
-            self.opts['no_merges'] = True
-            self.graphview.refresh(False, [], self.opts)
+            ftitle(_('merges'))
+            opts['only_merges'] = True
+            self.graphview.refresh(False, [], opts)
         elif self.filter == 'ancestry':
-            if not self.currow:
-                return
-            range = [self.currow[treemodel.REVID], 0]
-            sopts = {'noheads': True, 'revrange': range}
-            self.graphview.refresh(True, None, sopts)
+            ftitle(_('revision ancestry'))
+            range = [self.currevid, 0]
+            opts['noheads'] = True
+            opts['revrange'] = range
+            self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'tagged':
+            ftitle(_('tagged revisions'))
             tagged = []
             for t, r in self.repo.tagslist():
                 hr = self.repo[r].rev()
                 if hr not in tagged:
                     tagged.insert(0, hr)
-            self.opts['revs'] = tagged
-            self.graphview.refresh(False, [], self.opts)
+            opts['revlist'] = tagged
+            self.graphview.refresh(False, [], opts)
         elif self.filter == 'parents':
+            ftitle(_('working parents'))
             repo_parents = [x.rev() for x in self.repo.parents()]
-            self.opts['revs'] = [str(x) for x in repo_parents]
-            self.graphview.refresh(False, [], self.opts)
+            opts['revlist'] = [str(x) for x in repo_parents]
+            self.graphview.refresh(False, [], opts)
         elif self.filter == 'heads':
+            ftitle(_('heads'))
             heads = [self.repo[x].rev() for x in self.repo.heads()]
-            self.opts['revs'] = [str(x) for x in heads]
-            self.graphview.refresh(False, [], self.opts)
+            opts['revlist'] = [str(x) for x in heads]
+            self.graphview.refresh(False, [], opts)
+
+        # refresh MQ widget if exists
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.refresh()
 
     def tree_context_menu(self):
         m = gtk.Menu()
@@ -395,20 +476,28 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('e_mail patch'), self.email_patch))
         m.append(create_menu(_('_bundle rev:tip'), self.bundle_rev_to_tip))
         m.append(create_menu(_('add/remove _tag'), self.add_tag))
-        m.append(create_menu(_('backout revision'), self.backout_rev))
+        self.cmenu_backout = create_menu(_('backout revision'),
+                                         self.backout_rev)
+        m.append(self.cmenu_backout)
         m.append(create_menu(_('_revert'), self.revert))
+        m.append(create_menu(_('_archive'), self.archive))
 
+        # need transplant extension for transplant command
+        if 'transplant' in self.exs:
+            m.append(create_menu(_('transp_lant to local'),
+                     self.transplant_rev))
+        
         # need mq extension for strip command
-        extensions.loadall(self.ui)
-        extensions.load(self.ui, 'mq', None)
-        m.append(create_menu(_('strip revision'), self.strip_rev))
+        if 'mq' in self.exs:
+            m.append(create_menu(_('qimport'), self.qimport_rev))
+            m.append(create_menu(_('strip revision'), self.strip_rev))
 
         m.show_all()
         return m
 
     def restore_original_selection(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-        self.tree.get_selection().select_path(self.orig_sel)
+        self.tree.get_selection().select_path(self.origsel)
 
     def tree_diff_context_menu(self):
         m = gtk.Menu()
@@ -419,19 +508,70 @@ class GLog(gdialog.GDialog):
                  self.email_revs))
         m.append(create_menu(_('bundle from here to selected'),
                  self.bundle_revs))
+        m.append(create_menu(_('export patches from here to selected'),
+                 self.export_revs))
         self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
         m.append(self.cmenu_merge2)
+        
+        # need transplant extension for transplant command
+        if 'transplant' in self.exs:
+            m.append(create_menu(_('transplant revision range to local'),
+                     self.transplant_revs))
+
+        # need rebase extension for rebase command
+        if 'rebase' in self.exs:
+            m.append(create_menu(_('rebase on top of selected'),
+                     self.rebase_selected))
+        
+        # need MQ extension for qimport command
+        if 'mq' in self.exs:
+            m.append(create_menu(_('qimport from here to selected'),
+                     self.qimport_revs))
         m.connect_after('selection-done', self.restore_original_selection)
         m.show_all()
         return m
 
     def get_body(self):
-        self.filter_dialog = None
+        self.gorev_dialog = None
         self._menu = self.tree_context_menu()
         self._menu2 = self.tree_diff_context_menu()
+        self.stbar = gtklib.StatusBar()
+        self.limit = self.get_graphlimit(None)
 
-        treeframe = gtk.Frame()
-        treeframe.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        # Allocate TreeView instance to use internally
+        if self.opts['limit']:
+            firstlimit = self.get_graphlimit(self.opts['limit'])
+            self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
+        else:
+            self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
+
+        # Allocate ChangeSet instance to use internally
+        self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
+                self.opts, self.stbar)
+        self.changeview.display(False)
+        self.changeview.glog_parent = self
+
+        # Add extra toolbar buttons
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
+            _('Load more'), self.more_clicked, tip=_('load more revisions'))
+        self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
+            _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
+
+        vmenu = gtk.MenuToolButton('')
+        vmenu.set_menu(self.view_menu())
+        # A MenuToolButton has two parts; a Button and a ToggleButton
+        # we want to see the togglebutton, but not the button
+        b = vmenu.child.get_children()[0]
+        b.unmap()
+        b.set_sensitive(False)
+
+        tbar = self.changeview.get_tbbuttons()
+        tbar += [sep, self.nextbutton, self.allbutton, vmenu]
+        for tbutton in tbar:
+            self.toolbar.insert(tbutton, -1)
 
         # PyGtk 2.6 and below did not automatically register types
         if gobject.pygtk_version < (2, 8, 0):
@@ -441,6 +581,7 @@ class GLog(gdialog.GDialog):
         self.graphview.connect('revision-selected', self.selection_changed)
         self.graphview.connect('revisions-loaded', self.revisions_loaded)
 
+        self.tree.connect('popup-menu', self.tree_popup_menu)
         self.tree.connect('button-press-event', self.tree_button_press)
         self.tree.connect('row-activated', self.tree_row_act)
 
@@ -457,40 +598,110 @@ class GLog(gdialog.GDialog):
         self.tree.connect('thg-parent', self.thgparent)
         self.connect('thg-refresh', self.thgrefresh)
 
-        hbox = gtk.HBox()
-        hbox.pack_start(self.graphview, True, True, 0)
-        vbox = gtk.VBox()
-        self.colmenu = gtk.MenuToolButton('')
-        self.colmenu.set_menu(self.view_menu())
-        # A MenuToolButton has two parts; a Button and a ToggleButton
-        # we want to see the togglebutton, but not the button
-        b = self.colmenu.child.get_children()[0]
-        b.unmap()
-        b.set_sensitive(False)
-        self.nextbutton = gtk.ToolButton(gtk.STOCK_GO_DOWN)
-        self.nextbutton.connect('clicked', self.more_clicked)
-        self.allbutton = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
-        self.allbutton.connect('clicked', self.load_all_clicked)
-        vbox.pack_start(self.colmenu, False, False)
-        vbox.pack_start(gtk.Label(''), True, True) # expanding blank label
-        vbox.pack_start(self.nextbutton, False, False)
-        vbox.pack_start(self.allbutton, False, False)
+        self.filterbox = gtk.HBox()
+        filterbox = self.filterbox
 
-        self.nextbutton.set_tooltip(self.tooltips,
-                _('show next %d revisions') % self.limit)
-        self.allbutton.set_tooltip(self.tooltips,
-                _('show all remaining revisions'))
+        all = gtk.RadioButton(None, _('all'))
+        all.set_active(True)
+        all.connect('toggled', self.filter_selected, 'all')
+        filterbox.pack_start(all, False)
 
-        hbox.pack_start(vbox, False, False, 0)
-        treeframe.add(hbox)
-        treeframe.show_all()
+        all_compact = gtk.RadioButton(all, _('branches'))
+        all_compact.connect('toggled', self.filter_selected, 'branches')
+        filterbox.pack_start(all_compact, False)
+
+        self.newbutton = gtk.RadioButton(all, _('new'))
+        self.newbutton.connect('toggled', self.filter_selected, 'new')
+        filterbox.pack_start(self.newbutton, False)
+
+        tagged = gtk.RadioButton(all, _('tagged'))
+        tagged.connect('toggled', self.filter_selected, 'tagged')
+        filterbox.pack_start(tagged, False)
+
+        ancestry = gtk.RadioButton(all, _('ancestry'))
+        ancestry.connect('toggled', self.filter_selected, 'ancestry')
+        filterbox.pack_start(ancestry, False)
+        self.ancestrybutton = ancestry
+
+        parents = gtk.RadioButton(all, _('parents'))
+        parents.connect('toggled', self.filter_selected, 'parents')
+        filterbox.pack_start(parents, False)
+
+        heads = gtk.RadioButton(all, _('heads'))
+        heads.connect('toggled', self.filter_selected, 'heads')
+        filterbox.pack_start(heads, False)
+
+        merges = gtk.RadioButton(all, _('merges'))
+        merges.connect('toggled', self.filter_selected, 'only_merges')
+        filterbox.pack_start(merges, False)
+
+        branches = gtk.RadioButton(all, _('branch'))
+        branches.connect('toggled', self.filter_selected, 'branch')
+        branches.set_sensitive(False)
+        self.branchbutton = branches
+        filterbox.pack_start(branches, False)
+
+        dblist = self.repo.ui.config('tortoisehg', 'deadbranch', '')
+        deadbranches = [ x.strip() for x in dblist.split(',') ]
+        branchcombo = gtk.combo_box_new_text()
+        for name in self.repo.branchtags().keys():
+            if name not in deadbranches:
+                branchcombo.append_text(name)
+        branchcombo.connect('changed', self.select_branch)
+        self.lastbranchrow = None
+        filterbox.pack_start(branchcombo, False)
+        self.branchcombo = branchcombo
+
+        self.custombutton = gtk.RadioButton(all, _('custom'))
+        self.custombutton.set_sensitive(False)
+        filterbox.pack_start(self.custombutton, False)
+
+        filtercombo = gtk.combo_box_new_text()
+        for f in (_('Rev Range'), _('File Patterns'),
+                  _('Keywords'), _('Date')):
+            filtercombo.append_text(f)
+        filtercombo.set_active(1)
+        self.filtercombo = filtercombo
+        filterbox.pack_start(filtercombo, False)
+
+        helpbutton = gtk.Button("?")
+        helpbutton.set_relief(gtk.RELIEF_NONE)
+        helpbutton.connect('pressed', self.filter_help_pressed, filtercombo)
+        filterbox.pack_start(helpbutton, False)
+
+        entry = gtk.Entry()
+        entry.connect('activate', self.filter_entry_activated, filtercombo)
+        self.filterentry = entry
+        filterbox.pack_start(entry, True)
+
+        midpane = gtk.VBox()
+        midpane.pack_start(filterbox, False, False, 0)
+        midpane.pack_start(self.graphview, True, True, 0)
+        midpane.show_all()
+
+        if 'mq' in self.exs:
+            # create MQWidget
+            self.mqwidget = thgmq.MQWidget(self.repo, accelgroup)
+            self.mqwidget.connect('patch-selected', self.patch_selected)
+            self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
+
+            def wrapframe(widget):
+                frame = gtk.Frame()
+                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+                frame.add(widget)
+                return frame
+            self.mqpaned = gtk.HPaned()
+            self.mqpaned.add1(wrapframe(self.mqwidget))
+            self.mqpaned.add2(wrapframe(midpane))
+
+            midpane = self.mqpaned
 
         # Add ChangeSet instance to bottom half of vpane
         self.changeview.graphview = self.graphview
         self.hpaned = self.changeview.get_body()
 
         self.vpaned = gtk.VPaned()
-        self.vpaned.pack1(treeframe, True, False)
+        self.vpaned.pack1(midpane, True, False)
         self.vpaned.pack2(self.hpaned)
         gobject.idle_add(self.realize_settings)
 
@@ -515,8 +726,51 @@ class GLog(gdialog.GDialog):
         parent = self.repo['.'].rev()
         self.graphview.set_revision_id(parent)
 
+    def goto_clicked(self, toolbutton, data=None):
+        if self.gorev_dialog:
+            self.gorev_dialog.show()
+            self.gorev_dialog.present()
+        else:
+            self.show_goto_dialog()
+
+    def select_branch(self, combo):
+        row = combo.get_active()
+        if row >= 0 and row != self.lastbranchrow:
+            self.filter = 'branch'
+            self.lastbranchrow = row
+            self.branchbutton.set_active(True)
+            self.branchbutton.set_sensitive(True)
+            self.reload_log(branch=combo.get_model()[row][0])
+        else:
+            self.lastbranchrow = None
+            self.branchbutton.set_sensitive(False)
+
+    def show_goto_dialog(self):
+        'Launch a modeless goto revision dialog'
+        def goto_rev_(rev):
+            self.goto_rev(rev)
+
+        def response_(dialog, response_id):
+            dialog.hide()
+
+        def delete_event(dialog, event, data=None):
+            # return True to prevent the dialog from being destroyed
+            return True
+
+        dlg = gorev.GotoRevDialog(goto_rev_)
+        dlg.connect('response', response_)
+        dlg.connect('delete-event', delete_event)
+        dlg.set_modal(False)
+        dlg.show()
+
+        self.gorev_dialog = dlg
+
+    def goto_rev(self, revision):
+        rid = self.repo[revision].rev()
+        self.graphview.set_revision_id(rid, load=True)
+
     def strip_rev(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         res = gdialog.Confirm(_('Confirm Strip Revision(s)'), [], self,
                 _('Remove revision %d and all descendants?') % rev).run()
         if res != gtk.RESPONSE_YES:
@@ -532,43 +786,43 @@ class GLog(gdialog.GDialog):
         self.changeview._filelist.clear()
 
     def backout_rev(self, menuitem):
-        rev = self.currow[treemodel.REVID]
-        rev = str(self.repo[rev])
+        oldlen = len(self.repo)
+        hash = str(self.repo[self.currevid])
         parents = [x.node() for x in self.repo.parents()]
-        dlg = backout.BackoutDialog(rev)
+
+        def refresh(*args):
+            self.repo.invalidate()
+            if len(self.repo) != oldlen:
+                self.reload_log()
+
+        dlg = backout.BackoutDialog(hash)
         dlg.set_transient_for(self)
+        dlg.connect('destroy', refresh)
         dlg.show_all()
-        dlg.set_notify_func(self.checkout_completed, parents)
         dlg.present()
         dlg.set_transient_for(None)
 
     def revert(self, menuitem):
-        rev = self.currow[treemodel.REVID]
-        res = gdialog.Confirm(_('Confirm Revert Revision(s)'), [], self,
+        rev = self.currevid
+        res = gdialog.Confirm(_('Confirm Revert All Files'), [], self,
                 _('Revert all files to revision %d?\nThis will overwrite your '
                   'local changes') % rev).run()
-
         if res != gtk.RESPONSE_YES:
             return
-
         cmdline = ['hg', 'revert', '--verbose', '--all', '--rev', str(rev)]
-
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()
         dlg.hide()
 
     def vdiff_change(self, menuitem, pats=[]):
-        rev = self.currow[treemodel.REVID]
-        self._do_diff(pats, {'change' : rev})
+        self._do_diff(pats, {'change' : str(self.currevid)})
 
     def vdiff_local(self, menuitem, pats=[]):
-        rev = self.currow[treemodel.REVID]
-        opts = {'rev' : ["%s" % rev]}
-        self._do_diff(pats, opts)
+        self._do_diff(pats, {'rev' : [str(self.currevid)]})
 
     def diff_revs(self, menuitem):
-        rev0, rev1 = self.revs
+        rev0, rev1 = self.revrange
         statopts = self.merge_opts(commands.table['^status|st'][1],
                 ('include', 'exclude', 'git'))
         statopts['rev'] = ['%u:%u' % (rev0, rev1)]
@@ -581,44 +835,113 @@ class GLog(gdialog.GDialog):
         return True
 
     def vdiff_selected(self, menuitem):
-        strrevs = [str(r) for r in self.revs]
+        strrevs = [str(r) for r in self.revrange]
         self._do_diff(self.pats, {'rev' : strrevs})
 
     def email_revs(self, menuitem):
-        revs = list(self.revs)
-        revs.sort()
-        opts = ['--rev', str(revs[0]) + ':' + str(revs[1])]
+        revrange = list(self.revrange)
+        revrange.sort()
+        opts = ['--rev', str(revrange[0]) + ':' + str(revrange[1])]
         dlg = hgemail.EmailDialog(self.repo.root, opts)
         dlg.set_transient_for(self)
         dlg.show_all()
         dlg.present()
         dlg.set_transient_for(None)
 
+    def export_revs(self, menuitem):
+        result = gtklib.NativeFolderSelectDialog(title=_('Save patches to'),
+                                                 initial=self.repo.root).run()
+        if result:
+            revs = list(self.revrange)
+            revs.sort()
+            rev = '%d:%d' % (revs[0], revs[1])
+            # In case new export args are added in the future, merge the
+            # hg defaults
+            opts= self.merge_opts(commands.table['^export'][1], ())
+            opts['output'] = os.path.join(result, '%b_rev%R.patch')
+            def dohgexport():
+                commands.export(self.ui,self.repo, rev, **opts)
+            s, o = self._hg_call_wrapper('Export', dohgexport, False)
+
     def bundle_revs(self, menuitem):
-        revs = list(self.revs)
-        revs.sort()
-        parent = self.repo[revs[0]].parents()[0].rev()
+        revrange = list(self.revrange)
+        revrange.sort()
+        parent = self.repo[revrange[0]].parents()[0].rev()
         # Special case for revision 0's parent.
         if parent == -1: parent = 'null'
 
         filename = "%s_rev%d_to_rev%s.hg" % (os.path.basename(self.repo.root),
-                   revs[0], revs[1])
+                   revrange[0], revrange[1])
         result = gtklib.NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
                                          InitialDir=self.repo.root,
                                          FileName=filename).run()
         if result:
             cmdline = ['hg', 'bundle', '--base', str(parent),
-                      '--rev', str(revs[1]), result]
+                      '--rev', str(revrange[1]), result]
             dlg = hgcmd.CmdDialog(cmdline)
             dlg.show_all()
             dlg.run()
             dlg.hide()
 
+    def qimport_rev(self, menuitem):
+        """QImport selected revision."""
+        rev = str(self.currevid)
+        self.qimport_revs(menuitem, rev)
+
+    def qimport_revs(self, menuitem, rev=None):
+        """QImport revision range."""
+        if rev == None:
+            revs = list(self.revrange)
+            revs.sort()
+            rev = '%s:%s' % (str(revs[0]), str(revs[1]))
+        cmdline = ['hg', 'qimport', '--rev', rev]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
+        self.enable_mqpanel()
+
+    def rebase_selected(self, menuitem):
+        """Rebase revision on top of selection (1st on top of 2nd).""" 
+        revs = self.revrange
+        res = gdialog.Confirm(_('Confirm Rebase Revision'), [], self,
+            _('Rebase revision %d on top of %d?') % (revs[0], revs[1])).run()
+        if res != gtk.RESPONSE_YES:
+            return
+        cmdline = ['hg', 'rebase', '--source', str(revs[0]),
+                   '--dest', str(revs[1])]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
+
+    def transplant_revs(self, menuitem):
+        """Transplant revision range on top of current revision."""
+        revs = list(self.revrange)
+        revs.sort()
+        cmdline = ['hg', 'transplant', '%d:%d' % (revs[0], revs[1])]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
+
     def add_tag(self, menuitem):
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
         oldlen = len(self.repo)
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
 
         def refresh(*args):
             self.repo.invalidate()
@@ -629,7 +952,7 @@ class GLog(gdialog.GDialog):
                 if newtags != oldtags:
                     self.refresh_model()
 
-        dialog = tagadd.TagAddDialog(self.repo.root, rev=str(rev))
+        dialog = tagadd.TagAddDialog(self.repo, rev=str(rev))
         dialog.set_transient_for(self)
         dialog.connect('destroy', refresh)
         dialog.show_all()
@@ -637,20 +960,29 @@ class GLog(gdialog.GDialog):
         dialog.set_transient_for(None)
 
     def show_status(self, menuitem):
-        rev = self.currow[treemodel.REVID]
-        statopts = {'rev' : [str(rev)] }
-        dialog = changeset.ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
+        rev = self.currevid
+        statopts = self.merge_opts(commands.table['^status|st'][1],
+                ('include', 'exclude', 'git'))
+        if self.changeview.parent_toggle.get_active():
+            parent = self.repo[rev].parents()[1].rev()
+        else:
+            parent = self.repo[rev].parents()[0].rev()
+        statopts['rev'] = [str(parent), str(rev)]
+        statopts['modified'] = True
+        statopts['added'] = True
+        statopts['removed'] = True
+        dialog = status.GStatus(self.ui, self.repo, self.cwd, self.pats,
+                         statopts)
         dialog.display()
 
     def copy_hash(self, menuitem):
-        rev = self.currow[treemodel.REVID]
-        node = str(self.repo[rev])
+        hash = str(self.repo[self.currevid])
         sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
         clipboard = gtk.Clipboard(selection=sel)
-        clipboard.set_text(node)
+        clipboard.set_text(hash)
 
     def export_patch(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         filename = "%s_rev%s.patch" % (os.path.basename(self.repo.root), rev)
         result = gtklib.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
                                              InitialDir=self.repo.root,
@@ -674,7 +1006,7 @@ class GLog(gdialog.GDialog):
 
     def bundle_rev_to_tip(self, menuitem):
         try:
-            rev = int(self.currow[treemodel.REVID])
+            rev = self.currevid
             parent = self.repo[rev].parents()[0].rev()
             # Special case for revision 0's parent.
             if parent == -1: parent = 'null'
@@ -700,7 +1032,7 @@ class GLog(gdialog.GDialog):
             dlg.hide()
 
     def email_patch(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         dlg = hgemail.EmailDialog(self.repo.root, ['--rev', str(rev)])
         dlg.set_transient_for(self)
         dlg.show_all()
@@ -708,7 +1040,7 @@ class GLog(gdialog.GDialog):
         dlg.set_transient_for(None)
 
     def checkout(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
         dialog = update.UpdateDialog(rev)
         dialog.set_transient_for(self)
@@ -725,10 +1057,10 @@ class GLog(gdialog.GDialog):
             self.refresh_model()
 
     def merge(self, menuitem):
-        rev = self.currow[treemodel.REVID]
+        rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
         if rev == self.repo.parents()[0].rev():
-            rev = self.revs[1]
+            rev = self.revrange[1]
         dialog = merge.MergeDialog(rev)
         dialog.set_transient_for(self)
         dialog.show_all()
@@ -746,21 +1078,64 @@ class GLog(gdialog.GDialog):
         elif not oldparents == newparents:
             self.refresh_model()
 
-    def selection_changed(self, treeview):
-        self.currow = self.graphview.get_revision()
-        rev = self.currow[treemodel.REVID]
-        if rev != self.last_rev:
-            self.last_rev = rev
-            self.changeview.opts['rev'] = [str(rev)]
-            self.changeview.load_details(rev)
-        return False
+    def archive(self, menuitem):
+        rev = self.currevid
+        parents = [x.node() for x in self.repo.parents()]
+        dialog = archive.ArchiveDialog(rev)
+        dialog.set_transient_for(self)
+        dialog.show_all()
+        dialog.present()
+        dialog.set_transient_for(None)
+
+    def transplant_rev(self, menuitem):
+        """Transplant selection on top of current revision."""
+        rev = self.currevid
+        cmdline = ['hg', 'transplant', str(rev)]
+        dialog = hgcmd.CmdDialog(cmdline)
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+        self.repo.invalidate()
+        self.reload_log()
+        self.changeview._buffer.set_text('')
+        self.changeview._filelist.clear()
 
     def thgrefresh(self, window):
         self.reload_log()
 
+    def conf_clicked(self, toolbutton, data=None):
+        dlg = thgconfig.ConfigDialog(True)
+        dlg.focus_field('tortoisehg.authorcolor')
+        self.settingtb.set_sensitive(False)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        # Allow the dialog to run
+        self.refreshui()
+        self.repo.invalidate()
+        self.reload_log()
+        self.settingtb.set_sensitive(True)
+        return True
+
     def refresh_clicked(self, toolbutton, data=None):
         self.reload_log()
         return True
+
+    def enable_mqpanel(self, enable=None):
+        if not hasattr(self, 'mqpaned'):
+            return
+        if enable == None:
+            enable = bool('mq' in self.exs and self.repo.mq.applied)
+        self.mqpaned.set_position(enable and 180 or 0)
+
+        # set the state of MQ toolbutton
+        if hasattr(self, 'mqtb'):
+            self.mqtb.handler_block_by_func(self.mq_clicked)
+            self.mqtb.set_active(enable)
+            self.mqtb.handler_unblock_by_func(self.mq_clicked)
+
+    def mq_clicked(self, toolbutton, data=None):
+        self.enable_mqpanel(self.mqtb.get_active())
 
     def tree_button_press(self, tree, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
@@ -778,31 +1153,33 @@ class GLog(gdialog.GDialog):
             else:
                 tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
                 tree.get_selection().select_path(crow)
-                self.orig_sel = srow
-                self.revs = (int(model[srow][treemodel.REVID]),
-                        int(model[crow][treemodel.REVID]))
+                self.origsel = srow
+                rev0 = self.graphview.get_revid_at_path(srow)
+                rev1 = self.graphview.get_revid_at_path(crow)
+                self.revrange = (rev0, rev1)
                 self.tree_popup_menu_diff(tree, event.button, event.time)
             return True
         return False
 
     def tree_popup_menu(self, treeview, button=0, time=0) :
-        selrev = self.currow[treemodel.REVID]
-
         # disable/enable menus as required
         parents = [x.rev() for x in self.repo.parents()]
-        can_merge = selrev not in parents and len(parents) < 2
+        can_merge = self.currevid not in parents and len(parents) < 2
         self.cmenu_merge.set_sensitive(can_merge)
+
+        op1, op2 = self.repo.dirstate.parents()
+        node = self.repo[self.currevid].node()
+        a = self.repo.changelog.ancestor(op1, node)
+        self.cmenu_backout.set_sensitive(a == node)
 
         # display the context menu
         self._menu.popup(None, None, None, button, time)
         return True
 
     def tree_popup_menu_diff(self, treeview, button=0, time=0):
-        selrev = self.revs[0]
-
         # disable/enable menus as required
         parents = [x.rev() for x in self.repo.parents()]
-        can_merge = selrev in parents and len(parents) < 2
+        can_merge = self.currevid in parents and len(parents) < 2
         self.cmenu_merge2.set_sensitive(can_merge)
 
         # display the context menu
@@ -820,8 +1197,8 @@ def run(ui, *pats, **opts):
         'limit':0, 'rev':[], 'removed':False, 'no_merges':False,
         'date':None, 'only_merges':None, 'prune':[], 'git':False,
         'verbose':False, 'include':[], 'exclude':[], 'from-synch':False,
-        'orig-tip':None, 'filehist':None
+        'orig-tip':None, 'filehist':None, 'canonpats':[]
     }
     cmdoptions.update(opts)
-    pats = hglib.canonpaths(pats)
+    pats = hglib.canonpaths(pats) + cmdoptions['canonpats']
     return GLog(ui, None, None, pats, cmdoptions)

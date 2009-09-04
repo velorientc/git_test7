@@ -46,27 +46,30 @@ class Prompt(SimpleMessage):
 class CustomPrompt(gtk.MessageDialog):
     ''' Custom prompt dialog.  Provide a list of choices with ampersands
     to delineate response given for each choice (and keyboard
-    accelerator).  Default must be one of the choice responses.
+    accelerator). Default must be the index of one of the choice responses.
     '''
-    # ret = CustomPrompt('Title', 'Message', self, ('&Yes', 'N&o'), 'o').run()
-    # ret will be (gtk.RESPONSE_DELETE_EVENT, ord('y'), or ord('o'))
-    def __init__(self, title, message, parent, choices, default=None):
+    # ret = CustomPrompt('Title', 'Message', self, ('&Yes', 'N&o'), 1).run()
+    # ret will be (gtk.RESPONSE_DELETE_EVENT, 0 (for yes), or 1 (for no)
+    def __init__(self, title, message, parent, choices, default=None, esc=None):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION)
         self.set_title(hglib.toutf(title))
         self.format_secondary_markup('<b>' + hglib.toutf(message) + '</b>')
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
-        for s in choices:
+        for i, s in enumerate(choices):
             char = s[s.index('&')+1].lower()
-            button = self.add_button(s.replace('&', '_'), ord(char))
+            button = self.add_button(s.replace('&', '_'), i)
             button.add_accelerator('clicked', accel_group, ord(char), 0,
                     gtk.ACCEL_VISIBLE)
         if default:
-            self.set_default_response(ord(default))
+            self.set_default_response(default)
+        self.esc = esc
 
     def run(self):
         response = gtklib.MessageDialog.run(self)
+        if response == gtk.RESPONSE_DELETE_EVENT and self.esc != None:
+            response = self.esc
         self.destroy()
         return response
 
@@ -134,6 +137,11 @@ class GDialog(gtk.Window):
         self.toolbuttons = {}
         self.settings = settings.Settings(self.__class__.__name__)
         self.init()
+
+    def refreshui(self):
+        self.ui = ui.ui()
+        if self.repo:
+            self.repo = hg.repository(self.ui, path=self.repo.root)
 
     ### Following methods are meant to be overridden by subclasses ###
 
@@ -277,16 +285,24 @@ class GDialog(gtk.Window):
         return cnt
 
 
-    def make_toolbutton(self, stock, label, handler,
-            userdata=None, menu=None, tip=None):
+    def make_toolbutton(self, stock, label, handler, userdata=None,
+                menu=None, tip=None, toggle=False, icon=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
+        elif toggle:
+            tbutton = gtk.ToggleToolButton(stock)
         else:
             tbutton = gtk.ToolButton(stock)
 
         if tip:
             tbutton.set_tooltip(self.tooltips, tip)
+        if icon:
+            path = paths.get_tortoise_icon(icon)
+            if path:
+                image = gtk.Image()
+                image.set_from_file(path)
+                tbutton.set_icon_widget(image)
         tbutton.set_use_underline(True)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
@@ -415,7 +431,7 @@ class GDialog(gtk.Window):
     def _diff_file(self, stat, file):
         self._do_diff(file and [file] or [], self.opts)
 
-    def _view_file(self, stat, file, force_left=False):
+    def _view_files(self, files, otherparent):
         from hggtk import thgconfig
         def cleanup():
             shutil.rmtree(self.tmproot)
@@ -460,18 +476,20 @@ class GDialog(gtk.Window):
             pathroot = self.repo.root
             copynode = None
             # if we aren't looking at the wc, copy the node...
-            if stat in 'R!' or force_left:
+            if otherparent:
                 copynode = self._node1
             elif self._node2:
                 copynode = self._node2
 
             if copynode:
-                copydir = snapshot_node(self.ui, self.repo,
-                        [util.pconvert(file)], copynode, self.tmproot)
+                pf = [util.pconvert(f) for f in files]
+                copydir = snapshot_node(self.ui, self.repo, pf,
+                        copynode, self.tmproot)
                 pathroot = os.path.join(self.tmproot, copydir)
 
-            file_path = os.path.join(pathroot, file)
-            util.system("%s \"%s\"" % (editor, file_path),
+            paths = ['"'+os.path.join(pathroot, f)+'"' for f in files]
+            command = editor + ' ' + ' '.join(paths)
+            util.system(command,
                         environ={'HGUSER': self.ui.username()},
                         onerr=self.ui, errprefix=_('edit failed'))
 
@@ -492,8 +510,8 @@ class GDialog(gtk.Window):
             self._parse_config()
             return
 
-        file = util.localpath(file)
-        thread = threading.Thread(target=doedit, name='edit:'+file)
+        lfile = util.localpath(files[0])
+        thread = threading.Thread(target=doedit, name='edit:'+lfile)
         thread.setDaemon(True)
         thread.start()
 

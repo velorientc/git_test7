@@ -172,6 +172,18 @@ class EmailDialog(gtk.Window):
         self._subjbox = gtk.ComboBoxEntry(self._subjlist, 0)
         hbox.pack_start(gtk.Label(_('Subject:')), False, False, 4)
         hbox.pack_start(self._subjbox, True, True, 4)
+
+        # --flags was added after hg 1.3
+        hasflags = False
+        for arg in extensions.find('patchbomb').emailopts:
+            if arg[1] == 'flag':
+                hasflags = True
+                break
+        self._flaglist = gtk.ListStore(str)
+        self._flagbox = gtk.ComboBoxEntry(self._flaglist, 0)
+        if hasflags:
+            hbox.pack_start(gtk.Label(_('Flags:')), False, False, 4)
+            hbox.pack_start(self._flagbox, False, False, 4)
         vbox.pack_start(hbox, False, False, 4)
 
         self.descview = gtk.TextView(buffer=None)
@@ -224,28 +236,22 @@ class EmailDialog(gtk.Window):
             self._ccbox.child.set_text(hglib.fromutf(repo.ui.config('email', 'cc', '')))
             self._frombox.child.set_text(hglib.fromutf(repo.ui.config('email', 'from', '')))
             self._subjbox.child.set_text(hglib.fromutf(repo.ui.config('email', 'subject', '')))
-            self._intro = False
-            self._in_reply_to = False
-            for arg in extensions.find('patchbomb').cmdtable['email'][1]:
-                if arg[1] == 'intro':
-                    self._intro = True
-                elif arg[1] == 'in-reply-to':
-                    self._in_reply_to = True
-            if self._intro:
-                addtip = ''
-            else:
-                addtip = ' ' + _('The description field is unused '
-                               'when sending a single patch.')
             self.tooltips.set_tip(self._eventbox,
                     _('Patch series description is sent in initial summary'
                     ' email with [PATCH 0 of N] subject.  It should describe'
                     ' the effects of the entire patch series.  When emailing'
-                    ' a bundle, these fields make up the message subject and body.')
-                    + addtip)
+                    ' a bundle, these fields make up the message subject and'
+                    ' body. Flags is a comma separated list of tags'
+                    ' which are inserted into the message header.')
+                    )
+            gtklib.addspellcheck(self.descview, self.repo.ui)
         fill_history(history, self._tolist, 'email.to')
         fill_history(history, self._cclist, 'email.cc')
         fill_history(history, self._fromlist, 'email.from')
         fill_history(history, self._subjlist, 'email.subject')
+        fill_history(history, self._flaglist, 'email.flags')
+        if len(self._flaglist) == 0:
+            self._flaglist.append(['STABLE'])
 
         # See if user has set flags in defaults.email
         self._git.set_sensitive(True)
@@ -302,6 +308,7 @@ class EmailDialog(gtk.Window):
         cctext = hglib.fromutf(self._ccbox.child.get_text())
         fromtext = hglib.fromutf(self._frombox.child.get_text())
         subjtext = hglib.fromutf(self._subjbox.child.get_text())
+        flagtext = hglib.fromutf(self._flagbox.child.get_text())
         inreplyto = hglib.fromutf(self._replyto.get_text())
 
         if not totext:
@@ -335,6 +342,7 @@ class EmailDialog(gtk.Window):
             record_new_value('email.cc', history, cctext)
             record_new_value('email.from', history, fromtext)
             record_new_value('email.subject', history, subjtext)
+            record_new_value('email.flags', history, flagtext)
             history.write()
 
         cmdline = ['hg', 'email', '-f', fromtext, '-t', totext, '-c', cctext]
@@ -343,6 +351,10 @@ class EmailDialog(gtk.Window):
             if oldpager:
                 del os.environ['PAGER']
             cmdline.insert(2, '--test')
+        if flagtext:
+            flags = [f.split() for f in flagtext.split(',')]
+            for f in flags:
+                cmdline += ['--flag', f]
         if subjtext:
             cmdline += ['--subject', subjtext]
         if self._bundle.get_active():
@@ -354,12 +366,12 @@ class EmailDialog(gtk.Window):
         if self._inline.get_active():   cmdline += ['--inline']
         if self._attach.get_active():   cmdline += ['--attach']
         if self._diffstat.get_active(): cmdline += ['--diffstat']
-        if inreplyto and self._in_reply_to:
+        if inreplyto:
             cmdline += ['--in-reply-to', inreplyto]
         start = self.descbuffer.get_start_iter()
         end = self.descbuffer.get_end_iter()
         desc = self.descbuffer.get_text(start, end)
-        if desc and self._intro:
+        if desc:
             cmdline += ['--intro']
         tmpfile = None
         try:

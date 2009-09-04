@@ -25,7 +25,7 @@ _unspeclocalstr = hglib.fromutf(_unspecstr)
 _pwfields = ('http_proxy.passwd', 'smtp.password')
 
 _tortoise_info = (
-    (_('3-way Merge Tool'), 'ui.merge', [],
+    (_('Three-way Merge Tool'), 'ui.merge', [],
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
         ' on your system or use its internal merge tool that leaves conflict'
@@ -56,15 +56,17 @@ _tortoise_info = (
     (_('Bottom Diffs'), 'gtools.diffbottom', ['False', 'True'],
         _('Show the diff panel below the file list in status, shelve, and'
         ' commit dialogs.'
-        ' Default: False (show diffs to right of file list)')))
+        ' Default: False (show diffs to right of file list)')),
+    (_('Capture Stderr'), 'tortoisehg.stderrcapt', ['True', 'False'],
+        _('Redirect stderr to a buffer which is parsed at the end of'
+        ' the process for runtime errors. Default: True')),
+    (_('Fork hgtk'), 'tortoisehg.hgtkfork', ['True', 'False'],
+        _('When running hgtk from the command line, fork a background'
+        ' process to run graphical dialogs.  Default: True')))
 
 _commit_info = (
     (_('Username'), 'ui.username', [],
         _('Name associated with commits')),
-    (_('External Commit Tool'), 'tortoisehg.extcommit', ['None', 'qct'],
-        _('Select commit tool launched by TortoiseHg. (Qct is no longer'
-        ' distributed as part of TortoiseHG.)'
-        ' Default: None (use the builtin tool)')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', ['0', '70'],
        _('Maximum length of the commit message summary line.'
          ' If set, TortoiseHG will issue a warning if the'
@@ -94,7 +96,12 @@ _log_info = (
     (_('Copy Hash'), 'tortoisehg.copyhash', ['False', 'True'],
         _('Allow the changelog viewer to copy the changeset hash'
         ' of the currently selected changeset into the clipboard.'
-        ' Default: False')))
+        ' DEPRECATED. Default: False')),
+    (_('Dead Branches'), 'tortoisehg.deadbranch', [],
+        _('Comma separated list of branch names that should be ignored'
+        ' when building a list of branch names for a repository.'
+        ' Default: None')),
+        )
 
 _paths_info = (
     (_('After pull operation'), 'tortoisehg.postpull',
@@ -155,11 +162,11 @@ _proxy_info = (
     (_('Bypass List'), 'http_proxy.no', [],
         _('Optional. Comma-separated list of host names that'
         ' should bypass the proxy')),
-    (_('Password'), 'http_proxy.passwd', [],
-        _('Optional. Password to authenticate with at the'
-        ' proxy server')),
     (_('User'), 'http_proxy.user', [],
         _('Optional. User name to authenticate with at the'
+        ' proxy server')),
+    (_('Password'), 'http_proxy.passwd', [],
+        _('Optional. Password to authenticate with at the'
         ' proxy server')))
 
 _email_info = (
@@ -214,7 +221,8 @@ _diff_info = (
         ' Default: False')))
 
 class PathEditDialog(gtk.Dialog):
-    _protocols = ['ssh', 'http', 'https', 'local']
+    _protocols = (('ssh', _('ssh')), ('http', _('http')),
+                  ('https', _('https')), ('local', _('local')))
 
     def __init__(self, path, alias, list):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
@@ -224,6 +232,8 @@ class PathEditDialog(gtk.Dialog):
         self.connect('response', self.response)
         self.connect('key-press-event', self.key_press)
         self.set_title(_('Edit remote repository path'))
+        self.set_has_separator(False)
+        self.set_resizable(False)
         self.newpath, self.newalias = None, None
         self.list = list
 
@@ -234,60 +244,110 @@ class PathEditDialog(gtk.Dialog):
                      ('User', _('User')), ('Password', _('Password')),
                      ('Alias', _('Alias'))):
             entry = gtk.Entry()
+            entry.set_alignment(0)
             label = gtk.Label(name[1])
+            label.set_alignment(1, 0.5)
             self.entries[name[0]] = [entry, label, None]
 
-        self.entries['URL'][0].set_width_chars(50)
+        # persistent settings
+        self.settings = settings.Settings('pathedit')
+
+        # configure individual widgets
+        self.entries['Alias'][0].set_width_chars(18)
+        self.entries['URL'][0].set_width_chars(60)
+        self.entries['Port'][0].set_width_chars(8)
+        self.entries['User'][0].set_width_chars(18)
+        self.entries['Password'][0].set_width_chars(24)
         self.entries['Password'][0].set_visibility(False)
 
+        def createtable(cols=2):
+            newtable = gtk.Table(1, cols)
+            def addrow(header, cell):
+                row = newtable.get_property('n-rows')
+                newtable.set_property('n-rows', row + 1)
+                newtable.attach(header, 0, 1, row, row + 1, gtk.FILL, 0, 4, 2)
+                newtable.attach(cell, 1, 2, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
+            return newtable, addrow
+
+        # table for main entries
+        toptable, addrow = createtable()
+        self.vbox.pack_start(toptable, False, False, 2)
+
+        ## alias (and 'Browse...' button)
         hbox = gtk.HBox()
-        hbox.pack_start(self.entries['Alias'][1], False, False, 2)
-        hbox.pack_start(self.entries['Alias'][0], False, False, 2)
-        hbox.pack_start(self.entries['URL'][1], False, False, 2)
-        hbox.pack_start(self.entries['URL'][0], True, True, 2)
-        self.vbox.pack_start(hbox, False, False, 2)
+        hbox.pack_start(self.entries['Alias'][0], False, False)
+        hbox.pack_start(gtk.Label(''))
+        browse = gtk.Button(_('Browse...'))
+        browse.connect('clicked', self.browse_clicked)
+        hbox.pack_start(browse, False, False)
+        addrow(self.entries['Alias'][1], hbox)
 
-        frame = gtk.Frame()
-        self.vbox.pack_start(frame, False, False, 2)
-        vbox = gtk.VBox()
-        vbox.set_border_width(10)
-        frame.add(vbox)
-        frame.set_border_width(10)
+        ## final URL
+        addrow(self.entries['URL'][1], self.entries['URL'][0])
 
-        self.protcombo = gtk.combo_box_new_text()
-        for p in self._protocols:
-            self.protcombo.append_text(p)
-        vbox.pack_start(self.protcombo, False, False, 10)
+        self.expander = expander = gtk.Expander(_('URL Details'))
+        self.vbox.pack_start(expander, True, True, 2)
 
+        # table for separated entries
+        entrytable, addrow = createtable()
+        expander.add(entrytable)
+
+        ## path type
+        typelabel = gtk.Label(_('Type'))
+        typelabel.set_alignment(1, 0.5)
+        self.protocolcombo = gtk.combo_box_new_text()
+        for name, label in self._protocols:
+            self.protocolcombo.append_text(label)
         hbox = gtk.HBox()
-        hbox.pack_start(self.entries['Host'][1], False, False, 2)
-        hbox.pack_start(self.entries['Host'][0], True, True, 2)
-        hbox.pack_start(self.entries['Port'][1], False, False, 2)
-        hbox.pack_start(self.entries['Port'][0], False, False, 2)
-        vbox.pack_start(hbox, False, False, 2)
+        hbox.pack_start(self.protocolcombo, False, False)
+        hbox.pack_start(gtk.Label(''))
+        addrow(typelabel, hbox)
 
-        for n in ('Folder', 'User', 'Password'):
-            hbox = gtk.HBox()
-            hbox.pack_start(self.entries[n][1], False, False, 2)
-            hbox.pack_start(self.entries[n][0], True, True, 2)
-            vbox.pack_start(hbox, False, False, 2)
+        ## host & port
+        hbox = gtk.HBox()
+        hbox.pack_start(self.entries['Host'][0])
+        hbox.pack_start(self.entries['Port'][1], False, False, 4)
+        hbox.pack_start(self.entries['Port'][0], False, False)
+        addrow(self.entries['Host'][1], hbox)
 
+        ## folder
+        addrow(self.entries['Folder'][1], self.entries['Folder'][0])
+
+        ## username & password
+        hbox = gtk.HBox()
+        hbox.pack_start(self.entries['User'][0], False, False)
+        hbox.pack_start(self.entries['Password'][1], False, False, 4)
+        hbox.pack_start(self.entries['Password'][0], False, False)
+        addrow(self.entries['User'][1], hbox)
+
+        # prepare to show
+        self.load_settings()
         self.setentries(path, alias)
-
         self.sethandlers()
-
         self.lastproto = None
         self.update_sensitive()
         self.show_all()
 
+    def protocolindex(self, pname):
+        for (i, (name, label)) in enumerate(self._protocols):
+            if name == pname:
+                return i
+        return None
+
+    def protocolname(self, plabel):
+        for (name, label) in self._protocols:
+            if label == plabel:
+                return name
+        return None
+
     def sethandlers(self, enable=True):
         # protocol combobox
         if enable:
-            self.pcombo_hid = self.protcombo.connect('changed', self.changed)
+            self.pcombo_hid = self.protocolcombo.connect('changed', self.changed)
         else:
             h = self.pcombo_hid
-            if h and self.protcombo.handler_is_connected(h):
-                self.protcombo.disconnect(h)
+            if h and self.protocolcombo.handler_is_connected(h):
+                self.protocolcombo.disconnect(h)
 
         # other entries
         for n, (e, l, h) in self.entries.iteritems():
@@ -335,11 +395,10 @@ class PathEditDialog(gtk.Dialog):
         self.entries['Folder'][0].set_text(folder or '')
         self.entries['Password'][0].set_text(pw or '')
 
-        i = self._protocols.index(scheme)
-        self.protcombo.set_active(i)
+        self.protocolcombo.set_active(self.protocolindex(scheme) or 0)
 
     def update_sensitive(self):
-        proto = self.protcombo.get_active_text()
+        proto = self.protocolname(self.protocolcombo.get_active_text())
         if proto == self.lastproto:
             return
         self.lastproto = proto
@@ -358,6 +417,25 @@ class PathEditDialog(gtk.Dialog):
                 self.entries[n][0].set_sensitive(True)
                 self.entries[n][1].set_sensitive(True)
 
+    def load_settings(self):
+        expanded = self.settings.get_value('expanded', False, True)
+        self.expander.set_property('expanded', expanded)
+
+    def store_settings(self):
+        expanded = self.expander.get_property('expanded')
+        self.settings.set_value('expanded', expanded)
+        self.settings.write()
+
+    def browse_clicked(self, button):
+        if self.protocolname(self.protocolcombo.get_active_text()) == 'local':
+            initial = self.entries['URL'][0].get_text()
+        else:
+            initial = None
+        path = gtklib.NativeFolderSelectDialog(initial=initial,
+                          title=_('Select Local Folder')).run()
+        if path:
+            self.entries['URL'][0].set_text(path)
+
     def changed(self, combo):
         newurl = self.buildurl()
         self.sethandlers(False)
@@ -373,9 +451,16 @@ class PathEditDialog(gtk.Dialog):
 
     def response(self, widget, response_id):
         if response_id != gtk.RESPONSE_OK:
+            self.store_settings()
             self.destroy()
             return
-        newalias = self.entries['Alias'][0].get_text()
+        aliasinput = self.entries['Alias'][0]
+        newalias = aliasinput.get_text()
+        if newalias == '':
+            ret = dialog.error_dialog(self, _('Alias name is empty'),
+                    _('Please enter alias name'))
+            aliasinput.grab_focus()
+            return
         if newalias in self.list:
             ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
                    _("Overwrite existing '%s' path?") % newalias).run()
@@ -383,6 +468,7 @@ class PathEditDialog(gtk.Dialog):
                 return
         self.newpath = self.buildurl()
         self.newalias = newalias
+        self.store_settings()
         self.destroy()
 
     def key_press(self, widget, event):
@@ -390,7 +476,7 @@ class PathEditDialog(gtk.Dialog):
             self.response(widget, gtk.RESPONSE_OK)
 
     def buildurl(self):
-        proto = self.protcombo.get_active_text()
+        proto = self.protocolname(self.protocolcombo.get_active_text())
         host = self.entries['Host'][0].get_text()
         port = self.entries['Port'][0].get_text()
         folder = self.entries['Folder'][0].get_text()
@@ -413,7 +499,7 @@ class PathEditDialog(gtk.Dialog):
         return ret
 
 class ConfigDialog(gtk.Dialog):
-    def __init__(self, configrepo=False, focusfield=None, newpath=None):
+    def __init__(self, configrepo=False):
         """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
                           buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
@@ -438,16 +524,15 @@ class ConfigDialog(gtk.Dialog):
                 return
 
         try:
-            from mercurial import demandimport
-            demandimport.disable()
             import iniparse
-            demandimport.enable()
+            iniparse.INIConfig
+            self.readonly = False
         except ImportError:
             dialog.error_dialog(self, _('Iniparse package not found'),
-                         _('Please install iniparse package'))
-            self.destroy()
+                         _('Please install iniparse package\n'
+                           'Settings are only shown, no changing is possible'))
             print 'Please install http://code.google.com/p/iniparse/'
-            return
+            self.readonly = True
 
         # Catch close events
         self.connect('response', self.should_live)
@@ -483,9 +568,18 @@ class ConfigDialog(gtk.Dialog):
         self.tooltips = gtk.Tooltips()
         self.history = settings.Settings('thgconfig')
 
+        # add spell ckeck entry if spell check is supported
+        tortoise_info = _tortoise_info
+        if gtklib.hasspellcheck():
+            tortoise_info += ((
+                _('Spell Check Language'), 'tortoisehg.spellcheck', [],
+                _('Default language for spell check. '
+                  'System language is used if not specified. '
+                  'Examples: en, en_GB, en_US')),)
+
         # create pages for each section of configuration file
         self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
-        self.fill_frame(self.tortoise_frame, _tortoise_info)
+        self.fill_frame(self.tortoise_frame, tortoise_info)
 
         self.commit_frame = self.add_page(notebook, _('Commit'))
         self.fill_frame(self.commit_frame, _commit_info)
@@ -540,7 +634,7 @@ class ConfigDialog(gtk.Dialog):
         self.ini = self.load_config(self.rcpath)
         self.refresh_vlist()
         self.pathdata.clear()
-        if 'paths' in list(self.ini):
+        if 'paths' in self.ini:
             for name in self.ini['paths']:
                 path = self.ini['paths'][name]
                 safepath = hglib.toutf(url.hidepassword(path))
@@ -578,7 +672,7 @@ class ConfigDialog(gtk.Dialog):
         return True
 
     def should_live(self, *args):
-        if self.dirty:
+        if self.dirty and not self.readonly:
             ret = gdialog.Confirm(_('Confirm quit without saving?'), [], self,
                             _('Yes to abandon changes, No to continue')).run()
             if ret != gtk.RESPONSE_YES:
@@ -619,7 +713,7 @@ class ConfigDialog(gtk.Dialog):
 
     def dirty_event(self, *args):
         if not self.dirty:
-            self._btn_apply.set_sensitive(True)
+            self._btn_apply.set_sensitive(not self.readonly)
             self.dirty = True
 
     def _add_path(self, *args):
@@ -869,21 +963,7 @@ class ConfigDialog(gtk.Dialog):
                                 values.append(name)
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
-                    try:
-                        tools = []
-                        for key, value in self.ui.configitems('merge-tools'):
-                            t = key.split('.')[0]
-                            if t not in tools:
-                                tools.append(t)
-                        for t in tools:
-                            # Ensure the tool is installed
-                            if filemerge._findtool(self.ui, t):
-                                values.append(t)
-                        values.append('internal:merge')
-                        values.append('internal:prompt')
-                        values.append('internal:dump')
-                    except ImportError:
-                        pass
+                    hglib.mergetools(self.ui, values)
 
                 currow = None
                 if not ispw:
@@ -940,8 +1020,14 @@ class ConfigDialog(gtk.Dialog):
             f.write(_('# Generated by tortoisehg-config\n'))
             f.close()
         self.fn = fn
-        import iniparse
-        return iniparse.INIConfig(file(fn), optionxformvalue=None)
+        try:
+            import iniparse
+            return iniparse.INIConfig(file(fn), optionxformvalue=None)
+        except ImportError:
+            from mercurial import config
+            cfg = config.config()
+            cfg.read(fn)
+            return cfg
 
     def record_new_value(self, cpath, newvalue, keephistory=True):
         # 'newvalue' is converted to local encoding
@@ -952,7 +1038,7 @@ class ConfigDialog(gtk.Dialog):
             except KeyError:
                 pass
             return
-        if section not in list(self.ini):
+        if section not in self.ini:
             if hasattr(self.ini, '_new_namespace'):
                 self.ini._new_namespace(section)
             else:
@@ -967,6 +1053,9 @@ class ConfigDialog(gtk.Dialog):
         self.history.mrul(cpath).add(newvalue)
 
     def _apply_clicked(self, *args):
+        if self.readonly:
+            #dialog? Read only access, please install ...
+            return
         # Reload history, since it may have been modified externally
         self.history.read()
 
@@ -983,7 +1072,7 @@ class ConfigDialog(gtk.Dialog):
                 cpath = '.'.join(['paths', name])
                 self.record_new_value(cpath, path, False)
                 refreshlist.append(name)
-            for name in list(self.ini.paths):
+            for name in self.ini.paths:
                 if name not in refreshlist:
                     del self.ini['paths'][name]
         elif 'paths' in list(self.ini):

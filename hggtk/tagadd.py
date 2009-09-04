@@ -13,118 +13,107 @@ import traceback
 from mercurial import hg, ui, util
 
 from thgutil.i18n import _
-from thgutil import hglib
+from thgutil import hglib, settings, i18n
 
 from hggtk import dialog, gtklib
 
-class TagAddDialog(gtk.Window):
+keep = i18n.keepgettext()
+
+class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
-    def __init__(self, root='', tag='', rev=''):
+    def __init__(self, repo, tag='', rev=''):
         """ Initialize the Dialog """
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        root = hglib.toutf(os.path.basename(repo.root))
+        gtk.Dialog.__init__(self, title=_('TortoiseHg Tag - %s') % root,
+                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         gtklib.set_tortoise_keys(self)
+        self.set_resizable(False)
+        self.set_has_separator(False)
+        self.connect('response', self.dialog_response)
 
-        title = _('TortoiseHg Tag - %s') % (root or os.getcwd())
-        self.set_title(title)
+        # add Add button
+        addbutton = gtk.Button(_('Add'))
+        addbutton.connect('clicked', lambda b: self._do_add_tag())
+        self.action_area.pack_end(addbutton)
 
-        self.root = root
-        self.repo = None
+        # add Remove button
+        removebutton = gtk.Button(_('Remove'))
+        removebutton.connect('clicked', lambda b: self._do_rm_tag())
+        self.action_area.pack_end(removebutton)
 
-        try:
-            self.repo = hg.repository(ui.ui(), path=self.root)
-        except hglib.RepoError:
-            pass
+        # persistent settings
+        self.settings = settings.Settings('tagadd')
 
-        # build dialog
-        self._create(tag, rev)
+        self.repo = repo
 
-    def _create(self, tag, rev):
-        self.set_default_size(350, 180)
+        # copy from 'clone.py'
+        def createtable(cols=2):
+            newtable = gtk.Table(1, cols)
+            def addrow(*widgets):
+                row = newtable.get_property('n-rows')
+                newtable.set_property('n-rows', row + 1)
+                if len(widgets) == 1:
+                    col = newtable.get_property('n-columns')
+                    newtable.attach(widgets[0], 0, col, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
+                else:
+                    for col, widget in enumerate(widgets):
+                        flag = gtk.FILL if col == 0 else gtk.FILL|gtk.EXPAND
+                        newtable.attach(widget, col, col + 1, row, row + 1, flag, 0, 4, 2)
+            return newtable, addrow
 
-        # add toolbar with tooltips
-        self.tbar = gtk.Toolbar()
-        self.tips = gtk.Tooltips()
+        # top layout table
+        table, addrow = createtable()
+        self.vbox.pack_start(table, True, True, 2)
 
-        self._btn_addtag = self._toolbutton(
-                gtk.STOCK_ADD, _('Add'),
-                self._btn_addtag_clicked,
-                tip=_('Add tag to selected version'))
-        self._btn_rmtag = self._toolbutton(
-                gtk.STOCK_DELETE, _('Remove'),
-                self._btn_rmtag_clicked,
-                tip=_('Remove tag from repository'))
-        tbuttons = [
-                self._btn_addtag,
-                self._btn_rmtag
-            ]
-        for btn in tbuttons:
-            self.tbar.insert(btn, -1)
-        vbox = gtk.VBox()
-        self.add(vbox)
-        vbox.pack_start(self.tbar, False, False, 2)
-
-        # tag name input
-        tagbox = gtk.HBox()
+        ## tag name input
         lbl = gtk.Label(_('Tag:'))
-        lbl.set_property('width-chars', 10)
-        lbl.set_alignment(0, 0.5)
+        lbl.set_alignment(1, 0.5)
         self._tagslist = gtk.ListStore(str)
         self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
         self._tag_input = self._taglistbox.get_child()
         self._tag_input.connect('activate', self._taginput_activated)
         self._tag_input.set_text(tag)
-        tagbox.pack_start(lbl, False, False)
-        tagbox.pack_start(self._taglistbox, True, True)
-        vbox.pack_start(tagbox, True, True, 2)
+        addrow(lbl, self._taglistbox)
 
-        # revision input
-        revbox = gtk.HBox()
+        ## revision input
         lbl = gtk.Label(_('Revision:'))
-        lbl.set_property('width-chars', 10)
-        lbl.set_alignment(0, 0.5)
+        lbl.set_alignment(1, 0.5)
+        hbox = gtk.HBox()
         self._rev_input = gtk.Entry()
+        self._rev_input.set_width_chars(12)
         self._rev_input.set_text(rev)
-        revbox.pack_start(lbl, False, False)
-        revbox.pack_start(self._rev_input, False, False)
-        vbox.pack_start(revbox, False, False, 2)
+        hbox.pack_start(self._rev_input, False, False)
+        hbox.pack_start(gtk.Label(''))
+        addrow(lbl, hbox)
+        
+        # advanced options expander
+        self.expander = gtk.Expander(_('Advanced options'))
+        self.vbox.pack_start(self.expander, True, True, 2)
 
-        # tag options
-        option_box = gtk.VBox()
+        # advanced options layout table
+        table, addrow = createtable()
+        self.expander.add(table)
+
+        ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
         self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
-        self._use_msg = gtk.CheckButton(_('Use custom commit message'))
-        option_box.pack_start(self._local_tag, False, False)
-        option_box.pack_start(self._replace_tag, False, False)
-        option_box.pack_start(self._use_msg, False, False)
-        vbox.pack_start(option_box, False, False, 15)
+        self._eng_msg = gtk.CheckButton(_('Use English commit message'))
+        addrow(self._local_tag)
+        addrow(self._replace_tag)
+        addrow(self._eng_msg)
 
-        # commit message
-        lbl = gtk.Label(_('Commit message:'))
-        lbl.set_alignment(0, 0.5)
+        ## custom commit message
+        self._use_msg = gtk.CheckButton(_('Use custom commit message:'))
+        self._use_msg.connect('toggled', self.msg_toggled)
+        addrow(self._use_msg)
         self._commit_message = gtk.Entry()
-        vbox.pack_end(self._commit_message, False, False, 1)
-        vbox.pack_end(lbl, False, False, 1)
+        self._commit_message.set_sensitive(False)
+        addrow(self._commit_message)
 
-        # focus on tag input
-        self._taglistbox.grab_focus()
-
-        # show them all
+        # prepare to show
+        self.load_settings()
         self._refresh()
-        vbox.show_all()
-
-    def _toolbutton(self, stock, label, handler,
-                    menu=None, userdata=None, tip=None):
-        if menu:
-            tbutton = gtk.MenuToolButton(stock)
-            tbutton.set_menu(menu)
-        else:
-            tbutton = gtk.ToolButton(stock)
-
-        tbutton.set_label(label)
-        if tip:
-            tbutton.set_tooltip(self.tips, tip)
-        tbutton.connect('clicked', handler, userdata)
-        return tbutton
+        self._taglistbox.grab_focus()
 
     def _refresh(self):
         """ update display on dialog with recent repo data """
@@ -140,21 +129,36 @@ class TagAddDialog(gtk.Window):
                 continue
             self._tagslist.append([tagname])
 
+    def load_settings(self):
+        expanded = self.settings.get_value('expanded', False, True)
+        self.expander.set_property('expanded', expanded)
+
+        checked = self.settings.get_value('english', False, True)
+        self._eng_msg.set_active(checked)
+
+    def store_settings(self):
+        expanded = self.expander.get_property('expanded')
+        self.settings.set_value('expanded', expanded)
+
+        checked = self._eng_msg.get_active()
+        self.settings.set_value('english', checked)
+
+        self.settings.write()
+
+    def msg_toggled(self, checkbutton):
+        state = checkbutton.get_active()
+        self._commit_message.set_sensitive(state)
+        if state:
+            self._commit_message.grab_focus()
+
+    def dialog_response(self, dialog, response_id):
+        self.store_settings()
+        if response_id == gtk.RESPONSE_CLOSE \
+                or response_id == gtk.RESPONSE_DELETE_EVENT:
+            self.destroy()
+
     def _taginput_activated(self, taginput):
         self._do_add_tag()
-
-    def _btn_tag_clicked(self, button):
-        """ select tag from tags dialog """
-        import tags
-        tag = tags.select(self.root)
-        if tag is not None:
-            self._tag_input.set_text(tag)
-
-    def _btn_addtag_clicked(self, button, data=None):
-        self._do_add_tag()
-
-    def _btn_rmtag_clicked(self, button, data=None):
-        self._do_rm_tag()
 
     def _do_add_tag(self):
         # gather input data
@@ -162,6 +166,7 @@ class TagAddDialog(gtk.Window):
         name = self._tag_input.get_text()
         rev = self._rev_input.get_text()
         force = self._replace_tag.get_active()
+        eng_msg = self._eng_msg.get_active()
         use_msg = self._use_msg.get_active()
         message = self._commit_message.get_text()
 
@@ -179,7 +184,8 @@ class TagAddDialog(gtk.Window):
 
         # add tag to repo
         try:
-            self._add_hg_tag(name, rev, message, is_local, force=force)
+            self._add_hg_tag(name, rev, message, is_local, force=force,
+                            english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been added') % name)
             self._refresh()
@@ -195,6 +201,7 @@ class TagAddDialog(gtk.Window):
         # gather input data
         is_local = self._local_tag.get_active()
         name = self._tag_input.get_text()
+        eng_msg = self._eng_msg.get_active()
         use_msg = self._use_msg.get_active()
 
         # verify input
@@ -210,7 +217,7 @@ class TagAddDialog(gtk.Window):
             message = ''
 
         try:
-            self._rm_hg_tag(name, message, is_local)
+            self._rm_hg_tag(name, message, is_local, english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been removed') % name)
             self._refresh()
@@ -224,7 +231,7 @@ class TagAddDialog(gtk.Window):
 
 
     def _add_hg_tag(self, name, revision, message, local, user=None,
-                    date=None, force=False):
+                    date=None, force=False, english=False):
         if name in self.repo.tags() and not force:
             raise util.Abort(_('a tag named "%s" already exists') % name)
 
@@ -232,17 +239,21 @@ class TagAddDialog(gtk.Window):
         r = ctx.node()
 
         if not message:
-            message = _('Added tag %s for changeset %s') % (name, str(ctx))
+            msgset = keep._('Added tag %s for changeset %s')
+            message = (english and msgset['id'] or msgset['str']) \
+                        % (name, str(ctx))
         if name in self.repo.tags() and not force:
             raise util.Abort(_("Tag '%s' already exist") % name)
 
         self.repo.tag(name, r, hglib.fromutf(message), local, user, date)
 
-    def _rm_hg_tag(self, name, message, local, user=None, date=None):
+    def _rm_hg_tag(self, name, message, local, user=None, date=None,
+                    english=False):
         if not name in self.repo.tags():
             raise util.Abort(_("Tag '%s' does not exist") % name)
 
         if not message:
-            message = _('Removed tag %s') % name
+            msgset = keep._('Removed tag %s')
+            message = (english and msgset['id'] or msgset['str']) % name
         r = self.repo[-1].node()
         self.repo.tag(name, r, message, local, user, date)

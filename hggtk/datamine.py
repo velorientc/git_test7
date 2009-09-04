@@ -19,7 +19,6 @@ from thgutil.i18n import _
 from thgutil import hglib
 from thgutil import thread2
 
-from hggtk.logview import treemodel
 from hggtk.logview.colormap import AnnotateColorMap, AnnotateColorSaturation
 from hggtk.logview.treeview import TreeView as LogTreeView
 
@@ -75,7 +74,6 @@ class DataMineDialog(gdialog.GDialog):
 
     def load_settings(self, settings):
         gdialog.GDialog.load_settings(self, settings)
-        self.connect('thg-close', self.close_current_page)
         self.tabwidth = hglib.gettabwidth(self.ui)
 
     def get_body(self):
@@ -83,6 +81,7 @@ class DataMineDialog(gdialog.GDialog):
         self.grep_cmenu = self.grep_context_menu()
         self.changedesc = {}
         self.newpagecount = 1
+        self.currev = None
         vbox = gtk.VBox()
         notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
@@ -91,6 +90,18 @@ class DataMineDialog(gdialog.GDialog):
         notebook.show()
         self.notebook = notebook
         vbox.pack_start(self.notebook, True, True, 2)
+
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'w')
+        notebook.add_accelerator('thg-close', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        notebook.connect('thg-close', self.close_notebook)
+        key, modifier = gtk.accelerator_parse(mod+'n')
+        notebook.add_accelerator('thg-new', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        notebook.connect('thg-new', self.new_notebook)
 
         self.stbar = gtklib.StatusBar()
         self.stbar.sttext.set_property('use-markup', True)
@@ -165,7 +176,8 @@ class DataMineDialog(gdialog.GDialog):
         return True
 
     def grep_thgdiff(self, treeview):
-        self._do_diff([], {'change' : self.currev})
+        if self.currev:
+            self._do_diff([], {'change' : self.currev})
 
     def grep_row_act(self, tree, path, column):
         'Default action is the first entry in the context menu'
@@ -202,6 +214,15 @@ class DataMineDialog(gdialog.GDialog):
         iconBox.show()
         return button
 
+    def close_notebook(self, notebook):
+        if notebook.get_n_pages() <= 1:
+            gtklib.thgexit(self)
+        else:
+            self.close_current_page()
+
+    def new_notebook(self, notebook):
+        self.add_search_page()
+
     def add_search_page(self):
         frame = gtk.Frame()
         frame.set_border_width(10)
@@ -220,7 +241,7 @@ class DataMineDialog(gdialog.GDialog):
         search_hbox.pack_start(includes, True, True, 4)
         search_hbox.pack_start(gtk.Label(_('Excludes:')), False, False, 4)
         search_hbox.pack_start(excludes, True, True, 4)
-        search_hbox.pack_start(search, False, False)
+        search_hbox.pack_start(search, False, False, 4)
         self.tooltips.set_tip(search, _('Start this search'))
         self.tooltips.set_tip(regexp, _('Regular expression search pattern'))
         self.tooltips.set_tip(includes, _('Comma separated list of'
@@ -421,11 +442,10 @@ class DataMineDialog(gdialog.GDialog):
             self.curpath = hglib.fromutf(model[paths][self.COL_PATH])
             self.stbar.set_status_text(hglib.toutf(model[paths][self.COL_TOOLTIP]))
 
-    def close_current_page(self, window):
+    def close_current_page(self):
         num = self.notebook.get_current_page()
         if num != -1 and self.notebook.get_n_pages():
             self.notebook.remove_page(num)
-            self.emit_stop_by_name('thg-close')
 
     def stop_current_search(self, button, widget):
         num = self.notebook.get_current_page()
@@ -446,8 +466,11 @@ class DataMineDialog(gdialog.GDialog):
     def close_page(self, button, widget):
         '''Close page button has been pressed'''
         num = self.notebook.page_num(widget)
-        if num != -1 and self.notebook.get_n_pages() > 1:
+        if num != -1:
             self.notebook.remove_page(num)
+            if self.notebook.get_n_pages() < 1:
+                self.newpagecount = 1
+                self.add_search_page()
 
     def add_header_context_menu(self, col, menu):
         lb = gtk.Label(col.get_title())
@@ -497,12 +520,18 @@ class DataMineDialog(gdialog.GDialog):
         frame.set_border_width(10)
         vbox = gtk.VBox()
 
+        graphopts = { 'date': None, 'no_merges':False, 'only_merges':False,
+                'keyword':[], 'branch':None, 'pats':[], 'revrange':[],
+                'revlist':[], 'noheads':False, 'orig-tip':len(self.repo),
+                'branch-view':False, 'rev':[] }
+        graphopts['filehist'] = path
+
         # File log revision graph
         graphview = LogTreeView(self.repo, 5000, self.stbar)
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
-        graphview.refresh(True, None, {'filehist':path, 'filerev':rev})
+        graphview.refresh(True, [path], graphopts)
         graphview.set_property('rev-column-visible', True)
-        graphview.set_property('date-column-visible', True)
+        graphview.set_property('age-column-visible', True)
 
         hbox = gtk.HBox()
         followlabel = gtk.Label('')
@@ -617,12 +646,16 @@ class DataMineDialog(gdialog.GDialog):
         treeview.get_column(col).set_visible(b)
 
     def log_selection_changed(self, graphview, path, label, button):
-        row = graphview.get_revision()
-        rev = row[treemodel.REVID]
-        self.currev = str(rev)
-        ctx = self.repo[rev]
-        filectx = ctx.filectx(path)
-        info = filectx.renamed()
+        treeview = graphview.treeview
+        (model, paths) = treeview.get_selection().get_selected_rows()
+        revid = graphview.get_revid_at_path(paths[0])
+        self.currev = str(revid)
+        ctx = self.repo[revid]
+        try:
+            filectx = ctx.filectx(path)
+            info = filectx.renamed()
+        except LookupError:
+            info = None
         if info:
             (rpath, node) = info
             fl = self.repo.file(rpath)
@@ -641,9 +674,8 @@ class DataMineDialog(gdialog.GDialog):
         self.add_annotate_page(path, rev)
 
     def log_activate(self, treeview, path, column, objs):
-        model = treeview.get_model()
-        logiter = model.get_iter(path)
-        rev = model.get_value(logiter, treemodel.REVID)
+        (frame, treeview, file, graphview) = objs
+        rev = graphview.get_revid_at_path(path)
         self.trigger_annotate(rev, objs)
 
     def revisions_loaded(self, graphview, rev):

@@ -76,14 +76,13 @@ class StatusBar(gtk.HBox):
         gtk.HBox.__init__(self)
         self.pbar = gtk.ProgressBar()
         self.sttext = gtk.Label("")
-        self.sttext.set_ellipsize(pango.ELLIPSIZE_END)
         self.sttext.set_alignment(0, 0.5)
 
         self.pbox = gtk.HBox()
         self.pbox.pack_start(gtk.VSeparator(), False, False)
         self.pbox.pack_start(self.pbar, False, False)
 
-        self.pack_start(self.sttext, padding=1)
+        self.pack_start(self.sttext, padding=4)
         if extra:
             self.pack_end(extra, False, False)
         self.pack_end(self.pbox, False, False, padding=1)
@@ -100,7 +99,7 @@ class StatusBar(gtk.HBox):
         self.set_status_text(msg)
         self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
 
-    def end(self, msg=_('Done'), unmap=True):
+    def end(self, msg='', unmap=True):
         gobject.source_remove(self._timeout_event)
         self.set_status_text(msg)
         if unmap:
@@ -318,3 +317,60 @@ class NativeFolderSelectDialog:
         if response == gtk.RESPONSE_OK:
             return fname
         return None
+
+def addspellcheck(textview, ui=None):
+    lang = None
+    if ui:
+        lang = ui.config('tortoisehg', 'spellcheck', None)
+    try:
+        import gtkspell
+        gtkspell.Spell(textview, lang)
+    except ImportError:
+        pass
+    else:
+        def selectlang(senderitem):
+            from hggtk import dialog
+            spell = gtkspell.get_from_text_view(textview)
+            lang = ''
+            while True:
+                msg = _('Select language for spell checking.\n\n'
+                        'Empty is for the default language.\n'
+                        'When all text is highlited, the dictionary\n'
+                        'is probably not installed.\n\n'
+                        'examples: en, en_GB, en_US')
+                if lang:
+                    msg = _('Lang "%s" can not be set.\n') % lang + msg
+                lang = dialog.entry_dialog(None, msg)
+                if lang is None: # cancel
+                    return
+                lang = lang.strip()
+                if not lang:
+                    lang = None # set default language from $LANG
+                try:
+                    spell.set_language(lang)
+                    return
+                except Exception, e:
+                    pass
+        def langmenu(textview, menu):
+            item = gtk.MenuItem(_('Spell Check Language'))
+            item.connect('activate', selectlang)
+            menuitems = menu.get_children()[:2]
+            x = menuitems[0].get_submenu()
+            if len(menuitems) >= 2 and menuitems[1].get_child() is None and menuitems[0].get_submenu():
+                # the spellcheck language menu seems to be at the top
+                menu.insert(item, 1)
+            else:
+                sep = gtk.SeparatorMenuItem()
+                sep.show()
+                menu.append(sep)
+                menu.append(item)
+            item.show()
+        textview.connect('populate-popup', langmenu)
+
+def hasspellcheck():
+    try:
+        import gtkspell
+        gtkspell.Spell
+        return True
+    except ImportError:
+        return False
