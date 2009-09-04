@@ -489,6 +489,7 @@ class GLog(gdialog.GDialog):
         
         # need mq extension for strip command
         if 'mq' in self.exs:
+            m.append(create_menu(_('qimport'), self.qimport_rev))
             m.append(create_menu(_('strip revision'), self.strip_rev))
 
         m.show_all()
@@ -520,10 +521,10 @@ class GLog(gdialog.GDialog):
             m.append(create_menu(_('rebase on top of selected'),
                      self.rebase_selected))
         
-        # need MQ extension for qimport / qfinish commands
+        # need MQ extension for qimport command
         if 'mq' in self.exs:
-            m.append(create_menu(_('import as MQ patches from here to selected'),
-                     self.mqimport_revs))
+            m.append(create_menu(_('qimport from here to selected'),
+                     self.qimport_revs))
         m.connect_after('selection-done', self.restore_original_selection)
         m.show_all()
         return m
@@ -865,12 +866,18 @@ class GLog(gdialog.GDialog):
             dlg.run()
             dlg.hide()
 
-    def mqimport_revs(self, menuitem):
-        """Import revision range as MQ patches."""
-        revrange = list(self.revrange)
-        revrange.sort()
-        revrange = '%s:%s' % (str(revrange[0]), str(revrange[1]))
-        cmdline = ['hg', 'qimport', '--rev', revrange]
+    def qimport_rev(self, menuitem):
+        """QImport selected revision."""
+        rev = str(self.currevid)
+        self.qimport_revs(menuitem, rev)
+
+    def qimport_revs(self, menuitem, rev=None):
+        """QImport revision range."""
+        if rev == None:
+            revs = list(self.revrange)
+            revs.sort()
+            rev = '%s:%s' % (str(revs[0]), str(revs[1]))
+        cmdline = ['hg', 'qimport', '--rev', rev]
         dialog = hgcmd.CmdDialog(cmdline)
         dialog.show_all()
         dialog.run()
@@ -879,6 +886,7 @@ class GLog(gdialog.GDialog):
         self.reload_log()
         self.changeview._buffer.set_text('')
         self.changeview._filelist.clear()
+        self.enable_mqpanel()
 
     def rebase_selected(self, menuitem):
         """Rebase revision on top of selection (1st on top of 2nd).""" 
