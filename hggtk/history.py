@@ -508,6 +508,8 @@ class GLog(gdialog.GDialog):
                  self.email_revs))
         m.append(create_menu(_('bundle from here to selected'),
                  self.bundle_revs))
+        m.append(create_menu(_('export patches from here to selected'),
+                 self.export_revs))
         self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
         m.append(self.cmenu_merge2)
         
@@ -845,6 +847,21 @@ class GLog(gdialog.GDialog):
         dlg.show_all()
         dlg.present()
         dlg.set_transient_for(None)
+
+    def export_revs(self, menuitem):
+        result = gtklib.NativeFolderSelectDialog(title=_('Save patches to'),
+                                                 initial=self.repo.root).run()
+        if result:
+            revs = list(self.revrange)
+            revs.sort()
+            rev = '%d:%d' % (revs[0], revs[1])
+            # In case new export args are added in the future, merge the
+            # hg defaults
+            opts= self.merge_opts(commands.table['^export'][1], ())
+            opts['output'] = os.path.join(result, '%b_rev%R.patch')
+            def dohgexport():
+                commands.export(self.ui,self.repo, rev, **opts)
+            s, o = self._hg_call_wrapper('Export', dohgexport, False)
 
     def bundle_revs(self, menuitem):
         revrange = list(self.revrange)
