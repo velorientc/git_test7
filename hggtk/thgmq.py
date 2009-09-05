@@ -182,7 +182,7 @@ class MQWidget(gtk.VBox):
         pane.add(self.list)
 
         ## command widget
-        self.cmd = hgcmd.CmdWidget(textview=False, buttons=True)
+        self.cmd = hgcmd.CmdWidget(style=hgcmd.STYLE_COMPACT)
         mainbox.pack_start(self.cmd, False, False)
 
         # accelerator

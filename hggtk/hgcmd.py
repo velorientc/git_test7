@@ -178,103 +178,148 @@ class CmdDialog(gtk.Dialog):
         else:
             return False
 
+# CmdWidget style constans
+STYLE_NORMAL  = 'normal'    # pbar + popup log viewer
+STYLE_COMPACT = 'compact'   # pbar + log viewer
+
 class CmdWidget(gtk.VBox):
 
-    def __init__(self, textview=True, progressbar=True, buttons=False):
+    def __init__(self, style=STYLE_NORMAL):
         gtk.VBox.__init__(self)
 
         self.hgthread = None
+        self.last_pbar_update = 0
 
-        # build UI
-        if textview:
-            cmdpane = gtk.ScrolledWindow()
-            cmdpane.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-            cmdpane.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-            self.textview = gtk.TextView(buffer=None)
-            self.textview.set_editable(False)
-            self.textview.modify_font(pango.FontDescription('Monospace'))
-            cmdpane.add(self.textview)
-            self.textbuffer = self.textview.get_buffer()
-            self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                       foreground='#900000')
-            self.pack_start(cmdpane)
+        # log viewer
+        if style == STYLE_NORMAL:
+            self.log = CmdLogWidget()
+            self.pack_start(log)
+        elif style == STYLE_COMPACT:
+            self.dlg = CmdLogDialog()
+            self.log = self.dlg.get_logwidget()
+        else:
+            pass #FIXME should raise exception?
 
-        if progressbar:
-            self.last_pbar_update = 0
+        # progress bar box
+        self.progbox = progbox = gtk.HBox()
+        self.pack_start(progbox)
 
-            self.progbox = progbox = gtk.HBox()
-            self.pack_start(progbox)
+        ## log button
+        if style == STYLE_COMPACT:
+            img = gtk.Image()
+            img.set_from_stock(gtk.STOCK_JUSTIFY_LEFT,
+                               gtk.ICON_SIZE_SMALL_TOOLBAR)
+            self.log_btn = gtk.Button()
+            self.log_btn.set_image(img)
+            self.log_btn.set_relief(gtk.RELIEF_NONE)
+            self.log_btn.set_focus_on_click(False)
+            self.log_btn.connect('clicked', self.log_clicked)
+            progbox.pack_start(self.log_btn, False, False)
 
-            if buttons:
-                img = gtk.Image()
-                img.set_from_stock(gtk.STOCK_JUSTIFY_LEFT,
-                                   gtk.ICON_SIZE_SMALL_TOOLBAR)
-                self.popup_btn = gtk.Button()
-                self.popup_btn.set_image(img)
-                self.popup_btn.set_relief(gtk.RELIEF_NONE)
-                self.popup_btn.set_focus_on_click(False)
-                progbox.pack_start(self.popup_btn, False, False)
+        ## progress bar
+        self.pbar = gtk.ProgressBar()
+        progbox.pack_start(self.pbar)
 
-            self.pbar = gtk.ProgressBar()
-            progbox.pack_start(self.pbar)
+        ## stop & close buttons
+        if style == STYLE_COMPACT:
+            img = gtk.Image()
+            img.set_from_stock(gtk.STOCK_STOP,
+                               gtk.ICON_SIZE_SMALL_TOOLBAR)
+            self.stop_btn = gtk.Button()
+            self.stop_btn.set_image(img)
+            self.stop_btn.set_relief(gtk.RELIEF_NONE)
+            self.stop_btn.set_focus_on_click(False)
+            self.stop_btn.connect('clicked', self.stop_clicked)
+            progbox.pack_start(self.stop_btn, False, False)
 
-            if buttons:
-                img = gtk.Image()
-                img.set_from_stock(gtk.STOCK_STOP,
-                                   gtk.ICON_SIZE_SMALL_TOOLBAR)
-                self.stop_btn = gtk.Button()
-                self.stop_btn.set_image(img)
-                self.stop_btn.set_relief(gtk.RELIEF_NONE)
-                self.stop_btn.set_focus_on_click(False)
-                self.stop_btn.connect('clicked', self.stop_clicked)
-                progbox.pack_start(self.stop_btn, False, False)
+            img = gtk.Image()
+            img.set_from_stock(gtk.STOCK_CLOSE,
+                               gtk.ICON_SIZE_SMALL_TOOLBAR)
+            self.close_btn = gtk.Button()
+            self.close_btn.set_image(img)
+            self.close_btn.set_relief(gtk.RELIEF_NONE)
+            self.close_btn.set_focus_on_click(False)
+            self.close_btn.connect('clicked', self.close_clicked)
+            progbox.pack_start(self.close_btn, False, False)
 
-                img = gtk.Image()
-                img.set_from_stock(gtk.STOCK_CLOSE,
-                                   gtk.ICON_SIZE_SMALL_TOOLBAR)
-                self.close_btn = gtk.Button()
-                self.close_btn.set_image(img)
-                self.close_btn.set_relief(gtk.RELIEF_NONE)
-                self.close_btn.set_focus_on_click(False)
-                self.close_btn.connect('clicked', self.close_clicked)
-                progbox.pack_start(self.close_btn, False, False)
-
-            def after_init():
-                self.set_pbar_visible(False)
-                self.stop_btn.hide()
-            gobject.idle_add(after_init)
+        def after_init():
+            self.set_pbar(False)
+            self.set_buttons(stop=False)
+        gobject.idle_add(after_init)
 
     ### public functions ###
 
     def execute(self, cmdline, callback, *args, **kargs):
+        """
+        Execute passed command line using 'hgthread'.
+        When the command terminated, callback function is called
+        with return code. 
+
+        cmdline: command line string.
+        callback: function called after terminated the thread.
+
+        def callback(returncode, ...)
+
+        returncode: See the description of 'hgthread' about return code.
+        """
         if self.hgthread and self.hgthread.isAlive():
             return
         if self.hgthread is None:
+            self.log.clear()
             self.hgthread = hgthread.HgThread(cmdline[1:])
             self.hgthread.start()
             gobject.timeout_add(10, self.process_queue, callback, args, kargs)
             def is_done():
-                # show progressbar if it's still working
+                # show progress bar if it's still working
                 if self.hgthread and self.hgthread.isAlive():
-                    self.set_pbar_visible(True)
-                    self.stop_btn.show()
-                    self.close_btn.hide()
+                    self.set_pbar(True)
+                    self.set_buttons(stop=True, close=False)
                 return False
             gobject.timeout_add(500, is_done)
 
     def stop(self):
+        """
+        Terminate the thread forcibly.
+        """
         if self.hgthread:
             self.hgthread.terminate()
+            self.set_pbar(True)
+            self.set_buttons(stop=False, close=True)
 
-    def set_pbar_visible(self, visible):
+    def set_pbar(self, visible):
+        """
+        Set visible property of the progress bar box.
+
+        visible: if True, the progress bar box is shown.
+        """
         if hasattr(self, 'progbox'):
             self.progbox.set_property('visible', visible)
 
-    def enable_buttons(self, popup=True, stop=True):
-        if hasattr(self, 'popup_btn'):
-            self.popup_btn.set_property('visible', popup)
-        if hasattr(self, 'stop_btn'):
+    def set_buttons(self, log=None, stop=None, close=None):
+        """
+        Set visible properties of buttons on the progress bar box.
+        If omitted all argments, it does nothing.
+
+        log: if True, log button is shown. (default: None)
+        stop: if True, stop button is shown. (default: None)
+        close: if True, close button is shown. (default: None)
+        """
+        if not log is None and hasattr(self, 'log_btn'):
+            self.log_btn.set_property('visible', log)
+        if not stop is None and hasattr(self, 'stop_btn'):
             self.stop_btn.set_property('visible', stop)
+        if not close is None and hasattr(self, 'close_btn'):
+            self.close_btn.set_property('visible', close)
+
+    def show_log(self):
+        """
+        Show log viewer.
+        """
+        if hasattr(self, 'dlg'):
+            if not self.dlg.get_property('visible'):
+                self.dlg.show_all()
+            else:
+                self.dlg.present()
 
     ### internal use functions ###
 
@@ -297,33 +342,33 @@ class CmdWidget(gtk.VBox):
         """
         self.hgthread.process_dialogs()
 
-        if hasattr(self, 'textbuffer'):
-            enditer = self.textbuffer.get_end_iter()
-            while self.hgthread.getqueue().qsize():
-                try:
-                    msg = self.hgthread.getqueue().get(0)
-                    self.textbuffer.insert(enditer, hglib.toutf(msg))
-                    self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
-                except Queue.Empty:
-                    pass
-            while self.hgthread.geterrqueue().qsize():
-                try:
-                    msg = self.hgthread.geterrqueue().get(0)
-                    self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
-                    self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
-                except Queue.Empty:
-                    pass
+        # output to buffer
+        while self.hgthread.getqueue().qsize():
+            try:
+                msg = self.hgthread.getqueue().get(0)
+                self.log.append(hglib.toutf(msg))
+            except Queue.Empty:
+                pass
+        while self.hgthread.geterrqueue().qsize():
+            try:
+                msg = self.hgthread.geterrqueue().get(0)
+                self.log.append(hglib.toutf(msg), error=True)
+            except Queue.Empty:
+                pass
+
+        # update progress bar
         self.update_progress()
+
+        # check thread
         if not self.hgthread.isAlive():
             returncode = self.hgthread.return_code()
             if returncode == 0:
-                self.set_pbar_visible(False)
+                self.set_pbar(False)
             else:
-                self.set_pbar_visible(True)
-                self.stop_btn.hide()
-                self.close_btn.show()
+                self.set_pbar(True)
+                self.set_buttons(stop=False, close=True)
             if returncode is None:
-                self.write(_('\n[command interrupted]'))
+                self.log.append(_('\n[command interrupted]'))
             self.hgthread = None
             def call_callback():
                 callback(returncode, *args, **kargs)
@@ -332,19 +377,94 @@ class CmdWidget(gtk.VBox):
         else:
             return True # Continue polling
 
-    def write(self, msg, append=True):
-        if hasattr(self, 'textbuffer'):
-            msg = hglib.toutf(msg)
-            if append:
-                enditer = self.textbuffer.get_end_iter()
-                self.textbuffer.insert(enditer, msg)
-            else:
-                self.textbuffer.set_text(msg)
-
     ### signal handlers ###
+
+    def log_clicked(self, button):
+        self.show_log()
 
     def stop_clicked(self, button):
         self.stop()
 
     def close_clicked(self, button):
-        self.set_pbar_visible(False)
+        self.set_pbar(False)
+
+class CmdLogWidget(gtk.VBox):
+
+    def __init__(self):
+        gtk.VBox.__init__(self)
+
+        # scrolled pane
+        pane = gtk.ScrolledWindow()
+        pane.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        pane.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.add(pane)
+
+        # log textview
+        self.textview = gtk.TextView(buffer=None)
+        self.textview.set_editable(False)
+        self.textview.modify_font(pango.FontDescription('Monospace'))
+        pane.add(self.textview)
+
+        # text buffer
+        self.buffer = self.textview.get_buffer()
+        self.buffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
+                               foreground='#900000')
+
+    ### public functions ###
+
+    def append(self, text, error=False):
+        """
+        Insert the text to the end of TextView.
+
+        text: string you want to append.
+        error: if True, append text with 'error' tag. (default: False)
+        """
+        enditer = self.buffer.get_end_iter()
+        if error:
+            self.buffer.insert_with_tags_by_name(enditer, text, 'error')
+        else:
+            self.buffer.insert(enditer, text)
+        self.textview.scroll_to_mark(self.buffer.get_insert(), 0)
+
+    def clear(self):
+        """
+        Clear all text in TextView.
+        """
+        self.buffer.delete(self.buffer.get_start_iter(),
+                           self.buffer.get_end_iter())
+
+class CmdLogDialog(gtk.Window):
+
+    def __init__(self, title=_('Command Log')):
+        gtk.Window.__init__(self, type=gtk.WINDOW_TOPLEVEL)
+        gtklib.set_tortoise_icon(self, 'hg.ico')
+        self.set_title(title)
+        self.set_default_size(320, 240)
+        self.connect('delete-event', self.delete_event)
+
+        # log viewer & buffer
+        self.log = CmdLogWidget()
+        self.add(self.log)
+
+        # change window decorations
+        self.realize()
+        if self.window:
+            self.window.set_decorations(gtk.gdk.DECOR_BORDER | \
+                                        gtk.gdk.DECOR_RESIZEH | \
+                                        gtk.gdk.DECOR_TITLE | \
+                                        gtk.gdk.DECOR_MENU | \
+                                        gtk.gdk.DECOR_MINIMIZE)
+
+    ### public functions ###
+
+    def get_logwidget(self):
+        """
+        Return CmdLogWidget instance.
+        """
+        return self.log
+
+    ### signal handlers ###
+
+    def delete_event(self, widget, event):
+        self.hide()
+        return True
