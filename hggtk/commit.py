@@ -485,7 +485,9 @@ class GCommit(GStatus):
             if self.qnew:
                 c_btn.set_label(_('QNew'))
                 c_btn.set_tooltip(self.tooltips, _('create new MQ patch'))
-                self._hg_call_wrapper('Status', self.do_reload_status)
+                self.reload_status()
+                self.qnew_name.grab_focus()
+                self.qnew_name.set_position(-1)
             else:
                 c_btn.set_label(_('QRefresh'))
                 c_btn.set_tooltip(self.tooltips, _('refresh top MQ patch'))
