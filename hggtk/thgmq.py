@@ -479,7 +479,7 @@ class MQWidget(gtk.VBox):
     def row_sep_func(self, model, iter, data=None):
         return model[iter][MQ_INDEX] == INDEX_SEPARATOR;
 
-    def list_popup_menu(self, list, path):
+    def show_patch_cmenu(self, list, path):
         row = self.model[path]
         if row[MQ_INDEX] == INDEX_SEPARATOR:
             return
@@ -499,7 +499,7 @@ class MQWidget(gtk.VBox):
         is_qparent = row[MQ_INDEX] == INDEX_QPARENT
         is_applied = row[MQ_STATUS] == 'A'
 
-        if is_operable and not is_qtip:
+        if is_operable and not is_qtip and (not is_qparent or has_applied):
             append(_('_goto'), self.goto_activated)
         if has_patch and not is_qparent:
             append(_('_rename'), self.rename_activated)
@@ -510,9 +510,9 @@ class MQWidget(gtk.VBox):
             if has_applied and not is_qparent:
                 append(_('f_old'), self.fold_activated)
 
-        menu.show_all()
-        menu.popup(None, None, None, 0, 0)
-        return True
+        if len(menu.get_children()) > 0:
+            menu.show_all()
+            menu.popup(None, None, None, 0, 0)
 
     def create_view_menu(self):
         menu = gtk.Menu()
@@ -611,7 +611,7 @@ class MQWidget(gtk.VBox):
                 gobject.idle_add(unselect)
         elif event.button == 3:
             if pathinfo:
-                self.list_popup_menu(self.list, pathinfo[0])
+                self.show_patch_cmenu(self.list, pathinfo[0])
 
     def list_sel_changed(self, list):
         path, focus = list.get_cursor()
