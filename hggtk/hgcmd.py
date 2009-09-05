@@ -265,17 +265,24 @@ class CmdWidget(gtk.VBox):
         if self.hgthread and self.hgthread.isAlive():
             return
         if self.hgthread is None:
+            # clear previous logs
             self.log.clear()
+
+            # prepare UI
+            self.set_buttons(stop=True, close=False)
+            self.already_opened = self.get_pbar()
+            if not self.already_opened:
+                def is_done():
+                    # show progress bar if it's still working
+                    if self.hgthread and self.hgthread.isAlive():
+                        self.set_pbar(True)
+                    return False
+                gobject.timeout_add(500, is_done)
+
+            # thread start
             self.hgthread = hgthread.HgThread(cmdline[1:])
             self.hgthread.start()
             gobject.timeout_add(10, self.process_queue, callback, args, kargs)
-            def is_done():
-                # show progress bar if it's still working
-                if self.hgthread and self.hgthread.isAlive():
-                    self.set_pbar(True)
-                    self.set_buttons(stop=True, close=False)
-                return False
-            gobject.timeout_add(500, is_done)
 
     def stop(self):
         """
@@ -294,6 +301,15 @@ class CmdWidget(gtk.VBox):
         """
         if hasattr(self, 'progbox'):
             self.progbox.set_property('visible', visible)
+
+    def get_pbar(self):
+        """
+        Return 'visible' property of the progress bar box.
+        If not exists progress bar, it always returns False.
+        """
+        if hasattr(self, 'progbox'):
+            return self.progbox.get_property('visible')
+        return False
 
     def set_buttons(self, log=None, stop=None, close=None):
         """
@@ -337,9 +353,7 @@ class CmdWidget(gtk.VBox):
             self.pbar.pulse()
 
     def process_queue(self, callback, args, kargs):
-        """
-        Handle all the messages currently in the queue (if any).
-        """
+        # process queue
         self.hgthread.process_dialogs()
 
         # output to buffer
@@ -362,7 +376,7 @@ class CmdWidget(gtk.VBox):
         # check thread
         if not self.hgthread.isAlive():
             returncode = self.hgthread.return_code()
-            if returncode == 0:
+            if returncode == 0 and not self.already_opened:
                 self.set_pbar(False)
             else:
                 self.set_pbar(True)
@@ -442,7 +456,7 @@ class CmdLogDialog(gtk.Window):
         self.set_default_size(320, 240)
         self.connect('delete-event', self.delete_event)
 
-        # log viewer & buffer
+        # log viewer
         self.log = CmdLogWidget()
         self.add(self.log)
 
