@@ -25,7 +25,7 @@ MQ_SUMMARY = 3
 INDEX_SEPARATOR = -1
 INDEX_QPARENT   = -2
 
-class MQWidget(gtk.HBox):
+class MQWidget(gtk.VBox):
 
     __gproperties__ = {
         'index-column-visible': (gobject.TYPE_BOOLEAN,
@@ -66,18 +66,47 @@ class MQWidget(gtk.HBox):
     }
 
     def __init__(self, repo, accelgroup=None):
-        gtk.HBox.__init__(self)
+        gtk.VBox.__init__(self)
 
         self.repo = repo
         self.mqloaded = hasattr(repo, 'mq')
 
-        # side toolbar
+        # top toolbar
         toolbar = gtk.Toolbar()
         toolbar.set_style(gtk.TOOLBAR_ICONS)
-        toolbar.set_orientation(gtk.ORIENTATION_VERTICAL)
+        toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
         toolbar.set_property('icon-size', gtk.ICON_SIZE_SMALL_TOOLBAR)
 
         self.btn = {}
+
+        popallbtn = gtk.ToolButton(gtk.STOCK_GOTO_FIRST)
+        popallbtn.set_tooltip_text(_('Unapply all patches'))
+        popallbtn.connect('clicked', self.popall_clicked)
+        toolbar.insert(popallbtn, -1)
+        self.btn['popall'] = popallbtn
+
+        popbtn = gtk.ToolButton(gtk.STOCK_GO_BACK)
+        popbtn.set_tooltip_text(_('Unapply last patch'))
+        popbtn.connect('clicked', self.pop_clicked)
+        toolbar.insert(popbtn, -1)
+        self.btn['pop'] = popbtn
+
+        pushbtn = gtk.ToolButton(gtk.STOCK_GO_FORWARD)
+        pushbtn.set_tooltip_text(_('Apply next patch'))
+        pushbtn.connect('clicked', self.push_clicked)
+        toolbar.insert(pushbtn, -1)
+        self.btn['push'] = pushbtn
+
+        pushallbtn = gtk.ToolButton(gtk.STOCK_GOTO_LAST)
+        pushallbtn.set_tooltip_text(_('Apply all patches'))
+        pushallbtn.connect('clicked', self.pushall_clicked)
+        toolbar.insert(pushallbtn, -1)
+        self.btn['pushall'] = pushallbtn
+
+        sep = gtk.SeparatorToolItem()
+        sep.set_draw(False)
+        sep.set_expand(True)
+        toolbar.insert(sep, -1)
 
         menubtn = gtk.MenuToolButton('')
         menubtn.set_menu(self.create_view_menu())
@@ -89,34 +118,9 @@ class MQWidget(gtk.HBox):
             menubtn.child.get_children()[0].hide()
         gobject.idle_add(after_init)
 
-        popallbtn = gtk.ToolButton(gtk.STOCK_GOTO_TOP)
-        popallbtn.connect('clicked', self.popall_clicked)
-        toolbar.insert(popallbtn, -1)
-        self.btn['popall'] = popallbtn
-
-        popbtn = gtk.ToolButton(gtk.STOCK_GO_UP)
-        popbtn.connect('clicked', self.pop_clicked)
-        toolbar.insert(popbtn, -1)
-        self.btn['pop'] = popbtn
-
-        sep = gtk.SeparatorToolItem()
-        sep.set_draw(False)
-        sep.set_expand(True)
-        toolbar.insert(sep, -1)
-
-        pushbtn = gtk.ToolButton(gtk.STOCK_GO_DOWN)
-        pushbtn.connect('clicked', self.push_clicked)
-        toolbar.insert(pushbtn, -1)
-        self.btn['push'] = pushbtn
-
-        pushallbtn = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
-        pushallbtn.connect('clicked', self.pushall_clicked)
-        toolbar.insert(pushallbtn, -1)
-        self.btn['pushall'] = pushallbtn
 
         self.pack_start(toolbar, False, False)
 
-        # right box
         mainbox = gtk.VBox()
         self.pack_start(mainbox, True, True)
 
