@@ -134,10 +134,6 @@ class GCommit(GStatus):
     def parse_opts(self):
         GStatus.parse_opts(self)
 
-        # Need an entry, because extdiff code expects it
-        if not self.test_opt('rev'):
-            self.opts['rev'] = ''
-
     def get_title(self):
         root = hglib.toutf(os.path.basename(self.repo.root))
         user = self.opts.get('user')
