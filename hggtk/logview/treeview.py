@@ -375,11 +375,6 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.set_search_equal_func(self.search_in_tree, None)
         self.set_author_color()
 
-        # Fix old PyGTK (<1.12) bug - by JAM
-        set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
-        if set_tooltip is not None:
-            set_tooltip(treemodel.MESSAGE)
-
         self.treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
         self.treeview.connect("cursor-changed", self._on_selection_changed)
         self.treeview.set_property('fixed-height-mode', True)
