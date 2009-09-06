@@ -162,15 +162,21 @@ class GCommit(GStatus):
     def save_settings(self):
         settings = GStatus.save_settings(self)
         settings['commit-vpane'] = self.vpaned.get_position()
+        settings['showparents'] = self.showparents
+        settings['showadvanced'] = self.showadvanced
         return settings
 
 
     def load_settings(self, settings):
         self.connect('delete-event', self.delete)
         GStatus.load_settings(self, settings)
-        self._setting_vpos = -1
+        self.setting_vpos = -1
+        self.showparents = True
+        self.showadvanced = False
         try:
-            self._setting_vpos = settings['commit-vpane']
+            self.setting_vpos = settings['commit-vpane']
+            self.showparents = settings['showparents']
+            self.showadvanced = settings['showadvanced']
         except KeyError:
             pass
 
@@ -267,6 +273,14 @@ class GCommit(GStatus):
         vbox.pack_start(mbox, False, False)
         self._mru_messages = self.settings.mrul('recent_messages')
 
+        vmenu = gtk.MenuToolButton('')
+        # A MenuToolButton has two parts; a Button and a ToggleButton
+        # we want to see the togglebutton, but not the button
+        b = vmenu.child.get_children()[0]
+        b.unmap()
+        b.set_sensitive(False)
+        mbox.pack_start(vmenu, False, False, 2)
+
         frame = gtk.Frame()
         frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
@@ -307,6 +321,8 @@ class GCommit(GStatus):
         self.advanced_frame.add(adv_hbox)
         vbox.pack_start(self.advanced_frame, False, False, 2)
 
+        vmenu.set_menu(self.view_menu())
+
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
         self.vpaned.pack2(status_body, shrink=False)
@@ -315,6 +331,37 @@ class GCommit(GStatus):
 
     ### End of overridable methods ###
 
+
+    def view_menu(self):
+        menu = gtk.Menu()
+
+        button = gtk.CheckMenuItem(_('Show Parents'))
+        button.connect('toggled', self.toggle_view, 'parents')
+        button.set_active(self.showparents)
+        button.set_draw_as_radio(True)
+        menu.append(button)
+
+        button = gtk.CheckMenuItem(_('Show Advanced'))
+        button.connect('toggled', self.toggle_view, 'advanced')
+        button.set_active(self.showadvanced)
+        button.set_draw_as_radio(True)
+        menu.append(button)
+        menu.show_all()
+        return menu
+
+    def toggle_view(self, button, type):
+        if type == 'parents':
+            self.showparents = button.get_active()
+            if self.showparents:
+                self.parents_frame.show()
+            else:
+                self.parents_frame.hide()
+        elif type == 'advanced':
+            self.showadvanced = button.get_active()
+            if self.showadvanced:
+                self.advanced_frame.show()
+            else:
+                self.advanced_frame.hide()
 
     def changed_cb(self, combobox):
         model = combobox.get_model()
@@ -433,7 +480,11 @@ class GCommit(GStatus):
                     _('no parent is a head, commit to add a new head'))
 
     def realize_settings(self):
-        self.vpaned.set_position(self._setting_vpos)
+        self.vpaned.set_position(self.setting_vpos)
+        if not self.showparents:
+            self.parents_frame.hide()
+        if not self.showadvanced:
+            self.advanced_frame.hide()
 
     def thgaccept(self, window):
         self.commit_clicked(None)
