@@ -196,51 +196,41 @@ class GCommit(GStatus):
 
         return tbbuttons
 
+    def should_live(self, widget=None, event=None):
+        # If there are more than a few character typed into the commit
+        # message, ask if the exit should continue.
+        live = False
+        buf = self.text.get_buffer()
+        if buf.get_char_count() > 10 and buf.get_modified():
+            # response: 0=Yes, 1=No, 2=Cancel
+            response = gdialog.CustomPrompt(_('Confirm Exit'),
+                _('Save commit message at exit?'), self,
+                (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+            if response == 0:
+                begin, end = buf.get_bounds()
+                self.update_recent_messages(buf.get_text(begin, end))
+                buf.set_modified(False)
+            elif response == 2:
+                live = True
+        if not live:
+            self._destroying(widget)
+        return live
 
-    def changed_cb(self, combobox):
-        model = combobox.get_model()
-        index = combobox.get_active()
-        if index >= 0:
-            buf = self.text.get_buffer()
-            if buf.get_char_count() and buf.get_modified():
-                response = gdialog.Confirm(_('Confirm Discard Message'),
-                        [], self, _('Discard current commit message?')).run()
-                if response != gtk.RESPONSE_YES:
-                    combobox.set_active(-1)
-                    return
-            buf.set_text(model[index][1])
-            buf.set_modified(False)
 
-    def first_msg_popdown(self, combo, shown):
-        combo.disconnect(self.popupid)
-        self.popupid = None
-        self.update_recent_messages()
-
-    def update_recent_messages(self, msg=None):
-        if msg is not None:
-            self._mru_messages.add(msg)
-            self.settings.write()
-            if self.popupid is not None: return
-        liststore = self.msg_cbbox.get_model()
-        liststore.clear()
-        for msg in self._mru_messages:
-            sumline = hglib.toutf(hglib.tounicode(msg).splitlines()[0])
-            liststore.append([sumline, msg])
-
-    def branch_clicked(self, button):
-        if self.merging:
-            mb = [p.branch() for p in self.repo.parents()]
-        else:
-            mb = None
-        dialog = BranchOperationDialog(self.nextbranch, self.closebranch, mb)
-        dialog.run()
-        self.nextbranch = None
-        self.closebranch = False
-        if dialog.newbranch:
-            self.nextbranch = dialog.newbranch
-        elif dialog.closebranch:
-            self.closebranch = True
+    def refresh_complete(self):
+        self.check_merge()
+        self.check_patch_queue()
+        self.check_undo()
         self.refresh_branchop()
+        self.update_parent_labels()
+        if not self.comitter_entry.get_text():
+            username = self.repo.ui.config('ui', 'username', '')
+            self.comitter_entry.set_text(hglib.toutf(username))
+        if not self.autoinc_entry.get_text():
+            autoinc = self.repo.ui.config('tortoisehg', 'autoinc', '')
+            self.autoinc_entry.set_text(hglib.toutf(autoinc))
+        if self.qnew:
+            self.qnew_name.grab_focus() # set focus back
 
     def get_body(self):
         status_body = GStatus.get_body(self)
@@ -326,6 +316,54 @@ class GCommit(GStatus):
         self.vpaned.pack2(status_body, shrink=False)
         gobject.idle_add(self.realize_settings)
         return self.vpaned
+
+    ### End of overridable methods ###
+
+
+    def changed_cb(self, combobox):
+        model = combobox.get_model()
+        index = combobox.get_active()
+        if index >= 0:
+            buf = self.text.get_buffer()
+            if buf.get_char_count() and buf.get_modified():
+                response = gdialog.Confirm(_('Confirm Discard Message'),
+                        [], self, _('Discard current commit message?')).run()
+                if response != gtk.RESPONSE_YES:
+                    combobox.set_active(-1)
+                    return
+            buf.set_text(model[index][1])
+            buf.set_modified(False)
+
+    def first_msg_popdown(self, combo, shown):
+        combo.disconnect(self.popupid)
+        self.popupid = None
+        self.update_recent_messages()
+
+    def update_recent_messages(self, msg=None):
+        if msg is not None:
+            self._mru_messages.add(msg)
+            self.settings.write()
+            if self.popupid is not None: return
+        liststore = self.msg_cbbox.get_model()
+        liststore.clear()
+        for msg in self._mru_messages:
+            sumline = hglib.toutf(hglib.tounicode(msg).splitlines()[0])
+            liststore.append([sumline, msg])
+
+    def branch_clicked(self, button):
+        if self.merging:
+            mb = [p.branch() for p in self.repo.parents()]
+        else:
+            mb = None
+        dialog = BranchOperationDialog(self.nextbranch, self.closebranch, mb)
+        dialog.run()
+        self.nextbranch = None
+        self.closebranch = False
+        if dialog.newbranch:
+            self.nextbranch = dialog.newbranch
+        elif dialog.closebranch:
+            self.closebranch = True
+        self.refresh_branchop()
 
     def update_parent_labels(self):
         
@@ -421,44 +459,6 @@ class GCommit(GStatus):
             self.destroy()
         else:
             return True
-
-    def should_live(self, widget=None, event=None):
-        # If there are more than a few character typed into the commit
-        # message, ask if the exit should continue.
-        live = False
-        buf = self.text.get_buffer()
-        if buf.get_char_count() > 10 and buf.get_modified():
-            # response: 0=Yes, 1=No, 2=Cancel
-            response = gdialog.CustomPrompt(_('Confirm Exit'),
-                _('Save commit message at exit?'), self,
-                (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
-            if response == 0:
-                begin, end = buf.get_bounds()
-                self.update_recent_messages(buf.get_text(begin, end))
-                buf.set_modified(False)
-            elif response == 2:
-                live = True
-        if not live:
-            self._destroying(widget)
-        return live
-
-
-    def refresh_complete(self):
-        self.check_merge()
-        self.check_patch_queue()
-        self.check_undo()
-        self.refresh_branchop()
-        self.update_parent_labels()
-        if not self.comitter_entry.get_text():
-            username = self.repo.ui.config('ui', 'username', '')
-            self.comitter_entry.set_text(hglib.toutf(username))
-        if not self.autoinc_entry.get_text():
-            autoinc = self.repo.ui.config('tortoisehg', 'autoinc', '')
-            self.autoinc_entry.set_text(hglib.toutf(autoinc))
-        if self.qnew:
-            self.qnew_name.grab_focus() # set focus back
-
-    ### End of overridable methods ###
 
     def refresh_branchop(self):
         if self.nextbranch:
