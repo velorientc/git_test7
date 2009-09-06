@@ -63,7 +63,7 @@ class GLog(gdialog.GDialog):
                 gtk.SeparatorToolItem(),
                 self.make_toolbutton(gtk.STOCK_JUMP_TO,
                     _('Select Revision'),
-                    self.goto_clicked,
+                    self.goto_clicked, menu=self.gorev_menu(),
                     tip=_('Select revision')),
                 gtk.SeparatorToolItem(),
                 self.make_toolbutton(gtk.STOCK_REFRESH,
@@ -528,6 +528,22 @@ class GLog(gdialog.GDialog):
             m.append(create_menu(_('qimport from here to selected'),
                      self.qimport_revs))
         m.connect_after('selection-done', self.restore_original_selection)
+        m.show_all()
+        return m
+
+    def gorev_menu(self):
+        m = gtk.Menu()
+
+        def goto_tip(menuitem):
+            self.goto_rev(self.repo['tip'].node())
+        m.append(create_menu(_('tip'), goto_tip))
+
+        def goto_parent(menuitem):
+            self.goto_rev(self.repo['.'].node())
+        m.append(create_menu(_('parent'), goto_parent))
+
+        # TODO: last merged, qtip, qparent, qbase, tags
+
         m.show_all()
         return m
 
