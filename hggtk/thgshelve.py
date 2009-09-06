@@ -92,9 +92,9 @@ class GShelve(GStatus):
             self.shelve_selected(files)
             self.activate_shelve_buttons(True)
         if self.merging:
-            return []
+            return ()
         else:
-            return (_('_shelve'), commit, 'MAR')
+            return ((_('_shelve'), shelve, 'MAR'),)
 
 
     def should_live(self, widget=None, event=None):
