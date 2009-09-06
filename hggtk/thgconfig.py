@@ -673,12 +673,16 @@ class ConfigDialog(gtk.Dialog):
 
     def should_live(self, *args):
         if self.dirty and not self.readonly:
-            ret = gdialog.Confirm(_('Confirm quit without saving?'), [], self,
-                            _('Yes to abandon changes, No to continue')).run()
-            if ret != gtk.RESPONSE_YES:
+            ret = gdialog.CustomPrompt(_('Confirm Exit'),
+                        _("Exit after saving changes?"), self,
+                        (_('&Yes'), _('&No (discard changes)'),
+                         _('&Cancel')), default=2, esc=2).run()
+            if ret == 2:
                 if len(args) != 0:
                    self.emit_stop_by_name('response')
                 return True
+            elif ret == 0:
+                self._apply_clicked()
         return False
 
     def focus_field(self, focusfield):
