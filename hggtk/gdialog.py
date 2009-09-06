@@ -140,6 +140,7 @@ class GDialog(gtk.Window):
 
     def refreshui(self):
         self.ui = ui.ui()
+        self.ui.setconfig('ui', 'interactive', 'off')
         if self.repo:
             self.repo = hg.repository(self.ui, path=self.repo.root)
 
