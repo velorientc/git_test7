@@ -127,6 +127,13 @@ class GLog(gdialog.GDialog):
         if self.graphcol != active:
             self.graphcol = active
             self.reload_log()
+            self.compactgraph_button.set_sensitive(self.graphcol)
+
+    def toggle_compactgraph(self, button):
+        active = button.get_active()
+        if self.compactgraph != active:
+            self.compactgraph = active
+            self.reload_log()         
 
     def toggle_show_filterbar(self, button, property):
         self.show_filterbar = button.get_active()
@@ -236,6 +243,15 @@ class GLog(gdialog.GDialog):
         button.set_active(self.graphcol)
         button.set_draw_as_radio(True)
         menu.append(button)
+
+        button = gtk.CheckMenuItem(_('Compact Graph'))
+        button.connect('toggled', self.toggle_compactgraph)
+        button.set_active(self.compactgraph)
+        button.set_draw_as_radio(True)
+        button.set_sensitive(self.graphcol)
+        menu.append(button)
+        self.compactgraph_button = button
+
         button = gtk.CheckMenuItem(_('Show Rev'))
         button.connect('toggled', self.toggle_view_column,
                 'rev-column-visible')
@@ -346,6 +362,7 @@ class GLog(gdialog.GDialog):
         settings['branch-color'] = self.graphview.get_property('branch-color')
         settings['show-filterbar'] = self.show_filterbar
         settings['graphcol'] = self.graphcol
+        settings['compactgraph'] = self.compactgraph
         for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
@@ -359,6 +376,7 @@ class GLog(gdialog.GDialog):
         self.branch_color = False
         self.show_filterbar = True
         self.graphcol = True
+        self.compactgraph = False
         self.showcol = {}
         try:
             self.setting_vpos = settings['glog-vpane']
@@ -369,6 +387,7 @@ class GLog(gdialog.GDialog):
                 vis = settings['glog-vis-'+col]
                 self.showcol[col] = vis
             self.graphcol = settings['graphcol']
+            self.compactgraph = settings['compactgraph']
         except KeyError:
             pass
 
@@ -386,7 +405,7 @@ class GLog(gdialog.GDialog):
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
                 'revrange':[], 'revlist':[], 'noheads':False,
-                'branch-view':False, 'rev':[] }
+                'branch-view':self.compactgraph, 'rev':[] }
         opts.update(kwopts)
 
         # handle strips, rebases, etc
@@ -420,9 +439,6 @@ class GLog(gdialog.GDialog):
                 self.graphview.refresh(False, pats, opts)
         elif self.filter == 'all':
             ftitle(None)
-            self.graphview.refresh(self.graphcol, None, opts)
-        elif self.filter == 'branches':
-            opts['branch-view'] = True
             self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'new':
             ftitle(_('new revisions'))
@@ -621,10 +637,6 @@ class GLog(gdialog.GDialog):
         all.set_active(True)
         all.connect('toggled', self.filter_selected, 'all')
         filterbox.pack_start(all, False)
-
-        all_compact = gtk.RadioButton(all, _('branches'))
-        all_compact.connect('toggled', self.filter_selected, 'branches')
-        filterbox.pack_start(all_compact, False)
 
         self.newbutton = gtk.RadioButton(all, _('new'))
         self.newbutton.connect('toggled', self.filter_selected, 'new')
