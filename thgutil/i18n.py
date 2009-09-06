@@ -25,3 +25,6 @@ def agettext(message):
     except (LookupError, UnicodeEncodeError):
         return message
 
+class keepgettext():
+    def _(self, message):
+        return {'id': message, 'str': _(message)}

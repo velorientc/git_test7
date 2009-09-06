@@ -19,14 +19,17 @@ import gobject
 import pango
 import cairo
 
+# Styles used when rendering revision graph edges
+style_SOLID = 0
+style_DASHED = 1
 
 class CellRendererGraph(gtk.GenericCellRenderer):
     """Cell renderer for directed graph.
 
     Properties:
       node              (column, colour) tuple to draw revision node,
-      in_lines          (start, end, colour) tuple list to draw inward lines,
-      out_lines         (start, end, colour) tuple list to draw outward lines.
+      in_lines          (start, end, colour, style) tuple list to draw inward lines,
+      out_lines         (start, end, colour, style) tuple list to draw outward lines.
     """
 
     columns_len = 0
@@ -73,7 +76,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ascent = pango.PIXELS(metrics.get_ascent())
             descent = pango.PIXELS(metrics.get_descent())
 
-            self._box_size = ascent + descent + 6
+            self._box_size = ascent + descent
             return self._box_size
 
     def set_colour(self, ctx, colour, bg, fg):
@@ -144,16 +147,22 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
 
         # Draw lines into the cell
-        for start, end, colour in self.in_lines:
+        for start, end, colour, type in self.in_lines:
+            style = style_SOLID
+            if type & 1:
+                style = style_DASHED
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y, bg_area.height,
-                         start, end, colour)
+                         start, end, colour, style)
 
         # Draw lines out of the cell
-        for start, end, colour in self.out_lines:
+        for start, end, colour, type in self.out_lines:
+            style = style_SOLID
+            if type & 2:
+                style = style_DASHED
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y + bg_area.height, bg_area.height,
-                         start, end, colour)
+                         start, end, colour, style)
 
         # Draw the revision node in the right column
         (column, colour) = self.node
@@ -168,7 +177,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         ctx.fill()
 
     def render_line (self, ctx, cell_area, box_size, mid,
-            height, start, end, colour):
+            height, start, end, colour, style):
         if start is None:
             x = cell_area.x + box_size * end + box_size / 2
             ctx.move_to(x, mid + height / 3)
@@ -200,4 +209,8 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                              endx, mid + height / 2)
 
         self.set_colour(ctx, colour, 0.0, 0.65)
+        if style == style_DASHED:
+            dashes = [1, 2]
+            ctx.set_dash(dashes)
         ctx.stroke()
+        ctx.set_dash([])
