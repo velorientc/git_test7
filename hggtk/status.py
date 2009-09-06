@@ -1413,9 +1413,10 @@ class GStatus(gdialog.GDialog):
         for label, func, stats in self.get_custom_menus():
             make(label, func, stats)
 
-        menu.show_all()
-        menu.popup(None, None, None, 0, 0)
-        return True
+        if len(menu.get_children()) > 0:
+            menu.show_all()
+            menu.popup(None, None, None, 0, 0)
+            return True
 
 
     def tree_key_press(self, tree, event):
