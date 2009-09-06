@@ -77,7 +77,12 @@ _commit_info = (
          ' set, the popup menu can be used to format'
          ' the message and a warning will be issued'
          ' if any lines are too long at commit.'
-         '  Default: 0 (unenforced)')))
+         '  Default: 0 (unenforced)')),
+    (_('Auto Commit List'), 'tortoisehg.autoinc', [],
+       _('Comma separated list of files that are automatically included'
+         ' in every commit.  Intended for use only as a repository setting.'
+         '  Default: None'))
+       )
 
 _log_info = (
     (_('Author Coloring'), 'tortoisehg.authorcolor', ['False', 'True'],

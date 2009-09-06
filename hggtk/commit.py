@@ -308,6 +308,19 @@ class GCommit(GStatus):
         self.parent2_label = plabel()
         vbox.pack_start(self.parents_frame, False, False)
 
+        self.advanced_frame = gtk.Frame(_('Advanced'))
+        adv_hbox = gtk.HBox(spacing=2)
+        adv_hbox.pack_start(gtk.Label(_('Comitter:')), False, False, 2)
+        self.comitter_entry = gtk.Entry()
+        adv_hbox.pack_start(self.comitter_entry, True, True, 2)
+        adv_hbox.pack_start(gtk.Label(_('Auto-includes:')), False, False, 2)
+        self.autoinc_entry = gtk.Entry()
+        adv_hbox.pack_start(self.autoinc_entry, False, False, 2)
+        self.autopush = gtk.CheckButton(_('Push after commit'))
+        adv_hbox.pack_start(self.autopush, False, False, 2)
+        self.advanced_frame.add(adv_hbox)
+        vbox.pack_start(self.advanced_frame, False, False, 2)
+
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
         self.vpaned.pack2(status_body, shrink=False)
@@ -436,6 +449,14 @@ class GCommit(GStatus):
         self.check_undo()
         self.refresh_branchop()
         self.update_parent_labels()
+        if not self.comitter_entry.get_text():
+            username = self.repo.ui.config('ui', 'username', '')
+            self.comitter_entry.set_text(hglib.toutf(username))
+        if not self.autoinc_entry.get_text():
+            autoinc = self.repo.ui.config('tortoisehg', 'autoinc', '')
+            self.autoinc_entry.set_text(hglib.toutf(autoinc))
+        if self.qnew:
+            self.qnew_name.grab_focus() # set focus back
 
     ### End of overridable methods ###
 
@@ -733,7 +754,14 @@ class GCommit(GStatus):
 
 
     def hg_commit(self, files):
-        if not self.repo.ui.config('ui', 'username'):
+        # get advanced options
+        user = hglib.fromutf(self.comitter_entry.get_text())
+        self.opts['user'] = user
+        incs = hglib.fromutf(self.autoinc_entry.get_text())
+        self.opts['include'] = [i.strip() for i in incs.split(',') if i.strip()]
+        autopush = self.autopush.get_active()
+
+        if not user:
             gdialog.Prompt(_('Commit: Invalid username'),
                    _('Your username has not been configured.\n\n'
                     'Please configure your username and try again'),
@@ -747,11 +775,11 @@ class GCommit(GStatus):
             dlg.focus_field('ui.username')
             dlg.run()
             dlg.hide()
-            self.repo = hg.repository(ui.ui(), self.repo.root)
-            self.ui = self.repo.ui
+            self.refreshui()
+            self.refresh_complete()
             return
 
-        cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
+        cmdline  = ['hg', 'commit', '--verbose']
 
         if self.nextbranch:
             # response: 0=Yes, 1=No, 2=Cancel
@@ -791,10 +819,11 @@ class GCommit(GStatus):
             cmdline.extend(['--user', self.opts['user']])
         if self.opts['date']:
             cmdline.extend(['--date', self.opts['date']])
+        files += self.opts['include']
         cmdline += ['--message', hglib.fromutf(self.opts['message'])]
         if self.qnew:
             cmdline += [hglib.fromutf(self.get_qnew_name())]
-        cmdline += [self.repo.wjoin(x) for x in files]
+        cmdline += files
         dialog = hgcmd.CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
         dialog.run()
@@ -835,7 +864,6 @@ class GCommit(GStatus):
             self.qnew = qnew
             self.mode = qnew and 'status' or 'commit'
             self.reload_status()
-            self.qnew_name.grab_focus() # set focus back
             
     def msg_add_to_popup(self, textview, menu):
         menu_items = (('----', None),
@@ -914,7 +942,7 @@ class GCommit(GStatus):
         dlg.focus_field('tortoisehg.summarylen')
         dlg.run()
         dlg.hide()
-        self.repo = hg.repository(self.ui, self.repo.root)
+        self.refreshui()
         return
 
 
