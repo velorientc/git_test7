@@ -101,11 +101,8 @@ class GShelve(GStatus):
         return False
 
 
-    def reload_status(self):
-        if not self.ready: return False
-        success = GStatus.reload_status(self)
+    def refresh_complete(self):
         self.activate_shelve_buttons(True)
-        return success
 
     ### End of overridable methods ###
 
@@ -179,7 +176,7 @@ class GShelve(GStatus):
         hgshelve.filterpatch = filter_patch
         # shelve them!
         hgshelve.shelve(self.ui, self.repo, **opts)
-        self.opts['check'] = True  # recheck MAR after commit
+        self.ui.setconfig('ui', 'interactive', 'off')
         self.filechunks = {}       # do not keep chunks
         self.reload_status()
 
