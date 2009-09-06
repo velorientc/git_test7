@@ -46,8 +46,6 @@ class build_mo(build):
                 cmd.append('-c')
             self.mkpath(modir)
             self.make_file([pofile], mofile, spawn, (cmd,))
-            self.distribution.data_files.append((join('tortoisehg', modir),
-                                                 [mofile]))
 
 build.sub_commands.append(('build_mo', None))
 
