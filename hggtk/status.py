@@ -931,7 +931,7 @@ class GStatus(gdialog.GDialog):
             fctx = ctx.filectx(pfile)
         except hglib.LookupError:
             fctx = None
-        if fctx and fctx.size() > hglib.getmaxdiffsize(self.ui):
+        if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             # Fake patch that displays size warning
             lines = ['diff --git a/%s b/%s\n' % (wfile, wfile)]
             lines.append(_('File is larger than the specified max size.\n'))
@@ -1401,7 +1401,7 @@ class GStatus(gdialog.GDialog):
         make(_('mark resolved'), mark, 'u')
         if f:
             rmenu = gtk.Menu()
-            for tool in hglib.mergetools(self.ui):
+            for tool in hglib.mergetools(self.repo.ui):
                 item = gtk.MenuItem(tool, True)
                 item.connect('activate', resolve_with, tool, f)
                 item.set_border_width(1)
