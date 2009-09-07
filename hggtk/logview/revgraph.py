@@ -179,9 +179,12 @@ class BranchGrapher:
         #
         #  Graph variables
         #  These hold information related to the graph. Most are computed lazily.
+        #  The graph is split into a number of "branches", defined as paths within
+        #  a named branch.
         #
         
-        # Map rev to next rev in branch = first parent of rev. 
+        # Map rev to next rev in branch = parent with same branch name
+        # If two parents, use first that has same branch name.
         # The parent of last rev in a branch is undefined, 
         # even if the revsion has a parent rev.
         self.parent_of = {}
@@ -202,6 +205,9 @@ class BranchGrapher:
     def _get_parents(self, rev):
         return [x for x in self.repo.changelog.parentrevs(rev) if x != nullrev]
         
+    def _branch_name(self, rev):
+        return self.repo[rev].branch()
+        
     def _covered_rev(self, rev):
         """True if rev is inside the revision range for the iterator"""
         return self.stop_rev <= rev
@@ -215,22 +221,26 @@ class BranchGrapher:
         self.color4branch[branch_head] = self.nextcolor
         self.nextcolor += 1
         self.next_in_branch[branch_head] = branch_head
+        branch_name = self._branch_name(branch_head)
         rev = branch_head
         while not rev in self.branch4rev:
-            # TODO consider lazy evaluation here
+            # Determine if rev should be used
             if not self._covered_rev(rev):
                 # rev is outside visible range, so we don't know tail location
                 self.branch_tail[branch_head] = 0 # Prev revs wasn't tail
                 return
+            # Add rev to branch
             self.branch4rev[rev] = branch_head
             self.branch_tail[branch_head] = rev
-            parents = self._get_parents(rev)
-            if not parents:
-                # All revisions have been exhausted (rev = 0)
-                self.parent_of[rev] = None
+            # Find next revision in branch
+            self.parent_of[rev] = None
+            for parent in self._get_parents(rev):
+                if self._branch_name(parent) == branch_name:
+                    self.parent_of[rev] = parent
+                    break
+            if self.parent_of[rev] is None:
                 return
-            self.parent_of[rev] = parents[0]
-            rev = parents[0]
+            rev = self.parent_of[rev]
 
     def _get_rev_branch(self, rev):
         """Find revision branch or create a new branch"""
