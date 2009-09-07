@@ -18,7 +18,7 @@ from thgutil import shlib, hglib
 from hggtk import gtklib, hgthread
 
 class CmdDialog(gtk.Dialog):
-    def __init__(self, cmdline, progressbar=True, width=520, height=400):
+    def __init__(self, cmdline, progressbar=True):
         if progressbar:
             title = 'hg ' + ' '.join(cmdline[1:])
         else:
@@ -39,7 +39,7 @@ class CmdDialog(gtk.Dialog):
         self.returncode = None
         self.hgthread = None
 
-        self.set_default_size(width, height)
+        self.set_default_size(520, 400)
 
         self._button_stop = gtk.Button(_('Stop'))
         self._button_stop.connect('clicked', self._on_stop_clicked)
