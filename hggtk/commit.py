@@ -358,16 +358,15 @@ class GCommit(GStatus):
         return menu
 
     def toggle_view(self, button, type):
-        sn, fr  = {'parents':  ('showparents',  self.parents_frame),
-                   'advanced': ('showadvanced', self.advanced_frame), 
-                  }[type]
         show = button.get_active()
-        if show != getattr(self, sn):
+        statename = 'show' + type
+        if getattr(self, statename) != show:
+            frame = getattr(self, type + '_frame')
             if show:
-                fr.show()
+                frame.show()
             else:
-                fr.hide()
-            setattr(self, sn, show)
+                frame.hide()
+            setattr(self, statename, show)
 
     def changed_cb(self, combobox):
         model = combobox.get_model()
