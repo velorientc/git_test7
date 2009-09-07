@@ -226,8 +226,8 @@ class GCommit(GStatus):
         self.refresh_branchop()
         self.update_parent_labels()
         if not self.comitter_entry.get_text():
-            username = self.repo.ui.config('ui', 'username', '')
-            self.comitter_entry.set_text(hglib.toutf(username))
+            user = self.opts['user'] or self.repo.ui.config('ui', 'username')
+            self.comitter_entry.set_text(hglib.toutf(user or ''))
         if not self.autoinc_entry.get_text():
             autoinc = self.repo.ui.config('tortoisehg', 'autoinc', '')
             self.autoinc_entry.set_text(hglib.toutf(autoinc))
@@ -542,7 +542,9 @@ class GCommit(GStatus):
         c_btn = self.get_toolbutton(_('_Commit'))
         self.qheader = None
         if self.mqmode:
-            self.qheader = self.repo['qtip'].description()
+            qtipctx = self.repo['qtip']
+            self.qheader = qtipctx.description()
+            self.comitter_entry.set_text(hglib.toutf(qtipctx.user()))
             buf = self.text.get_buffer()
             if buf.get_char_count() == 0 or not buf.get_modified():
                 if self.qnew:
