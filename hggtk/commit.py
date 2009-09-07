@@ -298,20 +298,6 @@ class GCommit(GStatus):
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
 
-        self.parents_frame = gtk.Frame(_('Parent'))
-        parents_vbox = gtk.VBox(spacing=2)
-        self.parents_frame.add(parents_vbox)
-        def plabel():
-            w = gtk.Label()
-            w.set_selectable(True)
-            hb = gtk.HBox()
-            hb.pack_start(w, False, False, 4)
-            parents_vbox.pack_start(hb, False, False)
-            return w
-        self.parent1_label = plabel()
-        self.parent2_label = plabel()
-        vbox.pack_start(self.parents_frame, False, False)
-
         self.advanced_frame = gtk.Frame(_('Advanced'))
         adv_hbox = gtk.HBox(spacing=2)
         adv_hbox.pack_start(gtk.Label(_('Comitter:')), False, False, 2)
@@ -325,11 +311,28 @@ class GCommit(GStatus):
         self.advanced_frame.add(adv_hbox)
         vbox.pack_start(self.advanced_frame, False, False, 2)
 
+        vbox2 = gtk.VBox()
+        vbox2.pack_start(status_body)
+
+        self.parents_frame = gtk.Frame(_('Parent'))
+        parents_vbox = gtk.VBox(spacing=2)
+        self.parents_frame.add(parents_vbox)
+        def plabel():
+            w = gtk.Label()
+            w.set_selectable(True)
+            hb = gtk.HBox()
+            hb.pack_start(w, False, False, 4)
+            parents_vbox.pack_start(hb, False, False)
+            return w
+        self.parent1_label = plabel()
+        self.parent2_label = plabel()
+        vbox2.pack_start(self.parents_frame, False, False)
+
         self.vmenu.set_menu(self.view_menu())
 
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
-        self.vpaned.pack2(status_body, shrink=False)
+        self.vpaned.pack2(vbox2, shrink=False)
         gobject.idle_add(self.realize_settings)
         return self.vpaned
 
