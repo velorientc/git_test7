@@ -1,85 +1,87 @@
-**************************
-Frequently Asked Questions
-**************************
+************
+よくある質問
+************
 
+*TortoiseHg って何？*
 
-*What is TortoiseHg?*
+	Mercurial 分散構成管理システムのための Windows シェル拡張です。Subversion
+	における TortoiseSVN や、CVS における TortoiseCVS のような
+	クライアントアプリケーションです。TortoiseHg は他のプラットフォーム向けに
+	コマンドラインから起動するための hgtk スクリプトも含んでいます。
 
-	A Windows shell extension for the Mercurial revision control system,
-	similar to the Tortoise clients for Subversion and CVS. It also
-	includes an hgtk application for command line use on many platforms.
+*Windows 向けの TortoiseHg インストーラには何が含まれていますか？*
 
-*What comes included in the TortoiseHg binary installer for Windows?*
+	Mercurial、kdiff3、TortoisePlink、そして拡張機能として forest も同梱しています。
 
 	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
-	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
-	and and one bonus extension: hgfold.
+	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_,
+	そして拡張機能の hgfold 同梱しています。
 
-*How can I get translations for the Explorer context menu?*
+*エクスプローラの右クリックメニューは英語のままなの？*
 
-	See the `Download <http://bitbucket.org/tortoisehg/stable/wiki/install>`_
-	wiki page
+	公式 Wiki の `ダウンロード <http://bitbucket.org/kuy/thg-ja/wiki/install>`_
+	ページから翻訳ファイルを入手できます。
 
-*How do I do merges and arbitrary version checkouts in 0.8?*
+*バージョン 0.8 でマージや任意のリビジョンへの更新はどうやるの？*
 
-	Merges and updates intended to be done from within the Changelog
-	tool (:guilabel:`View Changelog` menu option) in 0.8.
+	バージョン 0.8 ではチェンジログツールからマージや更新を行うようになりました。
+	チェンジログツールはエクスプローラの右クリックメニューの :guilabel:`ログの表示`
+	から起動できます。
 
-*How do I fix* ``failed to import extension hgext.hgconfig...`` *warnings?*
+*'failed to import extension hgext.hgconfig...' という警告メッセージはどうすれば消えるの？*
 
-	Upgrading to release 0.7.2 or later should fix these warnings, but
-	there are further complications on Vista.  See
-	`issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_.
+	バージョン 0.7.2 以降にアップグレードしてください。ただし Windows Vista
+	では若干問題があります。詳しくは
+	`issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_
+	を参照してください。
 
-*Why can't I connect to an ssh server (TortoisePlink.exe* ``...cannot execute specified...`` *error message)?*
+*SSH サーバに接続できない (TortoisePlink.exe - "...cannot execute specified..." というエラーメッセージ)*
 
-	Release 0.7.2 and later include a version of TortoisePlink that does
-	not have extra library dependencies, so upgrading will probably fix
-	this problem. See also
-	`ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
+	バージョン 0.7.2 以降にはライブラリ依存のない TortoisePlink を同梱しているため、
+	最新版にアップグレードすることで解決するはずです。公式 Wiki の
+	`SSH 接続 <http://bitbucket.org/kuy/thg-ja/wiki/ssh>`_ ページも参考に
+	してみてください。
 
-*How can I use Qct with TortoiseHg, after version 0.7?*
+*バージョン 0.7 以降の TortoiseHg で Qct を使うことはできますか？*
 
-	We recommend that you try the commit tool that comes with TortoiseHg
-	before running back to Qct, but here are the instructions should you
-	decide to stick with ole' reliable:
+	Qct を使う前に是非 TortoiseHg 標準のコミットツールを試して欲しいところですが、
+	どうしてもという方もいますので方法を載せておきます：
 
-	1. Download and install Qct-1.7-standalone-win32.exe from
-	   http://qct.sourceforge.net
-	2. Add (or merge) the following into your :file:`Mercurial.ini` ::
+	1. `Qct-1.7-standalone-win32.exe <http://qct.sourceforge.net>`_ を
+	   ダウンロードしてインストールします
+	2. ホームディレクトリの :file:`Mercurial.ini` ファイルに以下の設定を追加します： ::
 
-		[extensions]
-		qct = C:\path\to\qct.py
+			[extensions]
+			qct = C:\path\to\qct.py
 
-		[tortoisehg]
-		extcommit = qct
+			[tortoisehg]
+			extcommit = qct
 
-		[qct]
-		path = "C:\Program Files\qct\qct.exe"
+			[qct]
+			path = "C:\Program Files\qct\qct.exe"
 
-	Now the :guilabel:`HG Commit` menu option should launch Qct, and
-	:command:`hg qct` should work from the command line and hgtk ci
-	should also launch Qct.
+	これで :guilabel:`HG コミット` を実行したとき Qct が起動し、
+	コマンドラインからは :command:`hg qct` が使用可能になります。
+	:command:`hgtk ci` を実行しても Qct が起動します。
 
-	In 0.9, hgtk ci will no longer launch Qct.  We will drop support for
-	any external commit tools.
+	バージョン 0.9 では Qct の起動ができなくなります。
+	それと同時に外部コミットツールの設定も廃止されます。
 
-*How can I use hgk (hg view) with TortoiseHg?*
+*TortoiseHg で hgk (hg view) を使うことはできますか？*
 
-	Download `tclkit <http://www.equi4.com/tclkit>`_ and place it in
-	your TortoiseHg directory.  Download the
-	`hgk <http://www.selenic.com/repo/hg/raw-file/tip/contrib/hgk>`_ script
-	from the Mercurial repository and place it in your
-	:file:`TortoiseHg\\contrib` directory. Create an :file:`hgk.cmd` file
-	and place it in :file:`TortoiseHg\\scripts`. This file should
-	contain ::
+	`tclkit <http://www.equi4.com/tclkit>`_ をダウンロードして
+	TortoiseHg のインストールディレクトリに置きます。
+	`hgk <http://www.selenic.com/repo/hg/raw-file/tip/contrib/hgk>`_
+	スクリプトは Mercurial のリポジトリからダウンロードして
+	:file:`TortoiseHg\\contrib` ディレクトリに置きます。
+	次に :file:`hgk.cmd` ファイルを作成して :file:`TortoiseHg\\scripts`
+	ディレクトリに置きます。このファイルには： ::
 
 		@set HG=C:\Program Files\TortoiseHg\hg.exe
 		@"C:\Program Files\TortoiseHg\tclkit-win32.exe" "C:\Program Files\TortoiseHg\contrib\hgk" %*
- 
-	Then enable hgk in your :file:`Mercurial.ini`
-	file::
+
+	を記述します。そして hgk を有効化するため :file:`Mercurial.ini` ファイルに： ::
 
 		[extensions]
 		hgk =
@@ -88,74 +90,73 @@ Frequently Asked Questions
 		path=C:\Program Files\TortoiseHg\scripts\hgk.cmd
 		vdiff=vdiff
 
-	This allows you launch :command:`hg view` from the command line.
+	を設定すればコマンドラインから :command:`hg view` で起動できます。
 
-*How can I use WinMerge as my visual diff tool?*
+*GUI の Diff ツールとして WinMerge を使うにはどうすればいいの？*
 
-	Add these lines to your personal :file:`Mercurial.ini` file ::
+	ホームディレクトリの :file:`Mercurial.ini` ファイルに以下を追加してください。
 
 		[extdiff]
 		cmd.winmerge = C:\Program Files\WinMerge\WinMerge.exe
 		opts.winmerge = /e /x /ub /wl
 
-	Now run the :guilabel:`Global Settings` tool. On the
-	:guilabel:`TortoiseHg` tab, you should see :guilabel:`winmerge`
-	available in the drop-down list for :guilabel:`Visual Diff Command`.
-	Select :guilabel:`winmerge`, apply, then close.
+	:guilabel:`グローバル設定` ダイアログを開いて、 :guilabel:`TortoiseHg`
+	タブにある :guilabel:`GUI 差分表示コマンド` のドロップダウンリストを見ると
+	:guilabel:`winmerge` という項目が追加されているので、それを選択して
+	:guilabel:`適用` ボタンを押してダイアログを閉じてください。
 
-	This same approach can be used to add nearly any visual diff tool,
-	but be aware that your diff tool must be able to support directory
-	diffs if it is to be used by TortoiseHg, unless you are using
-	release 0.8 or later.
+	他の WinMerge のような GUI の差分表示ツールでもこの方法で対応可能ですが、
+	TortoiseHg はディレクトリ差分の機能を使うため、それをサポートしている
+	ツールに限られます。バージョン 0.8 以降ではディレクトリ差分の無いツールでも
+	利用可能になりました。
 
-*How can I use Araxis Merge as my visual diff tool?*
+*GUI の Diff ツールとして Araxis Merge を使うにはどうすればいいの？*
 
-	Add these lines to your personal :file:`Mercurial.ini` file ::
+	ホームディレクトリの :file:`Mercurial.ini` ファイルに以下を追加してください。
 
 		[extdiff]
 		cmd.adiff=C:\Program Files\Araxis\Araxis Merge v6.5\compare.exe
 		opts.adiff=/wait
 
-	Now run the :guilabel:`Global Settings` tool. On the
-	:guilabel:`TortoiseHg` tab, you should see :guilabel:`adiff`
-	available in the drop-down list for :guilabel:`Visual Diff Command`.
-	Select :guilabel:`adiff`, apply, then close.
+	:guilabel:`グローバル設定` ダイアログを開いて、 :guilabel:`TortoiseHg`
+	タブにある :guilabel:`GUI 差分表示コマンド` のドロップダウンリストを見ると
+	:guilabel:`adiff` という項目が追加されているので、それを選択して :guilabel:`適用`
+	ボタンを押してダイアログを閉じてください。
 
-*Does TortoiseHg work on Vista?*
+*TortoiseHg は Windows Vista で動作しますか？*
 
-	TortoiseHg 0.8.n works well on x86 and x64 versions of Vista and Windows 7.
+	TortoiseHg 0.8 以降は Windows Vista / 7 の 32ビット・64ビット版共に動作します。
 
-*How can I get the context menus working on 64-bit Vista?*
+*64ビット版 Windows Vista で右クリックメニューを有効にするにはどうすればいいですか？*
 
-	Upgrade to TortoiseHg 0.8.n
+	TortoiseHg 0.8 以降のバージョンにアップグレードしてください。
 
-*I'm a CLI user, how do I disable the shell extensions (overlay icons and context menus)?*
+*シェル拡張を無効にする方法は？ (アイコンオーバーレイと右クリックメニュー)*
 
-	If you have TortoiseHg 0.8 or later, you can disable overlays via
-	the taskbar options menu.  The only way to disable the context menu
-	is to rename :file:`ThgShell.dll` in your install directory and then
-	restart explorer (this completely disables the shell extension).
+	TortoiseHg 0.8 以降を使用している場合、アイコンオーバーレイはトレイアイコンを
+	クリックして表示されるメニューにある :guilabel:`オプション` から起動できる
+	タスクバーダイアログで無効にできます。右クリックメニューを無効にする唯一の方法は
+	TortoiseHg のインストールディレクトリにある :file:`ThgShell.dll` ファイルの
+	名前を変更してエクスプローラを再起動します (シェル拡張を完全に無効化)。
 
-	If you have an older TortoiseHg release, run this command with
-	appropriate permissions: 
+	古い TortoiseHg を使っている場合はコマンドプロンプトから
 	:command:`regsvr32 /u "C:\\Program Files\\TortoiseHg\\tortoisehg.dll`
-	Run that command without the :command:`/u` argument to re-enable the
-	extensions. Both operations take effect after the next reboot.
+	を実行してください (管理者権限が必要)。 :command:`/u` を外して実行することで
+	再びシェル拡張を有効化することができます。どちらも Windows を再起動するまで
+	反映されません。
 
-*How is TortoiseHg configured?*
+*TortoiseHg はどこに設定を保存しているの？*
 
-	TortoiseHg gets configuration settings from two systems.
+	TortoiseHg は2種類の設定システムを利用しています。
 
-	1. The Mercurial configuration system, which is three-tiered
-		1. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
-		2. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
-		3. Per-Repository :file:`Mercurial.ini` in :file:`{repo-root}\.hg\hgrc`
-	2. :file:`%APPDATA%\\Tortoisehg` settings for application state
-	   (window positions, etc)
+	1. Mercurial の設定システムで、3つのレイヤがあります
+	   1. システム設定： :file:`%ProgramFiles%\\TortoiseHg` にある :file:`Mercurial.ini` ファイル
+	   2. グローバル設定： :file:`%UserProfile%` にある :file:`Mercurial.ini` ファイル
+	   3. リポジトリ設定： :file:`{repo-root}\.hg` にある :file:`hgrc` ファイル
+	2. ダイアログの位置や状態などを保存している :file:`%APPDATA%\\Tortoisehg`
 
-	These are configurables that are stored the Mercurial configuration
-	system. ::
-	
+	以下は Mercurial の設定システムに保存される項目です： ::
+
 		[tortoisehg]
 		extcommit = None
 		vdiff = vdiff
@@ -167,13 +168,14 @@ Frequently Asked Questions
 		authorcolor = True
 		authorcolor.steve = blue
 
-	See also :doc:`settings`, and
-	`issue #50 <http://bitbucket.org/tortoisehg/stable/issue/50/>`_.
+	詳細については :doc:`settings` や
+	`issue #50 <http://bitbucket.org/tortoisehg/stable/issue/50/>`_
+	をご覧ください。
 
-*Is it possible to change fonts?*
+*フォントの変更はできますか？*
 
-	In some cases, yes. The gtools based dialogs (commit, status,
-	shelve) allow some font configuration. ::
+	一部可能です。 TortoiseHg の各種ダイアログ (コミット、変更点の表示、
+	シェルフ) のベースとなっている gtools はフォント設定が可能です： ::
 
 		[gtools]
 		# font used in changeset viewer and commit log text
@@ -187,78 +189,77 @@ Frequently Asked Questions
 		# (applies to commit and status dialogs)
 		diffbottom = False
 
-*How do I switch GTK themes?*
+*GTK のテーマを変更するにはどうすればいいの？*
 
-	In 0.7, the theme was selectable at install time.  For other
-	releases, (and after install on 0.7) you can still do this manually
+	バージョン 0.7 ではインストール時に選択可能です。それ以降のバージョン
+	(またはバージョン 0.7 がインストール済み) の場合は手動で変更できます：
 
-		* cd :file:`C:\\Program Files\\TortoiseHg\\share\\themes`
-		  (>=0.8, this is :file:`gtk\\share\\themes`)
-		* look at the themes in this directory, remember their names or
-		  keep this folder open.
-		* :command:`cd ..\\..\\etc\\gtk-2.0`
-		* edit :file:`gtkrc` and change the name of the theme you wish to use
-		* Vista may try to prevent you from editing the file directly. I work
-		  around this by copying to your desktop, editing it there, then
-		  copying it back (and answering all the security dialogs)
-		* Changes immediately take affect on all newly launched applications
+	* :file:`C:\\Program Files\\TortoiseHg\\share\\themes` を開きます
+	  (バージョン 0.8 以降は
+	  :file:`C:\\Program Files\\TortoiseHg\\gtk\\share\\themes`)
+	* :file:`themes` ディレクトリにあるテーマ名を覚えるか開いたままにします
+	* :file:`C:\\Program Files\\TortoiseHg\\etc\\gtk-2.0` を開きます
+	  (バージョン 0.8 以降は
+	  :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0`)
+	* :file:`gtkrc` ファイルを開いてテーマ名を変更します
+	* Windows Vista の場合、ファイルを編集できないため、一度ファイルをデスクトップ
+	  などにコピーしてそれを編集して保存し、元の場所に上書きコピーします
+	  (表示されるセキュリティ警告のダイアログは全て「はい」を選択)
+	* 変更は次に TortoiseHg を起動したときから反映されます
 
-	You also should be able to download new themes and copy them into
-	the :file:`share\\themes` directory and then enable them in your
-	:file:`gtkrc`.
+	同梱されていないテーマでもそれをダウンロードして :file:`share\\themes`
+	ディレクトリにコピーすれば、 :file:`gtkrc` ファイルでそのテーマを設定可能です。
 
-*After uninstalling, it left a bunch of DLL and PYD files behind.*
+*アンインストールしても大量の DLL や PYD の拡張子のファイルが残ってしまう*
 
-	Reboot, like the uninstaller told you to :-) The uninstaller marked
-	those files for removal at the next boot since most of them could
-	not be removed while your system was running.
+	再起動してください、とアンインストーラが指示しているはずです :-)
+	Windows が起動している状態では削除できないファイルもあるため、それらは再起動後
+	に削除されるように設定されています。
 
-*How can I convert a subversion repository to Mercurial?*
+*Subversion のリポジトリを Mercurial に変換する方法は？*
 
-	You must install svn-win32-1.6 command line tools, then add them to
-	your path. Then you must enable the
+	まずコマンドラインツールの svn-win32-1.6 をインストールし、そのプログラムを
+	環境変数の PATH に追加してください。次に
 	`convert <http://mercurial.selenic.com/wiki/ConvertExtension>`_
-	extension. At this point, you should be able to use the
-	:command:`hg convert` command to do the conversion. Please direct
-	problems/questions about the convert extension to the Mercurial
-	mailing list or #mercurial on irc.freenode.net.
+	拡張機能を有効化し、 :command:`hg convert` コマンドを実行することで
+	変換できます。変換について何か問題が起きたときや、質問がある場合は直接
+	Mercurial のメーリングリストや IRC (irc.freenode.net の #mercurial)
+	に尋ねてみてください。
 
-*Where do TortoiseHg extensions look for external Python modules on Windows?*
+*Windows の TortoiseHg はどこの Python モジュールを参照しているの？*
 
-	TortoiseHg includes an entire Python distribution bundled up as
-	DLLs. The standard library modules are all in the
-	:file:`library.zip` file in :file:`C:\\Program Files\\TortoiseHg`.
+	TortoiseHg は Python の実行に必要な環境を DLL の形で同梱しています。
+	標準ライブラリは全て :file:`C:\\Program Files\\TortoiseHg` の
+	:file:`library.zip` ファイルに格納されています。
 
-	If you try to use an extension that imports a non-standard Python
-	module, you will find that the extension will fail to load because
-	it can't find the module. For example the ReviewBoard extension
-	imports the simplejson module, which is not part of the standard
-	Python distribution.
+	そのため、非標準の Python モジュールに依存した Mercurial 拡張機能
+	を使用するとそのモジュールが見つからないため読み込みに失敗します。
+	例えば ReviewBoard 拡張機能は Python の標準ライブラリに含まれていない
+	simplejson モジュールをインポートします。
 
-	In order to make it work you need to add a couple of lines to the
-	top of the extension's .py file, before the line that imports the
-	foreign module::
+	そのような拡張機能を動作させるにはちょっとした変更が必要です。
+	拡張機能のソースコードを開いて非標準のモジュールインポートの前に
+	そのモジュールのインストール場所を追記します： ::
 
 		import sys
 		sys.path.append(r'C:\path\to\module')
 
-	Note that this will not work for modules distributed as .egg files;
-	the supplied path must contain the module's .py or .pyc files.
+	この方法はモジュールが .egg ファイルとして配布されている場合はうまくいきません。
+	指定するパスは .py または .pyc ファイルを含んでいる必要があります。
 
-*How do I fix odd characters in dialog?*
+*ダイアログのぎこちないフォント描画を直すにはどうすればいいの？*
 
-	In 0.8, we no longer distribute multiple themes and switched default
-	theme to MS-Windows.  As a result, it might causes an issue related
-	default font of MS-Windows theme in some environments.  In order to
-	fix this issue, add following setting to TortoiseHg's :file:`gtkrc`
-	file::
+	バージョン 0.8 から複数の GTK+ テーマを同梱せず、デフォルトのテーマを
+	MS-Windows に変更しました。その結果、MS-Windows テーマが原因で
+	フォント描画がおかしくなる場合があります。これを直すには以下の設定を
+	TortoiseHg の :file:`gtkrc` ファイルに追加してください： ::
 
 		style "msw-default"
 		{
-		font_name = "MS UI Gothic 9"
+		    font_name = "MS UI Gothic 9"
 		}
 
-	You can find :file:`gtkrc` file in your TortoiseHg install directory:
-	i.e. :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
+	:file:`gtkrc` ファイルは TortoiseHg のインストールディレクトリにあります。
+	:file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
 
 .. vim: noet ts=4
