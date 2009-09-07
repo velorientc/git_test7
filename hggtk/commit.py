@@ -182,6 +182,7 @@ class GCommit(GStatus):
 
 
     def get_tbbuttons(self):
+        # insert to head of toolbar
         tbbuttons = GStatus.get_tbbuttons(self)
         tbbuttons.insert(0, gtk.SeparatorToolItem())
         self.undo_button = self.make_toolbutton(gtk.STOCK_UNDO, _('_Undo'),
@@ -191,10 +192,21 @@ class GCommit(GStatus):
         tbbuttons.insert(0, self.undo_button)
         tbbuttons.insert(0, self.commit_button)
 
+        # append to end of left align area
         self.changelog_button = self.make_toolbutton(gtk.STOCK_INDEX, _('Changelog'),
             self.changelog_clicked, tip=_('view changelog'))
         tbbuttons.append(self.changelog_button)
-        tbbuttons.append(gtk.SeparatorToolItem())
+
+        # append to align right
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        tbbuttons.append(sep)
+
+        self.vmenu = gtk.MenuToolButton('')
+        # hide the Button widget; we want to see only Menu button
+        gobject.idle_add(lambda: self.vmenu.child.get_children()[0].hide())
+        tbbuttons.append(self.vmenu)
 
         return tbbuttons
 
@@ -273,14 +285,6 @@ class GCommit(GStatus):
         vbox.pack_start(mbox, False, False)
         self._mru_messages = self.settings.mrul('recent_messages')
 
-        vmenu = gtk.MenuToolButton('')
-        # A MenuToolButton has two parts; a Button and a ToggleButton
-        # we want to see the togglebutton, but not the button
-        b = vmenu.child.get_children()[0]
-        b.unmap()
-        b.set_sensitive(False)
-        mbox.pack_start(vmenu, False, False, 2)
-
         frame = gtk.Frame()
         frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
@@ -321,7 +325,7 @@ class GCommit(GStatus):
         self.advanced_frame.add(adv_hbox)
         vbox.pack_start(self.advanced_frame, False, False, 2)
 
-        vmenu.set_menu(self.view_menu())
+        self.vmenu.set_menu(self.view_menu())
 
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
