@@ -1,342 +1,326 @@
-Commit
-======
+コミット
+========
 
 .. module:: commit.dialog
 	:synopsis: Dialog used to perform commit
 
-.. warning::   
-	The win32text extension can cause trouble with hunk selection.  This
-	has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
-	proper configuration. See
-	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
-   
-The commit tool is an important part of TortoiseHg.  It is, in fact, the
-only component that defaults to the top level shell context menu.  This
-is mainly because it is the most heavily used tool. Not only can you
-commit your changes, but you can examine the state of your working
-directory and perform most routine maintenance tasks (add new files,
-record renames, manage the repository ignore filter, etc).
+.. warning::
+	win32text 拡張機能はハンク選択で問題を引き起こす可能性があります。この問題は
+	Mercurial 1.3 と TortoiseHg 0.8 において解決されましたが、適切な設定が
+	必要です。詳しくは
+	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_
+	をご覧ください。
+
+コミットツールは TortoiseHg の中でも重要なツールと言えます。実際、このツールは
+デフォルトで右クリックメニューのトップレベルから直接起動できる唯一のツールです。
+これは最も使用頻度の高いツールであるというのが主な理由です。変更点をコミットする以外にも、
+作業ディレクトリの状態を確認したり、その他にも様々な作業 (新規ファイルの追加、
+名前変更の記録、リポジトリの無視フィルタの編集、等々) をコミットツール上で行えます。
 
 .. figure:: figures/commit.png
-	:alt: Commit dialog
+	:alt: コミットダイアログ
 
-	Commit dialog
+	コミットダイアログ
 
-Features
---------
+機能
+----
 
-Walking across the toolbar buttons:
+ツールバーボタンを左から順に見ていきます：
 
-	:guilabel:`Refresh`
-		Reload the state of the working directory. It tries to retain
-		check and selection state across refresh.
-	:guilabel:`Commit`
-		Commit selected diffs in checked files.
-	:guilabel:`Undo`
-		Undo (rollback) last immediate commit. Your commit message will be
-		available in the message history, so you can re-do the commit after
-		fixing whatever problem you noticed.
-	:guilabel:`Revert`
-		Revert checked files to last revisioned state.  If merging, it
-		allows you to select the revert parent.
-	:guilabel:`Add`
-		Add checked files that were in unknown '?' or ignored 'I' state.
-	:guilabel:`Move`
-		Move checked files to specified target directory in versioned
-		manner.
-	:guilabel:`Remove`
-		Delete checked unversioned files and/or remove (mark as deleted) any
-		versioned files.
+	:guilabel:`再読み込み`
+		作業ディレクトリの状態を再読み込みします。
+		再読み込み後もチェックボックスの選択状態は保たれます。
+	:guilabel:`コミット`
+		チェックされたファイルの選択されたハンクをコミットします。
+	:guilabel:`取り消し`
+		直前のコミットを取り消します。入力したコミットメッセージは
+		:guilabel:`最近コミットしたメッセージ` の一覧に追加されるため、
+		コミットミスを修正した後に同じメッセージでコミットできます。
+	:guilabel:`元に戻す`
+		チェックされているファイルを変更を加える前の状態に戻します。
+		その変更がマージの場合はどちらの親リビジョンに戻すか選択できます。
+	:guilabel:`追加`
+		チェックされている不明ファイル '?' または無視ファイル 'I' を追加します。
+	:guilabel:`移動`
+		チェックされているファイルを指定されたディレクトリに移動します。
+	:guilabel:`削除`
+		チェックされているファイルを削除します。
 
-Below the toolbar are useful widgets:
+ツールバーの下にはいくつかの便利なウィジェットがあります：
 
-	:guilabel:`Branch dialog`
-		Shows the current branch name of the working directory. Normally
-		this is informational only, but pressing this button opens up a
-		branch maintenance dialog.  Do not use this feature unless you
-		understand Mercurial's
-		`named branches <http://mercurial.selenic.com/wiki/NamedBranches>`_.
-	:guilabel:`Recent Commit Messages`
-		A drop-down list of the 10 most recent commit messages. The
-		the drop-down list is filled the first time it is opened.
+	:guilabel:`ブランチダイアログ`
+		作業ディレクトリの現在のブランチ名を表示します。通常はブランチ名の表示のみですが、
+		このボタンを押すとブランチ操作のためのダイアログが表示されます。
+		この機能は Mercurial の
+		`名前付きブランチ <http://mercurial.selenic.com/wiki/NamedBranches>`_
+		を理解している場合のみ使用してください。
+	:guilabel:`最近コミットしたメッセージ`
+		最近のコミットメッセージ 10 件のドロップダウンリストです。
+		このリストは最初に開いた時にコミットメッセージが読み込まれます。
 	:guilabel:`QNew`
-		If you have enabled the MQ extension, there will also be a text
-		entry for a new patch name.  Entering a patch name switches the
-		commit tool into 'QNew' mode.
+		MQ 拡張機能を使用している場合、新しいパッチ名を入力するためのテキストボックスが
+		表示されます。パッチ名を入力するとコミットツールは 'QNew' モードに切り替わります。
 
 
-The file list has four columns:
+ファイル一覧には4つの列があります：
 
-	1) A checkbox that indicates whether the file is selected for an
-	   operation.  The toolbar buttons only operate on checked files.
-	   "Partially" selected files have a special check state.  This
-	   column header is checkable, it will toggle the file selection
-	   states.
-	2) The :guilabel:`st` column holds the status of the file, defined
-	   by Mercurial's status command, one of 'MARD?IC'.
-	3) The :guilabel:`ms` column holds the merge state of the file,
-	   defined by Mercurial's resolve command, one of ' RU'.  See the
-	   merge section below.
-	4) The canonical path of the file (relative to the repository root)
+	1)	各種操作のためにそのファイルが選択されているかどうかを示すチェックボックス。
+		ツールバーボタンによる操作はチェックされているファイルにのみ行なわれます。
+		部分選択状態のファイルについては特殊なチェック状態となります。
+		この列のヘッダを使えば全てのファイルをチェックしたりチェックを外したりできます。
+	2)	:guilabel:`状態` 列には Mercurial の status コマンドで使用されている
+		ファイル状態を示す 'MARD?IC' のうちの1つが表示されます。
+	3)	:guilabel:`マージ` 列はそのファイルのマージ状態を示しており、Mercurial の
+		resolve コマンドで使用されている ' RU' のうちどれか1つが表示されます。
+	4)	リポジトリルートを基準としたファイルパスが表示されます。
 
-Below the file list are checkboxes that toggle the display of the
-various classes of files {modified, added, removed, deleted, unknown,
-clean, ignored}.  These check boxes will be disabled if the commit tool
-was given a specific set of files and/or directories.
+ファイル一覧の下に並んだチェックボックスは
+{M:変更, A:追加, R:削除, !:削除, ?:不明, C:クリーン, I:無視}
+のファイル状態ごとにファイル一覧に表示するかどうかを設定できます。
+このチェックボックスはコミットツールからファイルまたはディレクトリを指定された場合には
+無効になります。
 
-*Removed* means a revisioned file has been marked as removed. *Deleted*
-means a revisioned file is missing but Mercurial has not been told to
-quit tracking that file. For instance, if you rename a revisioned file
-in the explorer, the original filename will show up as deleted and the
-new filename will show up as unknown. By right-clicking on the new
-filename you can bring up the rename guessing dialog which can discover
-the rename by comparing file contents and mark the old file as removed
-and the new file as added while recording the whole operation as a
-rename.
+*R:削除* は管理済みファイルが削除されたとマークされている状態を意味しています。
+一方で *!:削除* は管理済みファイルが見当たらず、Mercurial がそのファイルを
+追跡できなくなったことを意味しています。例えば管理済みファイルの名前をエクスプローラで
+変更したとき、コミットツールのファイル一覧には元のファイル名が *!:削除* として表示され、
+新しいファイル名が *?:不明* として表示されます。新しいファイル名の右クリックメニューから
+名前変更推定ダイアログを起動すればファイル内容の比較によって名前変更を検出し、
+古いファイルを *R:削除* とマークし、新しいファイルを *A:追加* とマークすることが
+できます。
 
-*Unknown* files are not tracked by Mercurial, but they also do not match
-any ignore filters you have configured.  Unknown files are shown by
-default because they are usually files that need to be added to revision
-control.  It is recommended that you keep your ignore filters up to date
-to ensure that is the case.  The context menu of unknown files has an
-option open the ignore pattern tool.
+*?:不明* は Mercurial によって管理されておらず、かつ、設定されている
+無視ファイルフィルタに該当しないファイルにマークされます。リビジョン管理に
+追加する必要のあるファイルなどはデフォルトで不明ファイルとして表示されます。
+無視ファイルフィルタを最新に保つことは良いことです。不明ファイルの
+右クリックメニューには無視ファイルフィルタを編集するツールを開くコマンドがあります。
 
-*Clean* files are tracked files that have not been modified, while
-*Ignored* files are untracked files that match a configured ignore
-pattern.  Neither of those file types are shown by default, unless a the
-user includes such a file in a selection (explorer) or provides the file
-on the command line.
+*C:クリーン* は変更が加えられていない管理済みのファイルです。
+一方で *I:無視* は設定されている無視ファイルフィルタに該当し、管理されていない
+ファイルです。どちらのファイルもエクスプローラでの選択に含めるか、コマンドラインから
+そのファイルを指定して起動するかしない限りデフォルトでは表示されません。
 
 
-Change Selection
-----------------
+変更点の選択
+------------
 
-So what does it mean when we say the commit button will commit the
-selected diffs in checked files? Simple, the native TortoiseHg commit
-tool supports change selection instrinsically in the diff browser. This
-means that all of the changes you make to versioned files can be
-individually selected to be included in the commit or left out of the
-commit (but left in the working directory).  Fans of darcs or
-Mercurial's record extension will recognize this immediately.
+さて、「チェックされたファイルの選択されたハンクをコミットする」と言ったとき、
+これは何を意味しているのでしょうか？ これは単純に TortoiseHg 付属のコミット
+ツールの差分ビューアが変更点の選択に対応しているのです。
+つまり、管理下に置かれたファイルに対する全ての変更箇所は、どの部分をコミットに含めて、
+どの部分をコミットせずに (作業ディレクトリに) 残すのか個別に選択することができます。
+darcs バージョン管理システム、または Mercurial の record 拡張機能のユーザであれば
+すぐに分かるはずです。
 
-When is this necessary?
-^^^^^^^^^^^^^^^^^^^^^^^
+どんなとき必要になるのか？
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When you have more than a single coherent change in your source code and
-you would like to commit your changes piecemeal.  This can often be
-accomplished by filtering the list of files in each commit, but there
-will be times when your changes intermingle in the same set of files and
-that is when this change selection feature becomes indespensable.
+関連性の低い複数の変更が作業ディレクトリにあり、それらを個別のチェンジセットとして
+コミットしたいとします。この場合、コミット時にファイル一覧を指定することでうまく
+対処できるケースもありますが、同じソースコードに変更点が混ざり合っているケースでは
+コミットする変更点を選択する機能が必要不可欠になります。
 
-How does it work?
-^^^^^^^^^^^^^^^^^
+どうやって使うのか？
+^^^^^^^^^^^^^^^^^^^^
 
-By double-clicking on individual change hunks in the diff panel.
-*Technically, any action which activates a change hunk row will toggle
-it's selection status. The spacebar will also work.* When a hunk is
-unselected, the syntax highlighting of the diff is disabled and the
-background is turned gray.  At the same time, the file's diff header is
-updated to show the current selection state, the selected hunk count and
-changed lines will be updated. Toggle the hunk a second time to reselect
-it for inclusion in your commit.
+差分表示パネルのチェンジハンクをダブルクリックすることで選択状態を切り換えます。
+*厳密には選択状態はアクティベート操作によって切り替わるため、ダブルクリックでは
+なくスペースキーを押すことでも可能です。* ハンクが選択解除されると差分パネルの
+色分け表示が無効になり、背景色がグレーになります。それと同時にファイルの差分ヘッダ
+が更新され、現在選択されているハンクの数と行数が表示されます。もう一度
+ダブルクリックしてハンクを選択することでコミットにその変更を含めることができます。
 
-When a file is partially selected for commit, it's icon is changed from
-a checkbox to a radio button. At a glance at the file list, you should
-be able to find which files are entirely included in the commit,
-partially included, or excluded entirely.
+ファイル内の変更が部分的に選択されているとき、ファイル一覧に表示されるそのファイルの
+チェックボックス表示がラジオボタンのようになります。これにより、次のコミットで
+各ファイルの全体がコミットされるのか、部分的にコミットされるのか一目で分かります。
 
-What happens at commit time?
+コミットするとどうなるのか？
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The short answer is that the selected hunks in checked files are
-committed to the repository and the unselected changes are left in your
-working directory for the next commit.
+簡単に言ってしまえば、チェックの入ったファイル内の選択されたハンクがリポジトリに
+コミットされ、選択されなかった変更点は作業ディレクトリに残り、次のコミットに
+持ち越されます。
 
-The long answer is a little more complicated.  What happens behind the
-scenes is that the files which are partially selected are backed up in a
-safe location, reverted to their last revisioned state, have their
-selected change hunks applied back to them, committed, and then finally
-recovered from backup (thus placing the rejected change hunks back into
-the working copy).  Files which are not partially selected avoid the
-entire *backup, revert, patch, commit, recover* round trip and instead
-are committed in place.
+実際には少々複雑なことをしています。その裏側で何が起こっているのかというと、
+選択されなかったハンクのバックアップを安全な場所に作成した後、作業ディレクトリの
+内容が最新リビジョンの状態に戻し、クリーンな状態にします。そして選択された変更点
+のみが作業ディレクトリに書き戻されて、この状態でコミットされます。
+最後にバックアップから選択されなかったハンクが作業ディレクトリに復元されます。
+ハンク選択されなかったファイルは *バックアップ、書き戻し、コミット、復元* の
+一連の処理はされません。
 
-This longer answer is only interesting when something goes wrong, which
-on Windows unfortunately has a probability greater than 0. If some
-program (virus checker, compiler) locks your file in the middle of this
-process you may see an error about a failed patch.  These errors are
-recoverable.  Delete any new :file:`.rej` files and try the commit again.
+このハンク選択機能の内部処理に関する記述は、不運にも処理に失敗したときに役に立つ
+かもしれません (Windows ではその可能性がゼロであると言い切れないため)。
+何らかのプログラム (アンチウイルスソフト、コンパイラなど) が処理の過程で生成された
+一時ファイルをロックしてしまった場合、書き戻しに失敗したというエラーが発生する
+かもしれません。しかしこれらのエラーは修復できます。全ての :file:`.rej` ファイルを
+削除してからもう一度コミット試みてください。
 
 
-
-Keyboard navigation
--------------------
+キーボードショートカット
+------------------------
 
 :kbd:`Ctrl-Enter`
-	will trigger the commit
+	コミットします
 :kbd:`Ctrl-C`
-	In the diff panel will copy the currently highlighted (not selected,
-	but highlighted) diff hunks to the clipboard. These can be pasted
-	into a text buffer to generate any arbitrary patch based from the
-	changes in your working directory.
+	差分表示パネルでは現在ハイライト (選択ではない) されているハンクをクリップボードに
+	コピーします。作業ディレクトリの変更から任意の変更点をテキストとしてどこかにペースト
+	するのに使えます。
 
-The code which copies the hunks to the clipboard is intelligent about
-diff headers.  The clipboard contents will always be a valid patch.
-
-
-File Context Menus
-------------------
-
-By right clicking on a file in the file list, you will get a context
-menu of commands that are applicable to the selected file.  If multiple
-files are selected, the context menu only applies to the first selected
-file.
-
-If you have configured a visual editor (in
-:menuselection:`Global Settings --> TortoiseHg --> Visual Editor`)
-this includes an option to open the file in your editor.
-
-For unknown **?** files, the context menu will allow you to detect
-renames (if you think the unknown file is a copy or rename of a
-revisioned file) or to configure the repository's ignore filter (if the
-unknown file should never be revisioned and you want Mercurial to ignore
-it).
+クリップボードにコピーされるハンクは気が利いていて、差分のヘッダ情報が付加されます。
+つまり、クリップボードの内容はいつでも正しいパッチとして使えるというわけです。
 
 
-Merging
--------
+ファイルの右クリックメニュー
+----------------------------
 
-The commit tool has a special mode when it is opened in a repository
-that is in a merged state (technically, this means the current working
-directory has two parent revisions). The file list has no checkboxes and
-the diff pane does not allow selections. The commit 'manifest' is
-essentially immutable, since you must commit the entire working
-directory after a merge.
+ファイル一覧のファイルの上で右クリックすることで、選択されたファイルに対する
+コマンドを含むメニューが表示されます。複数のファイルを選択している状態で
+右クリックメニューを開いた場合、コマンドは最初のファイルにのみ適用されます。
 
-The merge state *ms* column is especially useful in this mode.  Files
-that are marked with *R* are files where Mercurial and/or the user have
-successfully merged (resolved) changes from both branches. Files that
-are marked with *U* have unresolved changes. You can use the *resolve*
-context menu option to restart the merge for that file, or you can use
-the *edit* context menu option to resolve the conflict by hand. When the
-conflict has been resolved, you use the *mark resolved* context menu
-option, which changes the file's merge state to *R*.
+GUI エディタ
+(:menuselection:`グローバル設定 --> TortoiseHg --> GUI エディタ`)
+が設定されている場合、メニューにはそのエディタで選択されているファイルを
+開くコマンドも含まれています。
 
-Mercurial will not allow you to commit a merge if any files have
-unresolved *U* merge states.
-
-For your reference, *local* is the revision you had checked out when you
-started the merge and *other* is the revision you merged with.
-
-To undo a failed merge attempt, you must tell Mercurial to remove the
-second parent from your working directory.  This usually means
-performing a clean update of the first parent.  The merge tool has an
-:guilabel:`Undo` button which does exactly that.  The recovery tool also
-has a :guilabel:`Clean` button that does the same thing.
-
-Once you have your working directory back at one parent revision, you
-may start the merge process again.
+不明ファイル **?** の右クリックメニューには名前変更を検出するコマンド
+(不明ファイルが管理下にあったファイルのコピーまたは名前変更されたものだと
+考えられる場合) や、リポジトリの無視フィルタを編集するするコマンド
+(その不明ファイルを今後もリビジョン管理することはなく、Mercurial にそれを
+無視して欲しい場合) が提供されます。
 
 
-Commit Message Pane
--------------------
-
-If your project has guidelines for commit message format, you can
-configure those in the settings tool.  The commit tool will enforce this
-policy at commit time, and also has the ability to apply the policy to
-the current message.
-
-The commit message pane has special context menu options:
-
-	:guilabel:`Paste Filenames`:
-		Pastes checked filenames into the commit message at the cursor.
-	:guilabel:`Apply Format`:
-		Apply configured message wrap policy to current message.
-	:guilabel:`Configure Format`:
-		Opens the settings dialog to the :guilabel:`Commit` tab.
-
-MQ patches
+マージ作業
 ----------
 
-Many advanced Mercurial users use the MQ extension to manage a patch
-queue. TortoiseHg does not offer much in the way of support for MQ, but
-the commit tool will at least recognize when a patch is applied. When a
-patch is applied, the usual commit command will not work, so the commit
-tool enters *patch refresh* mode. The title bar will say "refreshing
-patch *patchname*" and the patch comment will appear in the commit
-message pane.
+マージ状態のリポジトリを開いたとき (正確には現在の作業ディレクトリが2つの
+親リビジョンを持っているとき) コミットツールは特別なモードに切り替わります。
+ファイル一覧にはチェックボックスが表示されず、差分表示パネルではハンクを
+選択することができません。マージ後に作業ディレクトリ全体をコミットしなければ
+ならないため、基本的にコミットマニフェストは不変です。
 
-The commit tool will present the entire contents of the top patch
-including any changes that are in your working directory (un-refreshed
-changes). This is essentially what the qdiff command would show you.
-There is, in fact, no way to get just the working copy diffs beyond
-running :command:`hg diff` on the command line. The reason the dialog
-operates in this mode is that it allow you to use the integrated change
-selection features to move changes into or out of the top patch. You can
-move entire files or single changes in or out of the patch.
+このモードではマージ状態を示す *ms* 列が特に役に立ちます。この *ms* 列で
+*R* というマークが付いたファイルは Mercurial またはユーザによって2つの
+親リビジョンから正しくマージ (衝突の解決) されたファイルです。 *U* マーク
+付いたファイルは未解決のファイルです。そのファイルのマージ作業を再開するには
+右クリックメニューの *衝突の解決* メニューを選択するか、 *編集* メニューで
+ファイルを開いて手動で衝突を解決します。衝突を解決したら *解決済みとしてマーク*
+メニューを選択してファイルのマージ状態を *R* に変更します。
 
-The :guilabel:`Commit` button, which has been renamed :guilabel:`QRefresh`
-in this context, it will refresh the top patch with just the changes you
-have selected (including the patch description). This may be a bit
-confusing at first because the changes you leave out of the patch are
-still going to be in the working directory after the refresh, so it will
-look like nothing has changed.
+Mercurial は1つでもマージ状態が *U* となっているファイルがあるとコミットを
+中止します。
 
-So, in summary, using MQ with TortoiseHg is still almost entirely a
-command line operation, but you can use :command:`hgtk ci` to refresh your
-patches and take advantage of our excellent change selection support.
+*ローカル* はマージを始めたときにチェックアウトされていたリビジョンで、
+*他のリビジョン* はマージ対象のリビジョンです。
 
-QNew Mode
+失敗したマージ作業を取り消すには2つ目の親リビジョンによる変更点を作業リポジトリ
+から削除するために Mercurial に知らせなければなりません。
+これは通常1つ目の親リビジョンへのクリーンな (ローカルでの変更を上書き) 更新を
+意味します。マージツールにはまさにその操作のための :guilabel:`取り消し`
+ボタンがあります。これはリカバリツールの :guilabel:`クリーン` ボタンを
+押しても同じ結果になります。
+
+作業ディレクトリをどちらかの親リビジョンに戻せば再びマージ作業を始めることが
+できます。
+
+
+コミットメッセージパネル
+------------------------
+
+プロジェクトにコミットメッセージのルールがある場合はそれらを設定ダイアログで
+変更できます。コミットツールは設定されたポリシーをコミット時にチェックし、
+現在のメッセージに対しても適用する機能があります。
+
+コミットメッセージパネルはいくつかの特別な右クリックメニューがあります :
+
+	:guilabel:`ファイル名を貼り付け`:
+		チェックの入っているファイル名ををコミットメッセージのカーソル位置に
+		貼り付けます。
+	:guilabel:`フォーマットポリシーの適用`:
+		設定されたメッセージの折り返しポリシーを現在のメッセージに適用します。
+	:guilabel:`フォーマットポリシーの設定`:
+		設定ダイアログの :guilabel:`コミット` タブを開きます。
+
+
+MQ パッチ
 ---------
 
-Newly added in 0.8, the commit tool can be used to create a new patch
-for your patch queue.  If you have the MQ extension enabled, a text
-entry will be inserted between the branch maintenance button and the
-message history drop-down box.  If you enter a filename in this entry
-the commit tool will switch out of *commit* or *qrefresh* mode into
-*qnew* mode.  In *qnew* mode, the commit tool shows only working
-directory modifications (the changes that would typically get added to a
-new patch by :command:`hg qnew -f`).  The :guilabel:`Commit` button will
-change into a :guilabel:`QNew` button as well, to make the mode switch
-more obvious.
+多くの Mercurial 上級者はパッチの管理に MQ 拡張機能を使っていることでしょう。
+TortoiseHg は MQ のための機能をあまり多くは提供していませんが、コミットツール
+はパッチが適用されているかどうかを検出します。パッチが適用されているとき、
+通常のコミット操作ができないため、コミットツールは *パッチ更新* モードに
+切り替わります。ダイアログのタイトルは "パッチ更新 *パッチ名*" となり、
+コミットメッセージパネルにはそのパッチのコメントが表示されます。
 
-When the :guilabel:`QNew` button is pressed, the selected change hunks
-are written into a new patch (given the filename you specified), and the
-dialog is refreshed.  At refresh, the commit tool will obviously switch
-to *qrefresh* mode since there will now be at least one applied patch.
+コミットツールは現在のパッチ内容と作業ディレクトリにおける変更点 (まだ
+:command:`qrefresh` していない変更も含む) 全体をまとめて表示します。
+これは :command:`qdiff` コマンドを実行したときと同じ内容になります。
+実際には、コマンドラインから実行する :command:`hg diff` のように
+作業ディレクトリにおける変更点のみを表示する方法はありません。
+その理由はこのように全てまとめた形で表示することでハンク選択機能を使って
+現在のパッチから変更点を取り除く機能を提供できるからです。
 
-You may give the new patch a commit message at the initial *qnew* event,
-or you can do it now by using the *qrefresh* feature.
+:guilabel:`コミット` ボタン (パッチ更新モードではラベルが :guilabel:`QRefresh`
+に変化します) は現在のパッチ内容を選択されている変更点にコミットメッセージと共に
+更新します。更新後も除外した変更点は作業ディレクトリに残るので、ファイル一覧や
+差分表示パネルの内容は何も変化しないため、最初は少し戸惑うかもしれません。
 
-If you left change hunks out of the new patch, they will appear to be in
-the new patch anyway because of the way *qrefresh* mode shows the sum of
-both the top patch and the working directory changes.  If you enter a
-new patch name again, and switch the commit tool into *qnew* mode again,
-you will see the changes that you left in the working directory.
+まとめると、 TortoiseHg で MQ を使うにはまだまだコマンドラインからの操作が
+必要になりますが、現在のパッチを更新するために :command:`hgtk ci` が使える
+ことと、変更点の選択によるパッチ内容の分割という素晴しい利点があります。
 
 
-Configurables
--------------
+QNew モード
+-----------
 
-:menuselection:`Commit --> Username`
-	Sets username associated with your commits (see :doc:`quick`)
-:menuselection:`Commit --> External Tool`
-	Allows you to select Qct as the your commit tool [DEPRECATED]
-:menuselection:`Commit --> Summary Line Length`
-	Configures a 'policy' limit for summary lines
-:menuselection:`Commit --> Message Line Length`
-	Configures a 'policy' limit for message lines
-:menuselection:`TortoiseHg --> Bottom Diffs`
-	Toggles diff pane from left to below file list
-:menuselection:`TortoiseHg --> Max Diff Size`
-	Configures the diff size limit
+新しくバージョン 0.8 で導入された機能で、コミットツールから MQ のパッチを
+作成できます。 MQ 拡張機能が有効になっている場合、ブランチボタンとコミット
+メッセージ履歴のドロップダウンリストの間にテキストボックスが表示されます。
+このテキストボックスにパッチ名を入力し始めるとコミットツールは *コミット*
+または *パッチ更新* モードから *パッチ作成* モードに切り替わり、
+差分表示パネルには現在の作業ディレクトリにおける変更点が表示されます。
+正常にモードが切り替わると :guilabel:`コミット` ボタンが :guilabel:`QNew`
+ボタンに変化するので一目瞭然です。
 
-External tool configuration is deprecated and will be removed in 0.9
+:guilabel:`QNew` ボタンが押されると選択されている変更点のハンクが入力された
+名前の新しいパッチに書き込まれ、ダイアログが再読み込みされます。これにより、
+少なくとも1つ適用済みのパッチが存在するため、ダイアログは *パッチ更新* モード
+に切り替わります。
 
-From command line
------------------
+パッチのコミットメッセージは *パッチ作成* モードのときに入力することもできますし、
+作成後の *パッチ更新*  モードで更新することもできます。
 
-The commit tool can be started from command line::
+パッチ作成時に変更点の一部を除外した場合、その変更点も差分表示パネルの新しいパッチ
+の中に表示されますが、これは前述の通り *パッチ更新* モードが現在のパッチ内容と
+作業ディレクトリの変更点をまとめて表示するためです。ここで再びテキストボックスに
+パッチ名の入力を始めるとコミットツールは再度 *パッチ作成* モードに移行し、
+差分表示パネルには作業ディレクトリに残った (先ほどのパッチ作成で除外した)
+変更点が表示されます。
+
+
+オプション設定
+--------------
+
+:menuselection:`コミット --> ユーザ名`
+	コミットに関連付けるユーザ名を設定します (:doc:`quick`)
+:menuselection:`コミット --> 外部ツール`
+	コミットツールとして Qct を使います [廃止予定]
+:menuselection:`コミット --> 要約文字数`
+	要約行の文字数を制限するポリシーを設定します
+:menuselection:`コミット --> メッセージ文字数`
+	コミットメッセージ各行の文字数を制限するポリシーを設定します
+:menuselection:`TortoiseHg --> 差分を画面下部に表示`
+	差分表示パネルをファイル一覧の右側から下に切り替えます
+:menuselection:`TortoiseHg --> 最大差分サイズ`
+	表示する差分の上限サイズを設定します
+
+外部ツールの設定はバージョン 0.9 で廃止されます。
+
+
+コマンドラインからの実行
+------------------------
+
+コミットツールはコマンドラインから起動することもできます： ::
 
 	hgtk commit [OPTIONS] [FILE]...
 
@@ -351,13 +335,15 @@ The commit tool can be started from command line::
 
 	use "hgtk -v help commit" to show global options
 
-For a quick help on the format of date type::
-	
+日付の書式は： ::
+
 	hg help dates
 
- 
-Changes since 0.7
------------------
+から見ることができます。
+
+
+0.7 からの変更点
+----------------
 
 * The :guilabel:`Show Diff` button has been removed. Diffs are always shown.
 * The commit tool no longer shows all diffs at startup. Only the first
