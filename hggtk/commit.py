@@ -1001,7 +1001,7 @@ def run(_ui, *pats, **opts):
         'logfile':'', 'message':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
         'unknown':True, 'ignored':False,
-        'exclude':[], 'include':[],
+        'exclude':[], 'include':[], 'rev':[],
         'check': True, 'git':False, 'addremove':False,
     }
     return GCommit(_ui, None, None, pats, cmdoptions)
