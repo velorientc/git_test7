@@ -342,17 +342,18 @@ class GCommit(GStatus):
     def view_menu(self):
         menu = gtk.Menu()
 
+        button = gtk.CheckMenuItem(_('Show Advanced'))
+        button.connect('toggled', self.toggle_view, 'advanced')
+        button.set_active(self.showadvanced)
+        button.set_draw_as_radio(True)
+        menu.append(button)
+
         button = gtk.CheckMenuItem(_('Show Parents'))
         button.connect('toggled', self.toggle_view, 'parents')
         button.set_active(self.showparents)
         button.set_draw_as_radio(True)
         menu.append(button)
 
-        button = gtk.CheckMenuItem(_('Show Advanced'))
-        button.connect('toggled', self.toggle_view, 'advanced')
-        button.set_active(self.showadvanced)
-        button.set_draw_as_radio(True)
-        menu.append(button)
         menu.show_all()
         return menu
 
