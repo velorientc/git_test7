@@ -14,7 +14,7 @@ Frequently Asked Questions
 	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
-	and and one bonus extension: hgfold.
+	and one bonus extension: hgfold.
 
 *How can I get translations for the Explorer context menu?*
 
