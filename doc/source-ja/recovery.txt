@@ -8,6 +8,8 @@
 .. figure:: figures/recover.png
 	:alt: リカバリダイアログ
 
+	リカバリダイアログ
+
 ツールバーのボタンは Mercurial コマンドそのものになっています：
 
 :guilabel:`クリーン`
