@@ -85,6 +85,17 @@ class GShelve(GStatus):
         self.vpaned.add2(status_body)
         self.vpaned.set_position(self._setting_vpos)
         self.activate_shelve_buttons(True)
+
+        self.patch_text = gtk.TextView()
+        self.patch_text.set_wrap_mode(gtk.WRAP_NONE)
+        self.patch_text.set_editable(False)
+        self.patch_text.modify_font(self.difffont)
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC,
+                            gtk.POLICY_AUTOMATIC)
+        scroller.add(self.patch_text)
+        self.diff_notebook.append_page(scroller, gtk.Label(_('Shelf Contents')))
+        self.diff_notebook.show_all()
         return self.vpaned
 
     def get_custom_menus(self):
@@ -103,6 +114,13 @@ class GShelve(GStatus):
 
     def refresh_complete(self):
         self.activate_shelve_buttons(True)
+        if self.has_shelve_file():
+            fp = open(self.repo.join('shelve'))
+            buf = self.diff_highlight_buffer(fp.readlines())
+            self.patch_text.set_buffer(buf)
+        else:
+            self.patch_text.set_buffer(None)
+
 
     ### End of overridable methods ###
 
