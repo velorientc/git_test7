@@ -1,0 +1,13 @@
+== Rules for contributing to TortoiseHg ==
+
+Note that these rules may change together with the code base as the project
+evolves. Specifically, the compatibility rules in the default branch may be
+different from those in the stable branch.
+
+=== Library compatibility ===
+
+Our code base assumes minimum versions of library components as listed below.
+That is, our code must not depend on features or API's that were introduced
+in any later versions of the respective components.
+
+PyGtk: 2.10
