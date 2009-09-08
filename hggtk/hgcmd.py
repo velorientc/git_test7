@@ -19,6 +19,11 @@ from hggtk import gtklib, hgthread
 
 class CmdDialog(gtk.Dialog):
     def __init__(self, cmdline, progressbar=True):
+        if type(cmdline) is tuple:
+            self.cmdlist = list(cmdline)[1:]
+            cmdline = cmdline[0]
+        else:
+            self.cmdlist = []
         if progressbar:
             title = 'hg ' + ' '.join(cmdline[1:])
         else:
@@ -148,12 +153,17 @@ class CmdDialog(gtk.Dialog):
                 pass
         self.update_progress()
         if not self.hgthread.isAlive():
-            self._button_stop.set_sensitive(False)
-            self._button_ok.set_sensitive(True)
-            self._button_ok.grab_focus()
             self.returncode = self.hgthread.return_code()
             if self.returncode is None:
                 self.write(_('\n[command interrupted]'))
+            elif self.returncode == 0 and self.cmdlist:
+                cmdline = self.cmdlist.pop(0)
+                self.hgthread = hgthread.HgThread(cmdline[1:])
+                self.hgthread.start()
+                return True
+            self._button_stop.set_sensitive(False)
+            self._button_ok.set_sensitive(True)
+            self._button_ok.grab_focus()
             return False # Stop polling this function
         else:
             return True
