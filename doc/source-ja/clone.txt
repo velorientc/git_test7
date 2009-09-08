@@ -10,8 +10,9 @@
 コマンドラインから :command:`hgtk clone` を実行してください。
 
 .. figure:: figures/clone.png
-	:alt: 複製ダイアログ
+	:alt: クローンダイアログ
 
+	クローンダイアログ
 
 :guilabel:`クローン元`
 	複製したいリポジトリのパス (または URL) を指定してください。
