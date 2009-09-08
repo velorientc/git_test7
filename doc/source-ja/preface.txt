@@ -26,9 +26,10 @@
 :doc:`intro` では TortoiseHg とは何か、何ができるのか、どこからインストール
 すればいいのかなど、基本的な事柄について解説します。
 
-:doc:`quick` は TortoiseHg に初めて触れる人のためのクイックチュートリアルです。
+:doc:`quick` は TortoiseHg に初めて触れる人のための短いチュートリアルです。
 
-:doc:`faq` にはよくある質問がまとめてあります。
+:doc:`faq` には TortoiseHg 自体に関する質問や多くの人がぶつかる問題の解決方法
+などがまとめてあります。
 
 :doc:`debugging` は TortoiseHg のバグを見つけたときにどうやってデバッグを
 すればいいのかについて書かれています。
@@ -50,9 +51,10 @@ TortoiseHg は `GPLv2 <http://www.gnu.org/licenses/gpl-2.0.html>`_ の下で
 
 * `利用者 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - アナウンス、使い方などの質問、機能の議論など。
 * `開発者 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - パッチ投稿、バグ報告、開発関連の議論など。
-* `バグ通知 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - バグ管理システムからの通知。
+* `バグ通知 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - バグ管理システムからの自動通知メール。
 
-Bitbucket には`公式 Wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ もあります。
+Bitbucket には `公式 Wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ もあります。
+日本語 Wiki は `こちら <http://bitbucket.org/kuy/thg-ja/wiki/Home>`_ になります。
 
 謝辞
 ====
