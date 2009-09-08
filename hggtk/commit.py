@@ -878,6 +878,8 @@ class GCommit(GStatus):
         if self.qnew:
             cmdline += [hglib.fromutf(self.get_qnew_name())]
         cmdline += files
+        if autopush:
+            cmdline = (cmdline, ['hg', 'push'])
         dialog = hgcmd.CmdDialog(cmdline, True)
         dialog.set_transient_for(self)
         dialog.run()
