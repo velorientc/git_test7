@@ -418,7 +418,8 @@ class GCommit(GStatus):
         def setlabel(label, ctx, ishead):
             revision = str(ctx.rev())
             hash = str(ctx)
-            summary = hglib.toutf(ctx.description().split('\n')[0])
+            summary = gtklib.markup_escape_text(hglib.toutf(
+                                ctx.description().split('\n')[0]))
             face = 'monospace'
             size = '9000'
 
