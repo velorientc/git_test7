@@ -16,7 +16,7 @@ import tempfile
 import cStringIO
 import time
 
-from mercurial import ui, hg, util, patch
+from mercurial import ui, hg, util, patch, cmdutil
 
 from thgutil.i18n import _
 from thgutil import shlib, hglib
@@ -566,6 +566,24 @@ class GCommit(GStatus):
             else:
                 c_btn.set_label(_('QRefresh'))
                 c_btn.set_tooltip(self.tooltips, _('refresh top MQ patch'))
+                if not hasattr(self, 'patch_text'):
+                    self.patch_text = gtk.TextView()
+                    self.patch_text.set_wrap_mode(gtk.WRAP_NONE)
+                    self.patch_text.set_editable(False)
+                    self.patch_text.modify_font(self.difffont)
+                    scroller = gtk.ScrolledWindow()
+                    scroller.set_policy(gtk.POLICY_AUTOMATIC,
+                                        gtk.POLICY_AUTOMATIC)
+                    scroller.add(self.patch_text)
+                    self.diff_notebook.append_page(scroller,
+                                       gtk.Label(_('Patch Contents')))
+                    self.diff_notebook.show_all()
+                revs = cmdutil.revrange(self.repo, ['tip'])
+                fp = cStringIO.StringIO()
+                patch.export(self.repo, revs, fp=fp)
+                text = fp.getvalue().splitlines(True)
+                buf = self.diff_highlight_buffer(text)
+                self.patch_text.set_buffer(buf)
         elif self.qnew:
             c_btn.set_label(_('QNew'))
             c_btn.set_tooltip(self.tooltips, _('QNew'))
@@ -573,6 +591,8 @@ class GCommit(GStatus):
             if not buf.get_modified():
                 buf.set_text('')
                 buf.set_modified(False)
+            if hasattr(self, 'patch_text'):
+                self.patch_text.set_buffer(None)
         else:
             c_btn.set_label(_('_Commit'))
             c_btn.set_tooltip(self.tooltips, _('commit'))
