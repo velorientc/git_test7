@@ -114,7 +114,7 @@ class MergeDialog(gtk.Window):
         if tool:
             oldmergeenv = os.environ.get('HGMERGE')
             os.environ['HGMERGE'] = tool
-        dlg = hgcmd.CmdDialog(cmdline)
+        dlg = hgcmd.CmdDialog(cmdline, False)
         dlg.run()
         dlg.hide()
         repo = hg.repository(ui.ui(), path=paths.find_root())
