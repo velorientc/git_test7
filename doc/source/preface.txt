@@ -34,7 +34,7 @@ components of TortoiseHg.
 
 :doc:`settings` describes how to configure TortoiseHg.
 
-:doc:`recovery` describes the the recovery operations to do on
+:doc:`recovery` describes the recovery operations to do on
 a project.
 
 :doc:`faq` has a list of common questions and their answers.
