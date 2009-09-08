@@ -1369,7 +1369,7 @@ class GStatus(gdialog.GDialog):
             self.rename_file(files[0])
         def copy(menuitem, files):
             self.copy_file(files[0])
-        def guess(menuitem, files):
+        def guess_rename(menuitem, files):
             dlg = guess.DetectRenameDialog()
             dlg.show_all()
             dlg.set_notify_func(self.ignoremask_updated)
@@ -1389,7 +1389,7 @@ class GStatus(gdialog.GDialog):
         make(_('l_og'), log, 'MARC!ru')
         make(_('_forget'), forget, 'MARC!ru')
         make(_('_add'), add, 'I?')
-        make(_('_guess rename'), guess, '?')
+        make(_('_guess rename'), guess_rename, '?')
         make(_('_ignore'), ignore, '?')
         make(_('remove versioned'), remove, 'C')
         make(_('_delete unversioned'), delete, '?I')
