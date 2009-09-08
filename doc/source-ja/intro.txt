@@ -12,14 +12,14 @@ TortoiseHg は `Mercurial <http://mercurial.selenic.com/wiki/>`_
 分散構成管理のための GUI ツールと Windows エクスプローラに統合するための
 シェル拡張のパッケージです。
 
-Windows では,
+Windows では、
 	TortoiseHg はエクスプローラにアイコンオーバーレイおよび
 	右クリックメニューを提供するシェル拡張と、TortoiseHg の各種ダイアログを
 	起動するためのコマンドラインツール :file:`hgtk.exe` から構成されます。
 	Windows 用インストーラには Mercurial やマージツール、それ以外に必要なもの
 	全てを含んでおり、これをインストールするだけすぐ使えるようになっています。
 
-Linux では,
+Linux では、
 	TortoiseHg はコマンドラインから利用する :file:`hgtk` スクリプトと
 	ご使用のファイルマネージャにアイコンオーバーレイと右クリックメニューを
 	提供する Nautilus 拡張機能から構成されます。TortoiseHg を Linux で
@@ -67,7 +67,7 @@ TortoiseHg のユーザインターフェイスは様々な言語に翻訳され
 ダウンロードする必要はありません。
 :file:`C:\\Program Files\\TortoiseHg\\locale` で利用可能な言語が見られます。
 言語を有効にするには環境変数 ``LANGUAGE`` に好きな言語コードを設定するだけです。
-例えばイタリア語であれば ``set LANGUAGE=it`` を設定してください。
+例えば日本語であれば ``set LANGUAGE=ja`` を設定してください。
 
 .. note::
 	``LANGUAGE`` を設定しても :guilabel:`OK` や :guilabel:`Apply` というように
