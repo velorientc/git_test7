@@ -65,7 +65,7 @@ class MQWidget(gtk.VBox):
                             str)) # patch name
     }
 
-    def __init__(self, repo, accelgroup=None):
+    def __init__(self, repo, accelgroup=None, tooltips=None):
         gtk.VBox.__init__(self)
 
         self.repo = repo
@@ -80,25 +80,29 @@ class MQWidget(gtk.VBox):
         self.btn = {}
 
         popallbtn = gtk.ToolButton(gtk.STOCK_GOTO_FIRST)
-        popallbtn.set_tooltip_text(_('Unapply all patches'))
+        if tooltips:
+            popallbtn.set_tooltip(tooltips, _('Unapply all patches'))
         popallbtn.connect('clicked', self.popall_clicked)
         toolbar.insert(popallbtn, -1)
         self.btn['popall'] = popallbtn
 
         popbtn = gtk.ToolButton(gtk.STOCK_GO_BACK)
-        popbtn.set_tooltip_text(_('Unapply last patch'))
+        if tooltips:
+            popbtn.set_tooltip(tooltips, _('Unapply last patch'))
         popbtn.connect('clicked', self.pop_clicked)
         toolbar.insert(popbtn, -1)
         self.btn['pop'] = popbtn
 
         pushbtn = gtk.ToolButton(gtk.STOCK_GO_FORWARD)
-        pushbtn.set_tooltip_text(_('Apply next patch'))
+        if tooltips:
+            pushbtn.set_tooltip(tooltips, _('Apply next patch'))
         pushbtn.connect('clicked', self.push_clicked)
         toolbar.insert(pushbtn, -1)
         self.btn['push'] = pushbtn
 
         pushallbtn = gtk.ToolButton(gtk.STOCK_GOTO_LAST)
-        pushallbtn.set_tooltip_text(_('Apply all patches'))
+        if tooltips:
+            pushallbtn.set_tooltip(tooltips, _('Apply all patches'))
         pushallbtn.connect('clicked', self.pushall_clicked)
         toolbar.insert(pushallbtn, -1)
         self.btn['pushall'] = pushallbtn
