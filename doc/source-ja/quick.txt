@@ -28,7 +28,9 @@ TortoiseHg のグローバル設定から設定できます。プロジェクト
 右クリックして :menuselection:`TortoiseHg --> グローバル設定` を選択します。
 
 .. figure:: figures/cmenu-nofiles.jpg
-	:alt: Context Menu
+	:alt: 右クリックメニュー
+
+	何もファイルを選択していないときの右クリックメニュー
 
 そして :guilabel:`コミット` タブに切り替えて、 :guilabel:`ユーザ名` の
 テキストボックスに名前を入力してください。
@@ -40,13 +42,13 @@ TortoiseHg のグローバル設定から設定できます。プロジェクト
 .. note::
 	ユーザ名として設定する名前の形式に厳密なルールがあるわけではありませんが、
 	多くの人が次のような形式を採用しています：
-	
+
 		氏名 <電子メールアドレス>
-	
+
 	例えば：
-	
+
 		Taro Yamada <taroyamada@example.net>
-	
+
 	電子メールアドレスはチェンジログビューアで履歴を表示する際には削除され、
 	Mercurial 内蔵のウェブサーバを利用した場合はスパム対策のためメールアドレス
 	の一部のみ表示されます。
@@ -61,7 +63,9 @@ TortoiseHg のグローバル設定から設定できます。プロジェクト
 この作業はプロジェクトディレクトリのルートで一度だけ行ってください。
 
 .. figure:: figures/init.png
-	:alt: リポジトリ初期化ダイアログ
+	:alt: 初期化ダイアログ
+
+	リポジトリ初期化ダイアログ
 
 特に理由がなければ
 :guilabel:`特殊ファイルを追加する (.hgignoreなど)` にチェックを入れ、
@@ -141,7 +145,9 @@ TortoiseHg のグローバル設定から設定できます。プロジェクト
 	取り消すことは出来なくなります。
 
 .. figure:: figures/commit.png
-	:alt: コミットツール
+	:alt: コミットダイアログ
+
+	コミットツール
 
 
 リポジトリの共有
@@ -157,7 +163,9 @@ Mercurial ではこれを *リポジトリの複製 (cloning your repository)* �
 を選ぶか、コマンドラインから :command:`hgtk clone` を実行します。
 
 .. figure:: figures/share.png
-	:alt: 複製ツール
+	:alt: クローンダイアログ
+
+	クローンダイアログ
 
 チームでコードを共有するための *中央リポジトリ* に、あなたが持っている
 ローカルのリポジトリのような作業ディレクトリは必要ありません。
@@ -183,7 +191,9 @@ TortoiseHg には専用のダイアログが用意されています。
 コマンドラインから :command:`hgtk clone` を実行してください。
 
 .. figure:: figures/clone.png
-	:alt: Clone dialog
+	:alt: クローンダイアログ
+
+	クローンダイアログ
 
 今回はこれから複製するリポジトリの作業ディレクトリでプロジェクトの作業を
 するため、 :guilabel:`クローン後に作業ディレクトリを HEAD に更新しない`
@@ -237,7 +247,9 @@ synchronize (share changes) with the group repository.
 	Merges can be safely restarted if necessary.
 
 .. figure:: figures/synchronize.png
-	:alt: 同期ツール
+	:alt: 同期ダイアログ
+
+	同期ダイアログ
 
 Mercurial は共同作業を簡単に、素早く、効率的にします。
 詳しくは Mercurial の `wiki <http://mercurial.selenic.com/wiki/>`_
