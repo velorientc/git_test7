@@ -80,6 +80,7 @@ Mercurial のアイコン (銀色の水滴) をクリックして :guilabel:`Opt
 .. figure:: figures/rename.jpg
 	:alt: 名前変更ダイアログ
 
+	名前変更 (または移動) ダイアログ
 
 Nautilus
 --------
@@ -100,5 +101,7 @@ lines like these::
 
 .. figure:: figures/nautilus.png
 	:alt: Nautilus スクリーンショット
+
+	GNOME/Nautilus スクリーンショット
 
 .. vim: noet ts=4

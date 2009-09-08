@@ -56,6 +56,8 @@
 .. figure:: figures/visual-diff.jpg
 	:alt: 差分表示ウィンドウ
 
+	差分表示ウィンドウ
+
 TortoiseHg 0.8 では差分表示ダイアログにおける4つのユーザビリティ上の
 問題が解決されました：
 
@@ -125,6 +127,8 @@ TortoiseHg ダイアログの多くは Mercurial のコマンド実行の状況�
 
 .. figure:: figures/hgcmd.jpg
 	:alt: Mercurial コマンドダイアログ
+
+	Mercurial コマンドダイアログ
 
 .. note::
 	エラーメッセージは目立つように赤い文字として表示されます
