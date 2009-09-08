@@ -5,6 +5,7 @@
 .. module:: introduction
 	:synopsis: Introduce TortoiseHg and its various parts
 
+
 TortoiseHg とは何か?
 ====================
 
@@ -31,8 +32,10 @@ TortoiseHg は (Windows のシェル拡張を除いて) 主に Python と PyGTK 
 書かれています。 :file:`hgtk` スクリプトと TortoiseHg の各種ダイアログは
 (例えば Mac OS など) PyGTK に対応した環境であればどこでも使うことができます。
 
+
 TortoiseHg のインストール
 =========================
+
 
 Windows の場合
 --------------
@@ -76,11 +79,12 @@ TortoiseHg のユーザインターフェイスは様々な言語に翻訳され
 	これはリリース時にご利用の言語の TortoiseHg 翻訳が完了していなかったためです。
 
 Windows シェル拡張の右クリックメニューはその翻訳を Windows レジストリから
-取得します。すでに多くの言語向けの翻訳が利用可能になっており、それらは
-TortoiseHg `Wiki <http://bitbucket.org/tortoisehg/stable/wiki/install>`_ から
-確認できます。レジストリファイルをダウンロードしたらダブルクリックして
-登録してください。もしダウンロードしたファイルの拡張子が :file:`.txt`
-になっていたら :file:`.reg` に変更しておく必要があります。
+取得します。すでに多くの言語向けに翻訳されており、それらは TortoiseHg の
+`ダウンロードページ <http://bitbucket.org/kuy/thg-ja/wiki/install>`_
+から利用可能な言語を確認できます。レジストリファイルをダウンロードしたら
+ダブルクリックしてインストールしてください。ダウンロードしたファイルの拡張子が
+:file:`.txt` になっていたら :file:`.reg` に直しておく必要があります。
+
 
 Linux または Max OS の場合
 --------------------------
