@@ -245,6 +245,7 @@ class GCommit(GStatus):
             self.autoinc_entry.set_text(hglib.toutf(autoinc))
         if self.qnew:
             self.qnew_name.grab_focus() # set focus back
+            self.qnew_name.set_position(-1)
 
     def get_body(self):
         status_body = GStatus.get_body(self)
