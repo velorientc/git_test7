@@ -158,7 +158,8 @@ class CmdDialog(gtk.Dialog):
                 self.write(_('\n[command interrupted]'))
             elif self.returncode == 0 and self.cmdlist:
                 cmdline = self.cmdlist.pop(0)
-                self.textbuffer.insert(enditer, hglib.toutf(' '.join(cmdline)))
+                text = '\n' + hglib.toutf(' '.join(cmdline)) + '\n'
+                self.textbuffer.insert(enditer, text)
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
                 self.hgthread = hgthread.HgThread(cmdline[1:])
                 self.hgthread.start()
