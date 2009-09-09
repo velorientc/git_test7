@@ -211,12 +211,10 @@ TortoiseHg には専用のダイアログが用意されています。
 
 .. {{images/image001.png}}
 
-.. NEEDFORTRANSLATION
-
 コミットツールは変更の差分を表示してくれます。もしくは普段使用している GUI の
-差分表示ツール (kdiff など) を使用することもできます。
-Mercurial allows you to commit many changes before you decide to
-synchronize (share changes) with the group repository.
+差分表示ツール (kdiff など) を使用することもできます。 Mercurial のリポジトリは
+分散型になっているため、変更点を共有リポジトリと同期 (変更点の共有) するかどうか
+決める前にローカルリポジトリにコミットできます。
 
 変更を共有リポジトリに公開する準備が整ったら、
 
@@ -241,10 +239,8 @@ synchronize (share changes) with the group repository.
 
 文章にすると複雑に見えますが、実際には同期ツールのボタンを押すだけです。
 
-.. NEEDFORTRANSLATION
-
 .. note::
-	Merges can be safely restarted if necessary.
+	マージ作業に失敗したとしても安全に最初からマージ作業を始めることが可能です。
 
 .. figure:: figures/synchronize.png
 	:alt: 同期ダイアログ
