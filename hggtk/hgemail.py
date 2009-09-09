@@ -35,14 +35,14 @@ class EmailDialog(gtk.Window):
         self.tips = gtk.Tooltips()
 
         tbuttons = [
-                self._toolbutton(gtk.STOCK_GOTO_LAST, _('send'),
+                self._toolbutton(gtk.STOCK_GOTO_LAST, _('Send'),
                                  self._on_send_clicked,
                                  _('Send email(s)')),
-                self._toolbutton(gtk.STOCK_FIND, _('test'),
+                self._toolbutton(gtk.STOCK_FIND, _('Test'),
                                  self._on_test_clicked,
                                  _('Show email(s) which would be sent')),
                 gtk.SeparatorToolItem(),
-                self._toolbutton(gtk.STOCK_PREFERENCES, _('configure'),
+                self._toolbutton(gtk.STOCK_PREFERENCES, _('Configure'),
                                  self._on_conf_clicked,
                                  _('Configure email settings'))
             ]
