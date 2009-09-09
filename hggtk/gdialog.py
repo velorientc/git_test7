@@ -109,6 +109,8 @@ class GDialog(gtk.Window):
         get_minsize(self)
         get_defsize(self)
         get_tbbuttons(self)
+        get_menu_list(self)
+        get_help_url(self)
         get_body(self)
         get_extras(self)
         prepare_display(self)
@@ -169,6 +171,14 @@ class GDialog(gtk.Window):
 
     def get_tbbuttons(self):
         return []
+
+
+    def get_menu_list(self):
+        return None
+
+
+    def get_help_url(self):
+        return None
 
 
     def get_body(self):
@@ -321,6 +331,34 @@ class GDialog(gtk.Window):
             name = os.path.basename(self.repo.root)
         return hglib.toutf(name)
 
+    def helpcontents(self, item):
+        'User selected Help->Contents from menu bar'
+        url = self.get_help_url()
+        if not url:
+            return
+        if not url.startswith('http'):
+            docpath = os.path.dirname(paths.get_license_path())
+            url = os.path.join(docpath, url)
+        from hggtk import about
+        about.browseurl(url)
+
+    def launch(self, item, app):
+        import sys
+        # Spawn background process and exit
+        if hasattr(sys, "frozen"):
+            args = [sys.argv[0], app]
+        else:
+            args = [sys.executable] + [sys.argv[0], app]
+        if os.name == 'nt':
+            args = ['"%s"' % arg for arg in args]
+        oldcwd = os.getcwd()
+        root = paths.find_root(oldcwd)
+        try:
+            os.chdir(root)
+            os.spawnv(os.P_NOWAIT, sys.executable, args)
+        finally:
+            os.chdir(oldcwd)
+
     def windowstate(self, window, event):
         if event.changed_mask & gtk.gdk.WINDOW_STATE_MAXIMIZED:
             if event.new_window_state & gtk.gdk.WINDOW_STATE_MAXIMIZED:
@@ -365,6 +403,49 @@ class GDialog(gtk.Window):
 
         vbox = gtk.VBox(False, 0)
         self.add(vbox)
+
+        menus = self.get_menu_list()
+        if menus:
+            allmenus = [
+          (_('Launch'), False, False,
+           [(_('Changelog'), self.launch, ['log'], 'menulog.ico'),
+            (_('Commit'), self.launch, ['commit'], 'menucommit.ico'),
+            (_('Datamine'), self.launch, ['datamine'], 'menurepobrowse.ico'),
+            (_('Synchronize'), self.launch, ['synch'], 'menusynch.ico'),
+            (_('Shelve'), self.launch, ['shelve'], 'shelve.ico'),
+            (_('Settings'), self.launch, ['repoconfig'], 'settings_repo.ico')])
+           ] + menus + [
+          (_('Help'), False, True,
+           [(_('Contents'), self.helpcontents, [], gtk.STOCK_INFO),
+            (_('About'), self.launch, ['about'], gtk.STOCK_ABOUT)])
+          ]
+            menubar = gtk.MenuBar()
+            for title, aschecks, rightjustified, items in allmenus:
+                menu = gtk.Menu()
+                for name, func, args, icon_or_var in items:
+                    if aschecks:
+                        item = gtk.CheckMenuItem(name)
+                        item.set_active(icon_or_var)
+                        item.set_draw_as_radio(True)
+                    elif icon_or_var:
+                        item = gtk.ImageMenuItem(name)
+                        if icon_or_var.startswith('gtk'):
+                            img = gtk.image_new_from_stock(icon_or_var,
+                                                           gtk.ICON_SIZE_MENU)
+                        else:
+                            img = gtk.Image()
+                            ico = paths.get_tortoise_icon(icon_or_var)
+                            if ico: img.set_from_file(ico)
+                        item.set_image(img)
+                    else:
+                        item = gtk.MenuItem(name)
+                    item.connect('activate', func, *args)
+                    menu.append(item)
+                item = gtk.MenuItem(title)
+                item.set_submenu(menu)
+                item.set_right_justified(rightjustified)
+                menubar.append(item)
+            vbox.pack_start(menubar, False, False, 0)
 
         self.tooltips = gtk.Tooltips()
         toolbar = gtk.Toolbar()
