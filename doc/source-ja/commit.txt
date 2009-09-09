@@ -354,31 +354,28 @@ QNew モード
 から見ることができます。
 
 
-.. NEEDFORTRANSLATION
-
 0.7 からの変更点
 ----------------
 
-* The :guilabel:`Show Diff` button has been removed. Diffs are always shown.
-* The commit tool no longer shows all diffs at startup. Only the first
-  currently selected file is shown.
-* Added support for closing a named branch
-* The commit tool is now launchable from the merge dialog
-* The message pane context menu now has options for inserting selected
-  filenames, and configuring/applying a layout format.
-* :guilabel:`Ctrl-O` keyboard accelerator for triggering commit has been
-  replaced with :guilabel:`Ctrl-Enter` accelerator which is common to
-  many THG dialogs
-* Support for two-parent state (merging) has been improved, especially
-  the file context menus.
-* There is now a limit on the size of files that will be diffed by the commit
-  and changelog tools. Files above this size will only show a message
-  indicating why the file was not diffed.  This limit (default: 1MB) is
-  configurable (per-repository if necessary) via the settings dialog
-  :menuselection:`TortoiseHg --> Max Diff Size`.
-* You can specify the commiter and date via the command line: see
-  :command:`hgtk commit -h` for details
-* The :file:`qct.py` extension file is no longer bundled. It must be
-  downloaded separately if you wish to use Qct.
+* :guilabel:`差分表示` ボタンは削除されました。差分パネルは常に表示されます。
+* コミットツールは起動時に差分全体を表示しません。ファイル一覧で選択されている
+  1つ目のファイルの差分のみ表示されます。
+* 名前付きブランチを閉じる機能が追加されました。
+* コミットツールがマージダイアログから起動可能になりました。
+* コミットメッセージパネルの右クリックメニューに、チェックの入ったファイル一覧を
+  挿入するコマンドと、メッセージのフォーマットポリシーを適用または設定するコマンド
+  が追加されました。
+* これまで :guilabel:`Ctrl-O` がコミット実行のキーボードショートカットでしたが、
+  :guilabel:`Ctrl-Enter` に変更になりました。このショートカットは他の多くの
+  TortoiseHg のダイアログでも有効な共通のものです。
+* マージリビジョンにおけるファイルの右クリックメニューが改善されました。
+* コミットツールやチェンジログビューアでの差分表示のサイズに上限が設けられました。
+  この上限を超えるファイルは差分表示の代わりに理由が表示されます。この上限
+  (デフォルト：1MB) は :menuselection:`TortoiseHg --> 最大差分サイズ`
+  から (必要であればリポジトリごとに) 設定可能です。
+* コマンドラインからコミッタと日付を指定できるようになりました。詳しくは
+  :command:`hgtk commit -h` をご覧ください。
+* :file:`qct.py` 拡張機能は同梱されなくなりました。Qct を使用したい場合は
+  別途ダウンロードする必要があります。
 
 .. vim: noet ts=4
