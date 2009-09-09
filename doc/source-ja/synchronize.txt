@@ -139,13 +139,11 @@ Mercurial のマニュアルを参照してください。
 
 	use "hgtk -v help synch" to show global options
 
-.. NEEDFORTRANSLATION
-
 コマンド構文はグローバルオプションを除けばオプションや引数を必要としないため
 シンプルになっています。 :command:`push` 、 :command:`outgoing` 、 :command:`email`
 のエイリアスで同期ツールを起動した場合、自動的に *default-push* URL が選択されます。
 それ以外のエイリアスの場合は *default* URL が選択されます。
-If the selected URL is not found, it will use the first path it finds.
+選択された URL が見つからない場合は最初に見つかったパスが使用されます。
 
 0.7 からの変更点
 ----------------
