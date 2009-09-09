@@ -54,7 +54,7 @@ class GtkUi(ui.ui):
         if not self.interactive(): return default
         try:
             # send request to main thread, await response
-            self.dialogq.put( (msg, True, choices, default) )
+            self.dialogq.put( (msg, True, choices, None) )
             r = self.responseq.get(True)
             if r is None:
                 raise EOFError
