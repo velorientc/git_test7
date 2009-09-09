@@ -145,8 +145,8 @@ class GLog(gdialog.GDialog):
 
     def load_all_clicked(self, button, data=None):
         self.graphview.load_all_revisions()
-        self.nextbutton.set_sensitive(False)
-        self.allbutton.set_sensitive(False)
+        self.loadnextbutton.set_sensitive(False)
+        self.loadallbutton.set_sensitive(False)
 
     def selection_changed(self, graphview):
         'Graphview reports a new row selected'
@@ -168,8 +168,8 @@ class GLog(gdialog.GDialog):
         if not graphview.graphdata:
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
-        self.nextbutton.set_sensitive(False)
-        self.allbutton.set_sensitive(False)
+        self.loadnextbutton.set_sensitive(False)
+        self.loadallbutton.set_sensitive(False)
 
     def datamine_clicked(self, toolbutton, data=None):
         dlg = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
@@ -412,8 +412,8 @@ class GLog(gdialog.GDialog):
         self.origtip = min(len(self.repo), self.origtip)
         opts['orig-tip'] = self.origtip
 
-        self.nextbutton.set_sensitive(True)
-        self.allbutton.set_sensitive(True)
+        self.loadnextbutton.set_sensitive(True)
+        self.loadallbutton.set_sensitive(True)
         self.newbutton.set_sensitive(self.origtip != len(self.repo))
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
@@ -587,9 +587,9 @@ class GLog(gdialog.GDialog):
         sep = gtk.SeparatorToolItem()
         sep.set_expand(True)
         sep.set_draw(False)
-        self.nextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
+        self.loadnextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
             _('Load more'), self.more_clicked, tip=_('load more revisions'))
-        self.allbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
+        self.loadallbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
             _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
 
         vmenu = gtk.MenuToolButton('')
@@ -598,7 +598,7 @@ class GLog(gdialog.GDialog):
         gobject.idle_add(lambda: vmenu.child.get_children()[0].hide())
 
         tbar = self.changeview.get_tbbuttons()
-        tbar += [sep, self.nextbutton, self.allbutton, vmenu]
+        tbar += [sep, self.loadnextbutton, self.loadallbutton, vmenu]
         for tbutton in tbar:
             self.toolbar.insert(tbutton, -1)
 
