@@ -99,7 +99,7 @@ class MergeDialog(gtk.Window):
         for tool in hglib.mergetools(repo.ui):
             vlist.append((hglib.toutf(tool), False))
 
-        commit.connect('clicked', self.commit)
+        commit.connect('clicked', self.docommit)
         undo.connect('clicked', self.undo, local, merge, commit)
         merge.connect('clicked', self.merge, other, commit, undo)
         merge.grab_focus()
@@ -133,7 +133,7 @@ class MergeDialog(gtk.Window):
         commit.set_sensitive(True)
         commit.grab_focus()
 
-    def commit(self, button):
+    def docommit(self, button):
         dlg = commit.run(ui.ui())
         dlg.set_transient_for(self)
         dlg.set_modal(True)
