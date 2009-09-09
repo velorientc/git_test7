@@ -594,11 +594,8 @@ class GLog(gdialog.GDialog):
 
         vmenu = gtk.MenuToolButton('')
         vmenu.set_menu(self.view_menu())
-        # A MenuToolButton has two parts; a Button and a ToggleButton
-        # we want to see the togglebutton, but not the button
-        b = vmenu.child.get_children()[0]
-        b.unmap()
-        b.set_sensitive(False)
+        # hide the Button widget; we want to see only Menu button
+        gobject.idle_add(lambda: vmenu.child.get_children()[0].hide())
 
         tbar = self.changeview.get_tbbuttons()
         tbar += [sep, self.nextbutton, self.allbutton, vmenu]
