@@ -21,6 +21,7 @@ class GotoRevDialog(gtk.Dialog):
         super(GotoRevDialog, self).__init__(flags=gtk.DIALOG_MODAL)
         gtklib.set_tortoise_icon(self, 'menulog.ico')
         gtklib.set_tortoise_keys(self)
+        self.set_has_separator(False)
 
         self._btn_goto = gtk.Button(_('Select'))
         self._btn_goto.connect('clicked', self._btn_goto_clicked)
