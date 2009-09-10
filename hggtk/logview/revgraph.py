@@ -216,7 +216,6 @@ class BranchGrapher:
         """Mark all unknown revisions in range that are direct ancestors
         of branch_head as part of the same branch. Stops when stop_rev
         is passed or a known revision is found"""
-        assert self._covered_rev(branch_head)
         assert not branch_head in self.branch4rev
         self.color4branch[branch_head] = self.nextcolor
         self.nextcolor += 1
