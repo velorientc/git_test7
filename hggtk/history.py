@@ -96,9 +96,9 @@ class GLog(gdialog.GDialog):
         fnc = self.toggle_view_column
         return [(_('Columns'), True, False, [
             (_('Graph'), self.toggle_graphcol, [], self.graphcol),
-            (_('Rev'), fnc, ['rev-column-visible'], col('rev', True)),
-            (_('Hash ID'), fnc, ['id-column-visible'], col('id', False)),
-            (_('Branch'), fnc, ['branch-column-visible'], col('branch', False)),
+            (_('Revision Number'), fnc, ['rev-column-visible'], col('rev', True)),
+            (_('Changeset ID'), fnc, ['id-column-visible'], col('id', False)),
+            (_('Branch Name'), fnc, ['branch-column-visible'], col('branch', False)),
             (_('Local Date'), fnc, ['date-column-visible'], col('date', False)),
             (_('UTC Date'), fnc, ['utc-column-visible'], col('utc', False)),
             (_('Age'), fnc, ['age-column-visible'], col('age', True)),
