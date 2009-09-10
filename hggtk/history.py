@@ -202,17 +202,6 @@ class GLog(gdialog.GDialog):
         dlg = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dlg.display()
 
-    def filter_help_pressed(self, button, combo):
-        mode = combo.get_active()
-        if mode == 0: # Rev Range
-            pass
-        elif mode == 1: # File Patterns
-            pass
-        elif mode == 2: # Keywords
-            pass
-        elif mode == 3: # Date
-            pass
-
     def filter_entry_activated(self, entry, combo):
         'User pressed enter in the filter entry'
         opts = {}
@@ -639,11 +628,6 @@ class GLog(gdialog.GDialog):
         filtercombo.set_active(1)
         self.filtercombo = filtercombo
         filterbox.pack_start(filtercombo, False)
-
-        helpbutton = gtk.Button("?")
-        helpbutton.set_relief(gtk.RELIEF_NONE)
-        helpbutton.connect('pressed', self.filter_help_pressed, filtercombo)
-        filterbox.pack_start(helpbutton, False)
 
         entry = gtk.Entry()
         entry.connect('activate', self.filter_entry_activated, filtercombo)
