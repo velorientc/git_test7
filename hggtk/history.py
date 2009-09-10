@@ -89,11 +89,6 @@ class GLog(gdialog.GDialog):
                             toggle=True,
                             icon='menupatch.ico')
             tbar += [self.mqtb, gtk.SeparatorToolItem()]
-        self.settingtb = self.make_toolbutton(gtk.STOCK_PREFERENCES,
-                             _('Configure'),
-                             self.conf_clicked,
-                             tip=_('Configure changelog view'))
-        tbar += [self.settingtb, gtk.SeparatorToolItem()]
         return tbar
 
     def get_menu_list(self):
@@ -1065,20 +1060,6 @@ class GLog(gdialog.GDialog):
 
     def thgrefresh(self, window):
         self.reload_log()
-
-    def conf_clicked(self, toolbutton, data=None):
-        dlg = thgconfig.ConfigDialog(True)
-        dlg.focus_field('tortoisehg.authorcolor')
-        self.settingtb.set_sensitive(False)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        # Allow the dialog to run
-        self.refreshui()
-        self.repo.invalidate()
-        self.reload_log()
-        self.settingtb.set_sensitive(True)
-        return True
 
     def refresh_clicked(self, toolbutton, data=None):
         self.reload_log()
