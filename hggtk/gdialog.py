@@ -111,6 +111,7 @@ class GDialog(gtk.Window):
         get_tbbuttons(self)
         get_menu_list(self)
         get_help_url(self)
+        get_default_setting(self)
         get_body(self)
         get_extras(self)
         prepare_display(self)
@@ -178,6 +179,10 @@ class GDialog(gtk.Window):
 
 
     def get_help_url(self):
+        return None
+
+
+    def get_default_setting(self):
         return None
 
 
@@ -349,6 +354,8 @@ class GDialog(gtk.Window):
             args = [sys.argv[0], app]
         else:
             args = [sys.executable] + [sys.argv[0], app]
+        if app.endswith('config') and self.get_default_setting():
+            args += ['--focus', self.get_default_setting()]
         if os.name == 'nt':
             args = ['"%s"' % arg for arg in args]
         oldcwd = os.getcwd()
