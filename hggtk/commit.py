@@ -237,9 +237,10 @@ class GCommit(GStatus):
         self.check_undo()
         self.refresh_branchop()
         self.update_parent_labels()
-        if not self.comitter_entry.get_text():
+        if not self.committer_cbbox.get_active_text():
             user = self.opts['user'] or self.repo.ui.config('ui', 'username')
-            self.comitter_entry.set_text(hglib.toutf(user or ''))
+            if user:
+                update_recent_committers(hglib.toutf(user))
         if not self.autoinc_entry.get_text():
             autoinc = self.repo.ui.config('tortoisehg', 'autoinc', '')
             self.autoinc_entry.set_text(hglib.toutf(autoinc))
@@ -301,9 +302,20 @@ class GCommit(GStatus):
 
         self.advanced_frame = gtk.Frame(_('Advanced'))
         adv_hbox = gtk.HBox(spacing=2)
-        adv_hbox.pack_start(gtk.Label(_('Comitter:')), False, False, 2)
-        self.comitter_entry = gtk.Entry()
-        adv_hbox.pack_start(self.comitter_entry, True, True, 2)
+        adv_hbox.pack_start(gtk.Label(_('Committer:')), False, False, 2)
+
+        liststore = gtk.ListStore(str)
+        self.committer_cbbox = gtk.ComboBoxEntry(liststore)
+        cell = gtk.CellRendererText()
+        self.committer_cbbox.pack_start(cell, True)
+        adv_hbox.pack_start(self.committer_cbbox, True, True, 2)
+        self._mru_committers = self.settings.mrul('recent_committers')
+        self.update_recent_committers()
+        committer = self.repo.ui.config('ui', 'username')
+        if committer:
+            self.update_recent_committers(committer)
+        self.committer_cbbox.set_active(0)
+
         adv_hbox.pack_start(gtk.Label(_('Auto-includes:')), False, False, 2)
         self.autoinc_entry = gtk.Entry()
         adv_hbox.pack_start(self.autoinc_entry, False, False, 2)
@@ -368,6 +380,16 @@ class GCommit(GStatus):
             else:
                 frame.hide()
             setattr(self, statename, show)
+
+    def update_recent_committers(self, name=None):
+        if name is not None:
+            self._mru_committers.add(name)
+            self._mru_committers.compact()
+            self.settings.write()
+        liststore = self.committer_cbbox.get_model()
+        liststore.clear()
+        for name in self._mru_committers:
+            liststore.append([name])
 
     def changed_cb(self, combobox):
         model = combobox.get_model()
@@ -551,7 +573,7 @@ class GCommit(GStatus):
         if self.mqmode:
             qtipctx = self.repo['qtip']
             self.qheader = qtipctx.description()
-            self.comitter_entry.set_text(hglib.toutf(qtipctx.user()))
+            self.committer_cbbox.child.set_text(hglib.toutf(qtipctx.user()))
             buf = self.text.get_buffer()
             if buf.get_char_count() == 0 or not buf.get_modified():
                 if self.qnew:
@@ -829,15 +851,9 @@ class GCommit(GStatus):
         self.opts['message'] = buf.get_text(begin, end)
         return True
 
-
     def hg_commit(self, files):
         # get advanced options
-        user = hglib.fromutf(self.comitter_entry.get_text())
-        self.opts['user'] = user
-        incs = hglib.fromutf(self.autoinc_entry.get_text())
-        self.opts['include'] = [i.strip() for i in incs.split(',') if i.strip()]
-        autopush = self.autopush.get_active()
-
+        user = hglib.fromutf(self.committer_cbbox.get_active_text())
         if not user:
             gdialog.Prompt(_('Commit: Invalid username'),
                    _('Your username has not been configured.\n\n'
@@ -855,6 +871,12 @@ class GCommit(GStatus):
             self.refreshui()
             self.refresh_complete()
             return
+
+        self.update_recent_committers(user)
+        self.opts['user'] = user
+        incs = hglib.fromutf(self.autoinc_entry.get_text())
+        self.opts['include'] = [i.strip() for i in incs.split(',') if i.strip()]
+        autopush = self.autopush.get_active()
 
         cmdline  = ['hg', 'commit', '--verbose']
 
