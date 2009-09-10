@@ -327,7 +327,7 @@ class GLog(gdialog.GDialog):
             self.branch_color = settings.get('branch-color', False)
             self.show_filterbar = settings.get('show-filterbar', True)
             for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
-                vis = settings['glog-vis-'+col]
+                vis = settings.get('glog-vis-'+col, False)
                 self.showcol[col] = vis
             self.graphcol = settings['graphcol']
             self.compactgraph = settings['compactgraph']
