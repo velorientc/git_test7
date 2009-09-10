@@ -443,7 +443,6 @@ class GDialog(gtk.Window):
                     if aschecks:
                         item = gtk.CheckMenuItem(name)
                         item.set_active(icon_or_var)
-                        item.set_draw_as_radio(True)
                     elif icon_or_var:
                         item = gtk.ImageMenuItem(name)
                         if icon_or_var.startswith('gtk'):
