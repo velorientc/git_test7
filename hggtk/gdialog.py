@@ -424,7 +424,7 @@ class GDialog(gtk.Window):
         menus = self.get_menu_list()
         if menus:
             allmenus = [
-          (_('Launch'), False, False,
+          (_('Tools'), False, False,
            [(_('Changelog'), self.launch, ['log'], 'menulog.ico'),
             (_('Commit'), self.launch, ['commit'], 'menucommit.ico'),
             (_('Datamine'), self.launch, ['datamine'], 'menurepobrowse.ico'),
