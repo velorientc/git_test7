@@ -408,6 +408,19 @@ class GDialog(gtk.Window):
         if x >= 0 and x < w and y >= 0 and y < h:
             self.move(x, y)
 
+        self.tooltips = gtk.Tooltips()
+        toolbar = gtk.Toolbar()
+        tbuttons =  self.get_tbbuttons()
+        for tbutton in tbuttons:
+            toolbar.insert(tbutton, -1)
+        self.toolbar = toolbar
+
+        # Subclass returns the main body
+        body = self.get_body()
+
+        # Subclass provides extra stuff in bottom hbox
+        extras = self.get_extras()
+
         menus = self.get_menu_list()
         if menus:
             allmenus = [
@@ -449,19 +462,6 @@ class GDialog(gtk.Window):
                 item.set_submenu(menu)
                 item.set_right_justified(rightjustified)
                 menubar.append(item)
-
-        self.tooltips = gtk.Tooltips()
-        toolbar = gtk.Toolbar()
-        tbuttons =  self.get_tbbuttons()
-        for tbutton in tbuttons:
-            toolbar.insert(tbutton, -1)
-        self.toolbar = toolbar
-
-        # Subclass returns the main body
-        body = self.get_body()
-
-        # Subclass provides extra stuff in bottom hbox
-        extras = self.get_extras()
 
         vbox = gtk.VBox(False, 0)
         self.add(vbox)
