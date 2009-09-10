@@ -119,7 +119,7 @@ class GShelve(GStatus):
             buf = self.diff_highlight_buffer(fp.readlines())
             self.patch_text.set_buffer(buf)
         else:
-            self.patch_text.set_buffer(None)
+            self.patch_text.set_buffer(gtk.TextBuffer())
 
 
     ### End of overridable methods ###
