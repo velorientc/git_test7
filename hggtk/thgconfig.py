@@ -62,7 +62,10 @@ _tortoise_info = (
         ' the process for runtime errors. Default: True')),
     (_('Fork hgtk'), 'tortoisehg.hgtkfork', ['True', 'False'],
         _('When running hgtk from the command line, fork a background'
-        ' process to run graphical dialogs.  Default: True')))
+        ' process to run graphical dialogs.  Default: True')),
+    (_('Full path title'), 'tortoisehg.fullpath', ['False', 'True'],
+        _('Show a full directory path of the repository in the dialog title'
+        ' instead of just the root directory name.  Default: False')))
 
 _commit_info = (
     (_('Username'), 'ui.username', [],
