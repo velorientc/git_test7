@@ -585,7 +585,7 @@ class GCommit(GStatus):
                 buf.set_text('')
                 buf.set_modified(False)
             if hasattr(self, 'patch_text'):
-                self.patch_text.set_buffer(None)
+                self.patch_text.set_buffer(gtk.TextBuffer())
         else:
             c_btn.set_label(_('_Commit'))
             c_btn.set_tooltip(self.tooltips, _('commit'))
