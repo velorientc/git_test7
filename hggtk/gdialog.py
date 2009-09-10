@@ -432,7 +432,7 @@ class GDialog(gtk.Window):
             (_('Shelve'), self.launch, ['shelve'], 'shelve.ico'),
             (_('Settings'), self.launch, ['repoconfig'], 'settings_repo.ico')])
            ] + menus + [
-          (_('Help'), False, True,
+          (_('Help'), False, False,
            [(_('Contents'), self.helpcontents, [], gtk.STOCK_INFO),
             (_('About'), self.launch, ['about'], gtk.STOCK_ABOUT)])
           ]
