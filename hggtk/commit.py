@@ -150,6 +150,9 @@ class GCommit(GStatus):
     def get_icon(self):
         return 'menucommit.ico'
 
+    def get_default_setting(self):
+        return 'ui.username'
+
     def auto_check(self):
         if self.test_opt('check'):
             for entry in self.filemodel:
