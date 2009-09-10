@@ -159,6 +159,11 @@ class GCommit(GStatus):
         self.opts['check'] = False
 
 
+    def get_menu_list(self):
+        return [(_('View'), True, False,
+           [(_('Advanced'), self.toggleview, ['advanced'], self.showadvanced),
+            (_('Parents'), self.toggleview, ['parents'], self.showparents)])]
+
     def save_settings(self):
         settings = GStatus.save_settings(self)
         settings['commit-vpane'] = self.vpaned.get_position()
@@ -191,23 +196,6 @@ class GCommit(GStatus):
             self.commit_clicked, tip=_('commit'))
         tbbuttons.insert(0, self.undo_button)
         tbbuttons.insert(0, self.commit_button)
-
-        # append to end of left align area
-        self.changelog_button = self.make_toolbutton(gtk.STOCK_INDEX, _('Changelog'),
-            self.changelog_clicked, tip=_('view changelog'))
-        tbbuttons.append(self.changelog_button)
-
-        # append to align right
-        sep = gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
-        tbbuttons.append(sep)
-
-        self.vmenu = gtk.MenuToolButton('')
-        # hide the Button widget; we want to see only Menu button
-        gobject.idle_add(lambda: self.vmenu.child.get_children()[0].hide())
-        tbbuttons.append(self.vmenu)
-
         return tbbuttons
 
     def should_live(self, widget=None, event=None):
@@ -341,8 +329,6 @@ class GCommit(GStatus):
         self.parent2_label = plabel()
         vbox2.pack_start(self.parents_frame, False, False)
 
-        self.vmenu.set_menu(self.view_menu())
-
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
         self.vpaned.pack2(vbox2, shrink=False)
@@ -352,25 +338,7 @@ class GCommit(GStatus):
     ### End of overridable methods ###
 
 
-    def view_menu(self):
-        menu = gtk.Menu()
-
-        button = gtk.CheckMenuItem(_('Show Advanced'))
-        button.connect('toggled', self.toggle_view, 'advanced')
-        button.set_active(self.showadvanced)
-        button.set_draw_as_radio(True)
-        menu.append(button)
-
-        button = gtk.CheckMenuItem(_('Show Parents'))
-        button.connect('toggled', self.toggle_view, 'parents')
-        button.set_active(self.showparents)
-        button.set_draw_as_radio(True)
-        menu.append(button)
-
-        menu.show_all()
-        return menu
-
-    def toggle_view(self, button, type):
+    def toggleview(self, button, type):
         show = button.get_active()
         statename = 'show' + type
         if getattr(self, statename) != show:
