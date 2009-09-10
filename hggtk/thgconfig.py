@@ -518,7 +518,7 @@ class ConfigDialog(gtk.Dialog):
             root = paths.find_root()
             if root:
                 repo = hg.repository(self.ui, root)
-                name = repo.ui.config('web', 'name') or os.path.basename(root)
+                name = self.get_reponame(repo)
                 self.ui = repo.ui
             else:
                 repo = None
@@ -628,10 +628,18 @@ class ConfigDialog(gtk.Dialog):
         self.configrepo = combo.get_active() and True or False
         self.refresh()
 
+    def get_reponame(self, repo):
+        if repo.ui.config('tortoisehg', 'fullpath', False):
+            name = repo.root
+        else:
+            name = repo.ui.config('web', 'name') \
+                        or os.path.basename(repo.root)
+        return hglib.toutf(name)
+
     def refresh(self):
         if self.configrepo:
             repo = hg.repository(ui.ui(), self.root)
-            name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
+            name = self.get_reponame(repo)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
             self.set_title(_('TortoiseHg Configure Repository - ') + hglib.toutf(name))
             gtklib.set_tortoise_icon(self, 'settings_repo.ico')

@@ -314,6 +314,13 @@ class GDialog(gtk.Window):
     def get_toolbutton(self, label):
         return self.toolbuttons[label]
 
+    def get_reponame(self):
+        if self.repo.ui.config('tortoisehg', 'fullpath', False):
+            name = self.repo.root
+        else:
+            name = os.path.basename(self.repo.root)
+        return hglib.toutf(name)
+
     def windowstate(self, window, event):
         if event.changed_mask & gtk.gdk.WINDOW_STATE_MAXIMIZED:
             if event.new_window_state & gtk.gdk.WINDOW_STATE_MAXIMIZED:

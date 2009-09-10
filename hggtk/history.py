@@ -45,7 +45,7 @@ class GLog(gdialog.GDialog):
         self.exs = [ name for name, module in extensions.extensions() ]
 
     def get_title(self):
-        return hglib.toutf(os.path.basename(self.repo.root)) + ' log'
+        return _('%s log') % self.get_reponame()
 
     def get_icon(self):
         return 'menulog.ico'

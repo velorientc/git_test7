@@ -135,7 +135,7 @@ class GCommit(GStatus):
         GStatus.parse_opts(self)
 
     def get_title(self):
-        root = hglib.toutf(os.path.basename(self.repo.root))
+        root = self.get_reponame()
         user = self.opts.get('user')
         if user: user = 'as ' + user
         date = self.opts.get('date')

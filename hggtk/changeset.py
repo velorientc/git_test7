@@ -27,7 +27,7 @@ class ChangeSet(gdialog.GDialog):
         self.glog_parent = None
 
     def get_title(self):
-        title = toutf(os.path.basename(self.repo.root)) + ' changeset '
+        title = _('%s changeset ') % self.get_reponame()
         rev = self.opts['rev']
         if isinstance(rev, str):
             title += rev
