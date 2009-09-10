@@ -50,6 +50,9 @@ class GLog(gdialog.GDialog):
     def get_icon(self):
         return 'menulog.ico'
 
+    def get_default_setting(self):
+        return 'tortoisehg.authorcolor'
+
     def parse_opts(self):
         # Disable quiet to get full log info
         self.ui.quiet = False
