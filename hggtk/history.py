@@ -93,6 +93,28 @@ class GLog(gdialog.GDialog):
         tbar += [self.settingtb, gtk.SeparatorToolItem()]
         return tbar
 
+    def get_menu_list(self):
+        col = lambda x, y: self.showcol.get(x, y)
+        fnc = self.toggle_view_column
+        return [(_('Columns'), True, False, [
+            (_('Graph'), self.toggle_graphcol, [], self.graphcol),
+            (_('Rev'), fnc, ['rev-column-visible'], col('rev', True)),
+            (_('Hash ID'), fnc, ['id-column-visible'], col('id', False)),
+            (_('Branch'), fnc, ['branch-column-visible'], col('branch', False)),
+            (_('Local Date'), fnc, ['date-column-visible'], col('date', False)),
+            (_('UTC Date'), fnc, ['utc-column-visible'], col('utc', False)),
+            (_('Age'), fnc, ['age-column-visible'], col('age', True)),
+            (_('Tags'), fnc, ['tag-column-visible'], col('tag', False))]),
+                (_('Features'), True, False, [
+            (_('Filter Bar'), self.toggle_show_filterbar, [],
+                self.show_filterbar),
+            (_('Compact Graph'), self.toggle_compactgraph, [],
+                self.compactgraph),
+            (_('Color by Branch'), self.toggle_branchcolor, [],
+                self.branch_color),
+                ])
+            ]
+
     def synch_clicked(self, toolbutton, data):
         def sync_closed(dialog):
             self.synctb.set_sensitive(True)
@@ -119,7 +141,11 @@ class GLog(gdialog.GDialog):
     def toggle_view_column(self, button, property):
         active = button.get_active()
         self.graphview.set_property(property, active)
-        if property in ('branch-color') and self.ready:
+
+    def toggle_branchcolor(self, button):
+        active = button.get_active()
+        if self.branch_color != active:
+            self.branch_color = active
             self.reload_log()
 
     def toggle_graphcol(self, button):
@@ -127,7 +153,8 @@ class GLog(gdialog.GDialog):
         if self.graphcol != active:
             self.graphcol = active
             self.reload_log()
-            self.compactgraph_button.set_sensitive(self.graphcol)
+            # TODO: this could be tricky
+            #self.compactgraph_button.set_sensitive(self.graphcol)
 
     def toggle_compactgraph(self, button):
         active = button.get_active()
@@ -135,7 +162,7 @@ class GLog(gdialog.GDialog):
             self.compactgraph = active
             self.reload_log()         
 
-    def toggle_show_filterbar(self, button, property):
+    def toggle_show_filterbar(self, button):
         self.show_filterbar = button.get_active()
         if self.filterbox is not None:
             self.filterbox.set_property('visible', self.show_filterbar)
@@ -235,81 +262,6 @@ class GLog(gdialog.GDialog):
     def repo_invalidated(self, mqwidget):
         self.reload_log()
 
-    def view_menu(self):
-        menu = gtk.Menu()
-
-        button = gtk.CheckMenuItem(_('Show Graph'))
-        button.connect('toggled', self.toggle_graphcol)
-        button.set_active(self.graphcol)
-        button.set_draw_as_radio(True)
-        menu.append(button)
-
-        button = gtk.CheckMenuItem(_('Compact Graph'))
-        button.connect('toggled', self.toggle_compactgraph)
-        button.set_active(self.compactgraph)
-        button.set_draw_as_radio(True)
-        button.set_sensitive(self.graphcol)
-        menu.append(button)
-        self.compactgraph_button = button
-
-        button = gtk.CheckMenuItem(_('Show Rev'))
-        button.connect('toggled', self.toggle_view_column,
-                'rev-column-visible')
-        button.set_active(self.showcol.get('rev', True))
-        button.set_draw_as_radio(True)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('Show ID'))
-        button.connect('toggled', self.toggle_view_column,
-                'id-column-visible')
-        button.set_active(self.showcol.get('id', False))
-        button.set_draw_as_radio(True)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('Show Tags'))
-        button.connect('toggled', self.toggle_view_column,
-                'tag-column-visible')
-        button.set_active(self.showcol.get('tag', False))
-        button.set_draw_as_radio(True)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('Show Local Date'))
-        button.connect('toggled', self.toggle_view_column,
-                'date-column-visible')
-        button.set_active(self.showcol.get('date', False))
-        button.set_draw_as_radio(True)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('Show UTC Date'))
-        button.connect('toggled', self.toggle_view_column,
-                'utc-column-visible')
-        button.set_active(self.showcol.get('utc', False))
-        button.set_draw_as_radio(True)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('Show Age'))
-        button.connect('toggled', self.toggle_view_column,
-                'age-column-visible')
-        button.set_active(self.showcol.get('age', True))
-        button.set_draw_as_radio(True)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('Show Branch'))
-        button.connect('toggled', self.toggle_view_column,
-                'branch-column-visible')
-        button.set_active(self.showcol.get('branch', False))
-        button.set_draw_as_radio(True)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('Color by Branch'))
-        button.connect('toggled', self.toggle_view_column,
-                'branch-color')
-        button.set_active(self.branch_color)
-        button.set_draw_as_radio(True)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('Show Filterbar'))
-        button.connect('toggled', self.toggle_show_filterbar,
-                'show-filterbar')
-        button.set_active(self.show_filterbar)
-        button.set_draw_as_radio(True)
-        menu.append(button)
-
-        menu.show_all()
-        return menu
-
     def prepare_display(self):
         'Called at end of display() method'
         self.ready = True
@@ -339,6 +291,10 @@ class GLog(gdialog.GDialog):
 
         self.filterbox.set_property('visible', self.show_filterbar)
         self.filterbox.set_no_show_all(True)
+
+        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
+            self.graphview.set_property(col+'-column-visible',
+                    self.showcol[col])
 
         # enable MQ panel
         self.enable_mqpanel()
@@ -592,13 +548,8 @@ class GLog(gdialog.GDialog):
         self.loadallbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
             _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
 
-        vmenu = gtk.MenuToolButton('')
-        vmenu.set_menu(self.view_menu())
-        # hide the Button widget; we want to see only Menu button
-        gobject.idle_add(lambda: vmenu.child.get_children()[0].hide())
-
         tbar = self.changeview.get_tbbuttons()
-        tbar += [sep, self.loadnextbutton, self.loadallbutton, vmenu]
+        tbar += [sep, self.loadnextbutton, self.loadallbutton]
         for tbutton in tbar:
             self.toolbar.insert(tbutton, -1)
 
