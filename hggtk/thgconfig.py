@@ -209,6 +209,10 @@ _('Optional. Method to use to send email messages. If value is "smtp" (default),
         _('Hostname the sender can use to identify itself to the mail server.')))
 
 _diff_info = (
+    (_('Patch EOL'), 'patch.eol', ['strict', 'crlf', 'lf'],
+        _('Normalize file line endings during and after patch to lf or'
+          ' crlf.  Strict does no normalization.'
+        ' Default: strict')),
     (_('Git Format'), 'diff.git', ['False', 'True'],
         _('Use git extended diff header format.'
         ' Default: False')),
