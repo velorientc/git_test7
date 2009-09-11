@@ -21,7 +21,7 @@ from hggtk.logview.treeview import TreeView as LogTreeView
 
 from hggtk import gdialog, gtklib, hgcmd, datamine, logfilter, gorev
 from hggtk import backout, status, hgemail, tagadd, update, merge, archive
-from hggtk import changeset, thgconfig, thgmq
+from hggtk import changeset, thgconfig, thgmq, histdetails
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
@@ -38,6 +38,7 @@ class GLog(gdialog.GDialog):
         self.origtip = len(self.repo)
         self.ready = False
         self.filterbox = None
+        self.details_model = None
         os.chdir(self.repo.root)
 
         # Load extension support for commands which need it
@@ -92,20 +93,13 @@ class GLog(gdialog.GDialog):
         return tbar
 
     def get_menu_list(self):
-        col = lambda x, y: self.showcol.get(x, y)
         fnc = self.toggle_view_column
-        return [(_('Columns'), [
-            (_('Graph'), True, self.toggle_graphcol, [], self.graphcol),
-            (_('Revision Number'), True, fnc, ['rev-column-visible'], col('rev', True)),
-            (_('Changeset ID'), True, fnc, ['id-column-visible'], col('id', False)),
-            (_('Branch Name'), True, fnc, ['branch-column-visible'], col('branch', False)),
-            (_('Local Date'), True, fnc, ['date-column-visible'], col('date', False)),
-            (_('UTC Date'), True, fnc, ['utc-column-visible'], col('utc', False)),
-            (_('Age'), True, fnc, ['age-column-visible'], col('age', True)),
-            (_('Tags'), True, fnc, ['tag-column-visible'], col('tag', False))]),
-                (_('Features'), [
+        return [(_('View'), [
             (_('Filter Bar'), True, self.toggle_show_filterbar, [],
                 self.show_filterbar),
+            ('----', None, None, None, None),
+            (_('Choose Details...'), False, self.details_clicked, [], None),
+            ('----', None, None, None, None),
             (_('Compact Graph'), True, self.toggle_compactgraph, [],
                 self.compactgraph),
             (_('Color by Branch'), True, self.toggle_branchcolor, [],
@@ -200,6 +194,50 @@ class GLog(gdialog.GDialog):
     def datamine_clicked(self, toolbutton, data=None):
         dlg = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dlg.display()
+
+    def details_clicked(self, toolbutton, data=None):
+        self.show_details_dialog()
+
+    def show_details_dialog(self):
+
+        def close(dialog, response_id):
+            dialog.destroy()
+
+        model = gtk.ListStore(
+            gobject.TYPE_BOOLEAN, gobject.TYPE_STRING, gobject.TYPE_STRING)
+
+        model.append([self.graphcol, _('Graph'), 'graphcol'])
+        def column(col, default, text):
+            prop = col + '-column-visible'
+            vis = self.graphview.get_property(prop)
+            model.append([vis, text, prop])
+        column('rev', True, _('Revision Number'))
+        column('id', False, _('Changeset ID'))
+        column('branch', False, _('Branch Name'))
+        column('date', False, _('Local Date'))
+        column('utc', False, _('UTC Date'))
+        column('age', True, _('Age'))
+        column('tag', False, _('Tags'))
+
+        self.details_model = model
+
+        dlg = histdetails.LogDetailsDialog(model, self.apply_details)
+        dlg.connect('response', close)
+        dlg.show()
+
+    def apply_details(self):
+        if self.details_model:
+            reload = False
+            for show, uitext, property in self.details_model:
+                if property == 'graphcol':
+                    if self.graphcol != show:
+                        self.graphcol = show
+                        reload = True
+                else:
+                    self.graphview.set_property(property, show)
+                    self.showcol[property] = show
+            if reload:
+                self.reload_log()
 
     def filter_entry_activated(self, entry, combo):
         'User pressed enter in the filter entry'
