@@ -143,6 +143,7 @@ class GLog(gdialog.GDialog):
     def toggle_branchcolor(self, button):
         active = button.get_active()
         if self.branch_color != active:
+            self.graphview.set_property('branch-color', active)
             self.branch_color = active
             self.reload_log()
 
@@ -256,6 +257,7 @@ class GLog(gdialog.GDialog):
         os.chdir(root)  # for paths relative to repo root
 
         self.origtip = self.opts['orig-tip'] or len(self.repo)
+        self.graphview.set_property('branch-color', self.branch_color)
 
         # ignore file patterns that imply repo root
         if len(self.pats) == 1 and self.pats[0] in (root, root+os.sep, ''):
