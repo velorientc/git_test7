@@ -440,22 +440,25 @@ class GDialog(gtk.Window):
             for title, aschecks, rightjustified, items in allmenus:
                 menu = gtk.Menu()
                 for name, func, args, icon_or_var in items:
-                    if aschecks:
-                        item = gtk.CheckMenuItem(name)
-                        item.set_active(icon_or_var)
-                    elif icon_or_var:
-                        item = gtk.ImageMenuItem(name)
-                        if icon_or_var.startswith('gtk'):
-                            img = gtk.image_new_from_stock(icon_or_var,
-                                                           gtk.ICON_SIZE_MENU)
-                        else:
-                            img = gtk.Image()
-                            ico = paths.get_tortoise_icon(icon_or_var)
-                            if ico: img.set_from_file(ico)
-                        item.set_image(img)
+                    if name == '----':
+                        item = gtk.SeparatorMenuItem()
                     else:
-                        item = gtk.MenuItem(name)
-                    item.connect('activate', func, *args)
+                        if aschecks:
+                            item = gtk.CheckMenuItem(name)
+                            item.set_active(icon_or_var)
+                        elif icon_or_var:
+                            item = gtk.ImageMenuItem(name)
+                            if icon_or_var.startswith('gtk'):
+                                img = gtk.image_new_from_stock(
+                                    icon_or_var, gtk.ICON_SIZE_MENU)
+                            else:
+                                img = gtk.Image()
+                                ico = paths.get_tortoise_icon(icon_or_var)
+                                if ico: img.set_from_file(ico)
+                            item.set_image(img)
+                        else:
+                            item = gtk.MenuItem(name)
+                        item.connect('activate', func, *args)
                     menu.append(item)
                 item = gtk.MenuItem(title)
                 item.set_submenu(menu)
