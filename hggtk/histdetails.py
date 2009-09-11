@@ -59,6 +59,10 @@ class LogDetailsDialog(gtk.Dialog):
         info_col = gtk.TreeViewColumn('', cr, text=1)
         tv.append_column(info_col)
 
+        def activated(treeview, path, column):
+            toggled(None, path)
+        tv.connect('row-activated', activated)
+
         vbox = gtk.VBox()
         vbox.set_border_width(4)
         vbox.pack_start(tv)
