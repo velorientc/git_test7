@@ -39,7 +39,7 @@ def internalpatch(patchobj, ui, strip, cwd, reverse=False, files={}):
     if cwd:
         curdir = os.getcwd()
         os.chdir(cwd)
-        eolmode = ui.config('patch', 'eol')
+        eolmode = ui.config('patch', 'eol', 'strict')
     try:
         eol = {'strict': None, 'crlf': '\r\n', 'lf': '\n'}[eolmode.lower()]
     except KeyError:
