@@ -108,6 +108,10 @@ class ServeDialog(gtk.Window):
         vbox.pack_start(scrolledwindow, True, True)
         self._set_button_states()
 
+    def isatty(self):
+        'hgext/pager.py calls this method of stdout'
+        return False
+
     def _get_config(self):
         try:
             repo = hg.repository(ui.ui(), path=self._root)
