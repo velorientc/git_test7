@@ -936,7 +936,7 @@ class GLog(gdialog.GDialog):
         dialog.display()
 
     def copy_hash(self, menuitem):
-        hash = str(self.repo[self.currevid])
+        hash = self.repo[self.currevid].hex()
         sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
         clipboard = gtk.Clipboard(selection=sel)
         clipboard.set_text(hash)
