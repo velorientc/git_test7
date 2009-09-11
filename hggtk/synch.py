@@ -258,8 +258,12 @@ class SynchDialog(gtk.Window):
         self.viewpulled.connect('clicked', self._view_pulled_changes)
         self.updatetip = gtk.Button(_('Update to branch tip'))
         self.updatetip.connect('clicked', self._update_to_tip)
+        self.updatetipcheck = gtk.CheckButton(_('Check update'))
+        self.tips.set_tip(self.updatetipcheck, _('Force update unless there'
+            ' are uncommitted changes'))
         self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
         self.buttonhbox.pack_start(self.updatetip, False, False, 2)
+        self.buttonhbox.pack_start(self.updatetipcheck, False, False, 2)
         basevbox.pack_start(self.buttonhbox, False, False, 2)
 
         # statusbar
@@ -345,9 +349,11 @@ class SynchDialog(gtk.Window):
         parents = repo.parents()
         if len(parents) > 1 or parents[0].node() == branchhead or not branchhead:
             self.updatetip.hide()
+            self.updatetipcheck.hide()
         else:
             self.buttonhbox.show()
             self.updatetip.show()
+            self.updatetipcheck.show()
         self.repo = repo
 
     def _view_pulled_changes(self, button):
@@ -360,6 +366,8 @@ class SynchDialog(gtk.Window):
         gobject.timeout_add(10, self.process_queue)
         self.write("", False)
         cmdline = ['update', '-v']
+        if self.updatetipcheck.get_active():
+            cmdline += ['--check']
         self.hgthread = hgthread.HgThread(cmdline)
         self.hgthread.start()
         self.stbar.begin()
