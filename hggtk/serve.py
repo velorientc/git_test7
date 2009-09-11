@@ -113,13 +113,19 @@ class ServeDialog(gtk.Window):
         return False
 
     def _get_config(self):
-        try:
-            repo = hg.repository(ui.ui(), path=self._root)
-        except hglib.RepoError:
-            self.destroy()
-        self.defport = repo.ui.config('web', 'port') or '8000'
-        self.webname = repo.ui.config('web', 'name') or \
-                os.path.basename(self._root)
+        if self._root:
+            try:
+                repo = hg.repository(ui.ui(), path=self._root)
+            except hglib.RepoError:
+                self.destroy()
+            self.defport = repo.ui.config('web', 'port') or '8000'
+            self.webname = repo.ui.config('web', 'name') or \
+                    os.path.basename(self._root)
+        elif self._webdirconf:
+            self.defport = '8000'
+            self.webname = _('unknown')
+            self.set_title(_('Serve %s') % (hglib.toutf(self._webdirconf)))
+            return
         if self._webdirconf:
             self.set_title(_('Serve %s - %s') %
                     (hglib.toutf(self._webdirconf), hglib.toutf(self.webname)))
