@@ -94,21 +94,21 @@ class GLog(gdialog.GDialog):
     def get_menu_list(self):
         col = lambda x, y: self.showcol.get(x, y)
         fnc = self.toggle_view_column
-        return [(_('Columns'), True, False, [
-            (_('Graph'), self.toggle_graphcol, [], self.graphcol),
-            (_('Revision Number'), fnc, ['rev-column-visible'], col('rev', True)),
-            (_('Changeset ID'), fnc, ['id-column-visible'], col('id', False)),
-            (_('Branch Name'), fnc, ['branch-column-visible'], col('branch', False)),
-            (_('Local Date'), fnc, ['date-column-visible'], col('date', False)),
-            (_('UTC Date'), fnc, ['utc-column-visible'], col('utc', False)),
-            (_('Age'), fnc, ['age-column-visible'], col('age', True)),
-            (_('Tags'), fnc, ['tag-column-visible'], col('tag', False))]),
-                (_('Features'), True, False, [
-            (_('Filter Bar'), self.toggle_show_filterbar, [],
+        return [(_('Columns'), [
+            (_('Graph'), True, self.toggle_graphcol, [], self.graphcol),
+            (_('Revision Number'), True, fnc, ['rev-column-visible'], col('rev', True)),
+            (_('Changeset ID'), True, fnc, ['id-column-visible'], col('id', False)),
+            (_('Branch Name'), True, fnc, ['branch-column-visible'], col('branch', False)),
+            (_('Local Date'), True, fnc, ['date-column-visible'], col('date', False)),
+            (_('UTC Date'), True, fnc, ['utc-column-visible'], col('utc', False)),
+            (_('Age'), True, fnc, ['age-column-visible'], col('age', True)),
+            (_('Tags'), True, fnc, ['tag-column-visible'], col('tag', False))]),
+                (_('Features'), [
+            (_('Filter Bar'), True, self.toggle_show_filterbar, [],
                 self.show_filterbar),
-            (_('Compact Graph'), self.toggle_compactgraph, [],
+            (_('Compact Graph'), True, self.toggle_compactgraph, [],
                 self.compactgraph),
-            (_('Color by Branch'), self.toggle_branchcolor, [],
+            (_('Color by Branch'), True, self.toggle_branchcolor, [],
                 self.branch_color),
                 ])
             ]

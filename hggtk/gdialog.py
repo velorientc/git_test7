@@ -424,26 +424,26 @@ class GDialog(gtk.Window):
         menus = self.get_menu_list()
         if menus:
             allmenus = [
-          (_('Tools'), False, False,
-           [(_('Changelog'), self.launch, ['log'], 'menulog.ico'),
-            (_('Commit'), self.launch, ['commit'], 'menucommit.ico'),
-            (_('Datamine'), self.launch, ['datamine'], 'menurepobrowse.ico'),
-            (_('Synchronize'), self.launch, ['synch'], 'menusynch.ico'),
-            (_('Shelve'), self.launch, ['shelve'], 'shelve.ico'),
-            (_('Settings'), self.launch, ['repoconfig'], 'settings_repo.ico')])
+          (_('Tools'),
+           [(_('Changelog'), False, self.launch, ['log'], 'menulog.ico'),
+            (_('Commit'), False, self.launch, ['commit'], 'menucommit.ico'),
+            (_('Datamine'), False, self.launch, ['datamine'], 'menurepobrowse.ico'),
+            (_('Synchronize'), False, self.launch, ['synch'], 'menusynch.ico'),
+            (_('Shelve'), False, self.launch, ['shelve'], 'shelve.ico'),
+            (_('Settings'), False, self.launch, ['repoconfig'], 'settings_repo.ico')])
            ] + menus + [
-          (_('Help'), False, False,
-           [(_('Contents'), self.helpcontents, [], gtk.STOCK_INFO),
-            (_('About'), self.launch, ['about'], gtk.STOCK_ABOUT)])
+          (_('Help'),
+           [(_('Contents'), False, self.helpcontents, [], gtk.STOCK_INFO),
+            (_('About'), False, self.launch, ['about'], gtk.STOCK_ABOUT)])
           ]
             menubar = gtk.MenuBar()
-            for title, aschecks, rightjustified, items in allmenus:
+            for title, items in allmenus:
                 menu = gtk.Menu()
-                for name, func, args, icon_or_var in items:
+                for name, ascheck, func, args, icon_or_var in items:
                     if name == '----':
                         item = gtk.SeparatorMenuItem()
                     else:
-                        if aschecks:
+                        if ascheck:
                             item = gtk.CheckMenuItem(name)
                             item.set_active(icon_or_var)
                         elif icon_or_var:
@@ -462,7 +462,6 @@ class GDialog(gtk.Window):
                     menu.append(item)
                 item = gtk.MenuItem(title)
                 item.set_submenu(menu)
-                item.set_right_justified(rightjustified)
                 menubar.append(item)
 
         vbox = gtk.VBox(False, 0)

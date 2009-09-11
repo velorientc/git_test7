@@ -163,9 +163,9 @@ class GCommit(GStatus):
 
 
     def get_menu_list(self):
-        return [(_('View'), True, False,
-           [(_('Advanced'), self.toggleview, ['advanced'], self.showadvanced),
-            (_('Parents'), self.toggleview, ['parents'], self.showparents)])]
+        return [(_('View'),
+           [(_('Advanced'), True, self.toggleview, ['advanced'], self.showadvanced),
+            (_('Parents'), True, self.toggleview, ['parents'], self.showparents)])]
 
     def save_settings(self):
         settings = GStatus.save_settings(self)
