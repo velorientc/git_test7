@@ -27,7 +27,7 @@ from thgutil import hglib, paths, shlib
 from thgutil import version as thgversion
 
 nonrepo_commands = '''userconfig clone debugcomplete init about help
-version thgstatus'''
+version thgstatus serve'''
 
 # Add TortoiseHg signals, hooked to key accelerators in gtklib
 for sig in ('copy-clipboard', 'thg-diff', 'thg-parent', 'thg-rename'):
@@ -385,6 +385,9 @@ def forget(ui, *pats, **opts):
 def serve(ui, *pats, **opts):
     """web server"""
     from hggtk.serve import run
+    if paths.find_root() == None and not opts['webdir_conf']:
+        raise hglib.RepoError(_("There is no Mercurial repository here"
+                    " (.hg not found)"))
     gtkrun(run, ui, *pats, **opts)
 
 def status(ui, *pats, **opts):
