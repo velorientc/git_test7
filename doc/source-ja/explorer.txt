@@ -82,6 +82,7 @@ Mercurial のアイコン (銀色の水滴) をクリックして :guilabel:`Opt
 
 	名前変更 (または移動) ダイアログ
 
+
 Nautilus
 --------
 
@@ -89,12 +90,9 @@ TortoiseHg は nautilus-python プラグインを利用して GNOME デスクト
 シェルとの統合も提供しています。頒布パッケージから TortoiseHg をインストールした
 場合はこの拡張機能も既に設定済みです。そうでない場合は Wiki を参考にしてください。
 
-.. NEEDFORTRANSLATION
-
-While the nautilus extension does not have it's own GUI for managing the
-overlays and context menus, it does support command promotion into the
-top menu.  It requires you to edit your :file:`~/.hgrc` file and add
-lines like these::
+Nautilus 拡張機能のアイコンオーバーレイや右クリックメニューを設定するための GUI
+が用意されるまでの間は、 :file:`~/.hgrc` ファイルを編集することでメニュー項目を
+トップに持ってくる設定のみ可能です。以下の設定を追加してください::
 
 	[tortoisehg]
 	promoteditems = commit, log, synch

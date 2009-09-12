@@ -64,8 +64,6 @@ SysInternals による :command:`DbgView` ツールはシェル拡張からの�
 閲覧すると各種デバッグメッセージを取得することができます。
 
 
-.. NEEDFORTRANSLATION
-
 Nautilus ファイルマネージャ
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -80,16 +78,18 @@ Nautilus ファイルマネージャ
     nautilus -q
     DEBUG_THG=NOe nautilus
 
-* permanent debugging, set DEBUG_THG in a file which is read on session
-  start (~/.profile, ~/.xprofile)
+* 常にデバッグ状態で起動したい場合は環境変数 DEBUG_THG をセッション開始と共に
+  読み込まれる設定ファイル (~/.profile, ~/.xprofile など) に設定してください。
+
+.. NEEDFORTRANSLATION
 
 Upper case characters in DEBUG_THG specify modules.  Only *O* and *N*
 for *OverlayCache* and *Nautilus*, respecively, are supported module
 names.  Lower case characters imply parts. Only *e* is supported,
 implying *error* messages.
 
-To restart nautilus, chose either
+Nautilus を再起動は次のどちらかの方法で可能です：
 
-1) killall nautilus (the session restarts nautilus automatically, stdin and stdout go to ~/.xsession-errors)
+1) 全ての Nautilus プロセスを削除する (セッションが自動的に Nautilus を再起動し、標準入出力先は ~/.xsession-errors)
 
-2) nautilus -q; nautilus (stdin and stdout are on the console)
+2) コマンドラインから :command:`nautilus -q; nautilus` を実行 (標準入出力先はコンソール)
