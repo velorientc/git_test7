@@ -81,6 +81,9 @@ _commit_info = (
          ' the message and a warning will be issued'
          ' if any lines are too long at commit.'
          '  Default: 0 (unenforced)')),
+    (_('Push After Commit'), 'tortoisehg.pushafterci', ['False', 'True'],
+        _('Attempt to push to default push target after every successful'
+          ' commit.  Default: False')),
     (_('Auto Commit List'), 'tortoisehg.autoinc', [],
        _('Comma separated list of files that are automatically included'
          ' in every commit.  Intended for use only as a repository setting.'
