@@ -33,6 +33,11 @@ class MQWidget(gtk.VBox):
                                     'Show index column',
                                     False,
                                     gobject.PARAM_READWRITE),
+        'status-column-visible': (gobject.TYPE_BOOLEAN,
+                                    'Status',
+                                    'Show status column',
+                                    False,
+                                    gobject.PARAM_READWRITE),
         'name-column-visible': (gobject.TYPE_BOOLEAN,
                                     'Name',
                                     'Show name column',
@@ -179,6 +184,7 @@ class MQWidget(gtk.VBox):
                 self.qrename(newname, patch=patchname)
 
         addcol(_('#'), MQ_INDEX, right=True)
+        addcol(_('st'), MQ_STATUS)
         addcol(_('Name'), MQ_NAME, editfunc=cell_edited)
         addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
@@ -546,6 +552,7 @@ class MQWidget(gtk.VBox):
         self.vmenu = {}
 
         colappend(_('Show index'), MQ_INDEX)
+        colappend(_('Show status'), MQ_STATUS, active=False)
         colappend(_('Show name'), MQ_NAME)
         colappend(_('Show summary'), MQ_SUMMARY, active=False)
 
@@ -593,6 +600,8 @@ class MQWidget(gtk.VBox):
     def col_to_prop(self, col_idx):
         if col_idx == MQ_INDEX:
             return 'index-column-visible'
+        if col_idx == MQ_STATUS:
+            return 'status-column-visible'
         elif col_idx == MQ_NAME:
             return 'name-column-visible'
         elif col_idx == MQ_SUMMARY:
