@@ -122,7 +122,6 @@ class MQWidget(gtk.VBox):
             menubtn.child.get_children()[0].hide()
         gobject.idle_add(after_init)
 
-
         self.pack_start(toolbar, False, False)
 
         mainbox = gtk.VBox()
@@ -481,7 +480,7 @@ class MQWidget(gtk.VBox):
             cell.set_property('weight', pango.WEIGHT_NORMAL)
 
     def row_sep_func(self, model, iter, data=None):
-        return model[iter][MQ_INDEX] == INDEX_SEPARATOR;
+        return model[iter][MQ_INDEX] == INDEX_SEPARATOR
 
     def show_patch_cmenu(self, list, path):
         row = self.model[path]
