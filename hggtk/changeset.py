@@ -129,17 +129,64 @@ class ChangeSet(gdialog.GDialog):
         else:
             self._filesel.select_path((0,))
 
+    def load_patch_details(self, patchfile):
+        'Load specified patch details into buffer and file list'
+        self._filelist.clear()
+        self._filelist.append(('*', _('[All Files]'), ''))
+
+        # append files & collect hunks
+        self.currev = -1
+        self.curphunks = {}
+        self.curpatch = patchfile
+        pf = open(self.curpatch)
+        try:
+            def get_path(a, b):
+                rawpath = b != '/dev/null' and b or a
+                return rawpath.split('/', 1)[-1]
+            hunks = []
+            map = {'MODIFY': 'M', 'ADD': 'A', 'DELETE': 'R',
+                   'RENAME': '', 'COPY': ''}
+            for state, values in patch.iterhunks(self.ui, pf):
+                if state == 'git':
+                    for m in values:
+                        f = m.path
+                        self._filelist.append((map[m.op], toutf(f), f))
+                elif state == 'file':
+                    path = get_path(values[0], values[1])
+                    self.curphunks[path] = hunks = ['diff', '', '']
+                elif state == 'hunk':
+                    hunks.extend([l.rstrip('\r\n') for l in values.hunk])
+                else:
+                    raise 'Unknown hunk type: %s' % state
+        finally:
+            pf.close()
+
+        # select first file
+        if len(self._filelist) > 1:
+            self._filesel.select_path((1,))
+        else:
+            self._filesel.select_path((0,))
+
     def filelist_rowchanged(self, sel):
         model, path = sel.get_selected()
         if not path:
             return
-        status, file_utf8, self.curfile = model[path]
-        self.generate_change_header()
-        if self.curfile:
-            self.append_diff(self.curfile)
+        status, file_utf8, file = model[path]
+        if self.currev != -1:
+            self.curfile = file
+            self.generate_change_header()
+            if self.curfile:
+                self.append_diff(self.curfile)
+            else:
+                for _, _, f in model:
+                    self.append_diff(f)
         else:
-            for _, _, f in model:
-                self.append_diff(f)
+            self.generate_patch_header()
+            if file:
+                self.append_patch_diff(file)
+            else:
+                for _, _, f in model:
+                    self.append_patch_diff(f)
 
     def generate_change_header(self):
         buf, rev = self._buffer, self.currev
@@ -210,6 +257,46 @@ class ChangeSet(gdialog.GDialog):
         log = toutf(ctx.description())
         buf.insert(eob, '\n' + log + '\n\n')
 
+    def generate_patch_header(self):
+        buf = self._buffer
+        buf.set_text('')
+        eob = buf.get_end_iter()
+
+        # copy from generate_change_header
+        def title_line(title, text, tag):
+            pad = ' ' * (12 - len(title))
+            utext = toutf(title + pad + text)
+            buf.insert_with_tags_by_name(eob, utext, tag)
+            buf.insert(eob, '\n')
+
+        pf = open(self.curpatch)
+        try:
+            data = patch.extract(self.ui, pf)
+            tmp, msg, user, date, branch, node, p1, p2 = data
+            try:
+                ud = toutf(user) + '\t' + displaytime(util.parsedate(date))
+                msg = toutf(msg.rstrip('\r\n'))
+                patchname = os.path.basename(self.curpatch)
+                patchtitle = patchname
+                if node:
+                    patchtitle += ' (%s)' % node[:12]
+                title_line(_('patch:'), patchtitle, 'changeset')
+                if branch:
+                    title_line(_('branch:'), toutf(branch), 'greybg')
+                title_line(_('user/date:'), ud, 'changeset')
+                for pnode in (p1, p2):
+                    if pnode is None:
+                        continue
+                    title = _('parent:')
+                    title += ' ' * (12 - len(title)) + pnode[:12]
+                    buf.insert_with_tags_by_name(eob, title, 'parent')
+                    buf.insert(eob, '\n')
+                buf.insert(eob, '\n' + msg + '\n\n')
+            finally:
+                os.unlink(tmp)
+        finally:
+            pf.close()
+
     def append_diff(self, wfile):
         if not wfile:
             return
@@ -250,6 +337,29 @@ class ChangeSet(gdialog.GDialog):
         pos = buf.get_iter_at_offset(offset)
         buf.apply_tag_by_name('mono', pos, eob)
         return True
+
+    def append_patch_diff(self, patchfile):
+        if not patchfile:
+            return
+
+        # append diffs
+        buf = self._buffer
+        eob = buf.get_end_iter()
+        offset = eob.get_offset()
+        lines = self.curphunks[patchfile]
+        tags, lines = self.prepare_diff(lines, offset, patchfile)
+        for line in lines:
+            buf.insert(eob, line)
+
+        # insert the tags
+        for name, p0, p1 in tags:
+            i0 = buf.get_iter_at_offset(p0)
+            i1 = buf.get_iter_at_offset(p1)
+            buf.apply_tag_by_name(name, i0, i1)
+
+        sob, eob = buf.get_bounds()
+        pos = buf.get_iter_at_offset(offset)
+        buf.apply_tag_by_name('mono', pos, eob)
 
     def prepare_diff(self, difflines, offset, fname):
         'Borrowed from hgview; parses changeset diffs'

@@ -633,9 +633,10 @@ class MQWidget(gtk.VBox):
         patchname = row[MQ_NAME]
         try:
             ctx = self.repo[patchname]
-            self.emit('patch-selected', ctx.rev(), patchname)
+            revid = ctx.rev()
         except hglib.RepoError:
-            pass
+            revid = -1
+        self.emit('patch-selected', revid, patchname)
 
     def list_row_activated(self, list, path, column):
         self.qgoto_by_row(self.model[path])
