@@ -473,7 +473,7 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('di_splay change'), self.show_status))
         m.append(create_menu(_('diff to local'), self.vdiff_local))
         m.append(create_menu(_('_update'), self.checkout))
-        self.cmenu_merge = create_menu(_('_merge with'), self.merge)
+        self.cmenu_merge = create_menu(_('_merge with'), self.domerge)
         m.append(self.cmenu_merge)
         m.append(create_menu(_('_copy hash'), self.copy_hash))
         m.append(create_menu(_('_export patch'), self.export_patch))
@@ -514,7 +514,7 @@ class GLog(gdialog.GDialog):
                  self.bundle_revs))
         m.append(create_menu(_('export patches from here to selected'),
                  self.export_revs))
-        self.cmenu_merge2 = create_menu(_('_merge with'), self.merge)
+        self.cmenu_merge2 = create_menu(_('_merge with'), self.domerge)
         m.append(self.cmenu_merge2)
         
         # need transplant extension for transplant command
@@ -1059,7 +1059,7 @@ class GLog(gdialog.GDialog):
         if not oldparents == newparents:
             self.refresh_model()
 
-    def merge(self, menuitem):
+    def domerge(self, menuitem):
         rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
         if rev == self.repo.parents()[0].rev():
