@@ -2,7 +2,7 @@
 ================
 
 .. module:: clone.dialog
-	:synopsis: Dialog used to clone a repository
+	:synopsis: リポジトリのクローンに使うダイアログ
 
 リポジトリのクローンにはクローンダイアログを使います。
 エクスプローラで右クリックメニューを開いて

@@ -2,7 +2,7 @@
 ==============
 
 .. module:: guess.dialog
-	:synopsis: Dialog used to detect copies and/or renames
+	:synopsis: コピーまたは名前変更を検出するダイアログ
 
 .. figure:: figures/guess.jpg
 	:alt: 名前変更推定ダイアログ

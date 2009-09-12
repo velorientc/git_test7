@@ -3,7 +3,7 @@
 **************
 
 .. module:: settings.dialog
-	:synopsis: Dialog used to set preferences
+	:synopsis: TortoiseHg および Mercurial の設定ダイアログ
 
 .. figure:: figures/settings.png
 	:alt: 設定ダイアログ
@@ -72,7 +72,7 @@ Mercurial の Wiki には該当する情報がありません。
 
 
 .. module:: TortoiseHg.settings
-	:synopsis: Dialog used to set general TortoiseHg preferences
+	:synopsis: TortoiseHg の設定
 
 TortoiseHg
 ----------
@@ -114,7 +114,7 @@ TortoiseHg
 
 
 .. module:: commit.settings
-	:synopsis: Dialog used to set commit specific preferences
+	:synopsis: コミットダイアログに関する設定
 
 コミット
 --------
@@ -138,7 +138,7 @@ TortoiseHg
 
 
 .. module:: changelog.settings
-	:synopsis: Dialog used to set changelog specific preferences
+	:synopsis: チェンジログの表示に関する設定
 
 チェンジログ
 ------------
@@ -189,7 +189,7 @@ TortoiseHg
 
 
 .. module:: web.settings
-	:synopsis: Dialog used to set web server specific preferences
+	:synopsis: ウェブサーバに関する設定
 
 サーバ
 ------
@@ -246,7 +246,7 @@ TortoiseHg
 
 
 .. module:: proxy.settings
-	:synopsis: Dialog used to set proxy specific preferences
+	:synopsis: プロキシ設定
 
 プロキシ
 --------
@@ -265,7 +265,7 @@ TortoiseHg
 
 
 .. module:: email.settings
-	:synopsis: Dialog used to set email specific preferences
+	:synopsis: メール送信に関する設定
 
 メール送信
 ----------
@@ -308,7 +308,7 @@ TortoiseHg
 
 
 .. module:: diff.settings
-	:synopsis: Dialog used to set diff specific preferences
+	:synopsis: 差分表示に関する設定
 
 差分
 ----

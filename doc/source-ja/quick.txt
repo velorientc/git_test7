@@ -3,7 +3,7 @@
 ******************************************
 
 .. module:: tour
-	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
+	:synopsis: Windows で TortoiseHg を使うためのチュートリアル
 
 Mercurial はいくつもの異なる
 `コラボレーションモデル <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_

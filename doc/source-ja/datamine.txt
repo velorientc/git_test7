@@ -2,7 +2,7 @@
 ==============
 
 .. module:: datamine.dialog
-	:synopsis: Dialog used to search repository history
+	:synopsis: リポジトリ履歴から検索を行うダイアログ
 
 リポジトリ検索ツールはリポジトリのリビジョン履歴を調べるのに使うことができます。
 *検索* と *コメント* の2種類のタブを持つアプリケーションです。

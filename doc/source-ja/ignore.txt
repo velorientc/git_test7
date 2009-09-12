@@ -2,7 +2,7 @@
 ============
 
 .. module:: ignore.dialog
-	:synopsis: Dialog used to maintain the ignore filter
+	:synopsis: 無視フィルタの保守に使うダイアログ
 
 無視フィルタダイアログはリポジトリのルートにある :file:`.hgignore` ファイルの
 ような Mercurial の無視ファイルフィルタの編集に使われます。

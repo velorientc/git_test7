@@ -3,7 +3,7 @@
 ********
 
 .. module:: preface
-	:synopsis: About this manual
+	:synopsis: このマニュアルについて
 
 対象読者
 ========

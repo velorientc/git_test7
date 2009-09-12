@@ -2,7 +2,7 @@
 ==========
 
 .. module:: synchronize.dialog
-	:synopsis: Dialog used to perform synchronization operations
+	:synopsis: 他のリポジトリとの同期作業に使用するダイアログ
 
 .. figure:: figures/synchronize.png
 	:alt: 同期ダイアログ

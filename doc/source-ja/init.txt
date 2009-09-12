@@ -2,7 +2,7 @@
 ==========================
 
 .. module:: init.dialog
-	:synopsis: Dialog used to create a repository
+	:synopsis: 新しいリポジトリの作成に使用するダイアログ
 
 既存のディレクトリ (プロジェクト) に新しくリポジトリを作成するには、
 リポジトリ初期化ダイアログを開きます。エクスプローラで、プロジェクトの

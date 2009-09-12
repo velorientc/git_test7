@@ -2,7 +2,7 @@
 ======
 
 .. module:: serve.dialog
-	:synopsis: Dialog used to start/stop the web server
+	:synopsis: ウェブサーバを開始・停止するためのダイアログ
 
 .. figure:: figures/serve.png
 	:alt: ウェブサーバダイアログ

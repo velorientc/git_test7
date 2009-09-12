@@ -2,7 +2,7 @@
 ========
 
 .. module:: shelve.dialog
-	:synopsis: Dialog used to perform shelve/unshelve operations
+	:synopsis: シェルフ・シェルフから戻す操作をするためのダイアログ
 
 .. warning::
 	win32text 拡張機能はハンク選択で問題を引き起こす可能性があります。この問題は

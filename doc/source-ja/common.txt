@@ -2,7 +2,7 @@
 ==========
 
 .. module:: common.dialog
-	:synopsis: Common features to all the dialog
+	:synopsis: 全ダイアログ共通の機能
 
 これらの機能は多くの TortoiseHg ダイアログに共通しているため、
 ここにまとめておきます。

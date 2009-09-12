@@ -2,7 +2,7 @@
 ========
 
 .. module:: commit.dialog
-	:synopsis: Dialog used to perform commit
+	:synopsis: コミットを実行するダイアログ
 
 .. warning::
 	win32text 拡張機能はハンク選択で問題を引き起こす可能性があります。この問題は

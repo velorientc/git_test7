@@ -2,7 +2,7 @@ TortoiseHg のデバッグ
 =====================
 
 .. module:: debugging
-	:synopsis: Debug problems in shell extension or dialogs
+	:synopsis: TortoiseHg のダイアログやシェル拡張をデバッグするためのヒント
 
 
 ダイアログ

@@ -3,7 +3,7 @@
 ****
 
 .. module:: introduction
-	:synopsis: Introduce TortoiseHg and its various parts
+	:synopsis: TortoiseHg の導入
 
 
 TortoiseHg とは何か?

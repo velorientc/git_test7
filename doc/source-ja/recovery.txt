@@ -3,7 +3,7 @@
 ********
 
 .. module:: recovery.dialog
-	:synopsis: Dialog used to perform recovery operations
+	:synopsis: リカバリ操作を行うためのダイアログ
 
 .. figure:: figures/recover.png
 	:alt: リカバリダイアログ

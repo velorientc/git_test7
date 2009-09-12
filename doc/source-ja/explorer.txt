@@ -2,7 +2,7 @@ Windows エクスプローラ統合
 ==========================
 
 .. module:: explorer
-	:synopsis: Windows explorer integration
+	:synopsis: Windows エクスプローラへの統合
 
 アイコンオーバーレイ
 --------------------
