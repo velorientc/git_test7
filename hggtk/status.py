@@ -1299,7 +1299,7 @@ class GStatus(gdialog.GDialog):
         all = []
         for p in tpaths:
             row = model[p]
-            file = row[FM_PATH]
+            file = util.pconvert(row[FM_PATH])
             ms = row[FM_MERGE_STATUS]
             if ms == 'R':
                 types['r'].append(file)
@@ -1346,19 +1346,19 @@ class GStatus(gdialog.GDialog):
         def unmark(menuitem, files):
             ms = merge_.mergestate(self.repo)
             for wfile in files:
-                ms.mark(util.pconvert(wfile), "u")
+                ms.mark(wfile, "u")
             self.reload_status()
         def mark(menuitem, files):
             ms = merge_.mergestate(self.repo)
             for wfile in files:
-                ms.mark(util.pconvert(wfile), "r")
+                ms.mark(wfile, "r")
             self.reload_status()
         def resolve(stat, files):
             wctx = self.repo[None]
             mctx = wctx.parents()[-1]
             for wfile in files:
                 ms = merge_.mergestate(self.repo)
-                ms.resolve(util.pconvert(wfile), wctx, mctx)
+                ms.resolve(wfile, wctx, mctx)
             self.reload_status()
         def resolve_with(stat, tool, files):
             if tool:
@@ -1379,8 +1379,7 @@ class GStatus(gdialog.GDialog):
             dlg.show_all()
             dlg.set_notify_func(self.ignoremask_updated)
         def ignore(menuitem, files):
-            wfile = util.pconvert(files[0])
-            dlg = hgignore.HgIgnoreDialog(self.repo.root, wfile)
+            dlg = hgignore.HgIgnoreDialog(files[0])
             dlg.show_all()
             dlg.set_notify_func(self.ignoremask_updated)
 
