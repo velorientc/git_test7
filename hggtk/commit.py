@@ -311,6 +311,8 @@ class GCommit(GStatus):
         self.autoinc_entry = gtk.Entry()
         adv_hbox.pack_start(self.autoinc_entry, False, False, 2)
         self.autopush = gtk.CheckButton(_('Push after commit'))
+        pushafterci = self.repo.ui.configbool('tortoisehg', 'pushafterci')
+        self.autopush.set_active(pushafterci)
         adv_hbox.pack_start(self.autopush, False, False, 2)
         self.advanced_frame.add(adv_hbox)
         vbox.pack_start(self.advanced_frame, False, False, 2)
