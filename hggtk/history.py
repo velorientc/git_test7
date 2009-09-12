@@ -1114,7 +1114,7 @@ class GLog(gdialog.GDialog):
         if not hasattr(self, 'mqpaned'):
             return
         if enable == None:
-            enable = bool('mq' in self.exs and self.repo.mq.applied)
+            enable = self.mqwidget.has_patch()
         self.mqpaned.set_position(enable and 180 or 0)
 
         # set the state of MQ toolbutton
