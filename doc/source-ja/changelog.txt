@@ -117,7 +117,7 @@ TortoiseHg のチェンジログビューアはそれ以上の機能を提供し
 フィルタダイアログ
 ----------------------------
 
-.. figure:: figures/logfilter.jpg
+.. figure:: figures/logfilter.png
 	:alt: フィルタダイアログ
 
 	リビジョンフィルタダイアログ

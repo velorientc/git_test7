@@ -27,7 +27,7 @@ TortoiseHg の設定
 TortoiseHg のグローバル設定から設定できます。プロジェクトディレクトリを
 右クリックして :menuselection:`TortoiseHg --> グローバル設定` を選択します。
 
-.. figure:: figures/cmenu-nofiles.jpg
+.. figure:: figures/cmenu-nofiles.png
 	:alt: 右クリックメニュー
 
 	何もファイルを選択していないときの右クリックメニュー

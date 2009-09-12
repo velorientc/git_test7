@@ -54,14 +54,14 @@ TortoiseHg コマンド (GUI ウィンドウとダイアログ) はエクスプ�
 変化します。例えば次のスクリーンショットは Mercurial 管理下にあるディレクトリの
 右クリックメニューです：
 
-.. figure:: figures/cmenu-nofiles.jpg
+.. figure:: figures/cmenu-nofiles.png
 	:alt: 右クリックメニュー
 
 	Mercurial 管理下にあるディレクトリの右クリックメニュー
 
 そしてこれはファイルまたはディレクトリを選択した状態で開いた右クリックメニューです：
 
-.. figure:: figures/cmenu-files.jpg
+.. figure:: figures/cmenu-files.png
 	:alt: 右クリックメニュー
 
 	ファイルまたはディレクトリを選択した状態で開いた右クリックメニュー
