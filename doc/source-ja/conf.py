@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'TortoiseHg'
-copyright = u'2009, Steve Borho and others'
+copyright = u'2009, Steve Borho、他'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -168,8 +168,8 @@ htmlhelp_basename = 'TortoiseHg'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'TortoiseHg.tex', ur'TortoiseHg Documentation',
-   ur'Steve Borho and others', 'manual'),
+  ('index', 'TortoiseHg.tex', ur'TortoiseHg マニュアル',
+   ur'Steve Borho、他', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
