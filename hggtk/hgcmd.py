@@ -396,6 +396,7 @@ class CmdWidget(gtk.VBox):
                 self.set_buttons(stop=False, close=True)
             if returncode is None:
                 self.log.append(_('\n[command interrupted]'))
+                self.show_log()
             self.hgthread = None
             def call_callback():
                 callback(returncode, *args, **kargs)
