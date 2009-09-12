@@ -108,14 +108,24 @@ class ServeDialog(gtk.Window):
         vbox.pack_start(scrolledwindow, True, True)
         self._set_button_states()
 
+    def isatty(self):
+        'hgext/pager.py calls this method of stdout'
+        return False
+
     def _get_config(self):
-        try:
-            repo = hg.repository(ui.ui(), path=self._root)
-        except hglib.RepoError:
-            self.destroy()
-        self.defport = repo.ui.config('web', 'port') or '8000'
-        self.webname = repo.ui.config('web', 'name') or \
-                os.path.basename(self._root)
+        if self._root:
+            try:
+                repo = hg.repository(ui.ui(), path=self._root)
+            except hglib.RepoError:
+                self.destroy()
+            self.defport = repo.ui.config('web', 'port') or '8000'
+            self.webname = repo.ui.config('web', 'name') or \
+                    os.path.basename(self._root)
+        elif self._webdirconf:
+            self.defport = '8000'
+            self.webname = _('unknown')
+            self.set_title(_('Serve %s') % (hglib.toutf(self._webdirconf)))
+            return
         if self._webdirconf:
             self.set_title(_('Serve %s - %s') %
                     (hglib.toutf(self._webdirconf), hglib.toutf(self.webname)))
@@ -292,8 +302,7 @@ def thg_serve(ui, repo, **opts):
             self.stopped = True
             util.set_signal_handler()
             try:
-                baseui = (getattr(repo, 'baseui', None) or
-                          getattr(ui, 'parentui', None) or ui)
+                baseui = repo and repo.baseui or ui
                 repoui = repo and repo.ui != baseui and repo.ui or None
                 optlist = ("name templates style address port prefix ipv6"
                            " accesslog errorlog webdir_conf certificate")

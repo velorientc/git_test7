@@ -16,59 +16,53 @@ dialog.  Other portions stolen from graphlog extension.
 
 import gtk
 import gobject
-import re
 from mercurial import util, templatefilters
-from mercurial.hgweb import webutil
 from thgutil import hglib
 from hggtk import gtklib
 
 # treemodel row enumerated attributes
-LINES = 0
-NODE = 1
+LINES = 0           # These elements come from the changelog walker
+GRAPHNODE = 1
 REVID = 2
 LAST_LINES = 3
-MESSAGE = 4
-COMMITER = 5
-TIMESTAMP = 6
-REVISION = 7
-PARENTS = 8
-WCPARENT = 9
-HEAD = 10
-TAGS = 11
-FGCOLOR = 12
-HEXID = 13
-UTC = 14
-BRANCHES = 15
+
+BRANCH = 4          # calculated on demand, not cached
+HEXID = 5
+LOCALTIME = 6
+UTC = 7
+
+MESSAGE = 8         # calculated on demand, cached
+COMMITER = 9
+TAGS = 10
+FGCOLOR = 11
+AGE = 12
 
 class TreeModel(gtk.GenericTreeModel):
 
     def __init__ (self, repo, graphdata, color_func):
         gtk.GenericTreeModel.__init__(self)
-        self.revisions = {}
-        self.branch_names = {}
         self.repo = repo
-        self.line_graph_data = graphdata
+        self.revisions = {}
+        self.graphdata = graphdata
         self.color_func = color_func
         self.parents = [x.rev() for x in repo.parents()]
-        self.heads = [repo[x].rev() for x in repo.heads()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
 
     def refresh(self):
         repo = self.repo
-        oldtags, oldheads, oldparents = self.tagrevs, self.heads, self.parents
+        oldtags, oldparents = self.tagrevs, self.parents
         oldbranches = [repo[n].rev() for n in self.branchtags.values()]
 
         repo.invalidate()
         repo.dirstate.invalidate()
 
         self.parents = [x.rev() for x in repo.parents()]
-        self.heads = [repo[x].rev() for x in repo.heads()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
         brevs = [repo[n].rev() for n in self.branchtags.values()]
-        allrevs = set(oldtags + oldheads + oldparents + oldbranches +
-                      brevs + self.parents + self.heads + self.tagrevs)
+        allrevs = set(oldtags + oldparents + oldbranches +
+                      brevs + self.parents + self.tagrevs)
         for rev in allrevs:
             if rev in self.revisions:
                 del self.revisions[rev]
@@ -77,25 +71,24 @@ class TreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
 
     def on_get_n_columns(self):
-        return 15
+        return 13
 
     def on_get_column_type(self, index):
-        if index == NODE: return gobject.TYPE_PYOBJECT
+        if index == GRAPHNODE: return gobject.TYPE_PYOBJECT
         if index == LINES: return gobject.TYPE_PYOBJECT
-        if index == REVID: return gobject.TYPE_STRING
+        if index == REVID: return int
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
-        if index == MESSAGE: return gobject.TYPE_STRING
-        if index == COMMITER: return gobject.TYPE_STRING
-        if index == TIMESTAMP: return gobject.TYPE_STRING
-        if index == REVISION: return gobject.TYPE_PYOBJECT
-        if index == PARENTS: return gobject.TYPE_PYOBJECT
-        if index == WCPARENT: return gobject.TYPE_BOOLEAN
-        if index == HEAD: return gobject.TYPE_BOOLEAN
-        if index == TAGS: return gobject.TYPE_STRING
-        if index == FGCOLOR: return gobject.TYPE_STRING
-        if index == HEXID: return gobject.TYPE_STRING
-        if index == BRANCHES: return gobject.TYPE_STRING
-        if index == UTC: return gobject.TYPE_STRING
+
+        if index == BRANCH: return str
+        if index == HEXID: return str
+        if index == LOCALTIME: return str
+        if index == UTC: return str
+
+        if index == MESSAGE: return str
+        if index == COMMITER: return str
+        if index == TAGS: return str
+        if index == FGCOLOR: return str
+        if index == AGE: return str
 
     def on_get_iter(self, path):
         return path[0]
@@ -104,16 +97,29 @@ class TreeModel(gtk.GenericTreeModel):
         return rowref
 
     def on_get_value(self, rowref, column):
-        (revid, node, lines, parents) = self.line_graph_data[rowref]
+        (revid, graphnode, lines, parents) = self.graphdata[rowref]
 
         if column == REVID: return revid
-        if column == NODE: return node
+        if column == GRAPHNODE: return graphnode
         if column == LINES: return lines
-        if column == PARENTS: return parents
         if column == LAST_LINES:
             if rowref>0:
-                return self.line_graph_data[rowref-1][2]
+                return self.graphdata[rowref-1][2]
             return []
+
+        if column in (HEXID, BRANCH, LOCALTIME, UTC):
+            try:
+                ctx = self.repo[revid]
+            except IndexError:
+                return None
+            if column == HEXID:
+                return str(ctx)
+            if column == BRANCH:
+                return ctx.branch()
+            if column == LOCALTIME:
+                return hglib.displaytime(ctx.date())
+            if column == UTC:
+                return hglib.utctime(ctx.date())
 
         if revid not in self.revisions:
             try:
@@ -133,7 +139,7 @@ class TreeModel(gtk.GenericTreeModel):
             else:
                 summary = summary.splitlines()[0]
             summary = gtklib.markup_escape_text(hglib.toutf(summary))
-            node = self.repo.lookup(revid)
+            node = ctx.node()
             tags = self.repo.nodetags(node)
             taglist = hglib.toutf(', '.join(tags))
             tstr = ''
@@ -143,7 +149,7 @@ class TreeModel(gtk.GenericTreeModel):
 
             branch = ctx.branch()
             bstr = ''
-            if self.branchtags.get(branch) == ctx.node():
+            if self.branchtags.get(branch) == node:
                 bstr += '<span color="%s" background="%s"> %s </span> ' % \
                         ('black', '#aaffaa', branch)
 
@@ -151,34 +157,22 @@ class TreeModel(gtk.GenericTreeModel):
             if not author:
                 author = util.shortuser(ctx.user())
             author = hglib.toutf(author)
-            date = hglib.displaytime(ctx.date())
-            utc = hglib.utctime(ctx.date())
+            age = templatefilters.age(ctx.date())
 
-            wc_parent = revid in self.parents
-            head = revid in self.heads
             color = self.color_func(parents, revid, author)
-            if wc_parent:
+            if revid in self.parents:
                 sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
             else:
                 sumstr = bstr + tstr + summary
             
-            revision = (None, node, revid, None, sumstr,
-                    author, date, None, parents, wc_parent, head, taglist,
-                    color, str(ctx), utc)
+            revision = (sumstr, author, taglist, color, age)
             self.revisions[revid] = revision
-            self.branch_names[revid] = branch
         else:
             revision = self.revisions[revid]
-            branch = self.branch_names[revid]
-
-        if column == REVISION:
-            return revision
-        if column == BRANCHES:
-            return branch
-        return revision[column]
+        return revision[column-MESSAGE]
 
     def on_iter_next(self, rowref):
-        if rowref < len(self.line_graph_data) - 1:
+        if rowref < len(self.graphdata) - 1:
             return rowref+1
         return None
 
@@ -190,7 +184,7 @@ class TreeModel(gtk.GenericTreeModel):
         return False
 
     def on_iter_n_children(self, rowref):
-        if rowref is None: return len(self.line_graph_data)
+        if rowref is None: return len(self.graphdata)
         return 0
 
     def on_iter_nth_child(self, parent, n):
