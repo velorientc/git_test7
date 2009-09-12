@@ -380,8 +380,6 @@ class MQWidget(gtk.VBox):
         cmdline = ['hg', 'qfold', patch]
         self.cmd.execute(cmdline, self.cmd_done)
 
-    ### internal functions ###
-
     def has_patch(self):
         """ return True if MQ has applicable patch """
         if self.mqloaded:
@@ -403,6 +401,13 @@ class MQWidget(gtk.VBox):
             return len(repo.mq.series) > 0
         return False
 
+    def is_qtip(self, patchname):
+        if patchname:
+            return patchname == self.get_qtip_patchname()
+        return False
+
+    ### internal functions ###
+
     def get_iter_by_patchname(self, name):
         """ return iter has specified patch name """
         if name:
@@ -419,11 +424,6 @@ class MQWidget(gtk.VBox):
         if self.mqloaded and 'qtip' in self.repo.tags():
             return self.repo.mq.applied[-1].name
         return None
-
-    def is_qtip(self, patchname):
-        if patchname:
-            return patchname == self.get_qtip_patchname()
-        return False
 
     def update_sensitives(self):
         """ Update the sensitives of entire UI """
