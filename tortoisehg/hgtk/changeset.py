@@ -105,20 +105,28 @@ class ChangeSet(gdialog.GDialog):
         else:
             parent = self.repo[-1]
 
+        pats = self.pats
+        if self.graphview:
+            (path, focus) = self.graphview.treeview.get_cursor()
+            if path:
+                wfile = self.graphview.get_wfile_at_path(path)
+                if wfile:
+                    pats.append(wfile)
+
         self._filelist.clear()
         self._filelist.append(('*', _('[All Files]'), ''))
         modified, added, removed = self.repo.status(parent, ctx.node())[:3]
         selrow = None
         for f in modified:
-            if f in self.pats:
+            if f in pats:
                 selrow = len(self._filelist)
             self._filelist.append(('M', toutf(f), f))
         for f in added:
-            if f in self.pats:
+            if f in pats:
                 selrow = len(self._filelist)
             self._filelist.append(('A', toutf(f), f))
         for f in removed:
-            if f in self.pats:
+            if f in pats:
                 selrow = len(self._filelist)
             self._filelist.append(('R', toutf(f), f))
         self.curnodes = (parent, ctx.node())
