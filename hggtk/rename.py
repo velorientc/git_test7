@@ -28,7 +28,7 @@ def run(ui, *pats, **opts):
         target = hglib.toutf(util.normpath(target))
     else:
         target = hglib.toutf(fname)
-    title = 'Rename ' + hglib.toutf(fname)
+    title = _('Rename ') + hglib.toutf(fname)
     dlg = dialog.entry_dialog(None, title, True, target, rename_resp)
     dlg.orig = fname
     return dlg
