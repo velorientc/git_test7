@@ -346,6 +346,7 @@ def filelog_grapher(repo, path):
     revs = []
     rev_color = {}
     nextcolor = 0
+    type = type_PLAIN
     while filerev >= 0:
         fctx = repo.filectx(path, fileid=filerev)
 
@@ -374,17 +375,29 @@ def filelog_grapher(repo, path):
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color, type_PLAIN) )
+                lines.append( (i, next_revs.index(rev), color, type) )
             elif rev == filerev:
                 for parent in parents:
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color,
-                        type_PLAIN) )
+                    lines.append( (i, next_revs.index(parent), color, type) )
 
-        pcrevs = [pfc.rev() for pfc in fctx.parents()]
+        ret = fctx.renamed()
+        if ret:
+            path, fnode = ret
+            flog = repo.file(path)
+            filerev = flog.rev(fnode)
+            next_revs = [filerev]
+            rev_color[filerev] = nextcolor
+            pcrevs = [repo.filectx(path, fileid=filerev).rev()]
+            lines = [ (0, 0, nextcolor, type_LOOSE_LOW) ]
+            nextcolor += 1
+        else:
+            filerev -= 1
+            pcrevs = [pfc.rev() for pfc in fctx.parents()]
+
         yield (fctx.rev(), (index, curcolor), lines, pcrevs)
         revs = next_revs
-        filerev -= 1
+
 
 
 def dumb_log_generator(repo, revs):
