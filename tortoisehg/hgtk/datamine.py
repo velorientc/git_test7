@@ -144,7 +144,7 @@ class DataMineDialog(gdialog.GDialog):
         if not self.currev:
             return
         parent = self.repo[self.currev].parents()[0].rev()
-        self.trigger_annotate(parent, objs)
+        self.trigger_annotate(parent, self.wfile, objs)
 
     def cmenu_zoom(self, menuitem, objs):
         (frame, treeview, path, graphview) = objs
@@ -637,11 +637,13 @@ class DataMineDialog(gdialog.GDialog):
         (model, paths) = treeview.get_selection().get_selected_rows()
         revid = graphview.get_revid_at_path(paths[0])
         self.currev = str(revid)
+        self.wfile = graphview.get_wfile_at_path(paths[0])
 
     def log_activate(self, treeview, path, column, objs):
         (frame, treeview, file, graphview) = objs
         rev = graphview.get_revid_at_path(path)
-        self.trigger_annotate(rev, objs)
+        wfile = graphview.get_wfile_at_path(path)
+        self.trigger_annotate(rev, wfile, objs)
 
     def revisions_loaded(self, graphview, rev):
         graphview.set_revision_id(rev)
@@ -653,13 +655,13 @@ class DataMineDialog(gdialog.GDialog):
         if path != None and column != None:
             treeview.row_activated(path, column)
 
-    def trigger_annotate(self, rev, objs):
+    def trigger_annotate(self, rev, path, objs):
         '''
         User has selected a file revision to annotate.  Trigger a
         background thread to perform the annotation.  Disable the select
         button until this operation is complete.
         '''
-        (frame, treeview, path, graphview) = objs
+        (frame, treeview, origpath, graphview) = objs
         q = Queue.Queue()
         args = [self.repo.root, q, 'annotate', '--follow', '--number',
                 '--rev', str(rev), 'path:'+path]
