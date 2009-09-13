@@ -140,7 +140,7 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
                     color = rev_color[parent]
                     lines.append( (i, next_revs.index(parent), color, type_PLAIN) )
 
-        yield (curr_rev, (rev_index, rev_color[curr_rev]), lines, parents)
+        yield (curr_rev, (rev_index, rev_color[curr_rev]), lines, None)
         revs = next_revs
         curr_rev -= 1
 
@@ -328,8 +328,7 @@ class BranchGrapher:
         self.curr_rev -= 1
         
         # Return result
-        # TODO: Refactor parents field away - it is apparently not used anywhere
-        return (rev, node, lines, parents)
+        return (rev, node, lines, None)
     
 def branch_grapher(repo, start_rev, stop_rev):
     grapher = BranchGrapher(repo, start_rev, stop_rev)
@@ -383,19 +382,19 @@ def filelog_grapher(repo, path):
 
         ret = fctx.renamed()
         if ret:
-            path, fnode = ret
-            flog = repo.file(path)
+            nextpath, fnode = ret
+            flog = repo.file(nextpath)
             filerev = flog.rev(fnode)
             next_revs = [filerev]
             rev_color[filerev] = nextcolor
-            pcrevs = [repo.filectx(path, fileid=filerev).rev()]
             lines = [ (0, 0, nextcolor, type_LOOSE_LOW) ]
             nextcolor += 1
         else:
+            nextpath = path
             filerev -= 1
-            pcrevs = [pfc.rev() for pfc in fctx.parents()]
 
-        yield (fctx.rev(), (index, curcolor), lines, pcrevs)
+        yield (fctx.rev(), (index, curcolor), lines, path)
+        path = nextpath
         revs = next_revs
 
 
@@ -404,7 +403,7 @@ def dumb_log_generator(repo, revs):
     for revname in revs:
         node = repo.lookup(revname)
         rev = repo.changelog.rev(node)
-        yield (rev, (0,0), [], __get_parents(repo, rev))
+        yield (rev, (0,0), [], None)
 
 def filtered_log_generator(repo, pats, opts):
     '''Fill view model iteratively
@@ -452,4 +451,4 @@ def filtered_log_generator(repo, pats, opts):
                     break
             if miss:
                 continue
-        stack.append((rev, (0,0), [], parents))
+        stack.append((rev, (0,0), [], None))

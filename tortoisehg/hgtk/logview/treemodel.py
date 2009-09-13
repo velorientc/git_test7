@@ -25,17 +25,18 @@ LINES = 0           # These elements come from the changelog walker
 GRAPHNODE = 1
 REVID = 2
 LAST_LINES = 3
+WFILE = 4
 
-BRANCH = 4          # calculated on demand, not cached
-HEXID = 5
-LOCALTIME = 6
-UTC = 7
+BRANCH = 5          # calculated on demand, not cached
+HEXID = 6
+LOCALTIME = 7
+UTC = 8
 
-MESSAGE = 8         # calculated on demand, cached
-COMMITER = 9
-TAGS = 10
-FGCOLOR = 11
-AGE = 12
+MESSAGE = 9         # calculated on demand, cached
+COMMITER = 10
+TAGS = 11
+FGCOLOR = 12
+AGE = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -45,24 +46,24 @@ class TreeModel(gtk.GenericTreeModel):
         self.revisions = {}
         self.graphdata = graphdata
         self.color_func = color_func
-        self.parents = [x.rev() for x in repo.parents()]
+        self.wcparents = [x.rev() for x in repo.parents()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
 
     def refresh(self):
         repo = self.repo
-        oldtags, oldparents = self.tagrevs, self.parents
+        oldtags, oldparents = self.tagrevs, self.wcparents
         oldbranches = [repo[n].rev() for n in self.branchtags.values()]
 
         repo.invalidate()
         repo.dirstate.invalidate()
 
-        self.parents = [x.rev() for x in repo.parents()]
+        self.wcparents = [x.rev() for x in repo.parents()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
         brevs = [repo[n].rev() for n in self.branchtags.values()]
         allrevs = set(oldtags + oldparents + oldbranches +
-                      brevs + self.parents + self.tagrevs)
+                      brevs + self.wcparents + self.tagrevs)
         for rev in allrevs:
             if rev in self.revisions:
                 del self.revisions[rev]
@@ -78,6 +79,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == LINES: return gobject.TYPE_PYOBJECT
         if index == REVID: return int
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
+        if index == WFILE: return str
 
         if index == BRANCH: return str
         if index == HEXID: return str
@@ -97,7 +99,7 @@ class TreeModel(gtk.GenericTreeModel):
         return rowref
 
     def on_get_value(self, rowref, column):
-        (revid, graphnode, lines, parents) = self.graphdata[rowref]
+        (revid, graphnode, lines, path) = self.graphdata[rowref]
 
         if column == REVID: return revid
         if column == GRAPHNODE: return graphnode
@@ -106,6 +108,7 @@ class TreeModel(gtk.GenericTreeModel):
             if rowref>0:
                 return self.graphdata[rowref-1][2]
             return []
+        if column == WFILE: return path or ''
 
         if column in (HEXID, BRANCH, LOCALTIME, UTC):
             try:
@@ -159,8 +162,8 @@ class TreeModel(gtk.GenericTreeModel):
             author = hglib.toutf(author)
             age = templatefilters.age(ctx.date())
 
-            color = self.color_func(parents, revid, author)
-            if revid in self.parents:
+            color = self.color_func(ctx.parents(), revid, author)
+            if revid in self.wcparents:
                 sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
             else:
                 sumstr = bstr + tstr + summary
