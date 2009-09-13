@@ -18,12 +18,12 @@ def _thg_path():
         pfile = pfile[:-1]
     path = os.path.dirname(os.path.dirname(os.path.realpath(pfile)))
     thgpath = os.path.normpath(path)
-    testpath = os.path.join(thgpath, 'thgutil')
+    testpath = os.path.join(thgpath, 'tortoisehg')
     if os.path.isdir(testpath) and thgpath not in sys.path:
         sys.path.insert(0, thgpath)
 _thg_path()
 
-from thgutil.menuthg import thgcmenu
+from tortoisehg.util.menuthg import thgcmenu
 
 regkeytmpl = u'[HKEY_CURRENT_USER\\Software\\TortoiseHg\\CMenu\\%s\\%s]'
 regheaders = (  u'Windows Registry Editor Version 5.00',

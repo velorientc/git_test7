@@ -24,12 +24,11 @@ from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
 from mercurial import ui, error
-from thgutil.i18n import agettext as _
-from thgutil import thread2, paths, shlib
+from tortoisehg.util.i18n import agettext as _
+from tortoisehg.util import thread2, paths, shlib
 
 if hasattr(sys, "frozen"):
     # Insert PATH to binary installer gtk directory
-    from thgutil import paths
     gtkpath = os.path.join(paths.bin_path, 'gtk')
     os.environ['PATH'] = os.pathsep.join([gtkpath, os.environ['PATH']])
     # Give stdout/stderr closed attributes to prevent ui.py errors
@@ -45,7 +44,7 @@ def SetIcon(hwnd, name, add=False):
     # Try and find a custom icon
     print "SetIcon(%s)" % name
     hinst =  GetModuleHandle(None)
-    from thgutil.paths import get_tortoise_icon
+    from tortoisehg.util.paths import get_tortoise_icon
     iconPathName = get_tortoise_icon(name)
     if iconPathName and os.path.isfile(iconPathName):
         icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
@@ -172,7 +171,7 @@ class MainWindow:
     def launchgui(self):
         def launch():
             import gtk
-            from hggtk import taskbarui, hgtk
+            from tortoisehg.hgtk import taskbarui
             dlg = taskbarui.TaskBarUI(logger.getqueue(), requests)
             dlg.show_all()
             dlg.connect('destroy', gtk.main_quit)
