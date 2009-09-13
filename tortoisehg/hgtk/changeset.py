@@ -142,6 +142,8 @@ class ChangeSet(gdialog.GDialog):
         try:
             def get_path(a, b):
                 rawpath = b != '/dev/null' and b or a
+                if not rawpath.startswith(('a/', 'b/')):
+                    return rawpath
                 return rawpath.split('/', 1)[-1]
             hunks = []
             map = {'MODIFY': 'M', 'ADD': 'A', 'DELETE': 'R',
