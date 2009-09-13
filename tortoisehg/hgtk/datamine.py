@@ -128,6 +128,7 @@ class DataMineDialog(gdialog.GDialog):
         menu.append(create_menu(_('di_splay change'), self.cmenu_display))
         menu.append(create_menu(_('_annotate file'), self.cmenu_annotate))
         menu.append(create_menu(_('_file history'), self.cmenu_file_log))
+        menu.append(create_menu(_('_view file at revision'), self.cmenu_view))
         menu.show_all()
         return menu
 
@@ -137,6 +138,7 @@ class DataMineDialog(gdialog.GDialog):
         menu.append(create_menu(_('di_splay change'), self.cmenu_display))
         menu.append(create_menu(_('_annotate parent'),
             self.annotate_parent, objs))
+        menu.append(create_menu(_('_view file at revision'), self.cmenu_view))
         menu.show_all()
         return menu
 
@@ -144,7 +146,7 @@ class DataMineDialog(gdialog.GDialog):
         if not self.currev:
             return
         parent = self.repo[self.currev].parents()[0].rev()
-        self.trigger_annotate(parent, self.wfile, objs)
+        self.trigger_annotate(parent, self.curpath, objs)
 
     def cmenu_zoom(self, menuitem, objs):
         (frame, treeview, path, graphview) = objs
@@ -155,6 +157,10 @@ class DataMineDialog(gdialog.GDialog):
         statopts = {'rev' : [self.currev] }
         dlg = changeset.ChangeSet(self.ui, self.repo, self.cwd, [], statopts)
         dlg.display()
+
+    def cmenu_view(self, menuitem):
+        self._node2 = self.currev
+        self._view_files([self.curpath], False)
 
     def cmenu_annotate(self, menuitem):
         self.add_annotate_page(self.curpath, self.currev)
@@ -637,7 +643,9 @@ class DataMineDialog(gdialog.GDialog):
         (model, paths) = treeview.get_selection().get_selected_rows()
         revid = graphview.get_revid_at_path(paths[0])
         self.currev = str(revid)
-        self.wfile = graphview.get_wfile_at_path(paths[0])
+        wfile = graphview.get_wfile_at_path(paths[0])
+        if wfile:
+            self.curpath = wfile
 
     def log_activate(self, treeview, path, column, objs):
         (frame, treeview, file, graphview) = objs
