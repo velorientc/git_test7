@@ -532,16 +532,6 @@ class DataMineDialog(gdialog.GDialog):
         graphview.set_property('rev-column-visible', True)
         graphview.set_property('age-column-visible', True)
 
-        hbox = gtk.HBox()
-        followlabel = gtk.Label('')
-        follow = gtk.Button(_('Follow'))
-        follow.connect('clicked', self.follow_rename)
-        follow.hide()
-        follow.set_sensitive(False)
-        hbox.pack_start(gtk.Label(''), True, True)
-        hbox.pack_start(followlabel, False, False)
-        hbox.pack_start(follow, False, False)
-
         # Annotation text tree view
         treeview = gtk.TreeView()
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
@@ -594,7 +584,6 @@ class DataMineDialog(gdialog.GDialog):
         vpaned.pack1(graphview, True, True)
         vpaned.pack2(scroller, True, True)
         vbox.pack_start(vpaned, True, True)
-        vbox.pack_start(hbox, False, False)
         frame.add(vbox)
         frame.show_all()
 
@@ -612,8 +601,7 @@ class DataMineDialog(gdialog.GDialog):
             self.notebook.set_tab_reorderable(frame, True)
         self.notebook.set_current_page(num)
 
-        graphview.connect('revision-selected', self.log_selection_changed,
-                path, followlabel, follow)
+        graphview.connect('revision-selected', self.log_selection_changed, path)
 
         objs = (frame, treeview, path, graphview)
         graphview.treeview.connect('row-activated', self.log_activate, objs)
@@ -644,33 +632,11 @@ class DataMineDialog(gdialog.GDialog):
         b = button.get_active()
         treeview.get_column(col).set_visible(b)
 
-    def log_selection_changed(self, graphview, path, label, button):
+    def log_selection_changed(self, graphview, path):
         treeview = graphview.treeview
         (model, paths) = treeview.get_selection().get_selected_rows()
         revid = graphview.get_revid_at_path(paths[0])
         self.currev = str(revid)
-        ctx = self.repo[revid]
-        try:
-            filectx = ctx.filectx(path)
-            info = filectx.renamed()
-        except LookupError:
-            info = None
-        if info:
-            (rpath, node) = info
-            fl = self.repo.file(rpath)
-            frev = fl.linkrev(fl.rev(node))
-            button.set_label(hglib.toutf('%s@%s' % (rpath, frev)))
-            button.show()
-            button.set_sensitive(True)
-            label.set_text(_('Follow Rename:'))
-        else:
-            button.hide()
-            button.set_sensitive(False)
-            label.set_text('')
-
-    def follow_rename(self, button):
-        path, rev = button.get_label().rsplit('@', 1)
-        self.add_annotate_page(path, rev)
 
     def log_activate(self, treeview, path, column, objs):
         (frame, treeview, file, graphview) = objs
