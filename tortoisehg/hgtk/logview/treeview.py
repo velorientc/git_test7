@@ -521,7 +521,7 @@ class TreeView(gtk.ScrolledWindow):
             return 'blue'
         elif len(parents) == 1:
             # detect non-trivial parent
-            if long(rev) != parents[0]+1:
+            if long(rev) != parents[0].rev()+1:
                 return '#900000'
             else:
                 return 'black'
