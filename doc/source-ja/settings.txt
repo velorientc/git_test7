@@ -161,7 +161,7 @@ TortoiseHg
 
 
 .. module:: synchronize.settings
-	:synopsis: Dialog used to set synchronize specific preferences
+	:synopsis: 同期ツールに関する設定
 
 同期
 ----

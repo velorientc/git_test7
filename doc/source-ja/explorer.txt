@@ -77,7 +77,7 @@ Mercurial のアイコン (銀色の水滴) をクリックして :guilabel:`Opt
 
 これは名前変更・移動ダイアログです：
 
-.. figure:: figures/rename.jpg
+.. figure:: figures/rename.png
 	:alt: 名前変更ダイアログ
 
 	名前変更 (または移動) ダイアログ
