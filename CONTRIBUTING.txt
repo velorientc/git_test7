@@ -9,5 +9,9 @@ different from those in the stable branch.
 Our code base assumes minimum versions of library components as listed below.
 That is, our code must not depend on features or API's that were introduced
 in any later versions of the respective components.
+It may be ok though if some advanced user interface features are available only
+if later versions of a library are found to be present at runtime, provided the
+application is still reasonably usable with the base library versions listed
+below.
 
 PyGtk: 2.10
