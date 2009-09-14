@@ -93,12 +93,19 @@ class GLog(gdialog.GDialog):
         return tbar
 
     def get_menu_list(self):
+        def refresh(menuitem, resettip):
+            if resettip:
+                self.origtip = len(self.repo)
+            self.reload_log()
         fnc = self.toggle_view_column
         return [(_('View'), [
             (_('Filter Bar'), True, self.toggle_show_filterbar, [],
                 self.show_filterbar),
             ('----', None, None, None, None),
             (_('Choose Details...'), False, self.details_clicked, [], None),
+            ('----', None, None, None, None),
+            (_('Refresh'), False, refresh, [False], gtk.STOCK_REFRESH),
+            (_('Reset Tip'), False, refresh, [True], gtk.STOCK_REMOVE),
             ('----', None, None, None, None),
             (_('Compact Graph'), True, self.toggle_compactgraph, [],
                 self.compactgraph),
