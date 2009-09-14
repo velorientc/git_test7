@@ -333,8 +333,9 @@ class GLog(gdialog.GDialog):
         self.filterbox.set_no_show_all(True)
 
         for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
-            self.graphview.set_property(col+'-column-visible',
-                    self.showcol[col])
+            if col in self.showcol:
+                self.graphview.set_property(col+'-column-visible',
+                        self.showcol[col])
 
         # enable MQ panel
         self.enable_mqpanel()
@@ -367,25 +368,17 @@ class GLog(gdialog.GDialog):
     def load_settings(self, settings):
         'Called at beginning of display() method'
         gdialog.GDialog.load_settings(self, settings)
-        self.setting_vpos = -1
-        self.setting_hpos = -1
-        self.branch_color = False
-        self.show_filterbar = True
-        self.graphcol = True
-        self.compactgraph = False
+        self.setting_vpos = settings.get('glog-vpane', -1)
+        self.setting_hpos = settings.get('glog-hpane', -1)
+        self.branch_color = settings.get('branch-color', False)
+        self.show_filterbar = settings.get('show-filterbar', True)
+        self.graphcol = settings.get('graphcol', True)
+        self.compactgraph = settings.get('compactgraph', False)
         self.showcol = {}
-        try:
-            self.setting_vpos = settings['glog-vpane']
-            self.setting_hpos = settings['glog-hpane']
-            self.branch_color = settings.get('branch-color', False)
-            self.show_filterbar = settings.get('show-filterbar', True)
-            for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
-                vis = settings.get('glog-vis-'+col, False)
-                self.showcol[col] = vis
-            self.graphcol = settings['graphcol']
-            self.compactgraph = settings['compactgraph']
-        except KeyError:
-            pass
+        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
+            key = 'glog-vis-'+col
+            if key in settings:
+                self.showcol[col] = settings[key]
 
     def refresh_model(self):
         'Refresh data in the history model, without reloading graph'
