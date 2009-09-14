@@ -286,7 +286,9 @@ class ChangeSet(gdialog.GDialog):
             data = patch.extract(self.ui, pf)
             tmp, msg, user, date, branch, node, p1, p2 = data
             try:
-                ud = toutf(user) + '\t' + displaytime(util.parsedate(date))
+                ud = toutf(user)
+                if date:
+                    ud += '\t' + displaytime(util.parsedate(date))
                 msg = toutf(msg.rstrip('\r\n'))
                 patchname = os.path.basename(self.curpatch)
                 patchtitle = patchname
