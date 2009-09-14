@@ -380,7 +380,7 @@ class ChangeSet(gdialog.GDialog):
                 tags.append( [name, offset, offset+length] )
 
         add, rem = 0, 0
-        for l in difflines[3:]:
+        for l in difflines[1:]:
             if l.startswith('+'):
                 add += 1
             elif l.startswith('-'):
@@ -391,8 +391,12 @@ class ChangeSet(gdialog.GDialog):
         addtag( 'greybg', offset, len(txt) )
         outlines.append(txt)
         offset += len(txt.decode('utf-8'))
-        for l1 in difflines[3:]:
+        for l1 in difflines[1:]:
             l = toutf(l1)
+            if l.startswith('+++'):
+                continue
+            if l.startswith('---'):
+                continue
             if l.startswith('@@'):
                 tag = 'blue'
             elif l.startswith('+'):
