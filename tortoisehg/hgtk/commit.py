@@ -174,11 +174,22 @@ class GCommit(GStatus):
                 else:
                     frame.hide()
                 setattr(self, statename, show)
+        no = False
         return [(_('View'),
            [(_('Advanced'), True, toggle, ['advanced'], self.showadvanced),
             (_('Parents'), True, toggle, ['parents'], self.showparents),
             ('----', None, None, None, None),
             (_('Refresh'), False, refresh, [], gtk.STOCK_REFRESH)]),
+           (_('Operations'), [
+            (_('Commit'), no, self.commit_clicked, [], gtk.STOCK_OK),
+            (_('Undo'), no, self.undo_clicked, [], gtk.STOCK_UNDO),
+            ('----', None, None, None, None),
+            (_('Diff'), no, self.diff_clicked, [], gtk.STOCK_JUSTIFY_FILL),
+            (_('Revert'), no, self.revert_clicked, [], gtk.STOCK_MEDIA_REWIND),
+            (_('Add'), no, self.add_clicked, [], gtk.STOCK_ADD),
+            (_('Move'), no, self.move_clicked, [], gtk.STOCK_JUMP_TO),
+            (_('Remove'), no, self.remove_clicked, [], gtk.STOCK_DELETE),
+            (_('Forget'), no, self.forget_clicked, [], gtk.STOCK_CLEAR)]),
            ]
 
     def save_settings(self):
