@@ -139,6 +139,7 @@ class DataMineDialog(gdialog.GDialog):
         menu.append(create_menu(_('_annotate parent'),
             self.annotate_parent, objs))
         menu.append(create_menu(_('_view file at revision'), self.cmenu_view))
+        menu.append(create_menu(_('_file history'), self.cmenu_file_log))
         menu.show_all()
         return menu
 
