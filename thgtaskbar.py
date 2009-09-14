@@ -171,6 +171,8 @@ class MainWindow:
     def launchgui(self):
         def launch():
             import gtk
+            # Import hgtk for signal setup side-effects
+            from tortoisehg.hgtk import hgtk
             from tortoisehg.hgtk import taskbarui
             dlg = taskbarui.TaskBarUI(logger.getqueue(), requests)
             dlg.show_all()
