@@ -611,32 +611,40 @@ class GCommit(GStatus):
         self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
 
     def commit_clicked(self, toolbutton, data=None):
-        if not self.ready_message() or not self.isuptodate():
+        if not self.isuptodate():
             return
 
-        commitable = 'MAR'
-        if self.merging:
-            commit_list = self.relevant_checked_files(commitable)
-            # merges must be committed without specifying file list.
-            self.hg_commit([])
-        else:
-            addremove_list = self.relevant_checked_files('?!')
-            if len(addremove_list) and self.should_addremove(addremove_list):
-                commitable += '?!'
+        def get_list(addremove=True):
+            commitable = 'MAR'
+            if addremove:
+                ar_list = self.relevant_checked_files('?!')
+                if len(ar_list) > 0 and self.should_addremove(ar_list):
+                    commitable += '?!'
+            return self.relevant_checked_files(commitable)
 
-            commit_list = self.relevant_checked_files(commitable)
-            if len(commit_list) > 0:
-                self.commit_selected(commit_list)
-            elif len(self.filemodel) == 0 and self.qnew:
-                self.commit_selected([])
-            elif self.qheader is not None:
-                self.commit_selected([])
-            elif self.closebranch:
-                self.commit_selected([])
-            else:
-                gdialog.Prompt(_('Nothing Commited'),
-                       _('No committable files selected'), self).run()
+        if self.qnew:
+            commit_list = get_list()
+            self.commit_selected(commit_list)
+        else:
+            if not self.ready_message():
                 return
+
+            if self.merging:
+                commit_list = get_list(addremove=False)
+                # merges must be committed without specifying file list.
+                self.hg_commit([])
+            else:
+                commit_list = get_list()
+                if len(commit_list) > 0:
+                    self.commit_selected(commit_list)
+                elif self.qheader is not None:
+                    self.commit_selected([])
+                elif self.closebranch:
+                    self.commit_selected([])
+                else:
+                    gdialog.Prompt(_('Nothing Commited'),
+                           _('No committable files selected'), self).run()
+                    return
         self.reload_status()
         files = [self.repo.wjoin(x) for x in commit_list]
         shlib.shell_notify(files)
