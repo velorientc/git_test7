@@ -87,6 +87,14 @@ class GLog(gdialog.GDialog):
             if resettip:
                 self.origtip = len(self.repo)
             self.reload_log()
+        def navigate(menuitem, revname):
+            if revname:
+                self.goto_rev(revname)
+            elif self.gorev_dialog:
+                self.gorev_dialog.show()
+                self.gorev_dialog.present()
+            else:
+                self.show_goto_dialog()
         fnc = self.toggle_view_column
         return [(_('View'), [
             (_('Filter Bar'), True, self.toggle_show_filterbar, [],
@@ -101,6 +109,13 @@ class GLog(gdialog.GDialog):
                 self.compactgraph),
             (_('Color by Branch'), True, self.toggle_branchcolor, [],
                 self.branch_color),
+                ]),
+
+            (_('Navigate'), [
+                (_('Tip'), False, navigate, ['tip'], None),
+                (_('Working Parent'), False, navigate, ['.'], None),
+                ('----', None, None, None, None),
+                (_('Revision...'), False, navigate, [None], None),
                 ])
             ]
 
@@ -528,22 +543,6 @@ class GLog(gdialog.GDialog):
         m.show_all()
         return m
 
-    def gorev_menu(self):
-        m = gtk.Menu()
-
-        def goto_tip(menuitem):
-            self.goto_rev(self.repo['tip'].node())
-        m.append(create_menu(_('tip'), goto_tip))
-
-        def goto_parent(menuitem):
-            self.goto_rev(self.repo['.'].node())
-        m.append(create_menu(_('parent'), goto_parent))
-
-        # TODO: last merged, qtip, qparent, qbase, tags
-
-        m.show_all()
-        return m
-
     def get_body(self):
         self.gorev_dialog = None
         self._menu = self.tree_context_menu()
@@ -721,13 +720,6 @@ class GLog(gdialog.GDialog):
         'ctrl-p handler'
         parent = self.repo['.'].rev()
         self.graphview.set_revision_id(parent)
-
-    def goto_clicked(self, toolbutton, data=None):
-        if self.gorev_dialog:
-            self.gorev_dialog.show()
-            self.gorev_dialog.present()
-        else:
-            self.show_goto_dialog()
 
     def select_branch(self, combo):
         row = combo.get_active()
