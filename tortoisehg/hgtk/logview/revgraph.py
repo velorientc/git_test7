@@ -223,14 +223,14 @@ class BranchGrapher:
         branch_name = self._branch_name(branch_head)
         rev = branch_head
         while not rev in self.branch4rev:
-            # Determine if rev should be used
+            # Add rev to branch
+            self.branch4rev[rev] = branch_head
+            self.branch_tail[branch_head] = rev
+            # Exit if rev is outside visible range
             if not self._covered_rev(rev):
                 # rev is outside visible range, so we don't know tail location
                 self.branch_tail[branch_head] = 0 # Prev revs wasn't tail
                 return
-            # Add rev to branch
-            self.branch4rev[rev] = branch_head
-            self.branch_tail[branch_head] = rev
             # Find next revision in branch
             self.parent_of[rev] = None
             for parent in self._get_parents(rev):
