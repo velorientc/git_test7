@@ -168,6 +168,8 @@ class ChangeSet(gdialog.GDialog):
                     hunks.extend([l.rstrip('\r\n') for l in values.hunk])
                 else:
                     raise 'Unknown hunk type: %s' % state
+        except patch.NoHunks:
+            pass
         finally:
             pf.close()
 
@@ -303,7 +305,8 @@ class ChangeSet(gdialog.GDialog):
                     buf.insert(eob, '\n')
                 buf.insert(eob, '\n' + msg + '\n\n')
             finally:
-                os.unlink(tmp)
+                if tmp:
+                    os.unlink(tmp)
         finally:
             pf.close()
 
