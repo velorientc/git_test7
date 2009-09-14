@@ -162,9 +162,24 @@ class GCommit(GStatus):
 
 
     def get_menu_list(self):
+        def refresh(menu):
+            self.reload_status()
+        def toggle(button, type):
+            show = button.get_active()
+            statename = 'show' + type
+            if getattr(self, statename) != show:
+                frame = getattr(self, type + '_frame')
+                if show:
+                    frame.show()
+                else:
+                    frame.hide()
+                setattr(self, statename, show)
         return [(_('View'),
-           [(_('Advanced'), True, self.toggleview, ['advanced'], self.showadvanced),
-            (_('Parents'), True, self.toggleview, ['parents'], self.showparents)])]
+           [(_('Advanced'), True, toggle, ['advanced'], self.showadvanced),
+            (_('Parents'), True, toggle, ['parents'], self.showparents),
+            ('----', None, None, None, None),
+            (_('Refresh'), False, refresh, [], gtk.STOCK_REFRESH)]),
+           ]
 
     def save_settings(self):
         settings = GStatus.save_settings(self)
@@ -341,17 +356,6 @@ class GCommit(GStatus):
 
     ### End of overridable methods ###
 
-
-    def toggleview(self, button, type):
-        show = button.get_active()
-        statename = 'show' + type
-        if getattr(self, statename) != show:
-            frame = getattr(self, type + '_frame')
-            if show:
-                frame.show()
-            else:
-                frame.hide()
-            setattr(self, statename, show)
 
     def update_recent_committers(self, name=None):
         if name is not None:
