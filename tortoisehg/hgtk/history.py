@@ -19,7 +19,7 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 
-from tortoisehg.hgtk import gdialog, gtklib, hgcmd, datamine, logfilter, gorev
+from tortoisehg.hgtk import gdialog, gtklib, hgcmd, logfilter, gorev
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
 
@@ -60,16 +60,6 @@ class GLog(gdialog.GDialog):
 
     def get_tbbuttons(self):
         tbar = [
-                self.make_toolbutton(gtk.STOCK_FIND,
-                    _('_DataMine'),
-                    self.datamine_clicked,
-                    tip=_('Search Repository History')),
-                gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_JUMP_TO,
-                    _('Select Revision'),
-                    self.goto_clicked, menu=self.gorev_menu(),
-                    tip=_('Select revision')),
-                gtk.SeparatorToolItem(),
                 self.make_toolbutton(gtk.STOCK_REFRESH,
                     _('Re_fresh'),
                     self.refresh_clicked,
@@ -197,10 +187,6 @@ class GLog(gdialog.GDialog):
             self.changeview._filelist.clear()
         self.loadnextbutton.set_sensitive(False)
         self.loadallbutton.set_sensitive(False)
-
-    def datamine_clicked(self, toolbutton, data=None):
-        dlg = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
-        dlg.display()
 
     def details_clicked(self, toolbutton, data=None):
         self.show_details_dialog()
