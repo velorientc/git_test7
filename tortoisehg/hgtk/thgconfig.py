@@ -658,10 +658,12 @@ class ConfigDialog(gtk.Dialog):
         self.refresh_vlist()
         self.pathdata.clear()
         if 'paths' in self.ini:
-            for name in self.ini['paths']:
-                path = self.ini['paths'][name]
+            from mercurial import config
+            cfg = config.config()
+            cfg.read(self.fn, sections=('paths',))
+            for alias, path in cfg.items('paths'):
                 safepath = hglib.toutf(url.hidepassword(path))
-                self.pathdata.append([hglib.toutf(name), safepath,
+                self.pathdata.append([hglib.toutf(alias), safepath,
                     hglib.toutf(path)])
         self.refresh_path_list()
         self._btn_apply.set_sensitive(False)
