@@ -842,11 +842,8 @@ class GCommit(GStatus):
                                     (maxlen, ', '.join(errs))).run()
                 if resp != gtk.RESPONSE_YES:
                     return False
-        
-        begin, end = buf.get_bounds()
-        self.opts['message'] = buf.get_text(begin, end)
         return True
-
+        
     def hg_commit(self, files):
         # get advanced options
         user = hglib.fromutf(self.committer_cbbox.get_active_text())
@@ -873,6 +870,10 @@ class GCommit(GStatus):
         incs = hglib.fromutf(self.autoinc_entry.get_text())
         self.opts['include'] = [i.strip() for i in incs.split(',') if i.strip()]
         autopush = self.autopush.get_active()
+
+        buf = self.text.get_buffer()
+        begin, end = buf.get_bounds()
+        self.opts['message'] = buf.get_text(begin, end)
 
         cmdline  = ['hg', 'commit', '--verbose']
 
