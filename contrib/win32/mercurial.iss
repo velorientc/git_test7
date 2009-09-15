@@ -41,14 +41,14 @@ SetupLogging=yes
 ArchitecturesInstallIn64BitMode=x64
 
 [Types]
-Name: "full"; Description: "Full installation"
-Name: "custom"; Description: "Custom installation"; Flags: iscustom
+Name: full; Description: Full installation
+Name: custom; Description: Custom installation; Flags: iscustom
 
 [Components]
-Name: "main"; Description: "Main Files (includes 'hg' and 'hgtk' commands)"; Types: full custom; Flags: fixed
-Name: "help"; Description: "Help Files"; Types: full
-Name: "hgbook"; Description: "The book 'Mercurial: The Definitive Guide' (PDF)"; Types: full
-Name: "shell"; Description: "Shell integration (overlay icons, context menu) [admin required]"; Types: full; Flags: restart; Check: ShellInstallPossible
+Name: main; Description: Main Files (includes 'hg' and 'hgtk' commands); Types: full custom; Flags: fixed
+Name: help; Description: Help Files; Types: full
+Name: hgbook; Description: The book 'Mercurial: The Definitive Guide' (PDF); Types: full
+Name: shell; Description: Shell integration (overlay icons, context menu) [admin required]; Types: full; Flags: restart; Check: ShellInstallPossible
 
 [Files]
 Source: ..\build-hg\contrib\mercurial.el; DestDir: {app}/contrib
@@ -58,16 +58,16 @@ Source: ..\build-hg\contrib\hgk; DestDir: {app}/contrib
 Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
 Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
-Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n; Flags:
+Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n; Flags: 
 Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ; Components: help
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
-Source: ..\contrib\*.exe; DestDir: {app}; Flags:
-Source: ..\contrib\*.dll; DestDir: {app}; Flags:
-Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays;
+Source: ..\contrib\*.exe; DestDir: {app}; Flags: 
+Source: ..\contrib\*.dll; DestDir: {app}; Flags: 
+Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays
 Source: contrib\refreshicons.cmd; DestDir: {app}/contrib
-Source: dist\*.exe; Excludes: "thgtaskbar.exe"; DestDir: {app}; Flags: ignoreversion
+Source: dist\*.exe; Excludes: thgtaskbar.exe; DestDir: {app}; Flags: ignoreversion
 Source: dist\thgtaskbar.exe; DestDir: {app}; Flags: ignoreversion; Components: shell
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion
 Source: dist\library.zip; DestDir: {app}
@@ -76,10 +76,10 @@ Source: doc\build\chm\*.chm; DestDir: {app}/docs; Flags: ; Components: help
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
-Source: i18n\*.*; DestDir: {app}\i18n; Flags:
+Source: i18n\*.*; DestDir: {app}\i18n; Flags: 
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
-Source: ..\misc\hgbook.pdf; DestDir: {app}/docs ; Components: hgbook
+Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Components: hgbook
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 Source: ..\misc\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 
@@ -122,15 +122,15 @@ const
 
 procedure FileExpandString(fn: String);
 var
-    InFile: String;
-    i: Integer;
-    InFileLines: TArrayOfString;
+  InFile: String;
+  i: Integer;
+  InFileLines: TArrayOfString;
 begin
-    InFile := ExpandConstant(fn);
-    LoadStringsFromFile(InFile, InFileLines);
-    for i:= 0 to GetArrayLength(InFileLines)-1 do
-      InFileLines[i] := ExpandConstant(InFileLines[i]);
-    SaveStringsToFile(InFile, InFileLines, False);
+  InFile := ExpandConstant(fn);
+  LoadStringsFromFile(InFile, InFileLines);
+  for i:= 0 to GetArrayLength(InFileLines)-1 do
+    InFileLines[i] := ExpandConstant(InFileLines[i]);
+  SaveStringsToFile(InFile, InFileLines, False);
 end;
 
 var IsUpgrade: Boolean;
