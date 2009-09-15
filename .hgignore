@@ -3,7 +3,6 @@ syntax: glob
 *.orig
 *.rej
 *.pyc
-thgutil/__version__.py
 build/
 build-ja/
 dist/
@@ -31,3 +30,4 @@ glob:win32/shellext/Release/
 glob:.DS_Store
 glob:win32/*.reg
 glob:*~
+glob:tortoisehg/util/__version__.py
