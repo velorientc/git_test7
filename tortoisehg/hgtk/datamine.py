@@ -194,7 +194,7 @@ class DataMineDialog(gdialog.GDialog):
         if rev in self.changedesc:
             return self.changedesc[rev]
         ctx = self.repo[rev]
-        author = hglib.toutf(util.shortuser(ctx.user()))
+        author = hglib.toutf(hglib.username(ctx.user()))
         date = hglib.toutf(hglib.displaytime(ctx.date()))
         summary = gtklib.markup_escape_text(hglib.toutf(hglib.tounicode(
                 ctx.description()).replace(u'\0', '').splitlines()[0]))
