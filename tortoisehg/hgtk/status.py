@@ -405,35 +405,6 @@ class GStatus(gdialog.GDialog):
     def page_switched(self, notebook, page, page_num, filesel, difftree):
         self.tree_sel_changed(filesel, difftree, page_num)
 
-    def get_status_types(self):
-        table = gtk.Table(rows=2, columns=3)
-        table.set_col_spacings(8)
-
-        self._show_checks = {}
-        row, col = 0, 0
-        # Tuple: (ctype, translated label)
-        checks = (('modified', _('M: modified')),
-                  ('added',    _('A: added')),
-                  ('removed',  _('R: removed')))
-        if self.count_revs() <= 1:
-            checks += (('deleted', _('!: deleted')),
-                       ('unknown', _('?: unknown')),
-                       ('clean',   _('C: clean')),
-                       ('ignored', _('I: ignored')))
-
-        for ctuple in checks:
-            check = gtk.CheckButton(ctuple[1])
-            check.connect('toggled', self.show_toggle, ctuple[0])
-            table.attach(check, col, col+1, row, row+1)
-            self._show_checks[ctuple[0]] = check
-            col += row
-            row = not row
-
-        hbox = gtk.HBox()
-        hbox.pack_start(table, False, False)
-
-        return hbox
-
     def get_extras(self):
         self.counter = gtk.Label('')
         self.counter.set_alignment(1.0, 0.0) # right up
@@ -498,6 +469,35 @@ class GStatus(gdialog.GDialog):
         pass
 
     ### End of overrides ###
+
+    def get_status_types(self):
+        table = gtk.Table(rows=2, columns=3)
+        table.set_col_spacings(8)
+
+        self._show_checks = {}
+        row, col = 0, 0
+        # Tuple: (ctype, translated label)
+        checks = (('modified', _('M: modified')),
+                  ('added',    _('A: added')),
+                  ('removed',  _('R: removed')))
+        if self.count_revs() <= 1:
+            checks += (('deleted', _('!: deleted')),
+                       ('unknown', _('?: unknown')),
+                       ('clean',   _('C: clean')),
+                       ('ignored', _('I: ignored')))
+
+        for ctuple in checks:
+            check = gtk.CheckButton(ctuple[1])
+            check.connect('toggled', self.show_toggle, ctuple[0])
+            table.attach(check, col, col+1, row, row+1)
+            self._show_checks[ctuple[0]] = check
+            col += row
+            row = not row
+
+        hbox = gtk.HBox()
+        hbox.pack_start(table, False, False)
+
+        return hbox
 
     def realize_status_settings(self):
         self.diffpane.set_position(self.setting_pos)
