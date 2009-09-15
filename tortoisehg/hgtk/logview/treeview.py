@@ -193,10 +193,10 @@ class TreeView(gtk.ScrolledWindow):
         startsec = timer()
         try:
             while (not self.limit) or len(self.graphdata) < self.limit:
-                (rev, node, lines, parents) = self.grapher.next()
+                (rev, node, lines, wfile) = self.grapher.next()
                 self.max_cols = max(self.max_cols, len(lines))
                 self.index[rev] = len(self.graphdata)
-                self.graphdata.append( (rev, node, lines, parents) )
+                self.graphdata.append( (rev, node, lines, wfile) )
                 if self.model:
                     rowref = self.model.get_iter(len(self.graphdata)-1)
                     path = self.model.get_path(rowref) 
