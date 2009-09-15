@@ -280,8 +280,13 @@ class GStatus(gdialog.GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(self.filetree)
 
+        self.expander = expander = gtk.Expander(_('Status Types'))
+        expander.set_expanded(False)
+        expander.add(self.get_status_types())
+
         tvbox = gtk.VBox()
-        tvbox.pack_start( scroller, True, True, 0)
+        tvbox.pack_start(scroller, True, True, 0)
+        tvbox.pack_start(expander, False, False, 2)
         if self.pats:
             button = gtk.Button(_('Remove filter, show root'))
             button.connect('pressed', self.remove_filter)
@@ -400,7 +405,7 @@ class GStatus(gdialog.GDialog):
     def page_switched(self, notebook, page, page_num, filesel, difftree):
         self.tree_sel_changed(filesel, difftree, page_num)
 
-    def get_extras(self):
+    def get_status_types(self):
         table = gtk.Table(rows=2, columns=3)
         table.set_col_spacings(8)
 
@@ -424,19 +429,21 @@ class GStatus(gdialog.GDialog):
             col += row
             row = not row
 
+        hbox = gtk.HBox()
+        hbox.pack_start(table, False, False)
+
+        return hbox
+
+    def get_extras(self):
         self.counter = gtk.Label('')
         self.counter.set_alignment(1.0, 0.0) # right up
 
         self.stbar = gtklib.StatusBar()
 
-        rightbox = gtk.VBox()
-        rightbox.pack_start(self.counter)
-        rightbox.pack_start(self.stbar, False, False)
-
         hbox = gtk.HBox()
-        hbox.pack_start(table, False, False)
+        hbox.pack_start(self.stbar)
         hbox.pack_start(gtk.Label(''), True, True, 2)
-        hbox.pack_end(rightbox, False, False, 2)
+        hbox.pack_end(self.counter, False, False, 2)
 
         return hbox
 
