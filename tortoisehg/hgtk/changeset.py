@@ -204,8 +204,7 @@ class ChangeSet(gdialog.GDialog):
             if file:
                 self.append_patch_diff(file)
             else:
-                for _, _, f in model:
-                    self.append_patch_diff(f)
+                self.append_all_patch_diffs()
 
     def generate_change_header(self):
         buf, rev = self._buffer, self.currev
@@ -392,6 +391,15 @@ class ChangeSet(gdialog.GDialog):
         sob, eob = buf.get_bounds()
         pos = buf.get_iter_at_offset(offset)
         buf.apply_tag_by_name('mono', pos, eob)
+
+    def append_all_patch_diffs(self):
+        model = self._filelist
+        if len(model) > 1:
+            for st, fu, fn in model:
+                self.append_patch_diff(fn)
+        else:
+            self._buffer.insert(self._buffer.get_end_iter(),
+                                '\n' + _('[no hunks to display]'))
 
     def prepare_diff(self, difflines, offset, fname):
         'Borrowed from hgview; parses changeset diffs'
