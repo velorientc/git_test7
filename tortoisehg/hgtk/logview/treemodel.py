@@ -156,10 +156,7 @@ class TreeModel(gtk.GenericTreeModel):
                 bstr += '<span color="%s" background="%s"> %s </span> ' % \
                         ('black', '#aaffaa', branch)
 
-            author = templatefilters.person(ctx.user())
-            if not author:
-                author = util.shortuser(ctx.user())
-            author = hglib.toutf(author)
+            author = hglib.toutf(hglib.username(ctx.user()))
             age = templatefilters.age(ctx.date())
 
             color = self.color_func(ctx.parents(), revid, author)
