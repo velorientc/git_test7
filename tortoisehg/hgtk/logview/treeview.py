@@ -549,7 +549,7 @@ class TreeView(gtk.ScrolledWindow):
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
         (path, focus) = treeview.get_cursor()
-        if path:
+        if path and self.model:
             self.currevid = self.model[path][treemodel.REVID]
             self.emit('revision-selected')
 
