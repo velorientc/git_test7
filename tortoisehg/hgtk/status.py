@@ -851,6 +851,17 @@ class GStatus(gdialog.GDialog):
         if not paths:
             return
         row = paths[0]
+
+        # desensitize the text diff and hunk selection tabs
+        # if a non-MAR file is selected
+        status = model[row][FM_STATUS]
+        enable = (status in 'MAR')
+        for pn in [0, 1]:
+            child = self.diff_notebook.get_nth_page(pn)
+            child.set_sensitive(enable)
+            lb = self.diff_notebook.get_tab_label(child)
+            lb.set_sensitive(enable)
+
         if page_num is None:
             page_num = self.diff_notebook.get_current_page()
         if page_num == 0:
