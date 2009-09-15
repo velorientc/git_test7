@@ -87,6 +87,7 @@ class GStatus(gdialog.GDialog):
         self.ready = False
         self.filerowstart = {}
         self.filechunks = {}
+        self.status_error = None
 
     def auto_check(self):
         # Only auto-check files once, and only if a pattern was given.
@@ -626,19 +627,28 @@ class GStatus(gdialog.GDialog):
                 # node2 is None (the working dir) when 0 or 1 rev is specificed
                 n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
 
-            matcher = cmdutil.match(repo, self.pats, self.opts)
-            status = repo.status(node1=n1, node2=n2, match=matcher,
-                                 ignored=self.test_opt('ignored'),
-                                 clean=self.test_opt('clean'),
-                                 unknown=self.test_opt('unknown'))
-
-            self.status = status
             self._node1, self._node2, = n1, n2
+            self.status_error = None
+            matcher = cmdutil.match(repo, self.pats, self.opts)
+            try:
+                status = repo.status(node1=n1, node2=n2, match=matcher,
+                                     ignored=self.test_opt('ignored'),
+                                     clean=self.test_opt('clean'),
+                                     unknown=self.test_opt('unknown'))
+                self.status = status
+            except IOError, e:
+                self.status_error = str(e)
 
         def status_wait(thread):
             if thread.isAlive():
                 return True
             else:
+                if self.status_error:
+                    self.ready = True
+                    self.update_check_count()
+                    self.stbar.end()
+                    self.stbar.set_status_text(self.status_error)
+                    return False
                 self.refresh_file_tree()
                 self.update_check_count()
                 self.refresh_complete()
