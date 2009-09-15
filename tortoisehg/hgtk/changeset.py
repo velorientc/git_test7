@@ -312,7 +312,7 @@ class ChangeSet(gdialog.GDialog):
                 for pnode in (p1, p2):
                     if pnode is None:
                         continue
-                    title_line(_('parent:'), pnode[:12])
+                    title_line(_('parent:'), pnode[:12], 'parent')
                 # commit message
                 if msg:
                     buf.insert(eob, '\n' + toutf(msg.rstrip('\r\n')) + '\n\n')
