@@ -327,6 +327,8 @@ def addspellcheck(textview, ui=None):
         gtkspell.Spell(textview, lang)
     except ImportError:
         pass
+    except GError, e:
+        print e
     else:
         def selectlang(senderitem):
             from tortoisehg.hgtk import dialog
