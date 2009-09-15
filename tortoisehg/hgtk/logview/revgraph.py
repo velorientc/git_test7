@@ -417,7 +417,7 @@ def filtered_log_generator(repo, pats, opts):
         df = util.matchdate(opts['date'])
 
     stack = []
-    get = util.cachefunc(lambda r: repo.changectx(r).changeset())
+    get = util.cachefunc(lambda r: repo[r])
     changeiter, matchfn = cmdutil.walkchangerevs(repo.ui, repo, pats, get, opts)
     for st, rev, fns in changeiter:
         if st == 'iter':
