@@ -296,7 +296,10 @@ class TreeView(gtk.ScrolledWindow):
         return self.model[path][treemodel.REVID]
 
     def get_wfile_at_path(self, path):
-        return self.model[path][treemodel.WFILE]
+        if self.model:
+            return self.model[path][treemodel.WFILE]
+        else:
+            return None
 
     def next_revision_batch(self, size):
         self.batchsize = size
