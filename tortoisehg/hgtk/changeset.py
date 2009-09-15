@@ -149,10 +149,12 @@ class ChangeSet(gdialog.GDialog):
         pf = open(self.curpatch)
         try:
             def get_path(a, b):
-                rawpath = b != '/dev/null' and b or a
+                type = (a == '/dev/null') and 'A' or 'M'
+                type = (b == '/dev/null') and 'R' or type
+                rawpath = (b != '/dev/null') and b or a
                 if not rawpath.startswith(('a/', 'b/')):
-                    return rawpath
-                return rawpath.split('/', 1)[-1]
+                    return type, rawpath
+                return type, rawpath.split('/', 1)[-1]
             hunks = []
             files = []
             map = {'MODIFY': 'M', 'ADD': 'A', 'DELETE': 'R',
@@ -164,10 +166,10 @@ class ChangeSet(gdialog.GDialog):
                         self._filelist.append((map[m.op], toutf(f), f))
                         files.append(f)
                 elif state == 'file':
-                    path = get_path(values[0], values[1])
+                    type, path = get_path(values[0], values[1])
                     self.curphunks[path] = hunks = ['diff']
                     if path not in files:
-                        self._filelist.append(('M', toutf(path), path))
+                        self._filelist.append((type, toutf(path), path))
                         files.append(path)
                 elif state == 'hunk':
                     hunks.extend([l.rstrip('\r\n') for l in values.hunk])
