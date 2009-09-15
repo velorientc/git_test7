@@ -95,6 +95,13 @@ class GLog(gdialog.GDialog):
                 self.gorev_dialog.present()
             else:
                 self.show_goto_dialog()
+        lb = self.get_live_branches()
+        bmenus = []
+        if len(lb) > 1 or (lb and lb[0] != 'default'):
+            bmenus.append(('----', None, None, None, None))
+            for name in lb[:10]:
+                bmenus.append((name, False, navigate, [name], None))
+            
         fnc = self.toggle_view_column
         return [(_('View'), [
             (_('Filter Bar'), True, self.toggle_show_filterbar, [],
@@ -116,7 +123,7 @@ class GLog(gdialog.GDialog):
                 (_('Working Parent'), False, navigate, ['.'], None),
                 ('----', None, None, None, None),
                 (_('Revision...'), False, navigate, [None], None),
-                ])
+                ] + bmenus)
             ]
 
     def synch_clicked(self, toolbutton, data):
@@ -634,12 +641,10 @@ class GLog(gdialog.GDialog):
         self.branchbutton = branches
         filterbox.pack_start(branches, False)
 
-        dblist = self.repo.ui.config('tortoisehg', 'deadbranch', '')
-        deadbranches = [ x.strip() for x in dblist.split(',') ]
         branchcombo = gtk.combo_box_new_text()
-        for name in self.repo.branchtags().keys():
-            if name not in deadbranches:
-                branchcombo.append_text(name)
+        for name in self.get_live_branches():
+            branchcombo.append_text(name)
+        branchcombo = gtk.combo_box_new_text()
         branchcombo.connect('changed', self.select_branch)
         self.lastbranchrow = None
         filterbox.pack_start(branchcombo, False)
@@ -713,6 +718,15 @@ class GLog(gdialog.GDialog):
         'ctrl-p handler'
         parent = self.repo['.'].rev()
         self.graphview.set_revision_id(parent)
+
+    def get_live_branches(self):
+        live = []
+        dblist = self.repo.ui.config('tortoisehg', 'deadbranch', '')
+        deadbranches = [ x.strip() for x in dblist.split(',') ]
+        for name in self.repo.branchtags().keys():
+            if name not in deadbranches:
+                live.append(name)
+        return live
 
     def select_branch(self, combo):
         row = combo.get_active()
