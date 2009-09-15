@@ -253,6 +253,7 @@ class GCommit(GStatus):
         self.check_undo()
         self.refresh_branchop()
         self.update_parent_labels()
+        self.update_commit_button()
         if not self.committer_cbbox.get_active_text():
             user = self.opts['user'] or self.repo.ui.config('ui', 'username')
             if user:
@@ -424,6 +425,47 @@ class GCommit(GStatus):
             self.closebranch = True
         self.refresh_branchop()
 
+    def update_commit_button(self):
+        label = _('Commit')
+        tooltip = _('commit')
+
+        if self.qnew:
+            label = _('QNew')
+            tooltip = _('create new MQ patch')
+        elif self.mqmode:
+            label = _('QRefresh')
+            tooltip = _('refresh top MQ patch')
+        else:
+            plus, minus = _('_Commit (+1 head)'), _('_Commit (-1 head)')
+            ctxs, isheads, ismerge = self.get_head_info()
+            if not ismerge:
+                if not isheads[0]:
+                    label = plus
+                    tooltip = _('parent is not a head, '
+                                'commit to add a new head')
+            else:
+                if isheads[0] and isheads[1]:
+                    label = minus
+                    tooltip = _('commit to merge one head')
+                elif not isheads[0] and not isheads[1]:
+                    label = plus
+                    tooltip = _('no parent is a head, '
+                                'commit to add a new head')
+
+        btn = self.commit_button
+        btn.set_label(label)
+        btn.set_tooltip(self.tooltips, tooltip)
+
+    def get_head_info(self):
+        def ishead(ctx):
+            return len(ctx.children()) == 0
+        if self.mqmode:
+            ctxs = self.repo['.'].parents()
+        else:
+            ctxs = self.repo[None].parents()
+        isheads = [ishead(ctx) for ctx in ctxs]
+        return ctxs, isheads, len(ctxs) == 2
+
     def update_parent_labels(self):
         
         def setlabel(label, ctx, ishead):
@@ -454,47 +496,16 @@ class GCommit(GStatus):
             t += summary
             label.set_markup(t)
 
-        def ishead(ctx): return len(ctx.children()) == 0
+        ctxs, isheads, ismerge = self.get_head_info()
+        setlabel(self.parent1_label, ctxs[0], isheads[0])
 
-        if self.mqmode:
-            ctxs = self.repo['.'].parents()
-        else:
-            ctxs = self.repo[None].parents()
-
-        ishead0 = ishead(ctxs[0])
-        setlabel(self.parent1_label, ctxs[0], ishead0)
-
-        merge = len(ctxs) == 2
-        if not merge:
+        if not ismerge:
             self.parent2_label.hide()
         else:
-            ishead1 = ishead(ctxs[1])
-            setlabel(self.parent2_label, ctxs[1], ishead1)
+            setlabel(self.parent2_label, ctxs[1], isheads[1])
 
             self.parent2_label.show()
             self.parents_frame.set_label(_('Parents'))
-
-        if self.mqmode:
-            return
-
-        # add "{+|-}1 head" to label of commit button
-        b = self.commit_button
-        ph = _('_Commit (+1 head)')
-        mh = _('_Commit (-1 head)')
-        if not merge:
-            if not ishead0:
-                b.set_label(ph)
-                b.set_tooltip(self.tooltips, 
-                    _('parent is not a head, commit to add a new head'))
-        else:
-            if ishead0 and ishead1:
-                b.set_label(mh)
-                b.set_tooltip(self.tooltips, 
-                    _('commit to merge one head'))
-            elif not ishead0 and not ishead1:
-                b.set_label(ph)
-                b.set_tooltip(self.tooltips, 
-                    _('no parent is a head, commit to add a new head'))
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
@@ -538,7 +549,6 @@ class GCommit(GStatus):
                 self.last_commit_id is not None
         self.undo_button.set_sensitive(can_undo)
 
-
     def check_merge(self):
         if self.merging:
             # select all changes if repo is merged
@@ -556,7 +566,6 @@ class GCommit(GStatus):
 
     def check_patch_queue(self):
         'See if an MQ patch is applied, switch to qrefresh mode'
-        c_btn = self.get_toolbutton(_('_Commit'))
         self.qheader = None
         if self.mqmode:
             qtipctx = self.repo['qtip']
@@ -570,14 +579,10 @@ class GCommit(GStatus):
                     buf.set_text(self.qheader)
                 buf.set_modified(False)
             if self.qnew:
-                c_btn.set_label(_('QNew'))
-                c_btn.set_tooltip(self.tooltips, _('create new MQ patch'))
                 self.reload_status()
                 self.qnew_name.grab_focus()
                 self.qnew_name.set_position(-1)
             else:
-                c_btn.set_label(_('QRefresh'))
-                c_btn.set_tooltip(self.tooltips, _('refresh top MQ patch'))
                 if not hasattr(self, 'patch_text'):
                     self.patch_text = gtk.TextView()
                     self.patch_text.set_wrap_mode(gtk.WRAP_NONE)
@@ -598,17 +603,12 @@ class GCommit(GStatus):
                 buf = self.diff_highlight_buffer(text)
                 self.patch_text.set_buffer(buf)
         elif self.qnew:
-            c_btn.set_label(_('QNew'))
-            c_btn.set_tooltip(self.tooltips, _('QNew'))
             buf = self.text.get_buffer()
             if not buf.get_modified():
                 buf.set_text('')
                 buf.set_modified(False)
             if hasattr(self, 'patch_text'):
                 self.patch_text.set_buffer(gtk.TextBuffer())
-        else:
-            c_btn.set_label(_('_Commit'))
-            c_btn.set_tooltip(self.tooltips, _('commit'))
         self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
 
     def commit_clicked(self, toolbutton, data=None):
