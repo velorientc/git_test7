@@ -341,7 +341,7 @@ class ChangeSet(gdialog.GDialog):
         except LookupError:
             fctx = None
         if fctx and fctx.size() > getmaxdiffsize(self.ui):
-            lines = ['diff', '', '',
+            lines = ['diff',
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
             lines = []
@@ -352,7 +352,7 @@ class ChangeSet(gdialog.GDialog):
                     lines.extend(s.splitlines())
             except (RepoError, LookupError), e:
                 err = _('Repository Error:  %s, refresh suggested') % str(e)
-                lines = ['diff', '', '', '', err]
+                lines = ['diff', '', err]
         tags, lines = self.prepare_diff(lines, offset, wfile)
         for l in lines:
             buf.insert(eob, l)
