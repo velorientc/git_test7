@@ -62,6 +62,7 @@ Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ; Components: help
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
+Source: contrib\win32\mercurialuser.ini; DestDir: {%USERPROFILE}; DestName: Mercurial.ini; AfterInstall: FileExpandStringEx('{%USERPROFILE}\Mercurial.ini'); Flags: onlyifdoesntexist 
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
 Source: ..\contrib\*.exe; DestDir: {app}; Flags: 
 Source: ..\contrib\*.dll; DestDir: {app}; Flags: 
@@ -172,16 +173,60 @@ begin
     SP1Missing := True;
 end;
 
-function ShouldSkipPage(PageID: Integer): Boolean; 
-begin 
-  { Skip wpSelectDir page if upgrading; show all others } 
-  case PageID of 
-    wpSelectDir: 
-      Result := IsUpgrade; 
-  else 
-      Result := False; 
-  end; 
-end; 
+var UserInfoPage: TInputQueryWizardPage;
+var GetUserName: Boolean;
+
+procedure InitializeWizard(); 
+begin
+  if (not(FileExists(ExpandConstant('{%USERPROFILE}\Mercurial.ini')))) then
+  begin
+    // Create the page
+    UserInfoPage := CreateInputQueryPage(wpUserInfo,
+      'Personal Information', 'Who are you?',
+      'Please specify your name and email address, then click Next.');
+
+    // Add items (False means it's not a password edit)
+    UserInfoPage.Add('Full Name:', False);
+    UserInfoPage.Add('Email address:', False);
+
+    // Set initial values (optional)
+    UserInfoPage.Values[0] := ExpandConstant('{username}');
+    GetUserName := True;
+  end
+  else
+    GetUserName := False;
+end;
+
+procedure FileExpandStringEx(fn: String);
+var
+  InFile: String;
+  i: Integer;
+  InFileLines: TArrayOfString;
+begin
+  if (GetUserName) then
+  begin
+    InFile := ExpandConstant(fn);
+    LoadStringsFromFile(InFile, InFileLines);
+    for i:= 0 to GetArrayLength(InFileLines)-1 do
+    begin
+      InFileLines[i] := ExpandConstantEx(InFileLines[i], 
+        'hgusername', 
+         UserInfoPage.Values[0] + ' <' + UserInfoPage.Values[1] + '>');
+    end;
+    SaveStringsToFile(InFile, InFileLines, False);
+  end;
+end;
+
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  { Skip wpSelectDir page if upgrading; show all others }
+  case PageID of
+    wpSelectDir:
+      Result := IsUpgrade;
+  else
+      Result := False;
+  end;
+end;
 
 function TerminateThgTaskbar(): Boolean;
 var
