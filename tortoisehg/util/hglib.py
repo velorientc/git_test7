@@ -14,7 +14,7 @@ import time
 from mercurial.error import RepoError, ParseError, LookupError
 from mercurial.error import UnknownCommand, AmbiguousCommand
 from mercurial import hg, ui, util, extensions, commands, hook, match
-from mercurial import dispatch, encoding
+from mercurial import dispatch, encoding, templatefilters
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
@@ -195,3 +195,9 @@ def displaytime(date):
 
 def utctime(date):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(date[0]))
+
+def username(user):
+    author = templatefilters.person(user)
+    if not author:
+        author = util.shortuser(user)
+    return author
