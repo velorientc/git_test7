@@ -286,26 +286,36 @@ class ChangeSet(gdialog.GDialog):
             data = patch.extract(self.ui, pf)
             tmp, msg, user, date, branch, node, p1, p2 = data
             try:
-                ud = toutf(user)
-                if date:
-                    ud += '\t' + displaytime(util.parsedate(date))
-                msg = toutf(msg.rstrip('\r\n'))
-                patchname = os.path.basename(self.curpatch)
-                patchtitle = patchname
+                # title
+                patchtitle = os.path.basename(self.curpatch)
                 if node:
                     patchtitle += ' (%s)' % node[:12]
                 title_line(_('patch:'), patchtitle, 'changeset')
+                # branch
                 if branch:
                     title_line(_('branch:'), toutf(branch), 'greybg')
-                title_line(_('user/date:'), ud, 'changeset')
+                # user/date
+                udhead = udbody = None
+                if user and date:
+                    udhead = _('user/date:')
+                    udbody = toutf(user) + '\t' \
+                             + displaytime(util.parsedate(date))
+                elif user:
+                    udhead = _('user:')
+                    udbody = toutf(user)
+                elif date:
+                    udhead = _('date:')
+                    udbody = displaytime(util.parsedate(date))
+                if udhead and udbody:
+                    title_line(udhead, udbody, 'changeset')
+                # parents
                 for pnode in (p1, p2):
                     if pnode is None:
                         continue
-                    title = _('parent:')
-                    title += ' ' * (12 - len(title)) + pnode[:12]
-                    buf.insert_with_tags_by_name(eob, title, 'parent')
-                    buf.insert(eob, '\n')
-                buf.insert(eob, '\n' + msg + '\n\n')
+                    title_line(_('parent:'), pnode[:12])
+                # commit message
+                if msg:
+                    buf.insert(eob, '\n' + toutf(msg.rstrip('\r\n')) + '\n\n')
             finally:
                 if tmp:
                     os.unlink(tmp)
