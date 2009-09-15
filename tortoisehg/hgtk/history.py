@@ -12,7 +12,7 @@ import gobject
 import pango
 import StringIO
 
-from mercurial import ui, hg, cmdutil, commands, extensions, util
+from mercurial import ui, hg, cmdutil, commands, extensions, util, match
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -428,11 +428,14 @@ class GLog(gdialog.GDialog):
             ftitle(_('%s branch') % branch)
         elif self.filter == 'custom':
             ftitle(_('custom filter'))
-            if len(pats) == 1 and not os.path.isdir(pats[0]):
-                opts['filehist'] = pats[0]
-                self.graphview.refresh(self.graphcol, pats, opts)
-            else:
-                self.graphview.refresh(False, pats, opts)
+            npats = hglib.normpats(pats)
+            if len(npats) == 1:
+                kind, name = match._patsplit(npats[0], None)
+                if kind == 'path' and not os.path.isdir(name):
+                    opts['filehist'] = name
+                    self.graphview.refresh(self.graphcol, [name], opts)
+            if not opts.get('filehist'):
+                self.graphview.refresh(False, npats, opts)
         elif self.filter == 'all':
             ftitle(None)
             self.graphview.refresh(self.graphcol, None, opts)

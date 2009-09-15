@@ -10,7 +10,7 @@ import sys
 import traceback
 import shlib
 import time
-from mercurial import hg, ui, util, extensions, commands, hook
+from mercurial import hg, ui, util, extensions, commands, hook, match
 
 from i18n import _
 import paths
@@ -136,8 +136,22 @@ def canonpaths(list):
                 # May already be canonical
                 canonpats.append(f)
     return canonpats
-    
-    
+
+def normpats(pats):
+    'Normalize file patterns'
+    normpats = []
+    for pat in pats:
+        kind, p = match._patsplit(pat, None)
+        if kind:
+            normpats.append(pat)
+        else:
+            if '[' in p or '{' in p or '*' in p or '?' in p:
+                normpats.append('glob:' + p)
+            else:
+                normpats.append('path:' + p)
+    return normpats
+
+
 def mergetools(ui, values=None):
     'returns the configured merge tools and the internal ones'
     if values == None:
