@@ -644,7 +644,6 @@ class GLog(gdialog.GDialog):
         branchcombo = gtk.combo_box_new_text()
         for name in self.get_live_branches():
             branchcombo.append_text(name)
-        branchcombo = gtk.combo_box_new_text()
         branchcombo.connect('changed', self.select_branch)
         self.lastbranchrow = None
         filterbox.pack_start(branchcombo, False)
