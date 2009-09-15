@@ -327,7 +327,7 @@ def addspellcheck(textview, ui=None):
         gtkspell.Spell(textview, lang)
     except ImportError:
         pass
-    except GError, e:
+    except Exception, e:
         print e
     else:
         def selectlang(senderitem):
