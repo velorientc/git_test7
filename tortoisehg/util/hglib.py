@@ -10,18 +10,17 @@ import sys
 import traceback
 import shlib
 import time
-from mercurial import hg, ui, util, extensions, commands, hook, match
-
-from i18n import _
-import paths
 
 from mercurial.error import RepoError, ParseError, LookupError
 from mercurial.error import UnknownCommand, AmbiguousCommand
-from mercurial import dispatch, encoding, util
+from mercurial import hg, ui, util, extensions, commands, hook, match
+from mercurial import dispatch, encoding
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
 
+from tortoisehg.util import paths
+from tortoisehg.util.i18n import _
 from tortoisehg.util.hgversion import hgversion
 
 def tounicode(s):
