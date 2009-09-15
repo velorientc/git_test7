@@ -352,7 +352,7 @@ class EmailDialog(gtk.Window):
                 del os.environ['PAGER']
             cmdline.insert(2, '--test')
         if flagtext:
-            flags = [f.split() for f in flagtext.split(',')]
+            flags = [f.strip() for f in flagtext.split(',') if f.strip()]
             for f in flags:
                 cmdline += ['--flag', f]
         if subjtext:
