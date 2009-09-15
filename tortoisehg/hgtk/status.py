@@ -865,9 +865,10 @@ class GStatus(gdialog.GDialog):
         enable = (status in 'MAR')
         for pn in [0, 1]:
             child = self.diff_notebook.get_nth_page(pn)
-            child.set_sensitive(enable)
-            lb = self.diff_notebook.get_tab_label(child)
-            lb.set_sensitive(enable)
+            if child:
+                child.set_sensitive(enable)
+                lb = self.diff_notebook.get_tab_label(child)
+                lb.set_sensitive(enable)
 
         if page_num is None:
             page_num = self.diff_notebook.get_current_page()
