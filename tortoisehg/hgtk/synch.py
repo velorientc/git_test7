@@ -283,7 +283,6 @@ class SynchDialog(gtk.Window):
 
     def finalize_startup(self, *args):
         self.create_bottombox()
-        self.update_buttons()
         def pollstdout(*args):
             while True:
                 # blocking read of stdout pipe
