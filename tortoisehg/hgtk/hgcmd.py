@@ -211,7 +211,7 @@ class CmdWidget(gtk.VBox):
             self.dlg = CmdLogDialog()
             self.log = self.dlg.get_logwidget()
         else:
-            pass #FIXME should raise exception?
+            raise _('unknown CmdWidget style: %s') % style
 
         # progress bar box
         self.progbox = progbox = gtk.HBox()
