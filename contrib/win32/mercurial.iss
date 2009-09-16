@@ -82,6 +82,7 @@ Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
 Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Components: hgbook
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
+Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShellx86.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 Source: ..\misc\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 
 [INI]
@@ -103,7 +104,7 @@ Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 ;Filename: {tmp}\vcredist_x86.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
 ;Filename: {tmp}\vcredist_x64.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
-Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Check: not Is64BitInstallMode; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
+Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-x64.msi"" /qn /norestart ALLUSERS=1"; Check: Is64BitInstallMode; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
 
 [UninstallRun]
