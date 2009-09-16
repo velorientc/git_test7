@@ -174,7 +174,7 @@ class ChangeSet(gdialog.GDialog):
                 elif state == 'hunk':
                     hunks.extend([l.rstrip('\r\n') for l in values.hunk])
                 else:
-                    raise 'Unknown hunk type: %s' % state
+                    raise _('unknown hunk type: %s') % state
         except patch.NoHunks:
             pass
         finally:
