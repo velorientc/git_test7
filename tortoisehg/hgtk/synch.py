@@ -106,7 +106,7 @@ class SynchDialog(gtk.Window):
             self.tbar.insert(btn, -1)
 
         # Base box
-        basevbox = gtk.VBox()
+        self.basevbox = basevbox = gtk.VBox()
         self.add(basevbox)
         basevbox.pack_start(self.tbar, False, False, 2)
 
@@ -253,22 +253,9 @@ class SynchDialog(gtk.Window):
                                    foreground='#900000')
         basevbox.pack_start(scrolledwindow, True, True)
 
-        self.buttonhbox = gtk.HBox()
-        self.viewpulled = gtk.Button(_('View pulled revisions'))
-        self.viewpulled.connect('clicked', self._view_pulled_changes)
-        self.updatetip = gtk.Button(_('Update to branch tip'))
-        self.updatetip.connect('clicked', self._update_to_tip)
-        self.updatetipcheck = gtk.CheckButton(_('Check update'))
-        self.tips.set_tip(self.updatetipcheck, _('Force update unless there'
-            ' are uncommitted changes'))
-        self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
-        self.buttonhbox.pack_start(self.updatetip, False, False, 2)
-        self.buttonhbox.pack_start(self.updatetipcheck, False, False, 2)
-        basevbox.pack_start(self.buttonhbox, False, False, 2)
-
         # statusbar
         self.stbar = gtklib.StatusBar()
-        basevbox.pack_start(self.stbar, False, False, 2)
+        basevbox.pack_end(self.stbar, False, False, 2)
 
         # support dropping of repos or bundle files
         self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
@@ -280,7 +267,22 @@ class SynchDialog(gtk.Window):
         self.update_pull_setting()
         gobject.idle_add(self.finalize_startup)
 
+    def create_bottombox(self):
+        self.buttonhbox = gtk.HBox()
+        self.viewpulled = gtk.Button(_('View pulled revisions'))
+        self.viewpulled.connect('clicked', self._view_pulled_changes)
+        self.updatetip = gtk.Button(_('Update to branch tip'))
+        self.updatetip.connect('clicked', self._update_to_tip)
+        self.updatetipcheck = gtk.CheckButton(_('Check update'))
+        self.tips.set_tip(self.updatetipcheck, _('Force update unless there'
+            ' are uncommitted changes'))
+        self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
+        self.buttonhbox.pack_start(self.updatetip, False, False, 2)
+        self.buttonhbox.pack_start(self.updatetipcheck, False, False, 2)
+        self.basevbox.pack_start(self.buttonhbox, False, False, 2)
+
     def finalize_startup(self, *args):
+        self.create_bottombox()
         self.update_buttons()
         def pollstdout(*args):
             while True:
