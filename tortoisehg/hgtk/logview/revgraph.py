@@ -439,12 +439,12 @@ def filtered_log_generator(repo, pats, opts):
 
         # TODO: add copies/renames later
         if opts['keyword']:
-            changes = get(rev)
+            ctx = get(rev)
             miss = 0
             for k in [kw.lower() for kw in opts['keyword']]:
-                if not (k in changes[1].lower() or
-                        k in changes[4].lower() or
-                        k in " ".join(changes[3]).lower()):
+                if not (k in ctx.user().lower() or
+                        k in ctx.description().lower() or
+                        k in " ".join(ctx.files()).lower()):
                     miss = 1
                     break
             if miss:
