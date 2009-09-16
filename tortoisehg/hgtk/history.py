@@ -429,14 +429,15 @@ class GLog(gdialog.GDialog):
             self.graphview.refresh(self.graphcol, branch, opts)
             ftitle(_('%s branch') % branch)
         elif self.filter == 'custom':
-            ftitle(_('custom filter'))
             npats = hglib.normpats(pats)
             if len(npats) == 1:
                 kind, name = match._patsplit(npats[0], None)
                 if kind == 'path' and not os.path.isdir(name):
+                    ftitle(_('file history: ') + hglib.toutf(name))
                     opts['filehist'] = name
                     self.graphview.refresh(self.graphcol, [name], opts)
             if not opts.get('filehist'):
+                ftitle(_('custom filter'))
                 self.graphview.refresh(False, npats, opts)
         elif self.filter == 'all':
             ftitle(None)
