@@ -42,6 +42,8 @@ EXIT_CMD = 1025
 
 def SetIcon(hwnd, name, add=False):
     # Try and find a custom icon
+    if '--noicon' in sys.argv:
+        return
     print "SetIcon(%s)" % name
     hinst =  GetModuleHandle(None)
     from tortoisehg.util.paths import get_tortoise_icon
