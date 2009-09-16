@@ -20,6 +20,7 @@ MQ_INDEX   = 0
 MQ_STATUS  = 1
 MQ_NAME    = 2
 MQ_SUMMARY = 3
+MQ_ESCAPED = 4
 
 # Special patch indices
 INDEX_SEPARATOR = -1
@@ -142,12 +143,13 @@ class MQWidget(gtk.VBox):
         self.model = gtk.ListStore(int, # patch index
                                    str, # patch status
                                    str, # patch name
-                                   str) # summary
+                                   str, # summary
+                                   str) # escaped summary
         self.list = gtk.TreeView(self.model)
         self.list.set_row_separator_func(self.row_sep_func)
-        # To support old PyGTK (<1.12)
+        # To support old PyGTK (<2.12)
         if hasattr(self.list, 'set_tooltip_column'):
-            self.list.set_tooltip_column(MQ_SUMMARY)
+            self.list.set_tooltip_column(MQ_ESCAPED)
         self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
         self.list.connect('row-activated', self.list_row_activated)
@@ -231,7 +233,7 @@ class MQWidget(gtk.VBox):
         # insert 'qparent' row
         top = None
         if self.get_property('show-qparent'):
-            top = model.append((INDEX_QPARENT, None, None, None))
+            top = model.append((INDEX_QPARENT, None, None, None, None))
 
         # add patches
         from hgext import mq
@@ -242,15 +244,16 @@ class MQWidget(gtk.VBox):
             stat = patchname in applied and 'A' or 'U'
             try:
                 msg = mq.patchheader(q.join(patchname)).message[0]
+                msg_esc = gtklib.markup_escape_text(msg)
             except IndexError:
-                msg = None
-            iter = model.append((index, stat, patchname, msg))
+                msg = msg_esc = None
+            iter = model.append((index, stat, patchname, msg, msg_esc))
             if stat == 'A':
                 top = iter
 
         # insert separator
         if top:
-            model.insert_after(top, (INDEX_SEPARATOR, None, None, None))
+            model.insert_after(top, (INDEX_SEPARATOR, None, None, None, None))
 
         # restore patch selection
         if selname:
