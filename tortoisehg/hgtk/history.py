@@ -259,6 +259,8 @@ class GLog(gdialog.GDialog):
         opts = {}
         mode = combo.get_active()
         text = entry.get_text()
+        if not text:
+            return
         if mode == 0: # Rev Range
             try:
                 opts['revs'] = cmdutil.revrange(self.repo, [text])
