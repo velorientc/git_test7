@@ -582,11 +582,10 @@ class MQWidget(gtk.VBox):
             self.qgoto(row[MQ_NAME])
 
     def cmd_done(self, returncode, noemit=False):
-        if returncode == 0:
-            self.repo.mq.invalidate()
-            self.refresh()
-            if not noemit:
-                self.emit('repo-invalidated')
+        self.repo.mq.invalidate()
+        self.refresh()
+        if not noemit:
+            self.emit('repo-invalidated')
 
     def do_get_property(self, property):
         try:
