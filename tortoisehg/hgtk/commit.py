@@ -269,8 +269,36 @@ class GCommit(GStatus):
         status_body = GStatus.get_body(self)
 
         vbox = gtk.VBox()
-        mbox = gtk.HBox()
 
+        # Advanced bar
+        self.advanced_frame = gtk.VBox()
+        adv_hbox = gtk.HBox()
+        self.advanced_frame.pack_start(adv_hbox, False, False)
+        adv_hbox.pack_start(gtk.Label(_('Committer:')), False, False, 2)
+
+        liststore = gtk.ListStore(str)
+        self.committer_cbbox = gtk.ComboBoxEntry(liststore)
+        cell = gtk.CellRendererText()
+        self.committer_cbbox.pack_start(cell, True)
+        adv_hbox.pack_start(self.committer_cbbox, True, True, 2)
+        self._mru_committers = self.settings.mrul('recent_committers')
+        self.update_recent_committers()
+        committer = self.repo.ui.config('ui', 'username')
+        if committer:
+            self.update_recent_committers(committer)
+        self.committer_cbbox.set_active(0)
+
+        adv_hbox.pack_start(gtk.Label(_('Auto-includes:')), False, False, 2)
+        self.autoinc_entry = gtk.Entry()
+        adv_hbox.pack_start(self.autoinc_entry, False, False, 2)
+        self.autopush = gtk.CheckButton(_('Push after commit'))
+        pushafterci = self.repo.ui.configbool('tortoisehg', 'pushafterci')
+        self.autopush.set_active(pushafterci)
+        adv_hbox.pack_start(self.autopush, False, False, 2)
+
+        vbox.pack_start(self.advanced_frame, False, False, 2)
+
+        mbox = gtk.HBox()
         self.connect('thg-accept', self.thgaccept)
         self.branchbutton = gtk.Button()
         self.branchbutton.connect('clicked', self.branch_clicked)
@@ -304,6 +332,7 @@ class GCommit(GStatus):
         vbox.pack_start(mbox, False, False)
         self._mru_messages = self.settings.mrul('recent_messages')
 
+        # change message field
         frame = gtk.Frame()
         frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
@@ -316,34 +345,6 @@ class GCommit(GStatus):
         self.text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
-
-        # Advanced bar
-        self.advanced_frame = gtk.VBox()
-        adv_hbox = gtk.HBox()
-        self.advanced_frame.pack_start(adv_hbox, False, False)
-        adv_hbox.pack_start(gtk.Label(_('Committer:')), False, False, 2)
-
-        liststore = gtk.ListStore(str)
-        self.committer_cbbox = gtk.ComboBoxEntry(liststore)
-        cell = gtk.CellRendererText()
-        self.committer_cbbox.pack_start(cell, True)
-        adv_hbox.pack_start(self.committer_cbbox, True, True, 2)
-        self._mru_committers = self.settings.mrul('recent_committers')
-        self.update_recent_committers()
-        committer = self.repo.ui.config('ui', 'username')
-        if committer:
-            self.update_recent_committers(committer)
-        self.committer_cbbox.set_active(0)
-
-        adv_hbox.pack_start(gtk.Label(_('Auto-includes:')), False, False, 2)
-        self.autoinc_entry = gtk.Entry()
-        adv_hbox.pack_start(self.autoinc_entry, False, False, 2)
-        self.autopush = gtk.CheckButton(_('Push after commit'))
-        pushafterci = self.repo.ui.configbool('tortoisehg', 'pushafterci')
-        self.autopush.set_active(pushafterci)
-        adv_hbox.pack_start(self.autopush, False, False, 2)
-
-        vbox.pack_start(self.advanced_frame, False, False, 2)
 
         vbox2 = gtk.VBox()
         vbox2.pack_start(status_body)
