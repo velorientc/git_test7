@@ -19,6 +19,9 @@ from tortoisehg.hgtk import hgcmd, gtklib
 
 BRANCH_TIP = _('= Current Branch Tip =')
 
+MODE_NORMAL   = 'normal'
+MODE_UPDATING = 'updating'
+
 class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
     def __init__(self, rev=None):
@@ -45,7 +48,7 @@ class UpdateDialog(gtk.Dialog):
         self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         # revision label & combobox
-        hbox = gtk.HBox()
+        self.revhbox = hbox = gtk.HBox()
         lbl = gtk.Label(_('Update to:'))
         hbox.pack_start(lbl, False, False, 2)
         self.revcombo = combo = gtk.combo_box_entry_new_text()
@@ -75,6 +78,27 @@ class UpdateDialog(gtk.Dialog):
 
         # prepare to show
         self.updatebtn.grab_focus()
+        gobject.idle_add(self.after_init)
+
+    def after_init(self):
+        self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        self.cancelbtn.hide()
+
+    def switch_to(self, mode):
+        if mode == MODE_NORMAL:
+            normal = True
+        elif mode == MODE_UPDATING:
+            normal = False
+            self.cancelbtn.grab_focus()
+        else:
+            raise _('unknown mode name: %s') % mode
+        updating = not normal
+
+        self.revhbox.set_sensitive(normal)
+        self.optclean.set_sensitive(normal)
+        self.updatebtn.set_property('visible', normal)
+        self.closebtn.set_property('visible', normal)
+        self.cancelbtn.set_property('visible', updating)
 
     def update(self, repo):
         clean = self.optclean.get_active()
