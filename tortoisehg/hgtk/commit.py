@@ -346,7 +346,7 @@ class GCommit(GStatus):
         vbox2 = gtk.VBox()
         vbox2.pack_start(status_body)
 
-        parents_vbox = gtk.VBox(spacing=2)
+        parents_vbox = gtk.VBox(spacing=1)
         self.parents_frame = parents_vbox
         def plabel():
             w = gtk.Label()
@@ -357,6 +357,7 @@ class GCommit(GStatus):
             return w
         self.parent1_label = plabel()
         self.parent2_label = plabel()
+        parents_vbox.pack_start(gtk.HSeparator())
         vbox2.pack_start(parents_vbox, False, False)
 
         self.vpaned = gtk.VPaned()
