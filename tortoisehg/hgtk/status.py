@@ -492,11 +492,11 @@ class GStatus(gdialog.GDialog):
         self._show_checks = {}
         row, col = 0, 0
 
-        for ctuple in checks:
-            check = gtk.CheckButton(ctuple[1])
-            check.connect('toggled', self.show_toggle, ctuple[0])
+        for name, labeltext in checks:
+            check = gtk.CheckButton(labeltext)
+            check.connect('toggled', self.show_toggle, name)
             table.attach(check, col, col+1, row, row+1)
-            self._show_checks[ctuple[0]] = check
+            self._show_checks[name] = check
             col += row
             row = not row
 
