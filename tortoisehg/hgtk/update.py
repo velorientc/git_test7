@@ -19,16 +19,16 @@ from tortoisehg.hgtk import hgcmd, gtklib
 
 _branch_tip_ = _('= Current Branch Tip =')
 
-class UpdateDialog(gtk.Window):
+class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
     def __init__(self, rev=None):
         """ Initialize the Dialog """
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtk.Dialog.__init__(self, title=_('Update'),
+                            buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         gtklib.set_tortoise_icon(self, 'menucheckout.ico')
         gtklib.set_tortoise_keys(self)
-
-        self.set_default_size(350, 120)
-        self.notify_func = None
+        self.set_resizable(False)
+        self.set_has_separator(False)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -36,20 +36,24 @@ class UpdateDialog(gtk.Window):
             gobject.idle_add(self.destroy)
             return
 
-        title = _('Update - %s') % hglib.toutf(os.path.basename(repo.root))
-        self.set_title(title)
+        reponame = hglib.toutf(os.path.basename(repo.root))
+        self.set_title(_('Update - %s') % reponame)
 
-        vbox = gtk.VBox()
-        self.add(vbox)
+        # add update button
+        updatebtn = gtk.Button(_('Update'))
+        self.action_area.pack_end(updatebtn)
 
+        # revision label & combobox
         hbox = gtk.HBox()
         lbl = gtk.Label(_('Update to:'))
         hbox.pack_start(lbl, False, False, 2)
-
-        # revisions editable combo box
         combo = gtk.combo_box_entry_new_text()
+        entry = combo.child
+        entry.set_width_chars(38)
         hbox.pack_start(combo, True, True, 2)
-        vbox.pack_start(hbox, False, False, 10)
+        self.vbox.pack_start(hbox, False, False, 4)
+
+        # fill list of combo
         if rev != None:
             combo.append_text(str(rev))
         else:
@@ -63,36 +67,18 @@ class UpdateDialog(gtk.Window):
         for t in tags:
             combo.append_text(t)
 
-        self.overwrite = gtk.CheckButton(_('Overwrite local changes (--clean)'))
-        vbox.pack_start(self.overwrite, False, False, 10)
+        # option
+        overwrite = gtk.CheckButton(_('Overwrite local changes (--clean)'))
+        self.vbox.pack_start(overwrite, False, False, 4)
+        self.overwrite = overwrite
 
-        hbbox = gtk.HButtonBox()
-        hbbox.set_layout(gtk.BUTTONBOX_END)
-        vbox.pack_start(hbbox, False, False, 2)
-        close = gtk.Button(_('Close'))
-        close.connect('clicked', lambda x: self.destroy())
+        # set signal handlers
+        handler = lambda b: self.update(updatebtn, combo, repo)
+        updatebtn.connect('clicked', handler)
+        entry.connect('activate', handler)
 
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        key, modifier = gtk.accelerator_parse('Escape')
-        close.add_accelerator('clicked', accelgroup, key, 0,
-                gtk.ACCEL_VISIBLE)
-        hbbox.add(close)
-
-        update = gtk.Button(_('Update'))
-        update.connect('clicked', self.update, combo, repo)
-        mod = gtklib.get_thg_modifier()
-        key, modifier = gtk.accelerator_parse(mod+'Return')
-        update.add_accelerator('clicked', accelgroup, key, modifier,
-                gtk.ACCEL_VISIBLE)
-        hbbox.add(update)
-        update.grab_focus()
-
-        entry = combo.child
-        entry.connect('activate', self.entry_activated, update, combo, repo)
-
-    def entry_activated(self, entry, button, combo, repo):
-        self.update(button, combo, repo)
+        # prepare to show
+        updatebtn.grab_focus()
 
     def update(self, button, combo, repo):
         overwrite = self.overwrite.get_active()
@@ -107,7 +93,7 @@ class UpdateDialog(gtk.Window):
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
-        if self.notify_func:
+        if hasattr(self, 'notify_func'):
             self.notify_func(self.notify_args)
         if dlg.returncode == 0:
             self.destroy()
