@@ -346,9 +346,8 @@ class GCommit(GStatus):
         vbox2 = gtk.VBox()
         vbox2.pack_start(status_body)
 
-        self.parents_frame = gtk.Frame(_('Parent'))
         parents_vbox = gtk.VBox(spacing=2)
-        self.parents_frame.add(parents_vbox)
+        self.parents_frame = parents_vbox
         def plabel():
             w = gtk.Label()
             w.set_selectable(True)
@@ -358,7 +357,7 @@ class GCommit(GStatus):
             return w
         self.parent1_label = plabel()
         self.parent2_label = plabel()
-        vbox2.pack_start(self.parents_frame, False, False)
+        vbox2.pack_start(parents_vbox, False, False)
 
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
@@ -503,9 +502,7 @@ class GCommit(GStatus):
             self.parent2_label.hide()
         else:
             setlabel(self.parent2_label, ctxs[1], isheads[1])
-
             self.parent2_label.show()
-            self.parents_frame.set_label(_('Parents'))
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
