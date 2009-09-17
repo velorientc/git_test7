@@ -57,6 +57,9 @@ from mercurial import cmdutil, util
 def __get_parents(repo, rev):
     return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
 
+def _color_of_branch(repo, rev):
+    return sum([ord(c) for c in repo[rev].branch()])
+
 def _color_of(repo, rev, nextcolor, preferredcolor, branch_color=False):
     if not branch_color:
         if preferredcolor[0]:
@@ -67,7 +70,7 @@ def _color_of(repo, rev, nextcolor, preferredcolor, branch_color=False):
             nextcolor[0] = nextcolor[0] + 1
         return rv
     else:
-        return sum([ord(c) for c in repo[rev].branch()])
+        return _color_of_branch(repo, rev)
 
 type_PLAIN = 0
 type_LOOSE_LOW = 1
@@ -154,7 +157,12 @@ class BranchGrapher:
     two branches.
     """
     
-    def __init__(self, repo, start_rev, stop_rev):
+    def __init__(self, repo, start_rev, stop_rev, branch_color):
+        ''' 
+        start_rev - first (newest) changeset to cover
+        stop_rev - last (oldest) changeset to cover
+        branch_color - true if branch name determines colours
+        '''
         assert start_rev >= stop_rev
         self.repo = repo
         
@@ -201,6 +209,9 @@ class BranchGrapher:
         
         # Next colour used. for branches
         self.nextcolor = 0
+        
+        # Flag to indicate if coloring is done pr micro-branch or pr named branch
+        self.branch_color = branch_color
 
     def _get_parents(self, rev):
         return [x for x in self.repo.changelog.parentrevs(rev) if x != nullrev]
@@ -217,8 +228,12 @@ class BranchGrapher:
         of branch_head as part of the same branch. Stops when stop_rev
         is passed or a known revision is found"""
         assert not branch_head in self.branch4rev
-        self.color4branch[branch_head] = self.nextcolor
-        self.nextcolor += 1
+        if self.branch_color:
+            self.color4branch[branch_head] = \
+                _color_of_branch(self.repo, branch_head)
+        else:
+            self.color4branch[branch_head] = self.nextcolor
+            self.nextcolor += 1
         self.next_in_branch[branch_head] = branch_head
         branch_name = self._branch_name(branch_head)
         rev = branch_head
@@ -330,8 +345,8 @@ class BranchGrapher:
         # Return result
         return (rev, node, lines, None)
     
-def branch_grapher(repo, start_rev, stop_rev):
-    grapher = BranchGrapher(repo, start_rev, stop_rev)
+def branch_grapher(repo, start_rev, stop_rev, branch_color=False):
+    grapher = BranchGrapher(repo, start_rev, stop_rev, branch_color)
     while grapher.more():
         yield grapher.next()            
 
