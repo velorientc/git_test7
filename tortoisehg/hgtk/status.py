@@ -472,13 +472,13 @@ class GStatus(gdialog.GDialog):
 
     def get_status_types(self):
         # Tuple: (onmerge, ctype, translated label)
-        allchecks = [(True,  'modified', _('M: modified')),
+        allchecks = [(False, 'unknown',  _('?: unknown')),
+                     (True,  'modified', _('M: modified')),
+                     (False, 'ignored',  _('I: ignored')),
                      (True,  'added',    _('A: added')),
-                     (True,  'removed',  _('R: removed')),
-                     (False, 'deleted',  _('!: deleted')),
-                     (False, 'unknown',  _('?: unknown')),
                      (False, 'clean',    _('C: clean')),
-                     (False, 'ignored',  _('I: ignored')) ]
+                     (True,  'removed',  _('R: removed')),
+                     (False, 'deleted',  _('!: deleted')) ]
 
         checks = []
         nomerge = (self.count_revs() <= 1)
