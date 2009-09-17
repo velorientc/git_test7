@@ -471,11 +471,6 @@ class GStatus(gdialog.GDialog):
     ### End of overrides ###
 
     def get_status_types(self):
-        table = gtk.Table(rows=2, columns=3)
-        table.set_col_spacings(8)
-
-        self._show_checks = {}
-        row, col = 0, 0
         # Tuple: (ctype, translated label)
         checks = (('modified', _('M: modified')),
                   ('added',    _('A: added')),
@@ -485,6 +480,12 @@ class GStatus(gdialog.GDialog):
                        ('unknown', _('?: unknown')),
                        ('clean',   _('C: clean')),
                        ('ignored', _('I: ignored')))
+
+        table = gtk.Table(rows=2, columns=3)
+        table.set_col_spacings(8)
+
+        self._show_checks = {}
+        row, col = 0, 0
 
         for ctuple in checks:
             check = gtk.CheckButton(ctuple[1])
