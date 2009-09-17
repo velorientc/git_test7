@@ -471,15 +471,20 @@ class GStatus(gdialog.GDialog):
     ### End of overrides ###
 
     def get_status_types(self):
-        # Tuple: (ctype, translated label)
-        checks = (('modified', _('M: modified')),
-                  ('added',    _('A: added')),
-                  ('removed',  _('R: removed')))
-        if self.count_revs() <= 1:
-            checks += (('deleted', _('!: deleted')),
-                       ('unknown', _('?: unknown')),
-                       ('clean',   _('C: clean')),
-                       ('ignored', _('I: ignored')))
+        # Tuple: (onmerge, ctype, translated label)
+        allchecks = [(True,  'modified', _('M: modified')),
+                     (True,  'added',    _('A: added')),
+                     (True,  'removed',  _('R: removed')),
+                     (False, 'deleted',  _('!: deleted')),
+                     (False, 'unknown',  _('?: unknown')),
+                     (False, 'clean',    _('C: clean')),
+                     (False, 'ignored',  _('I: ignored')) ]
+
+        checks = []
+        nomerge = (self.count_revs() <= 1)
+        for onmerge, button, text in allchecks:
+            if onmerge or nomerge:
+                checks.append((button, text))
 
         table = gtk.Table(rows=2, columns=3)
         table.set_col_spacings(8)
