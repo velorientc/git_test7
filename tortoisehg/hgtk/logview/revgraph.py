@@ -157,10 +157,11 @@ class BranchGrapher:
     two branches.
     """
     
-    def __init__(self, repo, start_rev, stop_rev, branch_color):
+    def __init__(self, repo, start_rev, stop_rev, branch_filter, branch_color):
         ''' 
         start_rev - first (newest) changeset to cover
         stop_rev - last (oldest) changeset to cover
+        branch_filter - if not None, show this branch and all its ancestors
         branch_color - true if branch name determines colours
         '''
         assert start_rev >= stop_rev
@@ -209,6 +210,9 @@ class BranchGrapher:
         
         # Next colour used. for branches
         self.nextcolor = 0
+        
+        # If set, show only this branch and all descendants.
+        self.branch_filter = branch_filter
         
         # Flag to indicate if coloring is done pr micro-branch or pr named branch
         self.branch_color = branch_color
@@ -319,11 +323,23 @@ class BranchGrapher:
         """Perform one iteration of the branch grapher"""
         
         # Compute revision (on CUR branch row)
-        rev = self.curr_rev
-        rev_branch = self._get_rev_branch(rev)
-        if rev_branch not in self.curr_branches:
-            # New head
-            self.curr_branches.append(rev_branch)
+        while self.more():
+            rev = self.curr_rev
+            rev_branch = self._get_rev_branch(rev)
+            if rev_branch in self.curr_branches:
+                # Follow parent from known child
+                break
+            elif self.branch_filter is None:
+                # New head - no branch name filter
+                self.curr_branches.append(rev_branch)
+                break
+            elif self._branch_name(rev) == self.branch_filter:
+                # New head - matches branch name filter
+                self.curr_branches.append(rev_branch)
+                break
+            else:
+                # Skip this revision
+                self.curr_rev -= 1
         
         # Compute parents (indicates the branches on NEXT branch row that curr_rev links to)
         parents = self._get_parents(rev)
@@ -345,8 +361,8 @@ class BranchGrapher:
         # Return result
         return (rev, node, lines, None)
     
-def branch_grapher(repo, start_rev, stop_rev, branch_color=False):
-    grapher = BranchGrapher(repo, start_rev, stop_rev, branch_color)
+def branch_grapher(repo, start_rev, stop_rev, branch=None, branch_color=False):
+    grapher = BranchGrapher(repo, start_rev, stop_rev, branch, branch_color)
     while grapher.more():
         yield grapher.next()            
 

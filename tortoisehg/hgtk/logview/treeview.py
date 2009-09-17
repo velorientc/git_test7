@@ -165,7 +165,7 @@ class TreeView(gtk.ScrolledWindow):
             noheads = opts.get('noheads', False)
             if opts.get('branch-view', False):
                 self.grapher = branch_grapher(self.repo, start, end, 
-                    self.branch_color)
+                    pats, self.branch_color)
             else:
                 self.grapher = revision_grapher(self.repo, start, end, pats,
                         noheads, self.branch_color)
