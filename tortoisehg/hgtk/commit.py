@@ -474,9 +474,10 @@ class GCommit(GStatus):
                                 ctx.description().split('\n')[0]))
             face = 'monospace'
             size = '9000'
+            t = _('Parent: ')
 
             format = '<span face="%s" size="%s">%s (%s) </span>'
-            t = format % (face, size, revision, hash)
+            t += format % (face, size, revision, hash)
 
             if not ishead and not self.mqmode:
                 format = '<b>[%s]</b>  '
