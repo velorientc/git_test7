@@ -191,9 +191,9 @@ class CmdDialog(gtk.Dialog):
         else:
             return False
 
-# CmdWidget style constans
-STYLE_NORMAL  = 'normal'    # pbar + popup log viewer
-STYLE_COMPACT = 'compact'   # pbar + log viewer
+# CmdWidget style constants
+STYLE_NORMAL  = 'normal'    # pbar + embedded log viewer
+STYLE_COMPACT = 'compact'   # pbar + popup log viewer
 
 class CmdWidget(gtk.VBox):
 
@@ -202,12 +202,14 @@ class CmdWidget(gtk.VBox):
 
         self.hgthread = None
         self.last_pbar_update = 0
+        self.is_normal = style == STYLE_NORMAL
+        self.is_compact = style == STYLE_COMPACT
 
         # log viewer
-        if style == STYLE_NORMAL:
+        if self.is_normal:
             self.log = CmdLogWidget()
-            self.pack_start(log)
-        elif style == STYLE_COMPACT:
+            self.pack_start(self.log)
+        elif self.is_compact:
             self.dlg = CmdLogDialog()
             self.log = self.dlg.get_logwidget()
         else:
@@ -218,23 +220,22 @@ class CmdWidget(gtk.VBox):
         self.pack_start(progbox)
 
         ## log button
-        if style == STYLE_COMPACT:
-            img = gtk.Image()
-            img.set_from_stock(gtk.STOCK_JUSTIFY_LEFT,
-                               gtk.ICON_SIZE_SMALL_TOOLBAR)
-            self.log_btn = gtk.Button()
-            self.log_btn.set_image(img)
-            self.log_btn.set_relief(gtk.RELIEF_NONE)
-            self.log_btn.set_focus_on_click(False)
-            self.log_btn.connect('clicked', self.log_clicked)
-            progbox.pack_start(self.log_btn, False, False)
+        img = gtk.Image()
+        img.set_from_stock(gtk.STOCK_JUSTIFY_LEFT,
+                           gtk.ICON_SIZE_SMALL_TOOLBAR)
+        self.log_btn = gtk.Button()
+        self.log_btn.set_image(img)
+        self.log_btn.set_relief(gtk.RELIEF_NONE)
+        self.log_btn.set_focus_on_click(False)
+        self.log_btn.connect('clicked', self.log_clicked)
+        progbox.pack_start(self.log_btn, False, False)
 
         ## progress bar
         self.pbar = gtk.ProgressBar()
         progbox.pack_start(self.pbar)
 
         ## stop & close buttons
-        if style == STYLE_COMPACT:
+        if self.is_compact:
             img = gtk.Image()
             img.set_from_stock(gtk.STOCK_STOP,
                                gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -256,8 +257,9 @@ class CmdWidget(gtk.VBox):
             progbox.pack_start(self.close_btn, False, False)
 
         def after_init():
-            self.set_pbar(False)
             self.set_buttons(stop=False)
+            if not self.is_normal:
+                self.set_pbar(False)
         gobject.idle_add(after_init)
 
     ### public functions ###
