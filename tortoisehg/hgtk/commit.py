@@ -317,8 +317,10 @@ class GCommit(GStatus):
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
 
-        self.advanced_frame = gtk.Frame(_('Advanced'))
-        adv_hbox = gtk.HBox(spacing=2)
+        # Advanced bar
+        self.advanced_frame = gtk.VBox()
+        adv_hbox = gtk.HBox()
+        self.advanced_frame.pack_start(adv_hbox, False, False)
         adv_hbox.pack_start(gtk.Label(_('Committer:')), False, False, 2)
 
         liststore = gtk.ListStore(str)
@@ -340,7 +342,7 @@ class GCommit(GStatus):
         pushafterci = self.repo.ui.configbool('tortoisehg', 'pushafterci')
         self.autopush.set_active(pushafterci)
         adv_hbox.pack_start(self.autopush, False, False, 2)
-        self.advanced_frame.add(adv_hbox)
+
         vbox.pack_start(self.advanced_frame, False, False, 2)
 
         vbox2 = gtk.VBox()
