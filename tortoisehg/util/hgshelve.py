@@ -26,7 +26,7 @@ from tortoisehg.util import hglib
 
 lines_re = re.compile(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@\s*(.*)')
 
-def internalpatch(patchobj, ui, strip, cwd, reverse=False, files={}):
+def internalpatch(patchobj, ui, strip, cwd, files={}):
     """use builtin patch to apply <patchobj> to the working directory.
     returns whether patch was applied with fuzz factor.
 
@@ -45,8 +45,7 @@ def internalpatch(patchobj, ui, strip, cwd, reverse=False, files={}):
     except KeyError:
         raise util.Abort(_('Unsupported line endings type: %s') % eolmode)
     try:
-        ret = patch.applydiff(ui, fp, files, strip=strip,
-                              reverse=reverse, eol=eol)
+        ret = patch.applydiff(ui, fp, files, strip=strip, eol=eol)
     finally:
         if cwd:
             os.chdir(curdir)
