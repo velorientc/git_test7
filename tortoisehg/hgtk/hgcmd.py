@@ -208,9 +208,15 @@ class CmdWidget(gtk.VBox):
         # log viewer
         if self.is_normal:
             self.log = CmdLogWidget()
+            self.log.set_size_request(640, 320)
+            self.log.size_request()
             self.pack_start(self.log)
         elif self.is_compact:
             self.dlg = CmdLogDialog()
+            def close_hook(dialog):
+                self.show_log(False)
+                return False
+            self.dlg.set_close_hook(close_hook)
             self.log = self.dlg.get_logwidget()
         else:
             raise _('unknown CmdWidget style: %s') % style
@@ -223,11 +229,11 @@ class CmdWidget(gtk.VBox):
         img = gtk.Image()
         img.set_from_stock(gtk.STOCK_JUSTIFY_LEFT,
                            gtk.ICON_SIZE_SMALL_TOOLBAR)
-        self.log_btn = gtk.Button()
+        self.log_btn = gtk.ToggleButton()
         self.log_btn.set_image(img)
         self.log_btn.set_relief(gtk.RELIEF_NONE)
         self.log_btn.set_focus_on_click(False)
-        self.log_btn.connect('clicked', self.log_clicked)
+        self.log_btn.connect('toggled', self.log_toggled)
         progbox.pack_start(self.log_btn, False, False)
 
         ## progress bar
@@ -258,7 +264,9 @@ class CmdWidget(gtk.VBox):
 
         def after_init():
             self.set_buttons(stop=False)
-            if not self.is_normal:
+            if self.is_normal:
+                self.show_log(False)
+            if self.is_compact:
                 self.set_pbar(False)
         gobject.idle_add(after_init)
 
@@ -342,15 +350,39 @@ class CmdWidget(gtk.VBox):
         if not close is None and hasattr(self, 'close_btn'):
             self.close_btn.set_property('visible', close)
 
-    def show_log(self):
+    def show_log(self, visible=True):
         """
-        Show log viewer.
+        Show/hide log viewer.
         """
-        if hasattr(self, 'dlg'):
-            if not self.dlg.get_property('visible'):
-                self.dlg.show_all()
+        if self.is_normal:
+            self.log.set_property('visible', visible)
+        elif self.is_compact:
+            if visible:
+                if self.dlg.get_property('visible'):
+                    self.dlg.present()
+                else:
+                    self.dlg.show_all()
             else:
-                self.dlg.present()
+                self.dlg.hide()
+        else:
+            raise _('invalid state')
+
+        # change toggle button state
+        if self.log_btn.get_active() != visible:
+            self.log_btn.handler_block_by_func(self.log_toggled)
+            self.log_btn.set_active(visible)
+            self.log_btn.handler_unblock_by_func(self.log_toggled)
+
+    def is_show_log(self):
+        """
+        Return visible state of log viewer.
+        """
+        if self.is_normal:
+            return self.log.get_property('visible')
+        elif self.is_compact:
+            return self.dlg.get_property('visible')
+        else:
+            raise _('invalid state')
 
     ### internal use functions ###
 
@@ -410,8 +442,8 @@ class CmdWidget(gtk.VBox):
 
     ### signal handlers ###
 
-    def log_clicked(self, button):
-        self.show_log()
+    def log_toggled(self, button):
+        self.show_log(button.get_active())
 
     def stop_clicked(self, button):
         self.stop()
@@ -494,8 +526,24 @@ class CmdLogDialog(gtk.Window):
         """
         return self.log
 
+    def set_close_hook(self, hook):
+        """
+        Set hook function.
+
+        hook: the function called on closing this dialog.
+
+        def close_hook(dialog)
+
+        where 'dialog' is the instance of CmdLogDialog class.
+        The hook function should return True or False.
+        By returning True, you can prevent closing/hiding the dialog.
+        """
+        self.close_hook = hook
+
     ### signal handlers ###
 
     def delete_event(self, widget, event):
-        self.hide()
+        if hasattr(self, 'close_hook'):
+            if self.close_hook(self):
+                self.hide()
         return True
