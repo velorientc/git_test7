@@ -281,13 +281,26 @@ class GStatus(gdialog.GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(self.filetree)
 
-        self.expander = expander = gtk.Expander(_('Status Types'))
-        expander.set_expanded(False)
-        expander.add(self.get_status_types())
+        # Status Types expander
+        # We don't assign an expander child. We instead monitor the
+        # expanded property and do the hiding ourselves
+        expander = gtk.Expander(_('View'))
+        self.types_expander = expander
+        expander.connect("notify::expanded", self.types_expander_expanded)
+        exp_labelbox = gtk.HBox()
+        exp_labelbox.pack_start(expander, False, False)
+        exp_labelbox.pack_start(gtk.Label(), True, True)
+        self.counter = gtk.Label('')
+        exp_labelbox.pack_end(self.counter, False, False, 2)
+        self.status_types = self.get_status_types()
+        self.status_types.hide()
+        expander_box = gtk.VBox()
+        expander_box.pack_start(exp_labelbox)
+        expander_box.pack_start(self.status_types)
 
         tvbox = gtk.VBox()
         tvbox.pack_start(scroller, True, True, 0)
-        tvbox.pack_start(expander, False, False, 2)
+        tvbox.pack_start(expander_box, False, False, 2)
         if self.pats:
             button = gtk.Button(_('Remove filter, show root'))
             button.connect('pressed', self.remove_filter)
@@ -407,16 +420,10 @@ class GStatus(gdialog.GDialog):
         self.tree_sel_changed(filesel, difftree, page_num)
 
     def get_extras(self):
-        self.counter = gtk.Label('')
-        self.counter.set_alignment(1.0, 0.0) # right up
-
         self.stbar = gtklib.StatusBar()
-
         hbox = gtk.HBox()
         hbox.pack_start(self.stbar)
         hbox.pack_start(gtk.Label(''), True, True, 2)
-        hbox.pack_end(self.counter, False, False, 2)
-
         return hbox
 
     def add_header_checkbox(self, col, post=None, pre=None, toggle=False):
@@ -473,6 +480,12 @@ class GStatus(gdialog.GDialog):
 
     ### End of overrides ###
 
+    def types_expander_expanded(self, expander, dummy):
+        if expander.get_expanded():
+            self.status_types.show()
+        else:
+            self.status_types.hide()
+
     def get_status_types(self):
         # Tuple: (onmerge, ctype, translated label)
         allchecks = [(False, False, 'unknown',  _('?: unknown')),
@@ -512,6 +525,8 @@ class GStatus(gdialog.GDialog):
         return hbox
 
     def realize_status_settings(self):
+        if not self.types_expander.get_expanded():
+            self.status_types.hide()
         self.diffpane.set_position(self.setting_pos)
         self.reload_status()
 
@@ -748,12 +763,28 @@ class GStatus(gdialog.GDialog):
             newtext = "<span foreground='#888888'>" + newtext + "</span>"
         dmodel[hc][DM_DISP_TEXT] = newtext
 
+    def updated_codes(self):
+        types = [('modified', 'M'),
+                 ('added',    'A'),
+                 ('removed',  'R'),
+                 ('unknown',  '?'),
+                 ('deleted',  '!'),
+                 ('ignored',  'I'),
+                 ('clean',    'C') ]
+        codes = ''
+        try:
+            for name, code in types:
+                if self.opts[name]:
+                    codes += code
+        except KeyError:
+            pass
+        self.types_expander.set_label(_("View '%s'") % codes)
 
     def show_toggle(self, check, toggletype):
         self.opts[toggletype] = check.get_active()
         self.reload_status()
+        self.updated_codes()
         return True
-
 
     def sort_by_stat(self, model, iter1, iter2):
         order = 'MAR!?IC'
