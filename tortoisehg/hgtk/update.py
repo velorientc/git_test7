@@ -90,6 +90,8 @@ class UpdateDialog(gtk.Dialog):
             cmdline.append(rev)
         if overwrite:
             cmdline.append('--clean')
+        else:
+            cmdline.append('--check')
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()
