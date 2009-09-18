@@ -763,12 +763,28 @@ class GStatus(gdialog.GDialog):
             newtext = "<span foreground='#888888'>" + newtext + "</span>"
         dmodel[hc][DM_DISP_TEXT] = newtext
 
+    def updated_codes(self):
+        types = [('modified', 'M'),
+                 ('added',    'A'),
+                 ('removed',  'R'),
+                 ('unknown',  '?'),
+                 ('deleted',  '!'),
+                 ('ignored',  'I'),
+                 ('clean',    'C') ]
+        codes = ''
+        try:
+            for name, code in types:
+                if self.opts[name]:
+                    codes += code
+        except KeyError:
+            pass
+        self.types_expander.set_label(_("View '%s'") % codes)
 
     def show_toggle(self, check, toggletype):
         self.opts[toggletype] = check.get_active()
         self.reload_status()
+        self.updated_codes()
         return True
-
 
     def sort_by_stat(self, model, iter1, iter2):
         order = 'MAR!?IC'
