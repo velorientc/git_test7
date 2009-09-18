@@ -225,16 +225,19 @@ class CmdWidget(gtk.VBox):
         self.progbox = progbox = gtk.HBox()
         self.pack_start(progbox)
 
+        def add_button(stock, handler):
+            img = gtk.Image()
+            img.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
+            btn = gtk.ToggleButton()
+            btn.set_image(img)
+            btn.set_relief(gtk.RELIEF_NONE)
+            btn.set_focus_on_click(False)
+            btn.connect('clicked', handler)
+            progbox.pack_start(btn, False, False)
+            return btn
+
         ## log button
-        img = gtk.Image()
-        img.set_from_stock(gtk.STOCK_JUSTIFY_LEFT,
-                           gtk.ICON_SIZE_SMALL_TOOLBAR)
-        self.log_btn = gtk.ToggleButton()
-        self.log_btn.set_image(img)
-        self.log_btn.set_relief(gtk.RELIEF_NONE)
-        self.log_btn.set_focus_on_click(False)
-        self.log_btn.connect('toggled', self.log_toggled)
-        progbox.pack_start(self.log_btn, False, False)
+        self.log_btn = add_button(gtk.STOCK_JUSTIFY_LEFT, self.log_toggled)
 
         ## progress bar
         self.pbar = gtk.ProgressBar()
@@ -242,25 +245,8 @@ class CmdWidget(gtk.VBox):
 
         ## stop & close buttons
         if self.is_compact:
-            img = gtk.Image()
-            img.set_from_stock(gtk.STOCK_STOP,
-                               gtk.ICON_SIZE_SMALL_TOOLBAR)
-            self.stop_btn = gtk.Button()
-            self.stop_btn.set_image(img)
-            self.stop_btn.set_relief(gtk.RELIEF_NONE)
-            self.stop_btn.set_focus_on_click(False)
-            self.stop_btn.connect('clicked', self.stop_clicked)
-            progbox.pack_start(self.stop_btn, False, False)
-
-            img = gtk.Image()
-            img.set_from_stock(gtk.STOCK_CLOSE,
-                               gtk.ICON_SIZE_SMALL_TOOLBAR)
-            self.close_btn = gtk.Button()
-            self.close_btn.set_image(img)
-            self.close_btn.set_relief(gtk.RELIEF_NONE)
-            self.close_btn.set_focus_on_click(False)
-            self.close_btn.connect('clicked', self.close_clicked)
-            progbox.pack_start(self.close_btn, False, False)
+            self.stop_btn = add_button(gtk.STOCK_STOP, self.stop_clicked)
+            self.close_btn = add_button(gtk.STOCK_CLOSE, self.close_clicked)
 
         def after_init():
             self.set_buttons(stop=False)
