@@ -15,7 +15,7 @@ from mercurial import util
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, hgshelve
 
-from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
+from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH
 from tortoisehg.hgtk import gdialog, gtklib
 
 class GShelve(GStatus):
@@ -44,13 +44,13 @@ class GShelve(GStatus):
         return 'shelve.ico'
 
     def auto_check(self):
-        if self.test_opt('check'):
-            for entry in self.filemodel:
-                if entry[FM_STATUS] in 'MAR':
-                    entry[FM_CHECKED] = True
-            self.update_check_count()
+        if not self.test_opt('check'):
+            return
+        for row in self.filemodel:
+            if row[FM_STATUS] in 'MAR' and row[FM_PATH] not in self.excludes:
+                row[FM_CHECKED] = True
+        self.update_check_count()
         self.opts['check'] = False
-
 
     def save_settings(self):
         settings = GStatus.save_settings(self)
