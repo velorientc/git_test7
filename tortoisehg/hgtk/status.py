@@ -284,7 +284,7 @@ class GStatus(gdialog.GDialog):
         # Status Types expander
         # We don't assign an expander child. We instead monitor the
         # expanded property and do the hiding ourselves
-        expander = gtk.Expander(_('Status Types'))
+        expander = gtk.Expander(_('View'))
         self.types_expander = expander
         expander.connect("notify::expanded", self.types_expander_expanded)
         exp_labelbox = gtk.HBox()
