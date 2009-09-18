@@ -93,7 +93,8 @@ class GStatus(gdialog.GDialog):
         # Only auto-check files once, and only if a pattern was given.
         if self.pats and self.opts.get('check'):
             for entry in self.filemodel:
-                entry[FM_CHECKED] = True
+                if entry[FM_PATH] not in self.excludes:
+                    entry[FM_CHECKED] = True
             self.update_check_count()
             self.opts['check'] = False
 
