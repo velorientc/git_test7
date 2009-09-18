@@ -7,6 +7,7 @@
 
 import gtk
 import Queue
+import time
 import urllib2
 
 from mercurial import ui, util
@@ -159,9 +160,10 @@ class HgThread(thread2.Thread):
                 self.ui.setconfig('defaults', k, '')
             ret = hglib.dispatch._dispatch(self.ui, self.args)
             if ret:
-                self.ui.write(_('[command returned code %d]\n') % int(ret))
+                self.ui.write(_('[command returned code %d ') % int(ret))
             else:
-                self.ui.write(_('[command completed successfully]\n'))
+                self.ui.write(_('[command completed successfully '))
+            self.ui.write(time.asctime() + ']\n')
             self.ret = ret or 0
             if self.postfunc:
                 self.postfunc(ret)
