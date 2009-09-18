@@ -15,7 +15,7 @@ from mercurial import hg, ui
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
-from tortoisehg.hgtk import hgcmd, gtklib
+from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
 BRANCH_TIP = _('= Current Branch Tip =')
 
@@ -32,6 +32,7 @@ class UpdateDialog(gtk.Dialog):
         self.set_resizable(False)
         self.set_has_separator(False)
         self.connect('response', self.dialog_response)
+        self.connect('delete-event', self.delete_event)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -89,12 +90,27 @@ class UpdateDialog(gtk.Dialog):
         self.vbox.pack_start(self.cmd, True, True, 6)
 
         # cancel button
-        self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-        self.cancelbtn.hide()
+        self.cancelbtn = gtk.Button(_('Cancel'))
+        self.cancelbtn.connect('clicked', self.cancel_clicked)
+        self.action_area.pack_end(self.cancelbtn)
 
     def dialog_response(self, dialog, response_id):
-        if response_id != gtk.RESPONSE_CANCEL:
+        if not self.cmd.is_alive():
             self.destroy()
+
+    def delete_event(self, dialog, event):
+        if self.cmd.is_alive():
+            ret = gdialog.Confirm(_('Confirm Cancel'), [], self,
+                                  _('Do you want to cancel updating?')).run()
+            if ret == gtk.RESPONSE_YES:
+                self.cancel_clicked(self.cancelbtn)
+            return True
+        self.destroy()
+
+    def cancel_clicked(self, button):
+        self.cmd.stop()
+        self.cmd.show_log()
+        self.switch_to(MODE_NORMAL, cmd=False)
 
     def switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
