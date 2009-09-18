@@ -206,8 +206,9 @@ class GShelve(GStatus):
             hgshelve.unshelve(self.ui, self.repo, **opts)
             self.ui.quiet = False
             self.reload_status()
-        except:
-            pass
+        except Exception, e:
+            gdialog.Prompt(_('Unshelve Error'),
+                    _('Error: %s') % e, self).run()
 
     def shelve_clicked(self, toolbutton, data=None):
         if not self.isuptodate():
