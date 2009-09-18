@@ -289,6 +289,9 @@ class GStatus(gdialog.GDialog):
         expander.connect("notify::expanded", self.types_expander_expanded)
         exp_labelbox = gtk.HBox()
         exp_labelbox.pack_start(expander, False, False)
+        exp_labelbox.pack_start(gtk.Label(), True, True)
+        self.counter = gtk.Label('')
+        exp_labelbox.pack_end(self.counter, False, False, 2)
         self.status_types = self.get_status_types()
         self.status_types.hide()
         expander_box = gtk.VBox()
@@ -417,16 +420,10 @@ class GStatus(gdialog.GDialog):
         self.tree_sel_changed(filesel, difftree, page_num)
 
     def get_extras(self):
-        self.counter = gtk.Label('')
-        self.counter.set_alignment(1.0, 0.0) # right up
-
         self.stbar = gtklib.StatusBar()
-
         hbox = gtk.HBox()
         hbox.pack_start(self.stbar)
         hbox.pack_start(gtk.Label(''), True, True, 2)
-        hbox.pack_end(self.counter, False, False, 2)
-
         return hbox
 
     def add_header_checkbox(self, col, post=None, pre=None, toggle=False):
