@@ -31,6 +31,7 @@ class UpdateDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
+        self.connect('response', self.dialog_response)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -90,6 +91,10 @@ class UpdateDialog(gtk.Dialog):
         # cancel button
         self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
         self.cancelbtn.hide()
+
+    def dialog_response(self, dialog, response_id):
+        if response_id != gtk.RESPONSE_CANCEL:
+            self.destroy()
 
     def switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
