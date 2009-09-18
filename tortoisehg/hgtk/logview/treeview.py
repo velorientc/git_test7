@@ -495,7 +495,7 @@ class TreeView(gtk.ScrolledWindow):
         cell.set_property("width-chars", 10)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.age_column = gtk.TreeViewColumn(_('Age'))
-        self.age_column.set_visible(False)
+        self.age_column.set_visible(True)
         self.age_column.set_resizable(True)
         self.age_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.age_column.set_fixed_width(cell.get_size(self.treeview)[2])
