@@ -68,6 +68,9 @@ takes a community of developers, translators, and users to build a
 truly useful tool.  Especially users who care enough to report bugs and
 file feature requests.
 
+The TortoiseHg installer for Windows includes the TortoiseOverlays handler,
+as provided by the `TortoiseSVN <http://tortoisesvn.net>`_ project.
+
 Conventions used in this manual
 ===============================
 
