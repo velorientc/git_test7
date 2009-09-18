@@ -81,12 +81,20 @@ class UpdateDialog(gtk.Dialog):
         gobject.idle_add(self.after_init)
 
     def after_init(self):
+        # CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, True, True, 6)
+
+        # cancel button
         self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
         self.cancelbtn.hide()
 
-    def switch_to(self, mode):
+    def switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
             normal = True
+            self.closebtn.grab_focus()
         elif mode == MODE_UPDATING:
             normal = False
             self.cancelbtn.grab_focus()
@@ -98,25 +106,29 @@ class UpdateDialog(gtk.Dialog):
         self.optclean.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
+        if cmd:
+            self.cmd.set_property('visible', updating)
         self.cancelbtn.set_property('visible', updating)
 
     def update(self, repo):
+        self.switch_to(MODE_UPDATING)
+
         clean = self.optclean.get_active()
         rev = self.revcombo.get_active_text()
-
         cmdline = ['hg', 'update', '--verbose']
         if rev != BRANCH_TIP:
             cmdline.append('--rev')
             cmdline.append(rev)
         if clean:
             cmdline.append('--clean')
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.run()
-        dlg.hide()
-        if hasattr(self, 'notify_func'):
-            self.notify_func(self.notify_args)
-        if dlg.returncode == 0:
-            self.destroy()
+
+        def cmd_done(returncode):
+            self.switch_to(MODE_NORMAL, cmd=False)
+            if hasattr(self, 'notify_func'):
+                self.notify_func(self.notify_args)
+            if returncode == 0 and not self.cmd.is_show_log():
+                self.destroy()
+        self.cmd.execute(cmdline, cmd_done)
 
     def set_notify_func(self, func, *args):
         self.notify_func = func
