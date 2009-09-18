@@ -21,7 +21,8 @@ from mercurial import ui, hg, util, patch, cmdutil
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
-from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH_UTF8
+from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
+from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
 from tortoisehg.hgtk import gtklib, thgconfig, gdialog, hgcmd
 
 class BranchOperationDialog(gtk.Dialog):
@@ -153,11 +154,12 @@ class GCommit(GStatus):
         return 'ui.username'
 
     def auto_check(self):
-        if self.test_opt('check'):
-            for entry in self.filemodel:
-                if entry[FM_STATUS] in 'MAR':
-                    entry[FM_CHECKED] = True
-            self.update_check_count()
+        if not self.test_opt('check'):
+            return
+        for row in self.filemodel:
+            if row[FM_STATUS] in 'MAR' and row[FM_PATH] not in self.excludes:
+                row[FM_CHECKED] = True
+        self.update_check_count()
         self.opts['check'] = False
 
 

@@ -463,6 +463,8 @@ class GStatus(gdialog.GDialog):
             self.update_selection_preview()
 
     def prepare_display(self):
+        val = self.repo.ui.config('tortoisehg', 'ciexclude', '')
+        self.excludes = [i.strip() for i in val.split(',') if i.strip()]
         gobject.idle_add(self.realize_status_settings)
 
     def refresh_complete(self):
@@ -599,7 +601,8 @@ class GStatus(gdialog.GDialog):
             for wfile in wfiles:
                 mst = wfile in ms and ms[wfile].upper() or ""
                 wfile = util.localpath(wfile)
-                ck, p = waschecked.get(wfile, (stat in 'MAR', False))
+                defcheck = stat in 'MAR' and wfile not in self.excludes
+                ck, p = waschecked.get(wfile, (defcheck, False))
                 model.append([ck, stat, hglib.toutf(wfile), wfile, mst, p])
 
         self.auto_check() # may check more files
