@@ -281,13 +281,23 @@ class GStatus(gdialog.GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(self.filetree)
 
-        self.expander = expander = gtk.Expander(_('Status Types'))
-        expander.set_expanded(False)
-        expander.add(self.get_status_types())
+        # Status Types expander
+        # We don't assign an expander child. We instead monitor the
+        # expanded property and do the hiding ourselves
+        expander = gtk.Expander(_('Status Types'))
+        self.types_expander = expander
+        expander.connect("notify::expanded", self.types_expander_expanded)
+        exp_labelbox = gtk.HBox()
+        exp_labelbox.pack_start(expander, False, False)
+        self.status_types = self.get_status_types()
+        self.status_types.hide()
+        expander_box = gtk.VBox()
+        expander_box.pack_start(exp_labelbox)
+        expander_box.pack_start(self.status_types)
 
         tvbox = gtk.VBox()
         tvbox.pack_start(scroller, True, True, 0)
-        tvbox.pack_start(expander, False, False, 2)
+        tvbox.pack_start(expander_box, False, False, 2)
         if self.pats:
             button = gtk.Button(_('Remove filter, show root'))
             button.connect('pressed', self.remove_filter)
@@ -473,6 +483,12 @@ class GStatus(gdialog.GDialog):
 
     ### End of overrides ###
 
+    def types_expander_expanded(self, expander, dummy):
+        if expander.get_expanded():
+            self.status_types.show()
+        else:
+            self.status_types.hide()
+
     def get_status_types(self):
         # Tuple: (onmerge, ctype, translated label)
         allchecks = [(False, False, 'unknown',  _('?: unknown')),
@@ -512,6 +528,8 @@ class GStatus(gdialog.GDialog):
         return hbox
 
     def realize_status_settings(self):
+        if not self.types_expander.get_expanded():
+            self.status_types.hide()
         self.diffpane.set_position(self.setting_pos)
         self.reload_status()
 
