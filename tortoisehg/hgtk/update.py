@@ -142,6 +142,8 @@ class UpdateDialog(gtk.Dialog):
             cmdline.append(rev)
         if clean:
             cmdline.append('--clean')
+        else:
+            cmdline.append('--check')
 
         def cmd_done(returncode):
             self.switch_to(MODE_NORMAL, cmd=False)
