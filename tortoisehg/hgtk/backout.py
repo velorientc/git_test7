@@ -83,10 +83,18 @@ class BackoutDialog(gtk.Dialog):
                 _('Commit message text for new changeset that reverses the'
                 '  effect of the change being backed out.'))
 
+        hbox = gtk.HBox()
+
         ## use English backout message option
         self.eng_msg = gtk.CheckButton(_('Use English backout message'))
         self.eng_msg.connect('toggled', self.eng_msg_toggled)
-        msgvbox.pack_start(self.eng_msg, False, False)
+        hbox.pack_start(self.eng_msg, False, False)
+
+        ## merge after backout
+        self.merge_button = gtk.CheckButton(
+                _('Merge with old dirstate parent after backout'))
+        hbox.pack_start(self.merge_button, False, False, 4)
+        msgvbox.pack_start(hbox, False, False)
 
         # prepare to show
         self.load_settings()
@@ -95,10 +103,14 @@ class BackoutDialog(gtk.Dialog):
     def load_settings(self):
         checked = self.settings.get_value('english', False, True)
         self.eng_msg.set_active(checked)
+        checked = self.settings.get_value('merge', True, True)
+        self.merge_button.set_active(checked)
 
     def store_settings(self):
         checked = self.eng_msg.get_active()
         self.settings.set_value('english', checked)
+        checked = self.merge_button.get_active()
+        self.settings.set_value('merge', checked)
         self.settings.write()
 
     def dialog_response(self, dialog, response_id):
@@ -126,7 +138,10 @@ class BackoutDialog(gtk.Dialog):
     def backout(self, button, revstr):
         start, end = self.buf.get_bounds()
         msg = self.buf.get_text(start, end)
-        cmdline = ['hg', 'backout', '--rev', revstr, '--message', hglib.fromutf(msg)]
+        cmdline = ['hg', 'backout', '--rev', revstr]
+        if self.merge_button.get_active():
+            cmdline += ['--merge']
+        cmdline += ['--message', hglib.fromutf(msg)]
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.show_all()
         dlg.run()

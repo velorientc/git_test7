@@ -790,10 +790,24 @@ class GLog(gdialog.GDialog):
         hash = str(self.repo[self.currevid])
         parents = [x.node() for x in self.repo.parents()]
 
+        def cinotify(dlg):
+            'User comitted the merge'
+            dlg.ready = False
+            dlg.hide()
+            self.reload_log()
+
         def refresh(*args):
             self.repo.invalidate()
             if len(self.repo) != oldlen:
                 self.reload_log()
+            if len(self.repo.parents()) != len(parents):
+                # User auto-merged the backout
+                from tortoisehg.hgtk import commit
+                dlg = commit.run(ui.ui())
+                dlg.set_transient_for(self)
+                dlg.set_modal(True)
+                dlg.set_notify_func(cinotify, dlg)
+                dlg.display()
 
         dlg = backout.BackoutDialog(hash)
         dlg.set_transient_for(self)

@@ -87,6 +87,10 @@ _commit_info = (
     (_('Auto Commit List'), 'tortoisehg.autoinc', [],
        _('Comma separated list of files that are automatically included'
          ' in every commit.  Intended for use only as a repository setting.'
+         '  Default: None')),
+    (_('Auto Exclude List'), 'tortoisehg.ciexclude', [],
+       _('Comma separated list of files that are automatically unchecked'
+         ' when the status, commit, and shelve dialogs are opened.'
          '  Default: None'))
        )
 

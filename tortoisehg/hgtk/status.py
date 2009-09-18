@@ -93,7 +93,8 @@ class GStatus(gdialog.GDialog):
         # Only auto-check files once, and only if a pattern was given.
         if self.pats and self.opts.get('check'):
             for entry in self.filemodel:
-                entry[FM_CHECKED] = True
+                if entry[FM_PATH] not in self.excludes:
+                    entry[FM_CHECKED] = True
             self.update_check_count()
             self.opts['check'] = False
 
@@ -463,6 +464,8 @@ class GStatus(gdialog.GDialog):
             self.update_selection_preview()
 
     def prepare_display(self):
+        val = self.repo.ui.config('tortoisehg', 'ciexclude', '')
+        self.excludes = [i.strip() for i in val.split(',') if i.strip()]
         gobject.idle_add(self.realize_status_settings)
 
     def refresh_complete(self):
@@ -471,26 +474,35 @@ class GStatus(gdialog.GDialog):
     ### End of overrides ###
 
     def get_status_types(self):
+        # Tuple: (onmerge, ctype, translated label)
+        allchecks = [(False, False, 'unknown',  _('?: unknown')),
+                     (True,  False, 'modified', _('M: modified')),
+                     (False, False, 'ignored',  _('I: ignored')),
+                     (True,  False, 'added',    _('A: added')),
+                     (False, False, 'clean',    _('C: clean')),
+                     (True,  False, 'removed',  _('R: removed')),
+                     (False, True,  'deleted',  _('!: deleted')) ]
+
+        checks = []
+        nomerge = (self.count_revs() <= 1)
+        for onmerge, fixed, button, text in allchecks:
+            if onmerge or nomerge:
+                checks.append((fixed, button, text))
+
         table = gtk.Table(rows=2, columns=3)
         table.set_col_spacings(8)
 
         self._show_checks = {}
         row, col = 0, 0
-        # Tuple: (ctype, translated label)
-        checks = (('modified', _('M: modified')),
-                  ('added',    _('A: added')),
-                  ('removed',  _('R: removed')))
-        if self.count_revs() <= 1:
-            checks += (('deleted', _('!: deleted')),
-                       ('unknown', _('?: unknown')),
-                       ('clean',   _('C: clean')),
-                       ('ignored', _('I: ignored')))
 
-        for ctuple in checks:
-            check = gtk.CheckButton(ctuple[1])
-            check.connect('toggled', self.show_toggle, ctuple[0])
-            table.attach(check, col, col+1, row, row+1)
-            self._show_checks[ctuple[0]] = check
+        for fixed, name, labeltext in checks:
+            button = gtk.CheckButton(labeltext)
+            widget = button
+            if fixed:
+                widget = gtk.Label(labeltext)
+            button.connect('toggled', self.show_toggle, name)
+            self._show_checks[name] = button
+            table.attach(widget, col, col+1, row, row+1)
             col += row
             row = not row
 
@@ -590,7 +602,8 @@ class GStatus(gdialog.GDialog):
             for wfile in wfiles:
                 mst = wfile in ms and ms[wfile].upper() or ""
                 wfile = util.localpath(wfile)
-                ck, p = waschecked.get(wfile, (stat in 'MAR', False))
+                defcheck = stat in 'MAR' and wfile not in self.excludes
+                ck, p = waschecked.get(wfile, (defcheck, False))
                 model.append([ck, stat, hglib.toutf(wfile), wfile, mst, p])
 
         self.auto_check() # may check more files

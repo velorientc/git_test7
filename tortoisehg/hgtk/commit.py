@@ -21,7 +21,8 @@ from mercurial import ui, hg, util, patch, cmdutil
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
-from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED, FM_PATH_UTF8
+from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
+from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
 from tortoisehg.hgtk import gtklib, thgconfig, gdialog, hgcmd
 
 class BranchOperationDialog(gtk.Dialog):
@@ -153,11 +154,12 @@ class GCommit(GStatus):
         return 'ui.username'
 
     def auto_check(self):
-        if self.test_opt('check'):
-            for entry in self.filemodel:
-                if entry[FM_STATUS] in 'MAR':
-                    entry[FM_CHECKED] = True
-            self.update_check_count()
+        if not self.test_opt('check'):
+            return
+        for row in self.filemodel:
+            if row[FM_STATUS] in 'MAR' and row[FM_PATH] not in self.excludes:
+                row[FM_CHECKED] = True
+        self.update_check_count()
         self.opts['check'] = False
 
 
@@ -269,8 +271,36 @@ class GCommit(GStatus):
         status_body = GStatus.get_body(self)
 
         vbox = gtk.VBox()
-        mbox = gtk.HBox()
 
+        # Advanced bar
+        self.advanced_frame = gtk.VBox()
+        adv_hbox = gtk.HBox()
+        self.advanced_frame.pack_start(adv_hbox, False, False)
+        adv_hbox.pack_start(gtk.Label(_('Committer:')), False, False, 2)
+
+        liststore = gtk.ListStore(str)
+        self.committer_cbbox = gtk.ComboBoxEntry(liststore)
+        cell = gtk.CellRendererText()
+        self.committer_cbbox.pack_start(cell, True)
+        adv_hbox.pack_start(self.committer_cbbox, True, True, 2)
+        self._mru_committers = self.settings.mrul('recent_committers')
+        self.update_recent_committers()
+        committer = self.repo.ui.config('ui', 'username')
+        if committer:
+            self.update_recent_committers(committer)
+        self.committer_cbbox.set_active(0)
+
+        adv_hbox.pack_start(gtk.Label(_('Auto-includes:')), False, False, 2)
+        self.autoinc_entry = gtk.Entry()
+        adv_hbox.pack_start(self.autoinc_entry, False, False, 2)
+        self.autopush = gtk.CheckButton(_('Push after commit'))
+        pushafterci = self.repo.ui.configbool('tortoisehg', 'pushafterci')
+        self.autopush.set_active(pushafterci)
+        adv_hbox.pack_start(self.autopush, False, False, 2)
+
+        vbox.pack_start(self.advanced_frame, False, False, 2)
+
+        mbox = gtk.HBox()
         self.connect('thg-accept', self.thgaccept)
         self.branchbutton = gtk.Button()
         self.branchbutton.connect('clicked', self.branch_clicked)
@@ -304,6 +334,7 @@ class GCommit(GStatus):
         vbox.pack_start(mbox, False, False)
         self._mru_messages = self.settings.mrul('recent_messages')
 
+        # change message field
         frame = gtk.Frame()
         frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
@@ -317,38 +348,11 @@ class GCommit(GStatus):
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
 
-        self.advanced_frame = gtk.Frame(_('Advanced'))
-        adv_hbox = gtk.HBox(spacing=2)
-        adv_hbox.pack_start(gtk.Label(_('Committer:')), False, False, 2)
-
-        liststore = gtk.ListStore(str)
-        self.committer_cbbox = gtk.ComboBoxEntry(liststore)
-        cell = gtk.CellRendererText()
-        self.committer_cbbox.pack_start(cell, True)
-        adv_hbox.pack_start(self.committer_cbbox, True, True, 2)
-        self._mru_committers = self.settings.mrul('recent_committers')
-        self.update_recent_committers()
-        committer = self.repo.ui.config('ui', 'username')
-        if committer:
-            self.update_recent_committers(committer)
-        self.committer_cbbox.set_active(0)
-
-        adv_hbox.pack_start(gtk.Label(_('Auto-includes:')), False, False, 2)
-        self.autoinc_entry = gtk.Entry()
-        adv_hbox.pack_start(self.autoinc_entry, False, False, 2)
-        self.autopush = gtk.CheckButton(_('Push after commit'))
-        pushafterci = self.repo.ui.configbool('tortoisehg', 'pushafterci')
-        self.autopush.set_active(pushafterci)
-        adv_hbox.pack_start(self.autopush, False, False, 2)
-        self.advanced_frame.add(adv_hbox)
-        vbox.pack_start(self.advanced_frame, False, False, 2)
-
         vbox2 = gtk.VBox()
         vbox2.pack_start(status_body)
 
-        self.parents_frame = gtk.Frame(_('Parent'))
-        parents_vbox = gtk.VBox(spacing=2)
-        self.parents_frame.add(parents_vbox)
+        parents_vbox = gtk.VBox(spacing=1)
+        self.parents_frame = parents_vbox
         def plabel():
             w = gtk.Label()
             w.set_selectable(True)
@@ -358,7 +362,8 @@ class GCommit(GStatus):
             return w
         self.parent1_label = plabel()
         self.parent2_label = plabel()
-        vbox2.pack_start(self.parents_frame, False, False)
+        parents_vbox.pack_start(gtk.HSeparator())
+        vbox2.pack_start(parents_vbox, False, False)
 
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
@@ -475,9 +480,10 @@ class GCommit(GStatus):
                                 ctx.description().split('\n')[0]))
             face = 'monospace'
             size = '9000'
+            t = _('Parent: ')
 
             format = '<span face="%s" size="%s">%s (%s) </span>'
-            t = format % (face, size, revision, hash)
+            t += format % (face, size, revision, hash)
 
             if not ishead and not self.mqmode:
                 format = '<b>[%s]</b>  '
@@ -503,9 +509,7 @@ class GCommit(GStatus):
             self.parent2_label.hide()
         else:
             setlabel(self.parent2_label, ctxs[1], isheads[1])
-
             self.parent2_label.show()
-            self.parents_frame.set_label(_('Parents'))
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
