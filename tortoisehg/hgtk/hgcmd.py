@@ -293,6 +293,9 @@ class CmdWidget(gtk.VBox):
             self.hgthread.start()
             gobject.timeout_add(10, self.process_queue, callback, args, kargs)
 
+    def is_alive(self):
+        return self.hgthread and self.hgthread.isAlive()
+
     def stop(self):
         """
         Terminate the thread forcibly.
