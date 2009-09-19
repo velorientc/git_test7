@@ -428,8 +428,10 @@ class GDialog(gtk.Window):
            [(_('Changelog'), False, self.launch, ['log'], 'menulog.ico'),
             (_('Commit'), False, self.launch, ['commit'], 'menucommit.ico'),
             (_('Datamine'), False, self.launch, ['datamine'], 'menurepobrowse.ico'),
-            (_('Synchronize'), False, self.launch, ['synch'], 'menusynch.ico'),
+            (_('Recovery'), False, self.launch, ['recover'], 'general.ico'),
+            (_('Serve'), False, self.launch, ['serve'], 'proxy.ico'),
             (_('Shelve'), False, self.launch, ['shelve'], 'shelve.ico'),
+            (_('Synchronize'), False, self.launch, ['synch'], 'menusynch.ico'),
             (_('Settings'), False, self.launch, ['repoconfig'], 'settings_repo.ico')])
            ] + menus + [
           (_('Help'),
