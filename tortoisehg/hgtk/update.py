@@ -22,10 +22,6 @@ BRANCH_TIP = _('= Current Branch Tip =')
 MODE_NORMAL   = 'normal'
 MODE_UPDATING = 'updating'
 
-OPT_CHECK = 0
-OPT_CLEAN = 1
-OPT_MERGE = 2
-
 class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
     def __init__(self, rev=None):
@@ -92,12 +88,20 @@ class UpdateDialog(gtk.Dialog):
             combo.append_text(t)
 
         # options
-        self.optlist = gtk.combo_box_new_text()
-        self.optlist.append_text(_('Check local changes (--check)'))
-        self.optlist.append_text(_('Discard local changes (--clean)'))
-        self.optlist.append_text(_('Allow merge (default)'))
-        self.optlist.set_active(OPT_CHECK)
-        addrow(_('Option:'), self.optlist, expand=False)
+        self.opt_buttons = []
+        group = gtk.RadioButton(None, _('Allow merge with local changes (default)'))
+        addrow('', group, expand=False)
+        self.opt_buttons.append(group)
+
+        btn = gtk.RadioButton(group, _('Abort if local changes found (-c/--check)'))
+        addrow('', btn, expand=False)
+        self.opt_buttons.append(btn)
+        self.opt_check = btn
+
+        btn = gtk.RadioButton(group, _('Discard local changes, no backup (-C/--clean)'))
+        addrow('', btn, expand=False)
+        self.opt_buttons.append(btn)
+        self.opt_clean = btn
 
         # prepare to show
         self.updatebtn.grab_focus()
@@ -137,15 +141,18 @@ class UpdateDialog(gtk.Dialog):
         if mode == MODE_NORMAL:
             normal = True
             self.closebtn.grab_focus()
+            for btn in self.opt_buttons:
+                btn.set_sensitive(True)
         elif mode == MODE_UPDATING:
             normal = False
             self.cancelbtn.grab_focus()
+            for btn in self.opt_buttons:
+                btn.set_sensitive(False)
         else:
             raise _('unknown mode name: %s') % mode
         updating = not normal
 
         self.table.set_sensitive(normal)
-        self.optlist.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
@@ -160,10 +167,9 @@ class UpdateDialog(gtk.Dialog):
         if rev != BRANCH_TIP:
             cmdline.append('--rev')
             cmdline.append(rev)
-        opt = self.optlist.get_active()
-        if opt == OPT_CHECK:
+        if self.opt_check.get_active():
             cmdline.append('--check')
-        elif opt == OPT_CLEAN:
+        elif self.opt_clean.get_active():
             cmdline.append('--clean')
 
         def cmd_done(returncode):
