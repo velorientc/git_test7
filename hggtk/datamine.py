@@ -178,8 +178,9 @@ class DataMineDialog(gdialog.GDialog):
         ctx = self.repo[rev]
         author = hglib.toutf(util.shortuser(ctx.user()))
         date = hglib.toutf(hglib.displaytime(ctx.date()))
-        summary = gtklib.markup_escape_text(hglib.toutf(hglib.tounicode(
-                ctx.description()).replace(u'\0', '').splitlines()[0]))
+        text = hglib.tounicode(ctx.description()).replace(u'\0', '')
+        lines = text.splitlines()
+        summary = gtklib.markup_escape_text(lines and lines[0] or '')
         desc = '%s@%s %s "%s"' % (author, rev, date, summary)
         self.changedesc[rev] = (desc, author)
         return (desc, author)

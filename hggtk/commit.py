@@ -191,13 +191,14 @@ class GCommit(GStatus):
         self.update_recent_messages()
 
     def update_recent_messages(self, msg=None):
-        if msg is not None:
+        if msg:
             self._mru_messages.add(msg)
             self.settings.write()
             if self.popupid is not None: return
         liststore = self.msg_cbbox.get_model()
         liststore.clear()
         for msg in self._mru_messages:
+            if not msg: continue
             sumline = hglib.toutf(hglib.tounicode(msg).splitlines()[0])
             liststore.append([sumline, msg])
 

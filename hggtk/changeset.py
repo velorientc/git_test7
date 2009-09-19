@@ -155,8 +155,8 @@ class ChangeSet(gdialog.GDialog):
         title_line(_('user/date:'), ctx.user() + '\t' + date, 'changeset')
         for pctx in ctx.parents():
             try:
-                summary = pctx.description().splitlines()[0]
-                summary = toutf(summary)
+                lines = pctx.description().splitlines()
+                summary = toutf(lines and lines[0] or '')
             except:
                 summary = ""
             change = str(pctx.rev()) + ' : ' + str(pctx)
@@ -168,8 +168,8 @@ class ChangeSet(gdialog.GDialog):
             buf.insert(eob, "\n")
         for cctx in ctx.children():
             try:
-                summary = cctx.description().splitlines()[0]
-                summary = toutf(summary)
+                lines = cctx.description().splitlines()
+                summary = toutf(lines and lines[0] or '')
             except:
                 summary = ""
             change = str(cctx.rev()) + ' : ' + str(cctx)
