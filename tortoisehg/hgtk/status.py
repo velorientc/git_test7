@@ -421,10 +421,7 @@ class GStatus(gdialog.GDialog):
 
     def get_extras(self):
         self.stbar = gtklib.StatusBar()
-        hbox = gtk.HBox()
-        hbox.pack_start(self.stbar)
-        hbox.pack_start(gtk.Label(''), True, True, 2)
-        return hbox
+        return self.stbar
 
     def add_header_checkbox(self, col, post=None, pre=None, toggle=False):
         def cbclick(hdr, cb):
