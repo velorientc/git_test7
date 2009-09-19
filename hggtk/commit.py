@@ -651,9 +651,8 @@ class GCommit(GStatus):
         cmdline  = ['hg', 'commit', '--verbose', '--repository', self.repo.root]
 
         if self.nextbranch:
-            newbranch = hglib.fromutf(self.nextbranch)
-            if newbranch in self.repo.branchtags():
-                if newbranch not in [p.branch() for p in self.repo.parents()]:
+            if self.nextbranch in self.repo.branchtags():
+                if self.nextbranch in [p.branch() for p in self.repo.parents()]:
                     response = gdialog.Confirm(_('Confirm Override Branch'),
                             [], self, _('A branch named "%s" already exists,\n'
                         'override?') % self.nextbranch).run()
@@ -663,7 +662,7 @@ class GCommit(GStatus):
                 response = gdialog.Confirm(_('Confirm New Branch'), [], self,
                         _('Create new named branch "%s"?') % self.nextbranch).run()
             if response == gtk.RESPONSE_YES:
-                self.repo.dirstate.setbranch(newbranch)
+                self.repo.dirstate.setbranch(self.nextbranch)
             elif response != gtk.RESPONSE_NO:
                 return
         elif self.closebranch:
