@@ -394,7 +394,7 @@ class GStatus(gdialog.GDialog):
             scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             scroller.add(self.preview_text)
             self.diff_notebook.append_page(scroller,
-                    gtk.Label(_('Preview Selection')))
+                    gtk.Label(_('Commit Preview')))
 
         diff_frame.add(self.diff_notebook)
 
