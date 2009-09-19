@@ -706,10 +706,10 @@ class GLog(gdialog.GDialog):
         vbox = gtk.VBox()
         vbox.pack_start(self.vpaned, True, True)
 
-        # Append status bar
-        vbox.pack_start(gtk.HSeparator(), False, False)
-        vbox.pack_start(self.stbar, False, False)
         return vbox
+
+    def get_extras(self):
+        return self.stbar
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
