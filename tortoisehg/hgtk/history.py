@@ -100,7 +100,7 @@ class GLog(gdialog.GDialog):
         if len(lb) > 1 or (lb and lb[0] != 'default'):
             bmenus.append(('----', None, None, None, None))
             for name in lb[:10]:
-                bmenus.append((name, False, navigate, [name], None))
+                bmenus.append((hglib.toutf(name), False, navigate, [name], None))
             
         fnc = self.toggle_view_column
         return [(_('View'), [
@@ -649,7 +649,7 @@ class GLog(gdialog.GDialog):
 
         branchcombo = gtk.combo_box_new_text()
         for name in self.get_live_branches():
-            branchcombo.append_text(name)
+            branchcombo.append_text(hglib.toutf(name))
         branchcombo.connect('changed', self.select_branch)
         self.lastbranchrow = None
         filterbox.pack_start(branchcombo, False)
@@ -730,7 +730,7 @@ class GLog(gdialog.GDialog):
         deadbranches = [ x.strip() for x in dblist.split(',') ]
         for name in self.repo.branchtags().keys():
             if name not in deadbranches:
-                live.append(hglib.toutf(name))
+                live.append(name)
         return live
 
     def select_branch(self, combo):
