@@ -64,7 +64,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="shlwapi.lib"
 				LinkIncremental="2"
+				ModuleDefinitionFile="shellext.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -141,7 +143,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="shlwapi.lib"
 				LinkIncremental="2"
+				ModuleDefinitionFile="shellext.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
