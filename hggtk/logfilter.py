@@ -55,7 +55,7 @@ class FilterDialog(gtk.Dialog):
         self.tips.set_tip(eventbox, _('View revision graph of named branch'))
         self.vbox.pack_start(eventbox, False, False, 4)
         for name in self.repo.branchtags().keys():
-            self.branchlist.append([name])
+            self.branchlist.append([hglib.toutf(name)])
 
         # Revision range entries
         hbox = gtk.HBox()
