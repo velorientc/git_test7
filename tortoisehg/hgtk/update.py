@@ -22,6 +22,10 @@ BRANCH_TIP = _('= Current Branch Tip =')
 MODE_NORMAL   = 'normal'
 MODE_UPDATING = 'updating'
 
+OPT_CHECK = 0
+OPT_CLEAN = 1
+OPT_MERGE = 2
+
 class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
     def __init__(self, rev=None):
@@ -49,16 +53,29 @@ class UpdateDialog(gtk.Dialog):
         self.action_area.pack_end(self.updatebtn)
         self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
+        # layout table
+        self.table = table = gtk.Table(1, 2)
+        self.vbox.pack_start(table, True, True, 2)
+        # copy from 'thgconfig.py'
+        def addrow(text, widget, expand=True):
+            label = gtk.Label(text)
+            label.set_alignment(1, 0.5)
+            row = table.get_property('n-rows')
+            table.set_property('n-rows', row + 1)
+            table.attach(label, 0, 1, row, row + 1, gtk.FILL, 0, 4, 2)
+            if not expand:
+                hbox = gtk.HBox()
+                hbox.pack_start(widget, False, False)
+                hbox.pack_start(gtk.Label(''))
+                widget = hbox
+            table.attach(widget, 1, 2, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
+
         # revision label & combobox
-        self.revhbox = hbox = gtk.HBox()
-        lbl = gtk.Label(_('Update to:'))
-        hbox.pack_start(lbl, False, False, 2)
         self.revcombo = combo = gtk.combo_box_entry_new_text()
         entry = combo.child
         entry.connect('activate', lambda b: self.update(repo))
         entry.set_width_chars(38)
-        hbox.pack_start(combo, True, True, 2)
-        self.vbox.pack_start(hbox, False, False, 4)
+        addrow(_('Update to:'), self.revcombo)
 
         # fill list of combo
         if rev != None:
@@ -74,9 +91,13 @@ class UpdateDialog(gtk.Dialog):
         for t in tags:
             combo.append_text(t)
 
-        # option
-        self.optclean = gtk.CheckButton(_('Overwrite local changes (--clean)'))
-        self.vbox.pack_start(self.optclean, False, False, 4)
+        # options
+        self.optlist = gtk.combo_box_new_text()
+        self.optlist.append_text(_('Check local changes (--check)'))
+        self.optlist.append_text(_('Discard local changes (--clean)'))
+        self.optlist.append_text(_('Allow merge (default)'))
+        self.optlist.set_active(OPT_CHECK)
+        addrow(_('Option:'), self.optlist, expand=False)
 
         # prepare to show
         self.updatebtn.grab_focus()
@@ -123,8 +144,8 @@ class UpdateDialog(gtk.Dialog):
             raise _('unknown mode name: %s') % mode
         updating = not normal
 
-        self.revhbox.set_sensitive(normal)
-        self.optclean.set_sensitive(normal)
+        self.table.set_sensitive(normal)
+        self.optlist.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
@@ -134,16 +155,16 @@ class UpdateDialog(gtk.Dialog):
     def update(self, repo):
         self.switch_to(MODE_UPDATING)
 
-        clean = self.optclean.get_active()
-        rev = self.revcombo.get_active_text()
         cmdline = ['hg', 'update', '--verbose']
+        rev = self.revcombo.get_active_text()
         if rev != BRANCH_TIP:
             cmdline.append('--rev')
             cmdline.append(rev)
-        if clean:
-            cmdline.append('--clean')
-        else:
+        opt = self.optlist.get_active()
+        if opt == OPT_CHECK:
             cmdline.append('--check')
+        elif opt == OPT_CLEAN:
+            cmdline.append('--clean')
 
         def cmd_done(returncode):
             self.switch_to(MODE_NORMAL, cmd=False)
