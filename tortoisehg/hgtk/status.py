@@ -88,6 +88,7 @@ class GStatus(gdialog.GDialog):
         self.filerowstart = {}
         self.filechunks = {}
         self.status_error = None
+        self.preview_tab_name_label = None
 
     def auto_check(self):
         # Only auto-check files once, and only if a pattern was given.
@@ -393,8 +394,8 @@ class GStatus(gdialog.GDialog):
             scroller = gtk.ScrolledWindow()
             scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             scroller.add(self.preview_text)
-            self.diff_notebook.append_page(scroller,
-                    gtk.Label(_('Commit Preview')))
+            self.preview_tab_name_label = gtk.Label(self.get_preview_tab_name())
+            self.diff_notebook.append_page(scroller, self.preview_tab_name_label)
 
         diff_frame.add(self.diff_notebook)
 
@@ -475,7 +476,21 @@ class GStatus(gdialog.GDialog):
     def refresh_complete(self):
         pass
 
+    def get_preview_tab_name(self):
+        if self.mqmode:
+            res = _('Patch Preview')
+        else:
+            res = _('Commit Preview')
+        return res
+
     ### End of overrides ###
+
+    def set_preview_tab_name(self, name=None):
+        if self.preview_tab_name_label == None:
+            return
+        if name == None:
+            name = self.get_preview_tab_name()
+        self.preview_tab_name_label.set_text(name)
 
     def types_expander_expanded(self, expander, dummy):
         if expander.get_expanded():
@@ -688,6 +703,7 @@ class GStatus(gdialog.GDialog):
                 self.stbar.end()
                 return False
 
+        self.set_preview_tab_name()
         repo = self.repo
         hglib.invalidaterepo(repo)
         if hasattr(repo, 'mq'):
