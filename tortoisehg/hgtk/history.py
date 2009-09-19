@@ -730,7 +730,7 @@ class GLog(gdialog.GDialog):
         deadbranches = [ x.strip() for x in dblist.split(',') ]
         for name in self.repo.branchtags().keys():
             if name not in deadbranches:
-                live.append(name)
+                live.append(hglib.toutf(name))
         return live
 
     def select_branch(self, combo):
