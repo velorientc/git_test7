@@ -93,6 +93,7 @@ class UpdateDialog(gtk.Dialog):
 
         # summary of new revision
         label = gtk.Label('-')
+        label.set_selectable(True)
         hb = gtk.HBox()
         hb.pack_start(label, False, False)
         addrow('', hb, expand=False)
@@ -100,6 +101,7 @@ class UpdateDialog(gtk.Dialog):
 
         # summary of current revision
         label = gtk.Label('-')
+        label.set_selectable(True)
         hb = gtk.HBox()
         hb.pack_start(label, False, False)
         self.current_rev_label1 = label
@@ -108,6 +110,7 @@ class UpdateDialog(gtk.Dialog):
         if len(self.ctxs) == 2:
             addrow(_('Parent 1:'), hb, expand=False)
             label = gtk.Label('-')
+            label.set_selectable(True)
             hb = gtk.HBox()
             hb.pack_start(label, False, False)
             addrow('Parent 2:', hb, expand=False)
