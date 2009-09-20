@@ -138,6 +138,7 @@ class GDialog(gtk.Window):
         self.opts = opts
         self.tmproot = None
         self.toolbuttons = {}
+        self.menuitems = {}
         self.settings = settings.Settings(self.__class__.__name__)
         self.init()
 
@@ -329,6 +330,9 @@ class GDialog(gtk.Window):
     def get_toolbutton(self, label):
         return self.toolbuttons[label]
 
+    def get_menuitem(self, label):
+        return self.menuitems.get(label, None)
+
     def get_reponame(self):
         if self.repo.ui.config('tortoisehg', 'fullpath', False):
             name = self.repo.root
@@ -464,6 +468,7 @@ class GDialog(gtk.Window):
                         else:
                             item = gtk.MenuItem(name)
                         item.connect('activate', func, *args)
+                        self.menuitems[name] = item
                     menu.append(item)
                 item = gtk.MenuItem(title)
                 item.set_submenu(menu)
