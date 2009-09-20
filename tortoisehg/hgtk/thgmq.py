@@ -374,7 +374,7 @@ class MQWidget(gtk.VBox):
 
     def qfold(self, patch):
         """
-        [MQ] Execute 'qdelete' command.
+        [MQ] Execute 'qfold' command.
 
         patch: the patch name or an index to specify the patch.
         """
