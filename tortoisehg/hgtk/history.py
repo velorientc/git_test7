@@ -160,14 +160,6 @@ class GLog(gdialog.GDialog):
             self.branch_color = active
             self.reload_log()
 
-    def toggle_graphcol(self, button):
-        active = button.get_active()
-        if self.graphcol != active:
-            self.graphcol = active
-            self.reload_log()
-            # TODO: this could be tricky
-            #self.compactgraph_button.set_sensitive(self.graphcol)
-
     def toggle_compactgraph(self, button):
         active = button.get_active()
         if self.compactgraph != active:
