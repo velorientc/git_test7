@@ -78,8 +78,13 @@ class UpdateDialog(gtk.Dialog):
         else:
             combo.append_text(repo.dirstate.branch())
         combo.set_active(0)
-        for b in repo.branchtags():
-            combo.append_text(b)
+
+        dblist = self.repo.ui.config('tortoisehg', 'deadbranch', '')
+        deadbranches = [ x.strip() for x in dblist.split(',') ]
+        for name in self.repo.branchtags().keys():
+            if name not in deadbranches:
+                combo.append_text(name)
+
         tags = list(repo.tags())
         tags.sort()
         tags.reverse()
