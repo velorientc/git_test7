@@ -459,12 +459,11 @@ class GStatus(gdialog.GDialog):
         if self.count_revs() == 2:
             return
         sensitive = check_count and not self.merging
-        self.get_toolbutton(_('_Diff')).set_sensitive(sensitive)
-        self.get_toolbutton(_('Re_vert')).set_sensitive(sensitive)
-        self.get_toolbutton(_('_Add')).set_sensitive(sensitive)
-        self.get_toolbutton(_('_Remove')).set_sensitive(sensitive)
-        self.get_toolbutton(_('Move')).set_sensitive(sensitive)
-        self.get_toolbutton(_('_Forget')).set_sensitive(sensitive)
+        for label in (_('_Diff'), _('Re_vert'), _('_Add'), _('_Remove'),
+                      _('Move'), _('_Forget')):
+            self.get_toolbutton(label).set_sensitive(sensitive)
+            i = self.get_menuitem(label)
+            if i: i.set_sensitive(sensitive)
         if self.diff_notebook.get_current_page() == 2:
             self.update_selection_preview()
 

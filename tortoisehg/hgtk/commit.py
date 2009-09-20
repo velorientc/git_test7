@@ -183,15 +183,15 @@ class GCommit(GStatus):
             ('----', None, None, None, None),
             (_('Refresh'), False, refresh, [], gtk.STOCK_REFRESH)]),
            (_('Operations'), [
-            (_('Commit'), no, self.commit_clicked, [], gtk.STOCK_OK),
-            (_('Undo'), no, self.undo_clicked, [], gtk.STOCK_UNDO),
+            (_('_Commit'), no, self.commit_clicked, [], gtk.STOCK_OK),
+            (_('_Undo'), no, self.undo_clicked, [], gtk.STOCK_UNDO),
             ('----', None, None, None, None),
-            (_('Diff'), no, self.diff_clicked, [], gtk.STOCK_JUSTIFY_FILL),
-            (_('Revert'), no, self.revert_clicked, [], gtk.STOCK_MEDIA_REWIND),
-            (_('Add'), no, self.add_clicked, [], gtk.STOCK_ADD),
+            (_('_Diff'), no, self.diff_clicked, [], gtk.STOCK_JUSTIFY_FILL),
+            (_('Re_vert'), no, self.revert_clicked, [], gtk.STOCK_MEDIA_REWIND),
+            (_('_Add'), no, self.add_clicked, [], gtk.STOCK_ADD),
+            (_('_Remove'), no, self.remove_clicked, [], gtk.STOCK_DELETE),
             (_('Move'), no, self.move_clicked, [], gtk.STOCK_JUMP_TO),
-            (_('Remove'), no, self.remove_clicked, [], gtk.STOCK_DELETE),
-            (_('Forget'), no, self.forget_clicked, [], gtk.STOCK_CLEAR)]),
+            (_('_Forget'), no, self.forget_clicked, [], gtk.STOCK_CLEAR)]),
            ]
 
     def save_settings(self):
@@ -559,6 +559,7 @@ class GCommit(GStatus):
         can_undo = os.path.exists(self.repo.sjoin("undo")) and \
                 self.last_commit_id is not None
         self.undo_button.set_sensitive(can_undo)
+        self.get_menuitem(_('_Undo')).set_sensitive(can_undo)
 
     def check_merge(self):
         if self.merging:
