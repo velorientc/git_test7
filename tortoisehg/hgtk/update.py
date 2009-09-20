@@ -17,8 +17,6 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
-BRANCH_TIP = _('= Current Branch Tip =')
-
 MODE_NORMAL   = 'normal'
 MODE_UPDATING = 'updating'
 
@@ -77,7 +75,7 @@ class UpdateDialog(gtk.Dialog):
         if rev != None:
             combo.append_text(str(rev))
         else:
-            combo.append_text(BRANCH_TIP)
+            combo.append_text(repo.dirstate.branch())
         combo.set_active(0)
         for b in repo.branchtags():
             combo.append_text(b)
@@ -164,9 +162,8 @@ class UpdateDialog(gtk.Dialog):
 
         cmdline = ['hg', 'update', '--verbose']
         rev = self.revcombo.get_active_text()
-        if rev != BRANCH_TIP:
-            cmdline.append('--rev')
-            cmdline.append(rev)
+        cmdline.append('--rev')
+        cmdline.append(rev)
         if self.opt_check.get_active():
             cmdline.append('--check')
         elif self.opt_clean.get_active():
