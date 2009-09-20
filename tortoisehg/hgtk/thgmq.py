@@ -301,7 +301,7 @@ class MQWidget(gtk.VBox):
             cmdline.append('--all')
         self.cmd.execute(cmdline, self.cmd_done)
 
-    def qdelete(self, patch):
+    def qdelete(self, patch, keep=False):
         """
         [MQ] Execute 'qdelete' command.
 
@@ -310,6 +310,8 @@ class MQWidget(gtk.VBox):
         if not self.has_patch():
             return
         cmdline = ['hg', 'qdelete', patch]
+        if keep:
+            cmdline.append('--keep')
         self.cmd.execute(cmdline, self.cmd_done, noemit=True)
 
     def qrename(self, name, patch='qtip'):
@@ -519,6 +521,7 @@ class MQWidget(gtk.VBox):
             append(_('_finish applied'), self.finish_activated)
         if not is_applied and not is_qparent:
             append(_('_delete'), self.delete_activated)
+            append(_('delete --keep'), self.delete_keep_activated)
             if has_applied and not is_qparent:
                 append(_('f_old'), self.fold_activated)
 
@@ -667,6 +670,9 @@ class MQWidget(gtk.VBox):
     def delete_activated(self, menuitem, row):
         self.qdelete(row[MQ_NAME])
 
+    def delete_keep_activated(self, menuitem, row):
+        self.qdelete(row[MQ_NAME], keep=True)
+    
     def rename_activated(self, menuitem, row):
         self.qrename_ui(row[MQ_NAME])
 
