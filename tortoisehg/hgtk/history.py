@@ -248,6 +248,10 @@ class GLog(gdialog.GDialog):
                     if self.graphcol != show:
                         self.graphcol = show
                         reload = True
+                        item = self.get_menuitem(_('Compact Graph'))
+                        item.set_sensitive(self.graphcol)
+                        item = self.get_menuitem(_('Color by Branch'))
+                        item.set_sensitive(self.graphcol)
                 else:
                     self.graphview.set_property(property, show)
                     self.showcol[property] = show
@@ -345,6 +349,8 @@ class GLog(gdialog.GDialog):
             if col in self.showcol:
                 self.graphview.set_property(col+'-column-visible',
                         self.showcol[col])
+        self.get_menuitem(_('Compact Graph')).set_sensitive(self.graphcol)
+        self.get_menuitem(_('Color by Branch')).set_sensitive(self.graphcol)
 
         # enable MQ panel
         self.enable_mqpanel()
