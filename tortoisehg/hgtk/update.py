@@ -34,6 +34,7 @@ class UpdateDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
+            self.repo = repo
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
@@ -69,7 +70,7 @@ class UpdateDialog(gtk.Dialog):
         entry = combo.child
         entry.connect('activate', lambda b: self.update(repo))
         entry.set_width_chars(38)
-        addrow(_('Update to:'), self.revcombo)
+        addrow(_('Update to:'), self.revcombo, expand=False)
 
         # fill list of combo
         if rev != None:
@@ -85,10 +86,26 @@ class UpdateDialog(gtk.Dialog):
         for t in tags:
             combo.append_text(t)
 
+        # summary of current revision
+        label = gtk.Label('<current revision>')
+        hb = gtk.HBox()
+        hb.pack_start(label, False, False)
+        addrow('Current:', hb, expand=False)
+        self.current_rev_label = label
+
+        # summary of new revision
+        label = gtk.Label('<new revision>')
+        hb = gtk.HBox()
+        hb.pack_start(label, False, False)
+        addrow('New:', hb, expand=False)
+        self.new_rev_label = label
+
+        self.update_revisions()
+
         # options
         self.opt_buttons = []
         group = gtk.RadioButton(None, _('Allow merge with local changes (default)'))
-        addrow('', group, expand=False)
+        addrow(_('Options:'), group, expand=False)
         self.opt_buttons.append(group)
 
         btn = gtk.RadioButton(group, _('Abort if local changes found (-c/--check)'))
@@ -100,6 +117,8 @@ class UpdateDialog(gtk.Dialog):
         addrow('', btn, expand=False)
         self.opt_buttons.append(btn)
         self.opt_clean = btn
+
+        self.revcombo.connect('changed', lambda b: self.update_revisions())
 
         # prepare to show
         self.updatebtn.grab_focus()
@@ -156,6 +175,35 @@ class UpdateDialog(gtk.Dialog):
         if cmd:
             self.cmd.set_property('visible', updating)
         self.cancelbtn.set_property('visible', updating)
+
+    def update_revisions(self):
+        def setlabel(label, ctx):
+            revision = str(ctx.rev())
+            hash = str(ctx)
+            summary = gtklib.markup_escape_text(hglib.toutf(
+                                ctx.description().split('\n')[0]))
+            face = 'monospace'
+            size = '9000'
+
+            format = '<span face="%s" size="%s">%s (%s) </span>'
+            t = format % (face, size, revision, hash)
+
+            branch = ctx.branch()
+            if branch != 'default':
+                format = '<span color="%s" background="%s"> %s </span> '
+                t += format % ('black', '#aaffaa', branch)
+
+            tags = self.repo.nodetags(ctx.node())
+            format = '<span color="%s" background="%s"> %s </span> '
+            for tag in tags:
+                t += format % ('black', '#ffffaa', tag)
+
+            t += summary
+            label.set_markup(t)
+        
+        setlabel(self.current_rev_label, self.repo['.'])
+        newrev = self.revcombo.get_active_text()
+        setlabel(self.new_rev_label, self.repo[newrev])
 
     def update(self, repo):
         self.switch_to(MODE_UPDATING)
