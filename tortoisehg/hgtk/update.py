@@ -86,24 +86,30 @@ class UpdateDialog(gtk.Dialog):
         for t in tags:
             combo.append_text(t)
 
-        # summary of current revision
-        label = gtk.Label('-')
-        hb = gtk.HBox()
-        hb.pack_start(label, False, False)
-        addrow('Parent 1:', hb, expand=False)
-        self.current_rev_label1 = label
-        label = gtk.Label('-')
-        hb = gtk.HBox()
-        hb.pack_start(label, False, False)
-        addrow('Parent 2:', hb, expand=False)
-        self.current_rev_label2 = label
-
         # summary of new revision
         label = gtk.Label('-')
         hb = gtk.HBox()
         hb.pack_start(label, False, False)
-        addrow('Target:', hb, expand=False)
+        addrow('', hb, expand=False)
         self.new_rev_label = label
+
+        # summary of current revision
+        label = gtk.Label('-')
+        hb = gtk.HBox()
+        hb.pack_start(label, False, False)
+        self.current_rev_label1 = label
+
+        self.ctxs = self.repo[None].parents()
+        if len(self.ctxs) == 2:
+            addrow(_('Parent 1:'), hb, expand=False)
+            label = gtk.Label('-')
+            hb = gtk.HBox()
+            hb.pack_start(label, False, False)
+            addrow('Parent 2:', hb, expand=False)
+            self.current_rev_label2 = label
+        else:
+            addrow(_('Current:'), hb, expand=False)
+            self.current_rev_label2 = None
 
         self.update_revisions()
 
@@ -206,12 +212,10 @@ class UpdateDialog(gtk.Dialog):
             t += summary
             label.set_markup(t)
 
-        ctxs = self.repo[None].parents()
+        ctxs = self.ctxs
         setlabel(self.current_rev_label1, ctxs[0])
         if len(ctxs) == 2:
             setlabel(self.current_rev_label2, ctxs[1])
-        else:
-            self.current_rev_label2.set_text(_('<not set>'))
         newrev = self.revcombo.get_active_text()
         setlabel(self.new_rev_label, self.repo[newrev])
 
