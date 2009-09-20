@@ -1,4 +1,4 @@
-﻿# update.py - TortoiseHg's dialog for updating repo
+# update.py - TortoiseHg's dialog for updating repo
 #
 # Copyright 2007 TK Soh <teekaysoh@gmail.com>
 # Copyright 2007 Steve Borho <steve@borho.org>
