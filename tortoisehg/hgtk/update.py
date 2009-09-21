@@ -122,19 +122,15 @@ class UpdateDialog(gtk.Dialog):
         self.update_revisions()
 
         # options
-        self.opt_buttons = []
         group = gtk.RadioButton(None, _('Allow merge with local changes (default)'))
         addrow(_('Options:'), group, expand=False)
-        self.opt_buttons.append(group)
 
         btn = gtk.RadioButton(group, _('Abort if local changes found (-c/--check)'))
         addrow('', btn, expand=False)
-        self.opt_buttons.append(btn)
         self.opt_check = btn
 
         btn = gtk.RadioButton(group, _('Discard local changes, no backup (-C/--clean)'))
         addrow('', btn, expand=False)
-        self.opt_buttons.append(btn)
         self.opt_clean = btn
 
         self.revcombo.connect('changed', lambda b: self.update_revisions())
@@ -177,13 +173,9 @@ class UpdateDialog(gtk.Dialog):
         if mode == MODE_NORMAL:
             normal = True
             self.closebtn.grab_focus()
-            for btn in self.opt_buttons:
-                btn.set_sensitive(True)
         elif mode == MODE_UPDATING:
             normal = False
             self.cancelbtn.grab_focus()
-            for btn in self.opt_buttons:
-                btn.set_sensitive(False)
         else:
             raise _('unknown mode name: %s') % mode
         updating = not normal
