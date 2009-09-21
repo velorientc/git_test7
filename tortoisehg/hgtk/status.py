@@ -331,62 +331,59 @@ class GStatus(gdialog.GDialog):
         scroller.add(self.diff_text)
         self.append_page('text-diff', scroller, gtk.Label(_('Text Diff')))
 
-        if self.merging:
-            difftree = None
-        else:
-            # use treeview to show selectable diff hunks
-            sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
-            self.clipboard = gtk.Clipboard(selection=sel)
+        # use treeview to show selectable diff hunks
+        sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
+        self.clipboard = gtk.Clipboard(selection=sel)
 
-            self.diffmodel = gtk.ListStore(
-                    bool, # DM_REJECTED
-                    str,  # DM_DISP_TEXT
-                    bool, # DM_IS_HEADER
-                    str,  # DM_PATH
-                    int,  # DM_CHUNK_ID
-                    pango.FontDescription)
+        self.diffmodel = gtk.ListStore(
+                bool, # DM_REJECTED
+                str,  # DM_DISP_TEXT
+                bool, # DM_IS_HEADER
+                str,  # DM_PATH
+                int,  # DM_CHUNK_ID
+                pango.FontDescription)
 
-            difftree = gtk.TreeView(self.diffmodel)
+        difftree = gtk.TreeView(self.diffmodel)
 
-            # set CTRL-c accelerator for copy-clipboard
-            mod = gtklib.get_thg_modifier()
-            key, modifier = gtk.accelerator_parse(mod+'c')
-            difftree.add_accelerator('copy-clipboard', accelgroup, key,
-                            modifier, gtk.ACCEL_VISIBLE)
-            difftree.connect('copy-clipboard', self.copy_to_clipboard)
+        # set CTRL-c accelerator for copy-clipboard
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'c')
+        difftree.add_accelerator('copy-clipboard', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        difftree.connect('copy-clipboard', self.copy_to_clipboard)
 
-            difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-            difftree.set_headers_visible(False)
-            difftree.set_enable_search(False)
-            if getattr(difftree, 'enable-grid-lines', None) is not None:
-                difftree.set_property('enable-grid-lines', True)
-            difftree.connect('row-activated', self.diff_tree_row_act)
+        difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        difftree.set_headers_visible(False)
+        difftree.set_enable_search(False)
+        if getattr(difftree, 'enable-grid-lines', None) is not None:
+            difftree.set_property('enable-grid-lines', True)
+        difftree.connect('row-activated', self.diff_tree_row_act)
 
-            cell = gtk.CellRendererText()
-            diffcol = gtk.TreeViewColumn('diff', cell)
-            diffcol.set_resizable(True)
-            diffcol.add_attribute(cell, 'markup', DM_DISP_TEXT)
+        cell = gtk.CellRendererText()
+        diffcol = gtk.TreeViewColumn('diff', cell)
+        diffcol.set_resizable(True)
+        diffcol.add_attribute(cell, 'markup', DM_DISP_TEXT)
 
-            # differentiate header chunks
-            cell.set_property('cell-background', '#DDDDDD')
-            diffcol.add_attribute(cell, 'cell_background_set', DM_IS_HEADER)
-            self.headerfont = self.difffont.copy()
-            self.headerfont.set_weight(pango.WEIGHT_HEAVY)
+        # differentiate header chunks
+        cell.set_property('cell-background', '#DDDDDD')
+        diffcol.add_attribute(cell, 'cell_background_set', DM_IS_HEADER)
+        self.headerfont = self.difffont.copy()
+        self.headerfont.set_weight(pango.WEIGHT_HEAVY)
 
-            # differentiate rejected hunks
-            self.rejfont = self.difffont.copy()
-            self.rejfont.set_weight(pango.WEIGHT_LIGHT)
-            diffcol.add_attribute(cell, 'font-desc', DM_FONT)
-            cell.set_property('background', '#EEEEEE')
-            cell.set_property('foreground', '#888888')
-            diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
-            diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
-            difftree.append_column(diffcol)
-            scroller = gtk.ScrolledWindow()
-            scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-            scroller.add(difftree)
-            self.append_page('hunk-selection', scroller, 
-                gtk.Label(_('Hunk Selection')))
+        # differentiate rejected hunks
+        self.rejfont = self.difffont.copy()
+        self.rejfont.set_weight(pango.WEIGHT_LIGHT)
+        diffcol.add_attribute(cell, 'font-desc', DM_FONT)
+        cell.set_property('background', '#EEEEEE')
+        cell.set_property('foreground', '#888888')
+        diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
+        diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
+        difftree.append_column(diffcol)
+
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.add(difftree)
+        self.append_page('hunk-selection', scroller, gtk.Label(_('Hunk Selection')))
 
         # Add a page for commit preview
         self.preview_text = gtk.TextView()
@@ -928,7 +925,7 @@ class GStatus(gdialog.GDialog):
         status = model[row][FM_STATUS]
         enable = (status in 'MAR')
         self.enable_page('text-diff', enable)
-        self.enable_page('hunk-selection', enable)
+        self.enable_page('hunk-selection', enable and not self.merging)
 
         if page_num is None:
             page_num = self.diff_notebook.get_current_page()
@@ -1040,9 +1037,10 @@ class GStatus(gdialog.GDialog):
         wfile = self.filemodel[row][FM_PATH]
         self.filerowstart = {}
         self.diffmodel.clear()
-        self.append_diff_hunks(wfile)
-        if len(self.diffmodel):
-            tree.scroll_to_cell(0, use_align=True, row_align=0.0)
+        if not self.merging:
+            self.append_diff_hunks(wfile)
+            if len(self.diffmodel):
+                tree.scroll_to_cell(0, use_align=True, row_align=0.0)
 
     def read_file_chunks(self, wfile):
         'Get diffs of working file, parse into (c)hunks'
