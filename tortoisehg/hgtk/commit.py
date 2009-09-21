@@ -263,6 +263,8 @@ class GCommit(GStatus):
         if not self.autoinc_entry.get_text():
             autoinc = self.repo.ui.config('tortoisehg', 'autoinc', '')
             self.autoinc_entry.set_text(hglib.toutf(autoinc))
+        if self.qnew_name:
+            self.qnew_name.set_sensitive(not self.is_merge())
         if self.qnew:
             self.qnew_name.grab_focus() # set focus back
             self.qnew_name.set_position(-1)
@@ -314,6 +316,7 @@ class GCommit(GStatus):
             label = gtk.Label('QNew: ')
             mbox.pack_start(label, False, False, 2)
             self.qnew_name = gtk.Entry()
+            self.qnew_name.set_sensitive(not self.is_merge())
             self.qnew_name.set_width_chars(20)
             self.qnew_name.connect('changed', self.qnew_changed)
             mbox.pack_start(self.qnew_name, False, False, 2)
