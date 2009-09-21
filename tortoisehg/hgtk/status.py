@@ -241,21 +241,17 @@ class GStatus(gdialog.GDialog):
         path_cell = gtk.CellRendererText()
         stat_cell = gtk.CellRendererText()
 
-        if self.merging:
-            self.selcb = None
+        # file selection checkboxes
+        col0 = gtk.TreeViewColumn('', toggle_cell)
+        col0.set_visible(not self.merging) # hide when merging
+        col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
+        if gtk.pygtk_version >= (2, 12, 0):
+            col0.add_attribute(toggle_cell, 'inconsistent', FM_PARTIAL_SELECTED)
         else:
-            # show file selection checkboxes only when applicable
-            col0 = gtk.TreeViewColumn('', toggle_cell)
-            col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
-            if gtk.pygtk_version >= (2, 12, 0):
-                col0.add_attribute(toggle_cell, 'inconsistent',
-                        FM_PARTIAL_SELECTED)
-            else:
-                col0.add_attribute(toggle_cell, 'radio',
-                        FM_PARTIAL_SELECTED)
-            col0.set_resizable(False)
-            self.filetree.append_column(col0)
-            self.selcb = self.add_header_checkbox(col0, self.sel_clicked)
+            col0.add_attribute(toggle_cell, 'radio', FM_PARTIAL_SELECTED)
+        col0.set_resizable(False)
+        self.filetree.append_column(col0)
+        self.selcb = self.add_header_checkbox(col0, self.sel_clicked)
 
         col1 = gtk.TreeViewColumn(_('st'), stat_cell)
         col1.add_attribute(stat_cell, 'text', FM_STATUS)
