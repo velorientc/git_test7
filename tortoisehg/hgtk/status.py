@@ -201,10 +201,12 @@ class GStatus(gdialog.GDialog):
         if hasattr(repo, 'mq') and repo.mq.applied and repo['.'] == repo['qtip']:
             self.mqmode = True
 
+    def is_merge(self):
+        return self.count_revs() < 2 and len(self.repo.parents()) == 2
 
     def get_body(self):
-        self.merging = (self.count_revs() < 2
-            and len(self.repo.parents()) == 2)
+        is_merge = self.is_merge()
+        self.merging = is_merge
 
         # model stores the file list.
         fm = gtk.ListStore(bool, str, str, str, str, bool)
@@ -243,7 +245,7 @@ class GStatus(gdialog.GDialog):
 
         # file selection checkboxes
         col0 = gtk.TreeViewColumn('', toggle_cell)
-        col0.set_visible(not self.merging) # hide when merging
+        col0.set_visible(not is_merge) # hide when merging
         col0.add_attribute(toggle_cell, 'active', FM_CHECKED)
         if gtk.pygtk_version >= (2, 12, 0):
             col0.add_attribute(toggle_cell, 'inconsistent', FM_PARTIAL_SELECTED)
@@ -459,7 +461,7 @@ class GStatus(gdialog.GDialog):
             self.selcb.set_active(file_count and file_count == check_count)
         if self.count_revs() == 2:
             return
-        sensitive = check_count and not self.merging
+        sensitive = check_count and not self.is_merge()
         for label in (_('_Diff'), _('Re_vert'), _('_Add'), _('_Remove'),
                       _('Move'), _('_Forget')):
             self.get_toolbutton(label).set_sensitive(sensitive)
@@ -651,7 +653,7 @@ class GStatus(gdialog.GDialog):
             # clear diff pane if no files
             self.diff_text.set_buffer(gtk.TextBuffer())
             self.preview_text.set_buffer(gtk.TextBuffer())
-            if not self.merging:
+            if not self.is_merge():
                 self.diffmodel.clear()
 
         self.filetree.show()
@@ -922,7 +924,7 @@ class GStatus(gdialog.GDialog):
         status = model[row][FM_STATUS]
         enable = (status in 'MAR')
         self.enable_page('text-diff', enable)
-        self.enable_page('hunk-selection', enable and not self.merging)
+        self.enable_page('hunk-selection', enable and not self.is_merge())
 
         if page_num is None:
             page_num = self.diff_notebook.get_current_page()
@@ -954,7 +956,7 @@ class GStatus(gdialog.GDialog):
                 return
 
     def update_commit_preview(self):
-        if self.merging:
+        if self.is_merge():
             difftext = [_('===== Diff to first parent =====\n')]
             for s in patch.diff(self.repo, self._node1, self._node2,
                     opts=patch.diffopts(self.ui, self.opts)):
@@ -1014,13 +1016,14 @@ class GStatus(gdialog.GDialog):
         wfile = self.filemodel[row][FM_PATH]
         pfile = util.pconvert(wfile)
         difftext = []
-        if self.merging:
+        is_merge = self.is_merge()
+        if is_merge:
             difftext = [_('===== Diff to first parent =====\n')]
         matcher = cmdutil.matchfiles(self.repo, [pfile])
         for s in patch.diff(self.repo, self._node1, self._node2,
                 match=matcher, opts=patch.diffopts(self.ui, self.opts)):
             difftext.extend(s.splitlines(True))
-        if self.merging:
+        if is_merge:
             pctxs = self.repo[None].parents()
             difftext.append(_('\n===== Diff to second parent =====\n'))
             for s in patch.diff(self.repo, pctxs[1].node(), None,
@@ -1034,7 +1037,7 @@ class GStatus(gdialog.GDialog):
         wfile = self.filemodel[row][FM_PATH]
         self.filerowstart = {}
         self.diffmodel.clear()
-        if not self.merging:
+        if not self.is_merge():
             self.append_diff_hunks(wfile)
             if len(self.diffmodel):
                 tree.scroll_to_cell(0, use_align=True, row_align=0.0)
@@ -1258,7 +1261,7 @@ class GStatus(gdialog.GDialog):
                 text += '  ...\n'
             return text
 
-        if self.merging:
+        if self.is_merge():
             res = gdialog.CustomPrompt(
                     _('Uncommited merge - please select a parent revision'),
                     _('Revert file(s) to local or other parent?'),
@@ -1421,7 +1424,7 @@ class GStatus(gdialog.GDialog):
                 types[row[FM_STATUS]].append(file)
             all.append(file)
 
-        def make(label, handler, stats):
+        def make(label, handler, stats, enabled=True):
             files = []
             for t in stats:
                 files.extend(types[t])
@@ -1430,6 +1433,7 @@ class GStatus(gdialog.GDialog):
             item = gtk.MenuItem(label, True)
             item.connect('activate', handler, files)
             item.set_border_width(1)
+            item.set_sensitive(enabled)
             menu.append(item)
             return files
 
@@ -1499,8 +1503,7 @@ class GStatus(gdialog.GDialog):
         make(_('_visual diff'), vdiff, 'MAR!ru')
         make(_('edit'), edit, 'MACI?ru')
         make(_('view missing'), viewmissing, 'R!')
-        if self.merging:
-            make(_('view other'), other, 'MAru')
+        make(_('view other'), other, 'MAru', self.is_merge())
         make(_('_revert'), revert, 'MAR!ru')
         make(_('l_og'), log, 'MARC!ru')
         make(_('_forget'), forget, 'MARC!ru')
