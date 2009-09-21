@@ -265,7 +265,7 @@ class GStatus(gdialog.GDialog):
 
         # merge status column
         col = gtk.TreeViewColumn(_('ms'), stat_cell)
-        col.set_visible(is_merge)
+        col.set_visible(self.count_revs() <= 1)
         col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
         col.set_sort_column_id(4)
         col.set_resizable(False)
@@ -601,7 +601,7 @@ class GStatus(gdialog.GDialog):
 
         is_merge = self.is_merge()
         self.file_sel_column.set_visible(not is_merge)
-        self.merge_state_column.set_visible(is_merge)
+        self.merge_state_column.set_visible(self.count_revs() <= 1)
 
         selection = self.filetree.get_selection()
         if selection is None:
