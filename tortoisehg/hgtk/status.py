@@ -265,11 +265,12 @@ class GStatus(gdialog.GDialog):
 
         # merge status column
         col = gtk.TreeViewColumn(_('ms'), stat_cell)
-        col.set_visible(self.count_revs() <= 1)
+        col.set_visible(is_merge)
         col.add_attribute(stat_cell, 'text', FM_MERGE_STATUS)
         col.set_sort_column_id(4)
         col.set_resizable(False)
         self.filetree.append_column(col)
+        self.merge_state_column = col
 
         col2 = gtk.TreeViewColumn(_('path'), path_cell)
         col2.add_attribute(path_cell, 'text', FM_PATH_UTF8)
@@ -598,7 +599,9 @@ class GStatus(gdialog.GDialog):
         in the list.
         """
 
-        self.file_sel_column.set_visible(not self.is_merge())
+        is_merge = self.is_merge()
+        self.file_sel_column.set_visible(not is_merge)
+        self.merge_state_column.set_visible(is_merge)
 
         selection = self.filetree.get_selection()
         if selection is None:
@@ -657,7 +660,7 @@ class GStatus(gdialog.GDialog):
             # clear diff pane if no files
             self.diff_text.set_buffer(gtk.TextBuffer())
             self.preview_text.set_buffer(gtk.TextBuffer())
-            if not self.is_merge():
+            if not is_merge:
                 self.diffmodel.clear()
 
         self.filetree.show()
