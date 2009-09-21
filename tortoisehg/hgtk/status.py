@@ -316,6 +316,7 @@ class GStatus(gdialog.GDialog):
 
         self.diff_notebook = gtk.Notebook()
         self.diff_notebook.set_tab_pos(gtk.POS_BOTTOM)
+        self.diff_notebook_pages = {}
 
         self.difffont = pango.FontDescription(self.fontlist)
 
@@ -327,7 +328,7 @@ class GStatus(gdialog.GDialog):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(self.diff_text)
-        self.diff_notebook.append_page(scroller, gtk.Label(_('Text Diff')))
+        self.append_page('text-diff', scroller, gtk.Label(_('Text Diff')))
 
         if self.merging:
             difftree = None
@@ -383,8 +384,8 @@ class GStatus(gdialog.GDialog):
             scroller = gtk.ScrolledWindow()
             scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             scroller.add(difftree)
-            self.diff_notebook.append_page(
-                scroller, gtk.Label(_('Hunk Selection')))
+            self.append_page('hunk-selection', scroller, 
+                gtk.Label(_('Hunk Selection')))
 
             # Add a page for commit preview
             self.preview_text = gtk.TextView()
@@ -395,7 +396,8 @@ class GStatus(gdialog.GDialog):
             scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             scroller.add(self.preview_text)
             self.preview_tab_name_label = gtk.Label(self.get_preview_tab_name())
-            self.diff_notebook.append_page(scroller, self.preview_tab_name_label)
+            self.append_page('commit-preview', scroller, 
+                self.preview_tab_name_label)
 
         diff_frame.add(self.diff_notebook)
 
@@ -416,6 +418,10 @@ class GStatus(gdialog.GDialog):
         self.diff_notebook.connect('switch-page', self.page_switched,
                                    sel, difftree)
         return self.diffpane
+
+    def append_page(self, name, child, label):
+        num = self.diff_notebook.append_page(child,  label)
+        self.diff_notebook_pages[num] = name
 
     def page_switched(self, notebook, page, page_num, filesel, difftree):
         self.tree_sel_changed(filesel, difftree, page_num)
@@ -919,22 +925,32 @@ class GStatus(gdialog.GDialog):
         # if a non-MAR file is selected
         status = model[row][FM_STATUS]
         enable = (status in 'MAR')
-        for pn in [0, 1]:
-            child = self.diff_notebook.get_nth_page(pn)
-            if child:
-                child.set_sensitive(enable)
-                lb = self.diff_notebook.get_tab_label(child)
-                lb.set_sensitive(enable)
+        for pn in self.diff_notebook_pages:
+            pname = self.get_page_name(pn)
+            if pname == 'text-diff' or pname == 'hunk-selection':
+                child = self.diff_notebook.get_nth_page(pn)
+                if child:
+                    child.set_sensitive(enable)
+                    lb = self.diff_notebook.get_tab_label(child)
+                    lb.set_sensitive(enable)
 
         if page_num is None:
             page_num = self.diff_notebook.get_current_page()
-        if page_num == 0:
+
+        pname = self.get_page_name(page_num)
+        if pname == 'text-diff':
             buf = self.generate_text_diffs(row)
             self.diff_text.set_buffer(buf)
-        elif page_num == 1:
+        elif pname == 'hunk-selection':
             self.update_hunk_model(row, tree)
-        elif page_num == 2:
+        elif pname == 'commit-preview':
             self.update_commit_preview()
+
+    def get_page_name(self, num):
+        try:
+            return self.diff_notebook_pages[num]
+        except KeyError:
+            return ''
 
     def update_commit_preview(self):
         buf = cStringIO.StringIO()
