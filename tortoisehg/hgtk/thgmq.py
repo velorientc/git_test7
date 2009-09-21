@@ -228,12 +228,12 @@ class MQWidget(gtk.VBox):
             selname = model[paths[0]][MQ_NAME]
 
         # clear model data
-        model.clear()
+        self.model.clear()
 
         # insert 'qparent' row
         top = None
         if self.get_property('show-qparent'):
-            top = model.append((INDEX_QPARENT, None, None, None, None))
+            top = self.model.append((INDEX_QPARENT, None, None, None, None))
 
         # add patches
         from hgext import mq
@@ -247,13 +247,13 @@ class MQWidget(gtk.VBox):
                 msg_esc = gtklib.markup_escape_text(msg)
             except IndexError:
                 msg = msg_esc = None
-            iter = model.append((index, stat, patchname, msg, msg_esc))
+            iter = self.model.append((index, stat, patchname, msg, msg_esc))
             if stat == 'A':
                 top = iter
 
         # insert separator
         if top:
-            model.insert_after(top, (INDEX_SEPARATOR, None, None, None, None))
+            self.model.insert_after(top, (INDEX_SEPARATOR, None, None, None, None))
 
         # restore patch selection
         if selname:
