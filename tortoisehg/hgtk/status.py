@@ -386,7 +386,7 @@ class GStatus(gdialog.GDialog):
             self.diff_notebook.append_page(
                 scroller, gtk.Label(_('Hunk Selection')))
 
-            # Add a page for selection preview
+            # Add a page for commit preview
             self.preview_text = gtk.TextView()
             self.preview_text.set_wrap_mode(gtk.WRAP_NONE)
             self.preview_text.set_editable(False)
@@ -465,7 +465,7 @@ class GStatus(gdialog.GDialog):
             i = self.get_menuitem(label)
             if i: i.set_sensitive(sensitive)
         if self.diff_notebook.get_current_page() == 2:
-            self.update_selection_preview()
+            self.update_commit_preview()
 
     def prepare_display(self):
         val = self.repo.ui.config('tortoisehg', 'ciexclude', '')
@@ -934,10 +934,9 @@ class GStatus(gdialog.GDialog):
         elif page_num == 1:
             self.update_hunk_model(row, tree)
         elif page_num == 2:
-            self.update_selection_preview()
+            self.update_commit_preview()
 
-    def update_selection_preview(self):
-        'Refresh selected hunk view'
+    def update_commit_preview(self):
         buf = cStringIO.StringIO()
         dmodel = self.diffmodel
         for row in self.filemodel:
