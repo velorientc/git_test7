@@ -254,6 +254,7 @@ class GStatus(gdialog.GDialog):
         col0.set_resizable(False)
         self.filetree.append_column(col0)
         self.selcb = self.add_header_checkbox(col0, self.sel_clicked)
+        self.file_sel_column = col0
 
         col1 = gtk.TreeViewColumn(_('st'), stat_cell)
         col1.add_attribute(stat_cell, 'text', FM_STATUS)
@@ -596,6 +597,9 @@ class GStatus(gdialog.GDialog):
         repository status.  Also recheck and reselect files that remain
         in the list.
         """
+
+        self.file_sel_column.set_visible(not self.is_merge())
+
         selection = self.filetree.get_selection()
         if selection is None:
             return
