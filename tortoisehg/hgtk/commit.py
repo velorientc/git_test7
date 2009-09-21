@@ -305,7 +305,7 @@ class GCommit(GStatus):
         self.branchbutton = gtk.Button()
         self.branchbutton.connect('clicked', self.branch_clicked)
         mbox.pack_start(self.branchbutton, False, False, 2)
-        if self.merging:
+        if self.is_merge():
             branches = [p.branch() for p in self.repo.parents()]
             if branches[0] == branches[1]:
                 self.branchbutton.set_sensitive(False)
@@ -423,7 +423,7 @@ class GCommit(GStatus):
             liststore.append([sumline, msg])
 
     def branch_clicked(self, button):
-        if self.merging:
+        if self.is_merge():
             mb = [p.branch() for p in self.repo.parents()]
         else:
             mb = None
@@ -535,7 +535,7 @@ class GCommit(GStatus):
                 self.reload_status()
                 abs = [self.repo.wjoin(file) for file in files]
                 shlib.shell_notify(abs)
-        if self.merging:
+        if self.is_merge():
             return ()
         else:
             return [(_('_commit'), commit, 'MAR'),]
@@ -562,7 +562,7 @@ class GCommit(GStatus):
         self.get_menuitem(_('_Undo')).set_sensitive(can_undo)
 
     def check_merge(self):
-        if self.merging:
+        if self.is_merge():
             # select all changes if repo is merged
             for entry in self.filemodel:
                 if entry[FM_STATUS] in 'MARD':
@@ -642,7 +642,7 @@ class GCommit(GStatus):
             if not self.ready_message():
                 return
 
-            if self.merging:
+            if self.is_merge():
                 commit_list = get_list(addremove=False)
                 # merges must be committed without specifying file list.
                 self.hg_commit([])

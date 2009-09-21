@@ -206,7 +206,6 @@ class GStatus(gdialog.GDialog):
 
     def get_body(self):
         is_merge = self.is_merge()
-        self.merging = is_merge
 
         # model stores the file list.
         fm = gtk.ListStore(bool, str, str, str, str, bool)
