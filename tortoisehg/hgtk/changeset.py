@@ -147,36 +147,37 @@ class ChangeSet(gdialog.GDialog):
         self.curphunks = {}
         self.curpatch = patchfile
         pf = open(self.curpatch)
+        def get_path(a, b):
+            type = (a == '/dev/null') and 'A' or 'M'
+            type = (b == '/dev/null') and 'R' or type
+            rawpath = (b != '/dev/null') and b or a
+            if not rawpath.startswith(('a/', 'b/')):
+                return type, rawpath
+            return type, rawpath.split('/', 1)[-1]
+        hunks = []
+        files = []
+        map = {'MODIFY': 'M', 'ADD': 'A', 'DELETE': 'R',
+               'RENAME': '', 'COPY': ''}
         try:
-            def get_path(a, b):
-                type = (a == '/dev/null') and 'A' or 'M'
-                type = (b == '/dev/null') and 'R' or type
-                rawpath = (b != '/dev/null') and b or a
-                if not rawpath.startswith(('a/', 'b/')):
-                    return type, rawpath
-                return type, rawpath.split('/', 1)[-1]
-            hunks = []
-            files = []
-            map = {'MODIFY': 'M', 'ADD': 'A', 'DELETE': 'R',
-                   'RENAME': '', 'COPY': ''}
-            for state, values in patch.iterhunks(self.ui, pf):
-                if state == 'git':
-                    for m in values:
-                        f = m.path
-                        self._filelist.append((map[m.op], toutf(f), f))
-                        files.append(f)
-                elif state == 'file':
-                    type, path = get_path(values[0], values[1])
-                    self.curphunks[path] = hunks = ['diff']
-                    if path not in files:
-                        self._filelist.append((type, toutf(path), path))
-                        files.append(path)
-                elif state == 'hunk':
-                    hunks.extend([l.rstrip('\r\n') for l in values.hunk])
-                else:
-                    raise _('unknown hunk type: %s') % state
-        except patch.NoHunks:
-            pass
+            try:
+                for state, values in patch.iterhunks(self.ui, pf):
+                    if state == 'git':
+                        for m in values:
+                            f = m.path
+                            self._filelist.append((map[m.op], toutf(f), f))
+                            files.append(f)
+                    elif state == 'file':
+                        type, path = get_path(values[0], values[1])
+                        self.curphunks[path] = hunks = ['diff']
+                        if path not in files:
+                            self._filelist.append((type, toutf(path), path))
+                            files.append(path)
+                    elif state == 'hunk':
+                        hunks.extend([l.rstrip('\r\n') for l in values.hunk])
+                    else:
+                        raise _('unknown hunk type: %s') % state
+            except patch.NoHunks:
+                pass
         finally:
             pf.close()
 
