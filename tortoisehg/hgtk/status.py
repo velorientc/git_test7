@@ -321,6 +321,7 @@ class GStatus(gdialog.GDialog):
         self.difffont = pango.FontDescription(self.fontlist)
 
         self.clipboard = None
+
         self.diff_text = gtk.TextView()
         self.diff_text.set_wrap_mode(gtk.WRAP_NONE)
         self.diff_text.set_editable(False)
@@ -387,17 +388,17 @@ class GStatus(gdialog.GDialog):
             self.append_page('hunk-selection', scroller, 
                 gtk.Label(_('Hunk Selection')))
 
-            # Add a page for commit preview
-            self.preview_text = gtk.TextView()
-            self.preview_text.set_wrap_mode(gtk.WRAP_NONE)
-            self.preview_text.set_editable(False)
-            self.preview_text.modify_font(self.difffont)
-            scroller = gtk.ScrolledWindow()
-            scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-            scroller.add(self.preview_text)
-            self.preview_tab_name_label = gtk.Label(self.get_preview_tab_name())
-            self.append_page('commit-preview', scroller, 
-                self.preview_tab_name_label)
+        # Add a page for commit preview
+        self.preview_text = gtk.TextView()
+        self.preview_text.set_wrap_mode(gtk.WRAP_NONE)
+        self.preview_text.set_editable(False)
+        self.preview_text.modify_font(self.difffont)
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.add(self.preview_text)
+        self.preview_tab_name_label = gtk.Label(self.get_preview_tab_name())
+        self.append_page('commit-preview', scroller,
+            self.preview_tab_name_label)
 
         diff_frame.add(self.diff_notebook)
 
@@ -655,6 +656,7 @@ class GStatus(gdialog.GDialog):
         else:
             # clear diff pane if no files
             self.diff_text.set_buffer(gtk.TextBuffer())
+            self.preview_text.set_buffer(gtk.TextBuffer())
             if not self.merging:
                 self.diffmodel.clear()
 
@@ -953,25 +955,35 @@ class GStatus(gdialog.GDialog):
             return ''
 
     def update_commit_preview(self):
-        buf = cStringIO.StringIO()
-        dmodel = self.diffmodel
-        for row in self.filemodel:
-            if not row[FM_CHECKED]:
-                continue
-            wfile = row[FM_PATH]
-            if wfile in self.filechunks:
-                chunks = self.filechunks[wfile]
-            else:
-                chunks = self.read_file_chunks(wfile)
-                for c in chunks:
-                    c.active = True
-                self.filechunks[wfile] = chunks
-            for i, chunk in enumerate(chunks):
-                if i == 0:
-                    chunk.write(buf)
-                elif chunk.active:
-                    chunk.write(buf)
-        difftext = buf.getvalue().splitlines(True)
+        if self.merging:
+            difftext = [_('===== Diff to first parent =====\n')]
+            for s in patch.diff(self.repo, self._node1, self._node2,
+                    opts=patch.diffopts(self.ui, self.opts)):
+                difftext.extend(s.splitlines(True))
+            pctxs = self.repo[None].parents()
+            difftext.append(_('\n===== Diff to second parent =====\n'))
+            for s in patch.diff(self.repo, pctxs[1].node(), None,
+                    opts=patch.diffopts(self.ui, self.opts)):
+                difftext.extend(s.splitlines(True))
+        else:
+            buf = cStringIO.StringIO()
+            for row in self.filemodel:
+                if not row[FM_CHECKED]:
+                    continue
+                wfile = row[FM_PATH]
+                if wfile in self.filechunks:
+                    chunks = self.filechunks[wfile]
+                else:
+                    chunks = self.read_file_chunks(wfile)
+                    for c in chunks:
+                        c.active = True
+                    self.filechunks[wfile] = chunks
+                for i, chunk in enumerate(chunks):
+                    if i == 0:
+                        chunk.write(buf)
+                    elif chunk.active:
+                        chunk.write(buf)
+            difftext = buf.getvalue().splitlines(True)
         self.preview_text.set_buffer(self.diff_highlight_buffer(difftext))
 
     def diff_highlight_buffer(self, difftext):
