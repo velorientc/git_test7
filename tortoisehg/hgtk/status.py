@@ -927,14 +927,8 @@ class GStatus(gdialog.GDialog):
         # if a non-MAR file is selected
         status = model[row][FM_STATUS]
         enable = (status in 'MAR')
-        for pn in self.diff_notebook_pages:
-            pname = self.get_page_name(pn)
-            if pname == 'text-diff' or pname == 'hunk-selection':
-                child = self.diff_notebook.get_nth_page(pn)
-                if child:
-                    child.set_sensitive(enable)
-                    lb = self.diff_notebook.get_tab_label(child)
-                    lb.set_sensitive(enable)
+        self.enable_page('text-diff', enable)
+        self.enable_page('hunk-selection', enable)
 
         if page_num is None:
             page_num = self.diff_notebook.get_current_page()
@@ -953,6 +947,17 @@ class GStatus(gdialog.GDialog):
             return self.diff_notebook_pages[num]
         except KeyError:
             return ''
+
+    def enable_page(self, name, enable):
+        for pnum in self.diff_notebook_pages:
+            pname = self.get_page_name(pnum)
+            if pname == name:
+                child = self.diff_notebook.get_nth_page(pnum)
+                if child:
+                    child.set_sensitive(enable)
+                    lb = self.diff_notebook.get_tab_label(child)
+                    lb.set_sensitive(enable)
+                return
 
     def update_commit_preview(self):
         if self.merging:
