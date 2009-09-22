@@ -11,7 +11,7 @@ import traceback
 import shlib
 import time
 
-from mercurial.error import RepoError, ParseError, LookupError
+from mercurial.error import RepoError, ParseError, LookupError, RepoLookupError
 from mercurial.error import UnknownCommand, AmbiguousCommand
 from mercurial import hg, ui, util, extensions, commands, hook, match
 from mercurial import dispatch, encoding, templatefilters
