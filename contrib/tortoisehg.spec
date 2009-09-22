@@ -35,7 +35,7 @@ system available in the file manager with a graphical interface.
 # Fix for nautilus python extensions in lib64 on x86_64
 sed -i "s,lib/nautilus,%{_lib}/nautilus,g" setup.py
 
-cat > thgutil/config.py << EOT
+cat > tortoisehg/util/config.py << EOT
 bin_path     = "%{_bindir}"
 license_path = "%{_docdir}/%{name}-%{version}/COPYING.txt"
 locale_path  = "%{_datadir}/locale"
@@ -62,8 +62,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc COPYING.txt ReleaseNotes.txt doc/build/html/
 %{_bindir}/hgtk
-%{python_sitelib}/hggtk/
-%{python_sitelib}/thgutil/
+%{python_sitelib}/tortoisehg/hgtk/
+%{python_sitelib}/tortoisehg/util/
 %{python_sitelib}/tortoisehg-*.egg-info
 %{_datadir}/pixmaps/tortoisehg/
 %{_datadir}/locale/*/LC_MESSAGES/tortoisehg.mo
