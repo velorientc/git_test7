@@ -10,6 +10,7 @@ import gtk
 import gobject
 import pango
 import Queue
+import binascii
 
 from mercurial import cmdutil, context, util, ui, hg, patch, mdiff
 
@@ -269,6 +270,13 @@ class ChangeSet(gdialog.GDialog):
 
         if tags: 
             title_line(_('tags:'), tags, 'tag')
+
+        extra = ctx.extra()
+        try:
+            ts = extra['transplant_source']
+            title_line(_('transplant:'), binascii.hexlify(ts), 'changeset')
+        except KeyError:
+            pass
 
         desc = toutf(ctx.description())
         buf.insert(eob, '\n' + desc + '\n\n')
