@@ -210,9 +210,11 @@ class ChangeSet(gdialog.GDialog):
     def generate_change_header(self):
         buf, rev = self._buffer, self.currev
 
+        def pad_right(text):
+            return text + ' ' * (12 - len(text))
+
         def title_line(title, text, tag):
-            pad = ' ' * (12 - len(title))
-            utext = toutf(title + pad + text)
+            utext = toutf(pad_right(title) + text)
             buf.insert_with_tags_by_name(eob, utext, tag)
             buf.insert(eob, "\n")
 
@@ -224,57 +226,52 @@ class ChangeSet(gdialog.GDialog):
         change = str(rev) + ' (' + str(ctx) + ')'
         tags = ' '.join(ctx.tags())
 
+        branch = ctx.branch()
+
         title_line(_('changeset:'), change, 'changeset')
-        if ctx.branch() != 'default':
-            title_line(_('branch:'), ctx.branch(), 'greybg')
+        if branch != 'default':
+            title_line(_('branch:'), branch, 'greybg')
         title_line(_('user/date:'), ctx.user() + '\t' + date, 'changeset')
-        
-        if len(ctx.parents()) == 2 and self.parent_toggle.get_active():
+
+        def insert_link(title, ctx, highlight=False):
+            try:
+                lines = ctx.description().splitlines()
+                summary = toutf(lines and lines[0] or '')
+            except:
+                summary = ''
+
+            link = str(ctx.rev()) + ' (' + str(ctx) + ')'
+            if ctx.branch() != branch:
+                link += ' [' + toutf(ctx.branch()) + ']'
+
+            hl = ''
+            if highlight:
+                hl = 'hl'
+            ins = buf.insert_with_tags_by_name
+            ins(eob, pad_right(title), 'parent' + hl)
+            ins(eob, link, 'link' + hl)
+            ins(eob, ' ' + summary, 'parent' + hl)
+            buf.insert(eob, "\n")
+
+        ismerge = (len(ctx.parents()) == 2)
+
+        if ismerge and self.parent_toggle.get_active():
             parentindex = 1 
         else:
-            parentindex = 0 
-            
+            parentindex = 0
+
         for pctx in ctx.parents():
-            try:
-                lines = pctx.description().splitlines()
-                summary = toutf(lines and lines[0] or '')
-            except:
-                summary = ""
-            change = str(pctx.rev()) + ' (' + str(pctx) + ')'
-            if pctx.branch() != ctx.branch():
-                change += ' [' + toutf(pctx.branch()) + ']'
-            title = _('parent:')
-            title += ' ' * (12 - len(title))
+            hl = ismerge and pctx == ctx.parents()[parentindex]
+            insert_link(_('parent:'), pctx, hl)
 
-            if len(ctx.parents()) == 2 and pctx == ctx.parents()[parentindex]:
-                buf.insert_with_tags_by_name(eob, title, 'parenthl')
-                buf.insert_with_tags_by_name(eob, change, 'linkhl')
-                buf.insert_with_tags_by_name(eob, ' ' + summary, 'parenthl')
-            else:
-                buf.insert_with_tags_by_name(eob, title, 'parent')
-                buf.insert_with_tags_by_name(eob, change, 'link')
-                buf.insert_with_tags_by_name(eob, ' ' + summary, 'parent')
-            
-            buf.insert(eob, "\n")
         for cctx in ctx.children():
-            try:
-                lines = cctx.description().splitlines()
-                summary = toutf(lines and lines[0] or '')
-            except:
-                summary = ""
-            change = str(cctx.rev()) + ' (' + str(cctx) + ')'
-            if cctx.branch() != ctx.branch():
-                change += ' [' + toutf(cctx.branch()) + ']'
-            title = _('child:')
-            title += ' ' * (12 - len(title))
-            buf.insert_with_tags_by_name(eob, title, 'parent')
-            buf.insert_with_tags_by_name(eob, change, 'link')
-            buf.insert_with_tags_by_name(eob, ' ' + summary, 'parent')
-            buf.insert(eob, "\n")
-        if tags: title_line(_('tags:'), tags, 'tag')
+            insert_link(_('child:'), cctx)
 
-        log = toutf(ctx.description())
-        buf.insert(eob, '\n' + log + '\n\n')
+        if tags: 
+            title_line(_('tags:'), tags, 'tag')
+
+        desc = toutf(ctx.description())
+        buf.insert(eob, '\n' + desc + '\n\n')
 
     def generate_patch_header(self):
         buf = self._buffer
