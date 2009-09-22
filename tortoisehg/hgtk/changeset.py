@@ -277,7 +277,7 @@ class ChangeSet(gdialog.GDialog):
             try:
                 tctx = self.repo[ts]
                 insert_link(_('transplant:'), tctx)
-            except LookupError:
+            except (LookupError, RepoLookupError):
                 title_line(_('transplant:'), binascii.hexlify(ts), 'changeset')
         except KeyError:
             pass
@@ -361,7 +361,7 @@ class ChangeSet(gdialog.GDialog):
             try:
                 for s in patch.diff(self.repo, n1, n2, match=m, opts=opts):
                     lines.extend(s.splitlines())
-            except (RepoError, LookupError), e:
+            except (RepoLookupError, RepoError, LookupError), e:
                 err = _('Repository Error:  %s, refresh suggested') % str(e)
                 lines = ['diff', '', err]
         tags, lines = self.prepare_diff(lines, offset, wfile)
