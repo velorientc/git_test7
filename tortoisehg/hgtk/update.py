@@ -122,8 +122,12 @@ class UpdateDialog(gtk.Dialog):
         self.update_revisions()
 
         # options
-        group = gtk.RadioButton(None, _('Allow merge with local changes (default)'))
+        group = gtk.RadioButton(None, _('Interactive'))
         addrow(_('Options:'), group, expand=False)
+        self.opt_inter = group
+
+        btn = gtk.RadioButton(group, _('Allow merge with local changes (default)'))
+        addrow('', btn, expand=False)
 
         btn = gtk.RadioButton(group, _('Abort if local changes found (-c/--check)'))
         addrow('', btn, expand=False)
@@ -220,16 +224,85 @@ class UpdateDialog(gtk.Dialog):
         setlabel(self.new_rev_label, self.repo[newrev])
 
     def update(self, repo):
-        self.switch_to(MODE_UPDATING)
-
         cmdline = ['hg', 'update', '--verbose']
         rev = self.revcombo.get_active_text()
         cmdline.append('--rev')
         cmdline.append(rev)
-        if self.opt_check.get_active():
-            cmdline.append('--check')
-        elif self.opt_clean.get_active():
-            cmdline.append('--clean')
+
+        if self.opt_inter.get_active():
+            cur = self.repo['.']
+            node = self.repo[rev]
+            def isclean():
+                wc = self.repo[None]
+                return not (wc.modified() or wc.added() or wc.removed())
+            def iscrossbranch(p1, p2):
+                pa = p1.ancestor(p2)
+                return p1.branch() != p2.branch() or (p1 != pa and p2 != pa)
+            def islocalmerge(p1, p2, clean=None):
+                if clean is None:
+                    clean = isclean()
+                pa = p1.ancestor(p2)
+                return not clean and p1.branch() == p2.branch() and \
+                       (p1 != pa and p2 != pa)
+            def confirmupdate(clean=None, merge=None):
+                if clean is None:
+                    clean = isclean()
+                if merge is None:
+                    merge = islocalmerge(cur, node, clean)
+
+                msg = _('Detected uncommitted local changes in working tree.\n'
+                        'Please select to continue:\n\n')
+                data = {'discard': (_('&Discard'),
+                                    _('Discard - discard local changes, no backup')),
+                        'shelve': (_('&Shelve'),
+                                   _('Shelve - launch Shelve tool and continue')),
+                        'merge': (_('&Merge'),
+                                  _('Merge - allow to merge with local changes')),
+                        'cancel': (_('&Cancel'), None)}
+                opts = [data['discard'], data['shelve']]
+                if merge:
+                    opts.append(data['merge'])
+                opts.append(data['cancel'])
+
+                msg += '\n'.join([ desc for label, desc in opts if desc ])
+                buttons = [ label for label, desc in opts ]
+                cancel = len(opts) - 1
+                retcode = gdialog.CustomPrompt(_('Confirm Update'), msg, self,
+                                    buttons, default=cancel, esc=cancel).run()
+                retlabel = buttons[retcode]
+                retid = [ id for id, (label, desc) in data.items() \
+                             if label == retlabel ][0]
+                ret = {}
+                for id in data.keys():
+                    ret[id] = id == retid
+                return ret
+            clean = isclean()
+            if clean:
+                cmdline.append('--check')
+            else:
+                ret = confirmupdate(clean)
+                if ret['discard']:
+                    cmdline.append('--clean')
+                elif ret['shelve']:
+                    from tortoisehg.hgtk import thgshelve
+                    dlg = thgshelve.run(ui.ui())
+                    dlg.set_transient_for(self)
+                    dlg.set_modal(True)
+                    dlg.display()
+                    dlg.connect('destroy', lambda w: self.update(repo))
+                    return # retry later, no need to destroy
+                elif ret['merge']:
+                    pass # no args
+                elif ret['cancel']:
+                    self.destroy()
+                    return
+                else:
+                    raise _('invalid dialog result: %s') % ret
+        else:
+            if self.opt_check.get_active():
+                cmdline.append('--check')
+            elif self.opt_clean.get_active():
+                cmdline.append('--clean')
 
         def cmd_done(returncode):
             self.switch_to(MODE_NORMAL, cmd=False)
@@ -237,6 +310,7 @@ class UpdateDialog(gtk.Dialog):
                 self.notify_func(self.notify_args)
             if returncode == 0 and not self.cmd.is_show_log():
                 self.destroy()
+        self.switch_to(MODE_UPDATING)
         self.cmd.execute(cmdline, cmd_done)
 
     def set_notify_func(self, func, *args):
