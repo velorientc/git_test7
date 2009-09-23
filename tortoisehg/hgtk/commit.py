@@ -177,12 +177,12 @@ class GCommit(GStatus):
                     frame.hide()
                 setattr(self, statename, show)
         no = False
-        return [(_('View'),
+        return [(_('_View'),
            [(_('Advanced'), True, toggle, ['advanced'], self.showadvanced),
             (_('Parents'), True, toggle, ['parents'], self.showparents),
             ('----', None, None, None, None),
             (_('Refresh'), False, refresh, [], gtk.STOCK_REFRESH)]),
-           (_('Operations'), [
+           (_('_Operations'), [
             (_('_Commit'), no, self.commit_clicked, [], gtk.STOCK_OK),
             (_('_Undo'), no, self.undo_clicked, [], gtk.STOCK_UNDO),
             ('----', None, None, None, None),

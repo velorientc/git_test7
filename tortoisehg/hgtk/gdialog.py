@@ -428,7 +428,7 @@ class GDialog(gtk.Window):
         menus = self.get_menu_list()
         if menus:
             allmenus = [
-          (_('Tools'),
+          (_('_Tools'),
            [(_('Changelog'), False, self.launch, ['log'], 'menulog.ico'),
             (_('Commit'), False, self.launch, ['commit'], 'menucommit.ico'),
             (_('Datamine'), False, self.launch, ['datamine'], 'menurepobrowse.ico'),
@@ -438,7 +438,7 @@ class GDialog(gtk.Window):
             (_('Synchronize'), False, self.launch, ['synch'], 'menusynch.ico'),
             (_('Settings'), False, self.launch, ['repoconfig'], 'settings_repo.ico')])
            ] + menus + [
-          (_('Help'),
+          (_('_Help'),
            [(_('Contents'), False, self.helpcontents, [], gtk.STOCK_INFO),
             (_('About'), False, self.launch, ['about'], gtk.STOCK_ABOUT)])
           ]

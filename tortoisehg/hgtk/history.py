@@ -103,7 +103,7 @@ class GLog(gdialog.GDialog):
                 bmenus.append((hglib.toutf(name), False, navigate, [name], None))
             
         fnc = self.toggle_view_column
-        return [(_('View'), [
+        return [(_('_View'), [
             (_('Sync Bar'), True, self.toggle_show_syncbar, [],
                 self.show_syncbar),
             (_('Filter Bar'), True, self.toggle_show_filterbar, [],
@@ -120,7 +120,7 @@ class GLog(gdialog.GDialog):
                 self.branch_color),
                 ]),
 
-            (_('Navigate'), [
+            (_('_Navigate'), [
                 (_('Tip'), False, navigate, ['tip'], None),
                 (_('Working Parent'), False, navigate, ['.'], None),
                 ('----', None, None, None, None),
