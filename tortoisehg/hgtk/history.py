@@ -401,7 +401,9 @@ class GLog(gdialog.GDialog):
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
                 'revrange':[], 'revlist':[], 'noheads':False,
-                'branch-view':self.compactgraph, 'rev':[] }
+                'branch-view':False, 'rev':[] }
+        if self.opts is not None: opts = self.opts
+        opts['branch-view'] = self.compactgraph
         opts.update(kwopts)
 
         # handle strips, rebases, etc
@@ -478,6 +480,9 @@ class GLog(gdialog.GDialog):
         # refresh MQ widget if exists
         if hasattr(self, 'mqwidget'):
             self.mqwidget.refresh()
+
+        # Remember options to next time reload_log is called
+        self.opts = opts
 
     def tree_context_menu(self):
         m = gtk.Menu()
