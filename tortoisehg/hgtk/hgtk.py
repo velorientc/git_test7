@@ -33,7 +33,7 @@ version thgstatus serve'''
 for sig in ('copy-clipboard', 'thg-diff', 'thg-parent', 'thg-rename'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
-for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept'):
+for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept', 'thg-reflow'):
     gobject.signal_new(sig, gtk.Window,
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-close', 'thg-new'):

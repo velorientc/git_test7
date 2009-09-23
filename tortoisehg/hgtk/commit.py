@@ -345,8 +345,16 @@ class GCommit(GStatus):
         frame.add(scroller)
         vbox.pack_start(frame)
 
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse('<alt>q')
+        self.add_accelerator('thg-reflow', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+
         self.text = gtk.TextView()
         self.text.connect('populate-popup', self.msg_add_to_popup)
+        self.connect('thg-reflow', self.thgreflow, self.text)
         self.text.modify_font(pango.FontDescription(self.fontcomment))
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
@@ -520,6 +528,54 @@ class GCommit(GStatus):
         else:
             setlabel(self.parent2_label, ctxs[1], isheads[1])
             self.parent2_label.show()
+
+    def thgreflow(self, window, textview):
+        buffer = textview.get_buffer()
+        pos = buffer.get_property('cursor-position')
+        start = buffer.get_iter_at_offset(0)
+        end = start.copy()
+        end.forward_to_end()
+
+        text = hglib.tounicode(buffer.get_text(start, end))
+        if pos == len(text):
+            pos -= 1
+
+        sentence_begin = text.rfind('\n\n', 0, pos)
+        while sentence_begin >= 0 and text.rfind('\n\n', 0, pos - 1) == sentence_begin - 1:
+            sentence_begin -= 1
+        if sentence_begin == -1:
+            sentence_begin = 0
+        while sentence_begin < len(text) and text[sentence_begin] == '\n':
+            sentence_begin += 1
+
+        sentence_end = text.find('\n\n', sentence_begin + 1)
+        if sentence_end == -1:
+            sentence_end = len(text)
+
+        pre_sentence = text[:sentence_begin]
+        post_sentence = text[sentence_end:]
+        sentence = text[sentence_begin:sentence_end]
+
+        parts = sentence.replace('\r', '').replace('\n', ' ').replace('\t', ' ').split(' ')
+        line_width = int(self.repo.ui.config('tortoisehg', 'messagewrap', 80))
+        new_sentence = ['']
+
+        for part in parts:
+            if len(new_sentence[-1]) + len(part) > line_width:
+                new_sentence.append('')
+                
+            new_sentence[-1] += '%s ' % part
+
+        sentence = u'\n'.join([x.strip() for x in new_sentence]).encode('utf-8')
+
+        new_pos = len(pre_sentence + sentence)
+        buffer.set_text(pre_sentence + sentence + post_sentence)
+
+        new_pos_iter = buffer.get_iter_at_offset(new_pos)
+        buffer.place_cursor(new_pos_iter)
+        m = buffer.create_mark('newcurspos', new_pos_iter, False)
+        self.text.scroll_mark_onscreen(m)
+        buffer.delete_mark(m)
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
