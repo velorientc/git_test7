@@ -225,11 +225,16 @@ class ChangeSet(gdialog.GDialog):
         eob = buf.get_end_iter()
         date = displaytime(ctx.date())
         change = str(rev) + ' (' + str(ctx) + ')'
+        try:
+            lines = ctx.description().splitlines()
+            summary = toutf(lines and lines[0] or '')
+        except:
+            summary = ''
         tags = ' '.join(ctx.tags())
 
         branch = ctx.branch()
 
-        title_line(_('changeset:'), change, 'changeset')
+        title_line(_('changeset:'), change + ' ' + summary, 'changeset')
         if branch != 'default':
             title_line(_('branch:'), branch, 'greybg')
         title_line(_('user/date:'), ctx.user() + '\t' + date, 'changeset')
