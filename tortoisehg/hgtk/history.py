@@ -12,7 +12,7 @@ import gobject
 import pango
 import StringIO
 
-from mercurial import ui, hg, cmdutil, commands, extensions, util, match
+from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -104,6 +104,8 @@ class GLog(gdialog.GDialog):
             
         fnc = self.toggle_view_column
         return [(_('View'), [
+            (_('Sync Bar'), True, self.toggle_show_syncbar, [],
+                self.show_syncbar),
             (_('Filter Bar'), True, self.toggle_show_filterbar, [],
                 self.show_filterbar),
             ('----', None, None, None, None),
@@ -170,6 +172,11 @@ class GLog(gdialog.GDialog):
         self.show_filterbar = button.get_active()
         if self.filterbox is not None:
             self.filterbox.set_property('visible', self.show_filterbar)
+
+    def toggle_show_syncbar(self, button):
+        self.show_syncbar = button.get_active()
+        if self.syncbox is not None:
+            self.syncbox.set_property('visible', self.show_syncbar)
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
@@ -336,6 +343,8 @@ class GLog(gdialog.GDialog):
 
         self.filterbox.set_property('visible', self.show_filterbar)
         self.filterbox.set_no_show_all(True)
+        self.syncbox.set_property('visible', self.show_syncbar)
+        self.syncbox.set_no_show_all(True)
 
         for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
             if col in self.showcol:
@@ -365,6 +374,7 @@ class GLog(gdialog.GDialog):
         settings['glog-hpane'] = self.hpaned.get_position()
         settings['branch-color'] = self.graphview.get_property('branch-color')
         settings['show-filterbar'] = self.show_filterbar
+        settings['show-syncbar'] = self.show_syncbar
         settings['graphcol'] = self.graphcol
         settings['compactgraph'] = self.compactgraph
         for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
@@ -379,6 +389,7 @@ class GLog(gdialog.GDialog):
         self.setting_hpos = settings.get('glog-hpane', -1)
         self.branch_color = settings.get('branch-color', False)
         self.show_filterbar = settings.get('show-filterbar', True)
+        self.show_syncbar = settings.get('show-syncbar', True)
         self.graphcol = settings.get('graphcol', True)
         self.compactgraph = settings.get('compactgraph', False)
         self.showcol = {}
@@ -611,6 +622,55 @@ class GLog(gdialog.GDialog):
         self.tree.connect('thg-parent', self.thgparent)
         self.connect('thg-refresh', self.thgrefresh)
 
+        self.syncbox = gtk.HBox()
+        syncbox = self.syncbox
+
+        incoming = gtk.ToolButton(gtk.STOCK_GO_DOWN)
+        pull = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
+        outgoing = gtk.ToolButton(gtk.STOCK_GO_UP)
+        push = gtk.ToolButton(gtk.STOCK_GOTO_TOP)
+        syncbox.pack_start(incoming, False)
+        syncbox.pack_start(pull, False)
+        syncbox.pack_start(outgoing, False)
+        syncbox.pack_start(push, False)
+
+        ## target path combobox
+        urllist = gtk.ListStore(str, str)
+        urlcombo = gtk.ComboBoxEntry(urllist, 0)
+        cell = gtk.CellRendererText()
+        urlcombo.pack_end(cell, False)
+        urlcombo.add_attribute(cell, 'text', 1)
+        syncbox.pack_start(urlcombo, True, True, 2)
+
+        for alias, path in self.repo.ui.configitems('paths'):
+            path = url.hidepassword(path)
+            urllist.append([hglib.toutf(path), hglib.toutf(alias)])
+            if alias == 'default':
+                urlcombo.set_active(len(urllist)-1)
+
+        syncbox.pack_start(gtk.Label(_('After Pull:')), False, False, 2)
+        self.ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
+        ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
+        if 'fetch' in self.exs or 'fetch' == ppull:
+            self.ppulldata.append(('fetch', _('Fetch')))
+        if 'rebase' in self.exs or 'rebase' == ppull:
+            self.ppulldata.append(('rebase', _('Rebase')))
+
+        self.ppullcombo = gtk.combo_box_new_text()
+        ppullcombo = self.ppullcombo
+        for (index, (name, label)) in enumerate(self.ppulldata):
+            ppullcombo.insert_text(index, label)
+
+        for (index, (name, label)) in enumerate(self.ppulldata):
+            if ppull == name:
+                pos = index
+                break;
+        else:
+            pos = [index for (index, (name, label))
+                    in enumerate(self.ppulldata) if name == 'none'][0]
+        ppullcombo.set_active(pos)
+        syncbox.pack_start(ppullcombo, False, False, 2)
+
         self.filterbox = gtk.HBox()
         filterbox = self.filterbox
 
@@ -676,6 +736,7 @@ class GLog(gdialog.GDialog):
         filterbox.pack_start(entry, True)
 
         midpane = gtk.VBox()
+        midpane.pack_start(syncbox, False, False, 0)
         midpane.pack_start(filterbox, False, False, 0)
         midpane.pack_start(self.graphview, True, True, 0)
         midpane.show_all()
