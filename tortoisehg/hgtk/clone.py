@@ -69,7 +69,7 @@ class CloneDialog(gtk.Dialog):
                 else:
                     for col, widget in enumerate(widgets):
                         widget = getwidget(widget)
-                        flag = gtk.FILL if col == 0 else gtk.FILL|gtk.EXPAND
+                        flag = (col == 0) and gtk.FILL or gtk.FILL|gtk.EXPAND
                         newtable.attach(widget, col, col + 1, row, row + 1, flag, 0, 4, 2)
             return newtable, addrow
 

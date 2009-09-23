@@ -47,7 +47,7 @@ class InitDialog(gtk.Dialog):
                 table.attach(widgets[0], 0, col, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 2, 2)
             else:
                 for col, widget in enumerate(widgets):
-                    flag = gtk.FILL if col == 0 else gtk.FILL|gtk.EXPAND
+                    flag = (col == 0) and gtk.FILL or gtk.FILL|gtk.EXPAND
                     table.attach(widget, col, col + 1, row, row + 1, flag, 0, 4, 2)
 
         # init destination

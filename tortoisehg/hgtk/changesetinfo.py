@@ -21,7 +21,7 @@ def changesetinfo(repo, revid, head=False):
         label = gtk.Label()
         if bold:
             str = '<b>%s</b>' % str
-        label.set_alignment((1 if right else 0), 0)
+        label.set_alignment((right and 1 or 0), 0)
         label.set_markup(str)
         return label
     def addrow(table, header=None, value=None):
