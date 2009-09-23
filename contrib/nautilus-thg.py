@@ -35,13 +35,13 @@ def _thg_path():
         pfile = pfile[:-1]
     path = os.path.dirname(os.path.dirname(os.path.realpath(pfile)))
     thgpath = os.path.normpath(path)
-    testpath = os.path.join(thgpath, 'thgutil')
+    testpath = os.path.join(thgpath, 'tortoisehg')
     if os.path.isdir(testpath) and thgpath not in sys.path:
         sys.path.insert(0, thgpath)
 _thg_path()
 
-from thgutil import paths, debugthg, hglib, cachethg
-from hggtk import gtklib
+from tortoisehg.util import paths, debugthg, hglib, cachethg
+from tortoisehg.hgtk import gtklib
 
 if debugthg.debug('N'):
     debugf = debugthg.debugf
@@ -62,7 +62,7 @@ class HgExtension(nautilus.MenuProvider,
         self.allvfs = {}
         self.inv_dirs = set()
 
-        from thgutil import menuthg
+        from tortoisehg.util import menuthg
         self.hgtk = paths.find_in_path('hgtk')
         self.menu = menuthg.menuThg()
         self.notify = os.path.expanduser('~/.tortoisehg/notify')
