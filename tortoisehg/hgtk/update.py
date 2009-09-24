@@ -87,9 +87,6 @@ class UpdateDialog(gtk.Dialog):
         self.tables['summary'] = table
         self.vbox.pack_start(table)
 
-        ## changeset summaries
-        self.build_summaries()
-
         # options
         self.expander = gtk.Expander('Options')
         self.vbox.pack_start(self.expander, True, True, 2)
@@ -111,7 +108,6 @@ class UpdateDialog(gtk.Dialog):
 
         # prepare to show
         self.load_settings()
-        self.show_summaries(True)
         self.updatebtn.grab_focus()
         gobject.idle_add(self.after_init)
 
@@ -165,9 +161,16 @@ class UpdateDialog(gtk.Dialog):
         expanded = self.settings.get_value('expanded', True, True)
         self.expander.set_property('expanded', expanded)
 
+        summary = self.settings.get_value('summary', True, True)
+        self.show_summaries(summary)
+
     def store_settings(self):
         expanded = self.expander.get_property('expanded')
         self.settings.set_value('expanded', expanded)
+
+        summary = self.opt_summary.get_active()
+        self.settings.set_value('summary', summary)
+
         self.settings.write()
 
     def dialog_response(self, dialog, response_id):
@@ -216,7 +219,8 @@ class UpdateDialog(gtk.Dialog):
     def show_summaries(self, visible=True):
         if visible and not hasattr(self, 'ctxs'):
             self.build_summaries()
-        self.update_summaries()
+        if hasattr(self, 'ctxs'):
+            self.update_summaries()
         table = self.tables['summary']
         table.set_property('visible', visible)
 
