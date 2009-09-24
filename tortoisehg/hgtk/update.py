@@ -13,7 +13,7 @@ import gobject
 from mercurial import hg, ui
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, settings
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
@@ -47,6 +47,9 @@ class UpdateDialog(gtk.Dialog):
         self.updatebtn.connect('clicked', lambda b: self.update(repo))
         self.action_area.pack_end(self.updatebtn)
         self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+
+        # persistent settings
+        self.settings = settings.Settings('update')
 
         # layout table
         self.table = table = gtklib.LayoutTable()
@@ -122,6 +125,7 @@ class UpdateDialog(gtk.Dialog):
         combo.connect('changed', lambda b: self.update_revisions())
 
         # prepare to show
+        self.load_settings()
         self.update_revisions()
         self.updatebtn.grab_focus()
         gobject.idle_add(self.after_init)
@@ -138,8 +142,18 @@ class UpdateDialog(gtk.Dialog):
         self.cancelbtn.connect('clicked', self.cancel_clicked)
         self.action_area.pack_end(self.cancelbtn)
 
+    def load_settings(self):
+        expanded = self.settings.get_value('expanded', True, True)
+        self.expander.set_property('expanded', expanded)
+
+    def store_settings(self):
+        expanded = self.expander.get_property('expanded')
+        self.settings.set_value('expanded', expanded)
+        self.settings.write()
+
     def dialog_response(self, dialog, response_id):
         if not self.cmd.is_alive():
+            self.store_settings()
             self.destroy()
 
     def delete_event(self, dialog, event):
@@ -149,6 +163,7 @@ class UpdateDialog(gtk.Dialog):
             if ret == gtk.RESPONSE_YES:
                 self.cancel_clicked(self.cancelbtn)
             return True
+        self.store_settings()
         self.destroy()
 
     def cancel_clicked(self, button):
