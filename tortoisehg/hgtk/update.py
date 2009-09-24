@@ -243,7 +243,7 @@ class UpdateDialog(gtk.Dialog):
                     clean = isclean()
                 pa = p1.ancestor(p2)
                 return not clean and p1.branch() == p2.branch() and \
-                       (p1 != pa and p2 != pa)
+                       (p1 == pa or p2 == pa)
             def confirmupdate(clean=None, merge=None):
                 if clean is None:
                     clean = isclean()
