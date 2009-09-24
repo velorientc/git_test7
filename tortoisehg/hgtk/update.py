@@ -259,7 +259,10 @@ class UpdateDialog(gtk.Dialog):
         if len(ctxs) == 2:
             setlabel(self.current_rev_label2, ctxs[1])
         newrev = self.revcombo.get_active_text()
-        setlabel(self.new_rev_label, self.repo[newrev])
+        try:
+            setlabel(self.new_rev_label, self.repo[newrev])
+        except hglib.RepoError:
+            pass
 
     def update(self, repo):
         cmdline = ['hg', 'update', '--verbose']
