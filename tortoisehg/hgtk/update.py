@@ -273,10 +273,7 @@ class UpdateDialog(gtk.Dialog):
                 retlabel = buttons[retcode]
                 retid = [ id for id, (label, desc) in data.items() \
                              if label == retlabel ][0]
-                ret = {}
-                for id in data.keys():
-                    ret[id] = id == retid
-                return ret
+                return dict([(id, id == retid) for id in data.keys()])
             clean = isclean()
             if clean:
                 cmdline.append('--check')
