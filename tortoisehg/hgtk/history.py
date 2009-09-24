@@ -39,6 +39,8 @@ class GLog(gdialog.GDialog):
         self.ready = False
         self.filterbox = None
         self.details_model = None
+        self.syncbox = None
+        self.filteropts = {}
         os.chdir(self.repo.root)
 
         # Load extension support for commands which need it
@@ -85,6 +87,9 @@ class GLog(gdialog.GDialog):
     def get_menu_list(self):
         def refresh(menuitem, resettip):
             if resettip:
+                if self.filter == 'new':
+                    self.filter = 'all'
+                    self.filteropts = None
                 self.origtip = len(self.repo)
             self.reload_log()
         def navigate(menuitem, revname):
@@ -296,6 +301,7 @@ class GLog(gdialog.GDialog):
             self.select_branch(self.branchcombo)
         else:
             self.filter = type
+            self.filteropts = None
             self.reload_log()
 
     def patch_selected(self, mqwidget, revid, patchname):
@@ -413,7 +419,7 @@ class GLog(gdialog.GDialog):
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
                 'revrange':[], 'revlist':[], 'noheads':False,
                 'branch-view':False, 'rev':[] }
-        if self.opts is not None: opts = self.opts
+        if self.filteropts is not None: opts = self.filteropts
         opts['branch-view'] = self.compactgraph
         opts.update(kwopts)
 
@@ -493,7 +499,7 @@ class GLog(gdialog.GDialog):
             self.mqwidget.refresh()
 
         # Remember options to next time reload_log is called
-        self.opts = opts
+        self.filteropts = opts
 
     def tree_context_menu(self):
         m = gtk.Menu()
