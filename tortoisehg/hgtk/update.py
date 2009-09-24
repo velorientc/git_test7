@@ -49,28 +49,15 @@ class UpdateDialog(gtk.Dialog):
         self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         # layout table
-        self.table = table = gtk.Table(1, 2)
+        self.table = table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
-        # copy from 'thgconfig.py'
-        def addrow(text, widget, expand=True):
-            label = gtk.Label(text)
-            label.set_alignment(1, 0.5)
-            row = table.get_property('n-rows')
-            table.set_property('n-rows', row + 1)
-            table.attach(label, 0, 1, row, row + 1, gtk.FILL, 0, 4, 2)
-            if not expand:
-                hbox = gtk.HBox()
-                hbox.pack_start(widget, False, False)
-                hbox.pack_start(gtk.Label(''))
-                widget = hbox
-            table.attach(widget, 1, 2, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
 
         # revision label & combobox
         self.revcombo = combo = gtk.combo_box_entry_new_text()
         entry = combo.child
         entry.connect('activate', lambda b: self.update(repo))
         entry.set_width_chars(38)
-        addrow(_('Update to:'), self.revcombo, expand=False)
+        table.add_row(_('Update to:'), combo)
 
         # fill list of combo
         if rev != None:
@@ -96,7 +83,7 @@ class UpdateDialog(gtk.Dialog):
         label.set_selectable(True)
         hb = gtk.HBox()
         hb.pack_start(label, False, False)
-        addrow('', hb, expand=False)
+        table.add_row('', hb)
         self.new_rev_label = label
 
         # summary of current revision
@@ -108,30 +95,34 @@ class UpdateDialog(gtk.Dialog):
 
         self.ctxs = self.repo[None].parents()
         if len(self.ctxs) == 2:
-            addrow(_('Parent 1:'), hb, expand=False)
+            table.add_row(_('Parent 1:'), hb)
             label = gtk.Label('-')
             label.set_selectable(True)
             hb = gtk.HBox()
             hb.pack_start(label, False, False)
-            addrow('Parent 2:', hb, expand=False)
+            table.add_row('Parent 2:', hb)
             self.current_rev_label2 = label
         else:
-            addrow(_('Current:'), hb, expand=False)
+            table.add_row(_('Current:'), hb)
             self.current_rev_label2 = None
 
-        self.update_revisions()
-
         # options
-        group = gtk.RadioButton(None, _('Interactive'))
-        addrow(_('Options:'), group, expand=False)
+        self.expander = gtk.Expander('Options')
+        self.vbox.pack_start(self.expander, True, True, 2)
+        table = gtklib.LayoutTable()
+        self.expander.add(table)
 
-        btn = gtk.RadioButton(group, _('Discard local changes, no backup (-C/--clean)'))
-        addrow('', btn, expand=False)
+        group = gtk.RadioButton(None, _('Interactive'))
+        table.add_row(_('Ways:'), group)
+        btn = gtk.RadioButton(group, _('Discard local changes, '
+                                       'no backup (-C/--clean)'))
+        table.add_row(None, btn)
         self.opt_clean = btn
 
-        self.revcombo.connect('changed', lambda b: self.update_revisions())
+        combo.connect('changed', lambda b: self.update_revisions())
 
         # prepare to show
+        self.update_revisions()
         self.updatebtn.grab_focus()
         gobject.idle_add(self.after_init)
 
@@ -177,6 +168,7 @@ class UpdateDialog(gtk.Dialog):
         updating = not normal
 
         self.table.set_sensitive(normal)
+        self.expander.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
