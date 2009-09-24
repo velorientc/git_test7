@@ -51,18 +51,19 @@ class UpdateDialog(gtk.Dialog):
         # persistent settings
         self.settings = settings.Settings('update')
 
-        # layout table
-        self.table = table = gtklib.LayoutTable()
+        # layout table for fixed items
+        table = gtklib.LayoutTable(width=9)
+        self.tables = dict(fixed=table)
         self.vbox.pack_start(table, True, True, 2)
 
-        # revision label & combobox
+        ## revision label & combobox
         self.revcombo = combo = gtk.combo_box_entry_new_text()
         entry = combo.child
         entry.connect('activate', lambda b: self.update(repo))
         entry.set_width_chars(38)
         table.add_row(_('Update to:'), combo)
 
-        # fill list of combo
+        ## fill list of combo
         if rev != None:
             combo.append_text(str(rev))
         else:
@@ -80,6 +81,54 @@ class UpdateDialog(gtk.Dialog):
         tags.reverse()
         for t in tags:
             combo.append_text(t)
+
+        # layout table for summaries
+        table = gtklib.LayoutTable(width=9)
+        self.tables['summary'] = table
+        self.vbox.pack_start(table)
+
+        ## changeset summaries
+        self.build_summaries()
+
+        # options
+        self.expander = gtk.Expander('Options')
+        self.vbox.pack_start(self.expander, True, True, 2)
+        table = gtklib.LayoutTable()
+        self.expander.add(table)
+
+        ## update ways
+        group = gtk.RadioButton(None, _('Interactive'))
+        table.add_row(_('Ways:'), group)
+        btn = gtk.RadioButton(group, _('Discard local changes, '
+                                       'no backup (-C/--clean)'))
+        table.add_row(None, btn)
+        self.opt_clean = btn
+
+        ## summary displays
+        self.opt_summary = gtk.CheckButton(_('Show changeset summaries'))
+        self.opt_summary.connect('toggled', self.summary_toggled)
+        table.add_row(self.opt_summary)
+
+        # prepare to show
+        self.load_settings()
+        self.show_summaries(True)
+        self.updatebtn.grab_focus()
+        gobject.idle_add(self.after_init)
+
+    def after_init(self):
+        # CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, True, True, 6)
+
+        # cancel button
+        self.cancelbtn = gtk.Button(_('Cancel'))
+        self.cancelbtn.connect('clicked', self.cancel_clicked)
+        self.action_area.pack_end(self.cancelbtn)
+
+    def build_summaries(self):
+        table = self.tables['summary']
 
         # summary of new revision
         label = gtk.Label('-')
@@ -109,38 +158,8 @@ class UpdateDialog(gtk.Dialog):
             table.add_row(_('Current:'), hb)
             self.current_rev_label2 = None
 
-        # options
-        self.expander = gtk.Expander('Options')
-        self.vbox.pack_start(self.expander, True, True, 2)
-        table = gtklib.LayoutTable()
-        self.expander.add(table)
-
-        group = gtk.RadioButton(None, _('Interactive'))
-        table.add_row(_('Ways:'), group)
-        btn = gtk.RadioButton(group, _('Discard local changes, '
-                                       'no backup (-C/--clean)'))
-        table.add_row(None, btn)
-        self.opt_clean = btn
-
-        combo.connect('changed', lambda b: self.update_revisions())
-
-        # prepare to show
-        self.load_settings()
-        self.update_revisions()
-        self.updatebtn.grab_focus()
-        gobject.idle_add(self.after_init)
-
-    def after_init(self):
-        # CmdWidget
-        self.cmd = hgcmd.CmdWidget()
-        self.cmd.show_all()
-        self.cmd.hide()
-        self.vbox.pack_start(self.cmd, True, True, 6)
-
-        # cancel button
-        self.cancelbtn = gtk.Button(_('Cancel'))
-        self.cancelbtn.connect('clicked', self.cancel_clicked)
-        self.action_area.pack_end(self.cancelbtn)
+        table.show_all()
+        self.revcombo.connect('changed', lambda b: self.update_summaries())
 
     def load_settings(self):
         expanded = self.settings.get_value('expanded', True, True)
@@ -166,6 +185,9 @@ class UpdateDialog(gtk.Dialog):
         self.store_settings()
         self.destroy()
 
+    def summary_toggled(self, button):
+        self.show_summaries(button.get_active())
+
     def cancel_clicked(self, button):
         self.cmd.stop()
         self.cmd.show_log()
@@ -182,7 +204,8 @@ class UpdateDialog(gtk.Dialog):
             raise _('unknown mode name: %s') % mode
         updating = not normal
 
-        self.table.set_sensitive(normal)
+        for table in self.tables.values():
+            table.set_sensitive(normal)
         self.expander.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
@@ -190,7 +213,19 @@ class UpdateDialog(gtk.Dialog):
             self.cmd.set_property('visible', updating)
         self.cancelbtn.set_property('visible', updating)
 
-    def update_revisions(self):
+    def show_summaries(self, visible=True):
+        if visible and not hasattr(self, 'ctxs'):
+            self.build_summaries()
+        self.update_summaries()
+        table = self.tables['summary']
+        table.set_property('visible', visible)
+
+        # change check state
+        self.opt_summary.handler_block_by_func(self.summary_toggled)
+        self.opt_summary.set_active(visible)
+        self.opt_summary.handler_unblock_by_func(self.summary_toggled)
+
+    def update_summaries(self):
         def setlabel(label, ctx):
             revision = str(ctx.rev())
             hash = str(ctx)
