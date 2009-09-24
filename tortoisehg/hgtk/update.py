@@ -242,7 +242,7 @@ class UpdateDialog(gtk.Dialog):
             t = format % (face, size, revision, hash)
 
             branch = ctx.branch()
-            if branch != 'default':
+            if branch != 'default' or ctx == self.repo['default']:
                 format = '<span color="%s" background="%s"> %s </span> '
                 t += format % ('black', '#aaffaa', branch)
 
