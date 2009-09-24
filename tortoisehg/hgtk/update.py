@@ -233,9 +233,15 @@ class UpdateDialog(gtk.Dialog):
             cur = self.repo['.']
             node = self.repo[rev]
             def isclean():
+                '''whether WD is changed'''
                 wc = self.repo[None]
                 return not (wc.modified() or wc.added() or wc.removed())
+            def ismergedchange():
+                '''whether the local changes are merged (have 2 parents)'''
+                wc = self.repo[None]
+                return len(wc.parents()) == 2
             def iscrossbranch(p1, p2):
+                '''whether p1 -> p2 crosses branch'''
                 pa = p1.ancestor(p2)
                 return p1.branch() != p2.branch() or (p1 != pa and p2 != pa)
             def islocalmerge(p1, p2, clean=None):
@@ -244,11 +250,9 @@ class UpdateDialog(gtk.Dialog):
                 pa = p1.ancestor(p2)
                 return not clean and p1.branch() == p2.branch() and \
                        (p1 == pa or p2 == pa)
-            def confirmupdate(clean=None, merge=None):
+            def confirmupdate(clean=None):
                 if clean is None:
                     clean = isclean()
-                if merge is None:
-                    merge = islocalmerge(cur, node, clean)
 
                 msg = _('Detected uncommitted local changes in working tree.\n'
                         'Please select to continue:\n\n')
@@ -259,8 +263,11 @@ class UpdateDialog(gtk.Dialog):
                         'merge': (_('&Merge'),
                                   _('Merge - allow to merge with local changes')),
                         'cancel': (_('&Cancel'), None)}
-                opts = [data['discard'], data['shelve']]
-                if merge:
+
+                opts = [data['discard']]
+                if not ismergedchange():
+                    opts.append(data['shelve'])
+                if islocalmerge(cur, node, clean):
                     opts.append(data['merge'])
                 opts.append(data['cancel'])
 
