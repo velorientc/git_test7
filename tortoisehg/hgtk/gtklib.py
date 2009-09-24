@@ -318,6 +318,62 @@ class NativeFolderSelectDialog:
             return fname
         return None
 
+class LayoutTable(gtk.Frame):
+
+    def __init__(self, width=0):
+        gtk.Frame.__init__(self)
+        self.set_shadow_type(gtk.SHADOW_NONE)
+
+        self.width = width
+        self.table = gtk.Table(1, 2)
+        self.add(self.table)
+
+    def add_row(self, *widgets, **kargs):
+        if len(widgets) == 0:
+            return
+        t = self.table
+        FLAG = gtk.FILL|gtk.EXPAND
+        rows = t.get_property('n-rows')
+        t.set_property('n-rows', rows + 1)
+        expand = kargs.get('expand', False)
+        def getwidget(obj):
+            if obj == None:
+                return gtk.Label('')
+            elif isinstance(obj, (int, long)):
+                lbl = gtk.Label('')
+                lbl.set_width_chars(obj)
+                return lbl
+            elif isinstance(obj, basestring):
+                lbl = gtk.Label(obj)
+                return lbl
+            return obj
+        def pack(widgets, expand=False):
+            hbox = gtk.HBox()
+            if len(widgets) > 0:
+                widgets = [ getwidget(w) for w in widgets ]
+                if not expand:
+                    widgets.append(gtk.Label(''))
+                rest, last = widgets[:-1], widgets[-1]
+                for obj in rest:
+                    widget = getwidget(obj)
+                    hbox.pack_start(widget, False, False)
+                hbox.pack_start(last)
+            return hbox
+        if len(widgets) == 1:
+            cols = t.get_property('n-columns')
+            widget = getwidget(widgets[0])
+            widget = pack((widget,), expand=expand)
+            t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, 4, 2)
+        else:
+            first = getwidget(widgets[0])
+            if isinstance(first, gtk.Label):
+                first.set_alignment(1, 0.5)
+                if self.width > 0:
+                    first.set_width_chars(self.width)
+            t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, 4, 2)
+            rest = pack(widgets[1:], expand=expand)
+            t.attach(rest, 1, 2, rows, rows + 1, FLAG, 0, 4, 2)
+
 def addspellcheck(textview, ui=None):
     lang = None
     if ui:
