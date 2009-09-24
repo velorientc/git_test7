@@ -237,7 +237,8 @@ class ChangeSet(gdialog.GDialog):
         title_line(_('changeset:'), change + ' ' + summary, 'changeset')
         if branch != 'default':
             title_line(_('branch:'), branch, 'greybg')
-        title_line(_('user/date:'), ctx.user() + '\t' + date, 'changeset')
+        title_line(_('user:'), ctx.user(), 'changeset')
+        title_line(_('date:'), date, 'changeset')
 
         def insert_link(title, ctx, highlight=False):
             try:
