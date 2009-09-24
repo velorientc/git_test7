@@ -124,14 +124,6 @@ class UpdateDialog(gtk.Dialog):
         # options
         group = gtk.RadioButton(None, _('Interactive'))
         addrow(_('Options:'), group, expand=False)
-        self.opt_inter = group
-
-        btn = gtk.RadioButton(group, _('Allow merge with local changes (default)'))
-        addrow('', btn, expand=False)
-
-        btn = gtk.RadioButton(group, _('Abort if local changes found (-c/--check)'))
-        addrow('', btn, expand=False)
-        self.opt_check = btn
 
         btn = gtk.RadioButton(group, _('Discard local changes, no backup (-C/--clean)'))
         addrow('', btn, expand=False)
@@ -229,7 +221,9 @@ class UpdateDialog(gtk.Dialog):
         cmdline.append('--rev')
         cmdline.append(rev)
 
-        if self.opt_inter.get_active():
+        if self.opt_clean.get_active():
+            cmdline.append('--clean')
+        else:
             cur = self.repo['.']
             node = self.repo[rev]
             def isclean():
@@ -305,11 +299,6 @@ class UpdateDialog(gtk.Dialog):
                     return
                 else:
                     raise _('invalid dialog result: %s') % ret
-        else:
-            if self.opt_check.get_active():
-                cmdline.append('--check')
-            elif self.opt_clean.get_active():
-                cmdline.append('--clean')
 
         def cmd_done(returncode):
             self.switch_to(MODE_NORMAL, cmd=False)
