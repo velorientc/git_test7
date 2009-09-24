@@ -21,7 +21,7 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
 
 from tortoisehg.hgtk import dialog, gtklib, hgthread, history, thgconfig
-from tortoisehg.hgtk import thgshelve, hgemail
+from tortoisehg.hgtk import thgshelve, hgemail, update
 
 class SynchDialog(gtk.Window):
     def __init__(self, repos=[], pushmode=False, fromlog=False):
@@ -273,12 +273,8 @@ class SynchDialog(gtk.Window):
         self.viewpulled.connect('clicked', self._view_pulled_changes)
         self.updatetip = gtk.Button(_('Update to branch tip'))
         self.updatetip.connect('clicked', self._update_to_tip)
-        self.updatetipcheck = gtk.CheckButton(_('Check update'))
-        self.tips.set_tip(self.updatetipcheck, _('Force update unless there'
-            ' are uncommitted changes'))
         self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
         self.buttonhbox.pack_start(self.updatetip, False, False, 2)
-        self.buttonhbox.pack_start(self.updatetipcheck, False, False, 2)
         self.basevbox.pack_start(self.buttonhbox, False, False, 2)
 
     def finalize_startup(self, *args):
@@ -350,11 +346,9 @@ class SynchDialog(gtk.Window):
         parents = repo.parents()
         if len(parents) > 1 or parents[0].node() == branchhead or not branchhead:
             self.updatetip.hide()
-            self.updatetipcheck.hide()
         else:
             self.buttonhbox.show()
             self.updatetip.show()
-            self.updatetipcheck.show()
         self.repo = repo
 
     def _view_pulled_changes(self, button):
@@ -363,16 +357,18 @@ class SynchDialog(gtk.Window):
         dlg.display()
 
     def _update_to_tip(self, button):
-        # execute command and show output on text widget
-        gobject.timeout_add(10, self.process_queue)
-        self.write("", False)
-        cmdline = ['update', '-v']
-        if self.updatetipcheck.get_active():
-            cmdline += ['--check']
-        self.hgthread = hgthread.HgThread(cmdline)
-        self.hgthread.start()
-        self.stbar.begin()
-        self.stbar.set_status_text('hg ' + ' '.join(cmdline))
+        def update_notify(arg):
+            if self.notify_func:
+                self.notify_func(self.notify_args)
+            self.update_buttons()
+
+        wc = self.repo[None]
+        dialog = update.UpdateDialog(wc.branch())
+        dialog.set_notify_func(update_notify, None)
+        dialog.set_transient_for(self)
+        dialog.show_all()
+        dialog.present()
+        dialog.set_transient_for(None)
 
     def get_paths(self, sort="value"):
         """ retrieve symbolic paths """
