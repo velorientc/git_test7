@@ -87,24 +87,25 @@ class UpdateDialog(gtk.Dialog):
         self.tables['summary'] = table
         self.vbox.pack_start(table)
 
-        # options
-        self.expander = gtk.Expander('Options')
+        # advanced expander
+        self.expander = gtk.Expander(_('Advanced options'))
         self.vbox.pack_start(self.expander, True, True, 2)
-        table = gtklib.LayoutTable()
-        self.expander.add(table)
+        vb = gtk.VBox()
+        self.expander.add(vb)
+        hb = gtk.HBox()
+        vb.pack_start(hb, True, True, 4)
+        expbox = gtk.VBox()
+        hb.pack_start(expbox, True, True, 16)
 
-        ## update ways
+        ## update method
         group = gtk.RadioButton(None, _('Interactive'))
-        table.add_row(_('Ways:'), group)
+        expbox.pack_start(group)
         btn = gtk.RadioButton(group, _('Discard local changes, '
                                        'no backup (-C/--clean)'))
-        table.add_row(None, btn)
+        expbox.pack_start(btn)
         self.opt_clean = btn
 
-        ## summary displays
-        self.opt_summary = gtk.CheckButton(_('Show changeset summaries'))
-        self.opt_summary.connect('toggled', self.summary_toggled)
-        table.add_row(self.opt_summary)
+        self.show_summaries(True)
 
         # prepare to show
         self.load_settings()
@@ -167,10 +168,6 @@ class UpdateDialog(gtk.Dialog):
     def store_settings(self):
         expanded = self.expander.get_property('expanded')
         self.settings.set_value('expanded', expanded)
-
-        summary = self.opt_summary.get_active()
-        self.settings.set_value('summary', summary)
-
         self.settings.write()
 
     def dialog_response(self, dialog, response_id):
@@ -187,9 +184,6 @@ class UpdateDialog(gtk.Dialog):
             return True
         self.store_settings()
         self.destroy()
-
-    def summary_toggled(self, button):
-        self.show_summaries(button.get_active())
 
     def cancel_clicked(self, button):
         self.cmd.stop()
@@ -223,11 +217,6 @@ class UpdateDialog(gtk.Dialog):
             self.update_summaries()
         table = self.tables['summary']
         table.set_property('visible', visible)
-
-        # change check state
-        self.opt_summary.handler_block_by_func(self.summary_toggled)
-        self.opt_summary.set_active(visible)
-        self.opt_summary.handler_unblock_by_func(self.summary_toggled)
 
     def update_summaries(self):
         def setlabel(label, ctx):
