@@ -58,7 +58,12 @@ def __get_parents(repo, rev):
     return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
 
 def _color_of_branch(repo, rev):
-    return sum([ord(c) for c in repo[rev].branch()])
+    branch = repo[rev].branch()
+    if branch == 'default':
+        color = 0
+    else:
+        color = sum([ord(c) for c in branch])
+    return color
 
 def _color_of(repo, rev, nextcolor, preferredcolor, branch_color=False):
     if not branch_color:
