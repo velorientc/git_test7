@@ -234,7 +234,12 @@ class ChangeSet(gdialog.GDialog):
 
         branch = ctx.branch()
 
-        title_line(_('changeset:'), change + ' ' + summary, 'changeset')
+        utext = toutf(pad_right(_('changeset:')) + change)
+        buf.insert_with_tags_by_name(eob, utext, 'changeset')
+        utext = toutf(' ' + summary)
+        buf.insert_with_tags_by_name(eob, utext, 'changeset-summary')
+        buf.insert(eob, "\n")
+
         if branch != 'default':
             title_line(_('branch:'), branch, 'greybg')
         title_line(_('user:'), ctx.user(), 'changeset')
@@ -257,7 +262,7 @@ class ChangeSet(gdialog.GDialog):
             ins = buf.insert_with_tags_by_name
             ins(eob, pad_right(title), 'parent' + hl)
             ins(eob, link, 'link' + hl)
-            ins(eob, ' ' + summary, 'parent' + hl)
+            ins(eob, ' ' + summary, 'changeset-summary')
             buf.insert(eob, "\n")
 
         ismerge = (len(ctx.parents()) == 2)
@@ -612,8 +617,10 @@ class ChangeSet(gdialog.GDialog):
 
         tag_table = self._buffer.get_tag_table()
 
-        tag_table.add( make_texttag('changeset', foreground='#000090',
+        tag_table.add(make_texttag('changeset', foreground='#000090',
                 paragraph_background='#F0F0F0'))
+        tag_table.add(make_texttag('changeset-summary', foreground='black',
+                paragraph_background='#F0F0F0', family='Sans'))
         tag_table.add(make_texttag('date', foreground='#000090',
                 paragraph_background='#F0F0F0'))
         tag_table.add(make_texttag('tag', foreground='#000090',
