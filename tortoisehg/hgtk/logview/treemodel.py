@@ -135,12 +135,16 @@ class TreeModel(gtk.GenericTreeModel):
             if self.repo.ui.configbool('tortoisehg', 'longsummary'):
                 limit = 80
                 lines = summary.splitlines()
-                summary = lines.pop(0)
-                while len(summary) < limit and lines:
-                    summary += u'  ' + lines.pop(0)
-                summary = summary[0:limit]
+                if lines:
+                    summary = lines.pop(0)
+                    while len(summary) < limit and lines:
+                        summary += u'  ' + lines.pop(0)
+                    summary = summary[0:limit]
+                else:
+                    summary = ''
             else:
-                summary = summary.splitlines()[0]
+                lines = summary.splitlines()
+                summary = lines and lines[0] or ''
             summary = gtklib.markup_escape_text(hglib.toutf(summary))
             node = ctx.node()
             tags = self.repo.nodetags(node)
