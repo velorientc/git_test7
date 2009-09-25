@@ -635,10 +635,27 @@ class GLog(gdialog.GDialog):
         pull = gtk.ToolButton(gtk.STOCK_GOTO_BOTTOM)
         outgoing = gtk.ToolButton(gtk.STOCK_GO_UP)
         push = gtk.ToolButton(gtk.STOCK_GOTO_TOP)
+        conf = gtk.ToolButton(gtk.STOCK_PREFERENCES)
+        stop = gtk.ToolButton(gtk.STOCK_STOP)
+        stop.set_sensitive(False)
         syncbox.pack_start(incoming, False)
         syncbox.pack_start(pull, False)
         syncbox.pack_start(outgoing, False)
         syncbox.pack_start(push, False)
+        syncbox.pack_start(stop, False)
+
+        self.tooltips.set_tip(incoming,
+            _('Download and view incoming changesets'))
+        self.tooltips.set_tip(pull,
+            _('Pull incoming changesets'))
+        self.tooltips.set_tip(outgoing,
+            _('Determine and mark outgoing changesets'))
+        self.tooltips.set_tip(push,
+            _('Push outgoing changesets'))
+        self.tooltips.set_tip(stop,
+            _('Stop current transaction'))
+        self.tooltips.set_tip(conf,
+            _('Configure aliases and after push behavior'))
 
         ## target path combobox
         urllist = gtk.ListStore(str, str)
@@ -653,6 +670,9 @@ class GLog(gdialog.GDialog):
             urllist.append([hglib.toutf(path), hglib.toutf(alias)])
             if alias == 'default':
                 urlcombo.set_active(len(urllist)-1)
+
+        conf.connect('clicked', self.conf_clicked, urlcombo)
+        syncbox.pack_start(conf, False)
 
         syncbox.pack_start(gtk.Label(_('After Pull:')), False, False, 2)
         self.ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
@@ -780,6 +800,30 @@ class GLog(gdialog.GDialog):
 
     def get_extras(self):
         return self.stbar
+
+    def conf_clicked(self, toolbutton, combo):
+        newpath = hglib.fromutf(combo.get_child().get_text()).strip()
+        for alias, path in self.repo.ui.configitems('paths'):
+            if newpath in (path, url.hidepassword(path)):
+                newpath = None
+                break
+        dlg = thgconfig.ConfigDialog(True)
+        dlg.show_all()
+        if newpath:
+            dlg.new_path(newpath, 'default')
+        else:
+            dlg.focus_field('tortoisehg.postpull')
+        dlg.run()
+        dlg.hide()
+
+        self.refreshui()
+        urllist = combo.get_model()
+        urllist.clear()
+        for alias, path in self.repo.ui.configitems('paths'):
+            path = url.hidepassword(path)
+            urllist.append([hglib.toutf(path), hglib.toutf(alias)])
+            if alias == 'default':
+                combo.set_active(len(urllist)-1)
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
