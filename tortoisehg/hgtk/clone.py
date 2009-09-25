@@ -48,41 +48,12 @@ class CloneDialog(gtk.Dialog):
         elif len(repos):
             srcpath = repos[0]
 
-        # copy from 'thgconfig.py'
-        def createtable(cols=2):
-            newtable = gtk.Table(1, cols)
-            def addrow(*widgets):
-                row = newtable.get_property('n-rows')
-                newtable.set_property('n-rows', row + 1)
-                def getwidget(obj):
-                    if obj == None:
-                        return gtk.Label('')
-                    elif isinstance(obj, (int, long)):
-                        widget = gtk.Label('')
-                        widget.set_width_chars(obj)
-                        return widget
-                    return obj
-                if len(widgets) == 1:
-                    col = newtable.get_property('n-columns')
-                    widget = getwidget(widgets[0])
-                    newtable.attach(widget, 0, col, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
-                else:
-                    for col, widget in enumerate(widgets):
-                        widget = getwidget(widget)
-                        flag = (col == 0) and gtk.FILL or gtk.FILL|gtk.EXPAND
-                        newtable.attach(widget, col, col + 1, row, row + 1, flag, 0, 4, 2)
-            return newtable, addrow
-
         # layout table for fixed options
-        table, addrow = createtable()
+        table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
         def setcombosize(combo):
             combo.set_size_request(300, -1)
             combo.size_request()
-
-        ## clone source label
-        lbl = gtk.Label(_('Source path:'))
-        lbl.set_alignment(1, 0.5)
 
         ## comboentry for source paths
         srcbox = gtk.HBox()
@@ -106,7 +77,7 @@ class CloneDialog(gtk.Dialog):
         srcbrowse.connect('clicked', self.source_browse_clicked)
         srcbox.pack_start(srcbrowse, False, False, 4)
 
-        addrow(lbl, srcbox)
+        table.add_row(_('Source path:'), srcbox)
 
         ## add pre-defined src paths to pull-down list
         sync_src = settings.Settings('synch').mrul('src_paths')
@@ -117,10 +88,6 @@ class CloneDialog(gtk.Dialog):
         paths.sort()
         for p in paths:
             self.srclist.append([p])
-
-        ## clone dest label
-        lbl = gtk.Label(_('Destination path:'))
-        lbl.set_alignment(1, 0.5)
 
         ## comboentry for destination paths
         destbox = gtk.HBox()
@@ -145,7 +112,7 @@ class CloneDialog(gtk.Dialog):
         destbrowse.connect('clicked', self.dest_browse_clicked)
         destbox.pack_end(destbrowse, False, False, 4)
 
-        addrow(lbl, destbox)
+        table.add_row(_('Destination path:'), destbox)
 
         ## add most-recent dest paths to pull-down list
         paths = list(self.recentdest)
@@ -158,7 +125,7 @@ class CloneDialog(gtk.Dialog):
         self.vbox.pack_start(expander, True, True, 2)
 
         # layout table for advanced options
-        table, addrow = createtable()
+        table = gtklib.LayoutTable()
         expander.add(table)
 
         ## revision option
@@ -169,19 +136,19 @@ class CloneDialog(gtk.Dialog):
         self.optrev.connect('toggled', self.checkbutton_toggled, self.reventry)
         hbox.pack_start(self.optrev, False, False)
         hbox.pack_start(self.reventry, False, False, 4)
-        addrow(hbox)
+        table.add_row(hbox)
 
         ## options
         self.optupdate = gtk.CheckButton(_('Do not update the new working directory'))
         self.optpull = gtk.CheckButton(_('Use pull protocol to copy metadata'))
         self.optuncomp = gtk.CheckButton(_('Use uncompressed transfer'))
-        addrow(self.optupdate)
-        addrow(self.optpull)
-        addrow(self.optuncomp)
+        table.add_row(self.optupdate)
+        table.add_row(self.optpull)
+        table.add_row(self.optuncomp)
 
         ## proxy options
         self.optproxy = gtk.CheckButton(_('Use proxy server'))
-        addrow(self.optproxy)
+        table.add_row(self.optproxy)
         if self.ui.config('http_proxy', 'host'):
             self.optproxy.set_active(True)
         else:
@@ -192,8 +159,8 @@ class CloneDialog(gtk.Dialog):
         self.remotecmdentry.set_sensitive(False)
         self.optremote = gtk.CheckButton(_('Remote command:'))
         self.optremote.connect('toggled', self.checkbutton_toggled, self.remotecmdentry)
-        addrow(self.optremote)
-        addrow(self.remotecmdentry)
+        table.add_row(self.optremote)
+        table.add_row(self.remotecmdentry, expand=True)
 
         # prepare to show
         self.load_settings()
