@@ -328,6 +328,12 @@ class LayoutTable(gtk.Frame):
         self.table = gtk.Table(1, 2)
         self.add(self.table)
 
+        self.set_default_paddings()
+
+    def set_default_paddings(self, xpad=-1, ypad=-1):
+        self.xpad = xpad >= 0 and xpad or 4
+        self.ypad = ypad >= 0 and ypad or 2
+
     def add_row(self, *widgets, **kargs):
         if len(widgets) == 0:
             return
@@ -336,6 +342,8 @@ class LayoutTable(gtk.Frame):
         rows = t.get_property('n-rows')
         t.set_property('n-rows', rows + 1)
         expand = kargs.get('expand', False)
+        xpad = kargs.get('xpad', self.xpad)
+        ypad = kargs.get('ypad', self.ypad)
         def getwidget(obj):
             if obj == None:
                 return gtk.Label('')
@@ -363,16 +371,16 @@ class LayoutTable(gtk.Frame):
             cols = t.get_property('n-columns')
             widget = getwidget(widgets[0])
             widget = pack((widget,), expand=expand)
-            t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, 4, 2)
+            t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, xpad, ypad)
         else:
             first = getwidget(widgets[0])
             if isinstance(first, gtk.Label):
                 first.set_alignment(1, 0.5)
                 if self.width > 0:
                     first.set_width_chars(self.width)
-            t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, 4, 2)
+            t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, xpad, ypad)
             rest = pack(widgets[1:], expand=expand)
-            t.attach(rest, 1, 2, rows, rows + 1, FLAG, 0, 4, 2)
+            t.attach(rest, 1, 2, rows, rows + 1, FLAG, 0, xpad, ypad)
 
 def addspellcheck(textview, ui=None):
     lang = None
