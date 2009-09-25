@@ -28,6 +28,7 @@ class UpdateDialog(gtk.Dialog):
         gtklib.set_tortoise_icon(self, 'menucheckout.ico')
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
+        self.set_size_request(400, -1)
         self.set_has_separator(False)
         self.connect('response', self.dialog_response)
         self.connect('delete-event', self.delete_event)
@@ -126,35 +127,34 @@ class UpdateDialog(gtk.Dialog):
 
     def build_summaries(self):
         table = self.tables['summary']
+        
+        def new_label():
+            label = gtk.Label('-')
+            label.set_selectable(True)
+            label.set_line_wrap(True)
+            label.set_size_request(300, -1)
+            hb = gtk.HBox()
+            hb.pack_start(label, False, False)
+            return hb, label
 
         # summary of new revision
-        label = gtk.Label('-')
-        label.set_selectable(True)
-        hb = gtk.HBox()
-        hb.pack_start(label, False, False)
-        table.add_row('', hb)
+        hb, label = new_label()
+        table.add_row('Target:', hb, expand=True)
         self.new_rev_label = label
 
-        # summary of current revision
-        label = gtk.Label('-')
-        label.set_selectable(True)
-        hb = gtk.HBox()
-        hb.pack_start(label, False, False)
+        # summary of current revision(s)
+        hb, label = new_label()
         self.current_rev_label1 = label
 
         self.ctxs = self.repo[None].parents()
         if len(self.ctxs) == 2:
             table.add_row(_('Parent 1:'), hb)
-            label = gtk.Label('-')
-            label.set_selectable(True)
-            hb = gtk.HBox()
-            hb.pack_start(label, False, False)
-            table.add_row('Parent 2:', hb)
+            hb, label = new_label()
+            table.add_row('Parent 2:', hb, expand=True)
             self.current_rev_label2 = label
         else:
-            table.add_row(_('Current:'), hb)
+            table.add_row(_('Parent:'), hb, expand=True)
             self.current_rev_label2 = None
-
         table.show_all()
         self.revcombo.connect('changed', lambda b: self.update_summaries())
 
@@ -227,11 +227,11 @@ class UpdateDialog(gtk.Dialog):
             face = 'monospace'
             size = '9000'
 
-            format = '<span face="%s" size="%s">%s (%s) </span>'
+            format = '<span face="%s" size="%s">%s (%s)\n</span>'
             t = format % (face, size, revision, hash)
 
             branch = ctx.branch()
-            if branch != 'default' or ctx == self.repo['default']:
+            if branch != 'default':
                 format = '<span color="%s" background="%s"> %s </span> '
                 t += format % ('black', '#aaffaa', branch)
 
