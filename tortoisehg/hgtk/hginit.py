@@ -36,24 +36,11 @@ class InitDialog(gtk.Dialog):
         # preconditioning info
         self.dest_path = os.path.abspath(repos and repos[0] or self.cwd)
 
-        # copy from 'thgconfig.py'
-        table = gtk.Table(1, 2)
+        # layout table
+        table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
-        def addrow(*widgets):
-            row = table.get_property('n-rows')
-            table.set_property('n-rows', row + 1)
-            if len(widgets) == 1:
-                col = table.get_property('n-columns')
-                table.attach(widgets[0], 0, col, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 2, 2)
-            else:
-                for col, widget in enumerate(widgets):
-                    flag = (col == 0) and gtk.FILL or gtk.FILL|gtk.EXPAND
-                    table.attach(widget, col, col + 1, row, row + 1, flag, 0, 4, 2)
 
         # init destination
-        lbl = gtk.Label(_('Destination:'))
-
-        destbox = gtk.HBox()
         self.destentry = gtk.Entry()
         self.destentry.set_size_request(260, -1)
         self.destentry.size_request()
@@ -61,21 +48,19 @@ class InitDialog(gtk.Dialog):
         self.destentry.grab_focus()
         self.destentry.set_position(-1)
         self.destentry.connect('activate', lambda b: self.init())
-        destbox.pack_start(self.destentry, True, True, 2)
 
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.dest_clicked)
-        destbox.pack_start(destbrowse, False, False, 2)
 
-        addrow(lbl, destbox)
+        table.add_row(_('Destination:'), self.destentry, destbrowse)
 
         # options
         self.optspfiles = gtk.CheckButton(
                 _('Add special files (.hgignore, ...)'))
         self.optoldrepo = gtk.CheckButton(
                 _('Make repo compatible with Mercurial 1.0'))
-        addrow(self.optspfiles)
-        addrow(self.optoldrepo)
+        table.add_row(self.optspfiles, xpad=2)
+        table.add_row(self.optoldrepo, xpad=2)
 
         # set option states
         self.optspfiles.set_active(True)
