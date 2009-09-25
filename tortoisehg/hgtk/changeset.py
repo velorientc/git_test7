@@ -321,20 +321,13 @@ class ChangeSet(gdialog.GDialog):
                 # branch
                 if branch:
                     title_line(_('branch:'), toutf(branch), 'greybg')
-                # user/date
-                udhead = udbody = None
-                if user and date:
-                    udhead = _('user/date:')
-                    udbody = toutf(user) + '\t' \
-                             + displaytime(util.parsedate(date))
-                elif user:
-                    udhead = _('user:')
-                    udbody = toutf(user)
-                elif date:
-                    udhead = _('date:')
-                    udbody = displaytime(util.parsedate(date))
-                if udhead and udbody:
-                    title_line(udhead, udbody, 'changeset')
+                # user
+                if user:
+                    title_line(_('user:'), toutf(user), 'changeset')
+                # date
+                if date:
+                    title_line(_('date:'), displaytime(util.parsedate(date)),
+                               'changeset')
                 # parents
                 for pnode in (p1, p2):
                     if pnode is None:
@@ -342,7 +335,8 @@ class ChangeSet(gdialog.GDialog):
                     title_line(_('parent:'), pnode[:12], 'parent')
                 # commit message
                 if msg:
-                    buf.insert(eob, '\n' + toutf(msg.rstrip('\r\n')) + '\n\n')
+                    cmsg = '\n' + toutf(msg.rstrip('\r\n')) + '\n\n'
+                    buf.insert(eob, cmsg)
             finally:
                 if tmp:
                     os.unlink(tmp)
