@@ -45,9 +45,7 @@ class UpdateDialog(gtk.Dialog):
         self.set_title(_('Update - %s') % reponame)
 
         # add dialog buttons
-        self.updatebtn = gtk.Button(_('Update'))
-        self.updatebtn.connect('clicked', lambda b: self.update(repo))
-        self.action_area.pack_end(self.updatebtn)
+        self.updatebtn = self.add_button(_('Update'), gtk.RESPONSE_OK)
         self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
 
         # layout table for fixed items
@@ -145,7 +143,9 @@ class UpdateDialog(gtk.Dialog):
         self.revcombo.connect('changed', lambda b: self.update_summaries())
 
     def dialog_response(self, dialog, response_id):
-        if not self.cmd.is_alive():
+        if response_id == gtk.RESPONSE_OK:
+            self.update(self.repo)
+        elif not self.cmd.is_alive():
             self.destroy()
 
     def delete_event(self, dialog, event):
