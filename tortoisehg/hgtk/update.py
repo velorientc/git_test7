@@ -48,7 +48,7 @@ class UpdateDialog(gtk.Dialog):
         self.updatebtn = gtk.Button(_('Update'))
         self.updatebtn.connect('clicked', lambda b: self.update(repo))
         self.action_area.pack_end(self.updatebtn)
-        self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+        self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
 
         # layout table for fixed items
         table = gtklib.LayoutTable(width=9)
