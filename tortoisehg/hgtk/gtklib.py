@@ -320,18 +320,23 @@ class NativeFolderSelectDialog:
 
 class LayoutTable(gtk.VBox):
 
-    def __init__(self, width=0):
+    def __init__(self):
         gtk.VBox.__init__(self)
 
-        self.width = width
         self.table = gtk.Table(1, 2)
         self.pack_start(self.table)
+        self.headers = []
 
         self.set_default_paddings()
 
     def set_default_paddings(self, xpad=-1, ypad=-1):
         self.xpad = xpad >= 0 and xpad or 4
         self.ypad = ypad >= 0 and ypad or 2
+
+    def get_first_header(self):
+        if len(self.headers) > 0:
+            return self.headers[0]
+        return None
 
     def add_row(self, *widgets, **kargs):
         if len(widgets) == 0:
@@ -348,38 +353,38 @@ class LayoutTable(gtk.VBox):
                 return gtk.Label('')
             elif isinstance(obj, (int, long)):
                 lbl = gtk.Label('')
-                lbl.set_width_chars(obj)
+                lbl.set_size_request(obj, -1)
+                lbl.size_request()
                 return lbl
             elif isinstance(obj, basestring):
                 lbl = gtk.Label(obj)
                 return lbl
             return obj
-        def pack(widgets, expand=False):
+        def pack(*widgets, **kargs):
+            expand = kargs.get('expand', False)
             hbox = gtk.HBox()
-            if len(widgets) > 0:
-                widgets = [ getwidget(w) for w in widgets ]
-                if not expand:
-                    widgets.append(gtk.Label(''))
-                rest, last = widgets[:-1], widgets[-1]
-                for index, obj in enumerate(rest):
-                    widget = getwidget(obj)
-                    pad = index != 0 and 2 or 0
-                    hbox.pack_start(widget, False, False, pad)
-                hbox.pack_start(last, 2)
+            widgets = [ getwidget(w) for w in widgets ]
+            if not expand:
+                widgets.append(gtk.Label(''))
+            rest, last = widgets[:-1], widgets[-1]
+            for index, obj in enumerate(rest):
+                widget = getwidget(obj)
+                pad = index != 0 and 2 or 0
+                hbox.pack_start(widget, False, False, pad)
+            hbox.pack_start(last, 2)
             return hbox
         if len(widgets) == 1:
             cols = t.get_property('n-columns')
             widget = getwidget(widgets[0])
-            widget = pack((widget,), expand=expand)
+            widget = pack(widget, **kargs)
             t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, xpad, ypad)
         else:
             first = getwidget(widgets[0])
             if isinstance(first, gtk.Label):
                 first.set_alignment(1, 0.5)
-                if self.width > 0:
-                    first.set_width_chars(self.width)
             t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, xpad, ypad)
-            rest = pack(widgets[1:], expand=expand)
+            self.headers.append(first)
+            rest = pack(*(widgets[1:]), **kargs)
             t.attach(rest, 1, 2, rows, rows + 1, FLAG, 0, xpad, ypad)
 
 def addspellcheck(textview, ui=None):
