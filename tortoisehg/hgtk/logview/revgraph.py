@@ -447,6 +447,9 @@ def filtered_log_generator(repo, pats, opts):
        pats - list of file names or patterns
        opts - command line options for log command
     '''
+
+    only_branch = opts.get('branch', None)
+
     # Log searches: pattern, keyword, date, etc
     df = False
     if opts['date']:
@@ -462,6 +465,13 @@ def filtered_log_generator(repo, pats, opts):
             continue
         if st != 'add':
             continue
+
+        ctx = get(rev)
+
+        if only_branch:
+            if ctx.branch() != only_branch:
+                continue
+
         parents = __get_parents(repo, rev)
         if opts['no_merges'] and len(parents) == 2:
             continue
@@ -475,7 +485,6 @@ def filtered_log_generator(repo, pats, opts):
 
         # TODO: add copies/renames later
         if opts['keyword']:
-            ctx = get(rev)
             miss = 0
             for k in [kw.lower() for kw in opts['keyword']]:
                 if not (k in ctx.user().lower() or
