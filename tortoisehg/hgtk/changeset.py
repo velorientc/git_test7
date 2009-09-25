@@ -152,7 +152,7 @@ class ChangeSet(gdialog.GDialog):
             type = (a == '/dev/null') and 'A' or 'M'
             type = (b == '/dev/null') and 'R' or type
             rawpath = (b != '/dev/null') and b or a
-            if not rawpath.startswith(('a/', 'b/')):
+            if not (rawpath.startswith('a/') or rawpath.startswith('b/')):
                 return type, rawpath
             return type, rawpath.split('/', 1)[-1]
         hunks = []
