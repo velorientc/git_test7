@@ -318,15 +318,14 @@ class NativeFolderSelectDialog:
             return fname
         return None
 
-class LayoutTable(gtk.Frame):
+class LayoutTable(gtk.VBox):
 
     def __init__(self, width=0):
-        gtk.Frame.__init__(self)
-        self.set_shadow_type(gtk.SHADOW_NONE)
+        gtk.VBox.__init__(self)
 
         self.width = width
         self.table = gtk.Table(1, 2)
-        self.add(self.table)
+        self.pack_start(self.table)
 
         self.set_default_paddings()
 
