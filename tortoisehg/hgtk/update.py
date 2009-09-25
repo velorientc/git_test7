@@ -13,7 +13,7 @@ import gobject
 from mercurial import hg, ui
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths, settings
+from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
@@ -49,9 +49,6 @@ class UpdateDialog(gtk.Dialog):
         self.action_area.pack_end(self.updatebtn)
         self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
-        # persistent settings
-        self.settings = settings.Settings('update')
-
         # layout table for fixed items
         table = gtklib.LayoutTable(width=9)
         self.tables = dict(fixed=table)
@@ -62,7 +59,12 @@ class UpdateDialog(gtk.Dialog):
         entry = combo.child
         entry.connect('activate', lambda b: self.update(repo))
         entry.set_width_chars(38)
-        table.add_row(_('Update to:'), combo)
+        table.add_row(_('Update to:'), combo, expand=True)
+
+        ## update method
+        btn = gtk.CheckButton(_('Discard local changes, no backup (-C/--clean)'))
+        self.opt_clean = btn
+        table.add_row('', btn)
 
         ## fill list of combo
         if rev != None:
@@ -88,28 +90,9 @@ class UpdateDialog(gtk.Dialog):
         self.tables['summary'] = table
         self.vbox.pack_start(table)
 
-        # advanced expander
-        self.expander = gtk.Expander(_('Advanced options'))
-        self.vbox.pack_start(self.expander, True, True, 2)
-        vb = gtk.VBox()
-        self.expander.add(vb)
-        hb = gtk.HBox()
-        vb.pack_start(hb, True, True, 4)
-        expbox = gtk.VBox()
-        hb.pack_start(expbox, True, True, 16)
-
-        ## update method
-        group = gtk.RadioButton(None, _('Interactive'))
-        expbox.pack_start(group)
-        btn = gtk.RadioButton(group, _('Discard local changes, '
-                                       'no backup (-C/--clean)'))
-        expbox.pack_start(btn)
-        self.opt_clean = btn
-
         self.show_summaries(True)
 
         # prepare to show
-        self.load_settings()
         self.updatebtn.grab_focus()
         gobject.idle_add(self.after_init)
 
@@ -158,21 +141,8 @@ class UpdateDialog(gtk.Dialog):
         table.show_all()
         self.revcombo.connect('changed', lambda b: self.update_summaries())
 
-    def load_settings(self):
-        expanded = self.settings.get_value('expanded', True, True)
-        self.expander.set_property('expanded', expanded)
-
-        summary = self.settings.get_value('summary', True, True)
-        self.show_summaries(summary)
-
-    def store_settings(self):
-        expanded = self.expander.get_property('expanded')
-        self.settings.set_value('expanded', expanded)
-        self.settings.write()
-
     def dialog_response(self, dialog, response_id):
         if not self.cmd.is_alive():
-            self.store_settings()
             self.destroy()
 
     def delete_event(self, dialog, event):
@@ -182,7 +152,6 @@ class UpdateDialog(gtk.Dialog):
             if ret == gtk.RESPONSE_YES:
                 self.cancel_clicked(self.cancelbtn)
             return True
-        self.store_settings()
         self.destroy()
 
     def cancel_clicked(self, button):
@@ -203,7 +172,6 @@ class UpdateDialog(gtk.Dialog):
 
         for table in self.tables.values():
             table.set_sensitive(normal)
-        self.expander.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
