@@ -684,6 +684,12 @@ class GLog(gdialog.GDialog):
         syncbox.pack_start(cancel, False)
         syncbox.pack_start(conf, False)
 
+        incoming.connect('clicked', self.incoming_clicked, urlcombo, stop)
+        outgoing.connect('clicked', self.outgoing_clicked, urlcombo, stop)
+        push.connect('clicked', self.push_clicked, urlcombo, stop)
+        apply.connect('clicked', self.apply_clicked, urlcombo)
+        cancel.connect('clicked', self.cancel_clicked, urlcombo)
+
         syncbox.pack_start(gtk.Label(_('After Pull:')), False, False, 2)
         ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
         ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
@@ -705,6 +711,8 @@ class GLog(gdialog.GDialog):
             pos = [index for (index, (name, label))
                     in enumerate(ppulldata) if name == 'none'][0]
         ppullcombo.set_active(pos)
+
+        pull.connect('clicked', self.pull_clicked, urlcombo, stop, ppullcombo)
         syncbox.pack_start(ppullcombo, False, False, 2)
 
         self.filterbox = gtk.HBox()
@@ -810,6 +818,24 @@ class GLog(gdialog.GDialog):
 
     def get_extras(self):
         return self.stbar
+
+    def incoming_clicked(self, toolbutton, combo, stop):
+        print 'incoming', combo.get_child().get_text()
+
+    def pull_clicked(self, toolbutton, combo, stop, ppulcombo):
+        print 'pull', combo.get_child().get_text()
+
+    def outgoing_clicked(self, toolbutton, combo, stop):
+        print 'outgoing', combo.get_child().get_text()
+
+    def push_clicked(self, toolbutton, combo, stop):
+        print 'push', combo.get_child().get_text()
+
+    def apply_clicked(self, toolbutton, combo):
+        print 'accept incoming'
+
+    def cancel_clicked(self, toolbutton, combo):
+        print 'reject incoming'
 
     def conf_clicked(self, toolbutton, combo):
         newpath = hglib.fromutf(combo.get_child().get_text()).strip()
