@@ -213,11 +213,16 @@ class UpdateDialog(gtk.Dialog):
 
         ctxs = self.ctxs
         setlabel(self.current_rev_label1, ctxs[0])
-        if len(ctxs) == 2:
+        merge = len(ctxs) == 2
+        if merge:
             setlabel(self.current_rev_label2, ctxs[1])
         newrev = self.revcombo.get_active_text()
         try:
-            setlabel(self.new_rev_label, self.repo[newrev])
+            new_ctx = self.repo[newrev]
+            if not merge and new_ctx.rev() == ctxs[0].rev():
+                self.new_rev_label.set_label(_('(same as parent)'))
+            else:
+                setlabel(self.new_rev_label, self.repo[newrev])
         except hglib.RepoError:
             pass
 
