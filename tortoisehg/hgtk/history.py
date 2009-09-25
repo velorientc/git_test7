@@ -685,25 +685,25 @@ class GLog(gdialog.GDialog):
         syncbox.pack_start(conf, False)
 
         syncbox.pack_start(gtk.Label(_('After Pull:')), False, False, 2)
-        self.ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
+        ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
         ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
         if 'fetch' in self.exs or 'fetch' == ppull:
-            self.ppulldata.append(('fetch', _('Fetch')))
+            ppulldata.append(('fetch', _('Fetch')))
         if 'rebase' in self.exs or 'rebase' == ppull:
-            self.ppulldata.append(('rebase', _('Rebase')))
+            ppulldata.append(('rebase', _('Rebase')))
 
         self.ppullcombo = gtk.combo_box_new_text()
         ppullcombo = self.ppullcombo
-        for (index, (name, label)) in enumerate(self.ppulldata):
+        for (index, (name, label)) in enumerate(ppulldata):
             ppullcombo.insert_text(index, label)
 
-        for (index, (name, label)) in enumerate(self.ppulldata):
+        for (index, (name, label)) in enumerate(ppulldata):
             if ppull == name:
                 pos = index
                 break;
         else:
             pos = [index for (index, (name, label))
-                    in enumerate(self.ppulldata) if name == 'none'][0]
+                    in enumerate(ppulldata) if name == 'none'][0]
         ppullcombo.set_active(pos)
         syncbox.pack_start(ppullcombo, False, False, 2)
 
