@@ -288,7 +288,7 @@ class ChangeSet(gdialog.GDialog):
             try:
                 tctx = self.repo[ts]
                 insert_link(_('transplant:'), tctx)
-            except (LookupError, RepoLookupError):
+            except (LookupError, RepoLookupError, RepoError):
                 title_line(_('transplant:'), binascii.hexlify(ts), 'changeset')
         except KeyError:
             pass
