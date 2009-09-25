@@ -7,6 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import sys
 import gtk
 import gobject
 import pango
@@ -100,6 +101,12 @@ class GLog(gdialog.GDialog):
                 self.gorev_dialog.present()
             else:
                 self.show_goto_dialog()
+        def disable_maxdiff(menuitem):
+            if menuitem.get_active():
+                hglib._maxdiff = sys.maxint
+            else:
+                hglib._maxdiff = None
+            self.reload_log()
         lb = self.get_live_branches()
         bmenus = []
         if len(lb) > 1 or (lb and lb[0] != 'default'):
@@ -123,6 +130,7 @@ class GLog(gdialog.GDialog):
                 self.compactgraph),
             (_('Color by Branch'), True, self.toggle_branchcolor, [],
                 self.branch_color),
+            (_('Ignore Max Diff Size'), True, disable_maxdiff, [], False),
                 ]),
 
             (_('_Navigate'), [
