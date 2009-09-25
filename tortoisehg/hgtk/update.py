@@ -92,6 +92,8 @@ class UpdateDialog(gtk.Dialog):
 
         self.show_summaries(True)
 
+        self.opt_clean.connect('toggled', lambda b: self.update_summaries())
+
         # prepare to show
         self.updatebtn.grab_focus()
         gobject.idle_add(self.after_init)
@@ -221,8 +223,10 @@ class UpdateDialog(gtk.Dialog):
             new_ctx = self.repo[newrev]
             if not merge and new_ctx.rev() == ctxs[0].rev():
                 self.new_rev_label.set_label(_('(same as parent)'))
+                self.updatebtn.set_sensitive(self.opt_clean.get_active())
             else:
                 setlabel(self.new_rev_label, self.repo[newrev])
+                self.updatebtn.set_sensitive(True)
         except hglib.RepoError:
             pass
 
