@@ -663,7 +663,7 @@ class GLog(gdialog.GDialog):
         self.tooltips.set_tip(cancel,
             _('Reject incoming changesets'))
         self.tooltips.set_tip(conf,
-            _('Configure aliases and after push behavior'))
+            _('Configure aliases and after pull behavior'))
 
         ## target path combobox
         urllist = gtk.ListStore(str, str)
