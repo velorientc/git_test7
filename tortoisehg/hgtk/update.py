@@ -14,6 +14,7 @@ from mercurial import hg, ui
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
+from tortoisehg.util.hglib import LookupError, RepoLookupError, RepoError
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
@@ -227,8 +228,9 @@ class UpdateDialog(gtk.Dialog):
             else:
                 setlabel(self.new_rev_label, self.repo[newrev])
                 self.updatebtn.set_sensitive(True)
-        except hglib.RepoError:
-            pass
+        except (LookupError, RepoLookupError, RepoError):
+            self.new_rev_label.set_label(_('unknown revision!'))
+            self.updatebtn.set_sensitive(False)
 
     def update(self, repo):
         cmdline = ['hg', 'update', '--verbose']
