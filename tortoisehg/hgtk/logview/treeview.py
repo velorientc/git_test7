@@ -142,15 +142,17 @@ class TreeView(gtk.ScrolledWindow):
         if self.repo is None:
             self.grapher = None
             return
+            
+        only_branch = opts.get('branch', None)
 
         if opts.get('filehist') is not None:
             self.grapher = filelog_grapher(self.repo, opts['filehist'])
         elif graphcol:
             end = 0
-            if pats is not None:  # branch name
+            if only_branch is not None:
                 b = self.repo.branchtags()
-                if pats in b:
-                    node = b[pats]
+                if only_branch in b:
+                    node = b[only_branch]
                     start = self.repo.changelog.rev(node)
                 else:
                     start = len(self.repo.changelog) - 1
@@ -165,9 +167,9 @@ class TreeView(gtk.ScrolledWindow):
             noheads = opts.get('noheads', False)
             if opts.get('branch-view', False):
                 self.grapher = branch_grapher(self.repo, start, end, 
-                    pats, self.branch_color)
+                    only_branch, self.branch_color)
             else:
-                self.grapher = revision_grapher(self.repo, start, end, pats,
+                self.grapher = revision_grapher(self.repo, start, end, only_branch,
                         noheads, self.branch_color)
         elif opts.get('revlist', None):
             self.grapher = dumb_log_generator(self.repo, opts['revlist'])

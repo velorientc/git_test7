@@ -451,7 +451,7 @@ class GLog(gdialog.GDialog):
 
         if self.filter == 'branch':
             branch = opts.get('branch', None)
-            self.graphview.refresh(self.graphcol, branch, opts)
+            self.graphview.refresh(self.graphcol, None, opts)
             ftitle(_('%s branch') % branch)
         elif self.filter == 'custom':
             npats = hglib.normpats(pats)
