@@ -46,69 +46,47 @@ class TagAddDialog(gtk.Dialog):
 
         self.repo = repo
 
-        # copy from 'clone.py'
-        def createtable(cols=2):
-            newtable = gtk.Table(1, cols)
-            def addrow(*widgets):
-                row = newtable.get_property('n-rows')
-                newtable.set_property('n-rows', row + 1)
-                if len(widgets) == 1:
-                    col = newtable.get_property('n-columns')
-                    newtable.attach(widgets[0], 0, col, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
-                else:
-                    for col, widget in enumerate(widgets):
-                        flag = (col == 0) and gtk.FILL or gtk.FILL|gtk.EXPAND
-                        newtable.attach(widget, col, col + 1, row, row + 1, flag, 0, 4, 2)
-            return newtable, addrow
-
         # top layout table
-        table, addrow = createtable()
+        table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
 
         ## tag name input
-        lbl = gtk.Label(_('Tag:'))
-        lbl.set_alignment(1, 0.5)
         self._tagslist = gtk.ListStore(str)
         self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
         self._tag_input = self._taglistbox.get_child()
         self._tag_input.connect('activate', self._taginput_activated)
         self._tag_input.set_text(tag)
-        addrow(lbl, self._taglistbox)
+        table.add_row(_('Tag:'), self._taglistbox, expand=True)
 
         ## revision input
-        lbl = gtk.Label(_('Revision:'))
-        lbl.set_alignment(1, 0.5)
-        hbox = gtk.HBox()
         self._rev_input = gtk.Entry()
         self._rev_input.set_width_chars(12)
         self._rev_input.set_text(rev)
-        hbox.pack_start(self._rev_input, False, False)
-        hbox.pack_start(gtk.Label(''))
-        addrow(lbl, hbox)
+        table.add_row(_('Revision:'), self._rev_input)
         
         # advanced options expander
         self.expander = gtk.Expander(_('Advanced options'))
         self.vbox.pack_start(self.expander, True, True, 2)
 
         # advanced options layout table
-        table, addrow = createtable()
+        table = gtklib.LayoutTable()
         self.expander.add(table)
 
         ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
         self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
         self._eng_msg = gtk.CheckButton(_('Use English commit message'))
-        addrow(self._local_tag)
-        addrow(self._replace_tag)
-        addrow(self._eng_msg)
+        table.add_row(self._local_tag)
+        table.add_row(self._replace_tag)
+        table.add_row(self._eng_msg)
 
         ## custom commit message
         self._use_msg = gtk.CheckButton(_('Use custom commit message:'))
         self._use_msg.connect('toggled', self.msg_toggled)
-        addrow(self._use_msg)
         self._commit_message = gtk.Entry()
         self._commit_message.set_sensitive(False)
-        addrow(self._commit_message)
+        table.add_row(self._use_msg)
+        table.add_row(self._commit_message, expand=True)
 
         # prepare to show
         self.load_settings()
