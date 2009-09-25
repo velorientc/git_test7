@@ -638,6 +638,10 @@ class GLog(gdialog.GDialog):
         conf = gtk.ToolButton(gtk.STOCK_PREFERENCES)
         stop = gtk.ToolButton(gtk.STOCK_STOP)
         stop.set_sensitive(False)
+        apply = gtk.ToolButton(gtk.STOCK_APPLY)
+        apply.set_sensitive(False)
+        cancel = gtk.ToolButton(gtk.STOCK_DIALOG_ERROR)
+        cancel.set_sensitive(False)
         syncbox.pack_start(incoming, False)
         syncbox.pack_start(pull, False)
         syncbox.pack_start(outgoing, False)
@@ -654,6 +658,10 @@ class GLog(gdialog.GDialog):
             _('Push outgoing changesets'))
         self.tooltips.set_tip(stop,
             _('Stop current transaction'))
+        self.tooltips.set_tip(apply,
+            _('Accept previewed incoming changesets'))
+        self.tooltips.set_tip(cancel,
+            _('Reject incoming changesets'))
         self.tooltips.set_tip(conf,
             _('Configure aliases and after push behavior'))
 
@@ -672,6 +680,8 @@ class GLog(gdialog.GDialog):
                 urlcombo.set_active(len(urllist)-1)
 
         conf.connect('clicked', self.conf_clicked, urlcombo)
+        syncbox.pack_start(apply, False)
+        syncbox.pack_start(cancel, False)
         syncbox.pack_start(conf, False)
 
         syncbox.pack_start(gtk.Label(_('After Pull:')), False, False, 2)
