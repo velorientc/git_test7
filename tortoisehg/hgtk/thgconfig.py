@@ -117,7 +117,7 @@ _log_info = (
         ' when building a list of branch names for a repository.'
         ' Default: None')),
     (_('Branch Colors'), 'tortoisehg.branchcolors', [],
-        _('Space separated list of branch names and colors on the form'
+        _('Space separated list of branch names and colors of the form'
         ' branch:#XXXXXX. Spaces and colons in the branch name must be'
         ' escaped using a backslash (\\). Likewise some other characters'
         ' can be escaped in this way, e.g. \\u0040 will be decoded to the'
