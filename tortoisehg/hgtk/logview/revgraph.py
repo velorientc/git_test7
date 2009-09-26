@@ -51,14 +51,56 @@ which stores it in varables
 __copyright__ = "Copyright 2007 Joel Rosdahl, 2008 Steve Borho"
 __author__    = "Joel Rosdahl <joel@rosdahl.net>, Steve Borho <steve@borho.org>"
 
+import re
+
 from mercurial.node import nullrev
 from mercurial import cmdutil, util
+
+from tortoisehg.util import hglib
 
 def __get_parents(repo, rev):
     return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
 
+known_branch_colors = None # cache for repository colour configuration
+
+def _get_known_branch_colors(repo):
+    global known_branch_colors
+
+    repo_setting = repo.ui.config('tortoisehg', 'branchcolors')
+
+    if known_branch_colors:
+        branch_colors, setting = known_branch_colors
+        if repo_setting == setting:
+            return branch_colors
+
+    branchcolors = repo_setting
+    if not branchcolors:
+        return None
+
+    branchcolors = hglib.tounicode(branchcolors).decode('unicode_escape')
+    branchcolors = [x for x in re.split(r'(?<!\\) ', branchcolors) if x]
+    values = {}
+    for branchcolor in branchcolors:
+        parts = re.split(r'(?<!\\):', branchcolor)
+        if len(parts) != 2:
+            continue # ignore badly formed entry
+
+        # Mercurial branch names are encoded in utf-8 so we must
+        # make sure to encode back to that after having unescaped
+        # the string.
+        values[hglib.toutf(parts[0])] = hglib.toutf(parts[1])
+
+    known_branch_colors = values, repo_setting
+    return values
+
 def _color_of_branch(repo, rev):
     branch = repo[rev].branch()
+
+    candidates = _get_known_branch_colors(repo)
+
+    if branch in candidates:
+        return candidates[branch]
+
     if branch == 'default':
         color = 0
     else:

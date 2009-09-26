@@ -97,10 +97,14 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ( 1.0, 0.0, 1.0 ),
             ]
 
-        if colour == 0:
-            colour_rgb = mainline_color
+        if isinstance(colour, str):
+            r, g, b = colour[1:3], colour[3:5], colour[5:7]
+            colour_rgb = int(r, 16) / 255., int(g, 16) / 255., int(b, 16) / 255.
         else:
-            colour_rgb = colours[colour % len(colours)]
+            if colour == 0:
+                colour_rgb = mainline_color
+            else:
+                colour_rgb = colours[colour % len(colours)]
 
         red   = (colour_rgb[0] * fg) or bg
         green = (colour_rgb[1] * fg) or bg
