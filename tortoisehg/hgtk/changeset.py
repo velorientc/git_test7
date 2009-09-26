@@ -16,7 +16,7 @@ from mercurial import cmdutil, context, util, ui, hg, patch, mdiff
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util.hglib import *
-from tortoisehg.util import shlib
+from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd
 
@@ -212,7 +212,8 @@ class ChangeSet(gdialog.GDialog):
         buf, rev = self._buffer, self.currev
 
         def pad_right(text):
-            return text + ' ' * (12 - len(text))
+            spaces = ' ' * (12 - len(hglib.tounicode(text)))
+            return text + spaces
 
         def title_line(title, text, tag):
             utext = toutf(pad_right(title) + text)
