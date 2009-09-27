@@ -859,7 +859,11 @@ class GLog(gdialog.GDialog):
             atexit.register(cleanup)
 
         path = combo.get_child().get_text()
-        bfile = os.path.join(self.bundledir, path.replace('/', '_'))+'.hg'
+        bfile = path
+        for badchar in (':', '*', '\\', '?'):
+            bfile = bfile.replace(badchar, '')
+        bfile = bfile.replace('/', '_')
+        bfile = os.path.join(self.bundledir, bfile) + '.hg'
         cmdline = ['hg', 'incoming', '--bundle', bfile, path]
         dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
         dlg.show_all()
