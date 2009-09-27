@@ -286,65 +286,48 @@ class PathEditDialog(gtk.Dialog):
         self.entries['Password'][0].set_width_chars(24)
         self.entries['Password'][0].set_visibility(False)
 
-        def createtable(cols=2):
-            newtable = gtk.Table(1, cols)
-            def addrow(header, cell):
-                row = newtable.get_property('n-rows')
-                newtable.set_property('n-rows', row + 1)
-                newtable.attach(header, 0, 1, row, row + 1, gtk.FILL, 0, 4, 2)
-                newtable.attach(cell, 1, 2, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
-            return newtable, addrow
-
         # table for main entries
-        toptable, addrow = createtable()
+        toptable = gtklib.LayoutTable()
         self.vbox.pack_start(toptable, False, False, 2)
 
         ## alias (and 'Browse...' button)
-        hbox = gtk.HBox()
-        hbox.pack_start(self.entries['Alias'][0], False, False)
-        hbox.pack_start(gtk.Label(''))
         browse = gtk.Button(_('Browse...'))
         browse.connect('clicked', self.browse_clicked)
-        hbox.pack_start(browse, False, False)
-        addrow(self.entries['Alias'][1], hbox)
+        ealias = self.entries['Alias']
+        toptable.add_row(ealias[1], ealias[0], None, browse, padding=False)
 
         ## final URL
-        addrow(self.entries['URL'][1], self.entries['URL'][0])
+        eurl = self.entries['URL']
+        toptable.add_row(eurl[1], eurl[0], padding=False)
 
         self.expander = expander = gtk.Expander(_('URL Details'))
         self.vbox.pack_start(expander, True, True, 2)
 
         # table for separated entries
-        entrytable, addrow = createtable()
+        entrytable = gtklib.LayoutTable()
         expander.add(entrytable)
 
         ## path type
-        typelabel = gtk.Label(_('Type'))
-        typelabel.set_alignment(1, 0.5)
         self.protocolcombo = gtk.combo_box_new_text()
         for name, label in self._protocols:
             self.protocolcombo.append_text(label)
-        hbox = gtk.HBox()
-        hbox.pack_start(self.protocolcombo, False, False)
-        hbox.pack_start(gtk.Label(''))
-        addrow(typelabel, hbox)
+        toptable.add_row(_('Type'), self.protocolcombo)
 
         ## host & port
-        hbox = gtk.HBox()
-        hbox.pack_start(self.entries['Host'][0])
-        hbox.pack_start(self.entries['Port'][1], False, False, 4)
-        hbox.pack_start(self.entries['Port'][0], False, False)
-        addrow(self.entries['Host'][1], hbox)
+        ehost, eport = self.entries['Host'], self.entries['Port']
+        entrytable.add_row(ehost[1], ehost[0], 8, eport[1], eport[0])
 
         ## folder
-        addrow(self.entries['Folder'][1], self.entries['Folder'][0])
+        efolder = self.entries['Folder']
+        entrytable.add_row(efolder[1], efolder[0], padding=False)
 
         ## username & password
-        hbox = gtk.HBox()
-        hbox.pack_start(self.entries['User'][0], False, False)
-        hbox.pack_start(self.entries['Password'][1], False, False, 4)
-        hbox.pack_start(self.entries['Password'][0], False, False)
-        addrow(self.entries['User'][1], hbox)
+        euser, epasswd = self.entries['User'], self.entries['Password']
+        entrytable.add_row(euser[1], euser[0], 8, epasswd[1], epasswd[0])
+
+        # layout group
+        group = gtklib.LayoutGroup()
+        group.add(toptable, entrytable)
 
         # prepare to show
         self.load_settings()
