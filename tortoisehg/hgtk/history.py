@@ -35,6 +35,7 @@ class GLog(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
     def init(self):
         self.filter = 'all'
+        self.no_merges = False
         self.lastrevid = None
         self.currevid = None
         self.origtip = len(self.repo)
@@ -305,14 +306,31 @@ class GLog(gdialog.GDialog):
         self.reload_log(**opts)
 
     def filter_selected(self, widget, type):
+        if type == 'no_merges':
+            self.no_merges = widget.get_active()
+            self.reload_log()
+            return
+
         if not widget.get_active():
             return
+
         if type == 'branch':
             self.select_branch(self.branchcombo)
+            return
+
+        self.filter = type
+        self.filteropts = None
+        self.reload_log()
+
+    def update_hide_merges_button(self):
+        b = self.hide_merges_button
+        compatible = self.filter in ['all', 'new', 'branch', 'custom']
+        if not self.graphcol and compatible:
+            b.set_sensitive(True)
         else:
-            self.filter = type
-            self.filteropts = None
-            self.reload_log()
+            b.set_active(False)
+            b.set_sensitive(False)
+            self.no_merges = False
 
     def patch_selected(self, mqwidget, revid, patchname):
         if revid < 0:
@@ -425,6 +443,8 @@ class GLog(gdialog.GDialog):
 
     def reload_log(self, **kwopts):
         'Send refresh event to treeview object'
+        self.update_hide_merges_button()
+
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
                 'revrange':[], 'revlist':[], 'noheads':False,
@@ -436,6 +456,8 @@ class GLog(gdialog.GDialog):
         # handle strips, rebases, etc
         self.origtip = min(len(self.repo), self.origtip)
         opts['orig-tip'] = self.origtip
+
+        opts['no_merges'] = self.no_merges
 
         self.loadnextbutton.set_sensitive(True)
         self.loadallbutton.set_sensitive(True)
@@ -758,6 +780,11 @@ class GLog(gdialog.GDialog):
         merges = gtk.RadioButton(all, _('merges'))
         merges.connect('toggled', self.filter_selected, 'only_merges')
         filterbox.pack_start(merges, False)
+
+        b = gtk.CheckButton(_('hide merges'))
+        b.connect('toggled', self.filter_selected, 'no_merges')
+        filterbox.pack_start(b, False)
+        self.hide_merges_button = b
 
         branches = gtk.RadioButton(all, _('branch'))
         branches.connect('toggled', self.filter_selected, 'branch')
