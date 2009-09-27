@@ -56,7 +56,7 @@ class TagAddDialog(gtk.Dialog):
         self._tag_input = self._taglistbox.get_child()
         self._tag_input.connect('activate', self._taginput_activated)
         self._tag_input.set_text(tag)
-        table.add_row(_('Tag:'), self._taglistbox, expand=True)
+        table.add_row(_('Tag:'), self._taglistbox, padding=False)
 
         ## revision input
         self._rev_input = gtk.Entry()
@@ -86,7 +86,7 @@ class TagAddDialog(gtk.Dialog):
         self._commit_message = gtk.Entry()
         self._commit_message.set_sensitive(False)
         table.add_row(self._use_msg)
-        table.add_row(self._commit_message, expand=True)
+        table.add_row(self._commit_message, padding=False)
 
         # prepare to show
         self.load_settings()

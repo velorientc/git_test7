@@ -160,7 +160,7 @@ class CloneDialog(gtk.Dialog):
         self.optremote = gtk.CheckButton(_('Remote command:'))
         self.optremote.connect('toggled', self.checkbutton_toggled, self.remotecmdentry)
         table.add_row(self.optremote)
-        table.add_row(self.remotecmdentry, expand=True)
+        table.add_row(self.remotecmdentry, padding=False)
 
         # prepare to show
         self.load_settings()
