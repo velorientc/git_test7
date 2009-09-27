@@ -852,7 +852,10 @@ class GLog(gdialog.GDialog):
 
     def incoming_clicked(self, toolbutton, combo):
         def cleanup():
-            shutil.rmtree(self.bundledir)
+            try:
+                shutil.rmtree(self.bundledir)
+            except IOError:
+                pass
 
         if not self.bundledir:
             self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
