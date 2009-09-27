@@ -948,6 +948,9 @@ class GLog(gdialog.GDialog):
         dlg.show_all()
         dlg.run()
         dlg.hide()
+        if dlg.return_code() == 0 and self.graphview.outgoing:
+            self.graphview.set_outgoing([])
+            self.reload_log()
 
     def conf_clicked(self, toolbutton, combo):
         newpath = hglib.fromutf(combo.get_child().get_text()).strip()
