@@ -271,27 +271,30 @@ class CmdWidget(gtk.VBox):
 
         returncode: See the description of 'hgthread' about return code.
         """
-        if self.hgthread and self.hgthread.isAlive():
+        if self.hgthread:
             return
         if self.hgthread is None:
             # clear previous logs
             self.log.clear()
 
-            # prepare UI
-            self.set_buttons(stop=True, close=False)
-            self.already_opened = self.get_pbar()
-            if not self.already_opened:
-                def is_done():
-                    # show progress bar if it's still working
-                    if self.hgthread and self.hgthread.isAlive():
-                        self.set_pbar(True)
-                    return False
-                gobject.timeout_add(500, is_done)
+        # clear previous logs
+        self.log.clear()
 
-            # thread start
-            self.hgthread = hgthread.HgThread(cmdline[1:])
-            self.hgthread.start()
-            gobject.timeout_add(10, self.process_queue, callback, args, kargs)
+        # prepare UI
+        self.set_buttons(stop=True, close=False)
+        self.already_opened = self.get_pbar()
+        if not self.already_opened:
+            def is_done():
+                # show progress bar if it's still working
+                if self.hgthread and self.hgthread.isAlive():
+                    self.set_pbar(True)
+                return False
+            gobject.timeout_add(500, is_done)
+
+        # thread start
+        self.hgthread = hgthread.HgThread(cmdline[1:])
+        self.hgthread.start()
+        gobject.timeout_add(10, self.process_queue, callback, args, kargs)
 
     def is_alive(self):
         return self.hgthread and self.hgthread.isAlive()
