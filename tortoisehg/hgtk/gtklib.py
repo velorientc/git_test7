@@ -318,6 +318,51 @@ class NativeFolderSelectDialog:
             return fname
         return None
 
+class LayoutGroup(object):
+
+    def __init__(self, width=0):
+        self.width = width
+        self.tables = []
+
+    def add(self, *tables, **kargs):
+        self.tables.extend(tables)
+        if kargs.get('adjust', True):
+            self.adjust()
+
+    def adjust(self):
+        def realized():
+            '''check all tables realized or not'''
+            for table in self.tables:
+                if tuple(table.allocation) == (-1, -1, 1, 1):
+                    return False
+            return True
+        def trylater():
+            '''retry when occurred "size-allocate" signal'''
+            adjusted = [False]
+            def allocated(table, rect, hid):
+                table.disconnect(hid[0])
+                if not adjusted[0] and realized():
+                    adjusted[0] = True
+                    self.adjust()
+            for table in self.tables:
+                hid = [None]
+                hid[0] = table.connect('size-allocate', allocated, hid)
+        # check all realized
+        if not realized():
+            trylater()
+            return
+        # find out max width
+        max = self.width
+        for table in self.tables:
+            first = table.get_first_header()
+            w = first.allocation.width
+            max = w > max and w or max
+        # apply width
+        for table in self.tables:
+            first = table.get_first_header()
+            first.set_size_request(max, -1)
+            first.size_request()
+
 class LayoutTable(gtk.VBox):
 
     def __init__(self):
