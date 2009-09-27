@@ -364,6 +364,13 @@ class LayoutGroup(object):
             first.size_request()
 
 class LayoutTable(gtk.VBox):
+    """
+    Provide 2 columns layout table.
+
+    This table has 2 columns; first column is used for header, second
+    is used for body. In default, the header will be aligned right and
+    the body will be aligned left with expanded padding.
+    """
 
     def __init__(self):
         gtk.VBox.__init__(self)
@@ -384,6 +391,26 @@ class LayoutTable(gtk.VBox):
         return None
 
     def add_row(self, *widgets, **kargs):
+        """
+        Append a new row to the table.
+
+        widgets: mixed list of widget, string, number or None;
+                 i.e. ['host:', gtk.Entry(), 20, 'port:', gtk.Entry()]
+                 First item will be header, and the rest will be body
+                 after packed into a gtk.HBox.
+
+            widget: Standard GTK+ widget.
+            string: Label text, will be converted gtk.Label.
+            number: Fixed width padding.
+            None: Flexible padding.
+
+        kargs: 'padding', 'xpad' and 'ypad' are availabled.
+
+            padding: If False, the padding won't append the end of body.
+                     Default: True.
+            xpad: Overwrite default 'xpad' value.
+            ypad: Overwrite default 'ypad' value.
+        """
         if len(widgets) == 0:
             return
         t = self.table
