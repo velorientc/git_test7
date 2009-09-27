@@ -354,7 +354,7 @@ class TreeView(gtk.ScrolledWindow):
         self.origtip = opts['orig-tip']
         if self.repo is not None:
             hglib.invalidaterepo(self.repo)
-            if len(self.repo.changelog) > 0:
+            if len(self.repo) > 0:
                 self.create_log_generator(graphcol, pats, opts)
                 if self.pbar is not None:
                     self.pbar.begin()
