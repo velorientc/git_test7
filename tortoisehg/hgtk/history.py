@@ -926,6 +926,7 @@ class GLog(gdialog.GDialog):
             if thread.isAlive():
                 return True
             else:
+                self.stbar.end()
                 self.graphview.set_outgoing(outgoing)
                 self.reload_log()
                 stop.disconnect(stop_handler)
@@ -937,6 +938,7 @@ class GLog(gdialog.GDialog):
         outgoing = []
         thread = thread2.Thread(target=threadfunc, args=cmd)
         thread.start()
+        self.stbar.begin()
         stop_handler = stop.connect('clicked', stop_clicked)
         stop.set_sensitive(True)
         gobject.timeout_add(50, out_wait)
