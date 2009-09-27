@@ -171,6 +171,14 @@ class CmdDialog(gtk.Dialog):
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
+        while self.stdoutq.qsize():
+            try:
+                msg = self.stdoutq.get(0)
+                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
+            except Queue.Empty:
+                pass
+
         self.update_progress()
         if not self.hgthread.isAlive():
             self.returncode = self.hgthread.return_code()
