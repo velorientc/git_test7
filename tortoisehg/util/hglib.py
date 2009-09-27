@@ -14,7 +14,7 @@ import time
 from mercurial.error import RepoError, ParseError, LookupError, RepoLookupError
 from mercurial.error import UnknownCommand, AmbiguousCommand
 from mercurial import hg, ui, util, extensions, commands, hook, match
-from mercurial import dispatch, encoding, templatefilters
+from mercurial import dispatch, encoding, templatefilters, bundlerepo
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
@@ -110,6 +110,10 @@ def uiwrite(u, args):
     return True
 
 def invalidaterepo(repo):
+    if isinstance(repo, bundlerepo.bundlerepository):
+        # Work around a bug in hg-1.3.  repo.invalidate() breaks
+        # overlay bundlerepos
+        return
     repo.invalidate()
     repo.dirstate.invalidate()
     if 'mq' in repo.__dict__: #do not create if it does not exist
