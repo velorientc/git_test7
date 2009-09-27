@@ -390,7 +390,6 @@ class LayoutTable(gtk.VBox):
         FLAG = gtk.FILL|gtk.EXPAND
         rows = t.get_property('n-rows')
         t.set_property('n-rows', rows + 1)
-        expand = kargs.get('expand', False)
         xpad = kargs.get('xpad', self.xpad)
         ypad = kargs.get('ypad', self.ypad)
         def getwidget(obj):
@@ -406,22 +405,22 @@ class LayoutTable(gtk.VBox):
                 return lbl
             return obj
         def pack(*widgets, **kargs):
-            expand = kargs.get('expand', False)
-            hbox = gtk.HBox()
+            padding = kargs.get('padding', True)
+            if padding is True:
+                widgets += (None,)
+            expmap = [ w is None for w in widgets ]
+            if not (True in expmap):
+                expmap[-1] = True
             widgets = [ getwidget(w) for w in widgets ]
-            if not expand:
-                widgets.append(gtk.Label(''))
-            rest, last = widgets[:-1], widgets[-1]
-            for index, obj in enumerate(rest):
+            hbox = gtk.HBox()
+            for i, obj in enumerate(widgets):
                 widget = getwidget(obj)
-                pad = index != 0 and 2 or 0
-                hbox.pack_start(widget, False, False, pad)
-            hbox.pack_start(last, 2)
+                pad = i != 0 and 2 or 0
+                hbox.pack_start(widget, expmap[i], expmap[i], pad)
             return hbox
         if len(widgets) == 1:
             cols = t.get_property('n-columns')
-            widget = getwidget(widgets[0])
-            widget = pack(widget, **kargs)
+            widget = pack(*widgets, **kargs)
             t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, xpad, ypad)
         else:
             first = getwidget(widgets[0])
