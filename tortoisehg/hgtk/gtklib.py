@@ -361,10 +361,11 @@ class LayoutTable(gtk.VBox):
                 if not expand:
                     widgets.append(gtk.Label(''))
                 rest, last = widgets[:-1], widgets[-1]
-                for obj in rest:
+                for index, obj in enumerate(rest):
                     widget = getwidget(obj)
-                    hbox.pack_start(widget, False, False)
-                hbox.pack_start(last)
+                    pad = index != 0 and 2 or 0
+                    hbox.pack_start(widget, False, False, pad)
+                hbox.pack_start(last, 2)
             return hbox
         if len(widgets) == 1:
             cols = t.get_property('n-columns')
