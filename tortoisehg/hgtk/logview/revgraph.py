@@ -61,7 +61,7 @@ from tortoisehg.util import hglib
 def __get_parents(repo, rev):
     return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
 
-known_branch_colors = None # cache for repository colour configuration
+known_branch_colors = {} # cache for repository colour configuration
 
 def _get_known_branch_colors(repo):
     global known_branch_colors
@@ -75,7 +75,7 @@ def _get_known_branch_colors(repo):
 
     branchcolors = repo_setting
     if not branchcolors:
-        return None
+        return {}
 
     branchcolors = hglib.tounicode(branchcolors).decode('unicode_escape')
     branchcolors = [x for x in re.split(r'(?<!\\) ', branchcolors) if x]
