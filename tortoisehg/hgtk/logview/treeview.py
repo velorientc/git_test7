@@ -447,7 +447,7 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.branch_column)
         cell = gtk.CellRendererText()
 
-        cell.set_property("width-chars", 65)
+        cell.set_property("width-chars", 80)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.msg_column = gtk.TreeViewColumn(_('Summary'))
         self.msg_column.set_resizable(True)
