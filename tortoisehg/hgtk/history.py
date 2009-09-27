@@ -945,7 +945,14 @@ class GLog(gdialog.GDialog):
 
 
     def push_clicked(self, toolbutton, combo):
-        cmdline = ['hg', 'push', combo.get_child().get_text()]
+        entry = combo.get_child()
+        remote_path = hglib.fromutf(entry.get_text()).strip()
+        for alias, path in self.repo.ui.configitems('paths'):
+            if remote_path == alias:
+                remote_path = path
+            elif remote_path == url.hidepassword(path):
+                remote_path = path
+        cmdline = ['hg', 'push', remote_path]
         dlg = hgcmd.CmdDialog(cmdline, text='hg push')
         dlg.show_all()
         dlg.run()
