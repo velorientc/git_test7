@@ -692,9 +692,9 @@ class GLog(gdialog.GDialog):
         syncbox.pack_start(cancel, False)
         syncbox.pack_start(conf, False)
 
-        incoming.connect('clicked', self.incoming_clicked, urlcombo, stop)
+        incoming.connect('clicked', self.incoming_clicked, urlcombo)
         outgoing.connect('clicked', self.outgoing_clicked, urlcombo, stop)
-        push.connect('clicked', self.push_clicked, urlcombo, stop)
+        push.connect('clicked', self.push_clicked, urlcombo)
         apply.connect('clicked', self.apply_clicked, urlcombo)
         cancel.connect('clicked', self.cancel_clicked, urlcombo)
 
@@ -720,7 +720,8 @@ class GLog(gdialog.GDialog):
                     in enumerate(ppulldata) if name == 'none'][0]
         ppullcombo.set_active(pos)
 
-        pull.connect('clicked', self.pull_clicked, urlcombo, stop, ppullcombo)
+        pull.connect('clicked', self.pull_clicked, urlcombo, ppullcombo,
+                     ppulldata)
         syncbox.pack_start(ppullcombo, False, False, 2)
 
         self.filterbox = gtk.HBox()
@@ -827,16 +828,34 @@ class GLog(gdialog.GDialog):
     def get_extras(self):
         return self.stbar
 
-    def incoming_clicked(self, toolbutton, combo, stop):
+    def incoming_clicked(self, toolbutton, combo):
         print 'incoming', combo.get_child().get_text()
 
-    def pull_clicked(self, toolbutton, combo, stop, ppulcombo):
-        print 'pull', combo.get_child().get_text()
+    def pull_clicked(self, toolbutton, combo, ppullcombo, ppulldata):
+        sel = ppullcombo.get_active_text()
+        ppull = [name for (name, label) in ppulldata if sel == label][0]
+        if ppull == 'fetch':
+            cmd = ['fetch', '--message', 'merge']
+            # load the fetch extension explicitly
+            extensions.load(self.ui, 'fetch', None)
+        else:
+            cmd = ['pull']
+            if ppull == 'update':
+                cmd.append('--update')
+            elif ppull == 'rebase':
+                cmd.append('--rebase')
+                # load the rebase extension explicitly
+                extensions.load(self.ui, 'rebase', None)
+        cmdline = ['hg'] + cmd + [combo.get_child().get_text()]
+        dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
 
     def outgoing_clicked(self, toolbutton, combo, stop):
         print 'outgoing', combo.get_child().get_text()
 
-    def push_clicked(self, toolbutton, combo, stop):
+    def push_clicked(self, toolbutton, combo):
         cmdline = ['hg', 'push', combo.get_child().get_text()]
         dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
         dlg.show_all()
