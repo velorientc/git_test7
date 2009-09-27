@@ -837,7 +837,11 @@ class GLog(gdialog.GDialog):
         print 'outgoing', combo.get_child().get_text()
 
     def push_clicked(self, toolbutton, combo, stop):
-        print 'push', combo.get_child().get_text()
+        cmdline = ['hg', 'push', combo.get_child().get_text()]
+        dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
 
     def apply_clicked(self, toolbutton, combo):
         print 'accept incoming'
