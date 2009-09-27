@@ -797,8 +797,7 @@ class ConfigDialog(gtk.Dialog):
         if testpath[0] == '~':
             testpath = os.path.expanduser(testpath)
         cmdline = ['hg', 'incoming', '--verbose', testpath]
-        # Do not use progressbar, as it may show plaintext passwords
-        dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
+        dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
         dlg.run()
         dlg.hide()
 

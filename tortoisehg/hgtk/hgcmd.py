@@ -20,18 +20,13 @@ from tortoisehg.util import shlib, hglib
 from tortoisehg.hgtk import gtklib, hgthread
 
 class CmdDialog(gtk.Dialog):
-    def __init__(self, cmdline, progressbar=True):
+    def __init__(self, cmdline, progressbar=True, text=None):
         if type(cmdline) is tuple:
             self.cmdlist = list(cmdline)[1:]
             cmdline = cmdline[0]
         else:
             self.cmdlist = []
-        if progressbar:
-            title = 'hg ' + ' '.join(cmdline[1:])
-        else:
-            # use short title if progressbar is not in use.  The
-            # calling code may not want to show the complete command
-            title = 'hg ' + ' '.join(cmdline[1:2])
+        title = text or ' '.join(cmdline)
         if len(title) > 80:
             title = title[:80] + '...'
         title = hglib.toutf(title.replace('\n', ' '))

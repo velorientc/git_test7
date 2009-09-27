@@ -861,7 +861,7 @@ class GLog(gdialog.GDialog):
         path = combo.get_child().get_text()
         bfile = os.path.join(self.bundledir, path.replace('/', '_'))+'.hg'
         cmdline = ['hg', 'incoming', '--bundle', bfile, path]
-        dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
+        dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
         dlg.show_all()
         dlg.run()
         dlg.hide()
@@ -892,7 +892,7 @@ class GLog(gdialog.GDialog):
                 extensions.load(self.ui, 'rebase', None)
 
         cmdline = ['hg'] + cmd + [combo.get_child().get_text()]
-        dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
+        dlg = hgcmd.CmdDialog(cmdline, text=' '.join(['hg'] + cmd))
         dlg.show_all()
         dlg.run()
         dlg.hide()
@@ -944,7 +944,7 @@ class GLog(gdialog.GDialog):
 
     def push_clicked(self, toolbutton, combo):
         cmdline = ['hg', 'push', combo.get_child().get_text()]
-        dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
+        dlg = hgcmd.CmdDialog(cmdline, text='hg push')
         dlg.show_all()
         dlg.run()
         dlg.hide()
