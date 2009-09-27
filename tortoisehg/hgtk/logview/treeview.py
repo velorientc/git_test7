@@ -173,8 +173,8 @@ class TreeView(gtk.ScrolledWindow):
                 self.grapher = branch_grapher(self.repo, start, end, 
                     only_branch, self.branch_color)
             else:
-                self.grapher = revision_grapher(self.repo, start, end, only_branch,
-                        noheads, self.branch_color)
+                self.grapher = revision_grapher(self.repo, start, end,
+                        only_branch, noheads, self.branch_color)
         elif opts.get('revlist', None):
             self.grapher = dumb_log_generator(self.repo, opts['revlist'])
         else:
