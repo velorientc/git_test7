@@ -58,10 +58,13 @@ class CustomPrompt(gtk.MessageDialog):
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
         for i, s in enumerate(choices):
-            char = s[s.index('&')+1].lower()
             button = self.add_button(s.replace('&', '_'), i)
-            button.add_accelerator('clicked', accel_group, ord(char), 0,
-                    gtk.ACCEL_VISIBLE)
+            try:
+                char = s[s.index('&')+1].lower()
+                button.add_accelerator('clicked', accel_group, ord(char), 0,
+                        gtk.ACCEL_VISIBLE)
+            except ValueError:
+                pass
         if default:
             self.set_default_response(default)
         self.esc = esc
