@@ -878,11 +878,16 @@ class GLog(gdialog.GDialog):
             else:
                 self.graphview.set_outgoing(outgoing)
                 self.reload_log()
+                stop.disconnect(stop_handler)
                 stop.set_sensitive(False)
+
+        def stop_clicked(button):
+            thread.terminate()
 
         outgoing = []
         thread = thread2.Thread(target=threadfunc, args=cmd)
         thread.start()
+        stop_handler = stop.connect('clicked', stop_clicked)
         stop.set_sensitive(True)
         gobject.timeout_add(50, out_wait)
 
