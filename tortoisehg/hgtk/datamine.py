@@ -371,7 +371,7 @@ class DataMineDialog(gdialog.GDialog):
             return
 
         q = Queue.Queue()
-        args = [self.repo.root, q, 'grep']
+        args = [q, 'grep']
         if follow.get_active():     args.append('--follow')
         if ignorecase.get_active(): args.append('--ignore-case')
         if linenum.get_active():    args.append('--line-number')
@@ -384,9 +384,9 @@ class DataMineDialog(gdialog.GDialog):
             if x: args.extend(['-X', x])
         args.append(retext)
 
-        def threadfunc(path, q, *args):
+        def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(path, q, *args)
+                hglib.hgcmd_toq(q, *args)
             except util.Abort, e:
                 self.stbar.set_status_text(_('Abort: %s') % str(e))
 

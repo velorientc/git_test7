@@ -709,7 +709,7 @@ class ChangeSet(gdialog.GDialog):
                 os.remove(result)
 
             q = Queue.Queue()
-            hgcmd_toq(self.repo.root, q, 'cat', '--rev',
+            hgcmd_toq(q, 'cat', '--rev',
                 str(self.currev), '--output', fromutf(result), self.curfile)
 
     def diff_to_local(self, menuitem):

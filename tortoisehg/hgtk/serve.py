@@ -221,9 +221,9 @@ class ServeDialog(gtk.Window):
         self._get_config()
 
     def _start_server(self):
-        def threadfunc(path, q, *args):
+        def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(path, q, *args)
+                hglib.hgcmd_toq(q, *args)
             except util.Abort, e:
                 self._write(_('Abort: %s\n') % str(e))
 
@@ -239,7 +239,7 @@ class ServeDialog(gtk.Window):
         global gservice
         gservice = None
 
-        args = [self._root, self._queue, 'serve', '--port', str(port)]
+        args = [self._queue, 'serve', '--port', str(port)]
         if self._webdirconf:
             args.append('--webdir-conf=' + self._webdirconf)
         else:

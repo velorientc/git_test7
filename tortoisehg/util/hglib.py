@@ -171,7 +171,7 @@ def mergetools(ui, values=None):
     return values
 
 
-def hgcmd_toq(path, q, *args):
+def hgcmd_toq(q, *args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue
     object.  Assumes command is completely noninteractive.
