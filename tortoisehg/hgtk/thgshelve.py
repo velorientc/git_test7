@@ -102,7 +102,7 @@ class GShelve(GStatus):
         def shelve(menuitem, files):
             self.shelve_selected(files)
             self.activate_shelve_buttons(True)
-        if self.merging:
+        if self.is_merge():
             return ()
         else:
             return ((_('_shelve'), shelve, 'MAR'),)
