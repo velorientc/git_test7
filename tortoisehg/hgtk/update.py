@@ -49,7 +49,7 @@ class UpdateDialog(gtk.Dialog):
         self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
 
         # layout table for fixed items
-        table = gtklib.LayoutTable(width=9)
+        table = gtklib.LayoutTable()
         self.tables = dict(fixed=table)
         self.vbox.pack_start(table, True, True, 2)
 
@@ -85,13 +85,17 @@ class UpdateDialog(gtk.Dialog):
             combo.append_text(t)
 
         # layout table for summaries
-        table = gtklib.LayoutTable(width=9)
+        table = gtklib.LayoutTable()
         self.tables['summary'] = table
         self.vbox.pack_start(table)
 
         self.show_summaries(True)
 
         self.opt_clean.connect('toggled', lambda b: self.update_summaries())
+
+        # layout group
+        group = gtklib.LayoutGroup()
+        group.add(*self.tables.values())
 
         # prepare to show
         self.updatebtn.grab_focus()
