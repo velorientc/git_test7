@@ -77,18 +77,19 @@ def _get_known_branch_colors(repo):
     if not branchcolors:
         return {}
 
-    branchcolors = hglib.tounicode(branchcolors).decode('unicode_escape')
-    branchcolors = [x for x in re.split(r'(?<!\\) ', branchcolors) if x]
+    branchcolors = hglib.tounicode(branchcolors)
+    branchcolors = [x for x in re.split(r'(?:(?<=\\\\)|(?<!\\)) ', branchcolors) if x]
     values = {}
     for branchcolor in branchcolors:
-        parts = re.split(r'(?<!\\):', branchcolor)
+        parts = re.split(r'(?:(?<=\\\\)|(?<!\\)):', branchcolor)
         if len(parts) != 2:
             continue # ignore badly formed entry
 
         # Mercurial branch names are encoded in utf-8 so we must
         # make sure to encode back to that after having unescaped
         # the string.
-        values[hglib.toutf(parts[0])] = hglib.toutf(parts[1])
+        branch_name = hglib.toutf(parts[0].replace('\\:', ':').replace('\\ ', ' ').decode('unicode_escape'))
+        values[branch_name] = hglib.toutf(parts[1])
 
     known_branch_colors = values, repo_setting
     return values
