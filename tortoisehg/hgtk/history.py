@@ -13,6 +13,9 @@ import gobject
 import pango
 import Queue
 import StringIO
+import shutil
+import tempfile
+import atexit
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
 
@@ -44,6 +47,8 @@ class GLog(gdialog.GDialog):
         self.details_model = None
         self.syncbox = None
         self.filteropts = {}
+        self.bundledir = None
+        self.bfile = None
         os.chdir(self.repo.root)
 
         # Load extension support for commands which need it
@@ -670,10 +675,6 @@ class GLog(gdialog.GDialog):
         conf = gtk.ToolButton(gtk.STOCK_PREFERENCES)
         stop = gtk.ToolButton(gtk.STOCK_STOP)
         stop.set_sensitive(False)
-        apply = gtk.ToolButton(gtk.STOCK_APPLY)
-        apply.set_sensitive(False)
-        cancel = gtk.ToolButton(gtk.STOCK_DIALOG_ERROR)
-        cancel.set_sensitive(False)
         syncbox.pack_start(incoming, False)
         syncbox.pack_start(pull, False)
         syncbox.pack_start(outgoing, False)
@@ -690,10 +691,6 @@ class GLog(gdialog.GDialog):
             _('Push outgoing changesets'))
         self.tooltips.set_tip(stop,
             _('Stop current transaction'))
-        self.tooltips.set_tip(apply,
-            _('Accept previewed incoming changesets'))
-        self.tooltips.set_tip(cancel,
-            _('Reject incoming changesets'))
         self.tooltips.set_tip(conf,
             _('Configure aliases and after pull behavior'))
 
@@ -712,15 +709,11 @@ class GLog(gdialog.GDialog):
                 urlcombo.set_active(len(urllist)-1)
 
         conf.connect('clicked', self.conf_clicked, urlcombo)
-        syncbox.pack_start(apply, False)
-        syncbox.pack_start(cancel, False)
         syncbox.pack_start(conf, False)
 
         incoming.connect('clicked', self.incoming_clicked, urlcombo)
         outgoing.connect('clicked', self.outgoing_clicked, urlcombo, stop)
         push.connect('clicked', self.push_clicked, urlcombo)
-        apply.connect('clicked', self.apply_clicked, urlcombo)
-        cancel.connect('clicked', self.cancel_clicked, urlcombo)
 
         syncbox.pack_start(gtk.Label(_('After Pull:')), False, False, 2)
         ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
@@ -858,7 +851,27 @@ class GLog(gdialog.GDialog):
         return self.stbar
 
     def incoming_clicked(self, toolbutton, combo):
-        print 'incoming', combo.get_child().get_text()
+        def cleanup():
+            shutil.rmtree(self.bundledir)
+
+        if not self.bundledir:
+            self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
+            atexit.register(cleanup)
+
+        path = combo.get_child().get_text()
+        bfile = os.path.join(self.bundledir, path.replace('/', '_'))+'.hg'
+        cmdline = ['hg', 'incoming', '--bundle', bfile, path]
+        dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        if dlg.return_code() == 0 and os.path.isfile(bfile):
+            combo.get_child().set_text(bfile)
+            self.bfile = bfile
+            self.repo = hg.repository(self.ui, path=bfile)
+            self.graphview.set_repo(self.repo, self.stbar)
+            self.changeview.repo = self.repo
+            self.reload_log()
 
     def pull_clicked(self, toolbutton, combo, ppullcombo, ppulldata):
         sel = ppullcombo.get_active_text()
@@ -935,12 +948,6 @@ class GLog(gdialog.GDialog):
         dlg.show_all()
         dlg.run()
         dlg.hide()
-
-    def apply_clicked(self, toolbutton, combo):
-        print 'accept incoming'
-
-    def cancel_clicked(self, toolbutton, combo):
-        print 'reject incoming'
 
     def conf_clicked(self, toolbutton, combo):
         newpath = hglib.fromutf(combo.get_child().get_text()).strip()
