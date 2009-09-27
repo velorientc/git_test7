@@ -10,6 +10,8 @@ import gtk
 import gobject
 import pango
 import os
+import sys
+import threading
 import Queue
 
 from tortoisehg.util.i18n import _
@@ -116,12 +118,30 @@ class CmdDialog(gtk.Dialog):
             widget.emit_stop_by_name('response')
 
     def _on_window_map_event(self, event, param):
-        if self.hgthread is None:
-            self.hgthread = hgthread.HgThread(self.cmdline[1:])
-            self.hgthread.start()
-            self._button_ok.set_sensitive(False)
-            self._button_stop.set_sensitive(True)
-            gobject.timeout_add(10, self.process_queue)
+        if self.hgthread:
+            return
+
+        # Replace stdout file descriptor with our own pipe
+        def pollstdout(*args):
+            while True:
+                # blocking read of stdout pipe
+                o = os.read(self.readfd, 1024)
+                if o:
+                    self.stdoutq.put(o)
+                else:
+                    break
+        self.oldstdout = os.dup(sys.__stdout__.fileno())
+        self.stdoutq = Queue.Queue()
+        self.readfd, writefd = os.pipe()
+        os.dup2(writefd, sys.__stdout__.fileno())
+        thread = threading.Thread(target=pollstdout, args=[])
+        thread.start()
+
+        self.hgthread = hgthread.HgThread(self.cmdline[1:])
+        self.hgthread.start()
+        self._button_ok.set_sensitive(False)
+        self._button_stop.set_sensitive(True)
+        gobject.timeout_add(10, self.process_queue)
 
     def write(self, msg, append=True):
         msg = hglib.toutf(msg)
@@ -167,6 +187,8 @@ class CmdDialog(gtk.Dialog):
             self._button_stop.set_sensitive(False)
             self._button_ok.set_sensitive(True)
             self._button_ok.grab_focus()
+            os.dup2(self.oldstdout, sys.__stdout__.fileno())
+            os.close(self.oldstdout)
             return False # Stop polling this function
         else:
             return True
@@ -273,9 +295,6 @@ class CmdWidget(gtk.VBox):
         """
         if self.hgthread:
             return
-        if self.hgthread is None:
-            # clear previous logs
-            self.log.clear()
 
         # clear previous logs
         self.log.clear()
