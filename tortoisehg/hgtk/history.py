@@ -836,6 +836,7 @@ class GLog(gdialog.GDialog):
     def pull_clicked(self, toolbutton, combo, ppullcombo, ppulldata):
         sel = ppullcombo.get_active_text()
         ppull = [name for (name, label) in ppulldata if sel == label][0]
+        dorebase = False
         if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extension explicitly
@@ -845,14 +846,23 @@ class GLog(gdialog.GDialog):
             if ppull == 'update':
                 cmd.append('--update')
             elif ppull == 'rebase':
+                dorebase = True
                 cmd.append('--rebase')
                 # load the rebase extension explicitly
                 extensions.load(self.ui, 'rebase', None)
+
         cmdline = ['hg'] + cmd + [combo.get_child().get_text()]
         dlg = hgcmd.CmdDialog(cmdline, progressbar=False)
         dlg.show_all()
         dlg.run()
         dlg.hide()
+        if dlg.return_code() == 0:
+            self.repo.invalidate()
+            if dorebase:
+                self.origtip = len(self.repo)
+                self.reload_log()
+            elif len(self.repo) > self.origtip:
+                self.reload_log()
 
     def outgoing_clicked(self, toolbutton, combo, stop):
         q = Queue.Queue()
