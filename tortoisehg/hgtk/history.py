@@ -11,12 +11,13 @@ import sys
 import gtk
 import gobject
 import pango
+import Queue
 import StringIO
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, thread2
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 
@@ -86,11 +87,12 @@ class GLog(gdialog.GDialog):
         return tbar
 
     def get_menu_list(self):
-        def refresh(menuitem, resettip):
-            if resettip:
+        def refresh(menuitem, resetmarks):
+            if resetmarks:
                 if self.filter == 'new':
                     self.filter = 'all'
                     self.filteropts = None
+                self.graphview.set_outgoing([])
                 self.origtip = len(self.repo)
             self.reload_log()
         def navigate(menuitem, revname):
@@ -124,7 +126,7 @@ class GLog(gdialog.GDialog):
             (_('Choose Details...'), False, self.details_clicked, [], None),
             ('----', None, None, None, None),
             (_('Refresh'), False, refresh, [False], gtk.STOCK_REFRESH),
-            (_('Reset Tip'), False, refresh, [True], gtk.STOCK_REMOVE),
+            (_('Reset Marks'), False, refresh, [True], gtk.STOCK_REMOVE),
             ('----', None, None, None, None),
             (_('Compact Graph'), True, self.toggle_compactgraph, [],
                 self.compactgraph),
@@ -853,7 +855,37 @@ class GLog(gdialog.GDialog):
         dlg.hide()
 
     def outgoing_clicked(self, toolbutton, combo, stop):
-        print 'outgoing', combo.get_child().get_text()
+        q = Queue.Queue()
+        cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n',
+                combo.get_child().get_text()]
+
+        def threadfunc(q, *args):
+            try:
+                hglib.hgcmd_toq(q, *args)
+            except util.Abort, e:
+                self.stbar.set_status_text(_('Abort: %s') % str(e))
+
+        def out_wait():
+            while q.qsize():
+                hash = q.get(0).strip()
+                try:
+                    node = self.repo[hash].node()
+                    outgoing.append(node)
+                except:
+                    pass
+            if thread.isAlive():
+                return True
+            else:
+                self.graphview.set_outgoing(outgoing)
+                self.reload_log()
+                stop.set_sensitive(False)
+
+        outgoing = []
+        thread = thread2.Thread(target=threadfunc, args=cmd)
+        thread.start()
+        stop.set_sensitive(True)
+        gobject.timeout_add(50, out_wait)
+
 
     def push_clicked(self, toolbutton, combo):
         cmdline = ['hg', 'push', combo.get_child().get_text()]

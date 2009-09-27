@@ -118,6 +118,10 @@ class TreeView(gtk.ScrolledWindow):
         self.pbar = pbar
         self.origtip = None
         self.branch_color = False
+        self.outgoing = []
+
+    def set_outgoing(self, outgoing):
+        self.outgoing = outgoing
 
     def set_repo(self, repo, pbar=None):
         self.repo = repo
@@ -235,7 +239,7 @@ class TreeView(gtk.ScrolledWindow):
 
         if not self.model:
             self.model = treemodel.TreeModel(self.repo, self.graphdata,
-                    self.color_func)
+                    self.color_func, self.outgoing)
             self.treeview.set_model(self.model)
 
         self.emit('batch-loaded')

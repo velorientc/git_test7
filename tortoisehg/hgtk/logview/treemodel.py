@@ -40,9 +40,10 @@ AGE = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
-    def __init__ (self, repo, graphdata, color_func):
+    def __init__ (self, repo, graphdata, color_func, outgoing):
         gtk.GenericTreeModel.__init__(self)
         self.repo = repo
+        self.outgoing = outgoing
         self.revisions = {}
         self.graphdata = graphdata
         self.color_func = color_func
@@ -149,6 +150,11 @@ class TreeModel(gtk.GenericTreeModel):
             node = ctx.node()
             tags = self.repo.nodetags(node)
             taglist = hglib.toutf(', '.join(tags))
+            if node in self.outgoing:
+                out = '<span color="%s" background="%s"> %s </span> ' % \
+                        ('black', '#ffffaa', 'out')
+            else:
+                out = ''
             tstr = ''
             for tag in tags:
                 tstr += '<span color="%s" background="%s"> %s </span> ' % \
@@ -165,9 +171,9 @@ class TreeModel(gtk.GenericTreeModel):
 
             color = self.color_func(ctx.parents(), revid, author)
             if revid in self.wcparents:
-                sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
+                sumstr = out + bstr + tstr + '<b><u>' + summary + '</u></b>'
             else:
-                sumstr = bstr + tstr + summary
+                sumstr = out + bstr + tstr + summary
             
             revision = (sumstr, author, taglist, color, age)
             self.revisions[revid] = revision
