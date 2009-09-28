@@ -25,7 +25,7 @@ class build_mo(build):
                      "will be built")
             return
 
-        podir = 'i18n'
+        podir = 'i18n/tortoisehg'
         if not os.path.isdir(podir):
             self.warn("could not find %s/ directory" % podir)
             return
@@ -34,11 +34,8 @@ class build_mo(build):
         for po in os.listdir(podir):
             if not po.endswith('.po'):
                 continue
-            if not (po.find('tortoisehg-') == 0):
-                self.warn("Found file '%s' that was not tortoisehg .po" % po)
-                continue
             pofile = join(podir, po)
-            modir = join('locale', po[11:-3], 'LC_MESSAGES')
+            modir = join('locale', po[:-3], 'LC_MESSAGES')
             mofile = join(modir, 'tortoisehg.mo')
             cmd = ['msgfmt', '-v', '-o', mofile, pofile]
             if sys.platform != 'sunos5':
