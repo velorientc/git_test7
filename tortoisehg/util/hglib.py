@@ -110,12 +110,12 @@ def uiwrite(u, args):
     return True
 
 def invalidaterepo(repo):
+    repo.dirstate.invalidate()
     if isinstance(repo, bundlerepo.bundlerepository):
         # Work around a bug in hg-1.3.  repo.invalidate() breaks
         # overlay bundlerepos
         return
     repo.invalidate()
-    repo.dirstate.invalidate()
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
