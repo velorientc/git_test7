@@ -77,7 +77,8 @@ class CloneDialog(gtk.Dialog):
 
         ## source browse button
         srcbrowse = gtk.Button(_('Browse...'))
-        srcbrowse.connect('clicked', self.source_browse_clicked)
+        srcbrowse.connect('clicked', self.browse_clicked,
+                          _('Select Source Folder'), self.srcentry)
 
         table.add_row(_('Source path:'), srccombo, 0, srcbrowse)
 
@@ -110,7 +111,8 @@ class CloneDialog(gtk.Dialog):
 
         ## destination browse button
         destbrowse = gtk.Button(_('Browse...'))
-        destbrowse.connect('clicked', self.dest_browse_clicked)
+        destbrowse.connect('clicked', self.browse_clicked,
+                           _('Select Destination Folder'), self.destentry)
 
         table.add_row(_('Destination path:'), destcombo, 0, destbrowse)
 
@@ -213,21 +215,11 @@ class CloneDialog(gtk.Dialog):
 
         self.run() # doesn't close dialog
 
-    def dest_browse_clicked(self, button):
-        'select folder as clone destination'
-        response = gtklib.NativeFolderSelectDialog(
-                          initial=self.destentry.get_text(),
-                          title=_('Select Destination Folder')).run()
-        if response:
-            self.destentry.set_text(response)
-
-    def source_browse_clicked(self, button):
-        'select source folder to clone'
-        response = gtklib.NativeFolderSelectDialog(
-                          initial=self.destentry.get_text(),
-                          title=_('Select Source Folder')).run()
-        if response:
-            self.srcentry.set_text(response)
+    def browse_clicked(self, button, title, entry):
+        res = gtklib.NativeFolderSelectDialog(
+                     initial=entry.get_text(), title=title).run()
+        if res:
+            entry.set_text(res)
 
     def checkbutton_toggled(self, checkbutton, entry):
         state = checkbutton.get_active()
