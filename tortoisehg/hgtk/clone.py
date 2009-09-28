@@ -6,22 +6,26 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import gtk
 import os
+import gtk
+import gobject
 import pango
 import traceback
 
 from mercurial import ui, util
+
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, settings
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd
+
+MODE_NORMAL  = 'normal'
+MODE_WORKING = 'working'
 
 class CloneDialog(gtk.Dialog):
     """ Dialog to clone a Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self, title=_('TortoiseHg Clone'),
-                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        gtk.Dialog.__init__(self, title=_('TortoiseHg Clone'))
         gtklib.set_tortoise_icon(self, 'menuclone.ico')
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
@@ -29,9 +33,10 @@ class CloneDialog(gtk.Dialog):
         self.connect('response', self.dialog_response)
 
         # add clone button
-        clonebutton = gtk.Button(_('Clone'))
-        clonebutton.connect('clicked', lambda b: self.clone())
-        self.action_area.pack_end(clonebutton)
+        self.clonebtn = gtk.Button(_('Clone'))
+        self.clonebtn.connect('clicked', lambda b: self.clone())
+        self.action_area.pack_end(self.clonebtn)
+        self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
 
         self.ui = ui.ui()
 
@@ -49,7 +54,7 @@ class CloneDialog(gtk.Dialog):
             srcpath = repos[0]
 
         # layout table for fixed options
-        table = gtklib.LayoutTable()
+        self.table = table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
         def setcombosize(combo):
             combo.set_size_request(300, -1)
@@ -165,6 +170,19 @@ class CloneDialog(gtk.Dialog):
         # prepare to show
         self.load_settings()
         destcombo.grab_focus()
+        gobject.idle_add(self.after_init)
+
+    def after_init(self):
+        #CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, True, True, 6)
+
+        # abort button
+        self.abortbtn = gtk.Button(_('Abort'))
+        self.abortbtn.connect('clicked', self.abort_clicked)
+        self.action_area.pack_end(self.abortbtn)
 
     def load_settings(self):
         expanded = self.clonesettings.get_value('expanded', False, True)
@@ -177,6 +195,11 @@ class CloneDialog(gtk.Dialog):
 
     def dialog_response(self, dialog, response_id):
         self.store_settings()
+
+    def abort_clicked(self, button):
+        self.cmd.stop()
+        self.cmd.show_log()
+        self.switch_to(MODE_NORMAL, cmd=False)
 
     def dest_browse_clicked(self, button):
         'select folder as clone destination'
@@ -199,6 +222,25 @@ class CloneDialog(gtk.Dialog):
         entry.set_sensitive(state)
         if state:
             entry.grab_focus()
+
+    def switch_to(self, mode, cmd=True):
+        if mode == MODE_NORMAL:
+            normal = True
+            self.cancelbtn.grab_focus()
+        elif mode == MODE_WORKING:
+            normal = False
+            self.abortbtn.grab_focus()
+        else:
+            raise _('unknown mode name: %s') % mode
+        working = not normal
+
+        self.table.set_sensitive(normal)
+        self.expander.set_sensitive(normal)
+        self.clonebtn.set_property('visible', normal)
+        self.cancelbtn.set_property('visible', normal)
+        if cmd:
+            self.cmd.set_property('visible', working)
+        self.abortbtn.set_property('visible', working)
 
     def add_src_to_recent(self, src):
         if os.path.exists(src):
@@ -267,32 +309,39 @@ class CloneDialog(gtk.Dialog):
                 dest = os.path.join(os.path.dirname(dirabs), dest)
 
         # start cloning
+        cmdline = ['hg', 'clone']
+        if self.optupdate.get_active():
+            cmdline.append('--noupdate')
+        if self.optuncomp.get_active():
+            cmdline.append('--uncompressed')
+        if self.optpull.get_active():
+            cmdline.append('--pull')
+        if self.ui.config('http_proxy', 'host'):
+            if not self.optproxy.get_active():
+                cmdline += ['--config', 'http_proxy.host=']
+        if remotecmd:
+            cmdline.append('--remotecmd')
+            cmdline.append(hglib.fromutf(remotecmd))
+        if rev:
+            cmdline.append('--rev')
+            cmdline.append(rev)
+
+        cmdline.append('--verbose')
+        cmdline.append(hglib.fromutf(src))
+        if dest:
+            cmdline.append(hglib.fromutf(dest))
+
+        def cmd_done(returncode):
+            self.switch_to(MODE_NORMAL, cmd=False)
+            self.add_src_to_recent(src)
+            self.add_dest_to_recent(dest)
+            if returncode == 0:
+                shlib.shell_notify([dest])
+                if not self.cmd.is_show_log():
+                    self.response(gtk.RESPONSE_OK)
+        self.switch_to(MODE_WORKING)
         try:
-            cmdline = ['hg', 'clone']
-            if self.optupdate.get_active():
-                cmdline.append('--noupdate')
-            if self.optuncomp.get_active():
-                cmdline.append('--uncompressed')
-            if self.optpull.get_active():
-                cmdline.append('--pull')
-            if self.ui.config('http_proxy', 'host'):
-                if not self.optproxy.get_active():
-                    cmdline += ['--config', 'http_proxy.host=']
-            if remotecmd:
-                cmdline.append('--remotecmd')
-                cmdline.append(hglib.fromutf(remotecmd))
-            if rev:
-                cmdline.append('--rev')
-                cmdline.append(rev)
-
-            cmdline.append('--verbose')
-            cmdline.append(hglib.fromutf(src))
-            if dest:
-                cmdline.append(hglib.fromutf(dest))
-
-            dlg = hgcmd.CmdDialog(cmdline)
-            dlg.run()
-            dlg.hide()
+            self.cmd.execute(cmdline, cmd_done)
         except util.Abort, inst:
             gdialog.Prompt(_('Clone aborted'), str(inst), self).run()
             return False
@@ -300,15 +349,6 @@ class CloneDialog(gtk.Dialog):
             gdialog.Prompt(_('Clone error'),
                     traceback.format_exc(), self).run()
             return False
-
-        self.add_src_to_recent(src)
-        self.add_dest_to_recent(dest)
-        cancel = [b for b in self.action_area if b.get_label() == 'gtk-cancel'][0]
-        cancel.grab_focus()
-
-        if dlg.return_code() == 0:
-            shlib.shell_notify([dest])
-            self.response(gtk.RESPONSE_OK)
 
 def run(_ui, *pats, **opts):
     return CloneDialog(pats)
