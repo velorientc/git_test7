@@ -99,6 +99,11 @@ class GLog(gdialog.GDialog):
                     self.filter = 'all'
                     self.filteropts = None
                 self.graphview.set_outgoing([])
+                if self.bfile:
+                    self.bfile = None
+                    self.repo = hg.repository(self.ui, path=self.repo.root)
+                    self.graphview.set_repo(self.repo, self.stbar)
+                    self.changeview.repo = self.repo
                 self.origtip = len(self.repo)
             self.reload_log()
         def navigate(menuitem, revname):
