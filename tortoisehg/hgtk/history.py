@@ -128,9 +128,13 @@ class GLog(gdialog.GDialog):
                 bmenus.append((hglib.toutf(name), False, navigate, [name], None))
             
         fnc = self.toggle_view_column
-        return [(_('_View'), [
-            (_('Sync Bar'), True, self.toggle_show_syncbar, [],
-                self.show_syncbar),
+        if self.repo.ui.configbool('tortoisehg', 'disable-syncbar'):
+            sync_bar_item = []
+        else:
+            sync_bar_item = [(_('Sync Bar'), True, self.toggle_show_syncbar,
+                    [], self.show_syncbar)]
+
+        return [(_('_View'), sync_bar_item + [
             (_('Filter Bar'), True, self.toggle_show_filterbar, [],
                 self.show_filterbar),
             ('----', None, None, None, None),
@@ -434,6 +438,8 @@ class GLog(gdialog.GDialog):
         self.branch_color = settings.get('branch-color', False)
         self.show_filterbar = settings.get('show-filterbar', True)
         self.show_syncbar = settings.get('show-syncbar', True)
+        if self.repo.ui.configbool('tortoisehg', 'disable-syncbar'):
+            self.show_syncbar = False
         self.graphcol = settings.get('graphcol', True)
         self.compactgraph = settings.get('compactgraph', False)
         self.showcol = {}
