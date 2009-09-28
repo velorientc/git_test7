@@ -55,18 +55,16 @@ class CloneDialog(gtk.Dialog):
         self.table = table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
         def setcombosize(combo):
-            combo.set_size_request(300, -1)
+            combo.set_size_request(280, -1)
             combo.size_request()
 
         ## comboentry for source paths
-        srcbox = gtk.HBox()
         self.srclist = gtk.ListStore(str)
         srccombo = gtk.ComboBoxEntry(self.srclist, 0)
         setcombosize(srccombo)
         self.srcentry = srccombo.get_child()
         self.srcentry.set_text(srcpath)
         self.srcentry.set_position(-1)
-        srcbox.pack_start(srccombo)
 
         ## replace the drop-down widget so we can modify it's properties
         srccombo.clear()
@@ -78,9 +76,8 @@ class CloneDialog(gtk.Dialog):
         ## source browse button
         srcbrowse = gtk.Button(_('Browse...'))
         srcbrowse.connect('clicked', self.source_browse_clicked)
-        srcbox.pack_start(srcbrowse, False, False, 4)
 
-        table.add_row(_('Source path:'), srcbox)
+        table.add_row(_('Source path:'), srccombo, 0, srcbrowse)
 
         ## add pre-defined src paths to pull-down list
         sync_src = settings.Settings('synch').mrul('src_paths')
@@ -93,7 +90,6 @@ class CloneDialog(gtk.Dialog):
             self.srclist.append([p])
 
         ## comboentry for destination paths
-        destbox = gtk.HBox()
         self.destlist = gtk.ListStore(str)
         destcombo = gtk.ComboBoxEntry(self.destlist, 0)
         setcombosize(destcombo)
@@ -102,7 +98,6 @@ class CloneDialog(gtk.Dialog):
         self.destentry.set_position(-1)
         self.destentry.connect('activate',
                                lambda b: self.response(gtk.RESPONSE_OK))
-        destbox.pack_start(destcombo)
 
         ## replace the drop-down widget so we can modify it's properties
         destcombo.clear()
@@ -111,12 +106,11 @@ class CloneDialog(gtk.Dialog):
         destcombo.pack_start(cell)
         destcombo.add_attribute(cell, 'text', 0)
 
-        ## source browse button
+        ## destination browse button
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.dest_browse_clicked)
-        destbox.pack_end(destbrowse, False, False, 4)
 
-        table.add_row(_('Destination path:'), destbox)
+        table.add_row(_('Destination path:'), destcombo, 0, destbrowse)
 
         ## add most-recent dest paths to pull-down list
         paths = list(self.recentdest)
