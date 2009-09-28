@@ -51,36 +51,42 @@ class CloneDialog(gtk.Dialog):
         elif len(repos):
             srcpath = repos[0]
 
+        def createcombo(path, label, title):
+            # comboentry
+            model = gtk.ListStore(str)
+            combo = gtk.ComboBoxEntry(model, 0)
+            combo.set_size_request(280, -1)
+            combo.size_request()
+            entry = combo.get_child()
+            entry.set_text(path)
+            entry.set_position(-1)
+            entry.connect('activate',
+                          lambda b: self.response(gtk.RESPONSE_OK))
+
+            # replace the drop-down widget so we can modify it's properties
+            combo.clear()
+            cell = gtk.CellRendererText()
+            cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
+            combo.pack_start(cell)
+            combo.add_attribute(cell, 'text', 0)
+
+            # browse button
+            browse = gtk.Button(_('Browse...'))
+            browse.connect('clicked', self.browse_clicked, title, entry)
+
+            table.add_row(label, combo, 0, browse)
+
+            return model, combo
+
         # layout table for fixed options
         self.table = table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
-        def setcombosize(combo):
-            combo.set_size_request(280, -1)
-            combo.size_request()
 
         ## comboentry for source paths
-        self.srclist = gtk.ListStore(str)
-        srccombo = gtk.ComboBoxEntry(self.srclist, 0)
-        setcombosize(srccombo)
+        self.srclist, srccombo = createcombo(srcpath,
+                                             _('Source path:'),
+                                             _('Select Source Folder'))
         self.srcentry = srccombo.get_child()
-        self.srcentry.set_text(srcpath)
-        self.srcentry.set_position(-1)
-        self.srcentry.connect('activate',
-                              lambda b: self.response(gtk.RESPONSE_OK))
-
-        ## replace the drop-down widget so we can modify it's properties
-        srccombo.clear()
-        cell = gtk.CellRendererText()
-        cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
-        srccombo.pack_start(cell)
-        srccombo.add_attribute(cell, 'text', 0)
-
-        ## source browse button
-        srcbrowse = gtk.Button(_('Browse...'))
-        srcbrowse.connect('clicked', self.browse_clicked,
-                          _('Select Source Folder'), self.srcentry)
-
-        table.add_row(_('Source path:'), srccombo, 0, srcbrowse)
 
         ## add pre-defined src paths to pull-down list
         sync_src = settings.Settings('synch').mrul('src_paths')
@@ -93,28 +99,10 @@ class CloneDialog(gtk.Dialog):
             self.srclist.append([p])
 
         ## comboentry for destination paths
-        self.destlist = gtk.ListStore(str)
-        destcombo = gtk.ComboBoxEntry(self.destlist, 0)
-        setcombosize(destcombo)
+        self.destlist, destcombo = createcombo(destpath,
+                                               _('Destination path:'),
+                                               _('Select Destination Folder'))
         self.destentry = destcombo.get_child()
-        self.destentry.set_text(destpath)
-        self.destentry.set_position(-1)
-        self.destentry.connect('activate',
-                               lambda b: self.response(gtk.RESPONSE_OK))
-
-        ## replace the drop-down widget so we can modify it's properties
-        destcombo.clear()
-        cell = gtk.CellRendererText()
-        cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
-        destcombo.pack_start(cell)
-        destcombo.add_attribute(cell, 'text', 0)
-
-        ## destination browse button
-        destbrowse = gtk.Button(_('Browse...'))
-        destbrowse.connect('clicked', self.browse_clicked,
-                           _('Select Destination Folder'), self.destentry)
-
-        table.add_row(_('Destination path:'), destcombo, 0, destbrowse)
 
         ## add most-recent dest paths to pull-down list
         paths = list(self.recentdest)
