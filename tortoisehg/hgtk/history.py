@@ -674,6 +674,10 @@ class GLog(gdialog.GDialog):
         self.tree.add_accelerator('thg-parent', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         self.tree.connect('thg-parent', self.thgparent)
+        key, modifier = gtk.accelerator_parse(mod+'g')
+        self.tree.add_accelerator('thg-revision', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        self.tree.connect('thg-revision', self.thgnavigate)
         self.connect('thg-refresh', self.thgrefresh)
 
         self.syncbox = gtk.HBox()
@@ -1015,6 +1019,10 @@ class GLog(gdialog.GDialog):
         'ctrl-p handler'
         parent = self.repo['.'].rev()
         self.graphview.set_revision_id(parent)
+
+    def thgnavigate(self, treeview):
+        'ctrl-g handler'
+        self.show_goto_dialog()
 
     def get_live_branches(self):
         live = []
