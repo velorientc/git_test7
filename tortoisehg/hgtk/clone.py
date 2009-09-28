@@ -33,10 +33,8 @@ class CloneDialog(gtk.Dialog):
         self.connect('response', self.dialog_response)
 
         # add clone button
-        self.clonebtn = gtk.Button(_('Clone'))
-        self.clonebtn.connect('clicked', lambda b: self.clone())
-        self.action_area.pack_end(self.clonebtn)
-        self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        self.clonebtn = self.add_button(_('Clone'), gtk.RESPONSE_OK)
+        self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
 
         self.ui = ui.ui()
 
@@ -102,7 +100,8 @@ class CloneDialog(gtk.Dialog):
         self.destentry = destcombo.get_child()
         self.destentry.set_text(destpath)
         self.destentry.set_position(-1)
-        self.destentry.connect('activate', lambda b: self.clone())
+        self.destentry.connect('activate',
+                               lambda b: self.response(gtk.RESPONSE_OK))
         destbox.pack_start(destcombo)
 
         ## replace the drop-down widget so we can modify it's properties
@@ -180,9 +179,8 @@ class CloneDialog(gtk.Dialog):
         self.vbox.pack_start(self.cmd, True, True, 6)
 
         # abort button
-        self.abortbtn = gtk.Button(_('Abort'))
-        self.abortbtn.connect('clicked', self.abort_clicked)
-        self.action_area.pack_end(self.abortbtn)
+        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
+        self.abortbtn.hide()
 
     def load_settings(self):
         expanded = self.clonesettings.get_value('expanded', False, True)
@@ -194,12 +192,30 @@ class CloneDialog(gtk.Dialog):
         self.clonesettings.write()
 
     def dialog_response(self, dialog, response_id):
-        self.store_settings()
+        def abort():
+            self.cmd.stop()
+            self.cmd.show_log()
+            self.switch_to(MODE_NORMAL, cmd=False)
+        # Clone button
+        if response_id == gtk.RESPONSE_OK:
+            self.clone()
+        # Cancel button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            if self.cmd.is_alive():
+                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
+                                      _('Do you want to abort?')).run()
+                if ret == gtk.RESPONSE_YES:
+                    abort()
+            else:
+                self.store_settings()
+                return # close dialog
+        # Abort button
+        elif response_id == gtk.RESPONSE_CANCEL:
+            abort()
+        else:
+            raise _('unexpected response id: %s') % response_id
 
-    def abort_clicked(self, button):
-        self.cmd.stop()
-        self.cmd.show_log()
-        self.switch_to(MODE_NORMAL, cmd=False)
+        self.run() # doesn't close dialog
 
     def dest_browse_clicked(self, button):
         'select folder as clone destination'
