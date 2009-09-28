@@ -282,8 +282,8 @@ class CloneDialog(gtk.Dialog):
             return False
 
         if src == dest:
-            gdialog.Prompt(_('Source and dest are the same'),
-                    _('Please specify a different destination'), self).run()
+            gdialog.Prompt(_('Source and destination are the same'),
+                    _('Please specify different paths'), self).run()
             self.destentry.grab_focus()
             return False
 
