@@ -65,6 +65,8 @@ class CloneDialog(gtk.Dialog):
         self.srcentry = srccombo.get_child()
         self.srcentry.set_text(srcpath)
         self.srcentry.set_position(-1)
+        self.srcentry.connect('activate',
+                              lambda b: self.response(gtk.RESPONSE_OK))
 
         ## replace the drop-down widget so we can modify it's properties
         srccombo.clear()
