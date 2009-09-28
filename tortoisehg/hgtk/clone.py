@@ -332,15 +332,7 @@ class CloneDialog(gtk.Dialog):
                 if not self.cmd.is_show_log():
                     self.response(gtk.RESPONSE_OK)
         self.switch_to(MODE_WORKING)
-        try:
-            self.cmd.execute(cmdline, cmd_done)
-        except util.Abort, inst:
-            gdialog.Prompt(_('Clone aborted'), str(inst), self).run()
-            return False
-        except:
-            gdialog.Prompt(_('Clone error'),
-                    traceback.format_exc(), self).run()
-            return False
+        self.cmd.execute(cmdline, cmd_done)
 
 def run(_ui, *pats, **opts):
     return CloneDialog(pats)
