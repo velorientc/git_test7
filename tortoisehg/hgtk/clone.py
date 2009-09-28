@@ -119,14 +119,11 @@ class CloneDialog(gtk.Dialog):
         expander.add(table)
 
         ## revision option
-        hbox = gtk.HBox()
         self.reventry = gtk.Entry()
         self.reventry.set_sensitive(False)
         self.optrev = gtk.CheckButton(_('Clone to revision:'))
         self.optrev.connect('toggled', self.checkbutton_toggled, self.reventry)
-        hbox.pack_start(self.optrev, False, False)
-        hbox.pack_start(self.reventry, False, False, 4)
-        table.add_row(hbox)
+        table.add_row(self.optrev, self.reventry)
 
         ## options
         self.optupdate = gtk.CheckButton(_('Do not update the new working directory'))
