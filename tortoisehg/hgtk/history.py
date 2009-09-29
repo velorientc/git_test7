@@ -247,23 +247,33 @@ class GLog(gdialog.GDialog):
         def close(dialog, response_id):
             dialog.destroy()
 
-        model = gtk.ListStore(
-            gobject.TYPE_BOOLEAN, gobject.TYPE_STRING, gobject.TYPE_STRING)
+        columns = {}
+        columns['graph'] = (self.graphcol, _('Graph'), 'graphcol', 'graph')
 
-        model.append([self.graphcol, _('Graph'), 'graphcol'])
-        def column(col, default, text):
+        def column(col, text):
             prop = col + '-column-visible'
             vis = self.graphview.get_property(prop)
-            model.append([vis, text, prop])
-        column('rev', True, _('Revision Number'))
-        column('id', False, _('Changeset ID'))
-        column('branch', False, _('Branch Name'))
-        column('msg', True, _('Summary'))
-        column('user', True, _('User'))
-        column('date', False, _('Local Date'))
-        column('utc', False, _('UTC Date'))
-        column('age', True, _('Age'))
-        column('tag', False, _('Tags'))
+            columns[col] = (vis, text, prop, col)
+
+        column('rev', _('Revision Number'))
+        column('id', _('Changeset ID'))
+        column('branch', _('Branch Name'))
+        column('msg', _('Summary'))
+        column('user', _('User'))
+        column('date', _('Local Date'))
+        column('utc', _('UTC Date'))
+        column('age', _('Age'))
+        column('tag', _('Tags'))
+
+        model = gtk.ListStore(
+            gobject.TYPE_BOOLEAN, 
+            gobject.TYPE_STRING, 
+            gobject.TYPE_STRING,
+            gobject.TYPE_STRING)
+
+        for c in self.graphview.get_columns():
+            vis, text, prop, col = columns[c]
+            model.append([vis, text, prop, col])
 
         self.details_model = model
 
@@ -273,8 +283,12 @@ class GLog(gdialog.GDialog):
 
     def apply_details(self):
         if self.details_model:
+            columns = []
+            for show, uitext, property, colname in self.details_model:
+                columns.append(colname)
+            self.graphview.set_columns(columns)
             reload = False
-            for show, uitext, property in self.details_model:
+            for show, uitext, property, colname in self.details_model:
                 if property == 'graphcol':
                     if self.graphcol != show:
                         self.graphcol = show

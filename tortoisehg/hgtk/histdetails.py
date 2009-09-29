@@ -39,7 +39,15 @@ class LogDetailsDialog(gtk.Dialog):
         hbox.pack_start(lb, False, False, 4)
         self.vbox.pack_start(hbox, False, False, 4)
 
-        tv = gtk.TreeView(model)
+        mainhbox = gtk.HBox()
+        self.vbox.pack_start(mainhbox)
+        
+        leftvbox = gtk.VBox()
+        rightvox = gtk.VBox()
+        mainhbox.pack_start(leftvbox, True, True)
+        mainhbox.pack_start(rightvox, False, False)
+
+        tv = self.tv = gtk.TreeView(model)
         tv.set_headers_visible(False)
 
         cr = gtk.CellRendererToggle()
@@ -67,12 +75,44 @@ class LogDetailsDialog(gtk.Dialog):
         vbox.set_border_width(4)
         vbox.pack_start(tv)
 
-        self.vbox.pack_start(vbox, True, True)
+        leftvbox.pack_start(vbox, True, True)
+
+        self.up_button = gtk.ToolButton(gtk.STOCK_GO_UP)
+        self.up_button.connect('clicked', self.up_clicked)
+        self.down_button = gtk.ToolButton(gtk.STOCK_GO_DOWN)
+        self.down_button.connect('clicked', self.down_clicked)
+
+        rightvox.pack_start(self.up_button, False, False)
+        rightvox.pack_start(self.down_button, False, False)
 
         self.show_all()
 
     def update_buttons(self):
         self._btn_apply.set_sensitive(self.dirty)
+
+    def up_clicked(self, button):
+        model, seliter = self.tv.get_selection().get_selected()
+        i = model.get_iter_first()
+        if model.get_path(seliter) == model.get_path(i):
+            return
+        while True:
+            next = model.iter_next(i)
+            if next == None:
+                return
+            if model.get_path(next) == model.get_path(seliter):
+                model.swap(i, next)
+                self._btn_apply.set_sensitive(True)
+                self.dirty = True
+                return
+            i = next
+
+    def down_clicked(self, button):
+        model, seliter = self.tv.get_selection().get_selected()
+        next = model.iter_next(seliter)
+        if next:
+            model.swap(seliter, next)
+            self._btn_apply.set_sensitive(True)
+            self.dirty = True
 
     def _btn_apply_clicked(self, button, data=None):
         self.apply_func()
