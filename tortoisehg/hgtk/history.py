@@ -46,7 +46,7 @@ class GLog(gdialog.GDialog):
         self.filterbox = None
         self.details_model = None
         self.syncbox = None
-        self.filteropts = {}
+        self.filteropts = None
         self.bundledir = None
         self.bfile = None
         os.chdir(self.repo.root)
@@ -466,8 +466,7 @@ class GLog(gdialog.GDialog):
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
                 'revrange':[], 'revlist':[], 'noheads':False,
-                'branch-view':False, 'rev':[],
-                'user':[]}
+                'branch-view':False, 'rev':[], 'user':[]}
         if self.filteropts is not None: opts = self.filteropts
         opts['branch-view'] = self.compactgraph
         opts.update(kwopts)
