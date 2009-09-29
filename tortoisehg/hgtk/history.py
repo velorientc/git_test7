@@ -1308,8 +1308,7 @@ class GLog(gdialog.GDialog):
 
     def copy_hash(self, menuitem):
         hash = self.repo[self.currevid].hex()
-        sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
-        clipboard = gtk.Clipboard(selection=sel)
+        clipboard = gtk.Clipboard()
         clipboard.set_text(hash)
 
     def export_patch(self, menuitem):
