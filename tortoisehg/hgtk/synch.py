@@ -301,6 +301,16 @@ class SynchDialog(gtk.Window):
                     in enumerate(self.ppulldata) if name == 'none'][0]
         self.ppullcombo.set_active(pos)
 
+    def show_dialog(self, dlg):
+        # copy from history.py
+        dlg.set_transient_for(self)
+        dlg.show_all()
+        dlg.present()
+        if gtk.pygtk_version < (2, 12, 0):
+            # Workaround for old PyGTK (< 2.12.0) issue.
+            # See background of this: f668034aeda3
+            dlg.set_transient_for(None)
+
     def fill_path_combo(self):
         self.pathlist.clear()
         for alias, path in self.paths:
@@ -365,10 +375,7 @@ class SynchDialog(gtk.Window):
         wc = self.repo[None]
         dialog = update.UpdateDialog(wc.branch())
         dialog.set_notify_func(update_notify, None)
-        dialog.set_transient_for(self)
-        dialog.show_all()
-        dialog.present()
-        dialog.set_transient_for(None)
+        self.show_dialog(dialog)
 
     def get_paths(self, sort="value"):
         """ retrieve symbolic paths """
@@ -517,10 +524,7 @@ class SynchDialog(gtk.Window):
         if rev:
             opts.extend(rev)
         dlg = hgemail.EmailDialog(self.root, opts)
-        dlg.set_transient_for(self)
-        dlg.show_all()
-        dlg.present()
-        dlg.set_transient_for(None)
+        self.show_dialog(dlg)
 
     def shelve_clicked(self, toolbutton, data=None):
         dlg = thgshelve.run(self.ui)

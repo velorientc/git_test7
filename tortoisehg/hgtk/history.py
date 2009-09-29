@@ -1098,6 +1098,15 @@ class GLog(gdialog.GDialog):
         self.changeview._buffer.set_text('')
         self.changeview._filelist.clear()
 
+    def show_dialog(self, dlg):
+        dlg.set_transient_for(self)
+        dlg.show_all()
+        dlg.present()
+        if gtk.pygtk_version < (2, 12, 0):
+            # Workaround for old PyGTK (< 2.12.0) issue.
+            # See background of this: f668034aeda3
+            dlg.set_transient_for(None)
+
     def backout_rev(self, menuitem):
         oldlen = len(self.repo)
         hash = str(self.repo[self.currevid])
@@ -1123,11 +1132,8 @@ class GLog(gdialog.GDialog):
                 dlg.display()
 
         dlg = backout.BackoutDialog(hash)
-        dlg.set_transient_for(self)
         dlg.connect('destroy', refresh)
-        dlg.show_all()
-        dlg.present()
-        dlg.set_transient_for(None)
+        self.show_dialog(dlg)
 
     def revert(self, menuitem):
         rev = self.currevid
@@ -1170,10 +1176,7 @@ class GLog(gdialog.GDialog):
         revrange.sort()
         opts = ['--rev', str(revrange[0]) + ':' + str(revrange[1])]
         dlg = hgemail.EmailDialog(self.repo.root, opts)
-        dlg.set_transient_for(self)
-        dlg.show_all()
-        dlg.present()
-        dlg.set_transient_for(None)
+        self.show_dialog(dlg)
 
     def export_revs(self, menuitem):
         result = gtklib.NativeFolderSelectDialog(title=_('Save patches to'),
@@ -1280,11 +1283,8 @@ class GLog(gdialog.GDialog):
                     self.refresh_model()
 
         dialog = tagadd.TagAddDialog(self.repo, rev=str(rev))
-        dialog.set_transient_for(self)
         dialog.connect('destroy', refresh)
-        dialog.show_all()
-        dialog.present()
-        dialog.set_transient_for(None)
+        self.show_dialog(dialog)
 
     def show_status(self, menuitem):
         rev = self.currevid
@@ -1361,20 +1361,14 @@ class GLog(gdialog.GDialog):
     def email_patch(self, menuitem):
         rev = self.currevid
         dlg = hgemail.EmailDialog(self.repo.root, ['--rev', str(rev)])
-        dlg.set_transient_for(self)
-        dlg.show_all()
-        dlg.present()
-        dlg.set_transient_for(None)
+        self.show_dialog(dlg)
 
     def checkout(self, menuitem):
         rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
         dialog = update.UpdateDialog(rev)
-        dialog.set_transient_for(self)
-        dialog.show_all()
         dialog.set_notify_func(self.checkout_completed, parents)
-        dialog.present()
-        dialog.set_transient_for(None)
+        self.show_dialog(dialog)
 
     def checkout_completed(self, oldparents):
         self.repo.invalidate()
@@ -1389,11 +1383,8 @@ class GLog(gdialog.GDialog):
         if rev == self.repo.parents()[0].rev():
             rev = self.revrange[1]
         dialog = merge.MergeDialog(rev)
-        dialog.set_transient_for(self)
-        dialog.show_all()
         dialog.set_notify_func(self.merge_completed, parents, len(self.repo))
-        dialog.present()
-        dialog.set_transient_for(None)
+        self.show_dialog(dlg)
 
     def merge_completed(self, args):
         self.repo.invalidate()
@@ -1409,10 +1400,7 @@ class GLog(gdialog.GDialog):
         rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
         dialog = archive.ArchiveDialog(rev)
-        dialog.set_transient_for(self)
-        dialog.show_all()
-        dialog.present()
-        dialog.set_transient_for(None)
+        self.show_dialog(dlg)
 
     def transplant_rev(self, menuitem):
         """Transplant selection on top of current revision."""
