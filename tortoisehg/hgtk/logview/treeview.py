@@ -232,10 +232,9 @@ class TreeView(gtk.ScrolledWindow):
         width = self.graph_cell.get_size(self.treeview)[2]
         if width > 500:
             width = 500
-        self.graph_column.set_fixed_width(width)
-        # Allow the user to set size as they like
-        #self.graph_column.set_max_width(500)
-        self.graph_column.set_visible(self.show_graph)
+        gcol = self.tvcolumns['graph']
+        gcol.set_fixed_width(width)
+        gcol.set_visible(self.show_graph)
 
         if not self.model:
             self.model = treemodel.TreeModel(self.repo, self.graphdata,
@@ -252,52 +251,34 @@ class TreeView(gtk.ScrolledWindow):
         return False
 
     def do_get_property(self, property):
-        if property.name == 'date-column-visible':
-            return self.date_column.get_visible()
-        elif property.name == 'id-column-visible':
-            return self.id_column.get_visible()
-        elif property.name == 'rev-column-visible':
-            return self.rev_column.get_visible()
-        elif property.name == 'branch-column-visible':
-            return self.branch_column.get_visible()
-        elif property.name == 'branch-color':
+        pn = property.name
+        cv = '-column-visible'
+        if pn.endswith(cv):
+            colname = pn[:-len(cv)]
+            return self.tvcolumns[colname].get_visible()
+        elif pn == 'branch-color':
             return self.branch_color
-        elif property.name == 'utc-column-visible':
-            return self.utc_column.get_visible()
-        elif property.name == 'age-column-visible':
-            return self.age_column.get_visible()
-        elif property.name == 'tag-column-visible':
-            return self.tag_column.get_visible()
-        elif property.name == 'repo':
+        elif pn == 'repo':
             return self.repo
-        elif property.name == 'limit':
+        elif pn == 'limit':
             return self.limit
         else:
-            raise AttributeError, 'unknown property %s' % property.name
+            raise AttributeError, 'unknown property %s' % pn
 
     def do_set_property(self, property, value):
-        if property.name == 'date-column-visible':
-            self.date_column.set_visible(value)
-        elif property.name == 'id-column-visible':
-            self.id_column.set_visible(value)
-        elif property.name == 'rev-column-visible':
-            self.rev_column.set_visible(value)
-        elif property.name == 'branch-column-visible':
-            self.branch_column.set_visible(value)
-        elif property.name == 'branch-color':
+        pn = property.name
+        cv = '-column-visible'
+        if pn.endswith(cv):
+            colname = pn[:-len(cv)]
+            self.tvcolumns[colname].set_visible(value)
+        elif pn == 'branch-color':
             self.branch_color = value
-        elif property.name == 'utc-column-visible':
-            self.utc_column.set_visible(value)
-        elif property.name == 'age-column-visible':
-            self.age_column.set_visible(value)
-        elif property.name == 'tag-column-visible':
-            self.tag_column.set_visible(value)
-        elif property.name == 'repo':
+        elif pn == 'repo':
             self.repo = value
-        elif property.name == 'limit':
+        elif pn == 'limit':
             self.batchsize = value
         else:
-            raise AttributeError, 'unknown property %s' % property.name
+            raise AttributeError, 'unknown property %s' % pn
 
     def get_revid_at_path(self, path):
         return self.model[path][treemodel.REVID]
@@ -403,136 +384,134 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.show()
         self.add(self.treeview)
 
+        self.tvcolumns = {}
+
         self.graph_cell = CellRendererGraph()
-        self.graph_column = gtk.TreeViewColumn(_('Graph'))
-        self.graph_column.set_resizable(True)
-        self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.graph_column.pack_start(self.graph_cell, expand=False)
-        self.graph_column.add_attribute(self.graph_cell,
+        col = self.tvcolumns['graph'] = gtk.TreeViewColumn(_('Graph'))
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.pack_start(self.graph_cell, expand=False)
+        col.add_attribute(self.graph_cell,
                 "node", treemodel.GRAPHNODE)
-        self.graph_column.add_attribute(self.graph_cell,
+        col.add_attribute(self.graph_cell,
                 "in-lines", treemodel.LAST_LINES)
-        self.graph_column.add_attribute(self.graph_cell,
+        col.add_attribute(self.graph_cell,
                 "out-lines", treemodel.LINES)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 8)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.rev_column = gtk.TreeViewColumn(_('Rev'))
-        self.rev_column.set_visible(False)
-        self.rev_column.set_resizable(True)
-        self.rev_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.rev_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.rev_column.pack_start(cell, expand=True)
-        self.rev_column.add_attribute(cell, "text", treemodel.REVID)
-        self.rev_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col = self.tvcolumns['rev'] = gtk.TreeViewColumn(_('Rev'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.REVID)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.id_column = gtk.TreeViewColumn(_('ID'))
-        self.id_column.set_visible(False)
-        self.id_column.set_resizable(True)
-        self.id_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.id_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.id_column.pack_start(cell, expand=True)
-        self.id_column.add_attribute(cell, "text", treemodel.HEXID)
-        self.id_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col = self.tvcolumns['id'] = gtk.TreeViewColumn(_('ID'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.HEXID)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.branch_column = gtk.TreeViewColumn(_('Branch'))
-        self.branch_column.set_visible(False)
-        self.branch_column.set_resizable(True)
-        self.branch_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.branch_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.branch_column.pack_start(cell, expand=True)
-        self.branch_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.branch_column.add_attribute(cell, "markup", treemodel.BRANCH)
+        col = self.tvcolumns['branch'] = gtk.TreeViewColumn(_('Branch'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col.add_attribute(cell, "markup", treemodel.BRANCH)
+
         cell = gtk.CellRendererText()
 
         cell.set_property("width-chars", 80)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.msg_column = gtk.TreeViewColumn(_('Summary'))
-        self.msg_column.set_resizable(True)
-        self.msg_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.msg_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.msg_column.pack_end(cell, expand=True)
-        self.msg_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
+        col = self.tvcolumns['msg'] = gtk.TreeViewColumn(_('Summary'))
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_end(cell, expand=True)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col.add_attribute(cell, "markup", treemodel.MESSAGE)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.committer_column = gtk.TreeViewColumn(_('User'))
-        self.committer_column.set_resizable(True)
-        self.committer_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.committer_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.committer_column.pack_start(cell, expand=True)
-        self.committer_column.add_attribute(cell, "text", treemodel.COMMITER)
-        self.committer_column.add_attribute(cell, "foreground",
-                treemodel.FGCOLOR)
+        col = self.tvcolumns['user'] = gtk.TreeViewColumn(_('User'))
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.COMMITER)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.date_column = gtk.TreeViewColumn(_('Local Date'))
-        self.date_column.set_visible(False)
-        self.date_column.set_resizable(True)
-        self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.date_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.date_column.pack_start(cell, expand=True)
-        self.date_column.add_attribute(cell, "text", treemodel.LOCALTIME)
-        self.date_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col = self.tvcolumns['date'] = gtk.TreeViewColumn(_('Local Date'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.LOCALTIME)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.utc_column = gtk.TreeViewColumn(_('Universal Date'))
-        self.utc_column.set_visible(False)
-        self.utc_column.set_resizable(True)
-        self.utc_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.utc_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.utc_column.pack_start(cell, expand=True)
-        self.utc_column.add_attribute(cell, "text", treemodel.UTC)
-        self.utc_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col = self.tvcolumns['utc'] = gtk.TreeViewColumn(_('Universal Date'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.UTC)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 10)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.age_column = gtk.TreeViewColumn(_('Age'))
-        self.age_column.set_visible(True)
-        self.age_column.set_resizable(True)
-        self.age_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.age_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.age_column.pack_start(cell, expand=True)
-        self.age_column.add_attribute(cell, "text", treemodel.AGE)
-        self.age_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col = self.tvcolumns['age'] = gtk.TreeViewColumn(_('Age'))
+        col.set_visible(True)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.AGE)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 10)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.tag_column = gtk.TreeViewColumn(_('Tags'))
-        self.tag_column.set_visible(False)
-        self.tag_column.set_resizable(True)
-        self.tag_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.tag_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.tag_column.pack_start(cell, expand=True)
-        self.tag_column.add_attribute(cell, "text", treemodel.TAGS)
-        self.tag_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col = self.tvcolumns['tag']  = gtk.TreeViewColumn(_('Tags'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.TAGS)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+
+        cols = 'graph rev id branch msg user date utc age tag'
+        self.columns = cols.split()
 
         # append columns
-        self.treeview.append_column(self.graph_column)
-        self.treeview.append_column(self.rev_column)
-        self.treeview.append_column(self.id_column)
-        self.treeview.append_column(self.branch_column)
-        self.treeview.append_column(self.msg_column)
-        self.treeview.append_column(self.committer_column)
-        self.treeview.append_column(self.date_column)
-        self.treeview.append_column(self.utc_column)
-        self.treeview.append_column(self.age_column)
-        self.treeview.append_column(self.tag_column)
+        for cn in self.columns:
+            c = self.tvcolumns[cn]
+            self.treeview.append_column(c)
 
     def text_color_orig(self, parents, rev, author):
         if int(rev) >= self.origtip:
