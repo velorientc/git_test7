@@ -103,7 +103,6 @@ class TreeModel(gtk.GenericTreeModel):
         (revid, graphnode, lines, path) = self.graphdata[rowref]
 
         if column == REVID: return revid
-        if column == GRAPHNODE: return graphnode
         if column == LINES: return lines
         if column == LAST_LINES:
             if rowref>0:
@@ -150,11 +149,6 @@ class TreeModel(gtk.GenericTreeModel):
             node = ctx.node()
             tags = self.repo.nodetags(node)
             taglist = hglib.toutf(', '.join(tags))
-            if node in self.outgoing:
-                out = '<span color="%s" background="%s"> %s </span> ' % \
-                        ('black', '#ffffaa', 'out')
-            else:
-                out = ''
             tstr = ''
             for tag in tags:
                 tstr += '<span color="%s" background="%s"> %s </span> ' % \
@@ -171,15 +165,22 @@ class TreeModel(gtk.GenericTreeModel):
 
             color = self.color_func(ctx.parents(), revid, author)
             if revid in self.wcparents:
-                sumstr = out + bstr + tstr + '<b><u>' + summary + '</u></b>'
+                sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
             else:
-                sumstr = out + bstr + tstr + summary
+                sumstr = bstr + tstr + summary
+
+            status = node in self.outgoing and -1 or 0
+            # TODO: determine incoming, give status 1
             
-            revision = (sumstr, author, taglist, color, age)
+            revision = (sumstr, author, taglist, color, age, status)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
-        return revision[column-MESSAGE]
+        if column == GRAPHNODE:
+            column, color = graphnode
+            return (column, color, revision[5])
+        else:
+            return revision[column-MESSAGE]
 
     def on_iter_next(self, rowref):
         if rowref < len(self.graphdata) - 1:
