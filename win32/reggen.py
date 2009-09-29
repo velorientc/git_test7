@@ -11,7 +11,7 @@ import glob
 import re
 import codecs
 
-# copy of 'nautilus-thg.py'
+# based on 'nautilus-thg.py' and 'hgtk'
 def _thg_path():
     pfile = __file__
     if pfile.endswith('.pyc'):
@@ -23,6 +23,9 @@ def _thg_path():
         sys.path.insert(0, thgpath)
 _thg_path()
 
+from mercurial import demandimport
+demandimport.ignore.append('win32com.shell')
+demandimport.enable()
 from tortoisehg.util.menuthg import thgcmenu
 
 regkeytmpl = u'[HKEY_CURRENT_USER\\Software\\TortoiseHg\\CMenu\\%s\\%s]'
@@ -88,8 +91,8 @@ def wopen(path):
 
 # enumerate available languages
 langinfo = [{'code': u'en_US', 'file': None}]
-lang_pat = re.compile(u'^tortoisehg-([^\\.]+)\\.po$')
-for file in glob.glob(u'../i18n/*.po'):
+lang_pat = re.compile(u'([^\\.]+)\\.po$')
+for file in glob.glob(u'../i18n/tortoisehg/*.po'):
     m = lang_pat.match(os.path.basename(file))
     langinfo.append({'code': m.group(1), 'file': os.path.abspath(file)})
 

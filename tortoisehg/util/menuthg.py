@@ -9,10 +9,8 @@ import os
 
 from mercurial import hg, ui, node
 
-from i18n import _ as gettext
-import cachethg
-import paths
-import hglib
+from tortoisehg.util.i18n import _ as gettext
+from tortoisehg.util import cachethg, paths, hglib
 
 promoted = []
 try:
