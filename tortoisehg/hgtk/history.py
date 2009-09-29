@@ -895,7 +895,7 @@ class GLog(gdialog.GDialog):
 
         path = combo.get_child().get_text()
         bfile = path
-        for badchar in (':', '*', '\\', '?'):
+        for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
         bfile = bfile.replace('/', '_')
         bfile = os.path.join(self.bundledir, bfile) + '.hg'
