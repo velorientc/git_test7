@@ -337,9 +337,10 @@ class SynchDialog(gtk.Window):
 
     def _update_to_tip(self, button):
         # execute command and show output on text widget
+        cmdline = ['update', '-v']
+        self.lastcmd = cmdline
         gobject.timeout_add(10, self.process_queue)
         self.write("", False)
-        cmdline = ['update', '-v']
         self.hgthread = hgthread.HgThread(cmdline)
         self.hgthread.start()
         self.stbar.begin()
