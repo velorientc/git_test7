@@ -258,6 +258,8 @@ class GLog(gdialog.GDialog):
         column('rev', True, _('Revision Number'))
         column('id', False, _('Changeset ID'))
         column('branch', False, _('Branch Name'))
+        column('msg', True, _('Summary'))
+        column('user', True, _('User'))
         column('date', False, _('Local Date'))
         column('utc', False, _('UTC Date'))
         column('age', True, _('Age'))
