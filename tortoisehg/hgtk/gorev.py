@@ -52,6 +52,7 @@ class GotoRevDialog(gtk.Dialog):
             revision = self.revEntry.get_text()
             if self.gotofunc:
                 self.gotofunc(revision)
+            self.destroy()
         except mercurial.error.RepoError, e:
             gdialog.Prompt(_('Invalid Revision'), str(e), self).run()
             self.revEntry.grab_focus()
