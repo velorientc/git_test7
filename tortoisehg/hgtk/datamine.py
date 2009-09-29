@@ -673,7 +673,7 @@ class DataMineDialog(gdialog.GDialog):
         '''
         (frame, treeview, origpath, graphview) = objs
         q = Queue.Queue()
-        args = [self.repo.root, q, 'annotate', '--follow', '--number',
+        args = [q, 'annotate', '--follow', '--number',
                 '--rev', str(rev), 'path:'+path]
         thread = thread2.Thread(target=hglib.hgcmd_toq, args=args)
         thread.start()
