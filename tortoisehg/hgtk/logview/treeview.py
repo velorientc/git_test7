@@ -513,6 +513,19 @@ class TreeView(gtk.ScrolledWindow):
             c = self.tvcolumns[cn]
             self.treeview.append_column(c)
 
+    def set_columns(self, columns):
+        if ' '.join(columns) != ' '.join(self.columns):
+            for cn in self.columns:
+                c = self.tvcolumns[cn]
+                self.treeview.remove_column(c)
+            for cn in columns:
+                c = self.tvcolumns[cn]
+                self.treeview.append_column(c)
+                self.columns = columns
+
+    def get_columns(self):
+        return self.columns
+
     def text_color_orig(self, parents, rev, author):
         if int(rev) >= self.origtip:
             return 'darkgreen'
