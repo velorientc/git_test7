@@ -302,6 +302,15 @@ class TreeView(gtk.ScrolledWindow):
     def get_revid_at_path(self, path):
         return self.model[path][treemodel.REVID]
 
+    def get_path_at_revid(self, revid):
+        if revid in self.index:
+            row_index = self.index[revid]
+            iter = self.model.get_iter(row_index)
+            path = self.model.get_path(iter)
+            return path
+        else:
+            return None
+
     def get_wfile_at_path(self, path):
         if self.model:
             return self.model[path][treemodel.WFILE]

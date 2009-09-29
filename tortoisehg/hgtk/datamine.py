@@ -21,6 +21,7 @@ from tortoisehg.util import hglib, thread2
 from tortoisehg.hgtk.logview.colormap import AnnotateColorMap
 from tortoisehg.hgtk.logview.colormap import AnnotateColorSaturation
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
+from tortoisehg.hgtk.logview import treemodel as LogTreeModelModule
 from tortoisehg.hgtk import gtklib, gdialog, changeset
 
 class DataMineDialog(gdialog.GDialog):
@@ -137,17 +138,11 @@ class DataMineDialog(gdialog.GDialog):
         menu.append(create_menu(_('_zoom to change'), self.cmenu_zoom, objs))
         menu.append(create_menu(_('di_splay change'), self.cmenu_display))
         menu.append(create_menu(_('_annotate parent'),
-            self.annotate_parent, objs))
+                                self.cmenu_annotate_parent, objs))
         menu.append(create_menu(_('_view file at revision'), self.cmenu_view))
         menu.append(create_menu(_('_file history'), self.cmenu_file_log))
         menu.show_all()
         return menu
-
-    def annotate_parent(self, menuitem, objs):
-        if not self.currev:
-            return
-        parent = self.repo[self.currev].parents()[0].rev()
-        self.trigger_annotate(parent, self.curpath, objs)
 
     def cmenu_zoom(self, menuitem, objs):
         (frame, treeview, path, graphview) = objs
@@ -165,6 +160,57 @@ class DataMineDialog(gdialog.GDialog):
 
     def cmenu_annotate(self, menuitem):
         self.add_annotate_page(self.curpath, self.currev)
+
+    def cmenu_annotate_parent(self, menuitem, objs):
+        def error_prompt():
+            gdialog.Prompt(_('No parent file'),
+                           _('Unable to annotate'), self).run()
+            return False
+        (frame, treeview, filepath, graphview) = objs
+        anotrev = treeview.get_model().rev
+        graphmodel = graphview.treeview.get_model()
+        path = graphview.get_path_at_revid(int(self.currev))
+        if not path:
+            return error_prompt()
+        iter = graphmodel.get_iter(path)
+        parent_iter = graphmodel.iter_next(iter)
+        if not parent_iter:
+            return error_prompt()
+        parent_path = graphmodel.get_path(parent_iter)
+        parent_revid = graphmodel[parent_path][LogTreeModelModule.REVID]
+        parent_ctx = self.repo[parent_revid]
+        try:
+            parent_ctx.filectx(filepath)
+        except LookupError:
+            # file was renamed/moved, try to find previous file path
+            end_iter = iter
+            path = graphview.get_path_at_revid(int(anotrev))
+            if not path:
+                return error_prompt()
+            iter = graphmodel.get_iter(path)
+            while iter and iter != end_iter:
+                path = graphmodel.get_path(iter)
+                revid = graphmodel[path][LogTreeModelModule.REVID]
+                ctx = self.repo[revid]
+                try:
+                    fctx = ctx.filectx(filepath)
+                    renamed = fctx.renamed()
+                    if renamed:
+                        filepath = renamed[0]
+                        break
+                except LookupError:
+                    # break iteration, but don't use 'break' statement
+                    # so that avoid to drop to 'else' block.kA
+                    iter = end_iter
+                    continue
+                # move iterator to next
+                iter = graphmodel.iter_next(iter)
+            else:
+                return error_prompt()
+        # annotate file of parent rev
+        self.trigger_annotate(parent_revid, filepath, objs)
+        graphview.scroll_to_revision(int(parent_revid))
+        graphview.set_revision_id(int(parent_revid))
 
     def cmenu_file_log(self, menuitem):
         from tortoisehg.hgtk import history
