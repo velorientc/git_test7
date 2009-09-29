@@ -477,7 +477,9 @@ class GStatus(gdialog.GDialog):
         pass
 
     def get_preview_tab_name(self):
-        if self.mqmode:
+        if self.count_revs() == 2:
+            res = _('Save Preview')
+        elif self.mqmode:
             res = _('Patch Preview')
         else:
             res = _('Commit Preview')
