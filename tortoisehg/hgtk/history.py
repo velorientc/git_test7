@@ -947,7 +947,7 @@ class GLog(gdialog.GDialog):
         def threadfunc(q, *args):
             try:
                 hglib.hgcmd_toq(q, *args)
-            except util.Abort, e:
+            except (util.Abort, hglib.RepoError), e:
                 self.stbar.set_status_text(_('Abort: %s') % str(e))
 
         def out_wait():
