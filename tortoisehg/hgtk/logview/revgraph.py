@@ -537,4 +537,15 @@ def filtered_log_generator(repo, pats, opts):
                     break
             if miss:
                 continue
+
+        if opts['user']:
+            miss = 0
+            for u in [u.lower() for u in opts['user']]:
+                if u not in ctx.user().lower():
+                    print 'missing'
+                    miss = 1
+                    break
+            if miss:
+                continue
+
         stack.append((rev, (0,0), [], None))

@@ -313,6 +313,8 @@ class GLog(gdialog.GDialog):
                 gdialog.Prompt(_('Invalid date specification'),
                                str(e), self).run()
                 return
+        elif mode == 4: # User
+            opts['user'] = [w.strip() for w in text.split(',')]
         else:
             return
         self.custombutton.set_active(True)
@@ -464,7 +466,8 @@ class GLog(gdialog.GDialog):
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
                 'revrange':[], 'revlist':[], 'noheads':False,
-                'branch-view':False, 'rev':[] }
+                'branch-view':False, 'rev':[],
+                'user':[]}
         if self.filteropts is not None: opts = self.filteropts
         opts['branch-view'] = self.compactgraph
         opts.update(kwopts)
@@ -827,7 +830,8 @@ class GLog(gdialog.GDialog):
 
         filtercombo = gtk.combo_box_new_text()
         for f in (_('Rev Range'), _('File Patterns'),
-                  _('Keywords'), _('Date')):
+                  _('Keywords'), _('Date'),
+                  _('User')):
             filtercombo.append_text(f)
         filtercombo.set_active(1)
         self.filtercombo = filtercombo
