@@ -169,11 +169,30 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                          start, end, colour, style)
 
         # Draw the revision node in the right column
-        (column, colour) = self.node
-        ctx.arc(cell_area.x + box_size * column + box_size / 2,
-                cell_area.y + cell_area.height / 2,
+        (column, colour, status) = self.node
+        arc_start_position_x = cell_area.x + box_size * column + box_size / 2; 
+        arc_start_position_y = cell_area.y + cell_area.height / 2;
+        ctx.arc(arc_start_position_x, arc_start_position_y,
                 box_size / 5, 0, 2 * math.pi)
 
+        if status != 0:
+            arrow_y = arc_start_position_y - box_size / 4
+            arrow_x = arc_start_position_x + 7;
+            ctx.rectangle(arrow_x, arrow_y , 2, 5)
+            if status == 1:
+                ctx.move_to(arrow_x - 2, arrow_y + 5)
+                ctx.line_to(arrow_x + 4, arrow_y + 5)
+                ctx.line_to(arrow_x +1, arrow_y + 8)
+                ctx.line_to(arrow_x - 2, arrow_y + 5)
+                ctx.stroke_preserve()
+            elif status == -1:
+                ctx.move_to(arrow_x - 2, arrow_y)
+                ctx.line_to(arrow_x + 4, arrow_y)
+                ctx.line_to(arrow_x +1, arrow_y - 3)
+                ctx.line_to(arrow_x - 2, arrow_y)
+                ctx.stroke_preserve()
+            
+            
         self.set_colour(ctx, colour, 0.0, 0.5)
         ctx.stroke_preserve()
 
