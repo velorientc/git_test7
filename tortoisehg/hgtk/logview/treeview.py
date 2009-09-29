@@ -414,7 +414,6 @@ class TreeView(gtk.ScrolledWindow):
                 "in-lines", treemodel.LAST_LINES)
         self.graph_column.add_attribute(self.graph_cell,
                 "out-lines", treemodel.LINES)
-        self.treeview.append_column(self.graph_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 8)
@@ -427,7 +426,6 @@ class TreeView(gtk.ScrolledWindow):
         self.rev_column.pack_start(cell, expand=True)
         self.rev_column.add_attribute(cell, "text", treemodel.REVID)
         self.rev_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.treeview.append_column(self.rev_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
@@ -440,7 +438,6 @@ class TreeView(gtk.ScrolledWindow):
         self.id_column.pack_start(cell, expand=True)
         self.id_column.add_attribute(cell, "text", treemodel.HEXID)
         self.id_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.treeview.append_column(self.id_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
@@ -453,7 +450,6 @@ class TreeView(gtk.ScrolledWindow):
         self.branch_column.pack_start(cell, expand=True)
         self.branch_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.branch_column.add_attribute(cell, "markup", treemodel.BRANCH)
-        self.treeview.append_column(self.branch_column)
         cell = gtk.CellRendererText()
 
         cell.set_property("width-chars", 80)
@@ -465,7 +461,6 @@ class TreeView(gtk.ScrolledWindow):
         self.msg_column.pack_end(cell, expand=True)
         self.msg_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
         self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
-        self.treeview.append_column(self.msg_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
@@ -478,7 +473,6 @@ class TreeView(gtk.ScrolledWindow):
         self.committer_column.add_attribute(cell, "text", treemodel.COMMITER)
         self.committer_column.add_attribute(cell, "foreground",
                 treemodel.FGCOLOR)
-        self.treeview.append_column(self.committer_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
@@ -491,7 +485,6 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.pack_start(cell, expand=True)
         self.date_column.add_attribute(cell, "text", treemodel.LOCALTIME)
         self.date_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.treeview.append_column(self.date_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
@@ -504,7 +497,6 @@ class TreeView(gtk.ScrolledWindow):
         self.utc_column.pack_start(cell, expand=True)
         self.utc_column.add_attribute(cell, "text", treemodel.UTC)
         self.utc_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.treeview.append_column(self.utc_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 10)
@@ -517,7 +509,6 @@ class TreeView(gtk.ScrolledWindow):
         self.age_column.pack_start(cell, expand=True)
         self.age_column.add_attribute(cell, "text", treemodel.AGE)
         self.age_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        self.treeview.append_column(self.age_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 10)
@@ -530,6 +521,17 @@ class TreeView(gtk.ScrolledWindow):
         self.tag_column.pack_start(cell, expand=True)
         self.tag_column.add_attribute(cell, "text", treemodel.TAGS)
         self.tag_column.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+
+        # append columns
+        self.treeview.append_column(self.graph_column)
+        self.treeview.append_column(self.rev_column)
+        self.treeview.append_column(self.id_column)
+        self.treeview.append_column(self.branch_column)
+        self.treeview.append_column(self.msg_column)
+        self.treeview.append_column(self.committer_column)
+        self.treeview.append_column(self.date_column)
+        self.treeview.append_column(self.utc_column)
+        self.treeview.append_column(self.age_column)
         self.treeview.append_column(self.tag_column)
 
     def text_color_orig(self, parents, rev, author):
