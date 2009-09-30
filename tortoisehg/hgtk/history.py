@@ -10,7 +10,6 @@ import os
 import sys
 import gtk
 import gobject
-import pango
 import Queue
 import StringIO
 import shutil
