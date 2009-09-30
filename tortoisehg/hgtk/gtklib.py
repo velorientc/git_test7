@@ -461,6 +461,32 @@ class LayoutTable(gtk.VBox):
             rest = pack(*(widgets[1:]), **kargs)
             t.attach(rest, 1, 2, rows, rows + 1, FLAG, 0, xpad, ypad)
 
+class SlimToolbar(gtk.HBox):
+    """
+    Slim Toolbar, allows to add the buttons of menu size.
+    """
+
+    def __init__(self, tooltips=None):
+        gtk.HBox.__init__(self)
+        self.tooltips = tooltips
+
+    def append_stock(self, stock_id, tooltip=None):
+        icon = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
+        button = gtk.Button()
+        button.set_image(icon)
+        button.set_relief(gtk.RELIEF_NONE)
+        button.set_focus_on_click(False)
+        if self.tooltips and tooltip:
+            self.tooltips.set_tip(button, tooltip)
+        self.append_widget(button, padding=0)
+        return button
+
+    def append_widget(self, widget, expand=False, padding=2):
+        self.pack_start(widget, expand, expand, padding)
+
+    def append_space(self):
+        self.append_widget(gtk.Label(), expand=True, padding=0)
+
 def addspellcheck(textview, ui=None):
     lang = None
     if ui:
