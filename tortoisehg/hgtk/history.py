@@ -481,7 +481,7 @@ class GLog(gdialog.GDialog):
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
                 'revrange':[], 'revlist':[], 'noheads':False,
                 'branch-view':False, 'rev':[], 'user':[]}
-        if self.filteropts is not None: opts = self.filteropts
+        if self.filteropts and not kwopts: opts = self.filteropts
         opts['branch-view'] = self.compactgraph
         opts.update(kwopts)
 
