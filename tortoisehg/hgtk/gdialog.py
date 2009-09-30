@@ -253,7 +253,7 @@ class GDialog(gtk.Window):
         # defaults
         self.fontcomment = 'monospace 10'
         self.fontdiff = 'monospace 10'
-        self.fontlist = 'monospace 9'
+        self.fontlist = 'MS UI Gothic 9'
         self.diffbottom = ''
 
         for attr, setting in self.ui.configitems('gtools'):
