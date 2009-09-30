@@ -507,6 +507,9 @@ class GLog(gdialog.GDialog):
                 t = t + ' - ' + filtername
             self.set_title(t)
 
+        if self.filter != 'custom':
+            self.filterentry.set_text('')
+
         if self.filter == 'branch':
             branch = opts.get('branch', None)
             self.graphview.refresh(self.graphcol, None, opts)
