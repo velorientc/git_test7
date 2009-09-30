@@ -247,26 +247,21 @@ class CmdWidget(gtk.VBox):
             raise _('unknown CmdWidget style: %s') % style
 
         # progress bar box
-        self.progbox = progbox = gtk.HBox()
+        self.progbox = progbox = gtklib.SlimToolbar()
         self.pack_start(progbox)
 
-        def add_button(stock, handler):
-            img = gtk.Image()
-            img.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
-            btn = gtk.ToggleButton()
-            btn.set_image(img)
-            btn.set_relief(gtk.RELIEF_NONE)
-            btn.set_focus_on_click(False)
+        def add_button(stock_id, handler, toggle=False):
+            btn = progbox.append_stock(stock_id, toggle=toggle)
             btn.connect('clicked', handler)
-            progbox.pack_start(btn, False, False)
             return btn
 
-        ## log button
-        self.log_btn = add_button(gtk.STOCK_JUSTIFY_LEFT, self.log_toggled)
+        ## log toggle button
+        self.log_btn = add_button(gtk.STOCK_JUSTIFY_LEFT,
+                                  self.log_toggled, toggle=True)
 
         ## progress bar
         self.pbar = gtk.ProgressBar()
-        progbox.pack_start(self.pbar)
+        progbox.append_widget(self.pbar, expand=True)
 
         ## stop & close buttons
         if self.is_compact:
