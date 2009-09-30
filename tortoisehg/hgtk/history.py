@@ -444,6 +444,7 @@ class GLog(gdialog.GDialog):
         for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
+        settings['filter-mode'] = self.filtercombo.get_active()
         return settings
 
     def load_settings(self, settings):
@@ -463,6 +464,7 @@ class GLog(gdialog.GDialog):
             key = 'glog-vis-'+col
             if key in settings:
                 self.showcol[col] = settings[key]
+        self.filter_mode = settings.get('filter-mode', 1)
 
     def refresh_model(self):
         'Refresh data in the history model, without reloading graph'
@@ -817,11 +819,14 @@ class GLog(gdialog.GDialog):
         filterbox.append_widget(self.custombutton, padding=0)
 
         filtercombo = gtk.combo_box_new_text()
-        for f in (_('Rev Range'), _('File Patterns'),
-                  _('Keywords'), _('Date'),
-                  _('User')):
+        filtercombo_entries = (_('Rev Range'), _('File Patterns'),
+                  _('Keywords'), _('Date'), _('User'))
+        for f in filtercombo_entries:
             filtercombo.append_text(f)
-        filtercombo.set_active(1)
+        if (self.filter_mode >= len(filtercombo_entries) or
+                self.filter_mode < 0):
+            self.filter_mode = 1
+        filtercombo.set_active(self.filter_mode)
         self.filtercombo = filtercombo
         filterbox.append_widget(filtercombo, padding=0)
 
