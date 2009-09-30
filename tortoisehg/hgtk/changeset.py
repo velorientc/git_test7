@@ -541,6 +541,7 @@ class ChangeSet(gdialog.GDialog):
         filelist_tree.connect('popup-menu', self.file_popup_menu)
         filelist_tree.connect('row-activated', self.file_row_act)
         filelist_tree.set_search_equal_func(self.search_filelist)
+        filelist_tree.modify_font(pango.FontDescription(self.fontlist))
 
         accelgroup = gtk.AccelGroup()
         if self.glog_parent:
