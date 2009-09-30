@@ -315,7 +315,7 @@ class GStatus(gdialog.GDialog):
         self.diff_notebook.set_tab_pos(gtk.POS_BOTTOM)
         self.diff_notebook_pages = {}
 
-        self.difffont = pango.FontDescription(self.fontlist)
+        self.difffont = pango.FontDescription(self.fontdiff)
 
         self.clipboard = None
 
