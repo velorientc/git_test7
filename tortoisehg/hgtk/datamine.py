@@ -443,8 +443,7 @@ class DataMineDialog(gdialog.GDialog):
 
         model.clear()
         search_hbox.set_sensitive(False)
-        self.stbar.begin()
-        self.stbar.set_status_text('hg ' + ' '.join(args[2:]))
+        self.stbar.begin(msg='hg ' + ' '.join(args[2:]))
 
         hbox = gtk.HBox()
         lbl = gtk.Label(_('Search "%s"') % retext.split()[0])
@@ -580,7 +579,7 @@ class DataMineDialog(gdialog.GDialog):
         graphopts['filehist'] = path
 
         # File log revision graph
-        graphview = LogTreeView(self.repo, 5000, self.stbar)
+        graphview = LogTreeView(self.repo, 5000)
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
         graphview.refresh(True, [path], graphopts)
         graphview.set_property('rev-column-visible', True)
@@ -668,6 +667,8 @@ class DataMineDialog(gdialog.GDialog):
         treeview.connect('popup-menu', self.ann_popup_menu, objs)
         treeview.connect('row-activated', self.ann_row_act, objs)
 
+        self.stbar.begin(msg=_('Loading history...'))
+
     def search_in_file(self, model, column, key, iter):
         """Searches all fields shown in the tree when the user hits crtr+f,
         not just the ones that are set via tree.set_search_column.
@@ -702,6 +703,7 @@ class DataMineDialog(gdialog.GDialog):
         self.trigger_annotate(rev, wfile, objs)
 
     def revisions_loaded(self, graphview, rev):
+        self.stbar.end()
         graphview.set_revision_id(rev)
         treeview = graphview.treeview
         path, column = treeview.get_cursor()
@@ -737,8 +739,7 @@ class DataMineDialog(gdialog.GDialog):
 
         model, rows = treeview.get_selection().get_selected_rows()
         model.clear()
-        self.stbar.begin()
-        self.stbar.set_status_text(hglib.toutf('hg ' + ' '.join(args[2:])))
+        self.stbar.begin(msg=hglib.toutf('hg ' + ' '.join(args[2:])))
 
         hbox = gtk.HBox()
         lbl = gtk.Label(hglib.toutf(os.path.basename(path) + '@' + str(rev)))
