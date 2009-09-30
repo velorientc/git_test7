@@ -269,7 +269,7 @@ class DataMineDialog(gdialog.GDialog):
 
     def close_notebook(self, notebook):
         if notebook.get_n_pages() <= 1:
-            gtklib.thgexit(self)
+            gtklib.thgclose(self)
         else:
             self.close_current_page()
 
