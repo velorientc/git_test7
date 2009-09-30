@@ -743,6 +743,7 @@ class ChangeSet(gdialog.GDialog):
         rev = self.currev
         dialog = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dialog.display()
+        dialog.close_current_page()
         dialog.add_annotate_page(self.curfile, str(rev))
 
     def file_history(self, menuitem):
