@@ -361,7 +361,7 @@ class TreeView(gtk.ScrolledWindow):
                 gobject.idle_add(self.populate, self.currevid)
             else:
                 self.treeview.set_model(None)
-                self.pbar.set_status_text('Repository is empty')
+                self.pbar.set_status_text(_('Repository is empty'))
 
     def set_author_color(self):
         # If user has configured authorcolor in [tortoisehg], color
