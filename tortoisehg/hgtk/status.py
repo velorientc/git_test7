@@ -329,8 +329,7 @@ class GStatus(gdialog.GDialog):
         self.append_page('text-diff', scroller, gtk.Label(_('Text Diff')))
 
         # use treeview to show selectable diff hunks
-        sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
-        self.clipboard = gtk.Clipboard(selection=sel)
+        self.clipboard = gtk.Clipboard()
 
         self.diffmodel = gtk.ListStore(
                 bool, # DM_REJECTED
