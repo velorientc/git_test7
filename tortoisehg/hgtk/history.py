@@ -698,47 +698,23 @@ class GLog(gdialog.GDialog):
         self.tree.connect('thg-revision', self.thgnavigate)
         self.connect('thg-refresh', self.thgrefresh)
 
-        self.syncbox = gtk.HBox()
+        # synch bar
+        self.syncbox = gtklib.SlimToolbar(self.tooltips)
         syncbox = self.syncbox
 
-        ico = lambda x: gtk.image_new_from_stock(x, gtk.ICON_SIZE_MENU)
-        incoming = gtk.Button()
-        incoming.set_image(ico(gtk.STOCK_GO_DOWN))
-        incoming.set_relief(gtk.RELIEF_NONE)
-        pull = gtk.Button()
-        pull.set_image(ico(gtk.STOCK_GOTO_BOTTOM))
-        pull.set_relief(gtk.RELIEF_NONE)
-        outgoing = gtk.Button()
-        outgoing.set_image(ico(gtk.STOCK_GO_UP))
-        outgoing.set_relief(gtk.RELIEF_NONE)
-        push = gtk.Button()
-        push.set_image(ico(gtk.STOCK_GOTO_TOP))
-        push.set_relief(gtk.RELIEF_NONE)
-        conf = gtk.Button()
-        conf.set_image(ico(gtk.STOCK_PREFERENCES))
-        conf.set_relief(gtk.RELIEF_NONE)
-        stop = gtk.Button()
-        stop.set_image(ico(gtk.STOCK_STOP))
+        incoming = syncbox.append_stock(gtk.STOCK_GO_DOWN,
+                        _('Download and view incoming changesets'))
+        pull = syncbox.append_stock(gtk.STOCK_GOTO_BOTTOM,
+                        _('Pull incoming changesets'))
+        outgoing = syncbox.append_stock(gtk.STOCK_GO_UP,
+                        _('Determine and mark outgoing changesets'))
+        push = syncbox.append_stock(gtk.STOCK_GOTO_TOP,
+                        _('Push outgoing changesets'))
+        conf = syncbox.append_stock(gtk.STOCK_PREFERENCES,
+                        _('Stop current transaction'))
+        stop = syncbox.append_stock(gtk.STOCK_STOP,
+                        _('Configure aliases and after pull behavior'))
         stop.set_sensitive(False)
-        stop.set_relief(gtk.RELIEF_NONE)
-        syncbox.pack_start(incoming, False)
-        syncbox.pack_start(pull, False)
-        syncbox.pack_start(outgoing, False)
-        syncbox.pack_start(push, False)
-        syncbox.pack_start(stop, False)
-
-        self.tooltips.set_tip(incoming,
-            _('Download and view incoming changesets'))
-        self.tooltips.set_tip(pull,
-            _('Pull incoming changesets'))
-        self.tooltips.set_tip(outgoing,
-            _('Determine and mark outgoing changesets'))
-        self.tooltips.set_tip(push,
-            _('Push outgoing changesets'))
-        self.tooltips.set_tip(stop,
-            _('Stop current transaction'))
-        self.tooltips.set_tip(conf,
-            _('Configure aliases and after pull behavior'))
 
         ## target path combobox
         urllist = gtk.ListStore(str, str)
@@ -746,7 +722,7 @@ class GLog(gdialog.GDialog):
         cell = gtk.CellRendererText()
         urlcombo.pack_end(cell, False)
         urlcombo.add_attribute(cell, 'text', 1)
-        syncbox.pack_start(urlcombo, True, True, 2)
+        syncbox.append_widget(urlcombo, expand=True)
 
         for alias, path in self.repo.ui.configitems('paths'):
             path = url.hidepassword(path)
@@ -754,14 +730,12 @@ class GLog(gdialog.GDialog):
             if alias == 'default':
                 urlcombo.set_active(len(urllist)-1)
 
-        conf.connect('clicked', self.conf_clicked, urlcombo)
-        syncbox.pack_start(conf, False)
-
         incoming.connect('clicked', self.incoming_clicked, urlcombo)
         outgoing.connect('clicked', self.outgoing_clicked, urlcombo, stop)
         push.connect('clicked', self.push_clicked, urlcombo)
+        conf.connect('clicked', self.conf_clicked, urlcombo)
 
-        syncbox.pack_start(gtk.Label(_('After Pull:')), False, False, 2)
+        syncbox.append_widget(gtk.Label(_('After Pull:')))
         ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
         ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
         if 'fetch' in self.exs or 'fetch' == ppull:
@@ -785,8 +759,9 @@ class GLog(gdialog.GDialog):
 
         pull.connect('clicked', self.pull_clicked, urlcombo, ppullcombo,
                      ppulldata)
-        syncbox.pack_start(ppullcombo, False, False, 2)
+        syncbox.append_widget(ppullcombo)
 
+        # filter bar
         self.filterbox = gtk.HBox()
         filterbox = self.filterbox
 
@@ -863,6 +838,7 @@ class GLog(gdialog.GDialog):
         midpane.pack_start(self.graphview, True, True, 0)
         midpane.show_all()
 
+        # MQ widget
         if 'mq' in self.exs:
             # create MQWidget
             self.mqwidget = thgmq.MQWidget(self.repo, accelgroup, self.tooltips)
