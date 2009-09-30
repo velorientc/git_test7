@@ -200,7 +200,7 @@ class DataMineDialog(gdialog.GDialog):
                         break
                 except LookupError:
                     # break iteration, but don't use 'break' statement
-                    # so that avoid to drop to 'else' block.kA
+                    # so that execute 'else' block for showing prompt.
                     iter = end_iter
                     continue
                 # move iterator to next
