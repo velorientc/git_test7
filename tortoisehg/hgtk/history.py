@@ -286,6 +286,7 @@ class GLog(gdialog.GDialog):
             for show, uitext, property, colname in self.details_model:
                 columns.append(colname)
             self.graphview.set_columns(columns)
+            self.column_order = ' '.join(columns)
             reload = False
             for show, uitext, property, colname in self.details_model:
                 if property == 'graphcol':
@@ -414,6 +415,12 @@ class GLog(gdialog.GDialog):
             if col in self.showcol:
                 self.graphview.set_property(col+'-column-visible',
                         self.showcol[col])
+        try:
+            self.graphview.set_columns(self.column_order.split())
+        except KeyError:
+            # ignore unknown column names, these could originate from garbeled
+            # persisted data
+            pass
         self.get_menuitem(_('Compact Graph')).set_sensitive(self.graphcol)
         self.get_menuitem(_('Color by Branch')).set_sensitive(self.graphcol)
 
@@ -445,6 +452,7 @@ class GLog(gdialog.GDialog):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
         settings['filter-mode'] = self.filtercombo.get_active()
+        settings['column-order'] = ' '.join(self.graphview.get_columns())
         return settings
 
     def load_settings(self, settings):
@@ -465,6 +473,8 @@ class GLog(gdialog.GDialog):
             if key in settings:
                 self.showcol[col] = settings[key]
         self.filter_mode = settings.get('filter-mode', 1)
+        default_co = 'graph rev id branch msg user date utc age tag'
+        self.column_order = settings.get('column-order', default_co)
 
     def refresh_model(self):
         'Refresh data in the history model, without reloading graph'
