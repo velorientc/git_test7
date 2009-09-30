@@ -222,13 +222,17 @@ STYLE_COMPACT = 'compact'   # pbar + popup log viewer
 
 class CmdWidget(gtk.VBox):
 
-    def __init__(self, style=STYLE_NORMAL):
+    def __init__(self, style=STYLE_NORMAL, tooltips=None):
         gtk.VBox.__init__(self)
 
         self.hgthread = None
         self.last_pbar_update = 0
         self.is_normal = style == STYLE_NORMAL
         self.is_compact = style == STYLE_COMPACT
+
+        # tooltips
+        if tooltips is None:
+            tooltips = gtk.Tooltips()
 
         # log viewer
         if self.is_normal:
@@ -247,17 +251,17 @@ class CmdWidget(gtk.VBox):
             raise _('unknown CmdWidget style: %s') % style
 
         # progress bar box
-        self.progbox = progbox = gtklib.SlimToolbar()
+        self.progbox = progbox = gtklib.SlimToolbar(tooltips)
         self.pack_start(progbox)
 
-        def add_button(stock_id, handler, toggle=False):
-            btn = progbox.append_stock(stock_id, toggle=toggle)
+        def add_button(stock_id, tooltip, handler, toggle=False):
+            btn = progbox.append_stock(stock_id, tooltip, toggle)
             btn.connect('clicked', handler)
             return btn
 
         ## log toggle button
         self.log_btn = add_button(gtk.STOCK_JUSTIFY_LEFT,
-                                  self.log_toggled, toggle=True)
+                _('Toggle log window'), self.log_toggled, toggle=True)
 
         ## progress bar
         self.pbar = gtk.ProgressBar()
@@ -265,8 +269,10 @@ class CmdWidget(gtk.VBox):
 
         ## stop & close buttons
         if self.is_compact:
-            self.stop_btn = add_button(gtk.STOCK_STOP, self.stop_clicked)
-            self.close_btn = add_button(gtk.STOCK_CLOSE, self.close_clicked)
+            self.stop_btn = add_button(gtk.STOCK_STOP,
+                    _('Stop current transaction'), self.stop_clicked)
+            self.close_btn = add_button(gtk.STOCK_CLOSE,
+                    _('Close command bar'), self.close_clicked)
 
         def after_init():
             self.set_buttons(stop=False)
