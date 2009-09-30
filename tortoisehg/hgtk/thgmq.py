@@ -78,58 +78,43 @@ class MQWidget(gtk.VBox):
         self.mqloaded = hasattr(repo, 'mq')
 
         # top toolbar
-        toolbar = gtk.Toolbar()
-        toolbar.set_style(gtk.TOOLBAR_ICONS)
-        toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-        toolbar.set_property('icon-size', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        tbar = gtklib.SlimToolbar(tooltips)
 
+        ## buttons
         self.btn = {}
-
-        popallbtn = gtk.ToolButton(gtk.STOCK_GOTO_FIRST)
-        if tooltips:
-            popallbtn.set_tooltip(tooltips, _('Unapply all patches'))
+        popallbtn = tbar.append_stock(gtk.STOCK_GOTO_FIRST,
+                                      _('Unapply all patches'))
         popallbtn.connect('clicked', self.popall_clicked)
-        toolbar.insert(popallbtn, -1)
         self.btn['popall'] = popallbtn
 
-        popbtn = gtk.ToolButton(gtk.STOCK_GO_BACK)
-        if tooltips:
-            popbtn.set_tooltip(tooltips, _('Unapply last patch'))
+        popbtn = tbar.append_stock(gtk.STOCK_GO_BACK,
+                                   _('Unapply last patch'))
         popbtn.connect('clicked', self.pop_clicked)
-        toolbar.insert(popbtn, -1)
         self.btn['pop'] = popbtn
 
         pushbtn = gtk.ToolButton(gtk.STOCK_GO_FORWARD)
-        if tooltips:
-            pushbtn.set_tooltip(tooltips, _('Apply next patch'))
+        pushbtn = tbar.append_stock(gtk.STOCK_GO_FORWARD,
+                                    _('Apply next patch'))
         pushbtn.connect('clicked', self.push_clicked)
-        toolbar.insert(pushbtn, -1)
         self.btn['push'] = pushbtn
 
-        pushallbtn = gtk.ToolButton(gtk.STOCK_GOTO_LAST)
-        if tooltips:
-            pushallbtn.set_tooltip(tooltips, _('Apply all patches'))
+        pushallbtn = tbar.append_stock(gtk.STOCK_GOTO_LAST,
+                                       _('Apply all patches'))
         pushallbtn.connect('clicked', self.pushall_clicked)
-        toolbar.insert(pushallbtn, -1)
         self.btn['pushall'] = pushallbtn
 
-        sep = gtk.SeparatorToolItem()
-        sep.set_draw(False)
-        sep.set_expand(True)
-        toolbar.insert(sep, -1)
+        ## separator
+        tbar.append_space()
 
+        ## drop-down menu
         menubtn = gtk.MenuToolButton('')
         menubtn.set_menu(self.create_view_menu())
-        toolbar.insert(menubtn, -1)
+        tbar.append_widget(menubtn, padding=0)
         self.btn['menu'] = menubtn
-        def after_init():
-            arrowbtn = menubtn.child.get_children()[1]
-            arrowbtn.child.set(gtk.ARROW_DOWN, gtk.SHADOW_IN)
-            menubtn.child.get_children()[0].hide()
-        gobject.idle_add(after_init)
 
-        self.pack_start(toolbar, False, False)
+        self.pack_start(tbar, False, False)
 
+        # center pane
         mainbox = gtk.VBox()
         self.pack_start(mainbox, True, True)
 
