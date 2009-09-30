@@ -1374,8 +1374,8 @@ class GLog(gdialog.GDialog):
         parents = [x.node() for x in self.repo.parents()]
         if rev == self.repo.parents()[0].rev():
             rev = self.revrange[1]
-        dialog = merge.MergeDialog(rev)
-        dialog.set_notify_func(self.merge_completed, parents, len(self.repo))
+        dlg = merge.MergeDialog(rev)
+        dlg.set_notify_func(self.merge_completed, parents, len(self.repo))
         self.show_dialog(dlg)
 
     def merge_completed(self, args):

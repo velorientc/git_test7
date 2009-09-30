@@ -744,6 +744,7 @@ class ChangeSet(gdialog.GDialog):
         rev = self.currev
         dialog = datamine.DataMineDialog(self.ui, self.repo, self.cwd, [], {})
         dialog.display()
+        dialog.close_current_page()
         dialog.add_annotate_page(self.curfile, str(rev))
 
     def file_history(self, menuitem):
@@ -752,6 +753,8 @@ class ChangeSet(gdialog.GDialog):
             # If this changeset browser is embedded in glog, send
             # send this event to the main app
             opts = {'pats' : [self.curfile]}
+            self.glog_parent.filtercombo.set_active(1)
+            self.glog_parent.filterentry.set_text(self.curfile)
             self.glog_parent.custombutton.set_active(True)
             self.glog_parent.filter = 'custom'
             self.glog_parent.reload_log(**opts)
