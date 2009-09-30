@@ -355,13 +355,12 @@ class GLog(gdialog.GDialog):
         self.reload_log()
 
     def update_hide_merges_button(self):
-        b = self.hide_merges_button
         compatible = self.filter in ['all', 'new', 'branch', 'custom']
         if not self.graphcol and compatible:
-            b.set_sensitive(True)
+            self.hidemerges.set_sensitive(True)
         else:
-            b.set_active(False)
-            b.set_sensitive(False)
+            self.hidemerges.set_active(False)
+            self.hidemerges.set_sensitive(False)
             self.no_merges = False
 
     def patch_selected(self, mqwidget, revid, patchname):
@@ -762,61 +761,61 @@ class GLog(gdialog.GDialog):
         syncbox.append_widget(ppullcombo)
 
         # filter bar
-        self.filterbox = gtk.HBox()
+        self.filterbox = gtklib.SlimToolbar()
         filterbox = self.filterbox
 
         all = gtk.RadioButton(None, _('all'))
         all.set_active(True)
         all.connect('toggled', self.filter_selected, 'all')
-        filterbox.pack_start(all, False)
+        filterbox.append_widget(all, padding=0)
 
         self.newbutton = gtk.RadioButton(all, _('new'))
         self.newbutton.connect('toggled', self.filter_selected, 'new')
-        filterbox.pack_start(self.newbutton, False)
+        filterbox.append_widget(self.newbutton, padding=0)
 
         tagged = gtk.RadioButton(all, _('tagged'))
         tagged.connect('toggled', self.filter_selected, 'tagged')
-        filterbox.pack_start(tagged, False)
+        filterbox.append_widget(tagged, padding=0)
 
         ancestry = gtk.RadioButton(all, _('ancestry'))
         ancestry.connect('toggled', self.filter_selected, 'ancestry')
-        filterbox.pack_start(ancestry, False)
+        filterbox.append_widget(ancestry, padding=0)
         self.ancestrybutton = ancestry
 
         parents = gtk.RadioButton(all, _('parents'))
         parents.connect('toggled', self.filter_selected, 'parents')
-        filterbox.pack_start(parents, False)
+        filterbox.append_widget(parents, padding=0)
 
         heads = gtk.RadioButton(all, _('heads'))
         heads.connect('toggled', self.filter_selected, 'heads')
-        filterbox.pack_start(heads, False)
+        filterbox.append_widget(heads, padding=0)
 
         merges = gtk.RadioButton(all, _('merges'))
         merges.connect('toggled', self.filter_selected, 'only_merges')
-        filterbox.pack_start(merges, False)
+        filterbox.append_widget(merges, padding=0)
 
-        b = gtk.CheckButton(_('hide merges'))
-        b.connect('toggled', self.filter_selected, 'no_merges')
-        filterbox.pack_start(b, False)
-        self.hide_merges_button = b
+        hidemerges = gtk.CheckButton(_('hide merges'))
+        hidemerges.connect('toggled', self.filter_selected, 'no_merges')
+        filterbox.append_widget(hidemerges, padding=0)
+        self.hidemerges = hidemerges
 
         branches = gtk.RadioButton(all, _('branch'))
         branches.connect('toggled', self.filter_selected, 'branch')
         branches.set_sensitive(False)
+        filterbox.append_widget(branches, padding=0)
         self.branchbutton = branches
-        filterbox.pack_start(branches, False)
 
         branchcombo = gtk.combo_box_new_text()
         for name in self.get_live_branches():
             branchcombo.append_text(hglib.toutf(name))
         branchcombo.connect('changed', self.select_branch)
         self.lastbranchrow = None
-        filterbox.pack_start(branchcombo, False)
+        filterbox.append_widget(branchcombo, padding=0)
         self.branchcombo = branchcombo
 
         self.custombutton = gtk.RadioButton(all, _('custom'))
         self.custombutton.set_sensitive(False)
-        filterbox.pack_start(self.custombutton, False)
+        filterbox.append_widget(self.custombutton, padding=0)
 
         filtercombo = gtk.combo_box_new_text()
         for f in (_('Rev Range'), _('File Patterns'),
@@ -825,17 +824,17 @@ class GLog(gdialog.GDialog):
             filtercombo.append_text(f)
         filtercombo.set_active(1)
         self.filtercombo = filtercombo
-        filterbox.pack_start(filtercombo, False)
+        filterbox.append_widget(filtercombo, padding=0)
 
         entry = gtk.Entry()
         entry.connect('activate', self.filter_entry_activated, filtercombo)
         self.filterentry = entry
-        filterbox.pack_start(entry, True)
+        filterbox.append_widget(entry, expand=True, padding=0)
 
         midpane = gtk.VBox()
-        midpane.pack_start(syncbox, False, False, 0)
-        midpane.pack_start(filterbox, False, False, 0)
-        midpane.pack_start(self.graphview, True, True, 0)
+        midpane.pack_start(syncbox, False)
+        midpane.pack_start(filterbox, False)
+        midpane.pack_start(self.graphview)
         midpane.show_all()
 
         # MQ widget
