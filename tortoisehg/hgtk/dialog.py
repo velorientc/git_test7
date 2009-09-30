@@ -16,6 +16,7 @@
 
 import gtk
 from tortoisehg.util.i18n import _
+from tortoisehg.util import hglib
 from tortoisehg.hgtk import gtklib
 
 def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
@@ -35,7 +36,7 @@ def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
     entry.set_text(default or '')
     entry.set_visibility(visible)
     entry.set_activates_default(True)
-    lbl = gtk.Label(msg)
+    lbl = gtk.Label(hglib.toutf(msg))
     lbl.set_alignment(0, 0.5)
     dialog.vbox.pack_start(lbl, True, True, 6)
     dialog.vbox.pack_start(entry, False, False, 6)
