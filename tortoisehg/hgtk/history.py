@@ -1391,7 +1391,7 @@ class GLog(gdialog.GDialog):
     def archive(self, menuitem):
         rev = self.currevid
         parents = [x.node() for x in self.repo.parents()]
-        dialog = archive.ArchiveDialog(rev)
+        dlg = archive.ArchiveDialog(rev)
         self.show_dialog(dlg)
 
     def transplant_rev(self, menuitem):
