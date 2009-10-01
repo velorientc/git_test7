@@ -40,7 +40,7 @@ AGE = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
-    def __init__ (self, repo, graphdata, color_func, outgoing):
+    def __init__ (self, repo, graphdata, color_func, outgoing, origtip, bview):
         gtk.GenericTreeModel.__init__(self)
         self.repo = repo
         self.outgoing = outgoing
@@ -50,6 +50,8 @@ class TreeModel(gtk.GenericTreeModel):
         self.wcparents = [x.rev() for x in repo.parents()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
+        self.origtip = origtip
+        self.bundleview = bview
 
     def refresh(self):
         repo = self.repo
@@ -169,9 +171,13 @@ class TreeModel(gtk.GenericTreeModel):
             else:
                 sumstr = bstr + tstr + summary
 
-            status = node in self.outgoing and -1 or 0
-            # TODO: determine incoming, give status 1
-            
+            if node in self.outgoing:
+                status = -1
+            elif revid >= self.origtip:
+                status = self.bundleview and 2 or 1
+            else:
+                status = 0
+
             revision = (sumstr, author, taglist, color, age, status)
             self.revisions[revid] = revision
         else:

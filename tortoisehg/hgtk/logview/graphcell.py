@@ -174,11 +174,10 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         arc_start_position_y = cell_area.y + cell_area.height / 2;
         ctx.arc(arc_start_position_x, arc_start_position_y,
                 box_size / 5, 0, 2 * math.pi)
+        self.set_colour(ctx, colour, 0.0, 0.5)
+        ctx.stroke_preserve()
 
         # Possible node status
-        #  0 - normal
-        #  1 - outgoing
-        # -1 - incoming
         if status != 0:
             def draw_arrow(x, y, inc):
                 ctx.move_to(x - 2, y)
@@ -188,14 +187,16 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                 ctx.stroke_preserve()
             arrow_y = arc_start_position_y - box_size / 4
             arrow_x = arc_start_position_x + 7;
-            ctx.rectangle(arrow_x, arrow_y , 2, 5)
-            if status == 1:
-                draw_arrow(arrow_x, arrow_y + 5, 3)
-            elif status == -1:
+            ctx.rectangle(arrow_x, arrow_y, 2, 5)
+            if status == -1:  # Outgoing arrow
                 draw_arrow(arrow_x, arrow_y, -3)
-
-        self.set_colour(ctx, colour, 0.0, 0.5)
-        ctx.stroke_preserve()
+            elif status == 1: # New changeset, recently added to tip
+                # TODO: someone improve this, please
+                ctx.set_source_rgb(0, 1, 0)
+                ctx.arc(arrow_x, arrow_y, box_size / 5, 0, 2 * math.pi)
+            elif status == 2:  # Incoming (bundle preview) arrow
+                draw_arrow(arrow_x, arrow_y + 5, 3)
+            ctx.stroke_preserve()
 
         self.set_colour(ctx, colour, 0.5, 1.0)
         ctx.fill()

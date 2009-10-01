@@ -498,6 +498,7 @@ class GLog(gdialog.GDialog):
         # handle strips, rebases, etc
         self.origtip = min(len(self.repo), self.origtip)
         opts['orig-tip'] = self.origtip
+        opts['bundleview'] = bool(self.bfile)
 
         opts['no_merges'] = self.no_merges
 

@@ -129,6 +129,7 @@ class TreeView(gtk.ScrolledWindow):
         self.origtip = None
         self.branch_color = False
         self.outgoing = []
+        self.bundleview = False
 
     def set_outgoing(self, outgoing):
         self.outgoing = outgoing
@@ -247,9 +248,11 @@ class TreeView(gtk.ScrolledWindow):
         gcol.set_visible(self.show_graph)
 
         if not self.model:
-            self.model = treemodel.TreeModel(self.repo, self.graphdata,
-                    self.color_func, self.outgoing)
-            self.treeview.set_model(self.model)
+            model = treemodel.TreeModel(self.repo, self.graphdata,
+                    self.color_func, self.outgoing, self.origtip,
+                    self.bundleview)
+            self.treeview.set_model(model)
+            self.model = model
 
         self.emit('batch-loaded')
         if stopped:
@@ -356,6 +359,7 @@ class TreeView(gtk.ScrolledWindow):
 
     def refresh(self, graphcol, pats, opts):
         self.origtip = opts['orig-tip']
+        self.bundleview = opts['bundleview']
         if self.repo is not None:
             hglib.invalidaterepo(self.repo)
             if len(self.repo) > 0:
