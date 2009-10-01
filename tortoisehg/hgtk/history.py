@@ -55,7 +55,10 @@ class GLog(gdialog.GDialog):
         self.exs = [ name for name, module in extensions.extensions() ]
 
     def get_title(self):
-        return _('%s log') % self.get_reponame()
+        str = _('%s log') % self.get_reponame()
+        if self.bfile:
+            str += _(' (Bundle Preview)')
+        return str
 
     def get_icon(self):
         return 'menulog.ico'
