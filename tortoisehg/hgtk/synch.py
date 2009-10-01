@@ -20,11 +20,11 @@ from mercurial import hg, ui, extensions, url
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
 
-from tortoisehg.hgtk import dialog, gtklib, hgthread, history, thgconfig
+from tortoisehg.hgtk import dialog, gtklib, hgthread, thgconfig
 from tortoisehg.hgtk import thgshelve, hgemail, update
 
 class SynchDialog(gtk.Window):
-    def __init__(self, repos=[], pushmode=False, fromlog=False):
+    def __init__(self, repos=[], pushmode=False):
         """ Initialize the Dialog. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'menusynch.ico')
@@ -33,7 +33,6 @@ class SynchDialog(gtk.Window):
         self.root = paths.find_root()
         self.selected_path = None
         self.hgthread = None
-        self.fromlog = fromlog
         self.notify_func = None
         self.last_drop_time = None
         self.lastcmd = []
@@ -49,7 +48,6 @@ class SynchDialog(gtk.Window):
         self.set_default_size(655, 552)
 
         self.paths = self.get_paths()
-        self.origchangecount = len(self.repo)
 
         name = self.repo.ui.config('web', 'name') or os.path.basename(self.root)
         self.set_title(_('TortoiseHg Synchronize - ') + hglib.toutf(name))
@@ -269,11 +267,8 @@ class SynchDialog(gtk.Window):
 
     def create_bottombox(self):
         self.buttonhbox = gtk.HBox()
-        self.viewpulled = gtk.Button(_('View pulled revisions'))
-        self.viewpulled.connect('clicked', self._view_pulled_changes)
         self.updatetip = gtk.Button(_('Update to branch tip'))
         self.updatetip.connect('clicked', self._update_to_tip)
-        self.buttonhbox.pack_start(self.viewpulled, False, False, 2)
         self.buttonhbox.pack_start(self.updatetip, False, False, 2)
         self.basevbox.pack_start(self.buttonhbox, False, False, 2)
 
@@ -333,38 +328,20 @@ class SynchDialog(gtk.Window):
             self.pathtext.set_text(hglib.toutf(path))
 
     def update_buttons(self):
-        self.buttonhbox.hide()
         try:
             # open a new repo, rebase can confuse cached repo
             repo = hg.repository(ui.ui(), path=self.root)
         except hglib.RepoError:
             return
-        tip = len(repo)
-        if ' '.join(self.lastcmd[:2]) == 'pull --rebase':
-            # if last operation was a rebase, do not show 'viewpulled'
-            # and reset our remembered tip changeset
-            self.origchangecount = tip
-            self.viewpulled.hide()
-        elif self.origchangecount == tip or self.fromlog:
-            self.viewpulled.hide()
-        else:
-            self.buttonhbox.show()
-            self.viewpulled.show()
 
         wc = repo[None]
-        branchhead = repo.branchtags().get(wc.branch())
+        bhead = repo.branchtags().get(wc.branch())
         parents = repo.parents()
-        if len(parents) > 1 or parents[0].node() == branchhead or not branchhead:
-            self.updatetip.hide()
+        if len(parents) > 1 or parents[0].node() == bhead or not bhead:
+            self.buttonhbox.hide()
         else:
             self.buttonhbox.show()
-            self.updatetip.show()
         self.repo = repo
-
-    def _view_pulled_changes(self, button):
-        opts = {'orig-tip' : self.origchangecount, 'from-synch' : True}
-        dlg = history.run(self.ui, **opts)
-        dlg.display()
 
     def _update_to_tip(self, button):
         def update_notify(arg):

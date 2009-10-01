@@ -77,13 +77,12 @@ class GLog(gdialog.GDialog):
                     self.refresh_clicked,
                     tip=_('Reload revision history')),
                 gtk.SeparatorToolItem(),
+                self.make_toolbutton(gtk.STOCK_NETWORK,
+                     _('Synchronize'),
+                     self.synch_clicked,
+                     tip=_('Launch synchronize tool')),
+                gtk.SeparatorToolItem(),
                ]
-        if not self.opts.get('from-synch'):
-            self.synctb = self.make_toolbutton(gtk.STOCK_NETWORK,
-                              _('Synchronize'),
-                              self.synch_clicked,
-                              tip=_('Launch synchronize tool'))
-            tbar += [self.synctb, gtk.SeparatorToolItem()]
         if 'mq' in self.exs:
             self.mqtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
                             _('MQ'),
@@ -154,7 +153,7 @@ class GLog(gdialog.GDialog):
 
     def synch_clicked(self, toolbutton, data):
         def sync_closed(dialog):
-            self.synctb.set_sensitive(True)
+            self.get_toolbutton(_('Synchronize')).set_sensitive(True)
 
         def synch_callback(parents):
             self.repo.invalidate()
@@ -164,11 +163,11 @@ class GLog(gdialog.GDialog):
 
         from tortoisehg.hgtk import synch
         parents = [x.node() for x in self.repo.parents()]
-        dlg = synch.SynchDialog([], False, True)
+        dlg = synch.SynchDialog([], False)
         dlg.set_notify_func(synch_callback, parents)
         dlg.connect('destroy', sync_closed)
         dlg.show_all()
-        self.synctb.set_sensitive(False)
+        self.get_toolbutton(_('Synchronize')).set_sensitive(False)
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
@@ -374,7 +373,7 @@ class GLog(gdialog.GDialog):
         root = self.repo.root
         os.chdir(root)  # for paths relative to repo root
 
-        self.origtip = self.opts['orig-tip'] or len(self.repo)
+        self.origtip = len(self.repo)
         self.graphview.set_property('branch-color', self.branch_color)
 
         # ignore file patterns that imply repo root
@@ -1547,8 +1546,8 @@ def run(ui, *pats, **opts):
         'follow':False, 'follow-first':False, 'copies':False, 'keyword':[],
         'limit':0, 'rev':[], 'removed':False, 'no_merges':False,
         'date':None, 'only_merges':None, 'prune':[], 'git':False,
-        'verbose':False, 'include':[], 'exclude':[], 'from-synch':False,
-        'orig-tip':None, 'filehist':None, 'canonpats':[]
+        'verbose':False, 'include':[], 'exclude':[], 'filehist':None,
+        'canonpats':[]
     }
     cmdoptions.update(opts)
     pats = hglib.canonpaths(pats) + cmdoptions['canonpats']
