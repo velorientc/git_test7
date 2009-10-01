@@ -52,6 +52,8 @@ class TreeModel(gtk.GenericTreeModel):
         self.branchtags = repo.branchtags()
         self.origtip = origtip
         self.bundleview = bview
+        self.hidetags = self.repo.ui.config(
+            'tortoisehg', 'hidetags', '').split()
 
     def refresh(self):
         repo = self.repo
@@ -153,8 +155,9 @@ class TreeModel(gtk.GenericTreeModel):
             taglist = hglib.toutf(', '.join(tags))
             tstr = ''
             for tag in tags:
-                tstr += '<span color="%s" background="%s"> %s </span> ' % \
-                        ('black', '#ffffaa', tag)
+                if tag not in self.hidetags:
+                    tstr += '<span color="%s" background="%s"> %s </span> ' % \
+                            ('black', '#ffffaa', tag)
 
             branch = ctx.branch()
             bstr = ''
