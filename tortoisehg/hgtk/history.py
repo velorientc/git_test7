@@ -101,11 +101,6 @@ class GLog(gdialog.GDialog):
                     self.filter = 'all'
                     self.filteropts = None
                 self.graphview.set_outgoing([])
-                if self.bfile:
-                    self.bfile = None
-                    self.repo = hg.repository(self.ui, path=self.repo.root)
-                    self.graphview.set_repo(self.repo, self.stbar)
-                    self.changeview.repo = self.repo
                 self.origtip = len(self.repo)
             self.reload_log()
         def navigate(menuitem, revname):
@@ -588,19 +583,32 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('visualize change'), self.vdiff_change))
         m.append(create_menu(_('di_splay change'), self.show_status))
         m.append(create_menu(_('diff to local'), self.vdiff_local))
+        if self.bfile:
+            m.show_all()
+            return m
+
         m.append(create_menu(_('_update'), self.checkout))
-        self.cmenu_merge = create_menu(_('_merge with'), self.domerge)
-        m.append(self.cmenu_merge)
+        cmenu_merge = create_menu(_('_merge with'), self.domerge)
+        m.append(cmenu_merge)
         m.append(create_menu(_('_copy hash'), self.copy_hash))
         m.append(create_menu(_('_export patch'), self.export_patch))
         m.append(create_menu(_('e_mail patch'), self.email_patch))
         m.append(create_menu(_('_bundle rev:tip'), self.bundle_rev_to_tip))
         m.append(create_menu(_('add/remove _tag'), self.add_tag))
-        self.cmenu_backout = create_menu(_('backout revision'),
-                                         self.backout_rev)
-        m.append(self.cmenu_backout)
+        cmenu_backout = create_menu(_('backout revision'), self.backout_rev)
+        m.append(cmenu_backout)
         m.append(create_menu(_('_revert'), self.revert))
         m.append(create_menu(_('_archive'), self.archive))
+
+        # disable/enable menus as required
+        parents = [x.rev() for x in self.repo.parents()]
+        can_merge = self.currevid not in parents and len(parents) < 2
+
+        op1, op2 = self.repo.dirstate.parents()
+        node = self.repo[self.currevid].node()
+        a = self.repo.changelog.ancestor(op1, node)
+        cmenu_backout.set_sensitive(a == node)
+        cmenu_merge.set_sensitive(can_merge)
 
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
@@ -624,15 +632,25 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_diff with selected'), self.diff_revs))
         m.append(create_menu(_('visual diff with selected'),
                  self.vdiff_selected))
+        if self.bfile:
+            m.connect_after('selection-done', self.restore_original_selection)
+            m.show_all()
+            return m
+
         m.append(create_menu(_('email from here to selected'),
                  self.email_revs))
         m.append(create_menu(_('bundle from here to selected'),
                  self.bundle_revs))
         m.append(create_menu(_('export patches from here to selected'),
                  self.export_revs))
-        self.cmenu_merge2 = create_menu(_('_merge with'), self.domerge)
-        m.append(self.cmenu_merge2)
+        cmenu_merge = create_menu(_('_merge with'), self.domerge)
+        m.append(cmenu_merge)
         
+        # disable/enable menus as required
+        parents = [x.rev() for x in self.repo.parents()]
+        can_merge = self.currevid in parents and len(parents) < 2
+        cmenu_merge.set_sensitive(can_merge)
+
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
             m.append(create_menu(_('transplant revision range to local'),
@@ -653,8 +671,6 @@ class GLog(gdialog.GDialog):
 
     def get_body(self):
         self.gorev_dialog = None
-        self._menu = self.tree_context_menu()
-        self._menu2 = self.tree_diff_context_menu()
         self.stbar = gtklib.StatusBar()
         self.limit = self.get_graphlimit(None)
 
@@ -893,6 +909,29 @@ class GLog(gdialog.GDialog):
         return self.stbar
 
     def incoming_clicked(self, toolbutton, combo):
+        def apply_clicked(button, bfile):
+            cmdline = ['hg', 'pull', bfile]
+            dlg = hgcmd.CmdDialog(cmdline)
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
+            remove_overlay()
+
+        def reject_clicked(button):
+            remove_overlay()
+
+        def remove_overlay():
+            self.bfile = None
+            combo.get_child().set_text('')
+            self.repo = hg.repository(self.ui, path=self.repo.root)
+            self.graphview.set_repo(self.repo, self.stbar)
+            self.changeview.repo = self.repo
+            self.reload_log()
+            self.toolbar.remove(self.toolbar.get_nth_item(0))
+            self.toolbar.remove(self.toolbar.get_nth_item(0))
+            for tb in disabled:
+                tb.set_sensitive(True)
+
         def cleanup():
             try:
                 shutil.rmtree(self.bundledir)
@@ -916,7 +955,35 @@ class GLog(gdialog.GDialog):
         dlg.hide()
         if dlg.return_code() == 0 and os.path.isfile(bfile):
             combo.get_child().set_text(bfile)
+
+            # create apply/reject toolbar buttons
+            apply = gtk.ToolButton(gtk.STOCK_APPLY)
+            apply.set_tooltip(self.tooltips,
+                              _('Accept incoming previewed changesets'))
+            apply.set_label(_('Accept'))
+            apply.show()
+
+            reject = gtk.ToolButton(gtk.STOCK_DIALOG_ERROR)
+            reject.set_tooltip(self.tooltips,
+                               _('Reject incoming previewed changesets'))
+            reject.set_label(_('Reject'))
+            reject.show()
+
+            apply.connect('clicked', apply_clicked, bfile)
+            reject.connect('clicked', reject_clicked)
+
+            self.toolbar.insert(reject, 0)
+            self.toolbar.insert(apply, 0)
+
+            disabled = []
+            for label in (_('Re_fresh'), _('Synchronize'), _('MQ')):
+                tb = self.get_toolbutton(label)
+                if tb:
+                    tb.set_sensitive(False)
+                    disabled.append(tb)
+
             self.bfile = bfile
+            self.origtip = len(self.repo)
             self.repo = hg.repository(self.ui, path=bfile)
             self.graphview.set_repo(self.repo, self.stbar)
             self.changeview.repo = self.repo
@@ -1476,33 +1543,18 @@ class GLog(gdialog.GDialog):
         return False
 
     def tree_popup_menu(self, treeview, button=0, time=0) :
-        # disable/enable menus as required
-        parents = [x.rev() for x in self.repo.parents()]
-        can_merge = self.currevid not in parents and len(parents) < 2
-        self.cmenu_merge.set_sensitive(can_merge)
-
-        op1, op2 = self.repo.dirstate.parents()
-        node = self.repo[self.currevid].node()
-        a = self.repo.changelog.ancestor(op1, node)
-        self.cmenu_backout.set_sensitive(a == node)
-
-        # display the context menu
-        self._menu.popup(None, None, None, button, time)
+        menu = self.tree_context_menu()
+        menu.popup(None, None, None, button, time)
         return True
 
     def tree_popup_menu_diff(self, treeview, button=0, time=0):
-        # disable/enable menus as required
-        parents = [x.rev() for x in self.repo.parents()]
-        can_merge = self.currevid in parents and len(parents) < 2
-        self.cmenu_merge2.set_sensitive(can_merge)
-
-        # display the context menu
-        self._menu2.popup(None, None, None, button, time)
+        menu = self.tree_diff_context_menu()
+        menu.popup(None, None, None, button, time)
         return True
 
     def tree_row_act(self, tree, path, column) :
         'Default action is the first entry in the context menu'
-        self._menu.get_children()[0].activate()
+        self.tree_context_menu().get_children()[0].activate()
         return True
 
 def run(ui, *pats, **opts):
