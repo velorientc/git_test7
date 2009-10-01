@@ -929,8 +929,8 @@ class GLog(gdialog.GDialog):
             self.reload_log()
             self.toolbar.remove(self.toolbar.get_nth_item(0))
             self.toolbar.remove(self.toolbar.get_nth_item(0))
-            for tb in disabled:
-                tb.set_sensitive(True)
+            for w in disabled:
+                w.set_sensitive(True)
 
         def cleanup():
             try:
@@ -981,6 +981,8 @@ class GLog(gdialog.GDialog):
                 if tb:
                     tb.set_sensitive(False)
                     disabled.append(tb)
+            self.syncbox.set_sensitive(False)
+            disabled.append(self.syncbox)
 
             self.bfile = bfile
             self.origtip = len(self.repo)
