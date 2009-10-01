@@ -123,6 +123,11 @@ _log_info = (
         ' can be escaped in this way, e.g. \\u0040 will be decoded to the'
         ' @ character, and \\n to a linefeed.'
         ' Default: None')),
+    (_('Hide Tags'), 'tortoisehg.hidetags', [],
+        _('Space separated list of tags that will not be shown.'
+          ' Useful example: Specify "qbase qparent qtip" to hide the'
+          ' standard tags inserted by the Mercurial Queues Extension.' 
+        ' Default: None')),
         )
 
 _paths_info = (
