@@ -431,6 +431,7 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        cell.set_property("family", "Monospace")
         col = self.tvcolumns['id'] = gtk.TreeViewColumn(_('ID'))
         col.set_visible(False)
         col.set_resizable(True)
