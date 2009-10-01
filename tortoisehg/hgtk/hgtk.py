@@ -669,7 +669,7 @@ table = {
          _('hgtk serve [OPTION]...')),
     "thgstatus": (thgstatus,
         [('',  'delay', None, _('wait until the second ticks over')),
-         ('n', 'notify', [], _('notify the shell for path(s) given')),
+         ('n', 'notify', [], _('notify the shell for paths given')),
          ('',  'remove', None, _('remove the status cache')),
          ('s', 'show', None, _('show the contents of the'
                                ' status cache (no update)')),

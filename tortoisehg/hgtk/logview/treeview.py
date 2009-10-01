@@ -261,7 +261,7 @@ class TreeView(gtk.ScrolledWindow):
             self.set_revision_id(revid)
         if self.pbar is not None:
             self.pbar.end()
-            revision_text = _('Displaying %(count)d of %(total)d revision(s)') % {
+            revision_text = _('Displaying %(count)d of %(total)d revisions') % {
                     'count': len(self.model),
                     'total': len(self.repo) }
             self.pbar.set_status_text(revision_text)

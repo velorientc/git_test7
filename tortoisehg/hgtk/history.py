@@ -1149,7 +1149,7 @@ class GLog(gdialog.GDialog):
 
     def strip_rev(self, menuitem):
         rev = self.currevid
-        res = gdialog.Confirm(_('Confirm Strip Revision(s)'), [], self,
+        res = gdialog.Confirm(_('Confirm Strip Revisions'), [], self,
                 _('Remove revision %d and all descendants?') % rev).run()
         if res != gtk.RESPONSE_YES:
             return

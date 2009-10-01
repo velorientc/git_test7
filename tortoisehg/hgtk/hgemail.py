@@ -37,10 +37,10 @@ class EmailDialog(gtk.Window):
         tbuttons = [
                 self._toolbutton(gtk.STOCK_GOTO_LAST, _('Send'),
                                  self._on_send_clicked,
-                                 _('Send email(s)')),
+                                 _('Send emails')),
                 self._toolbutton(gtk.STOCK_FIND, _('Test'),
                                  self._on_test_clicked,
-                                 _('Show email(s) which would be sent')),
+                                 _('Show emails which would be sent')),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_PREFERENCES, _('Configure'),
                                  self._on_conf_clicked,
@@ -56,7 +56,7 @@ class EmailDialog(gtk.Window):
         if revargs[0] in ('--outgoing', '-o'):
             self.set_title(_('Email outgoing changes'))
         elif revargs[0] in ('--rev', '-r'):
-            self.set_title(_('Email revision(s) ') + ' '.join(revargs[1:]))
+            self.set_title(_('Email revisions ') + ' '.join(revargs[1:]))
         else:
             self.set_title(_('Email Mercurial Patches'))
         self.set_default_size(650, 450)

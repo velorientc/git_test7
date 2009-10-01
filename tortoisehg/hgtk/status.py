@@ -172,7 +172,7 @@ class GStatus(gdialog.GDialog):
                         tip=_('Remove or delete checked files')),
                     self.make_toolbutton(gtk.STOCK_CLEAR, _('_Forget'),
                         self.forget_clicked, 
-                        tip=_('Forget checked file(s) on next commit')),
+                        tip=_('Forget checked files on next commit')),
                     gtk.SeparatorToolItem(),
                     self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
                         self.refresh_clicked,
@@ -1268,7 +1268,7 @@ class GStatus(gdialog.GDialog):
         if self.is_merge():
             res = gdialog.CustomPrompt(
                     _('Uncommited merge - please select a parent revision'),
-                    _('Revert file(s) to local or other parent?'),
+                    _('Revert files to local or other parent?'),
                     self, (_('&Local'), _('&Other'), _('&Cancel')), 2).run()
             if res == 0:
                 revertopts['rev'] = self.repo[None].p1().rev()
@@ -1285,7 +1285,7 @@ class GStatus(gdialog.GDialog):
             else:
                 revertopts['rev'] = str(self.repo['.'].rev())
             response = gdialog.CustomPrompt(_('Confirm Revert'),
-                    _('Revert file(s) to revision %s?\n\n%s') % (revertopts['rev'],
+                    _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
                     filelist(files)), self, (_('&Yes (backup changes)'),
                                              _('Yes (&discard changes)'),
                                              _('&Cancel')), 2, 2).run()
