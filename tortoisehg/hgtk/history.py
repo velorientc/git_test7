@@ -97,9 +97,6 @@ class GLog(gdialog.GDialog):
     def get_menu_list(self):
         def refresh(menuitem, resetmarks):
             if resetmarks:
-                if self.filter == 'new':
-                    self.filter = 'all'
-                    self.filteropts = None
                 self.graphview.set_outgoing([])
                 self.origtip = len(self.repo)
             self.reload_log()
@@ -162,12 +159,7 @@ class GLog(gdialog.GDialog):
         def synch_callback(parents):
             self.repo.invalidate()
             newparents = [x.node() for x in self.repo.parents()]
-            if len(self.repo) != self.origtip:
-                if self.newbutton.get_active():
-                    self.reload_log()
-                else:
-                    self.newbutton.set_active(True)
-            elif not parents == newparents:
+            if parents != newparents:
                 self.refresh_model()
 
         from tortoisehg.hgtk import synch
@@ -353,7 +345,7 @@ class GLog(gdialog.GDialog):
         self.reload_log()
 
     def update_hide_merges_button(self):
-        compatible = self.filter in ['all', 'new', 'branch', 'custom']
+        compatible = self.filter in ['all', 'branch', 'custom']
         if not self.graphcol and compatible:
             self.hidemerges.set_sensitive(True)
         else:
@@ -504,7 +496,6 @@ class GLog(gdialog.GDialog):
 
         self.loadnextbutton.set_sensitive(True)
         self.loadallbutton.set_sensitive(True)
-        self.newbutton.set_sensitive(self.origtip != len(self.repo))
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
@@ -536,11 +527,6 @@ class GLog(gdialog.GDialog):
                 self.graphview.refresh(False, npats, opts)
         elif self.filter == 'all':
             ftitle(None)
-            self.graphview.refresh(self.graphcol, None, opts)
-        elif self.filter == 'new':
-            ftitle(_('new revisions'))
-            assert len(self.repo) > self.origtip
-            opts['revrange'] = [len(self.repo)-1, self.origtip]
             self.graphview.refresh(self.graphcol, None, opts)
         elif self.filter == 'only_merges':
             ftitle(_('merges'))
@@ -802,10 +788,6 @@ class GLog(gdialog.GDialog):
         all.set_active(True)
         all.connect('toggled', self.filter_selected, 'all')
         filterbox.append_widget(all, padding=0)
-
-        self.newbutton = gtk.RadioButton(all, _('new'))
-        self.newbutton.connect('toggled', self.filter_selected, 'new')
-        filterbox.append_widget(self.newbutton, padding=0)
 
         tagged = gtk.RadioButton(all, _('tagged'))
         tagged.connect('toggled', self.filter_selected, 'tagged')
