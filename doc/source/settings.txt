@@ -179,6 +179,12 @@ Changelog
 	of the currently selected changeset into the clipboard.
 	Default: False.
 
+:guilabel:`Hide Tags:`
+	Space separated list of tags that will not be shown.
+	Useful example: Specify "qbase qparent qtip" to hide the
+	standard tags inserted by the Mercurial Queues Extension.
+	Default: None.
+
 .. module:: synchronize.settings
 	:synopsis: Dialog used to set synchronize specific preferences
 
