@@ -337,13 +337,7 @@ class GDialog(gtk.Window):
         return self.menuitems.get(label, None)
 
     def get_reponame(self):
-        if self.repo.ui.config('tortoisehg', 'fullpath', False):
-            name = self.repo.root
-        elif self.repo.ui.config('web', 'name', False):
-            name = self.repo.ui.config('web', 'name')
-        else:
-            name = os.path.basename(self.repo.root)
-        return hglib.toutf(name)
+        return hglib.get_reponame(self.repo)
 
     def helpcontents(self, item):
         'User selected Help->Contents from menu bar'
