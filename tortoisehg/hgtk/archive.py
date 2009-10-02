@@ -52,29 +52,27 @@ class ArchiveDialog(gtk.Dialog):
 
         ## revision combo
         self.combo = gtk.combo_box_entry_new_text()
-        combo = self.combo
-        entry = combo.child
-        entry.set_width_chars(24)
-        entry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
+        self.combo.child.set_width_chars(24)
+        self.combo.child.connect('activate',
+                                 lambda b: self.response(gtk.RESPONSE_OK))
         if rev:
-            combo.append_text(str(rev))
+            self.combo.append_text(str(rev))
         else:
-            combo.append_text(WD_PARENT)
-        combo.set_active(0)
+            self.combo.append_text(WD_PARENT)
+        self.combo.set_active(0)
         for b in repo.branchtags():
-            combo.append_text(b)
+            self.combo.append_text(b)
         tags = list(repo.tags())
         tags.sort()
         tags.reverse()
         for t in tags:
-            combo.append_text(t)
+            self.combo.append_text(t)
 
-        table.add_row(_('Archive revision:'), combo)
+        table.add_row(_('Archive revision:'), self.combo)
 
         ## dest combo & browse button
         destcombo = gtk.combo_box_entry_new_text()
         self.destentry = destcombo.get_child()
-        self.destentry.set_text(repo.root)
         self.destentry.set_width_chars(46)
 
         destbrowse = gtk.Button(_('Browse...'))
@@ -97,7 +95,11 @@ class ArchiveDialog(gtk.Dialog):
         self.uzipradio = add_type(_('Uncompressed zip archive'))
         self.zipradio = add_type(_('Zip archive compressed using deflate'))
 
+        # register signal handlers
+        self.combo.connect('changed', lambda c: self.update_path())
+
         # prepare to show
+        self.update_path(hglib.toutf(repo.root))
         self.archivebtn.grab_focus()
         gobject.idle_add(self.after_init)
 
@@ -141,17 +143,35 @@ class ArchiveDialog(gtk.Dialog):
     def type_changed(self, radio):
         if not radio.get_active():
             return
-        def remove_exts(path):
+        self.update_path()
+
+    def update_path(self, path=None):
+        def remove_ext(path):
             for ext in ('.tar', '.tar.bz2', '.tar.gz', '.zip'):
                 if path.endswith(ext):
                     return path.replace(ext, '')
             return path
-        select = self.get_selected_archive_type()
-        path = self.destentry.get_text()
-        newpath = remove_exts(path)
-        if select['type'] != 'files':
-            newpath += select['ext']
-        self.destentry.set_text(newpath)
+        def remove_rev(path):
+            model = self.combo.get_model()
+            for rev in ['_' + rev[0] for rev in model]:
+                if path.endswith(rev):
+                    return path.replace(rev, '')
+            return path
+        def add_rev(path):
+            rev = self.combo.get_active_text()
+            return '%s_%s' % (path, rev)
+        def add_ext(path):
+            select = self.get_selected_archive_type()
+            if select['type'] != 'files':
+                path += select['ext']
+            return path
+        if path is None:
+            path = self.destentry.get_text()
+        path = remove_ext(path)
+        path = remove_rev(path)
+        path = add_rev(path)
+        path = add_ext(path)
+        self.destentry.set_text(path)
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
