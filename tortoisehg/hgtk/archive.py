@@ -154,35 +154,36 @@ class ArchiveDialog(gtk.Dialog):
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
         if self.tarradio.get_active():
-            return {'type': 'tar',
-                    'filter': ((_('Tar archives'), '*.tar'),)}
+            return {'type': 'tar', 'ext': '.tar',
+                    'label': _('Tar archives')}
         elif self.tbz2radio.get_active():
-            return {'type': 'tbz2',
-                    'filter': ((_('Bzip2 tar archives'), '*.tbz2'),)}
+            return {'type': 'tbz2', 'ext': '.tar.bz2',
+                    'label': _('Bzip2 tar archives')}
         elif self.tgzradio.get_active():
-            return {'type': 'tgz',
-                    'filter': ((_('Gzip tar archives'), '*.tgz'),)}
+            return {'type': 'tgz', 'ext': '.tar.gz',
+                    'label': _('Gzip tar archives')}
         elif self.uzipradio.get_active():
-            return {'type': 'uzip',
-                    'filter': ((_('Uncompressed zip archives'), '*.uzip'),)}
+            return {'type': 'uzip', 'ext': '.zip',
+                    'label': ('Uncompressed zip archives')}
         elif self.zipradio.get_active():
-            return {'type': 'zip',
-                    'filter': ((_('Compressed zip archives'), '*.zip'),)}
-        return {'type': 'files', 'filter': None}
+            return {'type': 'zip', 'ext': '.zip',
+                    'label': _('Compressed zip archives')}
+        return {'type': 'files', 'ext': None, 'label': None}
 
     def browse_clicked(self, button):
         """Select the destination directory or file"""
-        archive_type = self.get_selected_archive_type()
-        if archive_type['type'] == 'files':
+        select = self.get_selected_archive_type()
+        if select['type'] == 'files':
             response = gtklib.NativeFolderSelectDialog(
                             initial=self.destentry.get_text(),
                             title=_('Select Destination Folder')).run()
         else:
-            filter = archive_type['filter']
+            ext = '*' + select['ext']
+            label = '%s (%s)' % (select['label'], ext)
             response = gtklib.NativeSaveFileDialogWrapper(
                             InitialDir=self.destentry.get_text(), 
                             Title=_('Select Destination File'),
-                            Filter=filter).run()
+                            Filter=((label, ext),)).run()
 
         if response:
             self.destentry.set_text(response)
@@ -207,10 +208,10 @@ class ArchiveDialog(gtk.Dialog):
 
     def archive(self):
         # verify input
-        select = self.get_selected_archive_type()
+        type = self.get_selected_archive_type()['type']
         dest = self.destentry.get_text()
         if os.path.exists(dest):
-            if select['type'] != 'files':
+            if type != 'files':
                 ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
                             _('The destination "%s" already exists!\n\n'
                               'Do you want to overwrite it?') % dest).run()
@@ -229,7 +230,7 @@ class ArchiveDialog(gtk.Dialog):
             cmdline.append('--rev')
             cmdline.append(rev)
         cmdline.append('-t')
-        cmdline.append(select['type'])
+        cmdline.append(type)
         cmdline.append(hglib.fromutf(dest))
 
         def cmd_done(returncode):
