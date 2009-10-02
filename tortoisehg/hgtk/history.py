@@ -924,6 +924,7 @@ class GLog(gdialog.GDialog):
             self.repo = hg.repository(self.ui, path=self.repo.root)
             self.graphview.set_repo(self.repo, self.stbar)
             self.changeview.repo = self.repo
+            self.changeview.bfile = None
             if resettip:
                 self.origtip = len(self.repo)
             self.reload_log()
@@ -989,6 +990,7 @@ class GLog(gdialog.GDialog):
             self.repo = hg.repository(self.ui, path=bfile)
             self.graphview.set_repo(self.repo, self.stbar)
             self.changeview.repo = self.repo
+            self.changeview.bfile = bfile
             self.reload_log()
 
     def pull_clicked(self, toolbutton, combo, ppullcombo, ppulldata):
@@ -1230,9 +1232,11 @@ class GLog(gdialog.GDialog):
         dlg.hide()
 
     def vdiff_change(self, menuitem, pats=[]):
-        self._do_diff(pats, {'change' : str(self.currevid)})
+        opts = {'change':str(self.currevid), 'bundle':self.bfile}
+        self._do_diff(pats, opts)
 
     def vdiff_local(self, menuitem, pats=[]):
+        opts = {'rev':[str(self.currevid)], 'bundle':self.bfile}
         self._do_diff(pats, {'rev' : [str(self.currevid)]})
 
     def diff_revs(self, menuitem):

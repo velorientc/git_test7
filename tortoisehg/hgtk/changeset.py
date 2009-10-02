@@ -26,6 +26,7 @@ class ChangeSet(gdialog.GDialog):
         gdialog.GDialog.__init__(self, ui, repo, cwd, pats, opts)
         self.stbar = stbar
         self.glog_parent = None
+        self.bfile = None
 
     def get_title(self):
         title = _('%s changeset ') % self.get_reponame()
@@ -683,7 +684,8 @@ class ChangeSet(gdialog.GDialog):
             return False
         if not self.curfile:
             return False
-        self._do_diff([self.curfile], {'change' : self.currev})
+        opts = {'change':str(self.currev), 'bundle':self.bfile}
+        self._do_diff([self.curfile], opts)
 
     def file_row_act(self, tree, path, column) :
         'Default action is the first entry in the context menu'
@@ -716,13 +718,15 @@ class ChangeSet(gdialog.GDialog):
     def diff_to_local(self, menuitem):
         if not self.curfile:
             return
-        self._do_diff([self.curfile], {'rev' : str(self.currev)})
+        opts = {'rev':[str(self.currev)], 'bundle':self.bfile}
+        self._do_diff([self.curfile], opts)
 
     def diff_file_rev(self, menuitem):
         'User selected visual diff file from the file list context menu'
         if not self.curfile:
             return
-        self._do_diff([self.curfile], {'change' : str(self.currev)})
+        opts = {'change':str(self.currev), 'bundle':self.bfile}
+        self._do_diff([self.curfile], opts)
 
     def view_file_rev(self, menuitem):
         'User selected view file revision from the file list context menu'
