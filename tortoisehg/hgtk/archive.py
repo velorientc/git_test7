@@ -42,9 +42,7 @@ class ArchiveDialog(gtk.Dialog):
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
-
-        title = _('Archive - %s') % hglib.toutf(os.path.basename(repo.root))
-        self.set_title(title)
+        self.set_title(_('Archive - %s') % hglib.get_reponame(repo))
 
         # layout table
         self.table = table = gtklib.LayoutTable()
