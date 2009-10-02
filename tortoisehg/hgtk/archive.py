@@ -44,16 +44,16 @@ class ArchiveDialog(gtk.Dialog):
         title = _('Archive - %s') % hglib.toutf(os.path.basename(repo.root))
         self.set_title(title)
 
-        hbox = gtk.HBox()
-        lbl = gtk.Label(_('Archive revision:'))
-        hbox.pack_start(lbl, False, False, 2)
+        # layout table
+        table = gtklib.LayoutTable()
+        self.vbox.pack_start(table, True, True, 2)
 
-        # revisions editable combo box
+        ## revision combo
         self.combo = gtk.combo_box_entry_new_text()
         combo = self.combo
-        combo.child.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
-        hbox.pack_start(combo, True, True, 2)
-        self.vbox.pack_start(hbox, False, False, 10)
+        entry = combo.child
+        entry.set_width_chars(24)
+        entry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
         if rev:
             combo.append_text(str(rev))
         else:
@@ -67,48 +67,19 @@ class ArchiveDialog(gtk.Dialog):
         for t in tags:
             combo.append_text(t)
 
-        self.vbox.add(self.get_destination_container(self.get_default_path()))
-        self.vbox.add(self.get_type_container())
+        table.add_row(_('Archive revision:'), combo)
 
-        # prepare to show
-        self.archivebtn.grab_focus()
+        ## dest combo & browse button
 
-    def get_type_container(self):
-        """Return a frame containing the supported archive types"""
-        frame = gtk.Frame(_('Archive type'))
-        vbox = gtk.VBox()
-
-        self.filesradio = gtk.RadioButton(None, _('Directory of files'))
-        self.tarradio = gtk.RadioButton(self.filesradio, _('Uncompressed tar archive'))
-        self.tbz2radio = gtk.RadioButton(self.filesradio, _('Tar archive compressed using bzip2'))
-        self.tgzradio = gtk.RadioButton(self.filesradio, _('Tar archive compressed using gzip'))
-        self.uzipradio = gtk.RadioButton(self.filesradio, _('Uncompressed zip archive'))
-        self.zipradio = gtk.RadioButton(self.filesradio, _('Zip archive compressed using deflate'))
-
-        vbox.pack_start(self.filesradio, True, True, 2)
-        vbox.pack_start(self.tarradio, True, True, 2)
-        vbox.pack_start(self.tbz2radio, True, True, 2)
-        vbox.pack_start(self.tgzradio, True, True, 2)
-        vbox.pack_start(self.uzipradio, True, True, 2)
-        vbox.pack_start(self.zipradio, True, True, 2)
-        frame.add(vbox)
-        frame.set_border_width(2)
-        return frame
-
-    def get_destination_container(self, default_path):
-        """Return an hbox containing the widgets for the destination path"""
-        hbox = gtk.HBox()
-        lbl = gtk.Label(_('Destination Path:'))
-
-        # create drop-down list for source paths
+        ### create drop-down list for source paths
         self.destlist = gtk.ListStore(str)
         destcombo = gtk.ComboBoxEntry(self.destlist, 0)
         self.destentry = destcombo.get_child()
-        self.destentry.set_text(default_path)
+        self.destentry.set_text(self.get_default_path())
         self.destentry.set_position(-1)
-        self.destentry.set_width_chars(38)
+        self.destentry.set_width_chars(46)
 
-        # replace the drop-down widget so we can modify it's properties
+        ### replace the drop-down widget so we can modify it's properties
         destcombo.clear()
         cell = gtk.CellRendererText()
         cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
@@ -117,10 +88,24 @@ class ArchiveDialog(gtk.Dialog):
 
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.browse_clicked)
-        hbox.pack_start(lbl, False, False)
-        hbox.pack_start(destcombo, True, True, 2)
-        hbox.pack_end(destbrowse, False, False, 5)
-        return hbox
+
+        table.add_row(_('Destination path:'), destcombo, 0, destbrowse)
+
+        ## archive types
+        self.filesradio = gtk.RadioButton(None, _('Directory of files'))
+        table.add_row(_('Archive types:'), self.filesradio)
+        def add_type(label):
+            radio = gtk.RadioButton(self.filesradio, label)
+            table.add_row(None, radio)
+            return radio
+        self.tarradio = add_type(_('Uncompressed tar archive'))
+        self.tbz2radio = add_type(_('Tar archive compressed using bzip2'))
+        self.tgzradio = add_type(_('Tar archive compressed using gzip'))
+        self.uzipradio = add_type(_('Uncompressed zip archive'))
+        self.zipradio = add_type(_('Zip archive compressed using deflate'))
+
+        # prepare to show
+        self.archivebtn.grab_focus()
 
     def dialog_response(self, dialog, response_id):
         # Archive button
