@@ -29,12 +29,11 @@ class ArchiveDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
+        self.connect('response', self.dialog_response)
 
         # buttons
-        self.archivebtn = gtk.Button(_('Archive'))
-        self.action_area.pack_start(self.archivebtn)
-        self.closebtn = gtk.Button(_('Close'))
-        self.action_area.pack_start(self.closebtn)
+        self.archivebtn = self.add_button(_('Archive'), gtk.RESPONSE_OK)
+        self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -50,7 +49,9 @@ class ArchiveDialog(gtk.Dialog):
         hbox.pack_start(lbl, False, False, 2)
 
         # revisions editable combo box
-        combo = gtk.combo_box_entry_new_text()
+        self.combo = gtk.combo_box_entry_new_text()
+        combo = self.combo
+        combo.child.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
         hbox.pack_start(combo, True, True, 2)
         self.vbox.pack_start(hbox, False, False, 10)
         if rev:
@@ -68,13 +69,6 @@ class ArchiveDialog(gtk.Dialog):
 
         self.vbox.add(self.get_destination_container(self.get_default_path()))
         self.vbox.add(self.get_type_container())
-
-        # register signal handlers
-        def archive_handler(*args):
-            self.archive(self.archivebtn, combo, repo)
-        self.archivebtn.connect('clicked', archive_handler)
-        combo.child.connect('activate', archive_handler)
-        self.closebtn.connect('clicked', lambda b: self.destroy())
 
         # prepare to show
         self.archivebtn.grab_focus()
@@ -128,6 +122,14 @@ class ArchiveDialog(gtk.Dialog):
         hbox.pack_end(destbrowse, False, False, 5)
         return hbox
 
+    def dialog_response(self, dialog, response_id):
+        # Archive button
+        if response_id == gtk.RESPONSE_OK:
+            self.archive()
+            self.run()
+        else:
+            self.destroy()
+
     def get_default_path(self):
         """Return the default destination path"""
         return hglib.toutf(os.getcwd())
@@ -176,8 +178,8 @@ class ArchiveDialog(gtk.Dialog):
         if response:
             self.destentry.set_text(response)
 
-    def archive(self, button, combo, repo):
-        rev = combo.get_active_text()
+    def archive(self):
+        rev = self.combo.get_active_text()
 
         cmdline = ['hg', 'archive', '--verbose']
         if rev != _working_dir_parent_:
