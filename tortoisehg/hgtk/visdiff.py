@@ -133,6 +133,13 @@ class FileSelectionDialog(gtk.Dialog):
         else:
             gdialog.Prompt(_('No visual diff tool'),
                    _('No visual diff tool has been configured'), None).run()
+            from tortoisehg.hgtk import thgconfig
+            dlg = thgconfig.ConfigDialog(False)
+            dlg.show_all()
+            dlg.focus_field('tortoisehg.vdiff')
+            dlg.run()
+            dlg.hide()
+            gobject.idle_add(self.destroy)
 
     def search_filelist(self, model, column, key, iter):
         'case insensitive filename search'
