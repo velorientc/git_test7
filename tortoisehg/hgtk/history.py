@@ -729,9 +729,9 @@ class GLog(gdialog.GDialog):
         push = syncbox.append_stock(gtk.STOCK_GOTO_TOP,
                         _('Push outgoing changesets'))
         conf = syncbox.append_stock(gtk.STOCK_PREFERENCES,
-                        _('Stop current transaction'))
-        stop = syncbox.append_stock(gtk.STOCK_STOP,
                         _('Configure aliases and after pull behavior'))
+        stop = syncbox.append_stock(gtk.STOCK_STOP,
+                        _('Stop current transaction'))
         stop.set_sensitive(False)
 
         ## target path combobox
