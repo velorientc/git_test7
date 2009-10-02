@@ -72,21 +72,10 @@ class ArchiveDialog(gtk.Dialog):
         table.add_row(_('Archive revision:'), combo)
 
         ## dest combo & browse button
-
-        ### create drop-down list for source paths
-        self.destlist = gtk.ListStore(str)
-        destcombo = gtk.ComboBoxEntry(self.destlist, 0)
+        destcombo = gtk.combo_box_entry_new_text()
         self.destentry = destcombo.get_child()
-        self.destentry.set_text(self.get_default_path())
-        self.destentry.set_position(-1)
+        self.destentry.set_text(repo.root)
         self.destentry.set_width_chars(46)
-
-        ### replace the drop-down widget so we can modify it's properties
-        destcombo.clear()
-        cell = gtk.CellRendererText()
-        cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
-        destcombo.pack_start(cell)
-        destcombo.add_attribute(cell, 'text', 0)
 
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.browse_clicked)
@@ -163,10 +152,6 @@ class ArchiveDialog(gtk.Dialog):
         if select['type'] != 'files':
             newpath += select['ext']
         self.destentry.set_text(newpath)
-
-    def get_default_path(self):
-        """Return the default destination path"""
-        return hglib.toutf(os.getcwd())
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
