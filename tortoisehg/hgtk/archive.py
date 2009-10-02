@@ -19,16 +19,22 @@ from tortoisehg.hgtk import hgcmd, gtklib
 
 _working_dir_parent_ = _('= Working Directory Parent =')
 
-class ArchiveDialog(gtk.Window):
+class ArchiveDialog(gtk.Dialog):
     """ Dialog to archive a Mercurial repo """
+
     def __init__(self, rev=None):
         """ Initialize the Dialog """
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menucheckout.ico')
         gtklib.set_tortoise_keys(self)
+        self.set_resizable(False)
+        self.set_has_separator(False)
 
-        self.set_default_size(550, 120)
-        self.notify_func = None
+        # buttons
+        self.archivebtn = gtk.Button(_('Archive'))
+        self.action_area.pack_start(self.archivebtn)
+        self.closebtn = gtk.Button(_('Close'))
+        self.action_area.pack_start(self.closebtn)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -39,9 +45,6 @@ class ArchiveDialog(gtk.Window):
         title = _('Archive - %s') % hglib.toutf(os.path.basename(repo.root))
         self.set_title(title)
 
-        vbox = gtk.VBox()
-        self.add(vbox)
-
         hbox = gtk.HBox()
         lbl = gtk.Label(_('Archive revision:'))
         hbox.pack_start(lbl, False, False, 2)
@@ -49,7 +52,7 @@ class ArchiveDialog(gtk.Window):
         # revisions editable combo box
         combo = gtk.combo_box_entry_new_text()
         hbox.pack_start(combo, True, True, 2)
-        vbox.pack_start(hbox, False, False, 10)
+        self.vbox.pack_start(hbox, False, False, 10)
         if rev:
             combo.append_text(str(rev))
         else:
@@ -63,33 +66,18 @@ class ArchiveDialog(gtk.Window):
         for t in tags:
             combo.append_text(t)
 
-        vbox.add(self.get_destination_container(self.get_default_path()))
-        vbox.add(self.get_type_container())
+        self.vbox.add(self.get_destination_container(self.get_default_path()))
+        self.vbox.add(self.get_type_container())
 
-        hbbox = gtk.HButtonBox()
-        hbbox.set_layout(gtk.BUTTONBOX_END)
-        vbox.pack_start(hbbox, False, False, 2)
-        close = gtk.Button(_('Close'))
-        close.connect('clicked', lambda x: self.destroy())
+        # register signal handlers
+        def archive_handler(*args):
+            self.archive(self.archivebtn, combo, repo)
+        self.archivebtn.connect('clicked', archive_handler)
+        combo.child.connect('activate', archive_handler)
+        self.closebtn.connect('clicked', lambda b: self.destroy())
 
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        key, modifier = gtk.accelerator_parse('Escape')
-        close.add_accelerator('clicked', accelgroup, key, 0,
-                gtk.ACCEL_VISIBLE)
-        hbbox.add(close)
-
-        archive = gtk.Button(_('Archive'))
-        archive.connect('clicked', self.archive, combo, repo)
-        mod = gtklib.get_thg_modifier()
-        key, modifier = gtk.accelerator_parse(mod+'Return')
-        archive.add_accelerator('clicked', accelgroup, key, modifier,
-                gtk.ACCEL_VISIBLE)
-        hbbox.add(archive)
-        archive.grab_focus()
-
-        entry = combo.child
-        entry.connect('activate', self.entry_activated, archive, combo, repo)
+        # prepare to show
+        self.archivebtn.grab_focus()
 
     def get_type_container(self):
         """Return a frame containing the supported archive types"""
@@ -124,6 +112,7 @@ class ArchiveDialog(gtk.Window):
         self.destentry = destcombo.get_child()
         self.destentry.set_text(default_path)
         self.destentry.set_position(-1)
+        self.destentry.set_width_chars(38)
 
         # replace the drop-down widget so we can modify it's properties
         destcombo.clear()
@@ -172,9 +161,6 @@ class ArchiveDialog(gtk.Window):
             dict['type'] = 'files'
 
         return dict
-
-    def entry_activated(self, entry, button, combo, repo):
-        self.update(button, combo, repo)
 
     def browse_clicked(self, button):
         """Select the destination directory or file"""
