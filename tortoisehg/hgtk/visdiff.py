@@ -100,7 +100,8 @@ class FileSelectionDialog(gtk.Dialog):
         treeview.append_column(fcol)
 
         try:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
+            path = opts.get('bundle') or paths.find_root()
+            repo = hg.repository(ui.ui(), path=path)
         except hglib.RepoError:
             # hgtk should catch this earlier
             gdialog.Prompt(_('No repository'),
@@ -277,7 +278,8 @@ def rawextdiff(ui, *pats, **opts):
     'launch raw extdiff command, block until finish'
     from hgext import extdiff
     try:
-        repo = hg.repository(ui, path=paths.find_root())
+        path = opts.get('bundle') or paths.find_root()
+        repo = hg.repository(ui, path=path)
     except hglib.RepoError:
         # hgtk should catch this earlier
         ui.warn(_('No repository found here') + '\n')

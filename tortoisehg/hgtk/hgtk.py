@@ -681,6 +681,7 @@ table = {
     "^vdiff": (vdiff,
         [('c', 'change', '', _('changeset to view in diff tool')),
          ('r', 'rev', [], _('revisions to view in diff tool')),
+         ('b', 'bundle', '', _('bundle file to preview')),
          ('', 'raw', None, _('directly use raw extdiff command'))],
             _('launch visual diff tool')),
     "^version": (version,
