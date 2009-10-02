@@ -569,6 +569,7 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('visualize change'), self.vdiff_change))
         m.append(create_menu(_('di_splay change'), self.show_status))
         m.append(create_menu(_('diff to local'), self.vdiff_local))
+        m.append(create_menu(_('_copy hash'), self.copy_hash))
         if self.bfile:
             m.show_all()
             return m
@@ -576,7 +577,6 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_update'), self.checkout))
         cmenu_merge = create_menu(_('_merge with'), self.domerge)
         m.append(cmenu_merge)
-        m.append(create_menu(_('_copy hash'), self.copy_hash))
         m.append(create_menu(_('_export patch'), self.export_patch))
         m.append(create_menu(_('e_mail patch'), self.email_patch))
         m.append(create_menu(_('_bundle rev:tip'), self.bundle_rev_to_tip))
