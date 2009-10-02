@@ -748,7 +748,6 @@ class GLog(gdialog.GDialog):
             if alias == 'default':
                 urlcombo.set_active(len(urllist)-1)
 
-        incoming.connect('clicked', self.incoming_clicked, urlcombo)
         outgoing.connect('clicked', self.outgoing_clicked, urlcombo, stop)
         push.connect('clicked', self.push_clicked, urlcombo)
         conf.connect('clicked', self.conf_clicked, urlcombo)
@@ -775,6 +774,8 @@ class GLog(gdialog.GDialog):
                     in enumerate(ppulldata) if name == 'none'][0]
         ppullcombo.set_active(pos)
 
+        incoming.connect('clicked', self.incoming_clicked, urlcombo,
+                         ppullcombo, ppulldata)
         pull.connect('clicked', self.pull_clicked, urlcombo, ppullcombo,
                      ppulldata)
         syncbox.append_widget(ppullcombo)
@@ -890,24 +891,43 @@ class GLog(gdialog.GDialog):
     def get_extras(self):
         return self.stbar
 
-    def incoming_clicked(self, toolbutton, combo):
+    def incoming_clicked(self, toolbutton, combo, ppullcombo, ppulldata):
         def apply_clicked(button, bfile):
-            cmdline = ['hg', 'pull', bfile]
+            sel = ppullcombo.get_active_text()
+            ppull = [name for (name, label) in ppulldata if sel == label][0]
+            dorebase = False
+            if ppull == 'fetch':
+                cmd = ['fetch', '--message', 'merge']
+                # load the fetch extension explicitly
+                extensions.load(self.ui, 'fetch', None)
+            else:
+                cmd = ['pull']
+                if ppull == 'update':
+                    cmd.append('--update')
+                elif ppull == 'rebase':
+                    dorebase = True
+                    cmd.append('--rebase')
+                    # load the rebase extension explicitly
+                    extensions.load(self.ui, 'rebase', None)
+
+            cmdline = ['hg'] + cmd + [bfile]
             dlg = hgcmd.CmdDialog(cmdline)
             dlg.show_all()
             dlg.run()
             dlg.hide()
-            remove_overlay()
+            remove_overlay(dorebase)
 
         def reject_clicked(button):
-            remove_overlay()
+            remove_overlay(False)
 
-        def remove_overlay():
+        def remove_overlay(resettip):
             self.bfile = None
             combo.get_child().set_text('')
             self.repo = hg.repository(self.ui, path=self.repo.root)
             self.graphview.set_repo(self.repo, self.stbar)
             self.changeview.repo = self.repo
+            if resettip:
+                self.origtip = len(self.repo)
             self.reload_log()
             self.toolbar.remove(self.toolbar.get_nth_item(0))
             self.toolbar.remove(self.toolbar.get_nth_item(0))
