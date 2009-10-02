@@ -153,26 +153,22 @@ class ArchiveDialog(gtk.Dialog):
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
-        dict = {}
         if self.tarradio.get_active():
-            dict['type'] = 'tar'
-            dict['filter'] = ((_('Tar archives'), '*.tar'),)
+            return {'type': 'tar',
+                    'filter': ((_('Tar archives'), '*.tar'),)}
         elif self.tbz2radio.get_active():
-            dict['type'] = 'tbz2'
-            dict['filter'] = ((_('Bzip2 tar archives'), '*.tbz2'),)
+            return {'type': 'tbz2',
+                    'filter': ((_('Bzip2 tar archives'), '*.tbz2'),)}
         elif self.tgzradio.get_active():
-            dict['type'] = 'tgz'
-            dict['filter'] = ((_('Gzip tar archives'), '*.tgz'),)
+            return {'type': 'tgz',
+                    'filter': ((_('Gzip tar archives'), '*.tgz'),)}
         elif self.uzipradio.get_active():
-            dict['type'] = 'uzip'
-            dict['filter'] = ((_('Uncompressed zip archives'), '*.uzip'),)
+            return {'type': 'uzip',
+                    'filter': ((_('Uncompressed zip archives'), '*.uzip'),)}
         elif self.zipradio.get_active():
-            dict['type'] = 'zip'
-            dict['filter'] = ((_('Compressed zip archives'), '*.zip'),)
-        else:
-            dict['type'] = 'files'
-
-        return dict
+            return {'type': 'zip',
+                    'filter': ((_('Compressed zip archives'), '*.zip'),)}
+        return {'type': 'files', 'filter': None}
 
     def browse_clicked(self, button):
         """Select the destination directory or file"""
