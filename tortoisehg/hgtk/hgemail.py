@@ -253,34 +253,6 @@ class EmailDialog(gtk.Window):
         if len(self._flaglist) == 0:
             self._flaglist.append(['STABLE'])
 
-        # See if user has set flags in defaults.email
-        self._git.set_sensitive(True)
-        self._bundle.set_sensitive(True)
-        self._plain.set_sensitive(True)
-        self._inline.set_sensitive(True)
-        self._attach.set_sensitive(True)
-        self._diffstat.set_sensitive(True)
-        defaults = repo.ui.config('defaults', 'email', '').split()
-        for flag in defaults:
-            if flag in ('-g', '--git'):
-                self._git.set_active(True)
-                self._git.set_sensitive(False)
-            if flag in ('-b', '--bundle'):
-                self._bundle.set_active(True)
-                self._bundle.set_sensitive(False)
-            if flag in ('--plain'):
-                self._plain.set_active(True)
-                self._plain.set_sensitive(False)
-            if flag in ('i', '--inline'):
-                self._inline.set_active(True)
-                self._inline.set_sensitive(False)
-            if flag in ('a', '--attach'):
-                self._attach.set_active(True)
-                self._attach.set_sensitive(False)
-            if flag in ('d', '--diffstat'):
-                self._diffstat.set_active(True)
-                self._diffstat.set_sensitive(False)
-
     def _on_conf_clicked(self, button):
         dlg = thgconfig.ConfigDialog(False)
         dlg.show_all()
