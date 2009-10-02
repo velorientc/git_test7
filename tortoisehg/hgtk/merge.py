@@ -24,6 +24,7 @@ class MergeDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'menumerge.ico')
         gtklib.set_tortoise_keys(self)
+        self.set_default_size(350, 120)
         self.notify_func = None
 
         if not rev:
@@ -37,10 +38,7 @@ class MergeDialog(gtk.Window):
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
-
-        title = _("Merging in ") + hglib.toutf(os.path.basename(repo.root))
-        self.set_title(title)
-        self.set_default_size(350, 120)
+        self.set_title(_('Merging in %s') % hglib.get_reponame(repo))
 
         vbox = gtk.VBox()
         self.add(vbox)
