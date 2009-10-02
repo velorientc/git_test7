@@ -208,8 +208,8 @@ class ArchiveDialog(gtk.Dialog):
             response = gtklib.NativeSaveFileDialogWrapper(
                             InitialDir=dest, 
                             Title=_('Select Destination File'),
-                            Filter=((label, ext),)).run()
-
+                            Filter=((label, ext),
+                                    (_('All Files (*.*)'), '*.*'))).run()
         if response:
             self.destentry.set_text(response)
 
