@@ -151,13 +151,6 @@ class ArchiveDialog(gtk.Dialog):
         """Return the default destination path"""
         return hglib.toutf(os.getcwd())
 
-    def get_save_file_dialog(self, filter):
-        """Return a configured save file dialog"""
-        return gtklib.NativeSaveFileDialogWrapper(
-            InitialDir=self.destentry.get_text(), 
-            Title=_('Select Destination File'),
-            Filter=filter)
-
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
         dict = {}
@@ -186,11 +179,14 @@ class ArchiveDialog(gtk.Dialog):
         archive_type = self.get_selected_archive_type()
         if archive_type['type'] == 'files':
             response = gtklib.NativeFolderSelectDialog(
-                          initial=self.destentry.get_text(),
-                          title=_('Select Destination Folder')).run()
+                            initial=self.destentry.get_text(),
+                            title=_('Select Destination Folder')).run()
         else:
             filter = archive_type['filter']
-            response = self.get_save_file_dialog(filter).run()
+            response = gtklib.NativeSaveFileDialogWrapper(
+                            InitialDir=self.destentry.get_text(), 
+                            Title=_('Select Destination File'),
+                            Filter=filter).run()
 
         if response:
             self.destentry.set_text(response)
