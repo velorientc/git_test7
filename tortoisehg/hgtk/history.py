@@ -728,6 +728,8 @@ class GLog(gdialog.GDialog):
                         _('Determine and mark outgoing changesets'))
         push = syncbox.append_stock(gtk.STOCK_GOTO_TOP,
                         _('Push outgoing changesets'))
+        email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
+                        _('Email outgoing changesets'))
         conf = syncbox.append_stock(gtk.STOCK_PREFERENCES,
                         _('Configure aliases and after pull behavior'))
         stop = syncbox.append_stock(gtk.STOCK_STOP,
@@ -751,6 +753,7 @@ class GLog(gdialog.GDialog):
         outgoing.connect('clicked', self.outgoing_clicked, urlcombo, stop)
         push.connect('clicked', self.push_clicked, urlcombo)
         conf.connect('clicked', self.conf_clicked, urlcombo)
+        email.connect('clicked', self.email_clicked, urlcombo)
 
         syncbox.append_widget(gtk.Label(_('After Pull:')))
         ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
@@ -1061,6 +1064,17 @@ class GLog(gdialog.GDialog):
         stop.set_sensitive(True)
         gobject.timeout_add(50, out_wait)
 
+    def email_clicked(self, toolbutton, combo):
+        path = hglib.fromutf(combo.get_child().get_text()).strip()
+        if not path:
+            gdialog.Prompt(_('No repository selected'),
+                           _('Select a peer repository to compare with'),
+                           self).run()
+            combo.get_child().grab_focus()
+            return
+        opts = ['--outgoing', path]
+        dlg = hgemail.EmailDialog(self.repo.root, opts)
+        self.show_dialog(dlg)
 
     def push_clicked(self, toolbutton, combo):
         entry = combo.get_child()
