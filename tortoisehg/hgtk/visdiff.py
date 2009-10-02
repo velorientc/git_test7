@@ -316,6 +316,9 @@ def run(ui, *pats, **opts):
             args.extend(['--change', str(change)])
         for r in revs:
             args.extend(['--rev', str(r)])
+        bfile = opts.get('bundle')
+        if bfile:
+            args.extend(['--bundle', bfile])
         args.extend(pats)
         args.extend(opts.get('canonpats', []))
         if os.name == 'nt':
