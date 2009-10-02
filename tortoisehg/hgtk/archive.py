@@ -95,9 +95,11 @@ class ArchiveDialog(gtk.Dialog):
 
         ## archive types
         self.filesradio = gtk.RadioButton(None, _('Directory of files'))
+        self.filesradio.connect('toggled', self.type_changed)
         table.add_row(_('Archive types:'), self.filesradio)
         def add_type(label):
             radio = gtk.RadioButton(self.filesradio, label)
+            radio.connect('toggled', self.type_changed)
             table.add_row(None, radio)
             return radio
         self.tarradio = add_type(_('Uncompressed tar archive'))
@@ -146,6 +148,21 @@ class ArchiveDialog(gtk.Dialog):
             raise _('unexpected response id: %s') % response_id
 
         self.run() # doesn't close dialog
+
+    def type_changed(self, radio):
+        if not radio.get_active():
+            return
+        def remove_exts(path):
+            for ext in ('.tar', '.tar.bz2', '.tar.gz', '.zip'):
+                if path.endswith(ext):
+                    return path.replace(ext, '')
+            return path
+        select = self.get_selected_archive_type()
+        path = self.destentry.get_text()
+        newpath = remove_exts(path)
+        if select['type'] != 'files':
+            newpath += select['ext']
+        self.destentry.set_text(newpath)
 
     def get_default_path(self):
         """Return the default destination path"""
