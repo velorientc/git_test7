@@ -145,10 +145,16 @@ class EmailDialog(gtk.Window):
         self._bundle = gtk.RadioButton(self._normal,
                 _('Send single binary bundle, not patches'))
         vbox.pack_start(self._bundle, True, True, 4)
-        self.tooltips.set_tip(self._bundle,
+        if revargs[0] in ('--outgoing', '-o'):
+            self.tooltips.set_tip(self._bundle,
                 _('Bundles store complete changesets in binary form.'
                 ' Upstream users can pull from them. This is the safest'
                 ' way to send changes to recipient Mercurial users.'))
+        else:
+            self._bundle.set_sensitive(False)
+            self.tooltips.set_tip(self._bundle,
+                _('This feature is only available when sending outgoing'
+                ' changesets. It is not applicable with revision ranges.'))
 
         hbox = gtk.HBox()
         vbox.pack_start(hbox, False, False, 2)
