@@ -214,14 +214,31 @@ class ArchiveDialog(gtk.Dialog):
         self.abortbtn.set_property('visible', working)
 
     def archive(self):
+        # verify input
+        select = self.get_selected_archive_type()
+        dest = self.destentry.get_text()
+        if os.path.exists(dest):
+            if select['type'] != 'files':
+                ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
+                            _('The destination "%s" already exists!\n\n'
+                              'Do you want to overwrite it?') % dest).run()
+                if ret != gtk.RESPONSE_YES:
+                    return False
+            elif len(os.listdir(dest)) > 0:
+                ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
+                            _('The directory "%s" isn\'t empty!\n\n'
+                              'Do you want to overwrite it?') % dest).run()
+                if ret != gtk.RESPONSE_YES:
+                    return False
+
         cmdline = ['hg', 'archive', '--verbose']
         rev = self.combo.get_active_text()
         if rev != WD_PARENT:
             cmdline.append('--rev')
             cmdline.append(rev)
         cmdline.append('-t')
-        cmdline.append(self.get_selected_archive_type()['type'])
-        cmdline.append(hglib.fromutf(self.destentry.get_text()))
+        cmdline.append(select['type'])
+        cmdline.append(hglib.fromutf(dest))
 
         def cmd_done(returncode):
             self.switch_to(MODE_NORMAL, cmd=False)
