@@ -15,9 +15,11 @@ from mercurial import hg, ui
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
-from tortoisehg.hgtk import hgcmd, gtklib
+from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
-_working_dir_parent_ = _('= Working Directory Parent =')
+WD_PARENT = _('= Working Directory Parent =')
+MODE_NORMAL  = 'normal'
+MODE_WORKING = 'working'
 
 class ArchiveDialog(gtk.Dialog):
     """ Dialog to archive a Mercurial repo """
@@ -45,7 +47,7 @@ class ArchiveDialog(gtk.Dialog):
         self.set_title(title)
 
         # layout table
-        table = gtklib.LayoutTable()
+        self.table = table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
 
         ## revision combo
@@ -57,7 +59,7 @@ class ArchiveDialog(gtk.Dialog):
         if rev:
             combo.append_text(str(rev))
         else:
-            combo.append_text(_working_dir_parent_)
+            combo.append_text(WD_PARENT)
         combo.set_active(0)
         for b in repo.branchtags():
             combo.append_text(b)
@@ -106,14 +108,44 @@ class ArchiveDialog(gtk.Dialog):
 
         # prepare to show
         self.archivebtn.grab_focus()
+        gobject.idle_add(self.after_init)
+
+    def after_init(self):
+        # CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, True, True, 6)
+
+        # abort button
+        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
+        self.abortbtn.hide()
 
     def dialog_response(self, dialog, response_id):
+        def abort():
+            self.cmd.stop()
+            self.cmd.show_log()
+            self.switch_to(MODE_NORMAL, cmd=False)
         # Archive button
         if response_id == gtk.RESPONSE_OK:
             self.archive()
-            self.run()
+        # Close button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            if self.cmd.is_alive():
+                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
+                                      _('Do you want to abort?')).run()
+                if ret == gtk.RESPONSE_YES:
+                    abort()
+            else:
+                self.destroy()
+                return # close dialog
+        # Abort button
+        elif response_id == gtk.RESPONSE_CANCEL:
+            abort()
         else:
-            self.destroy()
+            raise _('unexpected response id: %s') % response_id
+
+        self.run() # doesn't close dialog
 
     def get_default_path(self):
         """Return the default destination path"""
@@ -163,21 +195,40 @@ class ArchiveDialog(gtk.Dialog):
         if response:
             self.destentry.set_text(response)
 
-    def archive(self):
-        rev = self.combo.get_active_text()
+    def switch_to(self, mode, cmd=True):
+        if mode == MODE_NORMAL:
+            normal = True
+            self.closebtn.grab_focus()
+        elif mode == MODE_WORKING:
+            normal = False
+            self.abortbtn.grab_focus()
+        else:
+            raise _('unknown mode name: %s') % mode
+        working = not normal
 
+        self.table.set_sensitive(normal)
+        self.archivebtn.set_property('visible', normal)
+        self.closebtn.set_property('visible', normal)
+        if cmd:
+            self.cmd.set_property('visible', working)
+        self.abortbtn.set_property('visible', working)
+
+    def archive(self):
         cmdline = ['hg', 'archive', '--verbose']
-        if rev != _working_dir_parent_:
+        rev = self.combo.get_active_text()
+        if rev != WD_PARENT:
             cmdline.append('--rev')
             cmdline.append(rev)
-
         cmdline.append('-t')
         cmdline.append(self.get_selected_archive_type()['type'])
         cmdline.append(hglib.fromutf(self.destentry.get_text()))
 
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.run()
-        dlg.hide()
+        def cmd_done(returncode):
+            self.switch_to(MODE_NORMAL, cmd=False)
+            if returncode == 0 and not self.cmd.is_show_log():
+                self.response(gtk.RESPONSE_CLOSE)
+        self.switch_to(MODE_WORKING)
+        self.cmd.execute(cmdline, cmd_done)
 
 def run(ui, *pats, **opts):
     return ArchiveDialog(opts.get('rev'))
