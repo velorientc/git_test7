@@ -11,7 +11,6 @@ import sys
 import gtk
 import gobject
 import Queue
-import StringIO
 import shutil
 import tempfile
 import atexit
@@ -19,7 +18,7 @@ import atexit
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths, thread2
+from tortoisehg.util import hglib, thread2
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 
