@@ -48,6 +48,7 @@ class GLog(gdialog.GDialog):
         self.filteropts = None
         self.bundledir = None
         self.bfile = None
+        self.npreviews = 0
         os.chdir(self.repo.root)
 
         # Load extension support for commands which need it
@@ -488,8 +489,11 @@ class GLog(gdialog.GDialog):
 
         # handle strips, rebases, etc
         self.origtip = min(len(self.repo), self.origtip)
+        if not self.bfile:
+            self.npreviews = 0
+        
         opts['orig-tip'] = self.origtip
-        opts['bundleview'] = bool(self.bfile)
+        opts['npreviews'] = self.npreviews
 
         opts['no_merges'] = self.no_merges
 
@@ -923,6 +927,7 @@ class GLog(gdialog.GDialog):
 
         def remove_overlay(resettip):
             self.bfile = None
+            self.npreviews = 0
             combo.get_child().set_text('')
             self.repo = hg.repository(self.ui, path=self.repo.root)
             self.graphview.set_repo(self.repo, self.stbar)
@@ -989,11 +994,12 @@ class GLog(gdialog.GDialog):
             disabled.append(self.syncbox)
 
             self.bfile = bfile
-            self.origtip = len(self.repo)
+            oldtip = len(self.repo)
             self.repo = hg.repository(self.ui, path=bfile)
             self.graphview.set_repo(self.repo, self.stbar)
             self.changeview.repo = self.repo
             self.changeview.bfile = bfile
+            self.npreviews = len(self.repo) - oldtip
             self.reload_log()
 
     def pull_clicked(self, toolbutton, combo, ppullcombo, ppulldata):

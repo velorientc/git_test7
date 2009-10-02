@@ -40,7 +40,7 @@ AGE = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
-    def __init__ (self, repo, graphdata, color_func, outgoing, origtip, bview):
+    def __init__ (self, repo, graphdata, color_func, outgoing, origtip, npreviews):
         gtk.GenericTreeModel.__init__(self)
         self.repo = repo
         self.outgoing = outgoing
@@ -51,7 +51,7 @@ class TreeModel(gtk.GenericTreeModel):
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
         self.origtip = origtip
-        self.bundleview = bview
+        self.npreviews = npreviews
         self.hidetags = self.repo.ui.config(
             'tortoisehg', 'hidetags', '').split()
 
@@ -177,7 +177,10 @@ class TreeModel(gtk.GenericTreeModel):
             if node in self.outgoing:
                 status = -1
             elif revid >= self.origtip:
-                status = self.bundleview and 2 or 1
+                if revid >= len(self.repo) - self.npreviews:
+                    status = 2
+                else:
+                    status = 1
             else:
                 status = 0
 
