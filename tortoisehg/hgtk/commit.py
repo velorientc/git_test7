@@ -16,7 +16,7 @@ import tempfile
 import cStringIO
 import time
 
-from mercurial import ui, hg, util, patch, cmdutil
+from mercurial import hg, util, patch, cmdutil
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
