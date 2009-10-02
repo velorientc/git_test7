@@ -194,16 +194,17 @@ class ArchiveDialog(gtk.Dialog):
 
     def browse_clicked(self, button):
         """Select the destination directory or file"""
+        dest = hglib.fromutf(self.destentry.get_text())
         select = self.get_selected_archive_type()
         if select['type'] == 'files':
             response = gtklib.NativeFolderSelectDialog(
-                            initial=self.destentry.get_text(),
+                            initial=dest,
                             title=_('Select Destination Folder')).run()
         else:
             ext = '*' + select['ext']
             label = '%s (%s)' % (select['label'], ext)
             response = gtklib.NativeSaveFileDialogWrapper(
-                            InitialDir=self.destentry.get_text(), 
+                            InitialDir=dest, 
                             Title=_('Select Destination File'),
                             Filter=((label, ext),)).run()
 
