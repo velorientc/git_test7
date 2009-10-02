@@ -507,7 +507,7 @@ class ChangeSet(gdialog.GDialog):
     def diff_to_local(self, menuitem):
         if not self.curfile:
             return
-        self._do_diff([self.curfile], {'rev' : str(self.currev)})
+        self._do_diff([self.curfile], {'rev' : [str(self.currev)]})
 
     def diff_file_rev(self, menuitem):
         'User selected visual diff file from the file list context menu'
