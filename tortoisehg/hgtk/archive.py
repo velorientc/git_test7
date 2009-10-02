@@ -195,6 +195,8 @@ class ArchiveDialog(gtk.Dialog):
     def browse_clicked(self, button):
         """Select the destination directory or file"""
         dest = hglib.fromutf(self.destentry.get_text())
+        if not os.path.exists(dest):
+            dest = os.path.dirname(dest)
         select = self.get_selected_archive_type()
         if select['type'] == 'files':
             response = gtklib.NativeFolderSelectDialog(
