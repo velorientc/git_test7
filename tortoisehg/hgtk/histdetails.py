@@ -77,13 +77,14 @@ class LogDetailsDialog(gtk.Dialog):
 
         leftvbox.pack_start(vbox, True, True)
 
-        self.up_button = gtk.ToolButton(gtk.STOCK_GO_UP)
+        self.up_button = gtk.Button(_('Move Up'))
         self.up_button.connect('clicked', self.up_clicked)
-        self.down_button = gtk.ToolButton(gtk.STOCK_GO_DOWN)
+
+        self.down_button = gtk.Button(_('Move Down'))
         self.down_button.connect('clicked', self.down_clicked)
 
         rightvox.pack_start(self.up_button, False, False)
-        rightvox.pack_start(self.down_button, False, False)
+        rightvox.pack_start(self.down_button, False, False, 4)
 
         self.show_all()
 
