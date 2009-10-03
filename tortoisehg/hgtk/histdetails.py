@@ -109,6 +109,10 @@ class LogDetailsDialog(gtk.Dialog):
         self.applybtn.set_sensitive(self.dirty)
 
         model, seliter = self.tv.get_selection().get_selected()
+        if not seliter:
+            self.down_button.set_sensitive(False)
+            self.up_button.set_sensitive(False)
+            return
 
         next = model.iter_next(seliter)
         self.down_button.set_sensitive(next != None)
