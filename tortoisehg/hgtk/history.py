@@ -609,8 +609,23 @@ class GLog(gdialog.GDialog):
         
         # need mq extension for strip command
         if 'mq' in self.exs:
-            m.append(create_menu(_('qimport'), self.qimport_rev))
-            m.append(create_menu(_('strip revision'), self.strip_rev))
+            cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
+            cmenu_strip = create_menu(_('strip revision'), self.strip_rev)
+
+            try:
+                ctx = self.repo[self.currevid]
+                qbase = self.repo['qbase']
+                actx = ctx.ancestor(qbase)
+                if actx == qbase or actx == ctx:
+                    # we're in the mq revision range or the mq
+                    # is a descendant of us
+                    cmenu_qimport.set_sensitive(False)
+                    cmenu_strip.set_sensitive(False)
+            except:
+                pass
+
+            m.append(cmenu_qimport)
+            m.append(cmenu_strip)
 
         m.show_all()
         return m
