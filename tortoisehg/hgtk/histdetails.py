@@ -91,10 +91,21 @@ class LogDetailsDialog(gtk.Dialog):
         rightvbox.pack_start(self.up_button, False, False, 2)
         rightvbox.pack_start(self.down_button, False, False, 4)
 
+        self.tv.connect('cursor-changed', lambda tv: self.update_buttons())
+
         self.show_all()
 
     def update_buttons(self):
         self._btn_apply.set_sensitive(self.dirty)
+
+        model, seliter = self.tv.get_selection().get_selected()
+
+        next = model.iter_next(seliter)
+        self.down_button.set_sensitive(next != None)
+
+        firstiter = model.get_iter_first()
+        islast = model.get_path(seliter) != model.get_path(firstiter)
+        self.up_button.set_sensitive(islast)
 
     def up_clicked(self, button):
         model, seliter = self.tv.get_selection().get_selected()
