@@ -235,9 +235,6 @@ class GLog(gdialog.GDialog):
 
     def show_details_dialog(self):
 
-        def close(dialog, response_id):
-            dialog.destroy()
-
         columns = {}
         columns['graph'] = (self.graphcol, _('Graph'), 'graphcol', 'graph')
 
@@ -269,7 +266,6 @@ class GLog(gdialog.GDialog):
         self.details_model = model
 
         dlg = histdetails.LogDetailsDialog(model, self.apply_details)
-        dlg.connect('response', close)
         dlg.show()
 
     def apply_details(self):

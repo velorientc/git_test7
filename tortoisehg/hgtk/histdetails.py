@@ -15,9 +15,9 @@ from tortoisehg.hgtk import gtklib
 class LogDetailsDialog(gtk.Dialog):
 
     def __init__(self, model, apply_func):
-        buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         super(LogDetailsDialog, self).__init__(
-            flags=gtk.DIALOG_MODAL, buttons=buttons)
+            flags=gtk.DIALOG_MODAL)
+        self.connect('response', self.dialog_response)
 
         self.apply_func = apply_func
         self.dirty = False
@@ -25,10 +25,11 @@ class LogDetailsDialog(gtk.Dialog):
         gtklib.set_tortoise_icon(self, 'general.ico')
         gtklib.set_tortoise_keys(self)
 
-        self._btn_apply = gtk.Button(_('Apply'))
-        self._btn_apply.set_sensitive(False)
-        self._btn_apply.connect('clicked', self._btn_apply_clicked)
-        self.action_area.pack_end(self._btn_apply)
+        # add dialog buttons
+        self.okbtn = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
+        self.applybtn = self.add_button(gtk.STOCK_APPLY, gtk.RESPONSE_APPLY)
+        self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
+        self.set_default_response(gtk.RESPONSE_OK)
 
         self.set_title(_('Log Details'))
 
@@ -95,8 +96,17 @@ class LogDetailsDialog(gtk.Dialog):
 
         self.show_all()
 
+    def dialog_response(self, dialog, response_id):
+        if response_id == gtk.RESPONSE_OK:
+            self.apply()
+            self.destroy()
+        elif response_id == gtk.RESPONSE_APPLY:
+            self.apply()
+        else:
+            self.destroy()
+
     def update_buttons(self):
-        self._btn_apply.set_sensitive(self.dirty)
+        self.applybtn.set_sensitive(self.dirty)
 
         model, seliter = self.tv.get_selection().get_selected()
 
@@ -130,7 +140,7 @@ class LogDetailsDialog(gtk.Dialog):
             self.dirty = True
         self.update_buttons()
 
-    def _btn_apply_clicked(self, button, data=None):
+    def apply(self):
         self.apply_func()
         self.dirty = False
         self.update_buttons()
