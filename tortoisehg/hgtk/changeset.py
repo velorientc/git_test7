@@ -12,7 +12,7 @@ import pango
 import Queue
 import binascii
 
-from mercurial import cmdutil, context, util, ui, hg, patch, mdiff
+from mercurial import cmdutil, util, patch, mdiff
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util.hglib import *
