@@ -49,8 +49,8 @@ class DetectRenameDialog(gtk.Window):
             return
         self.repo = repo
         self.notify_func = None
-        path = hglib.toutf(os.path.basename(self.repo.root))
-        self.set_title(_('Detect Copies/Renames in ') + path)
+        reponame = hglib.get_reponame(repo)
+        self.set_title(_('Detect Copies/Renames in %s') % reponame)
         self._settings = settings.Settings('guess')
         dims = self._settings.get_value('dims', (800, 600))
         self.set_default_size(dims[0], dims[1])
