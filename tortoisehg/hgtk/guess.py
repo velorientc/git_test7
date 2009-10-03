@@ -43,9 +43,14 @@ class DetectRenameDialog(gtk.Window):
         gtklib.set_tortoise_icon(self, 'detect_rename.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.root = paths.find_root()
+        try:
+            repo = hg.repository(ui.ui(), path=paths.find_root())
+        except RepoError:
+            gobject.idle_add(self.destroy)
+            return
+        self.repo = repo
         self.notify_func = None
-        path = toutf(os.path.basename(self.root))
+        path = toutf(os.path.basename(self.repo.root))
         self.set_title(_('Detect Copies/Renames in ') + path)
         self._settings = settings.Settings('guess')
         dims = self._settings.get_value('dims', (800, 600))
@@ -190,23 +195,20 @@ class DetectRenameDialog(gtk.Window):
         q = Queue.Queue()
         unkmodel.clear()
         thread = thread2.Thread(target=self.unknown_thread,
-                args=(self.root, q))
+                args=(self.repo.root, q))
         thread.start()
         gobject.timeout_add(50, self.unknown_wait, thread, q, unkmodel)
 
     def unknown_thread(self, root, q):
-        try:
-            repo = hg.repository(ui.ui(), root)
-        except RepoError:
-            return
-        matcher = match.always(repo.root, repo.root)
-        status = repo.status(node1=repo.dirstate.parents()[0], node2=None,
-                match=matcher, ignored=False, clean=False, unknown=True)
+        matcher = match.always(self.repo.root, self.repo.root)
+        status = self.repo.status(node1=self.repo.dirstate.parents()[0],
+                                  node2=None, match=matcher, ignored=False,
+                                  clean=False, unknown=True)
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         for u in unknown:
             q.put( u )
         for a in added:
-            if not repo.dirstate.copied(a):
+            if not self.repo.dirstate.copied(a):
                 q.put( a )
 
     def unknown_wait(self, thread, q, unkmodel):
@@ -233,28 +235,24 @@ class DetectRenameDialog(gtk.Window):
         tgts = [ umodel[p][0] for p in upaths ]
         q = Queue.Queue()
         thread = thread2.Thread(target=self.search_thread,
-                args=(self.root, q, tgts, adj))
+                args=(self.repo.root, q, tgts, adj))
         thread.start()
         stbar.begin()
         stbar.set_status_text(_('finding source of ') + ', '.join(tgts))
         gobject.timeout_add(50, self.search_wait, thread, q, cmodel, stbar)
 
     def search_thread(self, root, q, tgts, adj):
-        try:
-            repo = hg.repository(ui.ui(), root)
-        except RepoError:
-            return
         srcs = []
-        audit_path = util.path_auditor(repo.root)
-        m = cmdutil.match(repo)
-        for abs in repo.walk(m):
-            target = repo.wjoin(abs)
+        audit_path = util.path_auditor(self.repo.root)
+        m = cmdutil.match(self.repo)
+        for abs in self.repo.walk(m):
+            target = self.repo.wjoin(abs)
             good = True
             try:
                 audit_path(abs)
             except:
                 good = False
-            status = repo.dirstate[abs]
+            status = self.repo.dirstate[abs]
             if (not good or not util.lexists(target)
                 or (os.path.isdir(target) and not os.path.islink(target))):
                 srcs.append(abs)
@@ -270,7 +268,7 @@ class DetectRenameDialog(gtk.Window):
         else:
             simularity = 1.0
             gen = findmoves
-        for old, new, score in gen(repo, tgts, srcs, simularity):
+        for old, new, score in gen(self.repo, tgts, srcs, simularity):
             q.put( [old, new, '%d%%' % (score*100)] )
 
     def search_wait(self, thread, q, cmodel, stbar):
@@ -290,21 +288,17 @@ class DetectRenameDialog(gtk.Window):
 
     def accept_match(self, widget, unktree, ctree, adj, stbar):
         'User pressed "accept match" button'
-        try:
-            repo = hg.repository(ui.ui(), self.root)
-        except RepoError:
-            return
         cmodel, upaths = ctree.get_selection().get_selected_rows()
         for path in upaths:
             row = cmodel[path]
             src, usrc, dest, udest, percent, sensitive = row
             if not sensitive:
                 continue
-            if not os.path.exists(repo.wjoin(src)):
+            if not os.path.exists(self.repo.wjoin(src)):
                 # Mark missing rename source as removed
-                repo.remove([src])
-            repo.copy(src, dest)
-            shlib.shell_notify([repo.wjoin(src), repo.wjoin(dest)])
+                self.repo.remove([src])
+            self.repo.copy(src, dest)
+            shlib.shell_notify([self.repo.wjoin(src), self.repo.wjoin(dest)])
             if self.notify_func:
                 self.notify_func()
             # Mark all rows with this target file as non-sensitive
@@ -330,11 +324,6 @@ class DetectRenameDialog(gtk.Window):
         sensitive = cpaths and True or False
         ac.set_sensitive(sensitive)
 
-        try:
-            repo = hg.repository(ui.ui(), self.root)
-        except RepoError:
-            return
-
         buf.set_text('')
         bufiter = buf.get_start_iter()
         for path in cpaths:
@@ -342,8 +331,8 @@ class DetectRenameDialog(gtk.Window):
             src, usrc, dest, udest, percent, sensitive = row
             if not sensitive:
                 continue
-            ctx = repo['.']
-            aa = repo.wread(dest)
+            ctx = self.repo['.']
+            aa = self.repo.wread(dest)
             rr = ctx.filectx(src).data()
             opts = mdiff.defaultopts
             difftext = mdiff.unidiff(rr, '', aa, '', src, dest, None, opts=opts)
