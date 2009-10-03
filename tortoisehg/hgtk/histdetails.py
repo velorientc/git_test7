@@ -36,16 +36,18 @@ class LogDetailsDialog(gtk.Dialog):
 
         hbox = gtk.HBox()
         lb = gtk.Label(_('Columns') + ':')
-        hbox.pack_start(lb, False, False, 4)
-        self.vbox.pack_start(hbox, False, False, 4)
+        hbox.pack_start(lb, False, False, 6)
+        self.vbox.pack_start(gtk.HBox(), False, False, 3)
+        self.vbox.pack_start(hbox, False, False)
 
         mainhbox = gtk.HBox()
         self.vbox.pack_start(mainhbox)
-        
+
         leftvbox = gtk.VBox()
         rightvbox = gtk.VBox()
         mainhbox.pack_start(leftvbox, True, True)
-        mainhbox.pack_start(rightvbox, False, False)
+        mainhbox.pack_start(gtk.VBox(), False, False, 0)
+        mainhbox.pack_start(rightvbox, False, False, 4)
 
         tv = self.tv = gtk.TreeView(model)
         tv.set_headers_visible(False)
@@ -71,9 +73,12 @@ class LogDetailsDialog(gtk.Dialog):
             toggled(None, path)
         tv.connect('row-activated', activated)
 
+        frm = gtk.Frame()
+        frm.add(tv)
+
         vbox = gtk.VBox()
         vbox.set_border_width(4)
-        vbox.pack_start(tv)
+        vbox.pack_start(frm)
 
         leftvbox.pack_start(vbox, True, True)
 
@@ -83,7 +88,7 @@ class LogDetailsDialog(gtk.Dialog):
         self.down_button = gtk.Button(_('Move Down'))
         self.down_button.connect('clicked', self.down_clicked)
 
-        rightvbox.pack_start(self.up_button, False, False)
+        rightvbox.pack_start(self.up_button, False, False, 2)
         rightvbox.pack_start(self.down_button, False, False, 4)
 
         self.show_all()
