@@ -43,9 +43,9 @@ class LogDetailsDialog(gtk.Dialog):
         self.vbox.pack_start(mainhbox)
         
         leftvbox = gtk.VBox()
-        rightvox = gtk.VBox()
+        rightvbox = gtk.VBox()
         mainhbox.pack_start(leftvbox, True, True)
-        mainhbox.pack_start(rightvox, False, False)
+        mainhbox.pack_start(rightvbox, False, False)
 
         tv = self.tv = gtk.TreeView(model)
         tv.set_headers_visible(False)
@@ -83,8 +83,8 @@ class LogDetailsDialog(gtk.Dialog):
         self.down_button = gtk.Button(_('Move Down'))
         self.down_button.connect('clicked', self.down_clicked)
 
-        rightvox.pack_start(self.up_button, False, False)
-        rightvox.pack_start(self.down_button, False, False, 4)
+        rightvbox.pack_start(self.up_button, False, False)
+        rightvbox.pack_start(self.down_button, False, False, 4)
 
         self.show_all()
 
