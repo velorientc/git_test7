@@ -575,6 +575,8 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('diff to local'), self.vdiff_local))
         m.append(create_menu(_('_copy hash'), self.copy_hash))
         if self.bfile:
+            if self.currevid >= len(self.repo) - self.npreviews:
+                m.append(create_menu(_('pull to here'), self.pull_to))
             m.show_all()
             return m
 
@@ -1406,6 +1408,19 @@ class GLog(gdialog.GDialog):
         dialog = status.GStatus(self.ui, self.repo, self.cwd, self.pats,
                          statopts)
         dialog.display()
+
+    def pull_to(self, menuitem):
+        cmdline = ['hg', 'pull', '--rev', str(self.currevid), self.bfile]
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        curtip = len(hg.repository(self.ui, self.repo.root))
+        self.repo = hg.repository(self.ui, path=self.bfile)
+        self.graphview.set_repo(self.repo, self.stbar)
+        self.changeview.repo = self.repo
+        self.npreviews = len(self.repo) - curtip
+        self.reload_log()
 
     def copy_hash(self, menuitem):
         hash = self.repo[self.currevid].hex()
