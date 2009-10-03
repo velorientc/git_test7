@@ -49,6 +49,7 @@ class GLog(gdialog.GDialog):
         self.bundledir = None
         self.bfile = None
         self.npreviews = 0
+        self.outgoing = []
         os.chdir(self.repo.root)
 
         # Load extension support for commands which need it
@@ -97,6 +98,7 @@ class GLog(gdialog.GDialog):
     def get_menu_list(self):
         def refresh(menuitem, resetmarks):
             if resetmarks:
+                self.outgoing = []
                 self.graphview.set_outgoing([])
                 self.origtip = len(self.repo)
             self.reload_log()
@@ -580,6 +582,8 @@ class GLog(gdialog.GDialog):
             m.show_all()
             return m
 
+        if self.repo[self.currevid].node() in self.outgoing:
+            m.append(create_menu(_('push to here'), self.push_to))
         m.append(create_menu(_('_update'), self.checkout))
         cmenu_merge = create_menu(_('_merge with'), self.domerge)
         m.append(cmenu_merge)
@@ -748,6 +752,7 @@ class GLog(gdialog.GDialog):
         cell = gtk.CellRendererText()
         urlcombo.pack_end(cell, False)
         urlcombo.add_attribute(cell, 'text', 1)
+        self.pathentry = urlcombo.get_child()
         syncbox.append_widget(urlcombo, expand=True)
 
         for alias, path in self.repo.ui.configitems('paths'):
@@ -1057,6 +1062,7 @@ class GLog(gdialog.GDialog):
             else:
                 self.stbar.end()
                 self.graphview.set_outgoing(outgoing)
+                self.outgoing = outgoing
                 self.reload_log()
                 stop.disconnect(stop_handler)
                 stop.set_sensitive(False)
@@ -1097,7 +1103,8 @@ class GLog(gdialog.GDialog):
         dlg.show_all()
         dlg.run()
         dlg.hide()
-        if dlg.return_code() == 0 and self.graphview.outgoing:
+        if dlg.return_code() == 0 and self.outgoing:
+            self.outgoing = []
             self.graphview.set_outgoing([])
             self.reload_log()
 
@@ -1408,6 +1415,25 @@ class GLog(gdialog.GDialog):
         dialog = status.GStatus(self.ui, self.repo, self.cwd, self.pats,
                          statopts)
         dialog.display()
+
+    def push_to(self, menuitem):
+        remote_path = hglib.fromutf(self.pathentry.get_text()).strip()
+        for alias, path in self.repo.ui.configitems('paths'):
+            if remote_path == alias:
+                remote_path = path
+            elif remote_path == url.hidepassword(path):
+                remote_path = path
+        node = self.repo[self.currevid].node()
+        cmdline = ['hg', 'push', '--rev', str(self.currevid), remote_path]
+        dlg = hgcmd.CmdDialog(cmdline, text='hg push')
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        if dlg.return_code() == 0 and self.outgoing:
+            d = self.outgoing.index(node)
+            self.outgoing = self.outgoing[d+1:]
+            self.graphview.set_outgoing(self.outgoing)
+            self.reload_log()
 
     def pull_to(self, menuitem):
         cmdline = ['hg', 'pull', '--rev', str(self.currevid), self.bfile]
