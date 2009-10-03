@@ -51,140 +51,176 @@ class DetectRenameDialog(gtk.Window):
         self.notify_func = None
         reponame = hglib.get_reponame(repo)
         self.set_title(_('Detect Copies/Renames in %s') % reponame)
-        self._settings = settings.Settings('guess')
-        dims = self._settings.get_value('dims', (800, 600))
+        self.settings = settings.Settings('guess')
+        dims = self.settings.get_value('dims', (800, 600))
         self.set_default_size(dims[0], dims[1])
 
-        adjustment = gtk.Adjustment(50, 0, 100, 1)
-        value = self._settings.get_value('percent', None)
-        if value: adjustment.set_value(value)
-        hscale = gtk.HScale(adjustment)
-        frame = gtk.Frame(_('Minimum Simularity Percentage'))
-        frame.add(hscale)
+        # vbox for dialog main & status bar
+        mainvbox = gtk.VBox()
+        self.add(mainvbox)
+
+        # vsplit for top & diff
+        self.vpaned = gtk.VPaned()
+        mainvbox.pack_start(self.vpaned, True, True, 2)
+        pos = self.settings.get_value('vpaned', None)
+        if pos: self.vpaned.set_position(pos)
+
+        # vbox for top contents
         topvbox = gtk.VBox()
+        self.vpaned.pack1(topvbox, True, False)
+
+        # frame for simularity
+        frame = gtk.Frame(_('Minimum Simularity Percentage'))
         topvbox.pack_start(frame, False, False, 2)
 
-        unkmodel = gtk.ListStore(str, str)
-        unknowntree = gtk.TreeView(unkmodel)
-        unknowntree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        #$ simularity slider
+        self.adjustment = gtk.Adjustment(50, 0, 100, 1)
+        value = self.settings.get_value('percent', None)
+        if value: self.adjustment.set_value(value)
+        hscale = gtk.HScale(self.adjustment)
+        frame.add(hscale)
+
+        # horizontal splitter for unknown & candidate
+        self.hpaned = gtk.HPaned()
+        topvbox.pack_start(self.hpaned, True, True, 2)
+        pos = self.settings.get_value('hpaned', None)
+        if pos: self.hpaned.set_position(pos)
+
+        #$ frame for unknown list
+        unknownframe = gtk.Frame(_('Unrevisioned Files'))
+        self.hpaned.pack1(unknownframe, True, True)
+
+        #$$ vbox for unknown list & rename/copy buttons
+        unkvbox = gtk.VBox()
+        unknownframe.add(unkvbox)
+
+        #$$$ scroll window for unknown list
+        scroller = gtk.ScrolledWindow()
+        unkvbox.pack_start(scroller, True, True, 2)
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        #$$$$ unknown list
+        unkmodel = gtk.ListStore(str, # path
+                                 str) # path (utf-8)
+        self.unktree = gtk.TreeView(unkmodel)
+        scroller.add(self.unktree)
+        self.unktree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         cell = gtk.CellRendererText()
         cell.set_property("ellipsize", pango.ELLIPSIZE_START)
+
         col = gtk.TreeViewColumn('File', cell, text=1)
-        unknowntree.append_column(col)
-        unknowntree.set_enable_search(True)
-        unknowntree.set_headers_visible(False)
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.add(unknowntree)
+        self.unktree.append_column(col)
+        self.unktree.set_enable_search(True)
+        self.unktree.set_headers_visible(False)
 
-        vbox = gtk.VBox()
-        vbox.pack_start(scroller, True, True, 2)
+        #$$$ hbox for rename/copy buttons
+        btnhbox = gtk.HBox()
+        unkvbox.pack_start(btnhbox, False, False, 2)
+
+        #$$$$ rename/copy buttons in unknown frame
         fr = gtk.Button(_('Find Renames'))
-        fc = gtk.Button(_('Find Copies'))
-        hbox = gtk.HBox()
-        hbox.pack_start(fr, False, False, 2)
-        hbox.pack_start(fc, False, False, 2)
-        vbox.pack_start(hbox, False, False, 2)
         fr.set_sensitive(False)
+        btnhbox.pack_start(fr, False, False, 2)
+        fc = gtk.Button(_('Find Copies'))
         fc.set_sensitive(False)
+        btnhbox.pack_start(fc, False, False, 2)
 
-        unknownframe = gtk.Frame(_('Unrevisioned Files'))
-        unknownframe.add(vbox)
+        #$ frame for candidate list
+        candidateframe = gtk.Frame(_('Candidate Matches'))
+        self.hpaned.pack2(candidateframe, True, True)
 
-        # source, dest, percent match, sensitive
-        cmodel = gtk.ListStore(str, str, str, str, str, bool)
-        ctree = gtk.TreeView(cmodel)
-        ctree.set_rules_hint(True)
-        ctree.set_reorderable(False)
-        ctree.set_enable_search(False)
-        ctree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        #$$ vbox for candidate list & accept button
+        canvbox = gtk.VBox()
+        candidateframe.add(canvbox)
+
+        #$$$ scroll window for candidate list
+        scroller = gtk.ScrolledWindow()
+        canvbox.pack_start(scroller, True, True, 2)
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        #$$$$ candidate list
+        canmodel = gtk.ListStore(str,  # source
+                                 str,  # source (utf-8)
+                                 str,  # dest
+                                 str,  # dest (utf-8)
+                                 str,  # percent
+                                 bool) # sensitive
+        self.cantree = gtk.TreeView(canmodel)
+        scroller.add(self.cantree)
+        self.cantree.set_rules_hint(True)
+        self.cantree.set_reorderable(False)
+        self.cantree.set_enable_search(False)
+        self.cantree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 
         cell = gtk.CellRendererText()
         cell.set_property('width-chars', 30)
         cell.set_property('ellipsize', pango.ELLIPSIZE_START)
         col = gtk.TreeViewColumn(_('Source'), cell, text=1, sensitive=5)
         col.set_resizable(True)
-        ctree.append_column(col)
+        self.cantree.append_column(col)
 
         cell = gtk.CellRendererText()
         cell.set_property('width-chars', 30)
         cell.set_property('ellipsize', pango.ELLIPSIZE_START)
         col = gtk.TreeViewColumn(_('Dest'), cell, text=3, sensitive=5)
         col.set_resizable(True)
-        ctree.append_column(col)
+        self.cantree.append_column(col)
 
         cell = gtk.CellRendererText()
         cell.set_property('width-chars', 5)
         cell.set_property('ellipsize', pango.ELLIPSIZE_NONE)
         col = gtk.TreeViewColumn('%', cell, text=4, sensitive=5)
         col.set_resizable(True)
-        ctree.append_column(col)
+        self.cantree.append_column(col)
 
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.add(ctree)
+        #$$$ hbox for accept button
+        btnhbox = gtk.HBox()
+        canvbox.pack_start(btnhbox, False, False, 2)
 
-        stbar = gtklib.StatusBar()
-        vbox = gtk.VBox()
-        vbox.pack_start(scroller, True, True, 2)
+        #$$$$ accept button in candidate frame
         ac = gtk.Button(_('Accept Match'))
-        hbox = gtk.HBox()
-        hbox.pack_start(ac, False, False, 2)
-        vbox.pack_start(hbox, False, False, 2)
+        btnhbox.pack_start(ac, False, False, 2)
         ac.set_sensitive(False)
 
-        candidateframe = gtk.Frame(_('Candidate Matches'))
-        candidateframe.add(vbox)
-
-        hpaned = gtk.HPaned()
-        hpaned.pack1(unknownframe, True, True)
-        hpaned.pack2(candidateframe, True, True)
-        pos = self._settings.get_value('hpaned', None)
-        if pos: hpaned.set_position(pos)
-
-        topvbox.pack_start(hpaned, True, True, 2)
-
+        # frame for diff
         diffframe = gtk.Frame(_('Differences from Source to Dest'))
+        self.vpaned.pack2(diffframe)
         diffframe.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        diffframe.add(scroller)
 
+        #$ scroll window for diff
+        scroller = gtk.ScrolledWindow()
+        diffframe.add(scroller)
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        #$$ text view for diff
         buf = gtk.TextBuffer()
         buf.create_tag('removed', foreground='#900000')
         buf.create_tag('added', foreground='#006400')
         buf.create_tag('position', foreground='#FF8000')
         buf.create_tag('header', foreground='#000090')
-
         diffview = gtk.TextView(buf)
+        scroller.add(diffview)
         diffview.modify_font(pango.FontDescription('monospace'))
         diffview.set_wrap_mode(gtk.WRAP_NONE)
         diffview.set_editable(False)
-        scroller.add(diffview)
 
-        vpaned = gtk.VPaned()
-        vpaned.pack1(topvbox, True, False)
-        vpaned.pack2(diffframe)
-        pos = self._settings.get_value('vpaned', None)
-        if pos: vpaned.set_position(pos)
+        # status bar
+        self.stbar = gtklib.StatusBar()
+        mainvbox.pack_start(self.stbar, False, False, 2)
 
-        vbox = gtk.VBox()
-        vbox.pack_start(vpaned, True, True, 2)
-        vbox.pack_start(stbar, False, False, 2)
-        self.add(vbox)
-
-        args = (unknowntree, ctree, adjustment, stbar)
+        # register signal handlers
+        args = (self.unktree, self.cantree, self.adjustment, self.stbar)
         fc.connect('pressed', self.find_copies, *args)
         fr.connect('pressed', self.find_renames, *args)
         ac.connect('pressed', self.accept_match, *args)
 
-        unknowntree.get_selection().connect('changed',
+        self.unktree.get_selection().connect('changed',
                       self.unknown_sel_change, fr, fc)
-        ctree.connect('row-activated',
-                      self.candidate_row_act, unknowntree, stbar)
-        ctree.get_selection().connect('changed', self.show_diff, buf, ac)
+        self.cantree.connect('row-activated',
+                      self.candidate_row_act, self.unktree, self.stbar)
+        self.cantree.get_selection().connect('changed', self.show_diff, buf, ac)
         self.connect('delete-event', self.save_settings,
-                settings, hpaned, vpaned, adjustment)
+                self.settings, self.hpaned, self.vpaned, self.adjustment)
         gobject.idle_add(self.refresh, unkmodel)
 
     def set_notify_func(self, func):
@@ -217,28 +253,28 @@ class DetectRenameDialog(gtk.Window):
         return thread.isAlive()
 
     def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
-        self._settings.set_value('vpaned', vpaned.get_position())
-        self._settings.set_value('hpaned', hpaned.get_position())
-        self._settings.set_value('percent', adjustment.get_value())
+        self.settings.set_value('vpaned', vpaned.get_position())
+        self.settings.set_value('hpaned', hpaned.get_position())
+        self.settings.set_value('percent', adjustment.get_value())
         rect = self.get_allocation()
-        self._settings.set_value('dims', (rect.width, rect.height))
-        self._settings.write()
+        self.settings.set_value('dims', (rect.width, rect.height))
+        self.settings.write()
 
-    def find_renames(self, widget, unktree, ctree, adj, stbar):
+    def find_renames(self, widget, unktree, cantree, adj, stbar):
         'User pressed "find renames" button'
-        cmodel = ctree.get_model()
-        cmodel.clear()
-        umodel, upaths = unktree.get_selection().get_selected_rows()
+        canmodel = self.cantree.get_model()
+        canmodel.clear()
+        umodel, upaths = self.unktree.get_selection().get_selected_rows()
         if not upaths:
             return
         tgts = [ umodel[p][0] for p in upaths ]
         q = Queue.Queue()
         thread = thread2.Thread(target=self.search_thread,
-                args=(self.repo.root, q, tgts, adj))
+                args=(self.repo.root, q, tgts, self.adjustment))
         thread.start()
         stbar.begin()
         stbar.set_status_text(_('finding source of ') + ', '.join(tgts))
-        gobject.timeout_add(50, self.search_wait, thread, q, cmodel, stbar)
+        gobject.timeout_add(50, self.search_wait, thread, q, canmodel, stbar)
 
     def search_thread(self, root, q, tgts, adj):
         srcs = []
@@ -255,14 +291,14 @@ class DetectRenameDialog(gtk.Window):
             if (not good or not util.lexists(target)
                 or (os.path.isdir(target) and not os.path.islink(target))):
                 srcs.append(abs)
-            elif not adj and status == 'n':
+            elif not self.adjustment and status == 'n':
                 # looking for copies, so any revisioned file is a
                 # potential source (yes, this will be expensive)
                 # Added and removed files are not considered as copy
                 # sources.
                 srcs.append(abs)
-        if adj:
-            simularity = adj.get_value() / 100.0;
+        if self.adjustment:
+            simularity = self.adjustment.get_value() / 100.0;
             gen = cmdutil.findrenames
         else:
             simularity = 1.0
@@ -270,26 +306,26 @@ class DetectRenameDialog(gtk.Window):
         for old, new, score in gen(self.repo, tgts, srcs, simularity):
             q.put( [old, new, '%d%%' % (score*100)] )
 
-    def search_wait(self, thread, q, cmodel, stbar):
+    def search_wait(self, thread, q, canmodel, stbar):
         while q.qsize():
             source, dest, sim = q.get(0)
-            cmodel.append( [source, hglib.toutf(source), dest, hglib.toutf(dest), sim, True] )
+            canmodel.append( [source, hglib.toutf(source), dest, hglib.toutf(dest), sim, True] )
         if thread.isAlive():
             return True
         else:
             stbar.end()
             return False
 
-    def find_copies(self, widget, unktree, ctree, adj, stbar):
+    def find_copies(self, widget, unktree, cantree, adj, stbar):
         'User pressed "find copies" button'
         # call rename function with simularity = 100%
-        self.find_renames(widget, unktree, ctree, None, stbar)
+        self.find_renames(widget, self.unktree, self.cantree, None, stbar)
 
-    def accept_match(self, widget, unktree, ctree, adj, stbar):
+    def accept_match(self, widget, unktree, cantree, adj, stbar):
         'User pressed "accept match" button'
-        cmodel, upaths = ctree.get_selection().get_selected_rows()
+        canmodel, upaths = self.cantree.get_selection().get_selected_rows()
         for path in upaths:
-            row = cmodel[path]
+            row = canmodel[path]
             src, usrc, dest, udest, percent, sensitive = row
             if not sensitive:
                 continue
@@ -301,14 +337,14 @@ class DetectRenameDialog(gtk.Window):
             if self.notify_func:
                 self.notify_func()
             # Mark all rows with this target file as non-sensitive
-            for row in cmodel:
+            for row in canmodel:
                 if row[2] == dest:
                     row[5] = False
-        self.refresh(unktree.get_model())
+        self.refresh(self.unktree.get_model())
 
-    def candidate_row_act(self, ctree, path, column, unktree, stbar):
+    def candidate_row_act(self, cantree, path, column, unktree, stbar):
         'User activated row of candidate list'
-        self.accept_match(ctree, unktree, ctree, None, stbar)
+        self.accept_match(self.cantree, self.unktree, self.cantree, None, stbar)
 
     def unknown_sel_change(self, selection, fr, fc):
         'User selected a row in the unknown tree'
