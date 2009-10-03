@@ -16,8 +16,7 @@ import Queue
 from mercurial import hg, ui, mdiff, cmdutil, match, util
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util.hglib import toutf, fromutf, diffexpand, RepoError
-from tortoisehg.util import shlib, paths, thread2, settings
+from tortoisehg.util import hglib, shlib, paths, thread2, settings
 
 from tortoisehg.hgtk import gtklib
 
@@ -45,12 +44,12 @@ class DetectRenameDialog(gtk.Window):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except RepoError:
+        except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
         self.repo = repo
         self.notify_func = None
-        path = toutf(os.path.basename(self.repo.root))
+        path = hglib.toutf(os.path.basename(self.repo.root))
         self.set_title(_('Detect Copies/Renames in ') + path)
         self._settings = settings.Settings('guess')
         dims = self._settings.get_value('dims', (800, 600))
@@ -214,7 +213,7 @@ class DetectRenameDialog(gtk.Window):
     def unknown_wait(self, thread, q, unkmodel):
         while q.qsize():
             wfile = q.get(0)
-            unkmodel.append( [wfile, toutf(wfile)] )
+            unkmodel.append( [wfile, hglib.toutf(wfile)] )
         return thread.isAlive()
 
     def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
@@ -274,7 +273,7 @@ class DetectRenameDialog(gtk.Window):
     def search_wait(self, thread, q, cmodel, stbar):
         while q.qsize():
             source, dest, sim = q.get(0)
-            cmodel.append( [source, toutf(source), dest, toutf(dest), sim, True] )
+            cmodel.append( [source, hglib.toutf(source), dest, hglib.toutf(dest), sim, True] )
         if thread.isAlive():
             return True
         else:
@@ -342,19 +341,19 @@ class DetectRenameDialog(gtk.Window):
                 continue
             difflines = difftext.splitlines(True)
             for line in difflines:
-                line = toutf(line)
+                line = hglib.toutf(line)
                 if line.startswith('---') or line.startswith('+++'):
                     buf.insert_with_tags_by_name(bufiter, line, 'header')
                 elif line.startswith('-'):
-                    line = diffexpand(line)
+                    line = hglib.diffexpand(line)
                     buf.insert_with_tags_by_name(bufiter, line, 'removed')
                 elif line.startswith('+'):
-                    line = diffexpand(line)
+                    line = hglib.diffexpand(line)
                     buf.insert_with_tags_by_name(bufiter, line, 'added')
                 elif line.startswith('@@'):
                     buf.insert_with_tags_by_name(bufiter, line, 'position')
                 else:
-                    line = diffexpand(line)
+                    line = hglib.diffexpand(line)
                     buf.insert(bufiter, line)
 
 def run(ui, *pats, **opts):
