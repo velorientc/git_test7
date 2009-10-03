@@ -93,26 +93,25 @@ class LogDetailsDialog(gtk.Dialog):
     def up_clicked(self, button):
         model, seliter = self.tv.get_selection().get_selected()
         i = model.get_iter_first()
-        if model.get_path(seliter) == model.get_path(i):
-            return
-        while True:
-            next = model.iter_next(i)
-            if next == None:
-                return
-            if model.get_path(next) == model.get_path(seliter):
-                model.swap(i, next)
-                self._btn_apply.set_sensitive(True)
-                self.dirty = True
-                return
-            i = next
+        if model.get_path(seliter) != model.get_path(i):
+            while True:
+                next = model.iter_next(i)
+                if next == None:
+                    break
+                if model.get_path(next) == model.get_path(seliter):
+                    model.swap(i, next)
+                    self.dirty = True
+                    break
+                i = next
+        self.update_buttons()
 
     def down_clicked(self, button):
         model, seliter = self.tv.get_selection().get_selected()
         next = model.iter_next(seliter)
         if next:
             model.swap(seliter, next)
-            self._btn_apply.set_sensitive(True)
             self.dirty = True
+        self.update_buttons()
 
     def _btn_apply_clicked(self, button, data=None):
         self.apply_func()
