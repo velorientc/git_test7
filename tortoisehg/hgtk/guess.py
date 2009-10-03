@@ -118,12 +118,12 @@ class DetectRenameDialog(gtk.Window):
         unkvbox.pack_start(btnhbox, False, False, 2)
 
         #$$$$ rename/copy buttons in unknown frame
-        fr = gtk.Button(_('Find Renames'))
-        fr.set_sensitive(False)
-        btnhbox.pack_start(fr, False, False, 2)
-        fc = gtk.Button(_('Find Copies'))
-        fc.set_sensitive(False)
-        btnhbox.pack_start(fc, False, False, 2)
+        self.renamebtn = gtk.Button(_('Find Renames'))
+        self.renamebtn.set_sensitive(False)
+        btnhbox.pack_start(self.renamebtn, False, False, 2)
+        self.copybtn = gtk.Button(_('Find Copies'))
+        self.copybtn.set_sensitive(False)
+        btnhbox.pack_start(self.copybtn, False, False, 2)
 
         #$ frame for candidate list
         candidateframe = gtk.Frame(_('Candidate Matches'))
@@ -178,9 +178,9 @@ class DetectRenameDialog(gtk.Window):
         canvbox.pack_start(btnhbox, False, False, 2)
 
         #$$$$ accept button in candidate frame
-        ac = gtk.Button(_('Accept Match'))
-        btnhbox.pack_start(ac, False, False, 2)
-        ac.set_sensitive(False)
+        self.acceptbtn = gtk.Button(_('Accept Match'))
+        btnhbox.pack_start(self.acceptbtn, False, False, 2)
+        self.acceptbtn.set_sensitive(False)
 
         # frame for diff
         diffframe = gtk.Frame(_('Differences from Source to Dest'))
@@ -193,12 +193,12 @@ class DetectRenameDialog(gtk.Window):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
         #$$ text view for diff
-        buf = gtk.TextBuffer()
-        buf.create_tag('removed', foreground='#900000')
-        buf.create_tag('added', foreground='#006400')
-        buf.create_tag('position', foreground='#FF8000')
-        buf.create_tag('header', foreground='#000090')
-        diffview = gtk.TextView(buf)
+        self.buf = gtk.TextBuffer()
+        self.buf.create_tag('removed', foreground='#900000')
+        self.buf.create_tag('added', foreground='#006400')
+        self.buf.create_tag('position', foreground='#FF8000')
+        self.buf.create_tag('header', foreground='#000090')
+        diffview = gtk.TextView(self.buf)
         scroller.add(diffview)
         diffview.modify_font(pango.FontDescription('monospace'))
         diffview.set_wrap_mode(gtk.WRAP_NONE)
@@ -209,30 +209,27 @@ class DetectRenameDialog(gtk.Window):
         mainvbox.pack_start(self.stbar, False, False, 2)
 
         # register signal handlers
-        args = (self.unktree, self.cantree, self.adjustment, self.stbar)
-        fc.connect('pressed', self.find_copies, *args)
-        fr.connect('pressed', self.find_renames, *args)
-        ac.connect('pressed', self.accept_match, *args)
+        self.copybtn.connect('pressed', lambda b: self.find_copies())
+        self.renamebtn.connect('pressed', lambda b: self.find_renames())
+        self.acceptbtn.connect('pressed', lambda b: self.accept_match())
 
-        self.unktree.get_selection().connect('changed',
-                      self.unknown_sel_change, fr, fc)
-        self.cantree.connect('row-activated',
-                      self.candidate_row_act, self.unktree, self.stbar)
-        self.cantree.get_selection().connect('changed', self.show_diff, buf, ac)
-        self.connect('delete-event', self.save_settings,
-                self.settings, self.hpaned, self.vpaned, self.adjustment)
-        gobject.idle_add(self.refresh, unkmodel)
+        self.unktree.get_selection().connect('changed', self.unknown_sel_change)
+        self.cantree.connect('row-activated', lambda b: self.accept_match())
+        self.cantree.get_selection().connect('changed', self.show_diff, self.buf)
+        self.connect('delete-event', lambda *a: self.save_settings())
+        gobject.idle_add(self.refresh)
 
     def set_notify_func(self, func):
         self.notify_func = func
 
-    def refresh(self, unkmodel):
+    def refresh(self):
         q = Queue.Queue()
+        unkmodel = self.unktree.get_model()
         unkmodel.clear()
         thread = thread2.Thread(target=self.unknown_thread,
                 args=(self.repo.root, q))
         thread.start()
-        gobject.timeout_add(50, self.unknown_wait, thread, q, unkmodel)
+        gobject.timeout_add(50, self.unknown_wait, thread, q)
 
     def unknown_thread(self, root, q):
         matcher = match.always(self.repo.root, self.repo.root)
@@ -246,21 +243,22 @@ class DetectRenameDialog(gtk.Window):
             if not self.repo.dirstate.copied(a):
                 q.put( a )
 
-    def unknown_wait(self, thread, q, unkmodel):
+    def unknown_wait(self, thread, q):
+        unkmodel = self.unktree.get_model()
         while q.qsize():
             wfile = q.get(0)
             unkmodel.append( [wfile, hglib.toutf(wfile)] )
         return thread.isAlive()
 
-    def save_settings(self, w, event, settings, hpaned, vpaned, adjustment):
-        self.settings.set_value('vpaned', vpaned.get_position())
-        self.settings.set_value('hpaned', hpaned.get_position())
-        self.settings.set_value('percent', adjustment.get_value())
+    def save_settings(self):
+        self.settings.set_value('vpaned', self.vpaned.get_position())
+        self.settings.set_value('hpaned', self.hpaned.get_position())
+        self.settings.set_value('percent', self.adjustment.get_value())
         rect = self.get_allocation()
         self.settings.set_value('dims', (rect.width, rect.height))
         self.settings.write()
 
-    def find_renames(self, widget, unktree, cantree, adj, stbar):
+    def find_renames(self):
         'User pressed "find renames" button'
         canmodel = self.cantree.get_model()
         canmodel.clear()
@@ -270,13 +268,13 @@ class DetectRenameDialog(gtk.Window):
         tgts = [ umodel[p][0] for p in upaths ]
         q = Queue.Queue()
         thread = thread2.Thread(target=self.search_thread,
-                args=(self.repo.root, q, tgts, self.adjustment))
+                args=(self.repo.root, q, tgts))
         thread.start()
-        stbar.begin()
-        stbar.set_status_text(_('finding source of ') + ', '.join(tgts))
-        gobject.timeout_add(50, self.search_wait, thread, q, canmodel, stbar)
+        self.stbar.begin()
+        self.stbar.set_status_text(_('finding source of ') + ', '.join(tgts))
+        gobject.timeout_add(50, self.search_wait, thread, q)
 
-    def search_thread(self, root, q, tgts, adj):
+    def search_thread(self, root, q, tgts):
         srcs = []
         audit_path = util.path_auditor(self.repo.root)
         m = cmdutil.match(self.repo)
@@ -306,22 +304,23 @@ class DetectRenameDialog(gtk.Window):
         for old, new, score in gen(self.repo, tgts, srcs, simularity):
             q.put( [old, new, '%d%%' % (score*100)] )
 
-    def search_wait(self, thread, q, canmodel, stbar):
+    def search_wait(self, thread, q):
+        canmodel = self.cantree.get_model()
         while q.qsize():
             source, dest, sim = q.get(0)
             canmodel.append( [source, hglib.toutf(source), dest, hglib.toutf(dest), sim, True] )
         if thread.isAlive():
             return True
         else:
-            stbar.end()
+            self.stbar.end()
             return False
 
-    def find_copies(self, widget, unktree, cantree, adj, stbar):
+    def find_copies(self):
         'User pressed "find copies" button'
         # call rename function with simularity = 100%
-        self.find_renames(widget, self.unktree, self.cantree, None, stbar)
+        self.find_renames()
 
-    def accept_match(self, widget, unktree, cantree, adj, stbar):
+    def accept_match(self):
         'User pressed "accept match" button'
         canmodel, upaths = self.cantree.get_selection().get_selected_rows()
         for path in upaths:
@@ -340,27 +339,23 @@ class DetectRenameDialog(gtk.Window):
             for row in canmodel:
                 if row[2] == dest:
                     row[5] = False
-        self.refresh(self.unktree.get_model())
+        self.refresh()
 
-    def candidate_row_act(self, cantree, path, column, unktree, stbar):
-        'User activated row of candidate list'
-        self.accept_match(self.cantree, self.unktree, self.cantree, None, stbar)
-
-    def unknown_sel_change(self, selection, fr, fc):
+    def unknown_sel_change(self, selection):
         'User selected a row in the unknown tree'
         model, upaths = selection.get_selected_rows()
         sensitive = upaths and True or False
-        fr.set_sensitive(sensitive)
-        fc.set_sensitive(sensitive)
+        self.renamebtn.set_sensitive(sensitive)
+        self.copybtn.set_sensitive(sensitive)
 
-    def show_diff(self, selection, buf, ac):
+    def show_diff(self, selection):
         'User selected a row in the candidate tree'
         model, cpaths = selection.get_selected_rows()
         sensitive = cpaths and True or False
-        ac.set_sensitive(sensitive)
+        self.acceptbtn.set_sensitive(sensitive)
 
-        buf.set_text('')
-        bufiter = buf.get_start_iter()
+        self.buf.set_text('')
+        bufiter = self.buf.get_start_iter()
         for path in cpaths:
             row = model[path]
             src, usrc, dest, udest, percent, sensitive = row
@@ -373,24 +368,24 @@ class DetectRenameDialog(gtk.Window):
             difftext = mdiff.unidiff(rr, '', aa, '', src, dest, None, opts=opts)
             if not difftext:
                 l = _('== %s and %s have identical contents ==\n\n') % (src, dest)
-                buf.insert(bufiter, l)
+                self.buf.insert(bufiter, l)
                 continue
             difflines = difftext.splitlines(True)
             for line in difflines:
                 line = hglib.toutf(line)
                 if line.startswith('---') or line.startswith('+++'):
-                    buf.insert_with_tags_by_name(bufiter, line, 'header')
+                    self.buf.insert_with_tags_by_name(bufiter, line, 'header')
                 elif line.startswith('-'):
                     line = hglib.diffexpand(line)
-                    buf.insert_with_tags_by_name(bufiter, line, 'removed')
+                    self.buf.insert_with_tags_by_name(bufiter, line, 'removed')
                 elif line.startswith('+'):
                     line = hglib.diffexpand(line)
-                    buf.insert_with_tags_by_name(bufiter, line, 'added')
+                    self.buf.insert_with_tags_by_name(bufiter, line, 'added')
                 elif line.startswith('@@'):
-                    buf.insert_with_tags_by_name(bufiter, line, 'position')
+                    self.buf.insert_with_tags_by_name(bufiter, line, 'position')
                 else:
                     line = hglib.diffexpand(line)
-                    buf.insert(bufiter, line)
+                    self.buf.insert(bufiter, line)
 
 def run(ui, *pats, **opts):
     return DetectRenameDialog()
