@@ -23,7 +23,7 @@ from tortoisehg.util import hglib, paths, thread2
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 
-from tortoisehg.hgtk import gdialog, gtklib, hgcmd, logfilter, gorev
+from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
 
