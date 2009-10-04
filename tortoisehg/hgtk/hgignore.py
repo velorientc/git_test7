@@ -24,11 +24,16 @@ class HgIgnoreDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'ignore.ico')
         gtklib.set_tortoise_keys(self)
-
-        self.root = paths.find_root()
-        base = os.path.basename(self.root)
-        self.set_title(_('Ignore filter for ') + hglib.toutf(base))
         self.set_default_size(630, 400)
+
+        try:
+            repo = hg.repository(ui.ui(), path=paths.find_root())
+        except hglib.RepoError:
+            gobject.idle_add(self.destroy)
+            return
+        self.repo = repo
+        base = os.path.basename(repo.root)
+        self.set_title(_('Ignore filter for ') + hglib.toutf(base))
         self.notify_func = None
 
         # vbox for dialog main
@@ -67,8 +72,6 @@ class HgIgnoreDialog(gtk.Window):
         regexp_entry.connect('activate', self.add_regexp)
         self.regexp_entry = regexp_entry
 
-        try: repo = hg.repository(ui.ui(), path=self.root)
-        except: self.destroy()
         ignorefiles = [repo.wjoin('.hgignore')]
         for name, value in repo.ui.configitems('ui'):
             if name == 'ignore' or name.startswith('ignore.'):
@@ -188,19 +191,19 @@ class HgIgnoreDialog(gtk.Window):
         self.glob_entry.set_text(model[upaths][0])
 
     def add_glob(self, widget):
-        newglob = hglib.fromutf(glob_entry.get_text())
+        newglob = hglib.fromutf(self.glob_entry.get_text())
         if newglob == '':
             return
         newglob = 'glob:' + newglob
         try:
-            match.match(self.root, '', [], [newglob])
+            match.match(self.repo.root, '', [], [newglob])
         except util.Abort, inst:
             gdialog.Prompt(_('Invalid glob expression'), str(inst),
                            self).run()
             return
         self.ignorelines.append(newglob)
         self.write_ignore_lines()
-        glob_entry.set_text('')
+        self.glob_entry.set_text('')
         self.refresh()
 
     def add_regexp(self, widget):
@@ -208,7 +211,7 @@ class HgIgnoreDialog(gtk.Window):
         if newregexp == '':
             return
         try:
-            match.match(self.root, '', [], ['relre:' + newregexp])
+            match.match(self.repo.root, '', [], ['relre:' + newregexp])
             re.compile(newregexp)
         except (util.Abort, re.error), inst:
             gdialog.Prompt(_('Invalid regexp expression'), str(inst),
@@ -223,11 +226,9 @@ class HgIgnoreDialog(gtk.Window):
         self.notify_func = func
 
     def refresh(self):
-        try: repo = hg.repository(ui.ui(), path=self.root)
-        except: self.destroy()
-        matcher = match.always(repo.root, repo.root)
-        changes = repo.dirstate.status(matcher, ignored=False, clean=False,
-                                       unknown=True)
+        matcher = match.always(self.repo.root, self.repo.root)
+        changes = self.repo.dirstate.status(matcher, ignored=False,
+                                            clean=False, unknown=True)
         (lookup, modified, added, removed,
          deleted, unknown, ignored, clean) = changes
         self.unkmodel.clear()
@@ -246,7 +247,6 @@ class HgIgnoreDialog(gtk.Window):
             model.append([hglib.toutf(line.strip())])
             self.ignorelines.append(line.strip())
         self.pattree.set_model(model)
-        self.repo = repo
 
     def write_ignore_lines(self):
         if self.doseoln:
