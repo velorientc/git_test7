@@ -1152,7 +1152,7 @@ class GLog(gdialog.GDialog):
         if self.forcepush:
             cmdline += ['--force']
         cmdline += [remote_path]
-        dlg = hgcmd.CmdDialog(cmdline, text='hg push')
+        dlg = hgcmd.CmdDialog(cmdline, text=' '.join(cmdline[:-1]))
         dlg.show_all()
         dlg.run()
         dlg.hide()
