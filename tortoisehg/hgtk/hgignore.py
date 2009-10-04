@@ -31,13 +31,18 @@ class HgIgnoreDialog(gtk.Window):
         self.set_default_size(630, 400)
         self.notify_func = None
 
+        # vbox for dialog main
         mainvbox = gtk.VBox()
+        self.add(mainvbox)
+        mainvbox.set_border_width(2)
 
+        ## hbox for glob entry
         hbox = gtk.HBox()
+        mainvbox.pack_start(hbox, False, False)
         lbl = gtk.Label(_('Glob:'))
+        hbox.pack_start(lbl, False, False, 4)
         lbl.set_property('width-chars', 9)
         lbl.set_alignment(1.0, 0.5)
-        hbox.pack_start(lbl, False, False, 4)
         glob_entry = gtk.Entry()
         hbox.pack_start(glob_entry, True, True, 4)
         glob_button = gtk.Button(_('Add'))
@@ -46,21 +51,20 @@ class HgIgnoreDialog(gtk.Window):
         glob_entry.connect('activate', self.add_glob, glob_entry)
         glob_entry.set_text(hglib.toutf(fileglob))
         self.glob_entry = glob_entry
-        mainvbox.pack_start(hbox, False, False)
 
+        ## hbox for regexp entry
         hbox = gtk.HBox()
+        mainvbox.pack_start(hbox, False, False)
         lbl = gtk.Label(_('Regexp:'))
+        hbox.pack_start(lbl, False, False, 4)
         lbl.set_property('width-chars', 9)
         lbl.set_alignment(1.0, 0.5)
-        hbox.pack_start(lbl, False, False, 4)
         regexp_entry = gtk.Entry()
         hbox.pack_start(regexp_entry, True, True, 4)
         regexp_button = gtk.Button(_('Add'))
         hbox.pack_start(regexp_button, False, False, 4)
         regexp_button.connect('clicked', self.add_regexp, regexp_entry)
         regexp_entry.connect('activate', self.add_regexp, regexp_entry)
-        mainvbox.pack_start(hbox, False, False)
-        mainvbox.set_border_width(2)
 
         try: repo = hg.repository(ui.ui(), path=self.root)
         except: self.destroy()
@@ -69,19 +73,34 @@ class HgIgnoreDialog(gtk.Window):
             if name == 'ignore' or name.startswith('ignore.'):
                 ignorefiles.append(os.path.expanduser(value))
 
+        ## ignore file combo (if need)
         if len(ignorefiles) > 1:
             combo = gtk.combo_box_new_text()
+            mainvbox.pack_start(combo, False, False, 4)
             for f in ignorefiles:
                 combo.append_text(hglib.toutf(f))
             combo.set_active(0)
             combo.connect('changed', self.fileselect)
-            mainvbox.pack_start(combo, False, False, 4)
         self.ignorefile = ignorefiles[0]
 
+        ## hbox for filter & unknown list
         hbox = gtk.HBox()
+        mainvbox.pack_start(hbox, True, True)
+
+        ### frame for filter list & button
         frame = gtk.Frame(_('Filters'))
         hbox.pack_start(frame, True, True, 4)
+        vbox = gtk.VBox()
+        frame.add(vbox)
+        vbox.set_border_width(2)
+
+        #### filter list
+        scrolledwindow = gtk.ScrolledWindow()
+        vbox.pack_start(scrolledwindow, True, True, 2)
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.set_border_width(4)
         pattree = gtk.TreeView()
+        scrolledwindow.add(pattree)
         pattree.set_enable_search(False)
         pattree.set_reorderable(False)
         sel = pattree.get_selection()
@@ -90,49 +109,46 @@ class HgIgnoreDialog(gtk.Window):
         pattree.append_column(col)
         pattree.set_headers_visible(False)
         self.pattree = pattree
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.set_border_width(4)
-        scrolledwindow.add(pattree)
-        vbox = gtk.VBox()
-        vbox.pack_start(scrolledwindow, True, True, 2)
+
+        #### remove button
         bhbox = gtk.HBox()
+        vbox.pack_start(bhbox, False, False, 2)
         remove = gtk.Button(_('Remove Selected'))
+        bhbox.pack_start(remove, False, False, 2)
         remove.connect('pressed', self.remove_pressed, sel)
         remove.set_sensitive(False)
-        bhbox.pack_start(remove, False, False, 2)
-        vbox.pack_start(bhbox, False, False, 2)
-        vbox.set_border_width(2)
-        frame.add(vbox)
 
+        ### frame for unknown file list & button
         frame = gtk.Frame(_('Unknown Files'))
         hbox.pack_start(frame, True, True, 4)
+        vbox = gtk.VBox()
+        frame.add(vbox)
+        vbox.set_border_width(2)
+
+        #### unknown file list
+        scrolledwindow = gtk.ScrolledWindow()
+        vbox.pack_start(scrolledwindow, True, True, 2)
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.set_border_width(4)
         unknowntree = gtk.TreeView()
+        scrolledwindow.add(unknowntree)
         unknowntree.set_search_equal_func(self.unknown_search)
         col = gtk.TreeViewColumn(_('Files'), gtk.CellRendererText(), text=0)
         unknowntree.append_column(col)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.set_border_width(4)
-        scrolledwindow.add(unknowntree)
         model = gtk.ListStore(str, str)
         unknowntree.set_model(model)
         unknowntree.set_headers_visible(False)
         self.unkmodel = model
-        vbox = gtk.VBox()
-        vbox.pack_start(scrolledwindow, True, True, 2)
+
+        #### refresh button
         bhbox = gtk.HBox()
+        vbox.pack_start(bhbox, False, False, 2)
         refresh = gtk.Button(_('Refresh'))
+        bhbox.pack_start(refresh, False, False, 2)
         refresh.connect('pressed', self.refresh_clicked, sel)
         self.connect('thg-refresh', self.thgrefresh)
-        bhbox.pack_start(refresh, False, False, 2)
-        vbox.pack_start(bhbox, False, False, 2)
-        vbox.set_border_width(2)
-        frame.add(vbox)
 
-        mainvbox.pack_start(hbox, True, True)
-        self.add(mainvbox)
-
+        # prepare to show
         glob_entry.grab_focus()
         pattree.get_selection().connect('changed', self.pattree_rowchanged, remove)
         unknowntree.get_selection().connect('changed', self.unknown_rowchanged)
