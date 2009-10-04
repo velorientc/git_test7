@@ -36,13 +36,11 @@ class UpdateDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-            self.repo = repo
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
-
-        reponame = hglib.toutf(os.path.basename(repo.root))
-        self.set_title(_('Update - %s') % reponame)
+        self.repo = repo
+        self.set_title(_('Update - %s') % hglib.get_reponame(repo))
 
         # add dialog buttons
         self.updatebtn = self.add_button(_('Update'), gtk.RESPONSE_OK)

@@ -194,6 +194,15 @@ def hgcmd_toq(q, *args):
         u.setconfig('defaults', k, '')
     return dispatch._dispatch(u, list(args))
 
+def get_reponame(repo):
+    if repo.ui.config('tortoisehg', 'fullpath', False):
+        name = repo.root
+    elif repo.ui.config('web', 'name', False):
+        name = repo.ui.config('web', 'name')
+    else:
+        name = os.path.basename(repo.root)
+    return toutf(name)
+
 def displaytime(date):
     return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
 

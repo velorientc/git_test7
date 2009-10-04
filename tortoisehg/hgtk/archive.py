@@ -15,196 +15,253 @@ from mercurial import hg, ui
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
-from tortoisehg.hgtk import hgcmd, gtklib
+from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
-_working_dir_parent_ = _('= Working Directory Parent =')
+WD_PARENT = _('= Working Directory Parent =')
+MODE_NORMAL  = 'normal'
+MODE_WORKING = 'working'
 
-class ArchiveDialog(gtk.Window):
+class ArchiveDialog(gtk.Dialog):
     """ Dialog to archive a Mercurial repo """
+
     def __init__(self, rev=None):
         """ Initialize the Dialog """
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menucheckout.ico')
         gtklib.set_tortoise_keys(self)
+        self.set_resizable(False)
+        self.set_has_separator(False)
+        self.connect('response', self.dialog_response)
 
-        self.set_default_size(550, 120)
-        self.notify_func = None
+        # buttons
+        self.archivebtn = self.add_button(_('Archive'), gtk.RESPONSE_OK)
+        self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
+        self.set_title(_('Archive - %s') % hglib.get_reponame(repo))
 
-        title = _('Archive - %s') % hglib.toutf(os.path.basename(repo.root))
-        self.set_title(title)
+        # layout table
+        self.table = table = gtklib.LayoutTable()
+        self.vbox.pack_start(table, True, True, 2)
 
-        vbox = gtk.VBox()
-        self.add(vbox)
-
-        hbox = gtk.HBox()
-        lbl = gtk.Label(_('Archive revision:'))
-        hbox.pack_start(lbl, False, False, 2)
-
-        # revisions editable combo box
-        combo = gtk.combo_box_entry_new_text()
-        hbox.pack_start(combo, True, True, 2)
-        vbox.pack_start(hbox, False, False, 10)
+        ## revision combo
+        self.combo = gtk.combo_box_entry_new_text()
+        self.combo.child.set_width_chars(24)
+        self.combo.child.connect('activate',
+                                 lambda b: self.response(gtk.RESPONSE_OK))
         if rev:
-            combo.append_text(str(rev))
+            self.combo.append_text(str(rev))
         else:
-            combo.append_text(_working_dir_parent_)
-        combo.set_active(0)
+            self.combo.append_text(WD_PARENT)
+        self.combo.set_active(0)
         for b in repo.branchtags():
-            combo.append_text(b)
+            self.combo.append_text(b)
         tags = list(repo.tags())
         tags.sort()
         tags.reverse()
         for t in tags:
-            combo.append_text(t)
+            self.combo.append_text(t)
 
-        vbox.add(self.get_destination_container(self.get_default_path()))
-        vbox.add(self.get_type_container())
+        table.add_row(_('Archive revision:'), self.combo)
 
-        hbbox = gtk.HButtonBox()
-        hbbox.set_layout(gtk.BUTTONBOX_END)
-        vbox.pack_start(hbbox, False, False, 2)
-        close = gtk.Button(_('Close'))
-        close.connect('clicked', lambda x: self.destroy())
-
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        key, modifier = gtk.accelerator_parse('Escape')
-        close.add_accelerator('clicked', accelgroup, key, 0,
-                gtk.ACCEL_VISIBLE)
-        hbbox.add(close)
-
-        archive = gtk.Button(_('Archive'))
-        archive.connect('clicked', self.archive, combo, repo)
-        mod = gtklib.get_thg_modifier()
-        key, modifier = gtk.accelerator_parse(mod+'Return')
-        archive.add_accelerator('clicked', accelgroup, key, modifier,
-                gtk.ACCEL_VISIBLE)
-        hbbox.add(archive)
-        archive.grab_focus()
-
-        entry = combo.child
-        entry.connect('activate', self.entry_activated, archive, combo, repo)
-
-    def get_type_container(self):
-        """Return a frame containing the supported archive types"""
-        frame = gtk.Frame(_('Archive type'))
-        vbox = gtk.VBox()
-
-        self.filesradio = gtk.RadioButton(None, _('Directory of files'))
-        self.tarradio = gtk.RadioButton(self.filesradio, _('Uncompressed tar archive'))
-        self.tbz2radio = gtk.RadioButton(self.filesradio, _('Tar archive compressed using bzip2'))
-        self.tgzradio = gtk.RadioButton(self.filesradio, _('Tar archive compressed using gzip'))
-        self.uzipradio = gtk.RadioButton(self.filesradio, _('Uncompressed zip archive'))
-        self.zipradio = gtk.RadioButton(self.filesradio, _('Zip archive compressed using deflate'))
-
-        vbox.pack_start(self.filesradio, True, True, 2)
-        vbox.pack_start(self.tarradio, True, True, 2)
-        vbox.pack_start(self.tbz2radio, True, True, 2)
-        vbox.pack_start(self.tgzradio, True, True, 2)
-        vbox.pack_start(self.uzipradio, True, True, 2)
-        vbox.pack_start(self.zipradio, True, True, 2)
-        frame.add(vbox)
-        frame.set_border_width(2)
-        return frame
-
-    def get_destination_container(self, default_path):
-        """Return an hbox containing the widgets for the destination path"""
-        hbox = gtk.HBox()
-        lbl = gtk.Label(_('Destination Path:'))
-
-        # create drop-down list for source paths
-        self.destlist = gtk.ListStore(str)
-        destcombo = gtk.ComboBoxEntry(self.destlist, 0)
+        ## dest combo & browse button
+        destcombo = gtk.combo_box_entry_new_text()
         self.destentry = destcombo.get_child()
-        self.destentry.set_text(default_path)
-        self.destentry.set_position(-1)
-
-        # replace the drop-down widget so we can modify it's properties
-        destcombo.clear()
-        cell = gtk.CellRendererText()
-        cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
-        destcombo.pack_start(cell)
-        destcombo.add_attribute(cell, 'text', 0)
+        self.destentry.set_width_chars(46)
 
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.browse_clicked)
-        hbox.pack_start(lbl, False, False)
-        hbox.pack_start(destcombo, True, True, 2)
-        hbox.pack_end(destbrowse, False, False, 5)
-        return hbox
 
-    def get_default_path(self):
-        """Return the default destination path"""
-        return hglib.toutf(os.getcwd())
+        table.add_row(_('Destination path:'), destcombo, 0, destbrowse)
 
-    def get_save_file_dialog(self, filter):
-        """Return a configured save file dialog"""
-        return gtklib.NativeSaveFileDialogWrapper(
-            InitialDir=self.destentry.get_text(), 
-            Title=_('Select Destination File'),
-            Filter=filter)
+        ## archive types
+        self.filesradio = gtk.RadioButton(None, _('Directory of files'))
+        self.filesradio.connect('toggled', self.type_changed)
+        table.add_row(_('Archive types:'), self.filesradio)
+        def add_type(label):
+            radio = gtk.RadioButton(self.filesradio, label)
+            radio.connect('toggled', self.type_changed)
+            table.add_row(None, radio)
+            return radio
+        self.tarradio = add_type(_('Uncompressed tar archive'))
+        self.tbz2radio = add_type(_('Tar archive compressed using bzip2'))
+        self.tgzradio = add_type(_('Tar archive compressed using gzip'))
+        self.uzipradio = add_type(_('Uncompressed zip archive'))
+        self.zipradio = add_type(_('Zip archive compressed using deflate'))
+
+        # register signal handlers
+        self.combo.connect('changed', lambda c: self.update_path())
+
+        # prepare to show
+        self.update_path(hglib.toutf(repo.root))
+        self.archivebtn.grab_focus()
+        gobject.idle_add(self.after_init)
+
+    def after_init(self):
+        # CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, True, True, 6)
+
+        # abort button
+        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
+        self.abortbtn.hide()
+
+    def dialog_response(self, dialog, response_id):
+        def abort():
+            self.cmd.stop()
+            self.cmd.show_log()
+            self.switch_to(MODE_NORMAL, cmd=False)
+        # Archive button
+        if response_id == gtk.RESPONSE_OK:
+            self.archive()
+        # Close button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            if self.cmd.is_alive():
+                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
+                                      _('Do you want to abort?')).run()
+                if ret == gtk.RESPONSE_YES:
+                    abort()
+            else:
+                self.destroy()
+                return # close dialog
+        # Abort button
+        elif response_id == gtk.RESPONSE_CANCEL:
+            abort()
+        else:
+            raise _('unexpected response id: %s') % response_id
+
+        self.run() # doesn't close dialog
+
+    def type_changed(self, radio):
+        if not radio.get_active():
+            return
+        self.update_path()
+
+    def update_path(self, path=None):
+        def remove_ext(path):
+            for ext in ('.tar', '.tar.bz2', '.tar.gz', '.zip'):
+                if path.endswith(ext):
+                    return path.replace(ext, '')
+            return path
+        def remove_rev(path):
+            model = self.combo.get_model()
+            for rev in ['_' + rev[0] for rev in model]:
+                if path.endswith(rev):
+                    return path.replace(rev, '')
+            return path
+        def add_rev(path):
+            rev = self.combo.get_active_text()
+            return '%s_%s' % (path, rev)
+        def add_ext(path):
+            select = self.get_selected_archive_type()
+            if select['type'] != 'files':
+                path += select['ext']
+            return path
+        if path is None:
+            path = self.destentry.get_text()
+        path = remove_ext(path)
+        path = remove_rev(path)
+        path = add_rev(path)
+        path = add_ext(path)
+        self.destentry.set_text(path)
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
-        dict = {}
         if self.tarradio.get_active():
-            dict['type'] = 'tar'
-            dict['filter'] = ((_('Tar archives'), '*.tar'),)
+            return {'type': 'tar', 'ext': '.tar',
+                    'label': _('Tar archives')}
         elif self.tbz2radio.get_active():
-            dict['type'] = 'tbz2'
-            dict['filter'] = ((_('Bzip2 tar archives'), '*.tbz2'),)
+            return {'type': 'tbz2', 'ext': '.tar.bz2',
+                    'label': _('Bzip2 tar archives')}
         elif self.tgzradio.get_active():
-            dict['type'] = 'tgz'
-            dict['filter'] = ((_('Gzip tar archives'), '*.tgz'),)
+            return {'type': 'tgz', 'ext': '.tar.gz',
+                    'label': _('Gzip tar archives')}
         elif self.uzipradio.get_active():
-            dict['type'] = 'uzip'
-            dict['filter'] = ((_('Uncompressed zip archives'), '*.uzip'),)
+            return {'type': 'uzip', 'ext': '.zip',
+                    'label': ('Uncompressed zip archives')}
         elif self.zipradio.get_active():
-            dict['type'] = 'zip'
-            dict['filter'] = ((_('Compressed zip archives'), '*.zip'),)
-        else:
-            dict['type'] = 'files'
-
-        return dict
-
-    def entry_activated(self, entry, button, combo, repo):
-        self.update(button, combo, repo)
+            return {'type': 'zip', 'ext': '.zip',
+                    'label': _('Compressed zip archives')}
+        return {'type': 'files', 'ext': None, 'label': None}
 
     def browse_clicked(self, button):
         """Select the destination directory or file"""
-        archive_type = self.get_selected_archive_type()
-        if archive_type['type'] == 'files':
+        dest = hglib.fromutf(self.destentry.get_text())
+        if not os.path.exists(dest):
+            dest = os.path.dirname(dest)
+        select = self.get_selected_archive_type()
+        if select['type'] == 'files':
             response = gtklib.NativeFolderSelectDialog(
-                          initial=self.destentry.get_text(),
-                          title=_('Select Destination Folder')).run()
+                            initial=dest,
+                            title=_('Select Destination Folder')).run()
         else:
-            filter = archive_type['filter']
-            response = self.get_save_file_dialog(filter).run()
-
+            ext = '*' + select['ext']
+            label = '%s (%s)' % (select['label'], ext)
+            response = gtklib.NativeSaveFileDialogWrapper(
+                            InitialDir=dest, 
+                            Title=_('Select Destination File'),
+                            Filter=((label, ext),
+                                    (_('All Files (*.*)'), '*.*'))).run()
         if response:
             self.destentry.set_text(response)
 
-    def archive(self, button, combo, repo):
-        rev = combo.get_active_text()
+    def switch_to(self, mode, cmd=True):
+        if mode == MODE_NORMAL:
+            normal = True
+            self.closebtn.grab_focus()
+        elif mode == MODE_WORKING:
+            normal = False
+            self.abortbtn.grab_focus()
+        else:
+            raise _('unknown mode name: %s') % mode
+        working = not normal
+
+        self.table.set_sensitive(normal)
+        self.archivebtn.set_property('visible', normal)
+        self.closebtn.set_property('visible', normal)
+        if cmd:
+            self.cmd.set_property('visible', working)
+        self.abortbtn.set_property('visible', working)
+
+    def archive(self):
+        # verify input
+        type = self.get_selected_archive_type()['type']
+        dest = self.destentry.get_text()
+        if os.path.exists(dest):
+            if type != 'files':
+                ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
+                            _('The destination "%s" already exists!\n\n'
+                              'Do you want to overwrite it?') % dest).run()
+                if ret != gtk.RESPONSE_YES:
+                    return False
+            elif len(os.listdir(dest)) > 0:
+                ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
+                            _('The directory "%s" isn\'t empty!\n\n'
+                              'Do you want to overwrite it?') % dest).run()
+                if ret != gtk.RESPONSE_YES:
+                    return False
 
         cmdline = ['hg', 'archive', '--verbose']
-        if rev != _working_dir_parent_:
+        rev = self.combo.get_active_text()
+        if rev != WD_PARENT:
             cmdline.append('--rev')
             cmdline.append(rev)
-
         cmdline.append('-t')
-        cmdline.append(self.get_selected_archive_type()['type'])
-        cmdline.append(hglib.fromutf(self.destentry.get_text()))
+        cmdline.append(type)
+        cmdline.append(hglib.fromutf(dest))
 
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.run()
-        dlg.hide()
+        def cmd_done(returncode):
+            self.switch_to(MODE_NORMAL, cmd=False)
+            if returncode == 0 and not self.cmd.is_show_log():
+                self.response(gtk.RESPONSE_CLOSE)
+        self.switch_to(MODE_WORKING)
+        self.cmd.execute(cmdline, cmd_done)
 
 def run(ui, *pats, **opts):
     return ArchiveDialog(opts.get('rev'))

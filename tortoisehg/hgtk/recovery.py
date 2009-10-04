@@ -26,16 +26,18 @@ class RecoveryDialog(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'general.ico')
         gtklib.set_tortoise_keys(self)
-
-        self.root = paths.find_root()
-        self.selected_path = None
-        self.hgthread = None
-        self.connect('delete-event', self._delete)
-
         self.set_default_size(600, 400)
+        self.connect('delete-event', self._delete)
+        self.hgthread = None
 
-        name = os.path.basename(os.path.abspath(self.root))
-        self.set_title(_('TortoiseHg Recovery - ') + hglib.toutf(name))
+        try:
+            repo = hg.repository(ui.ui(), path=paths.find_root())
+        except hglib.RepoError:
+            gobject.idle_add(self.destroy)
+            return
+        self.repo = repo
+        self.reponame = hglib.get_reponame(repo)
+        self.set_title(_('Recovery - %s') % self.reponame)
 
         # toolbar
         self.tbar = gtk.Toolbar()
@@ -118,25 +120,20 @@ class RecoveryDialog(gtk.Window):
 
     def _clean_clicked(self, toolbutton, data=None):
         response = gdialog.Confirm(_('Confirm clean repository'), [], self,
-                _("Clean repository '%s' ?") % os.path.basename(self.root)).run()
+                _("Clean repository '%s' ?") % self.reponame).run()
         if response != gtk.RESPONSE_YES:
             return
-        try:
-            repo = hg.repository(ui.ui(), path=self.root)
-        except hglib.RepoError:
-            self.write(_('Unable to find repo at %s\n') % (self.root), False)
-            return
-        pl = repo.parents()
+        pl = self.repo.parents()
         cmd = ['update', '--clean', '--rev', str(pl[0].rev())]
         self._exec_cmd(cmd, postfunc=self._notify)
 
     def _notify(self, ret, *args):
         time.sleep(0.5)     # give fs some time to pick up changes
-        shlib.shell_notify([self.root])
+        shlib.shell_notify([self.repo.root])
 
     def _rollback_clicked(self, toolbutton, data=None):
         response = gdialog.Confirm(_('Confirm rollback repository'), [], self,
-                _("Rollback repository '%s' ?") % os.path.basename(self.root)).run()
+                _("Rollback repository '%s' ?") % self.reponame).run()
         if response != gtk.RESPONSE_YES:
             return
         cmd = ['rollback']
@@ -165,7 +162,7 @@ class RecoveryDialog(gtk.Window):
         cmdline = cmd
         cmdline.append('--verbose')
         cmdline.append('--repository')
-        cmdline.append(self.root)
+        cmdline.append(self.repo.root)
 
         # show command to be executed
         self.write("", False)
