@@ -32,8 +32,7 @@ class HgIgnoreDialog(gtk.Window):
             gobject.idle_add(self.destroy)
             return
         self.repo = repo
-        base = os.path.basename(repo.root)
-        self.set_title(_('Ignore filter for ') + hglib.toutf(base))
+        self.set_title(_('Ignore filter - %s') % hglib.get_reponame(repo))
         self.notify_func = None
 
         # vbox for dialog main
