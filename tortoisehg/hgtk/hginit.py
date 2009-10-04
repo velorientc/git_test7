@@ -52,7 +52,7 @@ class InitDialog(gtk.Dialog):
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.dest_clicked)
 
-        table.add_row(_('Destination:'), self.destentry, destbrowse)
+        table.add_row(_('Destination:'), self.destentry, 0, destbrowse)
 
         # options
         self.optspfiles = gtk.CheckButton(
