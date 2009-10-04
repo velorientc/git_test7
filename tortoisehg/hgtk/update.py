@@ -19,7 +19,7 @@ from tortoisehg.util.hglib import LookupError, RepoLookupError, RepoError
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
 MODE_NORMAL   = 'normal'
-MODE_UPDATING = 'updating'
+MODE_WORKING = 'working'
 
 class UpdateDialog(gtk.Dialog):
     """ Dialog to update Mercurial repo """
@@ -32,7 +32,6 @@ class UpdateDialog(gtk.Dialog):
         self.set_size_request(450, -1)
         self.set_has_separator(False)
         self.connect('response', self.dialog_response)
-        self.connect('delete-event', self.delete_event)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -54,8 +53,8 @@ class UpdateDialog(gtk.Dialog):
         ## revision label & combobox
         self.revcombo = combo = gtk.combo_box_entry_new_text()
         entry = combo.child
-        entry.connect('activate', lambda b: self.update(repo))
         entry.set_width_chars(38)
+        entry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
         table.add_row(_('Update to:'), combo, padding=False)
 
         ## update method
@@ -106,10 +105,9 @@ class UpdateDialog(gtk.Dialog):
         self.cmd.hide()
         self.vbox.pack_start(self.cmd, True, True, 6)
 
-        # cancel button
-        self.cancelbtn = gtk.Button(_('Cancel'))
-        self.cancelbtn.connect('clicked', self.cancel_clicked)
-        self.action_area.pack_end(self.cancelbtn)
+        # abort button
+        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
+        self.abortbtn.hide()
 
     def build_summaries(self):
         table = self.tables['summary']
@@ -144,44 +142,50 @@ class UpdateDialog(gtk.Dialog):
         table.show_all()
         self.revcombo.connect('changed', lambda b: self.update_summaries())
 
-    def dialog_response(self, dialog, response_id):
-        if response_id == gtk.RESPONSE_OK:
-            self.update(self.repo)
-        elif not self.cmd.is_alive():
-            self.destroy()
-
-    def delete_event(self, dialog, event):
-        if self.cmd.is_alive():
-            ret = gdialog.Confirm(_('Confirm Cancel'), [], self,
-                                  _('Do you want to cancel updating?')).run()
-            if ret == gtk.RESPONSE_YES:
-                self.cancel_clicked(self.cancelbtn)
-            return True
-        self.destroy()
-
-    def cancel_clicked(self, button):
+    def abort(self):
         self.cmd.stop()
         self.cmd.show_log()
         self.switch_to(MODE_NORMAL, cmd=False)
+
+    def dialog_response(self, dialog, response_id):
+        # Update button
+        if response_id == gtk.RESPONSE_OK:
+            self.update(self.repo)
+        # Close button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            if self.cmd.is_alive():
+                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
+                                      _('Do you want to abort?')).run()
+                if ret == gtk.RESPONSE_YES:
+                    self.abort()
+            else:
+                return # close dialog
+        # Abort button
+        elif response_id == gtk.RESPONSE_CANCEL:
+            self.abort()
+        else:
+            raise _('unexpected response id: %s') % response_id
+
+        self.run() # don't close dialog
 
     def switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
             normal = True
             self.closebtn.grab_focus()
-        elif mode == MODE_UPDATING:
+        elif mode == MODE_WORKING:
             normal = False
-            self.cancelbtn.grab_focus()
+            self.abortbtn.grab_focus()
         else:
             raise _('unknown mode name: %s') % mode
-        updating = not normal
+        working = not normal
 
         for table in self.tables.values():
             table.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
-            self.cmd.set_property('visible', updating)
-        self.cancelbtn.set_property('visible', updating)
+            self.cmd.set_property('visible', working)
+        self.abortbtn.set_property('visible', working)
 
     def show_summaries(self, visible=True):
         if visible and not hasattr(self, 'ctxs'):
@@ -311,7 +315,9 @@ class UpdateDialog(gtk.Dialog):
                 elif ret['merge']:
                     pass # no args
                 elif ret['cancel']:
-                    self.destroy()
+                    self.cmd.log.append(_('[user canceled]\n'), error=True)
+                    self.switch_to(MODE_WORKING)
+                    self.abort()
                     return
                 else:
                     raise _('invalid dialog result: %s') % ret
@@ -322,7 +328,7 @@ class UpdateDialog(gtk.Dialog):
                 self.notify_func(self.notify_args)
             if returncode == 0 and not self.cmd.is_show_log():
                 self.destroy()
-        self.switch_to(MODE_UPDATING)
+        self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
     def set_notify_func(self, func, *args):
