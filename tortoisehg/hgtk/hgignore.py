@@ -40,50 +40,40 @@ class HgIgnoreDialog(gtk.Window):
         self.add(mainvbox)
         mainvbox.set_border_width(2)
 
-        ## hbox for glob entry
-        hbox = gtk.HBox()
-        mainvbox.pack_start(hbox, False, False)
-        lbl = gtk.Label(_('Glob:'))
-        hbox.pack_start(lbl, False, False, 4)
-        lbl.set_property('width-chars', 9)
-        lbl.set_alignment(1.0, 0.5)
-        glob_entry = gtk.Entry()
-        hbox.pack_start(glob_entry, True, True, 4)
-        glob_button = gtk.Button(_('Add'))
-        hbox.pack_start(glob_button, False, False, 4)
-        glob_button.connect('clicked', self.add_glob)
-        glob_entry.connect('activate', self.add_glob)
-        glob_entry.set_text(hglib.toutf(fileglob))
-        self.glob_entry = glob_entry
+        ## layout table for top
+        table = gtklib.LayoutTable()
+        mainvbox.pack_start(table, False, False)
 
-        ## hbox for regexp entry
-        hbox = gtk.HBox()
-        mainvbox.pack_start(hbox, False, False)
-        lbl = gtk.Label(_('Regexp:'))
-        hbox.pack_start(lbl, False, False, 4)
-        lbl.set_property('width-chars', 9)
-        lbl.set_alignment(1.0, 0.5)
-        regexp_entry = gtk.Entry()
-        hbox.pack_start(regexp_entry, True, True, 4)
+        ### hbox for glob entry
+        self.glob_entry = gtk.Entry()
+        self.glob_entry.set_text(hglib.toutf(fileglob))
+        self.glob_entry.connect('activate', self.add_glob)
+        glob_button = gtk.Button(_('Add'))
+        glob_button.connect('clicked', self.add_glob)
+        table.add_row(_('Glob:'), self.glob_entry, 0,
+                      glob_button, expand=0)
+
+        ### hbox for regexp entry
+        self.regexp_entry = gtk.Entry()
+        self.regexp_entry.connect('activate', self.add_regexp)
         regexp_button = gtk.Button(_('Add'))
-        hbox.pack_start(regexp_button, False, False, 4)
         regexp_button.connect('clicked', self.add_regexp)
-        regexp_entry.connect('activate', self.add_regexp)
-        self.regexp_entry = regexp_entry
+        table.add_row(_('Regexp:'), self.regexp_entry, 0,
+                      regexp_button, expand=0)
 
         ignorefiles = [repo.wjoin('.hgignore')]
         for name, value in repo.ui.configitems('ui'):
             if name == 'ignore' or name.startswith('ignore.'):
                 ignorefiles.append(os.path.expanduser(value))
 
-        ## ignore file combo (if need)
+        ### ignore file combo if needs
         if len(ignorefiles) > 1:
             combo = gtk.combo_box_new_text()
-            mainvbox.pack_start(combo, False, False, 4)
             for f in ignorefiles:
                 combo.append_text(hglib.toutf(f))
             combo.set_active(0)
             combo.connect('changed', self.file_selected)
+            table.add_row(_('Apply to:'), combo, padding=False)
         self.ignorefile = ignorefiles[0]
 
         ## hbox for filter & unknown list
@@ -155,7 +145,7 @@ class HgIgnoreDialog(gtk.Window):
         unktree.get_selection().connect('changed', self.unknown_rowchanged)
 
         # prepare to show
-        glob_entry.grab_focus()
+        self.glob_entry.grab_focus()
         gobject.idle_add(self.refresh)
 
     def file_selected(self, combo):
