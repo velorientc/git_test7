@@ -49,6 +49,8 @@ class GLog(gdialog.GDialog):
         self.bfile = None
         self.npreviews = 0
         self.outgoing = []
+        self.useproxy = None
+        self.forcepush = False
         os.chdir(self.repo.root)
 
         # Load extension support for commands which need it
@@ -96,9 +98,9 @@ class GLog(gdialog.GDialog):
 
     def get_menu_list(self):
         def toggle_proxy(menuitem):
-            pass
+            self.useproxy = menuitem.get_active()
         def toggle_force(menuitem):
-            pass
+            self.forcepush = menuitem.get_active()
         def refresh(menuitem, resetmarks):
             if resetmarks:
                 self.outgoing = []
@@ -425,9 +427,22 @@ class GLog(gdialog.GDialog):
             pass
         self.get_menuitem(_('Compact Graph')).set_sensitive(self.graphcol)
         self.get_menuitem(_('Color by Branch')).set_sensitive(self.graphcol)
+        item = self.get_menuitem(_('Use proxy server'))
+        if ui.ui().config('http_proxy', 'host'):
+            item.set_sensitive(True)
+            item.set_active(True)
+        else:
+            item.set_sensitive(False)
 
         # enable MQ panel
         self.enable_mqpanel()
+
+    def get_proxy_args(self):
+        item = self.get_menuitem(_('Use proxy server'))
+        if item.get_property('sensitive') and not item.get_active():
+            return ['--config', 'http_proxy.host=']
+        else:
+            return []
 
     def get_graphlimit(self, suggestion):
         limit_opt = self.repo.ui.config('tortoisehg', 'graphlimit', '500')
@@ -995,7 +1010,9 @@ class GLog(gdialog.GDialog):
             bfile = bfile.replace(badchar, '')
         bfile = bfile.replace('/', '_')
         bfile = os.path.join(self.bundledir, bfile) + '.hg'
-        cmdline = ['hg', 'incoming', '--bundle', bfile, path]
+        cmdline = ['hg', 'incoming', '--bundle', bfile]
+        cmdline += self.get_proxy_args()
+        cmdline += [path]
         dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
         dlg.show_all()
         dlg.run()
@@ -1057,7 +1074,8 @@ class GLog(gdialog.GDialog):
                 # load the rebase extension explicitly
                 extensions.load(self.ui, 'rebase', None)
 
-        cmdline = ['hg'] + cmd + [self.pathentry.get_text()]
+        path = self.pathentry.get_text()
+        cmdline = ['hg'] + cmd + self.get_proxy_args() + [path]
         dlg = hgcmd.CmdDialog(cmdline, text=' '.join(['hg'] + cmd))
         dlg.show_all()
         dlg.run()
@@ -1072,8 +1090,9 @@ class GLog(gdialog.GDialog):
 
     def outgoing_clicked(self, toolbutton):
         q = Queue.Queue()
-        cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n',
-                self.pathentry.get_text()]
+        cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n']
+        cmd += self.get_proxy_args()
+        cmd += [self.pathentry.get_text()]
 
         def threadfunc(q, *args):
             try:
@@ -1129,7 +1148,10 @@ class GLog(gdialog.GDialog):
                 remote_path = path
             elif remote_path == url.hidepassword(path):
                 remote_path = path
-        cmdline = ['hg', 'push', remote_path]
+        cmdline = ['hg', 'push'] + self.get_proxy_args()
+        if self.forcepush:
+            cmdline += ['--force']
+        cmdline += [remote_path]
         dlg = hgcmd.CmdDialog(cmdline, text='hg push')
         dlg.show_all()
         dlg.run()
