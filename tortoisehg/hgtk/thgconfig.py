@@ -299,7 +299,7 @@ class PathEditDialog(gtk.Dialog):
         browse = gtk.Button(_('Browse...'))
         browse.connect('clicked', self.browse_clicked)
         ealias = self.entries['Alias']
-        toptable.add_row(ealias[1], ealias[0], None, browse, padding=False)
+        toptable.add_row(ealias[1], ealias[0], None, browse, expand=0)
 
         ## final URL
         eurl = self.entries['URL']
