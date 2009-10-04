@@ -382,13 +382,30 @@ class LayoutTable(gtk.VBox):
         self.pack_start(self.table)
         self.headers = []
 
-        self.set_default_paddings()
+        self.set_default_paddings(-1, -1)
 
-    def set_default_paddings(self, xpad=-1, ypad=-1):
-        self.xpad = xpad >= 0 and xpad or 4
-        self.ypad = ypad >= 0 and ypad or 2
+    def set_default_paddings(self, xpad=None, ypad=None):
+        """
+        Set default paddings between cells.
+
+        LayoutTable has xpad=4, ypad=2 as preset padding values.
+
+        xpad: Number. Pixcel value of padding for x-axis.
+              Use -1 to reset padding to preset value.
+              Default: None (no change).
+        ypad: Number. Pixcel value of padding for y-axis.
+              Use -1 to reset padding to preset value.
+              Default: None (no change).
+        """
+        if not xpad is None:
+            self.xpad = xpad >= 0 and xpad or 4
+        if not ypad is None:
+            self.ypad = ypad >= 0 and ypad or 2
 
     def get_first_header(self):
+        """
+        Return the cell at top-left corner if exists.
+        """
         if len(self.headers) > 0:
             return self.headers[0]
         return None
@@ -407,12 +424,15 @@ class LayoutTable(gtk.VBox):
             number: Fixed width padding.
             None: Flexible padding.
 
-        kargs: 'padding', 'xpad' and 'ypad' are availabled.
+        kargs: 'padding', 'expand', 'xpad' and 'ypad' are availabled.
 
-            padding: If False, the padding won't append the end of body.
-                     Default: True.
-            xpad: Overwrite default 'xpad' value.
-            ypad: Overwrite default 'ypad' value.
+            padding: Boolean. If False, the padding won't append the end
+                     of body.  Default: True.
+            expand: Number. Position of body element to expand.  If you
+                    specify this option, 'padding' option will be changed
+                    to False automatically.  Default: -1 (last element).
+            xpad: Number. Overwrite default 'xpad' value.
+            ypad: Number. Overwrite default 'ypad' value.
         """
         if len(widgets) == 0:
             return
@@ -423,6 +443,7 @@ class LayoutTable(gtk.VBox):
         xpad = kargs.get('xpad', self.xpad)
         ypad = kargs.get('ypad', self.ypad)
         def getwidget(obj):
+            '''element converter'''
             if obj == None:
                 return gtk.Label('')
             elif isinstance(obj, (int, long)):
@@ -435,12 +456,15 @@ class LayoutTable(gtk.VBox):
                 return lbl
             return obj
         def pack(*widgets, **kargs):
-            padding = kargs.get('padding', True)
+            '''pack some of widgets and return HBox'''
+            expand = kargs.get('expand', -1)
+            if len(widgets) <= expand:
+                expand = -1
+            padding = kargs.get('padding', expand == -1)
             if padding is True:
                 widgets += (None,)
             expmap = [ w is None for w in widgets ]
-            if not (True in expmap):
-                expmap[-1] = True
+            expmap[expand] = True
             widgets = [ getwidget(w) for w in widgets ]
             hbox = gtk.HBox()
             for i, obj in enumerate(widgets):
