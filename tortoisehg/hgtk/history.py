@@ -1045,8 +1045,11 @@ class GLog(gdialog.GDialog):
                 if tb:
                     tb.set_sensitive(False)
                     disabled.append(tb)
-            self.syncbox.set_sensitive(False)
-            disabled.append(self.syncbox)
+            def disable_child(w):
+                if w != self.ppullcombo:
+                    w.set_sensitive(False)
+                    disabled.append(w)
+            self.syncbox.foreach(disable_child)
 
             self.bfile = bfile
             oldtip = len(self.repo)
