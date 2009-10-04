@@ -615,7 +615,10 @@ class GLog(gdialog.GDialog):
                 ctx = self.repo[self.currevid]
                 qbase = self.repo['qbase']
                 actx = ctx.ancestor(qbase)
-                if actx == qbase or actx == ctx:
+                if self.repo['qparent'] == ctx:
+                    cmenu_qimport.set_sensitive(True)
+                    cmenu_strip.set_sensitive(False)
+                elif actx == qbase or actx == ctx:
                     # we're in the mq revision range or the mq
                     # is a descendant of us
                     cmenu_qimport.set_sensitive(False)
