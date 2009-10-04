@@ -128,7 +128,6 @@ class ArchiveDialog(gtk.Dialog):
                 if ret == gtk.RESPONSE_YES:
                     abort()
             else:
-                self.destroy()
                 return # close dialog
         # Abort button
         elif response_id == gtk.RESPONSE_CANCEL:
@@ -136,7 +135,7 @@ class ArchiveDialog(gtk.Dialog):
         else:
             raise _('unexpected response id: %s') % response_id
 
-        self.run() # doesn't close dialog
+        self.run() # don't close dialog
 
     def type_changed(self, radio):
         if not radio.get_active():
