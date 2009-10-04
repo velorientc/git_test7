@@ -95,6 +95,10 @@ class GLog(gdialog.GDialog):
         return tbar
 
     def get_menu_list(self):
+        def toggle_proxy(menuitem):
+            pass
+        def toggle_force(menuitem):
+            pass
         def refresh(menuitem, resetmarks):
             if resetmarks:
                 self.outgoing = []
@@ -150,7 +154,18 @@ class GLog(gdialog.GDialog):
                 (_('Working Parent'), False, navigate, ['.'], None),
                 ('----', None, None, None, None),
                 (_('Revision...'), False, navigate, [None], None),
-                ] + bmenus)
+                ] + bmenus),
+
+            (_('_Synchronize'), [
+                (_('Incoming'), False, self.incoming_clicked, [], None),
+                (_('Pull'), False, self.pull_clicked, [], None),
+                (_('Outgoing'), False, self.outgoing_clicked, [], None),
+                (_('Push'), False, self.push_clicked, [], None),
+                (_('Email...'), False, self.email_clicked, [], None),
+                ('----', None, None, None, None),
+                (_('Use proxy server'), True, toggle_proxy, [], False),
+                (_('Force push'), True, toggle_force, [], False),
+                ])
             ]
 
     def synch_clicked(self, toolbutton, data):
@@ -758,6 +773,7 @@ class GLog(gdialog.GDialog):
         stop = syncbox.append_stock(gtk.STOCK_STOP,
                         _('Stop current transaction'))
         stop.set_sensitive(False)
+        self.stop_button = stop
 
         ## target path combobox
         urllist = gtk.ListStore(str, str)
@@ -774,10 +790,12 @@ class GLog(gdialog.GDialog):
             if alias == 'default':
                 urlcombo.set_active(len(urllist)-1)
 
-        outgoing.connect('clicked', self.outgoing_clicked, urlcombo, stop)
-        push.connect('clicked', self.push_clicked, urlcombo)
+        incoming.connect('clicked', self.incoming_clicked)
+        pull.connect('clicked', self.pull_clicked)
+        outgoing.connect('clicked', self.outgoing_clicked)
+        push.connect('clicked', self.push_clicked)
         conf.connect('clicked', self.conf_clicked, urlcombo)
-        email.connect('clicked', self.email_clicked, urlcombo)
+        email.connect('clicked', self.email_clicked)
 
         syncbox.append_widget(gtk.Label(_('After Pull:')))
         ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
@@ -800,11 +818,9 @@ class GLog(gdialog.GDialog):
             pos = [index for (index, (name, label))
                     in enumerate(ppulldata) if name == 'none'][0]
         ppullcombo.set_active(pos)
+        self.ppullcombo = ppullcombo
+        self.ppulldata = ppulldata
 
-        incoming.connect('clicked', self.incoming_clicked, urlcombo,
-                         ppullcombo, ppulldata)
-        pull.connect('clicked', self.pull_clicked, urlcombo, ppullcombo,
-                     ppulldata)
         syncbox.append_widget(ppullcombo)
 
         # filter bar
@@ -918,7 +934,9 @@ class GLog(gdialog.GDialog):
     def get_extras(self):
         return self.stbar
 
-    def incoming_clicked(self, toolbutton, combo, ppullcombo, ppulldata):
+    def incoming_clicked(self, toolbutton):
+        ppullcombo, ppulldata = self.ppullcombo, self.ppulldata
+
         def apply_clicked(button, bfile):
             sel = ppullcombo.get_active_text()
             ppull = [name for (name, label) in ppulldata if sel == label][0]
@@ -948,7 +966,7 @@ class GLog(gdialog.GDialog):
         def remove_overlay(resettip):
             self.bfile = None
             self.npreviews = 0
-            combo.get_child().set_text('')
+            self.pathentry.set_text('')
             self.repo = hg.repository(self.ui, path=self.repo.root)
             self.graphview.set_repo(self.repo, self.stbar)
             self.changeview.repo = self.repo
@@ -971,7 +989,7 @@ class GLog(gdialog.GDialog):
             self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
             atexit.register(cleanup)
 
-        path = combo.get_child().get_text()
+        path = self.pathentry.get_text()
         bfile = path
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
@@ -983,7 +1001,7 @@ class GLog(gdialog.GDialog):
         dlg.run()
         dlg.hide()
         if dlg.return_code() == 0 and os.path.isfile(bfile):
-            combo.get_child().set_text(bfile)
+            self.pathentry.set_text(bfile)
 
             # create apply/reject toolbar buttons
             apply = gtk.ToolButton(gtk.STOCK_APPLY)
@@ -1022,7 +1040,8 @@ class GLog(gdialog.GDialog):
             self.npreviews = len(self.repo) - oldtip
             self.reload_log()
 
-    def pull_clicked(self, toolbutton, combo, ppullcombo, ppulldata):
+    def pull_clicked(self, toolbutton):
+        ppullcombo, ppulldata = self.ppullcombo, self.ppulldata
         sel = ppullcombo.get_active_text()
         ppull = [name for (name, label) in ppulldata if sel == label][0]
         if ppull == 'fetch':
@@ -1038,7 +1057,7 @@ class GLog(gdialog.GDialog):
                 # load the rebase extension explicitly
                 extensions.load(self.ui, 'rebase', None)
 
-        cmdline = ['hg'] + cmd + [combo.get_child().get_text()]
+        cmdline = ['hg'] + cmd + [self.pathentry.get_text()]
         dlg = hgcmd.CmdDialog(cmdline, text=' '.join(['hg'] + cmd))
         dlg.show_all()
         dlg.run()
@@ -1051,10 +1070,10 @@ class GLog(gdialog.GDialog):
             elif len(self.repo) > self.origtip:
                 self.reload_log()
 
-    def outgoing_clicked(self, toolbutton, combo, stop):
+    def outgoing_clicked(self, toolbutton):
         q = Queue.Queue()
         cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n',
-                combo.get_child().get_text()]
+                self.pathentry.get_text()]
 
         def threadfunc(q, *args):
             try:
@@ -1077,8 +1096,8 @@ class GLog(gdialog.GDialog):
                 self.graphview.set_outgoing(outgoing)
                 self.outgoing = outgoing
                 self.reload_log()
-                stop.disconnect(stop_handler)
-                stop.set_sensitive(False)
+                self.stop_button.disconnect(stop_handler)
+                self.stop_button.set_sensitive(False)
 
         def stop_clicked(button):
             thread.terminate()
@@ -1087,25 +1106,24 @@ class GLog(gdialog.GDialog):
         thread = thread2.Thread(target=threadfunc, args=cmd)
         thread.start()
         self.stbar.begin()
-        stop_handler = stop.connect('clicked', stop_clicked)
-        stop.set_sensitive(True)
+        stop_handler = self.stop_button.connect('clicked', stop_clicked)
+        self.stop_button.set_sensitive(True)
         gobject.timeout_add(50, out_wait)
 
-    def email_clicked(self, toolbutton, combo):
-        path = hglib.fromutf(combo.get_child().get_text()).strip()
+    def email_clicked(self, toolbutton):
+        path = hglib.fromutf(self.pathentry.get_text()).strip()
         if not path:
             gdialog.Prompt(_('No repository selected'),
                            _('Select a peer repository to compare with'),
                            self).run()
-            combo.get_child().grab_focus()
+            self.pathentry.grab_focus()
             return
         opts = ['--outgoing', path]
         dlg = hgemail.EmailDialog(self.repo.root, opts)
         self.show_dialog(dlg)
 
-    def push_clicked(self, toolbutton, combo):
-        entry = combo.get_child()
-        remote_path = hglib.fromutf(entry.get_text()).strip()
+    def push_clicked(self, toolbutton):
+        remote_path = hglib.fromutf(self.pathentry.get_text()).strip()
         for alias, path in self.repo.ui.configitems('paths'):
             if remote_path == alias:
                 remote_path = path
@@ -1122,7 +1140,7 @@ class GLog(gdialog.GDialog):
             self.reload_log()
 
     def conf_clicked(self, toolbutton, combo):
-        newpath = hglib.fromutf(combo.get_child().get_text()).strip()
+        newpath = hglib.fromutf(self.pathentry.get_text()).strip()
         for alias, path in self.repo.ui.configitems('paths'):
             if newpath in (path, url.hidepassword(path)):
                 newpath = None
