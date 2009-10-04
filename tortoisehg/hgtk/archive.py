@@ -157,6 +157,8 @@ class ArchiveDialog(gtk.Dialog):
             return path
         def add_rev(path):
             rev = self.combo.get_active_text()
+            if rev == WD_PARENT:
+                rev = 'tip'
             return '%s_%s' % (path, rev)
         def add_ext(path):
             select = self.get_selected_archive_type()
