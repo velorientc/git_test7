@@ -198,7 +198,7 @@ class CloneDialog(gtk.Dialog):
         else:
             raise _('unexpected response id: %s') % response_id
 
-        self.run() # doesn't close dialog
+        self.run() # don't close dialog
 
     def browse_clicked(self, button, title, entry):
         res = gtklib.NativeFolderSelectDialog(
@@ -327,7 +327,7 @@ class CloneDialog(gtk.Dialog):
             if returncode == 0:
                 shlib.shell_notify([dest])
                 if not self.cmd.is_show_log():
-                    self.response(gtk.RESPONSE_OK)
+                    self.response(gtk.RESPONSE_CLOSE)
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
