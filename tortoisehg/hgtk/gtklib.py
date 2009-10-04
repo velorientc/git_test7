@@ -184,17 +184,17 @@ class MessageDialog(gtk.Dialog):
 class NativeSaveFileDialogWrapper:
     """Wrap the windows file dialog, or display default gtk dialog if
     that isn't available"""
-    def __init__(self, InitialDir = None, Title = _('Save File'),
-                 Filter = ((_('All files'), '*.*'),), FilterIndex = 1,
-                 FileName = '', Open=False):
-        if InitialDir == None:
-            InitialDir = os.path.expanduser("~")
-        self.InitialDir = InitialDir
-        self.FileName = FileName
-        self.Title = Title
-        self.Filter = Filter
-        self.FilterIndex = FilterIndex
-        self.Open = Open
+    def __init__(self, initial = None, title = _('Save File'),
+                 filter = ((_('All files'), '*.*'),), filterindex = 1,
+                 filename = '', open=False):
+        if initial is None:
+            initial = os.path.expanduser("~")
+        self.initial = initial
+        self.filename = filename
+        self.title = title
+        self.filter = filter
+        self.filterindex = filterindex
+        self.open = open
 
     def run(self):
         """run the file dialog, either return a file name, or False if
@@ -211,17 +211,17 @@ class NativeSaveFileDialogWrapper:
         fname = None
         try:
             f = ''
-            for name, mask in self.Filter:
+            for name, mask in self.filter:
                 f += '\0'.join([name, mask,''])
-            opts = dict(InitialDir=self.InitialDir,
+            opts = dict(InitialDir=self.initial,
                     Flags=win32con.OFN_EXPLORER,
-                    File=self.FileName,
+                    File=self.filename,
                     DefExt=None,
-                    Title=hglib.fromutf(self.Title),
+                    Title=hglib.fromutf(self.title),
                     Filter= hglib.fromutf(f),
                     CustomFilter=None,
-                    FilterIndex=self.FilterIndex)
-            if self.Open:
+                    FilterIndex=self.filterindex)
+            if self.open:
                 fname, _, _ = win32gui.GetOpenFileNameW(**opts)
             else:
                 fname, _, _ = win32gui.GetSaveFileNameW(**opts)
@@ -233,7 +233,7 @@ class NativeSaveFileDialogWrapper:
         return fname
 
     def runCompatible(self):
-        if self.Open:
+        if self.open:
             action = gtk.FILE_CHOOSER_ACTION_OPEN
             buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                        gtk.STOCK_OPEN, gtk.RESPONSE_OK)
@@ -241,13 +241,13 @@ class NativeSaveFileDialogWrapper:
             action = gtk.FILE_CHOOSER_ACTION_SAVE
             buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                        gtk.STOCK_SAVE, gtk.RESPONSE_OK)
-        dlg = gtk.FileChooserDialog(self.Title, None, action, buttons)
+        dlg = gtk.FileChooserDialog(self.title, None, action, buttons)
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_default_response(gtk.RESPONSE_OK)
-        dlg.set_current_folder(self.InitialDir)
-        if not self.Open:
-            dlg.set_current_name(self.FileName)
-        for name, pattern in self.Filter:
+        dlg.set_current_folder(self.initial)
+        if not self.open:
+            dlg.set_current_name(self.filename)
+        for name, pattern in self.filter:
             fi = gtk.FileFilter()
             fi.set_name(name)
             fi.add_pattern(pattern)
@@ -280,7 +280,7 @@ class NativeFolderSelectDialog:
         import win32gui, pywintypes
 
         def BrowseCallbackProc(hwnd, msg, lp, data):
-            if msg== shellcon.BFFM_INITIALIZED:
+            if msg == shellcon.BFFM_INITIALIZED:
                 win32gui.SendMessage(hwnd, shellcon.BFFM_SETSELECTION, 1, data)
             elif msg == shellcon.BFFM_SELCHANGED:
                 # Set the status text of the

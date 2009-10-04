@@ -852,14 +852,13 @@ class GStatus(gdialog.GDialog):
     def copy_file(self, wfile):
         wfile = self.repo.wjoin(wfile)
         fdir, fname = os.path.split(wfile)
-        response = gtklib.NativeSaveFileDialogWrapper(
-                Title=_('Copy file to'),
-                InitialDir=fdir,
-                FileName=fname).run()
-        if not response:
+        result = gtklib.NativeSaveFileDialogWrapper(title=_('Copy file to'),
+                                                    initial=fdir,
+                                                    filename=fname).run()
+        if not result:
             return
-        if response != wfile:
-            self.hg_copy([wfile, response])
+        if result != wfile:
+            self.hg_copy([wfile, result])
         return True
 
 
@@ -1192,10 +1191,9 @@ class GStatus(gdialog.GDialog):
         'Write selected diff hunks to a patch file'
         revrange = self.opts.get('rev')[0]
         filename = "%s.patch" % revrange.replace(':', '_to_')
-        fd = gtklib.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
-                                         InitialDir=self.repo.root,
-                                         FileName=filename)
-        result = fd.run()
+        result = gtklib.NativeSaveFileDialogWrapper(title=_('Save patch to'),
+                                                    initial=self.repo.root,
+                                                    filename=filename).run()
         if not result:
             return
 

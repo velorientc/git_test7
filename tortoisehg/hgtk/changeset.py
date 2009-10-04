@@ -699,9 +699,9 @@ class ChangeSet(gdialog.GDialog):
             filename = "%s@%d%s" % (wfile, self.currev, ext)
         else:
             filename = "%s@%d" % (ext, self.currev)
-        result = gtklib.NativeSaveFileDialogWrapper(Title=_("Save file to"),
-                                             InitialDir=self.cwd,
-                                             FileName=filename).run()
+        result = gtklib.NativeSaveFileDialogWrapper(title=_("Save file to"),
+                                                    initial=self.cwd,
+                                                    filename=filename).run()
         if result:
             if os.path.exists(result):
                 res = gdialog.Confirm(_('Confirm Overwrite'), [], self,

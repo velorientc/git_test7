@@ -1312,9 +1312,9 @@ class GLog(gdialog.GDialog):
 
         filename = "%s_rev%d_to_rev%s.hg" % (os.path.basename(self.repo.root),
                    revrange[0], revrange[1])
-        result = gtklib.NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
-                                         InitialDir=self.repo.root,
-                                         FileName=filename).run()
+        result = gtklib.NativeSaveFileDialogWrapper(title=_('Write bundle to'),
+                                                    initial=self.repo.root,
+                                                    filename=filename).run()
         if result:
             cmdline = ['hg', 'bundle', '--base', str(parent),
                       '--rev', str(revrange[1]), result]
@@ -1452,9 +1452,9 @@ class GLog(gdialog.GDialog):
     def export_patch(self, menuitem):
         rev = self.currevid
         filename = "%s_rev%s.patch" % (os.path.basename(self.repo.root), rev)
-        result = gtklib.NativeSaveFileDialogWrapper(Title=_('Save patch to'),
-                                             InitialDir=self.repo.root,
-                                             FileName=filename).run()
+        result = gtklib.NativeSaveFileDialogWrapper(title=_('Save patch to'),
+                                                    initial=self.repo.root,
+                                                    filename=filename).run()
         if result:
             if os.path.exists(result):
                 res = gdialog.Confirm(_('Confirm Overwrite'), [], self,
@@ -1481,9 +1481,9 @@ class GLog(gdialog.GDialog):
         except (ValueError, hglib.LookupError):
             return
         filename = "%s_rev%d_to_tip.hg" % (os.path.basename(self.repo.root), rev)
-        result = gtklib.NativeSaveFileDialogWrapper(Title=_('Write bundle to'),
-                                         InitialDir=self.repo.root,
-                                         FileName=filename).run()
+        result = gtklib.NativeSaveFileDialogWrapper(title=_('Write bundle to'),
+                                                    initial=self.repo.root,
+                                                    filename=filename).run()
         if result:
             if os.path.exists(result):
                 res = gdialog.Confirm(_('Confirm Overwrite'), [], self,

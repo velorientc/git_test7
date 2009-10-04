@@ -70,10 +70,11 @@ class BugReport(gdialog.GDialog):
         return self.__error_text__ 
 
     def save_report_clicked(self, button):
-        file_path = gtklib.NativeSaveFileDialogWrapper(Title = _('Save error report to')).run()
+        result = gtklib.NativeSaveFileDialogWrapper(
+                        title=_('Save error report to')).run()
 
-        if file_path:
-            fd = file(file_path, 'w')
+        if result:
+            fd = file(result, 'w')
             fd.write(self.get_error_text())
             fd.close()
 

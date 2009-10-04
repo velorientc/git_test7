@@ -374,22 +374,22 @@ class SynchDialog(gtk.Window):
 
     def btn_remotepath_clicked(self, button):
         """ select source folder to clone """
-        response = gtklib.NativeFolderSelectDialog(
-                          initial=self.root,
-                          title=_('Select Repository')).run()
-        if response:
-            self.pathtext.set_text(response)
+        result = gtklib.NativeFolderSelectDialog(
+                        initial=self.root,
+                        title=_('Select Repository')).run()
+        if result:
+            self.pathtext.set_text(result)
 
     def btn_bundlepath_clicked(self, button):
         """ select bundle to read from """
-        response = gtklib.NativeSaveFileDialogWrapper(
-                InitialDir=self.root,
-                Title=_('Select Bundle'),
-                Filter=((_('Bundle (*.hg)'), '*.hg'),
-                        (_('Bundle (*)'), '*.*')),
-                Open=True).run()
-        if response:
-            self.pathtext.set_text(response)
+        result = gtklib.NativeSaveFileDialogWrapper(
+                        title=_('Select Bundle'),
+                        initial=self.root,
+                        filter=((_('Bundle (*.hg)'), '*.hg'),
+                                (_('Bundle (*)'), '*.*')),
+                        open=True).run()
+        if result:
+            self.pathtext.set_text(result)
 
     def should_live(self):
         if self.cmd_running():
