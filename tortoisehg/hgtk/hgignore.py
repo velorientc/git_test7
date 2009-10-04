@@ -47,8 +47,8 @@ class HgIgnoreDialog(gtk.Window):
         hbox.pack_start(glob_entry, True, True, 4)
         glob_button = gtk.Button(_('Add'))
         hbox.pack_start(glob_button, False, False, 4)
-        glob_button.connect('clicked', self.add_glob, glob_entry)
-        glob_entry.connect('activate', self.add_glob, glob_entry)
+        glob_button.connect('clicked', self.add_glob)
+        glob_entry.connect('activate', self.add_glob)
         glob_entry.set_text(hglib.toutf(fileglob))
         self.glob_entry = glob_entry
 
@@ -63,8 +63,9 @@ class HgIgnoreDialog(gtk.Window):
         hbox.pack_start(regexp_entry, True, True, 4)
         regexp_button = gtk.Button(_('Add'))
         hbox.pack_start(regexp_button, False, False, 4)
-        regexp_button.connect('clicked', self.add_regexp, regexp_entry)
-        regexp_entry.connect('activate', self.add_regexp, regexp_entry)
+        regexp_button.connect('clicked', self.add_regexp)
+        regexp_entry.connect('activate', self.add_regexp)
+        self.regexp_entry = regexp_entry
 
         try: repo = hg.repository(ui.ui(), path=self.root)
         except: self.destroy()
@@ -80,7 +81,7 @@ class HgIgnoreDialog(gtk.Window):
             for f in ignorefiles:
                 combo.append_text(hglib.toutf(f))
             combo.set_active(0)
-            combo.connect('changed', self.fileselect)
+            combo.connect('changed', self.file_selected)
         self.ignorefile = ignorefiles[0]
 
         ## hbox for filter & unknown list
@@ -103,8 +104,7 @@ class HgIgnoreDialog(gtk.Window):
         scrolledwindow.add(pattree)
         pattree.set_enable_search(False)
         pattree.set_reorderable(False)
-        sel = pattree.get_selection()
-        sel.set_mode(gtk.SELECTION_SINGLE)
+        pattree.get_selection().set_mode(gtk.SELECTION_SINGLE)
         col = gtk.TreeViewColumn(_('Patterns'), gtk.CellRendererText(), text=0)
         pattree.append_column(col)
         pattree.set_headers_visible(False)
@@ -113,10 +113,10 @@ class HgIgnoreDialog(gtk.Window):
         #### remove button
         bhbox = gtk.HBox()
         vbox.pack_start(bhbox, False, False, 2)
-        remove = gtk.Button(_('Remove Selected'))
-        bhbox.pack_start(remove, False, False, 2)
-        remove.connect('pressed', self.remove_pressed, sel)
-        remove.set_sensitive(False)
+        self.removebtn = gtk.Button(_('Remove Selected'))
+        bhbox.pack_start(self.removebtn, False, False, 2)
+        self.removebtn.connect('clicked', self.remove_clicked)
+        self.removebtn.set_sensitive(False)
 
         ### frame for unknown file list & button
         frame = gtk.Frame(_('Unknown Files'))
@@ -130,14 +130,14 @@ class HgIgnoreDialog(gtk.Window):
         vbox.pack_start(scrolledwindow, True, True, 2)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.set_border_width(4)
-        unknowntree = gtk.TreeView()
-        scrolledwindow.add(unknowntree)
-        unknowntree.set_search_equal_func(self.unknown_search)
+        unktree = gtk.TreeView()
+        scrolledwindow.add(unktree)
+        unktree.set_search_equal_func(self.unknown_search)
         col = gtk.TreeViewColumn(_('Files'), gtk.CellRendererText(), text=0)
-        unknowntree.append_column(col)
+        unktree.append_column(col)
         model = gtk.ListStore(str, str)
-        unknowntree.set_model(model)
-        unknowntree.set_headers_visible(False)
+        unktree.set_model(model)
+        unktree.set_headers_visible(False)
         self.unkmodel = model
 
         #### refresh button
@@ -145,16 +145,18 @@ class HgIgnoreDialog(gtk.Window):
         vbox.pack_start(bhbox, False, False, 2)
         refresh = gtk.Button(_('Refresh'))
         bhbox.pack_start(refresh, False, False, 2)
-        refresh.connect('pressed', self.refresh_clicked, sel)
-        self.connect('thg-refresh', self.thgrefresh)
+        refresh.connect('pressed', lambda b: self.refresh())
+        self.connect('thg-refresh', lambda w: self.refresh())
+
+        # register signal handlers
+        pattree.get_selection().connect('changed', self.pattree_rowchanged)
+        unktree.get_selection().connect('changed', self.unknown_rowchanged)
 
         # prepare to show
         glob_entry.grab_focus()
-        pattree.get_selection().connect('changed', self.pattree_rowchanged, remove)
-        unknowntree.get_selection().connect('changed', self.unknown_rowchanged)
         gobject.idle_add(self.refresh)
 
-    def fileselect(self, combo):
+    def file_selected(self, combo):
         'select another ignore file'
         self.ignorefile = hglib.fromutf(combo.get_active_text())
         self.refresh()
@@ -166,17 +168,18 @@ class HgIgnoreDialog(gtk.Window):
             return False
         return True
 
-    def remove_pressed(self, widget, selection):
-        model, rows = selection.get_selected_rows()
+    def remove_clicked(self, button):
+        sel = self.pattree.get_selection()
+        model, rows = sel.get_selected_rows()
         del model[rows[0]]
         del self.ignorelines[rows[0][0]]
         self.write_ignore_lines()
         self.refresh()
 
-    def pattree_rowchanged(self, sel, remove):
+    def pattree_rowchanged(self, sel):
         model, ppaths = sel.get_selected()
         sensitive = ppaths and True or False
-        remove.set_sensitive(sensitive)
+        self.removebtn.set_sensitive(sensitive)
 
     def unknown_rowchanged(self, sel):
         model, upaths = sel.get_selected()
@@ -184,7 +187,7 @@ class HgIgnoreDialog(gtk.Window):
             return
         self.glob_entry.set_text(model[upaths][0])
 
-    def add_glob(self, widget, glob_entry):
+    def add_glob(self, widget):
         newglob = hglib.fromutf(glob_entry.get_text())
         if newglob == '':
             return
@@ -200,8 +203,8 @@ class HgIgnoreDialog(gtk.Window):
         glob_entry.set_text('')
         self.refresh()
 
-    def add_regexp(self, widget, regexp_entry):
-        newregexp = hglib.fromutf(regexp_entry.get_text())
+    def add_regexp(self, widget):
+        newregexp = hglib.fromutf(self.regexp_entry.get_text())
         if newregexp == '':
             return
         try:
@@ -213,13 +216,7 @@ class HgIgnoreDialog(gtk.Window):
             return
         self.ignorelines.append('relre:' + newregexp)
         self.write_ignore_lines()
-        regexp_entry.set_text('')
-        self.refresh()
-
-    def thgrefresh(self, window):
-        self.refresh()
-
-    def refresh_clicked(self, togglebutton, data=None):
+        self.regexp_entry.set_text('')
         self.refresh()
 
     def set_notify_func(self, func):
