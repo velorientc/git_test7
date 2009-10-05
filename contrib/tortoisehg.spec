@@ -62,8 +62,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc COPYING.txt ReleaseNotes.txt doc/build/html/
 %{_bindir}/hgtk
-%{python_sitelib}/tortoisehg/hgtk/
-%{python_sitelib}/tortoisehg/util/
+%{python_sitelib}/tortoisehg/
 %{python_sitelib}/tortoisehg-*.egg-info
 %{_datadir}/pixmaps/tortoisehg/
 %{_datadir}/locale/*/LC_MESSAGES/tortoisehg.mo

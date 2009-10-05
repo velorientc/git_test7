@@ -126,8 +126,8 @@ def setup_posix():
     # Specific definitios for Posix installations
     _extra = {}
     _scripts = ['hgtk']
-    _packages = ['tortoisehg.hgtk', 'tortoisehg.hgtk.logview',
-                 'tortoisehg.util']
+    _packages = ['tortoisehg', 'tortoisehg.hgtk', 
+                 'tortoisehg.hgtk.logview', 'tortoisehg.util']
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('icons')]
