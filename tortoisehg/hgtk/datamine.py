@@ -690,6 +690,8 @@ class DataMineDialog(gdialog.GDialog):
     def log_selection_changed(self, graphview, path):
         treeview = graphview.treeview
         (model, paths) = treeview.get_selection().get_selected_rows()
+        if not paths:
+            return
         revid = graphview.get_revid_at_path(paths[0])
         self.currev = str(revid)
         wfile = graphview.get_wfile_at_path(paths[0])
