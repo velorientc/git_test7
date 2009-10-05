@@ -215,6 +215,7 @@ class HgIgnoreDialog(gtk.Window):
         self.notify_func = func
 
     def refresh(self):
+        hglib.invalidaterepo(self.repo)
         matcher = match.always(self.repo.root, self.repo.root)
         changes = self.repo.dirstate.status(matcher, ignored=False,
                                             clean=False, unknown=True)
