@@ -575,7 +575,7 @@ class DataMineDialog(gdialog.GDialog):
         graphopts = { 'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'revrange':[],
                 'revlist':[], 'noheads':False, 'orig-tip':len(self.repo),
-                'branch-view':False, 'rev':[], 'bundleview':False }
+                'branch-view':False, 'rev':[], 'npreviews':0 }
         graphopts['filehist'] = path
 
         # File log revision graph
