@@ -462,8 +462,10 @@ class GStatus(gdialog.GDialog):
         for label in (_('_Diff'), _('Re_vert'), _('_Add'), _('_Remove'),
                       _('Move'), _('_Forget')):
             self.get_toolbutton(label).set_sensitive(sensitive)
-            i = self.get_menuitem(label)
-            if i: i.set_sensitive(sensitive)
+        for cmd in ('diff', 'revert', 'add', 'remove', 'move', 'forget'):
+            i = self.get_menuitem(cmd, throw=False)
+            if i:
+                i.set_sensitive(sensitive)
         if self.diff_notebook.get_current_page() == 2:
             self.update_commit_preview()
 

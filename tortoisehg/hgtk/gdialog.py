@@ -333,8 +333,11 @@ class GDialog(gtk.Window):
     def get_toolbutton(self, label):
         return self.toolbuttons[label]
 
-    def get_menuitem(self, label):
-        return self.menuitems.get(label, None)
+    def get_menuitem(self, name, throw=True):
+        if throw:
+            return self.menuitems[name]
+        else:
+            return self.menuitems.get(name)
 
     def get_reponame(self):
         return hglib.get_reponame(self.repo)
@@ -428,46 +431,66 @@ class GDialog(gtk.Window):
         if menus:
             allmenus = [
           (_('_Tools'),
-           [(_('Changelog'), False, self.launch, ['log'], 'menulog.ico'),
-            (_('Commit'), False, self.launch, ['commit'], 'menucommit.ico'),
-            (_('Datamine'), False, self.launch, ['datamine'], 'menurepobrowse.ico'),
-            (_('Recovery'), False, self.launch, ['recover'], 'general.ico'),
-            (_('Serve'), False, self.launch, ['serve'], 'proxy.ico'),
-            (_('Shelve'), False, self.launch, ['shelve'], 'shelve.ico'),
-            (_('Synchronize'), False, self.launch, ['synch'], 'menusynch.ico'),
-            (_('Settings'), False, self.launch, ['repoconfig'], 'settings_repo.ico')])
+           [dict(text=_('Changelog'), func=self.launch, args=['log'],
+                icon='menulog.ico'),
+            dict(text=_('Commit'), func=self.launch, args=['commit'],
+                icon='menucommit.ico'),
+            dict(text=_('Datamine'), func=self.launch, args=['datamine'],
+                icon='menurepobrowse.ico'),
+            dict(text=_('Recovery'), func=self.launch, args=['recover'],
+                icon='general.ico'),
+            dict(text=_('Serve'), func=self.launch, args=['serve'],
+                icon='proxy.ico'),
+            dict(text=_('Shelve'), func=self.launch, args=['shelve'],
+                icon='shelve.ico'),
+            dict(text=_('Synchronize'), func=self.launch, args=['synch'],
+                icon='menusynch.ico'),
+            dict(text=_('Settings'), func=self.launch, args=['repoconfig'],
+                icon='settings_repo.ico')])
            ] + menus + [
           (_('_Help'),
-           [(_('Contents'), False, self.helpcontents, [], gtk.STOCK_INFO),
-            (_('About'), False, self.launch, ['about'], gtk.STOCK_ABOUT)])
+           [dict(text=_('Contents'), func=self.helpcontents,
+                icon=gtk.STOCK_INFO),
+            dict(text=_('About'), func=self.launch, args=['about'],
+                icon=gtk.STOCK_ABOUT)])
           ]
             menubar = gtk.MenuBar()
             for title, items in allmenus:
                 menu = gtk.Menu()
-                for name, ascheck, func, args, icon_or_var in items:
-                    if name == '----':
+                for d in items:
+                    text = d['text']
+                    name = d.get('name')
+                    func = d.get('func')
+                    ascheck = d.get('ascheck', False)
+                    args = d.get('args', [])
+                    icon = d.get('icon')
+                    check = d.get('check', False)
+                    if text == '----':
                         item = gtk.SeparatorMenuItem()
                     else:
                         if ascheck:
-                            item = gtk.CheckMenuItem(name)
-                            item.set_active(icon_or_var)
-                        elif icon_or_var:
-                            item = gtk.ImageMenuItem(name)
-                            if icon_or_var.startswith('gtk'):
+                            item = gtk.CheckMenuItem(text)
+                            item.set_active(check)
+                        elif icon:
+                            item = gtk.ImageMenuItem(text)
+                            if icon.startswith('gtk'):
                                 img = gtk.image_new_from_stock(
-                                    icon_or_var, gtk.ICON_SIZE_MENU)
+                                    icon, gtk.ICON_SIZE_MENU)
                             else:
                                 img = gtk.Image()
-                                ico = paths.get_tortoise_icon(icon_or_var)
+                                ico = paths.get_tortoise_icon(icon)
                                 if ico:
-                                    width, height = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)
-                                    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(ico, width, height)
+                                    width, height = gtk.icon_size_lookup(
+                                        gtk.ICON_SIZE_MENU)
+                                    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
+                                        ico, width, height)
                                     img.set_from_pixbuf(pixbuf)
                             item.set_image(img)
                         else:
-                            item = gtk.MenuItem(name)
+                            item = gtk.MenuItem(text)
                         item.connect('activate', func, *args)
-                        self.menuitems[name] = item
+                        if name:
+                            self.menuitems[name] = item
                     menu.append(item)
                 item = gtk.MenuItem(title)
                 item.set_submenu(menu)

@@ -124,49 +124,55 @@ class GLog(gdialog.GDialog):
         lb = self.get_live_branches()
         bmenus = []
         if len(lb) > 1 or (lb and lb[0] != 'default'):
-            bmenus.append(('----', None, None, None, None))
+            bmenus.append(dict(text='----'))
             for name in lb[:10]:
-                bmenus.append((hglib.toutf(name), False, navigate, [name], None))
-            
+                bmenus.append(dict(text=hglib.toutf(name), func=navigate, 
+                    args=[name]))
+
         fnc = self.toggle_view_column
         if self.repo.ui.configbool('tortoisehg', 'disable-syncbar'):
             sync_bar_item = []
         else:
-            sync_bar_item = [(_('Sync Bar'), True, self.toggle_show_syncbar,
-                    [], self.show_syncbar)]
+            sync_bar_item = [dict(text=_('Sync Bar'), ascheck=True, 
+                    func=self.toggle_show_syncbar, check=self.show_syncbar)]
 
         return [(_('_View'), sync_bar_item + [
-            (_('Filter Bar'), True, self.toggle_show_filterbar, [],
-                self.show_filterbar),
-            ('----', None, None, None, None),
-            (_('Choose Details...'), False, self.details_clicked, [], None),
-            ('----', None, None, None, None),
-            (_('Refresh'), False, refresh, [False], gtk.STOCK_REFRESH),
-            (_('Reset Marks'), False, refresh, [True], gtk.STOCK_REMOVE),
-            ('----', None, None, None, None),
-            (_('Compact Graph'), True, self.toggle_compactgraph, [],
-                self.compactgraph),
-            (_('Color by Branch'), True, self.toggle_branchcolor, [],
-                self.branch_color),
-            (_('Ignore Max Diff Size'), True, disable_maxdiff, [], False),
+            dict(text=_('Filter Bar'), ascheck=True, 
+                func=self.toggle_show_filterbar, check=self.show_filterbar),
+            dict(text='----'),
+            dict(text=_('Choose Details...'), func=self.details_clicked),
+            dict(text='----'),
+            dict(text=_('Refresh'), func=refresh, args=[False],
+                icon=gtk.STOCK_REFRESH),
+            dict(text=_('Reset Marks'), func=refresh, args=[True],
+                icon=gtk.STOCK_REMOVE),
+            dict(text='----'),
+            dict(name='compact-graph', text=('Compact Graph'), ascheck=True,
+                func=self.toggle_compactgraph, check=self.compactgraph),
+            dict(name='color-by-branch', text=_('Color by Branch'),
+                ascheck=True, func=self.toggle_branchcolor,
+                check=self.branch_color),
+            dict(text=_('Ignore Max Diff Size'), ascheck=True, 
+                func=disable_maxdiff),
                 ]),
 
             (_('_Navigate'), [
-                (_('Tip'), False, navigate, ['tip'], None),
-                (_('Working Parent'), False, navigate, ['.'], None),
-                ('----', None, None, None, None),
-                (_('Revision...'), False, navigate, [None], None),
+                dict(text=_('Tip'), func=navigate, args=['tip']),
+                dict(text=_('Working Parent'), func=navigate, args=['.']),
+                dict(text='----'),
+                dict(text=_('Revision...'), func=navigate, args=[None]),
                 ] + bmenus),
 
             (_('_Synchronize'), [
-                (_('Incoming'), False, self.incoming_clicked, [], None),
-                (_('Pull'), False, self.pull_clicked, [], None),
-                (_('Outgoing'), False, self.outgoing_clicked, [], None),
-                (_('Push'), False, self.push_clicked, [], None),
-                (_('Email...'), False, self.email_clicked, [], None),
-                ('----', None, None, None, None),
-                (_('Use proxy server'), True, toggle_proxy, [], False),
-                (_('Force push'), True, toggle_force, [], False),
+                dict(text=_('Incoming'), func=self.incoming_clicked),
+                dict(text=_('Pull'), func=self.pull_clicked),
+                dict(text=_('Outgoing'), func=self.outgoing_clicked),
+                dict(text=_('Push'), func=self.push_clicked),
+                dict(text=_('Email...'), func=self.email_clicked),
+                dict(text='----'),
+                dict(name='use-proxy-server', text=_('Use proxy server'),
+                    ascheck=True, func=toggle_proxy),
+                dict(text=_('Force push'), ascheck=True, func=toggle_force),
                 ])
             ]
 
@@ -297,9 +303,9 @@ class GLog(gdialog.GDialog):
                     if self.graphcol != show:
                         self.graphcol = show
                         reload = True
-                        item = self.get_menuitem(_('Compact Graph'))
+                        item = self.get_menuitem('compact-graph')
                         item.set_sensitive(self.graphcol)
-                        item = self.get_menuitem(_('Color by Branch'))
+                        item = self.get_menuitem('color-by-branch')
                         item.set_sensitive(self.graphcol)
                 else:
                     self.graphview.set_property(property, show)
@@ -425,9 +431,11 @@ class GLog(gdialog.GDialog):
             # ignore unknown column names, these could originate from garbeled
             # persisted data
             pass
-        self.get_menuitem(_('Compact Graph')).set_sensitive(self.graphcol)
-        self.get_menuitem(_('Color by Branch')).set_sensitive(self.graphcol)
-        item = self.get_menuitem(_('Use proxy server'))
+
+        self.get_menuitem('compact-graph').set_sensitive(self.graphcol)
+        self.get_menuitem('color-by-branch').set_sensitive(self.graphcol)
+
+        item = self.get_menuitem('use-proxy-server')
         if ui.ui().config('http_proxy', 'host'):
             item.set_sensitive(True)
             item.set_active(True)
@@ -438,7 +446,7 @@ class GLog(gdialog.GDialog):
         self.enable_mqpanel()
 
     def get_proxy_args(self):
-        item = self.get_menuitem(_('Use proxy server'))
+        item = self.get_menuitem('use-proxy-server')
         if item.get_property('sensitive') and not item.get_active():
             return ['--config', 'http_proxy.host=']
         else:

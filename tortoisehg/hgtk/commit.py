@@ -176,22 +176,31 @@ class GCommit(GStatus):
                 else:
                     frame.hide()
                 setattr(self, statename, show)
-        no = False
         return [(_('_View'),
-           [(_('Advanced'), True, toggle, ['advanced'], self.showadvanced),
-            (_('Parents'), True, toggle, ['parents'], self.showparents),
-            ('----', None, None, None, None),
-            (_('Refresh'), False, refresh, [], gtk.STOCK_REFRESH)]),
+           [dict(text=_('Advanced'), ascheck=True, func=toggle,
+                args=['advanced'], check=self.showadvanced),
+            dict(text=_('Parents'), ascheck=True, func=toggle,
+                args=['parents'], check=self.showparents),
+            dict(text='----'),
+            dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH)]),
            (_('_Operations'), [
-            (_('_Commit'), no, self.commit_clicked, [], gtk.STOCK_OK),
-            (_('_Undo'), no, self.undo_clicked, [], gtk.STOCK_UNDO),
-            ('----', None, None, None, None),
-            (_('_Diff'), no, self.diff_clicked, [], gtk.STOCK_JUSTIFY_FILL),
-            (_('Re_vert'), no, self.revert_clicked, [], gtk.STOCK_MEDIA_REWIND),
-            (_('_Add'), no, self.add_clicked, [], gtk.STOCK_ADD),
-            (_('_Remove'), no, self.remove_clicked, [], gtk.STOCK_DELETE),
-            (_('Move'), no, self.move_clicked, [], gtk.STOCK_JUMP_TO),
-            (_('_Forget'), no, self.forget_clicked, [], gtk.STOCK_CLEAR)]),
+            dict(text=_('_Commit'), func=self.commit_clicked,
+                icon=gtk.STOCK_OK),
+            dict(name='undo', text=_('_Undo'), func=self.undo_clicked,
+                icon=gtk.STOCK_UNDO),
+            dict(text='----'),
+            dict(name='diff', text=_('_Diff'), func=self.diff_clicked,
+                icon=gtk.STOCK_JUSTIFY_FILL),
+            dict(name='revert', text=_('Re_vert'), func=self.revert_clicked,
+                icon=gtk.STOCK_MEDIA_REWIND),
+            dict(name='add', text=_('_Add'), func=self.add_clicked,
+                icon=gtk.STOCK_ADD),
+            dict(name='remove', text=_('_Remove'), func=self.remove_clicked,
+                icon=gtk.STOCK_DELETE),
+            dict(name='move', text=_('Move'), func=self.move_clicked,
+                icon=gtk.STOCK_JUMP_TO),
+            dict(name='forget', text=_('_Forget'), func=self.forget_clicked,
+                icon=gtk.STOCK_CLEAR)]),
            ]
 
     def save_settings(self):
@@ -618,7 +627,7 @@ class GCommit(GStatus):
         can_undo = os.path.exists(self.repo.sjoin("undo")) and \
                 self.last_commit_id is not None
         self.undo_button.set_sensitive(can_undo)
-        self.get_menuitem(_('_Undo')).set_sensitive(can_undo)
+        self.get_menuitem('undo').set_sensitive(can_undo)
 
     def check_merge(self):
         if self.is_merge():
