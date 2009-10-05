@@ -42,6 +42,7 @@ class ArchiveDialog(gtk.Dialog):
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
+        self.repo = repo
         self.set_title(_('Archive - %s') % hglib.get_reponame(repo))
 
         # layout table
@@ -143,6 +144,7 @@ class ArchiveDialog(gtk.Dialog):
         self.update_path()
 
     def update_path(self, path=None):
+        wdrev = str(self.repo['.'].rev())
         def remove_ext(path):
             for ext in ('.tar', '.tar.bz2', '.tar.gz', '.zip'):
                 if path.endswith(ext):
@@ -150,14 +152,14 @@ class ArchiveDialog(gtk.Dialog):
             return path
         def remove_rev(path):
             model = self.combo.get_model()
-            for rev in ['_' + rev[0] for rev in model]:
+            for rev in ['_' + rev[0] for rev in model] + ['_' + wdrev,]:
                 if path.endswith(rev):
                     return path.replace(rev, '')
             return path
         def add_rev(path):
             rev = self.combo.get_active_text()
             if rev == WD_PARENT:
-                rev = 'tip'
+                rev = wdrev
             return '%s_%s' % (path, rev)
         def add_ext(path):
             select = self.get_selected_archive_type()
