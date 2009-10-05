@@ -281,9 +281,8 @@ def about(ui, *pats, **opts):
 
 def add(ui, *pats, **opts):
     """add files"""
-    from mercurial import dispatch as _dispatch
-    _dispatch.dispatch(['add'] + list(pats))
-    shlib.shell_notify([os.getcwd()])
+    from tortoisehg.hgtk.quickop import run
+    gtkrun(run, ui, *pats, **opts)
 
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
@@ -370,17 +369,17 @@ def recovery(ui, *pats, **opts):
 
 def remove(ui, *pats, **opts):
     """file status viewer in remove mode"""
-    from tortoisehg.hgtk.status import run
+    from tortoisehg.hgtk.quickop import run
     gtkrun(run, ui, *pats, **opts)
 
 def revert(ui, *pats, **opts):
     """file status viewer in revert mode"""
-    from tortoisehg.hgtk.status import run
+    from tortoisehg.hgtk.quickop import run
     gtkrun(run, ui, *pats, **opts)
 
 def forget(ui, *pats, **opts):
     """file status viewer in forget mode"""
-    from tortoisehg.hgtk.status import run
+    from tortoisehg.hgtk.quickop import run
     gtkrun(run, ui, *pats, **opts)
 
 def serve(ui, *pats, **opts):
