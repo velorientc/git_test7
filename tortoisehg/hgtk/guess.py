@@ -215,7 +215,7 @@ class DetectRenameDialog(gtk.Window):
 
         self.unktree.get_selection().connect('changed', self.unknown_sel_change)
         self.cantree.connect('row-activated', lambda b: self.accept_match())
-        self.cantree.get_selection().connect('changed', self.show_diff, self.buf)
+        self.cantree.get_selection().connect('changed', self.show_diff)
         self.connect('delete-event', lambda *a: self.save_settings())
         gobject.idle_add(self.refresh)
 
@@ -226,12 +226,11 @@ class DetectRenameDialog(gtk.Window):
         q = Queue.Queue()
         unkmodel = self.unktree.get_model()
         unkmodel.clear()
-        thread = thread2.Thread(target=self.unknown_thread,
-                args=(self.repo.root, q))
+        thread = thread2.Thread(target=self.unknown_thread, args=(q,))
         thread.start()
         gobject.timeout_add(50, self.unknown_wait, thread, q)
 
-    def unknown_thread(self, root, q):
+    def unknown_thread(self, q):
         hglib.invalidaterepo(self.repo)
         matcher = match.always(self.repo.root, self.repo.root)
         status = self.repo.status(node1=self.repo.dirstate.parents()[0],
@@ -268,14 +267,13 @@ class DetectRenameDialog(gtk.Window):
             return
         tgts = [ umodel[p][0] for p in upaths ]
         q = Queue.Queue()
-        thread = thread2.Thread(target=self.search_thread,
-                args=(self.repo.root, q, tgts))
+        thread = thread2.Thread(target=self.search_thread, args=(q, tgts))
         thread.start()
         self.stbar.begin()
         self.stbar.set_status_text(_('finding source of ') + ', '.join(tgts))
         gobject.timeout_add(50, self.search_wait, thread, q)
 
-    def search_thread(self, root, q, tgts):
+    def search_thread(self, q, tgts):
         hglib.invalidaterepo(self.repo)
         srcs = []
         audit_path = util.path_auditor(self.repo.root)
