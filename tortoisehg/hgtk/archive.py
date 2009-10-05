@@ -44,6 +44,7 @@ class ArchiveDialog(gtk.Dialog):
             return
         self.repo = repo
         self.set_title(_('Archive - %s') % hglib.get_reponame(repo))
+        self.prevtarget = None
 
         # layout table
         self.table = table = gtklib.LayoutTable()
@@ -144,7 +145,6 @@ class ArchiveDialog(gtk.Dialog):
         self.update_path()
 
     def update_path(self, path=None):
-        wdrev = str(self.repo['.'].rev())
         def remove_ext(path):
             for ext in ('.tar', '.tar.bz2', '.tar.gz', '.zip'):
                 if path.endswith(ext):
@@ -152,27 +152,40 @@ class ArchiveDialog(gtk.Dialog):
             return path
         def remove_rev(path):
             model = self.combo.get_model()
-            for rev in ['_' + rev[0] for rev in model] + ['_' + wdrev,]:
+            revs = [rev[0] for rev in model]
+            revs.append(wdrev)
+            if not self.prevtarget is None:
+                revs.append(self.prevtarget)
+            for rev in ['_' + rev for rev in revs]:
                 if path.endswith(rev):
                     return path.replace(rev, '')
             return path
-        def add_rev(path):
-            rev = self.combo.get_active_text()
-            if rev == WD_PARENT:
-                rev = wdrev
+        def add_rev(path, rev):
             return '%s_%s' % (path, rev)
         def add_ext(path):
             select = self.get_selected_archive_type()
             if select['type'] != 'files':
                 path += select['ext']
             return path
+        text = self.combo.get_active_text()
+        if len(text) == 0:
+            return
+        wdrev = str(self.repo['.'].rev())
+        if text == WD_PARENT:
+            text = wdrev
+        else:
+            try:
+                self.repo[text]
+            except (hglib.RepoError, hglib.LookupError):
+                return
         if path is None:
             path = self.destentry.get_text()
         path = remove_ext(path)
         path = remove_rev(path)
-        path = add_rev(path)
+        path = add_rev(path, text)
         path = add_ext(path)
         self.destentry.set_text(path)
+        self.prevtarget = text
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
