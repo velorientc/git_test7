@@ -220,11 +220,30 @@ class QuickOpDialog(gtk.Dialog):
 
     def operation(self, repo):
         fm = self.filetree.get_model()
-        list = [row[1] for row in fm if row[0]]
-        if not list:
+        deleting = self.command in ('remove', 'rm')
+        list, dellist = [], []
+        for row in fm:
+            if not row[0]: continue
+            if deleting and row[3] in (_('unknown'), _('ignored')):
+                dellist.append(row[1])
+            else:
+                list.append(row[1])
+
+        if not (list or dellist):
             gdialog.Prompt(_('No files selected'),
                            _('No operation to perform'), self).run()
             return
+
+        for file in dellist:
+            try:
+                os.unlink(file)
+            except IOError:
+                pass
+
+        if not list:
+            self.destroy()
+            return
+
         cmdline = ['hg', self.command, '--verbose'] + list
 
         def cmd_done(returncode):
