@@ -375,7 +375,7 @@ class TreeView(gtk.ScrolledWindow):
         # If user has configured authorcolor in [tortoisehg], color
         # rows by author matches
         self.author_pats = []
-        self.color_func =  self.text_color_orig
+        self.color_func =  self.text_color_default
 
         if self.repo is not None:
             for k, v in self.repo.ui.configitems('tortoisehg'):
@@ -385,8 +385,6 @@ class TreeView(gtk.ScrolledWindow):
             if self.author_pats or self.repo.ui.configbool('tortoisehg',
                     'authorcolor'):
                 self.color_func = self.text_color_author
-            else:
-                self.color_func = self.text_color_orig
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
@@ -559,6 +557,9 @@ class TreeView(gtk.ScrolledWindow):
                 return 'black'
         else:
             return 'black'
+
+    def text_color_default(self, parents, rev, author):
+        return int(rev) >= self.origtip and 'darkgreen' or 'black'
 
     colors = '''black blue deeppink mediumorchid blue burlywood4 goldenrod
      slateblue red2 navy dimgrey'''.split()
