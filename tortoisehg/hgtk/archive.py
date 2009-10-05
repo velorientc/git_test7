@@ -52,7 +52,7 @@ class ArchiveDialog(gtk.Dialog):
 
         ## revision combo
         self.combo = gtk.combo_box_entry_new_text()
-        self.combo.child.set_width_chars(24)
+        self.combo.child.set_width_chars(28)
         self.combo.child.connect('activate',
                                  lambda b: self.response(gtk.RESPONSE_OK))
         if rev:
@@ -71,23 +71,22 @@ class ArchiveDialog(gtk.Dialog):
         table.add_row(_('Archive revision:'), self.combo)
 
         ## dest combo & browse button
-        destcombo = gtk.combo_box_entry_new_text()
-        self.destentry = destcombo.get_child()
+        self.destentry = gtk.Entry()
         self.destentry.set_width_chars(46)
 
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.browse_clicked)
 
-        table.add_row(_('Destination path:'), destcombo, 0, destbrowse)
+        table.add_row(_('Destination path:'), self.destentry, 0, destbrowse)
 
         ## archive types
         self.filesradio = gtk.RadioButton(None, _('Directory of files'))
         self.filesradio.connect('toggled', self.type_changed)
-        table.add_row(_('Archive types:'), self.filesradio)
+        table.add_row(_('Archive types:'), self.filesradio, ypad=0)
         def add_type(label):
             radio = gtk.RadioButton(self.filesradio, label)
             radio.connect('toggled', self.type_changed)
-            table.add_row(None, radio)
+            table.add_row(None, radio, ypad=0)
             return radio
         self.tarradio = add_type(_('Uncompressed tar archive'))
         self.tbz2radio = add_type(_('Tar archive compressed using bzip2'))
