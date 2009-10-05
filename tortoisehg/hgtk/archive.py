@@ -42,7 +42,9 @@ class ArchiveDialog(gtk.Dialog):
         except hglib.RepoError:
             gobject.idle_add(self.destroy)
             return
+        self.repo = repo
         self.set_title(_('Archive - %s') % hglib.get_reponame(repo))
+        self.prevtarget = None
 
         # layout table
         self.table = table = gtklib.LayoutTable()
@@ -50,7 +52,7 @@ class ArchiveDialog(gtk.Dialog):
 
         ## revision combo
         self.combo = gtk.combo_box_entry_new_text()
-        self.combo.child.set_width_chars(24)
+        self.combo.child.set_width_chars(28)
         self.combo.child.connect('activate',
                                  lambda b: self.response(gtk.RESPONSE_OK))
         if rev:
@@ -69,23 +71,22 @@ class ArchiveDialog(gtk.Dialog):
         table.add_row(_('Archive revision:'), self.combo)
 
         ## dest combo & browse button
-        destcombo = gtk.combo_box_entry_new_text()
-        self.destentry = destcombo.get_child()
+        self.destentry = gtk.Entry()
         self.destentry.set_width_chars(46)
 
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.browse_clicked)
 
-        table.add_row(_('Destination path:'), destcombo, 0, destbrowse)
+        table.add_row(_('Destination path:'), self.destentry, 0, destbrowse)
 
         ## archive types
         self.filesradio = gtk.RadioButton(None, _('Directory of files'))
         self.filesradio.connect('toggled', self.type_changed)
-        table.add_row(_('Archive types:'), self.filesradio)
+        table.add_row(_('Archive types:'), self.filesradio, ypad=0)
         def add_type(label):
             radio = gtk.RadioButton(self.filesradio, label)
             radio.connect('toggled', self.type_changed)
-            table.add_row(None, radio)
+            table.add_row(None, radio, ypad=0)
             return radio
         self.tarradio = add_type(_('Uncompressed tar archive'))
         self.tbz2radio = add_type(_('Tar archive compressed using bzip2'))
@@ -150,27 +151,40 @@ class ArchiveDialog(gtk.Dialog):
             return path
         def remove_rev(path):
             model = self.combo.get_model()
-            for rev in ['_' + rev[0] for rev in model]:
+            revs = [rev[0] for rev in model]
+            revs.append(wdrev)
+            if not self.prevtarget is None:
+                revs.append(self.prevtarget)
+            for rev in ['_' + rev for rev in revs]:
                 if path.endswith(rev):
                     return path.replace(rev, '')
             return path
-        def add_rev(path):
-            rev = self.combo.get_active_text()
-            if rev == WD_PARENT:
-                rev = 'tip'
+        def add_rev(path, rev):
             return '%s_%s' % (path, rev)
         def add_ext(path):
             select = self.get_selected_archive_type()
             if select['type'] != 'files':
                 path += select['ext']
             return path
+        text = self.combo.get_active_text()
+        if len(text) == 0:
+            return
+        wdrev = str(self.repo['.'].rev())
+        if text == WD_PARENT:
+            text = wdrev
+        else:
+            try:
+                self.repo[text]
+            except (hglib.RepoError, hglib.LookupError):
+                return
         if path is None:
             path = self.destentry.get_text()
         path = remove_ext(path)
         path = remove_rev(path)
-        path = add_rev(path)
+        path = add_rev(path, text)
         path = add_ext(path)
         self.destentry.set_text(path)
+        self.prevtarget = text
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""

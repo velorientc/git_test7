@@ -123,7 +123,7 @@ class UpdateDialog(gtk.Dialog):
 
         # summary of new revision
         hb, label = new_label()
-        table.add_row('Target:', hb)
+        table.add_row(_('Target:'), hb)
         self.new_rev_label = label
 
         # summary of current revision(s)
@@ -134,7 +134,7 @@ class UpdateDialog(gtk.Dialog):
         if len(self.ctxs) == 2:
             table.add_row(_('Parent 1:'), hb)
             hb, label = new_label()
-            table.add_row('Parent 2:', hb)
+            table.add_row(_('Parent 2:'), hb)
             self.current_rev_label2 = label
         else:
             table.add_row(_('Parent:'), hb)
