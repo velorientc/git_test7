@@ -126,6 +126,7 @@ class QuickOpDialog(gtk.Dialog):
             pass
 
         (modified, added, removed, deleted, unknown, ignored, clean) = status
+        deleting = command in ('remove', 'rm')
         if 'M' in filetypes:
             for f in modified:
                 fm.append([True, f, hglib.toutf(f), _('modified')])
@@ -143,11 +144,11 @@ class QuickOpDialog(gtk.Dialog):
                 fm.append([True, f, hglib.toutf(f), _('unknown')])
         if 'I' in filetypes:
             for f in ignored:
-                if f in pats:
+                if deleting or f in pats:
                     fm.append([True, f, hglib.toutf(f), _('ignored')])
         if 'C' in filetypes:
             for f in clean:
-                if f in pats:
+                if deleting or f in pats:
                     fm.append([True, f, hglib.toutf(f), _('clean')])
 
         if not len(fm):
