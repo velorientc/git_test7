@@ -804,6 +804,7 @@ class GLog(gdialog.GDialog):
         cell = gtk.CellRendererText()
         urlcombo.pack_end(cell, False)
         urlcombo.add_attribute(cell, 'text', 1)
+        self.urlcombo = urlcombo
         self.pathentry = urlcombo.get_child()
         syncbox.append_widget(urlcombo, expand=True)
 
@@ -989,7 +990,7 @@ class GLog(gdialog.GDialog):
         def remove_overlay(resettip):
             self.bfile = None
             self.npreviews = 0
-            self.pathentry.set_text('')
+            self.urlcombo.set_active(origurl)
             self.repo = hg.repository(self.ui, path=self.repo.root)
             self.graphview.set_repo(self.repo, self.stbar)
             self.changeview.repo = self.repo
@@ -1012,6 +1013,7 @@ class GLog(gdialog.GDialog):
             self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
             atexit.register(cleanup)
 
+        origurl = self.urlcombo.get_active()
         path = self.pathentry.get_text()
         bfile = path
         for badchar in (':', '*', '\\', '?', '#'):
