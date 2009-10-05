@@ -175,9 +175,13 @@ class TreeModel(gtk.GenericTreeModel):
                 sumstr = bstr + tstr + summary
 
             if node in self.outgoing:
+                marker = hglib.toutf(u'\u2191 ') # up arrow
+                sumstr = marker + sumstr
                 status = -1
             elif revid >= self.origtip:
                 if revid >= len(self.repo) - self.npreviews:
+                    marker = hglib.toutf(u'\u2193 ') # down arrow
+                    sumstr = marker + sumstr
                     status = 2
                 else:
                     status = 1
