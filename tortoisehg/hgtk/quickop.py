@@ -38,6 +38,10 @@ class QuickOpDialog(gtk.Dialog):
             gobject.idle_add(self.destroy)
             return
 
+        # Handle rm alias
+        if command == 'rm':
+            command = 'remove'
+
         os.chdir(repo.root)
         self.repo = repo
         self.set_title(hglib.get_reponame(repo) + ' ' + command)
@@ -112,7 +116,7 @@ class QuickOpDialog(gtk.Dialog):
         types = { 'add' : 'I?',
                   'forget' : 'MAR!C',
                   'revert' : 'MAR!',
-                  'remove' : 'MAR!CI?', 'rm' : 'MAR!CI?',
+                  'remove' : 'MAR!CI?',
                 }
         filetypes = types[command]
 
@@ -126,7 +130,6 @@ class QuickOpDialog(gtk.Dialog):
             pass
 
         (modified, added, removed, deleted, unknown, ignored, clean) = status
-        deleting = command in ('remove', 'rm')
         if 'M' in filetypes:
             for f in modified:
                 fm.append([True, f, hglib.toutf(f), _('modified')])
@@ -144,11 +147,11 @@ class QuickOpDialog(gtk.Dialog):
                 fm.append([True, f, hglib.toutf(f), _('unknown')])
         if 'I' in filetypes:
             for f in ignored:
-                if deleting or f in pats:
+                if command == 'remove' or f in pats:
                     fm.append([True, f, hglib.toutf(f), _('ignored')])
         if 'C' in filetypes:
             for f in clean:
-                if deleting or f in pats:
+                if command == 'remove' or f in pats:
                     fm.append([True, f, hglib.toutf(f), _('clean')])
 
         if not len(fm):
@@ -220,7 +223,7 @@ class QuickOpDialog(gtk.Dialog):
 
     def operation(self, repo):
         fm = self.filetree.get_model()
-        deleting = self.command in ('remove', 'rm')
+        deleting = self.command == 'remove'
         list, dellist = [], []
         for row in fm:
             if not row[0]: continue
