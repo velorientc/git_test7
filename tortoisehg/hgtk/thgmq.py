@@ -10,6 +10,8 @@ import gtk
 import gobject
 import pango
 
+from mercurial import extensions
+
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
 
@@ -76,6 +78,12 @@ class MQWidget(gtk.VBox):
 
         self.repo = repo
         self.mqloaded = hasattr(repo, 'mq')
+
+        try:
+            extensions.find('qup')
+            self.hasqup = True
+        except KeyError:
+            self.hasqup = False
 
         # top toolbar
         tbar = gtklib.SlimToolbar(tooltips)
@@ -371,6 +379,17 @@ class MQWidget(gtk.VBox):
         cmdline = ['hg', 'qfold', patch]
         self.cmd.execute(cmdline, self.cmd_done)
 
+    def mknext(self, patch):
+        """
+        [MQ] Execute 'qup patch'
+
+        patch: the patch name or an index to specify the patch.
+        """
+        if not (self.hasqup and patch and self.is_operable()):
+            return
+        cmdline = ['hg', 'qup', patch]
+        self.cmd.execute(cmdline, self.cmd_done)
+
     def has_patch(self):
         """ return True if MQ has applicable patch """
         if self.mqloaded:
@@ -382,6 +401,12 @@ class MQWidget(gtk.VBox):
         if self.mqloaded:
             return len(self.repo.mq.applied) > 0
         return False
+
+    def number_applied(self):
+        """ return the number of applied patches """
+        if self.mqloaded:
+            return len(self.repo.mq.applied)
+        return 0
 
     def is_operable(self):
         """ return True if MQ is operable """
@@ -498,6 +523,7 @@ class MQWidget(gtk.VBox):
         is_qtip = self.is_qtip(row[MQ_NAME])
         is_qparent = row[MQ_INDEX] == INDEX_QPARENT
         is_applied = row[MQ_STATUS] == 'A'
+        is_next = row[MQ_INDEX] == self.number_applied()
 
         if is_operable and not is_qtip and (not is_qparent or has_applied):
             append(_('_goto'), self.goto_activated)
@@ -510,6 +536,8 @@ class MQWidget(gtk.VBox):
             append(_('delete --keep'), self.delete_keep_activated)
             if has_applied and not is_qparent:
                 append(_('f_old'), self.fold_activated)
+            if self.hasqup and not is_next:
+                append(_('make it _next'), self.mknext_activated)
 
         if len(menu.get_children()) > 0:
             menu.show_all()
@@ -667,3 +695,6 @@ class MQWidget(gtk.VBox):
 
     def fold_activated(self, menuitem, row):
         self.qfold(row[MQ_NAME])
+
+    def mknext_activated(self, menuitem, row):
+        self.mknext(row[MQ_NAME])
