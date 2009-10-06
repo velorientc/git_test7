@@ -124,11 +124,10 @@ class TreeView(gtk.ScrolledWindow):
         self.batchsize = limit
         self.repo = repo
         self.currevid = None
-        self.construct_treeview()
         self.pbar = pbar
-        self.branch_color = False
         self.opts = { 'outgoing':[], 'orig-tip':None, 'npreviews':0,
                       'branch-color':False }
+        self.construct_treeview()
 
     def set_repo(self, repo, pbar=None):
         self.repo = repo
