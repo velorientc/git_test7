@@ -156,22 +156,22 @@ class GStatus(gdialog.GDialog):
         else:
             tbuttons += [
                     self.make_toolbutton(gtk.STOCK_JUSTIFY_FILL, _('_Diff'),
-                        self.diff_clicked,
+                        self.diff_clicked, name='diff',
                         tip=_('Visual diff checked files')),
                     self.make_toolbutton(gtk.STOCK_MEDIA_REWIND, _('Re_vert'),
-                        self.revert_clicked,
+                        self.revert_clicked, name='revert',
                         tip=_('Revert checked files')),
                     self.make_toolbutton(gtk.STOCK_ADD, _('_Add'),
-                        self.add_clicked,
+                        self.add_clicked, name='add',
                         tip=_('Add checked files')),
                     self.make_toolbutton(gtk.STOCK_JUMP_TO, _('Move'),
-                        self.move_clicked,
+                        self.move_clicked, name='move',
                         tip=_('Move checked files to other directory')),
                     self.make_toolbutton(gtk.STOCK_DELETE, _('_Remove'),
-                        self.remove_clicked,
+                        self.remove_clicked, name='remove',
                         tip=_('Remove or delete checked files')),
                     self.make_toolbutton(gtk.STOCK_CLEAR, _('_Forget'),
-                        self.forget_clicked, 
+                        self.forget_clicked, name='forget',
                         tip=_('Forget checked files on next commit')),
                     gtk.SeparatorToolItem(),
                     self.make_toolbutton(gtk.STOCK_REFRESH, _('Re_fresh'),
@@ -459,10 +459,8 @@ class GStatus(gdialog.GDialog):
         if self.count_revs() == 2:
             return
         sensitive = check_count and not self.is_merge()
-        for label in (_('_Diff'), _('Re_vert'), _('_Add'), _('_Remove'),
-                      _('Move'), _('_Forget')):
-            self.get_toolbutton(label).set_sensitive(sensitive)
         for cmd in ('diff', 'revert', 'add', 'remove', 'move', 'forget'):
+            self.get_toolbutton(cmd).set_sensitive(sensitive)
             i = self.get_menuitem(cmd, throw=False)
             if i:
                 i.set_sensitive(sensitive)

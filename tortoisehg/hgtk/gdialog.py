@@ -306,7 +306,7 @@ class GDialog(gtk.Window):
 
 
     def make_toolbutton(self, stock, label, handler, userdata=None,
-                menu=None, tip=None, toggle=False, icon=None):
+                menu=None, tip=None, toggle=False, icon=None, name=None):
         if menu:
             tbutton = gtk.MenuToolButton(stock)
             tbutton.set_menu(menu)
@@ -326,12 +326,12 @@ class GDialog(gtk.Window):
         tbutton.set_use_underline(True)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
-        self.toolbuttons[label] = tbutton
+        if name:
+            self.toolbuttons[name] = tbutton
         return tbutton
 
-
-    def get_toolbutton(self, label):
-        return self.toolbuttons[label]
+    def get_toolbutton(self, name):
+        return self.toolbuttons[name]
 
     def get_menuitem(self, name, throw=True):
         if throw:

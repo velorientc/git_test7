@@ -77,19 +77,19 @@ class GLog(gdialog.GDialog):
         tbar = [
                 self.make_toolbutton(gtk.STOCK_REFRESH,
                     _('Re_fresh'),
-                    self.refresh_clicked,
+                    self.refresh_clicked, name='refresh',
                     tip=_('Reload revision history')),
                 gtk.SeparatorToolItem(),
                 self.make_toolbutton(gtk.STOCK_NETWORK,
                      _('Synchronize'),
-                     self.synch_clicked,
+                     self.synch_clicked, name='synchronize',
                      tip=_('Launch synchronize tool')),
                 gtk.SeparatorToolItem(),
                ]
         if 'mq' in self.exs:
             self.mqtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
                             _('MQ'),
-                            self.mq_clicked,
+                            self.mq_clicked, name='mq',
                             tip=_('Toggle MQ panel'),
                             toggle=True,
                             icon='menupatch.ico')
@@ -177,7 +177,7 @@ class GLog(gdialog.GDialog):
 
     def synch_clicked(self, toolbutton, data):
         def sync_closed(dialog):
-            self.get_toolbutton(_('Synchronize')).set_sensitive(True)
+            self.get_toolbutton('synchronize').set_sensitive(True)
 
         def synch_callback(parents):
             self.repo.invalidate()
@@ -191,7 +191,7 @@ class GLog(gdialog.GDialog):
         dlg.set_notify_func(synch_callback, parents)
         dlg.connect('destroy', sync_closed)
         dlg.show_all()
-        self.get_toolbutton(_('Synchronize')).set_sensitive(False)
+        self.get_toolbutton('synchronize').set_sensitive(False)
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
@@ -1049,8 +1049,8 @@ class GLog(gdialog.GDialog):
             self.toolbar.insert(apply, 0)
 
             disabled = []
-            for label in (_('Re_fresh'), _('Synchronize'), _('MQ')):
-                tb = self.get_toolbutton(label)
+            for cmd in ('refresh', 'synchronize', 'mq'):
+                tb = self.get_toolbutton(cmd)
                 if tb:
                     tb.set_sensitive(False)
                     disabled.append(tb)
