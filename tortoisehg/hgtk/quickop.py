@@ -244,7 +244,7 @@ class QuickOpDialog(gtk.Dialog):
                 pass
 
         if not list:
-            self.destroy()
+            gobject.idle_add(self.response, gtk.RESPONSE_CLOSE)
             return
 
         cmdline = ['hg', self.command, '--verbose'] + list
@@ -254,7 +254,7 @@ class QuickOpDialog(gtk.Dialog):
             if returncode == 0:
                 shlib.shell_notify(list)
                 if not self.cmd.is_show_log():
-                    self.destroy()
+                    self.response(gtk.RESPONSE_CLOSE)
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
