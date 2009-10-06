@@ -137,7 +137,6 @@ class TreeView(gtk.ScrolledWindow):
     def set_repo(self, repo, pbar=None):
         self.repo = repo
         self.pbar = pbar
-        self.set_author_color()
 
     def search_in_tree(self, model, column, key, iter, data):
         """Searches all fields shown in the tree when the user hits crtr+f,
@@ -249,8 +248,7 @@ class TreeView(gtk.ScrolledWindow):
 
         if not self.model:
             model = treemodel.TreeModel(self.repo, self.graphdata,
-                    self.color_func, self.outgoing, self.origtip,
-                    self.npreviews)
+                    self.outgoing, self.origtip, self.npreviews)
             self.treeview.set_model(model)
             self.model = model
 
@@ -371,28 +369,12 @@ class TreeView(gtk.ScrolledWindow):
                 self.treeview.set_model(None)
                 self.pbar.set_status_text(_('Repository is empty'))
 
-    def set_author_color(self):
-        # If user has configured authorcolor in [tortoisehg], color
-        # rows by author matches
-        self.author_pats = []
-        self.color_func =  self.text_color_default
-
-        if self.repo is not None:
-            for k, v in self.repo.ui.configitems('tortoisehg'):
-                if not k.startswith('authorcolor.'): continue
-                pat = k[12:]
-                self.author_pats.append((re.compile(pat, re.I), v))
-            if self.author_pats or self.repo.ui.configbool('tortoisehg',
-                    'authorcolor'):
-                self.color_func = self.text_color_author
-
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
         self.treeview.set_rules_hint(True)
         self.treeview.set_reorderable(False)
         self.treeview.set_enable_search(True)
         self.treeview.set_search_equal_func(self.search_in_tree, None)
-        self.set_author_color()
 
         self.treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
         self.treeview.connect("cursor-changed", self._on_selection_changed)
@@ -542,39 +524,6 @@ class TreeView(gtk.ScrolledWindow):
 
     def get_columns(self):
         return self.columns
-
-    def text_color_orig(self, parents, rev, author):
-        if int(rev) >= self.origtip:
-            return 'darkgreen'
-        if len(parents) == 2:
-            # mark merge changesets blue
-            return 'blue'
-        elif len(parents) == 1:
-            # detect non-trivial parent
-            if long(rev) != parents[0].rev()+1:
-                return '#900000'
-            else:
-                return 'black'
-        else:
-            return 'black'
-
-    def text_color_default(self, parents, rev, author):
-        return int(rev) >= self.origtip and 'darkgreen' or 'black'
-
-    colors = '''black blue deeppink mediumorchid blue burlywood4 goldenrod
-     slateblue red2 navy dimgrey'''.split()
-    color_cache = {}
-
-    def text_color_author(self, parents, rev, author):
-        if int(rev) >= self.origtip:
-            return 'darkgreen'
-        for re, v in self.author_pats:
-            if (re.search(author)):
-                return v
-        if author not in self.color_cache:
-            color = self.colors[len(self.color_cache.keys()) % len(self.colors)]
-            self.color_cache[author] = color
-        return self.color_cache[author]
 
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""

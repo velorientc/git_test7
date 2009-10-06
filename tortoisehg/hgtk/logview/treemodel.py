@@ -40,18 +40,18 @@ AGE = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
-    def __init__ (self, repo, graphdata, color_func, outgoing, origtip, npreviews):
+    def __init__ (self, repo, graphdata, outgoing, origtip, npreviews):
         gtk.GenericTreeModel.__init__(self)
         self.repo = repo
         self.outgoing = outgoing
         self.revisions = {}
         self.graphdata = graphdata
-        self.color_func = color_func
         self.wcparents = [x.rev() for x in repo.parents()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
         self.origtip = origtip
         self.npreviews = npreviews
+        self.set_author_color()
         self.hidetags = self.repo.ui.config(
             'tortoisehg', 'hidetags', '').split()
 
@@ -168,7 +168,7 @@ class TreeModel(gtk.GenericTreeModel):
             author = hglib.toutf(hglib.username(ctx.user()))
             age = templatefilters.age(ctx.date())
 
-            color = self.color_func(ctx.parents(), revid, author)
+            color = self.color_func(revid, author)
             if revid in self.wcparents:
                 sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
             else:
@@ -220,3 +220,37 @@ class TreeModel(gtk.GenericTreeModel):
 
     def on_iter_parent(self, child):
         return None
+
+    def set_author_color(self):
+        # If user has configured authorcolor in [tortoisehg], color
+        # rows by author matches
+        self.author_pats = []
+        self.color_func =  self.text_color_default
+
+        if self.repo is not None:
+            for k, v in self.repo.ui.configitems('tortoisehg'):
+                if not k.startswith('authorcolor.'): continue
+                pat = k[12:]
+                self.author_pats.append((re.compile(pat, re.I), v))
+            if self.author_pats or self.repo.ui.configbool('tortoisehg',
+                    'authorcolor'):
+                self.color_func = self.text_color_author
+
+    def text_color_default(self, rev, author):
+        return int(rev) >= self.origtip and 'darkgreen' or 'black'
+
+    colors = '''black blue deeppink mediumorchid blue burlywood4 goldenrod
+     slateblue red2 navy dimgrey'''.split()
+    color_cache = {}
+
+    def text_color_author(self, rev, author):
+        if int(rev) >= self.origtip:
+            return 'darkgreen'
+        for re, v in self.author_pats:
+            if (re.search(author)):
+                return v
+        if author not in self.color_cache:
+            color = self.colors[len(self.color_cache.keys()) % len(self.colors)]
+            self.color_cache[author] = color
+        return self.color_cache[author]
+
