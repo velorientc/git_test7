@@ -1128,7 +1128,7 @@ class ConfigDialog(gtk.Dialog):
         return 0
 
 def run(ui, *pats, **opts):
-    dlg = ConfigDialog(opts.get('repomode'))
+    dlg = ConfigDialog(opts.get('alias') == 'repoconfig')
     if opts.get('focus', ''):
         dlg.focus_field(opts['focus'])
     return dlg

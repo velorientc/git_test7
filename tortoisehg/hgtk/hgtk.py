@@ -313,13 +313,11 @@ def shelve(ui, *pats, **opts):
 def userconfig(ui, *pats, **opts):
     """user configuration editor"""
     from tortoisehg.hgtk.thgconfig import run
-    opts['repomode'] = False
     gtkrun(run, ui, *pats, **opts)
 
 def repoconfig(ui, *pats, **opts):
     """repository configuration editor"""
     from tortoisehg.hgtk.thgconfig import run
-    opts['repomode'] = True
     gtkrun(run, ui, *pats, **opts)
 
 def rename(ui, *pats, **opts):
