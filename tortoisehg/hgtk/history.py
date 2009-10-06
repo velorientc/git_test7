@@ -104,7 +104,6 @@ class GLog(gdialog.GDialog):
         def refresh(menuitem, resetmarks):
             if resetmarks:
                 self.outgoing = []
-                self.graphview.set_outgoing([])
                 self.origtip = len(self.repo)
             self.reload_log()
         def navigate(menuitem, revname):
@@ -519,7 +518,6 @@ class GLog(gdialog.GDialog):
                 'revrange':[], 'revlist':[], 'noheads':False,
                 'branch-view':False, 'rev':[], 'user':[]}
         if self.filteropts and not kwopts: opts = self.filteropts
-        opts['branch-view'] = self.compactgraph
         opts.update(kwopts)
 
         # handle strips, rebases, etc
@@ -527,9 +525,10 @@ class GLog(gdialog.GDialog):
         if not self.bfile:
             self.npreviews = 0
         
+        opts['branch-view'] = self.compactgraph
+        opts['outgoing'] = self.outgoing
         opts['orig-tip'] = self.origtip
         opts['npreviews'] = self.npreviews
-
         opts['no_merges'] = self.no_merges
 
         self.loadnextbutton.set_sensitive(True)
@@ -1125,7 +1124,6 @@ class GLog(gdialog.GDialog):
                 return True
             else:
                 self.stbar.end()
-                self.graphview.set_outgoing(outgoing)
                 self.outgoing = outgoing
                 self.reload_log()
                 self.stop_button.disconnect(stop_handler)
@@ -1171,7 +1169,6 @@ class GLog(gdialog.GDialog):
         dlg.hide()
         if dlg.return_code() == 0 and self.outgoing:
             self.outgoing = []
-            self.graphview.set_outgoing([])
             self.reload_log()
 
     def conf_clicked(self, toolbutton, combo):
@@ -1498,7 +1495,6 @@ class GLog(gdialog.GDialog):
         if dlg.return_code() == 0 and self.outgoing:
             d = self.outgoing.index(node)
             self.outgoing = self.outgoing[d+1:]
-            self.graphview.set_outgoing(self.outgoing)
             self.reload_log()
 
     def pull_to(self, menuitem):

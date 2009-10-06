@@ -130,9 +130,6 @@ class TreeView(gtk.ScrolledWindow):
         self.opts = { 'outgoing':[], 'orig-tip':None, 'npreviews':0,
                       'branch-color':False }
 
-    def set_outgoing(self, outgoing):
-        self.opts['outgoing'] = outgoing
-
     def set_repo(self, repo, pbar=None):
         self.repo = repo
         self.pbar = pbar
