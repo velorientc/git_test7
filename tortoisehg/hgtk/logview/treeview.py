@@ -126,7 +126,7 @@ class TreeView(gtk.ScrolledWindow):
         self.currevid = None
         self.pbar = pbar
         self.opts = { 'outgoing':[], 'orig-tip':None, 'npreviews':0,
-                      'branch-color':False }
+                      'branch-color':False, 'show-graph':True }
         self.construct_treeview()
 
     def set_repo(self, repo, pbar=None):
@@ -184,7 +184,7 @@ class TreeView(gtk.ScrolledWindow):
             self.grapher = dumb_log_generator(self.repo, opts['revlist'])
         else:
             self.grapher = filtered_log_generator(self.repo, pats, opts)
-        self.show_graph = graphcol
+        self.opts['show-graph'] = graphcol
         self.graphdata = []
         self.index = {}
         self.max_cols = 1
@@ -239,7 +239,7 @@ class TreeView(gtk.ScrolledWindow):
             width = 500
         gcol = self.tvcolumns['graph']
         gcol.set_fixed_width(width)
-        gcol.set_visible(self.show_graph)
+        gcol.set_visible(self.opts.get('show-graph'))
 
         if not self.model:
             model = treemodel.TreeModel(self.repo, self.graphdata, self.opts)

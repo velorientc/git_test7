@@ -46,6 +46,7 @@ class TreeModel(gtk.GenericTreeModel):
         self.outgoing = opts['outgoing']
         self.origtip = opts['orig-tip']
         self.npreviews = opts['npreviews']
+        self.showgraph = opts['show-graph']
         self.revisions = {}
         self.graphdata = graphdata
         self.wcparents = [x.rev() for x in repo.parents()]
