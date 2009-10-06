@@ -229,12 +229,12 @@ class GCommit(GStatus):
         # insert to head of toolbar
         tbbuttons = GStatus.get_tbbuttons(self)
         tbbuttons.insert(0, gtk.SeparatorToolItem())
-        self.undo_button = self.make_toolbutton(gtk.STOCK_UNDO, _('_Undo'),
-            self.undo_clicked, tip=_('undo recent commit'))
-        self.commit_button = self.make_toolbutton(gtk.STOCK_OK, _('_Commit'),
-            self.commit_clicked, tip=_('commit'))
-        tbbuttons.insert(0, self.undo_button)
-        tbbuttons.insert(0, self.commit_button)
+        undo_btn = self.make_toolbutton(gtk.STOCK_UNDO, _('_Undo'),
+            self.undo_clicked, name='undo', tip=_('undo recent commit'))
+        commit_btn = self.make_toolbutton(gtk.STOCK_OK, _('_Commit'),
+            self.commit_clicked, name='commit', tip=_('commit'))
+        tbbuttons.insert(0, undo_btn)
+        tbbuttons.insert(0, commit_btn)
         return tbbuttons
 
     def should_live(self, widget=None, event=None):
@@ -484,7 +484,7 @@ class GCommit(GStatus):
                     tooltip = _('no parent is a head, '
                                 'commit to add a new head')
 
-        btn = self.commit_button
+        btn = self.get_toolbutton('commit')
         btn.set_label(label)
         btn.set_tooltip(self.tooltips, tooltip)
 
@@ -626,7 +626,7 @@ class GCommit(GStatus):
     def check_undo(self):
         can_undo = os.path.exists(self.repo.sjoin("undo")) and \
                 self.last_commit_id is not None
-        self.undo_button.set_sensitive(can_undo)
+        self.get_toolbutton('undo').set_sensitive(can_undo)
         self.get_menuitem('undo').set_sensitive(can_undo)
 
     def check_merge(self):
