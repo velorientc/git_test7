@@ -40,17 +40,17 @@ AGE = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
-    def __init__ (self, repo, graphdata, outgoing, origtip, npreviews):
+    def __init__ (self, repo, graphdata, opts):
         gtk.GenericTreeModel.__init__(self)
         self.repo = repo
-        self.outgoing = outgoing
+        self.outgoing = opts['outgoing']
+        self.origtip = opts['orig-tip']
+        self.npreviews = opts['npreviews']
         self.revisions = {}
         self.graphdata = graphdata
         self.wcparents = [x.rev() for x in repo.parents()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
         self.branchtags = repo.branchtags()
-        self.origtip = origtip
-        self.npreviews = npreviews
         self.set_author_color()
         self.hidetags = self.repo.ui.config(
             'tortoisehg', 'hidetags', '').split()

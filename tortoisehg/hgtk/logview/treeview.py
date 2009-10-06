@@ -126,13 +126,12 @@ class TreeView(gtk.ScrolledWindow):
         self.currevid = None
         self.construct_treeview()
         self.pbar = pbar
-        self.origtip = None
         self.branch_color = False
-        self.outgoing = []
-        self.npreviews = 0
+        self.opts = { 'outgoing':[], 'orig-tip':None, 'npreviews':0,
+                      'branch-color':False }
 
     def set_outgoing(self, outgoing):
-        self.outgoing = outgoing
+        self.opts['outgoing'] = outgoing
 
     def set_repo(self, repo, pbar=None):
         self.repo = repo
@@ -181,10 +180,10 @@ class TreeView(gtk.ScrolledWindow):
             noheads = opts.get('noheads', False)
             if opts.get('branch-view', False):
                 self.grapher = branch_grapher(self.repo, start, end, 
-                    only_branch, self.branch_color)
+                    only_branch, self.opts.get('branch-color'))
             else:
                 self.grapher = revision_grapher(self.repo, start, end,
-                        only_branch, noheads, self.branch_color)
+                        only_branch, noheads, self.opts.get('branch-color'))
         elif opts.get('revlist', None):
             self.grapher = dumb_log_generator(self.repo, opts['revlist'])
         else:
@@ -247,8 +246,7 @@ class TreeView(gtk.ScrolledWindow):
         gcol.set_visible(self.show_graph)
 
         if not self.model:
-            model = treemodel.TreeModel(self.repo, self.graphdata,
-                    self.outgoing, self.origtip, self.npreviews)
+            model = treemodel.TreeModel(self.repo, self.graphdata, self.opts)
             self.treeview.set_model(model)
             self.model = model
 
@@ -272,7 +270,7 @@ class TreeView(gtk.ScrolledWindow):
             colname = pn[:-len(cv)]
             return self.tvcolumns[colname].get_visible()
         elif pn == 'branch-color':
-            return self.branch_color
+            return self.opts.get('branch-color')
         elif pn == 'repo':
             return self.repo
         elif pn == 'limit':
@@ -287,7 +285,7 @@ class TreeView(gtk.ScrolledWindow):
             colname = pn[:-len(cv)]
             self.tvcolumns[colname].set_visible(value)
         elif pn == 'branch-color':
-            self.branch_color = value
+            self.opts['branch-color'] = value
         elif pn == 'repo':
             self.repo = value
         elif pn == 'limit':
@@ -356,8 +354,7 @@ class TreeView(gtk.ScrolledWindow):
             self.next_revision_batch(self.batchsize)
 
     def refresh(self, graphcol, pats, opts):
-        self.origtip = opts['orig-tip']
-        self.npreviews = opts['npreviews']
+        self.opts.update(opts)
         if self.repo is not None:
             hglib.invalidaterepo(self.repo)
             if len(self.repo) > 0:
