@@ -68,19 +68,24 @@ class MergeDialog(gtk.Dialog):
         self.undobtn = self.add_button(_('Undo'), RESPONSE_UNDO)
         self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
-        vlist = gtk.ListStore(str, bool)
+        vlist = gtk.ListStore(str,  # tool name
+                              bool) # separator
         combo = gtk.ComboBoxEntry(vlist, 0)
         self.mergetool = combo
         combo.set_row_separator_func(lambda model, path: model[path][1])
         combo.child.set_width_chars(8)
-        lbl = gtk.Label(_('Merge tool:'))
+        lbl = gtk.Label(_('Merge tools:'))
         lbl.set_alignment(1, 0.5)
         self.mergelabel = lbl
         self.action_area.add(lbl)
         self.action_area.add(combo)
-        vlist.append(('', False))
         for tool in hglib.mergetools(repo.ui):
             vlist.append((hglib.toutf(tool), False))
+        mtool = repo.ui.config('ui', 'merge', None)
+        if mtool:
+            combo.child.set_text(hglib.toutf(mtool))
+        else:
+            combo.child.set_text('')
 
         # prepare to show
         self.mergebtn.grab_focus()
