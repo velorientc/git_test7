@@ -1055,7 +1055,7 @@ class GLog(gdialog.GDialog):
                     tb.set_sensitive(False)
                     disabled.append(tb)
             def disable_child(w):
-                if w != self.ppullcombo:
+                if w != self.ppullcombo and w.get_property('sensitive'):
                     w.set_sensitive(False)
                     disabled.append(w)
             self.syncbox.foreach(disable_child)
