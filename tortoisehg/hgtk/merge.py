@@ -121,8 +121,18 @@ class MergeDialog(gtk.Dialog):
                 if ret == gtk.RESPONSE_YES:
                     abort()
             else:
-                self.destroy()
-                return
+                repo = hg.repository(ui.ui(), path=paths.find_root())
+                if len(repo.parents()) == 2:
+                    ret = gdialog.Confirm(_('Confirm Exit'), [], self,
+                            _('To complete merging, you need to commit'
+                              ' merged files in working directory.\n\n'
+                              'Do you want to exit?')).run()
+                    if ret == gtk.RESPONSE_YES:
+                        self.destroy()
+                        return # close dialog
+                else:
+                    self.destroy()
+                    return # close dialog
         # Abort button
         elif response_id == gtk.RESPONSE_CANCEL:
             abort()
