@@ -56,6 +56,13 @@ You must then select the :guilabel:`Commit` tab and enter a name in the
 	viewer, and the built-in web server obfuscates email addresses to
 	prevent SPAM.
 
+If you are not using one of our Windows installers, you will also have
+to configure a visual diff tool.  Type :command:`hgtk userconfig`, on
+the TortoiseHg tab you will find :guilabel:`Visual Diff Command`.  If
+there are no options in the drop-down list, you must enable and
+configure Mercurial's ExtDiff extension and then restart the userconfig
+application.
+
 
 Initialize the repository
 =========================

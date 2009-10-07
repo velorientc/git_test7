@@ -90,8 +90,7 @@ RPM packages for Fedora are available on the
 page of the wiki.
 
 Deb packages for Ubuntu can be found at
-`this <https://launchpad.net/~maxb/+archive/ppa>`_ or
-`that <https://launchpad.net/~tortoisehg-ppa>`_ location.
+`that <https://launchpad.net/~tortoisehg-ppa>`_.
 
 For MacOSX, no packages are available but you can run hgtk and all the
 dialogs via the source install method. For details, see
