@@ -19,6 +19,9 @@ from tortoisehg.hgtk import changesetinfo, gtklib, hgcmd, gdialog
 
 keep = i18n.keepgettext()
 
+MODE_NORMAL  = 'normal'
+MODE_WORKING = 'working'
+
 class BackoutDialog(gtk.Dialog):
     """ Backout effect of a changeset """
     def __init__(self, rev=None):
@@ -55,6 +58,7 @@ class BackoutDialog(gtk.Dialog):
         revid, desc = changesetinfo.changesetinfo(repo, rev)
         frame.add(desc)
         self.vbox.pack_start(frame, False, False, 2)
+        self.csetframe = frame
 
         # backout commit message
         frame = gtk.Frame(_('Backout commit message'))
@@ -63,6 +67,7 @@ class BackoutDialog(gtk.Dialog):
         msgvbox.set_border_width(4)
         frame.add(msgvbox)
         self.vbox.pack_start(frame, True, True, 2)
+        self.cmsgframe = frame
 
         ## message text area
         self.logview = gtk.TextView(buffer=None)
@@ -98,6 +103,18 @@ class BackoutDialog(gtk.Dialog):
         # prepare to show
         self.load_settings()
         self.backoutbtn.grab_focus()
+        gobject.idle_add(self.after_init)
+
+    def after_init(self):
+        # CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, False, False, 6)
+
+        # abort button
+        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
+        self.abortbtn.hide()
 
     def load_settings(self):
         checked = self.settings.get_value('english', False, True)
@@ -113,10 +130,30 @@ class BackoutDialog(gtk.Dialog):
         self.settings.write()
 
     def dialog_response(self, dialog, response_id):
-        self.store_settings()
+        def abort():
+            self.cmd.stop()
+            self.cmd.show_log()
+            self.switch_to(MODE_NORMAL, cmd=False)
         # Backout button
         if response_id == gtk.RESPONSE_OK:
             self.backout()
+        # Close button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            if self.cmd.is_alive():
+                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
+                                      _('Do you want to abort?')).run()
+                if ret == gtk.RESPONSE_YES:
+                    abort()
+            else:
+                self.store_settings()
+                return # close dialog
+        # Abort button
+        elif response_id == gtk.RESPONSE_CANCEL:
+            abort()
+        else:
+            raise _('unexpected response id: %s') % response_id
+
+        self.run() # don't close dialog
 
     def eng_msg_toggled(self, checkbutton):
         start, end = self.buf.get_bounds()
@@ -134,6 +171,25 @@ class BackoutDialog(gtk.Dialog):
         newmsg = (state and self.msgset['id'] or self.msgset['str'])
         self.buf.set_text(newmsg)
 
+    def switch_to(self, mode, cmd=True):
+        if mode == MODE_NORMAL:
+            normal = True
+            self.closebtn.grab_focus()
+        elif mode == MODE_WORKING:
+            normal = False
+            self.abortbtn.grab_focus()
+        else:
+            raise _('unknown mode name: %s') % mode
+        working = not normal
+
+        self.csetframe.set_sensitive(normal)
+        self.cmsgframe.set_sensitive(normal)
+        self.backoutbtn.set_property('visible', normal)
+        self.closebtn.set_property('visible', normal)
+        if cmd:
+            self.cmd.set_property('visible', working)
+        self.abortbtn.set_property('visible', working)
+
     def backout(self):
         start, end = self.buf.get_bounds()
         msg = self.buf.get_text(start, end)
@@ -141,9 +197,10 @@ class BackoutDialog(gtk.Dialog):
         if self.merge_button.get_active():
             cmdline += ['--merge']
         cmdline += ['--message', hglib.fromutf(msg)]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        if dlg.returncode == 0:
-            self.destroy()
+
+        def cmd_done(returncode):
+            self.switch_to(MODE_NORMAL, cmd=False)
+            if returncode == 0 and not self.cmd.is_show_log():
+                self.destroy()
+        self.switch_to(MODE_WORKING)
+        self.cmd.execute(cmdline, cmd_done)
