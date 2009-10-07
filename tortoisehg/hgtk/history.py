@@ -1602,6 +1602,8 @@ class GLog(gdialog.GDialog):
             self.reload_log()
         elif not oldparents == newparents:
             self.refresh_model()
+        # update parents for the next nofifying
+        args[0] = newparents
 
     def archive(self, menuitem):
         rev = self.currevid

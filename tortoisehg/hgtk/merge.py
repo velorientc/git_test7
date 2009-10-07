@@ -133,7 +133,7 @@ class MergeDialog(gtk.Dialog):
 
     def set_notify_func(self, func, *args):
         self.notify_func = func
-        self.notify_args = args
+        self.notify_args = list(args)
 
     def switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
