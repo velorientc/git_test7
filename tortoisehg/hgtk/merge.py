@@ -17,14 +17,15 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import changesetinfo, gtklib, commit, gdialog, hgcmd
 
-class MergeDialog(gtk.Window):
+class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
     def __init__(self, rev=None):
         """ Initialize the Dialog """
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menumerge.ico')
         gtklib.set_tortoise_keys(self)
         self.set_default_size(350, 120)
+        self.set_has_separator(False)
         self.notify_func = None
 
         if not rev:
@@ -40,50 +41,34 @@ class MergeDialog(gtk.Window):
             return
         self.set_title(_('Merging in %s') % hglib.get_reponame(repo))
 
-        vbox = gtk.VBox()
-        self.add(vbox)
-
         frame = gtk.Frame(_('Merge target (other)'))
         other, desc = changesetinfo.changesetinfo(repo, rev, True)
         frame.add(desc)
         frame.set_border_width(5)
-        vbox.pack_start(frame, False, False, 2)
+        self.vbox.pack_start(frame, False, False)
 
         frame = gtk.Frame(_('Current revision (local)'))
         local, desc = changesetinfo.changesetinfo(repo, '.', True)
         frame.add(desc)
         frame.set_border_width(5)
-        vbox.pack_start(frame, False, False, 2)
+        self.vbox.pack_start(frame, False, False)
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
         mod = gtklib.get_thg_modifier()
 
-        hbbox = gtk.HButtonBox()
-        hbbox.set_layout(gtk.BUTTONBOX_END)
-        vbox.pack_start(hbbox, False, False, 2)
-
         close = gtk.Button(_('Close'))
         close.connect('clicked', lambda x: self.destroy())
-        key, modifier = gtk.accelerator_parse('Escape')
-        close.add_accelerator('clicked', accelgroup, key, 0,
-                gtk.ACCEL_VISIBLE)
-
         undo = gtk.Button(_('Undo'))
         undo.set_sensitive(False)
-
         commit = gtk.Button(_('Commit'))
         commit.set_sensitive(False)
-
         merge = gtk.Button(_('Merge'))
-        key, modifier = gtk.accelerator_parse(mod+'Return')
-        merge.add_accelerator('clicked', accelgroup, key, modifier,
-                gtk.ACCEL_VISIBLE)
 
-        hbbox.add(merge)
-        hbbox.add(commit)
-        hbbox.add(undo)
-        hbbox.add(close)
+        self.action_area.add(merge)
+        self.action_area.add(commit)
+        self.action_area.add(undo)
+        self.action_area.add(close)
 
         vlist = gtk.ListStore(str, bool)
         combo = gtk.ComboBoxEntry(vlist, 0)
@@ -91,8 +76,9 @@ class MergeDialog(gtk.Window):
         combo.set_row_separator_func(lambda model, path: model[path][1])
         combo.child.set_width_chars(8)
         lbl = gtk.Label(_('mergetool:'))
-        hbbox.add(lbl)
-        hbbox.add(combo)
+        lbl.set_alignment(1, 0.5)
+        self.action_area.add(lbl)
+        self.action_area.add(combo)
         vlist.append(('', False))
         for tool in hglib.mergetools(repo.ui):
             vlist.append((hglib.toutf(tool), False))
