@@ -75,7 +75,7 @@ class MergeDialog(gtk.Dialog):
         self.mergetool = combo
         combo.set_row_separator_func(lambda model, path: model[path][1])
         combo.child.set_width_chars(8)
-        lbl = gtk.Label(_('mergetool:'))
+        lbl = gtk.Label(_('Merge tool:'))
         lbl.set_alignment(1, 0.5)
         self.action_area.add(lbl)
         self.action_area.add(combo)
