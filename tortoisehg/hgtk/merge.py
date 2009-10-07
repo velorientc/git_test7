@@ -17,9 +17,12 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import changesetinfo, gtklib, commit, gdialog, hgcmd
 
-RES_MERGE =  1
-RES_COMMIT = 2
-RES_UNDO =   3
+RESPONSE_MERGE =  1
+RESPONSE_COMMIT = 2
+RESPONSE_UNDO =   3
+
+MODE_NORMAL  = 'normal'
+MODE_WORKING = 'working'
 
 class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
@@ -28,8 +31,8 @@ class MergeDialog(gtk.Dialog):
         gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menumerge.ico')
         gtklib.set_tortoise_keys(self)
-        self.set_default_size(350, 120)
         self.set_has_separator(False)
+        self.set_resizable(False)
         self.connect('response', self.dialog_response)
         self.notify_func = None
 
@@ -51,29 +54,19 @@ class MergeDialog(gtk.Dialog):
         frame.add(desc)
         frame.set_border_width(5)
         self.vbox.pack_start(frame, False, False)
+        self.otherframe = frame
 
         frame = gtk.Frame(_('Current revision (local)'))
         self.localrev, desc = changesetinfo.changesetinfo(repo, '.', True)
         frame.add(desc)
         frame.set_border_width(5)
         self.vbox.pack_start(frame, False, False)
+        self.localframe = frame
 
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        mod = gtklib.get_thg_modifier()
-
-        self.closebtn = gtk.Button(_('Close'))
-        self.closebtn.connect('clicked', lambda x: self.destroy())
-        self.undobtn = gtk.Button(_('Undo'))
-        self.undobtn.set_sensitive(False)
-        self.commitbtn = gtk.Button(_('Commit'))
-        self.commitbtn.set_sensitive(False)
-        self.mergebtn = gtk.Button(_('Merge'))
-
-        self.action_area.add(self.mergebtn)
-        self.action_area.add(self.commitbtn)
-        self.action_area.add(self.undobtn)
-        self.action_area.add(self.closebtn)
+        self.mergebtn = self.add_button(_('Merge'), RESPONSE_MERGE)
+        self.commitbtn = self.add_button(_('Commit'), RESPONSE_COMMIT)
+        self.undobtn = self.add_button(_('Undo'), RESPONSE_UNDO)
+        self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         vlist = gtk.ListStore(str, bool)
         combo = gtk.ComboBoxEntry(vlist, 0)
@@ -82,31 +75,92 @@ class MergeDialog(gtk.Dialog):
         combo.child.set_width_chars(8)
         lbl = gtk.Label(_('Merge tool:'))
         lbl.set_alignment(1, 0.5)
+        self.mergelabel = lbl
         self.action_area.add(lbl)
         self.action_area.add(combo)
         vlist.append(('', False))
         for tool in hglib.mergetools(repo.ui):
             vlist.append((hglib.toutf(tool), False))
 
-        self.mergebtn.connect('clicked', lambda b: self.response(RES_MERGE))
-        self.commitbtn.connect('clicked', lambda b: self.response(RES_COMMIT))
-        self.undobtn.connect('clicked', lambda b: self.response(RES_UNDO))
+        # prepare to show
         self.mergebtn.grab_focus()
+        self.commitbtn.set_sensitive(False)
+        self.undobtn.set_sensitive(False)
+        gobject.idle_add(self.after_init)
+
+    def after_init(self):
+        # CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, True, True, 6)
+
+        # abort button
+        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
+        self.abortbtn.hide()
 
     def dialog_response(self, dialog, response_id):
+        def abort():
+            self.cmd.stop()
+            self.cmd.show_log()
+            self.switch_to(MODE_NORMAL, cmd=False)
         # Merge button
-        if response_id == RES_MERGE:
+        if response_id == RESPONSE_MERGE:
             self.domerge()
         # Commit button
-        elif response_id == RES_COMMIT:
+        elif response_id == RESPONSE_COMMIT:
             self.docommit()
         # Undo button
-        elif response_id == RES_UNDO:
+        elif response_id == RESPONSE_UNDO:
             self.doundo()
+        # Close button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            if self.cmd.is_alive():
+                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
+                                      _('Do you want to abort?')).run()
+                if ret == gtk.RESPONSE_YES:
+                    abort()
+            else:
+                self.destroy()
+                return
+        # Abort button
+        elif response_id == gtk.RESPONSE_CANCEL:
+            abort()
+        else:
+            raise _('unexpected response id: %s') % response_id
+
+        self.run() # don't close dialog
 
     def set_notify_func(self, func, *args):
         self.notify_func = func
         self.notify_args = args
+
+    def switch_to(self, mode, cmd=True):
+        if mode == MODE_NORMAL:
+            normal = True
+        elif mode == MODE_WORKING:
+            normal = False
+            self.abortbtn.grab_focus()
+        else:
+            raise _('unknown mode name: %s') % mode
+        working = not normal
+
+        self.otherframe.set_sensitive(normal)
+        self.localframe.set_sensitive(normal)
+        self.mergetool.set_property('visible', normal)
+        self.mergelabel.set_property('visible', normal)
+        self.mergebtn.set_property('visible', normal)
+        self.commitbtn.set_property('visible', normal)
+        self.undobtn.set_property('visible', normal)
+        self.closebtn.set_property('visible', normal)
+        if cmd:
+            self.cmd.set_property('visible', working)
+        self.abortbtn.set_property('visible', working)
+
+    def cmd_done(self, returncode):
+        self.switch_to(MODE_NORMAL, cmd=False)
+        if returncode == 0 and not self.cmd.is_show_log():
+            self.response(gtk.RESPONSE_CLOSE)
 
     def domerge(self):
         cmdline = ['hg', 'merge', '--rev', self.otherrev]
@@ -114,24 +168,27 @@ class MergeDialog(gtk.Dialog):
         if tool:
             oldmergeenv = os.environ.get('HGMERGE')
             os.environ['HGMERGE'] = tool
-        dlg = hgcmd.CmdDialog(cmdline, False)
-        dlg.run()
-        dlg.hide()
-        repo = hg.repository(ui.ui(), path=paths.find_root())
-        if len(repo.parents()) == 1:
-            return
-        if tool:
-            if oldmergeenv:
-                os.environ['HGMERGE'] = oldmergeenv
-            else:
-                del os.environ['HGMERGE']
-        if self.notify_func:
-            self.notify_func(self.notify_args)
-        self.mergetool.set_sensitive(False)
-        self.mergebtn.set_sensitive(False)
-        self.undobtn.set_sensitive(True)
-        self.commitbtn.set_sensitive(True)
-        self.commitbtn.grab_focus()
+
+        def cmd_done(returncode):
+            self.switch_to(MODE_NORMAL, cmd=False)
+            repo = hg.repository(ui.ui(), path=paths.find_root())
+            if len(repo.parents()) == 1:
+                return
+            if tool:
+                if oldmergeenv:
+                    os.environ['HGMERGE'] = oldmergeenv
+                else:
+                    del os.environ['HGMERGE']
+            if self.notify_func:
+                self.notify_func(self.notify_args)
+            self.mergetool.set_sensitive(False)
+            self.mergelabel.set_sensitive(False)
+            self.mergebtn.set_sensitive(False)
+            self.undobtn.set_sensitive(True)
+            self.commitbtn.set_sensitive(True)
+            self.commitbtn.grab_focus()
+        self.switch_to(MODE_WORKING)
+        self.cmd.execute(cmdline, cmd_done)
 
     def docommit(self):
         dlg = commit.run(ui.ui())
@@ -152,21 +209,24 @@ class MergeDialog(gtk.Dialog):
         gobject.timeout_add(50, self.destroy)
 
     def doundo(self):
-        response = gdialog.Confirm(_('Confirm undo merge'), [], self,
-                       _('Clean checkout of original revision?')).run()
-        if response != gtk.RESPONSE_YES:
+        res = gdialog.Confirm(_('Confirm undo merge'), [], self,
+                              _('Clean checkout of original revision?')).run()
+        if res != gtk.RESPONSE_YES:
             return
         cmdline = ['hg', 'update', '--rev', self.localrev, '--clean']
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.run()
-        dlg.hide()
-        if self.notify_func:
-            self.notify_func(self.notify_args)
-        self.mergetool.set_sensitive(True)
-        self.mergebtn.set_sensitive(True)
-        self.mergebtn.grab_focus()
-        self.undobtn.set_sensitive(False)
-        self.commitbtn.set_sensitive(False)
+
+        def cmd_done(returncode):
+            self.switch_to(MODE_NORMAL, cmd=False)
+            if self.notify_func:
+                self.notify_func(self.notify_args)
+            self.mergetool.set_sensitive(True)
+            self.mergelabel.set_sensitive(True)
+            self.mergebtn.set_sensitive(True)
+            self.mergebtn.grab_focus()
+            self.undobtn.set_sensitive(False)
+            self.commitbtn.set_sensitive(False)
+        self.switch_to(MODE_WORKING)
+        self.cmd.execute(cmdline, cmd_done)
 
 def run(ui, *pats, **opts):
     return MergeDialog(opts.get('rev'))
