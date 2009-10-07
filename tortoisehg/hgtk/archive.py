@@ -129,6 +129,7 @@ class ArchiveDialog(gtk.Dialog):
                 if ret == gtk.RESPONSE_YES:
                     abort()
             else:
+                self.destroy()
                 return # close dialog
         # Abort button
         elif response_id == gtk.RESPONSE_CANCEL:

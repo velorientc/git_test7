@@ -18,7 +18,7 @@ from tortoisehg.util.hglib import LookupError, RepoLookupError, RepoError
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
-MODE_NORMAL   = 'normal'
+MODE_NORMAL  = 'normal'
 MODE_WORKING = 'working'
 
 class UpdateDialog(gtk.Dialog):
@@ -159,6 +159,7 @@ class UpdateDialog(gtk.Dialog):
                 if ret == gtk.RESPONSE_YES:
                     self.abort()
             else:
+                self.destroy()
                 return # close dialog
         # Abort button
         elif response_id == gtk.RESPONSE_CANCEL:

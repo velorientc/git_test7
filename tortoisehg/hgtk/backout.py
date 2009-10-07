@@ -146,6 +146,7 @@ class BackoutDialog(gtk.Dialog):
                     abort()
             else:
                 self.store_settings()
+                self.destroy()
                 return # close dialog
         # Abort button
         elif response_id == gtk.RESPONSE_CANCEL:
