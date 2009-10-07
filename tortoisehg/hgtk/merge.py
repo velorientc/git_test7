@@ -79,8 +79,11 @@ class MergeDialog(gtk.Dialog):
         self.mergelabel = lbl
         self.action_area.add(lbl)
         self.action_area.add(combo)
+        prev = False
         for tool in hglib.mergetools(repo.ui):
-            vlist.append((hglib.toutf(tool), False))
+            cur = tool.startswith('internal:')
+            vlist.append((hglib.toutf(tool), prev != cur))
+            prev = cur
         mtool = repo.ui.config('ui', 'merge', None)
         if mtool:
             combo.child.set_text(hglib.toutf(mtool))
