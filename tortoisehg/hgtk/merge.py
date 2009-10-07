@@ -17,6 +17,10 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import changesetinfo, gtklib, commit, gdialog, hgcmd
 
+RES_MERGE =  1
+RES_COMMIT = 2
+RES_UNDO =   3
+
 class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
     def __init__(self, rev=None):
@@ -26,6 +30,7 @@ class MergeDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_default_size(350, 120)
         self.set_has_separator(False)
+        self.connect('response', self.dialog_response)
         self.notify_func = None
 
         if not rev:
@@ -83,10 +88,21 @@ class MergeDialog(gtk.Dialog):
         for tool in hglib.mergetools(repo.ui):
             vlist.append((hglib.toutf(tool), False))
 
-        self.mergebtn.connect('clicked', lambda b: self.domerge())
-        self.commitbtn.connect('clicked', lambda b: self.docommit())
-        self.undobtn.connect('clicked', lambda b: self.doundo())
+        self.mergebtn.connect('clicked', lambda b: self.response(RES_MERGE))
+        self.commitbtn.connect('clicked', lambda b: self.response(RES_COMMIT))
+        self.undobtn.connect('clicked', lambda b: self.response(RES_UNDO))
         self.mergebtn.grab_focus()
+
+    def dialog_response(self, dialog, response_id):
+        # Merge button
+        if response_id == RES_MERGE:
+            self.domerge()
+        # Commit button
+        elif response_id == RES_COMMIT:
+            self.docommit()
+        # Undo button
+        elif response_id == RES_UNDO:
+            self.doundo()
 
     def set_notify_func(self, func, *args):
         self.notify_func = func
