@@ -1005,7 +1005,7 @@ class GLog(gdialog.GDialog):
         def cleanup():
             try:
                 shutil.rmtree(self.bundledir)
-            except IOError:
+            except OSError:
                 pass
 
         if not self.bundledir:
