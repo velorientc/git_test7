@@ -23,18 +23,17 @@ class BackoutDialog(gtk.Dialog):
     """ Backout effect of a changeset """
     def __init__(self, rev=None):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self, title=_('Backout changeset - %s') % rev,
-                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        gtk.Dialog.__init__(self, title=_('Backout changeset - %s') % rev)
         gtklib.set_tortoise_icon(self, 'menurevert.ico')
         gtklib.set_tortoise_keys(self)
         self.set_has_separator(False)
         self.set_default_size(600, 400)
         self.connect('response', self.dialog_response)
+        self.rev = rev
 
         # add Backout button
-        backoutbutton = gtk.Button(_('Backout'))
-        backoutbutton.connect('clicked', self.backout, rev)
-        self.action_area.pack_end(backoutbutton)
+        self.backoutbtn = self.add_button(_('Backout'), gtk.RESPONSE_OK)
+        self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         # persistent settings
         self.settings = settings.Settings('backout')
@@ -98,7 +97,7 @@ class BackoutDialog(gtk.Dialog):
 
         # prepare to show
         self.load_settings()
-        backoutbutton.grab_focus()
+        self.backoutbtn.grab_focus()
 
     def load_settings(self):
         checked = self.settings.get_value('english', False, True)
@@ -115,9 +114,9 @@ class BackoutDialog(gtk.Dialog):
 
     def dialog_response(self, dialog, response_id):
         self.store_settings()
-        if response_id == gtk.RESPONSE_CLOSE \
-                or response_id == gtk.RESPONSE_DELETE_EVENT:
-            self.destroy()
+        # Backout button
+        if response_id == gtk.RESPONSE_OK:
+            self.backout()
 
     def eng_msg_toggled(self, checkbutton):
         start, end = self.buf.get_bounds()
@@ -135,10 +134,10 @@ class BackoutDialog(gtk.Dialog):
         newmsg = (state and self.msgset['id'] or self.msgset['str'])
         self.buf.set_text(newmsg)
 
-    def backout(self, button, revstr):
+    def backout(self):
         start, end = self.buf.get_bounds()
         msg = self.buf.get_text(start, end)
-        cmdline = ['hg', 'backout', '--rev', revstr]
+        cmdline = ['hg', 'backout', '--rev', self.rev]
         if self.merge_button.get_active():
             cmdline += ['--merge']
         cmdline += ['--message', hglib.fromutf(msg)]
