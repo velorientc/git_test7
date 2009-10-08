@@ -37,8 +37,7 @@ class GShelve(GStatus):
             self.opts['rev'] = ''
 
     def get_title(self):
-        root = hglib.toutf(os.path.basename(self.repo.root))
-        return ' '.join([root, 'shelve'])
+        return self.get_reponame() + ' - shelve'
 
     def get_icon(self):
         return 'shelve.ico'
