@@ -119,7 +119,9 @@ class MQWidget(gtk.VBox):
         menubtn.set_menu(self.create_view_menu())
         tbar.append_widget(menubtn, padding=0)
         self.btn['menu'] = menubtn
-
+        def after_init():
+            menubtn.child.get_children()[0].hide()
+        gobject.idle_add(after_init)
         self.pack_start(tbar, False, False)
 
         # center pane
