@@ -48,9 +48,7 @@ class SynchDialog(gtk.Window):
         self.set_default_size(655, 552)
 
         self.paths = self.get_paths()
-
-        name = self.repo.ui.config('web', 'name') or os.path.basename(self.root)
-        self.set_title(_('TortoiseHg Synchronize - ') + hglib.toutf(name))
+        self.set_title(_('%s - synchronize') % hglib.get_reponame(self.repo))
 
         self.connect('delete-event', self.delete)
 
