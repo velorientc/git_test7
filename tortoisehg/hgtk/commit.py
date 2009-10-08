@@ -136,16 +136,16 @@ class GCommit(GStatus):
 
     def get_title(self):
         root = self.get_reponame()
-        user = self.opts.get('user')
+        user = self.opts.get('user') or ''
         if user: user = 'as ' + user
-        date = self.opts.get('date')
-        pats = ' '.join(self.pats)
+        date = self.opts.get('date') or ''
+        pats = ' '.join(self.pats) or ''
         if self.qnew:
-            return root + ' qnew'
+            return root + ' - qnew'
         elif self.mqmode:
             patch = self.repo.mq.lookup('qtip')
-            return root + ' qrefresh ' + patch
-        return ' '.join([root, 'commit', pats or '', user or '', date or ''])
+            return root + ' - qrefresh ' + patch
+        return root + ' - ' + ' '.join(['commit', pats, user, date])
 
     def get_icon(self):
         return 'menucommit.ico'
