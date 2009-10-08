@@ -320,7 +320,7 @@ class CloneDialog(gtk.Dialog):
         if dest:
             cmdline.append(hglib.fromutf(dest))
 
-        def cmd_done(returncode):
+        def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
             self.add_src_to_recent(src)
             self.add_dest_to_recent(dest)
@@ -328,6 +328,11 @@ class CloneDialog(gtk.Dialog):
                 shlib.shell_notify([dest])
                 if not self.cmd.is_show_log():
                     self.response(gtk.RESPONSE_CLOSE)
+                self.cmd.set_result(_('Cloned successfully'), style='ok')
+            elif useraborted:
+                self.cmd.set_result(_('Canceled cloning'), style='error')
+            else:
+                self.cmd.set_result(_('Failed to clone'), style='error')
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
