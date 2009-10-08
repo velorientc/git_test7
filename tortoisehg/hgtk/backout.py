@@ -199,9 +199,15 @@ class BackoutDialog(gtk.Dialog):
             cmdline += ['--merge']
         cmdline += ['--message', hglib.fromutf(msg)]
 
-        def cmd_done(returncode):
+        def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
-            if returncode == 0 and not self.cmd.is_show_log():
-                self.destroy()
+            if returncode == 0:
+                if not self.cmd.is_show_log():
+                    self.response(gtk.RESPONSE_CLOSE)
+                self.cmd.set_result(_('Backed out successfully'), style='ok')
+            elif useraborted:
+                self.cmd.set_result(_('Canceled backout'), style='error')
+            else:
+                self.cmd.set_result(_('Failed to backout'), style='error')
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
