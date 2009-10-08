@@ -946,7 +946,6 @@ class GCommit(GStatus):
             return
 
         self.update_recent_committers(user)
-        self.opts['user'] = user
         incs = hglib.fromutf(self.autoinc_entry.get_text())
         self.opts['include'] = [i.strip() for i in incs.split(',') if i.strip()]
         autopush = self.autopush.get_active()
@@ -990,8 +989,8 @@ class GCommit(GStatus):
                 cmdline += ['-X', self.repo.root]
         elif self.opts['addremove']:
             cmdline += ['--addremove']
-        if self.opts['user']:
-            cmdline.extend(['--user', self.opts['user']])
+        if self.opts['user'] or user:
+            cmdline.extend(['--user', self.opts['user'] or user])
         if self.opts['date']:
             cmdline.extend(['--date', self.opts['date']])
         files += self.opts['include']
