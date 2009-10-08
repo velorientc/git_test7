@@ -323,12 +323,18 @@ class UpdateDialog(gtk.Dialog):
                 else:
                     raise _('invalid dialog result: %s') % ret
 
-        def cmd_done(returncode):
+        def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
             if hasattr(self, 'notify_func'):
                 self.notify_func(self.notify_args)
-            if returncode == 0 and not self.cmd.is_show_log():
-                self.response(gtk.RESPONSE_CLOSE)
+            if returncode == 0:
+                if not self.cmd.is_show_log():
+                    self.response(gtk.RESPONSE_CLOSE)
+                self.cmd.set_result(_('Updated successfully'), style='ok')
+            elif useraborted:
+                self.cmd.set_result(_('Canceled updating'), style='error')
+            else:
+                self.cmd.set_result(_('Failed to update'), style='error')
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
