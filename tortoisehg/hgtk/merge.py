@@ -175,11 +175,6 @@ class MergeDialog(gtk.Dialog):
             self.cmd.set_property('visible', working)
         self.abortbtn.set_property('visible', working)
 
-    def cmd_done(self, returncode):
-        self.switch_to(MODE_NORMAL, cmd=False)
-        if returncode == 0 and not self.cmd.is_show_log():
-            self.response(gtk.RESPONSE_CLOSE)
-
     def domerge(self):
         cmdline = ['hg', 'merge', '--rev', self.otherrev]
         tool = hglib.fromutf(self.mergetool.child.get_text())
