@@ -37,7 +37,7 @@ class RecoveryDialog(gtk.Window):
             return
         self.repo = repo
         self.reponame = hglib.get_reponame(repo)
-        self.set_title(_('Recovery - %s') % self.reponame)
+        self.set_title(_('%s - recovery') % self.reponame)
 
         # toolbar
         self.tbar = gtk.Toolbar()
