@@ -598,7 +598,14 @@ class MQWidget(gtk.VBox):
         else:
             self.qgoto(row[MQ_NAME])
 
-    def cmd_done(self, returncode, noemit=False):
+    def cmd_done(self, returncode, useraborted, noemit=False):
+        if returncode == 0:
+            if self.cmd.get_pbar():
+                self.cmd.set_result(_('Succeed'), style='ok')
+        elif useraborted:
+            self.cmd.set_result(_('Canceled'), style='error')
+        else:
+            self.cmd.set_result(_('Failed'), style='error')
         self.repo.mq.invalidate()
         self.refresh()
         if not noemit:
