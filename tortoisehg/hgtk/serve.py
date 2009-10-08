@@ -124,13 +124,13 @@ class ServeDialog(gtk.Window):
         elif self._webdirconf:
             self.defport = '8000'
             self.webname = _('unknown')
-            self.set_title(_('Serve %s') % (hglib.toutf(self._webdirconf)))
+            self.set_title(_('%s - serve') % (hglib.toutf(self._webdirconf)))
             return
         if self._webdirconf:
-            self.set_title(_('Serve %s - %s') %
+            self.set_title(_('%s serve - %s') %
                     (hglib.toutf(self._webdirconf), hglib.toutf(self.webname)))
         else:
-            self.set_title(_('Serve - ') + hglib.toutf(self.webname))
+            self.set_title(hglib.toutf(self.webname) + _(' serve'))
 
     def _toolbutton(self, stock, label, handler, menu=None,
             userdata=None, tip=None):
