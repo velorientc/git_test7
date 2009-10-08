@@ -22,7 +22,7 @@ try:
             item = item.strip()
             if item: promoted.append(str(item))
     except EnvironmentError:
-        promoted = ['commit']
+        promoted = ['commit', 'log']
 except ImportError:
     # fallback method for non-win32 platforms
     u = ui.ui()
@@ -41,28 +41,31 @@ thgcmenu = {
     'init':       { 'label': _('Create Repository Here'),
                     'help':  _('Create a new repository'),
                     'icon':  'menucreaterepos.ico'},
-    'clone':      { 'label': _('Clone a Repository'),
+    'clone':      { 'label': _('Clone...'),
                     'help':  _('Create clone here from source'),
                     'icon': 'menuclone.ico'},
-    'status':     { 'label': _('View File Status'),
+    'status':     { 'label': _('File Status'),
                     'help':  _('Repository status & changes'),
                     'icon':  'menushowchanged.ico'},
     'shelve':     { 'label': _('Shelve Changes'),
                     'help':  _('Shelve or unshelve file changes'),
                     'icon':  'shelve.ico'},
-    'add':        { 'label': _('Add Files'),
+    'add':        { 'label': _('Add Files...'),
                     'help':  _('Add files to version control'),
                     'icon':  'menuadd.ico'},
-    'revert':     { 'label': _('Revert Files'),
+    'revert':     { 'label': _('Revert Files...'),
                     'help':  _('Revert file changes'),
                     'icon':  'menurevert.ico'},
-    'remove':     { 'label': _('Remove Files'),
+    'forget':     { 'label': _('Forget Files...'),
+                    'help':  _('Remove files from version control'),
+                    'icon':  'menurevert.ico'},
+    'remove':     { 'label': _('Remove Files...'),
                     'help':  _('Remove files from version control'),
                     'icon':  'menudelete.ico'},
     'rename':     { 'label': _('Rename File'),
                     'help':  _('Rename file or directory'),
                     'icon':  'general.ico'},
-    'log':        { 'label': _('View Changelog'),
+    'log':        { 'label': _('Repository Explorer'),
                     'help':  _('View change history in repository'),
                     'icon':  'menulog.ico'},
     'synch':      { 'label': _('Synchronize'),
@@ -71,7 +74,7 @@ thgcmenu = {
     'serve':      { 'label': _('Web Server'),
                     'help':  _('Start web server for this repository'),
                     'icon':  'proxy.ico'},
-    'update':     { 'label': _('Update To Revision'),
+    'update':     { 'label': _('Update...'),
                     'help':  _('Update working directory'),
                     'icon':  'menucheckout.ico'},
     'recover':    { 'label': _('Recovery...'),
@@ -86,7 +89,7 @@ thgcmenu = {
     'repoconf':   { 'label': _('Repository Settings'),
                     'help':  _('Configure repository settings'),
                     'icon':  'settings_repo.ico'},
-    'about':      { 'label': _('About...'),
+    'about':      { 'label': _('About TortoiseHg'),
                     'help':  _('Show About Dialog'),
                     'icon':  'menuabout.ico'},
     'datamine':   { 'label': _('Annotate Files'),
@@ -104,7 +107,7 @@ thgcmenu = {
     'grep':       { 'label': _('Search History'),
                     'help':  _('Search file revisions for patterns'),
                     'icon':  'menurepobrowse.ico'},
-    'dndsynch':   { 'label': _('Synchronize'),
+    'dndsynch':   { 'label': _('DnD Synchronize'),
                     'help':  _('Synchronize with dragged repository'),
                     'icon':  'menusynch.ico'}}
 
