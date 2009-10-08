@@ -137,7 +137,7 @@ class GStatus(gdialog.GDialog):
         revs = self.opts.get('rev')
         name = self.pats and _('filtered status') or _('status')
         r = revs and ':'.join(revs) or ''
-        return ' '.join([root, name, r])
+        return root + ' - ' + ' '.join([name, r])
 
     def get_icon(self):
         return 'menushowchanged.ico'
