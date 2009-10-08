@@ -170,7 +170,7 @@ class QuickOpDialog(gtk.Dialog):
         self.cmd = hgcmd.CmdWidget()
         self.cmd.show_all()
         self.cmd.hide()
-        self.vbox.pack_start(self.cmd, True, True, 6)
+        self.vbox.pack_start(self.cmd, False, False, 6)
 
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
@@ -249,12 +249,17 @@ class QuickOpDialog(gtk.Dialog):
 
         cmdline = ['hg', self.command, '--verbose'] + list
 
-        def cmd_done(returncode):
+        def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
             if returncode == 0:
                 shlib.shell_notify(list)
                 if not self.cmd.is_show_log():
                     self.response(gtk.RESPONSE_CLOSE)
+                self.cmd.set_result(_('Successfully'), style='ok')
+            elif useraborted:
+                self.cmd.set_result(_('Canceled'), style='error')
+            else:
+                self.cmd.set_result(_('Failed'), style='error')
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
