@@ -240,6 +240,7 @@ class CmdWidget(gtk.VBox):
 
         self.hgthread = None
         self.last_pbar_update = 0
+        self.useraborted = False
         self.is_normal = style == STYLE_NORMAL
         self.is_compact = style == STYLE_COMPACT
 
@@ -331,9 +332,10 @@ class CmdWidget(gtk.VBox):
         cmdline: command line string.
         callback: function called after terminated the thread.
 
-        def callback(returncode, ...)
+        def callback(returncode, useraborted, ...)
 
-        returncode: See the description of 'hgthread' about return code.
+        returncode: See the description of 'hgthread'.
+        useraborted: Indicates whether the thread is aborted by user.
         """
         if self.hgthread:
             return
@@ -369,6 +371,7 @@ class CmdWidget(gtk.VBox):
         Terminate the thread forcibly.
         """
         if self.hgthread:
+            self.useraborted = True
             self.hgthread.terminate()
             self.set_pbar(True)
             self.set_buttons(stop=False, close=True)
@@ -515,7 +518,8 @@ class CmdWidget(gtk.VBox):
                 self.show_log()
             self.hgthread = None
             def call_callback():
-                callback(returncode, *args, **kargs)
+                callback(returncode, self.useraborted, *args, **kargs)
+                self.useraborted = False
             gobject.idle_add(call_callback)
             return False # Stop polling this function
         else:
