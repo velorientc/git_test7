@@ -222,7 +222,20 @@ STYLE_COMPACT = 'compact'   # pbar + popup log viewer
 
 class CmdWidget(gtk.VBox):
 
-    def __init__(self, style=STYLE_NORMAL, tooltips=None):
+    def __init__(self, style=STYLE_NORMAL, tooltips=None, logsize=None):
+        """
+        style: String. Predefined constans of CmdWidget style.  Two styles;
+               STYLE_NORMAL (progress bar + popup log viewer) and
+               STYLE_COMPACT (progress bar + embedded log viewer) are
+               availabled. Default: STYLE_NORMAL.
+        tooltips: Reference. gtk.Tooltips instance to show tooltips of several
+                  buttons.  If you omit, it will create a new instance of
+                  gtk.Tooltips.  Default: None.
+        logsize: Tuple or list contains 2 numbers.  Specify the size of
+                 embedded log viewer.  size[0] = width, size[1] = height.  
+                 If you pass -1 as width or height size, it will be change to
+                 *natual* size of the widget.  Default: tuple(-1, 180).
+        """
         gtk.VBox.__init__(self)
 
         self.hgthread = None
@@ -237,7 +250,9 @@ class CmdWidget(gtk.VBox):
         # log viewer
         if self.is_normal:
             self.log = CmdLogWidget()
-            self.log.set_size_request(640, 320)
+            if logsize is None:
+                logsize = (-1, 180)
+            self.log.set_size_request(logsize[0], logsize[1])
             self.log.size_request()
             self.pack_start(self.log)
         elif self.is_compact:
@@ -320,6 +335,9 @@ class CmdWidget(gtk.VBox):
         gobject.timeout_add(10, self.process_queue, callback, args, kargs)
 
     def is_alive(self):
+        """
+        Return whether the thread is alive.
+        """
         return self.hgthread and self.hgthread.isAlive()
 
     def stop(self):
