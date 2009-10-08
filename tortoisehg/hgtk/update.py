@@ -328,7 +328,7 @@ class UpdateDialog(gtk.Dialog):
             if hasattr(self, 'notify_func'):
                 self.notify_func(self.notify_args)
             if returncode == 0 and not self.cmd.is_show_log():
-                self.destroy()
+                self.response(gtk.RESPONSE_CLOSE)
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
