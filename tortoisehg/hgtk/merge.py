@@ -182,9 +182,17 @@ class MergeDialog(gtk.Dialog):
             oldmergeenv = os.environ.get('HGMERGE')
             os.environ['HGMERGE'] = tool
 
-        def cmd_done(returncode):
+        def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
             repo = hg.repository(ui.ui(), path=paths.find_root())
+            if self.notify_func:
+                self.notify_func(self.notify_args)
+            if returncode == 0:
+                self.cmd.set_result(_('Merged successfully'), style='ok')
+            elif useraborted:
+                self.cmd.set_result(_('Canceled merging'), style='error')
+            else:
+                self.cmd.set_result(_('Failed to merge'), style='error')
             if len(repo.parents()) == 1:
                 return
             if tool:
@@ -192,8 +200,6 @@ class MergeDialog(gtk.Dialog):
                     os.environ['HGMERGE'] = oldmergeenv
                 else:
                     del os.environ['HGMERGE']
-            if self.notify_func:
-                self.notify_func(self.notify_args)
             self.mergetool.set_sensitive(False)
             self.mergelabel.set_sensitive(False)
             self.mergebtn.set_sensitive(False)
@@ -228,10 +234,16 @@ class MergeDialog(gtk.Dialog):
             return
         cmdline = ['hg', 'update', '--rev', self.localrev, '--clean']
 
-        def cmd_done(returncode):
+        def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
             if self.notify_func:
                 self.notify_func(self.notify_args)
+            if returncode == 0:
+                self.cmd.set_result(_('Undo successfully'), style='ok')
+            elif useraborted:
+                self.cmd.set_result(_('Canceled undo'), style='error')
+            else:
+                self.cmd.set_result(_('Failed to undo'), style='error')
             self.mergetool.set_sensitive(True)
             self.mergelabel.set_sensitive(True)
             self.mergebtn.set_sensitive(True)
