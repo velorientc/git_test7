@@ -34,7 +34,7 @@ class DataMineDialog(gdialog.GDialog):
     COL_LINENUM = 6
 
     def get_title(self):
-        return _('%s - DataMining') % self.get_reponame()
+        return _('%s - datamine') % self.get_reponame()
 
     def get_icon(self):
         return 'menurepobrowse.ico'
