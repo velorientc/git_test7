@@ -278,18 +278,41 @@ class CmdWidget(gtk.VBox):
         self.log_btn = add_button(gtk.STOCK_JUSTIFY_LEFT,
                 _('Toggle log window'), self.log_toggled, toggle=True)
 
-        ## progress bar
-        self.pbar = gtk.ProgressBar()
-        progbox.append_widget(self.pbar, expand=True)
+        ## result frame
+        self.rframe = gtk.Frame()
+        progbox.append_widget(self.rframe, expand=True)
+        self.rframe.set_shadow_type(gtk.SHADOW_IN)
+        rhbox = gtk.HBox()
+        self.rframe.add(rhbox)
 
-        ## stop & close buttons
-        if self.is_compact:
-            self.stop_btn = add_button(gtk.STOCK_STOP,
-                    _('Stop current transaction'), self.stop_clicked)
-            self.close_btn = add_button(gtk.STOCK_CLOSE,
-                    _('Close command bar'), self.close_clicked)
+        ### result label
+        self.rlabel = gtk.Label()
+        rhbox.pack_end(self.rlabel, True, True, 2)
+        self.rlabel.set_alignment(0, 0.5)
 
         def after_init():
+            # result icons
+            self.icons = {}
+            def add_icon(name, stock):
+                img = gtk.Image()
+                rhbox.pack_start(img, False, False, 2)
+                img.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                self.icons[name] = img
+            add_icon('succeed', gtk.STOCK_APPLY)
+            add_icon('error', gtk.STOCK_DIALOG_ERROR)
+
+            # progress bar
+            self.pbar = gtk.ProgressBar()
+            progbox.append_widget(self.pbar, expand=True)
+            self.pbar.hide()
+
+            # stop & close buttons
+            if self.is_compact:
+                self.stop_btn = add_button(gtk.STOCK_STOP,
+                        _('Stop transaction'), self.stop_clicked)
+                self.close_btn = add_button(gtk.STOCK_CLOSE,
+                        _('Close this'), self.close_clicked)
+
             self.set_buttons(stop=False)
             if self.is_normal:
                 self.show_log(False)
@@ -319,6 +342,7 @@ class CmdWidget(gtk.VBox):
         self.log.clear()
 
         # prepare UI
+        self.switch_to(working=True)
         self.set_buttons(stop=True, close=False)
         self.already_opened = self.get_pbar()
         if not self.already_opened:
@@ -348,6 +372,29 @@ class CmdWidget(gtk.VBox):
             self.hgthread.terminate()
             self.set_pbar(True)
             self.set_buttons(stop=False, close=True)
+
+    def set_result(self, text, style=None):
+        """
+        Put text message and icon to the progress bar.
+
+        style: String. If passed 'succeed', 'green' or 'ok', green
+               text and succeed icon will be shown.  If passed 'error',
+               'failed', 'fail' or 'red' are passed, red text and error
+               icon will be shown.
+        """
+        markup = '<span foreground="%s" weight="%s">%%s</span>'
+        if style in ('succeed', 'green', 'ok'):
+            markup = markup % ('#007700', 'bold')
+            icons = {'succeed': True}
+        elif style in ('error', 'failed', 'fail', 'red'):
+            markup = markup % ('#880000', 'bold')
+            icons = {'error': True}
+        else:
+            markup = markup % ('#000000', 'normal')
+            icons = {}
+        text = gtklib.markup_escape_text(text)
+        self.rlabel.set_markup(markup % text)
+        self.set_icons(**icons)
 
     def set_pbar(self, visible):
         """
@@ -460,6 +507,7 @@ class CmdWidget(gtk.VBox):
                 self.set_pbar(False)
             else:
                 self.set_pbar(True)
+                self.switch_to(ready=True)
                 self.set_buttons(stop=False, close=True)
             if returncode is None:
                 self.log.append(_('\n[command interrupted]'))
@@ -472,6 +520,19 @@ class CmdWidget(gtk.VBox):
             return False # Stop polling this function
         else:
             return True # Continue polling
+    
+    def set_icons(self, **kargs):
+        for name, img in self.icons.items():
+            visible =  kargs.get(name, False)
+            img.set_property('visible', visible)
+
+    def switch_to(self, ready=False, working=False):
+        if ready:
+            self.rframe.show()
+            self.pbar.hide()
+        elif working:
+            self.rframe.hide()
+            self.pbar.show()
 
     ### signal handlers ###
 
