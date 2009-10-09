@@ -27,17 +27,19 @@ from tortoisehg.hgtk import gtklib, gdialog, changeset
 # Column indexes for grep
 GCOL_REVID = 0
 GCOL_LINE  = 1 # matched line
-GCOL_DESC  = 2 # summary
-GCOL_PATH  = 3
+GCOL_EDESC = 2 # escaped summary
+GCOL_DESC  = 3 # summary
+GCOL_PATH  = 4
 
 # Column indexes for annotation
 ACOL_REVID = 0
 ACOL_LINE  = 1 # file line
-ACOL_DESC  = 2 # summary
-ACOL_PATH  = 3
-ACOL_COLOR = 4
-ACOL_USER  = 5
-ACOL_LNUM  = 6 # line number
+ACOL_EDESC = 2 # escaped summary
+ACOL_DESC  = 3 # summary
+ACOL_PATH  = 4
+ACOL_COLOR = 5
+ACOL_USER  = 6
+ACOL_LNUM  = 7 # line number
 
 class DataMineDialog(gdialog.GDialog):
 
@@ -252,10 +254,11 @@ class DataMineDialog(gdialog.GDialog):
         date = hglib.toutf(hglib.displaytime(ctx.date()))
         text = hglib.tounicode(ctx.description()).replace(u'\0', '')
         lines = text.splitlines()
-        summary = gtklib.markup_escape_text(lines and lines[0] or '')
+        summary = hglib.toutf(lines and lines[0] or '')
         desc = '%s@%s %s "%s"' % (author, rev, date, summary)
-        self.changedesc[rev] = (desc, author)
-        return (desc, author)
+        desc_esc = gtklib.markup_escape_text(desc)
+        self.changedesc[rev] = (desc, desc_esc, author)
+        return self.changedesc[rev]
 
     def search_clicked(self, button, data):
         self.add_search_page()
@@ -344,6 +347,7 @@ class DataMineDialog(gdialog.GDialog):
         results = gtk.ListStore(str, # revision id
                                 str, # matched line (utf-8)
                                 str, # description (utf-8, escaped)
+                                str, # description (utf-8)
                                 str) # file path (utf-8)
         treeview.set_model(results)
         treeview.set_search_equal_func(self.search_in_grep)
@@ -363,7 +367,7 @@ class DataMineDialog(gdialog.GDialog):
             column.add_attribute(cell, 'text', col)
             treeview.append_column(column)
         if hasattr(treeview, 'set_tooltip_column'):
-            treeview.set_tooltip_column(GCOL_DESC)
+            treeview.set_tooltip_column(GCOL_EDESC)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(treeview)
@@ -478,10 +482,11 @@ class DataMineDialog(gdialog.GDialog):
                 (path, revid, text) = line.split(':', 2)
             except ValueError:
                 continue
-            tip, user = self.get_rev_desc(long(revid))
+            desc, desc_esc, user = self.get_rev_desc(long(revid))
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, hglib.toutf(text[:512]), tip, hglib.toutf(path)))
+            model.append((revid, hglib.toutf(text[:512]), desc_esc,
+                          desc, hglib.toutf(path)))
         if thread.isAlive():
             return True
         else:
@@ -500,10 +505,10 @@ class DataMineDialog(gdialog.GDialog):
         (path, focus) = treeview.get_cursor()
         model = treeview.get_model()
         if path is not None and model is not None:
-            paths = model.get_iter(path)
-            self.currev = model[paths][GCOL_REVID]
-            self.curpath = hglib.fromutf(model[paths][GCOL_PATH])
-            self.stbar.set_status_text(hglib.toutf(model[paths][GCOL_DESC]))
+            iter = model.get_iter(path)
+            self.currev = model[iter][GCOL_REVID]
+            self.curpath = hglib.fromutf(model[iter][GCOL_PATH])
+            self.stbar.set_status_text(hglib.toutf(model[iter][GCOL_DESC]))
 
     def close_current_page(self):
         num = self.notebook.get_current_page()
@@ -613,6 +618,7 @@ class DataMineDialog(gdialog.GDialog):
         results = gtk.ListStore(str, # revision id
                                 str, # file line (utf-8)
                                 str, # description (utf-8, escaped)
+                                str, # description (utf-8)
                                 str, # file path (utf-8)
                                 str, # color
                                 str, # author (utf-8)
@@ -643,7 +649,7 @@ class DataMineDialog(gdialog.GDialog):
             self.add_header_context_menu(column, context_menu)
         treeview.set_headers_clickable(True)
         if hasattr(treeview, 'set_tooltip_column'):
-            treeview.set_tooltip_column(ACOL_DESC)
+            treeview.set_tooltip_column(ACOL_EDESC)
         results.path = path
         results.rev = revid
         scroller = gtk.ScrolledWindow()
@@ -785,13 +791,13 @@ class DataMineDialog(gdialog.GDialog):
                 rowrev = long(revid)
             except ValueError:
                 continue
-            tip, user = self.get_rev_desc(rowrev)
+            desc, desc_esc, user = self.get_rev_desc(rowrev)
             ctx = self.repo[rowrev]
             color = colormap.get_color(ctx, curdate)
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, hglib.toutf(text[:512]), tip, hglib.toutf(path.strip()),
-                    color, user, len(model)+1))
+            model.append((revid, hglib.toutf(text[:512]), desc_esc, desc,
+                    hglib.toutf(path.strip()), color, user, len(model)+1))
         if thread.isAlive():
             return True
         else:
