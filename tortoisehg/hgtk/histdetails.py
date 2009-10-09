@@ -17,6 +17,7 @@ class LogDetailsDialog(gtk.Dialog):
     def __init__(self, model, apply_func):
         super(LogDetailsDialog, self).__init__(
             flags=gtk.DIALOG_MODAL)
+        self.set_has_separator(False)
         self.connect('response', self.dialog_response)
 
         self.apply_func = apply_func
