@@ -24,14 +24,22 @@ from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk.logview import treemodel as LogTreeModelModule
 from tortoisehg.hgtk import gtklib, gdialog, changeset
 
+# Column indexes for grep
+GCOL_REVID = 0
+GCOL_LINE  = 1 # matched line
+GCOL_DESC  = 2 # summary
+GCOL_PATH  = 3
+
+# Column indexes for annotation
+ACOL_REVID = 0
+ACOL_LINE  = 1 # file line
+ACOL_DESC  = 2 # summary
+ACOL_PATH  = 3
+ACOL_COLOR = 4
+ACOL_USER  = 5
+ACOL_LNUM  = 6 # line number
+
 class DataMineDialog(gdialog.GDialog):
-    COL_REVID = 0
-    COL_TEXT = 1
-    COL_TOOLTIP = 2
-    COL_PATH = 3
-    COL_COLOR = 4
-    COL_USER = 5
-    COL_LINENUM = 6
 
     def get_title(self):
         return _('%s - datamine') % self.get_reponame()
@@ -340,9 +348,9 @@ class DataMineDialog(gdialog.GDialog):
         treeview.set_model(results)
         treeview.set_search_equal_func(self.search_in_grep)
         for title, width, col, emode in (
-                (_('Rev'), 10, self.COL_REVID, pango.ELLIPSIZE_NONE),
-                (_('File'), 25, self.COL_PATH, pango.ELLIPSIZE_START),
-                (_('Matches'), 80, self.COL_TEXT, pango.ELLIPSIZE_END)):
+                (_('Rev'), 10, GCOL_REVID, pango.ELLIPSIZE_NONE),
+                (_('File'), 25, GCOL_PATH, pango.ELLIPSIZE_START),
+                (_('Matches'), 80, GCOL_LINE, pango.ELLIPSIZE_END)):
             cell = gtk.CellRendererText()
             cell.set_property('width-chars', width)
             cell.set_property('ellipsize', emode)
@@ -355,7 +363,7 @@ class DataMineDialog(gdialog.GDialog):
             column.add_attribute(cell, 'text', col)
             treeview.append_column(column)
         if hasattr(treeview, 'set_tooltip_column'):
-            treeview.set_tooltip_column(self.COL_TOOLTIP)
+            treeview.set_tooltip_column(GCOL_DESC)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(treeview)
@@ -397,7 +405,7 @@ class DataMineDialog(gdialog.GDialog):
         Case insensitive
         """
         key = key.lower()
-        for col in (self.COL_PATH, self.COL_TEXT):
+        for col in (GCOL_PATH, GCOL_LINE):
             if key in model.get_value(iter, col).lower():
                 return False
         return True
@@ -493,9 +501,9 @@ class DataMineDialog(gdialog.GDialog):
         model = treeview.get_model()
         if path is not None and model is not None:
             paths = model.get_iter(path)
-            self.currev = model[paths][self.COL_REVID]
-            self.curpath = hglib.fromutf(model[paths][self.COL_PATH])
-            self.stbar.set_status_text(hglib.toutf(model[paths][self.COL_TOOLTIP]))
+            self.currev = model[paths][GCOL_REVID]
+            self.curpath = hglib.fromutf(model[paths][GCOL_PATH])
+            self.stbar.set_status_text(hglib.toutf(model[paths][GCOL_DESC]))
 
     def close_current_page(self):
         num = self.notebook.get_current_page()
@@ -614,11 +622,11 @@ class DataMineDialog(gdialog.GDialog):
 
         context_menu = self.ann_header_context_menu(treeview)
         for title, width, col, emode, visible in (
-                (_('Line'), 8, self.COL_LINENUM, pango.ELLIPSIZE_NONE, True),
-                (_('Rev'), 10, self.COL_REVID, pango.ELLIPSIZE_NONE, True),
-                (_('File'), 15, self.COL_PATH, pango.ELLIPSIZE_START, False),
-                (_('User'), 15, self.COL_USER, pango.ELLIPSIZE_END, False),
-                (_('Source'), 80, self.COL_TEXT, pango.ELLIPSIZE_END, True)):
+                (_('Line'), 8, ACOL_LNUM, pango.ELLIPSIZE_NONE, True),
+                (_('Rev'), 10, ACOL_REVID, pango.ELLIPSIZE_NONE, True),
+                (_('File'), 15, ACOL_PATH, pango.ELLIPSIZE_START, False),
+                (_('User'), 15, ACOL_USER, pango.ELLIPSIZE_END, False),
+                (_('Source'), 80, ACOL_LINE, pango.ELLIPSIZE_END, True)):
             cell = gtk.CellRendererText()
             cell.set_property('width-chars', width)
             cell.set_property('ellipsize', emode)
@@ -629,13 +637,13 @@ class DataMineDialog(gdialog.GDialog):
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
             column.add_attribute(cell, 'text', col)
-            column.add_attribute(cell, 'background', self.COL_COLOR)
+            column.add_attribute(cell, 'background', ACOL_COLOR)
             column.set_visible(visible)
             treeview.append_column(column)
             self.add_header_context_menu(column, context_menu)
         treeview.set_headers_clickable(True)
         if hasattr(treeview, 'set_tooltip_column'):
-            treeview.set_tooltip_column(self.COL_TOOLTIP)
+            treeview.set_tooltip_column(ACOL_DESC)
         results.path = path
         results.rev = revid
         scroller = gtk.ScrolledWindow()
@@ -684,7 +692,7 @@ class DataMineDialog(gdialog.GDialog):
         Case insensitive
         """
         key = key.lower()
-        for col in (self.COL_USER, self.COL_TEXT):
+        for col in (ACOL_USER, ACOL_LINE):
             if key in model.get_value(iter, col).lower():
                 return False
         return True
@@ -806,9 +814,9 @@ class DataMineDialog(gdialog.GDialog):
         model = treeview.get_model()
         if path is not None and model is not None:
             anniter = model.get_iter(path)
-            self.currev = model[anniter][self.COL_REVID]
+            self.currev = model[anniter][ACOL_REVID]
             self.path = model.path
-            self.stbar.set_status_text(model[anniter][self.COL_TOOLTIP])
+            self.stbar.set_status_text(model[anniter][ACOL_DESC])
 
     def ann_button_release(self, widget, event, objs):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
