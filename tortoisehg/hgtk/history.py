@@ -684,22 +684,25 @@ class GLog(gdialog.GDialog):
 
     def tree_diff_context_menu(self):
         m = gtk.Menu()
-        m.append(create_menu(_('_diff with selected'), self.diff_revs))
-        m.append(create_menu(_('visual diff with selected'),
+        m.append(create_menu(_('_Diff with selected'), self.diff_revs))
+        m.append(create_menu(_('Visual Diff with selected'),
                  self.vdiff_selected))
         if self.bfile:
             m.connect_after('selection-done', self.restore_original_selection)
             m.show_all()
             return m
 
-        m.append(create_menu(_('email from here to selected'),
+        m.append(gtk.SeparatorMenuItem())
+        m.append(create_menu(_('Email from here to selected...'),
                  self.email_revs))
-        m.append(create_menu(_('bundle from here to selected'),
+        m.append(create_menu(_('Bundle from here to selected...'),
                  self.bundle_revs))
-        m.append(create_menu(_('export patches from here to selected'),
+        m.append(create_menu(_('Export Patches from here to selected...'),
                  self.export_revs))
-        cmenu_merge = create_menu(_('_merge with'), self.domerge)
+        m.append(gtk.SeparatorMenuItem())
+        cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
         m.append(cmenu_merge)
+        m.append(gtk.SeparatorMenuItem())
         
         # disable/enable menus as required
         parents = [x.rev() for x in self.repo.parents()]
@@ -708,12 +711,12 @@ class GLog(gdialog.GDialog):
 
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
-            m.append(create_menu(_('transplant revision range to local'),
+            m.append(create_menu(_('Transplant Revision range to local'),
                      self.transplant_revs))
 
         # need rebase extension for rebase command
         if 'rebase' in self.exs:
-            m.append(create_menu(_('rebase on top of selected'),
+            m.append(create_menu(_('Rebase on top of selected'),
                      self.rebase_selected))
         
         # need MQ extension for qimport command
