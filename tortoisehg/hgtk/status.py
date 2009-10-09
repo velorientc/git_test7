@@ -1423,7 +1423,8 @@ class GStatus(gdialog.GDialog):
                 types[row[FM_STATUS]].append(file)
             all.append(file)
 
-        def make(label, handler, stats, enabled=True):
+        def make(label, handler, stats, enabled=True, 
+                sepbefore=False, sepafter=False):
             files = []
             for t in stats:
                 files.extend(types[t])
@@ -1433,7 +1434,11 @@ class GStatus(gdialog.GDialog):
             item.connect('activate', handler, files)
             item.set_border_width(1)
             item.set_sensitive(enabled)
+            if sepbefore:
+                menu.append(gtk.SeparatorMenuItem())
             menu.append(item)
+            if sepafter:
+                menu.append(gtk.SeparatorMenuItem())
             return files
 
         def vdiff(menuitem, files):
@@ -1499,24 +1504,25 @@ class GStatus(gdialog.GDialog):
             dlg.set_notify_func(self.ignoremask_updated)
 
         menu = gtk.Menu()
-        make(_('_visual diff'), vdiff, 'MAR!ru')
-        make(_('edit'), edit, 'MACI?ru')
-        make(_('view missing'), viewmissing, 'R!')
-        make(_('view other'), other, 'MAru', self.is_merge())
-        make(_('_revert'), revert, 'MAR!ru')
-        make(_('l_og'), log, 'MARC!ru')
-        make(_('_forget'), forget, 'MARC!ru')
-        make(_('_add'), add, 'I?')
-        make(_('_guess rename'), guess_rename, '?')
-        make(_('_ignore'), ignore, '?')
-        make(_('remove versioned'), remove, 'C')
-        make(_('_delete unversioned'), delete, '?I')
+        make(_('_Visual Diff'), vdiff, 'MAR!ru')
+        make(_('Edit'), edit, 'MACI?ru')
+        make(_('View missing'), viewmissing, 'R!')
+        make(_('View other'), other, 'MAru', self.is_merge())
+        menu.append(gtk.SeparatorMenuItem())
+        make(_('_Revert'), revert, 'MAR!ru', sepafter=True)
+        make(_('L_og'), log, 'MARC!ru', sepafter=True)
+        make(_('_Forget'), forget, 'MARC!ru')
+        make(_('_Add'), add, 'I?')
+        make(_('_Guess Rename...'), guess_rename, '?')
+        make(_('_Ignore'), ignore, '?')
+        make(_('Remove versioned'), remove, 'C')
+        make(_('_Delete unversioned'), delete, '?I')
         if len(all) == 1:
-            make(_('_copy'), copy, 'MC')
-            make(_('rename'), rename, 'MC')
-        f = make(_('restart merge'), resolve, 'u')
-        make(_('mark unresolved'), unmark, 'r')
-        make(_('mark resolved'), mark, 'u')
+            make(_('_Copy...'), copy, 'MC', sepbefore=True)
+            make(_('Rename...'), rename, 'MC')
+        f = make(_('Restart Merge...'), resolve, 'u', sepbefore=True)
+        make(_('Mark unresolved'), unmark, 'r')
+        make(_('Mark resolved'), mark, 'u')
         if f:
             rmenu = gtk.Menu()
             for tool in hglib.mergetools(self.repo.ui):
@@ -1524,7 +1530,7 @@ class GStatus(gdialog.GDialog):
                 item.connect('activate', resolve_with, tool, f)
                 item.set_border_width(1)
                 rmenu.append(item)
-            item = gtk.MenuItem(_('restart merge with'), True)
+            item = gtk.MenuItem(_('Restart merge with'), True)
             item.set_submenu(rmenu)
             menu.append(item)
 
