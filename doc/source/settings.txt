@@ -115,7 +115,15 @@ TortoiseHg
 	Show the diff panel below the file list in status, shelve, and
 	commit dialogs.
 	Default: False (show diffs to right of file list).
-	
+
+:guilabel:`Capture Stderr:`
+	Redirect stderr to a buffer which is parsed at the end of the process
+	for runtime errors. Default: True.
+
+:guilabel:`Fork hgtk:`
+	When running hgtk from the command line, fork a background process
+	to run graphical dialogs. Default: True.
+
 .. module:: commit.settings
 	:synopsis: Dialog used to set commit specific preferences
 
@@ -170,6 +178,12 @@ Changelog
 	Allow the changelog viewer to copy the changeset hash
 	of the currently selected changeset into the clipboard.
 	Default: False.
+
+:guilabel:`Hide Tags:`
+	Space separated list of tags that will not be shown.
+	Useful example: Specify "qbase qparent qtip" to hide the
+	standard tags inserted by the Mercurial Queues Extension.
+	Default: None.
 
 .. module:: synchronize.settings
 	:synopsis: Dialog used to set synchronize specific preferences
