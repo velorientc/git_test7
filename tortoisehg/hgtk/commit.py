@@ -626,8 +626,7 @@ class GCommit(GStatus):
     def check_undo(self):
         can_undo = os.path.exists(self.repo.sjoin("undo")) and \
                 self.last_commit_id is not None
-        self.get_toolbutton('undo').set_sensitive(can_undo)
-        self.get_menuitem('undo').set_sensitive(can_undo)
+        self.enable_cmd('undo', can_undo)
 
     def check_merge(self):
         if self.is_merge():
