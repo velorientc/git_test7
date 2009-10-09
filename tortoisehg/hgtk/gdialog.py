@@ -339,6 +339,14 @@ class GDialog(gtk.Window):
         else:
             return self.menuitems.get(name)
 
+    def enable_cmd(self, name, enable):
+        ws = []
+        ws.append(self.toolbuttons.get(name))
+        ws.append(self.menuitems.get(name))
+        for w in ws:
+            if w:
+                w.set_sensitive(enable)
+
     def get_reponame(self):
         return hglib.get_reponame(self.repo)
 
