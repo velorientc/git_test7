@@ -333,7 +333,10 @@ class DataMineDialog(gdialog.GDialog):
                         modifier, gtk.ACCEL_VISIBLE)
         treeview.connect('thg-diff', self.grep_thgdiff)
 
-        results = gtk.ListStore(str, str, str, str)
+        results = gtk.ListStore(str, # revision id
+                                str, # matched line (utf-8)
+                                str, # description (utf-8, escaped)
+                                str) # file path (utf-8)
         treeview.set_model(results)
         treeview.set_search_equal_func(self.search_in_grep)
         for title, width, col, emode in (
@@ -599,7 +602,13 @@ class DataMineDialog(gdialog.GDialog):
                         modifier, gtk.ACCEL_VISIBLE)
         treeview.connect('thg-diff', self.annotate_thgdiff)
 
-        results = gtk.ListStore(str, str, str, str, str, str, str)
+        results = gtk.ListStore(str, # revision id
+                                str, # file line (utf-8)
+                                str, # description (utf-8, escaped)
+                                str, # file path (utf-8)
+                                str, # color
+                                str, # author (utf-8)
+                                str) # line number
         treeview.set_model(results)
         treeview.set_search_equal_func(self.search_in_file)
 
