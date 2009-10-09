@@ -494,15 +494,19 @@ class ChangeSet(gdialog.GDialog):
             return menuitem
 
         menu = gtk.Menu()
-        menu.append(create_menu(_('_visual diff'), self.diff_file_rev))
-        menu.append(create_menu(_('diff to _local'), self.diff_to_local))
-        menu.append(create_menu(_('_view at revision'), self.view_file_rev))
-        self.save_menu = create_menu(_('_save at revision'), self.save_file_rev)
+        menu.append(create_menu(_('_Visual Diff'), self.diff_file_rev))
+        menu.append(create_menu(_('Diff to _local'), self.diff_to_local))
+        menu.append(gtk.SeparatorMenuItem())
+        menu.append(create_menu(_('_View at Revision'), self.view_file_rev))
+        self.save_menu = create_menu(_('_Save at Revision...'),
+            self.save_file_rev)
         menu.append(self.save_menu)
-        menu.append(create_menu(_('_file history'), self.file_history))
-        self.ann_menu = create_menu(_('_annotate file'), self.ann_file)
+        menu.append(gtk.SeparatorMenuItem())
+        menu.append(create_menu(_('_File History'), self.file_history))
+        self.ann_menu = create_menu(_('_Annotate File'), self.ann_file)
         menu.append(self.ann_menu)
-        menu.append(create_menu(_('_revert file contents'), self.revert_file))
+        menu.append(gtk.SeparatorMenuItem())
+        menu.append(create_menu(_('_Revert File Contents'), self.revert_file))
         menu.show_all()
         return menu
 
