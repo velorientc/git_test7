@@ -460,10 +460,7 @@ class GStatus(gdialog.GDialog):
             return
         sensitive = check_count and not self.is_merge()
         for cmd in ('diff', 'revert', 'add', 'remove', 'move', 'forget'):
-            self.get_toolbutton(cmd).set_sensitive(sensitive)
-            i = self.get_menuitem(cmd, throw=False)
-            if i:
-                i.set_sensitive(sensitive)
+            self.enable_cmd(cmd, sensitive)
         if self.diff_notebook.get_current_page() == 2:
             self.update_commit_preview()
 
