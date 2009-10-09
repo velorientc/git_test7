@@ -465,6 +465,8 @@ class GLog(gdialog.GDialog):
         settings = gdialog.GDialog.save_settings(self)
         settings['glog-vpane'] = self.vpaned.get_position()
         settings['glog-hpane'] = self.hpaned.get_position()
+        if hasattr(self, 'mqpaned'):
+            settings['glog-mqpane'] = self.mqpaned.get_position()
         settings['branch-color'] = self.graphview.get_property('branch-color')
         settings['show-filterbar'] = self.show_filterbar
         settings['show-syncbar'] = self.show_syncbar
@@ -482,6 +484,7 @@ class GLog(gdialog.GDialog):
         gdialog.GDialog.load_settings(self, settings)
         self.setting_vpos = settings.get('glog-vpane', -1)
         self.setting_hpos = settings.get('glog-hpane', -1)
+        self.setting_mqhpos = settings.get('glog-mqpane', 140)
         self.branch_color = settings.get('branch-color', False)
         self.show_filterbar = settings.get('show-filterbar', True)
         self.show_syncbar = settings.get('show-syncbar', True)
@@ -1204,6 +1207,8 @@ class GLog(gdialog.GDialog):
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
         self.hpaned.set_position(self.setting_hpos)
+        if hasattr(self, 'mqpaned'):
+            self.mqpaned.set_position(self.setting_mqhpos)
 
     def thgdiff(self, treeview):
         'ctrl-d handler'
@@ -1640,9 +1645,12 @@ class GLog(gdialog.GDialog):
     def enable_mqpanel(self, enable=None):
         if not hasattr(self, 'mqpaned'):
             return
-        if enable == None:
+        if enable is None:
             enable = self.mqwidget.has_patch()
-        self.mqpaned.set_position(enable and 180 or 0)
+        oldpos = self.mqpaned.get_position()
+        self.mqpaned.set_position(enable and self.setting_mqhpos or 0)
+        if not enable:
+            self.setting_mqhpos = oldpos
 
         # set the state of MQ toolbutton
         if hasattr(self, 'mqtb'):
