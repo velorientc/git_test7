@@ -69,9 +69,9 @@ class UpdateDialog(gtk.Dialog):
             combo.append_text(repo.dirstate.branch())
         combo.set_active(0)
 
-        dblist = self.repo.ui.config('tortoisehg', 'deadbranch', '')
+        dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
         deadbranches = [ x.strip() for x in dblist.split(',') ]
-        for name in self.repo.branchtags().keys():
+        for name in repo.branchtags().keys():
             if name not in deadbranches:
                 combo.append_text(name)
 
@@ -150,7 +150,7 @@ class UpdateDialog(gtk.Dialog):
     def dialog_response(self, dialog, response_id):
         # Update button
         if response_id == gtk.RESPONSE_OK:
-            self.update(self.repo)
+            self.update()
         # Close button or dialog closing by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
             if self.cmd.is_alive():
@@ -239,7 +239,7 @@ class UpdateDialog(gtk.Dialog):
             self.new_rev_label.set_label(_('unknown revision!'))
             self.updatebtn.set_sensitive(False)
 
-    def update(self, repo):
+    def update(self):
         cmdline = ['hg', 'update', '--verbose']
         rev = self.revcombo.get_active_text()
         cmdline.append('--rev')
@@ -311,7 +311,7 @@ class UpdateDialog(gtk.Dialog):
                     dlg.set_transient_for(self)
                     dlg.set_modal(True)
                     dlg.display()
-                    dlg.connect('destroy', lambda w: self.update(repo))
+                    dlg.connect('destroy', lambda w: self.update())
                     return # retry later, no need to destroy
                 elif ret['merge']:
                     pass # no args
