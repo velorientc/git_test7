@@ -392,6 +392,9 @@ class MQWidget(gtk.VBox):
         cmdline = ['hg', 'qup', patch]
         self.cmd.execute(cmdline, self.cmd_done)
 
+    def has_mq(self):
+        return self.mqloaded and os.path.isdir(self.repo.mq.path)
+
     def has_patch(self):
         """ return True if MQ has applicable patch """
         if self.mqloaded:

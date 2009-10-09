@@ -1666,6 +1666,7 @@ class GLog(gdialog.GDialog):
             self.mqtb.handler_block_by_func(self.mq_clicked)
             self.mqtb.set_active(enable)
             self.mqtb.handler_unblock_by_func(self.mq_clicked)
+            self.enable_cmd('mq', self.mqwidget.has_mq())
 
     def mq_clicked(self, toolbutton, data=None):
         self.enable_mqpanel(self.mqtb.get_active())
