@@ -138,8 +138,8 @@ class MQWidget(gtk.VBox):
         self.model = gtk.ListStore(int, # patch index
                                    str, # patch status
                                    str, # patch name
-                                   str, # summary
-                                   str) # escaped summary
+                                   str, # summary (utf-8)
+                                   str) # escaped summary (utf-8)
         self.list = gtk.TreeView(self.model)
         self.list.set_row_separator_func(self.row_sep_func)
         # To support old PyGTK (<2.12)
@@ -239,7 +239,7 @@ class MQWidget(gtk.VBox):
         for index, patchname in enumerate(q.series):
             stat = patchname in applied and 'A' or 'U'
             try:
-                msg = mq.patchheader(q.join(patchname)).message[0]
+                msg = hglib.toutf(mq.patchheader(q.join(patchname)).message[0])
                 msg_esc = gtklib.markup_escape_text(msg)
             except IndexError:
                 msg = msg_esc = None
