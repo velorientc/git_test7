@@ -605,21 +605,28 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('visualize change'), self.vdiff_change))
         m.append(create_menu(_('di_splay change'), self.show_status))
         m.append(create_menu(_('diff to local'), self.vdiff_local))
+        m.append(gtk.SeparatorMenuItem())
         m.append(create_menu(_('_copy hash'), self.copy_hash))
+        cursep = len(m)
         if self.bfile:
             if self.currevid >= len(self.repo) - self.npreviews:
+                m.append(gtk.SeparatorMenuItem())
                 m.append(create_menu(_('pull to here'), self.pull_to))
             m.show_all()
             return m
 
         if self.repo[self.currevid].node() in self.outgoing:
+            m.append(gtk.SeparatorMenuItem())
             m.append(create_menu(_('push to here'), self.push_to))
+        m.append(gtk.SeparatorMenuItem())
         m.append(create_menu(_('_update'), self.checkout))
         cmenu_merge = create_menu(_('_merge with'), self.domerge)
         m.append(cmenu_merge)
+        m.append(gtk.SeparatorMenuItem())
         m.append(create_menu(_('_export patch'), self.export_patch))
         m.append(create_menu(_('e_mail patch'), self.email_patch))
         m.append(create_menu(_('_bundle rev:tip'), self.bundle_rev_to_tip))
+        m.append(gtk.SeparatorMenuItem())
         m.append(create_menu(_('add/remove _tag'), self.add_tag))
         cmenu_backout = create_menu(_('backout revision'), self.backout_rev)
         m.append(cmenu_backout)
@@ -661,6 +668,7 @@ class GLog(gdialog.GDialog):
             except:
                 pass
 
+            m.append(gtk.SeparatorMenuItem())
             m.append(cmenu_qimport)
             m.append(cmenu_strip)
 
