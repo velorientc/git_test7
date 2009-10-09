@@ -198,6 +198,10 @@ void InitMenuMaps()
         for (std::size_t i = 0; i < sz; i++)
         {
             MenuDescription md = menuDescList[i];
+
+            if (md.name.size() == 0)
+                break;
+
             TDEBUG_TRACE("InitMenuMaps: adding " << md.name);
 
             // Look for translation of menu and help text
