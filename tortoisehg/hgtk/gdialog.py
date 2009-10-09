@@ -333,11 +333,8 @@ class GDialog(gtk.Window):
     def get_toolbutton(self, name):
         return self.toolbuttons[name]
 
-    def get_menuitem(self, name, throw=True):
-        if throw:
-            return self.menuitems[name]
-        else:
-            return self.menuitems.get(name)
+    def get_menuitem(self, name):
+        return self.menuitems[name]
 
     def enable_cmd(self, name, enable):
         ws = []
