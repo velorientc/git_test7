@@ -177,7 +177,7 @@ class GLog(gdialog.GDialog):
 
     def synch_clicked(self, toolbutton, data):
         def sync_closed(dialog):
-            self.get_toolbutton('synchronize').set_sensitive(True)
+            self.enable_cmd('synchronize', True)
 
         def synch_callback(parents):
             self.repo.invalidate()
@@ -191,7 +191,7 @@ class GLog(gdialog.GDialog):
         dlg.set_notify_func(synch_callback, parents)
         dlg.connect('destroy', sync_closed)
         dlg.show_all()
-        self.get_toolbutton('synchronize').set_sensitive(False)
+        self.enable_cmd('synchronize', False)
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
@@ -302,10 +302,8 @@ class GLog(gdialog.GDialog):
                     if self.graphcol != show:
                         self.graphcol = show
                         reload = True
-                        item = self.get_menuitem('compact-graph')
-                        item.set_sensitive(self.graphcol)
-                        item = self.get_menuitem('color-by-branch')
-                        item.set_sensitive(self.graphcol)
+                        self.enable_cmd('compact-graph', self.graphcol)
+                        self.enable_cmd('color-by-branch', self.graphcol)
                 else:
                     self.graphview.set_property(property, show)
                     self.showcol[property] = show
@@ -431,8 +429,8 @@ class GLog(gdialog.GDialog):
             # persisted data
             pass
 
-        self.get_menuitem('compact-graph').set_sensitive(self.graphcol)
-        self.get_menuitem('color-by-branch').set_sensitive(self.graphcol)
+        self.enable_cmd('compact-graph', self.graphcol)
+        self.enable_cmd('color-by-branch', self.graphcol)
 
         item = self.get_menuitem('use-proxy-server')
         if ui.ui().config('http_proxy', 'host'):
