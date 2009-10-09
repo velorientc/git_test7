@@ -465,9 +465,13 @@ class GLog(gdialog.GDialog):
         settings = gdialog.GDialog.save_settings(self)
         settings['glog-vpane'] = self.vpaned.get_position()
         settings['glog-hpane'] = self.hpaned.get_position()
-        if hasattr(self, 'mqpaned'):
+        if hasattr(self, 'mqpaned') and self.mqwidget.has_patch():
             curpos = self.mqpaned.get_position()
             settings['glog-mqpane'] = curpos or self.setting_mqhpos
+            settings['glog-mqvis'] = bool(curpos)
+        else:
+            settings['glog-mqpane'] = self.setting_mqhpos
+            settings['glog-mqvis'] = self.setting_mqvis
         settings['branch-color'] = self.graphview.get_property('branch-color')
         settings['show-filterbar'] = self.show_filterbar
         settings['show-syncbar'] = self.show_syncbar
@@ -486,6 +490,7 @@ class GLog(gdialog.GDialog):
         self.setting_vpos = settings.get('glog-vpane', -1)
         self.setting_hpos = settings.get('glog-hpane', -1)
         self.setting_mqhpos = settings.get('glog-mqpane', 140) or 140
+        self.setting_mqvis = settings.get('glog-mqvis', False)
         self.branch_color = settings.get('branch-color', False)
         self.show_filterbar = settings.get('show-filterbar', True)
         self.show_syncbar = settings.get('show-syncbar', True)
@@ -1650,7 +1655,7 @@ class GLog(gdialog.GDialog):
         if not hasattr(self, 'mqpaned'):
             return
         if enable is None:
-            enable = self.mqwidget.has_patch()
+            enable = self.setting_mqvis and self.mqwidget.has_patch()
         oldpos = self.mqpaned.get_position()
         self.mqpaned.set_position(enable and self.setting_mqhpos or 0)
         if not enable and oldpos:
