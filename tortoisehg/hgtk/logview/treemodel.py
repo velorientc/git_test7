@@ -179,17 +179,20 @@ class TreeModel(gtk.GenericTreeModel):
                 if not self.showgraph:
                     marker = hglib.toutf(u'\u2191 ') # up arrow
                     sumstr = marker + sumstr
-                status = -1
+                status = 1
             elif revid >= self.origtip:
                 if revid >= len(self.repo) - self.npreviews:
                     if not self.showgraph:
                         marker = hglib.toutf(u'\u2193 ') # down arrow
                         sumstr = marker + sumstr
-                    status = 2
+                    status = 3
                 else:
-                    status = 1
+                    status = 2
             else:
                 status = 0
+
+            if revid in self.wcparents:
+                status += 4
 
             revision = (sumstr, author, taglist, color, age, status)
             self.revisions[revid] = revision

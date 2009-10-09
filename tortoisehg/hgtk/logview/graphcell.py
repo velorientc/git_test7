@@ -172,8 +172,13 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         (column, colour, status) = self.node
         arc_start_position_x = cell_area.x + box_size * column + box_size / 2; 
         arc_start_position_y = cell_area.y + cell_area.height / 2;
-        ctx.arc(arc_start_position_x, arc_start_position_y,
-                box_size / 5, 0, 2 * math.pi)
+        if status >= 4:  # working directory parent
+            ctx.arc(arc_start_position_x, arc_start_position_y,
+                    box_size / 4, 0, 2 * math.pi)
+            status -= 4
+        else:
+            ctx.arc(arc_start_position_x, arc_start_position_y,
+                    box_size / 5, 0, 2 * math.pi)
         self.set_colour(ctx, colour, 0.0, 0.5)
         ctx.stroke_preserve()
 
@@ -202,13 +207,13 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                                        
             arrow_y = arc_start_position_y - box_size / 4
             arrow_x = arc_start_position_x + 7;
-            if status == -1:  # Outgoing arrow
+            if status == 1:  # Outgoing arrow
                 ctx.rectangle(arrow_x, arrow_y, 2, 5)
                 draw_arrow(arrow_x, arrow_y, -3)
-            elif status == 1: # New changeset, recently added to tip
+            elif status == 2: # New changeset, recently added to tip
                 ctx.set_source_rgb(0, 1, 0)
                 draw_star(arrow_x + box_size / 4, arc_start_position_y , 4, 6)
-            elif status == 2:  # Incoming (bundle preview) arrow
+            elif status == 3:  # Incoming (bundle preview) arrow
                 ctx.rectangle(arrow_x, arrow_y, 2, 5)
                 draw_arrow(arrow_x, arrow_y + 5, 3)
             ctx.stroke_preserve()
