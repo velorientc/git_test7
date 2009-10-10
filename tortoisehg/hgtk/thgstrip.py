@@ -139,6 +139,7 @@ class StripDialog(gtk.Dialog):
         self.notify_kargs = kargs
 
     def preview_changesets(self, rev=None, limit=True):
+        # validate revision
         if rev is None:
             rev = self.get_rev()
             if rev is None:
@@ -148,8 +149,9 @@ class StripDialog(gtk.Dialog):
             self.update_info(self.prevnum) # use cached count
             return
         self.prevrev = rev
+
         # enumerate all descendants
-        # borrowed from 'strip' function in 'mercurial/repair.py'
+        # borrowed from strip() in 'mercurial/repair.py'
         cl = self.repo.changelog
         tostrip = [rev,]
         for r in xrange(rev + 1, len(cl)):
@@ -161,22 +163,42 @@ class StripDialog(gtk.Dialog):
         # update changeset preview
         for child in self.resultbox.get_children():
             self.resultbox.remove(child)
-        showrevs = limit and tostrip[:50] or tostrip
-        for r in showrevs:
-            info = csinfo.changesetinfo(self.repo, r)[1]
+        NLIMIT = 50
+        if limit and numstrip > NLIMIT:
+            showrevs, lastrev = tostrip[:NLIMIT-1], tostrip[NLIMIT-1:][-1]
+        else:
+            showrevs, lastrev = tostrip, None
+        def add_info(revnum):
+            info = csinfo.changesetinfo(self.repo, revnum)[1]
             self.resultbox.pack_start(info, False, False, 2)
-            if not r == tostrip[-1]:
+        for r in showrevs:
+            add_info(r)
+            if not r == showrevs[-1]:
                 self.resultbox.pack_start(gtk.HSeparator())
+        if lastrev:
+            snipbox = gtk.HBox()
+            self.resultbox.pack_start(snipbox, False, False, 4)
+            spacer = gtk.Label()
+            snipbox.pack_start(spacer, False, False)
+            spacer.set_width_chars(24)
+            sniplbl = gtk.Label()
+            snipbox.pack_start(sniplbl, False, False)
+            sniplbl.set_markup('<span size="large" weight="heavy"'
+                               ' font_family="monospace">...</span>')
+            sniplbl.set_angle(90)
+            snipbox.pack_start(gtk.Label())
+            add_info(lastrev)
         self.resultbox.show_all()
 
         # update info label
         self.update_info(numstrip)
 
         # update preview status
-        notall = numstrip > len(showrevs)
+        numshow = len(showrevs) + (lastrev and 1 or 0)
+        notall = numstrip > numshow
         if notall:
             text = _('Displaying %(count)d of %(total)d changesets') \
-                        % dict(count=len(showrevs), total=numstrip)
+                        % dict(count=numshow, total=numstrip)
         else:
             text = _('Displaying all changesets')
         self.pstatlbl.set_text(text)
