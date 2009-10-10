@@ -22,7 +22,7 @@ from tortoisehg.util import hglib, thread2
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 
-from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev
+from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
 
@@ -1322,20 +1322,15 @@ class GLog(gdialog.GDialog):
         self.graphview.set_revision_id(rid, load=True)
 
     def strip_rev(self, menuitem):
+        def strip_completed():
+            self.repo.invalidate()
+            self.reload_log()
+            self.changeview._buffer.set_text('')
+            self.changeview._filelist.clear()
         rev = self.currevid
-        res = gdialog.Confirm(_('Confirm Strip Revisions'), [], self,
-                _('Remove revision %d and all descendants?') % rev).run()
-        if res != gtk.RESPONSE_YES:
-            return
-        cmdline = ['hg', 'strip', str(rev)]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.repo.invalidate()
-        self.reload_log()
-        self.changeview._buffer.set_text('')
-        self.changeview._filelist.clear()
+        dialog = thgstrip.StripDialog(rev)
+        dialog.set_notify_func(strip_completed)
+        self.show_dialog(dialog)
 
     def show_dialog(self, dlg):
         dlg.set_transient_for(self)
