@@ -1423,8 +1423,7 @@ class GStatus(gdialog.GDialog):
                 types[row[FM_STATUS]].append(file)
             all.append(file)
 
-        def make(label, handler, stats, enabled=True, 
-                sepbefore=False, sepafter=False):
+        def make(label, handler, stats, enabled=True):
             files = []
             for t in stats:
                 files.extend(types[t])
@@ -1434,11 +1433,7 @@ class GStatus(gdialog.GDialog):
             item.connect('activate', handler, files)
             item.set_border_width(1)
             item.set_sensitive(enabled)
-            if sepbefore:
-                menu.append(gtk.SeparatorMenuItem())
             menu.append(item)
-            if sepafter:
-                menu.append(gtk.SeparatorMenuItem())
             return files
 
         def vdiff(menuitem, files):
@@ -1503,14 +1498,16 @@ class GStatus(gdialog.GDialog):
             dlg.show_all()
             dlg.set_notify_func(self.ignoremask_updated)
 
-        menu = gtk.Menu()
+        menu = gtklib.MenuItems()
         make(_('_Visual Diff'), vdiff, 'MAR!ru')
         make(_('Edit'), edit, 'MACI?ru')
         make(_('View missing'), viewmissing, 'R!')
         make(_('View other'), other, 'MAru', self.is_merge())
-        menu.append(gtk.SeparatorMenuItem())
-        make(_('_Revert'), revert, 'MAR!ru', sepafter=True)
-        make(_('L_og'), log, 'MARC!ru', sepafter=True)
+        menu.append_sep()
+        make(_('_Revert'), revert, 'MAR!ru')
+        menu.append_sep()
+        make(_('L_og'), log, 'MARC!ru')
+        menu.append_sep()
         make(_('_Forget'), forget, 'MARC!ru')
         make(_('_Add'), add, 'I?')
         make(_('_Guess Rename...'), guess_rename, '?')
@@ -1518,9 +1515,11 @@ class GStatus(gdialog.GDialog):
         make(_('Remove versioned'), remove, 'C')
         make(_('_Delete unversioned'), delete, '?I')
         if len(all) == 1:
-            make(_('_Copy...'), copy, 'MC', sepbefore=True)
+            menu.append_sep()
+            make(_('_Copy...'), copy, 'MC')
             make(_('Rename...'), rename, 'MC')
-        f = make(_('Restart Merge...'), resolve, 'u', sepbefore=True)
+        menu.append_sep()
+        f = make(_('Restart Merge...'), resolve, 'u')
         make(_('Mark unresolved'), unmark, 'r')
         make(_('Mark resolved'), mark, 'u')
         if f:
@@ -1537,6 +1536,7 @@ class GStatus(gdialog.GDialog):
         for label, func, stats in self.get_custom_menus():
             make(label, func, stats)
 
+        menu = menu.create_menu()
         if len(menu.get_children()) > 0:
             menu.show_all()
             menu.popup(None, None, None, 0, 0)
