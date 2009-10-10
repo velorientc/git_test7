@@ -68,36 +68,51 @@ class StripDialog(gtk.Dialog):
         reventry.set_width_chars(32)
         reventry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
 
+        def createlabel():
+            label = gtk.Label()
+            label.set_alignment(0, 0.5)
+            label.set_size_request(-1, 24)
+            label.size_request()
+            return label
+
         ## result label
-        self.resultlbl = gtk.Label()
-        self.resultlbl.set_alignment(0, 0.5)
+        self.resultlbl = createlabel()
+        table.add_row(_('Result:'), self.resultlbl, padding=False)
 
-        ## view option
-        self.compactopt = gtk.CheckButton(_('Use compact view'))
-        table.add_row(_('Result:'), self.resultlbl, self.compactopt,
-                      padding=False, expand=0)
+        ## preview box
+        pframe = gtk.Frame()
+        table.add_row(None, pframe, padding=False)
+        pframe.set_shadow_type(gtk.SHADOW_IN)
+        pbox = gtk.VBox()
+        pframe.add(pbox)
 
-        ## result changesets
-        self.resuleview = rview = gtk.ScrolledWindow()
-        table.add_row(None, self.resuleview, padding=False)
-        rview.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        rview.set_size_request(400, 180)
-        rview.size_request()
-
-        self.resultbox = gtk.VBox()
-        rview.add_with_viewport(self.resultbox)
-
-        ## preview status
+        ### preview status box
         self.pstatbox = gtk.HBox()
-        table.add_row(None, self.pstatbox, padding=False)
-        self.pstatlbl = gtk.Label()
+        pbox.pack_start(self.pstatbox, True, True)
+        pbox.pack_start(gtk.HSeparator(), True, True, 2)
+
+        #### status label
+        self.pstatlbl = createlabel()
         self.pstatbox.pack_start(self.pstatlbl, False, False, 2)
-        self.pstatlbl.set_alignment(0, 0.5)
-        self.pstatlbl.set_size_request(-1, 24)
-        self.pstatlbl.size_request()
+
+        #### show all button
         self.allbtn = gtk.Button(_('Show all')) # add later
         self.allbtn.connect('clicked',
                 lambda b: self.preview_changesets(limit=False))
+
+        #### preview option
+        self.compactopt = gtk.CheckButton(_('Use compact view'))
+        self.pstatbox.pack_end(self.compactopt, False, False, 2)
+
+        ### changeset view
+        rview = gtk.ScrolledWindow()
+        pbox.add(rview)
+        rview.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        rview.set_size_request(400, 180)
+        rview.size_request()
+        self.resultbox = gtk.VBox()
+        rview.add_with_viewport(self.resultbox)
+        rview.child.set_shadow_type(gtk.SHADOW_NONE)
 
         # prepare to show
         self.preview_changesets()
