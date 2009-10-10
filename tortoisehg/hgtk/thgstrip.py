@@ -144,7 +144,7 @@ class StripDialog(gtk.Dialog):
             if rev is None:
                 self.update_info()
                 return
-        if self.prevrev == rev:
+        if limit and self.prevrev == rev:
             self.update_info(self.prevnum) # use cached count
             return
         self.prevrev = rev
