@@ -44,7 +44,7 @@ class BackoutDialog(gtk.Dialog):
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
 
         # message
@@ -103,7 +103,7 @@ class BackoutDialog(gtk.Dialog):
         # prepare to show
         self.load_settings()
         self.backoutbtn.grab_focus()
-        gobject.idle_add(self.after_init)
+        gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
         # CmdWidget

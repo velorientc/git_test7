@@ -261,7 +261,7 @@ class SynchDialog(gtk.Window):
         # prepare to show
         self.load_settings()
         self.update_pull_setting()
-        gobject.idle_add(self.finalize_startup)
+        gtklib.idle_add_single_call(self.finalize_startup)
 
     def create_bottombox(self):
         self.buttonhbox = gtk.HBox()
@@ -313,7 +313,7 @@ class SynchDialog(gtk.Window):
     def _drag_receive(self, widget, context, x, y, selection, targetType, time):
         if time != self.last_drop_time:
             files = selection.get_uris()
-            gobject.idle_add(self._set_path, files[0])
+            gtklib.idle_add_single_call(self._set_path, files[0])
             self.last_drop_time = time
 
     def _set_path(self, uri):

@@ -969,7 +969,7 @@ class GLog(gdialog.GDialog):
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(midpane, True, False)
         self.vpaned.pack2(self.hpaned)
-        gobject.idle_add(self.realize_settings)
+        gtklib.idle_add_single_call(self.realize_settings)
 
         vbox = gtk.VBox()
         vbox.pack_start(self.vpaned, True, True)

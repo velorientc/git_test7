@@ -39,13 +39,13 @@ class MergeDialog(gtk.Dialog):
         if not rev:
             gdialog.Prompt(_('Unable to merge'),
                            _('Must supply a target revision'), self).run()
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
         self.set_title(_('Merging in %s') % hglib.get_reponame(repo))
 
@@ -94,7 +94,7 @@ class MergeDialog(gtk.Dialog):
         self.mergebtn.grab_focus()
         self.commitbtn.set_sensitive(False)
         self.undobtn.set_sensitive(False)
-        gobject.idle_add(self.after_init)
+        gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
         # CmdWidget

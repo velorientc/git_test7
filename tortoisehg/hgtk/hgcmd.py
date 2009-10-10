@@ -319,7 +319,7 @@ class CmdWidget(gtk.VBox):
                 self.show_log(False)
             if self.is_compact:
                 self.set_pbar(False)
-        gobject.idle_add(after_init)
+        gtklib.idle_add_single_call(after_init)
 
     ### public functions ###
 
@@ -520,7 +520,7 @@ class CmdWidget(gtk.VBox):
             def call_callback():
                 callback(returncode, self.useraborted, *args, **kargs)
                 self.useraborted = False
-            gobject.idle_add(call_callback)
+            gtklib.idle_add_single_call(call_callback)
             return False # Stop polling this function
         else:
             return True # Continue polling

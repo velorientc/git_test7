@@ -152,7 +152,7 @@ class CloneDialog(gtk.Dialog):
         # prepare to show
         self.load_settings()
         destcombo.grab_focus()
-        gobject.idle_add(self.after_init)
+        gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
         #CmdWidget

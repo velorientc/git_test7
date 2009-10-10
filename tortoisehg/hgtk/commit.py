@@ -388,7 +388,7 @@ class GCommit(GStatus):
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
         self.vpaned.pack2(vbox2, shrink=False)
-        gobject.idle_add(self.realize_settings)
+        gtklib.idle_add_single_call(self.realize_settings)
         return self.vpaned
 
     def get_preview_tab_name(self):

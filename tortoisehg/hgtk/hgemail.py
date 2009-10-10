@@ -209,7 +209,7 @@ class EmailDialog(gtk.Window):
         frame.add(eventbox)
         self._eventbox = eventbox
         mainvbox.pack_start(frame, True, True, 4)
-        gobject.idle_add(self._refresh, True)
+        gtklib.idle_add_single_call(self._refresh, True)
 
     def _toolbutton(self, stock, label, handler, tip):
         tbutton = gtk.ToolButton(stock)

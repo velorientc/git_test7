@@ -121,7 +121,7 @@ class MQWidget(gtk.VBox):
         self.btn['menu'] = menubtn
         def after_init():
             menubtn.child.get_children()[0].hide()
-        gobject.idle_add(after_init)
+        gtklib.idle_add_single_call(after_init)
         self.pack_start(tbar, False, False)
 
         # center pane
@@ -651,7 +651,7 @@ class MQWidget(gtk.VBox):
                 def unselect():
                     selection = list.get_selection()
                     selection.unselect_all()
-                gobject.idle_add(unselect)
+                gtklib.idle_add_single_call(unselect)
         elif event.button == 3:
             if pathinfo:
                 self.show_patch_cmenu(self.list, pathinfo[0])

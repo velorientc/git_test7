@@ -467,7 +467,7 @@ class GStatus(gdialog.GDialog):
     def prepare_display(self):
         val = self.repo.ui.config('tortoisehg', 'ciexclude', '')
         self.excludes = [i.strip() for i in val.split(',') if i.strip()]
-        gobject.idle_add(self.realize_status_settings)
+        gtklib.idle_add_single_call(self.realize_status_settings)
 
     def refresh_complete(self):
         pass

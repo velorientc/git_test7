@@ -139,7 +139,7 @@ class FileSelectionDialog(gtk.Dialog):
             dlg.focus_field('tortoisehg.vdiff')
             dlg.run()
             dlg.hide()
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
 
     def search_filelist(self, model, column, key, iter):
         'case insensitive filename search'
@@ -179,7 +179,7 @@ class FileSelectionDialog(gtk.Dialog):
             gdialog.Prompt(_('No file changes'),
                    _('There are no file changes to view'), self).run()
             # GTK+ locks up if this is done immediately here
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
 
         tmproot = tempfile.mkdtemp(prefix='extdiff.')

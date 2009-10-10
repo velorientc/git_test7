@@ -45,7 +45,7 @@ class DetectRenameDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
         self.notify_func = None
@@ -217,7 +217,7 @@ class DetectRenameDialog(gtk.Window):
         self.cantree.connect('row-activated', lambda b: self.accept_match())
         self.cantree.get_selection().connect('changed', self.show_diff)
         self.connect('delete-event', lambda *a: self.save_settings())
-        gobject.idle_add(self.refresh)
+        gtklib.idle_add_single_call(self.refresh)
 
     def set_notify_func(self, func):
         self.notify_func = func

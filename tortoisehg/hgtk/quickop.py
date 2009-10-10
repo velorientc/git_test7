@@ -35,7 +35,7 @@ class QuickOpDialog(gtk.Dialog):
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
 
         # Handle rm alias
@@ -157,13 +157,13 @@ class QuickOpDialog(gtk.Dialog):
         if not len(fm):
             gdialog.Prompt(_('No appropriate files'),
                            _('No files found for this operation'), self).run()
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             self.hide()
             return
 
         # prepare to show
         self.gobutton.grab_focus()
-        gobject.idle_add(self.after_init)
+        gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
         # CmdWidget
@@ -244,7 +244,7 @@ class QuickOpDialog(gtk.Dialog):
                 pass
 
         if not list:
-            gobject.idle_add(self.response, gtk.RESPONSE_CLOSE)
+            gtklib.idle_add_single_call(self.response, gtk.RESPONSE_CLOSE)
             return
 
         cmdline = ['hg', self.command, '--verbose'] + list

@@ -33,7 +33,7 @@ class RecoveryDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
         self.reponame = hglib.get_reponame(repo)

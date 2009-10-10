@@ -29,7 +29,7 @@ class HgIgnoreDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
         self.set_title(_('Ignore filter - %s') % hglib.get_reponame(repo))
@@ -146,7 +146,7 @@ class HgIgnoreDialog(gtk.Window):
 
         # prepare to show
         self.glob_entry.grab_focus()
-        gobject.idle_add(self.refresh)
+        gtklib.idle_add_single_call(self.refresh)
 
     def file_selected(self, combo):
         'select another ignore file'
