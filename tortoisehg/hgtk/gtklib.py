@@ -604,3 +604,22 @@ def hasspellcheck():
         return True
     except ImportError:
         return False
+
+def idle_add_single_call(f, *args):
+    '''wrap function f for gobject.idle_add, so that f is guaranteed to be
+    called only once, independent of its return value'''
+
+    class single_call(object):
+        def __init__(self, f, args):
+           self.f = f
+           self.args = args
+        def __call__(self):
+           self.f(*args)  # ignore return value of f
+           return False   # return False to signal: don't call me again
+
+    # functions passed to gobject.idle_add must return False, or they
+    # will be called repeatedly. The single_call object wraps f and always
+    # returns False when called. So the return value of f doesn't matter,
+    # it can even return True (which would lead to gobject.idle_add
+    # calling the function again, if used without single_call).
+    gobject.idle_add(single_call(f, args))
