@@ -393,6 +393,11 @@ def status(ui, *pats, **opts):
     from tortoisehg.hgtk.status import run
     gtkrun(run, ui, *pats, **opts)
 
+def strip(ui, *pats, **opts):
+    """strip changesets"""
+    from tortoisehg.hgtk.thgstrip import run
+    gtkrun(run, ui, *pats, **opts)
+
 def synch(ui, *pats, **opts):
     """repository synchronization tool"""
     from tortoisehg.hgtk.synch import run
@@ -691,4 +696,5 @@ table = {
     "^archive": (archive,
         [('r', 'rev', '', _('revision to update'))],
         ('hgtk archive')),
+    "^strip": (strip, [], ('hgtk strip [REV]')),
 }
