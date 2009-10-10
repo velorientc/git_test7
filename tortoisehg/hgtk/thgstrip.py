@@ -51,7 +51,9 @@ class StripDialog(gtk.Dialog):
             rev = pats[0]
         elif rev is None:
             rev = 'tip'
-        self.prevrev = rev = str(rev)
+        rev = str(rev)
+        self.prevrev = None
+        self.prevnum = None
 
         # layout table
         self.table = table = gtklib.LayoutTable()
@@ -95,10 +97,10 @@ class StripDialog(gtk.Dialog):
         self.pstatlbl.size_request()
         self.allbtn = gtk.Button(_('Show all')) # add later
         self.allbtn.connect('clicked',
-                lambda b: self.preview_changesets(nocheck=True, limit=False))
+                lambda b: self.preview_changesets(limit=False))
 
         # prepare to show
-        self.preview_changesets(nocheck=True)
+        self.preview_changesets()
         self.stripbtn.grab_focus()
         gobject.idle_add(self.after_init)
 
@@ -121,51 +123,58 @@ class StripDialog(gtk.Dialog):
         self.notify_args = args
         self.notify_kargs = kargs
 
-    def preview_changesets(self, nocheck=False, limit=True):
-        revstr = self.revcombo.get_active_text()
-        if len(revstr) == 0 or (not nocheck and self.prevrev == revstr):
+    def preview_changesets(self, rev=None, limit=True):
+        if rev is None:
+            rev = self.get_rev()
+            if rev is None:
+                self.update_info()
+                return
+        if self.prevrev == rev:
+            self.update_info(self.prevnum) # use cached count
             return
-        self.prevrev = revstr
+        self.prevrev = rev
         # enumerate all descendants
         # borrowed from 'strip' function in 'mercurial/repair.py'
         cl = self.repo.changelog
-        try:
-            striprev = self.repo[revstr].rev()
-        except (hglib.RepoError, hglib.LookupError):
-            return
-        if striprev is None:
-            return
-        tostrip = [striprev,]
-        for r in xrange(striprev + 1, len(cl)):
+        tostrip = [rev,]
+        for r in xrange(rev + 1, len(cl)):
             parents = cl.parentrevs(r)
             if parents[0] in tostrip or parents[1] in tostrip:
                 tostrip.append(r)
+        self.prevnum = numstrip = len(tostrip)
 
         # update changeset preview
         for child in self.resultbox.get_children():
             self.resultbox.remove(child)
         showrevs = limit and tostrip[:50] or tostrip
-        for rev in showrevs:
-            r, info = csinfo.changesetinfo(self.repo, rev)
+        for r in showrevs:
+            info = csinfo.changesetinfo(self.repo, r)[1]
             self.resultbox.pack_start(info, False, False, 2)
-            if not rev == tostrip[-1]:
+            if not r == tostrip[-1]:
                 self.resultbox.pack_start(gtk.HSeparator())
         self.resultbox.show_all()
 
         # update info label
-        numstrip = len(tostrip)
-        self.resultlbl.set_markup(_('<span weight="bold">%s changesets</span>'
-                                    ' will be stripped') % numstrip)
+        self.update_info(numstrip)
 
         # update preview status
-        if numstrip > len(showrevs):
+        notall = numstrip > len(showrevs)
+        if notall:
             text = _('Displaying %(count)d of %(total)d changesets') \
                         % dict(count=len(showrevs), total=numstrip)
-            self.allbtn.show()
         else:
             text = _('Displaying all changesets')
-            self.allbtn.hide()
         self.pstatlbl.set_text(text)
+        self.allbtn.set_property('visible', notall)
+
+    def update_info(self, num=None):
+        if num is None:
+            text = '<span weight="bold" foreground="#880000">%s</span>' \
+                        % _('Unknown revision!')
+        else:
+            text = _('<span weight="bold">%s changesets</span> will'
+                     ' be stripped') % num
+        self.resultlbl.set_markup(text)
 
     def dialog_response(self, dialog, response_id):
         def abort():
@@ -193,14 +202,29 @@ class StripDialog(gtk.Dialog):
 
         self.run() # don't close dialog
 
+    def get_rev(self):
+        """ Return integer revision number or None """
+        revstr = self.revcombo.get_active_text()
+        if len(revstr) == 0:
+            return None
+        try:
+            revnum = self.repo[revstr].rev()
+        except (hglib.RepoError, hglib.LookupError):
+            return None
+        return revnum
+
     def update_on_timeout(self):
-        def timeout(id):
-            if self.timeout_queue[-1] == id[0]:
-                self.preview_changesets()
+        rev = self.get_rev()
+        if rev is None:
+            self.update_info()
+            return
+        def timeout(eid, revnum):
+            if self.timeout_queue[-1] == eid[0]:
+                self.preview_changesets(rev=revnum)
                 self.timeout_queue = []
             return False # don't repeat
         event_id = [None]
-        event_id[0] = gobject.timeout_add(600, timeout, event_id)
+        event_id[0] = gobject.timeout_add(600, timeout, event_id, rev)
         self.timeout_queue.append(event_id[0])
 
     def switch_to(self, mode, cmd=True):
