@@ -610,32 +610,32 @@ class GLog(gdialog.GDialog):
         self.filteropts = opts
 
     def tree_context_menu(self):
-        m = gtk.Menu()
+        m = gtklib.MenuItems()
         m.append(create_menu(_('Visualize Change'), self.vdiff_change))
         m.append(create_menu(_('Di_splay Change'), self.show_status))
         m.append(create_menu(_('Diff to local'), self.vdiff_local))
-        m.append(gtk.SeparatorMenuItem())
+        m.append_sep()
         m.append(create_menu(_('_Copy hash'), self.copy_hash))
-        cursep = len(m)
         if self.bfile:
             if self.currevid >= len(self.repo) - self.npreviews:
-                m.append(gtk.SeparatorMenuItem())
+                m.append_sep()
                 m.append(create_menu(_('Pull to here'), self.pull_to))
-            m.show_all()
-            return m
+            menu = m.create_menu()
+            menu.show_all()
+            return menu
 
         if self.repo[self.currevid].node() in self.outgoing:
-            m.append(gtk.SeparatorMenuItem())
+            m.append_sep()
             m.append(create_menu(_('Push to here'), self.push_to))
-        m.append(gtk.SeparatorMenuItem())
+        m.append_sep()
         m.append(create_menu(_('_Update...'), self.checkout))
         cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
         m.append(cmenu_merge)
-        m.append(gtk.SeparatorMenuItem())
+        m.append_sep()
         m.append(create_menu(_('_Export Patch...'), self.export_patch))
         m.append(create_menu(_('E_mail Patch...'), self.email_patch))
         m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
-        m.append(gtk.SeparatorMenuItem())
+        m.append_sep()
         m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
         cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
         m.append(cmenu_backout)
@@ -656,7 +656,7 @@ class GLog(gdialog.GDialog):
         if 'transplant' in self.exs:
             m.append(create_menu(_('Transp_lant to local'),
                      self.transplant_rev))
-        
+
         # need mq extension for strip command
         if 'mq' in self.exs:
             cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
@@ -677,38 +677,40 @@ class GLog(gdialog.GDialog):
             except:
                 pass
 
-            m.append(gtk.SeparatorMenuItem())
+            m.append_sep()
             m.append(cmenu_qimport)
             m.append(cmenu_strip)
 
-        m.show_all()
-        return m
+        menu = m.create_menu()
+        menu.show_all()
+        return menu
 
     def restore_original_selection(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
         self.tree.get_selection().select_path(self.origsel)
 
     def tree_diff_context_menu(self):
-        m = gtk.Menu()
+        m = gtklib.MenuItems()
         m.append(create_menu(_('_Diff with selected'), self.diff_revs))
         m.append(create_menu(_('Visual Diff with selected'),
                  self.vdiff_selected))
         if self.bfile:
-            m.connect_after('selection-done', self.restore_original_selection)
-            m.show_all()
-            return m
+            menu = m.create_menu()
+            menu.connect_after('selection-done', self.restore_original_selection)
+            menu.show_all()
+            return menu
 
-        m.append(gtk.SeparatorMenuItem())
+        m.append_sep()
         m.append(create_menu(_('Email from here to selected...'),
                  self.email_revs))
         m.append(create_menu(_('Bundle from here to selected...'),
                  self.bundle_revs))
         m.append(create_menu(_('Export Patches from here to selected...'),
                  self.export_revs))
-        m.append(gtk.SeparatorMenuItem())
+        m.append_sep()
         cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
         m.append(cmenu_merge)
-        m.append(gtk.SeparatorMenuItem())
+        m.append_sep()
         
         # disable/enable menus as required
         parents = [x.rev() for x in self.repo.parents()]
@@ -729,9 +731,11 @@ class GLog(gdialog.GDialog):
         if 'mq' in self.exs:
             m.append(create_menu(_('qimport from here to selected'),
                      self.qimport_revs))
-        m.connect_after('selection-done', self.restore_original_selection)
-        m.show_all()
-        return m
+
+        menu = m.create_menu()
+        menu.connect_after('selection-done', self.restore_original_selection)
+        menu.show_all()
+        return menu
 
     def get_body(self):
         self.gorev_dialog = None
