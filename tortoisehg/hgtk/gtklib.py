@@ -514,6 +514,38 @@ class SlimToolbar(gtk.HBox):
     def append_space(self):
         self.append_widget(gtk.Label(), expand=True, padding=0)
 
+class MenuItems(object):
+    '''controls creation of menus by ignoring separators at odd places'''
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.childs = []
+        self.sep = None
+
+    def append(self, child):
+        '''appends the child menu item, but ignores odd separators'''
+        if isinstance(child, gtk.SeparatorMenuItem):
+            if len(self.childs) > 0:
+                self.sep = child
+        else:
+            if self.sep:
+                self.childs.append(self.sep)
+                self.sep = None
+            self.childs.append(child)
+
+    def append_sep(self):
+        self.append(gtk.SeparatorMenuItem())
+
+    def create_menu(self):
+        '''creates the menu by ignoring any extra separator'''
+        res = gtk.Menu()
+        for c in self.childs:
+            res.append(c)
+        self.reset()
+        return res
+
 def addspellcheck(textview, ui=None):
     lang = None
     if ui:
