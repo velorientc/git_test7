@@ -493,20 +493,22 @@ class ChangeSet(gdialog.GDialog):
             menuitem.set_border_width(1)
             return menuitem
 
-        menu = gtk.Menu()
+        menu = gtklib.MenuItems()
         menu.append(create_menu(_('_Visual Diff'), self.diff_file_rev))
         menu.append(create_menu(_('Diff to _local'), self.diff_to_local))
-        menu.append(gtk.SeparatorMenuItem())
+        menu.append_sep()
         menu.append(create_menu(_('_View at Revision'), self.view_file_rev))
         self.save_menu = create_menu(_('_Save at Revision...'),
             self.save_file_rev)
         menu.append(self.save_menu)
-        menu.append(gtk.SeparatorMenuItem())
+        menu.append_sep()
         menu.append(create_menu(_('_File History'), self.file_history))
         self.ann_menu = create_menu(_('_Annotate File'), self.ann_file)
         menu.append(self.ann_menu)
-        menu.append(gtk.SeparatorMenuItem())
+        menu.append_sep()
         menu.append(create_menu(_('_Revert File Contents'), self.revert_file))
+
+        menu = menu.create_menu()
         menu.show_all()
         return menu
 
