@@ -18,7 +18,6 @@ AppSupportURL=http://bitbucket.org/tortoisehg/stable/
 AppUpdatesURL=http://bitbucket.org/tortoisehg/stable/
 AppID=TortoiseHg
 AppContact=Steve Borho <steve@borho.org>
-AppMutex=thgtaskbar,Global\thgtaskbar
 OutputBaseFilename=TortoiseHg-{#VERSION}
 DefaultDirName={pf}\TortoiseHg
 SourceDir=..\..
