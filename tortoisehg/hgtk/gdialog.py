@@ -344,6 +344,14 @@ class GDialog(gtk.Window):
             if w:
                 w.set_sensitive(enable)
 
+    def cmd_set_active(self, name, active):
+        ws = []
+        ws.append(self.toolbuttons.get(name))
+        ws.append(self.menuitems.get(name))
+        for w in ws:
+            if w:
+                w.set_active(active)    
+
     def get_reponame(self):
         return hglib.get_reponame(self.repo)
 
