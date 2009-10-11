@@ -517,6 +517,10 @@ class GLog(gdialog.GDialog):
         if hasattr(self, 'mqwidget'):
             self.mqwidget.refresh()
 
+        # force a redraw of the visible rows
+        self.graphview.hide()
+        self.graphview.show()
+
     def reload_log(self, **kwopts):
         'Send refresh event to treeview object'
         self.update_hide_merges_button()
