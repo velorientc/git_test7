@@ -1724,7 +1724,7 @@ class GLog(gdialog.GDialog):
         # set the state of MQ toolbutton
         if hasattr(self, 'mqtb'):
             self.mqtb.handler_block_by_func(self.mq_clicked)
-            self.mqtb.set_active(enable)
+            self.cmd_set_active('mq', enable)
             self.mqtb.handler_unblock_by_func(self.mq_clicked)
             self.enable_cmd('mq', self.mqwidget.has_mq())
 
