@@ -296,8 +296,23 @@ class StripDialog(gtk.Dialog):
         self.abortbtn.set_property('visible', working)
 
     def strip(self):
+        def isclean():
+            '''whether WD is changed'''
+            wc = self.repo[None]
+            return not (wc.modified() or wc.added() or wc.removed())
         revstr = self.revcombo.get_active_text()
         cmdline = ['hg', 'strip', '--verbose', revstr]
+        # check uncommitted changes
+        if not isclean():
+            ret = gdialog.CustomPrompt(_('Confirm Strip'),
+                          _('Detected uncommitted local changes.\nDo'
+                            ' you want to discard them and continue?'),
+                          self, (_('&Yes (--force)'), _('&No')),
+                          default=1, esc=1).run()
+            if ret == 0:
+                cmdline.append('--force')
+            else:
+                return
         def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
             if returncode == 0:
