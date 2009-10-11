@@ -136,7 +136,13 @@ class GLog(gdialog.GDialog):
             sync_bar_item = [dict(text=_('Sync Bar'), ascheck=True, 
                     func=self.toggle_show_syncbar, check=self.show_syncbar)]
 
-        return [(_('_View'), sync_bar_item + [
+        return [(_('_View'), [
+            dict(text=_('Load more Revisions'), name='load-more',
+                func=self.more_clicked, icon=gtk.STOCK_GO_DOWN),
+            dict(text=_('Load all Revisions'), name='load-all',
+                func=self.load_all_clicked, icon=gtk.STOCK_GOTO_BOTTOM),
+            dict(text='----')
+            ] + sync_bar_item + [
             dict(text=_('Filter Bar'), ascheck=True, 
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
             dict(text='----'),
