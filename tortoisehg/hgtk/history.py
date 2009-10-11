@@ -694,7 +694,7 @@ class GLog(gdialog.GDialog):
         menu.show_all()
         return menu
 
-    def restore_original_selection(self, widget, *args):
+    def restore_single_sel(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
         self.tree.get_selection().select_path(self.origsel)
         self.revrange = None
@@ -706,7 +706,7 @@ class GLog(gdialog.GDialog):
                  self.vdiff_selected))
         if self.bfile:
             menu = m.create_menu()
-            menu.connect_after('selection-done', self.restore_original_selection)
+            menu.connect_after('selection-done', self.restore_single_sel)
             menu.show_all()
             return menu
 
@@ -748,7 +748,7 @@ class GLog(gdialog.GDialog):
                      self.qimport_revs))
 
         menu = m.create_menu()
-        menu.connect_after('selection-done', self.restore_original_selection)
+        menu.connect_after('selection-done', self.restore_single_sel)
         menu.show_all()
         return menu
 
