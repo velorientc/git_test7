@@ -114,6 +114,15 @@ class StripDialog(gtk.Dialog):
         rview.add_with_viewport(self.resultbox)
         rview.child.set_shadow_type(gtk.SHADOW_NONE)
 
+        ## options
+        self.expander = gtk.Expander(_('Options:'))
+        self.expander.connect('notify::expanded', self.options_expanded)
+
+        ### force option (fixed)
+        self.forceopt = gtk.CheckButton(_('Discard local changes, no backup'
+                                          ' (-f/--force)'))
+        table.add_row(self.expander, self.forceopt)
+
         # prepare to show
         self.preview()
         self.stripbtn.grab_focus()
@@ -122,6 +131,23 @@ class StripDialog(gtk.Dialog):
     def after_init(self):
         # add 'Show all' button
         self.pstatbox.pack_start(self.allbtn, False, False, 4)
+
+        # backup types (foldable)
+        self.butable = gtklib.LayoutTable()
+        self.vbox.pack_start(self.butable, True, True)
+        def add_type(desc):
+            group = hasattr(self, 'buopt_all') and self.buopt_all or None
+            radio = gtk.RadioButton(group, desc)
+            self.butable.add_row(None, radio, ypad=0)
+            return radio
+        self.buopt_all = add_type(_('Backup all (default)'))
+        self.buopt_part = add_type(_('Backup unrelated changesets'
+                                     ' (-b/--backup)'))
+        self.buopt_none = add_type(_('No backup (-n/--nobackup)'))
+
+        # layout group
+        layout = gtklib.LayoutGroup()
+        layout.add(self.table, self.butable, force=True)
 
         # CmdWidget
         self.cmd = hgcmd.CmdWidget()
@@ -266,6 +292,12 @@ class StripDialog(gtk.Dialog):
 
         self.run() # don't close dialog
 
+    def options_expanded(self, expander, *args):
+        if expander.get_expanded():
+            self.butable.show_all()
+        else:
+            self.butable.hide()
+
     def get_rev(self):
         """ Return integer revision number or None """
         revstr = self.revcombo.get_active_text()
@@ -302,17 +334,28 @@ class StripDialog(gtk.Dialog):
             return not (wc.modified() or wc.added() or wc.removed())
         revstr = self.revcombo.get_active_text()
         cmdline = ['hg', 'strip', '--verbose', revstr]
-        # check uncommitted changes
-        if not isclean():
-            ret = gdialog.CustomPrompt(_('Confirm Strip'),
-                          _('Detected uncommitted local changes.\nDo'
-                            ' you want to discard them and continue?'),
-                          self, (_('&Yes (--force)'), _('&No')),
-                          default=1, esc=1).run()
-            if ret == 0:
-                cmdline.append('--force')
-            else:
-                return
+
+        # local changes
+        if self.forceopt.get_active():
+            cmdline.append('--force')
+        else:
+            if not isclean():
+                ret = gdialog.CustomPrompt(_('Confirm Strip'),
+                              _('Detected uncommitted local changes.\nDo'
+                                ' you want to discard them and continue?'),
+                              self, (_('&Yes (--force)'), _('&No')),
+                              default=1, esc=1).run()
+                if ret == 0:
+                    cmdline.append('--force')
+                else:
+                    return
+
+        # backup options
+        if self.buopt_part.get_active():
+            cmdline.append('--backup')
+        elif self.buopt_none.get_active():
+            cmdline.append('--nobackup')
+
         def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
             if returncode == 0:
