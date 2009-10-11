@@ -52,8 +52,8 @@ class StripDialog(gtk.Dialog):
         elif rev is None:
             rev = 'tip'
         rev = str(rev)
-        self.prevrev = None
-        self.prevnum = None
+        self.currev = None
+        self.curnum = None
 
         # layout table
         self.table = table = gtklib.LayoutTable()
@@ -62,7 +62,7 @@ class StripDialog(gtk.Dialog):
         ## target revision combo
         self.revcombo = gtk.combo_box_entry_new_text()
         table.add_row(_('Strip:'), self.revcombo)
-        self.revcombo.connect('changed', lambda c: self.update_on_timeout())
+        self.revcombo.connect('changed', lambda c: self.preview(queue=True))
         reventry = self.revcombo.child
         reventry.set_text(rev)
         reventry.set_width_chars(32)
@@ -98,7 +98,7 @@ class StripDialog(gtk.Dialog):
         #### show all button
         self.allbtn = gtk.Button(_('Show all')) # add later
         self.allbtn.connect('clicked',
-                lambda b: self.preview_changesets(limit=False))
+                lambda b: self.preview(limit=False))
 
         #### preview option
         self.compactopt = gtk.CheckButton(_('Use compact view'))
@@ -115,7 +115,7 @@ class StripDialog(gtk.Dialog):
         rview.child.set_shadow_type(gtk.SHADOW_NONE)
 
         # prepare to show
-        self.preview_changesets()
+        self.preview()
         self.stripbtn.grab_focus()
         gobject.idle_add(self.after_init)
 
@@ -138,17 +138,55 @@ class StripDialog(gtk.Dialog):
         self.notify_args = args
         self.notify_kargs = kargs
 
-    def preview_changesets(self, rev=None, limit=True):
-        # validate revision
+    def preview(self, limit=True, queue=False):
+        def clear_preview():
+            for child in self.resultbox.get_children():
+                self.resultbox.remove(child)
+        def update_info(num=None):
+            if num is None:
+                info = '<span weight="bold" foreground="#880000">%s</span>' \
+                            % _('Unknown revision!')
+            else:
+                info = _('<span weight="bold">%s changesets</span> will'
+                         ' be stripped') % num
+            self.resultlbl.set_markup(info)
+        def update_stat(show=None, total=None):
+            if show is None or total is None:
+                all = False
+                stat = _('No changesets to display')
+            else:
+                all = show == total
+                if all:
+                    stat = _('Displaying all changesets')
+                else:
+                    stat = _('Displaying %(count)d of %(total)d changesets') \
+                                % dict(count=show, total=total)
+            self.pstatlbl.set_text(stat)
+            return all
+
+        # check revision
+        rev = self.get_rev()
         if rev is None:
-            rev = self.get_rev()
-            if rev is None:
-                self.update_info()
-                return
-        if limit and self.prevrev == rev:
-            self.update_info(self.prevnum) # use cached count
+            clear_preview()
+            update_info()
+            update_stat()
+            self.timeout_queue = []
+            self.currev = None
             return
-        self.prevrev = rev
+        elif limit and self.currev == rev: # is already shown?
+            update_info(self.curnum)
+            return
+        elif queue: # queueing if need
+            def timeout(eid):
+                if self.timeout_queue and self.timeout_queue[-1] == eid[0]:
+                    self.preview()
+                    self.timeout_queue = []
+                return False # don't repeat
+            event_id = [None]
+            event_id[0] = gobject.timeout_add(600, timeout, event_id)
+            self.timeout_queue.append(event_id[0])
+            return
+        self.currev = rev
 
         # enumerate all descendants
         # borrowed from strip() in 'mercurial/repair.py'
@@ -158,24 +196,15 @@ class StripDialog(gtk.Dialog):
             parents = cl.parentrevs(r)
             if parents[0] in tostrip or parents[1] in tostrip:
                 tostrip.append(r)
-        self.prevnum = numstrip = len(tostrip)
+        self.curnum = numtotal = len(tostrip)
 
-        # update changeset preview
-        for child in self.resultbox.get_children():
-            self.resultbox.remove(child)
-        NLIMIT = 50
-        if limit and numstrip > NLIMIT:
-            showrevs, lastrev = tostrip[:NLIMIT-1], tostrip[NLIMIT-1:][-1]
-        else:
-            showrevs, lastrev = tostrip, None
-        def add_info(revnum):
+        LIM = 50
+        def add_csinfo(revnum):
             info = csinfo.changesetinfo(self.repo, revnum)[1]
             self.resultbox.pack_start(info, False, False, 2)
-        for r in showrevs:
-            add_info(r)
-            if not r == showrevs[-1]:
-                self.resultbox.pack_start(gtk.HSeparator())
-        if lastrev:
+        def add_sep():
+            self.resultbox.pack_start(gtk.HSeparator())
+        def add_snip():
             snipbox = gtk.HBox()
             self.resultbox.pack_start(snipbox, False, False, 4)
             spacer = gtk.Label()
@@ -187,31 +216,29 @@ class StripDialog(gtk.Dialog):
                                ' font_family="monospace">...</span>')
             sniplbl.set_angle(90)
             snipbox.pack_start(gtk.Label())
-            add_info(lastrev)
+
+        # update changeset preview
+        if limit and numtotal > LIM:
+            toshow, lastrev = tostrip[:LIM-1], tostrip[LIM-1:][-1]
+        else:
+            toshow, lastrev = tostrip, None
+        numshow = len(toshow) + (lastrev and 1 or 0)
+        clear_preview()
+        for r in toshow:
+            add_csinfo(r)
+            if not r == toshow[-1]: # no need to append to the last
+                add_sep()
+        if lastrev:
+            add_snip()
+            add_csinfo(lastrev)
         self.resultbox.show_all()
 
         # update info label
-        self.update_info(numstrip)
+        update_info(numtotal)
 
-        # update preview status
-        numshow = len(showrevs) + (lastrev and 1 or 0)
-        notall = numstrip > numshow
-        if notall:
-            text = _('Displaying %(count)d of %(total)d changesets') \
-                        % dict(count=numshow, total=numstrip)
-        else:
-            text = _('Displaying all changesets')
-        self.pstatlbl.set_text(text)
-        self.allbtn.set_property('visible', notall)
-
-    def update_info(self, num=None):
-        if num is None:
-            text = '<span weight="bold" foreground="#880000">%s</span>' \
-                        % _('Unknown revision!')
-        else:
-            text = _('<span weight="bold">%s changesets</span> will'
-                     ' be stripped') % num
-        self.resultlbl.set_markup(text)
+        # update preview status & button
+        all = update_stat(numshow, numtotal)
+        self.allbtn.set_property('visible', not all)
 
     def dialog_response(self, dialog, response_id):
         def abort():
@@ -249,21 +276,6 @@ class StripDialog(gtk.Dialog):
         except (hglib.RepoError, hglib.LookupError):
             return None
         return revnum
-
-    def update_on_timeout(self):
-        rev = self.get_rev()
-        if rev is None:
-            self.update_info()
-            self.timeout_queue = []
-            return
-        def timeout(eid, revnum):
-            if self.timeout_queue and self.timeout_queue[-1] == eid[0]:
-                self.preview_changesets(rev=revnum)
-                self.timeout_queue = []
-            return False # don't repeat
-        event_id = [None]
-        event_id[0] = gobject.timeout_add(600, timeout, event_id, rev)
-        self.timeout_queue.append(event_id[0])
 
     def switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
