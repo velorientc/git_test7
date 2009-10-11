@@ -126,6 +126,7 @@ class GCommit(GStatus):
         self.last_commit_id = None
         self.qnew = False
         self.notify_func = None
+        self.patch_text = None
 
     def set_notify_func(self, func, args):
         self.notify_func = func
@@ -661,8 +662,11 @@ class GCommit(GStatus):
                 self.reload_status()
                 self.qnew_name.grab_focus()
                 self.qnew_name.set_position(-1)
+                if self.patch_text:
+                    self.diff_notebook.remove_page(self.ppage)
+                    self.patch_text = None
             else:
-                if not hasattr(self, 'patch_text'):
+                if not self.patch_text:
                     self.patch_text = gtk.TextView()
                     self.patch_text.set_wrap_mode(gtk.WRAP_NONE)
                     self.patch_text.set_editable(False)
@@ -671,7 +675,7 @@ class GCommit(GStatus):
                     scroller.set_policy(gtk.POLICY_AUTOMATIC,
                                         gtk.POLICY_AUTOMATIC)
                     scroller.add(self.patch_text)
-                    self.diff_notebook.append_page(scroller,
+                    self.ppage = self.diff_notebook.append_page(scroller,
                                        gtk.Label(_('Patch Contents')))
                     self.diff_notebook.show_all()
                 revs = cmdutil.revrange(self.repo, ['tip'])
@@ -686,8 +690,16 @@ class GCommit(GStatus):
             if not buf.get_modified():
                 buf.set_text('')
                 buf.set_modified(False)
-            if hasattr(self, 'patch_text'):
-                self.patch_text.set_buffer(gtk.TextBuffer())
+            if self.patch_text:
+                self.diff_notebook.remove_page(self.ppage)
+                self.patch_text = None
+        elif self.patch_text:
+            buf = self.text.get_buffer()
+            if not buf.get_modified():
+                buf.set_text('')
+                buf.set_modified(False)
+            self.diff_notebook.remove_page(self.ppage)
+            self.patch_text = None
         self.branchbutton.set_sensitive(not (self.mqmode or self.qnew))
 
     def commit_clicked(self, toolbutton, data=None):
