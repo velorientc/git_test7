@@ -669,7 +669,7 @@ class GLog(gdialog.GDialog):
         # need mq extension for strip command
         if 'mq' in self.exs:
             cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
-            cmenu_strip = create_menu(_('Strip Revision'), self.strip_rev)
+            cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
 
             try:
                 ctx = self.repo[self.currevid]
