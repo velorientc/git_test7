@@ -136,6 +136,12 @@ class GLog(gdialog.GDialog):
             sync_bar_item = [dict(text=_('Sync Bar'), ascheck=True, 
                     func=self.toggle_show_syncbar, check=self.show_syncbar)]
 
+        if 'mq' in self.exs:
+            mq_item = [dict(text=_('Patch Queue'), name='mq', ascheck=True,
+                func=self.mq_clicked, check=self.mqtb.get_active()) ]
+        else:
+            mq_item = []
+
         return [(_('_View'), [
             dict(text=_('Load more Revisions'), name='load-more',
                 func=self.more_clicked, icon=gtk.STOCK_GO_DOWN),
@@ -145,6 +151,7 @@ class GLog(gdialog.GDialog):
             ] + sync_bar_item + [
             dict(text=_('Filter Bar'), ascheck=True, 
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
+            ] + mq_item + [
             dict(text='----'),
             dict(text=_('Choose Details...'), func=self.details_clicked),
             dict(text='----'),
@@ -1728,8 +1735,8 @@ class GLog(gdialog.GDialog):
             self.mqtb.handler_unblock_by_func(self.mq_clicked)
             self.enable_cmd('mq', self.mqwidget.has_mq())
 
-    def mq_clicked(self, toolbutton, data=None):
-        self.enable_mqpanel(self.mqtb.get_active())
+    def mq_clicked(self, widget, data=None):
+        self.enable_mqpanel(widget.get_active())
 
     def tree_button_press(self, tree, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
