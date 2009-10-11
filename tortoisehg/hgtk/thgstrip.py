@@ -254,9 +254,10 @@ class StripDialog(gtk.Dialog):
         rev = self.get_rev()
         if rev is None:
             self.update_info()
+            self.timeout_queue = []
             return
         def timeout(eid, revnum):
-            if self.timeout_queue[-1] == eid[0]:
+            if self.timeout_queue and self.timeout_queue[-1] == eid[0]:
                 self.preview_changesets(rev=revnum)
                 self.timeout_queue = []
             return False # don't repeat
