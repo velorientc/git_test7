@@ -147,7 +147,9 @@ class GLog(gdialog.GDialog):
                 func=self.more_clicked, icon=gtk.STOCK_GO_DOWN),
             dict(text=_('Load all Revisions'), name='load-all',
                 func=self.load_all_clicked, icon=gtk.STOCK_GOTO_BOTTOM),
-            dict(text='----')
+            dict(text='----'),
+            dict(text=_('Toolbar'), ascheck=True, check=self.show_toolbar,
+                func=self.toggle_show_toolbar),
             ] + sync_bar_item + [
             dict(text=_('Filter Bar'), ascheck=True, 
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
@@ -233,6 +235,10 @@ class GLog(gdialog.GDialog):
         self.show_syncbar = button.get_active()
         if self.syncbox is not None:
             self.syncbox.set_property('visible', self.show_syncbar)
+
+    def toggle_show_toolbar(self, button):
+        self.show_toolbar = button.get_active()
+        self.toolbar.set_property('visible', self.show_toolbar)
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
@@ -427,6 +433,10 @@ class GLog(gdialog.GDialog):
             opts['pats'] = self.pats
         self.reload_log(**opts)
 
+        # unfortunately, idle_add is needed here
+        gtklib.idle_add_single_call(self.toolbar.set_property, 
+            'visible', self.show_toolbar)
+
         self.filterbox.set_property('visible', self.show_filterbar)
         self.filterbox.set_no_show_all(True)
         self.syncbox.set_property('visible', self.show_syncbar)
@@ -487,6 +497,7 @@ class GLog(gdialog.GDialog):
             settings['glog-mqpane'] = self.setting_mqhpos
             settings['glog-mqvis'] = self.setting_mqvis
         settings['branch-color'] = self.graphview.get_property('branch-color')
+        settings['show-toolbar'] = self.show_toolbar
         settings['show-filterbar'] = self.show_filterbar
         settings['show-syncbar'] = self.show_syncbar
         settings['graphcol'] = self.graphcol
@@ -506,6 +517,7 @@ class GLog(gdialog.GDialog):
         self.setting_mqhpos = settings.get('glog-mqpane', 140) or 140
         self.setting_mqvis = settings.get('glog-mqvis', False)
         self.branch_color = settings.get('branch-color', False)
+        self.show_toolbar = settings.get('show-toolbar', True)
         self.show_filterbar = settings.get('show-filterbar', True)
         self.show_syncbar = settings.get('show-syncbar', True)
         if self.repo.ui.configbool('tortoisehg', 'disable-syncbar'):
