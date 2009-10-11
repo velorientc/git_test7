@@ -469,7 +469,7 @@ class GDialog(gtk.Window):
           ]
             menubar = gtk.MenuBar()
             for title, items in allmenus:
-                menu = gtk.Menu()
+                m_items = gtklib.MenuItems()
                 for d in items:
                     text = d['text']
                     name = d.get('name')
@@ -504,9 +504,9 @@ class GDialog(gtk.Window):
                         item.connect('activate', func, *args)
                         if name:
                             self.menuitems[name] = item
-                    menu.append(item)
+                    m_items.append(item)
                 item = gtk.MenuItem(title)
-                item.set_submenu(menu)
+                item.set_submenu(m_items.create_menu())
                 menubar.append(item)
 
         vbox = gtk.VBox(False, 0)
