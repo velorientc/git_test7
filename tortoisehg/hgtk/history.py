@@ -89,9 +89,9 @@ class GLog(gdialog.GDialog):
                ]
         if 'mq' in self.exs:
             self.mqtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
-                            _('MQ'),
+                            _('Patch Queue'),
                             self.mq_clicked, name='mq',
-                            tip=_('Toggle MQ panel'),
+                            tip=_('Show/Hide Patch Queue'),
                             toggle=True,
                             icon='menupatch.ico')
             tbar += [self.mqtb, gtk.SeparatorToolItem()]
@@ -136,9 +136,22 @@ class GLog(gdialog.GDialog):
             sync_bar_item = [dict(text=_('Sync Bar'), ascheck=True, 
                     func=self.toggle_show_syncbar, check=self.show_syncbar)]
 
-        return [(_('_View'), sync_bar_item + [
+        if 'mq' in self.exs:
+            mq_item = [dict(text=_('Patch Queue'), name='mq', ascheck=True,
+                func=self.mq_clicked, check=self.mqtb.get_active()) ]
+        else:
+            mq_item = []
+
+        return [(_('_View'), [
+            dict(text=_('Load more Revisions'), name='load-more',
+                func=self.more_clicked, icon=gtk.STOCK_GO_DOWN),
+            dict(text=_('Load all Revisions'), name='load-all',
+                func=self.load_all_clicked, icon=gtk.STOCK_GOTO_BOTTOM),
+            dict(text='----')
+            ] + sync_bar_item + [
             dict(text=_('Filter Bar'), ascheck=True, 
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
+            ] + mq_item + [
             dict(text='----'),
             dict(text=_('Choose Details...'), func=self.details_clicked),
             dict(text='----'),
@@ -226,8 +239,8 @@ class GLog(gdialog.GDialog):
 
     def load_all_clicked(self, button, data=None):
         self.graphview.load_all_revisions()
-        self.loadnextbutton.set_sensitive(False)
-        self.loadallbutton.set_sensitive(False)
+        self.enable_cmd('load-more', False)
+        self.enable_cmd('load-all', False)
 
     def selection_changed(self, graphview):
         'Graphview reports a new row selected'
@@ -249,8 +262,8 @@ class GLog(gdialog.GDialog):
         if not graphview.graphdata:
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
-        self.loadnextbutton.set_sensitive(False)
-        self.loadallbutton.set_sensitive(False)
+        self.enable_cmd('load-more', False)
+        self.enable_cmd('load-all', False)
 
     def details_clicked(self, toolbutton, data=None):
         self.show_details_dialog()
@@ -543,8 +556,8 @@ class GLog(gdialog.GDialog):
         opts['npreviews'] = self.npreviews
         opts['no_merges'] = self.no_merges
 
-        self.loadnextbutton.set_sensitive(True)
-        self.loadallbutton.set_sensitive(True)
+        self.enable_cmd('load-more', True)
+        self.enable_cmd('load-all', True)
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
@@ -774,13 +787,15 @@ class GLog(gdialog.GDialog):
         sep = gtk.SeparatorToolItem()
         sep.set_expand(True)
         sep.set_draw(False)
-        self.loadnextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
-            _('Load more'), self.more_clicked, tip=_('load more revisions'))
-        self.loadallbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
-            _('Load all'), self.load_all_clicked, tip=_('load all revisions'))
+        loadnext = self.make_toolbutton(gtk.STOCK_GO_DOWN,
+            _('Load more'), self.more_clicked, tip=_('load more revisions'),
+            name='load-more')
+        loadall = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
+            _('Load all'), self.load_all_clicked, tip=_('load all revisions'),
+            name='load-all')
 
         tbar = self.changeview.get_tbbuttons()
-        tbar += [sep, self.loadnextbutton, self.loadallbutton]
+        tbar += [sep, loadnext, loadall]
         for tbutton in tbar:
             self.toolbar.insert(tbutton, -1)
 
@@ -1711,12 +1726,12 @@ class GLog(gdialog.GDialog):
         # set the state of MQ toolbutton
         if hasattr(self, 'mqtb'):
             self.mqtb.handler_block_by_func(self.mq_clicked)
-            self.mqtb.set_active(enable)
+            self.cmd_set_active('mq', enable)
             self.mqtb.handler_unblock_by_func(self.mq_clicked)
             self.enable_cmd('mq', self.mqwidget.has_mq())
 
-    def mq_clicked(self, toolbutton, data=None):
-        self.enable_mqpanel(self.mqtb.get_active())
+    def mq_clicked(self, widget, data=None):
+        self.enable_mqpanel(widget.get_active())
 
     def tree_button_press(self, tree, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
