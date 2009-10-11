@@ -330,9 +330,9 @@ class LayoutGroup(object):
     def add(self, *tables, **kargs):
         self.tables.extend(tables)
         if kargs.get('adjust', True):
-            self.adjust()
+            self.adjust(**kargs)
 
-    def adjust(self):
+    def adjust(self, force=False):
         def realized():
             '''check all tables realized or not'''
             for table in self.tables:
@@ -351,7 +351,7 @@ class LayoutGroup(object):
                 hid = [None]
                 hid[0] = table.connect('size-allocate', allocated, hid)
         # check all realized
-        if not realized():
+        if not force and not realized():
             trylater()
             return
         # find out max width
