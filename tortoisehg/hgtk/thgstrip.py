@@ -62,7 +62,6 @@ class StripDialog(gtk.Dialog):
         ## target revision combo
         self.revcombo = gtk.combo_box_entry_new_text()
         table.add_row(_('Strip:'), self.revcombo)
-        self.revcombo.connect('changed', lambda c: self.preview(queue=True))
         reventry = self.revcombo.child
         reventry.set_text(rev)
         reventry.set_width_chars(32)
@@ -97,8 +96,6 @@ class StripDialog(gtk.Dialog):
 
         #### show all button
         self.allbtn = gtk.Button(_('Show all')) # add later
-        self.allbtn.connect('clicked',
-                lambda b: self.preview(limit=False))
 
         #### preview option
         self.compactopt = gtk.CheckButton(_('Use compact view'))
@@ -122,6 +119,10 @@ class StripDialog(gtk.Dialog):
         self.forceopt = gtk.CheckButton(_('Discard local changes, no backup'
                                           ' (-f/--force)'))
         table.add_row(self.expander, self.forceopt)
+
+        # signal handlers
+        self.revcombo.connect('changed', lambda c: self.preview(queue=True))
+        self.allbtn.connect('clicked', lambda b: self.preview(limit=False))
 
         # prepare to show
         self.preview()
