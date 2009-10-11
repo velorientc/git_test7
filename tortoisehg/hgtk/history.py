@@ -89,9 +89,9 @@ class GLog(gdialog.GDialog):
                ]
         if 'mq' in self.exs:
             self.mqtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
-                            _('MQ'),
+                            _('Patch Queue'),
                             self.mq_clicked, name='mq',
-                            tip=_('Toggle MQ panel'),
+                            tip=_('Show/Hide Patch Queue'),
                             toggle=True,
                             icon='menupatch.ico')
             tbar += [self.mqtb, gtk.SeparatorToolItem()]
