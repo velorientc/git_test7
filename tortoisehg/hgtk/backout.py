@@ -15,7 +15,7 @@ from mercurial import hg, ui
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths, i18n, settings
 
-from tortoisehg.hgtk import changesetinfo, gtklib, hgcmd, gdialog
+from tortoisehg.hgtk import csinfo, gtklib, hgcmd, gdialog
 
 keep = i18n.keepgettext()
 
@@ -55,7 +55,7 @@ class BackoutDialog(gtk.Dialog):
         # changeset info
         frame = gtk.Frame(_('Changeset Description'))
         frame.set_border_width(4)
-        revid, desc = changesetinfo.changesetinfo(repo, rev)
+        revid, desc = csinfo.create(repo, rev)
         frame.add(desc)
         self.vbox.pack_start(frame, False, False, 2)
         self.csetframe = frame

@@ -16,8 +16,7 @@ from mercurial.node import nullrev
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
-from tortoisehg.hgtk import hgcmd, gtklib, gdialog
-from tortoisehg.hgtk import changesetinfo as csinfo
+from tortoisehg.hgtk import csinfo, hgcmd, gtklib, gdialog
 
 MODE_NORMAL  = 'normal'
 MODE_WORKING = 'working'
@@ -227,7 +226,7 @@ class StripDialog(gtk.Dialog):
 
         LIM = 50
         def add_csinfo(revnum):
-            info = csinfo.changesetinfo(self.repo, revnum)[1]
+            info = csinfo.create(self.repo, revnum)[1]
             self.resultbox.pack_start(info, False, False, 2)
         def add_sep():
             self.resultbox.pack_start(gtk.HSeparator())

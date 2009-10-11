@@ -1,11 +1,11 @@
-# changesetinfo.py - component for displaying changeset summary
+# csinfo.py - embeddable changeset summary
 #
 # Copyright 2009 Yuki KODAMA <endflow.net@gmail.com>
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-'''component for displaying changeset summary'''
+'''embeddable changeset summary'''
 
 import os
 import gtk
@@ -15,7 +15,7 @@ from tortoisehg.util import hglib
 
 from tortoisehg.hgtk import gtklib
 
-def changesetinfo(repo, revid, head=False):
+def create(repo, revid, head=False):
     def lbl(str, bold=True, right=True):
         str = gtklib.markup_escape_text(str)
         label = gtk.Label()

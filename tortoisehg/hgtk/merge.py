@@ -15,7 +15,7 @@ from mercurial import hg, ui, commands
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
-from tortoisehg.hgtk import changesetinfo, gtklib, commit, gdialog, hgcmd
+from tortoisehg.hgtk import csinfo, gtklib, commit, gdialog, hgcmd
 
 RESPONSE_MERGE =  1
 RESPONSE_COMMIT = 2
@@ -69,14 +69,14 @@ class MergeDialog(gtk.Dialog):
             repo.ui.quiet = False
 
         frame = gtk.Frame(_('Merge target (other)'))
-        self.otherrev, desc = changesetinfo.changesetinfo(repo, rev1, True)
+        self.otherrev, desc = csinfo.create(repo, rev1, True)
         frame.add(desc)
         frame.set_border_width(5)
         self.vbox.pack_start(frame, False, False)
         self.otherframe = frame
 
         frame = gtk.Frame(_('Current revision (local)'))
-        self.localrev, desc = changesetinfo.changesetinfo(repo, rev0, True)
+        self.localrev, desc = csinfo.create(repo, rev0, True)
         frame.add(desc)
         frame.set_border_width(5)
         self.vbox.pack_start(frame, False, False)
