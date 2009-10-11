@@ -138,7 +138,7 @@ class GLog(gdialog.GDialog):
 
         if 'mq' in self.exs:
             mq_item = [dict(text=_('Patch Queue'), name='mq', ascheck=True,
-                func=self.mq_clicked, check=self.mqtb.get_active()) ]
+                func=self.mq_clicked, check=self.setting_mqvis) ]
         else:
             mq_item = []
 
