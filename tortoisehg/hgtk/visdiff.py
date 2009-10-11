@@ -184,6 +184,7 @@ class FileSelectionDialog(gtk.Dialog):
 
         tmproot = tempfile.mkdtemp(prefix='extdiff.')
         self.connect('destroy', self.delete_tmproot, tmproot)
+        self.connect('response', self.delete_tmproot_resp, tmproot)
         dir2 = ''
         dir2root = ''
         # Always make a copy of node1
@@ -207,10 +208,17 @@ class FileSelectionDialog(gtk.Dialog):
         if len(model) == 1 and self.singlecheck.get_active():
             self.launch(*model[0])
 
-    def delete_tmproot(self, window, tmproot):
+    def should_live(self, widget=None, event=None):
         vsettings = settings.Settings('visdiff')
         vsettings.set_value('launchsingle', self.singlecheck.get_active())
         vsettings.write()
+        return False
+
+    def delete_tmproot_resp(self, window, resp, tmproot):
+        self.delete_tmproot(window, tmproot)
+
+    def delete_tmproot(self, window, tmproot):
+        self.should_live()
         while True:
             try:
                 shutil.rmtree(tmproot)
