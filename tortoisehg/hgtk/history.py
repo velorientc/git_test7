@@ -774,15 +774,15 @@ class GLog(gdialog.GDialog):
         sep = gtk.SeparatorToolItem()
         sep.set_expand(True)
         sep.set_draw(False)
-        self.loadnextbutton = self.make_toolbutton(gtk.STOCK_GO_DOWN,
+        loadnext = self.make_toolbutton(gtk.STOCK_GO_DOWN,
             _('Load more'), self.more_clicked, tip=_('load more revisions'),
             name='load-more')
-        self.loadallbutton = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
+        loadall = self.make_toolbutton(gtk.STOCK_GOTO_BOTTOM,
             _('Load all'), self.load_all_clicked, tip=_('load all revisions'),
             name='load-all')
 
         tbar = self.changeview.get_tbbuttons()
-        tbar += [sep, self.loadnextbutton, self.loadallbutton]
+        tbar += [sep, loadnext, loadall]
         for tbutton in tbar:
             self.toolbar.insert(tbutton, -1)
 
