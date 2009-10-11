@@ -226,8 +226,8 @@ class GLog(gdialog.GDialog):
 
     def load_all_clicked(self, button, data=None):
         self.graphview.load_all_revisions()
-        self.loadnextbutton.set_sensitive(False)
-        self.loadallbutton.set_sensitive(False)
+        self.enable_cmd('load-more', False)
+        self.enable_cmd('load-all', False)
 
     def selection_changed(self, graphview):
         'Graphview reports a new row selected'
@@ -249,8 +249,8 @@ class GLog(gdialog.GDialog):
         if not graphview.graphdata:
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
-        self.loadnextbutton.set_sensitive(False)
-        self.loadallbutton.set_sensitive(False)
+        self.enable_cmd('load-more', False)
+        self.enable_cmd('load-all', False)
 
     def details_clicked(self, toolbutton, data=None):
         self.show_details_dialog()
@@ -543,8 +543,8 @@ class GLog(gdialog.GDialog):
         opts['npreviews'] = self.npreviews
         opts['no_merges'] = self.no_merges
 
-        self.loadnextbutton.set_sensitive(True)
-        self.loadallbutton.set_sensitive(True)
+        self.enable_cmd('load-more', True)
+        self.enable_cmd('load-all', True)
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
