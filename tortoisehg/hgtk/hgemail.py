@@ -179,6 +179,8 @@ class EmailDialog(gtk.Window):
         hbox.pack_start(gtk.Label(_('Subject:')), False, False, 4)
         hbox.pack_start(self._subjbox, True, True, 4)
 
+        extensions.load(self.repo.ui, 'patchbomb', None)
+
         # --flags was added after hg 1.3
         hasflags = False
         for arg in extensions.find('patchbomb').emailopts:
@@ -233,8 +235,6 @@ class EmailDialog(gtk.Window):
         except hglib.RepoError:
             self.repo = None
             return
-
-        extensions.load(self.repo.ui, 'patchbomb', None)
 
         if initial:
             # Only zap these fields at startup
