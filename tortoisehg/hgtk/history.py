@@ -383,7 +383,7 @@ class GLog(gdialog.GDialog):
 
     def update_hide_merges_button(self):
         compatible = self.filter in ['all', 'branch', 'custom']
-        if not self.graphcol and compatible:
+        if compatible:
             self.hidemerges.set_sensitive(True)
         else:
             self.hidemerges.set_active(False)
@@ -584,9 +584,13 @@ class GLog(gdialog.GDialog):
         if self.filter != 'custom':
             self.filterentry.set_text('')
 
+        graphcol = self.graphcol
+        if self.no_merges:
+            graphcol = False
+
         if self.filter == 'branch':
             branch = opts.get('branch', None)
-            self.graphview.refresh(self.graphcol, None, opts)
+            self.graphview.refresh(graphcol, None, opts)
             ftitle(_('%s branch') % branch)
         elif self.filter == 'custom':
             npats = hglib.normpats(pats)
@@ -595,13 +599,13 @@ class GLog(gdialog.GDialog):
                 if kind == 'path' and not os.path.isdir(name):
                     ftitle(_('file history: ') + hglib.toutf(name))
                     opts['filehist'] = name
-                    self.graphview.refresh(self.graphcol, [name], opts)
+                    self.graphview.refresh(graphcol, [name], opts)
             if not opts.get('filehist'):
                 ftitle(_('custom filter'))
                 self.graphview.refresh(False, npats, opts)
         elif self.filter == 'all':
             ftitle(None)
-            self.graphview.refresh(self.graphcol, None, opts)
+            self.graphview.refresh(graphcol, None, opts)
         elif self.filter == 'only_merges':
             ftitle(_('merges'))
             opts['only_merges'] = True
@@ -611,7 +615,7 @@ class GLog(gdialog.GDialog):
             range = [self.currevid, 0]
             opts['noheads'] = True
             opts['revrange'] = range
-            self.graphview.refresh(self.graphcol, None, opts)
+            self.graphview.refresh(graphcol, None, opts)
         elif self.filter == 'tagged':
             ftitle(_('tagged revisions'))
             tagged = []
