@@ -50,6 +50,7 @@ class GLog(gdialog.GDialog):
         self.npreviews = 0
         self.outgoing = []
         self.useproxy = None
+        self.revrange = None
         self.forcepush = False
         os.chdir(self.repo.root)
 
@@ -643,14 +644,18 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_Archive...'), self.archive))
 
         # disable/enable menus as required
-        parents = [x.rev() for x in self.repo.parents()]
-        can_merge = self.currevid not in parents and len(parents) < 2
-
-        op1, op2 = self.repo.dirstate.parents()
-        node = self.repo[self.currevid].node()
-        a = self.repo.changelog.ancestor(op1, node)
-        cmenu_backout.set_sensitive(a == node)
+        parents = self.repo.parents()
+        if len(parents) > 1:
+            can_merge = False
+            can_backout = False
+        else:
+            pctx = parents[0]
+            cctx = self.repo[self.currevid]
+            actx = cctx.ancestor(pctx)
+            can_merge = actx != pctx or pctx.branch() != cctx.branch()
+            can_backout = actx == cctx
         cmenu_merge.set_sensitive(can_merge)
+        cmenu_backout.set_sensitive(can_backout)
 
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
@@ -688,6 +693,7 @@ class GLog(gdialog.GDialog):
     def restore_original_selection(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
         self.tree.get_selection().select_path(self.origsel)
+        self.revrange = None
 
     def tree_diff_context_menu(self):
         m = gtklib.MenuItems()
@@ -713,8 +719,13 @@ class GLog(gdialog.GDialog):
         m.append_sep()
         
         # disable/enable menus as required
-        parents = [x.rev() for x in self.repo.parents()]
-        can_merge = self.currevid in parents and len(parents) < 2
+        parents = self.repo.parents()
+        if len(parents) > 1:
+            can_merge = False
+        else:
+            rev0, rev1 = self.revrange
+            c0, c1 = self.repo[rev0], self.repo[rev1]
+            can_merge = c0.branch() != c1.branch() or c0.ancestor(c1) != c1
         cmenu_merge.set_sensitive(can_merge)
 
         # need transplant extension for transplant command
@@ -1609,25 +1620,27 @@ class GLog(gdialog.GDialog):
             self.refresh_model()
 
     def domerge(self, menuitem):
-        rev = self.currevid
-        parents = [x.node() for x in self.repo.parents()]
-        if rev == self.repo.parents()[0].rev():
-            rev = self.revrange[1]
-        dlg = merge.MergeDialog(rev)
-        dlg.set_notify_func(self.merge_completed, parents, len(self.repo))
-        self.show_dialog(dlg)
+        def merge_notify(args):
+            oldparents, repolen = args
+            self.repo.invalidate()
+            self.repo.dirstate.invalidate()
+            if len(self.repo) != repolen:
+                self.reload_log()
+            elif not oldparents == self.repo.parents():
+                self.refresh_model()
+            # update parents for the next nofifying
+            args[0] = self.repo.parents()
 
-    def merge_completed(self, args):
-        self.repo.invalidate()
-        self.repo.dirstate.invalidate()
-        oldparents, repolen = args
-        newparents = [x.node() for x in self.repo.parents()]
-        if len(self.repo) != repolen:
-            self.reload_log()
-        elif not oldparents == newparents:
-            self.refresh_model()
-        # update parents for the next nofifying
-        args[0] = newparents
+        if self.revrange:
+            rev0, rev1 = self.revrange
+        else:
+            rev0, rev1 = self.repo['.'].rev(), self.currevid
+
+        args = [self.repo.parents(), len(self.repo)]
+        dlg = merge.MergeDialog(rev0, rev1)
+        dlg.set_notify_func(merge_notify, *args)
+        merge_notify(args) # could have immediately switched parents
+        self.show_dialog(dlg)
 
     def archive(self, menuitem):
         rev = self.currevid

@@ -10,7 +10,7 @@ import os
 import gtk
 import gobject
 
-from mercurial import hg, ui
+from mercurial import hg, ui, commands
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -26,7 +26,7 @@ MODE_WORKING = 'working'
 
 class MergeDialog(gtk.Dialog):
     """ Dialog to merge revisions of a Mercurial repo """
-    def __init__(self, rev=None):
+    def __init__(self, rev0, rev1):
         """ Initialize the Dialog """
         gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menumerge.ico')
@@ -36,12 +36,6 @@ class MergeDialog(gtk.Dialog):
         self.connect('response', self.dialog_response)
         self.notify_func = None
 
-        if not rev:
-            gdialog.Prompt(_('Unable to merge'),
-                           _('Must supply a target revision'), self).run()
-            gtklib.idle_add_single_call(self.destroy)
-            return
-
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
@@ -49,15 +43,40 @@ class MergeDialog(gtk.Dialog):
             return
         self.set_title(_('Merging in %s') % hglib.get_reponame(repo))
 
+        prevs = [ctx.rev() for ctx in repo.parents()]
+        if len(prevs) > 1:
+            rev0, rev1 = prevs
+        elif not rev1:
+            gdialog.Prompt(_('Unable to merge'),
+                           _('Must supply a target revision'), self).run()
+            gtklib.idle_add_single_call(self.destroy)
+            return
+        elif not rev0:
+            rev0 = prevs[0]
+        elif rev1 == prevs[0]:
+            # selected pair was backwards
+            rev0, rev1 = rev1, rev0
+        elif rev0 != prevs[0]:
+            # working parent not in selected revision pair
+            modified, added, removed, deleted = repo.status()[:4]
+            if modified or added or removed or deleted:
+                gdialog.Prompt(_('Unable to merge'),
+                               _('Outstanding uncommitted changes'), self).run()
+                gtklib.idle_add_single_call(self.destroy)
+                return
+            repo.ui.quiet = True
+            commands.update(repo.ui, repo, rev=rev0, check=True)
+            repo.ui.quiet = False
+
         frame = gtk.Frame(_('Merge target (other)'))
-        self.otherrev, desc = changesetinfo.changesetinfo(repo, rev, True)
+        self.otherrev, desc = changesetinfo.changesetinfo(repo, rev1, True)
         frame.add(desc)
         frame.set_border_width(5)
         self.vbox.pack_start(frame, False, False)
         self.otherframe = frame
 
         frame = gtk.Frame(_('Current revision (local)'))
-        self.localrev, desc = changesetinfo.changesetinfo(repo, '.', True)
+        self.localrev, desc = changesetinfo.changesetinfo(repo, rev0, True)
         frame.add(desc)
         frame.set_border_width(5)
         self.vbox.pack_start(frame, False, False)
@@ -91,9 +110,17 @@ class MergeDialog(gtk.Dialog):
             combo.child.set_text('')
 
         # prepare to show
-        self.mergebtn.grab_focus()
-        self.commitbtn.set_sensitive(False)
-        self.undobtn.set_sensitive(False)
+        if len(repo.parents()) == 2:
+            self.mergetool.set_sensitive(False)
+            self.mergelabel.set_sensitive(False)
+            self.mergebtn.set_sensitive(False)
+            self.undobtn.set_sensitive(True)
+            self.commitbtn.set_sensitive(True)
+            self.commitbtn.grab_focus()
+        else:
+            self.mergebtn.grab_focus()
+            self.commitbtn.set_sensitive(False)
+            self.undobtn.set_sensitive(False)
         gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
@@ -254,4 +281,4 @@ class MergeDialog(gtk.Dialog):
         self.cmd.execute(cmdline, cmd_done)
 
 def run(ui, *pats, **opts):
-    return MergeDialog(opts.get('rev'))
+    return MergeDialog(None, opts.get('rev'))
