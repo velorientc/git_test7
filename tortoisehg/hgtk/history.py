@@ -1045,12 +1045,18 @@ class GLog(gdialog.GDialog):
             except OSError:
                 pass
 
+        path = hglib.fromutf(self.pathentry.get_text()).strip()
+        if not path:
+            gdialog.Prompt(_('No remote path specified'),
+                           _('Please enter or select a remote path'),
+                           self).run()
+            self.pathentry.grab_focus()
+            return
         if not self.bundledir:
             self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
             atexit.register(cleanup)
 
         origurl = self.urlcombo.get_active()
-        path = self.pathentry.get_text()
         bfile = path
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
@@ -1123,7 +1129,13 @@ class GLog(gdialog.GDialog):
                 # load the rebase extension explicitly
                 extensions.load(self.ui, 'rebase', None)
 
-        path = self.pathentry.get_text()
+        path = hglib.fromutf(self.pathentry.get_text()).strip()
+        if not path:
+            gdialog.Prompt(_('No remote path specified'),
+                           _('Please enter or select a remote path'),
+                           self).run()
+            self.pathentry.grab_focus()
+            return
         cmdline = ['hg'] + cmd + self.get_proxy_args() + [path]
         dlg = hgcmd.CmdDialog(cmdline, text=' '.join(['hg'] + cmd))
         dlg.show_all()
@@ -1138,10 +1150,17 @@ class GLog(gdialog.GDialog):
                 self.reload_log()
 
     def outgoing_clicked(self, toolbutton):
+        path = hglib.fromutf(self.pathentry.get_text()).strip()
+        if not path:
+            gdialog.Prompt(_('No remote path specified'),
+                           _('Please enter or select a remote path'),
+                           self).run()
+            self.pathentry.grab_focus()
+            return
         q = Queue.Queue()
         cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n']
         cmd += self.get_proxy_args()
-        cmd += [self.pathentry.get_text()]
+        cmd += [path]
 
         def threadfunc(q, *args):
             try:
@@ -1196,6 +1215,12 @@ class GLog(gdialog.GDialog):
                 remote_path = path
             elif remote_path == url.hidepassword(path):
                 remote_path = path
+        if not remote_path:
+            gdialog.Prompt(_('No remote path specified'),
+                           _('Please enter or select a remote path'),
+                           self).run()
+            self.pathentry.grab_focus()
+            return
         cmdline = ['hg', 'push'] + self.get_proxy_args()
         if self.forcepush:
             cmdline += ['--force']
@@ -1525,6 +1550,12 @@ class GLog(gdialog.GDialog):
                 remote_path = path
             elif remote_path == url.hidepassword(path):
                 remote_path = path
+        if not remote_path:
+            gdialog.Prompt(_('No remote path specified'),
+                           _('Please enter or select a remote path'),
+                           self).run()
+            self.pathentry.grab_focus()
+            return
         node = self.repo[self.currevid].node()
         cmdline = ['hg', 'push', '--rev', str(self.currevid), remote_path]
         dlg = hgcmd.CmdDialog(cmdline, text='hg push')
