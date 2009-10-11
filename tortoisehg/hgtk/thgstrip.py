@@ -77,7 +77,7 @@ class StripDialog(gtk.Dialog):
 
         ## result label
         self.resultlbl = createlabel()
-        table.add_row(_('Result:'), self.resultlbl, padding=False)
+        table.add_row(_('Preview:'), self.resultlbl, padding=False)
 
         ## preview box
         pframe = gtk.Frame()
