@@ -42,7 +42,7 @@ class StripDialog(gtk.Dialog):
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
         except hglib.RepoError:
-            gobject.idle_add(self.destroy)
+            gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
         self.set_title(_('Strip - %s') % hglib.get_reponame(repo))
@@ -127,7 +127,7 @@ class StripDialog(gtk.Dialog):
         # prepare to show
         self.preview()
         self.stripbtn.grab_focus()
-        gobject.idle_add(self.after_init)
+        gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
         # add 'Show all' button
