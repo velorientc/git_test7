@@ -375,14 +375,16 @@ class LayoutTable(gtk.VBox):
     the body will be aligned left with expanded padding.
     """
 
-    def __init__(self):
+    def __init__(self, **kargs):
         gtk.VBox.__init__(self)
 
         self.table = gtk.Table(1, 2)
         self.pack_start(self.table)
         self.headers = []
 
-        self.set_default_paddings(-1, -1)
+        pads = {'xpad': -1, 'ypad': -1}
+        pads.update(kargs)
+        self.set_default_paddings(**pads)
 
     def set_default_paddings(self, xpad=None, ypad=None):
         """
