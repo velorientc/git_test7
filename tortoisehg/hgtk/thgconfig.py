@@ -516,7 +516,7 @@ class ConfigDialog(gtk.Dialog):
     def __init__(self, configrepo=False):
         """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
-                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE,
+                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                                    gtk.STOCK_APPLY, gtk.RESPONSE_APPLY,
                                    gtk.STOCK_OK, gtk.RESPONSE_OK))
         gtklib.set_tortoise_keys(self)
@@ -697,6 +697,8 @@ class ConfigDialog(gtk.Dialog):
             self._apply_clicked()
             self.emit_stop_by_name('response')
             return True
+        elif resp == gtk.RESPONSE_CANCEL:
+            return False
         if self.dirty and not self.readonly:
             if resp == gtk.RESPONSE_OK:
                 ret = 0
