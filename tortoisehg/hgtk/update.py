@@ -87,29 +87,24 @@ class UpdateDialog(gtk.Dialog):
             label.set_selectable(True)
             label.set_line_wrap(True)
             label.set_size_request(350, -1)
-            hb = gtk.HBox()
-            hb.pack_start(label, False, False)
-            return hb, label
+            return label
 
         ## summary of target revision
-        hb, label = new_label()
-        table.add_row(_('Target:'), hb)
-        self.new_rev_label = label
+        self.target_label = new_label()
+        table.add_row(_('Target:'), self.target_label)
 
         ## summary of parent 1 revision
-        hb, label = new_label()
-        self.current_rev_label1 = label
+        self.parent1_label = new_label()
 
         ## summary of parent 2 revision if needs
         self.ctxs = self.repo[None].parents()
         if len(self.ctxs) == 2:
-            table.add_row(_('Parent 1:'), hb)
-            hb, label = new_label()
-            table.add_row(_('Parent 2:'), hb)
-            self.current_rev_label2 = label
+            table.add_row(_('Parent 1:'), self.parent1_label)
+            self.parent2_label = new_label()
+            table.add_row(_('Parent 2:'), self.parent2_label)
         else:
-            table.add_row(_('Parent:'), hb)
-            self.current_rev_label2 = None
+            table.add_row(_('Parent:'), self.parent1_label)
+            self.parent2_label = None
 
         # signal handlers
         self.revcombo.connect('changed', lambda b: self.update_summaries())
@@ -202,21 +197,21 @@ class UpdateDialog(gtk.Dialog):
             label.set_markup(t)
 
         ctxs = self.ctxs
-        setlabel(self.current_rev_label1, ctxs[0])
+        setlabel(self.parent1_label, ctxs[0])
         merge = len(ctxs) == 2
         if merge:
-            setlabel(self.current_rev_label2, ctxs[1])
+            setlabel(self.parent2_label, ctxs[1])
         newrev = self.revcombo.get_active_text()
         try:
             new_ctx = self.repo[newrev]
             if not merge and new_ctx.rev() == ctxs[0].rev():
-                self.new_rev_label.set_label(_('(same as parent)'))
+                self.target_label.set_label(_('(same as parent)'))
                 self.updatebtn.set_sensitive(self.opt_clean.get_active())
             else:
-                setlabel(self.new_rev_label, self.repo[newrev])
+                setlabel(self.target_label, self.repo[newrev])
                 self.updatebtn.set_sensitive(True)
         except (LookupError, RepoLookupError, RepoError):
-            self.new_rev_label.set_label(_('unknown revision!'))
+            self.target_label.set_label(_('unknown revision!'))
             self.updatebtn.set_sensitive(False)
 
     def update(self):
