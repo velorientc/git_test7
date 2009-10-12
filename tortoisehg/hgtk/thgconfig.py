@@ -516,8 +516,11 @@ class ConfigDialog(gtk.Dialog):
     def __init__(self, configrepo=False):
         """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
-                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE,
+                                   gtk.STOCK_APPLY, gtk.RESPONSE_APPLY,
+                                   gtk.STOCK_OK, gtk.RESPONSE_OK))
         gtklib.set_tortoise_keys(self)
+        self._btn_apply = self.action_area.get_children()[1]
 
         self.ui = ui.ui()
         try:
@@ -572,10 +575,6 @@ class ConfigDialog(gtk.Dialog):
         notebook.show()
         self.show_tabs = True
         self.show_border = True
-
-        self._btn_apply = gtk.Button(_('Apply'))
-        self._btn_apply.connect('clicked', self._apply_clicked)
-        self.action_area.pack_end(self._btn_apply)
 
         self.dirty = False
         self.pages = []
@@ -695,15 +694,22 @@ class ConfigDialog(gtk.Dialog):
     def delete_event(self, dlg, event):
         return True
 
-    def should_live(self, *args):
+    def should_live(self, dialog=None, resp=None):
+        if resp == gtk.RESPONSE_APPLY:
+            self._apply_clicked()
+            self.emit_stop_by_name('response')
+            return True
         if self.dirty and not self.readonly:
-            ret = gdialog.CustomPrompt(_('Confirm Exit'),
+            if resp == gtk.RESPONSE_OK:
+                ret = 0
+            else:
+                ret = gdialog.CustomPrompt(_('Confirm Exit'),
                         _("Exit after saving changes?"), self,
                         (_('&Yes'), _('&No (discard changes)'),
                          _('&Cancel')), default=2, esc=2).run()
             if ret == 2:
-                if len(args) != 0:
-                   self.emit_stop_by_name('response')
+                if resp is not None:
+                    self.emit_stop_by_name('response')
                 return True
             elif ret == 0:
                 self._apply_clicked()
