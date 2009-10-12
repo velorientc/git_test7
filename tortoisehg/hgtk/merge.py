@@ -68,20 +68,31 @@ class MergeDialog(gtk.Dialog):
             commands.update(repo.ui, repo, rev=rev0, check=True)
             repo.ui.quiet = False
 
-        frame = gtk.Frame(_('Merge target (other)'))
-        self.otherrev, desc = csinfo.create(repo, rev1, True)
-        frame.add(desc)
-        frame.set_border_width(5)
-        self.vbox.pack_start(frame, False, False)
-        self.otherframe = frame
+        # changeset info
+        style = csinfo.panelstyle(contents=csinfo.PANEL_DEFAULT + ('ishead',),
+                                  margin=5, padding=2)
+        def data_func(widget, ctx):
+            node = ctx.node()
+            return node in repo.heads()
+        def markup_func(widget, value):
+            if value:
+                return ''
+            return gtklib.markup(_('Not a head revision!'), weight='bold')
+        custom = csinfo.custom(ishead={
+                        'data': data_func, 'markup': markup_func})
+        createinfo = csinfo.factory(style=style, repo=repo, custom=custom)
 
-        frame = gtk.Frame(_('Current revision (local)'))
-        self.localrev, desc = csinfo.create(repo, rev0, True)
-        frame.add(desc)
-        frame.set_border_width(5)
-        self.vbox.pack_start(frame, False, False)
-        self.localframe = frame
+        info = createinfo(rev1, style={'label': _('Merge target (other)')})
+        self.vbox.pack_start(info, False, False)
+        self.otherframe = info
+        self.otherrev = info.get_data('revnum')
 
+        info = createinfo(rev0, style={'label': _('Current revision (local)')})
+        self.vbox.pack_start(info, False, False)
+        self.localframe = info
+        self.localrev = '???'
+
+        # buttons
         self.mergebtn = self.add_button(_('Merge'), RESPONSE_MERGE)
         self.commitbtn = self.add_button(_('Commit'), RESPONSE_COMMIT)
         self.undobtn = self.add_button(_('Undo'), RESPONSE_UNDO)
