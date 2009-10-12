@@ -396,9 +396,10 @@ class LayoutTable(gtk.VBox):
         self.pack_start(self.table)
         self.headers = []
 
-        pads = {'xpad': -1, 'ypad': -1}
-        pads.update(kargs)
-        self.set_default_paddings(**pads)
+        self.set_default_paddings(kargs.get('xpad', -1),
+                                  kargs.get('ypad', -1))
+        self.set_default_options(kargs.get('headopts', None),
+                                 kargs.get('bodyopts', None))
 
     def set_default_paddings(self, xpad=None, ypad=None):
         """
@@ -413,10 +414,27 @@ class LayoutTable(gtk.VBox):
               Use -1 to reset padding to preset value.
               Default: None (no change).
         """
-        if not xpad is None:
+        if xpad is not None:
             self.xpad = xpad >= 0 and xpad or 4
-        if not ypad is None:
+        if ypad is not None:
             self.ypad = ypad >= 0 and ypad or 2
+
+    def set_default_options(self, headopts=None, bodyopts=None):
+        """
+        Set default options for markups of label.
+
+        In default, LayoutTable doesn't use any markups and set the test
+        as plane text.  See markup()'s description for more details of
+        option parameters.  Note that if called add_row() with just one
+        widget, it will be tried to apply 'bodyopts', not 'headopts'.
+
+        headopts: Dictionary. Options used for markups of gtk.Label.
+                  This option is only availabled for the label.
+                  The text will be escaped automatically.  Default: None.
+        bodyopts: [same as 'headopts']
+        """
+        self.headopts = headopts
+        self.bodyopts = bodyopts
 
     def get_first_header(self):
         """
@@ -447,8 +465,10 @@ class LayoutTable(gtk.VBox):
             expand: Number. Position of body element to expand.  If you
                     specify this option, 'padding' option will be changed
                     to False automatically.  Default: -1 (last element).
-            xpad: Number. Overwrite default 'xpad' value.
-            ypad: Number. Overwrite default 'ypad' value.
+            xpad: Number. Override default 'xpad' value.
+            ypad: [same as 'xpad']
+            headopts: Dictionary. Override default 'headopts' value.
+            bodyopts: [same as 'headopts']
         """
         if len(widgets) == 0:
             return
@@ -458,7 +478,9 @@ class LayoutTable(gtk.VBox):
         t.set_property('n-rows', rows + 1)
         xpad = kargs.get('xpad', self.xpad)
         ypad = kargs.get('ypad', self.ypad)
-        def getwidget(obj):
+        hopts = kargs.get('headopts', self.headopts)
+        bopts = kargs.get('bodyopts', self.bodyopts)
+        def getwidget(obj, opts=None):
             '''element converter'''
             if obj == None:
                 return gtk.Label('')
@@ -468,7 +490,12 @@ class LayoutTable(gtk.VBox):
                 lbl.size_request()
                 return lbl
             elif isinstance(obj, basestring):
-                lbl = gtk.Label(obj)
+                if opts is None:
+                    lbl = gtk.Label(obj)
+                else:
+                    obj = markup(obj, **opts)
+                    lbl = gtk.Label()
+                    lbl.set_markup(obj)
                 return lbl
             return obj
         def pack(*widgets, **kargs):
@@ -481,10 +508,10 @@ class LayoutTable(gtk.VBox):
                 widgets += (None,)
             expmap = [ w is None for w in widgets ]
             expmap[expand] = True
-            widgets = [ getwidget(w) for w in widgets ]
+            widgets = [ getwidget(w, bopts) for w in widgets ]
             hbox = gtk.HBox()
             for i, obj in enumerate(widgets):
-                widget = getwidget(obj)
+                widget = getwidget(obj, bopts)
                 pad = i != 0 and 2 or 0
                 hbox.pack_start(widget, expmap[i], expmap[i], pad)
             return hbox
@@ -493,7 +520,7 @@ class LayoutTable(gtk.VBox):
             widget = pack(*widgets, **kargs)
             t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, xpad, ypad)
         else:
-            first = getwidget(widgets[0])
+            first = getwidget(widgets[0], hopts)
             if isinstance(first, gtk.Label):
                 first.set_alignment(1, 0.5)
             t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, xpad, ypad)
