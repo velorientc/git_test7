@@ -53,12 +53,10 @@ class BackoutDialog(gtk.Dialog):
         self.msgset['str'] += rev
 
         # changeset info
-        frame = gtk.Frame(_('Changeset Description'))
-        frame.set_border_width(4)
-        revid, desc = csinfo.create(repo, rev)
-        frame.add(desc)
-        self.vbox.pack_start(frame, False, False, 2)
-        self.csetframe = frame
+        style = csinfo.panelstyle(label=_('Changeset Description'),
+                                  margin=4, padding=2)
+        self.csetframe = csinfo.create(rev, style, repo)
+        self.vbox.pack_start(self.csetframe, False, False, 2)
 
         # backout commit message
         frame = gtk.Frame(_('Backout commit message'))
