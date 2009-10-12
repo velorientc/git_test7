@@ -1147,10 +1147,13 @@ class GLog(gdialog.GDialog):
 
         self.incoming_disabled = []
         for cmd in ('refresh', 'synchronize', 'mq'):
-            tb = self.get_toolbutton(cmd)
-            if tb:
-                tb.set_sensitive(False)
-                self.incoming_disabled.append(tb)
+            try:
+                tb = self.get_toolbutton(cmd)
+                if tb:
+                    tb.set_sensitive(False)
+                    self.incoming_disabled.append(tb)
+            except KeyError:
+                pass
         def disable_child(w):
             if w != self.ppullcombo and w.get_property('sensitive'):
                 w.set_sensitive(False)
