@@ -23,7 +23,7 @@ from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
 from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
-from tortoisehg.hgtk import gtklib, thgconfig, gdialog, hgcmd
+from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close, mergebranches):
@@ -375,17 +375,27 @@ class GCommit(GStatus):
         vbox2 = gtk.VBox()
         vbox2.pack_start(status_body)
 
+        # parent changeset info
         parents_vbox = gtk.VBox(spacing=1)
         self.parents_frame = parents_vbox
-        def plabel():
-            w = gtk.Label()
-            w.set_selectable(True)
-            hb = gtk.HBox()
-            hb.pack_start(w, False, False, 4)
-            parents_vbox.pack_start(hb, False, False)
-            return w
-        self.parent1_label = plabel()
-        self.parent2_label = plabel()
+        style = csinfo.labelstyle(contents=('Parent: %(rev)s',
+                       ' %(athead)s', ' %(branch)s', ' %(tags)s',
+                       ' %(summary)s'), selectable=True)
+        def data_func(widget, ctx):
+            return len(ctx.children()) == 0
+        def markup_func(widget, value):
+            if value:
+                return ''
+            text = '[%s]' % _('not at head revision')
+            return gtklib.markup(text, weight='bold')
+        custom = csinfo.custom(athead={
+                        'data': data_func, 'markup': markup_func})
+        def add_parent():
+            label = csinfo.create('tip', style, self.repo, custom)
+            parents_vbox.pack_start(label, False, False)
+            return label
+        self.parent1_label = add_parent()
+        self.parent2_label = add_parent()
         parents_vbox.pack_start(gtk.HSeparator())
         vbox2.pack_start(parents_vbox, False, False)
 
@@ -503,43 +513,12 @@ class GCommit(GStatus):
         return ctxs, isheads, len(ctxs) == 2
 
     def update_parent_labels(self):
-        
-        def setlabel(label, ctx, ishead):
-            revision = str(ctx.rev())
-            hash = str(ctx)
-            summary = gtklib.markup_escape_text(hglib.toutf(
-                                ctx.description().split('\n')[0]))
-            face = 'monospace'
-            size = '9000'
-            t = _('Parent: ')
-
-            format = '<span face="%s" size="%s">%s (%s) </span>'
-            t += format % (face, size, revision, hash)
-
-            if not ishead and not self.mqmode:
-                format = '<b>[%s]</b>  '
-                t += format % _('not at head revision')
-
-            branch = ctx.branch()
-            if branch != 'default':
-                format = '<span color="%s" background="%s"> %s </span> '
-                t += format % ('black', '#aaffaa', branch)
-
-            tags = self.repo.nodetags(ctx.node())
-            format = '<span color="%s" background="%s"> %s </span> '
-            for tag in tags:
-                t += format % ('black', '#ffffaa', tag)
-
-            t += summary
-            label.set_markup(t)
-
         ctxs, isheads, ismerge = self.get_head_info()
-        setlabel(self.parent1_label, ctxs[0], isheads[0])
-
+        self.parent1_label.update(ctxs[0])
         if not ismerge:
             self.parent2_label.hide()
         else:
-            setlabel(self.parent2_label, ctxs[1], isheads[1])
+            self.parent2_label.update(ctxs[1])
             self.parent2_label.show()
 
     def thgreflow(self, window, textview):
