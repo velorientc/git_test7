@@ -58,6 +58,9 @@ class GLog(gdialog.GDialog):
         extensions.loadall(self.ui)
         self.exs = [ name for name, module in extensions.extensions() ]
 
+    def get_help_url(self):
+        return 'changelog.html'
+
     def get_title(self):
         str = _('%s - changelog') % self.get_reponame()
         if self.bfile:
