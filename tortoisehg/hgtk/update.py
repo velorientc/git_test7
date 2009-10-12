@@ -16,7 +16,7 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 from tortoisehg.util.hglib import LookupError, RepoLookupError, RepoError
 
-from tortoisehg.hgtk import hgcmd, gtklib, gdialog
+from tortoisehg.hgtk import csinfo, gtklib, gdialog, hgcmd
 
 MODE_NORMAL  = 'normal'
 MODE_WORKING = 'working'
@@ -82,25 +82,22 @@ class UpdateDialog(gtk.Dialog):
             combo.append_text(t)
 
         ## changeset summaries
-        def new_label():
-            label = gtk.Label('-')
-            label.set_selectable(True)
-            label.set_line_wrap(True)
-            label.set_size_request(350, -1)
-            return label
+        style = csinfo.labelstyle(contents=('%(rev)s', ' %(branch)s',
+                       ' %(tags)s', '\n%(summary)s'), selectable=True, width=350)
+        createinfo = csinfo.factory(style=style, repo=repo)
 
         ## summary of target revision
-        self.target_label = new_label()
+        self.target_label = createinfo('tip')
         table.add_row(_('Target:'), self.target_label)
 
         ## summary of parent 1 revision
-        self.parent1_label = new_label()
+        self.parent1_label = createinfo('tip')
 
         ## summary of parent 2 revision if needs
-        self.ctxs = self.repo[None].parents()
+        self.ctxs = repo[None].parents()
         if len(self.ctxs) == 2:
             table.add_row(_('Parent 1:'), self.parent1_label)
-            self.parent2_label = new_label()
+            self.parent2_label = createinfo('tip')
             table.add_row(_('Parent 2:'), self.parent2_label)
         else:
             table.add_row(_('Parent:'), self.parent1_label)
@@ -172,35 +169,11 @@ class UpdateDialog(gtk.Dialog):
         self.abortbtn.set_property('visible', working)
 
     def update_summaries(self):
-        def setlabel(label, ctx):
-            revision = str(ctx.rev())
-            hash = str(ctx)
-            summary = gtklib.markup_escape_text(hglib.toutf(
-                                ctx.description().split('\n')[0]))
-            face = 'monospace'
-            size = '9000'
-
-            format = '<span face="%s" size="%s">%s (%s)\n</span>'
-            t = format % (face, size, revision, hash)
-
-            branch = ctx.branch()
-            if branch != 'default':
-                format = '<span color="%s" background="%s"> %s </span> '
-                t += format % ('black', '#aaffaa', branch)
-
-            tags = self.repo.nodetags(ctx.node())
-            format = '<span color="%s" background="%s"> %s </span> '
-            for tag in tags:
-                t += format % ('black', '#ffffaa', tag)
-
-            t += summary
-            label.set_markup(t)
-
         ctxs = self.ctxs
-        setlabel(self.parent1_label, ctxs[0])
+        self.parent1_label.update(ctxs[0])
         merge = len(ctxs) == 2
         if merge:
-            setlabel(self.parent2_label, ctxs[1])
+            self.parent2_label.update(ctxs[1])
         newrev = self.revcombo.get_active_text()
         try:
             new_ctx = self.repo[newrev]
@@ -208,7 +181,7 @@ class UpdateDialog(gtk.Dialog):
                 self.target_label.set_label(_('(same as parent)'))
                 self.updatebtn.set_sensitive(self.opt_clean.get_active())
             else:
-                setlabel(self.target_label, self.repo[newrev])
+                self.target_label.update(self.repo[newrev])
                 self.updatebtn.set_sensitive(True)
         except (LookupError, RepoLookupError, RepoError):
             self.target_label.set_label(_('unknown revision!'))
