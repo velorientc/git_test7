@@ -225,8 +225,9 @@ class StripDialog(gtk.Dialog):
         self.curnum = numtotal = len(tostrip)
 
         LIM = 50
+        createinfo = csinfo.factory(style=csinfo.panelstyle(), repo=self.repo)
         def add_csinfo(revnum):
-            info = csinfo.create(self.repo, revnum)[1]
+            info = createinfo(revnum)
             self.resultbox.pack_start(info, False, False, 2)
         def add_sep():
             self.resultbox.pack_start(gtk.HSeparator())
