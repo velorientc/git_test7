@@ -203,7 +203,7 @@ class GLog(gdialog.GDialog):
 
     def synch_clicked(self, toolbutton, data):
         def sync_closed(dialog):
-            self.enable_cmd('synchronize', True)
+            self.cmd_set_sensitive('synchronize', True)
 
         def synch_callback(parents):
             self.repo.invalidate()
@@ -217,7 +217,7 @@ class GLog(gdialog.GDialog):
         dlg.set_notify_func(synch_callback, parents)
         dlg.connect('destroy', sync_closed)
         dlg.show_all()
-        self.enable_cmd('synchronize', False)
+        self.cmd_set_sensitive('synchronize', False)
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
@@ -255,8 +255,8 @@ class GLog(gdialog.GDialog):
 
     def load_all_clicked(self, button, data=None):
         self.graphview.load_all_revisions()
-        self.enable_cmd('load-more', False)
-        self.enable_cmd('load-all', False)
+        self.cmd_set_sensitive('load-more', False)
+        self.cmd_set_sensitive('load-all', False)
 
     def selection_changed(self, graphview):
         'Graphview reports a new row selected'
@@ -278,8 +278,8 @@ class GLog(gdialog.GDialog):
         if not graphview.graphdata:
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
-        self.enable_cmd('load-more', False)
-        self.enable_cmd('load-all', False)
+        self.cmd_set_sensitive('load-more', False)
+        self.cmd_set_sensitive('load-all', False)
 
     def details_clicked(self, toolbutton, data=None):
         self.show_details_dialog()
@@ -332,8 +332,8 @@ class GLog(gdialog.GDialog):
                     if self.graphcol != show:
                         self.graphcol = show
                         reload = True
-                        self.enable_cmd('compact-graph', self.graphcol)
-                        self.enable_cmd('color-by-branch', self.graphcol)
+                        self.cmd_set_sensitive('compact-graph', self.graphcol)
+                        self.cmd_set_sensitive('color-by-branch', self.graphcol)
                 else:
                     self.graphview.set_property(property, show)
                     self.showcol[property] = show
@@ -463,8 +463,8 @@ class GLog(gdialog.GDialog):
             # persisted data
             pass
 
-        self.enable_cmd('compact-graph', self.graphcol)
-        self.enable_cmd('color-by-branch', self.graphcol)
+        self.cmd_set_sensitive('compact-graph', self.graphcol)
+        self.cmd_set_sensitive('color-by-branch', self.graphcol)
 
         item = self.get_menuitem('use-proxy-server')
         if ui.ui().config('http_proxy', 'host'):
@@ -578,8 +578,8 @@ class GLog(gdialog.GDialog):
         opts['npreviews'] = self.npreviews
         opts['no_merges'] = self.no_merges
 
-        self.enable_cmd('load-more', True)
-        self.enable_cmd('load-all', True)
+        self.cmd_set_sensitive('load-more', True)
+        self.cmd_set_sensitive('load-all', True)
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
@@ -1072,8 +1072,8 @@ class GLog(gdialog.GDialog):
         self.reload_log()
         self.toolbar.remove(self.toolbar.get_nth_item(0))
         self.toolbar.remove(self.toolbar.get_nth_item(0))
-        self.enable_cmd('accept', False)
-        self.enable_cmd('reject', False)
+        self.cmd_set_sensitive('accept', False)
+        self.cmd_set_sensitive('reject', False)
         for w in self.incoming_disabled:
             w.set_sensitive(True)
 
@@ -1135,8 +1135,8 @@ class GLog(gdialog.GDialog):
             self.toolbar.insert(reject, 0)
             self.toolbar.insert(apply, 0)
             
-            self.enable_cmd('accept', True)
-            self.enable_cmd('reject', True)
+            self.cmd_set_sensitive('accept', True)
+            self.cmd_set_sensitive('reject', True)
 
             self.incoming_disabled = []
             for cmd in ('refresh', 'synchronize', 'mq'):
@@ -1760,7 +1760,7 @@ class GLog(gdialog.GDialog):
             self.mqtb.handler_block_by_func(self.mq_clicked)
             self.cmd_set_active('mq', enable)
             self.mqtb.handler_unblock_by_func(self.mq_clicked)
-            self.enable_cmd('mq', self.mqwidget.has_mq())
+            self.cmd_set_sensitive('mq', self.mqwidget.has_mq())
 
     def mq_clicked(self, widget, data=None):
         self.enable_mqpanel(widget.get_active())

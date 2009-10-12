@@ -336,13 +336,13 @@ class GDialog(gtk.Window):
     def get_menuitem(self, name):
         return self.menuitems[name]
 
-    def enable_cmd(self, name, enable):
+    def cmd_set_sensitive(self, name, sensitive):
         ws = []
         ws.append(self.toolbuttons.get(name))
         ws.append(self.menuitems.get(name))
         for w in ws:
             if w:
-                w.set_sensitive(enable)
+                w.set_sensitive(sensitive)
 
     def cmd_set_active(self, name, active):
         ws = []
