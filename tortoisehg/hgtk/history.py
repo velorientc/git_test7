@@ -1103,7 +1103,6 @@ class GLog(gdialog.GDialog):
             self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
             atexit.register(cleanup)
 
-        self.origurl = self.urlcombo.get_active()
         bfile = path
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
@@ -1120,6 +1119,7 @@ class GLog(gdialog.GDialog):
             self.set_bundlefile(bfile)
 
     def set_bundlefile(self, bfile):
+        self.origurl = self.urlcombo.get_active()
         self.pathentry.set_text(bfile)
 
         # create apply/reject toolbar buttons
@@ -1170,7 +1170,6 @@ class GLog(gdialog.GDialog):
         result = gtklib.NativeSaveFileDialogWrapper(
             title=_('Open Bundle'), open=True).run()
         if result:
-            self.origurl = self.urlcombo.get_active()
             self.set_bundlefile(result)
 
     def pull_clicked(self, toolbutton):
