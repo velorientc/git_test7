@@ -321,6 +321,20 @@ class NativeFolderSelectDialog:
             return fname
         return None
 
+def markup(text, **kargs):
+    """
+    A wrapper function for Pango Markup Language.
+
+    All options must be passed as keywork arguments.
+    """
+    if len(kargs) == 0:
+        return text
+    attr = ''
+    for name, value in kargs.items():
+        attr += ' %s="%s"' % (name, value)
+    text = markup_escape_text(text)
+    return '<span%s>%s</span>' % (attr, text)
+
 class LayoutGroup(object):
 
     def __init__(self, width=0):
