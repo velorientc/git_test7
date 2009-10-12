@@ -188,6 +188,9 @@ class GLog(gdialog.GDialog):
                 dict(text=_('Push'), func=self.push_clicked),
                 dict(text=_('Email...'), func=self.email_clicked),
                 dict(text='----'),
+                dict(text=_('Add Bundle...'), name='add-bundle',
+                    sensitive=not bool(self.bfile),
+                    func=self.add_bundle_clicked),
                 dict(text=_('Accept Bundle'), name='accept',
                     sensitive=bool(self.bfile),
                     func=self.apply_clicked, icon=gtk.STOCK_APPLY),
@@ -1074,6 +1077,7 @@ class GLog(gdialog.GDialog):
         self.toolbar.remove(self.toolbar.get_nth_item(0))
         self.cmd_set_sensitive('accept', False)
         self.cmd_set_sensitive('reject', False)
+        self.cmd_set_sensitive('add-bundle', True)
         for w in self.incoming_disabled:
             w.set_sensitive(True)
 
@@ -1114,50 +1118,61 @@ class GLog(gdialog.GDialog):
         dlg.run()
         dlg.hide()
         if dlg.return_code() == 0 and os.path.isfile(bfile):
-            self.pathentry.set_text(bfile)
+            self.set_bundlefile(bfile)
 
-            # create apply/reject toolbar buttons
-            apply = gtk.ToolButton(gtk.STOCK_APPLY)
-            apply.set_tooltip(self.tooltips,
-                              _('Accept incoming previewed changesets'))
-            apply.set_label(_('Accept'))
-            apply.show()
+    def set_bundlefile(self, bfile):
+        self.pathentry.set_text(bfile)
 
-            reject = gtk.ToolButton(gtk.STOCK_DIALOG_ERROR)
-            reject.set_tooltip(self.tooltips,
-                               _('Reject incoming previewed changesets'))
-            reject.set_label(_('Reject'))
-            reject.show()
+        # create apply/reject toolbar buttons
+        apply = gtk.ToolButton(gtk.STOCK_APPLY)
+        apply.set_tooltip(self.tooltips,
+                          _('Accept incoming previewed changesets'))
+        apply.set_label(_('Accept'))
+        apply.show()
 
-            apply.connect('clicked', self.apply_clicked)
-            reject.connect('clicked', self.reject_clicked)
+        reject = gtk.ToolButton(gtk.STOCK_DIALOG_ERROR)
+        reject.set_tooltip(self.tooltips,
+                           _('Reject incoming previewed changesets'))
+        reject.set_label(_('Reject'))
+        reject.show()
 
-            self.toolbar.insert(reject, 0)
-            self.toolbar.insert(apply, 0)
-            
-            self.cmd_set_sensitive('accept', True)
-            self.cmd_set_sensitive('reject', True)
+        apply.connect('clicked', self.apply_clicked)
+        reject.connect('clicked', self.reject_clicked)
 
-            self.incoming_disabled = []
-            for cmd in ('refresh', 'synchronize', 'mq'):
-                tb = self.get_toolbutton(cmd)
-                if tb:
-                    tb.set_sensitive(False)
-                    self.incoming_disabled.append(tb)
-            def disable_child(w):
-                if w != self.ppullcombo and w.get_property('sensitive'):
-                    w.set_sensitive(False)
-                    self.incoming_disabled.append(w)
-            self.syncbox.foreach(disable_child)
+        self.toolbar.insert(reject, 0)
+        self.toolbar.insert(apply, 0)
+        
+        self.cmd_set_sensitive('accept', True)
+        self.cmd_set_sensitive('reject', True)
+        self.cmd_set_sensitive('add-bundle', False)
 
-            self.bfile = bfile
-            oldtip = len(self.repo)
-            self.repo = hg.repository(self.ui, path=bfile)
-            self.graphview.set_repo(self.repo, self.stbar)
-            self.changeview.repo = self.repo
-            self.changeview.bfile = bfile
-            self.npreviews = len(self.repo) - oldtip
-            self.reload_log()
+        self.incoming_disabled = []
+        for cmd in ('refresh', 'synchronize', 'mq'):
+            tb = self.get_toolbutton(cmd)
+            if tb:
+                tb.set_sensitive(False)
+                self.incoming_disabled.append(tb)
+        def disable_child(w):
+            if w != self.ppullcombo and w.get_property('sensitive'):
+                w.set_sensitive(False)
+                self.incoming_disabled.append(w)
+        self.syncbox.foreach(disable_child)
+
+        self.bfile = bfile
+        oldtip = len(self.repo)
+        self.repo = hg.repository(self.ui, path=bfile)
+        self.graphview.set_repo(self.repo, self.stbar)
+        self.changeview.repo = self.repo
+        self.changeview.bfile = bfile
+        self.npreviews = len(self.repo) - oldtip
+        self.reload_log()
+
+    def add_bundle_clicked(self, button):
+        result = gtklib.NativeSaveFileDialogWrapper(
+            title=_('Open Bundle'), open=True).run()
+        if result:
+            self.origurl = self.urlcombo.get_active()
+            self.set_bundlefile(result)
 
     def pull_clicked(self, toolbutton):
         ppullcombo, ppulldata = self.ppullcombo, self.ppulldata
