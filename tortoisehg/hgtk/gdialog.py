@@ -361,8 +361,7 @@ class GDialog(gtk.Window):
         if not url:
             return
         if not url.startswith('http'):
-            docpath = os.path.dirname(paths.get_license_path())
-            url = os.path.join(docpath, url)
+            url = 'http://tortoisehg.bitbucket.org/manual/0.9/' + url
         from tortoisehg.hgtk import about
         about.browseurl(url)
 
