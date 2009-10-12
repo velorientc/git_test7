@@ -477,6 +477,7 @@ class GDialog(gtk.Window):
                     args = d.get('args', [])
                     icon = d.get('icon')
                     check = d.get('check', False)
+                    sensitive = d.get('sensitive', None)
                     if text == '----':
                         item = gtk.SeparatorMenuItem()
                     else:
@@ -500,6 +501,8 @@ class GDialog(gtk.Window):
                             item.set_image(img)
                         else:
                             item = gtk.MenuItem(text)
+                        if sensitive is not None:
+                            item.set_sensitive(sensitive)
                         item.connect('activate', func, *args)
                         if name:
                             self.menuitems[name] = item
