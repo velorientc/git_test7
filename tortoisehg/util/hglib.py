@@ -117,8 +117,7 @@ def invalidaterepo(repo):
         return
     repo.invalidate()
     if '_bookmarks' in repo.__dict__:
-        bm = extensions.find('bookmarks')
-        bm.reposetup(repo.ui, repo)
+        repo._bookmarks = {}
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
