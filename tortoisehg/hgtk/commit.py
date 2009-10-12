@@ -128,6 +128,9 @@ class GCommit(GStatus):
         self.notify_func = None
         self.patch_text = None
 
+    def get_help_url(self):
+        return 'commit.html'
+
     def set_notify_func(self, func, args):
         self.notify_func = func
         self.notify_args = args
