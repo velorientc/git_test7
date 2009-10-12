@@ -420,32 +420,51 @@ def filelog_grapher(repo, path):
     Graph the ancestry of a single file (log).  Deletions show
     up as breaks in the graph.
     '''
-    filerev = len(repo.file(path)) - 1
+    paths = { path : len(repo.file(path))-1 }
     revs = []
     rev_color = {}
     nextcolor = 0
     type = type_PLAIN
-    while filerev >= 0:
-        fctx = repo.filectx(path, fileid=filerev)
+    while paths:
+
+        # pick largest revision from known filenames
+        fctx = None
+        for path, filerev in paths.iteritems():
+            f = repo.filectx(path, fileid=filerev)
+            if not fctx or f.rev() > fctx.rev():
+                fctx = f
 
         # Compute revs and next_revs.
-        if filerev not in revs:
-            revs.append(filerev)
-            rev_color[filerev] = nextcolor ; nextcolor += 1
-        curcolor = rev_color[filerev]
-        index = revs.index(filerev)
+        if fctx.rev() not in revs:
+            revs.append(fctx.rev())
+            rev_color[fctx.rev()] = nextcolor ; nextcolor += 1
+        curcolor = rev_color[fctx.rev()]
+        index = revs.index(fctx.rev())
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = [f.filerev() for f in fctx.parents() if f.path() == path]
         parents_to_add = []
-        for parent in parents:
-            if parent not in next_revs:
-                parents_to_add.append(parent)
-                if len(parents) > 1:
-                    rev_color[parent] = nextcolor ; nextcolor += 1
+        for pfctx in fctx.parents():
+            if pfctx.path() != fctx.path():
+                continue
+            if pfctx.rev() not in next_revs:
+                parents_to_add.append(pfctx.rev())
+                if len(fctx.parents()) > 1:
+                    rev_color[pfctx.rev()] = nextcolor ; nextcolor += 1
                 else:
-                    rev_color[parent] = curcolor
+                    rev_color[pfctx.rev()] = curcolor
+
+        ret = fctx.renamed()
+        if ret:
+            renpath, fnode = ret
+            flog = repo.file(renpath)
+            filerev = flog.rev(fnode)
+            paths[renpath] = filerev
+            rfctx = repo.filectx(renpath, fileid=filerev)
+            if rfctx.rev() not in revs:
+                parents_to_add.append(rfctx.rev())
+                rev_color[rfctx.rev()] = nextcolor ; nextcolor += 1
+
         parents_to_add.sort()
         next_revs[index:index + 1] = parents_to_add
 
@@ -453,28 +472,18 @@ def filelog_grapher(repo, path):
         for i, rev in enumerate(revs):
             if rev in next_revs:
                 color = rev_color[rev]
-                lines.append( (i, next_revs.index(rev), color, type) )
-            elif rev == filerev:
-                for parent in parents:
-                    color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, type) )
+                lines.append((i, next_revs.index(rev), color, type))
+            elif rev == fctx.rev():
+                for pfctx in fctx.parents():
+                    color = rev_color[pfctx.rev()]
+                    lines.append((i, next_revs.index(pfctx.rev()), color, type))
 
-        ret = fctx.renamed()
-        if ret:
-            nextpath, fnode = ret
-            flog = repo.file(nextpath)
-            filerev = flog.rev(fnode)
-            next_revs = [filerev]
-            rev_color[filerev] = nextcolor
-            lines = [ (0, 0, nextcolor, type_LOOSE_LOW) ]
-            nextcolor += 1
+        if fctx.filerev() == 0:
+            del paths[fctx.path()]
         else:
-            nextpath = path
-            filerev -= 1
-
-        yield (fctx.rev(), (index, curcolor), lines, path)
-        path = nextpath
+            paths[fctx.path()] = fctx.filerev()-1
         revs = next_revs
+        yield (fctx.rev(), (index, curcolor), lines, fctx.path())
 
 
 
