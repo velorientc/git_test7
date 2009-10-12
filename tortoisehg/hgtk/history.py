@@ -185,6 +185,13 @@ class GLog(gdialog.GDialog):
                 dict(text=_('Push'), func=self.push_clicked),
                 dict(text=_('Email...'), func=self.email_clicked),
                 dict(text='----'),
+                dict(text=_('Accept Bundle'), name='accept',
+                    sensitive=bool(self.bfile),
+                    func=self.apply_clicked, icon=gtk.STOCK_APPLY),
+                dict(text=_('Reject Bundle'), name='reject',
+                    sensitive=bool(self.bfile),
+                    func=self.reject_clicked, icon=gtk.STOCK_DIALOG_ERROR),
+                dict(text='----'),
                 dict(name='use-proxy-server', text=_('Use proxy server'),
                     ascheck=True, func=toggle_proxy),
                 dict(text=_('Force push'), ascheck=True, func=toggle_force),
@@ -1025,50 +1032,53 @@ class GLog(gdialog.GDialog):
     def get_extras(self):
         return self.stbar
 
+    def apply_clicked(self, button):
+        ppullcombo, ppulldata = self.ppullcombo, self.ppulldata
+        sel = ppullcombo.get_active_text()
+        ppull = [name for (name, label) in ppulldata if sel == label][0]
+        if ppull == 'fetch':
+            cmd = ['fetch', '--message', 'merge']
+            # load the fetch extension explicitly
+            extensions.load(self.ui, 'fetch', None)
+        else:
+            cmd = ['pull']
+            if ppull == 'update':
+                cmd.append('--update')
+            elif ppull == 'rebase':
+                cmd.append('--rebase')
+                # load the rebase extension explicitly
+                extensions.load(self.ui, 'rebase', None)
+
+        cmdline = ['hg'] + cmd + [self.bfile]
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.remove_overlay('--rebase' in cmd)
+
+    def remove_overlay(self, resettip):
+        self.bfile = None
+        self.npreviews = 0
+        self.urlcombo.set_active(self.origurl)
+        self.repo = hg.repository(self.ui, path=self.repo.root)
+        self.graphview.set_repo(self.repo, self.stbar)
+        self.changeview.repo = self.repo
+        self.changeview.bfile = None
+        if resettip:
+            self.origtip = len(self.repo)
+        self.reload_log()
+        self.toolbar.remove(self.toolbar.get_nth_item(0))
+        self.toolbar.remove(self.toolbar.get_nth_item(0))
+        self.enable_cmd('accept', False)
+        self.enable_cmd('reject', False)
+        for w in self.incoming_disabled:
+            w.set_sensitive(True)
+
+    def reject_clicked(self, button):
+        self.remove_overlay(False)
+
     def incoming_clicked(self, toolbutton):
         ppullcombo, ppulldata = self.ppullcombo, self.ppulldata
-
-        def apply_clicked(button, bfile):
-            sel = ppullcombo.get_active_text()
-            ppull = [name for (name, label) in ppulldata if sel == label][0]
-            if ppull == 'fetch':
-                cmd = ['fetch', '--message', 'merge']
-                # load the fetch extension explicitly
-                extensions.load(self.ui, 'fetch', None)
-            else:
-                cmd = ['pull']
-                if ppull == 'update':
-                    cmd.append('--update')
-                elif ppull == 'rebase':
-                    cmd.append('--rebase')
-                    # load the rebase extension explicitly
-                    extensions.load(self.ui, 'rebase', None)
-
-            cmdline = ['hg'] + cmd + [bfile]
-            dlg = hgcmd.CmdDialog(cmdline)
-            dlg.show_all()
-            dlg.run()
-            dlg.hide()
-            remove_overlay('--rebase' in cmd)
-
-        def reject_clicked(button):
-            remove_overlay(False)
-
-        def remove_overlay(resettip):
-            self.bfile = None
-            self.npreviews = 0
-            self.urlcombo.set_active(origurl)
-            self.repo = hg.repository(self.ui, path=self.repo.root)
-            self.graphview.set_repo(self.repo, self.stbar)
-            self.changeview.repo = self.repo
-            self.changeview.bfile = None
-            if resettip:
-                self.origtip = len(self.repo)
-            self.reload_log()
-            self.toolbar.remove(self.toolbar.get_nth_item(0))
-            self.toolbar.remove(self.toolbar.get_nth_item(0))
-            for w in disabled:
-                w.set_sensitive(True)
 
         def cleanup():
             try:
@@ -1087,7 +1097,7 @@ class GLog(gdialog.GDialog):
             self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
             atexit.register(cleanup)
 
-        origurl = self.urlcombo.get_active()
+        self.origurl = self.urlcombo.get_active()
         bfile = path
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
@@ -1116,22 +1126,25 @@ class GLog(gdialog.GDialog):
             reject.set_label(_('Reject'))
             reject.show()
 
-            apply.connect('clicked', apply_clicked, bfile)
-            reject.connect('clicked', reject_clicked)
+            apply.connect('clicked', self.apply_clicked)
+            reject.connect('clicked', self.reject_clicked)
 
             self.toolbar.insert(reject, 0)
             self.toolbar.insert(apply, 0)
+            
+            self.enable_cmd('accept', True)
+            self.enable_cmd('reject', True)
 
-            disabled = []
+            self.incoming_disabled = []
             for cmd in ('refresh', 'synchronize', 'mq'):
                 tb = self.get_toolbutton(cmd)
                 if tb:
                     tb.set_sensitive(False)
-                    disabled.append(tb)
+                    self.incoming_disabled.append(tb)
             def disable_child(w):
                 if w != self.ppullcombo and w.get_property('sensitive'):
                     w.set_sensitive(False)
-                    disabled.append(w)
+                    self.incoming_disabled.append(w)
             self.syncbox.foreach(disable_child)
 
             self.bfile = bfile
