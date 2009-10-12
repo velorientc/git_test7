@@ -1085,7 +1085,6 @@ class GLog(gdialog.GDialog):
         self.remove_overlay(False)
 
     def incoming_clicked(self, toolbutton):
-        ppullcombo, ppulldata = self.ppullcombo, self.ppulldata
 
         def cleanup():
             try:
