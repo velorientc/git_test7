@@ -656,12 +656,10 @@ class ConfigDialog(gtk.Dialog):
         self.refresh_vlist()
         self.pathdata.clear()
         if 'paths' in self.ini:
-            from mercurial import config
-            cfg = config.config()
-            cfg.read(self.fn, sections=('paths',))
-            for alias, path in cfg.items('paths'):
+            for name in self.ini['paths']:
+                path = self.ini['paths'][name]
                 safepath = hglib.toutf(url.hidepassword(path))
-                self.pathdata.append([hglib.toutf(alias), safepath,
+                self.pathdata.append([hglib.toutf(name), safepath,
                     hglib.toutf(path)])
         self.refresh_path_list()
         self._btn_apply.set_sensitive(False)
@@ -1055,6 +1053,10 @@ class ConfigDialog(gtk.Dialog):
         self.fn = fn
         try:
             import iniparse
+            # Monkypatch this regex to prevent iniparse from considering
+            # 'rem' as a comment
+            iniparse.ini.CommentLine.regex = \
+                       re.compile(r'^(?P<csep>[;#])(?P<comment>.*)$')
             return iniparse.INIConfig(file(fn), optionxformvalue=None)
         except ImportError:
             from mercurial import config
