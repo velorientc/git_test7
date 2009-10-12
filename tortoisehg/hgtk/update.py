@@ -47,8 +47,8 @@ class UpdateDialog(gtk.Dialog):
 
         # layout table for fixed items
         table = gtklib.LayoutTable()
-        self.tables = dict(fixed=table)
         self.vbox.pack_start(table, True, True, 2)
+        self.table = table
 
         ## revision label & combobox
         self.revcombo = combo = gtk.combo_box_entry_new_text()
@@ -60,7 +60,7 @@ class UpdateDialog(gtk.Dialog):
         ## update method
         btn = gtk.CheckButton(_('Discard local changes, no backup (-C/--clean)'))
         self.opt_clean = btn
-        table.add_row('', btn)
+        table.add_row(None, btn)
 
         ## fill list of combo
         if rev != None:
@@ -81,20 +81,42 @@ class UpdateDialog(gtk.Dialog):
         for t in tags:
             combo.append_text(t)
 
-        # layout table for summaries
-        table = gtklib.LayoutTable()
-        self.tables['summary'] = table
-        self.vbox.pack_start(table)
+        ## changeset summaries
+        def new_label():
+            label = gtk.Label('-')
+            label.set_selectable(True)
+            label.set_line_wrap(True)
+            label.set_size_request(350, -1)
+            hb = gtk.HBox()
+            hb.pack_start(label, False, False)
+            return hb, label
 
-        self.show_summaries(True)
+        ## summary of target revision
+        hb, label = new_label()
+        table.add_row(_('Target:'), hb)
+        self.new_rev_label = label
 
+        ## summary of parent 1 revision
+        hb, label = new_label()
+        self.current_rev_label1 = label
+
+        ## summary of parent 2 revision if needs
+        self.ctxs = self.repo[None].parents()
+        if len(self.ctxs) == 2:
+            table.add_row(_('Parent 1:'), hb)
+            hb, label = new_label()
+            table.add_row(_('Parent 2:'), hb)
+            self.current_rev_label2 = label
+        else:
+            table.add_row(_('Parent:'), hb)
+            self.current_rev_label2 = None
+
+        # signal handlers
+        self.revcombo.connect('changed', lambda b: self.update_summaries())
         self.opt_clean.connect('toggled', lambda b: self.update_summaries())
 
-        # layout group
-        group = gtklib.LayoutGroup()
-        group.add(*self.tables.values())
-
         # prepare to show
+        self.update_summaries()
         self.updatebtn.grab_focus()
         gtklib.idle_add_single_call(self.after_init)
 
@@ -108,39 +130,6 @@ class UpdateDialog(gtk.Dialog):
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
         self.abortbtn.hide()
-
-    def build_summaries(self):
-        table = self.tables['summary']
-        
-        def new_label():
-            label = gtk.Label('-')
-            label.set_selectable(True)
-            label.set_line_wrap(True)
-            label.set_size_request(350, -1)
-            hb = gtk.HBox()
-            hb.pack_start(label, False, False)
-            return hb, label
-
-        # summary of new revision
-        hb, label = new_label()
-        table.add_row(_('Target:'), hb)
-        self.new_rev_label = label
-
-        # summary of current revision(s)
-        hb, label = new_label()
-        self.current_rev_label1 = label
-
-        self.ctxs = self.repo[None].parents()
-        if len(self.ctxs) == 2:
-            table.add_row(_('Parent 1:'), hb)
-            hb, label = new_label()
-            table.add_row(_('Parent 2:'), hb)
-            self.current_rev_label2 = label
-        else:
-            table.add_row(_('Parent:'), hb)
-            self.current_rev_label2 = None
-        table.show_all()
-        self.revcombo.connect('changed', lambda b: self.update_summaries())
 
     def abort(self):
         self.cmd.stop()
@@ -180,21 +169,12 @@ class UpdateDialog(gtk.Dialog):
             raise _('unknown mode name: %s') % mode
         working = not normal
 
-        for table in self.tables.values():
-            table.set_sensitive(normal)
+        self.table.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
             self.cmd.set_property('visible', working)
         self.abortbtn.set_property('visible', working)
-
-    def show_summaries(self, visible=True):
-        if visible and not hasattr(self, 'ctxs'):
-            self.build_summaries()
-        if hasattr(self, 'ctxs'):
-            self.update_summaries()
-        table = self.tables['summary']
-        table.set_property('visible', visible)
 
     def update_summaries(self):
         def setlabel(label, ctx):
