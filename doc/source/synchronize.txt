@@ -9,6 +9,11 @@ Synchronize
 
 	Synchronize dialog
 
+.. note::
+	The synchronize tool has been deprecated in the 0.9 release, and may
+	be removed in a future release.  We suggest you use the changelog
+	tool for performing synchronization duties.
+
 The synchronize tool is used to transmit changesets between repositories
 or to email recipients.
 
@@ -98,15 +103,13 @@ configurables that are valid for most push/pull operations.
 After Pull
 ----------
 
-After changesets are pulled into your repository, two buttons may appear
+After changesets are pulled into your repository, a buttons may appear
 at the bottom of the dialog:
 
-	:guilabel:`View pulled changesets`
-		Open the changelog viewer and inspect pulled changesets
-	:guilabel:`Update to tip`
-		Update your working directory to the new tip
+	:guilabel:`Update to branch tip`
+		Update your working directory to the new tip of the current branch
 
-Either button may be hidden if it is not applicable.
+The button will be hidden when it is not applicable.
 
 Email
 -----
@@ -155,15 +158,5 @@ or email command aliases, it will automatically select the
 *default-push* URL if.  For all other aliases the tool selects the
 *default* URL.  If the selected URL is not found, it will use the first
 path it finds.
-
-Changes since 0.7
------------------
-
-* Path drop-down list no longer includes most-recently-used paths.  It
-  only includes configured repository paths.
-* Email dialog now has buttons for configuring in-reply-to tags and the
-  attachment types.
-* Email dialog now sends an intro message only when one has been
-  entered, regardless of patch count.
 
 .. vim: noet ts=4
