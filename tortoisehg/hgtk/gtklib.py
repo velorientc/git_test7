@@ -11,9 +11,10 @@ import sys
 import gtk
 import gobject
 import pango
+import Queue
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import paths, hglib, thread2
 
 from tortoisehg.hgtk import hgtk
 
@@ -221,30 +222,43 @@ class NativeSaveFileDialogWrapper:
             return self.runCompatible()
 
     def runWindows(self):
-        import win32gui, win32con, pywintypes
-        cwd = os.getcwd()
+
+        def rundlg(q):
+            import win32gui, win32con, pywintypes
+            cwd = os.getcwd()
+            fname = None
+            try:
+                f = ''
+                for name, mask in self.filter:
+                    f += '\0'.join([name, mask,''])
+                opts = dict(InitialDir=self.initial,
+                        Flags=win32con.OFN_EXPLORER,
+                        File=self.filename,
+                        DefExt=None,
+                        Title=hglib.fromutf(self.title),
+                        Filter= hglib.fromutf(f),
+                        CustomFilter=None,
+                        FilterIndex=self.filterindex)
+                if self.open:
+                    fname, _, _ = win32gui.GetOpenFileNameW(**opts)
+                else:
+                    fname, _, _ = win32gui.GetSaveFileNameW(**opts)
+                if fname:
+                    fname = os.path.abspath(fname)
+            except pywintypes.error:
+                pass
+            os.chdir(cwd)
+            q.put(fname)
+
+        q = Queue.Queue()
+        thread = thread2.Thread(target=rundlg, args=(q,))
+        thread.start()
+        while thread.isAlive():
+            # let gtk process events while we wait for rundlg finishing
+            gtk.main_iteration(block=True)
         fname = None
-        try:
-            f = ''
-            for name, mask in self.filter:
-                f += '\0'.join([name, mask,''])
-            opts = dict(InitialDir=self.initial,
-                    Flags=win32con.OFN_EXPLORER,
-                    File=self.filename,
-                    DefExt=None,
-                    Title=hglib.fromutf(self.title),
-                    Filter= hglib.fromutf(f),
-                    CustomFilter=None,
-                    FilterIndex=self.filterindex)
-            if self.open:
-                fname, _, _ = win32gui.GetOpenFileNameW(**opts)
-            else:
-                fname, _, _ = win32gui.GetSaveFileNameW(**opts)
-            if fname:
-                fname = os.path.abspath(fname)
-        except pywintypes.error:
-            pass
-        os.chdir(cwd)
+        if q.qsize():
+            fname = q.get(0)
         return fname
 
     def runCompatible(self):
