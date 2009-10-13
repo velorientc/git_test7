@@ -477,6 +477,8 @@ class GStatus(gdialog.GDialog):
             res = _('Save Preview')
         elif self.mqmode:
             res = _('Patch Preview')
+        elif self.mode == 'shelve':
+            res = _('Shelf Preview')
         else:
             res = _('Commit Preview')
         return res
