@@ -14,11 +14,11 @@ thus is the most common approach people start with.
 
 To get started, suppose you volunteer to create the central repository.
 There are ways to `convert <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
-non-Mercurial repositories into Mercurial repositories, but for this
-example lets assume we're starting from scratch.
+non-Mercurial repositories into Mercurial repositories, but this example
+assumes you are starting from scratch.
 
-The rest of this tutorial assumes you already have TortoiseHg properly
-installed, and you have your project folder open in your file browser.
+This tutorial assumes you already have TortoiseHg properly installed,
+and you have your project folder open in your file browser.
 
 
 Configuring TortoiseHg
@@ -57,7 +57,7 @@ You must then select the :guilabel:`Commit` tab and enter a name in the
 	prevent SPAM.
 
 If you are not using one of our Windows installers, you will also have
-to configure a visual diff tool.  Type :command:`hgtk userconfig`, on
+to configure a visual diff tool.  Type :command:`hgtk userconfig` and on
 the TortoiseHg tab you will find :guilabel:`Visual Diff Command`.  If
 there are no options in the drop-down list, you must enable and
 configure Mercurial's ExtDiff extension and then restart the userconfig
@@ -102,11 +102,10 @@ Now it's time to tell Mercurial which files must be tracked and which
 files must be ignored. There are a lot of way to do this:
 
 1. To add files, select them in explorer and then right click and select
-   :menuselection:`TortoiseHg --> Add Files` in the context menu. In
-   this way the adding action happens immediately and no TortoiseHg
-   dialogs appear, but you will see the overlay icons change to indicate
-   added files.
-   
+   :menuselection:`TortoiseHg --> Add Files...` in the context menu. A
+   dialog will open for you to double check the selected files and
+   accept the add operation.
+ 
 2. Or open the status tool (:menuselection:`TortoiseHg --> View File Status`
    or :command:`hgtk status` from the command line). Check the files you
    want to add and then press the :guilabel:`Add` button. From the
@@ -120,11 +119,11 @@ files must be ignored. There are a lot of way to do this:
    pressing :guilabel:`Commit`.
    
 4. To ignore files, open the ignore filter dialog:
-   :menuselection:`TortoiseHg --> Edit Ignore Filter`
-   or from command line :command:`hgtk hgignore`. Choose a file from
-   the list or manually type in a *Glob* or *Regular expression*
-   filter and then press :guilabel:`Add`. Changes to the ignore filter
-   take effect immediately.
+   :menuselection:`TortoiseHg --> Edit Ignore Filter` or from command
+   line :command:`hgtk hgignore`. Choose a file from the list or
+   manually type in a *Glob* or *Regular expression* filter and then
+   press :guilabel:`Add`. Changes to the ignore filter take effect
+   immediately.
    
 .. note::
 	The :file:`.hgignore` file, contained in the working directory root,
@@ -133,22 +132,22 @@ files must be ignored. There are a lot of way to do this:
 .. note::
 	It is good practice to not have many *unknown* files in your working
 	directory, as it makes it too easy to forget to add vital new files.
-	So it is recommended that you keep your :file:`.hgignore`
-	file up to date.
+	It is recommended that you keep your :file:`.hgignore` file up to
+	date.
 
 
 Commit
 ======
    
 Commit your local repository by right-clicking anywhere in the folder,
-or on the folder itself, and then selecting
-:guilabel:`HG Commit ...`, or from command line type :command:`hgtk commit`.
-Write a commit message, select the files you wish to commit, then press
-:guilabel:`Commit`. If, after the commit, you realize that something was wrong
-with the message or the selected files, you can cancel the last commit
-using the :guilabel:`Undo` button.  Your previous commit message will be
-in the message history drop-down, so you do not have to type it in again
-from scratch.
+or on the folder itself, and then selecting :guilabel:`HG Commit ...`,
+or from command line type :command:`hgtk commit`.  Write a commit
+message, select the files you wish to commit, then press
+:guilabel:`Commit`. If, after the commit, you realize that something was
+wrong with the message or the selected files, you can cancel the last
+commit using the :guilabel:`Undo` button.  Your previous commit message
+will be in the message history drop-down, so you do not have to type it
+in again from scratch.
 
 .. note::
 	You lose the ability to easily undo the last commit when you close
@@ -163,12 +162,12 @@ Share the repository
 ====================
 
 Now you are ready to share your work. You do this by making a copy of
-your repository in a public place that everyone in your group can
-access. Mercurial calls this *cloning your repository*. To clone your
-repository to a common area, such as a shared drive or web site which
-will be the merge point for the team. From the shared drive select
+your repository in a public location that everyone in your group can
+read. Mercurial calls this copy operation *cloning your repository*. To
+clone your repository to a shared drive, open the clone tool
 :menuselection:`TortoiseHg --> Clone a Repository`, or
-:command:`hgtk clone` from command line.
+:command:`hgtk clone` from command line.  Then enter the destination
+path.
 
 .. figure:: figures/share.png
 	:alt: Clone dialog
@@ -183,7 +182,8 @@ Mercurial from checking out a working copy of the repository in the
 central repository clone.  It will only have the :file:`.hg` directory,
 which stores the entire revision history of the project.
 
-Other team members can then work from this clone.
+Other team members can clone from this clone with or without a checked
+out working directory.
 
 
 Fetching from the group repository
@@ -226,26 +226,25 @@ repository.
 
 When you're ready to publish your changes, you
 
-1. Commit your changes to your local repository, if you haven't already
-   (see above).
+1. Commit your changes to your local repository (see above).
 2. Pull changes from the group repository into your repository,
-   :menuselection:`TortoiseHg --> Synchronize` or
-   :command:`hgtk synch`, choose the path to the group repository
-   and then :guilabel:`Pull`.
+   :menuselection:`TortoiseHg --> Repository Browser` or
+   :command:`hgtk log`, choose the path to the group repository
+   in the syncbar and then :guilabel:`Pull`.
 3. If some changesets were pulled, merge those changes with your local
    changes and then commit the merge into your local repository. From
-   the changelog viewer (:menuselection:`TortoiseHg --> View Changelog`
+   the changelog viewer (:menuselection:`TortoiseHg --> Repository Browser`
    or :command:`hgtk log`) open the context menu over the changeset
    which you want to merge and select :guilabel:`merge with`.
    Finally, in the merge dialog, press :guilabel:`Merge` and then
    :guilabel:`Commit`.
 4. Ensure your merged work still builds and passes your extensive test suite.
 5. Push your changes to the group repository,
-   :menuselection:`TortoiseHg --> Synchronize` or :command:`hgtk synch`,
+   :menuselection:`TortoiseHg --> Repository Browser` or :command:`hgtk log`,
    choose the path to group repository and then :guilabel:`Push`.
 
 Which may sound complicated, but most of the time it is just pushing the
-buttons in the synchronize tool.
+buttons in the commit and changelog tools.
 
 .. note::
 	Merges can be safely restarted if necessary.

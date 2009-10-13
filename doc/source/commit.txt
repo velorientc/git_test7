@@ -179,6 +179,9 @@ Keyboard navigation
 	but highlighted) diff hunks to the clipboard. These can be pasted
 	into a text buffer to generate any arbitrary patch based from the
 	changes in your working directory.
+:kbd:`Alt-Q`
+	Reflow the paragraph currently under the cursor.  You must configure
+	a message format policy for this key to work.
 
 The code which copies the hunks to the clipboard is intelligent about
 diff headers.  The clipboard contents will always be a valid patch.
@@ -330,8 +333,6 @@ Configurables
 
 :menuselection:`Commit --> Username`
 	Sets username associated with your commits (see :doc:`quick`)
-:menuselection:`Commit --> External Tool`
-	Allows you to select Qct as the your commit tool [DEPRECATED]
 :menuselection:`Commit --> Summary Line Length`
 	Configures a 'policy' limit for summary lines
 :menuselection:`Commit --> Message Line Length`
@@ -341,7 +342,7 @@ Configurables
 :menuselection:`TortoiseHg --> Max Diff Size`
 	Configures the diff size limit
 
-External tool configuration is deprecated and will be removed in 0.9
+External tool configuration has been removed in 0.9
 
 From command line
 -----------------
@@ -364,31 +365,5 @@ The commit tool can be started from command line::
 For a quick help on the format of date type::
 	
 	hg help dates
-
- 
-Changes since 0.7
------------------
-
-* The :guilabel:`Show Diff` button has been removed. Diffs are always shown.
-* The commit tool no longer shows all diffs at startup. Only the first
-  currently selected file is shown.
-* Added support for closing a named branch
-* The commit tool is now launchable from the merge dialog
-* The message pane context menu now has options for inserting selected
-  filenames, and configuring/applying a layout format.
-* :guilabel:`Ctrl-O` keyboard accelerator for triggering commit has been
-  replaced with :guilabel:`Ctrl-Enter` accelerator which is common to
-  many TortoiseHg dialogs
-* Support for two-parent state (merging) has been improved, especially
-  the file context menus.
-* There is now a limit on the size of files that will be diffed by the commit
-  and changelog tools. Files above this size will only show a message
-  indicating why the file was not diffed.  This limit (default: 1MB) is
-  configurable (per-repository if necessary) via the settings dialog
-  :menuselection:`TortoiseHg --> Max Diff Size`.
-* You can specify the committer and date via the command line: see
-  :command:`hgtk commit -h` for details
-* The :file:`qct.py` extension file is no longer bundled. It must be
-  downloaded separately if you wish to use Qct.
 
 .. vim: noet ts=4
