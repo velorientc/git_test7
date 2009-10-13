@@ -1,3 +1,16 @@
 Describe path editing and [auth] hgrc section
 Need a page explaining merges and merge undo (tie together various parts)
 Describe how to use hgfold to correct case-folding conflicts
+
+intro: cmenu reg files will be included in the installer
+
+update screenshots (intro.txt)
+.. figure:: figures/cmenu-nofiles.jpg
+.. figure:: figures/init.png
+.. figure:: figures/share.png
+.. figure:: figures/clone.png
+.. {{images/image001.png}} (intro: overlay example)
+.. figure:: figures/synchronize.png (syncbar closeup)
+
+(common.txt)
+.. figure:: figures/hgcmd.jpg (show cmdwidget)
