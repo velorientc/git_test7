@@ -954,38 +954,38 @@ class GLog(gdialog.GDialog):
         self.filterbox = gtklib.SlimToolbar()
         filterbox = self.filterbox
 
-        all = gtk.RadioButton(None, _('all'))
+        all = gtk.RadioButton(None, _('All'))
         all.set_active(True)
         all.connect('toggled', self.filter_selected, 'all')
         filterbox.append_widget(all, padding=0)
 
-        tagged = gtk.RadioButton(all, _('tagged'))
+        tagged = gtk.RadioButton(all, _('Tagged'))
         tagged.connect('toggled', self.filter_selected, 'tagged')
         filterbox.append_widget(tagged, padding=0)
 
-        ancestry = gtk.RadioButton(all, _('ancestry'))
+        ancestry = gtk.RadioButton(all, _('Ancestry'))
         ancestry.connect('toggled', self.filter_selected, 'ancestry')
         filterbox.append_widget(ancestry, padding=0)
         self.ancestrybutton = ancestry
 
-        parents = gtk.RadioButton(all, _('parents'))
+        parents = gtk.RadioButton(all, _('Parents'))
         parents.connect('toggled', self.filter_selected, 'parents')
         filterbox.append_widget(parents, padding=0)
 
-        heads = gtk.RadioButton(all, _('heads'))
+        heads = gtk.RadioButton(all, _('Heads'))
         heads.connect('toggled', self.filter_selected, 'heads')
         filterbox.append_widget(heads, padding=0)
 
-        merges = gtk.RadioButton(all, _('merges'))
+        merges = gtk.RadioButton(all, _('Merges'))
         merges.connect('toggled', self.filter_selected, 'only_merges')
         filterbox.append_widget(merges, padding=0)
 
-        hidemerges = gtk.CheckButton(_('hide merges'))
+        hidemerges = gtk.CheckButton(_('Hide Merges'))
         hidemerges.connect('toggled', self.filter_selected, 'no_merges')
         filterbox.append_widget(hidemerges, padding=0)
         self.hidemerges = hidemerges
 
-        branches = gtk.RadioButton(all, _('branch'))
+        branches = gtk.RadioButton(all, _('Branch'))
         branches.connect('toggled', self.filter_selected, 'branch')
         branches.set_sensitive(False)
         filterbox.append_widget(branches, padding=0)
@@ -999,7 +999,7 @@ class GLog(gdialog.GDialog):
         filterbox.append_widget(branchcombo, padding=0)
         self.branchcombo = branchcombo
 
-        self.custombutton = gtk.RadioButton(all, _('custom'))
+        self.custombutton = gtk.RadioButton(all, _('Custom'))
         self.custombutton.set_sensitive(False)
         filterbox.append_widget(self.custombutton, padding=0)
 
