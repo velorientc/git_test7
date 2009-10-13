@@ -5,6 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import re
 import os
 import gtk
 import gobject
@@ -362,15 +363,36 @@ class StripDialog(gtk.Dialog):
             if returncode == 0:
                 if hasattr(self, 'notify_func'):
                     self.notify_func(*self.notify_args, **self.notify_kargs)
-                if not self.cmd.is_show_log():
-                    self.response(gtk.RESPONSE_CLOSE)
                 self.cmd.set_result(_('Stripped successfully'), style='ok')
+                self.after_strip()
             elif useraborted:
                 self.cmd.set_result(_('Canceled stripping'), style='error')
             else:
                 self.cmd.set_result(_('Failed to strip'), style='error')
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
+
+    def after_strip(self):
+        root = self.repo.root
+        bakdir = os.path.join(root, r'.hg\strip-backup')
+        escaped = bakdir.replace('\\', '\\\\')
+        buf = self.cmd.log.buffer
+        text = buf.get_text(buf.get_start_iter(), buf.get_end_iter())
+        m = re.search(escaped + r'\\[0-9abcdef]{12}-backup', text, re.I)
+        if m:
+            def open_bakdir():
+                gtklib.NativeFileManager(bakdir).run()
+            # backup bundle label & button
+            self.bubox = gtk.HBox()
+            self.vbox.pack_start(self.bubox, True, True, 2)
+            self.bulabel = gtk.Label(_('Saved at: %s') % m.group(0))
+            self.bubox.pack_start(self.bulabel, True, True, 8)
+            self.bulabel.set_alignment(0, 0.5)
+            self.bulabel.set_selectable(True)
+            self.bubtn = gtk.Button(_('Open...'))
+            self.bubox.pack_start(self.bubtn, False, False, 2)
+            self.bubtn.connect('clicked', lambda b: open_bakdir())
+            self.bubox.show_all()
 
 def run(ui, *pats, **opts):
     return StripDialog(None, *pats)

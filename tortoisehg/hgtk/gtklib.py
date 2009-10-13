@@ -366,6 +366,29 @@ class NativeFolderSelectDialog:
             return fname
         return None
 
+class NativeFileManager:
+    """
+    Wrapper for opening the specific file manager; Explorer on Windows,
+    Nautilus File Manager on Linux.
+    """
+    def __init__(self, path):
+        self.path = path
+
+    def run(self):
+        try:
+            import pywintypes
+            self.runExplorer()
+        except ImportError:
+            self.runNautilus()
+
+    def runExplorer(self):
+        import subprocess
+        subprocess.Popen('explorer "%s"' % self.path)
+
+    def runNautilus(self):
+        # TODO implement me!
+        pass
+
 def markup(text, **kargs):
     """
     A wrapper function for Pango Markup Language.
