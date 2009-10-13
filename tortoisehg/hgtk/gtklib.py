@@ -94,6 +94,8 @@ class StatusBar(gtk.HBox):
         self.pbox.set_child_visible(False)
         self.right2_label = gtk.Label()
         self.pack_end(self.right2_label, False, False, padding=5)
+        self.right3_label = gtk.Label()
+        self.pack_end(self.right3_label, False, False, padding=20)
         self.show_all()
 
     def _pulse_timer(self, now=False):
@@ -122,6 +124,9 @@ class StatusBar(gtk.HBox):
 
     def set_right2_text(self, msg):
         self.right2_label.set_text(str(msg))
+
+    def set_right3_text(self, msg):
+        self.right3_label.set_text(str(msg))
 
     def set_pulse_step(self, val):
         self.pbar.set_pulse_step(val)

@@ -73,11 +73,12 @@ class MQWidget(gtk.VBox):
                             str)) # patch name
     }
 
-    def __init__(self, repo, accelgroup=None, tooltips=None):
+    def __init__(self, repo, status_func, accelgroup=None, tooltips=None):
         gtk.VBox.__init__(self)
 
         self.repo = repo
         self.mqloaded = hasattr(repo, 'mq')
+        self.status_func = status_func
 
         try:
             extensions.find('qup')
@@ -259,6 +260,14 @@ class MQWidget(gtk.VBox):
 
         # update UI sensitives
         self.update_sensitives()
+
+        # report status
+        status_text = ''
+        if self.has_mq():
+            napp = len(self.repo.mq.applied)
+            nser = len(self.repo.mq.series)
+            status_text = _('%s of %s Patches applied') % (napp, nser)
+        self.status_func(status_text)
 
     def qgoto(self, patch):
         """
