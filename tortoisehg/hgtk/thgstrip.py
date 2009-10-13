@@ -87,8 +87,8 @@ class StripDialog(gtk.Dialog):
 
         ### preview status box
         self.pstatbox = gtk.HBox()
-        pbox.pack_start(self.pstatbox, True, True)
-        pbox.pack_start(gtk.HSeparator(), True, True, 2)
+        pbox.pack_start(self.pstatbox)
+        pbox.pack_start(gtk.HSeparator(), False, False, 2)
 
         #### status label
         self.pstatlbl = createlabel()
@@ -100,6 +100,7 @@ class StripDialog(gtk.Dialog):
         #### preview option
         self.compactopt = gtk.CheckButton(_('Use compact view'))
         self.pstatbox.pack_end(self.compactopt, False, False, 2)
+        self.compactopt.connect('toggled', self.compact_toggled)
 
         ### changeset view
         rview = gtk.ScrolledWindow()
@@ -110,6 +111,7 @@ class StripDialog(gtk.Dialog):
         self.resultbox = gtk.VBox()
         rview.add_with_viewport(self.resultbox)
         rview.child.set_shadow_type(gtk.SHADOW_NONE)
+        self.resultbox.set_border_width(4)
 
         ## options
         self.expander = gtk.Expander(_('Options:'))
@@ -165,7 +167,7 @@ class StripDialog(gtk.Dialog):
         self.notify_args = args
         self.notify_kargs = kargs
 
-    def preview(self, limit=True, queue=False):
+    def preview(self, limit=True, queue=False, force=False):
         def clear_preview():
             for child in self.resultbox.get_children():
                 self.resultbox.remove(child)
@@ -200,7 +202,7 @@ class StripDialog(gtk.Dialog):
             self.timeout_queue = []
             self.currev = None
             return
-        elif limit and self.currev == rev: # is already shown?
+        elif not force and limit and self.currev == rev: # is already shown?
             update_info(self.curnum)
             return
         elif queue: # queueing if need
@@ -226,12 +228,19 @@ class StripDialog(gtk.Dialog):
         self.curnum = numtotal = len(tostrip)
 
         LIM = 50
-        createinfo = csinfo.factory(style=csinfo.panelstyle(), repo=self.repo)
+        compactview = self.compactopt.get_active()
+        if compactview:
+            style = csinfo.labelstyle(contents=('%(revnum)s:', ' %(branch)s',
+                           ' %(tags)s', ' %(summary)s'))
+        else:
+            style = csinfo.panelstyle()
+        createinfo = csinfo.factory(style=style, repo=self.repo)
         def add_csinfo(revnum):
             info = createinfo(revnum)
             self.resultbox.pack_start(info, False, False, 2)
         def add_sep():
-            self.resultbox.pack_start(gtk.HSeparator())
+            if not compactview:
+                self.resultbox.pack_start(gtk.HSeparator(), False, False)
         def add_snip():
             snipbox = gtk.HBox()
             self.resultbox.pack_start(snipbox, False, False, 4)
@@ -299,6 +308,9 @@ class StripDialog(gtk.Dialog):
             self.butable.show_all()
         else:
             self.butable.hide()
+
+    def compact_toggled(self, checkbtn):
+        self.preview(force=True)
 
     def get_rev(self):
         """ Return integer revision number or None """
