@@ -4,13 +4,17 @@ Describe how to use hgfold to correct case-folding conflicts
 
 intro: cmenu reg files will be included in the installer
 
-update screenshots (intro.txt)
+update screenshots
 .. figure:: figures/cmenu-nofiles.jpg
 .. figure:: figures/init.png
 .. figure:: figures/share.png
 .. figure:: figures/clone.png
 .. {{images/image001.png}} (intro: overlay example)
 .. figure:: figures/synchronize.png (syncbar closeup)
-
-(common.txt)
 .. figure:: figures/hgcmd.jpg (show cmdwidget)
+.. figure:: figures/cmenu-files.jpg
+.. figure:: figures/overlayicons.png
+.. figure:: figures/taskbarui.jpg
+.. figure:: figures/rename.jpg
+.. figure:: figures/init.png
+.. figure:: figures/settings.png
