@@ -182,11 +182,16 @@ class GLog(gdialog.GDialog):
                 ] + bmenus),
 
             (_('_Synchronize'), [
-                dict(text=_('Incoming'), func=self.incoming_clicked),
-                dict(text=_('Pull'), func=self.pull_clicked),
-                dict(text=_('Outgoing'), func=self.outgoing_clicked),
-                dict(text=_('Push'), func=self.push_clicked),
-                dict(text=_('Email...'), func=self.email_clicked),
+                dict(text=_('Incoming'), name='incoming',
+                    func=self.incoming_clicked),
+                dict(text=_('Pull'), name='pull',
+                    func=self.pull_clicked),
+                dict(text=_('Outgoing'), name='outgoing',
+                    func=self.outgoing_clicked),
+                dict(text=_('Push'), name='push',
+                    func=self.push_clicked),
+                dict(text=_('Email...'), name='email',
+                    func=self.email_clicked),
                 dict(text='----'),
                 dict(text=_('Add Bundle...'), name='add-bundle',
                     sensitive=not bool(self.bfile),
@@ -1080,6 +1085,9 @@ class GLog(gdialog.GDialog):
         self.cmd_set_sensitive('add-bundle', True)
         for w in self.incoming_disabled:
             w.set_sensitive(True)
+        for cmd in ('incoming', 'outgoing', 'push', 'pull', 'email'):
+            self.cmd_set_sensitive(cmd, True)
+
 
     def reject_clicked(self, button):
         self.remove_overlay(False)
@@ -1144,6 +1152,9 @@ class GLog(gdialog.GDialog):
         self.cmd_set_sensitive('accept', True)
         self.cmd_set_sensitive('reject', True)
         self.cmd_set_sensitive('add-bundle', False)
+
+        for cmd in ('incoming', 'outgoing', 'push', 'pull', 'email'):
+            self.cmd_set_sensitive(cmd, False)
 
         self.incoming_disabled = []
         for cmd in ('refresh', 'synchronize', 'mq'):
