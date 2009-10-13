@@ -21,13 +21,12 @@ repository, and then *unshelve* them back at a later time.
 
 Walking across the toolbar buttons:
 
-	:guilabel:`Refresh`
-		Reload the state of the working directory. It tries to retain
-		check and selection state across refresh.
 	:guilabel:`Shelve` 
 		Shelve selected diffs in checked files.
 	:guilabel:`Unshelve`
 		Replace the shelved changes back into the working directory.
+	:guilabel:`Diff`
+		Visual diff checked files
 	:guilabel:`Revert`
 		Revert checked files to last revisioned state.  If merging, it
 		allows you to select the revert parent.
@@ -39,6 +38,11 @@ Walking across the toolbar buttons:
 	:guilabel:`Remove`
 		Delete checked unversioned files and/or remove (mark as deleted) any
 		versioned files.
+	:guilabel:`Forget`
+		Forget checked versioned files
+	:guilabel:`Refresh`
+		Reload the state of the working directory. It tries to retain
+		check and selection state across refresh.
 
 The file list has four columns:
 
@@ -126,6 +130,16 @@ The attic extension is a super-set of the shelve feature. In particular,
 attic allows you to have several named *shelves* which can be saved and
 restored independently.
 
+Tabs
+----
+
+The shelve tool has four tabs
+1) Text Diff - shows diff of currently selected file
+2) Hunk Selection - allows diff hunks of current file to be skipped
+3) Commit Preview (TODO) - displays all selected changes, this previews
+   the changes that will be stored in the shelve and removed from the
+   working directory.
+4) Shelf Contents - the current contents of the shelf.
 
 Keyboard navigation
 -------------------
