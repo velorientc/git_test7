@@ -606,10 +606,13 @@ class GLog(gdialog.GDialog):
         if self.no_merges:
             graphcol = False
 
+        filterprefix = _('Filter') 
+        filtertext = filterprefix + ': '
         if self.filter == 'branch':
             branch = opts.get('branch', None)
             self.graphview.refresh(graphcol, None, opts)
             ftitle(_('%s branch') % branch)
+            filtertext += _("Branch '%s'") % branch
         elif self.filter == 'custom':
             npats = hglib.normpats(pats)
             if len(npats) == 1:
@@ -621,19 +624,23 @@ class GLog(gdialog.GDialog):
             if not opts.get('filehist'):
                 ftitle(_('custom filter'))
                 self.graphview.refresh(False, npats, opts)
+            filtertext += self.filtercombo.get_active_text()
         elif self.filter == 'all':
             ftitle(None)
             self.graphview.refresh(graphcol, None, opts)
+            filtertext = ''
         elif self.filter == 'only_merges':
             ftitle(_('merges'))
             opts['only_merges'] = True
             self.graphview.refresh(False, [], opts)
+            filtertext += _('only Merges')
         elif self.filter == 'ancestry':
             ftitle(_('revision ancestry'))
             range = [self.currevid, 0]
             opts['noheads'] = True
             opts['revrange'] = range
             self.graphview.refresh(graphcol, None, opts)
+            filtertext += _("Ancestry of %s") % self.currevid
         elif self.filter == 'tagged':
             ftitle(_('tagged revisions'))
             tagged = []
@@ -643,16 +650,28 @@ class GLog(gdialog.GDialog):
                     tagged.insert(0, hr)
             opts['revlist'] = tagged
             self.graphview.refresh(False, [], opts)
+            filtertext += _("Tagged Revisions")
         elif self.filter == 'parents':
             ftitle(_('working parents'))
             repo_parents = [x.rev() for x in self.repo.parents()]
             opts['revlist'] = [str(x) for x in repo_parents]
             self.graphview.refresh(False, [], opts)
+            filtertext += _("Parents")
         elif self.filter == 'heads':
             ftitle(_('heads'))
             heads = [self.repo[x].rev() for x in self.repo.heads()]
             opts['revlist'] = [str(x) for x in heads]
             self.graphview.refresh(False, [], opts)
+            filtertext += _("Heads")
+
+        nomergestext = _('no Merges')
+        if self.no_merges:
+            if filtertext:
+                filtertext += ', %s' % nomergestext
+            else:
+                filtertext = '%s: %s' % (filterprefix, nomergestext)
+
+        self.stbar.set_right2_text(filtertext)
 
         # refresh MQ widget if exists
         if hasattr(self, 'mqwidget'):
