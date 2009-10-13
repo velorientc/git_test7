@@ -88,6 +88,8 @@ class StatusBar(gtk.HBox):
         self.pack_start(self.sttext, padding=4)
         if extra:
             self.pack_end(extra, False, False)
+        self.right1_label = gtk.Label()
+        self.pack_end(self.right1_label, False, False, padding=20)
         self.pack_end(self.pbox, False, False, padding=1)
         self.pbox.set_child_visible(False)
         self.show_all()
@@ -112,6 +114,9 @@ class StatusBar(gtk.HBox):
 
     def set_status_text(self, msg):
         self.sttext.set_text(str(msg))
+
+    def set_right1_text(self, msg):
+        self.right1_label.set_text(str(msg))
 
     def set_pulse_step(self, val):
         self.pbar.set_pulse_step(val)
