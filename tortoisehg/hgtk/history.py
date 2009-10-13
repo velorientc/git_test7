@@ -805,11 +805,10 @@ class GLog(gdialog.GDialog):
         self.limit = self.get_graphlimit(None)
 
         # Allocate TreeView instance to use internally
+        limit = self.limit
         if self.opts['limit']:
-            firstlimit = self.get_graphlimit(self.opts['limit'])
-            self.graphview = LogTreeView(self.repo, firstlimit, self.stbar)
-        else:
-            self.graphview = LogTreeView(self.repo, self.limit, self.stbar)
+            limit = self.get_graphlimit(self.opts['limit'])
+        self.graphview = LogTreeView(self.repo, limit, self.stbar)
 
         # Allocate ChangeSet instance to use internally
         self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
