@@ -142,11 +142,6 @@ Commit
 :guilabel:`Username:`
 	Name associated with commits.
 
-:guilabel:`External Commit Tool:`
-	Select commit tool launched by TortoiseHg. (Qct is no longer
-	distributed as part of TortoiseHg).
-	Default: None (use the builtin tool). [DEPRECATED]
-
 :guilabel:`Summary Line Length:`
 	Maximum length of the commit message summary line.
 	If set, TortoiseHg will issue a warning if the
