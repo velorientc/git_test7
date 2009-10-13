@@ -98,7 +98,9 @@ class ChangesetWidget(object):
             elif item == 'date':
                 return hglib.displaytime(ctx.date())
             elif item == 'branch':
-                return hglib.toutf(ctx.branch())
+                if ctx.node() in self.repo.branchtags().values():
+                    return hglib.toutf(ctx.branch())
+                return None
             elif item == 'tags':
                 value = hglib.toutf(', '.join(ctx.tags()))
                 if len(value) == 0:
