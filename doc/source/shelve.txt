@@ -62,6 +62,17 @@ various classes of files {modified, added, removed, deleted, unknown,
 clean, ignored}.  These check boxes will be disabled if the commit tool
 was given a specific set of files and/or directories.
 
+Tabs
+----
+
+The shelve tool has four tabs
+1) Text Diff - shows diff of currently selected file
+2) Hunk Selection - allows diff hunks of current file to be skipped
+3) Shelf Preview - displays all selected changes. This previews
+   the changes that will be removed from the working directory and
+   stored in the shelf.
+4) Shelf Contents - the current contents of the shelf.
+
 
 Shelving Changes
 ----------------
@@ -129,17 +140,6 @@ How is this different from attic?
 The attic extension is a super-set of the shelve feature. In particular,
 attic allows you to have several named *shelves* which can be saved and
 restored independently.
-
-Tabs
-----
-
-The shelve tool has four tabs
-1) Text Diff - shows diff of currently selected file
-2) Hunk Selection - allows diff hunks of current file to be skipped
-3) Shelf Preview - displays all selected changes, this previews
-   the changes that will be stored in the shelve and removed from the
-   working directory.
-4) Shelf Contents - the current contents of the shelf.
 
 Keyboard navigation
 -------------------
