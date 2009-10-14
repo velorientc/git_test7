@@ -244,15 +244,15 @@ Keyboard navigation
 -------------------
 
 :kbd:`Ctrl-Enter`
-	will trigger the commit
+	Trigger the commit
 :kbd:`Ctrl-C`
-	In the diff panel will copy the currently highlighted (not selected,
-	but highlighted) diff hunks to the clipboard. These can be pasted
-	into a text buffer to generate any arbitrary patch based from the
-	changes in your working directory.
+	When pressed in the diff panel, ctrl-c will copy the currently
+	highlighted (repeat highlighted, not selected) diff hunks to the
+	clipboard. These can be pasted into a text buffer to generate any
+	arbitrary patch based from the changes in your working directory.
 :kbd:`Alt-Q`
 	Reflow the paragraph currently under the cursor.  You must configure
-	a message format policy for this key to work.
+	a message format policy for this key combination to work.
 
 The code which copies the hunks to the clipboard is intelligent about
 diff headers.  The clipboard contents will always be a valid patch.
@@ -261,12 +261,8 @@ diff headers.  The clipboard contents will always be a valid patch.
 File Context Menus
 ------------------
 
-By right clicking on a file in the file list, you will get a context
+When right clicking on files in the file list, you will get a context
 menu of commands that are applicable to the selected files.
-
-If you have configured a visual editor (in
-:menuselection:`Global Settings --> TortoiseHg --> Visual Editor`)
-this includes an option to open the file in your editor.
 
 For unknown **?** files, the context menu will allow you to detect
 renames (if you think the unknown file is a copy or rename of a
