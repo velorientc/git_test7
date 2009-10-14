@@ -80,14 +80,14 @@ class MergeDialog(gtk.Dialog):
             return gtklib.markup(_('Not a head revision!'), weight='bold')
         custom = csinfo.custom(ishead={
                         'data': data_func, 'markup': markup_func})
-        createinfo = csinfo.factory(style=style, repo=repo, custom=custom)
+        factory = csinfo.factory(repo, custom, style)
 
-        info = createinfo(rev1, style={'label': _('Merge target (other)')})
+        info = factory(rev1, style={'label': _('Merge target (other)')})
         self.vbox.pack_start(info, False, False)
         self.otherframe = info
         self.otherrev = info.get_data('revnum')
 
-        info = createinfo(rev0, style={'label': _('Current revision (local)')})
+        info = factory(rev0, style={'label': _('Current revision (local)')})
         self.vbox.pack_start(info, False, False)
         self.localframe = info
         self.localrev = '???'

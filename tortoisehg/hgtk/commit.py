@@ -390,8 +390,9 @@ class GCommit(GStatus):
             return gtklib.markup(text, weight='bold')
         custom = csinfo.custom(athead={
                         'data': data_func, 'markup': markup_func})
+        factory = csinfo.factory(self.repo, custom, style)
         def add_parent():
-            label = csinfo.create('tip', style, self.repo, custom)
+            label = factory()
             parents_vbox.pack_start(label, False, False)
             return label
         self.parent1_label = add_parent()

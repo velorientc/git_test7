@@ -84,20 +84,20 @@ class UpdateDialog(gtk.Dialog):
         ## changeset summaries
         style = csinfo.labelstyle(contents=('%(rev)s', ' %(branch)s',
                        ' %(tags)s', '\n%(summary)s'), selectable=True, width=350)
-        createinfo = csinfo.factory(style=style, repo=repo)
+        factory = csinfo.factory(repo, style=style)
 
         ## summary of target revision
-        self.target_label = createinfo('tip')
+        self.target_label = factory()
         table.add_row(_('Target:'), self.target_label)
 
         ## summary of parent 1 revision
-        self.parent1_label = createinfo('tip')
+        self.parent1_label = factory()
 
         ## summary of parent 2 revision if needs
         self.ctxs = repo[None].parents()
         if len(self.ctxs) == 2:
             table.add_row(_('Parent 1:'), self.parent1_label)
-            self.parent2_label = createinfo('tip')
+            self.parent2_label = factory()
             table.add_row(_('Parent 2:'), self.parent2_label)
         else:
             table.add_row(_('Parent:'), self.parent1_label)

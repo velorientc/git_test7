@@ -126,6 +126,12 @@ class StripDialog(gtk.Dialog):
         self.revcombo.connect('changed', lambda c: self.preview(queue=True))
         self.allbtn.connect('clicked', lambda b: self.preview(limit=False))
 
+        # csetinfo factory
+        self.factory = csinfo.factory(repo, widgetcache=True)
+        self.lstyle = csinfo.labelstyle(contents=('%(revnum)s:',
+                             ' %(branch)s', ' %(tags)s', ' %(summary)s'))
+        self.pstyle = csinfo.panelstyle()
+
         # prepare to show
         self.preview()
         self.stripbtn.grab_focus()
@@ -169,8 +175,7 @@ class StripDialog(gtk.Dialog):
 
     def preview(self, limit=True, queue=False, force=False):
         def clear_preview():
-            for child in self.resultbox.get_children():
-                self.resultbox.remove(child)
+            self.resultbox.foreach(lambda c: c.parent.remove(c))
         def update_info(num=None):
             if num is None:
                 info = '<span weight="bold" foreground="#880000">%s</span>' \
@@ -227,16 +232,13 @@ class StripDialog(gtk.Dialog):
                 tostrip.append(r)
         self.curnum = numtotal = len(tostrip)
 
-        LIM = 50
+        LIM = 100
         compactview = self.compactopt.get_active()
-        if compactview:
-            style = csinfo.labelstyle(contents=('%(revnum)s:', ' %(branch)s',
-                           ' %(tags)s', ' %(summary)s'))
-        else:
-            style = csinfo.panelstyle()
-        createinfo = csinfo.factory(style=style, repo=self.repo)
+        style = compactview and self.lstyle or self.pstyle
         def add_csinfo(revnum):
-            info = createinfo(revnum)
+            info = self.factory(revnum, style)
+            if info.parent:
+                info.parent.remove(info)
             self.resultbox.pack_start(info, False, False, 2)
         def add_sep():
             if not compactview:

@@ -55,7 +55,7 @@ class BackoutDialog(gtk.Dialog):
         # changeset info
         style = csinfo.panelstyle(label=_('Changeset Description'),
                                   margin=4, padding=2)
-        self.csetframe = csinfo.create(rev, style, repo)
+        self.csetframe = csinfo.create(repo, rev, style)
         self.vbox.pack_start(self.csetframe, False, False, 2)
 
         # backout commit message
