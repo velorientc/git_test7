@@ -411,7 +411,7 @@ Diff
 
 
 Keyboard navigation
--------------------
+===================
 
 :kbd:`Ctrl-Enter`
 	Apply changes and close the tool, the equivalent of pressing the
