@@ -512,6 +512,10 @@ class LayoutTable(gtk.VBox):
             return self.headers[0]
         return None
 
+    def clear_rows(self):
+        for child in self.table.get_children():
+            self.table.remove(child)
+
     def add_row(self, *widgets, **kargs):
         """
         Append a new row to the table.
