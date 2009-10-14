@@ -264,9 +264,10 @@ class MQWidget(gtk.VBox):
         # report status
         status_text = ''
         if self.has_mq():
-            napp = len(self.repo.mq.applied)
             nser = len(self.repo.mq.series)
-            status_text = _('%s of %s Patches applied') % (napp, nser)
+            if nser:
+                napp = len(self.repo.mq.applied)
+                status_text = _('%s of %s Patches applied') % (napp, nser)
         self.status_func(status_text)
 
     def qgoto(self, patch):
