@@ -10,12 +10,14 @@ Commit
 	proper configuration. See
 	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
    
-The commit tool is an important part of TortoiseHg.  It is, in fact, the
-only component that defaults to the top level shell context menu.  This
-is mainly because it is the most heavily used tool. Not only can you
-commit your changes, but you can examine the state of your working
-directory and perform most routine maintenance tasks (add new files,
-record renames, manage the repository ignore filter, etc).
+The commit tool is one of the main two applications of TortoiseHg.
+Together with the Repository Explorer (aka, the changelog tool) these
+two tools can perform or access nearly every function that TortoiseHg
+supports.
+
+Not only can the commit tool commit your changes, but it can examine the
+state of your working directory and perform most routine maintenance
+tasks (add new files, record renames, manage the ignore filter, etc).
 
 .. figure:: figures/commit.png
 	:alt: Commit dialog
@@ -25,17 +27,29 @@ record renames, manage the repository ignore filter, etc).
 Features
 --------
 
-Walking across the toolbar buttons:
+At the top of the commit tool is a menu bar, newly introduced in version 0.9.
 
-	:guilabel:`Refresh`
-		Reload the state of the working directory. It tries to retain
-		check and selection state across refresh.
+	:guilabel:`Tools`
+		Launch common TortoiseHg tools in separate processes
+	:guilabel:`View`
+		Toggle the display of optional features, or refresh the working
+		directory contents.
+	:guilabel:`Operations`
+		These menu items correspond to the toolbar buttons.
+	:guilabel:`Help`
+		Open a web browser to this web page, or launch TortoiseHg About
+		dialog.
+
+Enumerating the toolbar buttons:
+
 	:guilabel:`Commit`
 		Commit selected diffs in checked files.
 	:guilabel:`Undo`
 		Undo (rollback) last immediate commit. Your commit message will be
-		available in the message history, so you can re-do the commit after
-		fixing whatever problem you noticed.
+		available in the message history, so you can easily repeat the
+		commit if necessary.
+	:guilabel:`Diff`
+		Visual diff checked files.
 	:guilabel:`Revert`
 		Revert checked files to last revisioned state.  If merging, it
 		allows you to select the revert parent.
@@ -47,6 +61,11 @@ Walking across the toolbar buttons:
 	:guilabel:`Remove`
 		Delete checked unversioned files and/or remove (mark as deleted) any
 		versioned files.
+	:guilabel:`Forget`
+		Forget checked versioned files.
+	:guilabel:`Refresh`
+		Reload the state of the working directory. It tries to retain
+		check and selection state across refresh.
 
 Below the toolbar are useful widgets:
 
@@ -79,10 +98,16 @@ The file list has four columns:
 	   merge section below.
 	4) The canonical path of the file (relative to the repository root)
 
-Below the file list are checkboxes that toggle the display of the
-various classes of files {modified, added, removed, deleted, unknown,
-clean, ignored}.  These check boxes will be disabled if the commit tool
-was given a specific set of files and/or directories.
+.. note::
+	If the commit tool was started with a file pattern or selection, a
+	button will appear at the bottom of the file list that can clear the
+	file pattern and give you an unfiltered view of the entire working
+	directory.
+
+Below the file list, inside an expander, are checkboxes that toggle the
+display of the various classes of files {modified, added, removed,
+deleted, unknown, clean, ignored}.  These check boxes will be disabled
+if the commit tool was started with a file pattern or selection.
 
 *Removed* means a revisioned file has been marked as removed. *Deleted*
 means a revisioned file is missing but Mercurial has not been told to
@@ -105,19 +130,63 @@ option open the ignore pattern tool.
 *Ignored* files are untracked files that match a configured ignore
 pattern.  Neither of those file types are shown by default, unless a the
 user includes such a file in a selection (explorer) or provides the file
-on the command line.
+name on the command line.
 
+To the right of the file list is the diff pane.  New in release 0.9, the
+diff pane is now tabbed.
+
+	:guilabel:`Text Diff`
+		Shows the textual diffs in the currently selected file.
+	:guilabel:`Hunk Selection`
+		In releases 0.7 through 0.8, this tab was the only content shown
+		to the user.  The diffs in this tab can be toggled per "hunk",
+		allowing the user to cherry pick changes to be included in the
+		commit.  As in 0.8, this tab only shows diff hunks for the
+		currently selected file.  This tab cannot show binary diffs or
+		renames.  That data can only be seen in the Text Diff tab.
+	:guilabel:`Commit Preview`
+		This tab previews all of the selected hunks in every checked
+		file, essentially a preview of what will be committed when you
+		press the commit button.
+	:guilabel:`Patch Contents`
+		Only visible when the commit tool is in QRefresh mode.  It
+		displays the current contents of the patch being refreshed.
+
+Below both the file list and diff pane is a narrow *Parents Bar*.  This
+bar shows you the current working directory parent(s), and gives you
+some warnings if a commit would introduce a new head.  The parents bar
+can be hidden by an option in the :guilabel:`View` menu.
+
+If the :guilabel:`Advanced Bar` is enabled in the :guilabel:`View` menu,
+a bar is inserted between the toolbar and the message history bar.  The
+*advanced bar* contains:
+
+	:guilabel:`Committer`
+		The username to use for this commit.  This value is usually read
+		from your Mercurial.ini file, but it can be specified on the
+		hgtk command line or read from a patch file.  Lastly, the user
+		could manually specify a different username here.
+	:guilabel:`Auto-includes`
+		A text entry that allows the user to modify the comma separated
+		list of files that are always included in the commit list,
+		regardless of whether they have been checked.  This is intended
+		for use in repositories that have pre-commit hooks that modify
+		certain files (say a changelog).
+	:guilabel:`Push after commit`
+		A toggle button that determines whether TortoiseHg will attempt
+		to push outgoing changes to your default push target after each
+		successful commit.
 
 Change Selection
 ----------------
 
-So what does it mean when we say the commit button will commit the
-selected diffs in checked files? Simple, the native TortoiseHg commit
-tool supports change selection intrinsically in the diff browser. This
-means that all of the changes you make to versioned files can be
-individually selected to be included in the commit or left out of the
-commit (but left in the working directory).  Fans of darcs or
-Mercurial's record extension will recognize this immediately.
+So what does the phrase 'commit the selected diffs in checked files'
+mean?  Simple, the TortoiseHg commit tool supports change selection
+intrinsically in the diff browser. This means that all of the changes
+you make to versioned files can be individually selected to be included
+in the commit or left out of the commit (but left in the working
+directory).  Fans of darcs or Mercurial's record extension will
+recognize this feature immediately.
 
 When is this necessary?
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -131,19 +200,20 @@ that is when this change selection feature becomes indispensable.
 How does it work?
 ^^^^^^^^^^^^^^^^^
 
-By double-clicking on individual change hunks in the diff panel.
-*Technically, any action which activates a change hunk row will toggle
-it's selection status. The spacebar will also work.* When a hunk is
-unselected, the syntax highlighting of the diff is disabled and the
-background is turned gray.  At the same time, the file's diff header is
-updated to show the current selection state, the selected hunk count and
-changed lines will be updated. Toggle the hunk a second time to reselect
-it for inclusion in your commit.
+By double-clicking on individual change hunks in the
+:guilabel:`Hunk Selection` tab of the diff panel.  *Technically, any
+action which activates a change hunk row will toggle it's selection
+status. The spacebar will also work.* When a hunk is unselected, the
+syntax highlighting of the diff is disabled and the background is turned
+gray.  At the same time, the file's diff header is updated to show the
+current selection state, the selected hunk count and changed lines will
+be updated. Toggle the hunk a second time to reselect it for inclusion
+in your commit.
 
 When a file is partially selected for commit, it's icon is changed from
 a checkbox to a radio button. At a glance at the file list, you should
 be able to find which files are entirely included in the commit,
-partially included, or excluded entirely.
+partially included, or entirely excluded.
 
 What happens at commit time?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -165,7 +235,8 @@ This longer answer is only interesting when something goes wrong, which
 on Windows unfortunately has a probability greater than 0. If some
 program (virus checker, compiler) locks your file in the middle of this
 process you may see an error about a failed patch.  These errors are
-recoverable.  Delete any new :file:`.rej` files and try the commit again.
+recoverable.  Delete any new :file:`.rej` files left in your repository
+and retry the commit.
 
 
 
@@ -191,9 +262,7 @@ File Context Menus
 ------------------
 
 By right clicking on a file in the file list, you will get a context
-menu of commands that are applicable to the selected file.  If multiple
-files are selected, the context menu only applies to the first selected
-file.
+menu of commands that are applicable to the selected files.
 
 If you have configured a visual editor (in
 :menuselection:`Global Settings --> TortoiseHg --> Visual Editor`)
@@ -219,11 +288,14 @@ directory after a merge.
 The merge state *ms* column is especially useful in this mode.  Files
 that are marked with *R* are files where Mercurial and/or the user have
 successfully merged (resolved) changes from both branches. Files that
-are marked with *U* have unresolved changes. You can use the *resolve*
-context menu option to restart the merge for that file, or you can use
-the *edit* context menu option to resolve the conflict by hand. When the
-conflict has been resolved, you use the *mark resolved* context menu
-option, which changes the file's merge state to *R*.
+are marked with *U* have unresolved changes. You can use the *Restart
+Merge* context menu option to restart the merge for that file, or you
+can use the *edit* context menu option to resolve the conflict by hand.
+The *Restart Merge* menu option allows you to select the merge tool to
+use to perform the merge, or even to pick one version or the other
+unconditionally (internal:local, internal:other).  When the conflict has
+been resolved, you must use the *mark resolved* context menu option to
+change the file's merge state to *R*.
 
 Mercurial will not allow you to commit a merge if any files have
 unresolved *U* merge states.
@@ -238,7 +310,7 @@ performing a clean update of the first parent.  The merge tool has an
 has a :guilabel:`Clean` button that does the same thing.
 
 Once you have your working directory back at one parent revision, you
-may start the merge process again.
+may restart the merge process.
 
 
 Commit Message Pane
@@ -272,61 +344,49 @@ MQ patches
 ----------
 
 Many advanced Mercurial users use the MQ extension to manage a patch
-queue. TortoiseHg does not offer much in the way of support for MQ, but
-the commit tool will at least recognize when a patch is applied. When a
-patch is applied, the usual commit command will not work, so the commit
-tool enters *patch refresh* mode. The title bar will say "refreshing
-patch *patchname*" and the patch comment will appear in the commit
-message pane.
+queue.  The commit tool will recognize when a patch is applied and enter
+*patch refresh* mode. The title bar will say "refreshing patch
+*patchname*" and the patch comment will appear in the commit message
+pane.
 
-The commit tool will present the entire contents of the top patch
-including any changes that are in your working directory (un-refreshed
-changes). This is essentially what the qdiff command would show you.
-There is, in fact, no way to get just the working copy diffs beyond
-running :command:`hg diff` on the command line. The reason the dialog
-operates in this mode is that it allow you to use the integrated change
-selection features to move changes into or out of the top patch. You can
-move entire files or single changes in or out of the patch.
+A new 'Patch Contents' tab will appear in the diff pane with the full
+contents of the top patch.  The Text Diff and Hunk Selection tabs will
+show the combined diff of the patch and working directory changes so
+that you can move changes into or out of the patch during the qrefresh.
+
+This is essentially what the qdiff command would show you.  There is, in
+fact, no way to get just the working copy diffs beyond running
+:command:`hg diff` on the command line or typing a name into the QNew
+entry which toggles the dialog into QNew mode (more below).
 
 The :guilabel:`Commit` button, which has been renamed :guilabel:`QRefresh`
-in this context, it will refresh the top patch with just the changes you
-have selected (including the patch description). This may be a bit
+in this context, will refresh the top patch with the changes you
+have selected, including the patch description. This may be a bit
 confusing at first because the changes you leave out of the patch are
-still going to be in the working directory after the refresh, so it will
-look like nothing has changed.
-
-So, in summary, using MQ with TortoiseHg is still almost entirely a
-command line operation, but you can use :command:`hgtk ci` to refresh your
-patches and take advantage of our excellent change selection support.
+still going to be in the working directory after the refresh, so unless
+you look at the patch contents it will not seem as if anything changed.
 
 QNew Mode
 ---------
 
-Newly added in 0.8, the commit tool can be used to create a new patch
-for your patch queue.  If you have the MQ extension enabled, a text
-entry will be inserted between the branch maintenance button and the
-message history drop-down box.  If you enter a filename in this entry
-the commit tool will switch out of *commit* or *qrefresh* mode into
-*qnew* mode.  In *qnew* mode, the commit tool shows only working
-directory modifications (the changes that would typically get added to a
-new patch by :command:`hg qnew -f`).  The :guilabel:`Commit` button will
-change into a :guilabel:`QNew` button as well, to make the mode switch
-more obvious.
+The commit tool can be used to create a new patch for your patch queue.
+If you have the MQ extension enabled, a text entry will be inserted
+between the branch maintenance button and the message history drop-down
+box.  If you enter a filename in this entry the commit tool will switch
+out of *commit* or *qrefresh* mode into *qnew* mode.  In *qnew* mode,
+the commit tool shows only working directory modifications (the changes
+that would typically get added to a new patch by :command:`hg qnew -f`).
+The :guilabel:`Commit` button will change into a :guilabel:`QNew` button
+as well, to make the mode switch more obvious.
 
 When the :guilabel:`QNew` button is pressed, the selected change hunks
 are written into a new patch (given the filename you specified), and the
-dialog is refreshed.  At refresh, the commit tool will obviously switch
-to *qrefresh* mode since there will now be at least one applied patch.
+dialog is refreshed.  After this refresh, the commit tool will obviously
+switch to *qrefresh* mode since there will now be at least one applied
+patch.
 
 You may give the new patch a commit message at the initial *qnew* event,
-or you can do it now by using the *qrefresh* feature.
-
-If you left change hunks out of the new patch, they will appear to be in
-the new patch anyway because of the way *qrefresh* mode shows the sum of
-both the top patch and the working directory changes.  If you enter a
-new patch name again, and switch the commit tool into *qnew* mode again,
-you will see the changes that you left in the working directory.
-
+or you can do it afterwords while in *qrefresh* mode.
 
 Configurables
 -------------
@@ -337,6 +397,19 @@ Configurables
 	Configures a 'policy' limit for summary lines
 :menuselection:`Commit --> Message Line Length`
 	Configures a 'policy' limit for message lines
+
+And three other features for *advanced* users.
+
+:menuselection:`Commit --> Push After Commit`:
+	When set to True, the commit tool will check the *push after
+	commit* toggle button on startup.
+:menuselection:`Commit --> Auto Commit List`:
+	Comma separated list of files that are automatically included in
+	every commit.  Intended for use only as a repository setting.
+:menuselection:`Commit --> Auto Exclude List`:
+	Comma separated list of files that are automatically unchecked
+	when the status, commit, and shelve tools are opened.
+
 :menuselection:`TortoiseHg --> Bottom Diffs`
 	Toggles diff pane from left to below file list
 :menuselection:`TortoiseHg --> Max Diff Size`
