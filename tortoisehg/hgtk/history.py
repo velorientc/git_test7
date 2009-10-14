@@ -1102,12 +1102,10 @@ class GLog(gdialog.GDialog):
         self.toolbar.remove(self.toolbar.get_nth_item(0))
         self.cmd_set_sensitive('accept', False)
         self.cmd_set_sensitive('reject', False)
-        self.cmd_set_sensitive('add-bundle', True)
         for w in self.incoming_disabled:
             w.set_sensitive(True)
-        for cmd in ('incoming', 'outgoing', 'push', 'pull', 'email'):
+        for cmd in self.incoming_disabled_cmds:
             self.cmd_set_sensitive(cmd, True)
-
 
     def reject_clicked(self, button):
         self.remove_overlay(False)
@@ -1171,20 +1169,15 @@ class GLog(gdialog.GDialog):
         
         self.cmd_set_sensitive('accept', True)
         self.cmd_set_sensitive('reject', True)
-        self.cmd_set_sensitive('add-bundle', False)
 
-        for cmd in ('incoming', 'outgoing', 'push', 'pull', 'email'):
+        cmds = ('incoming', 'outgoing', 'push', 'pull', 'email', 'refresh', 
+            'synchronize', 'mq', 'add-bundle')
+        self.incoming_disabled_cmds = []
+        for cmd in cmds:
             self.cmd_set_sensitive(cmd, False)
+            self.incoming_disabled_cmds.append(cmd)
 
         self.incoming_disabled = []
-        for cmd in ('refresh', 'synchronize', 'mq'):
-            try:
-                tb = self.get_toolbutton(cmd)
-                if tb:
-                    tb.set_sensitive(False)
-                    self.incoming_disabled.append(tb)
-            except KeyError:
-                pass
         def disable_child(w):
             if w != self.ppullcombo and w.get_property('sensitive'):
                 w.set_sensitive(False)
