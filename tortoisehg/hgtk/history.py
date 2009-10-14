@@ -158,6 +158,10 @@ class GLog(gdialog.GDialog):
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
             ] + mq_item + [
             dict(text='----'),
+            dict(text=_('Other Parent'), name='other-parent', 
+                ascheck=True, check=False,  sensitive=False,
+                func=self.parent_toggled),
+            dict(text='----'),
             dict(text=_('Choose Details...'), func=self.details_clicked),
             dict(text='----'),
             dict(text=_('Refresh'), func=refresh, args=[False],
@@ -208,6 +212,9 @@ class GLog(gdialog.GDialog):
                 dict(text=_('Force push'), ascheck=True, func=toggle_force),
                 ])
             ]
+
+    def parent_toggled(self, item):
+        pass
 
     def synch_clicked(self, toolbutton, data):
         def sync_closed(dialog):
