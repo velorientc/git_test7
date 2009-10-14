@@ -27,6 +27,7 @@ class ChangeSet(gdialog.GDialog):
         self.stbar = stbar
         self.glog_parent = None
         self.bfile = None
+        self.nothing_loaded = True
 
     def get_title(self):
         title = _('%s changeset ') % self.get_reponame()
@@ -41,24 +42,15 @@ class ChangeSet(gdialog.GDialog):
         return 'menushowchanged.ico'
 
     def get_tbbuttons(self):
-        self.parent_toggle = gtk.ToggleToolButton(gtk.STOCK_UNDO)
-        self.parent_toggle.set_use_underline(True)
-        self.parent_toggle.set_label(_('_Other Parent'))
-        self.parent_toggle.set_tooltip(self.tooltips, _('diff other parent'))
-        self.parent_toggle.set_sensitive(False)
-        self.parent_toggle.set_active(False)
-        self.parent_toggle.connect('toggled', self.parent_toggled)
-        return [self.parent_toggle]
+        return []
 
     def parent_toggled(self, button):
-        self.glog_parent.cmd_set_active(
-            'other-parent', self.parent_toggle.get_active())
         self.load_details(self.currev)
 
     def prepare_display(self):
         self.currow = None
         self.graphview = None
-        self.glog_parent = None
+        self.glog_parent = NoneY
         node0, node1 = cmdutil.revpair(self.repo, self.opts.get('rev'))
         self.load_details(self.repo.changelog.rev(node0))
 
@@ -81,28 +73,33 @@ class ChangeSet(gdialog.GDialog):
         if not ctx:
             return
 
+        if self.nothing_loaded:
+            self.other_parent_box.pack_start(
+                self.other_parent_checkbutton, False, False)
+            self.nothing_loaded = False
+
         parents = ctx.parents()
         title = self.get_title()
         if len(parents) == 2:
-            self.parent_toggle.set_sensitive(True)
-            if self.parent_toggle.get_active():
+            self.other_parent_box.show_all()
+            if self.other_parent_checkbutton.get_active():
                 title += ':' + str(parents[1].rev())
             else:
                 title += ':' + str(parents[0].rev())
         else:
-            self.parent_toggle.set_sensitive(False)
-            if self.parent_toggle.get_active():
+            self.other_parent_box.hide_all()
+            if self.other_parent_checkbutton.get_active():
                 # Parent button must be pushed out, but this
                 # will cause load_details to be called again
                 # so we exit out to prevent recursion.
-                self.parent_toggle.set_active(False)
+                self.other_parent_checkbutton.set_active(False)
                 return
 
         if self.clipboard:
             self.clipboard.set_text(str(ctx))
 
         self.set_title(title)
-        if self.parent_toggle.get_active():
+        if self.other_parent_checkbutton.get_active():
             parent = parents[1].node()
         elif parents:
             parent = parents[0].node()
@@ -271,7 +268,7 @@ class ChangeSet(gdialog.GDialog):
 
         ismerge = (len(ctx.parents()) == 2)
 
-        if ismerge and self.parent_toggle.get_active():
+        if ismerge and self.other_parent_checkbutton.get_active():
             parentindex = 1 
         else:
             parentindex = 0
@@ -579,7 +576,17 @@ class ChangeSet(gdialog.GDialog):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(filelist_tree)
-        list_frame.add(scroller)
+        flbox = gtk.VBox()
+        flbox.pack_start(scroller)
+        list_frame.add(flbox)
+
+        self.other_parent_box = gtk.HBox()
+        flbox.pack_start(self.other_parent_box, False, False)
+
+        btn = gtk.CheckButton(_('Diff to second Parent'))
+        btn.connect('toggled', self.parent_toggled)
+        # don't pack btn yet to keep it initially invisible
+        self.other_parent_checkbutton = btn
 
         self._hpaned = gtk.HPaned()
         self._hpaned.pack1(list_frame, True, True)

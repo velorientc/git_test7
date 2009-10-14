@@ -158,10 +158,6 @@ class GLog(gdialog.GDialog):
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
             ] + mq_item + [
             dict(text='----'),
-            dict(text=_('Other Parent'), name='other-parent', 
-                ascheck=True, check=False,  sensitive=False,
-                func=self.parent_toggled),
-            dict(text='----'),
             dict(text=_('Refresh'), func=refresh, args=[False],
                 icon=gtk.STOCK_REFRESH),
             dict(text=_('Reset Marks'), func=refresh, args=[True],
@@ -212,10 +208,6 @@ class GLog(gdialog.GDialog):
                 dict(text=_('Force push'), ascheck=True, func=toggle_force),
                 ])
             ]
-
-    def parent_toggled(self, item):
-        self.changeview.parent_toggle.set_active(item.get_active())
-        self.changeview.parent_toggled(None)
 
     def synch_clicked(self, toolbutton, data):
         def sync_closed(dialog):
@@ -287,10 +279,6 @@ class GLog(gdialog.GDialog):
             self.lastrevid = self.currevid
             self.changeview.opts['rev'] = [str(self.currevid)]
             self.changeview.load_details(self.currevid)
-            btn = self.changeview.parent_toggle
-            cmd = 'other-parent'
-            self.cmd_set_sensitive(cmd, btn.get_property('sensitive'))
-            self.cmd_set_active(cmd, btn.get_active())
         return False
 
     def revisions_loaded(self, graphview):
@@ -1625,7 +1613,7 @@ class GLog(gdialog.GDialog):
         rev = self.currevid
         statopts = self.merge_opts(commands.table['^status|st'][1],
                 ('include', 'exclude', 'git'))
-        if self.changeview.parent_toggle.get_active():
+        if self.changeview.other_parent_checkbutton.get_active():
             parent = self.repo[rev].parents()[1].rev()
         else:
             parent = self.repo[rev].parents()[0].rev()
