@@ -51,6 +51,8 @@ class ChangeSet(gdialog.GDialog):
         return [self.parent_toggle]
 
     def parent_toggled(self, button):
+        self.glog_parent.cmd_set_active(
+            'other-parent', self.parent_toggle.get_active())
         self.load_details(self.currev)
 
     def prepare_display(self):

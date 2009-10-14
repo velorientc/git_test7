@@ -214,7 +214,8 @@ class GLog(gdialog.GDialog):
             ]
 
     def parent_toggled(self, item):
-        pass
+        self.changeview.parent_toggle.set_active(item.get_active())
+        self.changeview.parent_toggled(None)
 
     def synch_clicked(self, toolbutton, data):
         def sync_closed(dialog):
@@ -286,6 +287,10 @@ class GLog(gdialog.GDialog):
             self.lastrevid = self.currevid
             self.changeview.opts['rev'] = [str(self.currevid)]
             self.changeview.load_details(self.currevid)
+            btn = self.changeview.parent_toggle
+            cmd = 'other-parent'
+            self.cmd_set_sensitive(cmd, btn.get_property('sensitive'))
+            self.cmd_set_active(cmd, btn.get_active())
         return False
 
     def revisions_loaded(self, graphview):
