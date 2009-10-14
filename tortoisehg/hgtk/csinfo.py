@@ -204,33 +204,27 @@ class ChangesetLabel(ChangesetWidget, gtk.Label):
         self.update(rev)
 
     def update(self, rev=None, style=None, repo=None):
-        if rev is None:
-            rev = self.rev
-        else:
+        if rev is not None:
             self.rev = str(rev)
-        if repo is None:
-            repo = self.repo
-        else:
-            self.repo = repo
-        if style is None:
-            style = self.csstyle
-        else:
+        if style is not None:
             self.csstyle = style
+        if repo is not None:
+            self.repo = repo
 
-        if 'selectable' in style:
-            sel = style['selectable']
+        if 'selectable' in self.csstyle:
+            sel = self.csstylestyle['selectable']
             assert isinstance(sel, bool)
             self.set_selectable(sel)
 
-        if 'width' in style or 'height' in style:
-            width = style.get('width', -1)
+        if 'width' in self.csstyle or 'height' in self.csstyle:
+            width = self.csstyle.get('width', -1)
             assert isinstance(width, (int, long))
-            height = style.get('height', -1)
+            height = self.csstyle.get('height', -1)
             assert isinstance(height, (int, long))
             self.set_size_request(width, height)
             self.set_line_wrap(True)
 
-        contents = style.get('contents', None)
+        contents = self.csstyle.get('contents', None)
         assert contents
 
         # build info
