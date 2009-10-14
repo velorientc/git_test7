@@ -305,36 +305,52 @@ class NativeFolderSelectDialog:
             return self.runCompatible()
 
     def runWindows(self):
-        from win32com.shell import shell, shellcon
-        import win32gui, pywintypes
+    
+        def rundlg(q):
+            from win32com.shell import shell, shellcon
+            import win32gui, pywintypes
 
-        def BrowseCallbackProc(hwnd, msg, lp, data):
-            if msg == shellcon.BFFM_INITIALIZED:
-                win32gui.SendMessage(hwnd, shellcon.BFFM_SETSELECTION, 1, data)
-            elif msg == shellcon.BFFM_SELCHANGED:
-                # Set the status text of the
-                # For this message, 'lp' is the address of the PIDL.
-                pidl = shell.AddressAsPIDL(lp)
-                try:
-                    path = shell.SHGetPathFromIDList(pidl)
-                    win32gui.SendMessage(hwnd, shellcon.BFFM_SETSTATUSTEXT, 0, path)
-                except shell.error:
-                    # No path for this PIDL
-                    pass
+            def BrowseCallbackProc(hwnd, msg, lp, data):
+                if msg == shellcon.BFFM_INITIALIZED:
+                    win32gui.SendMessage(
+                        hwnd, shellcon.BFFM_SETSELECTION, 1, data)
+                elif msg == shellcon.BFFM_SELCHANGED:
+                    # Set the status text of the
+                    # For this message, 'lp' is the address of the PIDL.
+                    pidl = shell.AddressAsPIDL(lp)
+                    try:
+                        path = shell.SHGetPathFromIDList(pidl)
+                        win32gui.SendMessage(
+                            hwnd, shellcon.BFFM_SETSTATUSTEXT, 0, path)
+                    except shell.error:
+                        # No path for this PIDL
+                        pass
 
+            fname = None
+            try: 
+                flags = shellcon.BIF_EDITBOX | 0x40 #shellcon.BIF_NEWDIALOGSTYLE
+                pidl, _, _ = shell.SHBrowseForFolder(
+                   0,
+                   None,
+                   hglib.fromutf(self.title),
+                   flags,
+                   BrowseCallbackProc, # callback function
+                   self.initial)       # 'data' param for the callback
+                if pidl:
+                    fname = hglib.toutf(shell.SHGetPathFromIDList(pidl))
+            except (pywintypes.error, pywintypes.com_error):
+                pass
+            q.put(fname)
+
+        q = Queue.Queue()
+        thread = thread2.Thread(target=rundlg, args=(q,))
+        thread.start()
+        while thread.isAlive():
+            # let gtk process events while we wait for rundlg finishing
+            gtk.main_iteration(block=True)
         fname = None
-        try: 
-            flags = shellcon.BIF_EDITBOX | 0x40  #shellcon.BIF_NEWDIALOGSTYLE
-            pidl, _, _ = shell.SHBrowseForFolder(0,
-                               None,
-                               hglib.fromutf(self.title),
-                               flags,
-                               BrowseCallbackProc, # callback function
-                               self.initial)       # 'data' param for the callback
-            if pidl:
-                fname = hglib.toutf(shell.SHGetPathFromIDList(pidl))
-        except (pywintypes.error, pywintypes.com_error):
-            pass
+        if q.qsize():
+            fname = q.get(0)
         return fname
 
     def runCompatible(self):
