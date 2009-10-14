@@ -146,6 +146,12 @@ class ChangesetWidget(object):
             return self.custom[item]['markup'](self, value)
         return preset_func(self, value)
 
+    def update(self, rev=None, repo=None):
+        if rev is not None:
+            self.rev = str(rev)
+        if repo is not None:
+            self.repo = repo
+
 class ChangesetPanel(ChangesetWidget, gtk.Frame):
 
     def __init__(self, rev, style, repo, custom):
@@ -162,12 +168,9 @@ class ChangesetPanel(ChangesetWidget, gtk.Frame):
         self.update()
 
     def update(self, rev=None, style=None, repo=None):
-        if rev is not None:
-            self.rev = str(rev)
+        ChangesetWidget.update(self, rev, repo)
         if style is not None:
             self.csstyle = style
-        if repo is not None:
-            self.repo = repo
 
         if 'label' in self.csstyle:
             label = self.csstyle['label']
@@ -213,12 +216,9 @@ class ChangesetLabel(ChangesetWidget, gtk.Label):
         self.update(rev)
 
     def update(self, rev=None, style=None, repo=None):
-        if rev is not None:
-            self.rev = str(rev)
+        ChangesetWidget.update(self, rev, repo)
         if style is not None:
             self.csstyle = style
-        if repo is not None:
-            self.repo = repo
 
         if 'selectable' in self.csstyle:
             sel = self.csstylestyle['selectable']
