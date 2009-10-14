@@ -146,11 +146,13 @@ class ChangesetWidget(object):
             return self.custom[item]['markup'](self, value)
         return preset_func(self, value)
 
-    def update(self, rev=None, repo=None):
+    def update(self, rev=None, repo=None, custom=None):
         if rev is not None:
             self.rev = str(rev)
         if repo is not None:
             self.repo = repo
+        if custom is not None:
+            self.custom = custom
 
 class ChangesetPanel(ChangesetWidget, gtk.Frame):
 
@@ -167,8 +169,8 @@ class ChangesetPanel(ChangesetWidget, gtk.Frame):
 
         self.update()
 
-    def update(self, rev=None, style=None, repo=None):
-        ChangesetWidget.update(self, rev, repo)
+    def update(self, rev=None, style=None, repo=None, custom=None):
+        ChangesetWidget.update(self, rev, repo, custom)
         if style is not None:
             self.csstyle = style
 
@@ -213,10 +215,10 @@ class ChangesetLabel(ChangesetWidget, gtk.Label):
         self.set_alignment(0, 0.5)
         self.csstyle = style
 
-        self.update(rev)
+        self.update()
 
-    def update(self, rev=None, style=None, repo=None):
-        ChangesetWidget.update(self, rev, repo)
+    def update(self, rev=None, style=None, repo=None, custom=None):
+        ChangesetWidget.update(self, rev, repo, custom)
         if style is not None:
             self.csstyle = style
 
