@@ -277,21 +277,21 @@ Merging
 The commit tool has a special mode when it is opened in a repository
 that is in a merged state (technically, this means the current working
 directory has two parent revisions). The file list has no checkboxes and
-the diff pane does not allow selections. The commit 'manifest' is
-essentially immutable, since you must commit the entire working
-directory after a merge.
+the hunk selection tabs are hidden. The commit 'manifest' is essentially
+immutable, since you must commit the entire working directory after a
+merge.
 
 The merge state *ms* column is especially useful in this mode.  Files
 that are marked with *R* are files where Mercurial and/or the user have
-successfully merged (resolved) changes from both branches. Files that
+successfully merged (resolved) changes from both parents. Files that
 are marked with *U* have unresolved changes. You can use the *Restart
-Merge* context menu option to restart the merge for that file, or you
+Merge* context menu option to restart the merge for those files, or you
 can use the *edit* context menu option to resolve the conflict by hand.
 The *Restart Merge* menu option allows you to select the merge tool to
 use to perform the merge, or even to pick one version or the other
-unconditionally (internal:local, internal:other).  When the conflict has
-been resolved, you must use the *mark resolved* context menu option to
-change the file's merge state to *R*.
+unconditionally (internal:local, internal:other).  After the conflicts
+have been manually resolved, you must use the *mark resolved* context
+menu option to change the file's merge state to *R*.
 
 Mercurial will not allow you to commit a merge if any files have
 unresolved *U* merge states.
