@@ -146,51 +146,60 @@ class ChangesetWidget(object):
             return self.custom[item]['markup'](self, value)
         return preset_func(self, value)
 
-class ChangesetPanel(ChangesetWidget, gtk.VBox):
+class ChangesetPanel(ChangesetWidget, gtk.Frame):
 
     def __init__(self, rev, style, repo, custom):
         ChangesetWidget.__init__(self, rev, repo, custom)
-        gtk.VBox.__init__(self)
+        gtk.Frame.__init__(self)
 
+        self.set_shadow_type(gtk.SHADOW_NONE)
         self.csstyle = style
 
-        if 'label' in style and style['label'] is not None:
-            label = style['label']
-            assert isinstance(label, basestring)
-            frame = gtk.Frame(label)
-            self.add(frame)
-            vbox = gtk.VBox()
-            frame.add(vbox)
-        else:
-            vbox = self
+        # layout table for contents
+        self.table = gtklib.LayoutTable(ypad=1, headopts={'weight': 'bold'})
+        self.add(self.table)
 
-        if 'margin' in style:
-            margin = style['margin']
+        self.update()
+
+    def update(self, rev=None, style=None, repo=None):
+        if rev is not None:
+            self.rev = str(rev)
+        if style is not None:
+            self.csstyle = style
+        if repo is not None:
+            self.repo = repo
+
+        if 'label' in self.csstyle:
+            label = self.csstyle['label']
+            assert isinstance(label, basestring)
+            self.set_label(label)
+            self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+
+        if 'margin' in self.csstyle:
+            margin = self.csstyle['margin']
             # 'border' range is 0-65535
             assert isinstance(margin, (int, long))
             assert 0 <= margin and margin <= 65535
             self.set_border_width(margin)
 
-        table = gtklib.LayoutTable(ypad=1, headopts={'weight': 'bold'})
-        vbox.add(table)
-
-        if 'padding' in style:
-            padding = style['padding']
+        if 'padding' in self.csstyle:
+            padding = self.csstyle['padding']
             # 'border' range is 0-65535
             assert isinstance(padding, (int, long))
             assert 0 <= padding and padding <= 65535
-            table.set_border_width(padding)
+            self.table.set_border_width(padding)
 
-        contents = style.get('contents', None)
+        contents = self.csstyle.get('contents', None)
         assert contents
 
         # build info
+        self.table.clear_rows()
         for item in contents:
             text = self.get_markup(item)
             if text:
                 body = gtk.Label()
                 body.set_markup(text)
-                table.add_row(self.get_label(item), body)
+                self.table.add_row(self.get_label(item), body)
 
 class ChangesetLabel(ChangesetWidget, gtk.Label):
 
