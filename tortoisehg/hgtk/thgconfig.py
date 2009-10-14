@@ -553,6 +553,7 @@ class ConfigDialog(gtk.Dialog):
 
         # Catch close events
         self.connect('response', self.should_live)
+        self.connect('thg-accept', self.thgaccept)
         self.connect('delete-event', self.delete_event)
 
         combo = gtk.combo_box_new_text()
@@ -691,6 +692,9 @@ class ConfigDialog(gtk.Dialog):
 
     def delete_event(self, dlg, event):
         return True
+
+    def thgaccept(self, dlg):
+        self.response(gtk.RESPONSE_OK)
 
     def should_live(self, dialog=None, resp=None):
         if resp == gtk.RESPONSE_APPLY:
