@@ -1473,7 +1473,17 @@ class GLog(gdialog.GDialog):
         dlg.hide()
 
     def vdiff_change(self, menuitem, pats=[]):
-        opts = {'change':str(self.currevid), 'bundle':self.bfile}
+        opts = {'bundle':self.bfile}
+        rev = self.currevid
+        parents = self.repo[rev].parents()
+        if len(parents) == 2:
+            if self.changeview.other_parent_checkbutton.get_active():
+                parent = parents[1].rev()
+            else:
+                parent = parents[0].rev()
+            opts['rev'] = [str(parent), str(rev)]
+        else:
+            opts['change'] = str(rev)
         self._do_diff(pats, opts)
 
     def vdiff_local(self, menuitem, pats=[]):
