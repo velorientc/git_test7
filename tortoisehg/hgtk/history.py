@@ -1107,6 +1107,7 @@ class GLog(gdialog.GDialog):
             w.set_sensitive(True)
         for cmd in self.incoming_disabled_cmds:
             self.cmd_set_sensitive(cmd, True)
+        self.stbar.set_idle_text(None)
 
     def reject_clicked(self, button):
         self.remove_overlay(False)
@@ -1193,6 +1194,8 @@ class GLog(gdialog.GDialog):
         self.changeview.bfile = bfile
         self.npreviews = len(self.repo) - oldtip
         self.reload_log()
+
+        self.stbar.set_idle_text(_('Bundle Preview'))
 
     def add_bundle_clicked(self, button):
         result = gtklib.NativeSaveFileDialogWrapper(
