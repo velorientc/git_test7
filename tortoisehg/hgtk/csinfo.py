@@ -114,7 +114,7 @@ class ChangesetInfo(object):
     LABELS = {'rev': _('rev:'), 'revnum': _('rev:'), 'revid': _('rev:'),
               'summary': _('summary:'), 'user': _('user:'),
               'date': _('date:'), 'branch': _('branch:'), 'tags': _('tags:'),
-              'rawbranch': _('branch:')}
+              'rawbranch': _('branch:'), 'rawtags': _('tags:')}
 
     def __init__(self):
         pass
@@ -153,10 +153,19 @@ class ChangesetInfo(object):
                                             for b in dblist.split(',')]:
                         value = None
                 return value
-            elif item == 'tags':
+            elif item == 'rawtags':
                 value = [hglib.toutf(tag) for tag in ctx.tags()]
                 if len(value) == 0:
                     return None
+                return value
+            elif item == 'tags':
+                value = self.get_data(widget, 'rawtags', rev, custom, repo)
+                if value:
+                    htags = repo.ui.config('tortoisehg', 'hidetags', '')
+                    htags = [hglib.toutf(b.strip()) for b in htags.split()]
+                    value = [tag for tag in value if tag not in htags]
+                    if len(value) == 0:
+                        value = None
                 return value
             elif item == 'ishead':
                 return len(ctx.children()) == 0
@@ -187,7 +196,7 @@ class ChangesetInfo(object):
             elif item in ('rawbranch', 'branch'):
                 return gtklib.markup(' %s ' % value, color='black',
                                      background='#aaffaa')
-            elif item == 'tags':
+            elif item in ('rawtags', 'tags'):
                 opts = dict(color='black', background='#ffffaa')
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
