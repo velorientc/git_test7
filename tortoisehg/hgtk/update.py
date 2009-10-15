@@ -264,7 +264,7 @@ class UpdateDialog(gtk.Dialog):
                 elif ret['merge']:
                     pass # no args
                 elif ret['cancel']:
-                    self.cmd.log.append(_('[user canceled]\n'), error=True)
+                    self.cmd.log.append(_('[canceled by user]\n'), error=True)
                     self.switch_to(MODE_WORKING)
                     self.abort()
                     return
