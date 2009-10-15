@@ -77,6 +77,7 @@ Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs creat
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: i18n\*.*; DestDir: {app}\i18n; Flags: recursesubdirs createallsubdirs
+Source: win32\*.reg; DestDir: {app}\cmenu_i18n;
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
 Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Components: hgbook
