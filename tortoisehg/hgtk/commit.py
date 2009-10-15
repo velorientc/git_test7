@@ -382,7 +382,7 @@ class GCommit(GStatus):
                        ' %(athead)s', ' %(branch)s', ' %(tags)s',
                        ' %(summary)s'), selectable=True)
         def data_func(widget, ctx):
-            return len(ctx.children()) == 0 or self.mqmode
+            return widget.get_data('ishead') or self.mqmode
         def markup_func(widget, value):
             if value:
                 return ''
