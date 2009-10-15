@@ -1477,7 +1477,7 @@ class GLog(gdialog.GDialog):
         rev = self.currevid
         parents = self.repo[rev].parents()
         if len(parents) == 2:
-            if self.changeview.other_parent_checkbutton.get_active():
+            if self.changeview.diff_other_parent():
                 parent = parents[1].rev()
             else:
                 parent = parents[0].rev()
@@ -1626,7 +1626,7 @@ class GLog(gdialog.GDialog):
         rev = self.currevid
         statopts = self.merge_opts(commands.table['^status|st'][1],
                 ('include', 'exclude', 'git'))
-        if self.changeview.other_parent_checkbutton.get_active():
+        if self.changeview.diff_other_parent():
             parent = self.repo[rev].parents()[1].rev()
         else:
             parent = self.repo[rev].parents()[0].rev()
