@@ -154,7 +154,7 @@ class ChangesetInfo(object):
                         value = None
                 return value
             elif item == 'tags':
-                value = hglib.toutf(', '.join(ctx.tags()))
+                value = [hglib.toutf(tag) for tag in ctx.tags()]
                 if len(value) == 0:
                     return None
                 return value
@@ -189,8 +189,7 @@ class ChangesetInfo(object):
                                      background='#aaffaa')
             elif item == 'tags':
                 opts = dict(color='black', background='#ffffaa')
-                tags = value.split(', ')
-                tags = [gtklib.markup(' %s ' % tag, **opts) for tag in tags]
+                tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
             return default_func(widget, value)
         value = self.get_data(widget, item, rev, custom, repo)
