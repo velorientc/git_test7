@@ -65,11 +65,13 @@ was given a specific set of files and/or directories.
 Tabs
 ----
 
-The shelve tool has four tabs
-1) Text Diff - shows diff of currently selected file
-2) Hunk Selection - allows diff hunks of current file to be skipped
-3) Shelf Preview - displays all selected changes. This previews the changes that will be removed from the working directory and stored in the shelf.
-4) Shelf Contents - the current contents of the shelf.
+The shelve tool diff pane has four tabs
+	1) Text Diff - shows diff of currently selected file
+	2) Hunk Selection - allows diff hunks of current file to be skipped
+	3) Shelf Preview - displays all selected changes. This previews the
+	   changes that will be removed from the working directory and
+	   stored in the shelf.
+	4) Shelf Contents - the current contents of the shelf.
 
 
 Shelving Changes

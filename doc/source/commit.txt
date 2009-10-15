@@ -132,8 +132,19 @@ pattern.  Neither of those file types are shown by default, unless a the
 user includes such a file in a selection (explorer) or provides the file
 name on the command line.
 
-To the right of the file list is the diff pane.  New in release 0.9, the
-diff pane is now tabbed.
+.. figure:: figures/parentbar.png
+	:alt: Parent bar
+
+	Parent bar in commit dialog
+
+Below both the file list and diff pane is a narrow
+:guilabel:`Parents Bar`.  This bar shows you the current working
+directory parent(s), and gives you some warnings if a commit would
+introduce a new head.  The parents bar can be hidden by an option in the
+:guilabel:`View` menu.
+
+To the right of the file list is the diff pane.  The diff pane is newly
+tabbed in the 0.9 release.
 
 	:guilabel:`Text Diff`
 		Shows the textual diffs in the currently selected file.
@@ -152,14 +163,14 @@ diff pane is now tabbed.
 		Only visible when the commit tool is in QRefresh mode.  It
 		displays the current contents of the patch being refreshed.
 
-Below both the file list and diff pane is a narrow *Parents Bar*.  This
-bar shows you the current working directory parent(s), and gives you
-some warnings if a commit would introduce a new head.  The parents bar
-can be hidden by an option in the :guilabel:`View` menu.
+.. figure:: figures/advancedbar.png
+	:alt: Advanced bar
+
+	Advanced bar in commit dialog
 
 If the :guilabel:`Advanced Bar` is enabled in the :guilabel:`View` menu,
 a bar is inserted between the toolbar and the message history bar.  The
-*advanced bar* contains:
+advanced bar contains:
 
 	:guilabel:`Committer`
 		The username to use for this commit.  This value is usually read

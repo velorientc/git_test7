@@ -253,11 +253,6 @@ buttons in the commit and changelog tools.
 .. note::
 	Merges can be safely restarted if necessary.
 
-.. figure:: figures/synchronize.png
-	:alt: Synchronize dialog
-
-	Synchronize Dialog
-
 Mercurial makes collaboration easy, fast, and productive.
 Learn more at Mercurial's `wiki <http://mercurial.selenic.com/wiki/>`_.
 

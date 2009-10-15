@@ -31,6 +31,10 @@ or to email recipients.
 		*tip* the new *tip* in the target repository
 	:guilabel:`Email`
 		send outgoing changesets (to target repository) as email
+	:guilabel:`Shelve`
+		launch the shelve tool to allow working changes to be
+		temporarily moved into the shelf, since some operations require
+		the working directory to be clean.
 	:guilabel:`Stop`
 		stop current operation
 	:guilabel:`Configure`
@@ -64,12 +68,12 @@ per-repository basis.
 		changes.
 	:guilabel:`Fetch`
 		Equivalent to hg fetch.  See the fetch extension documentation for
-		it's behavior.
+		it's behavior.  This feature is only available if the fetch
+		extension has been enabled by the user.
 	:guilabel:`Rebase`
-		Equivalent to pull --rebase.  See the rebase extension documentation
-		for it's behavior.  Rebase operations disable connections to any
-		changelog tools, since it is very destructive to any app which is
-		holding a repository object.
+		Equivalent to pull --rebase.  See the rebase extension
+		documentation for it's behavior.  This feature is only available
+		if the rebase extension has been enabled by the user.
 
 The :guilabel:`use proxy` button is a quick way to disable your proxy
 configuration for individual operations. The button is only sensitive

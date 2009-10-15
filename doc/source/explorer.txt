@@ -66,22 +66,14 @@ And here is the context menu for selected files or folders:
 	Context menu for file or folder selection
 
 TortoiseHg provides dialogs for the most regularly used Mercurial
-commands.  Less frequently used, and newly added, Mercurial commands
-must need be accessed on the CLI (command line interface) through the
+commands.  Less frequently used and newly added Mercurial commands
+must need be accessed on the CLI (command line interface) through 
 :file:`cmd.exe` windows.
 
 The context menus are configurable via the taskbar menu. Simply click on
 the Mercurial (droplet) icon in the system tray and select
 :guilabel:`Options`.  In the options dialog you can promote individual
 menu options to the top menu.
-
-This is the file rename/move dialog:
-
-.. figure:: figures/rename.jpg
-	:alt: Rename file dialog 
-
-	File rename (or move) dialog
-
 
 Nautilus
 --------
