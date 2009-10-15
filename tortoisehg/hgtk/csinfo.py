@@ -310,6 +310,7 @@ class ChangesetPanel(ChangesetBase, gtk.Frame):
                 body = gtk.Label()
                 body.set_markup(text)
                 self.table.add_row(self.get_label(item), body)
+        self.show_all()
 
 class ChangesetLabel(ChangesetBase, gtk.Label):
 
