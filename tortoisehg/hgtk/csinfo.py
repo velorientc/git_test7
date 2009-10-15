@@ -118,13 +118,13 @@ class ChangesetInfo(object):
     def __init__(self):
         pass
 
-    def get_data(self, item, rev, custom, repo):
+    def get_data(self, widget, item, rev, custom, repo):
         def default_func(widget, ctx):
             return None
         def preset_func(widget, ctx):
             if item == 'rev':
-                revnum = self.get_data('revnum', rev, custom, repo)
-                revid = self.get_data('revid', rev, custom, repo)
+                revnum = self.get_data(widget, 'revnum', rev, custom, repo)
+                revid = self.get_data(widget, 'revid', rev, custom, repo)
                 return '%s (%s)' % (revnum, revid)
             elif item == 'revnum':
                 return str(ctx.rev())
@@ -154,10 +154,10 @@ class ChangesetInfo(object):
             return default_func(widget, ctx)
         ctx = repo[rev]
         if custom.has_key(item) and custom[item].has_key('data'):
-            return custom[item]['data'](self, ctx)
-        return preset_func(self, ctx)
+            return custom[item]['data'](widget, ctx)
+        return preset_func(widget, ctx)
 
-    def get_label(self, item, rev, custom, repo):
+    def get_label(self, widget, item, rev, custom, repo):
         def default_func(widget):
             return ''
         def preset_func(widget):
@@ -166,10 +166,10 @@ class ChangesetInfo(object):
             except:
                 return default_func(widget)
         if custom.has_key(item) and custom[item].has_key('label'):
-            return custom[item]['label'](self)
-        return preset_func(self)
+            return custom[item]['label'](widget)
+        return preset_func(widget)
 
-    def get_markup(self, item, rev, custom, repo):
+    def get_markup(self, widget, item, rev, custom, repo):
         def default_func(widget, value):
             return gtklib.markup_escape_text(value)
         def preset_func(widget, value):
@@ -184,12 +184,12 @@ class ChangesetInfo(object):
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in tags]
                 return ' '.join(tags)
             return default_func(widget, value)
-        value = self.get_data(item, rev, custom, repo)
+        value = self.get_data(widget, item, rev, custom, repo)
         if value is None:
             return None
         if custom.has_key(item) and custom[item].has_key('markup'):
-            return custom[item]['markup'](self, value)
-        return preset_func(self, value)
+            return custom[item]['markup'](widget, value)
+        return preset_func(widget, value)
 
 class CachedChangesetInfo(ChangesetInfo):
 
@@ -198,7 +198,7 @@ class CachedChangesetInfo(ChangesetInfo):
         self.cache = {}
 
     def try_cache(self, target, func, *args):
-        item, rev, custom, repo = args
+        widget, item, rev, custom, repo = args
         key = target + item + str(rev) + str(custom) + str(id(repo))
         try:
             return self.cache[key]
@@ -227,13 +227,13 @@ class ChangesetBase(object):
         self.info = info
 
     def get_data(self, item):
-        return self.info.get_data(item, self.rev, self.custom, self.repo)
+        return self.info.get_data(self, item, self.rev, self.custom, self.repo)
 
     def get_label(self, item):
-        return self.info.get_label(item, self.rev, self.custom, self.repo)
+        return self.info.get_label(self, item, self.rev, self.custom, self.repo)
 
     def get_markup(self, item):
-        return self.info.get_markup(item, self.rev, self.custom, self.repo)
+        return self.info.get_markup(self, item, self.rev, self.custom, self.repo)
 
     def update(self, rev=None, custom=None, repo=None):
         if rev is not None:
