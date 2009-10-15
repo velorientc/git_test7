@@ -217,6 +217,10 @@ directories to find specific changes and commit them from Explorer. A
 quicker way is to use the commit tool:
 
 .. {{images/image001.png}}
+.. figure:: figures/overlayicons.png
+	:alt: Overlay Icons 
+
+	Overlay Icons on Vista
 
 The commit tool gives you a way to see differences or you can use your
 visual difference tool (kdiff). Mercurial allows you to commit many

@@ -122,14 +122,6 @@ commands that deal with arbitrary revision ranges.
 .. [#rcm6] Only sensitive if the selected revision is your current working
 		   directory parent
 
-Revision Filter Dialog
-----------------------
-
-.. figure:: figures/logfilter.jpg
-	:alt: Revision filter dialog
-
-	Log Filtering Dialog
-
 File Context Menus
 ------------------
 

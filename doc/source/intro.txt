@@ -71,10 +71,10 @@ variable ``LANGUAGE`` to the desidered language, e.g. for italian
 	locale was incomplete at release time.
 
 The Windows shell extension context menus get their translations from
-the Windows registry.  Translations for many locales are available from
-the TortoiseHg `wiki <http://bitbucket.org/tortoisehg/stable/wiki/download>`_.
-Once the desidered file is downloaded (rename it to :file:`.reg` if the
-extension is :file:`.txt`), double-click on it and confirm all the requests.
+the Windows registry.  Translations for many locales were installed
+under :file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  Select the
+locale you would like to use, double-click on it, and confirm all
+requests.
 
 On Linux and Mac
 ----------------

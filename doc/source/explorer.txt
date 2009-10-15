@@ -33,7 +33,7 @@ Mercurial (droplet) icon in the system tray and select
 :guilabel:`Options`.  In the options dialog you can disable overlays
 globally, or enable them for local disks only.
 
-.. figure:: figures/taskbarui.jpg
+.. figure:: figures/taskbarui.png
 	:alt: Taskbar options dialog
 
 	Taskbar Options Dialog
