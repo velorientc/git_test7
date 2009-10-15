@@ -18,8 +18,10 @@ Frequently Asked Questions
 
 *How can I get translations for the Explorer context menu?*
 
-	See the `Download <http://bitbucket.org/tortoisehg/stable/wiki/download>`_
-	wiki page
+	The available translations were stored by the installer under
+	:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  Select the
+	locale you would like to use, double-click on it, and confirm all
+	requests.
 
 *How do I do merges and arbitrary version checkouts?*
 
@@ -41,7 +43,7 @@ Frequently Asked Questions
 
 *How can I use Qct with TortoiseHg?*
 
-	In 0.9, we have dropped support for external commit tools.
+	In 0.9, we have dropped support for external commit tools.  Sorry.
 
 *How can I use hgk (hg view) with TortoiseHg?*
 
@@ -117,16 +119,14 @@ Frequently Asked Questions
 	2. :file:`%APPDATA%\\Tortoisehg` settings for application state
 	   (window positions, etc)
 
-	These are configurables that are stored the Mercurial configuration
-	system. ::
+	These are some of the configurables that are stored the Mercurial
+	configuration system. ::
 	
 		[tortoisehg]
-		extcommit = None
 		vdiff = vdiff
 		editor = gvim
 		tabwidth = 4
 		longsummary = True
-		copyhash = False
 		graphlimit = 500
 		authorcolor = True
 		authorcolor.steve = blue
@@ -143,10 +143,6 @@ Frequently Asked Questions
 		fontdiff = courier 10
 		# font used in file lists in status and commit tools
 		fontlist = courier 9
-
-		# make the integrated diff window appear at the bottom or side
-		# (applies to commit and status dialogs)
-		diffbottom = False
 
 *How do I switch GTK themes?*
 

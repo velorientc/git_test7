@@ -193,6 +193,7 @@ Changelog
 :guilabel:`Copy Hash:`
 	Allow the changelog viewer to copy the changeset hash
 	of the currently selected changeset into the clipboard.
+	DEPRECATED, will be removed in a later release.
 	Default: False.
 
 :guilabel:`Dead Branches:`
