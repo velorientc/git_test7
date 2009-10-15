@@ -66,6 +66,9 @@ class ChangeSet(gdialog.GDialog):
         else:
             self._setting_hpos = -1
 
+    def diff_other_parent(self):
+        return self.other_parent_checkbutton.get_active()
+
     def load_details(self, rev):
         'Load selected changeset details into buffer and filelist'
         self.currev = rev
@@ -82,7 +85,7 @@ class ChangeSet(gdialog.GDialog):
         title = self.get_title()
         if len(parents) == 2:
             self.other_parent_box.show_all()
-            if self.other_parent_checkbutton.get_active():
+            if self.diff_other_parent():
                 title += ':' + str(parents[1].rev())
             else:
                 title += ':' + str(parents[0].rev())
@@ -99,7 +102,7 @@ class ChangeSet(gdialog.GDialog):
             self.clipboard.set_text(str(ctx))
 
         self.set_title(title)
-        if self.other_parent_checkbutton.get_active():
+        if self.diff_other_parent():
             parent = parents[1].node()
         elif parents:
             parent = parents[0].node()
@@ -268,7 +271,7 @@ class ChangeSet(gdialog.GDialog):
 
         ismerge = (len(ctx.parents()) == 2)
 
-        if ismerge and self.other_parent_checkbutton.get_active():
+        if ismerge and self.diff_other_parent():
             parentindex = 1 
         else:
             parentindex = 0
