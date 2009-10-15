@@ -113,7 +113,8 @@ class ChangesetInfo(object):
 
     LABELS = {'rev': _('rev:'), 'revnum': _('rev:'), 'revid': _('rev:'),
               'summary': _('summary:'), 'user': _('user:'),
-              'date': _('date:'), 'branch': _('branch:'), 'tags': _('tags:')}
+              'date': _('date:'), 'branch': _('branch:'), 'tags': _('tags:'),
+              'rawbranch': _('branch:')}
 
     def __init__(self):
         pass
@@ -140,10 +141,18 @@ class ChangesetInfo(object):
                 return hglib.toutf(ctx.user())
             elif item == 'date':
                 return hglib.displaytime(ctx.date())
-            elif item == 'branch':
+            elif item == 'rawbranch':
                 if ctx.node() in repo.branchtags().values():
                     return hglib.toutf(ctx.branch())
                 return None
+            elif item == 'branch':
+                value = self.get_data(widget, 'rawbranch', rev, custom, repo)
+                if value:
+                    dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
+                    if dblist and value in [hglib.toutf(b.strip()) \
+                                            for b in dblist.split(',')]:
+                        value = None
+                return value
             elif item == 'tags':
                 value = hglib.toutf(', '.join(ctx.tags()))
                 if len(value) == 0:
@@ -175,7 +184,7 @@ class ChangesetInfo(object):
         def preset_func(widget, value):
             if item in ('rev', 'revnum', 'revid'):
                 return gtklib.markup(value, face='monospace', size='9000')
-            elif item == 'branch':
+            elif item in ('rawbranch', 'branch'):
                 return gtklib.markup(' %s ' % value, color='black',
                                      background='#aaffaa')
             elif item == 'tags':
