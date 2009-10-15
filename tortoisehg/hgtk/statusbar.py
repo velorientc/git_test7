@@ -14,6 +14,8 @@ from tortoisehg.util.i18n import _
 class StatusBar(gtk.HBox):
     def __init__(self, extra=None):
         gtk.HBox.__init__(self)
+        self.idle_text = None
+
         self.pbar = gtk.ProgressBar()
         self.sttext = gtk.Label("")
         self.sttext.set_alignment(0, 0.5)
@@ -45,9 +47,16 @@ class StatusBar(gtk.HBox):
         self.set_status_text(msg)
         self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
 
-    def end(self, msg='', unmap=True):
+    def end(self, msg=None, unmap=True):
         gobject.source_remove(self._timeout_event)
-        self.set_status_text(msg)
+
+        t = ''
+        if msg:
+            t = msg
+        elif self.idle_text:
+            t = self.idle_text
+        self.set_status_text(t)
+
         if unmap:
             self.pbox.unmap()
         else:
@@ -55,6 +64,11 @@ class StatusBar(gtk.HBox):
 
     def set_status_text(self, msg):
         self.sttext.set_text(str(msg))
+
+    def set_idle_text(self, msg):
+        self.idle_text = msg
+        if msg:
+            self.set_status_text(msg)
 
     def set_right1_text(self, msg):
         self.right1_label.set_text(str(msg))
