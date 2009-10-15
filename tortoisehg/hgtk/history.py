@@ -1031,8 +1031,7 @@ class GLog(gdialog.GDialog):
         if 'mq' in self.exs:
             # create MQWidget
             self.mqwidget = thgmq.MQWidget(
-                self.repo, self.stbar.set_right3_text, 
-                accelgroup, self.tooltips)
+                self.repo, self.stbar, accelgroup, self.tooltips)
             self.mqwidget.connect('patch-selected', self.patch_selected)
             self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
 

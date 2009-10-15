@@ -73,12 +73,12 @@ class MQWidget(gtk.VBox):
                             str)) # patch name
     }
 
-    def __init__(self, repo, status_func, accelgroup=None, tooltips=None):
+    def __init__(self, repo, statusbar, accelgroup=None, tooltips=None):
         gtk.VBox.__init__(self)
 
         self.repo = repo
         self.mqloaded = hasattr(repo, 'mq')
-        self.status_func = status_func
+        self.statusbar = statusbar
 
         try:
             extensions.find('qup')
@@ -263,12 +263,17 @@ class MQWidget(gtk.VBox):
 
         # report status
         status_text = ''
+        idle_text = None
         if self.has_mq():
             nser = len(self.repo.mq.series)
             if nser:
                 napp = len(self.repo.mq.applied)
                 status_text = _('%s of %s Patches applied') % (napp, nser)
-        self.status_func(status_text)
+                if napp:
+                    pn = self.get_qtip_patchname()
+                    idle_text = _("Patch '%s' applied") % pn
+        self.statusbar.set_right3_text(status_text)
+        self.statusbar.set_idle_text(idle_text)
 
     def qgoto(self, patch):
         """
