@@ -149,6 +149,8 @@ class ChangesetInfo(object):
                 if len(value) == 0:
                     return None
                 return value
+            elif item == 'ishead':
+                return len(ctx.children()) == 0
             return default_func(widget, ctx)
         ctx = repo[rev]
         if custom.has_key(item) and custom[item].has_key('data'):
