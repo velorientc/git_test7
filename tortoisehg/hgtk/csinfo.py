@@ -119,13 +119,14 @@ class ChangesetInfo(object):
     def __init__(self):
         pass
 
-    def get_data(self, widget, item, rev, custom, repo):
+    def get_data(self, item, *args):
+        widget, rev, custom, repo = args
         def default_func(widget, ctx):
             return None
         def preset_func(widget, ctx):
             if item == 'rev':
-                revnum = self.get_data(widget, 'revnum', rev, custom, repo)
-                revid = self.get_data(widget, 'revid', rev, custom, repo)
+                revnum = self.get_data('revnum', *args)
+                revid = self.get_data('revid', *args)
                 return '%s (%s)' % (revnum, revid)
             elif item == 'revnum':
                 return str(ctx.rev())
@@ -146,7 +147,7 @@ class ChangesetInfo(object):
                     return hglib.toutf(ctx.branch())
                 return None
             elif item == 'branch':
-                value = self.get_data(widget, 'rawbranch', rev, custom, repo)
+                value = self.get_data('rawbranch', *args)
                 if value:
                     dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
                     if dblist and value in [hglib.toutf(b.strip()) \
@@ -159,7 +160,7 @@ class ChangesetInfo(object):
                     return None
                 return value
             elif item == 'tags':
-                value = self.get_data(widget, 'rawtags', rev, custom, repo)
+                value = self.get_data('rawtags', *args)
                 if value:
                     htags = repo.ui.config('tortoisehg', 'hidetags', '')
                     htags = [hglib.toutf(b.strip()) for b in htags.split()]
@@ -175,7 +176,7 @@ class ChangesetInfo(object):
             return custom[item]['data'](widget, ctx)
         return preset_func(widget, ctx)
 
-    def get_label(self, widget, item, rev, custom, repo):
+    def get_label(self, item, widget, rev, custom, repo):
         def default_func(widget):
             return ''
         def preset_func(widget):
@@ -187,7 +188,7 @@ class ChangesetInfo(object):
             return custom[item]['label'](widget)
         return preset_func(widget)
 
-    def get_markup(self, widget, item, rev, custom, repo):
+    def get_markup(self, item, widget, rev, custom, repo):
         def default_func(widget, value):
             return gtklib.markup_escape_text(value)
         def preset_func(widget, value):
@@ -201,7 +202,7 @@ class ChangesetInfo(object):
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
             return default_func(widget, value)
-        value = self.get_data(widget, item, rev, custom, repo)
+        value = self.get_data(item, widget, rev, custom, repo)
         if value is None:
             return None
         if custom.has_key(item) and custom[item].has_key('markup'):
@@ -215,7 +216,7 @@ class CachedChangesetInfo(ChangesetInfo):
         self.cache = {}
 
     def try_cache(self, target, func, *args):
-        widget, item, rev, custom, repo = args
+        item, widget, rev, custom, repo = args
         key = target + item + str(rev) + str(custom) + str(id(repo))
         try:
             return self.cache[key]
@@ -244,13 +245,13 @@ class ChangesetBase(object):
         self.info = info
 
     def get_data(self, item):
-        return self.info.get_data(self, item, self.rev, self.custom, self.repo)
+        return self.info.get_data(item, self, self.rev, self.custom, self.repo)
 
     def get_label(self, item):
-        return self.info.get_label(self, item, self.rev, self.custom, self.repo)
+        return self.info.get_label(item, self, self.rev, self.custom, self.repo)
 
     def get_markup(self, item):
-        return self.info.get_markup(self, item, self.rev, self.custom, self.repo)
+        return self.info.get_markup(item, self, self.rev, self.custom, self.repo)
 
     def update(self, rev=None, custom=None, repo=None):
         if rev is not None:
