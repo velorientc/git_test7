@@ -22,7 +22,7 @@ from tortoisehg.hgtk.logview.colormap import AnnotateColorMap
 from tortoisehg.hgtk.logview.colormap import AnnotateColorSaturation
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk.logview import treemodel as LogTreeModelModule
-from tortoisehg.hgtk import gtklib, gdialog, changeset
+from tortoisehg.hgtk import gtklib, gdialog, changeset, statusbar
 
 # Column indexes for grep
 GCOL_REVID = 0
@@ -113,7 +113,7 @@ class DataMineDialog(gdialog.GDialog):
                         modifier, gtk.ACCEL_VISIBLE)
         notebook.connect('thg-new', self.new_notebook)
 
-        self.stbar = gtklib.StatusBar()
+        self.stbar = statusbar.StatusBar()
         self.stbar.sttext.set_property('use-markup', True)
         vbox.pack_start(self.stbar, False, False, 2)
         self.stop_button.set_sensitive(False)

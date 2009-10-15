@@ -18,7 +18,7 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util.hglib import *
 from tortoisehg.util import shlib, hglib
 
-from tortoisehg.hgtk import gdialog, gtklib, hgcmd
+from tortoisehg.hgtk import gdialog, gtklib, hgcmd, statusbar
 
 class ChangeSet(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
@@ -600,7 +600,7 @@ class ChangeSet(gdialog.GDialog):
             # add status bar for main app
             vbox = gtk.VBox()
             vbox.pack_start(self._hpaned, True, True)
-            self.stbar = gtklib.StatusBar()
+            self.stbar = statusbar.StatusBar()
             self.stbar.show()
             vbox.pack_start(gtk.HSeparator(), False, False)
             vbox.pack_start(self.stbar, False, False)

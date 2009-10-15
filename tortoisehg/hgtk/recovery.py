@@ -18,7 +18,7 @@ from mercurial import hg, ui
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, paths
 
-from tortoisehg.hgtk import gdialog, dialog, gtklib, hgthread
+from tortoisehg.hgtk import gdialog, dialog, gtklib, hgthread, statusbar
 
 class RecoveryDialog(gtk.Window):
     def __init__(self):
@@ -89,7 +89,7 @@ class RecoveryDialog(gtk.Window):
                                    foreground='#900000')
         vbox.pack_start(scrolledwindow, True, True)
 
-        self.stbar = gtklib.StatusBar()
+        self.stbar = statusbar.StatusBar()
         vbox.pack_start(self.stbar, False, False, 2)
 
     def _delete(self, widget, event):

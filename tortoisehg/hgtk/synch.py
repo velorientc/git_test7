@@ -21,7 +21,7 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
 
 from tortoisehg.hgtk import dialog, gtklib, hgthread, thgconfig
-from tortoisehg.hgtk import thgshelve, hgemail, update
+from tortoisehg.hgtk import thgshelve, hgemail, update, statusbar
 
 class SynchDialog(gtk.Window):
     def __init__(self, repos=[], pushmode=False):
@@ -250,7 +250,7 @@ class SynchDialog(gtk.Window):
         basevbox.pack_start(scrolledwindow, True, True)
 
         # statusbar
-        self.stbar = gtklib.StatusBar()
+        self.stbar = statusbar.StatusBar()
         basevbox.pack_end(self.stbar, False, False, 2)
 
         # support dropping of repos or bundle files

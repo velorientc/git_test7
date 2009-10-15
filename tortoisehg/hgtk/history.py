@@ -25,6 +25,7 @@ from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
+from tortoisehg.hgtk import statusbar
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
@@ -820,7 +821,7 @@ class GLog(gdialog.GDialog):
 
     def get_body(self):
         self.gorev_dialog = None
-        self.stbar = gtklib.StatusBar()
+        self.stbar = statusbar.StatusBar()
         self.limit = self.get_graphlimit(None)
 
         # Allocate TreeView instance to use internally

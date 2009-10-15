@@ -18,7 +18,7 @@ from mercurial import hg, ui, mdiff, cmdutil, match, util
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, paths, thread2, settings
 
-from tortoisehg.hgtk import gtklib
+from tortoisehg.hgtk import gtklib, statusbar
 
 # This function and some key bits below borrowed ruthelessly from
 # Peter Arrenbrecht <peter.arrenbrecht@gmail.com>
@@ -205,7 +205,7 @@ class DetectRenameDialog(gtk.Window):
         diffview.set_editable(False)
 
         # status bar
-        self.stbar = gtklib.StatusBar()
+        self.stbar = statusbar.StatusBar()
         mainvbox.pack_start(self.stbar, False, False, 2)
 
         # register signal handlers

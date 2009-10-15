@@ -75,64 +75,6 @@ def thgclose(window):
     window.destroy()
     return True
 
-class StatusBar(gtk.HBox):
-    def __init__(self, extra=None):
-        gtk.HBox.__init__(self)
-        self.pbar = gtk.ProgressBar()
-        self.sttext = gtk.Label("")
-        self.sttext.set_alignment(0, 0.5)
-
-        self.pbox = gtk.HBox()
-        self.pbox.pack_start(gtk.VSeparator(), False, False)
-        self.pbox.pack_start(self.pbar, False, False)
-
-        self.pack_start(self.sttext, padding=4)
-        if extra:
-            self.pack_end(extra, False, False)
-        self.right1_label = gtk.Label()
-        self.pack_end(self.right1_label, False, False, padding=20)
-        self.pack_end(self.pbox, False, False, padding=1)
-        self.pbox.set_child_visible(False)
-        self.right2_label = gtk.Label()
-        self.pack_end(self.right2_label, False, False, padding=5)
-        self.right3_label = gtk.Label()
-        self.pack_end(self.right3_label, False, False, padding=20)
-        self.show_all()
-
-    def _pulse_timer(self, now=False):
-        self.pbar.pulse()
-        return True
-
-    def begin(self, msg=_('Running'), timeout=100):
-        self.pbox.set_child_visible(True)
-        self.pbox.map()
-        self.set_status_text(msg)
-        self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
-
-    def end(self, msg='', unmap=True):
-        gobject.source_remove(self._timeout_event)
-        self.set_status_text(msg)
-        if unmap:
-            self.pbox.unmap()
-        else:
-            self.pbar.set_fraction(1.0)
-
-    def set_status_text(self, msg):
-        self.sttext.set_text(str(msg))
-
-    def set_right1_text(self, msg):
-        self.right1_label.set_text(str(msg))
-
-    def set_right2_text(self, msg):
-        self.right2_label.set_text(str(msg))
-
-    def set_right3_text(self, msg):
-        self.right3_label.set_text(str(msg))
-
-    def set_pulse_step(self, val):
-        self.pbar.set_pulse_step(val)
-
-
 class MessageDialog(gtk.Dialog):
     button_map = {
             gtk.BUTTONS_NONE: None,

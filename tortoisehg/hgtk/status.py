@@ -21,7 +21,7 @@ from mercurial import merge as merge_
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, paths, hgshelve
 
-from tortoisehg.hgtk import dialog, gdialog, gtklib, guess, hgignore
+from tortoisehg.hgtk import dialog, gdialog, gtklib, guess, hgignore, statusbar
 
 # file model row enumerations
 FM_CHECKED = 0
@@ -421,7 +421,7 @@ class GStatus(gdialog.GDialog):
         self.tree_sel_changed(filesel, difftree, page_num)
 
     def get_extras(self):
-        self.stbar = gtklib.StatusBar()
+        self.stbar = statusbar.StatusBar()
         return self.stbar
 
     def add_header_checkbox(self, col, post=None, pre=None, toggle=False):
