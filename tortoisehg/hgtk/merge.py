@@ -71,15 +71,11 @@ class MergeDialog(gtk.Dialog):
         # changeset info
         style = csinfo.panelstyle(contents=csinfo.PANEL_DEFAULT + ('ishead',),
                                   margin=5, padding=2)
-        def data_func(widget, ctx):
-            node = ctx.node()
-            return node in repo.heads()
         def markup_func(widget, value):
             if value:
                 return ''
             return gtklib.markup(_('Not a head revision!'), weight='bold')
-        custom = csinfo.custom(ishead={
-                        'data': data_func, 'markup': markup_func})
+        custom = csinfo.custom(ishead={'markup': markup_func})
         factory = csinfo.factory(repo, custom, style)
 
         info = factory(rev1, style={'label': _('Merge target (other)')})
