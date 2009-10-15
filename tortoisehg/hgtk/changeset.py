@@ -743,7 +743,19 @@ class ChangeSet(gdialog.GDialog):
         'User selected visual diff file from the file list context menu'
         if not self.curfile:
             return
-        opts = {'change':str(self.currev), 'bundle':self.bfile}
+
+        opts = {'bundle':self.bfile}
+        rev = self.currev
+        parents = self.repo[rev].parents()
+        if len(parents) == 2:
+            if self.diff_other_parent():
+                parent = parents[1].rev()
+            else:
+                parent = parents[0].rev()
+            opts['rev'] = [str(parent), str(rev)]
+        else:
+            opts['change'] = str(rev)
+
         self._do_diff([self.curfile], opts)
 
     def view_file_rev(self, menuitem):
