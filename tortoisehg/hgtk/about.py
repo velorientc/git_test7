@@ -22,12 +22,20 @@ def browse_url(url):
             import win32api, win32con
             win32api.ShellExecute(0, "open", url, None, "",
                 win32con.SW_SHOW)
+        elif sys.platform == 'darwin':
+            # use Mac OS X internet config module (removed in Python 3.0)
+            import ic
+            ic.launchurl(url)
         else:
-            import gconf
-            client = gconf.client_get_default()
-            browser = client.get_string(
-                    '/desktop/gnome/url-handlers/http/command') + '&'
-            os.system(browser % url)
+            try:
+                import gconf
+                client = gconf.client_get_default()
+                browser = client.get_string(
+                        '/desktop/gnome/url-handlers/http/command') + '&'
+                os.system(browser % url)
+            except ImportError:
+                # If gconf is not found, fall back to old standard
+                os.system('firefox ' + url)
     threading.Thread(target=start_browser).start()
 
 def url_handler(dialog, link, user_data):
