@@ -18,7 +18,7 @@ from tortoisehg.hgtk import gtklib
 
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'date', 'branch', 'tags')
 
-def create(repo, rev, style=None, custom=None):
+def create(repo, rev=None, style=None, custom=None):
     return CachedFactory(repo, custom, style, rev)()
 
 def factory(*args, **kargs):
@@ -271,8 +271,6 @@ class ChangesetPanel(ChangesetBase, gtk.Frame):
         self.table = gtklib.LayoutTable(ypad=1, headopts={'weight': 'bold'})
         self.add(self.table)
 
-        self.update()
-
     def update(self, rev=None, style=None, custom=None, repo=None):
         ChangesetBase.update(self, rev, custom, repo)
         if style is not None:
@@ -318,8 +316,6 @@ class ChangesetLabel(ChangesetBase, gtk.Label):
 
         self.set_alignment(0, 0.5)
         self.csstyle = style
-
-        self.update()
 
     def update(self, rev=None, style=None, custom=None, repo=None):
         ChangesetBase.update(self, rev, custom, repo)

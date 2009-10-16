@@ -80,11 +80,13 @@ class MergeDialog(gtk.Dialog):
 
         info = factory(rev1, style={'label': _('Merge target (other)')})
         self.vbox.pack_start(info, False, False)
+        info.update()
         self.otherframe = info
         self.otherrev = info.get_data('revnum')
 
         info = factory(rev0, style={'label': _('Current revision (local)')})
         self.vbox.pack_start(info, False, False)
+        info.update()
         self.localframe = info
         self.localrev = '???'
 

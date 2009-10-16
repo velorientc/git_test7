@@ -240,6 +240,7 @@ class StripDialog(gtk.Dialog):
             if info.parent:
                 info.parent.remove(info)
             self.resultbox.pack_start(info, False, False, 2)
+            info.update()
         def add_sep():
             if not compactview:
                 self.resultbox.pack_start(gtk.HSeparator(), False, False)
