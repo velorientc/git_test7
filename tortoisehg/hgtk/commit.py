@@ -381,15 +381,16 @@ class GCommit(GStatus):
         style = csinfo.labelstyle(contents=('Parent: %(rev)s',
                        ' %(athead)s', ' %(branch)s', ' %(tags)s',
                        ' %(summary)s'), selectable=True)
-        def data_func(widget, ctx):
-            return widget.get_data('ishead') or self.mqmode
-        def markup_func(widget, value):
-            if value:
-                return ''
-            text = '[%s]' % _('not at head revision')
-            return gtklib.markup(text, weight='bold')
-        custom = csinfo.custom(athead={
-                        'data': data_func, 'markup': markup_func})
+        def data_func(widget, item, ctx):
+            if item == 'athead':
+                return widget.get_data('ishead') or self.mqmode
+            raise csinfo.UnknownItem(item)
+        def markup_func(widget, item, value):
+            if item == 'athead' and value is False:
+                text = '[%s]' % _('not at head revision')
+                return gtklib.markup(text, weight='bold')
+            raise csinfo.UnknownItem(item)
+        custom = csinfo.custom(data=data_func, markup=markup_func)
         factory = csinfo.factory(self.repo, custom, style)
         def add_parent():
             label = factory()

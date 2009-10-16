@@ -109,6 +109,9 @@ class CachedFactory(object):
         else:
             raise _("must be specified 'type' in style")
 
+class UnknownItem(Exception):
+    pass
+
 class ChangesetInfo(object):
 
     LABELS = {'rev': _('rev:'), 'revnum': _('rev:'), 'revid': _('rev:'),
@@ -121,9 +124,9 @@ class ChangesetInfo(object):
 
     def get_data(self, item, *args):
         widget, rev, custom, repo = args
-        def default_func(widget, ctx):
+        def default_func(widget, item, ctx):
             return None
-        def preset_func(widget, ctx):
+        def preset_func(widget, item, ctx):
             if item == 'rev':
                 revnum = self.get_data('revnum', *args)
                 revid = self.get_data('revid', *args)
@@ -170,28 +173,42 @@ class ChangesetInfo(object):
                 return value
             elif item == 'ishead':
                 return len(ctx.children()) == 0
-            return default_func(widget, ctx)
+            raise UnknownItem(item)
         ctx = repo[rev]
-        if custom.has_key(item) and custom[item].has_key('data'):
-            return custom[item]['data'](widget, ctx)
-        return preset_func(widget, ctx)
+        if custom.has_key('data'):
+            try:
+                return custom['data'](widget, item, ctx)
+            except UnknownItem:
+                pass
+        try:
+            return preset_func(widget, item, ctx)
+        except UnknownItem:
+            pass
+        return default_func(widget, item, ctx)
 
     def get_label(self, item, widget, rev, custom, repo):
-        def default_func(widget):
+        def default_func(widget, item):
             return ''
-        def preset_func(widget):
+        def preset_func(widget, item):
             try:
                 return self.LABELS[item]
-            except:
-                return default_func(widget)
-        if custom.has_key(item) and custom[item].has_key('label'):
-            return custom[item]['label'](widget)
-        return preset_func(widget)
+            except KeyError:
+                raise UnknownItem(item)
+        if custom.has_key('label'):
+            try:
+                return custom['label'](widget, item)
+            except UnknownItem:
+                pass
+        try:
+            return preset_func(widget, item)
+        except UnknownItem:
+            pass
+        return default_func(widget, item)
 
     def get_markup(self, item, widget, rev, custom, repo):
-        def default_func(widget, value):
-            return gtklib.markup_escape_text(value)
-        def preset_func(widget, value):
+        def default_func(widget, item, value):
+            return ''
+        def preset_func(widget, item, value):
             if item in ('rev', 'revnum', 'revid'):
                 return gtklib.markup(value, face='monospace', size='9000')
             elif item in ('rawbranch', 'branch'):
@@ -201,13 +218,22 @@ class ChangesetInfo(object):
                 opts = dict(color='black', background='#ffffaa')
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
-            return default_func(widget, value)
+            elif item in ('summary', 'user', 'date'):
+                return gtklib.markup_escape_text(str(value))
+            raise UnknownItem(item)
         value = self.get_data(item, widget, rev, custom, repo)
         if value is None:
             return None
-        if custom.has_key(item) and custom[item].has_key('markup'):
-            return custom[item]['markup'](widget, value)
-        return preset_func(widget, value)
+        if custom.has_key('markup'):
+            try:
+                return custom['markup'](widget, item, value)
+            except UnknownItem:
+                pass
+        try:
+            return preset_func(widget, item, value)
+        except UnknownItem:
+            pass
+        return default_func(widget, item, value)
 
 class CachedChangesetInfo(ChangesetInfo):
 
