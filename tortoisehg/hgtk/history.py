@@ -62,6 +62,27 @@ class GLog(gdialog.GDialog):
     def get_help_url(self):
         return 'changelog.html'
 
+    def delete(self, window, event):
+        if not self.should_live():
+            self.destroy()
+        else:
+            return True
+
+    def should_live(self, widget=None, event=None):
+        live = False
+        if self.bfile:
+            # response: 0=Yes, 1=No, 2=Cancel
+            response = gdialog.CustomPrompt(_('Accept Incoming Changes?'),
+                _('Pull these incoming changes, or discard?'), self,
+                (_('&Accept'), _('&Reject'), _('&Cancel')), 2, 2).run()
+            if response == 0:
+                self.apply_clicked(None)
+            elif response == 2:
+                live = True
+        if not live:
+            self._destroying(widget)
+        return live
+
     def get_title(self):
         str = _('%s - changelog') % self.get_reponame()
         if self.bfile:
@@ -819,6 +840,7 @@ class GLog(gdialog.GDialog):
         return menu
 
     def get_body(self):
+        self.connect('delete-event', self.delete)
         self.gorev_dialog = None
         self.stbar = statusbar.StatusBar()
         self.limit = self.get_graphlimit(None)
