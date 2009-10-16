@@ -18,7 +18,7 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util.hglib import *
 from tortoisehg.util import shlib, hglib
 
-from tortoisehg.hgtk import gdialog, gtklib, hgcmd, statusbar
+from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
 
 class ChangeSet(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
@@ -212,91 +212,12 @@ class ChangeSet(gdialog.GDialog):
                 self.append_all_patch_diffs()
 
     def generate_change_header(self):
-        buf, rev = self._buffer, self.currev
+        self.csetinfo.update(self.currev)
 
-        def pad_right(text):
-            spaces = ' ' * (12 - len(hglib.tounicode(text)))
-            return text + spaces
-
-        def title_line(title, text, tag):
-            utext = toutf(pad_right(title) + text)
-            buf.insert_with_tags_by_name(eob, utext, tag)
-            buf.insert(eob, "\n")
-
+        buf = self._buffer
         buf.set_text('')
-        ctx = self.repo[rev]
-
         eob = buf.get_end_iter()
-        date = displaytime(ctx.date())
-        change = str(rev) + ' (' + str(ctx) + ')'
-        try:
-            lines = ctx.description().splitlines()
-            summary = toutf(lines and lines[0] or '')
-        except:
-            summary = ''
-        tags = ' '.join(ctx.tags())
-
-        branch = ctx.branch()
-
-        utext = toutf(pad_right(_('changeset:')) + change)
-        buf.insert_with_tags_by_name(eob, utext, 'changeset')
-        utext = toutf(' ' + summary)
-        buf.insert_with_tags_by_name(eob, utext, 'changeset-summary')
-        buf.insert(eob, "\n")
-
-        if branch != 'default':
-            title_line(_('branch:'), branch, 'greybg')
-        title_line(_('user:'), ctx.user(), 'changeset')
-        title_line(_('date:'), date, 'changeset')
-
-        def insert_link(title, ctx, highlight=False):
-            try:
-                lines = ctx.description().splitlines()
-                summary = toutf(lines and lines[0] or '')
-            except:
-                summary = ''
-
-            link = str(ctx.rev()) + ' (' + str(ctx) + ')'
-            if ctx.branch() != branch:
-                link += ' [' + toutf(ctx.branch()) + ']'
-
-            hl = ''
-            if highlight:
-                hl = 'hl'
-            ins = buf.insert_with_tags_by_name
-            ins(eob, pad_right(title), 'parent' + hl)
-            ins(eob, link, 'link' + hl)
-            ins(eob, ' ' + summary, 'changeset-summary')
-            buf.insert(eob, "\n")
-
-        ismerge = (len(ctx.parents()) == 2)
-
-        if ismerge and self.diff_other_parent():
-            parentindex = 1 
-        else:
-            parentindex = 0
-
-        for pctx in ctx.parents():
-            hl = ismerge and pctx == ctx.parents()[parentindex]
-            insert_link(_('parent:'), pctx, hl)
-
-        for cctx in ctx.children():
-            insert_link(_('child:'), cctx)
-
-        if tags: 
-            title_line(_('tags:'), tags, 'tag')
-
-        extra = ctx.extra()
-        try:
-            ts = extra['transplant_source']
-            try:
-                tctx = self.repo[ts]
-                insert_link(_('transplant:'), tctx)
-            except (LookupError, RepoLookupError, RepoError):
-                title_line(_('transplant:'), binascii.hexlify(ts), 'changeset')
-        except KeyError:
-            pass
-
+        ctx = self.repo[self.currev]
         desc = toutf(ctx.description())
         buf.insert(eob, '\n' + desc + '\n\n')
 
@@ -523,24 +444,89 @@ class ChangeSet(gdialog.GDialog):
             self.clipboard = None
         self.filemenu = self.file_context_menu()
 
+        # changeset frame
         details_frame = gtk.Frame()
         details_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         details_frame.add(scroller)
 
+        details_box = gtk.VBox()
+        scroller.add_with_viewport(details_box)
+        scroller.child.set_shadow_type(gtk.SHADOW_NONE)
+
+        ## changeset panel
+        style = csinfo.panelstyle(contents=('cset', 'branch', 'user', 'date',
+                                  'parents', 'children', 'tags', 'transplant'))
+        def data_func(widget, item, ctx):
+            def revline_data(ctx):
+                desc = ctx.description().replace('\0', '')
+                summary = hglib.toutf(desc.split('\n')[0][:80])
+                return (str(ctx.rev()), str(ctx), summary)
+            if item == 'cset':
+                return revline_data(ctx)
+            elif item == 'branch':
+                value = hglib.toutf(ctx.branch())
+                return value != 'default' and value or None
+            elif item == 'parents':
+                return [revline_data(ctx) for ctx in ctx.parents()]
+            elif item == 'children':
+                return [revline_data(ctx) for ctx in ctx.children()]
+            elif item == 'transplant':
+                extra = ctx.extra()
+                try:
+                    ts = extra['transplant_source']
+                    try:
+                        tctx = self.repo[ts]
+                        return revline_data(tctx)
+                    except (LookupError, RepoLookupError, RepoError):
+                        return binascii.hexlify(ts)
+                except KeyError:
+                    return None
+            raise csinfo.UnknownItem(item)
+        def label_func(widget, item):
+            if item == 'cset':
+                return _('changeset:')
+            elif item == 'parents':
+                return _('parent:')
+            elif item == 'children':
+                return _('child:')
+            elif item == 'transplant':
+                return _('transplant:')
+            raise csinfo.UnknownItem(item)
+        def markup_func(widget, item, value):
+            def revline_markup(revnum, revid, summary):
+                revnum = gtklib.markup(revnum)
+                revid = gtklib.markup(revid, face='monospace', size='9000')
+                summary = gtklib.markup(summary)
+                return '%s (%s) %s' % (revnum, revid, summary)
+            if item in ('cset', 'transplant'):
+                if isinstance(value, basestring):
+                    return gtklib.markup(value, face='monospace', size='9000')
+                return revline_markup(*value)
+            elif item in ('parents', 'children'):
+                return [revline_markup(*data) for data in value]
+            raise csinfo.UnknownItem(item)
+        custom = csinfo.custom(data=data_func, label=label_func,
+                               markup=markup_func)
+        self.csetinfo = csinfo.create(self.repo, None, style, custom)
+        details_box.pack_start(self.csetinfo, False, False)
+        details_box.pack_start(gtk.HSeparator(), False, False)
+
+        ## changeset diff
         details_text = gtk.TextView()
         details_text.set_wrap_mode(gtk.WRAP_NONE)
         details_text.connect('populate-popup', self.add_to_popup)
         details_text.set_editable(False)
         details_text.modify_font(pango.FontDescription(self.fontcomment))
-        scroller.add(details_text)
+        details_box.pack_start(details_text)
 
         self._buffer = gtk.TextBuffer()
         self.setup_tags()
         details_text.set_buffer(self._buffer)
         self.textview = details_text
 
+        ## file list
         filelist_tree = gtk.TreeView()
         filesel = filelist_tree.get_selection()
         filesel.connect('changed', self.filelist_rowchanged)
