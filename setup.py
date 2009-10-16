@@ -145,6 +145,7 @@ def setup_posix():
         f.write('license_path = "/usr/share/doc/tortoisehg/Copying.txt.gz"\n')
         f.write('locale_path  = "/usr/share/locale"\n')
         f.write('icon_path    = "/usr/share/pixmaps/tortoisehg/icons"\n')
+        f.write('nofork       = True\n')
         f.close()
 
     return _scripts, _packages, _data_files, _extra

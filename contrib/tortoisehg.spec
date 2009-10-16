@@ -44,6 +44,7 @@ bin_path     = "%{_bindir}"
 license_path = "%{_docdir}/%{name}-%{version}/COPYING.txt"
 locale_path  = "%{_datadir}/locale"
 icon_path    = "%{_datadir}/pixmaps/tortoisehg/icons"
+nofork       = True
 EOT
 
 %build

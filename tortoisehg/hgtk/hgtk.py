@@ -25,6 +25,10 @@ from mercurial import hg, util, fancyopts, cmdutil, extensions
 from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import hglib, paths, shlib
 from tortoisehg.util import version as thgversion
+try:
+    from tortoisehg.util.config import nofork as config_nofork
+except ImportError:
+    config_nofork = None
 
 nonrepo_commands = '''userconfig clone debugcomplete init about help
 version thgstatus serve'''
@@ -72,11 +76,13 @@ def dispatch(args):
             gtkrun(run, u, **opts)
 
 def portable_fork(ui, opts):
-    if 'THG_HGTK_SPAWN' in os.environ:
+    if 'THG_HGTK_SPAWN' in os.environ or \
+            opts.get('nofork') or opts.get('repository'):
         return
-    if opts.get('nofork') or opts.get('repository'):
-        return
-    if not ui.configbool('tortoisehg', 'hgtkfork', True):
+    elif ui.configbool('tortoisehg', 'hgtkfork', None) is not None:
+        if not ui.configbool('tortoisehg', 'hgtkfork'):
+            return
+    elif config_nofork:
         return
     # Spawn background process and exit
     if hasattr(sys, "frozen"):
