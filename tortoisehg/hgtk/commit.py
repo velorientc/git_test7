@@ -216,7 +216,6 @@ class GCommit(GStatus):
 
 
     def load_settings(self, settings):
-        self.connect('delete-event', self.delete)
         GStatus.load_settings(self, settings)
         self.setting_vpos = -1
         self.showparents = True
@@ -283,6 +282,7 @@ class GCommit(GStatus):
             self.qnew_name.set_position(-1)
 
     def get_body(self):
+        self.connect('delete-event', self.delete)
         status_body = GStatus.get_body(self)
 
         vbox = gtk.VBox()
