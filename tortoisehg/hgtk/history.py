@@ -257,7 +257,7 @@ class GLog(gdialog.GDialog):
 
     def toggle_show_toolbar(self, button):
         self.show_toolbar = button.get_active()
-        self.toolbar.set_property('visible', self.show_toolbar)
+        self._show_toolbar(self.show_toolbar)
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
@@ -452,10 +452,6 @@ class GLog(gdialog.GDialog):
             opts['pats'] = self.pats
         self.reload_log(**opts)
 
-        # unfortunately, idle_add is needed here
-        gtklib.idle_add_single_call(self.toolbar.set_property, 
-            'visible', self.show_toolbar)
-
         self.filterbox.set_property('visible', self.show_filterbar)
         self.filterbox.set_no_show_all(True)
         self.syncbox.set_property('visible', self.show_syncbar)
@@ -551,6 +547,9 @@ class GLog(gdialog.GDialog):
         self.filter_mode = settings.get('filter-mode', 1)
         default_co = 'graph rev id branch msg user date utc age tag'
         self.column_order = settings.get('column-order', default_co)
+
+    def show_toolbar_on_start(self):
+        return self.show_toolbar
 
     def refresh_model(self):
         'Refresh data in the history model, without reloading graph'
