@@ -331,8 +331,12 @@ class ChangesetPanel(ChangesetBase, gtk.Frame):
         # build info
         self.table.clear_rows()
         for item in contents:
-            text = self.get_markup(item)
-            if text:
+            markups = self.get_markup(item)
+            if not markups:
+                continue
+            if isinstance(markups, basestring):
+                markups = (markups,)
+            for text in markups:
                 body = gtk.Label()
                 body.set_markup(text)
                 self.table.add_row(self.get_label(item), body)
@@ -377,9 +381,12 @@ class ChangesetLabel(ChangesetBase, gtk.Label):
             # fetch required data
             data = {}
             for item in items:
-                text = self.get_markup(item)
-                if text:
-                    data[item] = text
+                markups = self.get_markup(item)
+                if not markups:
+                    continue
+                if isinstance(markups, basestring):
+                    markups = (markups,)
+                data[item] = ', '.join(markups)
             if len(data) == 0:
                 continue
             # insert data & append to label
