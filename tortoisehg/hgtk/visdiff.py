@@ -307,6 +307,15 @@ def rawextdiff(ui, *pats, **opts):
         ui.warn(_('Extdiff command not recognized\n'))
         return
     pats = hglib.canonpaths(pats)
+
+    # if both --change and --rev is given, remove --rev in 3-way mode,
+    # and --change in normal mode
+    if 'change' in opts and 'rev' in opts:
+        if '$parent2' in ''.join(diffopts):
+            del opts['rev']
+        else:
+            del opts['change']
+
     try:
         ret = extdiff.dodiff(ui, repo, diffcmd, diffopts, pats, opts)
     except OSError, e:
@@ -347,6 +356,11 @@ def run(ui, *pats, **opts):
             os.chdir(oldcwd)
         return None
     else:
+        # prefer --rev over --change for internal diff handling since we can
+        # only diff against a single parent at a time for merge changesets
+        if 'change' in opts and 'rev' in opts:
+            del opts['change']
+
         pats = hglib.canonpaths(pats)
         if opts.get('canonpats'):
             pats = list(pats) + opts['canonpats']
