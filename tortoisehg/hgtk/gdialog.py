@@ -231,6 +231,10 @@ class GDialog(gtk.Window):
         except KeyError:
             pass
 
+
+    def show_toolbar_on_start(self):
+        return True
+
     ### End of overridable methods ###
 
     def display(self, opengui=True):
@@ -515,12 +519,25 @@ class GDialog(gtk.Window):
         self.add(vbox)
         if menus:
             vbox.pack_start(menubar, False, False, 0)
-        vbox.pack_start(toolbar, False, False, 0)
+
+        self.toolbar_box = gtk.VBox()
+        vbox.pack_start(self.toolbar_box, False, False, 0)
+        if self.show_toolbar_on_start():
+            self._show_toolbar(True)
+
         vbox.pack_start(body, True, True, 0)
         if extras:
             vbox.pack_end(extras, False, False, 0)
 
         self.connect('destroy', self._destroying)
+
+
+    def _show_toolbar(self, show):
+        if self.toolbar in self.toolbar_box.get_children():
+            self.toolbar.set_property('visible', show)
+        elif show:
+            self.toolbar_box.pack_start(self.toolbar, False, False, 0)
+            self.toolbar.show_all()
 
 
     def _destroying(self, gtkobj):
