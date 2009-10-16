@@ -559,7 +559,7 @@ class GCommit(GStatus):
         new_sentence = ['']
 
         for part in parts:
-            if len(new_sentence[-1]) + len(part) > line_width:
+            if len(new_sentence[-1]) + len(part) + 1 > line_width:
                 new_sentence.append('')
                 
             new_sentence[-1] += '%s ' % part
