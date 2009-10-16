@@ -18,8 +18,8 @@ from tortoisehg.hgtk import gtklib
 
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'date', 'branch', 'tags')
 
-def create(repo, rev=None, style=None, custom=None):
-    return CachedFactory(repo, custom, style, rev)()
+def create(repo, rev=None, style=None, custom=None, **kargs):
+    return CachedFactory(repo, custom, style, rev, **kargs)()
 
 def factory(*args, **kargs):
     return CachedFactory(*args, **kargs)
@@ -40,7 +40,7 @@ def custom(**kargs):
 class CachedFactory(object):
 
     def __init__(self, repo=None, custom=None, style=None, rev=None,
-                 widgetcache=False):
+                 withupdate=False, widgetcache=False):
         if repo is None:
             try:
                 root = paths.find_root()
@@ -59,6 +59,7 @@ class CachedFactory(object):
         self.rev = rev
         self.info = CachedChangesetInfo()
 
+        self.withupdate = withupdate
         if widgetcache:
             self.cache = {}
 
@@ -102,6 +103,8 @@ class CachedFactory(object):
                 raise _("unknown 'type': %s") % type
             if hasattr(self, 'cache'):
                 self.cache[key] = widget
+            if self.withupdate:
+                widget.update()
             return widget
         else:
             raise _("must be specified 'type' in style")

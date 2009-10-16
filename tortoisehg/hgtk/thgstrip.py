@@ -127,7 +127,7 @@ class StripDialog(gtk.Dialog):
         self.allbtn.connect('clicked', lambda b: self.preview(limit=False))
 
         # csetinfo factory
-        self.factory = csinfo.factory(repo, widgetcache=True)
+        self.factory = csinfo.factory(repo, withupdate=True, widgetcache=True)
         self.lstyle = csinfo.labelstyle(contents=('%(revnum)s:',
                              ' %(branch)s', ' %(tags)s', ' %(summary)s'))
         self.pstyle = csinfo.panelstyle()
@@ -240,7 +240,6 @@ class StripDialog(gtk.Dialog):
             if info.parent:
                 info.parent.remove(info)
             self.resultbox.pack_start(info, False, False, 2)
-            info.update()
         def add_sep():
             if not compactview:
                 self.resultbox.pack_start(gtk.HSeparator(), False, False)

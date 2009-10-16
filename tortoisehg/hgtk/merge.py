@@ -76,19 +76,17 @@ class MergeDialog(gtk.Dialog):
                 return ''
             return gtklib.markup(_('Not a head revision!'), weight='bold')
         custom = csinfo.custom(ishead={'markup': markup_func})
-        factory = csinfo.factory(repo, custom, style)
+        factory = csinfo.factory(repo, custom, style, withupdate=True)
 
         info = factory(rev1, style={'label': _('Merge target (other)')})
         self.vbox.pack_start(info, False, False)
-        info.update()
         self.otherframe = info
         self.otherrev = info.get_data('revnum')
 
         info = factory(rev0, style={'label': _('Current revision (local)')})
         self.vbox.pack_start(info, False, False)
-        info.update()
         self.localframe = info
-        self.localrev = '???'
+        self.localrev = info.get_data('revnum')
 
         # buttons
         self.mergebtn = self.add_button(_('Merge'), RESPONSE_MERGE)
