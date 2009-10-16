@@ -26,6 +26,8 @@ def factory(*args, **kargs):
 
 def panelstyle(**kargs):
     kargs['type'] = 'panel'
+    if 'contents' not in kargs:
+        kargs['contents'] = PANEL_DEFAULT
     return kargs
 
 def labelstyle(**kargs):
@@ -50,7 +52,7 @@ class CachedFactory(object):
             custom = {}
         self.custom = custom
         if style is None:
-            style = panelstyle(contents=PANEL_DEFAULT)
+            style = panelstyle()
         self.csstyle = style
         if rev is None:
             rev = 'tip'
@@ -93,19 +95,14 @@ class CachedFactory(object):
             args = (rev, style, custom, repo, self.info)
             type = style['type']
             if type == 'panel':
-                if 'contents' not in style:
-                    style['contents'] = PANEL_DEFAULT
-                panel = ChangesetPanel(*args)
-                if hasattr(self, 'cache'):
-                    self.cache[key] = panel
-                return panel
+                widget = ChangesetPanel(*args)
             elif type == 'label':
-                label = ChangesetLabel(*args)
-                if hasattr(self, 'cache'):
-                    self.cache[key] = label
-                return label
+                widget = ChangesetLabel(*args)
             else:
                 raise _("unknown 'type': %s") % type
+            if hasattr(self, 'cache'):
+                self.cache[key] = widget
+            return widget
         else:
             raise _("must be specified 'type' in style")
 
