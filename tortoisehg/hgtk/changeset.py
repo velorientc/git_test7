@@ -457,7 +457,8 @@ class ChangeSet(gdialog.GDialog):
 
         ## changeset panel
         style = csinfo.panelstyle(contents=('cset', 'branch', 'user', 'date',
-                                  'parents', 'children', 'tags', 'transplant'))
+                                  'parents', 'children', 'tags', 'transplant'),
+                                  selectable=True)
         def data_func(widget, item, ctx):
             def revline_data(ctx):
                 desc = ctx.description().replace('\0', '')
