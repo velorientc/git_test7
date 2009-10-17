@@ -211,6 +211,9 @@ def displaytime(date):
 def utctime(date):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(date[0]))
 
+def age(date):
+    return templatefilters.age(date)
+
 def username(user):
     author = templatefilters.person(user)
     if not author:

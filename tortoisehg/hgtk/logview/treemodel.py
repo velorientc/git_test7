@@ -167,7 +167,7 @@ class TreeModel(gtk.GenericTreeModel):
                         ('black', '#aaffaa', branch)
 
             author = hglib.toutf(hglib.username(ctx.user()))
-            age = templatefilters.age(ctx.date())
+            age = hglib.age(ctx.date())
 
             color = self.color_func(revid, author)
             if revid in self.wcparents:
