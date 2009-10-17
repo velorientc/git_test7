@@ -456,9 +456,9 @@ class ChangeSet(gdialog.GDialog):
         scroller.child.set_shadow_type(gtk.SHADOW_NONE)
 
         ## changeset panel
-        style = csinfo.panelstyle(contents=('cset', 'branch', 'user', 'date',
-                                  'parents', 'children', 'tags', 'transplant'),
-                                  selectable=True)
+        style = csinfo.panelstyle(contents=('cset', 'branch', 'user',
+                                  'dateage', 'parents', 'children', 'tags',
+                                  'transplant'), selectable=True)
         def data_func(widget, item, ctx):
             def revline_data(ctx):
                 desc = ctx.description().replace('\0', '')
@@ -469,6 +469,10 @@ class ChangeSet(gdialog.GDialog):
             elif item == 'branch':
                 value = hglib.toutf(ctx.branch())
                 return value != 'default' and value or None
+            if item == 'dateage':
+                date = widget.get_data('date')
+                age = widget.get_data('age')
+                return (date, age)
             elif item == 'parents':
                 return [revline_data(ctx) for ctx in ctx.parents()]
             elif item == 'children':
@@ -488,6 +492,8 @@ class ChangeSet(gdialog.GDialog):
         def label_func(widget, item):
             if item == 'cset':
                 return _('changeset:')
+            elif item == 'dateage':
+                return _('date:')
             elif item == 'parents':
                 return _('parent:')
             elif item == 'children':
@@ -507,6 +513,8 @@ class ChangeSet(gdialog.GDialog):
                 return revline_markup(*value)
             elif item in ('parents', 'children'):
                 return [revline_markup(*data) for data in value]
+            elif item == 'dateage':
+                return gtklib.markup('%s (%s)' % value)
             raise csinfo.UnknownItem(item)
         custom = csinfo.custom(data=data_func, label=label_func,
                                markup=markup_func)
