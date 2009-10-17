@@ -219,7 +219,7 @@ class ChangesetInfo(object):
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
             elif item in ('summary', 'user', 'date'):
-                return gtklib.markup_escape_text(str(value))
+                return gtklib.markup(value)
             raise UnknownItem(item)
         value = self.get_data(item, widget, rev, custom, repo)
         if value is None:

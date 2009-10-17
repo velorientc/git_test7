@@ -338,7 +338,7 @@ def markup(text, **kargs):
     All options must be passed as keywork arguments.
     """
     if len(kargs) == 0:
-        return text
+        return markup_escape_text(str(text))
     attr = ''
     for name, value in kargs.items():
         attr += ' %s="%s"' % (name, value)
