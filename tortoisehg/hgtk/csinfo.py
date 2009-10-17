@@ -328,6 +328,9 @@ class ChangesetPanel(ChangesetBase, gtk.Frame):
         contents = self.csstyle.get('contents', None)
         assert contents
 
+        sel = self.csstyle.get('selectable', False)
+        assert isinstance(sel, bool)
+
         # build info
         self.table.clear_rows()
         for item in contents:
@@ -339,6 +342,7 @@ class ChangesetPanel(ChangesetBase, gtk.Frame):
             for text in markups:
                 body = gtk.Label()
                 body.set_markup(text)
+                body.set_selectable(sel)
                 self.table.add_row(self.get_label(item), body)
         self.show_all()
 
