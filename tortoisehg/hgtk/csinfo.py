@@ -115,7 +115,7 @@ class UnknownItem(Exception):
 class ChangesetInfo(object):
 
     LABELS = {'rev': _('rev:'), 'revnum': _('rev:'), 'revid': _('rev:'),
-              'summary': _('summary:'), 'user': _('user:'),
+              'summary': _('summary:'), 'user': _('user:'), 'age': _('age:'),
               'date': _('date:'), 'branch': _('branch:'), 'tags': _('tags:'),
               'rawbranch': _('branch:'), 'rawtags': _('tags:')}
 
@@ -145,6 +145,8 @@ class ChangesetInfo(object):
                 return hglib.toutf(ctx.user())
             elif item == 'date':
                 return hglib.displaytime(ctx.date())
+            elif item == 'age':
+                return hglib.age(ctx.date())
             elif item == 'rawbranch':
                 if ctx.node() in repo.branchtags().values():
                     return hglib.toutf(ctx.branch())
@@ -218,7 +220,7 @@ class ChangesetInfo(object):
                 opts = dict(color='black', background='#ffffaa')
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
-            elif item in ('summary', 'user', 'date'):
+            elif item in ('summary', 'user', 'date', 'age'):
                 return gtklib.markup(value)
             raise UnknownItem(item)
         value = self.get_data(item, widget, rev, custom, repo)
