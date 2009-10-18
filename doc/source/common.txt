@@ -7,19 +7,6 @@ Common Features
 These features are common to many TortoiseHg tools, so we document them
 here just once.
 
-Geometry Restore
-----------------
-
-Our primary applications like commit, changelog, and datamine will
-restore their geometry and position from the last time they were run.
-This includes maximization status.
-
-If the state to be restored does not fit within your current screen
-dimensions, the application will revert to factory default dimensions.
-
-Dialogs which have fixed geometry or are transitory allow the window
-manager to place them where it wishes.
-
 Keyboard Accelerators
 ---------------------
 
@@ -32,18 +19,18 @@ We define a few keyboard accelerators that all of the TortoiseHg tools support.
 	close the current window (same as :kbd:`Ctrl-Q` if only one window is open)
 
 :kbd:`Ctrl-D`
-	visual diff of currently selected file or changeset	
+	visual diff of currently selected file or changeset
 
 :kbd:`Ctrl-Enter`
 	activation
 
-:kbd:`F5`
+:kbd:`F5`, :kbd:`Ctrl-R`
 	refresh
 
-On `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_, the apple
-(command) key is used as the modifier instead of :kbd:`Ctrl`. However some
-keyboard accelerators are internal to GTK+ so you must use the control key to
-access cut-paste functionality, for instance.
+On `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_, the
+apple (command) key is used as the modifier instead of :kbd:`Ctrl`.
+However some keyboard accelerators are internal to GTK+ so you must use
+the control key to access cut-paste functionality, for instance.
 
 Visual Diffs
 ------------
@@ -104,12 +91,12 @@ user. The file lists in the status, commit, shelve, and changelog tools
 are treeviews. The changelog graph pane is a treeview. And even the
 annotate pane in the datamine tool is a treeview.
 
-Most of the TortoiseHg treeviews (as of release 0.8) are configured for
-live searches. Ensure that the treeview has focus (by clicking on a
-row), and begin typing a search phrase. A small entry window will appear
-containing the text you have typed, and the treeview will immediately
-jump to the first row that matches the text you have entered thus far.
-As you enter more characters, the search is refined.
+Most of the TortoiseHg treeviews are configured for live searches.
+Ensure that the treeview has focus (by clicking on a row), and begin
+typing a search phrase. A small entry window will appear containing the
+text you have typed, and the treeview will immediately jump to the first
+row that matches the text you have entered thus far.  As you enter more
+characters, the search is refined.
 
 * :kbd:`Ctrl-F` opens the search window explicitly
 * :kbd:`Ctrl-G` advances the search to the next match

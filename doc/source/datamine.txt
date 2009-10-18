@@ -65,6 +65,9 @@ will bring up a context menu with these features:
 		open an annotation tab for this file at this revision
 	:guilabel:`file history`
 		open a changelog window with this file's revision history
+	:guilabel:`view file at revision`
+		open the current file at the specified revision in your favorite
+		text editor.
 
 
 Annotate Tabs
@@ -98,12 +101,10 @@ Following Renames
 
 The annotation data will automatically follow lines of code back through
 copies and renames to find the initial changeset that introduced the
-line.  The graph log pane will not follow renames or copies
-automtaically.  Instead, when you click on a changeset in the revision
-graph that involved a rename or copy event, a button will appear that
-will allow you to follow the history graph back through the rename.
-Clicking on the button will open a new tab with the older filename
-annotated at the same changeset.
+line.  The graph log pane will also attempt to follow renames and
+copies, so some lines in the graph may corrolate to different filenames
+than the original annotated file path.  Renames are indicated in the
+graph by color changes within a column.
 
 Configurables
 ^^^^^^^^^^^^^

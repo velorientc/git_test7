@@ -122,14 +122,6 @@ commands that deal with arbitrary revision ranges.
 .. [#rcm6] Only sensitive if the selected revision is your current working
 		   directory parent
 
-Revision Filter Dialog
-----------------------
-
-.. figure:: figures/logfilter.jpg
-	:alt: Revision filter dialog
-
-	Log Filtering Dialog
-
 File Context Menus
 ------------------
 
@@ -206,6 +198,15 @@ the TortoiseHg Settings dialog on the Changelog tab.
 		Number of revisions to read in each batch load
 	:guilabel:`Copy Hash`
 		Copy a revision's changeset id hash to the clipboard when selected
+	:guilabel:`Dead Branches`
+		Comma separated list of branch names that should be ignored
+		when building a list of branch names for a repository.
+	:guilabel:`Branch Colors`
+		Space separated list of branch names and colors on the
+		form branch:#XXXXXX. Spaces and colons in the branch name must be
+		escaped using a backslash (\\). Likewise some other characters
+		can be escaped in this way, e.g. \\u0040 will be decoded to the
+		@ character, and \\n to a linefeed.
 
 The exact colors given to particular users can be configured by adding
 lines like these to your :file:`Mercurial.ini` file: ::

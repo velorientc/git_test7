@@ -18,7 +18,6 @@ AppSupportURL=http://bitbucket.org/tortoisehg/stable/
 AppUpdatesURL=http://bitbucket.org/tortoisehg/stable/
 AppID=TortoiseHg
 AppContact=Steve Borho <steve@borho.org>
-AppMutex=thgtaskbar,Global\thgtaskbar
 OutputBaseFilename=TortoiseHg-{#VERSION}
 DefaultDirName={pf}\TortoiseHg
 SourceDir=..\..
@@ -58,10 +57,11 @@ Source: ..\build-hg\contrib\hgk; DestDir: {app}/contrib
 Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
 Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
-Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n; Flags: 
+Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n; Flags:
 Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ; Components: help
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
+Source: contrib\win32\mercurialuser.ini; DestDir: {%USERPROFILE}; DestName: Mercurial.ini; AfterInstall: FileExpandStringEx('{%USERPROFILE}\Mercurial.ini'); Flags: onlyifdoesntexist 
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
 Source: ..\contrib\*.exe; DestDir: {app}; Flags: 
 Source: ..\contrib\*.dll; DestDir: {app}; Flags: 
@@ -76,11 +76,13 @@ Source: doc\build\chm\*.chm; DestDir: {app}/docs; Flags: ; Components: help
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
-Source: i18n\*.*; DestDir: {app}\i18n; Flags: 
+Source: i18n\*.*; DestDir: {app}\i18n; Flags: recursesubdirs createallsubdirs
+Source: win32\*.reg; DestDir: {app}\cmenu_i18n;
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
 Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Components: hgbook
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
+Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShellx86.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 Source: ..\misc\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 
 [INI]
@@ -102,7 +104,7 @@ Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 ;Filename: {tmp}\vcredist_x86.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
 ;Filename: {tmp}\vcredist_x64.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
-Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Check: not Is64BitInstallMode; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
+Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-x64.msi"" /qn /norestart ALLUSERS=1"; Check: Is64BitInstallMode; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
 
 [UninstallRun]
@@ -172,16 +174,60 @@ begin
     SP1Missing := True;
 end;
 
-function ShouldSkipPage(PageID: Integer): Boolean; 
-begin 
-  { Skip wpSelectDir page if upgrading; show all others } 
-  case PageID of 
-    wpSelectDir: 
-      Result := IsUpgrade; 
-  else 
-      Result := False; 
-  end; 
-end; 
+var UserInfoPage: TInputQueryWizardPage;
+var GetUserName: Boolean;
+
+procedure InitializeWizard(); 
+begin
+  if (not(FileExists(ExpandConstant('{%USERPROFILE}\Mercurial.ini')))) then
+  begin
+    // Create the page
+    UserInfoPage := CreateInputQueryPage(wpUserInfo,
+      'Personal Information', 'Who are you?',
+      'Please specify your name and email address, then click Next.');
+
+    // Add items (False means it's not a password edit)
+    UserInfoPage.Add('Full Name:', False);
+    UserInfoPage.Add('Email address:', False);
+
+    // Set initial values (optional)
+    UserInfoPage.Values[0] := ExpandConstant('{username}');
+    GetUserName := True;
+  end
+  else
+    GetUserName := False;
+end;
+
+procedure FileExpandStringEx(fn: String);
+var
+  InFile: String;
+  i: Integer;
+  InFileLines: TArrayOfString;
+begin
+  if (GetUserName) then
+  begin
+    InFile := ExpandConstant(fn);
+    LoadStringsFromFile(InFile, InFileLines);
+    for i:= 0 to GetArrayLength(InFileLines)-1 do
+    begin
+      InFileLines[i] := ExpandConstantEx(InFileLines[i], 
+        'hgusername', 
+         UserInfoPage.Values[0] + ' <' + UserInfoPage.Values[1] + '>');
+    end;
+    SaveStringsToFile(InFile, InFileLines, False);
+  end;
+end;
+
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  { Skip wpSelectDir page if upgrading; show all others }
+  case PageID of
+    wpSelectDir:
+      Result := IsUpgrade;
+  else
+      Result := False;
+  end;
+end;
 
 function TerminateThgTaskbar(): Boolean;
 var

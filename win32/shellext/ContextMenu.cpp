@@ -29,7 +29,7 @@ MenuDescription menuDescList[] =
     {"init",        L"Create Repository Here",
                     L"Create a new repository",
                     "menucreaterepos.ico", 0},
-    {"clone",       L"Clone a Repository",
+    {"clone",       L"Clone...",
                     L"Create clone here from source",
                     "menuclone.ico", 0},
     {"status",      L"View File Status",
@@ -38,19 +38,19 @@ MenuDescription menuDescList[] =
     {"shelve",      L"Shelve Changes",
                     L"Shelve or unshelve file changes",
                     "shelve.ico", 0},
-    {"add",         L"Add Files",
+    {"add",         L"Add Files...",
                     L"Add files to version control",
                     "menuadd.ico", 0},
-    {"revert",      L"Revert Files",
+    {"revert",      L"Revert Files...",
                     L"Revert file changes",
                     "menurevert.ico", 0},
-    {"remove",      L"Remove Files",
+    {"remove",      L"Remove Files...",
                     L"Remove files from version control",
                     "menudelete.ico", 0},
-    {"rename",      L"Rename File",
+    {"rename",      L"Rename File...",
                     L"Rename file or directory",
                     "general.ico", 0},
-    {"log",         L"View Changelog",
+    {"log",         L"Repository Explorer",
                     L"View change history in repository",
                     "menulog.ico", 0},
     {"synch",       L"Synchronize",
@@ -59,7 +59,7 @@ MenuDescription menuDescList[] =
     {"serve",       L"Web Server",
                     L"Start web server for this repository",
                     "proxy.ico", 0},
-    {"update",      L"Update To Revision",
+    {"update",      L"Update...",
                     L"Update working directory",
                     "menucheckout.ico", 0},
     {"recover",     L"Recovery...",
@@ -74,7 +74,7 @@ MenuDescription menuDescList[] =
     {"repoconf",    L"Repository Settings",
                     L"Configure repository settings",
                     "settings_repo.ico", 0},
-    {"about",       L"About...",
+    {"about",       L"About TortoiseHg",
                     L"Show About Dialog",
                     "menuabout.ico", 0},
     {"datamine",    L"Annotate Files",
@@ -92,6 +92,9 @@ MenuDescription menuDescList[] =
     {"grep",        L"Search History",
                     L"Search file revisions for patterns",
                     "menurepobrowse.ico", 0},
+    {"forget",      L"Forget Files...",
+                    L"Remove files from version control",
+                    "menudelete.ico", 0},
 
     /* Add new items here */
 
@@ -104,7 +107,7 @@ enum menuDescListEntries
 {
     Commit, Init, Clone, Status, Shelve, Add, Revert, Remove, Rename,
     Log, Synch, Serve, Update, Recover, Thgstatus, Userconf, Repoconf,
-    About, Datamine, VDiff, Ignore, Guess, Grep,
+    About, Datamine, VDiff, Ignore, Guess, Grep, Forget,
     /* Add new items here */
     Separator, EndOfList
 };
@@ -112,8 +115,9 @@ enum menuDescListEntries
 menuDescListEntries RepoNoFilesMenu[] =
 {
     Commit, Status, Shelve, VDiff, Separator,
-    Log, Update, Grep, Thgstatus, Separator,
-    Synch, Serve, Clone, Init, Separator,
+    Add, Revert, Rename, Forget, Remove, Separator,
+    Log, Update, Grep, Separator,
+    Synch, Serve, Clone, Init, Thgstatus, Separator,
     Ignore, Guess, Recover, Separator,
     Repoconf, Userconf, Separator,
     About, EndOfList
@@ -121,7 +125,8 @@ menuDescListEntries RepoNoFilesMenu[] =
 
 menuDescListEntries RepoFilesMenu[] =
 {
-    Commit, Status, VDiff, Add, Revert, Rename, Remove, Separator,
+    Commit, Status, VDiff, Separator,
+    Add, Revert, Rename, Forget, Remove, Separator,
     Log, Datamine, Separator,
     About, EndOfList
 };
@@ -193,6 +198,10 @@ void InitMenuMaps()
         for (std::size_t i = 0; i < sz; i++)
         {
             MenuDescription md = menuDescList[i];
+
+            if (md.name.size() == 0)
+                break;
+
             TDEBUG_TRACE("InitMenuMaps: adding " << md.name);
 
             // Look for translation of menu and help text
@@ -317,7 +326,7 @@ CShellExt::QueryContextMenu(
     bool promoted[sz];
     memset(&promoted, 0, sizeof(promoted));
 
-    std::string cval = "commit"; // default value if key not found
+    std::string cval = "commit,log"; // default value if key not found
     GetRegistryConfig("PromotedItems", cval);
 
     size_t found;
@@ -437,7 +446,7 @@ CShellExt::QueryContextMenu(
 
     TDEBUG_TRACE("  CShellExt::QueryContextMenu: adding main THG menu");
     InsertSubMenuItemWithIcon2(hMenu, hSubMenu, indexMenu++, idCmd++,
-            L"TortoiseHG...", "hg.ico");
+            L"TortoiseHG", "hg.ico");
 
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 

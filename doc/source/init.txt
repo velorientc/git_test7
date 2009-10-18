@@ -22,16 +22,17 @@ the folder, type :command:`hgtk init`.
 	If selected TortoiseHg creates an empty :file:`.hgignore` file
 	in the working directory.
 :guilabel:`Make repo compatible with Mercurial 1.0`
-	If selected TortoiseHg creates an old type Mercurial repository.
+	If selected TortoiseHg creates an older format Mercurial repository.
 	Do not check unless you have a strong reason to do, and you know
 	what you are doing.
 
 Creating a new repository means create a subdirectory called :file:`.hg`.
-In this subdirectory Mercurial keeps all versioning information.
+In this subdirectory Mercurial keeps all its versioning information.
 
 .. warning::
-	Never touch the files in :file:`.hg` directory, otherwise a repository
-	corruption can happen.
+	It is dangerous to manually edit the files in :file:`.hg` directory,
+	repository corruption can occur.  :file:`.hg/hgrc` is perhaps the
+	only exception to this rule.
 
 From command line
 -----------------

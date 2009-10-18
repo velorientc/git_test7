@@ -15,7 +15,7 @@ assumed that the user is familiar with the Windows explorer and knows
 how to use it.
 
 You can find the most up to date version of this documentation at our
-`web <http://bitbucket.org/tortoisehg/stable/downloads>`_ site.
+`web <http://bitbucket.org/tortoisehg/stable>`_ site.
 
 Reading guide
 =============
@@ -34,8 +34,8 @@ components of TortoiseHg.
 
 :doc:`settings` describes how to configure TortoiseHg.
 
-:doc:`recovery` describes the recovery operations to do on
-a project.
+:doc:`recovery` describes the recovery operations one can perform on a
+project.
 
 :doc:`faq` has a list of common questions and their answers.
 
@@ -58,7 +58,7 @@ Mailing Lists:
 * `Developers <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - Patches, bug reports, development discussions.
 * `Issues <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Notifications from the issue tracker.
 
-And our `wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ on BitBucket.
+And our `wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ on Bitbucket.
 
 Acknowledgement
 ===============

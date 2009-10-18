@@ -38,14 +38,14 @@ Global
 Repository
 	edits a repository :file:`.hg/hgrc` file
 
-In TortoiseHg 0.8, you may toggle between the two modes using the combo
-box at the top of the dialog.
+You may toggle between the two modes using the combo box at the top of
+the dialog, or directly edit the file in your configured visual editor.
 
 Most TortoiseHg users will want to store all configurables in their
 global user settings, and only use the repository hgrc to store paths
 (remote repository aliases) and web settings, though it is possible to
 override many configurables per-repository (a common example is to
-configure a different username for use in a repository).  Also note that
+configure a username for use in a specific repository).  Also note that
 the user and repository configuration files may not exist until you run
 the Settings dialog for the first time.
 
@@ -69,7 +69,7 @@ dialog.
 Please consult the Mercurial wiki for more detailed information about
 these configurables (except for the first three tabs:
 :guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`, which
-are specifically for TortoiseHg).
+are specific to TortoiseHg).
 
 .. module:: TortoiseHg.settings
 	:synopsis: Dialog used to set general TortoiseHg preferences
@@ -81,9 +81,10 @@ TortoiseHg
 	Graphical merge program for resolving merge conflicts.  If left
 	unspecified, Mercurial will use the first applicable tool it finds
 	on your system or use its internal merge tool that leaves conflict
-	markers in place.  Chose :guilabel:`internal:merge` to force conflict markers,
-	:guilabel:`internal:prompt` to always select local or other, or :guilabel:`internal:dump`
-	to leave files in the working directory for manual merging.
+	markers in place.  Chose :guilabel:`internal:merge` to force
+	conflict markers, :guilabel:`internal:prompt` to always select local
+	or other, or :guilabel:`internal:dump` to leave files in the working
+	directory for manual merging.
 
 :guilabel:`Visual Diff Command:`
 	Specify visual diff tool; must be an extdiff command.
@@ -113,9 +114,25 @@ TortoiseHg
 
 :guilabel:`Bottom Diffs:`
 	Show the diff panel below the file list in status, shelve, and
-	commit dialogs.
-	Default: False (show diffs to right of file list).
-	
+	commit dialogs.  Default: False (show diffs to right of file list).
+
+:guilabel:`Capture Stderr:`
+	Redirect stderr to a buffer which is parsed at the end of the process
+	for runtime errors. Default: True.
+
+:guilabel:`Fork hgtk:`
+	When running hgtk from the command line, fork a background process
+	to run graphical dialogs. Default: True.
+
+:guilabel:`Full path title:`
+	Show a full directory path of the repository in the dialog title
+	instead of just the root directory name.  Default: False
+
+:guilabel:`Spell Check Language:`
+	Default language for spell check.  System language is used if not
+	specified.  Examples: en, en_GB, en_US.  Spell checking requires
+	gtkspell, which is only available on Gnome PCs.
+
 .. module:: commit.settings
 	:synopsis: Dialog used to set commit specific preferences
 
@@ -124,11 +141,6 @@ Commit
 
 :guilabel:`Username:`
 	Name associated with commits.
-
-:guilabel:`External Commit Tool:`
-	Select commit tool launched by TortoiseHg. (Qct is no longer
-	distributed as part of TortoiseHg).
-	Default: None (use the builtin tool). [DEPRECATED]
 
 :guilabel:`Summary Line Length:`
 	Maximum length of the commit message summary line.
@@ -143,6 +155,18 @@ Commit
 	if any lines are too long at commit.
 	Default: 0 (unenforced).
 
+:guilabel:`Push After Commit:`
+	Attempt to push to default push target after every successful
+	commit.  Default: False
+
+:guilabel:`Auto Commit List:`
+	Comma separated list of files that are automatically included in
+	every commit.  Intended for use only as a repository setting.
+	Default: None
+
+:guilabel:`Auto Exclude List:`
+	Comma separated list of files that are automatically unchecked when
+	the status, commit, and shelve dialogs are opened.  Default: None
 
 .. module:: changelog.settings
 	:synopsis: Dialog used to set changelog specific preferences
@@ -169,7 +193,25 @@ Changelog
 :guilabel:`Copy Hash:`
 	Allow the changelog viewer to copy the changeset hash
 	of the currently selected changeset into the clipboard.
+	DEPRECATED, will be removed in a later release.
 	Default: False.
+
+:guilabel:`Dead Branches:`
+	Comma separated list of branch names that should be ignored when
+	building a list of branch names for a repository.  Default: None
+
+:guilabel:`Branch Colors:`
+	Space separated list of branch names and colors of the form
+	branch:#XXXXXX. Spaces and colons in the branch name must be escaped
+	using a backslash (\\). Likewise some other characters can be
+	escaped in this way, e.g. \\u0040 will be decoded to the @
+	character, and \\n to a linefeed.  Default: None
+
+:guilabel:`Hide Tags:`
+	Space separated list of tags that will not be shown.
+	Useful example: Specify "qbase qparent qtip" to hide the
+	standard tags inserted by the Mercurial Queues Extension.
+	Default: None.
 
 .. module:: synchronize.settings
 	:synopsis: Dialog used to set synchronize specific preferences
@@ -340,6 +382,10 @@ Email
 Diff
 ----
 
+:guilabel:`Patch EOL:`
+	Normalize file line endings during and after patch to lf or crlf.
+	Strict does no normalization.  Default: strict
+
 :guilabel:`Git Format:`
 	Use git extended diff header format.
 	Default: False.
@@ -364,6 +410,13 @@ Diff
 	Ignore changes whose lines are all blank.
 	Default: False.
 
+
+Keyboard navigation
+===================
+
+:kbd:`Ctrl-Enter`
+	Apply changes and close the tool, the equivalent of pressing the
+	'Ok' button.
 
 From command line
 =================

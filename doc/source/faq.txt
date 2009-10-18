@@ -14,17 +14,19 @@ Frequently Asked Questions
 	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
-	and one bonus extension: hgfold.
+	and two bonus extensions: hgfold, hgcr-gui.
 
 *How can I get translations for the Explorer context menu?*
 
-	See the `Download <http://bitbucket.org/tortoisehg/stable/wiki/download>`_
-	wiki page
+	The available translations were stored by the installer under
+	:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  Select the
+	locale you would like to use, double-click on it, and confirm all
+	requests.
 
-*How do I do merges and arbitrary version checkouts in 0.8?*
+*How do I do merges and arbitrary version checkouts?*
 
-	Merges and updates intended to be done from within the Changelog
-	tool (:guilabel:`View Changelog` menu option) in 0.8.
+	Merges and updates are intended to be done from within the Changelog
+	tool (:guilabel:`Repository Explorer` menu option)
 
 *How do I fix* ``failed to import extension hgext.hgconfig...`` *warnings?*
 
@@ -39,31 +41,9 @@ Frequently Asked Questions
 	this problem. See also
 	`ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
 
-*How can I use Qct with TortoiseHg, after version 0.7?*
+*How can I use Qct with TortoiseHg?*
 
-	We recommend that you try the commit tool that comes with TortoiseHg
-	before running back to Qct, but here are the instructions should you
-	decide to stick with ole' reliable:
-
-	1. Download and install Qct-1.7-standalone-win32.exe from
-	   http://qct.sourceforge.net
-	2. Add (or merge) the following into your :file:`Mercurial.ini` ::
-
-		[extensions]
-		qct = C:\path\to\qct.py
-
-		[tortoisehg]
-		extcommit = qct
-
-		[qct]
-		path = "C:\Program Files\qct\qct.exe"
-
-	Now the :guilabel:`HG Commit` menu option should launch Qct, and
-	:command:`hg qct` should work from the command line and hgtk ci
-	should also launch Qct.
-
-	In 0.9, hgtk ci will no longer launch Qct.  We will drop support for
-	any external commit tools.
+	In 0.9, we have dropped support for external commit tools.  Sorry.
 
 *How can I use hgk (hg view) with TortoiseHg?*
 
@@ -121,26 +101,12 @@ Frequently Asked Questions
 	available in the drop-down list for :guilabel:`Visual Diff Command`.
 	Select :guilabel:`adiff`, apply, then close.
 
-*Does TortoiseHg work on Vista?*
-
-	TortoiseHg 0.8.n works well on x86 and x64 versions of Vista and Windows 7.
-
-*How can I get the context menus working on 64-bit Vista?*
-
-	Upgrade to TortoiseHg 0.8.n
-
 *I'm a CLI user, how do I disable the shell extensions (overlay icons and context menus)?*
 
-	If you have TortoiseHg 0.8 or later, you can disable overlays via
-	the taskbar options menu.  The only way to disable the context menu
-	is to rename :file:`ThgShell.dll` in your install directory and then
-	restart explorer (this completely disables the shell extension).
-
-	If you have an older TortoiseHg release, run this command with
-	appropriate permissions: 
-	:command:`regsvr32 /u "C:\\Program Files\\TortoiseHg\\tortoisehg.dll`
-	Run that command without the :command:`/u` argument to re-enable the
-	extensions. Both operations take effect after the next reboot.
+	You can disable overlays via the taskbar options menu.  The only way
+	to disable the context menu is to rename :file:`ThgShell.dll` in
+	your install directory and then restart explorer (this completely
+	disables the shell extension).
 
 *How is TortoiseHg configured?*
 
@@ -153,22 +119,17 @@ Frequently Asked Questions
 	2. :file:`%APPDATA%\\Tortoisehg` settings for application state
 	   (window positions, etc)
 
-	These are configurables that are stored the Mercurial configuration
-	system. ::
+	These are some of the configurables that are stored the Mercurial
+	configuration system. ::
 	
 		[tortoisehg]
-		extcommit = None
 		vdiff = vdiff
 		editor = gvim
 		tabwidth = 4
 		longsummary = True
-		copyhash = False
 		graphlimit = 500
 		authorcolor = True
 		authorcolor.steve = blue
-
-	See also :doc:`settings`, and
-	`issue #50 <http://bitbucket.org/tortoisehg/stable/issue/50/>`_.
 
 *Is it possible to change fonts?*
 
@@ -183,17 +144,12 @@ Frequently Asked Questions
 		# font used in file lists in status and commit tools
 		fontlist = courier 9
 
-		# make the integrated diff window appear at the bottom or side
-		# (applies to commit and status dialogs)
-		diffbottom = False
-
 *How do I switch GTK themes?*
 
-	In 0.7, the theme was selectable at install time.  For other
-	releases, (and after install on 0.7) you can still do this manually
+	In 0.7, the theme was selectable at install time.  For later
+	releases, you can still do this manually.
 
-		* cd :file:`C:\\Program Files\\TortoiseHg\\share\\themes`
-		  (>=0.8, this is :file:`gtk\\share\\themes`)
+		* cd :file:`C:\\Program Files\\TortoiseHg\\gtk\\share\\themes`
 		* look at the themes in this directory, remember their names or
 		  keep this folder open.
 		* :command:`cd ..\\..\\etc\\gtk-2.0`
@@ -204,7 +160,7 @@ Frequently Asked Questions
 		* Changes immediately take affect on all newly launched applications
 
 	You also should be able to download new themes and copy them into
-	the :file:`share\\themes` directory and then enable them in your
+	the :file:`gtk\\share\\themes` directory and then enable them in your
 	:file:`gtkrc`.
 
 *After uninstalling, it left a bunch of DLL and PYD files behind.*
@@ -222,6 +178,8 @@ Frequently Asked Questions
 	:command:`hg convert` command to do the conversion. Please direct
 	problems/questions about the convert extension to the Mercurial
 	mailing list or #mercurial on irc.freenode.net.
+
+	Alternatively, you can use the hgsubversion extension.
 
 *Where do TortoiseHg extensions look for external Python modules on Windows?*
 
@@ -247,11 +205,11 @@ Frequently Asked Questions
 
 *How do I fix odd characters in dialog?*
 
-	In 0.8, we no longer distribute multiple themes and switched default
-	theme to MS-Windows.  As a result, it might causes an issue related
-	default font of MS-Windows theme in some environments.  In order to
-	fix this issue, add following setting to TortoiseHg's :file:`gtkrc`
-	file::
+	Since 0.8, we no longer distribute multiple themes and switched
+	default theme to MS-Windows.  As a result, it might causes an issue
+	related default font of MS-Windows theme in some environments.  In
+	order to fix this issue, add following setting to TortoiseHg's
+	:file:`gtkrc` file::
 
 		style "msw-default"
 		{
