@@ -15,7 +15,6 @@ import binascii
 from mercurial import cmdutil, util, patch, mdiff
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util.hglib import *
 from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
@@ -124,15 +123,15 @@ class ChangeSet(gdialog.GDialog):
         for f in modified:
             if f in pats:
                 selrow = len(self._filelist)
-            self._filelist.append(('M', toutf(f), f))
+            self._filelist.append(('M', hglib.toutf(f), f))
         for f in added:
             if f in pats:
                 selrow = len(self._filelist)
-            self._filelist.append(('A', toutf(f), f))
+            self._filelist.append(('A', hglib.toutf(f), f))
         for f in removed:
             if f in pats:
                 selrow = len(self._filelist)
-            self._filelist.append(('R', toutf(f), f))
+            self._filelist.append(('R', hglib.toutf(f), f))
         self.curnodes = (parent, ctx.node())
         if selrow is not None:
             self._filesel.select_path((selrow,))
@@ -168,13 +167,13 @@ class ChangeSet(gdialog.GDialog):
                     if state == 'git':
                         for m in values:
                             f = m.path
-                            self._filelist.append((map[m.op], toutf(f), f))
+                            self._filelist.append((map[m.op], hglib.toutf(f), f))
                             files.append(f)
                     elif state == 'file':
                         type, path = get_path(values[0], values[1])
                         self.curphunks[path] = hunks = ['diff']
                         if path not in files:
-                            self._filelist.append((type, toutf(path), path))
+                            self._filelist.append((type, hglib.toutf(path), path))
                             files.append(path)
                     elif state == 'hunk':
                         hunks.extend([l.rstrip('\r\n') for l in values.hunk])
@@ -247,7 +246,7 @@ class ChangeSet(gdialog.GDialog):
             fctx = self.repo[rev].filectx(wfile)
         except LookupError:
             fctx = None
-        if fctx and fctx.size() > getmaxdiffsize(self.ui):
+        if fctx and fctx.size() > hglib.getmaxdiffsize(self.ui):
             lines = ['diff',
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
@@ -323,12 +322,12 @@ class ChangeSet(gdialog.GDialog):
                 rem += 1
         outlines = []
         tags = []
-        txt = toutf('=== (+%d,-%d) %s ===\n' % (add, rem, fname))
+        txt = hglib.toutf('=== (+%d,-%d) %s ===\n' % (add, rem, fname))
         addtag( 'greybg', offset, len(txt) )
         outlines.append(txt)
         offset += len(txt.decode('utf-8'))
         for l1 in difflines[1:]:
-            l = toutf(l1)
+            l = hglib.toutf(l1)
             if l.startswith('+++'):
                 continue
             if l.startswith('---'):
@@ -337,13 +336,13 @@ class ChangeSet(gdialog.GDialog):
                 tag = 'blue'
             elif l.startswith('+'):
                 tag = 'green'
-                l = diffexpand(l)
+                l = hglib.diffexpand(l)
             elif l.startswith('-'):
                 tag = 'red'
-                l = diffexpand(l)
+                l = hglib.diffexpand(l)
             else:
                 tag = 'black'
-                l = diffexpand(l)
+                l = hglib.diffexpand(l)
             l = l+"\n"
             length = len(l.decode('utf-8'))
             addtag( tag, offset, length )
@@ -718,8 +717,8 @@ class ChangeSet(gdialog.GDialog):
                 os.remove(result)
 
             q = Queue.Queue()
-            hgcmd_toq(q, 'cat', '--rev',
-                str(self.currev), '--output', fromutf(result), self.curfile)
+            hglib.hgcmd_toq(q, 'cat', '--rev',
+                str(self.currev), '--output', hglib.fromutf(result), self.curfile)
 
     def diff_to_local(self, menuitem):
         if not self.curfile:
