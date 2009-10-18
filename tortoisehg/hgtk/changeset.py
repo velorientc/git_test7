@@ -213,60 +213,26 @@ class ChangeSet(gdialog.GDialog):
 
     def generate_change_header(self):
         self.csetinfo.update(self.currev)
+        self.csetinfo.show_all()
+        self.patchinfo.hide()
 
-        buf = self._buffer
-        buf.set_text('')
-        eob = buf.get_end_iter()
-        ctx = self.repo[self.currev]
-        desc = toutf(ctx.description())
-        buf.insert(eob, '\n' + desc + '\n\n')
+        desc = self.csetinfo.get_data('desc')
+        self.set_commitlog(desc)
 
     def generate_patch_header(self):
+        self.patchinfo.update(self.curpatch)
+        self.patchinfo.show_all()
+        self.csetinfo.hide()
+
+        desc = self.patchinfo.get_data('desc')
+        self.set_commitlog(desc)
+
+    def set_commitlog(self, desc):
+        'Append commit log after clearing buffer'
         buf = self._buffer
         buf.set_text('')
         eob = buf.get_end_iter()
-
-        # copy from generate_change_header
-        def title_line(title, text, tag):
-            pad = ' ' * (12 - len(title))
-            utext = toutf(title + pad + text)
-            buf.insert_with_tags_by_name(eob, utext, tag)
-            buf.insert(eob, '\n')
-
-        pf = open(self.curpatch)
-        try:
-            data = patch.extract(self.ui, pf)
-            tmp, msg, user, date, branch, node, p1, p2 = data
-            try:
-                # title
-                patchtitle = os.path.basename(self.curpatch)
-                if node:
-                    patchtitle += ' (%s)' % node[:12]
-                title_line(_('patch:'), patchtitle, 'changeset')
-                # branch
-                if branch:
-                    title_line(_('branch:'), toutf(branch), 'greybg')
-                # user
-                if user:
-                    title_line(_('user:'), toutf(user), 'changeset')
-                # date
-                if date:
-                    title_line(_('date:'), displaytime(util.parsedate(date)),
-                               'changeset')
-                # parents
-                for pnode in (p1, p2):
-                    if pnode is None:
-                        continue
-                    title_line(_('parent:'), pnode[:12], 'parent')
-                # commit message
-                if msg:
-                    cmsg = '\n' + toutf(msg.rstrip('\r\n')) + '\n\n'
-                    buf.insert(eob, cmsg)
-            finally:
-                if tmp:
-                    os.unlink(tmp)
-        finally:
-            pf.close()
+        buf.insert(eob, '\n' + desc + '\n\n')
 
     def append_diff(self, wfile):
         if not wfile:
@@ -456,14 +422,15 @@ class ChangeSet(gdialog.GDialog):
         scroller.child.set_shadow_type(gtk.SHADOW_NONE)
 
         ## changeset panel
-        style = csinfo.panelstyle(contents=('cset', 'branch', 'user',
-                                  'dateage', 'parents', 'children', 'tags',
-                                  'transplant'), selectable=True)
         def data_func(widget, item, ctx):
+            def summary_line(desc):
+                desc = desc.replace('\0', '')
+                return hglib.toutf(desc.split('\n')[0][:80])
             def revline_data(ctx):
-                desc = ctx.description().replace('\0', '')
-                summary = hglib.toutf(desc.split('\n')[0][:80])
-                return (str(ctx.rev()), str(ctx), summary)
+                if isinstance(ctx, basestring):
+                    return ctx
+                desc = ctx.description()
+                return (str(ctx.rev()), str(ctx), summary_line(desc))
             if item == 'cset':
                 return revline_data(ctx)
             elif item == 'branch':
@@ -488,6 +455,11 @@ class ChangeSet(gdialog.GDialog):
                         return binascii.hexlify(ts)
                 except KeyError:
                     return None
+            elif item == 'patch':
+                if hasattr(ctx, '_patchname'):
+                    desc = ctx.description()
+                    return (ctx._patchname, str(ctx), summary_line(desc))
+                return None
             raise csinfo.UnknownItem(item)
         def label_func(widget, item):
             if item == 'cset':
@@ -500,26 +472,47 @@ class ChangeSet(gdialog.GDialog):
                 return _('child:')
             elif item == 'transplant':
                 return _('transplant:')
+            elif item == 'patch':
+                return _('patch:')
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
+            def revid_markup(revid):
+                return gtklib.markup(revid, face='monospace', size='9000')
             def revline_markup(revnum, revid, summary):
                 revnum = gtklib.markup(revnum)
-                revid = gtklib.markup(revid, face='monospace', size='9000')
+                revid = revid_markup(revid)
                 summary = gtklib.markup(summary)
                 return '%s (%s) %s' % (revnum, revid, summary)
-            if item in ('cset', 'transplant'):
+            if item in ('cset', 'transplant', 'patch'):
                 if isinstance(value, basestring):
-                    return gtklib.markup(value, face='monospace', size='9000')
+                    return revid_markup(value)
                 return revline_markup(*value)
             elif item in ('parents', 'children'):
-                return [revline_markup(*data) for data in value]
+                csets = []
+                for cset in value:
+                    if isinstance(cset, basestring):
+                        csets.append(revid_markup(cset))
+                    else:
+                        csets.append(revline_markup(*cset))
+                return csets
             elif item == 'dateage':
                 return gtklib.markup('%s (%s)' % value)
             raise csinfo.UnknownItem(item)
+
         custom = csinfo.custom(data=data_func, label=label_func,
                                markup=markup_func)
-        self.csetinfo = csinfo.create(self.repo, None, style, custom)
+        args = dict(repo=self.repo, custom=custom)
+
+        csetstyle = csinfo.panelstyle(contents=('cset', 'branch', 'user',
+                           'dateage', 'parents', 'children', 'tags',
+                           'transplant'), selectable=True)
+        self.csetinfo = csinfo.create(style=csetstyle, **args)
         details_box.pack_start(self.csetinfo, False, False)
+
+        patchstyle = csinfo.panelstyle(contents=('patch', 'branch', 'user',
+                            'dateage', 'parents'), selectable=True)
+        self.patchinfo = csinfo.create(style=patchstyle, **args)
+        details_box.pack_start(self.patchinfo, False, False)
         details_box.pack_start(gtk.HSeparator(), False, False)
 
         ## changeset diff

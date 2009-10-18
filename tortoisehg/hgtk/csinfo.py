@@ -11,6 +11,9 @@ import re
 import os
 import gtk
 
+from mercurial import patch, util
+from mercurial.node import short, hex
+
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
@@ -18,8 +21,8 @@ from tortoisehg.hgtk import gtklib
 
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'date', 'branch', 'tags')
 
-def create(repo, rev=None, style=None, custom=None, **kargs):
-    return CachedFactory(repo, custom, style, rev, **kargs)()
+def create(repo, target=None, style=None, custom=None, **kargs):
+    return CachedFactory(repo, custom, style, target, **kargs)()
 
 def factory(*args, **kargs):
     return CachedFactory(*args, **kargs)
@@ -39,33 +42,31 @@ def custom(**kargs):
 
 class CachedFactory(object):
 
-    def __init__(self, repo=None, custom=None, style=None, rev=None,
+    def __init__(self, repo, custom=None, style=None, target=None,
                  withupdate=False, widgetcache=False):
         if repo is None:
-            try:
-                root = paths.find_root()
-                repo = hg.repository(ui.ui(), path=root)
-            except hglib.RepoError:
-                raise _('failed to get repo: %s') % root
+            raise _('must be specified repository')
         self.repo = repo
+        self.target = target
         if custom is None:
             custom = {}
         self.custom = custom
         if style is None:
             style = panelstyle()
         self.csstyle = style
-        if rev is None:
-            rev = 'tip'
-        self.rev = rev
-        self.info = CachedChangesetInfo()
+        self.info = CachedSummaryInfo()
 
         self.withupdate = withupdate
         if widgetcache:
             self.cache = {}
 
-    def __call__(self, rev=None, style=None, custom=None, repo=None):
-        if rev is None:
-            rev = self.rev
+    def __call__(self, target=None, style=None, custom=None, repo=None):
+        # try to create a context object
+        if target is None:
+            target = self.target
+        if repo is None:
+            repo = self.repo
+
         if style is None:
             style = self.csstyle
         else:
@@ -73,6 +74,7 @@ class CachedFactory(object):
             newstyle = self.csstyle.copy()
             newstyle.update(style)
             style = newstyle
+
         if custom is None:
             custom = self.custom
         else:
@@ -80,39 +82,118 @@ class CachedFactory(object):
             newcustom = self.custom.copy()
             newcustom.update(custom)
             custom = newcustom
-        if repo is None:
-            repo = self.repo
 
-        # check cache
-        if hasattr(self, 'cache'):
-            key = style['type'] + str(rev) + str(style) + str(custom) + str(id(repo))
+        if 'type' not in style:
+            raise _("must be specified 'type' in style")
+        type = style['type']
+        assert type in ('panel', 'label')
+
+        # check widgets cache
+        if target is None or repo is None:
+            key = None
+        else:
+            key = type + str(target) + str(style) + str(custom) + repo.root
+        if hasattr(self, 'cache') and key:
             try:
-                widget = self.cache[key]
-                return widget
+                return self.cache[key]
             except KeyError:
                 pass
 
-        if 'type' in style:
-            args = (rev, style, custom, repo, self.info)
-            type = style['type']
-            if type == 'panel':
-                widget = ChangesetPanel(*args)
-            elif type == 'label':
-                widget = ChangesetLabel(*args)
-            else:
-                raise _("unknown 'type': %s") % type
-            if hasattr(self, 'cache'):
-                self.cache[key] = widget
-            if self.withupdate:
-                widget.update()
-            return widget
+        # create widget
+        args = (target, style, custom, repo, self.info)
+        if type == 'panel':
+            widget = SummaryPanel(*args)
         else:
-            raise _("must be specified 'type' in style")
+            widget = SummaryLabel(*args)
+        if hasattr(self, 'cache') and key:
+            self.cache[key] = widget
+        if self.withupdate:
+            widget.update()
+        return widget
 
 class UnknownItem(Exception):
     pass
 
-class ChangesetInfo(object):
+def create_context(repo, target):
+    if repo is None or target is None:
+        return None
+    ctx = PatchContext(repo, target)
+    if ctx is None:
+        ctx = ChangesetContext(repo, target)
+    return ctx
+
+def ChangesetContext(repo, rev):
+    if repo is None or rev is None:
+        return None
+    try:
+        ctx = repo[rev]
+    except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+        ctx = None
+    return ctx
+
+def PatchContext(repo, patchpath, cache={}):
+    if repo is None or patchpath is None:
+        return None
+    # check path
+    if not os.path.isabs(patchpath) or not os.path.isfile(patchpath):
+        return None
+    # check cache
+    mtime = os.path.getmtime(patchpath)
+    key = repo.root + patchpath
+    holder = cache.get(key, None)
+    if holder is not None and mtime == holder[0]:
+        return holder[1]
+    # create a new context object
+    ctx = patchctx(patchpath, repo)
+    cache[key] = (mtime, ctx)
+    return ctx
+
+class patchctx(object):
+
+    def __init__(self, patchpath, repo):
+        self._path = patchpath
+        self._patchname = os.path.basename(patchpath)
+        self._repo = repo
+        pf = open(patchpath)
+        try:
+            data = patch.extract(self._repo.ui, pf)
+            tmpfile, msg, user, date, branch, node, p1, p2 = data
+            if tmpfile:
+                os.unlink(tmpfile)
+        finally:
+            pf.close()
+        self._node = node
+        self._user = user and hglib.toutf(user) or ''
+        self._date = date and util.parsedate(date) or None
+        self._desc = msg and hglib.toutf(msg.rstrip('\r\n')) or ''
+        self._branch = branch and hglib.toutf(branch) or ''
+        self._parents = []
+        for p in (p1, p2):
+            if not p:
+                continue
+            try:
+                self._parents.append(repo[p])
+            except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+                self._parents.append(p)
+
+    def __str__(self):
+        return short(self.node())
+
+    def __int__(self):
+        return self.rev()
+
+    def node(self): return self._node
+    def rev(self): return None
+    def hex(self): return hex(self.node())
+    def user(self): return self._user
+    def date(self): return self._date
+    def description(self): return self._desc
+    def branch(self): return self._branch
+    def tags(self): return ()
+    def parents(self): return self._parents
+    def children(self): return ()
+
+class SummaryInfo(object):
 
     LABELS = {'rev': _('rev:'), 'revnum': _('rev:'), 'revid': _('rev:'),
               'summary': _('summary:'), 'user': _('user:'), 'age': _('age:'),
@@ -123,7 +204,7 @@ class ChangesetInfo(object):
         pass
 
     def get_data(self, item, *args):
-        widget, rev, custom, repo = args
+        widget, ctx, custom = args
         def default_func(widget, item, ctx):
             return None
         def preset_func(widget, item, ctx):
@@ -135,9 +216,11 @@ class ChangesetInfo(object):
                 return str(ctx.rev())
             elif item == 'revid':
                 return str(ctx)
+            elif item == 'desc':
+                return hglib.toutf(ctx.description().replace('\0', ''))
             elif item == 'summary':
-                desc = ctx.description().replace('\0', '')
-                value = hglib.toutf(desc.split('\n')[0][:80])
+                desc = self.get_data('desc', *args)
+                value = desc.split('\n')[0][:80]
                 if len(value) == 0:
                     return  None
                 return value
@@ -148,16 +231,17 @@ class ChangesetInfo(object):
             elif item == 'age':
                 return hglib.age(ctx.date())
             elif item == 'rawbranch':
-                if ctx.node() in repo.branchtags().values():
-                    return hglib.toutf(ctx.branch())
-                return None
+                return hglib.toutf(ctx.branch())
             elif item == 'branch':
                 value = self.get_data('rawbranch', *args)
                 if value:
+                    repo = ctx._repo
+                    if ctx.node() not in repo.branchtags().values():
+                        return None
                     dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
                     if dblist and value in [hglib.toutf(b.strip()) \
                                             for b in dblist.split(',')]:
-                        value = None
+                        return None
                 return value
             elif item == 'rawtags':
                 value = [hglib.toutf(tag) for tag in ctx.tags()]
@@ -167,16 +251,16 @@ class ChangesetInfo(object):
             elif item == 'tags':
                 value = self.get_data('rawtags', *args)
                 if value:
+                    repo = ctx._repo
                     htags = repo.ui.config('tortoisehg', 'hidetags', '')
                     htags = [hglib.toutf(b.strip()) for b in htags.split()]
                     value = [tag for tag in value if tag not in htags]
                     if len(value) == 0:
-                        value = None
+                        return None
                 return value
             elif item == 'ishead':
                 return len(ctx.children()) == 0
             raise UnknownItem(item)
-        ctx = repo[rev]
         if custom.has_key('data'):
             try:
                 return custom['data'](widget, item, ctx)
@@ -188,7 +272,7 @@ class ChangesetInfo(object):
             pass
         return default_func(widget, item, ctx)
 
-    def get_label(self, item, widget, rev, custom, repo):
+    def get_label(self, item, widget, ctx, custom):
         def default_func(widget, item):
             return ''
         def preset_func(widget, item):
@@ -207,7 +291,7 @@ class ChangesetInfo(object):
             pass
         return default_func(widget, item)
 
-    def get_markup(self, item, widget, rev, custom, repo):
+    def get_markup(self, item, widget, ctx, custom):
         def default_func(widget, item, value):
             return ''
         def preset_func(widget, item, value):
@@ -220,10 +304,10 @@ class ChangesetInfo(object):
                 opts = dict(color='black', background='#ffffaa')
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
-            elif item in ('summary', 'user', 'date', 'age'):
+            elif item in ('desc', 'summary', 'user', 'date', 'age'):
                 return gtklib.markup(value)
             raise UnknownItem(item)
-        value = self.get_data(item, widget, rev, custom, repo)
+        value = self.get_data(item, widget, ctx, custom)
         if value is None:
             return None
         if custom.has_key('markup'):
@@ -237,15 +321,16 @@ class ChangesetInfo(object):
             pass
         return default_func(widget, item, value)
 
-class CachedChangesetInfo(ChangesetInfo):
+class CachedSummaryInfo(SummaryInfo):
 
     def __init__(self):
-        ChangesetInfo.__init__(self)
+        SummaryInfo.__init__(self)
         self.cache = {}
 
     def try_cache(self, target, func, *args):
-        item, widget, rev, custom, repo = args
-        key = target + item + str(rev) + str(custom) + str(id(repo))
+        item, widget, ctx, custom = args
+        ctxstr = ctx._repo.root + ctx.hex()
+        key = target + item + ctxstr + str(custom)
         try:
             return self.cache[key]
         except KeyError:
@@ -254,45 +339,58 @@ class CachedChangesetInfo(ChangesetInfo):
         return value
 
     def get_data(self, *args):
-        return self.try_cache('data', ChangesetInfo.get_data, *args)
+        return self.try_cache('data', SummaryInfo.get_data, *args)
 
     def get_label(self, *args):
-        return self.try_cache('label', ChangesetInfo.get_label, *args)
+        return self.try_cache('label', SummaryInfo.get_label, *args)
 
     def get_markup(self, *args):
-        return self.try_cache('markup', ChangesetInfo.get_markup, *args)
+        return self.try_cache('markup', SummaryInfo.get_markup, *args)
 
-class ChangesetBase(object):
 
-    def __init__(self, rev, custom, repo, info=None):
-        self.rev = str(rev)
+class SummaryBase(object):
+
+    def __init__(self, target, custom, repo, info=None):
+        if target is None:
+            self.target = None
+        else:
+            self.target = str(target)
         self.custom = custom
         self.repo = repo
         if info is None:
-            info = ChangesetInfo()
+            info = SummaryInfo()
         self.info = info
+        self.ctx = create_context(repo, self.target)
 
     def get_data(self, item):
-        return self.info.get_data(item, self, self.rev, self.custom, self.repo)
+        return self.info.get_data(item, self, self.ctx, self.custom)
 
     def get_label(self, item):
-        return self.info.get_label(item, self, self.rev, self.custom, self.repo)
+        return self.info.get_label(item, self, self.ctx, self.custom)
 
     def get_markup(self, item):
-        return self.info.get_markup(item, self, self.rev, self.custom, self.repo)
+        return self.info.get_markup(item, self, self.ctx, self.custom)
 
-    def update(self, rev=None, custom=None, repo=None):
-        if rev is not None:
-            self.rev = str(rev)
+    def update(self, target=None, custom=None, repo=None):
+        if target is None:
+            target = self.target
+        if target is not None:
+            target = str(target)
         if custom is not None:
             self.custom = custom
-        if repo is not None:
-            self.repo = repo
+        if repo is None:
+            repo = self.repo
+        self.ctx = create_context(repo, target)
+        if self.ctx is None:
+            return False # cannot update
+        self.target = target
+        self.repo = repo
+        return True
 
-class ChangesetPanel(ChangesetBase, gtk.Frame):
+class SummaryPanel(SummaryBase, gtk.Frame):
 
-    def __init__(self, rev, style, custom, repo, info=None):
-        ChangesetBase.__init__(self, rev, custom, repo, info)
+    def __init__(self, target, style, custom, repo, info=None):
+        SummaryBase.__init__(self, target, custom, repo, info)
         gtk.Frame.__init__(self)
 
         self.set_shadow_type(gtk.SHADOW_NONE)
@@ -302,8 +400,10 @@ class ChangesetPanel(ChangesetBase, gtk.Frame):
         self.table = gtklib.LayoutTable(ypad=1, headopts={'weight': 'bold'})
         self.add(self.table)
 
-    def update(self, rev=None, style=None, custom=None, repo=None):
-        ChangesetBase.update(self, rev, custom, repo)
+    def update(self, target=None, style=None, custom=None, repo=None):
+        if not SummaryBase.update(self, target, custom, repo):
+            return False # cannot update
+
         if style is not None:
             self.csstyle = style
 
@@ -348,17 +448,21 @@ class ChangesetPanel(ChangesetBase, gtk.Frame):
                 self.table.add_row(self.get_label(item), body)
         self.show_all()
 
-class ChangesetLabel(ChangesetBase, gtk.Label):
+        return True
 
-    def __init__(self, rev, style, custom, repo, info=None):
-        ChangesetBase.__init__(self, rev, custom, repo, info)
+class SummaryLabel(SummaryBase, gtk.Label):
+
+    def __init__(self, target, style, custom, repo, info=None):
+        SummaryBase.__init__(self, target, custom, repo, info)
         gtk.Label.__init__(self)
 
         self.set_alignment(0, 0.5)
         self.csstyle = style
 
-    def update(self, rev=None, style=None, custom=None, repo=None):
-        ChangesetBase.update(self, rev, custom, repo)
+    def update(self, target=None, style=None, custom=None, repo=None):
+        if not SummaryBase.update(self, target, custom, repo):
+            return False # cannot update
+
         if style is not None:
             self.csstyle = style
 
