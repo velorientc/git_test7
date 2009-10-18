@@ -462,17 +462,21 @@ class ChangeSet(gdialog.GDialog):
             raise csinfo.UnknownItem(item)
         def label_func(widget, item):
             if item == 'cset':
-                return _('changeset:')
+                return _('Changeset:')
             elif item == 'dateage':
-                return _('date:')
+                return _('Date:')
             elif item == 'parents':
-                return _('parent:')
+                return _('Parent:')
             elif item == 'children':
-                return _('child:')
+                return _('Child:')
             elif item == 'transplant':
-                return _('transplant:')
+                return _('Transplant:')
             elif item == 'patch':
-                return _('patch:')
+                return _('Patch:')
+            elif item == 'branch':
+                return _('Branch:')
+            elif item == 'user':
+                return _('User:')
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
             def revid_markup(revid):
