@@ -231,7 +231,7 @@ class ChangeSet(gdialog.GDialog):
         buf = self._buffer
         buf.set_text('')
         eob = buf.get_end_iter()
-        buf.insert(eob, '\n' + desc + '\n\n')
+        buf.insert(eob, desc + '\n\n')
 
     def append_diff(self, wfile):
         if not wfile:
