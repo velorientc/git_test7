@@ -151,6 +151,9 @@ The shell extension emits trace output (TDEBUG_TRACE macro calls in the sources)
 can be captured by using for example the tool **DebugView** from Microsoft sysinternals (see 
 http://technet.microsoft.com/en-us/sysinternals/bb896647.aspx).
 
+The debug output must be enabled in the registry. Double click the file
+"DebugShellExt.reg" and restart explorer.
+
 Example output (copied via clipboard):
 
 {{{

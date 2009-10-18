@@ -15,6 +15,8 @@
 #include <assert.h>
 #include <string>
 
+#include "ThgDebug.h"
+
 #define ASSERT assert
 
 
@@ -24,18 +26,18 @@
     // TDEBUG_TRACE() prints debugging messages to Windows' debugger display.
     // The messages can be viewed with Sysinternals DebugView, which may be
     // downloaded from Microsoft TechNet.
-    #define TDEBUG_TRACE(s) do {                                            \
+    #define TDEBUG_TRACE(s) if (ThgDebug::enabled()) {                      \
                                std::stringstream _the_msg;                  \
                                _the_msg << "[THG] " << s;                   \
                                std::string _the_str = _the_msg.str();       \
                                OutputDebugStringA(_the_str.c_str());         \
-                            } while (0)
-    #define TDEBUG_TRACEW(s) do {                                            \
+                            }
+    #define TDEBUG_TRACEW(s) if (ThgDebug::enabled()) {                      \
                                std::basic_stringstream<wchar_t> _the_msg;    \
                                _the_msg << L"[THG] " << s;                   \
                                std::wstring _the_str = _the_msg.str();       \
                                OutputDebugStringW(_the_str.c_str());         \
-                            } while (0)
+                            }
     #define TDEBUG_ENTER TDEBUG_TRACE
 #else
     #define TDEBUG_TRACE(s)

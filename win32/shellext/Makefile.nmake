@@ -2,7 +2,8 @@
 OBJECTS_DIRSTATE = TortoiseUtils.obj \
         Direntry.obj \
         Directory.obj \
-        Winstat.obj
+        Winstat.obj \
+        ThgDebug.obj
 
 OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         InitStatus.obj \
@@ -15,7 +16,8 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         Dirstatecache.obj \
         DirectoryStatus.obj \
         Thgstatus.obj \
-        QueryDirstate.obj
+        QueryDirstate.obj \
+        ThgDebug.obj
 
 LIBS    = User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib
 DEFFILE = ShellExt.def
