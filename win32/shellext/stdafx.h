@@ -39,6 +39,7 @@
     #define TDEBUG_ENTER TDEBUG_TRACE
 #else
     #define TDEBUG_TRACE(s)
+    #define TDEBUG_TRACEW(s)
     #define TDEBUG_ENTER(s)
 
 #endif
