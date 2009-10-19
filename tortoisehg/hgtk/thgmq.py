@@ -404,6 +404,10 @@ class MQWidget(gtk.VBox):
         """
         if not patch or not self.has_applied():
             return
+        ret = gdialog.Confirm(_('Confirm Fold'), [], None,
+                              _('Do you want to fold?')).run()
+        if ret != gtk.RESPONSE_YES:
+            return
         cmdline = ['hg', 'qfold', patch]
         self.cmd.execute(cmdline, self.cmd_done)
 
