@@ -473,10 +473,6 @@ class ChangeSet(gdialog.GDialog):
                 return _('Transplant:')
             elif item == 'patch':
                 return _('Patch:')
-            elif item == 'branch':
-                return _('Branch:')
-            elif item == 'user':
-                return _('User:')
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
             def revid_markup(revid):

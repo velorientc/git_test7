@@ -195,10 +195,11 @@ class patchctx(object):
 
 class SummaryInfo(object):
 
-    LABELS = {'rev': _('rev:'), 'revnum': _('rev:'), 'revid': _('rev:'),
-              'summary': _('summary:'), 'user': _('user:'), 'age': _('age:'),
-              'date': _('date:'), 'branch': _('branch:'), 'tags': _('tags:'),
-              'rawbranch': _('branch:'), 'rawtags': _('tags:')}
+    LABELS = {'rev': _('Revision:'), 'revnum': _('Revision:'),
+              'revid': _('Revision:'), 'summary': _('Summary:'),
+              'user': _('User:'), 'age': _('Age:'), 'date': _('Date:'),
+              'branch': _('Branch:'), 'tags': _('Tags:'),
+              'rawbranch': _('Branch:'), 'rawtags': _('Tags:')}
 
     def __init__(self):
         pass
