@@ -387,6 +387,8 @@ class StripDialog(gtk.Dialog):
         self.cmd.execute(cmdline, cmd_done)
 
     def after_strip(self):
+        if self.buopt_none.get_active():
+            self.response(gtk.RESPONSE_CLOSE)
         root = self.repo.root
         bakdir = os.path.join(root, r'.hg\strip-backup')
         escaped = bakdir.replace('\\', '\\\\')
