@@ -71,8 +71,8 @@ class GLog(gdialog.GDialog):
     def should_live(self, widget=None, event=None):
         live = False
         if self.bfile:
-            t = _('New changesets from the preview bundle are still pending.')
-            t += _('\n\nAccept or reject the new changesets?')
+            t = _('New changesets from the preview bundle are still pending.'
+                  '\n\nAccept or reject the new changesets?')
             # response: 0=Yes, 1=No, 2=Cancel
             response = gdialog.CustomPrompt(_('Accept new Changesets'),
                 t,
