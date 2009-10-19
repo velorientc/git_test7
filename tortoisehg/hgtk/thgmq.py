@@ -15,7 +15,7 @@ from mercurial import extensions
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
 
-from tortoisehg.hgtk import gtklib, hgcmd
+from tortoisehg.hgtk import gdialog, gtklib, hgcmd
 
 # MQ patches row enumerations
 MQ_INDEX   = 0
@@ -320,6 +320,17 @@ class MQWidget(gtk.VBox):
         """
         if not self.has_patch():
             return
+        if not keep:
+            ret = gdialog.CustomPrompt(_('Confirm Delete'),
+                          _('Do you want to delete?'), None,
+                          (_('&Yes'), _('Yes (&keep)'),
+                          _('&Cancel')), default=2, esc=2).run()
+            if ret == 0:
+                pass
+            elif ret == 1:
+                keep = True
+            else:
+                return
         cmdline = ['hg', 'qdelete', patch]
         if keep:
             cmdline.append('--keep')
