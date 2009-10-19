@@ -47,11 +47,17 @@ class QuickOpDialog(gtk.Dialog):
         self.set_title(hglib.get_reponame(repo) + ' ' + command)
         self.command = command
 
+        labels = { 'add': (_('Select files to add'), _('Add')),
+                   'forget': (_('Select files to forget'), _('Forget')),
+                   'revert': (_('Select files to revert'), _('Revert')),
+                   'remove': (_('Select files to remove'), _('Remove')),
+                }
+
         # add dialog buttons
-        self.gobutton = self.add_button(command.capitalize(), gtk.RESPONSE_OK)
+        self.gobutton = self.add_button(labels[command][1], gtk.RESPONSE_OK)
         self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
 
-        lbl = gtk.Label(_('Select files to ') + command)
+        lbl = gtk.Label(labels[command][0])
         lbl.set_alignment(0, 0)
         self.vbox.pack_start(lbl, False, False, 8)
 
