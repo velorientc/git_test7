@@ -330,14 +330,26 @@ class CachedSummaryInfo(SummaryInfo):
 
     def try_cache(self, target, func, *args):
         item, widget, ctx, custom = args
-        ctxstr = ctx._repo.root + ctx.hex()
-        key = target + item + ctxstr + str(custom)
+        root = ctx._repo.root
+        repoid = id(ctx._repo)
         try:
-            return self.cache[key]
+            cacheinfo = self.cache[root]
+            if cacheinfo[0] != repoid:
+                # clear cache
+                del self.cache[root] 
+                cacheinfo = None
+        except KeyError:
+            cacheinfo = None
+        if cacheinfo is None:
+            cacheinfo = (repoid, {})
+            self.cache[root] = cacheinfo
+        key = target + item + ctx.hex() + str(custom)
+        try:
+            return cacheinfo[1][key]
         except KeyError:
             pass
-        self.cache[key] = value = func(self, *args)
-        return value
+        cacheinfo[1][key] = func(self, *args)
+        return cacheinfo[1][key]
 
     def get_data(self, *args):
         return self.try_cache('data', SummaryInfo.get_data, *args)
