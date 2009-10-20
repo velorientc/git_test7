@@ -926,12 +926,20 @@ class GLog(gdialog.GDialog):
                         _('Push outgoing changesets'))
         email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
                         _('Email outgoing changesets'))
+        apply = syncbox.append_stock(gtk.STOCK_APPLY,
+                        _('Accept changes from Bundle preview'))
+        reject = syncbox.append_stock(gtk.STOCK_DIALOG_ERROR,
+                        _('Reject changes from Bundle preview'))
         conf = syncbox.append_stock(gtk.STOCK_PREFERENCES,
                         _('Configure aliases and after pull behavior'))
         stop = syncbox.append_stock(gtk.STOCK_STOP,
                         _('Stop current transaction'))
         stop.set_sensitive(False)
+        apply.set_sensitive(False)
+        reject.set_sensitive(False)
         self.stop_button = stop
+        self.syncbar_apply = apply
+        self.syncbar_reject = reject
 
         ## target path combobox
         urllist = gtk.ListStore(str, # path (utf-8)
@@ -950,6 +958,8 @@ class GLog(gdialog.GDialog):
         pull.connect('clicked', self.pull_clicked)
         outgoing.connect('clicked', self.outgoing_clicked)
         push.connect('clicked', self.push_clicked)
+        apply.connect('clicked', self.apply_clicked)
+        reject.connect('clicked', self.reject_clicked)
         conf.connect('clicked', self.conf_clicked, urlcombo)
         email.connect('clicked', self.email_clicked)
 
@@ -1148,6 +1158,8 @@ class GLog(gdialog.GDialog):
         self.toolbar.remove(self.toolbar.get_nth_item(0))
         self.cmd_set_sensitive('accept', False)
         self.cmd_set_sensitive('reject', False)
+        self.syncbar_apply.set_sensitive(False)
+        self.syncbar_reject.set_sensitive(False)
         for w in self.incoming_disabled:
             w.set_sensitive(True)
         for cmd in self.incoming_disabled_cmds:
@@ -1231,12 +1243,16 @@ class GLog(gdialog.GDialog):
             self.cmd_set_sensitive(cmd, False)
             self.incoming_disabled_cmds.append(cmd)
 
+        ignore = (self.syncbar_apply, self.syncbar_reject, self.ppullcombo)
         self.incoming_disabled = []
         def disable_child(w):
-            if w != self.ppullcombo and w.get_property('sensitive'):
+            if (w not in ignore) and w.get_property('sensitive'):
                 w.set_sensitive(False)
                 self.incoming_disabled.append(w)
         self.syncbox.foreach(disable_child)
+
+        self.syncbar_apply.set_sensitive(True)
+        self.syncbar_reject.set_sensitive(True)
 
         self.bfile = bfile
         oldtip = len(self.repo)
