@@ -214,19 +214,15 @@ class ChangeSet(gdialog.GDialog):
                 self.append_all_patch_diffs()
 
     def generate_change_header(self):
-        self.csetinfo.update(self.currev)
-        self.csetinfo.show_all()
-        self.patchinfo.hide()
+        self.summarypanel.update(self.currev, self.csetstyle)
 
-        desc = self.csetinfo.get_data('desc')
+        desc = self.summarypanel.get_data('desc')
         self.set_commitlog(desc)
 
     def generate_patch_header(self):
-        self.patchinfo.update(self.curpatch)
-        self.patchinfo.show_all()
-        self.csetinfo.hide()
+        self.summarypanel.update(self.curpatch, self.patchstyle)
 
-        desc = self.patchinfo.get_data('desc')
+        desc = self.summarypanel.get_data('desc')
         self.set_commitlog(desc)
 
     def set_commitlog(self, desc):
@@ -503,18 +499,14 @@ class ChangeSet(gdialog.GDialog):
 
         custom = csinfo.custom(data=data_func, label=label_func,
                                markup=markup_func)
-        args = dict(repo=self.repo, custom=custom)
-
-        csetstyle = csinfo.panelstyle(contents=('cset', 'branch', 'user',
-                           'dateage', 'parents', 'children', 'tags',
-                           'transplant'), selectable=True)
-        self.csetinfo = csinfo.create(style=csetstyle, **args)
-        details_box.pack_start(self.csetinfo, False, False)
-
-        patchstyle = csinfo.panelstyle(contents=('patch', 'branch', 'user',
-                            'dateage', 'parents'), selectable=True)
-        self.patchinfo = csinfo.create(style=patchstyle, **args)
-        details_box.pack_start(self.patchinfo, False, False)
+        self.csetstyle = csinfo.panelstyle(contents=('cset', 'branch',
+                                'user', 'dateage', 'parents', 'children',
+                                'tags', 'transplant'), selectable=True)
+        self.patchstyle = csinfo.panelstyle(contents=('patch', 'branch',
+                                 'user', 'dateage', 'parents'),
+                                 selectable=True)
+        self.summarypanel = csinfo.create(self.repo, custom=custom)
+        details_box.pack_start(self.summarypanel, False, False)
         details_box.pack_start(gtk.HSeparator(), False, False)
 
         ## changeset diff
