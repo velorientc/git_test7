@@ -441,7 +441,9 @@ class ChangeSet(gdialog.GDialog):
             if item == 'dateage':
                 date = widget.get_data('date')
                 age = widget.get_data('age')
-                return (date, age)
+                if date is not None and age is not None:
+                    return (date, age)
+                return None
             elif item == 'parents':
                 return [revline_data(ctx) for ctx in ctx.parents()]
             elif item == 'children':
