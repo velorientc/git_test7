@@ -310,8 +310,7 @@ class GLog(gdialog.GDialog):
     def revisions_loaded(self, graphview):
         'Graphview reports log generator has exited'
         if not graphview.graphdata:
-            self.changeview._buffer.set_text('')
-            self.changeview._filelist.clear()
+            self.changeview.clear()
         self.cmd_set_sensitive('load-more', False)
         self.cmd_set_sensitive('load-all', False)
 
@@ -1443,8 +1442,7 @@ class GLog(gdialog.GDialog):
             self.repo.invalidate()
             self.changeview.clear_cache()
             self.reload_log()
-            self.changeview._buffer.set_text('')
-            self.changeview._filelist.clear()
+            self.changeview.clear()
         rev = self.currevid
         dialog = thgstrip.StripDialog(rev)
         dialog.set_notify_func(strip_completed)
@@ -1595,8 +1593,7 @@ class GLog(gdialog.GDialog):
         self.repo.invalidate()
         self.changeview.clear_cache()
         self.reload_log()
-        self.changeview._buffer.set_text('')
-        self.changeview._filelist.clear()
+        self.changeview.clear()
         self.enable_mqpanel()
 
     def rebase_selected(self, menuitem):
@@ -1615,8 +1612,7 @@ class GLog(gdialog.GDialog):
         self.repo.invalidate()
         self.changeview.clear_cache()
         self.reload_log()
-        self.changeview._buffer.set_text('')
-        self.changeview._filelist.clear()
+        self.changeview.clear()
 
     def transplant_revs(self, menuitem):
         """Transplant revision range on top of current revision."""
@@ -1630,8 +1626,7 @@ class GLog(gdialog.GDialog):
         self.repo.invalidate()
         self.changeview.clear_cache()
         self.reload_log()
-        self.changeview._buffer.set_text('')
-        self.changeview._filelist.clear()
+        self.changeview.clear()
 
     def add_tag(self, menuitem):
         # save tag info for detecting new tags added
@@ -1822,8 +1817,7 @@ class GLog(gdialog.GDialog):
         self.repo.invalidate()
         self.changeview.clear_cache()
         self.reload_log()
-        self.changeview._buffer.set_text('')
-        self.changeview._filelist.clear()
+        self.changeview.clear()
 
     def thgrefresh(self, window):
         self.reload_log()
