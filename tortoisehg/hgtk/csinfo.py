@@ -444,8 +444,6 @@ class SummaryPanel(SummaryBase, gtk.Frame):
         # layout table for contents
         self.table = gtklib.LayoutTable(ypad=1, headopts={'weight': 'bold'})
 
-        self.expander.add(self.table)
-
     def update(self, target=None, style=None, custom=None, repo=None):
         if not SummaryBase.update(self, target, custom, repo):
             return False # cannot update
@@ -479,6 +477,8 @@ class SummaryPanel(SummaryBase, gtk.Frame):
         sel = self.csstyle.get('selectable', False)
         assert isinstance(sel, bool)
 
+        use_expander = self.csstyle.get('expander', False)
+
         # build info
         first = True
         self.table.clear_rows()
@@ -489,12 +489,16 @@ class SummaryPanel(SummaryBase, gtk.Frame):
             if isinstance(markups, basestring):
                 markups = (markups,)
             if markups and not self.get_child():
-                self.add(self.expander)
+                if use_expander:
+                    self.add(self.expander)
+                    self.expander.add(self.table)
+                else:
+                    self.add(self.table)
             for text in markups:
                 body = gtk.Label()
                 body.set_selectable(sel)
                 body.set_markup(text)
-                if first:
+                if use_expander and first:
                     self.expander.set_label_widget(body)
                     first = False
                 else:
