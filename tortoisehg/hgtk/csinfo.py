@@ -341,7 +341,10 @@ class CachedSummaryInfo(SummaryInfo):
         if cacheinfo is None:
             cacheinfo = (repoid, {})
             self.cache[root] = cacheinfo
-        key = target + item + ctx.hex() + str(custom)
+        revid = ctx.hex()
+        if not revid and hasattr(ctx, '_path'):
+            revid = ctx._path
+        key = target + item + revid + str(custom)
         try:
             return cacheinfo[1][key]
         except KeyError:
