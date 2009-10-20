@@ -358,6 +358,8 @@ class CachedSummaryInfo(SummaryInfo):
     def get_markup(self, *args):
         return self.try_cache('markup', SummaryInfo.get_markup, *args)
 
+    def clear_cache(self):
+        self.cache = {}
 
 class SummaryBase(object):
 
@@ -385,15 +387,16 @@ class SummaryBase(object):
             target = self.target
         if target is not None:
             target = str(target)
+            self.target = target
         if custom is not None:
             self.custom = custom
         if repo is None:
             repo = self.repo
+        if repo is not None:
+            self.repo = repo
         self.ctx = create_context(repo, target)
         if self.ctx is None:
             return False # cannot update
-        self.target = target
-        self.repo = repo
         return True
 
 class SummaryPanel(SummaryBase, gtk.Frame):
@@ -521,3 +524,5 @@ class SummaryLabel(SummaryBase, gtk.Label):
             # insert data & append to label
             info += snip % data
         self.set_markup(info)
+
+        return True
