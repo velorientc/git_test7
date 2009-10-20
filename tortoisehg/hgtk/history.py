@@ -240,6 +240,7 @@ class GLog(gdialog.GDialog):
 
         def synch_callback(parents):
             self.repo.invalidate()
+            self.changeview.clear_cache()
             newparents = [x.node() for x in self.repo.parents()]
             if parents != newparents:
                 self.refresh_model()
@@ -446,6 +447,7 @@ class GLog(gdialog.GDialog):
                 self.changeview.load_details(self.currevid)
 
     def repo_invalidated(self, mqwidget):
+        self.changeview.clear_cache()
         self.reload_log()
 
     def prepare_display(self):
@@ -1257,6 +1259,7 @@ class GLog(gdialog.GDialog):
         dlg.hide()
         if dlg.return_code() == 0:
             self.repo.invalidate()
+            self.changeview.clear_cache()
             if '--rebase' in cmd:
                 self.origtip = len(self.repo)
                 self.reload_log()
@@ -1438,6 +1441,7 @@ class GLog(gdialog.GDialog):
     def strip_rev(self, menuitem):
         def strip_completed():
             self.repo.invalidate()
+            self.changeview.clear_cache()
             self.reload_log()
             self.changeview._buffer.set_text('')
             self.changeview._filelist.clear()
@@ -1468,6 +1472,7 @@ class GLog(gdialog.GDialog):
 
         def refresh(*args):
             self.repo.invalidate()
+            self.changeview.clear_cache()
             if len(self.repo) != oldlen:
                 self.reload_log()
             if len(self.repo.parents()) != len(parents):
@@ -1588,6 +1593,7 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
+        self.changeview.clear_cache()
         self.reload_log()
         self.changeview._buffer.set_text('')
         self.changeview._filelist.clear()
@@ -1607,6 +1613,7 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
+        self.changeview.clear_cache()
         self.reload_log()
         self.changeview._buffer.set_text('')
         self.changeview._filelist.clear()
@@ -1621,6 +1628,7 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
+        self.changeview.clear_cache()
         self.reload_log()
         self.changeview._buffer.set_text('')
         self.changeview._filelist.clear()
@@ -1633,6 +1641,7 @@ class GLog(gdialog.GDialog):
 
         def refresh(*args):
             self.repo.invalidate()
+            self.changeview.clear_cache()
             if len(self.repo) != oldlen:
                 self.reload_log()
             else:
@@ -1767,6 +1776,7 @@ class GLog(gdialog.GDialog):
     def checkout_completed(self, oldparents):
         self.repo.invalidate()
         self.repo.dirstate.invalidate()
+        self.changeview.clear_cache()
         newparents = [x.node() for x in self.repo.parents()]
         if not oldparents == newparents:
             self.refresh_model()
@@ -1776,6 +1786,7 @@ class GLog(gdialog.GDialog):
             oldparents, repolen = args
             self.repo.invalidate()
             self.repo.dirstate.invalidate()
+            self.changeview.clear_cache()
             if len(self.repo) != repolen:
                 self.reload_log()
             elif not oldparents == self.repo.parents():
@@ -1809,6 +1820,7 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
+        self.changeview.clear_cache()
         self.reload_log()
         self.changeview._buffer.set_text('')
         self.changeview._filelist.clear()
