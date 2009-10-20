@@ -268,7 +268,8 @@ class MQWidget(gtk.VBox):
             nser = len(self.repo.mq.series)
             if nser:
                 napp = len(self.repo.mq.applied)
-                status_text = _('%s of %s Patches applied') % (napp, nser)
+                status_text = _('%(count)d of %(total)d Patches applied') % {
+                        'count': napp, 'total': nser}
                 if napp:
                     pn = self.get_qtip_patchname()
                     idle_text = _("Patch '%s' applied") % pn
