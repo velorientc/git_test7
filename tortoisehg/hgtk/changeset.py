@@ -479,9 +479,12 @@ class ChangeSet(gdialog.GDialog):
                 return gtklib.markup(revid, face='monospace', size='9000')
             def revline_markup(revnum, revid, summary):
                 revnum = gtklib.markup(revnum)
-                revid = revid_markup(revid)
                 summary = gtklib.markup(summary)
-                return '%s (%s) %s' % (revnum, revid, summary)
+                if revid:
+                    revid = revid_markup(revid)
+                    return '%s (%s) %s' % (revnum, revid, summary)
+                else:
+                    return '%s - %s' % (revnum, summary)
             if item in ('cset', 'transplant', 'patch'):
                 if isinstance(value, basestring):
                     return revid_markup(value)

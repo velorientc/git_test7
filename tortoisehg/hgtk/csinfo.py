@@ -177,14 +177,21 @@ class patchctx(object):
                 self._parents.append(p)
 
     def __str__(self):
-        return short(self.node())
+        node = self.node()
+        if node:
+            return short(node)
+        return ''
 
     def __int__(self):
         return self.rev()
 
     def node(self): return self._node
     def rev(self): return None
-    def hex(self): return hex(self.node())
+    def hex(self):
+        node = self.node()
+        if node:
+            return hex(node)
+        return ''
     def user(self): return self._user
     def date(self): return self._date
     def description(self): return self._desc
@@ -228,9 +235,15 @@ class SummaryInfo(object):
             elif item == 'user':
                 return hglib.toutf(ctx.user())
             elif item == 'date':
-                return hglib.displaytime(ctx.date())
+                date = ctx.date()
+                if date:
+                    return hglib.displaytime(date)
+                return None
             elif item == 'age':
-                return hglib.age(ctx.date())
+                date = ctx.date()
+                if date:
+                    return hglib.age(date)
+                return None
             elif item == 'rawbranch':
                 return hglib.toutf(ctx.branch())
             elif item == 'branch':
