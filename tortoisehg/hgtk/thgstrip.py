@@ -127,7 +127,7 @@ class StripDialog(gtk.Dialog):
         self.allbtn.connect('clicked', lambda b: self.preview(limit=False))
 
         # csetinfo factory
-        self.factory = csinfo.factory(repo, withupdate=True, widgetcache=True)
+        self.factory = csinfo.factory(repo, withupdate=True)
         self.lstyle = csinfo.labelstyle(contents=('%(revnum)s:',
                              ' %(branch)s', ' %(tags)s', ' %(summary)s'))
         self.pstyle = csinfo.panelstyle()

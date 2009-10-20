@@ -22,10 +22,10 @@ from tortoisehg.hgtk import gtklib
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'date', 'branch', 'tags')
 
 def create(repo, target=None, style=None, custom=None, **kargs):
-    return CachedFactory(repo, custom, style, target, **kargs)()
+    return Factory(repo, custom, style, target, **kargs)()
 
 def factory(*args, **kargs):
-    return CachedFactory(*args, **kargs)
+    return Factory(*args, **kargs)
 
 def panelstyle(**kargs):
     kargs['type'] = 'panel'
@@ -40,10 +40,10 @@ def labelstyle(**kargs):
 def custom(**kargs):
     return kargs
 
-class CachedFactory(object):
+class Factory(object):
 
     def __init__(self, repo, custom=None, style=None, target=None,
-                 withupdate=False, widgetcache=False):
+                 withupdate=False):
         if repo is None:
             raise _('must be specified repository')
         self.repo = repo
@@ -57,8 +57,6 @@ class CachedFactory(object):
         self.info = CachedSummaryInfo()
 
         self.withupdate = withupdate
-        if widgetcache:
-            self.cache = {}
 
     def __call__(self, target=None, style=None, custom=None, repo=None):
         # try to create a context object
@@ -88,25 +86,12 @@ class CachedFactory(object):
         type = style['type']
         assert type in ('panel', 'label')
 
-        # check widgets cache
-        if target is None or repo is None:
-            key = None
-        else:
-            key = type + str(target) + str(style) + str(custom) + repo.root
-        if hasattr(self, 'cache') and key:
-            try:
-                return self.cache[key]
-            except KeyError:
-                pass
-
         # create widget
         args = (target, style, custom, repo, self.info)
         if type == 'panel':
             widget = SummaryPanel(*args)
         else:
             widget = SummaryLabel(*args)
-        if hasattr(self, 'cache') and key:
-            self.cache[key] = widget
         if self.withupdate:
             widget.update()
         return widget
