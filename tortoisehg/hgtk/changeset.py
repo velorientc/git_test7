@@ -247,7 +247,7 @@ class ChangeSet(gdialog.GDialog):
 
         try:
             fctx = self.repo[rev].filectx(wfile)
-        except LookupError:
+        except hglib.LookupError:
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.ui):
             lines = ['diff',
@@ -259,7 +259,7 @@ class ChangeSet(gdialog.GDialog):
             try:
                 for s in patch.diff(self.repo, n1, n2, match=m, opts=opts):
                     lines.extend(s.splitlines())
-            except (RepoLookupError, RepoError, LookupError), e:
+            except (hglib.RepoLookupError, hglib.RepoError, hglib.LookupError), e:
                 err = _('Repository Error:  %s, refresh suggested') % str(e)
                 lines = ['diff', '', err]
         tags, lines = self.prepare_diff(lines, offset, wfile)
@@ -455,7 +455,7 @@ class ChangeSet(gdialog.GDialog):
                     try:
                         tctx = self.repo[ts]
                         return revline_data(tctx)
-                    except (LookupError, RepoLookupError, RepoError):
+                    except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
                         return binascii.hexlify(ts)
                 except KeyError:
                     return None
@@ -678,7 +678,7 @@ class ChangeSet(gdialog.GDialog):
         try:
             fctx = ctx.filectx(self.curfile)
             has_filelog = fctx.filelog().linkrev(fctx.filerev()) == ctx.rev()
-        except LookupError:
+        except hglib.LookupError:
             has_filelog = False
         self.ann_menu.set_sensitive(has_filelog)
         self.save_menu.set_sensitive(has_filelog)
