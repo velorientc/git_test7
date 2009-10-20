@@ -65,6 +65,9 @@ class ChangeSet(gdialog.GDialog):
         else:
             self._setting_hpos = -1
 
+    def set_repo(self, repo):
+        self.repo = repo
+
     def diff_other_parent(self):
         return self.other_parent_checkbutton.get_active()
 

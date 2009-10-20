@@ -1117,7 +1117,7 @@ class GLog(gdialog.GDialog):
         self.urlcombo.set_active(self.origurl)
         self.repo = hg.repository(self.ui, path=self.repo.root)
         self.graphview.set_repo(self.repo, self.stbar)
-        self.changeview.repo = self.repo
+        self.changeview.set_repo(self.repo)
         self.changeview.bfile = None
         if resettip:
             self.origtip = len(self.repo)
@@ -1213,7 +1213,7 @@ class GLog(gdialog.GDialog):
         oldtip = len(self.repo)
         self.repo = hg.repository(self.ui, path=bfile)
         self.graphview.set_repo(self.repo, self.stbar)
-        self.changeview.repo = self.repo
+        self.changeview.set_repo(self.repo)
         self.changeview.bfile = bfile
         self.npreviews = len(self.repo) - oldtip
         self.reload_log()
@@ -1693,7 +1693,7 @@ class GLog(gdialog.GDialog):
         curtip = len(hg.repository(self.ui, self.repo.root))
         self.repo = hg.repository(self.ui, path=self.bfile)
         self.graphview.set_repo(self.repo, self.stbar)
-        self.changeview.repo = self.repo
+        self.changeview.set_repo(self.repo)
         self.npreviews = len(self.repo) - curtip
         self.reload_log()
 
