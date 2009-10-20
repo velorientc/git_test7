@@ -74,6 +74,7 @@ class TagAddDialog(gtk.Dialog):
 
         ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
+        self._local_tag.connect('toggled', self.local_tag_toggled)
         self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
         self._eng_msg = gtk.CheckButton(_('Use English commit message'))
         table.add_row(self._local_tag)
@@ -122,6 +123,13 @@ class TagAddDialog(gtk.Dialog):
         self.settings.set_value('english', checked)
 
         self.settings.write()
+
+    def local_tag_toggled(self, checkbutton):
+        local_tag_st = checkbutton.get_active()
+        self._eng_msg.set_sensitive(not local_tag_st)
+        self._use_msg.set_sensitive(not local_tag_st)
+        use_msg_st = self._use_msg.get_active()
+        self._commit_message.set_sensitive(not local_tag_st and use_msg_st)
 
     def msg_toggled(self, checkbutton):
         state = checkbutton.get_active()
