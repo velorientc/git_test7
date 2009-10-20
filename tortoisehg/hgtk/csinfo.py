@@ -361,15 +361,13 @@ class CachedSummaryInfo(SummaryInfo):
 
 class SummaryBase(object):
 
-    def __init__(self, target, custom, repo, info=None):
+    def __init__(self, target, custom, repo, info):
         if target is None:
             self.target = None
         else:
             self.target = str(target)
         self.custom = custom
         self.repo = repo
-        if info is None:
-            info = SummaryInfo()
         self.info = info
         self.ctx = create_context(repo, self.target)
 
@@ -400,7 +398,7 @@ class SummaryBase(object):
 
 class SummaryPanel(SummaryBase, gtk.Frame):
 
-    def __init__(self, target, style, custom, repo, info=None):
+    def __init__(self, target, style, custom, repo, info):
         SummaryBase.__init__(self, target, custom, repo, info)
         gtk.Frame.__init__(self)
 
@@ -473,7 +471,7 @@ class SummaryPanel(SummaryBase, gtk.Frame):
 
 class SummaryLabel(SummaryBase, gtk.Label):
 
-    def __init__(self, target, style, custom, repo, info=None):
+    def __init__(self, target, style, custom, repo, info):
         SummaryBase.__init__(self, target, custom, repo, info)
         gtk.Label.__init__(self)
 
