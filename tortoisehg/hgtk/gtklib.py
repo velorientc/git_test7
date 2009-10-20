@@ -25,6 +25,10 @@ if gtk.gtk_version < (2, 14, 0):
 else:
     from gobject import markup_escape_text
 
+if gobject.pygobject_version <= (2,12,1):
+    # http://www.mail-archive.com/tortoisehg-develop@lists.sourceforge.net/msg06900.html
+    raise Exception('incompatible version of gobject')
+
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)
