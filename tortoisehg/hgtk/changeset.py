@@ -67,6 +67,7 @@ class ChangeSet(gdialog.GDialog):
 
     def set_repo(self, repo):
         self.repo = repo
+        self.summarypanel.update(repo=repo)
 
     def diff_other_parent(self):
         return self.other_parent_checkbutton.get_active()
