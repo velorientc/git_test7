@@ -72,6 +72,11 @@ class ChangeSet(gdialog.GDialog):
     def clear_cache(self):
         self.summarypanel.info.clear_cache()
 
+    def clear(self):
+        self._buffer.set_text('')
+        self._filelist.clear()
+        self.summarypanel.hide()
+
     def diff_other_parent(self):
         return self.other_parent_checkbutton.get_active()
 
