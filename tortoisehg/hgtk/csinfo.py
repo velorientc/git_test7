@@ -413,7 +413,6 @@ class SummaryPanel(SummaryBase, gtk.Frame):
 
         self.expander = gtk.Expander()
         self.expander.set_expanded(True)
-        self.add(self.expander)
 
         # layout table for contents
         self.table = gtklib.LayoutTable(ypad=1, headopts={'weight': 'bold'})
@@ -462,6 +461,8 @@ class SummaryPanel(SummaryBase, gtk.Frame):
                 continue
             if isinstance(markups, basestring):
                 markups = (markups,)
+            if markups and not self.get_child():
+                self.add(self.expander)
             for text in markups:
                 body = gtk.Label()
                 body.set_selectable(sel)
