@@ -1069,6 +1069,19 @@ class GLog(gdialog.GDialog):
             self.mqpaned.add1(wrapframe(self.mqwidget))
             self.mqpaned.add2(wrapframe(midpane))
 
+            # register signal handler
+            def notify(paned, gparam):
+                if not hasattr(self, 'mqtb'):
+                    return
+                pos = paned.get_position()
+                if self.cmd_get_active('mq'):
+                    if pos < 140:
+                        paned.set_position(140)
+                else:
+                    if pos != 0:
+                        paned.set_position(0)
+            self.mqpaned.connect('notify::position', notify)
+
             midpane = self.mqpaned
 
         # Add ChangeSet instance to bottom half of vpane
@@ -1786,7 +1799,7 @@ class GLog(gdialog.GDialog):
                 self.reload_log()
             elif not oldparents == self.repo.parents():
                 self.refresh_model()
-            # update parents for the next nofifying
+            # update parents for the next notifying
             args[0] = self.repo.parents()
 
         if self.revrange:
@@ -1831,19 +1844,20 @@ class GLog(gdialog.GDialog):
             return
         if enable is None:
             enable = self.setting_mqvis and self.mqwidget.has_patch()
+
+        # set the state of MQ toolbutton
+        self.cmd_handler_block_by_func('mq', self.mq_clicked)
+        self.cmd_set_active('mq', enable)
+        self.cmd_handler_unblock_by_func('mq', self.mq_clicked)
+        self.cmd_set_sensitive('mq', self.mqwidget.has_mq())
+
+        # show/hide MQ pane
         oldpos = self.mqpaned.get_position()
         self.mqpaned.set_position(enable and self.setting_mqhpos or 0)
         if not enable and oldpos:
             self.setting_mqhpos = oldpos
 
-        # set the state of MQ toolbutton
-        if hasattr(self, 'mqtb'):
-            self.mqtb.handler_block_by_func(self.mq_clicked)
-            self.cmd_set_active('mq', enable)
-            self.mqtb.handler_unblock_by_func(self.mq_clicked)
-            self.cmd_set_sensitive('mq', self.mqwidget.has_mq())
-
-    def mq_clicked(self, widget, data=None):
+    def mq_clicked(self, widget, *args):
         self.enable_mqpanel(widget.get_active())
 
     def tree_button_press(self, tree, event):
