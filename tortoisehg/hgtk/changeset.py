@@ -75,7 +75,7 @@ class ChangeSet(gdialog.GDialog):
     def clear(self):
         self._buffer.set_text('')
         self._filelist.clear()
-        self.summarypanel.hide()
+        self.summarybox.hide()
 
     def diff_other_parent(self):
         return self.other_parent_checkbutton.get_active()
@@ -224,12 +224,14 @@ class ChangeSet(gdialog.GDialog):
 
     def generate_change_header(self):
         self.summarypanel.update(self.currev, self.csetstyle)
+        self.summarybox.show()
 
         desc = self.summarypanel.get_data('desc')
         self.set_commitlog(desc)
 
     def generate_patch_header(self):
         self.summarypanel.update(self.curpatch, self.patchstyle)
+        self.summarybox.show()
 
         desc = self.summarypanel.get_data('desc')
         self.set_commitlog(desc)
@@ -520,8 +522,12 @@ class ChangeSet(gdialog.GDialog):
                                  'user', 'dateage', 'parents'),
                                  selectable=True)
         self.summarypanel = csinfo.create(self.repo, custom=custom)
-        details_box.pack_start(self.summarypanel, False, False)
-        details_box.pack_start(gtk.HSeparator(), False, False)
+
+        # summary box (summarypanel + separator)
+        self.summarybox = gtk.VBox()
+        details_box.pack_start(self.summarybox, False, False)
+        self.summarybox.pack_start(self.summarypanel, False, False)
+        self.summarybox.pack_start(gtk.HSeparator(), False, False)
 
         ## changeset diff
         details_text = gtk.TextView()
