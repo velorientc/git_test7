@@ -196,8 +196,8 @@ class SummaryInfo(object):
     def __init__(self):
         pass
 
-    def get_data(self, item, *args):
-        widget, ctx, custom = args
+    def get_data(self, item, widget, ctx, custom, **kargs):
+        args = (widget, ctx, custom)
         def default_func(widget, item, ctx):
             return None
         def preset_func(widget, item, ctx):
@@ -260,7 +260,7 @@ class SummaryInfo(object):
             elif item == 'ishead':
                 return len(ctx.children()) == 0
             raise UnknownItem(item)
-        if custom.has_key('data'):
+        if custom.has_key('data') and not kargs.get('usepreset', False):
             try:
                 return custom['data'](widget, item, ctx)
             except UnknownItem:
@@ -271,7 +271,7 @@ class SummaryInfo(object):
             pass
         return default_func(widget, item, ctx)
 
-    def get_label(self, item, widget, ctx, custom):
+    def get_label(self, item, widget, ctx, custom, **kargs):
         def default_func(widget, item):
             return ''
         def preset_func(widget, item):
@@ -279,7 +279,7 @@ class SummaryInfo(object):
                 return self.LABELS[item]
             except KeyError:
                 raise UnknownItem(item)
-        if custom.has_key('label'):
+        if custom.has_key('label') and not kargs.get('usepreset', False):
             try:
                 return custom['label'](widget, item)
             except UnknownItem:
@@ -290,7 +290,7 @@ class SummaryInfo(object):
             pass
         return default_func(widget, item)
 
-    def get_markup(self, item, widget, ctx, custom):
+    def get_markup(self, item, widget, ctx, custom, **kargs):
         args = (widget, ctx, custom)
         mono = dict(face='monospace', size='9000')
         def default_func(widget, item, value):
@@ -317,7 +317,7 @@ class SummaryInfo(object):
         value = self.get_data(item, *args)
         if value is None:
             return None
-        if custom.has_key('markup'):
+        if custom.has_key('markup') and not kargs.get('usepreset', False):
             try:
                 return custom['markup'](widget, item, value)
             except UnknownItem:
@@ -384,14 +384,14 @@ class SummaryBase(object):
         self.info = info
         self.ctx = create_context(repo, self.target)
 
-    def get_data(self, item):
-        return self.info.get_data(item, self, self.ctx, self.custom)
+    def get_data(self, item, **kargs):
+        return self.info.get_data(item, self, self.ctx, self.custom, **kargs)
 
-    def get_label(self, item):
-        return self.info.get_label(item, self, self.ctx, self.custom)
+    def get_label(self, item, **kargs):
+        return self.info.get_label(item, self, self.ctx, self.custom, **kargs)
 
-    def get_markup(self, item):
-        return self.info.get_markup(item, self, self.ctx, self.custom)
+    def get_markup(self, item, **kargs):
+        return self.info.get_markup(item, self, self.ctx, self.custom, **kargs)
 
     def update(self, target=None, custom=None, repo=None):
         if target is None:
