@@ -10,6 +10,7 @@
 import re
 import os
 import gtk
+import binascii
 
 from mercurial import patch, util
 from mercurial.node import short, hex
@@ -19,7 +20,7 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import gtklib
 
-PANEL_DEFAULT = ('rev', 'summary', 'user', 'date', 'branch', 'tags')
+PANEL_DEFAULT = ('rev', 'summary', 'user', 'date', 'branch', 'tags', 'transplant')
 
 def create(repo, target=None, style=None, custom=None, **kargs):
     return Factory(repo, custom, style, target, **kargs)()
@@ -191,7 +192,8 @@ class SummaryInfo(object):
               'revid': _('Revision:'), 'summary': _('Summary:'),
               'user': _('User:'), 'age': _('Age:'), 'date': _('Date:'),
               'branch': _('Branch:'), 'tags': _('Tags:'),
-              'rawbranch': _('Branch:'), 'rawtags': _('Tags:')}
+              'rawbranch': _('Branch:'), 'rawtags': _('Tags:'),
+              'transplant': _('Transplant:')}
 
     def __init__(self):
         pass
@@ -257,6 +259,15 @@ class SummaryInfo(object):
                     if len(value) == 0:
                         return None
                 return value
+            elif item == 'transplant':
+                extra = ctx.extra()
+                try:
+                    ts = extra['transplant_source']
+                    if ts:
+                        return binascii.hexlify(ts)
+                except KeyError:
+                    pass
+                return None
             elif item == 'ishead':
                 return len(ctx.children()) == 0
             raise UnknownItem(item)
@@ -300,7 +311,7 @@ class SummaryInfo(object):
                 revnum, revid = value
                 revid = gtklib.markup(revid, **mono)
                 return '%s (%s)' % (revnum, revid)
-            elif item == 'revid':
+            elif item in ('revid', 'transplant'):
                 return gtklib.markup(value, **mono)
             elif item == 'revnum':
                 return str(value)
@@ -334,7 +345,7 @@ class CachedSummaryInfo(SummaryInfo):
         SummaryInfo.__init__(self)
         self.cache = {}
 
-    def try_cache(self, target, func, *args):
+    def try_cache(self, target, func, *args, **kargs):
         item, widget, ctx, custom = args
         root = ctx._repo.root
         repoid = id(ctx._repo)
@@ -357,17 +368,17 @@ class CachedSummaryInfo(SummaryInfo):
             return cacheinfo[1][key]
         except KeyError:
             pass
-        cacheinfo[1][key] = func(self, *args)
+        cacheinfo[1][key] = func(self, *args, **kargs)
         return cacheinfo[1][key]
 
-    def get_data(self, *args):
-        return self.try_cache('data', SummaryInfo.get_data, *args)
+    def get_data(self, *args, **kargs):
+        return self.try_cache('data', SummaryInfo.get_data, *args, **kargs)
 
-    def get_label(self, *args):
-        return self.try_cache('label', SummaryInfo.get_label, *args)
+    def get_label(self, *args, **kargs):
+        return self.try_cache('label', SummaryInfo.get_label, *args, **kargs)
 
-    def get_markup(self, *args):
-        return self.try_cache('markup', SummaryInfo.get_markup, *args)
+    def get_markup(self, *args, **kargs):
+        return self.try_cache('markup', SummaryInfo.get_markup, *args, **kargs)
 
     def clear_cache(self):
         self.cache = {}

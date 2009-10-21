@@ -10,7 +10,6 @@ import gtk
 import gobject
 import pango
 import Queue
-import binascii
 
 from mercurial import cmdutil, util, patch, mdiff
 
@@ -456,16 +455,14 @@ class ChangeSet(gdialog.GDialog):
             elif item == 'children':
                 return [revline_data(ctx) for ctx in ctx.children()]
             elif item == 'transplant':
-                extra = ctx.extra()
-                try:
-                    ts = extra['transplant_source']
-                    try:
-                        tctx = self.repo[ts]
-                        return revline_data(tctx)
-                    except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
-                        return binascii.hexlify(ts)
-                except KeyError:
+                ts = widget.get_data('transplant', usepreset=True)
+                if not ts:
                     return None
+                try:
+                    tctx = self.repo[ts]
+                    return revline_data(tctx)
+                except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+                    return ts
             elif item == 'patch':
                 if hasattr(ctx, '_patchname'):
                     desc = ctx.description()
@@ -481,8 +478,6 @@ class ChangeSet(gdialog.GDialog):
                 return _('Parent:')
             elif item == 'children':
                 return _('Child:')
-            elif item == 'transplant':
-                return _('Transplant:')
             elif item == 'patch':
                 return _('Patch:')
             raise csinfo.UnknownItem(item)
