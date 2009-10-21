@@ -30,10 +30,8 @@ class CmdDialog(gtk.Dialog):
         if len(title) > 80:
             title = title[:80] + '...'
         title = hglib.toutf(title.replace('\n', ' '))
-        gtk.Dialog.__init__(self,
-                            title=title,
-                            flags=gtk.DIALOG_MODAL,
-                            )
+        gtk.Dialog.__init__(self, title=title, flags=gtk.DIALOG_MODAL)
+        self.set_has_separator(False)
 
         gtklib.set_tortoise_icon(self, 'hg.ico')
         gtklib.set_tortoise_keys(self)
