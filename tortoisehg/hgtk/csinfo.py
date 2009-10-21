@@ -20,7 +20,7 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import gtklib
 
-PANEL_DEFAULT = ('rev', 'summary', 'user', 'date', 'branch', 'tags', 'transplant')
+PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'tags', 'transplant')
 
 def create(repo, target=None, style=None, custom=None, **kargs):
     return Factory(repo, custom, style, target, **kargs)()
@@ -190,10 +190,10 @@ class SummaryInfo(object):
 
     LABELS = {'rev': _('Revision:'), 'revnum': _('Revision:'),
               'revid': _('Revision:'), 'summary': _('Summary:'),
-              'user': _('User:'), 'age': _('Age:'), 'date': _('Date:'),
-              'branch': _('Branch:'), 'tags': _('Tags:'),
-              'rawbranch': _('Branch:'), 'rawtags': _('Tags:'),
-              'transplant': _('Transplant:')}
+              'user': _('User:'), 'date': _('Date:'),'age': _('Age:'),
+              'dateage': _('Date'), 'branch': _('Branch:'),
+              'tags': _('Tags:'), 'rawbranch': _('Branch:'),
+              'rawtags': _('Tags:'), 'transplant': _('Transplant:')}
 
     def __init__(self):
         pass
@@ -221,6 +221,12 @@ class SummaryInfo(object):
                 return value
             elif item == 'user':
                 return hglib.toutf(ctx.user())
+            elif item == 'dateage':
+                date = self.get_data('date', *args)
+                age = self.get_data('age', *args)
+                if date and age:
+                    return (date, age)
+                return None
             elif item == 'date':
                 date = ctx.date()
                 if date:
@@ -324,6 +330,8 @@ class SummaryInfo(object):
                 return ' '.join(tags)
             elif item in ('desc', 'summary', 'user', 'date', 'age'):
                 return gtklib.markup(value)
+            elif item == 'dateage':
+                return gtklib.markup('%s (%s)' % value)
             raise UnknownItem(item)
         value = self.get_data(item, *args)
         if value is None:

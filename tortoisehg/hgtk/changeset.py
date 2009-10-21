@@ -444,12 +444,6 @@ class ChangeSet(gdialog.GDialog):
             elif item == 'branch':
                 value = hglib.toutf(ctx.branch())
                 return value != 'default' and value or None
-            elif item == 'dateage':
-                date = widget.get_data('date')
-                age = widget.get_data('age')
-                if date is not None and age is not None:
-                    return (date, age)
-                return None
             elif item == 'parents':
                 return [revline_data(ctx) for ctx in ctx.parents()]
             elif item == 'children':
@@ -472,8 +466,6 @@ class ChangeSet(gdialog.GDialog):
         def label_func(widget, item):
             if item == 'cset':
                 return _('Changeset:')
-            elif item == 'dateage':
-                return _('Date:')
             elif item == 'parents':
                 return _('Parent:')
             elif item == 'children':
@@ -504,8 +496,6 @@ class ChangeSet(gdialog.GDialog):
                     else:
                         csets.append(revline_markup(*cset))
                 return csets
-            elif item == 'dateage':
-                return gtklib.markup('%s (%s)' % value)
             raise csinfo.UnknownItem(item)
 
         custom = csinfo.custom(data=data_func, label=label_func,
@@ -518,7 +508,7 @@ class ChangeSet(gdialog.GDialog):
                                  selectable=True)
         self.summarypanel = csinfo.create(self.repo, custom=custom)
 
-        # summary box (summarypanel + separator)
+        ## summary box (summarypanel + separator)
         self.summarybox = gtk.VBox()
         details_box.pack_start(self.summarybox, False, False)
         self.summarybox.pack_start(self.summarypanel, False, False)
