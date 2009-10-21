@@ -57,6 +57,7 @@ else:
     mystderr = cStringIO.StringIO()
     origstderr = sys.stderr
     sys.stderr = mystderr
+    ret = 0
     try:
         ret = tortoisehg.hgtk.hgtk.dispatch(sys.argv[1:])
         sys.stderr = origstderr
