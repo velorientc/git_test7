@@ -1169,6 +1169,13 @@ class GLog(gdialog.GDialog):
             atexit.register(cleanup)
 
         bfile = path
+        
+        for alias, path_aux in self.repo.ui.configitems('paths'):
+            if path == alias:
+                path = path_aux
+            elif path == url.hidepassword(path_aux):
+                path = path_aux
+                
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
         bfile = bfile.replace('/', '_')
