@@ -340,21 +340,41 @@ class GDialog(gtk.Window):
     def get_menuitem(self, name):
         return self.menuitems[name]
 
+    def get_widgets(self, name):
+        widgets = []
+        widgets.append(self.toolbuttons.get(name))
+        widgets.append(self.menuitems.get(name))
+        return widgets
+
     def cmd_set_sensitive(self, name, sensitive):
-        ws = []
-        ws.append(self.toolbuttons.get(name))
-        ws.append(self.menuitems.get(name))
-        for w in ws:
+        for w in self.get_widgets(name):
             if w:
                 w.set_sensitive(sensitive)
 
     def cmd_set_active(self, name, active):
-        ws = []
-        ws.append(self.toolbuttons.get(name))
-        ws.append(self.menuitems.get(name))
-        for w in ws:
+        for w in self.get_widgets(name):
+            if w and hasattr(w, 'set_active'):
+                w.set_active(active)
+
+    def cmd_get_active(self, name, fallback=None):
+        prev = None
+        for w in self.get_widgets(name):
+            if w and hasattr(w, 'set_active'):
+                active = w.get_active()
+                if prev is not None and prev != active:
+                    return fallback
+                prev = active
+        return prev
+
+    def cmd_handler_block_by_func(self, name, func):
+        for w in self.get_widgets(name):
             if w:
-                w.set_active(active)    
+                w.handler_block_by_func(func)
+
+    def cmd_handler_unblock_by_func(self, name, func):
+        for w in self.get_widgets(name):
+            if w:
+                w.handler_unblock_by_func(func)
 
     def get_reponame(self):
         return hglib.get_reponame(self.repo)
