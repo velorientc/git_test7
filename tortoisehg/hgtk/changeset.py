@@ -443,7 +443,7 @@ class ChangeSet(gdialog.GDialog):
             elif item == 'branch':
                 value = hglib.toutf(ctx.branch())
                 return value != 'default' and value or None
-            if item == 'dateage':
+            elif item == 'dateage':
                 date = widget.get_data('date')
                 age = widget.get_data('age')
                 if date is not None and age is not None:

@@ -204,9 +204,9 @@ class SummaryInfo(object):
             if item == 'rev':
                 revnum = self.get_data('revnum', *args)
                 revid = self.get_data('revid', *args)
-                return '%s (%s)' % (revnum, revid)
+                return (revnum, revid)
             elif item == 'revnum':
-                return str(ctx.rev())
+                return ctx.rev()
             elif item == 'revid':
                 return str(ctx)
             elif item == 'desc':
@@ -291,11 +291,19 @@ class SummaryInfo(object):
         return default_func(widget, item)
 
     def get_markup(self, item, widget, ctx, custom):
+        args = (widget, ctx, custom)
+        mono = dict(face='monospace', size='9000')
         def default_func(widget, item, value):
             return ''
         def preset_func(widget, item, value):
-            if item in ('rev', 'revnum', 'revid'):
-                return gtklib.markup(value, face='monospace', size='9000')
+            if item == 'rev':
+                revnum, revid = value
+                revid = gtklib.markup(revid, **mono)
+                return '%s (%s)' % (revnum, revid)
+            elif item == 'revid':
+                return gtklib.markup(value, **mono)
+            elif item == 'revnum':
+                return str(value)
             elif item in ('rawbranch', 'branch'):
                 return gtklib.markup(' %s ' % value, color='black',
                                      background='#aaffaa')
@@ -306,7 +314,7 @@ class SummaryInfo(object):
             elif item in ('desc', 'summary', 'user', 'date', 'age'):
                 return gtklib.markup(value)
             raise UnknownItem(item)
-        value = self.get_data(item, widget, ctx, custom)
+        value = self.get_data(item, *args)
         if value is None:
             return None
         if custom.has_key('markup'):
