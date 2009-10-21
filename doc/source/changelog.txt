@@ -4,34 +4,46 @@ Changelog
 .. module:: changelog.dialog
 	:synopsis: Dialog used to view log
 
-The changelog tool is primarily used to visualize the revision history
-of your repository. It presents a graph of the revision history, showing
-the parent/child relationship of each change. At each revision you can
-view the files that were modified and the contents of those changes.
-These are the features that nearly all revision history browsers provide.
-
-The TortoiseHg changelog browser offers much more.  Since it is our best
-tool for viewing and selecting changesets, we use it to perform nearly
-all our tasks that involve changeset manipulation.
+The changelog tool (*also known as the repository explorer*) is
+used to visualize the revision history of your repository and to perform
+any maintenence tasks that involve changesets. It presents a graph of
+the revision history, showing the parent/child relationship of each
+change. At each revision you can view the files that were modified and
+the contents of those changes.
 
 .. figure:: figures/log.png
 	:alt: Changelog
 
-	Changelog viewer dialog
+	Changelog viewer dialog with main toolbar hidden
+
+New in 0.9, the changelog tool has a menu bar for accessing tool
+functions and for launching other tools.
+
+	:guilabel:`Tools`
+		Launch other TortoiseHg tools as separate processes
+	:guilabel:`View`
+		Toggle the visibility of various features, or refresh views
+	:guilabel:`Navigate`
+		Select specific changesets in your repository history
+	:guilabel:`Synchronize`
+		Access synchronization functions, more below
+	:guilabel:`Help`
+		Help contents shows this web page.  About shows TortoiseHg
+		version info
 
 The toolbar buttons from left to right:
 
 	:guilabel:`Refresh`
 		Reload the revision history (if you commit in another window, etc)
-	:guilabel:`Filter`
-		Open revision filter dialog. The toolbar button also has
-		drop-down for common filters
-	:guilabel:`Datamine`
-		Open datamine application for history searches and file annotations
-	:guilabel:`Other Parent`
-		Toggles parent revision when viewing merge changesets
 	:guilabel:`Synchronize`
 		Opens synchronize tool to communicate changes with other repositories
+	:guilabel:`Patch Queue`
+		Toggles the display of the MQ pane.  This button is only visible
+		when the MQ extension has been enabled by the user.
+	:guilabel:`Load more`
+		load the next N revisions into the graph
+	:guilabel:`Load all`
+		load all remaining revisions into the graph
 
 
 Revision Graph Details
@@ -40,21 +52,8 @@ Revision Graph Details
 The graph column shows the child-parent relationships between revisions
 in your repository history.  This column auto-sizes for as many lines of
 ancestry that are required to visualize the revisions you have loaded.
-The column does have a hard-limit width to prevent some degenerative
-cases from breaking the viewer.
-
-On the right of the revision graph are three buttons. From top to bottom
-these are:
-
-	:guilabel:`column toggles`
-		toggle the display of columns in the graph
-	:guilabel:`next-N revisions`
-		load the next N revisions into the graph
-	:guilabel:`all revisions`
-		load all remaining revisions into the graph
-
-The column visibility toggles are sticky settings.
-
+The column has an initial hard-limit width to prevent some degenerative
+cases from breaking the viewer, but can be resized after refreshes.
 
 Revision Context Menus
 ----------------------
@@ -62,65 +61,91 @@ Revision Context Menus
 Right-clicking on a revision in the (top) graph pane will bring up the
 revision context menu.
 
-	:guilabel:`visualize change`
+	:guilabel:`Visualize Change`
 		open this change in your visual diff tool
-	:guilabel:`display change`
+	:guilabel:`Display Change`
 		open this changeset in the changeset browser (more below)
-	:guilabel:`diff to local`
+	:guilabel:`Diff to Local`
 		display changes (visual diff) between this revision and your
 		current working directory
-	:guilabel:`update`
-		update your working directory to this revision [#rcm1]_
-	:guilabel:`merge with`
-		merge with this revision [#rcm2]_
-	:guilabel:`copy hash`
+	:guilabel:`Copy Hash`
 		copy current revision's full hash to the clipboard
-	:guilabel:`export patch`
+	:guilabel:`Update`
+		update your working directory to this revision [#rcm1]_
+	:guilabel:`Merge With`
+		merge with this revision [#rcm2]_
+	:guilabel:`Export Patch`
 		generate a patch file containing this revision's changes
-	:guilabel:`email patch`
+	:guilabel:`Email Patch`
 		send this revision's changes to email recipient [#rcm3]_
-	:guilabel:`bundle rev:tip`
+	:guilabel:`Bundle rev:tip`
 		create a bundle with all revs from selected to tip
-	:guilabel:`add/remove tag`
+	:guilabel:`Add/Remove Tag`
 		opens the TortoiseHg tag dialog with this revision selected
-	:guilabel:`backout`
+	:guilabel:`Backout revision`
 		create a backout changeset for selected revision
-	:guilabel:`revert`
+	:guilabel:`Revert`
 		revert working copy to this revision's contents, without
 		updating working directory parent revision. Use with care.
-	:guilabel:`strip`
+	:guilabel:`Archive...`
+		open the archive dialog for this revision, allowing user to
+		generate a backup copy of the repository at that revision.
+	:guilabel:`Transplant to local`
+		Transplant selected revision onto the current working parent.
+		*Only visible when the transplant extension is enabled*
+	:guilabel:`qimport`
+		Import selected revision into the current patch queue.  Only
+		valid for qbase or checked out head revision.  *Only visible
+		when MQ is enabled*
+	:guilabel:`Strip Revision...`
 		Remove the selected revision and all of it's descendants from the
-		repository [#rcm4]_
+		repository [#rcm4]_ *Only visible when MQ is enabled*
 
 
 If you right-click on a row other than the one that was currently
-selected, you get a different context menu.  This context menu has
-commands that deal with arbitrary revision ranges.
+selected, you get a secondary context menu which defines commands that
+operation on revision ranges.
 
-	:guilabel:`diff with selected`
-		 Opens status viewer with cumulative changes of the range of
-		 changesets.
-	:guilabel:`visual diff with selected` [#rcm5]_
-		 Opens visual diff window with cumulative changes of the range
-		 of changesets.
-	:guilabel:`email from here to selected`
-		 Opens email dialog with range of changesets.
-	:guilabel:`bundle from here to selected`
-		 Creates a bundle file with range of changesets.
-	:guilabel:`merge with selected` [#rcm6]_
-		 Merges this revision with the current working directory parent
-		 revision.  This menu item is only sensitive when the working
-		 parent is the current selected revision.
-	 
-.. [#rcm1] Opens the TortoiseHg update/checkout dialog with this revision selected.
+	:guilabel:`Diff with selected`
+		Opens status viewer with cumulative changes of the range of
+		changesets.  The status viewer allows cherry picked changes to
+		be saved to a file.
+	:guilabel:`Visual Diff with selected` [#rcm5]_
+		Opens visual diff window with cumulative changes of the range
+		of changesets.
+	:guilabel:`Email from here to selected`
+		Opens email dialog with range of changesets.
+	:guilabel:`Bundle from here to selected`
+		Creates a bundle file with range of changesets.
+	:guilabel:`Export patches from here to selected`
+		Creates a patch file for each changeset in selected range.
+	:guilabel:`Merge with selected` [#rcm6]_
+		Merges this revision with the other selected revision.  If
+		neither revision is currently checked out, the merge dialog will
+		be forced to update to the first selected revision before
+		starting the merge.  This will fail if the working directory is
+		not clean.
+	:guilabel:`Transplant revision range to local`
+		Transplant selected range of changesets on to current working
+		parent revision. *Only visible when the transplant extension is
+		enabled*
+	:guilabel:`Rebase on top of selected`
+		Rebase selected changeset and ancestors on top of original
+		selected revision.  *Only visible when the rebase extension is
+		enabled*
+	:guilabel:`qimport from here to selected`
+		Import selected revision range into the current patch queue.
+		*Only visible when MQ is enabled*
+
+.. [#rcm1] Opens the TortoiseHg update dialog with this revision selected.
 .. [#rcm2] Opens the TortoiseHg merge dialog with this revision selected.
 .. [#rcm3] Opens the TortoiseHg email dialog with this revision selected.
 .. [#rcm4] The strip command will store the stripped revisions in a bundle file
-		   that can later be reapplied.
-		   See `also <http://mercurial.selenic.com/wiki/EditingHistory>`_.
+		that can later be reapplied.
+		See `also <http://mercurial.selenic.com/wiki/EditingHistory>`_.
 .. [#rcm5] :menuselection:`Global Settings --> TortoiseHg --> Visual Diff Command`
 .. [#rcm6] Only sensitive if the selected revision is your current working
-		   directory parent
+		directory parent
 
 File Context Menus
 ------------------
@@ -128,18 +153,20 @@ File Context Menus
 Right-clicking on filenames in the file list (bottom left) pane will
 bring up a context menu for the selected file:
 
-	:guilabel:`visual diff`
-		Open this revision of the file in your visual editor [#flcm1]_
-	:guilabel:`diff to local`
+	:guilabel:`Visual Diff`
+		Open this revision of the file in your visual diff tool
+	:guilabel:`Diff to Local`
 		Visualize differences between this revision and your checked
 		out version
-	:guilabel:`save at revision`
+	:guilabel:`View at Revision`
+		Open this revision of the file in your visual editor [#flcm1]_
+	:guilabel:`Save at Revision`
 		Write this revision of the file to specified location
-	:guilabel:`file history`
+	:guilabel:`File History`
 		Show revisions that modified this file [#flcm2]_
-	:guilabel:`annotate file`
+	:guilabel:`Annotate File`
 		Open this file in the datamine app, annotated at this revision
-	:guilabel:`revert file contents`
+	:guilabel:`Revert File Contents`
 		Checkout this specific revision of this file [#flcm3]_
  
 .. [#flcm1] :menuselection:`Global Settings --> TortoiseHg --> Visual Editor`
@@ -156,7 +183,9 @@ a performance optimization.  If you would like to see all of the file
 diffs at once, click on the :guilabel:`[All Files]` row.  The changeset
 browser will also skip displaying diffs for files which are above a
 maximum limit. See
-:menuselection:`Global Settings --> TortoiseHg --> Max Diff Size`
+:menuselection:`Global Settings --> TortoiseHg --> Max Diff Size`.  The
+size limit can be temporarily disabled by toggling :menuselection:`View
+-> Ignore Max Diff Size`.
 
 The changelog and datamine tools can open the changeset browser to view
 a single revision or the combined effect of a range of revisions. The
@@ -164,15 +193,15 @@ changeset browser is very similar to the commit and shelve tools. It has
 a file list on the left of all files that have been changed, and a diff
 pane on the right with the changes to each file.
 
-When opened in the 'diff change with' mode, you can select files and
-hunks that you wish to extract from the changeset(s) you are browsing
-and write them to a patch file using the :guilabel:`Save as` toolbar
-button.  This is a very efficient way to cherry pick changes from a
-repository.  This changeset browser also supports the :kbd:`Ctrl-C`
-keyboard accelerator to copy hightlighted diff hunks to the clipboard.
+The diff pane is tabbed and allows one to select files and hunks that
+you wish to extract from the changeset(s) you are browsing and write
+them to a patch file using the :guilabel:`Save as` toolbar button.  This
+is a very efficient way to cherry pick changes from a repository.  This
+changeset browser also supports the :kbd:`Ctrl-C` keyboard accelerator
+to copy hightlighted diff hunks to the clipboard.
 
 Unfortunately, TortoiseHg still does not have a dialog for importing
-changes into a repository, so this must be done on the command line with
+patches into a repository, so this must be done on the command line with
 the :command:`hg import` command.
 
 Keyboard navigation
@@ -182,6 +211,8 @@ Keyboard navigation
 	Zoom to the working directory parent revision
 :kbd:`Ctrl-D`
 	Display visual diffs for selected changeset or file
+:kbd:`Ctrl-R`
+	Refresh repository contents
 
 
 Configurables
@@ -198,6 +229,7 @@ the TortoiseHg Settings dialog on the Changelog tab.
 		Number of revisions to read in each batch load
 	:guilabel:`Copy Hash`
 		Copy a revision's changeset id hash to the clipboard when selected
+		[DEPRECATED]
 	:guilabel:`Dead Branches`
 		Comma separated list of branch names that should be ignored
 		when building a list of branch names for a repository.
