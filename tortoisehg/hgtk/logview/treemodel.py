@@ -238,8 +238,11 @@ class TreeModel(gtk.GenericTreeModel):
                 if not k.startswith('authorcolor.'): continue
                 pat = k[12:]
                 self.author_pats.append((re.compile(pat, re.I), v))
-            if self.author_pats or self.repo.ui.configbool('tortoisehg',
-                    'authorcolor'):
+            try:
+                enabled = self.repo.ui.configbool('tortoisehg', 'authorcolor')
+            except hglib.ConfigError:
+                enabled = False
+            if self.author_pats or enabled:
                 self.color_func = self.text_color_author
 
     def text_color_default(self, rev, author):
