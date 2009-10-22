@@ -347,6 +347,27 @@ class SummaryInfo(object):
             pass
         return default_func(widget, item, value)
 
+    def get_widget(self, item, widget, ctx, custom, **kargs):
+        args = (widget, ctx, custom)
+        def default_func(widget, item, markups):
+            if isinstance(markups, basestring):
+                markups = (markups,)
+            labels = []
+            for text in markups:
+                label = gtk.Label()
+                label.set_markup(text)
+                labels.append(label)
+            return labels
+        markups = self.get_markup(item, *args)
+        if not markups:
+            return None
+        if custom.has_key('widget') and not kargs.get('usepreset', False):
+            try:
+                return custom['widget'](widget, item, markups)
+            except UnknownItem:
+                pass
+        return default_func(widget, item, markups)
+
 class CachedSummaryInfo(SummaryInfo):
 
     def __init__(self):
@@ -355,29 +376,30 @@ class CachedSummaryInfo(SummaryInfo):
 
     def try_cache(self, target, func, *args, **kargs):
         item, widget, ctx, custom = args
-        root = ctx._repo.root
-        repoid = id(ctx._repo)
-        try:
-            cacheinfo = self.cache[root]
-            if cacheinfo[0] != repoid:
-                # clear cache
-                del self.cache[root] 
+        if target != 'widget': # no cache for widget
+            root = ctx._repo.root
+            repoid = id(ctx._repo)
+            try:
+                cacheinfo = self.cache[root]
+                if cacheinfo[0] != repoid:
+                    del self.cache[root] # clear cache
+                    cacheinfo = None
+            except KeyError:
                 cacheinfo = None
-        except KeyError:
-            cacheinfo = None
-        if cacheinfo is None:
-            cacheinfo = (repoid, {})
-            self.cache[root] = cacheinfo
-        revid = ctx.hex()
-        if not revid and hasattr(ctx, '_path'):
-            revid = ctx._path
-        key = target + item + revid + str(custom)
-        try:
-            return cacheinfo[1][key]
-        except KeyError:
-            pass
-        cacheinfo[1][key] = func(self, *args, **kargs)
-        return cacheinfo[1][key]
+            if cacheinfo is None:
+                self.cache[root] = cacheinfo = (repoid, {})
+            revid = ctx.hex()
+            if not revid and hasattr(ctx, '_path'):
+                revid = ctx._path
+            key = target + item + revid + str(custom)
+            try:
+                return cacheinfo[1][key]
+            except KeyError:
+                pass
+        value = func(self, *args, **kargs)
+        if target != 'widget': # do not cache widgets
+            cacheinfo[1][key] = value
+        return value
 
     def get_data(self, *args, **kargs):
         return self.try_cache('data', SummaryInfo.get_data, *args, **kargs)
@@ -387,6 +409,9 @@ class CachedSummaryInfo(SummaryInfo):
 
     def get_markup(self, *args, **kargs):
         return self.try_cache('markup', SummaryInfo.get_markup, *args, **kargs)
+
+    def get_widget(self, *args, **kargs):
+        return self.try_cache('widget', SummaryInfo.get_widget, *args, **kargs)
 
     def clear_cache(self):
         self.cache = {}
@@ -411,6 +436,9 @@ class SummaryBase(object):
 
     def get_markup(self, item, **kargs):
         return self.info.get_markup(item, self, self.ctx, self.custom, **kargs)
+
+    def get_widget(self, item, **kargs):
+        return self.info.get_widget(item, self, self.ctx, self.custom, **kargs)
 
     def update(self, target=None, custom=None, repo=None):
         if target is None:
@@ -483,26 +511,25 @@ class SummaryPanel(SummaryBase, gtk.Frame):
         first = True
         self.table.clear_rows()
         for item in contents:
-            markups = self.get_markup(item)
-            if not markups:
+            widgets = self.get_widget(item)
+            if not widgets:
                 continue
-            if isinstance(markups, basestring):
-                markups = (markups,)
-            if markups and not self.get_child():
+            if isinstance(widgets, gtk.Widget):
+                widgets = (widgets,)
+            if not self.get_child():
                 if use_expander:
                     self.add(self.expander)
                     self.expander.add(self.table)
                 else:
                     self.add(self.table)
-            for text in markups:
-                body = gtk.Label()
-                body.set_selectable(sel)
-                body.set_markup(text)
+            for widget in widgets:
+                if hasattr(widget, 'set_selectable'):
+                    widget.set_selectable(sel)
                 if use_expander and first:
-                    self.expander.set_label_widget(body)
+                    self.expander.set_label_widget(widget)
                     first = False
                 else:
-                    self.table.add_row(self.get_label(item), body)
+                    self.table.add_row(self.get_label(item), widget)
         self.show_all()
 
         return True
