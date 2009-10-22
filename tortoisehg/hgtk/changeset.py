@@ -359,29 +359,12 @@ class ChangeSet(gdialog.GDialog):
             offset += length
         return tags, outlines
 
-    def link_event(self, tag, widget, event, liter):
-        if event.type != gtk.gdk.BUTTON_RELEASE:
-            return
-        text = self.get_link_text(tag, widget, liter)
-        if not text:
-            return
-        linkrev = long(text.split(' ')[0])
+    def link_event(self, label, event, revnum):
+        revnum = int(revnum)
         if self.graphview:
-            self.graphview.set_revision_id(linkrev, load=True)
+            self.graphview.set_revision_id(revnum, load=True)
         else:
-            self.load_details(linkrev)
-
-    def get_link_text(self, tag, widget, liter):
-        'handle clicking on a link in a textview'
-        text_buffer = widget.get_buffer()
-        beg = liter.copy()
-        while not beg.begins_tag(tag):
-            beg.backward_char()
-        end = liter.copy()
-        while not end.ends_tag(tag):
-            end.forward_char()
-        text = text_buffer.get_text(beg, end)
-        return text
+            self.load_details(revnum)
 
     def file_context_menu(self):
         def create_menu(label, callback):
@@ -430,6 +413,10 @@ class ChangeSet(gdialog.GDialog):
         scroller.child.set_shadow_type(gtk.SHADOW_NONE)
 
         ## changeset panel
+        def revid_markup(revid, **kargs):
+            opts = dict(face='monospace', size='9000')
+            opts.update(kargs)
+            return gtklib.markup(revid, **opts)
         def data_func(widget, item, ctx):
             def summary_line(desc):
                 desc = desc.replace('\0', '')
@@ -474,8 +461,6 @@ class ChangeSet(gdialog.GDialog):
                 return _('Patch:')
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
-            def revid_markup(revid):
-                return gtklib.markup(revid, face='monospace', size='9000')
             def revline_markup(revnum, revid, summary):
                 revnum = gtklib.markup(revnum)
                 summary = gtklib.markup(summary)
@@ -497,9 +482,31 @@ class ChangeSet(gdialog.GDialog):
                         csets.append(revline_markup(*cset))
                 return csets
             raise csinfo.UnknownItem(item)
+        def widget_func(widget, item, markups):
+            def linkwidget(revnum, revid, summary):
+                opts = dict(underline='single', foreground='#0000FF')
+                rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
+                                   revid_markup(revid, **opts))
+                link = gtk.Label()
+                link.set_markup(rev)
+                link.set_selectable(True)
+                link.connect('button-release-event', self.link_event, revnum)
+                text = gtk.Label(summary)
+                text.set_selectable(True)
+                box = gtk.HBox()
+                box.pack_start(link, False, False)
+                box.pack_start(text, True, True, 4)
+                return box
+            if item in ('parents', 'children'):
+                csets = widget.get_data(item)
+                return [linkwidget(*cset) for cset in csets]
+            elif item == 'transplant':
+                cset = widget.get_data(item)
+                return linkwidget(*cset)
+            raise csinfo.UnknownItem(item)
 
         custom = csinfo.custom(data=data_func, label=label_func,
-                               markup=markup_func)
+                               markup=markup_func, widget=widget_func)
         self.csetstyle = csinfo.panelstyle(contents=('cset', 'branch',
                                 'user', 'dateage', 'parents', 'children',
                                 'tags', 'transplant'), selectable=True)
@@ -605,13 +612,13 @@ class ChangeSet(gdialog.GDialog):
 
     def setup_tags(self):
         'Creates the tags to be used inside the TextView'
-        def make_texttag( name, **kwargs ):
+        def make_texttag(name, **kwargs):
             'Helper function generating a TextTag'
             tag = gtk.TextTag(name)
             for key, value in kwargs.iteritems():
                 key = key.replace("_","-")
                 try:
-                    tag.set_property( key, value )
+                    tag.set_property(key, value)
                 except TypeError:
                     print "Warning the property %s is unsupported in" % key
                     print "this version of pygtk"
@@ -635,24 +642,15 @@ class ChangeSet(gdialog.GDialog):
                 paragraph_background='#F0F0F0',
                 weight=pango.WEIGHT_BOLD ))
 
-        tag_table.add( make_texttag( 'mono', family='Monospace' ))
-        tag_table.add( make_texttag( 'blue', foreground='blue' ))
-        tag_table.add( make_texttag( 'red', foreground='red' ))
-        tag_table.add( make_texttag( 'green', foreground='darkgreen' ))
-        tag_table.add( make_texttag( 'black', foreground='black' ))
-        tag_table.add( make_texttag( 'greybg',
-                                     paragraph_background='grey',
-                                     weight=pango.WEIGHT_BOLD ))
-        tag_table.add( make_texttag( 'yellowbg', background='yellow' ))
-        link_tag = make_texttag( 'link', foreground='blue',
-                                 underline=pango.UNDERLINE_SINGLE )
-        linkhl_tag = make_texttag( 'linkhl', foreground='blue',
-                                 underline=pango.UNDERLINE_SINGLE,
-                                weight=pango.WEIGHT_BOLD )
-        link_tag.connect('event', self.link_event )
-        linkhl_tag.connect('event', self.link_event )
-        tag_table.add( link_tag )
-        tag_table.add( linkhl_tag )
+        tag_table.add(make_texttag('mono', family='Monospace'))
+        tag_table.add(make_texttag('blue', foreground='blue'))
+        tag_table.add(make_texttag('red', foreground='red'))
+        tag_table.add(make_texttag('green', foreground='darkgreen'))
+        tag_table.add(make_texttag('black', foreground='black'))
+        tag_table.add(make_texttag('greybg',
+                                   paragraph_background='grey',
+                                   weight=pango.WEIGHT_BOLD))
+        tag_table.add(make_texttag('yellowbg', background='yellow'))
 
     def file_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
