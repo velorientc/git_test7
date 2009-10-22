@@ -420,7 +420,10 @@ def filelog_grapher(repo, path):
     Graph the ancestry of a single file (log).  Deletions show
     up as breaks in the graph.
     '''
-    paths = { path : len(repo.file(path))-1 }
+    fctx = repo.file(path)
+    if not len(fctx):
+        return
+    paths = { path : len(fctx)-1 }
     revs = []
     rev_color = {}
     nextcolor = 0
