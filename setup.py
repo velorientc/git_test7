@@ -10,6 +10,7 @@
 import time
 import sys
 import os
+import subprocess
 from distutils.core import setup
 from distutils.command.build import build
 from distutils.spawn import spawn, find_executable
@@ -158,11 +159,19 @@ else:
     (scripts, packages, data_files, extra) = setup_posix()
     desc='TortoiseHg dialogs for Mercurial VCS'
 
+version = ''
+
 try:
-    l = os.popen('hg -R . id -it').read().split()
+    l = os.popen('hg -R . id -i -t').read().split()
     while len(l) > 1 and l[-1][0].isalpha(): # remove non-numbered tags
         l.pop()
-    version = l and l[-1] or 'unknown' # latest tag or revision number
+    if len(l) > 1: # tag found
+        version = l[-1]
+        if l[0].endswith('+'): # propagate the dirty status to the tag
+            version += '+'
+    elif len(l) == 1: # no tag found
+        cmd = 'hg parents --template {latesttag}+{latesttagdistance}-'
+        version = os.popen(cmd).read() + l[0]
     if version.endswith('+'):
         version += time.strftime('%Y%m%d')
 except OSError:
