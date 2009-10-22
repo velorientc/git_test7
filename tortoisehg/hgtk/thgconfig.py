@@ -516,11 +516,11 @@ class ConfigDialog(gtk.Dialog):
     def __init__(self, configrepo=False):
         """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
-                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                   gtk.STOCK_APPLY, gtk.RESPONSE_APPLY,
-                                   gtk.STOCK_OK, gtk.RESPONSE_OK))
+                            buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                     gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                     gtk.STOCK_APPLY, gtk.RESPONSE_APPLY))
         gtklib.set_tortoise_keys(self)
-        self._btn_apply = self.action_area.get_children()[1]
+        self._btn_apply = self.action_area.get_children()[0]
 
         self.ui = ui.ui()
         try:
