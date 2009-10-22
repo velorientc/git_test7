@@ -12,8 +12,10 @@ import shlex
 import subprocess
 import shutil
 import tempfile
+import re
 
 from mercurial import hg, ui, cmdutil, util
+from mercurial.node import short, nullid
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -26,26 +28,29 @@ try:
 except ImportError:
     openflags = 0
 
-def snapshot_node(repo, files, node, tmproot):
+def snapshot(repo, files, node, tmproot):
     '''snapshot files as of some revision'''
     dirname = os.path.basename(repo.root)
     if dirname == "":
         dirname = "root"
-    dirname = '%s.%s' % (dirname, str(repo[node]))
+    if node is not None:
+        dirname = '%s.%s' % (dirname, short(node))
     base = os.path.join(tmproot, dirname)
     os.mkdir(base)
     ctx = repo[node]
     for fn in files:
         wfn = util.pconvert(fn)
         if not wfn in ctx:
-            # skipping new file after a merge ?
+            # File doesn't exist; could be a bogus modify
             continue
         dest = os.path.join(base, wfn)
         destdir = os.path.dirname(dest)
         if not os.path.isdir(destdir):
             os.makedirs(destdir)
         data = repo.wwritedata(wfn, ctx[wfn].data())
-        open(dest, 'wb').write(data)
+        f = open(dest, 'wb')
+        f.write(data)
+        f.close()
     return dirname
 
 class FileSelectionDialog(gtk.Dialog):
@@ -66,8 +71,8 @@ class FileSelectionDialog(gtk.Dialog):
         scroller = gtk.ScrolledWindow()
         scroller.set_shadow_type(gtk.SHADOW_IN)
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        model = gtk.ListStore(str, str)
-        treeview = gtk.TreeView(model)
+        treeview = gtk.TreeView()
+        self.treeview = treeview
         treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
         treeview.set_search_equal_func(self.search_filelist)
         scroller.add(treeview)
@@ -86,18 +91,6 @@ class FileSelectionDialog(gtk.Dialog):
         treeview.set_headers_visible(False)
         treeview.set_property('enable-grid-lines', True)
         treeview.set_enable_search(False)
-
-        cell = gtk.CellRendererText()
-        stcol = gtk.TreeViewColumn('Status', cell)
-        stcol.set_resizable(True)
-        stcol.add_attribute(cell, 'text', 0)
-        treeview.append_column(stcol)
-
-        cell = gtk.CellRendererText()
-        fcol = gtk.TreeViewColumn('Filename', cell)
-        fcol.set_resizable(True)
-        fcol.add_attribute(cell, 'text', 1)
-        treeview.append_column(fcol)
 
         try:
             path = opts.get('bundle') or paths.find_root()
@@ -127,7 +120,27 @@ class FileSelectionDialog(gtk.Dialog):
             cwd = os.getcwd()
             try:
                 os.chdir(repo.root)
-                self.find_files(repo, canonpats, opts, model)
+                model = self.find_files(repo, canonpats, opts, treeview)
+                do3way = model.get_n_columns() == 3
+                treeview.set_model(model)
+                cell = gtk.CellRendererText()
+                stcol = gtk.TreeViewColumn('Status 1', cell)
+                stcol.set_resizable(True)
+                stcol.add_attribute(cell, 'text', 0)
+                treeview.append_column(stcol)
+                if do3way:
+                    cell = gtk.CellRendererText()
+                    stcol = gtk.TreeViewColumn('Status 2', cell)
+                    stcol.set_resizable(True)
+                    stcol.add_attribute(cell, 'text', 1)
+                    treeview.append_column(stcol)
+                cell = gtk.CellRendererText()
+                fcol = gtk.TreeViewColumn('Filename', cell)
+                fcol.set_resizable(True)
+                fcol.add_attribute(cell, 'text', do3way and 2 or 1)
+                treeview.append_column(fcol)
+                if len(model) == 1 and self.singlecheck.get_active():
+                    self.launch(*model[0])
             finally:
                 os.chdir(cwd)
         else:
@@ -153,20 +166,28 @@ class FileSelectionDialog(gtk.Dialog):
         if sel in tools:
             self.diffpath, self.diffopts = tools[sel]
 
-    def find_files(self, repo, pats, opts, model):
+    def find_files(self, repo, pats, opts, treeview):
+
         revs = opts.get('rev')
         change = opts.get('change')
+        do3way = '$parent2' in ''.join(self.diffopts)
 
-        if change:
+        if change and (do3way or not revs):
             title = _('changeset ') + str(change)
             node2 = repo.lookup(change)
-            node1 = repo[node2].parents()[0].node()
+            node1a, node1b = repo.changelog.parents(node2)
         else:
-            if revs:
-                title = _('revisions ') + ' to '.join(revs)
-            else:
+            node1a, node2 = cmdutil.revpair(repo, revs)
+            if not revs:
                 title = _('working changes')
-            node1, node2 = cmdutil.revpair(repo, revs)
+                node1b = repo.dirstate.parents()[1]
+            else:
+                title = _('revisions ') + ' to '.join(revs)
+                node1b = nullid
+
+        # Disable 3-way merge if there is only one parent
+        if node1b == nullid:
+            do3way = False
 
         title = _('Visual Diffs - ') + title
         if pats:
@@ -174,8 +195,14 @@ class FileSelectionDialog(gtk.Dialog):
         self.set_title(title)
 
         matcher = cmdutil.match(repo, pats, opts)
-        modified, added, removed = repo.status(node1, node2, matcher)[:3]
-        if not (modified or added or removed):
+        mod_a, add_a, rem_a = map(set, repo.status(node1a, node2, matcher)[:3])
+        if do3way:
+            mod_b, add_b, rem_b = map(set, repo.status(node1b, node2, matcher)[:3])
+        else:
+            mod_b, add_b, rem_b = set(), set(), set()
+        modadd = mod_a | add_a | mod_b | add_b
+        common = modadd | rem_a | rem_b
+        if not common:
             gdialog.Prompt(_('No file changes'),
                    _('There are no file changes to view'), self).run()
             # GTK+ locks up if this is done immediately here
@@ -184,38 +211,60 @@ class FileSelectionDialog(gtk.Dialog):
 
         tmproot = tempfile.mkdtemp(prefix='extdiff.')
         self.connect('destroy', self.delete_tmproot, tmproot)
-        self.connect('response', self.delete_tmproot_resp, tmproot)
-        dir2 = ''
-        dir2root = ''
-        # Always make a copy of node1
-        dir1 = snapshot_node(repo, modified + removed, node1, tmproot)
+
+        # Always make a copy of node1a (and node1b, if applicable)
+        dir1a_files = mod_a | rem_a | ((mod_b | add_b) - add_a)
+        dir1a = snapshot(repo, dir1a_files, node1a, tmproot)
+        if do3way:
+            dir1b_files = mod_b | rem_b | ((mod_a | add_a) - add_b)
+            dir1b = snapshot(repo, dir1b_files, node1b, tmproot)
+        else:
+            dir1b = None
 
         # If node2 in not the wc or there is >1 change, copy it
+        dir2root = ''
         if node2:
-            dir2 = snapshot_node(repo, modified + added, node2, tmproot)
+            dir2 = snapshot(repo, modadd, node2, tmproot)
+        elif len(common) > 1:
+            #we only actually need to get the files to copy back to the working
+            #dir in this case (because the other cases are: diffing 2 revisions
+            #or single file -- in which case the file is already directly passed
+            #to the diff tool).
+            dir2 = snapshot(repo, modadd, None, tmproot)
         else:
             # This lets the diff tool open the changed file directly
+            dir2 = ''
             dir2root = repo.root
 
-        self.dirs = (dir1, dir2, dir2root, tmproot)
+        self.dirs = (dir1a, dir1b, dir2, dir2root, tmproot)
 
-        for m in modified:
-            model.append(['M', hglib.toutf(m)])
-        for a in added:
-            model.append(['A', hglib.toutf(a)])
-        for r in removed:
-            model.append(['R', hglib.toutf(r)])
-        if len(model) == 1 and self.singlecheck.get_active():
-            self.launch(*model[0])
+        def get_status(file, mod, add, rem):
+            if file in mod:
+                return 'M'
+            if file in add:
+                return 'A'
+            if file in rem:
+                return 'R'
+            return ' '
+
+        if do3way:
+            model = gtk.ListStore(str, str, str)
+            for f in common:
+                model.append([get_status(f, mod_a, add_a, rem_a),
+                              get_status(f, mod_b, add_b, rem_b),
+                              hglib.toutf(f)])
+        else:
+            model = gtk.ListStore(str, str)
+            for f in common:
+                model.append([get_status(f, mod_a, add_a, rem_a),
+                              hglib.toutf(f)])
+        return model
 
     def should_live(self, widget=None, event=None):
         vsettings = settings.Settings('visdiff')
         vsettings.set_value('launchsingle', self.singlecheck.get_active())
         vsettings.write()
         return False
-
-    def delete_tmproot_resp(self, window, resp, tmproot):
-        self.delete_tmproot(window, tmproot)
 
     def delete_tmproot(self, window, tmproot):
         self.should_live()
@@ -239,26 +288,48 @@ class FileSelectionDialog(gtk.Dialog):
         model, paths = selection.get_selected_rows()
         self.launch(*model[paths[0]])
 
-    def launch(self, st, fname):
+    def launch(self, st1, st2, fname=None):
+        if not fname:
+            fname = st2
+            st2 = None
         fname = hglib.fromutf(fname)
-        dir1, dir2, dir2root, tmproot = self.dirs
-        if st == 'A':
-            dir1 = os.devnull
-            dir2 = os.path.join(dir2root, dir2, util.localpath(fname))
-        elif st == 'R':
-            dir1 = os.path.join(dir1, util.localpath(fname))
+        dir1a, dir1b, dir2, dir2root, tmproot = self.dirs
+
+        if st1 == 'A' or st2 == 'R':
+            dir1a = os.devnull
+        else:
+            dir1a = os.path.join(dir1a, util.localpath(fname))
+        if st2:
+            if st2 == 'A' or st1 == 'R':
+                dir1b = os.devnull
+            else:
+                dir1b = os.path.join(dir1b, util.localpath(fname))
+        if st1 == 'R' or st2 == 'R':
             dir2 = os.devnull
         else:
-            dir1 = os.path.join(dir1, util.localpath(fname))
             dir2 = os.path.join(dir2root, dir2, util.localpath(fname))
+
+        # Function to quote file/dir names in the argument string
+        # When not operating in 3-way mode, an empty string is returned for parent2
+        replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b, child=dir2)
+        def quote(match):
+            key = match.group()[1:]
+            if not st2 and key == 'parent2':
+                return ''
+            return util.shellquote(replace[key])
+
+        # Match parent2 first, so 'parent1?' will match both parent1 and parent
+        args = ' '.join(self.diffopts)
+        regex = '\$(parent2|parent1?|child)'
+        if not st2 and not re.search(regex, args):
+            args += ' $parent1 $child'
+        args = re.sub(regex, quote, args)
+        cmdline = util.shellquote(self.diffpath) + ' ' + args
+
         if os.name == 'nt':
-            cmdline = ('%s %s %s %s' %
-                   (util.shellquote(self.diffpath), ' '.join(self.diffopts),
-                    util.shellquote(dir1), util.shellquote(dir2)))
-        else:
-            cmdline = [self.diffpath] + self.diffopts + [dir1, dir2]
+            cmdline = '"%s"' % cmdline
         try:
-            subprocess.Popen(cmdline, shell=False, cwd=tmproot,
+            subprocess.Popen(cmdline, shell=True, cwd=tmproot,
                        creationflags=openflags,
                        stderr=subprocess.PIPE,
                        stdout=subprocess.PIPE,
@@ -356,11 +427,6 @@ def run(ui, *pats, **opts):
             os.chdir(oldcwd)
         return None
     else:
-        # prefer --rev over --change for internal diff handling since we can
-        # only diff against a single parent at a time for merge changesets
-        if 'change' in opts and 'rev' in opts:
-            del opts['change']
-
         pats = hglib.canonpaths(pats)
         if opts.get('canonpats'):
             pats = list(pats) + opts['canonpats']
