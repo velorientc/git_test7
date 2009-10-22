@@ -191,7 +191,7 @@ class SummaryInfo(object):
     LABELS = {'rev': _('Revision:'), 'revnum': _('Revision:'),
               'revid': _('Revision:'), 'summary': _('Summary:'),
               'user': _('User:'), 'date': _('Date:'),'age': _('Age:'),
-              'dateage': _('Date'), 'branch': _('Branch:'),
+              'dateage': _('Date:'), 'branch': _('Branch:'),
               'tags': _('Tags:'), 'rawbranch': _('Branch:'),
               'rawtags': _('Tags:'), 'transplant': _('Transplant:')}
 
