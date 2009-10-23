@@ -128,6 +128,8 @@ _log_info = (
           ' Useful example: Specify "qbase qparent qtip" to hide the'
           ' standard tags inserted by the Mercurial Queues Extension.' 
         ' Default: None')),
+    (_('Use Expander'), 'tortoisehg.changeset-expander', ['False', 'True'],
+        _('Show changeset details with an expander')),
         )
 
 _paths_info = (
