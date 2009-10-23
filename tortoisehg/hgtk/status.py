@@ -298,7 +298,8 @@ class GStatus(gdialog.GDialog):
 
         tvbox = gtk.VBox()
         tvbox.pack_start(scroller, True, True, 0)
-        tvbox.pack_start(expander_box, False, False, 2)
+        tvbox.pack_start(gtk.HSeparator(), False, False)
+        tvbox.pack_start(expander_box, False, False)
         if self.pats:
             button = gtk.Button(_('Remove filter, show root'))
             button.connect('pressed', self.remove_filter)
