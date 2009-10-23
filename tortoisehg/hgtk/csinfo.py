@@ -467,7 +467,7 @@ class SummaryPanel(SummaryBase, gtk.Frame):
         self.csstyle = style
 
         self.expander = gtk.Expander()
-        self.expander.set_expanded(True)
+        self.expander.set_expanded(False)
 
         # layout table for contents
         self.table = gtklib.LayoutTable(ypad=1, headopts={'weight': 'bold'})

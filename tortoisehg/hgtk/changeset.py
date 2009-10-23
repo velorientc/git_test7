@@ -392,6 +392,10 @@ class ChangeSet(gdialog.GDialog):
         return menu
 
     def get_body(self):
+        embedded = bool(self.stbar)
+        use_expander = embedded and self.ui.configbool(
+            'tortoisehg', 'changeset-expander')
+
         self.curfile = ''
         if self.repo.ui.configbool('tortoisehg', 'copyhash'):
             sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
@@ -399,6 +403,8 @@ class ChangeSet(gdialog.GDialog):
         else:
             self.clipboard = None
         self.filemenu = self.file_context_menu()
+
+        details_frame_parent = gtk.VBox()
 
         # changeset frame
         details_frame = gtk.Frame()
@@ -512,11 +518,20 @@ class ChangeSet(gdialog.GDialog):
         self.patchstyle = csinfo.panelstyle(contents=('patch', 'branch',
                                  'user', 'dateage', 'parents'),
                                  selectable=True)
+        if use_expander:
+            self.csetstyle['expander'] = True
+            self.patchstyle['expander'] = True
+
         self.summarypanel = csinfo.create(self.repo, custom=custom)
 
         ## summary box (summarypanel + separator)
         self.summarybox = gtk.VBox()
-        details_box.pack_start(self.summarybox, False, False)
+        if use_expander:
+            # don't scroll summarybox
+            details_frame_parent.pack_start(self.summarybox, False, False)
+        else:
+            # scroll summarybox
+            details_box.pack_start(self.summarybox, False, False)
         self.summarybox.pack_start(self.summarypanel, False, False)
         self.summarybox.pack_start(gtk.HSeparator(), False, False)
 
@@ -586,10 +601,12 @@ class ChangeSet(gdialog.GDialog):
 
         self._hpaned = gtk.HPaned()
         self._hpaned.pack1(list_frame, True, True)
-        self._hpaned.pack2(details_frame, True, True)
+        self._hpaned.pack2(details_frame_parent, True, True)
         self._hpaned.set_position(self._setting_hpos)
 
-        if self.stbar:
+        details_frame_parent.pack_start(details_frame, True, True)
+
+        if embedded:
             # embedded by changelog browser
             return self._hpaned
         else:
