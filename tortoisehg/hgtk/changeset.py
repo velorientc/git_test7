@@ -42,7 +42,6 @@ class ChangeSet(gdialog.GDialog):
         return []
 
     def parent_toggled(self, button):
-        self.clear_cache()
         self.load_details(self.currev)
 
     def prepare_display(self):
@@ -81,6 +80,7 @@ class ChangeSet(gdialog.GDialog):
 
     def load_details(self, rev):
         'Load selected changeset details into buffer and filelist'
+        oldrev = hasattr(self, 'currev') and self.currev or None
         self.currev = rev
         ctx = self.repo[rev]
         if not ctx:
@@ -88,34 +88,39 @@ class ChangeSet(gdialog.GDialog):
 
         if not self.parent_button.parent:
             self.parent_box.pack_start(self.parent_button, False, False)
+            self.parent_button.show_all()
 
         parents = ctx.parents()
         title = self.get_title()
-        if len(parents) == 2:
-            self.parent_box.show_all()
-            if self.diff_other_parent():
-                title += ':' + str(parents[1].rev())
+        if parents:
+            if len(parents) == 2:
+                self.parent_box.show()
+                if self.diff_other_parent():
+                    title += ':' + str(parents[1].rev())
+                    parent = parents[1].node()
+                else:
+                    title += ':' + str(parents[0].rev())
+                    parent = parents[0].node()
+                if rev != oldrev:
+                    # uncheck the check button
+                    self.parent_button.handler_block_by_func(
+                            self.parent_toggled)
+                    self.parent_button.set_active(False)
+                    self.parent_button.handler_unblock_by_func(
+                            self.parent_toggled)
+                # clear cache for highlighting parent correctly
+                self.clear_cache()
             else:
-                title += ':' + str(parents[0].rev())
+                self.parent_box.hide()
+                parent = parents[0].node()
         else:
-            self.parent_box.hide_all()
-            if self.parent_button.get_active():
-                # Parent button must be pushed out, but this
-                # will cause load_details to be called again
-                # so we exit out to prevent recursion.
-                self.parent_button.set_active(False)
-                return
+            parent = self.repo[-1]
+
+        # update dialog title
+        self.set_title(title)
 
         if self.clipboard:
             self.clipboard.set_text(str(ctx))
-
-        self.set_title(title)
-        if self.diff_other_parent():
-            parent = parents[1].node()
-        elif parents:
-            parent = parents[0].node()
-        else:
-            parent = self.repo[-1]
 
         pats = self.pats
         if self.graphview:
