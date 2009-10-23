@@ -77,7 +77,7 @@ class ChangeSet(gdialog.GDialog):
         self.summarybox.hide()
 
     def diff_other_parent(self):
-        return self.other_parent_checkbutton.get_active()
+        return self.parent_button.get_active()
 
     def load_details(self, rev):
         'Load selected changeset details into buffer and filelist'
@@ -86,25 +86,24 @@ class ChangeSet(gdialog.GDialog):
         if not ctx:
             return
 
-        if not self.other_parent_checkbutton.parent:
-            self.other_parent_box.pack_start(
-                self.other_parent_checkbutton, False, False)
+        if not self.parent_button.parent:
+            self.parent_box.pack_start(self.parent_button, False, False)
 
         parents = ctx.parents()
         title = self.get_title()
         if len(parents) == 2:
-            self.other_parent_box.show_all()
+            self.parent_box.show_all()
             if self.diff_other_parent():
                 title += ':' + str(parents[1].rev())
             else:
                 title += ':' + str(parents[0].rev())
         else:
-            self.other_parent_box.hide_all()
-            if self.other_parent_checkbutton.get_active():
+            self.parent_box.hide_all()
+            if self.parent_button.get_active():
                 # Parent button must be pushed out, but this
                 # will cause load_details to be called again
                 # so we exit out to prevent recursion.
-                self.other_parent_checkbutton.set_active(False)
+                self.parent_button.set_active(False)
                 return
 
         if self.clipboard:
@@ -584,13 +583,13 @@ class ChangeSet(gdialog.GDialog):
         flbox.pack_start(scroller)
         list_frame.add(flbox)
 
-        self.other_parent_box = gtk.HBox()
-        flbox.pack_start(self.other_parent_box, False, False)
+        self.parent_box = gtk.HBox()
+        flbox.pack_start(self.parent_box, False, False)
 
         btn = gtk.CheckButton(_('Diff to second Parent'))
         btn.connect('toggled', self.parent_toggled)
         # don't pack btn yet to keep it initially invisible
-        self.other_parent_checkbutton = btn
+        self.parent_button = btn
 
         self._hpaned = gtk.HPaned()
         self._hpaned.pack1(list_frame, True, True)
