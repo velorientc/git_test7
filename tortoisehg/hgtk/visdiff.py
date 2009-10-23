@@ -310,7 +310,7 @@ def rawextdiff(ui, *pats, **opts):
 
     # if both --change and --rev is given, remove --rev in 3-way mode,
     # and --change in normal mode
-    if 'change' in opts and 'rev' in opts:
+    if 'change' in opts and opts.get('rev'):
         if '$parent2' in ''.join(diffopts):
             del opts['rev']
         else:
