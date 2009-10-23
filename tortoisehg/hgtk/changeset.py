@@ -25,7 +25,6 @@ class ChangeSet(gdialog.GDialog):
         self.stbar = stbar
         self.glog_parent = None
         self.bfile = None
-        self.other_parent_box_added = False
 
     def get_title(self):
         title = _('%s changeset ') % self.get_reponame()
@@ -77,10 +76,11 @@ class ChangeSet(gdialog.GDialog):
         self.summarybox.hide()
 
     def diff_other_parent(self):
-        return self.other_parent_checkbutton.get_active()
+        return self.parent_button.get_active()
 
     def load_details(self, rev):
         'Load selected changeset details into buffer and filelist'
+        oldrev = hasattr(self, 'currev') and self.currev or None
         self.currev = rev
         ctx = self.repo[rev]
         if not ctx:
@@ -88,35 +88,39 @@ class ChangeSet(gdialog.GDialog):
 
         parents = ctx.parents()
         title = self.get_title()
-        if len(parents) == 2:
-            if not self.other_parent_box_added:
-                self.other_parent_box.pack_start(
-                    self.other_parent_checkbutton, False, False)
-                self.other_parent_box_added = True
-            self.other_parent_box.show_all()
-            if self.diff_other_parent():
-                title += ':' + str(parents[1].rev())
+        if parents:
+            if len(parents) == 2:
+                if not self.parent_button.parent:
+                    self.parent_box.pack_start(gtk.HSeparator(), False, False)
+                    self.parent_box.pack_start(self.parent_button, False, False)
+                    self.parent_box.show_all()
+                self.parent_box.show()
+                if self.diff_other_parent():
+                    title += ':' + str(parents[1].rev())
+                    parent = parents[1].node()
+                else:
+                    title += ':' + str(parents[0].rev())
+                    parent = parents[0].node()
+                if rev != oldrev:
+                    # uncheck the check button
+                    self.parent_button.handler_block_by_func(
+                            self.parent_toggled)
+                    self.parent_button.set_active(False)
+                    self.parent_button.handler_unblock_by_func(
+                            self.parent_toggled)
+                # clear cache for highlighting parent correctly
+                self.clear_cache()
             else:
-                title += ':' + str(parents[0].rev())
+                self.parent_box.hide()
+                parent = parents[0].node()
         else:
-            self.other_parent_box.hide_all()
-            if self.other_parent_checkbutton.get_active():
-                # Parent button must be pushed out, but this
-                # will cause load_details to be called again
-                # so we exit out to prevent recursion.
-                self.other_parent_checkbutton.set_active(False)
-                return
+            parent = self.repo[-1]
+
+        # update dialog title
+        self.set_title(title)
 
         if self.clipboard:
             self.clipboard.set_text(str(ctx))
-
-        self.set_title(title)
-        if self.diff_other_parent():
-            parent = parents[1].node()
-        elif parents:
-            parent = parents[0].node()
-        else:
-            parent = self.repo[-1]
 
         pats = self.pats
         if self.graphview:
@@ -426,18 +430,24 @@ class ChangeSet(gdialog.GDialog):
             def summary_line(desc):
                 desc = desc.replace('\0', '')
                 return hglib.toutf(desc.split('\n')[0][:80])
-            def revline_data(ctx):
+            def revline_data(ctx, hl=False):
                 if isinstance(ctx, basestring):
                     return ctx
                 desc = ctx.description()
-                return (str(ctx.rev()), str(ctx), summary_line(desc))
+                return (str(ctx.rev()), str(ctx), summary_line(desc), hl)
             if item == 'cset':
                 return revline_data(ctx)
             elif item == 'branch':
                 value = hglib.toutf(ctx.branch())
                 return value != 'default' and value or None
             elif item == 'parents':
-                return [revline_data(ctx) for ctx in ctx.parents()]
+                pindex = self.diff_other_parent() and 1 or 0
+                pctxs = ctx.parents()
+                parents = []
+                for pctx in pctxs:
+                    highlight = len(pctxs) == 2 and pctx == pctxs[pindex]
+                    parents.append(revline_data(pctx, highlight))
+                return parents
             elif item == 'children':
                 return [revline_data(ctx) for ctx in ctx.children()]
             elif item == 'transplant':
@@ -466,7 +476,7 @@ class ChangeSet(gdialog.GDialog):
                 return _('Patch:')
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
-            def revline_markup(revnum, revid, summary):
+            def revline_markup(revnum, revid, summary, highlight):
                 revnum = gtklib.markup(revnum)
                 summary = gtklib.markup(summary)
                 if revid:
@@ -488,8 +498,10 @@ class ChangeSet(gdialog.GDialog):
                 return csets
             raise csinfo.UnknownItem(item)
         def widget_func(widget, item, markups):
-            def linkwidget(revnum, revid, summary):
+            def linkwidget(revnum, revid, summary, highlight):
                 opts = dict(underline='single', foreground='#0000FF')
+                if highlight:
+                    opts['weight'] = 'bold'
                 rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
                                    revid_markup(revid, **opts))
                 link = gtk.Label()
@@ -591,13 +603,13 @@ class ChangeSet(gdialog.GDialog):
         flbox.pack_start(scroller)
         list_frame.add(flbox)
 
-        self.other_parent_box = gtk.HBox()
-        flbox.pack_start(self.other_parent_box, False, False)
+        self.parent_box = gtk.VBox()
+        flbox.pack_start(self.parent_box, False, False)
 
         btn = gtk.CheckButton(_('Diff to second Parent'))
         btn.connect('toggled', self.parent_toggled)
         # don't pack btn yet to keep it initially invisible
-        self.other_parent_checkbutton = btn
+        self.parent_button = btn
 
         self._hpaned = gtk.HPaned()
         self._hpaned.pack1(list_frame, True, True)
