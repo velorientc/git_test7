@@ -248,7 +248,7 @@ class EmailDialog(gtk.Window):
                     ' the effects of the entire patch series.  When emailing'
                     ' a bundle, these fields make up the message subject and'
                     ' body. Flags is a comma separated list of tags'
-                    ' which are inserted into the message header.')
+                    ' which are inserted into the message subject prefix.')
                     )
             gtklib.addspellcheck(self.descview, self.repo.ui)
         fill_history(history, self._tolist, 'email.to')
