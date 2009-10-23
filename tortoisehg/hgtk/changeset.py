@@ -43,6 +43,7 @@ class ChangeSet(gdialog.GDialog):
         return []
 
     def parent_toggled(self, button):
+        self.clear_cache()
         self.load_details(self.currev)
 
     def prepare_display(self):
@@ -421,18 +422,24 @@ class ChangeSet(gdialog.GDialog):
             def summary_line(desc):
                 desc = desc.replace('\0', '')
                 return hglib.toutf(desc.split('\n')[0][:80])
-            def revline_data(ctx):
+            def revline_data(ctx, hl=False):
                 if isinstance(ctx, basestring):
                     return ctx
                 desc = ctx.description()
-                return (str(ctx.rev()), str(ctx), summary_line(desc))
+                return (str(ctx.rev()), str(ctx), summary_line(desc), hl)
             if item == 'cset':
                 return revline_data(ctx)
             elif item == 'branch':
                 value = hglib.toutf(ctx.branch())
                 return value != 'default' and value or None
             elif item == 'parents':
-                return [revline_data(ctx) for ctx in ctx.parents()]
+                pindex = self.diff_other_parent() and 1 or 0
+                pctxs = ctx.parents()
+                parents = []
+                for pctx in pctxs:
+                    highlight = len(pctxs) == 2 and pctx == pctxs[pindex]
+                    parents.append(revline_data(pctx, highlight))
+                return parents
             elif item == 'children':
                 return [revline_data(ctx) for ctx in ctx.children()]
             elif item == 'transplant':
@@ -461,7 +468,7 @@ class ChangeSet(gdialog.GDialog):
                 return _('Patch:')
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
-            def revline_markup(revnum, revid, summary):
+            def revline_markup(revnum, revid, summary, highlight):
                 revnum = gtklib.markup(revnum)
                 summary = gtklib.markup(summary)
                 if revid:
@@ -483,8 +490,10 @@ class ChangeSet(gdialog.GDialog):
                 return csets
             raise csinfo.UnknownItem(item)
         def widget_func(widget, item, markups):
-            def linkwidget(revnum, revid, summary):
+            def linkwidget(revnum, revid, summary, highlight):
                 opts = dict(underline='single', foreground='#0000FF')
+                if highlight:
+                    opts['weight'] = 'bold'
                 rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
                                    revid_markup(revid, **opts))
                 link = gtk.Label()
