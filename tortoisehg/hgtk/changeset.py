@@ -25,7 +25,7 @@ class ChangeSet(gdialog.GDialog):
         self.stbar = stbar
         self.glog_parent = None
         self.bfile = None
-        self.nothing_loaded = True
+        self.other_parent_box_added = False
 
     def get_title(self):
         title = _('%s changeset ') % self.get_reponame()
@@ -86,14 +86,13 @@ class ChangeSet(gdialog.GDialog):
         if not ctx:
             return
 
-        if self.nothing_loaded:
-            self.other_parent_box.pack_start(
-                self.other_parent_checkbutton, False, False)
-            self.nothing_loaded = False
-
         parents = ctx.parents()
         title = self.get_title()
         if len(parents) == 2:
+            if not self.other_parent_box_added:
+                self.other_parent_box.pack_start(
+                    self.other_parent_checkbutton, False, False)
+                self.other_parent_box_added = True
             self.other_parent_box.show_all()
             if self.diff_other_parent():
                 title += ':' + str(parents[1].rev())
