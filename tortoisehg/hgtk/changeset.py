@@ -87,8 +87,9 @@ class ChangeSet(gdialog.GDialog):
             return
 
         if not self.parent_button.parent:
+            self.parent_box.pack_start(gtk.HSeparator(), False, False)
             self.parent_box.pack_start(self.parent_button, False, False)
-            self.parent_button.show_all()
+            self.parent_box.show_all()
 
         parents = ctx.parents()
         title = self.get_title()
@@ -588,7 +589,7 @@ class ChangeSet(gdialog.GDialog):
         flbox.pack_start(scroller)
         list_frame.add(flbox)
 
-        self.parent_box = gtk.HBox()
+        self.parent_box = gtk.VBox()
         flbox.pack_start(self.parent_box, False, False)
 
         btn = gtk.CheckButton(_('Diff to second Parent'))
