@@ -689,9 +689,8 @@ class ChangeSet(gdialog.GDialog):
         opts = {'change':str(self.currev), 'bundle':self.bfile}
         self._do_diff([self.curfile], opts)
 
-    def file_row_act(self, tree, path, column) :
-        'Default action is the first entry in the context menu'
-        self.filemenu.get_children()[0].activate()
+    def file_row_act(self, tree, path, column):
+        self.diff_file_rev(None)
         return True
 
     def save_file_rev(self, menuitem):

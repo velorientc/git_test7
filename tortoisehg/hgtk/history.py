@@ -1902,8 +1902,7 @@ class GLog(gdialog.GDialog):
         return True
 
     def tree_row_act(self, tree, path, column) :
-        'Default action is the first entry in the context menu'
-        self.tree_context_menu().get_children()[0].activate()
+        self.vdiff_change(None)
         return True
 
 def run(ui, *pats, **opts):
