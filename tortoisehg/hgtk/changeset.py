@@ -476,7 +476,7 @@ class ChangeSet(gdialog.GDialog):
                 return _('Patch:')
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
-            def revline_markup(revnum, revid, summary, highlight):
+            def revline_markup(revnum, revid, summary, highlight=None):
                 revnum = gtklib.markup(revnum)
                 summary = gtklib.markup(summary)
                 if revid:
@@ -498,7 +498,7 @@ class ChangeSet(gdialog.GDialog):
                 return csets
             raise csinfo.UnknownItem(item)
         def widget_func(widget, item, markups):
-            def linkwidget(revnum, revid, summary, highlight):
+            def linkwidget(revnum, revid, summary, highlight=None):
                 opts = dict(underline='single', foreground='#0000FF')
                 if highlight:
                     opts['weight'] = 'bold'
