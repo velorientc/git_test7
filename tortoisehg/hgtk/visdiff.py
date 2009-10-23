@@ -87,6 +87,8 @@ class FileSelectionDialog(gtk.Dialog):
         hbox.pack_start(check, True, True, 2)
         self.singlecheck = check
 
+        self.connect('response', self.response)
+
         treeview.connect('row-activated', self.rowactivated)
         treeview.set_headers_visible(False)
         treeview.set_property('enable-grid-lines', True)
@@ -260,14 +262,16 @@ class FileSelectionDialog(gtk.Dialog):
                               hglib.toutf(f)])
         return model
 
-    def should_live(self, widget=None, event=None):
+    def response(self, window, resp):
+        self.should_live()
+
+    def should_live(self):
         vsettings = settings.Settings('visdiff')
         vsettings.set_value('launchsingle', self.singlecheck.get_active())
         vsettings.write()
         return False
 
     def delete_tmproot(self, window, tmproot):
-        self.should_live()
         while True:
             try:
                 shutil.rmtree(tmproot)
