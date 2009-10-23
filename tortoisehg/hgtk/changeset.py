@@ -48,7 +48,7 @@ class ChangeSet(gdialog.GDialog):
     def prepare_display(self):
         self.currow = None
         self.graphview = None
-        self.glog_parent = NoneY
+        self.glog_parent = None
         node0, node1 = cmdutil.revpair(self.repo, self.opts.get('rev'))
         self.load_details(self.repo.changelog.rev(node0))
 
