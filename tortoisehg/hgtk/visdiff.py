@@ -63,6 +63,7 @@ class FileSelectionDialog(gtk.Dialog):
 
         self.set_default_size(400, 150)
         self.set_has_separator(False)
+        self.tmproot = None
 
         lbl = gtk.Label(_('Temporary files are removed when this dialog'
             ' is closed'))
@@ -86,8 +87,6 @@ class FileSelectionDialog(gtk.Dialog):
         check.set_active(single)
         hbox.pack_start(check, True, True, 2)
         self.singlecheck = check
-
-        self.connect('response', self.response)
 
         treeview.connect('row-activated', self.rowactivated)
         treeview.set_headers_visible(False)
@@ -212,7 +211,8 @@ class FileSelectionDialog(gtk.Dialog):
             return
 
         tmproot = tempfile.mkdtemp(prefix='extdiff.')
-        self.connect('destroy', self.delete_tmproot, tmproot)
+        self.connect('response', self.response)
+        self.tmproot = tmproot
 
         # Always make a copy of node1a (and node1b, if applicable)
         dir1a_files = mod_a | rem_a | ((mod_b | add_b) - add_a)
@@ -269,13 +269,10 @@ class FileSelectionDialog(gtk.Dialog):
         vsettings = settings.Settings('visdiff')
         vsettings.set_value('launchsingle', self.singlecheck.get_active())
         vsettings.write()
-        return False
-
-    def delete_tmproot(self, window, tmproot):
-        while True:
+        while self.tmproot:
             try:
-                shutil.rmtree(tmproot)
-                return
+                shutil.rmtree(self.tmproot)
+                return False
             except (IOError, OSError), e:
                 resp = gdialog.CustomPrompt(_('Unable to delete temp files'),
                     _('Close diff tools and try again, or quit to leak files?'),
@@ -283,7 +280,8 @@ class FileSelectionDialog(gtk.Dialog):
                 if resp == 0:
                     continue
                 else:
-                    return
+                    return False
+        return False
 
     def rowactivated(self, tree, path, column):
         selection = tree.get_selection()
