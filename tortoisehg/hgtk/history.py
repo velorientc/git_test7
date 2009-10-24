@@ -928,7 +928,8 @@ class GLog(gdialog.GDialog):
         self.stop_button = stop
 
         ## target path combobox
-        urllist = gtk.ListStore(str, str)
+        urllist = gtk.ListStore(str, # path (utf-8)
+                                str) # alias (utf-8)
         urlcombo = gtk.ComboBoxEntry(urllist, 0)
         cell = gtk.CellRendererText()
         urlcombo.pack_end(cell, False)
@@ -937,11 +938,7 @@ class GLog(gdialog.GDialog):
         self.pathentry = urlcombo.get_child()
         syncbox.append_widget(urlcombo, expand=True)
 
-        for alias, path in self.repo.ui.configitems('paths'):
-            path = url.hidepassword(path)
-            urllist.append([hglib.toutf(path), hglib.toutf(alias)])
-            if alias == 'default':
-                urlcombo.set_active(len(urllist)-1)
+        self.update_urllist()
 
         incoming.connect('clicked', self.incoming_clicked)
         pull.connect('clicked', self.pull_clicked)
@@ -1391,13 +1388,16 @@ class GLog(gdialog.GDialog):
         dlg.hide()
 
         self.refreshui()
-        urllist = combo.get_model()
+        self.update_urllist()
+
+    def update_urllist(self):
+        urllist = self.urlcombo.get_model()
         urllist.clear()
         for alias, path in self.repo.ui.configitems('paths'):
             path = url.hidepassword(path)
-            urllist.append([hglib.toutf(path), hglib.toutf(alias)])
+            urllist.append((hglib.toutf(path), hglib.toutf(alias)))
             if alias == 'default':
-                combo.set_active(len(urllist)-1)
+                self.urlcombo.set_active(len(urllist) - 1)
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
