@@ -212,8 +212,16 @@ def runcommand(ui, args):
     elif not cmd:
         return help_(ui, 'shortlist')
 
-    if options['repository']:
-        path = ui.expandpath(options['repository'])
+    path = options['repository']
+    if path:
+        if path.startswith('bundle:'):
+            s = path[7:].split('+', 1)
+            if len(s) == 1:
+                path, bundle = os.getcwd(), s[0]
+            else:
+                path, bundle = s
+            cmdoptions['bundle'] = os.path.abspath(bundle)
+        path = ui.expandpath(path)
         cmdoptions['repository'] = path
         os.chdir(path)
     if options['nofork']:

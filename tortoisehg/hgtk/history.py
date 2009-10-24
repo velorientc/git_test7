@@ -53,6 +53,7 @@ class GLog(gdialog.GDialog):
         self.useproxy = None
         self.revrange = None
         self.forcepush = False
+        self.bundle_autoreject = False
         os.chdir(self.repo.root)
 
         # Load extension support for commands which need it
@@ -70,7 +71,7 @@ class GLog(gdialog.GDialog):
 
     def should_live(self, widget=None, event=None):
         live = False
-        if self.bfile:
+        if self.bfile and not self.bundle_autoreject:
             t = _('New changesets from the preview bundle are still pending.'
                   '\n\nAccept or reject the new changesets?')
             # response: 0=Yes, 1=No, 2=Cancel
@@ -476,7 +477,11 @@ class GLog(gdialog.GDialog):
             self.filtercombo.set_active(1)
             self.filterentry.set_text(', '.join(self.pats))
             opts['pats'] = self.pats
-        self.reload_log(**opts)
+        if 'bundle' in opts:
+            self.set_bundlefile(opts['bundle'])
+            self.bundle_autoreject = True
+        else:
+            self.reload_log(**opts)
 
         self.filterbox.set_property('visible', self.show_filterbar)
         self.filterbox.set_no_show_all(True)
@@ -1193,7 +1198,7 @@ class GLog(gdialog.GDialog):
         if dlg.return_code() == 0 and os.path.isfile(bfile):
             self.set_bundlefile(bfile)
 
-    def set_bundlefile(self, bfile):
+    def set_bundlefile(self, bfile, **kwopts):
         self.origurl = self.urlcombo.get_active()
         self.pathentry.set_text(bfile)
 
@@ -1242,9 +1247,10 @@ class GLog(gdialog.GDialog):
         if hasattr(self, 'mqwidget'):
             self.mqwidget.set_repo(self.repo)
         self.npreviews = len(self.repo) - oldtip
-        self.reload_log()
+        self.reload_log(**kwopts)
 
         self.stbar.set_idle_text(_('Bundle Preview'))
+        self.bundle_autoreject = False
 
     def add_bundle_clicked(self, button):
         result = gtklib.NativeSaveFileDialogWrapper(
