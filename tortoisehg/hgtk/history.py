@@ -1135,6 +1135,8 @@ class GLog(gdialog.GDialog):
         self.graphview.set_repo(self.repo, self.stbar)
         self.changeview.set_repo(self.repo)
         self.changeview.bfile = None
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.set_repo(self.repo)
         if resettip:
             self.origtip = len(self.repo)
         self.reload_log()
@@ -1238,6 +1240,8 @@ class GLog(gdialog.GDialog):
         self.graphview.set_repo(self.repo, self.stbar)
         self.changeview.set_repo(self.repo)
         self.changeview.bfile = bfile
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.set_repo(self.repo)
         self.npreviews = len(self.repo) - oldtip
         self.reload_log()
 
@@ -1720,6 +1724,8 @@ class GLog(gdialog.GDialog):
         self.repo = hg.repository(self.ui, path=self.bfile)
         self.graphview.set_repo(self.repo, self.stbar)
         self.changeview.set_repo(self.repo)
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.set_repo(self.repo)
         self.npreviews = len(self.repo) - curtip
         self.reload_log()
 

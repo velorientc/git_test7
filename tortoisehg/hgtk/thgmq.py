@@ -276,6 +276,9 @@ class MQWidget(gtk.VBox):
         self.statusbar.set_right3_text(status_text)
         self.statusbar.set_idle_text(idle_text)
 
+    def set_repo(self, repo):
+        self.repo = repo
+
     def qgoto(self, patch):
         """
         [MQ] Execute 'qgoto' command.
