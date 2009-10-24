@@ -16,7 +16,7 @@ import Queue
 from tortoisehg.util.i18n import _
 from tortoisehg.util import paths, hglib, thread2
 
-from tortoisehg.hgtk import hgtk
+from tortoisehg.hgtk import hgtk, gdialog
 
 if gtk.gtk_version < (2, 14, 0):
     # at least on 2.12.12, gtk widgets can be confused by control
@@ -162,10 +162,11 @@ class NativeSaveFileDialogWrapper:
         """run the file dialog, either return a file name, or False if
         the user aborted the dialog"""
         try:
-            import win32gui, win32con, pywintypes
-            return self.runWindows()
+            import win32gui, win32con, pywintypes            
+            filepath = self.runWindows()
         except ImportError:
-            return self.runCompatible()
+            filepath = self.runCompatible()
+        return self.overwriteConfirmation(filepath)
 
     def runWindows(self):
 
@@ -217,7 +218,6 @@ class NativeSaveFileDialogWrapper:
             buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                        gtk.STOCK_SAVE, gtk.RESPONSE_OK)
         dlg = gtk.FileChooserDialog(self.title, None, action, buttons)
-        dlg.set_do_overwrite_confirmation(True)
         dlg.set_default_response(gtk.RESPONSE_OK)
         dlg.set_current_folder(self.initial)
         if not self.open:
@@ -232,6 +232,18 @@ class NativeSaveFileDialogWrapper:
         else:
             result = False
         dlg.destroy()
+        return result
+    
+    def overwriteConfirmation(self, filepath):        
+        result = filepath
+        if os.path.exists(filepath):
+            res = gdialog.Confirm(_('Confirm Overwrite'), [], None,
+                _('The file "%s" already exists!\n\n'
+                'Do you want to overwrite it?') % filepath).run()
+            if res == gtk.RESPONSE_YES:
+                os.remove(filepath)
+            else:                
+                result = False
         return result
 
 class NativeFolderSelectDialog:
