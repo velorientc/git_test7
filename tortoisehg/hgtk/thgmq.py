@@ -205,9 +205,6 @@ class MQWidget(gtk.VBox):
                     self.qrename_ui(model[paths[0]][MQ_NAME])
             self.list.connect('thg-rename', thgrename)
 
-        # prepare to show
-        self.refresh()
-
     ### public functions ###
 
     def refresh(self):
