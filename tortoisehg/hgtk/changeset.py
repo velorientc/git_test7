@@ -90,27 +90,35 @@ class ChangeSet(gdialog.GDialog):
         title = self.get_title()
         if parents:
             if len(parents) == 2:
+                # deferred adding of parent check button
                 if not self.parent_button.parent:
                     self.parent_box.pack_start(gtk.HSeparator(), False, False)
                     self.parent_box.pack_start(self.parent_button, False, False)
                     self.parent_box.show_all()
+
+                # show parent box
                 self.parent_box.show()
+
+                # uncheck the check button
+                if rev != oldrev:
+                    self.parent_button.handler_block_by_func(
+                            self.parent_toggled)
+                    self.parent_button.set_active(False)
+                    self.parent_button.handler_unblock_by_func(
+                            self.parent_toggled)
+
+                # determine title and current parent
                 if self.diff_other_parent():
                     title += ':' + str(parents[1].rev())
                     parent = parents[1].node()
                 else:
                     title += ':' + str(parents[0].rev())
                     parent = parents[0].node()
-                if rev != oldrev:
-                    # uncheck the check button
-                    self.parent_button.handler_block_by_func(
-                            self.parent_toggled)
-                    self.parent_button.set_active(False)
-                    self.parent_button.handler_unblock_by_func(
-                            self.parent_toggled)
+
                 # clear cache for highlighting parent correctly
                 self.clear_cache()
             else:
+                # hide parent box
                 self.parent_box.hide()
                 parent = parents[0].node()
         else:
