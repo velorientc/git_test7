@@ -245,7 +245,7 @@ class SummaryInfo(object):
                     repo = ctx._repo
                     if ctx.node() not in repo.branchtags().values():
                         return None
-                    dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
+                    dblist = self.get_config(repo, 'tortoisehg', 'deadbranch')
                     if dblist and value in [hglib.toutf(b.strip()) \
                                             for b in dblist.split(',')]:
                         return None
@@ -259,7 +259,7 @@ class SummaryInfo(object):
                 value = self.get_data('rawtags', *args)
                 if value:
                     repo = ctx._repo
-                    htags = repo.ui.config('tortoisehg', 'hidetags', '')
+                    htags = self.get_config(repo, 'tortoisehg', 'hidetags', '')
                     htags = [hglib.toutf(b.strip()) for b in htags.split()]
                     value = [tag for tag in value if tag not in htags]
                     if len(value) == 0:
@@ -372,7 +372,7 @@ class CachedSummaryInfo(SummaryInfo):
 
     def __init__(self):
         SummaryInfo.__init__(self)
-        self.cache = {}
+        self.clear_cache()
 
     def try_cache(self, target, func, *args, **kargs):
         item, widget, ctx, custom = args
@@ -413,8 +413,19 @@ class CachedSummaryInfo(SummaryInfo):
     def get_widget(self, *args, **kargs):
         return self.try_cache('widget', SummaryInfo.get_widget, *args, **kargs)
 
+    def get_config(self, repo, section, key, default=None, untrusted=False):
+        cachekey = repo.root + section + key
+        try:
+            return self.confcache[cachekey]
+        except KeyError:
+            pass
+        value = repo.ui.config(section, key, default, untrusted)
+        self.confcache[cachekey] = value
+        return value
+
     def clear_cache(self):
         self.cache = {}
+        self.confcache = {}
 
 class SummaryBase(object):
 
