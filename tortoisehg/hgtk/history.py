@@ -947,6 +947,7 @@ class GLog(gdialog.GDialog):
         conf.connect('clicked', self.conf_clicked, urlcombo)
         email.connect('clicked', self.email_clicked)
 
+        ## post pull drop-down list
         syncbox.append_widget(gtk.Label(_('After Pull:')))
         ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
         ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
@@ -955,23 +956,21 @@ class GLog(gdialog.GDialog):
         if 'rebase' in self.exs or 'rebase' == ppull:
             ppulldata.append(('rebase', _('Rebase')))
 
-        self.ppullcombo = gtk.combo_box_new_text()
-        ppullcombo = self.ppullcombo
-        for (index, (name, label)) in enumerate(ppulldata):
-            ppullcombo.insert_text(index, label)
-
-        for (index, (name, label)) in enumerate(ppulldata):
-            if ppull == name:
-                pos = index
-                break;
-        else:
-            pos = [index for (index, (name, label))
-                    in enumerate(ppulldata) if name == 'none'][0]
-        ppullcombo.set_active(pos)
+        ppulllist = gtk.ListStore(str, # name
+                                  str) # label (utf-8)
+        ppullcombo = gtk.ComboBox(ppulllist)
+        syncbox.append_widget(ppullcombo)
+        cell = gtk.CellRendererText()
+        ppullcombo.pack_start(cell)
+        ppullcombo.add_attribute(cell, 'text', 1)
+        selindex = 0
+        for name, label in ppulldata:
+            ppulllist.append((name, label))
+            if name == ppull:
+                selindex = len(ppulllist) - 1
+        ppullcombo.set_active(selindex)
         self.ppullcombo = ppullcombo
         self.ppulldata = ppulldata
-
-        syncbox.append_widget(ppullcombo)
 
         # filter bar
         self.filterbox = gtklib.SlimToolbar()
@@ -1101,9 +1100,9 @@ class GLog(gdialog.GDialog):
         return self.stbar
 
     def apply_clicked(self, button):
-        ppullcombo, ppulldata = self.ppullcombo, self.ppulldata
-        sel = ppullcombo.get_active_text()
-        ppull = [name for (name, label) in ppulldata if sel == label][0]
+        combo = self.ppullcombo
+        list, iter = combo.get_model(), combo.get_active_iter()
+        ppull, label = list[list.get_path(iter)]
         if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extension explicitly
@@ -1251,9 +1250,9 @@ class GLog(gdialog.GDialog):
             self.set_bundlefile(result)
 
     def pull_clicked(self, toolbutton):
-        ppullcombo, ppulldata = self.ppullcombo, self.ppulldata
-        sel = ppullcombo.get_active_text()
-        ppull = [name for (name, label) in ppulldata if sel == label][0]
+        combo = self.ppullcombo
+        list, iter = combo.get_model(), combo.get_active_iter()
+        ppull, label = list[list.get_path(iter)]
         if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extension explicitly
