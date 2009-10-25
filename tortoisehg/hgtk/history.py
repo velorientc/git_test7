@@ -417,6 +417,7 @@ class GLog(gdialog.GDialog):
             return
 
         if type == 'branch':
+            self.lastbranchrow = None
             self.select_branch(self.branchcombo)
             return
 
@@ -1005,15 +1006,19 @@ class GLog(gdialog.GDialog):
         filterbox.append_widget(hidemerges, padding=0)
         self.hidemerges = hidemerges
 
-        branches = gtk.RadioButton(all, _('Branch'))
+        branches = gtk.RadioButton(all)
         branches.connect('toggled', self.filter_selected, 'branch')
+        branches.set_property('tooltip-text', _('Branch Filter'))
+        branches.set_property('has-tooltip', True)
         branches.set_sensitive(False)
         filterbox.append_widget(branches, padding=0)
         self.branchbutton = branches
 
         branchcombo = gtk.combo_box_new_text()
+        branchcombo.append_text(_('Branches...'))
         for name in self.get_live_branches():
             branchcombo.append_text(hglib.toutf(name))
+        branchcombo.set_active(0)
         branchcombo.connect('changed', self.select_branch)
         self.lastbranchrow = None
         filterbox.append_widget(branchcombo, padding=0)
@@ -1436,15 +1441,15 @@ class GLog(gdialog.GDialog):
 
     def select_branch(self, combo):
         row = combo.get_active()
-        if row >= 0 and row != self.lastbranchrow:
+        if row == 0:
+            if self.lastbranchrow:
+                combo.set_active(self.lastbranchrow)
+        elif row != self.lastbranchrow:
             self.filter = 'branch'
             self.lastbranchrow = row
             self.branchbutton.set_active(True)
             self.branchbutton.set_sensitive(True)
             self.reload_log(branch=combo.get_model()[row][0])
-        else:
-            self.lastbranchrow = None
-            self.branchbutton.set_sensitive(False)
 
     def show_goto_dialog(self):
         'Launch a modeless goto revision dialog'
