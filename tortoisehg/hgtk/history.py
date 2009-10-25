@@ -1386,6 +1386,7 @@ class GLog(gdialog.GDialog):
 
         self.refreshui()
         self.update_urllist()
+        self.update_postpull()
 
     def update_urllist(self):
         urllist = self.urlcombo.get_model()
