@@ -741,14 +741,6 @@ class ChangeSet(gdialog.GDialog):
                                                     initial=self.cwd,
                                                     filename=filename).run()
         if result:
-            if os.path.exists(result):
-                res = gdialog.Confirm(_('Confirm Overwrite'), [], self,
-                   _('The file "%s" already exists!\n\n'
-                     'Do you want to overwrite it?') % result).run()
-                if res != gtk.RESPONSE_YES:
-                    return
-                os.remove(result)
-
             q = Queue.Queue()
             hglib.hgcmd_toq(q, 'cat', '--rev',
                 str(self.currev), '--output', hglib.fromutf(result), self.curfile)
