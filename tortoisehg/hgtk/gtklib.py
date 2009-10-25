@@ -166,7 +166,10 @@ class NativeSaveFileDialogWrapper:
             filepath = self.runWindows()
         except ImportError:
             filepath = self.runCompatible()
-        return self.overwriteConfirmation(filepath)
+        if filepath:
+            return self.overwriteConfirmation(filepath)
+        else:
+            return False
 
     def runWindows(self):
 
