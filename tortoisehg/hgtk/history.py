@@ -1813,14 +1813,6 @@ class GLog(gdialog.GDialog):
                                                     initial=self.repo.root,
                                                     filename=filename).run()
         if result:
-            if os.path.exists(result):
-                res = gdialog.Confirm(_('Confirm Overwrite'), [], self,
-                   _('The file "%s" already exists!\n\n'
-                     'Do you want to overwrite it?') % result).run()
-                if res != gtk.RESPONSE_YES:
-                    return
-                os.remove(result)
-
             # In case new export args are added in the future, merge the
             # hg defaults
             exportOpts= self.merge_opts(commands.table['^export'][1], ())
@@ -1842,14 +1834,6 @@ class GLog(gdialog.GDialog):
                                                     initial=self.repo.root,
                                                     filename=filename).run()
         if result:
-            if os.path.exists(result):
-                res = gdialog.Confirm(_('Confirm Overwrite'), [], self,
-                   _('The file "%s" already exists!\n\n'
-                     'Do you want to overwrite it?') % result).run()
-                if res != gtk.RESPONSE_YES:
-                    return
-                os.remove(result)
-        
             cmdline = ['hg', 'bundle', '--base', str(parent), result]
             dlg = hgcmd.CmdDialog(cmdline)
             dlg.show_all()
