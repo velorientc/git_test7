@@ -378,7 +378,7 @@ class GCommit(GStatus):
         # parent changeset info
         parents_vbox = gtk.VBox(spacing=1)
         self.parents_frame = parents_vbox
-        style = csinfo.labelstyle(contents=('Parent: %(rev)s',
+        style = csinfo.labelstyle(contents=(_('Parent: %(rev)s'),
                        ' %(athead)s', ' %(branch)s', ' %(tags)s',
                        ' %(summary)s'), selectable=True)
         def data_func(widget, item, ctx):
