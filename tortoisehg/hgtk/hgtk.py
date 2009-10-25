@@ -76,8 +76,9 @@ def dispatch(args):
             gtkrun(run, u, **opts)
 
 def portable_fork(ui, opts):
-    if 'THG_HGTK_SPAWN' in os.environ or \
-            opts.get('nofork') or opts.get('repository'):
+    if 'THG_HGTK_SPAWN' in os.environ or (
+            not opts.get('fork') and (
+                opts.get('nofork') or opts.get('repository'))):
         return
     elif ui.configbool('tortoisehg', 'hgtkfork', None) is not None:
         if not ui.configbool('tortoisehg', 'hgtkfork'):
@@ -224,6 +225,8 @@ def runcommand(ui, args):
         path = ui.expandpath(path)
         cmdoptions['repository'] = path
         os.chdir(path)
+    if options['fork']:
+        cmdoptions['fork'] = True
     if options['nofork']:
         cmdoptions['nofork'] = True
     path = paths.find_root(os.getcwd())
@@ -642,6 +645,7 @@ globalopts = [
     ('h', 'help', None, _('display help and exit')),
     ('', 'debugger', None, _('start debugger')),
     ('', 'nofork', None, _('do not fork GUI process')),
+    ('', 'fork', None, _('always fork GUI process')),
     ('', 'listfile', '', _('read file list from file')),
 ]
 
