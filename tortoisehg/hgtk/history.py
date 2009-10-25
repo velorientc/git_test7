@@ -1020,7 +1020,7 @@ class GLog(gdialog.GDialog):
         self.branchcombo = branchcombo
 
         self.custombutton = gtk.RadioButton(all)
-        self.custombutton.set_property('tooltip-text', _('custom filter'))
+        self.custombutton.set_property('tooltip-text', _('Custom Filter'))
         self.custombutton.set_property('has-tooltip', True)
         self.custombutton.set_sensitive(False)
         filterbox.append_widget(self.custombutton, padding=0)
