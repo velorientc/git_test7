@@ -190,7 +190,7 @@ class GLog(gdialog.GDialog):
             dict(text='----'),
             dict(text=_('Choose Details...'), func=self.details_clicked),
             dict(text='----'),
-            dict(name='compact-graph', text=('Compact Graph'), ascheck=True,
+            dict(name='compact-graph', text=(_('Compact Graph')), ascheck=True,
                 func=self.toggle_compactgraph, check=self.compactgraph),
             dict(name='color-by-branch', text=_('Color by Branch'),
                 ascheck=True, func=self.toggle_branchcolor,
