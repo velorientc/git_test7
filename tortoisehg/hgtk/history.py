@@ -963,14 +963,12 @@ class GLog(gdialog.GDialog):
         cell = gtk.CellRendererText()
         ppullcombo.pack_start(cell)
         ppullcombo.add_attribute(cell, 'text', 1)
-        selindex = 0
         for name, label in ppulldata:
             ppulllist.append((name, label))
-            if name == ppull:
-                selindex = len(ppulllist) - 1
-        ppullcombo.set_active(selindex)
         self.ppullcombo = ppullcombo
         self.ppulldata = ppulldata
+
+        self.update_postpull(ppull)
 
         # filter bar
         self.filterbox = gtklib.SlimToolbar()
@@ -1397,6 +1395,15 @@ class GLog(gdialog.GDialog):
             urllist.append((hglib.toutf(path), hglib.toutf(alias)))
             if alias == 'default':
                 self.urlcombo.set_active(len(urllist) - 1)
+
+    def update_postpull(self, ppull=None):
+        if ppull is None:
+            ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
+        for row in self.ppullcombo.get_model():
+            name, label = row
+            if name == ppull:
+                self.ppullcombo.set_active_iter(row.iter)
+                break
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
