@@ -145,11 +145,11 @@ class GCommit(GStatus):
         date = self.opts.get('date') or ''
         pats = ' '.join(self.pats) or ''
         if self.qnew:
-            return root + ' - qnew'
+            return root + _(' - qnew')
         elif self.mqmode:
             patch = self.repo.mq.lookup('qtip')
-            return root + ' - qrefresh ' + patch
-        return root + ' - ' + ' '.join(['commit', pats, user, date])
+            return root + _(' - qrefresh ') + patch
+        return root + ' - ' + ' '.join([_('commit'), pats, user, date])
 
     def get_icon(self):
         return 'menucommit.ico'
