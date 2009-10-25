@@ -336,7 +336,8 @@ class GCommit(GStatus):
         else:
             self.qnew_name = None
 
-        liststore = gtk.ListStore(str, str)
+        liststore = gtk.ListStore(str, # summary line (utf-8)
+                                  str) # full commit message
         self.msg_cbbox = gtk.ComboBox(liststore)
         cell = gtk.CellRendererText()
         self.msg_cbbox.pack_start(cell, True)
@@ -440,6 +441,7 @@ class GCommit(GStatus):
                     return
             buf.set_text(model[index][1])
             buf.set_modified(False)
+            combobox.set_active(-1)
 
     def first_msg_popdown(self, combo, shown):
         combo.disconnect(self.popupid)
@@ -450,11 +452,13 @@ class GCommit(GStatus):
         if msg:
             self._mru_messages.add(msg)
             self.settings.write()
-            if self.popupid is not None: return
+            if self.popupid is not None:
+                return
         liststore = self.msg_cbbox.get_model()
         liststore.clear()
         for msg in self._mru_messages:
-            if not msg: continue
+            if not msg:
+                continue
             sumline = hglib.toutf(hglib.tounicode(msg).splitlines()[0])
             liststore.append([sumline, msg])
 
