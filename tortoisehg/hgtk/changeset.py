@@ -526,7 +526,8 @@ class ChangeSet(gdialog.GDialog):
                         revid_markup(revid, **opts)]
                 if branch:
                     revfmt = '%s (%s) [%s]'
-                    revargs.append(branch)
+                    revargs.append(gtklib.markup(branch, color='black',
+                        background='#aaffaa'))
 
                 rev = revfmt % tuple(revargs)
                 link = gtk.Label()
