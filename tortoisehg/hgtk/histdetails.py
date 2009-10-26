@@ -28,8 +28,8 @@ class LogDetailsDialog(gtk.Dialog):
 
         # add dialog buttons
         self.okbtn = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
-        self.applybtn = self.add_button(gtk.STOCK_APPLY, gtk.RESPONSE_APPLY)
         self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
+        self.applybtn = self.add_button(gtk.STOCK_APPLY, gtk.RESPONSE_APPLY)
         self.set_default_response(gtk.RESPONSE_OK)
 
         self.set_title(_('Log Details'))
