@@ -924,16 +924,17 @@ class GLog(gdialog.GDialog):
                         _('Reject changes from Bundle preview'))
         pull = syncbox.append_stock(gtk.STOCK_GOTO_BOTTOM,
                         _('Pull incoming changesets'))
+
         outgoing = syncbox.append_stock(gtk.STOCK_GO_UP,
                         _('Determine and mark outgoing changesets'))
         push = syncbox.append_stock(gtk.STOCK_GOTO_TOP,
                         _('Push outgoing changesets'))
         email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
                         _('Email outgoing changesets'))
-        conf = syncbox.append_stock(gtk.STOCK_PREFERENCES,
-                        _('Configure aliases and after pull behavior'))
+
         stop = syncbox.append_stock(gtk.STOCK_STOP,
                         _('Stop current transaction'))
+
         stop.set_sensitive(False)
         apply.set_sensitive(False)
         reject.set_sensitive(False)
@@ -953,15 +954,6 @@ class GLog(gdialog.GDialog):
         syncbox.append_widget(urlcombo, expand=True)
 
         self.update_urllist()
-
-        incoming.connect('clicked', self.incoming_clicked)
-        pull.connect('clicked', self.pull_clicked)
-        outgoing.connect('clicked', self.outgoing_clicked)
-        push.connect('clicked', self.push_clicked)
-        apply.connect('clicked', self.apply_clicked)
-        reject.connect('clicked', self.reject_clicked)
-        conf.connect('clicked', self.conf_clicked, urlcombo)
-        email.connect('clicked', self.email_clicked)
 
         ## post pull drop-down list
         syncbox.append_widget(gtk.Label(_('After Pull:')))
@@ -985,6 +977,20 @@ class GLog(gdialog.GDialog):
         self.ppulldata = ppulldata
 
         self.update_postpull(ppull)
+
+        ## add conf button
+        conf = syncbox.append_stock(gtk.STOCK_PREFERENCES,
+                        _('Configure aliases and after pull behavior'))
+
+        ## connect syncbar buttons
+        incoming.connect('clicked', self.incoming_clicked)
+        pull.connect('clicked', self.pull_clicked)
+        outgoing.connect('clicked', self.outgoing_clicked)
+        push.connect('clicked', self.push_clicked)
+        apply.connect('clicked', self.apply_clicked)
+        reject.connect('clicked', self.reject_clicked)
+        conf.connect('clicked', self.conf_clicked, urlcombo)
+        email.connect('clicked', self.email_clicked)
 
         # filter bar
         self.filterbox = gtklib.SlimToolbar()
