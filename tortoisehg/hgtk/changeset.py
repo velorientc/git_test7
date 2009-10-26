@@ -438,11 +438,11 @@ class ChangeSet(gdialog.GDialog):
             def summary_line(desc):
                 desc = desc.replace('\0', '')
                 return hglib.toutf(desc.split('\n')[0][:80])
-            def revline_data(ctx, hl=False):
+            def revline_data(ctx, hl=False, branch=None):
                 if isinstance(ctx, basestring):
                     return ctx
                 desc = ctx.description()
-                return (str(ctx.rev()), str(ctx), summary_line(desc), hl)
+                return (str(ctx.rev()), str(ctx), summary_line(desc), hl, branch)
             if item == 'cset':
                 return revline_data(ctx)
             elif item == 'branch':
@@ -454,10 +454,17 @@ class ChangeSet(gdialog.GDialog):
                 parents = []
                 for pctx in pctxs:
                     highlight = len(pctxs) == 2 and pctx == pctxs[pindex]
-                    parents.append(revline_data(pctx, highlight))
+                    branch = pctx.branch() != ctx.branch() and pctx.branch() or None
+                    parents.append(revline_data(pctx, highlight, branch))
                 return parents
             elif item == 'children':
-                return [revline_data(ctx) for ctx in ctx.children()]
+                children = []
+                for cctx in ctx.children():
+                    branch = None
+                    if cctx.branch() != ctx.branch():
+                        branch = cctx.branch()
+                    children.append(revline_data(cctx, branch=branch))
+                return children
             elif item == 'transplant':
                 ts = widget.get_data('transplant', usepreset=True)
                 if not ts:
@@ -484,13 +491,17 @@ class ChangeSet(gdialog.GDialog):
                 return _('Patch:')
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
-            def revline_markup(revnum, revid, summary, highlight=None):
+            def revline_markup(revnum, revid, summary, highlight=None, branch=None):
                 revnum = gtklib.markup(revnum)
                 summary = gtklib.markup(summary)
                 if revid:
                     revid = revid_markup(revid)
+                    if branch:
+                        return '%s (%s) [%s] %s' % (revnum, revid, branch, summary)
                     return '%s (%s) %s' % (revnum, revid, summary)
                 else:
+                    if branch:
+                        return '%s [%s] - %s' % (revnum, branch, summary)
                     return '%s - %s' % (revnum, summary)
             if item in ('cset', 'transplant', 'patch'):
                 if isinstance(value, basestring):
@@ -506,12 +517,18 @@ class ChangeSet(gdialog.GDialog):
                 return csets
             raise csinfo.UnknownItem(item)
         def widget_func(widget, item, markups):
-            def linkwidget(revnum, revid, summary, highlight=None):
+            def linkwidget(revnum, revid, summary, highlight=None, branch=None):
                 opts = dict(underline='single', foreground='#0000FF')
                 if highlight:
                     opts['weight'] = 'bold'
-                rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
-                                   revid_markup(revid, **opts))
+                revfmt = '%s (%s)'
+                revargs = [gtklib.markup(revnum, **opts),
+                        revid_markup(revid, **opts)]
+                if branch:
+                    revfmt = '%s (%s) [%s]'
+                    revargs.append(branch)
+
+                rev = revfmt % tuple(revargs)
                 link = gtk.Label()
                 link.set_markup(rev)
                 link.set_selectable(True)
