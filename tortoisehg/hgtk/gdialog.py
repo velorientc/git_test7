@@ -30,9 +30,9 @@ class SimpleMessage(gtklib.MessageDialog):
 
 
 class Prompt(SimpleMessage):
-    def __init__(self, title, message, parent):
+    def __init__(self, title, message, parent, type=gtk.MESSAGE_INFO):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
-                gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE)
+                type, gtk.BUTTONS_CLOSE)
         self.set_title(hglib.toutf(title))
         self.set_markup('<b>' + hglib.toutf(message) + '</b>')
         mod = gtklib.get_thg_modifier()
