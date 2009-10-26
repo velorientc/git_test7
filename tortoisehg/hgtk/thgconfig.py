@@ -872,10 +872,10 @@ class ConfigDialog(gtk.Dialog):
 
     def fill_path_frame(self, frvbox):
         frame = gtk.Frame(_('Remote repository paths'))
-        frame.set_border_width(10)
+        frame.set_border_width(4)
         frvbox.pack_start(frame, True, True, 2)
         vbox = gtk.VBox()
-        vbox.set_border_width(5)
+        vbox.set_border_width(4)
         frame.add(vbox)
 
         # Initialize data model for 'Paths' tab
@@ -905,27 +905,27 @@ class ConfigDialog(gtk.Dialog):
         self.addButton = gtk.Button(_('_Add'))
         self.addButton.set_use_underline(True)
         self.addButton.connect('clicked', self._add_path)
-        buttonbox.pack_start(self.addButton)
+        buttonbox.pack_start(self.addButton, True, True, 2)
 
         self._editpathbutton = gtk.Button(_('_Edit'))
         self._editpathbutton.set_use_underline(True)
         self._editpathbutton.connect('clicked', self._edit_path)
-        buttonbox.pack_start(self._editpathbutton)
+        buttonbox.pack_start(self._editpathbutton, True, True, 2)
 
         self._delpathbutton = gtk.Button(_('_Remove'))
         self._delpathbutton.set_use_underline(True)
         self._delpathbutton.connect('clicked', self._remove_path)
-        buttonbox.pack_start(self._delpathbutton)
+        buttonbox.pack_start(self._delpathbutton, True, True, 2)
 
         self._testpathbutton = gtk.Button(_('_Test'))
         self._testpathbutton.set_use_underline(True)
         self._testpathbutton.connect('clicked', self._test_path)
-        buttonbox.pack_start(self._testpathbutton)
+        buttonbox.pack_start(self._testpathbutton, True, True, 2)
 
         self._defaultpathbutton = gtk.Button(_('Set as _default'))
         self._defaultpathbutton.set_use_underline(True)
         self._defaultpathbutton.connect('clicked', self._default_path)
-        buttonbox.pack_start(self._defaultpathbutton)
+        buttonbox.pack_start(self._defaultpathbutton, True, True, 2)
 
         vbox.pack_start(buttonbox, False, False, 4)
 
