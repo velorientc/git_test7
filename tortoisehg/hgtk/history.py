@@ -918,6 +918,10 @@ class GLog(gdialog.GDialog):
 
         incoming = syncbox.append_stock(gtk.STOCK_GO_DOWN,
                         _('Download and view incoming changesets'))
+        apply = syncbox.append_stock(gtk.STOCK_APPLY,
+                        _('Accept changes from Bundle preview'))
+        reject = syncbox.append_stock(gtk.STOCK_DIALOG_ERROR,
+                        _('Reject changes from Bundle preview'))
         pull = syncbox.append_stock(gtk.STOCK_GOTO_BOTTOM,
                         _('Pull incoming changesets'))
         outgoing = syncbox.append_stock(gtk.STOCK_GO_UP,
@@ -926,10 +930,6 @@ class GLog(gdialog.GDialog):
                         _('Push outgoing changesets'))
         email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
                         _('Email outgoing changesets'))
-        apply = syncbox.append_stock(gtk.STOCK_APPLY,
-                        _('Accept changes from Bundle preview'))
-        reject = syncbox.append_stock(gtk.STOCK_DIALOG_ERROR,
-                        _('Reject changes from Bundle preview'))
         conf = syncbox.append_stock(gtk.STOCK_PREFERENCES,
                         _('Configure aliases and after pull behavior'))
         stop = syncbox.append_stock(gtk.STOCK_STOP,
