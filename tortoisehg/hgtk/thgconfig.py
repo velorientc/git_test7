@@ -1032,7 +1032,7 @@ class ConfigDialog(gtk.Dialog):
                     combo.set_active(currow)
 
     def add_page(self, notebook, tab):
-        frame = gtk.Frame()
+        frame = gtk.VBox()
         frame.set_border_width(4)
         frame.show()
 
