@@ -206,7 +206,7 @@ class NativeSaveFileDialogWrapper:
         while thread.isAlive():
             # let gtk process events while we wait for rundlg finishing
             gtk.main_iteration(block=True)
-        fname = None
+        fname = False 
         if q.qsize():
             fname = q.get(0)
         return fname
