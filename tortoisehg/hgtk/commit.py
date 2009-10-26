@@ -149,7 +149,7 @@ class GCommit(GStatus):
         elif self.mqmode:
             patch = self.repo.mq.lookup('qtip')
             return root + _(' - qrefresh ') + patch
-        return root + ' - ' + ' '.join([_('commit'), pats, user, date])
+        return root + ' '.join([_(' - commit'), pats, user, date])
 
     def get_icon(self):
         return 'menucommit.ico'
