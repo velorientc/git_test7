@@ -45,6 +45,76 @@ The toolbar buttons from left to right:
 	:guilabel:`Load all`
 		load all remaining revisions into the graph
 
+Synch Bar
+---------
+
+.. figure:: figures/syncbar.png
+	:alt: Changelog
+
+	Synchronization features in changelog tool
+
+From left to right...
+
+	:guilabel:`Incoming`
+		Download incoming changesets from the remote repository, store
+		them in a temporary bundle file, then enter bundle preview mode
+		with the incoming changes applied.  Incoming changesets will
+		have a 'down' arrow in the revision graph.
+	:guilabel:`Accept`
+		Accept (pull) the changesets from the previewed bundle.  This
+		button is only sensitive when previewing a changeset bundle.
+		The after-pull effect is respected after pulling from a bundle.
+	:guilabel:`Reject`
+		Reject the changesets from the previewed bundle and exit preview
+		mode.  This button is only sensitive when previewing a changeset
+		bundle.
+	:guilabel:`Pull`
+		Pull incoming changesets from the remote repository, then apply
+		after-pull effect (update, fetch, or rebase).
+	:guilabel:`Outgoing`
+		Determine outgoing changesets that would be pushed to the
+		remote repository.  Outgoing changesets are marked with an 'up'
+		arrow.
+	:guilabel:`Push`
+		Push outgoing changesets to the remote repository.
+	:guilabel:`Email`
+		Email outgoing changesets to the remote repository.
+	:guilabel:`Stop`
+		Stop current transaction.  The button is only sensitive during
+		outgoing commands.
+
+To the right of the :guilabel:`Stop` button is a combo box containing
+all of the configured peer repository paths for the current repository.
+The default path is selected at startup, if it has been configured.
+
+To the right of the path combo box is the :guilabel:`After Pull` combo
+that selects the operation which is performed after every pull operation
+triggered by the search bar.  The user must have the rebase extension
+enabled in order for that option to be available in the after pull
+combo.  The same is true of the fetch extension and it's post pull
+operation.
+
+To the right of the :guilabel:`After Pull` combo is the
+:guilabel:`Settings` button.  It opens the repository settings tool on
+the :guilabel:`Sync` tab where the after pull configurable and peer
+repository paths can be configured.
+
+Changesets which are added to the repository after the changelog tool
+was opened are marked with green stars in the graph.  This includes
+recent commits, pulled changesets, and applied patches.
+
+.. note::
+	To clear the new, incoming, and outgoing marks from the changeset
+	graph, use :guilabel:`View -> Reset Marks`
+
+Search Bar
+----------
+
+.. figure:: figures/searchbar.png
+	:alt: Changelog
+
+	Synchronization features in changelog tool
+
 
 Revision Graph Details
 ----------------------
