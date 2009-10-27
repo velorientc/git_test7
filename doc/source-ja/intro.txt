@@ -51,16 +51,11 @@ TortoiseHg には簡単にセットアップできるようにインストーラ
 	インストーラは最初に古いバージョンをアンインストールするよう促します。
 	アンインストールは通常のソフトウェアと同様に、スタートメニューから
 	コントロールパネルを開き、その中の「プログラムの追加と削除」から可能です。
-	必須ではありませんが、もし TortoiseOverlays を利用するプログラムが他に
-	ないのであれば、こちらもアンインストールしておくことをお奨めします。
-	それにより最新の TortoiseOverlays がインストールされます。
 
 .. note::
 	バージョン 0.8 以降の TortoiseHg がインストールされている場合、
-	インストーラを起動する前に全ての ThgTaskBar アプリケーション
-	(:file:`thgtaskbar.exe`) を終了しておく必要があります。タスクトレイの
-	通知領域に表示されている Mercurial のアイコンを右クリックしてメニューを
-	開き、 :guilabel:`Exit` をクリックすれば終了できます。
+	インストーラは新しいファイルをコピーするときに ThgTaskbar アプリケーションを
+	終了します。
 
 言語設定
 ^^^^^^^^
@@ -68,34 +63,33 @@ TortoiseHg には簡単にセットアップできるようにインストーラ
 TortoiseHg のユーザインターフェイスは様々な言語に翻訳されています。
 利用可能な全ての言語はインストーラに含まれているため、別途言語パックを
 ダウンロードする必要はありません。
-:file:`C:\\Program Files\\TortoiseHg\\locale` で利用可能な言語が見られます。
-言語を有効にするには環境変数 ``LANGUAGE`` に好きな言語コードを設定するだけです。
+:file:`C:\\Program Files\\TortoiseHg\\locale` に利用可能な言語が
+用意されています。環境変数 ``LANGUAGE`` に言語コードを設定するだけで
+その言語が利用可能になります。
 例えば日本語であれば ``set LANGUAGE=ja`` を設定してください。
 
 .. note::
-	``LANGUAGE`` を設定しても :guilabel:`OK` や :guilabel:`Apply` というように
+	``LANGUAGE`` を設定しても :guilabel:`OK` や :guilabel:`Apply` のような
 	GTK+ 標準のダイアログボタンのラベルが英語のままになっている場合、TortoiseHg
 	のインストーラがその言語の GTK+ 翻訳ファイルを含んでいないことを意味します。
 	これはリリース時にご利用の言語の TortoiseHg 翻訳が完了していなかったためです。
 
-Windows シェル拡張の右クリックメニューはその翻訳を Windows レジストリから
-取得します。すでに多くの言語向けに翻訳されており、それらは TortoiseHg の
-`ダウンロードページ <http://bitbucket.org/kuy/thg-ja/wiki/install>`_
-から利用可能な言語を確認できます。レジストリファイルをダウンロードしたら
-ダブルクリックしてインストールしてください。ダウンロードしたファイルの拡張子が
-:file:`.txt` になっていたら :file:`.reg` に直しておく必要があります。
+Windows シェル拡張の右クリックメニューはその翻訳文字列を Windows のレジストリ
+から取得しています。すでに多くの言語向けに翻訳されており、それらは
+:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n` にインストールされています。
+使用したい言語のレジストリファイルをダブルクリックすると確認ダイアログが出ますので、
+指示に従ってインストールしてください。
 
 
 Linux または Max OS の場合
 --------------------------
 
-Fedora 向けの RPM パッケージは
-`ダウンロード <http://bitbucket.org/tortoisehg/stable/downloads/>`_ ページに
-用意されています。
+Debian の DEB パッケージまたは Fedora 向けの RPM パッケージは
+`ダウンロード <http://bitbucket.org/tortoisehg/stable/wiki/download/>`_
+ページに用意されています。
 
 Ubuntu 向けの Deb パッケージは
-`ここ <https://launchpad.net/~maxb/+archive/ppa>`_ 、もしくは
-`こちら <https://launchpad.net/~tortoisehg-ppa>`_ から入手できます。
+`ここ <https://launchpad.net/~tortoisehg-ppa>`_ から入手できます。
 
 Max OS X 向けのパッケージは用意されていませんが、ソースコードから
 インストールすることで hgtk スクリプトを含む全ての TortoiseHg ダイアログが
