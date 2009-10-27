@@ -672,7 +672,7 @@ table = {
     "^status|st|diff": (status,
         [('r', 'rev', [], _('revisions to compare'))],
         _('hgtk status [FILE]...')),
-    "^userconfig": (userconfig, [],
+    "^userconfig": (userconfig,
         [('', 'focus', '', _('field to give initial focus'))],
         _('hgtk userconfig')),
     "^repoconfig": (repoconfig,
