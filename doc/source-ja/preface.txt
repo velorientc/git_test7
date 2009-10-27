@@ -13,7 +13,7 @@
 書かれました。TortoiseHg は Windows のシェル拡張として提供されるため、
 ユーザは普段使っている Windows エクスプローラから利用することができます。
 
-本書の最新版は `公式サイト <http://bitbucket.org/tortoisehg/stable/downloads>`_
+本書の最新版は `公式サイト <http://bitbucket.org/tortoisehg/stable>`_
 からダウンロード可能です。
 
 本書の読み方
@@ -66,6 +66,9 @@ Bitbucket には `公式 Wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>
 TortoiseHg プロジェクトに貢献し、本当に便利なツールを作り上げた全ての開発者、
 翻訳者、利用者コミュニティ、そして特に貴重なバグレポートおよび機能要望に
 協力していただいた利用者に感謝の意を表します。
+
+TortoiseHg の Windows 向けインストーラには `TortoiseSVN <http://tortoisesvn.net>`_
+プロジェクトによる TortoiseOverlays ハンドラが含まれています。
 
 表記規則
 ========
