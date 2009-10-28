@@ -269,7 +269,8 @@ class GCommit(GStatus):
         self.update_parent_labels()
         self.update_commit_button()
         if not self.committer_cbbox.get_active_text():
-            user = self.opts['user'] or self.repo.ui.config('ui', 'username')
+            user = self.opts['user'] or os.environ.get('HGUSER') or \
+                   self.repo.ui.config('ui', 'username')
             if user:
                 update_recent_committers(hglib.toutf(user))
         if not self.autoinc_entry.get_text():
@@ -300,7 +301,7 @@ class GCommit(GStatus):
         adv_hbox.pack_start(self.committer_cbbox, True, True, 2)
         self._mru_committers = self.settings.mrul('recent_committers')
         self.update_recent_committers()
-        committer = self.repo.ui.config('ui', 'username')
+        committer = os.environ.get('HGUSER') or self.repo.ui.config('ui', 'username')
         if committer:
             self.update_recent_committers(committer)
         self.committer_cbbox.set_active(0)
