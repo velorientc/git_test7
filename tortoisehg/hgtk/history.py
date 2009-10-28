@@ -957,7 +957,9 @@ class GLog(gdialog.GDialog):
         self.update_urllist()
 
         ## post pull drop-down list
-        syncbox.append_widget(gtk.Label(_('After Pull:')))
+        ppullbox = gtk.HBox()
+        syncbox.append_widget(ppullbox)
+        ppullbox.pack_start(gtk.Label(_('After Pull:')), False, False, 4)
         ppulldata = [('none', _('Nothing')), ('update', _('Update'))]
         ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
         if 'fetch' in self.exs or 'fetch' == ppull:
@@ -968,7 +970,7 @@ class GLog(gdialog.GDialog):
         ppulllist = gtk.ListStore(str, # name
                                   str) # label (utf-8)
         ppullcombo = gtk.ComboBox(ppulllist)
-        syncbox.append_widget(ppullcombo)
+        ppullbox.pack_start(ppullcombo, False, False)
         cell = gtk.CellRendererText()
         ppullcombo.pack_start(cell)
         ppullcombo.add_attribute(cell, 'text', 1)
@@ -976,6 +978,7 @@ class GLog(gdialog.GDialog):
             ppulllist.append((name, label))
         self.ppullcombo = ppullcombo
         self.ppulldata = ppulldata
+        self.ppullbox = ppullbox
 
         self.update_postpull(ppull)
 
@@ -1196,12 +1199,8 @@ class GLog(gdialog.GDialog):
             atexit.register(cleanup)
 
         bfile = path
+        path = hglib.validate_synch_path(path, self.repo)
         
-        for alias, path_aux in self.repo.ui.configitems('paths'):
-            if path == alias:
-                path = path_aux
-            elif path == url.hidepassword(path_aux):
-                path = path_aux
                 
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
@@ -1250,7 +1249,7 @@ class GLog(gdialog.GDialog):
             self.cmd_set_sensitive(cmd, False)
             self.incoming_disabled_cmds.append(cmd)
 
-        ignore = (self.syncbar_apply, self.syncbar_reject, self.ppullcombo)
+        ignore = (self.syncbar_apply, self.syncbar_reject, self.ppullbox)
         self.incoming_disabled = []
         def disable_child(w):
             if (w not in ignore) and w.get_property('sensitive'):
@@ -1330,7 +1329,7 @@ class GLog(gdialog.GDialog):
         q = Queue.Queue()
         cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n']
         cmd += self.get_proxy_args()
-        cmd += [path]
+        cmd += [hglib.validate_synch_path(path, self.repo)] 
 
         def threadfunc(q, *args):
             try:

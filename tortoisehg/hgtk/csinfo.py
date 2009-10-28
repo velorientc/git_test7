@@ -148,10 +148,16 @@ class patchctx(object):
                 os.unlink(tmpfile)
         finally:
             pf.close()
+        if not msg and hasattr(repo, 'mq'):
+            # attempt to get commit message
+            from hgext import mq
+            msg = mq.patchheader(repo.mq.join(self._patchname)).message
+            if msg:
+                msg = '\n'.join(msg)
         self._node = node
         self._user = user and hglib.toutf(user) or ''
         self._date = date and util.parsedate(date) or None
-        self._desc = msg and hglib.toutf(msg.rstrip('\r\n')) or ''
+        self._desc = msg and msg or ''
         self._branch = branch and hglib.toutf(branch) or ''
         self._parents = []
         for p in (p1, p2):

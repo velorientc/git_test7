@@ -15,6 +15,7 @@ class StatusBar(gtk.HBox):
     def __init__(self, extra=None):
         gtk.HBox.__init__(self)
         self.idle_text = None
+        self.started = False
 
         self.pbar = gtk.ProgressBar()
         self.sttext = gtk.Label("")
@@ -45,9 +46,11 @@ class StatusBar(gtk.HBox):
         self.pbox.set_child_visible(True)
         self.pbox.map()
         self.set_status_text(msg)
+        self.started = True 
         self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
 
     def end(self, msg=None, unmap=True):
+        self.started = False 
         gobject.source_remove(self._timeout_event)
 
         t = ''
@@ -67,7 +70,7 @@ class StatusBar(gtk.HBox):
 
     def set_idle_text(self, msg):
         self.idle_text = msg
-        if msg:
+        if msg and not self.started:
             self.set_status_text(msg)
 
     def set_right1_text(self, msg):

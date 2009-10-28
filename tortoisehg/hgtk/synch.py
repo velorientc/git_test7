@@ -544,11 +544,7 @@ class SynchDialog(gtk.Window):
         use_proxy = self.use_proxy.get_active()
         text_entry = self.pathbox.get_child()
         remote_path = hglib.fromutf(text_entry.get_text()).strip()
-        for alias, path in self.paths:
-            if remote_path == alias:
-                remote_path = path
-            elif remote_path == url.hidepassword(path):
-                remote_path = path
+        remote_path = hglib.validate_synch_path(remote_path, self.repo)
 
         cmdline = cmd[:]
         cmdline += ['--verbose']
