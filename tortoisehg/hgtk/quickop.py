@@ -44,7 +44,7 @@ class QuickOpDialog(gtk.Dialog):
 
         os.chdir(repo.root)
         self.repo = repo
-        self.set_title(hglib.get_reponame(repo) + ' ' + command)
+        self.set_title(hglib.get_reponame(repo) + ' - hg ' + command)
         self.command = command
 
         labels = { 'add': (_('Select files to add'), _('Add')),
