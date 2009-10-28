@@ -11,23 +11,23 @@
 
 *Windows 向けの TortoiseHg インストーラには何が含まれていますか？*
 
-	Mercurial、kdiff3、TortoisePlink、そして拡張機能として forest も同梱しています。
-
 	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_,
-	そして拡張機能の hgfold 同梱しています。
+	に加えて拡張機能の hgfold と hgcr-gui を同梱しています。
 
 *エクスプローラの右クリックメニューは英語のままなの？*
 
-	公式 Wiki の `ダウンロード <http://bitbucket.org/kuy/thg-ja/wiki/install>`_
-	ページから翻訳ファイルを入手できます。
+	右クリックメニューの翻訳ファイルは TortoiseHg のインストールディレクトリ
+	:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n` にあります。
+	使用したい言語の Windows レジストリファイルをダブルクリックして、
+	表示される確認ダイアログの指示に従ってインストールしてください。
 
-*バージョン 0.8 でマージや任意のリビジョンへの更新はどうやるの？*
+*マージや任意のリビジョンへの更新はどうやるの？*
 
-	バージョン 0.8 ではチェンジログツールからマージや更新を行うようになりました。
-	チェンジログツールはエクスプローラの右クリックメニューの :guilabel:`ログの表示`
-	から起動できます。
+	チェンジログツールからマージや特定リビジョンへの更新が行えます。
+	エクスプローラの右クリックメニューの :guilabel:`ログの表示`
+	から起動してください。
 
 *'failed to import extension hgext.hgconfig...' という警告メッセージはどうすれば消えるの？*
 
@@ -43,30 +43,9 @@
 	`SSH 接続 <http://bitbucket.org/kuy/thg-ja/wiki/ssh>`_ ページも参考に
 	してみてください。
 
-*バージョン 0.7 以降の TortoiseHg で Qct を使うことはできますか？*
+*TortoiseHg で Qct を使うことはできますか？*
 
-	Qct を使う前に是非 TortoiseHg 標準のコミットツールを試して欲しいところですが、
-	どうしてもという方もいますので方法を載せておきます：
-
-	1. `Qct-1.7-standalone-win32.exe <http://qct.sourceforge.net>`_ を
-	   ダウンロードしてインストールします
-	2. ホームディレクトリの :file:`Mercurial.ini` ファイルに以下の設定を追加します： ::
-
-			[extensions]
-			qct = C:\path\to\qct.py
-
-			[tortoisehg]
-			extcommit = qct
-
-			[qct]
-			path = "C:\Program Files\qct\qct.exe"
-
-	これで :guilabel:`HG コミット` を実行したとき Qct が起動し、
-	コマンドラインからは :command:`hg qct` が使用可能になります。
-	:command:`hgtk ci` を実行しても Qct が起動します。
-
-	バージョン 0.9 では Qct の起動ができなくなります。
-	それと同時に外部コミットツールの設定も廃止されます。
+	申し訳ありませんが、外部コミットツールのオプションはバージョン 0.9 で廃止されました。
 
 *TortoiseHg で hgk (hg view) を使うことはできますか？*
 
@@ -123,27 +102,15 @@
 	:guilabel:`adiff` という項目が追加されているので、それを選択して :guilabel:`適用`
 	ボタンを押してダイアログを閉じてください。
 
-*TortoiseHg は Windows Vista で動作しますか？*
-
-	TortoiseHg 0.8 以降は Windows Vista / 7 の 32ビット・64ビット版共に動作します。
-
-*64ビット版 Windows Vista で右クリックメニューを有効にするにはどうすればいいですか？*
-
-	TortoiseHg 0.8 以降のバージョンにアップグレードしてください。
-
 *シェル拡張を無効にする方法は？ (アイコンオーバーレイと右クリックメニュー)*
 
-	TortoiseHg 0.8 以降を使用している場合、アイコンオーバーレイはトレイアイコンを
-	クリックして表示されるメニューにある :guilabel:`オプション` から起動できる
-	タスクバーダイアログで無効にできます。右クリックメニューを無効にする唯一の方法は
-	TortoiseHg のインストールディレクトリにある :file:`ThgShell.dll` ファイルの
-	名前を変更してエクスプローラを再起動します (シェル拡張を完全に無効化)。
-
-	古い TortoiseHg を使っている場合はコマンドプロンプトから
-	:command:`regsvr32 /u "C:\\Program Files\\TortoiseHg\\tortoisehg.dll`
-	を実行してください (管理者権限が必要)。 :command:`/u` を外して実行することで
-	再びシェル拡張を有効化することができます。どちらも Windows を再起動するまで
-	反映されません。
+	アイコンオーバーレイを無効化するにはトレイアイコンをクリックして表示される
+	メニューにある :guilabel:`オプション` から起動できるタスクバーダイアログで
+	無効にできます。右クリックメニューを非表示にするには TortoiseHg
+	インストールディレクトリにある :file:`ThgShell.dll` ファイルの名前を変更して
+	エクスプローラを再起動します。しかしこの方法は右クリックメニューだけでなく、
+	アイコンオーバーレイも同時に無効化されます。現在、右クリックメニューのみを
+	無効化する簡単な方法はありません。
 
 *TortoiseHg はどこに設定を保存しているの？*
 
@@ -155,22 +122,16 @@
 	   3. リポジトリ設定： :file:`{repo-root}\.hg` にある :file:`hgrc` ファイル
 	2. ダイアログの位置や状態などを保存している :file:`%APPDATA%\\Tortoisehg`
 
-	以下は Mercurial の設定システムに保存される項目です： ::
+	以下は Mercurial の設定システムに保存される設定項目です： ::
 
 		[tortoisehg]
-		extcommit = None
 		vdiff = vdiff
 		editor = gvim
 		tabwidth = 4
 		longsummary = True
-		copyhash = False
 		graphlimit = 500
 		authorcolor = True
 		authorcolor.steve = blue
-
-	詳細については :doc:`settings` や
-	`issue #50 <http://bitbucket.org/tortoisehg/stable/issue/50/>`_
-	をご覧ください。
 
 *フォントの変更はできますか？*
 
@@ -185,18 +146,12 @@
 		# font used in file lists in status and commit tools
 		fontlist = courier 9
 
-		# make the integrated diff window appear at the bottom or side
-		# (applies to commit and status dialogs)
-		diffbottom = False
-
 *GTK のテーマを変更するにはどうすればいいの？*
 
 	バージョン 0.7 ではインストール時に選択可能です。それ以降のバージョン
 	(またはバージョン 0.7 がインストール済み) の場合は手動で変更できます：
 
-	* :file:`C:\\Program Files\\TortoiseHg\\share\\themes` を開きます
-	  (バージョン 0.8 以降は
-	  :file:`C:\\Program Files\\TortoiseHg\\gtk\\share\\themes`)
+	* :file:`C:\\Program Files\\TortoiseHg\\gtk\\share\\themes` を開きます
 	* :file:`themes` ディレクトリにあるテーマ名を覚えるか開いたままにします
 	* :file:`C:\\Program Files\\TortoiseHg\\etc\\gtk-2.0` を開きます
 	  (バージョン 0.8 以降は
@@ -207,7 +162,7 @@
 	  (表示されるセキュリティ警告のダイアログは全て「はい」を選択)
 	* 変更は次に TortoiseHg を起動したときから反映されます
 
-	同梱されていないテーマでもそれをダウンロードして :file:`share\\themes`
+	同梱されていないテーマでもそれをダウンロードして :file:`gtk\\share\\themes`
 	ディレクトリにコピーすれば、 :file:`gtkrc` ファイルでそのテーマを設定可能です。
 
 *アンインストールしても大量の DLL や PYD の拡張子のファイルが残ってしまう*
@@ -225,6 +180,8 @@
 	変換できます。変換について何か問題が起きたときや、質問がある場合は直接
 	Mercurial のメーリングリストや IRC (irc.freenode.net の #mercurial)
 	に尋ねてみてください。
+
+	もしくは hgsubversion 拡張機能を使うという方法もあります。
 
 *Windows の TortoiseHg はどこの Python モジュールを参照しているの？*
 
@@ -249,8 +206,8 @@
 
 *ダイアログのぎこちないフォント描画を直すにはどうすればいいの？*
 
-	バージョン 0.8 から複数の GTK+ テーマを同梱せず、デフォルトのテーマを
-	MS-Windows に変更しました。その結果、MS-Windows テーマが原因で
+	バージョン 0.8 以降では複数の GTK+ テーマを同梱せず、デフォルトのテーマとして
+	MS-Windows のみを同梱しています。その結果、MS-Windows テーマが原因で
 	フォント描画がおかしくなる場合があります。これを直すには以下の設定を
 	TortoiseHg の :file:`gtkrc` ファイルに追加してください： ::
 
