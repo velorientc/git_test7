@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
-"POT-Creation-Date: 2009-10-21 20:31+0000\n"
-"PO-Revision-Date: 2009-10-22 18:27+0000\n"
+"POT-Creation-Date: 2009-10-27 13:01+0000\n"
+"PO-Revision-Date: 2009-10-27 10:39+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-23 07:28+0000\n"
+"X-Launchpad-Export-Date: 2009-10-28 01:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -62,7 +62,7 @@ msgid "Archive revision:"
 msgstr "Arkiv revision:"
 
 #: tortoisehg\hgtk\archive.py:77 tortoisehg\hgtk\clone.py:74
-#: tortoisehg\hgtk\hginit.py:52 tortoisehg\hgtk\thgconfig.py:299
+#: tortoisehg\hgtk\hginit.py:52 tortoisehg\hgtk\thgconfig.py:301
 msgid "Browse..."
 msgstr "Gennemse..."
 
@@ -163,9 +163,8 @@ msgid "unknown mode name: %s"
 msgstr "ukendt tilstandsnavn: %s"
 
 #: tortoisehg\hgtk\archive.py:254 tortoisehg\hgtk\archive.py:260
-#: tortoisehg\hgtk\changeset.py:712 tortoisehg\hgtk\history.py:1737
-#: tortoisehg\hgtk\history.py:1766 tortoisehg\hgtk\thgconfig.py:479
-#: tortoisehg\hgtk\thgconfig.py:829
+#: tortoisehg\hgtk\gtklib.py:243 tortoisehg\hgtk\thgconfig.py:481
+#: tortoisehg\hgtk\thgconfig.py:831
 msgid "Confirm Overwrite"
 msgstr "Bekræft overskrivning"
 
@@ -234,7 +233,7 @@ msgstr "Brug engelsk omgørelsesbesked"
 msgid "Merge with old dirstate parent after backout"
 msgstr ""
 
-#: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:436
+#: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:437
 msgid "Confirm Discard Message"
 msgstr "Bekræft kasser besked"
 
@@ -280,110 +279,99 @@ msgstr ""
 msgid "Save error report to"
 msgstr "Gem fejlrapport til"
 
-#: tortoisehg\hgtk\changeset.py:31
+#: tortoisehg\hgtk\changeset.py:30
 msgid "%s changeset "
 msgstr "%s ændringssæt "
 
-#: tortoisehg\hgtk\changeset.py:131 tortoisehg\hgtk\changeset.py:157
+#: tortoisehg\hgtk\changeset.py:142 tortoisehg\hgtk\changeset.py:168
 msgid "[All Files]"
 msgstr "[Alle Filer]"
 
-#: tortoisehg\hgtk\changeset.py:192
+#: tortoisehg\hgtk\changeset.py:203
 msgid "unknown hunk type: %s"
 msgstr "ukendt stykke type: %s"
 
-#: tortoisehg\hgtk\changeset.py:260
+#: tortoisehg\hgtk\changeset.py:271
 msgid " %s is larger than the specified max diff size"
 msgstr " %s er større end den specificerede max diff size"
 
-#: tortoisehg\hgtk\changeset.py:269
+#: tortoisehg\hgtk\changeset.py:280
 msgid "Repository Error:  %s, refresh suggested"
 msgstr "Opbevaringslager Fejl: %s, opfrisk foreslåede"
 
-#: tortoisehg\hgtk\changeset.py:316
+#: tortoisehg\hgtk\changeset.py:327
 msgid "[no hunks to display]"
 msgstr "[intet stykke at fremvise]"
 
-#: tortoisehg\hgtk\changeset.py:394 tortoisehg\hgtk\status.py:1504
+#: tortoisehg\hgtk\changeset.py:388 tortoisehg\hgtk\status.py:1505
 msgid "_Visual Diff"
 msgstr ""
 
-#: tortoisehg\hgtk\changeset.py:395
+#: tortoisehg\hgtk\changeset.py:389
 msgid "Diff to _local"
 msgstr ""
 
-#: tortoisehg\hgtk\changeset.py:397
+#: tortoisehg\hgtk\changeset.py:391
 msgid "_View at Revision"
 msgstr ""
 
-#: tortoisehg\hgtk\changeset.py:398
+#: tortoisehg\hgtk\changeset.py:392
 msgid "_Save at Revision..."
 msgstr ""
 
-#: tortoisehg\hgtk\changeset.py:402
+#: tortoisehg\hgtk\changeset.py:396
 msgid "_File History"
 msgstr "_Filhistorie"
 
-#: tortoisehg\hgtk\changeset.py:403
+#: tortoisehg\hgtk\changeset.py:397
 msgid "_Annotate File"
 msgstr ""
 
-#: tortoisehg\hgtk\changeset.py:406
+#: tortoisehg\hgtk\changeset.py:400
 msgid "_Revert File Contents"
 msgstr ""
 
-#: tortoisehg\hgtk\changeset.py:468
+#: tortoisehg\hgtk\changeset.py:485
 msgid "Changeset:"
 msgstr "Ændring:"
 
-#: tortoisehg\hgtk\changeset.py:470 tortoisehg\hgtk\update.py:103
+#: tortoisehg\hgtk\changeset.py:487 tortoisehg\hgtk\update.py:103
 msgid "Parent:"
 msgstr "Forælder:"
 
-#: tortoisehg\hgtk\changeset.py:472
+#: tortoisehg\hgtk\changeset.py:489
 msgid "Child:"
 msgstr "Barn:"
 
-#: tortoisehg\hgtk\changeset.py:474
+#: tortoisehg\hgtk\changeset.py:491
 msgid "Patch:"
 msgstr "Lap:"
 
-#: tortoisehg\hgtk\changeset.py:559
+#: tortoisehg\hgtk\changeset.py:618
 msgid "Stat"
 msgstr "Status"
 
-#: tortoisehg\hgtk\changeset.py:561 tortoisehg\hgtk\hgignore.py:128
+#: tortoisehg\hgtk\changeset.py:620 tortoisehg\hgtk\hgignore.py:128
 msgid "Files"
 msgstr "Filer"
 
-#: tortoisehg\hgtk\changeset.py:576
+#: tortoisehg\hgtk\changeset.py:635
 msgid "Diff to second Parent"
 msgstr "Forskel til anden forælder"
 
-#: tortoisehg\hgtk\changeset.py:707
+#: tortoisehg\hgtk\changeset.py:758
 msgid "Save file to"
 msgstr "Gem fil som"
 
-#: tortoisehg\hgtk\changeset.py:713 tortoisehg\hgtk\history.py:1738
-#: tortoisehg\hgtk\history.py:1767
-msgid ""
-"The file \"%s\" already exists!\n"
-"\n"
-"Do you want to overwrite it?"
-msgstr ""
-"Filen \"%s\" findes allerede!\n"
-"\n"
-"Vil du overskrive den?"
-
-#: tortoisehg\hgtk\changeset.py:789
+#: tortoisehg\hgtk\changeset.py:832
 msgid "Confirm revert file to old revision"
 msgstr "Bekræft tilbagefør fil til gammel revision"
 
-#: tortoisehg\hgtk\changeset.py:790
+#: tortoisehg\hgtk\changeset.py:833
 msgid "Revert %s to contents at revision %d?"
 msgstr "Tilbagefør %s til indhold i revision %d?"
 
-#: tortoisehg\hgtk\changeset.py:802 tortoisehg\hgtk\synch.py:672
+#: tortoisehg\hgtk\changeset.py:845 tortoisehg\hgtk\synch.py:672
 msgid "Toggle _Wordwrap"
 msgstr "Skifte _tekstombrydning"
 
@@ -423,7 +411,7 @@ msgstr "Brug træk-protokollen til at kopiere metadata"
 msgid "Use uncompressed transfer"
 msgstr "Brug ukomprimeret overførsel"
 
-#: tortoisehg\hgtk\clone.py:137 tortoisehg\hgtk\history.py:231
+#: tortoisehg\hgtk\clone.py:137 tortoisehg\hgtk\history.py:233
 #: tortoisehg\hgtk\synch.py:184
 msgid "Use proxy server"
 msgstr "Brug proxy server"
@@ -484,7 +472,19 @@ msgstr "Åben en ny navngivet gren"
 msgid "Close current named branch"
 msgstr "Luk nuværende navngivne gren"
 
-#: tortoisehg\hgtk\commit.py:183 tortoisehg\hgtk\history.py:173
+#: tortoisehg\hgtk\commit.py:148
+msgid " - qnew"
+msgstr " - qnew"
+
+#: tortoisehg\hgtk\commit.py:151
+msgid " - qrefresh "
+msgstr " - qrefresh "
+
+#: tortoisehg\hgtk\commit.py:152
+msgid " - commit"
+msgstr ""
+
+#: tortoisehg\hgtk\commit.py:183 tortoisehg\hgtk\history.py:175
 msgid "_View"
 msgstr "_Vis"
 
@@ -492,13 +492,13 @@ msgstr "_Vis"
 msgid "Advanced"
 msgstr "Avanceret"
 
-#: tortoisehg\hgtk\commit.py:186 tortoisehg\hgtk\history.py:684
-#: tortoisehg\hgtk\history.py:997
+#: tortoisehg\hgtk\commit.py:186 tortoisehg\hgtk\history.py:691
+#: tortoisehg\hgtk\history.py:1014
 msgid "Parents"
 msgstr "Forældre"
 
 #: tortoisehg\hgtk\commit.py:189 tortoisehg\hgtk\hgignore.py:138
-#: tortoisehg\hgtk\history.py:186
+#: tortoisehg\hgtk\history.py:188
 msgid "Refresh"
 msgstr "Opdater"
 
@@ -507,7 +507,7 @@ msgid "_Operations"
 msgstr "_Operationer"
 
 #: tortoisehg\hgtk\commit.py:191 tortoisehg\hgtk\commit.py:237
-#: tortoisehg\hgtk\commit.py:594
+#: tortoisehg\hgtk\commit.py:598
 msgid "_Commit"
 msgstr "_Integrer"
 
@@ -524,12 +524,12 @@ msgid "Re_vert"
 msgstr "Nulstil"
 
 #: tortoisehg\hgtk\commit.py:200 tortoisehg\hgtk\status.py:164
-#: tortoisehg\hgtk\status.py:1514 tortoisehg\hgtk\thgconfig.py:903
+#: tortoisehg\hgtk\status.py:1515 tortoisehg\hgtk\thgconfig.py:905
 msgid "_Add"
 msgstr "_Tilføj"
 
 #: tortoisehg\hgtk\commit.py:202 tortoisehg\hgtk\status.py:170
-#: tortoisehg\hgtk\thgconfig.py:913
+#: tortoisehg\hgtk\thgconfig.py:915
 msgid "_Remove"
 msgstr "_Fjern"
 
@@ -538,7 +538,7 @@ msgid "Move"
 msgstr "Flyt"
 
 #: tortoisehg\hgtk\commit.py:206 tortoisehg\hgtk\status.py:173
-#: tortoisehg\hgtk\status.py:1513
+#: tortoisehg\hgtk\status.py:1514
 msgid "_Forget"
 msgstr "_Glem"
 
@@ -546,12 +546,12 @@ msgstr "_Glem"
 msgid "undo recent commit"
 msgstr "fortryd sidste integration"
 
-#: tortoisehg\hgtk\commit.py:238 tortoisehg\hgtk\commit.py:478
+#: tortoisehg\hgtk\commit.py:238 tortoisehg\hgtk\commit.py:482
 msgid "commit"
 msgstr "integrér"
 
 #: tortoisehg\hgtk\commit.py:250 tortoisehg\hgtk\merge.py:169
-#: tortoisehg\hgtk\thgconfig.py:710
+#: tortoisehg\hgtk\thgconfig.py:712
 msgid "Confirm Exit"
 msgstr "Bekræft exit"
 
@@ -559,22 +559,23 @@ msgstr "Bekræft exit"
 msgid "Save commit message at exit?"
 msgstr "Gem integrationsbesked ved afslutning?"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:963
-#: tortoisehg\hgtk\commit.py:967 tortoisehg\hgtk\history.py:80
-#: tortoisehg\hgtk\status.py:1269 tortoisehg\hgtk\status.py:1288
-#: tortoisehg\hgtk\status.py:1581 tortoisehg\hgtk\thgconfig.py:713
-#: tortoisehg\hgtk\thgmq.py:328 tortoisehg\hgtk\update.py:231
+#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:967
+#: tortoisehg\hgtk\commit.py:971 tortoisehg\hgtk\history.py:81
+#: tortoisehg\hgtk\history.py:1419 tortoisehg\hgtk\status.py:1270
+#: tortoisehg\hgtk\status.py:1289 tortoisehg\hgtk\status.py:1582
+#: tortoisehg\hgtk\thgconfig.py:715 tortoisehg\hgtk\thgmq.py:328
+#: tortoisehg\hgtk\update.py:231
 msgid "&Cancel"
 msgstr "&Annuler"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:963
-#: tortoisehg\hgtk\commit.py:967 tortoisehg\hgtk\status.py:1581
-#: tortoisehg\hgtk\thgconfig.py:712 tortoisehg\hgtk\thgmq.py:327
+#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:967
+#: tortoisehg\hgtk\commit.py:971 tortoisehg\hgtk\status.py:1582
+#: tortoisehg\hgtk\thgconfig.py:714 tortoisehg\hgtk\thgmq.py:327
 msgid "&Yes"
 msgstr "&Ja"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:963
-#: tortoisehg\hgtk\commit.py:967 tortoisehg\hgtk\thgstrip.py:362
+#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:967
+#: tortoisehg\hgtk\commit.py:971 tortoisehg\hgtk\thgstrip.py:362
 msgid "&No"
 msgstr "&Nej"
 
@@ -590,117 +591,121 @@ msgstr "Auto-inkludér:"
 msgid "Push after commit"
 msgstr "Skub efter integrering"
 
-#: tortoisehg\hgtk\commit.py:344
+#: tortoisehg\hgtk\commit.py:345
 msgid "Recent commit messages..."
 msgstr "Seneste integrationsbeskedder..."
 
-#: tortoisehg\hgtk\commit.py:390
+#: tortoisehg\hgtk\commit.py:382
+msgid "Parent: %(rev)s"
+msgstr "Forælder: %(rev)s"
+
+#: tortoisehg\hgtk\commit.py:391
 msgid "not at head revision"
 msgstr "ikke ved hovedrevision"
 
-#: tortoisehg\hgtk\commit.py:412 tortoisehg\hgtk\status.py:479
+#: tortoisehg\hgtk\commit.py:413 tortoisehg\hgtk\status.py:480
 msgid "Patch Preview"
 msgstr "Lap Forhåndsvisning"
 
-#: tortoisehg\hgtk\commit.py:414 tortoisehg\hgtk\status.py:483
+#: tortoisehg\hgtk\commit.py:415 tortoisehg\hgtk\status.py:484
 msgid "Commit Preview"
 msgstr "Indsend Forhåndsvisning"
 
-#: tortoisehg\hgtk\commit.py:437
+#: tortoisehg\hgtk\commit.py:438
 msgid "Discard current commit message?"
 msgstr "Kasser nuværende integrationsbesked?"
 
-#: tortoisehg\hgtk\commit.py:477 tortoisehg\hgtk\commit.py:739
-#: tortoisehg\hgtk\commit.py:789 tortoisehg\hgtk\gdialog.py:472
-#: tortoisehg\hgtk\merge.py:94 tortoisehg\hgtk\thgconfig.py:598
+#: tortoisehg\hgtk\commit.py:481 tortoisehg\hgtk\commit.py:743
+#: tortoisehg\hgtk\commit.py:793 tortoisehg\hgtk\gdialog.py:472
+#: tortoisehg\hgtk\merge.py:94 tortoisehg\hgtk\thgconfig.py:600
 msgid "Commit"
 msgstr "Integrér"
 
-#: tortoisehg\hgtk\commit.py:481
+#: tortoisehg\hgtk\commit.py:485
 msgid "QNew"
 msgstr "QNew"
 
-#: tortoisehg\hgtk\commit.py:482
+#: tortoisehg\hgtk\commit.py:486
 msgid "create new MQ patch"
 msgstr "opret ny MQ lappeløsning"
 
-#: tortoisehg\hgtk\commit.py:484
+#: tortoisehg\hgtk\commit.py:488
 msgid "QRefresh"
 msgstr "QRefresh"
 
-#: tortoisehg\hgtk\commit.py:485
+#: tortoisehg\hgtk\commit.py:489
 msgid "refresh top MQ patch"
 msgstr "opfrisk øverste MQ lappeløsning"
 
-#: tortoisehg\hgtk\commit.py:487
+#: tortoisehg\hgtk\commit.py:491
 msgid "_Commit (+1 head)"
 msgstr "_Integrer (+1 hoved)"
 
-#: tortoisehg\hgtk\commit.py:487
+#: tortoisehg\hgtk\commit.py:491
 msgid "_Commit (-1 head)"
 msgstr "_Integrer (-1 hoved)"
 
-#: tortoisehg\hgtk\commit.py:492
+#: tortoisehg\hgtk\commit.py:496
 msgid "parent is not a head, commit to add a new head"
 msgstr "forælder er ikke et hoved, integrer vil tilføje et nyt hoved"
 
-#: tortoisehg\hgtk\commit.py:497
+#: tortoisehg\hgtk\commit.py:501
 msgid "commit to merge one head"
 msgstr "integrer for at flette et hoved"
 
-#: tortoisehg\hgtk\commit.py:500
+#: tortoisehg\hgtk\commit.py:504
 msgid "no parent is a head, commit to add a new head"
 msgstr "ingen forælder er et hoved, integrer vil tilføje et nyt hoved"
 
-#: tortoisehg\hgtk\commit.py:604
+#: tortoisehg\hgtk\commit.py:608
 msgid "new branch: "
 msgstr "ny gren: "
 
-#: tortoisehg\hgtk\commit.py:606
+#: tortoisehg\hgtk\commit.py:610
 msgid "close branch: "
 msgstr "luk gren: "
 
-#: tortoisehg\hgtk\commit.py:608
+#: tortoisehg\hgtk\commit.py:612
 msgid "branch: "
 msgstr "gren: "
 
-#: tortoisehg\hgtk\commit.py:627
+#: tortoisehg\hgtk\commit.py:631
 msgid "Merge "
 msgstr "Flet "
 
-#: tortoisehg\hgtk\commit.py:663
+#: tortoisehg\hgtk\commit.py:667
 msgid "Patch Contents"
 msgstr "Indhold af lappeløsning"
 
-#: tortoisehg\hgtk\commit.py:721 tortoisehg\hgtk\commit.py:874
+#: tortoisehg\hgtk\commit.py:725 tortoisehg\hgtk\commit.py:878
 msgid "Nothing Commited"
 msgstr "Intet integreret"
 
-#: tortoisehg\hgtk\commit.py:722
+#: tortoisehg\hgtk\commit.py:726
 msgid "No committable files selected"
 msgstr "Ingen integrerbare filer valgt"
 
-#: tortoisehg\hgtk\commit.py:740
+#: tortoisehg\hgtk\commit.py:744
 msgid "Unable to create "
 msgstr "Kan ikke oprette "
 
-#: tortoisehg\hgtk\commit.py:790
+#: tortoisehg\hgtk\commit.py:794
 msgid "Unable to apply patch"
 msgstr "Kan ikke anvende lap"
 
-#: tortoisehg\hgtk\commit.py:819
+#: tortoisehg\hgtk\commit.py:823
 msgid "Confirm Undo Commit"
 msgstr "Bekræft fortryd integration"
 
-#: tortoisehg\hgtk\commit.py:820
+#: tortoisehg\hgtk\commit.py:824
 msgid "Undo last commit"
 msgstr "Fortryd sidste integration"
 
-#: tortoisehg\hgtk\commit.py:826 tortoisehg\hgtk\commit.py:841
+#: tortoisehg\hgtk\commit.py:830 tortoisehg\hgtk\commit.py:845
 msgid "Undo Commit"
 msgstr "Fortryd integration"
 
-#: tortoisehg\hgtk\commit.py:827
+#: tortoisehg\hgtk\commit.py:831
 msgid ""
 "Unable to undo!\n"
 "\n"
@@ -710,36 +715,36 @@ msgstr ""
 "\n"
 "Spids-revision er ikke sidste integration."
 
-#: tortoisehg\hgtk\commit.py:842
+#: tortoisehg\hgtk\commit.py:846
 msgid "Errors during rollback!"
 msgstr "Fejl under tilbageføring!"
 
-#: tortoisehg\hgtk\commit.py:855
+#: tortoisehg\hgtk\commit.py:859
 msgid "Confirm Add/Remove"
 msgstr "Bekræft tilføj/fjern"
 
-#: tortoisehg\hgtk\commit.py:856
+#: tortoisehg\hgtk\commit.py:860
 msgid "Add/Remove the following files?"
 msgstr "Tilføj/fjern de følgende filer?"
 
-#: tortoisehg\hgtk\commit.py:875 tortoisehg\hgtk\tagadd.py:167
+#: tortoisehg\hgtk\commit.py:879 tortoisehg\hgtk\tagadd.py:167
 msgid "Please enter commit message"
 msgstr "Skriv integrationsbesked"
 
-#: tortoisehg\hgtk\commit.py:883
+#: tortoisehg\hgtk\commit.py:887
 msgid "Error"
 msgstr "Fejl"
 
-#: tortoisehg\hgtk\commit.py:884
+#: tortoisehg\hgtk\commit.py:888
 msgid "Message format configuration error"
 msgstr "Fejl i konfiguration af beskedformat"
 
-#: tortoisehg\hgtk\commit.py:893 tortoisehg\hgtk\commit.py:901
-#: tortoisehg\hgtk\commit.py:913
+#: tortoisehg\hgtk\commit.py:897 tortoisehg\hgtk\commit.py:905
+#: tortoisehg\hgtk\commit.py:917
 msgid "Confirm Commit"
 msgstr "Bekræft integration"
 
-#: tortoisehg\hgtk\commit.py:894
+#: tortoisehg\hgtk\commit.py:898
 msgid ""
 "The summary line length of %i is greater than %i.\n"
 "\n"
@@ -749,7 +754,7 @@ msgstr ""
 "\n"
 "Ignorer formateringspolitik og fortsæt integration?"
 
-#: tortoisehg\hgtk\commit.py:902
+#: tortoisehg\hgtk\commit.py:906
 msgid ""
 "The summary line is not followed by a blank line.\n"
 "\n"
@@ -759,7 +764,7 @@ msgstr ""
 "\n"
 "Ignorer formateringspolitik og fortsæt integration?"
 
-#: tortoisehg\hgtk\commit.py:914
+#: tortoisehg\hgtk\commit.py:918
 msgid ""
 "The following lines are over the %i-character limit: %s.\n"
 "\n"
@@ -769,11 +774,11 @@ msgstr ""
 "\n"
 "Ignorer formateringspolitik og fortsæt integration?"
 
-#: tortoisehg\hgtk\commit.py:926
+#: tortoisehg\hgtk\commit.py:930
 msgid "Commit: Invalid username"
 msgstr "Integrér: Ugyldigt brugernavn"
 
-#: tortoisehg\hgtk\commit.py:927
+#: tortoisehg\hgtk\commit.py:931
 msgid ""
 "Your username has not been configured.\n"
 "\n"
@@ -783,11 +788,11 @@ msgstr ""
 "\n"
 "Indstil brugernavn og prøv igen"
 
-#: tortoisehg\hgtk\commit.py:960
+#: tortoisehg\hgtk\commit.py:964
 msgid "Confirm Override Branch"
 msgstr "Bekræft dobbelt gren"
 
-#: tortoisehg\hgtk\commit.py:961
+#: tortoisehg\hgtk\commit.py:965
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
@@ -795,43 +800,43 @@ msgstr ""
 "Der findes allerede en gren ved navn \"%s\",\n"
 "tilføj nyt gren-hoved?"
 
-#: tortoisehg\hgtk\commit.py:965
+#: tortoisehg\hgtk\commit.py:969
 msgid "Confirm New Branch"
 msgstr "Bekræft ny gren"
 
-#: tortoisehg\hgtk\commit.py:966
+#: tortoisehg\hgtk\commit.py:970
 msgid "Create new named branch \"%s\"?"
 msgstr "Opret en ny gren ved navn \"%s\"?"
 
-#: tortoisehg\hgtk\commit.py:1041
+#: tortoisehg\hgtk\commit.py:1045
 msgid "Paste _Filenames"
 msgstr "Indsæt _Filnavne"
 
-#: tortoisehg\hgtk\commit.py:1042
+#: tortoisehg\hgtk\commit.py:1046
 msgid "App_ly Format"
 msgstr "_Anvend Format"
 
-#: tortoisehg\hgtk\commit.py:1043
+#: tortoisehg\hgtk\commit.py:1047
 msgid "C_onfigure Format"
 msgstr "_Konfigurer Format"
 
-#: tortoisehg\hgtk\commit.py:1069
+#: tortoisehg\hgtk\commit.py:1073
 msgid "Info Required"
 msgstr "Oplysninger mangler"
 
-#: tortoisehg\hgtk\commit.py:1070
+#: tortoisehg\hgtk\commit.py:1074
 msgid "Message format needs to be configured"
 msgstr "Beskedformat skal konfigureres"
 
-#: tortoisehg\hgtk\commit.py:1082 tortoisehg\hgtk\commit.py:1087
+#: tortoisehg\hgtk\commit.py:1086 tortoisehg\hgtk\commit.py:1091
 msgid "Warning"
 msgstr "Advarsel"
 
-#: tortoisehg\hgtk\commit.py:1083
+#: tortoisehg\hgtk\commit.py:1087
 msgid "The summary line length of %i is greater than %i"
 msgstr "Uddragslinjens længde %i er større end %i"
 
-#: tortoisehg\hgtk\commit.py:1088
+#: tortoisehg\hgtk\commit.py:1092
 msgid "The summary line is not followed by a blank line"
 msgstr "Uddragslinjen bliver ikke fulgt af en tom linje"
 
@@ -850,27 +855,23 @@ msgstr "Revision:"
 
 #: tortoisehg\hgtk\csinfo.py:192
 msgid "Summary:"
-msgstr ""
+msgstr "Uddrag:"
 
 #: tortoisehg\hgtk\csinfo.py:193
 msgid "Age:"
 msgstr "Alder:"
 
 #: tortoisehg\hgtk\csinfo.py:193
-msgid "Date:"
-msgstr "Dato:"
-
-#: tortoisehg\hgtk\csinfo.py:193
 msgid "User:"
 msgstr "Bruger:"
 
+#: tortoisehg\hgtk\csinfo.py:193 tortoisehg\hgtk\csinfo.py:194
+msgid "Date:"
+msgstr "Dato:"
+
 #: tortoisehg\hgtk\csinfo.py:194 tortoisehg\hgtk\csinfo.py:195
 msgid "Branch:"
-msgstr ""
-
-#: tortoisehg\hgtk\csinfo.py:194 tortoisehg\hgtk\history.py:1034
-msgid "Date"
-msgstr "Dato"
+msgstr "Gren:"
 
 #: tortoisehg\hgtk\csinfo.py:195 tortoisehg\hgtk\csinfo.py:196
 msgid "Tags:"
@@ -902,7 +903,7 @@ msgstr "Ny søgning"
 msgid "Open new search tab"
 msgstr "Åben nyt faneblad til søgning"
 
-#: tortoisehg\hgtk\datamine.py:73 tortoisehg\hgtk\thgconfig.py:1110
+#: tortoisehg\hgtk\datamine.py:73 tortoisehg\hgtk\thgconfig.py:1112
 msgid "Invalid path"
 msgstr "Ugyldig sti"
 
@@ -915,9 +916,9 @@ msgid "Filename"
 msgstr "Filnavn"
 
 #: tortoisehg\hgtk\datamine.py:131 tortoisehg\hgtk\datamine.py:634
-#: tortoisehg\hgtk\history.py:334 tortoisehg\hgtk\history.py:1034
-#: tortoisehg\hgtk\logview\treeview.py:444 tortoisehg\hgtk\thgconfig.py:192
-#: tortoisehg\hgtk\thgconfig.py:275
+#: tortoisehg\hgtk\history.py:336 tortoisehg\hgtk\history.py:1057
+#: tortoisehg\hgtk\logview\treeview.py:444 tortoisehg\hgtk\thgconfig.py:194
+#: tortoisehg\hgtk\thgconfig.py:277
 msgid "User"
 msgstr "Bruger"
 
@@ -1042,7 +1043,7 @@ msgstr "Ugyldigt regulært udtryk"
 msgid "Error: %s"
 msgstr "Fejl: %s"
 
-#: tortoisehg\hgtk\datamine.py:452 tortoisehg\hgtk\history.py:1305
+#: tortoisehg\hgtk\datamine.py:452 tortoisehg\hgtk\history.py:1339
 msgid "Abort: %s"
 msgstr "Afbrudt: %s"
 
@@ -1078,7 +1079,7 @@ msgstr "TortoiseHg prompt"
 msgid "_Tools"
 msgstr "Værk_tøjer"
 
-#: tortoisehg\hgtk\gdialog.py:470 tortoisehg\hgtk\thgconfig.py:601
+#: tortoisehg\hgtk\gdialog.py:470 tortoisehg\hgtk\thgconfig.py:603
 msgid "Changelog"
 msgstr "Ændringslog"
 
@@ -1098,9 +1099,9 @@ msgstr "Tjene"
 #: tortoisehg\hgtk\thgshelve.py:71 tortoisehg\hgtk\thgshelve.py:139
 #: tortoisehg\hgtk\thgshelve.py:145 tortoisehg\hgtk\thgshelve.py:153
 msgid "Shelve"
-msgstr "Sylt"
+msgstr "Hylden"
 
-#: tortoisehg\hgtk\gdialog.py:482 tortoisehg\hgtk\history.py:113
+#: tortoisehg\hgtk\gdialog.py:482 tortoisehg\hgtk\history.py:114
 #: tortoisehg\util\menuthg.py:71
 msgid "Synchronize"
 msgstr "Synkroniser"
@@ -1137,11 +1138,11 @@ msgstr "laver øjebliksbillede af %d filer fra rev %s\n"
 msgid "edit failed"
 msgstr "redigering fejlede"
 
-#: tortoisehg\hgtk\gdialog.py:684 tortoisehg\hgtk\thgconfig.py:684
+#: tortoisehg\hgtk\gdialog.py:684 tortoisehg\hgtk\thgconfig.py:686
 msgid "No visual editor configured"
 msgstr "Ingen visuel editor konfigureret"
 
-#: tortoisehg\hgtk\gdialog.py:685 tortoisehg\hgtk\thgconfig.py:685
+#: tortoisehg\hgtk\gdialog.py:685 tortoisehg\hgtk\thgconfig.py:687
 msgid "Please configure a visual editor."
 msgstr "Vælg en visuel editor."
 
@@ -1169,11 +1170,21 @@ msgstr "Gem fil"
 msgid "All files"
 msgstr "Alle filer"
 
-#: tortoisehg\hgtk\gtklib.py:240
+#: tortoisehg\hgtk\gtklib.py:244
+msgid ""
+"The file \"%s\" already exists!\n"
+"\n"
+"Do you want to overwrite it?"
+msgstr ""
+"Filen \"%s\" findes allerede!\n"
+"\n"
+"Vil du overskrive den?"
+
+#: tortoisehg\hgtk\gtklib.py:255
 msgid "Select Folder"
 msgstr "Vælg mappe"
 
-#: tortoisehg\hgtk\gtklib.py:627
+#: tortoisehg\hgtk\gtklib.py:642
 msgid ""
 "Select language for spell checking.\n"
 "\n"
@@ -1191,11 +1202,11 @@ msgstr ""
 "\n"
 "eksempler: da, en, en_GB, en_US"
 
-#: tortoisehg\hgtk\gtklib.py:633
+#: tortoisehg\hgtk\gtklib.py:648
 msgid "Lang \"%s\" can not be set.\n"
 msgstr "Sprog \"%s\" kan ikke aktiveres.\n"
 
-#: tortoisehg\hgtk\gtklib.py:646 tortoisehg\hgtk\thgconfig.py:589
+#: tortoisehg\hgtk\gtklib.py:661 tortoisehg\hgtk\thgconfig.py:591
 msgid "Spell Check Language"
 msgstr "Stavekontrolsprog"
 
@@ -1449,7 +1460,7 @@ msgid ""
 "N] subject.  It should describe the effects of the entire patch series.  "
 "When emailing a bundle, these fields make up the message subject and body. "
 "Flags is a comma separated list of tags which are inserted into the message "
-"header."
+"subject prefix."
 msgstr ""
 
 #: tortoisehg\hgtk\hgemail.py:293 tortoisehg\hgtk\hgemail.py:298
@@ -1583,19 +1594,19 @@ msgstr ""
 "\n"
 "Fangede tastaturafbrydelse, afbryder.\n"
 
-#: tortoisehg\hgtk\hgtk.py:109
+#: tortoisehg\hgtk\hgtk.py:110
 msgid "can not read file \"%s\". Ignored.\n"
 msgstr "kan ikke læse filen \"%s\". Ignoreret.\n"
 
-#: tortoisehg\hgtk\hgtk.py:188
+#: tortoisehg\hgtk\hgtk.py:189
 msgid "hgtk %s: %s\n"
 msgstr "hgtk %s: %s\n"
 
-#: tortoisehg\hgtk\hgtk.py:191
+#: tortoisehg\hgtk\hgtk.py:192
 msgid "hgtk: %s\n"
 msgstr "hgtk: %s\n"
 
-#: tortoisehg\hgtk\hgtk.py:194
+#: tortoisehg\hgtk\hgtk.py:195
 msgid ""
 "hgtk: command '%s' is ambiguous:\n"
 "    %s\n"
@@ -1603,54 +1614,54 @@ msgstr ""
 "hgtk: kommando '%s' er tvetydig:\n"
 "    %s\n"
 
-#: tortoisehg\hgtk\hgtk.py:197
+#: tortoisehg\hgtk\hgtk.py:198
 msgid "hgtk: unknown command '%s'\n"
 msgstr "hgtk: ukendt kommando '%s'\n"
 
-#: tortoisehg\hgtk\hgtk.py:200
+#: tortoisehg\hgtk\hgtk.py:201
 msgid "abort: %s!\n"
 msgstr "afbrudt: %s!\n"
 
-#: tortoisehg\hgtk\hgtk.py:245 tortoisehg\hgtk\hgtk.py:393
+#: tortoisehg\hgtk\hgtk.py:256 tortoisehg\hgtk\hgtk.py:404
 msgid "There is no Mercurial repository here (.hg not found)"
 msgstr "Der er intet Mercurial depot her (.hg ikke fundet)"
 
-#: tortoisehg\hgtk\hgtk.py:255
+#: tortoisehg\hgtk\hgtk.py:266
 msgid "invalid arguments"
 msgstr "ugyldige parametre"
 
-#: tortoisehg\hgtk\hgtk.py:333
+#: tortoisehg\hgtk\hgtk.py:344
 msgid "Rename error"
 msgstr "Omdøbningsfejl"
 
-#: tortoisehg\hgtk\hgtk.py:334
+#: tortoisehg\hgtk\hgtk.py:345
 msgid "rename takes one or two path arguments"
 msgstr "rename skal have et eller to argumenter"
 
-#: tortoisehg\hgtk\hgtk.py:444
+#: tortoisehg\hgtk\hgtk.py:455
 msgid "global options:"
 msgstr "globale indstillinger:"
 
-#: tortoisehg\hgtk\hgtk.py:446
+#: tortoisehg\hgtk\hgtk.py:457
 msgid "use \"hgtk help\" for the full list of commands"
 msgstr "skriv \"hgtk help\" for at få den fulde liste af kommandoer"
 
-#: tortoisehg\hgtk\hgtk.py:450
+#: tortoisehg\hgtk\hgtk.py:461
 msgid ""
 "use \"hgtk help\" for the full list of commands or \"hgtk -v\" for details"
 msgstr ""
 "skriv \"hgtk help\" for den fulde liste af kommandoer, eller \"hgtk -v\" for "
 "detaljer"
 
-#: tortoisehg\hgtk\hgtk.py:453
+#: tortoisehg\hgtk\hgtk.py:464
 msgid "use \"hgtk -v help%s\" to show aliases and global options"
 msgstr "skriv \"hgtk -v help%s\" for at vise aliaser og globale optioner"
 
-#: tortoisehg\hgtk\hgtk.py:456
+#: tortoisehg\hgtk\hgtk.py:467
 msgid "use \"hgtk -v help %s\" to show global options"
 msgstr "skriv \"hgtk -v help %s\" for at vise globale optioner"
 
-#: tortoisehg\hgtk\hgtk.py:468 tortoisehg\hgtk\hgtk.py:570
+#: tortoisehg\hgtk\hgtk.py:479 tortoisehg\hgtk\hgtk.py:581
 msgid ""
 "list of commands:\n"
 "\n"
@@ -1658,7 +1669,7 @@ msgstr ""
 "liste af kommandoer:\n"
 "\n"
 
-#: tortoisehg\hgtk\hgtk.py:476
+#: tortoisehg\hgtk\hgtk.py:487
 msgid ""
 "\n"
 "aliases: %s\n"
@@ -1666,24 +1677,24 @@ msgstr ""
 "\n"
 "aliasser: %s\n"
 
-#: tortoisehg\hgtk\hgtk.py:481 tortoisehg\hgtk\hgtk.py:507
-#: tortoisehg\hgtk\hgtk.py:539
+#: tortoisehg\hgtk\hgtk.py:492 tortoisehg\hgtk\hgtk.py:518
+#: tortoisehg\hgtk\hgtk.py:550
 msgid "(No help text available)"
 msgstr "(Ingen hjælpetekst)"
 
-#: tortoisehg\hgtk\hgtk.py:489
+#: tortoisehg\hgtk\hgtk.py:500
 msgid "options:\n"
 msgstr "indstillinger:\n"
 
-#: tortoisehg\hgtk\hgtk.py:512
+#: tortoisehg\hgtk\hgtk.py:523
 msgid "no commands defined\n"
 msgstr "ingen kommandoer defineret\n"
 
-#: tortoisehg\hgtk\hgtk.py:563
+#: tortoisehg\hgtk\hgtk.py:574
 msgid "Hgtk - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
 msgstr "Hgtk - TortoiseHg's GUI værktøj for Mercurial (Hg)\n"
 
-#: tortoisehg\hgtk\hgtk.py:568
+#: tortoisehg\hgtk\hgtk.py:579
 msgid ""
 "basic commands:\n"
 "\n"
@@ -1691,219 +1702,223 @@ msgstr ""
 "basale kommandoer:\n"
 "\n"
 
-#: tortoisehg\hgtk\hgtk.py:584
+#: tortoisehg\hgtk\hgtk.py:595
 msgid " (default: %s)"
 msgstr " (default: %s)"
 
-#: tortoisehg\hgtk\hgtk.py:597
+#: tortoisehg\hgtk\hgtk.py:608
 msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
 msgstr "TortoiseHg Dialoger (version %s), Mercurial (version %s)\n"
 
-#: tortoisehg\hgtk\hgtk.py:631
+#: tortoisehg\hgtk\hgtk.py:642
 msgid "repository root directory or symbolic path name"
 msgstr "depotrodfolder eller symbolsk stinavn"
 
-#: tortoisehg\hgtk\hgtk.py:632
+#: tortoisehg\hgtk\hgtk.py:643
 msgid "enable additional output"
 msgstr "aktiver yderlig output"
 
-#: tortoisehg\hgtk\hgtk.py:633
+#: tortoisehg\hgtk\hgtk.py:644
 msgid "suppress output"
 msgstr "undertryk output"
 
-#: tortoisehg\hgtk\hgtk.py:634
+#: tortoisehg\hgtk\hgtk.py:645
 msgid "display help and exit"
 msgstr "vis hjælp og exit"
 
-#: tortoisehg\hgtk\hgtk.py:635
+#: tortoisehg\hgtk\hgtk.py:646
 msgid "start debugger"
 msgstr "start debugger"
 
-#: tortoisehg\hgtk\hgtk.py:636
+#: tortoisehg\hgtk\hgtk.py:647
 msgid "do not fork GUI process"
 msgstr "undlad at forgrene GUI process"
 
-#: tortoisehg\hgtk\hgtk.py:637
+#: tortoisehg\hgtk\hgtk.py:648
+msgid "always fork GUI process"
+msgstr "forgren altid GUI proces"
+
+#: tortoisehg\hgtk\hgtk.py:649
 msgid "read file list from file"
 msgstr "læs fil-liste fra fil"
 
-#: tortoisehg\hgtk\hgtk.py:641
+#: tortoisehg\hgtk\hgtk.py:653
 msgid "hgtk about"
 msgstr "hgtk about"
 
-#: tortoisehg\hgtk\hgtk.py:642
+#: tortoisehg\hgtk\hgtk.py:654
 msgid "hgtk add [FILE]..."
 msgstr "hgtk add [FILE]..."
 
-#: tortoisehg\hgtk\hgtk.py:643
+#: tortoisehg\hgtk\hgtk.py:655
 msgid "hgtk clone SOURCE [DEST]"
 msgstr "hgtk clone SOURCE [DEST]"
 
-#: tortoisehg\hgtk\hgtk.py:645
+#: tortoisehg\hgtk\hgtk.py:657
 msgid "record user as committer"
 msgstr "noter bruger som integrator"
 
-#: tortoisehg\hgtk\hgtk.py:646
+#: tortoisehg\hgtk\hgtk.py:658
 msgid "record datecode as commit date"
 msgstr "noter dato som integrationsdato"
 
-#: tortoisehg\hgtk\hgtk.py:647
+#: tortoisehg\hgtk\hgtk.py:659
 msgid "hgtk commit [OPTIONS] [FILE]..."
 msgstr "hgtk commit [OPTIONS] [FILE]..."
 
-#: tortoisehg\hgtk\hgtk.py:648
+#: tortoisehg\hgtk\hgtk.py:660
 msgid "hgtk datamine"
 msgstr "hgtk datamine"
 
-#: tortoisehg\hgtk\hgtk.py:649
+#: tortoisehg\hgtk\hgtk.py:661
 msgid "hgtk hgignore [FILE]"
 msgstr "hgtk hgignore [FILE]"
 
-#: tortoisehg\hgtk\hgtk.py:650
+#: tortoisehg\hgtk\hgtk.py:662
 msgid "hgtk init [DEST]"
 msgstr "hgtk init [DEST]"
 
-#: tortoisehg\hgtk\hgtk.py:652
+#: tortoisehg\hgtk\hgtk.py:664
 msgid "limit number of changes displayed"
 msgstr "begræns antaln viste ændringer"
 
-#: tortoisehg\hgtk\hgtk.py:653
+#: tortoisehg\hgtk\hgtk.py:665
 msgid "hgtk log [OPTIONS] [FILE]"
 msgstr "hgtk log [FLAG] [FIL]"
 
-#: tortoisehg\hgtk\hgtk.py:655
+#: tortoisehg\hgtk\hgtk.py:667
 msgid "revision to merge with"
 msgstr "revision at flette med"
 
-#: tortoisehg\hgtk\hgtk.py:656
+#: tortoisehg\hgtk\hgtk.py:668
 msgid "hgtk merge"
 msgstr "hgtk merge"
 
-#: tortoisehg\hgtk\hgtk.py:657
+#: tortoisehg\hgtk\hgtk.py:669
 msgid "hgtk recovery"
 msgstr "hgtk recovery"
 
-#: tortoisehg\hgtk\hgtk.py:658
+#: tortoisehg\hgtk\hgtk.py:670
 msgid "hgtk shelve"
 msgstr "hgtk shelve"
 
-#: tortoisehg\hgtk\hgtk.py:659
+#: tortoisehg\hgtk\hgtk.py:671
 msgid "hgtk synch"
 msgstr "hgtk synch"
 
-#: tortoisehg\hgtk\hgtk.py:661
+#: tortoisehg\hgtk\hgtk.py:673
 msgid "revisions to compare"
 msgstr "revisioner til sammenligning"
 
-#: tortoisehg\hgtk\hgtk.py:662
+#: tortoisehg\hgtk\hgtk.py:674
 msgid "hgtk status [FILE]..."
 msgstr "hgtk status [FILER]..."
 
-#: tortoisehg\hgtk\hgtk.py:664 tortoisehg\hgtk\hgtk.py:667
+#: tortoisehg\hgtk\hgtk.py:676 tortoisehg\hgtk\hgtk.py:679
 msgid "field to give initial focus"
 msgstr "felt som gives indledende fokus"
 
-#: tortoisehg\hgtk\hgtk.py:665
+#: tortoisehg\hgtk\hgtk.py:677
 msgid "hgtk userconfig"
 msgstr "hgtk userconfig"
 
-#: tortoisehg\hgtk\hgtk.py:668
+#: tortoisehg\hgtk\hgtk.py:680
 msgid "hgtk repoconfig"
 msgstr "hgtk repoconfig"
 
-#: tortoisehg\hgtk\hgtk.py:669
+#: tortoisehg\hgtk\hgtk.py:681
 msgid "hgtk guess"
 msgstr "hgtk guess"
 
-#: tortoisehg\hgtk\hgtk.py:670
+#: tortoisehg\hgtk\hgtk.py:682
 msgid "hgtk remove [FILE]..."
 msgstr "hgtk remove [FILER]..."
 
-#: tortoisehg\hgtk\hgtk.py:671
+#: tortoisehg\hgtk\hgtk.py:683
 msgid "hgtk rename SOURCE [DEST]"
 msgstr "hgtk rename KILDE [MÅL]"
 
-#: tortoisehg\hgtk\hgtk.py:672
+#: tortoisehg\hgtk\hgtk.py:684
 msgid "hgtk revert [FILE]..."
 msgstr "hgtk revert [FILER]..."
 
-#: tortoisehg\hgtk\hgtk.py:673
+#: tortoisehg\hgtk\hgtk.py:685
 msgid "hgtk forget [FILE]..."
 msgstr "hgtk forget [FILER]..."
 
-#: tortoisehg\hgtk\hgtk.py:676
+#: tortoisehg\hgtk\hgtk.py:688
 msgid "name of the webdir config file"
 msgstr "navn af webdir konfigurationsfil"
 
-#: tortoisehg\hgtk\hgtk.py:677
+#: tortoisehg\hgtk\hgtk.py:689
 msgid "hgtk serve [OPTION]..."
 msgstr "hgtk serve [FLAG]..."
 
-#: tortoisehg\hgtk\hgtk.py:679
+#: tortoisehg\hgtk\hgtk.py:691
 msgid "wait until the second ticks over"
 msgstr "vent indtil næste sekund"
 
-#: tortoisehg\hgtk\hgtk.py:680
+#: tortoisehg\hgtk\hgtk.py:692
 msgid "notify the shell for paths given"
 msgstr ""
 
-#: tortoisehg\hgtk\hgtk.py:681
+#: tortoisehg\hgtk\hgtk.py:693
 msgid "remove the status cache"
 msgstr "fjern status cache"
 
-#: tortoisehg\hgtk\hgtk.py:682
+#: tortoisehg\hgtk\hgtk.py:694
 msgid "show the contents of the status cache (no update)"
 msgstr "vis indholdet af status cache (ingen updatering)"
 
-#: tortoisehg\hgtk\hgtk.py:684
+#: tortoisehg\hgtk\hgtk.py:696
 msgid "udpate all repos in current dir"
 msgstr "opdater alle depoter i aktuel folder"
 
-#: tortoisehg\hgtk\hgtk.py:685
+#: tortoisehg\hgtk\hgtk.py:697
 msgid "hgtk thgstatus [OPTION]"
 msgstr "hgtk thgstatus [FLAG]"
 
-#: tortoisehg\hgtk\hgtk.py:687 tortoisehg\hgtk\hgtk.py:703
+#: tortoisehg\hgtk\hgtk.py:699 tortoisehg\hgtk\hgtk.py:715
 msgid "revision to update"
 msgstr "valge revision"
 
-#: tortoisehg\hgtk\hgtk.py:690
+#: tortoisehg\hgtk\hgtk.py:702
 msgid "changeset to view in diff tool"
 msgstr "ændring at vise i diff-værktøj"
 
-#: tortoisehg\hgtk\hgtk.py:691
+#: tortoisehg\hgtk\hgtk.py:703
 msgid "revisions to view in diff tool"
 msgstr "revisioner at vise i diff-værktøj"
 
-#: tortoisehg\hgtk\hgtk.py:692
+#: tortoisehg\hgtk\hgtk.py:704
 msgid "bundle file to preview"
 msgstr ""
 
-#: tortoisehg\hgtk\hgtk.py:693
+#: tortoisehg\hgtk\hgtk.py:705
 msgid "directly use raw extdiff command"
 msgstr "bruger extdiff kommando direkte"
 
-#: tortoisehg\hgtk\hgtk.py:694
+#: tortoisehg\hgtk\hgtk.py:706
 msgid "launch visual diff tool"
 msgstr "start visuelt diff-værktøj"
 
-#: tortoisehg\hgtk\hgtk.py:696
+#: tortoisehg\hgtk\hgtk.py:708
 msgid "print license"
 msgstr "udskriv licens"
 
-#: tortoisehg\hgtk\hgtk.py:697
+#: tortoisehg\hgtk\hgtk.py:709
 msgid "hgtk version [OPTION]"
 msgstr "hgtk version [FLAG]"
 
-#: tortoisehg\hgtk\hgtk.py:699
+#: tortoisehg\hgtk\hgtk.py:711
 msgid "show the command options"
 msgstr "vis kommando-flag"
 
-#: tortoisehg\hgtk\hgtk.py:700
+#: tortoisehg\hgtk\hgtk.py:712
 msgid "[-o] CMD"
 msgstr "[-o] KOMMANDO"
 
-#: tortoisehg\hgtk\hgtk.py:701
+#: tortoisehg\hgtk\hgtk.py:713
 msgid "hgtk help [COMMAND]"
 msgstr "hgtk help [KOMMANDO]"
 
@@ -1923,508 +1938,577 @@ msgstr "Flyt op"
 msgid "Move Down"
 msgstr "Flyt ned"
 
-#: tortoisehg\hgtk\history.py:74
+#: tortoisehg\hgtk\history.py:75
 msgid ""
 "New changesets from the preview bundle are still pending.\n"
 "\n"
 "Accept or reject the new changesets?"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:77
+#: tortoisehg\hgtk\history.py:78
 msgid "Accept new Changesets"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:80
+#: tortoisehg\hgtk\history.py:81
 msgid "&Accept"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:80
+#: tortoisehg\hgtk\history.py:81
 msgid "&Reject"
-msgstr ""
+msgstr "&Afslå"
 
-#: tortoisehg\hgtk\history.py:90
+#: tortoisehg\hgtk\history.py:91
 msgid "%s - changelog"
-msgstr ""
+msgstr "%s - ændringslog"
 
-#: tortoisehg\hgtk\history.py:92
+#: tortoisehg\hgtk\history.py:93
 msgid " (Bundle Preview)"
-msgstr ""
+msgstr " (Bundt forhåndsvisning)"
 
-#: tortoisehg\hgtk\history.py:108 tortoisehg\hgtk\status.py:177
+#: tortoisehg\hgtk\history.py:109 tortoisehg\hgtk\status.py:177
 msgid "Re_fresh"
 msgstr "_Opdater"
 
-#: tortoisehg\hgtk\history.py:110
+#: tortoisehg\hgtk\history.py:111
 msgid "Reload revision history"
 msgstr "Hent revisionshistorien igen"
 
-#: tortoisehg\hgtk\history.py:115
+#: tortoisehg\hgtk\history.py:116
 msgid "Launch synchronize tool"
 msgstr "Start synkroniserings-værktøjet"
 
-#: tortoisehg\hgtk\history.py:120 tortoisehg\hgtk\history.py:168
+#: tortoisehg\hgtk\history.py:121 tortoisehg\hgtk\history.py:170
 msgid "Patch Queue"
 msgstr "lap-kø"
 
-#: tortoisehg\hgtk\history.py:122
+#: tortoisehg\hgtk\history.py:123
 msgid "Show/Hide Patch Queue"
 msgstr "vis/skjul lap-kø"
 
-#: tortoisehg\hgtk\history.py:164
+#: tortoisehg\hgtk\history.py:166
 msgid "Sync Bar"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:174
+#: tortoisehg\hgtk\history.py:176
 msgid "Load more Revisions"
 msgstr "Hent flere revisioner"
 
-#: tortoisehg\hgtk\history.py:176
+#: tortoisehg\hgtk\history.py:178
 msgid "Load all Revisions"
 msgstr "Hent alle revisioner"
 
-#: tortoisehg\hgtk\history.py:179
+#: tortoisehg\hgtk\history.py:181
 msgid "Toolbar"
 msgstr "Værktøjslinje"
 
-#: tortoisehg\hgtk\history.py:182
+#: tortoisehg\hgtk\history.py:184
 msgid "Filter Bar"
 msgstr "Bjælkefilter"
 
-#: tortoisehg\hgtk\history.py:188
+#: tortoisehg\hgtk\history.py:190
 msgid "Reset Marks"
 msgstr "Nulstil mærker"
 
-#: tortoisehg\hgtk\history.py:191
+#: tortoisehg\hgtk\history.py:193
 msgid "Choose Details..."
 msgstr "Vælg Detaljer..."
 
 #: tortoisehg\hgtk\history.py:195
+msgid "Compact Graph"
+msgstr "Kompakt Graf"
+
+#: tortoisehg\hgtk\history.py:197
 msgid "Color by Branch"
 msgstr "Farvelæg ud fra gren"
 
-#: tortoisehg\hgtk\history.py:198
+#: tortoisehg\hgtk\history.py:200
 msgid "Ignore Max Diff Size"
 msgstr "Ignorer maks diff størrelse"
 
-#: tortoisehg\hgtk\history.py:202
+#: tortoisehg\hgtk\history.py:204
 msgid "_Navigate"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:203
+#: tortoisehg\hgtk\history.py:205
 msgid "Tip"
 msgstr "Tip"
 
-#: tortoisehg\hgtk\history.py:204
+#: tortoisehg\hgtk\history.py:206
 msgid "Working Parent"
 msgstr "Arbejdende Forælder"
 
-#: tortoisehg\hgtk\history.py:206
+#: tortoisehg\hgtk\history.py:208
 msgid "Revision..."
 msgstr "Revision..."
 
-#: tortoisehg\hgtk\history.py:209
+#: tortoisehg\hgtk\history.py:211
 msgid "_Synchronize"
-msgstr ""
+msgstr "_Synkronisér"
 
-#: tortoisehg\hgtk\history.py:210 tortoisehg\hgtk\synch.py:63
+#: tortoisehg\hgtk\history.py:212 tortoisehg\hgtk\synch.py:63
 msgid "Incoming"
 msgstr "Indgående"
 
-#: tortoisehg\hgtk\history.py:212
+#: tortoisehg\hgtk\history.py:214
 msgid "Pull"
 msgstr "Træk"
 
-#: tortoisehg\hgtk\history.py:214 tortoisehg\hgtk\synch.py:74
+#: tortoisehg\hgtk\history.py:216 tortoisehg\hgtk\synch.py:74
 msgid "Outgoing"
 msgstr "Udgående"
 
-#: tortoisehg\hgtk\history.py:216 tortoisehg\hgtk\synch.py:79
+#: tortoisehg\hgtk\history.py:218 tortoisehg\hgtk\synch.py:79
 msgid "Push"
 msgstr "Skub"
 
-#: tortoisehg\hgtk\history.py:218
+#: tortoisehg\hgtk\history.py:220
 msgid "Email..."
 msgstr "E-mail..."
 
-#: tortoisehg\hgtk\history.py:221
+#: tortoisehg\hgtk\history.py:223
 msgid "Add Bundle..."
 msgstr "Tilføj bundt..."
 
-#: tortoisehg\hgtk\history.py:224
+#: tortoisehg\hgtk\history.py:226
 msgid "Accept Bundle"
 msgstr "Acepter bundt"
 
-#: tortoisehg\hgtk\history.py:227
+#: tortoisehg\hgtk\history.py:229
 msgid "Reject Bundle"
 msgstr "Afvis bundt"
 
-#: tortoisehg\hgtk\history.py:233
+#: tortoisehg\hgtk\history.py:235
 msgid "Force push"
 msgstr "Tving skub"
 
-#: tortoisehg\hgtk\history.py:323 tortoisehg\hgtk\logview\treeview.py:381
+#: tortoisehg\hgtk\history.py:325 tortoisehg\hgtk\logview\treeview.py:381
 msgid "Graph"
 msgstr "Graf"
 
-#: tortoisehg\hgtk\history.py:330
+#: tortoisehg\hgtk\history.py:332
 msgid "Revision Number"
 msgstr "Revisionsnummer"
 
-#: tortoisehg\hgtk\history.py:331
+#: tortoisehg\hgtk\history.py:333
 msgid "Changeset ID"
 msgstr "Ændringssæt ID"
 
-#: tortoisehg\hgtk\history.py:332
+#: tortoisehg\hgtk\history.py:334
 msgid "Branch Name"
 msgstr "Gren Navn"
 
-#: tortoisehg\hgtk\history.py:333 tortoisehg\hgtk\logview\treeview.py:433
+#: tortoisehg\hgtk\history.py:335 tortoisehg\hgtk\logview\treeview.py:433
 #: tortoisehg\hgtk\thgmq.py:187
 msgid "Summary"
 msgstr "Uddrag"
 
-#: tortoisehg\hgtk\history.py:335 tortoisehg\hgtk\logview\treeview.py:455
+#: tortoisehg\hgtk\history.py:337 tortoisehg\hgtk\logview\treeview.py:455
 msgid "Local Date"
 msgstr "Lokal dato"
 
-#: tortoisehg\hgtk\history.py:336
+#: tortoisehg\hgtk\history.py:338
 msgid "UTC Date"
 msgstr "UTC Dato"
 
-#: tortoisehg\hgtk\history.py:337 tortoisehg\hgtk\logview\treeview.py:479
+#: tortoisehg\hgtk\history.py:339 tortoisehg\hgtk\logview\treeview.py:479
 msgid "Age"
 msgstr "Alder"
 
-#: tortoisehg\hgtk\history.py:338 tortoisehg\hgtk\logview\treeview.py:491
+#: tortoisehg\hgtk\history.py:340 tortoisehg\hgtk\logview\treeview.py:491
 msgid "Tags"
 msgstr "Mærkater"
 
-#: tortoisehg\hgtk\history.py:387
+#: tortoisehg\hgtk\history.py:389
 msgid "Invalid revision range"
 msgstr "Ugyldigt revisionsinterval"
 
-#: tortoisehg\hgtk\history.py:399
+#: tortoisehg\hgtk\history.py:401
 msgid "Invalid date specification"
 msgstr "Ugyldig datospecifikation"
 
-#: tortoisehg\hgtk\history.py:634
+#: tortoisehg\hgtk\history.py:641
 msgid "Filter"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:639
+#: tortoisehg\hgtk\history.py:646
 msgid "%s branch"
 msgstr "%s grenen"
 
-#: tortoisehg\hgtk\history.py:640
+#: tortoisehg\hgtk\history.py:647
 msgid "Branch '%s'"
 msgstr "Gren '%s'"
 
-#: tortoisehg\hgtk\history.py:646
+#: tortoisehg\hgtk\history.py:653
 msgid "file history: "
 msgstr "filhistorik: "
 
-#: tortoisehg\hgtk\history.py:650
+#: tortoisehg\hgtk\history.py:657
 msgid "custom filter"
 msgstr "tilpasset filter"
 
-#: tortoisehg\hgtk\history.py:658
+#: tortoisehg\hgtk\history.py:665
 msgid "merges"
 msgstr "fletninger"
 
-#: tortoisehg\hgtk\history.py:661
+#: tortoisehg\hgtk\history.py:668
 msgid "only Merges"
 msgstr "kun fletninger"
 
-#: tortoisehg\hgtk\history.py:663
+#: tortoisehg\hgtk\history.py:670
 msgid "revision ancestry"
 msgstr "revision-forfædre"
 
-#: tortoisehg\hgtk\history.py:668
+#: tortoisehg\hgtk\history.py:675
 msgid "Ancestry of %s"
 msgstr "Forfædre til %s"
 
-#: tortoisehg\hgtk\history.py:670
+#: tortoisehg\hgtk\history.py:677
 msgid "tagged revisions"
 msgstr "revisioner med mærkat"
 
-#: tortoisehg\hgtk\history.py:678
+#: tortoisehg\hgtk\history.py:685
 msgid "Tagged Revisions"
 msgstr "Revisioner med mærkater"
 
-#: tortoisehg\hgtk\history.py:680
+#: tortoisehg\hgtk\history.py:687
 msgid "working parents"
 msgstr "forældre til arbejdskatalog"
 
-#: tortoisehg\hgtk\history.py:686
+#: tortoisehg\hgtk\history.py:693
 msgid "heads"
 msgstr "hoveder"
 
-#: tortoisehg\hgtk\history.py:690 tortoisehg\hgtk\history.py:1001
+#: tortoisehg\hgtk\history.py:697 tortoisehg\hgtk\history.py:1018
 msgid "Heads"
 msgstr "Hoveder"
 
-#: tortoisehg\hgtk\history.py:692
+#: tortoisehg\hgtk\history.py:699
 msgid "no Merges"
 msgstr "ingen fletninger"
 
-#: tortoisehg\hgtk\history.py:710
+#: tortoisehg\hgtk\history.py:717
 msgid "Visualize Change"
-msgstr ""
+msgstr "Visualiser ændringer"
 
-#: tortoisehg\hgtk\history.py:711
+#: tortoisehg\hgtk\history.py:718
 msgid "Di_splay Change"
-msgstr ""
+msgstr "_Vis ændring"
 
-#: tortoisehg\hgtk\history.py:712
+#: tortoisehg\hgtk\history.py:719
 msgid "Diff to local"
 msgstr "Diff til lokal"
 
-#: tortoisehg\hgtk\history.py:714
+#: tortoisehg\hgtk\history.py:721
 msgid "_Copy hash"
-msgstr ""
+msgstr "_Kopier hash"
 
-#: tortoisehg\hgtk\history.py:718
+#: tortoisehg\hgtk\history.py:725
 msgid "Pull to here"
 msgstr "Træk her"
 
-#: tortoisehg\hgtk\history.py:725
+#: tortoisehg\hgtk\history.py:732
 msgid "Push to here"
 msgstr "Skub der"
 
-#: tortoisehg\hgtk\history.py:727
+#: tortoisehg\hgtk\history.py:734
 msgid "_Update..."
-msgstr ""
+msgstr "_Opdater..."
 
-#: tortoisehg\hgtk\history.py:728 tortoisehg\hgtk\history.py:812
+#: tortoisehg\hgtk\history.py:735 tortoisehg\hgtk\history.py:819
 msgid "_Merge with..."
-msgstr ""
+msgstr "_Flet med..."
 
-#: tortoisehg\hgtk\history.py:731
+#: tortoisehg\hgtk\history.py:738
 msgid "_Export Patch..."
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:732
-msgid "E_mail Patch..."
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:733
-msgid "_Bundle rev:tip..."
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:735
-msgid "Add/Remove _Tag..."
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:736
-msgid "Backout Revision..."
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:738 tortoisehg\hgtk\status.py:1509
-msgid "_Revert"
-msgstr ""
+msgstr "_Eksporter lap..."
 
 #: tortoisehg\hgtk\history.py:739
+msgid "E_mail Patch..."
+msgstr "E_mail lap..."
+
+#: tortoisehg\hgtk\history.py:740
+msgid "_Bundle rev:tip..."
+msgstr "_Bundt rev:tip..."
+
+#: tortoisehg\hgtk\history.py:742
+msgid "Add/Remove _Tag..."
+msgstr "Tilføj/fjern _Mærkat"
+
+#: tortoisehg\hgtk\history.py:743
+msgid "Backout Revision..."
+msgstr "Omgør revision..."
+
+#: tortoisehg\hgtk\history.py:745 tortoisehg\hgtk\status.py:1510
+msgid "_Revert"
+msgstr "_Tilbagefør"
+
+#: tortoisehg\hgtk\history.py:746
 msgid "_Archive..."
-msgstr ""
+msgstr "_Arkivér..."
 
-#: tortoisehg\hgtk\history.py:757
+#: tortoisehg\hgtk\history.py:764
 msgid "Transp_lant to local"
-msgstr ""
+msgstr "Transp_lantér til lokal"
 
-#: tortoisehg\hgtk\history.py:762
+#: tortoisehg\hgtk\history.py:769
 msgid "qimport"
 msgstr "qimport"
 
-#: tortoisehg\hgtk\history.py:763
+#: tortoisehg\hgtk\history.py:770
 msgid "Strip Revision..."
 msgstr "Fjern revision..."
 
-#: tortoisehg\hgtk\history.py:795
+#: tortoisehg\hgtk\history.py:802
 msgid "_Diff with selected"
-msgstr ""
+msgstr "_Diff med markerede"
 
-#: tortoisehg\hgtk\history.py:796
+#: tortoisehg\hgtk\history.py:803
 msgid "Visual Diff with selected"
-msgstr ""
+msgstr "Visuel Diff med markerede"
 
-#: tortoisehg\hgtk\history.py:805
+#: tortoisehg\hgtk\history.py:812
 msgid "Email from here to selected..."
-msgstr ""
+msgstr "Email herfra til markerede..."
 
-#: tortoisehg\hgtk\history.py:807
+#: tortoisehg\hgtk\history.py:814
 msgid "Bundle from here to selected..."
-msgstr ""
+msgstr "Bundt herfra til markerede..."
 
-#: tortoisehg\hgtk\history.py:809
+#: tortoisehg\hgtk\history.py:816
 msgid "Export Patches from here to selected..."
-msgstr ""
+msgstr "Eksporter lapper herfra til markerede..."
 
-#: tortoisehg\hgtk\history.py:828
+#: tortoisehg\hgtk\history.py:835
 msgid "Transplant Revision range to local"
-msgstr ""
+msgstr "Transplanter revisions-interval til lokal"
 
-#: tortoisehg\hgtk\history.py:833
+#: tortoisehg\hgtk\history.py:840
 msgid "Rebase on top of selected"
-msgstr ""
+msgstr "Rebase efter markeret"
 
-#: tortoisehg\hgtk\history.py:838
+#: tortoisehg\hgtk\history.py:845
 msgid "qimport from here to selected"
 msgstr "qimport fra her til valgte"
 
-#: tortoisehg\hgtk\history.py:869
+#: tortoisehg\hgtk\history.py:876
 msgid "Load more"
 msgstr "Indlæs mere"
 
-#: tortoisehg\hgtk\history.py:869
+#: tortoisehg\hgtk\history.py:876
 msgid "load more revisions"
 msgstr "Indlæs flere revisioner"
 
-#: tortoisehg\hgtk\history.py:872
+#: tortoisehg\hgtk\history.py:879
 msgid "Load all"
 msgstr "Indlæs alt"
 
-#: tortoisehg\hgtk\history.py:872
+#: tortoisehg\hgtk\history.py:879
 msgid "load all revisions"
 msgstr "Indlæs alle revisioner"
 
-#: tortoisehg\hgtk\history.py:914
+#: tortoisehg\hgtk\history.py:921
 msgid "Download and view incoming changesets"
-msgstr ""
+msgstr "Hent og se indkommende ændringer"
 
-#: tortoisehg\hgtk\history.py:916
+#: tortoisehg\hgtk\history.py:923
+msgid "Accept changes from Bundle preview"
+msgstr "Godkend ændringer fra forhåndsvisning af bundt"
+
+#: tortoisehg\hgtk\history.py:925
+msgid "Reject changes from Bundle preview"
+msgstr "Afvis ændringer fra forhåndsvisning af bundt"
+
+#: tortoisehg\hgtk\history.py:927
 msgid "Pull incoming changesets"
 msgstr "Træk indgående ændringer"
 
-#: tortoisehg\hgtk\history.py:918
+#: tortoisehg\hgtk\history.py:930
 msgid "Determine and mark outgoing changesets"
 msgstr "Find og marker udgående ændringer"
 
-#: tortoisehg\hgtk\history.py:920
+#: tortoisehg\hgtk\history.py:932
 msgid "Push outgoing changesets"
 msgstr "Skub udgående ændringer"
 
-#: tortoisehg\hgtk\history.py:922
+#: tortoisehg\hgtk\history.py:934
 msgid "Email outgoing changesets"
 msgstr "Email udgående ændringer"
 
-#: tortoisehg\hgtk\history.py:924
-msgid "Configure aliases and after pull behavior"
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:926
+#: tortoisehg\hgtk\history.py:937
 msgid "Stop current transaction"
 msgstr "Stop nuværende transaktion"
 
-#: tortoisehg\hgtk\history.py:953
+#: tortoisehg\hgtk\history.py:960
 msgid "After Pull:"
 msgstr "Efter træk:"
 
-#: tortoisehg\hgtk\history.py:954 tortoisehg\hgtk\synch.py:155
+#: tortoisehg\hgtk\history.py:961 tortoisehg\hgtk\synch.py:155
 msgid "Nothing"
 msgstr "Ingenting"
 
-#: tortoisehg\hgtk\history.py:954 tortoisehg\hgtk\synch.py:155
+#: tortoisehg\hgtk\history.py:961 tortoisehg\hgtk\synch.py:155
 #: tortoisehg\hgtk\update.py:45
 msgid "Update"
 msgstr "Opdater"
 
-#: tortoisehg\hgtk\history.py:957 tortoisehg\hgtk\synch.py:158
+#: tortoisehg\hgtk\history.py:964 tortoisehg\hgtk\synch.py:158
 msgid "Fetch"
 msgstr "Hent"
 
-#: tortoisehg\hgtk\history.py:959 tortoisehg\hgtk\synch.py:160
+#: tortoisehg\hgtk\history.py:966 tortoisehg\hgtk\synch.py:160
 msgid "Rebase"
 msgstr "Rebase"
 
-#: tortoisehg\hgtk\history.py:983
+#: tortoisehg\hgtk\history.py:984
+msgid "Configure aliases and after pull behavior"
+msgstr "Konfigurer aliaser og opførsel efter 'hent'"
+
+#: tortoisehg\hgtk\history.py:1000
 msgid "All"
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:988
-msgid "Tagged"
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:992
-msgid "Ancestry"
-msgstr ""
+msgstr "Alle"
 
 #: tortoisehg\hgtk\history.py:1005
-msgid "Merges"
-msgstr ""
+msgid "Tagged"
+msgstr "Mærket"
 
 #: tortoisehg\hgtk\history.py:1009
+msgid "Ancestry"
+msgstr "Forfædre"
+
+#: tortoisehg\hgtk\history.py:1022
+msgid "Merges"
+msgstr "Fletninger"
+
+#: tortoisehg\hgtk\history.py:1026
 msgid "Hide Merges"
-msgstr ""
-
-#: tortoisehg\hgtk\history.py:1014 tortoisehg\hgtk\logview\treeview.py:420
-msgid "Branch"
-msgstr "Gren"
-
-#: tortoisehg\hgtk\history.py:1028
-msgid "Custom"
-msgstr ""
+msgstr "Skjul fletninger"
 
 #: tortoisehg\hgtk\history.py:1033
+msgid "Branch Filter"
+msgstr "Gren-filter"
+
+#: tortoisehg\hgtk\history.py:1040
+msgid "Branches..."
+msgstr "Grene..."
+
+#: tortoisehg\hgtk\history.py:1050
+msgid "Custom Filter"
+msgstr "Tilpasset filter"
+
+#: tortoisehg\hgtk\history.py:1056
 msgid "File Patterns"
 msgstr "Filmønstre"
 
-#: tortoisehg\hgtk\history.py:1033
+#: tortoisehg\hgtk\history.py:1056
 msgid "Rev Range"
 msgstr "Rev. interval"
 
-#: tortoisehg\hgtk\history.py:1034
+#: tortoisehg\hgtk\history.py:1057
+msgid "Date"
+msgstr "Dato"
+
+#: tortoisehg\hgtk\history.py:1057
 msgid "Keywords"
 msgstr "Søgeord"
 
-#: tortoisehg\hgtk\history.py:1162 tortoisehg\hgtk\history.py:1269
-#: tortoisehg\hgtk\history.py:1291 tortoisehg\hgtk\history.py:1355
-#: tortoisehg\hgtk\history.py:1695
+#: tortoisehg\hgtk\history.py:1189 tortoisehg\hgtk\history.py:1303
+#: tortoisehg\hgtk\history.py:1325 tortoisehg\hgtk\history.py:1391
+#: tortoisehg\hgtk\history.py:1776
 msgid "No remote path specified"
-msgstr ""
+msgstr "Ingen fjern-sti specificeret"
 
-#: tortoisehg\hgtk\history.py:1163 tortoisehg\hgtk\history.py:1270
-#: tortoisehg\hgtk\history.py:1292 tortoisehg\hgtk\history.py:1356
-#: tortoisehg\hgtk\history.py:1696
+#: tortoisehg\hgtk\history.py:1190 tortoisehg\hgtk\history.py:1304
+#: tortoisehg\hgtk\history.py:1326 tortoisehg\hgtk\history.py:1392
+#: tortoisehg\hgtk\history.py:1777
 msgid "Please enter or select a remote path"
-msgstr ""
+msgstr "Skriv eller vælg en fjern-sti"
 
-#: tortoisehg\hgtk\history.py:1200
+#: tortoisehg\hgtk\history.py:1227
 msgid "Accept incoming previewed changesets"
-msgstr ""
+msgstr "Godkend indgående ændringer som blev forhåndsvist"
 
-#: tortoisehg\hgtk\history.py:1201
+#: tortoisehg\hgtk\history.py:1228
 msgid "Accept"
-msgstr ""
+msgstr "Godkend"
 
-#: tortoisehg\hgtk\history.py:1206
+#: tortoisehg\hgtk\history.py:1233
 msgid "Reject incoming previewed changesets"
-msgstr ""
+msgstr "Afvis indgående ændringer som blev forhåndsvist"
 
-#: tortoisehg\hgtk\history.py:1207
+#: tortoisehg\hgtk\history.py:1234
 msgid "Reject"
-msgstr ""
+msgstr "Afvis"
 
-#: tortoisehg\hgtk\history.py:1242
+#: tortoisehg\hgtk\history.py:1275
 msgid "Bundle Preview"
-msgstr ""
+msgstr "Forhåndsvisning af bundt"
 
-#: tortoisehg\hgtk\history.py:1246
+#: tortoisehg\hgtk\history.py:1280
 msgid "Open Bundle"
+msgstr "Åben bundt"
+
+#: tortoisehg\hgtk\history.py:1355
+msgid "%d outgoing changesets"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:1338 tortoisehg\hgtk\synch.py:495
+#: tortoisehg\hgtk\history.py:1374 tortoisehg\hgtk\synch.py:495
 msgid "No repository selected"
 msgstr "Intet depot valgt"
 
-#: tortoisehg\hgtk\history.py:1339 tortoisehg\hgtk\synch.py:496
+#: tortoisehg\hgtk\history.py:1375 tortoisehg\hgtk\synch.py:496
 msgid "Select a peer repository to compare with"
 msgstr "Vælg et andet depot at sammenligne med"
 
-#: tortoisehg\hgtk\history.py:1511
+#: tortoisehg\hgtk\history.py:1402
+msgid "Confirm Forced Push to Remote Repository"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1403
+msgid ""
+"Forced push to remote repository\n"
+"%s\n"
+"(creating new heads in remote if needed)?"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1405 tortoisehg\hgtk\history.py:1415
+msgid "Forced &Push"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1407
+msgid "Confirm Push to remote Repository"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1408
+msgid ""
+"Push to remote repository\n"
+"%s\n"
+"?"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1409
+msgid "&Push"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1412
+msgid "Confirm Forced Push"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1413
+msgid ""
+"Forced push to repository\n"
+"%s\n"
+"(creating new heads if needed)?"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1423
+msgid "Invalid Remote Repository"
+msgstr ""
+
+#: tortoisehg\hgtk\history.py:1592
 msgid "Confirm Revert All Files"
 msgstr "Bekræft Tilbageføring af Alle Filer"
 
-#: tortoisehg\hgtk\history.py:1512
+#: tortoisehg\hgtk\history.py:1593
 msgid ""
 "Revert all files to revision %d?\n"
 "This will overwrite your local changes"
@@ -2432,29 +2516,29 @@ msgstr ""
 "Tilbagefør alle filer til revision %d?\n"
 "Dette vil overskrive dine lokale ændringer"
 
-#: tortoisehg\hgtk\history.py:1563
+#: tortoisehg\hgtk\history.py:1644
 msgid "Save patches to"
 msgstr "Gem lappeløsninger i"
 
-#: tortoisehg\hgtk\history.py:1586 tortoisehg\hgtk\history.py:1761
+#: tortoisehg\hgtk\history.py:1667 tortoisehg\hgtk\history.py:1836
 msgid "Write bundle to"
 msgstr "Skriv bundt til"
 
-#: tortoisehg\hgtk\history.py:1622
+#: tortoisehg\hgtk\history.py:1703
 msgid "Confirm Rebase Revision"
 msgstr "Bekræft rebase revision"
 
-#: tortoisehg\hgtk\history.py:1623
+#: tortoisehg\hgtk\history.py:1704
 msgid "Rebase revision %d on top of %d?"
 msgstr "Rebase revision %d efter %d?"
 
-#: tortoisehg\hgtk\history.py:1732 tortoisehg\hgtk\status.py:1193
+#: tortoisehg\hgtk\history.py:1815 tortoisehg\hgtk\status.py:1194
 msgid "Save patch to"
 msgstr "Gem lap som"
 
 #: tortoisehg\hgtk\logview\treeview.py:256
 msgid "%(count)d of %(total)d Revisions"
-msgstr ""
+msgstr "%(count)d af %(total)d revisioner"
 
 #: tortoisehg\hgtk\logview\treeview.py:363
 msgid "Repository is empty"
@@ -2464,13 +2548,17 @@ msgstr "Magasin er tomt"
 msgid "ID"
 msgstr "ID"
 
+#: tortoisehg\hgtk\logview\treeview.py:420
+msgid "Branch"
+msgstr "Gren"
+
 #: tortoisehg\hgtk\logview\treeview.py:467
 msgid "Universal Date"
 msgstr "Universel dato"
 
 #: tortoisehg\hgtk\merge.py:44
 msgid "Merging in %s"
-msgstr ""
+msgstr "Flet i %s"
 
 #: tortoisehg\hgtk\merge.py:50 tortoisehg\hgtk\merge.py:63
 msgid "Unable to merge"
@@ -2482,7 +2570,7 @@ msgstr "Der skal angives en revision at flette med"
 
 #: tortoisehg\hgtk\merge.py:64
 msgid "Outstanding uncommitted changes"
-msgstr ""
+msgstr "Der er stadig Ikke-integrerede ændringer"
 
 #: tortoisehg\hgtk\merge.py:76
 msgid "Not a head revision!"
@@ -2506,7 +2594,7 @@ msgstr "Fortryd"
 
 #: tortoisehg\hgtk\merge.py:104
 msgid "Merge tools:"
-msgstr ""
+msgstr "Fletteværktøj:"
 
 #: tortoisehg\hgtk\merge.py:170
 msgid ""
@@ -2517,15 +2605,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\merge.py:226
 msgid "Merged successfully"
-msgstr ""
+msgstr "Flet fuldført"
 
 #: tortoisehg\hgtk\merge.py:228
 msgid "Canceled merging"
-msgstr ""
+msgstr "Flet annuleret"
 
 #: tortoisehg\hgtk\merge.py:230
 msgid "Failed to merge"
-msgstr ""
+msgstr "Kunne ikke flette"
 
 #: tortoisehg\hgtk\merge.py:266
 msgid "Confirm undo merge"
@@ -2537,19 +2625,19 @@ msgstr "Ren opdatering til originalrevision?"
 
 #: tortoisehg\hgtk\merge.py:277
 msgid "Undo successfully"
-msgstr ""
+msgstr "Tilbageførsel fuldført"
 
 #: tortoisehg\hgtk\merge.py:279
 msgid "Canceled undo"
-msgstr ""
+msgstr "Tilbageførsel annuleret"
 
 #: tortoisehg\hgtk\merge.py:281
 msgid "Failed to undo"
-msgstr ""
+msgstr "Kunne ikke tilbageføre"
 
 #: tortoisehg\hgtk\quickop.py:50
 msgid "Select files to add"
-msgstr ""
+msgstr "Marker filer der skal tilføjes"
 
 #: tortoisehg\hgtk\quickop.py:51
 msgid "Forget"
@@ -2557,7 +2645,7 @@ msgstr "Glem"
 
 #: tortoisehg\hgtk\quickop.py:51
 msgid "Select files to forget"
-msgstr ""
+msgstr "Marker filer der skal glemmes"
 
 #: tortoisehg\hgtk\quickop.py:52
 msgid "Revert"
@@ -2565,11 +2653,11 @@ msgstr "Tilbagefør"
 
 #: tortoisehg\hgtk\quickop.py:52
 msgid "Select files to revert"
-msgstr ""
+msgstr "Marker filer der skal tilbageføres"
 
 #: tortoisehg\hgtk\quickop.py:53
 msgid "Select files to remove"
-msgstr ""
+msgstr "Marker filer der skal fjernes"
 
 #: tortoisehg\hgtk\quickop.py:53 tortoisehg\hgtk\tagadd.py:42
 msgid "Remove"
@@ -2585,23 +2673,23 @@ msgstr "sti"
 
 #: tortoisehg\hgtk\quickop.py:116
 msgid "Toggle all selections"
-msgstr ""
+msgstr "Vend markeringer"
 
 #: tortoisehg\hgtk\quickop.py:141
 msgid "modified"
-msgstr ""
+msgstr "ændret"
 
 #: tortoisehg\hgtk\quickop.py:144
 msgid "added"
-msgstr ""
+msgstr "tilføjet"
 
 #: tortoisehg\hgtk\quickop.py:147
 msgid "removed"
-msgstr ""
+msgstr "fjernet"
 
 #: tortoisehg\hgtk\quickop.py:150
 msgid "missing"
-msgstr ""
+msgstr "mangler"
 
 #: tortoisehg\hgtk\quickop.py:153 tortoisehg\hgtk\quickop.py:236
 #: tortoisehg\hgtk\serve.py:126 tortoisehg\util\shlib.py:26
@@ -2611,43 +2699,43 @@ msgstr "ukendt"
 
 #: tortoisehg\hgtk\quickop.py:157 tortoisehg\hgtk\quickop.py:236
 msgid "ignored"
-msgstr ""
+msgstr "ignoreret"
 
 #: tortoisehg\hgtk\quickop.py:161
 msgid "clean"
-msgstr ""
+msgstr "ren"
 
 #: tortoisehg\hgtk\quickop.py:164
 msgid "No appropriate files"
-msgstr ""
+msgstr "Ingen passende filer"
 
 #: tortoisehg\hgtk\quickop.py:165
 msgid "No files found for this operation"
-msgstr ""
+msgstr "Ingen filer passede til denne operation"
 
 #: tortoisehg\hgtk\quickop.py:242
 msgid "No files selected"
-msgstr ""
+msgstr "Ingen filer markeret"
 
 #: tortoisehg\hgtk\quickop.py:243
 msgid "No operation to perform"
-msgstr ""
+msgstr "Ingen operation at udføre"
 
 #: tortoisehg\hgtk\quickop.py:264
 msgid "Successfully"
-msgstr ""
+msgstr "Fuldført"
 
 #: tortoisehg\hgtk\quickop.py:266 tortoisehg\hgtk\thgmq.py:644
 msgid "Canceled"
-msgstr ""
+msgstr "Afbrudt"
 
 #: tortoisehg\hgtk\quickop.py:268 tortoisehg\hgtk\thgmq.py:646
 msgid "Failed"
-msgstr ""
+msgstr "Fejlet"
 
 #: tortoisehg\hgtk\recovery.py:40
 msgid "%s - recovery"
-msgstr ""
+msgstr "%s - genskabelse"
 
 #: tortoisehg\hgtk\recovery.py:46 tortoisehg\hgtk\synch.py:59
 msgid "Stop the hg operation"
@@ -2761,15 +2849,15 @@ msgstr "HTTP Port:"
 
 #: tortoisehg\hgtk\serve.py:127
 msgid "%s - serve"
-msgstr ""
+msgstr "%s - tjeneste"
 
 #: tortoisehg\hgtk\serve.py:130
 msgid "%s serve - %s"
-msgstr ""
+msgstr "%s tjeneste - %s"
 
 #: tortoisehg\hgtk\serve.py:133
 msgid " - serve"
-msgstr ""
+msgstr " - tjeneste"
 
 #: tortoisehg\hgtk\serve.py:164
 msgid "Confirm Really Exit?"
@@ -2901,7 +2989,7 @@ msgstr "Fjern eller slet valgte filer"
 
 #: tortoisehg\hgtk\status.py:175
 msgid "Forget checked files on next commit"
-msgstr ""
+msgstr "Glem valgte filer ved næste integration"
 
 #: tortoisehg\hgtk\status.py:179
 msgid "refresh"
@@ -2919,103 +3007,103 @@ msgstr "ms"
 msgid "View"
 msgstr "Vis"
 
-#: tortoisehg\hgtk\status.py:303
+#: tortoisehg\hgtk\status.py:304
 msgid "Remove filter, show root"
 msgstr "Fjern filter, vis roden"
 
-#: tortoisehg\hgtk\status.py:329
+#: tortoisehg\hgtk\status.py:330
 msgid "Text Diff"
 msgstr "Tekstforskel"
 
-#: tortoisehg\hgtk\status.py:382
+#: tortoisehg\hgtk\status.py:383
 msgid "Hunk Selection"
 msgstr "Valg af stump"
 
-#: tortoisehg\hgtk\status.py:455
+#: tortoisehg\hgtk\status.py:456
 msgid "%d selected, %d total"
 msgstr "%d valgte, %d i alt"
 
-#: tortoisehg\hgtk\status.py:477
+#: tortoisehg\hgtk\status.py:478
 msgid "Save Preview"
-msgstr ""
+msgstr "Gem forhåndsvisning"
 
-#: tortoisehg\hgtk\status.py:481
+#: tortoisehg\hgtk\status.py:482
 msgid "Shelf Preview"
-msgstr ""
+msgstr "Hylde forhåndsvisning"
 
-#: tortoisehg\hgtk\status.py:503
+#: tortoisehg\hgtk\status.py:504
 msgid "?: unknown"
 msgstr "?: ukendt"
 
-#: tortoisehg\hgtk\status.py:504
+#: tortoisehg\hgtk\status.py:505
 msgid "M: modified"
 msgstr "M: ændret"
 
-#: tortoisehg\hgtk\status.py:505
+#: tortoisehg\hgtk\status.py:506
 msgid "I: ignored"
 msgstr "I: ignoreret"
 
-#: tortoisehg\hgtk\status.py:506
+#: tortoisehg\hgtk\status.py:507
 msgid "A: added"
 msgstr "A: tilføjet"
 
-#: tortoisehg\hgtk\status.py:507
+#: tortoisehg\hgtk\status.py:508
 msgid "C: clean"
 msgstr "C: ren"
 
-#: tortoisehg\hgtk\status.py:508
+#: tortoisehg\hgtk\status.py:509
 msgid "R: removed"
 msgstr "R: fjernet"
 
-#: tortoisehg\hgtk\status.py:509
+#: tortoisehg\hgtk\status.py:510
 msgid "!: deleted"
 msgstr "!: mangler"
 
-#: tortoisehg\hgtk\status.py:800
+#: tortoisehg\hgtk\status.py:801
 msgid "View '%s'"
 msgstr "Se '%s'"
 
-#: tortoisehg\hgtk\status.py:845
+#: tortoisehg\hgtk\status.py:846
 msgid "Rename file to:"
 msgstr "Omdøb fil til:"
 
-#: tortoisehg\hgtk\status.py:854
+#: tortoisehg\hgtk\status.py:855
 msgid "Copy file to"
 msgstr "Kopier fil til"
 
-#: tortoisehg\hgtk\status.py:867 tortoisehg\hgtk\status.py:1331
+#: tortoisehg\hgtk\status.py:868 tortoisehg\hgtk\status.py:1332
 msgid "Nothing Removed"
 msgstr "Intet fjernet"
 
-#: tortoisehg\hgtk\status.py:868
+#: tortoisehg\hgtk\status.py:869
 msgid "Remove is not enabled when multiple revisions are specified."
 msgstr ""
 "Det er ikke muligt at fjerne filer når der er valgt flere revisioner."
 
-#: tortoisehg\hgtk\status.py:885
+#: tortoisehg\hgtk\status.py:886
 msgid "Move is not enabled when multiple revisions are specified."
 msgstr ""
 "Det er ikke muligt at flytte filer når der er valgt flere revisioner."
 
-#: tortoisehg\hgtk\status.py:885 tortoisehg\hgtk\status.py:1349
-#: tortoisehg\hgtk\status.py:1357
+#: tortoisehg\hgtk\status.py:886 tortoisehg\hgtk\status.py:1350
+#: tortoisehg\hgtk\status.py:1358
 msgid "Nothing Moved"
 msgstr "Intet flyttet"
 
-#: tortoisehg\hgtk\status.py:903
+#: tortoisehg\hgtk\status.py:904
 msgid "Copy is not enabled when multiple revisions are specified."
 msgstr ""
 "Det er ikke muligt at kopiere filer når der er valgt flere revisioner."
 
-#: tortoisehg\hgtk\status.py:903
+#: tortoisehg\hgtk\status.py:904
 msgid "Nothing Copied"
 msgstr "Intet kopieret"
 
-#: tortoisehg\hgtk\status.py:962 tortoisehg\hgtk\status.py:1023
+#: tortoisehg\hgtk\status.py:963 tortoisehg\hgtk\status.py:1024
 msgid "===== Diff to first parent =====\n"
 msgstr "===== Forskel til første forælder =====\n"
 
-#: tortoisehg\hgtk\status.py:967 tortoisehg\hgtk\status.py:1030
+#: tortoisehg\hgtk\status.py:968 tortoisehg\hgtk\status.py:1031
 msgid ""
 "\n"
 "===== Diff to second parent =====\n"
@@ -3023,55 +3111,55 @@ msgstr ""
 "\n"
 "===== Forskel til anden forælder =====\n"
 
-#: tortoisehg\hgtk\status.py:1059
+#: tortoisehg\hgtk\status.py:1060
 msgid "File is larger than the specified max size.\n"
 msgstr "Fil er større end den specificerede maksimale størrelse.\n"
 
-#: tortoisehg\hgtk\status.py:1060
+#: tortoisehg\hgtk\status.py:1061
 msgid "Hunk selection is disabled for this file.\n"
 msgstr "Stump-valg er deaktiveret for denne fil.\n"
 
-#: tortoisehg\hgtk\status.py:1231
+#: tortoisehg\hgtk\status.py:1232
 msgid "Nothing Diffed"
 msgstr "Ingenting sammenlignet"
 
-#: tortoisehg\hgtk\status.py:1232
+#: tortoisehg\hgtk\status.py:1233
 msgid "No diffable files selected"
 msgstr "Der er ikke valgt nogle filer der kan sammenlignes"
 
-#: tortoisehg\hgtk\status.py:1240 tortoisehg\hgtk\status.py:1248
+#: tortoisehg\hgtk\status.py:1241 tortoisehg\hgtk\status.py:1249
 msgid "Nothing Reverted"
 msgstr "Intet tilbageført"
 
-#: tortoisehg\hgtk\status.py:1241
+#: tortoisehg\hgtk\status.py:1242
 msgid "No revertable files selected"
 msgstr "Ingen af de valgte filer kan tilbageføres"
 
-#: tortoisehg\hgtk\status.py:1249
+#: tortoisehg\hgtk\status.py:1250
 msgid "Revert not allowed when viewing revision range."
 msgstr "Tilbagefør ikke tilladt når man ser på revisionsinterval."
 
-#: tortoisehg\hgtk\status.py:1267
+#: tortoisehg\hgtk\status.py:1268
 msgid "Uncommited merge - please select a parent revision"
 msgstr "Ikke-integreret flet - vælg en forælderrevision"
 
-#: tortoisehg\hgtk\status.py:1268
-msgid "Revert files to local or other parent?"
-msgstr ""
-
 #: tortoisehg\hgtk\status.py:1269
+msgid "Revert files to local or other parent?"
+msgstr "Tilbagefør filer til lokal eller anden forælder?"
+
+#: tortoisehg\hgtk\status.py:1270
 msgid "&Local"
 msgstr "&Lokal"
 
-#: tortoisehg\hgtk\status.py:1269
+#: tortoisehg\hgtk\status.py:1270
 msgid "&Other"
 msgstr "&Andet"
 
-#: tortoisehg\hgtk\status.py:1284
+#: tortoisehg\hgtk\status.py:1285
 msgid "Confirm Revert"
 msgstr "Bekræft tilbagefør"
 
-#: tortoisehg\hgtk\status.py:1285
+#: tortoisehg\hgtk\status.py:1286
 msgid ""
 "Revert files to revision %s?\n"
 "\n"
@@ -3081,35 +3169,35 @@ msgstr ""
 "\n"
 "%s"
 
-#: tortoisehg\hgtk\status.py:1286
+#: tortoisehg\hgtk\status.py:1287
 msgid "&Yes (backup changes)"
 msgstr "&Ja (sikkerhedskopier ændringer)"
 
-#: tortoisehg\hgtk\status.py:1287
+#: tortoisehg\hgtk\status.py:1288
 msgid "Yes (&discard changes)"
 msgstr "Ja (&kassér ændringer)"
 
-#: tortoisehg\hgtk\status.py:1307
+#: tortoisehg\hgtk\status.py:1308
 msgid "Nothing Added"
 msgstr "Intet tilføjet"
 
-#: tortoisehg\hgtk\status.py:1308
+#: tortoisehg\hgtk\status.py:1309
 msgid "No addable files selected"
 msgstr "Ingen af de valgte filer kan tilføjes"
 
-#: tortoisehg\hgtk\status.py:1332
+#: tortoisehg\hgtk\status.py:1333
 msgid "No removable files selected"
 msgstr "Ingen af de valgte filer kan fjernes"
 
-#: tortoisehg\hgtk\status.py:1340
+#: tortoisehg\hgtk\status.py:1341
 msgid "Move files to directory..."
 msgstr "Flyt filer til katalog..."
 
-#: tortoisehg\hgtk\status.py:1350
+#: tortoisehg\hgtk\status.py:1351
 msgid "Cannot move outside repo!"
 msgstr "Kan ikke flytte udenfor depot!"
 
-#: tortoisehg\hgtk\status.py:1357
+#: tortoisehg\hgtk\status.py:1358
 msgid ""
 "No movable files selected\n"
 "\n"
@@ -3119,87 +3207,87 @@ msgstr ""
 "\n"
 "Bemærk: Kun rene filer kan flyttes."
 
-#: tortoisehg\hgtk\status.py:1366
+#: tortoisehg\hgtk\status.py:1367
 msgid "Nothing Forgotten"
 msgstr "Ingenting glemt"
 
-#: tortoisehg\hgtk\status.py:1367
+#: tortoisehg\hgtk\status.py:1368
 msgid "No clean files selected"
 msgstr "Ingen rene filer valgt"
 
-#: tortoisehg\hgtk\status.py:1370
+#: tortoisehg\hgtk\status.py:1371
 msgid "Confirm Delete Unrevisioned"
 msgstr "Bekræft slet ikke-versioneret"
 
-#: tortoisehg\hgtk\status.py:1371
+#: tortoisehg\hgtk\status.py:1372
 msgid "Delete the following unrevisioned files?"
 msgstr "Slet de følgende ikke-versionerede filer?"
 
-#: tortoisehg\hgtk\status.py:1384
+#: tortoisehg\hgtk\status.py:1385
 msgid "Delete Errors"
 msgstr "Kunne ikke slette"
 
-#: tortoisehg\hgtk\status.py:1505
-msgid "Edit"
-msgstr ""
-
 #: tortoisehg\hgtk\status.py:1506
-msgid "View missing"
-msgstr ""
+msgid "Edit"
+msgstr "Rediger"
 
 #: tortoisehg\hgtk\status.py:1507
+msgid "View missing"
+msgstr "Vis manglende"
+
+#: tortoisehg\hgtk\status.py:1508
 msgid "View other"
-msgstr ""
+msgstr "Vis anden"
 
-#: tortoisehg\hgtk\status.py:1511
+#: tortoisehg\hgtk\status.py:1512
 msgid "L_og"
-msgstr ""
-
-#: tortoisehg\hgtk\status.py:1515
-msgid "_Guess Rename..."
-msgstr ""
+msgstr "_Log"
 
 #: tortoisehg\hgtk\status.py:1516
-msgid "_Ignore"
-msgstr ""
+msgid "_Guess Rename..."
+msgstr "_Gæt omdøbning..."
 
 #: tortoisehg\hgtk\status.py:1517
-msgid "Remove versioned"
-msgstr ""
+msgid "_Ignore"
+msgstr "_Ignorer"
 
 #: tortoisehg\hgtk\status.py:1518
-msgid "_Delete unversioned"
-msgstr ""
+msgid "Remove versioned"
+msgstr "Fjern versioneret"
 
-#: tortoisehg\hgtk\status.py:1521
-msgid "_Copy..."
-msgstr ""
+#: tortoisehg\hgtk\status.py:1519
+msgid "_Delete unversioned"
+msgstr "_Slet ikkeversioneret"
 
 #: tortoisehg\hgtk\status.py:1522
-msgid "Rename..."
-msgstr ""
+msgid "_Copy..."
+msgstr "_Kopier..."
 
-#: tortoisehg\hgtk\status.py:1524
-msgid "Restart Merge..."
-msgstr ""
+#: tortoisehg\hgtk\status.py:1523
+msgid "Rename..."
+msgstr "_Omdøb..."
 
 #: tortoisehg\hgtk\status.py:1525
-msgid "Mark unresolved"
-msgstr ""
+msgid "Restart Merge..."
+msgstr "Genstart flet..."
 
 #: tortoisehg\hgtk\status.py:1526
+msgid "Mark unresolved"
+msgstr "Marker som uløst"
+
+#: tortoisehg\hgtk\status.py:1527
 msgid "Mark resolved"
-msgstr ""
+msgstr "Marker som løst"
 
-#: tortoisehg\hgtk\status.py:1534
+#: tortoisehg\hgtk\status.py:1535
 msgid "Restart merge with"
-msgstr ""
+msgstr "Genstart flet med"
 
-#: tortoisehg\hgtk\status.py:1578
+#: tortoisehg\hgtk\status.py:1579
 msgid "not up to date"
 msgstr "ikke ajour"
 
-#: tortoisehg\hgtk\status.py:1579
+#: tortoisehg\hgtk\status.py:1580
 msgid ""
 "The parents have changed since the last refresh.\n"
 "Continue anyway?"
@@ -3207,7 +3295,7 @@ msgstr ""
 "Forældrene er ændret siden sidste opdatering.\n"
 "Fortsæt alligevel?"
 
-#: tortoisehg\hgtk\status.py:1581
+#: tortoisehg\hgtk\status.py:1582
 msgid "&Refresh"
 msgstr "&Opdater"
 
@@ -3217,7 +3305,7 @@ msgstr "Kører"
 
 #: tortoisehg\hgtk\synch.py:51
 msgid "%s - synchronize"
-msgstr ""
+msgstr "%s - synkroniser"
 
 #: tortoisehg\hgtk\synch.py:65
 msgid "Display changes that can be pulled from selected repository"
@@ -3239,7 +3327,7 @@ msgstr "Vis lokale ændringer som bliver skubbet til valgte depot"
 msgid "Push local changes to selected repository"
 msgstr "Skub lokale ændringer til valgte depot"
 
-#: tortoisehg\hgtk\synch.py:84 tortoisehg\hgtk\thgconfig.py:614
+#: tortoisehg\hgtk\synch.py:84 tortoisehg\hgtk\thgconfig.py:616
 msgid "Email"
 msgstr "Email"
 
@@ -3249,7 +3337,7 @@ msgstr "Email lokale ændringer til en eller flere modtagere"
 
 #: tortoisehg\hgtk\synch.py:91
 msgid "Shelve uncommited changes"
-msgstr "Sylt ikke-integrerede ændringer"
+msgstr "Læg ikke-integrerede ændringer på hylden"
 
 #: tortoisehg\hgtk\synch.py:98
 msgid "Configure peer repository paths"
@@ -3333,7 +3421,7 @@ msgstr "Bundt (*)"
 
 #: tortoisehg\hgtk\tagadd.py:29
 msgid "Tag - %s"
-msgstr ""
+msgstr "Mærkat - %s"
 
 #: tortoisehg\hgtk\tagadd.py:59
 msgid "Tag:"
@@ -3579,8 +3667,8 @@ msgid ""
 "Show the diff panel below the file list in status, shelve, and commit "
 "dialogs. Default: False (show diffs to right of file list)"
 msgstr ""
-"Viser diff-panelet under fil-listen ved status, sylt og integrér dialogerne. "
-"Default: Falsk (vis diff til højre for fil-listen)"
+"Viser diff-panelet under fil-listen ved status, læg-på-hylden og integrér "
+"dialogerne. Default: Falsk (vis diff til højre for fil-listen)"
 
 #: tortoisehg\hgtk\thgconfig.py:60
 msgid "Capture Stderr"
@@ -3688,6 +3776,8 @@ msgid ""
 "Comma separated list of files that are automatically unchecked when the "
 "status, commit, and shelve dialogs are opened.  Default: None"
 msgstr ""
+"Kommasepareret liste af filer som automatisk bliver fravalgt når status-, "
+"integrer- og hylde-dialogerne bliver åbnet. Standard: Ingen"
 
 #: tortoisehg\hgtk\thgconfig.py:98
 msgid "Author Coloring"
@@ -3751,7 +3841,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:119
 msgid "Branch Colors"
-msgstr ""
+msgstr "Grenfarver"
 
 #: tortoisehg\hgtk\thgconfig.py:120
 msgid ""
@@ -3760,10 +3850,14 @@ msgid ""
 "Likewise some other characters can be escaped in this way, e.g. \\u0040 will "
 "be decoded to the @ character, and \\n to a linefeed. Default: None"
 msgstr ""
+"Blank-separeret liste af gren-navne og -farver på formen \"gren:#XXXXXX\". "
+"Blanktegn og kolon i gren-navn skal bruge undvigesekvensen omvendt skråstreg "
+"(\\). På samme måde kan visse andre tegn kodes, f.eks. \\u0040 for tegnet @, "
+"og \\n for et linieskift. Standard: Ingen"
 
 #: tortoisehg\hgtk\thgconfig.py:126
 msgid "Hide Tags"
-msgstr ""
+msgstr "Skjul mærkater"
 
 #: tortoisehg\hgtk\thgconfig.py:127
 msgid ""
@@ -3771,12 +3865,23 @@ msgid ""
 "\"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial "
 "Queues Extension. Default: None"
 msgstr ""
+"Blank-separeret liste af mærkater som ikke vises. Eksempel: \"qbase qparent "
+"qtip\" vil skjule standard-mærkater fra Mercurial Queues udviddelsen. "
+"Standard: Ingen"
 
-#: tortoisehg\hgtk\thgconfig.py:134
+#: tortoisehg\hgtk\thgconfig.py:131
+msgid "Use Expander"
+msgstr "Brug udfolder"
+
+#: tortoisehg\hgtk\thgconfig.py:132
+msgid "Show changeset details with an expander"
+msgstr "Vis ændringsdetaljer med en udfolder"
+
+#: tortoisehg\hgtk\thgconfig.py:136
 msgid "After pull operation"
 msgstr "Operation efter træk"
 
-#: tortoisehg\hgtk\thgconfig.py:136
+#: tortoisehg\hgtk\thgconfig.py:138
 msgid ""
 "Operation which is performed directly after a successful pull. update "
 "equates to pull --update, fetch equates to the fetch extension, rebase "
@@ -3786,62 +3891,62 @@ msgstr ""
 "'update' svarer til 'pull --update', 'fetch' svarer til fetch-udviddelsen, "
 "'rebase' svarer til 'pull --rebase'. Default: ingen"
 
-#: tortoisehg\hgtk\thgconfig.py:141 tortoisehg\hgtk\thgmq.py:186
+#: tortoisehg\hgtk\thgconfig.py:143 tortoisehg\hgtk\thgmq.py:186
 msgid "Name"
 msgstr "Navn"
 
-#: tortoisehg\hgtk\thgconfig.py:142
+#: tortoisehg\hgtk\thgconfig.py:144
 msgid ""
 "Repository name to use in the web interface. Default is the working "
 "directory."
 msgstr ""
 "Depotnavn der skal anvendes i web grænsefladen. Default er arbejdskataloget."
 
-#: tortoisehg\hgtk\thgconfig.py:144 tortoisehg\hgtk\thgconfig.py:937
+#: tortoisehg\hgtk\thgconfig.py:146 tortoisehg\hgtk\thgconfig.py:939
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: tortoisehg\hgtk\thgconfig.py:145
+#: tortoisehg\hgtk\thgconfig.py:147
 msgid "Textual description of the repository's purpose or contents."
 msgstr "Tekstuel beskrivelse af depotets anvendelse eller indhold."
 
-#: tortoisehg\hgtk\thgconfig.py:147
+#: tortoisehg\hgtk\thgconfig.py:149
 msgid "Contact"
 msgstr "Kontakt"
 
-#: tortoisehg\hgtk\thgconfig.py:148
+#: tortoisehg\hgtk\thgconfig.py:150
 msgid "Name or email address of the person in charge of the repository."
 msgstr "Navn eller email på den ansvarlige for depotet."
 
-#: tortoisehg\hgtk\thgconfig.py:150
+#: tortoisehg\hgtk\thgconfig.py:152
 msgid "Style"
 msgstr "Stil"
 
-#: tortoisehg\hgtk\thgconfig.py:152
+#: tortoisehg\hgtk\thgconfig.py:154
 msgid "Which template map style to use"
 msgstr "Hvilke skabelon mapnings-stil skal anvendes"
 
-#: tortoisehg\hgtk\thgconfig.py:153
+#: tortoisehg\hgtk\thgconfig.py:155
 msgid "Archive Formats"
 msgstr "Arkivformater"
 
-#: tortoisehg\hgtk\thgconfig.py:154
+#: tortoisehg\hgtk\thgconfig.py:156
 msgid "Comma separated list of archive formats allowed for downloading"
 msgstr "Kommasepareret liste over arkivformater som kan downloades"
 
-#: tortoisehg\hgtk\thgconfig.py:156
+#: tortoisehg\hgtk\thgconfig.py:158
 msgid "Port to listen on"
 msgstr "Port at lytte på"
 
-#: tortoisehg\hgtk\thgconfig.py:156 tortoisehg\hgtk\thgconfig.py:273
+#: tortoisehg\hgtk\thgconfig.py:158 tortoisehg\hgtk\thgconfig.py:275
 msgid "Port"
 msgstr "Port"
 
-#: tortoisehg\hgtk\thgconfig.py:157
+#: tortoisehg\hgtk\thgconfig.py:159
 msgid "Push Requires SSL"
 msgstr "Skub kræver SSL"
 
-#: tortoisehg\hgtk\thgconfig.py:158
+#: tortoisehg\hgtk\thgconfig.py:160
 msgid ""
 "Whether to require that inbound pushes be transported over SSL to prevent "
 "password sniffing."
@@ -3849,11 +3954,11 @@ msgstr ""
 "Er det obligatorisk at indgående skub-operationer skal anvende SSL for at "
 "forbindre password-aflytning"
 
-#: tortoisehg\hgtk\thgconfig.py:160
+#: tortoisehg\hgtk\thgconfig.py:162
 msgid "Stripes"
 msgstr "Striber"
 
-#: tortoisehg\hgtk\thgconfig.py:161
+#: tortoisehg\hgtk\thgconfig.py:163
 msgid ""
 "How many lines a \"zebra stripe\" should span in multiline output. Default "
 "is 1; set to 0 to disable."
@@ -3861,27 +3966,27 @@ msgstr ""
 "Hvor mange linier skal en \"zebrastribe\" være på. Default er 1; sæt til 0 "
 "for at deaktivere."
 
-#: tortoisehg\hgtk\thgconfig.py:163
+#: tortoisehg\hgtk\thgconfig.py:165
 msgid "Max Files"
 msgstr "Maks filer"
 
-#: tortoisehg\hgtk\thgconfig.py:164
+#: tortoisehg\hgtk\thgconfig.py:166
 msgid "Maximum number of files to list per changeset."
 msgstr "Maksimum antal filer at vise pr ændring"
 
-#: tortoisehg\hgtk\thgconfig.py:165
+#: tortoisehg\hgtk\thgconfig.py:167
 msgid "Max Changes"
 msgstr "Maks ændringer"
 
-#: tortoisehg\hgtk\thgconfig.py:166
+#: tortoisehg\hgtk\thgconfig.py:168
 msgid "Maximum number of changes to list on the changelog."
 msgstr "Maksimum antal ændringer at vise i ændringsloggen."
 
-#: tortoisehg\hgtk\thgconfig.py:167
+#: tortoisehg\hgtk\thgconfig.py:169
 msgid "Allow Push"
 msgstr "Tillad skub"
 
-#: tortoisehg\hgtk\thgconfig.py:168
+#: tortoisehg\hgtk\thgconfig.py:170
 msgid ""
 "Whether to allow pushing to the repository. If empty or not set, push is not "
 "allowed. If the special value \"*\", any remote user can push, including "
@@ -3896,11 +4001,11 @@ msgstr ""
 "med et navn i denne liste (adskilt af blanktegn eller \",\"). Indholdet af "
 "tillad_skub listen bliver undersøgt efter forbyd_skub listen."
 
-#: tortoisehg\hgtk\thgconfig.py:175
+#: tortoisehg\hgtk\thgconfig.py:177
 msgid "Deny Push"
 msgstr "Forbyd skub"
 
-#: tortoisehg\hgtk\thgconfig.py:176
+#: tortoisehg\hgtk\thgconfig.py:178
 msgid ""
 "Whether to deny pushing to the repository. If empty or not set, push is not "
 "denied. If the special value \"*\", all remote users are denied push. "
@@ -3915,82 +4020,82 @@ msgstr ""
 "afvist. Indholdet af tillad_skub listen bliver undersøgt efter forbyd_skub "
 "listen."
 
-#: tortoisehg\hgtk\thgconfig.py:182
+#: tortoisehg\hgtk\thgconfig.py:184
 msgid "Encoding"
 msgstr "Indkodning"
 
-#: tortoisehg\hgtk\thgconfig.py:183
+#: tortoisehg\hgtk\thgconfig.py:185
 msgid "Character encoding name"
 msgstr "Navn på indkodning af tegn"
 
-#: tortoisehg\hgtk\thgconfig.py:186 tortoisehg\hgtk\thgconfig.py:274
+#: tortoisehg\hgtk\thgconfig.py:188 tortoisehg\hgtk\thgconfig.py:276
 msgid "Host"
 msgstr "Vært"
 
-#: tortoisehg\hgtk\thgconfig.py:187
+#: tortoisehg\hgtk\thgconfig.py:189
 msgid ""
 "Host name and (optional) port of proxy server, for example \"myproxy:8000\""
 msgstr ""
 "Værtsnavn og (valfrigt) port på proxy server, for eksempel \"myproxy:8000\""
 
-#: tortoisehg\hgtk\thgconfig.py:189
+#: tortoisehg\hgtk\thgconfig.py:191
 msgid "Bypass List"
 msgstr "bypass-liste"
 
-#: tortoisehg\hgtk\thgconfig.py:190
+#: tortoisehg\hgtk\thgconfig.py:192
 msgid ""
 "Optional. Comma-separated list of host names that should bypass the proxy"
 msgstr "Valgfri. Kommasepareret liste af værtsnavne som skal omgå proxyen"
 
-#: tortoisehg\hgtk\thgconfig.py:193
+#: tortoisehg\hgtk\thgconfig.py:195
 msgid "Optional. User name to authenticate with at the proxy server"
 msgstr "Valgfri. Brugernavn overfor proxyserveren"
 
-#: tortoisehg\hgtk\thgconfig.py:195 tortoisehg\hgtk\thgconfig.py:275
+#: tortoisehg\hgtk\thgconfig.py:197 tortoisehg\hgtk\thgconfig.py:277
 msgid "Password"
 msgstr "adgangskode"
 
-#: tortoisehg\hgtk\thgconfig.py:196
+#: tortoisehg\hgtk\thgconfig.py:198
 msgid "Optional. Password to authenticate with at the proxy server"
 msgstr "Valgfri. Adgangskode overfor proxyserveren"
 
-#: tortoisehg\hgtk\thgconfig.py:200
+#: tortoisehg\hgtk\thgconfig.py:202
 msgid "From"
 msgstr "Fra"
 
-#: tortoisehg\hgtk\thgconfig.py:201
+#: tortoisehg\hgtk\thgconfig.py:203
 msgid "Email address to use in the \"From\" header and for the SMTP envelope"
 msgstr "E-postadresse for afsender"
 
-#: tortoisehg\hgtk\thgconfig.py:202
+#: tortoisehg\hgtk\thgconfig.py:204
 msgid "To"
 msgstr "Til"
 
-#: tortoisehg\hgtk\thgconfig.py:203
+#: tortoisehg\hgtk\thgconfig.py:205
 msgid "Comma-separated list of recipient email addresses"
 msgstr "Kommasepareret liste over e-post adresser på modtagere"
 
-#: tortoisehg\hgtk\thgconfig.py:204
+#: tortoisehg\hgtk\thgconfig.py:206
 msgid "Cc"
 msgstr "Cc"
 
-#: tortoisehg\hgtk\thgconfig.py:205
+#: tortoisehg\hgtk\thgconfig.py:207
 msgid "Comma-separated list of carbon copy recipient email addresses"
 msgstr "Kommasepareret liste af cc-modtager-adresser"
 
-#: tortoisehg\hgtk\thgconfig.py:207
+#: tortoisehg\hgtk\thgconfig.py:209
 msgid "Bcc"
 msgstr "Bcc"
 
-#: tortoisehg\hgtk\thgconfig.py:208
+#: tortoisehg\hgtk\thgconfig.py:210
 msgid "Comma-separated list of blind carbon copy recipient email addresses"
 msgstr "Kommasepareret liste over blindkopi-modtagere"
 
-#: tortoisehg\hgtk\thgconfig.py:210
+#: tortoisehg\hgtk\thgconfig.py:212
 msgid "method"
 msgstr "metode"
 
-#: tortoisehg\hgtk\thgconfig.py:211
+#: tortoisehg\hgtk\thgconfig.py:213
 msgid ""
 "Optional. Method to use to send email messages. If value is \"smtp\" "
 "(default), use SMTP (configured below).  Otherwise, use as name of program "
@@ -4006,61 +4111,61 @@ msgstr ""
 "være nok at sætte værdien til \"sendmail\" eller \"/usr/sbin/sendmail\" for "
 "at sende beskeder."
 
-#: tortoisehg\hgtk\thgconfig.py:216
+#: tortoisehg\hgtk\thgconfig.py:218
 msgid "Host name of mail server"
 msgstr "Værtsnavn for mailserver"
 
-#: tortoisehg\hgtk\thgconfig.py:216
+#: tortoisehg\hgtk\thgconfig.py:218
 msgid "SMTP Host"
 msgstr "SMTP vært"
 
-#: tortoisehg\hgtk\thgconfig.py:217
+#: tortoisehg\hgtk\thgconfig.py:219
 msgid "SMTP Port"
 msgstr "SMTP port"
 
-#: tortoisehg\hgtk\thgconfig.py:218
+#: tortoisehg\hgtk\thgconfig.py:220
 msgid "Port to connect to on mail server. Default: 25"
 msgstr "Port til at forbinde til mail server. Default: 25"
 
-#: tortoisehg\hgtk\thgconfig.py:220
+#: tortoisehg\hgtk\thgconfig.py:222
 msgid "SMTP TLS"
 msgstr "SMTP TLS"
 
-#: tortoisehg\hgtk\thgconfig.py:221
+#: tortoisehg\hgtk\thgconfig.py:223
 msgid "Connect to mail server using TLS. Default: False"
 msgstr "Forbind til mail server via TLS. Default: False"
 
-#: tortoisehg\hgtk\thgconfig.py:223
+#: tortoisehg\hgtk\thgconfig.py:225
 msgid "SMTP Username"
 msgstr "SMTP brugernavn"
 
-#: tortoisehg\hgtk\thgconfig.py:224
+#: tortoisehg\hgtk\thgconfig.py:226
 msgid "Username to authenticate to mail server with"
 msgstr "Brugernavn til mailserver"
 
-#: tortoisehg\hgtk\thgconfig.py:225
+#: tortoisehg\hgtk\thgconfig.py:227
 msgid "SMTP Password"
 msgstr "SMTP kodeord"
 
-#: tortoisehg\hgtk\thgconfig.py:226
+#: tortoisehg\hgtk\thgconfig.py:228
 msgid "Password to authenticate to mail server with"
 msgstr "Kodeord til mailserver"
 
-#: tortoisehg\hgtk\thgconfig.py:227
+#: tortoisehg\hgtk\thgconfig.py:229
 msgid "Local Hostname"
 msgstr "Lokalt værtsnavn"
 
-#: tortoisehg\hgtk\thgconfig.py:228
+#: tortoisehg\hgtk\thgconfig.py:230
 msgid "Hostname the sender can use to identify itself to the mail server."
 msgstr ""
 "Værtsnavn som afsenderen kan bruge til at identificere sig overfor mail "
 "serveren."
 
-#: tortoisehg\hgtk\thgconfig.py:231
+#: tortoisehg\hgtk\thgconfig.py:233
 msgid "Patch EOL"
 msgstr "Lap EOL"
 
-#: tortoisehg\hgtk\thgconfig.py:232
+#: tortoisehg\hgtk\thgconfig.py:234
 msgid ""
 "Normalize file line endings during and after patch to lf or crlf.  Strict "
 "does no normalization. Default: strict"
@@ -4068,123 +4173,123 @@ msgstr ""
 "Normalisér linje-endelser på fil under og efter lap til If ellre crlf. "
 "Streng foretager ingen normalisering. Standard: streng"
 
-#: tortoisehg\hgtk\thgconfig.py:235
+#: tortoisehg\hgtk\thgconfig.py:237
 msgid "Git Format"
 msgstr "Git format"
 
-#: tortoisehg\hgtk\thgconfig.py:236
+#: tortoisehg\hgtk\thgconfig.py:238
 msgid "Use git extended diff header format. Default: False"
 msgstr "Brug git udviddet diff-header format. Default: Falsk"
 
-#: tortoisehg\hgtk\thgconfig.py:238
+#: tortoisehg\hgtk\thgconfig.py:240
 msgid "No Dates"
 msgstr "Ingen datoer"
 
-#: tortoisehg\hgtk\thgconfig.py:239
+#: tortoisehg\hgtk\thgconfig.py:241
 msgid "Do not include modification dates in diff headers. Default: False"
 msgstr "Inkluder ikke ændringsdato i diff headers. Default: Falsk"
 
-#: tortoisehg\hgtk\thgconfig.py:241
+#: tortoisehg\hgtk\thgconfig.py:243
 msgid "Show Function"
 msgstr "Vis funktion"
 
-#: tortoisehg\hgtk\thgconfig.py:242
+#: tortoisehg\hgtk\thgconfig.py:244
 msgid "Show which function each change is in. Default: False"
 msgstr "Vis hvilken funktion hver ændring tilhører. Default: Falsk"
 
-#: tortoisehg\hgtk\thgconfig.py:244
+#: tortoisehg\hgtk\thgconfig.py:246
 msgid "Ignore White Space"
 msgstr "Ignorer blanktegn"
 
-#: tortoisehg\hgtk\thgconfig.py:245
+#: tortoisehg\hgtk\thgconfig.py:247
 msgid "Ignore white space when comparing lines. Default: False"
 msgstr "Ignorer blanktegn ved sammenligning af linjer. Default: Falsk"
 
-#: tortoisehg\hgtk\thgconfig.py:247
+#: tortoisehg\hgtk\thgconfig.py:249
 msgid "Ignore WS Amount"
 msgstr "Ignorer mængden af blanktegn"
 
-#: tortoisehg\hgtk\thgconfig.py:248
+#: tortoisehg\hgtk\thgconfig.py:250
 msgid "Ignore changes in the amount of white space. Default: False"
 msgstr "Ignorer ændringer i mængden af blanktegn. Default: Falsk"
 
-#: tortoisehg\hgtk\thgconfig.py:250
+#: tortoisehg\hgtk\thgconfig.py:252
 msgid "Ignore Blank Lines"
 msgstr "Ignorer tomme linier"
 
-#: tortoisehg\hgtk\thgconfig.py:251
+#: tortoisehg\hgtk\thgconfig.py:253
 msgid "Ignore changes whose lines are all blank. Default: False"
 msgstr "Ignorer ændringer som kun indeholder tomme linier. Default: Falsk"
 
-#: tortoisehg\hgtk\thgconfig.py:255
+#: tortoisehg\hgtk\thgconfig.py:257
 msgid "http"
 msgstr "http"
 
-#: tortoisehg\hgtk\thgconfig.py:255
+#: tortoisehg\hgtk\thgconfig.py:257
 msgid "ssh"
 msgstr "ssh"
 
-#: tortoisehg\hgtk\thgconfig.py:256
+#: tortoisehg\hgtk\thgconfig.py:258
 msgid "https"
 msgstr "https"
 
-#: tortoisehg\hgtk\thgconfig.py:256
+#: tortoisehg\hgtk\thgconfig.py:258
 msgid "local"
 msgstr "lokal"
 
-#: tortoisehg\hgtk\thgconfig.py:265
+#: tortoisehg\hgtk\thgconfig.py:267
 msgid "Edit remote repository path"
 msgstr "Rediger sti til fjerndepot"
 
-#: tortoisehg\hgtk\thgconfig.py:273
+#: tortoisehg\hgtk\thgconfig.py:275
 msgid "URL"
 msgstr "URL"
 
-#: tortoisehg\hgtk\thgconfig.py:274
+#: tortoisehg\hgtk\thgconfig.py:276
 msgid "Folder"
 msgstr "Folder"
 
-#: tortoisehg\hgtk\thgconfig.py:276 tortoisehg\hgtk\thgconfig.py:890
+#: tortoisehg\hgtk\thgconfig.py:278 tortoisehg\hgtk\thgconfig.py:892
 msgid "Alias"
 msgstr "Alias"
 
-#: tortoisehg\hgtk\thgconfig.py:308
+#: tortoisehg\hgtk\thgconfig.py:310
 msgid "URL Details"
 msgstr "URL Detaljer"
 
-#: tortoisehg\hgtk\thgconfig.py:319
+#: tortoisehg\hgtk\thgconfig.py:321
 msgid "Type"
 msgstr "Type"
 
-#: tortoisehg\hgtk\thgconfig.py:449
+#: tortoisehg\hgtk\thgconfig.py:451
 msgid "Select Local Folder"
 msgstr "Vælg Lokal Mappe"
 
-#: tortoisehg\hgtk\thgconfig.py:474
+#: tortoisehg\hgtk\thgconfig.py:476
 msgid "Alias name is empty"
 msgstr "Alias-navn er tomt"
 
-#: tortoisehg\hgtk\thgconfig.py:475
+#: tortoisehg\hgtk\thgconfig.py:477
 msgid "Please enter alias name"
 msgstr "Indtast venligst alias-navn"
 
-#: tortoisehg\hgtk\thgconfig.py:480 tortoisehg\hgtk\thgconfig.py:830
+#: tortoisehg\hgtk\thgconfig.py:482 tortoisehg\hgtk\thgconfig.py:832
 msgid "Overwrite existing '%s' path?"
 msgstr "Overskriv eksisterende sti '%s'?"
 
-#: tortoisehg\hgtk\thgconfig.py:538
+#: tortoisehg\hgtk\thgconfig.py:540
 msgid "No repository found"
 msgstr "Intet depot fundet"
 
-#: tortoisehg\hgtk\thgconfig.py:539
+#: tortoisehg\hgtk\thgconfig.py:541
 msgid "no repo at "
 msgstr "intet depot på "
 
-#: tortoisehg\hgtk\thgconfig.py:548
+#: tortoisehg\hgtk\thgconfig.py:550
 msgid "Iniparse package not found"
 msgstr "Iniparse pakke ikke fundet"
 
-#: tortoisehg\hgtk\thgconfig.py:549
+#: tortoisehg\hgtk\thgconfig.py:551
 msgid ""
 "Please install iniparse package\n"
 "Settings are only shown, no changing is possible"
@@ -4192,19 +4297,19 @@ msgstr ""
 "Venligst indstallér iniparse pakke\n"
 "Indstilinger vises blot, ingen ændring er mulig"
 
-#: tortoisehg\hgtk\thgconfig.py:560
+#: tortoisehg\hgtk\thgconfig.py:562
 msgid "User global settings"
 msgstr "Brugerindstillinger"
 
-#: tortoisehg\hgtk\thgconfig.py:562
+#: tortoisehg\hgtk\thgconfig.py:564
 msgid "%s repository settings"
 msgstr "%s depot-indstillinger"
 
-#: tortoisehg\hgtk\thgconfig.py:567
+#: tortoisehg\hgtk\thgconfig.py:569
 msgid "Edit File"
 msgstr "Rediger fil"
 
-#: tortoisehg\hgtk\thgconfig.py:590
+#: tortoisehg\hgtk\thgconfig.py:592
 msgid ""
 "Default language for spell check. System language is used if not specified. "
 "Examples: en, en_GB, en_US"
@@ -4212,91 +4317,91 @@ msgstr ""
 "Standardsprog for stavekontrol. Systemsproget bliver anvendt hvis ikke "
 "anført. Eksempler: da, en, en_GB, en_US"
 
-#: tortoisehg\hgtk\thgconfig.py:604
+#: tortoisehg\hgtk\thgconfig.py:606
 msgid "Sync"
 msgstr "Synk."
 
-#: tortoisehg\hgtk\thgconfig.py:608
+#: tortoisehg\hgtk\thgconfig.py:610
 msgid "Web"
 msgstr "Web"
 
-#: tortoisehg\hgtk\thgconfig.py:611
+#: tortoisehg\hgtk\thgconfig.py:613
 msgid "Proxy"
 msgstr "Proxy"
 
-#: tortoisehg\hgtk\thgconfig.py:617
+#: tortoisehg\hgtk\thgconfig.py:619
 msgid "Diff"
 msgstr "Diff"
 
-#: tortoisehg\hgtk\thgconfig.py:630
+#: tortoisehg\hgtk\thgconfig.py:632
 msgid "Unapplied changes"
 msgstr "Ikke-anvendte ændringer"
 
-#: tortoisehg\hgtk\thgconfig.py:631
+#: tortoisehg\hgtk\thgconfig.py:633
 msgid "Lose changes and switch files?."
 msgstr "Skift filer og mist ændringer?"
 
-#: tortoisehg\hgtk\thgconfig.py:650
+#: tortoisehg\hgtk\thgconfig.py:652
 msgid "TortoiseHg Configure Repository - "
 msgstr "TortoiseHg konfigurer depot - "
 
-#: tortoisehg\hgtk\thgconfig.py:654
+#: tortoisehg\hgtk\thgconfig.py:656
 msgid "TortoiseHg Configure User-Global Settings"
 msgstr "TortoiseHg konfigurer brugerinstillinger"
 
-#: tortoisehg\hgtk\thgconfig.py:711
+#: tortoisehg\hgtk\thgconfig.py:713
 msgid "Exit after saving changes?"
 msgstr "Afslut efter gemning af ændringer?"
 
-#: tortoisehg\hgtk\thgconfig.py:712
+#: tortoisehg\hgtk\thgconfig.py:714
 msgid "&No (discard changes)"
 msgstr "&Nej (kassér ændringer)"
 
-#: tortoisehg\hgtk\thgconfig.py:805
+#: tortoisehg\hgtk\thgconfig.py:807
 msgid "No Repository Found"
 msgstr "Intet depot fundet"
 
-#: tortoisehg\hgtk\thgconfig.py:806
+#: tortoisehg\hgtk\thgconfig.py:808
 msgid "Path testing cannot work without a repository"
 msgstr "Afprøvning af sti fungerer ikke uden et depot"
 
-#: tortoisehg\hgtk\thgconfig.py:872
+#: tortoisehg\hgtk\thgconfig.py:874
 msgid "Remote repository paths"
 msgstr "Sti til andet depot"
 
-#: tortoisehg\hgtk\thgconfig.py:894
+#: tortoisehg\hgtk\thgconfig.py:896
 msgid "Repository Path"
 msgstr "Sti til depot"
 
-#: tortoisehg\hgtk\thgconfig.py:908
+#: tortoisehg\hgtk\thgconfig.py:910
 msgid "_Edit"
 msgstr "_Rediger"
 
-#: tortoisehg\hgtk\thgconfig.py:918
+#: tortoisehg\hgtk\thgconfig.py:920
 msgid "_Test"
 msgstr "_Afprøv"
 
-#: tortoisehg\hgtk\thgconfig.py:923
+#: tortoisehg\hgtk\thgconfig.py:925
 msgid "Set as _default"
 msgstr "Vælg som _default"
 
-#: tortoisehg\hgtk\thgconfig.py:1009
+#: tortoisehg\hgtk\thgconfig.py:1011
 msgid "Suggested"
 msgstr "Foreslået"
 
-#: tortoisehg\hgtk\thgconfig.py:1019
+#: tortoisehg\hgtk\thgconfig.py:1021
 msgid "History"
 msgstr "Historik"
 
-#: tortoisehg\hgtk\thgconfig.py:1057
+#: tortoisehg\hgtk\thgconfig.py:1059
 msgid "# Generated by tortoisehg-config\n"
 msgstr "# Genereret af tortoisehg-config\n"
 
-#: tortoisehg\hgtk\thgconfig.py:1111
+#: tortoisehg\hgtk\thgconfig.py:1113
 msgid "Skipped saving path with no alias"
 msgstr "Sti uden alias gemmes ikke"
 
-#: tortoisehg\hgtk\thgconfig.py:1139
+#: tortoisehg\hgtk\thgconfig.py:1141
 msgid "Unable to write configuration file"
 msgstr "Kan ikke skrive konfigurationsfilen"
 
@@ -4320,35 +4425,37 @@ msgstr "Anvend alle lapper"
 msgid "#"
 msgstr "#"
 
-#: tortoisehg\hgtk\thgmq.py:271
+#: tortoisehg\hgtk\thgmq.py:268
 msgid "%(count)d of %(total)d Patches applied"
-msgstr ""
+msgstr "%(count)d af %(total)d lapper anvendt"
 
-#: tortoisehg\hgtk\thgmq.py:275
+#: tortoisehg\hgtk\thgmq.py:272
 msgid "Patch '%s' applied"
-msgstr ""
+msgstr "Lap '%s' anvendt"
 
 #: tortoisehg\hgtk\thgmq.py:325
 msgid "Confirm Delete"
-msgstr ""
+msgstr "Bekræft sletning"
 
 #: tortoisehg\hgtk\thgmq.py:326
 msgid "Do you want to delete?"
-msgstr ""
+msgstr "Ønsker du at slette?"
 
 #: tortoisehg\hgtk\thgmq.py:327
 msgid "Yes (&keep)"
-msgstr ""
+msgstr "Ja (&bevar)"
 
 #: tortoisehg\hgtk\thgmq.py:409
 msgid "Confirm Fold"
-msgstr ""
+msgstr "Bekræft fold"
 
 #: tortoisehg\hgtk\thgmq.py:410
 msgid ""
 "Do you want to fold un-applied patch '%(target)s' into current patch "
 "'%(qtip)s'?"
 msgstr ""
+"Ønsker du at folde den ikke-anvendt lap '%(target)s' ind i aktuelle lap "
+"'%(qtip)s'?"
 
 #: tortoisehg\hgtk\thgmq.py:567
 msgid "_goto"
@@ -4356,11 +4463,11 @@ msgstr "_gå til"
 
 #: tortoisehg\hgtk\thgmq.py:569
 msgid "_rename"
-msgstr ""
+msgstr "_omdøb"
 
 #: tortoisehg\hgtk\thgmq.py:571
 msgid "_finish applied"
-msgstr ""
+msgstr "_afslut anvendte"
 
 #: tortoisehg\hgtk\thgmq.py:573
 msgid "_delete"
@@ -4368,15 +4475,15 @@ msgstr "_slet"
 
 #: tortoisehg\hgtk\thgmq.py:574
 msgid "delete --keep"
-msgstr ""
+msgstr "slet (og bevar lapper)"
 
 #: tortoisehg\hgtk\thgmq.py:576
 msgid "f_old"
-msgstr ""
+msgstr "f_old"
 
 #: tortoisehg\hgtk\thgmq.py:578
 msgid "make it _next"
-msgstr ""
+msgstr "gør til _næste"
 
 #: tortoisehg\hgtk\thgmq.py:612
 msgid "Show index"
@@ -4404,7 +4511,7 @@ msgstr "Vis 'qforælder'"
 
 #: tortoisehg\hgtk\thgmq.py:642
 msgid "Succeed"
-msgstr ""
+msgstr "Fuldført"
 
 #: tortoisehg\hgtk\thgshelve.py:72
 msgid "set aside selected changes"
@@ -4412,31 +4519,31 @@ msgstr "læg udvalgte ændringer til side"
 
 #: tortoisehg\hgtk\thgshelve.py:73
 msgid "Unshelve"
-msgstr "Afsylt"
+msgstr "Tag fra hylden"
 
 #: tortoisehg\hgtk\thgshelve.py:74
 msgid "restore shelved changes"
-msgstr "Gendan syltede ændringer"
+msgstr "Gendan ændringer fra hylden"
 
 #: tortoisehg\hgtk\thgshelve.py:96
 msgid "Shelf Contents"
-msgstr ""
+msgstr "Hyldens indhold"
 
 #: tortoisehg\hgtk\thgshelve.py:107
 msgid "_shelve"
-msgstr "_sylt"
+msgstr "_læg-på-hylden"
 
 #: tortoisehg\hgtk\thgshelve.py:140
 msgid "No changes to shelve"
-msgstr "Ingen ændriner til sylt"
+msgstr "Ingen ændriner til hylde"
 
 #: tortoisehg\hgtk\thgshelve.py:146
 msgid "Please select diff chunks to shelve"
-msgstr "Vælg diff-stumper at sylte"
+msgstr "Vælg diff-stumper at lægge på hylden"
 
 #: tortoisehg\hgtk\thgshelve.py:154
 msgid "<b>Shelve file exists!</b>"
-msgstr "<b>Sylte-fil eksisterer!</b>"
+msgstr "<b>Hylde-fil eksisterer!</b>"
 
 #: tortoisehg\hgtk\thgshelve.py:155
 msgid "Overwrite"
@@ -4452,105 +4559,107 @@ msgstr "Annuler"
 
 #: tortoisehg\hgtk\thgshelve.py:209
 msgid "Unshelve Error"
-msgstr ""
+msgstr "Tag-fra-hylden fejlede"
 
 #: tortoisehg\hgtk\thgstrip.py:39
 msgid "Strip"
-msgstr ""
+msgstr "Fjern"
 
 #: tortoisehg\hgtk\thgstrip.py:48
 msgid "Strip - %s"
-msgstr ""
+msgstr "Fjern - %s"
 
 #: tortoisehg\hgtk\thgstrip.py:64
 msgid "Strip:"
-msgstr ""
+msgstr "Fjern:"
 
 #: tortoisehg\hgtk\thgstrip.py:79
 msgid "Preview:"
-msgstr ""
+msgstr "Forhåndsvisning:"
 
 #: tortoisehg\hgtk\thgstrip.py:98
 msgid "Show all"
-msgstr ""
+msgstr "Vis alt"
 
 #: tortoisehg\hgtk\thgstrip.py:101
 msgid "Use compact view"
-msgstr ""
+msgstr "Brug kompakt visning"
 
 #: tortoisehg\hgtk\thgstrip.py:117
 msgid "Options:"
-msgstr ""
+msgstr "Indstillinger:"
 
 #: tortoisehg\hgtk\thgstrip.py:121
 msgid "Discard local changes, no backup (-f/--force)"
-msgstr ""
+msgstr "Kasser lokale ændringer, uden sikkerhedskopi (-f/--force)"
 
 #: tortoisehg\hgtk\thgstrip.py:152
 msgid "Backup all (default)"
-msgstr ""
+msgstr "Sikkerhedskopier alt (standard)"
 
 #: tortoisehg\hgtk\thgstrip.py:153
 msgid "Backup unrelated changesets (-b/--backup)"
-msgstr ""
+msgstr "Sikkerhedskopier ikke-relaterede ændringer (-b/--backup)"
 
 #: tortoisehg\hgtk\thgstrip.py:155
 msgid "No backup (-n/--nobackup)"
-msgstr ""
+msgstr "Ingen sikkerhedskopiering (-n/--nobackup)"
 
 #: tortoisehg\hgtk\thgstrip.py:182
 msgid "Unknown revision!"
-msgstr ""
+msgstr "Ukendt revision!"
 
 #: tortoisehg\hgtk\thgstrip.py:184
 msgid "<span weight=\"bold\">%s changesets</span> will be stripped"
-msgstr ""
+msgstr "<span weight=\"bold\">%s ændringer</span> vil blive fjernet"
 
 #: tortoisehg\hgtk\thgstrip.py:190
 msgid "No changesets to display"
-msgstr ""
+msgstr "Ingen ændringer at vise"
 
 #: tortoisehg\hgtk\thgstrip.py:194
 msgid "Displaying all changesets"
-msgstr ""
+msgstr "Viser alle ændringer"
 
 #: tortoisehg\hgtk\thgstrip.py:196
 msgid "Displaying %(count)d of %(total)d changesets"
-msgstr ""
+msgstr "Viser %(count)d af %(total)d ændringer"
 
 #: tortoisehg\hgtk\thgstrip.py:359
 msgid "Confirm Strip"
-msgstr ""
+msgstr "Bekræft fjern"
 
 #: tortoisehg\hgtk\thgstrip.py:360
 msgid ""
 "Detected uncommitted local changes.\n"
 "Do you want to discard them and continue?"
 msgstr ""
+"Fandt ikke-integrerede lokale ændringer.\n"
+"Ønsker du at forkaste dem og fortsætte?"
 
 #: tortoisehg\hgtk\thgstrip.py:362
 msgid "&Yes (--force)"
-msgstr ""
+msgstr "&Ja (--force)"
 
 #: tortoisehg\hgtk\thgstrip.py:380
 msgid "Stripped successfully"
-msgstr ""
+msgstr "Fjern gennemført"
 
 #: tortoisehg\hgtk\thgstrip.py:383
 msgid "Canceled stripping"
-msgstr ""
+msgstr "Fjern afbrudt"
 
 #: tortoisehg\hgtk\thgstrip.py:385
 msgid "Failed to strip"
-msgstr ""
+msgstr "Kunne ikke fjerne"
 
 #: tortoisehg\hgtk\thgstrip.py:404
 msgid "Saved at: %s"
-msgstr ""
+msgstr "Gemt som: %s"
 
 #: tortoisehg\hgtk\thgstrip.py:408
 msgid "Open..."
-msgstr ""
+msgstr "Åben..."
 
 #: tortoisehg\hgtk\update.py:42
 msgid "Update - %s"
@@ -4562,27 +4671,27 @@ msgstr "Opdater til:"
 
 #: tortoisehg\hgtk\update.py:61
 msgid "Discard local changes, no backup (-C/--clean)"
-msgstr ""
+msgstr "Forkast lokale ændringer, ingen sikkerhedskopi (-C/--clean)"
 
 #: tortoisehg\hgtk\update.py:91
 msgid "Target:"
-msgstr ""
+msgstr "Mål:"
 
 #: tortoisehg\hgtk\update.py:99
 msgid "Parent 1:"
-msgstr ""
+msgstr "Forælder 1:"
 
 #: tortoisehg\hgtk\update.py:101
 msgid "Parent 2:"
-msgstr ""
+msgstr "Forælder 2:"
 
 #: tortoisehg\hgtk\update.py:181
 msgid "(same as parent)"
-msgstr ""
+msgstr "(samme som forælder)"
 
 #: tortoisehg\hgtk\update.py:187
 msgid "unknown revision!"
-msgstr ""
+msgstr "ukendt revision!"
 
 #: tortoisehg\hgtk\update.py:223
 msgid ""
@@ -4590,136 +4699,139 @@ msgid ""
 "Please select to continue:\n"
 "\n"
 msgstr ""
+"Fandt ikke-integrerede lokale ændringer i arbejdskataloget.\n"
+"Hvordan vil du fortsætte:\n"
+"\n"
 
 #: tortoisehg\hgtk\update.py:225
 msgid "&Discard"
-msgstr ""
+msgstr "&Forkast"
 
 #: tortoisehg\hgtk\update.py:226
 msgid "Discard - discard local changes, no backup"
-msgstr ""
+msgstr "Forkast - forkaster lokale ændringer, uden sikkerhedskopi"
 
 #: tortoisehg\hgtk\update.py:227
 msgid "&Shelve"
-msgstr ""
+msgstr "&Hylde"
 
 #: tortoisehg\hgtk\update.py:228
 msgid "Shelve - launch Shelve tool and continue"
-msgstr ""
+msgstr "Hylde - starter hylde-værktøjet og fortsætter"
 
 #: tortoisehg\hgtk\update.py:229
 msgid "&Merge"
-msgstr ""
+msgstr "&Flet"
 
 #: tortoisehg\hgtk\update.py:230
 msgid "Merge - allow to merge with local changes"
-msgstr ""
+msgstr "Flet - for at flette med lokale ændringer"
 
 #: tortoisehg\hgtk\update.py:243
 msgid "Confirm Update"
-msgstr ""
+msgstr "Bekræft opdater"
 
 #: tortoisehg\hgtk\update.py:267
 msgid "[canceled by user]\n"
-msgstr ""
+msgstr "[afnnuleret af bruger]\n"
 
 #: tortoisehg\hgtk\update.py:272
 msgid "invalid dialog result: %s"
-msgstr ""
+msgstr "ugyldigt dialog-resultat: %s"
 
 #: tortoisehg\hgtk\update.py:281
 msgid "Updated successfully"
-msgstr ""
+msgstr "Opdatering fuldført"
 
 #: tortoisehg\hgtk\update.py:283
 msgid "Canceled updating"
-msgstr ""
+msgstr "Opdatering annuleret"
 
 #: tortoisehg\hgtk\update.py:285
 msgid "Failed to update"
-msgstr ""
+msgstr "Opdatering fejlede"
 
-#: tortoisehg\hgtk\visdiff.py:55
+#: tortoisehg\hgtk\visdiff.py:60
 msgid "Visual Diffs"
 msgstr "Visuel Diff."
 
-#: tortoisehg\hgtk\visdiff.py:62
+#: tortoisehg\hgtk\visdiff.py:68
 msgid "Temporary files are removed when this dialog is closed"
 msgstr "Midlertidige filer bliver fjernet når denne dialog lukkes"
 
-#: tortoisehg\hgtk\visdiff.py:80
+#: tortoisehg\hgtk\visdiff.py:86
 msgid "Always launch single files"
 msgstr "Altid start enlige filer"
 
-#: tortoisehg\hgtk\visdiff.py:107
+#: tortoisehg\hgtk\visdiff.py:101
 msgid "No repository"
 msgstr "Intet depot"
 
-#: tortoisehg\hgtk\visdiff.py:108 tortoisehg\hgtk\visdiff.py:300
+#: tortoisehg\hgtk\visdiff.py:102 tortoisehg\hgtk\visdiff.py:373
 msgid "No repository found here"
 msgstr "Intet depot fundet her"
 
-#: tortoisehg\hgtk\visdiff.py:115
+#: tortoisehg\hgtk\visdiff.py:109
 msgid "Select diff tool"
 msgstr "Vælg diff-værktøj"
 
-#: tortoisehg\hgtk\visdiff.py:134
+#: tortoisehg\hgtk\visdiff.py:148
 msgid "No visual diff tool"
 msgstr "Intet visuelt diff-værktøj"
 
-#: tortoisehg\hgtk\visdiff.py:135
+#: tortoisehg\hgtk\visdiff.py:149
 msgid "No visual diff tool has been configured"
 msgstr "Der er ikke konfigureret noget visuelt diff-værktøj"
 
-#: tortoisehg\hgtk\visdiff.py:161
+#: tortoisehg\hgtk\visdiff.py:177
 msgid "changeset "
 msgstr "ændring "
 
-#: tortoisehg\hgtk\visdiff.py:166
-msgid "revisions "
-msgstr ""
-
-#: tortoisehg\hgtk\visdiff.py:168
+#: tortoisehg\hgtk\visdiff.py:183
 msgid "working changes"
 msgstr "arbejdsændringer"
 
-#: tortoisehg\hgtk\visdiff.py:171
+#: tortoisehg\hgtk\visdiff.py:186
+msgid "revisions "
+msgstr "revisioner "
+
+#: tortoisehg\hgtk\visdiff.py:193
 msgid "Visual Diffs - "
 msgstr "Visuel diff - "
 
-#: tortoisehg\hgtk\visdiff.py:179 tortoisehg\hgtk\visdiff.py:325
+#: tortoisehg\hgtk\visdiff.py:207 tortoisehg\hgtk\visdiff.py:398
 msgid "No file changes"
 msgstr "Ingen filer ændret"
 
-#: tortoisehg\hgtk\visdiff.py:180 tortoisehg\hgtk\visdiff.py:326
+#: tortoisehg\hgtk\visdiff.py:208 tortoisehg\hgtk\visdiff.py:399
 msgid "There are no file changes to view"
 msgstr "Der er ingen fil-ændringer at se"
 
-#: tortoisehg\hgtk\visdiff.py:227
+#: tortoisehg\hgtk\visdiff.py:277
 msgid "Unable to delete temp files"
 msgstr "Kan ikke slette midlertidige filer"
 
-#: tortoisehg\hgtk\visdiff.py:228
+#: tortoisehg\hgtk\visdiff.py:278
 msgid "Close diff tools and try again, or quit to leak files?"
 msgstr "Luk diff-værktøj og prøv igen, eller stop og efterlad filer?"
 
-#: tortoisehg\hgtk\visdiff.py:229
+#: tortoisehg\hgtk\visdiff.py:279
 msgid "&Quit"
 msgstr "&Afslut"
 
-#: tortoisehg\hgtk\visdiff.py:229
+#: tortoisehg\hgtk\visdiff.py:279
 msgid "Try &Again"
 msgstr "Prøv &Igen"
 
-#: tortoisehg\hgtk\visdiff.py:267
+#: tortoisehg\hgtk\visdiff.py:340
 msgid "Tool launch failure"
 msgstr "Kunne ikke starte værktøj"
 
-#: tortoisehg\hgtk\visdiff.py:268
+#: tortoisehg\hgtk\visdiff.py:341
 msgid "%s : %s"
 msgstr "%s : %s"
 
-#: tortoisehg\hgtk\visdiff.py:307
+#: tortoisehg\hgtk\visdiff.py:380
 msgid "Extdiff command not recognized\n"
 msgstr "Extdiff kommando ikke kendt\n"
 
@@ -4764,7 +4876,7 @@ msgstr "user quit"
 
 #: tortoisehg\util\hgshelve.py:355
 msgid "shelve changes to %s?"
-msgstr "sylt ændringer til %s?"
+msgstr "læg ændringer til %s på hylden?"
 
 #: tortoisehg\util\hgshelve.py:356
 msgid " and "
@@ -4772,7 +4884,7 @@ msgstr " og "
 
 #: tortoisehg\util\hgshelve.py:366
 msgid "shelve this change to %r?"
-msgstr "sylt denne ændring til %r?"
+msgstr "læg denne ændring til %r på hylden?"
 
 #: tortoisehg\util\hgshelve.py:405
 msgid "backup %r as %r\n"
@@ -4780,15 +4892,15 @@ msgstr "sikkerhedskopier %r som %r\n"
 
 #: tortoisehg\util\hgshelve.py:438
 msgid "shelve can only be run interactively"
-msgstr "sylt kan kun køre interaktivt"
+msgstr "hylden kan kun anvendes interaktivt"
 
 #: tortoisehg\util\hgshelve.py:442
 msgid "shelve data already exists"
-msgstr "syltet data findes allerede"
+msgstr "hylden er allerede i brug"
 
 #: tortoisehg\util\hgshelve.py:473
 msgid "no changes to shelve\n"
-msgstr "ingen ændringer til sylte\n"
+msgstr "ingen ændringer til hylden\n"
 
 #: tortoisehg\util\hgshelve.py:507
 msgid "applying patch\n"
@@ -4796,7 +4908,7 @@ msgstr "tilføjer lap\n"
 
 #: tortoisehg\util\hgshelve.py:514
 msgid "saving patch to shelve\n"
-msgstr "sylter lap\n"
+msgstr "læg lap på hylden\n"
 
 #: tortoisehg\util\hgshelve.py:525 tortoisehg\util\hgshelve.py:576
 msgid "restoring %r to %r\n"
@@ -4804,7 +4916,7 @@ msgstr "gendanner %r som %r\n"
 
 #: tortoisehg\util\hgshelve.py:527
 msgid "removing shelve file\n"
-msgstr "fjerner sylte-filer\n"
+msgstr "fjerner hylde-filer\n"
 
 #: tortoisehg\util\hgshelve.py:536
 msgid "removing backup for %r : %r\n"
@@ -4812,7 +4924,7 @@ msgstr "fjerner sikkerhedskopi af %r : %r\n"
 
 #: tortoisehg\util\hgshelve.py:561
 msgid "applying shelved patch\n"
-msgstr "anvender syltede lapper\n"
+msgstr "anvender lap fra hylden\n"
 
 #: tortoisehg\util\hgshelve.py:574
 msgid "restoring backup files\n"
@@ -4824,27 +4936,28 @@ msgstr "fjerner sikkerhedskopi-filer\n"
 
 #: tortoisehg\util\hgshelve.py:587
 msgid "removing shelved patches\n"
-msgstr "fjerner syltede lapper\n"
+msgstr "fjerner lapper fra hylden\n"
 
 #: tortoisehg\util\hgshelve.py:589
 msgid "unshelve completed\n"
-msgstr "afsyltning fuldbragt\n"
+msgstr "hylden er tømt\n"
 
 #: tortoisehg\util\hgshelve.py:591
 msgid "nothing to unshelve\n"
-msgstr "intet at afsylte\n"
+msgstr "intet på hylden\n"
 
 #: tortoisehg\util\hgshelve.py:597
 msgid "mark new/missing files as added/removed before shelving"
-msgstr "marker nye/manglende filer som tilføjede/fjernede før syltning"
+msgstr ""
+"marker nye/manglende filer som tilføjede/fjernede før de lægges på hylden"
 
 #: tortoisehg\util\hgshelve.py:599
 msgid "overwrite existing shelve data"
-msgstr "overskriv eksitsterende sylte-data"
+msgstr "overskriv eksitsterende hylde-data"
 
 #: tortoisehg\util\hgshelve.py:601
 msgid "append to existing shelve data"
-msgstr "tilføj til eksisterende sylte-data"
+msgstr "tilføj til eksisterende hylde-data"
 
 #: tortoisehg\util\hgshelve.py:603
 msgid "hg shelve [OPTION]... [FILE]..."
@@ -4852,11 +4965,11 @@ msgstr "hg shelve [OPTION]... [FILE]..."
 
 #: tortoisehg\util\hgshelve.py:606
 msgid "inspect shelved changes only"
-msgstr "inspicer syltede ændringer"
+msgstr "inspicer ændringer på hylden"
 
 #: tortoisehg\util\hgshelve.py:608
 msgid "proceed even if patches do not unshelve cleanly"
-msgstr "fortsæt selv om lapper ikke afsyltes korrekt"
+msgstr "fortsæt selv om lapper ikke kommer korrekt fra hylden"
 
 #: tortoisehg\util\hgshelve.py:610
 msgid "hg unshelve [OPTION]... [FILE]..."
@@ -4876,7 +4989,7 @@ msgstr "Lav depot her"
 
 #: tortoisehg\util\menuthg.py:44
 msgid "Clone..."
-msgstr ""
+msgstr "Klon..."
 
 #: tortoisehg\util\menuthg.py:45
 msgid "Create clone here from source"
@@ -4884,7 +4997,7 @@ msgstr "Lav klon her fra kilden"
 
 #: tortoisehg\util\menuthg.py:47
 msgid "File Status"
-msgstr ""
+msgstr "Fil status"
 
 #: tortoisehg\util\menuthg.py:48
 msgid "Repository status & changes"
@@ -4892,15 +5005,15 @@ msgstr "Depotstatus og -ændringer"
 
 #: tortoisehg\util\menuthg.py:50
 msgid "Shelve Changes"
-msgstr "Sylt ændringer"
+msgstr "Læg ændringer på hylden"
 
 #: tortoisehg\util\menuthg.py:51
 msgid "Shelve or unshelve file changes"
-msgstr "Sylt eller afsylt ændringer"
+msgstr "Flyt filændringer til/fra hylden"
 
 #: tortoisehg\util\menuthg.py:53
 msgid "Add Files..."
-msgstr ""
+msgstr "Tilføj filer..."
 
 #: tortoisehg\util\menuthg.py:54
 msgid "Add files to version control"
@@ -4908,7 +5021,7 @@ msgstr "Tilføj filer til versionskontrol"
 
 #: tortoisehg\util\menuthg.py:56
 msgid "Revert Files..."
-msgstr ""
+msgstr "Tilbagefør filer..."
 
 #: tortoisehg\util\menuthg.py:57
 msgid "Revert file changes"
@@ -4916,7 +5029,7 @@ msgstr "Tilbagefør ændringer"
 
 #: tortoisehg\util\menuthg.py:59
 msgid "Forget Files..."
-msgstr ""
+msgstr "Glem filer..."
 
 #: tortoisehg\util\menuthg.py:60 tortoisehg\util\menuthg.py:63
 msgid "Remove files from version control"
@@ -4924,7 +5037,7 @@ msgstr "Fjern filer fra versionskontrol"
 
 #: tortoisehg\util\menuthg.py:62
 msgid "Remove Files..."
-msgstr ""
+msgstr "Fjern filer..."
 
 #: tortoisehg\util\menuthg.py:65
 msgid "Rename File"
@@ -4936,7 +5049,7 @@ msgstr "Omdøb fil eller katalog"
 
 #: tortoisehg\util\menuthg.py:68
 msgid "Repository Explorer"
-msgstr ""
+msgstr "Depot-stifinder"
 
 #: tortoisehg\util\menuthg.py:69
 msgid "View change history in repository"
@@ -4956,7 +5069,7 @@ msgstr "Start web-server for dette depot"
 
 #: tortoisehg\util\menuthg.py:77
 msgid "Update..."
-msgstr ""
+msgstr "Opdater..."
 
 #: tortoisehg\util\menuthg.py:78
 msgid "Update working directory"
@@ -5044,7 +5157,7 @@ msgstr "Søg i fil-revisioner efter mønstre"
 
 #: tortoisehg\util\menuthg.py:110
 msgid "DnD Synchronize"
-msgstr ""
+msgstr "Træk-og-slip synkroniser"
 
 #: tortoisehg\util\menuthg.py:111
 msgid "Synchronize with dragged repository"
@@ -5305,9 +5418,6 @@ msgstr "Synkroniser med indtrukket depot"
 #~ msgid "Show Head Revisions"
 #~ msgstr "Vis hoved-revisioner"
 
-#~ msgid "Custom Filter"
-#~ msgstr "Tilpasset filter"
-
 #~ msgid "visualize change"
 #~ msgstr "visualiser ændringer"
 
@@ -5547,9 +5657,6 @@ msgstr "Synkroniser med indtrukket depot"
 
 #~ msgid "create a new repository in this directory"
 #~ msgstr "lav et nyt depot i dette katalog"
-
-#~ msgid "Shelve or unshelve repository changes"
-#~ msgstr "Sylt eller afsylt depotændringer"
 
 #~ msgid "Revert Changes"
 #~ msgstr "Omgør ændringer"
