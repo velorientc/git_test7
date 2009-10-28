@@ -1394,35 +1394,28 @@ class GLog(gdialog.GDialog):
             return
 
         confirm_push = False
-        try:
-            dest_repo = hg.repository(self.ui, path=remote_path)
-            if not dest_repo.local():
-                if self.forcepush:
-                    title = _('Confirm Forced Push to Remote Repository')
-                    text = _('Forced push to remote repository\n%s\n'
-                        '(creating new heads in remote if needed)?') % remote_path
-                    buttontext = _('Forced &Push')
-                else:
-                    title = _('Confirm Push to remote Repository')
-                    text = _('Push to remote repository\n%s\n?') % remote_path
-                    buttontext = _('&Push')
-                confirm_push = True
-            elif self.forcepush:
-                title = _('Confirm Forced Push')
-                text = _('Forced push to repository\n%s\n'
-                    '(creating new heads if needed)?') % remote_path
+        if not hg.islocal(remote_path):
+            if self.forcepush:
+                title = _('Confirm Forced Push to Remote Repository')
+                text = _('Forced push to remote repository\n%s\n'
+                    '(creating new heads in remote if needed)?') % remote_path
                 buttontext = _('Forced &Push')
-                confirm_push = True
-            if confirm_push:
-                dlg = gdialog.CustomPrompt(title, text,
-                        None, (buttontext, _('&Cancel')), default=1, esc=1)
-                if dlg.run() != 0:
-                    return
-        except hglib.RepoError, e:
-            dlg = gdialog.Prompt(_('Invalid Remote Repository'), str(e), self,
-                    type=gtk.MESSAGE_ERROR)
-            dlg.run()
-            return
+            else:
+                title = _('Confirm Push to remote Repository')
+                text = _('Push to remote repository\n%s\n?') % remote_path
+                buttontext = _('&Push')
+            confirm_push = True
+        elif self.forcepush:
+            title = _('Confirm Forced Push')
+            text = _('Forced push to repository\n%s\n'
+                '(creating new heads if needed)?') % remote_path
+            buttontext = _('Forced &Push')
+            confirm_push = True
+        if confirm_push:
+            dlg = gdialog.CustomPrompt(title, text,
+                    None, (buttontext, _('&Cancel')), default=1, esc=1)
+            if dlg.run() != 0:
+                return
 
         cmdline = ['hg', 'push'] + self.get_proxy_args()
         if self.forcepush:
