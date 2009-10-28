@@ -41,7 +41,7 @@ class StatusBar(gtk.HBox):
         self.pbar.pulse()
         return True
 
-    def begin(self, msg=_('Running'), timeout=100):
+    def begin(self, msg=_('Running...'), timeout=100):
         self.pbox.set_child_visible(True)
         self.pbox.map()
         self.set_status_text(msg)
