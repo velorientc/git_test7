@@ -86,6 +86,8 @@ From left to right...
 To the right of the :guilabel:`Stop` button is a combo box containing
 all of the configured peer repository paths for the current repository.
 The default path is selected at startup, if it has been configured.
+See `hg.1.html <http://www.selenic.com/mercurial/hg.1.html#urls>`_  for
+details on specifying remote repository URLs.
 
 To the right of the path combo box is the :guilabel:`After Pull` combo
 that selects the operation which is performed after every pull operation
@@ -114,6 +116,59 @@ Search Bar
 	:alt: Changelog
 
 	Synchronization features in changelog tool
+
+The search bar allows one to quickly filter the changesets panel.
+Buttons from right to left...
+
+	:guilabel:`All`
+		Show all changesets in the respository.  Essentially removes all
+		filters.
+	:guilabel:`Tagged`
+		Show only changesets with tags.
+	:guilabel:`Ancestry`
+		Show only changesets that are ancestors of the currently
+		selected changeset.  This option is only sensitive when a
+		revision is selected.
+	:guilabel:`Parents`
+		Show only the working directory parent revisions.  Unless a
+		merge is in progress, this will be only one revision.
+	:guilabel:`Heads`
+		Show only repository heads (changesets without any child
+		revisions).
+	:guilabel:`Merges`
+		Show only merge changesets (changesets with two parents)
+	:guilabel:`Hide Merges`
+		A toggle button, not a radio like the other buttons in the
+		search bar, which toggles the display of merge changesets.
+	:guilabel:`Branches`
+		A combo box with the list of named branches in your repository.
+		See :guilabel:`Repo Settings -> Changelog -> Dead Branches` for
+		a method to prune names from this combo box.
+	:guilabel:`Custom Filter Combo`
+		Finally there is a combo box that selects among the various
+		filter types that can be manually specified.
+
+To specify a custom filter, the user selects the filter type, enters
+the search text of that type, and then hits return in the text entry.
+
+	:guilabel:`Rev Range`
+		Parse the user text as a revision range.  See
+		`hg.1.html <http://www.selenic.com/mercurial/hg.1.html#revisions>`_ 
+		for details on how to specify revision ranges.
+	:guilabel:`File Patterns`
+		Parse the user text as a file pattern glob, unless the user text
+		is prefixed with a pattern type like *regexp:*.  See
+		`hg.1.html <http://www.selenic.com/mercurial/hg.1.html#patterns>`_ 
+		for details on how to specify file patterns.
+	:guilabel:`Keywords`
+		Parse the user text as a keyword pattern that should be matched
+		against changeset meta data like comitter, message, etc.
+	:guilabel:`Date`
+		Parse the user text as a date range.  See
+		`hg.1.html <http://www.selenic.com/mercurial/hg.1.html#dates>`_ 
+		for details on how to specify date ranges.
+	:guilabel:`User`
+		Parse the user text as a user / comitter name.
 
 
 Revision Graph Details
