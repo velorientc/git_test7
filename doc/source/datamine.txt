@@ -102,7 +102,7 @@ Following Renames
 The annotation data will automatically follow lines of code back through
 copies and renames to find the initial changeset that introduced the
 line.  The graph log pane will also attempt to follow renames and
-copies, so some lines in the graph may corrolate to different filenames
+copies, so some lines in the graph may correlate to different filenames
 than the original annotated file path.  Renames are indicated in the
 graph by color changes within a column.
 
