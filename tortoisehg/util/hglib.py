@@ -4,6 +4,7 @@
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
+from mercurial.url import url
 
 import os
 import sys
@@ -219,3 +220,17 @@ def username(user):
     if not author:
         author = util.shortuser(user)
     return author
+
+def validate_synch_path(path, repo):
+    '''
+    Validate the path that must be used to sync operations (pull,
+    push, outgoing and incoming)
+    '''
+    return_path = path
+    for alias, path_aux in repo.ui.configitems('paths'):
+        if path == alias:
+            return_path = path_aux
+        elif path == url.hidepassword(path_aux):
+            return_path = path_aux
+    return return_path
+

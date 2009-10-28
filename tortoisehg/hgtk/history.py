@@ -1196,12 +1196,8 @@ class GLog(gdialog.GDialog):
             atexit.register(cleanup)
 
         bfile = path
+        path = hglib.validate_synch_path(path, self.repo)
         
-        for alias, path_aux in self.repo.ui.configitems('paths'):
-            if path == alias:
-                path = path_aux
-            elif path == url.hidepassword(path_aux):
-                path = path_aux
                 
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
@@ -1330,7 +1326,7 @@ class GLog(gdialog.GDialog):
         q = Queue.Queue()
         cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n']
         cmd += self.get_proxy_args()
-        cmd += [path]
+        cmd += [hglib.validate_synch_path(path, self.repo)] 
 
         def threadfunc(q, *args):
             try:
