@@ -309,6 +309,14 @@ the TortoiseHg Settings dialog on the Changelog tab.
 		escaped using a backslash (\\). Likewise some other characters
 		can be escaped in this way, e.g. \\u0040 will be decoded to the
 		@ character, and \\n to a linefeed.
+	:guilabel:`Hide Tags`
+		Space separated list of tags that will not be shown.  Useful
+		example: Specify "qbase qparent qtip" to hide the standard tags
+		inserted by the Mercurial Queues Extension.
+	:guilabel:`Use Expander`
+		Show changeset details within an expander.  When contained
+		within the expander, the details do not scroll with the
+		changeset contents.
 
 The exact colors given to particular users can be configured by adding
 lines like these to your :file:`Mercurial.ini` file: ::
