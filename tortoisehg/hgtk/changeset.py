@@ -454,14 +454,16 @@ class ChangeSet(gdialog.GDialog):
                 parents = []
                 for pctx in pctxs:
                     highlight = len(pctxs) == 2 and pctx == pctxs[pindex]
-                    branch = pctx.branch() != ctx.branch() and pctx.branch() or None
+                    branch = None
+                    if hasattr(pctx, 'branch') and pctx.branch() != ctx.branch():
+                        branch = pctx.branch()
                     parents.append(revline_data(pctx, highlight, branch))
                 return parents
             elif item == 'children':
                 children = []
                 for cctx in ctx.children():
                     branch = None
-                    if cctx.branch() != ctx.branch():
+                    if hasattr(cctx, 'branch') and cctx.branch() != ctx.branch():
                         branch = cctx.branch()
                     children.append(revline_data(cctx, branch=branch))
                 return children
@@ -540,12 +542,19 @@ class ChangeSet(gdialog.GDialog):
                 box.pack_start(link, False, False)
                 box.pack_start(text, True, True, 4)
                 return box
+            def genwidget(param):
+                if isinstance(param, basestring):
+                    label = gtk.Label()
+                    label.set_markup(param)
+                    label.set_selectable(True)
+                    return label
+                return linkwidget(*param)
             if item in ('parents', 'children'):
                 csets = widget.get_data(item)
-                return [linkwidget(*cset) for cset in csets]
+                return [genwidget(cset) for cset in csets]
             elif item == 'transplant':
                 cset = widget.get_data(item)
-                return linkwidget(*cset)
+                return genwidget(cset)
             raise csinfo.UnknownItem(item)
 
         custom = csinfo.custom(data=data_func, label=label_func,
