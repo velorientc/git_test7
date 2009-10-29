@@ -159,14 +159,14 @@ class CmdDialog(gtk.Dialog):
                 pass
         while self.hgthread.geterrqueue().qsize():
             try:
-                msg = self.hgthread.geterrqueue().get(0)
+                msg = hglib.toutf(self.hgthread.geterrqueue().get(0))
                 self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
         while self.stdoutq.qsize():
             try:
-                msg = self.stdoutq.get(0)
+                msg = hglib.toutf(self.stdoutq.get(0))
                 self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
