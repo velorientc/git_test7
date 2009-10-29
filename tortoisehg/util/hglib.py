@@ -56,11 +56,14 @@ def fromutf(s):
     """
     try:
         return s.decode('utf-8').encode(_encoding)
-    except UnicodeDecodeError:
+    except (UnicodeDecodeError, UnicodeEncodeError):
         pass
-    except UnicodeEncodeError:
+    try:
+        return s.decode('utf-8').encode(_fallbackencoding)
+    except (UnicodeDecodeError, UnicodeEncodeError):
         pass
-    return s.decode('utf-8').encode(_fallbackencoding)
+    u = s.decode('utf-8', 'replace') # last ditch
+    return u.encode(_encoding, 'replace')
 
 _tabwidth = None
 def gettabwidth(ui):
