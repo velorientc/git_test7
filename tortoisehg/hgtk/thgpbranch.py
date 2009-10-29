@@ -196,6 +196,7 @@ class PBranchWidget(gtk.VBox):
         in_lines = []
         if patch_list:
             dep_list = [patch_list[0]]
+        cur_branch = self.repo['.'].branch()
         for name in patch_list:
             parents = graph.deps(name)
 
@@ -204,7 +205,8 @@ class PBranchWidget(gtk.VBox):
                 node_col = dep_list.index(name)
             else:
                 node_col = len(dep_list)
-            node = (node_col,0,0) #             (column, colour, status) tuple to draw revision node,
+            node_status = (name == cur_branch) and 4 or 0
+            node = (node_col,0,node_status) #             (column, colour, status) tuple to draw revision node,
             
             # Find next dependency list
             my_deps = []
