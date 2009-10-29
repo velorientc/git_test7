@@ -54,7 +54,7 @@ __author__    = "Joel Rosdahl <joel@rosdahl.net>, Steve Borho <steve@borho.org>"
 import re
 
 from mercurial.node import nullrev
-from mercurial import cmdutil, util
+from mercurial import cmdutil, util, match
 
 from tortoisehg.util import hglib
 
@@ -511,17 +511,15 @@ def filtered_log_generator(repo, pats, opts):
         df = util.matchdate(opts['date'])
 
     stack = []
-    get = util.cachefunc(lambda r: repo[r])
-    changeiter, matchfn = cmdutil.walkchangerevs(repo.ui, repo, pats, get, opts)
-    for st, rev, fns in changeiter:
+    m = match.match(repo.root, repo.root, pats)
+    for st, ctx, fns in cmdutil.walkchangerevs(repo.ui, repo, m, opts):
+        rev = ctx.rev()
         if st == 'iter':
             if stack:
                 yield stack.pop()
             continue
         if st != 'add':
             continue
-
-        ctx = get(rev)
 
         if only_branch:
             if ctx.branch() != only_branch:
@@ -533,10 +531,8 @@ def filtered_log_generator(repo, pats, opts):
         if opts['only_merges'] and len(parents) != 2:
             continue
 
-        if df:
-            changes = get(rev)
-            if not df(changes[2][0]):
-                continue
+        if df and not df(ctx.date()[0]):
+            continue
 
         # TODO: add copies/renames later
         if opts['keyword']:
