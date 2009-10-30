@@ -502,57 +502,34 @@ def filtered_log_generator(repo, pats, opts):
        pats - list of file names or patterns
        opts - command line options for log command
     '''
-
+    matching_revs = []
     only_branch = opts.get('branch', None)
-
-    # Log searches: pattern, keyword, date, etc
     df = False
     if opts['date']:
         df = util.matchdate(opts['date'])
 
-    stack = []
-    m = match.match(repo.root, repo.root, pats)
-    for st, ctx, fns in cmdutil.walkchangerevs(repo.ui, repo, m, opts):
-        rev = ctx.rev()
-        if st == 'iter':
-            if stack:
-                yield stack.pop()
-            continue
-        if st != 'add':
-            continue
-
-        if only_branch:
-            if ctx.branch() != only_branch:
-                continue
-
-        parents = __get_parents(repo, rev)
-        if opts['no_merges'] and len(parents) == 2:
-            continue
-        if opts['only_merges'] and len(parents) != 2:
-            continue
-
+    def prep(ctx, fns):
+        if only_branch and ctx.branch() != only_branch:
+            return
+        if opts['no_merges'] and len(ctx.parents()) == 2:
+            return
+        if opts['only_merges'] and len(ctx.parents()) != 2:
+            return
         if df and not df(ctx.date()[0]):
-            continue
-
-        # TODO: add copies/renames later
+            return
+        if opts['user'] and not [k for k in opts['user'] if k in ctx.user()]:
+            return
         if opts['keyword']:
-            miss = 0
             for k in [kw.lower() for kw in opts['keyword']]:
-                if not (k in ctx.user().lower() or
-                        k in ctx.description().lower() or
-                        k in " ".join(ctx.files()).lower()):
-                    miss = 1
+                if (k in ctx.user().lower() or
+                    k in ctx.description().lower() or
+                    k in " ".join(ctx.files()).lower()):
                     break
-            if miss:
-                continue
+            else:
+                return
+        matching_revs.append(ctx.rev())
 
-        if opts['user']:
-            miss = 0
-            for u in [u.lower() for u in opts['user']]:
-                if u not in ctx.user().lower():
-                    miss = 1
-                    break
-            if miss:
-                continue
-
-        stack.append((rev, (0,0), [], None))
+    m = match.match(repo.root, repo.root, pats)
+    for ctx in cmdutil.walkchangerevs(repo, m, opts, prep):
+        if ctx.rev() in matching_revs:
+            yield (ctx.rev(), (0,0), [], None)
