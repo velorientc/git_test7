@@ -384,7 +384,7 @@ class GLog(gdialog.GDialog):
             return
         if mode == 0: # Rev Range
             try:
-                opts['revs'] = cmdutil.revrange(self.repo, [text])
+                opts['revlist'] = cmdutil.revrange(self.repo, [text])
             except Exception, e:
                 gdialog.Prompt(_('Invalid revision range'), str(e), self).run()
                 return
