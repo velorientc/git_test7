@@ -1351,7 +1351,7 @@ class GLog(gdialog.GDialog):
                 self.stbar.end()
                 self.outgoing = outgoing
                 self.reload_log()
-                text = _('%d outgoing changesets') % len(outgoing)
+                text = _('%d outgoing Changesets') % len(outgoing)
                 self.stbar.set_idle_text(text)
                 self.stop_button.disconnect(stop_handler)
                 self.stop_button.set_sensitive(False)
