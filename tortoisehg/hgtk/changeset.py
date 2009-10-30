@@ -499,11 +499,11 @@ class ChangeSet(gdialog.GDialog):
                 if revid:
                     revid = revid_markup(revid)
                     if branch:
-                        return '%s (%s) [%s] %s' % (revnum, revid, branch, summary)
+                        return '%s (%s) %s %s' % (revnum, revid, branch, summary)
                     return '%s (%s) %s' % (revnum, revid, summary)
                 else:
                     if branch:
-                        return '%s [%s] - %s' % (revnum, branch, summary)
+                        return '%s - %s %s' % (revnum, branch, summary)
                     return '%s - %s' % (revnum, summary)
             if item in ('cset', 'transplant', 'patch'):
                 if isinstance(value, basestring):
@@ -520,27 +520,27 @@ class ChangeSet(gdialog.GDialog):
             raise csinfo.UnknownItem(item)
         def widget_func(widget, item, markups):
             def linkwidget(revnum, revid, summary, highlight=None, branch=None):
+                # revision label
                 opts = dict(underline='single', foreground='#0000FF')
                 if highlight:
                     opts['weight'] = 'bold'
-                revfmt = '%s (%s)'
-                revargs = [gtklib.markup(revnum, **opts),
-                        revid_markup(revid, **opts)]
+                rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
+                        revid_markup(revid, **opts))
+                revlabel = gtk.Label()
+                revlabel.set_markup(rev)
+                revlabel.set_selectable(True)
+                revlabel.connect('button-release-event', self.link_event, revnum)
+                # summary & branch label
+                sum = gtklib.markup(summary)
                 if branch:
-                    revfmt = '%s (%s) [%s]'
-                    revargs.append(gtklib.markup(branch, color='black',
-                        background='#aaffaa'))
-
-                rev = revfmt % tuple(revargs)
-                link = gtk.Label()
-                link.set_markup(rev)
-                link.set_selectable(True)
-                link.connect('button-release-event', self.link_event, revnum)
-                text = gtk.Label(summary)
-                text.set_selectable(True)
+                    sum = gtklib.markup(branch, color='black',
+                        background='#aaffaa') + ' ' + sum
+                sumlabel = gtk.Label()
+                sumlabel.set_markup(sum)
+                sumlabel.set_selectable(True)
                 box = gtk.HBox()
-                box.pack_start(link, False, False)
-                box.pack_start(text, True, True, 4)
+                box.pack_start(revlabel, False, False)
+                box.pack_start(sumlabel, True, True, 4)
                 return box
             def genwidget(param):
                 if isinstance(param, basestring):
