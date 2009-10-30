@@ -239,15 +239,7 @@ def runcommand(ui, args):
     else:
         lui = ui
 
-    _loaded = {}
     extensions.loadall(ui)
-    for name, module in extensions.extensions():
-        if name in _loaded:
-            continue
-        extsetup = getattr(module, 'extsetup', None)
-        if extsetup:
-            extsetup()
-        _loaded[name] = 1
 
     if options['quiet']:
         ui.quiet = True
