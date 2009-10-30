@@ -232,6 +232,12 @@ class ChangeSet(gdialog.GDialog):
             else:
                 self.append_all_patch_diffs()
 
+        # reset position of diff pane's scroll bar
+        adj = self.diffscroller.get_vadjustment()
+        adj.set_value(0)
+        adj = self.diffscroller.get_hadjustment()
+        adj.set_value(0)
+
     def generate_change_header(self):
         self.summarypanel.update(self.currev, self.csetstyle)
         self.summarybox.show()
@@ -424,6 +430,7 @@ class ChangeSet(gdialog.GDialog):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         details_frame.add(scroller)
+        self.diffscroller = scroller
 
         details_box = gtk.VBox()
         scroller.add_with_viewport(details_box)
