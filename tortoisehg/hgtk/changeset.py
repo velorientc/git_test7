@@ -162,6 +162,8 @@ class ChangeSet(gdialog.GDialog):
         else:
             self._filesel.select_path((0,))
 
+        self.reset_scroll_pos()
+
     def load_patch_details(self, patchfile):
         'Load specified patch details into buffer and file list'
         self._filelist.clear()
@@ -212,6 +214,8 @@ class ChangeSet(gdialog.GDialog):
         else:
             self._filesel.select_path((0,))
 
+        self.reset_scroll_pos()
+
     def filelist_rowchanged(self, sel):
         model, path = sel.get_selected()
         if not path:
@@ -232,7 +236,7 @@ class ChangeSet(gdialog.GDialog):
             else:
                 self.append_all_patch_diffs()
 
-        # reset position of diff pane's scroll bar
+    def reset_scroll_pos(self):
         adj = self.diffscroller.get_vadjustment()
         adj.set_value(0)
         adj = self.diffscroller.get_hadjustment()
