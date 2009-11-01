@@ -181,6 +181,9 @@ Frequently Asked Questions
 
 	Alternatively, you can use the hgsubversion extension.
 
+	Refer to http://mercurial.selenic.com/wiki/RepositoryConversion for more
+	details.
+
 *Where do TortoiseHg extensions look for external Python modules on Windows?*
 
 	TortoiseHg includes an entire Python distribution bundled up as
