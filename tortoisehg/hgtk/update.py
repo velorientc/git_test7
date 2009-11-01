@@ -254,12 +254,14 @@ class UpdateDialog(gtk.Dialog):
                 if ret['discard']:
                     cmdline.append('--clean')
                 elif ret['shelve']:
-                    from tortoisehg.hgtk import thgshelve
-                    dlg = thgshelve.run(ui.ui())
-                    dlg.set_transient_for(self)
-                    dlg.set_modal(True)
-                    dlg.display()
-                    dlg.connect('destroy', lambda w: self.update())
+                    def launch_shelve():
+                        from tortoisehg.hgtk import thgshelve
+                        dlg = thgshelve.run(ui.ui())
+                        dlg.set_transient_for(self)
+                        dlg.set_modal(True)
+                        dlg.display()
+                        dlg.connect('destroy', lambda w: self.update())
+                    gtklib.idle_add_single_call(launch_shelve)
                     return # retry later, no need to destroy
                 elif ret['merge']:
                     pass # no args
