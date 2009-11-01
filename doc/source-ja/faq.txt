@@ -183,6 +183,10 @@
 
 	もしくは hgsubversion 拡張機能を使うという方法もあります。
 
+	詳しくは
+	`リポジトリの変換 <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
+	を参照してください。
+
 *Windows の TortoiseHg はどこの Python モジュールを参照しているの？*
 
 	TortoiseHg は Python の実行に必要な環境を DLL の形で同梱しています。

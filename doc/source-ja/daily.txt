@@ -7,7 +7,6 @@ TortoiseHg ダイアログ
 	
 	common
 	explorer
-	start
 	init
 	clone
 	commit
