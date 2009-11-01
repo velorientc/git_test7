@@ -45,7 +45,7 @@ The toolbar buttons from left to right:
 	:guilabel:`Load all`
 		load all remaining revisions into the graph
 
-Synch Bar
+Sync Bar
 ---------
 
 .. figure:: figures/syncbar.png
@@ -91,7 +91,7 @@ details on specifying remote repository URLs.
 
 To the right of the path combo box is the :guilabel:`After Pull` combo
 that selects the operation which is performed after every pull operation
-triggered by the search bar.  The user must have the rebase extension
+triggered by the sync bar.  The user must have the rebase extension
 enabled in order for that option to be available in the after pull
 combo.  The same is true of the fetch extension and it's post pull
 operation.
@@ -115,7 +115,7 @@ Search Bar
 .. figure:: figures/searchbar.png
 	:alt: Changelog
 
-	Synchronization features in changelog tool
+	Filter features in changelog tool
 
 The search bar allows one to quickly filter the changesets panel.
 Buttons from right to left...
