@@ -19,17 +19,17 @@ class InitDialog(gtk.Dialog):
     """ Dialog to initialize a Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self, title=_('Create a new repository'),
-                          buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        gtk.Dialog.__init__(self, title=_('Create a new repository'))
         gtklib.set_tortoise_icon(self, 'menucreaterepos.ico')
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
 
-        # add create button
+        # add buttons
         createbutton = gtk.Button(_('Create'))
         createbutton.connect('clicked', lambda b: self.init())
         self.action_area.pack_end(createbutton)
+        self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         self.cwd = os.getcwd()
 
