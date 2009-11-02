@@ -63,9 +63,23 @@ class StripDialog(gtk.Dialog):
         self.revcombo = gtk.combo_box_entry_new_text()
         table.add_row(_('Strip:'), self.revcombo)
         reventry = self.revcombo.child
-        reventry.set_text(rev)
         reventry.set_width_chars(32)
         reventry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
+
+        ### fill combo list
+        self.revcombo.append_text(rev)
+        self.revcombo.set_active(0)
+        dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
+        deadbranches = [ x.strip() for x in dblist.split(',') ]
+        for name in repo.branchtags().keys():
+            if name not in deadbranches:
+                self.revcombo.append_text(name)
+
+        tags = list(repo.tags())
+        tags.sort()
+        tags.reverse()
+        for tag in tags:
+            self.revcombo.append_text(tag)
 
         def createlabel():
             label = gtk.Label()
@@ -317,7 +331,7 @@ class StripDialog(gtk.Dialog):
     def get_rev(self):
         """ Return integer revision number or None """
         revstr = self.revcombo.get_active_text()
-        if len(revstr) == 0:
+        if revstr is None or len(revstr) == 0:
             return None
         try:
             revnum = self.repo[revstr].rev()
