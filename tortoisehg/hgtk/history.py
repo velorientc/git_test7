@@ -1540,6 +1540,23 @@ class GLog(gdialog.GWindow):
         midpane.pack_start(self.graphview)
         midpane.show_all()
 
+        # pbranch widget
+        if 'pbranch' in self.exs:
+            # create PBranchWidget
+            self.pbranchwidget = thgpbranch.PBranchWidget(
+                self.repo, self.stbar, accelgroup, self.tooltips)
+
+            def wrapframe(widget):
+                frame = gtk.Frame()
+                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+                frame.add(widget)
+                return frame
+            self.pbranchpaned = gtk.HPaned()
+            self.pbranchpaned.add1(wrapframe(self.pbranchwidget))
+            self.pbranchpaned.add2(wrapframe(midpane))
+
+            midpane = self.pbranchpaned
+
         # MQ widget
         if 'mq' in self.exs:
             # create MQWidget
@@ -1572,23 +1589,6 @@ class GLog(gdialog.GWindow):
             self.mqpaned.connect('notify::position', notify)
 
             midpane = self.mqpaned
-
-        # pbranch widget
-        if 'pbranch' in self.exs:
-            # create PBranchWidget
-            self.pbranchwidget = thgpbranch.PBranchWidget(
-                self.repo, self.stbar, accelgroup, self.tooltips)
-
-            def wrapframe(widget):
-                frame = gtk.Frame()
-                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-                frame.add(widget)
-                return frame
-            self.pbranchpaned = gtk.HPaned()
-            self.pbranchpaned.add1(wrapframe(self.pbranchwidget))
-            self.pbranchpaned.add2(wrapframe(midpane))
-
-            midpane = self.pbranchpaned
 
         # Add ChangeSet instance to bottom half of vpane
         self.changeview.graphview = self.graphview
