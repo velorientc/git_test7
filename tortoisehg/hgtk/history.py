@@ -2079,8 +2079,11 @@ class GLog(gdialog.GWindow):
         self.hpaned.set_position(self.setting_hpos)
         if hasattr(self, 'mqpaned') and self.mqtb.get_active():
             self.mqpaned.set_position(self.setting_mqhpos)
-        if hasattr(self, 'pbranchpaned') and self.pbranchtb.get_active():
-            self.pbranchpaned.set_position(self.setting_pbranchhpos)
+        if hasattr(self, 'pbranchpaned'):
+            pos = 0
+            if self.pbranchtb.get_active():
+                pos = self.setting_pbranchhpos
+            self.pbranchpaned.set_position(pos)
 
     def thgdiff(self, treeview):
         'ctrl-d handler'
