@@ -230,7 +230,7 @@ class PBranchWidget(gtk.VBox):
             patchname = name
             msg = '%s' % parents # summary (utf-8)
             msg_esc = 'what-is-this-for' # escaped summary (utf-8)
-            self.model.append((node, in_lines, out_lines, stat, patchname, msg, msg_esc))
+            self.model.append((node, in_lines, out_lines, patchname))
             # Loop
             in_lines = out_lines
             dep_list = next_dep_list
@@ -297,14 +297,14 @@ class PBranchWidget(gtk.VBox):
         heads = self.repo.branchheads(patch_name)
         if len(heads) > 1:
             status.append(_('needs merge of %i heads\n') % len(heads))
-        for dep, through in graph.pendingmerges(patch):
+        for dep, through in graph.pendingmerges(patch_name):
             if through:
                 status.append(_('needs merge with %s (through %s)\n') %
                           (dep, ", ".join(through)))
             else:
                 status.append(_('needs merge with %s\n') % dep)
-        for dep in graph.pendingrebases(patch):
-            ui.status(_('needs update of diff base to tip of %s\n') % dep)
+        for dep in graph.pendingrebases(patch_name):
+            status.append(_('needs update of diff base to tip of %s\n') % dep)
         return status
         
     def pnew(self, patch_name):
