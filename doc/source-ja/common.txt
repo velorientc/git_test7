@@ -111,7 +111,7 @@ HG コマンドダイアログ
 TortoiseHg ダイアログの多くは Mercurial のコマンド実行の状況をリアルタイムに
 表示するため *hgcmd* を使用しています。
 
-.. figure:: figures/hgcmd.jpg
+.. figure:: figures/hgcmd.png
 	:alt: Mercurial コマンドダイアログ
 
 	Mercurial コマンドダイアログ
