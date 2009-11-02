@@ -1545,6 +1545,7 @@ class GLog(gdialog.GWindow):
             # create PBranchWidget
             self.pbranchwidget = thgpbranch.PBranchWidget(
                 self.repo, self.stbar, accelgroup, self.tooltips)
+            self.pbranchwidget.connect('repo-invalidated', self.repo_invalidated)
 
             def wrapframe(widget):
                 frame = gtk.Frame()

@@ -12,7 +12,7 @@ from mercurial import extensions
 
 from tortoisehg.util.i18n import _
 
-from tortoisehg.hgtk import gtklib
+from tortoisehg.hgtk import gtklib, dialog
 from tortoisehg.hgtk.logview import graphcell
 
 # Patch Branch model enumeration
@@ -43,6 +43,12 @@ class PBranchWidget(gtk.VBox):
                             "Show internal branches",
                             False,
                             gobject.PARAM_READWRITE)
+    }
+
+    __gsignals__ = {
+        'repo-invalidated': (gobject.SIGNAL_RUN_FIRST,
+                             gobject.TYPE_NONE,
+                             ()),
     }
 
     def __init__(self, repo, statusbar, accelgroup=None, tooltips=None):
@@ -306,14 +312,32 @@ class PBranchWidget(gtk.VBox):
         for dep in graph.pendingrebases(patch_name):
             status.append(_('needs update of diff base to tip of %s\n') % dep)
         return status
-        
+
+    def pnew_ui(self):
+        """
+        Create new patch.
+        Propmt user for new patch name. Patch is created
+        on current branch.
+        """
+        parent =  None
+        title = _('New Patch Name')
+        new_name = dialog.entry_dialog(parent, title)
+        if not new_name:
+            return False
+        self.pnew(new_name)
+        return True
+
     def pnew(self, patch_name):
         """
         [pbranch] Execute 'pnew' command.
         
         :param patch_name: Name of new patch-branch
         """
-        assert False
+        if self.pbranch is None:
+            return False
+        self.pbranch.cmdnew(self.repo.ui, self.repo, patch_name)
+        self.emit('repo-invalidated')
+        return True
         
     def pmerge(self):
         """
@@ -518,9 +542,26 @@ class PBranchWidget(gtk.VBox):
         pass
 
     def pnew_clicked(self, toolbutton):
-        pass
+        self.pnew_ui()
 
     def reapply_clicked(self, toolbutton):
         pass
 
     ### context menu signal handlers ###
+
+    def pnew_activated(self, menuitem, row):
+        """Insert new patch after this row"""
+        if self.cur_patch() == row[M_NAME]:
+            self.pnew_ui()
+            return
+        # pnew from patch different than current
+        assert False
+        if self.wdir_modified():
+            # Ask user if current changes should be discarded
+            # Abort if user does not agree
+            pass
+        # remember prev branch
+        # Update to row[M_NAME]
+        # pnew_ui
+        # if aborted, update back to prev branch
+        pass
