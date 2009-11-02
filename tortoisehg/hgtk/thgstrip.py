@@ -351,6 +351,7 @@ class StripDialog(gtk.Dialog):
         working = not normal
 
         self.table.set_sensitive(normal)
+        self.butable.set_sensitive(normal)
         self.stripbtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
