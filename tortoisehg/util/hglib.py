@@ -4,7 +4,6 @@
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
-from mercurial.url import url
 
 import os
 import sys
@@ -15,7 +14,7 @@ import time
 from mercurial.error import RepoError, ParseError, LookupError, RepoLookupError
 from mercurial.error import UnknownCommand, AmbiguousCommand, ConfigError
 from mercurial import hg, ui, util, extensions, commands, hook, match
-from mercurial import dispatch, encoding, templatefilters, bundlerepo
+from mercurial import dispatch, encoding, templatefilters, bundlerepo, url
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
