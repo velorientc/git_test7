@@ -4,7 +4,7 @@
 .. module:: guess.dialog
 	:synopsis: コピーまたは名前変更を検出するダイアログ
 
-.. figure:: figures/guess.jpg
+.. figure:: figures/guess.png
 	:alt: 名前変更推定ダイアログ
 
 	名前変更推定ダイアログ
