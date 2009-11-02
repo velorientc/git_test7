@@ -259,8 +259,8 @@ class PathEditDialog(gtk.Dialog):
 
     def __init__(self, path, alias, list):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
-                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                              gtk.STOCK_OK, gtk.RESPONSE_OK))
+                          buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                              gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         gtklib.set_tortoise_keys(self)
         self.connect('response', self.response)
         self.connect('key-press-event', self.key_press)
