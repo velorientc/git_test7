@@ -188,7 +188,7 @@ class GLog(gdialog.GDialog):
             dict(text=_('Refresh'), func=refresh, args=[False],
                 icon=gtk.STOCK_REFRESH),
             dict(text=_('Reset Marks'), func=refresh, args=[True],
-                icon=gtk.STOCK_REMOVE),
+                icon=gtk.STOCK_CLEAR),
             dict(text='----'),
             dict(text=_('Choose Details...'), func=self.details_clicked,
                 icon='general.ico'),
