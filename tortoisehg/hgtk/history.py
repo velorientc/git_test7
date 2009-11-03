@@ -1384,12 +1384,8 @@ class GLog(gdialog.GDialog):
         self.show_dialog(dlg)
 
     def push_clicked(self, toolbutton):
-        remote_path = hglib.fromutf(self.pathentry.get_text()).strip()
-        for alias, path in self.repo.ui.configitems('paths'):
-            if remote_path == alias:
-                remote_path = path
-            elif remote_path == url.hidepassword(path):
-                remote_path = path
+        original_path = hglib.fromutf(self.pathentry.get_text()).strip()
+        remote_path = hglib.validate_synch_path(original_path, self.repo)
         if not remote_path:
             gdialog.Prompt(_('No remote path specified'),
                            _('Please enter or select a remote path'),
@@ -1402,17 +1398,17 @@ class GLog(gdialog.GDialog):
             if self.forcepush:
                 title = _('Confirm Forced Push to Remote Repository')
                 text = _('Forced push to remote repository\n%s\n'
-                    '(creating new heads in remote if needed)?') % remote_path
+                    '(creating new heads in remote if needed)?') % original_path
                 buttontext = _('Forced &Push')
             else:
                 title = _('Confirm Push to remote Repository')
-                text = _('Push to remote repository\n%s\n?') % remote_path
+                text = _('Push to remote repository\n%s\n?') % original_path
                 buttontext = _('&Push')
             confirm_push = True
         elif self.forcepush:
             title = _('Confirm Forced Push')
             text = _('Forced push to repository\n%s\n'
-                '(creating new heads if needed)?') % remote_path
+                '(creating new heads if needed)?') % original_path
             buttontext = _('Forced &Push')
             confirm_push = True
         if confirm_push:
