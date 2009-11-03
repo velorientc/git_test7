@@ -517,11 +517,15 @@ class GDialog(gtk.Window):
                                 img = gtk.Image()
                                 ico = paths.get_tortoise_icon(icon)
                                 if ico:
-                                    width, height = gtk.icon_size_lookup(
-                                        gtk.ICON_SIZE_MENU)
-                                    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
-                                        ico, width, height)
-                                    img.set_from_pixbuf(pixbuf)
+                                    try:
+                                        width, height = gtk.icon_size_lookup(
+                                            gtk.ICON_SIZE_MENU)
+                                        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
+                                            ico, width, height)
+                                        img.set_from_pixbuf(pixbuf)
+                                    except:
+                                        # don't let broken gtk+ to break dialogs
+                                        pass
                             item.set_image(img)
                         else:
                             item = gtk.MenuItem(text)
