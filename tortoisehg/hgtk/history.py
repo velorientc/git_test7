@@ -1037,8 +1037,7 @@ class GLog(gdialog.GDialog):
 
         branches = gtk.RadioButton(all)
         branches.connect('toggled', self.filter_selected, 'branch')
-        branches.set_property('tooltip-text', _('Branch Filter'))
-        branches.set_property('has-tooltip', True)
+        self.tooltips.set_tip(branches, _('Branch Filter'))
         branches.set_sensitive(False)
         filterbox.append_widget(branches, padding=0)
         self.branchbutton = branches
@@ -1054,8 +1053,7 @@ class GLog(gdialog.GDialog):
         self.branchcombo = branchcombo
 
         self.custombutton = gtk.RadioButton(all)
-        self.custombutton.set_property('tooltip-text', _('Custom Filter'))
-        self.custombutton.set_property('has-tooltip', True)
+        self.tooltips.set_tip(self.custombutton, _('Custom Filter'))
         self.custombutton.set_sensitive(False)
         filterbox.append_widget(self.custombutton, padding=0)
 
