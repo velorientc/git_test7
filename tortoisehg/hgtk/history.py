@@ -1792,7 +1792,10 @@ class GLog(gdialog.GDialog):
         if hasattr(self, 'mqwidget'):
             self.mqwidget.set_repo(self.repo)
         self.npreviews = len(self.repo) - curtip
-        self.reload_log()
+        if self.npreviews == 0:
+            self.remove_overlay(False)
+        else:
+            self.reload_log()
 
     def copy_hash(self, menuitem):
         hash = self.repo[self.currevid].hex()
