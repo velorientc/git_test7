@@ -33,7 +33,7 @@ class Prompt(SimpleMessage):
     def __init__(self, title, message, parent, type=gtk.MESSAGE_INFO):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 type, gtk.BUTTONS_CLOSE)
-        self.set_title(_('TortoiseHG'))
+        self.set_title('TortoiseHg')
         self.set_markup('<b>' + hglib.toutf(title) + '</b>')
         self.format_secondary_markup(hglib.toutf(message))
         mod = gtklib.get_thg_modifier()
