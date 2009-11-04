@@ -116,6 +116,7 @@ class PBranchWidget(gtk.VBox):
                 str) # patch name
         #### patch list view
         self.list = gtk.TreeView(self.model)
+        self.list.connect('button-press-event', self.list_pressed)
         self.list.connect('size-allocate', self.list_size_allocated)
 
         #### patch list columns
@@ -352,9 +353,11 @@ class PBranchWidget(gtk.VBox):
         assert False
 
     def has_pbranch(self):
+        """ return True if pbranch extension can be used """
         return self.pbranch is not None
 
     def has_patch(self):
+        """ return True if pbranch extension is in use on repo """
         return self.has_pbranch() and self.pgraph() != []
 
     def cur_patch(self):
@@ -423,12 +426,17 @@ class PBranchWidget(gtk.VBox):
                 item.connect('activate', handler, row)
             menu.append(item)
 
-        is_operable = self.is_operable()
-        has_patch = self.has_patch()
+        has_pbranch = self.has_pbranch()
+        is_current = self.has_patch() and self.cur_patch() == row[M_NAME]
+        is_patch = row[M_NAME] != 'default'
 
-        append(_('_goto (update workdir)'), self.update_activated)
-        append(_('_rename'), self.rename_activated)
-        append(_('_delete'), self.delete_activated)
+        if has_pbranch:
+            append(_('_new'), self.pnew_activated)
+        if not is_current:
+            append(_('_goto (update workdir)'), self.goto_activated)
+        if is_patch:
+            append(_('_rename'), self.rename_activated)
+            append(_('_delete'), self.delete_activated)
 
         if len(menu.get_children()) > 0:
             menu.show_all()
@@ -565,3 +573,12 @@ class PBranchWidget(gtk.VBox):
         # pnew_ui
         # if aborted, update back to prev branch
         pass
+
+    def goto_activated(self, menuitem, row):
+        assert False
+
+    def delete_activated(self, menuitem, row):
+        assert False
+
+    def rename_activated(self, menuitem, row):
+        assert False
