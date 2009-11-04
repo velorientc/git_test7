@@ -146,7 +146,7 @@ class PBranchWidget(gtk.VBox):
 
         def cell_edited(cell, path, newname):
             row = self.model[path]
-            patchname = row[PB_NAME]
+            patchname = row[M_NAME]
             if newname != patchname:
                 self.qrename(newname, patch=patchname)
 
@@ -181,7 +181,7 @@ class PBranchWidget(gtk.VBox):
         selname = None
         model, paths = self.list.get_selection().get_selected_rows()
         if len(paths) > 0:
-            selname = model[paths[0]][PB_NAME]
+            selname = model[paths[0]][M_NAME]
 
         # compute model data
         self.model.clear()
@@ -371,7 +371,7 @@ class PBranchWidget(gtk.VBox):
         """ return iter has specified patch name """
         if name:
             for row in self.model:
-                if row[PB_NAME] == name:
+                if row[M_NAME] == name:
                     return row.iter
         return None
 
@@ -520,7 +520,7 @@ class PBranchWidget(gtk.VBox):
     def list_sel_changed(self, list):
         path, focus = list.get_cursor()
         row = self.model[path]
-        patchname = row[PB_NAME]
+        patchname = row[M_NAME]
         try:
             ctx = self.repo[patchname]
             revid = ctx.rev()
