@@ -22,8 +22,8 @@ M_OUT_LINES = 2
 M_NAME      = 3
 
 # Patch Branch column enumeration
-PB_GRAPH   = 0
-PB_NAME    = 1
+C_GRAPH   = 0
+C_NAME    = 1
 
 class PBranchWidget(gtk.VBox):
 
@@ -152,13 +152,13 @@ class PBranchWidget(gtk.VBox):
 
         #### patch list columns and cell renderers
 
-        addcol(_('Graph'), PB_GRAPH, resizable=True, 
+        addcol(_('Graph'), C_GRAPH, resizable=True, 
             cell_renderer=graphcell.CellRendererGraph(),
             properties=[("node", M_NODE), 
                         ("in-lines",M_IN_LINES), 
                         ("out-lines", M_OUT_LINES)]
             )
-        addcol(_('Name'), PB_NAME, M_NAME, editfunc=cell_edited)
+        addcol(_('Name'), C_NAME, M_NAME, editfunc=cell_edited)
 
         pane.add(self.list)
 
@@ -464,13 +464,13 @@ class PBranchWidget(gtk.VBox):
 
         self.vmenu = {}
 
-        colappend(_('Show graph'), PB_GRAPH)
-        colappend(_('Show name'), PB_NAME)
+        colappend(_('Show graph'), C_GRAPH)
+        colappend(_('Show name'), C_NAME)
 
         append(sep=True)
 
         def enable_editable(item):
-            self.cells[PB_NAME].set_property('editable', item.get_active())
+            self.cells[C_NAME].set_property('editable', item.get_active())
         item = append(_('Enable editable cells'), enable_editable,
                 check=True, active=False)
         self.vmenu['editable-cell'] = item
@@ -494,9 +494,9 @@ class PBranchWidget(gtk.VBox):
             raise AttributeError, 'unknown property %s' % property.name
 
     def col_to_prop(self, col_idx):
-        if col_idx == PB_GRAPH:
+        if col_idx == C_GRAPH:
             return 'graph-column-visible'
-        if col_idx == PB_NAME:
+        if col_idx == C_NAME:
             return 'name-column-visible'
         return ''
 
