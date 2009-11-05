@@ -21,10 +21,12 @@ M_NODE      = 0
 M_IN_LINES  = 1
 M_OUT_LINES = 2
 M_NAME      = 3
+M_STATUS    = 4
 
 # Patch Branch column enumeration
 C_GRAPH   = 0
-C_NAME    = 1
+C_STATUS  = 1
+C_NAME    = 2
 
 class PBranchWidget(gtk.VBox):
 
@@ -32,6 +34,11 @@ class PBranchWidget(gtk.VBox):
         'graph-column-visible': (gobject.TYPE_BOOLEAN,
                                     'Graph',
                                     'Show graph column',
+                                    False,
+                                    gobject.PARAM_READWRITE),
+        'status-column-visible': (gobject.TYPE_BOOLEAN,
+                                    'Status',
+                                    'Show status column',
                                     False,
                                     gobject.PARAM_READWRITE),
         'name-column-visible': (gobject.TYPE_BOOLEAN,
@@ -115,7 +122,8 @@ class PBranchWidget(gtk.VBox):
                 gobject.TYPE_PYOBJECT, # node info
                 gobject.TYPE_PYOBJECT, # in-lines
                 gobject.TYPE_PYOBJECT, # out-lines
-                str) # patch name
+                str, # patch name
+                str) # patch status
         #### patch list view
         self.list = gtk.TreeView(self.model)
         self.list.connect('button-press-event', self.list_pressed)
@@ -162,6 +170,7 @@ class PBranchWidget(gtk.VBox):
                         ("in-lines",M_IN_LINES), 
                         ("out-lines", M_OUT_LINES)]
             )
+        addcol(_('St'), C_STATUS, M_STATUS)
         addcol(_('Name'), C_NAME, M_NAME, editfunc=cell_edited)
 
         pane.add(self.list)
@@ -200,16 +209,20 @@ class PBranchWidget(gtk.VBox):
         if patch_list:
             dep_list = [patch_list[0]]
         cur_branch = self.repo['.'].branch()
+        patch_status = {}
+        for name in patch_list:
+            patch_status[name] = self.pstatus(name)
         for name in patch_list:
             parents = graph.deps(name)
 
             # Node properties
             if name in dep_list: 
-                node_col = dep_list.index(name)
+                node_column = dep_list.index(name)
             else:
-                node_col = len(dep_list)
+                node_column = len(dep_list)
+            node_colour = patch_status[name] and '#ff0000' or 0
             node_status = (name == cur_branch) and 4 or 0
-            node = (node_col,0,node_status) #             (column, colour, status) tuple to draw revision node,
+            node = (node_column, node_colour, node_status)
             
             # Find next dependency list
             my_deps = []
@@ -217,32 +230,34 @@ class PBranchWidget(gtk.VBox):
                 if p not in dep_list:
                     my_deps.append(p)
             next_dep_list = dep_list[:]
-            next_dep_list[node_col:node_col+1] = my_deps
+            next_dep_list[node_column:node_column+1] = my_deps
             
             # Dependency lines
             shift = len(parents) - 1
             out_lines = []
             for p in parents:
-                dep_col = next_dep_list.index(p)
+                dep_column = next_dep_list.index(p)
                 colour = 0 # black
+                if patch_status[p]:
+                    colour = '#ff0000' # red
                 style = 0 # solid lines
-                out_lines.append((node_col, dep_col, colour, style))
+                out_lines.append((node_column, dep_column, colour, style))
             for lines in in_lines:
-                (start, end, colour, style) = lines
-                if end == node_col:
+                (start_column, end_column, colour, style) = lines
+                if end_column == node_column:
                     # Deps to current patch end here
                     pass
                 else:
                     # Find line continuations
-                    dep = dep_list[end]
-                    dep_col = next_dep_list.index(dep)
-                    out_lines.append((end, dep_col, colour, style))
+                    dep = dep_list[end_column]
+                    dep_column = next_dep_list.index(dep)
+                    out_lines.append((end_column, dep_column, colour, style))
                     
-            stat = '?' # patch status
+            stat = patch_status[name] and 'M' or 'C' # patch status
             patchname = name
             msg = '%s' % parents # summary (utf-8)
             msg_esc = 'what-is-this-for' # escaped summary (utf-8)
-            self.model.append((node, in_lines, out_lines, patchname))
+            self.model.append((node, in_lines, out_lines, patchname, stat))
             # Loop
             in_lines = out_lines
             dep_list = next_dep_list
@@ -478,6 +493,7 @@ class PBranchWidget(gtk.VBox):
         self.vmenu = {}
 
         colappend(_('Show graph'), C_GRAPH)
+        colappend(_('Show status'), C_STATUS, active=False)
         colappend(_('Show name'), C_NAME)
 
         append(sep=True)
@@ -537,6 +553,8 @@ class PBranchWidget(gtk.VBox):
     def col_to_prop(self, col_idx):
         if col_idx == C_GRAPH:
             return 'graph-column-visible'
+        if col_idx == C_STATUS:
+            return 'status-column-visible'
         if col_idx == C_NAME:
             return 'name-column-visible'
         return ''
