@@ -18,6 +18,12 @@ selected revision emits tuples with the following elements:
 The node tuple has the following elements:
   - rev_column: Column for the node "circle"
   - rev_color: Color used to render the circle
+  - rev_status: 
+        0 for normal circle, 
+        1 for add up arrow (outgoing cset)
+        2 for add star (new cset)
+        3 for add down arrow (incoming cset)
+        All above +4 for larger circle = current workdir parent
       
 The lines tuple has the following elements:
   - col: Column for the upper end of the line.
