@@ -16,6 +16,8 @@ dialog.  Other portions stolen from graphlog extension.
 
 import gtk
 import gobject
+import re
+
 from mercurial import util, templatefilters
 from tortoisehg.util import hglib
 from tortoisehg.hgtk import gtklib

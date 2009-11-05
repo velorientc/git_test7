@@ -18,7 +18,6 @@ import gtk
 import gobject
 import pango
 import os
-import re
 import time
 
 from tortoisehg.util.i18n import _
