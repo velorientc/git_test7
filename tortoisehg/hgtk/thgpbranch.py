@@ -8,10 +8,11 @@
 import gtk
 import gobject
 
-from mercurial import extensions
+from mercurial import cmdutil, extensions
 
 from tortoisehg.util.i18n import _
 
+from tortoisehg.hgtk import update
 from tortoisehg.hgtk import gtklib, dialog
 from tortoisehg.hgtk.logview import graphcell
 
@@ -51,9 +52,10 @@ class PBranchWidget(gtk.VBox):
                              ()),
     }
 
-    def __init__(self, repo, statusbar, accelgroup=None, tooltips=None):
+    def __init__(self, parentwin, repo, statusbar, accelgroup=None, tooltips=None):
         gtk.VBox.__init__(self)
 
+        self.parent_window = parentwin
         self.repo = repo
         self.pbranch = extensions.find('pbranch')
         self.statusbar = statusbar
@@ -117,6 +119,7 @@ class PBranchWidget(gtk.VBox):
         #### patch list view
         self.list = gtk.TreeView(self.model)
         self.list.connect('button-press-event', self.list_pressed)
+        self.list.connect('row-activated', self.list_row_activated)
         self.list.connect('size-allocate', self.list_size_allocated)
 
         #### patch list columns
@@ -491,6 +494,34 @@ class PBranchWidget(gtk.VBox):
         menu.show_all()
         return menu
 
+    def show_dialog(self, dlg):
+        """Show modal dialog and block application
+        See also show_dialog in history.py
+        """
+        dlg.set_transient_for(self.parent_window)
+        dlg.show_all()
+        dlg.run()
+        if gtk.pygtk_version < (2, 12, 0):
+            # Workaround for old PyGTK (< 2.12.0) issue.
+            # See background of this: f668034aeda3
+            dlg.set_transient_for(None)
+        
+
+    def update_by_row(self, row):
+        branch = row[M_NAME]
+        rev = cmdutil.revrange(self.repo, [branch])
+        parents = [x.node() for x in self.repo.parents()]
+        dialog = update.UpdateDialog(rev[0])
+        self.show_dialog(dialog)
+        self.update_completed(parents)
+
+    def update_completed(self, oldparents):
+        self.repo.invalidate()
+        self.repo.dirstate.invalidate()
+        newparents = [x.node() for x in self.repo.parents()]
+        if not oldparents == newparents:
+            self.emit('repo-invalidated')
+
     def do_get_property(self, property):
         try:
             return self.vmenu[property.name].get_active()
@@ -539,7 +570,7 @@ class PBranchWidget(gtk.VBox):
         self.emit('patch-selected', revid, patchname)
 
     def list_row_activated(self, list, path, column):
-        self.qgoto_by_row(self.model[path])
+        self.update_by_row(self.model[path])
 
     def list_size_allocated(self, list, req):
         if self.has_patch():
@@ -577,7 +608,7 @@ class PBranchWidget(gtk.VBox):
         pass
 
     def goto_activated(self, menuitem, row):
-        assert False
+        self.update_by_row(row)
 
     def delete_activated(self, menuitem, row):
         assert False

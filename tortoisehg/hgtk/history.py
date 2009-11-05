@@ -1002,6 +1002,10 @@ class GLog(gdialog.GWindow):
         if hasattr(self, 'mqwidget'):
             self.mqwidget.refresh()
 
+        # refresh pbranch widget if exists
+        if hasattr(self, 'pbranchwidget'):
+            self.pbranchwidget.refresh()
+
         # force a redraw of the visible rows
         self.graphview.hide()
         self.graphview.show()
@@ -1544,7 +1548,7 @@ class GLog(gdialog.GWindow):
         if 'pbranch' in self.exs:
             # create PBranchWidget
             self.pbranchwidget = thgpbranch.PBranchWidget(
-                self.repo, self.stbar, accelgroup, self.tooltips)
+                self, self.repo, self.stbar, accelgroup, self.tooltips)
             self.pbranchwidget.connect('repo-invalidated', self.repo_invalidated)
 
             def wrapframe(widget):
