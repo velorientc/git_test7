@@ -234,25 +234,6 @@ class GLog(gdialog.GDialog):
                 ])
             ]
 
-    def synch_clicked(self, toolbutton, data):
-        def sync_closed(dialog):
-            self.cmd_set_sensitive('synchronize', True)
-
-        def synch_callback(parents):
-            self.repo.invalidate()
-            self.changeview.clear_cache()
-            newparents = [x.node() for x in self.repo.parents()]
-            if parents != newparents:
-                self.refresh_model()
-
-        from tortoisehg.hgtk import synch
-        parents = [x.node() for x in self.repo.parents()]
-        dlg = synch.SynchDialog([], False)
-        dlg.set_notify_func(synch_callback, parents)
-        dlg.connect('destroy', sync_closed)
-        dlg.show_all()
-        self.cmd_set_sensitive('synchronize', False)
-
     def toggle_view_column(self, button, property):
         active = button.get_active()
         self.graphview.set_property(property, active)
