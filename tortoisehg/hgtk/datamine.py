@@ -296,7 +296,12 @@ class DataMineDialog(gdialog.GDialog):
         regexp = gtk.Entry()
         includes = gtk.Entry()
         if self.cwd.startswith(self.repo.root):
-            includes.set_text(util.canonpath(self.repo.root, self.cwd, '.'))
+            try:
+                relpath = util.canonpath(self.repo.root, self.cwd, '.')
+                includes.set_text(relpath)
+            except hglib.Abort:
+                # Some paths inside root are invalid (.hg/*)
+                pass
         excludes = gtk.Entry()
         search = gtk.Button(_('Search'))
         search_hbox.pack_start(gtk.Label(_('Regexp:')), False, False, 4)
