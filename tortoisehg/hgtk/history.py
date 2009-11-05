@@ -109,12 +109,6 @@ class GLog(gdialog.GDialog):
                     _('Re_fresh'),
                     self.refresh_clicked, name='refresh',
                     tip=_('Reload revision history')),
-                gtk.SeparatorToolItem(),
-                self.make_toolbutton(gtk.STOCK_NETWORK,
-                     _('Synchronize'),
-                     self.synch_clicked, name='synchronize',
-                     tip=_('Launch synchronize tool')),
-                gtk.SeparatorToolItem(),
                ]
         if 'mq' in self.exs:
             self.mqtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
@@ -123,7 +117,7 @@ class GLog(gdialog.GDialog):
                             tip=_('Show/Hide Patch Queue'),
                             toggle=True,
                             icon='menupatch.ico')
-            tbar += [self.mqtb, gtk.SeparatorToolItem()]
+            tbar += [gtk.SeparatorToolItem(), self.mqtb]
         return tbar
 
     def get_menu_list(self):
