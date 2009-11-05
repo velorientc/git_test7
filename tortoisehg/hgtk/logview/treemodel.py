@@ -51,12 +51,16 @@ class TreeModel(gtk.GenericTreeModel):
         self.showgraph = opts['show-graph']
         self.revisions = {}
         self.graphdata = graphdata
-        self.wcparents = [x.rev() for x in repo.parents()]
-        self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
-        self.branchtags = repo.branchtags()
         self.set_author_color()
         self.hidetags = self.repo.ui.config(
             'tortoisehg', 'hidetags', '').split()
+        self.wcparents, self.tagrevs, self.branchtags = [], [], {}
+        try:
+            self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
+            self.branchtags = repo.branchtags()
+            self.wcparents = [x.rev() for x in repo.parents()]
+        except hglib.Abort:
+            pass
 
     def refresh(self):
         repo = self.repo
