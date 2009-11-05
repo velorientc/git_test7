@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-10-27 13:01+0000\n"
-"PO-Revision-Date: 2009-10-18 09:27+0000\n"
-"Last-Translator: Tachikoma <durkjae.yun@gmail.com>\n"
+"PO-Revision-Date: 2009-11-01 14:00+0000\n"
+"Last-Translator: hklee002 <Unknown>\n"
 "Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-28 01:56+0000\n"
+"X-Launchpad-Export-Date: 2009-11-05 03:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -23,11 +23,11 @@ msgstr ""
 
 #: thgtaskbar.py:115
 msgid "Options..."
-msgstr ""
+msgstr "옵션..."
 
 #: thgtaskbar.py:117
 msgid "Exit"
-msgstr ""
+msgstr "종료"
 
 #: tortoisehg\hgtk\about.py:62
 msgid "Several icons are courtesy of the TortoiseSVN project"
@@ -59,7 +59,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\archive.py:71
 msgid "Archive revision:"
-msgstr ""
+msgstr "아카치브 개정판:"
 
 #: tortoisehg\hgtk\archive.py:77 tortoisehg\hgtk\clone.py:74
 #: tortoisehg\hgtk\hginit.py:52 tortoisehg\hgtk\thgconfig.py:301
@@ -68,15 +68,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\archive.py:80 tortoisehg\hgtk\clone.py:103
 msgid "Destination path:"
-msgstr ""
+msgstr "목적지 경로:"
 
 #: tortoisehg\hgtk\archive.py:83
 msgid "Directory of files"
-msgstr ""
+msgstr "디렉토리 파일"
 
 #: tortoisehg\hgtk\archive.py:85
 msgid "Archive types:"
-msgstr ""
+msgstr "아카이브 유형:"
 
 #: tortoisehg\hgtk\archive.py:91
 msgid "Uncompressed tar archive"
@@ -103,21 +103,21 @@ msgstr ""
 #: tortoisehg\hgtk\quickop.py:182 tortoisehg\hgtk\thgstrip.py:168
 #: tortoisehg\hgtk\update.py:123
 msgid "Abort"
-msgstr ""
+msgstr "취소"
 
 #: tortoisehg\hgtk\archive.py:127 tortoisehg\hgtk\backout.py:141
 #: tortoisehg\hgtk\clone.py:188 tortoisehg\hgtk\merge.py:162
 #: tortoisehg\hgtk\quickop.py:197 tortoisehg\hgtk\thgstrip.py:293
 #: tortoisehg\hgtk\update.py:138
 msgid "Confirm Abort"
-msgstr ""
+msgstr "취소 확인"
 
 #: tortoisehg\hgtk\archive.py:128 tortoisehg\hgtk\backout.py:142
 #: tortoisehg\hgtk\clone.py:189 tortoisehg\hgtk\merge.py:163
 #: tortoisehg\hgtk\quickop.py:198 tortoisehg\hgtk\thgstrip.py:294
 #: tortoisehg\hgtk\update.py:139
 msgid "Do you want to abort?"
-msgstr ""
+msgstr "취소하시겠습니까?"
 
 #: tortoisehg\hgtk\archive.py:138 tortoisehg\hgtk\backout.py:153
 #: tortoisehg\hgtk\clone.py:199 tortoisehg\hgtk\merge.py:183
@@ -153,7 +153,7 @@ msgstr "대상 파일 선택"
 
 #: tortoisehg\hgtk\archive.py:226
 msgid "All Files (*.*)"
-msgstr ""
+msgstr "모든 파일 (*."
 
 #: tortoisehg\hgtk\archive.py:238 tortoisehg\hgtk\backout.py:181
 #: tortoisehg\hgtk\clone.py:223 tortoisehg\hgtk\merge.py:198
@@ -200,7 +200,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\backout.py:38
 msgid "Backout"
-msgstr ""
+msgstr "취소"
 
 #: tortoisehg\hgtk\backout.py:51
 msgid "Backed out changeset: "
@@ -254,7 +254,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\bugreport.py:46
 msgid "Save as.."
-msgstr ""
+msgstr "다른 이름으로 저장"
 
 #: tortoisehg\hgtk\bugreport.py:49 tortoisehg\hgtk\hgcmd.py:48
 #: tortoisehg\hgtk\taskbarui.py:33
@@ -345,7 +345,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\changeset.py:620 tortoisehg\hgtk\hgignore.py:128
 msgid "Files"
-msgstr ""
+msgstr "파일"
 
 #: tortoisehg\hgtk\changeset.py:635
 msgid "Diff to second Parent"
@@ -353,7 +353,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\changeset.py:758
 msgid "Save file to"
-msgstr ""
+msgstr "파일 저장"
 
 #: tortoisehg\hgtk\changeset.py:832
 msgid "Confirm revert file to old revision"
@@ -406,11 +406,11 @@ msgstr ""
 #: tortoisehg\hgtk\clone.py:137 tortoisehg\hgtk\history.py:233
 #: tortoisehg\hgtk\synch.py:184
 msgid "Use proxy server"
-msgstr ""
+msgstr "프록시 서버 사용"
 
 #: tortoisehg\hgtk\clone.py:147 tortoisehg\hgtk\synch.py:205
 msgid "Remote command:"
-msgstr ""
+msgstr "원격 명령:"
 
 #: tortoisehg\hgtk\clone.py:276
 msgid "Source path is empty"
@@ -482,7 +482,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:184
 msgid "Advanced"
-msgstr ""
+msgstr "고급"
 
 #: tortoisehg\hgtk\commit.py:186 tortoisehg\hgtk\history.py:691
 #: tortoisehg\hgtk\history.py:1014
@@ -492,7 +492,7 @@ msgstr ""
 #: tortoisehg\hgtk\commit.py:189 tortoisehg\hgtk\hgignore.py:138
 #: tortoisehg\hgtk\history.py:188
 msgid "Refresh"
-msgstr ""
+msgstr "새로고침"
 
 #: tortoisehg\hgtk\commit.py:190
 msgid "_Operations"
@@ -527,7 +527,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:204 tortoisehg\hgtk\status.py:167
 msgid "Move"
-msgstr ""
+msgstr "이동"
 
 #: tortoisehg\hgtk\commit.py:206 tortoisehg\hgtk\status.py:173
 #: tortoisehg\hgtk\status.py:1514
@@ -545,7 +545,7 @@ msgstr ""
 #: tortoisehg\hgtk\commit.py:250 tortoisehg\hgtk\merge.py:169
 #: tortoisehg\hgtk\thgconfig.py:712
 msgid "Confirm Exit"
-msgstr ""
+msgstr "종료확인"
 
 #: tortoisehg\hgtk\commit.py:251
 msgid "Save commit message at exit?"
@@ -597,7 +597,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:413 tortoisehg\hgtk\status.py:480
 msgid "Patch Preview"
-msgstr ""
+msgstr "패치 미리보기"
 
 #: tortoisehg\hgtk\commit.py:415 tortoisehg\hgtk\status.py:484
 msgid "Commit Preview"
@@ -659,11 +659,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:612
 msgid "branch: "
-msgstr ""
+msgstr "지점: "
 
 #: tortoisehg\hgtk\commit.py:631
 msgid "Merge "
-msgstr ""
+msgstr "병합 "
 
 #: tortoisehg\hgtk\commit.py:667
 msgid "Patch Contents"
@@ -722,7 +722,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:887
 msgid "Error"
-msgstr ""
+msgstr "오류"
 
 #: tortoisehg\hgtk\commit.py:888
 msgid "Message format configuration error"
@@ -797,7 +797,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:1073
 msgid "Info Required"
-msgstr ""
+msgstr "필수 정보"
 
 #: tortoisehg\hgtk\commit.py:1074
 msgid "Message format needs to be configured"
@@ -805,7 +805,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:1086 tortoisehg\hgtk\commit.py:1091
 msgid "Warning"
-msgstr ""
+msgstr "경고"
 
 #: tortoisehg\hgtk\commit.py:1087
 msgid "The summary line length of %i is greater than %i"
@@ -826,23 +826,23 @@ msgstr ""
 #: tortoisehg\hgtk\csinfo.py:191 tortoisehg\hgtk\csinfo.py:192
 #: tortoisehg\hgtk\tagadd.py:65
 msgid "Revision:"
-msgstr ""
+msgstr "개정:"
 
 #: tortoisehg\hgtk\csinfo.py:192
 msgid "Summary:"
-msgstr ""
+msgstr "요약:"
 
 #: tortoisehg\hgtk\csinfo.py:193
 msgid "Age:"
-msgstr ""
+msgstr "나이:"
 
 #: tortoisehg\hgtk\csinfo.py:193
 msgid "User:"
-msgstr ""
+msgstr "사용자:"
 
 #: tortoisehg\hgtk\csinfo.py:193 tortoisehg\hgtk\csinfo.py:194
 msgid "Date:"
-msgstr ""
+msgstr "날짜:"
 
 #: tortoisehg\hgtk\csinfo.py:194 tortoisehg\hgtk\csinfo.py:195
 msgid "Branch:"
@@ -850,7 +850,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\csinfo.py:195 tortoisehg\hgtk\csinfo.py:196
 msgid "Tags:"
-msgstr ""
+msgstr "태그:"
 
 #: tortoisehg\hgtk\csinfo.py:196
 msgid "Transplant:"
@@ -864,7 +864,7 @@ msgstr ""
 #: tortoisehg\hgtk\recovery.py:46 tortoisehg\hgtk\serve.py:62
 #: tortoisehg\hgtk\synch.py:59
 msgid "Stop"
-msgstr ""
+msgstr "정지"
 
 #: tortoisehg\hgtk\datamine.py:58
 msgid "Stop operation on current tab"
@@ -872,7 +872,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:60
 msgid "New Search"
-msgstr ""
+msgstr "새로운 검색"
 
 #: tortoisehg\hgtk\datamine.py:62
 msgid "Open new search tab"
@@ -880,7 +880,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:73 tortoisehg\hgtk\thgconfig.py:1112
 msgid "Invalid path"
-msgstr ""
+msgstr "잘못된 경로"
 
 #: tortoisehg\hgtk\datamine.py:74
 msgid "Cannot annotate directory: %s"
@@ -888,14 +888,14 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:128
 msgid "Filename"
-msgstr ""
+msgstr "파일이름"
 
 #: tortoisehg\hgtk\datamine.py:131 tortoisehg\hgtk\datamine.py:634
 #: tortoisehg\hgtk\history.py:336 tortoisehg\hgtk\history.py:1057
 #: tortoisehg\hgtk\logview\treeview.py:444 tortoisehg\hgtk\thgconfig.py:194
 #: tortoisehg\hgtk\thgconfig.py:277
 msgid "User"
-msgstr ""
+msgstr "사용자"
 
 #: tortoisehg\hgtk\datamine.py:139 tortoisehg\hgtk\datamine.py:149
 msgid "di_splay change"
@@ -931,7 +931,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:301
 msgid "Search"
-msgstr ""
+msgstr "검색"
 
 #: tortoisehg\hgtk\datamine.py:302 tortoisehg\hgtk\hgignore.py:61
 msgid "Regexp:"
@@ -939,11 +939,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:304
 msgid "Includes:"
-msgstr ""
+msgstr "포함:"
 
 #: tortoisehg\hgtk\datamine.py:306
 msgid "Excludes:"
-msgstr ""
+msgstr "제외:"
 
 #: tortoisehg\hgtk\datamine.py:309
 msgid "Start this search"
@@ -975,7 +975,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:322
 msgid "Show line numbers"
-msgstr ""
+msgstr "줄 번호 표시"
 
 #: tortoisehg\hgtk\datamine.py:323
 msgid "Show all matching revisions"
@@ -988,11 +988,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:356 tortoisehg\hgtk\datamine.py:633
 msgid "File"
-msgstr ""
+msgstr "파일"
 
 #: tortoisehg\hgtk\datamine.py:357
 msgid "Matches"
-msgstr ""
+msgstr "일치"
 
 #: tortoisehg\hgtk\datamine.py:379
 msgid "Search %d"
@@ -1024,11 +1024,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:579
 msgid "File is unrevisioned"
-msgstr ""
+msgstr "파일이 개정되지 않았습니다."
 
 #: tortoisehg\hgtk\datamine.py:580
 msgid "Unable to annotate "
-msgstr ""
+msgstr "주석이 없습니다. "
 
 #: tortoisehg\hgtk\datamine.py:631
 msgid "Line"
@@ -1107,7 +1107,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\gdialog.py:676
 msgid "edit failed"
-msgstr ""
+msgstr "수정 실패"
 
 #: tortoisehg\hgtk\gdialog.py:684 tortoisehg\hgtk\thgconfig.py:686
 msgid "No visual editor configured"
@@ -1119,7 +1119,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\gorev.py:26
 msgid "Select"
-msgstr ""
+msgstr "선택"
 
 #: tortoisehg\hgtk\gorev.py:30
 msgid "Select Revision"
@@ -1135,11 +1135,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\gtklib.py:149
 msgid "Save File"
-msgstr ""
+msgstr "파일 저장"
 
 #: tortoisehg\hgtk\gtklib.py:150
 msgid "All files"
-msgstr ""
+msgstr "모든 파일"
 
 #: tortoisehg\hgtk\gtklib.py:244
 msgid ""
@@ -1150,7 +1150,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\gtklib.py:255
 msgid "Select Folder"
-msgstr ""
+msgstr "폴더 선택"
 
 #: tortoisehg\hgtk\gtklib.py:642
 msgid ""
@@ -1249,15 +1249,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgemail.py:38
 msgid "Send"
-msgstr ""
+msgstr "전송"
 
 #: tortoisehg\hgtk\hgemail.py:40
 msgid "Send emails"
-msgstr ""
+msgstr "이메일 전송"
 
 #: tortoisehg\hgtk\hgemail.py:41
 msgid "Test"
-msgstr ""
+msgstr "테스트"
 
 #: tortoisehg\hgtk\hgemail.py:43
 msgid "Show emails which would be sent"
@@ -1266,11 +1266,11 @@ msgstr ""
 #: tortoisehg\hgtk\hgemail.py:45 tortoisehg\hgtk\serve.py:70
 #: tortoisehg\hgtk\synch.py:96
 msgid "Configure"
-msgstr ""
+msgstr "구성"
 
 #: tortoisehg\hgtk\hgemail.py:47
 msgid "Configure email settings"
-msgstr ""
+msgstr "이메일 설정 구성"
 
 #: tortoisehg\hgtk\hgemail.py:57
 msgid "Email outgoing changes"
@@ -1290,7 +1290,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgemail.py:66 tortoisehg\hgtk\taskbarui.py:47
 msgid "Options"
-msgstr ""
+msgstr "옵션"
 
 #: tortoisehg\hgtk\hgemail.py:78
 msgid "To:"
@@ -1388,7 +1388,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgemail.py:179
 msgid "Subject:"
-msgstr ""
+msgstr "제목:"
 
 #: tortoisehg\hgtk\hgemail.py:193
 msgid "Flags:"
@@ -1439,7 +1439,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgignore.py:76
 msgid "Apply to:"
-msgstr ""
+msgstr "적용:"
 
 #: tortoisehg\hgtk\hgignore.py:84
 msgid "Filters"
@@ -1455,7 +1455,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgignore.py:114
 msgid "Unknown Files"
-msgstr ""
+msgstr "알 수 없는 파일"
 
 #: tortoisehg\hgtk\hgignore.py:190
 msgid "Invalid glob expression"
@@ -1516,7 +1516,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgthread.py:86
 msgid "password: "
-msgstr ""
+msgstr "비밀번호: "
 
 #: tortoisehg\hgtk\hgthread.py:163
 msgid "[command returned code %d "
@@ -1660,7 +1660,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgtk.py:646
 msgid "start debugger"
-msgstr ""
+msgstr "디버거 시작"
 
 #: tortoisehg\hgtk\hgtk.py:647
 msgid "do not fork GUI process"
@@ -1860,7 +1860,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\histdetails.py:40
 msgid "Columns"
-msgstr ""
+msgstr "열"
 
 #: tortoisehg\hgtk\histdetails.py:87
 msgid "Move Up"
@@ -2015,7 +2015,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:325 tortoisehg\hgtk\logview\treeview.py:381
 msgid "Graph"
-msgstr ""
+msgstr "그래프"
 
 #: tortoisehg\hgtk\history.py:332
 msgid "Revision Number"
@@ -2044,7 +2044,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:339 tortoisehg\hgtk\logview\treeview.py:479
 msgid "Age"
-msgstr ""
+msgstr "나이"
 
 #: tortoisehg\hgtk\history.py:340 tortoisehg\hgtk\logview\treeview.py:491
 msgid "Tags"
@@ -2281,7 +2281,7 @@ msgstr ""
 #: tortoisehg\hgtk\history.py:961 tortoisehg\hgtk\synch.py:155
 #: tortoisehg\hgtk\update.py:45
 msgid "Update"
-msgstr ""
+msgstr "업데이트"
 
 #: tortoisehg\hgtk\history.py:964 tortoisehg\hgtk\synch.py:158
 msgid "Fetch"
@@ -2361,7 +2361,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:1228
 msgid "Accept"
-msgstr ""
+msgstr "수락"
 
 #: tortoisehg\hgtk\history.py:1233
 msgid "Reject incoming previewed changesets"
@@ -2567,7 +2567,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\quickop.py:50
 msgid "Select files to add"
-msgstr ""
+msgstr "추가할 파일 선택"
 
 #: tortoisehg\hgtk\quickop.py:51
 msgid "Forget"
@@ -2749,7 +2749,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\serve.py:58
 msgid "Start"
-msgstr ""
+msgstr "시작"
 
 #: tortoisehg\hgtk\serve.py:60
 msgid "Start server"
@@ -2773,7 +2773,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\serve.py:91
 msgid "HTTP Port:"
-msgstr ""
+msgstr "HTTP 포트:"
 
 #: tortoisehg\hgtk\serve.py:127
 msgid "%s - serve"
@@ -2887,7 +2887,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:154
 msgid "Save As"
-msgstr ""
+msgstr "다른 이름으로 저장"
 
 #: tortoisehg\hgtk\status.py:155
 msgid "Save selected changes"

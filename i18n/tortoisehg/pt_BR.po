@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-10-27 13:01+0000\n"
-"PO-Revision-Date: 2009-10-27 13:23+0000\n"
+"PO-Revision-Date: 2009-11-04 15:05+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-28 01:56+0000\n"
+"X-Launchpad-Export-Date: 2009-11-05 03:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: tortoisehg\hgtk\history.py:218 tortoisehg\hgtk\synch.py:79
@@ -320,7 +320,7 @@ msgstr "Diff com versão _local"
 
 #: tortoisehg\hgtk\changeset.py:391
 msgid "_View at Revision"
-msgstr "_Ver na revisão"
+msgstr "_Ver na Revisão"
 
 #: tortoisehg\hgtk\changeset.py:392
 msgid "_Save at Revision..."
@@ -461,7 +461,7 @@ msgstr "Operações de Ramos"
 
 #: tortoisehg\hgtk\commit.py:39
 msgid "Select branch of merge commit"
-msgstr "Selecionar ramo para consolidação de mesclagem"
+msgstr "Selecione o ramo para consolidação da mesclagem"
 
 #: tortoisehg\hgtk\commit.py:51
 msgid "Changes take effect on next commit"
@@ -507,7 +507,7 @@ msgstr "Pais"
 #: tortoisehg\hgtk\commit.py:189 tortoisehg\hgtk\hgignore.py:138
 #: tortoisehg\hgtk\history.py:188
 msgid "Refresh"
-msgstr "Atualizar"
+msgstr "Reler"
 
 #: tortoisehg\hgtk\commit.py:190
 msgid "_Operations"
@@ -724,7 +724,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:846
 msgid "Errors during rollback!"
-msgstr "Erro durante rollback!"
+msgstr "Erros durante o rollback!"
 
 #: tortoisehg\hgtk\commit.py:859
 msgid "Confirm Add/Remove"
@@ -757,7 +757,7 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
-"O tamanho da linha do sumário de %i é maior que %i.\n"
+"O tamanho %i da linha do sumário é maior que %i.\n"
 "\n"
 "Ignorar a política de formato e continuar a consolidação?"
 
@@ -841,7 +841,7 @@ msgstr "Aviso"
 
 #: tortoisehg\hgtk\commit.py:1087
 msgid "The summary line length of %i is greater than %i"
-msgstr "O comprimento da linha de sumário de %i é maior que %i"
+msgstr "O comprimento %i da linha de sumário é maior que %i"
 
 #: tortoisehg\hgtk\commit.py:1092
 msgid "The summary line is not followed by a blank line"
@@ -931,7 +931,7 @@ msgstr "Usuário"
 
 #: tortoisehg\hgtk\datamine.py:139 tortoisehg\hgtk\datamine.py:149
 msgid "di_splay change"
-msgstr "mudar di_splay"
+msgstr "mo_strar mudança"
 
 #: tortoisehg\hgtk\datamine.py:140
 msgid "_annotate file"
@@ -959,7 +959,7 @@ msgstr "Nenhum arquivo pai"
 
 #: tortoisehg\hgtk\datamine.py:177
 msgid "Unable to annotate"
-msgstr "Incapaz de fazer o annotate"
+msgstr "Incapaz de fazer a anotação"
 
 #: tortoisehg\hgtk\datamine.py:301
 msgid "Search"
@@ -1064,7 +1064,7 @@ msgstr "O arquivo não é versionado"
 
 #: tortoisehg\hgtk\datamine.py:580
 msgid "Unable to annotate "
-msgstr "Incapaz de comentar "
+msgstr "Incapaz de fazer anotação de "
 
 #: tortoisehg\hgtk\datamine.py:631
 msgid "Line"
@@ -1096,11 +1096,11 @@ msgstr "Datamine"
 
 #: tortoisehg\hgtk\gdialog.py:476
 msgid "Recovery"
-msgstr "Recovery"
+msgstr "Recuperação"
 
 #: tortoisehg\hgtk\gdialog.py:478
 msgid "Serve"
-msgstr "Serve"
+msgstr "Servidor web"
 
 #: tortoisehg\hgtk\gdialog.py:480 tortoisehg\hgtk\synch.py:89
 #: tortoisehg\hgtk\thgshelve.py:71 tortoisehg\hgtk\thgshelve.py:139
@@ -1175,7 +1175,7 @@ msgstr "Salvar o Arquivo"
 
 #: tortoisehg\hgtk\gtklib.py:150
 msgid "All files"
-msgstr "Todos os Arquivos"
+msgstr "Todos os arquivos"
 
 #: tortoisehg\hgtk\gtklib.py:244
 msgid ""
@@ -1311,7 +1311,7 @@ msgstr "Testar"
 
 #: tortoisehg\hgtk\hgemail.py:43
 msgid "Show emails which would be sent"
-msgstr "Exibir e-mails que precisam ser mandados"
+msgstr "Exibe os e-mails que seriam enviados"
 
 #: tortoisehg\hgtk\hgemail.py:45 tortoisehg\hgtk\serve.py:70
 #: tortoisehg\hgtk\synch.py:96
@@ -1496,7 +1496,7 @@ msgstr "Você deve configurar o SMTP"
 
 #: tortoisehg\hgtk\hgignore.py:35
 msgid "Ignore filter - %s"
-msgstr "Ignorar filtro - %s"
+msgstr "Filtro de arquivos ignorados - %s"
 
 #: tortoisehg\hgtk\hgignore.py:51 tortoisehg\hgtk\hgignore.py:59
 #: tortoisehg\hgtk\quickop.py:50 tortoisehg\hgtk\tagadd.py:37
@@ -5062,7 +5062,7 @@ msgstr "Adiciona arquivos ao controle de versão"
 
 #: tortoisehg\util\menuthg.py:56
 msgid "Revert Files..."
-msgstr "Reverter arquivos..."
+msgstr "Reverter Arquivos..."
 
 #: tortoisehg\util\menuthg.py:57
 msgid "Revert file changes"

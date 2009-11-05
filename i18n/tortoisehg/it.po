@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-10-27 13:01+0000\n"
-"PO-Revision-Date: 2009-10-27 23:45+0000\n"
+"PO-Revision-Date: 2009-10-30 12:26+0000\n"
 "Last-Translator: paolof <gp.fadel@gmail.com>\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-28 01:56+0000\n"
+"X-Launchpad-Export-Date: 2009-11-05 03:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -234,7 +234,7 @@ msgstr "Usa messaggio di backout in inglese"
 
 #: tortoisehg\hgtk\backout.py:97
 msgid "Merge with old dirstate parent after backout"
-msgstr ""
+msgstr "Esegue il merge con il dirstate del genitore dopo il backout"
 
 #: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:437
 msgid "Confirm Discard Message"
@@ -345,7 +345,7 @@ msgstr "Genitore:"
 
 #: tortoisehg\hgtk\changeset.py:489
 msgid "Child:"
-msgstr "Figlia:"
+msgstr "Figlio:"
 
 #: tortoisehg\hgtk\changeset.py:491
 msgid "Patch:"
@@ -454,11 +454,11 @@ msgstr "Clonazione fallita"
 
 #: tortoisehg\hgtk\commit.py:34
 msgid "Branch Operations"
-msgstr "Operazioni sui branch"
+msgstr "Operazioni sui rami"
 
 #: tortoisehg\hgtk\commit.py:39
 msgid "Select branch of merge commit"
-msgstr ""
+msgstr "Selezionare il ramo su cui eseguire il commit del merge"
 
 #: tortoisehg\hgtk\commit.py:51
 msgid "Changes take effect on next commit"
@@ -466,15 +466,15 @@ msgstr "Le modifiche avranno effetto al prossimo commit"
 
 #: tortoisehg\hgtk\commit.py:52
 msgid "No branch changes"
-msgstr "Nessuna operazione sui branch"
+msgstr "Nessuna operazione sui rami"
 
 #: tortoisehg\hgtk\commit.py:54
 msgid "Open a new named branch"
-msgstr "Apre un nuovo branch"
+msgstr "Apre un nuovo ramo"
 
 #: tortoisehg\hgtk\commit.py:56
 msgid "Close current named branch"
-msgstr "Chiude il branch corrente"
+msgstr "Chiude il ramo corrente"
 
 #: tortoisehg\hgtk\commit.py:148
 msgid " - qnew"
@@ -544,7 +544,7 @@ msgstr "Sposta"
 #: tortoisehg\hgtk\commit.py:206 tortoisehg\hgtk\status.py:173
 #: tortoisehg\hgtk\status.py:1514
 msgid "_Forget"
-msgstr "_Forget"
+msgstr "_Dimentica"
 
 #: tortoisehg\hgtk\commit.py:236
 msgid "undo recent commit"
@@ -667,15 +667,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:608
 msgid "new branch: "
-msgstr "nuovo branch: "
+msgstr "nuovo ramo: "
 
 #: tortoisehg\hgtk\commit.py:610
 msgid "close branch: "
-msgstr "chiudi branch: "
+msgstr "chiudi ramo: "
 
 #: tortoisehg\hgtk\commit.py:612
 msgid "branch: "
-msgstr "branch: "
+msgstr "Ramo: "
 
 #: tortoisehg\hgtk\commit.py:631
 msgid "Merge "
@@ -799,23 +799,23 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:964
 msgid "Confirm Override Branch"
-msgstr "Conferma sovrascrittura branch"
+msgstr "Conferma sovrascrittura ramo"
 
 #: tortoisehg\hgtk\commit.py:965
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
 msgstr ""
-"Il branch \"%s\" esiste già,\n"
+"Il ramo \"%s\" esiste già,\n"
 "sovrascrivere?"
 
 #: tortoisehg\hgtk\commit.py:969
 msgid "Confirm New Branch"
-msgstr "Conferma nuovo branch"
+msgstr "Conferma nuovo ramo"
 
 #: tortoisehg\hgtk\commit.py:970
 msgid "Create new named branch \"%s\"?"
-msgstr "Crea il nuovo branch \"%s\"?"
+msgstr "Crea il nuovo ramo \"%s\"?"
 
 #: tortoisehg\hgtk\commit.py:1045
 msgid "Paste _Filenames"
@@ -882,7 +882,7 @@ msgstr "Data:"
 
 #: tortoisehg\hgtk\csinfo.py:194 tortoisehg\hgtk\csinfo.py:195
 msgid "Branch:"
-msgstr "Branch:"
+msgstr "Ramo:"
 
 #: tortoisehg\hgtk\csinfo.py:195 tortoisehg\hgtk\csinfo.py:196
 msgid "Tags:"
@@ -1167,7 +1167,7 @@ msgstr "Revisione"
 
 #: tortoisehg\hgtk\gorev.py:43
 msgid "revision number, changeset ID, branch or tag"
-msgstr "Numero di revisione, ID del changeset, branch o etichetta"
+msgstr "Numero di revisione, ID del changeset, ramo o etichetta"
 
 #: tortoisehg\hgtk\gorev.py:58
 msgid "Invalid Revision"
@@ -1427,6 +1427,8 @@ msgid ""
 "This feature is only available when sending outgoing changesets. It is not "
 "applicable with revision ranges."
 msgstr ""
+"Questa opzione è disponibile solo quando si spediscono i changeset con la "
+"sincronizzazione. Non è applicabile con un intervallo di revisioni."
 
 #: tortoisehg\hgtk\hgemail.py:162
 msgid "attach"
@@ -1472,6 +1474,12 @@ msgid ""
 "Flags is a comma separated list of tags which are inserted into the message "
 "subject prefix."
 msgstr ""
+"La descrizione della serie di patch è inviata in una email iniziale di "
+"riassunto con [PATCH 0 of N] come oggetto. Dovrebbe descrivere gli effetti "
+"dell'intera serie di patch.  Quando viene inviato un bundle, questi campi "
+"compongono l'oggetto ed il corpo del messaggio. Il campo flag è un elenco "
+"separato da virgola di etichette che saranno inserite come prefisso al "
+"soggetto del messaggio."
 
 #: tortoisehg\hgtk\hgemail.py:293 tortoisehg\hgtk\hgemail.py:298
 #: tortoisehg\hgtk\hgemail.py:307
@@ -1798,7 +1806,7 @@ msgstr "hgtk log [OPZIONI] [FILE]"
 
 #: tortoisehg\hgtk\hgtk.py:667
 msgid "revision to merge with"
-msgstr ""
+msgstr "revisione con la quale eseguire il merge"
 
 #: tortoisehg\hgtk\hgtk.py:668
 msgid "hgtk merge"
@@ -1996,7 +2004,7 @@ msgstr "Coda patch"
 
 #: tortoisehg\hgtk\history.py:123
 msgid "Show/Hide Patch Queue"
-msgstr "Visualizza nasconde la code delle patch"
+msgstr "Visualizza/nasconde la coda delle patch"
 
 #: tortoisehg\hgtk\history.py:166
 msgid "Sync Bar"
@@ -2032,7 +2040,7 @@ msgstr "Grafico compatto"
 
 #: tortoisehg\hgtk\history.py:197
 msgid "Color by Branch"
-msgstr "Colora per Branch"
+msgstr "Colora per ramo"
 
 #: tortoisehg\hgtk\history.py:200
 msgid "Ignore Max Diff Size"
@@ -2108,7 +2116,7 @@ msgstr "ID Changeset"
 
 #: tortoisehg\hgtk\history.py:334
 msgid "Branch Name"
-msgstr "Nome branch"
+msgstr "Nome ramo"
 
 #: tortoisehg\hgtk\history.py:335 tortoisehg\hgtk\logview\treeview.py:433
 #: tortoisehg\hgtk\thgmq.py:187
@@ -2145,11 +2153,11 @@ msgstr "Filtro"
 
 #: tortoisehg\hgtk\history.py:646
 msgid "%s branch"
-msgstr "branch %s"
+msgstr "ramo %s"
 
 #: tortoisehg\hgtk\history.py:647
 msgid "Branch '%s'"
-msgstr "Branch '%s'"
+msgstr "Ramo '%s'"
 
 #: tortoisehg\hgtk\history.py:653
 msgid "file history: "
@@ -2201,11 +2209,11 @@ msgstr "no merge"
 
 #: tortoisehg\hgtk\history.py:717
 msgid "Visualize Change"
-msgstr ""
+msgstr "Comparazione visuale con genitore"
 
 #: tortoisehg\hgtk\history.py:718
 msgid "Di_splay Change"
-msgstr ""
+msgstr "Comparazione con genitore"
 
 #: tortoisehg\hgtk\history.py:719
 msgid "Diff to local"
@@ -2261,7 +2269,7 @@ msgstr "_Archivia..."
 
 #: tortoisehg\hgtk\history.py:764
 msgid "Transp_lant to local"
-msgstr ""
+msgstr "Transp_lant in locale"
 
 #: tortoisehg\hgtk\history.py:769
 msgid "qimport"
@@ -2293,7 +2301,7 @@ msgstr "Esporta patch da qui alla selezionata..."
 
 #: tortoisehg\hgtk\history.py:835
 msgid "Transplant Revision range to local"
-msgstr ""
+msgstr "Transplant intervallo revisioni in locale"
 
 #: tortoisehg\hgtk\history.py:840
 msgid "Rebase on top of selected"
@@ -2352,11 +2360,11 @@ msgstr "Invia una email delle modifiche in uscita a uno o più destinatari"
 
 #: tortoisehg\hgtk\history.py:937
 msgid "Stop current transaction"
-msgstr "Arresta la transazione corrente"
+msgstr "Arresta l'operazione in corso"
 
 #: tortoisehg\hgtk\history.py:960
 msgid "After Pull:"
-msgstr "Operazione dopo Pull:"
+msgstr "Operazione dopo il pull:"
 
 #: tortoisehg\hgtk\history.py:961 tortoisehg\hgtk\synch.py:155
 msgid "Nothing"
@@ -2401,11 +2409,11 @@ msgstr "Nascondi merge"
 
 #: tortoisehg\hgtk\history.py:1033
 msgid "Branch Filter"
-msgstr "Filtro branch"
+msgstr "Filtro rami"
 
 #: tortoisehg\hgtk\history.py:1040
 msgid "Branches..."
-msgstr "Branch..."
+msgstr "Rami..."
 
 #: tortoisehg\hgtk\history.py:1050
 msgid "Custom Filter"
@@ -2461,7 +2469,7 @@ msgstr "Anteprima bundle"
 
 #: tortoisehg\hgtk\history.py:1280
 msgid "Open Bundle"
-msgstr ""
+msgstr "Apri bundle"
 
 #: tortoisehg\hgtk\history.py:1355
 msgid "%d outgoing changesets"
@@ -2551,11 +2559,11 @@ msgstr "Scrivi bundle in"
 
 #: tortoisehg\hgtk\history.py:1703
 msgid "Confirm Rebase Revision"
-msgstr ""
+msgstr "Conferma rebase revisione"
 
 #: tortoisehg\hgtk\history.py:1704
 msgid "Rebase revision %d on top of %d?"
-msgstr ""
+msgstr "Eseguire il rebase della revisione %d sopra la revisione %d?"
 
 #: tortoisehg\hgtk\history.py:1815 tortoisehg\hgtk\status.py:1194
 msgid "Save patch to"
@@ -2575,7 +2583,7 @@ msgstr "ID"
 
 #: tortoisehg\hgtk\logview\treeview.py:420
 msgid "Branch"
-msgstr "Branch"
+msgstr "Ramo"
 
 #: tortoisehg\hgtk\logview\treeview.py:467
 msgid "Universal Date"
@@ -2583,7 +2591,7 @@ msgstr "Data universale"
 
 #: tortoisehg\hgtk\merge.py:44
 msgid "Merging in %s"
-msgstr ""
+msgstr "Merge in %s"
 
 #: tortoisehg\hgtk\merge.py:50 tortoisehg\hgtk\merge.py:63
 msgid "Unable to merge"
@@ -2627,6 +2635,10 @@ msgid ""
 "\n"
 "Do you want to exit?"
 msgstr ""
+"Per completare il merge si deve eseguire il commit dei file aggiornati nella "
+"directory di lavoro.\n"
+"\n"
+"Uscire?"
 
 #: tortoisehg\hgtk\merge.py:226
 msgid "Merged successfully"
@@ -2666,7 +2678,7 @@ msgstr "Selezionare file da aggiungere"
 
 #: tortoisehg\hgtk\quickop.py:51
 msgid "Forget"
-msgstr "Forget"
+msgstr "Dimentica"
 
 #: tortoisehg\hgtk\quickop.py:51
 msgid "Select files to forget"
@@ -3050,7 +3062,7 @@ msgstr "%d selezionati, %d totale"
 
 #: tortoisehg\hgtk\status.py:478
 msgid "Save Preview"
-msgstr ""
+msgstr "Anteprima salvataggio"
 
 #: tortoisehg\hgtk\status.py:482
 msgid "Shelf Preview"
@@ -3146,11 +3158,11 @@ msgstr "La selezione dei blocchi è disabilitata per questo file.\n"
 
 #: tortoisehg\hgtk\status.py:1232
 msgid "Nothing Diffed"
-msgstr ""
+msgstr "Comparazione non eseguita"
 
 #: tortoisehg\hgtk\status.py:1233
 msgid "No diffable files selected"
-msgstr ""
+msgstr "Nessun file comparabile selezionato"
 
 #: tortoisehg\hgtk\status.py:1241 tortoisehg\hgtk\status.py:1249
 msgid "Nothing Reverted"
@@ -3169,6 +3181,8 @@ msgstr ""
 #: tortoisehg\hgtk\status.py:1268
 msgid "Uncommited merge - please select a parent revision"
 msgstr ""
+"Merge di cui non si è effettuato il commit - si prega di selezionare una "
+"revisione genitore"
 
 #: tortoisehg\hgtk\status.py:1269
 msgid "Revert files to local or other parent?"
@@ -3236,7 +3250,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:1367
 msgid "Nothing Forgotten"
-msgstr "Forget non eseguito"
+msgstr "Nessun file dimenticato"
 
 #: tortoisehg\hgtk\status.py:1368
 msgid "No clean files selected"
@@ -3260,11 +3274,11 @@ msgstr "Modifica"
 
 #: tortoisehg\hgtk\status.py:1507
 msgid "View missing"
-msgstr ""
+msgstr "Vedi file mancante"
 
 #: tortoisehg\hgtk\status.py:1508
 msgid "View other"
-msgstr ""
+msgstr "Vedi altro"
 
 #: tortoisehg\hgtk\status.py:1512
 msgid "L_og"
@@ -3427,7 +3441,7 @@ msgstr "Nasconde i merge"
 
 #: tortoisehg\hgtk\synch.py:268
 msgid "Update to branch tip"
-msgstr "Aggiorna al tip del branch"
+msgstr "Aggiorna al tip del ramo"
 
 #: tortoisehg\hgtk\synch.py:367
 msgid "unknown sort key '%s'"
@@ -3791,7 +3805,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:87
 msgid "Auto Commit List"
-msgstr "Elenco file automaticamente inclusi"
+msgstr "File automaticamente inclusi"
 
 #: tortoisehg\hgtk\thgconfig.py:88
 msgid ""
@@ -3803,15 +3817,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:91
 msgid "Auto Exclude List"
-msgstr "Elenco file automaticamente esclusi"
+msgstr "File automaticamente esclusi"
 
 #: tortoisehg\hgtk\thgconfig.py:92
 msgid ""
 "Comma separated list of files that are automatically unchecked when the "
 "status, commit, and shelve dialogs are opened.  Default: None"
 msgstr ""
-"Elenco separato da virgola di files che saranno automaticamente "
-"deselezionati nelle finestre di status, commit e shelve.  Default: vuoto"
+"Elenco separato da virgola di file che saranno automaticamente deselezionati "
+"nelle finestre di stato file, commit e shelve.  Default: vuoto"
 
 #: tortoisehg\hgtk\thgconfig.py:98
 msgid "Author Coloring"
@@ -3865,19 +3879,19 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:115
 msgid "Dead Branches"
-msgstr "Branch morti"
+msgstr "Rami morti"
 
 #: tortoisehg\hgtk\thgconfig.py:116
 msgid ""
 "Comma separated list of branch names that should be ignored when building a "
 "list of branch names for a repository. Default: None"
 msgstr ""
-"Elenco separato da virgola di nomi di branch da ignorare quando viene "
-"costruito l'elenco dei branch del repository. Default: vuoto"
+"Elenco separato da virgola di nomi di rami da ignorare quando viene "
+"costruito l'elenco dei rami del repository. Default: vuoto"
 
 #: tortoisehg\hgtk\thgconfig.py:119
 msgid "Branch Colors"
-msgstr "Colori dei branch"
+msgstr "Colori dei rami"
 
 #: tortoisehg\hgtk\thgconfig.py:120
 msgid ""
@@ -3886,8 +3900,8 @@ msgid ""
 "Likewise some other characters can be escaped in this way, e.g. \\u0040 will "
 "be decoded to the @ character, and \\n to a linefeed. Default: None"
 msgstr ""
-"Elenco separato da spazi di nomi di branch e colori nella forma "
-"branch:#XXXXXX. Spazi e due punti nel nome del branch devono essere espressi "
+"Elenco separato da spazi di nomi di rami e colori nella forma "
+"branch:#XXXXXX. Spazi e due punti nel nome del ramo devono essere espressi "
 "con una sequenza di escape usando il carattere backslash (\\). Analogamente "
 "altri caratteri possono essere espressi in questo modo, ad esempio \\u0040 è "
 "il carattere @, mentre \\n è il linefeed.  Default: vuoto"
@@ -3908,11 +3922,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:131
 msgid "Use Expander"
-msgstr ""
+msgstr "Usa Expander"
 
 #: tortoisehg\hgtk\thgconfig.py:132
 msgid "Show changeset details with an expander"
-msgstr ""
+msgstr "Mostra i dettagli del changeset usando un oggetto grafico expander"
 
 #: tortoisehg\hgtk\thgconfig.py:136
 msgid "After pull operation"
@@ -3924,7 +3938,7 @@ msgid ""
 "equates to pull --update, fetch equates to the fetch extension, rebase "
 "equates to pull --rebase.  Default: none"
 msgstr ""
-"Operazione da eseguire dopo un pull completato con successo. 'aggiorna'  "
+"Operazione da eseguire dopo un pull completato con successo. 'update'  "
 "equivale a 'pull --update', 'fetch' equivale all'estensione fetch, 'rebase' "
 "equivale a 'pull --rebase'. Default: nessuna"
 
@@ -4398,7 +4412,7 @@ msgstr "TortoiseHg Configurazione opzioni globali utente"
 
 #: tortoisehg\hgtk\thgconfig.py:713
 msgid "Exit after saving changes?"
-msgstr "Uscire dopo aver salvato le modifiche?"
+msgstr "Salvare le modifiche prima di uscire?"
 
 #: tortoisehg\hgtk\thgconfig.py:714
 msgid "&No (discard changes)"
@@ -4494,25 +4508,27 @@ msgstr "Si (&mantiene)"
 
 #: tortoisehg\hgtk\thgmq.py:409
 msgid "Confirm Fold"
-msgstr ""
+msgstr "Conferma raggruppamento"
 
 #: tortoisehg\hgtk\thgmq.py:410
 msgid ""
 "Do you want to fold un-applied patch '%(target)s' into current patch "
 "'%(qtip)s'?"
 msgstr ""
+"Raggruppare il patch non applicato '%(target)s' nel patch corrente "
+"'%(qtip)s'?"
 
 #: tortoisehg\hgtk\thgmq.py:567
 msgid "_goto"
-msgstr ""
+msgstr "_Vai a"
 
 #: tortoisehg\hgtk\thgmq.py:569
 msgid "_rename"
-msgstr ""
+msgstr "_Rinomina"
 
 #: tortoisehg\hgtk\thgmq.py:571
 msgid "_finish applied"
-msgstr ""
+msgstr "_Importa le applicate"
 
 #: tortoisehg\hgtk\thgmq.py:573
 msgid "_delete"
@@ -4520,15 +4536,15 @@ msgstr "_elimina"
 
 #: tortoisehg\hgtk\thgmq.py:574
 msgid "delete --keep"
-msgstr ""
+msgstr "Elimina --keep"
 
 #: tortoisehg\hgtk\thgmq.py:576
 msgid "f_old"
-msgstr ""
+msgstr "Ragruppa"
 
 #: tortoisehg\hgtk\thgmq.py:578
 msgid "make it _next"
-msgstr ""
+msgstr "Rendila prossima"
 
 #: tortoisehg\hgtk\thgmq.py:612
 msgid "Show index"
@@ -4556,7 +4572,7 @@ msgstr "Mostra 'qparent'"
 
 #: tortoisehg\hgtk\thgmq.py:642
 msgid "Succeed"
-msgstr ""
+msgstr "Successo"
 
 #: tortoisehg\hgtk\thgshelve.py:72
 msgid "set aside selected changes"
@@ -4658,7 +4674,7 @@ msgstr "Revisione sconosciuta!"
 
 #: tortoisehg\hgtk\thgstrip.py:184
 msgid "<span weight=\"bold\">%s changesets</span> will be stripped"
-msgstr "<span weight=\"bold\">%s changeset</span> verrà eliminato"
+msgstr "verranno eliminati <span weight=\"bold\">%s changeset</span>"
 
 #: tortoisehg\hgtk\thgstrip.py:190
 msgid "No changesets to display"
@@ -5049,7 +5065,7 @@ msgstr "Stato file"
 
 #: tortoisehg\util\menuthg.py:48
 msgid "Repository status & changes"
-msgstr "Mostra lo stato delle modifiche ai file"
+msgstr "Mostra lo stato e le modifiche dei file"
 
 #: tortoisehg\util\menuthg.py:50
 msgid "Shelve Changes"
@@ -5077,7 +5093,7 @@ msgstr "Ripristina le modifiche ai file"
 
 #: tortoisehg\util\menuthg.py:59
 msgid "Forget Files..."
-msgstr "Forget file..."
+msgstr "Dimentica file..."
 
 #: tortoisehg\util\menuthg.py:60 tortoisehg\util\menuthg.py:63
 msgid "Remove files from version control"
@@ -5177,7 +5193,7 @@ msgstr "Comparazione visuale"
 
 #: tortoisehg\util\menuthg.py:99
 msgid "View changes using GUI diff tool"
-msgstr "Vedi le modifiche usando un tool di comparazione grafico"
+msgstr "Mostra le modifiche usando un tool di comparazione grafico"
 
 #: tortoisehg\util\menuthg.py:101
 msgid "Edit Ignore Filter"
@@ -5201,11 +5217,11 @@ msgstr "Ricerca nel repository"
 
 #: tortoisehg\util\menuthg.py:108
 msgid "Search file revisions for patterns"
-msgstr ""
+msgstr "Cerca del testo nelle revisioni dei file"
 
 #: tortoisehg\util\menuthg.py:110
 msgid "DnD Synchronize"
-msgstr ""
+msgstr "Sincronizzazione Drag and Drop"
 
 #: tortoisehg\util\menuthg.py:111
 msgid "Synchronize with dragged repository"

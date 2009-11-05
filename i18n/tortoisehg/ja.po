@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-10-27 13:01+0000\n"
-"PO-Revision-Date: 2009-10-27 15:31+0000\n"
+"PO-Revision-Date: 2009-11-03 13:20+0000\n"
 "Last-Translator: Yuki Kodama <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-28 01:56+0000\n"
+"X-Launchpad-Export-Date: 2009-11-05 03:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -317,7 +317,7 @@ msgstr "エディタで表示(_V)"
 
 #: tortoisehg\hgtk\changeset.py:392
 msgid "_Save at Revision..."
-msgstr "ファイルに保存(_S)"
+msgstr "ファイルに保存...(_S)"
 
 #: tortoisehg\hgtk\changeset.py:396
 msgid "_File History"
@@ -474,11 +474,11 @@ msgstr "現在のブランチを閉じる"
 
 #: tortoisehg\hgtk\commit.py:148
 msgid " - qnew"
-msgstr " - パッチの作成"
+msgstr " - パッチ作成"
 
 #: tortoisehg\hgtk\commit.py:151
 msgid " - qrefresh "
-msgstr " - パッチの更新 "
+msgstr " - パッチ更新 "
 
 #: tortoisehg\hgtk\commit.py:152
 msgid " - commit"
@@ -851,7 +851,7 @@ msgstr "スタイルには 'type' が必須です"
 #: tortoisehg\hgtk\csinfo.py:191 tortoisehg\hgtk\csinfo.py:192
 #: tortoisehg\hgtk\tagadd.py:65
 msgid "Revision:"
-msgstr "リビジョン："
+msgstr "リビジョン:"
 
 #: tortoisehg\hgtk\csinfo.py:192
 msgid "Summary:"
@@ -1517,7 +1517,7 @@ msgstr "無効な正規表現です"
 
 #: tortoisehg\hgtk\hginit.py:22 tortoisehg\util\menuthg.py:42
 msgid "Create a new repository"
-msgstr "新しいリポジトリの作成"
+msgstr "ここに新しいリポジトリを作成します"
 
 #: tortoisehg\hgtk\hginit.py:30
 msgid "Create"
@@ -1924,7 +1924,7 @@ msgstr "列"
 
 #: tortoisehg\hgtk\histdetails.py:87
 msgid "Move Up"
-msgstr "上に移動"
+msgstr "一番上に移動"
 
 #: tortoisehg\hgtk\histdetails.py:90
 msgid "Move Down"
@@ -1998,7 +1998,7 @@ msgstr "ツールバー"
 
 #: tortoisehg\hgtk\history.py:184
 msgid "Filter Bar"
-msgstr "フィルタバーの表示"
+msgstr "フィルタバー"
 
 #: tortoisehg\hgtk\history.py:190
 msgid "Reset Marks"
@@ -2247,7 +2247,7 @@ msgstr "ローカルに移植(_L)"
 
 #: tortoisehg\hgtk\history.py:769
 msgid "qimport"
-msgstr "MQ パッチとしてインポート"
+msgstr "MQ にインポート"
 
 #: tortoisehg\hgtk\history.py:770
 msgid "Strip Revision..."
@@ -2263,7 +2263,7 @@ msgstr "選択中のリビジョンとの GUI 差分表示"
 
 #: tortoisehg\hgtk\history.py:812
 msgid "Email from here to selected..."
-msgstr "この範囲をメールで送信"
+msgstr "この範囲をメールで送信..."
 
 #: tortoisehg\hgtk\history.py:814
 msgid "Bundle from here to selected..."
@@ -2275,15 +2275,15 @@ msgstr "この範囲をパッチとして保存..."
 
 #: tortoisehg\hgtk\history.py:835
 msgid "Transplant Revision range to local"
-msgstr "この範囲のリビジョンをローカルに移植"
+msgstr "この範囲をローカルに移植"
 
 #: tortoisehg\hgtk\history.py:840
 msgid "Rebase on top of selected"
-msgstr "選択中のリビジョンの上にリベースする"
+msgstr "選択中のリビジョンの上にリベース"
 
 #: tortoisehg\hgtk\history.py:845
 msgid "qimport from here to selected"
-msgstr "この範囲を MQ パッチとしてインポート"
+msgstr "この範囲を MQ にインポート"
 
 #: tortoisehg\hgtk\history.py:876
 msgid "Load more"
@@ -4924,7 +4924,7 @@ msgstr "変更点をリポジトリにコミットします"
 
 #: tortoisehg\util\menuthg.py:41
 msgid "Create Repository Here"
-msgstr "ここに新しいリポジトリを作成します"
+msgstr "ここにリポジトリを作成"
 
 #: tortoisehg\util\menuthg.py:44
 msgid "Clone..."
@@ -4944,7 +4944,7 @@ msgstr "作業ツリーの状態と変更点を表示します"
 
 #: tortoisehg\util\menuthg.py:50
 msgid "Shelve Changes"
-msgstr "変更をシェルフする"
+msgstr "変更点のシェルフ"
 
 #: tortoisehg\util\menuthg.py:51
 msgid "Shelve or unshelve file changes"
@@ -4980,7 +4980,7 @@ msgstr "削除..."
 
 #: tortoisehg\util\menuthg.py:65
 msgid "Rename File"
-msgstr "名前の変更"
+msgstr "名前の変更..."
 
 #: tortoisehg\util\menuthg.py:66
 msgid "Rename file or directory"
@@ -5008,7 +5008,7 @@ msgstr "リポジトリのウェブサーバを起動します"
 
 #: tortoisehg\util\menuthg.py:77
 msgid "Update..."
-msgstr "特定のリビジョンへ更新"
+msgstr "特定のリビジョンへ更新..."
 
 #: tortoisehg\util\menuthg.py:78
 msgid "Update working directory"

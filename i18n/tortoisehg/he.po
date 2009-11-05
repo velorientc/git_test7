@@ -14,7 +14,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-28 01:56+0000\n"
+"X-Launchpad-Export-Date: 2009-11-05 03:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -55,24 +55,24 @@ msgstr ""
 
 #: tortoisehg\hgtk\archive.py:46
 msgid "Archive - %s"
-msgstr ""
+msgstr "ארכיון - %s"
 
 #: tortoisehg\hgtk\archive.py:71
 msgid "Archive revision:"
-msgstr ""
+msgstr "גרסת הארכיון:"
 
 #: tortoisehg\hgtk\archive.py:77 tortoisehg\hgtk\clone.py:74
 #: tortoisehg\hgtk\hginit.py:52 tortoisehg\hgtk\thgconfig.py:301
 msgid "Browse..."
-msgstr ""
+msgstr "עיין..."
 
 #: tortoisehg\hgtk\archive.py:80 tortoisehg\hgtk\clone.py:103
 msgid "Destination path:"
-msgstr ""
+msgstr "נתיב היעד:"
 
 #: tortoisehg\hgtk\archive.py:83
 msgid "Directory of files"
-msgstr ""
+msgstr "תיקיית קבצים"
 
 #: tortoisehg\hgtk\archive.py:85
 msgid "Archive types:"

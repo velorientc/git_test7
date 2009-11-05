@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "POT-Creation-Date: 2009-10-27 13:01+0000\n"
-"PO-Revision-Date: 2009-10-27 10:39+0000\n"
+"PO-Revision-Date: 2009-11-01 08:22+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-28 01:56+0000\n"
+"X-Launchpad-Export-Date: 2009-11-05 03:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -231,7 +231,7 @@ msgstr "Brug engelsk omgørelsesbesked"
 
 #: tortoisehg\hgtk\backout.py:97
 msgid "Merge with old dirstate parent after backout"
-msgstr ""
+msgstr "Foren med gammel mappetilstand forælder efter omgørelse"
 
 #: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:437
 msgid "Confirm Discard Message"
@@ -305,19 +305,19 @@ msgstr "[intet stykke at fremvise]"
 
 #: tortoisehg\hgtk\changeset.py:388 tortoisehg\hgtk\status.py:1505
 msgid "_Visual Diff"
-msgstr ""
+msgstr "_Visuel Diff"
 
 #: tortoisehg\hgtk\changeset.py:389
 msgid "Diff to _local"
-msgstr ""
+msgstr "Diff til _lokal"
 
 #: tortoisehg\hgtk\changeset.py:391
 msgid "_View at Revision"
-msgstr ""
+msgstr "_Vis revision"
 
 #: tortoisehg\hgtk\changeset.py:392
 msgid "_Save at Revision..."
-msgstr ""
+msgstr "_Gem revision..."
 
 #: tortoisehg\hgtk\changeset.py:396
 msgid "_File History"
@@ -325,11 +325,11 @@ msgstr "_Filhistorie"
 
 #: tortoisehg\hgtk\changeset.py:397
 msgid "_Annotate File"
-msgstr ""
+msgstr "_Annotér fil"
 
 #: tortoisehg\hgtk\changeset.py:400
 msgid "_Revert File Contents"
-msgstr ""
+msgstr "_Tilbagefør filindhold"
 
 #: tortoisehg\hgtk\changeset.py:485
 msgid "Changeset:"
@@ -482,7 +482,7 @@ msgstr " - qrefresh "
 
 #: tortoisehg\hgtk\commit.py:152
 msgid " - commit"
-msgstr ""
+msgstr " - integrér"
 
 #: tortoisehg\hgtk\commit.py:183 tortoisehg\hgtk\history.py:175
 msgid "_View"
@@ -842,11 +842,11 @@ msgstr "Uddragslinjen bliver ikke fulgt af en tom linje"
 
 #: tortoisehg\hgtk\csinfo.py:49
 msgid "must be specified repository"
-msgstr ""
+msgstr "depot skal være angivet"
 
 #: tortoisehg\hgtk\csinfo.py:86
 msgid "must be specified 'type' in style"
-msgstr ""
+msgstr "'type' skal angives i stilen"
 
 #: tortoisehg\hgtk\csinfo.py:191 tortoisehg\hgtk\csinfo.py:192
 #: tortoisehg\hgtk\tagadd.py:65
@@ -879,11 +879,11 @@ msgstr "Mærker:"
 
 #: tortoisehg\hgtk\csinfo.py:196
 msgid "Transplant:"
-msgstr ""
+msgstr "Transplanter:"
 
 #: tortoisehg\hgtk\datamine.py:47
 msgid "%s - datamine"
-msgstr ""
+msgstr "%s - datamine"
 
 #: tortoisehg\hgtk\datamine.py:56 tortoisehg\hgtk\hgcmd.py:44
 #: tortoisehg\hgtk\recovery.py:46 tortoisehg\hgtk\serve.py:62
@@ -1280,7 +1280,7 @@ msgstr "Stop transaktion"
 
 #: tortoisehg\hgtk\hgcmd.py:313
 msgid "Close this"
-msgstr ""
+msgstr "Luk denne"
 
 #: tortoisehg\hgtk\hgcmd.py:449 tortoisehg\hgtk\hgcmd.py:466
 msgid "invalid state"
@@ -1462,6 +1462,11 @@ msgid ""
 "Flags is a comma separated list of tags which are inserted into the message "
 "subject prefix."
 msgstr ""
+"Lap-sekvens beskrivelsen bliver sendt i den indledende sammendragsmail med "
+"[PATCH 0 of N] som emne. Denne skal beskrive effekten af den samlede lap-"
+"sekvens. Når man sender et bundt vil disse felter udgøre meddelelsestekst og "
+"-emne. Flag er en komma-separeret liste af mærkater som bliver indsat først "
+"i besked-emnet."
 
 #: tortoisehg\hgtk\hgemail.py:293 tortoisehg\hgtk\hgemail.py:298
 #: tortoisehg\hgtk\hgemail.py:307
@@ -1482,7 +1487,7 @@ msgstr "Du skal konfigurere SMTP"
 
 #: tortoisehg\hgtk\hgignore.py:35
 msgid "Ignore filter - %s"
-msgstr ""
+msgstr "Ignoreringsmønster - %s"
 
 #: tortoisehg\hgtk\hgignore.py:51 tortoisehg\hgtk\hgignore.py:59
 #: tortoisehg\hgtk\quickop.py:50 tortoisehg\hgtk\tagadd.py:37
@@ -1860,7 +1865,7 @@ msgstr "vent indtil næste sekund"
 
 #: tortoisehg\hgtk\hgtk.py:692
 msgid "notify the shell for paths given"
-msgstr ""
+msgstr "notificer shell for angivne stier"
 
 #: tortoisehg\hgtk\hgtk.py:693
 msgid "remove the status cache"
@@ -1892,7 +1897,7 @@ msgstr "revisioner at vise i diff-værktøj"
 
 #: tortoisehg\hgtk\hgtk.py:704
 msgid "bundle file to preview"
-msgstr ""
+msgstr "bundt-fil som skal forhåndsvises"
 
 #: tortoisehg\hgtk\hgtk.py:705
 msgid "directly use raw extdiff command"
@@ -1944,14 +1949,17 @@ msgid ""
 "\n"
 "Accept or reject the new changesets?"
 msgstr ""
+"Der er stadig nye ændringer i forhåndsvisningsbundtet.\n"
+"\n"
+"Godkend eller afvis de nye ændringer?"
 
 #: tortoisehg\hgtk\history.py:78
 msgid "Accept new Changesets"
-msgstr ""
+msgstr "Godkend nye ændringer"
 
 #: tortoisehg\hgtk\history.py:81
 msgid "&Accept"
-msgstr ""
+msgstr "&Godkend"
 
 #: tortoisehg\hgtk\history.py:81
 msgid "&Reject"
@@ -1987,7 +1995,7 @@ msgstr "vis/skjul lap-kø"
 
 #: tortoisehg\hgtk\history.py:166
 msgid "Sync Bar"
-msgstr ""
+msgstr "Synk. bjælke"
 
 #: tortoisehg\hgtk\history.py:176
 msgid "Load more Revisions"
@@ -2027,7 +2035,7 @@ msgstr "Ignorer maks diff størrelse"
 
 #: tortoisehg\hgtk\history.py:204
 msgid "_Navigate"
-msgstr ""
+msgstr "_Navigér"
 
 #: tortoisehg\hgtk\history.py:205
 msgid "Tip"
@@ -2128,7 +2136,7 @@ msgstr "Ugyldig datospecifikation"
 
 #: tortoisehg\hgtk\history.py:641
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: tortoisehg\hgtk\history.py:646
 msgid "%s branch"
@@ -2449,7 +2457,7 @@ msgstr "Åben bundt"
 
 #: tortoisehg\hgtk\history.py:1355
 msgid "%d outgoing changesets"
-msgstr ""
+msgstr "%d udgående ændringer"
 
 #: tortoisehg\hgtk\history.py:1374 tortoisehg\hgtk\synch.py:495
 msgid "No repository selected"
@@ -2461,7 +2469,7 @@ msgstr "Vælg et andet depot at sammenligne med"
 
 #: tortoisehg\hgtk\history.py:1402
 msgid "Confirm Forced Push to Remote Repository"
-msgstr ""
+msgstr "Bekræft tvunget skub til fjern-depot"
 
 #: tortoisehg\hgtk\history.py:1403
 msgid ""
@@ -2469,14 +2477,17 @@ msgid ""
 "%s\n"
 "(creating new heads in remote if needed)?"
 msgstr ""
+"Tvunget skub til fjern-depot\n"
+"%s\n"
+"(opret nyt hoved i fjerndepot om nødvendigt)?"
 
 #: tortoisehg\hgtk\history.py:1405 tortoisehg\hgtk\history.py:1415
 msgid "Forced &Push"
-msgstr ""
+msgstr "Tvunget &skub"
 
 #: tortoisehg\hgtk\history.py:1407
 msgid "Confirm Push to remote Repository"
-msgstr ""
+msgstr "Bekræft skub til fjern-depot"
 
 #: tortoisehg\hgtk\history.py:1408
 msgid ""
@@ -2484,14 +2495,17 @@ msgid ""
 "%s\n"
 "?"
 msgstr ""
+"Skub til fjern-depot\n"
+"%s\n"
+"?"
 
 #: tortoisehg\hgtk\history.py:1409
 msgid "&Push"
-msgstr ""
+msgstr "&Skub"
 
 #: tortoisehg\hgtk\history.py:1412
 msgid "Confirm Forced Push"
-msgstr ""
+msgstr "Bekræft tvuget skub"
 
 #: tortoisehg\hgtk\history.py:1413
 msgid ""
@@ -2499,10 +2513,13 @@ msgid ""
 "%s\n"
 "(creating new heads if needed)?"
 msgstr ""
+"Tvunget skub til depot\n"
+"%s\n"
+"(opret nye hoveder om nødvendigt)?"
 
 #: tortoisehg\hgtk\history.py:1423
 msgid "Invalid Remote Repository"
-msgstr ""
+msgstr "Ugyldigt fjern-depot"
 
 #: tortoisehg\hgtk\history.py:1592
 msgid "Confirm Revert All Files"
@@ -2602,6 +2619,9 @@ msgid ""
 "\n"
 "Do you want to exit?"
 msgstr ""
+"For at gennemføre flet skal du integrere flettede filer i arbejdskataloget.\n"
+"\n"
+"Vil du afslutte?"
 
 #: tortoisehg\hgtk\merge.py:226
 msgid "Merged successfully"
