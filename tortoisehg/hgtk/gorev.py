@@ -54,6 +54,10 @@ class GotoRevDialog(gtk.Dialog):
                 self.gotofunc(revision)
             self.revEntry.set_text('')
             self.hide()
+        except mercurial.error.LookupError, e:
+            gdialog.Prompt(_('Ambiguous Revision'), str(e), self).run()
+            self.revEntry.grab_focus()
+            return
         except mercurial.error.RepoError, e:
             gdialog.Prompt(_('Invalid Revision'), str(e), self).run()
             self.revEntry.grab_focus()
