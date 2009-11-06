@@ -39,7 +39,7 @@
 差分表示
 --------
 
-.. figure:: figures/visual-diff.jpg
+.. figure:: figures/visual-diff.png
 	:alt: 差分表示ウィンドウ
 
 	差分表示ウィンドウ
