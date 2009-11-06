@@ -906,8 +906,9 @@ class GLog(gdialog.GWindow):
         else:
             item.set_sensitive(False)
 
-        # enable MQ panel
+        # enable panels
         self.enable_mqpanel()
+        self.enable_pbranchpanel()
 
     def get_proxy_args(self):
         item = self.get_menuitem('use-proxy-server')
@@ -2090,11 +2091,8 @@ class GLog(gdialog.GWindow):
         self.hpaned.set_position(self.setting_hpos)
         if hasattr(self, 'mqpaned') and self.mqtb.get_active():
             self.mqpaned.set_position(self.setting_mqhpos)
-        if hasattr(self, 'pbranchpaned'):
-            pos = 0
-            if self.pbranchtb.get_active():
-                pos = self.setting_pbranchhpos
-            self.pbranchpaned.set_position(pos)
+        if hasattr(self, 'pbranchpaned') and self.pbranchtb.get_active():
+            self.pbranchpaned.set_position(self.setting_pbranchhpos)
 
     def thgdiff(self, treeview):
         'ctrl-d handler'
@@ -2687,7 +2685,7 @@ class GLog(gdialog.GWindow):
         if not hasattr(self, 'pbranchpaned'):
             return
         if enable is None:
-            enable = self.setting_pbvis and self.pbranchwidget.has_patch()
+            enable = self.setting_pbranchvis and self.pbranchwidget.has_patch()
         oldpos = self.pbranchpaned.get_position()
         self.pbranchpaned.set_position(enable and self.setting_pbranchhpos or 0)
         if not enable and oldpos:
