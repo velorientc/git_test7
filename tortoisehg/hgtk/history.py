@@ -333,6 +333,12 @@ class GLog(gdialog.GWindow):
         else:
             p4menu = []
 
+        if 'pbranch' in self.exs:
+            pbranch_item = [dict(text=_('Patch Branch'), name='pbranch', ascheck=True,
+                func=self.pbranch_clicked, check=self.setting_pbranchvis) ]
+        else:
+            pbranch_item = []
+
         return [
         dict(text=_('_View'), subitems=[
             dict(text=_('Load more Revisions'), name='load-more',
@@ -345,7 +351,7 @@ class GLog(gdialog.GWindow):
             ] + sync_bar_item + [
             dict(text=_('Filter Bar'), ascheck=True,
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
-            ] + mq_item + [
+            ] + mq_item + pbranch_item + [
             dict(text='----'),
             dict(text=_('Refresh'), func=refresh, args=[False],
                 icon=gtk.STOCK_REFRESH),
