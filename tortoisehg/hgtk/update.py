@@ -29,7 +29,6 @@ class UpdateDialog(gtk.Dialog):
         gtklib.set_tortoise_icon(self, 'menucheckout.ico')
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
-        self.set_size_request(450, -1)
         self.set_has_separator(False)
         self.connect('response', self.dialog_response)
 
