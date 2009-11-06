@@ -834,7 +834,8 @@ class GLog(gdialog.GWindow):
         else:
             self.goto_rev(revid)
 
-    def repo_invalidated(self, mqwidget):
+    def repo_invalidated(self, widget):
+        'Emitted from MQWidget and PBranchWidget'
         self.reload_log()
 
     def files_dropped(self, mqwidget, files, *args):
