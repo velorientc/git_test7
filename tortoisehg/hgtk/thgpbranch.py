@@ -23,12 +23,15 @@ M_OUT_LINES = 2
 M_NAME      = 3
 M_STATUS    = 4
 M_TITLE     = 5
+M_MSG       = 6
+M_MSGESC    = 7
 
 # Patch Branch column enumeration
 C_GRAPH   = 0
 C_STATUS  = 1
 C_NAME    = 2
 C_TITLE   = 3
+C_MSG     = 4
 
 class PBranchWidget(gtk.VBox):
 
@@ -49,6 +52,11 @@ class PBranchWidget(gtk.VBox):
                                     False,
                                     gobject.PARAM_READWRITE),
         'title-column-visible': (gobject.TYPE_BOOLEAN,
+                                    'Title',
+                                    'Show title column',
+                                    False,
+                                    gobject.PARAM_READWRITE),
+        'message-column-visible': (gobject.TYPE_BOOLEAN,
                                     'Title',
                                     'Show title column',
                                     False,
@@ -131,9 +139,14 @@ class PBranchWidget(gtk.VBox):
                 gobject.TYPE_PYOBJECT, # out-lines
                 str, # patch name
                 str, # patch status
-                str) # patch title
+                str, # patch title
+                str, # patch message
+                str) # patch message escaped
         #### patch list view
         self.list = gtk.TreeView(self.model)
+        # To support old PyGTK (<2.12)
+        if hasattr(self.list, 'set_tooltip_column'):
+            self.list.set_tooltip_column(M_MSGESC)
         self.list.connect('button-press-event', self.list_pressed)
         self.list.connect('row-activated', self.list_row_activated)
         self.list.connect('size-allocate', self.list_size_allocated)
@@ -181,6 +194,7 @@ class PBranchWidget(gtk.VBox):
         addcol(_('St'), C_STATUS, M_STATUS)
         addcol(_('Name'), C_NAME, M_NAME, editfunc=cell_edited)
         addcol(_('Title'), C_TITLE, M_TITLE)
+        addcol(_('Message'), C_MSG, M_MSG)
 
         pane.add(self.list)
 
@@ -264,10 +278,15 @@ class PBranchWidget(gtk.VBox):
                     
             stat = patch_status[name] and 'M' or 'C' # patch status
             patchname = name
-            msg = self.pmessage(name) or '' # summary
-            msg_esc = 'message for tool-tip' # escaped summary (utf-8)
-            title = msg.split('\n')[0]
-            self.model.append((node, in_lines, out_lines, patchname, stat, title))
+            msg = self.pmessage(name) # summary
+            if msg:
+                msg_esc = gtklib.markup_escape_text(msg) # escaped summary (utf-8)
+                title = msg.split('\n')[0]
+            else:
+                msg_esc = None
+                title = None
+            self.model.append((node, in_lines, out_lines, patchname, stat,
+                               title, msg, msg_esc))
             # Loop
             in_lines = out_lines
             dep_list = next_dep_list
@@ -518,6 +537,7 @@ class PBranchWidget(gtk.VBox):
         colappend(_('Show status'), C_STATUS, active=False)
         colappend(_('Show name'), C_NAME)
         colappend(_('Show title'), C_TITLE, active=False)
+        colappend(_('Show message'), C_MSG, active=False)
 
         append(sep=True)
 
@@ -582,6 +602,8 @@ class PBranchWidget(gtk.VBox):
             return 'name-column-visible'
         if col_idx == C_TITLE:
             return 'title-column-visible'
+        if col_idx == C_MSG:
+            return 'message-column-visible'
         return ''
 
     ### signal handlers ###
