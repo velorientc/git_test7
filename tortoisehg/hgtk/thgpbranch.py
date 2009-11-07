@@ -22,11 +22,13 @@ M_IN_LINES  = 1
 M_OUT_LINES = 2
 M_NAME      = 3
 M_STATUS    = 4
+M_TITLE     = 5
 
 # Patch Branch column enumeration
 C_GRAPH   = 0
 C_STATUS  = 1
 C_NAME    = 2
+C_TITLE   = 3
 
 class PBranchWidget(gtk.VBox):
 
@@ -44,6 +46,11 @@ class PBranchWidget(gtk.VBox):
         'name-column-visible': (gobject.TYPE_BOOLEAN,
                                     'Name',
                                     'Show name column',
+                                    False,
+                                    gobject.PARAM_READWRITE),
+        'title-column-visible': (gobject.TYPE_BOOLEAN,
+                                    'Title',
+                                    'Show title column',
                                     False,
                                     gobject.PARAM_READWRITE),
         'show-internal-branches': (gobject.TYPE_BOOLEAN,
@@ -123,7 +130,8 @@ class PBranchWidget(gtk.VBox):
                 gobject.TYPE_PYOBJECT, # in-lines
                 gobject.TYPE_PYOBJECT, # out-lines
                 str, # patch name
-                str) # patch status
+                str, # patch status
+                str) # patch title
         #### patch list view
         self.list = gtk.TreeView(self.model)
         self.list.connect('button-press-event', self.list_pressed)
@@ -172,6 +180,7 @@ class PBranchWidget(gtk.VBox):
             )
         addcol(_('St'), C_STATUS, M_STATUS)
         addcol(_('Name'), C_NAME, M_NAME, editfunc=cell_edited)
+        addcol(_('Title'), C_TITLE, M_TITLE)
 
         pane.add(self.list)
 
@@ -255,9 +264,10 @@ class PBranchWidget(gtk.VBox):
                     
             stat = patch_status[name] and 'M' or 'C' # patch status
             patchname = name
-            msg = '%s' % parents # summary (utf-8)
-            msg_esc = 'what-is-this-for' # escaped summary (utf-8)
-            self.model.append((node, in_lines, out_lines, patchname, stat))
+            msg = self.pmessage(name) or '' # summary
+            msg_esc = 'message for tool-tip' # escaped summary (utf-8)
+            title = msg.split('\n')[0]
+            self.model.append((node, in_lines, out_lines, patchname, stat, title))
             # Loop
             in_lines = out_lines
             dep_list = next_dep_list
@@ -334,6 +344,18 @@ class PBranchWidget(gtk.VBox):
             status.append(_('needs update of diff base to tip of %s\n') % dep)
         return status
 
+    def pmessage(self, patch_name):
+        """
+        Get patch message
+
+        :param patch_name: Name of patch-branch
+        :retv: Full patch message. If you extract the first line
+        you will get the patch title.
+        """
+        opts = {}
+        mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
+        return mgr.patchdesc(patch_name)
+        
     def pnew_ui(self):
         """
         Create new patch.
@@ -495,6 +517,7 @@ class PBranchWidget(gtk.VBox):
         colappend(_('Show graph'), C_GRAPH)
         colappend(_('Show status'), C_STATUS, active=False)
         colappend(_('Show name'), C_NAME)
+        colappend(_('Show title'), C_TITLE, active=False)
 
         append(sep=True)
 
@@ -557,6 +580,8 @@ class PBranchWidget(gtk.VBox):
             return 'status-column-visible'
         if col_idx == C_NAME:
             return 'name-column-visible'
+        if col_idx == C_TITLE:
+            return 'title-column-visible'
         return ''
 
     ### signal handlers ###
