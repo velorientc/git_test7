@@ -1,0 +1,110 @@
+**********
+Extensions
+**********
+
+.. module:: extensions
+	:synopsis: Describe extensions bundled with TortoiseHg binary packages
+
+This chapter describes Mercurial extensions that are shipped with
+TortoiseHg binary packages for Windows.  These external extensions are
+included as a convenience to users, so they can be easily enabled as
+soon as they are needed.
+
+Hgfold
+======
+
+`hgfold <http://mercurial.selenic.com/wiki/CaseFoldExtension>`_ is a
+Mercurial extension that helps Windows users deal with filename case
+collisions on VFAT and NTFS.
+
+It adds options to the following Mercurial commands. Type
+:command:`hg help <command>` for more information::
+
+	up    - allows you to update to a revision with filename collisions
+	merge - allows you to merge with a changeset that would create filename collisions
+    
+The extension does not currently do anything to prevent filename
+collisions. See discussion on the Mercurial Wiki
+
+**Installation**
+
+To test the use of this plugin, you can specify it on the Mercurial
+command line like this::
+
+	hg --config "extensions.fold=" status
+
+You may want to add it to your Mercurial.ini or a repository's hgrc like this::
+
+	[extensions]
+	fold=
+ 
+If you do this, you can omit the --config command-line option.
+
+**Warnings**
+
+Like all merge operations, fold.py has to change the parents of the
+working directory. It is still in early testing, so use with caution.
+
+If you get an error about an unknown changeset after running
+:command:`hg recover` try
+:command:`hg debugsetparents <number of tip revision>`.
+You can find the number of the tip revision by running :command:`hg log -l 2`.
+
+Hgcr-gui
+========
+
+CodeReview management tool
+
+* This extension allows you to manage reviews for your code in any project you like.
+* It helps to keep the review management inside the mercurial.
+* One can add files to the review, remove them and notify reviewr that files are ready for review.
+* The reviewer can mark the code as 'completed' review cycle and return the message to the developer.
+* The project manager can check the review status - which files are reviewd and which are not yet.
+* The extension will automatically spot the files that were changed since their last review and notify about that. 
+* This extension uses GUI from TortoiseHg but also implements command line interface.
+* Code review database is stored in .code-review file in your repository root directory as a map of file and revision when review was done.
+
+**Usage**::
+
+	hg cr [OPTIONS] [FILES]
+
+	Code Review Plugin (requires Mercurial 1.3.x and TortoiseHg 0.9)
+
+	options:
+
+	 -c --complete  Mark CR as complete
+	 -a --add       Add files to CR list
+	 -r --remove    Remove files from CR list
+	 -l --list      Print files in CR list
+
+	use "hg -v help cr" to show global options
+
+.. note::
+	 To start GUI don't give any options.
+
+**More Details**
+
+* I've implemented the review around files and not changesets, because at the end,
+  I want to be able to tell for the specific project if all the files went through
+  code review process or not - the project status.
+* Suppose you have some project that you are in charge and many developers do 
+  write code for it. And there is a group of reviewrs that review the developers code.
+* Is is very difficult to keep track of changes developers do, but simple to find
+  out what files have already been reviewd (by reviewers) and what were not.
+* Using this extension, Developer can mark his files (when finished development 
+  process) as "Ready for review" and send notice to reviewer.
+* Reviewer will pick up the changeset (because changesets are stored in the code
+  review database) and perform code review (put notes inside the developer's code).
+* Afterwards Reviewr will mark the files as "Review Completed" and return the 
+  notice to the developer.
+* The project manager can follow every time what is going on with his/her project. 
+
+**Installation**
+
+You may want to add it to your Mercurial.ini or a repository's hgrc like this::
+
+	[extensions]
+	hgcr-gui=
+ 
+                                   
+.. vim: noet ts=4
