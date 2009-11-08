@@ -824,6 +824,10 @@ class GLog(gdialog.GDialog):
             m.append(create_menu(_('qimport from here to selected'),
                      self.qimport_revs))
 
+        m.append_sep()
+        m.append(create_menu(_('Select common ancestor revision'),
+            self.select_common_ancestor))
+
         menu = m.create_menu()
         menu.connect_after('selection-done', self.restore_single_sel)
         menu.show_all()
@@ -1873,6 +1877,14 @@ class GLog(gdialog.GDialog):
         self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
+
+    def select_common_ancestor(self, menuitem):
+        rev1, rev2 = self.revrange
+        changelog = self.repo.changelog
+        lookup = self.repo.lookup
+        ancestor = changelog.ancestor(lookup(rev1), lookup(rev2))
+        rev = changelog.rev(ancestor)
+        self.graphview.set_revision_id(rev, True)
 
     def thgrefresh(self, window):
         self.reload_log()
