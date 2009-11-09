@@ -12,6 +12,7 @@ from mercurial import cmdutil, extensions
 
 from tortoisehg.util.i18n import _
 
+from tortoisehg.hgtk import hgcmd
 from tortoisehg.hgtk import update
 from tortoisehg.hgtk import gtklib, dialog
 from tortoisehg.hgtk.logview import graphcell
@@ -88,7 +89,7 @@ class PBranchWidget(gtk.VBox):
         ## buttons
         self.btn = {}
         pmergebtn = tbar.append_stock(gtk.STOCK_CONVERT,
-                                      _('Merge pending dependencies'))
+                                      _('Merge all pending dependencies'))
         pmergebtn.connect('clicked', self.pmerge_clicked)
         self.btn['pmerge'] = pmergebtn
 
@@ -197,6 +198,11 @@ class PBranchWidget(gtk.VBox):
         addcol(_('Message'), C_MSG, M_MSG)
 
         pane.add(self.list)
+
+        ## command widget
+        self.cmd = hgcmd.CmdWidget(style=hgcmd.STYLE_COMPACT,
+                                   tooltips=tooltips)
+        mainbox.pack_start(self.cmd, False, False)
 
         # accelerator
         if accelgroup:
@@ -401,11 +407,20 @@ class PBranchWidget(gtk.VBox):
         self.emit('repo-invalidated')
         return True
         
-    def pmerge(self):
+    def pmerge(self, patch_name=None):
         """
         [pbranch] Execute 'pmerge' command.
+
+        :param patch_name: Merge to this patch-branch
         """
-        assert False
+        if not self.has_patch():
+            return
+        cmdline = ['hg', 'pmerge']
+        if patch_name:
+            cmdline += [patch_name]
+        else:
+            cmdline += ['--all']
+        self.cmd.execute(cmdline, self.cmd_done)
         
     def pbackout(self):
         """
@@ -581,6 +596,18 @@ class PBranchWidget(gtk.VBox):
         if not oldparents == newparents:
             self.emit('repo-invalidated')
 
+    def cmd_done(self, returncode, useraborted, noemit=False):
+        if returncode == 0:
+            if self.cmd.get_pbar():
+                self.cmd.set_result(_('Succeed'), style='ok')
+        elif useraborted:
+            self.cmd.set_result(_('Canceled'), style='error')
+        else:
+            self.cmd.set_result(_('Failed'), style='error')
+        self.refresh()
+        if not noemit:
+            self.emit('repo-invalidated')
+
     def do_get_property(self, property):
         try:
             return self.vmenu[property.name].get_active()
@@ -645,7 +672,7 @@ class PBranchWidget(gtk.VBox):
         pass
 
     def pmerge_clicked(self, toolbutton):
-        pass
+        self.pmerge()
 
     def pnew_clicked(self, toolbutton):
         self.pnew_ui()
