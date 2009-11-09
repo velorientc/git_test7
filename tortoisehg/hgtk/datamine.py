@@ -299,7 +299,7 @@ class DataMineDialog(gdialog.GDialog):
             try:
                 relpath = util.canonpath(self.repo.root, self.cwd, '.')
                 includes.set_text(relpath)
-            except hglib.Abort:
+            except util.Abort:
                 # Some paths inside root are invalid (.hg/*)
                 pass
         excludes = gtk.Entry()
@@ -453,7 +453,7 @@ class DataMineDialog(gdialog.GDialog):
         def threadfunc(q, *args):
             try:
                 hglib.hgcmd_toq(q, *args)
-            except hglib.Abort, e:
+            except (util.Abort, hglib.LookupError), e:
                 self.stbar.set_status_text(_('Abort: %s') % str(e))
 
         thread = thread2.Thread(target=threadfunc, args=args)
@@ -749,11 +749,17 @@ class DataMineDialog(gdialog.GDialog):
         background thread to perform the annotation.  Disable the select
         button until this operation is complete.
         '''
+        def threadfunc(q, *args):
+            try:
+                hglib.hgcmd_toq(q, *args)
+            except (util.Abort, hglib.LookupError), e:
+                self.stbar.set_status_text(_('Abort: %s') % str(e))
+
         (frame, treeview, origpath, graphview) = objs
         q = Queue.Queue()
         args = [q, 'annotate', '--follow', '--number',
                 '--rev', str(rev), 'path:'+path]
-        thread = thread2.Thread(target=hglib.hgcmd_toq, args=args)
+        thread = thread2.Thread(target=threadfunc, args=args)
         thread.start()
         frame._mythread = thread
         self.stop_button.set_sensitive(True)
