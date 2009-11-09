@@ -380,6 +380,17 @@ class PBranchWidget(gtk.VBox):
         opts = {}
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
         return mgr.patchdesc(patch_name)
+
+    def peditmessage(self, patch_name):
+        """
+        Edit patch message
+
+        :param patch_name: Name of patch-branch
+        """
+        if not patch_name in self.patch_list():
+            return
+        cmdline = ['hg', 'peditmessage', patch_name]
+        self.cmd.execute(cmdline, self.cmd_done)
         
     def pnew_ui(self):
         """
@@ -511,6 +522,7 @@ class PBranchWidget(gtk.VBox):
         if not is_current:
             append(_('_goto (update workdir)'), self.goto_activated)
         if is_patch:
+            append(_('_edit message'), self.edit_message_activated)
             append(_('_rename'), self.rename_activated)
             append(_('_delete'), self.delete_activated)
 
@@ -698,6 +710,9 @@ class PBranchWidget(gtk.VBox):
         # pnew_ui
         # if aborted, update back to prev branch
         pass
+
+    def edit_message_activated(self, menuitem, row):
+        self.peditmessage(row[M_NAME])
 
     def goto_activated(self, menuitem, row):
         self.update_by_row(row)
