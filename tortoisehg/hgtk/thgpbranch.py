@@ -375,11 +375,15 @@ class PBranchWidget(gtk.VBox):
 
         :param patch_name: Name of patch-branch
         :retv: Full patch message. If you extract the first line
-        you will get the patch title.
+        you will get the patch title. If the repo does not contain
+        message or patch, the function returns None
         """
         opts = {}
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
-        return mgr.patchdesc(patch_name)
+        try:
+            return mgr.patchdesc(patch_name)
+        except:
+            return None
 
     def peditmessage(self, patch_name):
         """
