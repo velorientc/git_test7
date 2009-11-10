@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-10-27 13:01+0000\n"
-"PO-Revision-Date: 2009-11-03 20:19+0000\n"
+"POT-Creation-Date: 2009-11-07 00:18+0000\n"
+"PO-Revision-Date: 2009-11-08 00:10+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-05 03:52+0000\n"
+"X-Launchpad-Export-Date: 2009-11-09 04:41+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -100,28 +100,28 @@ msgstr "Архів Zip стиснуто з використанням deflate"
 
 #: tortoisehg\hgtk\archive.py:113 tortoisehg\hgtk\backout.py:114
 #: tortoisehg\hgtk\clone.py:165 tortoisehg\hgtk\merge.py:142
-#: tortoisehg\hgtk\quickop.py:182 tortoisehg\hgtk\thgstrip.py:168
+#: tortoisehg\hgtk\quickop.py:182 tortoisehg\hgtk\thgstrip.py:182
 #: tortoisehg\hgtk\update.py:123
 msgid "Abort"
 msgstr "Відмінити"
 
 #: tortoisehg\hgtk\archive.py:127 tortoisehg\hgtk\backout.py:141
 #: tortoisehg\hgtk\clone.py:188 tortoisehg\hgtk\merge.py:162
-#: tortoisehg\hgtk\quickop.py:197 tortoisehg\hgtk\thgstrip.py:293
+#: tortoisehg\hgtk\quickop.py:197 tortoisehg\hgtk\thgstrip.py:307
 #: tortoisehg\hgtk\update.py:138
 msgid "Confirm Abort"
 msgstr "Підтвердіть відміну"
 
 #: tortoisehg\hgtk\archive.py:128 tortoisehg\hgtk\backout.py:142
 #: tortoisehg\hgtk\clone.py:189 tortoisehg\hgtk\merge.py:163
-#: tortoisehg\hgtk\quickop.py:198 tortoisehg\hgtk\thgstrip.py:294
+#: tortoisehg\hgtk\quickop.py:198 tortoisehg\hgtk\thgstrip.py:308
 #: tortoisehg\hgtk\update.py:139
 msgid "Do you want to abort?"
 msgstr "Ви дійсно хочете відмінити?"
 
 #: tortoisehg\hgtk\archive.py:138 tortoisehg\hgtk\backout.py:153
 #: tortoisehg\hgtk\clone.py:199 tortoisehg\hgtk\merge.py:183
-#: tortoisehg\hgtk\quickop.py:207 tortoisehg\hgtk\thgstrip.py:304
+#: tortoisehg\hgtk\quickop.py:207 tortoisehg\hgtk\thgstrip.py:318
 #: tortoisehg\hgtk\update.py:149
 msgid "unexpected response id: %s"
 msgstr "невідома відповідь id: %s"
@@ -157,13 +157,13 @@ msgstr "Усі файли (*.*)"
 
 #: tortoisehg\hgtk\archive.py:238 tortoisehg\hgtk\backout.py:181
 #: tortoisehg\hgtk\clone.py:223 tortoisehg\hgtk\merge.py:198
-#: tortoisehg\hgtk\quickop.py:219 tortoisehg\hgtk\thgstrip.py:336
+#: tortoisehg\hgtk\quickop.py:219 tortoisehg\hgtk\thgstrip.py:350
 #: tortoisehg\hgtk\update.py:161
 msgid "unknown mode name: %s"
 msgstr "помилкова форма імені: %s"
 
 #: tortoisehg\hgtk\archive.py:254 tortoisehg\hgtk\archive.py:260
-#: tortoisehg\hgtk\gtklib.py:243 tortoisehg\hgtk\thgconfig.py:481
+#: tortoisehg\hgtk\gtklib.py:245 tortoisehg\hgtk\thgconfig.py:481
 #: tortoisehg\hgtk\thgconfig.py:831
 msgid "Confirm Overwrite"
 msgstr "Підтвердіть перезапис"
@@ -235,7 +235,7 @@ msgstr "Використовувати англійські зворотні н�
 msgid "Merge with old dirstate parent after backout"
 msgstr "Об'єднання зі старими dirstate попередників після backout"
 
-#: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:437
+#: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:438
 msgid "Confirm Discard Message"
 msgstr "Підтвердити відмову від нотатки"
 
@@ -285,95 +285,95 @@ msgstr "Зберегти звіт про помилку до"
 msgid "%s changeset "
 msgstr "%s набір змін "
 
-#: tortoisehg\hgtk\changeset.py:142 tortoisehg\hgtk\changeset.py:168
+#: tortoisehg\hgtk\changeset.py:142 tortoisehg\hgtk\changeset.py:170
 msgid "[All Files]"
 msgstr "[Всі файли]"
 
-#: tortoisehg\hgtk\changeset.py:203
+#: tortoisehg\hgtk\changeset.py:205
 msgid "unknown hunk type: %s"
 msgstr "шматок невідомого типу: %s"
 
-#: tortoisehg\hgtk\changeset.py:271
+#: tortoisehg\hgtk\changeset.py:281
 msgid " %s is larger than the specified max diff size"
 msgstr " %s перевищує максимальний розмір файлу відмінностей"
 
-#: tortoisehg\hgtk\changeset.py:280
+#: tortoisehg\hgtk\changeset.py:290
 msgid "Repository Error:  %s, refresh suggested"
 msgstr "Помилка сховища:  %s, пропонується оновити"
 
-#: tortoisehg\hgtk\changeset.py:327
+#: tortoisehg\hgtk\changeset.py:337
 msgid "[no hunks to display]"
 msgstr "[не показувати шматки]"
 
-#: tortoisehg\hgtk\changeset.py:388 tortoisehg\hgtk\status.py:1505
+#: tortoisehg\hgtk\changeset.py:398 tortoisehg\hgtk\status.py:1505
 msgid "_Visual Diff"
 msgstr "_Показати Різницю"
 
-#: tortoisehg\hgtk\changeset.py:389
+#: tortoisehg\hgtk\changeset.py:399
 msgid "Diff to _local"
 msgstr "Різницю до _local"
 
-#: tortoisehg\hgtk\changeset.py:391
+#: tortoisehg\hgtk\changeset.py:401
 msgid "_View at Revision"
 msgstr "_Показати як редакцію"
 
-#: tortoisehg\hgtk\changeset.py:392
+#: tortoisehg\hgtk\changeset.py:402
 msgid "_Save at Revision..."
 msgstr "_Зберегти як редакцію..."
 
-#: tortoisehg\hgtk\changeset.py:396
+#: tortoisehg\hgtk\changeset.py:406
 msgid "_File History"
 msgstr "_Файл історії"
 
-#: tortoisehg\hgtk\changeset.py:397
+#: tortoisehg\hgtk\changeset.py:407
 msgid "_Annotate File"
 msgstr "_Файл заголовку"
 
-#: tortoisehg\hgtk\changeset.py:400
+#: tortoisehg\hgtk\changeset.py:410
 msgid "_Revert File Contents"
 msgstr "_Повернути файл змісту"
 
-#: tortoisehg\hgtk\changeset.py:485
+#: tortoisehg\hgtk\changeset.py:498
 msgid "Changeset:"
 msgstr "Набір змін"
 
-#: tortoisehg\hgtk\changeset.py:487 tortoisehg\hgtk\update.py:103
+#: tortoisehg\hgtk\changeset.py:500 tortoisehg\hgtk\update.py:103
 msgid "Parent:"
 msgstr "Попередник:"
 
-#: tortoisehg\hgtk\changeset.py:489
+#: tortoisehg\hgtk\changeset.py:502
 msgid "Child:"
 msgstr "Нащадок:"
 
-#: tortoisehg\hgtk\changeset.py:491
+#: tortoisehg\hgtk\changeset.py:504
 msgid "Patch:"
 msgstr "Латка:"
 
-#: tortoisehg\hgtk\changeset.py:618
+#: tortoisehg\hgtk\changeset.py:638
 msgid "Stat"
 msgstr "Статус"
 
-#: tortoisehg\hgtk\changeset.py:620 tortoisehg\hgtk\hgignore.py:128
+#: tortoisehg\hgtk\changeset.py:640 tortoisehg\hgtk\hgignore.py:128
 msgid "Files"
 msgstr "Файли"
 
-#: tortoisehg\hgtk\changeset.py:635
+#: tortoisehg\hgtk\changeset.py:655
 msgid "Diff to second Parent"
 msgstr "Різниця по відношенню до другого попередника"
 
-#: tortoisehg\hgtk\changeset.py:758
+#: tortoisehg\hgtk\changeset.py:778
 msgid "Save file to"
 msgstr "Зберегти файл до"
 
-#: tortoisehg\hgtk\changeset.py:832
+#: tortoisehg\hgtk\changeset.py:852
 msgid "Confirm revert file to old revision"
 msgstr "Вимагати підтвердження повернення до старої редакції"
 
-#: tortoisehg\hgtk\changeset.py:833
+#: tortoisehg\hgtk\changeset.py:853
 msgid "Revert %s to contents at revision %d?"
 msgstr "Повернути зміст %s до редакції %d?"
 
-#: tortoisehg\hgtk\changeset.py:845 tortoisehg\hgtk\synch.py:672
+#: tortoisehg\hgtk\changeset.py:865 tortoisehg\hgtk\synch.py:668
 msgid "Toggle _Wordwrap"
 msgstr "Переносити по словах"
 
@@ -413,7 +413,7 @@ msgstr "Використовувати pull протокол для копіру
 msgid "Use uncompressed transfer"
 msgstr "Під час передачі не використовувати стискання"
 
-#: tortoisehg\hgtk\clone.py:137 tortoisehg\hgtk\history.py:233
+#: tortoisehg\hgtk\clone.py:137 tortoisehg\hgtk\history.py:231
 #: tortoisehg\hgtk\synch.py:184
 msgid "Use proxy server"
 msgstr "Використовувати проксі-сервер"
@@ -486,7 +486,7 @@ msgstr " - швидко перечитати "
 msgid " - commit"
 msgstr " - фіксація"
 
-#: tortoisehg\hgtk\commit.py:183 tortoisehg\hgtk\history.py:175
+#: tortoisehg\hgtk\commit.py:183 tortoisehg\hgtk\history.py:169
 msgid "_View"
 msgstr "_Вигляд"
 
@@ -494,13 +494,13 @@ msgstr "_Вигляд"
 msgid "Advanced"
 msgstr "Додатково"
 
-#: tortoisehg\hgtk\commit.py:186 tortoisehg\hgtk\history.py:691
-#: tortoisehg\hgtk\history.py:1014
+#: tortoisehg\hgtk\commit.py:186 tortoisehg\hgtk\history.py:670
+#: tortoisehg\hgtk\history.py:996
 msgid "Parents"
 msgstr "Попередники"
 
 #: tortoisehg\hgtk\commit.py:189 tortoisehg\hgtk\hgignore.py:138
-#: tortoisehg\hgtk\history.py:188
+#: tortoisehg\hgtk\history.py:182
 msgid "Refresh"
 msgstr "Перечитати"
 
@@ -509,7 +509,7 @@ msgid "_Operations"
 msgstr "_Операції"
 
 #: tortoisehg\hgtk\commit.py:191 tortoisehg\hgtk\commit.py:237
-#: tortoisehg\hgtk\commit.py:598
+#: tortoisehg\hgtk\commit.py:599
 msgid "_Commit"
 msgstr "Фіксація"
 
@@ -548,7 +548,7 @@ msgstr "_Забути"
 msgid "undo recent commit"
 msgstr "відмінити останню фіксацію"
 
-#: tortoisehg\hgtk\commit.py:238 tortoisehg\hgtk\commit.py:482
+#: tortoisehg\hgtk\commit.py:238 tortoisehg\hgtk\commit.py:483
 msgid "commit"
 msgstr "фіксувати"
 
@@ -561,153 +561,153 @@ msgstr "Підтвердіть вихід"
 msgid "Save commit message at exit?"
 msgstr "Зберігти нотатки фіксації та вийти?"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:967
-#: tortoisehg\hgtk\commit.py:971 tortoisehg\hgtk\history.py:81
-#: tortoisehg\hgtk\history.py:1419 tortoisehg\hgtk\status.py:1270
+#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:968
+#: tortoisehg\hgtk\commit.py:972 tortoisehg\hgtk\history.py:81
+#: tortoisehg\hgtk\history.py:1389 tortoisehg\hgtk\status.py:1270
 #: tortoisehg\hgtk\status.py:1289 tortoisehg\hgtk\status.py:1582
 #: tortoisehg\hgtk\thgconfig.py:715 tortoisehg\hgtk\thgmq.py:328
 #: tortoisehg\hgtk\update.py:231
 msgid "&Cancel"
 msgstr "&Скасувати"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:967
-#: tortoisehg\hgtk\commit.py:971 tortoisehg\hgtk\status.py:1582
+#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:968
+#: tortoisehg\hgtk\commit.py:972 tortoisehg\hgtk\status.py:1582
 #: tortoisehg\hgtk\thgconfig.py:714 tortoisehg\hgtk\thgmq.py:327
 msgid "&Yes"
 msgstr "&Так"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:967
-#: tortoisehg\hgtk\commit.py:971 tortoisehg\hgtk\thgstrip.py:362
+#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:968
+#: tortoisehg\hgtk\commit.py:972 tortoisehg\hgtk\thgstrip.py:377
 msgid "&No"
 msgstr "&Ні"
 
-#: tortoisehg\hgtk\commit.py:294
+#: tortoisehg\hgtk\commit.py:295
 msgid "Committer:"
 msgstr "Автор:"
 
-#: tortoisehg\hgtk\commit.py:308
+#: tortoisehg\hgtk\commit.py:309
 msgid "Auto-includes:"
 msgstr "Автоматичне додавання:"
 
-#: tortoisehg\hgtk\commit.py:311
+#: tortoisehg\hgtk\commit.py:312
 msgid "Push after commit"
 msgstr "Push після фіксації"
 
-#: tortoisehg\hgtk\commit.py:345
+#: tortoisehg\hgtk\commit.py:346
 msgid "Recent commit messages..."
 msgstr "Нове повідомлення про фіксацію..."
 
-#: tortoisehg\hgtk\commit.py:382
+#: tortoisehg\hgtk\commit.py:383
 msgid "Parent: %(rev)s"
 msgstr "Попередник: %(редакція)s"
 
-#: tortoisehg\hgtk\commit.py:391
+#: tortoisehg\hgtk\commit.py:392
 msgid "not at head revision"
 msgstr "не головна редакція"
 
-#: tortoisehg\hgtk\commit.py:413 tortoisehg\hgtk\status.py:480
+#: tortoisehg\hgtk\commit.py:414 tortoisehg\hgtk\status.py:480
 msgid "Patch Preview"
 msgstr "Попередній перегляд латки"
 
-#: tortoisehg\hgtk\commit.py:415 tortoisehg\hgtk\status.py:484
+#: tortoisehg\hgtk\commit.py:416 tortoisehg\hgtk\status.py:484
 msgid "Commit Preview"
 msgstr "Фіксація попереднього перегляду"
 
-#: tortoisehg\hgtk\commit.py:438
+#: tortoisehg\hgtk\commit.py:439
 msgid "Discard current commit message?"
 msgstr "Відмовитися від поточної фіксації нотатки?"
 
-#: tortoisehg\hgtk\commit.py:481 tortoisehg\hgtk\commit.py:743
-#: tortoisehg\hgtk\commit.py:793 tortoisehg\hgtk\gdialog.py:472
+#: tortoisehg\hgtk\commit.py:482 tortoisehg\hgtk\commit.py:744
+#: tortoisehg\hgtk\commit.py:794 tortoisehg\hgtk\gdialog.py:473
 #: tortoisehg\hgtk\merge.py:94 tortoisehg\hgtk\thgconfig.py:600
 msgid "Commit"
 msgstr "Фіксація"
 
-#: tortoisehg\hgtk\commit.py:485
+#: tortoisehg\hgtk\commit.py:486
 msgid "QNew"
 msgstr "нова латка"
 
-#: tortoisehg\hgtk\commit.py:486
+#: tortoisehg\hgtk\commit.py:487
 msgid "create new MQ patch"
 msgstr "створити новий MQ шлях"
 
-#: tortoisehg\hgtk\commit.py:488
+#: tortoisehg\hgtk\commit.py:489
 msgid "QRefresh"
 msgstr "Оновити латку"
 
-#: tortoisehg\hgtk\commit.py:489
+#: tortoisehg\hgtk\commit.py:490
 msgid "refresh top MQ patch"
 msgstr "оновити головну MQ латку"
 
-#: tortoisehg\hgtk\commit.py:491
+#: tortoisehg\hgtk\commit.py:492
 msgid "_Commit (+1 head)"
 msgstr "_Фіксація (+1 голова)"
 
-#: tortoisehg\hgtk\commit.py:491
+#: tortoisehg\hgtk\commit.py:492
 msgid "_Commit (-1 head)"
 msgstr "_Фіксація (-1 голова)"
 
-#: tortoisehg\hgtk\commit.py:496
+#: tortoisehg\hgtk\commit.py:497
 msgid "parent is not a head, commit to add a new head"
 msgstr "Попередники не головні, зробити, щоб додати нову голову"
 
-#: tortoisehg\hgtk\commit.py:501
+#: tortoisehg\hgtk\commit.py:502
 msgid "commit to merge one head"
 msgstr "Зробити обєднання у одну голову"
 
-#: tortoisehg\hgtk\commit.py:504
+#: tortoisehg\hgtk\commit.py:505
 msgid "no parent is a head, commit to add a new head"
 msgstr "no parent is a head, commit to add a new head"
 
-#: tortoisehg\hgtk\commit.py:608
+#: tortoisehg\hgtk\commit.py:609
 msgid "new branch: "
 msgstr "нова гілка: "
 
-#: tortoisehg\hgtk\commit.py:610
+#: tortoisehg\hgtk\commit.py:611
 msgid "close branch: "
 msgstr "закрити гілку: "
 
-#: tortoisehg\hgtk\commit.py:612
+#: tortoisehg\hgtk\commit.py:613
 msgid "branch: "
 msgstr "гілка: "
 
-#: tortoisehg\hgtk\commit.py:631
+#: tortoisehg\hgtk\commit.py:632
 msgid "Merge "
 msgstr "Об'єднання "
 
-#: tortoisehg\hgtk\commit.py:667
+#: tortoisehg\hgtk\commit.py:668
 msgid "Patch Contents"
 msgstr "Зміст латки"
 
-#: tortoisehg\hgtk\commit.py:725 tortoisehg\hgtk\commit.py:878
+#: tortoisehg\hgtk\commit.py:726 tortoisehg\hgtk\commit.py:879
 msgid "Nothing Commited"
 msgstr "Нічого фіксувати"
 
-#: tortoisehg\hgtk\commit.py:726
+#: tortoisehg\hgtk\commit.py:727
 msgid "No committable files selected"
 msgstr "Не вибрано файлів для фіксації"
 
-#: tortoisehg\hgtk\commit.py:744
+#: tortoisehg\hgtk\commit.py:745
 msgid "Unable to create "
 msgstr "Неможливо створити "
 
-#: tortoisehg\hgtk\commit.py:794
+#: tortoisehg\hgtk\commit.py:795
 msgid "Unable to apply patch"
 msgstr "Неможливо застосувати латку"
 
-#: tortoisehg\hgtk\commit.py:823
+#: tortoisehg\hgtk\commit.py:824
 msgid "Confirm Undo Commit"
 msgstr "Підтвердіть повернення фіксації"
 
-#: tortoisehg\hgtk\commit.py:824
+#: tortoisehg\hgtk\commit.py:825
 msgid "Undo last commit"
 msgstr "Повернути останню фіксацію"
 
-#: tortoisehg\hgtk\commit.py:830 tortoisehg\hgtk\commit.py:845
+#: tortoisehg\hgtk\commit.py:831 tortoisehg\hgtk\commit.py:846
 msgid "Undo Commit"
 msgstr "Повернути фіксацію"
 
-#: tortoisehg\hgtk\commit.py:831
+#: tortoisehg\hgtk\commit.py:832
 msgid ""
 "Unable to undo!\n"
 "\n"
@@ -716,36 +716,36 @@ msgstr ""
 "Неможливо повернути!\n"
 "Кінцева ревізія відрізняється від останньої фіксації."
 
-#: tortoisehg\hgtk\commit.py:846
+#: tortoisehg\hgtk\commit.py:847
 msgid "Errors during rollback!"
 msgstr "Помилки під час відмови від операції!"
 
-#: tortoisehg\hgtk\commit.py:859
+#: tortoisehg\hgtk\commit.py:860
 msgid "Confirm Add/Remove"
 msgstr "Підтвердіть додати/видалити"
 
-#: tortoisehg\hgtk\commit.py:860
+#: tortoisehg\hgtk\commit.py:861
 msgid "Add/Remove the following files?"
 msgstr "Додати/видалити вказані файли?"
 
-#: tortoisehg\hgtk\commit.py:879 tortoisehg\hgtk\tagadd.py:167
+#: tortoisehg\hgtk\commit.py:880 tortoisehg\hgtk\tagadd.py:167
 msgid "Please enter commit message"
 msgstr "Будь-ласка, введіть нотатку фіксації"
 
-#: tortoisehg\hgtk\commit.py:887
+#: tortoisehg\hgtk\commit.py:888
 msgid "Error"
 msgstr "Помилка"
 
-#: tortoisehg\hgtk\commit.py:888
+#: tortoisehg\hgtk\commit.py:889
 msgid "Message format configuration error"
 msgstr "Помилка налаштування формату нотатки"
 
-#: tortoisehg\hgtk\commit.py:897 tortoisehg\hgtk\commit.py:905
-#: tortoisehg\hgtk\commit.py:917
+#: tortoisehg\hgtk\commit.py:898 tortoisehg\hgtk\commit.py:906
+#: tortoisehg\hgtk\commit.py:918
 msgid "Confirm Commit"
 msgstr "Підтвердіть фіксацію"
 
-#: tortoisehg\hgtk\commit.py:898
+#: tortoisehg\hgtk\commit.py:899
 msgid ""
 "The summary line length of %i is greater than %i.\n"
 "\n"
@@ -755,7 +755,7 @@ msgstr ""
 "\n"
 "Не звертати уваги на правила форматування та продовжити фіксацію?"
 
-#: tortoisehg\hgtk\commit.py:906
+#: tortoisehg\hgtk\commit.py:907
 msgid ""
 "The summary line is not followed by a blank line.\n"
 "\n"
@@ -765,7 +765,7 @@ msgstr ""
 "\n"
 "Не звертати уваги на правила форматування та продовжити фіксацію?"
 
-#: tortoisehg\hgtk\commit.py:918
+#: tortoisehg\hgtk\commit.py:919
 msgid ""
 "The following lines are over the %i-character limit: %s.\n"
 "\n"
@@ -775,11 +775,11 @@ msgstr ""
 "\n"
 "Не звертати уваги на правила форматування та продовжити фіксацію?"
 
-#: tortoisehg\hgtk\commit.py:930
+#: tortoisehg\hgtk\commit.py:931
 msgid "Commit: Invalid username"
 msgstr "Фіксація: помилкове імя користувача"
 
-#: tortoisehg\hgtk\commit.py:931
+#: tortoisehg\hgtk\commit.py:932
 msgid ""
 "Your username has not been configured.\n"
 "\n"
@@ -789,11 +789,11 @@ msgstr ""
 "\n"
 "Будь-ласка налаштуйте імя користувача та спробуйте знову."
 
-#: tortoisehg\hgtk\commit.py:964
+#: tortoisehg\hgtk\commit.py:965
 msgid "Confirm Override Branch"
 msgstr "Підтвердіть перезапис гілки"
 
-#: tortoisehg\hgtk\commit.py:965
+#: tortoisehg\hgtk\commit.py:966
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
@@ -801,43 +801,43 @@ msgstr ""
 "Гілка з назвою \"%s\" вже існує,\n"
 "перезаписати?"
 
-#: tortoisehg\hgtk\commit.py:969
+#: tortoisehg\hgtk\commit.py:970
 msgid "Confirm New Branch"
 msgstr "Підтвердіть створення нової гілки"
 
-#: tortoisehg\hgtk\commit.py:970
+#: tortoisehg\hgtk\commit.py:971
 msgid "Create new named branch \"%s\"?"
 msgstr "Створити нову гілку з назвою \"%s\"?"
 
-#: tortoisehg\hgtk\commit.py:1045
+#: tortoisehg\hgtk\commit.py:1046
 msgid "Paste _Filenames"
 msgstr "Вставити _назви файлів"
 
-#: tortoisehg\hgtk\commit.py:1046
+#: tortoisehg\hgtk\commit.py:1047
 msgid "App_ly Format"
 msgstr "Застосувати формат"
 
-#: tortoisehg\hgtk\commit.py:1047
+#: tortoisehg\hgtk\commit.py:1048
 msgid "C_onfigure Format"
 msgstr "Налаштувати формат"
 
-#: tortoisehg\hgtk\commit.py:1073
+#: tortoisehg\hgtk\commit.py:1074
 msgid "Info Required"
 msgstr "Вимагає інформацію"
 
-#: tortoisehg\hgtk\commit.py:1074
+#: tortoisehg\hgtk\commit.py:1075
 msgid "Message format needs to be configured"
 msgstr "Необхідно налаштувати формат нотатки"
 
-#: tortoisehg\hgtk\commit.py:1086 tortoisehg\hgtk\commit.py:1091
+#: tortoisehg\hgtk\commit.py:1087 tortoisehg\hgtk\commit.py:1092
 msgid "Warning"
 msgstr "Застереження"
 
-#: tortoisehg\hgtk\commit.py:1087
+#: tortoisehg\hgtk\commit.py:1088
 msgid "The summary line length of %i is greater than %i"
 msgstr "Загальна довжина рядка %i більше ніж %i"
 
-#: tortoisehg\hgtk\commit.py:1092
+#: tortoisehg\hgtk\commit.py:1093
 msgid "The summary line is not followed by a blank line"
 msgstr "Підсумковий рядок не закінчується пустим рядком"
 
@@ -849,36 +849,36 @@ msgstr "необхідно вказати сховище"
 msgid "must be specified 'type' in style"
 msgstr "неохідно вказати стиль 'type'"
 
-#: tortoisehg\hgtk\csinfo.py:191 tortoisehg\hgtk\csinfo.py:192
+#: tortoisehg\hgtk\csinfo.py:197 tortoisehg\hgtk\csinfo.py:198
 #: tortoisehg\hgtk\tagadd.py:65
 msgid "Revision:"
 msgstr "Редакція:"
 
-#: tortoisehg\hgtk\csinfo.py:192
+#: tortoisehg\hgtk\csinfo.py:198
 msgid "Summary:"
 msgstr "Зведення:"
 
-#: tortoisehg\hgtk\csinfo.py:193
+#: tortoisehg\hgtk\csinfo.py:199
 msgid "Age:"
 msgstr "Вік:"
 
-#: tortoisehg\hgtk\csinfo.py:193
+#: tortoisehg\hgtk\csinfo.py:199
 msgid "User:"
 msgstr "Користувач:"
 
-#: tortoisehg\hgtk\csinfo.py:193 tortoisehg\hgtk\csinfo.py:194
+#: tortoisehg\hgtk\csinfo.py:199 tortoisehg\hgtk\csinfo.py:200
 msgid "Date:"
 msgstr "Дата:"
 
-#: tortoisehg\hgtk\csinfo.py:194 tortoisehg\hgtk\csinfo.py:195
+#: tortoisehg\hgtk\csinfo.py:200 tortoisehg\hgtk\csinfo.py:201
 msgid "Branch:"
 msgstr "Гілка:"
 
-#: tortoisehg\hgtk\csinfo.py:195 tortoisehg\hgtk\csinfo.py:196
+#: tortoisehg\hgtk\csinfo.py:201 tortoisehg\hgtk\csinfo.py:202
 msgid "Tags:"
 msgstr "Мітки:"
 
-#: tortoisehg\hgtk\csinfo.py:196
+#: tortoisehg\hgtk\csinfo.py:202
 msgid "Transplant:"
 msgstr "Трансплантант:"
 
@@ -916,9 +916,9 @@ msgstr "Неможна коментувати каталог: %s"
 msgid "Filename"
 msgstr "Назва файлу"
 
-#: tortoisehg\hgtk\datamine.py:131 tortoisehg\hgtk\datamine.py:634
-#: tortoisehg\hgtk\history.py:336 tortoisehg\hgtk\history.py:1057
-#: tortoisehg\hgtk\logview\treeview.py:444 tortoisehg\hgtk\thgconfig.py:194
+#: tortoisehg\hgtk\datamine.py:131 tortoisehg\hgtk\datamine.py:639
+#: tortoisehg\hgtk\history.py:315 tortoisehg\hgtk\history.py:1037
+#: tortoisehg\hgtk\logview\treeview.py:443 tortoisehg\hgtk\thgconfig.py:194
 #: tortoisehg\hgtk\thgconfig.py:277
 msgid "User"
 msgstr "Користувач"
@@ -955,39 +955,39 @@ msgstr "Немає попередників у файла"
 msgid "Unable to annotate"
 msgstr "Неможливо коментувати"
 
-#: tortoisehg\hgtk\datamine.py:301
+#: tortoisehg\hgtk\datamine.py:306
 msgid "Search"
-msgstr "Пошук"
+msgstr "Знайти"
 
-#: tortoisehg\hgtk\datamine.py:302 tortoisehg\hgtk\hgignore.py:61
+#: tortoisehg\hgtk\datamine.py:307 tortoisehg\hgtk\hgignore.py:61
 msgid "Regexp:"
 msgstr "Регулярний вираз:"
 
-#: tortoisehg\hgtk\datamine.py:304
+#: tortoisehg\hgtk\datamine.py:309
 msgid "Includes:"
 msgstr "Включає:"
 
-#: tortoisehg\hgtk\datamine.py:306
+#: tortoisehg\hgtk\datamine.py:311
 msgid "Excludes:"
 msgstr "Виключає:"
 
-#: tortoisehg\hgtk\datamine.py:309
+#: tortoisehg\hgtk\datamine.py:314
 msgid "Start this search"
 msgstr "Почати пошук"
 
-#: tortoisehg\hgtk\datamine.py:310
+#: tortoisehg\hgtk\datamine.py:315
 msgid "Regular expression search pattern"
-msgstr "Пошук взірців за регулярними виразами"
+msgstr "Шукати взірці регулярними виразами"
 
-#: tortoisehg\hgtk\datamine.py:311
+#: tortoisehg\hgtk\datamine.py:316
 msgid ""
 "Comma separated list of inclusion patterns.  By default, the entire "
 "repository is searched."
 msgstr ""
-"Перелік взірців, які застосовуються, розділений комами.  За замовченням, "
+"Перелік взірців, розділений комами, які застосовуються.  За замовченням, "
 "пошук по всьому сховищу."
 
-#: tortoisehg\hgtk\datamine.py:314
+#: tortoisehg\hgtk\datamine.py:319
 msgid ""
 "Comma separated list of exclusion patterns.  Exclusion patterns are applied "
 "after inclusion patterns."
@@ -995,80 +995,80 @@ msgstr ""
 "Перелік взірців виключення, розділений комами. Взірці виключення "
 "застосовуються після взірців."
 
-#: tortoisehg\hgtk\datamine.py:320
+#: tortoisehg\hgtk\datamine.py:325
 msgid "Follow copies and renames"
 msgstr "Відслідковувати копіювання та перейменування"
 
-#: tortoisehg\hgtk\datamine.py:321
+#: tortoisehg\hgtk\datamine.py:326
 msgid "Ignore case"
 msgstr "Без урахування регістру"
 
-#: tortoisehg\hgtk\datamine.py:322
+#: tortoisehg\hgtk\datamine.py:327
 msgid "Show line numbers"
-msgstr "Показувати номери рядків"
+msgstr "Показувати нумерацію рядків"
 
-#: tortoisehg\hgtk\datamine.py:323
+#: tortoisehg\hgtk\datamine.py:328
 msgid "Show all matching revisions"
-msgstr "Надати всі відповідні версії"
+msgstr "Показувати всі відповідні редакції"
 
-#: tortoisehg\hgtk\datamine.py:355 tortoisehg\hgtk\datamine.py:632
-#: tortoisehg\hgtk\logview\treeview.py:395
+#: tortoisehg\hgtk\datamine.py:360 tortoisehg\hgtk\datamine.py:637
+#: tortoisehg\hgtk\logview\treeview.py:394
 msgid "Rev"
 msgstr "Редакція"
 
-#: tortoisehg\hgtk\datamine.py:356 tortoisehg\hgtk\datamine.py:633
+#: tortoisehg\hgtk\datamine.py:361 tortoisehg\hgtk\datamine.py:638
 msgid "File"
 msgstr "Файл"
 
-#: tortoisehg\hgtk\datamine.py:357
+#: tortoisehg\hgtk\datamine.py:362
 msgid "Matches"
 msgstr "Відповідності"
 
-#: tortoisehg\hgtk\datamine.py:379
+#: tortoisehg\hgtk\datamine.py:384
 msgid "Search %d"
-msgstr "Пошук %d"
+msgstr "Знайти %d"
 
-#: tortoisehg\hgtk\datamine.py:422
+#: tortoisehg\hgtk\datamine.py:427
 msgid "No regular expression given"
-msgstr "Регулярний вираз не задано"
+msgstr "Не задано регулярний вираз"
 
-#: tortoisehg\hgtk\datamine.py:423
+#: tortoisehg\hgtk\datamine.py:428
 msgid "You must provide a search expression"
-msgstr "Необхідно вказати регулярний вираз для пошуку"
+msgstr "Ви повинні вказати вираз для пошуку"
 
-#: tortoisehg\hgtk\datamine.py:429
+#: tortoisehg\hgtk\datamine.py:434
 msgid "Invalid regular expression"
 msgstr "Помилковий регулярний вираз"
 
-#: tortoisehg\hgtk\datamine.py:430 tortoisehg\hgtk\thgshelve.py:210
+#: tortoisehg\hgtk\datamine.py:435 tortoisehg\hgtk\thgshelve.py:210
 msgid "Error: %s"
 msgstr "Помилка: %s"
 
-#: tortoisehg\hgtk\datamine.py:452 tortoisehg\hgtk\history.py:1339
+#: tortoisehg\hgtk\datamine.py:457 tortoisehg\hgtk\history.py:1315
 msgid "Abort: %s"
 msgstr "Перервано: %s"
 
-#: tortoisehg\hgtk\datamine.py:464
+#: tortoisehg\hgtk\datamine.py:469
 msgid "Search \"%s\""
-msgstr "Пошук \"%s\""
+msgstr "Знайти \"%s\""
 
-#: tortoisehg\hgtk\datamine.py:579
+#: tortoisehg\hgtk\datamine.py:584
 msgid "File is unrevisioned"
 msgstr "Файл поза редакціями"
 
-#: tortoisehg\hgtk\datamine.py:580
+#: tortoisehg\hgtk\datamine.py:585
 msgid "Unable to annotate "
 msgstr "Коментар відсутній "
 
-#: tortoisehg\hgtk\datamine.py:631
+#: tortoisehg\hgtk\datamine.py:636
 msgid "Line"
 msgstr "Рядок"
 
-#: tortoisehg\hgtk\datamine.py:635 tortoisehg\hgtk\guess.py:158
+#: tortoisehg\hgtk\datamine.py:640 tortoisehg\hgtk\guess.py:158
 msgid "Source"
 msgstr "Звідки"
 
-#: tortoisehg\hgtk\datamine.py:693
+#: tortoisehg\hgtk\datamine.py:698
 msgid "Loading history..."
 msgstr "Завантаження історії..."
 
@@ -1076,74 +1076,73 @@ msgstr "Завантаження історії..."
 msgid "TortoiseHg Prompt"
 msgstr "TortoiseHg Вивід"
 
-#: tortoisehg\hgtk\gdialog.py:469
+#: tortoisehg\hgtk\gdialog.py:470
 msgid "_Tools"
 msgstr "_Інструменти"
 
-#: tortoisehg\hgtk\gdialog.py:470 tortoisehg\hgtk\thgconfig.py:603
+#: tortoisehg\hgtk\gdialog.py:471 tortoisehg\hgtk\thgconfig.py:603
 msgid "Changelog"
-msgstr "Журнал змін"
+msgstr "Перелік змін"
 
-#: tortoisehg\hgtk\gdialog.py:474
+#: tortoisehg\hgtk\gdialog.py:475
 msgid "Datamine"
 msgstr "Datamine"
 
-#: tortoisehg\hgtk\gdialog.py:476
+#: tortoisehg\hgtk\gdialog.py:477
 msgid "Recovery"
-msgstr "Відновлення"
+msgstr "Відновити"
 
-#: tortoisehg\hgtk\gdialog.py:478
+#: tortoisehg\hgtk\gdialog.py:479
 msgid "Serve"
 msgstr "Serve"
 
-#: tortoisehg\hgtk\gdialog.py:480 tortoisehg\hgtk\synch.py:89
+#: tortoisehg\hgtk\gdialog.py:481 tortoisehg\hgtk\synch.py:89
 #: tortoisehg\hgtk\thgshelve.py:71 tortoisehg\hgtk\thgshelve.py:139
 #: tortoisehg\hgtk\thgshelve.py:145 tortoisehg\hgtk\thgshelve.py:153
 msgid "Shelve"
 msgstr "Відтермінувати"
 
-#: tortoisehg\hgtk\gdialog.py:482 tortoisehg\hgtk\history.py:114
-#: tortoisehg\util\menuthg.py:71
+#: tortoisehg\hgtk\gdialog.py:483 tortoisehg\util\menuthg.py:71
 msgid "Synchronize"
 msgstr "Синхронізувати"
 
-#: tortoisehg\hgtk\gdialog.py:484
+#: tortoisehg\hgtk\gdialog.py:485
 msgid "Settings"
 msgstr "Налаштування"
 
-#: tortoisehg\hgtk\gdialog.py:487
+#: tortoisehg\hgtk\gdialog.py:488
 msgid "_Help"
 msgstr "_Довідка"
 
-#: tortoisehg\hgtk\gdialog.py:488
+#: tortoisehg\hgtk\gdialog.py:489
 msgid "Contents"
 msgstr "Зміст"
 
-#: tortoisehg\hgtk\gdialog.py:490 tortoisehg\hgtk\taskbarui.py:31
+#: tortoisehg\hgtk\gdialog.py:491 tortoisehg\hgtk\taskbarui.py:31
 msgid "About"
 msgstr "Про програму"
 
-#: tortoisehg\hgtk\gdialog.py:587
+#: tortoisehg\hgtk\gdialog.py:592
 msgid " Aborted"
 msgstr " Перервано"
 
-#: tortoisehg\hgtk\gdialog.py:598
+#: tortoisehg\hgtk\gdialog.py:603
 msgid " Messages and Errors"
-msgstr " Нотатки та Помилки"
+msgstr " Нотатки та помилки"
 
-#: tortoisehg\hgtk\gdialog.py:641
+#: tortoisehg\hgtk\gdialog.py:646
 msgid "making snapshot of %d files from rev %s\n"
-msgstr "створюється знімок %d файлів з версії %s\n"
+msgstr "створення знімку %d файлів редакції %s\n"
 
-#: tortoisehg\hgtk\gdialog.py:676
+#: tortoisehg\hgtk\gdialog.py:681
 msgid "edit failed"
 msgstr "невдача під час редагування"
 
-#: tortoisehg\hgtk\gdialog.py:684 tortoisehg\hgtk\thgconfig.py:686
+#: tortoisehg\hgtk\gdialog.py:689 tortoisehg\hgtk\thgconfig.py:686
 msgid "No visual editor configured"
 msgstr "Не налаштований візуальний редактор"
 
-#: tortoisehg\hgtk\gdialog.py:685 tortoisehg\hgtk\thgconfig.py:687
+#: tortoisehg\hgtk\gdialog.py:690 tortoisehg\hgtk\thgconfig.py:687
 msgid "Please configure a visual editor."
 msgstr "Будь ласка, налаштуйте візуальний редактор"
 
@@ -1160,8 +1159,12 @@ msgid "revision number, changeset ID, branch or tag"
 msgstr "номер редакції, ID набору змін, гілка та мітка"
 
 #: tortoisehg\hgtk\gorev.py:58
+msgid "Ambiguous Revision"
+msgstr ""
+
+#: tortoisehg\hgtk\gorev.py:62
 msgid "Invalid Revision"
-msgstr "Помилкова Редакції"
+msgstr "Помилкова редакції"
 
 #: tortoisehg\hgtk\gtklib.py:149
 msgid "Save File"
@@ -1169,9 +1172,9 @@ msgstr "Зберегти файл"
 
 #: tortoisehg\hgtk\gtklib.py:150
 msgid "All files"
-msgstr "Всі файли"
+msgstr "Усі файли"
 
-#: tortoisehg\hgtk\gtklib.py:244
+#: tortoisehg\hgtk\gtklib.py:246
 msgid ""
 "The file \"%s\" already exists!\n"
 "\n"
@@ -1179,13 +1182,13 @@ msgid ""
 msgstr ""
 "Файл \"%s\" вже існує!\n"
 "\n"
-"Ви дійсно хочете перезаписати?"
+"Ви дійсно хочете його гперезаписати?"
 
-#: tortoisehg\hgtk\gtklib.py:255
+#: tortoisehg\hgtk\gtklib.py:257
 msgid "Select Folder"
-msgstr "Оберіть теку"
+msgstr "Виберіть теку"
 
-#: tortoisehg\hgtk\gtklib.py:642
+#: tortoisehg\hgtk\gtklib.py:644
 msgid ""
 "Select language for spell checking.\n"
 "\n"
@@ -1195,7 +1198,7 @@ msgid ""
 "\n"
 "examples: en, en_GB, en_US"
 msgstr ""
-"Виберіть мову для перевірки правопису.\n"
+"Виберіть мову перевірки правопису.\n"
 "\n"
 "Пусто для мови по замовченню.\n"
 "Якщо весь текст підсвічено, тоді словник\n"
@@ -1203,21 +1206,21 @@ msgstr ""
 "\n"
 "наприклад: en, en_GB, en_US"
 
-#: tortoisehg\hgtk\gtklib.py:648
+#: tortoisehg\hgtk\gtklib.py:650
 msgid "Lang \"%s\" can not be set.\n"
 msgstr "Мова \"%s\" не може бути встановлена.\n"
 
-#: tortoisehg\hgtk\gtklib.py:661 tortoisehg\hgtk\thgconfig.py:591
+#: tortoisehg\hgtk\gtklib.py:663 tortoisehg\hgtk\thgconfig.py:591
 msgid "Spell Check Language"
 msgstr "Мова, для якої перевіряється правопис"
 
 #: tortoisehg\hgtk\guess.py:53
 msgid "Detect Copies/Renames in %s"
-msgstr "Detect Copies/Renames in %s"
+msgstr "Визначення копірування/зміна назви у %s"
 
 #: tortoisehg\hgtk\guess.py:73
 msgid "Minimum Simularity Percentage"
-msgstr "Мінімальний відсоток відповідності"
+msgstr "Мінімальний відсоток співпадання"
 
 #: tortoisehg\hgtk\guess.py:90
 msgid "Unrevisioned Files"
@@ -1229,11 +1232,11 @@ msgstr "Знайти зміни назви"
 
 #: tortoisehg\hgtk\guess.py:124
 msgid "Find Copies"
-msgstr "Знайти Копії"
+msgstr "Знайти копії"
 
 #: tortoisehg\hgtk\guess.py:129
 msgid "Candidate Matches"
-msgstr "Претендент на Відповідність"
+msgstr "Претендент на співпадання"
 
 #: tortoisehg\hgtk\guess.py:165
 msgid "Dest"
@@ -1241,11 +1244,11 @@ msgstr "Наступник"
 
 #: tortoisehg\hgtk\guess.py:181
 msgid "Accept Match"
-msgstr "Прийняти Відповідність"
+msgstr "Прийняти збіг"
 
 #: tortoisehg\hgtk\guess.py:186
 msgid "Differences from Source to Dest"
-msgstr "Різниця між основою та наступником"
+msgstr "Відмінність між основою та наступником"
 
 #: tortoisehg\hgtk\guess.py:273
 msgid "finding source of "
@@ -1273,7 +1276,7 @@ msgstr "невідомий CmdWidget стиль: %s"
 
 #: tortoisehg\hgtk\hgcmd.py:278
 msgid "Toggle log window"
-msgstr "Перемикання вікно журналу"
+msgstr "Перемикання вікна журналу"
 
 #: tortoisehg\hgtk\hgcmd.py:311
 msgid "Stop transaction"
@@ -1281,7 +1284,7 @@ msgstr "Зупинити операцію"
 
 #: tortoisehg\hgtk\hgcmd.py:313
 msgid "Close this"
-msgstr "Закрити це"
+msgstr "Скасувати це"
 
 #: tortoisehg\hgtk\hgcmd.py:449 tortoisehg\hgtk\hgcmd.py:466
 msgid "invalid state"
@@ -1289,7 +1292,7 @@ msgstr "помилкова статистика"
 
 #: tortoisehg\hgtk\hgcmd.py:597
 msgid "Command Log"
-msgstr "Command Log"
+msgstr "Журнал команд"
 
 #: tortoisehg\hgtk\hgemail.py:38
 msgid "Send"
@@ -1301,7 +1304,7 @@ msgstr "Надіслати emails"
 
 #: tortoisehg\hgtk\hgemail.py:41
 msgid "Test"
-msgstr "Перевірка"
+msgstr "Перевірити"
 
 #: tortoisehg\hgtk\hgemail.py:43
 msgid "Show emails which would be sent"
@@ -1314,27 +1317,27 @@ msgstr "Налаштувати"
 
 #: tortoisehg\hgtk\hgemail.py:47
 msgid "Configure email settings"
-msgstr "Налаштувати електронні адреси"
+msgstr "Налаштувати параметри email"
 
 #: tortoisehg\hgtk\hgemail.py:57
 msgid "Email outgoing changes"
-msgstr "Відправлення по пошті вихідних змін"
+msgstr ""
 
 #: tortoisehg\hgtk\hgemail.py:59
 msgid "Email revisions "
-msgstr "Надіслати Email редакції "
+msgstr "Email редакції "
 
 #: tortoisehg\hgtk\hgemail.py:61
 msgid "Email Mercurial Patches"
-msgstr "Email Mercurial Латок"
+msgstr "Email Mercurial латки"
 
 #: tortoisehg\hgtk\hgemail.py:65
 msgid "Envelope"
-msgstr "Конверт"
+msgstr "Обгортка"
 
 #: tortoisehg\hgtk\hgemail.py:66 tortoisehg\hgtk\taskbarui.py:47
 msgid "Options"
-msgstr "Параметри"
+msgstr "Налаштування"
 
 #: tortoisehg\hgtk\hgemail.py:78
 msgid "To:"
@@ -1355,7 +1358,7 @@ msgstr "У відповідь на:"
 #: tortoisehg\hgtk\hgemail.py:116
 msgid "Message identifier to reply to, for threading"
 msgstr ""
-"Ідентифікатор нотатки відповіді використовується для створення теми "
+"Ідентифікатор нотатки відповіді використовувати для створення теми "
 "обговорення"
 
 #: tortoisehg\hgtk\hgemail.py:122
@@ -1386,7 +1389,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgemail.py:138
 msgid "Plain, do not prepend HG header"
-msgstr "Спрощений формат, не додавати заголовок HG"
+msgstr "Спрощено, не додавати заголовок HG"
 
 #: tortoisehg\hgtk\hgemail.py:141
 msgid ""
@@ -1417,8 +1420,8 @@ msgid ""
 "This feature is only available when sending outgoing changesets. It is not "
 "applicable with revision ranges."
 msgstr ""
-"Дані можливості стануть доступні після відсилання набору змін назовні. Це не "
-"стосується нумерацією редакцій"
+"Ці можливості стануть доступні після відсилання набору змін назовні. Це не "
+"стосується нумерації редакцій"
 
 #: tortoisehg\hgtk\hgemail.py:162
 msgid "attach"
@@ -1426,7 +1429,7 @@ msgstr "прикріпити"
 
 #: tortoisehg\hgtk\hgemail.py:164
 msgid "send patches as attachments"
-msgstr "відправити латки як прикріплені"
+msgstr "надіслати латки, як прикріплені"
 
 #: tortoisehg\hgtk\hgemail.py:165
 msgid "inline"
@@ -1434,7 +1437,7 @@ msgstr "у тексті"
 
 #: tortoisehg\hgtk\hgemail.py:167
 msgid "send patches as inline attachments"
-msgstr "відправити латки як вкладення у тексті"
+msgstr "надіслати латки, як вкладення у тексті"
 
 #: tortoisehg\hgtk\hgemail.py:168
 msgid "diffstat"
@@ -1442,7 +1445,7 @@ msgstr "статистика різниць"
 
 #: tortoisehg\hgtk\hgemail.py:170
 msgid "add diffstat output to messages"
-msgstr "додати статистику різниць нотатками"
+msgstr "додати статистику різниць до повідомлень"
 
 #: tortoisehg\hgtk\hgemail.py:179
 msgid "Subject:"
@@ -1454,7 +1457,7 @@ msgstr "Ознаки:"
 
 #: tortoisehg\hgtk\hgemail.py:205
 msgid "Patch Series (Bundle) Description"
-msgstr "Опис рядку латок (пачка)"
+msgstr "Опис серії латок (пачка)"
 
 #: tortoisehg\hgtk\hgemail.py:246
 msgid ""
@@ -1464,24 +1467,24 @@ msgid ""
 "Flags is a comma separated list of tags which are inserted into the message "
 "subject prefix."
 msgstr ""
-"Patch series description is sent in initial summary email with [PATCH 0 of "
-"N] subject.  It should describe the effects of the entire patch series.  "
-"When emailing a bundle, these fields make up the message subject and body. "
-"Flags is a comma separated list of tags which are inserted into the message "
+"Опис серії латок надіслано у первинному зведенні разом [Латка 0 of N] з "
+"темою.  It should describe the effects of the entire patch series.  When "
+"emailing a bundle, these fields make up the message subject and body. "
+"Ознаки, розділені комою, перелік of tags which are inserted into the message "
 "subject prefix."
 
 #: tortoisehg\hgtk\hgemail.py:293 tortoisehg\hgtk\hgemail.py:298
 #: tortoisehg\hgtk\hgemail.py:307
 msgid "Info required"
-msgstr "Необхідна інформація"
+msgstr "Вимагається інформація"
 
 #: tortoisehg\hgtk\hgemail.py:294
 msgid "You must specify a recipient"
-msgstr "Необхідно вказати отримувача"
+msgstr "Ви повинні вказати отримувача"
 
 #: tortoisehg\hgtk\hgemail.py:299
 msgid "You must specify a sender address"
-msgstr "Необхідно вказати адресу відправника"
+msgstr "Ви повинні вказати адресу відправника"
 
 #: tortoisehg\hgtk\hgemail.py:308
 msgid "You must configure SMTP"
@@ -1489,7 +1492,7 @@ msgstr "Необхідно налаштувати SMTP"
 
 #: tortoisehg\hgtk\hgignore.py:35
 msgid "Ignore filter - %s"
-msgstr "Незважати на фільтри - %s"
+msgstr "Незважати на фільтр - %s"
 
 #: tortoisehg\hgtk\hgignore.py:51 tortoisehg\hgtk\hgignore.py:59
 #: tortoisehg\hgtk\quickop.py:50 tortoisehg\hgtk\tagadd.py:37
@@ -1514,7 +1517,7 @@ msgstr "Взірці"
 
 #: tortoisehg\hgtk\hgignore.py:108
 msgid "Remove Selected"
-msgstr "Вилучити вибране"
+msgstr "Перемістити виділене"
 
 #: tortoisehg\hgtk\hgignore.py:114
 msgid "Unknown Files"
@@ -1522,7 +1525,7 @@ msgstr "Невідомі файли"
 
 #: tortoisehg\hgtk\hgignore.py:190
 msgid "Invalid glob expression"
-msgstr "Помилкова маска"
+msgstr "Помилковий вираз маски"
 
 #: tortoisehg\hgtk\hgignore.py:206
 msgid "Invalid regexp expression"
@@ -1532,7 +1535,7 @@ msgstr "Помилковий регулярний вираз"
 msgid "Create a new repository"
 msgstr "Створити нове сховище"
 
-#: tortoisehg\hgtk\hginit.py:30
+#: tortoisehg\hgtk\hginit.py:29
 msgid "Create"
 msgstr "Створити"
 
@@ -1562,7 +1565,7 @@ msgstr "Неможливо створити нове сховище"
 
 #: tortoisehg\hgtk\hginit.py:107 tortoisehg\hgtk\hginit.py:112
 msgid "Error when creating repository"
-msgstr "Помилка під час створення нового сховища"
+msgstr "Помилка під час створення сховища"
 
 #: tortoisehg\hgtk\hginit.py:129
 msgid "New repository created"
@@ -1599,7 +1602,7 @@ msgid ""
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
 "\n"
-"Caught клавіатура переривань, перервати.\n"
+"Caught клавіатура переривань, перервано.\n"
 
 #: tortoisehg\hgtk\hgtk.py:110
 msgid "can not read file \"%s\". Ignored.\n"
@@ -1629,49 +1632,49 @@ msgstr "hgtk: невідома команда '%s'\n"
 msgid "abort: %s!\n"
 msgstr "перервати: %s!\n"
 
-#: tortoisehg\hgtk\hgtk.py:256 tortoisehg\hgtk\hgtk.py:404
+#: tortoisehg\hgtk\hgtk.py:248 tortoisehg\hgtk\hgtk.py:396
 msgid "There is no Mercurial repository here (.hg not found)"
 msgstr "Це не Mercurial сховище (.hg не знайдено)"
 
-#: tortoisehg\hgtk\hgtk.py:266
+#: tortoisehg\hgtk\hgtk.py:258
 msgid "invalid arguments"
 msgstr "помилковий аргумент"
 
-#: tortoisehg\hgtk\hgtk.py:344
+#: tortoisehg\hgtk\hgtk.py:336
 msgid "Rename error"
 msgstr "Помилка зміни назви"
 
-#: tortoisehg\hgtk\hgtk.py:345
+#: tortoisehg\hgtk\hgtk.py:337
 msgid "rename takes one or two path arguments"
-msgstr "Зміна назви вимагає одного або двох аргументів"
+msgstr "зміна назви вимагає одного або двох аргументів"
 
-#: tortoisehg\hgtk\hgtk.py:455
+#: tortoisehg\hgtk\hgtk.py:447
 msgid "global options:"
-msgstr "Загальні параметри:"
+msgstr "загальні параметри:"
 
-#: tortoisehg\hgtk\hgtk.py:457
+#: tortoisehg\hgtk\hgtk.py:449
 msgid "use \"hgtk help\" for the full list of commands"
 msgstr "використовуйте \"hgtk help\" для повного переліку команд"
 
-#: tortoisehg\hgtk\hgtk.py:461
+#: tortoisehg\hgtk\hgtk.py:453
 msgid ""
 "use \"hgtk help\" for the full list of commands or \"hgtk -v\" for details"
 msgstr ""
 "використовуйте \"hgtk help\" для повного переліку команд або \"hgtk -v\" для "
 "деталей"
 
-#: tortoisehg\hgtk\hgtk.py:464
+#: tortoisehg\hgtk\hgtk.py:456
 msgid "use \"hgtk -v help%s\" to show aliases and global options"
 msgstr ""
 "використовуйте \"hgtk -v help%s\" для перегляду псевдонімів та загальних "
 "налаштувань"
 
-#: tortoisehg\hgtk\hgtk.py:467
+#: tortoisehg\hgtk\hgtk.py:459
 msgid "use \"hgtk -v help %s\" to show global options"
 msgstr ""
 "використовуйте \"hgtk -v help %s\" для перегляду загальних налаштувань"
 
-#: tortoisehg\hgtk\hgtk.py:479 tortoisehg\hgtk\hgtk.py:581
+#: tortoisehg\hgtk\hgtk.py:471 tortoisehg\hgtk\hgtk.py:573
 msgid ""
 "list of commands:\n"
 "\n"
@@ -1679,7 +1682,7 @@ msgstr ""
 "перелік команд:\n"
 "\n"
 
-#: tortoisehg\hgtk\hgtk.py:487
+#: tortoisehg\hgtk\hgtk.py:479
 msgid ""
 "\n"
 "aliases: %s\n"
@@ -1687,24 +1690,24 @@ msgstr ""
 "\n"
 "псевдонім: %s\n"
 
-#: tortoisehg\hgtk\hgtk.py:492 tortoisehg\hgtk\hgtk.py:518
-#: tortoisehg\hgtk\hgtk.py:550
+#: tortoisehg\hgtk\hgtk.py:484 tortoisehg\hgtk\hgtk.py:510
+#: tortoisehg\hgtk\hgtk.py:542
 msgid "(No help text available)"
 msgstr "(Відсутній текст довідки)"
 
-#: tortoisehg\hgtk\hgtk.py:500
+#: tortoisehg\hgtk\hgtk.py:492
 msgid "options:\n"
 msgstr "налаштування:\n"
 
-#: tortoisehg\hgtk\hgtk.py:523
+#: tortoisehg\hgtk\hgtk.py:515
 msgid "no commands defined\n"
 msgstr "команди невизначені\n"
 
-#: tortoisehg\hgtk\hgtk.py:574
+#: tortoisehg\hgtk\hgtk.py:566
 msgid "Hgtk - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
 msgstr "Hgtk - TortoiseHg's графічний інструмент для Mercurial SCM (Hg)\n"
 
-#: tortoisehg\hgtk\hgtk.py:579
+#: tortoisehg\hgtk\hgtk.py:571
 msgid ""
 "basic commands:\n"
 "\n"
@@ -1712,241 +1715,241 @@ msgstr ""
 "основні команди:\n"
 "\n"
 
-#: tortoisehg\hgtk\hgtk.py:595
+#: tortoisehg\hgtk\hgtk.py:587
 msgid " (default: %s)"
 msgstr " (за замовченням: %s)"
 
-#: tortoisehg\hgtk\hgtk.py:608
+#: tortoisehg\hgtk\hgtk.py:600
 msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
 msgstr "TortoiseHg Діалоги (версія %s), Mercurial (версія %s)\n"
 
-#: tortoisehg\hgtk\hgtk.py:642
+#: tortoisehg\hgtk\hgtk.py:634
 msgid "repository root directory or symbolic path name"
 msgstr "назва каталогу у корені сховища або символічного посилання"
 
-#: tortoisehg\hgtk\hgtk.py:643
+#: tortoisehg\hgtk\hgtk.py:635
 msgid "enable additional output"
-msgstr "увімкнути розширений вивід"
+msgstr "увімкнути додатковий вихід"
 
-#: tortoisehg\hgtk\hgtk.py:644
+#: tortoisehg\hgtk\hgtk.py:636
 msgid "suppress output"
 msgstr "заборонити вихід"
 
-#: tortoisehg\hgtk\hgtk.py:645
+#: tortoisehg\hgtk\hgtk.py:637
 msgid "display help and exit"
 msgstr "показати довідку та вийти"
 
-#: tortoisehg\hgtk\hgtk.py:646
+#: tortoisehg\hgtk\hgtk.py:638
 msgid "start debugger"
 msgstr "початок відлагодження"
 
-#: tortoisehg\hgtk\hgtk.py:647
+#: tortoisehg\hgtk\hgtk.py:639
 msgid "do not fork GUI process"
-msgstr "не відгалужуйте графічний процес"
+msgstr "не відгалужувати графічний процес"
 
-#: tortoisehg\hgtk\hgtk.py:648
+#: tortoisehg\hgtk\hgtk.py:640
 msgid "always fork GUI process"
 msgstr "завжди відгалужувати GUI процес"
 
-#: tortoisehg\hgtk\hgtk.py:649
+#: tortoisehg\hgtk\hgtk.py:641
 msgid "read file list from file"
 msgstr "читати перелік файлів з файлу"
 
-#: tortoisehg\hgtk\hgtk.py:653
+#: tortoisehg\hgtk\hgtk.py:645
 msgid "hgtk about"
 msgstr "Про hgtk"
 
-#: tortoisehg\hgtk\hgtk.py:654
+#: tortoisehg\hgtk\hgtk.py:646
 msgid "hgtk add [FILE]..."
-msgstr "hgtk add [Файл]..."
+msgstr "hgtk add [ФАЙЛ]..."
 
-#: tortoisehg\hgtk\hgtk.py:655
+#: tortoisehg\hgtk\hgtk.py:647
 msgid "hgtk clone SOURCE [DEST]"
-msgstr "hgtk clone Основа [Призначення]"
+msgstr "hgtk clone SOURCE [ПРИЗНАЧЕННЯ]"
 
-#: tortoisehg\hgtk\hgtk.py:657
+#: tortoisehg\hgtk\hgtk.py:649
 msgid "record user as committer"
-msgstr "записати користувача, як той що фіксує"
+msgstr "записувати користувача, як той що фіксує"
 
-#: tortoisehg\hgtk\hgtk.py:658
+#: tortoisehg\hgtk\hgtk.py:650
 msgid "record datecode as commit date"
-msgstr "записати дату фіксації"
+msgstr "записувати дату коду, як дату фіксації"
 
-#: tortoisehg\hgtk\hgtk.py:659
+#: tortoisehg\hgtk\hgtk.py:651
 msgid "hgtk commit [OPTIONS] [FILE]..."
 msgstr "hgtk commit [ПАРАМЕТРИ] [ФАЙЛ]..."
 
-#: tortoisehg\hgtk\hgtk.py:660
+#: tortoisehg\hgtk\hgtk.py:652
 msgid "hgtk datamine"
 msgstr "hgtk datamine"
 
-#: tortoisehg\hgtk\hgtk.py:661
+#: tortoisehg\hgtk\hgtk.py:653
 msgid "hgtk hgignore [FILE]"
 msgstr "hgtk hgignore [ФАЙЛ]"
 
-#: tortoisehg\hgtk\hgtk.py:662
+#: tortoisehg\hgtk\hgtk.py:654
 msgid "hgtk init [DEST]"
 msgstr "hgtk init [ПРИЗНАЧЕННЯ]"
 
-#: tortoisehg\hgtk\hgtk.py:664
+#: tortoisehg\hgtk\hgtk.py:656
 msgid "limit number of changes displayed"
 msgstr "обмеження на кількість змін, що відображаються"
 
-#: tortoisehg\hgtk\hgtk.py:665
+#: tortoisehg\hgtk\hgtk.py:657
 msgid "hgtk log [OPTIONS] [FILE]"
 msgstr "hgtk log [ПАРАМЕТРИ] [ФАЙЛ]"
 
-#: tortoisehg\hgtk\hgtk.py:667
+#: tortoisehg\hgtk\hgtk.py:659
 msgid "revision to merge with"
-msgstr "версія для обєднання з"
+msgstr "редакція для обєднання з"
 
-#: tortoisehg\hgtk\hgtk.py:668
+#: tortoisehg\hgtk\hgtk.py:660
 msgid "hgtk merge"
 msgstr "hgtk merge"
 
-#: tortoisehg\hgtk\hgtk.py:669
+#: tortoisehg\hgtk\hgtk.py:661
 msgid "hgtk recovery"
 msgstr "hgtk recovery"
 
-#: tortoisehg\hgtk\hgtk.py:670
+#: tortoisehg\hgtk\hgtk.py:662
 msgid "hgtk shelve"
 msgstr "hgtk shelve"
 
-#: tortoisehg\hgtk\hgtk.py:671
+#: tortoisehg\hgtk\hgtk.py:663
 msgid "hgtk synch"
 msgstr "hgtk synch"
 
-#: tortoisehg\hgtk\hgtk.py:673
+#: tortoisehg\hgtk\hgtk.py:665
 msgid "revisions to compare"
-msgstr "версії для порівняння"
+msgstr "редакції для порівняння"
 
-#: tortoisehg\hgtk\hgtk.py:674
+#: tortoisehg\hgtk\hgtk.py:666
 msgid "hgtk status [FILE]..."
 msgstr "hgtk status [ФАЙЛ]..."
 
-#: tortoisehg\hgtk\hgtk.py:676 tortoisehg\hgtk\hgtk.py:679
+#: tortoisehg\hgtk\hgtk.py:668 tortoisehg\hgtk\hgtk.py:671
 msgid "field to give initial focus"
 msgstr "поля, першочергової уваги"
 
-#: tortoisehg\hgtk\hgtk.py:677
+#: tortoisehg\hgtk\hgtk.py:669
 msgid "hgtk userconfig"
 msgstr "hgtk userconfig"
 
-#: tortoisehg\hgtk\hgtk.py:680
+#: tortoisehg\hgtk\hgtk.py:672
 msgid "hgtk repoconfig"
 msgstr "hgtk repoconfig"
 
-#: tortoisehg\hgtk\hgtk.py:681
+#: tortoisehg\hgtk\hgtk.py:673
 msgid "hgtk guess"
 msgstr "hgtk guess"
 
-#: tortoisehg\hgtk\hgtk.py:682
+#: tortoisehg\hgtk\hgtk.py:674
 msgid "hgtk remove [FILE]..."
 msgstr "hgtk remove [ФАЙЛ]..."
 
-#: tortoisehg\hgtk\hgtk.py:683
+#: tortoisehg\hgtk\hgtk.py:675
 msgid "hgtk rename SOURCE [DEST]"
 msgstr "hgtk rename SOURCE [ПРИЗНАЧЕННЯ]"
 
-#: tortoisehg\hgtk\hgtk.py:684
+#: tortoisehg\hgtk\hgtk.py:676
 msgid "hgtk revert [FILE]..."
 msgstr "hgtk revert [ФАЙЛ]..."
 
-#: tortoisehg\hgtk\hgtk.py:685
+#: tortoisehg\hgtk\hgtk.py:677
 msgid "hgtk forget [FILE]..."
 msgstr "hgtk forget [ФАЙЛ]..."
 
-#: tortoisehg\hgtk\hgtk.py:688
+#: tortoisehg\hgtk\hgtk.py:680
 msgid "name of the webdir config file"
 msgstr "назва файлу з налаштуваннями webdir"
 
-#: tortoisehg\hgtk\hgtk.py:689
+#: tortoisehg\hgtk\hgtk.py:681
 msgid "hgtk serve [OPTION]..."
 msgstr "hgtk serve [ПАРАМЕТРИ]..."
 
-#: tortoisehg\hgtk\hgtk.py:691
+#: tortoisehg\hgtk\hgtk.py:683
 msgid "wait until the second ticks over"
 msgstr "почекайте хвильку"
 
-#: tortoisehg\hgtk\hgtk.py:692
+#: tortoisehg\hgtk\hgtk.py:684
 msgid "notify the shell for paths given"
-msgstr "notify the shell for paths given"
+msgstr "повідомлення shell для обумовлених шляхів"
 
-#: tortoisehg\hgtk\hgtk.py:693
+#: tortoisehg\hgtk\hgtk.py:685
 msgid "remove the status cache"
-msgstr "видалити кеш статусу"
+msgstr "перемістити кеш статусу"
 
-#: tortoisehg\hgtk\hgtk.py:694
+#: tortoisehg\hgtk\hgtk.py:686
 msgid "show the contents of the status cache (no update)"
 msgstr "переглянути зміст статусу кешу (без оновлення)"
 
-#: tortoisehg\hgtk\hgtk.py:696
+#: tortoisehg\hgtk\hgtk.py:688
 msgid "udpate all repos in current dir"
 msgstr "оновити всі сховища у поточному каталозі"
 
-#: tortoisehg\hgtk\hgtk.py:697
+#: tortoisehg\hgtk\hgtk.py:689
 msgid "hgtk thgstatus [OPTION]"
 msgstr "hgtk thgstatus [ПАРАМЕТРИ]"
 
-#: tortoisehg\hgtk\hgtk.py:699 tortoisehg\hgtk\hgtk.py:715
+#: tortoisehg\hgtk\hgtk.py:691 tortoisehg\hgtk\hgtk.py:707
 msgid "revision to update"
-msgstr "версія для оновлення"
+msgstr "редакція для оновлення"
 
-#: tortoisehg\hgtk\hgtk.py:702
+#: tortoisehg\hgtk\hgtk.py:694
 msgid "changeset to view in diff tool"
 msgstr "набір змін для перегляду у інструменті порівнянь"
 
-#: tortoisehg\hgtk\hgtk.py:703
+#: tortoisehg\hgtk\hgtk.py:695
 msgid "revisions to view in diff tool"
-msgstr "версії для відображення у інструменті порівнянь"
+msgstr "редакції для відображення у інструменті порівнянь"
 
-#: tortoisehg\hgtk\hgtk.py:704
+#: tortoisehg\hgtk\hgtk.py:696
 msgid "bundle file to preview"
-msgstr "розшарування файлу для попереднього перегляду"
+msgstr "набір файлів для попереднього перегляду"
 
-#: tortoisehg\hgtk\hgtk.py:705
+#: tortoisehg\hgtk\hgtk.py:697
 msgid "directly use raw extdiff command"
-msgstr "безпосередньо використання команди raw extdiff command"
+msgstr "пряме використання команди raw extdiff command"
 
-#: tortoisehg\hgtk\hgtk.py:706
+#: tortoisehg\hgtk\hgtk.py:698
 msgid "launch visual diff tool"
 msgstr "запустити візуальний інструмент для порівняння"
 
-#: tortoisehg\hgtk\hgtk.py:708
+#: tortoisehg\hgtk\hgtk.py:700
 msgid "print license"
 msgstr "друкувати ліцензію"
 
-#: tortoisehg\hgtk\hgtk.py:709
+#: tortoisehg\hgtk\hgtk.py:701
 msgid "hgtk version [OPTION]"
 msgstr "hgtk version [ПАРАМЕТРИ]"
 
-#: tortoisehg\hgtk\hgtk.py:711
+#: tortoisehg\hgtk\hgtk.py:703
 msgid "show the command options"
 msgstr "переглянути параметри команди"
 
-#: tortoisehg\hgtk\hgtk.py:712
+#: tortoisehg\hgtk\hgtk.py:704
 msgid "[-o] CMD"
 msgstr "[-o] CMD"
 
-#: tortoisehg\hgtk\hgtk.py:713
+#: tortoisehg\hgtk\hgtk.py:705
 msgid "hgtk help [COMMAND]"
 msgstr "hgtk help [КОМАНДА]"
 
 #: tortoisehg\hgtk\histdetails.py:35
 msgid "Log Details"
-msgstr "Деталізація журналу"
+msgstr "Журнал деталізацій"
 
 #: tortoisehg\hgtk\histdetails.py:40
 msgid "Columns"
-msgstr "Стовпчики"
+msgstr "Стовпці"
 
 #: tortoisehg\hgtk\histdetails.py:87
 msgid "Move Up"
-msgstr "Пересунути вгору"
+msgstr "Підняти"
 
 #: tortoisehg\hgtk\histdetails.py:90
 msgid "Move Down"
-msgstr "Пересунути вниз"
+msgstr "Опустити"
 
 #: tortoisehg\hgtk\history.py:75
 msgid ""
@@ -1981,503 +1984,499 @@ msgstr " (Пакет попереднього перегляду)"
 
 #: tortoisehg\hgtk\history.py:109 tortoisehg\hgtk\status.py:177
 msgid "Re_fresh"
-msgstr "Оновити"
+msgstr "О_новити"
 
 #: tortoisehg\hgtk\history.py:111
 msgid "Reload revision history"
-msgstr "Перезавантажити історію версій"
+msgstr "Перезавантажити історію редакцій"
 
-#: tortoisehg\hgtk\history.py:116
-msgid "Launch synchronize tool"
-msgstr "Запустити інструмент сінхронізації"
-
-#: tortoisehg\hgtk\history.py:121 tortoisehg\hgtk\history.py:170
+#: tortoisehg\hgtk\history.py:115 tortoisehg\hgtk\history.py:164
 msgid "Patch Queue"
 msgstr "Черга латок"
 
-#: tortoisehg\hgtk\history.py:123
+#: tortoisehg\hgtk\history.py:117
 msgid "Show/Hide Patch Queue"
 msgstr "Показати/Сховати чергу латок"
 
-#: tortoisehg\hgtk\history.py:166
+#: tortoisehg\hgtk\history.py:160
 msgid "Sync Bar"
 msgstr "Sync Bar"
 
-#: tortoisehg\hgtk\history.py:176
+#: tortoisehg\hgtk\history.py:170
 msgid "Load more Revisions"
-msgstr "Завантажити більше Редакцій"
+msgstr "Завантажити редакції"
+
+#: tortoisehg\hgtk\history.py:172
+msgid "Load all Revisions"
+msgstr "Завантажити всі редакції"
+
+#: tortoisehg\hgtk\history.py:175
+msgid "Toolbar"
+msgstr "Пенал"
 
 #: tortoisehg\hgtk\history.py:178
-msgid "Load all Revisions"
-msgstr "Завантажити всі Редакції"
-
-#: tortoisehg\hgtk\history.py:181
-msgid "Toolbar"
-msgstr "Панель інструментів"
+msgid "Filter Bar"
+msgstr "Пенал фільтрів"
 
 #: tortoisehg\hgtk\history.py:184
-msgid "Filter Bar"
-msgstr "Панель Фільтрів"
-
-#: tortoisehg\hgtk\history.py:190
 msgid "Reset Marks"
 msgstr "Скинути знаки"
 
-#: tortoisehg\hgtk\history.py:193
+#: tortoisehg\hgtk\history.py:187
 msgid "Choose Details..."
-msgstr "Оберіть деталі..."
+msgstr "Вибрати..."
 
-#: tortoisehg\hgtk\history.py:195
+#: tortoisehg\hgtk\history.py:190
 msgid "Compact Graph"
 msgstr "Компактний графік"
 
-#: tortoisehg\hgtk\history.py:197
+#: tortoisehg\hgtk\history.py:192
 msgid "Color by Branch"
 msgstr "Колір по гілці"
 
-#: tortoisehg\hgtk\history.py:200
+#: tortoisehg\hgtk\history.py:195
 msgid "Ignore Max Diff Size"
-msgstr "НЕ зважати на максимальний розмір різниць"
+msgstr "Не зважати на максимальний розмір різниць"
 
-#: tortoisehg\hgtk\history.py:204
+#: tortoisehg\hgtk\history.py:199
 msgid "_Navigate"
 msgstr "_Навігація"
 
-#: tortoisehg\hgtk\history.py:205
+#: tortoisehg\hgtk\history.py:200
 msgid "Tip"
 msgstr "Підказка"
 
-#: tortoisehg\hgtk\history.py:206
+#: tortoisehg\hgtk\history.py:202
 msgid "Working Parent"
-msgstr "Робочий Попередник"
+msgstr "Робочий попередник"
 
-#: tortoisehg\hgtk\history.py:208
+#: tortoisehg\hgtk\history.py:205
 msgid "Revision..."
 msgstr "Редакції..."
 
-#: tortoisehg\hgtk\history.py:211
+#: tortoisehg\hgtk\history.py:209
 msgid "_Synchronize"
 msgstr "_Сінхронізація"
 
-#: tortoisehg\hgtk\history.py:212 tortoisehg\hgtk\synch.py:63
+#: tortoisehg\hgtk\history.py:210 tortoisehg\hgtk\synch.py:63
 msgid "Incoming"
 msgstr "Вхідні"
 
-#: tortoisehg\hgtk\history.py:214
+#: tortoisehg\hgtk\history.py:212
 msgid "Pull"
 msgstr "Отримати"
 
-#: tortoisehg\hgtk\history.py:216 tortoisehg\hgtk\synch.py:74
+#: tortoisehg\hgtk\history.py:214 tortoisehg\hgtk\synch.py:74
 msgid "Outgoing"
 msgstr "Вихідні"
 
-#: tortoisehg\hgtk\history.py:218 tortoisehg\hgtk\synch.py:79
+#: tortoisehg\hgtk\history.py:216 tortoisehg\hgtk\synch.py:79
 msgid "Push"
 msgstr "Передати"
 
-#: tortoisehg\hgtk\history.py:220
+#: tortoisehg\hgtk\history.py:218
 msgid "Email..."
 msgstr "Електронна пошта..."
 
-#: tortoisehg\hgtk\history.py:223
+#: tortoisehg\hgtk\history.py:221
 msgid "Add Bundle..."
 msgstr "Додати пакет..."
 
-#: tortoisehg\hgtk\history.py:226
+#: tortoisehg\hgtk\history.py:224
 msgid "Accept Bundle"
 msgstr "Прийняти пакет"
 
-#: tortoisehg\hgtk\history.py:229
+#: tortoisehg\hgtk\history.py:227
 msgid "Reject Bundle"
 msgstr "Відхилити пакет"
 
-#: tortoisehg\hgtk\history.py:235
+#: tortoisehg\hgtk\history.py:233
 msgid "Force push"
-msgstr "Незважати та віддати"
+msgstr "Примусово віддати"
 
-#: tortoisehg\hgtk\history.py:325 tortoisehg\hgtk\logview\treeview.py:381
+#: tortoisehg\hgtk\history.py:304 tortoisehg\hgtk\logview\treeview.py:380
 msgid "Graph"
 msgstr "Графік"
 
-#: tortoisehg\hgtk\history.py:332
+#: tortoisehg\hgtk\history.py:311
 msgid "Revision Number"
 msgstr "Номер редакції"
 
-#: tortoisehg\hgtk\history.py:333
+#: tortoisehg\hgtk\history.py:312
 msgid "Changeset ID"
 msgstr "ID набору змін"
 
-#: tortoisehg\hgtk\history.py:334
+#: tortoisehg\hgtk\history.py:313
 msgid "Branch Name"
 msgstr "Назва гілки"
 
-#: tortoisehg\hgtk\history.py:335 tortoisehg\hgtk\logview\treeview.py:433
+#: tortoisehg\hgtk\history.py:314 tortoisehg\hgtk\logview\treeview.py:432
 #: tortoisehg\hgtk\thgmq.py:187
 msgid "Summary"
-msgstr "Підсумок"
+msgstr "Зведення"
 
-#: tortoisehg\hgtk\history.py:337 tortoisehg\hgtk\logview\treeview.py:455
+#: tortoisehg\hgtk\history.py:316 tortoisehg\hgtk\logview\treeview.py:454
 msgid "Local Date"
 msgstr "Місцевий час"
 
-#: tortoisehg\hgtk\history.py:338
+#: tortoisehg\hgtk\history.py:317
 msgid "UTC Date"
 msgstr "UTC Дата"
 
-#: tortoisehg\hgtk\history.py:339 tortoisehg\hgtk\logview\treeview.py:479
+#: tortoisehg\hgtk\history.py:318 tortoisehg\hgtk\logview\treeview.py:478
 msgid "Age"
 msgstr "Вік"
 
-#: tortoisehg\hgtk\history.py:340 tortoisehg\hgtk\logview\treeview.py:491
+#: tortoisehg\hgtk\history.py:319 tortoisehg\hgtk\logview\treeview.py:490
 msgid "Tags"
 msgstr "Мітки"
 
-#: tortoisehg\hgtk\history.py:389
+#: tortoisehg\hgtk\history.py:368
 msgid "Invalid revision range"
 msgstr "Помилковий діапазон редакцій"
 
-#: tortoisehg\hgtk\history.py:401
+#: tortoisehg\hgtk\history.py:380
 msgid "Invalid date specification"
 msgstr "Невірний формат дати"
 
-#: tortoisehg\hgtk\history.py:641
+#: tortoisehg\hgtk\history.py:620
 msgid "Filter"
 msgstr "Фільтр"
 
-#: tortoisehg\hgtk\history.py:646
+#: tortoisehg\hgtk\history.py:625
 msgid "%s branch"
 msgstr "%s гілка"
 
-#: tortoisehg\hgtk\history.py:647
+#: tortoisehg\hgtk\history.py:626
 msgid "Branch '%s'"
 msgstr "Гілка '%s'"
 
-#: tortoisehg\hgtk\history.py:653
+#: tortoisehg\hgtk\history.py:632
 msgid "file history: "
 msgstr "файл історії: "
 
-#: tortoisehg\hgtk\history.py:657
+#: tortoisehg\hgtk\history.py:636
 msgid "custom filter"
 msgstr "фільтр користувача"
 
-#: tortoisehg\hgtk\history.py:665
+#: tortoisehg\hgtk\history.py:644
 msgid "merges"
-msgstr "обєднує"
+msgstr "об'єднує"
 
-#: tortoisehg\hgtk\history.py:668
+#: tortoisehg\hgtk\history.py:647
 msgid "only Merges"
-msgstr "тільки Обєднує"
+msgstr "тільки об'єднує"
 
-#: tortoisehg\hgtk\history.py:670
+#: tortoisehg\hgtk\history.py:649
 msgid "revision ancestry"
-msgstr "Родовід Версії"
+msgstr "родовід редакції"
 
-#: tortoisehg\hgtk\history.py:675
+#: tortoisehg\hgtk\history.py:654
 msgid "Ancestry of %s"
 msgstr "Родовід для %s"
 
-#: tortoisehg\hgtk\history.py:677
+#: tortoisehg\hgtk\history.py:656
 msgid "tagged revisions"
-msgstr "відзначити версії"
+msgstr "відзначити редакції"
 
-#: tortoisehg\hgtk\history.py:685
+#: tortoisehg\hgtk\history.py:664
 msgid "Tagged Revisions"
-msgstr "Відзначити Версії"
+msgstr "Відзначити редакції"
 
-#: tortoisehg\hgtk\history.py:687
+#: tortoisehg\hgtk\history.py:666
 msgid "working parents"
 msgstr "робочі попередники"
 
-#: tortoisehg\hgtk\history.py:693
+#: tortoisehg\hgtk\history.py:672
 msgid "heads"
 msgstr "головки"
 
-#: tortoisehg\hgtk\history.py:697 tortoisehg\hgtk\history.py:1018
+#: tortoisehg\hgtk\history.py:676 tortoisehg\hgtk\history.py:1000
 msgid "Heads"
-msgstr "Головки"
+msgstr "Голови"
 
-#: tortoisehg\hgtk\history.py:699
+#: tortoisehg\hgtk\history.py:678
 msgid "no Merges"
-msgstr "не Обєднує"
+msgstr "не об'єднує"
 
-#: tortoisehg\hgtk\history.py:717
+#: tortoisehg\hgtk\history.py:696
 msgid "Visualize Change"
 msgstr "Показати зміну"
 
-#: tortoisehg\hgtk\history.py:718
+#: tortoisehg\hgtk\history.py:697
 msgid "Di_splay Change"
 msgstr "Відобразити зміну"
 
-#: tortoisehg\hgtk\history.py:719
+#: tortoisehg\hgtk\history.py:698
 msgid "Diff to local"
-msgstr "Різниця з місцевими"
+msgstr "Різниця з місцевим"
 
-#: tortoisehg\hgtk\history.py:721
+#: tortoisehg\hgtk\history.py:700
 msgid "_Copy hash"
 msgstr "_Копірувати hash"
 
-#: tortoisehg\hgtk\history.py:725
+#: tortoisehg\hgtk\history.py:704
 msgid "Pull to here"
-msgstr "Отримати собі"
+msgstr "Отримати сюди"
 
-#: tortoisehg\hgtk\history.py:732
+#: tortoisehg\hgtk\history.py:711
 msgid "Push to here"
-msgstr "Віддати своє"
+msgstr "Віддати сюди"
 
-#: tortoisehg\hgtk\history.py:734
+#: tortoisehg\hgtk\history.py:713
 msgid "_Update..."
 msgstr "_Оновити..."
 
-#: tortoisehg\hgtk\history.py:735 tortoisehg\hgtk\history.py:819
+#: tortoisehg\hgtk\history.py:714 tortoisehg\hgtk\history.py:798
 msgid "_Merge with..."
-msgstr "_Обєднати з..."
+msgstr "_Об'єднати з..."
 
-#: tortoisehg\hgtk\history.py:738
+#: tortoisehg\hgtk\history.py:717
 msgid "_Export Patch..."
 msgstr "_Експорт латки..."
 
-#: tortoisehg\hgtk\history.py:739
+#: tortoisehg\hgtk\history.py:718
 msgid "E_mail Patch..."
 msgstr "Надіслати латку електронною поштою"
 
-#: tortoisehg\hgtk\history.py:740
+#: tortoisehg\hgtk\history.py:719
 msgid "_Bundle rev:tip..."
 msgstr "_Пакет версія:підказка..."
 
-#: tortoisehg\hgtk\history.py:742
+#: tortoisehg\hgtk\history.py:721
 msgid "Add/Remove _Tag..."
 msgstr "Додати/Видалити _Мітку..."
 
-#: tortoisehg\hgtk\history.py:743
+#: tortoisehg\hgtk\history.py:722
 msgid "Backout Revision..."
 msgstr "Повернутися назад до Версії..."
 
-#: tortoisehg\hgtk\history.py:745 tortoisehg\hgtk\status.py:1510
+#: tortoisehg\hgtk\history.py:724 tortoisehg\hgtk\status.py:1510
 msgid "_Revert"
 msgstr "_Повернути"
 
-#: tortoisehg\hgtk\history.py:746
+#: tortoisehg\hgtk\history.py:725
 msgid "_Archive..."
 msgstr "_Архів..."
 
-#: tortoisehg\hgtk\history.py:764
+#: tortoisehg\hgtk\history.py:743
 msgid "Transp_lant to local"
 msgstr "Трансплантація до місцевого"
 
-#: tortoisehg\hgtk\history.py:769
+#: tortoisehg\hgtk\history.py:748
 msgid "qimport"
 msgstr "Швидкий імпорт"
 
-#: tortoisehg\hgtk\history.py:770
+#: tortoisehg\hgtk\history.py:749
 msgid "Strip Revision..."
 msgstr "Пошматована Редакція..."
 
-#: tortoisehg\hgtk\history.py:802
+#: tortoisehg\hgtk\history.py:781
 msgid "_Diff with selected"
 msgstr "_Різниця з обраним"
 
-#: tortoisehg\hgtk\history.py:803
+#: tortoisehg\hgtk\history.py:782
 msgid "Visual Diff with selected"
 msgstr "Visual Diff з обраним"
 
-#: tortoisehg\hgtk\history.py:812
+#: tortoisehg\hgtk\history.py:791
 msgid "Email from here to selected..."
 msgstr "Email звідси до вибраного..."
 
-#: tortoisehg\hgtk\history.py:814
+#: tortoisehg\hgtk\history.py:793
 msgid "Bundle from here to selected..."
 msgstr "Пакети звідси вибрані..."
 
-#: tortoisehg\hgtk\history.py:816
+#: tortoisehg\hgtk\history.py:795
 msgid "Export Patches from here to selected..."
 msgstr "Експорт пакетів звідси вибраних..."
 
-#: tortoisehg\hgtk\history.py:835
+#: tortoisehg\hgtk\history.py:814
 msgid "Transplant Revision range to local"
 msgstr "Пересадка діапазону редакцій до місцевого"
 
-#: tortoisehg\hgtk\history.py:840
+#: tortoisehg\hgtk\history.py:819
 msgid "Rebase on top of selected"
 msgstr "Зміна бази даний на крок вище вибраної"
 
-#: tortoisehg\hgtk\history.py:845
+#: tortoisehg\hgtk\history.py:824
 msgid "qimport from here to selected"
 msgstr "qimport from here to selected"
 
-#: tortoisehg\hgtk\history.py:876
+#: tortoisehg\hgtk\history.py:855
 msgid "Load more"
 msgstr "Завантажити більше"
 
-#: tortoisehg\hgtk\history.py:876
+#: tortoisehg\hgtk\history.py:855
 msgid "load more revisions"
 msgstr "завантажити більше редакцій"
 
-#: tortoisehg\hgtk\history.py:879
+#: tortoisehg\hgtk\history.py:858
 msgid "Load all"
 msgstr "Завантажити все"
 
-#: tortoisehg\hgtk\history.py:879
+#: tortoisehg\hgtk\history.py:858
 msgid "load all revisions"
 msgstr "завантажити всі редакції"
 
-#: tortoisehg\hgtk\history.py:921
+#: tortoisehg\hgtk\history.py:900
 msgid "Download and view incoming changesets"
 msgstr "Завантажити та переглянути вхідні набори змін"
 
-#: tortoisehg\hgtk\history.py:923
+#: tortoisehg\hgtk\history.py:902
 msgid "Accept changes from Bundle preview"
 msgstr "Приймати зміни при попередньому перегляді Пакета"
 
-#: tortoisehg\hgtk\history.py:925
+#: tortoisehg\hgtk\history.py:904
 msgid "Reject changes from Bundle preview"
 msgstr "Видавати зміни при попередньому перегляді Пакета"
 
-#: tortoisehg\hgtk\history.py:927
+#: tortoisehg\hgtk\history.py:906
 msgid "Pull incoming changesets"
 msgstr "Отримати вхідні набори змін"
 
-#: tortoisehg\hgtk\history.py:930
+#: tortoisehg\hgtk\history.py:909
 msgid "Determine and mark outgoing changesets"
 msgstr "Determine and mark outgoing changesets"
 
-#: tortoisehg\hgtk\history.py:932
+#: tortoisehg\hgtk\history.py:911
 msgid "Push outgoing changesets"
 msgstr "Передати набори змін назовні"
 
-#: tortoisehg\hgtk\history.py:934
+#: tortoisehg\hgtk\history.py:913
 msgid "Email outgoing changesets"
 msgstr "Email outgoing changesets"
 
-#: tortoisehg\hgtk\history.py:937
+#: tortoisehg\hgtk\history.py:916
 msgid "Stop current transaction"
 msgstr "Зупинити поточну операцію"
 
-#: tortoisehg\hgtk\history.py:960
+#: tortoisehg\hgtk\history.py:941
 msgid "After Pull:"
 msgstr "Після отримання:"
 
-#: tortoisehg\hgtk\history.py:961 tortoisehg\hgtk\synch.py:155
+#: tortoisehg\hgtk\history.py:942 tortoisehg\hgtk\synch.py:155
 msgid "Nothing"
 msgstr "Нічого"
 
-#: tortoisehg\hgtk\history.py:961 tortoisehg\hgtk\synch.py:155
+#: tortoisehg\hgtk\history.py:942 tortoisehg\hgtk\synch.py:155
 #: tortoisehg\hgtk\update.py:45
 msgid "Update"
 msgstr "Оновити"
 
-#: tortoisehg\hgtk\history.py:964 tortoisehg\hgtk\synch.py:158
+#: tortoisehg\hgtk\history.py:945 tortoisehg\hgtk\synch.py:158
 msgid "Fetch"
 msgstr "Завантажити"
 
-#: tortoisehg\hgtk\history.py:966 tortoisehg\hgtk\synch.py:160
+#: tortoisehg\hgtk\history.py:947 tortoisehg\hgtk\synch.py:160
 msgid "Rebase"
 msgstr "Змінити базу"
 
-#: tortoisehg\hgtk\history.py:984
+#: tortoisehg\hgtk\history.py:966
 msgid "Configure aliases and after pull behavior"
 msgstr "Налаштувати прізвисько та після отримати поведінку"
 
-#: tortoisehg\hgtk\history.py:1000
+#: tortoisehg\hgtk\history.py:982
 msgid "All"
 msgstr "Всі"
 
-#: tortoisehg\hgtk\history.py:1005
+#: tortoisehg\hgtk\history.py:987
 msgid "Tagged"
 msgstr "З міткою"
 
-#: tortoisehg\hgtk\history.py:1009
+#: tortoisehg\hgtk\history.py:991
 msgid "Ancestry"
 msgstr "Походження"
 
-#: tortoisehg\hgtk\history.py:1022
+#: tortoisehg\hgtk\history.py:1004
 msgid "Merges"
 msgstr "Обєднати"
 
-#: tortoisehg\hgtk\history.py:1026
+#: tortoisehg\hgtk\history.py:1008
 msgid "Hide Merges"
 msgstr "Приховане обєднання"
 
-#: tortoisehg\hgtk\history.py:1033
+#: tortoisehg\hgtk\history.py:1015
 msgid "Branch Filter"
 msgstr "Фільтр гілки"
 
-#: tortoisehg\hgtk\history.py:1040
+#: tortoisehg\hgtk\history.py:1021
 msgid "Branches..."
 msgstr "Гілки..."
 
-#: tortoisehg\hgtk\history.py:1050
+#: tortoisehg\hgtk\history.py:1031
 msgid "Custom Filter"
 msgstr "Налаштування фільтру"
 
-#: tortoisehg\hgtk\history.py:1056
+#: tortoisehg\hgtk\history.py:1036
 msgid "File Patterns"
 msgstr "Взірці файла"
 
-#: tortoisehg\hgtk\history.py:1056
+#: tortoisehg\hgtk\history.py:1036
 msgid "Rev Range"
 msgstr "Діапазон редакцій"
 
-#: tortoisehg\hgtk\history.py:1057
+#: tortoisehg\hgtk\history.py:1037
 msgid "Date"
 msgstr "Дата"
 
-#: tortoisehg\hgtk\history.py:1057
+#: tortoisehg\hgtk\history.py:1037
 msgid "Keywords"
 msgstr "Ключові слова"
 
-#: tortoisehg\hgtk\history.py:1189 tortoisehg\hgtk\history.py:1303
-#: tortoisehg\hgtk\history.py:1325 tortoisehg\hgtk\history.py:1391
-#: tortoisehg\hgtk\history.py:1776
+#: tortoisehg\hgtk\history.py:1169 tortoisehg\hgtk\history.py:1279
+#: tortoisehg\hgtk\history.py:1301 tortoisehg\hgtk\history.py:1363
+#: tortoisehg\hgtk\history.py:1741
 msgid "No remote path specified"
 msgstr "Відсутній вказаний віддалений шлях"
 
-#: tortoisehg\hgtk\history.py:1190 tortoisehg\hgtk\history.py:1304
-#: tortoisehg\hgtk\history.py:1326 tortoisehg\hgtk\history.py:1392
-#: tortoisehg\hgtk\history.py:1777
+#: tortoisehg\hgtk\history.py:1170 tortoisehg\hgtk\history.py:1280
+#: tortoisehg\hgtk\history.py:1302 tortoisehg\hgtk\history.py:1364
+#: tortoisehg\hgtk\history.py:1742
 msgid "Please enter or select a remote path"
 msgstr "Будь-ласка, введіть або оберіть віддалений шлях"
 
-#: tortoisehg\hgtk\history.py:1227
+#: tortoisehg\hgtk\history.py:1203
 msgid "Accept incoming previewed changesets"
 msgstr "Приймати вхідні попередньо переглянуті набори змін"
 
-#: tortoisehg\hgtk\history.py:1228
+#: tortoisehg\hgtk\history.py:1204
 msgid "Accept"
 msgstr "Прийняти"
 
-#: tortoisehg\hgtk\history.py:1233
+#: tortoisehg\hgtk\history.py:1209
 msgid "Reject incoming previewed changesets"
 msgstr "Відхиляти вхідні попередньо переглянуті набори змін"
 
-#: tortoisehg\hgtk\history.py:1234
+#: tortoisehg\hgtk\history.py:1210
 msgid "Reject"
 msgstr "Відхилити"
 
-#: tortoisehg\hgtk\history.py:1275
+#: tortoisehg\hgtk\history.py:1251
 msgid "Bundle Preview"
 msgstr "Попередній перегляд Пакету"
 
-#: tortoisehg\hgtk\history.py:1280
+#: tortoisehg\hgtk\history.py:1256
 msgid "Open Bundle"
 msgstr "Відкрити пакет"
 
-#: tortoisehg\hgtk\history.py:1355
+#: tortoisehg\hgtk\history.py:1331
 msgid "%d outgoing changesets"
 msgstr "%d вихідні набори змін"
 
-#: tortoisehg\hgtk\history.py:1374 tortoisehg\hgtk\synch.py:495
+#: tortoisehg\hgtk\history.py:1350 tortoisehg\hgtk\synch.py:495
 msgid "No repository selected"
 msgstr "Не обрано сховища"
 
-#: tortoisehg\hgtk\history.py:1375 tortoisehg\hgtk\synch.py:496
+#: tortoisehg\hgtk\history.py:1351 tortoisehg\hgtk\synch.py:496
 msgid "Select a peer repository to compare with"
 msgstr "Оберіть сховище для порівняння з"
 
-#: tortoisehg\hgtk\history.py:1402
+#: tortoisehg\hgtk\history.py:1372
 msgid "Confirm Forced Push to Remote Repository"
 msgstr "Підтвердіть примусове відправлення до віддаленого сховища"
 
-#: tortoisehg\hgtk\history.py:1403
+#: tortoisehg\hgtk\history.py:1373
 msgid ""
 "Forced push to remote repository\n"
 "%s\n"
@@ -2487,15 +2486,15 @@ msgstr ""
 "%s\n"
 "(створити нову голову у віддаленому, якщо це необхідно)?"
 
-#: tortoisehg\hgtk\history.py:1405 tortoisehg\hgtk\history.py:1415
+#: tortoisehg\hgtk\history.py:1375 tortoisehg\hgtk\history.py:1385
 msgid "Forced &Push"
 msgstr "Forced &Push"
 
-#: tortoisehg\hgtk\history.py:1407
+#: tortoisehg\hgtk\history.py:1377
 msgid "Confirm Push to remote Repository"
 msgstr "Підтвердіть відправлення до віддаленого сховища"
 
-#: tortoisehg\hgtk\history.py:1408
+#: tortoisehg\hgtk\history.py:1378
 msgid ""
 "Push to remote repository\n"
 "%s\n"
@@ -2505,15 +2504,15 @@ msgstr ""
 "%s\n"
 "?"
 
-#: tortoisehg\hgtk\history.py:1409
+#: tortoisehg\hgtk\history.py:1379
 msgid "&Push"
 msgstr "&Push"
 
-#: tortoisehg\hgtk\history.py:1412
+#: tortoisehg\hgtk\history.py:1382
 msgid "Confirm Forced Push"
 msgstr "Підтвердіть примусове відправлення"
 
-#: tortoisehg\hgtk\history.py:1413
+#: tortoisehg\hgtk\history.py:1383
 msgid ""
 "Forced push to repository\n"
 "%s\n"
@@ -2523,15 +2522,11 @@ msgstr ""
 "%s\n"
 "(створити нові голови за необхідністю)?"
 
-#: tortoisehg\hgtk\history.py:1423
-msgid "Invalid Remote Repository"
-msgstr "Невірне віддалене сховище"
-
-#: tortoisehg\hgtk\history.py:1592
+#: tortoisehg\hgtk\history.py:1557
 msgid "Confirm Revert All Files"
 msgstr "Підтвердіть повернення всіх файлів"
 
-#: tortoisehg\hgtk\history.py:1593
+#: tortoisehg\hgtk\history.py:1558
 msgid ""
 "Revert all files to revision %d?\n"
 "This will overwrite your local changes"
@@ -2539,43 +2534,43 @@ msgstr ""
 "Повернути всі файли до версії %d?\n"
 "Це перезапише всі локальні зміни"
 
-#: tortoisehg\hgtk\history.py:1644
+#: tortoisehg\hgtk\history.py:1609
 msgid "Save patches to"
 msgstr "Записати латки до"
 
-#: tortoisehg\hgtk\history.py:1667 tortoisehg\hgtk\history.py:1836
+#: tortoisehg\hgtk\history.py:1632 tortoisehg\hgtk\history.py:1804
 msgid "Write bundle to"
 msgstr "Записати пакет до"
 
-#: tortoisehg\hgtk\history.py:1703
+#: tortoisehg\hgtk\history.py:1668
 msgid "Confirm Rebase Revision"
 msgstr "Підтвердіть зміну бази редакцій"
 
-#: tortoisehg\hgtk\history.py:1704
+#: tortoisehg\hgtk\history.py:1669
 msgid "Rebase revision %d on top of %d?"
 msgstr "Зміна бази редакцій %d на верхню %d?"
 
-#: tortoisehg\hgtk\history.py:1815 tortoisehg\hgtk\status.py:1194
+#: tortoisehg\hgtk\history.py:1783 tortoisehg\hgtk\status.py:1194
 msgid "Save patch to"
 msgstr "Зберегти латку до"
 
-#: tortoisehg\hgtk\logview\treeview.py:256
+#: tortoisehg\hgtk\logview\treeview.py:255
 msgid "%(count)d of %(total)d Revisions"
 msgstr "%(кількість)d у %(загалом)d Редакціях"
 
-#: tortoisehg\hgtk\logview\treeview.py:363
+#: tortoisehg\hgtk\logview\treeview.py:362
 msgid "Repository is empty"
 msgstr "Пусте сховище"
 
-#: tortoisehg\hgtk\logview\treeview.py:408
+#: tortoisehg\hgtk\logview\treeview.py:407
 msgid "ID"
 msgstr "ID"
 
-#: tortoisehg\hgtk\logview\treeview.py:420
+#: tortoisehg\hgtk\logview\treeview.py:419
 msgid "Branch"
 msgstr "Гілка"
 
-#: tortoisehg\hgtk\logview\treeview.py:467
+#: tortoisehg\hgtk\logview\treeview.py:466
 msgid "Universal Date"
 msgstr "Світовий час"
 
@@ -2833,7 +2828,7 @@ msgstr "Неможливо виконати зараз"
 msgid "Please try again after the previous command is completed"
 msgstr "Будь-ласка, спробуйте після закінчення дії попередньої команди"
 
-#: tortoisehg\hgtk\recovery.py:220 tortoisehg\hgtk\synch.py:632
+#: tortoisehg\hgtk\recovery.py:220 tortoisehg\hgtk\synch.py:628
 msgid "[command interrupted]"
 msgstr "[команда перервана]"
 
@@ -3324,7 +3319,7 @@ msgstr ""
 msgid "&Refresh"
 msgstr "&Оновити"
 
-#: tortoisehg\hgtk\statusbar.py:44
+#: tortoisehg\hgtk\statusbar.py:45
 msgid "Running"
 msgstr "Виконання"
 
@@ -4613,63 +4608,63 @@ msgstr "Вирізати - %s"
 msgid "Strip:"
 msgstr "Вирізати:"
 
-#: tortoisehg\hgtk\thgstrip.py:79
+#: tortoisehg\hgtk\thgstrip.py:93
 msgid "Preview:"
 msgstr "Попередній перегляд:"
 
-#: tortoisehg\hgtk\thgstrip.py:98
+#: tortoisehg\hgtk\thgstrip.py:112
 msgid "Show all"
 msgstr "Показати все"
 
-#: tortoisehg\hgtk\thgstrip.py:101
+#: tortoisehg\hgtk\thgstrip.py:115
 msgid "Use compact view"
 msgstr "Use compact view"
 
-#: tortoisehg\hgtk\thgstrip.py:117
+#: tortoisehg\hgtk\thgstrip.py:131
 msgid "Options:"
 msgstr "Параметри:"
 
-#: tortoisehg\hgtk\thgstrip.py:121
+#: tortoisehg\hgtk\thgstrip.py:135
 msgid "Discard local changes, no backup (-f/--force)"
 msgstr "Discard local changes, no backup (-f/--force)"
 
-#: tortoisehg\hgtk\thgstrip.py:152
+#: tortoisehg\hgtk\thgstrip.py:166
 msgid "Backup all (default)"
 msgstr "Резервна копія всього (за замовченням)"
 
-#: tortoisehg\hgtk\thgstrip.py:153
+#: tortoisehg\hgtk\thgstrip.py:167
 msgid "Backup unrelated changesets (-b/--backup)"
 msgstr "Backup unrelated changesets (-b/--backup)"
 
-#: tortoisehg\hgtk\thgstrip.py:155
+#: tortoisehg\hgtk\thgstrip.py:169
 msgid "No backup (-n/--nobackup)"
 msgstr "Без резервної копії (-n/--nobackup)"
 
-#: tortoisehg\hgtk\thgstrip.py:182
+#: tortoisehg\hgtk\thgstrip.py:196
 msgid "Unknown revision!"
 msgstr "Невідома редакція!"
 
-#: tortoisehg\hgtk\thgstrip.py:184
+#: tortoisehg\hgtk\thgstrip.py:198
 msgid "<span weight=\"bold\">%s changesets</span> will be stripped"
 msgstr "<span weight=\"bold\">%s changesets</span> will be stripped"
 
-#: tortoisehg\hgtk\thgstrip.py:190
+#: tortoisehg\hgtk\thgstrip.py:204
 msgid "No changesets to display"
 msgstr "Немає наборів змін для показу"
 
-#: tortoisehg\hgtk\thgstrip.py:194
+#: tortoisehg\hgtk\thgstrip.py:208
 msgid "Displaying all changesets"
 msgstr "Показувати всі набори змін"
 
-#: tortoisehg\hgtk\thgstrip.py:196
+#: tortoisehg\hgtk\thgstrip.py:210
 msgid "Displaying %(count)d of %(total)d changesets"
 msgstr "Відображається %(кількість)d of %(загалом)d наборів змін"
 
-#: tortoisehg\hgtk\thgstrip.py:359
+#: tortoisehg\hgtk\thgstrip.py:374
 msgid "Confirm Strip"
 msgstr "Confirm Strip"
 
-#: tortoisehg\hgtk\thgstrip.py:360
+#: tortoisehg\hgtk\thgstrip.py:375
 msgid ""
 "Detected uncommitted local changes.\n"
 "Do you want to discard them and continue?"
@@ -4677,27 +4672,27 @@ msgstr ""
 "Detected uncommitted local changes.\n"
 "Do you want to discard them and continue?"
 
-#: tortoisehg\hgtk\thgstrip.py:362
+#: tortoisehg\hgtk\thgstrip.py:377
 msgid "&Yes (--force)"
 msgstr "&Так (--force)"
 
-#: tortoisehg\hgtk\thgstrip.py:380
+#: tortoisehg\hgtk\thgstrip.py:395
 msgid "Stripped successfully"
 msgstr "Stripped successfully"
 
-#: tortoisehg\hgtk\thgstrip.py:383
+#: tortoisehg\hgtk\thgstrip.py:398
 msgid "Canceled stripping"
 msgstr "Canceled stripping"
 
-#: tortoisehg\hgtk\thgstrip.py:385
+#: tortoisehg\hgtk\thgstrip.py:400
 msgid "Failed to strip"
 msgstr "Failed to strip"
 
-#: tortoisehg\hgtk\thgstrip.py:404
+#: tortoisehg\hgtk\thgstrip.py:419
 msgid "Saved at: %s"
 msgstr "Збережено: %s"
 
-#: tortoisehg\hgtk\thgstrip.py:408
+#: tortoisehg\hgtk\thgstrip.py:423
 msgid "Open..."
 msgstr "Відкрити..."
 
@@ -4771,23 +4766,23 @@ msgstr "Merge - allow to merge with local changes"
 msgid "Confirm Update"
 msgstr "Підтвердіть Оновлення"
 
-#: tortoisehg\hgtk\update.py:267
+#: tortoisehg\hgtk\update.py:269
 msgid "[canceled by user]\n"
 msgstr "[закінчено користувачем]\n"
 
-#: tortoisehg\hgtk\update.py:272
+#: tortoisehg\hgtk\update.py:274
 msgid "invalid dialog result: %s"
 msgstr "invalid dialog result: %s"
 
-#: tortoisehg\hgtk\update.py:281
+#: tortoisehg\hgtk\update.py:283
 msgid "Updated successfully"
 msgstr "Успішно оновлений"
 
-#: tortoisehg\hgtk\update.py:283
+#: tortoisehg\hgtk\update.py:285
 msgid "Canceled updating"
 msgstr "Canceled updating"
 
-#: tortoisehg\hgtk\update.py:285
+#: tortoisehg\hgtk\update.py:287
 msgid "Failed to update"
 msgstr "Failed to update"
 
@@ -5248,6 +5243,9 @@ msgstr "Сінхронізувати з відсталим сховищем"
 
 #~ msgid "_view at revision"
 #~ msgstr "показати для версії"
+
+#~ msgid "Launch synchronize tool"
+#~ msgstr "Запустити інструмент сінхронізації"
 
 #~ msgid "diff to local"
 #~ msgstr "різниця в порівнянні з локальним"
