@@ -69,7 +69,7 @@ def rename_resp(dlg, response):
             targetdir = os.path.dirname(new_name) or '.'
             if not os.path.isdir(targetdir):
                 os.makedirs(targetdir)
-            util.copyfile(dlg.orig, new_name)
+            shutil.move(dlg.orig, new_name)
             commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
         except (OSError, IOError, util.Abort, hglib.RepoError), inst:
