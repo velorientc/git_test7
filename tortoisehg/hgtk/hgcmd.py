@@ -28,7 +28,7 @@ class CmdDialog(gtk.Dialog):
             self.cmdlist = []
         title = text or ' '.join(cmdline)
         if len(title) > 80:
-            title = title[:80] + '...'
+            title = hglib.tounicode(title)[:80] + '...'
         title = hglib.toutf(title.replace('\n', ' '))
         gtk.Dialog.__init__(self, title=title, flags=gtk.DIALOG_MODAL)
         self.set_has_separator(False)

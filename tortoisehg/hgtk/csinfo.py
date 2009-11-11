@@ -220,11 +220,11 @@ class SummaryInfo(object):
             elif item == 'desc':
                 return hglib.toutf(ctx.description().replace('\0', ''))
             elif item == 'summary':
-                desc = self.get_data('desc', *args)
-                value = desc.split('\n')[0][:80]
+                value = ctx.description().replace('\0', '').split('\n')[0]
+                value = hglib.tounicode(value[:80])
                 if len(value) == 0:
                     return  None
-                return value
+                return hglib.toutf(value)
             elif item == 'user':
                 return hglib.toutf(ctx.user())
             elif item == 'dateage':
