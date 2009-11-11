@@ -15,15 +15,20 @@ from mercurial import hg, ui, util, commands
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
-from tortoisehg.hgtk import dialog
+from tortoisehg.hgtk import dialog, gdialog
 
 def run(ui, *pats, **opts):
     fname, target = '', ''
+    cwd = os.getcwd()
+    root = paths.find_root(cwd)
     try:
-        fname = pats[0]
-        target = pats[1]
+        fname = util.canonpath(root, cwd, pats[0])
+        target = util.canonpath(root, cwd, pats[1])
+    except util.Abort, e:
+        return gdialog.Prompt("invalid path", str(e), None)
     except IndexError:
         pass
+    os.chdir(root)
     fname = util.normpath(fname)
     if target:
         target = hglib.toutf(util.normpath(target))
