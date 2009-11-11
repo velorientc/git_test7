@@ -9,6 +9,7 @@ import os
 import sys
 import gtk
 import cStringIO
+import shutil
 
 from mercurial import hg, ui, util, commands
 
@@ -65,10 +66,13 @@ def rename_resp(dlg, response):
         repo.ui.quiet = True
         try:
             new_name = util.canonpath(root, root, new_name)
-            os.rename(dlg.orig, new_name)
+            targetdir = os.path.dirname(new_name) or '.'
+            if not os.path.isdir(targetdir):
+                os.makedirs(targetdir)
+            util.copyfile(dlg.orig, new_name)
             commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
-        except (OSError, util.Abort, hglib.RepoError), inst:
+        except (OSError, IOError, util.Abort, hglib.RepoError), inst:
             dialog.error_dialog(None, _('rename error'), str(inst))
             toquit = False
     finally:
