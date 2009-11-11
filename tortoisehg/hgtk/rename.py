@@ -64,6 +64,7 @@ def rename_resp(dlg, response):
         repo.ui.pushbuffer()
         repo.ui.quiet = True
         try:
+            new_name = util.canonpath(root, root, new_name)
             os.rename(dlg.orig, new_name)
             commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
