@@ -891,8 +891,8 @@ class GCommit(GStatus):
             self.msg_config(None)
             return False
         
-        lines = buf.get_text(buf.get_start_iter(),
-                             buf.get_end_iter()).splitlines()
+        lines = hglib.tounicode(buf.get_text(buf.get_start_iter(),
+                                             buf.get_end_iter())).splitlines()
         
         if sumlen and len(lines[0].rstrip()) > sumlen:
             resp = gdialog.Confirm(_('Confirm Commit'), [], self,

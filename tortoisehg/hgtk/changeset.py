@@ -447,8 +447,8 @@ class ChangeSet(gdialog.GDialog):
             return gtklib.markup(revid, **opts)
         def data_func(widget, item, ctx):
             def summary_line(desc):
-                desc = desc.replace('\0', '')
-                return hglib.toutf(desc.split('\n')[0][:80])
+                desc = hglib.tounicode(desc.replace('\0', '').split('\n')[0])
+                return hglib.toutf(desc[:80])
             def revline_data(ctx, hl=False, branch=None):
                 if isinstance(ctx, basestring):
                     return ctx
