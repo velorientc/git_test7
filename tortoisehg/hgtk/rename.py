@@ -5,24 +5,31 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
 import sys
 import gtk
 import cStringIO
+import shutil
 
 from mercurial import hg, ui, util, commands
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
-from tortoisehg.hgtk import dialog
+from tortoisehg.hgtk import dialog, gdialog
 
 def run(ui, *pats, **opts):
     fname, target = '', ''
+    cwd = os.getcwd()
+    root = paths.find_root(cwd)
     try:
-        fname = pats[0]
-        target = pats[1]
+        fname = util.canonpath(root, cwd, pats[0])
+        target = util.canonpath(root, cwd, pats[1])
+    except util.Abort, e:
+        return gdialog.Prompt("invalid path", str(e), None)
     except IndexError:
         pass
+    os.chdir(root)
     fname = util.normpath(fname)
     if target:
         target = hglib.toutf(util.normpath(target))
@@ -47,7 +54,7 @@ def rename_resp(dlg, response):
     new_name = hglib.fromutf(dlg.entry.get_text())
     opts = {}
     opts['force'] = False # Checkbox? Nah.
-    opts['after'] = False
+    opts['after'] = True
     opts['dry_run'] = False
 
     saved = sys.stderr
@@ -58,16 +65,21 @@ def rename_resp(dlg, response):
         repo.ui.pushbuffer()
         repo.ui.quiet = True
         try:
+            new_name = util.canonpath(root, root, new_name)
+            targetdir = os.path.dirname(new_name) or '.'
+            if not os.path.isdir(targetdir):
+                os.makedirs(targetdir)
+            util.copyfile(dlg.orig, new_name)
             commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
-        except (util.Abort, hglib.RepoError), inst:
-            dlg.error_dialog(None, _('rename error'), str(inst))
+        except (OSError, IOError, util.Abort, hglib.RepoError), inst:
+            dialog.error_dialog(None, _('rename error'), str(inst))
             toquit = False
     finally:
         sys.stderr = saved
         textout = errors.getvalue() + repo.ui.popbuffer()
         errors.close()
         if len(textout) > 1:
-            dlg.error_dialog(None, _('rename error'), textout)
+            dialog.error_dialog(None, _('rename error'), textout)
         elif toquit:
             dlg.destroy()
