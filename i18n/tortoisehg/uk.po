@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-11-07 00:18+0000\n"
-"PO-Revision-Date: 2009-11-08 00:10+0000\n"
+"PO-Revision-Date: 2009-11-10 13:52+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-09 04:41+0000\n"
+"X-Launchpad-Export-Date: 2009-11-11 04:47+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -1160,7 +1160,7 @@ msgstr "номер редакції, ID набору змін, гілка та �
 
 #: tortoisehg\hgtk\gorev.py:58
 msgid "Ambiguous Revision"
-msgstr ""
+msgstr "Неоднозначна редакція"
 
 #: tortoisehg\hgtk\gorev.py:62
 msgid "Invalid Revision"
@@ -1321,7 +1321,7 @@ msgstr "Налаштувати параметри email"
 
 #: tortoisehg\hgtk\hgemail.py:57
 msgid "Email outgoing changes"
-msgstr ""
+msgstr "Відправити по пошті вихідні зміни"
 
 #: tortoisehg\hgtk\hgemail.py:59
 msgid "Email revisions "
@@ -2241,15 +2241,15 @@ msgstr "Надіслати латку електронною поштою"
 
 #: tortoisehg\hgtk\history.py:719
 msgid "_Bundle rev:tip..."
-msgstr "_Пакет версія:підказка..."
+msgstr "_Пакет редакція:підказка..."
 
 #: tortoisehg\hgtk\history.py:721
 msgid "Add/Remove _Tag..."
-msgstr "Додати/Видалити _Мітку..."
+msgstr "Додати/видалити _Мітку..."
 
 #: tortoisehg\hgtk\history.py:722
 msgid "Backout Revision..."
-msgstr "Повернутися назад до Версії..."
+msgstr "Назад з редакції..."
 
 #: tortoisehg\hgtk\history.py:724 tortoisehg\hgtk\status.py:1510
 msgid "_Revert"
@@ -2261,7 +2261,7 @@ msgstr "_Архів..."
 
 #: tortoisehg\hgtk\history.py:743
 msgid "Transp_lant to local"
-msgstr "Трансплантація до місцевого"
+msgstr "Місцевий трансплантант"
 
 #: tortoisehg\hgtk\history.py:748
 msgid "qimport"
@@ -2269,7 +2269,7 @@ msgstr "Швидкий імпорт"
 
 #: tortoisehg\hgtk\history.py:749
 msgid "Strip Revision..."
-msgstr "Пошматована Редакція..."
+msgstr "Порізана редакція..."
 
 #: tortoisehg\hgtk\history.py:781
 msgid "_Diff with selected"
