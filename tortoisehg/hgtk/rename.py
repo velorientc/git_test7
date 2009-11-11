@@ -5,6 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
 import sys
 import gtk
 import cStringIO
@@ -47,7 +48,7 @@ def rename_resp(dlg, response):
     new_name = hglib.fromutf(dlg.entry.get_text())
     opts = {}
     opts['force'] = False # Checkbox? Nah.
-    opts['after'] = False
+    opts['after'] = True
     opts['dry_run'] = False
 
     saved = sys.stderr
@@ -58,9 +59,10 @@ def rename_resp(dlg, response):
         repo.ui.pushbuffer()
         repo.ui.quiet = True
         try:
+            os.rename(dlg.orig, new_name)
             commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
-        except (util.Abort, hglib.RepoError), inst:
+        except (OSError, util.Abort, hglib.RepoError), inst:
             dlg.error_dialog(None, _('rename error'), str(inst))
             toquit = False
     finally:
