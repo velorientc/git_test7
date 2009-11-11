@@ -482,9 +482,10 @@ class PBranchWidget(gtk.VBox):
             self.list.set_sensitive(True)
             self.btn['menu'].set_sensitive(True)
             in_pbranch = True #TODO
+            is_merge = len(self.repo.parents()) > 1
             self.btn['pmerge'].set_sensitive(in_pbranch)
             self.btn['pbackout'].set_sensitive(in_pbranch)
-            self.btn['pnew'].set_sensitive(True)
+            self.btn['pnew'].set_sensitive(not is_merge)
             self.btn['reapply'].set_sensitive(True)
         else:
             self.list.set_sensitive(False)
@@ -520,8 +521,9 @@ class PBranchWidget(gtk.VBox):
         has_pbranch = self.has_pbranch()
         is_current = self.has_patch() and self.cur_patch() == row[M_NAME]
         is_patch = row[M_NAME] != 'default'
+        is_merge = len(self.repo.branchheads(row[M_NAME])) > 1
 
-        if has_pbranch:
+        if has_pbranch and not is_merge:
             append(_('_new'), self.pnew_activated)
         if not is_current:
             append(_('_goto (update workdir)'), self.goto_activated)
