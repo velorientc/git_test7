@@ -68,13 +68,13 @@ def rename_resp(dlg, response):
             commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
         except (OSError, util.Abort, hglib.RepoError), inst:
-            dlg.error_dialog(None, _('rename error'), str(inst))
+            dialog.error_dialog(None, _('rename error'), str(inst))
             toquit = False
     finally:
         sys.stderr = saved
         textout = errors.getvalue() + repo.ui.popbuffer()
         errors.close()
         if len(textout) > 1:
-            dlg.error_dialog(None, _('rename error'), textout)
+            dialog.error_dialog(None, _('rename error'), textout)
         elif toquit:
             dlg.destroy()
