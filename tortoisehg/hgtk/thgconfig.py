@@ -1063,6 +1063,14 @@ class ConfigDialog(gtk.Dialog):
                     break
                 except (IOError, OSError):
                     pass
+            else:
+                gdialog.Prompt(_('Unable to create a Mercurial.ini file'),
+                       _('Insufficient access rights, reverting to read-only'
+                         'mode.'), self).run()
+                from mercurial import config
+                self.fn = rcpath[0]
+                cfg = config.config()
+                return cfg
         self.fn = fn
         try:
             import iniparse
