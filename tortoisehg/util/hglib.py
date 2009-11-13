@@ -236,3 +236,5 @@ def validate_synch_path(path, repo):
             return_path = path_aux
     return return_path
 
+def get_repo_bookmarks(repo):
+    return repo._bookmarks.keys()
