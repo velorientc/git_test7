@@ -227,7 +227,7 @@ class PBranchWidget(gtk.VBox):
 
         # compute model data
         self.model.clear()
-        opts = {}
+        opts = {'tips': True}
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
         graph = mgr.graphforopts(opts)
         if not self.get_property('show-internal-branches'):
