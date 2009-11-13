@@ -719,7 +719,9 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
         m.append_sep()
         m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
-        m.append(create_menu(_('Add/Remove B_ookmark...'), self.add_bookmark))
+        if 'bookmarks' in self.exs:
+            m.append(create_menu(_('Add/Remove B_ookmark...'), 
+                                   self.add_bookmark))
         cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
         m.append(cmenu_backout)
         m.append(create_menu(_('_Revert'), self.revert))
