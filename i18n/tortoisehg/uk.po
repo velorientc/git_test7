@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-11-07 00:18+0000\n"
-"PO-Revision-Date: 2009-11-10 13:52+0000\n"
+"PO-Revision-Date: 2009-11-11 10:17+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-11 04:47+0000\n"
+"X-Launchpad-Export-Date: 2009-11-12 04:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -2277,31 +2277,31 @@ msgstr "_Різниця з обраним"
 
 #: tortoisehg\hgtk\history.py:782
 msgid "Visual Diff with selected"
-msgstr "Visual Diff з обраним"
+msgstr "Показати різниці з обраним"
 
 #: tortoisehg\hgtk\history.py:791
 msgid "Email from here to selected..."
-msgstr "Email звідси до вибраного..."
+msgstr "Відправити поштою звідси до вибраного..."
 
 #: tortoisehg\hgtk\history.py:793
 msgid "Bundle from here to selected..."
-msgstr "Пакети звідси вибрані..."
+msgstr "Пакети вибрані звідси..."
 
 #: tortoisehg\hgtk\history.py:795
 msgid "Export Patches from here to selected..."
-msgstr "Експорт пакетів звідси вибраних..."
+msgstr "Експорт пакетів вибраних звідси..."
 
 #: tortoisehg\hgtk\history.py:814
 msgid "Transplant Revision range to local"
-msgstr "Пересадка діапазону редакцій до місцевого"
+msgstr "Пересадка діапазону редакцій місцевому"
 
 #: tortoisehg\hgtk\history.py:819
 msgid "Rebase on top of selected"
-msgstr "Зміна бази даний на крок вище вибраної"
+msgstr "Зміна бази на крок вище вибраної"
 
 #: tortoisehg\hgtk\history.py:824
 msgid "qimport from here to selected"
-msgstr "qimport from here to selected"
+msgstr "Швидко імпортувати це до вибраного"
 
 #: tortoisehg\hgtk\history.py:855
 msgid "Load more"
@@ -2325,11 +2325,11 @@ msgstr "Завантажити та переглянути вхідні набо
 
 #: tortoisehg\hgtk\history.py:902
 msgid "Accept changes from Bundle preview"
-msgstr "Приймати зміни при попередньому перегляді Пакета"
+msgstr "Прийняти зміни при попередньому перегляді пакета"
 
 #: tortoisehg\hgtk\history.py:904
 msgid "Reject changes from Bundle preview"
-msgstr "Видавати зміни при попередньому перегляді Пакета"
+msgstr "Видавати зміни при попередньому перегляді пакета"
 
 #: tortoisehg\hgtk\history.py:906
 msgid "Pull incoming changesets"
@@ -2337,19 +2337,19 @@ msgstr "Отримати вхідні набори змін"
 
 #: tortoisehg\hgtk\history.py:909
 msgid "Determine and mark outgoing changesets"
-msgstr "Determine and mark outgoing changesets"
+msgstr "Визначити та відмітити вихідні набори змін"
 
 #: tortoisehg\hgtk\history.py:911
 msgid "Push outgoing changesets"
-msgstr "Передати набори змін назовні"
+msgstr "Передати набори змін"
 
 #: tortoisehg\hgtk\history.py:913
 msgid "Email outgoing changesets"
-msgstr "Email outgoing changesets"
+msgstr "Відправити поштою вихідний набір змін"
 
 #: tortoisehg\hgtk\history.py:916
 msgid "Stop current transaction"
-msgstr "Зупинити поточну операцію"
+msgstr "Зупинити поточну справу"
 
 #: tortoisehg\hgtk\history.py:941
 msgid "After Pull:"
@@ -2390,11 +2390,11 @@ msgstr "Походження"
 
 #: tortoisehg\hgtk\history.py:1004
 msgid "Merges"
-msgstr "Обєднати"
+msgstr "Об'єднати"
 
 #: tortoisehg\hgtk\history.py:1008
 msgid "Hide Merges"
-msgstr "Приховане обєднання"
+msgstr "Приховане об'єднання"
 
 #: tortoisehg\hgtk\history.py:1015
 msgid "Branch Filter"
@@ -2410,7 +2410,7 @@ msgstr "Налаштування фільтру"
 
 #: tortoisehg\hgtk\history.py:1036
 msgid "File Patterns"
-msgstr "Взірці файла"
+msgstr "Файл взірців"
 
 #: tortoisehg\hgtk\history.py:1036
 msgid "Rev Range"
@@ -2428,7 +2428,7 @@ msgstr "Ключові слова"
 #: tortoisehg\hgtk\history.py:1301 tortoisehg\hgtk\history.py:1363
 #: tortoisehg\hgtk\history.py:1741
 msgid "No remote path specified"
-msgstr "Відсутній вказаний віддалений шлях"
+msgstr "Не вказано віддалений шлях"
 
 #: tortoisehg\hgtk\history.py:1170 tortoisehg\hgtk\history.py:1280
 #: tortoisehg\hgtk\history.py:1302 tortoisehg\hgtk\history.py:1364
@@ -2438,7 +2438,7 @@ msgstr "Будь-ласка, введіть або оберіть віддале
 
 #: tortoisehg\hgtk\history.py:1203
 msgid "Accept incoming previewed changesets"
-msgstr "Приймати вхідні попередньо переглянуті набори змін"
+msgstr "Прийняти вхідні, попередньо переглянуті, набори змін"
 
 #: tortoisehg\hgtk\history.py:1204
 msgid "Accept"
@@ -2446,7 +2446,7 @@ msgstr "Прийняти"
 
 #: tortoisehg\hgtk\history.py:1209
 msgid "Reject incoming previewed changesets"
-msgstr "Відхиляти вхідні попередньо переглянуті набори змін"
+msgstr "Відхилити вхідні, попередньо переглянуті, набори змін"
 
 #: tortoisehg\hgtk\history.py:1210
 msgid "Reject"
@@ -2454,7 +2454,7 @@ msgstr "Відхилити"
 
 #: tortoisehg\hgtk\history.py:1251
 msgid "Bundle Preview"
-msgstr "Попередній перегляд Пакету"
+msgstr "Попередній перегляд пакету"
 
 #: tortoisehg\hgtk\history.py:1256
 msgid "Open Bundle"
