@@ -73,6 +73,10 @@ class PBranchWidget(gtk.VBox):
         'repo-invalidated': (gobject.SIGNAL_RUN_FIRST,
                              gobject.TYPE_NONE,
                              ()),
+        'patch-selected': (gobject.SIGNAL_RUN_FIRST,
+                           gobject.TYPE_NONE,
+                           (int,  # revision number for patch head
+                            str)) # patch name
     }
 
     def __init__(self, parentwin, repo, statusbar, accelgroup=None, tooltips=None):
@@ -148,6 +152,7 @@ class PBranchWidget(gtk.VBox):
         # To support old PyGTK (<2.12)
         if hasattr(self.list, 'set_tooltip_column'):
             self.list.set_tooltip_column(M_MSGESC)
+        self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
         self.list.connect('row-activated', self.list_row_activated)
         self.list.connect('size-allocate', self.list_size_allocated)
@@ -396,6 +401,18 @@ class PBranchWidget(gtk.VBox):
         cmdline = ['hg', 'peditmessage', patch_name]
         self.cmd.execute(cmdline, self.cmd_done)
         
+    def pdiff(self, patch_name):
+        """
+        [pbranch] Execute 'pdiff --tips' command.
+        
+        :param patch_name: Name of patch-branch
+        :retv: list of lines of generated patch
+        """
+        opts = {}
+        mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
+        graph = mgr.graphattips()
+        return graph.diff(patch_name, None, opts)
+
     def pnew_ui(self):
         """
         Create new patch.

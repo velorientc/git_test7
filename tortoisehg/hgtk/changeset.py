@@ -191,6 +191,16 @@ class ChangeSet(gdialog.GWindow):
 
     def load_patch_details(self, patchfile):
         'Load specified patch details into buffer and file list'
+        pf = open(patchfile)
+        self.load_patch_details_from_file_object(pf, patchfile)
+        
+    def load_patch_details_from_file_object(self, pf, patchfile, isTemp=False):
+        """ Load patch details into buffer and file list
+        :param pf: open file object
+        :param patchfile: path and name of patch file
+        :param isTemp: if True, then pf is a temporary file 
+            and patchfile does not exist
+        """
         self._filelist.clear()
         self._filelist.append(('*', _('[All Files]'), ''))
 
@@ -198,7 +208,11 @@ class ChangeSet(gdialog.GWindow):
         self.currev = -1
         self.curphunks = {}
         self.curpatch = patchfile
-        pf = open(self.curpatch)
+        if isTemp:
+            # pf is a temporary, so update panel cache while we can
+            patch_ctx = csinfo.patchctx(patchfile, self.repo, patchHandle=pf)
+            self.summarypanel.update(patch_ctx, self.patchstyle)
+            pf.seek(0)
         def get_path(a, b):
             type = (a == '/dev/null') and 'A' or 'M'
             type = (b == '/dev/null') and 'R' or type

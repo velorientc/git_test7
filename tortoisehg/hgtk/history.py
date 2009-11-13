@@ -834,6 +834,22 @@ class GLog(gdialog.GWindow):
         else:
             self.goto_rev(revid)
 
+    def pbranch_selected(self, pbranchwidget, revid, patchname):
+        'if revid < 0 then the patch is listed in .hg/pgraph but not in repo'
+        self.stbar.set_status_text('')
+        pf = tempfile.TemporaryFile()
+        try:
+            try:
+                pf.writelines(pbranchwidget.pdiff(patchname))
+            except (util.Abort, hglib.RepoError), e:
+                self.stbar.set_status_text(str(e))
+                return
+            self.currevid = self.lastrevid = None
+            pf.seek(0)
+            self.changeview.load_patch_details_from_file_object(pf, patchname, isTemp=True)
+        finally:
+            pf.close()
+
     def repo_invalidated(self, widget):
         'Emitted from MQWidget and PBranchWidget'
         self.reload_log()
@@ -1557,6 +1573,7 @@ class GLog(gdialog.GWindow):
             # create PBranchWidget
             self.pbranchwidget = thgpbranch.PBranchWidget(
                 self, self.repo, self.stbar, accelgroup, self.tooltips)
+            self.pbranchwidget.connect('patch-selected', self.pbranch_selected)
             self.pbranchwidget.connect('repo-invalidated', self.repo_invalidated)
 
             def wrapframe(widget):

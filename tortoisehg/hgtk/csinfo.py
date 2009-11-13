@@ -136,18 +136,31 @@ def PatchContext(repo, patchpath, cache={}):
 
 class patchctx(object):
 
-    def __init__(self, patchpath, repo):
+    def __init__(self, patchpath, repo, patchHandle=None):
+        """ Read patch context from file
+        :param patchHandle: If set, then the patch is a temporary.
+            The provided handle is used to read the patch and
+			the patchpath contains the name of the patch. 
+            The handle is NOT closed.
+        """
         self._path = patchpath
         self._patchname = os.path.basename(patchpath)
         self._repo = repo
-        pf = open(patchpath)
+        if patchHandle:
+            pf = patchHandle
+            pf_start_pos = pf.tell()
+        else:
+            pf = open(patchpath)
         try:
             data = patch.extract(self._repo.ui, pf)
             tmpfile, msg, user, date, branch, node, p1, p2 = data
             if tmpfile:
                 os.unlink(tmpfile)
         finally:
-            pf.close()
+            if patchHandle:
+                pf.seek(pf_start_pos)
+            else:
+                pf.close()
         if not msg and hasattr(repo, 'mq'):
             # attempt to get commit message
             from hgext import mq
@@ -469,6 +482,13 @@ class SummaryBase(object):
         return self.info.get_widget(item, self, self.ctx, self.custom, **kargs)
 
     def update(self, target=None, custom=None, repo=None):
+        self.ctx = None
+        if type(target) == patchctx:
+            # If a patchctx is specified as target, use it instead
+			# of creating a context from revision or patch file
+            self.ctx = target
+            target = None
+            self.target = None
         if target is None:
             target = self.target
         if target is not None:
@@ -480,7 +500,8 @@ class SummaryBase(object):
             repo = self.repo
         if repo is not None:
             self.repo = repo
-        self.ctx = create_context(repo, target)
+        if self.ctx is None:
+            self.ctx = create_context(repo, target)
         if self.ctx is None:
             return False # cannot update
         return True
