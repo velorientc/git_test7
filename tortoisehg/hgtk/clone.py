@@ -77,7 +77,8 @@ class CloneDialog(gtk.Dialog):
             if bundle:
                 # bundle button
                 bundlebtn = gtk.Button(_('Bundle...'))
-                bundlebtn.connect('clicked', self.bundle_clicked, title, entry)
+                bundlebtn.connect('clicked', self.bundle_clicked, 
+                                  _('Select a Mercurial Bundle'), entry)
                 table.add_row(label, combo, 0, browse, bundlebtn)
             else:
                 table.add_row(label, combo, 0, browse)
