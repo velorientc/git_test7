@@ -722,6 +722,8 @@ class GLog(gdialog.GDialog):
         if 'bookmarks' in self.exs:
             m.append(create_menu(_('Add/Remove B_ookmark...'), 
                                    self.add_bookmark))
+            m.append(create_menu(_('Rename Bookmark...'), 
+                                   self.rename_bookmark))
             m.append_sep()
 
         cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
@@ -1738,6 +1740,21 @@ class GLog(gdialog.GDialog):
                                           hglib.get_repo_bookmarks(self.repo))
 
         dialog = bookmark.BookmarkAddDialog(self.repo, rev=str(rev))
+        dialog.connect('destroy', refresh)
+        self.show_dialog(dialog)
+
+    def rename_bookmark(self, menuitem):
+        # save bookmark info for detecting new bookmarks added
+        oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
+        oldlen = len(self.repo)
+        rev = self.currevid
+
+        def refresh(*args):
+            self.refresh_on_marker_change(oldlen, 
+                                          oldbookmarks, 
+                                          hglib.get_repo_bookmarks(self.repo))
+
+        dialog = bookmark.BookmarkRenameDialog(self.repo, rev=str(rev))
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
 
