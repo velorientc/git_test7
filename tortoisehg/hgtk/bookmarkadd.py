@@ -77,9 +77,8 @@ class BookmarkAddDialog(gtk.Dialog):
         bookmarks = hglib.get_repo_bookmarks(self.repo) 
         bookmarks.sort()
         for bookmarkname in bookmarks:
-            if bookmarkname == "tip":
-                continue
-            self._bookmarkslist.append([bookmarkname])
+            if bookmarkname != "tip":
+                self._bookmarkslist.append([bookmarkname])
 
     def dialog_response(self, dialog, response_id):
         if response_id == gtk.RESPONSE_CLOSE \
@@ -143,8 +142,6 @@ class BookmarkAddDialog(gtk.Dialog):
         if name in hglib.get_repo_bookmarks(self.repo):
             raise util.Abort(_('a bookmark named "%s" already exists') % name)
 
-        ctx = self.repo[revision]
-        r = ctx.node()
         bookmarks.bookmark(ui=ui.ui(), 
                            repo=self.repo, 
                            rev=revision, 
