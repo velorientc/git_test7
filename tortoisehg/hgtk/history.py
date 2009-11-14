@@ -1904,7 +1904,7 @@ class GLog(gdialog.GDialog):
         lookup = self.repo.lookup
         ancestor = changelog.ancestor(lookup(rev1), lookup(rev2))
         rev = changelog.rev(ancestor)
-        self.graphview.set_revision_id(rev, True)
+        self.goto_rev(rev)
 
     def thgrefresh(self, window):
         self.reload_log()
