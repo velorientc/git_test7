@@ -25,7 +25,7 @@ from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
-from tortoisehg.hgtk import statusbar, bookmarkadd
+from tortoisehg.hgtk import statusbar, bookmark
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
@@ -1737,7 +1737,7 @@ class GLog(gdialog.GDialog):
                                           oldbookmarks, 
                                           hglib.get_repo_bookmarks(self.repo))
 
-        dialog = bookmarkadd.BookmarkAddDialog(self.repo, rev=str(rev))
+        dialog = bookmark.BookmarkAddDialog(self.repo, rev=str(rev))
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
 
