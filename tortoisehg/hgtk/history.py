@@ -722,6 +722,8 @@ class GLog(gdialog.GDialog):
         if 'bookmarks' in self.exs:
             m.append(create_menu(_('Add/Remove B_ookmark...'), 
                                    self.add_bookmark))
+            m.append_sep()
+
         cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
         m.append(cmenu_backout)
         m.append(create_menu(_('_Revert'), self.revert))
