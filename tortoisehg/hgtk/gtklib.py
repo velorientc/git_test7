@@ -317,7 +317,7 @@ class NativeFolderSelectDialog:
         return fname
 
     def runCompatible(self):
-        dialog = gtk.FileChooserDialog(title=None,
+        dialog = gtk.FileChooserDialog(title=self.title,
                 action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                 buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))

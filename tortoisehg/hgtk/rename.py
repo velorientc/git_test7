@@ -26,7 +26,7 @@ def run(ui, *pats, **opts):
         fname = util.canonpath(root, cwd, pats[0])
         target = util.canonpath(root, cwd, pats[1])
     except util.Abort, e:
-        return gdialog.Prompt("invalid path", str(e), None)
+        return gdialog.Prompt(_('Invalid path'), str(e), None)
     except IndexError:
         pass
     os.chdir(root)

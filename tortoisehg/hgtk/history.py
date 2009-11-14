@@ -25,7 +25,7 @@ from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
-from tortoisehg.hgtk import statusbar
+from tortoisehg.hgtk import statusbar, bookmarkadd
 
 def create_menu(label, callback):
     menuitem = gtk.MenuItem(label, True)
@@ -719,6 +719,9 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
         m.append_sep()
         m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
+        if 'bookmarks' in self.exs:
+            m.append(create_menu(_('Add/Remove B_ookmark...'), 
+                                   self.add_bookmark))
         cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
         m.append(cmenu_backout)
         m.append(create_menu(_('_Revert'), self.revert))
@@ -1109,6 +1112,15 @@ class GLog(gdialog.GDialog):
     def get_extras(self):
         return self.stbar
 
+    def refresh_on_marker_change(self, oldlen, oldmarkers, newmarkers):
+        self.repo.invalidate()
+        self.changeview.clear_cache()
+        if len(self.repo) != oldlen:
+            self.reload_log()
+        else:
+            if newmarkers != oldmarkers:
+                self.refresh_model()
+        
     def apply_clicked(self, button):
         combo = self.ppullcombo
         list, iter = combo.get_model(), combo.get_active_iter()
@@ -1333,7 +1345,7 @@ class GLog(gdialog.GDialog):
                 self.stbar.end()
                 self.outgoing = outgoing
                 self.reload_log()
-                text = _('%d outgoing changesets') % len(outgoing)
+                text = _('%d outgoing Changesets') % len(outgoing)
                 self.stbar.set_idle_text(text)
                 self.stop_button.disconnect(stop_handler)
                 self.stop_button.set_sensitive(False)
@@ -1706,16 +1718,24 @@ class GLog(gdialog.GDialog):
         rev = self.currevid
 
         def refresh(*args):
-            self.repo.invalidate()
-            self.changeview.clear_cache()
-            if len(self.repo) != oldlen:
-                self.reload_log()
-            else:
-                newtags = self.repo.tagslist()
-                if newtags != oldtags:
-                    self.refresh_model()
+            self.refresh_on_marker_change(oldlen, oldtags, self.repo.tagslist())
 
         dialog = tagadd.TagAddDialog(self.repo, rev=str(rev))
+        dialog.connect('destroy', refresh)
+        self.show_dialog(dialog)
+
+    def add_bookmark(self, menuitem):
+        # save bookmark info for detecting new bookmarks added
+        oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
+        oldlen = len(self.repo)
+        rev = self.currevid
+
+        def refresh(*args):
+            self.refresh_on_marker_change(oldlen, 
+                                          oldbookmarks, 
+                                          hglib.get_repo_bookmarks(self.repo))
+
+        dialog = bookmarkadd.BookmarkAddDialog(self.repo, rev=str(rev))
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
 
