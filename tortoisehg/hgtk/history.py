@@ -776,7 +776,8 @@ class GLog(gdialog.GDialog):
 
     def restore_single_sel(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
-        self.tree.get_selection().select_path(self.origsel)
+        if self.origsel:
+            self.tree.get_selection().select_path(self.origsel)
         self.revrange = None
 
     def tree_diff_context_menu(self):
@@ -1905,6 +1906,7 @@ class GLog(gdialog.GDialog):
         ancestor = changelog.ancestor(lookup(rev1), lookup(rev2))
         rev = changelog.rev(ancestor)
         self.goto_rev(rev)
+        self.origsel = None
 
     def thgrefresh(self, window):
         self.reload_log()
