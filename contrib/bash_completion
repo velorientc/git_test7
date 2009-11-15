@@ -1,0 +1,14 @@
+_hgtk()
+{
+       local cur prev opts
+
+       COMPREPLY=()
+       cur="${COMP_WORDS[COMP_CWORD]}"
+       prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+       opts="about add annotate archive blame checkout clone commit datamine diff filter email forget grep guess hgignore history ignore init incoming log merge outgoing pull push recovery remove rename repoconfig revert rollback serve shelve status strip synch unshelve update userconfig vdiff verify version"
+
+       COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+
+complete -F _hgtk hgtk
