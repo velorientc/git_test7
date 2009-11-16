@@ -211,11 +211,12 @@ class MergeDialog(gtk.Dialog):
         self.abortbtn.set_property('visible', working)
 
     def domerge(self):
-        cmdline = ['hg', 'merge', '--rev', self.otherrev]
         tool = hglib.fromutf(self.mergetool.child.get_text())
         if tool:
-            oldmergeenv = os.environ.get('HGMERGE')
-            os.environ['HGMERGE'] = tool
+            cmdline = ['hg', '--config', 'ui.merge=%s' % tool]
+        else:
+            cmdline = ['hg']
+        cmdline.extend(['merge', '--rev', self.otherrev])
 
         def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
@@ -230,11 +231,6 @@ class MergeDialog(gtk.Dialog):
                 self.cmd.set_result(_('Failed to merge'), style='error')
             if len(repo.parents()) == 1:
                 return
-            if tool:
-                if oldmergeenv:
-                    os.environ['HGMERGE'] = oldmergeenv
-                else:
-                    del os.environ['HGMERGE']
             self.mergetool.set_sensitive(False)
             self.mergelabel.set_sensitive(False)
             self.mergebtn.set_sensitive(False)

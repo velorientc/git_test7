@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-11-07 00:18+0000\n"
-"PO-Revision-Date: 2009-11-11 10:17+0000\n"
+"PO-Revision-Date: 2009-11-14 22:43+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-12 04:56+0000\n"
+"X-Launchpad-Export-Date: 2009-11-15 04:50+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -2273,19 +2273,19 @@ msgstr "Порізана редакція..."
 
 #: tortoisehg\hgtk\history.py:781
 msgid "_Diff with selected"
-msgstr "_Різниця з обраним"
+msgstr "_У порівнянні з"
 
 #: tortoisehg\hgtk\history.py:782
 msgid "Visual Diff with selected"
-msgstr "Показати різниці з обраним"
+msgstr "Показати різницю з обраним"
 
 #: tortoisehg\hgtk\history.py:791
 msgid "Email from here to selected..."
-msgstr "Відправити поштою звідси до вибраного..."
+msgstr "Відправити поштою до вибраного..."
 
 #: tortoisehg\hgtk\history.py:793
 msgid "Bundle from here to selected..."
-msgstr "Пакети вибрані звідси..."
+msgstr "Ту пачку що вибрали..."
 
 #: tortoisehg\hgtk\history.py:795
 msgid "Export Patches from here to selected..."
@@ -2394,7 +2394,7 @@ msgstr "Об'єднати"
 
 #: tortoisehg\hgtk\history.py:1008
 msgid "Hide Merges"
-msgstr "Приховане об'єднання"
+msgstr "Приховати об'єднання"
 
 #: tortoisehg\hgtk\history.py:1015
 msgid "Branch Filter"
@@ -2406,7 +2406,7 @@ msgstr "Гілки..."
 
 #: tortoisehg\hgtk\history.py:1031
 msgid "Custom Filter"
-msgstr "Налаштування фільтру"
+msgstr "Користувальницькі фільтри"
 
 #: tortoisehg\hgtk\history.py:1036
 msgid "File Patterns"
@@ -2466,7 +2466,7 @@ msgstr "%d вихідні набори змін"
 
 #: tortoisehg\hgtk\history.py:1350 tortoisehg\hgtk\synch.py:495
 msgid "No repository selected"
-msgstr "Не обрано сховища"
+msgstr "Не обрано сховищ"
 
 #: tortoisehg\hgtk\history.py:1351 tortoisehg\hgtk\synch.py:496
 msgid "Select a peer repository to compare with"
@@ -2488,7 +2488,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:1375 tortoisehg\hgtk\history.py:1385
 msgid "Forced &Push"
-msgstr "Forced &Push"
+msgstr "Примусово &Відправити"
 
 #: tortoisehg\hgtk\history.py:1377
 msgid "Confirm Push to remote Repository"
@@ -2506,7 +2506,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:1379
 msgid "&Push"
-msgstr "&Push"
+msgstr "&Відправити"
 
 #: tortoisehg\hgtk\history.py:1382
 msgid "Confirm Forced Push"
@@ -2556,7 +2556,7 @@ msgstr "Зберегти латку до"
 
 #: tortoisehg\hgtk\logview\treeview.py:255
 msgid "%(count)d of %(total)d Revisions"
-msgstr "%(кількість)d у %(загалом)d Редакціях"
+msgstr "%(кількість)d у %(загалом)d редакціях"
 
 #: tortoisehg\hgtk\logview\treeview.py:362
 msgid "Repository is empty"
@@ -2564,7 +2564,7 @@ msgstr "Пусте сховище"
 
 #: tortoisehg\hgtk\logview\treeview.py:407
 msgid "ID"
-msgstr "ID"
+msgstr "Ідентифікатор"
 
 #: tortoisehg\hgtk\logview\treeview.py:419
 msgid "Branch"
@@ -2576,7 +2576,7 @@ msgstr "Світовий час"
 
 #: tortoisehg\hgtk\merge.py:44
 msgid "Merging in %s"
-msgstr "Обєднання з %s"
+msgstr "Об'єднання з %s"
 
 #: tortoisehg\hgtk\merge.py:50 tortoisehg\hgtk\merge.py:63
 msgid "Unable to merge"
@@ -2612,7 +2612,7 @@ msgstr "Повернути"
 
 #: tortoisehg\hgtk\merge.py:104
 msgid "Merge tools:"
-msgstr "Інструменти обєднання:"
+msgstr "Інструменти об'єднання:"
 
 #: tortoisehg\hgtk\merge.py:170
 msgid ""
@@ -2620,21 +2620,21 @@ msgid ""
 "\n"
 "Do you want to exit?"
 msgstr ""
-"To complete merging, you need to commit merged files in working directory.\n"
+"Для повного об'єднання, необхідно об'єднати файли в робочому каталозі.\n"
 "\n"
 "Ви хочете вийти?"
 
 #: tortoisehg\hgtk\merge.py:226
 msgid "Merged successfully"
-msgstr "Обєднано успішно"
+msgstr "Об'єднано успішно"
 
 #: tortoisehg\hgtk\merge.py:228
 msgid "Canceled merging"
-msgstr "Обєднання закінчено"
+msgstr "Об'єднання закінчено"
 
 #: tortoisehg\hgtk\merge.py:230
 msgid "Failed to merge"
-msgstr "Помилка обєднання"
+msgstr "Помилка об'єднання"
 
 #: tortoisehg\hgtk\merge.py:266
 msgid "Confirm undo merge"
@@ -2654,11 +2654,11 @@ msgstr "Повернення скасовано"
 
 #: tortoisehg\hgtk\merge.py:281
 msgid "Failed to undo"
-msgstr "Не вдалося скасувати"
+msgstr "Не вдалося повернути"
 
 #: tortoisehg\hgtk\quickop.py:50
 msgid "Select files to add"
-msgstr "Обрані файли додано"
+msgstr "Вибрати файли для додавання"
 
 #: tortoisehg\hgtk\quickop.py:51
 msgid "Forget"
@@ -2666,7 +2666,7 @@ msgstr "Зневажати"
 
 #: tortoisehg\hgtk\quickop.py:51
 msgid "Select files to forget"
-msgstr "Зневажати обрані файли"
+msgstr "Зневажати вибрані файли"
 
 #: tortoisehg\hgtk\quickop.py:52
 msgid "Revert"
@@ -2674,11 +2674,11 @@ msgstr "Повернути"
 
 #: tortoisehg\hgtk\quickop.py:52
 msgid "Select files to revert"
-msgstr "Повернути обрані файли"
+msgstr "Повернути вибрані файли"
 
 #: tortoisehg\hgtk\quickop.py:53
 msgid "Select files to remove"
-msgstr "Вилучити обрані файли"
+msgstr "Вилучити вибрані файли"
 
 #: tortoisehg\hgtk\quickop.py:53 tortoisehg\hgtk\tagadd.py:42
 msgid "Remove"
@@ -2686,7 +2686,7 @@ msgstr "Вилучити"
 
 #: tortoisehg\hgtk\quickop.py:100 tortoisehg\hgtk\status.py:138
 msgid "status"
-msgstr "Стан:"
+msgstr "стан"
 
 #: tortoisehg\hgtk\quickop.py:103 tortoisehg\hgtk\status.py:271
 msgid "path"
@@ -2702,15 +2702,15 @@ msgstr "змінений"
 
 #: tortoisehg\hgtk\quickop.py:144
 msgid "added"
-msgstr "доданий"
+msgstr "наставний"
 
 #: tortoisehg\hgtk\quickop.py:147
 msgid "removed"
-msgstr "видалений"
+msgstr "видалено"
 
 #: tortoisehg\hgtk\quickop.py:150
 msgid "missing"
-msgstr "відсутнє"
+msgstr "відсутні"
 
 #: tortoisehg\hgtk\quickop.py:153 tortoisehg\hgtk\quickop.py:236
 #: tortoisehg\hgtk\serve.py:126 tortoisehg\util\shlib.py:26
@@ -2720,7 +2720,7 @@ msgstr "невідомий"
 
 #: tortoisehg\hgtk\quickop.py:157 tortoisehg\hgtk\quickop.py:236
 msgid "ignored"
-msgstr "проігноровано"
+msgstr "ігноруються"
 
 #: tortoisehg\hgtk\quickop.py:161
 msgid "clean"
@@ -2748,15 +2748,15 @@ msgstr "Успішно"
 
 #: tortoisehg\hgtk\quickop.py:266 tortoisehg\hgtk\thgmq.py:644
 msgid "Canceled"
-msgstr "Скасований"
+msgstr "Скасовано"
 
 #: tortoisehg\hgtk\quickop.py:268 tortoisehg\hgtk\thgmq.py:646
 msgid "Failed"
-msgstr "Невдача"
+msgstr "Невдало"
 
 #: tortoisehg\hgtk\recovery.py:40
 msgid "%s - recovery"
-msgstr "%s - відновлено"
+msgstr "%s - відновлення"
 
 #: tortoisehg\hgtk\recovery.py:46 tortoisehg\hgtk\synch.py:59
 msgid "Stop the hg operation"
@@ -2768,7 +2768,7 @@ msgstr "Очистити"
 
 #: tortoisehg\hgtk\recovery.py:52
 msgid "Clean checkout, undo all changes"
-msgstr "Очистити вивантаження, відмінити всі зміни"
+msgstr "Очистити випробовування, відмінити всі зміни"
 
 #: tortoisehg\hgtk\recovery.py:55
 msgid "Rollback"
@@ -2777,7 +2777,7 @@ msgstr "Відкинути"
 #: tortoisehg\hgtk\recovery.py:57
 msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
 msgstr ""
-"Відкинути (повернути) останню операцію до сховища (отримання, фіксація та "
+"Відкинути (повернути) останню операцію по сховищу (отримання, фіксація та "
 "інше)"
 
 #: tortoisehg\hgtk\recovery.py:61
@@ -2794,7 +2794,7 @@ msgstr "Перевірка"
 
 #: tortoisehg\hgtk\recovery.py:68
 msgid "Validate repository consistency"
-msgstr "Перевірити сховище на суцільність"
+msgstr "Перевірити сховище на цілісність"
 
 #: tortoisehg\hgtk\recovery.py:102 tortoisehg\hgtk\synch.py:394
 msgid "Cannot close now"
@@ -2802,7 +2802,7 @@ msgstr "Неможливо закрити зараз"
 
 #: tortoisehg\hgtk\recovery.py:103 tortoisehg\hgtk\synch.py:395
 msgid "command is running"
-msgstr "команда в дії"
+msgstr "команда виконується"
 
 #: tortoisehg\hgtk\recovery.py:122
 msgid "Confirm clean repository"
@@ -2882,7 +2882,7 @@ msgstr " - serve"
 
 #: tortoisehg\hgtk\serve.py:164
 msgid "Confirm Really Exit?"
-msgstr "Підтвердіть дійсність виходу?"
+msgstr "Підтвердіть реальність виходу?"
 
 #: tortoisehg\hgtk\serve.py:165
 msgid ""
@@ -2926,15 +2926,15 @@ msgstr "використовувати у режимі демону (серві�
 
 #: tortoisehg\hgtk\serve.py:355
 msgid "name of error log file to write to"
-msgstr "назва файла журнала для запису помилок"
+msgstr "назва файла журнала запису помилок"
 
 #: tortoisehg\hgtk\serve.py:356
 msgid "port to use (default: 8000)"
-msgstr "порт використовується (за замовченням: 8000)"
+msgstr "використовується порт (за замовченням: 8000)"
 
 #: tortoisehg\hgtk\serve.py:357
 msgid "address to use"
-msgstr "адреса використовується"
+msgstr "використовується адреса"
 
 #: tortoisehg\hgtk\serve.py:358
 msgid "prefix path to serve from (default: server root)"
@@ -2980,7 +2980,7 @@ msgstr "hg serve [ПАРАМЕТРИ]..."
 
 #: tortoisehg\hgtk\status.py:138
 msgid "filtered status"
-msgstr "відфільтрований стан"
+msgstr "фільтрують статус"
 
 #: tortoisehg\hgtk\status.py:154
 msgid "Save As"
@@ -2992,7 +2992,7 @@ msgstr "Зберегти обрані зміни"
 
 #: tortoisehg\hgtk\status.py:160
 msgid "Visual diff checked files"
-msgstr "Показати різницю між файлами"
+msgstr "Візуальні відмінності у перевірених файлах"
 
 #: tortoisehg\hgtk\status.py:163
 msgid "Revert checked files"
@@ -3016,7 +3016,7 @@ msgstr "Зневажати перевірені файли під час нас�
 
 #: tortoisehg\hgtk\status.py:179
 msgid "refresh"
-msgstr "оновити"
+msgstr "перечитати"
 
 #: tortoisehg\hgtk\status.py:255 tortoisehg\hgtk\thgmq.py:185
 msgid "st"
@@ -3032,19 +3032,19 @@ msgstr "Перегляд"
 
 #: tortoisehg\hgtk\status.py:304
 msgid "Remove filter, show root"
-msgstr "Вилучити фільтр, показати основу"
+msgstr "Вилучити фільтр, показати корінь"
 
 #: tortoisehg\hgtk\status.py:330
 msgid "Text Diff"
-msgstr "Текстова Різниця"
+msgstr "Відмінності тексту"
 
 #: tortoisehg\hgtk\status.py:383
 msgid "Hunk Selection"
-msgstr "Обрати Шматок"
+msgstr "Обрати шматок"
 
 #: tortoisehg\hgtk\status.py:456
 msgid "%d selected, %d total"
-msgstr "%d обрано, %d загалом"
+msgstr "%d вибрано, %d загалом"
 
 #: tortoisehg\hgtk\status.py:478
 msgid "Save Preview"
@@ -3157,19 +3157,19 @@ msgstr "Файли які обрано не можливо повернути"
 
 #: tortoisehg\hgtk\status.py:1250
 msgid "Revert not allowed when viewing revision range."
-msgstr "Повернення не дозволено, коли відкритий діапазон редакцій."
+msgstr "Повернення не допускається, під час перегляду діапазону редакцій."
 
 #: tortoisehg\hgtk\status.py:1268
 msgid "Uncommited merge - please select a parent revision"
-msgstr "Незафіксоване обєднання - будь-ласка оберіть редакцію попередника"
+msgstr "Не зафіксоване об'єднання - будь-ласка оберіть редакцію попередника"
 
 #: tortoisehg\hgtk\status.py:1269
 msgid "Revert files to local or other parent?"
-msgstr "Полвернути файли до місцевого та іншого попередника?"
+msgstr "ВІдновити файли на локальному або іншому попереднику?"
 
 #: tortoisehg\hgtk\status.py:1270
 msgid "&Local"
-msgstr "&Місцеві"
+msgstr "&Локальні"
 
 #: tortoisehg\hgtk\status.py:1270
 msgid "&Other"
@@ -3191,7 +3191,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:1287
 msgid "&Yes (backup changes)"
-msgstr "&Так (зберегти зміни)"
+msgstr "&Так (резервне копіювання змін)"
 
 #: tortoisehg\hgtk\status.py:1288
 msgid "Yes (&discard changes)"
@@ -3199,7 +3199,7 @@ msgstr "Так (&відмовитись від змін)"
 
 #: tortoisehg\hgtk\status.py:1308
 msgid "Nothing Added"
-msgstr "Нічого додавати"
+msgstr "Нічого не додано"
 
 #: tortoisehg\hgtk\status.py:1309
 msgid "No addable files selected"
@@ -3207,7 +3207,7 @@ msgstr "Не обрано файлів для додавання"
 
 #: tortoisehg\hgtk\status.py:1333
 msgid "No removable files selected"
-msgstr "Не обрано файли для вилучення"
+msgstr "Вибрано файли, які неможливо змінювати"
 
 #: tortoisehg\hgtk\status.py:1341
 msgid "Move files to directory..."
@@ -3249,15 +3249,15 @@ msgstr "Видалити помилки"
 
 #: tortoisehg\hgtk\status.py:1506
 msgid "Edit"
-msgstr "Редагувати"
+msgstr "Змінити"
 
 #: tortoisehg\hgtk\status.py:1507
 msgid "View missing"
-msgstr "Відкрити відсутній"
+msgstr "Переглянути відсутній"
 
 #: tortoisehg\hgtk\status.py:1508
 msgid "View other"
-msgstr "Відкрити інший"
+msgstr "Переглянути інший"
 
 #: tortoisehg\hgtk\status.py:1512
 msgid "L_og"
@@ -3269,15 +3269,15 @@ msgstr "_Guess зміна назви..."
 
 #: tortoisehg\hgtk\status.py:1517
 msgid "_Ignore"
-msgstr "_Ігнорувати"
+msgstr "_Зневажати"
 
 #: tortoisehg\hgtk\status.py:1518
 msgid "Remove versioned"
-msgstr "Видалити редакції"
+msgstr "Переміщення версіонується"
 
 #: tortoisehg\hgtk\status.py:1519
 msgid "_Delete unversioned"
-msgstr "_Видалити без редакцій"
+msgstr "_Видалити без версіонування"
 
 #: tortoisehg\hgtk\status.py:1522
 msgid "_Copy..."
@@ -3289,7 +3289,7 @@ msgstr "Змінити назву..."
 
 #: tortoisehg\hgtk\status.py:1525
 msgid "Restart Merge..."
-msgstr "Перезапуск обєднання..."
+msgstr "Перезапуск об'єднання..."
 
 #: tortoisehg\hgtk\status.py:1526
 msgid "Mark unresolved"
