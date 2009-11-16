@@ -27,11 +27,17 @@ from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
 from tortoisehg.hgtk import statusbar, bookmark
 
-def create_menu(label, callback):
+def create_menu(label, callback=None):
     menuitem = gtk.MenuItem(label, True)
-    menuitem.connect('activate', callback)
+    if callback:
+        menuitem.connect('activate', callback)
     menuitem.set_border_width(1)
     return menuitem
+
+def create_submenu(label, menu):
+    m = create_menu(label)
+    m.set_submenu(menu)
+    return m
 
 class GLog(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
@@ -713,19 +719,10 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_Update...'), self.checkout))
         cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
         m.append(cmenu_merge)
-        m.append_sep()
-        m.append(create_menu(_('_Export Patch...'), self.export_patch))
-        m.append(create_menu(_('E_mail Patch...'), self.email_patch))
-        m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
-        m.append_sep()
-        m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
-        if 'bookmarks' in self.exs:
-            m.append(create_menu(_('Add/Remove B_ookmark...'), 
-                                   self.add_bookmark))
-            m.append(create_menu(_('Rename Bookmark...'), 
-                                   self.rename_bookmark))
-            m.append_sep()
-
+        m.append(create_submenu(_('Patches & Bundles...'), 
+                                self.patches_context_menu()))
+        m.append(create_submenu(_('Tags & Bookmarks...'),
+                                self.tags_context_menu()))
         cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
         m.append(cmenu_backout)
         m.append(create_menu(_('_Revert'), self.revert))
@@ -752,31 +749,54 @@ class GLog(gdialog.GDialog):
 
         # need mq extension for strip command
         if 'mq' in self.exs:
-            cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
-            cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
-
-            try:
-                ctx = self.repo[self.currevid]
-                qbase = self.repo['qbase']
-                actx = ctx.ancestor(qbase)
-                if self.repo['qparent'] == ctx:
-                    cmenu_qimport.set_sensitive(True)
-                    cmenu_strip.set_sensitive(False)
-                elif actx == qbase or actx == ctx:
-                    # we're in the mq revision range or the mq
-                    # is a descendant of us
-                    cmenu_qimport.set_sensitive(False)
-                    cmenu_strip.set_sensitive(False)
-            except:
-                pass
-
-            m.append_sep()
-            m.append(cmenu_qimport)
-            m.append(cmenu_strip)
+            m.append(create_submenu(_('Mercurial Queues...'),
+                                self.mq_context_menu()))
 
         menu = m.create_menu()
         menu.show_all()
         return menu
+
+    def patches_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('_Export Patch...'), self.export_patch))
+        m.append(create_menu(_('E_mail Patch...'), self.email_patch))
+        m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
+        return m.create_menu()
+
+    def tags_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
+        if 'bookmarks' in self.exs:
+            m.append(create_menu(_('Add/Remove B_ookmark...'), 
+                                 self.add_bookmark))
+            m.append(create_menu(_('Rename Bookmark...'), 
+                                 self.rename_bookmark))
+        return m.create_menu()
+
+    def mq_context_menu(self):
+        m = gtklib.MenuItems() 
+        cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
+        cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
+
+        try:
+            ctx = self.repo[self.currevid]
+            qbase = self.repo['qbase']
+            actx = ctx.ancestor(qbase)
+            if self.repo['qparent'] == ctx:
+                cmenu_qimport.set_sensitive(True)
+                cmenu_strip.set_sensitive(False)
+            elif actx == qbase or actx == ctx:
+                # we're in the mq revision range or the mq
+                # is a descendant of us
+                cmenu_qimport.set_sensitive(False)
+                cmenu_strip.set_sensitive(False)
+        except:
+            pass
+
+        m.append_sep()
+        m.append(cmenu_qimport)
+        m.append(cmenu_strip)
+        return m.create_menu()
 
     def restore_single_sel(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
