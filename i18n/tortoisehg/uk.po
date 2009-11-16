@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-11-07 00:18+0000\n"
-"PO-Revision-Date: 2009-11-12 13:01+0000\n"
+"PO-Revision-Date: 2009-11-14 22:43+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-13 11:35+0000\n"
+"X-Launchpad-Export-Date: 2009-11-15 04:50+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -3157,19 +3157,19 @@ msgstr "Файли які обрано не можливо повернути"
 
 #: tortoisehg\hgtk\status.py:1250
 msgid "Revert not allowed when viewing revision range."
-msgstr "Повернення не дозволено, коли відкритий діапазон редакцій."
+msgstr "Повернення не допускається, під час перегляду діапазону редакцій."
 
 #: tortoisehg\hgtk\status.py:1268
 msgid "Uncommited merge - please select a parent revision"
-msgstr "Незафіксоване обєднання - будь-ласка оберіть редакцію попередника"
+msgstr "Не зафіксоване об'єднання - будь-ласка оберіть редакцію попередника"
 
 #: tortoisehg\hgtk\status.py:1269
 msgid "Revert files to local or other parent?"
-msgstr "Полвернути файли до місцевого та іншого попередника?"
+msgstr "ВІдновити файли на локальному або іншому попереднику?"
 
 #: tortoisehg\hgtk\status.py:1270
 msgid "&Local"
-msgstr "&Місцеві"
+msgstr "&Локальні"
 
 #: tortoisehg\hgtk\status.py:1270
 msgid "&Other"
@@ -3191,7 +3191,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:1287
 msgid "&Yes (backup changes)"
-msgstr "&Так (зберегти зміни)"
+msgstr "&Так (резервне копіювання змін)"
 
 #: tortoisehg\hgtk\status.py:1288
 msgid "Yes (&discard changes)"
@@ -3199,7 +3199,7 @@ msgstr "Так (&відмовитись від змін)"
 
 #: tortoisehg\hgtk\status.py:1308
 msgid "Nothing Added"
-msgstr "Нічого додавати"
+msgstr "Нічого не додано"
 
 #: tortoisehg\hgtk\status.py:1309
 msgid "No addable files selected"
@@ -3207,7 +3207,7 @@ msgstr "Не обрано файлів для додавання"
 
 #: tortoisehg\hgtk\status.py:1333
 msgid "No removable files selected"
-msgstr "Не обрано файли для вилучення"
+msgstr "Вибрано файли, які неможливо змінювати"
 
 #: tortoisehg\hgtk\status.py:1341
 msgid "Move files to directory..."
@@ -3249,15 +3249,15 @@ msgstr "Видалити помилки"
 
 #: tortoisehg\hgtk\status.py:1506
 msgid "Edit"
-msgstr "Редагувати"
+msgstr "Змінити"
 
 #: tortoisehg\hgtk\status.py:1507
 msgid "View missing"
-msgstr "Відкрити відсутній"
+msgstr "Переглянути відсутній"
 
 #: tortoisehg\hgtk\status.py:1508
 msgid "View other"
-msgstr "Відкрити інший"
+msgstr "Переглянути інший"
 
 #: tortoisehg\hgtk\status.py:1512
 msgid "L_og"
@@ -3269,15 +3269,15 @@ msgstr "_Guess зміна назви..."
 
 #: tortoisehg\hgtk\status.py:1517
 msgid "_Ignore"
-msgstr "_Ігнорувати"
+msgstr "_Зневажати"
 
 #: tortoisehg\hgtk\status.py:1518
 msgid "Remove versioned"
-msgstr "Видалити редакції"
+msgstr "Переміщення версіонується"
 
 #: tortoisehg\hgtk\status.py:1519
 msgid "_Delete unversioned"
-msgstr "_Видалити без редакцій"
+msgstr "_Видалити без версіонування"
 
 #: tortoisehg\hgtk\status.py:1522
 msgid "_Copy..."
@@ -3289,7 +3289,7 @@ msgstr "Змінити назву..."
 
 #: tortoisehg\hgtk\status.py:1525
 msgid "Restart Merge..."
-msgstr "Перезапуск обєднання..."
+msgstr "Перезапуск об'єднання..."
 
 #: tortoisehg\hgtk\status.py:1526
 msgid "Mark unresolved"
