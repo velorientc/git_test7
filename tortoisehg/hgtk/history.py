@@ -16,6 +16,7 @@ import tempfile
 import atexit
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
+from mercurial import hbisect
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, thread2
@@ -752,6 +753,8 @@ class GLog(gdialog.GDialog):
             m.append(create_submenu(_('Mercurial Queues...'),
                                 self.mq_context_menu()))
 
+        m.append(create_submenu(_('Bisect...'),
+                                self.bisect_context_menu()))
         menu = m.create_menu()
         menu.show_all()
         return menu
@@ -796,6 +799,14 @@ class GLog(gdialog.GDialog):
         m.append_sep()
         m.append(cmenu_qimport)
         m.append(cmenu_strip)
+        return m.create_menu()
+
+    def bisect_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('Reset'), self.bisect_reset))
+        m.append(create_menu(_('Mark as good'), self.bisect_good))
+        m.append(create_menu(_('Mark as bad'), self.bisect_bad))
+        m.append(create_menu(_('Skip testing'), self.bisect_skip))
         return m.create_menu()
 
     def restore_single_sel(self, widget, *args):
@@ -1777,6 +1788,38 @@ class GLog(gdialog.GDialog):
         dialog = bookmark.BookmarkRenameDialog(self.repo, rev=str(rev))
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
+
+    def bisect_reset(self, menuitem):
+        commands.bisect(ui=self.ui,
+                        repo=self.repo,
+                        good=False,
+                        bad=False,
+                        skip=False,
+                        reset=True)
+
+    def bisect_good(self, menuitem):
+        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
+
+    def bisect_bad(self, menuitem):
+        cmd = ['hg', 'bisect', '--bad', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
+
+    def bisect_skip(self, menuitem):
+        cmd = ['hg', 'bisect', '--skip', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
 
     def show_status(self, menuitem):
         rev = self.currevid
