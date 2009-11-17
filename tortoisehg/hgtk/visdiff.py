@@ -208,7 +208,7 @@ class FileSelectionDialog(gtk.Dialog):
                    _('There are no file changes to view'), self).run()
             # GTK+ locks up if this is done immediately here
             gtklib.idle_add_single_call(self.destroy)
-            return
+            return gtk.ListStore(str, str)
 
         tmproot = tempfile.mkdtemp(prefix='extdiff.')
         self.connect('response', self.response)
