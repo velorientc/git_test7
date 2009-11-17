@@ -189,9 +189,9 @@ else:
 
 setup(name="tortoisehg",
         version=version,
-        author='TK Soh',
-        author_email='teekaysoh@gmail.com',
-        url='http://bitbucket.org/tortoisehg/stable/',
+        author='Steve Borho',
+        author_email='steve@borho.org',
+        url='http://tortoisehg.bitbucket.org',
         description=desc,
         license='GNU GPL2',
         scripts=scripts,
