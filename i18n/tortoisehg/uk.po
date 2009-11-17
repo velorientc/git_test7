@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-11-07 00:18+0000\n"
-"PO-Revision-Date: 2009-11-14 22:43+0000\n"
+"PO-Revision-Date: 2009-11-15 21:38+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-15 04:50+0000\n"
+"X-Launchpad-Export-Date: 2009-11-16 04:47+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -3293,7 +3293,7 @@ msgstr "Перезапуск об'єднання..."
 
 #: tortoisehg\hgtk\status.py:1526
 msgid "Mark unresolved"
-msgstr "Відмітити, як невирішене"
+msgstr "Відмітити, як невиріше"
 
 #: tortoisehg\hgtk\status.py:1527
 msgid "Mark resolved"
@@ -3301,7 +3301,7 @@ msgstr "Відмітити, як вирішене"
 
 #: tortoisehg\hgtk\status.py:1535
 msgid "Restart merge with"
-msgstr "Перезапуск обєднання з"
+msgstr "Перезапуск з об'єднанням"
 
 #: tortoisehg\hgtk\status.py:1579
 msgid "not up to date"
@@ -3317,11 +3317,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:1582
 msgid "&Refresh"
-msgstr "&Оновити"
+msgstr "&Поновити"
 
 #: tortoisehg\hgtk\statusbar.py:45
 msgid "Running"
-msgstr "Виконання"
+msgstr "Працює"
 
 #: tortoisehg\hgtk\synch.py:51
 msgid "%s - synchronize"
@@ -3361,7 +3361,7 @@ msgstr "Поличка непідтвержених змін"
 
 #: tortoisehg\hgtk\synch.py:98
 msgid "Configure peer repository paths"
-msgstr "Налаштувати шлях до сховища"
+msgstr "Налаштувати шляхи до сховищ"
 
 #: tortoisehg\hgtk\synch.py:113
 msgid "Repo:"
@@ -3377,11 +3377,11 @@ msgstr "Після отримання: "
 
 #: tortoisehg\hgtk\synch.py:174
 msgid "Advanced Options"
-msgstr "Розширені параметри"
+msgstr "Додаткові параметри"
 
 #: tortoisehg\hgtk\synch.py:181
 msgid "Force pull or push"
-msgstr "Примусове отримання або передача"
+msgstr "Примусово отримати або передати"
 
 #: tortoisehg\hgtk\synch.py:182
 msgid "Run even when remote repository is unrelated."
@@ -3393,7 +3393,7 @@ msgstr "Мета редакції:"
 
 #: tortoisehg\hgtk\synch.py:199
 msgid "A specific revision up to which you would like to push or pull."
-msgstr "Редакція до якої Ви хочете Передати або Отримати."
+msgstr "Редакція до якої Ви хочете передати або отримати."
 
 #: tortoisehg\hgtk\synch.py:209
 msgid "Name of hg executable on remote machine."
@@ -3413,7 +3413,7 @@ msgstr "Нові показувати першими"
 
 #: tortoisehg\hgtk\synch.py:224
 msgid "Show no merges"
-msgstr "Показати не обєднані"
+msgstr "Показати не об'єднані"
 
 #: tortoisehg\hgtk\synch.py:268
 msgid "Update to branch tip"
@@ -3425,7 +3425,7 @@ msgstr "невідомий ключ сортування '%s'"
 
 #: tortoisehg\hgtk\synch.py:377
 msgid "Select Repository"
-msgstr "Оберіть Сховище"
+msgstr "Оберіть сховище"
 
 #: tortoisehg\hgtk\synch.py:384
 msgid "Select Bundle"
@@ -3465,7 +3465,7 @@ msgstr "Використовувати повідомлення фіксації
 
 #: tortoisehg\hgtk\tagadd.py:161
 msgid "Tag input is empty"
-msgstr "Вхідна мітка пуста"
+msgstr "Немає вхідної мітки"
 
 #: tortoisehg\hgtk\tagadd.py:162
 msgid "Please enter tag name"
@@ -3473,7 +3473,7 @@ msgstr "Будь-ласка, введіть назву мітки"
 
 #: tortoisehg\hgtk\tagadd.py:166
 msgid "Custom commit message is empty"
-msgstr "Нотатка фіксації пуста"
+msgstr "Немає нотатки фіксації"
 
 #: tortoisehg\hgtk\tagadd.py:175 tortoisehg\hgtk\tagadd.py:207
 msgid "Tagging completed"
@@ -3494,7 +3494,7 @@ msgstr "Відсутня назва мітки"
 
 #: tortoisehg\hgtk\tagadd.py:196
 msgid "Please select tag name to remove"
-msgstr "Будь-ласка, оберіть мітку для видалення"
+msgstr "Будь-ласка, оберіть назву мітки для переміщення"
 
 #: tortoisehg\hgtk\tagadd.py:208
 msgid "Tag \"%s\" has been removed"
