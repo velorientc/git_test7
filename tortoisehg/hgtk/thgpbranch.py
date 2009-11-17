@@ -468,6 +468,12 @@ class PBranchWidget(gtk.VBox):
         """ return True if pbranch extension is in use on repo """
         return self.has_pbranch() and self.pgraph() != []
 
+    def is_patch(self, branch_name):
+        """ return True if branch is a patch. This excludes root branches
+        and internal diff base branches (for patches with multiple 
+        dependencies. """
+        return self.has_pbranch() and self.pgraph().ispatch(branch_name)
+
     def cur_patch(self):
         current_patch = self.repo.dirstate.branch()
         if current_patch == 'default':
@@ -537,10 +543,11 @@ class PBranchWidget(gtk.VBox):
 
         has_pbranch = self.has_pbranch()
         is_current = self.has_patch() and self.cur_patch() == row[M_NAME]
-        is_patch = row[M_NAME] != 'default'
+        is_patch = self.is_patch(row[M_NAME])
+        is_internal = self.pbranch.isinternal(row[M_NAME])
         is_merge = len(self.repo.branchheads(row[M_NAME])) > 1
 
-        if has_pbranch and not is_merge:
+        if has_pbranch and not is_merge and not is_internal:
             append(_('_new'), self.pnew_activated)
         if not is_current:
             append(_('_goto (update workdir)'), self.goto_activated)
