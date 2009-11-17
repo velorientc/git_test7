@@ -939,6 +939,7 @@ class GStatus(gdialog.GDialog):
         elif pname == 'hunk-selection':
             self.update_hunk_model(row, tree)
         elif pname == 'commit-preview':
+            self.update_hunk_model(row, tree)
             self.update_commit_preview()
 
     def get_page_name(self, num):
