@@ -16,7 +16,7 @@ import Queue
 from tortoisehg.util.i18n import _
 from tortoisehg.util import paths, hglib, thread2
 
-from tortoisehg.hgtk import hgtk, gdialog
+from tortoisehg.hgtk import hgtk
 
 if gtk.gtk_version < (2, 14, 0):
     # at least on 2.12.12, gtk widgets can be confused by control
@@ -242,6 +242,7 @@ class NativeSaveFileDialogWrapper:
     def overwriteConfirmation(self, filepath):        
         result = filepath
         if os.path.exists(filepath):
+            from tortoisehg.hgtk import gdialog
             res = gdialog.Confirm(_('Confirm Overwrite'), [], None,
                 _('The file "%s" already exists!\n\n'
                 'Do you want to overwrite it?') % filepath).run()
