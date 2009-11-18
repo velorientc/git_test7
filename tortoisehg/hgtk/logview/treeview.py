@@ -124,6 +124,7 @@ class TreeView(gtk.ScrolledWindow):
         self.repo = repo
         self.currevid = None
         self.pbar = pbar
+        self.index = {}
         self.opts = { 'outgoing':[], 'orig-tip':None, 'npreviews':0,
                       'branch-color':False, 'show-graph':True }
         self.construct_treeview()
