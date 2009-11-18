@@ -652,7 +652,7 @@ table = {
     "^datamine|annotate|blame|grep": (datamine, [], _('hgtk datamine')),
     "^hgignore|ignore|filter": (hgignore, [], _('hgtk hgignore [FILE]')),
     "^init": (hginit, [], _('hgtk init [DEST]')),
-    "^log|history": (log,
+    "^log|history|explorer": (log,
         [('l', 'limit', '', _('limit number of changes displayed'))],
         _('hgtk log [OPTIONS] [FILE]')),
     "^merge": (merge, 

@@ -88,7 +88,7 @@ class GLog(gdialog.GDialog):
         return live
 
     def get_title(self):
-        str = _('%s - changelog') % self.get_reponame()
+        str = self.get_reponame() + ' - ' + _('Repository Explorer')
         if self.bfile:
             str += _(' (Bundle Preview)')
         return str
