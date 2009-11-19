@@ -59,7 +59,7 @@ class TreeModel(gtk.GenericTreeModel):
             self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
             self.branchtags = repo.branchtags()
             self.wcparents = [x.rev() for x in repo.parents()]
-        except hglib.Abort:
+        except util.Abort:
             pass
 
     def refresh(self):
