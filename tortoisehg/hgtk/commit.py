@@ -272,7 +272,7 @@ class GCommit(GStatus):
             user = self.opts['user'] or os.environ.get('HGUSER') or \
                    self.repo.ui.config('ui', 'username')
             if user:
-                update_recent_committers(hglib.toutf(user))
+                self.update_recent_committers(hglib.toutf(user))
         if not self.autoinc_entry.get_text():
             autoinc = self.repo.ui.config('tortoisehg', 'autoinc', '')
             self.autoinc_entry.set_text(hglib.toutf(autoinc))
