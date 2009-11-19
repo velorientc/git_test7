@@ -5,6 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
 import gtk
 import gobject
 
@@ -111,6 +112,11 @@ class PBranchWidget(gtk.VBox):
         pnewbtn = tbar.append_stock(gtk.STOCK_NEW,
                                        _('Start a new patch branch'))
         pnewbtn.connect('clicked', self.pnew_clicked)
+        self.btn['pnew'] = pnewbtn
+
+        pgraphbtn = tbar.append_stock(gtk.STOCK_EDIT,
+                                       _('Edit patch dependency graph'))
+        pgraphbtn.connect('clicked', self.edit_pgraph_clicked)
         self.btn['pnew'] = pnewbtn
 
         ## separator
@@ -721,6 +727,17 @@ class PBranchWidget(gtk.VBox):
 
     def reapply_clicked(self, toolbutton):
         pass
+
+    def edit_pgraph_clicked(self, toolbutton):
+        opts = {} # TODO: How to find user ID
+        mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
+        oldtext = mgr.graphdesc()
+        # run editor in the repository root
+        olddir = os.getcwd()
+        os.chdir(self.repo.root)
+        newtext = self.repo.ui.edit(oldtext, opts.get('user'))
+        os.chdir(olddir)
+        mgr.updategraphdesc(newtext)
 
     ### context menu signal handlers ###
 
