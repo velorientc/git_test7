@@ -847,13 +847,6 @@ class GCommit(GStatus):
                     _('Errors during rollback!'), self).run()
 
 
-    def changelog_clicked(self, toolbutton, data=None):
-        from tortoisehg.hgtk import history
-        dlg = history.run(self.ui)
-        dlg.display()
-        return True
-
-
     def should_addremove(self, files):
         if self.test_opt('addremove'):
             return True
