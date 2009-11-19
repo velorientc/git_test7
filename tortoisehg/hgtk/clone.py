@@ -288,7 +288,7 @@ class CloneDialog(gtk.Dialog):
 
     def clone(self):
         # gather input data
-        src = self.srcentry.get_text()
+        src = self.srcentry.get_text().strip()
         dest = self.destentry.get_text() or os.path.basename(src)
         remotecmd = self.remotecmdentry.get_text()
         rev = self.reventry.get_text()
