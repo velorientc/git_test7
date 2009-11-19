@@ -88,18 +88,27 @@ Frequently Asked Questions
 	diffs if it is to be used by TortoiseHg, unless you are using
 	release 0.8 or later.
 
-*How can I use Araxis Merge as my visual diff tool?*
+*How can I use Araxis Merge as my visual diff and merge tool?*
 
 	Add these lines to your personal :file:`Mercurial.ini` file ::
 
 		[extdiff]
-		cmd.adiff=C:\Program Files\Araxis\Araxis Merge v6.5\compare.exe
-		opts.adiff=/wait
+		cmd.araxis=C:\Program Files\Araxis\Araxis Merge\compare.exe
+		opts.araxis=/wait
+
+		[merge-tools]
+		araxis.executable=C:\Program Files\Araxis\Araxis Merge\AraxisP4WinMrg.exe
+		araxis.priority=1
+		araxis.args=$base $other $local $output
+		araxis.gui=True
+
+	If you're on a 64 bit OS, append (x86) to Program Files.
 
 	Now run the :guilabel:`Global Settings` tool. On the
-	:guilabel:`TortoiseHg` tab, you should see :guilabel:`adiff`
-	available in the drop-down list for :guilabel:`Visual Diff Command`.
-	Select :guilabel:`adiff`, apply, then close.
+	:guilabel:`TortoiseHg` tab, you should see :guilabel:`araxis`
+	available in the drop-down list for :guilabel:`Three-way Merge Tool`
+	and :guilabel:`Visual Diff Command`.  Select :guilabel:`araxis` for
+	both, then close.
 
 *I'm a CLI user, how do I disable the shell extensions (overlay icons and context menus)?*
 
