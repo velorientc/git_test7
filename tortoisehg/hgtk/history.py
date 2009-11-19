@@ -16,6 +16,7 @@ import tempfile
 import atexit
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
+from mercurial import hbisect
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, thread2
@@ -25,13 +26,19 @@ from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
-from tortoisehg.hgtk import statusbar
+from tortoisehg.hgtk import statusbar, bookmark
 
-def create_menu(label, callback):
+def create_menu(label, callback=None):
     menuitem = gtk.MenuItem(label, True)
-    menuitem.connect('activate', callback)
+    if callback:
+        menuitem.connect('activate', callback)
     menuitem.set_border_width(1)
     return menuitem
+
+def create_submenu(label, menu):
+    m = create_menu(label)
+    m.set_submenu(menu)
+    return m
 
 class GLog(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
@@ -713,12 +720,10 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_Update...'), self.checkout))
         cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
         m.append(cmenu_merge)
-        m.append_sep()
-        m.append(create_menu(_('_Export Patch...'), self.export_patch))
-        m.append(create_menu(_('E_mail Patch...'), self.email_patch))
-        m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
-        m.append_sep()
-        m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
+        m.append(create_submenu(_('Patches & Bundles...'), 
+                                self.patches_context_menu()))
+        m.append(create_submenu(_('Tags & Bookmarks...'),
+                                self.tags_context_menu()))
         cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
         m.append(cmenu_backout)
         m.append(create_menu(_('_Revert'), self.revert))
@@ -745,31 +750,64 @@ class GLog(gdialog.GDialog):
 
         # need mq extension for strip command
         if 'mq' in self.exs:
-            cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
-            cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
+            m.append(create_submenu(_('Mercurial Queues...'),
+                                self.mq_context_menu()))
 
-            try:
-                ctx = self.repo[self.currevid]
-                qbase = self.repo['qbase']
-                actx = ctx.ancestor(qbase)
-                if self.repo['qparent'] == ctx:
-                    cmenu_qimport.set_sensitive(True)
-                    cmenu_strip.set_sensitive(False)
-                elif actx == qbase or actx == ctx:
-                    # we're in the mq revision range or the mq
-                    # is a descendant of us
-                    cmenu_qimport.set_sensitive(False)
-                    cmenu_strip.set_sensitive(False)
-            except:
-                pass
-
-            m.append_sep()
-            m.append(cmenu_qimport)
-            m.append(cmenu_strip)
-
+        m.append(create_submenu(_('Bisect...'),
+                                self.bisect_context_menu()))
         menu = m.create_menu()
         menu.show_all()
         return menu
+
+    def patches_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('_Export Patch...'), self.export_patch))
+        m.append(create_menu(_('E_mail Patch...'), self.email_patch))
+        m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
+        return m.create_menu()
+
+    def tags_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
+        if 'bookmarks' in self.exs:
+            m.append(create_menu(_('Add/Remove B_ookmark...'), 
+                                 self.add_bookmark))
+            m.append(create_menu(_('Rename Bookmark...'), 
+                                 self.rename_bookmark))
+        return m.create_menu()
+
+    def mq_context_menu(self):
+        m = gtklib.MenuItems() 
+        cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
+        cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
+
+        try:
+            ctx = self.repo[self.currevid]
+            qbase = self.repo['qbase']
+            actx = ctx.ancestor(qbase)
+            if self.repo['qparent'] == ctx:
+                cmenu_qimport.set_sensitive(True)
+                cmenu_strip.set_sensitive(False)
+            elif actx == qbase or actx == ctx:
+                # we're in the mq revision range or the mq
+                # is a descendant of us
+                cmenu_qimport.set_sensitive(False)
+                cmenu_strip.set_sensitive(False)
+        except:
+            pass
+
+        m.append_sep()
+        m.append(cmenu_qimport)
+        m.append(cmenu_strip)
+        return m.create_menu()
+
+    def bisect_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('Reset'), self.bisect_reset))
+        m.append(create_menu(_('Mark as good'), self.bisect_good))
+        m.append(create_menu(_('Mark as bad'), self.bisect_bad))
+        m.append(create_menu(_('Skip testing'), self.bisect_skip))
+        return m.create_menu()
 
     def restore_single_sel(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
@@ -1109,6 +1147,15 @@ class GLog(gdialog.GDialog):
     def get_extras(self):
         return self.stbar
 
+    def refresh_on_marker_change(self, oldlen, oldmarkers, newmarkers):
+        self.repo.invalidate()
+        self.changeview.clear_cache()
+        if len(self.repo) != oldlen:
+            self.reload_log()
+        else:
+            if newmarkers != oldmarkers:
+                self.refresh_model()
+        
     def apply_clicked(self, button):
         combo = self.ppullcombo
         list, iter = combo.get_model(), combo.get_active_iter()
@@ -1333,7 +1380,7 @@ class GLog(gdialog.GDialog):
                 self.stbar.end()
                 self.outgoing = outgoing
                 self.reload_log()
-                text = _('%d outgoing changesets') % len(outgoing)
+                text = _('%d outgoing Changesets') % len(outgoing)
                 self.stbar.set_idle_text(text)
                 self.stop_button.disconnect(stop_handler)
                 self.stop_button.set_sensitive(False)
@@ -1706,18 +1753,73 @@ class GLog(gdialog.GDialog):
         rev = self.currevid
 
         def refresh(*args):
-            self.repo.invalidate()
-            self.changeview.clear_cache()
-            if len(self.repo) != oldlen:
-                self.reload_log()
-            else:
-                newtags = self.repo.tagslist()
-                if newtags != oldtags:
-                    self.refresh_model()
+            self.refresh_on_marker_change(oldlen, oldtags, self.repo.tagslist())
 
         dialog = tagadd.TagAddDialog(self.repo, rev=str(rev))
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
+
+    def add_bookmark(self, menuitem):
+        # save bookmark info for detecting new bookmarks added
+        oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
+        oldlen = len(self.repo)
+        rev = self.currevid
+
+        def refresh(*args):
+            self.refresh_on_marker_change(oldlen, 
+                                          oldbookmarks, 
+                                          hglib.get_repo_bookmarks(self.repo))
+
+        dialog = bookmark.BookmarkAddDialog(self.repo, rev=str(rev))
+        dialog.connect('destroy', refresh)
+        self.show_dialog(dialog)
+
+    def rename_bookmark(self, menuitem):
+        # save bookmark info for detecting new bookmarks added
+        oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
+        oldlen = len(self.repo)
+        rev = self.currevid
+
+        def refresh(*args):
+            self.refresh_on_marker_change(oldlen, 
+                                          oldbookmarks, 
+                                          hglib.get_repo_bookmarks(self.repo))
+
+        dialog = bookmark.BookmarkRenameDialog(self.repo, rev=str(rev))
+        dialog.connect('destroy', refresh)
+        self.show_dialog(dialog)
+
+    def bisect_reset(self, menuitem):
+        commands.bisect(ui=self.ui,
+                        repo=self.repo,
+                        good=False,
+                        bad=False,
+                        skip=False,
+                        reset=True)
+
+    def bisect_good(self, menuitem):
+        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
+
+    def bisect_bad(self, menuitem):
+        cmd = ['hg', 'bisect', '--bad', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
+
+    def bisect_skip(self, menuitem):
+        cmd = ['hg', 'bisect', '--skip', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
 
     def show_status(self, menuitem):
         rev = self.currevid
