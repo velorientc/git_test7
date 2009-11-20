@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import re
+
 try:
     # post 1.1.2
     from mercurial import util
@@ -23,7 +25,7 @@ def checkhgversion(v):
     if not v or v == 'unknown' or len(v) >= 12:
         # can't make any intelligent decisions about unknown or hashes
         return
-    vers = v.split('.')[:2]
+    vers = re.split(r'\.|-', v)[:2]
     if vers == reqver or len(vers) < 2:
         return
     nextver = list(reqver)
