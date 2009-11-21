@@ -601,6 +601,17 @@ class CmdLogDialog(gtk.Window):
         self.set_default_size(320, 240)
         self.connect('delete-event', self.delete_event)
 
+        # accelerators
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+        for key, modifier in (gtk.accelerator_parse(mod+'w'),
+                              gtk.accelerator_parse(mod+'q'),
+                              gtk.accelerator_parse('Escape')):
+            self.add_accelerator('thg-close', accelgroup, key,
+                                 modifier, gtk.ACCEL_VISIBLE)
+        self.connect('thg-close', self.delete_event)
+
         # log viewer
         self.log = CmdLogWidget()
         self.add(self.log)
@@ -638,7 +649,7 @@ class CmdLogDialog(gtk.Window):
 
     ### signal handlers ###
 
-    def delete_event(self, widget, event):
+    def delete_event(self, *args):
         if hasattr(self, 'close_hook'):
             if self.close_hook(self):
                 self.hide()
