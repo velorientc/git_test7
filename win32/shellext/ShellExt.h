@@ -25,8 +25,6 @@ class CDllRegSxClassFactory: public IClassFactory
         STDMETHODIMP LockServer(BOOL);
 };
 
-typedef CDllRegSxClassFactory* LPCSHELLEXTCLASSFACTORY;
-
 
 class CShellExt: 
     public IContextMenu3, IShellIconOverlayIdentifier, IShellExtInit
