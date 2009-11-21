@@ -400,8 +400,10 @@ class GCommit(GStatus):
             return label
         self.parent1_label = add_parent()
         self.parent2_label = add_parent()
-        parents_vbox.pack_start(gtk.HSeparator())
-        vbox2.pack_start(parents_vbox, False, False)
+        parents_hbox = gtk.HBox()
+        parents_hbox.pack_start(parents_vbox, False, False, 5)
+        vbox2.pack_start(parents_hbox, False, False, 2)
+        vbox2.pack_start(gtk.HSeparator(), False, False)
 
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
