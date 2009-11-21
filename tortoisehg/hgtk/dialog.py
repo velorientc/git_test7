@@ -32,6 +32,7 @@ def entry_dialog(parent, msg, visible=True, default='', respfunc=None):
     dialog = gtk.Dialog(parent=parent, flags=gtk.DIALOG_MODAL,
             buttons=buttons)
     dialog.set_title(_('TortoiseHg Prompt'))
+    dialog.set_has_separator(False)
     entry = gtk.Entry()
     entry.set_text(default or '')
     entry.set_visibility(visible)
