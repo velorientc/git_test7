@@ -29,8 +29,9 @@ class TaskBarUI(gtk.Window):
         self.set_title(_('TortoiseHg Taskbar'))
 
         about = gtk.Button(_('About'))
+        okay = gtk.Button(_('OK'))
+        cancel = gtk.Button(_('Cancel'))
         self.apply = gtk.Button(_('Apply'))
-        close = gtk.Button(_('Close'))
 
         vbox = gtk.VBox()
         vbox.set_border_width(5)
@@ -193,15 +194,21 @@ class TaskBarUI(gtk.Window):
         righthbbox.set_spacing(6)
         bbox.pack_start(righthbbox, False, False)
 
+        okay.connect('clicked', self.okay_clicked)
+        key, modifier = gtk.accelerator_parse('Return')
+        okay.add_accelerator('clicked', accelgroup, key, 0,
+                gtk.ACCEL_VISIBLE)
+        righthbbox.pack_start(okay, False, False)
+
+        cancel.connect('clicked', lambda x: self.destroy())
+        key, modifier = gtk.accelerator_parse('Escape')
+        cancel.add_accelerator('clicked', accelgroup, key, 0,
+                gtk.ACCEL_VISIBLE)
+        righthbbox.pack_start(cancel, False, False)
+
         self.apply.connect('clicked', self.apply_clicked)
         self.apply.set_sensitive(False)
         righthbbox.pack_start(self.apply, False, False)
-
-        close.connect('clicked', lambda x: self.destroy())
-        key, modifier = gtk.accelerator_parse('Escape')
-        close.add_accelerator('clicked', accelgroup, key, 0,
-                gtk.ACCEL_VISIBLE)
-        righthbbox.pack_start(close, False, False)
 
     def add_page(self, notebook, tab):
         frame = gtk.Frame()
@@ -310,6 +317,10 @@ class TaskBarUI(gtk.Window):
 
     def top_clicked(self, button):
         self.move_to_other(self.submlist)
+
+    def okay_clicked(self, button):
+        self.store_shell_configs()
+        self.destroy()
 
     def apply_clicked(self, button):
         self.store_shell_configs()
