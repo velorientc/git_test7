@@ -33,6 +33,7 @@ class TaskBarUI(gtk.Window):
         close = gtk.Button(_('Close'))
 
         vbox = gtk.VBox()
+        vbox.set_border_width(5)
         self.add(vbox)
 
         # Create a new notebook, place the position of the tabs
@@ -170,12 +171,16 @@ class TaskBarUI(gtk.Window):
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
 
+        # Padding
+        vbox.pack_start(gtk.HBox(), False, False, 3)
+
         # Bottom buttons
         bbox = gtk.HBox()
-        vbox.pack_start(bbox, False, False, 2)
+        vbox.pack_start(bbox, False, False)
 
         lefthbbox = gtk.HButtonBox()
         lefthbbox.set_layout(gtk.BUTTONBOX_START)
+        lefthbbox.set_spacing(6)
         bbox.pack_start(lefthbbox, False, False)
 
         about.connect('clicked', self.about)
@@ -185,6 +190,7 @@ class TaskBarUI(gtk.Window):
 
         righthbbox = gtk.HButtonBox()
         righthbbox.set_layout(gtk.BUTTONBOX_END)
+        righthbbox.set_spacing(6)
         bbox.pack_start(righthbbox, False, False)
 
         self.apply.connect('clicked', self.apply_clicked)
