@@ -25,8 +25,6 @@ DEFINE_GUID(CLSID_TortoiseHg6, 0xb456dba6L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x1
 UINT g_cRefThisDll = 0;
 HINSTANCE g_hmodThisDll = NULL;
 
-HMENU hSubMenu = 0;
-
 CRITICAL_SECTION g_critical_section;
 
 
@@ -130,8 +128,6 @@ VOID _LoadResources(VOID)
 
 VOID _UnloadResources(VOID)
 {
-    if (hSubMenu)
-        DestroyMenu(hSubMenu);
 }
 
 
