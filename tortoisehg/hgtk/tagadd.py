@@ -19,6 +19,9 @@ from tortoisehg.hgtk import dialog, gtklib
 
 keep = i18n.keepgettext()
 
+RESPONSE_ADD    = 1
+RESPONSE_REMOVE = 2
+
 class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, repo, tag='', rev=''):
@@ -35,12 +38,13 @@ class TagAddDialog(gtk.Dialog):
 
         # add Add button
         addbutton = gtk.Button(_('Add'))
-        addbutton.connect('clicked', lambda b: self._do_add_tag())
+        addbutton.connect('clicked', lambda b: self.response(RESPONSE_ADD))
         self.action_area.pack_end(addbutton)
 
         # add Remove button
         removebutton = gtk.Button(_('Remove'))
-        removebutton.connect('clicked', lambda b: self._do_rm_tag())
+        removebutton.connect('clicked',
+                             lambda b: self.response(RESPONSE_REMOVE))
         self.action_area.pack_end(removebutton)
 
         # persistent settings
@@ -54,7 +58,8 @@ class TagAddDialog(gtk.Dialog):
         self._tagslist = gtk.ListStore(str)
         self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
         self._tag_input = self._taglistbox.get_child()
-        self._tag_input.connect('activate', self._taginput_activated)
+        self._tag_input.connect('activate',
+                                lambda *a: self.response(RESPONSE_ADD))
         self._tag_input.set_text(tag)
         table.add_row(_('Tag:'), self._taglistbox, padding=False)
 
@@ -138,13 +143,21 @@ class TagAddDialog(gtk.Dialog):
             self._commit_message.grab_focus()
 
     def dialog_response(self, dialog, response_id):
-        self.store_settings()
-        if response_id == gtk.RESPONSE_CLOSE \
-                or response_id == gtk.RESPONSE_DELETE_EVENT:
+        # Add button
+        if response_id == RESPONSE_ADD:
+            self._do_add_tag()
+        # Remove button
+        elif response_id == RESPONSE_REMOVE:
+            self._do_rm_tag()
+        # Close button or closed by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            self.store_settings()
             self.destroy()
+            return # close dialog
+        else:
+            raise _('unexpected response id: %s') % response_id
 
-    def _taginput_activated(self, taginput):
-        self._do_add_tag()
+        self.run() # don't close dialog
 
     def _do_add_tag(self):
         # gather input data
