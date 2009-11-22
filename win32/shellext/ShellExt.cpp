@@ -3,6 +3,8 @@
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "InitStatus.h"
+#include "ThgClassFactory.h"
+
 #include <olectl.h>
 
 #define INITGUID
@@ -75,34 +77,32 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     TDEBUG_TRACE("DllGetClassObject clsid = " << WideToMultibyte(pwszShellExt));
     *ppvOut = NULL;
 
+    typedef ThgClassFactory<CShellExt> Fact;
+
     if (IsEqualIID(rclsid, CLSID_TortoiseHg0))
     {
-        CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory('C');  // clean
+        Fact *pcf = new Fact('C');  // clean
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg0");
         ++InitStatus::inst().unchanged_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg1))
     {
-        CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory('A');  // added
+        Fact *pcf = new Fact('A');  // added
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg1");
         ++InitStatus::inst().added_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg2))
     {
-        CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory('M');   // modified
+        Fact *pcf = new Fact('M');   // modified
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
         ++InitStatus::inst().modified_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg6))
     {
-        CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory('?');   // not in repo
+        Fact *pcf = new Fact('?');   // not in repo
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
         ++InitStatus::inst().notinrepo_;
         return pcf->QueryInterface(riid, ppvOut);
@@ -121,84 +121,6 @@ VOID _UnloadResources(VOID)
 {
     if (hSubMenu)
         DestroyMenu(hSubMenu);
-}
-
-
-LPCRITICAL_SECTION CDllRegSxClassFactory::GetCriticalSection()
-{
-    return &g_critical_section;
-}
-
-
-CDllRegSxClassFactory::CDllRegSxClassFactory(char classToMake) :
-    myclassToMake(classToMake)
-{
-    ThgCriticalSection cs(GetCriticalSection());
-    m_cRef = 0L;
-    g_cRefThisDll++;
-}
-
-
-CDllRegSxClassFactory::~CDllRegSxClassFactory()
-{
-    ThgCriticalSection cs(GetCriticalSection());
-    g_cRefThisDll--;
-}
-
-
-STDMETHODIMP CDllRegSxClassFactory::QueryInterface(
-    REFIID riid, LPVOID FAR* ppv)
-{
-    *ppv = NULL;
-
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
-    {
-        *ppv = (LPCLASSFACTORY) this;
-        AddRef();
-        return NOERROR;
-    }
-
-    return E_NOINTERFACE;
-}
-
-
-STDMETHODIMP_(ULONG) CDllRegSxClassFactory::AddRef()
-{
-    ThgCriticalSection cs(GetCriticalSection());
-    return ++m_cRef;
-}
-
-
-STDMETHODIMP_(ULONG) CDllRegSxClassFactory::Release()
-{
-    ThgCriticalSection cs(GetCriticalSection());
-    if (--m_cRef)
-        return m_cRef;
-
-    delete this;
-    return 0L;
-}
-
-
-STDMETHODIMP CDllRegSxClassFactory::CreateInstance(
-    LPUNKNOWN pUnkOuter, REFIID riid, LPVOID* ppvObj)
-{
-    *ppvObj = NULL;
-
-    if (pUnkOuter)
-        return CLASS_E_NOAGGREGATION;
-
-    LPCSHELLEXT pShellExt = new CShellExt(myclassToMake);
-    if (NULL == pShellExt)
-        return E_OUTOFMEMORY;
-
-    return pShellExt->QueryInterface(riid, ppvObj);
-}
-
-
-STDMETHODIMP CDllRegSxClassFactory::LockServer(BOOL fLock)
-{
-    return NOERROR;
 }
 
 
@@ -229,6 +151,20 @@ CShellExt::~CShellExt()
 LPCRITICAL_SECTION CShellExt::GetCriticalSection()
 {
     return &g_critical_section;
+}
+
+
+void CShellExt::IncDllRef()
+{
+    ThgCriticalSection cs(GetCriticalSection());
+    g_cRefThisDll++;
+}
+
+
+void CShellExt::DecDllRef()
+{
+    ThgCriticalSection cs(GetCriticalSection());
+    g_cRefThisDll--;
 }
 
 

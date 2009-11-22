@@ -5,27 +5,6 @@
 #include <string>
 
 
-class CDllRegSxClassFactory: public IClassFactory
-{
-    protected:
-        ULONG m_cRef;
-        const char myclassToMake;
-
-    public:
-        explicit CDllRegSxClassFactory(char classToMake);
-        ~CDllRegSxClassFactory();
-
-        static LPCRITICAL_SECTION GetCriticalSection();
-
-        STDMETHODIMP QueryInterface(REFIID, LPVOID FAR*);
-        STDMETHODIMP_(ULONG) AddRef();
-        STDMETHODIMP_(ULONG) Release();
-
-        STDMETHODIMP CreateInstance(LPUNKNOWN, REFIID, LPVOID FAR*);
-        STDMETHODIMP LockServer(BOOL);
-};
-
-
 class CShellExt: 
     public IContextMenu3, IShellIconOverlayIdentifier, IShellExtInit
 {
@@ -43,6 +22,8 @@ class CShellExt:
 
     public:
         static LPCRITICAL_SECTION GetCriticalSection();
+        static void IncDllRef();
+        static void DecDllRef();
 
         explicit CShellExt(char Class);
         ~CShellExt();
