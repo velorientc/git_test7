@@ -5,6 +5,7 @@
 #include "InitStatus.h"
 #include "ThgClassFactory.h"
 #include "CShellExtCMenu.h"
+#include "CShellExtOverlay.h"
 
 #include <olectl.h>
 

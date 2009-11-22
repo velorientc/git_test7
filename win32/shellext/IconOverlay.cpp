@@ -3,6 +3,7 @@
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "QueryDirstate.h"
+#include "CShellExtOverlay.h"
 
 #include <shlwapi.h>
 
