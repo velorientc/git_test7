@@ -748,3 +748,65 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
     LaunchCommand(hgcmd, cwd);
     InitStatus::check();
 }
+
+
+STDMETHODIMP CShellExtCMenu::Initialize(
+    LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
+{
+    TCHAR name[MAX_PATH+1];
+
+    TDEBUG_TRACE("CShellExtCMenu::Initialize");
+    TDEBUG_TRACE("  pIDFolder: " << pIDFolder);
+    TDEBUG_TRACE("  pDataObj: " << pDataObj);
+
+    myFolder.clear();
+    myFiles.clear();
+
+    if (pDataObj)
+    {
+        FORMATETC fmt = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+        STGMEDIUM stg = { TYMED_HGLOBAL };
+        if (SUCCEEDED(pDataObj->GetData(&fmt, &stg)) && stg.hGlobal)
+        {
+            HDROP hDrop = (HDROP) GlobalLock(stg.hGlobal);
+            
+            if (hDrop)
+            {
+                UINT uNumFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+                TDEBUG_TRACE("  hDrop uNumFiles = " << uNumFiles);
+                for (UINT i = 0; i < uNumFiles; ++i) {
+                    if (DragQueryFile(hDrop, i, name, MAX_PATH) > 0)
+                    {
+                        TDEBUG_TRACE("  DragQueryFile [" << i << "] = " << name);
+                        myFiles.push_back(name);
+                    }   
+                }
+            }
+            else 
+            {
+                TDEBUG_TRACE("  hDrop is NULL ");
+            }
+
+            GlobalUnlock(stg.hGlobal);
+            if (stg.pUnkForRelease)
+            {
+                IUnknown* relInterface = (IUnknown*) stg.pUnkForRelease;
+                relInterface->Release();
+            }
+        }
+        else
+        {
+            TDEBUG_TRACE("  pDataObj->GetData failed");
+        }
+    }
+
+    // if a directory background
+    if (pIDFolder) 
+    {
+        SHGetPathFromIDList(pIDFolder, name);
+        TDEBUG_TRACE("  Folder " << name);
+        myFolder = name;
+    }
+
+    return NOERROR;
+}
