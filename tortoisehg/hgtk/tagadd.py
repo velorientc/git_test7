@@ -26,8 +26,7 @@ class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, repo, tag='', rev=''):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self,
-                            buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        gtk.Dialog.__init__(self)
         gtklib.set_tortoise_keys(self)
         self.set_title(_('Tag - %s') % hglib.get_reponame(repo))
         self.set_resizable(False)
@@ -36,16 +35,10 @@ class TagAddDialog(gtk.Dialog):
 
         self.repo = repo
 
-        # add Add button
-        addbutton = gtk.Button(_('Add'))
-        addbutton.connect('clicked', lambda b: self.response(RESPONSE_ADD))
-        self.action_area.pack_end(addbutton)
-
-        # add Remove button
-        removebutton = gtk.Button(_('Remove'))
-        removebutton.connect('clicked',
-                             lambda b: self.response(RESPONSE_REMOVE))
-        self.action_area.pack_end(removebutton)
+        # add buttons
+        self.add_button(_('Add'), RESPONSE_ADD)
+        self.add_button(_('Remove'), RESPONSE_REMOVE)
+        self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         # persistent settings
         self.settings = settings.Settings('tagadd')
