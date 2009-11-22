@@ -19,7 +19,7 @@ class InitDialog(gtk.Dialog):
     """ Dialog to initialize a Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self, title=_('Create a new repository'))
+        gtk.Dialog.__init__(self, title=_('TortoiseHg Init'))
         gtklib.set_tortoise_icon(self, 'menucreaterepos.ico')
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
