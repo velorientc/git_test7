@@ -1,11 +1,14 @@
 #include "stdafx.h"
-#include "CShellExtCMenu.h"
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "Dirstatecache.h"
 #include "Thgstatus.h"
 #include "Winstat.h"
 #include "InitStatus.h"
+#include "ShellExt.h"
+
+#include "CShellExtCMenu.h"
+
 #include <map>
 
 
@@ -809,4 +812,65 @@ STDMETHODIMP CShellExtCMenu::Initialize(
     }
 
     return NOERROR;
+}
+
+
+CShellExtCMenu::CShellExtCMenu(char dummy) :
+    m_ppszFileUserClickedOn(0)
+{
+    m_cRef = 0L;
+    CShellExt::IncDllRef();    
+}
+
+
+CShellExtCMenu::~CShellExtCMenu()
+{
+    CShellExt::DecDllRef();
+}
+
+
+STDMETHODIMP_(ULONG) CShellExtCMenu::AddRef()
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    return ++m_cRef;
+}
+
+
+STDMETHODIMP_(ULONG) CShellExtCMenu::Release()
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    if(--m_cRef)
+        return m_cRef;
+    delete this;
+    return 0L;
+}
+
+
+STDMETHODIMP CShellExtCMenu::QueryInterface(REFIID riid, LPVOID FAR* ppv)
+{    
+    *ppv = NULL;
+    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
+    {
+        *ppv = (LPSHELLEXTINIT) this;
+    }
+    else if (IsEqualIID(riid, IID_IContextMenu))
+    {
+        *ppv = (LPCONTEXTMENU) this;
+    }
+    else if (IsEqualIID(riid, IID_IContextMenu2))
+    {
+        *ppv = (IContextMenu2*) this;
+    }
+    else if (IsEqualIID(riid, IID_IContextMenu3))
+    {
+        *ppv = (IContextMenu3*) this;
+    }
+    
+    if (*ppv)
+    {
+        AddRef();
+        return NOERROR;
+    }
+
+    return E_NOINTERFACE;
 }

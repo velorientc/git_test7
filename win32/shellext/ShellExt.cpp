@@ -142,24 +142,11 @@ CShellExtOverlay::CShellExtOverlay(char tortoiseClass) :
     CShellExt::IncDllRef();
 }
 
-CShellExtCMenu::CShellExtCMenu(char dummy) :
-    m_ppszFileUserClickedOn(0)
-{
-    m_cRef = 0L;
-    CShellExt::IncDllRef();    
-}
-
 
 CShellExtOverlay::~CShellExtOverlay()
 {
     CShellExt::DecDllRef();
 }
-
-CShellExtCMenu::~CShellExtCMenu()
-{
-    CShellExt::DecDllRef();
-}
-
 
 LPCRITICAL_SECTION CShellExt::GetCriticalSection()
 {
@@ -199,35 +186,6 @@ STDMETHODIMP CShellExtOverlay::QueryInterface(REFIID riid, LPVOID FAR* ppv)
     return E_NOINTERFACE;
 }
 
-STDMETHODIMP CShellExtCMenu::QueryInterface(REFIID riid, LPVOID FAR* ppv)
-{    
-    *ppv = NULL;
-    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
-    {
-        *ppv = (LPSHELLEXTINIT) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu))
-    {
-        *ppv = (LPCONTEXTMENU) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu2))
-    {
-        *ppv = (IContextMenu2*) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu3))
-    {
-        *ppv = (IContextMenu3*) this;
-    }
-    
-    if (*ppv)
-    {
-        AddRef();
-        return NOERROR;
-    }
-
-    return E_NOINTERFACE;
-}
-
 
 STDMETHODIMP_(ULONG) CShellExtOverlay::AddRef()
 {
@@ -235,23 +193,9 @@ STDMETHODIMP_(ULONG) CShellExtOverlay::AddRef()
     return ++m_cRef;
 }
 
-STDMETHODIMP_(ULONG) CShellExtCMenu::AddRef()
-{
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    return ++m_cRef;
-}
 
 
 STDMETHODIMP_(ULONG) CShellExtOverlay::Release()
-{
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    if(--m_cRef)
-        return m_cRef;
-    delete this;
-    return 0L;
-}
-
-STDMETHODIMP_(ULONG) CShellExtCMenu::Release()
 {
     ThgCriticalSection cs(CShellExt::GetCriticalSection());
     if(--m_cRef)
