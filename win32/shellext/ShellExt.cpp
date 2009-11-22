@@ -135,19 +135,6 @@ VOID _UnloadResources(VOID)
 }
 
 
-CShellExtOverlay::CShellExtOverlay(char tortoiseClass) :
-    myTortoiseClass(tortoiseClass)
-{
-    m_cRef = 0L;
-    CShellExt::IncDllRef();
-}
-
-
-CShellExtOverlay::~CShellExtOverlay()
-{
-    CShellExt::DecDllRef();
-}
-
 LPCRITICAL_SECTION CShellExt::GetCriticalSection()
 {
     return &g_critical_section;
@@ -165,41 +152,4 @@ void CShellExt::DecDllRef()
 {
     ThgCriticalSection cs(CShellExt::GetCriticalSection());
     g_cRefThisDll--;
-}
-
-
-STDMETHODIMP CShellExtOverlay::QueryInterface(REFIID riid, LPVOID FAR* ppv)
-{    
-    *ppv = NULL;
-    if (IsEqualIID(riid, IID_IShellIconOverlayIdentifier) 
-        || IsEqualIID(riid, IID_IUnknown) )
-    {
-        *ppv = (IShellIconOverlayIdentifier*) this;
-    }
-    
-    if (*ppv)
-    {
-        AddRef();
-        return NOERROR;
-    }
-
-    return E_NOINTERFACE;
-}
-
-
-STDMETHODIMP_(ULONG) CShellExtOverlay::AddRef()
-{
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    return ++m_cRef;
-}
-
-
-
-STDMETHODIMP_(ULONG) CShellExtOverlay::Release()
-{
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    if(--m_cRef)
-        return m_cRef;
-    delete this;
-    return 0L;
 }
