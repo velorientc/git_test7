@@ -10,6 +10,8 @@
 #define INITGUID
 #include <initguid.h>
 
+DEFINE_GUID(CLSID_TortoiseHgCmenu, 0xb456db9fL, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
+
 DEFINE_GUID(CLSID_TortoiseHg0, 0xb456dba0L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
 DEFINE_GUID(CLSID_TortoiseHg1, 0xb456dba1L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
 DEFINE_GUID(CLSID_TortoiseHg2, 0xb456dba2L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
@@ -77,32 +79,39 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     TDEBUG_TRACE("DllGetClassObject clsid = " << WideToMultibyte(pwszShellExt));
     *ppvOut = NULL;
 
-    typedef ThgClassFactory<CShellExt> Fact;
+    typedef ThgClassFactory<CShellExtOverlay> FactOvl;
+    typedef ThgClassFactory<CShellExtCMenu>   FactCmenu;
 
-    if (IsEqualIID(rclsid, CLSID_TortoiseHg0))
+    if (IsEqualIID(rclsid, CLSID_TortoiseHgCmenu))
     {
-        Fact *pcf = new Fact('C');  // clean
+        FactCmenu *pcf = new FactCmenu(0);
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgCmenu");
+        return pcf->QueryInterface(riid, ppvOut);
+    }
+    else if (IsEqualIID(rclsid, CLSID_TortoiseHg0))
+    {
+        FactOvl *pcf = new FactOvl('C');  // clean
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg0");
         ++InitStatus::inst().unchanged_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg1))
     {
-        Fact *pcf = new Fact('A');  // added
+        FactOvl *pcf = new FactOvl('A');  // added
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg1");
         ++InitStatus::inst().added_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg2))
     {
-        Fact *pcf = new Fact('M');   // modified
+        FactOvl *pcf = new FactOvl('M');   // modified
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
         ++InitStatus::inst().modified_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg6))
     {
-        Fact *pcf = new Fact('?');   // not in repo
+        FactOvl *pcf = new FactOvl('?');   // not in repo
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
         ++InitStatus::inst().notinrepo_;
         return pcf->QueryInterface(riid, ppvOut);
@@ -124,26 +133,35 @@ VOID _UnloadResources(VOID)
 }
 
 
-CShellExt::CShellExt(char tortoiseClass) :
-    myTortoiseClass(tortoiseClass), 
+CShellExtOverlay::CShellExtOverlay(char tortoiseClass) :
+    myTortoiseClass(tortoiseClass)
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    m_cRef = 0L;
+    g_cRefThisDll++;
+}
+
+CShellExtCMenu::CShellExtCMenu(char dummy) :
     m_ppszFileUserClickedOn(0)
 {
-    ThgCriticalSection cs(GetCriticalSection());
-
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
     m_cRef = 0L;
     m_pDataObj = NULL;
-
     g_cRefThisDll++;
 }
 
 
-CShellExt::~CShellExt()
+CShellExtOverlay::~CShellExtOverlay()
 {
-    ThgCriticalSection cs(GetCriticalSection());
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    g_cRefThisDll--;
+}
 
+CShellExtCMenu::~CShellExtCMenu()
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
     if (m_pDataObj)
         m_pDataObj->Release();
-
     g_cRefThisDll--;
 }
 
@@ -156,19 +174,37 @@ LPCRITICAL_SECTION CShellExt::GetCriticalSection()
 
 void CShellExt::IncDllRef()
 {
-    ThgCriticalSection cs(GetCriticalSection());
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
     g_cRefThisDll++;
 }
 
 
 void CShellExt::DecDllRef()
 {
-    ThgCriticalSection cs(GetCriticalSection());
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
     g_cRefThisDll--;
 }
 
 
-STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR* ppv)
+STDMETHODIMP CShellExtOverlay::QueryInterface(REFIID riid, LPVOID FAR* ppv)
+{    
+    *ppv = NULL;
+    if (IsEqualIID(riid, IID_IShellIconOverlayIdentifier) 
+        || IsEqualIID(riid, IID_IUnknown) )
+    {
+        *ppv = (IShellIconOverlayIdentifier*) this;
+    }
+    
+    if (*ppv)
+    {
+        AddRef();
+        return NOERROR;
+    }
+
+    return E_NOINTERFACE;
+}
+
+STDMETHODIMP CShellExtCMenu::QueryInterface(REFIID riid, LPVOID FAR* ppv)
 {    
     *ppv = NULL;
     if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
@@ -187,10 +223,6 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR* ppv)
     {
         *ppv = (IContextMenu3*) this;
     }
-    else if (IsEqualIID(riid, IID_IShellIconOverlayIdentifier))
-    {
-        *ppv = (IShellIconOverlayIdentifier*) this;
-    }
     
     if (*ppv)
     {
@@ -202,31 +234,44 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR* ppv)
 }
 
 
-STDMETHODIMP_(ULONG) CShellExt::AddRef()
+STDMETHODIMP_(ULONG) CShellExtOverlay::AddRef()
 {
-    ThgCriticalSection cs(GetCriticalSection());
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    return ++m_cRef;
+}
+
+STDMETHODIMP_(ULONG) CShellExtCMenu::AddRef()
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
     return ++m_cRef;
 }
 
 
-STDMETHODIMP_(ULONG) CShellExt::Release()
+STDMETHODIMP_(ULONG) CShellExtOverlay::Release()
 {
-    ThgCriticalSection cs(GetCriticalSection());
-
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
     if(--m_cRef)
         return m_cRef;
+    delete this;
+    return 0L;
+}
 
+STDMETHODIMP_(ULONG) CShellExtCMenu::Release()
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    if(--m_cRef)
+        return m_cRef;
     delete this;
     return 0L;
 }
 
 
-STDMETHODIMP CShellExt::Initialize(
+STDMETHODIMP CShellExtCMenu::Initialize(
     LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
     TCHAR name[MAX_PATH+1];
 
-    TDEBUG_TRACE("CShellExt::Initialize");
+    TDEBUG_TRACE("CShellExtCMenu::Initialize");
     TDEBUG_TRACE("  pIDFolder: " << pIDFolder);
     TDEBUG_TRACE("  pDataObj: " << pDataObj);
 

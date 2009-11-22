@@ -7,10 +7,10 @@
 #include <shlwapi.h>
 
 
-STDMETHODIMP CShellExt::GetOverlayInfo(
+STDMETHODIMP CShellExtOverlay::GetOverlayInfo(
     LPWSTR pwszIconFile, int cchMax, int *pIndex, DWORD *pdwFlags)
 {
-    TDEBUG_TRACE("CShellExt::GetOverlayInfo: myTortoiseClass = " << myTortoiseClass);
+    TDEBUG_TRACE("CShellExtOverlay::GetOverlayInfo: myTortoiseClass = " << myTortoiseClass);
     // icons are determined by TortoiseOverlays shim
     *pIndex = 0;
     *pdwFlags = 0;
@@ -19,16 +19,16 @@ STDMETHODIMP CShellExt::GetOverlayInfo(
 }
 
 
-STDMETHODIMP CShellExt::GetPriority(int *pPriority)
+STDMETHODIMP CShellExtOverlay::GetPriority(int *pPriority)
 {
     *pPriority = 1;
     return S_OK;
 }
 
 
-STDMETHODIMP CShellExt::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
+STDMETHODIMP CShellExtOverlay::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */)
 {
-    ThgCriticalSection cs(GetCriticalSection());
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
 
     std::string cval;
     if (GetRegistryConfig("EnableOverlays", cval) != 0 && cval == "0")
