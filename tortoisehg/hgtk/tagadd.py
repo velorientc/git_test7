@@ -141,7 +141,7 @@ class TagAddDialog(gtk.Dialog):
             self._do_add_tag()
         # Remove button
         elif response_id == RESPONSE_REMOVE:
-            self._do_rm_tag()
+            self._do_remove_tag()
         # Close button or closed by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
             self.store_settings()
@@ -189,7 +189,7 @@ class TagAddDialog(gtk.Dialog):
                     traceback.format_exc())
             return False
 
-    def _do_rm_tag(self):
+    def _do_remove_tag(self):
         # gather input data
         is_local = self._local_tag.get_active()
         name = self._tag_input.get_text()
@@ -209,7 +209,7 @@ class TagAddDialog(gtk.Dialog):
             message = ''
 
         try:
-            self._rm_hg_tag(name, message, is_local, english=eng_msg)
+            self._remove_hg_tag(name, message, is_local, english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been removed') % name)
             self._refresh()
@@ -239,7 +239,7 @@ class TagAddDialog(gtk.Dialog):
 
         self.repo.tag(name, r, hglib.fromutf(message), local, user, date)
 
-    def _rm_hg_tag(self, name, message, local, user=None, date=None,
+    def _remove_hg_tag(self, name, message, local, user=None, date=None,
                     english=False):
         if not name in self.repo.tags():
             raise util.Abort(_("Tag '%s' does not exist") % name)
