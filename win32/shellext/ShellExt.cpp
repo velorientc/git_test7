@@ -138,30 +138,26 @@ VOID _UnloadResources(VOID)
 CShellExtOverlay::CShellExtOverlay(char tortoiseClass) :
     myTortoiseClass(tortoiseClass)
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
     m_cRef = 0L;
-    g_cRefThisDll++;
+    CShellExt::IncDllRef();
 }
 
 CShellExtCMenu::CShellExtCMenu(char dummy) :
     m_ppszFileUserClickedOn(0)
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
     m_cRef = 0L;
-    g_cRefThisDll++;
+    CShellExt::IncDllRef();    
 }
 
 
 CShellExtOverlay::~CShellExtOverlay()
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    g_cRefThisDll--;
+    CShellExt::DecDllRef();
 }
 
 CShellExtCMenu::~CShellExtCMenu()
 {
-    ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    g_cRefThisDll--;
+    CShellExt::DecDllRef();
 }
 
 
