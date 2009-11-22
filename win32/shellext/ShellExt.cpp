@@ -4,6 +4,7 @@
 #include "StringUtils.h"
 #include "InitStatus.h"
 #include "ThgClassFactory.h"
+#include "CShellExtCMenu.h"
 
 #include <olectl.h>
 

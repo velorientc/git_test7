@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "ShellExt.h"
+#include "CShellExtCMenu.h"
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "Dirstatecache.h"
