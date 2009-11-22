@@ -146,7 +146,6 @@ CShellExtCMenu::CShellExtCMenu(char dummy) :
 {
     ThgCriticalSection cs(CShellExt::GetCriticalSection());
     m_cRef = 0L;
-    m_pDataObj = NULL;
     g_cRefThisDll++;
 }
 
@@ -160,8 +159,6 @@ CShellExtOverlay::~CShellExtOverlay()
 CShellExtCMenu::~CShellExtCMenu()
 {
     ThgCriticalSection cs(CShellExt::GetCriticalSection());
-    if (m_pDataObj)
-        m_pDataObj->Release();
     g_cRefThisDll--;
 }
 

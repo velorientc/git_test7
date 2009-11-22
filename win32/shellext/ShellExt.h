@@ -17,7 +17,6 @@ public:
 class CShellExtCMenu: public IContextMenu3, IShellExtInit
 {
     ULONG m_cRef;
-    LPDATAOBJECT m_pDataObj;
 
     LPTSTR* m_ppszFileUserClickedOn; // [MAX_PATH]
     std::vector<std::string> myFiles;
