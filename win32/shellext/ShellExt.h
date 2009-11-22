@@ -56,8 +56,6 @@ class CShellExt:
             LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hKeyID);
     };
 
-typedef CShellExt* LPCSHELLEXT;
-
 
 class ThgCriticalSection
 {
