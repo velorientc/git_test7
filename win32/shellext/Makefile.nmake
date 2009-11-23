@@ -16,8 +16,7 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         Dirstatecache.obj \
         DirectoryStatus.obj \
         Thgstatus.obj \
-        QueryDirstate.obj \
-        ThgDebug.obj
+        QueryDirstate.obj
 
 LIBS    = User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib
 DEFFILE = ShellExt.def
