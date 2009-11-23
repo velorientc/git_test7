@@ -8,7 +8,7 @@ OBJECTS_DIRSTATE = TortoiseUtils.obj \
 OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         InitStatus.obj \
         CShellExtCMenu.obj \
-        IconOverlay.obj \
+        CShellExtOverlay.obj \
         ShellExt.obj \
         StringUtils.obj \
         dirstate.obj \
