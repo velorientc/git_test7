@@ -745,7 +745,7 @@ class GLog(gdialog.GDialog):
 
         # need mq extension for strip command
         if 'mq' in self.exs:
-            cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
+            cmenu_qimport = create_menu(_('QImport Revision'), self.qimport_rev)
             cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
 
             try:
@@ -822,7 +822,7 @@ class GLog(gdialog.GDialog):
         
         # need MQ extension for qimport command
         if 'mq' in self.exs:
-            m.append(create_menu(_('qimport from here to selected'),
+            m.append(create_menu(_('QImport from here to selected'),
                      self.qimport_revs))
 
         m.append_sep()
