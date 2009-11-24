@@ -19,12 +19,14 @@ from tortoisehg.hgtk import dialog, gtklib
 
 keep = i18n.keepgettext()
 
+RESPONSE_ADD    = 1
+RESPONSE_REMOVE = 2
+
 class TagAddDialog(gtk.Dialog):
     """ Dialog to add tag to Mercurial repo """
     def __init__(self, repo, tag='', rev=''):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self,
-                            buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        gtk.Dialog.__init__(self)
         gtklib.set_tortoise_keys(self)
         self.set_title(_('Tag - %s') % hglib.get_reponame(repo))
         self.set_resizable(False)
@@ -33,15 +35,10 @@ class TagAddDialog(gtk.Dialog):
 
         self.repo = repo
 
-        # add Add button
-        addbutton = gtk.Button(_('Add'))
-        addbutton.connect('clicked', lambda b: self._do_add_tag())
-        self.action_area.pack_end(addbutton)
-
-        # add Remove button
-        removebutton = gtk.Button(_('Remove'))
-        removebutton.connect('clicked', lambda b: self._do_rm_tag())
-        self.action_area.pack_end(removebutton)
+        # add buttons
+        self.add_button(_('Add'), RESPONSE_ADD)
+        self.add_button(_('Remove'), RESPONSE_REMOVE)
+        self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         # persistent settings
         self.settings = settings.Settings('tagadd')
@@ -54,7 +51,8 @@ class TagAddDialog(gtk.Dialog):
         self._tagslist = gtk.ListStore(str)
         self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
         self._tag_input = self._taglistbox.get_child()
-        self._tag_input.connect('activate', self._taginput_activated)
+        self._tag_input.connect('activate',
+                                lambda *a: self.response(RESPONSE_ADD))
         self._tag_input.set_text(tag)
         table.add_row(_('Tag:'), self._taglistbox, padding=False)
 
@@ -138,13 +136,21 @@ class TagAddDialog(gtk.Dialog):
             self._commit_message.grab_focus()
 
     def dialog_response(self, dialog, response_id):
-        self.store_settings()
-        if response_id == gtk.RESPONSE_CLOSE \
-                or response_id == gtk.RESPONSE_DELETE_EVENT:
+        # Add button
+        if response_id == RESPONSE_ADD:
+            self._do_add_tag()
+        # Remove button
+        elif response_id == RESPONSE_REMOVE:
+            self._do_remove_tag()
+        # Close button or closed by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            self.store_settings()
             self.destroy()
+            return # close dialog
+        else:
+            raise _('unexpected response id: %s') % response_id
 
-    def _taginput_activated(self, taginput):
-        self._do_add_tag()
+        self.run() # don't close dialog
 
     def _do_add_tag(self):
         # gather input data
@@ -183,7 +189,7 @@ class TagAddDialog(gtk.Dialog):
                     traceback.format_exc())
             return False
 
-    def _do_rm_tag(self):
+    def _do_remove_tag(self):
         # gather input data
         is_local = self._local_tag.get_active()
         name = self._tag_input.get_text()
@@ -203,7 +209,7 @@ class TagAddDialog(gtk.Dialog):
             message = ''
 
         try:
-            self._rm_hg_tag(name, message, is_local, english=eng_msg)
+            self._remove_hg_tag(name, message, is_local, english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been removed') % name)
             self._refresh()
@@ -233,7 +239,7 @@ class TagAddDialog(gtk.Dialog):
 
         self.repo.tag(name, r, hglib.fromutf(message), local, user, date)
 
-    def _rm_hg_tag(self, name, message, local, user=None, date=None,
+    def _remove_hg_tag(self, name, message, local, user=None, date=None,
                     english=False):
         if not name in self.repo.tags():
             raise util.Abort(_("Tag '%s' does not exist") % name)

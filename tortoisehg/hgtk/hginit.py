@@ -19,16 +19,15 @@ class InitDialog(gtk.Dialog):
     """ Dialog to initialize a Mercurial repo """
     def __init__(self, repos=[]):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self, title=_('Create a new repository'))
+        gtk.Dialog.__init__(self, title=_('TortoiseHg Init'))
         gtklib.set_tortoise_icon(self, 'menucreaterepos.ico')
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
+        self.connect('response', self.dialog_response)
 
         # add buttons
-        createbutton = gtk.Button(_('Create'))
-        createbutton.connect('clicked', lambda b: self.init())
-        self.action_area.pack_end(createbutton)
+        self.add_button(_('Create'), gtk.RESPONSE_OK)
         self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         self.cwd = os.getcwd()
@@ -70,8 +69,20 @@ class InitDialog(gtk.Dialog):
         except:
             pass
 
+    def dialog_response(self, dialog, response_id):
+        # Create button
+        if response_id == gtk.RESPONSE_OK:
+            self.init()
+        # Cancel button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            return # close dialog
+        else:
+            raise _('unexpected response id: %s') % response_id
+
+        self.run() # don't close dialog
+
     def dest_clicked(self, button):
-        """ select destination folder to clone """
+        """ select destination folder to init """
         response = gtklib.NativeFolderSelectDialog(
                           initial=self.cwd,
                           title=_('Select Destination Folder')).run()
@@ -84,7 +95,7 @@ class InitDialog(gtk.Dialog):
         dest = hglib.fromutf(self.destentry.get_text())
 
         # verify input
-        if dest == "":
+        if dest == '':
             dialog.error_dialog(self, _('Destination path is empty'),
                     _('Please enter the directory path'))
             self.destentry.grab_focus()
@@ -129,7 +140,7 @@ class InitDialog(gtk.Dialog):
         dialog.info_dialog(self, _('New repository created'),
                 _('in directory %s') % hglib.toutf(os.path.abspath(dest)))
 
-        self.response(gtk.RESPONSE_OK)
+        self.response(gtk.RESPONSE_CLOSE)
 
 def run(ui, *pats, **opts):
     return InitDialog(pats)

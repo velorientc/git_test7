@@ -523,6 +523,7 @@ class ConfigDialog(gtk.Dialog):
                                      gtk.STOCK_APPLY, gtk.RESPONSE_APPLY))
         gtklib.set_tortoise_keys(self)
         self._btn_apply = self.action_area.get_children()[0]
+        self.set_has_separator(False)
 
         self.ui = ui.ui()
         try:

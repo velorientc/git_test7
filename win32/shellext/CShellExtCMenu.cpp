@@ -1,11 +1,14 @@
 #include "stdafx.h"
-#include "ShellExt.h"
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "Dirstatecache.h"
 #include "Thgstatus.h"
 #include "Winstat.h"
 #include "InitStatus.h"
+#include "ShellExt.h"
+
+#include "CShellExtCMenu.h"
+
 #include <map>
 
 
@@ -301,10 +304,10 @@ void InsertMenuItemByName(
 
 // IContextMenu
 STDMETHODIMP
-CShellExt::QueryContextMenu(
+CShellExtCMenu::QueryContextMenu(
     HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
-    TDEBUG_TRACE("CShellExt::QueryContextMenu");
+    TDEBUG_TRACE("CShellExtCMenu::QueryContextMenu");
     InitMenuMaps();
 
     UINT idCmd = idCmdFirst;
@@ -444,7 +447,7 @@ CShellExt::QueryContextMenu(
             RemoveMenu(hSubMenu, indexSubMenu - 1, MF_BYPOSITION);
     }
 
-    TDEBUG_TRACE("  CShellExt::QueryContextMenu: adding main THG menu");
+    TDEBUG_TRACE("  CShellExtCMenu::QueryContextMenu: adding main THG menu");
     InsertSubMenuItemWithIcon2(hMenu, hSubMenu, indexMenu++, idCmd++,
             L"TortoiseHG", "hg.ico");
 
@@ -456,15 +459,15 @@ CShellExt::QueryContextMenu(
 
 
 STDMETHODIMP
-CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
+CShellExtCMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 {
-    TDEBUG_TRACE("CShellExt::InvokeCommand");
+    TDEBUG_TRACE("CShellExtCMenu::InvokeCommand");
 
     HRESULT hr = E_INVALIDARG;
     if (!HIWORD(lpcmi->lpVerb))
     {
         UINT idCmd = LOWORD(lpcmi->lpVerb);
-        TDEBUG_TRACE("CShellExt::InvokeCommand: idCmd = " << idCmd);
+        TDEBUG_TRACE("CShellExtCMenu::InvokeCommand: idCmd = " << idCmd);
         MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmd);
         if (iter != MenuIdMap.end())
         {
@@ -474,7 +477,7 @@ CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         else
         {
             TDEBUG_TRACE(
-                "CShellExt::InvokeCommand: action not found for idCmd "
+                "CShellExtCMenu::InvokeCommand: action not found for idCmd "
                 << idCmd
             );
         }
@@ -484,7 +487,7 @@ CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 
 
 STDMETHODIMP
-CShellExt::GetCommandString(
+CShellExtCMenu::GetCommandString(
     UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved,
     LPSTR pszName, UINT cchMax)
 {
@@ -513,7 +516,7 @@ CShellExt::GetCommandString(
     }
 
     TDEBUG_TRACE(
-        "CShellExt::GetCommandString: idCmd = " << idCmd 
+        "CShellExtCMenu::GetCommandString: idCmd = " << idCmd 
         << ", uFlags = " << uFlags << " (" << sflags << ")"
         << ", cchMax = " << cchMax
     );
@@ -521,12 +524,12 @@ CShellExt::GetCommandString(
     MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter == MenuIdMap.end())
     {
-        TDEBUG_TRACE("CShellExt::GetCommandString: idCmd not found");
+        TDEBUG_TRACE("CShellExtCMenu::GetCommandString: idCmd not found");
     }
     else
     {
         TDEBUG_TRACE(
-            "CShellExt::GetCommandString: name = \"" << iter->second.name << "\"");
+            "CShellExtCMenu::GetCommandString: name = \"" << iter->second.name << "\"");
 
         if (uFlags == GCS_HELPTEXTW)
         {
@@ -537,7 +540,7 @@ CShellExt::GetCommandString(
             if (size >= 40)
             {
                 TDEBUG_TRACE(
-                    "CShellExt::GetCommandString: warning:" 
+                    "CShellExtCMenu::GetCommandString: warning:" 
                     << " length of help text is " << size
                     << ", which is not reasonably short (<40)");
             }
@@ -566,7 +569,7 @@ CShellExt::GetCommandString(
 
     if (cchMax < 1)
     {
-        TDEBUG_TRACE("CShellExt::GetCommandString: cchMax = " 
+        TDEBUG_TRACE("CShellExtCMenu::GetCommandString: cchMax = " 
             << cchMax << " (is <1)");
         return res;
     }
@@ -583,7 +586,7 @@ CShellExt::GetCommandString(
 
         size = wcslen(src);
 
-        TDEBUG_TRACEW(L"CShellExt::GetCommandString: res = " << int(res)
+        TDEBUG_TRACEW(L"CShellExtCMenu::GetCommandString: res = " << int(res)
             << L", pszName (wide) = \"" << dest << L"\"");
     }
     else
@@ -593,14 +596,14 @@ CShellExt::GetCommandString(
 
         size = strlen(psz);
 
-        TDEBUG_TRACE("CShellExt::GetCommandString: res = " << int(res)
+        TDEBUG_TRACE("CShellExtCMenu::GetCommandString: res = " << int(res)
             << ", pszName = \"" << psz << "\"");
     }
 
     if (size > cchMax-1)
     {
         TDEBUG_TRACE(
-            "CShellExt::GetCommandString: string was truncated: size = "
+            "CShellExtCMenu::GetCommandString: string was truncated: size = "
                 << size << ", cchMax = " << cchMax);
     }
 
@@ -609,7 +612,7 @@ CShellExt::GetCommandString(
 
 
 STDMETHODIMP
-CShellExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
+CShellExtCMenu::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     LRESULT res;
     return HandleMenuMsg2(uMsg, wParam, lParam, &res);
@@ -617,7 +620,7 @@ CShellExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 
 STDMETHODIMP
-CShellExt::HandleMenuMsg2(
+CShellExtCMenu::HandleMenuMsg2(
     UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
     // A great tutorial on owner drawn menus in shell extension can be found
@@ -667,7 +670,7 @@ CShellExt::HandleMenuMsg2(
 }
 
 
-void CShellExt::DoHgtk(const std::string &cmd)
+void CShellExtCMenu::DoHgtk(const std::string &cmd)
 {
     std::string dir = GetTHgProgRoot();
     if (dir.empty())
@@ -747,4 +750,127 @@ void CShellExt::DoHgtk(const std::string &cmd)
 
     LaunchCommand(hgcmd, cwd);
     InitStatus::check();
+}
+
+
+STDMETHODIMP CShellExtCMenu::Initialize(
+    LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
+{
+    TCHAR name[MAX_PATH+1];
+
+    TDEBUG_TRACE("CShellExtCMenu::Initialize");
+    TDEBUG_TRACE("  pIDFolder: " << pIDFolder);
+    TDEBUG_TRACE("  pDataObj: " << pDataObj);
+
+    myFolder.clear();
+    myFiles.clear();
+
+    if (pDataObj)
+    {
+        FORMATETC fmt = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+        STGMEDIUM stg = { TYMED_HGLOBAL };
+        if (SUCCEEDED(pDataObj->GetData(&fmt, &stg)) && stg.hGlobal)
+        {
+            HDROP hDrop = (HDROP) GlobalLock(stg.hGlobal);
+            
+            if (hDrop)
+            {
+                UINT uNumFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+                TDEBUG_TRACE("  hDrop uNumFiles = " << uNumFiles);
+                for (UINT i = 0; i < uNumFiles; ++i) {
+                    if (DragQueryFile(hDrop, i, name, MAX_PATH) > 0)
+                    {
+                        TDEBUG_TRACE("  DragQueryFile [" << i << "] = " << name);
+                        myFiles.push_back(name);
+                    }   
+                }
+            }
+            else 
+            {
+                TDEBUG_TRACE("  hDrop is NULL ");
+            }
+
+            GlobalUnlock(stg.hGlobal);
+            if (stg.pUnkForRelease)
+            {
+                IUnknown* relInterface = (IUnknown*) stg.pUnkForRelease;
+                relInterface->Release();
+            }
+        }
+        else
+        {
+            TDEBUG_TRACE("  pDataObj->GetData failed");
+        }
+    }
+
+    // if a directory background
+    if (pIDFolder) 
+    {
+        SHGetPathFromIDList(pIDFolder, name);
+        TDEBUG_TRACE("  Folder " << name);
+        myFolder = name;
+    }
+
+    return NOERROR;
+}
+
+
+CShellExtCMenu::CShellExtCMenu(char dummy) :
+    m_ppszFileUserClickedOn(0)
+{
+    m_cRef = 0L;
+    CShellExt::IncDllRef();    
+}
+
+
+CShellExtCMenu::~CShellExtCMenu()
+{
+    CShellExt::DecDllRef();
+}
+
+
+STDMETHODIMP_(ULONG) CShellExtCMenu::AddRef()
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    return ++m_cRef;
+}
+
+
+STDMETHODIMP_(ULONG) CShellExtCMenu::Release()
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    if(--m_cRef)
+        return m_cRef;
+    delete this;
+    return 0L;
+}
+
+
+STDMETHODIMP CShellExtCMenu::QueryInterface(REFIID riid, LPVOID FAR* ppv)
+{    
+    *ppv = NULL;
+    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
+    {
+        *ppv = (LPSHELLEXTINIT) this;
+    }
+    else if (IsEqualIID(riid, IID_IContextMenu))
+    {
+        *ppv = (LPCONTEXTMENU) this;
+    }
+    else if (IsEqualIID(riid, IID_IContextMenu2))
+    {
+        *ppv = (IContextMenu2*) this;
+    }
+    else if (IsEqualIID(riid, IID_IContextMenu3))
+    {
+        *ppv = (IContextMenu3*) this;
+    }
+    
+    if (*ppv)
+    {
+        AddRef();
+        return NOERROR;
+    }
+
+    return E_NOINTERFACE;
 }

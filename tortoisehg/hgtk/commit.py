@@ -303,7 +303,7 @@ class GCommit(GStatus):
         self.update_recent_committers()
         committer = os.environ.get('HGUSER') or self.repo.ui.config('ui', 'username')
         if committer:
-            self.update_recent_committers(committer)
+            self.update_recent_committers(hglib.toutf(committer))
         self.committer_cbbox.set_active(0)
 
         adv_hbox.pack_start(gtk.Label(_('Auto-includes:')), False, False, 2)
@@ -400,8 +400,10 @@ class GCommit(GStatus):
             return label
         self.parent1_label = add_parent()
         self.parent2_label = add_parent()
-        parents_vbox.pack_start(gtk.HSeparator())
-        vbox2.pack_start(parents_vbox, False, False)
+        parents_hbox = gtk.HBox()
+        parents_hbox.pack_start(parents_vbox, False, False, 5)
+        vbox2.pack_start(parents_hbox, False, False, 2)
+        vbox2.pack_start(gtk.HSeparator(), False, False)
 
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
@@ -420,6 +422,7 @@ class GCommit(GStatus):
 
 
     def update_recent_committers(self, name=None):
+        """ 'name' argument must be in UTF-8. """
         if name is not None:
             self._mru_committers.add(name)
             self._mru_committers.compact()
@@ -938,7 +941,7 @@ class GCommit(GStatus):
             self.refresh_complete()
             return
 
-        self.update_recent_committers(user)
+        self.update_recent_committers(hglib.toutf(user))
         incs = hglib.fromutf(self.autoinc_entry.get_text())
         self.opts['include'] = [i.strip() for i in incs.split(',') if i.strip()]
         autopush = self.autopush.get_active()

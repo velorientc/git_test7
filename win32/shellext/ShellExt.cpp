@@ -3,10 +3,16 @@
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "InitStatus.h"
+#include "ThgClassFactory.h"
+#include "CShellExtCMenu.h"
+#include "CShellExtOverlay.h"
+
 #include <olectl.h>
 
 #define INITGUID
 #include <initguid.h>
+
+DEFINE_GUID(CLSID_TortoiseHgCmenu, 0xb456db9fL, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
 
 DEFINE_GUID(CLSID_TortoiseHg0, 0xb456dba0L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
 DEFINE_GUID(CLSID_TortoiseHg1, 0xb456dba1L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x13, 0xc, 0x2c, 0x21, 0x2e);
@@ -18,8 +24,6 @@ DEFINE_GUID(CLSID_TortoiseHg6, 0xb456dba6L, 0x7bf4, 0x478c, 0x93, 0x7a, 0x5, 0x1
 
 UINT g_cRefThisDll = 0;
 HINSTANCE g_hmodThisDll = NULL;
-
-HMENU hSubMenu = 0;
 
 CRITICAL_SECTION g_critical_section;
 
@@ -75,34 +79,39 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     TDEBUG_TRACE("DllGetClassObject clsid = " << WideToMultibyte(pwszShellExt));
     *ppvOut = NULL;
 
-    if (IsEqualIID(rclsid, CLSID_TortoiseHg0))
+    typedef ThgClassFactory<CShellExtOverlay> FactOvl;
+    typedef ThgClassFactory<CShellExtCMenu>   FactCmenu;
+
+    if (IsEqualIID(rclsid, CLSID_TortoiseHgCmenu))
     {
-        CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory('C');  // clean
+        FactCmenu *pcf = new FactCmenu(0);
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgCmenu");
+        return pcf->QueryInterface(riid, ppvOut);
+    }
+    else if (IsEqualIID(rclsid, CLSID_TortoiseHg0))
+    {
+        FactOvl *pcf = new FactOvl('C');  // clean
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg0");
         ++InitStatus::inst().unchanged_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg1))
     {
-        CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory('A');  // added
+        FactOvl *pcf = new FactOvl('A');  // added
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg1");
         ++InitStatus::inst().added_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg2))
     {
-        CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory('M');   // modified
+        FactOvl *pcf = new FactOvl('M');   // modified
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
         ++InitStatus::inst().modified_;
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (IsEqualIID(rclsid, CLSID_TortoiseHg6))
     {
-        CDllRegSxClassFactory *pcf =
-            new CDllRegSxClassFactory('?');   // not in repo
+        FactOvl *pcf = new FactOvl('?');   // not in repo
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
         ++InitStatus::inst().notinrepo_;
         return pcf->QueryInterface(riid, ppvOut);
@@ -119,110 +128,6 @@ VOID _LoadResources(VOID)
 
 VOID _UnloadResources(VOID)
 {
-    if (hSubMenu)
-        DestroyMenu(hSubMenu);
-}
-
-
-LPCRITICAL_SECTION CDllRegSxClassFactory::GetCriticalSection()
-{
-    return &g_critical_section;
-}
-
-
-CDllRegSxClassFactory::CDllRegSxClassFactory(char classToMake) :
-    myclassToMake(classToMake)
-{
-    ThgCriticalSection cs(GetCriticalSection());
-    m_cRef = 0L;
-    g_cRefThisDll++;
-}
-
-
-CDllRegSxClassFactory::~CDllRegSxClassFactory()
-{
-    ThgCriticalSection cs(GetCriticalSection());
-    g_cRefThisDll--;
-}
-
-
-STDMETHODIMP CDllRegSxClassFactory::QueryInterface(
-    REFIID riid, LPVOID FAR* ppv)
-{
-    *ppv = NULL;
-
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
-    {
-        *ppv = (LPCLASSFACTORY) this;
-        AddRef();
-        return NOERROR;
-    }
-
-    return E_NOINTERFACE;
-}
-
-
-STDMETHODIMP_(ULONG) CDllRegSxClassFactory::AddRef()
-{
-    ThgCriticalSection cs(GetCriticalSection());
-    return ++m_cRef;
-}
-
-
-STDMETHODIMP_(ULONG) CDllRegSxClassFactory::Release()
-{
-    ThgCriticalSection cs(GetCriticalSection());
-    if (--m_cRef)
-        return m_cRef;
-
-    delete this;
-    return 0L;
-}
-
-
-STDMETHODIMP CDllRegSxClassFactory::CreateInstance(
-    LPUNKNOWN pUnkOuter, REFIID riid, LPVOID* ppvObj)
-{
-    *ppvObj = NULL;
-
-    if (pUnkOuter)
-        return CLASS_E_NOAGGREGATION;
-
-    LPCSHELLEXT pShellExt = new CShellExt(myclassToMake);
-    if (NULL == pShellExt)
-        return E_OUTOFMEMORY;
-
-    return pShellExt->QueryInterface(riid, ppvObj);
-}
-
-
-STDMETHODIMP CDllRegSxClassFactory::LockServer(BOOL fLock)
-{
-    return NOERROR;
-}
-
-
-CShellExt::CShellExt(char tortoiseClass) :
-    myTortoiseClass(tortoiseClass), 
-    m_ppszFileUserClickedOn(0)
-{
-    ThgCriticalSection cs(GetCriticalSection());
-
-    m_cRef = 0L;
-    m_pDataObj = NULL;
-
-    g_cRefThisDll++;
-}
-
-
-CShellExt::~CShellExt()
-{
-    ThgCriticalSection cs(GetCriticalSection());
-
-    if (m_pDataObj)
-        m_pDataObj->Release();
-
-    g_cRefThisDll--;
 }
 
 
@@ -232,116 +137,15 @@ LPCRITICAL_SECTION CShellExt::GetCriticalSection()
 }
 
 
-STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR* ppv)
-{    
-    *ppv = NULL;
-    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
-    {
-        *ppv = (LPSHELLEXTINIT) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu))
-    {
-        *ppv = (LPCONTEXTMENU) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu2))
-    {
-        *ppv = (IContextMenu2*) this;
-    }
-    else if (IsEqualIID(riid, IID_IContextMenu3))
-    {
-        *ppv = (IContextMenu3*) this;
-    }
-    else if (IsEqualIID(riid, IID_IShellIconOverlayIdentifier))
-    {
-        *ppv = (IShellIconOverlayIdentifier*) this;
-    }
-    
-    if (*ppv)
-    {
-        AddRef();
-        return NOERROR;
-    }
-
-    return E_NOINTERFACE;
+void CShellExt::IncDllRef()
+{
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    g_cRefThisDll++;
 }
 
 
-STDMETHODIMP_(ULONG) CShellExt::AddRef()
+void CShellExt::DecDllRef()
 {
-    ThgCriticalSection cs(GetCriticalSection());
-    return ++m_cRef;
-}
-
-
-STDMETHODIMP_(ULONG) CShellExt::Release()
-{
-    ThgCriticalSection cs(GetCriticalSection());
-
-    if(--m_cRef)
-        return m_cRef;
-
-    delete this;
-    return 0L;
-}
-
-
-STDMETHODIMP CShellExt::Initialize(
-    LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
-{
-    TCHAR name[MAX_PATH+1];
-
-    TDEBUG_TRACE("CShellExt::Initialize");
-    TDEBUG_TRACE("  pIDFolder: " << pIDFolder);
-    TDEBUG_TRACE("  pDataObj: " << pDataObj);
-
-    myFolder.clear();
-    myFiles.clear();
-
-    if (pDataObj)
-    {
-        FORMATETC fmt = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-        STGMEDIUM stg = { TYMED_HGLOBAL };
-        if (SUCCEEDED(pDataObj->GetData(&fmt, &stg)) && stg.hGlobal)
-        {
-            HDROP hDrop = (HDROP) GlobalLock(stg.hGlobal);
-            
-            if (hDrop)
-            {
-                UINT uNumFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
-                TDEBUG_TRACE("  hDrop uNumFiles = " << uNumFiles);
-                for (UINT i = 0; i < uNumFiles; ++i) {
-                    if (DragQueryFile(hDrop, i, name, MAX_PATH) > 0)
-                    {
-                        TDEBUG_TRACE("  DragQueryFile [" << i << "] = " << name);
-                        myFiles.push_back(name);
-                    }   
-                }
-            }
-            else 
-            {
-                TDEBUG_TRACE("  hDrop is NULL ");
-            }
-
-            GlobalUnlock(stg.hGlobal);
-            if (stg.pUnkForRelease)
-            {
-                IUnknown* relInterface = (IUnknown*) stg.pUnkForRelease;
-                relInterface->Release();
-            }
-        }
-        else
-        {
-            TDEBUG_TRACE("  pDataObj->GetData failed");
-        }
-    }
-
-    // if a directory background
-    if (pIDFolder) 
-    {
-        SHGetPathFromIDList(pIDFolder, name);
-        TDEBUG_TRACE("  Folder " << name);
-        myFolder = name;
-    }
-
-    return NOERROR;
+    ThgCriticalSection cs(CShellExt::GetCriticalSection());
+    g_cRefThisDll--;
 }

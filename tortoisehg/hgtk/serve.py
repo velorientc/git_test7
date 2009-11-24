@@ -88,12 +88,9 @@ class ServeDialog(gtk.Window):
 
         # revision input
         revbox = gtk.HBox()
-        lbl = gtk.Label(_('HTTP Port:'))
-        lbl.set_property('width-chars', 16)
-        lbl.set_alignment(0, 0.5)
         self._port_input = gtk.Entry()
         self._port_input.set_text(self.defport)
-        revbox.pack_start(lbl, False, False)
+        revbox.pack_start(gtk.Label(_('HTTP Port:')), False, False, 4)
         revbox.pack_start(self._port_input, False, False)
         vbox.pack_start(revbox, False, False, 2)
 

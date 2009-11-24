@@ -778,7 +778,7 @@ class GLog(gdialog.GDialog):
 
     def mq_context_menu(self):
         m = gtklib.MenuItems() 
-        cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
+        cmenu_qimport = create_menu(_('QImport Revision'), self.qimport_rev)
         cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
 
         try:
