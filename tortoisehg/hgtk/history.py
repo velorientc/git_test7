@@ -720,14 +720,16 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_Update...'), self.checkout))
         cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
         m.append(cmenu_merge)
-        m.append(create_submenu(_('Patches & Bundles...'), 
-                                self.patches_context_menu()))
-        m.append(create_submenu(_('Tags & Bookmarks...'),
-                                self.tags_context_menu()))
-        cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
+        cmenu_backout = create_menu(_('Backout...'), self.backout_rev)
         m.append(cmenu_backout)
         m.append(create_menu(_('_Revert'), self.revert))
-        m.append(create_menu(_('_Archive...'), self.archive))
+        m.append_sep()
+        m.append(create_submenu(_('Export'), 
+                                self.export_context_menu()))
+        m.append_sep()
+        m.append(create_submenu(_('Tag'),
+                                self.tags_context_menu()))
+        m.append_sep()
 
         # disable/enable menus as required
         parents = self.repo.parents()
@@ -743,27 +745,29 @@ class GLog(gdialog.GDialog):
         cmenu_merge.set_sensitive(can_merge)
         cmenu_backout.set_sensitive(can_backout)
 
+        # need mq extension for strip command
+        if 'mq' in self.exs:
+            m.append(create_submenu(_('Mercurial Queues'),
+                                self.mq_context_menu()))
+
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
             m.append(create_menu(_('Transp_lant to local'),
                      self.transplant_rev))
 
-        # need mq extension for strip command
-        if 'mq' in self.exs:
-            m.append(create_submenu(_('Mercurial Queues...'),
-                                self.mq_context_menu()))
-
-        m.append(create_submenu(_('Bisect...'),
+        m.append_sep()
+        m.append(create_submenu(_('Bisect'),
                                 self.bisect_context_menu()))
         menu = m.create_menu()
         menu.show_all()
         return menu
 
-    def patches_context_menu(self):
+    def export_context_menu(self):
         m = gtklib.MenuItems() 
         m.append(create_menu(_('_Export Patch...'), self.export_patch))
         m.append(create_menu(_('E_mail Patch...'), self.email_patch))
         m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
+        m.append(create_menu(_('_Archive...'), self.archive))
         return m.create_menu()
 
     def tags_context_menu(self):
