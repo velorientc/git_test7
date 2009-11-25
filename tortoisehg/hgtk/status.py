@@ -684,11 +684,14 @@ class GStatus(gdialog.GDialog):
             self._node1, self._node2, = n1, n2
             self.status_error = None
             matcher = cmdutil.match(repo, self.pats, self.opts)
+            unknown = self.test_opt('unknown') and not self.is_merge()
+            clean = self.test_opt('clean') and not self.is_merge()
+            ignored = self.test_opt('ignored') and not self.is_merge()
             try:
                 status = repo.status(node1=n1, node2=n2, match=matcher,
-                                     ignored=self.test_opt('ignored'),
-                                     clean=self.test_opt('clean'),
-                                     unknown=self.test_opt('unknown'))
+                                     ignored=ignored,
+                                     clean=clean,
+                                     unknown=unknown)
                 self.status = status
             except IOError, e:
                 self.status_error = str(e)
