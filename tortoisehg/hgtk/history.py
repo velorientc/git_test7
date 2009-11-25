@@ -1136,7 +1136,10 @@ class GLog(gdialog.GDialog):
     def remove_overlay(self, resettip):
         self.bfile = None
         self.npreviews = 0
-        self.urlcombo.set_active(self.origurl)
+        if isinstance(self.origurl, int):
+            self.urlcombo.set_active(self.origurl)
+        else:
+            self.pathentry.set_text(self.origurl)
         self.repo = hg.repository(self.ui, path=self.repo.root)
         self.graphview.set_repo(self.repo, self.stbar)
         self.changeview.set_repo(self.repo)
@@ -1200,6 +1203,8 @@ class GLog(gdialog.GDialog):
 
     def set_bundlefile(self, bfile, **kwopts):
         self.origurl = self.urlcombo.get_active()
+        if self.origurl == -1:
+            self.origurl = self.pathentry.get_text()
         self.pathentry.set_text(bfile)
 
         # create apply/reject toolbar buttons
