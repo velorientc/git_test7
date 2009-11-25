@@ -468,7 +468,7 @@ class GDialog(gtk.Window):
         if menus:
             allmenus = [
           (_('_Tools'),
-           [dict(text=_('Changelog'), func=self.launch, args=['log'],
+           [dict(text=_('Repository Explorer'), func=self.launch, args=['log'],
                 icon='menulog.ico'),
             dict(text=_('Commit'), func=self.launch, args=['commit'],
                 icon='menucommit.ico'),

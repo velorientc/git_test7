@@ -1327,13 +1327,14 @@ class GLog(gdialog.GDialog):
                 extensions.load(self.ui, 'rebase', None)
 
         path = hglib.fromutf(self.pathentry.get_text()).strip()
+        remote_path = hglib.validate_synch_path(path, self.repo)
         if not path:
             gdialog.Prompt(_('No remote path specified'),
                            _('Please enter or select a remote path'),
                            self).run()
             self.pathentry.grab_focus()
             return
-        cmdline = ['hg'] + cmd + self.get_proxy_args() + [path]
+        cmdline = ['hg'] + cmd + self.get_proxy_args() + [remote_path]
         dlg = hgcmd.CmdDialog(cmdline, text=' '.join(['hg'] + cmd))
         dlg.show_all()
         dlg.run()
