@@ -18,13 +18,6 @@ def get_system_times():
         t = (t[0], t[1], t[2], t[3], time.clock())
     return t
 
-def version():
-    try:
-        import __version__
-        return __version__.version
-    except ImportError:
-        return _('unknown')
-
 if os.name == 'nt':
     def shell_notify(paths):
         try:
