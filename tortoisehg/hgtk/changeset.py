@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 import gtk
 import gobject
 import pango
@@ -16,7 +17,7 @@ from mercurial import cmdutil, util, patch, mdiff
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
-from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
+from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar, about
 
 class ChangeSet(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
@@ -25,6 +26,14 @@ class ChangeSet(gdialog.GDialog):
         self.stbar = stbar
         self.glog_parent = None
         self.bfile = None
+
+        # initialize changeset/issue tracker link regex and dict
+        match = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
+        issue = repo.ui.config('tortoisehg', 'issue.regex')
+        if issue:
+            match = r'%s|(%s)' % (match, issue)
+        self.bodyre = re.compile(match)
+        self.issuedict = dict()
 
     def get_title(self):
         title = _('%s changeset ') % self.get_reponame()
@@ -261,7 +270,26 @@ class ChangeSet(gdialog.GDialog):
         buf = self._buffer
         buf.set_text('')
         eob = buf.get_end_iter()
-        buf.insert(eob, desc + '\n\n')
+
+        pos = 0
+        self.issuedict.clear()
+        for m in self.bodyre.finditer(desc):
+            a, b = m.span()
+            if a > pos:
+                buf.insert(eob, desc[pos:a])
+                pos = b
+            groups = m.groups()
+            link = groups[0]
+            if link:
+                buf.insert_with_tags_by_name(eob, link, 'csetlink')
+            else:
+                link = groups[1]
+                if len(groups) > 2:
+                    self.issuedict[link] = groups[1:]
+                buf.insert_with_tags_by_name(eob, link, 'issuelink')
+        if pos < len(desc):
+            buf.insert(eob, desc[pos:])
+        buf.insert(eob, '\n\n')
 
     def append_diff(self, wfile):
         if not wfile:
@@ -725,6 +753,56 @@ class ChangeSet(gdialog.GDialog):
                                    paragraph_background='grey',
                                    weight=pango.WEIGHT_BOLD))
         tag_table.add(make_texttag('yellowbg', background='yellow'))
+
+        issuelink_tag = make_texttag('issuelink', foreground='blue',
+                                     underline=pango.UNDERLINE_SINGLE)
+        issuelink_tag.connect('event', self.issuelink_event)
+        tag_table.add(issuelink_tag)
+        csetlink_tag = make_texttag('csetlink', foreground='blue',
+                                    underline=pango.UNDERLINE_SINGLE)
+        csetlink_tag.connect('event', self.csetlink_event)
+        tag_table.add(csetlink_tag)
+
+    def issuelink_event(self, tag, widget, event, liter):
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return
+        text = self.get_link_text(tag, widget, liter)
+        if not text:
+            return
+        link = self.repo.ui.config('tortoisehg', 'issue.link')
+        if link:
+            groups = self.issuedict.get(text, [text])
+            link, num = re.subn(r'\{(\d+)\}', lambda m:
+                groups[int(m.group(1))], link)
+            if not num:
+                link += text
+            about.browse_url(link)
+
+    def csetlink_event(self, tag, widget, event, liter):
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return
+        text = self.get_link_text(tag, widget, liter)
+        if not text:
+            return
+        try:
+            rev = self.repo[text].rev()
+            if self.graphview:
+                self.graphview.set_revision_id(rev, load=True)
+            else:
+                self.load_details(rev)
+        except RepoError:
+            pass
+
+    def get_link_text(self, tag, widget, liter):
+        text_buffer = widget.get_buffer()
+        beg = liter.copy()
+        while not beg.begins_tag(tag):
+            beg.backward_char()
+        end = liter.copy()
+        while not end.ends_tag(tag):
+            end.forward_char()
+        text = text_buffer.get_text(beg, end)
+        return text
 
     def file_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
