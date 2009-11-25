@@ -140,6 +140,8 @@ class GCommit(GStatus):
 
     def get_title(self):
         root = self.get_reponame()
+        if self.is_merge():
+            root = _('merging ') + root
         user = self.opts.get('user') or ''
         if user: user = 'as ' + user
         date = self.opts.get('date') or ''
