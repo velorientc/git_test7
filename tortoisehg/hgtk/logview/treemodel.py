@@ -156,21 +156,22 @@ class TreeModel(gtk.GenericTreeModel):
             else:
                 lines = summary.splitlines()
                 summary = lines and lines[0] or ''
-            summary = gtklib.markup_escape_text(hglib.toutf(summary))
+            escape = gtklib.markup_escape_text
+            summary = escape(hglib.toutf(summary))
             node = ctx.node()
             tags = self.repo.nodetags(node)
             taglist = hglib.toutf(', '.join(tags))
             tstr = ''
             for tag in tags:
                 if tag not in self.hidetags:
-                    tstr += '<span color="%s" background="%s"> %s </span> ' % \
-                            ('black', '#ffffaa', tag)
+                    tstr += gtklib.markup(' %s ' % tag, color='black',
+                                          background='#ffffaa') + ' '
 
             branch = ctx.branch()
             bstr = ''
             if self.branchtags.get(branch) == node:
-                bstr += '<span color="%s" background="%s"> %s </span> ' % \
-                        ('black', '#aaffaa', branch)
+                bstr += gtklib.markup(' %s ' % branch, color='black',
+                                      background='#aaffaa') + ' '
 
             author = hglib.toutf(hglib.username(ctx.user()))
             age = hglib.age(ctx.date())

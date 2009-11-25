@@ -423,8 +423,8 @@ class TreeView(gtk.ScrolledWindow):
         col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         col.set_fixed_width(cell.get_size(self.treeview)[2])
         col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.BRANCH)
         col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
-        col.add_attribute(cell, "markup", treemodel.BRANCH)
 
         cell = gtk.CellRendererText()
 
