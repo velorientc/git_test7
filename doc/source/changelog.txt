@@ -329,6 +329,40 @@ Unfortunately, TortoiseHg still does not have a dialog for importing
 patches into a repository, so this must be done on the command line with
 the :command:`hg import` command.
 
+Message Parsing
+---------------
+
+New in TortoiseHg 0.10, the repository browser will detect and underline
+changeset hashes and bug report identifiers inside changeset messages.  These
+underlined phrases are clickable links.
+
+Every word-boundary delimited string of 12 or 40 characters from the
+range [0-9a-f] is considered a changeset link. Clicking on it in the
+repository explorer will jump to the given changeset if possible.
+
+Issue tracker links are enabled when configured in the tortoisehg
+section of the configuration files. There are two keys: issue.regex
+and issue.link. The first defines the regex to match when picking up
+issue numbers, while the second defines the command to run when an
+issue number is recognized.
+
+You may include groups in issue.regex, and corresponding {n} tokens
+in issue.link (where n is a non-negative integer). {0} refers to the
+entire string matched by issue.regex, while {1} refers to the first
+group and so on. If no {n} tokens are found in issue.link, the entire
+matched string is appended instead.
+
+Examples::
+
+	BitBucket:
+	issue.regex = #(\d+)\b
+	issue.link = http://bitbucket.org/<your project and repo>/issue/{1}/
+
+	Mercurial:
+	issue.regex = \bissue\d+\b
+	issue.link = http://mercurial.selenic.com/bts/
+
+
 Keyboard navigation
 -------------------
 
