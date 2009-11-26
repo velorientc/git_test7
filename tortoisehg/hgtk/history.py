@@ -427,7 +427,6 @@ class GLog(gdialog.GDialog):
                 self.changeview.load_details(self.currevid)
 
     def repo_invalidated(self, mqwidget):
-        self.changeview.clear_cache()
         self.reload_log()
 
     def prepare_display(self):
@@ -577,6 +576,7 @@ class GLog(gdialog.GDialog):
     def reload_log(self, **kwopts):
         'Send refresh event to treeview object'
         self.update_hide_merges_button()
+        self.changeview.clear_cache()
 
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
@@ -1493,7 +1493,6 @@ class GLog(gdialog.GDialog):
     def strip_rev(self, menuitem):
         def strip_completed():
             self.repo.invalidate()
-            self.changeview.clear_cache()
             self.reload_log()
             self.changeview.clear()
         rev = self.currevid
@@ -1644,7 +1643,6 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
-        self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
         self.enable_mqpanel()
@@ -1663,7 +1661,6 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
-        self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
 
@@ -1677,7 +1674,6 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
-        self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
 
@@ -1857,7 +1853,6 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
-        self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
 
