@@ -28,11 +28,15 @@ from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close, mergebranches):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
-                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                              gtk.STOCK_OK, gtk.RESPONSE_OK))
+                            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                     gtk.STOCK_OK, gtk.RESPONSE_OK),
+                            title=_('Branch Operations'))
         gtklib.set_tortoise_icon(self, 'branch.ico')
         gtklib.set_tortoise_keys(self)
-        self.set_title(_('Branch Operations'))
+        self.set_resizable(False)
+        self.set_has_separator(False)
+        self.connect('response', self.response)
+
         self.newbranch = None
         self.closebranch = False
 
@@ -48,30 +52,30 @@ class BranchOperationDialog(gtk.Dialog):
             self.show_all()
             return
 
-        self.connect('response', self.response)
-        lbl = gtk.Label(_('Changes take effect on next commit'))
+        # create widgets
         nochanges = gtk.RadioButton(None, _('No branch changes'))
         self.newbranchradio = gtk.RadioButton(nochanges,
                 _('Open a new named branch'))
-        self.closebranchradio = gtk.RadioButton(nochanges,
-                _('Close current named branch'))
+        self.newbranchradio.set_active(True)
+        self.newbranchradio.connect('toggled', self.nbtoggle)
         self.branchentry = gtk.Entry()
         self.branchentry.connect('activate', self.activated)
+        self.closebranchradio = gtk.RadioButton(nochanges,
+                _('Close current named branch'))
 
-        hbox = gtk.HBox()
-        hbox.pack_start(self.newbranchradio, False, False, 2)
-        hbox.pack_start(self.branchentry, True, True, 2)
-        self.vbox.pack_start(hbox, True, True, 2)
-        hbox = gtk.HBox()
-        hbox.pack_start(self.closebranchradio, True, True, 2)
-        self.vbox.pack_start(hbox, True, True, 2)
-        hbox = gtk.HBox()
-        hbox.pack_start(nochanges, True, True, 2)
-        self.vbox.pack_start(hbox, True, True, 2)
-        self.vbox.pack_start(lbl, True, True, 10)
-        self.newbranchradio.connect('toggled', self.nbtoggle)
+        # layout table
+        table = gtklib.LayoutTable()
+        self.vbox.pack_start(table, True, True, 2)
 
-        self.newbranchradio.set_active(True)
+        lbl = gtk.Label()
+        lbl.set_markup(gtklib.markup(_('Changes take effect on next commit'),
+                                     weight='bold'))
+        table.add_row(lbl, padding=False, ypad=6)
+        table.add_row(self.newbranchradio, self.branchentry)
+        table.add_row(self.closebranchradio)
+        table.add_row(nochanges)
+
+        # prepare to show
         if branch:
             self.newbranch = branch
             self.branchentry.set_text(branch)
@@ -81,6 +85,7 @@ class BranchOperationDialog(gtk.Dialog):
             self.closebranchradio.set_active(True)
         else:
             nochanges.set_active(True)
+
         self.show_all()
 
     def nbtoggle(self, radio):
