@@ -353,13 +353,32 @@ class GLog(gdialog.GDialog):
             if reload:
                 self.reload_log()
 
+    def filter_entry_changed(self, entrycombo, filtercombo):
+        row = entrycombo.get_active()
+        if row < 0:
+            return
+        mode, text, display = entrycombo.get_model()[row]
+        filtercombo.set_active(mode)
+        entrycombo.child.set_text(text)
+        self.activate_filter(text, mode)
+
     def filter_entry_activated(self, entry, combo):
         'User pressed enter in the filter entry'
-        opts = {}
         mode = combo.get_active()
         text = entry.get_text()
         if not text:
             return
+        row = [mode, text, combo.get_active_text()] 
+        model = self.entrycombo.get_model()
+        for r in model:
+            if r[0] == row[0] and r[1] == row[1]:
+                break
+        else:
+            self.entrycombo.get_model().append( row )
+        self.activate_filter(text, mode)
+
+    def activate_filter(self, text, mode):
+        opts = {}
         if mode == 0: # Rev Range
             try:
                 opts['revlist'] = cmdutil.revrange(self.repo, [text])
@@ -443,21 +462,24 @@ class GLog(gdialog.GDialog):
             self.pats = []
 
         opts = self.opts
+        if 'bundle' in opts:
+            self.set_bundlefile(opts['bundle'])
+            self.bundle_autoreject = True
         if opts['filehist']:
+            file = opts['filehist']
+            opts['pats'] = [file]
             self.custombutton.set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
-            self.filterentry.set_text(opts['filehist'])
-            opts['pats'] = [opts['filehist']]
+            self.filterentry.set_text(file)
+            self.filter_entry_activated(self.filterentry, self.filtercombo)
         elif self.pats:
             self.custombutton.set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
             self.filterentry.set_text(', '.join(self.pats))
             opts['pats'] = self.pats
-        if 'bundle' in opts:
-            self.set_bundlefile(opts['bundle'])
-            self.bundle_autoreject = True
+            self.filter_entry_activated(self.filterentry, self.filtercombo)
         else:
             self.reload_log(**opts)
 
@@ -1043,10 +1065,19 @@ class GLog(gdialog.GDialog):
         self.filtercombo = filtercombo
         filterbox.append_widget(filtercombo, padding=0)
 
-        entry = gtk.Entry()
+        searchlist = gtk.ListStore(int, # filtercombo value
+                                   str, # search string (utf-8)
+                                   str) # mode string (utf-8)
+        entrycombo = gtk.ComboBoxEntry(searchlist, 1)
+        cell = gtk.CellRendererText()
+        entrycombo.pack_end(cell, False)
+        entrycombo.add_attribute(cell, 'text', 2)
+        entry = entrycombo.child
         entry.connect('activate', self.filter_entry_activated, filtercombo)
+        entrycombo.connect('changed', self.filter_entry_changed, filtercombo)
+        self.entrycombo = entrycombo
         self.filterentry = entry
-        filterbox.append_widget(entry, expand=True, padding=0)
+        filterbox.append_widget(entrycombo, expand=True, padding=0)
 
         midpane = gtk.VBox()
         midpane.pack_start(syncbox, False)
