@@ -1098,22 +1098,18 @@ class GLog(gdialog.GDialog):
         self.filtercombo = filterbox.filtercombo
         self.filterentry = filterbox.entry
 
-        self.filterbox.connect('all_toggled', self.filter_selected, 'all')
-        self.filterbox.connect('tagged_toggled', self.filter_selected, 'tagged')
-        self.filterbox.connect('ancestry_toggled', self.filter_selected, 
-                                        'ancestry')
-        self.filterbox.connect('parents_toggled', self.filter_selected, 
-                                       'parents')
-        self.filterbox.connect('heads_toggled', self.filter_selected, 'heads')
-        self.filterbox.connect('merges_toggled', self.filter_selected, 
-                                      'only_merges')
-        self.filterbox.connect('hidemerges_toggled', self.filter_selected, 
-                                          'no_merges')
-        self.filterbox.connect('branches_toggled', self.filter_selected, 
-                                        'branch')
-        self.filterbox.connect('branchcombo_changed', self.select_branch)
-        self.filterbox.connect('entry_activate', self.filter_entry_activated, 
-                                     self.filtercombo)
+        fcon = self.filterbox.connect
+        fsel = self.filter_selected
+        fcon('all_toggled', fsel, 'all')
+        fcon('tagged_toggled', fsel, 'tagged')
+        fcon('ancestry_toggled', fsel, 'ancestry')
+        fcon('parents_toggled', fsel, 'parents')
+        fcon('heads_toggled', fsel, 'heads')
+        fcon('merges_toggled', fsel, 'only_merges')
+        fcon('hidemerges_toggled', fsel, 'no_merges')
+        fcon('branches_toggled', fsel, 'branch')
+        fcon('branchcombo_changed', self.select_branch)
+        fcon('entry_activate', self.filter_entry_activated, self.filtercombo)
 
         midpane = gtk.VBox()
         midpane.pack_start(syncbox, False)
