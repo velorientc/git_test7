@@ -30,6 +30,7 @@ class BranchOperationDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                           buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                               gtk.STOCK_OK, gtk.RESPONSE_OK))
+        gtklib.set_tortoise_icon(self, 'branch.ico')
         gtklib.set_tortoise_keys(self)
         self.set_title(_('Branch Operations'))
         self.newbranch = None
