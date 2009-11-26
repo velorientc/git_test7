@@ -5,10 +5,9 @@
 #include "Thgstatus.h"
 #include "Winstat.h"
 #include "InitStatus.h"
+#include "SysInfo.h"
 #include "ShellExt.h"
-
 #include "CShellExtCMenu.h"
-
 #include <map>
 
 
@@ -231,17 +230,35 @@ void InsertMenuItemWithIcon1(
     mi.wID = idCmd;
     mi.fType = MFT_STRING;
 
-    HICON h = GetTortoiseIcon(iconName);
-    if (h)
+    if (SysInfo::Instance().IsVistaOrLater())
     {
-        mi.fMask = MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_BITMAP | MIIM_DATA;
-        mi.dwItemData = (ULONG_PTR) h;
-        mi.hbmpItem = HBMMENU_CALLBACK;
+        TDEBUG_TRACE("    InsertMenuItemWithIcon1: Vista or later detected, using modern context menu style");
+        HBITMAP hBmp = GetTortoiseIconBitmap(iconName);
+        if (hBmp)
+        {
+            mi.fMask = MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_BITMAP;
+            mi.hbmpItem = hBmp;
+        }
+        else
+        {
+            TDEBUG_TRACE("    InsertMenuItemWithIcon1: can't find " + iconName);
+            mi.fMask = MIIM_TYPE | MIIM_ID;
+        }
     }
     else
     {
-        TDEBUG_TRACE("    InsertMenuItemWithIcon1: can't find " + iconName);
-        mi.fMask = MIIM_TYPE | MIIM_ID;
+        HICON h = GetTortoiseIcon(iconName);
+        if (h)
+        {
+            mi.fMask = MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_BITMAP | MIIM_DATA;
+            mi.dwItemData = (ULONG_PTR) h;
+            mi.hbmpItem = HBMMENU_CALLBACK;
+        }
+        else
+        {
+            TDEBUG_TRACE("    InsertMenuItemWithIcon1: can't find " + iconName);
+            mi.fMask = MIIM_TYPE | MIIM_ID;
+        }
     }
     InsertMenuItemW(hMenu, indexMenu, TRUE, &mi);
 
@@ -257,24 +274,43 @@ void InsertSubMenuItemWithIcon2(
     MENUITEMINFOW mi;
     memset(&mi, 0, sizeof(mi));
     mi.cbSize = sizeof(mi);
-    mi.fMask = MIIM_SUBMENU | MIIM_STRING | MIIM_ID;
     mi.fType = MFT_STRING;
     mi.dwTypeData = const_cast<wchar_t*>(menuText.c_str());
     mi.cch = static_cast<UINT>(menuText.length());
     mi.wID = idCmd;
     mi.hSubMenu = hSubMenu;
-    HICON h = GetTortoiseIcon(iconName);
-    if (h)
+
+    if (SysInfo::Instance().IsVistaOrLater())
     {
-        mi.fMask = MIIM_FTYPE | MIIM_STRING | MIIM_SUBMENU | MIIM_ID |
-                   MIIM_BITMAP | MIIM_DATA;
-        mi.dwItemData = (ULONG_PTR) h;
-        mi.hbmpItem = HBMMENU_CALLBACK;
+        TDEBUG_TRACE("    InsertMenuItemWithIcon1: Vista or later detected, using modern context menu style");
+        HBITMAP hBmp = GetTortoiseIconBitmap(iconName);
+        if (hBmp)
+        {
+            mi.fMask = MIIM_SUBMENU | MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_BITMAP;
+            mi.hbmpItem = hBmp;
+        }
+        else
+        {
+            TDEBUG_TRACE("    InsertSubMenuItemWithIcon2: can't find " + iconName);
+            mi.fMask = MIIM_TYPE | MIIM_ID;
+        }
     }
     else
     {
-        TDEBUG_TRACE("    InsertSubMenuItemWithIcon2: can't find " + iconName);
+        HICON h = GetTortoiseIcon(iconName);
+        if (h)
+        {
+            mi.fMask = MIIM_SUBMENU | MIIM_STRING | MIIM_ID;
+            mi.dwItemData = (ULONG_PTR) h;
+            mi.hbmpItem = HBMMENU_CALLBACK;
+        }
+        else
+        {
+            TDEBUG_TRACE("    InsertSubMenuItemWithIcon2: can't find " + iconName);
+            mi.fMask = MIIM_TYPE | MIIM_ID;
+        }
     }
+
     InsertMenuItemW(hMenu, indexMenu, TRUE, &mi);
 
     TDEBUG_TRACEW(
@@ -445,6 +481,19 @@ CShellExtCMenu::QueryContextMenu(
         }
         if (isSeparator && indexSubMenu > 0)
             RemoveMenu(hSubMenu, indexSubMenu - 1, MF_BYPOSITION);
+
+        if (SysInfo::Instance().IsVistaOrLater())
+        {
+            MENUINFO MenuInfo;
+            
+            memset(&MenuInfo, 0, sizeof(MenuInfo));
+
+            MenuInfo.cbSize  = sizeof(MenuInfo);
+            MenuInfo.fMask   = MIM_STYLE | MIM_APPLYTOSUBMENUS;
+            MenuInfo.dwStyle = MNS_CHECKORBMP;
+            
+            SetMenuInfo(hSubMenu, &MenuInfo);
+        }
     }
 
     TDEBUG_TRACE("  CShellExtCMenu::QueryContextMenu: adding main THG menu");
@@ -454,6 +503,20 @@ CShellExtCMenu::QueryContextMenu(
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 
     InitStatus::check();
+
+    if (SysInfo::Instance().IsVistaOrLater())
+    {
+        MENUINFO MenuInfo;
+
+        memset(&MenuInfo, 0, sizeof(MenuInfo));
+
+        MenuInfo.cbSize  = sizeof(MenuInfo);
+        MenuInfo.fMask   = MIM_STYLE | MIM_APPLYTOSUBMENUS;
+        MenuInfo.dwStyle = MNS_CHECKORBMP;
+
+        SetMenuInfo(hMenu, &MenuInfo);
+    }
+
     return ResultFromShort(idCmd - idCmdFirst);
 }
 
