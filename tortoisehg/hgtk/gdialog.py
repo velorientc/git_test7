@@ -34,14 +34,14 @@ class Prompt(SimpleMessage):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 type, gtk.BUTTONS_CLOSE)
         self.set_title('TortoiseHg')
-        self.set_markup('<b>' + hglib.toutf(title) + '</b>')
-        self.format_secondary_markup(hglib.toutf(message))
+        self.set_markup(gtklib.markup(hglib.toutf(title), weight='bold'))
+        self.format_secondary_text(hglib.toutf(message))
         mod = gtklib.get_thg_modifier()
         key, modifier = gtk.accelerator_parse(mod+'Return')
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
         buttons = self.get_children()[0].get_children()[1].get_children()
-        buttons[0].add_accelerator("clicked", accel_group, key,
+        buttons[0].add_accelerator('clicked', accel_group, key,
                 modifier, gtk.ACCEL_VISIBLE)
 
 class CustomPrompt(gtk.MessageDialog):
@@ -55,15 +55,16 @@ class CustomPrompt(gtk.MessageDialog):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION)
         self.set_title(hglib.toutf(title))
-        self.format_secondary_markup('<b>' + hglib.toutf(message) + '</b>')
+        self.format_secondary_markup(gtklib.markup(hglib.toutf(message),
+                                     weight='bold'))
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
         for i, s in enumerate(choices):
             button = self.add_button(s.replace('&', '_'), i)
             try:
                 char = s[s.index('&')+1].lower()
-                button.add_accelerator('clicked', accel_group, ord(char), 0,
-                        gtk.ACCEL_VISIBLE)
+                button.add_accelerator('clicked', accel_group, ord(char),
+                                       0, gtk.ACCEL_VISIBLE)
             except ValueError:
                 pass
         if default:
@@ -84,8 +85,7 @@ class Confirm(SimpleMessage):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO)
         self.set_title(hglib.toutf(title))
-        primary = '<b>' + primary + '</b>'
-        self.set_markup(hglib.toutf(primary))
+        self.set_markup(gtklib.markup(hglib.toutf(primary), weight='bold'))
         message = ''
         for i, f in enumerate(files):
             message += '   ' + f + '\n'
