@@ -700,22 +700,6 @@ class ChangeSet(gdialog.GDialog):
 
         tag_table = self._buffer.get_tag_table()
 
-        tag_table.add(make_texttag('changeset', foreground='#000090',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('changeset-summary', foreground='black',
-                paragraph_background='#F0F0F0', family='Sans'))
-        tag_table.add(make_texttag('date', foreground='#000090',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('tag', foreground='#000090',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('files', foreground='#5C5C5C',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('parent', foreground='#000090',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('parenthl', foreground='#000090',
-                paragraph_background='#F0F0F0',
-                weight=pango.WEIGHT_BOLD))
-
         tag_table.add(make_texttag('diff', font=self.fontdiff))
         tag_table.add(make_texttag('blue', foreground='blue'))
         tag_table.add(make_texttag('red', foreground='red'))
