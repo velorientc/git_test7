@@ -96,8 +96,18 @@ class FilterBox(gtklib.SlimToolbar):
         self.filtercombo.set_active(self.filter_mode)
         self.append_widget(self.filtercombo, padding=0)
 
-        self.entry = gtk.Entry()
-        self.append_widget(self.entry, expand=True, padding=0)
+        searchlist = gtk.ListStore(int, # filtercombo value
+                                   str, # search string (utf-8)
+                                   str) # mode string (utf-8)
+        entrycombo = gtk.ComboBoxEntry(searchlist, 1)
+        cell = gtk.CellRendererText()
+        entrycombo.pack_end(cell, False)
+        entrycombo.add_attribute(cell, 'text', 2)
+        entry = entrycombo.child
+        self.entrycombo = entrycombo
+        self.entry = entry
+        self.append_widget(entrycombo, expand=True, padding=0)
+
 
     def connect(self, detailed_signal, handler, *opts):
         '''Connect an external signal handler to an internal widget
@@ -427,13 +437,32 @@ class GLog(gdialog.GDialog):
             if reload:
                 self.reload_log()
 
+    def filter_entry_changed(self, entrycombo, filtercombo):
+        row = entrycombo.get_active()
+        if row < 0:
+            return
+        mode, text, display = entrycombo.get_model()[row]
+        filtercombo.set_active(mode)
+        entrycombo.child.set_text(text)
+        self.activate_filter(text, mode)
+
     def filter_entry_activated(self, entry, combo):
         'User pressed enter in the filter entry'
-        opts = {}
         mode = combo.get_active()
         text = entry.get_text()
         if not text:
             return
+        row = [mode, text, combo.get_active_text()]
+        model = self.entrycombo.get_model()
+        for r in model:
+            if r[0] == row[0] and r[1] == row[1]:
+                break
+        else:
+            self.entrycombo.get_model().append( row )
+        self.activate_filter(text, mode)
+
+    def activate_filter(self, text, mode):
+        opts = {}
         if mode == 0: # Rev Range
             try:
                 opts['revlist'] = cmdutil.revrange(self.repo, [text])
@@ -1097,6 +1126,7 @@ class GLog(gdialog.GDialog):
         self.filter_mode = filterbox.filter_mode
         self.filtercombo = filterbox.filtercombo
         self.filterentry = filterbox.entry
+        self.entrycombo = filterbox.entrycombo
 
         fcon = self.filterbox.connect
         fsel = self.filter_selected
@@ -1110,6 +1140,7 @@ class GLog(gdialog.GDialog):
         fcon('branches_toggled', fsel, 'branch')
         fcon('branchcombo_changed', self.select_branch)
         fcon('entry_activate', self.filter_entry_activated, self.filtercombo)
+        fcon('entrycombo_changed', self.filter_entry_changed, self.filtercombo)
 
         midpane = gtk.VBox()
         midpane.pack_start(syncbox, False)
