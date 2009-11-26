@@ -19,6 +19,7 @@ std::string DirName(const std::string&);
 std::string BaseName(const std::string&);
 bool LaunchCommand(const std::string& command, const std::string& cwd);
 HICON GetTortoiseIcon(const std::string & iconname);
+HBITMAP GetTortoiseIconBitmap(const std::string& iconname);
 std::string GetHgRepoRoot(const std::string& path);
 bool IsHgRepo(const std::string& path);
 int GetRegistryConfig(const std::string& name, std::string& res);

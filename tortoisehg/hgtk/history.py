@@ -15,6 +15,7 @@ import tempfile
 import atexit
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
+from mercurial import hbisect
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -24,13 +25,86 @@ from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
-from tortoisehg.hgtk import statusbar
+from tortoisehg.hgtk import statusbar, bookmark
 
-def create_menu(label, callback):
+def create_menu(label, callback=None):
     menuitem = gtk.MenuItem(label, True)
-    menuitem.connect('activate', callback)
+    if callback:
+        menuitem.connect('activate', callback)
     menuitem.set_border_width(1)
     return menuitem
+
+def create_submenu(label, menu):
+    m = create_menu(label)
+    m.set_submenu(menu)
+    return m
+
+class FilterBox(gtklib.SlimToolbar):
+    'Filter Toolbar for repository log'
+
+    def __init__(self, tooltips, filter_mode, branch_names):
+        gtklib.SlimToolbar.__init__(self, tooltips)
+        self.filter_mode = filter_mode
+
+        self.all = gtk.RadioButton(None, _('All'))
+        self.all.set_active(True)
+        self.append_widget(self.all, padding=0)
+
+        self.tagged = gtk.RadioButton(self.all, _('Tagged'))
+        self.append_widget(self.tagged, padding=0)
+
+        self.ancestry = gtk.RadioButton(self.all, _('Ancestry'))
+        self.append_widget(self.ancestry, padding=0)
+
+        self.parents = gtk.RadioButton(self.all, _('Parents'))
+        self.append_widget(self.parents, padding=0)
+
+        self.heads = gtk.RadioButton(self.all, _('Heads'))
+        self.append_widget(self.heads, padding=0)
+
+        self.merges = gtk.RadioButton(self.all, _('Merges'))
+        self.append_widget(self.merges, padding=0)
+
+        self.hidemerges = gtk.CheckButton(_('Hide Merges'))
+        self.append_widget(self.hidemerges, padding=0)
+
+        self.branches = gtk.RadioButton(self.all)
+        tooltips.set_tip(self.branches, _('Branch Filter'))
+        self.branches.set_sensitive(False)
+        self.append_widget(self.branches, padding=0)
+
+        self.branchcombo = gtk.combo_box_new_text()
+        self.branchcombo.append_text(_('Branches...'))
+        for name in branch_names:
+            self.branchcombo.append_text(hglib.toutf(name))
+        self.branchcombo.set_active(0)
+        self.append_widget(self.branchcombo, padding=0)
+
+        self.custombutton = gtk.RadioButton(self.all)
+        tooltips.set_tip(self.custombutton, _('Custom Filter'))
+        self.custombutton.set_sensitive(False)
+        self.append_widget(self.custombutton, padding=0)
+
+        self.filtercombo = gtk.combo_box_new_text()
+        self.filtercombo_entries = (_('Rev Range'), _('File Patterns'),
+                  _('Keywords'), _('Date'), _('User'))
+        for f in self.filtercombo_entries:
+            self.filtercombo.append_text(f)
+        if (self.filter_mode >= len(self.filtercombo_entries) or
+                self.filter_mode < 0):
+            self.filter_mode = 1
+        self.filtercombo.set_active(self.filter_mode)
+        self.append_widget(self.filtercombo, padding=0)
+
+        self.entry = gtk.Entry()
+        self.append_widget(self.entry, expand=True, padding=0)
+
+    def connect(self, detailed_signal, handler, *opts):
+        '''Connect an external signal handler to an internal widget
+           Signal format is '[widget_name]_[signal]'.'''
+        widget_name, signal = detailed_signal.split('_')
+        widget = self.__dict__[widget_name]
+        widget.connect(signal, handler, *opts)
 
 class GLog(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
@@ -712,16 +786,16 @@ class GLog(gdialog.GDialog):
         m.append(create_menu(_('_Update...'), self.checkout))
         cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
         m.append(cmenu_merge)
-        m.append_sep()
-        m.append(create_menu(_('_Export Patch...'), self.export_patch))
-        m.append(create_menu(_('E_mail Patch...'), self.email_patch))
-        m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
-        m.append_sep()
-        m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
-        cmenu_backout = create_menu(_('Backout Revision...'), self.backout_rev)
+        cmenu_backout = create_menu(_('Backout...'), self.backout_rev)
         m.append(cmenu_backout)
         m.append(create_menu(_('_Revert'), self.revert))
-        m.append(create_menu(_('_Archive...'), self.archive))
+        m.append_sep()
+        m.append(create_submenu(_('Export'), 
+                                self.export_context_menu()))
+        m.append_sep()
+        m.append(create_submenu(_('Tag'),
+                                self.tags_context_menu()))
+        m.append_sep()
 
         # disable/enable menus as required
         parents = self.repo.parents()
@@ -737,38 +811,73 @@ class GLog(gdialog.GDialog):
         cmenu_merge.set_sensitive(can_merge)
         cmenu_backout.set_sensitive(can_backout)
 
+        # need mq extension for strip command
+        if 'mq' in self.exs:
+            m.append(create_submenu(_('Mercurial Queues'),
+                                self.mq_context_menu()))
+
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
             m.append(create_menu(_('Transp_lant to local'),
                      self.transplant_rev))
 
-        # need mq extension for strip command
-        if 'mq' in self.exs:
-            cmenu_qimport = create_menu(_('QImport Revision'), self.qimport_rev)
-            cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
-
-            try:
-                ctx = self.repo[self.currevid]
-                qbase = self.repo['qbase']
-                actx = ctx.ancestor(qbase)
-                if self.repo['qparent'] == ctx:
-                    cmenu_qimport.set_sensitive(True)
-                    cmenu_strip.set_sensitive(False)
-                elif actx == qbase or actx == ctx:
-                    # we're in the mq revision range or the mq
-                    # is a descendant of us
-                    cmenu_qimport.set_sensitive(False)
-                    cmenu_strip.set_sensitive(False)
-            except:
-                pass
-
-            m.append_sep()
-            m.append(cmenu_qimport)
-            m.append(cmenu_strip)
-
+        m.append_sep()
+        m.append(create_submenu(_('Bisect'),
+                                self.bisect_context_menu()))
         menu = m.create_menu()
         menu.show_all()
         return menu
+
+    def export_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('_Export Patch...'), self.export_patch))
+        m.append(create_menu(_('E_mail Patch...'), self.email_patch))
+        m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
+        m.append(create_menu(_('_Archive...'), self.archive))
+        return m.create_menu()
+
+    def tags_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
+        if 'bookmarks' in self.exs:
+            m.append(create_menu(_('Add/Remove B_ookmark...'), 
+                                 self.add_bookmark))
+            m.append(create_menu(_('Rename Bookmark...'), 
+                                 self.rename_bookmark))
+        return m.create_menu()
+
+    def mq_context_menu(self):
+        m = gtklib.MenuItems() 
+        cmenu_qimport = create_menu(_('QImport Revision'), self.qimport_rev)
+        cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
+
+        try:
+            ctx = self.repo[self.currevid]
+            qbase = self.repo['qbase']
+            actx = ctx.ancestor(qbase)
+            if self.repo['qparent'] == ctx:
+                cmenu_qimport.set_sensitive(True)
+                cmenu_strip.set_sensitive(False)
+            elif actx == qbase or actx == ctx:
+                # we're in the mq revision range or the mq
+                # is a descendant of us
+                cmenu_qimport.set_sensitive(False)
+                cmenu_strip.set_sensitive(False)
+        except:
+            pass
+
+        m.append_sep()
+        m.append(cmenu_qimport)
+        m.append(cmenu_strip)
+        return m.create_menu()
+
+    def bisect_context_menu(self):
+        m = gtklib.MenuItems() 
+        m.append(create_menu(_('Reset'), self.bisect_reset))
+        m.append(create_menu(_('Mark as good'), self.bisect_good))
+        m.append(create_menu(_('Mark as bad'), self.bisect_bad))
+        m.append(create_menu(_('Skip testing'), self.bisect_skip))
+        return m.create_menu()
 
     def restore_single_sel(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
@@ -821,7 +930,7 @@ class GLog(gdialog.GDialog):
         
         # need MQ extension for qimport command
         if 'mq' in self.exs:
-            m.append(create_menu(_('QImport from here to selected'),
+            m.append(create_menu(_('qimport from here to selected'),
                      self.qimport_revs))
 
         m.append_sep()
@@ -975,78 +1084,36 @@ class GLog(gdialog.GDialog):
         email.connect('clicked', self.email_clicked)
 
         # filter bar
-        self.filterbox = gtklib.SlimToolbar()
+        self.filterbox = FilterBox(self.tooltips,
+                                   self.filter_mode, 
+                                   self.get_live_branches())
         filterbox = self.filterbox
-
-        all = gtk.RadioButton(None, _('All'))
-        all.set_active(True)
-        all.connect('toggled', self.filter_selected, 'all')
-        filterbox.append_widget(all, padding=0)
-
-        tagged = gtk.RadioButton(all, _('Tagged'))
-        tagged.connect('toggled', self.filter_selected, 'tagged')
-        filterbox.append_widget(tagged, padding=0)
-
-        ancestry = gtk.RadioButton(all, _('Ancestry'))
-        ancestry.connect('toggled', self.filter_selected, 'ancestry')
-        filterbox.append_widget(ancestry, padding=0)
-        self.ancestrybutton = ancestry
-
-        parents = gtk.RadioButton(all, _('Parents'))
-        parents.connect('toggled', self.filter_selected, 'parents')
-        filterbox.append_widget(parents, padding=0)
-
-        heads = gtk.RadioButton(all, _('Heads'))
-        heads.connect('toggled', self.filter_selected, 'heads')
-        filterbox.append_widget(heads, padding=0)
-
-        merges = gtk.RadioButton(all, _('Merges'))
-        merges.connect('toggled', self.filter_selected, 'only_merges')
-        filterbox.append_widget(merges, padding=0)
-
-        hidemerges = gtk.CheckButton(_('Hide Merges'))
-        hidemerges.connect('toggled', self.filter_selected, 'no_merges')
-        filterbox.append_widget(hidemerges, padding=0)
-        self.hidemerges = hidemerges
-
-        branches = gtk.RadioButton(all)
-        branches.connect('toggled', self.filter_selected, 'branch')
-        self.tooltips.set_tip(branches, _('Branch Filter'))
-        branches.set_sensitive(False)
-        filterbox.append_widget(branches, padding=0)
-        self.branchbutton = branches
-
-        branchcombo = gtk.combo_box_new_text()
-        branchcombo.append_text(_('Branches...'))
-        for name in self.get_live_branches():
-            branchcombo.append_text(hglib.toutf(name))
-        branchcombo.set_active(0)
-        branchcombo.connect('changed', self.select_branch)
+        self.ancestrybutton = filterbox.ancestry
+        self.hidemerges = filterbox.hidemerges
+        self.branchbutton = filterbox.branches
         self.lastbranchrow = None
-        filterbox.append_widget(branchcombo, padding=0)
-        self.branchcombo = branchcombo
+        self.branchcombo = filterbox.branchcombo
+        self.custombutton = filterbox.custombutton 
+        self.filter_mode = filterbox.filter_mode
+        self.filtercombo = filterbox.filtercombo
+        self.filterentry = filterbox.entry
 
-        self.custombutton = gtk.RadioButton(all)
-        self.tooltips.set_tip(self.custombutton, _('Custom Filter'))
-        self.custombutton.set_sensitive(False)
-        filterbox.append_widget(self.custombutton, padding=0)
-
-        filtercombo = gtk.combo_box_new_text()
-        filtercombo_entries = (_('Rev Range'), _('File Patterns'),
-                  _('Keywords'), _('Date'), _('User'))
-        for f in filtercombo_entries:
-            filtercombo.append_text(f)
-        if (self.filter_mode >= len(filtercombo_entries) or
-                self.filter_mode < 0):
-            self.filter_mode = 1
-        filtercombo.set_active(self.filter_mode)
-        self.filtercombo = filtercombo
-        filterbox.append_widget(filtercombo, padding=0)
-
-        entry = gtk.Entry()
-        entry.connect('activate', self.filter_entry_activated, filtercombo)
-        self.filterentry = entry
-        filterbox.append_widget(entry, expand=True, padding=0)
+        self.filterbox.connect('all_toggled', self.filter_selected, 'all')
+        self.filterbox.connect('tagged_toggled', self.filter_selected, 'tagged')
+        self.filterbox.connect('ancestry_toggled', self.filter_selected, 
+                                        'ancestry')
+        self.filterbox.connect('parents_toggled', self.filter_selected, 
+                                       'parents')
+        self.filterbox.connect('heads_toggled', self.filter_selected, 'heads')
+        self.filterbox.connect('merges_toggled', self.filter_selected, 
+                                      'only_merges')
+        self.filterbox.connect('hidemerges_toggled', self.filter_selected, 
+                                          'no_merges')
+        self.filterbox.connect('branches_toggled', self.filter_selected, 
+                                        'branch')
+        self.filterbox.connect('branchcombo_changed', self.select_branch)
+        self.filterbox.connect('entry_activate', self.filter_entry_activated, 
+                                     self.filtercombo)
 
         midpane = gtk.VBox()
         midpane.pack_start(syncbox, False)
@@ -1103,6 +1170,15 @@ class GLog(gdialog.GDialog):
     def get_extras(self):
         return self.stbar
 
+    def refresh_on_marker_change(self, oldlen, oldmarkers, newmarkers):
+        self.repo.invalidate()
+        self.changeview.clear_cache()
+        if len(self.repo) != oldlen:
+            self.reload_log()
+        else:
+            if newmarkers != oldmarkers:
+                self.refresh_model()
+        
     def apply_clicked(self, button):
         combo = self.ppullcombo
         list, iter = combo.get_model(), combo.get_active_iter()
@@ -1690,18 +1766,73 @@ class GLog(gdialog.GDialog):
             tag = ''
 
         def refresh(*args):
-            self.repo.invalidate()
-            self.changeview.clear_cache()
-            if len(self.repo) != oldlen:
-                self.reload_log()
-            else:
-                newtags = self.repo.tagslist()
-                if newtags != oldtags:
-                    self.refresh_model()
+            self.refresh_on_marker_change(oldlen, oldtags, self.repo.tagslist())
 
         dialog = tagadd.TagAddDialog(self.repo, tag, rev)
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
+
+    def add_bookmark(self, menuitem):
+        # save bookmark info for detecting new bookmarks added
+        oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
+        oldlen = len(self.repo)
+        rev = self.currevid
+
+        def refresh(*args):
+            self.refresh_on_marker_change(oldlen, 
+                                          oldbookmarks, 
+                                          hglib.get_repo_bookmarks(self.repo))
+
+        dialog = bookmark.BookmarkAddDialog(self.repo, rev=str(rev))
+        dialog.connect('destroy', refresh)
+        self.show_dialog(dialog)
+
+    def rename_bookmark(self, menuitem):
+        # save bookmark info for detecting new bookmarks added
+        oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
+        oldlen = len(self.repo)
+        rev = self.currevid
+
+        def refresh(*args):
+            self.refresh_on_marker_change(oldlen, 
+                                          oldbookmarks, 
+                                          hglib.get_repo_bookmarks(self.repo))
+
+        dialog = bookmark.BookmarkRenameDialog(self.repo, rev=str(rev))
+        dialog.connect('destroy', refresh)
+        self.show_dialog(dialog)
+
+    def bisect_reset(self, menuitem):
+        commands.bisect(ui=self.ui,
+                        repo=self.repo,
+                        good=False,
+                        bad=False,
+                        skip=False,
+                        reset=True)
+
+    def bisect_good(self, menuitem):
+        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
+
+    def bisect_bad(self, menuitem):
+        cmd = ['hg', 'bisect', '--bad', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
+
+    def bisect_skip(self, menuitem):
+        cmd = ['hg', 'bisect', '--skip', str(self.currevid)]
+        dlg = hgcmd.CmdDialog(cmd)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        self.refresh_model()
 
     def show_status(self, menuitem):
         rev = self.currevid
