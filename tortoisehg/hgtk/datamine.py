@@ -84,7 +84,7 @@ class DataMineDialog(gdialog.GDialog):
 
     def load_settings(self, settings):
         gdialog.GDialog.load_settings(self, settings)
-        self.tabwidth = hglib.gettabwidth(self.ui)
+        self.tabwidth = hglib.gettabwidth(self.repo.ui)
 
     def get_body(self):
         """ Initialize the Dialog. """
