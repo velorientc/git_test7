@@ -276,7 +276,7 @@ class ChangeSet(gdialog.GDialog):
             fctx = self.repo[rev].filectx(wfile)
         except hglib.LookupError:
             fctx = None
-        if fctx and fctx.size() > hglib.getmaxdiffsize(self.ui):
+        if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             lines = ['diff',
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
