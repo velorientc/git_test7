@@ -9,6 +9,7 @@
 import os
 import sys
 import time
+import threading
 from mercurial.i18n import _
 from mercurial import hg
 
@@ -19,6 +20,12 @@ def get_system_times():
     return t
 
 if os.name == 'nt':
+    def browse_url(url):
+        def start_browser():
+            import win32api, win32con
+            win32api.ShellExecute(0, "open", url, None, "", win32con.SW_SHOW)
+        threading.Thread(target=start_browser).start()
+
     def shell_notify(paths):
         try:
             from win32com.shell import shell, shellcon
@@ -136,3 +143,22 @@ else:
 
     def update_thgstatus(*args, **kws):
         pass
+
+    def browse_url(url):
+        def start_browser():
+            if sys.platform == 'darwin':
+                # use Mac OS X internet config module (removed in Python 3.0)
+                import ic
+                ic.launchurl(url)
+            else:
+                try:
+                    import gconf
+                    client = gconf.client_get_default()
+                    browser = client.get_string(
+                            '/desktop/gnome/url-handlers/http/command') + '&'
+                    os.system(browser % url)
+                except ImportError:
+                    # If gconf is not found, fall back to old standard
+                    os.system('firefox ' + url)
+        threading.Thread(target=start_browser).start()
+

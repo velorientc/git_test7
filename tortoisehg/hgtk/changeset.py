@@ -17,7 +17,7 @@ from mercurial import cmdutil, util, patch, mdiff
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
-from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar, about
+from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
 
 class ChangeSet(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
@@ -776,7 +776,7 @@ class ChangeSet(gdialog.GDialog):
                 groups[int(m.group(1))], link)
             if not num:
                 link += text
-            about.browse_url(link)
+            shlib.browse_url(link)
 
     def csetlink_event(self, tag, widget, event, liter):
         if event.type != gtk.gdk.BUTTON_RELEASE:

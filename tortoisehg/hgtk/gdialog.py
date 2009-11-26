@@ -18,7 +18,7 @@ import atexit
 from mercurial import cmdutil, util, ui, hg, commands
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import settings, hglib, paths
+from tortoisehg.util import settings, hglib, paths, shlib
 
 from tortoisehg.hgtk import gtklib
 
@@ -387,8 +387,7 @@ class GDialog(gtk.Window):
             return
         if not url.startswith('http'):
             url = 'http://tortoisehg.bitbucket.org/manual/0.9/' + url
-        from tortoisehg.hgtk import about
-        about.browse_url(url)
+        shlib.browse_url(url)
 
     def launch(self, item, app):
         import sys
