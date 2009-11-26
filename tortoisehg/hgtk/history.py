@@ -40,6 +40,73 @@ def create_submenu(label, menu):
     m.set_submenu(menu)
     return m
 
+class FilterBox(gtklib.SlimToolbar):
+    'Filter Toolbar for repository log'
+
+    def __init__(self, tooltips, filter_mode, branch_names):
+        gtklib.SlimToolbar.__init__(self, tooltips)
+        self.filter_mode = filter_mode
+
+        self.all = gtk.RadioButton(None, _('All'))
+        self.all.set_active(True)
+        self.append_widget(self.all, padding=0)
+
+        self.tagged = gtk.RadioButton(self.all, _('Tagged'))
+        self.append_widget(self.tagged, padding=0)
+
+        self.ancestry = gtk.RadioButton(self.all, _('Ancestry'))
+        self.append_widget(self.ancestry, padding=0)
+
+        self.parents = gtk.RadioButton(self.all, _('Parents'))
+        self.append_widget(self.parents, padding=0)
+
+        self.heads = gtk.RadioButton(self.all, _('Heads'))
+        self.append_widget(self.heads, padding=0)
+
+        self.merges = gtk.RadioButton(self.all, _('Merges'))
+        self.append_widget(self.merges, padding=0)
+
+        self.hidemerges = gtk.CheckButton(_('Hide Merges'))
+        self.append_widget(self.hidemerges, padding=0)
+
+        self.branches = gtk.RadioButton(self.all)
+        tooltips.set_tip(self.branches, _('Branch Filter'))
+        self.branches.set_sensitive(False)
+        self.append_widget(self.branches, padding=0)
+
+        self.branchcombo = gtk.combo_box_new_text()
+        self.branchcombo.append_text(_('Branches...'))
+        for name in branch_names:
+            self.branchcombo.append_text(hglib.toutf(name))
+        self.branchcombo.set_active(0)
+        self.append_widget(self.branchcombo, padding=0)
+
+        self.custombutton = gtk.RadioButton(self.all)
+        tooltips.set_tip(self.custombutton, _('Custom Filter'))
+        self.custombutton.set_sensitive(False)
+        self.append_widget(self.custombutton, padding=0)
+
+        self.filtercombo = gtk.combo_box_new_text()
+        self.filtercombo_entries = (_('Rev Range'), _('File Patterns'),
+                  _('Keywords'), _('Date'), _('User'))
+        for f in self.filtercombo_entries:
+            self.filtercombo.append_text(f)
+        if (self.filter_mode >= len(self.filtercombo_entries) or
+                self.filter_mode < 0):
+            self.filter_mode = 1
+        self.filtercombo.set_active(self.filter_mode)
+        self.append_widget(self.filtercombo, padding=0)
+
+        self.entry = gtk.Entry()
+        self.append_widget(self.entry, expand=True, padding=0)
+
+    def connect(self, detailed_signal, handler, *opts):
+        '''Connect an external signal handler to an internal widget
+           Signal format is '[widget_name]_[signal]'.'''
+        widget_name, signal = detailed_signal.split('_')
+        widget = self.__dict__[widget_name]
+        widget.connect(signal, handler, *opts)
+
 class GLog(gdialog.GDialog):
     'GTK+ based dialog for displaying repository logs'
     def init(self):
@@ -1023,78 +1090,36 @@ class GLog(gdialog.GDialog):
         email.connect('clicked', self.email_clicked)
 
         # filter bar
-        self.filterbox = gtklib.SlimToolbar()
+        self.filterbox = FilterBox(self.tooltips,
+                                   self.filter_mode, 
+                                   self.get_live_branches())
         filterbox = self.filterbox
-
-        all = gtk.RadioButton(None, _('All'))
-        all.set_active(True)
-        all.connect('toggled', self.filter_selected, 'all')
-        filterbox.append_widget(all, padding=0)
-
-        tagged = gtk.RadioButton(all, _('Tagged'))
-        tagged.connect('toggled', self.filter_selected, 'tagged')
-        filterbox.append_widget(tagged, padding=0)
-
-        ancestry = gtk.RadioButton(all, _('Ancestry'))
-        ancestry.connect('toggled', self.filter_selected, 'ancestry')
-        filterbox.append_widget(ancestry, padding=0)
-        self.ancestrybutton = ancestry
-
-        parents = gtk.RadioButton(all, _('Parents'))
-        parents.connect('toggled', self.filter_selected, 'parents')
-        filterbox.append_widget(parents, padding=0)
-
-        heads = gtk.RadioButton(all, _('Heads'))
-        heads.connect('toggled', self.filter_selected, 'heads')
-        filterbox.append_widget(heads, padding=0)
-
-        merges = gtk.RadioButton(all, _('Merges'))
-        merges.connect('toggled', self.filter_selected, 'only_merges')
-        filterbox.append_widget(merges, padding=0)
-
-        hidemerges = gtk.CheckButton(_('Hide Merges'))
-        hidemerges.connect('toggled', self.filter_selected, 'no_merges')
-        filterbox.append_widget(hidemerges, padding=0)
-        self.hidemerges = hidemerges
-
-        branches = gtk.RadioButton(all)
-        branches.connect('toggled', self.filter_selected, 'branch')
-        self.tooltips.set_tip(branches, _('Branch Filter'))
-        branches.set_sensitive(False)
-        filterbox.append_widget(branches, padding=0)
-        self.branchbutton = branches
-
-        branchcombo = gtk.combo_box_new_text()
-        branchcombo.append_text(_('Branches...'))
-        for name in self.get_live_branches():
-            branchcombo.append_text(hglib.toutf(name))
-        branchcombo.set_active(0)
-        branchcombo.connect('changed', self.select_branch)
+        self.ancestrybutton = filterbox.ancestry
+        self.hidemerges = filterbox.hidemerges
+        self.branchbutton = filterbox.branches
         self.lastbranchrow = None
-        filterbox.append_widget(branchcombo, padding=0)
-        self.branchcombo = branchcombo
+        self.branchcombo = filterbox.branchcombo
+        self.custombutton = filterbox.custombutton 
+        self.filter_mode = filterbox.filter_mode
+        self.filtercombo = filterbox.filtercombo
+        self.filterentry = filterbox.entry
 
-        self.custombutton = gtk.RadioButton(all)
-        self.tooltips.set_tip(self.custombutton, _('Custom Filter'))
-        self.custombutton.set_sensitive(False)
-        filterbox.append_widget(self.custombutton, padding=0)
-
-        filtercombo = gtk.combo_box_new_text()
-        filtercombo_entries = (_('Rev Range'), _('File Patterns'),
-                  _('Keywords'), _('Date'), _('User'))
-        for f in filtercombo_entries:
-            filtercombo.append_text(f)
-        if (self.filter_mode >= len(filtercombo_entries) or
-                self.filter_mode < 0):
-            self.filter_mode = 1
-        filtercombo.set_active(self.filter_mode)
-        self.filtercombo = filtercombo
-        filterbox.append_widget(filtercombo, padding=0)
-
-        entry = gtk.Entry()
-        entry.connect('activate', self.filter_entry_activated, filtercombo)
-        self.filterentry = entry
-        filterbox.append_widget(entry, expand=True, padding=0)
+        self.filterbox.connect('all_toggled', self.filter_selected, 'all')
+        self.filterbox.connect('tagged_toggled', self.filter_selected, 'tagged')
+        self.filterbox.connect('ancestry_toggled', self.filter_selected, 
+                                        'ancestry')
+        self.filterbox.connect('parents_toggled', self.filter_selected, 
+                                       'parents')
+        self.filterbox.connect('heads_toggled', self.filter_selected, 'heads')
+        self.filterbox.connect('merges_toggled', self.filter_selected, 
+                                      'only_merges')
+        self.filterbox.connect('hidemerges_toggled', self.filter_selected, 
+                                          'no_merges')
+        self.filterbox.connect('branches_toggled', self.filter_selected, 
+                                        'branch')
+        self.filterbox.connect('branchcombo_changed', self.select_branch)
+        self.filterbox.connect('entry_activate', self.filter_entry_activated, 
+                                     self.filtercombo)
 
         midpane = gtk.VBox()
         midpane.pack_start(syncbox, False)
