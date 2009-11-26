@@ -28,8 +28,8 @@ from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close, mergebranches):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
-                            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                     gtk.STOCK_OK, gtk.RESPONSE_OK),
+                            buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                     gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL),
                             title=_('Branch Operations'))
         gtklib.set_tortoise_icon(self, 'branch.ico')
         gtklib.set_tortoise_keys(self)
