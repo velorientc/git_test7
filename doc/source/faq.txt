@@ -34,6 +34,13 @@ Frequently Asked Questions
 	there are further complications on Vista.  See
 	`issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_.
 
+*How do I use TortoiseHg's shelve extension from the hg command line?*
+	
+	Enable the extension in your Mercurial.ini file::
+
+		[extensions]
+		tortoisehg.util.hgshelve=
+
 *Why can't I connect to an ssh server (TortoisePlink.exe* ``...cannot execute specified...`` *error message)?*
 
 	Release 0.7.2 and later include a version of TortoisePlink that does

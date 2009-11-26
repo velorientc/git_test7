@@ -134,6 +134,9 @@ For example:
 	6) Open the shelve tool and press :guilabel:`Unshelve`
 	7) Refresh top patch (repeat step 4)
 
+You cannot shelve added, removed, or renamed files, but MQ can handle
+this just fine.
+
 How is this different from attic?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -173,5 +176,14 @@ The shelve tool can be started from command line::
 	shelve/unshelve tool
 
 	use "hgtk -v help shelve" to show global options
+
+To use TortoiseHg's shelve functionality from the Mercurial command
+line, you must enable the extension with lines like these in your
+Mercurial.ini file::
+	
+	[extensions]
+	tortoisehg.util.hgshelve=
+
+This adds commands named :command:`shelve` and :command:`unshelve` to hg.
 
 .. vim: noet ts=4
