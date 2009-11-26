@@ -89,22 +89,25 @@ class TagAddDialog(gtk.Dialog):
 
         # prepare to show
         self.load_settings()
-        self._refresh()
+        self._refresh(clear=False)
         self._taglistbox.grab_focus()
 
-    def _refresh(self):
+    def _refresh(self, clear=True):
         """ update display on dialog with recent repo data """
         self.repo.invalidate()
         self._tagslist.clear()
-        self._tag_input.set_text("")
 
         # add tags to drop-down list
         tags = [x[0] for x in self.repo.tagslist()]
         tags.sort()
         for tagname in tags:
-            if tagname == "tip":
+            if tagname == 'tip':
                 continue
             self._tagslist.append([tagname])
+
+        # clear tag input
+        if clear:
+            self._tag_input.set_text('')
 
     def load_settings(self):
         expanded = self.settings.get_value('expanded', False, True)

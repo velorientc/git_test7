@@ -1681,7 +1681,13 @@ class GLog(gdialog.GDialog):
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
         oldlen = len(self.repo)
-        rev = self.currevid
+        rev = str(self.currevid)
+        for t in self.repo.nodetags(self.repo[rev].node()):
+            if t != 'tip':
+                tag = t
+                break;
+        else:
+            tag = ''
 
         def refresh(*args):
             self.repo.invalidate()
@@ -1693,7 +1699,7 @@ class GLog(gdialog.GDialog):
                 if newtags != oldtags:
                     self.refresh_model()
 
-        dialog = tagadd.TagAddDialog(self.repo, rev=str(rev))
+        dialog = tagadd.TagAddDialog(self.repo, tag, rev)
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
 
