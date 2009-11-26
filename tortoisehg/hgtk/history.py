@@ -10,7 +10,6 @@ import os
 import sys
 import gtk
 import gobject
-import Queue
 import shutil
 import tempfile
 import atexit
@@ -18,7 +17,7 @@ import atexit
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, thread2
+from tortoisehg.util import hglib
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 
@@ -916,14 +915,9 @@ class GLog(gdialog.GDialog):
                         _('Push outgoing changesets'))
         email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
                         _('Email outgoing changesets'))
-        syncbox.append_widget(gtk.VSeparator())
-        stop = syncbox.append_stock(gtk.STOCK_STOP,
-                        _('Stop current transaction'))
 
-        stop.set_sensitive(False)
         apply.set_sensitive(False)
         reject.set_sensitive(False)
-        self.stop_button = stop
         self.syncbar_apply = apply
         self.syncbar_reject = reject
 
@@ -1314,46 +1308,28 @@ class GLog(gdialog.GDialog):
                            self).run()
             self.pathentry.grab_focus()
             return
-        q = Queue.Queue()
-        cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n']
+        cmd = ['hg', 'outgoing', '--quiet', '--template', '{node}\n']
         cmd += self.get_proxy_args()
         cmd += [hglib.validate_synch_path(path, self.repo)] 
 
-        def threadfunc(q, *args):
-            try:
-                hglib.hgcmd_toq(q, *args)
-            except (util.Abort, hglib.RepoError), e:
-                self.stbar.set_status_text(_('Abort: %s') % str(e))
-
-        def out_wait():
-            while q.qsize():
-                hash = q.get(0).strip()
+        dlg = hgcmd.CmdDialog(cmd, text='hg outgoing')
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        if dlg.return_code() == 0:
+            outgoing = []
+            buf = dlg.textbuffer
+            begin, end = buf.get_bounds()
+            for line in buf.get_text(begin, end).splitlines()[:-1]:
                 try:
-                    node = self.repo[hash].node()
+                    node = self.repo[line].node()
                     outgoing.append(node)
                 except:
                     pass
-            if thread.isAlive():
-                return True
-            else:
-                self.stbar.end()
-                self.outgoing = outgoing
-                self.reload_log()
-                text = _('%d outgoing changesets') % len(outgoing)
-                self.stbar.set_idle_text(text)
-                self.stop_button.disconnect(stop_handler)
-                self.stop_button.set_sensitive(False)
-
-        def stop_clicked(button):
-            thread.terminate()
-
-        outgoing = []
-        thread = thread2.Thread(target=threadfunc, args=cmd)
-        thread.start()
-        self.stbar.begin()
-        stop_handler = self.stop_button.connect('clicked', stop_clicked)
-        self.stop_button.set_sensitive(True)
-        gobject.timeout_add(50, out_wait)
+            self.outgoing = outgoing
+            self.reload_log()
+            text = _('%d outgoing changesets') % len(outgoing)
+            self.stbar.set_idle_text(text)
 
     def email_clicked(self, toolbutton):
         path = hglib.fromutf(self.pathentry.get_text()).strip()
