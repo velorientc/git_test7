@@ -51,7 +51,7 @@ class CloneDialog(gtk.Dialog):
         elif len(repos):
             srcpath = repos[0]
 
-        def createcombo(path, label, title):
+        def createcombo(path, label, title, bundle=False):
             # comboentry
             model = gtk.ListStore(str)
             combo = gtk.ComboBoxEntry(model, 0)
@@ -74,7 +74,14 @@ class CloneDialog(gtk.Dialog):
             browse = gtk.Button(_('Browse...'))
             browse.connect('clicked', self.browse_clicked, title, entry)
 
-            table.add_row(label, combo, 0, browse)
+            if bundle:
+                # bundle button
+                bundlebtn = gtk.Button(_('Bundle...'))
+                bundlebtn.connect('clicked', self.bundle_clicked, 
+                                  _('Select a Mercurial Bundle'), entry)
+                table.add_row(label, combo, 0, browse, bundlebtn)
+            else:
+                table.add_row(label, combo, 0, browse)
 
             return model, combo
 
@@ -85,7 +92,7 @@ class CloneDialog(gtk.Dialog):
         ## comboentry for source paths
         self.srclist, srccombo = createcombo(srcpath,
                                              _('Source path:'),
-                                             _('Select Source Folder'))
+                                             _('Select Source Folder'), True)
         self.srcentry = srccombo.get_child()
 
         ## add pre-defined src paths to pull-down list
@@ -206,6 +213,21 @@ class CloneDialog(gtk.Dialog):
         if res:
             entry.set_text(res)
 
+    def bundle_clicked(self, button, title, entry):
+        path = entry.get_text()
+        if os.path.isdir(path):
+            initial = path
+        else:
+            initial = os.path.dirname(path)
+
+        res = gtklib.NativeSaveFileDialogWrapper(
+                     initial=initial,
+                     title=title, 
+                     filter= ((_('Mercurial bundles'), '*.hg'),),
+                     open=True).run()
+        if res:
+            entry.set_text(res)
+
     def checkbutton_toggled(self, checkbutton, entry):
         state = checkbutton.get_active()
         entry.set_sensitive(state)
@@ -266,7 +288,7 @@ class CloneDialog(gtk.Dialog):
 
     def clone(self):
         # gather input data
-        src = self.srcentry.get_text()
+        src = self.srcentry.get_text().strip()
         dest = self.destentry.get_text() or os.path.basename(src)
         remotecmd = self.remotecmdentry.get_text()
         rev = self.reventry.get_text()
