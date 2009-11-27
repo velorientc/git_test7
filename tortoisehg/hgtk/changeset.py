@@ -492,7 +492,7 @@ class ChangeSet(gdialog.GDialog):
                 pctxs = ctx.parents()
                 parents = []
                 for pctx in pctxs:
-                    highlight = len(pctxs) == 2 and pctx == pctxs[pindex]
+                    highlight = len(pctxs) == 2 and pctx == pctxs[1]
                     branch = None
                     if hasattr(pctx, 'branch') and pctx.branch() != ctx.branch():
                         branch = pctx.branch()

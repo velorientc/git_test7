@@ -147,7 +147,9 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         box_size = self.box_size(widget)
 
-        ctx.set_line_width(box_size / 8)
+        linewidth = box_size / 8
+        merge_linewidth = 2.5 * linewidth
+        ctx.set_line_width(linewidth)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
 
         # Draw lines into the cell
@@ -155,18 +157,24 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             style = style_SOLID
             if type & 1:
                 style = style_DASHED
+            if type & 4:
+                ctx.set_line_width(merge_linewidth)
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y, bg_area.height,
                          start, end, colour, style)
+            ctx.set_line_width(linewidth)
 
         # Draw lines out of the cell
         for start, end, colour, type in self.out_lines:
             style = style_SOLID
             if type & 2:
                 style = style_DASHED
+            if type & 4:
+                ctx.set_line_width(merge_linewidth)
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y + bg_area.height, bg_area.height,
                          start, end, colour, style)
+            ctx.set_line_width(linewidth)
 
         # Draw the revision node in the right column
         (column, colour, status) = self.node
