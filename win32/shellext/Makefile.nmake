@@ -9,8 +9,11 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         InitStatus.obj \
         CShellExtCMenu.obj \
         CShellExtOverlay.obj \
+		IconBitmapUtils.obj \
+		Registry.obj \
         ShellExt.obj \
         StringUtils.obj \
+        SysInfo.obj \
         dirstate.obj \
         Winstat64.obj \
         Dirstatecache.obj \
@@ -18,7 +21,7 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         Thgstatus.obj \
         QueryDirstate.obj
 
-LIBS    = User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib
+LIBS    = shlwapi.lib gdiplus.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib
 DEFFILE = ShellExt.def
 
 
@@ -29,7 +32,7 @@ LDFLAGS_THGSHELL = $(BASE_LDFLAGS) /DLL /DEF:$(DEFFILE)
 LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
 
 
-all: THgShell.dll dirstate.exe
+all: THgShell.dll
 
 clean:
     del *.obj *.dll *.exe *.lib *.exp *.manifest

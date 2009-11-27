@@ -129,6 +129,7 @@ def _color_of(repo, rev, nextcolor, preferredcolor, branch_color=False):
 type_PLAIN = 0
 type_LOOSE_LOW = 1
 type_LOOSE_HIGH = 2
+type_MERGE = 4
 
 def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, branch_color=False):
     """incremental revision grapher
@@ -193,9 +194,12 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
                 color = rev_color[rev]
                 lines.append( (i, next_revs.index(rev), color, type_PLAIN) )
             elif rev == curr_rev:
-                for parent in parents:
+                for index, parent in enumerate(parents):
                     color = rev_color[parent]
-                    lines.append( (i, next_revs.index(parent), color, type_PLAIN) )
+                    type = type_PLAIN
+                    if index == 1:
+                        type = type | type_MERGE
+                    lines.append( (i, next_revs.index(parent), color, type) )
 
         yield (curr_rev, (rev_index, rev_color[curr_rev]), lines, None)
         revs = next_revs
