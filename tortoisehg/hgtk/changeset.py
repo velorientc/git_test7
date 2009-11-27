@@ -270,6 +270,7 @@ class ChangeSet(gdialog.GDialog):
         buf = self._buffer
         buf.set_text('')
         eob = buf.get_end_iter()
+        desc.rstrip('\n\r')
 
         pos = 0
         self.issuedict.clear()
@@ -289,7 +290,7 @@ class ChangeSet(gdialog.GDialog):
                 buf.insert_with_tags_by_name(eob, link, 'issuelink')
         if pos < len(desc):
             buf.insert(eob, desc[pos:])
-        buf.insert(eob, desc.rstrip('\n\r') + '\n\n')
+        buf.insert(eob, '\n\n')
 
     def append_diff(self, wfile):
         if not wfile:
