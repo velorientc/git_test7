@@ -270,7 +270,7 @@ class ChangeSet(gdialog.GDialog):
         buf = self._buffer
         buf.set_text('')
         eob = buf.get_end_iter()
-        desc.rstrip('\n\r')
+        desc = desc.rstrip('\n\r')
 
         pos = 0
         self.issuedict.clear()
