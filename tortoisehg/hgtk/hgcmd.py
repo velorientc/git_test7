@@ -654,3 +654,117 @@ class CmdLogDialog(gtk.Window):
             if self.close_hook(self):
                 self.hide()
         return True
+
+class CmdRunner(object):
+    """
+    Interactive command runner without GUI.
+
+    In default, it doesn't have any GUI, such as CmdDialog.
+    If it needs something user interaction (i.e. HTTPS auth) while
+    running, simple input dialog will be popup.
+    """
+    def __init__(self):
+        self.hgthread = None
+        self.clear_buffers()
+
+    ### public functions ###
+
+    def execute(self, cmdline, callback, *args, **kargs):
+        """
+        Execute passed command line using 'hgthread'.
+        When the command terminated, callback function is called
+        with return code. 
+
+        cmdline: command line string.
+        callback: function called after terminated the thread.
+
+        def callback(returncode, msg, err, ...)
+
+        returncode: See the description of 'hgthread'.
+        msg: Message buffer.
+        err: Error messages buffer.
+
+        return: True if it starts correctly, otherwise False.
+        """
+        if self.hgthread:
+            return False
+
+        # clear previous logs
+        self.clear_buffers()
+
+        # thread start
+        self.hgthread = hgthread.HgThread(cmdline[1:])
+        self.hgthread.start()
+        gobject.timeout_add(10, self.process_queue, callback, args, kargs)
+
+        return True
+
+    def is_alive(self):
+        """
+        Return whether the thread is alive.
+        """
+        return self.hgthread and self.hgthread.isAlive()
+
+    def stop(self):
+        """
+        Terminate the thread forcibly.
+        """
+        if self.hgthread:
+            self.hgthread.terminate()
+
+    def get_msg_buffer(self):
+        """
+        Return message buffer.
+
+        Note that the buffer will be cleared when called 'execute' method.
+        So you need to store this before next execution.
+        """
+        return self.msg_buffer
+
+    def get_err_buffer(self):
+        """
+        Return error message buffer.
+
+        Note that the buffer will be cleared when called 'execute' method.
+        So you need to store this before next execution.
+        """
+        return self.err_buffer
+
+    ### internal use functions ###
+
+    def clear_buffers(self):
+        """
+        Clear both message and error buffers.
+        """
+        self.msg_buffer = ''
+        self.err_buffer = ''
+
+    def process_queue(self, callback, args, kargs):
+        # process queue
+        self.hgthread.process_dialogs()
+
+        # receive messages from queue
+        while self.hgthread.getqueue().qsize():
+            try:
+                msg = self.hgthread.getqueue().get(0)
+                self.msg_buffer += hglib.toutf(msg)
+            except Queue.Empty:
+                pass
+        while self.hgthread.geterrqueue().qsize():
+            try:
+                msg = hglib.toutf(self.hgthread.geterrqueue().get(0))
+                self.err_buffer += hglib.toutf(msg)
+            except Queue.Empty:
+                pass
+
+        # check thread state
+        if not self.hgthread.isAlive():
+            returncode = self.hgthread.return_code()
+            self.hgthread = None
+            def call_callback():
+                callback(returncode, self.msg_buffer, self.err_buffer,
+                         *args, **kargs)
+            gtklib.idle_add_single_call(call_callback)
+            return False # Stop polling this function
+        else:
+            return True # Continue polling
