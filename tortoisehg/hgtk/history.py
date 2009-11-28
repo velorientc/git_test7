@@ -137,6 +137,7 @@ class GLog(gdialog.GDialog):
         self.revrange = None
         self.forcepush = False
         self.bundle_autoreject = False
+        self.runner = hgcmd.CmdRunner()
         os.chdir(self.repo.root)
 
         # Load extension support for commands which need it
@@ -1282,8 +1283,7 @@ class GLog(gdialog.GDialog):
 
         bfile = path
         path = hglib.validate_synch_path(path, self.repo)
-        
-                
+
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
         bfile = bfile.replace('/', '_')
@@ -1291,12 +1291,17 @@ class GLog(gdialog.GDialog):
         cmdline = ['hg', 'incoming', '--bundle', bfile]
         cmdline += self.get_proxy_args()
         cmdline += [path]
-        dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        if dlg.return_code() == 0 and os.path.isfile(bfile):
-            self.set_bundlefile(bfile)
+
+        def callback(return_code, *args):
+            self.stbar.end()
+            if return_code == 0 and os.path.isfile(bfile):
+                self.set_bundlefile(bfile)
+        if self.runner.execute(cmdline, callback):
+            self.stbar.begin(_('Checking incoming changesets...'))
+        else:
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def set_bundlefile(self, bfile, **kwopts):
         self.origurl = self.urlcombo.get_active()
@@ -1415,24 +1420,26 @@ class GLog(gdialog.GDialog):
         cmd += self.get_proxy_args()
         cmd += [hglib.validate_synch_path(path, self.repo)] 
 
-        dlg = hgcmd.CmdDialog(cmd, text='hg outgoing')
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        if dlg.return_code() == 0:
-            outgoing = []
-            buf = dlg.textbuffer
-            begin, end = buf.get_bounds()
-            for line in buf.get_text(begin, end).splitlines()[:-1]:
-                try:
-                    node = self.repo[line].node()
-                    outgoing.append(node)
-                except:
-                    pass
-            self.outgoing = outgoing
-            self.reload_log()
-            text = _('%d outgoing changesets') % len(outgoing)
-            self.stbar.set_idle_text(text)
+        def callback(return_code, msg, *args):
+            self.stbar.end()
+            if return_code == 0:
+                outgoing = []
+                for line in msg.splitlines()[:-1]:
+                    try:
+                        node = self.repo[line].node()
+                        outgoing.append(node)
+                    except:
+                        pass
+                self.outgoing = outgoing
+                self.reload_log()
+                text = _('%d outgoing changesets') % len(outgoing)
+                self.stbar.set_idle_text(text)
+        if self.runner.execute(cmd, callback):
+            self.stbar.begin(_('Checking outgoing changesets...'))
+        else:
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def email_clicked(self, toolbutton):
         path = hglib.fromutf(self.pathentry.get_text()).strip()
