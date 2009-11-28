@@ -1395,18 +1395,23 @@ class GLog(gdialog.GDialog):
             self.pathentry.grab_focus()
             return
         cmdline = ['hg'] + cmd + self.get_proxy_args() + [remote_path]
-        dlg = hgcmd.CmdDialog(cmdline, text=' '.join(['hg'] + cmd))
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        if dlg.return_code() == 0:
-            self.repo.invalidate()
-            self.changeview.clear_cache()
-            if '--rebase' in cmd:
-                self.origtip = len(self.repo)
-                self.reload_log()
-            elif len(self.repo) > self.origtip:
-                self.reload_log()
+
+        def callback(return_code, *args):
+            self.stbar.end()
+            if return_code == 0:
+                self.repo.invalidate()
+                self.changeview.clear_cache()
+                if '--rebase' in cmd:
+                    self.origtip = len(self.repo)
+                    self.reload_log()
+                elif len(self.repo) > self.origtip:
+                    self.reload_log()
+        if self.runner.execute(cmdline, callback):
+            self.stbar.begin(_('Pulling changesets...'))
+        else:
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def outgoing_clicked(self, toolbutton):
         path = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -1491,13 +1496,18 @@ class GLog(gdialog.GDialog):
         if self.forcepush:
             cmdline += ['--force']
         cmdline += [remote_path]
-        dlg = hgcmd.CmdDialog(cmdline, text=' '.join(cmdline[:-1]))
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        if dlg.return_code() == 0 and self.outgoing:
-            self.outgoing = []
-            self.reload_log()
+
+        def callback(return_code, *args):
+            self.stbar.end()
+            if return_code == 0 and self.outgoing:
+                self.outgoing = []
+                self.reload_log()
+        if self.runner.execute(cmdline, callback):
+            self.stbar.begin(_('Pushing changesets...'))
+        else:
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def conf_clicked(self, toolbutton, combo):
         newpath = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -1898,33 +1908,45 @@ class GLog(gdialog.GDialog):
             self.pathentry.grab_focus()
             return
         node = self.repo[self.currevid].node()
-        cmdline = ['hg', 'push', '--rev', str(self.currevid), remote_path]
-        dlg = hgcmd.CmdDialog(cmdline, text='hg push')
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        if dlg.return_code() == 0 and self.outgoing:
-            d = self.outgoing.index(node)
-            self.outgoing = self.outgoing[d+1:]
-            self.reload_log()
+        rev = str(self.currevid)
+        cmdline = ['hg', 'push', '--rev', rev, remote_path]
+
+        def callback(return_code, *args):
+            self.stbar.end()
+            if return_code == 0 and self.outgoing:
+                d = self.outgoing.index(node)
+                self.outgoing = self.outgoing[d+1:]
+                self.reload_log()
+        if self.runner.execute(cmdline, callback):
+            self.stbar.begin(_("Pushing changesets to %s...") % rev)
+        else:
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def pull_to(self, menuitem):
-        cmdline = ['hg', 'pull', '--rev', str(self.currevid), self.bfile]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        curtip = len(hg.repository(self.ui, self.repo.root))
-        self.repo = hg.repository(self.ui, path=self.bfile)
-        self.graphview.set_repo(self.repo, self.stbar)
-        self.changeview.set_repo(self.repo)
-        if hasattr(self, 'mqwidget'):
-            self.mqwidget.set_repo(self.repo)
-        self.npreviews = len(self.repo) - curtip
-        if self.npreviews == 0:
-            self.remove_overlay(False)
+        rev = str(self.currevid)
+        cmdline = ['hg', 'pull', '--rev', rev, self.bfile]
+
+        def callback(*args):
+            self.stbar.end()
+            curtip = len(hg.repository(self.ui, self.repo.root))
+            self.repo = hg.repository(self.ui, path=self.bfile)
+            self.graphview.set_repo(self.repo, self.stbar)
+            self.changeview.set_repo(self.repo)
+            if hasattr(self, 'mqwidget'):
+                self.mqwidget.set_repo(self.repo)
+            self.npreviews = len(self.repo) - curtip
+            if self.npreviews == 0:
+                self.remove_overlay(False)
+            else:
+                self.reload_log()
+        if self.runner.execute(cmdline, callback):
+            self.stbar.begin(_("Pulling changesets to %s...") % rev)
         else:
-            self.reload_log()
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def copy_hash(self, menuitem):
         hash = self.repo[self.currevid].hex()
