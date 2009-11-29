@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-11-16 15:27+0000\n"
-"PO-Revision-Date: 2009-11-16 19:07+0000\n"
+"POT-Creation-Date: 2009-11-25 15:36+0000\n"
+"PO-Revision-Date: 2009-11-26 13:46+0000\n"
 "Last-Translator: Yuki Kodama <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-17 05:22+0000\n"
+"X-Launchpad-Export-Date: 2009-11-27 04:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -62,7 +62,7 @@ msgid "Archive revision:"
 msgstr "アーカイブにするリビジョン:"
 
 #: tortoisehg\hgtk\archive.py:77 tortoisehg\hgtk\clone.py:74
-#: tortoisehg\hgtk\hginit.py:52 tortoisehg\hgtk\thgconfig.py:301
+#: tortoisehg\hgtk\hginit.py:51 tortoisehg\hgtk\thgconfig.py:301
 msgid "Browse..."
 msgstr "選択..."
 
@@ -120,8 +120,9 @@ msgid "Do you want to abort?"
 msgstr "中止してもよろしいですか？"
 
 #: tortoisehg\hgtk\archive.py:138 tortoisehg\hgtk\backout.py:153
-#: tortoisehg\hgtk\clone.py:199 tortoisehg\hgtk\merge.py:183
-#: tortoisehg\hgtk\quickop.py:207 tortoisehg\hgtk\thgstrip.py:318
+#: tortoisehg\hgtk\clone.py:199 tortoisehg\hgtk\hginit.py:80
+#: tortoisehg\hgtk\merge.py:183 tortoisehg\hgtk\quickop.py:207
+#: tortoisehg\hgtk\tagadd.py:151 tortoisehg\hgtk\thgstrip.py:318
 #: tortoisehg\hgtk\update.py:148
 msgid "unexpected response id: %s"
 msgstr "予期しない応答 ID: %s"
@@ -143,7 +144,7 @@ msgid "Compressed zip archives"
 msgstr "zip 圧縮アーカイブ"
 
 #: tortoisehg\hgtk\archive.py:218 tortoisehg\hgtk\clone.py:104
-#: tortoisehg\hgtk\hginit.py:77
+#: tortoisehg\hgtk\hginit.py:88
 msgid "Select Destination Folder"
 msgstr "クローン先"
 
@@ -163,8 +164,8 @@ msgid "unknown mode name: %s"
 msgstr "不明なモード名: %s"
 
 #: tortoisehg\hgtk\archive.py:254 tortoisehg\hgtk\archive.py:260
-#: tortoisehg\hgtk\gtklib.py:245 tortoisehg\hgtk\thgconfig.py:481
-#: tortoisehg\hgtk\thgconfig.py:831
+#: tortoisehg\hgtk\gtklib.py:246 tortoisehg\hgtk\thgconfig.py:481
+#: tortoisehg\hgtk\thgconfig.py:832
 msgid "Confirm Overwrite"
 msgstr "上書きの確認"
 
@@ -234,7 +235,7 @@ msgstr "英語のバックアウトメッセージを使用する"
 msgid "Merge with old dirstate parent after backout"
 msgstr "バックアウト後に古い親リビジョンとマージする"
 
-#: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:438
+#: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:443
 msgid "Confirm Discard Message"
 msgstr "コミットログの破棄"
 
@@ -263,7 +264,6 @@ msgid "Save as.."
 msgstr "名前を付けて保存..."
 
 #: tortoisehg\hgtk\bugreport.py:49 tortoisehg\hgtk\hgcmd.py:48
-#: tortoisehg\hgtk\taskbarui.py:33
 msgid "Close"
 msgstr "閉じる"
 
@@ -303,7 +303,7 @@ msgstr "リポジトリエラー: %s, 再読み込みしてください"
 msgid "[no hunks to display]"
 msgstr "[表示可能なハンクがありません]"
 
-#: tortoisehg\hgtk\changeset.py:398 tortoisehg\hgtk\status.py:1505
+#: tortoisehg\hgtk\changeset.py:398 tortoisehg\hgtk\status.py:1509
 msgid "_Visual Diff"
 msgstr "GUI 差分表示(_V)"
 
@@ -391,7 +391,7 @@ msgstr "クローン元:"
 msgid "Select Source Folder"
 msgstr "クローン元"
 
-#: tortoisehg\hgtk\clone.py:114 tortoisehg\hgtk\tagadd.py:68
+#: tortoisehg\hgtk\clone.py:114 tortoisehg\hgtk\tagadd.py:66
 msgid "Advanced options"
 msgstr "詳細設定"
 
@@ -472,240 +472,244 @@ msgstr "新しくブランチを開始する"
 msgid "Close current named branch"
 msgstr "現在のブランチを閉じる"
 
-#: tortoisehg\hgtk\commit.py:148
+#: tortoisehg\hgtk\commit.py:144
+msgid "merging "
+msgstr "マージ中 "
+
+#: tortoisehg\hgtk\commit.py:150
 msgid " - qnew"
 msgstr " - パッチ作成"
 
-#: tortoisehg\hgtk\commit.py:151
+#: tortoisehg\hgtk\commit.py:153
 msgid " - qrefresh "
 msgstr " - パッチ更新 "
 
-#: tortoisehg\hgtk\commit.py:152
+#: tortoisehg\hgtk\commit.py:154
 msgid " - commit"
 msgstr " - コミット"
 
-#: tortoisehg\hgtk\commit.py:183 tortoisehg\hgtk\history.py:169
+#: tortoisehg\hgtk\commit.py:185 tortoisehg\hgtk\history.py:169
 msgid "_View"
 msgstr "表示(_V)"
 
-#: tortoisehg\hgtk\commit.py:184
+#: tortoisehg\hgtk\commit.py:186
 msgid "Advanced"
 msgstr "詳細設定"
 
-#: tortoisehg\hgtk\commit.py:186 tortoisehg\hgtk\history.py:670
+#: tortoisehg\hgtk\commit.py:188 tortoisehg\hgtk\history.py:670
 #: tortoisehg\hgtk\history.py:1001
 msgid "Parents"
 msgstr "親リビジョン"
 
-#: tortoisehg\hgtk\commit.py:189 tortoisehg\hgtk\hgignore.py:138
+#: tortoisehg\hgtk\commit.py:191 tortoisehg\hgtk\hgignore.py:138
 #: tortoisehg\hgtk\history.py:182
 msgid "Refresh"
 msgstr "再読み込み"
 
-#: tortoisehg\hgtk\commit.py:190
+#: tortoisehg\hgtk\commit.py:192
 msgid "_Operations"
 msgstr "操作(_O)"
 
-#: tortoisehg\hgtk\commit.py:191 tortoisehg\hgtk\commit.py:237
-#: tortoisehg\hgtk\commit.py:599
+#: tortoisehg\hgtk\commit.py:193 tortoisehg\hgtk\commit.py:239
+#: tortoisehg\hgtk\commit.py:604
 msgid "_Commit"
 msgstr "コミット(_C)"
 
-#: tortoisehg\hgtk\commit.py:193 tortoisehg\hgtk\commit.py:235
+#: tortoisehg\hgtk\commit.py:195 tortoisehg\hgtk\commit.py:237
 msgid "_Undo"
 msgstr "取り消し(_U)"
 
-#: tortoisehg\hgtk\commit.py:196 tortoisehg\hgtk\status.py:158
+#: tortoisehg\hgtk\commit.py:198 tortoisehg\hgtk\status.py:158
 msgid "_Diff"
 msgstr "差分 (_D)"
 
-#: tortoisehg\hgtk\commit.py:198 tortoisehg\hgtk\status.py:161
+#: tortoisehg\hgtk\commit.py:200 tortoisehg\hgtk\status.py:161
 msgid "Re_vert"
 msgstr "元に戻す(_V)"
 
-#: tortoisehg\hgtk\commit.py:200 tortoisehg\hgtk\status.py:164
-#: tortoisehg\hgtk\status.py:1515 tortoisehg\hgtk\thgconfig.py:905
+#: tortoisehg\hgtk\commit.py:202 tortoisehg\hgtk\status.py:164
+#: tortoisehg\hgtk\status.py:1519 tortoisehg\hgtk\thgconfig.py:906
 msgid "_Add"
 msgstr "追加(_A)"
 
-#: tortoisehg\hgtk\commit.py:202 tortoisehg\hgtk\status.py:170
-#: tortoisehg\hgtk\thgconfig.py:915
+#: tortoisehg\hgtk\commit.py:204 tortoisehg\hgtk\status.py:170
+#: tortoisehg\hgtk\thgconfig.py:916
 msgid "_Remove"
 msgstr "削除(_R)"
 
-#: tortoisehg\hgtk\commit.py:204 tortoisehg\hgtk\status.py:167
+#: tortoisehg\hgtk\commit.py:206 tortoisehg\hgtk\status.py:167
 msgid "Move"
 msgstr "移動"
 
-#: tortoisehg\hgtk\commit.py:206 tortoisehg\hgtk\status.py:173
-#: tortoisehg\hgtk\status.py:1514
+#: tortoisehg\hgtk\commit.py:208 tortoisehg\hgtk\status.py:173
+#: tortoisehg\hgtk\status.py:1518
 msgid "_Forget"
 msgstr "破棄 (_F)"
 
-#: tortoisehg\hgtk\commit.py:236
+#: tortoisehg\hgtk\commit.py:238
 msgid "undo recent commit"
 msgstr "直前のコミットを取り消す"
 
-#: tortoisehg\hgtk\commit.py:238 tortoisehg\hgtk\commit.py:483
+#: tortoisehg\hgtk\commit.py:240 tortoisehg\hgtk\commit.py:488
 msgid "commit"
 msgstr "コミットする"
 
-#: tortoisehg\hgtk\commit.py:250 tortoisehg\hgtk\merge.py:169
-#: tortoisehg\hgtk\thgconfig.py:712
+#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\merge.py:169
+#: tortoisehg\hgtk\thgconfig.py:713
 msgid "Confirm Exit"
 msgstr "終了"
 
-#: tortoisehg\hgtk\commit.py:251
+#: tortoisehg\hgtk\commit.py:253
 msgid "Save commit message at exit?"
 msgstr "終了時にコミットメッセージを保存しますか？"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:968
-#: tortoisehg\hgtk\commit.py:972 tortoisehg\hgtk\history.py:81
-#: tortoisehg\hgtk\history.py:1394 tortoisehg\hgtk\status.py:1270
-#: tortoisehg\hgtk\status.py:1289 tortoisehg\hgtk\status.py:1582
-#: tortoisehg\hgtk\thgconfig.py:715 tortoisehg\hgtk\thgmq.py:328
+#: tortoisehg\hgtk\commit.py:254 tortoisehg\hgtk\commit.py:973
+#: tortoisehg\hgtk\commit.py:977 tortoisehg\hgtk\history.py:81
+#: tortoisehg\hgtk\history.py:1395 tortoisehg\hgtk\status.py:1274
+#: tortoisehg\hgtk\status.py:1293 tortoisehg\hgtk\status.py:1586
+#: tortoisehg\hgtk\thgconfig.py:716 tortoisehg\hgtk\thgmq.py:328
 #: tortoisehg\hgtk\update.py:230
 msgid "&Cancel"
 msgstr "キャンセル（&C）"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:968
-#: tortoisehg\hgtk\commit.py:972 tortoisehg\hgtk\status.py:1582
-#: tortoisehg\hgtk\thgconfig.py:714 tortoisehg\hgtk\thgmq.py:327
+#: tortoisehg\hgtk\commit.py:254 tortoisehg\hgtk\commit.py:973
+#: tortoisehg\hgtk\commit.py:977 tortoisehg\hgtk\status.py:1586
+#: tortoisehg\hgtk\thgconfig.py:715 tortoisehg\hgtk\thgmq.py:327
 msgid "&Yes"
 msgstr "はい (&Y)"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\commit.py:968
-#: tortoisehg\hgtk\commit.py:972 tortoisehg\hgtk\thgstrip.py:377
+#: tortoisehg\hgtk\commit.py:254 tortoisehg\hgtk\commit.py:973
+#: tortoisehg\hgtk\commit.py:977 tortoisehg\hgtk\thgstrip.py:377
 msgid "&No"
 msgstr "いいえ (&N)"
 
-#: tortoisehg\hgtk\commit.py:295
+#: tortoisehg\hgtk\commit.py:297
 msgid "Committer:"
 msgstr "コミッタ:"
 
-#: tortoisehg\hgtk\commit.py:309
+#: tortoisehg\hgtk\commit.py:311
 msgid "Auto-includes:"
 msgstr "自動的に含む:"
 
-#: tortoisehg\hgtk\commit.py:312
+#: tortoisehg\hgtk\commit.py:314
 msgid "Push after commit"
 msgstr "コミット後にプッシュ"
 
-#: tortoisehg\hgtk\commit.py:346
+#: tortoisehg\hgtk\commit.py:348
 msgid "Recent commit messages..."
 msgstr "最近のコミットメッセージ..."
 
-#: tortoisehg\hgtk\commit.py:383
+#: tortoisehg\hgtk\commit.py:385
 msgid "Parent: %(rev)s"
 msgstr "親リビジョン: %(rev)s"
 
-#: tortoisehg\hgtk\commit.py:392
+#: tortoisehg\hgtk\commit.py:394
 msgid "not at head revision"
 msgstr "非ヘッドリビジョン"
 
-#: tortoisehg\hgtk\commit.py:414 tortoisehg\hgtk\status.py:480
+#: tortoisehg\hgtk\commit.py:418 tortoisehg\hgtk\status.py:480
 msgid "Patch Preview"
 msgstr "パッチプレビュー"
 
-#: tortoisehg\hgtk\commit.py:416 tortoisehg\hgtk\status.py:484
+#: tortoisehg\hgtk\commit.py:420 tortoisehg\hgtk\status.py:484
 msgid "Commit Preview"
 msgstr "コミットプレビュー"
 
-#: tortoisehg\hgtk\commit.py:439
+#: tortoisehg\hgtk\commit.py:444
 msgid "Discard current commit message?"
 msgstr "現在のコミットメッセージを破棄してもよろしいですか？"
 
-#: tortoisehg\hgtk\commit.py:482 tortoisehg\hgtk\commit.py:744
-#: tortoisehg\hgtk\commit.py:794 tortoisehg\hgtk\gdialog.py:473
-#: tortoisehg\hgtk\merge.py:94 tortoisehg\hgtk\thgconfig.py:600
+#: tortoisehg\hgtk\commit.py:487 tortoisehg\hgtk\commit.py:749
+#: tortoisehg\hgtk\commit.py:799 tortoisehg\hgtk\gdialog.py:473
+#: tortoisehg\hgtk\merge.py:94 tortoisehg\hgtk\thgconfig.py:601
 msgid "Commit"
 msgstr "コミット"
 
-#: tortoisehg\hgtk\commit.py:486
+#: tortoisehg\hgtk\commit.py:491
 msgid "QNew"
 msgstr "パッチ作成"
 
-#: tortoisehg\hgtk\commit.py:487
+#: tortoisehg\hgtk\commit.py:492
 msgid "create new MQ patch"
 msgstr "新しく MQ パッチを作成します (qnew)"
 
-#: tortoisehg\hgtk\commit.py:489
+#: tortoisehg\hgtk\commit.py:494
 msgid "QRefresh"
 msgstr "パッチ更新"
 
-#: tortoisehg\hgtk\commit.py:490
+#: tortoisehg\hgtk\commit.py:495
 msgid "refresh top MQ patch"
 msgstr "現在の MQ パッチを更新します (qrefresh)"
 
-#: tortoisehg\hgtk\commit.py:492
+#: tortoisehg\hgtk\commit.py:497
 msgid "_Commit (+1 head)"
 msgstr "コミット (+1 ヘッド)"
 
-#: tortoisehg\hgtk\commit.py:492
+#: tortoisehg\hgtk\commit.py:497
 msgid "_Commit (-1 head)"
 msgstr "コミット (-1 ヘッド)"
 
-#: tortoisehg\hgtk\commit.py:497
+#: tortoisehg\hgtk\commit.py:502
 msgid "parent is not a head, commit to add a new head"
 msgstr "親リビジョンがヘッドではないため、コミットによって新しいヘッドが追加されます"
 
-#: tortoisehg\hgtk\commit.py:502
+#: tortoisehg\hgtk\commit.py:507
 msgid "commit to merge one head"
 msgstr "コミットしてヘッドをマージします"
 
-#: tortoisehg\hgtk\commit.py:505
+#: tortoisehg\hgtk\commit.py:510
 msgid "no parent is a head, commit to add a new head"
 msgstr "ヘッドである親リビジョンがないため、コミットによって新しいヘッドが追加されます"
 
-#: tortoisehg\hgtk\commit.py:609
+#: tortoisehg\hgtk\commit.py:614
 msgid "new branch: "
 msgstr "新規ブランチ: "
 
-#: tortoisehg\hgtk\commit.py:611
+#: tortoisehg\hgtk\commit.py:616
 msgid "close branch: "
 msgstr "閉じるブランチ: "
 
-#: tortoisehg\hgtk\commit.py:613
+#: tortoisehg\hgtk\commit.py:618
 msgid "branch: "
 msgstr "ブランチ: "
 
-#: tortoisehg\hgtk\commit.py:632
+#: tortoisehg\hgtk\commit.py:637
 msgid "Merge "
 msgstr "マージ "
 
-#: tortoisehg\hgtk\commit.py:668
+#: tortoisehg\hgtk\commit.py:673
 msgid "Patch Contents"
 msgstr "パッチ内容"
 
-#: tortoisehg\hgtk\commit.py:726 tortoisehg\hgtk\commit.py:879
+#: tortoisehg\hgtk\commit.py:731 tortoisehg\hgtk\commit.py:884
 msgid "Nothing Commited"
 msgstr "何もコミットされませんでした"
 
-#: tortoisehg\hgtk\commit.py:727
+#: tortoisehg\hgtk\commit.py:732
 msgid "No committable files selected"
 msgstr "コミット可能なファイルが選択されていません"
 
-#: tortoisehg\hgtk\commit.py:745
+#: tortoisehg\hgtk\commit.py:750
 msgid "Unable to create "
 msgstr "バックアップディレクトリを作成できませんでした "
 
-#: tortoisehg\hgtk\commit.py:795
+#: tortoisehg\hgtk\commit.py:800
 msgid "Unable to apply patch"
 msgstr "パッチを適用できませんでした"
 
-#: tortoisehg\hgtk\commit.py:824
+#: tortoisehg\hgtk\commit.py:829
 msgid "Confirm Undo Commit"
 msgstr "コミット取り消しの確認"
 
-#: tortoisehg\hgtk\commit.py:825
+#: tortoisehg\hgtk\commit.py:830
 msgid "Undo last commit"
 msgstr "直前のコミットを取り消しますか？"
 
-#: tortoisehg\hgtk\commit.py:831 tortoisehg\hgtk\commit.py:846
+#: tortoisehg\hgtk\commit.py:836 tortoisehg\hgtk\commit.py:851
 msgid "Undo Commit"
 msgstr "コミットを取り消す"
 
-#: tortoisehg\hgtk\commit.py:832
+#: tortoisehg\hgtk\commit.py:837
 msgid ""
 "Unable to undo!\n"
 "\n"
@@ -715,36 +719,36 @@ msgstr ""
 "\n"
 "tipリビジョンが直前のコミットとは異なります。"
 
-#: tortoisehg\hgtk\commit.py:847
+#: tortoisehg\hgtk\commit.py:852
 msgid "Errors during rollback!"
 msgstr "ロールバック中にエラーが発生しました！"
 
-#: tortoisehg\hgtk\commit.py:860
+#: tortoisehg\hgtk\commit.py:865
 msgid "Confirm Add/Remove"
 msgstr "追加/削除"
 
-#: tortoisehg\hgtk\commit.py:861
+#: tortoisehg\hgtk\commit.py:866
 msgid "Add/Remove the following files?"
 msgstr "次のファイルを追加/削除しますか？"
 
-#: tortoisehg\hgtk\commit.py:880 tortoisehg\hgtk\tagadd.py:167
+#: tortoisehg\hgtk\commit.py:885 tortoisehg\hgtk\tagadd.py:173
 msgid "Please enter commit message"
 msgstr "コミットメッセージを入力してください"
 
-#: tortoisehg\hgtk\commit.py:888
+#: tortoisehg\hgtk\commit.py:893
 msgid "Error"
 msgstr "エラー"
 
-#: tortoisehg\hgtk\commit.py:889
+#: tortoisehg\hgtk\commit.py:894
 msgid "Message format configuration error"
 msgstr "フォーマットポリシー設定エラー"
 
-#: tortoisehg\hgtk\commit.py:898 tortoisehg\hgtk\commit.py:906
-#: tortoisehg\hgtk\commit.py:918
+#: tortoisehg\hgtk\commit.py:903 tortoisehg\hgtk\commit.py:911
+#: tortoisehg\hgtk\commit.py:923
 msgid "Confirm Commit"
 msgstr "コミット"
 
-#: tortoisehg\hgtk\commit.py:899
+#: tortoisehg\hgtk\commit.py:904
 msgid ""
 "The summary line length of %i is greater than %i.\n"
 "\n"
@@ -754,7 +758,7 @@ msgstr ""
 "\n"
 "フォーマットポリシーを無視してコミットを続行しますか？"
 
-#: tortoisehg\hgtk\commit.py:907
+#: tortoisehg\hgtk\commit.py:912
 msgid ""
 "The summary line is not followed by a blank line.\n"
 "\n"
@@ -764,7 +768,7 @@ msgstr ""
 "\n"
 "フォーマットポリシーを無視してコミットを続行しますか？"
 
-#: tortoisehg\hgtk\commit.py:919
+#: tortoisehg\hgtk\commit.py:924
 msgid ""
 "The following lines are over the %i-character limit: %s.\n"
 "\n"
@@ -774,11 +778,11 @@ msgstr ""
 "\n"
 "フォーマットポリシーを無視してコミットを続行しますか？"
 
-#: tortoisehg\hgtk\commit.py:931
+#: tortoisehg\hgtk\commit.py:936
 msgid "Commit: Invalid username"
 msgstr "コミット: 無効なユーザ名です"
 
-#: tortoisehg\hgtk\commit.py:932
+#: tortoisehg\hgtk\commit.py:937
 msgid ""
 "Your username has not been configured.\n"
 "\n"
@@ -788,11 +792,11 @@ msgstr ""
 "\n"
 "ユーザ名を設定をしてからもう一度試してください。"
 
-#: tortoisehg\hgtk\commit.py:965
+#: tortoisehg\hgtk\commit.py:970
 msgid "Confirm Override Branch"
 msgstr "ブランチの上書き"
 
-#: tortoisehg\hgtk\commit.py:966
+#: tortoisehg\hgtk\commit.py:971
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
@@ -800,43 +804,43 @@ msgstr ""
 "\"%s\" ブランチは既に存在しています。\n"
 "上書きしますか？"
 
-#: tortoisehg\hgtk\commit.py:970
+#: tortoisehg\hgtk\commit.py:975
 msgid "Confirm New Branch"
 msgstr "新規ブランチの作成"
 
-#: tortoisehg\hgtk\commit.py:971
+#: tortoisehg\hgtk\commit.py:976
 msgid "Create new named branch \"%s\"?"
 msgstr "新しいブランチ \"%s\" を作成しますか？"
 
-#: tortoisehg\hgtk\commit.py:1046
+#: tortoisehg\hgtk\commit.py:1051
 msgid "Paste _Filenames"
 msgstr "ファイル名を貼り付け(_F)"
 
-#: tortoisehg\hgtk\commit.py:1047
+#: tortoisehg\hgtk\commit.py:1052
 msgid "App_ly Format"
 msgstr "フォーマットポリシーの適用(_L)"
 
-#: tortoisehg\hgtk\commit.py:1048
+#: tortoisehg\hgtk\commit.py:1053
 msgid "C_onfigure Format"
 msgstr "フォーマットポリシーの設定(_O)"
 
-#: tortoisehg\hgtk\commit.py:1074
+#: tortoisehg\hgtk\commit.py:1079
 msgid "Info Required"
 msgstr "設定が必要"
 
-#: tortoisehg\hgtk\commit.py:1075
+#: tortoisehg\hgtk\commit.py:1080
 msgid "Message format needs to be configured"
 msgstr "フォーマットポリシーが設定されている必要があります"
 
-#: tortoisehg\hgtk\commit.py:1087 tortoisehg\hgtk\commit.py:1092
+#: tortoisehg\hgtk\commit.py:1092 tortoisehg\hgtk\commit.py:1097
 msgid "Warning"
 msgstr "警告"
 
-#: tortoisehg\hgtk\commit.py:1088
+#: tortoisehg\hgtk\commit.py:1093
 msgid "The summary line length of %i is greater than %i"
 msgstr "要約行の長さ %i は %i より大きいです"
 
-#: tortoisehg\hgtk\commit.py:1093
+#: tortoisehg\hgtk\commit.py:1098
 msgid "The summary line is not followed by a blank line"
 msgstr "要約行の最後に空行はありません"
 
@@ -849,7 +853,7 @@ msgid "must be specified 'type' in style"
 msgstr "スタイルには 'type' が必須です"
 
 #: tortoisehg\hgtk\csinfo.py:197 tortoisehg\hgtk\csinfo.py:198
-#: tortoisehg\hgtk\tagadd.py:65
+#: tortoisehg\hgtk\tagadd.py:63
 msgid "Revision:"
 msgstr "リビジョン:"
 
@@ -903,7 +907,7 @@ msgstr "新規検索"
 msgid "Open new search tab"
 msgstr "新しく検索タブを開く"
 
-#: tortoisehg\hgtk\datamine.py:73 tortoisehg\hgtk\thgconfig.py:1117
+#: tortoisehg\hgtk\datamine.py:73 tortoisehg\hgtk\thgconfig.py:1118
 msgid "Invalid path"
 msgstr "無効なパスです"
 
@@ -917,7 +921,7 @@ msgstr "ファイル名"
 
 #: tortoisehg\hgtk\datamine.py:131 tortoisehg\hgtk\datamine.py:639
 #: tortoisehg\hgtk\history.py:315 tortoisehg\hgtk\history.py:1042
-#: tortoisehg\hgtk\logview\treeview.py:443 tortoisehg\hgtk\thgconfig.py:194
+#: tortoisehg\hgtk\logview\treeview.py:444 tortoisehg\hgtk\thgconfig.py:194
 #: tortoisehg\hgtk\thgconfig.py:277
 msgid "User"
 msgstr "ユーザ名"
@@ -1007,7 +1011,7 @@ msgid "Show all matching revisions"
 msgstr "該当リビジョンを全て表示"
 
 #: tortoisehg\hgtk\datamine.py:360 tortoisehg\hgtk\datamine.py:637
-#: tortoisehg\hgtk\logview\treeview.py:394
+#: tortoisehg\hgtk\logview\treeview.py:395
 msgid "Rev"
 msgstr "リビジョン"
 
@@ -1040,7 +1044,7 @@ msgid "Error: %s"
 msgstr "エラー: %s"
 
 #: tortoisehg\hgtk\datamine.py:457 tortoisehg\hgtk\datamine.py:756
-#: tortoisehg\hgtk\history.py:1320
+#: tortoisehg\hgtk\history.py:1321
 msgid "Abort: %s"
 msgstr "中止: %s"
 
@@ -1076,9 +1080,10 @@ msgstr "TortoiseHgプロンプト"
 msgid "_Tools"
 msgstr "ツール(_T)"
 
-#: tortoisehg\hgtk\gdialog.py:471 tortoisehg\hgtk\thgconfig.py:603
-msgid "Changelog"
-msgstr "チェンジログ"
+#: tortoisehg\hgtk\gdialog.py:471 tortoisehg\hgtk\history.py:91
+#: tortoisehg\util\menuthg.py:68
+msgid "Repository Explorer"
+msgstr "ログの表示"
 
 #: tortoisehg\hgtk\gdialog.py:475
 msgid "Datamine"
@@ -1134,11 +1139,11 @@ msgstr "%d 個のファイルのスナップショットをリビジョン %s �
 msgid "edit failed"
 msgstr "編集に失敗しました"
 
-#: tortoisehg\hgtk\gdialog.py:689 tortoisehg\hgtk\thgconfig.py:686
+#: tortoisehg\hgtk\gdialog.py:689 tortoisehg\hgtk\thgconfig.py:687
 msgid "No visual editor configured"
 msgstr "GUIエディタが設定されていません"
 
-#: tortoisehg\hgtk\gdialog.py:690 tortoisehg\hgtk\thgconfig.py:687
+#: tortoisehg\hgtk\gdialog.py:690 tortoisehg\hgtk\thgconfig.py:688
 msgid "Please configure a visual editor."
 msgstr "GUIエディタを設定してください"
 
@@ -1170,7 +1175,7 @@ msgstr "ファイルに保存"
 msgid "All files"
 msgstr "全てのファイル"
 
-#: tortoisehg\hgtk\gtklib.py:246
+#: tortoisehg\hgtk\gtklib.py:247
 msgid ""
 "The file \"%s\" already exists!\n"
 "\n"
@@ -1180,11 +1185,11 @@ msgstr ""
 "\n"
 "このファイルを上書きしますか？"
 
-#: tortoisehg\hgtk\gtklib.py:257
+#: tortoisehg\hgtk\gtklib.py:258
 msgid "Select Folder"
 msgstr "フォルダの選択"
 
-#: tortoisehg\hgtk\gtklib.py:644
+#: tortoisehg\hgtk\gtklib.py:645
 msgid ""
 "Select language for spell checking.\n"
 "\n"
@@ -1202,11 +1207,11 @@ msgstr ""
 "\n"
 "例：en, en_GB, en_US"
 
-#: tortoisehg\hgtk\gtklib.py:650
+#: tortoisehg\hgtk\gtklib.py:651
 msgid "Lang \"%s\" can not be set.\n"
 msgstr "言語 \"%s\" は設定できません。\n"
 
-#: tortoisehg\hgtk\gtklib.py:663 tortoisehg\hgtk\thgconfig.py:591
+#: tortoisehg\hgtk\gtklib.py:664 tortoisehg\hgtk\thgconfig.py:592
 msgid "Spell Check Language"
 msgstr "スペルチェック言語"
 
@@ -1331,7 +1336,7 @@ msgstr "Mercurialのパッチをメールで送信"
 msgid "Envelope"
 msgstr "メール設定"
 
-#: tortoisehg\hgtk\hgemail.py:66 tortoisehg\hgtk\taskbarui.py:47
+#: tortoisehg\hgtk\hgemail.py:66 tortoisehg\hgtk\taskbarui.py:49
 msgid "Options"
 msgstr "オプション"
 
@@ -1483,7 +1488,7 @@ msgid "Ignore filter - %s"
 msgstr "無視ファイルフィルタ - %s"
 
 #: tortoisehg\hgtk\hgignore.py:51 tortoisehg\hgtk\hgignore.py:59
-#: tortoisehg\hgtk\quickop.py:50 tortoisehg\hgtk\tagadd.py:37
+#: tortoisehg\hgtk\quickop.py:50 tortoisehg\hgtk\tagadd.py:39
 msgid "Add"
 msgstr "追加"
 
@@ -1519,47 +1524,47 @@ msgstr "無効な glob です"
 msgid "Invalid regexp expression"
 msgstr "無効な正規表現です"
 
-#: tortoisehg\hgtk\hginit.py:22 tortoisehg\util\menuthg.py:42
-msgid "Create a new repository"
-msgstr "ここに新しいリポジトリを作成します"
+#: tortoisehg\hgtk\hginit.py:22
+msgid "TortoiseHg Init"
+msgstr "TortoiseHg リポジトリ作成"
 
-#: tortoisehg\hgtk\hginit.py:29
+#: tortoisehg\hgtk\hginit.py:30
 msgid "Create"
 msgstr "作成"
 
-#: tortoisehg\hgtk\hginit.py:55
+#: tortoisehg\hgtk\hginit.py:54
 msgid "Destination:"
 msgstr "作成先:"
 
-#: tortoisehg\hgtk\hginit.py:59
+#: tortoisehg\hgtk\hginit.py:58
 msgid "Add special files (.hgignore, ...)"
 msgstr "特殊ファイルを追加する (.hgignoreなど)"
 
-#: tortoisehg\hgtk\hginit.py:61
+#: tortoisehg\hgtk\hginit.py:60
 msgid "Make repo compatible with Mercurial 1.0"
 msgstr "Mercurial 1.0 互換のリポジトリを作成"
 
-#: tortoisehg\hgtk\hginit.py:88
+#: tortoisehg\hgtk\hginit.py:99
 msgid "Destination path is empty"
 msgstr "リポジトリを作成する場所を指定してください"
 
-#: tortoisehg\hgtk\hginit.py:89
+#: tortoisehg\hgtk\hginit.py:100
 msgid "Please enter the directory path"
 msgstr "ディレクトリパスを入力してください"
 
-#: tortoisehg\hgtk\hginit.py:103
+#: tortoisehg\hgtk\hginit.py:114
 msgid "Unable to create new repository"
 msgstr "新しいリポジトリの作成に失敗しました"
 
-#: tortoisehg\hgtk\hginit.py:107 tortoisehg\hgtk\hginit.py:112
+#: tortoisehg\hgtk\hginit.py:118 tortoisehg\hgtk\hginit.py:123
 msgid "Error when creating repository"
 msgstr "リポジトリ作成中にエラーが発生しました"
 
-#: tortoisehg\hgtk\hginit.py:129
+#: tortoisehg\hgtk\hginit.py:140
 msgid "New repository created"
 msgstr "新しいリポジトリが作成されました"
 
-#: tortoisehg\hgtk\hginit.py:130
+#: tortoisehg\hgtk\hginit.py:141
 msgid "in directory %s"
 msgstr "%s フォルダ内"
 
@@ -1956,10 +1961,6 @@ msgstr "取り込む(&A)"
 msgid "&Reject"
 msgstr "破棄する(&R)"
 
-#: tortoisehg\hgtk\history.py:91
-msgid "%s - changelog"
-msgstr "%s - チェンジログ"
-
 #: tortoisehg\hgtk\history.py:93
 msgid " (Bundle Preview)"
 msgstr " (バンドルプレビュー)"
@@ -2076,7 +2077,7 @@ msgstr "バンドルを破棄する"
 msgid "Force push"
 msgstr "強制的にプッシュ"
 
-#: tortoisehg\hgtk\history.py:304 tortoisehg\hgtk\logview\treeview.py:380
+#: tortoisehg\hgtk\history.py:304 tortoisehg\hgtk\logview\treeview.py:381
 msgid "Graph"
 msgstr "グラフ"
 
@@ -2092,12 +2093,12 @@ msgstr "チェンジセット ID"
 msgid "Branch Name"
 msgstr "ブランチ名"
 
-#: tortoisehg\hgtk\history.py:314 tortoisehg\hgtk\logview\treeview.py:432
+#: tortoisehg\hgtk\history.py:314 tortoisehg\hgtk\logview\treeview.py:433
 #: tortoisehg\hgtk\thgmq.py:187
 msgid "Summary"
 msgstr "要約"
 
-#: tortoisehg\hgtk\history.py:316 tortoisehg\hgtk\logview\treeview.py:454
+#: tortoisehg\hgtk\history.py:316 tortoisehg\hgtk\logview\treeview.py:455
 msgid "Local Date"
 msgstr "ローカル時間"
 
@@ -2105,11 +2106,11 @@ msgstr "ローカル時間"
 msgid "UTC Date"
 msgstr "UTC 時間"
 
-#: tortoisehg\hgtk\history.py:318 tortoisehg\hgtk\logview\treeview.py:478
+#: tortoisehg\hgtk\history.py:318 tortoisehg\hgtk\logview\treeview.py:479
 msgid "Age"
 msgstr "経過時間"
 
-#: tortoisehg\hgtk\history.py:319 tortoisehg\hgtk\logview\treeview.py:490
+#: tortoisehg\hgtk\history.py:319 tortoisehg\hgtk\logview\treeview.py:491
 msgid "Tags"
 msgstr "タグ"
 
@@ -2233,7 +2234,7 @@ msgstr "タグの追加/削除...(_T)"
 msgid "Backout Revision..."
 msgstr "バックアウト..."
 
-#: tortoisehg\hgtk\history.py:724 tortoisehg\hgtk\status.py:1510
+#: tortoisehg\hgtk\history.py:724 tortoisehg\hgtk\status.py:1514
 msgid "_Revert"
 msgstr "元に戻す(_R)"
 
@@ -2246,7 +2247,7 @@ msgid "Transp_lant to local"
 msgstr "ローカルに移植(_L)"
 
 #: tortoisehg\hgtk\history.py:748
-msgid "qimport"
+msgid "QImport Revision"
 msgstr "MQ にインポート"
 
 #: tortoisehg\hgtk\history.py:749
@@ -2282,7 +2283,7 @@ msgid "Rebase on top of selected"
 msgstr "選択中のリビジョンの上にリベース"
 
 #: tortoisehg\hgtk\history.py:825
-msgid "qimport from here to selected"
+msgid "QImport from here to selected"
 msgstr "この範囲を MQ にインポート"
 
 #: tortoisehg\hgtk\history.py:829
@@ -2410,15 +2411,15 @@ msgstr "日付"
 msgid "Keywords"
 msgstr "キーワード"
 
-#: tortoisehg\hgtk\history.py:1174 tortoisehg\hgtk\history.py:1284
-#: tortoisehg\hgtk\history.py:1306 tortoisehg\hgtk\history.py:1368
-#: tortoisehg\hgtk\history.py:1746
+#: tortoisehg\hgtk\history.py:1174 tortoisehg\hgtk\history.py:1285
+#: tortoisehg\hgtk\history.py:1307 tortoisehg\hgtk\history.py:1369
+#: tortoisehg\hgtk\history.py:1747
 msgid "No remote path specified"
 msgstr "リモートパスがありません"
 
-#: tortoisehg\hgtk\history.py:1175 tortoisehg\hgtk\history.py:1285
-#: tortoisehg\hgtk\history.py:1307 tortoisehg\hgtk\history.py:1369
-#: tortoisehg\hgtk\history.py:1747
+#: tortoisehg\hgtk\history.py:1175 tortoisehg\hgtk\history.py:1286
+#: tortoisehg\hgtk\history.py:1308 tortoisehg\hgtk\history.py:1370
+#: tortoisehg\hgtk\history.py:1748
 msgid "Please enter or select a remote path"
 msgstr "同期対象のパスを入力するか選択してください"
 
@@ -2446,23 +2447,23 @@ msgstr "バンドルプレビュー"
 msgid "Open Bundle"
 msgstr "バンドルを開く"
 
-#: tortoisehg\hgtk\history.py:1336
+#: tortoisehg\hgtk\history.py:1337
 msgid "%d outgoing changesets"
 msgstr "%d 件の送信チェンジセット"
 
-#: tortoisehg\hgtk\history.py:1355 tortoisehg\hgtk\synch.py:495
+#: tortoisehg\hgtk\history.py:1356 tortoisehg\hgtk\synch.py:495
 msgid "No repository selected"
 msgstr "リポジトリが選択されていません"
 
-#: tortoisehg\hgtk\history.py:1356 tortoisehg\hgtk\synch.py:496
+#: tortoisehg\hgtk\history.py:1357 tortoisehg\hgtk\synch.py:496
 msgid "Select a peer repository to compare with"
 msgstr "比較対象の2つのリポジトリを選択"
 
-#: tortoisehg\hgtk\history.py:1377
+#: tortoisehg\hgtk\history.py:1378
 msgid "Confirm Forced Push to Remote Repository"
 msgstr "強制的なプッシュの確認"
 
-#: tortoisehg\hgtk\history.py:1378
+#: tortoisehg\hgtk\history.py:1379
 msgid ""
 "Forced push to remote repository\n"
 "%s\n"
@@ -2472,15 +2473,15 @@ msgstr ""
 "%s\n"
 "(必要に応じてリモートリポジトリに新しくヘッドが作成されます)"
 
-#: tortoisehg\hgtk\history.py:1380 tortoisehg\hgtk\history.py:1390
+#: tortoisehg\hgtk\history.py:1381 tortoisehg\hgtk\history.py:1391
 msgid "Forced &Push"
 msgstr "強制的にプッシュ(&P)"
 
-#: tortoisehg\hgtk\history.py:1382
+#: tortoisehg\hgtk\history.py:1383
 msgid "Confirm Push to remote Repository"
 msgstr "プッシュの確認"
 
-#: tortoisehg\hgtk\history.py:1383
+#: tortoisehg\hgtk\history.py:1384
 msgid ""
 "Push to remote repository\n"
 "%s\n"
@@ -2489,15 +2490,15 @@ msgstr ""
 "リモートリポジトリへプッシュしてもよろしいですか？\n"
 "%s"
 
-#: tortoisehg\hgtk\history.py:1384
+#: tortoisehg\hgtk\history.py:1385
 msgid "&Push"
 msgstr "プッシュ(&P)"
 
-#: tortoisehg\hgtk\history.py:1387
+#: tortoisehg\hgtk\history.py:1388
 msgid "Confirm Forced Push"
 msgstr "強制的なプッシュの確認"
 
-#: tortoisehg\hgtk\history.py:1388
+#: tortoisehg\hgtk\history.py:1389
 msgid ""
 "Forced push to repository\n"
 "%s\n"
@@ -2507,11 +2508,11 @@ msgstr ""
 "%s\n"
 "(必要に応じて新しくヘッドが作成されます)"
 
-#: tortoisehg\hgtk\history.py:1562
+#: tortoisehg\hgtk\history.py:1563
 msgid "Confirm Revert All Files"
 msgstr "全ファイルの復帰"
 
-#: tortoisehg\hgtk\history.py:1563
+#: tortoisehg\hgtk\history.py:1564
 msgid ""
 "Revert all files to revision %d?\n"
 "This will overwrite your local changes"
@@ -2519,43 +2520,43 @@ msgstr ""
 "全てのファイルをリビジョン %d に戻しますか？\n"
 "この操作は作業ディレクトリの内容を上書きします。"
 
-#: tortoisehg\hgtk\history.py:1614
+#: tortoisehg\hgtk\history.py:1615
 msgid "Save patches to"
 msgstr "パッチの保存"
 
-#: tortoisehg\hgtk\history.py:1637 tortoisehg\hgtk\history.py:1809
+#: tortoisehg\hgtk\history.py:1638 tortoisehg\hgtk\history.py:1810
 msgid "Write bundle to"
 msgstr "バンドルの保存"
 
-#: tortoisehg\hgtk\history.py:1673
+#: tortoisehg\hgtk\history.py:1674
 msgid "Confirm Rebase Revision"
 msgstr "リベースの確認"
 
-#: tortoisehg\hgtk\history.py:1674
+#: tortoisehg\hgtk\history.py:1675
 msgid "Rebase revision %d on top of %d?"
 msgstr "リビジョン %d を リビジョン %d の上にリベースしますか？"
 
-#: tortoisehg\hgtk\history.py:1788 tortoisehg\hgtk\status.py:1194
+#: tortoisehg\hgtk\history.py:1789 tortoisehg\hgtk\status.py:1198
 msgid "Save patch to"
 msgstr "パッチの保存"
 
-#: tortoisehg\hgtk\logview\treeview.py:255
+#: tortoisehg\hgtk\logview\treeview.py:256
 msgid "%(count)d of %(total)d Revisions"
 msgstr "%(total)d 中 %(count)d リビジョン"
 
-#: tortoisehg\hgtk\logview\treeview.py:362
+#: tortoisehg\hgtk\logview\treeview.py:363
 msgid "Repository is empty"
 msgstr "リポジトリが空です"
 
-#: tortoisehg\hgtk\logview\treeview.py:407
+#: tortoisehg\hgtk\logview\treeview.py:408
 msgid "ID"
 msgstr "ID"
 
-#: tortoisehg\hgtk\logview\treeview.py:419
+#: tortoisehg\hgtk\logview\treeview.py:420
 msgid "Branch"
 msgstr "ブランチ"
 
-#: tortoisehg\hgtk\logview\treeview.py:466
+#: tortoisehg\hgtk\logview\treeview.py:467
 msgid "Universal Date"
 msgstr "UTC時間"
 
@@ -2664,7 +2665,7 @@ msgstr "元に戻すファイルの選択"
 msgid "Select files to remove"
 msgstr "削除するファイルの選択"
 
-#: tortoisehg\hgtk\quickop.py:53 tortoisehg\hgtk\tagadd.py:42
+#: tortoisehg\hgtk\quickop.py:53 tortoisehg\hgtk\tagadd.py:40
 msgid "Remove"
 msgstr "削除"
 
@@ -2697,7 +2698,7 @@ msgid "missing"
 msgstr "見つかりません"
 
 #: tortoisehg\hgtk\quickop.py:153 tortoisehg\hgtk\quickop.py:236
-#: tortoisehg\hgtk\serve.py:126 tortoisehg\util\shlib.py:26
+#: tortoisehg\hgtk\serve.py:123 tortoisehg\util\shlib.py:26
 #: tortoisehg\util\version.py:15
 msgid "unknown"
 msgstr "不明"
@@ -2846,27 +2847,27 @@ msgstr "ブラウザを起動してリポジトリを表示する"
 msgid "Configure web settings"
 msgstr "ウェブ設定を編集する"
 
-#: tortoisehg\hgtk\serve.py:91
+#: tortoisehg\hgtk\serve.py:93
 msgid "HTTP Port:"
 msgstr "ポート番号:"
 
-#: tortoisehg\hgtk\serve.py:127
+#: tortoisehg\hgtk\serve.py:124
 msgid "%s - serve"
 msgstr "%s - ウェブサーバ"
 
-#: tortoisehg\hgtk\serve.py:130
+#: tortoisehg\hgtk\serve.py:127
 msgid "%s serve - %s"
 msgstr "%s サーバ動作中 - %s"
 
-#: tortoisehg\hgtk\serve.py:133
+#: tortoisehg\hgtk\serve.py:130
 msgid " - serve"
 msgstr " - サーバ動作中"
 
-#: tortoisehg\hgtk\serve.py:164
+#: tortoisehg\hgtk\serve.py:161
 msgid "Confirm Really Exit?"
 msgstr "終了"
 
-#: tortoisehg\hgtk\serve.py:165
+#: tortoisehg\hgtk\serve.py:162
 msgid ""
 "Server process is still running\n"
 "Exiting will stop the server."
@@ -2874,87 +2875,87 @@ msgstr ""
 "サーバプロセスがまだ動いています\n"
 "サーバを停止しています"
 
-#: tortoisehg\hgtk\serve.py:228
+#: tortoisehg\hgtk\serve.py:225
 msgid "Abort: %s\n"
 msgstr "中断: %s\n"
 
-#: tortoisehg\hgtk\serve.py:236
+#: tortoisehg\hgtk\serve.py:233
 msgid "Invalid port 2048..65535"
 msgstr "無効なポート番号 2048～65535"
 
-#: tortoisehg\hgtk\serve.py:237
+#: tortoisehg\hgtk\serve.py:234
 msgid "Defaulting to "
 msgstr "デフォルトに戻す： "
 
-#: tortoisehg\hgtk\serve.py:316
+#: tortoisehg\hgtk\serve.py:313
 msgid "cannot start server: "
 msgstr "サーバを起動できませんでした: "
 
-#: tortoisehg\hgtk\serve.py:327
+#: tortoisehg\hgtk\serve.py:324
 msgid "listening at http://%s%s/%s (%s:%d)\n"
 msgstr "http://%s%s/%s (%s:%d) で待ち受け中\n"
 
-#: tortoisehg\hgtk\serve.py:352
+#: tortoisehg\hgtk\serve.py:349
 msgid "name of access log file to write to"
 msgstr "アクセスログファイルの名前"
 
-#: tortoisehg\hgtk\serve.py:353
+#: tortoisehg\hgtk\serve.py:350
 msgid "run server in background"
 msgstr "サーバをバックグラウンドで実行する"
 
-#: tortoisehg\hgtk\serve.py:354
+#: tortoisehg\hgtk\serve.py:351
 msgid "used internally by daemon mode"
 msgstr "デーモンモードによって内部的に使用される"
 
-#: tortoisehg\hgtk\serve.py:355
+#: tortoisehg\hgtk\serve.py:352
 msgid "name of error log file to write to"
 msgstr "エラーログのファイル名"
 
-#: tortoisehg\hgtk\serve.py:356
+#: tortoisehg\hgtk\serve.py:353
 msgid "port to use (default: 8000)"
 msgstr "待ち受けポート番号(デフォルト: 8000)"
 
-#: tortoisehg\hgtk\serve.py:357
+#: tortoisehg\hgtk\serve.py:354
 msgid "address to use"
 msgstr "使用するアドレス"
 
-#: tortoisehg\hgtk\serve.py:358
+#: tortoisehg\hgtk\serve.py:355
 msgid "prefix path to serve from (default: server root)"
 msgstr "サーバURLの接頭辞(デフォルト: サーバのルート)"
 
-#: tortoisehg\hgtk\serve.py:360
+#: tortoisehg\hgtk\serve.py:357
 msgid "name to show in web pages (default: working dir)"
 msgstr "Webページで表示する名前"
 
-#: tortoisehg\hgtk\serve.py:361
+#: tortoisehg\hgtk\serve.py:358
 msgid "name of the webdir config file (serve more than one repo)"
 msgstr "Webディレクトリの設定ファイル名(複数のリポジトリを管理する場合)"
 
-#: tortoisehg\hgtk\serve.py:363
+#: tortoisehg\hgtk\serve.py:360
 msgid "name of file to write process ID to"
 msgstr "プロセスIDを書き込むためのファイル名"
 
-#: tortoisehg\hgtk\serve.py:364
+#: tortoisehg\hgtk\serve.py:361
 msgid "for remote clients"
 msgstr "リモートクライアント用"
 
-#: tortoisehg\hgtk\serve.py:365
+#: tortoisehg\hgtk\serve.py:362
 msgid "web templates to use"
 msgstr "使用するWebテンプレート"
 
-#: tortoisehg\hgtk\serve.py:366
+#: tortoisehg\hgtk\serve.py:363
 msgid "template style to use"
 msgstr "使用するテンプレート"
 
-#: tortoisehg\hgtk\serve.py:367
+#: tortoisehg\hgtk\serve.py:364
 msgid "use IPv6 in addition to IPv4"
 msgstr "IPv4だけでなくIPv6も使用する"
 
-#: tortoisehg\hgtk\serve.py:368
+#: tortoisehg\hgtk\serve.py:365
 msgid "SSL certificate file"
 msgstr "SSL証明書のファイル"
 
-#: tortoisehg\hgtk\serve.py:369
+#: tortoisehg\hgtk\serve.py:366
 msgid "hg serve [OPTION]..."
 msgstr "hg serve [OPTION]..."
 
@@ -3062,48 +3063,48 @@ msgstr "Ｒ：削除"
 msgid "!: deleted"
 msgstr "！：削除"
 
-#: tortoisehg\hgtk\status.py:801
+#: tortoisehg\hgtk\status.py:804
 msgid "View '%s'"
 msgstr "表示 '%s'"
 
-#: tortoisehg\hgtk\status.py:846
+#: tortoisehg\hgtk\status.py:849
 msgid "Rename file to:"
 msgstr "ファイルを名前変更："
 
-#: tortoisehg\hgtk\status.py:855
+#: tortoisehg\hgtk\status.py:858
 msgid "Copy file to"
 msgstr "ファイルをコピー："
 
-#: tortoisehg\hgtk\status.py:868 tortoisehg\hgtk\status.py:1332
+#: tortoisehg\hgtk\status.py:871 tortoisehg\hgtk\status.py:1336
 msgid "Nothing Removed"
 msgstr "削除するものがありません"
 
-#: tortoisehg\hgtk\status.py:869
+#: tortoisehg\hgtk\status.py:872
 msgid "Remove is not enabled when multiple revisions are specified."
 msgstr "\"削除\"は複数のリビジョンが指定された場合は無効になります"
 
-#: tortoisehg\hgtk\status.py:886
+#: tortoisehg\hgtk\status.py:889
 msgid "Move is not enabled when multiple revisions are specified."
 msgstr "\"移動\"は複数のリビジョンが指定された場合は無効になります"
 
-#: tortoisehg\hgtk\status.py:886 tortoisehg\hgtk\status.py:1350
-#: tortoisehg\hgtk\status.py:1358
+#: tortoisehg\hgtk\status.py:889 tortoisehg\hgtk\status.py:1354
+#: tortoisehg\hgtk\status.py:1362
 msgid "Nothing Moved"
 msgstr "移動するものがありません"
 
-#: tortoisehg\hgtk\status.py:904
+#: tortoisehg\hgtk\status.py:907
 msgid "Copy is not enabled when multiple revisions are specified."
 msgstr "\"コピー\"は複数のリビジョンが指定された場合は無効になります"
 
-#: tortoisehg\hgtk\status.py:904
+#: tortoisehg\hgtk\status.py:907
 msgid "Nothing Copied"
 msgstr "コピーするものがありません"
 
-#: tortoisehg\hgtk\status.py:963 tortoisehg\hgtk\status.py:1024
+#: tortoisehg\hgtk\status.py:967 tortoisehg\hgtk\status.py:1028
 msgid "===== Diff to first parent =====\n"
 msgstr "===== 1番目の親リビジョン =====\n"
 
-#: tortoisehg\hgtk\status.py:968 tortoisehg\hgtk\status.py:1031
+#: tortoisehg\hgtk\status.py:972 tortoisehg\hgtk\status.py:1035
 msgid ""
 "\n"
 "===== Diff to second parent =====\n"
@@ -3111,55 +3112,55 @@ msgstr ""
 "\n"
 "===== 2番目の親リビジョン =====\n"
 
-#: tortoisehg\hgtk\status.py:1060
+#: tortoisehg\hgtk\status.py:1064
 msgid "File is larger than the specified max size.\n"
 msgstr "設定されている最大ファイルサイズを超えています。\n"
 
-#: tortoisehg\hgtk\status.py:1061
+#: tortoisehg\hgtk\status.py:1065
 msgid "Hunk selection is disabled for this file.\n"
 msgstr "このファイルではハンクの選択が無効化されています。\n"
 
-#: tortoisehg\hgtk\status.py:1232
+#: tortoisehg\hgtk\status.py:1236
 msgid "Nothing Diffed"
 msgstr "差分がありません"
 
-#: tortoisehg\hgtk\status.py:1233
+#: tortoisehg\hgtk\status.py:1237
 msgid "No diffable files selected"
 msgstr "差分表示可能なファイルが選択されていません"
 
-#: tortoisehg\hgtk\status.py:1241 tortoisehg\hgtk\status.py:1249
+#: tortoisehg\hgtk\status.py:1245 tortoisehg\hgtk\status.py:1253
 msgid "Nothing Reverted"
 msgstr "元に戻すものがありません"
 
-#: tortoisehg\hgtk\status.py:1242
+#: tortoisehg\hgtk\status.py:1246
 msgid "No revertable files selected"
 msgstr "元に戻せるファイルが選択されていません"
 
-#: tortoisehg\hgtk\status.py:1250
+#: tortoisehg\hgtk\status.py:1254
 msgid "Revert not allowed when viewing revision range."
 msgstr "リビジョン範囲を表示しているときは元に戻せません"
 
-#: tortoisehg\hgtk\status.py:1268
+#: tortoisehg\hgtk\status.py:1272
 msgid "Uncommited merge - please select a parent revision"
 msgstr "未コミットマージ - 親リビジョンを選択してください"
 
-#: tortoisehg\hgtk\status.py:1269
+#: tortoisehg\hgtk\status.py:1273
 msgid "Revert files to local or other parent?"
 msgstr "ファイルをローカルまたは他の親リビジョンの状態に戻しますか？"
 
-#: tortoisehg\hgtk\status.py:1270
+#: tortoisehg\hgtk\status.py:1274
 msgid "&Local"
 msgstr "ローカル(&L)"
 
-#: tortoisehg\hgtk\status.py:1270
+#: tortoisehg\hgtk\status.py:1274
 msgid "&Other"
 msgstr "その他(&O)"
 
-#: tortoisehg\hgtk\status.py:1285
+#: tortoisehg\hgtk\status.py:1289
 msgid "Confirm Revert"
 msgstr "元に戻す"
 
-#: tortoisehg\hgtk\status.py:1286
+#: tortoisehg\hgtk\status.py:1290
 msgid ""
 "Revert files to revision %s?\n"
 "\n"
@@ -3169,35 +3170,35 @@ msgstr ""
 "\n"
 "%s"
 
-#: tortoisehg\hgtk\status.py:1287
+#: tortoisehg\hgtk\status.py:1291
 msgid "&Yes (backup changes)"
 msgstr "はい (変更をバックアップ)"
 
-#: tortoisehg\hgtk\status.py:1288
+#: tortoisehg\hgtk\status.py:1292
 msgid "Yes (&discard changes)"
 msgstr "はい (変更を破棄)"
 
-#: tortoisehg\hgtk\status.py:1308
+#: tortoisehg\hgtk\status.py:1312
 msgid "Nothing Added"
 msgstr "追加するものがありません"
 
-#: tortoisehg\hgtk\status.py:1309
+#: tortoisehg\hgtk\status.py:1313
 msgid "No addable files selected"
 msgstr "追加するファイルが選択されていません"
 
-#: tortoisehg\hgtk\status.py:1333
+#: tortoisehg\hgtk\status.py:1337
 msgid "No removable files selected"
 msgstr "削除するファイルが選択されていません"
 
-#: tortoisehg\hgtk\status.py:1341
+#: tortoisehg\hgtk\status.py:1345
 msgid "Move files to directory..."
 msgstr "ファイルの移動..."
 
-#: tortoisehg\hgtk\status.py:1351
+#: tortoisehg\hgtk\status.py:1355
 msgid "Cannot move outside repo!"
 msgstr "リポジトリの外には移動できません！"
 
-#: tortoisehg\hgtk\status.py:1358
+#: tortoisehg\hgtk\status.py:1362
 msgid ""
 "No movable files selected\n"
 "\n"
@@ -3207,87 +3208,87 @@ msgstr ""
 "\n"
 "ヒント： クリーンなファイルしか移動できません"
 
-#: tortoisehg\hgtk\status.py:1367
+#: tortoisehg\hgtk\status.py:1371
 msgid "Nothing Forgotten"
 msgstr "破棄するファイルがありません"
 
-#: tortoisehg\hgtk\status.py:1368
+#: tortoisehg\hgtk\status.py:1372
 msgid "No clean files selected"
 msgstr "クリーンなファイルが選択されていません"
 
-#: tortoisehg\hgtk\status.py:1371
+#: tortoisehg\hgtk\status.py:1375
 msgid "Confirm Delete Unrevisioned"
 msgstr "未管理ファイルの削除"
 
-#: tortoisehg\hgtk\status.py:1372
+#: tortoisehg\hgtk\status.py:1376
 msgid "Delete the following unrevisioned files?"
 msgstr "次の管理されていないファイルを削除しますか？"
 
-#: tortoisehg\hgtk\status.py:1385
+#: tortoisehg\hgtk\status.py:1389
 msgid "Delete Errors"
 msgstr "エラーを削除"
 
-#: tortoisehg\hgtk\status.py:1506
+#: tortoisehg\hgtk\status.py:1510
 msgid "Edit"
 msgstr "編集"
 
-#: tortoisehg\hgtk\status.py:1507
+#: tortoisehg\hgtk\status.py:1511
 msgid "View missing"
 msgstr "紛失ファイルを表示"
 
-#: tortoisehg\hgtk\status.py:1508
+#: tortoisehg\hgtk\status.py:1512
 msgid "View other"
 msgstr "他を表示"
 
-#: tortoisehg\hgtk\status.py:1512
+#: tortoisehg\hgtk\status.py:1516
 msgid "L_og"
 msgstr "ログ(_L)"
 
-#: tortoisehg\hgtk\status.py:1516
+#: tortoisehg\hgtk\status.py:1520
 msgid "_Guess Rename..."
 msgstr "名前変更の推定...(_G)"
 
-#: tortoisehg\hgtk\status.py:1517
+#: tortoisehg\hgtk\status.py:1521
 msgid "_Ignore"
 msgstr "無視フィルタ(_I)"
 
-#: tortoisehg\hgtk\status.py:1518
+#: tortoisehg\hgtk\status.py:1522
 msgid "Remove versioned"
 msgstr "削除"
 
-#: tortoisehg\hgtk\status.py:1519
+#: tortoisehg\hgtk\status.py:1523
 msgid "_Delete unversioned"
 msgstr "削除(未管理)"
 
-#: tortoisehg\hgtk\status.py:1522
+#: tortoisehg\hgtk\status.py:1526
 msgid "_Copy..."
 msgstr "コピー...(_C)"
 
-#: tortoisehg\hgtk\status.py:1523
+#: tortoisehg\hgtk\status.py:1527
 msgid "Rename..."
 msgstr "名前変更..."
 
-#: tortoisehg\hgtk\status.py:1525
+#: tortoisehg\hgtk\status.py:1529
 msgid "Restart Merge..."
 msgstr "マージの再開..."
 
-#: tortoisehg\hgtk\status.py:1526
+#: tortoisehg\hgtk\status.py:1530
 msgid "Mark unresolved"
 msgstr "未解決としてマーク"
 
-#: tortoisehg\hgtk\status.py:1527
+#: tortoisehg\hgtk\status.py:1531
 msgid "Mark resolved"
 msgstr "解決済みとしてマーク"
 
-#: tortoisehg\hgtk\status.py:1535
+#: tortoisehg\hgtk\status.py:1539
 msgid "Restart merge with"
 msgstr "マージの再開:"
 
-#: tortoisehg\hgtk\status.py:1579
+#: tortoisehg\hgtk\status.py:1583
 msgid "not up to date"
 msgstr "最新ではありません"
 
-#: tortoisehg\hgtk\status.py:1580
+#: tortoisehg\hgtk\status.py:1584
 msgid ""
 "The parents have changed since the last refresh.\n"
 "Continue anyway?"
@@ -3295,7 +3296,7 @@ msgstr ""
 "親リビジョンが変更されています。\n"
 "それでも続行しますか？"
 
-#: tortoisehg\hgtk\status.py:1582
+#: tortoisehg\hgtk\status.py:1586
 msgid "&Refresh"
 msgstr "再読み込み (&R)"
 
@@ -3327,7 +3328,7 @@ msgstr "選択されたリポジトリにプッシュされるローカルでの
 msgid "Push local changes to selected repository"
 msgstr "選択されたリポジトリにローカルの変更をプッシュする"
 
-#: tortoisehg\hgtk\synch.py:84 tortoisehg\hgtk\thgconfig.py:616
+#: tortoisehg\hgtk\synch.py:84 tortoisehg\hgtk\thgconfig.py:617
 msgid "Email"
 msgstr "メール送信"
 
@@ -3419,84 +3420,84 @@ msgstr "バンドル (*.hg)"
 msgid "Bundle (*)"
 msgstr "バンドル (*)"
 
-#: tortoisehg\hgtk\tagadd.py:29
+#: tortoisehg\hgtk\tagadd.py:31
 msgid "Tag - %s"
 msgstr "タグ - %s"
 
-#: tortoisehg\hgtk\tagadd.py:59
+#: tortoisehg\hgtk\tagadd.py:57
 msgid "Tag:"
 msgstr "タグ："
 
-#: tortoisehg\hgtk\tagadd.py:76
+#: tortoisehg\hgtk\tagadd.py:74
 msgid "Tag is local"
 msgstr "ローカルタグ"
 
-#: tortoisehg\hgtk\tagadd.py:78
+#: tortoisehg\hgtk\tagadd.py:76
 msgid "Replace existing tag"
 msgstr "既存のタグを置換"
 
-#: tortoisehg\hgtk\tagadd.py:79
+#: tortoisehg\hgtk\tagadd.py:77
 msgid "Use English commit message"
 msgstr "英語のコミットメッセージを使用する"
 
-#: tortoisehg\hgtk\tagadd.py:85
+#: tortoisehg\hgtk\tagadd.py:83
 msgid "Use custom commit message:"
 msgstr "カスタムコミットメッセージを使用する:"
 
-#: tortoisehg\hgtk\tagadd.py:161
+#: tortoisehg\hgtk\tagadd.py:167
 msgid "Tag input is empty"
 msgstr "タグが未入力です"
 
-#: tortoisehg\hgtk\tagadd.py:162
+#: tortoisehg\hgtk\tagadd.py:168
 msgid "Please enter tag name"
 msgstr "タグ名を入力してください"
 
-#: tortoisehg\hgtk\tagadd.py:166
+#: tortoisehg\hgtk\tagadd.py:172
 msgid "Custom commit message is empty"
 msgstr "カスタムコミットメッセージが未入力です"
 
-#: tortoisehg\hgtk\tagadd.py:175 tortoisehg\hgtk\tagadd.py:207
+#: tortoisehg\hgtk\tagadd.py:181 tortoisehg\hgtk\tagadd.py:213
 msgid "Tagging completed"
 msgstr "タグ処理が完了しました"
 
-#: tortoisehg\hgtk\tagadd.py:176
+#: tortoisehg\hgtk\tagadd.py:182
 msgid "Tag \"%s\" has been added"
 msgstr "タグ \"%s\" が追加されました"
 
-#: tortoisehg\hgtk\tagadd.py:179 tortoisehg\hgtk\tagadd.py:182
-#: tortoisehg\hgtk\tagadd.py:211 tortoisehg\hgtk\tagadd.py:214
+#: tortoisehg\hgtk\tagadd.py:185 tortoisehg\hgtk\tagadd.py:188
+#: tortoisehg\hgtk\tagadd.py:217 tortoisehg\hgtk\tagadd.py:220
 msgid "Error in tagging"
 msgstr "タグ処理中にエラーが発生しました"
 
-#: tortoisehg\hgtk\tagadd.py:195
+#: tortoisehg\hgtk\tagadd.py:201
 msgid "Tag name is empty"
 msgstr "タグ名がありません"
 
-#: tortoisehg\hgtk\tagadd.py:196
+#: tortoisehg\hgtk\tagadd.py:202
 msgid "Please select tag name to remove"
 msgstr "削除するタグ名を選択してください"
 
-#: tortoisehg\hgtk\tagadd.py:208
+#: tortoisehg\hgtk\tagadd.py:214
 msgid "Tag \"%s\" has been removed"
 msgstr "タグ \"%s\" が削除されました"
 
-#: tortoisehg\hgtk\tagadd.py:222
+#: tortoisehg\hgtk\tagadd.py:228
 msgid "a tag named \"%s\" already exists"
 msgstr "\"%s\" タグは既に存在しています"
 
-#: tortoisehg\hgtk\tagadd.py:228
+#: tortoisehg\hgtk\tagadd.py:234
 msgid "Added tag %s for changeset %s"
 msgstr "\"%s\" タグをチェンジセット \"%s\" に追加しました"
 
-#: tortoisehg\hgtk\tagadd.py:232
+#: tortoisehg\hgtk\tagadd.py:238
 msgid "Tag '%s' already exist"
 msgstr "タグ \"%s\" は既に存在しています"
 
-#: tortoisehg\hgtk\tagadd.py:239
+#: tortoisehg\hgtk\tagadd.py:245
 msgid "Tag '%s' does not exist"
 msgstr "タグ \"%s\" は存在しません"
 
-#: tortoisehg\hgtk\tagadd.py:242
+#: tortoisehg\hgtk\tagadd.py:248
 msgid "Removed tag %s"
 msgstr "\"%s\" タグを削除する"
 
@@ -3505,62 +3506,70 @@ msgid "TortoiseHg Taskbar"
 msgstr "TortoiseHg タスクバー"
 
 #: tortoisehg\hgtk\taskbarui.py:32
+msgid "OK"
+msgstr "OK"
+
+#: tortoisehg\hgtk\taskbarui.py:33 tortoisehg\hgtk\thgshelve.py:157
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: tortoisehg\hgtk\taskbarui.py:34
 msgid "Apply"
 msgstr "適用"
 
-#: tortoisehg\hgtk\taskbarui.py:52
+#: tortoisehg\hgtk\taskbarui.py:54
 msgid "Overlays"
 msgstr "アイコンオーバーレイ"
 
-#: tortoisehg\hgtk\taskbarui.py:59
+#: tortoisehg\hgtk\taskbarui.py:61
 msgid "Enable overlays"
 msgstr "使用する"
 
-#: tortoisehg\hgtk\taskbarui.py:61
+#: tortoisehg\hgtk\taskbarui.py:63
 msgid "Local disks only"
 msgstr "ローカルのみ"
 
-#: tortoisehg\hgtk\taskbarui.py:65
+#: tortoisehg\hgtk\taskbarui.py:67
 msgid "Context Menu"
 msgstr "右クリックメニュー"
 
-#: tortoisehg\hgtk\taskbarui.py:81
+#: tortoisehg\hgtk\taskbarui.py:83
 msgid "Sub menu items:"
 msgstr "サブメニューとして表示:"
 
-#: tortoisehg\hgtk\taskbarui.py:100
+#: tortoisehg\hgtk\taskbarui.py:102
 msgid "Top menu items:"
 msgstr "トップメニューとして表示:"
 
-#: tortoisehg\hgtk\taskbarui.py:122
+#: tortoisehg\hgtk\taskbarui.py:124
 msgid "Top ->"
 msgstr "トップヘ →"
 
-#: tortoisehg\hgtk\taskbarui.py:125
+#: tortoisehg\hgtk\taskbarui.py:127
 msgid "<- Sub"
 msgstr "← サブへ"
 
-#: tortoisehg\hgtk\taskbarui.py:130
+#: tortoisehg\hgtk\taskbarui.py:132
 msgid "Taskbar"
 msgstr "タスクバー"
 
-#: tortoisehg\hgtk\taskbarui.py:137
+#: tortoisehg\hgtk\taskbarui.py:139
 msgid "Highlight Icon"
 msgstr "トレイアイコンの点滅"
 
-#: tortoisehg\hgtk\taskbarui.py:143
+#: tortoisehg\hgtk\taskbarui.py:145
 msgid "Enable/Disable the overlay icons globally"
 msgstr "アイコンオーバーレイを有効/無効にする"
 
-#: tortoisehg\hgtk\taskbarui.py:146
+#: tortoisehg\hgtk\taskbarui.py:148
 msgid "Only enable overlays on local disks"
 msgstr "このコンピュータ上にあるファイル(ローカル)のみアイコンオーバーレイを有効にする"
 
-#: tortoisehg\hgtk\taskbarui.py:150
+#: tortoisehg\hgtk\taskbarui.py:152
 msgid "Highlight the taskbar icon during activity"
 msgstr "処理中にトレイアイコンの色を変化させる"
 
-#: tortoisehg\hgtk\taskbarui.py:157
+#: tortoisehg\hgtk\taskbarui.py:159
 msgid "Event Log"
 msgstr "イベントログ"
 
@@ -3864,7 +3873,7 @@ msgid ""
 "directory."
 msgstr "ウェブインタフェースで使用するリポジトリ名。デフォルトでは作業ディレクトリの名前。"
 
-#: tortoisehg\hgtk\thgconfig.py:146 tortoisehg\hgtk\thgconfig.py:939
+#: tortoisehg\hgtk\thgconfig.py:146 tortoisehg\hgtk\thgconfig.py:940
 msgid "Description"
 msgstr "説明"
 
@@ -4195,7 +4204,7 @@ msgstr "URL"
 msgid "Folder"
 msgstr "フォルダ"
 
-#: tortoisehg\hgtk\thgconfig.py:278 tortoisehg\hgtk\thgconfig.py:892
+#: tortoisehg\hgtk\thgconfig.py:278 tortoisehg\hgtk\thgconfig.py:893
 msgid "Alias"
 msgstr "エイリアス"
 
@@ -4219,23 +4228,23 @@ msgstr "エイリアス名が空欄です"
 msgid "Please enter alias name"
 msgstr "パスのエイリアス名を入力してください"
 
-#: tortoisehg\hgtk\thgconfig.py:482 tortoisehg\hgtk\thgconfig.py:832
+#: tortoisehg\hgtk\thgconfig.py:482 tortoisehg\hgtk\thgconfig.py:833
 msgid "Overwrite existing '%s' path?"
 msgstr "すでに存在するパス '%s' を上書きしますか？"
 
-#: tortoisehg\hgtk\thgconfig.py:540
+#: tortoisehg\hgtk\thgconfig.py:541
 msgid "No repository found"
 msgstr "リポジトリがありません"
 
-#: tortoisehg\hgtk\thgconfig.py:541
+#: tortoisehg\hgtk\thgconfig.py:542
 msgid "no repo at "
 msgstr "以下にリポジトリはありません： "
 
-#: tortoisehg\hgtk\thgconfig.py:550
+#: tortoisehg\hgtk\thgconfig.py:551
 msgid "Iniparse package not found"
 msgstr "iniparse パッケージがありません"
 
-#: tortoisehg\hgtk\thgconfig.py:551
+#: tortoisehg\hgtk\thgconfig.py:552
 msgid ""
 "Please install iniparse package\n"
 "Settings are only shown, no changing is possible"
@@ -4243,109 +4252,113 @@ msgstr ""
 "iniparse パッケージをインストールしてください\n"
 "設定ダイアログは変更不可として表示されます"
 
-#: tortoisehg\hgtk\thgconfig.py:562
+#: tortoisehg\hgtk\thgconfig.py:563
 msgid "User global settings"
 msgstr "グローバル設定"
 
-#: tortoisehg\hgtk\thgconfig.py:564
+#: tortoisehg\hgtk\thgconfig.py:565
 msgid "%s repository settings"
 msgstr "%s リポジトリ設定"
 
-#: tortoisehg\hgtk\thgconfig.py:569
+#: tortoisehg\hgtk\thgconfig.py:570
 msgid "Edit File"
 msgstr "ファイルを開く"
 
-#: tortoisehg\hgtk\thgconfig.py:592
+#: tortoisehg\hgtk\thgconfig.py:593
 msgid ""
 "Default language for spell check. System language is used if not specified. "
 "Examples: en, en_GB, en_US"
 msgstr "スペルチェックのデフォルト言語。未設定の場合はシステムの言語が使用されます。例：en, en_GB, en_US"
 
-#: tortoisehg\hgtk\thgconfig.py:606
+#: tortoisehg\hgtk\thgconfig.py:604
+msgid "Changelog"
+msgstr "チェンジログ"
+
+#: tortoisehg\hgtk\thgconfig.py:607
 msgid "Sync"
 msgstr "同期"
 
-#: tortoisehg\hgtk\thgconfig.py:610
+#: tortoisehg\hgtk\thgconfig.py:611
 msgid "Web"
 msgstr "サーバ"
 
-#: tortoisehg\hgtk\thgconfig.py:613
+#: tortoisehg\hgtk\thgconfig.py:614
 msgid "Proxy"
 msgstr "プロキシ"
 
-#: tortoisehg\hgtk\thgconfig.py:619
+#: tortoisehg\hgtk\thgconfig.py:620
 msgid "Diff"
 msgstr "差分"
 
-#: tortoisehg\hgtk\thgconfig.py:632
+#: tortoisehg\hgtk\thgconfig.py:633
 msgid "Unapplied changes"
 msgstr "変更の適用を取り消す"
 
-#: tortoisehg\hgtk\thgconfig.py:633
+#: tortoisehg\hgtk\thgconfig.py:634
 msgid "Lose changes and switch files?."
 msgstr "変更を破棄して切り替えますか？"
 
-#: tortoisehg\hgtk\thgconfig.py:652
+#: tortoisehg\hgtk\thgconfig.py:653
 msgid "TortoiseHg Configure Repository - "
 msgstr "TortoiseHg リポジトリ設定 - "
 
-#: tortoisehg\hgtk\thgconfig.py:656
+#: tortoisehg\hgtk\thgconfig.py:657
 msgid "TortoiseHg Configure User-Global Settings"
 msgstr "TortoiseHg グローバル設定"
 
-#: tortoisehg\hgtk\thgconfig.py:713
+#: tortoisehg\hgtk\thgconfig.py:714
 msgid "Exit after saving changes?"
 msgstr "保存して閉じますか？"
 
-#: tortoisehg\hgtk\thgconfig.py:714
+#: tortoisehg\hgtk\thgconfig.py:715
 msgid "&No (discard changes)"
 msgstr "いいえ (変更を破棄)"
 
-#: tortoisehg\hgtk\thgconfig.py:807
+#: tortoisehg\hgtk\thgconfig.py:808
 msgid "No Repository Found"
 msgstr "リポジトリが見つかりません"
 
-#: tortoisehg\hgtk\thgconfig.py:808
+#: tortoisehg\hgtk\thgconfig.py:809
 msgid "Path testing cannot work without a repository"
 msgstr "パステストはリポジトリなしでは動かすことができません"
 
-#: tortoisehg\hgtk\thgconfig.py:874
+#: tortoisehg\hgtk\thgconfig.py:875
 msgid "Remote repository paths"
 msgstr "リモートリポジトリパス"
 
-#: tortoisehg\hgtk\thgconfig.py:896
+#: tortoisehg\hgtk\thgconfig.py:897
 msgid "Repository Path"
 msgstr "リポジトリパス"
 
-#: tortoisehg\hgtk\thgconfig.py:910
+#: tortoisehg\hgtk\thgconfig.py:911
 msgid "_Edit"
 msgstr "編集(_E)"
 
-#: tortoisehg\hgtk\thgconfig.py:920
+#: tortoisehg\hgtk\thgconfig.py:921
 msgid "_Test"
 msgstr "テスト(_T)"
 
-#: tortoisehg\hgtk\thgconfig.py:925
+#: tortoisehg\hgtk\thgconfig.py:926
 msgid "Set as _default"
 msgstr "デフォルトにする(_D)"
 
-#: tortoisehg\hgtk\thgconfig.py:1011
+#: tortoisehg\hgtk\thgconfig.py:1012
 msgid "Suggested"
 msgstr "推奨"
 
-#: tortoisehg\hgtk\thgconfig.py:1021
+#: tortoisehg\hgtk\thgconfig.py:1022
 msgid "History"
 msgstr "履歴"
 
-#: tortoisehg\hgtk\thgconfig.py:1061
+#: tortoisehg\hgtk\thgconfig.py:1062
 msgid "# Generated by tortoisehg-config\n"
 msgstr "# tortoisehg-config によって生成されました\n"
 
-#: tortoisehg\hgtk\thgconfig.py:1118
+#: tortoisehg\hgtk\thgconfig.py:1119
 msgid "Skipped saving path with no alias"
 msgstr "エイリアスのないパスは保存されません"
 
-#: tortoisehg\hgtk\thgconfig.py:1146
+#: tortoisehg\hgtk\thgconfig.py:1147
 msgid "Unable to write configuration file"
 msgstr "設定ファイルに書き込めません"
 
@@ -4494,10 +4507,6 @@ msgstr "上書き"
 #: tortoisehg\hgtk\thgshelve.py:156
 msgid "Append"
 msgstr "追加"
-
-#: tortoisehg\hgtk\thgshelve.py:157
-msgid "Cancel"
-msgstr "キャンセル"
 
 #: tortoisehg\hgtk\thgshelve.py:209
 msgid "Unshelve Error"
@@ -4926,6 +4935,10 @@ msgstr "変更点をリポジトリにコミットします"
 msgid "Create Repository Here"
 msgstr "ここにリポジトリを作成"
 
+#: tortoisehg\util\menuthg.py:42
+msgid "Create a new repository"
+msgstr "ここに新しいリポジトリを作成します"
+
 #: tortoisehg\util\menuthg.py:44
 msgid "Clone..."
 msgstr "リポジトリのクローン..."
@@ -4985,10 +4998,6 @@ msgstr "名前の変更..."
 #: tortoisehg\util\menuthg.py:66
 msgid "Rename file or directory"
 msgstr "ファイルまたはフォルダ名の変更"
-
-#: tortoisehg\util\menuthg.py:68
-msgid "Repository Explorer"
-msgstr "ログの表示"
 
 #: tortoisehg\util\menuthg.py:69
 msgid "View change history in repository"
