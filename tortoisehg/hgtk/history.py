@@ -1408,8 +1408,15 @@ class GLog(gdialog.GDialog):
                 if '--rebase' in cmd:
                     self.origtip = len(self.repo)
                     self.reload_log()
+                    text = _('Finished pull with rebase')
                 elif len(self.repo) > self.origtip:
                     self.reload_log()
+                    text = _('Finished pull')
+                else:
+                    text = _('No changesets to pull')
+            else:
+                text = _('Aborted pull')
+            self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
             self.stbar.begin(_('Pulling changesets...'))
         else:
@@ -1507,9 +1514,14 @@ class GLog(gdialog.GDialog):
 
         def callback(return_code, *args):
             self.stbar.end()
-            if return_code == 0 and self.outgoing:
-                self.outgoing = []
-                self.reload_log()
+            if return_code == 0:
+                if self.outgoing:
+                    self.outgoing = []
+                    self.reload_log()
+                text = _('Finished push')
+            else:
+                text = _('Aborted push')
+            self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
             self.stbar.begin(_('Pushing changesets...'))
         else:
@@ -1921,12 +1933,17 @@ class GLog(gdialog.GDialog):
 
         def callback(return_code, *args):
             self.stbar.end()
-            if return_code == 0 and self.outgoing:
-                d = self.outgoing.index(node)
-                self.outgoing = self.outgoing[d+1:]
-                self.reload_log()
+            if return_code == 0:
+                if self.outgoing:
+                    d = self.outgoing.index(node)
+                    self.outgoing = self.outgoing[d + 1:]
+                    self.reload_log()
+                text = _('Finished push to revision %s') % rev
+            else:
+                text = _('Aborted push')
+            self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
-            self.stbar.begin(_("Pushing changesets to %s...") % rev)
+            self.stbar.begin(_('Pushing changesets to revision %s...') % rev)
         else:
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
@@ -1936,21 +1953,26 @@ class GLog(gdialog.GDialog):
         rev = str(self.currevid)
         cmdline = ['hg', 'pull', '--rev', rev, self.bfile]
 
-        def callback(*args):
+        def callback(return_code, *args):
             self.stbar.end()
-            curtip = len(hg.repository(self.ui, self.repo.root))
-            self.repo = hg.repository(self.ui, path=self.bfile)
-            self.graphview.set_repo(self.repo, self.stbar)
-            self.changeview.set_repo(self.repo)
-            if hasattr(self, 'mqwidget'):
-                self.mqwidget.set_repo(self.repo)
-            self.npreviews = len(self.repo) - curtip
-            if self.npreviews == 0:
-                self.remove_overlay(False)
+            if return_code == 0:
+                curtip = len(hg.repository(self.ui, self.repo.root))
+                self.repo = hg.repository(self.ui, path=self.bfile)
+                self.graphview.set_repo(self.repo, self.stbar)
+                self.changeview.set_repo(self.repo)
+                if hasattr(self, 'mqwidget'):
+                    self.mqwidget.set_repo(self.repo)
+                self.npreviews = len(self.repo) - curtip
+                if self.npreviews == 0:
+                    self.remove_overlay(False)
+                else:
+                    self.reload_log()
+                text = _('Finished pull to revision %s') % rev
             else:
-                self.reload_log()
+                text = _('Aborted pull')
+            self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
-            self.stbar.begin(_("Pulling changesets to %s...") % rev)
+            self.stbar.begin(_('Pulling changesets to revision %s...') % rev)
         else:
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
