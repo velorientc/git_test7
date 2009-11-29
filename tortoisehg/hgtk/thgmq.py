@@ -609,10 +609,10 @@ class MQWidget(gtk.VBox):
 
         self.vmenu = {}
 
-        colappend(_('Show index'), MQ_INDEX)
-        colappend(_('Show status'), MQ_STATUS, active=False)
-        colappend(_('Show name'), MQ_NAME)
-        colappend(_('Show summary'), MQ_SUMMARY, active=False)
+        colappend(_('Show Index'), MQ_INDEX)
+        colappend(_('Show Status'), MQ_STATUS, active=False)
+        colappend(_('Show Name'), MQ_NAME)
+        colappend(_('Show Summary'), MQ_SUMMARY, active=False)
 
         append(sep=True)
 
