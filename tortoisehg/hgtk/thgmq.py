@@ -611,7 +611,6 @@ class MQWidget(gtk.VBox):
 
         colappend(_('Show Index'), MQ_INDEX)
         colappend(_('Show Status'), MQ_STATUS, active=False)
-        colappend(_('Show Name'), MQ_NAME)
         colappend(_('Show Summary'), MQ_SUMMARY, active=False)
 
         append(sep=True)
@@ -650,6 +649,8 @@ class MQWidget(gtk.VBox):
             self.emit('repo-invalidated')
 
     def do_get_property(self, property):
+        if property.name == 'name-column-visible':
+            return True
         try:
             return self.vmenu[property.name].get_active()
         except:
