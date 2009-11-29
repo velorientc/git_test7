@@ -301,6 +301,8 @@ class GLog(gdialog.GDialog):
                     func=self.push_clicked, icon=gtk.STOCK_GOTO_TOP),
                 dict(text=_('Email...'), name='email',
                     func=self.email_clicked, icon=gtk.STOCK_GOTO_LAST),
+                dict(text=_('Stop'), name='stop', sensitive=False,
+                    func=self.stop_clicked, icon=gtk.STOCK_STOP),
                 dict(text='----'),
                 dict(text=_('Add Bundle...'), name='add-bundle',
                     sensitive=not bool(self.bfile),
@@ -1054,9 +1056,14 @@ class GLog(gdialog.GDialog):
                         _('Push outgoing changesets'))
         email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
                         _('Email outgoing changesets'))
+        syncbox.append_widget(gtk.VSeparator())
+        stop = syncbox.append_stock(gtk.STOCK_STOP,
+                        _('Stop current transaction'))
 
+        stop.set_sensitive(False)
         apply.set_sensitive(False)
         reject.set_sensitive(False)
+        self.stop_button = stop
         self.syncbar_apply = apply
         self.syncbar_reject = reject
 
@@ -1112,6 +1119,7 @@ class GLog(gdialog.GDialog):
         reject.connect('clicked', self.reject_clicked)
         conf.connect('clicked', self.conf_clicked, urlcombo)
         email.connect('clicked', self.email_clicked)
+        stop.connect('clicked', self.stop_clicked)
 
         # filter bar
         self.filterbox = FilterBox(self.tooltips,
@@ -1292,6 +1300,8 @@ class GLog(gdialog.GDialog):
 
         def callback(return_code, *args):
             self.stbar.end()
+            self.stop_button.set_sensitive(False)
+            self.cmd_set_sensitive('stop', False)
             if return_code == 0 and os.path.isfile(bfile):
                 self.set_bundlefile(bfile)
                 text = _('%d incoming changesets') % self.npreviews
@@ -1302,6 +1312,8 @@ class GLog(gdialog.GDialog):
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
             self.stbar.begin(_('Checking incoming changesets...'))
+            self.stop_button.set_sensitive(True)
+            self.cmd_set_sensitive('stop', True)
         else:
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
@@ -1342,7 +1354,7 @@ class GLog(gdialog.GDialog):
             self.cmd_set_sensitive(cmd, False)
             self.incoming_disabled_cmds.append(cmd)
 
-        ignore = (self.syncbar_apply, self.syncbar_reject, self.ppullbox)
+        ignore = (self.syncbar_apply, self.syncbar_reject, self.ppullbox, self.stop_button)
         self.incoming_disabled = []
         def disable_child(w):
             if (w not in ignore) and w.get_property('sensitive'):
@@ -1402,6 +1414,8 @@ class GLog(gdialog.GDialog):
 
         def callback(return_code, *args):
             self.stbar.end()
+            self.stop_button.set_sensitive(False)
+            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 self.repo.invalidate()
                 self.changeview.clear_cache()
@@ -1419,6 +1433,8 @@ class GLog(gdialog.GDialog):
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
             self.stbar.begin(_('Pulling changesets...'))
+            self.stop_button.set_sensitive(True)
+            self.cmd_set_sensitive('stop', True)
         else:
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
@@ -1438,6 +1454,8 @@ class GLog(gdialog.GDialog):
 
         def callback(return_code, buffer, *args):
             self.stbar.end()
+            self.stop_button.set_sensitive(False)
+            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 outgoing = []
                 for line in buffer.splitlines()[:-1]:
@@ -1456,6 +1474,8 @@ class GLog(gdialog.GDialog):
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmd, callback):
             self.stbar.begin(_('Checking outgoing changesets...'))
+            self.stop_button.set_sensitive(True)
+            self.cmd_set_sensitive('stop', True)
         else:
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
@@ -1514,6 +1534,8 @@ class GLog(gdialog.GDialog):
 
         def callback(return_code, *args):
             self.stbar.end()
+            self.stop_button.set_sensitive(False)
+            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 if self.outgoing:
                     self.outgoing = []
@@ -1524,6 +1546,8 @@ class GLog(gdialog.GDialog):
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
             self.stbar.begin(_('Pushing changesets...'))
+            self.stop_button.set_sensitive(True)
+            self.cmd_set_sensitive('stop', True)
         else:
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
@@ -1547,6 +1571,9 @@ class GLog(gdialog.GDialog):
         self.refreshui()
         self.update_urllist()
         self.update_postpull()
+
+    def stop_clicked(self, toolbutton):
+        self.runner.stop()
 
     def update_urllist(self):
         urllist = self.urlcombo.get_model()
@@ -1933,6 +1960,8 @@ class GLog(gdialog.GDialog):
 
         def callback(return_code, *args):
             self.stbar.end()
+            self.stop_button.set_sensitive(False)
+            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 if self.outgoing:
                     d = self.outgoing.index(node)
@@ -1944,6 +1973,8 @@ class GLog(gdialog.GDialog):
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
             self.stbar.begin(_('Pushing changesets to revision %s...') % rev)
+            self.stop_button.set_sensitive(True)
+            self.cmd_set_sensitive('stop', True)
         else:
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
@@ -1955,6 +1986,8 @@ class GLog(gdialog.GDialog):
 
         def callback(return_code, *args):
             self.stbar.end()
+            self.stop_button.set_sensitive(False)
+            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 curtip = len(hg.repository(self.ui, self.repo.root))
                 self.repo = hg.repository(self.ui, path=self.bfile)
@@ -1973,6 +2006,8 @@ class GLog(gdialog.GDialog):
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
             self.stbar.begin(_('Pulling changesets to revision %s...') % rev)
+            self.stop_button.set_sensitive(True)
+            self.cmd_set_sensitive('stop', True)
         else:
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
