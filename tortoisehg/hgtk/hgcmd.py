@@ -655,6 +655,10 @@ class CmdLogDialog(gtk.Window):
                 self.hide()
         return True
 
+# Structured log types for CmdRunner
+LOG_NORMAL = 0
+LOG_ERROR = 1
+
 class CmdRunner(object):
     """
     Interactive command runner without GUI.
@@ -665,6 +669,13 @@ class CmdRunner(object):
     """
     def __init__(self):
         self.hgthread = None
+
+        self.dlg = CmdLogDialog()
+        def close_hook(dialog):
+            self.show_log(False)
+            return False
+        self.dlg.set_close_hook(close_hook)
+
         self.clear_buffers()
 
     ### public functions ###
@@ -678,11 +689,10 @@ class CmdRunner(object):
         cmdline: command line string.
         callback: function called after terminated the thread.
 
-        def callback(returncode, msg, err, ...)
+        def callback(returncode, buffer, ...)
 
         returncode: See the description of 'hgthread'.
-        msg: Message buffer.
-        err: Error messages buffer.
+        buffer: a buffer contains all messages.
 
         return: True if it starts correctly, otherwise False.
         """
@@ -712,14 +722,33 @@ class CmdRunner(object):
         if self.hgthread:
             self.hgthread.terminate()
 
-    def get_msg_buffer(self):
+    def get_buffer(self):
         """
-        Return message buffer.
+        Return buffer contains all messages.
 
         Note that the buffer will be cleared when called 'execute' method.
         So you need to store this before next execution.
         """
-        return self.msg_buffer
+        return ''.join([chunk[0] for chunk in self.buffer])
+
+    def get_raw_buffer(self):
+        """
+        Return structured buffer.
+
+        Note that the buffer will be cleared when called 'execute' method.
+        So you need to store this before next execution.
+        """
+        return self.buffer
+
+    def get_msg_buffer(self):
+        """
+        Return normal message buffer.
+
+        Note that the buffer will be cleared when called 'execute' method.
+        So you need to store this before next execution.
+        """
+        return ''.join([chunk[0] for chunk in self.buffer \
+                                           if chunk[1] == LOG_NORMAL])
 
     def get_err_buffer(self):
         """
@@ -728,7 +757,8 @@ class CmdRunner(object):
         Note that the buffer will be cleared when called 'execute' method.
         So you need to store this before next execution.
         """
-        return self.err_buffer
+        return ''.join([chunk[0] for chunk in self.buffer \
+                                           if chunk[1] == LOG_ERROR])
 
     ### internal use functions ###
 
@@ -736,8 +766,17 @@ class CmdRunner(object):
         """
         Clear both message and error buffers.
         """
-        self.msg_buffer = ''
-        self.err_buffer = ''
+        self.buffer = []
+        self.dlg.log.clear()
+
+    def show_log(self, visible=True):
+        if visible:
+            if self.dlg.get_property('visible'):
+                self.dlg.present()
+            else:
+                self.dlg.show_all()
+        else:
+            self.dlg.hide()
 
     def process_queue(self, callback, args, kargs):
         # process queue
@@ -746,14 +785,16 @@ class CmdRunner(object):
         # receive messages from queue
         while self.hgthread.getqueue().qsize():
             try:
-                msg = self.hgthread.getqueue().get(0)
-                self.msg_buffer += hglib.toutf(msg)
+                msg = hglib.toutf(self.hgthread.getqueue().get(0))
+                self.buffer.append((msg, LOG_NORMAL))
+                self.dlg.log.append(msg)
             except Queue.Empty:
                 pass
         while self.hgthread.geterrqueue().qsize():
             try:
                 msg = hglib.toutf(self.hgthread.geterrqueue().get(0))
-                self.err_buffer += hglib.toutf(msg)
+                self.buffer.append((msg, LOG_ERROR))
+                self.dlg.log.append(msg, error=True)
             except Queue.Empty:
                 pass
 
@@ -761,9 +802,10 @@ class CmdRunner(object):
         if not self.hgthread.isAlive():
             returncode = self.hgthread.return_code()
             self.hgthread = None
+            if len(self.get_err_buffer()) > 0:
+                self.show_log(True)
             def call_callback():
-                callback(returncode, self.msg_buffer, self.err_buffer,
-                         *args, **kargs)
+                callback(returncode, self.get_buffer(), *args, **kargs)
             gtklib.idle_add_single_call(call_callback)
             return False # Stop polling this function
         else:
