@@ -1282,20 +1282,24 @@ class GLog(gdialog.GDialog):
             atexit.register(cleanup)
 
         bfile = path
-        path = hglib.validate_synch_path(path, self.repo)
-
         for badchar in (':', '*', '\\', '?', '#'):
             bfile = bfile.replace(badchar, '')
         bfile = bfile.replace('/', '_')
         bfile = os.path.join(self.bundledir, bfile) + '.hg'
         cmdline = ['hg', 'incoming', '--bundle', bfile]
         cmdline += self.get_proxy_args()
-        cmdline += [path]
+        cmdline += [hglib.validate_synch_path(path, self.repo)]
 
         def callback(return_code, *args):
             self.stbar.end()
             if return_code == 0 and os.path.isfile(bfile):
                 self.set_bundlefile(bfile)
+                text = _('%d incoming changesets') % self.npreviews
+            elif return_code is None:
+                text = _('Aborted incoming')
+            else:
+                text = _('No incoming changesets')
+            self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
             self.stbar.begin(_('Checking incoming changesets...'))
         else:
@@ -1425,11 +1429,11 @@ class GLog(gdialog.GDialog):
         cmd += self.get_proxy_args()
         cmd += [hglib.validate_synch_path(path, self.repo)] 
 
-        def callback(return_code, msg, *args):
+        def callback(return_code, buffer, *args):
             self.stbar.end()
             if return_code == 0:
                 outgoing = []
-                for line in msg.splitlines()[:-1]:
+                for line in buffer.splitlines()[:-1]:
                     try:
                         node = self.repo[line].node()
                         outgoing.append(node)
@@ -1438,7 +1442,11 @@ class GLog(gdialog.GDialog):
                 self.outgoing = outgoing
                 self.reload_log()
                 text = _('%d outgoing changesets') % len(outgoing)
-                self.stbar.set_idle_text(text)
+            elif return_code is None:
+                text = _('Aborted outgoing')
+            else:
+                text = _('No outgoing changesets')
+            self.stbar.set_idle_text(text)
         if self.runner.execute(cmd, callback):
             self.stbar.begin(_('Checking outgoing changesets...'))
         else:
