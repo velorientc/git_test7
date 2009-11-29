@@ -222,17 +222,17 @@ class CmdWidget(gtk.VBox):
 
     def __init__(self, style=STYLE_NORMAL, tooltips=None, logsize=None):
         """
-        style: String. Predefined constans of CmdWidget style.  Two styles;
-               STYLE_NORMAL (progress bar + popup log viewer) and
-               STYLE_COMPACT (progress bar + embedded log viewer) are
-               availabled. Default: STYLE_NORMAL.
+        style:    String. Predefined constans of CmdWidget style. Two styles,
+                  STYLE_NORMAL (progress bar + popup log viewer) and
+                  STYLE_COMPACT (progress bar + embedded log viewer) are
+                  available. Default: STYLE_NORMAL.
         tooltips: Reference. gtk.Tooltips instance to show tooltips of several
-                  buttons.  If you omit, it will create a new instance of
-                  gtk.Tooltips.  Default: None.
-        logsize: Tuple or list contains 2 numbers.  Specify the size of
-                 embedded log viewer.  size[0] = width, size[1] = height.  
-                 If you pass -1 as width or height size, it will be change to
-                 *natual* size of the widget.  Default: tuple(-1, 180).
+                  buttons. If omitted, a new instance of gtk.Tooltips will be
+                  created. Default: None.
+        logsize:  Tuple or list containing two numbers. Specify the size of the
+                  embedded log viewer. size[0] = width, size[1] = height.  
+                  If you pass -1 as width or height size, it will be set to
+                  the natural size of the widget. Default: tuple(-1, 180).
         """
         gtk.VBox.__init__(self)
 
@@ -324,16 +324,16 @@ class CmdWidget(gtk.VBox):
     def execute(self, cmdline, callback, *args, **kargs):
         """
         Execute passed command line using 'hgthread'.
-        When the command terminated, callback function is called
-        with return code. 
+        When the command terminates, the callback function is invoked
+        with its return code. 
 
         cmdline: command line string.
-        callback: function called after terminated the thread.
+        callback: function invoked after the command terminates.
 
         def callback(returncode, useraborted, ...)
 
         returncode: See the description of 'hgthread'.
-        useraborted: Indicates whether the thread is aborted by user.
+        useraborted: Whether the command was aborted by the user.
         """
         if self.hgthread:
             return
@@ -376,12 +376,11 @@ class CmdWidget(gtk.VBox):
 
     def set_result(self, text, style=None):
         """
-        Put text message and icon to the progress bar.
+        Put text message and icon in the progress bar.
 
         style: String. If passed 'succeed', 'green' or 'ok', green
                text and succeed icon will be shown.  If passed 'error',
-               'failed', 'fail' or 'red' are passed, red text and error
-               icon will be shown.
+               'failed', 'fail' or 'red', red text and error icon will be shown.
         """
         markup = '<span foreground="%s" weight="%s">%%s</span>'
         if style in ('succeed', 'green', 'ok'):
@@ -409,7 +408,7 @@ class CmdWidget(gtk.VBox):
     def get_pbar(self):
         """
         Return 'visible' property of the progress bar box.
-        If not exists progress bar, it always returns False.
+        If there is no progress bar, it returns False.
         """
         if hasattr(self, 'progbox'):
             return self.progbox.get_property('visible')
@@ -418,7 +417,7 @@ class CmdWidget(gtk.VBox):
     def set_buttons(self, log=None, stop=None, close=None):
         """
         Set visible properties of buttons on the progress bar box.
-        If omitted all argments, it does nothing.
+        If all arguments are omitted, it does nothing.
 
         log: if True, log button is shown. (default: None)
         stop: if True, stop button is shown. (default: None)
@@ -573,7 +572,7 @@ class CmdLogWidget(gtk.VBox):
 
     def append(self, text, error=False):
         """
-        Insert the text to the end of TextView.
+        Insert text at the end of the TextView.
 
         text: string you want to append.
         error: if True, append text with 'error' tag. (default: False)
@@ -587,7 +586,7 @@ class CmdLogWidget(gtk.VBox):
 
     def clear(self):
         """
-        Clear all text in TextView.
+        Clear all text in the TextView.
         """
         self.buffer.delete(self.buffer.get_start_iter(),
                            self.buffer.get_end_iter())
@@ -637,13 +636,13 @@ class CmdLogDialog(gtk.Window):
         """
         Set hook function.
 
-        hook: the function called on closing this dialog.
+        hook: the function called when this dialog is closed.
 
         def close_hook(dialog)
 
-        where 'dialog' is the instance of CmdLogDialog class.
+        where 'dialog' is an instance of the CmdLogDialog class.
         The hook function should return True or False.
-        By returning True, you can prevent closing/hiding the dialog.
+        If True is returned, closing the dialog is prevented.
         """
         self.close_hook = hook
 
@@ -663,9 +662,9 @@ class CmdRunner(object):
     """
     Interactive command runner without GUI.
 
-    In default, it doesn't have any GUI, such as CmdDialog.
-    If it needs something user interaction (i.e. HTTPS auth) while
-    running, simple input dialog will be popup.
+    By default, there is no GUI (as opposed to CmdDialog).
+    If user interaction is needed (e.g. HTTPS auth), a simple
+    input dialog will be shown.
     """
     def __init__(self):
         self.hgthread = None
@@ -683,18 +682,19 @@ class CmdRunner(object):
     def execute(self, cmdline, callback, *args, **kargs):
         """
         Execute passed command line using 'hgthread'.
-        When the command terminated, callback function is called
-        with return code. 
+        When the command terminates, the callback function is invoked
+        with its return code. 
 
         cmdline: command line string.
-        callback: function called after terminated the thread.
+        callback: function invoked after the command terminates.
 
-        def callback(returncode, buffer, ...)
+        def callback(returncode, useraborted, ...)
 
         returncode: See the description of 'hgthread'.
-        buffer: a buffer contains all messages.
+        useraborted: Whether the command was aborted by the user.
 
-        return: True if it starts correctly, otherwise False.
+        return: True if the command was started,
+                False if a command is already running.
         """
         if self.hgthread:
             return False
@@ -724,10 +724,10 @@ class CmdRunner(object):
 
     def get_buffer(self):
         """
-        Return buffer contains all messages.
+        Return buffer containing all messages.
 
-        Note that the buffer will be cleared when called 'execute' method.
-        So you need to store this before next execution.
+        Note that the buffer will be cleared when the 'execute' method
+        is called, so you need to store this before next execution.
         """
         return ''.join([chunk[0] for chunk in self.buffer])
 
@@ -735,34 +735,34 @@ class CmdRunner(object):
         """
         Return structured buffer.
 
-        Note that the buffer will be cleared when called 'execute' method.
-        So you need to store this before next execution.
+        Note that the buffer will be cleared when the 'execute' method
+        is called, so you need to store this before next execution.
         """
         return self.buffer
 
     def get_msg_buffer(self):
         """
-        Return normal message buffer.
+        Return buffer with regular messages.
 
-        Note that the buffer will be cleared when called 'execute' method.
-        So you need to store this before next execution.
+        Note that the buffer will be cleared when the 'execute' method
+        is called, so you need to store this before next execution.
         """
         return ''.join([chunk[0] for chunk in self.buffer \
                                            if chunk[1] == LOG_NORMAL])
 
     def get_err_buffer(self):
         """
-        Return error message buffer.
+        Return buffer with error messages.
 
-        Note that the buffer will be cleared when called 'execute' method.
-        So you need to store this before next execution.
+        Note that the buffer will be cleared when the 'execute' method
+        is called, so you need to store this before next execution.
         """
         return ''.join([chunk[0] for chunk in self.buffer \
                                            if chunk[1] == LOG_ERROR])
 
     def set_title(self, title):
         """
-        Set the title text of command log window.
+        Set the title of the command log window.
         """
         self.dlg.set_title(title)
 
