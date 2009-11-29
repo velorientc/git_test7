@@ -183,7 +183,7 @@ class MQWidget(gtk.VBox):
 
         addcol(_('#'), MQ_INDEX, right=True)
         addcol(_('st'), MQ_STATUS)
-        addcol(_('Name'), MQ_NAME, editfunc=cell_edited)
+        addcol(_('Patch'), MQ_NAME, editfunc=cell_edited)
         addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
         pane.add(self.list)
