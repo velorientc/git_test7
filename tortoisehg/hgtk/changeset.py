@@ -15,7 +15,7 @@ import Queue
 from mercurial import cmdutil, util, patch, mdiff
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import shlib, hglib
+from tortoisehg.util import shlib, hglib, paths
 
 from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
 
@@ -637,6 +637,7 @@ class ChangeSet(gdialog.GDialog):
 
         ## file list
         filelist_tree = gtk.TreeView()
+        filelist_tree.set_headers_visible(False)
         filesel = filelist_tree.get_selection()
         filesel.connect('changed', self.filelist_rowchanged)
         self._filesel = filesel
@@ -664,10 +665,37 @@ class ChangeSet(gdialog.GDialog):
                 gobject.TYPE_STRING,   # filename
                 )
         filelist_tree.set_model(self._filelist)
-        column = gtk.TreeViewColumn(_('Stat'), gtk.CellRendererText(), text=0)
+
+        column = gtk.TreeViewColumn()
         filelist_tree.append_column(column)
-        column = gtk.TreeViewColumn(_('Files'), gtk.CellRendererText(), text=1)
-        filelist_tree.append_column(column)
+
+        iconcell = gtk.CellRendererPixbuf()
+        filecell = gtk.CellRendererText()
+
+        column.pack_start(iconcell, expand=False)
+        column.pack_start(filecell, expand=False)
+        column.add_attribute(filecell, 'text', 1)
+
+        iconw, iconh = gtk.icon_size_lookup(gtk.ICON_SIZE_SMALL_TOOLBAR)
+
+        def get_pixbuf(iconfilename):
+            iconpath = paths.get_tortoise_icon(iconfilename)
+            return gtk.gdk.pixbuf_new_from_file_at_size(
+                iconpath, iconw, iconh)
+
+        addedpixbuf = get_pixbuf('menuadd.ico')
+        removedpixbuf = get_pixbuf('menudelete.ico')
+
+        def cell_seticon(column, cell, model, iter):
+            state = model.get_value(iter, 0)
+            pixbuf = None
+            if state == 'A':
+                pixbuf = addedpixbuf
+            elif state == 'R':
+                pixbuf = removedpixbuf
+            cell.set_property('pixbuf', pixbuf)
+
+        column.set_cell_data_func(iconcell, cell_seticon)
 
         list_frame = gtk.Frame()
         list_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
