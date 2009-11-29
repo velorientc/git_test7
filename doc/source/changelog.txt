@@ -170,6 +170,9 @@ the search text of that type, and then hits return in the text entry.
 	:guilabel:`User`
 		Parse the user text as a user / comitter name.
 
+In 0.9.1, the filter entry was given a combo box which stores the
+history of searches made while the dialog was open.  Selecting an item
+from the drop down list will trigger re-enable that filter.
 
 Revision Graph Details
 ----------------------
