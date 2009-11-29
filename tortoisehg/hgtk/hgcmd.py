@@ -760,6 +760,12 @@ class CmdRunner(object):
         return ''.join([chunk[0] for chunk in self.buffer \
                                            if chunk[1] == LOG_ERROR])
 
+    def set_title(self, title):
+        """
+        Set the title text of command log window.
+        """
+        self.dlg.set_title(title)
+
     ### internal use functions ###
 
     def clear_buffers(self):

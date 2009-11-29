@@ -314,7 +314,7 @@ class GLog(gdialog.GDialog):
                     sensitive=bool(self.bfile),
                     func=self.reject_clicked, icon=gtk.STOCK_DIALOG_ERROR),
                 dict(text='----'),
-                dict(name='use-proxy-server', text=_('Use proxy server'),
+                dict(text=_('Use proxy server'), name='use-proxy-server',
                     ascheck=True, func=toggle_proxy),
                 dict(text=_('Force push'), ascheck=True, func=toggle_force),
                 ])
@@ -1311,6 +1311,7 @@ class GLog(gdialog.GDialog):
                 text = _('No incoming changesets')
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
+            self.runner.set_title(_('Incoming'))
             self.stbar.begin(_('Checking incoming changesets...'))
             self.stop_button.set_sensitive(True)
             self.cmd_set_sensitive('stop', True)
@@ -1347,14 +1348,15 @@ class GLog(gdialog.GDialog):
         self.cmd_set_sensitive('accept', True)
         self.cmd_set_sensitive('reject', True)
 
-        cmds = ('incoming', 'outgoing', 'push', 'pull', 'email', 'refresh', 
-            'synchronize', 'mq', 'add-bundle')
+        cmds = ('incoming', 'outgoing', 'push', 'pull', 'email', 'refresh',
+                'synchronize', 'mq', 'add-bundle')
         self.incoming_disabled_cmds = []
         for cmd in cmds:
             self.cmd_set_sensitive(cmd, False)
             self.incoming_disabled_cmds.append(cmd)
 
-        ignore = (self.syncbar_apply, self.syncbar_reject, self.ppullbox, self.stop_button)
+        ignore = (self.syncbar_apply, self.syncbar_reject, self.ppullbox,
+                  self.stop_button)
         self.incoming_disabled = []
         def disable_child(w):
             if (w not in ignore) and w.get_property('sensitive'):
@@ -1432,6 +1434,7 @@ class GLog(gdialog.GDialog):
                 text = _('Aborted pull')
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
+            self.runner.set_title(_('Pull'))
             self.stbar.begin(_('Pulling changesets...'))
             self.stop_button.set_sensitive(True)
             self.cmd_set_sensitive('stop', True)
@@ -1473,6 +1476,7 @@ class GLog(gdialog.GDialog):
                 text = _('No outgoing changesets')
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmd, callback):
+            self.runner.set_title(_('Outgoing'))
             self.stbar.begin(_('Checking outgoing changesets...'))
             self.stop_button.set_sensitive(True)
             self.cmd_set_sensitive('stop', True)
@@ -1545,6 +1549,7 @@ class GLog(gdialog.GDialog):
                 text = _('Aborted push')
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
+            self.runner.set_title(_('Push'))
             self.stbar.begin(_('Pushing changesets...'))
             self.stop_button.set_sensitive(True)
             self.cmd_set_sensitive('stop', True)
@@ -1972,6 +1977,7 @@ class GLog(gdialog.GDialog):
                 text = _('Aborted push')
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
+            self.runner.set_title(_('Push to %s') % rev)
             self.stbar.begin(_('Pushing changesets to revision %s...') % rev)
             self.stop_button.set_sensitive(True)
             self.cmd_set_sensitive('stop', True)
@@ -2005,6 +2011,7 @@ class GLog(gdialog.GDialog):
                 text = _('Aborted pull')
             self.stbar.set_idle_text(text)
         if self.runner.execute(cmdline, callback):
+            self.runner.set_title(_('Pull to %s') % rev)
             self.stbar.begin(_('Pulling changesets to revision %s...') % rev)
             self.stop_button.set_sensitive(True)
             self.cmd_set_sensitive('stop', True)
