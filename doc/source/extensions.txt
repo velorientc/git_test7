@@ -53,7 +53,7 @@ You can find the number of the tip revision by running :command:`hg log -l 2`.
 Hgcr-gui
 ========
 
-CodeReview management tool
+`CodeReview <http://bitbucket.org/glimchb/hgcr-gui/wiki/Home>`_ management tool
 
 * This extension allows you to manage reviews for your code in any project you like.
 * It helps to keep the review management inside the mercurial.
@@ -106,5 +106,45 @@ You may want to add it to your Mercurial.ini or a repository's hgrc like this::
 	[extensions]
 	hgcr-gui=
  
+Schemes
+=======
                                    
+`Schemes <http://mercurial.selenic.com/wiki/SchemesExtension>`_ allows
+you to specify shortcuts for parent urls, for example::
+
+	[schemes]
+	py = http://code.python.org/hg/
+
+After that you can use it like::
+
+	hg clone py://trunk/
+
+Of course, it is possible to supply custom urls for schemes with suffixes::
+
+	[schemes]
+	ex = ssh://example.com/hg
+	ex+http = http://hg.example.com/
+
+Additionally there is support for some more complex schemas, for example used
+by Google Code::
+
+	[schemes]
+	gcode = http://{1}.googlecode.com/hg/
+
+The syntax is taken from Mercurial templates, and you have unlimited number of
+variables, starting with {1} and continuing with {2}, {3} and so on. This
+variables will receive parts of url supplied, splitted by /. Anything not
+specified as {part} will be just appended to an url.
+
+To use the schemes extension, add it to your Mercurial.ini along with
+some configuration::
+
+	[extensions]
+	schemes =
+
+	[schemes]
+	bb = http://bitbucket.org/
+	bb+ssh = ssh://hg@bitbucket.org/
+
+
 .. vim: noet ts=4
