@@ -57,9 +57,15 @@ class QuickOpDialog(gtk.Dialog):
         self.gobutton = self.add_button(labels[command][1], gtk.RESPONSE_OK)
         self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
 
+        # wrap box
+        wrapbox = gtk.VBox()
+        wrapbox.set_border_width(5)
+        self.vbox.pack_start(wrapbox, True, True)
+        self.wrapbox = wrapbox
+
         lbl = gtk.Label(labels[command][0])
         lbl.set_alignment(0, 0)
-        self.vbox.pack_start(lbl, False, False, 8)
+        wrapbox.pack_start(lbl, False, False)
 
         def keypressed(tree, event):
             'Make spacebar toggle selected rows'
@@ -105,8 +111,9 @@ class QuickOpDialog(gtk.Dialog):
 
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller.add(self.filetree)
-        self.vbox.pack_start(scroller, True, True, 8)
+        wrapbox.pack_start(scroller, True, True, 6)
 
         def toggleall(button):
             for row in self.filetree.get_model():
@@ -114,7 +121,7 @@ class QuickOpDialog(gtk.Dialog):
 
         # extra box
         self.extrabox = hbox = gtk.HBox()
-        self.vbox.pack_start(hbox, False, False, 2)
+        wrapbox.pack_start(hbox, False, False)
 
         ## toggle button
         tb = gtk.Button(_('Toggle all selections'))
@@ -187,7 +194,7 @@ class QuickOpDialog(gtk.Dialog):
         self.cmd = hgcmd.CmdWidget()
         self.cmd.show_all()
         self.cmd.hide()
-        self.vbox.pack_start(self.cmd, False, False, 6)
+        self.wrapbox.pack_start(self.cmd, False, False, 8)
 
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
@@ -230,8 +237,7 @@ class QuickOpDialog(gtk.Dialog):
             raise _('unknown mode name: %s') % mode
         working = not normal
 
-        self.filetree.set_sensitive(normal)
-        self.extrabox.set_sensitive(normal)
+        self.wrapbox.set_sensitive(normal)
         self.gobutton.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
