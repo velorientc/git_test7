@@ -564,18 +564,18 @@ class MQWidget(gtk.VBox):
         is_next = row[MQ_INDEX] == self.number_applied()
 
         if is_operable and not is_qtip and (not is_qparent or has_applied):
-            append(_('_goto'), self.goto_activated)
+            append(_('_Goto'), self.goto_activated)
         if has_patch and not is_qparent:
-            append(_('_rename'), self.rename_activated)
+            append(_('_Rename'), self.rename_activated)
         if has_applied and not is_qparent:
-            append(_('_finish applied'), self.finish_activated)
+            append(_('_Finish Applied'), self.finish_activated)
         if not is_applied and not is_qparent:
-            append(_('_delete'), self.delete_activated)
-            append(_('delete --keep'), self.delete_keep_activated)
+            append(_('_Delete'), self.delete_activated)
+            append(_('Delete --keep'), self.delete_keep_activated)
             if has_applied and not is_qparent:
-                append(_('f_old'), self.fold_activated)
+                append(_('F_old'), self.fold_activated)
             if self.hasqup and not is_next:
-                append(_('make it _next'), self.mknext_activated)
+                append(_('Make It _Next'), self.mknext_activated)
 
         if len(menu.get_children()) > 0:
             menu.show_all()
