@@ -101,8 +101,8 @@ class ChangeSet(gdialog.GDialog):
             if len(parents) == 2:
                 # deferred adding of parent check button
                 if not self.parent_button.parent:
-                    self.parent_box.pack_start(gtk.HSeparator(), False, False)
                     self.parent_box.pack_start(self.parent_button, False, False)
+                    self.parent_box.pack_start(gtk.HSeparator(), False, False)
                     self.parent_box.show_all()
 
                 # show parent box
@@ -703,11 +703,10 @@ class ChangeSet(gdialog.GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(filelist_tree)
         flbox = gtk.VBox()
-        flbox.pack_start(scroller)
         list_frame.add(flbox)
-
         self.parent_box = gtk.VBox()
         flbox.pack_start(self.parent_box, False, False)
+        flbox.pack_start(scroller)
 
         btn = gtk.CheckButton(_('Diff to second Parent'))
         btn.connect('toggled', self.parent_toggled)
