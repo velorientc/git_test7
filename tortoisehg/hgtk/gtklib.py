@@ -68,6 +68,8 @@ def set_tortoise_keys(window):
     window.connect('thg-close', thgclose)
     window.connect('thg-exit', thgexit)
 
+    return accelgroup, mod
+
 def thgexit(window):
     if thgclose(window):
         gobject.idle_add(hgtk.thgexit, window)
