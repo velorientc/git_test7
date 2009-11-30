@@ -112,12 +112,23 @@ class QuickOpDialog(gtk.Dialog):
             for row in self.filetree.get_model():
                 row[0] = not row[0]
 
-        hbox = gtk.HBox()
+        # extra box
+        self.extrabox = hbox = gtk.HBox()
+        self.vbox.pack_start(hbox, False, False, 2)
+
+        ## toggle button
         tb = gtk.Button(_('Toggle all selections'))
         tb.connect('pressed', toggleall)
-        self.toggleall = tb
-        hbox.pack_start(tb, False, False, 0)
-        self.vbox.pack_start(hbox, False, False, 2)
+        hbox.pack_start(tb, False, False)
+
+        if command == 'revert':
+            ## no backup checkbox
+            chk = gtk.CheckButton(_('Do not save backup files (*.orig)'))
+            hbox.pack_start(chk, False, False, 6)
+            self.nobackup = chk
+
+            ## padding
+            hbox.pack_start(gtk.Label())
 
         types = { 'add' : 'I?',
                   'forget' : 'MAR!C',
@@ -220,7 +231,7 @@ class QuickOpDialog(gtk.Dialog):
         working = not normal
 
         self.filetree.set_sensitive(normal)
-        self.toggleall.set_sensitive(normal)
+        self.extrabox.set_sensitive(normal)
         self.gobutton.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
@@ -254,6 +265,8 @@ class QuickOpDialog(gtk.Dialog):
             return
 
         cmdline = ['hg', self.command, '--verbose'] + list
+        if self.nobackup.get_active():
+            cmdline.append('--no-backup')
 
         def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
