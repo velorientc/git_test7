@@ -318,6 +318,7 @@ class MQWidget(gtk.VBox):
         [MQ] Execute 'qdelete' command.
 
         patch: the patch name or an index to specify the patch.
+        keep: if True, use '--keep' option. (default: False)
         """
         if not self.has_patch():
             return
@@ -571,7 +572,6 @@ class MQWidget(gtk.VBox):
             append(_('_Finish Applied'), self.finish_activated)
         if not is_applied and not is_qparent:
             append(_('_Delete'), self.delete_activated)
-            append(_('Delete --keep'), self.delete_keep_activated)
             if has_applied and not is_qparent:
                 append(_('F_old'), self.fold_activated)
             if self.hasqup and not is_next:
@@ -730,9 +730,6 @@ class MQWidget(gtk.VBox):
     def delete_activated(self, menuitem, row):
         self.qdelete(row[MQ_NAME])
 
-    def delete_keep_activated(self, menuitem, row):
-        self.qdelete(row[MQ_NAME], keep=True)
-    
     def rename_activated(self, menuitem, row):
         self.qrename_ui(row[MQ_NAME])
 
