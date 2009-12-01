@@ -15,7 +15,7 @@ assumed that the user is familiar with the Windows explorer and knows
 how to use it.
 
 You can find the most up to date version of this documentation at our
-`web <http://bitbucket.org/tortoisehg/stable>`_ site.
+`web <http://tortoise.org>`_ site.
 
 Reading guide
 =============
