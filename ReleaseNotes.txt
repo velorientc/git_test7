@@ -11,6 +11,91 @@ been added in the current version.
 The ReleaseNotes page on the TortosieHg Wiki is usually kept up to date.
 http://bitbucket.org/tortoisehg/stable/wiki/ReleaseNotes
 
+== TortoiseHg 0.9 ==
+
+Released November 16, 2009
+
+Codenamed **Sandpaper**
+
+=== Packaged Versions ===
+
+TortoiseHg 0.9 requires Mercurial version 1.4
+
+=== Behavior Changes ===
+
+* dropped support for external commit tools
+* potentially harmful extensions are no longer loaded for you.  MQ, qup,
+rebase, transplant, and fetch must be enabled by the user to unlock their
+support inside the TortoiseHg tools.
+* The synchronize tool has been deprecated.  Most of it's functionality has
+been merged into the changelog tool.  Synchronize will be removed in a future
+release.
+* commit tool - after a commit, all remaining files are unchecked
+* commit/status/etc - context menus were refactored as per issue #133
+
+**Note** During upgrade, it is possible for the taskbar app to crash when the
+installer closes it.  This only happens if the taskbar config dialog has been
+opened, and it only seems to happen on slower XP machines.  It is also
+harmless.  The installer was trying to kill it, it just happened to die in a
+non-orderly fashion.  Just ignore the crash.  If you don't want to see this
+happen, simply exit the taskbar app before starting the upgrade.
+
+=== Enhancements ===
+
+* spell checker for commit and email tools (gtkspell, Gnome only)
+* changelog - integrate synchronize functionality, including previews of incoming changesets
+* changelog - integrate MQ
+* changelog - new branch graphing algorithm
+* changelog - rebase and transplant context menu support
+* changelog - transplanted changes link to their source, when possible
+* changelog - allow columns to be re-ordered
+* changelog - improve display of merge changesets
+* changelog - allow graph column to be resized past 500 pixels
+* changelog - less padding between changeset rows
+* changelog - per-branch coloring in the graph (toggleable)
+* changelog - show filelog graph if single file pattern specified #265
+* changelog - new "Select Revision" dialog and Navigate menu
+* changelog - new filter bar below toolbar, title indicates current filter
+* changelog - memory utilization improvements
+* changelog - refresh/load performance improvements
+* changelog - menu bar
+* datamine - improved rename support
+* datamine - view at revision, file history context menu options
+* status - menu bar
+* status - progress bar for repo.status() calls
+* status - add support for forget command
+* status - add a button for clearing file filter pattern
+* status - allow revert to discard changes
+* status - disable toolbar buttons when no files are checked
+* status - move refresh button #402
+* commit - text diff tab
+* commit - parent changeset indication
+* commit - use gtkspell on platforms that support it (Linux, etc)
+* commit - username entry, autoinclude, push-after-commit advanced bar
+* commit - uncommitted changes are unchecked
+* commit - QNew and Qrefresh improvements, 'patch contents' tab
+* commit - merge improvements
+* archive - new archive feature, from both 'hgtk archive' and the changelog menu
+* synch - shelve toolbar button
+* thgtaskbar - added --noicon command line argument
+* shelve - 'shelf contents' tab
+
+=== Bug fixes ===
+
+* changelog - clicking on cset links loads revisions if needed
+* status - catch IOErrors during repo.status
+* rename - fix error handling when no arguments specified
+* too many more to enumerate
+
+=== Installer / Source Changes ===
+
+* Spell Checker depends on gtkspell.  In Debian 5 it is included in the package
+python-gnome2-extras, in sid probably in python-gtkspell
+* [[http://code.google.com/p/iniparse/|iniparse]] was unbundled from the source repository
+* The hggtk and thgutil python packages were moved into tortoisehg/hgtk and tortoisehg/util, respectively
+
+
+
 = 0.8 Release July 1, 2009 =
 
 == C++ Shell Extension ==

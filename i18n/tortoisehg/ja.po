@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-11-25 15:36+0000\n"
-"PO-Revision-Date: 2009-11-26 13:46+0000\n"
-"Last-Translator: Yuki Kodama <Unknown>\n"
+"PO-Revision-Date: 2009-11-30 09:33+0000\n"
+"Last-Translator: NAKADA Nobuhiro <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-27 04:53+0000\n"
+"X-Launchpad-Export-Date: 2009-12-01 04:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -31,7 +31,7 @@ msgstr "終了"
 
 #: tortoisehg\hgtk\about.py:62
 msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr "一部アイコンはTortoiseSVNからの提供です"
+msgstr "一部のアイコンはTortoiseSVNからの提供です"
 
 #: tortoisehg\hgtk\about.py:66
 msgid "(version %s)"
@@ -39,11 +39,11 @@ msgstr "(バージョン %s)"
 
 #: tortoisehg\hgtk\about.py:69
 msgid "Copyright 2009 TK Soh and others"
-msgstr "Copyright 2009 TK Soh 他"
+msgstr "Copyright 2009 TK Soh & その他の人々"
 
 #: tortoisehg\hgtk\about.py:85
 msgid "with %s"
-msgstr "%s"
+msgstr "%s と共に"
 
 #: tortoisehg\hgtk\archive.py:20
 msgid "= Working Directory Parent ="
