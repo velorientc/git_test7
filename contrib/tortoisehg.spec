@@ -9,7 +9,7 @@ Summary:	Mercurial GUI command line tool hgtk
 Group:		Development/Tools
 License:	GPLv2
 # Few files are under the more permissive GPLv2+
-URL:		http://bitbucket.org/tortoisehg/stable/wiki/
+URL:		http://tortoisehg.org
 Source0:	%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # This package should be noarch, but we can't do it because the nautilus
