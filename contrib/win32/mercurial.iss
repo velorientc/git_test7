@@ -13,9 +13,9 @@ InfoAfterFile=contrib/win32/postinstall.txt
 LicenseFile=COPYING.txt
 ShowLanguageDialog=yes
 AppPublisher=Steve Borho and others
-AppPublisherURL=http://bitbucket.org/tortoisehg/stable/
-AppSupportURL=http://bitbucket.org/tortoisehg/stable/
-AppUpdatesURL=http://bitbucket.org/tortoisehg/stable/
+AppPublisherURL=http://tortoisehg.org/
+AppSupportURL=http://tortoisehg.org/
+AppUpdatesURL=http://tortoisehg.org/
 AppID=TortoiseHg
 AppContact=Steve Borho <steve@borho.org>
 OutputBaseFilename=TortoiseHg-{#VERSION}
@@ -86,8 +86,8 @@ Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShellx86.dll; Chec
 Source: ..\misc\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 
 [INI]
-Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http://www.selenic.com/mercurial/
-Filename: {app}\TortoiseHg.url; Section: InternetShortcut; Key: URL; String: http://bitbucket.org/tortoisehg/stable/
+Filename: {app}\Mercurial.url; Section: InternetShortcut; Key: URL; String: http://mercurial.selenic.com/
+Filename: {app}\TortoiseHg.url; Section: InternetShortcut; Key: URL; String: http://tortoisehg.org/
 
 [Icons]
 Name: {group}\Start Taskbar App; Filename: {app}\thgtaskbar.exe; Components: shell
