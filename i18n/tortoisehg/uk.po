@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-11-25 15:36+0000\n"
-"PO-Revision-Date: 2009-11-25 10:16+0000\n"
+"PO-Revision-Date: 2009-11-30 06:41+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-26 04:40+0000\n"
+"X-Launchpad-Export-Date: 2009-12-01 04:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -476,7 +476,7 @@ msgstr "Закрити поточну названу гілку"
 
 #: tortoisehg\hgtk\commit.py:144
 msgid "merging "
-msgstr ""
+msgstr "об'єднання "
 
 #: tortoisehg\hgtk\commit.py:150
 msgid " - qnew"
@@ -1539,7 +1539,7 @@ msgstr "Помилковий регулярний вираз"
 
 #: tortoisehg\hgtk\hginit.py:22
 msgid "TortoiseHg Init"
-msgstr ""
+msgstr "TortoiseHg Init"
 
 #: tortoisehg\hgtk\hginit.py:30
 msgid "Create"
@@ -2267,7 +2267,7 @@ msgstr "Місцевий трансплантант"
 
 #: tortoisehg\hgtk\history.py:748
 msgid "QImport Revision"
-msgstr ""
+msgstr "Швидкий імпорт редакція"
 
 #: tortoisehg\hgtk\history.py:749
 msgid "Strip Revision..."
@@ -2303,7 +2303,7 @@ msgstr "Зміна бази на крок вище вибраної"
 
 #: tortoisehg\hgtk\history.py:825
 msgid "QImport from here to selected"
-msgstr ""
+msgstr "Швидкий імпорт звідси до вибраної"
 
 #: tortoisehg\hgtk\history.py:829
 msgid "Select common ancestor revision"
@@ -3532,7 +3532,7 @@ msgstr "TortoiseHg Панель задач"
 
 #: tortoisehg\hgtk\taskbarui.py:32
 msgid "OK"
-msgstr ""
+msgstr "Гаразд"
 
 #: tortoisehg\hgtk\taskbarui.py:33 tortoisehg\hgtk\thgshelve.py:157
 msgid "Cancel"
