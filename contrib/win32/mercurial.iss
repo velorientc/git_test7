@@ -58,7 +58,7 @@ Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
 Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n
-Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Components: help
+Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ignoreversion; Components: help
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
 Source: contrib\win32\mercurialuser.ini; DestDir: {%USERPROFILE}; DestName: Mercurial.ini; AfterInstall: FileExpandStringEx('{%USERPROFILE}\Mercurial.ini'); Flags: onlyifdoesntexist 
@@ -71,8 +71,8 @@ Source: dist\*.exe; Excludes: thgtaskbar.exe; DestDir: {app}; Flags: ignoreversi
 Source: dist\thgtaskbar.exe; DestDir: {app}; Flags: ignoreversion; Components: shell
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion
 Source: dist\library.zip; DestDir: {app}
-Source: doc\build\pdf\*.pdf; DestDir: {app}/docs; Components: help
-Source: doc\build\chm\*.chm; DestDir: {app}/docs; Components: help
+Source: doc\build\pdf\*.pdf; DestDir: {app}/docs; Flags: ignoreversion; Components: help
+Source: doc\build\chm\*.chm; DestDir: {app}/docs; Flags: ignoreversion; Components: help
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
@@ -80,7 +80,7 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags: recursesubdirs createallsubdirs
 Source: win32\*.reg; DestDir: {app}\cmenu_i18n
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
-Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Components: hgbook
+Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Flags: ignoreversion; Components: hgbook
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShellx86.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 Source: ..\misc\ThgShellx64.dll; DestDir: {app}; DestName: ThgShell.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
