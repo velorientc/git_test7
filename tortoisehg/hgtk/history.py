@@ -1583,6 +1583,8 @@ class GLog(gdialog.GDialog):
         dlg.hide()
 
     def vdiff_change(self, menuitem, pats=[]):
+        if self.currevid is None:
+            return
         rev = self.currevid
         opts = {'change':str(rev), 'bundle':self.bfile}
         parents = self.repo[rev].parents()
