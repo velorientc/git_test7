@@ -57,27 +57,27 @@ Source: ..\build-hg\contrib\hgk; DestDir: {app}/contrib
 Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
 Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
-Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n; Flags:
-Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ; Components: help
+Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n
+Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Components: help
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
 Source: contrib\win32\mercurialuser.ini; DestDir: {%USERPROFILE}; DestName: Mercurial.ini; AfterInstall: FileExpandStringEx('{%USERPROFILE}\Mercurial.ini'); Flags: onlyifdoesntexist 
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
-Source: ..\contrib\*.exe; DestDir: {app}; Flags: 
-Source: ..\contrib\*.dll; DestDir: {app}; Flags: 
+Source: ..\contrib\*.exe; DestDir: {app}
+Source: ..\contrib\*.dll; DestDir: {app}
 Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays
 Source: contrib\refreshicons.cmd; DestDir: {app}/contrib
 Source: dist\*.exe; Excludes: thgtaskbar.exe; DestDir: {app}; Flags: ignoreversion
 Source: dist\thgtaskbar.exe; DestDir: {app}; Flags: ignoreversion; Components: shell
 Source: dist\*.dll; DestDir: {app}; Flags: ignoreversion
 Source: dist\library.zip; DestDir: {app}
-Source: doc\build\pdf\*.pdf; DestDir: {app}/docs; Flags: ; Components: help
-Source: doc\build\chm\*.chm; DestDir: {app}/docs; Flags: ; Components: help
+Source: doc\build\pdf\*.pdf; DestDir: {app}/docs; Components: help
+Source: doc\build\chm\*.chm; DestDir: {app}/docs; Components: help
 Source: icons\*; DestDir: {app}\icons; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: dist\gtk\*; DestDir: {app}\gtk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: i18n\*.*; DestDir: {app}\i18n; Flags: recursesubdirs createallsubdirs
-Source: win32\*.reg; DestDir: {app}\cmenu_i18n;
+Source: win32\*.reg; DestDir: {app}\cmenu_i18n
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
 Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Components: hgbook
@@ -101,8 +101,6 @@ Name: {group}\Mercurial Web Site; Filename: {app}\Mercurial.url
 Name: {group}\Uninstall TortoiseHg; Filename: {uninstallexe}
 
 [Run]
-;Filename: {tmp}\vcredist_x86.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and not Is64BitInstallMode
-;Filename: {tmp}\vcredist_x64.exe; Parameters: /q; Check: ShouldInstallVCPPSP1 and Is64BitInstallMode
 Filename: {app}\add_path.exe; Parameters: {app}; StatusMsg: Adding the installation path to the search path...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-win32.msi"" /qn /norestart ALLUSERS=1"; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
 Filename: msiexec.exe; Parameters: "/i ""{app}\TortoiseOverlays\TortoiseOverlays-1.0.6.16523-x64.msi"" /qn /norestart ALLUSERS=1"; Check: Is64BitInstallMode; Components: shell; StatusMsg: Installing TortoiseOverlays.dll ...
@@ -136,12 +134,6 @@ begin
 end;
 
 var IsUpgrade: Boolean;
-var SP1Missing: Boolean;
-
-function ShouldInstallVCPPSP1(): Boolean;
-begin
-    Result := SP1Missing;
-end;
 
 function InitializeSetup(): Boolean;
 var
@@ -168,10 +160,6 @@ begin
     Result := False; {quit and abort installation}
   end;
  end;
-
- {Detect whether VC2005-SP1 Redistributable package is installed}
- if (not(RegValueExists(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v2.0.50727', 'SP'))) then
-    SP1Missing := True;
 end;
 
 var UserInfoPage: TInputQueryWizardPage;
