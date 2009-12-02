@@ -68,6 +68,8 @@ def set_tortoise_keys(window):
     window.connect('thg-close', thgclose)
     window.connect('thg-exit', thgexit)
 
+    return accelgroup, mod
+
 def thgexit(window):
     if thgclose(window):
         gobject.idle_add(hgtk.thgexit, window)
@@ -318,7 +320,7 @@ class NativeFolderSelectDialog:
         return fname
 
     def runCompatible(self):
-        dialog = gtk.FileChooserDialog(title=None,
+        dialog = gtk.FileChooserDialog(title=self.title,
                 action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                 buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))

@@ -559,6 +559,12 @@ class ConfigDialog(gtk.Dialog):
         self.connect('thg-accept', self.thgaccept)
         self.connect('delete-event', self.delete_event)
 
+        # wrapper box for padding
+        wrapbox = gtk.VBox()
+        wrapbox.set_border_width(5)
+        self.vbox.pack_start(wrapbox, False, False)
+
+        # create combo to select the target
         combo = gtk.combo_box_new_text()
         combo.append_text(_('User global settings'))
         if repo:
@@ -570,12 +576,15 @@ class ConfigDialog(gtk.Dialog):
         edit = gtk.Button(_('Edit File'))
         hbox.pack_start(edit, False, False, 2)
         edit.connect('clicked', self.edit_clicked)
-        self.vbox.pack_start(hbox, False, False, 4)
+        wrapbox.pack_start(hbox, False, False, 1)
+
+        # insert padding of between combo and notebook
+        wrapbox.pack_start(gtk.VBox(), False, False, 3)
 
         # Create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
-        self.vbox.pack_start(notebook, True, True)
+        wrapbox.pack_start(notebook, True, True)
         notebook.show()
         self.show_tabs = True
         self.show_border = True
@@ -1064,6 +1073,14 @@ class ConfigDialog(gtk.Dialog):
                     break
                 except (IOError, OSError):
                     pass
+            else:
+                gdialog.Prompt(_('Unable to create a Mercurial.ini file'),
+                       _('Insufficient access rights, reverting to read-only'
+                         'mode.'), self).run()
+                from mercurial import config
+                self.fn = rcpath[0]
+                cfg = config.config()
+                return cfg
         self.fn = fn
         try:
             import iniparse
