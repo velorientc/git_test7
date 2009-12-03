@@ -911,7 +911,11 @@ STDMETHODIMP_(ULONG) CShellExtCMenu::Release()
 
 STDMETHODIMP CShellExtCMenu::QueryInterface(REFIID riid, LPVOID FAR* ppv)
 {    
+    if (ppv == 0)
+        return E_POINTER;
+
     *ppv = NULL;
+
     if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
     {
         *ppv = (LPSHELLEXTINIT) this;

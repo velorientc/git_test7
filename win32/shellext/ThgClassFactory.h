@@ -28,6 +28,9 @@ public:
     STDMETHODIMP QueryInterface(
         REFIID riid, LPVOID FAR* ppv)
     {
+        if (ppv == 0)
+           return E_POINTER;
+
         *ppv = NULL;
 
         if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
@@ -62,6 +65,9 @@ public:
     STDMETHODIMP CreateInstance(
         LPUNKNOWN pUnkOuter, REFIID riid, LPVOID* ppvObj)
     {
+        if (ppvObj == 0)
+            return E_POINTER;
+
         *ppvObj = NULL;
 
         if (pUnkOuter)

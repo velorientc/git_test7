@@ -89,7 +89,11 @@ STDMETHODIMP_(ULONG) CShellExtOverlay::Release()
 
 STDMETHODIMP CShellExtOverlay::QueryInterface(REFIID riid, LPVOID FAR* ppv)
 {    
+    if (ppv == 0)
+        return E_POINTER;
+
     *ppv = NULL;
+
     if (IsEqualIID(riid, IID_IShellIconOverlayIdentifier) 
         || IsEqualIID(riid, IID_IUnknown) )
     {
