@@ -387,9 +387,9 @@ class ChangeSet(gdialog.GDialog):
         offset += len(txt.decode('utf-8'))
         for l1 in difflines[1:]:
             l = hglib.toutf(l1)
-            if l.startswith('+++'):
+            if l.startswith('--- '):
                 continue
-            if l.startswith('---'):
+            if l.startswith('+++ '):
                 continue
             if l.startswith('@@'):
                 tag = 'blue'
