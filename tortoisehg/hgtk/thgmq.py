@@ -183,7 +183,7 @@ class MQWidget(gtk.VBox):
 
         addcol(_('#'), MQ_INDEX, right=True)
         addcol(_('st'), MQ_STATUS)
-        addcol(_('Name'), MQ_NAME, editfunc=cell_edited)
+        addcol(_('Patch'), MQ_NAME, editfunc=cell_edited)
         addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
         pane.add(self.list)
@@ -318,6 +318,7 @@ class MQWidget(gtk.VBox):
         [MQ] Execute 'qdelete' command.
 
         patch: the patch name or an index to specify the patch.
+        keep: if True, use '--keep' option. (default: False)
         """
         if not self.has_patch():
             return
@@ -564,18 +565,17 @@ class MQWidget(gtk.VBox):
         is_next = row[MQ_INDEX] == self.number_applied()
 
         if is_operable and not is_qtip and (not is_qparent or has_applied):
-            append(_('_goto'), self.goto_activated)
+            append(_('_Goto'), self.goto_activated)
         if has_patch and not is_qparent:
-            append(_('_rename'), self.rename_activated)
+            append(_('_Rename'), self.rename_activated)
         if has_applied and not is_qparent:
-            append(_('_finish applied'), self.finish_activated)
+            append(_('_Finish Applied'), self.finish_activated)
         if not is_applied and not is_qparent:
-            append(_('_delete'), self.delete_activated)
-            append(_('delete --keep'), self.delete_keep_activated)
+            append(_('_Delete'), self.delete_activated)
             if has_applied and not is_qparent:
-                append(_('f_old'), self.fold_activated)
+                append(_('F_old'), self.fold_activated)
             if self.hasqup and not is_next:
-                append(_('make it _next'), self.mknext_activated)
+                append(_('Make It _Next'), self.mknext_activated)
 
         if len(menu.get_children()) > 0:
             menu.show_all()
@@ -609,10 +609,9 @@ class MQWidget(gtk.VBox):
 
         self.vmenu = {}
 
-        colappend(_('Show index'), MQ_INDEX)
-        colappend(_('Show status'), MQ_STATUS, active=False)
-        colappend(_('Show name'), MQ_NAME)
-        colappend(_('Show summary'), MQ_SUMMARY, active=False)
+        colappend(_('Show Index'), MQ_INDEX)
+        colappend(_('Show Status'), MQ_STATUS, active=False)
+        colappend(_('Show Summary'), MQ_SUMMARY, active=False)
 
         append(sep=True)
 
@@ -650,6 +649,8 @@ class MQWidget(gtk.VBox):
             self.emit('repo-invalidated')
 
     def do_get_property(self, property):
+        if property.name == 'name-column-visible':
+            return True
         try:
             return self.vmenu[property.name].get_active()
         except:
@@ -729,9 +730,6 @@ class MQWidget(gtk.VBox):
     def delete_activated(self, menuitem, row):
         self.qdelete(row[MQ_NAME])
 
-    def delete_keep_activated(self, menuitem, row):
-        self.qdelete(row[MQ_NAME], keep=True)
-    
     def rename_activated(self, menuitem, row):
         self.qrename_ui(row[MQ_NAME])
 
