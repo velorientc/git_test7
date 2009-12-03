@@ -683,8 +683,9 @@ class ChangeSet(gdialog.GDialog):
             return gtk.gdk.pixbuf_new_from_file_at_size(
                 iconpath, iconw, iconh)
 
-        addedpixbuf = get_pixbuf('menuadd.ico')
-        removedpixbuf = get_pixbuf('menudelete.ico')
+        addedpixbuf = get_pixbuf('fileadd.ico')
+        removedpixbuf = get_pixbuf('filedelete.ico')
+        modifiedpixbuf = get_pixbuf('filemodify.ico')
 
         def cell_seticon(column, cell, model, iter):
             state = model.get_value(iter, 0)
@@ -693,6 +694,8 @@ class ChangeSet(gdialog.GDialog):
                 pixbuf = addedpixbuf
             elif state == 'R':
                 pixbuf = removedpixbuf
+            elif state == 'M':
+                pixbuf = modifiedpixbuf
             cell.set_property('pixbuf', pixbuf)
 
         column.set_cell_data_func(iconcell, cell_seticon)
