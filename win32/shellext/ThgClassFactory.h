@@ -77,7 +77,11 @@ public:
         if (NULL == pShellExt)
             return E_OUTOFMEMORY;
 
-        return pShellExt->QueryInterface(riid, ppvObj);
+        const HRESULT hr = pShellExt->QueryInterface(riid, ppvObj);
+        if (FAILED(hr))
+            delete pShellExt;
+
+        return hr;
     }
 
 
