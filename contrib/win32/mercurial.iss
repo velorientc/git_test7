@@ -55,7 +55,8 @@ Source: ..\build-hg\contrib\vim\*.*; DestDir: {app}/contrib/vim
 Source: ..\build-hg\contrib\zsh_completion; DestDir: {app}/contrib
 Source: ..\build-hg\contrib\hgk; DestDir: {app}/contrib
 Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
-Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
+Source: ..\build-hg\mercurial\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
+Source: ..\build-hg\mercurial\help\*.txt; DestDir: {app}\docs\help; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n
 Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ignoreversion; Components: help
