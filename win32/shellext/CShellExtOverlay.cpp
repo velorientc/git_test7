@@ -103,7 +103,7 @@ STDMETHODIMP CShellExtOverlay::QueryInterface(REFIID riid, LPVOID FAR* ppv)
     if (*ppv)
     {
         AddRef();
-        return NOERROR;
+        return S_OK;
     }
 
     return E_NOINTERFACE;

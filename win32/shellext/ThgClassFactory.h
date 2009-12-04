@@ -37,7 +37,7 @@ public:
         {
             *ppv = (LPCLASSFACTORY) this;
             AddRef();
-            return NOERROR;
+            return S_OK;
         }
 
         return E_NOINTERFACE;
@@ -87,7 +87,7 @@ public:
 
     STDMETHODIMP LockServer(BOOL fLock)
     {
-        return NOERROR;
+        return S_OK;
     }
 
 };
