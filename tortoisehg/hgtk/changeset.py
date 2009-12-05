@@ -680,6 +680,9 @@ class ChangeSet(gdialog.GDialog):
 
         def get_pixbuf(iconfilename):
             iconpath = paths.get_tortoise_icon(iconfilename)
+            if iconpath == None:
+                raise (_("could not open icon file '%s' (check install)") 
+                            % iconfilename)
             return gtk.gdk.pixbuf_new_from_file_at_size(
                 iconpath, iconw, iconh)
 
