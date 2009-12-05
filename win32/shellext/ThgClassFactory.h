@@ -28,13 +28,16 @@ public:
     STDMETHODIMP QueryInterface(
         REFIID riid, LPVOID FAR* ppv)
     {
+        if (ppv == 0)
+           return E_POINTER;
+
         *ppv = NULL;
 
         if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
         {
             *ppv = (LPCLASSFACTORY) this;
             AddRef();
-            return NOERROR;
+            return S_OK;
         }
 
         return E_NOINTERFACE;
@@ -62,6 +65,9 @@ public:
     STDMETHODIMP CreateInstance(
         LPUNKNOWN pUnkOuter, REFIID riid, LPVOID* ppvObj)
     {
+        if (ppvObj == 0)
+            return E_POINTER;
+
         *ppvObj = NULL;
 
         if (pUnkOuter)
@@ -71,13 +77,17 @@ public:
         if (NULL == pShellExt)
             return E_OUTOFMEMORY;
 
-        return pShellExt->QueryInterface(riid, ppvObj);
+        const HRESULT hr = pShellExt->QueryInterface(riid, ppvObj);
+        if (FAILED(hr))
+            delete pShellExt;
+
+        return hr;
     }
 
 
     STDMETHODIMP LockServer(BOOL fLock)
     {
-        return NOERROR;
+        return S_OK;
     }
 
 };

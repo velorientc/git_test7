@@ -359,7 +359,7 @@ CShellExtCMenu::QueryContextMenu(
         bAppendItems = FALSE;
 
     if (!bAppendItems)
-        return NOERROR;
+        return S_OK;
 
     const std::size_t sz = sizeof(menuDescList) / sizeof(MenuDescription);
     bool promoted[sz];
@@ -535,7 +535,7 @@ CShellExtCMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         if (iter != MenuIdMap.end())
         {
             DoHgtk(iter->second.name);
-            hr = NOERROR;
+            hr = S_OK;
         }
         else
         {
@@ -726,10 +726,10 @@ CShellExtCMenu::HandleMenuMsg2(
         break;
 
     default:
-        return NOERROR;
+        return S_OK;
     }
 
-    return NOERROR;
+    return S_OK;
 }
 
 
@@ -874,7 +874,7 @@ STDMETHODIMP CShellExtCMenu::Initialize(
         myFolder = name;
     }
 
-    return NOERROR;
+    return S_OK;
 }
 
 
@@ -911,7 +911,11 @@ STDMETHODIMP_(ULONG) CShellExtCMenu::Release()
 
 STDMETHODIMP CShellExtCMenu::QueryInterface(REFIID riid, LPVOID FAR* ppv)
 {    
+    if (ppv == 0)
+        return E_POINTER;
+
     *ppv = NULL;
+
     if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
     {
         *ppv = (LPSHELLEXTINIT) this;
@@ -932,7 +936,7 @@ STDMETHODIMP CShellExtCMenu::QueryInterface(REFIID riid, LPVOID FAR* ppv)
     if (*ppv)
     {
         AddRef();
-        return NOERROR;
+        return S_OK;
     }
 
     return E_NOINTERFACE;

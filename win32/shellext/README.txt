@@ -27,29 +27,25 @@ section "4.4.2 Setting Build Environment Switches" after install)
 
 === Building the x86 (32 bit) target ===
 
-Click on "Start -> All Programs -> Microsoft Windows SDK v7.0 -> CMD Shell"
-
-This will open a command shell.
+Open a command shell and cd into win32/shellext of the TortoiseHg sources.
 
 Copy/paste the following line (including the double quotes) into that shell
 
-"C:\Program Files\Microsoft SDKs\Windows\v7.0\Bin\setenv.cmd" /xp /x86 /Release
+cmd.exe /E:ON /V:ON /K "C:\Program Files\Microsoft SDKs\Windows\v7.0\Bin\SetEnv.cmd" /xp /x86 /Release
 
 and execute it (see ReleaseNotes.Htm).
 
-This will show the following in your shell
+This should show the following in your shell
 
 '''
 Setting SDK environment relative to C:\Program Files\Microsoft SDKs\Windows\v7.0.
 Targeting Windows XP x86 RELEASE
-
-C:\Program Files\Microsoft SDKs\Windows\v7.0>
 '''
 
-Then cd into the win32/shellext of the TortoiseHg sources and execute
-  
+Then execute
+
   nmake /f Makefile.nmake clean
-  
+
 followed by
 
   nmake /f Makefile.nmake
@@ -57,23 +53,19 @@ followed by
 Which should go like this:
 
 '''
-C:\Program Files\Microsoft SDKs\Windows\v7.0>cd C:\Users\adi\hgrepos\thg-stable\win32\shellext
-
-C:\Users\adi\hgrepos\thg-stable\win32\shellext>nmake /f Makefile.nmake clean
+$ nmake /f Makefile.nmake clean
 
 Microsoft (R) Program Maintenance Utility Version 9.00.30729.01
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
         del *.obj *.dll *.exe *.lib *.exp *.manifest
 
-C:\Users\adi\hgrepos\thg-stable\win32\shellext>nmake /f Makefile.nmake
+$ nmake /f Makefile.nmake
 
 Microsoft (R) Program Maintenance Utility Version 9.00.30729.01
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
-        cl /nologo /Ox /W2 /EHsc /MT /DAPPMAIN /DTHG_DEBUG /c TortoiseUtils.cpp Direntry.cpp Directory.cpp Winstat.cpp ThgDebug.cpp
- InitStatus.cpp CShellExtCMenu.cpp CShellExtOverlay.cpp ShellExt.cpp StringUtils.cpp dirstate.cpp Winstat64.cpp Dirstatecache.cpp D
-irectoryStatus.cpp Thgstatus.cpp QueryDirstate.cpp
+        cl /nologo /Ox /W2 /EHsc /MT /DAPPMAIN /DTHG_DEBUG /c TortoiseUtils.cpp Direntry.cpp Directory.cpp Winstat.cpp ThgDebug.cpp InitStatus.cpp CShellExtCMenu.cpp CShellExtOverlay.cpp IconBitmapUtils.cpp Registry.cpp ShellExt.cpp StringUtils.cpp SysInfo.cpp dirstate.cpp Winstat64.cpp Dirstatecache.cpp DirectoryStatus.cpp Thgstatus.cpp QueryDirstate.cpp
 TortoiseUtils.cpp
 Direntry.cpp
 Directory.cpp
@@ -82,8 +74,11 @@ ThgDebug.cpp
 InitStatus.cpp
 CShellExtCMenu.cpp
 CShellExtOverlay.cpp
+IconBitmapUtils.cpp
+Registry.cpp
 ShellExt.cpp
 StringUtils.cpp
+SysInfo.cpp
 dirstate.cpp
 Winstat64.cpp
 Dirstatecache.cpp
@@ -91,16 +86,11 @@ DirectoryStatus.cpp
 Thgstatus.cpp
 QueryDirstate.cpp
 Generating Code...
-        link /OUT:THgShell.dll /nologo /INCREMENTAL:NO /MANIFEST User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib /DLL /DE
-F:ShellExt.def TortoiseUtils.obj Direntry.obj Directory.obj Winstat.obj ThgDebug.obj InitStatus.obj CShellExtCMenu.obj CShellExtOve
-rlay.obj ShellExt.obj StringUtils.obj dirstate.obj Winstat64.obj Dirstatecache.obj DirectoryStatus.obj Thgstatus.obj QueryDirstate.
-obj
-ShellExt.def(4) : warning LNK4017: DESCRIPTION statement not supported for the target platform; ignored
+        link /OUT:THgShell.dll /nologo /INCREMENTAL:NO /MANIFEST shlwapi.lib gdiplus.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /DLL /DEF:ShellExt.def TortoiseUtils.obj Direntry.obj Directory.obj Winstat.obj
+ThgDebug.obj InitStatus.obj CShellExtCMenu.obj CShellExtOverlay.obj IconBitmapUtils.obj Registry.obj ShellExt.obj StringUtils.obj SysInfo.obj dirstate.obj
+Winstat64.obj Dirstatecache.obj DirectoryStatus.obj Thgstatus.obj QueryDirstate.obj
    Creating library THgShell.lib and object THgShell.exp
         mt -nologo -manifest THgShell.dll.manifest -outputresource:"THgShell.dll;#2"
-        link /OUT:dirstate.exe /nologo /INCREMENTAL:NO /MANIFEST User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib /SUBSYST
-EM:CONSOLE dirstate.obj TortoiseUtils.obj Direntry.obj Directory.obj Winstat.obj ThgDebug.obj
-        mt -nologo -manifest dirstate.exe.manifest -outputresource:"dirstate.exe;#1"
 '''
 
 This should produce the file THgShell.dll, which contains the 32 bit variant of the
@@ -113,26 +103,22 @@ to something else (e.g. THgShell-01.dll), then copy the newly built THgShell.dll
 
 === Building the 64 bit target ===
 
-Click on "Start -> All Programs -> Microsoft Windows SDK v7.0 -> CMD Shell"
-
-This will open a command shell.
+Open a command shell and cd into win32/shellext of the TortoiseHg sources.
 
 Copy/paste the following line (including the double quotes) into that shell
 
-"C:\Program Files\Microsoft SDKs\Windows\v7.0\Bin\setenv.cmd" /xp /x64 /Release
+cmd.exe /E:ON /V:ON /K "C:\Program Files\Microsoft SDKs\Windows\v7.0\Bin\SetEnv.cmd" /xp /x64 /Release
 
 and execute it (see ReleaseNotes.Htm).
 
-This will show the following in your shell
+This should show the following in your shell
 
 '''
 Setting SDK environment relative to C:\Program Files\Microsoft SDKs\Windows\v7.0.
 Targeting Windows XP x64 RELEASE
-
-C:\Program Files\Microsoft SDKs\Windows\v7.0>
 '''
 
-Then cd into the win32/shellext of the TortoiseHg sources and execute
+Then execute
   
   nmake /f Makefile.nmake clean
   
@@ -143,23 +129,19 @@ followed by
 Which should go like this:
 
 '''
-C:\Program Files\Microsoft SDKs\Windows\v7.0>cd C:\Users\adi\hgrepos\thg-stable\win32\shellext
-
-C:\Users\adi\hgrepos\thg-stable\win32\shellext>nmake /f Makefile.nmake clean
+$ nmake /f Makefile.nmake clean
 
 Microsoft (R) Program Maintenance Utility Version 9.00.30729.01
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
         del *.obj *.dll *.exe *.lib *.exp *.manifest
 
-C:\Users\adi\hgrepos\thg-stable\win32\shellext>nmake /f Makefile.nmake
+$ nmake /f Makefile.nmake
 
 Microsoft (R) Program Maintenance Utility Version 9.00.30729.01
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
-        cl /nologo /Ox /W2 /EHsc /MT /DAPPMAIN /DTHG_DEBUG /c TortoiseUtils.cpp Direntry.cpp Directory.cpp Winstat.cpp ThgDebug.cpp
- InitStatus.cpp CShellExtCMenu.cpp CShellExtOverlay.cpp ShellExt.cpp StringUtils.cpp dirstate.cpp Winstat64.cpp Dirstatecache.cpp D
-irectoryStatus.cpp Thgstatus.cpp QueryDirstate.cpp
+        cl /nologo /Ox /W2 /EHsc /MT /DAPPMAIN /DTHG_DEBUG /c TortoiseUtils.cpp Direntry.cpp Directory.cpp Winstat.cpp ThgDebug.cpp InitStatus.cpp CShellExtCMenu.cpp CShellExtOverlay.cpp IconBitmapUtils.cpp Registry.cpp ShellExt.cpp StringUtils.cpp SysInfo.cpp dirstate.cpp Winstat64.cpp Dirstatecache.cpp DirectoryStatus.cpp Thgstatus.cpp QueryDirstate.cpp
 TortoiseUtils.cpp
 Direntry.cpp
 Directory.cpp
@@ -168,8 +150,11 @@ ThgDebug.cpp
 InitStatus.cpp
 CShellExtCMenu.cpp
 CShellExtOverlay.cpp
+IconBitmapUtils.cpp
+Registry.cpp
 ShellExt.cpp
 StringUtils.cpp
+SysInfo.cpp
 dirstate.cpp
 Winstat64.cpp
 Dirstatecache.cpp
@@ -177,16 +162,11 @@ DirectoryStatus.cpp
 Thgstatus.cpp
 QueryDirstate.cpp
 Generating Code...
-        link /OUT:THgShell.dll /nologo /INCREMENTAL:NO /MANIFEST User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib /DLL /DE
-F:ShellExt.def TortoiseUtils.obj Direntry.obj Directory.obj Winstat.obj ThgDebug.obj InitStatus.obj CShellExtCMenu.obj CShellExtOve
-rlay.obj ShellExt.obj StringUtils.obj dirstate.obj Winstat64.obj Dirstatecache.obj DirectoryStatus.obj Thgstatus.obj QueryDirstate.
-obj
-ShellExt.def(4) : warning LNK4017: DESCRIPTION statement not supported for the target platform; ignored
+        link /OUT:THgShell.dll /nologo /INCREMENTAL:NO /MANIFEST shlwapi.lib gdiplus.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /DLL /DEF:ShellExt.def TortoiseUtils.obj Direntry.obj Directory.obj Winstat.obj
+ThgDebug.obj InitStatus.obj CShellExtCMenu.obj CShellExtOverlay.obj IconBitmapUtils.obj Registry.obj ShellExt.obj StringUtils.obj SysInfo.obj dirstate.obj
+Winstat64.obj Dirstatecache.obj DirectoryStatus.obj Thgstatus.obj QueryDirstate.obj
    Creating library THgShell.lib and object THgShell.exp
         mt -nologo -manifest THgShell.dll.manifest -outputresource:"THgShell.dll;#2"
-        link /OUT:dirstate.exe /nologo /INCREMENTAL:NO /MANIFEST User32.lib Ole32.lib Shlwapi.lib Shell32.lib Advapi32.lib /SUBSYST
-EM:CONSOLE dirstate.obj TortoiseUtils.obj Direntry.obj Directory.obj Winstat.obj ThgDebug.obj
-        mt -nologo -manifest dirstate.exe.manifest -outputresource:"dirstate.exe;#1"
 '''
 
 This should produce the file THgShell.dll, which contains the 64 bit variant of the

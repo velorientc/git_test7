@@ -77,6 +77,13 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     LPWSTR   pwszShellExt;
     StringFromIID(rclsid, &pwszShellExt);
     TDEBUG_TRACE("DllGetClassObject clsid = " << WideToMultibyte(pwszShellExt));
+
+    if (ppvOut == 0)
+    {
+        TDEBUG_TRACE("**** DllGetClassObject: error: ppvOut is 0");
+        return E_POINTER;
+    }
+
     *ppvOut = NULL;
 
     typedef ThgClassFactory<CShellExtOverlay> FactOvl;
