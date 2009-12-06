@@ -30,8 +30,8 @@ try:
 except ImportError:
     config_nofork = None
 
-nonrepo_commands = '''userconfig clone debugcomplete init about help
-version thgstatus serve'''
+nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
+about help version thgstatus serve'''
 
 # Add TortoiseHg signals, hooked to key accelerators in gtklib
 for sig in ('copy-clipboard', 'thg-diff', 'thg-parent', 'thg-rename',
@@ -327,6 +327,11 @@ def userconfig(ui, *pats, **opts):
 def repoconfig(ui, *pats, **opts):
     """repository configuration editor"""
     from tortoisehg.hgtk.thgconfig import run
+    gtkrun(run, ui, *pats, **opts)
+
+def shellconfig(ui, *pats, **opts):
+    """Explorer extension configuration editor"""
+    from tortoisehg.hgtk.shellconf import run
     gtkrun(run, ui, *pats, **opts)
 
 def rename(ui, *pats, **opts):
@@ -708,3 +713,7 @@ table = {
         ('hgtk archive')),
     "^strip": (strip, [], ('hgtk strip [REV]')),
 }
+
+if os.name == 'nt':
+    # TODO: extra detection to determine if shell extension is installed
+    table['shellconfig'] = (shellconfig, [], _('hgtk shellconfig'))

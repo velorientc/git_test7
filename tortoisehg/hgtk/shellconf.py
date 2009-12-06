@@ -1,4 +1,4 @@
-# taskbarui.py - User interface for the TortoiseHg shell extension settings
+# shellconf.py - User interface for the TortoiseHg shell extension settings
 #
 # Copyright 2009 Steve Borho <steve@borho.org>
 #
@@ -10,14 +10,10 @@ import gtk
 import gobject
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, settings, menuthg
+from tortoisehg.util import menuthg
 from tortoisehg.hgtk import gtklib
 
-shellcmds = '''about add clone commit datamine init log recovery
-shelve synch status thgstatus userconf repoconf remove rename
-revert serve update vdiff'''.split()
-
-class TaskBarUI(gtk.Window):
+class ShellConfigWindow(gtk.Window):
     'User interface for the TortoiseHg taskbar application'
     def __init__(self):
         'Initialize the Dialog'
@@ -302,3 +298,6 @@ class TaskBarUI(gtk.Window):
     def ovenable_toggled(self, check):
         self.lclonly.set_sensitive(check.get_active())
         self.apply.set_sensitive(True)
+
+def run(ui, *pats, **opts):
+    return ShellConfigWindow()
