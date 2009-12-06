@@ -191,6 +191,7 @@ class patchctx(object):
     def tags(self): return ()
     def parents(self): return self._parents
     def children(self): return ()
+    def extra(self): return {}
 
 class SummaryInfo(object):
 
