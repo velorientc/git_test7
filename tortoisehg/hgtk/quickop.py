@@ -269,11 +269,9 @@ class QuickOpDialog(gtk.Dialog):
         if not list:
             gtklib.idle_add_single_call(self.response, gtk.RESPONSE_CLOSE)
             return
-
         cmdline = ['hg', self.command, '--verbose'] + list
-        if self.nobackup.get_active():
+        if hasattr(self, 'nobackup') and self.nobackup.get_active():
             cmdline.append('--no-backup')
-
         def cmd_done(returncode, useraborted):
             self.switch_to(MODE_NORMAL, cmd=False)
             if returncode == 0:
