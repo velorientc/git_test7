@@ -13,7 +13,7 @@ import gtk
 import binascii
 
 from mercurial import patch, util, error
-from mercurial.node import short, hex
+from mercurial.node import hex
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -171,7 +171,7 @@ class patchctx(object):
     def __str__(self):
         node = self.node()
         if node:
-            return short(node)
+            return node[:12]
         return ''
 
     def __int__(self):
@@ -322,7 +322,10 @@ class SummaryInfo(object):
             if item == 'rev':
                 revnum, revid = value
                 revid = gtklib.markup(revid, **mono)
-                return '%s (%s)' % (revnum, revid)
+                if revnum:
+                    return '%s (%s)' % (revnum, revid)
+                else:
+                    return '%s' % revid
             elif item in ('revid', 'transplant'):
                 return gtklib.markup(value, **mono)
             elif item == 'revnum':
