@@ -230,6 +230,9 @@ begin
   TaskbarMutex := 'thgtaskbar,Global\thgtaskbar';
   tries := 0;
   while (tries < 4) and CheckForMutexes(TaskbarMutex) do begin
+    TaskbarWindow := FindWindowByWindowName('TortoiseHg Overlay Icon Server');
+    if TaskbarWindow <> 0 then
+      SendMessage(TaskbarWindow, wm_Close, 0, 0);
     TaskbarWindow := FindWindowByWindowName('TortoiseHg RPC server');
     if TaskbarWindow <> 0 then
       SendMessage(TaskbarWindow, wm_Close, 0, 0);
