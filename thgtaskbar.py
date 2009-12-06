@@ -93,7 +93,9 @@ class MainWindow:
         self._DoCreateIcons()
 
     def _DoCreateIcons(self):
-        SetIcon(self.hwnd, "hg.ico", add=True)
+        show, highlight = get_config()
+        if show:
+            SetIcon(self.hwnd, "hg.ico", add=True)
         # start namepipe server for hg status
         self.start_pipe_server()
 
@@ -244,16 +246,19 @@ def update_batch(batch):
 requests = Queue.Queue(0)
 
 def get_config():
+    show_taskbaricon = True
     hgighlight_taskbaricon = True
     try:
         from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
         hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
         t = ('1', 'True')
+        try: show_taskbaricon = QueryValueEx(hkey, 'ShowTaskbarIcon')[0] in t
+        except EnvironmentError: pass
         try: hgighlight_taskbaricon = QueryValueEx(hkey, 'HighlightTaskbarIcon')[0] in t
         except EnvironmentError: pass
     except (ImportError, WindowsError):
         pass
-    return hgighlight_taskbaricon
+    return (show_taskbaricon, hgighlight_taskbaricon)
 
 def update(args, hwnd):
     batch = []
@@ -261,8 +266,8 @@ def update(args, hwnd):
     print "got update request %s (first in batch)" % r
     batch.append(r)
     print "wait a bit for additional requests..."
-    highlight = get_config()
-    if highlight:
+    show, highlight = get_config()
+    if show and highlight:
         SetIcon(hwnd, "hgB.ico")
     time.sleep(0.2)
     deferred_requests = []
@@ -283,7 +288,7 @@ def update(args, hwnd):
     msg = "processing batch with %i update requests"
     print msg % len(batch)
     update_batch(batch)
-    if highlight:
+    if show and highlight:
         SetIcon(hwnd, "hg.ico")
 
 def remove(args):
@@ -431,8 +436,16 @@ def main():
     # see http://www.jrsoftware.org/iskb.php?mutexsessions
     installmutex1 = win32event.CreateMutex(sa, 1, INSTALLMUTEXNAME)
     installmutex2 = win32event.CreateMutex(sa, 1, 'Global\\' + INSTALLMUTEXNAME)
-    if len(args) >= 1:
-        logger.setfile(args[0])
+
+    logfilename = None
+    for arg in args:
+        if arg[0] == '-':
+            pass
+        else:
+            logfilename = arg
+    if logfilename:
+        logger.setfile(logfilename)
+
     w=MainWindow()
     PumpMessages()
 

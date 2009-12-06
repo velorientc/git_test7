@@ -120,6 +120,8 @@ class ShellConfigWindow(gtk.Window):
         taskbarframe.add(taskbarbox)
         hbox = gtk.HBox()
         taskbarbox.pack_start(hbox, False, False, 2)
+        self.show_taskbaricon = gtk.CheckButton(_('Show Icon'))
+        hbox.pack_start(self.show_taskbaricon, False, False, 2)        
         self.hgighlight_taskbaricon = gtk.CheckButton(_('Highlight Icon'))
         hbox.pack_start(self.hgighlight_taskbaricon, False, False, 2)        
 
@@ -133,6 +135,9 @@ class ShellConfigWindow(gtk.Window):
         tips.set_tip(self.lclonly, tooltip)
         self.lclonly.connect('toggled', lambda x: self.apply.set_sensitive(True))
 
+        tooltip = _('Show the taskbar icon (restart needed)')
+        tips.set_tip(self.show_taskbaricon, tooltip)
+        self.show_taskbaricon.connect('toggled', lambda x: self.apply.set_sensitive(True))
         tooltip = _('Highlight the taskbar icon during activity')
         tips.set_tip(self.hgighlight_taskbaricon, tooltip)
         self.hgighlight_taskbaricon.connect('toggled', lambda x: self.apply.set_sensitive(True))
@@ -187,6 +192,7 @@ class ShellConfigWindow(gtk.Window):
         overlayenable = True
         localdisks = False
         promoteditems = 'commit'
+        show_taskbaricon = True
         hgighlight_taskbaricon = True
         try:
             from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
@@ -195,6 +201,8 @@ class ShellConfigWindow(gtk.Window):
             try: overlayenable = QueryValueEx(hkey, 'EnableOverlays')[0] in t
             except EnvironmentError: pass
             try: localdisks = QueryValueEx(hkey, 'LocalDisksOnly')[0] in t
+            except EnvironmentError: pass
+            try: show_taskbaricon = QueryValueEx(hkey, 'ShowTaskbarIcon')[0] in t
             except EnvironmentError: pass
             try: hgighlight_taskbaricon = QueryValueEx(hkey, 'HighlightTaskbarIcon')[0] in t
             except EnvironmentError: pass
@@ -206,6 +214,7 @@ class ShellConfigWindow(gtk.Window):
         self.ovenable.set_active(overlayenable)
         self.lclonly.set_active(localdisks)
         self.lclonly.set_sensitive(overlayenable)
+        self.show_taskbaricon.set_active(show_taskbaricon)
         self.hgighlight_taskbaricon.set_active(hgighlight_taskbaricon)
 
         promoted = [pi.strip() for pi in promoteditems.split(',')]
@@ -223,6 +232,7 @@ class ShellConfigWindow(gtk.Window):
     def store_shell_configs(self):
         overlayenable = self.ovenable.get_active() and '1' or '0'
         localdisks = self.lclonly.get_active() and '1' or '0'
+        show_taskbaricon = self.show_taskbaricon.get_active() and '1' or '0'
         hgighlight_taskbaricon = self.hgighlight_taskbaricon.get_active() and '1' or '0'
         promoted = []
         for row in self.topmmodel:
@@ -232,6 +242,7 @@ class ShellConfigWindow(gtk.Window):
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
             SetValueEx(hkey, 'EnableOverlays', 0, REG_SZ, overlayenable)
             SetValueEx(hkey, 'LocalDisksOnly', 0, REG_SZ, localdisks)
+            SetValueEx(hkey, 'ShowTaskbarIcon', 0, REG_SZ, show_taskbaricon)
             SetValueEx(hkey, 'HighlightTaskbarIcon', 0, REG_SZ, hgighlight_taskbaricon)
             SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
         except ImportError:
