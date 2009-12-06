@@ -66,7 +66,7 @@ class ShellConfigWindow(gtk.Window):
         # Sub menus pane
         label = gtk.Label(_('Sub menu items:'))
         label.set_alignment(0, 0.5)
-        setcell(label, 0, 0)
+        setcell(label, 0, 2)
 
         # model: [0]hgcmd, [1]translated menu label
         self.submmodel = model = gtk.ListStore(gobject.TYPE_STRING,
@@ -80,12 +80,12 @@ class ShellConfigWindow(gtk.Window):
         cell = gtk.CellRendererText()
         column.pack_start(cell, True)
         column.add_attribute(cell, 'text', 1)
-        setcell(withframe(list), 1, 0)
+        setcell(withframe(list), 1, 2)
 
         # Top menus pane
         label = gtk.Label(_('Top menu items:'))
         label.set_alignment(0, 0.5)
-        setcell(label, 0, 2)
+        setcell(label, 0, 0)
 
         # model: [0]hgcmd, [1]translated menu label
         self.topmmodel = model = gtk.ListStore(gobject.TYPE_STRING,
@@ -99,16 +99,16 @@ class ShellConfigWindow(gtk.Window):
         cell = gtk.CellRendererText()
         column.pack_start(cell, True)
         column.add_attribute(cell, 'text', 1)
-        setcell(withframe(list), 1, 2)
+        setcell(withframe(list), 1, 0)
 
         # move buttons
         mbbox = gtk.VBox()
         setcell(mbbox, 1, 1)
 
-        topbutton = gtk.Button(_('Top ->'))
+        topbutton = gtk.Button(_('<- Top'))
         topbutton.connect('clicked', self.top_clicked)
         mbbox.add(topbutton)
-        subbutton = gtk.Button(_('<- Sub'))
+        subbutton = gtk.Button(_('Sub ->'))
         subbutton.connect('clicked', self.sub_clicked)
         mbbox.add(subbutton)
 
