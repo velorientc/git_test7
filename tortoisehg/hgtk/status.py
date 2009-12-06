@@ -1399,6 +1399,7 @@ class GStatus(gdialog.GDialog):
 
     def ignoremask_updated(self):
         '''User has changed the ignore mask in hgignore dialog'''
+        self.opts['check'] = True
         self.reload_status()
 
     def relevant_checked_files(self, stats):
