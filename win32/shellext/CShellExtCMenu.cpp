@@ -97,6 +97,9 @@ MenuDescription menuDescList[] =
     {"forget",      L"Forget Files...",
                     L"Remove files from version control",
                     "menudelete.ico", 0},
+    {"shellconf",   L"Explorer Extension Settings",
+                    L"Configure Explorer extension",
+                    "settings_repo.ico", 0},
 
     /* Add new items here */
 
@@ -109,7 +112,7 @@ enum menuDescListEntries
 {
     Commit, Init, Clone, Status, Shelve, Add, Revert, Remove, Rename,
     Log, Synch, Serve, Update, Recover, Thgstatus, Userconf, Repoconf,
-    About, Datamine, VDiff, Ignore, Guess, Grep, Forget,
+    About, Datamine, VDiff, Ignore, Guess, Grep, Forget, Shellconf,
     /* Add new items here */
     Separator, EndOfList
 };
@@ -121,7 +124,7 @@ menuDescListEntries RepoNoFilesMenu[] =
     Log, Update, Grep, Separator,
     Synch, Serve, Clone, Init, Thgstatus, Separator,
     Ignore, Guess, Recover, Separator,
-    Repoconf, Userconf, Separator,
+    Shellconf, Repoconf, Userconf, Separator,
     About, EndOfList
 };
 
@@ -135,7 +138,7 @@ menuDescListEntries RepoFilesMenu[] =
 
 menuDescListEntries NoRepoMenu[] =
 {
-    Clone, Init, Userconf, Thgstatus, Separator,
+    Clone, Init, Shellconf, Userconf, Thgstatus, Separator,
     About, EndOfList
 };
 
