@@ -255,7 +255,7 @@ class SummaryInfo(object):
                     if dblist and value in [hglib.toutf(b.strip()) \
                                             for b in dblist.split(',')]:
                         return None
-                return value
+                return None
             elif item == 'rawtags':
                 value = [hglib.toutf(tag) for tag in ctx.tags()]
                 if len(value) == 0:
@@ -270,7 +270,7 @@ class SummaryInfo(object):
                     value = [tag for tag in value if tag not in htags]
                     if len(value) == 0:
                         return None
-                return value
+                return None
             elif item == 'transplant':
                 extra = ctx.extra()
                 try:
