@@ -1,4 +1,4 @@
-# taskbarui.py - User interface for the TortoiseHg taskbar app
+# taskbarui.py - User interface for the TortoiseHg shell extension settings
 #
 # Copyright 2009 Steve Borho <steve@borho.org>
 #
@@ -19,14 +19,14 @@ revert serve update vdiff'''.split()
 
 class TaskBarUI(gtk.Window):
     'User interface for the TortoiseHg taskbar application'
-    def __init__(self, inputq, requestq):
+    def __init__(self):
         'Initialize the Dialog'
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'hg.ico')
         gtklib.set_tortoise_keys(self)
 
         self.set_default_size(400, 520)
-        self.set_title(_('TortoiseHg Taskbar'))
+        self.set_title(_('TortoiseHg Shell Configuration'))
 
         about = gtk.Button(_('About'))
         okay = gtk.Button(_('OK'))
@@ -155,20 +155,6 @@ class TaskBarUI(gtk.Window):
 
         self.load_shell_configs()
 
-        # Event log page
-        frame = self.add_page(notebook, _('Event Log'))
-        frame.set_border_width(2)
-
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.set_border_width(2)
-        textview = gtk.TextView()
-        textview.set_editable(False)
-        scrolledwindow.add(textview)
-        frame.add(scrolledwindow)
-        gobject.timeout_add(100, self.pollq, inputq, textview)
-
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
 
@@ -223,19 +209,6 @@ class TaskBarUI(gtk.Window):
         from tortoisehg.hgtk import about
         dlg = about.AboutDialog()
         dlg.show_all()
-
-    def pollq(self, queue, textview):
-        'Poll the input queue'
-        buf = textview.get_buffer()
-        enditer = buf.get_end_iter()
-        while queue.qsize():
-            try:
-                msg = queue.get(0)
-                buf.insert(enditer, msg+'\n')
-                textview.scroll_to_mark(buf.get_insert(), 0)
-            except Queue.Empty:
-                pass
-        return True
 
     def load_shell_configs(self):
         overlayenable = True
