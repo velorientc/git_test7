@@ -21,10 +21,9 @@ class ShellConfigWindow(gtk.Window):
         gtklib.set_tortoise_icon(self, 'hg.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.set_default_size(400, 520)
+        self.set_default_size(400, -1)
         self.set_title(_('TortoiseHg Shell Configuration'))
 
-        about = gtk.Button(_('About'))
         okay = gtk.Button(_('OK'))
         cancel = gtk.Button(_('Cancel'))
         self.apply = gtk.Button(_('Apply'))
@@ -33,23 +32,12 @@ class ShellConfigWindow(gtk.Window):
         vbox.set_border_width(5)
         self.add(vbox)
 
-        # Create a new notebook, place the position of the tabs
-        self.notebook = notebook = gtk.Notebook()
-        notebook.set_tab_pos(gtk.POS_TOP)
-        vbox.pack_start(notebook, True, True)
-        notebook.show()
-        self.show_tabs = True
-        self.show_border = True
-
         # Options page
-        settingsframe = self.add_page(notebook, _('Options'))
-        settingsvbox = gtk.VBox()
-        settingsframe.add(settingsvbox)
 
         ## Overlays group
         ovframe = gtk.Frame(_('Overlays'))
         ovframe.set_border_width(2)
-        settingsvbox.pack_start(ovframe, False, False, 2)
+        vbox.pack_start(ovframe, False, False, 2)
         ovcvbox = gtk.VBox()
         ovframe.add(ovcvbox)
         hbox = gtk.HBox()
@@ -62,7 +50,7 @@ class ShellConfigWindow(gtk.Window):
         ## Context Menu group
         cmframe = gtk.Frame(_('Context Menu'))
         cmframe.set_border_width(2)
-        settingsvbox.pack_start(cmframe, False, False, 2)
+        vbox.pack_start(cmframe, True, True, 2)
 
         table = gtk.Table(2, 3)
         cmframe.add(table)
@@ -127,7 +115,7 @@ class ShellConfigWindow(gtk.Window):
         ## Taskbar group
         taskbarframe = gtk.Frame(_('Taskbar'))
         taskbarframe.set_border_width(2)
-        settingsvbox.pack_start(taskbarframe, False, False, 2)
+        vbox.pack_start(taskbarframe, False, False, 2)
         taskbarbox = gtk.VBox()
         taskbarframe.add(taskbarbox)
         hbox = gtk.HBox()
@@ -154,9 +142,6 @@ class ShellConfigWindow(gtk.Window):
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
 
-        # Padding
-        vbox.pack_start(gtk.HBox(), False, False, 3)
-
         # Bottom buttons
         bbox = gtk.HBox()
         vbox.pack_start(bbox, False, False)
@@ -165,9 +150,6 @@ class ShellConfigWindow(gtk.Window):
         lefthbbox.set_layout(gtk.BUTTONBOX_START)
         lefthbbox.set_spacing(6)
         bbox.pack_start(lefthbbox, False, False)
-
-        about.connect('clicked', self.about)
-        lefthbbox.pack_start(about, False, False)
 
         bbox.pack_start(gtk.Label(''), True, True)
 
@@ -200,11 +182,6 @@ class ShellConfigWindow(gtk.Window):
         label = gtk.Label(tab)
         notebook.append_page(frame, label)
         return frame
-
-    def about(self, button):
-        from tortoisehg.hgtk import about
-        dlg = about.AboutDialog()
-        dlg.show_all()
 
     def load_shell_configs(self):
         overlayenable = True
