@@ -427,6 +427,11 @@ def update(ui, *pats, **opts):
     from tortoisehg.hgtk.update import run
     gtkrun(run, ui, *pats, **opts)
 
+def browse(ui, *pats, **opts):
+    """browse repository state"""
+    from tortoisehg.hgtk.browse import run
+    gtkrun(run, ui, *pats, **opts)
+
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
     from tortoisehg.hgtk.visdiff import run, rawextdiff
@@ -712,6 +717,7 @@ table = {
         [('r', 'rev', '', _('revision to update'))],
         ('hgtk archive')),
     "^strip": (strip, [], ('hgtk strip [REV]')),
+    "^browse": (browse, [], ('hgtk browse [REV]')),
 }
 
 if os.name == 'nt':
