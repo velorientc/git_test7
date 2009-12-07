@@ -77,14 +77,13 @@ class BookmarkDialog(gtk.Dialog):
         entry.connect('activate', self.entry_activated, type)
 
         # prepare to show
-        self._refresh()
+        self._refresh(clear=False)
         self._bookmarklistbox.grab_focus()
 
-    def _refresh(self):
+    def _refresh(self, clear=True):
         """ update display on dialog with recent repo data """
         self.repo.invalidate()
         self._bookmarkslist.clear()
-        self._bookmark_input.set_text('')
 
         # add bookmarks to drop-down list
         bookmarks = hglib.get_repo_bookmarks(self.repo) 
@@ -92,6 +91,10 @@ class BookmarkDialog(gtk.Dialog):
         for bookmarkname in bookmarks:
             if bookmarkname != 'tip':
                 self._bookmarkslist.append([bookmarkname])
+
+        # clear bookmark name input
+        if clear:
+            self._bookmark_input.set_text('')
 
     def dialog_response(self, dialog, response_id):
         # Add button

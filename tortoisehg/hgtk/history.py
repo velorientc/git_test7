@@ -1851,20 +1851,25 @@ class GLog(gdialog.GDialog):
         self.reload_log()
         self.changeview.clear()
 
+    def get_rev_tag(self, rev, include=None, exclude=None):
+        for tag in self.repo.nodetags(self.repo[rev].node()):
+            if tag != 'tip' \
+                    and ((not include) or (include and tag in include)) \
+                    and ((not exclude) or (exclude and tag not in exclude)):
+                return tag
+        return ''
+
     def add_tag(self, menuitem):
         # save tag info for detecting new tags added
+        bmarks = hglib.get_repo_bookmarks(self.repo) 
         oldtags = self.repo.tagslist()
         oldlen = len(self.repo)
         rev = str(self.currevid)
-        for t in self.repo.nodetags(self.repo[rev].node()):
-            if t != 'tip':
-                tag = t
-                break;
-        else:
-            tag = ''
+        tag = self.get_rev_tag(rev, exclude=bmarks)
 
         def refresh(*args):
-            self.refresh_on_marker_change(oldlen, oldtags, self.repo.tagslist())
+            self.refresh_on_marker_change(oldlen, oldtags,
+                                          self.repo.tagslist())
 
         dialog = tagadd.TagAddDialog(self.repo, tag, rev)
         dialog.connect('destroy', refresh)
@@ -1874,31 +1879,31 @@ class GLog(gdialog.GDialog):
         # save bookmark info for detecting new bookmarks added
         oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
         oldlen = len(self.repo)
-        rev = self.currevid
+        rev = str(self.currevid)
+        bmark = self.get_rev_tag(rev, include=oldbookmarks)
 
         def refresh(*args):
-            self.refresh_on_marker_change(oldlen, 
-                                          oldbookmarks, 
+            self.refresh_on_marker_change(oldlen, oldbookmarks,
                                           hglib.get_repo_bookmarks(self.repo))
 
-        dialog = bookmark.BookmarkDialog(self.repo,
-                          type=bookmark.TYPE_ADDREMOVE, rev=str(rev))
+        dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_ADDREMOVE,
+                                         bmark, rev)
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
 
     def rename_bookmark(self, menuitem):
-        # save bookmark info for detecting new bookmarks added
+        # save bookmark info for detecting bookmarks renamed
         oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
         oldlen = len(self.repo)
-        rev = self.currevid
+        rev = str(self.currevid)
+        bmark = self.get_rev_tag(rev, include=oldbookmarks)
 
         def refresh(*args):
-            self.refresh_on_marker_change(oldlen, 
-                                          oldbookmarks, 
+            self.refresh_on_marker_change(oldlen, oldbookmarks,
                                           hglib.get_repo_bookmarks(self.repo))
 
-        dialog = bookmark.BookmarkDialog(self.repo,
-                          type=bookmark.TYPE_RENAME, rev=str(rev))
+        dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_RENAME,
+                                         bmark, rev)
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
 
