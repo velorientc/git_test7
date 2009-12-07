@@ -18,12 +18,14 @@ from tortoisehg.util import hglib, i18n
 
 from tortoisehg.hgtk import dialog, gtklib
 
+RESPONSE_ADD    = 1
+RESPONSE_REMOVE = 2
+
 class BookmarkAddDialog(gtk.Dialog):
     """ Dialog to add bookmark to Mercurial repo """
     def __init__(self, repo, bookmark='', rev=''):
         """ Initialize the Dialog """
-        gtk.Dialog.__init__(self,
-                            buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        gtk.Dialog.__init__(self)
         gtklib.set_tortoise_keys(self)
         self.set_title(_('Bookmark - %s') % hglib.get_reponame(repo))
         self.set_resizable(False)
@@ -32,17 +34,12 @@ class BookmarkAddDialog(gtk.Dialog):
 
         self.repo = repo
 
-        # add Add button
-        addbutton = gtk.Button(_('Add'))
-        addbutton.connect('clicked', lambda b: self._do_add_bookmark())
-        self.action_area.pack_end(addbutton)
+        # add buttons
+        self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+        self.add_button(_('Add'), RESPONSE_ADD)
+        self.add_button(_('Remove'), RESPONSE_REMOVE)
 
-        # add Remove button
-        removebutton = gtk.Button(_('Remove'))
-        removebutton.connect('clicked', lambda b: self._do_rm_bookmark())
-        self.action_area.pack_end(removebutton)
-
-        # top layout table
+        # layout table
         table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
 
@@ -50,7 +47,8 @@ class BookmarkAddDialog(gtk.Dialog):
         self._bookmarkslist = gtk.ListStore(str)
         self._bookmarklistbox = gtk.ComboBoxEntry(self._bookmarkslist, 0)
         self._bookmark_input = self._bookmarklistbox.get_child()
-        self._bookmark_input.connect('activate', self._bookmarkinput_activated)
+        self._bookmark_input.connect('activate',
+                                     lambda w: self.response(RESPONSE_ADD))
         self._bookmark_input.set_text(bookmark)
         table.add_row(_('Bookmark:'), self._bookmarklistbox, padding=False)
 
@@ -78,12 +76,20 @@ class BookmarkAddDialog(gtk.Dialog):
                 self._bookmarkslist.append([bookmarkname])
 
     def dialog_response(self, dialog, response_id):
-        if response_id == gtk.RESPONSE_CLOSE \
-                or response_id == gtk.RESPONSE_DELETE_EVENT:
+        # Add button
+        if response_id == RESPONSE_ADD:
+            self._do_add_bookmark()
+        # Remove button
+        elif response_id == RESPONSE_REMOVE:
+            self._do_rm_bookmark()
+        # Close button or closed by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
             self.destroy()
+            return # close dialog
+        else:
+            raise _('unexpected response id: %s') % response_id
 
-    def _bookmarkinput_activated(self, bookmarkinput):
-        self._do_add_bookmark()
+        self.run() # don't close dialog
 
     def _do_add_bookmark(self):
         # gather input data
