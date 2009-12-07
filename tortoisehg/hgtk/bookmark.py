@@ -68,13 +68,13 @@ class BookmarkAddDialog(gtk.Dialog):
         """ update display on dialog with recent repo data """
         self.repo.invalidate()
         self._bookmarkslist.clear()
-        self._bookmark_input.set_text("")
+        self._bookmark_input.set_text('')
 
         # add bookmarks to drop-down list
         bookmarks = hglib.get_repo_bookmarks(self.repo) 
         bookmarks.sort()
         for bookmarkname in bookmarks:
-            if bookmarkname != "tip":
+            if bookmarkname != 'tip':
                 self._bookmarkslist.append([bookmarkname])
 
     def dialog_response(self, dialog, response_id):
@@ -196,13 +196,13 @@ class BookmarkRenameDialog(gtk.Dialog):
         """ update display on dialog with recent repo data """
         self.repo.invalidate()
         self._bookmarkslist.clear()
-        self._bookmark_input.set_text("")
+        self._bookmark_input.set_text('')
 
         # add bookmarks to drop-down list
         bookmarks = hglib.get_repo_bookmarks(self.repo) 
         bookmarks.sort()
         for bookmarkname in bookmarks:
-            if bookmarkname == "tip":
+            if bookmarkname == 'tip':
                 continue
             self._bookmarkslist.append([bookmarkname])
 
