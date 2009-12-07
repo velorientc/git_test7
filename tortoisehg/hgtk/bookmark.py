@@ -7,19 +7,16 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
 import gtk
 import traceback
 
-from mercurial import hg, ui, util
+from mercurial import ui, util
 from hgext import bookmarks
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, i18n
 
 from tortoisehg.hgtk import dialog, gtklib
-
-keep = i18n.keepgettext()
 
 class BookmarkAddDialog(gtk.Dialog):
     """ Dialog to add bookmark to Mercurial repo """
