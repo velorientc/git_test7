@@ -1881,7 +1881,7 @@ class GLog(gdialog.GDialog):
                                           oldbookmarks, 
                                           hglib.get_repo_bookmarks(self.repo))
 
-        dialog = bookmark.BookmarkAddDialog(self.repo,
+        dialog = bookmark.BookmarkDialog(self.repo,
                           type=bookmark.TYPE_ADDREMOVE, rev=str(rev))
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
@@ -1897,7 +1897,7 @@ class GLog(gdialog.GDialog):
                                           oldbookmarks, 
                                           hglib.get_repo_bookmarks(self.repo))
 
-        dialog = bookmark.BookmarkAddDialog(self.repo,
+        dialog = bookmark.BookmarkDialog(self.repo,
                           type=bookmark.TYPE_RENAME, rev=str(rev))
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)

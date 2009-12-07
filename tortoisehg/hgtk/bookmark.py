@@ -25,7 +25,7 @@ RESPONSE_ADD    = 1
 RESPONSE_REMOVE = 2
 RESPONSE_RENAME = 3
 
-class BookmarkAddDialog(gtk.Dialog):
+class BookmarkDialog(gtk.Dialog):
     """ Dialog to add bookmark to Mercurial repo """
     def __init__(self, repo, type, bookmark='', rev=''):
         """ Initialize the Dialog """
