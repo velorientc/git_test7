@@ -35,9 +35,9 @@ class BookmarkAddDialog(gtk.Dialog):
         self.repo = repo
 
         # add buttons
-        self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
         self.add_button(_('Add'), RESPONSE_ADD)
         self.add_button(_('Remove'), RESPONSE_REMOVE)
+        self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         # layout table
         table = gtklib.LayoutTable()
