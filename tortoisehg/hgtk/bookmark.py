@@ -81,7 +81,7 @@ class BookmarkAddDialog(gtk.Dialog):
             self._do_add_bookmark()
         # Remove button
         elif response_id == RESPONSE_REMOVE:
-            self._do_rm_bookmark()
+            self._do_remove_bookmark()
         # Close button or closed by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
             self.destroy()
@@ -117,7 +117,7 @@ class BookmarkAddDialog(gtk.Dialog):
                     traceback.format_exc())
             return False
 
-    def _do_rm_bookmark(self):
+    def _do_remove_bookmark(self):
         # gather input data
         name = self._bookmark_input.get_text()
 
@@ -129,7 +129,7 @@ class BookmarkAddDialog(gtk.Dialog):
             return False
 
         try:
-            self._rm_hg_bookmark(name)
+            self._remove_hg_bookmark(name)
             dialog.info_dialog(self, _('Bookmarking completed'),
                               _('Bookmark "%s" has been removed') % name)
             self._refresh()
@@ -150,7 +150,7 @@ class BookmarkAddDialog(gtk.Dialog):
                            rev=revision, 
                            mark=name)
 
-    def _rm_hg_bookmark(self, name):
+    def _remove_hg_bookmark(self, name):
         if not name in hglib.get_repo_bookmarks(self.repo):
             raise util.Abort(_("Bookmark '%s' does not exist") % name)
 
