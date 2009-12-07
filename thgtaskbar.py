@@ -104,7 +104,10 @@ class MainWindow:
 
     def OnDestroy(self, hwnd, msg, wparam, lparam):
         nid = (self.hwnd, 0)
-        Shell_NotifyIcon(NIM_DELETE, nid)
+        try:
+            Shell_NotifyIcon(NIM_DELETE, nid)
+        except pywintypes.error:
+            pass # happens when we run without icon
         PostQuitMessage(0) # Terminate the app.
 
     def OnTaskbarNotify(self, hwnd, msg, wparam, lparam):
@@ -339,6 +342,7 @@ class Updater(threading.Thread):
 
 class PipeServer:
     def __init__(self, hwnd):
+        self.hwnd = hwnd
         self.updater = Updater(hwnd)
         self.updater.start()
 
@@ -412,6 +416,11 @@ class PipeServer:
 
                 try:
                     requests.put(data)
+                    if data == 'terminate|':
+                        print 'PipeServer received terminate from pipe'
+                        print 'posting EXIT_CMD to gui thread...'
+                        PostMessage(self.hwnd, win32con.WM_COMMAND, EXIT_CMD, 0)
+                        break
                 except SystemExit:
                     raise SystemExit # interrupted by thread2.terminate()
                 except:
