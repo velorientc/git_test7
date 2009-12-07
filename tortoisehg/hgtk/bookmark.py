@@ -1,4 +1,4 @@
-# bookmarkadd.py - TortoiseHg dialog to add bookmark
+# bookmark.py - TortoiseHg dialog to add/remove/rename bookmarks
 #
 # Copyright 2007 TK Soh <teekaysoh@gmail.com>
 # Copyright 2007 Steve Borho <steve@borho.org>
