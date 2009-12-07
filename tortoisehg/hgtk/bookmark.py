@@ -65,11 +65,9 @@ class BookmarkDialog(gtk.Dialog):
             entry.set_width_chars(12)
             entry.set_text(rev)
             table.add_row(_('Revision:'), entry)
-        elif type == TYPE_RENAME:
+        else:
             self._name_input = entry
             table.add_row(_('New name:'), entry)
-        else:
-            raise _('unexpected type: %s') % type
 
         # signal handlers
         self.connect('response', self.dialog_response)
@@ -78,7 +76,10 @@ class BookmarkDialog(gtk.Dialog):
 
         # prepare to show
         self._refresh(clear=False)
-        self._bookmarklistbox.grab_focus()
+        if type == TYPE_ADDREMOVE:
+            self._bookmarklistbox.grab_focus()
+        else:
+            self._name_input.grab_focus()
 
     def _refresh(self, clear=True):
         """ update display on dialog with recent repo data """
