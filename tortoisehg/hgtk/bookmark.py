@@ -73,7 +73,8 @@ class BookmarkDialog(gtk.Dialog):
 
         # signal handlers
         self.connect('response', self.dialog_response)
-        self._bookmark_input.connect('activate', self.combo_activated, type)
+        self._bookmark_input.connect('activate', self.entry_activated, type)
+        entry.connect('activate', self.entry_activated, type)
 
         # prepare to show
         self._refresh()
@@ -111,7 +112,7 @@ class BookmarkDialog(gtk.Dialog):
 
         self.run() # don't close dialog
 
-    def combo_activated(self, entry, type):
+    def entry_activated(self, entry, type):
         if type == TYPE_ADDREMOVE:
             self.response(RESPONSE_ADD)
         elif type == TYPE_RENAME:
