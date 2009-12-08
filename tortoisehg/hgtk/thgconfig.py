@@ -549,8 +549,8 @@ class ConfigDialog(gtk.Dialog):
             self.readonly = False
         except ImportError:
             dialog.error_dialog(self, _('Iniparse package not found'),
-                         _('Please install iniparse package\n'
-                           'Settings are only shown, no changing is possible'))
+                         _("Can't change settings without iniparse package - "
+                           "view is readonly."))
             print 'Please install http://code.google.com/p/iniparse/'
             self.readonly = True
 
