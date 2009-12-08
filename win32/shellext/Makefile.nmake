@@ -9,8 +9,8 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         InitStatus.obj \
         CShellExtCMenu.obj \
         CShellExtOverlay.obj \
-		IconBitmapUtils.obj \
-		Registry.obj \
+        IconBitmapUtils.obj \
+        Registry.obj \
         ShellExt.obj \
         StringUtils.obj \
         SysInfo.obj \
