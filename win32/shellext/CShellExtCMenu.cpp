@@ -7,9 +7,12 @@
 #include "InitStatus.h"
 #include "SysInfo.h"
 #include "ShellExt.h"
-#include "CShellExtCMenu.h"
 #include "RegistryConfig.h"
+#include "TortoiseIconBitmap.h"
+
 #include <map>
+
+#include "CShellExtCMenu.h"
 
 
 struct MenuDescription
