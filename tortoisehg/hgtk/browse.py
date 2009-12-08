@@ -154,6 +154,7 @@ class BrowsePane(gtk.TreeView):
             curdir.addfile(basename, filestatus)
 
         model = self.get_model()
+        self.set_model(None) # disable updates while we fill the model
         model.clear()
         def adddir(node, iter):
             # insert subdirectories at this level (recursive)
@@ -166,6 +167,7 @@ class BrowsePane(gtk.TreeView):
 
         # insert directory tree into TreeModel
         adddir(modelroot, model.get_iter_root())
+        self.set_model(model)
 
 
 def run(ui, *pats, **opts):
