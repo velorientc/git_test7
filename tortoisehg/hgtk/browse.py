@@ -87,45 +87,56 @@ class BrowsePane(gtk.TreeView):
                              unknown='?' in filetypes)
         except IOError:
             pass
-        files = []
+        filelist = []
         # concatenate status output into a single list, then sort on filename
         for l, s in ( (st[0], 'M'), (st[1], 'A'), (st[2], 'R'), (st[3], '!'),
                       (st[4], '?'), (st[5], 'I'), (st[6], 'C') ):
             for m in l:
-                files.append([ m, s ])
-        files.sort()
+                filelist.append([ m, s ])
+        filelist.sort()
+
+        class dirnode(object):
+            def __init__(self):
+                self.subdirs = {}
+                self.files = []
+                self.statuses = set()
+            def addfile(self, filename, st):
+                self.files.append((filename, st))
+                self.addstatus(st)
+            def addsubdir(self, dirname):
+                self.subdirs[dirname] = dirnode()
+            def addstatus(self, st):
+                self.statuses.add(st)
 
         # Build tree data structure
-        modelroot = ({}, [], set())
-        for name, filestatus in files:
+        modelroot = dirnode()
+        for name, filestatus in filelist:
             dirs, basename = self.split(name)
             curdir = modelroot
             for dir in dirs:
-                if dir not in curdir[0]:
-                    curdir[0][dir] = ({}, [], set())
-                curdir[2].add(filestatus)
-                curdir = curdir[0][dir]
-            curdir[1].append((basename, filestatus))
-            curdir[2].add(filestatus)
+                if dir not in curdir.subdirs:
+                    curdir.addsubdir(dir)
+                curdir.addstatus(filestatus)
+                curdir = curdir.subdirs[dir]
+            curdir.addfile(basename, filestatus)
 
         model = self.get_model()
         model.clear()
-        def adddir(name, dirmodel, iter):
-            dirdict, files, dirstatus = dirmodel
+        def adddir(node, iter):
             # insert subdirectories at this level (recursive)
-            for dname, nextmodel in dirdict.iteritems():
-                statuslist = list(nextmodel[2])
+            for dname, dirnode in node.subdirs.iteritems():
+                statuslist = list(dirnode.statuses)
                 st = ''.join(statuslist)
                 row = [dname, False, hglib.toutf(dname), st]
                 piter = model.append(iter, row)
-                adddir(dname, nextmodel, piter)
+                adddir(dirnode, piter)
             # insert files at this level
-            for fname, st in files:
+            for fname, st in node.files:
                 row = [fname, False, hglib.toutf(fname), st]
                 model.append(iter, row)
 
         # insert directory tree into TreeModel
-        adddir('root', modelroot, model.get_iter_root())
+        adddir(modelroot, model.get_iter_root())
 
 
 def run(ui, *pats, **opts):
