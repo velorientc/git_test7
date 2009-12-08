@@ -8,6 +8,7 @@
 #include "SysInfo.h"
 #include "ShellExt.h"
 #include "CShellExtCMenu.h"
+#include "RegistryConfig.h"
 #include <map>
 
 

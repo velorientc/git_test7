@@ -3,6 +3,7 @@ OBJECTS_DIRSTATE = TortoiseUtils.obj \
         Direntry.obj \
         Directory.obj \
         Winstat.obj \
+        RegistryConfig.obj \
         ThgDebug.obj
 
 OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
@@ -21,13 +22,8 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         Thgstatus.obj \
         QueryDirstate.obj
 
-# TODO: Break link dependencies: Thgstatus needs ThgDebug if compiled with
-# /DTHG_DEBUG, which in turn depends on TortoiseUtils and then even 
-# IconBitmapUtils and SysInfo
-OBJECTS_TERMINATE = TortoiseUtils.obj \
-        SysInfo.obj \
-        IconBitmapUtils.obj \
-        Thgstatus.obj \
+OBJECTS_TERMINATE = Thgstatus.obj \
+        RegistryConfig.obj \
         ThgDebug.obj
 
 LIBS    = shlwapi.lib gdiplus.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib
