@@ -7,6 +7,7 @@
 
 import os
 import gtk
+import gtk.keysyms
 import gobject
 import pango
 
@@ -193,8 +194,9 @@ class MQWidget(gtk.VBox):
                                    tooltips=tooltips)
         mainbox.pack_start(self.cmd, False, False)
 
-        # accelerator
+        # accelerators
         if accelgroup:
+
             key, mod = gtk.accelerator_parse('F2')
             self.list.add_accelerator('thg-rename', accelgroup,
                     key, mod, gtk.ACCEL_VISIBLE)
@@ -204,6 +206,70 @@ class MQWidget(gtk.VBox):
                     model, paths = sel.get_selected_rows()
                     self.qrename_ui(model[paths[0]][MQ_NAME])
             self.list.connect('thg-rename', thgrename)
+
+            mod = gtk.gdk.CONTROL_MASK
+
+            def mq_move(tree, key):
+                oldrow = tree.get_cursor()[0][0]
+                minval = self.separator_pos + 1
+                if oldrow < minval:
+                    return True
+                maxval = len(self.model) - 1
+                if key == gtk.keysyms.Up:
+                    newrow = oldrow - 1
+                elif key == gtk.keysyms.Down:
+                    newrow = oldrow + 1
+                elif key == gtk.keysyms.Page_Up:
+                    newrow = minval
+                elif key == gtk.keysyms.Page_Down:
+                    newrow = maxval
+                else:
+                    return True
+                if newrow != oldrow and newrow >= minval and newrow <= maxval:
+                    self.move_patch(oldrow, newrow)
+                return True
+
+            def add(name, key, hook=None):
+                self.list.add_accelerator(name, accelgroup, key, mod, 0)
+                if hook:
+                    self.list.connect(name, hook)
+                else:
+                    self.list.connect(name, mq_move, key)
+
+            add('mq-move-up', gtk.keysyms.Up)
+            add('mq-move-down', gtk.keysyms.Down)
+            add('mq-move-top', gtk.keysyms.Page_Up)
+            add('mq-move-bottom', gtk.keysyms.Page_Down)
+            add('mq-pop', gtk.keysyms.Left, lambda _: self.qpop())
+            add('mq-push', gtk.keysyms.Right, lambda _: self.qpush())
+
+    def move_patch(self, oldidx, newidx):
+
+        def list_move_item(list, oldpos, newpos):
+            olditem = list[oldpos]
+            del list[oldpos]
+            list.insert(newpos, olditem)
+
+        # Update series
+        p = self.repo.mq
+        model = self.model
+        oldrow = model[oldidx]
+        newrow = model[newidx]
+        list_move_item(p.full_series, p.find_series(oldrow[MQ_NAME]),
+                                      p.find_series(newrow[MQ_NAME]))
+        p.series_dirty = True
+        p.save_dirty()
+
+        # Update TreeView
+        if newidx < oldidx:
+            model.move_before(oldrow.iter, newrow.iter)
+        else:
+            model.move_after(oldrow.iter, newrow.iter)
+        begin = min(oldidx, newidx)
+        offset = min(oldrow[MQ_INDEX], newrow[MQ_INDEX]) - begin
+        for i in xrange(begin, max(oldidx, newidx) + 1):
+            model[i][MQ_INDEX] = i + offset
+
 
     ### public functions ###
 
@@ -247,7 +313,8 @@ class MQWidget(gtk.VBox):
 
         # insert separator
         if top:
-            self.model.insert_after(top, (INDEX_SEPARATOR, None, None, None, None))
+            row = self.model.insert_after(top, (INDEX_SEPARATOR, None, None, None, None))
+            self.separator_pos = self.model.get_path(row)[0]
 
         # restore patch selection
         if selname:

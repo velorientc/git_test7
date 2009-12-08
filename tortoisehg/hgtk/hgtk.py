@@ -35,7 +35,8 @@ about help version thgstatus serve'''
 
 # Add TortoiseHg signals, hooked to key accelerators in gtklib
 for sig in ('copy-clipboard', 'thg-diff', 'thg-parent', 'thg-rename',
-        'thg-revision'):
+            'thg-revision', 'mq-move-up', 'mq-move-down', 'mq-move-top',
+            'mq-move-bottom', 'mq-pop', 'mq-push'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept', 'thg-reflow'):
