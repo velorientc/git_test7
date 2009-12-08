@@ -83,7 +83,7 @@ Debian DEB and RPM packages for Fedora are available on the
 `download <http://bitbucket.org/tortoisehg/stable/wiki/download/>`_
 page of the wiki.
 
-Deb packages for Ubuntu can be found at
+Packages for Ubuntu can be found at
 `that <https://launchpad.net/~tortoisehg-ppa>`_.
 
 For MacOSX, no packages are available but you can run hgtk and all the
