@@ -18,6 +18,54 @@ from tortoisehg.util.hglib import RepoError
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
+folderxpm = [
+    "17 16 7 1",
+    "  c #000000",
+    ". c #808000",
+    "X c yellow",
+    "o c #808080",
+    "O c #c0c0c0",
+    "+ c white",
+    "@ c None",
+    "@@@@@@@@@@@@@@@@@",
+    "@@@@@@@@@@@@@@@@@",
+    "@@+XXXX.@@@@@@@@@",
+    "@+OOOOOO.@@@@@@@@",
+    "@+OXOXOXOXOXOXO. ",
+    "@+XOXOXOXOXOXOX. ",
+    "@+OXOXOXOXOXOXO. ",
+    "@+XOXOXOXOXOXOX. ",
+    "@+OXOXOXOXOXOXO. ",
+    "@+XOXOXOXOXOXOX. ",
+    "@+OXOXOXOXOXOXO. ",
+    "@+XOXOXOXOXOXOX. ",
+    "@+OOOOOOOOOOOOO. ",
+    "@                ",
+    "@@@@@@@@@@@@@@@@@",
+    "@@@@@@@@@@@@@@@@@"
+    ]
+folderpb = gtk.gdk.pixbuf_new_from_xpm_data(folderxpm)
+
+filexpm = [
+    "12 12 3 1",
+    "  c #000000",
+    ". c #ffff04",
+    "X c #b2c0dc",
+    "X        XXX",
+    "X ...... XXX",
+    "X ......   X",
+    "X .    ... X",
+    "X ........ X",
+    "X .   .... X",
+    "X ........ X",
+    "X .     .. X",
+    "X ........ X",
+    "X .     .. X",
+    "X ........ X",
+    "X          X"
+    ]
+filepb = gtk.gdk.pixbuf_new_from_xpm_data(filexpm)
+
 class BrowseDialog(gtk.Dialog):
     'Dialog for performing quick dirstate operations'
     def __init__(self, command, pats):
@@ -50,7 +98,7 @@ class BrowsePane(gtk.TreeView):
     def __init__(self, repo):
         gtk.TreeView.__init__(self)
         self.repo = repo
-        fm = gtk.TreeStore(str,  # Path
+        fm = gtk.ListStore(str,  # Path
                            bool, # Checked
                            str,  # Path-UTF8
                            bool, # M
@@ -59,13 +107,16 @@ class BrowsePane(gtk.TreeView):
                            bool, # !
                            bool, # ?
                            bool, # I
-                           bool) # C
+                           bool, # C
+                           gobject.TYPE_PYOBJECT)  # file or folder xpm
         self.set_model(fm)
+        self.set_headers_visible(False)
         self.set_reorderable(True)
         if hasattr(self, 'set_rubber_banding'):
             self.set_rubber_banding(True)
         fontlist = repo.ui.config('gtools', 'fontlist', 'MS UI Gothic 9')
         self.modify_font(pango.FontDescription(fontlist))
+
         col = gtk.TreeViewColumn(_('status'))
         self.append_column(col)
 
@@ -88,6 +139,16 @@ class BrowsePane(gtk.TreeView):
         packpixmap('menublame.ico', 7) # unknown
         #packpixmap('ignore.ico', 8) # ignored
         #packpixmap('hg.ico', 9) # clean
+
+        def cell_seticon(column, cell, model, iter):
+            pixbuf = model.get_value(iter, 10)
+            cell.set_property('pixbuf', pixbuf)
+
+        col = gtk.TreeViewColumn(_('type'))
+        cell = gtk.CellRendererPixbuf()
+        col.pack_start(cell, expand=False)
+        col.set_cell_data_func(cell, cell_seticon)
+        self.append_column(col)
 
         col = gtk.TreeViewColumn(_('path'), gtk.CellRendererText(), text=2)
         self.append_column(col)
@@ -135,11 +196,13 @@ class BrowsePane(gtk.TreeView):
             def addstatus(self, st):
                 self.statuses.add(st)
 
-        def buildrow(name, stset):
-            return [ name, False, hglib.toutf(name),
+        def buildrow(name, stset, isfile):
+            pixmap = isfile and filepb or folderpb
+            row = [ name, False, hglib.toutf(name),
                      'M' in stset, 'A' in stset, 'R' in stset,
                      '!' in stset, '?' in stset, 'I' in stset,
-                     'C' in stset ]
+                     'C' in stset, pixmap ]
+            return row
 
         # Build tree data structure
         modelroot = dirnode()
@@ -156,17 +219,14 @@ class BrowsePane(gtk.TreeView):
         model = self.get_model()
         self.set_model(None) # disable updates while we fill the model
         model.clear()
-        def adddir(node, iter):
+        def adddir(node):
             # insert subdirectories at this level (recursive)
             for dname, dirnode in node.subdirs.iteritems():
-                piter = model.append(iter, buildrow(dname, dirnode.statuses))
-                adddir(dirnode, piter)
+                model.append(buildrow(dname, dirnode.statuses, False))
             # insert files at this level
             for fname, st in node.files:
-                model.append(iter, buildrow(fname, st))
-
-        # insert directory tree into TreeModel
-        adddir(modelroot, model.get_iter_root())
+                model.append(buildrow(fname, st, True))
+        adddir(modelroot)
         self.set_model(model)
 
 
