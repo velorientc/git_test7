@@ -49,21 +49,48 @@ class BrowsePane(gtk.TreeView):
     'Dialog for browsing repo.status() output'
     def __init__(self, repo):
         gtk.TreeView.__init__(self)
+        self.repo = repo
         fm = gtk.TreeStore(str,  # Path
                            bool, # Checked
                            str,  # Path-UTF8
-                           str)  # Status
+                           bool, # M
+                           bool, # A
+                           bool, # R
+                           bool, # !
+                           bool, # ?
+                           bool, # I
+                           bool) # C
         self.set_model(fm)
         self.set_reorderable(True)
         if hasattr(self, 'set_rubber_banding'):
             self.set_rubber_banding(True)
         fontlist = repo.ui.config('gtools', 'fontlist', 'MS UI Gothic 9')
         self.modify_font(pango.FontDescription(fontlist))
-        col = gtk.TreeViewColumn(_('status'), gtk.CellRendererText(), text=3)
+        col = gtk.TreeViewColumn(_('status'))
         self.append_column(col)
+
+        iconw, iconh = gtk.icon_size_lookup(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        def packpixmap(ico, id):
+            iconpath = paths.get_tortoise_icon(ico)
+            if iconpath == None:
+                raise (_("could not open icon file '%s' (check install)") % ico)
+            pm = gtk.gdk.pixbuf_new_from_file_at_size(iconpath, iconw, iconh)
+            cell = gtk.CellRendererPixbuf()
+            cell.set_property('pixbuf', pm)
+            col.pack_start(cell, expand=False)
+            col.add_attribute(cell, 'visible', id)
+
+        #packpixmap('filemodify.ico', 3) # this icon does not load for me
+        packpixmap('menucommit.ico', 3) # M
+        packpixmap('fileadd.ico', 4)    # A
+        packpixmap('filedelete.ico', 5) # R
+        packpixmap('detect_rename.ico', 6) # missing
+        packpixmap('menublame.ico', 7) # unknown
+        #packpixmap('ignore.ico', 8) # ignored
+        #packpixmap('hg.ico', 9) # clean
+
         col = gtk.TreeViewColumn(_('path'), gtk.CellRendererText(), text=2)
         self.append_column(col)
-        self.repo = repo
 
     def split(self, filename):
         'Split a filename into a list of directories and the basename'
@@ -108,6 +135,12 @@ class BrowsePane(gtk.TreeView):
             def addstatus(self, st):
                 self.statuses.add(st)
 
+        def buildrow(name, stset):
+            return [ name, False, hglib.toutf(name),
+                     'M' in stset, 'A' in stset, 'R' in stset,
+                     '!' in stset, '?' in stset, 'I' in stset,
+                     'C' in stset ]
+
         # Build tree data structure
         modelroot = dirnode()
         for name, filestatus in filelist:
@@ -125,15 +158,11 @@ class BrowsePane(gtk.TreeView):
         def adddir(node, iter):
             # insert subdirectories at this level (recursive)
             for dname, dirnode in node.subdirs.iteritems():
-                statuslist = list(dirnode.statuses)
-                st = ''.join(statuslist)
-                row = [dname, False, hglib.toutf(dname), st]
-                piter = model.append(iter, row)
+                piter = model.append(iter, buildrow(dname, dirnode.statuses))
                 adddir(dirnode, piter)
             # insert files at this level
             for fname, st in node.files:
-                row = [fname, False, hglib.toutf(fname), st]
-                model.append(iter, row)
+                model.append(iter, buildrow(fname, st))
 
         # insert directory tree into TreeModel
         adddir(modelroot, model.get_iter_root())
