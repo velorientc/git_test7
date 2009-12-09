@@ -13,7 +13,7 @@ import pango
 from mercurial import hg, ui, cmdutil
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths, shlib
+from tortoisehg.util import hglib, paths, shlib, menuthg
 from tortoisehg.util.hglib import RepoError
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
@@ -66,47 +66,28 @@ filexpm = [
     ]
 filepb = gtk.gdk.pixbuf_new_from_xpm_data(filexpm)
 
-class BrowseDialog(gtk.Dialog):
-    'Dialog for performing quick dirstate operations'
-    def __init__(self, command, pats):
-        gtk.Dialog.__init__(self)
-        gtklib.set_tortoise_icon(self, 'hg.ico')
-        gtklib.set_tortoise_keys(self)
-        self.set_has_separator(False)
-        self.set_default_size(400, 500)
-        self.connect('response', self.dialog_response)
-        repo = hg.repository(ui.ui(), path=paths.find_root())
-
-        self.set_title(_('%s - browser') % hglib.get_reponame(repo))
-
-        browse = BrowsePane(repo)
-        entry = gtk.Entry()
-        entry.set_text(repo.root)
-        self.vbox.pack_start(entry, False, True)
-
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        scroller.add(browse)
-        self.vbox.pack_start(scroller, True, True)
-        self.show_all()
-        self.browse = browse
-        gobject.idle_add(self.refresh)
-
-    def refresh(self):
-        self.browse.refresh()
-
-    def dialog_response(self, dialog, response):
-        return True
+class dirnode(object):
+    def __init__(self):
+        self.subdirs = {}
+        self.files = []
+        self.statuses = set()
+    def addfile(self, filename, st):
+        self.files.append((filename, st))
+        self.addstatus(st)
+    def addsubdir(self, dirname):
+        self.subdirs[dirname] = dirnode()
+    def addstatus(self, st):
+        self.statuses.add(st)
 
 class BrowsePane(gtk.TreeView):
     'Dialog for browsing repo.status() output'
     def __init__(self, repo):
         gtk.TreeView.__init__(self)
         self.repo = repo
-        fm = gtk.ListStore(str,  # Path
+        self.menu = menuthg.menuThg()
+        fm = gtk.ListStore(str,  # canonical path
                            bool, # Checked
-                           str,  # Path-UTF8
+                           str,  # basename-UTF8
                            bool, # M
                            bool, # A
                            bool, # R
@@ -116,8 +97,15 @@ class BrowsePane(gtk.TreeView):
                            bool, # C
                            bool) # isfile
         self.set_model(fm)
+
         self.set_headers_visible(False)
         self.set_reorderable(True)
+        self.connect('popup-menu', self.popupmenu)
+        self.connect('button-release-event', self.buttonrelease)
+        self.connect('row-activated', self.rowactivated)
+        self.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.set_reorderable(False)
+        self.set_enable_search(True)
         if hasattr(self, 'set_rubber_banding'):
             self.set_rubber_banding(True)
         fontlist = repo.ui.config('gtools', 'fontlist', 'MS UI Gothic 9')
@@ -190,21 +178,9 @@ class BrowsePane(gtk.TreeView):
                 filelist.append([ m, s ])
         filelist.sort()
 
-        class dirnode(object):
-            def __init__(self):
-                self.subdirs = {}
-                self.files = []
-                self.statuses = set()
-            def addfile(self, filename, st):
-                self.files.append((filename, st))
-                self.addstatus(st)
-            def addsubdir(self, dirname):
-                self.subdirs[dirname] = dirnode()
-            def addstatus(self, st):
-                self.statuses.add(st)
-
         def buildrow(name, stset, isfile):
-            row = [ name, False, hglib.toutf(name),
+            dirs, basename = self.split(name)
+            row = [ name, False, hglib.toutf(basename),
                      'M' in stset, 'A' in stset, 'R' in stset,
                      '!' in stset, '?' in stset, 'I' in stset,
                      'C' in stset, isfile ]
@@ -220,7 +196,7 @@ class BrowsePane(gtk.TreeView):
                     curdir.addsubdir(dir)
                 curdir.addstatus(filestatus)
                 curdir = curdir.subdirs[dir]
-            curdir.addfile(basename, filestatus)
+            curdir.addfile(name, filestatus)
 
         model = self.get_model()
         self.set_model(None) # disable updates while we fill the model
@@ -236,6 +212,63 @@ class BrowsePane(gtk.TreeView):
         adddir(modelroot)
         self.set_model(model)
 
+    def popupmenu(self, browse):
+        model, tpaths = browse.get_selection().get_selected_rows()
+        if not tpaths:
+            return
+        files = [model[p][0] for p in tpaths if model[p][10]]
+        menus = self.menu.get_commands(self.repo, self.repo.root, files)
+        # see nautilus extension for usage info
+        for menu_info in menus:
+            print menu_info
+
+    def buttonrelease(self, browse, event):
+        if event.button != 3:
+            return False
+        self.popupmenu(browse)
+        return True
+
+    def rowactivated(self, browse, path, column):
+        model, tpaths = browse.get_selection().get_selected_rows()
+        if not tpaths:
+            return
+        if len(tpaths) == 1 and not model[tpaths[0]][10]:
+            print 'cd', model[tpaths[0]][0]
+        else:
+            files = [model[p][0] for p in tpaths and model[p][10]]
+            print files, 'activated'
+
+class BrowseDialog(gtk.Dialog):
+    'Wrapper application for BrowsePane'
+    def __init__(self, command, pats):
+        gtk.Dialog.__init__(self)
+        gtklib.set_tortoise_icon(self, 'hg.ico')
+        gtklib.set_tortoise_keys(self)
+        self.set_has_separator(False)
+        self.set_default_size(400, 500)
+        self.connect('response', self.dialog_response)
+        repo = hg.repository(ui.ui(), path=paths.find_root())
+        self.set_title(_('%s - browser') % hglib.get_reponame(repo))
+
+        browse = BrowsePane(repo)
+        entry = gtk.Entry()
+        entry.set_text(repo.root)
+        self.vbox.pack_start(entry, False, True)
+
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        scroller.add(browse)
+        self.vbox.pack_start(scroller, True, True)
+        self.show_all()
+        self.browse = browse
+        gobject.idle_add(self.refresh)
+
+    def refresh(self):
+        self.browse.refresh()
+
+    def dialog_response(self, dialog, response):
+        return True
 
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)
