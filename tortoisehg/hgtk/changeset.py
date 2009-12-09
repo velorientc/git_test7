@@ -808,7 +808,7 @@ class ChangeSet(gdialog.GDialog):
                 self.graphview.set_revision_id(rev, load=True)
             else:
                 self.load_details(rev)
-        except RepoError:
+        except hglib.RepoError:
             pass
 
     def get_link_text(self, tag, widget, liter):
