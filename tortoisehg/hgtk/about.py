@@ -42,7 +42,7 @@ class AboutDialog(gtk.AboutDialog):
         self.set_name("TortoiseHg")
         self.set_version(_("(version %s)") % version.version())
         if hasattr(self, 'set_wrap_license'):
-            self.set_wrap_license(True)
+            self.set_wrap_license(False)
         self.set_copyright(_("Copyright 2009 Steve Borho and others"))
 
         thg_logo = paths.get_tortoise_icon('thg_logo_92x50.png')
@@ -60,8 +60,10 @@ class AboutDialog(gtk.AboutDialog):
             self.set_license('\n'.join(license))
 
         self.set_comments(_("with %s") % lib_versions + "\n\n" + comment)
-        self.set_logo(gtk.gdk.pixbuf_new_from_file(thg_logo))
-        self.set_icon_from_file(thg_icon)
+        if thg_logo:
+            self.set_logo(gtk.gdk.pixbuf_new_from_file(thg_logo))
+        if thg_icon:
+            self.set_icon_from_file(thg_icon)
         self.connect('response', self.response)
 
     def response(self, widget, respid):
