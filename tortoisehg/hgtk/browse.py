@@ -81,9 +81,9 @@ class dirnode(object):
 
 class BrowsePane(gtk.TreeView):
     'Dialog for browsing repo.status() output'
-    def __init__(self, repo):
+    def __init__(self, entry):
         gtk.TreeView.__init__(self)
-        self.repo = repo
+        self.entry = entry
         self.menu = menuthg.menuThg()
         fm = gtk.ListStore(str,  # canonical path
                            bool, # Checked
@@ -108,8 +108,6 @@ class BrowsePane(gtk.TreeView):
         self.set_enable_search(True)
         if hasattr(self, 'set_rubber_banding'):
             self.set_rubber_banding(True)
-        fontlist = repo.ui.config('gtools', 'fontlist', 'MS UI Gothic 9')
-        self.modify_font(pango.FontDescription(fontlist))
 
         col = gtk.TreeViewColumn(_('status'))
         self.append_column(col)
@@ -158,8 +156,47 @@ class BrowsePane(gtk.TreeView):
         dirs.reverse()
         return dirs, basename
 
-    def refresh(self, pats=[], filetypes='CI?'):
-        repo = self.repo
+    def chdir(self, cwd, repo):
+        'change directories inside a repo, or out of a repo'
+        def buildrow(name, stset, isfile):
+            dirs, basename = self.split(name)
+            row = [ name, False, hglib.toutf(basename),
+                     'M' in stset, 'A' in stset, 'R' in stset,
+                     '!' in stset, '?' in stset, 'I' in stset,
+                     'C' in stset, isfile ]
+            return row
+
+        def adddir(node):
+            for dname, dirnode in node.subdirs.iteritems():
+                model.append(buildrow(dname, dirnode.statuses, False))
+            for fname, st in node.files:
+                model.append(buildrow(fname, st, True))
+
+        model = self.get_model()
+        self.set_model(None) # disable updates while we fill the model
+        model.clear()
+        drive, tail = os.path.splitdrive(cwd)
+        if cwd != '/' or (drive and tail):
+            model.append(buildrow('..', '', False))
+
+        if repo and cwd.startswith(repo.root):
+            relpath = cwd[len(repo.root)+len(os.sep):]
+            dirs, basename = self.split(relpath)
+            node = self.cachedmodel
+            for dname in dirs:
+                node = node.subdirs[dname]
+            if basename:
+                node = node.subdirs[basename]
+            adddir(node)
+        else:
+            for name in os.listdir(cwd):
+                model.append(buildrow(name, '', os.path.isfile(name)))
+        self.entry.set_text(cwd)
+        self.set_model(model)
+        self.cwd = cwd
+        self.repo = repo
+
+    def refresh(self, cwd, repo, pats=[], filetypes='CI?'):
         hglib.invalidaterepo(repo)
         status = ([],)*7
         try:
@@ -178,14 +215,6 @@ class BrowsePane(gtk.TreeView):
                 filelist.append([ m, s ])
         filelist.sort()
 
-        def buildrow(name, stset, isfile):
-            dirs, basename = self.split(name)
-            row = [ name, False, hglib.toutf(basename),
-                     'M' in stset, 'A' in stset, 'R' in stset,
-                     '!' in stset, '?' in stset, 'I' in stset,
-                     'C' in stset, isfile ]
-            return row
-
         # Build tree data structure
         modelroot = dirnode()
         for name, filestatus in filelist:
@@ -198,19 +227,8 @@ class BrowsePane(gtk.TreeView):
                 curdir = curdir.subdirs[dir]
             curdir.addfile(name, filestatus)
 
-        model = self.get_model()
-        self.set_model(None) # disable updates while we fill the model
-        model.clear()
-        model.append(buildrow('..', '', False))
-        def adddir(node):
-            # insert subdirectories at this level (recursive)
-            for dname, dirnode in node.subdirs.iteritems():
-                model.append(buildrow(dname, dirnode.statuses, False))
-            # insert files at this level
-            for fname, st in node.files:
-                model.append(buildrow(fname, st, True))
-        adddir(modelroot)
-        self.set_model(model)
+        self.cachedmodel = modelroot
+        self.chdir(cwd, repo)
 
     def popupmenu(self, browse):
         model, tpaths = browse.get_selection().get_selected_rows()
@@ -233,7 +251,9 @@ class BrowsePane(gtk.TreeView):
         if not tpaths:
             return
         if len(tpaths) == 1 and not model[tpaths[0]][10]:
-            print 'cd', model[tpaths[0]][0]
+            newpath = os.path.join(self.cwd, model[tpaths[0]][0])
+            newpath = os.path.abspath(newpath)
+            self.chdir(newpath, self.repo)
         else:
             files = [model[p][0] for p in tpaths and model[p][10]]
             print files, 'activated'
@@ -250,10 +270,10 @@ class BrowseDialog(gtk.Dialog):
         repo = hg.repository(ui.ui(), path=paths.find_root())
         self.set_title(_('%s - browser') % hglib.get_reponame(repo))
 
-        browse = BrowsePane(repo)
         entry = gtk.Entry()
         entry.set_text(repo.root)
         self.vbox.pack_start(entry, False, True)
+        browse = BrowsePane(entry)
 
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -262,10 +282,10 @@ class BrowseDialog(gtk.Dialog):
         self.vbox.pack_start(scroller, True, True)
         self.show_all()
         self.browse = browse
-        gobject.idle_add(self.refresh)
+        gobject.idle_add(self.refresh, repo.root, repo)
 
-    def refresh(self):
-        self.browse.refresh()
+    def refresh(self, cwd, repo):
+        self.browse.refresh(cwd, repo)
 
     def dialog_response(self, dialog, response):
         return True
