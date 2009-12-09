@@ -76,13 +76,19 @@ class BrowseDialog(gtk.Dialog):
         self.set_default_size(400, 500)
         self.connect('response', self.dialog_response)
         repo = hg.repository(ui.ui(), path=paths.find_root())
+
+        self.set_title(_('%s - browser') % hglib.get_reponame(repo))
+
         browse = BrowsePane(repo)
+        entry = gtk.Entry()
+        entry.set_text(repo.root)
+        self.vbox.pack_start(entry, False, True)
 
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller.add(browse)
-        self.vbox.pack_start(scroller)
+        self.vbox.pack_start(scroller, True, True)
         self.show_all()
         self.browse = browse
         gobject.idle_add(self.refresh)
@@ -108,7 +114,7 @@ class BrowsePane(gtk.TreeView):
                            bool, # ?
                            bool, # I
                            bool, # C
-                           gobject.TYPE_PYOBJECT)  # file or folder xpm
+                           bool) # isfile
         self.set_model(fm)
         self.set_headers_visible(False)
         self.set_reorderable(True)
@@ -141,7 +147,8 @@ class BrowsePane(gtk.TreeView):
         #packpixmap('hg.ico', 9) # clean
 
         def cell_seticon(column, cell, model, iter):
-            pixbuf = model.get_value(iter, 10)
+            isfile = model.get_value(iter, 10)
+            pixbuf = isfile and filepb or folderpb
             cell.set_property('pixbuf', pixbuf)
 
         col = gtk.TreeViewColumn(_('type'))
@@ -197,11 +204,10 @@ class BrowsePane(gtk.TreeView):
                 self.statuses.add(st)
 
         def buildrow(name, stset, isfile):
-            pixmap = isfile and filepb or folderpb
             row = [ name, False, hglib.toutf(name),
                      'M' in stset, 'A' in stset, 'R' in stset,
                      '!' in stset, '?' in stset, 'I' in stset,
-                     'C' in stset, pixmap ]
+                     'C' in stset, isfile ]
             return row
 
         # Build tree data structure
@@ -219,6 +225,7 @@ class BrowsePane(gtk.TreeView):
         model = self.get_model()
         self.set_model(None) # disable updates while we fill the model
         model.clear()
+        model.append(buildrow('..', '', False))
         def adddir(node):
             # insert subdirectories at this level (recursive)
             for dname, dirnode in node.subdirs.iteritems():
