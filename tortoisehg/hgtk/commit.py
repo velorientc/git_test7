@@ -26,7 +26,7 @@ from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
 from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
 
 class BranchOperationDialog(gtk.Dialog):
-    def __init__(self, branch, close, mergebranches):
+    def __init__(self, branch, close, repo):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                             buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
                                      gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL),
@@ -40,11 +40,11 @@ class BranchOperationDialog(gtk.Dialog):
         self.newbranch = None
         self.closebranch = False
 
-        if mergebranches:
+        if len(repo.parents()) == 2:
             lbl = gtk.Label(_('Select branch of merge commit'))
             branchcombo = gtk.combo_box_new_text()
-            for name in mergebranches:
-                branchcombo.append_text(name)
+            for p in repo.parents():
+                branchcombo.append_text(p.branch())
             branchcombo.set_active(0)
             self.vbox.pack_start(lbl, True, True, 2)
             self.vbox.pack_start(branchcombo, True, True, 2)
@@ -58,8 +58,16 @@ class BranchOperationDialog(gtk.Dialog):
                 _('Open a new named branch'))
         self.newbranchradio.set_active(True)
         self.newbranchradio.connect('toggled', self.nbtoggle)
-        self.branchentry = gtk.Entry()
+        branchcombo = gtk.combo_box_entry_new_text()
+        self.branchentry = branchcombo.child
         self.branchentry.connect('activate', self.activated)
+
+        dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
+        deadbranches = [ x.strip() for x in dblist.split(',') ]
+        for name in repo.branchtags().keys():
+            if name not in deadbranches:
+                branchcombo.append_text(name)
+
         self.closebranchradio = gtk.RadioButton(nochanges,
                 _('Close current named branch'))
 
@@ -71,7 +79,7 @@ class BranchOperationDialog(gtk.Dialog):
         lbl.set_markup(gtklib.markup(_('Changes take effect on next commit'),
                                      weight='bold'))
         table.add_row(lbl, padding=False, ypad=6)
-        table.add_row(self.newbranchradio, self.branchentry)
+        table.add_row(self.newbranchradio, branchcombo)
         table.add_row(self.closebranchradio)
         table.add_row(nochanges)
 
@@ -475,11 +483,8 @@ class GCommit(GStatus):
             liststore.append([sumline, msg])
 
     def branch_clicked(self, button):
-        if self.is_merge():
-            mb = [p.branch() for p in self.repo.parents()]
-        else:
-            mb = None
-        dialog = BranchOperationDialog(self.nextbranch, self.closebranch, mb)
+        dialog = BranchOperationDialog(self.nextbranch,
+                                       self.closebranch, self.repo)
         dialog.run()
         self.nextbranch = None
         self.closebranch = False
@@ -856,13 +861,6 @@ class GCommit(GStatus):
         except:
             gdialog.Prompt(_('Undo Commit'),
                     _('Errors during rollback!'), self).run()
-
-
-    def changelog_clicked(self, toolbutton, data=None):
-        from tortoisehg.hgtk import history
-        dlg = history.run(self.ui)
-        dlg.display()
-        return True
 
 
     def should_addremove(self, files):

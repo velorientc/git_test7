@@ -10,7 +10,7 @@ import gtk
 import gobject
 import pango
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths, i18n, settings
@@ -43,7 +43,7 @@ class BackoutDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
 

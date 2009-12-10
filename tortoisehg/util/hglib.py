@@ -11,10 +11,9 @@ import traceback
 import shlib
 import time
 
-from mercurial.error import RepoError, ParseError, LookupError, RepoLookupError
-from mercurial.error import UnknownCommand, AmbiguousCommand, ConfigError
 from mercurial import hg, ui, util, extensions, commands, hook, match
 from mercurial import dispatch, encoding, templatefilters, bundlerepo, url
+
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
@@ -236,3 +235,5 @@ def validate_synch_path(path, repo):
             return_path = path_aux
     return return_path
 
+def get_repo_bookmarks(repo):
+    return repo._bookmarks.keys()

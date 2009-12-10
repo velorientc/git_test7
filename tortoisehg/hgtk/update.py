@@ -10,11 +10,10 @@ import os
 import gtk
 import gobject
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
-from tortoisehg.util.hglib import LookupError, RepoLookupError, RepoError
 
 from tortoisehg.hgtk import csinfo, gtklib, gdialog, hgcmd
 
@@ -34,7 +33,7 @@ class UpdateDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
@@ -182,7 +181,7 @@ class UpdateDialog(gtk.Dialog):
             else:
                 self.target_label.update(self.repo[newrev])
                 self.updatebtn.set_sensitive(True)
-        except (LookupError, RepoLookupError, RepoError):
+        except (error.LookupError, error.RepoLookupError, error.RepoError):
             self.target_label.set_label(_('unknown revision!'))
             self.updatebtn.set_sensitive(False)
 

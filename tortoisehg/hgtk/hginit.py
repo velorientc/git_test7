@@ -8,7 +8,7 @@
 import os
 import gtk
 
-from mercurial import hg, ui, util
+from mercurial import hg, ui, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib
@@ -110,7 +110,7 @@ class InitDialog(gtk.Dialog):
 
         try:
             hg.repository(u, dest, create=1)
-        except hglib.RepoError, inst:
+        except error.RepoError, inst:
             dialog.error_dialog(self, _('Unable to create new repository'),
                     hglib.toutf(str(inst)))
             return False

@@ -50,13 +50,15 @@ Name: hgbook; Description: The book 'Mercurial: The Definitive Guide' (PDF); Typ
 Name: shell; Description: Shell integration (overlay icons, context menu) [admin required]; Types: full; Flags: restart; Check: ShellInstallPossible
 
 [Files]
-Source: ..\build-hg\contrib\mercurial.el; DestDir: {app}/contrib
-Source: ..\build-hg\contrib\vim\*.*; DestDir: {app}/contrib/vim
-Source: ..\build-hg\contrib\zsh_completion; DestDir: {app}/contrib
+Source: ..\build-hg\contrib\mercurial.el; DestDir: {app}\contrib
+Source: ..\build-hg\contrib\vim\*.*; DestDir: {app}\contrib\vim
+Source: ..\build-hg\contrib\zsh\*.*; DestDir: {app}\contrib\zsh
+Source: ..\build-hg\contrib\bash\*.*; DestDir: {app}\contrib\bash
 Source: ..\build-hg\contrib\hgk; DestDir: {app}/contrib
 Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
-Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
-Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
+Source: ..\build-hg\mercurial\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
+Source: ..\build-hg\mercurial\help\*.txt; DestDir: {app}\help; Components: help
+Source: ..\build-hg\mercurial\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n
 Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ignoreversion; Components: help
 Source: ..\build-hg\doc\style.css; DestDir: {app}\docs; Flags: ignoreversion; Components: help
@@ -228,6 +230,9 @@ begin
   TaskbarMutex := 'thgtaskbar,Global\thgtaskbar';
   tries := 0;
   while (tries < 4) and CheckForMutexes(TaskbarMutex) do begin
+    TaskbarWindow := FindWindowByWindowName('TortoiseHg Overlay Icon Server');
+    if TaskbarWindow <> 0 then
+      SendMessage(TaskbarWindow, wm_Close, 0, 0);
     TaskbarWindow := FindWindowByWindowName('TortoiseHg RPC server');
     if TaskbarWindow <> 0 then
       SendMessage(TaskbarWindow, wm_Close, 0, 0);

@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, ui, node
+from mercurial import hg, ui, node, error
 
 from tortoisehg.util.i18n import _ as gettext
 from tortoisehg.util import cachethg, paths, hglib
@@ -89,6 +89,9 @@ thgcmenu = {
     'repoconf':   { 'label': _('Repository Settings'),
                     'help':  _('Configure repository settings'),
                     'icon':  'settings_repo.ico'},
+    'shellconf':  { 'label': _('Explorer extension settings'),
+                    'help':  _('Configure Explorer shell extension'),
+                    'icon':  'settings_user.ico'},
     'about':      { 'label': _('About TortoiseHg'),
                     'help':  _('Show About Dialog'),
                     'icon':  'menuabout.ico'},
@@ -204,7 +207,7 @@ def open_repo(path):
         try:
             repo = hg.repository(ui.ui(), path=root)
             return repo
-        except hglib.RepoError:
+        except error.RepoError:
             pass
         except StandardError, e:
             print "error while opening repo %s:" % path

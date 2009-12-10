@@ -10,7 +10,7 @@ import gtk
 import gobject
 import re
 
-from mercurial import hg, ui, match, util
+from mercurial import hg, ui, match, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib, paths
@@ -28,7 +28,7 @@ class HgIgnoreDialog(gtk.Window):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
