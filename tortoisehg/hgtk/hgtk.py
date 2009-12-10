@@ -20,7 +20,7 @@ import gtk
 import gobject
 
 import mercurial.ui as _ui
-from mercurial import hg, util, fancyopts, cmdutil, extensions
+from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 
 from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import hglib, paths, shlib
@@ -141,7 +141,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
     except fancyopts.getopt.GetoptError, inst:
-        raise hglib.ParseError(None, inst)
+        raise error.ParseError(None, inst)
 
     if args:
         alias, args = args[0], args[1:]
@@ -164,7 +164,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions)
     except fancyopts.getopt.GetoptError, inst:
-        raise hglib.ParseError(cmd, inst)
+        raise error.ParseError(cmd, inst)
 
     # separate global options back out
     for o in globalopts:
@@ -185,20 +185,20 @@ def _runcatch(ui, args):
             return runcommand(ui, args)
         finally:
             ui.flush()
-    except hglib.ParseError, inst:
+    except error.ParseError, inst:
         if inst.args[0]:
             ui.status(_("hgtk %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
             ui.status(_("hgtk: %s\n") % inst.args[1])
             help_(ui, 'shortlist')
-    except hglib.AmbiguousCommand, inst:
+    except error.AmbiguousCommand, inst:
         ui.status(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
-    except hglib.UnknownCommand, inst:
+    except error.UnknownCommand, inst:
         ui.status(_("hgtk: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
-    except hglib.RepoError, inst:
+    except error.RepoError, inst:
         ui.status(_("abort: %s!\n") % inst)
 
     return -1
@@ -246,7 +246,7 @@ def runcommand(ui, args):
         ui.quiet = True
 
     if cmd not in nonrepo_commands.split() and not path:
-        raise hglib.RepoError(_("There is no Mercurial repository here"
+        raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
 
     try:
@@ -256,7 +256,7 @@ def runcommand(ui, args):
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 1: # no
             raise
-        raise hglib.ParseError(cmd, _("invalid arguments"))
+        raise error.ParseError(cmd, _("invalid arguments"))
 
 mainwindow = None
 def thgexit(win):
@@ -399,7 +399,7 @@ def serve(ui, *pats, **opts):
     """web server"""
     from tortoisehg.hgtk.serve import run
     if paths.find_root() == None and not opts['webdir_conf']:
-        raise hglib.RepoError(_("There is no Mercurial repository here"
+        raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
     gtkrun(run, ui, *pats, **opts)
 
@@ -477,7 +477,7 @@ def help_(ui, name=None, with_version=False, alias=None):
 
         try:
             aliases, i = cmdutil.findcmd(name, table, False)
-        except hglib.AmbiguousCommand, inst:
+        except error.AmbiguousCommand, inst:
             select = lambda c: c.lstrip('^').startswith(inst.args[0])
             helplist(_('list of commands:\n\n'), select)
             return
@@ -546,7 +546,7 @@ def help_(ui, name=None, with_version=False, alias=None):
             if name in names:
                 break
         else:
-            raise hglib.UnknownCommand(name)
+            raise error.UnknownCommand(name)
 
         # description
         if not doc:
@@ -564,7 +564,7 @@ def help_(ui, name=None, with_version=False, alias=None):
                 f(name)
                 i = None
                 break
-            except hglib.UnknownCommand, inst:
+            except error.UnknownCommand, inst:
                 i = inst
         if i:
             raise i

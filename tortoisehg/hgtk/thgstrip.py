@@ -11,7 +11,7 @@ import gtk
 import gobject
 import pango
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 from mercurial.node import nullrev
 
 from tortoisehg.util.i18n import _
@@ -41,7 +41,7 @@ class StripDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
@@ -335,7 +335,7 @@ class StripDialog(gtk.Dialog):
             return None
         try:
             revnum = self.repo[revstr].rev()
-        except (hglib.RepoError, hglib.LookupError):
+        except (error.RepoError, error.LookupError):
             return None
         return revnum
 

@@ -12,7 +12,7 @@ import gobject
 import pango
 import Queue
 
-from mercurial import cmdutil, util, patch, mdiff
+from mercurial import cmdutil, util, patch, mdiff, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib, paths
@@ -303,7 +303,7 @@ class ChangeSet(gdialog.GDialog):
 
         try:
             fctx = self.repo[rev].filectx(wfile)
-        except hglib.LookupError:
+        except error.LookupError:
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             lines = ['diff',
@@ -315,7 +315,7 @@ class ChangeSet(gdialog.GDialog):
             try:
                 for s in patch.diff(self.repo, n1, n2, match=m, opts=opts):
                     lines.extend(s.splitlines())
-            except (hglib.RepoLookupError, hglib.RepoError, hglib.LookupError), e:
+            except (error.RepoLookupError, error.RepoError, error.LookupError), e:
                 err = _('Repository Error:  %s, refresh suggested') % str(e)
                 lines = ['diff', '', err]
         tags, lines = self.prepare_diff(lines, offset, wfile)
@@ -514,7 +514,7 @@ class ChangeSet(gdialog.GDialog):
                 try:
                     tctx = self.repo[ts]
                     return revline_data(tctx)
-                except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+                except (error.LookupError, error.RepoLookupError, error.RepoError):
                     return ts
             elif item == 'patch':
                 if hasattr(ctx, '_patchname'):
@@ -808,7 +808,7 @@ class ChangeSet(gdialog.GDialog):
                 self.graphview.set_revision_id(rev, load=True)
             else:
                 self.load_details(rev)
-        except hglib.RepoError:
+        except error.RepoError:
             pass
 
     def get_link_text(self, tag, widget, liter):
@@ -842,7 +842,7 @@ class ChangeSet(gdialog.GDialog):
         try:
             fctx = ctx.filectx(self.curfile)
             has_filelog = fctx.filelog().linkrev(fctx.filerev()) == ctx.rev()
-        except hglib.LookupError:
+        except error.LookupError:
             has_filelog = False
         self.ann_menu.set_sensitive(has_filelog)
         self.save_menu.set_sensitive(has_filelog)

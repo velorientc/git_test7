@@ -15,7 +15,7 @@ import gobject
 import pango
 import threading
 
-from mercurial import cmdutil, util, commands, patch, mdiff
+from mercurial import cmdutil, util, commands, patch, mdiff, error
 from mercurial import merge as merge_
 
 from tortoisehg.util.i18n import _
@@ -1062,7 +1062,7 @@ class GStatus(gdialog.GDialog):
         try:
             pfile = util.pconvert(wfile)
             fctx = ctx.filectx(pfile)
-        except hglib.LookupError:
+        except error.LookupError:
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             # Fake patch that displays size warning

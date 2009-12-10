@@ -10,7 +10,7 @@ import gtk
 import gobject
 import pango
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -39,7 +39,7 @@ class ArchiveDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
@@ -176,7 +176,7 @@ class ArchiveDialog(gtk.Dialog):
         else:
             try:
                 self.repo[text]
-            except (hglib.RepoError, hglib.LookupError):
+            except (error.RepoError, error.LookupError):
                 return
         if path is None:
             path = self.destentry.get_text()

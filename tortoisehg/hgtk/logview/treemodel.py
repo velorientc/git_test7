@@ -18,7 +18,7 @@ import gtk
 import gobject
 import re
 
-from mercurial import util, templatefilters
+from mercurial import util, error
 from tortoisehg.util import hglib
 from tortoisehg.hgtk import gtklib
 
@@ -263,7 +263,7 @@ class TreeModel(gtk.GenericTreeModel):
                 self.author_pats.append((re.compile(pat, re.I), v))
             try:
                 enabled = self.repo.ui.configbool('tortoisehg', 'authorcolor')
-            except hglib.ConfigError:
+            except error.ConfigError:
                 enabled = False
             if self.author_pats or enabled:
                 self.color_func = self.text_color_author

@@ -12,7 +12,7 @@ import re
 import urlparse
 import threading
 
-from mercurial import hg, ui, util, url, filemerge
+from mercurial import hg, ui, util, url, filemerge, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -535,7 +535,7 @@ class ConfigDialog(gtk.Dialog):
             else:
                 repo = None
             self.root = root
-        except hglib.RepoError:
+        except error.RepoError:
             repo = None
             if configrepo:
                 dialog.error_dialog(self, _('No repository found'),

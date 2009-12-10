@@ -12,7 +12,7 @@ import os
 import gtk
 import binascii
 
-from mercurial import patch, util
+from mercurial import patch, util, error
 from mercurial.node import short, hex
 
 from tortoisehg.util.i18n import _
@@ -113,7 +113,7 @@ def ChangesetContext(repo, rev):
         return None
     try:
         ctx = repo[rev]
-    except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+    except (error.LookupError, error.RepoLookupError, error.RepoError):
         ctx = None
     return ctx
 
@@ -165,7 +165,7 @@ class patchctx(object):
                 continue
             try:
                 self._parents.append(repo[p])
-            except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+            except (error.LookupError, error.RepoLookupError, error.RepoError):
                 self._parents.append(p)
 
     def __str__(self):

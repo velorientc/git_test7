@@ -11,7 +11,7 @@ import gtk
 import cStringIO
 import shutil
 
-from mercurial import hg, ui, util, commands
+from mercurial import hg, ui, util, commands, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -47,7 +47,7 @@ def rename_resp(dlg, response):
     try:
         root = paths.find_root()
         repo = hg.repository(ui.ui(), root)
-    except (ImportError, hglib.RepoError):
+    except (ImportError, error.RepoError):
         dlg.destroy()
         return
 
@@ -72,7 +72,7 @@ def rename_resp(dlg, response):
             shutil.move(dlg.orig, new_name)
             commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
-        except (OSError, IOError, util.Abort, hglib.RepoError), inst:
+        except (OSError, IOError, util.Abort, error.RepoError), inst:
             dialog.error_dialog(None, _('rename error'), str(inst))
             toquit = False
     finally:

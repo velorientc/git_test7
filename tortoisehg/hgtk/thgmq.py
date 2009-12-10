@@ -11,7 +11,7 @@ import gtk.keysyms
 import gobject
 import pango
 
-from mercurial import extensions
+from mercurial import extensions, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -766,7 +766,7 @@ class MQWidget(gtk.VBox):
         try:
             ctx = self.repo[patchname]
             revid = ctx.rev()
-        except hglib.RepoError:
+        except (error.RepoError, error.RepoLookupError):
             revid = -1
         self.emit('patch-selected', revid, patchname)
 

@@ -15,7 +15,7 @@ import tempfile
 import atexit
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
-from mercurial import hbisect
+from mercurial import hbisect, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -2055,7 +2055,7 @@ class GLog(gdialog.GDialog):
             parent = self.repo[rev].parents()[0].rev()
             # Special case for revision 0's parent.
             if parent == -1: parent = 'null'
-        except (ValueError, hglib.LookupError):
+        except (ValueError, error.LookupError):
             return
         filename = "%s_rev%d_to_tip.hg" % (os.path.basename(self.repo.root), rev)
         result = gtklib.NativeSaveFileDialogWrapper(title=_('Write bundle to'),

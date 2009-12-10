@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, ui, node
+from mercurial import hg, ui, node, error
 
 from tortoisehg.util.i18n import _ as gettext
 from tortoisehg.util import cachethg, paths, hglib
@@ -207,7 +207,7 @@ def open_repo(path):
         try:
             repo = hg.repository(ui.ui(), path=root)
             return repo
-        except hglib.RepoError:
+        except error.RepoError:
             pass
         except StandardError, e:
             print "error while opening repo %s:" % path

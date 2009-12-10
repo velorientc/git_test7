@@ -10,11 +10,10 @@ import gtk
 import gobject
 import pango
 
-from mercurial import hg, ui, cmdutil
+from mercurial import hg, ui, cmdutil, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths, shlib
-from tortoisehg.util.hglib import RepoError
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
@@ -34,7 +33,7 @@ class QuickOpDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
 

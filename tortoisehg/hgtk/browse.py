@@ -14,7 +14,6 @@ from mercurial import hg, ui, cmdutil
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths, shlib, menuthg
-from tortoisehg.util.hglib import RepoError
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog
 
