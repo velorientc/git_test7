@@ -18,7 +18,7 @@ import gtk
 import gobject
 import re
 
-from mercurial import util, templatefilters
+from mercurial import util, error
 from tortoisehg.util import hglib
 from tortoisehg.hgtk import gtklib
 
@@ -65,7 +65,10 @@ class TreeModel(gtk.GenericTreeModel):
     def refresh(self):
         repo = self.repo
         oldtags, oldparents = self.tagrevs, self.wcparents
-        oldbranches = [repo[n].rev() for n in self.branchtags.values()]
+        try:
+            oldbranches = [repo[n].rev() for n in self.branchtags.values()]
+        except error.RepoLookupError:
+            oldbranches = []
 
         repo.invalidate()
         repo.dirstate.invalidate()
