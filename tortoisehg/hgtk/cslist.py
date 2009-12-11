@@ -1,4 +1,4 @@
-# cslist.py - embeddable changeset list component
+# cslist.py - embeddable changeset/patch list component
 #
 # Copyright 2009 Yuki KODAMA <endflow.net@gmail.com>
 #
@@ -24,7 +24,7 @@ class ChangesetList(gtk.Frame):
                          gobject.TYPE_NONE,
                          (object, # number of count or None
                           object, # number of total or None
-                          bool,   # whether all changesets are shown
+                          bool,   # whether all items are shown
                           bool))  # whether cslist is updating
     }
 
@@ -69,7 +69,7 @@ class ChangesetList(gtk.Frame):
         self.compactopt = gtk.CheckButton(_('Use compact view'))
         statusbox.pack_end(self.compactopt, False, False, 2)
 
-        ## changeset list
+        ## item list
         scroll = gtk.ScrolledWindow()
         basebox.add(scroll)
         self.scroll = scroll
@@ -117,7 +117,7 @@ class ChangesetList(gtk.Frame):
 
     def update(self, items=None, repo=None, limit=True, queue=False, **kargs):
         """
-        Update changeset list.
+        Update the item list.
 
         Public arguments:
         items:   List of revision numbers and/or patch file path.
@@ -127,7 +127,7 @@ class ChangesetList(gtk.Frame):
         repo:    Repository used to get changeset information.
                  If omitted, previous repo will be used to show them.
                  Default: None.
-        limit:   If True, some of changesets will be shown.  Default: True.
+        limit:   If True, some of items will be shown.  Default: True.
         queue:   If True, the update request will be queued to prevent
                  frequent updatings.  In some cases, this option will help
                  to improve UI response.  Default: False.
@@ -137,8 +137,8 @@ class ChangesetList(gtk.Frame):
                  Note that if you use this, 'limit' value will be ignored
                  and overwritten by previous 'limit' value.  Default: False.
 
-        return:  True if the list was updated, False if the list wasn't
-                 updated.
+        return:  True if the item list was updated successfully,
+                 False if it wasn't updated.
         """
         # check parameters
         if not items or not repo:
@@ -203,7 +203,7 @@ class ChangesetList(gtk.Frame):
             snipbox.pack_start(gtk.Label())
             self.item_snip = snipbox
 
-        # determine changesets to show
+        # determine items to show
         numtotal = len(items)
         if limit and self.limit < numtotal:
             toshow, lastitem = items[:self.limit-1], items[self.limit-1:][-1]
@@ -213,7 +213,7 @@ class ChangesetList(gtk.Frame):
         self.showitems = toshow + (lastitem and [lastitem] or [])
 
         def proc():
-            # update changeset list
+            # update item list
             add_sep(False, 'first', (-1, 0))
             for index, r in enumerate(toshow):
                 add_csinfo(r)
@@ -246,7 +246,7 @@ class ChangesetList(gtk.Frame):
 
     def clear(self, noemit=False):
         """
-        Clear changeset list.
+        Clear the item list.
 
         noemit: If True, cslist won't emit 'list-updated' signal.
                 Default: False.
@@ -279,12 +279,12 @@ class ChangesetList(gtk.Frame):
         return []
 
     def get_list_limit(self):
-        """ Return number of changesets to limit to display """
+        """ Return number of items to limit to display """
         return self.limit
 
     def set_list_limit(self, limit):
         """
-        Set number of changesets to limit to display.
+        Set number of items to limit to display.
 
         limit: Integer, must be more than 3.  Default: 20.
         """
@@ -313,7 +313,7 @@ class ChangesetList(gtk.Frame):
         """
         Set whether the selection feature is enabled.
         When it's enabled, checboxes will be shown in the left of
-        changeset panels.
+        csinfo widgets.
 
         enable: Boolean, if True, the selection feature will be enabled.
                 Default: False.
@@ -322,8 +322,8 @@ class ChangesetList(gtk.Frame):
 
     def has_limit(self):
         """
-        Return whether the list shows all changesets.
-        If the list has no changesets, it will return None.
+        Return whether the item list shows all items.
+        If the item list has no items, it will return None.
         """
         if self.curitems:
             num = len(self.curitems)
@@ -354,14 +354,14 @@ class ChangesetList(gtk.Frame):
         if message:
             text = message
         elif count is None or total is None:
-            text = _('No changesets to display')
+            text = _('No items to display')
         else:
             all = count == total
             button = not all
             if all:
-                text = _('Displaying all changesets')
+                text = _('Displaying all items')
             else:
-                text = _('Displaying %(count)d of %(total)d changesets') \
+                text = _('Displaying %(count)d of %(total)d items') \
                             % dict(count=count, total=total)
         self.statuslabel.set_text(text)
         self.allbtn.set_property('visible', button)
