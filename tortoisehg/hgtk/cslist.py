@@ -24,7 +24,8 @@ class ChangesetList(gtk.Frame):
                          gobject.TYPE_NONE,
                          (object, # number of count or None
                           object, # number of total or None
-                          bool))  # whether all changesets are shown
+                          bool,   # whether all changesets are shown
+                          bool))  # whether cslist is updating
     }
 
     def __init__(self):
@@ -109,7 +110,7 @@ class ChangesetList(gtk.Frame):
         self.pstyle = csinfo.panelstyle()
 
         # prepare to show
-        self.clear()
+        self.clear(noemit=True)
         gtklib.idle_add_single_call(self.after_init)
 
     ### public functions ###
@@ -157,7 +158,7 @@ class ChangesetList(gtk.Frame):
         if kargs.get('keep', False) and self.has_limit() is False:
             limit = False
 
-        self.clear()
+        self.clear(noemit=True)
 
         self.curitems = items
         self.currepo = repo
@@ -211,31 +212,49 @@ class ChangesetList(gtk.Frame):
         numshow = len(toshow) + (lastitem and 1 or 0)
         self.showitems = toshow + (lastitem and [lastitem] or [])
 
-        # update changeset list
-        add_sep(False, 'first', (-1, 0))
-        for index, r in enumerate(toshow):
-            add_csinfo(r)
-            if not r == toshow[-1]:
-                key = (index, index + 1)
-                add_sep(not compactview, key)
-        if lastitem:
-            add_sep(False, (len(toshow) - 1, len(toshow)))
-            add_snip()
-            add_sep(False, (numtotal - 2, numtotal - 1))
-            add_csinfo(lastitem)
-        key = (numtotal - 1, numtotal)
-        add_sep(False, 'last', key)
-        self.csbox.show_all()
+        def proc():
+            # update changeset list
+            add_sep(False, 'first', (-1, 0))
+            for index, r in enumerate(toshow):
+                add_csinfo(r)
+                if not r == toshow[-1]:
+                    key = (index, index + 1)
+                    add_sep(not compactview, key)
+            if lastitem:
+                add_sep(False, (len(toshow) - 1, len(toshow)))
+                add_snip()
+                add_sep(False, (numtotal - 2, numtotal - 1))
+                add_csinfo(lastitem)
+            key = (numtotal - 1, numtotal)
+            add_sep(False, 'last', key)
+            self.csbox.show_all()
 
-        # update status
-        all = self.update_status(numshow, numtotal)
+            # update status
+            self.update_status(numshow, numtotal)
+            self.emit('list-updated', numshow, numtotal,
+                      not self.has_limit(), False)
+
+        if numshow < 80:
+            proc()
+        else:
+            self.update_status(message=_('Updating...'))
+            self.emit('list-updated', numshow, numtotal,
+                      not self.has_limit(), True)
+            gtklib.idle_add_single_call(proc)
 
         return True
 
-    def clear(self):
-        """ Clear changeset list """
+    def clear(self, noemit=False):
+        """
+        Clear changeset list.
+
+        noemit: If True, cslist won't emit 'list-updated' signal.
+                Default: False.
+        """
         self.csbox.foreach(lambda c: c.parent.remove(c))
         self.update_status()
+        if not noemit:
+            self.emit('list-updated', None, None, None, None)
         self.curitems = None
         self.showitems = None
         self.currepo = None
@@ -330,9 +349,11 @@ class ChangesetList(gtk.Frame):
         add('center', (SIZE, SIZE, alloc.width - 2 * SIZE,
                        alloc.height - 2 * SIZE))
 
-    def update_status(self, count=None, total=None):
-        if count is None or total is None:
-            all = button = False
+    def update_status(self, count=None, total=None, message=None):
+        all = button = False
+        if message:
+            text = message
+        elif count is None or total is None:
             text = _('No changesets to display')
         else:
             all = count == total
@@ -344,7 +365,6 @@ class ChangesetList(gtk.Frame):
                             % dict(count=count, total=total)
         self.statuslabel.set_text(text)
         self.allbtn.set_property('visible', button)
-        self.emit('list-updated', count, total, all)
 
     def setup_dnd(self, restart=False):
         if not restart and self.scroll_timer is None:
