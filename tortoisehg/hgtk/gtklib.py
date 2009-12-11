@@ -150,7 +150,7 @@ class NativeSaveFileDialogWrapper:
     that isn't available"""
     def __init__(self, initial = None, title = _('Save File'),
                  filter = ((_('All files'), '*.*'),), filterindex = 1,
-                 filename = '', open=False):
+                 filename = '', open=False, multi=False):
         if initial is None:
             initial = os.path.expanduser("~")
         self.initial = initial
@@ -159,6 +159,7 @@ class NativeSaveFileDialogWrapper:
         self.filter = filter
         self.filterindex = filterindex
         self.open = open
+        self.multi = multi
 
     def run(self):
         """run the file dialog, either return a file name, or False if
@@ -185,8 +186,11 @@ class NativeSaveFileDialogWrapper:
                 f = ''
                 for name, mask in self.filter:
                     f += '\0'.join([name, mask,''])
+                flags = win32con.OFN_EXPLORER
+                if self.multi:
+                    flags |= win32con.OFN_ALLOWMULTISELECT
                 opts = dict(InitialDir=self.initial,
-                        Flags=win32con.OFN_EXPLORER,
+                        Flags=flags,
                         File=self.filename,
                         DefExt=None,
                         Title=hglib.fromutf(self.title),
@@ -194,11 +198,10 @@ class NativeSaveFileDialogWrapper:
                         CustomFilter=None,
                         FilterIndex=self.filterindex)
                 if self.open:
-                    fname, _, _ = win32gui.GetOpenFileNameW(**opts)
+                    ret = win32gui.GetOpenFileNameW(**opts)
                 else:
-                    fname, _, _ = win32gui.GetSaveFileNameW(**opts)
-                if fname:
-                    fname = os.path.abspath(fname)
+                    ret = win32gui.GetSaveFileNameW(**opts)
+                fname = ret[0]
             except pywintypes.error:
                 pass
             os.chdir(cwd)
@@ -213,6 +216,14 @@ class NativeSaveFileDialogWrapper:
         fname = False 
         if q.qsize():
             fname = q.get(0)
+        if fname and self.multi and fname.find('\x00') != -1:
+            splitted = fname.split('\x00')
+            dir, fnames = splitted[0], splitted[1:]
+            fname = []
+            for fn in fnames:
+                path = os.path.abspath(os.path.join(dir, fn))
+                if os.path.exists(path):
+                    fname.append(hglib.toutf(path))
         return fname
 
     def runCompatible(self):
@@ -227,6 +238,8 @@ class NativeSaveFileDialogWrapper:
         dlg = gtk.FileChooserDialog(self.title, None, action, buttons)
         dlg.set_default_response(gtk.RESPONSE_OK)
         dlg.set_current_folder(self.initial)
+        if self.multi:
+            dlg.set_select_multiple(True)
         if not self.open:
             dlg.set_current_name(self.filename)
         for name, pattern in self.filter:
@@ -235,7 +248,10 @@ class NativeSaveFileDialogWrapper:
             fi.add_pattern(pattern)
             dlg.add_filter(fi)
         if dlg.run() == gtk.RESPONSE_OK:
-            result = dlg.get_filename();
+            if self.multi:
+                result = dlg.get_filenames()
+            else:
+                result = dlg.get_filename()
         else:
             result = False
         dlg.destroy()
