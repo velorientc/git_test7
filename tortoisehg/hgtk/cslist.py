@@ -32,6 +32,7 @@ class ChangesetList(gtk.Frame):
         self.set_shadow_type(gtk.SHADOW_IN)
 
         self.limit = 20
+        self.sel_enable = False
 
         # dnd variables
         self.dnd_enable = False
@@ -165,12 +166,22 @@ class ChangesetList(gtk.Frame):
         style = compactview and self.lstyle or self.pstyle
         factory = csinfo.factory(repo, withupdate=True)
 
-        def add_csinfo(rev):
-            info = factory(rev, style)
+        def add_csinfo(item):
+            info = factory(item, style)
             if info.parent:
                 info.parent.remove(info)
+            if self.sel_enable:
+                check = gtk.CheckButton()
+                check.set_active(True)
+                self.chkmap[item] = check
+                align = gtk.Alignment(0.5, 0)
+                align.add(check)
+                hbox = gtk.HBox()
+                hbox.pack_start(align, False, False)
+                hbox.pack_start(info, False, False)
+                info = hbox
             self.csbox.pack_start(info, False, False, 2)
-            self.itemmap[rev] = info
+            self.itemmap[item] = info
         def add_sep(show, *keys):
             sep = FixedHSeparator(visible=show)
             self.csbox.pack_start(sep, False, False)
@@ -230,7 +241,23 @@ class ChangesetList(gtk.Frame):
         self.currepo = None
         self.timeout_queue = []
         self.itemmap = {}
+        self.chkmap = {}
         self.sepmap = {}
+
+    def get_items(self, sel=False):
+        """
+        Return a list of items or tuples contained 2 values:
+        'item' (String) and 'selection state' (Boolean).
+        If cslist lists no items, it returns an empty list.
+
+        sel: If True, it returns a list of tuples.  Default: False.
+        """
+        if self.curitems:
+            items = self.curitems
+            if not sel:
+                return items
+            return [(item, self.chkmap[item].get_active()) for item in items]
+        return []
 
     def get_list_limit(self):
         """ Return number of changesets to limit to display """
@@ -258,6 +285,21 @@ class ChangesetList(gtk.Frame):
                 Default: False.
         """
         self.dnd_enable = enable
+
+    def get_checkbox_enable(self):
+        """ Return whether the selection feature is enabled """
+        return self.sel_enable
+
+    def set_checkbox_enable(self, enable):
+        """
+        Set whether the selection feature is enabled.
+        When it's enabled, checboxes will be shown in the left of
+        changeset panels.
+
+        enable: Boolean, if True, the selection feature will be enabled.
+                Default: False.
+        """
+        self.sel_enable = enable
 
     def has_limit(self):
         """
