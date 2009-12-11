@@ -22,8 +22,9 @@ class ChangesetList(gtk.Frame):
     __gsignals__ = {
         'list-updated': (gobject.SIGNAL_RUN_FIRST,
                          gobject.TYPE_NONE,
-                         (object, # number of count or None
-                          object, # number of total or None
+                         (object, # number of all items or None
+                          object, # number of selections or None
+                          object, # number of showings or None
                           bool,   # whether all items are shown
                           bool))  # whether cslist is updating
     }
@@ -32,11 +33,20 @@ class ChangesetList(gtk.Frame):
         gtk.Frame.__init__(self)
         self.set_shadow_type(gtk.SHADOW_IN)
 
+        # member variables
+        self.curitems = None
+        self.currepo = None
+        self.showitems = None
+        self.chkmap = {}
         self.limit = 20
+
+        self.timeout_queue = []
         self.sel_enable = False
+        self.dnd_enable = False
 
         # dnd variables
-        self.dnd_enable = False
+        self.itemmap = {}
+        self.sepmap = {}
         self.hlsep = None
         self.dnd_pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, 1, 1)
         self.scroll_timer = None
@@ -87,7 +97,7 @@ class ChangesetList(gtk.Frame):
 
         # signal handlers
         self.allbtn.connect('clicked', lambda b: self.update(self.curitems, \
-                self.currepo, limit=False, queue=False))
+                self.currepo, limit=False, queue=False, keep=True))
         self.compactopt.connect('toggled', lambda b: self.update( \
                 self.curitems, self.currepo, queue=False, keep=True))
 
@@ -110,7 +120,6 @@ class ChangesetList(gtk.Frame):
         self.pstyle = csinfo.panelstyle()
 
         # prepare to show
-        self.clear(noemit=True)
         gtklib.idle_add_single_call(self.after_init)
 
     ### public functions ###
@@ -120,25 +129,26 @@ class ChangesetList(gtk.Frame):
         Update the item list.
 
         Public arguments:
-        items:   List of revision numbers and/or patch file path.
-                 You can pass mixed list.  The order will be respected.
-                 If omitted, previous items will be used to show them.
-                 Default: None.
-        repo:    Repository used to get changeset information.
-                 If omitted, previous repo will be used to show them.
-                 Default: None.
-        limit:   If True, some of items will be shown.  Default: True.
-        queue:   If True, the update request will be queued to prevent
-                 frequent updatings.  In some cases, this option will help
-                 to improve UI response.  Default: False.
+        items: List of revision numbers and/or patch file path.
+               You can pass mixed list.  The order will be respected.
+               If omitted, previous items will be used to show them.
+               Default: None.
+        repo: Repository used to get changeset information.
+              If omitted, previous repo will be used to show them.
+              Default: None.
+        limit: If True, some of items will be shown.  Default: True.
+        queue: If True, the update request will be queued to prevent
+               frequent updatings.  In some cases, this option will help
+               to improve UI response.  Default: False.
 
         Internal argument:
-        keep:    If True, it keeps previous 'limit' state after refreshing.
-                 Note that if you use this, 'limit' value will be ignored
-                 and overwritten by previous 'limit' value.  Default: False.
+        keep: If True, it keeps previous selection states and 'limit' value
+              after refreshing.  Note that if you use 'limit' and this options
+              at the same time, 'limit' value is used against previous value.
+              Default: False.
 
-        return:  True if the item list was updated successfully,
-                 False if it wasn't updated.
+        return: True if the item list was updated successfully,
+                False if it wasn't updated.
         """
         # check parameters
         if not items or not repo:
@@ -158,11 +168,27 @@ class ChangesetList(gtk.Frame):
         if kargs.get('keep', False) and self.has_limit() is False:
             limit = False
 
-        self.clear(noemit=True)
-
+        # initialize variables
         self.curitems = items
         self.currepo = repo
+        self.itemmap = {}
+        self.sepmap = {}
 
+        if self.sel_enable and not kargs.get('keep', False):
+            self.chkmap = {}
+            for item in items:
+                self.chkmap[item] = True
+
+        # determine items to show
+        numtotal = len(items)
+        if limit and self.limit < numtotal:
+            toshow, lastitem = items[:self.limit-1], items[self.limit-1:][-1]
+        else:
+            toshow, lastitem = items, None
+        numshow = len(toshow) + (lastitem and 1 or 0)
+        self.showitems = toshow + (lastitem and [lastitem] or [])
+
+        # prepare to update item list
         compactview = self.compactopt.get_active()
         style = compactview and self.lstyle or self.pstyle
         factory = csinfo.factory(repo, withupdate=True)
@@ -173,8 +199,8 @@ class ChangesetList(gtk.Frame):
                 info.parent.remove(info)
             if self.sel_enable:
                 check = gtk.CheckButton()
-                check.set_active(True)
-                self.chkmap[item] = check
+                check.set_active(self.chkmap[item])
+                check.connect('toggled', self.check_toggled, item)
                 align = gtk.Alignment(0.5, 0)
                 align.add(check)
                 hbox = gtk.HBox()
@@ -203,17 +229,11 @@ class ChangesetList(gtk.Frame):
             snipbox.pack_start(gtk.Label())
             self.item_snip = snipbox
 
-        # determine items to show
-        numtotal = len(items)
-        if limit and self.limit < numtotal:
-            toshow, lastitem = items[:self.limit-1], items[self.limit-1:][-1]
-        else:
-            toshow, lastitem = items, None
-        numshow = len(toshow) + (lastitem and 1 or 0)
-        self.showitems = toshow + (lastitem and [lastitem] or [])
+        # clear item list
+        self.csbox.foreach(lambda c: c.parent.remove(c))
 
+        # update item list
         def proc():
-            # update item list
             add_sep(False, 'first', (-1, 0))
             for index, r in enumerate(toshow):
                 add_csinfo(r)
@@ -230,38 +250,20 @@ class ChangesetList(gtk.Frame):
             self.csbox.show_all()
 
             # update status
-            self.update_status(numshow, numtotal)
-            self.emit('list-updated', numshow, numtotal,
-                      not self.has_limit(), False)
+            self.update_status()
 
         if numshow < 80:
             proc()
         else:
-            self.update_status(message=_('Updating...'))
-            self.emit('list-updated', numshow, numtotal,
-                      not self.has_limit(), True)
+            self.update_status(updating=True)
             gtklib.idle_add_single_call(proc)
 
         return True
 
-    def clear(self, noemit=False):
-        """
-        Clear the item list.
-
-        noemit: If True, cslist won't emit 'list-updated' signal.
-                Default: False.
-        """
+    def clear(self):
+        """ Clear the item list  """
         self.csbox.foreach(lambda c: c.parent.remove(c))
         self.update_status()
-        if not noemit:
-            self.emit('list-updated', None, None, None, None)
-        self.curitems = None
-        self.showitems = None
-        self.currepo = None
-        self.timeout_queue = []
-        self.itemmap = {}
-        self.chkmap = {}
-        self.sepmap = {}
 
     def get_items(self, sel=False):
         """
@@ -271,11 +273,11 @@ class ChangesetList(gtk.Frame):
 
         sel: If True, it returns a list of tuples.  Default: False.
         """
-        if self.curitems:
-            items = self.curitems
+        items = self.curitems
+        if items:
             if not sel:
                 return items
-            return [(item, self.chkmap[item].get_active()) for item in items]
+            return [(item, self.chkmap[item]) for item in items]
         return []
 
     def get_list_limit(self):
@@ -349,29 +351,44 @@ class ChangesetList(gtk.Frame):
         add('center', (SIZE, SIZE, alloc.width - 2 * SIZE,
                        alloc.height - 2 * SIZE))
 
-    def update_status(self, count=None, total=None, message=None):
-        all = button = False
-        if message:
-            text = message
-        elif count is None or total is None:
+    def update_status(self, updating=False):
+        numshow = numsel = numtotal = all = None
+        button = False
+        if updating:
+            text = _('Updating...')
+        elif self.curitems is None:
             text = _('No items to display')
         else:
-            all = count == total
+            numshow, numtotal = len(self.showitems), len(self.curitems)
+            data = dict(count=numshow, total=numtotal)
+            all = data['count'] == data['total']
             button = not all
-            if all:
-                text = _('Displaying all items')
+            if self.sel_enable:
+                items = self.get_items(sel=True)
+                numsel = len([item for item, sel in items if sel])
+                data['sel'] = numsel
+                if all:
+                    text = _('Selecting %(sel)d of %(total)d, displaying '
+                             'all items') % data
+                else:
+                    text = _('Selecting %(sel)d, displaying %(count)d of '
+                             '%(total)d items') % data
             else:
-                text = _('Displaying %(count)d of %(total)d items') \
-                            % dict(count=count, total=total)
+                if all:
+                    text = _('Displaying all items')
+                else:
+                    text = _('Displaying %(count)d of %(total)d items') % data
         self.statuslabel.set_text(text)
         self.allbtn.set_property('visible', button)
+        self.emit('list-updated', numtotal, numsel, numshow, all, updating)
 
     def setup_dnd(self, restart=False):
         if not restart and self.scroll_timer is None:
             self.scroll_timer = gobject.timeout_add(25, self.scroll_timeout)
     def teardown_dnd(self, pause=False):
-        self.sepmap['first'].set_visible(False)
-        self.sepmap['last'].set_visible(False)
+        if self.sepmap:
+            self.sepmap['first'].set_visible(False)
+            self.sepmap['last'].set_visible(False)
         if self.hlsep:
             self.hlsep.drag_unhighlight()
             self.hlsep = None
@@ -399,6 +416,10 @@ class ChangesetList(gtk.Frame):
         return start, start + 1
 
     ### signal handlers ###
+
+    def check_toggled(self, button, item):
+        self.chkmap[item] = button.get_active()
+        self.update_status()
 
     def dnd_begin(self, widget, context):
         self.setup_dnd()

@@ -195,7 +195,7 @@ class StripDialog(gtk.Dialog):
         else:
             self.butable.hide()
 
-    def preview_updated(self, cslist, count, total, *args):
+    def preview_updated(self, cslist, total, *args):
         if total is None:
             info = '<span weight="bold" foreground="#880000">%s</span>' \
                         % _('Unknown revision!')
