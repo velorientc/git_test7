@@ -46,12 +46,6 @@ Name: help; Description: Help Files; Types: full
 Name: hgbook; Description: The book 'Mercurial: The Definitive Guide' (PDF); Types: full
 
 [Files]
-Source: ..\build-hg\contrib\mercurial.el; DestDir: {app}\contrib
-Source: ..\build-hg\contrib\vim\*.*; DestDir: {app}\contrib\vim
-Source: ..\build-hg\contrib\zsh\*.*; DestDir: {app}\contrib\zsh
-Source: ..\build-hg\contrib\bash\*.*; DestDir: {app}\contrib\bash
-Source: ..\build-hg\contrib\hgk; DestDir: {app}/contrib
-Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
 Source: ..\build-hg\mercurial\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\mercurial\help\*.txt; DestDir: {app}\help; Components: help
 Source: ..\build-hg\mercurial\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
