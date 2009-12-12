@@ -80,9 +80,10 @@ class dirnode(object):
 
 class BrowsePane(gtk.TreeView):
     'Dialog for browsing repo.status() output'
-    def __init__(self, entry):
+    def __init__(self, callback):
         gtk.TreeView.__init__(self)
-        self.entry = entry
+        self.callback = callback
+        self.cachedroot = None
         self.menu = menuthg.menuThg()
         fm = gtk.ListStore(str,  # canonical path
                            bool, # Checked
@@ -155,8 +156,20 @@ class BrowsePane(gtk.TreeView):
         dirs.reverse()
         return dirs, basename
 
-    def chdir(self, cwd, repo):
-        'change directories inside a repo, or out of a repo'
+    def chdir(self, cwd):
+        'change to a new directory'
+        # disable updates while we refill the model
+        model = self.get_model()
+        self.set_model(None)
+        model.clear()
+        try:
+            self._chdir(model, cwd)
+        except Exception, e:
+            # report to status bar
+            pass
+        self.set_model(model)
+
+    def _chdir(self, model, cwd):
         def buildrow(name, stset, isfile):
             dirs, basename = self.split(name)
             row = [ name, False, hglib.toutf(basename),
@@ -171,34 +184,39 @@ class BrowsePane(gtk.TreeView):
             for fname, st in node.files:
                 model.append(buildrow(fname, st, True))
 
-        model = self.get_model()
-        self.set_model(None) # disable updates while we fill the model
-        model.clear()
         drive, tail = os.path.splitdrive(cwd)
         if cwd != '/' or (drive and tail):
             model.append(buildrow('..', '', False))
 
-        if repo and cwd.startswith(repo.root):
-            relpath = cwd[len(repo.root)+len(os.sep):]
-            dirs, basename = self.split(relpath)
+        root = paths.find_root(cwd)
+        if root and self.cachedroot != root:
+            self.cacherepo(root)
+
+        if root:
             node = self.cachedmodel
+            relpath = cwd[len(root)+len(os.sep):]
+            dirs, basename = self.split(relpath)
             for dname in dirs:
                 node = node.subdirs[dname]
             if basename:
                 node = node.subdirs[basename]
             adddir(node)
+            self.currepo = None
         else:
-            for name in os.listdir(cwd):
-                model.append(buildrow(name, '', os.path.isfile(name)))
-        self.entry.set_text(cwd)
-        self.set_model(model)
-        self.cwd = cwd
-        self.repo = repo
+            try:
+                for name in os.listdir(cwd):
+                    isfile = os.path.isfile(os.path.join(cwd, name))
+                    model.append(buildrow(name, '', isfile))
+            except OSError:
+                # report to status bar
+                pass
+            self.currepo = self.cachedrepo
 
-    def refresh(self, cwd, repo, pats=[], filetypes='CI?'):
-        hglib.invalidaterepo(repo)
+
+    def cacherepo(self, root, pats=[], filetypes='CI?'):
         status = ([],)*7
         try:
+            repo = hg.repository(ui.ui(), path=root)
             matcher = cmdutil.match(repo, pats)
             st = repo.status(match=matcher,
                              clean='C' in filetypes,
@@ -227,14 +245,19 @@ class BrowsePane(gtk.TreeView):
             curdir.addfile(name, filestatus)
 
         self.cachedmodel = modelroot
-        self.chdir(cwd, repo)
+        self.cachedroot = root
+        self.cachedrepo = repo
 
     def popupmenu(self, browse):
         model, tpaths = browse.get_selection().get_selected_rows()
         if not tpaths:
             return
         files = [model[p][0] for p in tpaths if model[p][10]]
-        menus = self.menu.get_commands(self.repo, self.repo.root, files)
+        if self.currepo:
+            repo = self.currepo
+            menus = self.menu.get_commands(repo, repo.root, files)
+        else:
+            menus = self.menu.get_norepo_commands(None, files)
         # see nautilus extension for usage info
         for menu_info in menus:
             print menu_info
@@ -250,11 +273,9 @@ class BrowsePane(gtk.TreeView):
         if not tpaths:
             return
         if len(tpaths) == 1 and not model[tpaths[0]][10]:
-            newpath = os.path.join(self.cwd, model[tpaths[0]][0])
-            newpath = os.path.abspath(newpath)
-            self.chdir(newpath, self.repo)
+            self.callback(model[tpaths[0]][0])
         else:
-            files = [model[p][0] for p in tpaths and model[p][10]]
+            files = [model[p][0] for p in tpaths if model[p][10]]
             print files, 'activated'
 
 class BrowseDialog(gtk.Dialog):
@@ -266,25 +287,37 @@ class BrowseDialog(gtk.Dialog):
         self.set_has_separator(False)
         self.set_default_size(400, 500)
         self.connect('response', self.dialog_response)
-        repo = hg.repository(ui.ui(), path=paths.find_root())
-        self.set_title(_('%s - browser') % hglib.get_reponame(repo))
 
         entry = gtk.Entry()
-        entry.set_text(repo.root)
         self.vbox.pack_start(entry, False, True)
-        browse = BrowsePane(entry)
 
+        def newfolder_notify(newfolder):
+            curpath = entry.get_text()
+            newpath = os.path.join(curpath, newfolder)
+            newpath = hglib.toutf(os.path.abspath(newpath))
+            root = paths.find_root(newpath)
+            if root:
+                self.set_title(root + ' - ' + _('browser'))
+            else:
+                self.set_title(_('browser'))
+            entry.set_text(newpath)
+            browse.chdir(newpath)
+
+        browse = BrowsePane(newfolder_notify)
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller.add(browse)
         self.vbox.pack_start(scroller, True, True)
         self.show_all()
-        self.browse = browse
-        gobject.idle_add(self.refresh, repo.root, repo)
 
-    def refresh(self, cwd, repo):
-        self.browse.refresh(cwd, repo)
+        cwd = hglib.toutf(os.getcwd())
+        entry.connect('activate', self.entry_activated, browse)
+        entry.set_text(cwd)
+        browse.chdir(cwd)
+
+    def entry_activated(self, entry, browse):
+        browse.chdir(entry.get_text())
 
     def dialog_response(self, dialog, response):
         return True
