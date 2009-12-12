@@ -25,7 +25,6 @@ class ChangesetList(gtk.Frame):
                          (object, # number of all items or None
                           object, # number of selections or None
                           object, # number of showings or None
-                          bool,   # whether all items are shown
                           bool))  # whether cslist is updating
     }
 
@@ -157,6 +156,7 @@ class ChangesetList(gtk.Frame):
         elif queue:
             def timeout(eid, items, repo):
                 if self.timeout_queue and self.timeout_queue[-1] == eid[0]:
+                    self.timeout_queue = []
                     self.update(items, repo, limit, False)
                 return False # don't repeat
             eid = [None]
@@ -208,7 +208,7 @@ class ChangesetList(gtk.Frame):
                 hbox.pack_start(info, False, False)
                 info = hbox
             self.csbox.pack_start(info, False, False, 2)
-            self.itemmap[item] = info
+            self.itemmap[item] = {'widget': info}
         def add_sep(show, *keys):
             sep = FixedHSeparator(visible=show)
             self.csbox.pack_start(sep, False, False)
@@ -227,7 +227,7 @@ class ChangesetList(gtk.Frame):
                                ' font_family="monospace">...</span>')
             sniplbl.set_angle(90)
             snipbox.pack_start(gtk.Label())
-            self.item_snip = snipbox
+            self.itemmap['snip'] = {'widget': snipbox}
 
         # clear item list
         self.csbox.foreach(lambda c: c.parent.remove(c))
@@ -263,6 +263,7 @@ class ChangesetList(gtk.Frame):
     def clear(self):
         """ Clear the item list  """
         self.csbox.foreach(lambda c: c.parent.remove(c))
+        self.curitems = None
         self.update_status()
 
     def get_items(self, sel=False):
@@ -353,20 +354,23 @@ class ChangesetList(gtk.Frame):
 
     def update_status(self, updating=False):
         numshow = numsel = numtotal = all = None
-        button = False
-        if updating:
-            text = _('Updating...')
-        elif self.curitems is None:
+        if self.curitems is None:
+            button = False
             text = _('No items to display')
         else:
+            # prepare data
             numshow, numtotal = len(self.showitems), len(self.curitems)
             data = dict(count=numshow, total=numtotal)
-            all = data['count'] == data['total']
-            button = not all
             if self.sel_enable:
                 items = self.get_items(sel=True)
                 numsel = len([item for item, sel in items if sel])
                 data['sel'] = numsel
+            all = data['count'] == data['total']
+            button = not all
+            # generate status text
+            if updating:
+                text = _('Updating...')
+            elif self.sel_enable:
                 if all:
                     text = _('Selecting %(sel)d of %(total)d, displaying '
                              'all items') % data
@@ -380,11 +384,12 @@ class ChangesetList(gtk.Frame):
                     text = _('Displaying %(count)d of %(total)d items') % data
         self.statuslabel.set_text(text)
         self.allbtn.set_property('visible', button)
-        self.emit('list-updated', numtotal, numsel, numshow, all, updating)
+        self.emit('list-updated', numtotal, numsel, numshow, updating)
 
     def setup_dnd(self, restart=False):
         if not restart and self.scroll_timer is None:
             self.scroll_timer = gobject.timeout_add(25, self.scroll_timeout)
+
     def teardown_dnd(self, pause=False):
         if self.sepmap:
             self.sepmap['first'].set_visible(False)
@@ -395,25 +400,61 @@ class ChangesetList(gtk.Frame):
         if not pause and self.scroll_timer:
             gobject.source_remove(self.scroll_timer)
             self.scroll_timer = None
-    def get_drop_pos(self, y):
-        first = self.itemmap[self.curitems[0]].allocation
-        last = self.itemmap[self.curitems[-1]].allocation
-        half = first.height / 2
-        num = len(self.curitems)
-        if y < first.y + half:
-            return -1, 0
-        elif last.y + half < y:
-            return num - 1, num
-        pos = (y - self.item_offset) / float(self.item_unit)
-        start = int(pos - 0.5)
+
+    def get_item_pos(self, y, detail=False):
+        pos = None
+        items = self.curitems
+        num = len(items)
         numshow = len(self.showitems)
-        if self.has_limit() and numshow - 1 <= pos:
-            snip = self.item_snip.allocation
-            if y < snip.y + snip.height / 2:
-                return numshow - 2, numshow - 1
+        first = self.itemmap[items[0]]
+        beforesnip = self.itemmap[items[numshow - 2]]
+        snip = self.has_limit() and self.itemmap['snip'] or None
+        last = self.itemmap[items[-1]]
+        def calc_ratio(geom):
+            return (y - geom['y']) / float(geom['height'])
+        if y < first['y']:
+            start, end = -1, 0
+        elif last['bottom'] < y:
+            start, end = num - 1, num
+        elif snip and beforesnip['bottom'] < y and y < last['y']:
+            ratio = calc_ratio(snip)
+            if ratio < 0.5:
+                start, end = numshow - 2, numshow - 1
             else:
-                return num - 2, num - 1
-        return start, start + 1
+                start, end = num - 2, num - 1
+        else:
+            # calc item pos (binary search)
+            def mid(start, end):
+                return (start + end) / 2
+            start, end = 0, numshow - 1
+            pos = mid(start, end)
+            while start < end:
+                data = self.itemmap[self.showitems[pos]]
+                if y < data['y']:
+                    end = pos - 1
+                elif data['bottom'] < y:
+                    start = pos + 1
+                else:
+                    break
+                pos = mid(start, end)
+            # translate index in curitems
+            if pos == numshow - 1:
+                pos = num - 1
+            # calc detailed pos
+            if detail:
+                data = self.itemmap[items[pos]]
+                ratio = calc_ratio(data)
+                if ratio < 0.5:
+                    start, end = pos - 1, pos
+                else:
+                    start, end = pos, pos + 1
+        if detail:
+            return pos, start, end
+        return pos
+
+    def get_sep(self, y):
+        pos, start, end = self.get_item_pos(y, detail=True)
+        return self.sepmap[(start, end)]
 
     ### signal handlers ###
 
@@ -433,11 +474,12 @@ class ChangesetList(gtk.Frame):
             num = len(self.curitems)
             if not self.hlsep:
                 self.setup_dnd(restart=True)
-            key = self.get_drop_pos(y)
-            self.sepmap['first'].set_visible(key == (-1, 0))
-            self.sepmap['last'].set_visible(key == (num - 1, num))
             # highlight separator
-            sep = self.sepmap[key]
+            sep = self.get_sep(y)
+            first = self.sepmap['first']
+            first.set_visible(first == sep)
+            last = self.sepmap['last']
+            last.set_visible(last == sep)
             if self.hlsep != sep:
                 if self.hlsep:
                     self.hlsep.drag_unhighlight()
@@ -450,7 +492,7 @@ class ChangesetList(gtk.Frame):
     def dnd_received(self, widget, context, x, y, sel, target_type, event_time):
         if target_type == CSL_DND_ID:
             items = self.curitems
-            start, end = self.get_drop_pos(y)
+            drop_pos, start, end = self.get_item_pos(y, detail=True)
             pos = self.item_drag
             if start != pos and end != pos:
                 item = items[pos]
@@ -462,29 +504,24 @@ class ChangesetList(gtk.Frame):
                 self.update(items, self.currepo, queue=False, keep=True)
 
     def dnd_get(self, widget, context, sel, target_type, event_time):
-        if target_type == CSL_DND_ID and self.item_drag is not None:
-            sel.set(sel.target, 8, str(self.curitems[self.item_drag]))
+        pos = self.item_drag
+        if target_type == CSL_DND_ID and pos is not None:
+            sel.set(sel.target, 8, str(self.curitems[pos]))
 
     def button_press(self, widget, event):
         items = self.curitems
         if not self.dnd_enable or not items or len(items) <= 1:
             return
         if event.type == gtk.gdk.BUTTON_PRESS and event.button == 1:
+            # gather geometry data for dnd
+            items = self.showitems + (self.has_limit() and ['snip'] or [])
+            for item in items:
+                data = self.itemmap[item]
+                alloc = data['widget'].allocation
+                data.update(y=alloc.y, height=alloc.height)
+                data['bottom'] = alloc.y + alloc.height
             # get pressed csinfo widget based on pointer position
-            first = self.itemmap[items[0]].allocation
-            second = self.itemmap[items[1]].allocation
-            self.item_offset = first.y
-            self.item_unit = second.y - first.y
-            pos = int((event.y - self.item_offset) / self.item_unit)
-            numshow = len(self.showitems)
-            if self.has_limit() and numshow - 1 <= pos:
-                last = self.itemmap[items[-1]].allocation
-                if last.y < event.y and event.y < (last.y + last.height):
-                    pos = len(items) - 1
-                else:
-                    pos = None
-            elif numshow <= pos:
-                pos = None
+            pos = self.get_item_pos(event.y)
             if pos is not None:
                 self.item_drag = pos
                 # start dnd
