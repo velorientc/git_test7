@@ -38,6 +38,7 @@ class ChangesetList(gtk.Frame):
         self.showitems = None
         self.chkmap = {}
         self.limit = 20
+        self.curfactory = None
 
         self.timeout_queue = []
         self.sel_enable = False
@@ -45,7 +46,6 @@ class ChangesetList(gtk.Frame):
 
         # dnd variables
         self.itemmap = {}
-        self.sepmap = {}
         self.hlsep = None
         self.dnd_pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, 1, 1)
         self.scroll_timer = None
@@ -172,7 +172,6 @@ class ChangesetList(gtk.Frame):
         self.curitems = items
         self.currepo = repo
         self.itemmap = {}
-        self.sepmap = {}
 
         if self.sel_enable and not kargs.get('keep', False):
             self.chkmap = {}
@@ -182,72 +181,35 @@ class ChangesetList(gtk.Frame):
         # determine items to show
         numtotal = len(items)
         if limit and self.limit < numtotal:
-            toshow, lastitem = items[:self.limit-1], items[self.limit-1:][-1]
+            toshow, lastitem = items[:self.limit-1], items[-1]
         else:
             toshow, lastitem = items, None
         numshow = len(toshow) + (lastitem and 1 or 0)
         self.showitems = toshow + (lastitem and [lastitem] or [])
 
         # prepare to update item list
-        compactview = self.compactopt.get_active()
-        style = compactview and self.lstyle or self.pstyle
-        factory = csinfo.factory(repo, withupdate=True)
+        self.curfactory = csinfo.factory(repo, withupdate=True)
 
-        def add_csinfo(item):
-            info = factory(item, style)
-            if info.parent:
-                info.parent.remove(info)
-            if self.sel_enable:
-                check = gtk.CheckButton()
-                check.set_active(self.chkmap[item])
-                check.connect('toggled', self.check_toggled, item)
-                align = gtk.Alignment(0.5, 0)
-                align.add(check)
-                hbox = gtk.HBox()
-                hbox.pack_start(align, False, False)
-                hbox.pack_start(info, False, False)
-                info = hbox
-            self.csbox.pack_start(info, False, False, 2)
-            self.itemmap[item] = {'widget': info}
-        def add_sep(show, *keys):
-            sep = FixedHSeparator(visible=show)
+        def add_sep():
+            sep = self.create_sep()
             self.csbox.pack_start(sep, False, False)
-            for key in keys:
-                self.sepmap[key] = sep
-            return sep
-        def add_snip():
-            snipbox = gtk.HBox()
-            self.csbox.pack_start(snipbox, False, False, 4)
-            spacer = gtk.Label()
-            snipbox.pack_start(spacer, False, False)
-            spacer.set_width_chars(24)
-            sniplbl = gtk.Label()
-            snipbox.pack_start(sniplbl, False, False)
-            sniplbl.set_markup('<span size="large" weight="heavy"'
-                               ' font_family="monospace">...</span>')
-            sniplbl.set_angle(90)
-            snipbox.pack_start(gtk.Label())
-            self.itemmap['snip'] = {'widget': snipbox}
 
         # clear item list
         self.csbox.foreach(lambda c: c.parent.remove(c))
 
         # update item list
         def proc():
-            add_sep(False, 'first', (-1, 0))
+            # add csinfo widgets
             for index, r in enumerate(toshow):
-                add_csinfo(r)
-                if not r == toshow[-1]:
-                    key = (index, index + 1)
-                    add_sep(not compactview, key)
+                self.add_csinfo(r)
             if lastitem:
-                add_sep(False, (len(toshow) - 1, len(toshow)))
-                add_snip()
-                add_sep(False, (numtotal - 2, numtotal - 1))
-                add_csinfo(lastitem)
-            key = (numtotal - 1, numtotal)
-            add_sep(False, 'last', key)
+                self.add_snip()
+                self.add_csinfo(lastitem)
+            add_sep()
             self.csbox.show_all()
+
+            # show/hide separators
+            self.update_seps()
 
             # update status
             self.update_status()
@@ -315,13 +277,26 @@ class ChangesetList(gtk.Frame):
     def set_checkbox_enable(self, enable):
         """
         Set whether the selection feature is enabled.
-        When it's enabled, checboxes will be shown in the left of
+        When it's enabled, checboxes will be placed at the left of
         csinfo widgets.
 
         enable: Boolean, if True, the selection feature will be enabled.
                 Default: False.
         """
         self.sel_enable = enable
+
+    def get_compact_view(self):
+        """ Return whether the compact view is enabled """
+        return self.compactopt.get_active()
+
+    def set_compact_view(self, compact):
+        """
+        Set whether the compact view is enabled.
+
+        enable: Boolean, if True, the compact view will be enabled.
+                Default: False.
+        """
+        self.compactopt.set_active(compact)
 
     def has_limit(self):
         """
@@ -391,9 +366,12 @@ class ChangesetList(gtk.Frame):
             self.scroll_timer = gobject.timeout_add(25, self.scroll_timeout)
 
     def teardown_dnd(self, pause=False):
-        if self.sepmap:
-            self.sepmap['first'].set_visible(False)
-            self.sepmap['last'].set_visible(False)
+        first = self.get_sep(0)
+        if first:
+            first.set_visible(False)
+        last = self.get_sep(-1)
+        if last:
+            last.set_visible(False)
         if self.hlsep:
             self.hlsep.drag_unhighlight()
             self.hlsep = None
@@ -423,7 +401,7 @@ class ChangesetList(gtk.Frame):
             else:
                 start, end = num - 2, num - 1
         else:
-            # calc item pos (binary search)
+            # calc item showitems pos (binary search)
             def mid(start, end):
                 return (start + end) / 2
             start, end = 0, numshow - 1
@@ -437,10 +415,9 @@ class ChangesetList(gtk.Frame):
                 else:
                     break
                 pos = mid(start, end)
-            # translate index in curitems
-            if pos == numshow - 1:
-                pos = num - 1
-            # calc detailed pos
+            # translate to curitems pos
+            pos = self.trans_to_cur(pos)
+            # calc detailed pos if need
             if detail:
                 data = self.itemmap[items[pos]]
                 ratio = calc_ratio(data)
@@ -452,9 +429,204 @@ class ChangesetList(gtk.Frame):
             return pos, start, end
         return pos
 
-    def get_sep(self, y):
+    def get_sep(self, pos):
+        """
+        pos: Number, the position of separator you need.
+             If -1 or list length, indicates the last separator.
+        """
+        # invalid position
+        if pos < -1:
+            return None
+        def get_last():
+            children = self.csbox.get_children()
+            return children[-1]
+        # -1
+        if pos == -1:
+            return get_last()
+        # limiting case
+        if self.has_limit():
+            # snip box separator
+            if pos == self.limit - 1:
+                return self.itemmap['snip']['sep']
+            # list length (+ snip box)
+            if pos == self.limit + 1:
+                return get_last()
+            # separators after snip box
+            if self.limit - 1 < pos:
+                return self.itemmap[self.showitems[pos-1]]['sep']
+        # list length
+        elif pos == len(self.showitems):
+            return get_last()
+        # others
+        return self.itemmap[self.showitems[pos]]['sep']
+
+    def get_sep_by_y(self, y):
         pos, start, end = self.get_item_pos(y, detail=True)
-        return self.sepmap[(start, end)]
+        sep_pos = self.trans_to_show(end)
+        if self.has_limit() and len(self.curitems) - 1 <= end:
+            sep_pos += 1
+        return self.get_sep(sep_pos)
+
+    def update_seps(self):
+        """ Update visibility of all separators """
+        compact = self.get_compact_view()
+        for item in self.showitems[1:]:
+            sep = self.itemmap[item]['sep']
+            sep.set_visible(not compact)
+        if self.has_limit():
+            self.itemmap['snip']['sep'].set_visible(False)
+            self.itemmap[self.showitems[-1]]['sep'].set_visible(False)
+        self.get_sep(0).set_visible(False)
+        self.get_sep(-1).set_visible(False)
+
+    def reorder_item(self, pos, insert):
+        """
+        pos: Number, the position of item to move. This must be curitems
+             index, not showitems index.
+        insert: Number, the new position to insert target item.
+                If list length, indicates the end of the list.
+                This must be curitems index, not showitems index.
+        """
+        # reject unneeded reordering
+        if pos == insert or pos + 1 == insert:
+            return
+
+        # reorder target csinfo
+        if self.has_limit() and self.limit - 1 <= pos:
+            item = self.curitems[pos]
+            if insert < self.limit - 1:
+                # move target csinfo to insert pos
+                target = self.itemmap[item]['widget']
+                self.csbox.reorder_child(target, insert)
+
+                # remove csinfo to be snipped
+                item = self.showitems[-2]
+                self.remove_csinfo(item)
+            else:
+                # remove target csinfo
+                self.remove_csinfo(item)
+
+            # insert csinfo before the last separator
+            item = self.curitems[-2]
+            info = self.add_csinfo(item)
+            info.show_all()
+            numc = len(self.csbox.get_children())
+            self.csbox.reorder_child(info, numc - 2)
+
+        elif self.has_limit() and self.limit - 1 < insert:
+            if self.trans_to_show(insert) < self.limit:
+                # remove target csinfo
+                rm_item = self.curitems[pos]
+            else:
+                # move target csinfo to the end of VBox
+                item = self.curitems[pos]
+                target = self.itemmap[item]['widget']
+                numc = len(self.csbox.get_children())
+                self.csbox.reorder_child(target, numc - 2)
+
+                # remove last csinfo
+                rm_item = self.showitems[-1]
+
+            # remove it
+            self.remove_csinfo(rm_item)
+
+            # insert csinfo before snip box
+            item = self.curitems[self.limit - 1]
+            info = self.add_csinfo(item)
+            info.show_all()
+            self.csbox.reorder_child(info, self.limit - 2)
+        else:
+            info = self.itemmap[self.showitems[pos]]['widget']
+            if insert < pos:
+                self.csbox.reorder_child(info, insert)
+            else:
+                self.csbox.reorder_child(info, insert - 1)
+
+        # reorder curitems
+        item = self.curitems[pos]
+        items = self.curitems[:pos] + self.curitems[pos+1:]
+        if insert < pos:
+            items.insert(insert, item)
+        else:
+            items.insert(insert - 1, item)
+        self.curitems = items
+
+        # reorder showitems
+        if self.has_limit():
+            self.showitems = items[:self.limit-1] + [items[-1]]
+        else:
+            self.showitems = items
+
+        # show/hide separators
+        self.update_seps()
+
+        # just emit 'list-updated' signal
+        self.update_status()
+
+    def trans_to_show(self, index):
+        """ Translate from curitems index to showitems index """
+        numrest = len(self.curitems) - self.limit
+        if self.has_limit() and numrest <= index:
+            return index - numrest
+        return index
+
+    def trans_to_cur(self, index):
+        """ Translate from showitems index to curitems index """
+        if self.has_limit() and self.limit - 1 <= index:
+            return index + len(self.curitems) - self.limit
+        return index
+
+    def create_sep(self):
+        return FixedHSeparator()
+
+    def add_csinfo(self, item):
+        wrapbox = gtk.VBox()
+        sep = self.create_sep()
+        wrapbox.pack_start(sep, False, False)
+        style = self.get_compact_view() and self.lstyle or self.pstyle
+        info = self.curfactory(item, style)
+        if self.sel_enable:
+            check = gtk.CheckButton()
+            check.set_active(self.chkmap[item])
+            check.connect('toggled', self.check_toggled, item)
+            align = gtk.Alignment(0.5, 0)
+            align.add(check)
+            hbox = gtk.HBox()
+            hbox.pack_start(align, False, False)
+            hbox.pack_start(info, False, False)
+            info = hbox
+        wrapbox.pack_start(info, False, False)
+        self.csbox.pack_start(wrapbox, False, False)
+        self.itemmap[item] = {'widget': wrapbox,
+                              'info': info,
+                              'sep': sep}
+        return wrapbox
+
+    def remove_csinfo(self, item):
+        info = self.itemmap[item]['widget']
+        self.csbox.remove(info)
+        del self.itemmap[item]
+
+    def add_snip(self):
+        wrapbox = gtk.VBox()
+        sep = self.create_sep()
+        wrapbox.pack_start(sep, False, False)
+        snipbox = gtk.HBox()
+        wrapbox.pack_start(snipbox, False, False)
+        spacer = gtk.Label()
+        snipbox.pack_start(spacer, False, False)
+        spacer.set_width_chars(24)
+        sniplbl = gtk.Label()
+        snipbox.pack_start(sniplbl, False, False)
+        sniplbl.set_markup('<span size="large" weight="heavy"'
+                           ' font_family="monospace">...</span>')
+        sniplbl.set_angle(90)
+        snipbox.pack_start(gtk.Label())
+        self.csbox.pack_start(wrapbox, False, False, 2)
+        self.itemmap['snip'] = {'widget': wrapbox,
+                                'snip': snipbox,
+                                'sep': sep}
+        return wrapbox
 
     ### signal handlers ###
 
@@ -475,10 +647,10 @@ class ChangesetList(gtk.Frame):
             if not self.hlsep:
                 self.setup_dnd(restart=True)
             # highlight separator
-            sep = self.get_sep(y)
-            first = self.sepmap['first']
+            sep = self.get_sep_by_y(y)
+            first = self.get_sep(0)
             first.set_visible(first == sep)
-            last = self.sepmap['last']
+            last = self.get_sep(-1)
             last.set_visible(last == sep)
             if self.hlsep != sep:
                 if self.hlsep:
@@ -492,16 +664,8 @@ class ChangesetList(gtk.Frame):
     def dnd_received(self, widget, context, x, y, sel, target_type, event_time):
         if target_type == CSL_DND_ID:
             items = self.curitems
-            drop_pos, start, end = self.get_item_pos(y, detail=True)
-            pos = self.item_drag
-            if start != pos and end != pos:
-                item = items[pos]
-                items = items[:pos] + items[pos+1:]
-                if end < pos:
-                    items.insert(end, item)
-                else:
-                    items.insert(end - 1, item)
-                self.update(items, self.currepo, queue=False, keep=True)
+            pos, start, end = self.get_item_pos(y, detail=True)
+            self.reorder_item(self.item_drag, end)
 
     def dnd_get(self, widget, context, sel, target_type, event_time):
         pos = self.item_drag
