@@ -77,6 +77,7 @@ class ImportDialog(gtk.Dialog):
         self.files_btn.connect('clicked', self.files_clicked)
         self.dir_btn.connect('clicked', self.dir_clicked)
         self.cslist.connect('list-updated', self.list_updated)
+        self.cslist.connect('files-dropped', self.files_dropped)
         self.source_entry.connect('changed', lambda e: self.preview(queue=True))
 
         # prepare to show
@@ -115,6 +116,13 @@ class ImportDialog(gtk.Dialog):
 
     def list_updated(self, cslist, total, sel, *args):
         self.update_status(sel)
+
+    def files_dropped(self, cslist, files, *args):
+        src = self.source_entry.get_text()
+        if src:
+            files = [src] + files
+        self.source_entry.set_text(os.pathsep.join(files))
+        self.preview()
 
     def dialog_response(self, dialog, response_id):
         def abort():
@@ -175,7 +183,7 @@ class ImportDialog(gtk.Dialog):
         files = []
         for path in src.split(os.pathsep):
             path = path.strip('\r\n\t ')
-            if not os.path.exists(path):
+            if not os.path.exists(path) or path in files:
                 continue
             if os.path.isdir(path):
                 entries = os.listdir(path)
