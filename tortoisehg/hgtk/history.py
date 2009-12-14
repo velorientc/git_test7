@@ -25,7 +25,7 @@ from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
-from tortoisehg.hgtk import statusbar, bookmark
+from tortoisehg.hgtk import statusbar, bookmark, thgimport
 
 def create_menu(label, callback=None):
     menuitem = gtk.MenuItem(label, True)
@@ -304,15 +304,18 @@ class GLog(gdialog.GDialog):
                 dict(text=_('Stop'), name='stop', sensitive=False,
                     func=self.stop_clicked, icon=gtk.STOCK_STOP),
                 dict(text='----'),
-                dict(text=_('Add Bundle...'), name='add-bundle',
-                    sensitive=not bool(self.bfile),
-                    func=self.add_bundle_clicked, icon=gtk.STOCK_ADD),
                 dict(text=_('Accept Bundle'), name='accept',
                     sensitive=bool(self.bfile),
                     func=self.apply_clicked, icon=gtk.STOCK_APPLY),
                 dict(text=_('Reject Bundle'), name='reject',
                     sensitive=bool(self.bfile),
                     func=self.reject_clicked, icon=gtk.STOCK_DIALOG_ERROR),
+                dict(text='----'),
+                dict(text=_('Import...'), name='import',
+                    func=self.import_clicked, icon='menuimport.ico'),
+                dict(text=_('Add Bundle...'), name='add-bundle',
+                    sensitive=not bool(self.bfile),
+                    func=self.add_bundle_clicked, icon=gtk.STOCK_ADD),
                 dict(text='----'),
                 dict(text=_('Use proxy server'), name='use-proxy-server',
                     ascheck=True, func=toggle_proxy),
@@ -1579,6 +1582,17 @@ class GLog(gdialog.GDialog):
 
     def stop_clicked(self, toolbutton):
         self.runner.stop()
+
+    def import_clicked(self, toolbutton):
+        oldlen = len(self.repo)
+        def import_completed():
+            self.repo.invalidate()
+            self.changeview.clear()
+            if oldlen < len(self.repo):
+                self.reload_log()
+        dialog = thgimport.ImportDialog(self.repo)
+        dialog.set_notify_func(import_completed)
+        self.show_dialog(dialog)
 
     def update_urllist(self):
         urllist = self.urlcombo.get_model()
