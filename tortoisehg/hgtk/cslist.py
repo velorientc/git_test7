@@ -154,10 +154,11 @@ class ChangesetList(gtk.Frame):
             raise csinfo.UnknownItem(item)
         self.custom = csinfo.custom(data=data_func, label=label_func,
                                     markup=markup_func)
-        self.lstyle = csinfo.labelstyle(contents=('%(item_l)s:',
-                             ' %(branch)s', ' %(tags)s', ' %(summary)s'))
-        self.pstyle = csinfo.panelstyle(contents=('item',) + \
-                                        csinfo.PANEL_DEFAULT[1:])
+        self.lstyle = csinfo.labelstyle(selectable=True,
+                             contents=('%(item_l)s:', ' %(branch)s',
+                                       ' %(tags)s', ' %(summary)s'))
+        self.pstyle = csinfo.panelstyle(selectable=True,
+                             contents=('item',) + csinfo.PANEL_DEFAULT[1:])
 
         # prepare to show
         gtklib.idle_add_single_call(self.after_init)
@@ -625,6 +626,8 @@ class ChangesetList(gtk.Frame):
         sep = self.create_sep()
         wrapbox.pack_start(sep, False, False)
         style = self.get_compact_view() and self.lstyle or self.pstyle
+        if self.dnd_enable:
+            style['selectable'] = False
         info = self.curfactory(item, style)
         if self.sel_enable:
             check = gtk.CheckButton()
