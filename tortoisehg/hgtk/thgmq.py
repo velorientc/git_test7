@@ -497,18 +497,20 @@ class MQWidget(gtk.VBox):
         return self.mqloaded and os.path.isdir(self.repo.mq.path)
 
     def has_patch(self):
-        """ return True if MQ has applicable patch """
-        if self.mqloaded:
-            return len(self.repo.mq.series) > 0
-        return False
+        """ return True if MQ has applicable patches """
+        return bool(self.get_num_patches())
 
     def has_applied(self):
         """ return True if MQ has applied patches """
-        if self.mqloaded:
-            return len(self.repo.mq.applied) > 0
-        return False
+        return bool(self.get_num_applied())
 
-    def number_applied(self):
+    def get_num_patches(self):
+        """ return the number of patches in patch queue """
+        if self.mqloaded:
+            return len(self.repo.mq.series)
+        return 0
+
+    def get_num_applied(self):
         """ return the number of applied patches """
         if self.mqloaded:
             return len(self.repo.mq.applied)
@@ -629,7 +631,7 @@ class MQWidget(gtk.VBox):
         is_qtip = self.is_qtip(row[MQ_NAME])
         is_qparent = row[MQ_INDEX] == INDEX_QPARENT
         is_applied = row[MQ_STATUS] == 'A'
-        is_next = row[MQ_INDEX] == self.number_applied()
+        is_next = row[MQ_INDEX] == self.get_num_applied()
 
         if is_operable and not is_qtip and (not is_qparent or has_applied):
             append(_('_Goto'), self.goto_activated)
