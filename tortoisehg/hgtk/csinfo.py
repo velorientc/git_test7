@@ -213,7 +213,9 @@ class SummaryInfo(object):
             if item == 'rev':
                 revnum = self.get_data('revnum', *args)
                 revid = self.get_data('revid', *args)
-                return (revnum, revid)
+                if revid:
+                    return (revnum, revid)
+                return None
             elif item == 'revnum':
                 return ctx.rev()
             elif item == 'revid':
@@ -322,10 +324,9 @@ class SummaryInfo(object):
             if item == 'rev':
                 revnum, revid = value
                 revid = gtklib.markup(revid, **mono)
-                if revnum:
+                if revnum is not None and revid is not None:
                     return '%s (%s)' % (revnum, revid)
-                else:
-                    return '%s' % revid
+                return '%s' % revid
             elif item in ('revid', 'transplant'):
                 return gtklib.markup(value, **mono)
             elif item == 'revnum':
