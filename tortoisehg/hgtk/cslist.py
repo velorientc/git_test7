@@ -5,8 +5,10 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
 import gtk
 import gobject
+import urllib
 
 from mercurial import hg, ui
 
@@ -15,7 +17,8 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import csinfo, gtklib
 
-CSL_DND_ID = 1024
+CSL_DND_ITEM     = 1024
+CSL_DND_URI_LIST = 1025
 
 class ChangesetList(gtk.Frame):
 
@@ -25,7 +28,11 @@ class ChangesetList(gtk.Frame):
                          (object, # number of all items or None
                           object, # number of selections or None
                           object, # number of showings or None
-                          bool))  # whether cslist is updating
+                          bool)), # whether cslist is updating
+        'files-dropped': (gobject.SIGNAL_RUN_FIRST,
+                          gobject.TYPE_NONE,
+                          (object, # list of dropped files
+                           str))   # raw string data
     }
 
     def __init__(self):
@@ -101,10 +108,10 @@ class ChangesetList(gtk.Frame):
                 self.curitems, self.currepo, queue=False, keep=True))
 
         # dnd setup
-        self.dnd_targets = [('thg-dnd', gtk.TARGET_SAME_WIDGET, CSL_DND_ID)]
-        csevent.drag_dest_set(gtk.DEST_DEFAULT_MOTION |
-                              gtk.DEST_DEFAULT_DROP, self.dnd_targets,
-                              gtk.gdk.ACTION_MOVE)
+        self.dnd_targets = [('thg-dnd', gtk.TARGET_SAME_WIDGET, CSL_DND_ITEM)]
+        targets = self.dnd_targets + [('text/uri-list', 0, CSL_DND_URI_LIST)]
+        csevent.drag_dest_set(gtk.DEST_DEFAULT_MOTION | gtk.DEST_DEFAULT_DROP,
+                              targets, gtk.gdk.ACTION_MOVE)
         csevent.connect('drag-begin', self.dnd_begin)
         csevent.connect('drag-end', self.dnd_end)
         csevent.connect('drag-motion', self.dnd_motion)
@@ -661,15 +668,23 @@ class ChangesetList(gtk.Frame):
     def dnd_leave(self, widget, context, event_time):
         self.teardown_dnd(pause=True)
 
-    def dnd_received(self, widget, context, x, y, sel, target_type, event_time):
-        if target_type == CSL_DND_ID:
+    def dnd_received(self, widget, context, x, y, sel, target_type, *args):
+        if target_type == CSL_DND_ITEM:
             items = self.curitems
             pos, start, end = self.get_item_pos(y, detail=True)
             self.reorder_item(self.item_drag, end)
+        elif target_type == CSL_DND_URI_LIST:
+            files = []
+            for line in sel.data.rstrip('\x00').splitlines():
+                if line.startswith('file:'):
+                    path = os.path.normpath(urllib.url2pathname(line[5:]))
+                    files.append(path)
+            if files:
+                self.emit('files-dropped', files, sel.data)
 
     def dnd_get(self, widget, context, sel, target_type, event_time):
         pos = self.item_drag
-        if target_type == CSL_DND_ID and pos is not None:
+        if target_type == CSL_DND_ITEM and pos is not None:
             sel.set(sel.target, 8, str(self.curitems[pos]))
 
     def button_press(self, widget, event):
