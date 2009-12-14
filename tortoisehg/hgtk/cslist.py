@@ -121,9 +121,43 @@ class ChangesetList(gtk.Frame):
         csevent.connect('button-press-event', self.button_press)
 
         # csetinfo
-        self.lstyle = csinfo.labelstyle(contents=('%(revnum)s:',
+        def data_func(widget, item, ctx):
+            if item in ('item', 'item_l'):
+                if not isinstance(ctx, csinfo.patchctx):
+                    return True # dummy
+                revid = widget.get_data('revid')
+                if not revid:
+                    return widget.target
+                filename = os.path.basename(widget.target)
+                return filename, revid
+            raise csinfo.UnknownItem(item)
+        def label_func(widget, item):
+            if item in ('item', 'item_l'):
+                if not isinstance(widget.ctx, csinfo.patchctx):
+                    return _('Revision:')
+                return _('Patch:')
+            raise csinfo.UnknownItem(item)
+        def markup_func(widget, item, value):
+            if item in ('item', 'item_l'):
+                if not isinstance(widget.ctx, csinfo.patchctx):
+                    if item == 'item':
+                        return widget.get_markup('rev')
+                    return widget.get_markup('revnum')
+                mono = dict(face='monospace', size='9000')
+                if isinstance(value, basestring):
+                    return gtklib.markup(value, **mono)
+                filename = gtklib.markup(value[0])
+                revid = gtklib.markup(value[1], **mono)
+                if item == 'item':
+                    return '%s (%s)' % (filename, revid)
+                return filename
+            raise csinfo.UnknownItem(item)
+        self.custom = csinfo.custom(data=data_func, label=label_func,
+                                    markup=markup_func)
+        self.lstyle = csinfo.labelstyle(contents=('%(item_l)s:',
                              ' %(branch)s', ' %(tags)s', ' %(summary)s'))
-        self.pstyle = csinfo.panelstyle()
+        self.pstyle = csinfo.panelstyle(contents=('item',) + \
+                                        csinfo.PANEL_DEFAULT[1:])
 
         # prepare to show
         gtklib.idle_add_single_call(self.after_init)
@@ -195,7 +229,7 @@ class ChangesetList(gtk.Frame):
         self.showitems = toshow + (lastitem and [lastitem] or [])
 
         # prepare to update item list
-        self.curfactory = csinfo.factory(repo, withupdate=True)
+        self.curfactory = csinfo.factory(repo, self.custom, withupdate=True)
 
         def add_sep():
             sep = self.create_sep()
