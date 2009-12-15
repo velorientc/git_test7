@@ -705,8 +705,8 @@ class GLog(gdialog.GDialog):
         opts['npreviews'] = self.npreviews
         opts['no_merges'] = self.no_merges
 
-        self.cmd_set_sensitive('load-more', True)
-        self.cmd_set_sensitive('load-all', True)
+        self.cmd_set_sensitive('load-more', len(self.repo)>0)
+        self.cmd_set_sensitive('load-all', len(self.repo)>0)
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats

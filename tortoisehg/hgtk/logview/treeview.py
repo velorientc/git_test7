@@ -124,6 +124,8 @@ class TreeView(gtk.ScrolledWindow):
         self.repo = repo
         self.currevid = None
         self.pbar = pbar
+        self.grapher = None
+        self.graphdata = []
         self.index = {}
         self.opts = { 'outgoing':[], 'orig-tip':None, 'npreviews':0,
                       'branch-color':False, 'show-graph':True }
@@ -308,6 +310,9 @@ class TreeView(gtk.ScrolledWindow):
             return None
 
     def next_revision_batch(self, size):
+        if not self.grapher:
+            self.emit('revisions-loaded')
+            return
         self.batchsize = size
         self.limit += self.batchsize
         if self.pbar is not None:
@@ -315,6 +320,9 @@ class TreeView(gtk.ScrolledWindow):
         gobject.idle_add(self.populate)
 
     def load_all_revisions(self):
+        if not self.grapher:
+            self.emit('revisions-loaded')
+            return
         self.limit = None
         if self.pbar is not None:
             self.pbar.begin()
