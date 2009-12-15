@@ -736,7 +736,7 @@ class GCommit(GStatus):
                     self.commit_selected(commit_list)
                 elif self.qheader is not None:
                     self.commit_selected([])
-                elif self.closebranch:
+                elif self.closebranch or self.nextbranch:
                     self.commit_selected([])
                 else:
                     gdialog.Prompt(_('Nothing Commited'),
