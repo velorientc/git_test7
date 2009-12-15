@@ -203,6 +203,7 @@ class StripDialog(gtk.Dialog):
             info = _('<span weight="bold">%s changesets</span> will'
                      ' be stripped') % total
         self.resultlbl.set_markup(info)
+        self.stripbtn.set_sensitive(bool(total))
 
     def get_rev(self):
         """ Return integer revision number or None """
