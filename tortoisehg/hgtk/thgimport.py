@@ -7,6 +7,7 @@
 
 import os
 import gtk
+import gobject
 
 from mercurial import hg, ui
 
@@ -17,6 +18,9 @@ from tortoisehg.hgtk import hgcmd, gtklib, gdialog, cslist
 
 MODE_NORMAL  = 'normal'
 MODE_WORKING = 'working'
+
+DEST_ID    = 0
+DEST_LABEL = 1
 
 class ImportDialog(gtk.Dialog):
     """ Dialog to import patches """
@@ -64,7 +68,21 @@ class ImportDialog(gtk.Dialog):
 
         ## info label
         self.infolbl = createlabel()
-        table.add_row(_('Preview:'), self.infolbl, padding=False)
+        self.infobox = gtk.HBox()
+        self.infobox.pack_start(self.infolbl, False, False)
+        table.add_row(_('Preview:'), self.infobox, padding=False)
+
+        ## dest combo
+        self.dest_model = gtk.ListStore(gobject.TYPE_STRING, # dest id
+                                        gobject.TYPE_STRING) # dest label
+        for row in {'repo': _('Repository'),
+                     'mq': _('Patch Queue')}.items():
+            self.dest_model.append(row)
+        self.dest_combo = gtk.ComboBox(self.dest_model)
+        cell = gtk.CellRendererText()
+        self.dest_combo.pack_start(cell, True)
+        self.dest_combo.add_attribute(cell, 'text', DEST_LABEL)
+        self.dest_combo.set_active(0)
 
         ## patch preview
         self.cslist = cslist.ChangesetList()
@@ -85,6 +103,11 @@ class ImportDialog(gtk.Dialog):
         gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
+        # dest combo
+        self.dest_combo.show_all()
+        self.dest_combo.hide()
+        self.infobox.pack_start(self.dest_combo, False, False, 6)
+
         # CmdWidget
         self.cmd = hgcmd.CmdWidget()
         self.cmd.show_all()
@@ -169,11 +192,12 @@ class ImportDialog(gtk.Dialog):
     def update_status(self, count):
         if count:
             info = _('<span weight="bold">%s patches</span> will'
-                     ' be imported') % count
+                     ' be imported to the') % count
         else:
             info = '<span weight="bold" foreground="#880000">%s</span>' \
                         % _('Nothing to import')
         self.infolbl.set_markup(info)
+        self.dest_combo.set_property('visible', bool(count))
         self.importbtn.set_sensitive(bool(count))
 
     def get_filepaths(self):
@@ -194,6 +218,10 @@ class ImportDialog(gtk.Dialog):
             elif os.path.isfile(path):
                 files.append(path)
         return files
+
+    def get_dest(self):
+        iter = self.dest_combo.get_active_iter()
+        return self.dest_model.get(iter, DEST_ID)[0]
 
     def preview(self, queue=False):
         files = self.get_filepaths()
@@ -230,7 +258,12 @@ class ImportDialog(gtk.Dialog):
         files = [file for file, sel in items if sel]
         if not files:
             return
-        cmdline = ['hg', 'import', '--verbose']
+
+        if 'repo' == self.get_dest():
+            cmd = 'import'
+        else:
+            cmd = 'qimport'
+        cmdline = ['hg', cmd, '--verbose']
         cmdline.extend(files)
 
         def cmd_done(returncode, useraborted):
