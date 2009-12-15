@@ -13,7 +13,7 @@ import gobject
 from mercurial import hg, ui, error
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, settings
 
 from tortoisehg.hgtk import csinfo, gtklib, gdialog, hgcmd
 
@@ -43,6 +43,9 @@ class UpdateDialog(gtk.Dialog):
         self.updatebtn = self.add_button(_('Update'), gtk.RESPONSE_OK)
         self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
 
+        # persistent settings
+        self.settings = settings.Settings('update')
+        
         # layout table for fixed items
         table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
@@ -59,6 +62,11 @@ class UpdateDialog(gtk.Dialog):
         btn = gtk.CheckButton(_('Discard local changes, no backup (-C/--clean)'))
         self.opt_clean = btn
         table.add_row(None, btn)
+
+        ## automatically merge, if possible (similar to command-line behavior)
+        check = gtk.CheckButton(_('Always merge (when possible)'))
+        self.opt_merge = check
+        table.add_row(None, check)
 
         ## fill list of combo
         if rev != None:
@@ -106,9 +114,20 @@ class UpdateDialog(gtk.Dialog):
         self.opt_clean.connect('toggled', lambda b: self.update_summaries())
 
         # prepare to show
+        self.load_settings()
         self.update_summaries()
         self.updatebtn.grab_focus()
         gtklib.idle_add_single_call(self.after_init)
+
+    def load_settings(self):
+        merge = self.settings.get_value('mergedefault', False)
+        self.opt_merge.set_active(merge)
+
+    def store_settings(self):
+        checked = self.opt_merge.get_active()
+        self.settings.set_value('mergedefault', checked)
+
+        self.settings.write()
 
     def after_init(self):
         # CmdWidget
@@ -138,6 +157,7 @@ class UpdateDialog(gtk.Dialog):
                 if ret == gtk.RESPONSE_YES:
                     self.abort()
             else:
+                self.store_settings()                
                 self.destroy()
                 return # close dialog
         # Abort button
@@ -244,10 +264,13 @@ class UpdateDialog(gtk.Dialog):
                 retid = [ id for id, (label, desc) in data.items() \
                              if label == retlabel ][0]
                 return dict([(id, id == retid) for id in data.keys()])
+            # If merge-by-default, we want to merge whenever possible,
+            # without prompting user (similar to command-line behavior)
+            defaultmerge = self.opt_merge.get_active()
             clean = isclean()
             if clean:
                 cmdline.append('--check')
-            else:
+            elif not (defaultmerge and islocalmerge(cur, node, clean)):
                 ret = confirmupdate(clean)
                 if ret['discard']:
                     cmdline.append('--clean')

@@ -879,6 +879,9 @@ class GLog(gdialog.GDialog):
                                  self.add_bookmark))
             m.append(create_menu(_('Rename Bookmark...'), 
                                  self.rename_bookmark))
+            if self.repo.ui.configbool('bookmarks', 'track.current'):
+                m.append(create_menu(_('Set Current Bookmark...'), 
+                                 self.current_bookmark))
         return m.create_menu()
 
     def mq_context_menu(self):
@@ -1217,6 +1220,18 @@ class GLog(gdialog.GDialog):
         else:
             if newmarkers != oldmarkers:
                 self.refresh_model()
+    
+    def refresh_on_current_marker_change(self, oldlen, oldmarkers,
+                                         oldcurrent, newmarkers,
+                                         newcurrent):
+        self.repo.invalidate()
+        self.changeview.clear_cache()
+        if len(self.repo) != oldlen:
+            self.reload_log()
+        else:
+            if newmarkers != oldmarkers or \
+                oldcurrent != newcurrent:
+                self.refresh_model()    
         
     def apply_clicked(self, button):
         combo = self.ppullcombo
@@ -1917,6 +1932,27 @@ class GLog(gdialog.GDialog):
                                           hglib.get_repo_bookmarks(self.repo))
 
         dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_RENAME,
+                                         bmark, rev)
+        dialog.connect('destroy', refresh)
+        self.show_dialog(dialog)
+        
+    def current_bookmark(self, menuitem):
+        # save current bookmark info for detecting current bookmark changed
+        bookmarks = extensions.find('bookmarks')
+        # Note that the dialog shouldn't change the repo len, or # of bookmarks,
+        # etc, but check in case they've been modified by something else...
+        oldbookmarks = hglib.get_repo_bookmarks(self.repo)
+        oldlen = len(self.repo)
+        oldcurrent = bookmarks.current(self.repo)
+        rev = str(self.currevid)
+        bmark = self.get_rev_tag(rev, include=oldbookmarks)
+
+        def refresh(*args):
+            self.refresh_on_current_marker_change(oldlen, oldbookmarks, oldcurrent,
+                                                  hglib.get_repo_bookmarks(self.repo),
+                                                  bookmarks.current(self.repo))
+
+        dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_CURRENT,
                                          bmark, rev)
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)

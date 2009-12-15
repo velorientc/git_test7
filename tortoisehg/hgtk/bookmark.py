@@ -20,10 +20,12 @@ from tortoisehg.hgtk import dialog, gtklib
 
 TYPE_ADDREMOVE = 1
 TYPE_RENAME    = 2
+TYPE_CURRENT   = 3
 
-RESPONSE_ADD    = 1
-RESPONSE_REMOVE = 2
-RESPONSE_RENAME = 3
+RESPONSE_ADD     = 1
+RESPONSE_REMOVE  = 2
+RESPONSE_RENAME  = 3
+RESPONSE_CURRENT = 4
 
 class BookmarkDialog(gtk.Dialog):
     """ Dialog to add bookmark to Mercurial repo """
@@ -43,6 +45,8 @@ class BookmarkDialog(gtk.Dialog):
             self.add_button(_('Remove'), RESPONSE_REMOVE)
         elif type == TYPE_RENAME:
             self.add_button(_('Rename'), RESPONSE_RENAME)
+        elif type == TYPE_CURRENT:
+            self.add_button(_('Set Current'), RESPONSE_CURRENT)            
         else:
             raise _('unexpected type: %s') % type
         self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
@@ -65,7 +69,7 @@ class BookmarkDialog(gtk.Dialog):
             entry.set_width_chars(12)
             entry.set_text(rev)
             table.add_row(_('Revision:'), entry)
-        else:
+        elif type == TYPE_RENAME:
             self._name_input = entry
             table.add_row(_('New name:'), entry)
 
@@ -76,10 +80,10 @@ class BookmarkDialog(gtk.Dialog):
 
         # prepare to show
         self._refresh(clear=False)
-        if type == TYPE_ADDREMOVE:
-            self._bookmarklistbox.grab_focus()
-        else:
+        if type == TYPE_RENAME:
             self._name_input.grab_focus()
+        else:
+            self._bookmarklistbox.grab_focus()
 
     def _refresh(self, clear=True):
         """ update display on dialog with recent repo data """
@@ -107,6 +111,9 @@ class BookmarkDialog(gtk.Dialog):
         # Rename button
         elif response_id == RESPONSE_RENAME:
             self._do_rename_bookmark()
+        # Set Current button
+        elif response_id == RESPONSE_CURRENT:
+            self._do_current_bookmark()
         # Close button or closed by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
             self.destroy()
@@ -121,6 +128,8 @@ class BookmarkDialog(gtk.Dialog):
             self.response(RESPONSE_ADD)
         elif type == TYPE_RENAME:
             self.response(RESPONSE_RENAME)
+        elif type == TYPE_CURRENT:
+            self.response(RESPONSE_CURRENT)
         else:
             raise _('unexpected type: %s') % type
 
@@ -207,6 +216,32 @@ class BookmarkDialog(gtk.Dialog):
                     traceback.format_exc())
             return False
 
+    def _do_current_bookmark(self):
+        # gather input data
+        name = self._bookmark_input.get_text()
+
+        # verify input
+        if name == '':
+            dialog.error_dialog(self, _('Bookmark input is empty'),
+                         _('Please enter bookmark name'))
+            self._bookmark_input.grab_focus()
+            return False
+
+        # set current bookmark
+        try:
+            self._current_hg_bookmark(name)
+            dialog.info_dialog(self, _('Bookmarking completed'),
+                              _('Bookmark "%s" has been made current') %
+                              name)
+            self._refresh()
+        except util.Abort, inst:
+            dialog.error_dialog(self, _('Error in bookmarking'), str(inst))
+            return False
+        except:
+            dialog.error_dialog(self, _('Error in bookmarking'),
+                    traceback.format_exc())
+            return False
+
     def _add_hg_bookmark(self, name, revision):
         if name in hglib.get_repo_bookmarks(self.repo):
             raise util.Abort(_('a bookmark named "%s" already exists') % name)
@@ -233,3 +268,9 @@ class BookmarkDialog(gtk.Dialog):
                            repo=self.repo,
                            mark=new_name,
                            rename=name)
+        
+    def _current_hg_bookmark(self, name):
+        if name not in hglib.get_repo_bookmarks(self.repo):
+            raise util.Abort(_('no bookmark named "%s" exists') %
+                             name)
+        bookmarks.setcurrent(self.repo, name)      
