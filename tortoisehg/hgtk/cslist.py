@@ -480,9 +480,9 @@ class ChangesetList(gtk.Frame):
         if pos < -1:
             return None
         def get_last():
-            children = self.csbox.get_children()
-            return children[-1]
-        # -1
+            child = self.csbox.get_children()[-1]
+            return isinstance(child, FixedHSeparator) and child or None
+        # last separator
         if pos == -1:
             return get_last()
         # limiting case
@@ -548,12 +548,9 @@ class ChangesetList(gtk.Frame):
                 # remove target csinfo
                 self.remove_csinfo(item)
 
-            # insert csinfo before the last separator
+            # insert csinfo the end of the item list
             item = self.curitems[-2]
-            info = self.add_csinfo(item)
-            info.show_all()
-            numc = len(self.csbox.get_children())
-            self.csbox.reorder_child(info, numc - 2)
+            self.insert_csinfo(item, -1)
 
         elif self.has_limit() and self.limit - 1 < insert:
             if self.trans_to_show(insert) < self.limit:
@@ -574,9 +571,7 @@ class ChangesetList(gtk.Frame):
 
             # insert csinfo before snip box
             item = self.curitems[self.limit - 1]
-            info = self.add_csinfo(item)
-            info.show_all()
-            self.csbox.reorder_child(info, self.limit - 2)
+            self.insert_csinfo(item, self.limit - 1)
         else:
             info = self.itemmap[self.showitems[pos]]['widget']
             if insert < pos:
@@ -622,6 +617,15 @@ class ChangesetList(gtk.Frame):
         return FixedHSeparator()
 
     def add_csinfo(self, item):
+        self.insert_csinfo(item, -1)
+
+    def insert_csinfo(self, item, pos):
+        """
+        item: String, revision number or patch file path to display.
+        pos: Number, an index of insertion point.  If -1, indicates
+        the end of the item list.
+        """
+        # create csinfo
         wrapbox = gtk.VBox()
         sep = self.create_sep()
         wrapbox.pack_start(sep, False, False)
@@ -640,11 +644,21 @@ class ChangesetList(gtk.Frame):
             hbox.pack_start(info, False, False)
             info = hbox
         wrapbox.pack_start(info, False, False)
+        wrapbox.show_all()
         self.csbox.pack_start(wrapbox, False, False)
         self.itemmap[item] = {'widget': wrapbox,
                               'info': info,
                               'sep': sep}
-        return wrapbox
+
+        # reorder it
+        children = self.csbox.get_children()
+        if 1 < len(children) and isinstance(children[-2], FixedHSeparator):
+            if pos == -1:
+                numc = len(children)
+                pos = numc - 2
+            elif self.has_limit():
+                pos = pos - 1
+            self.csbox.reorder_child(wrapbox, pos)
 
     def remove_csinfo(self, item):
         info = self.itemmap[item]['widget']
