@@ -396,17 +396,17 @@ class GCommit(GStatus):
         # parent changeset info
         parents_vbox = gtk.VBox(spacing=1)
         self.parents_frame = parents_vbox
-        style = csinfo.labelstyle(contents=(_('Parent: %(rev)s'),
-                       ' %(athead)s', ' %(branch)s', ' %(tags)s',
+        style = csinfo.labelstyle(contents=('%(athead)s ',
+                       _('Parent: %(rev)s'), ' %(branch)s', ' %(tags)s',
                        ' %(summary)s'), selectable=True)
         def data_func(widget, item, ctx):
             if item == 'athead':
-                return widget.get_data('ishead') or self.mqmode
+                return widget.get_data('ishead') or bool(self.mqmode)
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
             if item == 'athead' and value is False:
-                text = '[%s]' % _('not at head revision')
-                return gtklib.markup(text, weight='bold')
+                text = '[%s]' % _('Not at head')
+                return gtklib.markup(text, weight='bold', color='#880000')
             raise csinfo.UnknownItem(item)
         custom = csinfo.custom(data=data_func, markup=markup_func)
         factory = csinfo.factory(self.repo, custom, style)
