@@ -60,7 +60,11 @@ class BookmarkDialog(gtk.Dialog):
         self._bookmarklistbox = gtk.ComboBoxEntry(self._bookmarkslist, 0)
         self._bookmark_input = self._bookmarklistbox.get_child()
         self._bookmark_input.set_text(bookmark)
-        table.add_row(_('Bookmark:'), self._bookmarklistbox, padding=False)
+        if type == TYPE_RENAME:
+            label = _('Old name:')
+        else:
+            label = _('Bookmark:')
+        table.add_row(label, self._bookmarklistbox, padding=False)
 
         ## add entry
         entry = gtk.Entry()
@@ -68,10 +72,11 @@ class BookmarkDialog(gtk.Dialog):
             self._rev_input = entry
             entry.set_width_chars(12)
             entry.set_text(rev)
-            table.add_row(_('Revision:'), entry)
+            label = _('Revision:')
         elif type == TYPE_RENAME:
             self._name_input = entry
-            table.add_row(_('New name:'), entry)
+            label = _('New Name:')
+        table.add_row(label, entry, padding=False)
 
         # signal handlers
         self.connect('response', self.dialog_response)
