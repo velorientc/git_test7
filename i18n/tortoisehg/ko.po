@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-11-25 15:36+0000\n"
-"PO-Revision-Date: 2009-11-30 15:36+0000\n"
-"Last-Translator: hklee002 <Unknown>\n"
+"PO-Revision-Date: 2009-12-10 15:35+0000\n"
+"Last-Translator: Tachikoma <durkjae.yun@gmail.com>\n"
 "Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-12-01 04:49+0000\n"
+"X-Launchpad-Export-Date: 2009-12-11 04:37+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -59,7 +59,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\archive.py:71
 msgid "Archive revision:"
-msgstr "아카치브 개정판:"
+msgstr "아카이브 개정번호:"
 
 #: tortoisehg\hgtk\archive.py:77 tortoisehg\hgtk\clone.py:74
 #: tortoisehg\hgtk\hginit.py:51 tortoisehg\hgtk\thgconfig.py:301
@@ -4972,7 +4972,7 @@ msgstr ""
 
 #: tortoisehg\util\menuthg.py:107
 msgid "Search History"
-msgstr "검색 기록"
+msgstr "기록 검색"
 
 #: tortoisehg\util\menuthg.py:108
 msgid "Search file revisions for patterns"
