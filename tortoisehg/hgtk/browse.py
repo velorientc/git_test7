@@ -258,9 +258,41 @@ class BrowsePane(gtk.TreeView):
             menus = self.menu.get_commands(repo, repo.root, files)
         else:
             menus = self.menu.get_norepo_commands(None, files)
-        # see nautilus extension for usage info
-        for menu_info in menus:
-            print menu_info
+
+        def rundialog(item, hgcmd):
+            print 'rundialog', hgcmd, files
+
+        def create_menu(label, hgcmd=None):
+            menuitem = gtk.MenuItem(label, True)
+            if hgcmd:
+                menuitem.connect('activate', rundialog, hgcmd)
+            menuitem.set_border_width(1)
+            return menuitem
+
+        def create_submenu(label, menu):
+            m = create_menu(label)
+            m.set_submenu(menu)
+            return m
+
+        def buildmenus(menus):
+            m = gtklib.MenuItems()
+            for menu_info in menus:
+                if menu_info.isSep():
+                    m.append_sep()
+                elif menu_info.isSubmenu():
+                    item = create_submenu(menu_info.menutext,
+                                          buildmenus(menu_info.get_menus()))
+                    m.append(item)
+                elif menu_info.state:
+                    # TODO: do something with menu_info.helptext, .icon
+                    item = create_menu(menu_info.menutext, menu_info.hgcmd)
+                    m.append(item)
+            return m.create_menu()
+
+        menu = buildmenus(menus)
+        menu.show_all()
+        menu.popup(None, None, None, 0, 0)
+
 
     def buttonrelease(self, browse, event):
         if event.button != 3:
