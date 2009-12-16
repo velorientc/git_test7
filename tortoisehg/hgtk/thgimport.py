@@ -12,7 +12,7 @@ import gobject
 from mercurial import hg, ui
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, settings
 
 from tortoisehg.hgtk import hgcmd, gtklib, gdialog, cslist
 
@@ -47,16 +47,25 @@ class ImportDialog(gtk.Dialog):
         self.set_title(_('Import - %s') % hglib.get_reponame(repo))
         self.done = False
 
+        # persistent settings
+        self.settings = settings.Settings('import')
+        self.recent = self.settings.mrul('src_paths')
+
         # layout table
         self.table = table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
 
-        ## source path entry & browse button
-        self.source_entry = gtk.Entry()
+        ## source path combo & browse buttons
+        self.src_list = gtk.ListStore(str)
+        self.src_combo = gtk.ComboBoxEntry(self.src_list, 0)
         self.files_btn = gtk.Button(_('Files...'))
         self.dir_btn = gtk.Button(_('Directory...'))
-        table.add_row(_('Source:'), self.source_entry, 1,
+        table.add_row(_('Source:'), self.src_combo, 1,
                       self.files_btn, self.dir_btn, expand=0)
+
+        ## add MRU paths to source combo
+        for path in self.recent:
+            self.src_list.append([path])
 
         # copy form thgstrip.py
         def createlabel():
@@ -96,7 +105,7 @@ class ImportDialog(gtk.Dialog):
         self.dir_btn.connect('clicked', self.dir_clicked)
         self.cslist.connect('list-updated', self.list_updated)
         self.cslist.connect('files-dropped', self.files_dropped)
-        self.source_entry.connect('changed', lambda e: self.preview(queue=True))
+        self.src_combo.connect('changed', lambda e: self.preview(queue=True))
 
         # prepare to show
         self.cslist.clear()
@@ -125,7 +134,7 @@ class ImportDialog(gtk.Dialog):
         if result and result != initdir:
             if not isinstance(result, basestring):
                 result = os.pathsep.join(result)
-            self.source_entry.set_text(result)
+            self.src_combo.child.set_text(result)
             self.preview()
 
     def dir_clicked(self, button):
@@ -134,17 +143,17 @@ class ImportDialog(gtk.Dialog):
                         title=_('Select Directory contains patches:'),
                         initial=initdir).run()
         if result and result != initdir:
-            self.source_entry.set_text(result)
+            self.src_combo.child.set_text(result)
             self.preview()
 
     def list_updated(self, cslist, total, sel, *args):
         self.update_status(sel)
 
     def files_dropped(self, cslist, files, *args):
-        src = self.source_entry.get_text()
+        src = self.src_combo.child.get_text()
         if src:
             files = [src] + files
-        self.source_entry.set_text(os.pathsep.join(files))
+        self.src_combo.child.set_text(os.pathsep.join(files))
         self.preview()
 
     def dialog_response(self, dialog, response_id):
@@ -180,7 +189,7 @@ class ImportDialog(gtk.Dialog):
         self.run() # don't close dialog
 
     def get_initial_dir(self):
-        src = self.source_entry.get_text()
+        src = self.src_combo.child.get_text()
         if src and os.path.exists(src):
             if os.path.isdir(src):
                 return src
@@ -188,6 +197,13 @@ class ImportDialog(gtk.Dialog):
             if parent and os.path.exists(parent):
                 return parent
         return None
+
+    def add_to_mru(self):
+        dirs = self.get_dirpaths()
+        for dir in dirs:
+            self.recent.add(dir)
+            self.src_list.append([dir])
+        self.settings.write()
 
     def update_status(self, count):
         if count:
@@ -201,7 +217,7 @@ class ImportDialog(gtk.Dialog):
         self.importbtn.set_sensitive(bool(count))
 
     def get_filepaths(self):
-        src = self.source_entry.get_text()
+        src = self.src_combo.child.get_text()
         if not src:
             return []
         files = []
@@ -218,6 +234,15 @@ class ImportDialog(gtk.Dialog):
             elif os.path.isfile(path):
                 files.append(path)
         return files
+
+    def get_dirpaths(self):
+        dirs = []
+        files = self.get_filepaths()
+        for file in files:
+            dir = os.path.dirname(file)
+            if os.path.isdir(dir) and dir not in dirs:
+                dirs.append(dir)
+        return dirs
 
     def get_dest(self):
         iter = self.dest_combo.get_active_iter()
@@ -269,6 +294,7 @@ class ImportDialog(gtk.Dialog):
         def cmd_done(returncode, useraborted):
             self.done = True
             self.switch_to(MODE_NORMAL, cmd=False)
+            self.add_to_mru()
             if hasattr(self, 'notify_func'):
                 self.notify_func(*self.notify_args, **self.notify_kargs)
             if returncode == 0:
