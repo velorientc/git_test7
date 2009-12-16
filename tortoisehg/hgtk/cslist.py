@@ -102,8 +102,7 @@ class ChangesetList(gtk.Frame):
         self.csbox.set_border_width(4)
 
         # signal handlers
-        self.allbtn.connect('clicked', lambda b: self.update(self.curitems, \
-                self.currepo, limit=False, queue=False, keep=True))
+        self.allbtn.connect('clicked', lambda b: self.expand_items())
         self.compactopt.connect('toggled', lambda b: self.update( \
                 self.curitems, self.currepo, queue=False, keep=True))
 
@@ -521,6 +520,20 @@ class ChangesetList(gtk.Frame):
         self.get_sep(0).set_visible(False)
         self.get_sep(-1).set_visible(False)
 
+    def expand_items(self):
+        if not self.has_limit():
+            return
+        # insert snipped csinfo
+        rest = self.curitems[self.limit - 1:-1]
+        for pos, item in enumerate(rest):
+            self.insert_csinfo(item, self.limit + pos)
+        # remove snip
+        self.remove_snip()
+
+        self.showitems = self.curitems[:]
+        self.update_seps()
+        self.update_status()
+
     def reorder_item(self, pos, insert):
         """
         pos: Number, the position of item to move. This must be curitems
@@ -684,13 +697,25 @@ class ChangesetList(gtk.Frame):
         self.itemmap['snip'] = {'widget': wrapbox,
                                 'snip': snipbox,
                                 'sep': sep}
-        return wrapbox
+
+    def remove_snip(self):
+        if not self.has_limit():
+            return
+        snip = self.itemmap['snip']['widget']
+        self.csbox.remove(snip)
+        del self.itemmap['snip']
 
     ### signal handlers ###
 
     def check_toggled(self, button, item):
         self.chkmap[item] = button.get_active()
         self.update_status()
+
+    def allbtn_clicked(self, button):
+        self.update(self.curitems, self.currepo, limit=False,
+                    queue=False, keep=True)
+
+    ### dnd signal handlers ###
 
     def dnd_begin(self, widget, context):
         self.setup_dnd()
