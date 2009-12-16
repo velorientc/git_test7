@@ -46,6 +46,7 @@ class ImportDialog(gtk.Dialog):
         self.repo = repo
         self.set_title(_('Import - %s') % hglib.get_reponame(repo))
         self.done = False
+        self.mqloaded = hasattr(self.repo, 'mq')
 
         # persistent settings
         self.settings = settings.Settings('import')
@@ -112,10 +113,11 @@ class ImportDialog(gtk.Dialog):
         gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
-        # dest combo
-        self.dest_combo.show_all()
-        self.dest_combo.hide()
-        self.infobox.pack_start(self.dest_combo, False, False, 6)
+        if self.mqloaded:
+            # dest combo
+            self.dest_combo.show_all()
+            self.dest_combo.hide()
+            self.infobox.pack_start(self.dest_combo, False, False, 6)
 
         # CmdWidget
         self.cmd = hgcmd.CmdWidget()
@@ -207,13 +209,18 @@ class ImportDialog(gtk.Dialog):
 
     def update_status(self, count):
         if count:
-            info = _('<span weight="bold">%s patches</span> will'
-                     ' be imported to the') % count
+            if self.mqloaded:
+                info = _('<span weight="bold">%s patches</span> will'
+                         ' be imported to the') % count
+            else:
+                info = _('<span weight="bold">%s patches</span> will'
+                         ' be imported to the repository') % count
         else:
             info = '<span weight="bold" foreground="#880000">%s</span>' \
                         % _('Nothing to import')
         self.infolbl.set_markup(info)
-        self.dest_combo.set_property('visible', bool(count))
+        if self.mqloaded:
+            self.dest_combo.set_property('visible', bool(count))
         self.importbtn.set_sensitive(bool(count))
 
     def get_filepaths(self):
