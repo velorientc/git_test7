@@ -72,7 +72,7 @@ class ImportDialog(gtk.Dialog):
         def createlabel():
             label = gtk.Label()
             label.set_alignment(0, 0.5)
-            label.set_size_request(-1, 24)
+            label.set_size_request(-1, 25)
             label.size_request()
             return label
 
