@@ -35,7 +35,6 @@ class BranchOperationDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
-        self.connect('response', self.response)
 
         self.newbranch = None
         self.closebranch = False
@@ -57,9 +56,7 @@ class BranchOperationDialog(gtk.Dialog):
         self.newbranchradio = gtk.RadioButton(nochanges,
                 _('Open a new named branch'))
         self.newbranchradio.set_active(True)
-        self.newbranchradio.connect('toggled', self.nbtoggle)
         self.branchentry = gtk.Entry()
-        self.branchentry.connect('activate', self.activated)
         self.closebranchradio = gtk.RadioButton(nochanges,
                 _('Close current named branch'))
 
@@ -74,6 +71,11 @@ class BranchOperationDialog(gtk.Dialog):
         table.add_row(self.newbranchradio, self.branchentry)
         table.add_row(self.closebranchradio)
         table.add_row(nochanges)
+
+        # signal handlers
+        self.connect('response', self.response)
+        self.newbranchradio.connect('toggled', self.nbtoggle)
+        self.branchentry.connect('activate', self.activated)
 
         # prepare to show
         if branch:
