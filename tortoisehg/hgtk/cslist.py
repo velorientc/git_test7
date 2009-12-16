@@ -20,6 +20,8 @@ from tortoisehg.hgtk import csinfo, gtklib
 CSL_DND_ITEM     = 1024
 CSL_DND_URI_LIST = 1025
 
+ASYNC_LIMIT = 60
+
 class ChangesetList(gtk.Frame):
 
     __gsignals__ = {
@@ -255,7 +257,8 @@ class ChangesetList(gtk.Frame):
             # update status
             self.update_status()
 
-        if numshow < 80:
+        # determine doing it now or later
+        if numshow < ASYNC_LIMIT:
             proc()
         else:
             self.update_status(updating=True)
@@ -523,16 +526,27 @@ class ChangesetList(gtk.Frame):
     def expand_items(self):
         if not self.has_limit():
             return
-        # insert snipped csinfo
-        rest = self.curitems[self.limit - 1:-1]
-        for pos, item in enumerate(rest):
-            self.insert_csinfo(item, self.limit + pos)
-        # remove snip
-        self.remove_snip()
 
-        self.showitems = self.curitems[:]
-        self.update_seps()
-        self.update_status()
+        # fix up snipped items
+        rest = self.curitems[self.limit - 1:-1]
+
+        def proc():
+            # insert snipped csinfo
+            for pos, item in enumerate(rest):
+                self.insert_csinfo(item, self.limit + pos)
+            # remove snip
+            self.remove_snip()
+
+            self.showitems = self.curitems[:]
+            self.update_seps()
+            self.update_status()
+
+        # determine doing it now or later
+        if len(rest) < ASYNC_LIMIT:
+            proc()
+        else:
+            self.update_status(updating=True)
+            gtklib.idle_add_single_call(proc)
 
     def reorder_item(self, pos, insert):
         """
