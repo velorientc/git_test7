@@ -20,7 +20,7 @@ import gtk
 import gobject
 
 import mercurial.ui as _ui
-from mercurial import hg, util, fancyopts, cmdutil, extensions
+from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 
 from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import hglib, paths, shlib
@@ -30,12 +30,13 @@ try:
 except ImportError:
     config_nofork = None
 
-nonrepo_commands = '''userconfig clone debugcomplete init about help
-version thgstatus serve'''
+nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
+about help version thgstatus serve'''
 
 # Add TortoiseHg signals, hooked to key accelerators in gtklib
 for sig in ('copy-clipboard', 'thg-diff', 'thg-parent', 'thg-rename',
-        'thg-revision'):
+            'thg-revision', 'mq-move-up', 'mq-move-down', 'mq-move-top',
+            'mq-move-bottom', 'mq-pop', 'mq-push'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept', 'thg-reflow'):
@@ -140,7 +141,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
     except fancyopts.getopt.GetoptError, inst:
-        raise hglib.ParseError(None, inst)
+        raise error.ParseError(None, inst)
 
     if args:
         alias, args = args[0], args[1:]
@@ -163,7 +164,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions)
     except fancyopts.getopt.GetoptError, inst:
-        raise hglib.ParseError(cmd, inst)
+        raise error.ParseError(cmd, inst)
 
     # separate global options back out
     for o in globalopts:
@@ -184,20 +185,20 @@ def _runcatch(ui, args):
             return runcommand(ui, args)
         finally:
             ui.flush()
-    except hglib.ParseError, inst:
+    except error.ParseError, inst:
         if inst.args[0]:
             ui.status(_("hgtk %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
             ui.status(_("hgtk: %s\n") % inst.args[1])
             help_(ui, 'shortlist')
-    except hglib.AmbiguousCommand, inst:
+    except error.AmbiguousCommand, inst:
         ui.status(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
-    except hglib.UnknownCommand, inst:
+    except error.UnknownCommand, inst:
         ui.status(_("hgtk: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
-    except hglib.RepoError, inst:
+    except error.RepoError, inst:
         ui.status(_("abort: %s!\n") % inst)
 
     return -1
@@ -245,7 +246,7 @@ def runcommand(ui, args):
         ui.quiet = True
 
     if cmd not in nonrepo_commands.split() and not path:
-        raise hglib.RepoError(_("There is no Mercurial repository here"
+        raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
 
     try:
@@ -255,7 +256,7 @@ def runcommand(ui, args):
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 1: # no
             raise
-        raise hglib.ParseError(cmd, _("invalid arguments"))
+        raise error.ParseError(cmd, _("invalid arguments"))
 
 mainwindow = None
 def thgexit(win):
@@ -329,6 +330,11 @@ def repoconfig(ui, *pats, **opts):
     from tortoisehg.hgtk.thgconfig import run
     gtkrun(run, ui, *pats, **opts)
 
+def shellconfig(ui, *pats, **opts):
+    """Explorer extension configuration editor"""
+    from tortoisehg.hgtk.shellconf import run
+    gtkrun(run, ui, *pats, **opts)
+
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     if not pats or len(pats) > 2:
@@ -393,7 +399,7 @@ def serve(ui, *pats, **opts):
     """web server"""
     from tortoisehg.hgtk.serve import run
     if paths.find_root() == None and not opts['webdir_conf']:
-        raise hglib.RepoError(_("There is no Mercurial repository here"
+        raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
     gtkrun(run, ui, *pats, **opts)
 
@@ -420,6 +426,11 @@ def synch(ui, *pats, **opts):
 def update(ui, *pats, **opts):
     """update/checkout tool"""
     from tortoisehg.hgtk.update import run
+    gtkrun(run, ui, *pats, **opts)
+
+def browse(ui, *pats, **opts):
+    """browse repository state"""
+    from tortoisehg.hgtk.browse import run
     gtkrun(run, ui, *pats, **opts)
 
 def vdiff(ui, *pats, **opts):
@@ -466,7 +477,7 @@ def help_(ui, name=None, with_version=False, alias=None):
 
         try:
             aliases, i = cmdutil.findcmd(name, table, False)
-        except hglib.AmbiguousCommand, inst:
+        except error.AmbiguousCommand, inst:
             select = lambda c: c.lstrip('^').startswith(inst.args[0])
             helplist(_('list of commands:\n\n'), select)
             return
@@ -535,7 +546,7 @@ def help_(ui, name=None, with_version=False, alias=None):
             if name in names:
                 break
         else:
-            raise hglib.UnknownCommand(name)
+            raise error.UnknownCommand(name)
 
         # description
         if not doc:
@@ -553,7 +564,7 @@ def help_(ui, name=None, with_version=False, alias=None):
                 f(name)
                 i = None
                 break
-            except hglib.UnknownCommand, inst:
+            except error.UnknownCommand, inst:
                 i = inst
         if i:
             raise i
@@ -707,4 +718,9 @@ table = {
         [('r', 'rev', '', _('revision to update'))],
         ('hgtk archive')),
     "^strip": (strip, [], ('hgtk strip [REV]')),
+    "^browse": (browse, [], ('hgtk browse [REV]')),
 }
+
+if os.name == 'nt':
+    # TODO: extra detection to determine if shell extension is installed
+    table['shellconfig'] = (shellconfig, [], _('hgtk shellconfig'))
