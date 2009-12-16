@@ -516,6 +516,15 @@ class ChangeSet(gdialog.GDialog):
                     return revline_data(tctx)
                 except (error.LookupError, error.RepoLookupError, error.RepoError):
                     return ts
+            elif item == 'p4':
+                ts = widget.get_data('p4', usepreset=True)
+                if not ts:
+                    return None
+                try:
+                    tctx = self.repo[ts]
+                    return revline_data(tctx)
+                except (error.LookupError, error.RepoLookupError, error.RepoError):
+                    return ts
             elif item == 'patch':
                 if hasattr(ctx, '_patchname'):
                     desc = ctx.description()
@@ -545,7 +554,7 @@ class ChangeSet(gdialog.GDialog):
                     if branch:
                         return '%s - %s %s' % (revnum, branch, summary)
                     return '%s - %s' % (revnum, summary)
-            if item in ('cset', 'transplant', 'patch'):
+            if item in ('cset', 'transplant', 'patch', 'p4'):
                 if isinstance(value, basestring):
                     return revid_markup(value)
                 return revline_markup(*value)
@@ -601,7 +610,7 @@ class ChangeSet(gdialog.GDialog):
                                markup=markup_func, widget=widget_func)
         self.csetstyle = csinfo.panelstyle(contents=('cset', 'branch',
                                 'user', 'dateage', 'parents', 'children',
-                                'tags', 'transplant'), selectable=True)
+                                'tags', 'transplant', 'p4'), selectable=True)
         self.patchstyle = csinfo.panelstyle(contents=('patch', 'branch',
                                  'user', 'dateage', 'parents'),
                                  selectable=True)
