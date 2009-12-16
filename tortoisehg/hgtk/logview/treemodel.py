@@ -82,6 +82,9 @@ class TreeModel(gtk.GenericTreeModel):
         for rev in allrevs:
             if rev in self.revisions:
                 del self.revisions[rev]
+                
+        if hasattr(self.repo, '_bookmarkcurrent'):
+            self.repo._bookmarkcurrent = None
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
@@ -162,13 +165,29 @@ class TreeModel(gtk.GenericTreeModel):
             escape = gtklib.markup_escape_text
             summary = escape(hglib.toutf(summary))
             node = ctx.node()
+
+            # Check if we're using bookmarks, and have the
+            # 'track.current' option set; if so,
+            # find what the 'current' bookmark is
+            currentBookmark = None
+            bookmarks = None
+            try:
+                bookmarks = hglib.extensions.find('bookmarks')
+            except KeyError:
+                pass
+            if bookmarks:
+                if self.repo.ui.configbool('bookmarks', 'track.current'):
+                    currentBookmark = bookmarks.current(self.repo)
+                
             tags = self.repo.nodetags(node)
             taglist = hglib.toutf(', '.join(tags))
             tstr = ''
             for tag in tags:
                 if tag not in self.hidetags:
-                    tstr += gtklib.markup(' %s ' % tag, color='black',
-                                          background='#ffffaa') + ' '
+                    style = {'color':'black', 'background':'#ffffaa'}
+                    if tag == currentBookmark:
+                        style['background'] = '#ffcc99'
+                    tstr += gtklib.markup(' %s ' % tag, **style) + ' '
 
             branch = ctx.branch()
             bstr = ''
@@ -250,7 +269,7 @@ class TreeModel(gtk.GenericTreeModel):
                 self.author_pats.append((re.compile(pat, re.I), v))
             try:
                 enabled = self.repo.ui.configbool('tortoisehg', 'authorcolor')
-            except hglib.ConfigError:
+            except error.ConfigError:
                 enabled = False
             if self.author_pats or enabled:
                 self.color_func = self.text_color_author

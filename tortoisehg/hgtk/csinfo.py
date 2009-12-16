@@ -12,8 +12,8 @@ import os
 import gtk
 import binascii
 
-from mercurial import patch, util
-from mercurial.node import short, hex
+from mercurial import patch, util, error
+from mercurial.node import hex
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -113,7 +113,7 @@ def ChangesetContext(repo, rev):
         return None
     try:
         ctx = repo[rev]
-    except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+    except (error.LookupError, error.RepoLookupError, error.RepoError):
         ctx = None
     return ctx
 
@@ -165,13 +165,13 @@ class patchctx(object):
                 continue
             try:
                 self._parents.append(repo[p])
-            except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+            except (error.LookupError, error.RepoLookupError, error.RepoError):
                 self._parents.append(p)
 
     def __str__(self):
         node = self.node()
         if node:
-            return short(node)
+            return node[:12]
         return ''
 
     def __int__(self):
@@ -191,6 +191,7 @@ class patchctx(object):
     def tags(self): return ()
     def parents(self): return self._parents
     def children(self): return ()
+    def extra(self): return {}
 
 class SummaryInfo(object):
 
@@ -212,7 +213,9 @@ class SummaryInfo(object):
             if item == 'rev':
                 revnum = self.get_data('revnum', *args)
                 revid = self.get_data('revid', *args)
-                return (revnum, revid)
+                if revid:
+                    return (revnum, revid)
+                return None
             elif item == 'revnum':
                 return ctx.rev()
             elif item == 'revid':
@@ -254,7 +257,7 @@ class SummaryInfo(object):
                     if dblist and value in [hglib.toutf(b.strip()) \
                                             for b in dblist.split(',')]:
                         return None
-                return value
+                return None
             elif item == 'rawtags':
                 value = [hglib.toutf(tag) for tag in ctx.tags()]
                 if len(value) == 0:
@@ -269,7 +272,7 @@ class SummaryInfo(object):
                     value = [tag for tag in value if tag not in htags]
                     if len(value) == 0:
                         return None
-                return value
+                return None
             elif item == 'transplant':
                 extra = ctx.extra()
                 try:
@@ -321,7 +324,9 @@ class SummaryInfo(object):
             if item == 'rev':
                 revnum, revid = value
                 revid = gtklib.markup(revid, **mono)
-                return '%s (%s)' % (revnum, revid)
+                if revnum is not None and revid is not None:
+                    return '%s (%s)' % (revnum, revid)
+                return '%s' % revid
             elif item in ('revid', 'transplant'):
                 return gtklib.markup(value, **mono)
             elif item == 'revnum':
