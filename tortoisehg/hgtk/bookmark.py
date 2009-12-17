@@ -26,6 +26,7 @@ RESPONSE_ADD     = 1
 RESPONSE_REMOVE  = 2
 RESPONSE_RENAME  = 3
 RESPONSE_CURRENT = 4
+RESPONSE_MOVE    = 5
 
 class BookmarkDialog(gtk.Dialog):
     """ Dialog to add bookmark to Mercurial repo """
@@ -41,7 +42,8 @@ class BookmarkDialog(gtk.Dialog):
 
         # add buttons
         if type == TYPE_ADDREMOVE:
-            self.add_button(_('Add'), RESPONSE_ADD)
+            self._button_add = self.add_button(_('Add'), RESPONSE_ADD)
+            self._button_move = self.add_button(_('Move'), RESPONSE_MOVE)
             self.add_button(_('Remove'), RESPONSE_REMOVE)
         elif type == TYPE_RENAME:
             self.add_button(_('Rename'), RESPONSE_RENAME)
@@ -82,8 +84,12 @@ class BookmarkDialog(gtk.Dialog):
         self.connect('response', self.dialog_response)
         self._bookmark_input.connect('activate', self.entry_activated, type)
         entry.connect('activate', self.entry_activated, type)
+        if type == TYPE_ADDREMOVE:
+            self._bookmark_input.connect('changed', self.bookmark_changed)
 
         # prepare to show
+        if type == TYPE_ADDREMOVE:
+            self.set_add_move_button_sensitivity()
         self._refresh(clear=False)
         if type == TYPE_RENAME:
             self._name_input.grab_focus()
@@ -110,6 +116,9 @@ class BookmarkDialog(gtk.Dialog):
         # Add button
         if response_id == RESPONSE_ADD:
             self._do_add_bookmark()
+        # Move button
+        elif response_id == RESPONSE_MOVE:
+            self._do_move_bookmark()
         # Remove button
         elif response_id == RESPONSE_REMOVE:
             self._do_remove_bookmark()
@@ -130,13 +139,29 @@ class BookmarkDialog(gtk.Dialog):
 
     def entry_activated(self, entry, type):
         if type == TYPE_ADDREMOVE:
-            self.response(RESPONSE_ADD)
+            if self._button_add.get_property('sensitive'):
+                self.response(RESPONSE_ADD)
+            else:
+                self.response(RESPONSE_MOVE)
         elif type == TYPE_RENAME:
             self.response(RESPONSE_RENAME)
         elif type == TYPE_CURRENT:
             self.response(RESPONSE_CURRENT)
         else:
             raise _('unexpected type: %s') % type
+
+    def bookmark_changed(self, bookmark_widget):
+        self.set_add_move_button_sensitivity()
+
+    def set_add_move_button_sensitivity(self):
+        mark = self._bookmark_input.get_text()
+        if mark in hglib.get_repo_bookmarks(self.repo):
+            self._button_add.set_sensitive(False)
+            self._button_move.set_sensitive(True)
+        else:
+            self._button_add.set_sensitive(True)
+            self._button_move.set_sensitive(False)
+            
 
     def _do_add_bookmark(self):
         # gather input data
@@ -155,6 +180,32 @@ class BookmarkDialog(gtk.Dialog):
             self._add_hg_bookmark(name, rev)
             dialog.info_dialog(self, _('Bookmarking completed'),
                               _('Bookmark "%s" has been added') % name)
+            self._refresh()
+        except util.Abort, inst:
+            dialog.error_dialog(self, _('Error in bookmarking'), str(inst))
+            return False
+        except:
+            dialog.error_dialog(self, _('Error in bookmarking'),
+                    traceback.format_exc())
+            return False
+
+    def _do_move_bookmark(self):
+        # gather input data
+        name = self._bookmark_input.get_text()
+        rev = self._rev_input.get_text()
+
+        # verify input
+        if name == '':
+            dialog.error_dialog(self, _('Bookmark input is empty'),
+                         _('Please enter bookmark name'))
+            self._bookmark_input.grab_focus()
+            return False
+
+        # move bookmark
+        try:
+            self._move_hg_bookmark(name, rev)
+            dialog.info_dialog(self, _('Bookmarking completed'),
+                              _('Bookmark "%s" has been moved') % name)
             self._refresh()
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error in bookmarking'), str(inst))
@@ -256,6 +307,16 @@ class BookmarkDialog(gtk.Dialog):
                            rev=revision,
                            mark=name)
 
+    def _move_hg_bookmark(self, name, revision):
+        if name not in hglib.get_repo_bookmarks(self.repo):
+            raise util.Abort(_('No bookmark named "%s" exists') % name)
+
+        bookmarks.bookmark(ui=ui.ui(),
+                           repo=self.repo,
+                           rev=revision,
+                           mark=name,
+                           force=True)
+        
     def _remove_hg_bookmark(self, name):
         if not name in hglib.get_repo_bookmarks(self.repo):
             raise util.Abort(_("Bookmark '%s' does not exist") % name)

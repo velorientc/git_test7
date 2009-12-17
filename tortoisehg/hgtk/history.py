@@ -875,7 +875,7 @@ class GLog(gdialog.GDialog):
         m = gtklib.MenuItems() 
         m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
         if 'bookmarks' in self.exs:
-            m.append(create_menu(_('Add/Remove B_ookmark...'), 
+            m.append(create_menu(_('Add/Move/Remove B_ookmark...'), 
                                  self.add_bookmark))
             m.append(create_menu(_('Rename Bookmark...'), 
                                  self.rename_bookmark))
@@ -1213,6 +1213,9 @@ class GLog(gdialog.GDialog):
         return self.stbar
 
     def refresh_on_marker_change(self, oldlen, oldmarkers, newmarkers):
+        # Note that oldmarkers/newmarkers may be either dicts
+        # (for add/remove bookmarks, which can also 'move'
+        # bookmarks), or lists (everything else)
         self.repo.invalidate()
         self.changeview.clear_cache()
         if len(self.repo) != oldlen:
@@ -1906,14 +1909,17 @@ class GLog(gdialog.GDialog):
 
     def add_bookmark(self, menuitem):
         # save bookmark info for detecting new bookmarks added
-        oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
+        # since we can now move bookmarks, need to store
+        # the associated changesets as well
+        oldbookmarks = hglib.get_repo_bookmarks(self.repo, values=True)
         oldlen = len(self.repo)
         rev = str(self.currevid)
         bmark = self.get_rev_tag(rev, include=oldbookmarks)
 
         def refresh(*args):
             self.refresh_on_marker_change(oldlen, oldbookmarks,
-                                          hglib.get_repo_bookmarks(self.repo))
+                                          hglib.get_repo_bookmarks(self.repo,
+                                                                   values=True))
 
         dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_ADDREMOVE,
                                          bmark, rev)
