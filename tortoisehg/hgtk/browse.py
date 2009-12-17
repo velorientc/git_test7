@@ -159,6 +159,7 @@ class BrowsePane(gtk.TreeView):
     def chdir(self, cwd):
         'change to a new directory'
         # disable updates while we refill the model
+        self.cwd = cwd
         model = self.get_model()
         self.set_model(None)
         model.clear()
@@ -201,7 +202,7 @@ class BrowsePane(gtk.TreeView):
             if basename:
                 node = node.subdirs[basename]
             adddir(node)
-            self.currepo = None
+            self.currepo = self.cachedrepo
         else:
             try:
                 for name in os.listdir(cwd):
@@ -210,7 +211,7 @@ class BrowsePane(gtk.TreeView):
             except OSError:
                 # report to status bar
                 pass
-            self.currepo = self.cachedrepo
+            self.currepo = None
 
 
     def cacherepo(self, root, pats=[], filetypes='CI?'):
@@ -252,15 +253,17 @@ class BrowsePane(gtk.TreeView):
         model, tpaths = browse.get_selection().get_selected_rows()
         if not tpaths:
             return
-        files = [model[p][0] for p in tpaths if model[p][10]]
+        cpaths = [model[p][0] for p in tpaths]
+        files = []
         if self.currepo:
             repo = self.currepo
-            menus = self.menu.get_commands(repo, repo.root, files)
+            files = [os.path.join(self.cwd, p) for p in cpaths]
+            menus = self.menu.get_commands(repo, self.cwd, files)
         else:
-            menus = self.menu.get_norepo_commands(None, files)
+            menus = self.menu.get_norepo_commands(None, cpaths)
 
         def rundialog(item, hgcmd):
-            print 'rundialog', hgcmd, files
+            print 'rundialog', hgcmd, cpaths
 
         def create_menu(label, hgcmd=None):
             menuitem = gtk.MenuItem(label, True)
