@@ -72,18 +72,22 @@ class BookmarkDialog(gtk.Dialog):
         table.add_row(label, self._bookmarklistbox, padding=False)
 
         ## add entry
-        trackcurrent = self.repo.ui.configbool('bookmarks', 'track.current')        
-        entry = gtk.Entry()
-        if type == TYPE_ADDREMOVE:
-            self._rev_input = entry
-            entry.set_width_chars(12)
-            entry.set_text(rev)
-            label = _('Revision:')
-        elif type == TYPE_RENAME:
-            self._name_input = entry
-            label = _('New Name:')
-        table.add_row(label, entry, padding=False)
+        if type == TYPE_CURRENT:
+            entry = None
+        else:
+            entry = gtk.Entry()
+            if type == TYPE_ADDREMOVE:
+                self._rev_input = entry
+                entry.set_width_chars(12)
+                entry.set_text(rev)
+                label = _('Revision:')
+            elif type == TYPE_RENAME:
+                self._name_input = entry
+                label = _('New Name:')
+            table.add_row(label, entry, padding=False)
+            
         # Option to make new bookmark the active one
+        trackcurrent = self.repo.ui.configbool('bookmarks', 'track.current')
         if type == TYPE_ADDREMOVE and trackcurrent:
             check = gtk.CheckButton(_('Make new bookmark current'))
             self.opt_newcurrent = check
@@ -93,7 +97,8 @@ class BookmarkDialog(gtk.Dialog):
         # signal handlers
         self.connect('response', self.dialog_response)
         self._bookmark_input.connect('activate', self.entry_activated, type)
-        entry.connect('activate', self.entry_activated, type)
+        if entry:
+            entry.connect('activate', self.entry_activated, type)
         if type == TYPE_ADDREMOVE:
             self._bookmark_input.connect('changed', self.bookmark_changed)
             if trackcurrent:
