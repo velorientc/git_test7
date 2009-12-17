@@ -506,10 +506,9 @@ class ChangesetList(gtk.Frame):
 
     def get_sep_by_y(self, y):
         pos, start, end = self.get_item_pos(y, detail=True)
-        sep_pos = self.trans_to_show(end)
-        if self.has_limit() and len(self.curitems) - 1 <= end:
-            sep_pos += 1
-        return self.get_sep(sep_pos)
+        if self.has_limit() and self.limit - 1 < end:
+            end -= len(self.curitems) - self.limit - 1
+        return self.get_sep(end)
 
     def update_seps(self):
         """ Update visibility of all separators """
