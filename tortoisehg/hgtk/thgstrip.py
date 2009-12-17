@@ -11,13 +11,13 @@ import gtk
 import gobject
 import pango
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 from mercurial.node import nullrev
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
-from tortoisehg.hgtk import csinfo, hgcmd, gtklib, gdialog
+from tortoisehg.hgtk import csinfo, hgcmd, gtklib, gdialog, cslist
 
 MODE_NORMAL  = 'normal'
 MODE_WORKING = 'working'
@@ -33,7 +33,6 @@ class StripDialog(gtk.Dialog):
         self.set_resizable(False)
         self.set_has_separator(False)
         self.connect('response', self.dialog_response)
-        self.timeout_queue = []
 
         # buttons
         self.stripbtn = self.add_button(_('Strip'), gtk.RESPONSE_OK)
@@ -41,7 +40,7 @@ class StripDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
@@ -52,8 +51,6 @@ class StripDialog(gtk.Dialog):
         elif rev is None:
             rev = 'tip'
         rev = str(rev)
-        self.currev = None
-        self.curnum = None
 
         # layout table
         self.table = table = gtklib.LayoutTable()
@@ -92,40 +89,9 @@ class StripDialog(gtk.Dialog):
         self.resultlbl = createlabel()
         table.add_row(_('Preview:'), self.resultlbl, padding=False)
 
-        ## preview box
-        pframe = gtk.Frame()
-        table.add_row(None, pframe, padding=False)
-        pframe.set_shadow_type(gtk.SHADOW_IN)
-        pbox = gtk.VBox()
-        pframe.add(pbox)
-
-        ### preview status box
-        self.pstatbox = gtk.HBox()
-        pbox.pack_start(self.pstatbox)
-        pbox.pack_start(gtk.HSeparator(), False, False, 2)
-
-        #### status label
-        self.pstatlbl = createlabel()
-        self.pstatbox.pack_start(self.pstatlbl, False, False, 2)
-
-        #### show all button
-        self.allbtn = gtk.Button(_('Show all')) # add later
-
-        #### preview option
-        self.compactopt = gtk.CheckButton(_('Use compact view'))
-        self.pstatbox.pack_end(self.compactopt, False, False, 2)
-        self.compactopt.connect('toggled', self.compact_toggled)
-
-        ### changeset view
-        rview = gtk.ScrolledWindow()
-        pbox.add(rview)
-        rview.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        rview.set_size_request(400, 180)
-        rview.size_request()
-        self.resultbox = gtk.VBox()
-        rview.add_with_viewport(self.resultbox)
-        rview.child.set_shadow_type(gtk.SHADOW_NONE)
-        self.resultbox.set_border_width(4)
+        ## changeset list
+        self.cslist = cslist.ChangesetList()
+        table.add_row(None, self.cslist, padding=False)
 
         ## options
         self.expander = gtk.Expander(_('Options:'))
@@ -138,13 +104,7 @@ class StripDialog(gtk.Dialog):
 
         # signal handlers
         self.revcombo.connect('changed', lambda c: self.preview(queue=True))
-        self.allbtn.connect('clicked', lambda b: self.preview(limit=False))
-
-        # csetinfo factory
-        self.factory = csinfo.factory(repo, withupdate=True)
-        self.lstyle = csinfo.labelstyle(contents=('%(revnum)s:',
-                             ' %(branch)s', ' %(tags)s', ' %(summary)s'))
-        self.pstyle = csinfo.panelstyle()
+        self.cslist.connect('list-updated', self.preview_updated)
 
         # prepare to show
         self.preview()
@@ -152,9 +112,6 @@ class StripDialog(gtk.Dialog):
         gtklib.idle_add_single_call(self.after_init)
 
     def after_init(self):
-        # add 'Show all' button
-        self.pstatbox.pack_start(self.allbtn, False, False, 4)
-
         # backup types (foldable)
         self.butable = gtklib.LayoutTable()
         self.vbox.pack_start(self.butable, True, True)
@@ -188,53 +145,11 @@ class StripDialog(gtk.Dialog):
         self.notify_kargs = kargs
 
     def preview(self, limit=True, queue=False, force=False):
-        def clear_preview():
-            self.resultbox.foreach(lambda c: c.parent.remove(c))
-        def update_info(num=None):
-            if num is None:
-                info = '<span weight="bold" foreground="#880000">%s</span>' \
-                            % _('Unknown revision!')
-            else:
-                info = _('<span weight="bold">%s changesets</span> will'
-                         ' be stripped') % num
-            self.resultlbl.set_markup(info)
-        def update_stat(show=None, total=None):
-            if show is None or total is None:
-                all = False
-                stat = _('No changesets to display')
-            else:
-                all = show == total
-                if all:
-                    stat = _('Displaying all changesets')
-                else:
-                    stat = _('Displaying %(count)d of %(total)d changesets') \
-                                % dict(count=show, total=total)
-            self.pstatlbl.set_text(stat)
-            return all
-
         # check revision
         rev = self.get_rev()
         if rev is None:
-            clear_preview()
-            update_info()
-            update_stat()
-            self.timeout_queue = []
-            self.currev = None
+            self.cslist.clear()
             return
-        elif not force and limit and self.currev == rev: # is already shown?
-            update_info(self.curnum)
-            return
-        elif queue: # queueing if need
-            def timeout(eid):
-                if self.timeout_queue and self.timeout_queue[-1] == eid[0]:
-                    self.preview()
-                    self.timeout_queue = []
-                return False # don't repeat
-            event_id = [None]
-            event_id[0] = gobject.timeout_add(600, timeout, event_id)
-            self.timeout_queue.append(event_id[0])
-            return
-        self.currev = rev
 
         # enumerate all descendants
         # borrowed from strip() in 'mercurial/repair.py'
@@ -244,54 +159,9 @@ class StripDialog(gtk.Dialog):
             parents = cl.parentrevs(r)
             if parents[0] in tostrip or parents[1] in tostrip:
                 tostrip.append(r)
-        self.curnum = numtotal = len(tostrip)
 
-        LIM = 100
-        compactview = self.compactopt.get_active()
-        style = compactview and self.lstyle or self.pstyle
-        def add_csinfo(revnum):
-            info = self.factory(revnum, style)
-            if info.parent:
-                info.parent.remove(info)
-            self.resultbox.pack_start(info, False, False, 2)
-        def add_sep():
-            if not compactview:
-                self.resultbox.pack_start(gtk.HSeparator(), False, False)
-        def add_snip():
-            snipbox = gtk.HBox()
-            self.resultbox.pack_start(snipbox, False, False, 4)
-            spacer = gtk.Label()
-            snipbox.pack_start(spacer, False, False)
-            spacer.set_width_chars(24)
-            sniplbl = gtk.Label()
-            snipbox.pack_start(sniplbl, False, False)
-            sniplbl.set_markup('<span size="large" weight="heavy"'
-                               ' font_family="monospace">...</span>')
-            sniplbl.set_angle(90)
-            snipbox.pack_start(gtk.Label())
-
-        # update changeset preview
-        if limit and numtotal > LIM:
-            toshow, lastrev = tostrip[:LIM-1], tostrip[LIM-1:][-1]
-        else:
-            toshow, lastrev = tostrip, None
-        numshow = len(toshow) + (lastrev and 1 or 0)
-        clear_preview()
-        for r in toshow:
-            add_csinfo(r)
-            if not r == toshow[-1]: # no need to append to the last
-                add_sep()
-        if lastrev:
-            add_snip()
-            add_csinfo(lastrev)
-        self.resultbox.show_all()
-
-        # update info label
-        update_info(numtotal)
-
-        # update preview status & button
-        all = update_stat(numshow, numtotal)
-        self.allbtn.set_property('visible', not all)
+        # update preview
+        self.cslist.update(tostrip, self.repo, limit, queue)
 
     def dialog_response(self, dialog, response_id):
         def abort():
@@ -325,8 +195,15 @@ class StripDialog(gtk.Dialog):
         else:
             self.butable.hide()
 
-    def compact_toggled(self, checkbtn):
-        self.preview(force=True)
+    def preview_updated(self, cslist, total, *args):
+        if total is None:
+            info = '<span weight="bold" foreground="#880000">%s</span>' \
+                        % _('Unknown revision!')
+        else:
+            info = _('<span weight="bold">%s changesets</span> will'
+                     ' be stripped') % total
+        self.resultlbl.set_markup(info)
+        self.stripbtn.set_sensitive(bool(total))
 
     def get_rev(self):
         """ Return integer revision number or None """
@@ -335,7 +212,7 @@ class StripDialog(gtk.Dialog):
             return None
         try:
             revnum = self.repo[revstr].rev()
-        except (hglib.RepoError, hglib.LookupError):
+        except (error.RepoError, error.LookupError):
             return None
         return revnum
 

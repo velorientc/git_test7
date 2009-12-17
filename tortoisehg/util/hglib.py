@@ -11,10 +11,9 @@ import traceback
 import shlib
 import time
 
-from mercurial.error import RepoError, ParseError, LookupError, RepoLookupError
-from mercurial.error import UnknownCommand, AmbiguousCommand, ConfigError
 from mercurial import hg, ui, util, extensions, commands, hook, match
 from mercurial import dispatch, encoding, templatefilters, bundlerepo, url
+
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
@@ -121,6 +120,8 @@ def invalidaterepo(repo):
     repo.invalidate()
     if '_bookmarks' in repo.__dict__:
         repo._bookmarks = {}
+    if hasattr(repo, '_bookmarkcurrent'):
+        repo._bookmarkcurrent = None
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
@@ -236,3 +237,25 @@ def validate_synch_path(path, repo):
             return_path = path_aux
     return return_path
 
+def get_repo_bookmarks(repo, values=False):
+    if values:
+        return dict(repo._bookmarks)
+    else:
+        return repo._bookmarks.keys()
+
+def is_rev_current(repo, rev):
+    '''
+    Returns True if the revision indicated by 'rev' is the current
+    working directory parent.
+    
+    If rev is '' or None, it is assumed to mean 'tip'.
+    '''
+    if rev in ('', None):
+        rev = 'tip'
+    rev = repo.lookup(rev)
+    parents = repo.parents()
+    
+    if len(parents) > 1:
+        return False
+    
+    return rev == parents[0].node()

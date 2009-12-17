@@ -14,7 +14,7 @@ import shutil
 import tempfile
 import re
 
-from mercurial import hg, ui, cmdutil, util
+from mercurial import hg, ui, cmdutil, util, error
 from mercurial.node import short, nullid
 
 from tortoisehg.util.i18n import _
@@ -96,7 +96,7 @@ class FileSelectionDialog(gtk.Dialog):
         try:
             path = opts.get('bundle') or paths.find_root()
             repo = hg.repository(ui.ui(), path=path)
-        except hglib.RepoError:
+        except error.RepoError:
             # hgtk should catch this earlier
             gdialog.Prompt(_('No repository'),
                    _('No repository found here'), None).run()
@@ -368,7 +368,7 @@ def rawextdiff(ui, *pats, **opts):
     try:
         path = opts.get('bundle') or paths.find_root()
         repo = hg.repository(ui, path=path)
-    except hglib.RepoError:
+    except error.RepoError:
         # hgtk should catch this earlier
         ui.warn(_('No repository found here') + '\n')
         return

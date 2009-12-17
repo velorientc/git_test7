@@ -25,7 +25,7 @@ demandimport.enable()
 import subprocess
 import urllib
 
-from mercurial import hg, ui, match, util
+from mercurial import hg, ui, match, util, error
 from mercurial.node import short
 
 def _thg_path():
@@ -40,7 +40,7 @@ def _thg_path():
         sys.path.insert(0, thgpath)
 _thg_path()
 
-from tortoisehg.util import paths, debugthg, hglib, cachethg
+from tortoisehg.util import paths, debugthg, cachethg
 from tortoisehg.hgtk import gtklib
 
 if debugthg.debug('N'):
@@ -107,7 +107,7 @@ class HgExtension(nautilus.MenuProvider,
             return None
         try:
             return hg.repository(ui.ui(), path=p)
-        except hglib.RepoError:
+        except error.RepoError:
             return None
         except StandardError, e:
             debugf(e)

@@ -10,7 +10,7 @@ import os
 import gtk
 import gobject
 
-from mercurial import hg, ui, commands
+from mercurial import hg, ui, commands, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -38,7 +38,7 @@ class MergeDialog(gtk.Dialog):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.set_title(_('Merging in %s') % hglib.get_reponame(repo))
