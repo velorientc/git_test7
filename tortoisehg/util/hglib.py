@@ -120,6 +120,8 @@ def invalidaterepo(repo):
     repo.invalidate()
     if '_bookmarks' in repo.__dict__:
         repo._bookmarks = {}
+    if hasattr(repo, '_bookmarkcurrent'):
+        repo._bookmarkcurrent = None
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
