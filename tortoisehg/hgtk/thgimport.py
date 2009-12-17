@@ -30,7 +30,7 @@ class ImportDialog(gtk.Dialog):
         gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menuimport.ico')
         gtklib.set_tortoise_keys(self)
-        self.set_resizable(False)
+        self.set_default_size(500, 390)
         self.set_has_separator(False)
 
         # buttons
@@ -96,7 +96,8 @@ class ImportDialog(gtk.Dialog):
 
         ## patch preview
         self.cslist = cslist.ChangesetList()
-        table.add_row(None, self.cslist, padding=False)
+        table.add_row(None, self.cslist, padding=False,
+                      yopt=gtk.FILL|gtk.EXPAND)
         self.cslist.set_dnd_enable(True)
         self.cslist.set_checkbox_enable(True)
 
