@@ -65,7 +65,7 @@ class ChangesetList(gtk.Frame):
 
         ## status box
         self.statusbox = statusbox = gtk.HBox()
-        basebox.pack_start(statusbox)
+        basebox.pack_start(statusbox, False, False)
         basebox.pack_start(gtk.HSeparator(), False, False, 2)
 
         # copy form thgstrip.py
