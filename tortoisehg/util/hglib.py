@@ -240,3 +240,20 @@ def get_repo_bookmarks(repo, values=False):
         return dict(repo._bookmarks)
     else:
         return repo._bookmarks.keys()
+
+def is_rev_current(repo, rev):
+    '''
+    Returns True if the revision indicated by 'rev' is the current
+    working directory parent.
+    
+    If rev is '' or None, it is assumed to mean 'tip'.
+    '''
+    if rev in ('', None):
+        rev = 'tip'
+    rev = repo.lookup(rev)
+    parents = repo.parents()
+    
+    if len(parents) > 1:
+        return False
+    
+    return rev == parents[0].node()

@@ -14,7 +14,7 @@ from mercurial import ui, util
 from hgext import bookmarks
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, i18n
+from tortoisehg.util import hglib, i18n, settings
 
 from tortoisehg.hgtk import dialog, gtklib
 
@@ -39,6 +39,9 @@ class BookmarkDialog(gtk.Dialog):
         self.set_has_separator(False)
 
         self.repo = repo
+
+        # persistent settings
+        self.settings = settings.Settings('bookmark')
 
         # add buttons
         if type == TYPE_ADDREMOVE:
@@ -69,6 +72,7 @@ class BookmarkDialog(gtk.Dialog):
         table.add_row(label, self._bookmarklistbox, padding=False)
 
         ## add entry
+        trackcurrent = self.repo.ui.configbool('bookmarks', 'track.current')        
         entry = gtk.Entry()
         if type == TYPE_ADDREMOVE:
             self._rev_input = entry
@@ -79,15 +83,24 @@ class BookmarkDialog(gtk.Dialog):
             self._name_input = entry
             label = _('New Name:')
         table.add_row(label, entry, padding=False)
-
+        # Option to make new bookmark the active one
+        if type == TYPE_ADDREMOVE and trackcurrent:
+            check = gtk.CheckButton(_('Make new bookmark current'))
+            self.opt_newcurrent = check
+            check.set_sensitive(hglib.is_rev_current(self.repo, rev))
+            table.add_row(None, check)        
+ 
         # signal handlers
         self.connect('response', self.dialog_response)
         self._bookmark_input.connect('activate', self.entry_activated, type)
         entry.connect('activate', self.entry_activated, type)
         if type == TYPE_ADDREMOVE:
             self._bookmark_input.connect('changed', self.bookmark_changed)
+            if trackcurrent:
+                self._rev_input.connect('changed', self.rev_changed)                
 
         # prepare to show
+        self.load_settings()        
         if type == TYPE_ADDREMOVE:
             self.set_add_move_button_sensitivity()
         self._refresh(clear=False)
@@ -112,6 +125,18 @@ class BookmarkDialog(gtk.Dialog):
         if clear:
             self._bookmark_input.set_text('')
 
+    def load_settings(self):
+        if hasattr(self, 'opt_newcurrent'):
+            newcurrent = self.settings.get_value('newcurrent', False)
+            self.opt_newcurrent.set_active(newcurrent)
+
+    def store_settings(self):
+        if hasattr(self, 'opt_newcurrent'):
+            newcurrent = self.opt_newcurrent.get_active()
+            self.settings.set_value('newcurrent', newcurrent)
+
+        self.settings.write()
+
     def dialog_response(self, dialog, response_id):
         # Add button
         if response_id == RESPONSE_ADD:
@@ -130,6 +155,7 @@ class BookmarkDialog(gtk.Dialog):
             self._do_current_bookmark()
         # Close button or closed by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            self.store_settings()
             self.destroy()
             return # close dialog
         else:
@@ -149,6 +175,10 @@ class BookmarkDialog(gtk.Dialog):
             self.response(RESPONSE_CURRENT)
         else:
             raise _('unexpected type: %s') % type
+
+    def rev_changed(self, rev_input):
+        rev = rev_input.get_text()
+        self.opt_newcurrent.set_sensitive(hglib.is_rev_current(self.repo, rev))
 
     def bookmark_changed(self, bookmark_widget):
         self.set_add_move_button_sensitivity()
@@ -180,6 +210,10 @@ class BookmarkDialog(gtk.Dialog):
             self._add_hg_bookmark(name, rev)
             dialog.info_dialog(self, _('Bookmarking completed'),
                               _('Bookmark "%s" has been added') % name)
+            if (hasattr(self, 'opt_newcurrent') and
+                    self.opt_newcurrent.get_property('sensitive') and
+                    self.opt_newcurrent.get_active()):
+                self._current_hg_bookmark(name)            
             self._refresh()
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error in bookmarking'), str(inst))
