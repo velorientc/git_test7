@@ -357,20 +357,6 @@ class ChangesetList(gtk.Frame):
     def after_init(self):
         self.statusbox.pack_start(self.allbtn, False, False, 4)
 
-        # prepare for auto-scrolling while DnD
-        SIZE = 20
-        alloc = self.scroll.child.allocation
-        self.areas = {}
-        def add(name, arg):
-            region = gtk.gdk.region_rectangle(arg)
-            self.areas[name] = (region, gtk.gdk.Rectangle(*arg))
-        add('top', (0, 0, alloc.width, SIZE))
-        add('right', (alloc.width - SIZE, 0, SIZE, alloc.height))
-        add('bottom', (0, alloc.height - SIZE, alloc.width, SIZE))
-        add('left', (0, 0, SIZE, alloc.height))
-        add('center', (SIZE, SIZE, alloc.width - 2 * SIZE,
-                       alloc.height - 2 * SIZE))
-
     def update_status(self, updating=False):
         numshow = numsel = numtotal = all = None
         if self.curitems is None:
@@ -791,8 +777,21 @@ class ChangesetList(gtk.Frame):
             # get pressed csinfo widget based on pointer position
             pos = self.get_item_pos(event.y)
             if pos is not None:
-                self.item_drag = pos
+                # prepare for auto-scrolling while DnD
+                W = 20
+                alloc = self.scroll.child.allocation
+                self.areas = {}
+                def add(name, arg):
+                    region = gtk.gdk.region_rectangle(arg)
+                    self.areas[name] = (region, gtk.gdk.Rectangle(*arg))
+                add('top', (0, 0, alloc.width, W))
+                add('right', (alloc.width - W, 0, W, alloc.height))
+                add('bottom', (0, alloc.height - W, alloc.width, W))
+                add('left', (0, 0, W, alloc.height))
+                add('center', (W, W, alloc.width - 2 * W,
+                               alloc.height - 2 * W))
                 # start dnd
+                self.item_drag = pos
                 self.csevent.drag_begin(self.dnd_targets,
                                         gtk.gdk.ACTION_MOVE, 1, event)
 
