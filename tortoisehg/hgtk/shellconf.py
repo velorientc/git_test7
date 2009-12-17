@@ -54,8 +54,8 @@ class ShellConfigWindow(gtk.Window):
 
         table = gtk.Table(2, 3)
         cmframe.add(table)
-        def setcell(child, row, col):
-            table.attach(child, col, col + 1, row, row + 1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
+        def setcell(child, row, col, xopts=gtk.FILL|gtk.EXPAND, yopts=0):
+            table.attach(child, col, col + 1, row, row + 1, xopts, yopts, 4, 2)
         def withframe(widget):
             scroll = gtk.ScrolledWindow()
             scroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_ALWAYS)
@@ -80,7 +80,7 @@ class ShellConfigWindow(gtk.Window):
         cell = gtk.CellRendererText()
         column.pack_start(cell, True)
         column.add_attribute(cell, 'text', 1)
-        setcell(withframe(list), 1, 2)
+        setcell(withframe(list), 1, 2, yopts=gtk.FILL|gtk.EXPAND)
 
         # Top menus pane
         label = gtk.Label(_('Top menu items:'))
@@ -99,11 +99,11 @@ class ShellConfigWindow(gtk.Window):
         cell = gtk.CellRendererText()
         column.pack_start(cell, True)
         column.add_attribute(cell, 'text', 1)
-        setcell(withframe(list), 1, 0)
+        setcell(withframe(list), 1, 0, yopts=gtk.FILL|gtk.EXPAND)
 
         # move buttons
         mbbox = gtk.VBox()
-        setcell(mbbox, 1, 1)
+        setcell(mbbox, 1, 1, xopts=0, yopts=0)
 
         topbutton = gtk.Button(_('<- Top'))
         topbutton.connect('clicked', self.top_clicked)
