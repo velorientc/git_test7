@@ -464,8 +464,8 @@ class ChangesetList(gtk.Frame):
         pos: Number, the position of separator you need.
              If -1 or list length, indicates the last separator.
         """
-        # invalid position
-        if pos < -1:
+        # invalid position/condition
+        if pos < -1 or not self.showitems:
             return None
         def get_last():
             child = self.csbox.get_children()[-1]
@@ -724,7 +724,7 @@ class ChangesetList(gtk.Frame):
         self.teardown_dnd()
 
     def dnd_motion(self, widget, context, x, y, event_time):
-        if self.item_drag is not None:
+        if hasattr(self, 'item_drag') and self.item_drag is not None:
             num = len(self.curitems)
             if not self.hlsep:
                 self.setup_dnd(restart=True)
