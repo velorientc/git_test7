@@ -70,8 +70,7 @@ class TreeModel(gtk.GenericTreeModel):
         except error.RepoLookupError:
             oldbranches = []
 
-        repo.invalidate()
-        repo.dirstate.invalidate()
+        hglib.invalidaterepo(repo)
 
         self.wcparents = [x.rev() for x in repo.parents()]
         self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
@@ -82,9 +81,6 @@ class TreeModel(gtk.GenericTreeModel):
         for rev in allrevs:
             if rev in self.revisions:
                 del self.revisions[rev]
-                
-        if hasattr(self.repo, '_bookmarkcurrent'):
-            self.repo._bookmarkcurrent = None
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
