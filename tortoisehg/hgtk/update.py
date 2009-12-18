@@ -68,6 +68,11 @@ class UpdateDialog(gtk.Dialog):
         self.opt_merge = check
         table.add_row(None, check)
 
+        ## always show command log widget
+        showlog = gtk.CheckButton(_('Always show log'))
+        self.opt_showlog = showlog
+        table.add_row(None, showlog)
+
         ## fill list of combo
         if rev != None:
             combo.append_text(str(rev))
@@ -121,11 +126,15 @@ class UpdateDialog(gtk.Dialog):
 
     def load_settings(self):
         merge = self.settings.get_value('mergedefault', False)
+        showlog = self.settings.get_value('showlog', False)
         self.opt_merge.set_active(merge)
+        self.opt_showlog.set_active(showlog)
 
     def store_settings(self):
         checked = self.opt_merge.get_active()
+        showlog = self.opt_showlog.get_active()
         self.settings.set_value('mergedefault', checked)
+        self.settings.set_value('showlog', showlog)
 
         self.settings.write()
 
@@ -184,6 +193,8 @@ class UpdateDialog(gtk.Dialog):
         self.closebtn.set_property('visible', normal)
         if cmd:
             self.cmd.set_property('visible', working)
+            if self.opt_showlog.get_active():
+                self.cmd.show_log()
         self.abortbtn.set_property('visible', working)
 
     def update_summaries(self):
