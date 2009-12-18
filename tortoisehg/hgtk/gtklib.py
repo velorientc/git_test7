@@ -39,7 +39,7 @@ def get_thg_modifier():
     else:
         return '<Control>'
 
-def set_tortoise_keys(window):
+def set_tortoise_keys(window, connect=True):
     'Set default TortoiseHg keyboard accelerators'
     if sys.platform == 'darwin':
         mask = gtk.accelerator_get_default_mod_mask()
@@ -65,8 +65,9 @@ def set_tortoise_keys(window):
             gtk.ACCEL_VISIBLE)
 
     # connect ctrl-w and ctrl-q to every window
-    window.connect('thg-close', thgclose)
-    window.connect('thg-exit', thgexit)
+    if connect:
+        window.connect('thg-close', thgclose)
+        window.connect('thg-exit', thgexit)
 
     return accelgroup, mod
 
