@@ -1047,6 +1047,9 @@ class GLog(gdialog.GDialog):
         self.syncbox = gtklib.SlimToolbar(self.tooltips)
         syncbox = self.syncbox
 
+        refresh = syncbox.append_stock(gtk.STOCK_REFRESH,
+                        _('Reload revision history'))
+        syncbox.append_widget(gtk.VSeparator())
         incoming = syncbox.append_stock(gtk.STOCK_GO_DOWN,
                         _('Download and view incoming changesets'))
         apply = syncbox.append_stock(gtk.STOCK_APPLY,
@@ -1117,6 +1120,7 @@ class GLog(gdialog.GDialog):
                         _('Configure aliases and after pull behavior'))
 
         ## connect syncbar buttons
+        refresh.connect('clicked', self.refresh_clicked)
         incoming.connect('clicked', self.incoming_clicked)
         pull.connect('clicked', self.pull_clicked)
         outgoing.connect('clicked', self.outgoing_clicked)
