@@ -89,7 +89,7 @@ class BookmarkDialog(gtk.Dialog):
         # Option to make new bookmark the active one
         trackcurrent = self.repo.ui.configbool('bookmarks', 'track.current')
         if type == TYPE_ADDREMOVE and trackcurrent:
-            check = gtk.CheckButton(_('Make new bookmark current'))
+            check = gtk.CheckButton(_('Make new/moved bookmark current'))
             self.opt_newcurrent = check
             check.set_sensitive(hglib.is_rev_current(self.repo, rev))
             table.add_row(None, check)        
@@ -218,7 +218,7 @@ class BookmarkDialog(gtk.Dialog):
             if (hasattr(self, 'opt_newcurrent') and
                     self.opt_newcurrent.get_property('sensitive') and
                     self.opt_newcurrent.get_active()):
-                self._current_hg_bookmark(name)            
+                self._current_hg_bookmark(name)
             self._refresh()
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error in bookmarking'), str(inst))
@@ -245,6 +245,10 @@ class BookmarkDialog(gtk.Dialog):
             self._move_hg_bookmark(name, rev)
             dialog.info_dialog(self, _('Bookmarking completed'),
                               _('Bookmark "%s" has been moved') % name)
+            if (hasattr(self, 'opt_newcurrent') and
+                    self.opt_newcurrent.get_property('sensitive') and
+                    self.opt_newcurrent.get_active()):
+                self._current_hg_bookmark(name)
             self._refresh()
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error in bookmarking'), str(inst))
