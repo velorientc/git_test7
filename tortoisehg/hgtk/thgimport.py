@@ -10,7 +10,7 @@ import gtk
 import gobject
 import tempfile
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths, settings
@@ -20,13 +20,16 @@ from tortoisehg.hgtk import hgcmd, gtklib, gdialog, cslist
 MODE_NORMAL  = 'normal'
 MODE_WORKING = 'working'
 
-DEST_ID    = 0
-DEST_LABEL = 1
+COL_NAME  = 0
+COL_LABEL = 1
+
+DEST_REPO = 'repo'
+DEST_MQ   = 'mq'
 
 class ImportDialog(gtk.Dialog):
     """ Dialog to import patches """
 
-    def __init__(self, repo=None):
+    def __init__(self, repo=None, dest=DEST_REPO, sources=None):
         """ Initialize the Dialog """
         gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menuimport.ico')
@@ -41,7 +44,7 @@ class ImportDialog(gtk.Dialog):
         if not repo:
             try:
                 repo = hg.repository(ui.ui(), path=paths.find_root())
-            except hglib.RepoError:
+            except error.RepoError:
                 gtklib.idle_add_single_call(self.destroy)
                 return
         self.repo = repo
@@ -50,6 +53,9 @@ class ImportDialog(gtk.Dialog):
         self.mqloaded = hasattr(self.repo, 'mq')
         self.clipboard = gtk.Clipboard()
         self.tempfiles = []
+
+        if not self.mqloaded and dest == DEST_MQ:
+            dest = DEST_REPO
 
         # persistent settings
         self.settings = settings.Settings('import')
@@ -63,6 +69,11 @@ class ImportDialog(gtk.Dialog):
         self.src_list = gtk.ListStore(str)
         self.src_combo = gtk.ComboBoxEntry(self.src_list, 0)
         self.files_btn = gtk.Button(_('Browse...'))
+
+        ## set given sources (but preview later)
+        if sources:
+            src = os.pathsep.join(sources)
+            self.src_combo.child.set_text(src)
 
         ## other sources
         menubtn = gtk.ToggleButton()
@@ -101,16 +112,21 @@ class ImportDialog(gtk.Dialog):
         table.add_row(_('Preview:'), self.infobox, padding=False)
 
         ## dest combo
-        self.dest_model = gtk.ListStore(gobject.TYPE_STRING, # dest id
+        self.dest_model = gtk.ListStore(gobject.TYPE_STRING, # dest name
                                         gobject.TYPE_STRING) # dest label
-        for row in {'repo': _('Repository'),
-                     'mq': _('Patch Queue')}.items():
+        for row in {DEST_REPO: _('Repository'),
+                    DEST_MQ: _('Patch Queue')}.items():
             self.dest_model.append(row)
         self.dest_combo = gtk.ComboBox(self.dest_model)
         cell = gtk.CellRendererText()
         self.dest_combo.pack_start(cell, True)
-        self.dest_combo.add_attribute(cell, 'text', DEST_LABEL)
-        self.dest_combo.set_active(0)
+        self.dest_combo.add_attribute(cell, 'text', COL_LABEL)
+
+        for row in self.dest_model:
+            name, label = self.dest_model[row.path]
+            if name == dest:
+                self.dest_combo.set_active_iter(row.iter)
+                break
 
         ## patch preview
         self.cslist = cslist.ChangesetList()
@@ -140,9 +156,9 @@ class ImportDialog(gtk.Dialog):
 
         # prepare to show
         self.cslist.clear()
-        gtklib.idle_add_single_call(self.after_init)
+        gtklib.idle_add_single_call(self.after_init, sources)
 
-    def after_init(self):
+    def after_init(self, sources):
         if self.mqloaded:
             # dest combo
             self.dest_combo.show_all()
@@ -158,6 +174,10 @@ class ImportDialog(gtk.Dialog):
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
         self.abortbtn.hide()
+
+        # start preview
+        if sources:
+            self.preview()
 
     def files_clicked(self, button):
         initdir = self.get_initial_dir()
@@ -315,7 +335,7 @@ class ImportDialog(gtk.Dialog):
 
     def get_dest(self):
         iter = self.dest_combo.get_active_iter()
-        return self.dest_model.get(iter, DEST_ID)[0]
+        return self.dest_model.get(iter, COL_NAME)[0]
 
     def preview(self, queue=False):
         files = self.get_filepaths()
@@ -353,10 +373,13 @@ class ImportDialog(gtk.Dialog):
         if not files:
             return
 
-        if 'repo' == self.get_dest():
+        dest = self.get_dest()
+        if DEST_REPO == dest:
             cmd = 'import'
-        else:
+        elif DEST_MQ == dest:
             cmd = 'qimport'
+        else:
+            raise _('unexpected destination name: %s') % dest
         cmdline = ['hg', cmd, '--verbose']
         cmdline.extend(files)
 
@@ -376,3 +399,11 @@ class ImportDialog(gtk.Dialog):
                 self.cmd.set_result(_('Failed to import'), style='error')
         self.switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
+
+def run(ui, *pats, **opts):
+    dest = opts.get('mq', False) and DEST_MQ or DEST_REPO
+    sources = []
+    for item in pats:
+        if os.path.exists(item):
+            sources.append(os.path.abspath(item))
+    return ImportDialog(dest=dest, sources=sources)

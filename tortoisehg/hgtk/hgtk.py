@@ -441,6 +441,11 @@ def vdiff(ui, *pats, **opts):
         return
     gtkrun(run, ui, *pats, **opts)
 
+def thgimport(ui, *pats, **opts):
+    """import patches to repository/patch queue"""
+    from tortoisehg.hgtk.thgimport import run
+    gtkrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, alias=None):
     """show help for a command, extension, or list of commands
@@ -719,6 +724,10 @@ table = {
         ('hgtk archive')),
     "^strip": (strip, [], ('hgtk strip [REV]')),
     "^browse": (browse, [], ('hgtk browse [REV]')),
+    "^import": (thgimport,
+        [('', 'repo', False, _('import to the repository')),
+         ('', 'mq', False, _('import to the patch queue (MQ)'))],
+        _('hgtk import [OPTION] [SOURCE]...')),
 }
 
 if os.name == 'nt':
