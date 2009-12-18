@@ -169,7 +169,7 @@ class ImportDialog(gtk.Dialog):
         self.cmd = hgcmd.CmdWidget()
         self.cmd.show_all()
         self.cmd.hide()
-        self.vbox.pack_start(self.cmd, True, True, 6)
+        self.vbox.pack_start(self.cmd, False, False, 6)
 
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
