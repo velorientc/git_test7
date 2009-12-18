@@ -39,7 +39,7 @@ def get_thg_modifier():
     else:
         return '<Control>'
 
-def set_tortoise_keys(window):
+def set_tortoise_keys(window, connect=True):
     'Set default TortoiseHg keyboard accelerators'
     if sys.platform == 'darwin':
         mask = gtk.accelerator_get_default_mod_mask()
@@ -65,8 +65,9 @@ def set_tortoise_keys(window):
             gtk.ACCEL_VISIBLE)
 
     # connect ctrl-w and ctrl-q to every window
-    window.connect('thg-close', thgclose)
-    window.connect('thg-exit', thgexit)
+    if connect:
+        window.connect('thg-close', thgclose)
+        window.connect('thg-exit', thgexit)
 
     return accelgroup, mod
 
@@ -520,18 +521,23 @@ class LayoutTable(gtk.VBox):
                     specify this option, 'padding' option will be changed
                     to False automatically.  Default: -1 (last element).
             xpad: Number. Override default 'xpad' value.
-            ypad: [same as 'xpad']
+            ypad: Same as 'xpad'.
+            xopt: Number. Combination of gtk.EXPAND, gtk.SHRINK or gtk.FILL.
+                  Note that This option is applied only body elements, not
+                  header. Default: gtk.FILL|gtk.EXPAND.
+            yopt: Same as 'xopt' except Default: 0.
             headopts: Dictionary. Override default 'headopts' value.
-            bodyopts: [same as 'headopts']
+            bodyopts: Same as 'headopts'.
         """
         if len(widgets) == 0:
             return
         t = self.table
-        FLAG = gtk.FILL|gtk.EXPAND
         rows = t.get_property('n-rows')
         t.set_property('n-rows', rows + 1)
         xpad = kargs.get('xpad', self.xpad)
         ypad = kargs.get('ypad', self.ypad)
+        xopt = kargs.get('xopt', gtk.FILL|gtk.EXPAND)
+        yopt = kargs.get('yopt', 0)
         hopts = kargs.get('headopts', self.headopts)
         bopts = kargs.get('bodyopts', self.bodyopts)
         def getwidget(obj, opts=None):
@@ -572,7 +578,7 @@ class LayoutTable(gtk.VBox):
         if len(widgets) == 1:
             cols = t.get_property('n-columns')
             widget = pack(*widgets, **kargs)
-            t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, xpad, ypad)
+            t.attach(widget, 0, cols, rows, rows + 1, xopt, yopt, xpad, ypad)
         else:
             first = getwidget(widgets[0], hopts)
             if isinstance(first, gtk.Label):
@@ -580,7 +586,7 @@ class LayoutTable(gtk.VBox):
             t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, xpad, ypad)
             self.headers.append(first)
             rest = pack(*(widgets[1:]), **kargs)
-            t.attach(rest, 1, 2, rows, rows + 1, FLAG, 0, xpad, ypad)
+            t.attach(rest, 1, 2, rows, rows + 1, xopt, yopt, xpad, ypad)
 
 class SlimToolbar(gtk.HBox):
     """

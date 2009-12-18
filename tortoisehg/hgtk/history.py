@@ -1607,11 +1607,17 @@ class GLog(gdialog.GDialog):
 
     def import_clicked(self, toolbutton):
         oldlen = len(self.repo)
+        enabled = hasattr(self, 'mqpaned')
+        if enabled:
+            oldnum = self.mqwidget.get_num_patches()
         def import_completed():
-            self.repo.invalidate()
+            hglib.invalidaterepo(self.repo)
             self.changeview.clear()
             if oldlen < len(self.repo):
                 self.reload_log()
+            if enabled and oldnum < self.mqwidget.get_num_patches():
+                self.mqwidget.refresh()
+                self.enable_mqpanel(enable=True)
         dialog = thgimport.ImportDialog(self.repo)
         dialog.set_notify_func(import_completed)
         self.show_dialog(dialog)

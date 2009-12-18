@@ -20,6 +20,8 @@ from tortoisehg.hgtk import csinfo, gtklib
 CSL_DND_ITEM     = 1024
 CSL_DND_URI_LIST = 1025
 
+ASYNC_LIMIT = 60
+
 class ChangesetList(gtk.Frame):
 
     __gsignals__ = {
@@ -63,7 +65,7 @@ class ChangesetList(gtk.Frame):
 
         ## status box
         self.statusbox = statusbox = gtk.HBox()
-        basebox.pack_start(statusbox)
+        basebox.pack_start(statusbox, False, False)
         basebox.pack_start(gtk.HSeparator(), False, False, 2)
 
         # copy form thgstrip.py
@@ -102,8 +104,7 @@ class ChangesetList(gtk.Frame):
         self.csbox.set_border_width(4)
 
         # signal handlers
-        self.allbtn.connect('clicked', lambda b: self.update(self.curitems, \
-                self.currepo, limit=False, queue=False, keep=True))
+        self.allbtn.connect('clicked', lambda b: self.expand_items())
         self.compactopt.connect('toggled', lambda b: self.update( \
                 self.curitems, self.currepo, queue=False, keep=True))
 
@@ -256,7 +257,8 @@ class ChangesetList(gtk.Frame):
             # update status
             self.update_status()
 
-        if numshow < 80:
+        # determine doing it now or later
+        if numshow < ASYNC_LIMIT:
             proc()
         else:
             self.update_status(updating=True)
@@ -354,20 +356,6 @@ class ChangesetList(gtk.Frame):
 
     def after_init(self):
         self.statusbox.pack_start(self.allbtn, False, False, 4)
-
-        # prepare for auto-scrolling while DnD
-        SIZE = 20
-        alloc = self.scroll.child.allocation
-        self.areas = {}
-        def add(name, arg):
-            region = gtk.gdk.region_rectangle(arg)
-            self.areas[name] = (region, gtk.gdk.Rectangle(*arg))
-        add('top', (0, 0, alloc.width, SIZE))
-        add('right', (alloc.width - SIZE, 0, SIZE, alloc.height))
-        add('bottom', (0, alloc.height - SIZE, alloc.width, SIZE))
-        add('left', (0, 0, SIZE, alloc.height))
-        add('center', (SIZE, SIZE, alloc.width - 2 * SIZE,
-                       alloc.height - 2 * SIZE))
 
     def update_status(self, updating=False):
         numshow = numsel = numtotal = all = None
@@ -480,9 +468,9 @@ class ChangesetList(gtk.Frame):
         if pos < -1:
             return None
         def get_last():
-            children = self.csbox.get_children()
-            return children[-1]
-        # -1
+            child = self.csbox.get_children()[-1]
+            return isinstance(child, FixedHSeparator) and child or None
+        # last separator
         if pos == -1:
             return get_last()
         # limiting case
@@ -504,10 +492,9 @@ class ChangesetList(gtk.Frame):
 
     def get_sep_by_y(self, y):
         pos, start, end = self.get_item_pos(y, detail=True)
-        sep_pos = self.trans_to_show(end)
-        if self.has_limit() and len(self.curitems) - 1 <= end:
-            sep_pos += 1
-        return self.get_sep(sep_pos)
+        if self.has_limit() and self.limit - 1 < end:
+            end -= len(self.curitems) - self.limit - 1
+        return self.get_sep(end)
 
     def update_seps(self):
         """ Update visibility of all separators """
@@ -520,6 +507,31 @@ class ChangesetList(gtk.Frame):
             self.itemmap[self.showitems[-1]]['sep'].set_visible(False)
         self.get_sep(0).set_visible(False)
         self.get_sep(-1).set_visible(False)
+
+    def expand_items(self):
+        if not self.has_limit():
+            return
+
+        # fix up snipped items
+        rest = self.curitems[self.limit - 1:-1]
+
+        def proc():
+            # insert snipped csinfo
+            for pos, item in enumerate(rest):
+                self.insert_csinfo(item, self.limit + pos)
+            # remove snip
+            self.remove_snip()
+
+            self.showitems = self.curitems[:]
+            self.update_seps()
+            self.update_status()
+
+        # determine doing it now or later
+        if len(rest) < ASYNC_LIMIT:
+            proc()
+        else:
+            self.update_status(updating=True)
+            gtklib.idle_add_single_call(proc)
 
     def reorder_item(self, pos, insert):
         """
@@ -548,12 +560,9 @@ class ChangesetList(gtk.Frame):
                 # remove target csinfo
                 self.remove_csinfo(item)
 
-            # insert csinfo before the last separator
+            # insert csinfo the end of the item list
             item = self.curitems[-2]
-            info = self.add_csinfo(item)
-            info.show_all()
-            numc = len(self.csbox.get_children())
-            self.csbox.reorder_child(info, numc - 2)
+            self.insert_csinfo(item, -1)
 
         elif self.has_limit() and self.limit - 1 < insert:
             if self.trans_to_show(insert) < self.limit:
@@ -574,9 +583,7 @@ class ChangesetList(gtk.Frame):
 
             # insert csinfo before snip box
             item = self.curitems[self.limit - 1]
-            info = self.add_csinfo(item)
-            info.show_all()
-            self.csbox.reorder_child(info, self.limit - 2)
+            self.insert_csinfo(item, self.limit - 1)
         else:
             info = self.itemmap[self.showitems[pos]]['widget']
             if insert < pos:
@@ -622,6 +629,15 @@ class ChangesetList(gtk.Frame):
         return FixedHSeparator()
 
     def add_csinfo(self, item):
+        self.insert_csinfo(item, -1)
+
+    def insert_csinfo(self, item, pos):
+        """
+        item: String, revision number or patch file path to display.
+        pos: Number, an index of insertion point.  If -1, indicates
+        the end of the item list.
+        """
+        # create csinfo
         wrapbox = gtk.VBox()
         sep = self.create_sep()
         wrapbox.pack_start(sep, False, False)
@@ -640,11 +656,21 @@ class ChangesetList(gtk.Frame):
             hbox.pack_start(info, False, False)
             info = hbox
         wrapbox.pack_start(info, False, False)
+        wrapbox.show_all()
         self.csbox.pack_start(wrapbox, False, False)
         self.itemmap[item] = {'widget': wrapbox,
                               'info': info,
                               'sep': sep}
-        return wrapbox
+
+        # reorder it
+        children = self.csbox.get_children()
+        if 1 < len(children) and isinstance(children[-2], FixedHSeparator):
+            if pos == -1:
+                numc = len(children)
+                pos = numc - 2
+            elif self.has_limit():
+                pos = pos - 1
+            self.csbox.reorder_child(wrapbox, pos)
 
     def remove_csinfo(self, item):
         info = self.itemmap[item]['widget']
@@ -670,13 +696,25 @@ class ChangesetList(gtk.Frame):
         self.itemmap['snip'] = {'widget': wrapbox,
                                 'snip': snipbox,
                                 'sep': sep}
-        return wrapbox
+
+    def remove_snip(self):
+        if not self.has_limit():
+            return
+        snip = self.itemmap['snip']['widget']
+        self.csbox.remove(snip)
+        del self.itemmap['snip']
 
     ### signal handlers ###
 
     def check_toggled(self, button, item):
         self.chkmap[item] = button.get_active()
         self.update_status()
+
+    def allbtn_clicked(self, button):
+        self.update(self.curitems, self.currepo, limit=False,
+                    queue=False, keep=True)
+
+    ### dnd signal handlers ###
 
     def dnd_begin(self, widget, context):
         self.setup_dnd()
@@ -739,8 +777,21 @@ class ChangesetList(gtk.Frame):
             # get pressed csinfo widget based on pointer position
             pos = self.get_item_pos(event.y)
             if pos is not None:
-                self.item_drag = pos
+                # prepare for auto-scrolling while DnD
+                W = 20
+                alloc = self.scroll.child.allocation
+                self.areas = {}
+                def add(name, arg):
+                    region = gtk.gdk.region_rectangle(arg)
+                    self.areas[name] = (region, gtk.gdk.Rectangle(*arg))
+                add('top', (0, 0, alloc.width, W))
+                add('right', (alloc.width - W, 0, W, alloc.height))
+                add('bottom', (0, alloc.height - W, alloc.width, W))
+                add('left', (0, 0, W, alloc.height))
+                add('center', (W, W, alloc.width - 2 * W,
+                               alloc.height - 2 * W))
                 # start dnd
+                self.item_drag = pos
                 self.csevent.drag_begin(self.dnd_targets,
                                         gtk.gdk.ACTION_MOVE, 1, event)
 
