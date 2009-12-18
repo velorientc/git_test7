@@ -6,10 +6,13 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import tempfile
 import gtk
 import gobject
 
 from mercurial import cmdutil, extensions
+from mercurial import commands as hg
+import mercurial.ui
 
 from tortoisehg.util.i18n import _
 
@@ -466,6 +469,92 @@ class PBranchWidget(gtk.VBox):
         """
         assert False
 
+    def pfinish(self, patch_name):
+        """
+        [pbranch] Execute 'pfinish' command.
+        
+        The workdir must be clean.
+        The patch branch dependencies must be merged.
+        
+        :param patch_name: A patch branch (not an internal branch)
+        """
+        # Check preconditions for pfinish
+
+        assert self.is_patch(patch_name)
+
+        pmerge_status = self.pstatus(patch_name)
+        if pmerge_status != []:
+            dialog.error_dialog(self.parent_window,
+            _('Pending Pmerge'),
+            _('You cannot finish this patch branch unless you pmerge it first.\n'
+              'pmerge will solve the following issues with %(patch)s:\n'
+              '* %(issuelist)s') %
+            {'patch': patch_name,
+             'issuelist': '* '.join(pmerge_status)}
+            )
+            return
+
+        if not self.workdir_is_clean():
+            dialog.error_dialog(self.parent_window,
+            _('Uncommitted Local Changes'),
+            _('pfinish uses your working directory for temporary work.\n'
+              'Please commit your local changes before issuing pfinish.')
+            )
+            return
+
+        if hasattr(self.repo, 'mq') and len(self.repo.mq.applied) > 0:
+            dialog.error_dialog(self.parent_window,
+            _('Applied MQ patch'),
+            _('pfinish must be able to commit, but this is not allowed\n'
+              'as long as you have MQ patches applied.')
+            )
+            return
+
+        # Set up environment for mercurial commands
+        class CmdWidgetUi(mercurial.ui.ui):
+            def __init__(self, cmdLogWidget):
+                src = None
+                super(CmdWidgetUi, self).__init__(src)
+                self.cmdLogWidget = cmdLogWidget
+            def write(self, *args):
+                for a in args:
+                    self.cmdLogWidget.append(str(a))
+            def write_err(self, *args):
+                for a in args:
+                    self.cmdLogWidget.append(str(a), error=True)
+            def flush(self):
+                pass
+            def prompt(self, msg, choices=None, default="y"):
+                raise util.Abort("Internal Error: prompt not available")
+            def promptchoice(self, msg, choices, default=0):
+                raise util.Abort("Internal Error: promptchoice not available")
+            def getpass(self, prompt=None, default=None):
+                raise util.Abort("Internal Error: getpass not available")
+        repo = self.repo
+        ui = CmdWidgetUi(self.cmd.log)
+        old_ui = repo.ui
+        repo.ui = ui
+
+        # Commit patch to dependency
+        fd, patch_file_name = tempfile.mkstemp(prefix='thg-patch-')
+        patch_file = os.fdopen(fd, 'w')
+        patch_file.writelines(self.pdiff(patch_name))
+        patch_file.close()    
+        upstream_branch = self.pgraph().deps(patch_name)[0]
+        hg.update(ui, repo, rev=upstream_branch)
+        hg.import_(ui, repo, patch_file_name, base='', strip=1)
+        os.unlink(patch_file_name)
+        
+        # Close patch branch
+        hg.update(ui, repo, rev=patch_name)
+        hg.merge(ui, repo, upstream_branch)
+        msg = _('Patch branch finished')
+        hg.commit(ui, repo, close_branch=True, message=msg)
+        
+        # Update GUI
+        repo.ui = old_ui
+        self.emit('repo-invalidated')
+
     def has_pbranch(self):
         """ return True if pbranch extension can be used """
         return self.pbranch is not None
@@ -480,13 +569,14 @@ class PBranchWidget(gtk.VBox):
         dependencies. """
         return self.has_pbranch() and self.pgraph().ispatch(branch_name)
 
-    def cur_patch(self):
-        current_patch = self.repo.dirstate.branch()
-        if current_patch == 'default':
-            return None
-        if current_patch not in self.patch_list():
-            return None
-        return current_patch
+    def cur_branch(self):
+        """ Return branch that workdir belongs to. """
+        return self.repo.dirstate.branch()
+
+    def workdir_is_clean(self):
+        """ return True if the working directory is clean """
+        c = self.repo[None]
+        return not (c.modified() or c.added() or c.removed())
 
     ### internal functions ###
 
@@ -500,7 +590,10 @@ class PBranchWidget(gtk.VBox):
 
     def get_path_by_patchname(self, name):
         """ return path has specified patch name """
-        return self.model.get_path(self.get_iter_by_patchname(name))
+        iter = self.get_iter_by_patchname(name)
+        if iter:
+            return self.model.get_path(iter)
+        return None
 
     def update_sensitives(self):
         """ Update the sensitives of entire UI """
@@ -528,7 +621,7 @@ class PBranchWidget(gtk.VBox):
         """
         if self.list.get_selection().count_selected_rows() > 0:
             return
-        curpatch = self.cur_patch()
+        curpatch = self.cur_branch()
         if not curpatch:
             return
         path = self.get_path_by_patchname(curpatch)
@@ -548,7 +641,7 @@ class PBranchWidget(gtk.VBox):
             menu.append(item)
 
         has_pbranch = self.has_pbranch()
-        is_current = self.has_patch() and self.cur_patch() == row[M_NAME]
+        is_current = self.has_patch() and self.cur_branch() == row[M_NAME]
         is_patch = self.is_patch(row[M_NAME])
         is_internal = self.pbranch.isinternal(row[M_NAME])
         is_merge = len(self.repo.branchheads(row[M_NAME])) > 1
@@ -561,6 +654,7 @@ class PBranchWidget(gtk.VBox):
             append(_('_edit message'), self.edit_message_activated)
             append(_('_rename'), self.rename_activated)
             append(_('_delete'), self.delete_activated)
+            append(_('_finish'), self.finish_activated)
 
         if len(menu.get_children()) > 0:
             menu.show_all()
@@ -743,7 +837,7 @@ class PBranchWidget(gtk.VBox):
 
     def pnew_activated(self, menuitem, row):
         """Insert new patch after this row"""
-        if self.cur_patch() == row[M_NAME]:
+        if self.cur_branch() == row[M_NAME]:
             self.pnew_ui()
             return
         # pnew from patch different than current
@@ -769,3 +863,6 @@ class PBranchWidget(gtk.VBox):
 
     def rename_activated(self, menuitem, row):
         assert False
+
+    def finish_activated(self, menuitem, row):
+        self.pfinish(row[M_NAME])
