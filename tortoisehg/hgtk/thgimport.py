@@ -274,6 +274,8 @@ class ImportDialog(gtk.Dialog):
     def add_to_mru(self):
         dirs = self.get_dirpaths()
         for dir in dirs:
+            if dir.find(tempfile.gettempdir()) != -1:
+                continue
             self.recent.add(dir)
             self.src_list.append([dir])
         self.settings.write()
