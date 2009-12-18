@@ -8,6 +8,7 @@
 import os
 import gtk
 import gobject
+import tempfile
 
 from mercurial import hg, ui
 
@@ -29,7 +30,7 @@ class ImportDialog(gtk.Dialog):
         """ Initialize the Dialog """
         gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menuimport.ico')
-        gtklib.set_tortoise_keys(self)
+        gtklib.set_tortoise_keys(self, connect=False)
         self.set_default_size(500, 390)
         self.set_has_separator(False)
 
@@ -47,6 +48,8 @@ class ImportDialog(gtk.Dialog):
         self.set_title(_('Import - %s') % hglib.get_reponame(repo))
         self.done = False
         self.mqloaded = hasattr(self.repo, 'mq')
+        self.clipboard = gtk.Clipboard()
+        self.tempfiles = []
 
         # persistent settings
         self.settings = settings.Settings('import')
@@ -59,10 +62,25 @@ class ImportDialog(gtk.Dialog):
         ## source path combo & browse buttons
         self.src_list = gtk.ListStore(str)
         self.src_combo = gtk.ComboBoxEntry(self.src_list, 0)
-        self.files_btn = gtk.Button(_('Files...'))
-        self.dir_btn = gtk.Button(_('Directory...'))
+        self.files_btn = gtk.Button(_('Browse...'))
+
+        ## other sources
+        menubtn = gtk.ToggleButton()
+        menubtn.set_focus_on_click(False)
+        menubtn.add(gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE))
+
+        self.menu = gtk.Menu()
+        def append(label, handler=None):
+            item = gtk.MenuItem(label, True)
+            item.set_border_width(1)
+            if handler:
+                item.connect('activate', handler)
+            self.menu.append(item)
+        append(_('Browse Directory...'), self.dir_clicked)
+        append(_('Import from Clipboard'), self.clip_clicked)
+
         table.add_row(_('Source:'), self.src_combo, 1,
-                      self.files_btn, self.dir_btn, expand=0)
+                      self.files_btn, menubtn, expand=0)
 
         ## add MRU paths to source combo
         for path in self.recent:
@@ -104,10 +122,21 @@ class ImportDialog(gtk.Dialog):
         # signal handlers
         self.connect('response', self.dialog_response)
         self.files_btn.connect('clicked', self.files_clicked)
-        self.dir_btn.connect('clicked', self.dir_clicked)
         self.cslist.connect('list-updated', self.list_updated)
         self.cslist.connect('files-dropped', self.files_dropped)
         self.src_combo.connect('changed', lambda e: self.preview(queue=True))
+
+        menubtn.connect('button-press-event', self.extra_pressed)
+        popdown = lambda m: menubtn.set_active(False)
+        self.menu.connect('selection-done', popdown)
+        self.menu.connect('cancel', popdown)
+
+        # hook thg-close/thg-exit
+        def hook(dialog, orig):
+            self.unlink_all_tempfiles()
+            return orig(dialog)
+        self.connect('thg-close', hook, gtklib.thgclose)
+        self.connect('thg-exit', hook, gtklib.thgexit)
 
         # prepare to show
         self.cslist.clear()
@@ -140,7 +169,7 @@ class ImportDialog(gtk.Dialog):
             self.src_combo.child.set_text(result)
             self.preview()
 
-    def dir_clicked(self, button):
+    def dir_clicked(self, menuitem):
         initdir = self.get_initial_dir()
         result = gtklib.NativeFolderSelectDialog(
                         title=_('Select Directory contains patches:'),
@@ -148,6 +177,25 @@ class ImportDialog(gtk.Dialog):
         if result and result != initdir:
             self.src_combo.child.set_text(result)
             self.preview()
+
+    def clip_clicked(self, menuitem):
+        text = self.clipboard.wait_for_text()
+        if not text:
+            return
+        filepath = self.save_as_tempfile(text)
+        cur_text = self.src_combo.child.get_text()
+        self.src_combo.child.set_text(cur_text + os.pathsep + filepath)
+        self.preview()
+
+    def extra_pressed(self, button, event):
+        if not button.get_active():
+            button.set_active(True)
+            self.menu.show_all()
+            def pos(*args):
+                x, y = button.window.get_origin()
+                r = button.allocation
+                return (x + r.x, y + r.y + r.height, True)
+            self.menu.popup(None, None, pos, event.button, event.time)
 
     def list_updated(self, cslist, total, sel, *args):
         self.update_status(sel)
@@ -178,9 +226,11 @@ class ImportDialog(gtk.Dialog):
                 ret = gdialog.Confirm(_('Confirm Close'), [], self,
                                       _('Do you want to close?')).run()
                 if ret == gtk.RESPONSE_YES:
+                    self.unlink_all_tempfiles()
                     self.destroy()
                     return # close dialog
             else:
+                self.unlink_all_tempfiles()
                 self.destroy()
                 return # close dialog
         # Abort button
@@ -207,6 +257,17 @@ class ImportDialog(gtk.Dialog):
             self.recent.add(dir)
             self.src_list.append([dir])
         self.settings.write()
+
+    def save_as_tempfile(self, text):
+        fd, filepath = tempfile.mkstemp(prefix='thg-patch-')
+        os.write(fd, text)
+        os.close(fd)
+        self.tempfiles.append(filepath)
+        return filepath
+
+    def unlink_all_tempfiles(self):
+        for path in self.tempfiles:
+            os.unlink(path)
 
     def update_status(self, count):
         if count:
