@@ -179,7 +179,7 @@ class EmailDialog(gtk.Window):
         hbox.pack_start(gtk.Label(_('Subject:')), False, False, 4)
         hbox.pack_start(self._subjbox, True, True, 4)
 
-        extensions.load(ui.ui(), 'patchbomb', None)
+        hglib.loadextension(ui.ui(), 'patchbomb')
 
         # --flags was added after hg 1.3
         hasflags = False
