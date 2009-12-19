@@ -153,7 +153,7 @@ class thg_menu(object):
         self.name = name
         self.sep = [False]
         self.promoted = []
-        pl = self.ui.config('tortoisehg', 'promoteditems', 'commit')
+        pl = self.ui.config('tortoisehg', 'promoteditems', 'commit,log')
         for item in pl.split(','):
             item = item.strip()
             if item:
