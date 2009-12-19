@@ -147,7 +147,6 @@ class SynchDialog(gtk.Window):
         elif defrow is not None:
             self.pathbox.set_active(defrow)
 
-        extensions.loadall(self.ui)
         exs = [ name for name, module in extensions.extensions() ]
 
         # Post Pull Operation
@@ -445,7 +444,7 @@ class SynchDialog(gtk.Window):
         if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extension explicitly
-            extensions.load(self.ui, 'fetch', None)
+            hglib.loadextension(self.ui, 'fetch')
         else:
             cmd = ['pull']
             cmd += aopts.get('force', [])
@@ -455,7 +454,7 @@ class SynchDialog(gtk.Window):
             elif ppull == 'rebase':
                 cmd.append('--rebase')
                 # load the rebase extension explicitly
-                extensions.load(self.ui, 'rebase', None)
+                hglib.loadextension(self.ui, 'rebase')
         cmd += aopts.get('rev', [])
         self.exec_cmd(cmd)
 
