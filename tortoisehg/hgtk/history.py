@@ -54,9 +54,6 @@ class GLog(gdialog.GDialog):
         self.forcepush = False
         self.bundle_autoreject = False
         os.chdir(self.repo.root)
-
-        # Load extension support for commands which need it
-        extensions.loadall(self.ui)
         self.exs = [ name for name, module in extensions.extensions() ]
 
     def get_help_url(self):
@@ -1141,7 +1138,7 @@ class GLog(gdialog.GDialog):
         if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extension explicitly
-            extensions.load(self.ui, 'fetch', None)
+            hglib.loadextension(self.ui, 'fetch')
         else:
             cmd = ['pull']
             if ppull == 'update':
@@ -1149,7 +1146,7 @@ class GLog(gdialog.GDialog):
             elif ppull == 'rebase':
                 cmd.append('--rebase')
                 # load the rebase extension explicitly
-                extensions.load(self.ui, 'rebase', None)
+                hglib.loadextension(self.ui, 'rebase')
 
         cmdline = ['hg'] + cmd + [self.bfile]
         dlg = hgcmd.CmdDialog(cmdline)
@@ -1299,7 +1296,7 @@ class GLog(gdialog.GDialog):
         if ppull == 'fetch':
             cmd = ['fetch', '--message', 'merge']
             # load the fetch extension explicitly
-            extensions.load(self.ui, 'fetch', None)
+            hglib.loadextension(self.ui, 'fetch')
         else:
             cmd = ['pull']
             if ppull == 'update':
@@ -1307,7 +1304,7 @@ class GLog(gdialog.GDialog):
             elif ppull == 'rebase':
                 cmd.append('--rebase')
                 # load the rebase extension explicitly
-                extensions.load(self.ui, 'rebase', None)
+                hglib.loadextension(self.ui, 'rebase')
 
         path = hglib.fromutf(self.pathentry.get_text()).strip()
         remote_path = hglib.validate_synch_path(path, self.repo)

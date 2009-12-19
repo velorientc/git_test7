@@ -124,6 +124,16 @@ def invalidaterepo(repo):
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
+def loadextension(ui, name):
+    # Between Mercurial revisions 1.2 and 1.3, extensions.load() stopped
+    # calling uisetup() after loading an extension.  This could do
+    # unexpected things if you use an hg version < 1.3
+    extensions.load(ui, name, None)
+    mod = extensions.find(name)
+    uisetup = getattr(mod, 'uisetup', None)
+    if uisetup:
+        uisetup(ui)
+
 def canonpaths(list):
     'Get canonical paths (relative to root) for list of files'
     # This is a horrible hack.  Please remove this when HG acquires a
