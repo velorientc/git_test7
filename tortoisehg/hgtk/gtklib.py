@@ -600,7 +600,22 @@ class SlimToolbar(gtk.HBox):
     ### public methods ###
 
     def append_button(self, icon, tooltip=None, toggle=False, group=None):
-        img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
+        """
+        icon: stock id or file name bundled in TortoiseHg.
+        """
+        if icon.startswith('gtk'):
+            img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
+        else:
+            img = gtk.Image()
+            filepath = paths.get_tortoise_icon(icon)
+            if filepath:
+                try:
+                    size = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)
+                    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
+                                 filepath, *size)
+                    img.set_from_pixbuf(pixbuf)
+                except:
+                    pass
         if toggle:
             button = gtk.ToggleButton()
         else:
