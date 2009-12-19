@@ -1058,6 +1058,8 @@ class GLog(gdialog.GDialog):
                         _('Download and view incoming changesets'))
         pull = syncbox.append_button(gtk.STOCK_GOTO_BOTTOM,
                         _('Pull incoming changesets'))
+        importbtn = syncbox.append_button('menuimport.ico',
+                        _('Import patches'))
         syncbox.append_separator()
         outgoing = syncbox.append_button(gtk.STOCK_GO_UP,
                         _('Determine and mark outgoing changesets'))
@@ -1123,6 +1125,7 @@ class GLog(gdialog.GDialog):
         refresh.connect('clicked', self.refresh_clicked)
         incoming.connect('clicked', self.incoming_clicked)
         pull.connect('clicked', self.pull_clicked)
+        importbtn.connect('clicked', self.import_clicked)
         outgoing.connect('clicked', self.outgoing_clicked)
         push.connect('clicked', self.push_clicked)
         apply.connect('clicked', self.apply_clicked)
