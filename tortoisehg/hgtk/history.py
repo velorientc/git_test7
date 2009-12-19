@@ -1230,7 +1230,7 @@ class GLog(gdialog.GDialog):
         else:
             if newmarkers != oldmarkers:
                 self.refresh_model()
-    
+
     def refresh_on_current_marker_change(self, oldlen, oldmarkers,
                                          oldcurrent, newmarkers,
                                          newcurrent):
@@ -1241,8 +1241,8 @@ class GLog(gdialog.GDialog):
         else:
             if newmarkers != oldmarkers or \
                 oldcurrent != newcurrent:
-                self.refresh_model()    
-        
+                self.refresh_model()
+
     def apply_clicked(self, button):
         combo = self.ppullcombo
         list, iter = combo.get_model(), combo.get_active_iter()
@@ -1261,11 +1261,18 @@ class GLog(gdialog.GDialog):
                 hglib.loadextension(self.ui, 'rebase')
 
         cmdline = ['hg'] + cmd + [self.bfile]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-        self.remove_overlay('--rebase' in cmd)
+
+        def callback(return_code, *args):
+            self.stbar.end()
+            self.remove_overlay('--rebase' in cmd)
+
+        if self.runner.execute(cmdline, callback):
+            self.runner.set_title(_('Applying bundle'))
+            self.stbar.begin(_('Applying bundle...'))
+        else:
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def remove_overlay(self, resettip):
         self.bfile = None
@@ -1337,6 +1344,7 @@ class GLog(gdialog.GDialog):
             else:
                 text = _('No incoming changesets')
             self.stbar.set_idle_text(text)
+
         if self.runner.execute(cmdline, callback):
             self.runner.set_title(_('Incoming'))
             self.stbar.begin(_('Checking incoming changesets...'))
