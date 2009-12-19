@@ -617,6 +617,9 @@ class SlimToolbar(gtk.HBox):
     def append_space(self):
         self.append_widget(gtk.Label(), expand=True, padding=0)
 
+    def append_separator(self):
+        self.append_widget(gtk.VSeparator())
+
 class MenuItems(object):
     '''controls creation of menus by ignoring separators at odd places'''
 

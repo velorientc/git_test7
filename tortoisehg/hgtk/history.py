@@ -1046,7 +1046,7 @@ class GLog(gdialog.GDialog):
 
         refresh = syncbox.append_stock(gtk.STOCK_REFRESH,
                         _('Reload revision history'))
-        syncbox.append_widget(gtk.VSeparator())
+        syncbox.append_separator()
         incoming = syncbox.append_stock(gtk.STOCK_GO_DOWN,
                         _('Download and view incoming changesets'))
         apply = syncbox.append_stock(gtk.STOCK_APPLY,
@@ -1055,14 +1055,14 @@ class GLog(gdialog.GDialog):
                         _('Reject changes from Bundle preview'))
         pull = syncbox.append_stock(gtk.STOCK_GOTO_BOTTOM,
                         _('Pull incoming changesets'))
-        syncbox.append_widget(gtk.VSeparator())
+        syncbox.append_separator()
         outgoing = syncbox.append_stock(gtk.STOCK_GO_UP,
                         _('Determine and mark outgoing changesets'))
         push = syncbox.append_stock(gtk.STOCK_GOTO_TOP,
                         _('Push outgoing changesets'))
         email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
                         _('Email outgoing changesets'))
-        syncbox.append_widget(gtk.VSeparator())
+        syncbox.append_separator()
         stop = syncbox.append_stock(gtk.STOCK_STOP,
                         _('Stop current transaction'))
 
