@@ -590,14 +590,16 @@ class LayoutTable(gtk.VBox):
 
 class SlimToolbar(gtk.HBox):
     """
-    Slim Toolbar, allows to add the buttons of menu size.
+    Slim Toolbar, allows to add the buttons with small icon.
     """
-
     def __init__(self, tooltips=None):
         gtk.HBox.__init__(self)
         self.tooltips = tooltips
+        self.groups = {}
 
-    def append_stock(self, stock_id, tooltip=None, toggle=False):
+    ### public methods ###
+
+    def append_stock(self, stock_id, tooltip=None, toggle=False, group=None):
         icon = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
         if toggle:
             button = gtk.ToggleButton()
@@ -608,17 +610,43 @@ class SlimToolbar(gtk.HBox):
         button.set_focus_on_click(False)
         if self.tooltips and tooltip:
             self.tooltips.set_tip(button, tooltip)
-        self.append_widget(button, padding=0)
+        self.append_widget(button, padding=0, group=group)
         return button
 
-    def append_widget(self, widget, expand=False, padding=2):
+    def append_widget(self, widget, expand=False, padding=2, group=None):
         self.pack_start(widget, expand, expand, padding)
+        self.add_group(group, widget)
 
     def append_space(self):
         self.append_widget(gtk.Label(), expand=True, padding=0)
 
-    def append_separator(self):
-        self.append_widget(gtk.VSeparator())
+    def append_separator(self, group=None):
+        self.append_widget(gtk.VSeparator(), group=group)
+
+    def set_enable(self, group, enable=True):
+        if not group or not self.groups.has_key(group):
+            return
+        for widget in self.groups[group]:
+            widget.set_sensitive(enable)
+
+    def set_visible(self, group, visible=True):
+        if not group or not self.groups.has_key(group):
+            return
+        for widget in self.groups[group]:
+            if visible is True:
+                widget.set_no_show_all(False)
+            widget.set_property('visible', visible)
+            if visible is False:
+                widget.set_no_show_all(True)
+
+    ### internal method ###
+
+    def add_group(self, group, widget):
+        if not group or not widget:
+            return
+        if not self.groups.has_key(group):
+            self.groups[group] = []
+        self.groups[group].append(widget)
 
 class MenuItems(object):
     '''controls creation of menus by ignoring separators at odd places'''
