@@ -599,13 +599,13 @@ class SlimToolbar(gtk.HBox):
 
     ### public methods ###
 
-    def append_stock(self, stock_id, tooltip=None, toggle=False, group=None):
-        icon = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
+    def append_button(self, icon, tooltip=None, toggle=False, group=None):
+        img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
         if toggle:
             button = gtk.ToggleButton()
         else:
             button = gtk.Button()
-        button.set_image(icon)
+        button.set_image(img)
         button.set_relief(gtk.RELIEF_NONE)
         button.set_focus_on_click(False)
         if self.tooltips and tooltip:

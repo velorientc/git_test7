@@ -269,7 +269,7 @@ class CmdWidget(gtk.VBox):
         self.pack_start(progbox)
 
         def add_button(stock_id, tooltip, handler, toggle=False):
-            btn = progbox.append_stock(stock_id, tooltip, toggle)
+            btn = progbox.append_button(stock_id, tooltip, toggle)
             btn.connect('clicked', handler)
             return btn
 

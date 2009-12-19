@@ -1044,29 +1044,29 @@ class GLog(gdialog.GDialog):
         self.syncbox = gtklib.SlimToolbar(self.tooltips)
         syncbox = self.syncbox
 
-        refresh = syncbox.append_stock(gtk.STOCK_REFRESH,
+        refresh = syncbox.append_button(gtk.STOCK_REFRESH,
                         _('Reload revision history'))
         syncbox.append_separator()
-        apply = syncbox.append_stock(gtk.STOCK_APPLY,
+        apply = syncbox.append_button(gtk.STOCK_APPLY,
                         _('Accept changes from Bundle preview'),
                         group='bundle')
-        reject = syncbox.append_stock(gtk.STOCK_DIALOG_ERROR,
+        reject = syncbox.append_button(gtk.STOCK_DIALOG_ERROR,
                         _('Reject changes from Bundle preview'),
                         group='bundle')
         syncbox.append_separator(group='bundle')
-        incoming = syncbox.append_stock(gtk.STOCK_GO_DOWN,
+        incoming = syncbox.append_button(gtk.STOCK_GO_DOWN,
                         _('Download and view incoming changesets'))
-        pull = syncbox.append_stock(gtk.STOCK_GOTO_BOTTOM,
+        pull = syncbox.append_button(gtk.STOCK_GOTO_BOTTOM,
                         _('Pull incoming changesets'))
         syncbox.append_separator()
-        outgoing = syncbox.append_stock(gtk.STOCK_GO_UP,
+        outgoing = syncbox.append_button(gtk.STOCK_GO_UP,
                         _('Determine and mark outgoing changesets'))
-        push = syncbox.append_stock(gtk.STOCK_GOTO_TOP,
+        push = syncbox.append_button(gtk.STOCK_GOTO_TOP,
                         _('Push outgoing changesets'))
-        email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
+        email = syncbox.append_button(gtk.STOCK_GOTO_LAST,
                         _('Email outgoing changesets'))
         syncbox.append_separator(group='stop')
-        stop = syncbox.append_stock(gtk.STOCK_STOP,
+        stop = syncbox.append_button(gtk.STOCK_STOP,
                         _('Stop current transaction'), group='stop')
 
         syncbox.set_visible('stop', False)
@@ -1116,7 +1116,7 @@ class GLog(gdialog.GDialog):
         self.update_postpull(ppull)
 
         ## add conf button
-        conf = syncbox.append_stock(gtk.STOCK_PREFERENCES,
+        conf = syncbox.append_button(gtk.STOCK_PREFERENCES,
                         _('Configure aliases and after pull behavior'))
 
         ## connect syncbar buttons
