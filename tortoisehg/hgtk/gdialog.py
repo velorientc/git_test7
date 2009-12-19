@@ -40,9 +40,12 @@ class Prompt(SimpleMessage):
         key, modifier = gtk.accelerator_parse(mod+'Return')
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
-        buttons = self.get_children()[0].get_children()[1].get_children()
-        buttons[0].add_accelerator('clicked', accel_group, key,
-                modifier, gtk.ACCEL_VISIBLE)
+        try:
+            buttons = self.get_children()[0].get_children()[1].get_children()
+            buttons[0].add_accelerator('clicked', accel_group, key,
+                                       modifier, gtk.ACCEL_VISIBLE)
+        except IndexError:
+            pass
 
 class CustomPrompt(gtk.MessageDialog):
     ''' Custom prompt dialog.  Provide a list of choices with ampersands
