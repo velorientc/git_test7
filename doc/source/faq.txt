@@ -26,8 +26,8 @@ Frequently Asked Questions
 *Can I configure the toolbars in TortoiseHg applications?*
 
 	TortoiseHg dialogs are PyGtk applications, so they can be configured by
-	modifying the gtkrc file that is installed as gtk\etc\gtk-2.0\gtkrc under the
-	installation folder::
+	modifying the gtkrc file that is installed as
+	:file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`::
 
 		gtk-toolbar-icon-size = GTK_ICON_SIZE_LARGE_TOOLBAR
 		# Pick an icon size from:
