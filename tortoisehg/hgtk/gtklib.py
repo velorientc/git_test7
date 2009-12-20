@@ -369,8 +369,8 @@ class NativeFileManager:
         subprocess.Popen('explorer "%s"' % self.path)
 
     def runNautilus(self):
-        # TODO implement me!
-        pass
+        import subprocess
+        subprocess.Popen('nautilus --browser "%s"' % self.path)
 
 def markup(text, **kargs):
     """
