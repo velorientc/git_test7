@@ -31,6 +31,7 @@ WFILE = 4
 
 BRANCH = 5          # calculated on demand, not cached
 HEXID = 6
+REVHEX = 14
 LOCALTIME = 7
 UTC = 8
 
@@ -105,6 +106,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == TAGS: return str
         if index == FGCOLOR: return str
         if index == AGE: return str
+        if index == REVHEX: return str
 
     def on_get_iter(self, path):
         return path[0]
@@ -123,13 +125,16 @@ class TreeModel(gtk.GenericTreeModel):
             return []
         if column == WFILE: return path or ''
 
-        if column in (HEXID, BRANCH, LOCALTIME, UTC):
+        if column in (HEXID, REVHEX, BRANCH, LOCALTIME, UTC):
             try:
                 ctx = self.repo[revid]
             except IndexError:
                 return None
             if column == HEXID:
                 return str(ctx)
+            if column == REVHEX:
+                hexid = gtklib.markup(str(ctx), face='monospace')
+                return '%s: %s' % (revid, hexid)
             if column == BRANCH:
                 return ctx.branch()
             if column == LOCALTIME:

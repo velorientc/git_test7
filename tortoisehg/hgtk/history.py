@@ -396,6 +396,7 @@ class GLog(gdialog.GDialog):
 
         column('rev', _('Revision Number'))
         column('id', _('Changeset ID'))
+        column('revhex', _('Revision Number/ID'))
         column('branch', _('Branch Name'))
         column('msg', _('Summary'))
         column('user', _('User'))
@@ -572,7 +573,7 @@ class GLog(gdialog.GDialog):
         self.syncbox.set_property('visible', self.show_syncbar)
         self.syncbox.set_no_show_all(True)
 
-        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
+        for col in ('rev', 'date', 'id', 'revhex', 'branch', 'utc', 'age', 'tag'):
             if col in self.showcol:
                 self.graphview.set_property(col+'-column-visible',
                         self.showcol[col])
@@ -632,7 +633,7 @@ class GLog(gdialog.GDialog):
         settings['show-syncbar'] = self.show_syncbar
         settings['graphcol'] = self.graphcol
         settings['compactgraph'] = self.compactgraph
-        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
+        for col in ('rev', 'date', 'id', 'revhex', 'branch', 'utc', 'age', 'tag'):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
         settings['filter-mode'] = self.filtercombo.get_active()
@@ -655,12 +656,12 @@ class GLog(gdialog.GDialog):
         self.graphcol = settings.get('graphcol', True)
         self.compactgraph = settings.get('compactgraph', False)
         self.showcol = {}
-        for col in ('rev', 'date', 'id', 'branch', 'utc', 'age', 'tag'):
+        for col in ('rev', 'date', 'id', 'revhex', 'branch', 'utc', 'age', 'tag'):
             key = 'glog-vis-'+col
             if key in settings:
                 self.showcol[col] = settings[key]
         self.filter_mode = settings.get('filter-mode', 1)
-        default_co = 'graph rev id branch msg user date utc age tag'
+        default_co = 'graph rev id revhex branch msg user date utc age tag'
         self.column_order = settings.get('column-order', default_co)
 
     def show_toolbar_on_start(self):
