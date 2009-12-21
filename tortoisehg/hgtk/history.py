@@ -350,6 +350,7 @@ class GLog(gdialog.GDialog):
 
     def toggle_show_toolbar(self, button):
         self.show_toolbar = button.get_active()
+        self.syncbox.set_visible('reload', not self.show_toolbar)
         self._show_toolbar(self.show_toolbar)
 
     def more_clicked(self, button, data=None):
@@ -1057,8 +1058,8 @@ class GLog(gdialog.GDialog):
         syncbox = self.syncbox
 
         refresh = syncbox.append_button(gtk.STOCK_REFRESH,
-                        _('Reload revision history'))
-        syncbox.append_separator()
+                        _('Reload revision history'), group='reload')
+        syncbox.append_separator(group='reload')
         incoming = syncbox.append_button(gtk.STOCK_GO_DOWN,
                         _('Download and view incoming changesets'))
         apply = syncbox.append_button(gtk.STOCK_APPLY,
@@ -1082,12 +1083,13 @@ class GLog(gdialog.GDialog):
         stop = syncbox.append_button(gtk.STOCK_STOP,
                         _('Stop current transaction'), group='stop')
 
-        syncbox.set_enable('stop', False)
+        syncbox.set_visible('reload', not self.show_toolbar)
         syncbox.set_enable('bundle', False)
+        syncbox.set_enable('stop', False)
 
-        self.stop_button = stop
         self.syncbar_apply = apply
         self.syncbar_reject = reject
+        self.stop_button = stop
 
         ## target path combobox
         urllist = gtk.ListStore(str, # path (utf-8)
