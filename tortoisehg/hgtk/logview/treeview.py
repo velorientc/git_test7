@@ -27,6 +27,7 @@ from tortoisehg.hgtk.logview import treemodel
 from tortoisehg.hgtk.logview.graphcell import CellRendererGraph
 from tortoisehg.hgtk.logview.revgraph import *
 
+COLS = 'graph rev id revhex branch msg user date utc age tag'
 
 class TreeView(gtk.ScrolledWindow):
 
@@ -523,8 +524,7 @@ class TreeView(gtk.ScrolledWindow):
         col.add_attribute(cell, "text", treemodel.TAGS)
         col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
-        cols = 'graph rev id revhex branch msg user date utc age tag'
-        self.columns = cols.split()
+        self.columns = COLS.split()
 
         # append columns
         for cn in self.columns:

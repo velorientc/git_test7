@@ -21,6 +21,7 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
+from tortoisehg.hgtk.logview.treeview import COLS as DEFAULT_COLS
 
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
@@ -406,8 +407,8 @@ class GLog(gdialog.GDialog):
         column('tag', _('Tags'))
 
         model = gtk.ListStore(
-            gobject.TYPE_BOOLEAN, 
-            gobject.TYPE_STRING, 
+            gobject.TYPE_BOOLEAN,
+            gobject.TYPE_STRING,
             gobject.TYPE_STRING,
             gobject.TYPE_STRING)
 
@@ -573,7 +574,7 @@ class GLog(gdialog.GDialog):
         self.syncbox.set_property('visible', self.show_syncbar)
         self.syncbox.set_no_show_all(True)
 
-        for col in ('rev', 'date', 'id', 'revhex', 'branch', 'utc', 'age', 'tag'):
+        for col in [col for col in DEFAULT_COLS.split() if col != 'graph']:
             if col in self.showcol:
                 self.graphview.set_property(col+'-column-visible',
                         self.showcol[col])
@@ -633,7 +634,7 @@ class GLog(gdialog.GDialog):
         settings['show-syncbar'] = self.show_syncbar
         settings['graphcol'] = self.graphcol
         settings['compactgraph'] = self.compactgraph
-        for col in ('rev', 'date', 'id', 'revhex', 'branch', 'utc', 'age', 'tag'):
+        for col in [col for col in DEFAULT_COLS.split() if col != 'graph']:
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
         settings['filter-mode'] = self.filtercombo.get_active()
@@ -656,13 +657,12 @@ class GLog(gdialog.GDialog):
         self.graphcol = settings.get('graphcol', True)
         self.compactgraph = settings.get('compactgraph', False)
         self.showcol = {}
-        for col in ('rev', 'date', 'id', 'revhex', 'branch', 'utc', 'age', 'tag'):
+        for col in [col for col in DEFAULT_COLS.split() if col != 'graph']:
             key = 'glog-vis-'+col
             if key in settings:
                 self.showcol[col] = settings[key]
         self.filter_mode = settings.get('filter-mode', 1)
-        default_co = 'graph rev id revhex branch msg user date utc age tag'
-        self.column_order = settings.get('column-order', default_co)
+        self.column_order = settings.get('column-order', DEFAULT_COLS)
 
     def show_toolbar_on_start(self):
         return self.show_toolbar
