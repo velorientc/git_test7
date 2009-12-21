@@ -30,9 +30,8 @@ class StripDialog(gtk.Dialog):
         gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'menudelete.ico')
         gtklib.set_tortoise_keys(self)
-        self.set_resizable(False)
+        self.set_default_size(480, 360)
         self.set_has_separator(False)
-        self.connect('response', self.dialog_response)
 
         # buttons
         self.stripbtn = self.add_button(_('Strip'), gtk.RESPONSE_OK)
@@ -61,7 +60,6 @@ class StripDialog(gtk.Dialog):
         table.add_row(_('Strip:'), self.revcombo)
         reventry = self.revcombo.child
         reventry.set_width_chars(32)
-        reventry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
 
         ### fill combo list
         self.revcombo.append_text(rev)
@@ -91,7 +89,8 @@ class StripDialog(gtk.Dialog):
 
         ## changeset list
         self.cslist = cslist.ChangesetList()
-        table.add_row(None, self.cslist, padding=False)
+        table.add_row(None, self.cslist, padding=False,
+                      yopt=gtk.FILL|gtk.EXPAND)
 
         ## options
         self.expander = gtk.Expander(_('Options:'))
@@ -103,6 +102,8 @@ class StripDialog(gtk.Dialog):
         table.add_row(self.expander, self.forceopt)
 
         # signal handlers
+        self.connect('response', self.dialog_response)
+        reventry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
         self.revcombo.connect('changed', lambda c: self.preview(queue=True))
         self.cslist.connect('list-updated', self.preview_updated)
 
@@ -114,7 +115,7 @@ class StripDialog(gtk.Dialog):
     def after_init(self):
         # backup types (foldable)
         self.butable = gtklib.LayoutTable()
-        self.vbox.pack_start(self.butable, True, True)
+        self.vbox.pack_start(self.butable, False, False)
         def add_type(desc):
             group = hasattr(self, 'buopt_all') and self.buopt_all or None
             radio = gtk.RadioButton(group, desc)
@@ -133,7 +134,7 @@ class StripDialog(gtk.Dialog):
         self.cmd = hgcmd.CmdWidget()
         self.cmd.show_all()
         self.cmd.hide()
-        self.vbox.pack_start(self.cmd, True, True, 6)
+        self.vbox.pack_start(self.cmd, False, False, 6)
 
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
