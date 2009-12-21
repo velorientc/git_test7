@@ -360,6 +360,13 @@ def readtools(ui):
             else:
                 path, diffopts = cmd, []
             tools[cmd] = [path, diffopts]
+    mergetools = []
+    hglib.mergetools(ui, mergetools)
+    for t in mergetools:
+        if t.startswith('internal:'):
+            continue
+        opts = ui.config('merge-tools', t + '.diffargs', '')
+        tools[t] = [t, shlex.split(opts)]
     return tools
 
 def rawextdiff(ui, *pats, **opts):
