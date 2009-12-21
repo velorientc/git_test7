@@ -26,7 +26,6 @@ class QuickOpDialog(gtk.Dialog):
         gtk.Dialog.__init__(self)
         gtklib.set_tortoise_icon(self, 'hg.ico')
         gtklib.set_tortoise_keys(self)
-        self.set_resizable(False)
         self.set_size_request(450, 300)
         self.set_has_separator(False)
         self.connect('response', self.dialog_response)
@@ -184,6 +183,11 @@ class QuickOpDialog(gtk.Dialog):
             self.hide()
             return
 
+        # show minimize/maximize buttons
+        self.realize()
+        if self.window:
+            self.window.set_decorations(gtk.gdk.DECOR_ALL)
+
         # prepare to show
         self.gobutton.grab_focus()
         gtklib.idle_add_single_call(self.after_init)
@@ -193,7 +197,7 @@ class QuickOpDialog(gtk.Dialog):
         self.cmd = hgcmd.CmdWidget()
         self.cmd.show_all()
         self.cmd.hide()
-        self.wrapbox.pack_start(self.cmd, False, False, 8)
+        self.wrapbox.pack_start(self.cmd, False, False, 6)
 
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
