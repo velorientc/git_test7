@@ -662,7 +662,18 @@ class GLog(gdialog.GDialog):
             if key in settings:
                 self.showcol[col] = settings[key]
         self.filter_mode = settings.get('filter-mode', 1)
-        self.column_order = settings.get('column-order', DEFAULT_COLS)
+        order = settings.get('column-order', DEFAULT_COLS)
+        order_list, def_list = order.split(), DEFAULT_COLS.split()
+        order_len, def_len = len(order_list), len(def_list)
+        if order_len != def_len:
+            # add newly added columns if exists
+            added = set(def_list).difference(set(order_list))
+            if added:
+                order_list += list(added)
+            # remove obsoleted columns if exists
+            order_list = [c for c in order_list if c in def_list]
+            order = ' '.join(order_list)
+        self.column_order = order
 
     def show_toolbar_on_start(self):
         return self.show_toolbar
