@@ -179,15 +179,6 @@ class ShellConfigWindow(gtk.Window):
         self.apply.set_sensitive(False)
         righthbbox.pack_start(self.apply, False, False)
 
-    def add_page(self, notebook, tab):
-        frame = gtk.Frame()
-        frame.set_border_width(5)
-        frame.set_shadow_type(gtk.SHADOW_NONE)
-        frame.show()
-        label = gtk.Label(tab)
-        notebook.append_page(frame, label)
-        return frame
-
     def load_shell_configs(self):
         overlayenable = True
         localdisks = False
@@ -253,6 +244,8 @@ class ShellConfigWindow(gtk.Window):
             model, paths = list.get_selection().get_selected_rows()
         else:
             model = list.get_model()
+        if not paths:
+            return
         if list == self.submlist:
             otherlist = self.topmlist
             othermodel = self.topmmodel
