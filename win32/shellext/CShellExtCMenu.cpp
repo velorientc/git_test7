@@ -429,6 +429,11 @@ CShellExtCMenu::QueryContextMenu(
         }
     }
 
+    TDEBUG_TRACE(
+        "CShellExtCMenu::QueryContextMenu: isHgrepo = " 
+        << isHgrepo << ", fileMenu = " << fileMenu
+    );
+
     /* We have three menu types: files-selected, no-files-selected, no-repo */
     menuDescListEntries *entries;
     if (isHgrepo)
