@@ -11,7 +11,7 @@ import shlex
 import time
 
 from mercurial import ui, util, extensions, match, bundlerepo, url
-from mercurial import dispatch, encoding, templatefilters
+from mercurial import dispatch, encoding, templatefilters, filemerge
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
@@ -174,7 +174,6 @@ def mergetools(ui, values=None):
     'returns the configured merge tools and the internal ones'
     if values == None:
         values = []
-    from mercurial import filemerge
     for key, value in ui.configitems('merge-tools'):
         t = key.split('.')[0]
         if t not in values:
@@ -216,7 +215,7 @@ def difftools(ui):
         if t.startswith('internal:'):
             continue
         opts = ui.config('merge-tools', t + '.diffargs', '')
-        tools[t] = [t, shlex.split(opts)]
+        tools[t] = [filemerge._findtool(ui, t), shlex.split(opts)]
     return tools
 
 
