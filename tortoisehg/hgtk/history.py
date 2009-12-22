@@ -400,6 +400,7 @@ class GLog(gdialog.GDialog):
         column('id', _('Changeset ID'))
         column('revhex', _('Revision Number/ID'))
         column('branch', _('Branch Name'))
+        column('changes', _('Changes'))
         column('msg', _('Summary'))
         column('user', _('User'))
         column('date', _('Local Date'))

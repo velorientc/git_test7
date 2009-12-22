@@ -31,15 +31,16 @@ WFILE = 4
 
 BRANCH = 5          # calculated on demand, not cached
 HEXID = 6
-REVHEX = 14
-LOCALTIME = 7
-UTC = 8
+REVHEX = 7
+LOCALTIME = 8
+UTC = 9
 
-MESSAGE = 9         # calculated on demand, cached
-COMMITER = 10
-TAGS = 11
-FGCOLOR = 12
-AGE = 13
+MESSAGE = 10        # calculated on demand, cached
+COMMITER = 11
+TAGS = 12
+FGCOLOR = 13
+AGE = 14
+CHANGES = 15
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -98,6 +99,7 @@ class TreeModel(gtk.GenericTreeModel):
 
         if index == BRANCH: return str
         if index == HEXID: return str
+        if index == REVHEX: return str
         if index == LOCALTIME: return str
         if index == UTC: return str
 
@@ -106,7 +108,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == TAGS: return str
         if index == FGCOLOR: return str
         if index == AGE: return str
-        if index == REVHEX: return str
+        if index == CHANGES: return str
 
     def on_get_iter(self, path):
         return path[0]
@@ -224,13 +226,23 @@ class TreeModel(gtk.GenericTreeModel):
                     # new
                     status += 2
 
-            revision = (sumstr, author, taglist, color, age, status)
+            M, A, R = self.repo.status(ctx.parents()[0].node(), ctx.node())[:3]
+            common = dict(color='black')
+            M = M and gtklib.markup(' %s ' % len(M),
+                                    background='#ffddaa', **common) or ''
+            A = A and gtklib.markup(' %s ' % len(A),
+                                    background='#aaffaa', **common) or ''
+            R = R and gtklib.markup(' %s ' % len(R),
+                                    background='#ffcccc', **common) or ''
+            changes = ''.join((M, A, R))
+
+            revision = (sumstr, author, taglist, color, age, changes, status)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
         if column == GRAPHNODE:
             column, color = graphnode
-            return (column, color, revision[5])
+            return (column, color, revision[-1])
         else:
             return revision[column-MESSAGE]
 
