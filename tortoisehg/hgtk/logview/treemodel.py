@@ -79,7 +79,11 @@ class TreeModel(gtk.GenericTreeModel):
             pass
         if bookmarks:
             if repo.ui.configbool('bookmarks', 'track.current'):
-                self.curbookmark = bookmarks.current(repo)
+                # bookmarks.py changed between 1.4 and 1.5
+                if hasattr(repo, '_bookmarkcurrent'):
+                    self.curbookmark = repo._bookmarkcurrent
+                else:
+                    self.curbookmark = bookmarks.current(repo)
         try:
             self.wcparents = [x.rev() for x in repo.parents()]
             self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
