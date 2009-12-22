@@ -18,7 +18,7 @@ import atexit
 from mercurial import cmdutil, util, ui, hg, commands
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import settings, hglib, paths
+from tortoisehg.util import settings, hglib, paths, shlib
 
 from tortoisehg.hgtk import gtklib
 
@@ -40,9 +40,12 @@ class Prompt(SimpleMessage):
         key, modifier = gtk.accelerator_parse(mod+'Return')
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
-        buttons = self.get_children()[0].get_children()[1].get_children()
-        buttons[0].add_accelerator('clicked', accel_group, key,
-                modifier, gtk.ACCEL_VISIBLE)
+        try:
+            buttons = self.get_children()[0].get_children()[1].get_children()
+            buttons[0].add_accelerator('clicked', accel_group, key,
+                                       modifier, gtk.ACCEL_VISIBLE)
+        except IndexError:
+            pass
 
 class CustomPrompt(gtk.MessageDialog):
     ''' Custom prompt dialog.  Provide a list of choices with ampersands
@@ -387,8 +390,7 @@ class GDialog(gtk.Window):
             return
         if not url.startswith('http'):
             url = 'http://tortoisehg.org/manual/0.9/' + url
-        from tortoisehg.hgtk import about
-        about.browse_url(url)
+        shlib.browse_url(url)
 
     def launch(self, item, app):
         import sys

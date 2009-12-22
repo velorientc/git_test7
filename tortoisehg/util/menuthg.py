@@ -7,29 +7,10 @@
 
 import os
 
-from mercurial import hg, ui, node
+from mercurial import hg, ui, node, error
 
 from tortoisehg.util.i18n import _ as gettext
 from tortoisehg.util import cachethg, paths, hglib
-
-promoted = []
-try:
-    from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
-    try:
-        hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
-        pl = QueryValueEx(hkey, 'PromotedItems')[0]
-        for item in pl.split(','):
-            item = item.strip()
-            if item: promoted.append(str(item))
-    except EnvironmentError:
-        promoted = ['commit', 'log']
-except ImportError:
-    # fallback method for non-win32 platforms
-    u = ui.ui()
-    pl = u.config('tortoisehg', 'promoteditems', 'commit')
-    for item in pl.split(','):
-        item = item.strip()
-        if item: promoted.append(str(item))
 
 def _(msgid):
     return {'id': msgid, 'str': gettext(msgid)}
@@ -89,6 +70,9 @@ thgcmenu = {
     'repoconf':   { 'label': _('Repository Settings'),
                     'help':  _('Configure repository settings'),
                     'icon':  'settings_repo.ico'},
+    'shellconf':  { 'label': _('Explorer extension settings'),
+                    'help':  _('Configure Explorer shell extension'),
+                    'icon':  'settings_user.ico'},
     'about':      { 'label': _('About TortoiseHg'),
                     'help':  _('Show About Dialog'),
                     'icon':  'menuabout.ico'},
@@ -168,10 +152,17 @@ class thg_menu(object):
         self.ui = ui
         self.name = name
         self.sep = [False]
+        self.promoted = []
+        pl = self.ui.config('tortoisehg', 'promoteditems', 'commit,log')
+        for item in pl.split(','):
+            item = item.strip()
+            if item:
+                self.promoted.append(str(item))
+
 
     def add_menu(self, hgcmd, icon=None, state=True):
-        global promoted, thgcmenu
-        if hgcmd in promoted:
+        global thgcmenu
+        if hgcmd in self.promoted:
             pos = 0
         else:
             pos = 1
@@ -204,7 +195,7 @@ def open_repo(path):
         try:
             repo = hg.repository(ui.ui(), path=root)
             return repo
-        except hglib.RepoError:
+        except error.RepoError:
             pass
         except StandardError, e:
             print "error while opening repo %s:" % path

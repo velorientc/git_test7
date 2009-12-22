@@ -12,7 +12,7 @@ import re
 import urlparse
 import threading
 
-from mercurial import hg, ui, util, url, filemerge
+from mercurial import hg, ui, util, url, filemerge, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -535,7 +535,7 @@ class ConfigDialog(gtk.Dialog):
             else:
                 repo = None
             self.root = root
-        except hglib.RepoError:
+        except error.RepoError:
             repo = None
             if configrepo:
                 dialog.error_dialog(self, _('No repository found'),
@@ -549,8 +549,8 @@ class ConfigDialog(gtk.Dialog):
             self.readonly = False
         except ImportError:
             dialog.error_dialog(self, _('Iniparse package not found'),
-                         _('Please install iniparse package\n'
-                           'Settings are only shown, no changing is possible'))
+                         _("Can't change settings without iniparse package - "
+                           "view is readonly."))
             print 'Please install http://code.google.com/p/iniparse/'
             self.readonly = True
 
@@ -559,6 +559,12 @@ class ConfigDialog(gtk.Dialog):
         self.connect('thg-accept', self.thgaccept)
         self.connect('delete-event', self.delete_event)
 
+        # wrapper box for padding
+        wrapbox = gtk.VBox()
+        wrapbox.set_border_width(5)
+        self.vbox.pack_start(wrapbox, False, False)
+
+        # create combo to select the target
         combo = gtk.combo_box_new_text()
         combo.append_text(_('User global settings'))
         if repo:
@@ -570,12 +576,15 @@ class ConfigDialog(gtk.Dialog):
         edit = gtk.Button(_('Edit File'))
         hbox.pack_start(edit, False, False, 2)
         edit.connect('clicked', self.edit_clicked)
-        self.vbox.pack_start(hbox, False, False, 4)
+        wrapbox.pack_start(hbox, False, False, 1)
+
+        # insert padding of between combo and notebook
+        wrapbox.pack_start(gtk.VBox(), False, False, 3)
 
         # Create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
         notebook.set_tab_pos(gtk.POS_TOP)
-        self.vbox.pack_start(notebook, True, True)
+        wrapbox.pack_start(notebook, True, True)
         notebook.show()
         self.show_tabs = True
         self.show_border = True
@@ -993,14 +1002,8 @@ class ConfigDialog(gtk.Dialog):
                 curvalue = self.get_ini_config(cpath)
 
                 if cpath == 'tortoisehg.vdiff':
-                    # Special case, add extdiff.cmd.* to possible values
-                    for name, value in self.ui.configitems('extdiff'):
-                        if name.startswith('cmd.'):
-                            if name[4:] not in values:
-                                values.append(name[4:])
-                        elif not name.startswith('opts.'):
-                            if name not in values:
-                                values.append(name)
+                    tools = hglib.difftools(self.ui)
+                    values.extend(tools.keys())
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     hglib.mergetools(self.ui, values)
@@ -1064,6 +1067,14 @@ class ConfigDialog(gtk.Dialog):
                     break
                 except (IOError, OSError):
                     pass
+            else:
+                gdialog.Prompt(_('Unable to create a Mercurial.ini file'),
+                       _('Insufficient access rights, reverting to read-only'
+                         'mode.'), self).run()
+                from mercurial import config
+                self.fn = rcpath[0]
+                cfg = config.config()
+                return cfg
         self.fn = fn
         try:
             import iniparse

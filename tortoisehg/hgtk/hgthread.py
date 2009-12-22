@@ -10,7 +10,7 @@ import Queue
 import time
 import urllib2
 
-from mercurial import ui, util
+from mercurial import ui, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, thread2
@@ -169,7 +169,7 @@ class HgThread(thread2.Thread):
                 self.postfunc(ret)
         except util.Abort, e:
             self.ui.write_err(_('abort: ') + str(e) + '\n')
-        except (hglib.RepoError, urllib2.HTTPError), e:
+        except (error.RepoError, urllib2.HTTPError), e:
             self.ui.write_err(str(e) + '\n')
         except (Exception, OSError, IOError), e:
             self.ui.write_err(str(e) + '\n')

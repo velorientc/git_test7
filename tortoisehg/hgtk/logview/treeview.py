@@ -27,6 +27,7 @@ from tortoisehg.hgtk.logview import treemodel
 from tortoisehg.hgtk.logview.graphcell import CellRendererGraph
 from tortoisehg.hgtk.logview.revgraph import *
 
+COLS = 'graph rev id revhex branch changes msg user date utc age tag'
 
 class TreeView(gtk.ScrolledWindow):
 
@@ -77,13 +78,23 @@ class TreeView(gtk.ScrolledWindow):
                                  False,
                                  gobject.PARAM_READWRITE),
         'id-column-visible': (gobject.TYPE_BOOLEAN,
-                                 'Tags',
+                                 'ID',
                                  'Show revision ID column',
+                                 False,
+                                 gobject.PARAM_READWRITE),
+        'revhex-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Rev/ID',
+                                 'Show revision number/ID column',
                                  False,
                                  gobject.PARAM_READWRITE),
         'branch-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Branch',
                                  'Show branch',
+                                 False,
+                                 gobject.PARAM_READWRITE),
+        'changes-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Changes',
+                                 'Show changes column',
                                  False,
                                  gobject.PARAM_READWRITE),
         'tag-column-visible': (gobject.TYPE_BOOLEAN,
@@ -424,6 +435,18 @@ class TreeView(gtk.ScrolledWindow):
         col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 22)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        col = self.tvcolumns['revhex'] = gtk.TreeViewColumn(_('Rev/ID'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col.add_attribute(cell, "markup", treemodel.REVHEX)
+
+        cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         col = self.tvcolumns['branch'] = gtk.TreeViewColumn(_('Branch'))
@@ -436,7 +459,18 @@ class TreeView(gtk.ScrolledWindow):
         col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 10)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        col = self.tvcolumns['changes'] = gtk.TreeViewColumn(_('Changes'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+        col.add_attribute(cell, "markup", treemodel.CHANGES)
 
+        cell = gtk.CellRendererText()
         cell.set_property("width-chars", 80)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         col = self.tvcolumns['msg'] = gtk.TreeViewColumn(_('Summary'))
@@ -506,8 +540,7 @@ class TreeView(gtk.ScrolledWindow):
         col.add_attribute(cell, "text", treemodel.TAGS)
         col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
-        cols = 'graph rev id branch msg user date utc age tag'
-        self.columns = cols.split()
+        self.columns = COLS.split()
 
         # append columns
         for cn in self.columns:

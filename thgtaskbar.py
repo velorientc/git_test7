@@ -1,5 +1,6 @@
 # Creates a task-bar icon.  Run from Python.exe to see the
-# messages printed.
+# messages printed. Takes an optional logfile as first command
+# line parameter
 
 import gc
 import os
@@ -28,16 +29,12 @@ from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import thread2, paths, shlib
 
 if hasattr(sys, "frozen"):
-    # Insert PATH to binary installer gtk directory
-    gtkpath = os.path.join(paths.bin_path, 'gtk')
-    os.environ['PATH'] = os.pathsep.join([gtkpath, os.environ['PATH']])
     # Give stdout/stderr closed attributes to prevent ui.py errors
     sys.stdout.closed = True
     sys.stderr.closed = True
 
-APP_TITLE = _('TortoiseHg RPC server')
+APP_TITLE = _('TortoiseHg Overlay Icon Server')
 
-SHOWLOG_CMD = 1023
 EXIT_CMD = 1025
 
 def SetIcon(hwnd, name, add=False):
@@ -93,11 +90,12 @@ class MainWindow:
                 0, 0, win32con.CW_USEDEFAULT, win32con.CW_USEDEFAULT, \
                 0, 0, hinst, None)
         UpdateWindow(self.hwnd)
-        self.guithread = None
         self._DoCreateIcons()
 
     def _DoCreateIcons(self):
-        SetIcon(self.hwnd, "hg.ico", add=True)
+        show, highlight = get_config()
+        if show:
+            SetIcon(self.hwnd, "hg.ico", add=True)
         # start namepipe server for hg status
         self.start_pipe_server()
 
@@ -115,8 +113,7 @@ class MainWindow:
     def OnTaskbarNotify(self, hwnd, msg, wparam, lparam):
         if lparam==win32con.WM_RBUTTONUP or lparam==win32con.WM_LBUTTONUP:
             menu = CreatePopupMenu()
-            AppendMenu(menu, win32con.MF_STRING, SHOWLOG_CMD, _('Options...'))
-            AppendMenu(menu, win32con.MF_SEPARATOR, 0, '')
+            # AppendMenu(menu, win32con.MF_SEPARATOR, 0, '')
             AppendMenu(menu, win32con.MF_STRING, EXIT_CMD, _('Exit'))
             pos = GetCursorPos()
             # See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/menus_0hdi.asp
@@ -130,12 +127,7 @@ class MainWindow:
 
     def OnCommand(self, hwnd, msg, wparam, lparam):
         id = LOWORD(wparam)
-        if id == SHOWLOG_CMD:
-            if not self.guithread or not self.guithread.isAlive():
-                self.launchgui()
-            else:
-                print "TortoiseHG options dialog already running"
-        elif id == EXIT_CMD:
+        if id == EXIT_CMD:
             self.exit_application()
         else:
             print "Unknown command -", id
@@ -143,11 +135,8 @@ class MainWindow:
     def exit_application(self):
         if self.stop_pipe_server():
             DestroyWindow(self.hwnd)
-        if self.guithread and self.guithread.isAlive():
-            import gobject
-            gobject.idle_add(self.dialog.destroy)
         print "Goodbye"
-    
+
     def stop_pipe_server(self):
         print "Stopping pipe server..."
         if not self.pipethread.isAlive():
@@ -173,25 +162,6 @@ class MainWindow:
         else:
             return True
 
-    def launchgui(self):
-        def launch():
-            import gtk
-            # Import hgtk for signal setup side-effects
-            from tortoisehg.hgtk import hgtk
-            from tortoisehg.hgtk import taskbarui
-            dlg = taskbarui.TaskBarUI(logger.getqueue(), requests)
-            dlg.show_all()
-            dlg.connect('destroy', gtk.main_quit)
-            self.dialog = dlg
-            gtk.gdk.threads_init()
-            gtk.gdk.threads_enter()
-            gtk.main()
-            gtk.gdk.threads_leave()
-            logger.reset()
-
-        self.guithread = thread2.Thread(target=launch)
-        self.guithread.start()
-
     def start_pipe_server(self):
         def servepipe():
             self.svc = PipeServer(self.hwnd)
@@ -208,19 +178,19 @@ PIPEBUFSIZE = 4096
 
 class Logger():
     def __init__(self):
-        self.q = None
+        self.file = None
 
-    def getqueue(self):
-        self.q = Queue.Queue()
-        return self.q
-
-    def reset(self):
-        self.q = None
+    def setfile(self, name):
+        self.file = open(name, 'wb')
+        self.msg('Logging to file started')
 
     def msg(self, msg):
         ts = '[%s] ' % time.strftime('%c')
-        if self.q:
-            self.q.put(ts + msg)
+        f = self.file
+        if f:
+            f.write(ts + msg + '\n')
+            f.flush()
+            os.fsync(f.fileno())
             print 'L' + ts + msg
         else:
             print ts + msg
@@ -279,16 +249,19 @@ def update_batch(batch):
 requests = Queue.Queue(0)
 
 def get_config():
+    show_taskbaricon = True
     hgighlight_taskbaricon = True
     try:
         from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
         hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
         t = ('1', 'True')
+        try: show_taskbaricon = QueryValueEx(hkey, 'ShowTaskbarIcon')[0] in t
+        except EnvironmentError: pass
         try: hgighlight_taskbaricon = QueryValueEx(hkey, 'HighlightTaskbarIcon')[0] in t
         except EnvironmentError: pass
     except (ImportError, WindowsError):
         pass
-    return hgighlight_taskbaricon
+    return (show_taskbaricon, hgighlight_taskbaricon)
 
 def update(args, hwnd):
     batch = []
@@ -296,8 +269,8 @@ def update(args, hwnd):
     print "got update request %s (first in batch)" % r
     batch.append(r)
     print "wait a bit for additional requests..."
-    highlight = get_config()
-    if highlight:
+    show, highlight = get_config()
+    if show and highlight:
         SetIcon(hwnd, "hgB.ico")
     time.sleep(0.2)
     deferred_requests = []
@@ -318,7 +291,7 @@ def update(args, hwnd):
     msg = "processing batch with %i update requests"
     print msg % len(batch)
     update_batch(batch)
-    if highlight:
+    if show and highlight:
         SetIcon(hwnd, "hg.ico")
 
 def remove(args):
@@ -462,6 +435,7 @@ INSTALLMUTEXNAME = 'thgtaskbar'
 RUNMUTEXNAME = 'thgtaskbar-' + GetUserName()
 
 def main():
+    args = sys.argv[1:]
     sa = win32security.SECURITY_ATTRIBUTES() 
     sa.SetSecurityDescriptorDacl(1, None, 0) # allow full access
     runmutex = win32event.CreateMutex(sa, 1, RUNMUTEXNAME)
@@ -471,6 +445,16 @@ def main():
     # see http://www.jrsoftware.org/iskb.php?mutexsessions
     installmutex1 = win32event.CreateMutex(sa, 1, INSTALLMUTEXNAME)
     installmutex2 = win32event.CreateMutex(sa, 1, 'Global\\' + INSTALLMUTEXNAME)
+
+    logfilename = None
+    for arg in args:
+        if arg[0] == '-':
+            pass
+        else:
+            logfilename = arg
+    if logfilename:
+        logger.setfile(logfilename)
+
     w=MainWindow()
     PumpMessages()
 

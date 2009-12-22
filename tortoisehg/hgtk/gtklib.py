@@ -39,7 +39,7 @@ def get_thg_modifier():
     else:
         return '<Control>'
 
-def set_tortoise_keys(window):
+def set_tortoise_keys(window, connect=True):
     'Set default TortoiseHg keyboard accelerators'
     if sys.platform == 'darwin':
         mask = gtk.accelerator_get_default_mod_mask()
@@ -65,8 +65,11 @@ def set_tortoise_keys(window):
             gtk.ACCEL_VISIBLE)
 
     # connect ctrl-w and ctrl-q to every window
-    window.connect('thg-close', thgclose)
-    window.connect('thg-exit', thgexit)
+    if connect:
+        window.connect('thg-close', thgclose)
+        window.connect('thg-exit', thgexit)
+
+    return accelgroup, mod
 
 def thgexit(window):
     if thgclose(window):
@@ -148,7 +151,7 @@ class NativeSaveFileDialogWrapper:
     that isn't available"""
     def __init__(self, initial = None, title = _('Save File'),
                  filter = ((_('All files'), '*.*'),), filterindex = 1,
-                 filename = '', open=False):
+                 filename = '', open=False, multi=False):
         if initial is None:
             initial = os.path.expanduser("~")
         self.initial = initial
@@ -157,6 +160,7 @@ class NativeSaveFileDialogWrapper:
         self.filter = filter
         self.filterindex = filterindex
         self.open = open
+        self.multi = multi
 
     def run(self):
         """run the file dialog, either return a file name, or False if
@@ -183,8 +187,11 @@ class NativeSaveFileDialogWrapper:
                 f = ''
                 for name, mask in self.filter:
                     f += '\0'.join([name, mask,''])
+                flags = win32con.OFN_EXPLORER
+                if self.multi:
+                    flags |= win32con.OFN_ALLOWMULTISELECT
                 opts = dict(InitialDir=self.initial,
-                        Flags=win32con.OFN_EXPLORER,
+                        Flags=flags,
                         File=self.filename,
                         DefExt=None,
                         Title=hglib.fromutf(self.title),
@@ -192,11 +199,10 @@ class NativeSaveFileDialogWrapper:
                         CustomFilter=None,
                         FilterIndex=self.filterindex)
                 if self.open:
-                    fname, _, _ = win32gui.GetOpenFileNameW(**opts)
+                    ret = win32gui.GetOpenFileNameW(**opts)
                 else:
-                    fname, _, _ = win32gui.GetSaveFileNameW(**opts)
-                if fname:
-                    fname = os.path.abspath(fname)
+                    ret = win32gui.GetSaveFileNameW(**opts)
+                fname = ret[0]
             except pywintypes.error:
                 pass
             os.chdir(cwd)
@@ -211,6 +217,14 @@ class NativeSaveFileDialogWrapper:
         fname = False 
         if q.qsize():
             fname = q.get(0)
+        if fname and self.multi and fname.find('\x00') != -1:
+            splitted = fname.split('\x00')
+            dir, fnames = splitted[0], splitted[1:]
+            fname = []
+            for fn in fnames:
+                path = os.path.abspath(os.path.join(dir, fn))
+                if os.path.exists(path):
+                    fname.append(hglib.toutf(path))
         return fname
 
     def runCompatible(self):
@@ -225,6 +239,8 @@ class NativeSaveFileDialogWrapper:
         dlg = gtk.FileChooserDialog(self.title, None, action, buttons)
         dlg.set_default_response(gtk.RESPONSE_OK)
         dlg.set_current_folder(self.initial)
+        if self.multi:
+            dlg.set_select_multiple(True)
         if not self.open:
             dlg.set_current_name(self.filename)
         for name, pattern in self.filter:
@@ -233,7 +249,10 @@ class NativeSaveFileDialogWrapper:
             fi.add_pattern(pattern)
             dlg.add_filter(fi)
         if dlg.run() == gtk.RESPONSE_OK:
-            result = dlg.get_filename();
+            if self.multi:
+                result = dlg.get_filenames()
+            else:
+                result = dlg.get_filename()
         else:
             result = False
         dlg.destroy()
@@ -318,7 +337,7 @@ class NativeFolderSelectDialog:
         return fname
 
     def runCompatible(self):
-        dialog = gtk.FileChooserDialog(title=None,
+        dialog = gtk.FileChooserDialog(title=self.title,
                 action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                 buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
@@ -350,8 +369,8 @@ class NativeFileManager:
         subprocess.Popen('explorer "%s"' % self.path)
 
     def runNautilus(self):
-        # TODO implement me!
-        pass
+        import subprocess
+        subprocess.Popen('nautilus --browser "%s"' % self.path)
 
 def markup(text, **kargs):
     """
@@ -502,18 +521,23 @@ class LayoutTable(gtk.VBox):
                     specify this option, 'padding' option will be changed
                     to False automatically.  Default: -1 (last element).
             xpad: Number. Override default 'xpad' value.
-            ypad: [same as 'xpad']
+            ypad: Same as 'xpad'.
+            xopt: Number. Combination of gtk.EXPAND, gtk.SHRINK or gtk.FILL.
+                  Note that This option is applied only body elements, not
+                  header. Default: gtk.FILL|gtk.EXPAND.
+            yopt: Same as 'xopt' except Default: 0.
             headopts: Dictionary. Override default 'headopts' value.
-            bodyopts: [same as 'headopts']
+            bodyopts: Same as 'headopts'.
         """
         if len(widgets) == 0:
             return
         t = self.table
-        FLAG = gtk.FILL|gtk.EXPAND
         rows = t.get_property('n-rows')
         t.set_property('n-rows', rows + 1)
         xpad = kargs.get('xpad', self.xpad)
         ypad = kargs.get('ypad', self.ypad)
+        xopt = kargs.get('xopt', gtk.FILL|gtk.EXPAND)
+        yopt = kargs.get('yopt', 0)
         hopts = kargs.get('headopts', self.headopts)
         bopts = kargs.get('bodyopts', self.bodyopts)
         def getwidget(obj, opts=None):
@@ -554,7 +578,7 @@ class LayoutTable(gtk.VBox):
         if len(widgets) == 1:
             cols = t.get_property('n-columns')
             widget = pack(*widgets, **kargs)
-            t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, xpad, ypad)
+            t.attach(widget, 0, cols, rows, rows + 1, xopt, yopt, xpad, ypad)
         else:
             first = getwidget(widgets[0], hopts)
             if isinstance(first, gtk.Label):
@@ -562,36 +586,82 @@ class LayoutTable(gtk.VBox):
             t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, xpad, ypad)
             self.headers.append(first)
             rest = pack(*(widgets[1:]), **kargs)
-            t.attach(rest, 1, 2, rows, rows + 1, FLAG, 0, xpad, ypad)
+            t.attach(rest, 1, 2, rows, rows + 1, xopt, yopt, xpad, ypad)
 
 class SlimToolbar(gtk.HBox):
     """
-    Slim Toolbar, allows to add the buttons of menu size.
+    Slim Toolbar, allows to add the buttons with small icon.
     """
-
     def __init__(self, tooltips=None):
         gtk.HBox.__init__(self)
         self.tooltips = tooltips
+        self.groups = {}
 
-    def append_stock(self, stock_id, tooltip=None, toggle=False):
-        icon = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
+    ### public methods ###
+
+    def append_button(self, icon, tooltip=None, toggle=False, group=None):
+        """
+        icon: stock id or file name bundled in TortoiseHg.
+        """
+        if icon.startswith('gtk'):
+            img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
+        else:
+            img = gtk.Image()
+            filepath = paths.get_tortoise_icon(icon)
+            if filepath:
+                try:
+                    size = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)
+                    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
+                                 filepath, *size)
+                    img.set_from_pixbuf(pixbuf)
+                except:
+                    pass
         if toggle:
             button = gtk.ToggleButton()
         else:
             button = gtk.Button()
-        button.set_image(icon)
+        button.set_image(img)
         button.set_relief(gtk.RELIEF_NONE)
         button.set_focus_on_click(False)
         if self.tooltips and tooltip:
             self.tooltips.set_tip(button, tooltip)
-        self.append_widget(button, padding=0)
+        self.append_widget(button, padding=0, group=group)
         return button
 
-    def append_widget(self, widget, expand=False, padding=2):
+    def append_widget(self, widget, expand=False, padding=2, group=None):
         self.pack_start(widget, expand, expand, padding)
+        self.add_group(group, widget)
 
     def append_space(self):
         self.append_widget(gtk.Label(), expand=True, padding=0)
+
+    def append_separator(self, group=None):
+        self.append_widget(gtk.VSeparator(), group=group)
+
+    def set_enable(self, group, enable=True):
+        if not group or not self.groups.has_key(group):
+            return
+        for widget in self.groups[group]:
+            widget.set_sensitive(enable)
+
+    def set_visible(self, group, visible=True):
+        if not group or not self.groups.has_key(group):
+            return
+        for widget in self.groups[group]:
+            if visible is True:
+                widget.set_no_show_all(False)
+            widget.set_property('visible', visible)
+            if visible is False:
+                widget.set_no_show_all(True)
+
+    ### internal method ###
+
+    def add_group(self, group, widget):
+        if not group or not widget:
+            return
+        if not self.groups.has_key(group):
+            self.groups[group] = []
+        self.groups[group].append(widget)
 
 class MenuItems(object):
     '''controls creation of menus by ignoring separators at odd places'''
