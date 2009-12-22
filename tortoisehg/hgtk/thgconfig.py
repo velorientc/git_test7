@@ -1002,14 +1002,8 @@ class ConfigDialog(gtk.Dialog):
                 curvalue = self.get_ini_config(cpath)
 
                 if cpath == 'tortoisehg.vdiff':
-                    # Special case, add extdiff.cmd.* to possible values
-                    for name, value in self.ui.configitems('extdiff'):
-                        if name.startswith('cmd.'):
-                            if name[4:] not in values:
-                                values.append(name[4:])
-                        elif not name.startswith('opts.'):
-                            if name not in values:
-                                values.append(name)
+                    tools = hglib.difftools(self.ui)
+                    values.extend(tools.keys())
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     hglib.mergetools(self.ui, values)

@@ -8,7 +8,6 @@
 import gtk
 import gobject
 import os
-import shlex
 import subprocess
 import shutil
 import tempfile
@@ -102,7 +101,7 @@ class FileSelectionDialog(gtk.Dialog):
                    _('No repository found here'), None).run()
             return
 
-        tools = readtools(repo.ui)
+        tools = hglib.difftools(repo.ui)
         preferred = repo.ui.config('tortoisehg', 'vdiff', 'vdiff')
         if preferred and preferred in tools:
             if len(tools) > 1:
@@ -340,35 +339,6 @@ class FileSelectionDialog(gtk.Dialog):
             gdialog.Prompt(_('Tool launch failure'),
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
 
-def readtools(ui):
-    tools = {}
-    for cmd, path in ui.configitems('extdiff'):
-        if cmd.startswith('cmd.'):
-            cmd = cmd[4:]
-            if not path:
-                path = cmd
-            diffopts = ui.config('extdiff', 'opts.' + cmd, '')
-            diffopts = diffopts and [diffopts] or []
-            tools[cmd] = [path, diffopts]
-        elif cmd.startswith('opts.'):
-            continue
-        else:
-            # command = path opts
-            if path:
-                diffopts = shlex.split(path)
-                path = diffopts.pop(0)
-            else:
-                path, diffopts = cmd, []
-            tools[cmd] = [path, diffopts]
-    mergetools = []
-    hglib.mergetools(ui, mergetools)
-    for t in mergetools:
-        if t.startswith('internal:'):
-            continue
-        opts = ui.config('merge-tools', t + '.diffargs', '')
-        tools[t] = [t, shlex.split(opts)]
-    return tools
-
 def rawextdiff(ui, *pats, **opts):
     'launch raw extdiff command, block until finish'
     from hgext import extdiff
@@ -379,7 +349,7 @@ def rawextdiff(ui, *pats, **opts):
         # hgtk should catch this earlier
         ui.warn(_('No repository found here') + '\n')
         return
-    tools = readtools(ui)
+    tools = hglib.difftools(repo.ui)
     preferred = ui.config('tortoisehg', 'vdiff', 'vdiff')
     try:
         diffcmd, diffopts = tools[preferred]

@@ -7,12 +7,11 @@
 
 import os
 import sys
-import traceback
-import shlib
+import shlex
 import time
 
-from mercurial import hg, ui, util, extensions, commands, hook, match
-from mercurial import dispatch, encoding, templatefilters, bundlerepo, url
+from mercurial import ui, util, extensions, match, bundlerepo, url
+from mercurial import dispatch, encoding, templatefilters
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
@@ -189,6 +188,36 @@ def mergetools(ui, values=None):
     values.append('internal:other')
     values.append('internal:fail')
     return values
+
+
+def difftools(ui):
+    tools = {}
+    for cmd, path in ui.configitems('extdiff'):
+        if cmd.startswith('cmd.'):
+            cmd = cmd[4:]
+            if not path:
+                path = cmd
+            diffopts = ui.config('extdiff', 'opts.' + cmd, '')
+            diffopts = diffopts and [diffopts] or []
+            tools[cmd] = [path, diffopts]
+        elif cmd.startswith('opts.'):
+            continue
+        else:
+            # command = path opts
+            if path:
+                diffopts = shlex.split(path)
+                path = diffopts.pop(0)
+            else:
+                path, diffopts = cmd, []
+            tools[cmd] = [path, diffopts]
+    mt = []
+    mergetools(ui, mt)
+    for t in mt:
+        if t.startswith('internal:'):
+            continue
+        opts = ui.config('merge-tools', t + '.diffargs', '')
+        tools[t] = [t, shlex.split(opts)]
+    return tools
 
 
 def hgcmd_toq(q, *args):
