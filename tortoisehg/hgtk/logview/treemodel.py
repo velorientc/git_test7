@@ -53,16 +53,8 @@ class TreeModel(gtk.GenericTreeModel):
         self.showgraph = opts['show-graph']
         self.revisions = {}
         self.graphdata = graphdata
-        self.set_author_color()
-        self.hidetags = self.repo.ui.config(
-            'tortoisehg', 'hidetags', '').split()
         self.wcparents, self.tagrevs, self.branchtags = [], [], {}
-        try:
-            self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
-            self.branchtags = repo.branchtags()
-            self.wcparents = [x.rev() for x in repo.parents()]
-        except util.Abort:
-            pass
+        self.refresh()
 
     def refresh(self):
         repo = self.repo
@@ -74,9 +66,26 @@ class TreeModel(gtk.GenericTreeModel):
 
         hglib.invalidaterepo(repo)
 
-        self.wcparents = [x.rev() for x in repo.parents()]
-        self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
-        self.branchtags = repo.branchtags()
+        self.set_author_color()
+        self.hidetags = repo.ui.config('tortoisehg', 'hidetags', '').split()
+
+        # Check if we're using bookmarks, and have the 'track.current'
+        # option set; if so, find what the 'current' bookmark is
+        self.curbookmark = None
+        bookmarks = None
+        try:
+            bookmarks = hglib.extensions.find('bookmarks')
+        except KeyError:
+            pass
+        if bookmarks:
+            if repo.ui.configbool('bookmarks', 'track.current'):
+                self.curbookmark = bookmarks.current(repo)
+        try:
+            self.wcparents = [x.rev() for x in repo.parents()]
+            self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
+            self.branchtags = repo.branchtags()
+        except util.Abort:
+            pass
         brevs = [repo[n].rev() for n in self.branchtags.values()]
         allrevs = set(oldtags + oldparents + oldbranches +
                       brevs + self.wcparents + self.tagrevs)
@@ -169,26 +178,13 @@ class TreeModel(gtk.GenericTreeModel):
             summary = escape(hglib.toutf(summary))
             node = ctx.node()
 
-            # Check if we're using bookmarks, and have the
-            # 'track.current' option set; if so,
-            # find what the 'current' bookmark is
-            currentBookmark = None
-            bookmarks = None
-            try:
-                bookmarks = hglib.extensions.find('bookmarks')
-            except KeyError:
-                pass
-            if bookmarks:
-                if self.repo.ui.configbool('bookmarks', 'track.current'):
-                    currentBookmark = bookmarks.current(self.repo)
-                
             tags = self.repo.nodetags(node)
             taglist = hglib.toutf(', '.join(tags))
             tstr = ''
             for tag in tags:
                 if tag not in self.hidetags:
                     style = {'color':'black', 'background':'#ffffaa'}
-                    if tag == currentBookmark:
+                    if tag == self.curbookmark:
                         style['background'] = '#ffcc99'
                     tstr += gtklib.markup(' %s ' % tag, **style) + ' '
 
