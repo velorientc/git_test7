@@ -86,7 +86,7 @@ class RecoveryDialog(gtk.Window):
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground='#900000')
+                                   foreground=gtklib.DRED)
         vbox.pack_start(scrolledwindow, True, True)
 
         self.stbar = statusbar.StatusBar()

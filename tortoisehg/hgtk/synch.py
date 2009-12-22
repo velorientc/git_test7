@@ -245,7 +245,7 @@ class SynchDialog(gtk.Window):
         self.textview.connect('populate-popup', self.add_to_popup)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground='#900000')
+                                   foreground=gtklib.DRED)
         basevbox.pack_start(scrolledwindow, True, True)
 
         # statusbar

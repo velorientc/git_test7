@@ -41,30 +41,30 @@ DM_FONT      = 5
 
 def hunk_markup(text):
     'Format a diff hunk for display in a TreeView row with markup'
-    hunk = ""
+    hunk = ''
     # don't use splitlines, should split with only LF for the patch
     lines = hglib.tounicode(text).split(u'\n')
     for line in lines:
-        line = gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        line = hglib.toutf(line[:512]) + '\n'
         if line.startswith('---') or line.startswith('+++'):
-            hunk += '<span foreground="#000090">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DBLUE)
         elif line.startswith('-'):
-            hunk += '<span foreground="#900000">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DRED)
         elif line.startswith('+'):
-            hunk += '<span foreground="#006400">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DGREEN)
         elif line.startswith('@@'):
-            hunk = '<span foreground="#FF8000">%s</span>' % line
+            hunk = gtklib.markup(line, color='#FF8000')
         else:
             hunk += line
     return hunk
 
 def hunk_unmarkup(text):
     'Format a diff hunk for display in a TreeView row without markup'
-    hunk = ""
+    hunk = ''
     # don't use splitlines, should split with only LF for the patch
     lines = hglib.tounicode(text).split(u'\n')
     for line in lines:
-        hunk += gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        hunk += gtklib.markup(hglib.toutf(line[:512])) + '\n'
     return hunk
 
 class GStatus(gdialog.GDialog):
@@ -833,11 +833,11 @@ class GStatus(gdialog.GDialog):
     def text_color(self, column, text_renderer, model, row_iter):
         stat = model[row_iter][FM_STATUS]
         if stat == 'M':
-            text_renderer.set_property('foreground', '#000090')
+            text_renderer.set_property('foreground', gtklib.DBLUE)
         elif stat == 'A':
-            text_renderer.set_property('foreground', '#006400')
+            text_renderer.set_property('foreground', gtklib.DGREEN)
         elif stat == 'R':
-            text_renderer.set_property('foreground', '#900000')
+            text_renderer.set_property('foreground', gtklib.DRED)
         elif stat == 'C':
             text_renderer.set_property('foreground', 'black')
         elif stat == '!':
@@ -1002,10 +1002,10 @@ class GStatus(gdialog.GDialog):
 
     def diff_highlight_buffer(self, difftext):
         buf = gtk.TextBuffer()
-        buf.create_tag('removed', foreground='#900000')
-        buf.create_tag('added', foreground='#006400')
+        buf.create_tag('removed', foreground=gtklib.DRED)
+        buf.create_tag('added', foreground=gtklib.DGREEN)
         buf.create_tag('position', foreground='#FF8000')
-        buf.create_tag('header', foreground='#000090')
+        buf.create_tag('header', foreground=gtklib.DBLUE)
 
         bufiter = buf.get_start_iter()
         for line in difftext:

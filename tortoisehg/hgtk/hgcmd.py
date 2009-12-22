@@ -88,7 +88,7 @@ class CmdDialog(gtk.Dialog):
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground='#900000')
+                                   foreground=gtklib.DRED)
 
         self.vbox.pack_start(scrolledwindow, True, True)
         self.connect('map_event', self._on_window_map_event)
@@ -384,13 +384,13 @@ class CmdWidget(gtk.VBox):
         """
         markup = '<span foreground="%s" weight="%s">%%s</span>'
         if style in ('succeed', 'green', 'ok'):
-            markup = markup % ('#007700', 'bold')
+            markup = markup % (gtklib.DGREEN, 'bold')
             icons = {'succeed': True}
         elif style in ('error', 'failed', 'fail', 'red'):
-            markup = markup % ('#880000', 'bold')
+            markup = markup % (gtklib.DRED, 'bold')
             icons = {'error': True}
         else:
-            markup = markup % ('#000000', 'normal')
+            markup = markup % ('black', 'normal')
             icons = {}
         text = gtklib.markup_escape_text(text)
         self.rlabel.set_markup(markup % text)
@@ -566,7 +566,7 @@ class CmdLogWidget(gtk.VBox):
         # text buffer
         self.buffer = self.textview.get_buffer()
         self.buffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                               foreground='#900000')
+                               foreground=gtklib.DRED)
 
     ### public functions ###
 

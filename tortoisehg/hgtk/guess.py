@@ -194,10 +194,10 @@ class DetectRenameDialog(gtk.Window):
 
         #$$ text view for diff
         self.buf = gtk.TextBuffer()
-        self.buf.create_tag('removed', foreground='#900000')
-        self.buf.create_tag('added', foreground='#006400')
+        self.buf.create_tag('removed', foreground=gtklib.DRED)
+        self.buf.create_tag('added', foreground=gtklib.DGREEN)
         self.buf.create_tag('position', foreground='#FF8000')
-        self.buf.create_tag('header', foreground='#000090')
+        self.buf.create_tag('header', foreground=gtklib.DBLUE)
         diffview = gtk.TextView(self.buf)
         scroller.add(diffview)
         diffview.modify_font(pango.FontDescription('monospace'))

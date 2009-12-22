@@ -29,6 +29,18 @@ if gobject.pygobject_version <= (2,12,1):
     # http://www.mail-archive.com/tortoisehg-develop@lists.sourceforge.net/msg06900.html
     raise Exception('incompatible version of gobject')
 
+# common colors
+
+DRED = '#900000'
+DGREEN = '#006400'
+DBLUE = '#000090'
+
+PRED = '#ffcccc'
+PGREEN = '#aaffaa'
+PBLUE = '#aaddff'
+PYELLOW = '#ffffaa'
+PORANGE = '#ffddaa'
+
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)

@@ -570,7 +570,7 @@ class ChangeSet(gdialog.GDialog):
         def widget_func(widget, item, markups):
             def linkwidget(revnum, revid, summary, highlight=None, branch=None):
                 # revision label
-                opts = dict(underline='single', foreground='#0000FF')
+                opts = dict(underline='single', color='blue')
                 if highlight:
                     opts['weight'] = 'bold'
                 rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
@@ -583,7 +583,7 @@ class ChangeSet(gdialog.GDialog):
                 sum = gtklib.markup(summary)
                 if branch:
                     sum = gtklib.markup(branch, color='black',
-                        background='#aaffaa') + ' ' + sum
+                        background=gtklib.PGREEN) + ' ' + sum
                 sumlabel = gtk.Label()
                 sumlabel.set_markup(sum)
                 sumlabel.set_selectable(True)

@@ -293,15 +293,14 @@ class ImportDialog(gtk.Dialog):
 
     def update_status(self, count):
         if count:
+            inner = gtklib.markup(_('%s patches') % count, weight='bold')
             if self.mqloaded:
-                info = _('<span weight="bold">%s patches</span> will'
-                         ' be imported to the') % count
+                info = _('%s will be imported to the') % inner
             else:
-                info = _('<span weight="bold">%s patches</span> will'
-                         ' be imported to the repository') % count
+                info = _('%s will be imported to the repository') % inner
         else:
-            info = '<span weight="bold" foreground="#880000">%s</span>' \
-                        % _('Nothing to import')
+            info = gtklib.markup(_('Nothing to import'),
+                                 weight='bold', color=gtklib.DRED)
         self.infolbl.set_markup(info)
         if self.mqloaded:
             self.dest_combo.set_property('visible', bool(count))

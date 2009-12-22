@@ -187,16 +187,16 @@ class TreeModel(gtk.GenericTreeModel):
             tstr = ''
             for tag in tags:
                 if tag not in self.hidetags:
-                    style = {'color':'black', 'background':'#ffffaa'}
+                    style = {'color':'black', 'background':gtklib.PYELLOW}
                     if tag == currentBookmark:
-                        style['background'] = '#ffcc99'
+                        style['background'] = gtklib.PORANGE
                     tstr += gtklib.markup(' %s ' % tag, **style) + ' '
 
             branch = ctx.branch()
             bstr = ''
             if self.branchtags.get(branch) == node:
                 bstr += gtklib.markup(' %s ' % branch, color='black',
-                                      background='#aaffaa') + ' '
+                                      background=gtklib.PGREEN) + ' '
 
             author = hglib.toutf(hglib.username(ctx.user()))
             age = hglib.age(ctx.date())
@@ -229,11 +229,11 @@ class TreeModel(gtk.GenericTreeModel):
             M, A, R = self.repo.status(ctx.parents()[0].node(), ctx.node())[:3]
             common = dict(color='black')
             M = M and gtklib.markup(' %s ' % len(M),
-                                    background='#ffddaa', **common) or ''
+                                    background=gtklib.PORANGE, **common) or ''
             A = A and gtklib.markup(' %s ' % len(A),
-                                    background='#aaffaa', **common) or ''
+                                    background=gtklib.PGREEN, **common) or ''
             R = R and gtklib.markup(' %s ' % len(R),
-                                    background='#ffcccc', **common) or ''
+                                    background=gtklib.PRED, **common) or ''
             changes = ''.join((M, A, R))
 
             revision = (sumstr, author, taglist, color, age, changes, status)

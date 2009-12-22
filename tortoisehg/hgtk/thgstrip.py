@@ -198,11 +198,11 @@ class StripDialog(gtk.Dialog):
 
     def preview_updated(self, cslist, total, *args):
         if total is None:
-            info = '<span weight="bold" foreground="#880000">%s</span>' \
-                        % _('Unknown revision!')
+            info = gtklib.markup(_('Unknown revision!'),
+                                 weight='bold', color=gtklib.DRED)
         else:
-            info = _('<span weight="bold">%s changesets</span> will'
-                     ' be stripped') % total
+            inner = gtklib.markup(_('%s changesets') % total, weight='bold')
+            info = _('%s will be stripped') % inner
         self.resultlbl.set_markup(info)
         self.stripbtn.set_sensitive(bool(total))
 

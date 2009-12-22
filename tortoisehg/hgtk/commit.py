@@ -408,7 +408,7 @@ class GCommit(GStatus):
         def markup_func(widget, item, value):
             if item == 'athead' and value is False:
                 text = '[%s]' % _('Not at head')
-                return gtklib.markup(text, weight='bold', color='#880000')
+                return gtklib.markup(text, weight='bold', color=gtklib.DRED)
             raise csinfo.UnknownItem(item)
         custom = csinfo.custom(data=data_func, markup=markup_func)
         factory = csinfo.factory(self.repo, custom, style)
