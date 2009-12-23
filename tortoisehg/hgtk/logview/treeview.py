@@ -517,7 +517,7 @@ class TreeView(gtk.ScrolledWindow):
         col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 10)
+        cell.set_property("width-chars", 16)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         col = self.tvcolumns['age'] = gtk.TreeViewColumn(_('Age'))
         col.set_visible(True)
