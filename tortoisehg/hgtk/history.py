@@ -200,6 +200,27 @@ class GLog(gdialog.GDialog):
                             toggle=True,
                             icon='menupatch.ico')
             tbar += [gtk.SeparatorToolItem(), self.mqtb]
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        tbar.append(sep)
+        tbar += [
+            self.make_toolbutton(gtk.STOCK_OK, _('Commit'),
+                self.launch, userdata='commit', icon='menucommit.ico',
+                tip=_('Launch commit tool')),
+            self.make_toolbutton(gtk.STOCK_OK, _('Datamine'),
+                self.launch, userdata='datamine', icon='menurepobrowse.ico',
+                tip=_('Launch data mining tool')),
+            self.make_toolbutton(gtk.STOCK_OK, _('Recovery'),
+                self.launch, userdata='recovery', icon='general.ico',
+                tip=_('Launch recovery tool')),
+            self.make_toolbutton(gtk.STOCK_OK, _('Serve'),
+                self.launch, userdata='serve', icon='proxy.ico',
+                tip=_('Launch web server')),
+            self.make_toolbutton(gtk.STOCK_OK, _('Shelve'),
+                self.launch, userdata='shelve', icon='shelve.ico',
+                tip=_('Launch shelve tool')),
+                ]
         return tbar
 
     def get_menu_list(self):
