@@ -326,11 +326,8 @@ class GDialog(gtk.Window):
         if tip:
             tbutton.set_tooltip(self.tooltips, tip)
         if icon:
-            path = paths.get_tortoise_icon(icon)
-            if path:
-                image = gtk.Image()
-                image.set_from_file(path)
-                tbutton.set_icon_widget(image)
+            image = self.icon_from_name(icon)
+            tbutton.set_icon_widget(image)
         tbutton.set_use_underline(True)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
@@ -426,6 +423,22 @@ class GDialog(gtk.Window):
     def setfocus(self, window, event):
         self.lastpos = self.get_position()
 
+    def icon_from_name(self, icon):
+        if icon.startswith('gtk'):
+            img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
+        else:
+            img = gtk.Image()
+            ico = paths.get_tortoise_icon(icon)
+            if not ico:
+                return img
+            try:
+                width, height = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)
+                buf = gtk.gdk.pixbuf_new_from_file_at_size(ico, width, height)
+                img.set_from_pixbuf(buf)
+            except: # don't let broken gtk+ to break dialogs
+                pass
+        return img
+
     def _setup_gtk(self):
         self.set_title(self.get_title())
         gtklib.set_tortoise_icon(self, self.get_icon())
@@ -513,22 +526,7 @@ class GDialog(gtk.Window):
                             item.set_active(check)
                         elif icon:
                             item = gtk.ImageMenuItem(text)
-                            if icon.startswith('gtk'):
-                                img = gtk.image_new_from_stock(
-                                    icon, gtk.ICON_SIZE_MENU)
-                            else:
-                                img = gtk.Image()
-                                ico = paths.get_tortoise_icon(icon)
-                                if ico:
-                                    try:
-                                        width, height = gtk.icon_size_lookup(
-                                            gtk.ICON_SIZE_MENU)
-                                        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
-                                            ico, width, height)
-                                        img.set_from_pixbuf(pixbuf)
-                                    except:
-                                        # don't let broken gtk+ to break dialogs
-                                        pass
+                            img = self.icon_from_name(icon)
                             item.set_image(img)
                         else:
                             item = gtk.MenuItem(text)
