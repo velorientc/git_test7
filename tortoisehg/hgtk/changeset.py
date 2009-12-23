@@ -133,6 +133,19 @@ class ChangeSet(gdialog.GDialog):
         else:
             parent = self.repo[-1]
 
+        oldother = hasattr(self, 'otherparent') and self.otherparent or None
+        self.otherparent = len(parents) == 2 and self.diff_other_parent()
+
+        # refresh merge row without graph redrawing
+        if self.graphview:
+            gview = self.graphview
+            if oldother:
+                gview.model.clear_parents()
+            elif self.otherparent:
+                gview.model.set_parent(ctx.rev(), parent)
+            gview.hide()
+            gview.show()
+
         # update dialog title
         self.set_title(title)
 

@@ -51,8 +51,8 @@ class TreeModel(gtk.GenericTreeModel):
         self.origtip = opts['orig-tip']
         self.npreviews = opts['npreviews']
         self.showgraph = opts['show-graph']
-        self.revisions = {}
         self.graphdata = graphdata
+        self.revisions, self.parents = {}, {}
         self.wcparents, self.tagrevs, self.branchtags = [], [], {}
         self.refresh()
 
@@ -230,7 +230,10 @@ class TreeModel(gtk.GenericTreeModel):
                     # new
                     status += 2
 
-            M, A, R = self.repo.status(ctx.parents()[0].node(), ctx.node())[:3]
+            parent = self.parents.get(revid, None)
+            if parent is None:
+                parent = ctx.parents()[0].node()
+            M, A, R = self.repo.status(parent, ctx.node())[:3]
             common = dict(color='black')
             M = M and gtklib.markup(' %s ' % len(M),
                                     background=gtklib.PORANGE, **common) or ''
@@ -309,3 +312,13 @@ class TreeModel(gtk.GenericTreeModel):
             self.color_cache[author] = color
         return self.color_cache[author]
 
+    def set_parent(self, rev, parent):
+        self.parents[rev] = parent
+        if rev in self.revisions:
+            del self.revisions[rev]
+
+    def clear_parents(self):
+        for rev in self.parents.keys():
+            if rev in self.revisions:
+                del self.revisions[rev]
+        self.parents = {}
