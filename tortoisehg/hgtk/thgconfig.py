@@ -130,6 +130,10 @@ _log_info = (
         ' Default: None')),
     (_('Use Expander'), 'tortoisehg.changeset-expander', ['False', 'True'],
         _('Show changeset details with an expander')),
+    (_('Toolbar Style'), 'tortoisehg.logtbarstyle',
+        ['small', 'large', 'theme'],
+        _('Adjust the display of the main toolbar in the Repository'
+          ' Explorer.  Values: small, large, or theme.  Default: theme')),
         )
 
 _paths_info = (

@@ -569,6 +569,14 @@ class GLog(gdialog.GDialog):
         self.origtip = len(self.repo)
         self.graphview.set_property('branch-color', self.branch_color)
 
+        style = self.repo.ui.config('tortoisehg', 'logtbarstyle', 'theme')
+        if style == 'small':
+            self.toolbar.set_icon_size(gtk.ICON_SIZE_MENU)
+            self.toolbar.set_property('toolbar-style', gtk.TOOLBAR_ICONS)
+        if style == 'large':
+            self.toolbar.set_icon_size(gtk.ICON_SIZE_LARGE_TOOLBAR)
+            self.toolbar.set_property('toolbar-style', gtk.TOOLBAR_BOTH)
+
         # ignore file patterns that imply repo root
         if len(self.pats) == 1 and self.pats[0] in (root, root+os.sep, ''):
             self.pats = []
