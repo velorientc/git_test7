@@ -47,9 +47,12 @@ CRegStdBase::CRegStdBase()
 CRegStdBase::CRegStdBase (const tstring& key, bool force, HKEY base, REGSAM sam)
     : CRegBaseCommon<tstring> (key, force, base, sam)
 {
-	tstring::size_type pos = key.find_last_of(_T('\\'));
-    m_path = key.substr(0, pos);
-	m_key = key.substr(pos + 1);
+    tstring::size_type pos = key.find_last_of(_T('\\'));
+    if (pos != tstring::npos)
+    {
+        m_path = key.substr(0, pos);
+        m_key = key.substr(pos + 1);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

@@ -200,6 +200,27 @@ class GLog(gdialog.GDialog):
                             toggle=True,
                             icon='menupatch.ico')
             tbar += [gtk.SeparatorToolItem(), self.mqtb]
+        sep = gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        tbar.append(sep)
+        tbar += [
+            self.make_toolbutton(gtk.STOCK_OK, _('Commit'),
+                self.launch, userdata='commit', icon='menucommit.ico',
+                tip=_('Launch commit tool')),
+            self.make_toolbutton(gtk.STOCK_OK, _('Datamine'),
+                self.launch, userdata='datamine', icon='menurepobrowse.ico',
+                tip=_('Launch data mining tool')),
+            self.make_toolbutton(gtk.STOCK_OK, _('Recovery'),
+                self.launch, userdata='recovery', icon='general.ico',
+                tip=_('Launch recovery tool')),
+            self.make_toolbutton(gtk.STOCK_OK, _('Serve'),
+                self.launch, userdata='serve', icon='proxy.ico',
+                tip=_('Launch web server')),
+            self.make_toolbutton(gtk.STOCK_OK, _('Shelve'),
+                self.launch, userdata='shelve', icon='shelve.ico',
+                tip=_('Launch shelve tool')),
+                ]
         return tbar
 
     def get_menu_list(self):
@@ -547,6 +568,14 @@ class GLog(gdialog.GDialog):
 
         self.origtip = len(self.repo)
         self.graphview.set_property('branch-color', self.branch_color)
+
+        style = self.repo.ui.config('tortoisehg', 'logtbarstyle', 'theme')
+        if style == 'small':
+            self.toolbar.set_icon_size(gtk.ICON_SIZE_MENU)
+            self.toolbar.set_property('toolbar-style', gtk.TOOLBAR_ICONS)
+        if style == 'large':
+            self.toolbar.set_icon_size(gtk.ICON_SIZE_LARGE_TOOLBAR)
+            self.toolbar.set_property('toolbar-style', gtk.TOOLBAR_BOTH)
 
         # ignore file patterns that imply repo root
         if len(self.pats) == 1 and self.pats[0] in (root, root+os.sep, ''):
@@ -1982,14 +2011,14 @@ class GLog(gdialog.GDialog):
         # etc, but check in case they've been modified by something else...
         oldbookmarks = hglib.get_repo_bookmarks(self.repo)
         oldlen = len(self.repo)
-        oldcurrent = bookmarks.current(self.repo)
+        oldcurrent = hglib.get_repo_bookmarkcurrent(self.repo)
         rev = str(self.currevid)
         bmark = self.get_rev_tag(rev, include=oldbookmarks)
 
         def refresh(*args):
             self.refresh_on_current_marker_change(oldlen, oldbookmarks, oldcurrent,
                                                   hglib.get_repo_bookmarks(self.repo),
-                                                  bookmarks.current(self.repo))
+                                                  hglib.get_repo_bookmarkcurrent(self.repo))
 
         dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_CURRENT,
                                          bmark, rev)

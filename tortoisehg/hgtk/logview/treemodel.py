@@ -69,17 +69,7 @@ class TreeModel(gtk.GenericTreeModel):
         self.set_author_color()
         self.hidetags = repo.ui.config('tortoisehg', 'hidetags', '').split()
 
-        # Check if we're using bookmarks, and have the 'track.current'
-        # option set; if so, find what the 'current' bookmark is
-        self.curbookmark = None
-        bookmarks = None
-        try:
-            bookmarks = hglib.extensions.find('bookmarks')
-        except KeyError:
-            pass
-        if bookmarks:
-            if repo.ui.configbool('bookmarks', 'track.current'):
-                self.curbookmark = bookmarks.current(repo)
+        self.curbookmark = hglib.get_repo_bookmarkcurrent(repo)
         try:
             self.wcparents = [x.rev() for x in repo.parents()]
             self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]

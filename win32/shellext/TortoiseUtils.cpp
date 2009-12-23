@@ -132,6 +132,8 @@ std::string DirName(const std::string& filename)
     if (filename.empty())
         return filename;
     std::string::size_type pos = filename.find_last_of("\\");
+    if (pos == std::string::npos)
+        return "";
     std::string myfilename = filename.substr(0, pos);
     if (myfilename.size() > 0 && myfilename[myfilename.size()-1] == ':')
         myfilename.push_back('\\');
@@ -143,6 +145,8 @@ std::string BaseName(const std::string& filename)
     if (filename.empty())
         return filename;
     std::string::size_type pos = filename.find_last_of("\\");
+    if (pos == std::string::npos)
+        return filename;
     return filename.substr(pos+1);
 }
 
