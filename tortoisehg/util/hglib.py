@@ -298,7 +298,10 @@ def get_repo_bookmarks(repo, values=False):
     If the extension is not loaded, returns an empty
     list/dict.
     """
-    bookmarks = extensions.find('bookmarks')
+    try:
+        bookmarks = extensions.find('bookmarks')
+    except KeyError:
+        return values and {} or []
     if bookmarks:
         # Bookmarks changed from 1.4 to 1.5...
         if hasattr(bookmarks, 'parse'):
@@ -324,7 +327,10 @@ def get_repo_bookmarkcurrent(repo):
     If the extension is not loaded, or track.current
     is not set, returns None
     """
-    bookmarks = extensions.find('bookmarks')
+    try:
+        bookmarks = extensions.find('bookmarks')
+    except KeyError:
+        return None
     if bookmarks and repo.ui.configbool('bookmarks', 'track.current'):
         # Bookmarks changed from 1.4 to 1.5...
         if hasattr(bookmarks, 'current'):
