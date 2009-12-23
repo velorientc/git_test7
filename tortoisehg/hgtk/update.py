@@ -29,7 +29,6 @@ class UpdateDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
-        self.connect('response', self.dialog_response)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -46,7 +45,7 @@ class UpdateDialog(gtk.Dialog):
         # persistent settings
         self.settings = settings.Settings('update')
         
-        # layout table for fixed items
+        # layout table
         table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
         self.table = table
@@ -57,21 +56,6 @@ class UpdateDialog(gtk.Dialog):
         entry.set_width_chars(38)
         entry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
         table.add_row(_('Update to:'), combo, padding=False)
-
-        ## update method
-        btn = gtk.CheckButton(_('Discard local changes, no backup (-C/--clean)'))
-        self.opt_clean = btn
-        table.add_row(None, btn)
-
-        ## automatically merge, if possible (similar to command-line behavior)
-        check = gtk.CheckButton(_('Always merge (when possible)'))
-        self.opt_merge = check
-        table.add_row(None, check)
-
-        ## always show command log widget
-        showlog = gtk.CheckButton(_('Always show log'))
-        self.opt_showlog = showlog
-        table.add_row(None, showlog)
 
         ## fill list of combo
         if rev != None:
@@ -114,7 +98,24 @@ class UpdateDialog(gtk.Dialog):
             table.add_row(_('Parent:'), self.parent1_label)
             self.parent2_label = None
 
+        ## option expander
+        self.expander = gtk.Expander(_('Options:'))
+        self.expander.connect('notify::expanded', self.options_expanded)
+
+        ### update method (fixed)
+        self.opt_clean = gtk.CheckButton(_('Discard local changes, '
+                                           'no backup (-C/--clean)'))
+        table.add_row(self.expander, self.opt_clean)
+
+        ### other options (foldable), put later
+        ### automatically merge, if possible (similar to command-line behavior)
+        self.opt_merge = gtk.CheckButton(_('Always merge (when possible)'))
+
+        ### always show command log widget
+        self.opt_showlog = gtk.CheckButton(_('Always show log'))
+
         # signal handlers
+        self.connect('response', self.dialog_response)
         self.revcombo.connect('changed', lambda b: self.update_summaries())
         self.opt_clean.connect('toggled', lambda b: self.update_summaries())
 
@@ -139,11 +140,21 @@ class UpdateDialog(gtk.Dialog):
         self.settings.write()
 
     def after_init(self):
+        # append options
+        self.opttable = gtklib.LayoutTable()
+        self.vbox.pack_start(self.opttable, False, False)
+        self.opttable.add_row(None, self.opt_merge, ypad=0)
+        self.opttable.add_row(None, self.opt_showlog, ypad=0)
+
+        # layout group
+        layout = gtklib.LayoutGroup()
+        layout.add(self.table, self.opttable, force=True)
+
         # CmdWidget
         self.cmd = hgcmd.CmdWidget()
         self.cmd.show_all()
         self.cmd.hide()
-        self.vbox.pack_start(self.cmd, True, True, 6)
+        self.vbox.pack_start(self.cmd, False, False, 6)
 
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
@@ -177,6 +188,12 @@ class UpdateDialog(gtk.Dialog):
 
         self.run() # don't close dialog
 
+    def options_expanded(self, expander, *args):
+        if expander.get_expanded():
+            self.opttable.show_all()
+        else:
+            self.opttable.hide()
+
     def switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
             normal = True
@@ -189,6 +206,7 @@ class UpdateDialog(gtk.Dialog):
         working = not normal
 
         self.table.set_sensitive(normal)
+        self.opttable.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
