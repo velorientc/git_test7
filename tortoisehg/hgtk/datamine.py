@@ -13,7 +13,7 @@ import Queue
 import threading
 import re
 
-from mercurial import util
+from mercurial import util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, thread2
@@ -191,7 +191,7 @@ class DataMineDialog(gdialog.GDialog):
         parent_ctx = self.repo[parent_revid]
         try:
             parent_ctx.filectx(filepath)
-        except LookupError:
+        except error.LookupError:
             # file was renamed/moved, try to find previous file path
             end_iter = iter
             path = graphview.get_path_at_revid(int(anotrev))
@@ -208,7 +208,7 @@ class DataMineDialog(gdialog.GDialog):
                     if renamed:
                         filepath = renamed[0]
                         break
-                except LookupError:
+                except error.LookupError:
                     # break iteration, but don't use 'break' statement
                     # so that execute 'else' block for showing prompt.
                     iter = end_iter
@@ -453,7 +453,7 @@ class DataMineDialog(gdialog.GDialog):
         def threadfunc(q, *args):
             try:
                 hglib.hgcmd_toq(q, *args)
-            except (util.Abort, hglib.LookupError), e:
+            except (util.Abort, error.LookupError), e:
                 self.stbar.set_status_text(_('Abort: %s') % str(e))
 
         thread = thread2.Thread(target=threadfunc, args=args)
@@ -580,7 +580,7 @@ class DataMineDialog(gdialog.GDialog):
             ctx = self.repo.parents()[0]
             try:
                 fctx = ctx.filectx(path)
-            except LookupError:
+            except error.LookupError:
                 gdialog.Prompt(_('File is unrevisioned'),
                        _('Unable to annotate ') + path, self).run()
                 return
@@ -752,7 +752,7 @@ class DataMineDialog(gdialog.GDialog):
         def threadfunc(q, *args):
             try:
                 hglib.hgcmd_toq(q, *args)
-            except (util.Abort, hglib.LookupError), e:
+            except (util.Abort, error.LookupError), e:
                 self.stbar.set_status_text(_('Abort: %s') % str(e))
 
         (frame, treeview, origpath, graphview) = objs

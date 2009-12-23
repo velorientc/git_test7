@@ -31,14 +31,16 @@ WFILE = 4
 
 BRANCH = 5          # calculated on demand, not cached
 HEXID = 6
-LOCALTIME = 7
-UTC = 8
+REVHEX = 7
+LOCALTIME = 8
+UTC = 9
 
-MESSAGE = 9         # calculated on demand, cached
-COMMITER = 10
-TAGS = 11
-FGCOLOR = 12
-AGE = 13
+MESSAGE = 10        # calculated on demand, cached
+COMMITER = 11
+TAGS = 12
+FGCOLOR = 13
+AGE = 14
+CHANGES = 15
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -51,16 +53,8 @@ class TreeModel(gtk.GenericTreeModel):
         self.showgraph = opts['show-graph']
         self.revisions = {}
         self.graphdata = graphdata
-        self.set_author_color()
-        self.hidetags = self.repo.ui.config(
-            'tortoisehg', 'hidetags', '').split()
         self.wcparents, self.tagrevs, self.branchtags = [], [], {}
-        try:
-            self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
-            self.branchtags = repo.branchtags()
-            self.wcparents = [x.rev() for x in repo.parents()]
-        except util.Abort:
-            pass
+        self.refresh()
 
     def refresh(self):
         repo = self.repo
@@ -70,12 +64,32 @@ class TreeModel(gtk.GenericTreeModel):
         except error.RepoLookupError:
             oldbranches = []
 
-        repo.invalidate()
-        repo.dirstate.invalidate()
+        hglib.invalidaterepo(repo)
 
-        self.wcparents = [x.rev() for x in repo.parents()]
-        self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
-        self.branchtags = repo.branchtags()
+        self.set_author_color()
+        self.hidetags = repo.ui.config('tortoisehg', 'hidetags', '').split()
+
+        # Check if we're using bookmarks, and have the 'track.current'
+        # option set; if so, find what the 'current' bookmark is
+        self.curbookmark = None
+        bookmarks = None
+        try:
+            bookmarks = hglib.extensions.find('bookmarks')
+        except KeyError:
+            pass
+        if bookmarks:
+            if repo.ui.configbool('bookmarks', 'track.current'):
+                # bookmarks.py changed between 1.4 and 1.5
+                if hasattr(repo, '_bookmarkcurrent'):
+                    self.curbookmark = repo._bookmarkcurrent
+                else:
+                    self.curbookmark = bookmarks.current(repo)
+        try:
+            self.wcparents = [x.rev() for x in repo.parents()]
+            self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
+            self.branchtags = repo.branchtags()
+        except util.Abort:
+            pass
         brevs = [repo[n].rev() for n in self.branchtags.values()]
         allrevs = set(oldtags + oldparents + oldbranches +
                       brevs + self.wcparents + self.tagrevs)
@@ -98,6 +112,7 @@ class TreeModel(gtk.GenericTreeModel):
 
         if index == BRANCH: return str
         if index == HEXID: return str
+        if index == REVHEX: return str
         if index == LOCALTIME: return str
         if index == UTC: return str
 
@@ -106,6 +121,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == TAGS: return str
         if index == FGCOLOR: return str
         if index == AGE: return str
+        if index == CHANGES: return str
 
     def on_get_iter(self, path):
         return path[0]
@@ -124,13 +140,16 @@ class TreeModel(gtk.GenericTreeModel):
             return []
         if column == WFILE: return path or ''
 
-        if column in (HEXID, BRANCH, LOCALTIME, UTC):
+        if column in (HEXID, REVHEX, BRANCH, LOCALTIME, UTC):
             try:
                 ctx = self.repo[revid]
             except IndexError:
                 return None
             if column == HEXID:
                 return str(ctx)
+            if column == REVHEX:
+                hexid = gtklib.markup(str(ctx), face='monospace')
+                return '%s: %s' % (revid, hexid)
             if column == BRANCH:
                 return ctx.branch()
             if column == LOCALTIME:
@@ -162,19 +181,22 @@ class TreeModel(gtk.GenericTreeModel):
             escape = gtklib.markup_escape_text
             summary = escape(hglib.toutf(summary))
             node = ctx.node()
+
             tags = self.repo.nodetags(node)
             taglist = hglib.toutf(', '.join(tags))
             tstr = ''
             for tag in tags:
                 if tag not in self.hidetags:
-                    tstr += gtklib.markup(' %s ' % tag, color='black',
-                                          background='#ffffaa') + ' '
+                    style = {'color':'black', 'background':gtklib.PYELLOW}
+                    if tag == self.curbookmark:
+                        style['background'] = gtklib.PORANGE
+                    tstr += gtklib.markup(' %s ' % tag, **style) + ' '
 
             branch = ctx.branch()
             bstr = ''
             if self.branchtags.get(branch) == node:
                 bstr += gtklib.markup(' %s ' % branch, color='black',
-                                      background='#aaffaa') + ' '
+                                      background=gtklib.PGREEN) + ' '
 
             author = hglib.toutf(hglib.username(ctx.user()))
             age = hglib.age(ctx.date())
@@ -204,13 +226,23 @@ class TreeModel(gtk.GenericTreeModel):
                     # new
                     status += 2
 
-            revision = (sumstr, author, taglist, color, age, status)
+            M, A, R = self.repo.status(ctx.parents()[0].node(), ctx.node())[:3]
+            common = dict(color='black')
+            M = M and gtklib.markup(' %s ' % len(M),
+                                    background=gtklib.PORANGE, **common) or ''
+            A = A and gtklib.markup(' %s ' % len(A),
+                                    background=gtklib.PGREEN, **common) or ''
+            R = R and gtklib.markup(' %s ' % len(R),
+                                    background=gtklib.PRED, **common) or ''
+            changes = ''.join((M, A, R))
+
+            revision = (sumstr, author, taglist, color, age, changes, status)
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
         if column == GRAPHNODE:
             column, color = graphnode
-            return (column, color, revision[5])
+            return (column, color, revision[-1])
         else:
             return revision[column-MESSAGE]
 
@@ -250,7 +282,7 @@ class TreeModel(gtk.GenericTreeModel):
                 self.author_pats.append((re.compile(pat, re.I), v))
             try:
                 enabled = self.repo.ui.configbool('tortoisehg', 'authorcolor')
-            except hglib.ConfigError:
+            except error.ConfigError:
                 enabled = False
             if self.author_pats or enabled:
                 self.color_func = self.text_color_author

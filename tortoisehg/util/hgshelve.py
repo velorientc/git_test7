@@ -130,11 +130,11 @@ class header(object):
                     if selected(i):
                         shunks += 1
                         slines += h.added + h.removed
-                str += "<span foreground='#000088'>"
+                str += '<span foreground="%s">' % gtklib.DBLUE
                 str += _('total: %d hunks (%d changed lines); '
                         'selected: %d hunks (%d changed lines)') % (hunks,
                                 lines, shunks, slines)
-                str += "</span>"
+                str += '</span>'
                 break
             str += hglib.toutf(h)
         return str

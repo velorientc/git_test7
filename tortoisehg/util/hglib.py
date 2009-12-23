@@ -7,14 +7,12 @@
 
 import os
 import sys
-import traceback
-import shlib
+import shlex
 import time
 
-from mercurial.error import RepoError, ParseError, LookupError, RepoLookupError
-from mercurial.error import UnknownCommand, AmbiguousCommand, ConfigError
-from mercurial import hg, ui, util, extensions, commands, hook, match
-from mercurial import dispatch, encoding, templatefilters, bundlerepo, url
+from mercurial import ui, util, extensions, match, bundlerepo, url
+from mercurial import dispatch, encoding, templatefilters, filemerge
+
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
@@ -121,6 +119,8 @@ def invalidaterepo(repo):
     repo.invalidate()
     if '_bookmarks' in repo.__dict__:
         repo._bookmarks = {}
+    if hasattr(repo, '_bookmarkcurrent'):
+        repo._bookmarkcurrent = None
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
@@ -174,7 +174,6 @@ def mergetools(ui, values=None):
     'returns the configured merge tools and the internal ones'
     if values == None:
         values = []
-    from mercurial import filemerge
     for key, value in ui.configitems('merge-tools'):
         t = key.split('.')[0]
         if t not in values:
@@ -188,6 +187,36 @@ def mergetools(ui, values=None):
     values.append('internal:other')
     values.append('internal:fail')
     return values
+
+
+def difftools(ui):
+    tools = {}
+    for cmd, path in ui.configitems('extdiff'):
+        if cmd.startswith('cmd.'):
+            cmd = cmd[4:]
+            if not path:
+                path = cmd
+            diffopts = ui.config('extdiff', 'opts.' + cmd, '')
+            diffopts = diffopts and [diffopts] or []
+            tools[cmd] = [path, diffopts]
+        elif cmd.startswith('opts.'):
+            continue
+        else:
+            # command = path opts
+            if path:
+                diffopts = shlex.split(path)
+                path = diffopts.pop(0)
+            else:
+                path, diffopts = cmd, []
+            tools[cmd] = [path, diffopts]
+    mt = []
+    mergetools(ui, mt)
+    for t in mt:
+        if t.startswith('internal:'):
+            continue
+        opts = ui.config('merge-tools', t + '.diffargs', '')
+        tools[t] = [filemerge._findtool(ui, t), shlex.split(opts)]
+    return tools
 
 
 def hgcmd_toq(q, *args):
@@ -246,3 +275,25 @@ def validate_synch_path(path, repo):
             return_path = path_aux
     return return_path
 
+def get_repo_bookmarks(repo, values=False):
+    if values:
+        return dict(repo._bookmarks)
+    else:
+        return repo._bookmarks.keys()
+
+def is_rev_current(repo, rev):
+    '''
+    Returns True if the revision indicated by 'rev' is the current
+    working directory parent.
+    
+    If rev is '' or None, it is assumed to mean 'tip'.
+    '''
+    if rev in ('', None):
+        rev = 'tip'
+    rev = repo.lookup(rev)
+    parents = repo.parents()
+    
+    if len(parents) > 1:
+        return False
+    
+    return rev == parents[0].node()

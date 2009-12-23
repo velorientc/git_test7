@@ -13,7 +13,7 @@ import gtk
 import pango
 import tempfile
 
-from mercurial import hg, ui, extensions
+from mercurial import hg, ui, extensions, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings
@@ -232,7 +232,7 @@ class EmailDialog(gtk.Window):
         try:
             repo = hg.repository(ui.ui(), path=self.root)
             self.repo = repo
-        except hglib.RepoError:
+        except error.RepoError:
             self.repo = None
             return
 

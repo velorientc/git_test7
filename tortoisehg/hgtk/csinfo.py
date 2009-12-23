@@ -12,15 +12,15 @@ import os
 import gtk
 import binascii
 
-from mercurial import patch, util
-from mercurial.node import short, hex
+from mercurial import patch, util, error
+from mercurial.node import hex
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import gtklib
 
-PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'tags', 'transplant')
+PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'tags', 'transplant', 'p4')
 
 def create(repo, target=None, style=None, custom=None, **kargs):
     return Factory(repo, custom, style, target, **kargs)()
@@ -113,7 +113,7 @@ def ChangesetContext(repo, rev):
         return None
     try:
         ctx = repo[rev]
-    except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+    except (error.LookupError, error.RepoLookupError, error.RepoError):
         ctx = None
     return ctx
 
@@ -165,13 +165,13 @@ class patchctx(object):
                 continue
             try:
                 self._parents.append(repo[p])
-            except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+            except (error.LookupError, error.RepoLookupError, error.RepoError):
                 self._parents.append(p)
 
     def __str__(self):
         node = self.node()
         if node:
-            return short(node)
+            return node[:12]
         return ''
 
     def __int__(self):
@@ -191,6 +191,7 @@ class patchctx(object):
     def tags(self): return ()
     def parents(self): return self._parents
     def children(self): return ()
+    def extra(self): return {}
 
 class SummaryInfo(object):
 
@@ -199,7 +200,8 @@ class SummaryInfo(object):
               'user': _('User:'), 'date': _('Date:'),'age': _('Age:'),
               'dateage': _('Date:'), 'branch': _('Branch:'),
               'tags': _('Tags:'), 'rawbranch': _('Branch:'),
-              'rawtags': _('Tags:'), 'transplant': _('Transplant:')}
+              'rawtags': _('Tags:'), 'transplant': _('Transplant:'),
+              'p4': _('Perforce:')}
 
     def __init__(self):
         pass
@@ -212,7 +214,9 @@ class SummaryInfo(object):
             if item == 'rev':
                 revnum = self.get_data('revnum', *args)
                 revid = self.get_data('revid', *args)
-                return (revnum, revid)
+                if revid:
+                    return (revnum, revid)
+                return None
             elif item == 'revnum':
                 return ctx.rev()
             elif item == 'revid':
@@ -254,7 +258,7 @@ class SummaryInfo(object):
                     if dblist and value in [hglib.toutf(b.strip()) \
                                             for b in dblist.split(',')]:
                         return None
-                return value
+                return None
             elif item == 'rawtags':
                 value = [hglib.toutf(tag) for tag in ctx.tags()]
                 if len(value) == 0:
@@ -269,7 +273,7 @@ class SummaryInfo(object):
                     value = [tag for tag in value if tag not in htags]
                     if len(value) == 0:
                         return None
-                return value
+                return None
             elif item == 'transplant':
                 extra = ctx.extra()
                 try:
@@ -279,6 +283,9 @@ class SummaryInfo(object):
                 except KeyError:
                     pass
                 return None
+            elif item == 'p4':
+                extra = ctx.extra()
+                return extra.get('p4', None)
             elif item == 'ishead':
                 return len(ctx.children()) == 0
             raise UnknownItem(item)
@@ -321,16 +328,18 @@ class SummaryInfo(object):
             if item == 'rev':
                 revnum, revid = value
                 revid = gtklib.markup(revid, **mono)
-                return '%s (%s)' % (revnum, revid)
+                if revnum is not None and revid is not None:
+                    return '%s (%s)' % (revnum, revid)
+                return '%s' % revid
             elif item in ('revid', 'transplant'):
                 return gtklib.markup(value, **mono)
-            elif item == 'revnum':
+            elif item in ('revnum', 'p4'):
                 return str(value)
             elif item in ('rawbranch', 'branch'):
                 return gtklib.markup(' %s ' % value, color='black',
-                                     background='#aaffaa')
+                                     background=gtklib.PGREEN)
             elif item in ('rawtags', 'tags'):
-                opts = dict(color='black', background='#ffffaa')
+                opts = dict(color='black', background=gtklib.PYELLOW)
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
             elif item in ('desc', 'summary', 'user', 'date', 'age'):
