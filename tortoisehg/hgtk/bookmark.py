@@ -353,7 +353,6 @@ class BookmarkDialog(gtk.Dialog):
     def _move_hg_bookmark(self, name, revision):
         if name not in hglib.get_repo_bookmarks(self.repo):
             raise util.Abort(_('No bookmark named "%s" exists') % name)
-
         bookmarks.bookmark(ui=ui.ui(),
                            repo=self.repo,
                            rev=revision,
@@ -380,6 +379,5 @@ class BookmarkDialog(gtk.Dialog):
         
     def _current_hg_bookmark(self, name):
         if name not in hglib.get_repo_bookmarks(self.repo):
-            raise util.Abort(_('no bookmark named "%s" exists') %
-                             name)
+            raise util.Abort(_('No bookmark named "%s" exists') % name)
         bookmarks.setcurrent(self.repo, name)      

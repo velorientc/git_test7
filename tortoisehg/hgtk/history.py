@@ -1982,14 +1982,14 @@ class GLog(gdialog.GDialog):
         # etc, but check in case they've been modified by something else...
         oldbookmarks = hglib.get_repo_bookmarks(self.repo)
         oldlen = len(self.repo)
-        oldcurrent = bookmarks.current(self.repo)
+        oldcurrent = hglib.get_repo_bookmarkcurrent(self.repo)
         rev = str(self.currevid)
         bmark = self.get_rev_tag(rev, include=oldbookmarks)
 
         def refresh(*args):
             self.refresh_on_current_marker_change(oldlen, oldbookmarks, oldcurrent,
                                                   hglib.get_repo_bookmarks(self.repo),
-                                                  bookmarks.current(self.repo))
+                                                  hglib.get_repo_bookmarkcurrent(self.repo))
 
         dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_CURRENT,
                                          bmark, rev)
