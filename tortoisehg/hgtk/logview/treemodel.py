@@ -93,6 +93,11 @@ class TreeModel(gtk.GenericTreeModel):
             if rev in self.revisions:
                 del self.revisions[rev]
 
+        self.mqpatches = []
+        if hasattr(self.repo, 'mq'):
+            self.repo.mq.parse_series()
+            self.mqpatches = [p.name for p in self.repo.mq.applied]
+
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
 
@@ -183,9 +188,12 @@ class TreeModel(gtk.GenericTreeModel):
             tstr = ''
             for tag in tags:
                 if tag not in self.hidetags:
-                    style = {'color':'black', 'background':gtklib.PYELLOW}
+                    bg = gtklib.PYELLOW
                     if tag == self.curbookmark:
-                        style['background'] = gtklib.PORANGE
+                        bg = gtklib.PORANGE
+                    elif tag in self.mqpatches:
+                        bg = gtklib.PBLUE
+                    style = {'color': 'black', 'background': bg}
                     tstr += gtklib.markup(' %s ' % tag, **style) + ' '
 
             branch = ctx.branch()
