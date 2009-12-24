@@ -455,7 +455,7 @@ CShellExtCMenu::QueryContextMenu(
         {
             InsertMenuItemByName(
                 hMenu, menuDescList[idx].name, indexMenu++,
-                idCmd++, idCmdFirst, L"HG "
+                idCmd++, idCmdFirst, L"Hg "
             );
         }
     }
