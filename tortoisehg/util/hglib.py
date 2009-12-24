@@ -101,6 +101,14 @@ def getdeadbranch(ui):
         _deadbranch = dblist
     return _deadbranch
 
+def getlivebranch(repo):
+    lives = []
+    deads = getdeadbranch(repo.ui)
+    for branch in repo.branchtags().keys():
+        if branch not in deads:
+            lives.append(branch)
+    return lives
+
 _hidetags = None
 def gethidetags(ui):
     global _hidetags
