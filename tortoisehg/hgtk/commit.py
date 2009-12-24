@@ -26,7 +26,7 @@ from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
 from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
 
 class BranchOperationDialog(gtk.Dialog):
-    def __init__(self, branch, close, mergebranches):
+    def __init__(self, branch, close, repo):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                             buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
                                      gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL),
@@ -39,11 +39,11 @@ class BranchOperationDialog(gtk.Dialog):
         self.newbranch = None
         self.closebranch = False
 
-        if mergebranches:
+        if len(repo.parents()) == 2:
             lbl = gtk.Label(_('Select branch of merge commit'))
             branchcombo = gtk.combo_box_new_text()
-            for name in mergebranches:
-                branchcombo.append_text(name)
+            for p in repo.parents():
+                branchcombo.append_text(p.branch())
             branchcombo.set_active(0)
             self.vbox.pack_start(lbl, True, True, 2)
             self.vbox.pack_start(branchcombo, True, True, 2)
@@ -56,7 +56,11 @@ class BranchOperationDialog(gtk.Dialog):
         self.newbranchradio = gtk.RadioButton(nochanges,
                 _('Open a new named branch'))
         self.newbranchradio.set_active(True)
-        self.branchentry = gtk.Entry()
+        branchcombo = gtk.combo_box_entry_new_text()
+        for name in hglib.getlivebranch(repo):
+            branchcombo.append_text(name)
+        self.branchentry = branchcombo.child
+
         self.closebranchradio = gtk.RadioButton(nochanges,
                 _('Close current named branch'))
 
@@ -68,7 +72,7 @@ class BranchOperationDialog(gtk.Dialog):
         lbl.set_markup(gtklib.markup(_('Changes take effect on next commit'),
                                      weight='bold'))
         table.add_row(lbl, padding=False, ypad=6)
-        table.add_row(self.newbranchradio, self.branchentry)
+        table.add_row(self.newbranchradio, branchcombo)
         table.add_row(self.closebranchradio)
         table.add_row(nochanges)
 
@@ -390,17 +394,17 @@ class GCommit(GStatus):
         # parent changeset info
         parents_vbox = gtk.VBox(spacing=1)
         self.parents_frame = parents_vbox
-        style = csinfo.labelstyle(contents=(_('Parent: %(rev)s'),
-                       ' %(athead)s', ' %(branch)s', ' %(tags)s',
+        style = csinfo.labelstyle(contents=('%(athead)s ',
+                       _('Parent: %(rev)s'), ' %(branch)s', ' %(tags)s',
                        ' %(summary)s'), selectable=True)
         def data_func(widget, item, ctx):
             if item == 'athead':
-                return widget.get_data('ishead') or self.mqmode
+                return widget.get_data('ishead') or bool(self.mqmode)
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
             if item == 'athead' and value is False:
-                text = '[%s]' % _('not at head revision')
-                return gtklib.markup(text, weight='bold')
+                text = '[%s]' % _('Not at head')
+                return gtklib.markup(text, weight='bold', color=gtklib.DRED)
             raise csinfo.UnknownItem(item)
         custom = csinfo.custom(data=data_func, markup=markup_func)
         factory = csinfo.factory(self.repo, custom, style)
@@ -477,11 +481,8 @@ class GCommit(GStatus):
             liststore.append([sumline, msg])
 
     def branch_clicked(self, button):
-        if self.is_merge():
-            mb = [p.branch() for p in self.repo.parents()]
-        else:
-            mb = None
-        dialog = BranchOperationDialog(self.nextbranch, self.closebranch, mb)
+        dialog = BranchOperationDialog(self.nextbranch,
+                                       self.closebranch, self.repo)
         dialog.run()
         self.nextbranch = None
         self.closebranch = False
@@ -733,7 +734,7 @@ class GCommit(GStatus):
                     self.commit_selected(commit_list)
                 elif self.qheader is not None:
                     self.commit_selected([])
-                elif self.closebranch:
+                elif self.closebranch or self.nextbranch:
                     self.commit_selected([])
                 else:
                     gdialog.Prompt(_('Nothing Commited'),
@@ -858,13 +859,6 @@ class GCommit(GStatus):
         except:
             gdialog.Prompt(_('Undo Commit'),
                     _('Errors during rollback!'), self).run()
-
-
-    def changelog_clicked(self, toolbutton, data=None):
-        from tortoisehg.hgtk import history
-        dlg = history.run(self.ui)
-        dlg.display()
-        return True
 
 
     def should_addremove(self, files):

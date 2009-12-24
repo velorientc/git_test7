@@ -7,10 +7,11 @@
 
 import os
 import gtk
+import gtk.keysyms
 import gobject
 import pango
 
-from mercurial import extensions
+from mercurial import extensions, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -91,23 +92,23 @@ class MQWidget(gtk.VBox):
 
         ## buttons
         self.btn = {}
-        popallbtn = tbar.append_stock(gtk.STOCK_GOTO_FIRST,
+        popallbtn = tbar.append_button(gtk.STOCK_GOTO_FIRST,
                                       _('Unapply all patches'))
         popallbtn.connect('clicked', self.popall_clicked)
         self.btn['popall'] = popallbtn
 
-        popbtn = tbar.append_stock(gtk.STOCK_GO_BACK,
+        popbtn = tbar.append_button(gtk.STOCK_GO_BACK,
                                    _('Unapply last patch'))
         popbtn.connect('clicked', self.pop_clicked)
         self.btn['pop'] = popbtn
 
         pushbtn = gtk.ToolButton(gtk.STOCK_GO_FORWARD)
-        pushbtn = tbar.append_stock(gtk.STOCK_GO_FORWARD,
+        pushbtn = tbar.append_button(gtk.STOCK_GO_FORWARD,
                                     _('Apply next patch'))
         pushbtn.connect('clicked', self.push_clicked)
         self.btn['push'] = pushbtn
 
-        pushallbtn = tbar.append_stock(gtk.STOCK_GOTO_LAST,
+        pushallbtn = tbar.append_button(gtk.STOCK_GOTO_LAST,
                                        _('Apply all patches'))
         pushallbtn.connect('clicked', self.pushall_clicked)
         self.btn['pushall'] = pushallbtn
@@ -183,7 +184,7 @@ class MQWidget(gtk.VBox):
 
         addcol(_('#'), MQ_INDEX, right=True)
         addcol(_('st'), MQ_STATUS)
-        addcol(_('Name'), MQ_NAME, editfunc=cell_edited)
+        addcol(_('Patch'), MQ_NAME, editfunc=cell_edited)
         addcol(_('Summary'), MQ_SUMMARY, resizable=True)
 
         pane.add(self.list)
@@ -193,8 +194,9 @@ class MQWidget(gtk.VBox):
                                    tooltips=tooltips)
         mainbox.pack_start(self.cmd, False, False)
 
-        # accelerator
+        # accelerators
         if accelgroup:
+
             key, mod = gtk.accelerator_parse('F2')
             self.list.add_accelerator('thg-rename', accelgroup,
                     key, mod, gtk.ACCEL_VISIBLE)
@@ -204,6 +206,70 @@ class MQWidget(gtk.VBox):
                     model, paths = sel.get_selected_rows()
                     self.qrename_ui(model[paths[0]][MQ_NAME])
             self.list.connect('thg-rename', thgrename)
+
+            mod = gtk.gdk.CONTROL_MASK
+
+            def mq_move(tree, key):
+                oldrow = tree.get_cursor()[0][0]
+                minval = self.separator_pos + 1
+                if oldrow < minval:
+                    return True
+                maxval = len(self.model) - 1
+                if key == gtk.keysyms.Up:
+                    newrow = oldrow - 1
+                elif key == gtk.keysyms.Down:
+                    newrow = oldrow + 1
+                elif key == gtk.keysyms.Page_Up:
+                    newrow = minval
+                elif key == gtk.keysyms.Page_Down:
+                    newrow = maxval
+                else:
+                    return True
+                if newrow != oldrow and newrow >= minval and newrow <= maxval:
+                    self.move_patch(oldrow, newrow)
+                return True
+
+            def add(name, key, hook=None):
+                self.list.add_accelerator(name, accelgroup, key, mod, 0)
+                if hook:
+                    self.list.connect(name, hook)
+                else:
+                    self.list.connect(name, mq_move, key)
+
+            add('mq-move-up', gtk.keysyms.Up)
+            add('mq-move-down', gtk.keysyms.Down)
+            add('mq-move-top', gtk.keysyms.Page_Up)
+            add('mq-move-bottom', gtk.keysyms.Page_Down)
+            add('mq-pop', gtk.keysyms.Left, lambda _: self.qpop())
+            add('mq-push', gtk.keysyms.Right, lambda _: self.qpush())
+
+    def move_patch(self, oldidx, newidx):
+
+        def list_move_item(list, oldpos, newpos):
+            olditem = list[oldpos]
+            del list[oldpos]
+            list.insert(newpos, olditem)
+
+        # Update series
+        p = self.repo.mq
+        model = self.model
+        oldrow = model[oldidx]
+        newrow = model[newidx]
+        list_move_item(p.full_series, p.find_series(oldrow[MQ_NAME]),
+                                      p.find_series(newrow[MQ_NAME]))
+        p.series_dirty = True
+        p.save_dirty()
+
+        # Update TreeView
+        if newidx < oldidx:
+            model.move_before(oldrow.iter, newrow.iter)
+        else:
+            model.move_after(oldrow.iter, newrow.iter)
+        begin = min(oldidx, newidx)
+        offset = min(oldrow[MQ_INDEX], newrow[MQ_INDEX]) - begin
+        for i in xrange(begin, max(oldidx, newidx) + 1):
+            model[i][MQ_INDEX] = i + offset
+
 
     ### public functions ###
 
@@ -247,7 +313,8 @@ class MQWidget(gtk.VBox):
 
         # insert separator
         if top:
-            self.model.insert_after(top, (INDEX_SEPARATOR, None, None, None, None))
+            row = self.model.insert_after(top, (INDEX_SEPARATOR, None, None, None, None))
+            self.separator_pos = self.model.get_path(row)[0]
 
         # restore patch selection
         if selname:
@@ -318,6 +385,7 @@ class MQWidget(gtk.VBox):
         [MQ] Execute 'qdelete' command.
 
         patch: the patch name or an index to specify the patch.
+        keep: if True, use '--keep' option. (default: False)
         """
         if not self.has_patch():
             return
@@ -429,18 +497,20 @@ class MQWidget(gtk.VBox):
         return self.mqloaded and os.path.isdir(self.repo.mq.path)
 
     def has_patch(self):
-        """ return True if MQ has applicable patch """
-        if self.mqloaded:
-            return len(self.repo.mq.series) > 0
-        return False
+        """ return True if MQ has applicable patches """
+        return bool(self.get_num_patches())
 
     def has_applied(self):
         """ return True if MQ has applied patches """
-        if self.mqloaded:
-            return len(self.repo.mq.applied) > 0
-        return False
+        return bool(self.get_num_applied())
 
-    def number_applied(self):
+    def get_num_patches(self):
+        """ return the number of patches in patch queue """
+        if self.mqloaded:
+            return len(self.repo.mq.series)
+        return 0
+
+    def get_num_applied(self):
         """ return the number of applied patches """
         if self.mqloaded:
             return len(self.repo.mq.applied)
@@ -561,21 +631,20 @@ class MQWidget(gtk.VBox):
         is_qtip = self.is_qtip(row[MQ_NAME])
         is_qparent = row[MQ_INDEX] == INDEX_QPARENT
         is_applied = row[MQ_STATUS] == 'A'
-        is_next = row[MQ_INDEX] == self.number_applied()
+        is_next = row[MQ_INDEX] == self.get_num_applied()
 
         if is_operable and not is_qtip and (not is_qparent or has_applied):
-            append(_('_goto'), self.goto_activated)
+            append(_('_Goto'), self.goto_activated)
         if has_patch and not is_qparent:
-            append(_('_rename'), self.rename_activated)
+            append(_('_Rename'), self.rename_activated)
         if has_applied and not is_qparent:
-            append(_('_finish applied'), self.finish_activated)
+            append(_('_Finish Applied'), self.finish_activated)
         if not is_applied and not is_qparent:
-            append(_('_delete'), self.delete_activated)
-            append(_('delete --keep'), self.delete_keep_activated)
+            append(_('_Delete'), self.delete_activated)
             if has_applied and not is_qparent:
-                append(_('f_old'), self.fold_activated)
+                append(_('F_old'), self.fold_activated)
             if self.hasqup and not is_next:
-                append(_('make it _next'), self.mknext_activated)
+                append(_('Make It _Next'), self.mknext_activated)
 
         if len(menu.get_children()) > 0:
             menu.show_all()
@@ -609,10 +678,9 @@ class MQWidget(gtk.VBox):
 
         self.vmenu = {}
 
-        colappend(_('Show index'), MQ_INDEX)
-        colappend(_('Show status'), MQ_STATUS, active=False)
-        colappend(_('Show name'), MQ_NAME)
-        colappend(_('Show summary'), MQ_SUMMARY, active=False)
+        colappend(_('Show Index'), MQ_INDEX)
+        colappend(_('Show Status'), MQ_STATUS, active=False)
+        colappend(_('Show Summary'), MQ_SUMMARY, active=False)
 
         append(sep=True)
 
@@ -650,6 +718,8 @@ class MQWidget(gtk.VBox):
             self.emit('repo-invalidated')
 
     def do_get_property(self, property):
+        if property.name == 'name-column-visible':
+            return True
         try:
             return self.vmenu[property.name].get_active()
         except:
@@ -698,7 +768,7 @@ class MQWidget(gtk.VBox):
         try:
             ctx = self.repo[patchname]
             revid = ctx.rev()
-        except hglib.RepoError:
+        except (error.RepoError, error.RepoLookupError):
             revid = -1
         self.emit('patch-selected', revid, patchname)
 
@@ -729,9 +799,6 @@ class MQWidget(gtk.VBox):
     def delete_activated(self, menuitem, row):
         self.qdelete(row[MQ_NAME])
 
-    def delete_keep_activated(self, menuitem, row):
-        self.qdelete(row[MQ_NAME], keep=True)
-    
     def rename_activated(self, menuitem, row):
         self.qrename_ui(row[MQ_NAME])
 
