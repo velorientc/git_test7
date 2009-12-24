@@ -251,22 +251,29 @@ class BrowsePane(gtk.TreeView):
 
     def popupmenu(self, browse):
         model, tpaths = browse.get_selection().get_selected_rows()
-        if not tpaths:
-            return
-        cpaths = [model[p][0] for p in tpaths]
-        files = [os.path.join(self.cwd, p) for p in cpaths]
-        if self.currepo:
-            repo = self.currepo
-            menus = self.menu.get_commands(repo, self.cwd, files)
+        if tpaths:
+            cpaths = [model[p][0] for p in tpaths]
+            files = [os.path.join(self.cwd, p) for p in cpaths]
+            if self.currepo:
+                repo = self.currepo
+                menus = self.menu.get_commands(repo, self.cwd, files)
+            else:
+                menus = self.menu.get_norepo_commands(None, cpaths)
+                hgdir = os.path.join(self.cwd, cpaths[0], '.hg')
+                if os.path.isdir(hgdir):
+                    try:
+                        root = os.path.join(self.cwd, cpaths[0])
+                        repo = hg.repository(ui.ui(), path=root)
+                        menus = self.menu.get_commands(repo, self.cwd, files)
+                    except error.RepoError:
+                        pass
         else:
-            menus = self.menu.get_norepo_commands(None, cpaths)
-            hgdir = os.path.join(self.cwd, cpaths[0], '.hg')
-            if os.path.isdir(hgdir):
-                try:
-                    repo = hg.repository(ui.ui(), path=paths.find_root(hgdir))
-                    menus = self.menu.get_commands(repo, self.cwd, files)
-                except error.RepoError:
-                    pass
+            files = []
+            if self.currepo:
+                repo = self.currepo
+                menus = self.menu.get_commands(repo, self.cwd, files)
+            else:
+                menus = self.menu.get_norepo_commands(None, files)
 
         def rundialog(item, hgcmd):
             import sys
