@@ -47,7 +47,7 @@ _tortoise_info = (
         ' the user.  Only used by command line interface commands.')),
     (_('Tab Width'), 'tortoisehg.tabwidth', [],
         _('Specify the number of spaces that tabs expand to in various'
-        ' TortoiseHG windows.'
+        ' TortoiseHg windows.'
         ' Default: Not expanded')),
     (_('Max Diff Size'), 'tortoisehg.maxdiff', ['1024', '0'],
         _('The maximum size file (in KB) that TortoiseHg will '
@@ -72,7 +72,7 @@ _commit_info = (
         _('Name associated with commits')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', ['0', '70'],
        _('Maximum length of the commit message summary line.'
-         ' If set, TortoiseHG will issue a warning if the'
+         ' If set, TortoiseHg will issue a warning if the'
          ' summary line is too long or not separated by a'
          ' blank line. Default: 0 (unenforced)')),
     (_('Message Line Length'), 'tortoisehg.messagewrap', ['0', '80'],
@@ -608,7 +608,7 @@ class ConfigDialog(gtk.Dialog):
                   'Examples: en, en_GB, en_US')),)
 
         # create pages for each section of configuration file
-        self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
+        self.tortoise_frame = self.add_page(notebook, 'TortoiseHg')
         self.fill_frame(self.tortoise_frame, tortoise_info)
 
         self.commit_frame = self.add_page(notebook, _('Commit'))

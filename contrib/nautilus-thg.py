@@ -212,7 +212,7 @@ class HgExtension(nautilus.MenuProvider,
     def get_columns(self):
         return nautilus.Column("HgNautilus::80hg_status",
                                "hg_status",
-                               "HG Status",
+                               "Hg Status",
                                "Version control status"),
 
     def _get_file_status(self, localpath, repo=None):
