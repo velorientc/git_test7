@@ -59,10 +59,9 @@ class BranchOperationDialog(gtk.Dialog):
         branchcombo = gtk.combo_box_entry_new_text()
         self.branchentry = branchcombo.child
 
-        dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
-        deadbranches = [ x.strip() for x in dblist.split(',') ]
+        dblist = hglib.getdeadbranch(repo.ui)
         for name in repo.branchtags().keys():
-            if name not in deadbranches:
+            if name not in dblist:
                 branchcombo.append_text(name)
 
         self.closebranchradio = gtk.RadioButton(nochanges,

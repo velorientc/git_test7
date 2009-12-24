@@ -1713,10 +1713,9 @@ class GLog(gdialog.GDialog):
 
     def get_live_branches(self):
         live = []
-        dblist = self.repo.ui.config('tortoisehg', 'deadbranch', '')
-        deadbranches = [ x.strip() for x in dblist.split(',') ]
+        dblist = hglib.getdeadbranch(self.repo.ui)
         for name in self.repo.branchtags().keys():
-            if name not in deadbranches:
+            if name not in dblist:
                 live.append(name)
         return live
 
