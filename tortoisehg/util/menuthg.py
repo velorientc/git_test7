@@ -49,6 +49,9 @@ thgcmenu = {
     'log':        { 'label': _('Repository Explorer'),
                     'help':  _('View change history in repository'),
                     'icon':  'menulog.ico'},
+    'history':    { 'label': _('File History'),
+                    'help':  _('View change history of selected files'),
+                    'icon':  'menulog.ico'},
     'synch':      { 'label': _('Synchronize'),
                     'help':  _('Synchronize with remote repository'),
                     'icon':  'menusynch.ico'},
@@ -321,7 +324,7 @@ class menuThg:
         menu.add_sep()
 
         if tracked:
-            menu.add_menu('log')
+            menu.add_menu(files and 'history' or 'log')
 
         if len(files) == 0:
             menu.add_sep()
