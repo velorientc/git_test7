@@ -67,7 +67,7 @@ class TreeModel(gtk.GenericTreeModel):
         hglib.invalidaterepo(repo)
 
         self.set_author_color()
-        self.hidetags = repo.ui.config('tortoisehg', 'hidetags', '').split()
+        self.hidetags = hglib.gethidetags(repo.ui)
 
         self.curbookmark = hglib.get_repo_bookmarkcurrent(repo)
         try:
