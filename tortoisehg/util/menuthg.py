@@ -95,6 +95,8 @@ thgcmenu = {
                     'help':  _('Synchronize with dragged repository'),
                     'icon':  'menusynch.ico'}}
 
+_ALWAYS_DEMOTE_ = ('about', 'userconf', 'repoconf')
+
 class TortoiseMenu(object):
 
     def __init__(self, menutext, helptext, hgcmd, icon=None, state=True):
@@ -147,18 +149,12 @@ class TortoiseMenuSep(object):
 
 class thg_menu(object):
 
-    def __init__(self, ui, name = "TortoiseHG"):
+    def __init__(self, ui, promoted, name = "TortoiseHg"):
         self.menus = [[]]
         self.ui = ui
         self.name = name
         self.sep = [False]
-        self.promoted = []
-        pl = self.ui.config('tortoisehg', 'promoteditems', 'commit,log')
-        for item in pl.split(','):
-            item = item.strip()
-            if item:
-                self.promoted.append(str(item))
-
+        self.promoted = promoted
 
     def add_menu(self, hgcmd, icon=None, state=True):
         global thgcmenu
@@ -207,8 +203,22 @@ def open_repo(path):
 class menuThg:
     """shell extension that adds context menu items"""
 
-    def __init__(self):
-        self.name = "TortoiseHG"
+    def __init__(self, internal=False):
+        self.name = "TortoiseHg"
+        promoted = []
+        pl = ui.ui().config('tortoisehg', 'promoteditems', 'commit,log')
+        for item in pl.split(','):
+            item = item.strip()
+            if item:
+                promoted.append(item)
+        if internal:
+            for item in thgcmenu.keys():
+                promoted.append(item)
+        for item in _ALWAYS_DEMOTE_:
+            if item in promoted:
+                promoted.remove(item)
+        self.promoted = promoted
+
 
     def get_commands_dragdrop(self, srcfiles, destfolder):
         """
@@ -234,7 +244,7 @@ class menuThg:
 
         drop_repo = open_repo(destfolder)
 
-        menu = thg_menu(drag_repo.ui, self.name)
+        menu = thg_menu(drag_repo.ui, self.promoted, self.name)
         menu.add_menu('clone')
 
         if drop_repo:
@@ -242,7 +252,7 @@ class menuThg:
         return menu
 
     def get_norepo_commands(self, cwd, files):
-        menu = thg_menu(ui.ui(), self.name)
+        menu = thg_menu(ui.ui(), self.promoted, self.name)
         menu.add_menu('clone')
         menu.add_menu('init')
         menu.add_menu('userconf')
@@ -277,7 +287,7 @@ class menuThg:
         tracked = changed or modified or clean
         new = bool(states & set([cachethg.UNKNOWN, cachethg.IGNORED]))
 
-        menu = thg_menu(repo.ui, self.name)
+        menu = thg_menu(repo.ui, self.promoted, self.name)
         if changed or cachethg.UNKNOWN in states or 'qtip' in repo['.'].tags():
             menu.add_menu('commit')
         if hashgignore or new and len(states) == 1:
