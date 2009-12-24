@@ -92,6 +92,24 @@ def getmaxdiffsize(ui):
     _maxdiff = maxdiff * 1024
     return _maxdiff
 
+_deadbranch = None
+def getdeadbranch(ui):
+    global _deadbranch
+    if _deadbranch is None:
+        db = toutf(ui.config('tortoisehg', 'deadbranch', ''))
+        dblist = [b.strip() for b in db.split(',')]
+        _deadbranch = dblist
+    return _deadbranch
+
+_hidetags = None
+def gethidetags(ui):
+    global _hidetags
+    if _hidetags is None:
+        tags = toutf(ui.config('tortoisehg', 'hidetags', ''))
+        taglist = [t.strip() for t in tags.split()]
+        _hidetags = taglist
+    return _hidetags
+
 def diffexpand(line):
     'Expand tabs in a line of diff/patch text'
     if _tabwidth is None:
