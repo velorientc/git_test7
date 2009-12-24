@@ -10,7 +10,7 @@ import gtk
 import gobject
 import pango
 
-from mercurial import hg, ui, cmdutil
+from mercurial import hg, ui, cmdutil, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths, shlib, menuthg
@@ -254,27 +254,32 @@ class BrowsePane(gtk.TreeView):
         if not tpaths:
             return
         cpaths = [model[p][0] for p in tpaths]
-        files = []
+        files = [os.path.join(self.cwd, p) for p in cpaths]
         if self.currepo:
             repo = self.currepo
-            files = [os.path.join(self.cwd, p) for p in cpaths]
             menus = self.menu.get_commands(repo, self.cwd, files)
         else:
             menus = self.menu.get_norepo_commands(None, cpaths)
+            hgdir = os.path.join(self.cwd, cpaths[0], '.hg')
+            if os.path.isdir(hgdir):
+                try:
+                    repo = hg.repository(ui.ui(), path=paths.find_root(hgdir))
+                    menus = self.menu.get_commands(repo, self.cwd, files)
+                except error.RepoError:
+                    pass
 
         def rundialog(item, hgcmd):
             import sys
             # Spawn background process and exit
             if hasattr(sys, "frozen"):
-                args = [sys.argv[0], hgcmd] + cpaths
+                args = [sys.argv[0], hgcmd] + files
             else:
-                args = [sys.executable] + [sys.argv[0], hgcmd] + cpaths
+                args = [sys.executable] + [sys.argv[0], hgcmd] + files
             if os.name == 'nt':
                 args = ['"%s"' % arg for arg in args]
             oldcwd = os.getcwd()
-            root = paths.find_root(oldcwd)
             try:
-                os.chdir(root)
+                os.chdir(self.cwd)
                 os.spawnv(os.P_NOWAIT, sys.executable, args)
             finally:
                 os.chdir(oldcwd)
