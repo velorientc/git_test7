@@ -338,12 +338,12 @@ class menuThg:
             menu.add_menu('clone')
             if repo.root != cwd:
                 menu.add_menu('init')
-            menu.add_sep()
-            menu.add_menu('userconf')
-            menu.add_menu('repoconf')
 
         # add common menu items
         menu.add_sep()
+        menu.add_menu('userconf')
+        if tracked:
+            menu.add_menu('repoconf')
         menu.add_menu('about')
 
         menu.add_sep()
