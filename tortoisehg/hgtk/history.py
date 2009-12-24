@@ -248,7 +248,7 @@ class GLog(gdialog.GDialog):
             else:
                 hglib._maxdiff = None
             self.reload_log()
-        lb = self.get_live_branches()
+        lb = hglib.getlivebranch(self.repo)
         bmenus = []
         if len(lb) > 1 or (lb and lb[0] != 'default'):
             bmenus.append(dict(text='----'))
@@ -1180,7 +1180,7 @@ class GLog(gdialog.GDialog):
         # filter bar
         self.filterbox = FilterBox(self.tooltips,
                                    self.filter_mode, 
-                                   self.get_live_branches())
+                                   hglib.getlivebranch(self.repo))
         filterbox = self.filterbox
         self.ancestrybutton = filterbox.ancestry
         self.hidemerges = filterbox.hidemerges
@@ -1710,14 +1710,6 @@ class GLog(gdialog.GDialog):
     def thgnavigate(self, treeview):
         'ctrl-g handler'
         self.show_goto_dialog()
-
-    def get_live_branches(self):
-        live = []
-        dblist = hglib.getdeadbranch(self.repo.ui)
-        for name in self.repo.branchtags().keys():
-            if name not in dblist:
-                live.append(name)
-        return live
 
     def select_branch(self, combo):
         row = combo.get_active()

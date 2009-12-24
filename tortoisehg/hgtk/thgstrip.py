@@ -64,10 +64,8 @@ class StripDialog(gtk.Dialog):
         ### fill combo list
         self.revcombo.append_text(rev)
         self.revcombo.set_active(0)
-        dblist = hglib.getdeadbranch(repo.ui)
-        for name in repo.branchtags().keys():
-            if name not in dblist:
-                self.revcombo.append_text(name)
+        for name in hglib.getlivebranch(repo):
+            self.revcombo.append_text(name)
 
         tags = list(repo.tags())
         tags.sort()

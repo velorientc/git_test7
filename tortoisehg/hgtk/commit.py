@@ -57,12 +57,9 @@ class BranchOperationDialog(gtk.Dialog):
                 _('Open a new named branch'))
         self.newbranchradio.set_active(True)
         branchcombo = gtk.combo_box_entry_new_text()
+        for name in hglib.getlivebranch(repo):
+            branchcombo.append_text(name)
         self.branchentry = branchcombo.child
-
-        dblist = hglib.getdeadbranch(repo.ui)
-        for name in repo.branchtags().keys():
-            if name not in dblist:
-                branchcombo.append_text(name)
 
         self.closebranchradio = gtk.RadioButton(nochanges,
                 _('Close current named branch'))

@@ -63,11 +63,8 @@ class UpdateDialog(gtk.Dialog):
         else:
             combo.append_text(repo.dirstate.branch())
         combo.set_active(0)
-
-        dblist = hglib.getdeadbranch(repo.ui)
-        for name in repo.branchtags().keys():
-            if name not in dblist:
-                combo.append_text(name)
+        for name in hglib.getlivebranch(repo):
+            combo.append_text(name)
 
         tags = list(repo.tags())
         tags.sort()
