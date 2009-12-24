@@ -267,7 +267,8 @@ std::string GetHgRepoRoot(const std::string& path)
     std::string p = IsDirectory(path)? path : DirName(path);
     for (;;)
     {
-        if (IsDirectory(p + "\\.hg"))
+        std::string tdir = p + "\\.hg";
+        if (IsDirectory(tdir))
             break;
         std::string oldp = p;
         p = DirName(p);
