@@ -264,11 +264,25 @@ HBITMAP GetTortoiseIconBitmap(const std::string& iconname)
 
 std::string GetHgRepoRoot(const std::string& path)
 {
+    TDEBUG_TRACE("GetHgRepoRoot('" << path << "')");
+
+    if (::PathIsUNCServerShare(path.c_str()))
+    {
+        TDEBUG_TRACE("GetHgRepoRoot: path is UNC share '" << path << "'");
+        return "";
+    }
+
     std::string p = IsDirectory(path)? path : DirName(path);
     for (;;)
     {
         std::string tdir = p + "\\.hg";
-        if (IsDirectory(tdir))
+        if (::PathIsUNCServerShare(tdir.c_str()))
+        {
+            TDEBUG_TRACE("GetHgRepoRoot: tdir is UNC share '" << tdir << "'");
+            p.clear();
+            break;
+        }
+        else if (IsDirectory(tdir))
             break;
         std::string oldp = p;
         p = DirName(p);
@@ -278,6 +292,8 @@ std::string GetHgRepoRoot(const std::string& path)
             break;
         }
     }
+
+    TDEBUG_TRACE("GetHgRepoRoot: returning '" << p << "'");
     return p;
 }
 
