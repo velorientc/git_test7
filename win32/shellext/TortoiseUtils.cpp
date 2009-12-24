@@ -265,8 +265,10 @@ HBITMAP GetTortoiseIconBitmap(const std::string& iconname)
 std::string GetHgRepoRoot(const std::string& path)
 {
     std::string p = IsDirectory(path)? path : DirName(path);
-    while (!IsDirectory(p + "\\.hg"))
+    for (;;)
     {
+        if (IsDirectory(p + "\\.hg"))
+            break;
         std::string oldp = p;
         p = DirName(p);
         if (p == oldp)
