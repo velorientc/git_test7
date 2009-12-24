@@ -263,7 +263,21 @@ class BrowsePane(gtk.TreeView):
             menus = self.menu.get_norepo_commands(None, cpaths)
 
         def rundialog(item, hgcmd):
-            print 'rundialog', hgcmd, cpaths
+            import sys
+            # Spawn background process and exit
+            if hasattr(sys, "frozen"):
+                args = [sys.argv[0], hgcmd] + cpaths
+            else:
+                args = [sys.executable] + [sys.argv[0], hgcmd] + cpaths
+            if os.name == 'nt':
+                args = ['"%s"' % arg for arg in args]
+            oldcwd = os.getcwd()
+            root = paths.find_root(oldcwd)
+            try:
+                os.chdir(root)
+                os.spawnv(os.P_NOWAIT, sys.executable, args)
+            finally:
+                os.chdir(oldcwd)
 
         def create_menu(label, hgcmd=None):
             menuitem = gtk.MenuItem(label, True)
