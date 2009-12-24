@@ -9,6 +9,7 @@ import os
 import sys
 import shlex
 import time
+import inspect
 
 from mercurial import ui, util, extensions, match, bundlerepo, url
 from mercurial import dispatch, encoding, templatefilters, filemerge
@@ -147,8 +148,7 @@ def invalidaterepo(repo):
     # from 1.4 to 1.5...
     for cachedAttr in ('_bookmarks', '_bookmarkcurrent'):
         # Check if it's a property or normal value...
-        classAttr = getattr(repo.__class__, cachedAttr, None)
-        if hasattr(classAttr, '__get__'):
+        if is_descriptor(repo, cachedAttr):
             # The very act of calling hasattr would
             # re-cache the property, so just assume it's
             # already cached, and catch the error if it wasn't.
@@ -381,3 +381,18 @@ def is_rev_current(repo, rev):
         return False
     
     return rev == parents[0].node()
+
+def is_descriptor(obj, attr):
+    """
+    Returns True if obj.attr is a descriptor - ie, accessing
+    the attribute will actually invoke the '__get__' method of
+    some object.
+
+    Returns False if obj.attr exists, but is not a descriptor,
+    and None if obj.attr was not found at all.
+    """
+    for cls in inspect.getmro(obj.__class__):
+        if attr in cls.__dict__:
+            return hasattr(cls.__dict__[attr], '__get__')
+    return None
+    
