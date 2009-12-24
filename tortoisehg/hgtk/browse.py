@@ -84,7 +84,7 @@ class BrowsePane(gtk.TreeView):
         gtk.TreeView.__init__(self)
         self.callback = callback
         self.cachedroot = None
-        self.menu = menuthg.menuThg()
+        self.menu = menuthg.menuThg(internal=True)
         fm = gtk.ListStore(str,  # canonical path
                            bool, # Checked
                            str,  # basename-UTF8
