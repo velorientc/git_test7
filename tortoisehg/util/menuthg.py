@@ -160,7 +160,6 @@ class thg_menu(object):
         self.promoted = promoted
 
     def add_menu(self, hgcmd, icon=None, state=True):
-        global thgcmenu
         if hgcmd in self.promoted:
             pos = 0
         else:
@@ -171,8 +170,10 @@ class thg_menu(object):
         if self.sep[pos]:
             self.sep[pos] = False
             self.menus[pos].append(TortoiseMenuSep())
-        self.menus[pos].append(TortoiseMenu(thgcmenu[hgcmd]['label']['str'],
-                thgcmenu[hgcmd]['help']['str'], hgcmd, thgcmenu[hgcmd]['icon'], state))
+        self.menus[pos].append(TortoiseMenu(
+                thgcmenu[hgcmd]['label']['str'],
+                thgcmenu[hgcmd]['help']['str'], hgcmd,
+                thgcmenu[hgcmd]['icon'], state))
 
     def add_sep(self):
         self.sep = [True for _s in self.sep]
