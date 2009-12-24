@@ -247,17 +247,20 @@ class SummaryInfo(object):
                     return hglib.age(date)
                 return None
             elif item == 'rawbranch':
-                return hglib.toutf(ctx.branch())
+                value = ctx.branch()
+                if value:
+                    return hglib.toutf(value)
+                return None
             elif item == 'branch':
                 value = self.get_data('rawbranch', *args)
                 if value:
                     repo = ctx._repo
                     if ctx.node() not in repo.branchtags().values():
                         return None
-                    dblist = self.get_config(repo, 'tortoisehg', 'deadbranch')
-                    if dblist and value in [hglib.toutf(b.strip()) \
-                                            for b in dblist.split(',')]:
+                    dblist = hglib.getdeadbranch(repo.ui)
+                    if value in dblist:
                         return None
+                    return value
                 return None
             elif item == 'rawtags':
                 value = [hglib.toutf(tag) for tag in ctx.tags()]
@@ -267,12 +270,11 @@ class SummaryInfo(object):
             elif item == 'tags':
                 value = self.get_data('rawtags', *args)
                 if value:
-                    repo = ctx._repo
-                    htags = self.get_config(repo, 'tortoisehg', 'hidetags', '')
-                    htags = [hglib.toutf(b.strip()) for b in htags.split()]
-                    value = [tag for tag in value if tag not in htags]
-                    if len(value) == 0:
+                    htlist = hglib.gethidetags(ctx._repo.ui)
+                    tags = [tag for tag in value if tag not in htlist]
+                    if len(tags) == 0:
                         return None
+                    return tags
                 return None
             elif item == 'transplant':
                 extra = ctx.extra()
@@ -427,19 +429,8 @@ class CachedSummaryInfo(SummaryInfo):
     def get_widget(self, *args, **kargs):
         return self.try_cache('widget', SummaryInfo.get_widget, *args, **kargs)
 
-    def get_config(self, repo, section, key, default=None, untrusted=False):
-        cachekey = repo.root + section + key
-        try:
-            return self.confcache[cachekey]
-        except KeyError:
-            pass
-        value = repo.ui.config(section, key, default, untrusted)
-        self.confcache[cachekey] = value
-        return value
-
     def clear_cache(self):
         self.cache = {}
-        self.confcache = {}
 
 class SummaryBase(object):
 
