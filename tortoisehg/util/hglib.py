@@ -235,7 +235,7 @@ def difftools(ui):
                 path = cmd
             diffopts = ui.config('extdiff', 'opts.' + cmd, '')
             diffopts = diffopts and [diffopts] or []
-            tools[cmd] = [path, diffopts]
+            tools[cmd] = [path, diffopts, None]
         elif cmd.startswith('opts.'):
             continue
         else:
@@ -245,14 +245,16 @@ def difftools(ui):
                 path = diffopts.pop(0)
             else:
                 path, diffopts = cmd, []
-            tools[cmd] = [path, diffopts]
+            tools[cmd] = [path, diffopts, None]
     mt = []
     mergetools(ui, mt)
     for t in mt:
         if t.startswith('internal:'):
             continue
-        opts = ui.config('merge-tools', t + '.diffargs', '')
-        tools[t] = [filemerge._findtool(ui, t), shlex.split(opts)]
+        dopts = ui.config('merge-tools', t + '.diffargs', '')
+        mopts = ui.config('merge-tools', t + '.diff3args', '')
+        dopts, mopts = shlex.split(dopts), shlex.split(mopts)
+        tools[t] = [filemerge._findtool(ui, t), dopts, mopts]
     return tools
 
 
