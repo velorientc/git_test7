@@ -249,6 +249,7 @@ def runcommand(ui, args):
         raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
 
+    cmdoptions['mainapp'] = True
     try:
         return func(ui, *args, **cmdoptions)
     except TypeError, inst:
@@ -435,10 +436,7 @@ def browse(ui, *pats, **opts):
 
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
-    from tortoisehg.hgtk.visdiff import run, rawextdiff
-    if opts.get('raw'):
-        rawextdiff(ui, *pats, **opts)
-        return
+    from tortoisehg.hgtk.visdiff import run
     gtkrun(run, ui, *pats, **opts)
 
 def thgimport(ui, *pats, **opts):

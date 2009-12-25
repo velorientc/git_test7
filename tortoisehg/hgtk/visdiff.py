@@ -10,6 +10,7 @@ import gobject
 import os
 import subprocess
 import shutil
+import threading
 import tempfile
 import re
 
@@ -96,7 +97,7 @@ def visualdiff(ui, repo, pats, opts):
     tool = selecttool(repo.ui)
     if tool is None:
         ui.warn(_('No diff tool found.  Aborting.\n'))
-        return 0
+        return
     diffcmd, diffopts, mergeopts = tool
 
     # Disable 3-way merge if there is only one parent or no tool support
@@ -116,7 +117,9 @@ def visualdiff(ui, repo, pats, opts):
     MA = mod_a | add_a | mod_b | add_b
     MAR = MA | rem_a | rem_b
     if not MAR:
-       return 0
+        gdialog.Prompt(_('No file changes'),
+                      _('There are no file changes to view'), None).run()
+        return
 
     fns_and_mtime = []
     tmproot = tempfile.mkdtemp(prefix='visualdiff.')
@@ -181,16 +184,14 @@ def visualdiff(ui, repo, pats, opts):
                              stdin=subprocess.PIPE).communicate()
         except (OSError, EnvironmentError), e:
             ui.warn(_('Tool launch failure: %s\n') % str(e))
-            return 0
+            return
 
         # detect if changes were made to mirrored working files
         for copy_fn, working_fn, mtime in fns_and_mtime:
             if os.path.getmtime(copy_fn) != mtime:
-                # TODO: Prompt dialog, yes or no, once
                 ui.debug('file changed while diffing. '
                          'Overwriting: %s (src: %s)\n' % (working_fn, copy_fn))
                 util.copyfile(copy_fn, working_fn)
-        return 1
     finally:
         ui.note(_('cleaning up temp directory\n'))
         shutil.rmtree(tmproot)
@@ -469,7 +470,6 @@ class FileSelectionDialog(gtk.Dialog):
 
 def rawextdiff(ui, *pats, **opts):
     'launch raw extdiff command, block until finish'
-    from hgext import extdiff
     try:
         path = opts.get('bundle') or paths.find_root()
         repo = hg.repository(ui, path=path)
@@ -477,48 +477,20 @@ def rawextdiff(ui, *pats, **opts):
         # hgtk should catch this earlier
         ui.warn(_('No repository found here') + '\n')
         return
-    pats = hglib.canonpaths(pats)
-    try:
-        ret = visualdiff(ui, repo, pats, opts)
-    except OSError, e:
-        ui.warn(str(e) + '\n')
-        return
-    if ret == 0:
-        gdialog.Prompt(_('No file changes'),
-                      _('There are no file changes to view'), None).run()
+    if opts.get('mainapp'):
+        visualdiff(ui, repo, pats, opts)
+    else:
+        def dodiff():
+            visualdiff(ui, repo, pats, opts)
+        thread = threading.Thread(target=dodiff, name='visualdiff')
+        thread.setDaemon(True)
+        thread.start()
 
 def run(ui, *pats, **opts):
+    pats = hglib.canonpaths(pats)
+    if opts.get('canonpats'):
+        pats = list(pats) + opts['canonpats']
     if ui.configbool('tortoisehg', 'vdiffnowin'):
-        import sys
-        # Spawn background process and exit
-        if hasattr(sys, "frozen"):
-            args = [sys.argv[0]]
-        else:
-            args = [sys.executable] + [sys.argv[0]]
-        args.extend(['vdiff', '--nofork', '--raw'])
-        revs = opts.get('rev', [])
-        change = opts.get('change')
-        if change:
-            args.extend(['--change', str(change)])
-        for r in revs:
-            args.extend(['--rev', str(r)])
-        bfile = opts.get('bundle')
-        if bfile:
-            args.extend(['--bundle', bfile])
-        args.extend(pats)
-        args.extend(opts.get('canonpats', []))
-        if os.name == 'nt':
-            args = ['"%s"' % arg for arg in args]
-        oldcwd = os.getcwd()
-        root = paths.find_root(oldcwd)
-        try:
-            os.chdir(root)
-            os.spawnv(os.P_NOWAIT, sys.executable, args)
-        finally:
-            os.chdir(oldcwd)
-        return None
+        rawextdiff(ui, *pats, **opts)
     else:
-        pats = hglib.canonpaths(pats)
-        if opts.get('canonpats'):
-            pats = list(pats) + opts['canonpats']
         return FileSelectionDialog(pats, opts)
