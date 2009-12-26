@@ -52,7 +52,7 @@ def snapshot(repo, files, ctx, tmproot):
         f.close()
         if ctx.rev() is None:
             fns_and_mtime.append((dest, repo.wjoin(fn), os.path.getmtime(dest)))
-        else:
+        elif os.name != 'nt':
             # Make file read/only, to indicate it's static (archival) nature
             os.chmod(dest, stat.S_IREAD)
     return base, fns_and_mtime
