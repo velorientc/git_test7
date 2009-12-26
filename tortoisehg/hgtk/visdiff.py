@@ -9,6 +9,7 @@ import gtk
 import gobject
 import os
 import subprocess
+import stat
 import shutil
 import threading
 import tempfile
@@ -52,8 +53,8 @@ def snapshot(repo, files, ctx, tmproot):
         if ctx.rev() is None:
             fns_and_mtime.append((dest, repo.wjoin(fn), os.path.getmtime(dest)))
         else:
-            # TODO: Mark file read-only to help diff tools
-            pass
+            # Make file read/only, to indicate it's static (archival) nature
+            os.chmod(dest, stat.S_IREAD)
     return base, fns_and_mtime
 
 
