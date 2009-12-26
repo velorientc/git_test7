@@ -77,6 +77,7 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags: recursesubdirs createallsubdirs
 Source: win32\*.reg; DestDir: {app}\cmenu_i18n
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
+Source: ..\contrib\diff-scripts\*.*; DestDir: {app}\diff-scripts
 Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Flags: ignoreversion; Components: hgbook
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShellx86.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
