@@ -1,14 +1,41 @@
+#
+#      hgtk
+#
+#      contrib/bash_completion
+#
+#      Copyright 2009 Andreas Tscharner <andy@vis.ethz.ch>
+#
+#      This program is free software; you can redistribute it and/or modify
+#      it under the terms of the GNU General Public License version 2
+#      as published by the Free Software Foundation.
+#
+#      This program is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU General Public License for more details.
+#
+#      You should have received a copy of the GNU General Public License
+#      along with this program; if not, write to the Free Software
+#      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#      MA 02110-1301, USA.
+
 _hgtk()
 {
-       local cur prev opts
+	local cur prev opts cmds
 
-       COMPREPLY=()
-       cur="${COMP_WORDS[COMP_CWORD]}"
-       prev="${COMP_WORDS[COMP_CWORD-1]}"
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-       opts="about add annotate archive blame checkout clone commit datamine diff filter email forget grep guess hgignore history ignore init incoming log merge outgoing pull push recovery remove rename repoconfig revert rollback serve shelve status strip synch unshelve update userconfig vdiff verify version"
+	cmds="about add annotate archive blame checkout clone commit datamine diff email explorer filter forget grep guess hgignore history ignore init incoming log merge outgoing pull push recovery remove rename repoconfig revert rollback serve shelve status strip synch unshelve update userconfig vdiff verify version"
 
-       COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+	opts="-R --repository -v --verbose -q --quiet -h --help --debugger --nofork --fork --listfile"
+
+	if [[ ${cur} == -* ]] ; then
+		COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+	else
+		COMPREPLY=( $(compgen -W "${cmds}" -- ${cur}) )
+	fi
+	return 0
 }
-
 complete -F _hgtk hgtk

@@ -10,11 +10,10 @@ import os
 import gtk
 import gobject
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths
-from tortoisehg.util.hglib import LookupError, RepoLookupError, RepoError
+from tortoisehg.util import hglib, paths, settings
 
 from tortoisehg.hgtk import csinfo, gtklib, gdialog, hgcmd
 
@@ -30,11 +29,10 @@ class UpdateDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_resizable(False)
         self.set_has_separator(False)
-        self.connect('response', self.dialog_response)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
@@ -44,7 +42,10 @@ class UpdateDialog(gtk.Dialog):
         self.updatebtn = self.add_button(_('Update'), gtk.RESPONSE_OK)
         self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
 
-        # layout table for fixed items
+        # persistent settings
+        self.settings = settings.Settings('update')
+        
+        # layout table
         table = gtklib.LayoutTable()
         self.vbox.pack_start(table, True, True, 2)
         self.table = table
@@ -56,23 +57,14 @@ class UpdateDialog(gtk.Dialog):
         entry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
         table.add_row(_('Update to:'), combo, padding=False)
 
-        ## update method
-        btn = gtk.CheckButton(_('Discard local changes, no backup (-C/--clean)'))
-        self.opt_clean = btn
-        table.add_row(None, btn)
-
         ## fill list of combo
         if rev != None:
             combo.append_text(str(rev))
         else:
             combo.append_text(repo.dirstate.branch())
         combo.set_active(0)
-
-        dblist = repo.ui.config('tortoisehg', 'deadbranch', '')
-        deadbranches = [ x.strip() for x in dblist.split(',') ]
-        for name in repo.branchtags().keys():
-            if name not in deadbranches:
-                combo.append_text(name)
+        for name in hglib.getlivebranch(repo):
+            combo.append_text(name)
 
         tags = list(repo.tags())
         tags.sort()
@@ -102,21 +94,63 @@ class UpdateDialog(gtk.Dialog):
             table.add_row(_('Parent:'), self.parent1_label)
             self.parent2_label = None
 
+        ## option expander
+        self.expander = gtk.Expander(_('Options:'))
+        self.expander.connect('notify::expanded', self.options_expanded)
+
+        ### update method (fixed)
+        self.opt_clean = gtk.CheckButton(_('Discard local changes, '
+                                           'no backup (-C/--clean)'))
+        table.add_row(self.expander, self.opt_clean)
+
+        ### other options (foldable), put later
+        ### automatically merge, if possible (similar to command-line behavior)
+        self.opt_merge = gtk.CheckButton(_('Always merge (when possible)'))
+
+        ### always show command log widget
+        self.opt_showlog = gtk.CheckButton(_('Always show log'))
+
         # signal handlers
+        self.connect('response', self.dialog_response)
         self.revcombo.connect('changed', lambda b: self.update_summaries())
         self.opt_clean.connect('toggled', lambda b: self.update_summaries())
 
         # prepare to show
+        self.load_settings()
         self.update_summaries()
         self.updatebtn.grab_focus()
         gtklib.idle_add_single_call(self.after_init)
 
+    def load_settings(self):
+        merge = self.settings.get_value('mergedefault', False)
+        showlog = self.settings.get_value('showlog', False)
+        self.opt_merge.set_active(merge)
+        self.opt_showlog.set_active(showlog)
+
+    def store_settings(self):
+        checked = self.opt_merge.get_active()
+        showlog = self.opt_showlog.get_active()
+        self.settings.set_value('mergedefault', checked)
+        self.settings.set_value('showlog', showlog)
+
+        self.settings.write()
+
     def after_init(self):
+        # append options
+        self.opttable = gtklib.LayoutTable()
+        self.vbox.pack_start(self.opttable, False, False)
+        self.opttable.add_row(None, self.opt_merge, ypad=0)
+        self.opttable.add_row(None, self.opt_showlog, ypad=0)
+
+        # layout group
+        layout = gtklib.LayoutGroup()
+        layout.add(self.table, self.opttable, force=True)
+
         # CmdWidget
         self.cmd = hgcmd.CmdWidget()
         self.cmd.show_all()
         self.cmd.hide()
-        self.vbox.pack_start(self.cmd, True, True, 6)
+        self.vbox.pack_start(self.cmd, False, False, 6)
 
         # abort button
         self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
@@ -139,6 +173,7 @@ class UpdateDialog(gtk.Dialog):
                 if ret == gtk.RESPONSE_YES:
                     self.abort()
             else:
+                self.store_settings()                
                 self.destroy()
                 return # close dialog
         # Abort button
@@ -148,6 +183,12 @@ class UpdateDialog(gtk.Dialog):
             raise _('unexpected response id: %s') % response_id
 
         self.run() # don't close dialog
+
+    def options_expanded(self, expander, *args):
+        if expander.get_expanded():
+            self.opttable.show_all()
+        else:
+            self.opttable.hide()
 
     def switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
@@ -161,10 +202,13 @@ class UpdateDialog(gtk.Dialog):
         working = not normal
 
         self.table.set_sensitive(normal)
+        self.opttable.set_sensitive(normal)
         self.updatebtn.set_property('visible', normal)
         self.closebtn.set_property('visible', normal)
         if cmd:
             self.cmd.set_property('visible', working)
+            if self.opt_showlog.get_active():
+                self.cmd.show_log()
         self.abortbtn.set_property('visible', working)
 
     def update_summaries(self):
@@ -182,7 +226,7 @@ class UpdateDialog(gtk.Dialog):
             else:
                 self.target_label.update(self.repo[newrev])
                 self.updatebtn.set_sensitive(True)
-        except (LookupError, RepoLookupError, RepoError):
+        except (error.LookupError, error.RepoLookupError, error.RepoError):
             self.target_label.set_label(_('unknown revision!'))
             self.updatebtn.set_sensitive(False)
 
@@ -245,10 +289,13 @@ class UpdateDialog(gtk.Dialog):
                 retid = [ id for id, (label, desc) in data.items() \
                              if label == retlabel ][0]
                 return dict([(id, id == retid) for id in data.keys()])
+            # If merge-by-default, we want to merge whenever possible,
+            # without prompting user (similar to command-line behavior)
+            defaultmerge = self.opt_merge.get_active()
             clean = isclean()
             if clean:
                 cmdline.append('--check')
-            else:
+            elif not (defaultmerge and islocalmerge(cur, node, clean)):
                 ret = confirmupdate(clean)
                 if ret['discard']:
                     cmdline.append('--clean')
