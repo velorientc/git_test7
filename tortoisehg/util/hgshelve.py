@@ -24,6 +24,8 @@ from mercurial import util, fancyopts
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
 
+from tortoisehg.hgtk import gtklib
+
 lines_re = re.compile(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@\s*(.*)')
 
 def internalpatch(patchobj, ui, strip, cwd, files={}):
