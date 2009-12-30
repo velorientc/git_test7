@@ -50,7 +50,7 @@ def main():
         local, base, other, output = args
 
     base, ext = os.path.splitext(local)
-    if ext.lower() not in scripts.keys():
+    if not ext or ext.lower()[1:] not in scripts.keys():
         print 'Unsupported file type', local
         sys.exit(1)
 
@@ -61,8 +61,11 @@ def main():
     except:
         filename = win32api.GetModuleFileName(0)
     path = os.path.join(os.path.dirname(filename), 'diff-scripts')
+    if not os.path.isdir(path):
+        print 'Diff scripts not found at', path
+        sys.exit(1)
 
-    use = scripts[ext.lower()]
+    use = scripts[ext.lower()[1:]]
     if len(args) == 2:
         script = os.path.join(path, use[0])
         cmdline = ['wscript', script, other, local]
