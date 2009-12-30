@@ -1,0 +1,84 @@
+'''
+Binary document diff wrapper script
+
+This script is converted into an executable by py2exe for use in
+TortoiseHg binary packages.  It is then used by TortoiseHg as a visual
+diff application for binary document types.
+
+It takes two (diff) or four (merge) arguments, determines the file type
+based on the file extension, then launches the appropriate document diff
+script that THG has borrowed from the TortoiseSVN project.
+
+This script is quite useless outside of a TortoiseHg binary install.
+'''
+
+import os
+import sys
+import subprocess
+import win32con
+import win32api
+import win32process
+
+scripts = {
+    'doc'  : ('diff-doc.js', 'merge-doc.js'),    # MS Word
+    'docx' : ('diff-doc.js', 'merge-doc.js'),
+    'docm' : ('diff-doc.js', 'merge-doc.js'),
+    'ppt'  : ('diff-ppt.js'),                    # MS PowerPoint
+    'pptx' : ('diff-ppt.js'),
+    'pptm' : ('diff-ppt.js'),
+    'xls'  : ('diff-xls.vbs'),                   # MS Excel
+    'xlsx' : ('diff-xls.vbs'),
+    'xlsm' : ('diff-xls.vbs'),
+    'xlsb' : ('diff-xls.vbs'),
+    'xlam' : ('diff-xls.vbs'),
+    'ods'  : ('diff-odt.vbs', 'merge-ods.vbs'),  # OpenOffice Text
+    'odt'  : ('diff-odt.vbs', 'merge-ods.vbs'),
+    'sxw'  : ('diff-sxw.vbs', 'merge-ods.vbs'),  # OpenOffice Calc
+    'nb'   : ('diff-nb.vbs'),                    # Mathematica Notebook
+}
+
+def main():
+    args = sys.argv[1:]
+    if len(args) not in (2, 4):
+        print 'Two or four arguments expected:'
+        print sys.argv[0], '[local] [other]'
+        print sys.argv[0], '[local] [base] [other] [output]'
+        sys.exit(1)
+    elif len(args) == 2:
+        local, other = args
+    else:
+        local, base, other, output = args
+
+    base, ext = os.path.splitext(local)
+    if ext.lower() not in scripts.keys():
+        print 'Unsupported file type', local
+        sys.exit(1)
+
+    proc = win32api.GetCurrentProcess()
+    try:
+        # This will fail on windows < NT
+        filename = win32process.GetModuleFileNameEx(proc, 0)
+    except:
+        filename = win32api.GetModuleFileName(0)
+    path = os.path.join(os.path.dirname(filename), 'diff-scripts')
+
+    use = scripts[ext.lower()]
+    if len(args) == 2:
+        script = os.path.join(path, use[0])
+        cmdline = ['wscript', script, other, local]
+    elif len(use) == 1:
+        print 'Unsupported file type for merge', local
+        sys.exit(1)
+    else:
+        script = os.path.join(path, use[1])
+        cmdline = ['wscript', script, output, other, local, base]
+
+    proc = subprocess.Popen(cmdline, shell=True,
+                            creationflags=win32con.CREATE_NO_WINDOW,
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stdin=subprocess.PIPE)
+    return proc.communicate()
+
+if __name__=='__main__':
+    main()
