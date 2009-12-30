@@ -22,8 +22,11 @@ def get_system_times():
 if os.name == 'nt':
     def browse_url(url):
         def start_browser():
-            import win32api, win32con
-            win32api.ShellExecute(0, "open", url, None, "", win32con.SW_SHOW)
+            try:
+                import win32api
+                win32api.ShellExecute(0, 'open', url, None, None, 0)
+            except (ImportError, Exception):
+                pass
         threading.Thread(target=start_browser).start()
 
     def shell_notify(paths):
