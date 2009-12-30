@@ -28,7 +28,6 @@ class SimpleMessage(gtklib.MessageDialog):
         self.destroy()
         return response
 
-
 class Prompt(SimpleMessage):
     def __init__(self, title, message, parent, type=gtk.MESSAGE_INFO):
         SimpleMessage.__init__(self, parent, gtk.DIALOG_MODAL,
@@ -99,9 +98,9 @@ class Confirm(SimpleMessage):
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
         buttons = self.get_children()[0].get_children()[1].get_children()
-        buttons[1].add_accelerator("clicked", accel_group, ord("y"),
+        buttons[1].add_accelerator('clicked', accel_group, ord('y'),
                               0, gtk.ACCEL_VISIBLE)
-        buttons[0].add_accelerator("clicked", accel_group, ord("n"),
+        buttons[0].add_accelerator('clicked', accel_group, ord('n'),
                               0, gtk.ACCEL_VISIBLE)
 
 
@@ -392,7 +391,7 @@ class GDialog(gtk.Window):
     def launch(self, item, app):
         import sys
         # Spawn background process and exit
-        if hasattr(sys, "frozen"):
+        if hasattr(sys, 'frozen'):
             args = [sys.argv[0], app]
         else:
             args = [sys.executable] + [sys.argv[0], app]
@@ -635,8 +634,8 @@ class GDialog(gtk.Window):
             ctx = repo[node]
             mf = ctx.manifest()
             dirname = os.path.basename(repo.root)
-            if dirname == "":
-                dirname = "root"
+            if dirname == '':
+                dirname = 'root'
             dirname = '%s.%s' % (dirname, str(ctx))
             base = os.path.join(tmproot, dirname)
             try:
@@ -674,8 +673,8 @@ class GDialog(gtk.Window):
                         copynode, self.tmproot)
                 pathroot = os.path.join(self.tmproot, copydir)
 
-            paths = ['"'+os.path.join(pathroot, f)+'"' for f in files]
-            command = editor + ' ' + ' '.join(paths)
+            paths = ['"%s"' % os.path.join(pathroot, f) for f in files]
+            command = '%s %s' % (editor, ' '.join(paths))
             util.system(command,
                         environ={'HGUSER': self.ui.username()},
                         onerr=self.ui, errprefix=_('edit failed'))
