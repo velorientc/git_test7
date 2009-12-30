@@ -68,14 +68,15 @@ def main():
     use = scripts[ext.lower()[1:]]
     if len(args) == 2:
         script = os.path.join(path, use[0])
-        cmdline = ['wscript', script, other, local]
+        cmd = ['wscript', script, other, local]
     elif len(use) == 1:
         print 'Unsupported file type for merge', local
         sys.exit(1)
     else:
         script = os.path.join(path, use[1])
-        cmdline = ['wscript', script, output, other, local, base]
+        cmd = ['wscript', script, output, other, local, base]
 
+    cmdline = '"' + ' '.join(['"'+a+'"' for a in cmd]) + '"'
     proc = subprocess.Popen(cmdline, shell=True,
                             creationflags=win32con.CREATE_NO_WINDOW,
                             stderr=subprocess.PIPE,
