@@ -41,7 +41,7 @@ ACOL_COLOR = 5
 ACOL_USER  = 6
 ACOL_LNUM  = 7 # line number
 
-class DataMineDialog(gdialog.GDialog):
+class DataMineDialog(gdialog.GWindow):
 
     def get_title(self):
         return _('%s - datamine') % self.get_reponame()
@@ -79,11 +79,11 @@ class DataMineDialog(gdialog.GDialog):
         os.chdir(root)
 
     def save_settings(self):
-        settings = gdialog.GDialog.save_settings(self)
+        settings = gdialog.GWindow.save_settings(self)
         return settings
 
     def load_settings(self, settings):
-        gdialog.GDialog.load_settings(self, settings)
+        gdialog.GWindow.load_settings(self, settings)
         self.tabwidth = hglib.gettabwidth(self.repo.ui)
 
     def get_body(self):
@@ -121,7 +121,7 @@ class DataMineDialog(gdialog.GDialog):
 
     def _destroying(self, gtkobj):
         self.stop_all_searches()
-        gdialog.GDialog._destroying(self, gtkobj)
+        gdialog.GWindow._destroying(self, gtkobj)
 
     def ann_header_context_menu(self, treeview):
         menu = gtk.Menu()

@@ -117,7 +117,7 @@ class FilterBox(gtklib.SlimToolbar):
         widget = self.__dict__[widget_name]
         widget.connect(signal, handler, *opts)
 
-class GLog(gdialog.GDialog):
+class GLog(gdialog.GWindow):
     'GTK+ based dialog for displaying repository logs'
     def init(self):
         self.filter = 'all'
@@ -649,7 +649,7 @@ class GLog(gdialog.GDialog):
         return l or 500
 
     def save_settings(self):
-        settings = gdialog.GDialog.save_settings(self)
+        settings = gdialog.GWindow.save_settings(self)
         settings['glog-vpane'] = self.vpaned.get_position()
         settings['glog-hpane'] = self.hpaned.get_position()
         if hasattr(self, 'mqpaned') and self.mqwidget.has_patch():
@@ -674,7 +674,7 @@ class GLog(gdialog.GDialog):
 
     def load_settings(self, settings):
         'Called at beginning of display() method'
-        gdialog.GDialog.load_settings(self, settings)
+        gdialog.GWindow.load_settings(self, settings)
         self.setting_vpos = settings.get('glog-vpane', -1)
         self.setting_hpos = settings.get('glog-hpane', -1)
         self.setting_mqhpos = settings.get('glog-mqpane', 140) or 140

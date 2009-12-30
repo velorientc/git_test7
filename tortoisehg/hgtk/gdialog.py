@@ -1,4 +1,4 @@
-# gdialog.py - base dialog for gtools
+# gdialog.py - base dialogs for gtools
 #
 # Copyright 2007 Brad Schick, brad at gmail . com
 # Copyright 2008 Steve Borho <steve@borho.org>
@@ -104,8 +104,9 @@ class Confirm(SimpleMessage):
                               0, gtk.ACCEL_VISIBLE)
 
 
-class GDialog(gtk.Window):
-    """GTK+ based dialog for displaying mercurial information
+class GWindow(gtk.Window):
+    """
+    gtk.Window based window for displaying mercurial information
 
     The following methods are meant to be overridden by subclasses. At this
     point GCommit is really the only intended subclass.

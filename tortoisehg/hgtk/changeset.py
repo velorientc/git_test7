@@ -19,10 +19,10 @@ from tortoisehg.util import shlib, hglib, paths
 
 from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
 
-class ChangeSet(gdialog.GDialog):
+class ChangeSet(gdialog.GWindow):
     'GTK+ based dialog for displaying repository logs'
     def __init__(self, ui, repo, cwd, pats, opts, stbar=None):
-        gdialog.GDialog.__init__(self, ui, repo, cwd, pats, opts)
+        gdialog.GWindow.__init__(self, ui, repo, cwd, pats, opts)
         self.stbar = stbar
         self.glog_parent = None
         self.bfile = None
@@ -61,12 +61,12 @@ class ChangeSet(gdialog.GDialog):
         self.load_details(self.repo.changelog.rev(node0))
 
     def save_settings(self):
-        settings = gdialog.GDialog.save_settings(self)
+        settings = gdialog.GWindow.save_settings(self)
         settings['changeset'] = self._hpaned.get_position()
         return settings
 
     def load_settings(self, settings):
-        gdialog.GDialog.load_settings(self, settings)
+        gdialog.GWindow.load_settings(self, settings)
         if settings and 'changeset' in settings:
             self._setting_hpos = settings['changeset']
         else:

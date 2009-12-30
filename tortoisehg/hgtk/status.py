@@ -67,7 +67,7 @@ def hunk_unmarkup(text):
         hunk += gtklib.markup(hglib.toutf(line[:512])) + '\n'
     return hunk
 
-class GStatus(gdialog.GDialog):
+class GStatus(gdialog.GWindow):
     """GTK+ based dialog for displaying repository status
 
     Also provides related operations like add, delete, remove, revert, refresh,
@@ -82,7 +82,7 @@ class GStatus(gdialog.GDialog):
     ### Following methods are meant to be overridden by subclasses ###
 
     def init(self):
-        gdialog.GDialog.init(self)
+        gdialog.GWindow.init(self)
         self.mode = 'status'
         self.ready = False
         self.filerowstart = {}
@@ -182,14 +182,14 @@ class GStatus(gdialog.GDialog):
 
 
     def save_settings(self):
-        settings = gdialog.GDialog.save_settings(self)
+        settings = gdialog.GWindow.save_settings(self)
         settings['gstatus-hpane'] = self.diffpane.get_position()
         settings['gstatus-lastpos'] = self.setting_lastpos
         return settings
 
 
     def load_settings(self, settings):
-        gdialog.GDialog.load_settings(self, settings)
+        gdialog.GWindow.load_settings(self, settings)
         self.setting_pos = 270
         self.setting_lastpos = 64000
         try:
