@@ -114,6 +114,8 @@ def setup_windows():
     extra['console'] = [
             {'script':'contrib/hg', 'icon_resources':[(0,'icons/hg.ico')]},
             {'script':'hgtk', 'icon_resources':[(0,'icons/thg_logo.ico')]}
+            {'script':'contrib/docdiff.py',
+             'icon_resources':[(0,'icons/TortoiseMerge.ico')]},
             ]
     extra['windows'] = [
             {'script':'thgtaskbar.py',
