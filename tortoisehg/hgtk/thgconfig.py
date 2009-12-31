@@ -33,18 +33,14 @@ _tortoise_info = (
         ' internal:prompt to always select local or other, or internal:dump'
         ' to leave files in the working directory for manual merging')),
     (_('Visual Diff Command'), 'tortoisehg.vdiff', [],
-        _('Specify visual diff tool; must be an extdiff command')),
-    (_('Skip Diff Window'), 'tortoisehg.vdiffnowin', ['False', 'True'],
-        _("Bypass the builtin visual diff dialog and directly use your"
-          " visual diff tool's directory diff feature.  Only enable this"
-          " feature if you know your diff tool has a valid extdiff"
-          " configuration.  Default: False")),
+        _('Specify visual diff tool, as described in the [merge-tools]'
+          ' section of your Mercurial configuration file.')),
     (_('Visual Editor'), 'tortoisehg.editor', [],
         _('Specify the visual editor used to view files, etc')),
     (_('CLI Editor'), 'ui.editor', [],
-        _('The editor to use during a commit and other'
-        ' instances where Mercurial needs multiline input from'
-        ' the user.  Only used by command line interface commands.')),
+        _('The editor to use during a commit and other instances where'
+        ' Mercurial needs multiline input from the user.  Used by'
+        ' command line commands, including patch import.')),
     (_('Tab Width'), 'tortoisehg.tabwidth', [],
         _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHg windows.'
@@ -1007,7 +1003,9 @@ class ConfigDialog(gtk.Dialog):
 
                 if cpath == 'tortoisehg.vdiff':
                     tools = hglib.difftools(self.ui)
-                    values.extend(tools.keys())
+                    for name in tools.keys():
+                        if name not in values:
+                            values.append(name)
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     hglib.mergetools(self.ui, values)
