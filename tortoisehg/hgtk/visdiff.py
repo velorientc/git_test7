@@ -460,8 +460,11 @@ class FileSelectionDialog(gtk.Dialog):
         args = do3way and self.mergeopts or self.diffopts
         args = ' '.join(args)
         regex = '\$(parent2|parent1?|child)'
-        if not st2 and not re.search(regex, args):
-            args += ' $parent1 $child'
+        if not re.search(regex, args):
+            if st2 and not st1:
+                args += ' $parent2 $child'
+            else:
+                args += ' $parent1 $child'
         args = re.sub(regex, quote, args)
         cmdline = util.shellquote(self.diffpath) + ' ' + args
         cmdline = util.quotecommand(cmdline)
