@@ -15,7 +15,7 @@ import threading
 import tempfile
 import re
 
-from mercurial import hg, ui, cmdutil, util, error
+from mercurial import hg, ui, cmdutil, util, error, match
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -293,6 +293,12 @@ class FileSelectionDialog(gtk.Dialog):
             hbox.pack_start(lbl, False, False, 2)
             hbox.pack_start(combo, False, False, 2)
 
+            patterns = ui.configitems('diff-patterns')
+            patterns = [(p, t) for p,t in patterns if t in tools]
+            filesel = treeview.get_selection()
+            filesel.connect('changed', self.fileselect, repo, combo, tools,
+                            patterns, preferred)
+
         cell = gtk.CellRendererText()
         stcol = gtk.TreeViewColumn('Status 1', cell)
         stcol.set_resizable(True)
@@ -374,6 +380,24 @@ class FileSelectionDialog(gtk.Dialog):
         sel = combo.get_active_text()
         if sel in tools:
             self.diffpath, self.diffopts, self.mergeopts = tools[sel]
+
+    def fileselect(self, selection, repo, combo, tools, patterns, preferred):
+        'user selected a file, pick an appropriate tool from combo'
+        model, path = selection.get_selected()
+        if not path:
+            return
+        row = model[path]
+        fname = row[-1]
+        for pat, tool in patterns:
+            mf = match.match(repo.root, '', [pat])
+            if mf(fname):
+                selected = tool
+                break
+        else:
+            selected = preferred
+        for i, name in enumerate(tools.iterkeys()):
+            if name == selected:
+                combo.set_active(i)
 
     def response(self, window, resp):
         self.should_live()
