@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-11-25 15:36+0000\n"
-"PO-Revision-Date: 2009-11-25 15:47+0000\n"
+"POT-Creation-Date: 2009-12-29 02:36+0000\n"
+"PO-Revision-Date: 2009-12-29 13:24+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-26 04:40+0000\n"
+"X-Launchpad-Export-Date: 2009-12-30 04:50+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
-#: tortoisehg\hgtk\history.py:216 tortoisehg\hgtk\synch.py:79
+#: tortoisehg\hgtk\history.py:212 tortoisehg\hgtk\synch.py:79
 msgid "Push"
 msgstr "Push"
 
@@ -25,11 +25,11 @@ msgstr "Push"
 msgid "TortoiseHg RPC server"
 msgstr "Servidor RPC do TortoiseHg"
 
-#: thgtaskbar.py:115
+#: thgtaskbar.py:118
 msgid "Options..."
 msgstr "Opções..."
 
-#: thgtaskbar.py:117
+#: thgtaskbar.py:120
 msgid "Exit"
 msgstr "Sair"
 
@@ -42,8 +42,8 @@ msgid "(version %s)"
 msgstr "(versão %s)"
 
 #: tortoisehg\hgtk\about.py:69
-msgid "Copyright 2009 TK Soh and others"
-msgstr "Copyright 2009 TK Soh e outros"
+msgid "Copyright 2009 Steve Borho and others"
+msgstr "Copyright 2009 Steve Borho e outros"
 
 #: tortoisehg\hgtk\about.py:85
 msgid "with %s"
@@ -126,7 +126,7 @@ msgstr "Você deseja cancelar?"
 #: tortoisehg\hgtk\archive.py:138 tortoisehg\hgtk\backout.py:153
 #: tortoisehg\hgtk\clone.py:199 tortoisehg\hgtk\hginit.py:80
 #: tortoisehg\hgtk\merge.py:183 tortoisehg\hgtk\quickop.py:207
-#: tortoisehg\hgtk\tagadd.py:151 tortoisehg\hgtk\thgstrip.py:318
+#: tortoisehg\hgtk\tagadd.py:154 tortoisehg\hgtk\thgstrip.py:318
 #: tortoisehg\hgtk\update.py:148
 msgid "unexpected response id: %s"
 msgstr "id de resposta inesperado: %s"
@@ -241,7 +241,7 @@ msgstr "Use mensagem em inglês para a anulação"
 msgid "Merge with old dirstate parent after backout"
 msgstr "Mesclar com o antigo pai do diretório de trabalho após a anulação"
 
-#: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:443
+#: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:451
 msgid "Confirm Discard Message"
 msgstr "Confirmar Descarte da Mensagem"
 
@@ -366,19 +366,19 @@ msgstr "Arquivos"
 msgid "Diff to second Parent"
 msgstr "Diff com segundo Pai"
 
-#: tortoisehg\hgtk\changeset.py:778
+#: tortoisehg\hgtk\changeset.py:762
 msgid "Save file to"
 msgstr "Salvar arquivo em"
 
-#: tortoisehg\hgtk\changeset.py:852
+#: tortoisehg\hgtk\changeset.py:836
 msgid "Confirm revert file to old revision"
 msgstr "Confirma a reversão do arquivo para a revisão anterior"
 
-#: tortoisehg\hgtk\changeset.py:853
+#: tortoisehg\hgtk\changeset.py:837
 msgid "Revert %s to contents at revision %d?"
 msgstr "Reverter %s para o conteúdo na revisão %d?"
 
-#: tortoisehg\hgtk\changeset.py:865 tortoisehg\hgtk\synch.py:668
+#: tortoisehg\hgtk\changeset.py:849 tortoisehg\hgtk\synch.py:667
 msgid "Toggle _Wordwrap"
 msgstr "Trocar _Wordwrap"
 
@@ -418,12 +418,12 @@ msgstr "Usar o protocolo pull para copiar metadados"
 msgid "Use uncompressed transfer"
 msgstr "Usar transferência não comprimida"
 
-#: tortoisehg\hgtk\clone.py:137 tortoisehg\hgtk\history.py:231
-#: tortoisehg\hgtk\synch.py:184
+#: tortoisehg\hgtk\clone.py:137 tortoisehg\hgtk\history.py:227
+#: tortoisehg\hgtk\synch.py:183
 msgid "Use proxy server"
 msgstr "Usar servidor proxy"
 
-#: tortoisehg\hgtk\clone.py:147 tortoisehg\hgtk\synch.py:205
+#: tortoisehg\hgtk\clone.py:147 tortoisehg\hgtk\synch.py:204
 msgid "Remote command:"
 msgstr "Comando remoto:"
 
@@ -455,268 +455,268 @@ msgstr "Clone cancelado"
 msgid "Failed to clone"
 msgstr "Falha ao clonar"
 
-#: tortoisehg\hgtk\commit.py:34
+#: tortoisehg\hgtk\commit.py:33
 msgid "Branch Operations"
 msgstr "Operações de Ramos"
 
-#: tortoisehg\hgtk\commit.py:39
+#: tortoisehg\hgtk\commit.py:43
 msgid "Select branch of merge commit"
 msgstr "Selecione o ramo para consolidação da mesclagem"
 
-#: tortoisehg\hgtk\commit.py:51
-msgid "Changes take effect on next commit"
-msgstr "As alterações terão efeito na próxima consolidação"
-
-#: tortoisehg\hgtk\commit.py:52
+#: tortoisehg\hgtk\commit.py:55
 msgid "No branch changes"
 msgstr "Sem alterações no ramo"
 
-#: tortoisehg\hgtk\commit.py:54
+#: tortoisehg\hgtk\commit.py:57
 msgid "Open a new named branch"
 msgstr "Abrir um novo ramo nomeado"
 
-#: tortoisehg\hgtk\commit.py:56
+#: tortoisehg\hgtk\commit.py:61
 msgid "Close current named branch"
 msgstr "Fechar o ramo nomeado atual"
 
-#: tortoisehg\hgtk\commit.py:144
+#: tortoisehg\hgtk\commit.py:68
+msgid "Changes take effect on next commit"
+msgstr "As alterações terão efeito na próxima consolidação"
+
+#: tortoisehg\hgtk\commit.py:152
 msgid "merging "
 msgstr "mesclando "
 
-#: tortoisehg\hgtk\commit.py:150
+#: tortoisehg\hgtk\commit.py:158
 msgid " - qnew"
 msgstr " - qnew (novo patch MQ)"
 
-#: tortoisehg\hgtk\commit.py:153
+#: tortoisehg\hgtk\commit.py:161
 msgid " - qrefresh "
 msgstr " - qrefresh (atualiza patch MQ) "
 
-#: tortoisehg\hgtk\commit.py:154
+#: tortoisehg\hgtk\commit.py:162
 msgid " - commit"
 msgstr " - commit (nova revisão)"
 
-#: tortoisehg\hgtk\commit.py:185 tortoisehg\hgtk\history.py:169
+#: tortoisehg\hgtk\commit.py:193 tortoisehg\hgtk\history.py:165
 msgid "_View"
 msgstr "E_xibir"
 
-#: tortoisehg\hgtk\commit.py:186
+#: tortoisehg\hgtk\commit.py:194
 msgid "Advanced"
 msgstr "Avançado"
 
-#: tortoisehg\hgtk\commit.py:188 tortoisehg\hgtk\history.py:670
-#: tortoisehg\hgtk\history.py:1001
+#: tortoisehg\hgtk\commit.py:196 tortoisehg\hgtk\history.py:688
+#: tortoisehg\hgtk\history.py:1014
 msgid "Parents"
 msgstr "Pais"
 
-#: tortoisehg\hgtk\commit.py:191 tortoisehg\hgtk\hgignore.py:138
-#: tortoisehg\hgtk\history.py:182
+#: tortoisehg\hgtk\commit.py:199 tortoisehg\hgtk\hgignore.py:138
+#: tortoisehg\hgtk\history.py:178
 msgid "Refresh"
 msgstr "Reler"
 
-#: tortoisehg\hgtk\commit.py:192
+#: tortoisehg\hgtk\commit.py:200
 msgid "_Operations"
 msgstr "_Operações"
 
-#: tortoisehg\hgtk\commit.py:193 tortoisehg\hgtk\commit.py:239
-#: tortoisehg\hgtk\commit.py:604
+#: tortoisehg\hgtk\commit.py:201 tortoisehg\hgtk\commit.py:247
+#: tortoisehg\hgtk\commit.py:612
 msgid "_Commit"
 msgstr "_Consolidar"
 
-#: tortoisehg\hgtk\commit.py:195 tortoisehg\hgtk\commit.py:237
+#: tortoisehg\hgtk\commit.py:203 tortoisehg\hgtk\commit.py:245
 msgid "_Undo"
 msgstr "_Desfazer"
 
-#: tortoisehg\hgtk\commit.py:198 tortoisehg\hgtk\status.py:158
+#: tortoisehg\hgtk\commit.py:206 tortoisehg\hgtk\status.py:158
 msgid "_Diff"
 msgstr "_Diff"
 
-#: tortoisehg\hgtk\commit.py:200 tortoisehg\hgtk\status.py:161
+#: tortoisehg\hgtk\commit.py:208 tortoisehg\hgtk\status.py:161
 msgid "Re_vert"
 msgstr "Re_verter"
 
-#: tortoisehg\hgtk\commit.py:202 tortoisehg\hgtk\status.py:164
+#: tortoisehg\hgtk\commit.py:210 tortoisehg\hgtk\status.py:164
 #: tortoisehg\hgtk\status.py:1519 tortoisehg\hgtk\thgconfig.py:906
 msgid "_Add"
 msgstr "_Adicionar"
 
-#: tortoisehg\hgtk\commit.py:204 tortoisehg\hgtk\status.py:170
+#: tortoisehg\hgtk\commit.py:212 tortoisehg\hgtk\status.py:170
 #: tortoisehg\hgtk\thgconfig.py:916
 msgid "_Remove"
 msgstr "_Remover"
 
-#: tortoisehg\hgtk\commit.py:206 tortoisehg\hgtk\status.py:167
+#: tortoisehg\hgtk\commit.py:214 tortoisehg\hgtk\status.py:167
 msgid "Move"
 msgstr "Mover"
 
-#: tortoisehg\hgtk\commit.py:208 tortoisehg\hgtk\status.py:173
+#: tortoisehg\hgtk\commit.py:216 tortoisehg\hgtk\status.py:173
 #: tortoisehg\hgtk\status.py:1518
 msgid "_Forget"
 msgstr "_Esquecer"
 
-#: tortoisehg\hgtk\commit.py:238
+#: tortoisehg\hgtk\commit.py:246
 msgid "undo recent commit"
 msgstr "desfazer uma consolidação recente"
 
-#: tortoisehg\hgtk\commit.py:240 tortoisehg\hgtk\commit.py:488
+#: tortoisehg\hgtk\commit.py:248 tortoisehg\hgtk\commit.py:496
 msgid "commit"
 msgstr "consolidar"
 
-#: tortoisehg\hgtk\commit.py:252 tortoisehg\hgtk\merge.py:169
+#: tortoisehg\hgtk\commit.py:260 tortoisehg\hgtk\merge.py:169
 #: tortoisehg\hgtk\thgconfig.py:713
 msgid "Confirm Exit"
 msgstr "Confirmar Saída"
 
-#: tortoisehg\hgtk\commit.py:253
+#: tortoisehg\hgtk\commit.py:261
 msgid "Save commit message at exit?"
 msgstr "Guardar mensagem de consolidação ao sair?"
 
-#: tortoisehg\hgtk\commit.py:254 tortoisehg\hgtk\commit.py:973
-#: tortoisehg\hgtk\commit.py:977 tortoisehg\hgtk\history.py:81
-#: tortoisehg\hgtk\history.py:1395 tortoisehg\hgtk\status.py:1274
+#: tortoisehg\hgtk\commit.py:262 tortoisehg\hgtk\commit.py:981
+#: tortoisehg\hgtk\commit.py:985 tortoisehg\hgtk\history.py:77
+#: tortoisehg\hgtk\history.py:1404 tortoisehg\hgtk\status.py:1274
 #: tortoisehg\hgtk\status.py:1293 tortoisehg\hgtk\status.py:1586
 #: tortoisehg\hgtk\thgconfig.py:716 tortoisehg\hgtk\thgmq.py:328
 #: tortoisehg\hgtk\update.py:230
 msgid "&Cancel"
 msgstr "&Cancelar"
 
-#: tortoisehg\hgtk\commit.py:254 tortoisehg\hgtk\commit.py:973
-#: tortoisehg\hgtk\commit.py:977 tortoisehg\hgtk\status.py:1586
+#: tortoisehg\hgtk\commit.py:262 tortoisehg\hgtk\commit.py:981
+#: tortoisehg\hgtk\commit.py:985 tortoisehg\hgtk\status.py:1586
 #: tortoisehg\hgtk\thgconfig.py:715 tortoisehg\hgtk\thgmq.py:327
 msgid "&Yes"
 msgstr "&Sim"
 
-#: tortoisehg\hgtk\commit.py:254 tortoisehg\hgtk\commit.py:973
-#: tortoisehg\hgtk\commit.py:977 tortoisehg\hgtk\thgstrip.py:377
+#: tortoisehg\hgtk\commit.py:262 tortoisehg\hgtk\commit.py:981
+#: tortoisehg\hgtk\commit.py:985 tortoisehg\hgtk\thgstrip.py:377
 msgid "&No"
 msgstr "&Não"
 
-#: tortoisehg\hgtk\commit.py:297
+#: tortoisehg\hgtk\commit.py:305
 msgid "Committer:"
 msgstr "Autor:"
 
-#: tortoisehg\hgtk\commit.py:311
+#: tortoisehg\hgtk\commit.py:319
 msgid "Auto-includes:"
 msgstr "Auto-inclusão:"
 
-#: tortoisehg\hgtk\commit.py:314
+#: tortoisehg\hgtk\commit.py:322
 msgid "Push after commit"
 msgstr "Push após commit"
 
-#: tortoisehg\hgtk\commit.py:348
+#: tortoisehg\hgtk\commit.py:356
 msgid "Recent commit messages..."
 msgstr "Mensagens de consolidação recentes..."
 
-#: tortoisehg\hgtk\commit.py:385
+#: tortoisehg\hgtk\commit.py:393
 msgid "Parent: %(rev)s"
 msgstr "Pai: %(rev)s"
 
-#: tortoisehg\hgtk\commit.py:394
+#: tortoisehg\hgtk\commit.py:402
 msgid "not at head revision"
 msgstr "não está em uma revisão cabeça"
 
-#: tortoisehg\hgtk\commit.py:418 tortoisehg\hgtk\status.py:480
+#: tortoisehg\hgtk\commit.py:426 tortoisehg\hgtk\status.py:480
 msgid "Patch Preview"
 msgstr "Preview do Patch"
 
-#: tortoisehg\hgtk\commit.py:420 tortoisehg\hgtk\status.py:484
+#: tortoisehg\hgtk\commit.py:428 tortoisehg\hgtk\status.py:484
 msgid "Commit Preview"
 msgstr "Pré-Visualização da Consolidação"
 
-#: tortoisehg\hgtk\commit.py:444
+#: tortoisehg\hgtk\commit.py:452
 msgid "Discard current commit message?"
 msgstr "Descartar mensagem de consolidação atual?"
 
-#: tortoisehg\hgtk\commit.py:487 tortoisehg\hgtk\commit.py:749
-#: tortoisehg\hgtk\commit.py:799 tortoisehg\hgtk\gdialog.py:473
+#: tortoisehg\hgtk\commit.py:495 tortoisehg\hgtk\commit.py:757
+#: tortoisehg\hgtk\commit.py:807 tortoisehg\hgtk\gdialog.py:473
 #: tortoisehg\hgtk\merge.py:94 tortoisehg\hgtk\thgconfig.py:601
 msgid "Commit"
 msgstr "Consolidar (commit)"
 
-#: tortoisehg\hgtk\commit.py:491
+#: tortoisehg\hgtk\commit.py:499
 msgid "QNew"
 msgstr "QNew"
 
-#: tortoisehg\hgtk\commit.py:492
+#: tortoisehg\hgtk\commit.py:500
 msgid "create new MQ patch"
 msgstr "criar novo patch MQ"
 
-#: tortoisehg\hgtk\commit.py:494
+#: tortoisehg\hgtk\commit.py:502
 msgid "QRefresh"
 msgstr "QRefresh"
 
-#: tortoisehg\hgtk\commit.py:495
+#: tortoisehg\hgtk\commit.py:503
 msgid "refresh top MQ patch"
 msgstr "atualiza o patch do topo da MQ"
 
-#: tortoisehg\hgtk\commit.py:497
+#: tortoisehg\hgtk\commit.py:505
 msgid "_Commit (+1 head)"
 msgstr "_Consolidar (commit) (+1 cabeça)"
 
-#: tortoisehg\hgtk\commit.py:497
+#: tortoisehg\hgtk\commit.py:505
 msgid "_Commit (-1 head)"
 msgstr "_Consolidar (commit) (-1 cabeça)"
 
-#: tortoisehg\hgtk\commit.py:502
+#: tortoisehg\hgtk\commit.py:510
 msgid "parent is not a head, commit to add a new head"
 msgstr "o pai não é uma cabeça, consolide para adicionar uma nova"
 
-#: tortoisehg\hgtk\commit.py:507
+#: tortoisehg\hgtk\commit.py:515
 msgid "commit to merge one head"
 msgstr "consolide para mesclar uma cabeça"
 
-#: tortoisehg\hgtk\commit.py:510
+#: tortoisehg\hgtk\commit.py:518
 msgid "no parent is a head, commit to add a new head"
 msgstr "nenhum pai é uma cabeça, consolide para adicionar uma nova"
 
-#: tortoisehg\hgtk\commit.py:614
+#: tortoisehg\hgtk\commit.py:622
 msgid "new branch: "
 msgstr "novo ramo: "
 
-#: tortoisehg\hgtk\commit.py:616
+#: tortoisehg\hgtk\commit.py:624
 msgid "close branch: "
 msgstr "fechar ramo: "
 
-#: tortoisehg\hgtk\commit.py:618
+#: tortoisehg\hgtk\commit.py:626
 msgid "branch: "
 msgstr "ramo: "
 
-#: tortoisehg\hgtk\commit.py:637
+#: tortoisehg\hgtk\commit.py:645
 msgid "Merge "
 msgstr "Mesclar "
 
-#: tortoisehg\hgtk\commit.py:673
+#: tortoisehg\hgtk\commit.py:681
 msgid "Patch Contents"
 msgstr "Conteúdo do Patch"
 
-#: tortoisehg\hgtk\commit.py:731 tortoisehg\hgtk\commit.py:884
+#: tortoisehg\hgtk\commit.py:739 tortoisehg\hgtk\commit.py:892
 msgid "Nothing Commited"
 msgstr "Nada foi consolidado"
 
-#: tortoisehg\hgtk\commit.py:732
+#: tortoisehg\hgtk\commit.py:740
 msgid "No committable files selected"
 msgstr "Nenhum arquivo consolidável selecionado"
 
-#: tortoisehg\hgtk\commit.py:750
+#: tortoisehg\hgtk\commit.py:758
 msgid "Unable to create "
 msgstr "Impossível criar "
 
-#: tortoisehg\hgtk\commit.py:800
+#: tortoisehg\hgtk\commit.py:808
 msgid "Unable to apply patch"
 msgstr "Impossível aplicar patch"
 
-#: tortoisehg\hgtk\commit.py:829
+#: tortoisehg\hgtk\commit.py:837
 msgid "Confirm Undo Commit"
 msgstr "Confirmar Desfazimento de Consolidação"
 
-#: tortoisehg\hgtk\commit.py:830
+#: tortoisehg\hgtk\commit.py:838
 msgid "Undo last commit"
 msgstr "Desfaz a última consolidação"
 
-#: tortoisehg\hgtk\commit.py:836 tortoisehg\hgtk\commit.py:851
+#: tortoisehg\hgtk\commit.py:844 tortoisehg\hgtk\commit.py:859
 msgid "Undo Commit"
 msgstr "Desfazer Consolidação"
 
-#: tortoisehg\hgtk\commit.py:837
+#: tortoisehg\hgtk\commit.py:845
 msgid ""
 "Unable to undo!\n"
 "\n"
@@ -726,36 +726,36 @@ msgstr ""
 "\n"
 "A revisão tip é diferente da última consolidação."
 
-#: tortoisehg\hgtk\commit.py:852
+#: tortoisehg\hgtk\commit.py:860
 msgid "Errors during rollback!"
 msgstr "Erros durante o rollback!"
 
-#: tortoisehg\hgtk\commit.py:865
+#: tortoisehg\hgtk\commit.py:873
 msgid "Confirm Add/Remove"
 msgstr "Confirmar Adicão/Remoção"
 
-#: tortoisehg\hgtk\commit.py:866
+#: tortoisehg\hgtk\commit.py:874
 msgid "Add/Remove the following files?"
 msgstr "Adicionar/Remover os seguintes arquivos?"
 
-#: tortoisehg\hgtk\commit.py:885 tortoisehg\hgtk\tagadd.py:173
+#: tortoisehg\hgtk\commit.py:893 tortoisehg\hgtk\tagadd.py:176
 msgid "Please enter commit message"
 msgstr "Por favor forneça a mensagem de consolidação"
 
-#: tortoisehg\hgtk\commit.py:893
+#: tortoisehg\hgtk\commit.py:901
 msgid "Error"
 msgstr "Erro"
 
-#: tortoisehg\hgtk\commit.py:894
+#: tortoisehg\hgtk\commit.py:902
 msgid "Message format configuration error"
 msgstr "Erro de configuração do formato da mensagem"
 
-#: tortoisehg\hgtk\commit.py:903 tortoisehg\hgtk\commit.py:911
-#: tortoisehg\hgtk\commit.py:923
+#: tortoisehg\hgtk\commit.py:911 tortoisehg\hgtk\commit.py:919
+#: tortoisehg\hgtk\commit.py:931
 msgid "Confirm Commit"
 msgstr "Confirmar Consolidação"
 
-#: tortoisehg\hgtk\commit.py:904
+#: tortoisehg\hgtk\commit.py:912
 msgid ""
 "The summary line length of %i is greater than %i.\n"
 "\n"
@@ -765,7 +765,7 @@ msgstr ""
 "\n"
 "Ignorar a política de formato e continuar a consolidação?"
 
-#: tortoisehg\hgtk\commit.py:912
+#: tortoisehg\hgtk\commit.py:920
 msgid ""
 "The summary line is not followed by a blank line.\n"
 "\n"
@@ -775,7 +775,7 @@ msgstr ""
 "\n"
 "Ignorar a política de formato e continuar a consolidação?"
 
-#: tortoisehg\hgtk\commit.py:924
+#: tortoisehg\hgtk\commit.py:932
 msgid ""
 "The following lines are over the %i-character limit: %s.\n"
 "\n"
@@ -785,11 +785,11 @@ msgstr ""
 "\n"
 "Ignorar a política de formato e continuar a consolidação?"
 
-#: tortoisehg\hgtk\commit.py:936
+#: tortoisehg\hgtk\commit.py:944
 msgid "Commit: Invalid username"
 msgstr "Consolidação: nome de usuário inválido"
 
-#: tortoisehg\hgtk\commit.py:937
+#: tortoisehg\hgtk\commit.py:945
 msgid ""
 "Your username has not been configured.\n"
 "\n"
@@ -799,11 +799,11 @@ msgstr ""
 "\n"
 "Por favor configure o seu nome de usuário e tente novamente"
 
-#: tortoisehg\hgtk\commit.py:970
+#: tortoisehg\hgtk\commit.py:978
 msgid "Confirm Override Branch"
 msgstr "Confirmar Sobreposição do Ramo"
 
-#: tortoisehg\hgtk\commit.py:971
+#: tortoisehg\hgtk\commit.py:979
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
@@ -811,43 +811,43 @@ msgstr ""
 "Já existe um  ramo com o nome \"%s\" ,\n"
 "sobrepor?"
 
-#: tortoisehg\hgtk\commit.py:975
+#: tortoisehg\hgtk\commit.py:983
 msgid "Confirm New Branch"
 msgstr "Confirmar Novo Ramo"
 
-#: tortoisehg\hgtk\commit.py:976
+#: tortoisehg\hgtk\commit.py:984
 msgid "Create new named branch \"%s\"?"
 msgstr "Criar um novo ramo com o nome \"%s\"?"
 
-#: tortoisehg\hgtk\commit.py:1051
+#: tortoisehg\hgtk\commit.py:1059
 msgid "Paste _Filenames"
 msgstr "Colar _Arquivos"
 
-#: tortoisehg\hgtk\commit.py:1052
+#: tortoisehg\hgtk\commit.py:1060
 msgid "App_ly Format"
 msgstr "Ap_licar Formato"
 
-#: tortoisehg\hgtk\commit.py:1053
+#: tortoisehg\hgtk\commit.py:1061
 msgid "C_onfigure Format"
 msgstr "C_onfigurar Formato"
 
-#: tortoisehg\hgtk\commit.py:1079
+#: tortoisehg\hgtk\commit.py:1087
 msgid "Info Required"
 msgstr "Informação Requerida"
 
-#: tortoisehg\hgtk\commit.py:1080
+#: tortoisehg\hgtk\commit.py:1088
 msgid "Message format needs to be configured"
 msgstr "A mensagem de formato precisa ser configurada"
 
-#: tortoisehg\hgtk\commit.py:1092 tortoisehg\hgtk\commit.py:1097
+#: tortoisehg\hgtk\commit.py:1100 tortoisehg\hgtk\commit.py:1105
 msgid "Warning"
 msgstr "Aviso"
 
-#: tortoisehg\hgtk\commit.py:1093
+#: tortoisehg\hgtk\commit.py:1101
 msgid "The summary line length of %i is greater than %i"
 msgstr "O comprimento %i da linha de sumário é maior que %i"
 
-#: tortoisehg\hgtk\commit.py:1098
+#: tortoisehg\hgtk\commit.py:1106
 msgid "The summary line is not followed by a blank line"
 msgstr "A linha do sumário não é seguida por uma linha em branco"
 
@@ -927,8 +927,8 @@ msgid "Filename"
 msgstr "Nome do arquivo"
 
 #: tortoisehg\hgtk\datamine.py:131 tortoisehg\hgtk\datamine.py:639
-#: tortoisehg\hgtk\history.py:315 tortoisehg\hgtk\history.py:1042
-#: tortoisehg\hgtk\logview\treeview.py:444 tortoisehg\hgtk\thgconfig.py:194
+#: tortoisehg\hgtk\history.py:311 tortoisehg\hgtk\history.py:1055
+#: tortoisehg\hgtk\logview\treeview.py:453 tortoisehg\hgtk\thgconfig.py:194
 #: tortoisehg\hgtk\thgconfig.py:277
 msgid "User"
 msgstr "Usuário"
@@ -1022,7 +1022,7 @@ msgid "Show all matching revisions"
 msgstr "Mostrar todas as revisões que correspondem"
 
 #: tortoisehg\hgtk\datamine.py:360 tortoisehg\hgtk\datamine.py:637
-#: tortoisehg\hgtk\logview\treeview.py:395
+#: tortoisehg\hgtk\logview\treeview.py:404
 msgid "Rev"
 msgstr "Rev"
 
@@ -1055,7 +1055,6 @@ msgid "Error: %s"
 msgstr "Erro: %s"
 
 #: tortoisehg\hgtk\datamine.py:457 tortoisehg\hgtk\datamine.py:756
-#: tortoisehg\hgtk\history.py:1321
 msgid "Abort: %s"
 msgstr "Abortado: %s"
 
@@ -1091,7 +1090,7 @@ msgstr "Prompt do TortoiseHg"
 msgid "_Tools"
 msgstr "_Ferramentas"
 
-#: tortoisehg\hgtk\gdialog.py:471 tortoisehg\hgtk\history.py:91
+#: tortoisehg\hgtk\gdialog.py:471 tortoisehg\hgtk\history.py:87
 #: tortoisehg\util\menuthg.py:68
 msgid "Repository Explorer"
 msgstr "Explorador de Repositório"
@@ -1961,7 +1960,7 @@ msgstr "Mover Para Cima"
 msgid "Move Down"
 msgstr "Mover Para Baixo"
 
-#: tortoisehg\hgtk\history.py:75
+#: tortoisehg\hgtk\history.py:71
 msgid ""
 "New changesets from the preview bundle are still pending.\n"
 "\n"
@@ -1971,517 +1970,513 @@ msgstr ""
 "\n"
 "Aceitar ou rejeitar as novas revisões?"
 
-#: tortoisehg\hgtk\history.py:78
+#: tortoisehg\hgtk\history.py:74
 msgid "Accept new Changesets"
 msgstr "Aceitar novas Revisões"
 
-#: tortoisehg\hgtk\history.py:81
+#: tortoisehg\hgtk\history.py:77
 msgid "&Accept"
 msgstr "&Aceitar"
 
-#: tortoisehg\hgtk\history.py:81
+#: tortoisehg\hgtk\history.py:77
 msgid "&Reject"
 msgstr "&Rejeitar"
 
-#: tortoisehg\hgtk\history.py:93
+#: tortoisehg\hgtk\history.py:89
 msgid " (Bundle Preview)"
 msgstr " (Pré-Visualização de Bundle)"
 
-#: tortoisehg\hgtk\history.py:109 tortoisehg\hgtk\status.py:177
+#: tortoisehg\hgtk\history.py:105 tortoisehg\hgtk\status.py:177
 msgid "Re_fresh"
 msgstr "Re_ler"
 
-#: tortoisehg\hgtk\history.py:111
+#: tortoisehg\hgtk\history.py:107
 msgid "Reload revision history"
 msgstr "Recarrega histórico de revisões"
 
-#: tortoisehg\hgtk\history.py:115 tortoisehg\hgtk\history.py:164
+#: tortoisehg\hgtk\history.py:111 tortoisehg\hgtk\history.py:160
 msgid "Patch Queue"
 msgstr "Fila de Patches"
 
-#: tortoisehg\hgtk\history.py:117
+#: tortoisehg\hgtk\history.py:113
 msgid "Show/Hide Patch Queue"
 msgstr "Mostra/Oculta Fila de Patches"
 
-#: tortoisehg\hgtk\history.py:160
+#: tortoisehg\hgtk\history.py:156
 msgid "Sync Bar"
 msgstr "Barra de Sincronização"
 
-#: tortoisehg\hgtk\history.py:170
+#: tortoisehg\hgtk\history.py:166
 msgid "Load more Revisions"
 msgstr "Carrega mais Revisões"
 
-#: tortoisehg\hgtk\history.py:172
+#: tortoisehg\hgtk\history.py:168
 msgid "Load all Revisions"
 msgstr "Carrega todas as Revisões"
 
-#: tortoisehg\hgtk\history.py:175
+#: tortoisehg\hgtk\history.py:171
 msgid "Toolbar"
 msgstr "Barra de Tarefas"
 
-#: tortoisehg\hgtk\history.py:178
+#: tortoisehg\hgtk\history.py:174
 msgid "Filter Bar"
 msgstr "Barra de Filtragem"
 
-#: tortoisehg\hgtk\history.py:184
+#: tortoisehg\hgtk\history.py:180
 msgid "Reset Marks"
 msgstr "Remover Marcações"
 
-#: tortoisehg\hgtk\history.py:187
+#: tortoisehg\hgtk\history.py:183
 msgid "Choose Details..."
 msgstr "Escolher Detalhes..."
 
-#: tortoisehg\hgtk\history.py:190
+#: tortoisehg\hgtk\history.py:186
 msgid "Compact Graph"
 msgstr "Grafo Compacto"
 
-#: tortoisehg\hgtk\history.py:192
+#: tortoisehg\hgtk\history.py:188
 msgid "Color by Branch"
 msgstr "Colorir por Ramo"
 
-#: tortoisehg\hgtk\history.py:195
+#: tortoisehg\hgtk\history.py:191
 msgid "Ignore Max Diff Size"
 msgstr "Ignorar Tamanho Máximo de Diff"
 
-#: tortoisehg\hgtk\history.py:199
+#: tortoisehg\hgtk\history.py:195
 msgid "_Navigate"
 msgstr "_Navegar"
 
-#: tortoisehg\hgtk\history.py:200
+#: tortoisehg\hgtk\history.py:196
 msgid "Tip"
 msgstr "Tip"
 
-#: tortoisehg\hgtk\history.py:202
+#: tortoisehg\hgtk\history.py:198
 msgid "Working Parent"
 msgstr "Pai do Diretório de Trabalho"
 
-#: tortoisehg\hgtk\history.py:205
+#: tortoisehg\hgtk\history.py:201
 msgid "Revision..."
 msgstr "Revisão..."
 
-#: tortoisehg\hgtk\history.py:209
+#: tortoisehg\hgtk\history.py:205
 msgid "_Synchronize"
 msgstr "_Sincronizar"
 
-#: tortoisehg\hgtk\history.py:210 tortoisehg\hgtk\synch.py:63
+#: tortoisehg\hgtk\history.py:206 tortoisehg\hgtk\synch.py:63
 msgid "Incoming"
 msgstr "Incoming"
 
-#: tortoisehg\hgtk\history.py:212
+#: tortoisehg\hgtk\history.py:208
 msgid "Pull"
 msgstr "Pull"
 
-#: tortoisehg\hgtk\history.py:214 tortoisehg\hgtk\synch.py:74
+#: tortoisehg\hgtk\history.py:210 tortoisehg\hgtk\synch.py:74
 msgid "Outgoing"
 msgstr "Outgoing"
 
-#: tortoisehg\hgtk\history.py:218
+#: tortoisehg\hgtk\history.py:214
 msgid "Email..."
 msgstr "Email..."
 
-#: tortoisehg\hgtk\history.py:221
+#: tortoisehg\hgtk\history.py:217
 msgid "Add Bundle..."
 msgstr "Adicionar Bundle..."
 
-#: tortoisehg\hgtk\history.py:224
+#: tortoisehg\hgtk\history.py:220
 msgid "Accept Bundle"
 msgstr "Aceitar Bundle"
 
-#: tortoisehg\hgtk\history.py:227
+#: tortoisehg\hgtk\history.py:223
 msgid "Reject Bundle"
 msgstr "Rejeitar Bundle"
 
-#: tortoisehg\hgtk\history.py:233
+#: tortoisehg\hgtk\history.py:229
 msgid "Force push"
 msgstr "Forçar push"
 
-#: tortoisehg\hgtk\history.py:304 tortoisehg\hgtk\logview\treeview.py:381
+#: tortoisehg\hgtk\history.py:300 tortoisehg\hgtk\logview\treeview.py:389
 msgid "Graph"
 msgstr "Grafo"
 
-#: tortoisehg\hgtk\history.py:311
+#: tortoisehg\hgtk\history.py:307
 msgid "Revision Number"
 msgstr "Número de Ordem da Revisão"
 
-#: tortoisehg\hgtk\history.py:312
+#: tortoisehg\hgtk\history.py:308
 msgid "Changeset ID"
 msgstr "ID da Revisão"
 
-#: tortoisehg\hgtk\history.py:313
+#: tortoisehg\hgtk\history.py:309
 msgid "Branch Name"
 msgstr "Nome do Ramo"
 
-#: tortoisehg\hgtk\history.py:314 tortoisehg\hgtk\logview\treeview.py:433
+#: tortoisehg\hgtk\history.py:310 tortoisehg\hgtk\logview\treeview.py:442
 #: tortoisehg\hgtk\thgmq.py:187
 msgid "Summary"
 msgstr "Sumário"
 
-#: tortoisehg\hgtk\history.py:316 tortoisehg\hgtk\logview\treeview.py:455
+#: tortoisehg\hgtk\history.py:312 tortoisehg\hgtk\logview\treeview.py:464
 msgid "Local Date"
 msgstr "Data local"
 
-#: tortoisehg\hgtk\history.py:317
+#: tortoisehg\hgtk\history.py:313
 msgid "UTC Date"
 msgstr "Data UTC"
 
-#: tortoisehg\hgtk\history.py:318 tortoisehg\hgtk\logview\treeview.py:479
+#: tortoisehg\hgtk\history.py:314 tortoisehg\hgtk\logview\treeview.py:488
 msgid "Age"
 msgstr "Idade"
 
-#: tortoisehg\hgtk\history.py:319 tortoisehg\hgtk\logview\treeview.py:491
+#: tortoisehg\hgtk\history.py:315 tortoisehg\hgtk\logview\treeview.py:500
 msgid "Tags"
 msgstr "Etiquetas"
 
-#: tortoisehg\hgtk\history.py:368
+#: tortoisehg\hgtk\history.py:383
 msgid "Invalid revision range"
 msgstr "Faixa de revisões inválida"
 
-#: tortoisehg\hgtk\history.py:380
+#: tortoisehg\hgtk\history.py:395
 msgid "Invalid date specification"
 msgstr "especificação da data inválida"
 
-#: tortoisehg\hgtk\history.py:620
+#: tortoisehg\hgtk\history.py:638
 msgid "Filter"
 msgstr "Filtro"
 
-#: tortoisehg\hgtk\history.py:625
+#: tortoisehg\hgtk\history.py:643
 msgid "%s branch"
 msgstr "ramo %s"
 
-#: tortoisehg\hgtk\history.py:626
+#: tortoisehg\hgtk\history.py:644
 msgid "Branch '%s'"
 msgstr "Ramo '%s'"
 
-#: tortoisehg\hgtk\history.py:632
+#: tortoisehg\hgtk\history.py:650
 msgid "file history: "
 msgstr "histórico do arquivo: "
 
-#: tortoisehg\hgtk\history.py:636
+#: tortoisehg\hgtk\history.py:654
 msgid "custom filter"
 msgstr "filtro personalizado"
 
-#: tortoisehg\hgtk\history.py:644
+#: tortoisehg\hgtk\history.py:662
 msgid "merges"
 msgstr "mesclagens"
 
-#: tortoisehg\hgtk\history.py:647
+#: tortoisehg\hgtk\history.py:665
 msgid "only Merges"
 msgstr "apenas Mesclagens"
 
-#: tortoisehg\hgtk\history.py:649
+#: tortoisehg\hgtk\history.py:667
 msgid "revision ancestry"
 msgstr "ancestralidade de revisões"
 
-#: tortoisehg\hgtk\history.py:654
+#: tortoisehg\hgtk\history.py:672
 msgid "Ancestry of %s"
 msgstr "Ancestralidade de %s"
 
-#: tortoisehg\hgtk\history.py:656
+#: tortoisehg\hgtk\history.py:674
 msgid "tagged revisions"
 msgstr "revisões etiquetadas"
 
-#: tortoisehg\hgtk\history.py:664
+#: tortoisehg\hgtk\history.py:682
 msgid "Tagged Revisions"
 msgstr "Revisões Etiquetadas"
 
-#: tortoisehg\hgtk\history.py:666
+#: tortoisehg\hgtk\history.py:684
 msgid "working parents"
 msgstr "pais de trabalho"
 
-#: tortoisehg\hgtk\history.py:672
+#: tortoisehg\hgtk\history.py:690
 msgid "heads"
 msgstr "cabeças"
 
-#: tortoisehg\hgtk\history.py:676 tortoisehg\hgtk\history.py:1005
+#: tortoisehg\hgtk\history.py:694 tortoisehg\hgtk\history.py:1018
 msgid "Heads"
 msgstr "Cabeças"
 
-#: tortoisehg\hgtk\history.py:678
+#: tortoisehg\hgtk\history.py:696
 msgid "no Merges"
 msgstr "não mostrar Mesclagens"
 
-#: tortoisehg\hgtk\history.py:696
+#: tortoisehg\hgtk\history.py:714
 msgid "Visualize Change"
 msgstr "Visualizar Mudança (externo)"
 
-#: tortoisehg\hgtk\history.py:697
+#: tortoisehg\hgtk\history.py:715
 msgid "Di_splay Change"
 msgstr "E_xibir Mudança (interno)"
 
-#: tortoisehg\hgtk\history.py:698
+#: tortoisehg\hgtk\history.py:716
 msgid "Diff to local"
 msgstr "Diferença com local"
 
-#: tortoisehg\hgtk\history.py:700
+#: tortoisehg\hgtk\history.py:718
 msgid "_Copy hash"
 msgstr "_Copiar hash (ID)"
 
-#: tortoisehg\hgtk\history.py:704
+#: tortoisehg\hgtk\history.py:722
 msgid "Pull to here"
 msgstr "Pull até aqui"
 
-#: tortoisehg\hgtk\history.py:711
+#: tortoisehg\hgtk\history.py:729
 msgid "Push to here"
 msgstr "Push até aqui"
 
-#: tortoisehg\hgtk\history.py:713
+#: tortoisehg\hgtk\history.py:731
 msgid "_Update..."
 msgstr "At_ualizar..."
 
-#: tortoisehg\hgtk\history.py:714 tortoisehg\hgtk\history.py:799
+#: tortoisehg\hgtk\history.py:732 tortoisehg\hgtk\history.py:817
 msgid "_Merge with..."
 msgstr "_Mesclar com..."
 
-#: tortoisehg\hgtk\history.py:717
+#: tortoisehg\hgtk\history.py:735
 msgid "_Export Patch..."
 msgstr "_Exportar Patch..."
 
-#: tortoisehg\hgtk\history.py:718
+#: tortoisehg\hgtk\history.py:736
 msgid "E_mail Patch..."
 msgstr "Enviar Patch por E_mail..."
 
-#: tortoisehg\hgtk\history.py:719
+#: tortoisehg\hgtk\history.py:737
 msgid "_Bundle rev:tip..."
 msgstr "Criar _Bundle rev:tip..."
 
-#: tortoisehg\hgtk\history.py:721
+#: tortoisehg\hgtk\history.py:739
 msgid "Add/Remove _Tag..."
 msgstr "Adicionar/Remover E_tiqueta..."
 
-#: tortoisehg\hgtk\history.py:722
+#: tortoisehg\hgtk\history.py:740
 msgid "Backout Revision..."
 msgstr "Anular Revisão (backout)..."
 
-#: tortoisehg\hgtk\history.py:724 tortoisehg\hgtk\status.py:1514
+#: tortoisehg\hgtk\history.py:742 tortoisehg\hgtk\status.py:1514
 msgid "_Revert"
 msgstr "_Reverter"
 
-#: tortoisehg\hgtk\history.py:725
+#: tortoisehg\hgtk\history.py:743
 msgid "_Archive..."
 msgstr "Criar P_acote..."
 
-#: tortoisehg\hgtk\history.py:743
+#: tortoisehg\hgtk\history.py:761
 msgid "Transp_lant to local"
 msgstr "Transp_lantar sobre a atual"
 
-#: tortoisehg\hgtk\history.py:748
+#: tortoisehg\hgtk\history.py:766
 msgid "QImport Revision"
 msgstr "Importar Revisão com Qimport"
 
-#: tortoisehg\hgtk\history.py:749
+#: tortoisehg\hgtk\history.py:767
 msgid "Strip Revision..."
 msgstr "Remover revisão..."
 
-#: tortoisehg\hgtk\history.py:782
+#: tortoisehg\hgtk\history.py:800
 msgid "_Diff with selected"
 msgstr "_Diff com selecionada (interno)"
 
-#: tortoisehg\hgtk\history.py:783
+#: tortoisehg\hgtk\history.py:801
 msgid "Visual Diff with selected"
 msgstr "Diferença Visual com selecionada (externo)"
 
-#: tortoisehg\hgtk\history.py:792
+#: tortoisehg\hgtk\history.py:810
 msgid "Email from here to selected..."
 msgstr "Enviar por Email daqui até selecionada..."
 
-#: tortoisehg\hgtk\history.py:794
+#: tortoisehg\hgtk\history.py:812
 msgid "Bundle from here to selected..."
 msgstr "Criar Bundle daqui até selecionada..."
 
-#: tortoisehg\hgtk\history.py:796
+#: tortoisehg\hgtk\history.py:814
 msgid "Export Patches from here to selected..."
 msgstr "Exportar Patches daqui até selecionada..."
 
-#: tortoisehg\hgtk\history.py:815
+#: tortoisehg\hgtk\history.py:833
 msgid "Transplant Revision range to local"
 msgstr "Transplantar faixa de Revisões sobre a local"
 
-#: tortoisehg\hgtk\history.py:820
+#: tortoisehg\hgtk\history.py:838
 msgid "Rebase on top of selected"
 msgstr "Rebasear no topo da selecionada"
 
-#: tortoisehg\hgtk\history.py:825
+#: tortoisehg\hgtk\history.py:843
 msgid "QImport from here to selected"
 msgstr "Importar com qimport daqui até a selecionada"
 
-#: tortoisehg\hgtk\history.py:829
+#: tortoisehg\hgtk\history.py:847
 msgid "Select common ancestor revision"
 msgstr "Selecionar revisão ancestral comum"
 
-#: tortoisehg\hgtk\history.py:860
+#: tortoisehg\hgtk\history.py:878
 msgid "Load more"
 msgstr "Carregar mais"
 
-#: tortoisehg\hgtk\history.py:860
+#: tortoisehg\hgtk\history.py:878
 msgid "load more revisions"
 msgstr "carrega mais revisões"
 
-#: tortoisehg\hgtk\history.py:863
+#: tortoisehg\hgtk\history.py:881
 msgid "Load all"
 msgstr "Carregar todas"
 
-#: tortoisehg\hgtk\history.py:863
+#: tortoisehg\hgtk\history.py:881
 msgid "load all revisions"
 msgstr "carrega todas as revisões"
 
-#: tortoisehg\hgtk\history.py:905
+#: tortoisehg\hgtk\history.py:923
 msgid "Download and view incoming changesets"
 msgstr "Baixa e visualiza revisões novas remotas"
 
-#: tortoisehg\hgtk\history.py:907
+#: tortoisehg\hgtk\history.py:925
 msgid "Accept changes from Bundle preview"
 msgstr "Aceita mudanças da pré-visualização do bundle"
 
-#: tortoisehg\hgtk\history.py:909
+#: tortoisehg\hgtk\history.py:927
 msgid "Reject changes from Bundle preview"
 msgstr "Rejeita mudanças da pré-visualização do bundle"
 
-#: tortoisehg\hgtk\history.py:911
+#: tortoisehg\hgtk\history.py:929
 msgid "Pull incoming changesets"
 msgstr "Traz revisões novas remotas (pull)"
 
-#: tortoisehg\hgtk\history.py:914
+#: tortoisehg\hgtk\history.py:932
 msgid "Determine and mark outgoing changesets"
 msgstr "Determina e marca revisões locais não presentes no remoto"
 
-#: tortoisehg\hgtk\history.py:916
+#: tortoisehg\hgtk\history.py:934
 msgid "Push outgoing changesets"
 msgstr "Envia revisões locais não presentes no remoto (push)"
 
-#: tortoisehg\hgtk\history.py:918
+#: tortoisehg\hgtk\history.py:936
 msgid "Email outgoing changesets"
 msgstr "Envia por email revisões locais não presentes no remoto"
 
-#: tortoisehg\hgtk\history.py:921
-msgid "Stop current transaction"
-msgstr "Interrompe a transação atual"
-
-#: tortoisehg\hgtk\history.py:946
+#: tortoisehg\hgtk\history.py:959
 msgid "After Pull:"
 msgstr "Após o Pull:"
 
-#: tortoisehg\hgtk\history.py:947 tortoisehg\hgtk\synch.py:155
+#: tortoisehg\hgtk\history.py:960 tortoisehg\hgtk\synch.py:154
 msgid "Nothing"
 msgstr "Nenhuma Ação"
 
-#: tortoisehg\hgtk\history.py:947 tortoisehg\hgtk\synch.py:155
+#: tortoisehg\hgtk\history.py:960 tortoisehg\hgtk\synch.py:154
 #: tortoisehg\hgtk\update.py:44
 msgid "Update"
 msgstr "Atualizar"
 
-#: tortoisehg\hgtk\history.py:950 tortoisehg\hgtk\synch.py:158
+#: tortoisehg\hgtk\history.py:963 tortoisehg\hgtk\synch.py:157
 msgid "Fetch"
 msgstr "Fetch"
 
-#: tortoisehg\hgtk\history.py:952 tortoisehg\hgtk\synch.py:160
+#: tortoisehg\hgtk\history.py:965 tortoisehg\hgtk\synch.py:159
 msgid "Rebase"
 msgstr "Rebasear (--rebase)"
 
-#: tortoisehg\hgtk\history.py:971
+#: tortoisehg\hgtk\history.py:984
 msgid "Configure aliases and after pull behavior"
 msgstr "Configura apelidos de repositórios e ações após o pull"
 
-#: tortoisehg\hgtk\history.py:987
+#: tortoisehg\hgtk\history.py:1000
 msgid "All"
 msgstr "Todas"
 
-#: tortoisehg\hgtk\history.py:992
+#: tortoisehg\hgtk\history.py:1005
 msgid "Tagged"
 msgstr "Etiquetadas"
 
-#: tortoisehg\hgtk\history.py:996
+#: tortoisehg\hgtk\history.py:1009
 msgid "Ancestry"
 msgstr "Ancestrais"
 
-#: tortoisehg\hgtk\history.py:1009
+#: tortoisehg\hgtk\history.py:1022
 msgid "Merges"
 msgstr "Mesclagens"
 
-#: tortoisehg\hgtk\history.py:1013
+#: tortoisehg\hgtk\history.py:1026
 msgid "Hide Merges"
 msgstr "Ocultar Mesclagens"
 
-#: tortoisehg\hgtk\history.py:1020
+#: tortoisehg\hgtk\history.py:1033
 msgid "Branch Filter"
 msgstr "Filtro de Ramos"
 
-#: tortoisehg\hgtk\history.py:1026
+#: tortoisehg\hgtk\history.py:1039
 msgid "Branches..."
 msgstr "Ramos..."
 
-#: tortoisehg\hgtk\history.py:1036
+#: tortoisehg\hgtk\history.py:1049
 msgid "Custom Filter"
 msgstr "Filtro Personalizado"
 
-#: tortoisehg\hgtk\history.py:1041
+#: tortoisehg\hgtk\history.py:1054
 msgid "File Patterns"
 msgstr "Padrões de Arquivo"
 
-#: tortoisehg\hgtk\history.py:1041
+#: tortoisehg\hgtk\history.py:1054
 msgid "Rev Range"
 msgstr "Faixa de Revisões"
 
-#: tortoisehg\hgtk\history.py:1042
+#: tortoisehg\hgtk\history.py:1055
 msgid "Date"
 msgstr "Data"
 
-#: tortoisehg\hgtk\history.py:1042
+#: tortoisehg\hgtk\history.py:1055
 msgid "Keywords"
 msgstr "Palavras Chave"
 
-#: tortoisehg\hgtk\history.py:1174 tortoisehg\hgtk\history.py:1285
-#: tortoisehg\hgtk\history.py:1307 tortoisehg\hgtk\history.py:1369
-#: tortoisehg\hgtk\history.py:1747
+#: tortoisehg\hgtk\history.py:1199 tortoisehg\hgtk\history.py:1312
+#: tortoisehg\hgtk\history.py:1334 tortoisehg\hgtk\history.py:1378
+#: tortoisehg\hgtk\history.py:1760
 msgid "No remote path specified"
 msgstr "Nenhum caminho remoto especificado"
 
-#: tortoisehg\hgtk\history.py:1175 tortoisehg\hgtk\history.py:1286
-#: tortoisehg\hgtk\history.py:1308 tortoisehg\hgtk\history.py:1370
-#: tortoisehg\hgtk\history.py:1748
+#: tortoisehg\hgtk\history.py:1200 tortoisehg\hgtk\history.py:1313
+#: tortoisehg\hgtk\history.py:1335 tortoisehg\hgtk\history.py:1379
+#: tortoisehg\hgtk\history.py:1761
 msgid "Please enter or select a remote path"
 msgstr "Por favor digite ou selecione um caminho remoto"
 
-#: tortoisehg\hgtk\history.py:1208
+#: tortoisehg\hgtk\history.py:1235
 msgid "Accept incoming previewed changesets"
 msgstr "Aceita revisões remotas da pré-visualização"
 
-#: tortoisehg\hgtk\history.py:1209
+#: tortoisehg\hgtk\history.py:1236
 msgid "Accept"
 msgstr "Aceitar"
 
-#: tortoisehg\hgtk\history.py:1214
+#: tortoisehg\hgtk\history.py:1241
 msgid "Reject incoming previewed changesets"
 msgstr "Rejeita revisões remotas da pré-visualização"
 
-#: tortoisehg\hgtk\history.py:1215
+#: tortoisehg\hgtk\history.py:1242
 msgid "Reject"
 msgstr "Rejeitar"
 
-#: tortoisehg\hgtk\history.py:1256
+#: tortoisehg\hgtk\history.py:1283
 msgid "Bundle Preview"
 msgstr "Pré-Visualização de Bundle"
 
-#: tortoisehg\hgtk\history.py:1261
+#: tortoisehg\hgtk\history.py:1288
 msgid "Open Bundle"
 msgstr "Abrir Bundle"
 
-#: tortoisehg\hgtk\history.py:1337
+#: tortoisehg\hgtk\history.py:1359
 msgid "%d outgoing changesets"
 msgstr "%d revisões a serem enviadas"
 
-#: tortoisehg\hgtk\history.py:1356 tortoisehg\hgtk\synch.py:495
+#: tortoisehg\hgtk\history.py:1365 tortoisehg\hgtk\synch.py:494
 msgid "No repository selected"
 msgstr "Nenhum repositório selecionado"
 
-#: tortoisehg\hgtk\history.py:1357 tortoisehg\hgtk\synch.py:496
+#: tortoisehg\hgtk\history.py:1366 tortoisehg\hgtk\synch.py:495
 msgid "Select a peer repository to compare with"
 msgstr "Selecione um repositório relacionado com o qual comparar"
 
-#: tortoisehg\hgtk\history.py:1378
+#: tortoisehg\hgtk\history.py:1387
 msgid "Confirm Forced Push to Remote Repository"
 msgstr "Confirmação de Push Forçado para o Repositório Remoto"
 
-#: tortoisehg\hgtk\history.py:1379
+#: tortoisehg\hgtk\history.py:1388
 msgid ""
 "Forced push to remote repository\n"
 "%s\n"
@@ -2491,15 +2486,15 @@ msgstr ""
 "%s\n"
 "(criando novas cabeças no remoto se necessário)?"
 
-#: tortoisehg\hgtk\history.py:1381 tortoisehg\hgtk\history.py:1391
+#: tortoisehg\hgtk\history.py:1390 tortoisehg\hgtk\history.py:1400
 msgid "Forced &Push"
 msgstr "&Push Forçado"
 
-#: tortoisehg\hgtk\history.py:1383
+#: tortoisehg\hgtk\history.py:1392
 msgid "Confirm Push to remote Repository"
 msgstr "Confirmação de Push para o Repositório Remoto"
 
-#: tortoisehg\hgtk\history.py:1384
+#: tortoisehg\hgtk\history.py:1393
 msgid ""
 "Push to remote repository\n"
 "%s\n"
@@ -2509,15 +2504,15 @@ msgstr ""
 "%s\n"
 "?"
 
-#: tortoisehg\hgtk\history.py:1385
+#: tortoisehg\hgtk\history.py:1394
 msgid "&Push"
 msgstr "&Push"
 
-#: tortoisehg\hgtk\history.py:1388
+#: tortoisehg\hgtk\history.py:1397
 msgid "Confirm Forced Push"
 msgstr "Confirmação de Push Forçado"
 
-#: tortoisehg\hgtk\history.py:1389
+#: tortoisehg\hgtk\history.py:1398
 msgid ""
 "Forced push to repository\n"
 "%s\n"
@@ -2527,11 +2522,11 @@ msgstr ""
 "%s\n"
 "(criando novas cabeças se necessário)?"
 
-#: tortoisehg\hgtk\history.py:1563
+#: tortoisehg\hgtk\history.py:1571
 msgid "Confirm Revert All Files"
 msgstr "Confirmar Reversão de Todos os Arquivos"
 
-#: tortoisehg\hgtk\history.py:1564
+#: tortoisehg\hgtk\history.py:1572
 msgid ""
 "Revert all files to revision %d?\n"
 "This will overwrite your local changes"
@@ -2539,43 +2534,43 @@ msgstr ""
 "Reverter todos os arquivos para a revisão %d?\n"
 "Isto irá sobrescrever as suas alterações locais"
 
-#: tortoisehg\hgtk\history.py:1615
+#: tortoisehg\hgtk\history.py:1625
 msgid "Save patches to"
 msgstr "Salvar patches em"
 
-#: tortoisehg\hgtk\history.py:1638 tortoisehg\hgtk\history.py:1810
+#: tortoisehg\hgtk\history.py:1648 tortoisehg\hgtk\history.py:1823
 msgid "Write bundle to"
 msgstr "Escrever bundle para"
 
-#: tortoisehg\hgtk\history.py:1674
+#: tortoisehg\hgtk\history.py:1683
 msgid "Confirm Rebase Revision"
 msgstr "Confirmar Rebaseamento de Revisões"
 
-#: tortoisehg\hgtk\history.py:1675
+#: tortoisehg\hgtk\history.py:1684
 msgid "Rebase revision %d on top of %d?"
 msgstr "Rebasear revisão %d no topo de %d?"
 
-#: tortoisehg\hgtk\history.py:1789 tortoisehg\hgtk\status.py:1198
+#: tortoisehg\hgtk\history.py:1802 tortoisehg\hgtk\status.py:1198
 msgid "Save patch to"
 msgstr "Salvar patch em"
 
-#: tortoisehg\hgtk\logview\treeview.py:256
+#: tortoisehg\hgtk\logview\treeview.py:258
 msgid "%(count)d of %(total)d Revisions"
 msgstr "%(count)d de %(total)d Revisões"
 
-#: tortoisehg\hgtk\logview\treeview.py:363
+#: tortoisehg\hgtk\logview\treeview.py:371
 msgid "Repository is empty"
 msgstr "Repositório está vazio"
 
-#: tortoisehg\hgtk\logview\treeview.py:408
+#: tortoisehg\hgtk\logview\treeview.py:417
 msgid "ID"
 msgstr "ID"
 
-#: tortoisehg\hgtk\logview\treeview.py:420
+#: tortoisehg\hgtk\logview\treeview.py:429
 msgid "Branch"
 msgstr "Ramo"
 
-#: tortoisehg\hgtk\logview\treeview.py:467
+#: tortoisehg\hgtk\logview\treeview.py:476
 msgid "Universal Date"
 msgstr "Data Universal"
 
@@ -2802,11 +2797,11 @@ msgstr "Verificar"
 msgid "Validate repository consistency"
 msgstr "Validar consistência do repositório"
 
-#: tortoisehg\hgtk\recovery.py:102 tortoisehg\hgtk\synch.py:394
+#: tortoisehg\hgtk\recovery.py:102 tortoisehg\hgtk\synch.py:393
 msgid "Cannot close now"
 msgstr "Não é possível fechar agora"
 
-#: tortoisehg\hgtk\recovery.py:103 tortoisehg\hgtk\synch.py:395
+#: tortoisehg\hgtk\recovery.py:103 tortoisehg\hgtk\synch.py:394
 msgid "command is running"
 msgstr "o comando está em execução"
 
@@ -2826,15 +2821,15 @@ msgstr "Confirma rollback do repositório"
 msgid "Rollback repository '%s' ?"
 msgstr "Rollback no repositório '%s' ?"
 
-#: tortoisehg\hgtk\recovery.py:157 tortoisehg\hgtk\synch.py:537
+#: tortoisehg\hgtk\recovery.py:157 tortoisehg\hgtk\synch.py:536
 msgid "Cannot run now"
 msgstr "Não é possível executar agora"
 
-#: tortoisehg\hgtk\recovery.py:158 tortoisehg\hgtk\synch.py:538
+#: tortoisehg\hgtk\recovery.py:158 tortoisehg\hgtk\synch.py:537
 msgid "Please try again after the previous command is completed"
 msgstr "Por favor tente de novo após o comando anterior terminar"
 
-#: tortoisehg\hgtk\recovery.py:220 tortoisehg\hgtk\synch.py:628
+#: tortoisehg\hgtk\recovery.py:220 tortoisehg\hgtk\synch.py:627
 msgid "[command interrupted]"
 msgstr "[comando interrompido]"
 
@@ -3376,71 +3371,71 @@ msgstr "Repo:"
 msgid "Bundle:"
 msgstr "Bundle:"
 
-#: tortoisehg\hgtk\synch.py:164
+#: tortoisehg\hgtk\synch.py:163
 msgid "Post Pull: "
 msgstr "Após Pull: "
 
-#: tortoisehg\hgtk\synch.py:174
+#: tortoisehg\hgtk\synch.py:173
 msgid "Advanced Options"
 msgstr "Opções Avançadas"
 
-#: tortoisehg\hgtk\synch.py:181
+#: tortoisehg\hgtk\synch.py:180
 msgid "Force pull or push"
 msgstr "Força pull ou push"
 
-#: tortoisehg\hgtk\synch.py:182
+#: tortoisehg\hgtk\synch.py:181
 msgid "Run even when remote repository is unrelated."
 msgstr "Executar mesmo se o repositório remoto não for relacionado."
 
-#: tortoisehg\hgtk\synch.py:195
+#: tortoisehg\hgtk\synch.py:194
 msgid "Target revision:"
 msgstr "Revisão alvo:"
 
-#: tortoisehg\hgtk\synch.py:199
+#: tortoisehg\hgtk\synch.py:198
 msgid "A specific revision up to which you would like to push or pull."
 msgstr "Uma revisão específica até a qual se deseja enviar ou trazer."
 
-#: tortoisehg\hgtk\synch.py:209
+#: tortoisehg\hgtk\synch.py:208
 msgid "Name of hg executable on remote machine."
 msgstr "Nome do executável hg na máquina remota."
 
-#: tortoisehg\hgtk\synch.py:219
+#: tortoisehg\hgtk\synch.py:218
 msgid "Incoming/Outgoing"
 msgstr "Incoming/Outgoing"
 
-#: tortoisehg\hgtk\synch.py:222
+#: tortoisehg\hgtk\synch.py:221
 msgid "Show patches"
 msgstr "Mostrar patches"
 
-#: tortoisehg\hgtk\synch.py:223
+#: tortoisehg\hgtk\synch.py:222
 msgid "Show newest first"
 msgstr "Mostrar mais novos primeiro"
 
-#: tortoisehg\hgtk\synch.py:224
+#: tortoisehg\hgtk\synch.py:223
 msgid "Show no merges"
 msgstr "Não mostrar mesclagens"
 
-#: tortoisehg\hgtk\synch.py:268
+#: tortoisehg\hgtk\synch.py:267
 msgid "Update to branch tip"
 msgstr "Atualizar para tip do ramo"
 
-#: tortoisehg\hgtk\synch.py:367
+#: tortoisehg\hgtk\synch.py:366
 msgid "unknown sort key '%s'"
 msgstr "chave de ordenação '%s' desconhecida"
 
-#: tortoisehg\hgtk\synch.py:377
+#: tortoisehg\hgtk\synch.py:376
 msgid "Select Repository"
 msgstr "Selecionar Repositório"
 
-#: tortoisehg\hgtk\synch.py:384
+#: tortoisehg\hgtk\synch.py:383
 msgid "Select Bundle"
 msgstr "Selecionar Bundle"
 
-#: tortoisehg\hgtk\synch.py:386
+#: tortoisehg\hgtk\synch.py:385
 msgid "Bundle (*.hg)"
 msgstr "Bundle (*.hg)"
 
-#: tortoisehg\hgtk\synch.py:387
+#: tortoisehg\hgtk\synch.py:386
 msgid "Bundle (*)"
 msgstr "Bundle (*)"
 
@@ -3468,60 +3463,60 @@ msgstr "Usar mensagem de consolidação em inglês"
 msgid "Use custom commit message:"
 msgstr "Usar mensagem de consolidação personalizada:"
 
-#: tortoisehg\hgtk\tagadd.py:167
+#: tortoisehg\hgtk\tagadd.py:170
 msgid "Tag input is empty"
 msgstr "A entrada da etiqueta está vazia"
 
-#: tortoisehg\hgtk\tagadd.py:168
+#: tortoisehg\hgtk\tagadd.py:171
 msgid "Please enter tag name"
 msgstr "Por favor escreva o nome da etiqueta"
 
-#: tortoisehg\hgtk\tagadd.py:172
+#: tortoisehg\hgtk\tagadd.py:175
 msgid "Custom commit message is empty"
 msgstr "A mensagem personalizada está vazia"
 
-#: tortoisehg\hgtk\tagadd.py:181 tortoisehg\hgtk\tagadd.py:213
+#: tortoisehg\hgtk\tagadd.py:184 tortoisehg\hgtk\tagadd.py:216
 msgid "Tagging completed"
 msgstr "Criação da etiqueta terminada"
 
-#: tortoisehg\hgtk\tagadd.py:182
+#: tortoisehg\hgtk\tagadd.py:185
 msgid "Tag \"%s\" has been added"
 msgstr "A etiqueta \"%s\" foi adicionada"
 
-#: tortoisehg\hgtk\tagadd.py:185 tortoisehg\hgtk\tagadd.py:188
-#: tortoisehg\hgtk\tagadd.py:217 tortoisehg\hgtk\tagadd.py:220
+#: tortoisehg\hgtk\tagadd.py:188 tortoisehg\hgtk\tagadd.py:191
+#: tortoisehg\hgtk\tagadd.py:220 tortoisehg\hgtk\tagadd.py:223
 msgid "Error in tagging"
 msgstr "Erro ao etiquetar"
 
-#: tortoisehg\hgtk\tagadd.py:201
+#: tortoisehg\hgtk\tagadd.py:204
 msgid "Tag name is empty"
 msgstr "O nome da etiqueta está vazio"
 
-#: tortoisehg\hgtk\tagadd.py:202
+#: tortoisehg\hgtk\tagadd.py:205
 msgid "Please select tag name to remove"
 msgstr "Selecione o nome da etiqueta a remover"
 
-#: tortoisehg\hgtk\tagadd.py:214
+#: tortoisehg\hgtk\tagadd.py:217
 msgid "Tag \"%s\" has been removed"
 msgstr "A etiqueta\"%s\" foi removida"
 
-#: tortoisehg\hgtk\tagadd.py:228
+#: tortoisehg\hgtk\tagadd.py:231
 msgid "a tag named \"%s\" already exists"
 msgstr "Já existe uma etiqueta com o nome \"%s\""
 
-#: tortoisehg\hgtk\tagadd.py:234
+#: tortoisehg\hgtk\tagadd.py:237
 msgid "Added tag %s for changeset %s"
 msgstr "Etiqueta %s adicionada para a revisão %s"
 
-#: tortoisehg\hgtk\tagadd.py:238
+#: tortoisehg\hgtk\tagadd.py:241
 msgid "Tag '%s' already exist"
 msgstr "A etiqueta '%s'  já existe"
 
-#: tortoisehg\hgtk\tagadd.py:245
+#: tortoisehg\hgtk\tagadd.py:248
 msgid "Tag '%s' does not exist"
 msgstr "A etiqueta '%s'  não existe"
 
-#: tortoisehg\hgtk\tagadd.py:248
+#: tortoisehg\hgtk\tagadd.py:251
 msgid "Removed tag %s"
 msgstr "Etiqueta %s removida"
 
@@ -5221,6 +5216,9 @@ msgstr "Sincronizar com o repositório arrastado"
 
 #~ msgid "Launch synchronize tool"
 #~ msgstr "Executa a ferramenta de sincronização"
+
+#~ msgid "Copyright 2009 TK Soh and others"
+#~ msgstr "Copyright 2009 TK Soh e outros"
 
 #~ msgid "user:"
 #~ msgstr "usuário:"
