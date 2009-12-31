@@ -1,4 +1,4 @@
-# gdialog.py - base dialogs for gtools
+# gdialog.py - base window & dialogs for gtools
 #
 # Copyright 2007 Brad Schick, brad at gmail . com
 # Copyright 2008 Steve Borho <steve@borho.org>
@@ -20,7 +20,7 @@ from mercurial import cmdutil, util, ui, hg, commands
 from tortoisehg.util.i18n import _
 from tortoisehg.util import settings, hglib, paths, shlib
 
-from tortoisehg.hgtk import gtklib
+from tortoisehg.hgtk import gtklib, hgcmd
 
 class SimpleMessage(gtklib.MessageDialog):
     def run(self):
@@ -102,7 +102,6 @@ class Confirm(SimpleMessage):
                               0, gtk.ACCEL_VISIBLE)
         buttons[0].add_accelerator('clicked', accel_group, ord('n'),
                               0, gtk.ACCEL_VISIBLE)
-
 
 class GWindow(gtk.Window):
     """
@@ -702,3 +701,204 @@ class GWindow(gtk.Window):
         thread.setDaemon(True)
         thread.start()
 
+MODE_NORMAL  = 'normal'
+MODE_WORKING = 'working'
+
+RESPONSE_FORCE_CLOSE = 1024
+
+class GDialog(gtk.Dialog):
+    """ gtk.Dialog based window for executing mercurial operations """
+    def __init__(self, resizable=False, norepo=False):
+        gtk.Dialog.__init__(self)
+        gtklib.set_tortoise_icon(self, self.get_icon())
+        gtklib.set_tortoise_keys(self)
+        self.set_resizable(resizable)
+        self.set_has_separator(False)
+
+        self.ui = ui.ui()
+        if norepo:
+            repo = None
+        else:
+            try:
+                repo = hg.repository(self.ui, path=paths.find_root())
+            except error.RepoError:
+                gtklib.idle_add_single_call(self.destroy)
+                return
+        self.repo = repo
+        self.after_done = True
+
+        # persistent settings
+        name = self.get_setting_name()
+        if name:
+            self.settings = settings.Settings(name)
+
+        # dialog size
+        defsize = self.get_defsize()
+        if defsize != (-1, -1):
+            self.set_default_size(*defsize)
+
+        # signal handler
+        self.connect('realize', self.realized)
+
+    ### Overridable Functions ###
+
+    def get_title(self, reponame):
+        return 'TortoiseHg - %s' % reponame
+
+    def get_icon(self):
+        return 'thg_logo.ico'
+
+    def get_defsize(self):
+        return (-1, -1)
+
+    def get_setting_name(self):
+        return None
+
+    def get_body(self, vbox):
+        pass
+
+    def get_extras(self, vbox):
+        pass
+
+    def get_buttons(self):
+        return []
+
+    def get_default_button(self):
+        return None
+
+    def get_action_map(self):
+        return {}
+
+    def switch_to(self, normal, working, cmd):
+        pass
+
+    def command_done(self, returncode, useraborted, *args):
+        pass
+
+    def before_close(self):
+        return True
+
+    def load_settings(self):
+        pass
+
+    def store_settings(self):
+        pass
+
+    ### Public Functions ###
+
+    def set_notify_func(self, func, *args):
+        self.notify_func = func
+        self.notify_args = args
+
+    def set_after_done(self, close):
+        self.after_done = close
+
+    ### Internal Functions ###
+
+    def after_init(self):
+        self.get_extras(self.vbox)
+
+        # CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, False, False, 6)
+
+        # abort button
+        btn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
+        self.buttons['abort'] = btn
+        btn.hide()
+
+    def do_switch_to(self, mode, cmd=True):
+        if mode == MODE_NORMAL:
+            normal = True
+        elif mode == MODE_WORKING:
+            normal = False
+            self.buttons['abort'].grab_focus()
+        else:
+            raise _('unknown mode name: %s') % mode
+        working = not normal
+
+        if cmd:
+            self.cmd.set_property('visible', working)
+        self.buttons['abort'].set_property('visible', working)
+
+        self.switch_to(normal, working, cmd)
+
+    def abort(self):
+        self.cmd.stop()
+        self.cmd.show_log()
+        self.do_switch_to(MODE_NORMAL, cmd=False)
+
+    def execute_command(self, cmdline, *args):
+        def cmd_done(returncode, useraborted):
+            self.do_switch_to(MODE_NORMAL, cmd=False)
+            self.command_done(returncode, useraborted, *args)
+            if hasattr(self, 'notify_func') and self.notify_func:
+                self.notify_func(*self.notify_args)
+            if self.after_done and returncode == 0:
+                if not self.cmd.is_show_log():
+                    self.response(gtk.RESPONSE_CLOSE)
+        self.do_switch_to(MODE_WORKING)
+        self.cmd.execute(cmdline, cmd_done)
+
+    ### Signal Handler ###
+
+    def realized(self, *args):
+        # set title
+        reponame = self.repo and hglib.get_reponame(self.repo) or ''
+        self.set_title(self.get_title(reponame))
+
+        # construct ui widgets
+        self.buttons = {}
+        for name, label, res in self.get_buttons():
+            btn = self.add_button(label, res)
+            self.buttons[name] = btn
+        self.get_body(self.vbox)
+
+        name = self.get_default_button()
+        if name:
+            btn = self.buttons.get(name)
+            if btn:
+                btn.grab_focus()
+
+        # signal handler
+        self.connect('response', self.dialog_response)
+
+        # prepare to show
+        self.load_settings()
+        self.vbox.show_all()
+        gtklib.idle_add_single_call(self.after_init)
+
+    def dialog_response(self, dialog, response_id):
+        # User-defined buttons
+        actmap = self.get_action_map()
+        if actmap.has_key(response_id):
+            actmap[response_id]()
+        # Forced close
+        elif response_id == RESPONSE_FORCE_CLOSE:
+            if self.cmd.is_alive():
+                self.abort()
+            self.store_settings()
+            self.destroy()
+            return # close dialog
+        # Cancel button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            if self.cmd.is_alive():
+                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
+                                      _('Do you want to abort?')).run()
+                if ret == gtk.RESPONSE_YES:
+                    self.abort()
+            else:
+                close = self.before_close()
+                if close:
+                    self.store_settings()
+                    self.destroy()
+                    return # close dialog
+        # Abort button
+        elif response_id == gtk.RESPONSE_CANCEL:
+            self.abort()
+        else:
+            raise _('unexpected response id: %s') % response_id
+
+        self.run() # don't close dialog
