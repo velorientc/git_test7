@@ -7,14 +7,13 @@
 
 import os
 import sys
-import traceback
-import shlib
+import shlex
 import time
+import inspect
 
-from mercurial.error import RepoError, ParseError, LookupError, RepoLookupError
-from mercurial.error import UnknownCommand, AmbiguousCommand, ConfigError
-from mercurial import hg, ui, util, extensions, commands, hook, match
-from mercurial import dispatch, encoding, templatefilters, bundlerepo, url
+from mercurial import ui, util, extensions, match, bundlerepo, url
+from mercurial import dispatch, encoding, templatefilters, filemerge
+
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
@@ -94,6 +93,32 @@ def getmaxdiffsize(ui):
     _maxdiff = maxdiff * 1024
     return _maxdiff
 
+_deadbranch = None
+def getdeadbranch(ui):
+    global _deadbranch
+    if _deadbranch is None:
+        db = toutf(ui.config('tortoisehg', 'deadbranch', ''))
+        dblist = [b.strip() for b in db.split(',')]
+        _deadbranch = dblist
+    return _deadbranch
+
+def getlivebranch(repo):
+    lives = []
+    deads = getdeadbranch(repo.ui)
+    for branch in repo.branchtags().keys():
+        if branch not in deads:
+            lives.append(branch)
+    return lives
+
+_hidetags = None
+def gethidetags(ui):
+    global _hidetags
+    if _hidetags is None:
+        tags = toutf(ui.config('tortoisehg', 'hidetags', ''))
+        taglist = [t.strip() for t in tags.split()]
+        _hidetags = taglist
+    return _hidetags
+
 def diffexpand(line):
     'Expand tabs in a line of diff/patch text'
     if _tabwidth is None:
@@ -119,8 +144,20 @@ def invalidaterepo(repo):
         # overlay bundlerepos
         return
     repo.invalidate()
-    if '_bookmarks' in repo.__dict__:
-        repo._bookmarks = {}
+    # way _bookmarks / _bookmarkcurrent cached changed
+    # from 1.4 to 1.5...
+    for cachedAttr in ('_bookmarks', '_bookmarkcurrent'):
+        # Check if it's a property or normal value...
+        if is_descriptor(repo, cachedAttr):
+            # The very act of calling hasattr would
+            # re-cache the property, so just assume it's
+            # already cached, and catch the error if it wasn't.
+            try:
+                delattr(repo, cachedAttr)
+            except AttributeError:
+                pass
+        elif hasattr(repo, cachedAttr):
+            setattr(repo, cachedAttr, None)
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
@@ -174,7 +211,6 @@ def mergetools(ui, values=None):
     'returns the configured merge tools and the internal ones'
     if values == None:
         values = []
-    from mercurial import filemerge
     for key, value in ui.configitems('merge-tools'):
         t = key.split('.')[0]
         if t not in values:
@@ -188,6 +224,38 @@ def mergetools(ui, values=None):
     values.append('internal:other')
     values.append('internal:fail')
     return values
+
+
+def difftools(ui):
+    tools = {}
+    for cmd, path in ui.configitems('extdiff'):
+        if cmd.startswith('cmd.'):
+            cmd = cmd[4:]
+            if not path:
+                path = cmd
+            diffopts = ui.config('extdiff', 'opts.' + cmd, '')
+            diffopts = diffopts and [diffopts] or []
+            tools[cmd] = [path, diffopts, None]
+        elif cmd.startswith('opts.'):
+            continue
+        else:
+            # command = path opts
+            if path:
+                diffopts = shlex.split(path)
+                path = diffopts.pop(0)
+            else:
+                path, diffopts = cmd, []
+            tools[cmd] = [path, diffopts, None]
+    mt = []
+    mergetools(ui, mt)
+    for t in mt:
+        if t.startswith('internal:'):
+            continue
+        dopts = ui.config('merge-tools', t + '.diffargs', '')
+        mopts = ui.config('merge-tools', t + '.diff3args', '')
+        dopts, mopts = shlex.split(dopts), shlex.split(mopts)
+        tools[t] = [filemerge._findtool(ui, t), dopts, mopts]
+    return tools
 
 
 def hgcmd_toq(q, *args):
@@ -246,3 +314,87 @@ def validate_synch_path(path, repo):
             return_path = path_aux
     return return_path
 
+def get_repo_bookmarks(repo, values=False):
+    """
+    Will return the bookmarks for the given repo if the
+    bookmarks extension is loaded.
+    
+    By default, returns a list of bookmark names; if
+    values is True, returns a dict mapping names to 
+    nodes.
+    
+    If the extension is not loaded, returns an empty
+    list/dict.
+    """
+    try:
+        bookmarks = extensions.find('bookmarks')
+    except KeyError:
+        return values and {} or []
+    if bookmarks:
+        # Bookmarks changed from 1.4 to 1.5...
+        if hasattr(bookmarks, 'parse'):
+            marks = bookmarks.parse(repo)
+        elif hasattr(repo, '_bookmarks'):
+            marks = repo._bookmarks
+        else:
+            marks = {}
+    else:
+        marks = {}
+            
+    if values:
+        return marks
+    else:
+        return marks.keys()
+    
+def get_repo_bookmarkcurrent(repo):
+    """
+    Will return the current bookmark for the given repo
+    if the bookmarks extension is loaded, and the
+    track.current option is on.
+    
+    If the extension is not loaded, or track.current
+    is not set, returns None
+    """
+    try:
+        bookmarks = extensions.find('bookmarks')
+    except KeyError:
+        return None
+    if bookmarks and repo.ui.configbool('bookmarks', 'track.current'):
+        # Bookmarks changed from 1.4 to 1.5...
+        if hasattr(bookmarks, 'current'):
+            return bookmarks.current(repo)
+        elif hasattr(repo, '_bookmarkcurrent'):
+            return repo._bookmarkcurrent
+    return None
+
+def is_rev_current(repo, rev):
+    '''
+    Returns True if the revision indicated by 'rev' is the current
+    working directory parent.
+    
+    If rev is '' or None, it is assumed to mean 'tip'.
+    '''
+    if rev in ('', None):
+        rev = 'tip'
+    rev = repo.lookup(rev)
+    parents = repo.parents()
+    
+    if len(parents) > 1:
+        return False
+    
+    return rev == parents[0].node()
+
+def is_descriptor(obj, attr):
+    """
+    Returns True if obj.attr is a descriptor - ie, accessing
+    the attribute will actually invoke the '__get__' method of
+    some object.
+
+    Returns False if obj.attr exists, but is not a descriptor,
+    and None if obj.attr was not found at all.
+    """
+    for cls in inspect.getmro(obj.__class__):
+        if attr in cls.__dict__:
+            return hasattr(cls.__dict__[attr], '__get__')
+    return None
+    

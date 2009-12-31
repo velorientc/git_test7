@@ -181,45 +181,53 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                     box_size / 5, 0, 2 * math.pi)
         self.set_colour(ctx, colour, 0.0, 0.5)
         ctx.stroke_preserve()
+        self.set_colour(ctx, colour, 0.5, 1.0)
+        ctx.fill()
 
         # Possible node status
         if status != 0:
-            def draw_arrow(x, y, inc):
-                ctx.move_to(x - 2, y)
-                ctx.line_to(x + 4, y)
-                ctx.line_to(x + 1, y + inc)
-                ctx.line_to(x - 2, y)
+            def draw_arrow(x, y, dir):
+                self.set_colour(ctx, '#2e3436', 0.0, 1.0)
+                ctx.rectangle(x, y, 2, 5)
+                ax, ay = x, y + (dir == 'down' and 5 or 0)
+                inc = 3 * (dir == 'up' and -1 or 1)
+                ctx.move_to(ax - 2, ay)
+                ctx.line_to(ax + 4, ay)
+                ctx.line_to(ax + 1, ay + inc)
+                ctx.line_to(ax - 2, ay)
                 ctx.stroke_preserve()
-            
-            def draw_star(x, y, radius, nodes):
+                fillcolor = dir == 'up' and '#feaf3e' or '#8ae234'
+                self.set_colour(ctx, fillcolor, 0.0, 1.0)
+                ctx.fill()
+
+            def draw_star(x, y, radius, nodes, offset=False):
+                self.set_colour(ctx, '#2e3436', 0.0, 1.0)
                 total_nodes = nodes * 2 #inner + outer nodes
                 angle = 2 * math.pi / total_nodes;
+                offset = offset and angle / 2 or 0
                 for value in range(total_nodes + 1): # + 1 = backing to the start to close
                     radius_point = radius
                     if value % 2:
                         radius_point = 0.4 * radius_point;
-                    arc_y = y - math.sin(angle * value) * radius_point
-                    arc_x = x - math.cos(angle * value) * radius_point 
+                    arc_y = y - math.sin(angle * value + offset) * radius_point
+                    arc_x = x - math.cos(angle * value + offset) * radius_point
                     if value == 0:
                         ctx.move_to(arc_x,arc_y)
                     else:
                         ctx.line_to(arc_x, arc_y)
-                                       
+                ctx.stroke_preserve()
+                self.set_colour(ctx, '#fce94f', 0.0, 1.0)
+                ctx.fill()
+
             arrow_y = arc_start_position_y - box_size / 4
             arrow_x = arc_start_position_x + 7;
             if status == 1:  # Outgoing arrow
-                ctx.rectangle(arrow_x, arrow_y, 2, 5)
-                draw_arrow(arrow_x, arrow_y, -3)
+                draw_arrow(arrow_x, arrow_y, 'up')
             elif status == 2: # New changeset, recently added to tip
-                ctx.set_source_rgb(0, 1, 0)
-                draw_star(arrow_x + box_size / 4, arc_start_position_y , 4, 6)
+                draw_star(arrow_x + box_size / 4 - 1,
+                          arc_start_position_y, 4, 5, True)
             elif status == 3:  # Incoming (bundle preview) arrow
-                ctx.rectangle(arrow_x, arrow_y, 2, 5)
-                draw_arrow(arrow_x, arrow_y + 5, 3)
-            ctx.stroke_preserve()
-
-        self.set_colour(ctx, colour, 0.5, 1.0)
-        ctx.fill()
+                draw_arrow(arrow_x, arrow_y, 'down')
 
     def render_line (self, ctx, cell_area, box_size, mid,
             height, start, end, colour, style):

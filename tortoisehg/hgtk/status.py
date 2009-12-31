@@ -15,7 +15,7 @@ import gobject
 import pango
 import threading
 
-from mercurial import cmdutil, util, commands, patch, mdiff
+from mercurial import cmdutil, util, commands, patch, mdiff, error
 from mercurial import merge as merge_
 
 from tortoisehg.util.i18n import _
@@ -41,30 +41,30 @@ DM_FONT      = 5
 
 def hunk_markup(text):
     'Format a diff hunk for display in a TreeView row with markup'
-    hunk = ""
+    hunk = ''
     # don't use splitlines, should split with only LF for the patch
     lines = hglib.tounicode(text).split(u'\n')
     for line in lines:
-        line = gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        line = hglib.toutf(line[:512]) + '\n'
         if line.startswith('---') or line.startswith('+++'):
-            hunk += '<span foreground="#000090">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DBLUE)
         elif line.startswith('-'):
-            hunk += '<span foreground="#900000">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DRED)
         elif line.startswith('+'):
-            hunk += '<span foreground="#006400">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DGREEN)
         elif line.startswith('@@'):
-            hunk = '<span foreground="#FF8000">%s</span>' % line
+            hunk = gtklib.markup(line, color='#FF8000')
         else:
             hunk += line
     return hunk
 
 def hunk_unmarkup(text):
     'Format a diff hunk for display in a TreeView row without markup'
-    hunk = ""
+    hunk = ''
     # don't use splitlines, should split with only LF for the patch
     lines = hglib.tounicode(text).split(u'\n')
     for line in lines:
-        hunk += gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        hunk += gtklib.markup(hglib.toutf(line[:512])) + '\n'
     return hunk
 
 class GStatus(gdialog.GDialog):
@@ -728,6 +728,12 @@ class GStatus(gdialog.GDialog):
         gobject.timeout_add(50, status_wait, thread)
         return True
 
+    def set_file_states(self, paths, state=True):
+        for p in paths:
+            self.filemodel[p][FM_CHECKED] = state
+            self.update_chunk_state(self.filemodel[p])
+        self.update_check_count()
+
     def select_toggle(self, cellrenderer, path):
         'User manually toggled file status via checkbox'
         self.filemodel[path][FM_CHECKED] = not self.filemodel[path][FM_CHECKED]
@@ -827,11 +833,11 @@ class GStatus(gdialog.GDialog):
     def text_color(self, column, text_renderer, model, row_iter):
         stat = model[row_iter][FM_STATUS]
         if stat == 'M':
-            text_renderer.set_property('foreground', '#000090')
+            text_renderer.set_property('foreground', gtklib.DBLUE)
         elif stat == 'A':
-            text_renderer.set_property('foreground', '#006400')
+            text_renderer.set_property('foreground', gtklib.DGREEN)
         elif stat == 'R':
-            text_renderer.set_property('foreground', '#900000')
+            text_renderer.set_property('foreground', gtklib.DRED)
         elif stat == 'C':
             text_renderer.set_property('foreground', 'black')
         elif stat == '!':
@@ -996,10 +1002,10 @@ class GStatus(gdialog.GDialog):
 
     def diff_highlight_buffer(self, difftext):
         buf = gtk.TextBuffer()
-        buf.create_tag('removed', foreground='#900000')
-        buf.create_tag('added', foreground='#006400')
+        buf.create_tag('removed', foreground=gtklib.DRED)
+        buf.create_tag('added', foreground=gtklib.DGREEN)
         buf.create_tag('position', foreground='#FF8000')
-        buf.create_tag('header', foreground='#000090')
+        buf.create_tag('header', foreground=gtklib.DBLUE)
 
         bufiter = buf.get_start_iter()
         for line in difftext:
@@ -1056,7 +1062,7 @@ class GStatus(gdialog.GDialog):
         try:
             pfile = util.pconvert(wfile)
             fctx = ctx.filectx(pfile)
-        except hglib.LookupError:
+        except error.LookupError:
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             # Fake patch that displays size warning
@@ -1393,6 +1399,7 @@ class GStatus(gdialog.GDialog):
 
     def ignoremask_updated(self):
         '''User has changed the ignore mask in hgignore dialog'''
+        self.opts['check'] = True
         self.reload_status()
 
     def relevant_checked_files(self, stats):
@@ -1418,6 +1425,7 @@ class GStatus(gdialog.GDialog):
         types = {'M':[], 'A':[], 'R':[], '!':[], 'I':[], '?':[], 'C':[],
                  'r':[], 'u':[]}
         all = []
+        pathmap = {}
         for p in tpaths:
             row = model[p]
             file = util.pconvert(row[FM_PATH])
@@ -1429,15 +1437,20 @@ class GStatus(gdialog.GDialog):
             else:
                 types[row[FM_STATUS]].append(file)
             all.append(file)
+            pathmap[file] = p
 
-        def make(label, handler, stats, enabled=True):
+        def make(label, handler, stats, enabled=True, paths=False):
             files = []
             for t in stats:
                 files.extend(types[t])
             if not files:
                 return
             item = gtk.MenuItem(label, True)
-            item.connect('activate', handler, files)
+            if paths:
+                p = [pathmap[f] for f in files]
+                item.connect('activate', handler, files, p)
+            else:
+                item.connect('activate', handler, files)
             item.set_border_width(1)
             item.set_sensitive(enabled)
             menu.append(item)
@@ -1459,10 +1472,12 @@ class GStatus(gdialog.GDialog):
             from tortoisehg.hgtk import history
             dlg = history.run(self.ui, canonpats=files)
             dlg.display()
-        def forget(menuitem, files):
+        def forget(menuitem, files, paths):
             self.hg_forget(files)
-        def add(menuitem, files):
+            self.set_file_states(paths, state=False)
+        def add(menuitem, files, paths):
             self.hg_add(files)
+            self.set_file_states(paths, state=True)
         def delete(menuitem, files):
             self.delete_files(files)
         def unmark(menuitem, files):
@@ -1515,8 +1530,8 @@ class GStatus(gdialog.GDialog):
         menu.append_sep()
         make(_('L_og'), log, 'MARC!ru')
         menu.append_sep()
-        make(_('_Forget'), forget, 'MARC!ru')
-        make(_('_Add'), add, 'I?')
+        make(_('_Forget'), forget, 'MARC!ru', paths=True)
+        make(_('_Add'), add, 'I?', paths=True)
         make(_('_Guess Rename...'), guess_rename, '?')
         make(_('_Ignore'), ignore, '?')
         make(_('Remove versioned'), remove, 'C')

@@ -104,7 +104,7 @@ characters, the search is refined.
 * The mouse scroll wheel will advance forwards and backwards through
   matching lines 
 
-HG command dialog
+Hg command dialog
 -----------------
 
 Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
