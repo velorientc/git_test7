@@ -60,8 +60,7 @@ def snapshot(repo, files, ctx, tmproot):
 
 def besttool(ui, tools):
     'Select preferred or highest priority tool from dictionary'
-    preferred = ui.config('tortoisehg', 'vdiff', None) or \
-                ui.config('ui', 'merge', None)
+    preferred = ui.config('tortoisehg', 'vdiff') or ui.config('ui', 'merge')
     if preferred and preferred in tools:
         return preferred
     pris = []
