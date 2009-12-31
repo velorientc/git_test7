@@ -433,23 +433,29 @@ class FileSelectionDialog(gtk.Dialog):
         dir1a, dir1b, dir2, tmproot = self.dirs
 
         if st1 == 'A' or st2 == 'R':
-            dir1a = os.devnull
+            file1a = os.devnull
         else:
-            dir1a = os.path.join(dir1a, util.localpath(fname))
+            file1a = os.path.join(dir1a, util.localpath(fname))
         if st2:
             if st2 == 'A' or st1 == 'R':
-                dir1b = os.devnull
+                file1b = os.devnull
             else:
-                dir1b = os.path.join(dir1b, util.localpath(fname))
+                file1b = os.path.join(dir1b, util.localpath(fname))
         if st1 == 'R' or st2 == 'R':
-            dir2 = os.devnull
+            file2 = os.devnull
         else:
-            dir2 = os.path.join(dir2, util.localpath(fname))
+            file2 = os.path.join(dir2, util.localpath(fname))
+
+        args = do3way and self.mergeopts or self.diffopts
+        args = ' '.join(args)
 
         # Function to quote file/dir names in the argument string When
         # not operating in 3-way mode, an empty string is returned for
         # parent2
-        replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b, child=dir2)
+
+        # TODO: Add more vars: $nameleft $nameright $namecenter $ancestor
+        replace = dict(parent=file1a, parent1=file1a, parent2=file1b,
+                       child=file2)
         def quote(match):
             key = match.group()[1:]
             if not st2 and key == 'parent2':
@@ -457,8 +463,6 @@ class FileSelectionDialog(gtk.Dialog):
             return util.shellquote(replace[key])
 
         # Match parent2 first, so 'parent1?' will match both parent1 and parent
-        args = do3way and self.mergeopts or self.diffopts
-        args = ' '.join(args)
         regex = '\$(parent2|parent1?|child)'
         if not re.search(regex, args):
             if st2 and not st1:
