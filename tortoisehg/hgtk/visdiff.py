@@ -126,7 +126,7 @@ def visualdiff(ui, repo, pats, opts):
         else:
             toollist.add(preferred)
 
-    if len(toollist) > 1 or (len(MAR)>1 and not dirdiff):
+    if len(toollist) > 1 or (len(MAR)>1 and (ctx1b or not dirdiff)):
         # Multiple required tools, or tool does not support directory diffs
         sa = [mod_a, add_a, rem_a]
         sb = [mod_b, add_b, rem_b]
