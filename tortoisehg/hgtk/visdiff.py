@@ -441,6 +441,8 @@ class FileSelectionDialog(gtk.Dialog):
                 file1b = os.devnull
             else:
                 file1b = os.path.join(dir1b, util.localpath(fname))
+        else:
+            file1b = None
         if st1 == 'R' or st2 == 'R':
             file2 = os.devnull
         else:
