@@ -17,7 +17,7 @@ import sys
 import threading
 import time
 
-from mercurial import hg, ui, commands, cmdutil, util
+from mercurial import hg, ui, commands, cmdutil, util, error
 from mercurial.hgweb import server
 
 from tortoisehg.util.i18n import _
@@ -113,7 +113,7 @@ class ServeDialog(gtk.Window):
         if self._root:
             try:
                 repo = hg.repository(ui.ui(), path=self._root)
-            except hglib.RepoError:
+            except error.RepoError:
                 self.destroy()
             self.defport = repo.ui.config('web', 'port') or '8000'
             self.webname = repo.ui.config('web', 'name') or \
