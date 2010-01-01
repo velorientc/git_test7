@@ -53,6 +53,7 @@ Name: shell; Description: Shell integration (overlay icons, context menu) [admin
 Source: ..\build-hg\mercurial\help\*.txt; DestDir: {app}\help
 Source: ..\build-hg\mercurial\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
 Source: ..\build-hg\mercurial\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
+Source: ..\build-hg\contrib\xml.rnc; DestDir: {app}/contrib
 Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n
 Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ignoreversion; Components: help
 Source: ..\build-hg\doc\style.css; DestDir: {app}\docs; Flags: ignoreversion; Components: help
