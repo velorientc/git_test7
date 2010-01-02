@@ -111,7 +111,6 @@ def visualdiff(ui, repo, pats, opts):
         return None
 
     preferred = besttool(repo.ui, detectedtools)
-    dirdiff = repo.ui.configbool('merge-tools', preferred + '.dirdiff')
 
     # Build tool list based on diff-patterns matches
     toollist = set()
@@ -126,7 +125,19 @@ def visualdiff(ui, repo, pats, opts):
         else:
             toollist.add(preferred)
 
-    if len(toollist) > 1 or (len(MAR)>1 and (ctx1b or not dirdiff)):
+    if len(toollist) > 1:
+        usewin = True
+    else:
+        preferred = toollist.pop()
+        dirdiff = repo.ui.configbool('merge-tools', preferred + '.dirdiff')
+        dir3diff = repo.ui.configbool('merge-tools', preferred + '.dir3diff')
+        usewin = repo.ui.configbool('merge-tools', preferred + '.usewin')
+        if not usewin and len(MAR) > 1:
+            if ctx1b is not None:
+                usewin = not dir3diff
+            else:
+                usewin = not dirdiff
+    if usewin:
         # Multiple required tools, or tool does not support directory diffs
         sa = [mod_a, add_a, rem_a]
         sb = [mod_b, add_b, rem_b]
@@ -134,8 +145,7 @@ def visualdiff(ui, repo, pats, opts):
         return dlg
 
     # We can directly use the selected tool, without a visual diff window
-    assert(len(toollist)==1)
-    diffcmd, diffopts, mergeopts = detectedtools[toollist.pop()]
+    diffcmd, diffopts, mergeopts = detectedtools[preferred]
 
     # Disable 3-way merge if there is only one parent or no tool support
     do3way = bool(mergeopts) and ctx1b is not None
@@ -160,7 +170,7 @@ def visualdiff(ui, repo, pats, opts):
             dira = snapshot(repo, MA, ctxa, tmproot)[0]
             labela = '@%d' % ctxa.rev()
         else:
-            dir1b = None
+            dir1b, dira = None, None
             label1b, labela = '', ''
 
         if ctx2.rev() is not None:
@@ -188,8 +198,8 @@ def visualdiff(ui, repo, pats, opts):
                 dir1b = os.path.join(dir1b, lfile)
                 if not os.path.isfile(os.path.join(tmproot, dir1b)):
                     dir1b = os.devnull
-            if not os.path.isfile(os.path.join(tmproot, dira)):
-                dira = os.devnull
+                if not os.path.isfile(os.path.join(tmproot, dira)):
+                    dira = os.devnull
             dir2 = os.path.join(dir2, lfile)
             label1a = lfile + label1a
             label1b = lfile + label1b
@@ -365,8 +375,8 @@ class FileSelectionDialog(gtk.Dialog):
             dira = snapshot(repo, MA, ctxa, tmproot)[0]
             reva = '@%d' % ctxa.rev()
         else:
-            dir1b = None
-            rev1b = ''
+            dir1b, dira = None, None
+            rev1b, reva = '', ''
 
         # If ctx2 is the working copy, use it directly
         if ctx2.rev() is None:
