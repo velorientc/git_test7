@@ -150,21 +150,22 @@ def visualdiff(ui, repo, pats, opts):
         # Always make a copy of ctx1a (and ctx1b, if applicable)
         files = mod_a | rem_a | ((mod_b | add_b) - add_a)
         dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
-        label1a = 'rev%d' % ctx1a.rev()
+        label1a = '@%d' % ctx1a.rev()
         if do3way:
             files = mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
-            label1b = 'rev%d' % ctx1b.rev()
+            label1b = '@%d' % ctx1b.rev()
         else:
             dir1b = None
-            label1b = None
+            label1b = ''
 
         if ctx2.rev() is not None:
             # If ctx2 is not the working copy, create a snapshot for it
             dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
-            label2 = 'rev%d' % ctx2.rev()
+            label2 = '@%d' % ctx2.rev()
         elif len(MAR) == 1:
             # This lets the diff tool open the changed file directly
+            label2 = ''
             dir2 = repo.root
         else:
             # Create a snapshot, record mtime to detect mods made by
@@ -184,9 +185,14 @@ def visualdiff(ui, repo, pats, opts):
                 if not os.path.isfile(os.path.join(tmproot, dir1b)):
                     dir1b = os.devnull
             dir2 = os.path.join(dir2, lfile)
-            label1a = '%s[%s]' % (lfile, label1a)
-            label1b = '%s[%s]' % (lfile, label1b)
-            label2 = lfile
+            label1a = lfile + label1a
+            label1b = lfile + label1b
+            label2 = lfile + label2
+
+        if do3way:
+            label1a += '[local]'
+            label1b += '[other]'
+            label2 += '[merged]'
 
         # Function to quote file/dir names in the argument string.
         # When not operating in 3-way mode, an empty string is
@@ -340,22 +346,22 @@ class FileSelectionDialog(gtk.Dialog):
         # Always make a copy of node1a (and node1b, if applicable)
         files = mod_a | rem_a | ((mod_b | add_b) - add_a)
         dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
-        rev1a = '[rev%d]' % ctx1a.rev()
+        rev1a = '@%d' % ctx1a.rev()
         if do3way:
             files = mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
-            rev1b = '[rev%d]' % ctx1b.rev()
+            rev1b = '@%d' % ctx1b.rev()
         else:
             dir1b = None
-            rev1b = None
+            rev1b = ''
 
         # If ctx2 is the working copy, use it directly
         if ctx2.rev() is None:
             dir2 = repo.root
-            rev2 = '[working]'
+            rev2 = ''
         else:
             dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
-            rev2 = '[rev%d]' % ctx2.rev()
+            rev2 = '@%d' % ctx2.rev()
 
         self.dirs = (dir1a, dir1b, dir2)
         self.revs = (rev1a, rev1b, rev2)
@@ -466,8 +472,12 @@ class FileSelectionDialog(gtk.Dialog):
             file2 = os.path.join(dir2, util.localpath(fname))
 
         label1a = fname+rev1a
-        label1b = file1b and fname+rev1b or ''
+        label1b = fname+rev1b
         label2 = fname+rev2
+        if do3way:
+            label1a += '[local]'
+            label1b += '[other]'
+            label2 += '[merged]'
 
         args = do3way and self.mergeopts or self.diffopts
         args = ' '.join(args)
