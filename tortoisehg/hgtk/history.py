@@ -1771,12 +1771,6 @@ class GLog(gdialog.GWindow):
         hash = str(self.repo[self.currevid])
         parents = [x.node() for x in self.repo.parents()]
 
-        def cinotify(dlg):
-            'User comitted the merge'
-            dlg.ready = False
-            dlg.hide()
-            self.reload_log()
-
         def refresh(*args):
             self.repo.invalidate()
             self.changeview.clear_cache()
@@ -1784,11 +1778,16 @@ class GLog(gdialog.GWindow):
                 self.reload_log()
             if len(self.repo.parents()) != len(parents):
                 # User auto-merged the backout
+                def cinotify():
+                    'User comitted the merge'
+                    dlg.ready = False
+                    dlg.hide()
+                    self.reload_log()
                 from tortoisehg.hgtk import commit
                 dlg = commit.run(ui.ui())
                 dlg.set_transient_for(self)
                 dlg.set_modal(True)
-                dlg.set_notify_func(cinotify, dlg)
+                dlg.set_notify_func(cinotify)
                 dlg.display()
 
         dlg = backout.BackoutDialog(hash)
@@ -2198,27 +2197,24 @@ class GLog(gdialog.GWindow):
             self.refresh_model()
 
     def domerge(self, menuitem):
-        def merge_notify(args):
-            oldparents, repolen = args
-            self.repo.invalidate()
-            self.repo.dirstate.invalidate()
+        if self.revrange:
+            rev0, rev1 = self.revrange
+        else:
+            rev0, rev1 = self.repo['.'].rev(), self.currevid
+        dlg = merge.MergeDialog(rev0, rev1)
+        def merge_notify(oldparents, repolen, func):
+            hglib.invalidaterepo(self.repo)
             self.changeview.clear_cache()
             if len(self.repo) != repolen:
                 self.reload_log()
             elif not oldparents == self.repo.parents():
                 self.refresh_model()
-            # update parents for the next notifying
-            args[0] = self.repo.parents()
-
-        if self.revrange:
-            rev0, rev1 = self.revrange
-        else:
-            rev0, rev1 = self.repo['.'].rev(), self.currevid
-
-        args = [self.repo.parents(), len(self.repo)]
-        dlg = merge.MergeDialog(rev0, rev1)
+            # update arguments for notify func
+            oldparents = self.repo.parents()
+            dlg.set_notify_func(func, oldparents, repolen, func)
+        args = [self.repo.parents(), len(self.repo), merge_notify]
         dlg.set_notify_func(merge_notify, *args)
-        merge_notify(args) # could have immediately switched parents
+        merge_notify(*args) # could have immediately switched parents
         self.show_dialog(dlg)
 
     def archive(self, menuitem):

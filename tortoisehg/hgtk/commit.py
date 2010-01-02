@@ -143,7 +143,7 @@ class GCommit(GStatus):
     def get_help_url(self):
         return 'commit.html'
 
-    def set_notify_func(self, func, args):
+    def set_notify_func(self, func, *args):
         self.notify_func = func
         self.notify_args = args
 
@@ -1031,7 +1031,7 @@ class GCommit(GStatus):
                 self.msg_cbbox.set_active(-1)
                 self.last_commit_id = self.get_tip_rev(True)
             if self.notify_func:
-                self.notify_func(self.notify_args)
+                self.notify_func(*self.notify_args)
 
     def get_tip_rev(self, refresh=False):
         if refresh:
