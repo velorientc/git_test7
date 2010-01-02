@@ -8,52 +8,41 @@
 import re
 import os
 import gtk
-import gobject
-import pango
 
-from mercurial import hg, ui, error
-from mercurial.node import nullrev
+from mercurial import error
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 
-from tortoisehg.hgtk import csinfo, hgcmd, gtklib, gdialog, cslist
+from tortoisehg.hgtk import gtklib, gdialog, cslist
 
-MODE_NORMAL  = 'normal'
-MODE_WORKING = 'working'
-
-class StripDialog(gtk.Dialog):
+class StripDialog(gdialog.GDialog):
     """ Dialog to strip changesets """
 
     def __init__(self, rev=None, *pats):
-        """ Initialize the Dialog """
-        gtk.Dialog.__init__(self)
-        gtklib.set_tortoise_icon(self, 'menudelete.ico')
-        gtklib.set_tortoise_keys(self)
-        self.set_default_size(480, 360)
-        self.set_has_separator(False)
-
-        # buttons
-        self.stripbtn = self.add_button(_('Strip'), gtk.RESPONSE_OK)
-        self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-
-        try:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
-        except error.RepoError:
-            gtklib.idle_add_single_call(self.destroy)
-            return
-        self.repo = repo
-        self.set_title(_('Strip - %s') % hglib.get_reponame(repo))
+        gdialog.GDialog.__init__(self, resizable=True)
 
         if len(pats) > 0:
             rev = pats[0]
         elif rev is None:
             rev = 'tip'
-        rev = str(rev)
+        self.initrev = str(rev)
 
+    ### Start of Overriding Section ###
+
+    def get_title(self, reponame):
+        return _('Strip - %s') % reponame
+
+    def get_icon(self):
+        return 'menudelete.ico'
+
+    def get_defsize(self):
+        return (500, 380)
+
+    def get_body(self, vbox):
         # layout table
         self.table = table = gtklib.LayoutTable()
-        self.vbox.pack_start(table, True, True, 2)
+        vbox.pack_start(table, True, True, 2)
 
         ## target revision combo
         self.revcombo = gtk.combo_box_entry_new_text()
@@ -62,12 +51,12 @@ class StripDialog(gtk.Dialog):
         reventry.set_width_chars(32)
 
         ### fill combo list
-        self.revcombo.append_text(rev)
+        self.revcombo.append_text(self.initrev)
         self.revcombo.set_active(0)
-        for name in hglib.getlivebranch(repo):
+        for name in hglib.getlivebranch(self.repo):
             self.revcombo.append_text(name)
 
-        tags = list(repo.tags())
+        tags = list(self.repo.tags())
         tags.sort()
         tags.reverse()
         for tag in tags:
@@ -99,20 +88,17 @@ class StripDialog(gtk.Dialog):
         table.add_row(self.expander, self.forceopt)
 
         # signal handlers
-        self.connect('response', self.dialog_response)
         reventry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
         self.revcombo.connect('changed', lambda c: self.preview(queue=True))
         self.cslist.connect('list-updated', self.preview_updated)
 
         # prepare to show
         self.preview()
-        self.stripbtn.grab_focus()
-        gtklib.idle_add_single_call(self.after_init)
 
-    def after_init(self):
+    def get_extras(self, vbox):
         # backup types (foldable)
         self.butable = gtklib.LayoutTable()
-        self.vbox.pack_start(self.butable, False, False)
+        vbox.pack_start(self.butable, False, False)
         def add_type(desc):
             group = hasattr(self, 'buopt_all') and self.buopt_all or None
             radio = gtk.RadioButton(group, desc)
@@ -127,20 +113,34 @@ class StripDialog(gtk.Dialog):
         layout = gtklib.LayoutGroup()
         layout.add(self.table, self.butable, force=True)
 
-        # CmdWidget
-        self.cmd = hgcmd.CmdWidget()
-        self.cmd.show_all()
-        self.cmd.hide()
-        self.vbox.pack_start(self.cmd, False, False, 6)
+    def get_buttons(self):
+        return [('strip', _('Strip'), gtk.RESPONSE_OK),
+                ('close', gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)]
 
-        # abort button
-        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
-        self.abortbtn.hide()
+    def get_default_button(self):
+        return 'strip'
 
-    def set_notify_func(self, func, *args, **kargs):
-        self.notify_func = func
-        self.notify_args = args
-        self.notify_kargs = kargs
+    def get_action_map(self):
+        return {gtk.RESPONSE_OK: self.strip}
+
+    def switch_to(self, normal, working, cmd):
+        self.table.set_sensitive(normal)
+        self.butable.set_sensitive(normal)
+        self.buttons['strip'].set_property('visible', normal)
+        self.buttons['close'].set_property('visible', normal)
+        if normal:
+            self.buttons['close'].grab_focus()
+
+    def command_done(self, returncode, useraborted, *args):
+        if returncode == 0:
+            self.cmd.set_result(_('Stripped successfully'), style='ok')
+            self.after_strip()
+        elif useraborted:
+            self.cmd.set_result(_('Canceled stripping'), style='error')
+        else:
+            self.cmd.set_result(_('Failed to strip'), style='error')
+
+    ### End of Overriding Section ###
 
     def preview(self, limit=True, queue=False, force=False):
         # check revision
@@ -161,32 +161,6 @@ class StripDialog(gtk.Dialog):
         # update preview
         self.cslist.update(tostrip, self.repo, limit, queue)
 
-    def dialog_response(self, dialog, response_id):
-        def abort():
-            self.cmd.stop()
-            self.cmd.show_log()
-            self.switch_to(MODE_NORMAL, cmd=False)
-        # Strip button
-        if response_id == gtk.RESPONSE_OK:
-            self.strip()
-        # Close button or dialog closing by the user
-        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
-            if self.cmd.is_alive():
-                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
-                                      _('Do you want to abort?')).run()
-                if ret == gtk.RESPONSE_YES:
-                    abort()
-            else:
-                self.destroy()
-                return # close dialog
-        # Abort button
-        elif response_id == gtk.RESPONSE_CANCEL:
-            abort()
-        else:
-            raise _('unexpected response id: %s') % response_id
-
-        self.run() # don't close dialog
-
     def options_expanded(self, expander, *args):
         if expander.get_expanded():
             self.butable.show_all()
@@ -201,7 +175,7 @@ class StripDialog(gtk.Dialog):
             inner = gtklib.markup(_('%s changesets') % total, weight='bold')
             info = _('%s will be stripped') % inner
         self.resultlbl.set_markup(info)
-        self.stripbtn.set_sensitive(bool(total))
+        self.buttons['strip'].set_sensitive(bool(total))
 
     def get_rev(self):
         """ Return integer revision number or None """
@@ -213,25 +187,6 @@ class StripDialog(gtk.Dialog):
         except (error.RepoError, error.LookupError):
             return None
         return revnum
-
-    def switch_to(self, mode, cmd=True):
-        if mode == MODE_NORMAL:
-            normal = True
-            self.closebtn.grab_focus()
-        elif mode == MODE_WORKING:
-            normal = False
-            self.abortbtn.grab_focus()
-        else:
-            raise _('unknown mode name: %s') % mode
-        working = not normal
-
-        self.table.set_sensitive(normal)
-        self.butable.set_sensitive(normal)
-        self.stripbtn.set_property('visible', normal)
-        self.closebtn.set_property('visible', normal)
-        if cmd:
-            self.cmd.set_property('visible', working)
-        self.abortbtn.set_property('visible', working)
 
     def strip(self):
         def isclean():
@@ -262,19 +217,8 @@ class StripDialog(gtk.Dialog):
         elif self.buopt_none.get_active():
             cmdline.append('--nobackup')
 
-        def cmd_done(returncode, useraborted):
-            self.switch_to(MODE_NORMAL, cmd=False)
-            if returncode == 0:
-                if hasattr(self, 'notify_func'):
-                    self.notify_func(*self.notify_args, **self.notify_kargs)
-                self.cmd.set_result(_('Stripped successfully'), style='ok')
-                self.after_strip()
-            elif useraborted:
-                self.cmd.set_result(_('Canceled stripping'), style='error')
-            else:
-                self.cmd.set_result(_('Failed to strip'), style='error')
-        self.switch_to(MODE_WORKING)
-        self.cmd.execute(cmdline, cmd_done)
+        # start strip
+        self.execute_command(cmdline)
 
     def after_strip(self):
         if self.buopt_none.get_active():
