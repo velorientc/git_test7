@@ -10,15 +10,9 @@ import gtk
 import gobject
 import tempfile
 
-from mercurial import hg, ui, error
-
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths, settings
 
-from tortoisehg.hgtk import hgcmd, gtklib, gdialog, cslist
-
-MODE_NORMAL  = 'normal'
-MODE_WORKING = 'working'
+from tortoisehg.hgtk import gtklib, gdialog, cslist
 
 COL_NAME  = 0
 COL_LABEL = 1
@@ -26,44 +20,42 @@ COL_LABEL = 1
 DEST_REPO = 'repo'
 DEST_MQ   = 'mq'
 
-class ImportDialog(gtk.Dialog):
+class ImportDialog(gdialog.GDialog):
     """ Dialog to import patches """
 
     def __init__(self, repo=None, dest=DEST_REPO, sources=None):
-        """ Initialize the Dialog """
-        gtk.Dialog.__init__(self)
-        gtklib.set_tortoise_icon(self, 'menuimport.ico')
-        gtklib.set_tortoise_keys(self, connect=False)
-        self.set_default_size(500, 390)
-        self.set_has_separator(False)
+        gdialog.GDialog.__init__(self, resizable=True)
 
-        # buttons
-        self.importbtn = self.add_button(_('Import'), gtk.RESPONSE_OK)
-        self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-
-        if not repo:
-            try:
-                repo = hg.repository(ui.ui(), path=paths.find_root())
-            except error.RepoError:
-                gtklib.idle_add_single_call(self.destroy)
-                return
-        self.repo = repo
-        self.set_title(_('Import - %s') % hglib.get_reponame(repo))
         self.done = False
         self.mqloaded = hasattr(self.repo, 'mq')
         self.clipboard = gtk.Clipboard()
         self.tempfiles = []
-
+        self.initdest = dest
         if not self.mqloaded and dest == DEST_MQ:
-            dest = DEST_REPO
+            self.initdest = DEST_REPO
+        self.initsrc = sources
 
         # persistent settings
-        self.settings = settings.Settings('import')
         self.recent = self.settings.mrul('src_paths')
 
+    ### Start of Overriding Section ###
+
+    def get_title(self, reponame):
+        return _('Import - %s') % reponame
+
+    def get_icon(self):
+        return 'menuimport.ico'
+
+    def get_defsize(self):
+        return (500, 390)
+
+    def get_setting_name(self):
+        return 'import'
+
+    def get_body(self, vbox):
         # layout table
         self.table = table = gtklib.LayoutTable()
-        self.vbox.pack_start(table, True, True, 2)
+        vbox.pack_start(table, True, True, 2)
 
         ## source path combo & browse buttons
         self.src_list = gtk.ListStore(str)
@@ -71,8 +63,8 @@ class ImportDialog(gtk.Dialog):
         self.files_btn = gtk.Button(_('Browse...'))
 
         ## set given sources (but preview later)
-        if sources:
-            src = os.pathsep.join(sources)
+        if self.initsrc:
+            src = os.pathsep.join(self.initsrc)
             self.src_combo.child.set_text(src)
 
         ## other sources
@@ -124,7 +116,7 @@ class ImportDialog(gtk.Dialog):
 
         for row in self.dest_model:
             name, label = self.dest_model[row.path]
-            if name == dest:
+            if name == self.initdest:
                 self.dest_combo.set_active_iter(row.iter)
                 break
 
@@ -136,7 +128,6 @@ class ImportDialog(gtk.Dialog):
         self.cslist.set_checkbox_enable(True)
 
         # signal handlers
-        self.connect('response', self.dialog_response)
         self.files_btn.connect('clicked', self.files_clicked)
         self.cslist.connect('list-updated', self.list_updated)
         self.cslist.connect('files-dropped', self.files_dropped)
@@ -156,28 +147,55 @@ class ImportDialog(gtk.Dialog):
 
         # prepare to show
         self.cslist.clear()
-        gtklib.idle_add_single_call(self.after_init, sources)
 
-    def after_init(self, sources):
+    def get_extras(self, vbox):
+        # dest combo
         if self.mqloaded:
-            # dest combo
             self.dest_combo.show_all()
             self.dest_combo.hide()
             self.infobox.pack_start(self.dest_combo, False, False, 6)
 
-        # CmdWidget
-        self.cmd = hgcmd.CmdWidget()
-        self.cmd.show_all()
-        self.cmd.hide()
-        self.vbox.pack_start(self.cmd, False, False, 6)
-
-        # abort button
-        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
-        self.abortbtn.hide()
-
         # start preview
-        if sources:
+        if self.initsrc:
             self.preview()
+
+    def get_buttons(self):
+        return [('import', _('Import'), gtk.RESPONSE_OK),
+                ('close', gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)]
+
+    def get_default_button(self):
+        return 'import'
+
+    def get_action_map(self):
+        return {gtk.RESPONSE_OK: self.doimport}
+
+    def switch_to(self, normal, working, cmd):
+        self.table.set_sensitive(normal)
+        self.buttons['import'].set_property('visible', normal)
+        self.buttons['close'].set_property('visible', normal)
+        if normal:
+            self.buttons['close'].grab_focus()
+
+    def command_done(self, returncode, useraborted, *args):
+        self.done = True
+        self.add_to_mru()
+        if returncode == 0:
+            self.cmd.set_result(_('Imported successfully'), style='ok')
+        elif useraborted:
+            self.cmd.set_result(_('Canceled importing'), style='error')
+        else:
+            self.cmd.set_result(_('Failed to import'), style='error')
+
+    def before_close(self):
+        if len(self.cslist.get_items()) != 0 and not self.done:
+            ret = gdialog.Confirm(_('Confirm Close'), [], self,
+                                  _('Do you want to close?')).run()
+            if ret != gtk.RESPONSE_YES:
+                return False # don't close
+            self.unlink_all_tempfiles()
+        return True
+
+    ### End of Overriding Section ###
 
     def files_clicked(self, button):
         initdir = self.get_initial_dir()
@@ -227,40 +245,6 @@ class ImportDialog(gtk.Dialog):
         self.src_combo.child.set_text(os.pathsep.join(files))
         self.preview()
 
-    def dialog_response(self, dialog, response_id):
-        def abort():
-            self.cmd.stop()
-            self.cmd.show_log()
-            self.switch_to(MODE_NORMAL, cmd=False)
-        # Import button
-        if response_id == gtk.RESPONSE_OK:
-            self.doimport()
-        # Close button or dialog closing by the user
-        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
-            if self.cmd.is_alive():
-                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
-                                      _('Do you want to abort?')).run()
-                if ret == gtk.RESPONSE_YES:
-                    abort()
-            elif len(self.cslist.get_items()) != 0 and not self.done:
-                ret = gdialog.Confirm(_('Confirm Close'), [], self,
-                                      _('Do you want to close?')).run()
-                if ret == gtk.RESPONSE_YES:
-                    self.unlink_all_tempfiles()
-                    self.destroy()
-                    return # close dialog
-            else:
-                self.unlink_all_tempfiles()
-                self.destroy()
-                return # close dialog
-        # Abort button
-        elif response_id == gtk.RESPONSE_CANCEL:
-            abort()
-        else:
-            raise _('unexpected response id: %s') % response_id
-
-        self.run() # don't close dialog
-
     def get_initial_dir(self):
         src = self.src_combo.child.get_text()
         if src and os.path.exists(src):
@@ -304,7 +288,7 @@ class ImportDialog(gtk.Dialog):
         self.infolbl.set_markup(info)
         if self.mqloaded:
             self.dest_combo.set_property('visible', bool(count))
-        self.importbtn.set_sensitive(bool(count))
+        self.buttons['import'].set_sensitive(bool(count))
 
     def get_filepaths(self):
         src = self.src_combo.child.get_text()
@@ -345,29 +329,6 @@ class ImportDialog(gtk.Dialog):
         else:
             self.cslist.clear()
 
-    def set_notify_func(self, func, *args, **kargs):
-        self.notify_func = func
-        self.notify_args = args
-        self.notify_kargs = kargs
-
-    def switch_to(self, mode, cmd=True):
-        if mode == MODE_NORMAL:
-            normal = True
-            self.closebtn.grab_focus()
-        elif mode == MODE_WORKING:
-            normal = False
-            self.abortbtn.grab_focus()
-        else:
-            raise _('unknown mode name: %s') % mode
-        working = not normal
-
-        self.table.set_sensitive(normal)
-        self.importbtn.set_property('visible', normal)
-        self.closebtn.set_property('visible', normal)
-        if cmd:
-            self.cmd.set_property('visible', working)
-        self.abortbtn.set_property('visible', working)
-
     def doimport(self):
         items = self.cslist.get_items(sel=True)
         files = [file for file, sel in items if sel]
@@ -381,25 +342,13 @@ class ImportDialog(gtk.Dialog):
             cmd = 'qimport'
         else:
             raise _('unexpected destination name: %s') % dest
+
+        # prepare command line
         cmdline = ['hg', cmd, '--verbose']
         cmdline.extend(files)
 
-        def cmd_done(returncode, useraborted):
-            self.done = True
-            self.switch_to(MODE_NORMAL, cmd=False)
-            self.add_to_mru()
-            if hasattr(self, 'notify_func'):
-                self.notify_func(*self.notify_args, **self.notify_kargs)
-            if returncode == 0:
-                if not self.cmd.is_show_log():
-                    self.response(gtk.RESPONSE_CLOSE)
-                self.cmd.set_result(_('Imported successfully'), style='ok')
-            elif useraborted:
-                self.cmd.set_result(_('Canceled importing'), style='error')
-            else:
-                self.cmd.set_result(_('Failed to import'), style='error')
-        self.switch_to(MODE_WORKING)
-        self.cmd.execute(cmdline, cmd_done)
+        # start importing
+        self.execute_command(cmdline)
 
 def run(ui, *pats, **opts):
     dest = opts.get('mq', False) and DEST_MQ or DEST_REPO
