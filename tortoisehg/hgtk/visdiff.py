@@ -150,15 +150,19 @@ def visualdiff(ui, repo, pats, opts):
         # Always make a copy of ctx1a (and ctx1b, if applicable)
         files = mod_a | rem_a | ((mod_b | add_b) - add_a)
         dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
+        label1a = 'rev%d' % ctx1a.rev()
         if do3way:
             files = mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
+            label1b = 'rev%d' % ctx1b.rev()
         else:
             dir1b = None
+            label1b = None
 
         if ctx2.rev() is not None:
             # If ctx2 is not the working copy, create a snapshot for it
             dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
+            label2 = 'rev%d' % ctx2.rev()
         elif len(MAR) == 1:
             # This lets the diff tool open the changed file directly
             dir2 = repo.root
@@ -166,6 +170,7 @@ def visualdiff(ui, repo, pats, opts):
             # Create a snapshot, record mtime to detect mods made by
             # diff tool
             dir2, fns_and_mtime = snapshot(repo, MA, ctx2, tmproot)
+            label2 = 'working files'
 
         # If only one change, diff the files instead of the directories
         # Handle bogus modifies correctly by checking if the files exist
@@ -179,11 +184,16 @@ def visualdiff(ui, repo, pats, opts):
                 if not os.path.isfile(os.path.join(tmproot, dir1b)):
                     dir1b = os.devnull
             dir2 = os.path.join(dir2, lfile)
+            label1a = '%s[%s]' % (lfile, label1a)
+            label1b = '%s[%s]' % (lfile, label1b)
+            label2 = lfile
 
         # Function to quote file/dir names in the argument string.
         # When not operating in 3-way mode, an empty string is
         # returned for parent2
-        replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b, child=dir2)
+        replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b,
+                       plabel1=label1a, plabel2=label1b, clabel=label2,
+                       child=dir2)
         def quote(match):
             key = match.group()[1:]
             if not do3way and key == 'parent2':
@@ -191,7 +201,7 @@ def visualdiff(ui, repo, pats, opts):
             return util.shellquote(replace[key])
 
         # Match parent2 first, so 'parent1?' will match both parent1 and parent
-        regex = '\$(parent2|parent1?|child)'
+        regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel)'
         if not do3way and not re.search(regex, args):
             args += ' $parent1 $child'
         args = re.sub(regex, quote, args)
@@ -330,19 +340,25 @@ class FileSelectionDialog(gtk.Dialog):
         # Always make a copy of node1a (and node1b, if applicable)
         files = mod_a | rem_a | ((mod_b | add_b) - add_a)
         dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
+        rev1a = '[rev%d]' % ctx1a.rev()
         if do3way:
             files = mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
+            rev1b = '[rev%d]' % ctx1b.rev()
         else:
             dir1b = None
+            rev1b = None
 
         # If ctx2 is the working copy, use it directly
         if ctx2.rev() is None:
             dir2 = repo.root
+            rev2 = '[working]'
         else:
             dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
+            rev2 = '[rev%d]' % ctx2.rev()
 
-        self.dirs = (dir1a, dir1b, dir2, tmproot)
+        self.dirs = (dir1a, dir1b, dir2)
+        self.revs = (rev1a, rev1b, rev2)
 
         def get_status(file, mod, add, rem):
             if file in mod:
@@ -430,7 +446,8 @@ class FileSelectionDialog(gtk.Dialog):
             fname = st2
             st2 = None
         fname = hglib.fromutf(fname)
-        dir1a, dir1b, dir2, tmproot = self.dirs
+        dir1a, dir1b, dir2 = self.dirs
+        rev1a, rev1b, rev2 = self.revs
 
         if st1 == 'A' or st2 == 'R':
             file1a = os.devnull
@@ -448,6 +465,10 @@ class FileSelectionDialog(gtk.Dialog):
         else:
             file2 = os.path.join(dir2, util.localpath(fname))
 
+        label1a = fname+rev1a
+        label1b = file1b and fname+rev1b or ''
+        label2 = fname+rev2
+
         args = do3way and self.mergeopts or self.diffopts
         args = ' '.join(args)
 
@@ -455,8 +476,9 @@ class FileSelectionDialog(gtk.Dialog):
         # not operating in 3-way mode, an empty string is returned for
         # parent2
 
-        # TODO: Add more vars: $nameleft $nameright $namecenter $ancestor
+        # TODO: Add more vars: $ancestor
         replace = dict(parent=file1a, parent1=file1a, parent2=file1b,
+                       plabel1=label1a, plabel2=label1b, clabel=label2,
                        child=file2)
         def quote(match):
             key = match.group()[1:]
@@ -465,7 +487,7 @@ class FileSelectionDialog(gtk.Dialog):
             return util.shellquote(replace[key])
 
         # Match parent2 first, so 'parent1?' will match both parent1 and parent
-        regex = '\$(parent2|parent1?|child)'
+        regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel)'
         if not re.search(regex, args):
             if st2 and not st1:
                 args += ' $parent2 $child'
