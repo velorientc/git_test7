@@ -6,48 +6,36 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
 import gtk
-import gobject
 
-from mercurial import hg, ui, error
+from mercurial import ui, error
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths, settings
+from tortoisehg.util import hglib
 
-from tortoisehg.hgtk import csinfo, gtklib, gdialog, hgcmd
+from tortoisehg.hgtk import csinfo, gtklib, gdialog
 
-MODE_NORMAL  = 'normal'
-MODE_WORKING = 'working'
-
-class UpdateDialog(gtk.Dialog):
+class UpdateDialog(gdialog.GDialog):
     """ Dialog to update Mercurial repo """
     def __init__(self, rev=None):
-        """ Initialize the Dialog """
-        gtk.Dialog.__init__(self)
-        gtklib.set_tortoise_icon(self, 'menucheckout.ico')
-        gtklib.set_tortoise_keys(self)
-        self.set_resizable(False)
-        self.set_has_separator(False)
+        gdialog.GDialog.__init__(self)
+        self.rev = rev
 
-        try:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
-        except error.RepoError:
-            gtklib.idle_add_single_call(self.destroy)
-            return
-        self.repo = repo
-        self.set_title(_('Update - %s') % hglib.get_reponame(repo))
+    ### Start of Overriding Section ###
 
-        # add dialog buttons
-        self.updatebtn = self.add_button(_('Update'), gtk.RESPONSE_OK)
-        self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
+    def get_title(self, reponame):
+        return _('Update - %s') % reponame
 
-        # persistent settings
-        self.settings = settings.Settings('update')
-        
+    def get_icon(self):
+        return 'menucheckout.ico'
+
+    def get_setting_name(self):
+        return 'update'
+
+    def get_body(self, vbox):
         # layout table
         table = gtklib.LayoutTable()
-        self.vbox.pack_start(table, True, True, 2)
+        vbox.pack_start(table, True, True, 2)
         self.table = table
 
         ## revision label & combobox
@@ -58,15 +46,15 @@ class UpdateDialog(gtk.Dialog):
         table.add_row(_('Update to:'), combo, padding=False)
 
         ## fill list of combo
-        if rev != None:
-            combo.append_text(str(rev))
+        if self.rev != None:
+            combo.append_text(str(self.rev))
         else:
-            combo.append_text(repo.dirstate.branch())
+            combo.append_text(self.repo.dirstate.branch())
         combo.set_active(0)
-        for name in hglib.getlivebranch(repo):
+        for name in hglib.getlivebranch(self.repo):
             combo.append_text(name)
 
-        tags = list(repo.tags())
+        tags = list(self.repo.tags())
         tags.sort()
         tags.reverse()
         for t in tags:
@@ -75,7 +63,7 @@ class UpdateDialog(gtk.Dialog):
         ## changeset summaries
         style = csinfo.labelstyle(contents=('%(rev)s', ' %(branch)s',
                        ' %(tags)s', '\n%(summary)s'), selectable=True, width=350)
-        factory = csinfo.factory(repo, style=style)
+        factory = csinfo.factory(self.repo, style=style)
 
         ## summary of target revision
         self.target_label = factory()
@@ -85,7 +73,7 @@ class UpdateDialog(gtk.Dialog):
         self.parent1_label = factory()
 
         ## summary of parent 2 revision if needs
-        self.ctxs = repo[None].parents()
+        self.ctxs = self.repo[None].parents()
         if len(self.ctxs) == 2:
             table.add_row(_('Parent 1:'), self.parent1_label)
             self.parent2_label = factory()
@@ -111,15 +99,50 @@ class UpdateDialog(gtk.Dialog):
         self.opt_showlog = gtk.CheckButton(_('Always show log'))
 
         # signal handlers
-        self.connect('response', self.dialog_response)
         self.revcombo.connect('changed', lambda b: self.update_summaries())
         self.opt_clean.connect('toggled', lambda b: self.update_summaries())
 
         # prepare to show
-        self.load_settings()
         self.update_summaries()
-        self.updatebtn.grab_focus()
-        gtklib.idle_add_single_call(self.after_init)
+
+    def get_extras(self, vbox):
+        # append options
+        self.opttable = gtklib.LayoutTable()
+        vbox.pack_start(self.opttable, False, False)
+        self.opttable.add_row(None, self.opt_merge, ypad=0)
+        self.opttable.add_row(None, self.opt_showlog, ypad=0)
+
+        # layout group
+        layout = gtklib.LayoutGroup()
+        layout.add(self.table, self.opttable, force=True)
+
+    def get_buttons(self):
+        return [('update', _('Update'), gtk.RESPONSE_OK),
+                ('close', gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)]
+
+    def get_default_button(self):
+        return 'update'
+
+    def get_action_map(self):
+        return {gtk.RESPONSE_OK: self.update}
+
+    def switch_to(self, normal, working, cmd):
+        self.table.set_sensitive(normal)
+        self.opttable.set_sensitive(normal)
+        self.buttons['update'].set_property('visible', normal)
+        self.buttons['close'].set_property('visible', normal)
+        if normal:
+            self.buttons['close'].grab_focus()
+        if cmd and self.opt_showlog.get_active():
+            self.cmd.show_log()
+
+    def command_done(self, returncode, useraborted, *args):
+        if returncode == 0:
+            self.cmd.set_result(_('Updated successfully'), style='ok')
+        elif useraborted:
+            self.cmd.set_result(_('Canceled updating'), style='error')
+        else:
+            self.cmd.set_result(_('Failed to update'), style='error')
 
     def load_settings(self):
         merge = self.settings.get_value('mergedefault', False)
@@ -132,84 +155,15 @@ class UpdateDialog(gtk.Dialog):
         showlog = self.opt_showlog.get_active()
         self.settings.set_value('mergedefault', checked)
         self.settings.set_value('showlog', showlog)
-
         self.settings.write()
 
-    def after_init(self):
-        # append options
-        self.opttable = gtklib.LayoutTable()
-        self.vbox.pack_start(self.opttable, False, False)
-        self.opttable.add_row(None, self.opt_merge, ypad=0)
-        self.opttable.add_row(None, self.opt_showlog, ypad=0)
-
-        # layout group
-        layout = gtklib.LayoutGroup()
-        layout.add(self.table, self.opttable, force=True)
-
-        # CmdWidget
-        self.cmd = hgcmd.CmdWidget()
-        self.cmd.show_all()
-        self.cmd.hide()
-        self.vbox.pack_start(self.cmd, False, False, 6)
-
-        # abort button
-        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
-        self.abortbtn.hide()
-
-    def abort(self):
-        self.cmd.stop()
-        self.cmd.show_log()
-        self.switch_to(MODE_NORMAL, cmd=False)
-
-    def dialog_response(self, dialog, response_id):
-        # Update button
-        if response_id == gtk.RESPONSE_OK:
-            self.update()
-        # Close button or dialog closing by the user
-        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
-            if self.cmd.is_alive():
-                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
-                                      _('Do you want to abort?')).run()
-                if ret == gtk.RESPONSE_YES:
-                    self.abort()
-            else:
-                self.store_settings()                
-                self.destroy()
-                return # close dialog
-        # Abort button
-        elif response_id == gtk.RESPONSE_CANCEL:
-            self.abort()
-        else:
-            raise _('unexpected response id: %s') % response_id
-
-        self.run() # don't close dialog
+    ### End of Overriding Section ###
 
     def options_expanded(self, expander, *args):
         if expander.get_expanded():
             self.opttable.show_all()
         else:
             self.opttable.hide()
-
-    def switch_to(self, mode, cmd=True):
-        if mode == MODE_NORMAL:
-            normal = True
-            self.closebtn.grab_focus()
-        elif mode == MODE_WORKING:
-            normal = False
-            self.abortbtn.grab_focus()
-        else:
-            raise _('unknown mode name: %s') % mode
-        working = not normal
-
-        self.table.set_sensitive(normal)
-        self.opttable.set_sensitive(normal)
-        self.updatebtn.set_property('visible', normal)
-        self.closebtn.set_property('visible', normal)
-        if cmd:
-            self.cmd.set_property('visible', working)
-            if self.opt_showlog.get_active():
-                self.cmd.show_log()
-        self.abortbtn.set_property('visible', working)
 
     def update_summaries(self):
         ctxs = self.ctxs
@@ -222,13 +176,14 @@ class UpdateDialog(gtk.Dialog):
             new_ctx = self.repo[newrev]
             if not merge and new_ctx.rev() == ctxs[0].rev():
                 self.target_label.set_label(_('(same as parent)'))
-                self.updatebtn.set_sensitive(self.opt_clean.get_active())
+                clean = self.opt_clean.get_active()
+                self.buttons['update'].set_sensitive(clean)
             else:
                 self.target_label.update(self.repo[newrev])
-                self.updatebtn.set_sensitive(True)
+                self.buttons['update'].set_sensitive(True)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             self.target_label.set_label(_('unknown revision!'))
-            self.updatebtn.set_sensitive(False)
+            self.buttons['update'].set_sensitive(False)
 
     def update(self):
         cmdline = ['hg', 'update', '--verbose']
@@ -313,30 +268,14 @@ class UpdateDialog(gtk.Dialog):
                     pass # no args
                 elif ret['cancel']:
                     self.cmd.log.append(_('[canceled by user]\n'), error=True)
-                    self.switch_to(MODE_WORKING)
+                    self.do_switch_to(gdialog.MODE_WORKING)
                     self.abort()
                     return
                 else:
                     raise _('invalid dialog result: %s') % ret
 
-        def cmd_done(returncode, useraborted):
-            self.switch_to(MODE_NORMAL, cmd=False)
-            if hasattr(self, 'notify_func'):
-                self.notify_func(self.notify_args)
-            if returncode == 0:
-                if not self.cmd.is_show_log():
-                    self.response(gtk.RESPONSE_CLOSE)
-                self.cmd.set_result(_('Updated successfully'), style='ok')
-            elif useraborted:
-                self.cmd.set_result(_('Canceled updating'), style='error')
-            else:
-                self.cmd.set_result(_('Failed to update'), style='error')
-        self.switch_to(MODE_WORKING)
-        self.cmd.execute(cmdline, cmd_done)
-
-    def set_notify_func(self, func, *args):
-        self.notify_func = func
-        self.notify_args = args
+        # start updating
+        self.execute_command(cmdline)
 
 def run(ui, *pats, **opts):
     return UpdateDialog(opts.get('rev'))
