@@ -204,6 +204,85 @@ class GStatus(gdialog.GWindow):
     def is_merge(self):
         return self.count_revs() < 2 and len(self.repo.parents()) == 2
 
+
+    def get_accelgroup(self):
+        accelgroup = gtk.AccelGroup()
+        mod = gtklib.get_thg_modifier()
+        
+        key, modifier = gtk.accelerator_parse(mod+'d')
+        self.filetree.add_accelerator('thg-diff', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        self.filetree.connect('thg-diff', self.thgdiff)
+        self.connect('thg-refresh', self.thgrefresh)
+
+        # set CTRL-c accelerator for copy-clipboard
+        key, modifier = gtk.accelerator_parse(mod+'c')
+        self.difftree.add_accelerator('copy-clipboard', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        self.difftree.connect('copy-clipboard', self.copy_to_clipboard)
+
+        def scroll_diff_notebook(widget, direction=gtk.SCROLL_PAGE_DOWN):
+            page_num = self.diff_notebook.get_current_page()
+            page = self.diff_notebook.get_nth_page(page_num)
+
+            page.emit("scroll-child", direction, False)
+
+        def move_filetree_selection(widget, distance=1):
+            row = 0
+            path = self.filetree.get_cursor()[0]
+            if path:
+                row = path[0]
+            model = self.filetree.get_model()
+
+            # make sure new row is within bounds            
+            new_row = min((row + distance), len(model) - 1)
+            new_row = max(0, new_row)
+
+            selected = model.get_iter_from_string(str(new_row))
+            selection = self.filetree.get_selection()
+            selection.unselect_all()
+            selection.select_iter(selected)
+            self.filetree.set_cursor(model.get_path(selected))
+
+        def toggle_filetree_selection(*arguments):
+            self.sel_clicked(not self.selcb.get_active())
+
+        def next_diff_notebook_page(*arguments):
+            notebook = self.diff_notebook
+            if notebook.get_current_page() >= len(notebook) - 1:
+                notebook.set_current_page(0)
+            else:
+                notebook.next_page()
+                
+        def previous_diff_notebook_page(*arguments):
+            notebook = self.diff_notebook
+            if notebook.get_current_page() <= 0:
+                notebook.set_current_page(len(notebook) - 1)
+            else:
+                notebook.prev_page()
+                
+        # signal, accelerator key, handler, parameter                
+        status_accelerators = [
+            ('status-scroll-down', 'bracketright', scroll_diff_notebook,
+             gtk.SCROLL_PAGE_DOWN),
+            ('status-scroll-up', 'bracketleft', scroll_diff_notebook,
+             gtk.SCROLL_PAGE_UP),
+            ('status-next-file', 'period', move_filetree_selection, 1),
+            ('status-previous-file', 'comma', move_filetree_selection, -1),
+            ('status-select-all', 'u', toggle_filetree_selection, None),
+            ('status-next-page', 'p', next_diff_notebook_page, None),
+            ('status-previous-page', '<Shift>p',
+             previous_diff_notebook_page, None),
+            ]
+        
+        for signal, accelerator, handler, param in status_accelerators:
+            key, modifier = gtk.accelerator_parse(mod + accelerator)
+            self.add_accelerator(signal, accelgroup, key, modifier, 0)
+            self.connect(signal, handler, param)
+
+        return accelgroup
+                
+
     def get_body(self):
         is_merge = self.is_merge()
 
@@ -225,15 +304,6 @@ class GStatus(gdialog.GWindow):
             self.filetree.set_rubber_banding(True)
         self.filetree.modify_font(pango.FontDescription(self.fontlist))
         self.filetree.set_headers_clickable(True)
-
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        mod = gtklib.get_thg_modifier()
-        key, modifier = gtk.accelerator_parse(mod+'d')
-        self.filetree.add_accelerator('thg-diff', accelgroup, key,
-                        modifier, gtk.ACCEL_VISIBLE)
-        self.filetree.connect('thg-diff', self.thgdiff)
-        self.connect('thg-refresh', self.thgrefresh)
 
         toggle_cell = gtk.CellRendererToggle()
         toggle_cell.connect('toggled', self.select_toggle)
@@ -341,50 +411,6 @@ class GStatus(gdialog.GWindow):
                 pango.FontDescription)
 
         difftree = gtk.TreeView(self.diffmodel)
-
-        # set CTRL-c accelerator for copy-clipboard
-        mod = gtklib.get_thg_modifier()
-        key, modifier = gtk.accelerator_parse(mod+'c')
-        difftree.add_accelerator('copy-clipboard', accelgroup, key,
-                        modifier, gtk.ACCEL_VISIBLE)
-        difftree.connect('copy-clipboard', self.copy_to_clipboard)
-
-        def scroll_diff_notebook(widget, direction=gtk.SCROLL_PAGE_DOWN):
-            page_num = self.diff_notebook.get_current_page()
-            page = self.diff_notebook.get_nth_page(page_num)
-
-            page.emit("scroll-child", direction, False)
-
-        def move_filetree_selection(widget, distance=1):
-            row = 0
-            path = self.filetree.get_cursor()[0]
-            if path:
-                row = path[0]
-            model = self.filetree.get_model()
-
-            # make sure new row is within bounds            
-            new_row = min((row + distance), len(model) - 1)
-            new_row = max(0, new_row)
-
-            selected = model.get_iter_from_string(str(new_row))
-            selection = self.filetree.get_selection()
-            selection.unselect_all()
-            selection.select_iter(selected)
-            self.filetree.set_cursor(model.get_path(selected))
-
-        status_accelerators = [
-            ('status-scroll-down', 'bracketright', scroll_diff_notebook,
-             gtk.SCROLL_PAGE_DOWN),
-            ('status-scroll-up', 'bracketleft', scroll_diff_notebook,
-             gtk.SCROLL_PAGE_UP),
-            ('status-next-file', 'period', move_filetree_selection, 1),
-            ('status-previous-file', 'comma', move_filetree_selection, -1),
-            ]
-        
-        for signal, accelerator, handler, param in status_accelerators:
-            key, modifier = gtk.accelerator_parse(mod + accelerator)
-            self.add_accelerator(signal, accelgroup, key, modifier, 0)
-            self.connect(signal, handler, param)
         
         difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         difftree.set_headers_visible(False)
@@ -392,7 +418,8 @@ class GStatus(gdialog.GWindow):
         if getattr(difftree, 'enable-grid-lines', None) is not None:
             difftree.set_property('enable-grid-lines', True)
         difftree.connect('row-activated', self.diff_tree_row_act)
-
+        self.difftree = difftree
+        
         cell = gtk.CellRendererText()
         diffcol = gtk.TreeViewColumn('diff', cell)
         diffcol.set_resizable(True)
@@ -449,6 +476,11 @@ class GStatus(gdialog.GWindow):
 
         self.diff_notebook.connect('switch-page', self.page_switched,
                                    sel, difftree)
+
+        # add keyboard accelerators
+        accelgroup = self.get_accelgroup()     
+        self.add_accel_group(accelgroup)
+        
         return self.diffpane
 
     def append_page(self, name, child, label):
