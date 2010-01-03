@@ -349,6 +349,43 @@ class GStatus(gdialog.GWindow):
                         modifier, gtk.ACCEL_VISIBLE)
         difftree.connect('copy-clipboard', self.copy_to_clipboard)
 
+        def scroll_diff_notebook(widget, direction=gtk.SCROLL_PAGE_DOWN):
+            page_num = self.diff_notebook.get_current_page()
+            page = self.diff_notebook.get_nth_page(page_num)
+
+            page.emit("scroll-child", direction, False)
+
+        def move_filetree_selection(widget, distance=1):
+            row = 0
+            path = self.filetree.get_cursor()[0]
+            if path:
+                row = path[0]
+            model = self.filetree.get_model()
+
+            # make sure new row is within bounds            
+            new_row = min((row + distance), len(model) - 1)
+            new_row = max(0, new_row)
+
+            selected = model.get_iter_from_string(str(new_row))
+            selection = self.filetree.get_selection()
+            selection.unselect_all()
+            selection.select_iter(selected)
+            self.filetree.set_cursor(model.get_path(selected))
+
+        status_accelerators = [
+            ('status-scroll-down', 'bracketright', scroll_diff_notebook,
+             gtk.SCROLL_PAGE_DOWN),
+            ('status-scroll-up', 'bracketleft', scroll_diff_notebook,
+             gtk.SCROLL_PAGE_UP),
+            ('status-next-file', 'period', move_filetree_selection, 1),
+            ('status-previous-file', 'comma', move_filetree_selection, -1),
+            ]
+        
+        for signal, accelerator, handler, param in status_accelerators:
+            key, modifier = gtk.accelerator_parse(mod + accelerator)
+            self.add_accelerator(signal, accelgroup, key, modifier, 0)
+            self.connect(signal, handler, param)
+        
         difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         difftree.set_headers_visible(False)
         difftree.set_enable_search(False)

@@ -39,7 +39,9 @@ for sig in ('copy-clipboard', 'thg-diff', 'thg-parent', 'thg-rename',
             'mq-move-bottom', 'mq-pop', 'mq-push'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
-for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept', 'thg-reflow'):
+for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept',
+            'thg-reflow', 'status-scroll-down', 'status-scroll-up', 
+			'status-next-file', 'status-previous-file'):
     gobject.signal_new(sig, gtk.Window,
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-close', 'thg-new'):
