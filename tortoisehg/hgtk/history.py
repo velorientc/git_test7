@@ -269,6 +269,20 @@ class GLog(gdialog.GWindow):
         else:
             mq_item = []
 
+        if 'perfarce' in self.exs:
+            p4menu = [(_('_Perforce'), [
+                dict(text=_('Identify'), func=self.p4identify,
+                    icon=gtk.STOCK_PROPERTIES),
+                dict(text=_('Pending'), func=self.p4pending,
+                    icon=gtk.STOCK_DIALOG_QUESTION),
+                dict(text=_('Submit'), func=self.p4submit,
+                    icon=gtk.STOCK_APPLY),
+                dict(text=_('Revert'), func=self.p4revert,
+                    icon=gtk.STOCK_CLEAR),
+                ])]
+        else:
+            p4menu = []
+
         return [(_('_View'), [
             dict(text=_('Load more Revisions'), name='load-more',
                 func=self.more_clicked, icon=gtk.STOCK_GO_DOWN),
@@ -340,7 +354,7 @@ class GLog(gdialog.GWindow):
                     ascheck=True, func=toggle_proxy),
                 dict(text=_('Force push'), ascheck=True, func=toggle_force),
                 ])
-            ]
+            ] + p4menu
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
@@ -373,6 +387,34 @@ class GLog(gdialog.GWindow):
         self.show_toolbar = button.get_active()
         self.syncbox.set_visible('reload', not self.show_toolbar)
         self._show_toolbar(self.show_toolbar)
+
+    def p4pending(self, button):
+        cmdline = ['hg', 'p4pending', '--verbose']
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+
+    def p4submit(self, button):
+        cmdline = ['hg', 'p4submit', '--verbose']
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+
+    def p4revert(self, button):
+        cmdline = ['hg', 'p4revert', '--verbose']
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+
+    def p4identify(self, button):
+        cmdline = ['hg', 'p4identify', '--verbose']
+        dlg = hgcmd.CmdDialog(cmdline)
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
