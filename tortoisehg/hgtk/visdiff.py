@@ -125,7 +125,13 @@ def visualdiff(ui, repo, pats, opts):
         else:
             toollist.add(preferred)
 
-    if len(toollist) > 1:
+    renames = False
+    for f in mod_a | add_a:
+        fctx = ctx2.filectx(f)
+        if fctx.renamed():
+            renames = True
+            break
+    if len(toollist) > 1 or renames:
         usewin = True
     else:
         preferred = toollist.pop()
@@ -376,6 +382,7 @@ class FileSelectionDialog(gtk.Dialog):
             reva = '@%d' % ctxa.rev()
         else:
             dir1b, dira = None, None
+            ctxa = None
             rev1b, reva = '', ''
 
         # If ctx2 is the working copy, use it directly
@@ -388,6 +395,7 @@ class FileSelectionDialog(gtk.Dialog):
 
         self.dirs = (dir1a, dir1b, dira, dir2)
         self.revs = (rev1a, rev1b, reva, rev2)
+        self.ctxs = (ctx1a, ctx1b, ctxa, ctx2)
 
         def get_status(file, mod, add, rem):
             if file in mod:
@@ -477,11 +485,23 @@ class FileSelectionDialog(gtk.Dialog):
         fname = hglib.fromutf(fname)
         dir1a, dir1b, dira, dir2 = self.dirs
         rev1a, rev1b, reva, rev2 = self.revs
+        ctx1a, ctx1b, ctxa, ctx2 = self.ctxs
 
-        if st1 == 'A' or st2 == 'R':
+        source = fname
+        try:
+            fctx = ctx2.filectx(source)
+            ren = fctx.renamed()
+            if ren:
+                source, node = ren
+        except error.LookupError:
+            fctx = None
+        if source != fname:
+            file1a = os.path.join(dir1a, util.localpath(source))
+        elif st1 == 'A' or st2 == 'R':
             file1a = os.devnull
         else:
-            file1a = os.path.join(dir1a, util.localpath(fname))
+            file1a = os.path.join(dir1a, util.localpath(source))
+
         if st2:
             if st2 == 'A' or st1 == 'R':
                 file1b = os.devnull
@@ -492,12 +512,13 @@ class FileSelectionDialog(gtk.Dialog):
                 filea = os.devnull
         else:
             file1b, filea = None, None
+
         if st1 == 'R' or st2 == 'R':
             file2 = os.devnull
         else:
             file2 = os.path.join(dir2, util.localpath(fname))
 
-        label1a = fname+rev1a
+        label1a = source+rev1a
         label1b = fname+rev1b
         labela = fname+reva
         label2 = fname+rev2
