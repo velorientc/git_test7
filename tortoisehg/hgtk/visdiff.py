@@ -127,7 +127,7 @@ def visualdiff(ui, repo, pats, opts):
             toollist.add(preferred)
 
     renames = False
-    for f in mod_a | add_a:
+    for f in MA:
         fctx = ctx2.filectx(f)
         if fctx.renamed():
             renames = True
