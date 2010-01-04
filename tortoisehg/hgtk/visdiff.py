@@ -90,7 +90,8 @@ def visualdiff(ui, repo, pats, opts):
         if not revs and len(p) > 1:
             ctx1b = p[1]
 
-    m = cmdutil.match(repo, pats, opts)
+    lpats = [util.localpath(f) for f in pats]
+    m = cmdutil.match(repo, lpats, opts)
     n2 = ctx2.node()
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
     if ctx1b:
