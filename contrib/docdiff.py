@@ -45,9 +45,9 @@ def main():
         print sys.argv[0], '[local] [base] [other] [output]'
         sys.exit(1)
     elif len(args) == 2:
-        local, other = args
+        local, other = [os.path.abspath(f) for f in args]
     else:
-        local, base, other, output = args
+        local, base, other, output = [os.path.abspath(f) for f in args]
 
     base, ext = os.path.splitext(local)
     if not ext or ext.lower()[1:] not in scripts.keys():
