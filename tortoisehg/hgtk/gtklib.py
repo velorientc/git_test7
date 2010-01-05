@@ -51,6 +51,15 @@ def get_thg_modifier():
     else:
         return '<Control>'
 
+def add_accelerator(widget, signal, accelgroup, accelerator,
+                    accel_flags=gtk.ACCEL_VISIBLE):
+    """Add an accelerator for signal to widget.
+
+    accelerator is the key string parsed by gtk.accelerator_parse; the
+    other parameters are passed to gtk.Widget.add_accelerator"""
+    key, modifier = gtk.accelerator_parse(accelerator)
+    widget.add_accelerator(signal, accelgroup, key, modifier, accel_flags)
+
 def set_tortoise_keys(window, connect=True):
     'Set default TortoiseHg keyboard accelerators'
     if sys.platform == 'darwin':
@@ -60,21 +69,17 @@ def set_tortoise_keys(window, connect=True):
     mod = get_thg_modifier()
     accelgroup = gtk.AccelGroup()
     window.add_accel_group(accelgroup)
-    key, modifier = gtk.accelerator_parse(mod+'w')
-    window.add_accelerator('thg-close', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse(mod+'q')
-    window.add_accelerator('thg-exit', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse('F5')
-    window.add_accelerator('thg-refresh', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse(mod+'r')
-    window.add_accelerator('thg-refresh', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse(mod+'Return')
-    window.add_accelerator('thg-accept', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
+
+    default_accelerators = [
+        (mod+'w', 'thg-close'),
+        (mod+'q', 'thg-exit'),
+        ('F5', 'thg-refresh'),
+        (mod+'r', 'thg-refresh'),
+        (mod+'Return', 'thg-accept'),
+    ]
+
+    for accelerator, signal in default_accelerators:
+        add_accelerator(window, signal, accelgroup, accelerator)
 
     # connect ctrl-w and ctrl-q to every window
     if connect:
@@ -93,6 +98,31 @@ def thgclose(window):
             return False
     window.destroy()
     return True
+
+def move_treeview_selection(window, treeview, distance=1):
+    """Accelerator handler to move a treeview's cursor and selection
+
+    Moves the treeview's cursor by distance and selects the row on which
+    the cursor lands.
+
+    distance: an integer number of rows to move the cursor, positive to
+              move the selection down, negative for up.  A distance of
+              0 will reset the selection to the current row."""
+    row = 0
+    path = treeview.get_cursor()[0]
+    if path:
+        row = path[0]
+    model = treeview.get_model()
+
+    # make sure new row is within bounds
+    new_row = min((row + distance), len(model) - 1)
+    new_row = max(0, new_row)
+
+    selected = model.get_iter_from_string(str(new_row))
+    selection = treeview.get_selection()
+    selection.unselect_all()
+    selection.select_iter(selected)
+    treeview.set_cursor(model.get_path(selected))
 
 class MessageDialog(gtk.Dialog):
     button_map = {

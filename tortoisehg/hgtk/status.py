@@ -209,16 +209,12 @@ class GStatus(gdialog.GWindow):
         accelgroup = gtk.AccelGroup()
         mod = gtklib.get_thg_modifier()
         
-        key, modifier = gtk.accelerator_parse(mod+'d')
-        self.filetree.add_accelerator('thg-diff', accelgroup, key,
-                        modifier, gtk.ACCEL_VISIBLE)
+        gtklib.add_accelerator(self.filetree, 'thg-diff', accelgroup, mod+'d')
         self.filetree.connect('thg-diff', self.thgdiff)
         self.connect('thg-refresh', self.thgrefresh)
 
         # set CTRL-c accelerator for copy-clipboard
-        key, modifier = gtk.accelerator_parse(mod+'c')
-        self.difftree.add_accelerator('copy-clipboard', accelgroup, key,
-                        modifier, gtk.ACCEL_VISIBLE)
+        gtklib.add_accelerator(self.difftree, 'copy-clipboard', accelgroup, mod+'c')
         self.difftree.connect('copy-clipboard', self.copy_to_clipboard)
 
         def scroll_diff_notebook(widget, direction=gtk.SCROLL_PAGE_DOWN):
@@ -226,23 +222,6 @@ class GStatus(gdialog.GWindow):
             page = self.diff_notebook.get_nth_page(page_num)
 
             page.emit("scroll-child", direction, False)
-
-        def move_filetree_selection(widget, distance=1):
-            row = 0
-            path = self.filetree.get_cursor()[0]
-            if path:
-                row = path[0]
-            model = self.filetree.get_model()
-
-            # make sure new row is within bounds            
-            new_row = min((row + distance), len(model) - 1)
-            new_row = max(0, new_row)
-
-            selected = model.get_iter_from_string(str(new_row))
-            selection = self.filetree.get_selection()
-            selection.unselect_all()
-            selection.select_iter(selected)
-            self.filetree.set_cursor(model.get_path(selected))
 
         def toggle_filetree_selection(*arguments):
             self.sel_clicked(not self.selcb.get_active())
@@ -261,24 +240,26 @@ class GStatus(gdialog.GWindow):
             else:
                 notebook.prev_page()
                 
-        # signal, accelerator key, handler, parameter                
+        # signal, accelerator key, handler, (parameters)
         status_accelerators = [
             ('status-scroll-down', 'bracketright', scroll_diff_notebook,
-             gtk.SCROLL_PAGE_DOWN),
+             (gtk.SCROLL_PAGE_DOWN,)),
             ('status-scroll-up', 'bracketleft', scroll_diff_notebook,
-             gtk.SCROLL_PAGE_UP),
-            ('status-next-file', 'period', move_filetree_selection, 1),
-            ('status-previous-file', 'comma', move_filetree_selection, -1),
-            ('status-select-all', 'u', toggle_filetree_selection, None),
-            ('status-next-page', 'p', next_diff_notebook_page, None),
+             (gtk.SCROLL_PAGE_UP,)),
+            ('status-next-file', 'period', gtklib.move_treeview_selection,
+             (self.filetree, 1)),
+            ('status-previous-file', 'comma', gtklib.move_treeview_selection,
+             (self.filetree, -1)),
+            ('status-select-all', 'u', toggle_filetree_selection, ()),
+            ('status-next-page', 'p', next_diff_notebook_page, ()),
             ('status-previous-page', '<Shift>p',
-             previous_diff_notebook_page, None),
-            ]
+             previous_diff_notebook_page, ()),
+        ]
         
-        for signal, accelerator, handler, param in status_accelerators:
-            key, modifier = gtk.accelerator_parse(mod + accelerator)
-            self.add_accelerator(signal, accelgroup, key, modifier, 0)
-            self.connect(signal, handler, param)
+        for signal, accelerator, handler, parameters in status_accelerators:
+            gtklib.add_accelerator(self, signal, accelgroup,
+                                   mod + accelerator)
+            self.connect(signal, handler, *parameters)
 
         return accelgroup
                 
