@@ -55,7 +55,7 @@ def hunk_markup(text):
         elif line.startswith('@@'):
             hunk = gtklib.markup(line, color='#FF8000')
         else:
-            hunk += line
+            hunk += gtklib.markup(line)
     return hunk
 
 def hunk_unmarkup(text):
