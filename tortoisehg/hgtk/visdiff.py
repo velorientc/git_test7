@@ -91,7 +91,7 @@ def visualdiff(ui, repo, pats, opts):
             ctx1b = p[1]
 
     lpats = [util.localpath(f) for f in pats]
-    m = cmdutil.match(repo, lpats, opts)
+    m = match.match(repo.root, repo.root, lpats)
     n2 = ctx2.node()
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
     if ctx1b:
