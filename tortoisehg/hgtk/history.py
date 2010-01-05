@@ -274,11 +274,7 @@ class GLog(gdialog.GWindow):
                 dict(text=_('Identify'), func=self.p4identify,
                     icon=gtk.STOCK_PROPERTIES),
                 dict(text=_('Pending'), func=self.p4pending,
-                    icon=gtk.STOCK_DIALOG_QUESTION),
-                dict(text=_('Submit'), func=self.p4submit,
                     icon=gtk.STOCK_APPLY),
-                dict(text=_('Revert'), func=self.p4revert,
-                    icon=gtk.STOCK_CLEAR),
                 ])]
         else:
             p4menu = []
@@ -389,32 +385,70 @@ class GLog(gdialog.GWindow):
         self._show_toolbar(self.show_toolbar)
 
     def p4pending(self, button):
-        cmdline = ['hg', 'p4pending', '--verbose']
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-
-    def p4submit(self, button):
-        cmdline = ['hg', 'p4submit', '--verbose']
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
-
-    def p4revert(self, button):
-        cmdline = ['hg', 'p4revert', '--verbose']
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
+        'revert or submit these pending changelists'
+        cmd = ['hg', 'p4pending']
+        def callback(return_code, buffer, *args):
+            self.stbar.end()
+            self.syncbox.set_enable('stop', False)
+            self.cmd_set_sensitive('stop', False)
+            if return_code == 0:
+                pending = {}
+                for line in buffer.splitlines()[:-1]:
+                    try:
+                        state, changes = line.split(' ')
+                        pending[state] = changes
+                    except ValueError:
+                        text = _('Unable to parse some output')
+                if pending:
+                    # TODO: Pending dialog
+                    print pending
+                else:
+                    text = _('No pending Perforce changelists')
+            elif return_code is None:
+                text = _('Aborted p4pending')
+            else:
+                text = _('Unable to determine pending changesets')
+            self.stbar.set_idle_text(text)
+        if self.runner.execute(cmd, callback):
+            self.runner.set_title(_('Pending Perforce changelists'))
+            self.stbar.begin(_('Finding pending Perforce changelists...'))
+            self.syncbox.set_enable('stop', True)
+            self.cmd_set_sensitive('stop', True)
+        else:
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def p4identify(self, button):
-        cmdline = ['hg', 'p4identify', '--verbose']
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
+        cmd = ['hg', 'p4identify']
+        def callback(return_code, buffer, *args):
+            self.stbar.end()
+            self.syncbox.set_enable('stop', False)
+            self.cmd_set_sensitive('stop', False)
+            if return_code == 0:
+                lines = buffer.splitlines()[:-1]
+                if len(lines) == 1:
+                    changelist, hash = lines[0].split(' ')
+                    text = _('Perforce changelist %s') % changelist
+                    try:
+                        ctx = self.repo[hash]
+                        self.graphview.set_revision_id(ctx.rev(), load=True)
+                    except error.LookupError:
+                        text = _('Unable to find rev %s') % hash
+            elif return_code is None:
+                text = _('Aborted p4identify')
+            else:
+                text = _('Unable to identify Perforce tip')
+            self.stbar.set_idle_text(text)
+        if self.runner.execute(cmd, callback):
+            self.runner.set_title(_('Identifying Perforce tip'))
+            self.stbar.begin(_('Finding tip Perforce changelist...'))
+            self.syncbox.set_enable('stop', True)
+            self.cmd_set_sensitive('stop', True)
+        else:
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
@@ -1404,6 +1438,13 @@ class GLog(gdialog.GWindow):
                            self).run()
             self.pathentry.grab_focus()
             return
+        if path.startswith('p4://'):
+            cmdline = ['hg', 'incoming', '--verbose', path]
+            dlg = hgcmd.CmdDialog(cmdline)
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
+            return
         if not self.bundledir:
             self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
             atexit.register(cleanup)
@@ -1569,6 +1610,13 @@ class GLog(gdialog.GWindow):
                            _('Please enter or select a remote path'),
                            self).run()
             self.pathentry.grab_focus()
+            return
+        if path.startswith('p4://'):
+            cmdline = ['hg', 'outgoing', '--verbose', path]
+            dlg = hgcmd.CmdDialog(cmdline)
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
             return
         cmd = ['hg', 'outgoing', '--quiet', '--template', '{node}\n']
         cmd += self.get_proxy_args()
