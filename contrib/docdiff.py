@@ -19,6 +19,8 @@ import win32con
 import win32api
 import win32process
 
+from mercurial import util
+
 scripts = {
     'doc'  : ('diff-doc.js', 'merge-doc.js'),    # MS Word
     'docx' : ('diff-doc.js', 'merge-doc.js'),
@@ -76,7 +78,8 @@ def main():
         script = os.path.join(path, use[1])
         cmd = ['wscript', script, output, other, local, base]
 
-    cmdline = '"' + ' '.join(['"'+a+'"' for a in cmd]) + '"'
+    cmd = [util.shellquote(arg) for arg in cmd]
+    cmdline = util.quotecommand(' '.join(cmd))
     proc = subprocess.Popen(cmdline, shell=True,
                             creationflags=win32con.CREATE_NO_WINDOW,
                             stderr=subprocess.PIPE,
