@@ -179,8 +179,10 @@ class ChangeSet(gdialog.GWindow):
         self.curnodes = (parent, ctx.node())
         if selrow is not None:
             self._filesel.select_path((selrow,))
+            self._filelist_tree.set_cursor((selrow,))
         elif len(self._filelist) > 1:
             self._filesel.select_path((1,))
+            self._filelist_tree.set_cursor((1,))
         else:
             self._filesel.select_path((0,))
 
@@ -669,6 +671,7 @@ class ChangeSet(gdialog.GWindow):
         filelist_tree.connect('row-activated', self.file_row_act)
         filelist_tree.set_search_equal_func(self.search_filelist)
         filelist_tree.modify_font(pango.FontDescription(self.fontlist))
+        self._filelist_tree = filelist_tree
 
         accelgroup = gtk.AccelGroup()
         if self.glog_parent:
@@ -680,6 +683,27 @@ class ChangeSet(gdialog.GWindow):
         filelist_tree.add_accelerator('thg-diff', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
         filelist_tree.connect('thg-diff', self.thgdiff)
+
+        def scroll_details(widget, direction=gtk.SCROLL_PAGE_DOWN):
+            self.diffscroller.emit("scroll-child", direction, False)
+
+        # signal, accelerator key, handler, (parameters,)
+        status_accelerators = [
+            ('status-scroll-down', 'bracketright', scroll_details,
+             (gtk.SCROLL_PAGE_DOWN,)),
+            ('status-scroll-up', 'bracketleft', scroll_details,
+             (gtk.SCROLL_PAGE_UP,)),
+            ('status-next-file', 'period', gtklib.move_treeview_selection,
+             (filelist_tree, 1)),
+            ('status-previous-file', 'comma', gtklib.move_treeview_selection,
+             (filelist_tree, -1)),
+        ]
+        
+        for signal, accelerator, handler, param in status_accelerators:
+            root = self.glog_parent or self
+            gtklib.add_accelerator(root, signal, accelgroup,
+                                   mod + accelerator)
+            root.connect(signal, handler, *param)
 
         self._filelist = gtk.ListStore(
                 gobject.TYPE_STRING,   # MAR status
