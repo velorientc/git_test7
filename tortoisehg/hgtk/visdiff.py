@@ -174,7 +174,12 @@ def visualdiff(ui, repo, pats, opts):
             label1b = '@%d' % ctx1b.rev()
             # snapshot for ancestor revision
             ctxa = ctx1a.ancestor(ctx1b)
-            dira = snapshot(repo, MA, ctxa, tmproot)[0]
+            if ctxa == ctx1a:
+                dira = dir1a
+            elif ctxa == ctx1b:
+                dira = dir1b
+            else:
+                dira = snapshot(repo, MA, ctxa, tmproot)[0]
             labela = '@%d' % ctxa.rev()
         else:
             dir1b, dira = None, None
@@ -379,7 +384,12 @@ class FileSelectionDialog(gtk.Dialog):
             rev1b = '@%d' % ctx1b.rev()
             # snapshot for ancestor revision
             ctxa = ctx1a.ancestor(ctx1b)
-            dira = snapshot(repo, MA, ctxa, tmproot)[0]
+            if ctxa == ctx1a:
+                dira = dir1a
+            elif ctxa == ctx1b:
+                dira = dir1b
+            else:
+                dira = snapshot(repo, MA, ctxa, tmproot)[0]
             reva = '@%d' % ctxa.rev()
         else:
             dir1b, dira = None, None
