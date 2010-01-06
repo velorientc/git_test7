@@ -408,7 +408,6 @@ CShellExtCMenu::QueryContextMenu(
     HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
     TDEBUG_TRACE("CShellExtCMenu::QueryContextMenu");
-    InitMenuMaps();
 
     UINT idCmd = idCmdFirst;
     BOOL bAppendItems = TRUE;
@@ -432,6 +431,8 @@ CShellExtCMenu::QueryContextMenu(
             << "TortoiseHg menu entry already in menu -> skipping");
         return S_OK;
     }
+
+    InitMenuMaps();
 
     const std::size_t sz = sizeof(menuDescList) / sizeof(MenuDescription);
     bool promoted[sz];
