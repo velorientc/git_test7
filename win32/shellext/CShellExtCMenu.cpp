@@ -336,6 +336,70 @@ void InsertMenuItemByName(
 }
 
 
+const std::wstring TortoiseHgMenuEntryString = L"TortoiseHg";
+
+int HasTortoiseMenu(HMENU hMenu, bool& hasmenu)
+// returns -1 on error, 0 otherwise
+{
+    hasmenu = false;
+
+    const int count = ::GetMenuItemCount(hMenu);
+    if (count == -1)
+    {
+        TDEBUG_TRACE("HasTortoiseMenu: GetMenuItemCount returned -1");
+        return -1;
+    }
+
+    MENUITEMINFOW mii;
+    for (int i = 0; i < count; ++i)
+    {
+        memset(&mii, 0, sizeof(MENUITEMINFOW));
+        mii.cbSize = sizeof(MENUITEMINFOW);
+        
+        // first GetMenuItemInfoW call: get size of menu item string
+        mii.fMask = MIIM_STRING;
+        BOOL res = ::GetMenuItemInfoW(hMenu, i, true, &mii);
+        if (res == 0) {
+            TDEBUG_TRACE("HasTortoiseMenu: "
+                << "first GetMenuItemInfo returned 0");
+            continue;
+        }
+
+        if (mii.dwTypeData != MFT_STRING)
+        {
+            // not a string
+            continue;
+        }
+
+        // allocate buffer for the string
+        std::vector<wchar_t> text(mii.cch + 1);
+
+        // second GetMenuItemInfoW call: get string into buffer
+        mii.dwTypeData = &text[0];
+        ++mii.cch; // size of buffer is one more than length of string
+        res = ::GetMenuItemInfoW(hMenu, i, true, &mii);
+        if (res == 0) {
+            TDEBUG_TRACE("HasTortoiseMenu: "
+                << "second GetMenuItemInfo returned 0");
+            continue;
+        }
+
+        const std::wstring menuitemtext(&text[0]);
+        //TDEBUG_TRACEW(L"HasTortoiseMenu: "
+        //    << L"menuitemtext is '" << menuitemtext << L"'");
+
+        if (menuitemtext == TortoiseHgMenuEntryString)
+        {
+            TDEBUG_TRACE("HasTortoiseMenu: FOUND TortoiseHg menu entry");
+            hasmenu = true;
+            return 0;
+        }
+    }
+
+    TDEBUG_TRACE("HasTortoiseMenu: TortoiseHg menu entry NOT found");
+    return 0;
+}
+
 #define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
 // IContextMenu
@@ -360,6 +424,14 @@ CShellExtCMenu::QueryContextMenu(
 
     if (!bAppendItems)
         return S_OK;
+
+    bool hasthgmenu = false;
+    if (HasTortoiseMenu(hMenu, hasthgmenu) == 0 && hasthgmenu)
+    {
+        TDEBUG_TRACE("CShellExtCMenu::QueryContextMenu: "
+            << "TortoiseHg menu entry already in menu -> skipping");
+        return S_OK;
+    }
 
     const std::size_t sz = sizeof(menuDescList) / sizeof(MenuDescription);
     bool promoted[sz];
@@ -503,7 +575,7 @@ CShellExtCMenu::QueryContextMenu(
 
     TDEBUG_TRACE("  CShellExtCMenu::QueryContextMenu: adding main THG menu");
     InsertSubMenuItemWithIcon2(hMenu, hSubMenu, indexMenu++, idCmd++,
-            L"TortoiseHg", "hg.ico");
+            TortoiseHgMenuEntryString, "hg.ico");
 
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 
