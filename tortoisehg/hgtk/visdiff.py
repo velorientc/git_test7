@@ -102,7 +102,9 @@ def visualdiff(ui, repo, pats, opts):
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
     if ctx1b:
         mod_b, add_b, rem_b = map(set, repo.status(ctx1b.node(), n2, m)[:3])
+        cpy = copies.copies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
     else:
+        cpy = copies.copies(repo, ctx1a, ctx2, repo[-1])[0]
         mod_b, add_b, rem_b = set(), set(), set()
     MA = mod_a | add_a | mod_b | add_b
     MAR = MA | rem_a | rem_b
@@ -132,11 +134,6 @@ def visualdiff(ui, repo, pats, opts):
         else:
             toollist.add(preferred)
 
-    if ctx1b:
-        cpy = copies.copies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
-    else:
-        cpy = copies.copies(repo, ctx1a, ctx2, repo[-1])[0]
-
     if len(toollist) > 1 or cpy:
         usewin = True
     else:
@@ -153,7 +150,7 @@ def visualdiff(ui, repo, pats, opts):
         # Multiple required tools, or tool does not support directory diffs
         sa = [mod_a, add_a, rem_a]
         sb = [mod_b, add_b, rem_b]
-        dlg = FileSelectionDialog(ui, repo, pats, ctx1a, sa, ctx1b, sb, ctx2)
+        dlg = FileSelectionDialog(repo, pats, ctx1a, sa, ctx1b, sb, ctx2, cpy)
         return dlg
 
     # We can directly use the selected tool, without a visual diff window
@@ -288,7 +285,7 @@ def visualdiff(ui, repo, pats, opts):
 
 class FileSelectionDialog(gtk.Dialog):
     'Dialog for selecting visual diff candidates'
-    def __init__(self, ui, repo, pats, ctx1a, sa, ctx1b, sb, ctx2):
+    def __init__(self, repo, pats, ctx1a, sa, ctx1b, sb, ctx2, cpy):
         'Initialize the Dialog'
         gtk.Dialog.__init__(self, title=_('Visual Diffs'))
         gtklib.set_tortoise_icon(self, 'menushowchanged.ico')
@@ -327,8 +324,8 @@ class FileSelectionDialog(gtk.Dialog):
         treeview.set_property('enable-grid-lines', True)
         treeview.set_enable_search(False)
 
-        tools = hglib.difftools(ui)
-        preferred = besttool(ui, tools)
+        tools = hglib.difftools(repo.ui)
+        preferred = besttool(repo.ui, tools)
         self.diffpath, self.diffopts, self.mergeopts = tools[preferred]
 
         if len(tools) > 1:
@@ -345,65 +342,55 @@ class FileSelectionDialog(gtk.Dialog):
             hbox.pack_start(lbl, False, False, 2)
             hbox.pack_start(combo, False, False, 2)
 
-            patterns = ui.configitems('diff-patterns')
+            patterns = repo.ui.configitems('diff-patterns')
             patterns = [(p, t) for p,t in patterns if t in tools]
             filesel = treeview.get_selection()
             filesel.connect('changed', self.fileselect, repo, combo, tools,
                             patterns, preferred)
 
         cell = gtk.CellRendererText()
-        stcol = gtk.TreeViewColumn('Status 1', cell)
+        stcol = gtk.TreeViewColumn('Status', cell)
         stcol.set_resizable(True)
         stcol.add_attribute(cell, 'text', 0)
         treeview.append_column(stcol)
 
-        do3way = ctx1b is not None and self.mergeopts
-        if do3way:
-            cell = gtk.CellRendererText()
-            stcol = gtk.TreeViewColumn('Status 2', cell)
-            stcol.set_resizable(True)
-            stcol.add_attribute(cell, 'text', 1)
-            treeview.append_column(stcol)
-
         cell = gtk.CellRendererText()
         fcol = gtk.TreeViewColumn('Filename', cell)
         fcol.set_resizable(True)
-        fcol.add_attribute(cell, 'text', do3way and 2 or 1)
+        fcol.add_attribute(cell, 'text', 1)
         treeview.append_column(fcol)
 
         mod_a, add_a, rem_a = sa
         mod_b, add_b, rem_b = sb
-        MA = mod_a | add_a | mod_b | add_b
-        MAR = MA | rem_a | rem_b
+        self.copies = cpy
+        sources = set(self.copies.values())
 
-        if do3way:
-            ctxa = ctx1a.ancestor(ctx1b)
-            self.copies = copies.copies(repo, ctx1a, ctx1b, ctxa)[0]
-        else:
-            ctxa = ctx1a
-            self.copies = copies.copies(repo, ctx1a, ctx2, repo[-1])[0]
+        MA = mod_a | add_a | mod_b | add_b
+        MAR = MA | rem_a | rem_b | sources
 
         tmproot = tempfile.mkdtemp(prefix='visualdiff.')
         self.tmproot = tmproot
 
         # Always make a copy of node1a (and node1b, if applicable)
-        cpy = set(self.copies.values())
-        files = cpy | mod_a | rem_a | ((mod_b | add_b) - add_a)
+        files = sources | mod_a | rem_a | ((mod_b | add_b) - add_a)
         dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
         rev1a = '@%d' % ctx1a.rev()
-        if do3way:
-            files = cpy | mod_b | rem_b | ((mod_a | add_a) - add_b)
+        if ctx1b:
+            files = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
             rev1b = '@%d' % ctx1b.rev()
+
+            ctxa = ctx1a.ancestor(ctx1b)
             if ctxa == ctx1a:
                 dira = dir1a
             elif ctxa == ctx1b:
                 dira = dir1b
             else:
                 # snapshot for ancestor revision
-                dira = snapshot(repo, MAR | cpy, ctxa, tmproot)[0]
+                dira = snapshot(repo, MAR, ctxa, tmproot)[0]
             reva = '@%d' % ctxa.rev()
         else:
+            ctxa = ctx1a
             dir1b, dira = None, None
             rev1b, reva = '', ''
 
@@ -428,17 +415,9 @@ class FileSelectionDialog(gtk.Dialog):
                 return 'R'
             return ' '
 
-        if do3way:
-            model = gtk.ListStore(str, str, str)
-            for f in MAR:
-                model.append([get_status(f, mod_a, add_a, rem_a),
-                              get_status(f, mod_b, add_b, rem_b),
-                              hglib.toutf(f)])
-        else:
-            model = gtk.ListStore(str, str)
-            for f in MAR:
-                model.append([get_status(f, mod_a, add_a, rem_a),
-                              hglib.toutf(f)])
+        model = gtk.ListStore(str, str)
+        for f in mod_a | add_a | rem_a:
+            model.append([get_status(f, mod_a, add_a, rem_a), hglib.toutf(f)])
 
         treeview.set_model(model)
         self.connect('response', self.response)
@@ -499,12 +478,9 @@ class FileSelectionDialog(gtk.Dialog):
         model, paths = selection.get_selected_rows()
         self.launch(*model[paths[0]])
 
-    def launch(self, st1, st2, fname=None):
-        do3way = bool(fname) and self.mergeopts
-        if not fname:
-            fname = st2
-            st2 = None
+    def launch(self, st, fname):
         fname = hglib.fromutf(fname)
+        source = self.copies.get(fname, None)
         dir1a, dir1b, dira, dir2 = self.dirs
         rev1a, rev1b, reva, rev2 = self.revs
         ctx1a, ctx1b, ctxa, ctx2 = self.ctxs
@@ -520,31 +496,26 @@ class FileSelectionDialog(gtk.Dialog):
             else:
                 return fname, os.devnull
 
-        source = self.copies.get(fname, None)
         local, file1a = getfile(ctx1a, dir1a, fname, source)
-        if do3way:
+        if ctx1b:
             other, file1b = getfile(ctx1b, dir1b, fname, source)
             ancestor, filea = getfile(ctxa, dira, fname, source)
         else:
             other, ancestor = fname
             file1b, filea = None, None
-
-        if st1 == 'R' or st2 == 'R':
-            file2 = os.devnull
-        else:
-            file2 = os.path.join(dir2, util.localpath(fname))
+        fname, file2 = getfile(ctx2, dir2, fname, None)
 
         label1a = local+rev1a
         label1b = other+rev1b
         labela = ancestor+reva
         label2 = fname+rev2
-        if do3way:
+        if ctx1b:
             label1a += '[local]'
             label1b += '[other]'
             labela += '[ancestor]'
             label2 += '[merged]'
 
-        args = do3way and self.mergeopts or self.diffopts
+        args = ctx1b and self.mergeopts or self.diffopts
         args = ' '.join(args)
 
         # Function to quote file/dir names in the argument string When
@@ -556,17 +527,12 @@ class FileSelectionDialog(gtk.Dialog):
                        clabel=label2, child=file2)
         def quote(match):
             key = match.group()[1:]
-            if not st2 and key == 'parent2':
-                return ''
             return util.shellquote(replace[key])
 
         # Match parent2 first, so 'parent1?' will match both parent1 and parent
         regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|ancestor|alabel)'
         if not re.search(regex, args):
-            if st2 and not st1:
-                args += ' $parent2 $child'
-            else:
-                args += ' $parent1 $child'
+            args += ' $parent1 $child'
         args = re.sub(regex, quote, args)
         cmdline = util.shellquote(self.diffpath) + ' ' + args
         cmdline = util.quotecommand(cmdline)
