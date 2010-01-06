@@ -14,7 +14,7 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, version
 from tortoisehg.hgtk import gdialog, gtklib
 
-class BugReport(gdialog.GDialog):
+class BugReport(gdialog.GWindow):
     """GTK+ based dialog for displaying traceback info to the user in a
     cut-paste friendly manner.  And include a number of useful bit of
     information like version numbers, etc.

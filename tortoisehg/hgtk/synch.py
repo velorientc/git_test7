@@ -15,7 +15,7 @@ import sys
 import threading
 import urllib
 
-from mercurial import hg, ui, extensions, url
+from mercurial import hg, ui, extensions, url, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -245,7 +245,7 @@ class SynchDialog(gtk.Window):
         self.textview.connect('populate-popup', self.add_to_popup)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground='#900000')
+                                   foreground=gtklib.DRED)
         basevbox.pack_start(scrolledwindow, True, True)
 
         # statusbar
@@ -328,7 +328,7 @@ class SynchDialog(gtk.Window):
         try:
             # open a new repo, rebase can confuse cached repo
             repo = hg.repository(ui.ui(), path=self.root)
-        except hglib.RepoError:
+        except error.RepoError:
             return
 
         wc = repo[None]
@@ -366,7 +366,7 @@ class SynchDialog(gtk.Window):
                     raise _("unknown sort key '%s'") % sort
                 uipaths.sort(sortfunc)
             return uipaths
-        except hglib.RepoError:
+        except error.RepoError:
             return None
 
     def btn_remotepath_clicked(self, button):

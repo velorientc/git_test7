@@ -8,40 +8,16 @@
 
 import os
 import gtk
-import gobject
 import pango
-import traceback
-
-from mercurial import ui, util
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, settings
-from tortoisehg.hgtk import gdialog, gtklib, hgcmd
+from tortoisehg.hgtk import gdialog, gtklib
 
-MODE_NORMAL  = 'normal'
-MODE_WORKING = 'working'
-
-class CloneDialog(gtk.Dialog):
+class CloneDialog(gdialog.GDialog):
     """ Dialog to clone a Mercurial repo """
     def __init__(self, repos=[]):
-        """ Initialize the Dialog """
-        gtk.Dialog.__init__(self, title=_('TortoiseHg Clone'))
-        gtklib.set_tortoise_icon(self, 'menuclone.ico')
-        gtklib.set_tortoise_keys(self)
-        self.set_resizable(False)
-        self.set_has_separator(False)
-        self.connect('response', self.dialog_response)
-
-        # add clone button
-        self.clonebtn = self.add_button(_('Clone'), gtk.RESPONSE_OK)
-        self.cancelbtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
-
-        self.ui = ui.ui()
-
-        # persistent settings
-        self.clonesettings = settings.Settings('clone')
-        self.recentsrc = self.clonesettings.mrul('src_paths')
-        self.recentdest = self.clonesettings.mrul('dest_paths')
+        gdialog.GDialog.__init__(self, norepo=True)
 
         srcpath = hglib.toutf(os.getcwd())
         destpath = srcpath
@@ -50,8 +26,26 @@ class CloneDialog(gtk.Dialog):
             destpath = repos[1]
         elif len(repos):
             srcpath = repos[0]
+        self.srcpath = srcpath
+        self.destpath = destpath
 
-        def createcombo(path, label, title):
+    ### Start of Overriding Section ###
+
+    def get_title(self, *args):
+        return _('TortoiseHg Clone')
+
+    def get_icon(self):
+        return 'menuclone.ico'
+
+    def get_setting_name(self):
+        return 'clone'
+
+    def get_body(self, vbox):
+        # MRU lists
+        self.recentsrc = self.settings.mrul('src_paths')
+        self.recentdest = self.settings.mrul('dest_paths')
+
+        def createcombo(path, label, title, bundle=False):
             # comboentry
             model = gtk.ListStore(str)
             combo = gtk.ComboBoxEntry(model, 0)
@@ -74,18 +68,25 @@ class CloneDialog(gtk.Dialog):
             browse = gtk.Button(_('Browse...'))
             browse.connect('clicked', self.browse_clicked, title, entry)
 
-            table.add_row(label, combo, 0, browse)
+            if bundle:
+                # bundle button
+                bundlebtn = gtk.Button(_('Bundle...'))
+                bundlebtn.connect('clicked', self.bundle_clicked, 
+                                  _('Select a Mercurial Bundle'), entry)
+                table.add_row(label, combo, 0, browse, bundlebtn)
+            else:
+                table.add_row(label, combo, 0, browse)
 
             return model, combo
 
         # layout table for fixed options
         self.table = table = gtklib.LayoutTable()
-        self.vbox.pack_start(table, True, True, 2)
+        vbox.pack_start(table, True, True, 2)
 
         ## comboentry for source paths
-        self.srclist, srccombo = createcombo(srcpath,
+        self.srclist, srccombo = createcombo(self.srcpath,
                                              _('Source path:'),
-                                             _('Select Source Folder'))
+                                             _('Select Source Folder'), True)
         self.srcentry = srccombo.get_child()
 
         ## add pre-defined src paths to pull-down list
@@ -99,7 +100,7 @@ class CloneDialog(gtk.Dialog):
             self.srclist.append([p])
 
         ## comboentry for destination paths
-        self.destlist, destcombo = createcombo(destpath,
+        self.destlist, destcombo = createcombo(self.destpath,
                                                _('Destination path:'),
                                                _('Select Destination Folder'))
         self.destentry = destcombo.get_child()
@@ -112,7 +113,7 @@ class CloneDialog(gtk.Dialog):
 
         # expander for advanced options
         self.expander = expander = gtk.Expander(_('Advanced options'))
-        self.vbox.pack_start(expander, True, True, 2)
+        vbox.pack_start(expander, True, True, 2)
 
         # layout table for advanced options
         table = gtklib.LayoutTable()
@@ -149,60 +150,64 @@ class CloneDialog(gtk.Dialog):
         table.add_row(self.optremote)
         table.add_row(self.remotecmdentry, padding=False)
 
-        # prepare to show
-        self.load_settings()
-        destcombo.grab_focus()
-        gtklib.idle_add_single_call(self.after_init)
+    def get_buttons(self):
+        return [('clone', _('Clone'), gtk.RESPONSE_OK),
+                ('cancel', gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)]
 
-    def after_init(self):
-        #CmdWidget
-        self.cmd = hgcmd.CmdWidget()
-        self.cmd.show_all()
-        self.cmd.hide()
-        self.vbox.pack_start(self.cmd, True, True, 6)
+    def get_default_button(self):
+        return 'clone'
 
-        # abort button
-        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
-        self.abortbtn.hide()
+    def get_action_map(self):
+        return {gtk.RESPONSE_OK: self.clone}
+
+    def switch_to(self, normal, *args):
+        self.table.set_sensitive(normal)
+        self.expander.set_sensitive(normal)
+        self.buttons['clone'].set_property('visible', normal)
+        self.buttons['cancel'].set_property('visible', normal)
+        if normal:
+            self.buttons['cancel'].grab_focus()
+
+    def command_done(self, returncode, useraborted, src, dest):
+        self.add_src_to_recent(src)
+        self.add_dest_to_recent(dest)
+        if returncode == 0:
+            shlib.shell_notify([dest])
+            self.cmd.set_result(_('Cloned successfully'), style='ok')
+        elif useraborted:
+            self.cmd.set_result(_('Canceled updating'), style='error')
+        else:
+            self.cmd.set_result(_('Failed to clone'), style='error')
 
     def load_settings(self):
-        expanded = self.clonesettings.get_value('expanded', False, True)
+        expanded = self.settings.get_value('expanded', False, True)
         self.expander.set_property('expanded', expanded)
 
     def store_settings(self):
         expanded = self.expander.get_property('expanded')
-        self.clonesettings.set_value('expanded', expanded)
-        self.clonesettings.write()
+        self.settings.set_value('expanded', expanded)
+        self.settings.write()
 
-    def dialog_response(self, dialog, response_id):
-        def abort():
-            self.cmd.stop()
-            self.cmd.show_log()
-            self.switch_to(MODE_NORMAL, cmd=False)
-        # Clone button
-        if response_id == gtk.RESPONSE_OK:
-            self.clone()
-        # Cancel button or dialog closing by the user
-        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
-            if self.cmd.is_alive():
-                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
-                                      _('Do you want to abort?')).run()
-                if ret == gtk.RESPONSE_YES:
-                    abort()
-            else:
-                self.store_settings()
-                return # close dialog
-        # Abort button
-        elif response_id == gtk.RESPONSE_CANCEL:
-            abort()
-        else:
-            raise _('unexpected response id: %s') % response_id
-
-        self.run() # don't close dialog
+    ### End of Overriding Section ###
 
     def browse_clicked(self, button, title, entry):
         res = gtklib.NativeFolderSelectDialog(
                      initial=entry.get_text(), title=title).run()
+        if res:
+            entry.set_text(res)
+
+    def bundle_clicked(self, button, title, entry):
+        path = entry.get_text()
+        if os.path.isdir(path):
+            initial = path
+        else:
+            initial = os.path.dirname(path)
+
+        res = gtklib.NativeSaveFileDialogWrapper(
+                     initial=initial,
+                     title=title, 
+                     filter= ((_('Mercurial bundles'), '*.hg'),),
+                     open=True).run()
         if res:
             entry.set_text(res)
 
@@ -212,32 +217,13 @@ class CloneDialog(gtk.Dialog):
         if state:
             entry.grab_focus()
 
-    def switch_to(self, mode, cmd=True):
-        if mode == MODE_NORMAL:
-            normal = True
-            self.cancelbtn.grab_focus()
-        elif mode == MODE_WORKING:
-            normal = False
-            self.abortbtn.grab_focus()
-        else:
-            raise _('unknown mode name: %s') % mode
-        working = not normal
-
-        self.table.set_sensitive(normal)
-        self.expander.set_sensitive(normal)
-        self.clonebtn.set_property('visible', normal)
-        self.cancelbtn.set_property('visible', normal)
-        if cmd:
-            self.cmd.set_property('visible', working)
-        self.abortbtn.set_property('visible', working)
-
     def add_src_to_recent(self, src):
         if os.path.exists(src):
             src = os.path.abspath(src)
 
         # save path to recent list in history
         self.recentsrc.add(src)
-        self.clonesettings.write()
+        self.settings.write()
 
         # update drop-down list
         self.srclist.clear()
@@ -255,7 +241,7 @@ class CloneDialog(gtk.Dialog):
 
         # save path to recent list in history
         self.recentdest.add(dest)
-        self.clonesettings.write()
+        self.settings.write()
 
         # update drop down list
         paths = list(self.recentdest)
@@ -266,7 +252,7 @@ class CloneDialog(gtk.Dialog):
 
     def clone(self):
         # gather input data
-        src = self.srcentry.get_text()
+        src = self.srcentry.get_text().strip()
         dest = self.destentry.get_text() or os.path.basename(src)
         remotecmd = self.remotecmdentry.get_text()
         rev = self.reventry.get_text()
@@ -297,7 +283,7 @@ class CloneDialog(gtk.Dialog):
             if dirabs == src:
                 dest = os.path.join(os.path.dirname(dirabs), dest)
 
-        # start cloning
+        # prepare command line
         cmdline = ['hg', 'clone']
         if self.optupdate.get_active():
             cmdline.append('--noupdate')
@@ -320,21 +306,8 @@ class CloneDialog(gtk.Dialog):
         if dest:
             cmdline.append(hglib.fromutf(dest))
 
-        def cmd_done(returncode, useraborted):
-            self.switch_to(MODE_NORMAL, cmd=False)
-            self.add_src_to_recent(src)
-            self.add_dest_to_recent(dest)
-            if returncode == 0:
-                shlib.shell_notify([dest])
-                if not self.cmd.is_show_log():
-                    self.response(gtk.RESPONSE_CLOSE)
-                self.cmd.set_result(_('Cloned successfully'), style='ok')
-            elif useraborted:
-                self.cmd.set_result(_('Canceled cloning'), style='error')
-            else:
-                self.cmd.set_result(_('Failed to clone'), style='error')
-        self.switch_to(MODE_WORKING)
-        self.cmd.execute(cmdline, cmd_done)
+        # start cloning
+        self.execute_command(cmdline, src, dest)
 
 def run(_ui, *pats, **opts):
     return CloneDialog(pats)

@@ -8,14 +8,14 @@
 import gtk
 import gobject
 import os
-import shlex
 import subprocess
+import stat
 import shutil
+import threading
 import tempfile
 import re
 
-from mercurial import hg, ui, cmdutil, util
-from mercurial.node import short, nullid
+from mercurial import hg, ui, cmdutil, util, error, match, copies
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -28,16 +28,15 @@ try:
 except ImportError:
     openflags = 0
 
-def snapshot(repo, files, node, tmproot):
+
+def snapshot(repo, files, ctx, tmproot):
     '''snapshot files as of some revision'''
-    dirname = os.path.basename(repo.root)
-    if dirname == "":
-        dirname = "root"
-    if node is not None:
-        dirname = '%s.%s' % (dirname, short(node))
+    dirname = os.path.basename(repo.root) or 'root'
+    if ctx.rev() is not None:
+        dirname = '%s.%s' % (dirname, str(ctx))
     base = os.path.join(tmproot, dirname)
     os.mkdir(base)
-    ctx = repo[node]
+    fns_and_mtime = []
     for fn in files:
         wfn = util.pconvert(fn)
         if not wfn in ctx:
@@ -51,19 +50,260 @@ def snapshot(repo, files, node, tmproot):
         f = open(dest, 'wb')
         f.write(data)
         f.close()
-    return dirname
+        if ctx.rev() is None:
+            fns_and_mtime.append((dest, repo.wjoin(fn), os.path.getmtime(dest)))
+        elif os.name != 'nt':
+            # Make file read/only, to indicate it's static (archival) nature
+            os.chmod(dest, stat.S_IREAD)
+    return base, fns_and_mtime
+
+
+def besttool(ui, tools):
+    'Select preferred or highest priority tool from dictionary'
+    preferred = ui.config('tortoisehg', 'vdiff') or ui.config('ui', 'merge')
+    if preferred and preferred in tools:
+        return preferred
+    pris = []
+    for t in tools.keys():
+        p = int(ui.config('merge-tools', t + '.priority', 0))
+        pris.append((-p, t))
+    tools = sorted(pris)
+    return tools[0][1]
+
+
+def visualdiff(ui, repo, pats, opts):
+    revs = opts.get('rev')
+    change = opts.get('change')
+
+    try:
+        ctx1b = None
+        if change:
+            ctx2 = repo[change]
+            p = ctx2.parents()
+            if len(p) > 1:
+                ctx1a, ctx1b = p
+            else:
+                ctx1a = p[0]
+        else:
+            n1, n2 = cmdutil.revpair(repo, revs)
+            ctx1a, ctx2 = repo[n1], repo[n2]
+            p = ctx2.parents()
+            if not revs and len(p) > 1:
+                ctx1b = p[1]
+    except (error.LookupError, error.RepoError):
+        gdialog.Prompt(_('Unable to find changeset'),
+                       _('You likely need to refresh this application'),
+                       None).run()
+        return None
+
+    lpats = [util.localpath(f) for f in pats]
+    m = match.match(repo.root, repo.root, lpats)
+    n2 = ctx2.node()
+    mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
+    if ctx1b:
+        mod_b, add_b, rem_b = map(set, repo.status(ctx1b.node(), n2, m)[:3])
+        cpy = copies.copies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
+    else:
+        cpy = copies.copies(repo, ctx1a, ctx2, repo[-1])[0]
+        mod_b, add_b, rem_b = set(), set(), set()
+    MA = mod_a | add_a | mod_b | add_b
+    MAR = MA | rem_a | rem_b
+    if not MAR:
+        gdialog.Prompt(_('No file changes'),
+                       _('There are no file changes to view'), None).run()
+        return None
+
+    detectedtools = hglib.difftools(repo.ui)
+    if not detectedtools:
+        gdialog.Prompt(_('No diff tool found'),
+                       _('No visual diff tools were detected'), None).run()
+        return None
+
+    preferred = besttool(repo.ui, detectedtools)
+
+    # Build tool list based on diff-patterns matches
+    toollist = set()
+    patterns = ui.configitems('diff-patterns')
+    patterns = [(p, t) for p,t in patterns if t in detectedtools]
+    for path in MAR:
+        for pat, tool in patterns:
+            mf = match.match(repo.root, '', [pat])
+            if mf(path):
+                toollist.add(tool)
+                break
+        else:
+            toollist.add(preferred)
+
+    if len(toollist) > 1 or cpy:
+        usewin = True
+    else:
+        preferred = toollist.pop()
+        dirdiff = repo.ui.configbool('merge-tools', preferred + '.dirdiff')
+        dir3diff = repo.ui.configbool('merge-tools', preferred + '.dir3diff')
+        usewin = repo.ui.configbool('merge-tools', preferred + '.usewin')
+        if not usewin and len(MAR) > 1:
+            if ctx1b is not None:
+                usewin = not dir3diff
+            else:
+                usewin = not dirdiff
+    if usewin:
+        # Multiple required tools, or tool does not support directory diffs
+        sa = [mod_a, add_a, rem_a]
+        sb = [mod_b, add_b, rem_b]
+        dlg = FileSelectionDialog(repo, pats, ctx1a, sa, ctx1b, sb, ctx2, cpy)
+        return dlg
+
+    # We can directly use the selected tool, without a visual diff window
+    diffcmd, diffopts, mergeopts = detectedtools[preferred]
+
+    # Disable 3-way merge if there is only one parent or no tool support
+    do3way = bool(mergeopts) and ctx1b is not None
+    if do3way:
+        args = ' '.join(mergeopts)
+    else:
+        args = ' '.join(diffopts)
+
+    def dodiff(tmproot, diffcmd, args):
+        fns_and_mtime = []
+
+        # Always make a copy of ctx1a (and ctx1b, if applicable)
+        files = mod_a | rem_a | ((mod_b | add_b) - add_a)
+        dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
+        label1a = '@%d' % ctx1a.rev()
+        if do3way:
+            files = mod_b | rem_b | ((mod_a | add_a) - add_b)
+            dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
+            label1b = '@%d' % ctx1b.rev()
+            # snapshot for ancestor revision
+            ctxa = ctx1a.ancestor(ctx1b)
+            if ctxa == ctx1a:
+                dira = dir1a
+            elif ctxa == ctx1b:
+                dira = dir1b
+            else:
+                dira = snapshot(repo, MAR, ctxa, tmproot)[0]
+            labela = '@%d' % ctxa.rev()
+        else:
+            dir1b, dira = None, None
+            label1b, labela = '', ''
+
+        if ctx2.rev() is not None:
+            # If ctx2 is not the working copy, create a snapshot for it
+            dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
+            label2 = '@%d' % ctx2.rev()
+        elif len(MAR) == 1:
+            # This lets the diff tool open the changed file directly
+            label2 = ''
+            dir2 = repo.root
+        else:
+            # Create a snapshot, record mtime to detect mods made by
+            # diff tool
+            dir2, fns_and_mtime = snapshot(repo, MA, ctx2, tmproot)
+            label2 = 'working files'
+
+        # If only one change, diff the files instead of the directories
+        # Handle bogus modifies correctly by checking if the files exist
+        if len(MAR) == 1:
+            lfile = util.localpath(MAR.pop())
+            dir1a = os.path.join(dir1a, lfile)
+            if not os.path.isfile(os.path.join(tmproot, dir1a)):
+                dir1a = os.devnull
+            if do3way:
+                dir1b = os.path.join(dir1b, lfile)
+                if not os.path.isfile(os.path.join(tmproot, dir1b)):
+                    dir1b = os.devnull
+                if not os.path.isfile(os.path.join(tmproot, dira)):
+                    dira = os.devnull
+            dir2 = os.path.join(dir2, lfile)
+            label1a = lfile + label1a
+            label1b = lfile + label1b
+            labela = lfile + labela
+            label2 = lfile + label2
+
+        if do3way:
+            label1a += '[local]'
+            label1b += '[other]'
+            labela += '[ancestor]'
+            label2 += '[merged]'
+
+        # Function to quote file/dir names in the argument string.
+        # When not operating in 3-way mode, an empty string is
+        # returned for parent2
+        replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b,
+                       plabel1=label1a, plabel2=label1b,
+                       ancestor=dira, alabel=labela,
+                       clabel=label2, child=dir2)
+        def quote(match):
+            key = match.group()[1:]
+            if not do3way and key == 'parent2':
+                return ''
+            return util.shellquote(replace[key])
+
+        # Match parent2 first, so 'parent1?' will match both parent1 and parent
+        regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|ancestor|alabel)'
+        if not do3way and not re.search(regex, args):
+            args += ' $parent1 $child'
+        args = re.sub(regex, quote, args)
+        cmdline = util.shellquote(diffcmd) + ' ' + args
+        cmdline = util.quotecommand(cmdline)
+
+        ui.debug('running %r\n' % (cmdline))
+        try:
+            subprocess.Popen(cmdline, shell=True,
+                             creationflags=openflags,
+                             stderr=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             stdin=subprocess.PIPE).communicate()
+        except (OSError, EnvironmentError), e:
+            gdialog.Prompt(_('Tool launch failure'),
+                           _('%s : %s') % (diffcmd, str(e)), None).run()
+            return None
+
+        # detect if changes were made to mirrored working files
+        for copy_fn, working_fn, mtime in fns_and_mtime:
+            if os.path.getmtime(copy_fn) != mtime:
+                ui.debug('file changed while diffing. '
+                         'Overwriting: %s (src: %s)\n' % (working_fn, copy_fn))
+                util.copyfile(copy_fn, working_fn)
+
+    def dodiffwrapper():
+        try:
+            dodiff(tmproot, diffcmd, args)
+        finally:
+            ui.note(_('cleaning up temp directory\n'))
+            shutil.rmtree(tmproot)
+
+    tmproot = tempfile.mkdtemp(prefix='visualdiff.')
+    if opts.get('mainapp'):
+        dodiffwrapper()
+    else:
+        # We are not the main application, so this must be done in a
+        # background thread
+        thread = threading.Thread(target=dodiffwrapper, name='visualdiff')
+        thread.setDaemon(True)
+        thread.start()
 
 class FileSelectionDialog(gtk.Dialog):
     'Dialog for selecting visual diff candidates'
-    def __init__(self, canonpats, opts):
+    def __init__(self, repo, pats, ctx1a, sa, ctx1b, sb, ctx2, cpy):
         'Initialize the Dialog'
         gtk.Dialog.__init__(self, title=_('Visual Diffs'))
         gtklib.set_tortoise_icon(self, 'menushowchanged.ico')
         gtklib.set_tortoise_keys(self)
 
-        self.set_default_size(400, 150)
+        if ctx2.rev() is None:
+            title = _('working changes')
+        elif ctx1a == ctx2.parents()[0]:
+            title = _('changeset ') + str(ctx2.rev())
+        else:
+            title = _('revisions %d to %d') % (ctx1a.rev(), ctx2.rev())
+        title = _('Visual Diffs - ') + title
+        if pats:
+            title += _(' filtered')
+        self.set_title(title)
+
+        self.set_default_size(400, 450)
         self.set_has_separator(False)
-        self.tmproot = None
 
         lbl = gtk.Label(_('Temporary files are removed when this dialog'
             ' is closed'))
@@ -79,166 +319,92 @@ class FileSelectionDialog(gtk.Dialog):
         scroller.add(treeview)
         self.vbox.pack_start(scroller, True, True, 2)
 
-        hbox = gtk.HBox()
-        self.vbox.pack_start(hbox, False, False, 2)
-        vsettings = settings.Settings('visdiff')
-        single = vsettings.get_value('launchsingle', False)
-        check = gtk.CheckButton(_('Always launch single files'))
-        check.set_active(single)
-        hbox.pack_start(check, True, True, 2)
-        self.singlecheck = check
-
         treeview.connect('row-activated', self.rowactivated)
         treeview.set_headers_visible(False)
         treeview.set_property('enable-grid-lines', True)
         treeview.set_enable_search(False)
 
-        try:
-            path = opts.get('bundle') or paths.find_root()
-            repo = hg.repository(ui.ui(), path=path)
-        except hglib.RepoError:
-            # hgtk should catch this earlier
-            gdialog.Prompt(_('No repository'),
-                   _('No repository found here'), None).run()
-            return
+        tools = hglib.difftools(repo.ui)
+        preferred = besttool(repo.ui, tools)
+        self.diffpath, self.diffopts, self.mergeopts = tools[preferred]
 
-        tools = readtools(repo.ui)
-        preferred = repo.ui.config('tortoisehg', 'vdiff', 'vdiff')
-        if preferred and preferred in tools:
-            if len(tools) > 1:
-                lbl = gtk.Label(_('Select diff tool'))
-                combo = gtk.combo_box_new_text()
-                for i, name in enumerate(tools.iterkeys()):
-                    combo.append_text(name)
-                    if name == preferred:
-                        defrow = i
-                combo.connect('changed', self.toolselect, tools)
-                combo.set_active(defrow)
-                hbox.pack_start(lbl, False, False, 2)
-                hbox.pack_start(combo, False, False, 2)
-            else:
-                self.diffpath, self.diffopts = tools[preferred]
-            cwd = os.getcwd()
-            try:
-                os.chdir(repo.root)
-                model = self.find_files(repo, canonpats, opts, treeview)
-                do3way = model.get_n_columns() == 3
-                treeview.set_model(model)
-                cell = gtk.CellRendererText()
-                stcol = gtk.TreeViewColumn('Status 1', cell)
-                stcol.set_resizable(True)
-                stcol.add_attribute(cell, 'text', 0)
-                treeview.append_column(stcol)
-                if do3way:
-                    cell = gtk.CellRendererText()
-                    stcol = gtk.TreeViewColumn('Status 2', cell)
-                    stcol.set_resizable(True)
-                    stcol.add_attribute(cell, 'text', 1)
-                    treeview.append_column(stcol)
-                cell = gtk.CellRendererText()
-                fcol = gtk.TreeViewColumn('Filename', cell)
-                fcol.set_resizable(True)
-                fcol.add_attribute(cell, 'text', do3way and 2 or 1)
-                treeview.append_column(fcol)
-                if len(model) == 1 and self.singlecheck.get_active():
-                    self.launch(*model[0])
-            finally:
-                os.chdir(cwd)
-        else:
-            gdialog.Prompt(_('No visual diff tool'),
-                   _('No visual diff tool has been configured'), None).run()
-            from tortoisehg.hgtk import thgconfig
-            dlg = thgconfig.ConfigDialog(False)
-            dlg.show_all()
-            dlg.focus_field('tortoisehg.vdiff')
-            dlg.run()
-            dlg.hide()
-            gtklib.idle_add_single_call(self.destroy)
+        if len(tools) > 1:
+            lbl = gtk.Label(_('Select diff tool'))
+            combo = gtk.combo_box_new_text()
+            for i, name in enumerate(tools.iterkeys()):
+                combo.append_text(name)
+                if name == preferred:
+                    defrow = i
+            combo.set_active(defrow)
+            combo.connect('changed', self.toolselect, tools)
+            hbox = gtk.HBox()
+            self.vbox.pack_start(hbox, False, False, 2)
+            hbox.pack_start(lbl, False, False, 2)
+            hbox.pack_start(combo, False, False, 2)
 
-    def search_filelist(self, model, column, key, iter):
-        'case insensitive filename search'
-        key = key.lower()
-        if key in model.get_value(iter, 1).lower():
-            return False
-        return True
+            patterns = repo.ui.configitems('diff-patterns')
+            patterns = [(p, t) for p,t in patterns if t in tools]
+            filesel = treeview.get_selection()
+            filesel.connect('changed', self.fileselect, repo, combo, tools,
+                            patterns, preferred)
 
-    def toolselect(self, combo, tools):
-        sel = combo.get_active_text()
-        if sel in tools:
-            self.diffpath, self.diffopts = tools[sel]
+        cell = gtk.CellRendererText()
+        stcol = gtk.TreeViewColumn('Status', cell)
+        stcol.set_resizable(True)
+        stcol.add_attribute(cell, 'text', 0)
+        treeview.append_column(stcol)
 
-    def find_files(self, repo, pats, opts, treeview):
+        cell = gtk.CellRendererText()
+        fcol = gtk.TreeViewColumn('Filename', cell)
+        fcol.set_resizable(True)
+        fcol.add_attribute(cell, 'text', 1)
+        treeview.append_column(fcol)
 
-        revs = opts.get('rev')
-        change = opts.get('change')
-        do3way = '$parent2' in ''.join(self.diffopts)
+        mod_a, add_a, rem_a = sa
+        mod_b, add_b, rem_b = sb
+        self.copies = cpy
+        sources = set(self.copies.values())
 
-        if change and (do3way or not revs):
-            title = _('changeset ') + str(change)
-            node2 = repo.lookup(change)
-            node1a, node1b = repo.changelog.parents(node2)
-        else:
-            node1a, node2 = cmdutil.revpair(repo, revs)
-            if not revs:
-                title = _('working changes')
-                node1b = repo.dirstate.parents()[1]
-            else:
-                title = _('revisions ') + ' to '.join(revs)
-                node1b = nullid
+        MA = mod_a | add_a | mod_b | add_b
+        MAR = MA | rem_a | rem_b | sources
 
-        # Disable 3-way merge if there is only one parent
-        if node1b == nullid:
-            do3way = False
-
-        title = _('Visual Diffs - ') + title
-        if pats:
-            title += ' filtered'
-        self.set_title(title)
-
-        matcher = cmdutil.match(repo, pats, opts)
-        mod_a, add_a, rem_a = map(set, repo.status(node1a, node2, matcher)[:3])
-        if do3way:
-            mod_b, add_b, rem_b = map(set, repo.status(node1b, node2, matcher)[:3])
-        else:
-            mod_b, add_b, rem_b = set(), set(), set()
-        modadd = mod_a | add_a | mod_b | add_b
-        common = modadd | rem_a | rem_b
-        if not common:
-            gdialog.Prompt(_('No file changes'),
-                   _('There are no file changes to view'), self).run()
-            # GTK+ locks up if this is done immediately here
-            gtklib.idle_add_single_call(self.destroy)
-            return gtk.ListStore(str, str)
-
-        tmproot = tempfile.mkdtemp(prefix='extdiff.')
-        self.connect('response', self.response)
+        tmproot = tempfile.mkdtemp(prefix='visualdiff.')
         self.tmproot = tmproot
 
         # Always make a copy of node1a (and node1b, if applicable)
-        dir1a_files = mod_a | rem_a | ((mod_b | add_b) - add_a)
-        dir1a = snapshot(repo, dir1a_files, node1a, tmproot)
-        if do3way:
-            dir1b_files = mod_b | rem_b | ((mod_a | add_a) - add_b)
-            dir1b = snapshot(repo, dir1b_files, node1b, tmproot)
-        else:
-            dir1b = None
+        files = sources | mod_a | rem_a | ((mod_b | add_b) - add_a)
+        dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
+        rev1a = '@%d' % ctx1a.rev()
+        if ctx1b:
+            files = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
+            dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
+            rev1b = '@%d' % ctx1b.rev()
 
-        # If node2 in not the wc or there is >1 change, copy it
-        dir2root = ''
-        if node2:
-            dir2 = snapshot(repo, modadd, node2, tmproot)
-        elif len(common) > 1:
-            #we only actually need to get the files to copy back to the working
-            #dir in this case (because the other cases are: diffing 2 revisions
-            #or single file -- in which case the file is already directly passed
-            #to the diff tool).
-            dir2 = snapshot(repo, modadd, None, tmproot)
+            ctxa = ctx1a.ancestor(ctx1b)
+            if ctxa == ctx1a:
+                dira = dir1a
+            elif ctxa == ctx1b:
+                dira = dir1b
+            else:
+                # snapshot for ancestor revision
+                dira = snapshot(repo, MAR, ctxa, tmproot)[0]
+            reva = '@%d' % ctxa.rev()
         else:
-            # This lets the diff tool open the changed file directly
-            dir2 = ''
-            dir2root = repo.root
+            ctxa = ctx1a
+            dir1b, dira = None, None
+            rev1b, reva = '', ''
 
-        self.dirs = (dir1a, dir1b, dir2, dir2root, tmproot)
+        # If ctx2 is the working copy, use it directly
+        if ctx2.rev() is None:
+            dir2 = repo.root
+            rev2 = ''
+        else:
+            dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
+            rev2 = '@%d' % ctx2.rev()
+
+        self.dirs = (dir1a, dir1b, dira, dir2)
+        self.revs = (rev1a, rev1b, reva, rev2)
+        self.ctxs = (ctx1a, ctx1b, ctxa, ctx2)
 
         def get_status(file, mod, add, rem):
             if file in mod:
@@ -249,26 +415,48 @@ class FileSelectionDialog(gtk.Dialog):
                 return 'R'
             return ' '
 
-        if do3way:
-            model = gtk.ListStore(str, str, str)
-            for f in common:
-                model.append([get_status(f, mod_a, add_a, rem_a),
-                              get_status(f, mod_b, add_b, rem_b),
-                              hglib.toutf(f)])
+        model = gtk.ListStore(str, str)
+        for f in mod_a | add_a | rem_a:
+            model.append([get_status(f, mod_a, add_a, rem_a), hglib.toutf(f)])
+
+        treeview.set_model(model)
+        self.connect('response', self.response)
+
+    def search_filelist(self, model, column, key, iter):
+        'case insensitive filename search'
+        key = key.lower()
+        if key in model.get_value(iter, 1).lower():
+            return False
+        return True
+
+    def toolselect(self, combo, tools):
+        'user selected a tool from the tool combo'
+        sel = combo.get_active_text()
+        if sel in tools:
+            self.diffpath, self.diffopts, self.mergeopts = tools[sel]
+
+    def fileselect(self, selection, repo, combo, tools, patterns, preferred):
+        'user selected a file, pick an appropriate tool from combo'
+        model, path = selection.get_selected()
+        if not path:
+            return
+        row = model[path]
+        fname = row[-1]
+        for pat, tool in patterns:
+            mf = match.match(repo.root, '', [pat])
+            if mf(fname):
+                selected = tool
+                break
         else:
-            model = gtk.ListStore(str, str)
-            for f in common:
-                model.append([get_status(f, mod_a, add_a, rem_a),
-                              hglib.toutf(f)])
-        return model
+            selected = preferred
+        for i, name in enumerate(tools.iterkeys()):
+            if name == selected:
+                combo.set_active(i)
 
     def response(self, window, resp):
         self.should_live()
 
     def should_live(self):
-        vsettings = settings.Settings('visdiff')
-        vsettings.set_value('launchsingle', self.singlecheck.get_active())
-        vsettings.write()
         while self.tmproot:
             try:
                 shutil.rmtree(self.tmproot)
@@ -290,48 +478,66 @@ class FileSelectionDialog(gtk.Dialog):
         model, paths = selection.get_selected_rows()
         self.launch(*model[paths[0]])
 
-    def launch(self, st1, st2, fname=None):
-        if not fname:
-            fname = st2
-            st2 = None
+    def launch(self, st, fname):
         fname = hglib.fromutf(fname)
-        dir1a, dir1b, dir2, dir2root, tmproot = self.dirs
+        source = self.copies.get(fname, None)
+        dir1a, dir1b, dira, dir2 = self.dirs
+        rev1a, rev1b, reva, rev2 = self.revs
+        ctx1a, ctx1b, ctxa, ctx2 = self.ctxs
 
-        if st1 == 'A' or st2 == 'R':
-            dir1a = os.devnull
-        else:
-            dir1a = os.path.join(dir1a, util.localpath(fname))
-        if st2:
-            if st2 == 'A' or st1 == 'R':
-                dir1b = os.devnull
+        def getfile(ctx, dir, fname, source):
+            m = ctx.manifest()
+            if fname in m:
+                path = os.path.join(dir, util.localpath(fname))
+                return fname, path
+            elif source and source in m:
+                path = os.path.join(dir, util.localpath(source))
+                return source, path
             else:
-                dir1b = os.path.join(dir1b, util.localpath(fname))
-        if st1 == 'R' or st2 == 'R':
-            dir2 = os.devnull
-        else:
-            dir2 = os.path.join(dir2root, dir2, util.localpath(fname))
+                return fname, os.devnull
 
-        # Function to quote file/dir names in the argument string
-        # When not operating in 3-way mode, an empty string is returned for parent2
-        replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b, child=dir2)
+        local, file1a = getfile(ctx1a, dir1a, fname, source)
+        if ctx1b:
+            other, file1b = getfile(ctx1b, dir1b, fname, source)
+            ancestor, filea = getfile(ctxa, dira, fname, source)
+        else:
+            other, ancestor = fname
+            file1b, filea = None, None
+        fname, file2 = getfile(ctx2, dir2, fname, None)
+
+        label1a = local+rev1a
+        label1b = other+rev1b
+        labela = ancestor+reva
+        label2 = fname+rev2
+        if ctx1b:
+            label1a += '[local]'
+            label1b += '[other]'
+            labela += '[ancestor]'
+            label2 += '[merged]'
+
+        args = ctx1b and self.mergeopts or self.diffopts
+        args = ' '.join(args)
+
+        # Function to quote file/dir names in the argument string When
+        # not operating in 3-way mode, an empty string is returned for
+        # parent2
+        replace = dict(parent=file1a, parent1=file1a, plabel1=label1a,
+                       parent2=file1b, plabel2=label1b,
+                       ancestor=filea, alabel=labela,
+                       clabel=label2, child=file2)
         def quote(match):
             key = match.group()[1:]
-            if not st2 and key == 'parent2':
-                return ''
             return util.shellquote(replace[key])
 
         # Match parent2 first, so 'parent1?' will match both parent1 and parent
-        args = ' '.join(self.diffopts)
-        regex = '\$(parent2|parent1?|child)'
-        if not st2 and not re.search(regex, args):
+        regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|ancestor|alabel)'
+        if not re.search(regex, args):
             args += ' $parent1 $child'
         args = re.sub(regex, quote, args)
         cmdline = util.shellquote(self.diffpath) + ' ' + args
-
-        if os.name == 'nt':
-            cmdline = '"%s"' % cmdline
+        cmdline = util.quotecommand(cmdline)
         try:
-            subprocess.Popen(cmdline, shell=True, cwd=tmproot,
+            subprocess.Popen(cmdline, shell=True,
                        creationflags=openflags,
                        stderr=subprocess.PIPE,
                        stdout=subprocess.PIPE,
@@ -340,96 +546,16 @@ class FileSelectionDialog(gtk.Dialog):
             gdialog.Prompt(_('Tool launch failure'),
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
 
-def readtools(ui):
-    tools = {}
-    for cmd, path in ui.configitems('extdiff'):
-        if cmd.startswith('cmd.'):
-            cmd = cmd[4:]
-            if not path:
-                path = cmd
-            diffopts = ui.config('extdiff', 'opts.' + cmd, '')
-            diffopts = diffopts and [diffopts] or []
-            tools[cmd] = [path, diffopts]
-        elif cmd.startswith('opts.'):
-            continue
-        else:
-            # command = path opts
-            if path:
-                diffopts = shlex.split(path)
-                path = diffopts.pop(0)
-            else:
-                path, diffopts = cmd, []
-            tools[cmd] = [path, diffopts]
-    return tools
-
-def rawextdiff(ui, *pats, **opts):
-    'launch raw extdiff command, block until finish'
-    from hgext import extdiff
+def run(ui, *pats, **opts):
     try:
         path = opts.get('bundle') or paths.find_root()
         repo = hg.repository(ui, path=path)
-    except hglib.RepoError:
-        # hgtk should catch this earlier
+    except error.RepoError:
         ui.warn(_('No repository found here') + '\n')
-        return
-    tools = readtools(ui)
-    preferred = ui.config('tortoisehg', 'vdiff', 'vdiff')
-    try:
-        diffcmd, diffopts = tools[preferred]
-    except KeyError:
-        ui.warn(_('Extdiff command not recognized\n'))
-        return
-    pats = hglib.canonpaths(pats)
-
-    # if both --change and --rev is given, remove --rev in 3-way mode,
-    # and --change in normal mode
-    if opts.get('change') and opts.get('rev'):
-        if '$parent2' in ''.join(diffopts):
-            del opts['rev']
-        else:
-            del opts['change']
-
-    try:
-        ret = extdiff.dodiff(ui, repo, diffcmd, diffopts, pats, opts)
-    except OSError, e:
-        ui.warn(str(e) + '\n')
-        return
-    if ret == 0:
-        gdialog.Prompt(_('No file changes'),
-                      _('There are no file changes to view'), None).run()
-
-def run(ui, *pats, **opts):
-    if ui.configbool('tortoisehg', 'vdiffnowin'):
-        import sys
-        # Spawn background process and exit
-        if hasattr(sys, "frozen"):
-            args = [sys.argv[0]]
-        else:
-            args = [sys.executable] + [sys.argv[0]]
-        args.extend(['vdiff', '--nofork', '--raw'])
-        revs = opts.get('rev', [])
-        change = opts.get('change')
-        if change:
-            args.extend(['--change', str(change)])
-        for r in revs:
-            args.extend(['--rev', str(r)])
-        bfile = opts.get('bundle')
-        if bfile:
-            args.extend(['--bundle', bfile])
-        args.extend(pats)
-        args.extend(opts.get('canonpats', []))
-        if os.name == 'nt':
-            args = ['"%s"' % arg for arg in args]
-        oldcwd = os.getcwd()
-        root = paths.find_root(oldcwd)
-        try:
-            os.chdir(root)
-            os.spawnv(os.P_NOWAIT, sys.executable, args)
-        finally:
-            os.chdir(oldcwd)
         return None
-    else:
-        pats = hglib.canonpaths(pats)
-        if opts.get('canonpats'):
-            pats = list(pats) + opts['canonpats']
-        return FileSelectionDialog(pats, opts)
+
+    pats = hglib.canonpaths(pats)
+    if opts.get('canonpats'):
+        pats = list(pats) + opts['canonpats']
+
+    return visualdiff(ui, repo, pats, opts)
