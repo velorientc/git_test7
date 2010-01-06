@@ -15,7 +15,7 @@ import threading
 import tempfile
 import re
 
-from mercurial import hg, ui, cmdutil, util, error, match
+from mercurial import hg, ui, cmdutil, util, error, match, copies
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -132,13 +132,12 @@ def visualdiff(ui, repo, pats, opts):
         else:
             toollist.add(preferred)
 
-    renames = False
-    for f in MA:
-        fctx = ctx2.filectx(f)
-        if fctx.renamed():
-            renames = True
-            break
-    if len(toollist) > 1 or renames:
+    if ctx1b:
+        cpy = copies.copies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
+    else:
+        cpy = copies.copies(repo, ctx1a, ctx2, ctx1a.ancestor(ctx2))[0]
+
+    if len(toollist) > 1 or cpy:
         usewin = True
     else:
         preferred = toollist.pop()
@@ -377,29 +376,35 @@ class FileSelectionDialog(gtk.Dialog):
         MA = mod_a | add_a | mod_b | add_b
         MAR = MA | rem_a | rem_b
 
+        if do3way:
+            ctxa = ctx1a.ancestor(ctx1b)
+            self.copies = copies.copies(repo, ctx1a, ctx1b, ctxa)[0]
+        else:
+            ctxa = ctx1a.ancestor(ctx2)
+            self.copies = copies.copies(repo, ctx1a, ctx2, ctxa)[0]
+
         tmproot = tempfile.mkdtemp(prefix='visualdiff.')
         self.tmproot = tmproot
 
         # Always make a copy of node1a (and node1b, if applicable)
-        files = mod_a | rem_a | ((mod_b | add_b) - add_a)
+        cpy = set(self.copies.values())
+        files = cpy | mod_a | rem_a | ((mod_b | add_b) - add_a)
         dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
         rev1a = '@%d' % ctx1a.rev()
         if do3way:
-            files = mod_b | rem_b | ((mod_a | add_a) - add_b)
+            files = cpy | mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
             rev1b = '@%d' % ctx1b.rev()
-            # snapshot for ancestor revision
-            ctxa = ctx1a.ancestor(ctx1b)
             if ctxa == ctx1a:
                 dira = dir1a
             elif ctxa == ctx1b:
                 dira = dir1b
             else:
-                dira = snapshot(repo, MA, ctxa, tmproot)[0]
+                # snapshot for ancestor revision
+                dira = snapshot(repo, MAR | cpy, ctxa, tmproot)[0]
             reva = '@%d' % ctxa.rev()
         else:
             dir1b, dira = None, None
-            ctxa = None
             rev1b, reva = '', ''
 
         # If ctx2 is the working copy, use it directly
@@ -503,28 +508,28 @@ class FileSelectionDialog(gtk.Dialog):
         dir1a, dir1b, dira, dir2 = self.dirs
         rev1a, rev1b, reva, rev2 = self.revs
         ctx1a, ctx1b, ctxa, ctx2 = self.ctxs
+        source = self.copies.get(fname, None)
 
-        source = fname
-        try:
-            fctx = ctx2.filectx(source)
-            ren = fctx.renamed()
-            if ren:
-                source, node = ren
-        except error.LookupError:
-            fctx = None
-        if source != fname:
-            file1a = os.path.join(dir1a, util.localpath(source))
+        local, other, ancestor = fname, fname, fname
+        if source and source in ctx1a.manifest():
+            local = source
+            file1a = os.path.join(dir1a, util.localpath(local))
         elif st1 == 'A' or st2 == 'R':
             file1a = os.devnull
         else:
-            file1a = os.path.join(dir1a, util.localpath(source))
-
+            file1a = os.path.join(dir1a, util.localpath(local))
         if st2:
-            if st2 == 'A' or st1 == 'R':
+            if source and source in ctx1b.manifest():
+                other = source
+                file1b = os.path.join(dir1b, util.localpath(other))
+            elif st2 == 'A' or st1 == 'R':
                 file1b = os.devnull
             else:
-                file1b = os.path.join(dir1b, util.localpath(fname))
-            filea = os.path.join(dira, util.localpath(fname))
+                file1b = os.path.join(dir1b, util.localpath(other))
+
+            if source and source in ctxa.manifest():
+                ancestor = source
+            filea = os.path.join(dira, util.localpath(ancestor))
             if not os.path.exists(filea):
                 filea = os.devnull
         else:
@@ -535,9 +540,9 @@ class FileSelectionDialog(gtk.Dialog):
         else:
             file2 = os.path.join(dir2, util.localpath(fname))
 
-        label1a = source+rev1a
-        label1b = fname+rev1b
-        labela = fname+reva
+        label1a = local+rev1a
+        label1b = other+rev1b
+        labela = ancestor+reva
         label2 = fname+rev2
         if do3way:
             label1a += '[local]'
