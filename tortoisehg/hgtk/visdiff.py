@@ -305,7 +305,7 @@ class FileSelectionDialog(gtk.Dialog):
             title += _(' filtered')
         self.set_title(title)
 
-        self.set_default_size(400, 150)
+        self.set_default_size(400, 450)
         self.set_has_separator(False)
 
         lbl = gtk.Label(_('Temporary files are removed when this dialog'
