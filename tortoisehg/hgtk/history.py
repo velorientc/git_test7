@@ -384,6 +384,20 @@ class GLog(gdialog.GWindow):
         self.syncbox.set_visible('reload', not self.show_toolbar)
         self._show_toolbar(self.show_toolbar)
 
+    def p4pending_test(self, button):
+        'used for testing p4pending without a p4 server or client'
+        # TODO: DELETE ME
+        from tortoisehg.hgtk.p4pending import PerforcePending
+        pending = {
+                '5270342' : ['c4d780fd4abc', '46b33a7c177b'],
+                'Submitted0' : ['46b33a7c177b', 'c4d780fd4abc']
+                }
+        text = _('%d pending changelists found') % len(pending)
+        self.stbar.set_idle_text(text)
+        dialog = PerforcePending(self.repo, pending, self.goto_rev)
+        dialog.show_all()
+        dialog.present()
+
     def p4pending(self, button):
         'revert or submit these pending changelists'
         cmd = ['hg', 'p4pending']
@@ -391,17 +405,20 @@ class GLog(gdialog.GWindow):
             self.stbar.end()
             self.syncbox.set_enable('stop', False)
             self.cmd_set_sensitive('stop', False)
+            pending = {}
             if return_code == 0:
-                pending = {}
+                submitted = 0
                 for line in buffer.splitlines()[:-1]:
                     try:
-                        state, changes = line.split(' ')
-                        pending[state] = changes
+                        changelist, hashes = line.split(' ')
+                        if changelist == 'submitted':
+                            changelist = _('Submitted') + str(submitted)
+                            submitted += 1
+                        pending[changelist] = hashes
                     except ValueError:
-                        text = _('Unable to parse some output')
+                        text = _('Unable to parse p4pending output')
                 if pending:
-                    # TODO: Pending dialog
-                    print pending
+                    text = _('%d pending changelists found') % len(pending)
                 else:
                     text = _('No pending Perforce changelists')
             elif return_code is None:
@@ -409,6 +426,11 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('Unable to determine pending changesets')
             self.stbar.set_idle_text(text)
+            if pending:
+                from tortoisehg.hgtk.p4pending import PerforcePending
+                dialog = PerforcePending(self.repo, pending, self.goto_rev)
+                dialog.show_all()
+                dialog.present()
         if self.runner.execute(cmd, callback):
             self.runner.set_title(_('Pending Perforce changelists'))
             self.stbar.begin(_('Finding pending Perforce changelists...'))
