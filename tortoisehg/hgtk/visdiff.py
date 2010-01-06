@@ -135,7 +135,7 @@ def visualdiff(ui, repo, pats, opts):
     if ctx1b:
         cpy = copies.copies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
     else:
-        cpy = copies.copies(repo, ctx1a, ctx2, ctx1a.ancestor(ctx2))[0]
+        cpy = copies.copies(repo, ctx1a, ctx2, repo[-1])[0]
 
     if len(toollist) > 1 or cpy:
         usewin = True
@@ -380,8 +380,8 @@ class FileSelectionDialog(gtk.Dialog):
             ctxa = ctx1a.ancestor(ctx1b)
             self.copies = copies.copies(repo, ctx1a, ctx1b, ctxa)[0]
         else:
-            ctxa = ctx1a.ancestor(ctx2)
-            self.copies = copies.copies(repo, ctx1a, ctx2, ctxa)[0]
+            ctxa = ctx1a
+            self.copies = copies.copies(repo, ctx1a, ctx2, repo[-1])[0]
 
         tmproot = tempfile.mkdtemp(prefix='visualdiff.')
         self.tmproot = tmproot
