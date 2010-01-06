@@ -508,31 +508,25 @@ class FileSelectionDialog(gtk.Dialog):
         dir1a, dir1b, dira, dir2 = self.dirs
         rev1a, rev1b, reva, rev2 = self.revs
         ctx1a, ctx1b, ctxa, ctx2 = self.ctxs
-        source = self.copies.get(fname, None)
 
-        local, other, ancestor = fname, fname, fname
-        if source and source in ctx1a.manifest():
-            local = source
-            file1a = os.path.join(dir1a, util.localpath(local))
-        elif st1 == 'A' or st2 == 'R':
-            file1a = os.devnull
-        else:
-            file1a = os.path.join(dir1a, util.localpath(local))
-        if st2:
-            if source and source in ctx1b.manifest():
-                other = source
-                file1b = os.path.join(dir1b, util.localpath(other))
-            elif st2 == 'A' or st1 == 'R':
-                file1b = os.devnull
+        def getfile(ctx, dir, fname, source):
+            m = ctx.manifest()
+            if fname in m:
+                path = os.path.join(dir, util.localpath(fname))
+                return fname, path
+            elif source and source in m:
+                path = os.path.join(dir, util.localpath(source))
+                return source, path
             else:
-                file1b = os.path.join(dir1b, util.localpath(other))
+                return fname, os.devnull
 
-            if source and source in ctxa.manifest():
-                ancestor = source
-            filea = os.path.join(dira, util.localpath(ancestor))
-            if not os.path.exists(filea):
-                filea = os.devnull
+        source = self.copies.get(fname, None)
+        local, file1a = getfile(ctx1a, dir1a, fname, source)
+        if do3way:
+            other, file1b = getfile(ctx1b, dir1b, fname, source)
+            ancestor, filea = getfile(ctxa, dira, fname, source)
         else:
+            other, ancestor = fname
             file1b, filea = None, None
 
         if st1 == 'R' or st2 == 'R':
