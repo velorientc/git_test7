@@ -235,8 +235,6 @@ def visualdiff(ui, repo, pats, opts):
                        clabel=label2, child=dir2)
         def quote(match):
             key = match.group()[1:]
-            if not do3way and key == 'parent2':
-                return ''
             return util.shellquote(replace[key])
 
         # Match parent2 first, so 'parent1?' will match both parent1 and parent
