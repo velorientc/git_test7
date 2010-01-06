@@ -448,7 +448,7 @@ CShellExtCMenu::QueryContextMenu(
         {
             InsertMenuItemByName(
                 hMenu, menuDescList[idx].name, indexMenu++,
-                idCmd++, idCmdFirst, L"HG "
+                idCmd++, idCmdFirst, L"Hg "
             );
         }
     }
@@ -503,7 +503,7 @@ CShellExtCMenu::QueryContextMenu(
 
     TDEBUG_TRACE("  CShellExtCMenu::QueryContextMenu: adding main THG menu");
     InsertSubMenuItemWithIcon2(hMenu, hSubMenu, indexMenu++, idCmd++,
-            L"TortoiseHG", "hg.ico");
+            L"TortoiseHg", "hg.ico");
 
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 
