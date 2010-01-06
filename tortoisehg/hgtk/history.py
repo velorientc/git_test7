@@ -400,7 +400,7 @@ class GLog(gdialog.GWindow):
 
     def p4pending(self, button):
         'revert or submit these pending changelists'
-        cmd = ['hg', 'p4pending']
+        cmd = ['hg', 'p4pending', '--verbose']
         def callback(return_code, buffer, *args):
             self.stbar.end()
             self.syncbox.set_enable('stop', False)
@@ -411,6 +411,8 @@ class GLog(gdialog.GWindow):
                 for line in buffer.splitlines()[:-1]:
                     try:
                         changelist, hashes = line.split(' ')
+                        if type(hashes) is str:
+                            hashes = [hashes]
                         if changelist == 'submitted':
                             changelist = _('Submitted') + str(submitted)
                             submitted += 1
