@@ -75,20 +75,26 @@ def visualdiff(ui, repo, pats, opts):
     revs = opts.get('rev')
     change = opts.get('change')
 
-    ctx1b = None
-    if change:
-        ctx2 = repo[change]
-        p = ctx2.parents()
-        if len(p) > 1:
-            ctx1a, ctx1b = p
+    try:
+        ctx1b = None
+        if change:
+            ctx2 = repo[change]
+            p = ctx2.parents()
+            if len(p) > 1:
+                ctx1a, ctx1b = p
+            else:
+                ctx1a = p[0]
         else:
-            ctx1a = p[0]
-    else:
-        n1, n2 = cmdutil.revpair(repo, revs)
-        ctx1a, ctx2 = repo[n1], repo[n2]
-        p = ctx2.parents()
-        if not revs and len(p) > 1:
-            ctx1b = p[1]
+            n1, n2 = cmdutil.revpair(repo, revs)
+            ctx1a, ctx2 = repo[n1], repo[n2]
+            p = ctx2.parents()
+            if not revs and len(p) > 1:
+                ctx1b = p[1]
+    except (error.LookupError, error.RepoError):
+        gdialog.Prompt(_('Unable to find changeset'),
+                       _('You likely need to refresh this application'),
+                       None).run()
+        return None
 
     lpats = [util.localpath(f) for f in pats]
     m = match.match(repo.root, repo.root, lpats)
