@@ -184,7 +184,7 @@ def visualdiff(ui, repo, pats, opts):
             elif ctxa == ctx1b:
                 dira = dir1b
             else:
-                dira = snapshot(repo, MA, ctxa, tmproot)[0]
+                dira = snapshot(repo, MAR, ctxa, tmproot)[0]
             labela = '@%d' % ctxa.rev()
         else:
             dir1b, dira = None, None
