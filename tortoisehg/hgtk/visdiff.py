@@ -535,7 +535,7 @@ class FileSelectionDialog(gtk.Dialog):
             other, file1b = getfile(ctx1b, dir1b, fname, source)
             ancestor, filea = getfile(ctxa, dira, fname, source)
         else:
-            other, ancestor = fname
+            other, ancestor = fname, fname
             file1b, filea = None, None
         fname, file2 = getfile(ctx2, dir2, fname, None)
 
