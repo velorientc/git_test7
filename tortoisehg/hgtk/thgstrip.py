@@ -21,6 +21,7 @@ class StripDialog(gdialog.GDialog):
 
     def __init__(self, rev=None, graphview=None, *pats):
         gdialog.GDialog.__init__(self, resizable=True)
+        self.set_after_done(False)
 
         if len(pats) > 0:
             rev = pats[0]
@@ -230,6 +231,10 @@ class StripDialog(gdialog.GDialog):
     def after_strip(self):
         if self.buopt_none.get_active():
             self.response(gtk.RESPONSE_CLOSE)
+            return
+        # clear changeset list
+        self.revcombo.child.set_text('')
+        # show backup dir
         root = self.repo.root
         bakdir = os.path.join(root, r'.hg\strip-backup')
         escaped = bakdir.replace('\\', '\\\\')
@@ -241,7 +246,7 @@ class StripDialog(gdialog.GDialog):
                 gtklib.NativeFileManager(bakdir).run()
             # backup bundle label & button
             self.bubox = gtk.HBox()
-            self.vbox.pack_start(self.bubox, True, True, 2)
+            self.vbox.pack_start(self.bubox, False, False, 2)
             self.bulabel = gtk.Label(_('Saved at: %s') % m.group(0))
             self.bubox.pack_start(self.bulabel, True, True, 8)
             self.bulabel.set_alignment(0, 0.5)
