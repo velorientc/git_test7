@@ -239,7 +239,12 @@ def difftools(ui):
                 path = cmd
             diffopts = ui.config('extdiff', 'opts.' + cmd, '')
             diffopts = diffopts and [diffopts] or []
-            tools[cmd] = [path, diffopts, None]
+            if '$parent2' in diffopts:
+                mergeopts = diffopts
+                diffopts = diffopts.replace('$parent2', '')
+            else:
+                mergeopts = None
+            tools[cmd] = [path, diffopts, mergeopts]
         elif cmd.startswith('opts.'):
             continue
         else:
@@ -249,7 +254,12 @@ def difftools(ui):
                 path = diffopts.pop(0)
             else:
                 path, diffopts = cmd, []
-            tools[cmd] = [path, diffopts, None]
+            if '$parent2' in diffopts:
+                mergeopts = diffopts
+                diffopts = diffopts.replace('$parent2', '')
+            else:
+                mergeopts = None
+            tools[cmd] = [path, diffopts, mergeopts]
     mt = []
     mergetools(ui, mt)
     for t in mt:
