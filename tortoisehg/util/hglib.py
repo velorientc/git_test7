@@ -226,7 +226,11 @@ def mergetools(ui, values=None):
     return values
 
 
+_difftools = None
 def difftools(ui):
+    global _difftools
+    if _difftools:
+        return _difftools
     tools = {}
     for cmd, path in ui.configitems('extdiff'):
         if cmd.startswith('cmd.'):
@@ -255,6 +259,7 @@ def difftools(ui):
         mopts = ui.config('merge-tools', t + '.diff3args', '')
         dopts, mopts = shlex.split(dopts), shlex.split(mopts)
         tools[t] = [filemerge._findtool(ui, t), dopts, mopts]
+    _difftools = tools
     return tools
 
 
