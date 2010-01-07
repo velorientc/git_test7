@@ -359,13 +359,13 @@ class FileSelectionDialog(gtk.Dialog):
             self.p2button.connect('pressed', self.p2dirdiff)
             self.p3button = gtk.Button(_('3-way dir diff'))
             self.p3button.connect('pressed', self.threewaydirdiff)
-            hbox.pack_end(self.p3button)
-            hbox.pack_end(self.p2button)
-            hbox.pack_end(self.p1button)
+            hbox.pack_end(self.p3button, False, False)
+            hbox.pack_end(self.p2button, False, False)
+            hbox.pack_end(self.p1button, False, False)
         else:
             self.dbutton = gtk.Button(_('Directory diff'))
             self.dbutton.connect('pressed', self.p1dirdiff)
-            hbox.pack_end(self.dbutton)
+            hbox.pack_end(self.dbutton, False, False)
 
         self.update_diff_buttons(preferred)
 
