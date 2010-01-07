@@ -19,7 +19,7 @@ from tortoisehg.hgtk import gtklib, gdialog, cslist
 class StripDialog(gdialog.GDialog):
     """ Dialog to strip changesets """
 
-    def __init__(self, rev=None, *pats):
+    def __init__(self, rev=None, graphview=None, *pats):
         gdialog.GDialog.__init__(self, resizable=True)
 
         if len(pats) > 0:
@@ -27,6 +27,7 @@ class StripDialog(gdialog.GDialog):
         elif rev is None:
             rev = 'tip'
         self.initrev = str(rev)
+        self.graphview = graphview
 
     ### Start of Overriding Section ###
 
@@ -75,6 +76,7 @@ class StripDialog(gdialog.GDialog):
 
         ## changeset list
         self.cslist = cslist.ChangesetList()
+        self.cslist.set_activatable_enable(True)
         table.add_row(None, self.cslist, padding=False,
                       yopt=gtk.FILL|gtk.EXPAND)
 
@@ -91,6 +93,7 @@ class StripDialog(gdialog.GDialog):
         reventry.connect('activate', lambda b: self.response(gtk.RESPONSE_OK))
         self.revcombo.connect('changed', lambda c: self.preview(queue=True))
         self.cslist.connect('list-updated', self.preview_updated)
+        self.cslist.connect('item-activated', self.item_activated)
 
         # prepare to show
         self.preview()
@@ -176,6 +179,10 @@ class StripDialog(gdialog.GDialog):
             info = _('%s will be stripped') % inner
         self.resultlbl.set_markup(info)
         self.buttons['strip'].set_sensitive(bool(total))
+
+    def item_activated(self, cslist, rev, *args):
+        if self.graphview:
+            self.graphview.set_revision_id(int(rev))
 
     def get_rev(self):
         """ Return integer revision number or None """

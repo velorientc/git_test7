@@ -1867,7 +1867,7 @@ class GLog(gdialog.GWindow):
             self.reload_log()
             self.changeview.clear()
         rev = self.currevid
-        dialog = thgstrip.StripDialog(rev)
+        dialog = thgstrip.StripDialog(rev, self.graphview)
         dialog.set_notify_func(strip_completed)
         self.show_dialog(dialog)
 
