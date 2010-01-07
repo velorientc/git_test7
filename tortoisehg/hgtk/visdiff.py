@@ -28,6 +28,8 @@ try:
 except ImportError:
     openflags = 0
 
+# Match parent2 first, so 'parent1?' will match both parent1 and parent
+_regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|ancestor|alabel)'
 
 def snapshot(repo, files, ctx, tmproot):
     '''snapshot files as of some revision'''
@@ -226,9 +228,7 @@ def visualdiff(ui, repo, pats, opts):
             labela += '[ancestor]'
             label2 += '[merged]'
 
-        # Function to quote file/dir names in the argument string.
-        # When not operating in 3-way mode, an empty string is
-        # returned for parent2
+        # Function to quote file/dir names in the argument string
         replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b,
                        plabel1=label1a, plabel2=label1b,
                        ancestor=dira, alabel=labela,
@@ -237,11 +237,7 @@ def visualdiff(ui, repo, pats, opts):
             key = match.group()[1:]
             return util.shellquote(replace[key])
 
-        # Match parent2 first, so 'parent1?' will match both parent1 and parent
-        regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|ancestor|alabel)'
-        if not do3way and not re.search(regex, args):
-            args += ' $parent1 $child'
-        args = re.sub(regex, quote, args)
+        args = re.sub(_regex, quote, args)
         cmdline = util.shellquote(diffcmd) + ' ' + args
         cmdline = util.quotecommand(cmdline)
 
@@ -300,8 +296,16 @@ class FileSelectionDialog(gtk.Dialog):
             title += _(' filtered')
         self.set_title(title)
 
-        self.set_default_size(400, 450)
+        self.set_default_size(400, 250)
         self.set_has_separator(False)
+
+        if ctx1b:
+            ctxa = ctx1a.ancestor(ctx1b)
+        else:
+            ctxa = ctx1a
+        self.ctxs = (ctx1a, ctx1b, ctxa, ctx2)
+        self.copies = cpy
+        self.ui = repo.ui
 
         lbl = gtk.Label(_('Temporary files are removed when this dialog'
             ' is closed'))
@@ -322,30 +326,6 @@ class FileSelectionDialog(gtk.Dialog):
         treeview.set_property('enable-grid-lines', True)
         treeview.set_enable_search(False)
 
-        tools = hglib.difftools(repo.ui)
-        preferred = besttool(repo.ui, tools)
-        self.diffpath, self.diffopts, self.mergeopts = tools[preferred]
-
-        if len(tools) > 1:
-            lbl = gtk.Label(_('Select diff tool'))
-            combo = gtk.combo_box_new_text()
-            for i, name in enumerate(tools.iterkeys()):
-                combo.append_text(name)
-                if name == preferred:
-                    defrow = i
-            combo.set_active(defrow)
-            combo.connect('changed', self.toolselect, tools)
-            hbox = gtk.HBox()
-            self.vbox.pack_start(hbox, False, False, 2)
-            hbox.pack_start(lbl, False, False, 2)
-            hbox.pack_start(combo, False, False, 2)
-
-            patterns = repo.ui.configitems('diff-patterns')
-            patterns = [(p, t) for p,t in patterns if t in tools]
-            filesel = treeview.get_selection()
-            filesel.connect('changed', self.fileselect, repo, combo, tools,
-                            patterns, preferred)
-
         cell = gtk.CellRendererText()
         stcol = gtk.TreeViewColumn('Status', cell)
         stcol.set_resizable(True)
@@ -358,16 +338,52 @@ class FileSelectionDialog(gtk.Dialog):
         fcol.add_attribute(cell, 'text', 1)
         treeview.append_column(fcol)
 
-        if ctx1b:
-            ctxa = ctx1a.ancestor(ctx1b)
-        else:
-            ctxa = ctx1a
-
-        self.ctxs = (ctx1a, ctx1b, ctxa, ctx2)
-        self.copies = cpy
-
         model = gtk.ListStore(str, str)
         treeview.set_model(model)
+
+        tools = hglib.difftools(repo.ui)
+        preferred = besttool(repo.ui, tools)
+        self.diffpath, self.diffopts, self.mergeopts = tools[preferred]
+
+        hbox = gtk.HBox()
+        self.vbox.pack_start(hbox, False, False, 2)
+
+        if ctx2.rev() is None:
+            pass
+            # Do not offer directory diffs when the working directory
+            # is being referenced directly
+        elif ctx1b:
+            self.p1button = gtk.Button(_('Dir diff to p1'))
+            self.p1button.connect('pressed', self.p1dirdiff)
+            self.p2button = gtk.Button(_('Dir diff to p2'))
+            self.p2button.connect('pressed', self.p2dirdiff)
+            self.p3button = gtk.Button(_('3-way dir diff'))
+            self.p3button.connect('pressed', self.threewaydirdiff)
+            hbox.pack_end(self.p3button)
+            hbox.pack_end(self.p2button)
+            hbox.pack_end(self.p1button)
+        else:
+            self.dbutton = gtk.Button(_('Directory diff'))
+            self.dbutton.connect('pressed', self.p1dirdiff)
+            hbox.pack_end(self.dbutton)
+
+        self.update_diff_buttons(preferred)
+
+        if len(tools) > 1:
+            combo = gtk.combo_box_new_text()
+            for i, name in enumerate(tools.iterkeys()):
+                combo.append_text(name)
+                if name == preferred:
+                    defrow = i
+            combo.set_active(defrow)
+            combo.connect('changed', self.toolselect, tools)
+            hbox.pack_start(combo, False, False, 2)
+
+            patterns = repo.ui.configitems('diff-patterns')
+            patterns = [(p, t) for p,t in patterns if t in tools]
+            filesel = treeview.get_selection()
+            filesel.connect('changed', self.fileselect, repo, combo, tools,
+                            patterns, preferred)
 
         gobject.idle_add(self.fillmodel, repo, model, sa, sb)
 
@@ -440,6 +456,18 @@ class FileSelectionDialog(gtk.Dialog):
         sel = combo.get_active_text()
         if sel in tools:
             self.diffpath, self.diffopts, self.mergeopts = tools[sel]
+            self.update_diff_buttons(sel)
+
+    def update_diff_buttons(self, tool):
+        if hasattr(self, 'p1button'):
+            d2 = self.ui.configbool('merge-tools', tool + '.dirdiff')
+            d3 = self.ui.configbool('merge-tools', tool + '.dir3diff')
+            self.p1button.set_sensitive(d2)
+            self.p2button.set_sensitive(d2)
+            self.p3button.set_sensitive(d3)
+        elif hasattr(self, 'dbutton'):
+            d2 = self.ui.configbool('merge-tools', tool + '.dirdiff')
+            self.dbutton.set_sensitive(d2)
 
     def fileselect(self, selection, repo, combo, tools, patterns, preferred):
         'user selected a file, pick an appropriate tool from combo'
@@ -524,9 +552,7 @@ class FileSelectionDialog(gtk.Dialog):
         args = ctx1b and self.mergeopts or self.diffopts
         args = ' '.join(args)
 
-        # Function to quote file/dir names in the argument string When
-        # not operating in 3-way mode, an empty string is returned for
-        # parent2
+        # Function to quote file/dir names in the argument string
         replace = dict(parent=file1a, parent1=file1a, plabel1=label1a,
                        parent2=file1b, plabel2=label1b,
                        ancestor=filea, alabel=labela,
@@ -535,11 +561,7 @@ class FileSelectionDialog(gtk.Dialog):
             key = match.group()[1:]
             return util.shellquote(replace[key])
 
-        # Match parent2 first, so 'parent1?' will match both parent1 and parent
-        regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|ancestor|alabel)'
-        if not re.search(regex, args):
-            args += ' $parent1 $child'
-        args = re.sub(regex, quote, args)
+        args = re.sub(_regex, quote, args)
         cmdline = util.shellquote(self.diffpath) + ' ' + args
         cmdline = util.quotecommand(cmdline)
         try:
@@ -551,6 +573,86 @@ class FileSelectionDialog(gtk.Dialog):
         except (OSError, EnvironmentError), e:
             gdialog.Prompt(_('Tool launch failure'),
                     _('%s : %s') % (self.diffpath, str(e)), None).run()
+
+    def p1dirdiff(self, button):
+        dir1a, dir1b, dira, dir2 = self.dirs
+        rev1a, rev1b, reva, rev2 = self.revs
+
+        # Function to quote file/dir names in the argument string
+        replace = dict(parent=dir1a, parent1=dir1a, plabel1=rev1a,
+                       parent2='', plabel2='', ancestor='', alabel='',
+                       clabel=rev2, child=dir2)
+        def quote(match):
+            key = match.group()[1:]
+            return util.shellquote(replace[key])
+
+        args = ' '.join(self.diffopts)
+        args = re.sub(_regex, quote, args)
+        cmdline = util.shellquote(self.diffpath) + ' ' + args
+        cmdline = util.quotecommand(cmdline)
+        try:
+            subprocess.Popen(cmdline, shell=True,
+                       creationflags=openflags,
+                       stderr=subprocess.PIPE,
+                       stdout=subprocess.PIPE,
+                       stdin=subprocess.PIPE)
+        except (OSError, EnvironmentError), e:
+            gdialog.Prompt(_('Tool launch failure'),
+                    _('%s : %s') % (self.diffpath, str(e)), None).run()
+
+    def p2dirdiff(self, button):
+        dir1a, dir1b, dira, dir2 = self.dirs
+        rev1a, rev1b, reva, rev2 = self.revs
+
+        # Function to quote file/dir names in the argument string
+        replace = dict(parent=dir1b, parent1=dir1b, plabel1=rev1b,
+                       parent2='', plabel2='', ancestor='', alabel='',
+                       clabel=rev2, child=dir2)
+        def quote(match):
+            key = match.group()[1:]
+            return util.shellquote(replace[key])
+
+        args = ' '.join(self.diffopts)
+        args = re.sub(_regex, quote, args)
+        cmdline = util.shellquote(self.diffpath) + ' ' + args
+        cmdline = util.quotecommand(cmdline)
+        try:
+            subprocess.Popen(cmdline, shell=True,
+                       creationflags=openflags,
+                       stderr=subprocess.PIPE,
+                       stdout=subprocess.PIPE,
+                       stdin=subprocess.PIPE)
+        except (OSError, EnvironmentError), e:
+            gdialog.Prompt(_('Tool launch failure'),
+                    _('%s : %s') % (self.diffpath, str(e)), None).run()
+
+    def threewaydirdiff(self, button):
+        dir1a, dir1b, dira, dir2 = self.dirs
+        rev1a, rev1b, reva, rev2 = self.revs
+
+        # Function to quote file/dir names in the argument string
+        replace = dict(parent=dir1a, parent1=dir1a, plabel1=rev1a,
+                       parent2=dir1b, plabel2=rev1b,
+                       ancestor=dira, alabel=reva,
+                       clabel=dir2, child=rev2)
+        def quote(match):
+            key = match.group()[1:]
+            return util.shellquote(replace[key])
+
+        args = ' '.join(self.mergeopts)
+        args = re.sub(_regex, quote, args)
+        cmdline = util.shellquote(self.diffpath) + ' ' + args
+        cmdline = util.quotecommand(cmdline)
+        try:
+            subprocess.Popen(cmdline, shell=True,
+                       creationflags=openflags,
+                       stderr=subprocess.PIPE,
+                       stdout=subprocess.PIPE,
+                       stdin=subprocess.PIPE)
+        except (OSError, EnvironmentError), e:
+            gdialog.Prompt(_('Tool launch failure'),
+                    _('%s : %s') % (self.diffpath, str(e)), None).run()
+
 
 def run(ui, *pats, **opts):
     try:
