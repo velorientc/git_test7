@@ -34,7 +34,11 @@ class ChangesetList(gtk.Frame):
         'files-dropped': (gobject.SIGNAL_RUN_FIRST,
                           gobject.TYPE_NONE,
                           (object, # list of dropped files
-                           str))   # raw string data
+                           str)),  # raw string data
+        'item-activated': (gobject.SIGNAL_RUN_FIRST,
+                           gobject.TYPE_NONE,
+                           (str,     # revision number or patch file path
+                            object)) # reference of csinfo widget
     }
 
     def __init__(self):
@@ -52,6 +56,7 @@ class ChangesetList(gtk.Frame):
         self.timeout_queue = []
         self.sel_enable = False
         self.dnd_enable = False
+        self.act_enable = False
 
         # dnd variables
         self.itemmap = {}
@@ -155,10 +160,10 @@ class ChangesetList(gtk.Frame):
             raise csinfo.UnknownItem(item)
         self.custom = csinfo.custom(data=data_func, label=label_func,
                                     markup=markup_func)
-        self.lstyle = csinfo.labelstyle(selectable=True,
+        self.lstyle = csinfo.labelstyle(
                              contents=('%(item_l)s:', ' %(branch)s',
                                        ' %(tags)s', ' %(summary)s'))
-        self.pstyle = csinfo.panelstyle(selectable=True,
+        self.pstyle = csinfo.panelstyle(
                              contents=('item',) + csinfo.PANEL_DEFAULT[1:])
 
         # prepare to show
@@ -328,6 +333,20 @@ class ChangesetList(gtk.Frame):
                 Default: False.
         """
         self.sel_enable = enable
+
+    def get_activatable_enable(self):
+        """ Return whether items are activatable """
+        return self.act_enable
+
+    def set_activatable_enable(self, enable):
+        """
+        Set whether items are activatable.
+        By enabling this, items in the list will be emitted 'item-activated'
+        signal when the user double-clicked on the list.
+
+        enable: Boolean, if True, items will be selectable.  Default: False.
+        """
+        self.act_enable = enable
 
     def get_compact_view(self):
         """ Return whether the compact view is enabled """
@@ -763,37 +782,44 @@ class ChangesetList(gtk.Frame):
             sel.set(sel.target, 8, str(self.curitems[pos]))
 
     def button_press(self, widget, event):
-        items = self.curitems
-        if not self.dnd_enable or not items or len(items) <= 1:
+        if not self.curitems:
             return
-        if event.type == gtk.gdk.BUTTON_PRESS and event.button == 1:
-            # gather geometry data for dnd
-            items = self.showitems + (self.has_limit() and ['snip'] or [])
-            for item in items:
-                data = self.itemmap[item]
-                alloc = data['widget'].allocation
-                data.update(y=alloc.y, height=alloc.height)
-                data['bottom'] = alloc.y + alloc.height
-            # get pressed csinfo widget based on pointer position
-            pos = self.get_item_pos(event.y)
-            if pos is not None:
-                # prepare for auto-scrolling while DnD
-                W = 20
-                alloc = self.scroll.child.allocation
-                self.areas = {}
-                def add(name, arg):
-                    region = gtk.gdk.region_rectangle(arg)
-                    self.areas[name] = (region, gtk.gdk.Rectangle(*arg))
-                add('top', (0, 0, alloc.width, W))
-                add('right', (alloc.width - W, 0, W, alloc.height))
-                add('bottom', (0, alloc.height - W, alloc.width, W))
-                add('left', (0, 0, W, alloc.height))
-                add('center', (W, W, alloc.width - 2 * W,
-                               alloc.height - 2 * W))
-                # start dnd
-                self.item_drag = pos
-                self.csevent.drag_begin(self.dnd_targets,
-                                        gtk.gdk.ACTION_MOVE, 1, event)
+        # gather geometry data
+        items = self.showitems
+        if self.has_limit():
+            items.append('snip')
+        for item in items:
+            data = self.itemmap[item]
+            alloc = data['widget'].allocation
+            data.update(y=alloc.y, height=alloc.height)
+            data['bottom'] = alloc.y + alloc.height
+        # get pressed csinfo widget based on pointer position
+        pos = self.get_item_pos(event.y)
+        if pos is None:
+            return
+        # emit activated signal
+        if self.act_enable and event.type == gtk.gdk._2BUTTON_PRESS:
+            item = self.curitems[pos]
+            self.emit('item-activated', item, self.itemmap[item]['widget'])
+        # dnd setup
+        if self.dnd_enable and event.type == gtk.gdk.BUTTON_PRESS \
+                           and 1 < len(self.curitems):
+            # prepare for dnd auto-scrolling
+            W = 20
+            alloc = self.scroll.child.allocation
+            self.areas = {}
+            def add(name, arg):
+                region = gtk.gdk.region_rectangle(arg)
+                self.areas[name] = (region, gtk.gdk.Rectangle(*arg))
+            add('top', (0, 0, alloc.width, W))
+            add('right', (alloc.width - W, 0, W, alloc.height))
+            add('bottom', (0, alloc.height - W, alloc.width, W))
+            add('left', (0, 0, W, alloc.height))
+            add('center', (W, W, alloc.width - 2 * W, alloc.height - 2 * W))
+            # start dnd
+            self.item_drag = pos
+            self.csevent.drag_begin(self.dnd_targets,
+                                    gtk.gdk.ACTION_MOVE, 1, event)
 
     def scroll_timeout(self):
         x, y = self.scroll.get_pointer()
