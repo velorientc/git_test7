@@ -1076,6 +1076,7 @@ class ConfigDialog(gtk.Dialog):
                 from mercurial import config
                 self.fn = rcpath[0]
                 cfg = config.config()
+                self.readonly = True
                 return cfg
         self.fn = fn
         try:
@@ -1089,6 +1090,15 @@ class ConfigDialog(gtk.Dialog):
             from mercurial import config
             cfg = config.config()
             cfg.read(fn)
+            self.readonly = True
+            return cfg
+        except Exception, e:
+            gdialog.Prompt(_('Unable to parse a config file'),
+                    _('%s\nReverting to read-only mode.') % str(e), self).run()
+            from mercurial import config
+            cfg = config.config()
+            cfg.read(fn)
+            self.readonly = True
             return cfg
 
     def record_new_value(self, cpath, newvalue, keephistory=True):
