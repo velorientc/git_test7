@@ -326,6 +326,14 @@ class FileSelectionDialog(gtk.Dialog):
         treeview.set_property('enable-grid-lines', True)
         treeview.set_enable_search(False)
 
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        mod = gtklib.get_thg_modifier()
+        key, modifier = gtk.accelerator_parse(mod+'d')
+        treeview.add_accelerator('thg-diff', accelgroup, key,
+                        modifier, gtk.ACCEL_VISIBLE)
+        treeview.connect('thg-diff', self.rowactivated)
+
         cell = gtk.CellRendererText()
         stcol = gtk.TreeViewColumn('Status', cell)
         stcol.set_resizable(True)
@@ -505,7 +513,7 @@ class FileSelectionDialog(gtk.Dialog):
                     return False
         return False
 
-    def rowactivated(self, tree, path, column):
+    def rowactivated(self, tree, *args):
         selection = tree.get_selection()
         if selection.count_selected_rows() != 1:
             return False
