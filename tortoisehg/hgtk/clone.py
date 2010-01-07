@@ -10,6 +10,8 @@ import os
 import gtk
 import pango
 
+from mercurial import extensions
+
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, settings
 from tortoisehg.hgtk import gdialog, gtklib
@@ -125,6 +127,15 @@ class CloneDialog(gdialog.GDialog):
         self.optrev = gtk.CheckButton(_('Clone to revision:'))
         self.optrev.connect('toggled', self.checkbutton_toggled, self.reventry)
         table.add_row(self.optrev, self.reventry)
+
+        self.exs = [name for name, module in extensions.extensions()]
+        if 'perfarce' in self.exs:
+            self.startreventry = gtk.Entry()
+            self.startreventry.set_sensitive(False)
+            self.optstartrev = gtk.CheckButton(_('Starting P4 Changelist:'))
+            self.optstartrev.connect('toggled',
+                    self.checkbutton_toggled, self.startreventry)
+            table.add_row(self.optstartrev, self.startreventry)
 
         ## options
         self.optupdate = gtk.CheckButton(_('Do not update the new working directory'))
@@ -255,7 +266,16 @@ class CloneDialog(gdialog.GDialog):
         src = self.srcentry.get_text().strip()
         dest = self.destentry.get_text() or os.path.basename(src)
         remotecmd = self.remotecmdentry.get_text()
-        rev = self.reventry.get_text()
+        if self.reventry.get_property('sensitive'):
+            rev = self.reventry.get_text()
+        else:
+            rev = None
+
+        if hasattr(self, 'startreventry') and \
+                   self.startreventry.get_property('sensitive'):
+            startrev = self.startreventry.get_text()
+        else:
+            startrev = None
 
         # verify input
         if src == '':
@@ -300,6 +320,9 @@ class CloneDialog(gdialog.GDialog):
         if rev:
             cmdline.append('--rev')
             cmdline.append(rev)
+        if src.startswith('p4://') and startrev:
+            cmdline.append('--startrev')
+            cmdline.append(startrev)
 
         cmdline.append('--verbose')
         cmdline.append(hglib.fromutf(src))
