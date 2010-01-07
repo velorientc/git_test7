@@ -358,9 +358,23 @@ class FileSelectionDialog(gtk.Dialog):
         fcol.add_attribute(cell, 'text', 1)
         treeview.append_column(fcol)
 
+        if ctx1b:
+            ctxa = ctx1a.ancestor(ctx1b)
+        else:
+            ctxa = ctx1a
+
+        self.ctxs = (ctx1a, ctx1b, ctxa, ctx2)
+        self.copies = cpy
+
+        model = gtk.ListStore(str, str)
+        treeview.set_model(model)
+
+        gobject.idle_add(self.fillmodel, repo, model, sa, sb)
+
+    def fillmodel(self, repo, model, sa, sb):
+        ctx1a, ctx1b, ctxa, ctx2 = self.ctxs
         mod_a, add_a, rem_a = sa
         mod_b, add_b, rem_b = sb
-        self.copies = cpy
         sources = set(self.copies.values())
 
         MA = mod_a | add_a | mod_b | add_b
@@ -377,8 +391,6 @@ class FileSelectionDialog(gtk.Dialog):
             files = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
             rev1b = '@%d' % ctx1b.rev()
-
-            ctxa = ctx1a.ancestor(ctx1b)
             if ctxa == ctx1a:
                 dira = dir1a
             elif ctxa == ctx1b:
@@ -388,7 +400,6 @@ class FileSelectionDialog(gtk.Dialog):
                 dira = snapshot(repo, MAR, ctxa, tmproot)[0]
             reva = '@%d' % ctxa.rev()
         else:
-            ctxa = ctx1a
             dir1b, dira = None, None
             rev1b, reva = '', ''
 
@@ -402,7 +413,6 @@ class FileSelectionDialog(gtk.Dialog):
 
         self.dirs = (dir1a, dir1b, dira, dir2)
         self.revs = (rev1a, rev1b, reva, rev2)
-        self.ctxs = (ctx1a, ctx1b, ctxa, ctx2)
 
         def get_status(file, mod, add, rem):
             if file in mod:
@@ -413,11 +423,9 @@ class FileSelectionDialog(gtk.Dialog):
                 return 'R'
             return ' '
 
-        model = gtk.ListStore(str, str)
         for f in mod_a | add_a | rem_a:
             model.append([get_status(f, mod_a, add_a, rem_a), hglib.toutf(f)])
 
-        treeview.set_model(model)
         self.connect('response', self.response)
 
     def search_filelist(self, model, column, key, iter):
