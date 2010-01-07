@@ -234,12 +234,13 @@ def difftools(ui):
 
     def fixup_extdiff(diffopts):
         if '$child' not in diffopts:
-            diffopts += ' $parent1 $child'
+            diffopts.append('$parent1')
+            diffopts.append('$child')
         if '$parent2' in diffopts:
-            mergeopts = diffopts
-            diffopts = diffopts.replace('$parent2', '')
+            mergeopts = diffopts[:]
+            diffopts.remove('$parent2')
         else:
-            mergeopts = None
+            mergeopts = []
         return diffopts, mergeopts
 
     tools = {}
@@ -249,6 +250,7 @@ def difftools(ui):
             if not path:
                 path = cmd
             diffopts = ui.config('extdiff', 'opts.' + cmd, '')
+            diffopts = shlex.split(diffopts)
             diffopts, mergeopts = fixup_extdiff(diffopts)
             tools[cmd] = [path, diffopts, mergeopts]
         elif cmd.startswith('opts.'):
@@ -260,7 +262,7 @@ def difftools(ui):
                 path = diffopts.pop(0)
             else:
                 path, diffopts = cmd, []
-            diffopts, mergeopts = fixup_extdiff(' '.join(diffopts))
+            diffopts, mergeopts = fixup_extdiff(diffopts)
             tools[cmd] = [path, diffopts, mergeopts]
     mt = []
     mergetools(ui, mt)
