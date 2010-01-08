@@ -196,7 +196,8 @@ class EmailDialog(gtk.Window):
 
         self.descview = gtk.TextView(buffer=None)
         self.descview.set_editable(True)
-        self.descview.modify_font(pango.FontDescription('Monospace'))
+        fontcomment = hglib.getfontconfig()['fontcomment']
+        self.descview.modify_font(pango.FontDescription(fontcomment))
         self.descbuffer = self.descview.get_buffer()
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
