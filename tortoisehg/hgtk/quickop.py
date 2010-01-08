@@ -82,7 +82,7 @@ class QuickOpDialog(gdialog.GDialog):
         self.filetree.set_reorderable(False)
         if hasattr(self.filetree, 'set_rubber_banding'):
             self.filetree.set_rubber_banding(True)
-        fontlist = self.repo.ui.config('gtools', 'fontlist', 'MS UI Gothic 9')
+        fontlist = hglib.getfontconfig()['fontlist']
         self.filetree.modify_font(pango.FontDescription(fontlist))
 
         def select_toggle(cell, path):
