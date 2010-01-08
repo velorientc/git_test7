@@ -1084,7 +1084,7 @@ class ConfigDialog(gtk.Dialog):
             # Monkypatch this regex to prevent iniparse from considering
             # 'rem' as a comment
             iniparse.ini.CommentLine.regex = \
-                       re.compile(r'^(?P<csep>[;#])(?P<comment>.*)$')
+                       re.compile(r'^(?P<csep>[%;#])(?P<comment>.*)$')
             return iniparse.INIConfig(file(fn), optionxformvalue=None)
         except ImportError:
             from mercurial import config
